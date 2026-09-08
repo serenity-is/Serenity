@@ -25,12 +25,12 @@ public class HtmlReportRenderUrl : IDisposable
     /// <summary>
     /// The generated URL for footer content
     /// </summary>
-    public string FooterUrl { get; set; }
+    public string? FooterUrl { get; set; }
 
     /// <summary>
     /// The generated URL for header content
     /// </summary>
-    public string HeaderUrl { get; set; }
+    public string? HeaderUrl { get; set; }
 
     /// <summary>
     /// List of cookies to forward

@@ -47,8 +47,8 @@ public class UndeleteRequestHandler<TRow, TUndeleteRequest, TUndeleteResponse> :
         if (Row is IDisplayOrderRow displayOrderRow)
         {
             var filter = GetDisplayOrderFilter();
-            DisplayOrderHelper.ReorderValues(Connection, displayOrderRow, filter,
-                Row.IdField.AsObject(Row), displayOrderRow.DisplayOrderField[Row].Value, false);
+            DisplayOrderHelper.ReorderValues(Connection!, displayOrderRow, filter,
+                Row.IdField!.AsObject(Row), displayOrderRow.DisplayOrderField[Row]!.Value, false);
         }
 
         foreach (var behavior in behaviors.Value)
@@ -82,7 +82,7 @@ public class UndeleteRequestHandler<TRow, TUndeleteRequest, TUndeleteResponse> :
     protected virtual void LoadEntity()
     {
         var idField = Row.IdField;
-        var id = idField.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture);
+        var id = idField!.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture);
 
         var query = new SqlQuery()
             .Dialect(Connection.GetDialect())
@@ -123,7 +123,7 @@ public class UndeleteRequestHandler<TRow, TUndeleteRequest, TUndeleteResponse> :
     protected virtual void ExecuteUndelete()
     {
         var idField = Row.IdField;
-        var id = idField.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture);
+        var id = idField!.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture);
 
         var isActiveDeletedRow = Row as IIsActiveDeletedRow;
         var isDeletedRow = Row as IIsDeletedRow;
@@ -187,7 +187,7 @@ public class UndeleteRequestHandler<TRow, TUndeleteRequest, TUndeleteResponse> :
     public TUndeleteResponse Process(IUnitOfWork unitOfWork, TUndeleteRequest request)
     {
         StateBag.Clear();
-        UnitOfWork = unitOfWork ?? throw new ArgumentNullException("unitOfWork");
+        UnitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         Request = request;
         Response = new TUndeleteResponse();
 

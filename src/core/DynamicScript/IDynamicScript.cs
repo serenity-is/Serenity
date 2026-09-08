@@ -1,4 +1,4 @@
-﻿namespace Serenity.Web;
+namespace Serenity.Web;
 
 /// <summary>
 /// Dynamic script abstraction
@@ -21,7 +21,7 @@ public interface IDynamicScript
     /// <summary>
     /// Group key for cached items
     /// </summary>
-    string GroupKey { get; }
+    string? GroupKey { get; }
 
     /// <summary>
     /// Cache expiration timespan

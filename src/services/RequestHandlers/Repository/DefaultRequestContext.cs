@@ -26,6 +26,6 @@ public class DefaultRequestContext(IBehaviorProvider behaviors, ITwoLevelCache c
     /// <inheritdoc/>
     public IPermissionService Permissions { get; private set; } = permissions ?? throw new ArgumentNullException(nameof(permissions));
     /// <inheritdoc/>
-    public ClaimsPrincipal User => userAccessor.User;
+    public ClaimsPrincipal? User => userAccessor.User;
 }
 

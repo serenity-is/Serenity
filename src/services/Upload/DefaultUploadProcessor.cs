@@ -15,8 +15,8 @@ namespace Serenity.Web;
 /// <param name="avScanner">Optional antivirus scanner</param>
 /// <exception cref="ArgumentNullException"><paramref name="imageProcessor"/>, <paramref name="uploadStorage"/> or <paramref name="uploadValidator"/> is <c>null</c>.</exception>
 public class DefaultUploadProcessor(IImageProcessor imageProcessor, IUploadStorage uploadStorage, IUploadValidator uploadValidator,
-    ILogger<DefaultUploadProcessor> logger = null,
-    IUploadAVScanner avScanner = null) : IUploadProcessor
+    ILogger<DefaultUploadProcessor>? logger = null,
+    IUploadAVScanner? avScanner = null) : IUploadProcessor
 {
     /// <summary>
     /// Gets the image processor.
@@ -36,12 +36,12 @@ public class DefaultUploadProcessor(IImageProcessor imageProcessor, IUploadStora
     /// <summary>
     /// Gets the logger.
     /// </summary>
-    protected readonly ILogger<DefaultUploadProcessor> logger = logger;
+    protected readonly ILogger<DefaultUploadProcessor>? logger = logger;
 
     /// <summary>
     /// Gets the AV scanner.
     /// </summary>
-    protected readonly IUploadAVScanner avScanner = avScanner;
+    protected readonly IUploadAVScanner? avScanner = avScanner;
 
     /// <inheritdoc/>
     public virtual ProcessedUploadInfo Process(System.IO.Stream stream, string filename, IUploadOptions options)

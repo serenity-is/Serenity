@@ -28,7 +28,7 @@ public static class RowExtensions
         where TRow : IRow
     {
         if (row == null)
-            throw new ArgumentNullException("row");
+            throw new ArgumentNullException(nameof(row));
 
         foreach (var field in row.Fields)
         {
@@ -49,7 +49,7 @@ public static class RowExtensions
     /// <param name="row">The row.</param>
     /// <param name="name">The name.</param>
     /// <returns>The field with the specified name.</returns>
-    public static Field FindField(this IRow row, string name)
+    public static Field? FindField(this IRow row, string name)
     {
         return row.Fields.FindField(name);
     }
@@ -60,7 +60,7 @@ public static class RowExtensions
     /// <param name="row">The row.</param>
     /// <param name="name">The name.</param>
     /// <returns>The field with the specified property name.</returns>
-    public static Field FindFieldByPropertyName(this IRow row, string name)
+    public static Field? FindFieldByPropertyName(this IRow row, string name)
     {
         return row.Fields.FindFieldByPropertyName(name);
     }

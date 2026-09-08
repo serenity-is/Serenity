@@ -1,4 +1,4 @@
-﻿namespace Serenity.Abstractions;
+namespace Serenity.Abstractions;
 
 /// <summary>
 /// Checks whether the current user has a given permission.

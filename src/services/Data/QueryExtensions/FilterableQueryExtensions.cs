@@ -1,4 +1,4 @@
-﻿
+
 namespace Serenity.Data;
 
 /// <summary>
@@ -21,7 +21,7 @@ public static class FilterableQueryExtensions
     /// <returns>
     ///   Query itself.
     /// </returns>
-    public static T Where<T>(this T self, ICriteria filter) where T : IFilterableQuery
+    public static T Where<T>(this T self, ICriteria? filter) where T : IFilterableQuery
     {
         if (filter is object && !filter.IsEmpty)
         {
@@ -46,7 +46,7 @@ public static class FilterableQueryExtensions
     /// <returns>
     ///   The new filter parameter.
     /// </returns>
-    public static T WhereEqual<T>(this T self, IField field, object value) where T : IFilterableQuery
+    public static T WhereEqual<T>(this T self, IField field, object? value) where T : IFilterableQuery
     {
         self.Where(new Criteria(field) == self.AddParam(value));
         return self;

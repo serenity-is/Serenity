@@ -19,10 +19,10 @@ public abstract class GenericValueField<TValue> : Field, IEnumTypeField where TV
     /// <summary>
     /// The enum type.
     /// </summary>
-    protected internal Type _enumType;
+    protected internal Type? _enumType;
 
-    internal GenericValueField(ICollection<Field> collection, FieldType type, string name, LocalText caption, int size, FieldFlags flags,
-        Func<IRow, TValue?> getValue = null, Action<IRow, TValue?> setValue = null)
+    internal GenericValueField(ICollection<Field> collection, FieldType type, string name, LocalText? caption, int size, FieldFlags flags,
+        Func<IRow, TValue?>? getValue = null, Action<IRow, TValue?>? setValue = null)
         : base(collection, type, name, caption, size, flags)
     {
         _getValue = getValue ?? (r => (TValue?)(r.GetIndexedData(index)));
@@ -35,7 +35,7 @@ public abstract class GenericValueField<TValue> : Field, IEnumTypeField where TV
     /// <param name="source">The source.</param>
     /// <param name="provider">The provider.</param>
     /// <returns>The converted value.</returns>
-    public override object ConvertValue(object source, IFormatProvider provider)
+    public override object? ConvertValue(object? source, IFormatProvider provider)
     {
         if (source is Newtonsoft.Json.Linq.JValue jValue)
             source = jValue.Value;
@@ -103,7 +103,7 @@ public abstract class GenericValueField<TValue> : Field, IEnumTypeField where TV
     /// <param name="row">The row.</param>
     /// <param name="value">The value.</param>
     /// <exception cref="InvalidCastException">Invalid cast exception while trying to set the value of {Name} field on {row.GetType().Name} as object.</exception>
-    public override void AsObject(IRow row, object value)
+    public override void AsObject(IRow row, object? value)
     {
         if (value == null)
             _setValue(row, null);

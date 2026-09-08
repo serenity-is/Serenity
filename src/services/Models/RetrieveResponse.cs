@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 
 namespace Serenity.Services;
 
@@ -11,18 +11,18 @@ public class RetrieveResponse<T> : ServiceResponse, IRetrieveResponse
     /// <summary>
     /// The returned entity
     /// </summary>
-    public T Entity { get; set; }
+    public T? Entity { get; set; }
 
     /// <summary>
     /// Dictionary containing localizations if requested.
     /// </summary>
-    public Dictionary<string, T> Localizations { get; set; }
+    public Dictionary<string, T>? Localizations { get; set; }
 
-    object IRetrieveResponse.Entity => Entity;
+    object? IRetrieveResponse.Entity => Entity;
 
-    IDictionary IRetrieveResponse.Localizations
+    IDictionary? IRetrieveResponse.Localizations
     {
         get { return Localizations; }
-        set { Localizations = (Dictionary<string, T>)value; }
+        set { Localizations = (Dictionary<string, T>?)value; }
     }
 }

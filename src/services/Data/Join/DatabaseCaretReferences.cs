@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Serenity.Data;
 
 /// <summary>
@@ -10,7 +12,8 @@ public class DatabaseCaretReferences
     /// </summary>
     /// <param name="expression">The expression.</param>
     /// <returns>Replaced expression.</returns>
-    public static string Replace(string expression)
+    [return:NotNullIfNotNull(nameof(expression))]
+    public static string? Replace(string? expression)
     {
         if (expression == null || expression.IndexOf('^') < 0)
             return expression;
@@ -21,12 +24,12 @@ public class DatabaseCaretReferences
             if (idx < 0)
                 return contents;
 
-            string connectionKey = null;
+            string? connectionKey = null;
 
             if (idx != 0)
                 connectionKey = contents[..idx];
 
-            string databaseName;
+            string? databaseName;
 
             if (!string.IsNullOrEmpty(connectionKey))
             {
@@ -45,5 +48,5 @@ public class DatabaseCaretReferences
     /// <summary>
     /// Temporary workaround as this class has no reference to SQL connection strings
     /// </summary>
-    public static Func<string, string> GetDatabaseName { get; set; }
+    public static Func<string, string>? GetDatabaseName { get; set; }
 }

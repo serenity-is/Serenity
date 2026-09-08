@@ -73,7 +73,11 @@ public class PropertyItem
     /// </value>
     [Newtonsoft.Json.JsonProperty("editorParams")]
     [JsonPropertyName("editorParams")]
-    public Dictionary<string, object>? EditorParams { get; set; }
+    public Dictionary<string, object?> EditorParams
+    {
+        get;
+        set => field = value ?? [];
+    } = [];
 
     /// <summary>
     /// Gets or sets the editor addons that should be attached
@@ -388,7 +392,11 @@ public class PropertyItem
     /// </value>
     [Newtonsoft.Json.JsonProperty("formatterParams")]
     [JsonPropertyName("formatterParams")]
-    public Dictionary<string, object>? FormatterParams { get; set; }
+    public Dictionary<string, object?> FormatterParams
+    {
+        get;
+        set => field = value ?? [];
+    } = [];
 
     /// <summary>
     /// Gets or sets the display format to be passed to the formatter
@@ -618,7 +626,11 @@ public class PropertyItem
     /// </value>
     [Newtonsoft.Json.JsonProperty("filteringParams")]
     [JsonPropertyName("filteringParams")]
-    public Dictionary<string, object>? FilteringParams { get; set; }
+    public Dictionary<string, object?> FilteringParams
+    {
+        get;
+        set => field = value ?? [];
+    } = [];
 
     /// <summary>
     /// Gets or sets the filtering identifier field.
@@ -674,7 +686,11 @@ public class PropertyItem
     /// </value>
     [Newtonsoft.Json.JsonProperty("quickFilterParams")]
     [JsonPropertyName("quickFilterParams")]
-    public Dictionary<string, object>? QuickFilterParams { get; set; }
+    public Dictionary<string, object?> QuickFilterParams
+    {
+        get;
+        set => field = value ?? [];
+    } = [];
 
     /// <summary>
     /// Gets or sets the quick filter separator flag.
@@ -705,7 +721,11 @@ public class PropertyItem
     /// </value>
     [JsonExtensionData]
     [Newtonsoft.Json.JsonExtensionData]
-    public Dictionary<string, object>? ExtensionData { get; set; }
+    public Dictionary<string, object?> ExtensionData
+    {
+        get;
+        set => field = value ?? [];
+    } = [];
 
     /// <summary>
     /// Should the EditorType property be serialized by JSON.NET, used to reduce JSON size.
@@ -753,17 +773,5 @@ public class PropertyItem
     public bool ShouldSerializeQuickFilterParams()
     {
         return QuickFilterParams != null && QuickFilterParams.Count > 0;
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="PropertyItem"/> class.
-    /// </summary>
-    public PropertyItem()
-    {
-        EditorParams = [];
-        FormatterParams = [];
-        FilteringParams = [];
-        QuickFilterParams = [];
-        ExtensionData = [];
     }
 }

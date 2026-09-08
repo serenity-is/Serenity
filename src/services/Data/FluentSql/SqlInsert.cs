@@ -7,8 +7,8 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
 {
     private readonly string tableName;
     private readonly List<FieldExpressionPair> fieldExpressions = [];
-    private string identityColumn;
-    private string cachedQuery;
+    private string? identityColumn;
+    private string? cachedQuery;
 
     /// <summary>
     ///   Creates a new SqlInsert query.</summary>
@@ -26,7 +26,7 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
     /// Gets the identity column.
     /// </summary>
     /// <returns>The identity column name, or <c>null</c> if none is set.</returns>
-    public string IdentityColumn()
+    public string? IdentityColumn()
     {
         return identityColumn;
     }
@@ -152,7 +152,7 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
     /// <exception cref="ArgumentNullException">dialect is null.</exception>
     public SqlInsert Dialect(ISqlDialect dialect)
     {
-        this.dialect = dialect ?? throw new ArgumentNullException("dialect");
+        this.dialect = dialect ?? throw new ArgumentNullException(nameof(dialect));
         dialectOverridden = true;
 
         return this;
@@ -184,7 +184,7 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
     /// <exception cref="ArgumentNullException">tableName or fieldExpressions is null.</exception>
     /// <exception cref="ArgumentOutOfRangeException">fieldExpressions has an odd number of elements.</exception>
     [Obsolete("Use overload with IEnumerable<FieldExpressionPair>")]
-    public static string Format(string tableName, List<string> fieldExpressions, ISqlDialect dialect = null)
+    public static string Format(string tableName, List<string> fieldExpressions, ISqlDialect? dialect = null)
     {
         ArgumentNullException.ThrowIfNull(fieldExpressions);
 
@@ -207,7 +207,7 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
     /// <returns>
     ///   Formatted query.</returns>
     /// <exception cref="ArgumentNullException">tableName or fieldExpressions is null.</exception>
-    public static string Format(string tableName, IEnumerable<FieldExpressionPair> fieldExpressions, ISqlDialect dialect = null)
+    public static string Format(string tableName, IEnumerable<FieldExpressionPair> fieldExpressions, ISqlDialect? dialect = null)
     {
         if (tableName == null || tableName.Length == 0)
             throw new ArgumentNullException(tableName);
@@ -253,7 +253,7 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
     /// <returns>
     ///   Formatted UPSERT query.</returns>
     public static string FormatUpsert(string tableName, IEnumerable<FieldExpressionPair> fieldExpressions,
-        IEnumerable<string> keyFields, ISqlDialect dialect = null)
+        IEnumerable<string> keyFields, ISqlDialect? dialect = null)
     {
         if (tableName == null || tableName.Length == 0)
             throw new ArgumentNullException(nameof(tableName));

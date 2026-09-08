@@ -14,7 +14,7 @@ public static class ServiceQueryHelper
     /// or available in the row)</param>
     /// <param name="descending">Descending flag</param>
     /// <exception cref="ArgumentNullException">query is null</exception>
-    public static SqlQuery ApplySort(this SqlQuery query, string sort, bool descending)
+    public static SqlQuery ApplySort(this SqlQuery query, string? sort, bool descending)
     {
         ArgumentNullException.ThrowIfNull(query);
 
@@ -24,7 +24,7 @@ public static class ServiceQueryHelper
 
         if (sort != null)
         {
-            string expr = ((IGetExpressionByName)query).GetExpression(sort);
+            string? expr = ((IGetExpressionByName)query).GetExpression(sort);
 
             if (expr == null)
             {
@@ -54,7 +54,7 @@ public static class ServiceQueryHelper
     /// <param name="sortBy">Sort order</param>
     public static SqlQuery ApplySort(this SqlQuery query, SortBy sortBy)
     {
-        if (sortBy != null)
+        if (sortBy?.Field != null)
             return ApplySort(query, sortBy.Field, sortBy.Descending);
 
         return query;
@@ -75,7 +75,7 @@ public static class ServiceQueryHelper
             for (var i = sortByList.Count - 1; i >= 0; i--)
             {
                 var sortBy = sortByList[i];
-                if (sortBy != null)
+                if (sortBy?.Field != null)
                 {
                     ApplySort(query, sortBy.Field, sortBy.Descending);
                 }
@@ -108,7 +108,7 @@ public static class ServiceQueryHelper
     /// <param name="query">Query</param>
     /// <param name="containsText">Contains text</param>
     /// <param name="filter">Filter callback</param>
-    public static SqlQuery ApplyContainsText(this SqlQuery query, string containsText,
+    public static SqlQuery ApplyContainsText(this SqlQuery query, string? containsText,
         Action<string, long?> filter)
     {
         containsText = containsText.TrimToNull();
@@ -130,7 +130,7 @@ public static class ServiceQueryHelper
     /// </summary>
     /// <param name="containsText">Contains text</param>
     /// <param name="textFields">The list of fields to search contains text in</param>
-    public static BaseCriteria GetContainsTextFilter(string containsText, Criteria[] textFields)
+    public static BaseCriteria? GetContainsTextFilter(string? containsText, Criteria[] textFields)
     {
         containsText = containsText.TrimToNull();
         if (containsText != null && textFields.Length > 0)
@@ -138,7 +138,7 @@ public static class ServiceQueryHelper
             var flt = Criteria.Empty;
             foreach (var field in textFields)
                 flt |= field.Contains(containsText);
-            flt = ~(flt);
+            flt = ~(flt!);
 
             return flt;
         }
@@ -150,7 +150,7 @@ public static class ServiceQueryHelper
     /// rows that support soft delete.
     /// </summary>
     /// <param name="row">Row instance</param>
-    public static BaseCriteria GetNotDeletedCriteria(IRow row)
+    public static BaseCriteria? GetNotDeletedCriteria(IRow row)
     {
         if (row is IIsActiveDeletedRow isActiveDeletedRow)
         {

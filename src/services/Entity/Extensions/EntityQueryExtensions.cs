@@ -46,7 +46,7 @@ public static class EntityQueryExtensions
     /// <returns>
     ///   The object itself.
     /// </returns>
-    public static T Set<T>(this T self, IRow row, IField exclude = null) where T : ISetFieldByStatement
+    public static T Set<T>(this T self, IRow row, IField? exclude = null) where T : ISetFieldByStatement
     {
         ArgumentNullException.ThrowIfNull(row);
 
@@ -192,7 +192,7 @@ public static class EntityQueryExtensions
     /// <returns>
     ///   The object itself.
     /// </returns>
-    public static T Set<T>(this T self, IField field, object value) where T : ISetFieldByStatement
+    public static T Set<T>(this T self, IField field, object? value) where T : ISetFieldByStatement
     {
         var param = self.AddParam(value);
         self.SetTo(field.Name, param.Name);

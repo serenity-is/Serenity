@@ -29,9 +29,9 @@ public class DeltaLister<TItem>
         Func<TItem, long?> getItemId, DeltaOptions options = DeltaOptions.Default)
     {
         _options = options;
-        _oldItems = oldList ?? throw new ArgumentNullException("oldList");
-        _newItems = newList ?? throw new ArgumentNullException("newList");
-        _getItemId = getItemId ?? throw new ArgumentNullException("getItemId");
+        _oldItems = oldList ?? throw new ArgumentNullException(nameof(oldList));
+        _newItems = newList ?? throw new ArgumentNullException(nameof(newList));
+        _getItemId = getItemId ?? throw new ArgumentNullException(nameof(getItemId));
 
         _oldById = [];
         _newById = [];

@@ -34,7 +34,7 @@ internal class AsyncToSyncRetrieveRequestProcessorWrapper<TRow>(IRetrieveRequest
     IRow IRetrieveRequestHandler.Row => handler.Row;
     RetrieveRequest IRetrieveRequestHandler.Request => handler.Request;
     IRetrieveResponse IRetrieveRequestHandler.Response => handler.Response;
-    IDictionary<string, object> IRetrieveRequestHandler.StateBag => handler.StateBag;
+    IDictionary<string, object?> IRetrieveRequestHandler.StateBag => handler.StateBag;
     IDbConnection IRetrieveRequestHandler.Connection => handler.Connection;
     bool IRetrieveRequestHandler.AllowSelectField(Field field) => handler.AllowSelectField(field);
     bool IRetrieveRequestHandler.ShouldSelectField(Field field) => handler.ShouldSelectField(field);

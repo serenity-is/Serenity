@@ -113,7 +113,7 @@ public class JsonRowConverter : JsonConverter
             switch (reader.TokenType)
             {
                 case Newtonsoft.Json.JsonToken.PropertyName:
-                    string fieldName = (string)reader.Value;
+                    string fieldName = (string)reader.Value!;
 
                     if (!reader.Read())
                         throw new JsonSerializationException("Unexpected end when deserializing object.");

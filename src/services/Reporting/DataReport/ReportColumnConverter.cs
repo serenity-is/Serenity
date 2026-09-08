@@ -61,7 +61,7 @@ public static class ReportColumnConverter
     /// <param name="field">The field object</param>
     /// <param name="localizer">Text localizer</param>
     /// <param name="baseField">Base field object</param>
-    public static ReportColumn FromFieldInfo(FieldInfo field, ITextLocalizer localizer, Field baseField = null)
+    public static ReportColumn FromFieldInfo(FieldInfo field, ITextLocalizer localizer, Field? baseField = null)
     {
         return FromMember(field, field.FieldType, baseField, localizer);
     }
@@ -72,7 +72,7 @@ public static class ReportColumnConverter
     /// <param name="property">The property object</param>
     /// <param name="localizer">Text localizer</param>
     /// <param name="baseField">Base field object</param>
-    public static ReportColumn FromPropertyInfo(PropertyInfo property, ITextLocalizer localizer, Field baseField = null)
+    public static ReportColumn FromPropertyInfo(PropertyInfo property, ITextLocalizer localizer, Field? baseField = null)
     {
         return FromMember(property, property.PropertyType, baseField, localizer);
     }

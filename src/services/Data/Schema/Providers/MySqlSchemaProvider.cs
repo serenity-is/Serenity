@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data.Schema;
+namespace Serenity.Data.Schema;
 
 /// <summary>
 /// MySql metadata provider.
@@ -12,7 +12,7 @@ public class MySqlSchemaProvider : ISchemaProvider
     /// <value>
     /// The default schema.
     /// </value>
-    public string DefaultSchema => null;
+    public string? DefaultSchema => null;
 
     private class FieldInfoSource
     {

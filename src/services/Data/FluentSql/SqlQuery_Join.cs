@@ -48,7 +48,7 @@ public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressio
         string expression = sb.ToString();
 
         if (!string.IsNullOrEmpty(join.Name) &&
-            aliasExpressions != null && aliasExpressions.TryGetValue(join.Name, out string existingExpression))
+            aliasExpressions != null && aliasExpressions.TryGetValue(join.Name, out string? existingExpression))
         {
             if (expression == existingExpression)
                 return this;
@@ -66,8 +66,8 @@ public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressio
         {
             AliasExpressions[join.Name] = expression;
 
-            if (join as IHaveJoins != null)
-                AliasWithJoins[join.Name] = join as IHaveJoins;
+            if (join is IHaveJoins haveJoins)
+                AliasWithJoins[join.Name] = haveJoins;
         }
 
         return this;
@@ -120,8 +120,8 @@ public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressio
 
         Join(join);
 
-        if (alias as IHaveJoins != null)
-            AliasWithJoins[alias.Name] = alias as IHaveJoins;
+        if (alias is IHaveJoins haveJoins)
+            AliasWithJoins[alias.Name] = haveJoins;
 
         return this;
     }
@@ -177,8 +177,8 @@ public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressio
 
         Join(join);
 
-        if (alias as IHaveJoins != null)
-            AliasWithJoins[alias.Name] = alias as IHaveJoins;
+        if (alias is IHaveJoins haveJoins)
+            AliasWithJoins[alias.Name] = haveJoins;
 
         return this;
     }
@@ -220,7 +220,7 @@ public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressio
         {
             if (haveJoin.Value is IAlias alias && haveJoin.Key == alias.Name)
             {
-                if (haveJoin.Value.Joins.TryGetValue(joinAlias, out Join join))
+                if (haveJoin.Value.Joins.TryGetValue(joinAlias, out Join? join))
                 {
                     EnsureJoin(join);
                     break;
@@ -273,7 +273,7 @@ public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressio
                 if (string.Compare(alias, joinAlias, StringComparison.OrdinalIgnoreCase) == 0)
                     continue;
 
-                if (join.Joins.TryGetValue(alias, out Join other))
+                if (join.Joins.TryGetValue(alias, out Join? other))
                     EnsureJoin(other);
             }
 

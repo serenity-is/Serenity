@@ -15,8 +15,8 @@ namespace Serenity.Data;
 /// <param name="flags">The flags.</param>
 /// <param name="getValue">The get value.</param>
 /// <param name="setValue">The set value.</param>
-public sealed class DoubleField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
-    Func<IRow, double?> getValue = null, Action<IRow, double?> setValue = null) : GenericValueField<double>(collection, FieldType.Double, name, caption, size, flags, getValue, setValue)
+public sealed class DoubleField(ICollection<Field> collection, string name, LocalText? caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
+    Func<IRow, double?>? getValue = null, Action<IRow, double?>? setValue = null) : GenericValueField<double>(collection, FieldType.Double, name, caption, size, flags, getValue, setValue)
 {
 
     /// <summary>
@@ -30,7 +30,7 @@ public sealed class DoubleField(ICollection<Field> collection, string name, Loca
     /// <param name="getValue">The get value.</param>
     /// <param name="setValue">The set value.</param>
     /// <returns>A new DoubleField instance.</returns>
-    public static DoubleField Factory(ICollection<Field> collection, string name, LocalText caption, int size, FieldFlags flags,
+    public static DoubleField Factory(ICollection<Field> collection, string name, LocalText? caption, int size, FieldFlags flags,
         Func<IRow, double?> getValue, Action<IRow, double?> setValue)
     {
         return new DoubleField(collection, name, caption, size, flags, getValue, setValue);
@@ -92,7 +92,7 @@ public sealed class DoubleField(ICollection<Field> collection, string name, Loca
                 _setValue(row, Convert.ToDouble(reader.Value, CultureInfo.InvariantCulture));
                 break;
             case Newtonsoft.Json.JsonToken.String:
-                var s = ((string)reader.Value).TrimToNull();
+                var s = ((string?)reader.Value).TrimToNull();
                 if (s == null)
                     _setValue(row, null);
                 else

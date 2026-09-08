@@ -28,7 +28,7 @@ public class DiskUploadStorage : IUploadStorage
     /// <param name="options">Upload options</param>
     /// <param name="fileSystem">File system to use</param>
     /// <exception cref="ArgumentNullException"><paramref name="options"/> is <c>null</c>.</exception>
-    public DiskUploadStorage(DiskUploadStorageOptions options, IDiskUploadFileSystem fileSystem = null)
+    public DiskUploadStorage(DiskUploadStorageOptions options, IDiskUploadFileSystem? fileSystem = null)
     {
         this.fileSystem = fileSystem ?? new PhysicalDiskUploadFileSystem();
         var opt = options ?? throw new ArgumentNullException(nameof(options));

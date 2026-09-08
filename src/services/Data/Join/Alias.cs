@@ -56,7 +56,7 @@ public class Alias : IAlias
 
     private readonly string alias;
     private readonly string aliasDot;
-    private readonly string table;
+    private readonly string? table;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Alias"/> class.
@@ -75,9 +75,7 @@ public class Alias : IAlias
     /// <exception cref="ArgumentNullException">alias is null or empty.</exception>
     public Alias(string alias)
     {
-        if (string.IsNullOrEmpty(alias))
-            throw new ArgumentNullException("alias");
-
+        ArgumentException.ThrowIfNullOrEmpty(alias);
         this.alias = alias;
         aliasDot = alias + ".";
     }
@@ -126,7 +124,7 @@ public class Alias : IAlias
     /// <value>
     /// The table.
     /// </value>
-    public string Table => table;
+    public string? Table => table;
 
     /// <summary>
     /// Gets the prefixed expression with the specified field name.

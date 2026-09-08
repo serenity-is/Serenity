@@ -202,7 +202,7 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
     /// <exception cref="ArgumentNullException">dialect is null.</exception>
     public SqlUpdate Dialect(ISqlDialect dialect)
     {
-        this.dialect = dialect ?? throw new ArgumentNullException("dialect");
+        this.dialect = dialect ?? throw new ArgumentNullException(nameof(dialect));
         dialectOverridden = true;
 
         return this;
@@ -273,7 +273,7 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
     /// <exception cref="ArgumentOutOfRangeException">fieldExpressions has an odd number of elements.</exception>
     [Obsolete("Use overload with IEnumerable<FieldExpressionPair>")]
     public static string Format(string tableName, string where,
-        List<string> fieldExpressions, ISqlDialect dialect = null)
+        List<string> fieldExpressions, ISqlDialect? dialect = null)
     {
         ArgumentNullException.ThrowIfNull(fieldExpressions);
 
@@ -295,7 +295,7 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
     /// <returns>Formatted UPDATE query.</returns>
     /// <exception cref="ArgumentNullException">tableName or fieldExpressions is null.</exception>
     public static string Format(string tableName, string where,
-        IEnumerable<FieldExpressionPair> fieldExpressions, ISqlDialect dialect = null)
+        IEnumerable<FieldExpressionPair> fieldExpressions, ISqlDialect? dialect = null)
     {
         if (tableName == null || tableName.Length == 0)
             throw new ArgumentNullException(tableName);

@@ -40,7 +40,7 @@ public interface IRow : IEntityWithJoins
     /// </summary>
     /// <param name="key">The key.</param>
     /// <returns>The value stored under the specified key, or <c>null</c> if not present.</returns>
-    object GetDictionaryData(object key);
+    object? GetDictionaryData(object key);
     /// <summary>
     /// Gets the dictionary data keys.
     /// </summary>
@@ -51,19 +51,19 @@ public interface IRow : IEntityWithJoins
     /// </summary>
     /// <param name="key">The key.</param>
     /// <param name="value">The value.</param>
-    void SetDictionaryData(object key, object value);
+    void SetDictionaryData(object key, object? value);
     /// <summary>
     /// Gets the indexed data.
     /// </summary>
     /// <param name="index">The index.</param>
     /// <returns>The value stored at the specified index, or <c>null</c> if not present.</returns>
-    object GetIndexedData(int index);
+    object? GetIndexedData(int index);
     /// <summary>
     /// Sets the indexed data.
     /// </summary>
     /// <param name="index">The index.</param>
     /// <param name="value">The value.</param>
-    void SetIndexedData(int index, object value);
+    void SetIndexedData(int index, object? value);
     /// <summary>
     /// Gets or sets a flag indicating whether to track assignments to field values.
     /// </summary>
@@ -118,19 +118,19 @@ public interface IRow : IEntityWithJoins
     /// <value>
     /// The identifier field.
     /// </value>
-    Field IdField { get; }
+    Field? IdField { get; }
     /// <summary>
     /// Gets the name field.
     /// </summary>
     /// <value>
     /// The name field.
     /// </value>
-    Field NameField { get; }
+    Field? NameField { get; }
     /// <summary>
     /// Gets or sets a field value with specified name
     /// </summary>
     /// <param name="fieldName">Name of the field.</param>
-    object this[string fieldName] { get; set; }
+    object? this[string fieldName] { get; set; }
 }
 
 /// <summary>

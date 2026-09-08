@@ -5,8 +5,8 @@ namespace Serenity.Reporting;
 /// </summary>
 public class ReportRegistry : IReportRegistry
 {
-    private Dictionary<string, Report> reportByKey;
-    private Dictionary<string, List<Report>> reportsByCategory;
+    private Dictionary<string, Report>? reportByKey;
+    private Dictionary<string, List<Report>>? reportsByCategory;
     private readonly IEnumerable<Type> types;
     private readonly IPermissionService permissions;
     private readonly ITextLocalizer localizer;
@@ -35,7 +35,7 @@ public class ReportRegistry : IReportRegistry
     {
         var attr = type.GetCustomAttribute<ReportAttribute>(inherit: false);
         if (attr == null || string.IsNullOrEmpty(attr.ReportKey))
-            return type.FullName;
+            return type.FullName!;
 
         return attr.ReportKey;
     }
@@ -87,11 +87,11 @@ public class ReportRegistry : IReportRegistry
             var report = new Report(type, localizer);
             var key = report.Key.TrimToNull() ?? type.FullName;
 
-            reportByKeyNew[key] = report;
+            reportByKeyNew[key!] = report;
 
-            var category = report.Category.Key;
+            var category = report.Category!.Key;
 
-            if (!reportsByCategoryNew.TryGetValue(category, out List<Report> reports))
+            if (!reportsByCategoryNew.TryGetValue(category, out List<Report>? reports))
             {
                 reports = [];
                 reportsByCategoryNew[category] = reports;
@@ -109,7 +109,7 @@ public class ReportRegistry : IReportRegistry
     {
         EnsureTypes();
 
-        if (!reportsByCategory.TryGetValue(categoryKey, out List<Report> reports))
+        if (!reportsByCategory!.TryGetValue(categoryKey, out List<Report>? reports))
             return false;
 
         foreach (var report in reports)
@@ -126,7 +126,7 @@ public class ReportRegistry : IReportRegistry
 
         var list = new List<Report>();
 
-        foreach (var k in reportsByCategory)
+        foreach (var k in reportsByCategory!)
             if (string.IsNullOrEmpty(categoryKey) ||
                 string.Compare(k.Key, categoryKey, StringComparison.OrdinalIgnoreCase) == 0 ||
                 (k.Key + "/").StartsWith((categoryKey ?? ""), StringComparison.OrdinalIgnoreCase))
@@ -150,14 +150,14 @@ public class ReportRegistry : IReportRegistry
     /// <param name="reportKey">Report key</param>
     /// <param name="validatePermission">Validate permission. Default true.</param>
     /// <exception cref="ArgumentNullException"><paramref name="reportKey"/> is <c>null</c> or empty.</exception>
-    public Report GetReport(string reportKey, bool validatePermission = true)
+    public Report? GetReport(string reportKey, bool validatePermission = true)
     {
         if (string.IsNullOrEmpty(reportKey))
             throw new ArgumentNullException(nameof(reportKey));
 
         EnsureTypes();
 
-        if (reportByKey.TryGetValue(reportKey, out Report report))
+        if (reportByKey!.TryGetValue(reportKey, out Report? report))
         {
             if (validatePermission && report.Permission != null)
                 permissions.ValidatePermission(report.Permission, localizer);
@@ -176,27 +176,27 @@ public class ReportRegistry : IReportRegistry
         /// <summary>
         /// Gets the type of the report.
         /// </summary>
-        public Type Type { get; private set; }
+        public Type? Type { get; private set; }
 
         /// <summary>
         /// Gets the report key.
         /// </summary>
-        public string Key { get; private set; }
+        public string? Key { get; private set; }
 
         /// <summary>
         /// Gets the report permission.
         /// </summary>
-        public string Permission { get; private set; }
+        public string? Permission { get; private set; }
 
         /// <summary>
         /// Gets the report title.
         /// </summary>
-        public string Title { get; private set; }
+        public string? Title { get; private set; }
 
         /// <summary>
         /// Gets the category.
         /// </summary>
-        public Category Category { get; private set; }
+        public Category? Category { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the class.
@@ -206,7 +206,7 @@ public class ReportRegistry : IReportRegistry
         /// <exception cref="ArgumentNullException"><paramref name="type"/> is <c>null</c>.</exception>
         public Report(Type type, ITextLocalizer localizer)
         {
-            Type = type ?? throw new ArgumentNullException("type");
+            Type = type ?? throw new ArgumentNullException(nameof(type));
 
             Key = GetReportKey(type);
 

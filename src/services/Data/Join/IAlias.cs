@@ -1,4 +1,4 @@
-﻿
+
 namespace Serenity.Data;
 
 /// <summary>
@@ -28,5 +28,5 @@ public interface IAlias
     /// <value>
     /// The table.
     /// </value>
-    string Table { get; }
+    string? Table { get; }
 }

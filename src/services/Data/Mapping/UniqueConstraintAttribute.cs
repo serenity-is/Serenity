@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data.Mapping;
+namespace Serenity.Data.Mapping;
 
 /// <summary>
 /// Adds a unique constraint check to the row.
@@ -15,7 +15,7 @@ public class UniqueConstraintAttribute : Attribute
     public UniqueConstraintAttribute(params string[] fields)
     {
         if (fields.IsEmptyOrNull())
-            throw new ArgumentNullException("fields");
+            throw new ArgumentNullException(nameof(fields));
 
         Fields = fields;
         CheckBeforeSave = true;
@@ -27,7 +27,7 @@ public class UniqueConstraintAttribute : Attribute
     /// <value>
     /// The name.
     /// </value>
-    public string Name { get; set; }
+    public string? Name { get; set; }
 
     /// <summary>
     /// Gets the fields.
@@ -59,5 +59,5 @@ public class UniqueConstraintAttribute : Attribute
     /// <value>
     /// The error message.
     /// </value>
-    public string ErrorMessage { get; set; }
+    public string? ErrorMessage { get; set; }
 }

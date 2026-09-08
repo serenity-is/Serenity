@@ -1,4 +1,4 @@
-﻿namespace Serenity.Web;
+namespace Serenity.Web;
 
 /// <summary>
 /// Base abstract implementation for <see cref="IDynamicScript"/>.
@@ -23,11 +23,11 @@ public abstract class DynamicScript : IDynamicScript
     }
 
     /// <inheritdoc/>
-    public string GroupKey { get; set; }
+    public string? GroupKey { get; set; }
     
     /// <inheritdoc/>
     public TimeSpan Expiration { get; set; }
     
     /// <inheritdoc/>
-    public string Permission { get; set; }
+    public string? Permission { get; set; }
 }

@@ -30,7 +30,7 @@ public static class UploadFormatting
         }
         else
         {
-            s = identity.ToString();
+            s = identity.ToString()!;
             if (long.TryParse(s, out long l))
                 groupKey = l / 1000;
             else if (s.Length == 0)

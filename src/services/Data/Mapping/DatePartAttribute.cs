@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data.Mapping;
+namespace Serenity.Data.Mapping;
 
 /// <summary>
 /// DatePart expression attribute
@@ -28,7 +28,7 @@ public class DatePartAttribute(DateParts part, object expression) : BaseExpressi
     /// <inheritdoc/>
     public override string Translate(ISqlDialect dialect)
     {
-        string datePart = Enum.GetName(typeof(DateParts), Part).ToUpperInvariant();
+        string datePart = Enum.GetName<DateParts>(Part)!.ToUpperInvariant();
         string expression = ToString(Expression, dialect);
         return dialect.ServerType switch
         {

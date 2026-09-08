@@ -37,12 +37,12 @@ public static class AuthorizationExtensions
     /// <exception cref="ArgumentNullException"><paramref name="permissions"/> is <c>null</c>.</exception>
     /// <exception cref="ValidationError">The current user does not have the required permission.</exception>
     public static void ValidatePermission(this IPermissionService permissions,
-        string permission, ITextLocalizer localizer)
+        string? permission, ITextLocalizer? localizer)
     {
         if (permissions == null)
             throw new ArgumentNullException(nameof(permissions));
 
-        if (!permissions.HasPermission(permission))
+        if (!permissions.HasPermission(permission!))
             throw new ValidationError("AccessDenied", null,
                 CoreTexts.Authorization.AccessDenied.ToString(localizer));
     }

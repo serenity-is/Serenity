@@ -12,17 +12,17 @@ namespace Serenity.Data;
 /// <param name="connectionStrings">The named connection strings.</param>
 /// <param name="profiler">The profiler, if any.</param>
 /// <param name="loggerFactory">The optional logger factory (to be used by static SqlHelper methods).</param>
-public class DefaultSqlConnections(IConnectionStrings connectionStrings, IConnectionProfiler profiler = null, ILoggerFactory loggerFactory = null)
+public class DefaultSqlConnections(IConnectionStrings connectionStrings, IConnectionProfiler? profiler = null, ILoggerFactory? loggerFactory = null)
     : ISqlConnections, IConnectionKeyFallbacks
 {
     /// <summary>The connection strings.</summary>
     protected readonly IConnectionStrings connectionStrings = connectionStrings ?? throw new ArgumentNullException(nameof(connectionStrings));
     /// <summary>The connection key fallbacks, if the connection string source supports them.</summary>
-    protected readonly IConnectionKeyFallbacks connectionKeyFallbacks = connectionStrings as IConnectionKeyFallbacks;
+    protected readonly IConnectionKeyFallbacks? connectionKeyFallbacks = connectionStrings as IConnectionKeyFallbacks;
     /// <summary>The profiler.</summary>
-    protected readonly IConnectionProfiler profiler = profiler;
+    protected readonly IConnectionProfiler? profiler = profiler;
     /// <summary>The logger factory.</summary>
-    protected readonly ILoggerFactory loggerFactory = loggerFactory;
+    protected readonly ILoggerFactory? loggerFactory = loggerFactory;
 
     /// <summary>
     /// Lists all known connection strings.
@@ -43,11 +43,10 @@ public class DefaultSqlConnections(IConnectionStrings connectionStrings, IConnec
     protected virtual IDbConnection CreateConnection(string connectionString, string providerName, ISqlDialect dialect)
     {
         ArgumentNullException.ThrowIfNull(providerName);
-
         ArgumentNullException.ThrowIfNull(connectionString);
 
         var factory = DbProviderFactories.GetFactory(providerName);
-        var connection = factory.CreateConnection();
+        var connection = factory.CreateConnection()!;
         try
         {
             connection.ConnectionString = connectionString;
@@ -55,7 +54,7 @@ public class DefaultSqlConnections(IConnectionStrings connectionStrings, IConnec
         catch
         {
             connection.Dispose();
-            return null;
+            throw;
         }
 
         return connection;
@@ -105,7 +104,7 @@ public class DefaultSqlConnections(IConnectionStrings connectionStrings, IConnec
     /// </summary>
     /// <param name="connectionKey">The connection key.</param>
     /// <returns>The connection string, or <c>null</c> if not found.</returns>
-    public virtual IConnectionString TryGetConnectionString(string connectionKey)
+    public virtual IConnectionString? TryGetConnectionString(string connectionKey)
     {
         return connectionStrings.TryGetConnectionString(connectionKey);
     }
@@ -118,7 +117,7 @@ public class DefaultSqlConnections(IConnectionStrings connectionStrings, IConnec
     }
 
     /// <inheritdoc/>
-    public string ResolveConnectionKey(string connectionKey)
+    public string? ResolveConnectionKey(string connectionKey)
     {
         ArgumentException.ThrowIfNullOrEmpty(connectionKey);
         return connectionKeyFallbacks?.ResolveConnectionKey(connectionKey) ??

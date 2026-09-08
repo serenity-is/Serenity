@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 /// <summary>
 /// SqlQuery interface.
@@ -28,27 +28,27 @@ public interface ISqlQuery : IQueryWithParams, IChainable
     /// <summary>
     /// Gets FOR JSON part if any.
     /// </summary>
-    string ForJson { get; }
+    string? ForJson { get; }
 
     /// <summary>
     /// Gets FOR XML part if any.
     /// </summary>
-    string ForXml { get; }
+    string? ForXml { get; }
 
     /// <summary>
     /// Gets access to FROM part if any.
     /// </summary>
-    string From { get; }
+    string? From { get; }
 
     /// <summary>
     /// Gets access to GROUP BY part if any.
     /// </summary>
-    string GroupBy { get; }
+    string? GroupBy { get; }
 
     /// <summary>
     /// Gets access to HAVING part if any.
     /// </summary>
-    string Having { get; }
+    string? Having { get; }
 
     /// <summary>
     /// Where to omit params while converting to string.
@@ -63,7 +63,7 @@ public interface ISqlQuery : IQueryWithParams, IChainable
     /// <summary>
     /// Gets access to parent query if any.
     /// </summary>
-    IQueryWithParams Parent { get; }
+    IQueryWithParams? Parent { get; }
 
     /// <summary>
     /// Gets skip number.
@@ -78,7 +78,7 @@ public interface ISqlQuery : IQueryWithParams, IChainable
     /// <summary>
     /// Gets access to internal union query if any.
     /// </summary>
-    ISqlQuery UnionQuery { get; }
+    ISqlQuery? UnionQuery { get; }
 
     /// <summary>
     /// Gets access to internal union type if any.
@@ -88,5 +88,5 @@ public interface ISqlQuery : IQueryWithParams, IChainable
     /// <summary>
     /// Gets access to WHERE part if any.
     /// </summary>
-    string Where { get; }
+    string? Where { get; }
 }

@@ -83,7 +83,7 @@ public class ValidationError : Exception, IIsSensitiveMessage
     /// <param name="arguments">The arguments.</param>
     /// <param name="errorMessageFormat">The error message format.</param>
     /// <param name="formatArgs">The format arguments.</param>
-    public ValidationError(string errorCode, string? arguments, string errorMessageFormat, params object[] formatArgs)
+    public ValidationError(string errorCode, string? arguments, string errorMessageFormat, params object?[] formatArgs)
         : base(string.Format(errorMessageFormat, formatArgs))
     {
         ErrorCode = errorCode;

@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+
 namespace Serenity.Services;
 
 /// <summary>
@@ -13,6 +15,8 @@ public abstract class UndeleteRequestHandlerBase<TRow, TUndeleteRequest, TUndele
     where TUndeleteRequest : UndeleteRequest
     where TUndeleteResponse : UndeleteResponse, new()
 {
+    private IUnitOfWork? unitOfWork;
+
     /// <summary>
     /// Initializes a new instance of the class.
     /// </summary>
@@ -21,7 +25,7 @@ public abstract class UndeleteRequestHandlerBase<TRow, TUndeleteRequest, TUndele
     protected UndeleteRequestHandlerBase(IRequestContext context)
     {
         Context = context ?? throw new ArgumentNullException(nameof(context));
-        StateBag = new Dictionary<string, object>();
+        StateBag = new Dictionary<string, object?>();
     }
 
     /// <summary>
@@ -66,11 +70,11 @@ public abstract class UndeleteRequestHandlerBase<TRow, TUndeleteRequest, TUndele
     protected virtual void ValidatePermissions()
     {
         var attr = typeof(TRow).GetCustomAttribute<DeletePermissionAttribute>(true) ??
-            (PermissionAttributeBase)typeof(TRow).GetCustomAttribute<ModifyPermissionAttribute>(true) ??
+            (PermissionAttributeBase?)typeof(TRow).GetCustomAttribute<ModifyPermissionAttribute>(true) ??
             typeof(TRow).GetCustomAttribute<ReadPermissionAttribute>(true);
 
         if (attr != null)
-            Permissions.ValidatePermission(attr.Permission ?? "?", Localizer);
+            Permissions!.ValidatePermission(attr.Permission ?? "?", Localizer);
     }
 
     /// <summary>
@@ -80,33 +84,38 @@ public abstract class UndeleteRequestHandlerBase<TRow, TUndeleteRequest, TUndele
     /// </summary>
     protected virtual void InvalidateCacheOnCommit()
     {
-        Cache.InvalidateOnCommit(UnitOfWork, Row);
+        Cache!.InvalidateOnCommit(UnitOfWork, Row);
     }
 
     /// <summary>
     /// Gets the two level cache from the request context.
     /// </summary>
-    public ITwoLevelCache Cache => Context.Cache;
+    public ITwoLevelCache Cache => Context?.Cache;
+
+    private InvalidOperationException PropertyReadError([CallerMemberName] string? property = default)
+    {
+        return new InvalidOperationException($"Error reading '{property}' of {GetType().Name}. The handler has not been initialized.");
+    }
 
     /// <summary>
     /// Gets the request context.
     /// </summary>
-    public IRequestContext Context { get; private set; }
+    public IRequestContext Context { get; }
 
     /// <summary>
     /// Gets the localizer from the request context.
     /// </summary>
-    public ITextLocalizer Localizer => Context.Localizer;
+    public ITextLocalizer Localizer => Context?.Localizer;
 
     /// <summary>
     /// Gets the permission service from the request context.
     /// </summary>
-    public IPermissionService Permissions => Context.Permissions;
+    public IPermissionService Permissions => Context?.Permissions;
 
     /// <summary>
     /// Gets the current user from the request context.
     /// </summary>
-    public ClaimsPrincipal User => Context.User;
+    public ClaimsPrincipal? User => Context?.User;
 
     /// <summary>
     /// Gets the current connection.
@@ -116,30 +125,30 @@ public abstract class UndeleteRequestHandlerBase<TRow, TUndeleteRequest, TUndele
     /// <summary>
     /// Gets the current unit of work.
     /// </summary>
-    public IUnitOfWork UnitOfWork { get; protected set; }
+    public IUnitOfWork UnitOfWork { get => unitOfWork ?? throw PropertyReadError(); protected set => unitOfWork = value; }
 
     /// <summary>
     /// Gets the entity being undeleted.
     /// </summary>
-    public TRow Row { get; protected set; }
+    public TRow Row { get => field ?? throw PropertyReadError(); protected set; }
 
     /// <summary>
     /// Gets the request object.
     /// </summary>
-    public TUndeleteRequest Request { get; protected set; }
+    public TUndeleteRequest Request { get => field ?? throw PropertyReadError(); protected set; }
 
     /// <summary>
     /// Gets the response object.
     /// </summary>
-    public TUndeleteResponse Response { get; protected set; }
+    public TUndeleteResponse Response { get => field ?? throw PropertyReadError(); protected set; }
 
     /// <summary>
     /// A state bag for behaviors to preserve state among their methods.
     /// It will be cleared before each request, e.g. Process call.
     /// </summary>
-    public IDictionary<string, object> StateBag { get; private set; }
+    public IDictionary<string, object?> StateBag { get; }
 
-    IRow IUndeleteRequestHandler.Row => Row;
+    IRow? IUndeleteRequestHandler.Row => Row;
     UndeleteRequest IUndeleteRequestHandler.Request => Request;
     UndeleteResponse IUndeleteRequestHandler.Response => Response;
 }

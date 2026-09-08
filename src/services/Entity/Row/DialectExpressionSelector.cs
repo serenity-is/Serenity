@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 /// <summary>
 /// Selects field expressions based on dialect
@@ -33,7 +33,7 @@ public class DialectExpressionSelector(ISqlDialect dialect)
     /// <param name="getDialect">The get dialect.</param>
     /// <returns>The best matching attribute, or <c>null</c> if none match.</returns>
     public TAttribute GetBestMatch<TAttribute>(IEnumerable<TAttribute> attributes, 
-        Func<TAttribute, string> getDialect)
+        Func<TAttribute, string?> getDialect)
         where TAttribute: class
     {
         var st = dialectServerType;

@@ -1,4 +1,6 @@
-﻿namespace Serenity.Data;
+using System.Diagnostics.CodeAnalysis;
+
+namespace Serenity.Data;
 
 /// <summary>
 /// Contains helper methods for locating / replacing brackets in an SQL expression.
@@ -12,7 +14,8 @@ public static class BracketLocator
     /// <param name="validChar1">An additional character allowed to be in brackets.</param>
     /// <param name="replace">The replace function.</param>
     /// <returns>The expression with bracket contents replaced.</returns>
-    public static string ReplaceBracketContents(string expression, char validChar1, Func<string, string> replace)
+    [return:NotNullIfNotNull(nameof(expression))]
+    public static string? ReplaceBracketContents(string? expression, char validChar1, Func<string, string> replace)
     {
         if (expression == null)
             return null;
@@ -73,7 +76,8 @@ public static class BracketLocator
     /// <param name="expression">The expression.</param>
     /// <param name="dialect">The dialect.</param>
     /// <returns>The expression with brackets replaced.</returns>
-    public static string ReplaceBrackets(string expression, ISqlDialect dialect)
+    [return:NotNullIfNotNull(nameof(expression))]
+    public static string? ReplaceBrackets(string? expression, ISqlDialect dialect)
     {
         if (expression == null)
             return null;

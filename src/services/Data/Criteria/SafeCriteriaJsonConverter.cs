@@ -8,7 +8,7 @@ namespace Serenity.JsonConverters;
 public class SafeCriteriaJsonConverter : CriteriaJsonConverter
 {
     /// <inheritdoc/>
-    public override BaseCriteria Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override BaseCriteria? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         var value = base.Read(ref reader, typeToConvert, options);
 

@@ -3,11 +3,11 @@ namespace Serenity.Data;
 public abstract partial class Row<TFields> : IEditableRow
 {
     internal int insidePostHandler;
-    internal Row<TFields> originalValues;
-    internal Row<TFields> previousValues;
-    internal PropertyChangedEventHandler propertyChanged;
-    internal Action<IRow> postHandler;
-    private Dictionary<string, string> validationErrors;
+    internal Row<TFields>? originalValues;
+    internal Row<TFields>? previousValues;
+    internal PropertyChangedEventHandler? propertyChanged;
+    internal Action<IRow>? postHandler;
+    private Dictionary<string, string>? validationErrors;
 
     internal void RaisePropertyChanged(Field field)
     {
@@ -23,13 +23,16 @@ public abstract partial class Row<TFields> : IEditableRow
             fields.propertyChangedEventArgs = args;
         }
 
+        if (propertyChanged is null)
+            return;
+
         if (field is null)
             propertyChanged(this, fields.propertyChangedEventArgs[fields.Count]);
         else
             propertyChanged(this, fields.propertyChangedEventArgs[field.Index]);
     }
 
-    Action<IRow> IEditableRow.PostHandler
+    Action<IRow>? IEditableRow.PostHandler
     {
         get { return postHandler; }
         set { postHandler = value; }
@@ -41,7 +44,7 @@ public abstract partial class Row<TFields> : IEditableRow
                 field.IndexCompare(originalValues, this) != 0);
     }
 
-    event PropertyChangedEventHandler INotifyPropertyChanged.PropertyChanged
+    event PropertyChangedEventHandler? INotifyPropertyChanged.PropertyChanged
     {
         add
         {
@@ -150,9 +153,9 @@ public abstract partial class Row<TFields> : IEditableRow
 
     bool IEditableRow.HasPostHandler => postHandler != null;
 
-    private EventHandler postEnded;
+    private EventHandler? postEnded;
 
-    event EventHandler IEditableRow.PostEnded 
+    event EventHandler? IEditableRow.PostEnded 
     { 
         add => postEnded += value; 
         remove => postEnded -= value;
@@ -178,7 +181,7 @@ public abstract partial class Row<TFields> : IEditableRow
         validationErrors?.Remove(propertyName ?? string.Empty);
     }
 
-    IDictionary<string, string> IEditableRow.ValidationErrors => validationErrors;
+    IDictionary<string, string>? IEditableRow.ValidationErrors => validationErrors;
 
     bool IEditableRow.HasErrors => validationErrors != null &&
             validationErrors.Count > 0;

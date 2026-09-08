@@ -11,24 +11,24 @@ namespace Serenity.Data;
 /// <seealso cref="ISqlQueryExtensible" />
 public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IGetExpressionByName, ISqlQueryExtensible
 {
-    private Dictionary<string, string> aliasExpressions;
-    private Dictionary<string, IHaveJoins> aliasWithJoins;
+    private Dictionary<string, string>? aliasExpressions;
+    private Dictionary<string, IHaveJoins>? aliasWithJoins;
     private List<Column> columns;
     private bool countRecords;
     private bool distinct;
     private bool omitParens;
     private StringBuilder from;
-    private StringBuilder having;
-    private StringBuilder groupBy;
-    private List<string> orderBy;
-    private string forXml;
-    private string forJson;
+    private StringBuilder? having;
+    private StringBuilder? groupBy;
+    private List<string>? orderBy;
+    private string? forXml;
+    private string? forJson;
     private int skip;
     private int take;
-    private StringBuilder where;
+    private StringBuilder? where;
     private int intoIndex = -1;
     private List<object> into = [];
-    private SqlQuery unionQuery;
+    private SqlQuery? unionQuery;
     private SqlUnionType unionType;
 
     /// <summary>
@@ -84,7 +84,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     public SqlQuery From(string table)
     {
         if (string.IsNullOrEmpty(table))
-            throw new ArgumentNullException("table");
+            throw new ArgumentNullException(nameof(table));
 
         if (from.Length > 0)
             from.Append(", ");
@@ -116,8 +116,8 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
 
         AliasExpressions.Add(alias.Name, table + " " + alias.Name);
 
-        if (alias as IHaveJoins != null)
-            AliasWithJoins[alias.Name] = alias as IHaveJoins;
+        if (alias is IHaveJoins haveJoins)
+            AliasWithJoins[alias.Name] = haveJoins;
 
         return this;
     }
@@ -151,7 +151,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
 
         ArgumentNullException.ThrowIfNull(alias);
 
-        return From(subQuery.ToString(), alias);
+        return From(subQuery.ToString()!, alias);
     }
 
     /// <summary>
@@ -160,11 +160,11 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     /// <param name="columnName">Column name.</param>
     /// <returns>Expression or null if not found.</returns>
     /// <remarks>This function uses a linear search in column list, so use with caution.</remarks>
-    string IGetExpressionByName.GetExpression(string columnName)
+    string? IGetExpressionByName.GetExpression(string columnName)
     {
         ArgumentNullException.ThrowIfNull(columnName);
 
-        Column fieldInfo = columns.Find(
+        Column? fieldInfo = columns.Find(
             column => (column.ColumnName != null && column.ColumnName == columnName) ||
                  (string.IsNullOrEmpty(column.ColumnName) && column.Expression == columnName));
 
@@ -182,7 +182,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     public SqlQuery GroupBy(string expression)
     {
         if (string.IsNullOrEmpty(expression))
-            throw new ArgumentNullException("expression");
+            throw new ArgumentNullException(nameof(expression));
 
         if (groupBy == null || groupBy.Length == 0)
             groupBy = new StringBuilder(expression);
@@ -219,7 +219,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     public SqlQuery Having(string expression)
     {
         if (string.IsNullOrEmpty(expression))
-            throw new ArgumentNullException("expression");
+            throw new ArgumentNullException(nameof(expression));
 
         if (having == null)
             having = new StringBuilder(expression);
@@ -286,7 +286,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     public SqlQuery OrderByFirst(string expression, bool desc = false)
     {
         if (string.IsNullOrEmpty(expression))
-            throw new ArgumentNullException("field");
+            throw new ArgumentNullException(nameof(expression));
 
         if (desc)
             expression += SqlKeywords.Desc;
@@ -304,11 +304,11 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
         orderBy.RemoveAll(x => string.Compare((x ?? "").Trim(), search, StringComparison.OrdinalIgnoreCase) == 0);
 
         if (orderBy.Count > 0)
-            orderBy.Insert(0, expression);
+            orderBy.Insert(0, expression!);
         else
-            orderBy.Add(expression);
+            orderBy.Add(expression!);
 
-        EnsureJoinsInExpression(expression);
+        EnsureJoinsInExpression(expression!);
 
         return this;
     }
@@ -323,7 +323,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     public SqlQuery Select(string expression)
     {
         if (string.IsNullOrEmpty(expression))
-            throw new ArgumentNullException("expression");
+            throw new ArgumentNullException(nameof(expression));
 
         columns.Add(new Column(expression, null, intoIndex, null));
 
@@ -344,7 +344,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
         ArgumentNullException.ThrowIfNull(alias);
 
         if (string.IsNullOrEmpty(fieldName))
-            throw new ArgumentNullException("fieldName");
+            throw new ArgumentNullException(nameof(fieldName));
 
         string expression = alias.NameDot + fieldName;
 
@@ -365,10 +365,10 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     public SqlQuery Select(string expression, string columnName)
     {
         if (string.IsNullOrEmpty(expression))
-            throw new ArgumentNullException("expression");
+            throw new ArgumentNullException(nameof(expression));
 
         if (string.IsNullOrEmpty(columnName))
-            throw new ArgumentNullException("columnName");
+            throw new ArgumentNullException(nameof(columnName));
 
         columns.Add(new Column(expression, columnName, intoIndex, null));
 
@@ -389,10 +389,10 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
         ArgumentNullException.ThrowIfNull(alias);
 
         if (string.IsNullOrEmpty(fieldName))
-            throw new ArgumentNullException("fieldName");
+            throw new ArgumentNullException(nameof(fieldName));
 
         if (string.IsNullOrEmpty(columnName))
-            throw new ArgumentNullException("columnName");
+            throw new ArgumentNullException(nameof(columnName));
 
         var expression = alias.NameDot + fieldName;
 
@@ -414,9 +414,9 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
         ArgumentNullException.ThrowIfNull(expression);
 
         if (string.IsNullOrEmpty(columnName))
-            throw new ArgumentNullException("columnName");
+            throw new ArgumentNullException(nameof(columnName));
 
-        Select(expression.ToString(), columnName);
+        Select(expression.ToString()!, columnName);
 
         return this;
     }
@@ -430,7 +430,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     {
         ArgumentNullException.ThrowIfNull(expression);
 
-        Select(expression.ToString());
+        Select(expression.ToString()!);
 
         return this;
     }
@@ -575,7 +575,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     /// <exception cref="ArgumentNullException">dialect is null.</exception>
     public SqlQuery Dialect(ISqlDialect dialect)
     {
-        this.dialect = dialect ?? throw new ArgumentNullException("dialect");
+        this.dialect = dialect ?? throw new ArgumentNullException(nameof(dialect));
         dialectOverridden = true;
 
         return this;
@@ -604,7 +604,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
         set { countRecords = value; }
     }
 
-    object ISqlQueryExtensible.FirstIntoRow => into.Count > 0 ? into[0] : null;
+    object? ISqlQueryExtensible.FirstIntoRow => into.Count > 0 ? into[0] : null;
 
     IList<Column> ISqlQueryExtensible.Columns => columns;
 
@@ -661,16 +661,16 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     /// <param name="columnName">Name of the column.</param>
     /// <param name="intoRow">The select into row index.</param>
     /// <param name="intoField">The select into field.</param>
-    public class Column(string expression, string columnName, int intoRow, object intoField)
+    public class Column(string expression, string? columnName, int intoRow, object? intoField)
     {
         /// <summary>Field or expression</summary>
         public readonly string Expression = expression;
         /// <summary>Column name</summary>
-        public readonly string ColumnName = columnName;
+        public readonly string? ColumnName = columnName;
         /// <summary>Used by entity system when more than one entity is used as a target</summary>
         public readonly int IntoRowIndex = intoRow;
         /// <summary>Used by entity system, to determine which field this column value will be read into</summary>
-        public readonly object IntoField = intoField;
+        public readonly object? IntoField = intoField;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Column"/> class.
@@ -679,7 +679,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
         /// <param name="expression">The expression.</param>
         /// <param name="columnName">Name of the column.</param>
         /// <param name="intoField">The select into field.</param>
-        public Column(SqlQuery query, string expression, string columnName, object intoField)
+        public Column(SqlQuery query, string expression, string? columnName, object? intoField)
             : this(expression, columnName, query.intoIndex, intoField)
         {
             query.columns.Add(this);

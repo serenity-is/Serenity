@@ -28,13 +28,14 @@ public class Criteria : BaseCriteria
     /// <summary>
     /// Gets a reference to the <see cref="IField"/> object passed to the constructor.
     /// </summary>
-    public static IField Field { get; private set; }
+    public static IField? Field { get; private set; }
 
     /// <summary>
     /// Creates an empty criteria.
     /// </summary>
     private Criteria()
     {
+        expression = "";
     }
 
     /// <summary>
@@ -61,7 +62,7 @@ public class Criteria : BaseCriteria
     public Criteria(IField field)
     {
         Field = field ?? throw new ArgumentNullException(nameof(field));
-        expression = field.Expression;
+        expression = field.Expression!;
     }
 
     /// <summary>
@@ -76,10 +77,10 @@ public class Criteria : BaseCriteria
     public Criteria(string alias, string field)
     {
         if (string.IsNullOrEmpty(field))
-            throw new ArgumentNullException("field");
+            throw new ArgumentNullException(nameof(field));
 
         if (string.IsNullOrEmpty(alias))
-            throw new ArgumentNullException("alias");
+            throw new ArgumentNullException(nameof(alias));
         expression = alias + "." + SqlSyntax.AutoBracketValid(field, dialect: null);
     }
 
@@ -94,10 +95,10 @@ public class Criteria : BaseCriteria
     public Criteria(int joinNumber, string field)
     {
         if (string.IsNullOrEmpty(field))
-            throw new ArgumentNullException("field");
+            throw new ArgumentNullException(nameof(field));
 
         if (joinNumber < 0)
-            throw new ArgumentOutOfRangeException("joinNumber");
+            throw new ArgumentOutOfRangeException(nameof(joinNumber));
 
         expression = joinNumber.TableAliasDot() + SqlSyntax.AutoBracketValid(field, dialect: null);
     }
@@ -167,7 +168,7 @@ public class Criteria : BaseCriteria
     /// </summary>
     /// <param name="query">The query.</param>
     public Criteria(ISqlQuery query)
-        : this(query.ToString())
+        : this(query.ToString()!)
     {
     }
 
@@ -181,7 +182,7 @@ public class Criteria : BaseCriteria
     public static Criteria Bracket(string fieldName)
     {
         if (string.IsNullOrEmpty(fieldName))
-            throw new ArgumentNullException("fieldName");
+            throw new ArgumentNullException(nameof(fieldName));
 
         return new Criteria("[" + fieldName + "]");
     }

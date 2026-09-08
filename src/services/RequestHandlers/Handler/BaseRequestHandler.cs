@@ -1,4 +1,4 @@
-﻿namespace Serenity.Services;
+namespace Serenity.Services;
 
 /// <summary>
 /// An abstract class that can be used as base for request handlers
@@ -35,5 +35,5 @@ public abstract class BaseRequestHandler(IRequestContext context) : IRequestHand
     /// <summary>
     /// Gets the user from the request context.
     /// </summary>
-    protected ClaimsPrincipal User => Context.User;
+    protected ClaimsPrincipal? User => Context.User;
 }

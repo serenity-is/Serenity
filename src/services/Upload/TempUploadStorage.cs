@@ -1,4 +1,4 @@
-﻿namespace Serenity.Web;
+namespace Serenity.Web;
 
 /// <summary>
 /// A subclass of <see cref="DiskUploadStorage"/> specialized for the temporary upload folder,
@@ -11,7 +11,7 @@ public class TempUploadStorage : DiskUploadStorage
     /// </summary>
     /// <param name="options">Upload storage options</param>
     /// <param name="fileSystem">File system</param>
-    public TempUploadStorage(DiskUploadStorageOptions options, IDiskUploadFileSystem fileSystem = null)
+    public TempUploadStorage(DiskUploadStorageOptions options, IDiskUploadFileSystem? fileSystem = null)
         : base(options, fileSystem)
     {
         if (!this.fileSystem.DirectoryExists(RootPath))
@@ -19,7 +19,7 @@ public class TempUploadStorage : DiskUploadStorage
             try
             {
                 this.fileSystem.CreateDirectory(RootPath);
-                this.fileSystem.WriteAllText(fileSystem.Combine(RootPath, ".temporary"), "");
+                this.fileSystem.WriteAllText(this.fileSystem.Combine(RootPath, ".temporary"), "");
             }
             catch
             {

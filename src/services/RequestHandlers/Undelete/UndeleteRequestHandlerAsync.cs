@@ -47,8 +47,8 @@ public class UndeleteRequestHandlerAsync<TRow, TUndeleteRequest, TUndeleteRespon
         if (Row is IDisplayOrderRow displayOrderRow)
         {
             var filter = GetDisplayOrderFilter();
-            await DisplayOrderHelper.ReorderValuesAsync(Connection, displayOrderRow, filter,
-                Row.IdField.AsObject(Row), displayOrderRow.DisplayOrderField[Row].Value,
+            await DisplayOrderHelper.ReorderValuesAsync(Connection!, displayOrderRow, filter,
+                Row.IdField!.AsObject(Row), displayOrderRow.DisplayOrderField[Row]!.Value,
                 hasUniqueConstraint: false, cancellationToken: cancellationToken).ConfigureAwait(false);
         }
 
@@ -84,7 +84,7 @@ public class UndeleteRequestHandlerAsync<TRow, TUndeleteRequest, TUndeleteRespon
     protected virtual async Task LoadEntityAsync(CancellationToken cancellationToken = default)
     {
         var idField = Row.IdField;
-        var id = idField.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture);
+        var id = idField!.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture);
 
         var query = new SqlQuery()
             .Dialect(Connection.GetDialect())
@@ -93,7 +93,7 @@ public class UndeleteRequestHandlerAsync<TRow, TUndeleteRequest, TUndeleteRespon
 
         await PrepareQueryAsync(query, cancellationToken).ConfigureAwait(false);
 
-        if (!await query.GetFirstAsync(Connection, cancellationToken).ConfigureAwait(false))
+        if (!await query.GetFirstAsync(Connection!, cancellationToken).ConfigureAwait(false))
             throw DataValidation.EntityNotFoundError(Row, id, Localizer);
     }
 
@@ -126,7 +126,7 @@ public class UndeleteRequestHandlerAsync<TRow, TUndeleteRequest, TUndeleteRespon
     protected virtual async Task ExecuteUndeleteAsync(CancellationToken cancellationToken = default)
     {
         var idField = Row.IdField;
-        var id = idField.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture);
+        var id = idField!.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture);
 
         var isActiveDeletedRow = Row as IIsActiveDeletedRow;
         var isDeletedRow = Row as IIsDeletedRow;
@@ -156,7 +156,7 @@ public class UndeleteRequestHandlerAsync<TRow, TUndeleteRequest, TUndeleteRespon
 
         await InvokeUndeleteActionAsync(async () =>
         {
-            if (await update.ExecuteAsync(Connection, ExpectedRows.One, cancellationToken: cancellationToken).ConfigureAwait(false) != 1)
+            if (await update.ExecuteAsync(Connection!, ExpectedRows.One, cancellationToken: cancellationToken).ConfigureAwait(false) != 1)
                 throw DataValidation.EntityNotFoundError(Row, id, Localizer);
         }, cancellationToken).ConfigureAwait(false);
 

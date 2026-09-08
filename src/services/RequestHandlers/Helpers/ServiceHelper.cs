@@ -55,7 +55,7 @@ public static class ServiceHelper
         response.Skip = query.Skip();
         response.Take = query.Take();
         if (response.Take == 0)
-            response.TotalCount = response.Entities.Count + response.Skip;
+            response.TotalCount = response.Entities!.Count + response.Skip;
     }
 
     /// <summary>
@@ -103,13 +103,13 @@ public static class ServiceHelper
 
         var query = new SqlQuery()
             .Dialect(connection.GetDialect())
-            .From(row).Select(idField);
+            .From(row).Select(idField!);
         foreach (var field in indexFields)
             query.WhereEqual(field, field.AsSqlValue(newRow));
 
         if (!query.GetFirst(connection))
             return false;
 
-        return idField.IndexCompare(row, newRow) != 0;
+        return idField!.IndexCompare(row, newRow) != 0;
     }
 }

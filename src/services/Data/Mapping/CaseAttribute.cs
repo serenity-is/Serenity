@@ -55,7 +55,7 @@ public class CaseAttribute : BaseExpressionAttribute
     /// <summary>
     /// Gets the switch expression.
     /// </summary>
-    public object Switch { get; set; }
+    public object? Switch { get; set; }
 
     /// <summary>
     /// Gets the when expressions.
@@ -70,5 +70,5 @@ public class CaseAttribute : BaseExpressionAttribute
     /// <summary>
     /// Gets the else expression.
     /// </summary>
-    public object Else { get; set; }
+    public object? Else { get; set; }
 }

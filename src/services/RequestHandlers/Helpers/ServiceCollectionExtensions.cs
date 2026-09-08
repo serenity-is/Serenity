@@ -91,7 +91,7 @@ public static class ServiceCollectionExtensions
     /// <exception cref="ArgumentNullException">collection is null or typeSource can't be found in the collection</exception>
     /// <exception cref="InvalidProgramException">Multiple candidates found for a service interface.</exception>
     public static IServiceCollection AddCustomRequestHandlers(this IServiceCollection collection, 
-        ITypeSource typeSource = null, Func<Type, Type, bool> predicate = null)
+        ITypeSource? typeSource = null, Func<Type, Type, bool>? predicate = null)
     {
         ArgumentNullException.ThrowIfNull(collection);
 
@@ -205,7 +205,7 @@ public static class ServiceCollectionExtensions
     /// themselves (recommended), the predicate should be "(intf, impl) => intf != impl"</param>
     /// <exception cref="InvalidProgramException">Multiple candidates found for a service interface.</exception>
     public static IServiceCollection AddServiceHandlers(this IServiceCollection collection, 
-        ITypeSource customHandlerTypeSource = null, Func<Type, Type, bool> customHandlerPredicate = null)
+        ITypeSource? customHandlerTypeSource = null, Func<Type, Type, bool>? customHandlerPredicate = null)
     {
         ArgumentNullException.ThrowIfNull(collection);
 
@@ -232,7 +232,7 @@ public static class ServiceCollectionExtensions
     /// any assembly with a JsonLocalTextAssetsAttribute attribute</param>
     /// <returns>Local text registry</returns>
     /// <exception cref="ArgumentNullException">Provider is null</exception>
-    public static ILocalTextRegistry AddBaseTexts(this IServiceProvider provider, IFileProvider webFileProvider = null)
+    public static ILocalTextRegistry AddBaseTexts(this IServiceProvider provider, IFileProvider? webFileProvider = null)
     {
         ArgumentNullException.ThrowIfNull(provider);
 
@@ -262,7 +262,7 @@ public static class ServiceCollectionExtensions
     /// <returns>Local text registry</returns>
     /// <exception cref="ArgumentNullException">textRegistry or typeSource is null</exception>
     public static ILocalTextRegistry AddBaseTexts(this ILocalTextRegistry textRegistry, ITypeSource typeSource,
-        IRowTypeRegistry rowTypeRegistry = null, bool includeResources = true)
+        IRowTypeRegistry? rowTypeRegistry = null, bool includeResources = true)
     {
         ArgumentNullException.ThrowIfNull(textRegistry);
 
@@ -273,7 +273,7 @@ public static class ServiceCollectionExtensions
         textRegistry.AddNestedPermissions(typeSource);
 
         rowTypeRegistry ??= new DefaultRowTypeRegistry(typeSource);
-        var rowInstances = rowTypeRegistry.AllRowTypes.Select(x => (IRow)Activator.CreateInstance(x));
+        var rowInstances = rowTypeRegistry.AllRowTypes.Select(x => (IRow)Activator.CreateInstance(x)!);
         textRegistry.AddRowTexts(rowInstances);
 
         if (includeResources)
@@ -334,12 +334,12 @@ public static class ServiceCollectionExtensions
 
             using var stream = entry.CreateReadStream();
             using var sr = new StreamReader(stream);
-            string json = sr.ReadToEnd().TrimToNull();
+            string? json = sr.ReadToEnd().TrimToNull();
             if (json is null)
                 continue;
-            var texts = JSON.Parse<Dictionary<string, object>>(json);
+            var texts = JSON.Parse<Dictionary<string, object?>>(json);
 
-            JsonLocalTextRegistration.AddFromNestedDictionary(texts, "", langID, registry);
+            JsonLocalTextRegistration.AddFromNestedDictionary(texts!, "", langID, registry);
         }
 
         return registry;

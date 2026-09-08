@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+
 namespace Serenity.Services;
 
 /// <summary>
@@ -13,6 +15,8 @@ public abstract class RetrieveRequestHandlerBase<TRow, TRetrieveRequest, TRetrie
     where TRetrieveRequest : RetrieveRequest
     where TRetrieveResponse : RetrieveResponse<TRow>, new()
 {
+    private IDbConnection connection;
+
     /// <summary>
     /// Initializes a new instance of the class.
     /// </summary>
@@ -21,7 +25,7 @@ public abstract class RetrieveRequestHandlerBase<TRow, TRetrieveRequest, TRetrie
     protected RetrieveRequestHandlerBase(IRequestContext context)
     {
         Context = context ?? throw new ArgumentNullException(nameof(context));
-        StateBag = new Dictionary<string, object>();
+        StateBag = new Dictionary<string, object?>();
     }
 
     /// <summary>
@@ -187,7 +191,7 @@ public abstract class RetrieveRequestHandlerBase<TRow, TRetrieveRequest, TRetrie
             .From(Row);
 
         var idField = ((IIdRow)Row).IdField;
-        var id = idField.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture);
+        var id = idField!.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture);
 
         query.WhereEqual(idField, id);
 
@@ -199,10 +203,15 @@ public abstract class RetrieveRequestHandlerBase<TRow, TRetrieveRequest, TRetrie
     /// </summary>
     public ITwoLevelCache Cache => Context.Cache;
 
+    private InvalidOperationException PropertyReadError([CallerMemberName] string? property = default)
+    {
+        return new InvalidOperationException($"Error reading '{property}' of {GetType().Name}. The handler has not been initialized.");
+    }
+
     /// <summary>
     /// Gets the request context.
     /// </summary>
-    public IRequestContext Context { get; private set; }
+    public IRequestContext Context { get; }
 
     /// <summary>
     /// Gets the localizer from the request context.
@@ -217,38 +226,38 @@ public abstract class RetrieveRequestHandlerBase<TRow, TRetrieveRequest, TRetrie
     /// <summary>
     /// Gets the current user from the request context.
     /// </summary>
-    public ClaimsPrincipal User => Context.User;
+    public ClaimsPrincipal? User => Context.User;
 
     /// <summary>
     /// Gets the current connection.
     /// </summary>
-    public IDbConnection Connection { get; protected set; }
+    public IDbConnection Connection { get => connection ?? throw PropertyReadError(); protected set => connection = value; }
 
     /// <summary>
     /// Gets the select query.
     /// </summary>
-    public SqlQuery Query { get; protected set; }
+    public SqlQuery Query { get => field ?? throw PropertyReadError(); protected set; }
 
     /// <summary>
     /// Gets the entity used for querying / metadata lookup.
     /// </summary>
-    public TRow Row { get; protected set; }
+    public TRow Row { get => field ?? throw PropertyReadError(); protected set; }
 
     /// <summary>
     /// Gets the request object.
     /// </summary>
-    public TRetrieveRequest Request { get; protected set; }
+    public TRetrieveRequest Request { get => field ?? throw PropertyReadError(); protected set; }
 
     /// <summary>
     /// Gets the response object.
     /// </summary>
-    public TRetrieveResponse Response { get; protected set; }
+    public TRetrieveResponse Response { get => field ?? throw PropertyReadError(); protected set; }
 
     /// <summary>
     /// A state bag for behaviors to preserve state among their methods.
     /// It will be cleared before each request, e.g. Process call.
     /// </summary>
-    public IDictionary<string, object> StateBag { get; private set; }
+    public IDictionary<string, object?> StateBag { get; }
 
     IRow IRetrieveRequestHandler.Row => Row;
     RetrieveRequest IRetrieveRequestHandler.Request => Request;

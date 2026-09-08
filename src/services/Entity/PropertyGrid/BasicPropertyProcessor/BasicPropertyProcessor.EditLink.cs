@@ -27,12 +27,12 @@ public partial class BasicPropertyProcessor : PropertyProcessor
         }
     }
 
-    private static string AutoDetermineIdField(Field basedOnField)
+    private static string? AutoDetermineIdField(Field? basedOnField)
     {
         if (basedOnField is null)
             return null;
 
-        Field idField;
+        Field? idField;
 
         if (basedOnField.Join == null && (basedOnField.ReferencedAliases == null || basedOnField.ReferencedAliases.Count != 1))
             return null;
@@ -45,7 +45,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
         }
         else
         {
-            var joinName = basedOnField.Join != null ? basedOnField.Join.Name : basedOnField.ReferencedAliases.Single();
+            var joinName = basedOnField.Join != null ? basedOnField.Join.Name : basedOnField.ReferencedAliases?.SingleOrDefault();
             idField = basedOnField.Fields.FirstOrDefault(x => x.ForeignJoinAlias != null &&
                 x.ForeignJoinAlias.Name == joinName);
         }

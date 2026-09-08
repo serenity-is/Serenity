@@ -5,9 +5,9 @@ namespace Serenity.Data;
 /// </summary>
 public static class SqlSyntax
 {
-    private static string[] _indexParam;
-    private static string[] _tableAlias;
-    private static string[] _tableAliasDot;
+    private static string[]? _indexParam;
+    private static string[]? _tableAlias;
+    private static string[]? _tableAliasDot;
     private static readonly CultureInfo _invariant = CultureInfo.InvariantCulture;
 
     /// <summary>
@@ -108,7 +108,7 @@ public static class SqlSyntax
     /// <returns>
     ///   <c>true</c> if is valid identifier; otherwise, <c>false</c>.
     /// </returns>
-    public static bool IsValidIdentifier(string s)
+    public static bool IsValidIdentifier(string? s)
     {
         if (string.IsNullOrEmpty(s))
             return false;
@@ -187,7 +187,7 @@ public static class SqlSyntax
     /// <param name="s">The string.</param>
     /// <param name="dialect">The dialect.</param>
     /// <returns>The bracketed string.</returns>
-    public static string AutoBracket(string s, ISqlDialect dialect = null)
+    public static string AutoBracket(string s, ISqlDialect? dialect = null)
     {
         if (string.IsNullOrEmpty(s))
             return s;
@@ -202,14 +202,14 @@ public static class SqlSyntax
         return '[' + s + ']';
     }
 
-    private static bool ShouldAutoQuote(ISqlDialect dialect)
+    private static bool ShouldAutoQuote(ISqlDialect? dialect)
     {
         return (dialect?.AutoQuotedIdentifiers ?? SqlSettings.DefaultDialect?.AutoQuotedIdentifiers ?? SqlSettings.AutoQuotedIdentifiers);
     }
 
-    private static bool IsKeywordFor(string s, ISqlDialect dialect)
+    private static bool IsKeywordFor(string? s, ISqlDialect? dialect)
     { 
-        return dialect?.IsReservedKeyword(s) ?? IsReservedKeywordForAny(s);
+        return s != null && (dialect?.IsReservedKeyword(s) ?? IsReservedKeywordForAny(s));
     }
 
     /// <summary>
@@ -219,7 +219,7 @@ public static class SqlSyntax
     /// <param name="s">The string.</param>
     /// <param name="dialect">Target dialect; <see cref="SqlSettings.DefaultDialect"/> is used if null.</param>
     /// <returns>The bracketed string.</returns>
-    public static string AutoBracketValid(string s, ISqlDialect dialect = null)
+    public static string? AutoBracketValid(string? s, ISqlDialect? dialect = null)
     {
         if (!ShouldAutoQuote(dialect) &&
             !IsKeywordFor(s, dialect))

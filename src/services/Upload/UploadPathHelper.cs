@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Path = System.IO.Path;
 
 namespace Serenity.Web;
@@ -14,7 +15,8 @@ public static class UploadPathHelper
     /// <param name="width">Thumb width</param>
     /// <param name="height">Thumb height</param>
     /// <returns>The thumbnail file name.</returns>
-    public static string GetThumbnailName(string path, int? width = null, int? height = null)
+    [return:NotNullIfNotNull(nameof(path))]
+    public static string? GetThumbnailName(string? path, int? width = null, int? height = null)
     {
         if (string.IsNullOrEmpty(path))
             return path;
@@ -37,7 +39,7 @@ public static class UploadPathHelper
     /// <param name="width">Thumb width</param>
     /// <param name="height">Thumb height</param>
     public static bool TryParseThumbSuffix(string path,
-        out string baseName, out string suffix, out int width, out int height)
+        [MaybeNullWhen(false)] out string? baseName, [MaybeNullWhen(false)] out string? suffix, out int width, out int height)
     {
         width = -1;
         height = -1;
@@ -111,7 +113,7 @@ public static class UploadPathHelper
         ArgumentNullException.ThrowIfNull(exists);
 
         var extension = Path.GetExtension(path);
-        string baseFileName = null;
+        string? baseFileName = null;
         int tries = 0;
         while (exists(path) && ++tries < 10000)
         {

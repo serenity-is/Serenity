@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 /// <summary>
 /// Methods and properties of a row to support editing in desktop applications, grids, and similar scenarios.
@@ -61,7 +61,7 @@ public interface IEditableRow : IRow, IEditableObject, INotifyPropertyChanged
     /// <summary>
     /// The post ended event
     /// </summary>
-    event EventHandler PostEnded;
+    event EventHandler? PostEnded;
 
     /// <summary>
     /// Gets the original values.
@@ -69,7 +69,7 @@ public interface IEditableRow : IRow, IEditableObject, INotifyPropertyChanged
     /// <value>
     /// The original values.
     /// </value>
-    public IRow OriginalValues { get; }
+    public IRow? OriginalValues { get; }
 
     /// <summary>
     /// Gets the previous values.
@@ -77,7 +77,7 @@ public interface IEditableRow : IRow, IEditableObject, INotifyPropertyChanged
     /// <value>
     /// The previous values.
     /// </value>
-    public IRow PreviousValues { get; }
+    public IRow? PreviousValues { get; }
 
     /// <summary>
     /// Removes the validation error.
@@ -91,7 +91,7 @@ public interface IEditableRow : IRow, IEditableObject, INotifyPropertyChanged
     /// <value>
     /// The validation errors.
     /// </value>        
-    IDictionary<string, string> ValidationErrors { get; }
+    IDictionary<string, string>? ValidationErrors { get; }
 
     /// <summary>
     /// Gets or sets the post handler.
@@ -99,5 +99,5 @@ public interface IEditableRow : IRow, IEditableObject, INotifyPropertyChanged
     /// <value>
     /// The post handler.
     /// </value>
-    Action<IRow> PostHandler { get; set; }
+    Action<IRow>? PostHandler { get; set; }
 }

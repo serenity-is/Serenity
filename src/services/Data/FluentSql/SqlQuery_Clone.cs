@@ -65,7 +65,7 @@ public partial class SqlQuery
                 aliasExpressions, StringComparer.OrdinalIgnoreCase);
 
         if (aliasWithJoins != null)
-            aliasWithJoins = new Dictionary<string, IHaveJoins>(
+            clone.aliasWithJoins = new Dictionary<string, IHaveJoins>(
                 aliasWithJoins, StringComparer.OrdinalIgnoreCase);
 
         return clone;

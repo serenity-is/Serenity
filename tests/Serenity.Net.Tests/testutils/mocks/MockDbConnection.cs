@@ -172,7 +172,7 @@ public class MockDbConnection : DbConnection, IRowOperationInterceptor, ISqlOper
 
     public readonly List<InterceptExecuteNonQueryArgs> ExecuteNonQueryCalls = [];
 
-    public OptionalValue<long?> ExecuteNonQuery(string commandText, IDictionary<string, object> parameters, ExpectedRows expectedRows, IQueryWithParams query, bool getNewId)
+    public OptionalValue<long?> ExecuteNonQuery(string commandText, IDictionary<string, object>? parameters, ExpectedRows expectedRows, IQueryWithParams query, bool getNewId)
     {
         var args = new InterceptExecuteNonQueryArgs(commandText, parameters, expectedRows, query, getNewId);
         ExecuteNonQueryCalls.Add(args);
@@ -190,7 +190,7 @@ public class MockDbConnection : DbConnection, IRowOperationInterceptor, ISqlOper
 
     public readonly List<InterceptExecuteReaderArgs> ExecuteReaderCalls = [];
 
-    public OptionalValue<IDataReader> ExecuteReader(string commandText, IDictionary<string, object> parameters, SqlQuery query)
+    public OptionalValue<IDataReader> ExecuteReader(string commandText, IDictionary<string, object>? parameters, SqlQuery query)
     {
         var args = new InterceptExecuteReaderArgs(commandText, parameters, query);
         ExecuteReaderCalls.Add(args);
@@ -207,7 +207,7 @@ public class MockDbConnection : DbConnection, IRowOperationInterceptor, ISqlOper
 
     public readonly List<InterceptExecuteScalarArgs> ExecuteScalarCalls = [];
 
-    public OptionalValue<object> ExecuteScalar(string commandText, IDictionary<string, object> parameters, SqlQuery query)
+    public OptionalValue<object> ExecuteScalar(string commandText, IDictionary<string, object>? parameters, SqlQuery query)
     {
         var args = new InterceptExecuteScalarArgs(commandText, parameters, query);
         ExecuteScalarCalls.Add(args);
@@ -238,7 +238,7 @@ public class MockDbConnection : DbConnection, IRowOperationInterceptor, ISqlOper
         return interceptManipulateRow?.Invoke(args) ?? default;
     }
 
-    public async Task<OptionalValue<long?>> ExecuteNonQueryAsync(string commandText, IDictionary<string, object> parameters, ExpectedRows expectedRows, IQueryWithParams query, bool getNewId, CancellationToken cancellationToken = default)
+    public async Task<OptionalValue<long?>> ExecuteNonQueryAsync(string commandText, IDictionary<string, object>? parameters, ExpectedRows expectedRows, IQueryWithParams query, bool getNewId, CancellationToken cancellationToken = default)
     {
         await Task.CompletedTask.ConfigureAwait(false);
         var args = new InterceptExecuteNonQueryArgs(commandText, parameters, expectedRows, query, getNewId, IsAsync: true);
@@ -246,7 +246,7 @@ public class MockDbConnection : DbConnection, IRowOperationInterceptor, ISqlOper
         return interceptExecuteNonQuery?.Invoke(args) ?? default;
     }
 
-    public async Task<OptionalValue<IDataReader>> ExecuteReaderAsync(string commandText, IDictionary<string, object> parameters, SqlQuery query, CancellationToken cancellationToken = default)
+    public async Task<OptionalValue<IDataReader>> ExecuteReaderAsync(string commandText, IDictionary<string, object>? parameters, SqlQuery query, CancellationToken cancellationToken = default)
     {
         await Task.CompletedTask.ConfigureAwait(false);
         var args = new InterceptExecuteReaderArgs(commandText, parameters, query, IsAsync: true);
@@ -254,7 +254,7 @@ public class MockDbConnection : DbConnection, IRowOperationInterceptor, ISqlOper
         return interceptExecuteReader?.Invoke(args) ?? default;
     }
 
-    public async Task<OptionalValue<object>> ExecuteScalarAsync(string commandText, IDictionary<string, object> parameters, SqlQuery query, CancellationToken cancellationToken = default)
+    public async Task<OptionalValue<object>> ExecuteScalarAsync(string commandText, IDictionary<string, object>? parameters, SqlQuery query, CancellationToken cancellationToken = default)
     {
         await Task.CompletedTask.ConfigureAwait(false);
         var args = new InterceptExecuteScalarArgs(commandText, parameters, query, IsAsync: true);
@@ -275,6 +275,6 @@ public class MockDbConnection : DbConnection, IRowOperationInterceptor, ISqlOper
 public record InterceptFindRowArgs(Type Type, OptionalValue<object> Id, ICriteria Where, Action<SqlQuery> EditQuery, bool GetFirst, bool IsAsync = false);
 public record InterceptListRowsArgs(Type Type, ICriteria Where, Action<SqlQuery> EditQuery, bool CountOnly, bool IsAsync = false);
 public record InterceptManipulateRowArgs(Type Type, OptionalValue<object> Id, IRow Row, ExpectedRows ExpectedRows, bool GetNewId, bool IsAsync = false);
-public record InterceptExecuteNonQueryArgs(string CommandText, IDictionary<string, object> Parameters, ExpectedRows ExpectedRows, IQueryWithParams Query, bool GetNewId, bool IsAsync = false);
-public record InterceptExecuteReaderArgs(string CommandText, IDictionary<string, object> Parameters, SqlQuery Query, bool IsAsync = false);
-public record InterceptExecuteScalarArgs(string CommandText, IDictionary<string, object> Parameters, SqlQuery Query, bool IsAsync = false);
+public record InterceptExecuteNonQueryArgs(string CommandText, IDictionary<string, object>? Parameters, ExpectedRows ExpectedRows, IQueryWithParams Query, bool GetNewId, bool IsAsync = false);
+public record InterceptExecuteReaderArgs(string CommandText, IDictionary<string, object>? Parameters, SqlQuery Query, bool IsAsync = false);
+public record InterceptExecuteScalarArgs(string CommandText, IDictionary<string, object>? Parameters, SqlQuery Query, bool IsAsync = false);

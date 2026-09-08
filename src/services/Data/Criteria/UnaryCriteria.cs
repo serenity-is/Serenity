@@ -21,7 +21,7 @@ public class UnaryCriteria : BaseCriteria
         ArgumentNullException.ThrowIfNull(operand);
 
         if (op < CriteriaOperator.Paren || op > CriteriaOperator.Exists)
-            throw new ArgumentOutOfRangeException("op");
+            throw new ArgumentOutOfRangeException(nameof(op));
 
         this.op = op;
         this.operand = operand;

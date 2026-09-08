@@ -15,8 +15,8 @@
 /// <param name="getValue">The get value.</param>
 /// <param name="setValue">The set value.</param>
 [NotMapped]
-public class ListField<TItem>(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default | FieldFlags.NotMapped,
-    Func<IRow, List<TItem>> getValue = null, Action<IRow, List<TItem>> setValue = null) : CustomClassField<List<TItem>>(collection, name, caption, size, flags, getValue, setValue)
+public class ListField<TItem>(ICollection<Field> collection, string name, LocalText? caption = null, int size = 0, FieldFlags flags = FieldFlags.Default | FieldFlags.NotMapped,
+    Func<IRow, List<TItem>>? getValue = null, Action<IRow, List<TItem>>? setValue = null) : CustomClassField<List<TItem>>(collection, name, caption, size, flags, getValue, setValue)
 {
 
     /// <summary>

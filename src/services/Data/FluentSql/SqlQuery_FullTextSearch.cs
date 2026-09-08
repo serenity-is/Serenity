@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 public partial class SqlQuery
 {
@@ -32,17 +32,17 @@ public partial class SqlQuery
         string searchTableAlias, string searchTableKey, string containsAlias)
     {
         if (string.IsNullOrEmpty(searchTable))
-            throw new ArgumentNullException("searchTable");
+            throw new ArgumentNullException(nameof(searchTable));
         if (string.IsNullOrEmpty(searchFields))
-            throw new ArgumentNullException("searchFields");
+            throw new ArgumentNullException(nameof(searchFields));
         if (string.IsNullOrEmpty(searchQuery))
-            throw new ArgumentNullException("searchQuery");
+            throw new ArgumentNullException(nameof(searchQuery));
         if (string.IsNullOrEmpty(searchTableAlias))
-            throw new ArgumentNullException("searchTableAlias");
+            throw new ArgumentNullException(nameof(searchTableAlias));
         if (string.IsNullOrEmpty(searchTableKey))
-            throw new ArgumentNullException("searchTableKey");
+            throw new ArgumentNullException(nameof(searchTableKey));
         if (string.IsNullOrEmpty(containsAlias))
-            throw new ArgumentNullException("containsAlias");
+            throw new ArgumentNullException(nameof(containsAlias));
 
         if (from.Length > 0)
             from.Append(" \n");

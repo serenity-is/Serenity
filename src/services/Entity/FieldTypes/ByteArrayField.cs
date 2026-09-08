@@ -15,8 +15,8 @@ namespace Serenity.Data;
 /// <param name="flags">The flags.</param>
 /// <param name="getValue">The get value.</param>
 /// <param name="setValue">The set value.</param>
-public class ByteArrayField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
-    Func<IRow, byte[]> getValue = null, Action<IRow, byte[]> setValue = null) : CustomClassField<byte[]>(collection, name, caption, size, flags, getValue, setValue)
+public class ByteArrayField(ICollection<Field> collection, string name, LocalText? caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
+    Func<IRow, byte[]?>? getValue = null, Action<IRow, byte[]?>? setValue = null) : CustomClassField<byte[]>(collection, name, caption, size, flags, getValue, setValue)
 {
 
     /// <summary>
@@ -30,8 +30,8 @@ public class ByteArrayField(ICollection<Field> collection, string name, LocalTex
     /// <param name="getValue">The get value.</param>
     /// <param name="setValue">The set value.</param>
     /// <returns>A new ByteArrayField instance.</returns>
-    public static ByteArrayField Factory(ICollection<Field> collection, string name, LocalText caption, int size, FieldFlags flags,
-        Func<IRow, byte[]> getValue, Action<IRow, byte[]> setValue)
+    public static ByteArrayField Factory(ICollection<Field> collection, string name, LocalText? caption, int size, FieldFlags flags,
+        Func<IRow, byte[]> getValue, Action<IRow, byte[]?> setValue)
     {
         return new ByteArrayField(collection, name, caption, size, flags, getValue, setValue);
     }
@@ -95,9 +95,9 @@ public class ByteArrayField(ICollection<Field> collection, string name, LocalTex
     /// </summary>
     /// <param name="value">The value.</param>
     /// <returns>A clone of the value.</returns>
-    protected override byte[] Clone(byte[] value)
+    protected override byte[]? Clone(byte[]? value)
     {
-        return (byte[])value.Clone();
+        return (byte[]?)value?.Clone();
     }
 
     /// <summary>
@@ -135,10 +135,10 @@ public class ByteArrayField(ICollection<Field> collection, string name, LocalTex
                 _setValue(row, null);
                 break;
             case Newtonsoft.Json.JsonToken.String:
-                _setValue(row, Convert.FromBase64String((string)reader.Value));
+                _setValue(row, Convert.FromBase64String((string)reader.Value!));
                 break;
             case Newtonsoft.Json.JsonToken.Bytes:
-                _setValue(row, (byte[])reader.Value);
+                _setValue(row, (byte[])reader.Value!);
                 break;
             default:
                 throw JsonUnexpectedToken(reader);

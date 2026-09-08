@@ -15,8 +15,8 @@
 public class TransactionlessUnitOfWork(IDbConnection connection) : IDisposable, IUnitOfWork
 {
     private readonly IDbConnection connection = connection ?? throw new ArgumentNullException(nameof(connection));
-    private Action onCommit;
-    private Action onRollback;
+    private Action? onCommit;
+    private Action? onRollback;
     private bool commitCalled;
 
     /// <summary>

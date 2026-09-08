@@ -10,7 +10,7 @@ public interface IConnectionStrings
     /// </summary>
     /// <param name="connectionKey">The connection key.</param>
     /// <returns>The connection string, or <c>null</c> if not found.</returns>
-    IConnectionString TryGetConnectionString(string connectionKey);
+    IConnectionString? TryGetConnectionString(string connectionKey);
 
     /// <summary>
     /// Lists all known connection strings.

@@ -13,7 +13,7 @@ public static class SqlHelper
     /// </summary>
     /// <param name="value">The value.</param>
     /// <returns>The value converted to a suitable SQL parameter type.</returns>
-    public static object FixParamType(object value)
+    public static object? FixParamType(object? value)
     {
         if (value == null)
             return DBNull.Value;
@@ -49,7 +49,7 @@ public static class SqlHelper
     /// <param name="dialect">The dialect.</param>
     /// <returns>Fixed query.</returns>
     [Obsolete("Use SqlConversions.Translate")]
-    public static string FixCommandText(string commandText, ISqlDialect dialect)
+    public static string? FixCommandText(string commandText, ISqlDialect dialect)
     {
         return SqlConversions.Translate(commandText, dialect);
     }
@@ -84,7 +84,7 @@ public static class SqlHelper
     /// <param name="value">The value.</param>
     /// <param name="dialect">The dialect.</param>
     /// <returns>The new parameter.</returns>
-    public static IDbDataParameter AddParamWithValue(this IDbCommand command, string name, object value, ISqlDialect dialect)
+    public static IDbDataParameter AddParamWithValue(this IDbCommand command, string name, object? value, ISqlDialect dialect)
     {
         name = dialect.ParameterPrefix != '@' &&
             name.StartsWith('@') ? dialect.ParameterPrefix + name[1..] :
@@ -94,7 +94,7 @@ public static class SqlHelper
         if (value is Dapper.SqlMapper.ICustomQueryParameter cqp)
         {
             cqp.AddParameter(command, name);
-            return (IDbDataParameter)command.Parameters[^1];
+            return (IDbDataParameter)command.Parameters[^1]!;
         }
 #endif
         IDbDataParameter param = command.CreateParameter();
@@ -147,7 +147,7 @@ public static class SqlHelper
     /// <param name="commandText">The command text.</param>
     /// <param name="param">The parameters.</param>
     /// <returns>A new command with the specified command text and parameters.</returns>
-    public static IDbCommand NewCommand(IDbConnection connection, string commandText, IDictionary<string, object> param)
+    public static IDbCommand NewCommand(IDbConnection connection, string commandText, IDictionary<string, object?>? param)
     {
         var command = NewCommand(connection, commandText);
 
@@ -267,7 +267,7 @@ public static class SqlHelper
     /// <exception cref="ArgumentNullException">
     /// command is null or command.Connection is null.
     /// </exception>
-    private static int InternalExecuteNonQuery(IDbCommand command, ILogger logger)
+    private static int InternalExecuteNonQuery(IDbCommand command, ILogger? logger)
     {
         ArgumentNullException.ThrowIfNull(command);
 
@@ -317,11 +317,11 @@ public static class SqlHelper
     /// <param name="param">The parameters.</param>
     /// <param name="logger">The logger.</param>
     /// <returns>The number of affected rows.</returns>
-    public static int ExecuteNonQuery(IDbConnection connection, string commandText, IDictionary<string, object> param = null, ILogger logger = null)
+    public static int ExecuteNonQuery(IDbConnection connection, string commandText, IDictionary<string, object?>? param = null, ILogger? logger = null)
     {
         if (connection is ISqlOperationInterceptor interceptor &&
             interceptor.ExecuteNonQuery(commandText, param, ExpectedRows.Ignore, query: null, getNewId: false) is { HasValue: true } intres)
-            return (int)intres.Value;
+            return (int)intres.Value!;
         using IDbCommand command = NewCommand(connection, commandText, param);
         return InternalExecuteNonQuery(command, logger);
     }
@@ -345,7 +345,7 @@ public static class SqlHelper
     /// <exception cref="ArgumentNullException">
     /// command is null or command.Connection is null.
     /// </exception>
-    private static async Task<int> InternalExecuteNonQueryAsync(IDbCommand command, ILogger logger, CancellationToken cancellationToken = default)
+    private static async Task<int> InternalExecuteNonQueryAsync(IDbCommand command, ILogger? logger, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(command);
 
@@ -396,11 +396,11 @@ public static class SqlHelper
     /// <param name="logger">The logger.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the number of affected rows.</returns>
-    public static async Task<int> ExecuteNonQueryAsync(IDbConnection connection, string commandText, IDictionary<string, object> param = null, ILogger logger = null, CancellationToken cancellationToken = default)
+    public static async Task<int> ExecuteNonQueryAsync(IDbConnection connection, string commandText, IDictionary<string, object?>? param = null, ILogger? logger = null, CancellationToken cancellationToken = default)
     {
         if (connection is ISqlOperationInterceptor interceptor &&
             await interceptor.ExecuteNonQueryAsync(commandText, param, ExpectedRows.Ignore, query: null, getNewId: false, cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
-            return (int)intres.Value;
+            return (int)intres.Value!;
         using IDbCommand command = NewCommand(connection, commandText, param);
         return await InternalExecuteNonQueryAsync(command, logger, cancellationToken).ConfigureAwait(false);
     }
@@ -415,7 +415,7 @@ public static class SqlHelper
     /// <returns>The generated identity value, or null if none was generated.</returns>
     /// <exception cref="ArgumentNullException">query.IdentityColumn is null.</exception>
     /// <exception cref="NotImplementedException">The connection dialect doesn't support returning the inserted identity.</exception>
-    public static long? ExecuteAndGetID(this SqlInsert query, IDbConnection connection, ILogger logger = null)
+    public static long? ExecuteAndGetID(this SqlInsert query, IDbConnection connection, ILogger? logger = null)
     {
         string queryText = query.ToString();
 
@@ -453,7 +453,7 @@ public static class SqlHelper
     /// <returns>A task that represents the asynchronous operation. The task result contains the generated identity value, or null if none was generated.</returns>
     /// <exception cref="ArgumentNullException">query.IdentityColumn is null.</exception>
     /// <exception cref="NotImplementedException">The connection dialect doesn't support returning the inserted identity.</exception>
-    public static async Task<long?> ExecuteAndGetIDAsync(this SqlInsert query, IDbConnection connection, ILogger logger = null, CancellationToken cancellationToken = default)
+    public static async Task<long?> ExecuteAndGetIDAsync(this SqlInsert query, IDbConnection connection, ILogger? logger = null, CancellationToken cancellationToken = default)
     {
         string queryText = query.ToString();
 
@@ -550,7 +550,7 @@ public static class SqlHelper
     /// <param name="query">The query.</param>
     /// <param name="connection">The connection.</param>
     /// <param name="logger">The logger.</param>
-    public static void Execute(this SqlInsert query, IDbConnection connection, ILogger logger = null)
+    public static void Execute(this SqlInsert query, IDbConnection connection, ILogger? logger = null)
     {
         string commandText = query.ToString();
         if (connection is ISqlOperationInterceptor interceptor &&
@@ -569,7 +569,7 @@ public static class SqlHelper
     /// <param name="logger">The logger.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
-    public static async Task ExecuteAsync(this SqlInsert query, IDbConnection connection, ILogger logger = null, CancellationToken cancellationToken = default)
+    public static async Task ExecuteAsync(this SqlInsert query, IDbConnection connection, ILogger? logger = null, CancellationToken cancellationToken = default)
     {
         string commandText = query.ToString();
         if (connection is ISqlOperationInterceptor interceptor &&
@@ -591,7 +591,7 @@ public static class SqlHelper
     /// <param name="logger">The logger.</param>
     /// <returns>The number of affected rows.</returns>
     public static int ExecuteUpsert(this SqlInsert query, IDbConnection connection,
-        IEnumerable<string> keyFields, ExpectedRows expectedRows = ExpectedRows.Ignore, ILogger logger = null)
+        IEnumerable<string> keyFields, ExpectedRows expectedRows = ExpectedRows.Ignore, ILogger? logger = null)
     {
         ArgumentNullException.ThrowIfNull(query);
         ArgumentNullException.ThrowIfNull(connection);
@@ -616,7 +616,7 @@ public static class SqlHelper
 
         if (connection is ISqlOperationInterceptor interceptor &&
             interceptor.ExecuteNonQuery(commandText, query.Params, expectedRows, query, getNewId: false) is { HasValue: true } intres)
-            return (int)intres.Value;
+            return (int)intres.Value!;
 
         using var command = NewCommand(connection, commandText, query.Params);
         return CheckExpectedRows(expectedRows, InternalExecuteNonQuery(command, logger));
@@ -634,7 +634,7 @@ public static class SqlHelper
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the number of affected rows.</returns>
     public static async Task<int> ExecuteUpsertAsync(this SqlInsert query, IDbConnection connection,
-        IEnumerable<string> keyFields, ExpectedRows expectedRows = ExpectedRows.Ignore, ILogger logger = null, CancellationToken cancellationToken = default)
+        IEnumerable<string> keyFields, ExpectedRows expectedRows = ExpectedRows.Ignore, ILogger? logger = null, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(query);
         ArgumentNullException.ThrowIfNull(connection);
@@ -659,7 +659,7 @@ public static class SqlHelper
 
         if (connection is ISqlOperationInterceptor interceptor &&
             await interceptor.ExecuteNonQueryAsync(commandText, query.Params, expectedRows, query, getNewId: false, cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
-            return (int)intres.Value;
+            return (int)intres.Value!;
 
         using var command = NewCommand(connection, commandText, query.Params);
         return CheckExpectedRows(expectedRows, await InternalExecuteNonQueryAsync(command, logger, cancellationToken).ConfigureAwait(false));
@@ -673,12 +673,12 @@ public static class SqlHelper
     /// <param name="expectedRows">The expected rows. Used to validate the expected number of affected rows.</param>
     /// <param name="logger">The logger.</param>
     /// <returns>The number of affected rows.</returns>
-    public static int Execute(this SqlUpdate query, IDbConnection connection, ExpectedRows expectedRows = ExpectedRows.One, ILogger logger = null)
+    public static int Execute(this SqlUpdate query, IDbConnection connection, ExpectedRows expectedRows = ExpectedRows.One, ILogger? logger = null)
     {
         string commandText = query.ToString();
         if (connection is ISqlOperationInterceptor interceptor &&
             interceptor.ExecuteNonQuery(commandText, query.Params, ExpectedRows.One, query, getNewId: false) is { HasValue: true } intres)
-            return (int)intres.Value;
+            return (int)intres.Value!;
 
         using var command = NewCommand(connection, commandText, query.Params);
         return CheckExpectedRows(expectedRows, InternalExecuteNonQuery(command, logger));
@@ -693,12 +693,12 @@ public static class SqlHelper
     /// <param name="logger">The logger.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the number of affected rows.</returns>
-    public static async Task<int> ExecuteAsync(this SqlUpdate query, IDbConnection connection, ExpectedRows expectedRows = ExpectedRows.One, ILogger logger = null, CancellationToken cancellationToken = default)
+    public static async Task<int> ExecuteAsync(this SqlUpdate query, IDbConnection connection, ExpectedRows expectedRows = ExpectedRows.One, ILogger? logger = null, CancellationToken cancellationToken = default)
     {
         string commandText = query.ToString();
         if (connection is ISqlOperationInterceptor interceptor &&
             await interceptor.ExecuteNonQueryAsync(commandText, query.Params, ExpectedRows.One, query, getNewId: false, cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
-            return (int)intres.Value;
+            return (int)intres.Value!;
 
         using var command = NewCommand(connection, commandText, query.Params);
         return CheckExpectedRows(expectedRows, await InternalExecuteNonQueryAsync(command, logger, cancellationToken).ConfigureAwait(false));
@@ -714,7 +714,7 @@ public static class SqlHelper
     /// <returns>
     /// The number of affected rows.
     /// </returns>
-    public static int Execute(this SqlDelete query, IDbConnection connection, ExpectedRows expectedRows = ExpectedRows.One, ILogger logger = null)
+    public static int Execute(this SqlDelete query, IDbConnection connection, ExpectedRows expectedRows = ExpectedRows.One, ILogger? logger = null)
     {
         ArgumentNullException.ThrowIfNull(query);
 
@@ -722,7 +722,7 @@ public static class SqlHelper
 
         if (connection is ISqlOperationInterceptor interceptor &&
             interceptor.ExecuteNonQuery(commandText, query.Params, expectedRows, query, getNewId: false) is { HasValue: true } intres)
-            return (int)intres.Value;
+            return (int)intres.Value!;
 
         using var command = NewCommand(connection, commandText, query.Params);
         return CheckExpectedRows(expectedRows, InternalExecuteNonQuery(command, logger));
@@ -737,7 +737,7 @@ public static class SqlHelper
     /// <param name="logger">The logger.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the number of affected rows.</returns>
-    public static async Task<int> ExecuteAsync(this SqlDelete query, IDbConnection connection, ExpectedRows expectedRows = ExpectedRows.One, ILogger logger = null, CancellationToken cancellationToken = default)
+    public static async Task<int> ExecuteAsync(this SqlDelete query, IDbConnection connection, ExpectedRows expectedRows = ExpectedRows.One, ILogger? logger = null, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(query);
 
@@ -745,13 +745,13 @@ public static class SqlHelper
 
         if (connection is ISqlOperationInterceptor interceptor &&
             await interceptor.ExecuteNonQueryAsync(commandText, query.Params, expectedRows, query, getNewId: false, cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
-            return (int)intres.Value;
+            return (int)intres.Value!;
 
         using var command = NewCommand(connection, commandText, query.Params);
         return CheckExpectedRows(expectedRows, await InternalExecuteNonQueryAsync(command, logger, cancellationToken).ConfigureAwait(false));
     }
 
-    private static IDataReader InternalExecuteReader(IDbConnection connection, string commandText, IDictionary<string, object> param, ILogger logger)
+    private static IDataReader InternalExecuteReader(IDbConnection connection, string commandText, IDictionary<string, object?>? param, ILogger? logger)
     {
         ArgumentNullException.ThrowIfNull(connection);
 
@@ -801,7 +801,7 @@ public static class SqlHelper
     /// <returns>A data reader with the results.</returns>
     /// <exception cref="ArgumentNullException">connection is null.</exception>
     public static IDataReader ExecuteReader(IDbConnection connection, string commandText,
-        IDictionary<string, object> param, ILogger logger = null)
+        IDictionary<string, object?>? param, ILogger? logger = null)
     {
         if (connection is ISqlOperationInterceptor interceptor &&
             interceptor.ExecuteReader(commandText, param, query: null) is { HasValue: true } intres)
@@ -819,7 +819,7 @@ public static class SqlHelper
         return command.ExecuteReader();
     }
 
-    private static async Task<IDataReader> InternalExecuteReaderAsync(IDbConnection connection, string commandText, IDictionary<string, object> param, ILogger logger, CancellationToken cancellationToken = default)
+    private static async Task<IDataReader> InternalExecuteReaderAsync(IDbConnection connection, string commandText, IDictionary<string, object?>? param, ILogger? logger, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(connection);
 
@@ -870,7 +870,7 @@ public static class SqlHelper
     /// <returns>A task that represents the asynchronous operation. The task result contains a data reader with the results.</returns>
     /// <exception cref="ArgumentNullException">connection is null.</exception>
     public static async Task<IDataReader> ExecuteReaderAsync(IDbConnection connection, string commandText,
-        IDictionary<string, object> param, ILogger logger = null, CancellationToken cancellationToken = default)
+        IDictionary<string, object?>? param, ILogger? logger = null, CancellationToken cancellationToken = default)
     {
         if (connection is ISqlOperationInterceptor interceptor &&
             await interceptor.ExecuteReaderAsync(commandText, param, query: null, cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
@@ -886,7 +886,7 @@ public static class SqlHelper
     /// <param name="connection">The connection.</param>
     /// <param name="logger">The logger.</param>
     /// <returns>A data reader with the results.</returns>
-    public static IDataReader ExecuteReader(this SqlQuery query, IDbConnection connection, ILogger logger = null)
+    public static IDataReader ExecuteReader(this SqlQuery query, IDbConnection connection, ILogger? logger = null)
     {
         ArgumentNullException.ThrowIfNull(query);
 
@@ -906,7 +906,7 @@ public static class SqlHelper
     /// <param name="logger">The logger.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains a data reader with the results.</returns>
-    public static async Task<IDataReader> ExecuteReaderAsync(this SqlQuery query, IDbConnection connection, ILogger logger = null, CancellationToken cancellationToken = default)
+    public static async Task<IDataReader> ExecuteReaderAsync(this SqlQuery query, IDbConnection connection, ILogger? logger = null, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(query);
 
@@ -918,7 +918,7 @@ public static class SqlHelper
         return await InternalExecuteReaderAsync(connection, commandText, query.Params, logger, cancellationToken).ConfigureAwait(false);
     }
 
-    private static object InternalExecuteScalar(IDbConnection connection, string commandText, IDictionary<string, object> param, ILogger logger)
+    private static object? InternalExecuteScalar(IDbConnection connection, string commandText, IDictionary<string, object?>? param, ILogger? logger)
     {
         ArgumentNullException.ThrowIfNull(connection);
 
@@ -967,7 +967,7 @@ public static class SqlHelper
     /// <param name="logger">The logger.</param>
     /// <returns>The scalar value.</returns>
     /// <exception cref="ArgumentNullException">connection is null.</exception>
-    public static object ExecuteScalar(IDbConnection connection, string commandText, IDictionary<string, object> param = null, ILogger logger = null)
+    public static object? ExecuteScalar(IDbConnection connection, string commandText, IDictionary<string, object?>? param = null, ILogger? logger = null)
     {
         if (connection is ISqlOperationInterceptor interceptor &&
             interceptor.ExecuteScalar(commandText, param, query: null) is { HasValue: true } intres)
@@ -976,7 +976,7 @@ public static class SqlHelper
         return InternalExecuteScalar(connection, commandText, param, logger);
     }
 
-    private static Task<object> ExecuteScalarAsync(IDbCommand command, CancellationToken cancellationToken)
+    private static Task<object?> ExecuteScalarAsync(IDbCommand command, CancellationToken cancellationToken)
     {
         if (command is System.Data.Common.DbCommand dbCommand)
             return dbCommand.ExecuteScalarAsync(cancellationToken);
@@ -985,7 +985,7 @@ public static class SqlHelper
         return Task.FromResult(command.ExecuteScalar());
     }
 
-    private static async Task<object> InternalExecuteScalarAsync(IDbConnection connection, string commandText, IDictionary<string, object> param, ILogger logger, CancellationToken cancellationToken = default)
+    private static async Task<object?> InternalExecuteScalarAsync(IDbConnection connection, string commandText, IDictionary<string, object?>? param, ILogger? logger, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(connection);
 
@@ -1035,7 +1035,7 @@ public static class SqlHelper
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the scalar value.</returns>
     /// <exception cref="ArgumentNullException">connection is null.</exception>
-    public static async Task<object> ExecuteScalarAsync(IDbConnection connection, string commandText, IDictionary<string, object> param = null, ILogger logger = null, CancellationToken cancellationToken = default)
+    public static async Task<object?> ExecuteScalarAsync(IDbConnection connection, string commandText, IDictionary<string, object?>? param = null, ILogger? logger = null, CancellationToken cancellationToken = default)
     {
         if (connection is ISqlOperationInterceptor interceptor &&
             await interceptor.ExecuteScalarAsync(commandText, param, query: null, cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
@@ -1052,7 +1052,7 @@ public static class SqlHelper
     /// <param name="logger">The logger.</param>
     /// <returns>The scalar value.</returns>
     /// <exception cref="ArgumentNullException">selectQuery is null.</exception>
-    public static object ExecuteScalar(IDbConnection connection, SqlQuery query, ILogger logger = null)
+    public static object? ExecuteScalar(IDbConnection connection, SqlQuery query, ILogger? logger = null)
     {
         ArgumentNullException.ThrowIfNull(query);
 
@@ -1073,7 +1073,7 @@ public static class SqlHelper
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the scalar value.</returns>
     /// <exception cref="ArgumentNullException">selectQuery is null.</exception>
-    public static async Task<object> ExecuteScalarAsync(IDbConnection connection, SqlQuery query, ILogger logger = null, CancellationToken cancellationToken = default)
+    public static async Task<object?> ExecuteScalarAsync(IDbConnection connection, SqlQuery query, ILogger? logger = null, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(query);
 
@@ -1092,7 +1092,7 @@ public static class SqlHelper
     /// <param name="connection">The connection.</param>
     /// <param name="logger">The logger.</param>
     /// <returns>True if the query returns at least one result.</returns>
-    public static bool Exists(this SqlQuery query, IDbConnection connection, ILogger logger = null)
+    public static bool Exists(this SqlQuery query, IDbConnection connection, ILogger? logger = null)
     {
         using var reader = ExecuteReader(query, connection, logger);
         return reader.Read();
@@ -1106,7 +1106,7 @@ public static class SqlHelper
     /// <param name="logger">The logger.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task that represents the asynchronous operation. The task result is true if the query returns at least one result.</returns>
-    public static async Task<bool> ExistsAsync(this SqlQuery query, IDbConnection connection, ILogger logger = null, CancellationToken cancellationToken = default)
+    public static async Task<bool> ExistsAsync(this SqlQuery query, IDbConnection connection, ILogger? logger = null, CancellationToken cancellationToken = default)
     {
         using var reader = await ExecuteReaderAsync(query, connection, logger, cancellationToken).ConfigureAwait(false);
         return await reader.ReadAsync(cancellationToken).ConfigureAwait(false);

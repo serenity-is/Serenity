@@ -1,4 +1,4 @@
-﻿namespace Serenity.TestUtils;
+namespace Serenity.TestUtils;
 
 public class NullPermissions : IPermissionService
 {

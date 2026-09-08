@@ -1,4 +1,4 @@
-﻿namespace Serenity.Services;
+namespace Serenity.Services;
 
 /// <summary>
 /// Uploaded file item which is used by multiple upload editors
@@ -9,10 +9,10 @@ public class UploadedFile
     /// <summary>
     /// Gets or sets the file path.
     /// </summary>
-    public string Filename { get; set; }
+    public string? Filename { get; set; }
 
     /// <summary>
     /// Gets or sets the original file name.
     /// </summary>
-    public string OriginalName { get; set; }
+    public string? OriginalName { get; set; }
 }

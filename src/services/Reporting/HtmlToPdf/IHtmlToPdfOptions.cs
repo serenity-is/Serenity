@@ -8,7 +8,7 @@ public interface IHtmlToPdfOptions
     /// <summary>
     /// The URL that is being converted
     /// </summary>
-    string Url { get; set; }
+    string? Url { get; set; }
 
     /// <summary>
     /// Optional list of URLs that should be converted and appended to the document
@@ -43,12 +43,12 @@ public interface IHtmlToPdfOptions
     /// <summary>
     /// Page width like 21cm. Default value is unspecified.
     /// </summary>
-    string PageWidth { get; set; }
+    string? PageWidth { get; set; }
 
     /// <summary>
     /// Page height like 15cm. Default value is unspecified.
     /// </summary>
-    string PageHeight { get; set; }
+    string? PageHeight { get; set; }
 
     /// <summary>
     /// Use smart shrinking. Default is false.
@@ -68,42 +68,42 @@ public interface IHtmlToPdfOptions
     /// <summary>
     /// Zoom value like "0.33". Default is unspecified.
     /// </summary>
-    string Zoom { get; set; }
+    string? Zoom { get; set; }
 
     /// <summary>
     /// Use this to set all margins (left, right, bottom, top) at once
     /// </summary>
-    string MarginsAll { set; }
+    string? MarginsAll { set; }
 
     /// <summary>
     /// Page left margin, default is unspecified.
     /// </summary>
-    string MarginLeft { get; set; }
+    string? MarginLeft { get; set; }
 
     /// <summary>
     /// Page right margin, default is unspecified.
     /// </summary>
-    string MarginRight { get; set; }
+    string? MarginRight { get; set; }
 
     /// <summary>
     /// Page bottom margin, default is unspecified.
     /// </summary>
-    string MarginBottom { get; set; }
+    string? MarginBottom { get; set; }
 
     /// <summary>
     /// Page top margin, default is unspecified.
     /// </summary>
-    string MarginTop { get; set; }
+    string? MarginTop { get; set; }
 
     /// <summary>
     /// Url of header HTML page
     /// </summary>
-    string HeaderHtmlUrl { get; set; }
+    string? HeaderHtmlUrl { get; set; }
 
     /// <summary>
     /// Url of footer HTML page
     /// </summary>
-    string FooterHtmlUrl { get; set; }
+    string? FooterHtmlUrl { get; set; }
 
     /// <summary>
     /// A set of key value pairs that should be search replaced in footer and header
@@ -128,10 +128,10 @@ public interface IHtmlToPdfOptions
     /// <summary>
     /// Allows editing LaunchOptions, only available for Puppeteer
     /// </summary>
-    Action<object> EditLaunchOptions { get; set; }
+    Action<object>? EditLaunchOptions { get; set; }
 
     /// <summary>
     /// Allows editing PdfOptions, only available for Puppeteer
     /// </summary>
-    Action<object> EditPdfOptions { get; set; }
+    Action<object>? EditPdfOptions { get; set; }
 }

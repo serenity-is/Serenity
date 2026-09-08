@@ -14,7 +14,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
             {
                 Type = x.AddonType
             };
-            var p = new Dictionary<string, object>();
+            var p = new Dictionary<string, object?>();
             x.SetParams(p);
             if (p.Count > 0)
                 addon.Params = p;

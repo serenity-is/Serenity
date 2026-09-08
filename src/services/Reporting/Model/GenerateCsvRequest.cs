@@ -19,5 +19,5 @@ public class GenerateCsvRequest : ServiceRequest
     /// <summary>
     /// The download name for the exported file.
     /// </summary>
-    public string DownloadName { get; set; }
+    public string? DownloadName { get; set; }
 }

@@ -1,4 +1,4 @@
-﻿namespace Serenity.Reporting;
+namespace Serenity.Reporting;
 
 /// <summary>
 /// The interface for reports that return some type of
@@ -12,5 +12,5 @@ public interface IReportWithAdditionalData
     /// dictionary of dataset key / dataset content, if any.
     /// </summary>
     /// <returns>The additional data, or <c>null</c> if there is none.</returns>
-    IDictionary<string, object> GetAdditionalData();
+    IDictionary<string, object?>? GetAdditionalData();
 }

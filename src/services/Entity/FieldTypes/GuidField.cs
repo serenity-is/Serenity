@@ -15,8 +15,8 @@ namespace Serenity.Data;
 /// <param name="flags">The flags.</param>
 /// <param name="getValue">The get value.</param>
 /// <param name="setValue">The set value.</param>
-public sealed class GuidField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
-    Func<IRow, Guid?> getValue = null, Action<IRow, Guid?> setValue = null) : GenericValueField<Guid>(collection, FieldType.Guid, name, caption, size, flags, getValue, setValue)
+public sealed class GuidField(ICollection<Field> collection, string name, LocalText? caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
+    Func<IRow, Guid?>? getValue = null, Action<IRow, Guid?>? setValue = null) : GenericValueField<Guid>(collection, FieldType.Guid, name, caption, size, flags, getValue, setValue)
 {
 
     /// <summary>
@@ -30,7 +30,7 @@ public sealed class GuidField(ICollection<Field> collection, string name, LocalT
     /// <param name="getValue">The get value.</param>
     /// <param name="setValue">The set value.</param>
     /// <returns>A new GuidField instance.</returns>
-    public static GuidField Factory(ICollection<Field> collection, string name, LocalText caption, int size, FieldFlags flags,
+    public static GuidField Factory(ICollection<Field> collection, string name, LocalText? caption, int size, FieldFlags flags,
         Func<IRow, Guid?> getValue, Action<IRow, Guid?> setValue)
     {
         return new GuidField(collection, name, caption, size, flags, getValue, setValue);
@@ -85,10 +85,10 @@ public sealed class GuidField(ICollection<Field> collection, string name, LocalT
                 break;
             case Newtonsoft.Json.JsonToken.String:
                 var val = reader.Value as string;
-                if (val == "")
+                if (val == "" || val == null)
                     _setValue(row, null);
                 else
-                    _setValue(row, Guid.Parse((string)reader.Value));
+                    _setValue(row, Guid.Parse(val));
                 break;
             default:
                 throw JsonUnexpectedToken(reader);
@@ -103,7 +103,7 @@ public sealed class GuidField(ICollection<Field> collection, string name, LocalT
     /// <param name="source">The source.</param>
     /// <param name="provider">The provider.</param>
     /// <returns>The converted value.</returns>
-    public override object ConvertValue(object source, IFormatProvider provider)
+    public override object? ConvertValue(object? source, IFormatProvider provider)
     {
         if (source is Newtonsoft.Json.Linq.JValue jValue)
             source = jValue.Value;

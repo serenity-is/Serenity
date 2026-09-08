@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
 namespace Serenity;
@@ -85,6 +86,7 @@ public static class PathHelper
     ///   Filename.</param>
     /// <returns>
     ///   Converted filename.</returns>
+    [return:NotNullIfNotNull(nameof(fileName))]
     public static string? ToUrl(string? fileName)
     {
         if (fileName != null && fileName.IndexOf('\\') >= 0)

@@ -1,4 +1,4 @@
-﻿
+
 namespace Serenity.Reporting;
 
 /// <summary>
@@ -8,22 +8,22 @@ namespace Serenity.Reporting;
 public abstract class BaseCellDecorator : ICellDecorator
 {
     /// <inheritdoc/>
-    public object Item { get; set; }
+    public object? Item { get; set; }
 
     /// <inheritdoc/>
-    public string Name { get; set; }
+    public string? Name { get; set; }
 
     /// <inheritdoc/>
-    public object Value { get; set; }
+    public object? Value { get; set; }
 
     /// <inheritdoc/>
-    public string Background { get; set; }
+    public string? Background { get; set; }
 
     /// <inheritdoc/>
-    public string Foreground { get; set; }
+    public string? Foreground { get; set; }
 
     /// <inheritdoc/>
-    public string Format { get; set; }
+    public string? Format { get; set; }
 
     /// <inheritdoc/>
     public abstract void Decorate();

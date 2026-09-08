@@ -34,7 +34,7 @@ internal class AsyncToSyncListRequestProcessorWrapper<TRow>(IListRequestProcesso
     IRow IListRequestHandler.Row => handler.Row;
     ListRequest IListRequestHandler.Request => handler.Request;
     IListResponse IListRequestHandler.Response => handler.Response;
-    IDictionary<string, object> IListRequestHandler.StateBag => handler.StateBag;
+    IDictionary<string, object?> IListRequestHandler.StateBag => handler.StateBag;
     IDbConnection IListRequestHandler.Connection => handler.Connection;
     IRequestContext IListRequestHandler.Context => handler.Context;
     bool IListRequestHandler.AllowSelectField(Field field) => handler.AllowSelectField(field);

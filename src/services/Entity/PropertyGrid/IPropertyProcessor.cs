@@ -1,4 +1,4 @@
-﻿namespace Serenity.PropertyGrid;
+namespace Serenity.PropertyGrid;
 
 /// <summary>
 /// Interface for property processors, which sets properties of a PropertyItem
@@ -45,7 +45,7 @@ public interface IPropertyProcessor
     /// <value>
     /// The based on row.
     /// </value>
-    IRow BasedOnRow { get; set; }
+    IRow? BasedOnRow { get; set; }
 
     /// <summary>
     /// Gets the priority. The processors are called based

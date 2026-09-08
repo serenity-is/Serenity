@@ -4,9 +4,9 @@ namespace Serenity.PropertyGrid;
 
 public partial class BasicPropertyProcessor : PropertyProcessor
 {
-    private string propertyItemsTextPrefix;
+    private string? propertyItemsTextPrefix;
 
-    private string GetLocalizableTextValue<TAttribute>(IPropertySource source, string text,
+    private string? GetLocalizableTextValue<TAttribute>(IPropertySource source, string? text,
         Func<string> getSuffix, bool ignoreField = false)
         where TAttribute : Attribute
     {
@@ -38,7 +38,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
         if (getSuffix() is not string suffix)
             return text;
 
-        return (fromField ? ("Db." + source.BasedOnField.Fields.LocalTextPrefix + ".") :
+        return (fromField ? ("Db." + source.BasedOnField!.Fields.LocalTextPrefix + ".") :
             propertyItemsTextPrefix) + suffix;
     }
 

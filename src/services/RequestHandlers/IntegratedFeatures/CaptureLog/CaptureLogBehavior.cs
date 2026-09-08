@@ -6,7 +6,7 @@ namespace Serenity.Services;
 public class CaptureLogBehavior : BaseSaveDeleteBehaviorAsync, ISaveBehaviorSync, IDeleteBehaviorSync,
     IUndeleteBehaviorAsync, IUndeleteBehaviorSync, IImplicitBehavior
 {
-    private CaptureLogAttribute captureLogAttr;
+    private CaptureLogAttribute? captureLogAttr;
 
     /// <inheritdoc/>
     public bool ActivateFor(IRow row)
@@ -64,7 +64,7 @@ public class CaptureLogBehavior : BaseSaveDeleteBehaviorAsync, ISaveBehaviorSync
         return LogAsync(handler.UnitOfWork, handler.Row, newRow, handler.Context.User?.GetIdentifier(), cancellationToken);
     }
 
-    private static IRow GetDeletedLogRow(IRow row)
+    private static IRow? GetDeletedLogRow(IRow row)
     {
         // if row is not actually deleted, but set to deleted by a flag, log it as if it is an update operation
         if (row is IIsActiveDeletedRow isActiveDeletedRow)
@@ -83,23 +83,23 @@ public class CaptureLogBehavior : BaseSaveDeleteBehaviorAsync, ISaveBehaviorSync
         return null;
     }
 
-    private static IRow GetUndeletedLogRow(IRow row)
+    private static IRow? GetUndeletedLogRow(IRow row)
     {
         var newRow = row.Clone();
 
         // log it as if it is an update operation
-        if (row is IIsActiveDeletedRow isActiveDeletedRow)
+        if (newRow is IIsActiveDeletedRow isActiveDeletedRow)
         {
-            ((IIsActiveDeletedRow)newRow).IsActiveField[newRow] = 1;
+            isActiveDeletedRow.IsActiveField[newRow] = 1;
         }
-        else if (row is IIsDeletedRow isDeletedRow)
+        else if (newRow is IIsDeletedRow isDeletedRow)
         {
-            ((IIsDeletedRow)newRow).IsDeletedField[newRow] = true;
+            isDeletedRow.IsDeletedField[newRow] = true;
         }
-        else if (row is IDeleteLogRow deleteLogRow)
+        else if (newRow is IDeleteLogRow deleteLogRow)
         {
-            ((IDeleteLogRow)newRow).DeleteUserIdField.AsObject(newRow, null);
-            ((IDeleteLogRow)newRow).DeleteDateField.AsObject(newRow, null);
+            deleteLogRow.DeleteUserIdField.AsObject(newRow, null);
+            deleteLogRow.DeleteDateField.AsObject(newRow, null);
         }
         else
             return null;
@@ -155,7 +155,7 @@ public class CaptureLogBehavior : BaseSaveDeleteBehaviorAsync, ISaveBehaviorSync
             if (handler.Row is IUpdateUserIdRow updateUserIdRow && ReferenceEquals(updateUserIdRow.UpdateUserIdField, field))
                 continue;
 
-            if (field.IndexCompare(handler.Old, handler.Row) != 0)
+            if (field.IndexCompare(handler.Old!, handler.Row) != 0)
                 return true;
         }
 
@@ -171,9 +171,9 @@ public class CaptureLogBehavior : BaseSaveDeleteBehaviorAsync, ISaveBehaviorSync
     /// <param name="userId">User ID</param>
     /// <exception cref="ArgumentNullException"><paramref name="old"/> and <paramref name="row"/> are both <c>null</c>.</exception>
     /// <exception cref="InvalidOperationException">Capture log row type does not implement ICaptureLogRow interface</exception>
-    public void Log(IUnitOfWork uow, IRow old, IRow row, object userId)
+    public void Log(IUnitOfWork uow, IRow? old, IRow? row, object? userId)
     {
-        var context = PrepareLog(uow, old, row, userId);
+        var context = PrepareLog(old, row, userId);
 
         if (BuildCloseActiveUpdate(context).Execute(uow.Connection, ExpectedRows.Ignore) > 1)
             throw new InvalidOperationException($"Capture log has more than one active instance " +
@@ -198,10 +198,10 @@ public class CaptureLogBehavior : BaseSaveDeleteBehaviorAsync, ISaveBehaviorSync
     /// <param name="cancellationToken">Cancellation token</param>
     /// <exception cref="ArgumentNullException"><paramref name="old"/> and <paramref name="row"/> are both <c>null</c>.</exception>
     /// <exception cref="InvalidOperationException">Capture log row type does not implement ICaptureLogRow interface</exception>
-    public async Task LogAsync(IUnitOfWork uow, IRow old, IRow row, object userId,
+    public async Task LogAsync(IUnitOfWork uow, IRow? old, IRow? row, object? userId,
         CancellationToken cancellationToken = default)
     {
-        var context = PrepareLog(uow, old, row, userId);
+        var context = PrepareLog(old, row, userId);
 
         if (await BuildCloseActiveUpdate(context).ExecuteAsync(uow.Connection, ExpectedRows.Ignore,
                 cancellationToken: cancellationToken).ConfigureAwait(false) > 1)
@@ -237,21 +237,21 @@ public class CaptureLogBehavior : BaseSaveDeleteBehaviorAsync, ISaveBehaviorSync
         return updateLogRow;
     }
 
-    private LogContext PrepareLog(IUnitOfWork uow, IRow old, IRow row, object userId)
+    private LogContext PrepareLog(IRow? old, IRow? row, object? userId)
     {
         if (old == null && row == null)
-            throw new ArgumentNullException("old");
+            throw new ArgumentNullException(nameof(old));
 
         var now = DateTime.Now;
-        var rowInstance = row ?? old;
-        var rowType = rowInstance.GetType();
-        var logRow = (Activator.CreateInstance(captureLogAttr.LogRow) as ICaptureLogRow) ??
+        var rowInstance = (row ?? old)!;
+        var rowType = rowInstance!.GetType();
+        var logRow = (Activator.CreateInstance(captureLogAttr!.LogRow) as ICaptureLogRow) ??
             throw new InvalidOperationException($"Capture log table {captureLogAttr.LogRow.FullName} " +
                 $"for {rowType.FullName} doesn't implement ICaptureLogRow interface!");
 
         var rowFieldPrefixLength = PrefixHelper.DeterminePrefixLength(rowInstance.EnumerateTableFields(), x => x.Name);
         var logFieldPrefixLength = PrefixHelper.DeterminePrefixLength(logRow.EnumerateTableFields(), x => x.Name);
-        var mappedIdFieldName = captureLogAttr.MappedIdField ?? rowInstance.IdField.Name;
+        var mappedIdFieldName = captureLogAttr.MappedIdField ?? rowInstance.IdField!.Name;
         var mappedIdField = logRow.FindField(mappedIdFieldName) ?? throw new InvalidOperationException($"Can't locate capture log table " +
                 $"mapped ID field for {logRow.Table}!");
         logRow.TrackAssignments = true;
@@ -278,11 +278,11 @@ public class CaptureLogBehavior : BaseSaveDeleteBehaviorAsync, ISaveBehaviorSync
                     continue;
 
                 if (ReferenceEquals(logField, mappedIdField))
-                    yield return new Tuple<Field, Field>(logField, rowInstance.IdField);
+                    yield return new Tuple<Field, Field>(logField, rowInstance.IdField!);
                 else
                 {
                     var name = logField.Name[logFieldPrefixLength..];
-                    name = rowInstance.IdField.Name[..rowFieldPrefixLength] + name;
+                    name = rowInstance.IdField!.Name[..rowFieldPrefixLength] + name;
                     var match = rowInstance.FindField(name) ?? throw new InvalidOperationException($"Can't find match in the row for log table field {name}!");
                     yield return new Tuple<Field, Field>(logField, match);
                 }
@@ -301,25 +301,25 @@ public class CaptureLogBehavior : BaseSaveDeleteBehaviorAsync, ISaveBehaviorSync
         if (operationType == CaptureOperationType.Insert)
         {
             logRow.ValidUntilField[logRow] = CaptureLogConsts.UntilMax;
-            copyCapturedFields(row, logRow);
+            copyCapturedFields(row!, logRow);
         }
         else
         {
             logRow.ValidUntilField[logRow] = now;
-            copyCapturedFields(old, logRow);
+            copyCapturedFields(old!, logRow);
         }
 
-        return new LogContext(logRow, row, operationType, now, userId, copyCapturedFields, mappedIdField);
+        return new LogContext(logRow, rowInstance, operationType, now, userId, copyCapturedFields, mappedIdField);
     }
 
     private sealed class LogContext(ICaptureLogRow logRow, IRow row, CaptureOperationType operationType,
-        DateTime now, object userId, Action<IRow, IRow> copyCapturedFields, Field mappedIdField)
+        DateTime now, object? userId, Action<IRow, IRow> copyCapturedFields, Field mappedIdField)
     {
         public ICaptureLogRow LogRow { get; } = logRow;
         public IRow Row { get; } = row;
         public CaptureOperationType OperationType { get; } = operationType;
         public DateTime Now { get; } = now;
-        public object UserId { get; } = userId;
+        public object? UserId { get; } = userId;
         public Action<IRow, IRow> CopyCapturedFields { get; } = copyCapturedFields;
         public Field MappedIdField { get; } = mappedIdField;
     }

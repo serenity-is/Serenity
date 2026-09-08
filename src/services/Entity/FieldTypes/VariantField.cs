@@ -15,8 +15,8 @@ namespace Serenity.Data;
 /// <param name="flags">The flags.</param>
 /// <param name="getValue">The get value.</param>
 /// <param name="setValue">The set value.</param>
-public class VariantField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
-    Func<IRow, object> getValue = null, Action<IRow, object> setValue = null) : GenericClassField<object>(collection, FieldType.String, name, caption, size, flags, getValue, setValue)
+public class VariantField(ICollection<Field> collection, string name, LocalText? caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
+    Func<IRow, object?>? getValue = null, Action<IRow, object?>? setValue = null) : GenericClassField<object>(collection, FieldType.String, name, caption, size, flags, getValue, setValue)
 {
 
     /// <summary>
@@ -30,8 +30,8 @@ public class VariantField(ICollection<Field> collection, string name, LocalText 
     /// <param name="getValue">The get value.</param>
     /// <param name="setValue">The set value.</param>
     /// <returns>A new VariantField instance.</returns>
-    public static VariantField Factory(ICollection<Field> collection, string name, LocalText caption, int size, FieldFlags flags,
-        Func<IRow, object> getValue, Action<IRow, object> setValue)
+    public static VariantField Factory(ICollection<Field> collection, string name, LocalText? caption, int size, FieldFlags flags,
+        Func<IRow, object?>? getValue, Action<IRow, object?>? setValue)
     {
         return new VariantField(collection, name, caption, size, flags, getValue, setValue);
     }
@@ -66,8 +66,8 @@ public class VariantField(ICollection<Field> collection, string name, LocalText 
         var value1 = _getValue(row1);
         var value2 = _getValue(row2);
 
-        bool null1 = value1 == null;
-        bool null2 = value2 == null;
+        bool null1 = value1 is null;
+        bool null2 = value2 is null;
         if (null1 || null2)
         {
             if (null1 && null2)
@@ -78,7 +78,7 @@ public class VariantField(ICollection<Field> collection, string name, LocalText 
                 return 1;
         }
         else
-            return value1.GetHashCode().CompareTo(value2.GetHashCode());
+            return value1!.GetHashCode().CompareTo(value2!.GetHashCode());
     }
 
     /// <summary>

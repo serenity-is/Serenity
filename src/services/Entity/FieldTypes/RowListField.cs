@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 /// <summary>
 /// Field with a RowList value.
@@ -15,8 +15,8 @@
 /// <param name="getValue">The get value.</param>
 /// <param name="setValue">The set value.</param>
 [NotMapped]
-public class RowListField<TForeign>(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default | FieldFlags.NotMapped,
-    Func<IRow, List<TForeign>> getValue = null, Action<IRow, List<TForeign>> setValue = null) : CustomClassField<List<TForeign>>(collection, name, caption, size, flags, getValue, setValue) where TForeign : class, IRow
+public class RowListField<TForeign>(ICollection<Field> collection, string name, LocalText? caption = null, int size = 0, FieldFlags flags = FieldFlags.Default | FieldFlags.NotMapped,
+    Func<IRow, List<TForeign>>? getValue = null, Action<IRow, List<TForeign>?>? setValue = null) : CustomClassField<List<TForeign>>(collection, name, caption, size, flags, getValue, setValue) where TForeign : class, IRow
 {
 
     /// <summary>
@@ -59,8 +59,10 @@ public class RowListField<TForeign>(ICollection<Field> collection, string name, 
     /// </summary>
     /// <param name="value">The value.</param>
     /// <returns>A clone of the value.</returns>
-    protected override List<TForeign> Clone(List<TForeign> value)
+    protected override List<TForeign>? Clone(List<TForeign>? value)
     {
+        if (value is null)
+            return null;
         var clone = new List<TForeign>();
         foreach (var row in value)
             clone.Add(row.Clone());

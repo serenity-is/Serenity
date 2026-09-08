@@ -153,7 +153,7 @@ public static class DataReaderExtensions
     /// <param name="reader">The reader (required).</param>
     /// <param name="index">The field index.</param>
     /// <returns>The field value, or <c>null</c> if the value is <see cref="DBNull"/>.</returns>
-    public static string AsString(this IDataReader reader, int index)
+    public static string? AsString(this IDataReader reader, int index)
     {
         if (reader.IsDBNull(index))
             return null;
@@ -167,7 +167,7 @@ public static class DataReaderExtensions
     /// <param name="reader">The reader (required).</param>
     /// <param name="index">The field index.</param>
     /// <returns>The field value, or <c>null</c> if the value is <see cref="DBNull"/>.</returns>
-    public static string ToString(this IDataReader reader, int index)
+    public static string? ToString(this IDataReader reader, int index)
     {
         if (reader.IsDBNull(index))
             return null;

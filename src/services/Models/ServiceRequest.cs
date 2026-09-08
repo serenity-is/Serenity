@@ -1,4 +1,4 @@
-﻿namespace Serenity.Services;
+namespace Serenity.Services;
 
 /// <summary>
 /// The base request object model for all service requests.
@@ -14,5 +14,5 @@ public class ServiceRequest
     /// way to the side effect ignoring typos.
     /// </summary>
     [IgnoreUIField]
-    public Dictionary<string, object> CustomData { get; set; }
+    public Dictionary<string, object?>? CustomData { get; set; }
 }

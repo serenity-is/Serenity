@@ -148,7 +148,7 @@ public static class EntitySqlHelper
     /// <param name="loaderRow">The loader row.</param>
     /// <returns>List of rows.</returns>
     public static List<TRow> List<TRow>(this SqlQuery query,
-        IDbConnection connection, TRow loaderRow = null) where TRow : class, IRow
+        IDbConnection connection, TRow? loaderRow = null) where TRow : class, IRow
     {
         var list = new List<TRow>();
         ForEach(query, connection, delegate ()
@@ -168,7 +168,7 @@ public static class EntitySqlHelper
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task representing the asynchronous operation. The task result is the list of rows.</returns>
     public static async Task<List<TRow>> ListAsync<TRow>(this SqlQuery query,
-        IDbConnection connection, TRow loaderRow = null, CancellationToken cancellationToken = default) where TRow : class, IRow
+        IDbConnection connection, TRow? loaderRow = null, CancellationToken cancellationToken = default) where TRow : class, IRow
     {
         var list = new List<TRow>();
         await ForEachAsync(query, connection, delegate ()

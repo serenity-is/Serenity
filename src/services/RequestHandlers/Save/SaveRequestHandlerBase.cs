@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+
 namespace Serenity.Services;
 
 /// <summary>
@@ -18,6 +20,8 @@ public abstract class SaveRequestHandlerBase<TRow, TSaveRequest, TSaveResponse>(
     where TSaveResponse : SaveResponse, new()
     where TSaveRequest : SaveRequest<TRow>, new()
 {
+    private IUnitOfWork? unitOfWork;
+
     /// <summary>
     /// Gets the list of save behaviors.
     /// </summary>
@@ -97,9 +101,9 @@ public abstract class SaveRequestHandlerBase<TRow, TSaveRequest, TSaveResponse>(
     /// <param name="field">The field to handle.</param>
     protected virtual void HandleNonEditable(Field field)
     {
-        if (IsUpdate && field.IndexCompare(Row, Old) == 0)
+        if (IsUpdate && field.IndexCompare(Row, Old!) == 0)
         {
-            field.CopyNoAssignment(Old, Row);
+            field.CopyNoAssignment(Old!, Row);
             Row.ClearAssignment(field);
             return;
         }
@@ -115,7 +119,7 @@ public abstract class SaveRequestHandlerBase<TRow, TSaveRequest, TSaveResponse>(
                 if (!isNonTableField)
                     throw DataValidation.ReadOnlyError(field, Localizer);
 
-                field.CopyNoAssignment(Old, Row);
+                field.CopyNoAssignment(Old!, Row);
                 Row.ClearAssignment(field);
             }
         }
@@ -194,7 +198,7 @@ public abstract class SaveRequestHandlerBase<TRow, TSaveRequest, TSaveResponse>(
         {
             if (IsUpdate && !Row.IsAssigned(field))
             {
-                field.CopyNoAssignment(Old, Row);
+                field.CopyNoAssignment(Old!, Row);
                 Row.ClearAssignment(field);
                 continue;
             }
@@ -240,7 +244,7 @@ public abstract class SaveRequestHandlerBase<TRow, TSaveRequest, TSaveResponse>(
     /// <exception cref="ValidationError">One of the fields has an invalid value</exception>
     protected virtual void ValidateFieldValues()
     {
-        var context = new RowValidationContext(Connection, Row, Localizer);
+        var context = new RowValidationContext(Connection!, Row, Localizer);
 
         foreach (var field in Row.GetFields())
         {
@@ -292,10 +296,10 @@ public abstract class SaveRequestHandlerBase<TRow, TSaveRequest, TSaveResponse>(
     protected virtual void ValidateAndClearIdField()
     {
         var idField = Row.IdField;
-        if (Row.IsAssigned(idField))
-            Row.ValidateRequired(idField, Localizer);
+        if (Row.IsAssigned(idField!))
+            Row.ValidateRequired(idField!, Localizer);
 
-        if ((idField.Flags & FieldFlags.Updatable) != FieldFlags.Updatable)
+        if ((idField!.Flags & FieldFlags.Updatable) != FieldFlags.Updatable)
             Row.ClearAssignment(idField);
     }
 
@@ -306,7 +310,7 @@ public abstract class SaveRequestHandlerBase<TRow, TSaveRequest, TSaveResponse>(
     /// </summary>
     protected virtual void ValidatePermissions()
     {
-        PermissionAttributeBase attr = null;
+        PermissionAttributeBase? attr = null;
 
         if (IsUpdate)
         {
@@ -317,7 +321,7 @@ public abstract class SaveRequestHandlerBase<TRow, TSaveRequest, TSaveResponse>(
             attr = typeof(TRow).GetCustomAttribute<InsertPermissionAttribute>(true);
         }
 
-        attr ??= (PermissionAttributeBase)typeof(TRow).GetCustomAttribute<ModifyPermissionAttribute>(true) ??
+        attr ??= (PermissionAttributeBase?)typeof(TRow).GetCustomAttribute<ModifyPermissionAttribute>(true) ??
             typeof(TRow).GetCustomAttribute<ReadPermissionAttribute>(true);
 
         if (attr != null)
@@ -334,6 +338,16 @@ public abstract class SaveRequestHandlerBase<TRow, TSaveRequest, TSaveResponse>(
     }
 
     /// <summary>
+    /// Creates an exception indicating that the handler has not been initialized.
+    /// </summary>
+    /// <param name="property">The property being accessed.</param>
+    /// <returns>The initialization error.</returns>
+    private InvalidOperationException PropertyReadError([CallerMemberName] string? property = default)
+    {
+        return new InvalidOperationException($"Error reading '{property}' of {GetType().Name}. The handler has not been initialized.");
+    }
+
+    /// <summary>
     /// Gets the two level cache from the request context.
     /// </summary>
     public ITwoLevelCache Cache => Context.Cache;
@@ -341,7 +355,7 @@ public abstract class SaveRequestHandlerBase<TRow, TSaveRequest, TSaveResponse>(
     /// <summary>
     /// Gets the request context.
     /// </summary>
-    public IRequestContext Context { get; private set; } = context ?? throw new ArgumentNullException(nameof(context));
+    public IRequestContext Context { get; } = context ?? throw new ArgumentNullException(nameof(context));
 
     /// <summary>
     /// Gets the localizer from the request context.
@@ -356,27 +370,27 @@ public abstract class SaveRequestHandlerBase<TRow, TSaveRequest, TSaveResponse>(
     /// <summary>
     /// Gets the current user from the request context.
     /// </summary>
-    public ClaimsPrincipal User => Context.User;
+    public ClaimsPrincipal? User => Context.User;
 
     /// <summary>
     /// Gets the current connection.
     /// </summary>
-    public IDbConnection Connection => UnitOfWork.Connection;
+    public IDbConnection Connection { get => unitOfWork?.Connection ?? throw PropertyReadError(); }
 
     /// <summary>
     /// Gets the current unit of work.
     /// </summary>
-    public IUnitOfWork UnitOfWork { get; protected set; }
+    public IUnitOfWork UnitOfWork { get => unitOfWork ?? throw PropertyReadError(); protected set => unitOfWork = value; }
 
     /// <summary>
     /// Gets the old entity for update.
     /// </summary>
-    public TRow Old { get; protected set; }
+    public TRow? Old { get; protected set; }
 
     /// <summary>
     /// Gets the inserted entity for Create and the new entity for Update.
     /// </summary>
-    public TRow Row { get; protected set; }
+    public TRow Row { get => field ?? throw PropertyReadError(); protected set; }
 
     /// <summary>
     /// Returns true if this is a Create operation.
@@ -391,21 +405,21 @@ public abstract class SaveRequestHandlerBase<TRow, TSaveRequest, TSaveResponse>(
     /// <summary>
     /// Gets the request object.
     /// </summary>
-    public TSaveRequest Request { get; protected set; }
+    public TSaveRequest Request { get => field ?? throw PropertyReadError(); protected set; }
 
     /// <summary>
     /// Gets the response object.
     /// </summary>
-    public TSaveResponse Response { get; protected set; }
+    public TSaveResponse Response { get => field ?? throw PropertyReadError(); protected set; }
 
     /// <summary>
     /// A state bag for behaviors to preserve state among their methods.
     /// It will be cleared before each request, e.g. Process call.
     /// </summary>
-    public IDictionary<string, object> StateBag { get; private set; } = new Dictionary<string, object>();
+    public IDictionary<string, object?> StateBag { get; } = new Dictionary<string, object?>();
 
     ISaveRequest ISaveRequestHandler.Request => Request;
     SaveResponse ISaveRequestHandler.Response => Response;
-    IRow ISaveRequestHandler.Old => Old;
+    IRow? ISaveRequestHandler.Old => Old;
     IRow ISaveRequestHandler.Row => Row;
 }

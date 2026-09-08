@@ -15,7 +15,7 @@ public class JoinAliasLocator
     {
         ArgumentNullException.ThrowIfNull(expression);
 
-        HashSet<string> aliases = null;
+        HashSet<string>? aliases = null;
         EnumerateAliases(expression, s =>
         {
             aliases ??= new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -36,8 +36,8 @@ public class JoinAliasLocator
     {
         ArgumentNullException.ThrowIfNull(expression);
 
-        HashSet<string> aliases = null;
-        string alias = null;
+        HashSet<string>? aliases = null;
+        string? alias = null;
         EnumerateAliases(expression, s =>
         {
             if (aliases == null && (alias == null || (aliases == null && alias == s)))

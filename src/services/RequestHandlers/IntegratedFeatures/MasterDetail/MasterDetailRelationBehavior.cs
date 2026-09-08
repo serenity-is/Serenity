@@ -15,21 +15,21 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
     IListBehaviorSync, IListBehaviorAsync, IFieldBehavior, IImplicitBehavior
 {
     /// <inheritdoc/>
-    public Field Target { get; set; }
+    public Field? Target { get; set; }
 
     private readonly IDefaultHandlerFactory handlerFactory = handlerFactory ?? throw new ArgumentNullException(nameof(handlerFactory));
-    private MasterDetailRelationAttribute attr;
-    private Func<IList> rowListFactory;
-    private Func<IRow> rowFactory;
-    private Type rowType;
-    private Field foreignKeyField;
-    private BaseCriteria foreignKeyCriteria;
-    private Field filterField;
-    private Field masterKeyField;
-    private object filterValue;
-    private BaseCriteria filterCriteria;
-    private BaseCriteria queryCriteria;
-    private HashSet<string> includeColumns;
+    private MasterDetailRelationAttribute? attr;
+    private Func<IList>? rowListFactory;
+    private Func<IRow>? rowFactory;
+    private Type? rowType;
+    private Field? foreignKeyField;
+    private BaseCriteria? foreignKeyCriteria;
+    private Field? filterField;
+    private Field? masterKeyField;
+    private object? filterValue;
+    private BaseCriteria? filterCriteria;
+    private BaseCriteria? queryCriteria;
+    private HashSet<string>? includeColumns;
 
     /// <inheritdoc/>
     public bool ActivateFor(IRow row)
@@ -61,8 +61,8 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
                     Target.PropertyName ?? Target.Name, row.GetType().FullName));
         }
 
-        rowListFactory = () => (IList)Activator.CreateInstance(rowListType);
-        rowFactory = () => (IRow)Activator.CreateInstance(rowType);
+        rowListFactory = () => (IList)Activator.CreateInstance(rowListType)!;
+        rowFactory = () => (IRow)Activator.CreateInstance(rowType)!;
 
         if (attr.MasterKeyField != null)
         {
@@ -149,9 +149,9 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
             !handler.ShouldSelectField(Target))
             return;
 
-        var listHandler = handlerFactory.CreateHandler<IListRequestProcessor>(rowType);
+        var listHandler = handlerFactory.CreateHandler<IListRequestProcessor>(rowType!);
         var listRequest = BuildRetrieveListRequest(listHandler.CreateRequest(), handler);
-        var response = listHandler.Process(handler.Connection, listRequest);
+        var response = listHandler.Process(handler.Connection!, listRequest);
         FillRetrieveList(handler, response);
     }
 
@@ -168,27 +168,27 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
 
     private async Task OnReturnAsyncCore(IRetrieveRequestHandler handler, CancellationToken cancellationToken)
     {
-        var listHandler = handlerFactory.CreateHandler<IListRequestProcessorAsync>(rowType);
+        var listHandler = handlerFactory.CreateHandler<IListRequestProcessorAsync>(rowType!);
         var listRequest = BuildRetrieveListRequest(listHandler.CreateRequest(), handler);
-        var response = await listHandler.ProcessAsync(handler.Connection, listRequest, cancellationToken).ConfigureAwait(false);
+        var response = await listHandler.ProcessAsync(handler.Connection!, listRequest, cancellationToken).ConfigureAwait(false);
         FillRetrieveList(handler, response);
     }
 
     private ListRequest BuildRetrieveListRequest(ListRequest listRequest, IRetrieveRequestHandler handler)
     {
-        listRequest.ColumnSelection = attr.ColumnSelection;
-        listRequest.IncludeColumns = includeColumns;
-        listRequest.Criteria = foreignKeyCriteria == new ValueCriteria(masterKeyField.AsObject(handler.Row)) & filterCriteria;
+        listRequest.ColumnSelection = attr!.ColumnSelection;
+        listRequest.IncludeColumns = includeColumns!;
+        listRequest.Criteria = foreignKeyCriteria! == new ValueCriteria(masterKeyField!.AsObject(handler.Row)) & filterCriteria;
         return listRequest;
     }
 
     private void FillRetrieveList(IRetrieveRequestHandler handler, IListResponse response)
     {
-        var list = rowListFactory();
-        foreach (var item in response.Entities)
+        var list = rowListFactory!();
+        foreach (var item in response.Entities!)
             list.Add(item);
 
-        Target.AsObject(handler.Row, list);
+        Target!.AsObject(handler.Row, list);
     }
 
     /// <inheritdoc/>
@@ -197,15 +197,15 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
         if (Target is null ||
             !handler.AllowSelectField(Target) ||
             !handler.ShouldSelectField(Target) ||
-            handler.Response.Entities.IsEmptyOrNull())
+            handler.Response.Entities!.IsEmptyOrNull())
             return;
 
-        var listHandler = handlerFactory.CreateHandler<IListRequestProcessor>(rowType);
+        var listHandler = handlerFactory.CreateHandler<IListRequestProcessor>(rowType!);
         var listRequest = listHandler.CreateRequest();
-        listRequest.ColumnSelection = attr.ColumnSelection;
+        listRequest.ColumnSelection = attr!.ColumnSelection;
         listRequest.IncludeColumns = includeColumns;
 
-        var enumerator = handler.Response.Entities.Cast<IRow>();
+        var enumerator = handler.Response.Entities!.Cast<IRow>();
         while (true)
         {
             var part = enumerator.Take(1000);
@@ -214,8 +214,8 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
 
             enumerator = enumerator.Skip(1000);
 
-            listRequest.Criteria = foreignKeyCriteria.In(
-                part.Select(x => masterKeyField.AsObject(x))) & filterCriteria;
+            listRequest.Criteria = foreignKeyCriteria!.In(
+                part.Select(x => masterKeyField!.AsObject(x))) & filterCriteria;
 
             var response = listHandler.Process(handler.Connection, listRequest);
             FillListPart(handler, part, response);
@@ -228,7 +228,7 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
         if (Target is null ||
             !handler.AllowSelectField(Target) ||
             !handler.ShouldSelectField(Target) ||
-            handler.Response.Entities.IsEmptyOrNull())
+            handler.Response.Entities!.IsEmptyOrNull())
             return Task.CompletedTask;
 
         return OnReturnAsyncCore(handler, cancellationToken);
@@ -236,12 +236,12 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
 
     private async Task OnReturnAsyncCore(IListRequestHandler handler, CancellationToken cancellationToken)
     {
-        var listHandler = handlerFactory.CreateHandler<IListRequestProcessorAsync>(rowType);
+        var listHandler = handlerFactory.CreateHandler<IListRequestProcessorAsync>(rowType!);
         var listRequest = listHandler.CreateRequest();
-        listRequest.ColumnSelection = attr.ColumnSelection;
+        listRequest.ColumnSelection = attr!.ColumnSelection;
         listRequest.IncludeColumns = includeColumns;
 
-        var enumerator = handler.Response.Entities.Cast<IRow>();
+        var enumerator = handler.Response.Entities!.Cast<IRow>();
         while (true)
         {
             var part = enumerator.Take(1000);
@@ -250,8 +250,8 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
 
             enumerator = enumerator.Skip(1000);
 
-            listRequest.Criteria = foreignKeyCriteria.In(
-                part.Select(x => masterKeyField.AsObject(x))) & filterCriteria;
+            listRequest.Criteria = foreignKeyCriteria!.In(
+                part.Select(x => masterKeyField!.AsObject(x))) & filterCriteria;
 
             var response = await listHandler.ProcessAsync(handler.Connection, listRequest, cancellationToken).ConfigureAwait(false);
             FillListPart(handler, part, response);
@@ -260,56 +260,56 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
 
     private void FillListPart(IListRequestHandler handler, IEnumerable<IRow> part, IListResponse response)
     {
-        var lookup = response.Entities.Cast<IRow>()
-            .ToLookup(x => AsString(foreignKeyField.AsObject(x)));
+        var lookup = response.Entities!.Cast<IRow>()
+            .ToLookup(x => AsString(foreignKeyField!.AsObject(x)));
 
         foreach (var row in part)
         {
-            var list = rowListFactory();
-            var matching = lookup[AsString(masterKeyField.AsObject(row))];
+            var list = rowListFactory!();
+            var matching = lookup[AsString(masterKeyField!.AsObject(row))];
             foreach (var x in matching)
                 list.Add(x);
 
-            Target.AsObject(row, list);
+            Target!.AsObject(row, list);
         }
     }
 
-    private void SaveDetail(IUnitOfWork uow, IRow detail, object masterId, object detailId)
+    private void SaveDetail(IUnitOfWork uow, IRow detail, object masterId, object? detailId)
     {
         detail = PrepareDetail(detail, masterId, detailId);
 
-        var saveHandler = handlerFactory.CreateHandler<ISaveRequestProcessor>(rowType);
+        var saveHandler = handlerFactory.CreateHandler<ISaveRequestProcessor>(rowType!);
         var saveRequest = saveHandler.CreateRequest();
         saveRequest.Entity = detail;
         saveHandler.Process(uow, saveRequest, detailId == null ? SaveRequestType.Create : SaveRequestType.Update);
     }
 
-    private async Task SaveDetailAsync(IUnitOfWork uow, IRow detail, object masterId, object detailId,
+    private async Task SaveDetailAsync(IUnitOfWork uow, IRow detail, object masterId, object? detailId,
         CancellationToken cancellationToken = default)
     {
         detail = PrepareDetail(detail, masterId, detailId);
 
-        var saveHandler = handlerFactory.CreateHandler<ISaveRequestProcessorAsync>(rowType);
+        var saveHandler = handlerFactory.CreateHandler<ISaveRequestProcessorAsync>(rowType!);
         var saveRequest = saveHandler.CreateRequest();
         saveRequest.Entity = detail;
         await saveHandler.ProcessAsync(uow, saveRequest,
             detailId == null ? SaveRequestType.Create : SaveRequestType.Update, cancellationToken).ConfigureAwait(false);
     }
 
-    private IRow PrepareDetail(IRow detail, object masterId, object detailId)
+    private IRow PrepareDetail(IRow detail, object masterId, object? detailId)
     {
         detail = detail.Clone();
 
-        foreignKeyField.AsObject(detail, masterId);
+        foreignKeyField!.AsObject(detail, masterId);
         filterField?.AsObject(detail, filterValue);
 
-        detail.IdField.AsObject(detail, detailId);
+        detail.IdField!.AsObject(detail, detailId);
         return detail;
     }
 
-    private void DeleteDetail(IUnitOfWork uow, object detailId)
+    private void DeleteDetail(IUnitOfWork uow, object? detailId)
     {
-        var deleteHandler = handlerFactory.CreateHandler<IDeleteRequestProcessor>(rowType);
+        var deleteHandler = handlerFactory.CreateHandler<IDeleteRequestProcessor>(rowType!);
         var deleteRequest = deleteHandler.CreateRequest();
         deleteRequest.EntityId = detailId;
         deleteHandler.Process(uow, deleteRequest);
@@ -317,13 +317,13 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
 
     private Task DeleteDetailAsync(IUnitOfWork uow, object detailId, CancellationToken cancellationToken = default)
     {
-        var deleteHandler = handlerFactory.CreateHandler<IDeleteRequestProcessorAsync>(rowType);
+        var deleteHandler = handlerFactory.CreateHandler<IDeleteRequestProcessorAsync>(rowType!);
         var deleteRequest = deleteHandler.CreateRequest();
         deleteRequest.EntityId = detailId;
         return deleteHandler.ProcessAsync(uow, deleteRequest, cancellationToken);
     }
 
-    private static string AsString(object obj)
+    private static string? AsString(object? obj)
     {
         if (obj == null)
             return null;
@@ -338,13 +338,13 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
             return;
 
         foreach (var row in changes.RowsToUpdate)
-            SaveDetail(uow, row.Row, masterId, row.Id);
+            SaveDetail(uow, row.Row!, masterId, row.Id);
 
         foreach (var row in changes.RowsToDelete)
             DeleteDetail(uow, row.Id);
 
         foreach (var row in changes.RowsToInsert)
-            SaveDetail(uow, row.Row, masterId, null);
+            SaveDetail(uow, row.Row!, masterId, null);
     }
 
     private async Task DetailListSaveAsync(IUnitOfWork uow, object masterId, IList oldList, IList newList,
@@ -355,16 +355,16 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
             return;
 
         foreach (var row in changes.RowsToUpdate)
-            await SaveDetailAsync(uow, row.Row, masterId, row.Id, cancellationToken).ConfigureAwait(false);
+            await SaveDetailAsync(uow, row.Row!, masterId, row.Id!, cancellationToken).ConfigureAwait(false);
 
         foreach (var row in changes.RowsToDelete)
-            await DeleteDetailAsync(uow, row.Id, cancellationToken).ConfigureAwait(false);
+            await DeleteDetailAsync(uow, row.Id!, cancellationToken).ConfigureAwait(false);
 
         foreach (var row in changes.RowsToInsert)
-            await SaveDetailAsync(uow, row.Row, masterId, null, cancellationToken).ConfigureAwait(false);
+            await SaveDetailAsync(uow, row.Row!, masterId, null, cancellationToken).ConfigureAwait(false);
     }
 
-    private DetailChanges ComputeDetailChanges(IList oldList, IList newList)
+    private DetailChanges? ComputeDetailChanges(IList oldList, IList newList)
     {
         if ((oldList.Count > 0 ? oldList[0] :
             (newList.Count > 0) ? newList[0] : null) is not IRow row)
@@ -384,19 +384,19 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
         if (newList.Count == 0)
         {
             foreach (IRow entity in oldList)
-                changes.RowsToDelete.Add(new DetailRow(null, rowIdField.AsObject(entity)));
+                changes.RowsToDelete.Add(new DetailRow(null, rowIdField!.AsObject(entity)));
 
             return changes;
         }
 
         var oldById = new Dictionary<string, IRow>(oldList.Count);
         foreach (IRow item in oldList)
-            oldById[AsString(rowIdField.AsObject(item))] = item;
+            oldById[AsString(rowIdField!.AsObject(item))!] = item;
 
         var newById = new Dictionary<string, IRow>(newList.Count);
         foreach (IRow item in newList)
         {
-            var idStr = AsString(rowIdField.AsObject(item));
+            var idStr = AsString(rowIdField!.AsObject(item));
 
             if (!string.IsNullOrEmpty(idStr))
                 newById[idStr] = item;
@@ -404,21 +404,21 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
 
         foreach (IRow item in oldList)
         {
-            var id = rowIdField.AsObject(item);
+            var id = rowIdField!.AsObject(item);
             var idStr = AsString(id);
-            if (!newById.ContainsKey(idStr))
+            if (!newById.ContainsKey(idStr!))
                 changes.RowsToDelete.Add(new DetailRow(null, id));
         }
 
         foreach (IRow item in newList)
         {
-            var id = rowIdField.AsObject(item);
+            var id = rowIdField!.AsObject(item);
             var idStr = AsString(id);
 
-            if (string.IsNullOrEmpty(idStr) || !oldById.TryGetValue(idStr, out IRow old))
+            if (string.IsNullOrEmpty(idStr) || !oldById.TryGetValue(idStr, out IRow? old))
                 continue;
 
-            if (attr.CheckChangesOnUpdate)
+            if (attr!.CheckChangesOnUpdate)
             {
                 bool anyChanges = false;
                 foreach (var field in item.GetFields())
@@ -441,7 +441,7 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
 
         foreach (IRow item in newList)
         {
-            var id = rowIdField.AsObject(item);
+            var id = rowIdField!.AsObject(item);
             var idStr = AsString(id);
             if (string.IsNullOrEmpty(idStr) || !oldById.ContainsKey(idStr))
                 changes.RowsToInsert.Add(new DetailRow(item, null));
@@ -450,10 +450,10 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
         return changes;
     }
 
-    private sealed class DetailRow(IRow row, object id)
+    private sealed class DetailRow(IRow? row, object? id)
     {
-        public IRow Row { get; } = row;
-        public object Id { get; } = id;
+        public IRow? Row { get; } = row;
+        public object? Id { get; } = id;
     }
 
     private sealed class DetailChanges
@@ -466,10 +466,10 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
     /// <inheritdoc/>
     public virtual void OnAfterSave(ISaveRequestHandler handler)
     {
-        if (Target.AsObject(handler.Row) is not IList newList)
+        if (Target!.AsObject(handler.Row) is not IList newList)
             return;
 
-        var masterId = masterKeyField.AsObject(handler.Row);
+        var masterId = masterKeyField!.AsObject(handler.Row)!;
 
         if (handler.IsCreate)
         {
@@ -486,10 +486,10 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
     /// <inheritdoc/>
     public override async Task OnAfterSaveAsync(ISaveRequestHandler handler, CancellationToken cancellationToken = default)
     {
-        if (Target.AsObject(handler.Row) is not IList newList)
+        if (Target!.AsObject(handler.Row) is not IList newList)
             return;
 
-        var masterId = masterKeyField.AsObject(handler.Row);
+        var masterId = masterKeyField!.AsObject(handler.Row)!;
 
         if (handler.IsCreate)
         {
@@ -507,28 +507,28 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
     {
         var oldList = new List<IRow>();
 
-        if (!attr.CheckChangesOnUpdate)
+        if (!attr!.CheckChangesOnUpdate)
         {
-            var row = rowFactory();
+            var row = rowFactory!();
             var rowIdField = row.IdField;
 
             // if we're not gonna compare old rows with new ones
             // no need to call list request handler
 
-            BuildOldRowsQuery(handler, row, rowIdField)
-                .ForEach(handler.Connection, () =>
+            BuildOldRowsQuery(handler, row, rowIdField!)
+                .ForEach(handler.Connection!, () =>
                 {
                     oldList.Add(row.Clone());
                 });
         }
         else
         {
-            var listHandler = handlerFactory.CreateHandler<IListRequestProcessor>(rowType);
+            var listHandler = handlerFactory.CreateHandler<IListRequestProcessor>(rowType!);
             var listRequest = listHandler.CreateRequest();
             listRequest.ColumnSelection = ColumnSelection.List;
-            listRequest.Criteria = foreignKeyCriteria == new ValueCriteria(masterKeyField.AsObject(handler.Row)) & filterCriteria;
+            listRequest.Criteria = foreignKeyCriteria! == new ValueCriteria(masterKeyField!.AsObject(handler.Row)) & filterCriteria;
 
-            var entities = listHandler.Process(handler.Connection, listRequest).Entities;
+            var entities = listHandler.Process(handler.Connection!, listRequest).Entities!;
             foreach (IRow entity in entities)
                 oldList.Add(entity);
         }
@@ -540,28 +540,28 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
     {
         var oldList = new List<IRow>();
 
-        if (!attr.CheckChangesOnUpdate)
+        if (!attr!.CheckChangesOnUpdate)
         {
-            var row = rowFactory();
+            var row = rowFactory!();
             var rowIdField = row.IdField;
 
             // if we're not gonna compare old rows with new ones
             // no need to call list request handler
 
-            await BuildOldRowsQuery(handler, row, rowIdField)
-                .ForEachAsync(handler.Connection, () =>
+            await BuildOldRowsQuery(handler, row, rowIdField!)
+                .ForEachAsync(handler.Connection!, () =>
                 {
                     oldList.Add(row.Clone());
                 }, cancellationToken).ConfigureAwait(false);
         }
         else
         {
-            var listHandler = handlerFactory.CreateHandler<IListRequestProcessorAsync>(rowType);
+            var listHandler = handlerFactory.CreateHandler<IListRequestProcessorAsync>(rowType!);
             var listRequest = listHandler.CreateRequest();
             listRequest.ColumnSelection = ColumnSelection.List;
-            listRequest.Criteria = foreignKeyCriteria == new ValueCriteria(masterKeyField.AsObject(handler.Row)) & filterCriteria;
+            listRequest.Criteria = foreignKeyCriteria! == new ValueCriteria(masterKeyField!.AsObject(handler.Row)) & filterCriteria;
 
-            var entities = (await listHandler.ProcessAsync(handler.Connection, listRequest, cancellationToken).ConfigureAwait(false)).Entities;
+            var entities = (await listHandler.ProcessAsync(handler.Connection!, listRequest, cancellationToken).ConfigureAwait(false)).Entities!;
             foreach (IRow entity in entities)
                 oldList.Add(entity);
         }
@@ -576,7 +576,7 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
             .From(row)
             .Select(rowIdField)
             .Where(
-                foreignKeyField == new ValueCriteria(masterKeyField.AsSqlValue(handler.Row)) &
+                foreignKeyField! == new ValueCriteria(masterKeyField!.AsSqlValue(handler.Row)) &
                 queryCriteria);
     }
 
@@ -587,7 +587,7 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
             (Target.Flags & FieldFlags.Updatable) != FieldFlags.Updatable)
             return;
 
-        if (!attr.ForceCascadeDelete && ServiceQueryHelper.UseSoftDelete(handler.Row))
+        if (!attr!.ForceCascadeDelete && ServiceQueryHelper.UseSoftDelete(handler.Row))
             return;
 
         var deleteList = GetDeleteList(handler);
@@ -602,7 +602,7 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
             (Target.Flags & FieldFlags.Updatable) != FieldFlags.Updatable)
             return;
 
-        if (!attr.ForceCascadeDelete && ServiceQueryHelper.UseSoftDelete(handler.Row))
+        if (!attr!.ForceCascadeDelete && ServiceQueryHelper.UseSoftDelete(handler.Row))
             return;
 
         var deleteList = await GetDeleteListAsync(handler, cancellationToken).ConfigureAwait(false);
@@ -612,14 +612,14 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
 
     private List<object> GetDeleteList(IDeleteRequestHandler handler)
     {
-        var row = rowFactory();
+        var row = rowFactory!();
         var rowIdField = row.IdField;
 
         var deleteList = new List<object>();
-        BuildDeleteListQuery(handler, row, rowIdField)
+        BuildDeleteListQuery(handler, row, rowIdField!)
             .ForEach(handler.Connection, () =>
             {
-                deleteList.Add(rowIdField.AsObject(row));
+                deleteList.Add(rowIdField!.AsObject(row)!);
             });
 
         return deleteList;
@@ -627,14 +627,14 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
 
     private async Task<List<object>> GetDeleteListAsync(IDeleteRequestHandler handler, CancellationToken cancellationToken)
     {
-        var row = rowFactory();
+        var row = rowFactory!();
         var rowIdField = row.IdField;
 
         var deleteList = new List<object>();
-        await BuildDeleteListQuery(handler, row, rowIdField)
+        await BuildDeleteListQuery(handler, row, rowIdField!)
             .ForEachAsync(handler.Connection, () =>
             {
-                deleteList.Add(rowIdField.AsObject(row));
+                deleteList.Add(rowIdField!.AsObject(row)!);
             }, cancellationToken).ConfigureAwait(false);
 
         return deleteList;
@@ -647,7 +647,7 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
             .From(row)
             .Select(rowIdField)
             .Where(
-                foreignKeyField == new ValueCriteria(masterKeyField.AsSqlValue(handler.Row)) &
+                foreignKeyField! == new ValueCriteria(masterKeyField!.AsSqlValue(handler.Row)) &
                 queryCriteria);
     }
 }

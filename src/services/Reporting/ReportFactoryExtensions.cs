@@ -13,7 +13,7 @@ public static class ReportFactoryExtensions
     /// <param name="setParams">Optional callback to initialize params</param>
     /// <param name="validatePermission">True if the permission for the report should be validated</param>
     /// <returns>Report instance</returns>
-    public static TReport Create<TReport>(this IReportFactory factory, Action<TReport> setParams = null, bool validatePermission = true)
+    public static TReport Create<TReport>(this IReportFactory factory, Action<TReport>? setParams = null, bool validatePermission = true)
         where TReport: IReport
     {
         var reportKey = ReportRegistry.GetReportKey(typeof(TReport));

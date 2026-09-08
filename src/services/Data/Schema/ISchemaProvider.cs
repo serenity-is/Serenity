@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data.Schema;
+namespace Serenity.Data.Schema;
 
 /// <summary>
 /// Abstraction for SQL metadata providers.
@@ -11,7 +11,7 @@ public interface ISchemaProvider
     /// <value>
     /// The default schema.
     /// </value>
-    string DefaultSchema { get; }
+    string? DefaultSchema { get; }
 
     /// <summary>
     /// Gets the foreign keys.

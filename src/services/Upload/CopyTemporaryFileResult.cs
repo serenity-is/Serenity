@@ -1,4 +1,4 @@
-﻿namespace Serenity.Web;
+namespace Serenity.Web;
 
 /// <summary>
 /// Result of the copying of a temporary file to its target
@@ -8,12 +8,12 @@ public class CopyTemporaryFileResult
     /// <summary>
     /// Gets or sets the path of the file.
     /// </summary>
-    public string Path { get; set; }
+    public string? Path { get; set; }
 
     /// <summary>
     /// Gets or sets the original name.
     /// </summary>
-    public string OriginalName { get; set; }
+    public string? OriginalName { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether the file has a thumbnail.

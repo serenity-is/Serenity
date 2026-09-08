@@ -17,7 +17,7 @@ public interface ISqlOperationInterceptor
     /// <param name="expectedRows">The expected rows.</param>
     /// <param name="query">The query.</param>
     /// <param name="getNewId">True if <c>InsertAndGetID</c> is called.</param>
-    OptionalValue<long?> ExecuteNonQuery(string commandText, IDictionary<string, object> parameters, ExpectedRows expectedRows, IQueryWithParams query, bool getNewId);
+    OptionalValue<long?> ExecuteNonQuery(string commandText, IDictionary<string, object?>? parameters, ExpectedRows expectedRows, IQueryWithParams? query, bool getNewId);
 
     /// <summary>
     /// Intercepts the <see cref="SqlHelper"/> <c>ExecuteReader</c> method.
@@ -25,7 +25,7 @@ public interface ISqlOperationInterceptor
     /// <param name="commandText">The command text.</param>
     /// <param name="parameters">The parameters.</param>
     /// <param name="query">The query.</param>
-    OptionalValue<IDataReader> ExecuteReader(string commandText, IDictionary<string, object> parameters, SqlQuery query);
+    OptionalValue<IDataReader> ExecuteReader(string commandText, IDictionary<string, object?>? parameters, SqlQuery? query);
 
     /// <summary>
     /// Intercepts the <see cref="SqlHelper"/> <c>ExecuteScalar</c> method.
@@ -33,7 +33,7 @@ public interface ISqlOperationInterceptor
     /// <param name="commandText">The command text.</param>
     /// <param name="parameters">The parameters.</param>
     /// <param name="query">The query.</param>
-    OptionalValue<object> ExecuteScalar(string commandText, IDictionary<string, object> parameters, SqlQuery query);
+    OptionalValue<object> ExecuteScalar(string commandText, IDictionary<string, object?>? parameters, SqlQuery? query);
 
     /// <summary>
     /// Intercepts the async <see cref="SqlHelper"/> <c>Execute</c> methods (SqlDelete/SqlUpdate/SqlInsert).
@@ -45,7 +45,7 @@ public interface ISqlOperationInterceptor
     /// <param name="query">The query.</param>
     /// <param name="getNewId">True if <c>InsertAndGetIDAsync</c> is called.</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    Task<OptionalValue<long?>> ExecuteNonQueryAsync(string commandText, IDictionary<string, object> parameters, ExpectedRows expectedRows, IQueryWithParams query, bool getNewId, CancellationToken cancellationToken = default)
+    Task<OptionalValue<long?>> ExecuteNonQueryAsync(string commandText, IDictionary<string, object?>? parameters, ExpectedRows expectedRows, IQueryWithParams? query, bool getNewId, CancellationToken cancellationToken = default)
         => Task.FromResult(ExecuteNonQuery(commandText, parameters, expectedRows, query, getNewId));
 
     /// <summary>
@@ -56,7 +56,7 @@ public interface ISqlOperationInterceptor
     /// <param name="parameters">The parameters.</param>
     /// <param name="query">The query.</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    Task<OptionalValue<IDataReader>> ExecuteReaderAsync(string commandText, IDictionary<string, object> parameters, SqlQuery query, CancellationToken cancellationToken = default)
+    Task<OptionalValue<IDataReader>> ExecuteReaderAsync(string commandText, IDictionary<string, object?>? parameters, SqlQuery? query, CancellationToken cancellationToken = default)
         => Task.FromResult(ExecuteReader(commandText, parameters, query));
 
     /// <summary>
@@ -67,6 +67,6 @@ public interface ISqlOperationInterceptor
     /// <param name="parameters">The parameters.</param>
     /// <param name="query">The query.</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    Task<OptionalValue<object>> ExecuteScalarAsync(string commandText, IDictionary<string, object> parameters, SqlQuery query, CancellationToken cancellationToken = default)
+    Task<OptionalValue<object>> ExecuteScalarAsync(string commandText, IDictionary<string, object?>? parameters, SqlQuery? query, CancellationToken cancellationToken = default)
         => Task.FromResult(ExecuteScalar(commandText, parameters, query));
 }

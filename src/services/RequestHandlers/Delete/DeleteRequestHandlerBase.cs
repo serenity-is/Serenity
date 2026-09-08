@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+
 namespace Serenity.Services;
 
 /// <summary>
@@ -18,6 +20,7 @@ public abstract class DeleteRequestHandlerBase<TRow, TDeleteRequest, TDeleteResp
     where TDeleteRequest : DeleteRequest
     where TDeleteResponse : DeleteResponse, new()
 {
+    private IUnitOfWork? unitOfWork;
 
     /// <summary>
     /// Gets the list of delete behaviors.
@@ -56,7 +59,7 @@ public abstract class DeleteRequestHandlerBase<TRow, TDeleteRequest, TDeleteResp
     protected virtual void ValidatePermissions()
     {
         var attr = typeof(TRow).GetCustomAttribute<DeletePermissionAttribute>(true) ??
-            (PermissionAttributeBase)typeof(TRow).GetCustomAttribute<ModifyPermissionAttribute>(true) ??
+            (PermissionAttributeBase?)typeof(TRow).GetCustomAttribute<ModifyPermissionAttribute>(true) ??
             typeof(TRow).GetCustomAttribute<ReadPermissionAttribute>(true);
 
         if (attr != null)
@@ -78,10 +81,15 @@ public abstract class DeleteRequestHandlerBase<TRow, TDeleteRequest, TDeleteResp
     /// </summary>
     public ITwoLevelCache Cache => Context.Cache;
 
+    private InvalidOperationException PropertyReadError([CallerMemberName] string? property = default)
+    {
+        return new InvalidOperationException($"Error reading '{property}' of {GetType().Name}. The handler has not been initialized.");
+    }
+
     /// <summary>
     /// Gets the request context.
     /// </summary>
-    public IRequestContext Context { get; private set; } = context ?? throw new ArgumentNullException(nameof(context));
+    public IRequestContext Context { get; } = context ?? throw new ArgumentNullException(nameof(context));
 
     /// <summary>
     /// Gets the localizer from the request context.
@@ -96,7 +104,7 @@ public abstract class DeleteRequestHandlerBase<TRow, TDeleteRequest, TDeleteResp
     /// <summary>
     /// Gets the current user from the request context.
     /// </summary>
-    public ClaimsPrincipal User => Context.User;
+    public ClaimsPrincipal? User => Context.User;
 
     /// <summary>
     /// Gets the current connection.
@@ -106,28 +114,28 @@ public abstract class DeleteRequestHandlerBase<TRow, TDeleteRequest, TDeleteResp
     /// <summary>
     /// Gets the current unit of work.
     /// </summary>
-    public IUnitOfWork UnitOfWork { get; protected set; }
+    public IUnitOfWork UnitOfWork { get => unitOfWork ?? throw PropertyReadError(); protected set => unitOfWork = value; }
 
     /// <summary>
     /// Gets the entity being deleted.
     /// </summary>
-    public TRow Row { get; protected set; }
+    public TRow Row { get => field ?? throw PropertyReadError(); protected set; }
 
     /// <summary>
     /// Gets the request object.
     /// </summary>
-    public TDeleteRequest Request { get; protected set; }
+    public TDeleteRequest Request { get => field ?? throw PropertyReadError(); protected set; }
 
     /// <summary>
     /// Gets the response object.
     /// </summary>
-    public TDeleteResponse Response { get; protected set; }
+    public TDeleteResponse Response { get => field ?? throw PropertyReadError(); protected set; }
 
     /// <summary>
     /// A state bag for behaviors to preserve state among their methods.
     /// It will be cleared before each request, e.g. Process call.
     /// </summary>
-    public IDictionary<string, object> StateBag { get; private set; } = new Dictionary<string, object>();
+    public IDictionary<string, object?> StateBag { get; } = new Dictionary<string, object?>();
 
     IRow IDeleteRequestHandler.Row => Row;
     DeleteRequest IDeleteRequestHandler.Request => Request;

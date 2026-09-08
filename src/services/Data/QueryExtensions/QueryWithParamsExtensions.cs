@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 /// <summary>
 ///   Extension methods for classes implementing <see cref="IQueryWithParams"/>.
@@ -13,7 +13,7 @@ public static class QueryWithParamsExtensions
     /// <param name="param">The parameter.</param>
     /// <param name="value">The value.</param>
     /// <returns>The query itself.</returns>
-    public static T SetParam<T>(this T self, Parameter param, object value) where T : IQueryWithParams
+    public static T SetParam<T>(this T self, Parameter param, object? value) where T : IQueryWithParams
     {
         self.SetParam(param.Name, value);
         return self;
@@ -26,7 +26,7 @@ public static class QueryWithParamsExtensions
     /// <param name="self">The query.</param>
     /// <param name="value">The value.</param>
     /// <returns>The automatically named parameter that was added.</returns>
-    public static Parameter AddParam<T>(this T self, object value) where T : IQueryWithParams
+    public static Parameter AddParam<T>(this T self, object? value) where T : IQueryWithParams
     {
         var param = self.AutoParam();
         self.AddParam(param.Name, value);

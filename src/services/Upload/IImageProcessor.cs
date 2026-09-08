@@ -19,7 +19,7 @@ public interface IImageProcessor
     /// </summary>
     /// <param name="source">Source stream</param>
     /// <param name="formatInfo">Information about loaded image format</param>
-    object Load(Stream source, out ImageFormatInfo formatInfo);
+    object? Load(Stream source, out ImageFormatInfo? formatInfo);
 
     /// <summary>
     ///   Generates a thumbnail of the source image based on parameters.</summary>

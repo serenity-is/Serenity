@@ -65,7 +65,7 @@ public static class SqlConversions
     /// <param name="value">The value.</param>
     /// <param name="dialect">The dialect.</param>
     /// <returns>The SQL constant, or NULL if the value has no value.</returns>
-    public static string ToSql(this DateTime? value, ISqlDialect dialect = null)
+    public static string ToSql(this DateTime? value, ISqlDialect? dialect = null)
     {
         if (!value.HasValue)
             return Null;
@@ -82,7 +82,7 @@ public static class SqlConversions
     /// <param name="value">The value.</param>
     /// <param name="dialect">The dialect.</param>
     /// <returns>The SQL constant.</returns>
-    public static string ToSql(this DateTime value, ISqlDialect dialect = null)
+    public static string ToSql(this DateTime value, ISqlDialect? dialect = null)
     {
         if (value.Date == value)
             return value.ToString((dialect ?? SqlSettings.DefaultDialect).DateFormat, Invariants.DateTimeFormat);
@@ -96,7 +96,7 @@ public static class SqlConversions
     /// <param name="value">The value.</param>
     /// <param name="dialect">The dialect.</param>
     /// <returns>The SQL date constant, or NULL if the value has no value.</returns>
-    public static string ToSqlDate(this DateTime? value, ISqlDialect dialect = null)
+    public static string ToSqlDate(this DateTime? value, ISqlDialect? dialect = null)
     {
         if (!value.HasValue)
             return Null;
@@ -109,7 +109,7 @@ public static class SqlConversions
     /// <param name="value">The value.</param>
     /// <param name="dialect">The dialect.</param>
     /// <returns>The SQL date constant.</returns>
-    public static string ToSqlDate(this DateTime value, ISqlDialect dialect = null)
+    public static string ToSqlDate(this DateTime value, ISqlDialect? dialect = null)
     {
         return value.ToString((dialect ?? SqlSettings.DefaultDialect).DateFormat, Invariants.DateTimeFormat);
     }
@@ -120,7 +120,7 @@ public static class SqlConversions
     /// <param name="value">The value.</param>
     /// <param name="dialect">The dialect.</param>
     /// <returns>The SQL time constant, or NULL if the value has no value.</returns>
-    public static string ToSqlTime(this DateTime? value, ISqlDialect dialect = null)
+    public static string ToSqlTime(this DateTime? value, ISqlDialect? dialect = null)
     {
         if (!value.HasValue)
             return Null;
@@ -133,7 +133,7 @@ public static class SqlConversions
     /// <param name="value">The value.</param>
     /// <param name="dialect">The dialect.</param>
     /// <returns>The SQL time constant.</returns>
-    public static string ToSqlTime(this DateTime value, ISqlDialect dialect = null)
+    public static string ToSqlTime(this DateTime value, ISqlDialect? dialect = null)
     {
         return value.ToString((dialect ?? SqlSettings.DefaultDialect).TimeFormat, Invariants.DateTimeFormat);
     }
@@ -156,7 +156,7 @@ public static class SqlConversions
     /// <param name="value">The value.</param>
     /// <param name="dialect">The dialect.</param>
     /// <returns>The SQL constant, or NULL if the value is null.</returns>
-    public static string ToSql(this string value, ISqlDialect dialect = null)
+    public static string ToSql(this string value, ISqlDialect? dialect = null)
     {
         if (value == null)
             return Null;
@@ -223,6 +223,6 @@ public static class SqlConversions
     {
         ArgumentNullException.ThrowIfNull(query);
 
-        return Translate(query.ToString(), connection.GetDialect());
+        return Translate(query.ToString()!, connection.GetDialect());
     }
 }

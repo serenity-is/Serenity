@@ -20,14 +20,14 @@ public partial class BasicPropertyProcessor : PropertyProcessor
                 var distinct = source.GetAttribute<DistinctValuesEditorAttribute>();
                 if (distinct != null)
                 {
-                    string prefix = null;
+                    string? prefix = null;
                     if (distinct.RowType != null)
                     {
                         if (!distinct.RowType.IsInterface &&
                             !distinct.RowType.IsAbstract &&
                             typeof(IRow).IsAssignableFrom(distinct.RowType))
                         {
-                            prefix = ((IRow)Activator.CreateInstance(distinct.RowType))
+                            prefix = ((IRow)Activator.CreateInstance(distinct.RowType)!)
                                 .Fields.LocalTextPrefix;
                         }
                     }
@@ -44,7 +44,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
                                 prefix = source.BasedOnField.Fields.LocalTextPrefix;
                         }
                         else
-                            prefix = ((IRow)Activator.CreateInstance(source.ReflectedType))
+                            prefix = ((IRow)Activator.CreateInstance(source.ReflectedType!)!)
                                 .Fields.LocalTextPrefix;
                     }
 
@@ -139,13 +139,13 @@ public partial class BasicPropertyProcessor : PropertyProcessor
                 key.Length >= 1)
                 key = key[..1].ToLowerInvariant() + key[1..];
 
-            item.EditorParams[key] = param.Value;
+            item.EditorParams[key!] = param.Value;
         }
 
         SetServiceLookupParams(editorTypeAttr, item.EditorParams);
     }
 
-    private static void SetServiceLookupParams(EditorTypeAttribute editorTypeAttr, Dictionary<string, object> editorParams)
+    private static void SetServiceLookupParams(EditorTypeAttribute? editorTypeAttr, Dictionary<string, object?> editorParams)
     {
         if (editorTypeAttr is not ServiceLookupEditorBaseAttribute sle || sle.ItemType == null)
             return;
@@ -173,7 +173,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
 
                 if (!editorParams.ContainsKey("textField"))
                 {
-                    var nameField = rowInstance.NameField;
+                    var nameField = rowInstance!.NameField;
                     if (nameField is not null)
                         editorParams["textField"] = nameField.PropertyName ??
                             nameField.Name;
@@ -182,7 +182,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
                 if (!editorParams.ContainsKey("includeColumns") &&
                     !editorParams.ContainsKey("columnSelection"))
                 {
-                    editorParams["includeColumns"] = rowInstance.Fields
+                    editorParams["includeColumns"] = rowInstance!.Fields
                         .Where(x => x.GetAttribute<LookupIncludeAttribute>() != null)
                         .Select(x => x.PropertyName ?? x.Name)
                         .ToArray();
@@ -194,7 +194,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
         }
     }
 
-    private static string AutoDetermineEditorType(Type valueType, Type enumType, IDictionary<string, object> editorParams)
+    private static string AutoDetermineEditorType(Type valueType, Type? enumType, Dictionary<string, object?> editorParams)
     {
         if (enumType != null)
             return "Enum";

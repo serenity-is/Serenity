@@ -1,4 +1,6 @@
-﻿namespace Serenity.Data;
+using System.Diagnostics.CodeAnalysis;
+
+namespace Serenity.Data;
 
 /// <summary>
 /// Replaces the parameter prefix character in SQL expressions.
@@ -11,7 +13,8 @@ public static class ParamPrefixReplacer
     /// <param name="expression">The expression.</param>
     /// <param name="paramPrefix">The parameter prefix.</param>
     /// <returns>The expression with parameter prefixes replaced.</returns>
-    public static string Replace(string expression, char paramPrefix)
+    [return:NotNullIfNotNull(nameof(expression))]
+    public static string? Replace(string? expression, char paramPrefix)
     {
         if (expression == null)
             return null;

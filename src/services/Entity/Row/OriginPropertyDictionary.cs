@@ -103,7 +103,7 @@ internal class OriginPropertyDictionary
 
     public static OriginPropertyDictionary GetPropertyDictionary(Type rowType)
     {
-        if (!cache.TryGetValue(rowType, out OriginPropertyDictionary dictionary))
+        if (!cache.TryGetValue(rowType, out OriginPropertyDictionary? dictionary))
         {
             dictionary = new OriginPropertyDictionary(rowType);
             cache[rowType] = dictionary;
@@ -156,7 +156,7 @@ internal class OriginPropertyDictionary
 
             if (originRowType == null)
             {
-                throw new ArgumentOutOfRangeException("origin", string.Format(
+                throw new ArgumentOutOfRangeException(nameof(origin), string.Format(
                     "Property '{0}' on row type '{1}' has a [Origin] attribute, " +
                     "but [ForeignKey] and [LeftJoin] attributes on related join " +
                     "property '{2}' doesn't use a typeof(SomeRow)!",
@@ -168,7 +168,7 @@ internal class OriginPropertyDictionary
             originRowType = rowJoin.RowType;
             if (originRowType == null)
             {
-                throw new ArgumentOutOfRangeException("origin", string.Format(
+                throw new ArgumentOutOfRangeException(nameof(origin), string.Format(
                     "Property '{0}' on row type '{1}' has a [Origin] attribute, " +
                     "but related join declaration on row has no RowType!",
                         property.Name, rowType.Name, joinAlias));
@@ -176,7 +176,7 @@ internal class OriginPropertyDictionary
         }
         else
         {
-            throw new ArgumentOutOfRangeException("origin", string.Format(
+            throw new ArgumentOutOfRangeException(nameof(origin), string.Format(
                 "Property '{0}' on row type '{1}' has a [Origin] attribute, " +
                 "but declaration of join '{2}' is not found!",
                     property.Name, rowType.Name, joinAlias));
@@ -207,7 +207,7 @@ internal class OriginPropertyDictionary
         if (originProperty == null &&
             !originDictionary.propertyByName.TryGetValue(originPropertyName, out originProperty))
         {
-            throw new ArgumentOutOfRangeException("origin", string.Format(
+            throw new ArgumentOutOfRangeException(nameof(origin), string.Format(
                 "Property '{0}' on row type '{1}' has a [Origin] attribute, " +
                 "but its corresponding property '{2}' on row type '{3}' is not found!",
                     property.Name, rowType.Name, originPropertyName, originRowType.Name));

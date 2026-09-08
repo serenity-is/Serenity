@@ -82,7 +82,7 @@ public class CriteriaJsonConverter : JsonConverter<BaseCriteria>
     }
 
     /// <inheritdoc/>
-    public override BaseCriteria Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override BaseCriteria? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         if (reader.TokenType == JsonTokenType.Null)
             return null;
@@ -94,7 +94,7 @@ public class CriteriaJsonConverter : JsonConverter<BaseCriteria>
     private BaseCriteria ParseValue(JsonElement value)
     {
         if (value.ValueKind == JsonValueKind.String)
-            return new ValueCriteria(value.GetString());
+            return new ValueCriteria(value.GetString()!);
         else if (value.ValueKind == JsonValueKind.Number)
             return new ValueCriteria(value.GetDouble());
         else if (value.ValueKind == JsonValueKind.True)
@@ -108,7 +108,7 @@ public class CriteriaJsonConverter : JsonConverter<BaseCriteria>
         throw new JsonException(string.Format("Can't deserialize {0} as Criteria value", value.ToString()));
     }
 
-    private BaseCriteria Parse(JsonElement[] array)
+    private BaseCriteria Parse(JsonElement[]? array)
     {
         if (array == null)
             return Criteria.Empty;
@@ -127,7 +127,7 @@ public class CriteriaJsonConverter : JsonConverter<BaseCriteria>
                         throw new ArgumentNullException("item");
 
                     if (item.ValueKind == JsonValueKind.String)
-                            list.Add(item.GetString());
+                            list.Add(item.GetString()!);
                     else if (item.ValueKind == JsonValueKind.Number)
                         list.Add(item.GetDouble());
                     else if (item.ValueKind == JsonValueKind.True)
@@ -158,7 +158,7 @@ public class CriteriaJsonConverter : JsonConverter<BaseCriteria>
 
             var opStr = array[0].GetString();
 
-            if (!KeyToOperator.TryGetValue(opStr, out CriteriaOperator op))
+            if (!KeyToOperator.TryGetValue(opStr!, out CriteriaOperator op))
                 throw new JsonException(string.Format("Unknown Criteria operator: {0}", opStr));
 
             if (op < CriteriaOperator.Paren || op > CriteriaOperator.Exists)
@@ -174,7 +174,7 @@ public class CriteriaJsonConverter : JsonConverter<BaseCriteria>
 
             var opStr = array[1].GetString();
 
-            if (!KeyToOperator.TryGetValue(opStr, out CriteriaOperator op))
+            if (!KeyToOperator.TryGetValue(opStr!, out CriteriaOperator op))
                 throw new JsonException(string.Format("Unknown Criteria operator: {0}", opStr));
 
             if (op < CriteriaOperator.AND || op > CriteriaOperator.NotLike)

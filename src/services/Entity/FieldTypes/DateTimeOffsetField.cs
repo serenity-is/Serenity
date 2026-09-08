@@ -15,8 +15,8 @@ namespace Serenity.Data;
 /// <param name="flags">The flags.</param>
 /// <param name="getValue">The get value.</param>
 /// <param name="setValue">The set value.</param>
-public sealed class DateTimeOffsetField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
-    Func<IRow, DateTimeOffset?> getValue = null, Action<IRow, DateTimeOffset?> setValue = null) : GenericValueField<DateTimeOffset>(collection, FieldType.DateTime, name, caption, size, flags, getValue, setValue)
+public sealed class DateTimeOffsetField(ICollection<Field> collection, string name, LocalText? caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
+    Func<IRow, DateTimeOffset?>? getValue = null, Action<IRow, DateTimeOffset?>? setValue = null) : GenericValueField<DateTimeOffset>(collection, FieldType.DateTime, name, caption, size, flags, getValue, setValue)
 {
 
     /// <summary>
@@ -30,7 +30,7 @@ public sealed class DateTimeOffsetField(ICollection<Field> collection, string na
     /// <param name="getValue">The get value.</param>
     /// <param name="setValue">The set value.</param>
     /// <returns>A new DateTimeOffsetField instance.</returns>
-    public static DateTimeOffsetField Factory(ICollection<Field> collection, string name, LocalText caption, int size, FieldFlags flags,
+    public static DateTimeOffsetField Factory(ICollection<Field> collection, string name, LocalText? caption, int size, FieldFlags flags,
         Func<IRow, DateTimeOffset?> getValue, Action<IRow, DateTimeOffset?> setValue)
     {
         return new DateTimeOffsetField(collection, name, caption, size, flags, getValue, setValue);
@@ -42,7 +42,7 @@ public sealed class DateTimeOffsetField(ICollection<Field> collection, string na
     /// <param name="source">The source.</param>
     /// <param name="provider">The provider.</param>
     /// <returns>The converted value.</returns>
-    public override object ConvertValue(object source, IFormatProvider provider)
+    public override object? ConvertValue(object? source, IFormatProvider provider)
     {
         if (source is Newtonsoft.Json.Linq.JValue jValue)
             source = jValue.Value;
@@ -93,7 +93,7 @@ public sealed class DateTimeOffsetField(ICollection<Field> collection, string na
             else if (value is DateTimeOffset dtofs)
                 dto = dtofs;
             else
-                dto = DateTimeOffset.Parse(value.ToString());
+                dto = DateTimeOffset.Parse(value.ToString()!);
 
             _setValue(row, dto);
         }
@@ -141,11 +141,11 @@ public sealed class DateTimeOffsetField(ICollection<Field> collection, string na
                 else if (obj is DateTimeOffset dto)
                     value = dto;
                 else
-                    value = DateTimeOffset.Parse(reader.Value.ToString(), CultureInfo.InvariantCulture);
+                    value = DateTimeOffset.Parse(reader.Value!.ToString()!, CultureInfo.InvariantCulture);
                 _setValue(row, value);
                 break;
             case Newtonsoft.Json.JsonToken.String:
-                var s = ((string)reader.Value).TrimToNull();
+                var s = ((string?)reader.Value).TrimToNull();
                 if (s == null)
                     _setValue(row, null);
                 else

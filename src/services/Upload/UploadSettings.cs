@@ -16,31 +16,31 @@ public class UploadSettings : IOptions<UploadSettings>
     /// <summary>
     /// Semicolon separated list of custom metadata keys that are allowed to be set by client
     /// </summary>
-    public string EditableMetadataKeys { get; set; } = FileMetadataKeys.Description;
+    public string? EditableMetadataKeys { get; set; } = FileMetadataKeys.Description;
 
     /// <summary>
     /// List of blacklisted extensions
     /// </summary>
-    public string ExtensionBlacklist { get; set; } = ".;.asax;.compiled;.ascx;.asmx;.aspx;.bat;.cmd;.com;.config;.cshtml;" +
+    public string? ExtensionBlacklist { get; set; } = ".;.asax;.compiled;.ascx;.asmx;.aspx;.bat;.cmd;.com;.config;.cshtml;" +
         ".dll;.jar;.jsp;.htm;.html;.htaccess;.htpasswd;.lnk;.php;.ps1;.vbe;.vbs";
 
     /// <summary>
     /// This allows including additional extensions in ExtensionBlacklist
     /// without having to write all the default extensions in ExtensionBlacklist
     /// </summary>
-    public string ExtensionBlacklistInclude { get; set; }
+    public string? ExtensionBlacklistInclude { get; set; }
 
     /// <summary>
     /// This allows excluding some extensions from ExtensionBlacklist
     /// without having to write all the default extensions in ExtensionBlacklist
     /// </summary>
-    public string ExtensionBlacklistExclude { get; set; }
+    public string? ExtensionBlacklistExclude { get; set; }
 
     /// <summary>
     /// List of whitelisted extensions; Even if an extension is in this list,
     /// it won't be allowed if it is also in the ExtensionBlacklist
     /// </summary>
-    public string ExtensionWhitelist { get; set; } = ".3gp;.7z;.ai;.avi;.bmp;.csv;.doc;.docx;.eps;.jpg;.jpeg;.json;" +
+    public string? ExtensionWhitelist { get; set; } = ".3gp;.7z;.ai;.avi;.bmp;.csv;.doc;.docx;.eps;.jpg;.jpeg;.json;" +
         ".gif;.gz;.ico;.mpg;.mpeg;.mp3;.mp4;.mkv;.mpp;.pdf;.png;.ppt;.pptx;.psd;" +
         ".rar;.rtf;.svg;.tif;.tiff;.txt;.vsd;.vsdx;.wav;.webm;.webp;.xls;.xlsx;.xml;" +
         ".xps;.zip;";
@@ -49,23 +49,23 @@ public class UploadSettings : IOptions<UploadSettings>
     /// This allows including additional extensions to ExtensionWhitelist
     /// without overriding all the default extensions in ExtensionWhitelist
     /// </summary>
-    public string ExtensionWhitelistInclude { get; set; }
+    public string? ExtensionWhitelistInclude { get; set; }
 
     /// <summary>
     /// This allows excluding some extensions from ExtensionWhitelist
     /// without having to write all the default extensions in ExtensionWhitelist
     /// </summary>
-    public string ExtensionWhitelistExclude { get; set; }
+    public string? ExtensionWhitelistExclude { get; set; }
 
     /// <summary>
     /// Gets or sets the root path for uploads, default is "App_Data/upload/".
     /// </summary>
-    public string Path { get; set; }
+    public string? Path { get; set; }
 
     /// <summary>
     /// Gets or sets the root URL for uploads, default is "~/upload".
     /// </summary>
-    public string Url { get; set; }
+    public string? Url { get; set; }
 
     /// <summary>
     /// Initializes a new instance of the class.

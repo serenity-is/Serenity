@@ -12,13 +12,13 @@ public class TabularDataReport : IDataOnlyReport
     /// <summary>
     /// The report data
     /// </summary>
-    protected IEnumerable Data { get; set; }
+    protected IEnumerable? Data { get; set; }
 
     /// <summary>
     /// Columns type to use for export. This is used to determine
     /// the list of columns and their formats, decorator types etc.
     /// </summary>
-    protected Type ColumnsType { get; set; }
+    protected Type? ColumnsType { get; set; }
 
     /// <summary>
     /// List of columns to export. If <see cref="ColumnsType"/> or 
@@ -26,17 +26,17 @@ public class TabularDataReport : IDataOnlyReport
     /// subset the columns. Otherwise it contains the list of 
     /// columns to export.
     /// </summary>
-    protected IEnumerable<string> ExportColumns { get; set; }
+    protected IEnumerable<string>? ExportColumns { get; set; }
 
     /// <summary>
     /// Service provider.
     /// </summary>
-    protected IServiceProvider ServiceProvider { get; set; }
+    protected IServiceProvider? ServiceProvider { get; set; }
 
     /// <summary>
     /// The column list
     /// </summary>
-    protected List<ReportColumn> ColumnList { get; set; }
+    protected List<ReportColumn>? ColumnList { get; set; }
 
     /// <summary>
     /// A group key for caching.
@@ -98,7 +98,7 @@ public class TabularDataReport : IDataOnlyReport
     }
 
     /// <inheritdoc/>
-    public virtual object GetData()
+    public virtual object? GetData()
     {
         return Data;
     }
@@ -112,10 +112,10 @@ public class TabularDataReport : IDataOnlyReport
         if (ColumnsType != null)
             return GetColumnListFor(ColumnsType, ExportColumns, ServiceProvider);
 
-        return ExportColumns.Select(x => new ReportColumn
+        return [.. ExportColumns!.Select(x => new ReportColumn
         {
             Name = x
-        }).ToList();
+        })];
     }
 
     /// <summary>
@@ -126,7 +126,7 @@ public class TabularDataReport : IDataOnlyReport
     /// <param name="serviceProvider">Service provider</param>
     /// <exception cref="ArgumentNullException"><paramref name="columnsType"/> or <paramref name="serviceProvider"/> is <c>null</c>.</exception>
     public static List<ReportColumn> GetColumnListFor(Type columnsType,
-        IEnumerable<string> exportColumns, IServiceProvider serviceProvider)
+        IEnumerable<string>? exportColumns, IServiceProvider? serviceProvider)
     {
         ArgumentNullException.ThrowIfNull(columnsType);
 
@@ -136,10 +136,10 @@ public class TabularDataReport : IDataOnlyReport
         if (exportColumns != null && !exportColumns.Any())
             return list;
 
-        List<PropertyItem> propertyItems = null;
-        IDictionary<string, PropertyItem> propertyItemByName = null;
-        IDictionary<string, PropertyInfo> propertyInfos = null;
-        IRow basedOnRow = null;
+        List<PropertyItem>? propertyItems = null;
+        IDictionary<string, PropertyItem>? propertyItemByName = null;
+        IDictionary<string, PropertyInfo>? propertyInfos = null;
+        IRow? basedOnRow = null;
         if (columnsType != null)
         {
             var cache = serviceProvider.GetRequiredService<ITwoLevelCache>();
@@ -153,13 +153,13 @@ public class TabularDataReport : IDataOnlyReport
                     {
                         var instance = ActivatorUtilities.CreateInstance(serviceProvider, 
                             columnsType) as ICustomizePropertyItems;
-                        instance.Customize(items);
+                        instance!.Customize(items);
                     }
 
                     return items;
-                });
+                })!;
 
-            propertyItemByName = propertyItems.ToDictionary(x => x.Name);
+            propertyItemByName = propertyItems.ToDictionary(x => x.Name!);
             propertyInfos = columnsType.GetProperties().ToDictionary(x => x.Name);
 
             var basedOnAttr = columnsType.GetCustomAttribute<BasedOnRowAttribute>();
@@ -169,21 +169,21 @@ public class TabularDataReport : IDataOnlyReport
                 !basedOnAttr.RowType.IsAbstract &&
                 typeof(IRow).IsAssignableFrom(basedOnAttr.RowType))
             {
-                basedOnRow = (IRow)Activator.CreateInstance(basedOnAttr.RowType);
+                basedOnRow = (IRow)Activator.CreateInstance(basedOnAttr.RowType)!;
             }
         }
 
-        exportColumns ??= propertyItems.Select(x => x.Name).ToList();
+        exportColumns ??= [.. propertyItems!.Select(x => x.Name!)];
 
         foreach (var columnName in exportColumns)
         {
-            if (!propertyItemByName.TryGetValue(columnName, out PropertyItem item))
+            if (!propertyItemByName!.TryGetValue(columnName, out PropertyItem? item))
                 continue;
 
             var basedOnField = basedOnRow == null ? null :
                 (basedOnRow.FindField(columnName) ?? basedOnRow.FindFieldByPropertyName(columnName));
 
-            if (propertyInfos == null || !propertyInfos.TryGetValue(columnName, out PropertyInfo p))
+            if (propertyInfos == null || !propertyInfos.TryGetValue(columnName, out PropertyInfo? p))
                 p = null;
 
             list.Add(FromPropertyItem(item, basedOnField, p, serviceProvider, 
@@ -202,8 +202,8 @@ public class TabularDataReport : IDataOnlyReport
     /// <param name="provider">Service provider</param>
     /// <param name="localizer">Text localizer</param>
     /// <exception cref="ArgumentNullException"><paramref name="item"/> or <paramref name="localizer"/> is <c>null</c>.</exception>
-    public static ReportColumn FromPropertyItem(PropertyItem item, Field field, 
-        PropertyInfo property, IServiceProvider provider, ITextLocalizer localizer)
+    public static ReportColumn FromPropertyItem(PropertyItem item, Field? field, 
+        PropertyInfo? property, IServiceProvider provider, ITextLocalizer localizer)
     {
         ArgumentNullException.ThrowIfNull(item);
 

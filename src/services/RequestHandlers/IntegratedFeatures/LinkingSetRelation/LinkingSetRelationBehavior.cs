@@ -445,7 +445,7 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
         {
             if (!newItemKeys.Take(oldRows.Count).SequenceEqual(
                     oldRows.Select(x => itemKeyField.AsObject(x))) &&
-                newItemKeys.Any(x => !oldByItemKey.ContainsKey(x.ToString())))
+                newItemKeys.Any(x => !oldByItemKey.ContainsKey(x.ToString()!)))
             {
                 rowsToDelete.AddRange(oldRows);
                 oldByItemKey = [];
@@ -456,7 +456,7 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
         foreach (object item in newItemKeys)
         {
             if (item != null)
-                newByItemKey.Add(item.ToString());
+                newByItemKey.Add(item.ToString()!);
         }
 
         foreach (IRow item in oldRows)
@@ -465,14 +465,14 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
                 continue;
 
             var itemKey = itemKeyField.AsObject(item);
-            if (itemKey == null || !newByItemKey.Contains(itemKey.ToString()))
+            if (itemKey == null || !newByItemKey.Contains(itemKey.ToString()!))
                 rowsToDelete.Add(item);
         }
 
         var keysToInsert = new List<object>();
         foreach (object itemKey in newItemKeys)
         {
-            if (oldByItemKey.ContainsKey(itemKey.ToString()))
+            if (oldByItemKey.ContainsKey(itemKey.ToString()!))
                 continue;
 
             keysToInsert.Add(itemKey);
@@ -494,7 +494,7 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
         {
             var itemKey = itemKeyField.AsObject(item);
             if (itemKey != null)
-                oldByItemKey[itemKey.ToString()] = item;
+                oldByItemKey[itemKey.ToString()!] = item;
         }
 
         return oldByItemKey;

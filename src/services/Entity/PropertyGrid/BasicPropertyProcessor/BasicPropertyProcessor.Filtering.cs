@@ -1,4 +1,4 @@
-﻿namespace Serenity.PropertyGrid;
+namespace Serenity.PropertyGrid;
 
 public partial class BasicPropertyProcessor : PropertyProcessor
 {
@@ -38,13 +38,13 @@ public partial class BasicPropertyProcessor : PropertyProcessor
             }
         }
 
-        Field idField;
-        string idFieldName;
+        Field? idField;
+        string? idFieldName;
         var filteringIdField = source.GetAttribute<FilteringIdFieldAttribute>();
         if (filteringIdField != null)
         {
             idFieldName = filteringIdField.Value;
-            idField = basedOnField.Fields.FindFieldByPropertyName(idFieldName) ?? basedOnField.Fields.FindField(idFieldName);
+            idField = basedOnField?.Fields.FindFieldByPropertyName(idFieldName) ?? basedOnField?.Fields.FindField(idFieldName);
         }
         else
         {
@@ -53,9 +53,9 @@ public partial class BasicPropertyProcessor : PropertyProcessor
             idField = null;
             if (idFieldName != null)
             {
-                idField = basedOnField.Fields.FindFieldByPropertyName(idFieldName) ?? basedOnField.Fields.FindField(idFieldName);
+                idField = basedOnField!.Fields.FindFieldByPropertyName(idFieldName) ?? basedOnField!.Fields.FindField(idFieldName);
                 if (idField is null ||
-                    (idField.TextualField != basedOnField.PropertyName &&
+                    (idField.TextualField != basedOnField!.PropertyName &&
                      idField.TextualField != basedOnField.Name))
                 {
                     idField = null;
@@ -67,22 +67,22 @@ public partial class BasicPropertyProcessor : PropertyProcessor
         var valueType = source.ValueType;
 
         var filteringTypeAttr = source.GetAttribute<FilteringTypeAttribute>() ??
-            idField.GetAttribute<FilteringTypeAttribute>();
+            idField?.GetAttribute<FilteringTypeAttribute>();
 
 
         if (filteringTypeAttr == null)
         {
             var editorAttr = source.GetAttribute<EditorTypeAttribute>() ??
-                idField.GetAttribute<EditorTypeAttribute>();
+                idField?.GetAttribute<EditorTypeAttribute>();
 
             void copyParamsFromEditor(string[] keys)
             {
-                var prm = new Dictionary<string, object>();
+                var prm = new Dictionary<string, object?>();
                 editorAttr.SetParams(prm);
                 SetServiceLookupParams(editorAttr, prm);
                 foreach (var key in keys)
                 {
-                    if (prm.TryGetValue(key, out object o))
+                    if (prm.TryGetValue(key, out object? o))
                         item.FilteringParams[key] = o;
                 }
             }
@@ -158,7 +158,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
                 if (!item.FilteringParams.ContainsKey("editorType"))
                 {
                     var editorAttr = source.GetAttribute<EditorTypeAttribute>() ??
-                        idField.GetAttribute<EditorTypeAttribute>();
+                        idField?.GetAttribute<EditorTypeAttribute>();
 
                     if (editorAttr != null)
                         item.FilteringParams["editorType"] = editorAttr.EditorType;
@@ -171,7 +171,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
                 }
             }
 
-            if (item.FilteringParams.TryGetValue("idField", out object idFieldObj) && idFieldObj is string)
+            if (item.FilteringParams.TryGetValue("idField", out object? idFieldObj) && idFieldObj is string)
                 item.FilteringIdField = (idFieldObj as string).TrimToNull();
             else
                 item.FilteringIdField = idFieldName;
@@ -182,7 +182,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
             item.FilteringParams["displayFormat"] = displayFormatAttr.Value;
 
         foreach (FilteringOptionAttribute param in
-            idField.GetAttributes<FilteringOptionAttribute>().Concat(
+            (idField?.GetAttributes<FilteringOptionAttribute>() ?? []).Concat(
             source.GetAttributes<FilteringOptionAttribute>()))
         {
             var key = param.Key;
@@ -193,11 +193,11 @@ public partial class BasicPropertyProcessor : PropertyProcessor
             if (key == "idField")
                 item.FilteringIdField = (param.Value as string) ?? item.FilteringIdField;
 
-            item.FilteringParams[key] = param.Value;
+            item.FilteringParams[key!] = param.Value;
         }
 
         foreach (QuickFilterOptionAttribute param in
-            idField.GetAttributes<QuickFilterOptionAttribute>().Concat(
+            (idField?.GetAttributes<QuickFilterOptionAttribute>() ?? []).Concat(
             source.GetAttributes<QuickFilterOptionAttribute>()))
         {
             var key = param.Key;
@@ -205,7 +205,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
                 key.Length >= 1)
                 key = key[..1].ToLowerInvariant() + key[1..];
 
-            item.QuickFilterParams[key] = param.Value;
+            item.QuickFilterParams[key!] = param.Value;
         }
     }
 

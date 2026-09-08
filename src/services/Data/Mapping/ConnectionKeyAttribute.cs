@@ -26,7 +26,7 @@ public class ConnectionKeyAttribute : Attribute
     {
         ArgumentNullException.ThrowIfNull(sourceType);
 
-        var attr = sourceType.GetCustomAttribute<ConnectionKeyAttribute>(true) ?? throw new ArgumentOutOfRangeException("sourceType",
+        var attr = sourceType.GetCustomAttribute<ConnectionKeyAttribute>(true) ?? throw new ArgumentOutOfRangeException(nameof(sourceType),
                 "ConnectionKeyAttribute is created with source type " + sourceType.Name +
                 ", but that class has no ConnectionKey attribute");
         Value = attr.Value;
@@ -47,5 +47,5 @@ public class ConnectionKeyAttribute : Attribute
     /// <value>
     /// The type of the source.
     /// </value>
-    public Type SourceType { get; private set; }
+    public Type? SourceType { get; private set; }
 }

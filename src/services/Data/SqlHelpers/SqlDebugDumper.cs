@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 
 namespace Serenity.Data;
 
@@ -14,7 +14,7 @@ public class SqlDebugDumper
     /// <param name="parameters">The parameters.</param>
     /// <param name="dialect">The dialect.</param>
     /// <returns>The debug version of the SQL.</returns>
-    public static string Dump(string sql, IDictionary<string, object> parameters, ISqlDialect dialect = null)
+    public static string? Dump(string? sql, IDictionary<string, object?>? parameters, ISqlDialect? dialect = null)
     {
         if (parameters == null)
             return sql;
@@ -24,12 +24,12 @@ public class SqlDebugDumper
         {
             var name = param[i].Key;
             if (!name.StartsWith("@"))
-                param[i] = new KeyValuePair<string, object>("@" + name, param[i].Value);
+                param[i] = new KeyValuePair<string, object?>("@" + name, param[i].Value);
         }
 
         param.Sort((x, y) => y.Key.Length.CompareTo(x.Key.Length));
 
-        var sb = new StringBuilder(sql);
+        var sb = new StringBuilder(sql ?? "");
         foreach (var pair in param)
             sb.Replace(pair.Key, DumpParameterValue(pair.Value, dialect));
 
@@ -47,7 +47,7 @@ public class SqlDebugDumper
         return text;
     }
 
-    private static string DumpParameterValue(object value, ISqlDialect dialect = null)
+    private static string DumpParameterValue(object? value, ISqlDialect? dialect = null)
     {
         if (value == null || value == DBNull.Value)
             return "NULL";
@@ -56,7 +56,7 @@ public class SqlDebugDumper
             return str.ToSql(dialect);
 
         if (value is char || value is char[])
-            return value.ToString().ToSql(dialect);
+            return value.ToString()!.ToSql(dialect);
 
         if (value is bool b)
             return b ? "1" : "0";
@@ -89,6 +89,6 @@ public class SqlDebugDumper
         if (value is IFormattable formattable)
             return formattable.ToString(null, CultureInfo.InvariantCulture);
 
-        return value.ToString();
+        return value.ToString()!;
     }
 }

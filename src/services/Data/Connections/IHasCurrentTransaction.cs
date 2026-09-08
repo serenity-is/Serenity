@@ -6,7 +6,7 @@
 public interface IHasCurrentTransaction
 {
     /// <summary>
-    /// Gets the current transaction.
+    /// Gets the current transaction, if any.
     /// </summary>
-    IDbTransaction CurrentTransaction { get; }
+    IDbTransaction? CurrentTransaction { get; }
 }

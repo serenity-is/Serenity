@@ -11,7 +11,7 @@ namespace Serenity.Data;
 /// <param name="options">The connection string options.</param>
 /// <param name="sqlDialectMapper">The SQL dialect mapper.</param>
 /// <param name="typeSource">The type source used to discover connection key fallbacks.</param>
-public class DefaultConnectionStrings(IOptions<ConnectionStringOptions> options, ISqlDialectMapper sqlDialectMapper = null, ITypeSource typeSource = null)
+public class DefaultConnectionStrings(IOptions<ConnectionStringOptions> options, ISqlDialectMapper? sqlDialectMapper = null, ITypeSource? typeSource = null)
     : IConnectionStrings, IConnectionKeyFallbacks
 {
     /// <summary>The options.</summary>
@@ -26,7 +26,7 @@ public class DefaultConnectionStrings(IOptions<ConnectionStringOptions> options,
     /// override <see cref="GetFallbackMap"/> to avoid caching, or set this field to
     /// <c>null</c> to invalidate it so it is rebuilt on the next access.
     /// </remarks>
-    protected Dictionary<string, string> fallbackMap;
+    protected Dictionary<string, string>? fallbackMap;
 
     /// <summary>
     /// Determines the dialect for a connection.
@@ -56,9 +56,9 @@ public class DefaultConnectionStrings(IOptions<ConnectionStringOptions> options,
     /// </summary>
     /// <param name="connectionKey">The connection key.</param>
     /// <returns>The connection string, or <c>null</c> if not found.</returns>
-    public virtual IConnectionString TryGetConnectionString(string connectionKey)
+    public virtual IConnectionString? TryGetConnectionString(string connectionKey)
     {
-        if (byKey.TryGetValue(connectionKey, out ConnectionStringInfo info))
+        if (byKey.TryGetValue(connectionKey, out ConnectionStringInfo? info))
             return info;
 
         var resolvedKey = ResolveConnectionKey(connectionKey);
@@ -68,7 +68,7 @@ public class DefaultConnectionStrings(IOptions<ConnectionStringOptions> options,
         if (byKey.TryGetValue(resolvedKey, out info))
             return info;
 
-        if (!options.Value.TryGetValue(resolvedKey, out ConnectionStringEntry entry))
+        if (!options.Value.TryGetValue(resolvedKey, out ConnectionStringEntry? entry))
             return null;
 
         info = new ConnectionStringInfo(resolvedKey, entry.ConnectionString, entry.ProviderName,
@@ -89,7 +89,7 @@ public class DefaultConnectionStrings(IOptions<ConnectionStringOptions> options,
     /// </remarks>
     public virtual IEnumerable<IConnectionString> ListConnectionStrings()
     {
-        return options.Value.Keys.Select(TryGetConnectionString);
+        return options.Value.Keys.Select(TryGetConnectionString).OfType<IConnectionString>();
     }
 
     /// <inheritdoc/>
@@ -117,7 +117,7 @@ public class DefaultConnectionStrings(IOptions<ConnectionStringOptions> options,
     }
 
     /// <inheritdoc/>
-    public virtual string ResolveConnectionKey(string connectionKey)
+    public virtual string? ResolveConnectionKey(string connectionKey)
     {
         ArgumentException.ThrowIfNullOrEmpty(connectionKey);
 
@@ -176,7 +176,7 @@ public class DefaultConnectionStrings(IOptions<ConnectionStringOptions> options,
     /// </summary>
     /// <param name="typeSource">The type source used to discover connection key fallbacks.</param>
     /// <returns>The connection key fallback map.</returns>
-    protected static Dictionary<string, string> BuildFallbackMap(ITypeSource typeSource)
+    protected static Dictionary<string, string> BuildFallbackMap(ITypeSource? typeSource)
     {
         var map = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         if (typeSource == null)

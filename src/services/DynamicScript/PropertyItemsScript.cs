@@ -86,7 +86,7 @@ public abstract partial class PropertyItemsScript(string scriptName, Type type,
         if (basedOnRowAttr != null &&
             basedOnRowAttr.RowType != null)
         {
-            var existing = new HashSet<string>(data.Items.Select(x => x.Name));
+            var existing = new HashSet<string>(data.Items.Where(x => x.Name is not null).Select(x => x.Name!));
             var additional = new HashSet<string>();
             foreach (var item in data.Items)
             {

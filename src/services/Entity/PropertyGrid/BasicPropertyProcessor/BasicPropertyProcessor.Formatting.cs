@@ -1,4 +1,4 @@
-﻿namespace Serenity.PropertyGrid;
+namespace Serenity.PropertyGrid;
 
 public partial class BasicPropertyProcessor : PropertyProcessor
 {
@@ -55,7 +55,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
                 key.Length >= 1)
                 key = key[..1].ToLowerInvariant() + key[1..];
 
-            item.FormatterParams[key] = param.Value;
+            item.FormatterParams[key!] = param.Value;
         }
     }
 }

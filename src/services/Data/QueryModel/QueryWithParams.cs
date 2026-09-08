@@ -1,5 +1,5 @@
 using System.Diagnostics;
-using Dictionary = System.Collections.Generic.Dictionary<string, object>;
+using Dictionary = System.Collections.Generic.Dictionary<string, object?>;
 
 namespace Serenity.Data;
 
@@ -23,12 +23,12 @@ public class QueryWithParams : IQueryWithParams
     /// <summary>
     /// The parent query with param storage.
     /// </summary>
-    protected QueryWithParams parent;
+    protected QueryWithParams? parent;
 
     /// <summary>
     /// The parameters.
     /// </summary>
-    protected Dictionary parameters;
+    protected Dictionary? parameters;
 
     /// <summary>
     /// The next auto param counter.
@@ -57,8 +57,9 @@ public class QueryWithParams : IQueryWithParams
 
             target.parameters = p;
         }
-
-        target.parameters = null;
+        else {
+            target.parameters = null;
+        }
     }
 
     /// <summary>
@@ -66,7 +67,7 @@ public class QueryWithParams : IQueryWithParams
     /// </summary>
     /// <param name="name">The name.</param>
     /// <param name="value">The value.</param>
-    public void AddParam(string name, object value)
+    public void AddParam(string name, object? value)
     {
         if (parent != null)
         {
@@ -84,7 +85,7 @@ public class QueryWithParams : IQueryWithParams
     /// </summary>
     /// <param name="name">The name.</param>
     /// <param name="value">The value.</param>
-    public void SetParam(string name, object value)
+    public void SetParam(string name, object? value)
     {
         if (parent != null)
         {
@@ -103,7 +104,7 @@ public class QueryWithParams : IQueryWithParams
     /// <value>
     /// The parameters.
     /// </value>
-    public IDictionary<string, object> Params
+    public IDictionary<string, object?>? Params
     {
         get
         {

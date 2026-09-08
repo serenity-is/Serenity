@@ -6,12 +6,12 @@ namespace Serenity.Data;
 public static class SqlSettings
 {
     private static ISqlDialect defaultDialect;
-    private static readonly AsyncLocal<ISqlDialect> localDialect;
+    private static readonly AsyncLocal<ISqlDialect?> localDialect;
 
     static SqlSettings()
     {
         defaultDialect = new SqlServer2012Dialect();
-        localDialect = new AsyncLocal<ISqlDialect>();
+        localDialect = new AsyncLocal<ISqlDialect?>();
     }
 
     /// <summary>
@@ -51,7 +51,7 @@ public static class SqlSettings
     /// </summary>
     /// <param name="dialect">The dialect. Can be null.</param>
     /// <returns>The old local dialect, if any.</returns>
-    public static ISqlDialect SetLocalDialect(ISqlDialect dialect)
+    public static ISqlDialect? SetLocalDialect(ISqlDialect? dialect)
     {
         var old = localDialect.Value;
         localDialect.Value = dialect;

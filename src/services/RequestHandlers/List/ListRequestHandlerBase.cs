@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Runtime.CompilerServices;
 
 namespace Serenity.Services;
 
@@ -20,6 +21,8 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(
     where TListRequest : ListRequest
     where TListResponse : ListResponse<TRow>, new()
 {
+    private IDbConnection connection;
+
     /// <summary>
     /// Set of ignored equality filter entries.
     /// </summary>
@@ -654,7 +657,7 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(
     /// that is not allowed to be selected, like <see cref="FieldFlags.NotMapped"/> and
     /// <see cref="SelectLevel.Never"/> etc.
     /// </summary>
-    public Field[] GetDistinctFields()
+    public Field[]? GetDistinctFields()
     {
         if (!Request.DistinctFields.IsEmptyOrNull())
         {
@@ -692,10 +695,15 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(
     /// </summary>
     public ITwoLevelCache Cache => Context.Cache;
 
+    private InvalidOperationException PropertyReadError([CallerMemberName] string? property = default)
+    {
+        return new InvalidOperationException($"Error reading '{property}' of {GetType().Name}. The handler has not been initialized.");
+    }
+
     /// <summary>
     /// Gets the request context.
     /// </summary>
-    public IRequestContext Context { get; private set; } = context ?? throw new ArgumentNullException(nameof(context));
+    public IRequestContext Context { get; } = context ?? throw new ArgumentNullException(nameof(context));
 
     /// <summary>
     /// Gets the localizer from the request context.
@@ -720,33 +728,33 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(
     /// <summary>
     /// Gets the current connection.
     /// </summary>
-    public IDbConnection Connection { get; protected set; }
+    public IDbConnection Connection { get => connection ?? throw PropertyReadError(); protected set => connection = value; }
 
     /// <summary>
     /// Gets the select query.
     /// </summary>
-    public SqlQuery Query { get; protected set; }
+    public SqlQuery Query { get => field ?? throw PropertyReadError(); protected set; }
 
     /// <summary>
     /// Gets the entity used for querying / metadata lookup.
     /// </summary>
-    public TRow Row { get; protected set; }
+    public TRow Row { get => field ?? throw PropertyReadError(); protected set; }
 
     /// <summary>
     /// Gets the request object.
     /// </summary>
-    public TListRequest Request { get; protected set; }
+    public TListRequest Request { get => field ?? throw PropertyReadError(); protected set; }
 
     /// <summary>
     /// Gets the response object.
     /// </summary>
-    public TListResponse Response { get; protected set; }
+    public TListResponse Response { get => field ?? throw PropertyReadError(); protected set; }
 
     /// <summary>
     /// A state bag for behaviors to preserve state among their methods.
     /// It will be cleared before each request, e.g. Process call.
     /// </summary>
-    public IDictionary<string, object> StateBag { get; private set; } = new Dictionary<string, object>();
+    public IDictionary<string, object?> StateBag { get; } = new Dictionary<string, object?>();
 
     IRow IListRequestHandler.Row => Row;
     ListRequest IListRequestHandler.Request => Request;

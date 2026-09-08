@@ -49,7 +49,7 @@ public class ConstantCriteria : Criteria
     /// </summary>
     /// <param name="value">The value.</param>
     /// <param name="dialect">The dialect.</param>
-    public ConstantCriteria(string value, ISqlDialect dialect = null)
+    public ConstantCriteria(string value, ISqlDialect? dialect = null)
         : base(value.ToSql(dialect))
     {
     }
@@ -59,7 +59,7 @@ public class ConstantCriteria : Criteria
     /// </summary>
     /// <param name="values">The values.</param>
     /// <param name="dialect">The dialect.</param>
-    public ConstantCriteria(IEnumerable<string> values, ISqlDialect dialect = null)
+    public ConstantCriteria(IEnumerable<string> values, ISqlDialect? dialect = null)
         : base(string.Join(",", values.Select(x => x.ToSql(dialect))))
     {
     }

@@ -1,9 +1,9 @@
-﻿namespace Serenity.PropertyGrid;
+namespace Serenity.PropertyGrid;
 
 public partial class BasicPropertyProcessor : PropertyProcessor
 {
-    private FormCssClassAttribute formCssClassPrior;
-    private FormWidthAttribute formWidthPrior;
+    private FormCssClassAttribute? formCssClassPrior;
+    private FormWidthAttribute? formWidthPrior;
 
     private void SetFormCssClass(IPropertySource source, PropertyItem item)
     {

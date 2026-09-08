@@ -1,4 +1,4 @@
-﻿
+
 using System.Collections;
 
 namespace Serenity.Services;
@@ -10,7 +10,7 @@ namespace Serenity.Services;
 public class SaveRequest<TEntity> : ServiceRequest, ISaveRequest
 {
     /// <inheritdoc/>
-    public object EntityId { get; set; }
+    public object? EntityId { get; set; }
     
     /// <summary>
     /// The entity containing only the fields that should
@@ -18,23 +18,23 @@ public class SaveRequest<TEntity> : ServiceRequest, ISaveRequest
     /// with Row types as only it provides assignment information
     /// from the originating JSON.
     /// </summary>
-    public TEntity Entity { get; set; }
+    public TEntity? Entity { get; set; }
 
     /// <summary>
     /// The set of localizations if translations are requested to 
     /// be updated.
     /// </summary>
-    public Dictionary<string, TEntity> Localizations { get; set; }
+    public Dictionary<string, TEntity>? Localizations { get; set; }
 
-    object ISaveRequest.Entity
+    object? ISaveRequest.Entity
     {
         get { return Entity; }
-        set { Entity = (TEntity)value; }
+        set { Entity = (TEntity?)value; }
     }
 
-    IDictionary ISaveRequest.Localizations
+    IDictionary? ISaveRequest.Localizations
     {
         get { return Localizations; }
-        set { Localizations = (Dictionary<string, TEntity>)value; }
+        set { Localizations = (Dictionary<string, TEntity>?)value; }
     }
 }

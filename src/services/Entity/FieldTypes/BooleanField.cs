@@ -15,8 +15,8 @@ namespace Serenity.Data;
 /// <param name="flags">The flags.</param>
 /// <param name="getValue">The get value callback.</param>
 /// <param name="setValue">The set value callback.</param>
-public sealed class BooleanField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
-    Func<IRow, bool?> getValue = null, Action<IRow, bool?> setValue = null) : GenericValueField<bool>(collection, FieldType.Boolean, name, caption, size, flags, getValue, setValue)
+public sealed class BooleanField(ICollection<Field> collection, string name, LocalText? caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
+    Func<IRow, bool?>? getValue = null, Action<IRow, bool?>? setValue = null) : GenericValueField<bool>(collection, FieldType.Boolean, name, caption, size, flags, getValue, setValue)
 {
 
     /// <summary>
@@ -30,8 +30,8 @@ public sealed class BooleanField(ICollection<Field> collection, string name, Loc
     /// <param name="getValue">The get value.</param>
     /// <param name="setValue">The set value.</param>
     /// <returns>A new BooleanField instance.</returns>
-    public static BooleanField Factory(ICollection<Field> collection, string name, LocalText caption, int size, FieldFlags flags,
-        Func<IRow, bool?> getValue, Action<IRow, bool?> setValue)
+    public static BooleanField Factory(ICollection<Field> collection, string name, LocalText? caption, int size, FieldFlags flags,
+        Func<IRow, bool?> getValue, Action<IRow, bool?>? setValue)
     {
         return new BooleanField(collection, name, caption, size, flags, getValue, setValue);
     }
@@ -84,14 +84,14 @@ public sealed class BooleanField(ICollection<Field> collection, string name, Loc
                 _setValue(row, null);
                 break;
             case Newtonsoft.Json.JsonToken.Boolean:
-                _setValue(row, (bool)reader.Value);
+                _setValue(row, (bool)reader.Value!);
                 break;
             case Newtonsoft.Json.JsonToken.Integer:
             case Newtonsoft.Json.JsonToken.Float:
                 _setValue(row, Convert.ToBoolean(reader.Value, CultureInfo.InvariantCulture));
                 break;
             case Newtonsoft.Json.JsonToken.String:
-                var s = ((string)reader.Value).TrimToNull();
+                var s = ((string?)reader.Value).TrimToNull();
                 if (s == null)
                     _setValue(row, null);
                 else

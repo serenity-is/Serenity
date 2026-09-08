@@ -32,7 +32,7 @@ public static class TwoLevelCacheInvalidationExtensions
             throw new ArgumentNullException(nameof(groupKey));
 
         var updater = cache.Memory.Get("BatchGenerationUpdater:UpdaterInstance:" + groupKey, TimeSpan.Zero,
-            () => new GenerationUpdater(cache, groupKey));
+            () => new GenerationUpdater(cache, groupKey))!;
 
         uow.OnCommit -= updater.Update;
         uow.OnCommit += updater.Update;
@@ -59,7 +59,7 @@ public static class TwoLevelCacheInvalidationExtensions
         {
             foreach (var rowType in attr.LinkedRows)
             {
-                var rowInstance = (IRow)Activator.CreateInstance(rowType);
+                var rowInstance = (IRow)Activator.CreateInstance(rowType)!;
                 InvalidateOnCommit(cache, uow, rowInstance.GetFields().GenerationKey);
             }
         }

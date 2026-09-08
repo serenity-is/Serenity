@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Serenity.Data;
 
@@ -18,7 +19,7 @@ namespace Serenity.Data;
 /// <param name="toCriteria">Optional field to criteria converter</param>
 /// <exception cref="ArgumentNullException"><paramref name="row"/> or <paramref name="permissions"/> is <c>null</c>.</exception>
 public class CriteriaFieldExpressionReplacer(IRow row, IPermissionService permissions,
-    bool lookupAccessMode = false, ISqlDialect dialect = null, Func<IField, BaseCriteria> toCriteria = null) : SafeCriteriaValidator
+    bool lookupAccessMode = false, ISqlDialect? dialect = null, Func<IField, BaseCriteria>? toCriteria = null) : SafeCriteriaValidator
 {
     private readonly IPermissionService permissions = permissions ?? throw new ArgumentNullException(nameof(permissions));
     private readonly bool lookupAccessMode = lookupAccessMode;
@@ -39,7 +40,7 @@ public class CriteriaFieldExpressionReplacer(IRow row, IPermissionService permis
     /// expressions.
     /// </summary>
     /// <param name="criteria">The criteria</param>
-    public BaseCriteria Process(BaseCriteria criteria)
+    public BaseCriteria? Process(BaseCriteria criteria)
     {
         return Visit(criteria);
     }
@@ -73,7 +74,7 @@ public class CriteriaFieldExpressionReplacer(IRow row, IPermissionService permis
     /// Finds a field by its property name or field name
     /// </summary>
     /// <param name="expression">The property name or field name</param>
-    protected virtual Field FindField(string expression)
+    protected virtual Field? FindField(string expression)
     {
         return Row.FindFieldByPropertyName(expression) ?? Row.FindField(expression);
     }
@@ -88,20 +89,18 @@ public class CriteriaFieldExpressionReplacer(IRow row, IPermissionService permis
     }
 
     /// <inheritdoc/>
-    protected override BaseCriteria VisitCriteria(Criteria criteria)
+    protected override BaseCriteria? VisitCriteria(Criteria criteria)
     {
         var result = base.VisitCriteria(criteria);
 
-        criteria = result as Criteria;
-
-        if (criteria is not null)
+        if (result is Criteria critResult)
         {
-            var field = FindField(criteria.Expression) ?? throw new ValidationError("InvalidCriteriaField", criteria.Expression,
-                    string.Format("'{0}' criteria field is not found!", criteria.Expression));
+            var field = FindField(critResult.Expression) ?? throw new ValidationError("InvalidCriteriaField", critResult.Expression,
+                    string.Format("'{0}' criteria field is not found!", critResult.Expression));
             if (!CanFilterField(field))
             {
-                throw new ValidationError("CantFilterField", criteria.Expression,
-                    string.Format("Can't filter on field '{0}'!", criteria.Expression));
+                throw new ValidationError("CantFilterField", critResult.Expression,
+                    string.Format("Can't filter on field '{0}'!", critResult.Expression));
             }
 
             return ToCriteria(field);
@@ -110,7 +109,7 @@ public class CriteriaFieldExpressionReplacer(IRow row, IPermissionService permis
         return result;
     }
 
-    private bool ShouldConvertValues(BinaryCriteria criteria, out Field field, out object value)
+    private bool ShouldConvertValues(BinaryCriteria criteria, [MaybeNullWhen(false)] out Field field, out object? value)
     {
         field = null;
         value = null;
@@ -137,7 +136,7 @@ public class CriteriaFieldExpressionReplacer(IRow row, IPermissionService permis
         return value != null;
     }
 
-    private bool ShouldHandleLikeCriteria(BinaryCriteria criteria, out Field field)
+    private bool ShouldHandleLikeCriteria(BinaryCriteria? criteria, [MaybeNullWhen(false)] out Field field)
     {
         field = null;
         return Dialect.IsLikeCaseSensitive &&
@@ -147,26 +146,27 @@ public class CriteriaFieldExpressionReplacer(IRow row, IPermissionService permis
              criteria.RightOperand is ValueCriteria right &&
              right.Value is string &&
              criteria.LeftOperand is Criteria left &&
-             ((field = FindField(left.Expression)) is StringField);
+             left.Expression is string expression &&
+             ((field = FindField(expression)) is StringField);
     }
 
     /// <inheritdoc/>
     protected override BaseCriteria VisitBinary(BinaryCriteria criteria)
     {
-        if (ShouldHandleLikeCriteria(criteria, out Field fieldToUpper))
+        if (ShouldHandleLikeCriteria(criteria, out Field? fieldToUpper))
         {
             return new BinaryCriteria(new UpperFunctionCriteria(ToCriteria(fieldToUpper)), 
                 criteria.Operator, new UpperFunctionCriteria(criteria.RightOperand));
         }
 
-        if (ShouldConvertValues(criteria, out Field field, out object value))
+        if (ShouldConvertValues(criteria, out Field? field, out object? value))
             try
             {
                 var str = value as string;
-                if (str == null && value is IEnumerable)
+                if (str == null && value is IEnumerable enumerable)
                 {
-                    var values = new List<object>();
-                    foreach (var v in value as IEnumerable)
+                    var values = new List<object?>();
+                    foreach (var v in enumerable)
                         values.Add(field.ConvertValue(v, CultureInfo.InvariantCulture));
 
                     return new BinaryCriteria(ToCriteria(field), criteria.Operator, new ValueCriteria(values));

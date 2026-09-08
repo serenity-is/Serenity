@@ -43,7 +43,7 @@ public abstract class BaseExpressionAttribute : Attribute
     /// Gets or sets an optional format string to apply with
     /// {0} placeholder for the expression.
     /// </summary>
-    public string Format { get; set; }
+    public string? Format { get; set; }
 
     /// <summary>
     /// Convert the expression to string. Used by derived expression attributes
@@ -87,7 +87,7 @@ public abstract class BaseExpressionAttribute : Attribute
             !t1.IsAbstract &&
             typeof(BaseExpressionAttribute).IsAssignableFrom(t1))
         {
-            var instance = (BaseExpressionAttribute)(Activator.CreateInstance(t1));
+            var instance = (BaseExpressionAttribute)(Activator.CreateInstance(t1)!);
             return instance.ToString(dialect);
         }
 
@@ -97,10 +97,10 @@ public abstract class BaseExpressionAttribute : Attribute
             typeof(BaseExpressionAttribute).IsAssignableFrom(t2))
         {
             var args = enumerable.Skip(1).ToArray();
-            var instance = (BaseExpressionAttribute)Activator.CreateInstance(t2, args);
+            var instance = (BaseExpressionAttribute)Activator.CreateInstance(t2, args)!;
             return instance.ToString(dialect);
         }
 
-        return Convert.ToString(expression, CultureInfo.InvariantCulture);
+        return Convert.ToString(expression, CultureInfo.InvariantCulture)!;
     }
 }

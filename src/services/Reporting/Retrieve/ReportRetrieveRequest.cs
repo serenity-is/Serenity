@@ -1,4 +1,4 @@
-﻿namespace Serenity.Reporting;
+namespace Serenity.Reporting;
 
 /// <summary>
 /// Request model to retrieve a report by its key.
@@ -9,5 +9,5 @@ public class ReportRetrieveRequest : ServiceRequest
     /// <summary>
     /// The report key to retrieve.
     /// </summary>
-    public string ReportKey { get; set; }
+    public string? ReportKey { get; set; }
 }

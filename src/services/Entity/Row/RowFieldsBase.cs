@@ -1,5 +1,6 @@
 using Serenity.Reflection;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection.Emit;
 
 namespace Serenity.Data;
@@ -14,28 +15,28 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
 {
     internal Dictionary<string, Field> byName;
     internal Dictionary<string, Field> byPropertyName;
-    internal Dictionary<Type, Field[]> byAttribute;
-    internal Field idField;
-    internal Field[] primaryKeys;
-    internal Field nameField;
-    internal Tuple<Field, bool>[] sortOrders;
+    internal Dictionary<Type, Field[]>? byAttribute;
+    internal Field? idField;
+    internal Field[]? primaryKeys;
+    internal Field? nameField;
+    internal Tuple<Field, bool>[]? sortOrders;
     internal bool isInitialized;
     internal string fieldPrefix;
     internal Dictionary<string, Join> joins;
-    internal string localTextPrefix;
-    internal PropertyChangedEventArgs[] propertyChangedEventArgs;
-    internal Func<IRow> rowFactory;
-    internal Type rowType;
-    internal IAnnotatedType annotations;
-    internal ISqlDialect dialect;
-    internal string moduleIdentifier;
-    internal string connectionKey;
-    internal string generationKey;
+    internal string? localTextPrefix;
+    internal PropertyChangedEventArgs[]? propertyChangedEventArgs;
+    internal Func<IRow>? rowFactory;
+    internal Type? rowType;
+    internal IAnnotatedType? annotations;
+    internal ISqlDialect? dialect;
+    internal string? moduleIdentifier;
+    internal string? connectionKey;
+    internal string? generationKey;
     internal object initializeLock;
-    internal string database;
-    internal string schema;
-    internal string tableOnly;
-    internal string tableName;
+    internal string? database;
+    internal string? schema;
+    internal string? tableOnly;
+    internal string? tableName;
     internal string alias;
     internal string aliasDot;
     internal bool aliasLocked;
@@ -45,7 +46,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
     /// </summary>
     /// <param name="tableName">Name of the table.</param>
     /// <param name="fieldPrefix">The field prefix.</param>
-    protected RowFieldsBase(string tableName = null, string fieldPrefix = "")
+    protected RowFieldsBase(string? tableName = null, string fieldPrefix = "")
     {
         this.tableName = tableName;
         alias = "T0";
@@ -83,20 +84,20 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
         if (!typeof(IRow).IsAssignableFrom(rowType) ||
             rowType.IsInterface)
             throw new InvalidProgramException(string.Format(
-                "RowFields {0}'s declaring row type {1} must be a subclass of Row!", fieldsType.Name, rowType.Name));
+                "RowFields {0}'s declaring row type {1} must be a subclass of Row!", fieldsType.Name, rowType!.Name));
 
         var constructor = rowType.GetConstructors().FirstOrDefault(x => x.GetParameters().Length == 1 &&
             x.GetParameters()[0].GetType().IsSubclassOf(typeof(RowFieldsBase)));
 
         if (constructor != null)
-            rowFactory = () => (IRow)Activator.CreateInstance(rowType, this);
+            rowFactory = () => (IRow)Activator.CreateInstance(rowType, this)!;
         else
-            rowFactory = () => (IRow)Activator.CreateInstance(rowType);
+            rowFactory = () => (IRow)Activator.CreateInstance(rowType)!;
     }
 
     private void DetermineTableName(DialectExpressionSelector expressionSelector)
     {
-        var attr = expressionSelector.GetBestMatch(rowType.GetCustomAttributes<TableNameAttribute>(),
+        var attr = expressionSelector.GetBestMatch(rowType!.GetCustomAttributes<TableNameAttribute>(),
             x => x.Dialect);
 
         if (tableName != null)
@@ -104,7 +105,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
             if (attr != null && string.Compare(tableName, attr.Name, StringComparison.OrdinalIgnoreCase) != 0)
                 throw new InvalidProgramException(string.Format(
                     "Tablename in row type {0} can't be overridden by attribute!",
-                        rowType.Name));
+                        rowType!.Name));
         }
         else if (attr != null)
         {
@@ -113,7 +114,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
         else
         {
 
-            var name = rowType.Name;
+            var name = rowType!.Name;
             if (name.EndsWith("Row"))
                 name = name[0..^3];
 
@@ -130,8 +131,8 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
     /// <param name="database">The database.</param>
     /// <param name="schema">The schema.</param>
     /// <returns></returns>
-    public static string ParseDatabaseAndSchema(string tableName,
-        out string database, out string schema)
+    public static string? ParseDatabaseAndSchema(string tableName,
+        out string? database, out string? schema)
     {
         database = null;
         schema = null;
@@ -157,7 +158,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
 
     private void DetermineConnectionKey()
     {
-        var connectionKeyAttr = rowType.GetCustomAttribute<ConnectionKeyAttribute>();
+        var connectionKeyAttr = rowType!.GetCustomAttribute<ConnectionKeyAttribute>();
         if (connectionKeyAttr != null)
             connectionKey = connectionKeyAttr.Value;
         else
@@ -166,12 +167,12 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
 
     private void DetermineModuleIdentifier()
     {
-        var moduleAttr = rowType.GetCustomAttribute<ModuleAttribute>();
+        var moduleAttr = rowType!.GetCustomAttribute<ModuleAttribute>();
         if (moduleAttr != null)
             moduleIdentifier = moduleAttr.Value;
         else
         {
-            var ns = rowType.Namespace ?? "";
+            var ns = rowType!.Namespace ?? "";
 
             if (ns.EndsWith(".Entities"))
                 ns = ns[0..^9];
@@ -189,7 +190,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
         if (localTextPrefix != null)
             return;
 
-        var localTextPrefixAttr = rowType.GetCustomAttribute<LocalTextPrefixAttribute>();
+        var localTextPrefixAttr = rowType!.GetCustomAttribute<LocalTextPrefixAttribute>();
         if (localTextPrefixAttr != null)
         {
             localTextPrefix = localTextPrefixAttr.Value;
@@ -206,7 +207,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
         rowFields = new(StringComparer.OrdinalIgnoreCase);
         rowProperties = new(StringComparer.Ordinal);
 
-        var members = rowType.GetMembers(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+        var members = rowType!.GetMembers(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
         foreach (var member in members)
         {
             var fi = member as FieldInfo;
@@ -239,7 +240,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
     /// <exception cref="ArgumentNullException">dialect</exception>
     /// <exception cref="InvalidProgramException">
     /// </exception>
-    public void Initialize(IAnnotatedType annotations, ISqlDialect dialect)
+    public void Initialize(IAnnotatedType? annotations, ISqlDialect dialect)
     {
         if (isInitialized)
             return;
@@ -252,48 +253,48 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
             this.dialect = dialect ?? throw new ArgumentNullException(nameof(dialect));
             var expressionSelector = new DialectExpressionSelector(dialect);
 
-            var rowCustomAttributes = rowType.GetCustomAttributes().ToList();
+            var rowCustomAttributes = rowType!.GetCustomAttributes().ToList();
 
             DetermineTableName(expressionSelector);
 
-            var fieldsReadPerm = rowType.GetCustomAttribute<FieldReadPermissionAttribute>();
+            var fieldsReadPerm = rowType!.GetCustomAttribute<FieldReadPermissionAttribute>();
             if (fieldsReadPerm != null && !fieldsReadPerm.ApplyToLookups)
                 fieldsReadPerm = null; // ignore as need to specially handle in initialize
 
-            PermissionAttributeBase fieldsModifyPerm = rowType.GetCustomAttribute<FieldModifyPermissionAttribute>();
-            PermissionAttributeBase fieldsInsertPerm = rowType.GetCustomAttribute<FieldInsertPermissionAttribute>();
-            PermissionAttributeBase fieldsUpdatePerm = rowType.GetCustomAttribute<FieldUpdatePermissionAttribute>();
+            PermissionAttributeBase? fieldsModifyPerm = rowType!.GetCustomAttribute<FieldModifyPermissionAttribute>();
+            PermissionAttributeBase? fieldsInsertPerm = rowType!.GetCustomAttribute<FieldInsertPermissionAttribute>();
+            PermissionAttributeBase? fieldsUpdatePerm = rowType!.GetCustomAttribute<FieldUpdatePermissionAttribute>();
 
             foreach (var fieldInfo in GetType().GetFields(BindingFlags.Instance | BindingFlags.Public))
             {
                 if (fieldInfo.FieldType.IsSubclassOf(typeof(Field)))
                 {
-                    var field = (Field)fieldInfo.GetValue(this);
+                    var field = (Field?)fieldInfo.GetValue(this);
 
-                    if (!rowProperties.TryGetValue(fieldInfo.Name, out IPropertyInfo property))
+                    if (!rowProperties.TryGetValue(fieldInfo.Name, out IPropertyInfo? property))
                         property = null;
 
-                    ColumnAttribute column = null;
-                    DisplayNameAttribute display = null;
-                    SizeAttribute size = null;
-                    BaseExpressionAttribute expression = null;
-                    ScaleAttribute scale = null;
-                    MinSelectLevelAttribute selectLevel = null;
-                    ForeignKeyAttribute foreignKey = null;
-                    LeftJoinAttribute leftJoin = null;
-                    InnerJoinAttribute innerJoin = null;
-                    DefaultValueAttribute defaultValue = null;
-                    TextualFieldAttribute textualField = null;
-                    DateTimeKindAttribute dateTimeKind = null;
+                    ColumnAttribute? column = null;
+                    DisplayNameAttribute? display = null;
+                    SizeAttribute? size = null;
+                    BaseExpressionAttribute? expression = null;
+                    ScaleAttribute? scale = null;
+                    MinSelectLevelAttribute? selectLevel = null;
+                    ForeignKeyAttribute? foreignKey = null;
+                    LeftJoinAttribute? leftJoin = null;
+                    InnerJoinAttribute? innerJoin = null;
+                    DefaultValueAttribute? defaultValue = null;
+                    TextualFieldAttribute? textualField = null;
+                    DateTimeKindAttribute? dateTimeKind = null;
 
-                    PermissionAttributeBase readPermission;
-                    PermissionAttributeBase insertPermission;
-                    PermissionAttributeBase updatePermission;
+                    PermissionAttributeBase? readPermission;
+                    PermissionAttributeBase? insertPermission;
+                    PermissionAttributeBase? updatePermission;
 
                     FieldFlags addFlags = 0;
                     FieldFlags removeFlags = 0;
 
-                    OriginPropertyDictionary propertyDictionary = null;
+                    OriginPropertyDictionary? propertyDictionary = null;
 
                     if (property != null)
                     {
@@ -314,7 +315,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
                             {
                                 throw new AmbiguousMatchException(string.Format(
                                     "Error while determining expression for row type {0}, property '{1}'",
-                                    rowType.FullName, property.Name), ex);
+                                    rowType!.FullName, property.Name), ex);
                             }
                         }
 
@@ -338,13 +339,13 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
                         {
                             throw new AmbiguousMatchException(string.Format(
                                 "Error while determining join attributes for row type {0}, property '{1}'",
-                                    rowType.FullName, property.Name), ex);
+                                    rowType!.FullName, property.Name), ex);
                         }
 
                         defaultValue = property.GetAttribute<DefaultValueAttribute>();
                         textualField = property.GetAttribute<TextualFieldAttribute>();
                         dateTimeKind = property.GetAttribute<DateTimeKindAttribute>();
-                        readPermission = property.GetAttribute<ReadPermissionAttribute>() ?? (PermissionAttributeBase)fieldsReadPerm;
+                        readPermission = property.GetAttribute<ReadPermissionAttribute>() ?? (PermissionAttributeBase?)fieldsReadPerm;
                         insertPermission = property.GetAttribute<InsertPermissionAttribute>() ?? fieldsInsertPerm ??
                             property.GetAttribute<ModifyPermissionAttribute>() ?? fieldsModifyPerm ?? readPermission ?? fieldsReadPerm;
                         updatePermission = property.GetAttribute<UpdatePermissionAttribute>() ?? fieldsUpdatePerm ??
@@ -352,7 +353,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
 
                         if (origin != null)
                         {
-                            propertyDictionary ??= OriginPropertyDictionary.GetPropertyDictionary(rowType);
+                            propertyDictionary ??= OriginPropertyDictionary.GetPropertyDictionary(rowType!);
                             try
                             {
                                 if (!expressions.Any() && expression == null)
@@ -373,7 +374,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
                                 throw new InvalidProgramException(string.Format(
                                     "Infinite recursion detected while determining origins " +
                                     "for property '{0}' on row type '{1}'",
-                                    property.Name, rowType.FullName));
+                                    property.Name, rowType!.FullName));
                             }
                         }
 
@@ -408,10 +409,10 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
                         {
                             throw new InvalidProgramException(string.Format(
                                 "Field {0} in type {1} is null and has no corresponding property in entity!",
-                                    fieldInfo.Name, rowType.Name));
+                                    fieldInfo.Name, rowType!.Name));
                         }
 
-                        object[] prm =
+                        object?[] prm =
                         [
                             this, // owner
                             column == null ? property.Name : (column.Name.TrimToNull() ?? property.Name),
@@ -421,7 +422,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
                             null,
                             null,
                         ];
-                        if (rowFields.TryGetValue("_" + property.Name, out FieldInfo storage) ||
+                        if (rowFields.TryGetValue("_" + property.Name, out FieldInfo? storage) ||
                             rowFields.TryGetValue("m_" + property.Name, out storage) ||
                             rowFields.TryGetValue(property.Name, out storage))
                         {
@@ -429,7 +430,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
                             prm[6] = CreateFieldSetMethod(storage);
                         }
 
-                        field = (Field)Activator.CreateInstance(fieldInfo.FieldType, prm);
+                        field = (Field)Activator.CreateInstance(fieldInfo.FieldType, prm)!;
                         fieldInfo.SetValue(this, field);
                     }
                     else
@@ -446,7 +447,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
                         if (column != null && string.Compare(column.Name, field.Name, StringComparison.OrdinalIgnoreCase) != 0)
                             throw new InvalidProgramException(string.Format(
                                 "Field name '{0}' in type {1} can't be overridden by Column name attribute!",
-                                    fieldInfo.Name, rowType.FullName));
+                                    fieldInfo.Name, rowType!.FullName));
                     }
 
                     if (scale != null)
@@ -472,7 +473,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
                     if (foreignKey != null)
                     {
                         field.ForeignTable = foreignKey.Table ??
-                            expressionSelector.GetBestMatch(foreignKey.RowType
+                            expressionSelector.GetBestMatch(foreignKey.RowType!
                                 .GetCustomAttributes<TableNameAttribute>(), x => x.Dialect).Name;
                         field.ForeignField = foreignKey.Field;
                     }
@@ -480,23 +481,23 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
                     if ((leftJoin != null || innerJoin != null) && string.IsNullOrEmpty(field.ForeignTable))
                         throw new InvalidProgramException(string.Format("Property {0} of row type {1} has a [LeftJoin] or [InnerJoin] attribute " +
                             "but its foreign table is undefined. Make sure it has a valid [ForeignKey] attribute!",
-                                fieldInfo.Name, rowType.FullName));
+                                fieldInfo.Name, rowType!.FullName));
 
                     if ((leftJoin != null || innerJoin != null) && string.IsNullOrEmpty(field.ForeignField))
                         throw new InvalidProgramException(string.Format("Property {0} of row type {1} has a [LeftJoin] or [InnerJoin] attribute " +
                             "but its foreign field is undefined. Make sure it has a valid [ForeignKey] attribute!",
-                                fieldInfo.Name, rowType.FullName));
+                                fieldInfo.Name, rowType!.FullName));
 
                     if (leftJoin != null)
                     {
-                        field.ForeignJoinAlias = new LeftJoin(joins, field.ForeignTable, leftJoin.Alias,
-                            new Criteria(leftJoin.Alias, field.ForeignField) == new Criteria(field));
+                        field.ForeignJoinAlias = new LeftJoin(joins, field.ForeignTable!, leftJoin.Alias,
+                            new Criteria(leftJoin.Alias, field.ForeignField!) == new Criteria(field));
                     }
 
                     if (innerJoin != null)
                     {
-                        field.ForeignJoinAlias = new InnerJoin(joins, field.ForeignTable, innerJoin.Alias,
-                            new Criteria(innerJoin.Alias, field.ForeignField) == new Criteria(field));
+                        field.ForeignJoinAlias = new InnerJoin(joins, field.ForeignTable!, innerJoin.Alias,
+                            new Criteria(innerJoin.Alias, field.ForeignField!) == new Criteria(field));
                     }
 
                     if (textualField != null)
@@ -527,17 +528,17 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
                     if (property != null)
                     {
                         if (property.PropertyType != null &&
-                            field is IEnumTypeField)
+                            field is IEnumTypeField enumTypeField)
                         {
                             if (property.PropertyType.IsEnum)
                             {
-                                (field as IEnumTypeField).EnumType = property.PropertyType;
+                                enumTypeField.EnumType = property.PropertyType;
                             }
                             else
                             {
                                 var nullableType = Nullable.GetUnderlyingType(property.PropertyType);
                                 if (nullableType != null && nullableType.IsEnum)
-                                    (field as IEnumTypeField).EnumType = nullableType;
+                                    enumTypeField.EnumType = nullableType;
                             }
                         }
 
@@ -557,7 +558,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
                             {
                                 throw new AmbiguousMatchException(string.Format(
                                     "Error while determining join attributes for row type {0}, property '{1}'",
-                                        rowType.FullName, property.Name), ex);
+                                        rowType!.FullName, property.Name), ex);
                             }
 
                             if (bestMatch is LeftJoinAttribute lja)
@@ -582,7 +583,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
                     if (idFieldAttribute != null)
                     {
                         if (idField is not null)
-                            throw new InvalidProgramException($"{rowType.FullName} have multiple [IdProperty] attributes!");
+                            throw new InvalidProgramException($"{rowType!.FullName} have multiple [IdProperty] attributes!");
 
                         idField = field;
                     }
@@ -591,7 +592,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
                     if (nameFieldAttribute != null)
                     {
                         if (nameField is not null)
-                            throw new InvalidProgramException($"{rowType.FullName} have multiple [NameProperty] attributes!");
+                            throw new InvalidProgramException($"{rowType!.FullName} have multiple [NameProperty] attributes!");
 
                         nameField = field;
                     }
@@ -612,7 +613,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
                 {
                     throw new AmbiguousMatchException(string.Format(
                         "Error while determining join attributes for row type {0}, join alias '{1}'",
-                            rowType.FullName, rowJoinGroup.Key), ex);
+                            rowType!.FullName, rowJoinGroup.Key), ex);
                 }
 
                 if (bestMatch is LeftJoinAttribute lja)
@@ -670,7 +671,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
         var byAttribute = this.byAttribute;
 
         if (byAttribute != null &&
-            byAttribute.TryGetValue(attrType, out Field[] fieldList))
+            byAttribute.TryGetValue(attrType, out Field[]? fieldList))
             return fieldList;
 
         List<Field> newList = [];
@@ -712,11 +713,11 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
     {
         Type[] arguments = [typeof(IRow)];
         var getter = new DynamicMethod(string.Concat("_Get", fieldInfo.Name, "_"),
-            fieldInfo.FieldType, arguments, fieldInfo.DeclaringType);
+            fieldInfo.FieldType, arguments, fieldInfo.DeclaringType!);
 
         ILGenerator generator = getter.GetILGenerator();
         generator.Emit(OpCodes.Ldarg_0);
-        generator.Emit(OpCodes.Castclass, fieldInfo.DeclaringType);
+        generator.Emit(OpCodes.Castclass, fieldInfo.DeclaringType!);
         generator.Emit(OpCodes.Ldfld, fieldInfo);
         generator.Emit(OpCodes.Ret);
         return getter.CreateDelegate(typeof(Func<,>).MakeGenericType(typeof(IRow), fieldInfo.FieldType));
@@ -726,11 +727,11 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
     {
         Type[] arguments = [typeof(IRow), fieldInfo.FieldType];
         var getter = new DynamicMethod(string.Concat("_Set", fieldInfo.Name, "_"),
-            null, arguments, fieldInfo.DeclaringType);
+            null, arguments, fieldInfo.DeclaringType!);
 
         ILGenerator generator = getter.GetILGenerator();
         generator.Emit(OpCodes.Ldarg_0);
-        generator.Emit(OpCodes.Castclass, fieldInfo.DeclaringType);
+        generator.Emit(OpCodes.Castclass, fieldInfo.DeclaringType!);
         generator.Emit(OpCodes.Ldarg_1);
         generator.Emit(OpCodes.Stfld, fieldInfo);
         generator.Emit(OpCodes.Ret);
@@ -749,7 +750,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
                     if (string.Compare(field.ForeignTable, join.Table) == 0 &&
                         (join is LeftJoin || join is InnerJoin) &&
                         join.OnCriteria is object &&
-                        join.OnCriteria.ToStringIgnoreParams().Contains(field.Expression, StringComparison.OrdinalIgnoreCase))
+                        join.OnCriteria.ToStringIgnoreParams().Contains(field.Expression!, StringComparison.OrdinalIgnoreCase))
                     {
                         foreach (var f in this)
                             if (string.Compare(f.JoinAlias, join.Name, StringComparison.OrdinalIgnoreCase) == 0 &&
@@ -773,7 +774,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
     /// <value>
     /// The name of the table.
     /// </value>
-    public string TableName => tableName;
+    public string TableName => tableName!;
 
     /// <summary>
     /// Gets the database.
@@ -781,7 +782,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
     /// <value>
     /// The database.
     /// </value>
-    public string Database => database;
+    public string? Database => database;
 
     /// <summary>
     /// Gets the schema.
@@ -789,7 +790,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
     /// <value>
     /// The schema.
     /// </value>
-    public string Schema => schema;
+    public string? Schema => schema;
 
     /// <summary>
     /// Gets the table only.
@@ -797,7 +798,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
     /// <value>
     /// The table only.
     /// </value>
-    public string TableOnly => tableOnly;
+    public string TableOnly => tableOnly!;
 
     /// <summary>
     /// Gets or sets the field prefix.
@@ -829,7 +830,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
     /// <value>
     /// The module identifier.
     /// </value>
-    public string ModuleIdentifier => moduleIdentifier;
+    public string? ModuleIdentifier => moduleIdentifier;
 
     /// <summary>
     /// Gets the row identifier.
@@ -841,7 +842,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
     {
         get
         {
-            var name = rowType.Name;
+            var name = rowType!.Name;
             if (name.EndsWith("Row"))
                 name = name[0..^3];
 
@@ -855,7 +856,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
     /// <value>
     /// The connection key.
     /// </value>
-    public string ConnectionKey => connectionKey;
+    public string ConnectionKey => connectionKey!;
 
     /// <summary>
     /// Gets the dialect.
@@ -863,7 +864,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
     /// <value>
     /// The dialect.
     /// </value>
-    public ISqlDialect Dialect => dialect;
+    public ISqlDialect? Dialect => dialect;
 
     /// <summary>
     /// Gets or sets the generation key.
@@ -893,21 +894,21 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
     /// <value>
     /// The identifier field.
     /// </value>
-    public Field IdField => idField;
+    public Field? IdField => idField;
     /// <summary>
     /// Gets the name field.
     /// </summary>
     /// <value>
     /// The name field.
     /// </value>
-    public Field NameField => nameField;
+    public Field? NameField => nameField;
     /// <summary>
     /// Gets the primary keys.
     /// </summary>
     /// <value>
     /// The primary keys.
     /// </value>
-    public Field[] PrimaryKeys => primaryKeys;
+    public Field[]? PrimaryKeys => primaryKeys;
 
     /// <summary>
     /// Gets the sort orders.
@@ -1024,9 +1025,9 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
     /// </summary>
     /// <param name="fieldName">Name of the field.</param>
     /// <returns></returns>
-    public Field FindField(string fieldName)
+    public Field? FindField(string fieldName)
     {
-        if (byName.TryGetValue(fieldName, out Field field))
+        if (byName.TryGetValue(fieldName, out Field? field))
             return field;
         else
             return null;
@@ -1047,7 +1048,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
             throw new ArgumentOutOfRangeException(nameof(IdField),
                 $"Row type {GetType().FullName} has INameRow interface but does not have a field with [NameProperty] attribute!");
 
-        var readPerm = rowType.GetCustomAttribute<FieldReadPermissionAttribute>();
+        var readPerm = rowType!.GetCustomAttribute<FieldReadPermissionAttribute>();
         if (readPerm != null && readPerm.Permission != null && !readPerm.ApplyToLookups)
         {
             var permission = readPerm.Permission;
@@ -1073,9 +1074,9 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
     /// </summary>
     /// <param name="propertyName">Name of the property.</param>
     /// <returns></returns>
-    public Field FindFieldByPropertyName(string propertyName)
+    public Field? FindFieldByPropertyName(string propertyName)
     {
-        if (byPropertyName.TryGetValue(propertyName, out Field field))
+        if (byPropertyName.TryGetValue(propertyName, out Field? field))
             return field;
         else
             return null;
@@ -1125,7 +1126,8 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
             return aliasPrefix + x;
         }
 
-        string mapExpression(string x)
+        [return:NotNullIfNotNull(nameof(x))]
+        string? mapExpression(string? x)
         {
             if (x == null)
                 return null;
@@ -1139,7 +1141,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
         {
             field.expression = mapExpression(field.expression);
 
-            if (field.referencedAliases != null && field.ReferencedAliases.Count > 0)
+            if (field.referencedAliases != null && field.ReferencedAliases!.Count > 0)
             {
                 var old = field.ReferencedAliases.ToArray();
                 field.ReferencedAliases.Clear();
@@ -1155,7 +1157,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
         joins.Clear();
         foreach (var join in oldJoins)
         {
-            BaseCriteria onCriteria;
+            BaseCriteria? onCriteria;
             if (join.Value.OnCriteria is BinaryCriteria bc)
                 onCriteria = new BinaryCriteria(
                     new Criteria(mapExpression(bc.LeftOperand.ToString())),
@@ -1166,11 +1168,11 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
                 if (join.Value.OnCriteria is null)
                     onCriteria = null;
                 else
-                    onCriteria = new Criteria(mapExpression(join.Value.OnCriteria.ToString()));
+                    onCriteria = new Criteria(mapExpression(join.Value.OnCriteria!.ToString())!);
             }
 
             _ = new ReplacedJoin(joins,
-                mapExpression(join.Value.Table),
+                mapExpression(join.Value.Table)!,
                 mapAlias(join.Value.Name),
                 onCriteria,
                 join.Value.GetKeyword());
@@ -1181,7 +1183,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
     }
 
     private class ReplacedJoin(IDictionary<string, Join> joins,
-        string toTable, string alias, ICriteria onCriteria, string keyword) : Join(joins, toTable, alias, onCriteria)
+        string toTable, string alias, ICriteria? onCriteria, string keyword) : Join(joins, toTable, alias, onCriteria)
     {
         private readonly string keyword = keyword;
 
@@ -1200,7 +1202,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
 
     string IAlias.NameDot => aliasDot;
 
-    string IAlias.Table => tableName;
+    string? IAlias.Table => tableName;
 
     /// <summary>
     /// Gets the name of the alias.

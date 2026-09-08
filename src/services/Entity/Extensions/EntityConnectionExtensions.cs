@@ -575,7 +575,7 @@ public static class EntityConnectionExtensions
     /// <param name="connection">The connection.</param>
     /// <param name="where">The where criteria.</param>
     /// <returns>Number of records matching the specified criteria.</returns>
-    public static int Count<TRow>(this IDbConnection connection, ICriteria where)
+    public static int Count<TRow>(this IDbConnection connection, ICriteria? where)
         where TRow : class, IRow, new()
     {
         if (connection is IRowOperationInterceptor interceptor &&
@@ -611,7 +611,7 @@ public static class EntityConnectionExtensions
     /// <param name="where">The where criteria.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task representing the asynchronous operation. The task result is the number of records matching the specified criteria.</returns>
-    public static async Task<int> CountAsync<TRow>(this IDbConnection connection, ICriteria where, CancellationToken cancellationToken = default)
+    public static async Task<int> CountAsync<TRow>(this IDbConnection connection, ICriteria? where, CancellationToken cancellationToken = default)
         where TRow : class, IRow, new()
     {
         if (connection is IRowOperationInterceptor interceptor &&
@@ -726,7 +726,7 @@ public static class EntityConnectionExtensions
     public static List<TRow> List<TRow>(this IDbConnection connection)
         where TRow : class, IRow, new()
     {
-        return connection.List<TRow>((Criteria)null);
+        return connection.List<TRow>((Criteria?)null);
     }
 
     /// <summary>
@@ -738,7 +738,7 @@ public static class EntityConnectionExtensions
     /// <param name="connection">The connection.</param>
     /// <param name="where">The where criteria.</param>
     /// <returns>Records matching the specified criteria.</returns>
-    public static List<TRow> List<TRow>(this IDbConnection connection, ICriteria where)
+    public static List<TRow> List<TRow>(this IDbConnection connection, ICriteria? where)
         where TRow : class, IRow, new()
     {
         if (connection is IRowOperationInterceptor interceptor &&
@@ -787,7 +787,7 @@ public static class EntityConnectionExtensions
     public static Task<List<TRow>> ListAsync<TRow>(this IDbConnection connection, CancellationToken cancellationToken = default)
         where TRow : class, IRow, new()
     {
-        return connection.ListAsync<TRow>((Criteria)null, cancellationToken);
+        return connection.ListAsync<TRow>((Criteria?)null, cancellationToken);
     }
 
     /// <summary>
@@ -800,7 +800,7 @@ public static class EntityConnectionExtensions
     /// <param name="where">The where criteria.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task representing the asynchronous operation. The task result is the records matching the specified criteria.</returns>
-    public static async Task<List<TRow>> ListAsync<TRow>(this IDbConnection connection, ICriteria where, CancellationToken cancellationToken = default)
+    public static async Task<List<TRow>> ListAsync<TRow>(this IDbConnection connection, ICriteria? where, CancellationToken cancellationToken = default)
         where TRow : class, IRow, new()
     {
         if (connection is IRowOperationInterceptor interceptor &&
@@ -984,7 +984,7 @@ public static class EntityConnectionExtensions
     {
         if (connection is IRowOperationInterceptor interceptor &&
             interceptor.ManipulateRow(typeof(TRow), id, row: null, expectedRows, getNewId: false) is { HasValue: true } intres)
-            return (int)intres.Value;
+            return (int)intres.Value!;
 
         var row = new TRow();
         return new SqlDelete(row.Table)
@@ -1008,7 +1008,7 @@ public static class EntityConnectionExtensions
     {
         if (connection is IRowOperationInterceptor interceptor &&
             await interceptor.ManipulateRowAsync(typeof(TRow), id, row: null, expectedRows, getNewId: false, cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
-            return (int)intres.Value;
+            return (int)intres.Value!;
 
         var row = new TRow();
         return await new SqlDelete(row.Table)

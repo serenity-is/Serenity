@@ -1,4 +1,4 @@
-﻿namespace Serenity.Services;
+namespace Serenity.Services;
 
 /// <summary>
 /// Represents a SaveRequestHandler. Is used with SaveBehavior objects.
@@ -9,7 +9,7 @@ public interface ISaveRequestHandler : IRequestHandler
     /// <summary>
     /// Gets the old row, if any, otherwise <c>null</c>.
     /// </summary>
-    IRow Old { get; }
+    IRow? Old { get; }
 
     /// <summary>
     /// Gets the new row.
@@ -39,7 +39,7 @@ public interface ISaveRequestHandler : IRequestHandler
     /// <summary>
     /// Gets a state bag that can be used as storage within a request handler context.
     /// </summary>
-    IDictionary<string, object> StateBag { get; }
+    IDictionary<string, object?> StateBag { get; }
 
     /// <summary>
     /// Gets the current connection.

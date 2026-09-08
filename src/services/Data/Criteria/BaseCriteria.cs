@@ -135,25 +135,25 @@ public abstract class BaseCriteria : ICriteria
     public BaseCriteria In<T>(params T[] values)
     {
         if (values == null || values.Length == 0)
-            throw new ArgumentNullException("values");
+            throw new ArgumentNullException(nameof(values));
 
         if (values.Length == 1 &&
-            values[0] is BaseCriteria)
+            values[0] is BaseCriteria bc)
         {
-            return In((BaseCriteria)(object)values[0]);
+            return In(bc);
         }
 
         if (values.Length == 1 &&
             values[0] is not string &&
             values[0] is IEnumerable)
         {
-            return new BinaryCriteria(this, CriteriaOperator.In, new ValueCriteria(values[0]));
+            return new BinaryCriteria(this, CriteriaOperator.In, new ValueCriteria(values[0]!));
         }
 
         if (values.Length == 1 &&
-            values[0] is ISqlQuery)
+            values[0] is ISqlQuery q)
         {
-            return In((ISqlQuery)(object)values[0]);
+            return In(q);
         }
 
         return new BinaryCriteria(this, CriteriaOperator.In, new ValueCriteria(values));
@@ -168,7 +168,7 @@ public abstract class BaseCriteria : ICriteria
     public BaseCriteria In(BaseCriteria statement)
     {
         if (statement is null || statement.IsEmpty)
-            throw new ArgumentNullException("statement");
+            throw new ArgumentNullException(nameof(statement));
 
         return new BinaryCriteria(this, CriteriaOperator.In, statement);
     }
@@ -206,25 +206,25 @@ public abstract class BaseCriteria : ICriteria
     public BaseCriteria NotIn<T>(params T[] values)
     {
         if (values == null || values.Length == 0)
-            throw new ArgumentNullException("values");
+            throw new ArgumentNullException(nameof(values));
 
         if (values.Length == 1 &&
-            values[0] is BaseCriteria)
+            values[0] is BaseCriteria bc)
         {
-            return NotIn((BaseCriteria)(object)values[0]);
+            return NotIn(bc);
         }
 
         if (values.Length == 1 &&
             values[0] is not string &&
             values[0] is IEnumerable)
         {
-            return new BinaryCriteria(this, CriteriaOperator.NotIn, new ValueCriteria(values[0]));
+            return new BinaryCriteria(this, CriteriaOperator.NotIn, new ValueCriteria(values[0]!));
         }
 
         if (values.Length == 1 &&
-            values[0] is ISqlQuery)
+            values[0] is ISqlQuery q)
         {
-            return NotIn((ISqlQuery)(object)values[0]);
+            return NotIn(q);
         }
 
         return new BinaryCriteria(this, CriteriaOperator.NotIn, new ValueCriteria(values));
@@ -239,7 +239,7 @@ public abstract class BaseCriteria : ICriteria
     public BaseCriteria NotIn(BaseCriteria statement)
     {
         if (statement is null || statement.IsEmpty)
-            throw new ArgumentNullException("statement");
+            throw new ArgumentNullException(nameof(statement));
 
         return new BinaryCriteria(this, CriteriaOperator.NotIn, statement);
     }
@@ -1049,7 +1049,7 @@ public abstract class BaseCriteria : ICriteria
         return new BinaryCriteria(criteria1, CriteriaOperator.LE, new ValueCriteria(value));
     }
 
-    private static BaseCriteria JoinIf(BaseCriteria criteria1, BaseCriteria criteria2, CriteriaOperator op)
+    private static BaseCriteria? JoinIf(BaseCriteria? criteria1, BaseCriteria? criteria2, CriteriaOperator op)
     {
         if (criteria1 is null || criteria1.IsEmpty)
             return criteria2;
@@ -1068,7 +1068,7 @@ public abstract class BaseCriteria : ICriteria
     /// <returns>
     /// The result of the operator.
     /// </returns>
-    public static BaseCriteria operator &(BaseCriteria criteria1, BaseCriteria criteria2)
+    public static BaseCriteria? operator &(BaseCriteria? criteria1, BaseCriteria? criteria2)
     {
         return JoinIf(criteria1, criteria2, CriteriaOperator.AND);
     }
@@ -1081,7 +1081,7 @@ public abstract class BaseCriteria : ICriteria
     /// <returns>
     /// The result of the operator.
     /// </returns>
-    public static BaseCriteria operator |(BaseCriteria criteria1, BaseCriteria criteria2)
+    public static BaseCriteria? operator |(BaseCriteria? criteria1, BaseCriteria? criteria2)
     {
         return JoinIf(criteria1, criteria2, CriteriaOperator.OR);
     }
@@ -1094,7 +1094,7 @@ public abstract class BaseCriteria : ICriteria
     /// <returns>
     /// The result of the operator.
     /// </returns>
-    public static BaseCriteria operator ^(BaseCriteria criteria1, BaseCriteria criteria2)
+    public static BaseCriteria? operator ^(BaseCriteria? criteria1, BaseCriteria? criteria2)
     {
         return JoinIf(criteria1, criteria2, CriteriaOperator.XOR);
     }
@@ -1149,7 +1149,7 @@ public abstract class BaseCriteria : ICriteria
     /// </summary>
     /// <param name="obj">object</param>
     /// <returns>True if equals to object</returns>
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         return base.Equals(obj);
     }
@@ -1203,12 +1203,12 @@ public abstract class BaseCriteria : ICriteria
 
     private class NoParamsChecker : IQueryWithParams
     {
-        public void AddParam(string name, object value)
+        public void AddParam(string name, object? value)
         {
             throw new InvalidOperationException("Criteria should not have parameters!");
         }
 
-        public void SetParam(string name, object value)
+        public void SetParam(string name, object? value)
         {
             throw new InvalidOperationException("Criteria should not have parameters!");
         }
@@ -1218,7 +1218,7 @@ public abstract class BaseCriteria : ICriteria
             throw new InvalidOperationException("Criteria should not have parameters!");
         }
 
-        public IDictionary<string, object> Params => null;
+        public IDictionary<string, object?>? Params => null;
 
         public ISqlDialect Dialect => SqlSettings.DefaultDialect;
     }
@@ -1227,11 +1227,11 @@ public abstract class BaseCriteria : ICriteria
     {
         private static int next;
 
-        public void AddParam(string name, object value)
+        public void AddParam(string name, object? value)
         {
         }
 
-        public void SetParam(string name, object value)
+        public void SetParam(string name, object? value)
         {
         }
 
@@ -1240,7 +1240,7 @@ public abstract class BaseCriteria : ICriteria
             return new Parameter((next++).IndexParam());
         }
 
-        public IDictionary<string, object> Params => null;
+        public IDictionary<string, object?>? Params => null;
 
         public ISqlDialect Dialect => SqlSettings.DefaultDialect;
     }

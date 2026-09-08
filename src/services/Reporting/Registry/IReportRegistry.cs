@@ -1,4 +1,4 @@
-﻿namespace Serenity.Reporting;
+namespace Serenity.Reporting;
 
 /// <summary>
 /// Abstraction for the registry which holds and allows querying
@@ -21,7 +21,7 @@ public interface IReportRegistry
     /// <param name="reportKey">Report key</param>
     /// <param name="validatePermission">Should validate the permission for report before returning.</param>
     /// <returns>The report with the given key, or <c>null</c> if it is not found.</returns>
-    ReportRegistry.Report GetReport(string reportKey, bool validatePermission = true);
+    ReportRegistry.Report? GetReport(string reportKey, bool validatePermission = true);
 
     /// <summary>
     /// Returns true if there are reports in the category passed.

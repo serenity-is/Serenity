@@ -2,7 +2,7 @@ namespace Serenity.PropertyGrid;
 
 public partial class BasicPropertyProcessor : PropertyProcessor
 {
-    private LabelWidthAttribute labelWidthPrior;
+    private LabelWidthAttribute? labelWidthPrior;
 
     private void SetWidth(IPropertySource source, PropertyItem item)
     {

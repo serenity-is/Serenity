@@ -89,7 +89,7 @@ public class RetrieveRequestHandlerAsync<TRow, TRetrieveRequest, TRetrieveRespon
     {
         try
         {
-            if (await Query.GetFirstAsync(Connection, cancellationToken).ConfigureAwait(false))
+            if (await Query!.GetFirstAsync(Connection!, cancellationToken).ConfigureAwait(false))
                 Response.Entity = Row;
             else
                 throw DataValidation.EntityNotFoundError(Row, Request.EntityId, Localizer);
@@ -118,7 +118,7 @@ public class RetrieveRequestHandlerAsync<TRow, TRetrieveRequest, TRetrieveRespon
     {
         StateBag.Clear();
 
-        Connection = connection ?? throw new ArgumentNullException("connection");
+        Connection = connection ?? throw new ArgumentNullException(nameof(connection));
         Request = request ?? throw new ArgumentNullException(nameof(request));
 
         if (request.EntityId == null)
