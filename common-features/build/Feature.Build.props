@@ -8,6 +8,7 @@
     <DefineConstants Condition="'$(IsPublicDemo)'=='true'">$(DefineConstants);IsPublicDemo</DefineConstants>
     <ESMAssetBasePath>/$(MSBuildProjectName)/esm</ESMAssetBasePath>
     <LangVersion>latest</LangVersion>
+    <Nullable>annotations</Nullable>
     <RestoreNodeTypes>false</RestoreNodeTypes>
     <SerenitySrc Condition="'$(SerenitySrc)' == ''">$(MSBuildThisFileDirectory)..\..\src\</SerenitySrc>
     <StaticWebAssetBasePath>/$(MSBuildProjectName)</StaticWebAssetBasePath>
