@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Serenity.Data;
 
@@ -65,7 +66,7 @@ public abstract class BaseCriteria : ICriteria
     /// <param name="upper"><c>true</c> to use the UPPER function on both sides.</param>
     /// <returns>A new binary Not Like criteria.</returns>
     public BaseCriteria NotLike(string mask, bool upper = false)
-{
+    {
         var left = this;
         if (upper)
             left = new UpperFunctionCriteria(left);
@@ -147,7 +148,7 @@ public abstract class BaseCriteria : ICriteria
             values[0] is not string &&
             values[0] is IEnumerable)
         {
-            return new BinaryCriteria(this, CriteriaOperator.In, new ValueCriteria(values[0]!));
+            return new BinaryCriteria(this, CriteriaOperator.In, new ValueCriteria(values[0]));
         }
 
         if (values.Length == 1 &&
@@ -218,7 +219,7 @@ public abstract class BaseCriteria : ICriteria
             values[0] is not string &&
             values[0] is IEnumerable)
         {
-            return new BinaryCriteria(this, CriteriaOperator.NotIn, new ValueCriteria(values[0]!));
+            return new BinaryCriteria(this, CriteriaOperator.NotIn, new ValueCriteria(values[0]));
         }
 
         if (values.Length == 1 &&
@@ -1068,6 +1069,8 @@ public abstract class BaseCriteria : ICriteria
     /// <returns>
     /// The result of the operator.
     /// </returns>
+    [return: NotNullIfNotNull(nameof(criteria1))]
+    [return: NotNullIfNotNull(nameof(criteria2))]
     public static BaseCriteria? operator &(BaseCriteria? criteria1, BaseCriteria? criteria2)
     {
         return JoinIf(criteria1, criteria2, CriteriaOperator.AND);
@@ -1081,6 +1084,8 @@ public abstract class BaseCriteria : ICriteria
     /// <returns>
     /// The result of the operator.
     /// </returns>
+    [return: NotNullIfNotNull(nameof(criteria1))]
+    [return: NotNullIfNotNull(nameof(criteria2))]
     public static BaseCriteria? operator |(BaseCriteria? criteria1, BaseCriteria? criteria2)
     {
         return JoinIf(criteria1, criteria2, CriteriaOperator.OR);
@@ -1094,6 +1099,8 @@ public abstract class BaseCriteria : ICriteria
     /// <returns>
     /// The result of the operator.
     /// </returns>
+    [return: NotNullIfNotNull(nameof(criteria1))]
+    [return: NotNullIfNotNull(nameof(criteria2))]
     public static BaseCriteria? operator ^(BaseCriteria? criteria1, BaseCriteria? criteria2)
     {
         return JoinIf(criteria1, criteria2, CriteriaOperator.XOR);

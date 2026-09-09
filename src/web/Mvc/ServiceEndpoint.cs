@@ -30,17 +30,10 @@ public abstract class ServiceEndpoint : ControllerBase, IActionFilter, IAsyncAct
     /// otherwise <c>false</c>.</param>
     protected virtual void Dispose(bool disposing)
     {
-        if (unitOfWork != null)
-        {
-            unitOfWork.Dispose();
-            unitOfWork = null;
-        }
-
-        if (connection != null)
-        {
-            connection.Dispose();
-            connection = null;
-        }
+        unitOfWork?.Dispose();
+        unitOfWork = null;
+        connection?.Dispose();
+        connection = null;
     }
 
     /// <summary>
@@ -116,11 +109,8 @@ public abstract class ServiceEndpoint : ControllerBase, IActionFilter, IAsyncAct
             unitOfWork = null;
         }
 
-        if (connection != null)
-        {
-            connection.Dispose();
-            connection = null;
-        }
+        connection?.Dispose();
+        connection = null;
 
         context.Result = (context.Result as ActionResult) ?? new Result<object>(context.Result);
     }

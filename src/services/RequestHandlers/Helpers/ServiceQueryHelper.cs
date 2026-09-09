@@ -31,7 +31,7 @@ public static class ServiceQueryHelper
                 var row = ext.FirstIntoRow;
                 if (row != null)
                 {
-                    var field = ((IRow)ext.FirstIntoRow).FindFieldByPropertyName(sort);
+                    var field = ((IRow)row).FindFieldByPropertyName(sort);
                     if (field is not null)
                     {
                         expr = ((IGetExpressionByName)query).GetExpression(field.Name);
@@ -138,7 +138,7 @@ public static class ServiceQueryHelper
             var flt = Criteria.Empty;
             foreach (var field in textFields)
                 flt |= field.Contains(containsText);
-            flt = ~(flt!);
+            flt = ~(flt);
 
             return flt;
         }

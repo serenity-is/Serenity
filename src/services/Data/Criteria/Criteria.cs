@@ -62,7 +62,7 @@ public class Criteria : BaseCriteria
     public Criteria(IField field)
     {
         Field = field ?? throw new ArgumentNullException(nameof(field));
-        expression = field.Expression!;
+        expression = field.Expression;
     }
 
     /// <summary>

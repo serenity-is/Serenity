@@ -98,10 +98,10 @@ public class UniqueFieldSaveBehavior(ITextLocalizer localizer) : BaseSaveBehavio
             else
                 criteria &= field == new ValueCriteria(field.AsSqlValue(handler.Row));
 
-        var idField = ((IIdRow)handler.Row).IdField;
+        var idField = handler.Row.GetIdField();
 
         if (handler.IsUpdate)
-            criteria &= idField! != new ValueCriteria(idField!.AsSqlValue(handler.Old!));
+            criteria &= idField != new ValueCriteria(idField.AsSqlValue(handler.Old!));
 
         var row = handler.Row.CreateNew();
         return new SqlQuery()

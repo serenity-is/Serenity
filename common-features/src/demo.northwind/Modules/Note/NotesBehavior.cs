@@ -43,7 +43,7 @@ public class NotesBehavior(IUserRetrieveService userRetriever,
             !handler.ShouldSelectField(Target))
             return;
 
-        var idField = (handler.Row as IIdRow).IdField;
+        var idField = (handler.Row as IIdRow).GetIdField();
         var fld = NoteRow.Fields;
 
         var listRequest = new ListRequest
@@ -95,7 +95,7 @@ public class NotesBehavior(IUserRetrieveService userRetriever,
             await saveHandlerResolver.Resolve().UpdateAsync(uow, saveRequest, cancellationToken).ConfigureAwait(false);
     }
 
-    private Task DeleteNoteAsync(IUnitOfWork uow, long noteId, CancellationToken cancellationToken)
+    private Task<DeleteResponse> DeleteNoteAsync(IUnitOfWork uow, long noteId, CancellationToken cancellationToken)
     {
         return deleteHandlerResolver.Resolve().DeleteAsync(uow, new DeleteRequest { EntityId = noteId }, cancellationToken);
     }
@@ -117,7 +117,7 @@ public class NotesBehavior(IUserRetrieveService userRetriever,
             return;
         }
 
-        var rowIdField = (row as IIdRow).IdField;
+        var rowIdField = row.GetIdField();
 
         if (newList.Count == 0)
         {
@@ -189,7 +189,7 @@ public class NotesBehavior(IUserRetrieveService userRetriever,
         if (Target.AsObject(handler.Row) is not List<NoteRow> newList)
             return;
 
-        var idField = (handler.Row as IIdRow).IdField;
+        var idField = handler.Row.GetIdField();
         var entityId = Convert.ToString(idField.AsObject(handler.Row),
             CultureInfo.InvariantCulture);
 
@@ -225,7 +225,7 @@ public class NotesBehavior(IUserRetrieveService userRetriever,
             (Target.Flags & FieldFlags.Updatable) != FieldFlags.Updatable)
             return;
 
-        var idField = (handler.Row as IIdRow).IdField;
+        var idField = handler.Row.GetIdField();
         var row = new NoteRow();
         var fld = NoteRow.Fields;
 

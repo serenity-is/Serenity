@@ -35,7 +35,7 @@ public static class EntityConnectionExtensions
     /// <param name="id">The identifier.</param>
     /// <returns>Entity with the given ID, or null if not found.</returns>
     /// <exception cref="InvalidOperationException">Multiple records with the ID found.</exception>
-    public static TRow TryById<TRow>(this IDbConnection connection, object id)
+    public static TRow? TryById<TRow>(this IDbConnection connection, object id)
         where TRow : class, IRow, IIdRow, new()
     {
         if (connection is IRowOperationInterceptor interceptor &&
@@ -45,7 +45,7 @@ public static class EntityConnectionExtensions
         var row = new TRow() { TrackWithChecks = true };
         if (new SqlQuery().From(row)
                 .SelectTableFields()
-                .Where(new Criteria(row.IdField) == new ValueCriteria(id))
+                .Where(new Criteria(row.GetIdField()) == new ValueCriteria(id))
                 .GetSingle(connection))
             return row;
 
@@ -82,7 +82,7 @@ public static class EntityConnectionExtensions
     /// <param name="editQuery">Callback to edit the query.</param>
     /// <returns>Entity with the given ID, or null if not found.</returns>
     /// <exception cref="InvalidOperationException">Multiple records with the ID found.</exception> 
-    public static TRow TryById<TRow>(this IDbConnection connection, object id, Action<SqlQuery> editQuery)
+    public static TRow? TryById<TRow>(this IDbConnection connection, object id, Action<SqlQuery> editQuery)
         where TRow : class, IRow, IIdRow, new()
     {
         if (connection is IRowOperationInterceptor interceptor &&
@@ -91,7 +91,7 @@ public static class EntityConnectionExtensions
 
         var row = new TRow() { TrackWithChecks = true };
         var query = new SqlQuery().From(row)
-            .Where(new Criteria(row.IdField) == new ValueCriteria(id));
+            .Where(new Criteria(row.GetIdField()) == new ValueCriteria(id));
 
         editQuery(query);
 
@@ -132,7 +132,7 @@ public static class EntityConnectionExtensions
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task representing the asynchronous operation. The task result is the entity with the given ID, or null if not found.</returns>
     /// <exception cref="InvalidOperationException">Multiple records with the ID found.</exception>
-    public static async Task<TRow> TryByIdAsync<TRow>(this IDbConnection connection, object id, CancellationToken cancellationToken = default)
+    public static async Task<TRow?> TryByIdAsync<TRow>(this IDbConnection connection, object id, CancellationToken cancellationToken = default)
         where TRow : class, IRow, IIdRow, new()
     {
         if (connection is IRowOperationInterceptor interceptor &&
@@ -142,7 +142,7 @@ public static class EntityConnectionExtensions
         var row = new TRow() { TrackWithChecks = true };
         if (await new SqlQuery().From(row)
                 .SelectTableFields()
-                .Where(new Criteria(row.IdField) == new ValueCriteria(id))
+                .Where(new Criteria(row.GetIdField()) == new ValueCriteria(id))
                 .GetSingleAsync(connection, cancellationToken).ConfigureAwait(false))
             return row;
 
@@ -181,7 +181,7 @@ public static class EntityConnectionExtensions
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task representing the asynchronous operation. The task result is the entity with the given ID, or null if not found.</returns>
     /// <exception cref="InvalidOperationException">Multiple records with the ID found.</exception>
-    public static async Task<TRow> TryByIdAsync<TRow>(this IDbConnection connection, object id, Action<SqlQuery> editQuery, CancellationToken cancellationToken = default)
+    public static async Task<TRow?> TryByIdAsync<TRow>(this IDbConnection connection, object id, Action<SqlQuery> editQuery, CancellationToken cancellationToken = default)
         where TRow : class, IRow, IIdRow, new()
     {
         if (connection is IRowOperationInterceptor interceptor &&
@@ -190,7 +190,7 @@ public static class EntityConnectionExtensions
 
         var row = new TRow() { TrackWithChecks = true };
         var query = new SqlQuery().From(row)
-            .Where(new Criteria(row.IdField) == new ValueCriteria(id));
+            .Where(new Criteria(row.GetIdField()) == new ValueCriteria(id));
 
         editQuery(query);
 
@@ -230,7 +230,7 @@ public static class EntityConnectionExtensions
     /// <param name="where">The where criteria.</param>
     /// <returns>The single entity matching the specified criteria, or null if no matching record is found.</returns>
     /// <exception cref="InvalidOperationException">Multiple records matching the criteria found.</exception>
-    public static TRow TrySingle<TRow>(this IDbConnection connection, ICriteria where)
+    public static TRow? TrySingle<TRow>(this IDbConnection connection, ICriteria? where)
         where TRow : class, IRow, new()
     {
         if (connection is IRowOperationInterceptor interceptor &&
@@ -273,7 +273,7 @@ public static class EntityConnectionExtensions
     /// <param name="editQuery">The edit query.</param>
     /// <returns>Single entity matching the criteria set by editQuery, or null if not found.</returns>
     /// <exception cref="InvalidOperationException">Multiple records matching the specified criteria.</exception>
-    public static TRow TrySingle<TRow>(this IDbConnection connection, Action<SqlQuery> editQuery)
+    public static TRow? TrySingle<TRow>(this IDbConnection connection, Action<SqlQuery> editQuery)
         where TRow : class, IRow, new()
     {
         if (connection is IRowOperationInterceptor interceptor &&
@@ -304,7 +304,7 @@ public static class EntityConnectionExtensions
     /// <returns>A task representing the asynchronous operation. The task result is the single entity matching the specified criteria.</returns>
     /// <exception cref="ValidationError">No matching records found.</exception>
     /// <exception cref="InvalidOperationException">Multiple records matching the specified criteria.</exception>
-    public static async Task<TRow> SingleAsync<TRow>(this IDbConnection connection, ICriteria where, CancellationToken cancellationToken = default)
+    public static async Task<TRow> SingleAsync<TRow>(this IDbConnection connection, ICriteria? where, CancellationToken cancellationToken = default)
         where TRow : class, IRow, new()
     {
         var row = await TrySingleAsync<TRow>(connection, where, cancellationToken).ConfigureAwait(false)
@@ -324,7 +324,7 @@ public static class EntityConnectionExtensions
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task representing the asynchronous operation. The task result is the single entity matching the specified criteria, or null if no matching record is found.</returns>
     /// <exception cref="InvalidOperationException">Multiple records matching the criteria found.</exception>
-    public static async Task<TRow> TrySingleAsync<TRow>(this IDbConnection connection, ICriteria where, CancellationToken cancellationToken = default)
+    public static async Task<TRow?> TrySingleAsync<TRow>(this IDbConnection connection, ICriteria? where, CancellationToken cancellationToken = default)
         where TRow : class, IRow, new()
     {
         if (connection is IRowOperationInterceptor interceptor &&
@@ -370,7 +370,7 @@ public static class EntityConnectionExtensions
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task representing the asynchronous operation. The task result is the single entity matching the criteria set by editQuery, or null if not found.</returns>
     /// <exception cref="InvalidOperationException">Multiple records matching the specified criteria.</exception>
-    public static async Task<TRow> TrySingleAsync<TRow>(this IDbConnection connection, Action<SqlQuery> editQuery, CancellationToken cancellationToken = default)
+    public static async Task<TRow?> TrySingleAsync<TRow>(this IDbConnection connection, Action<SqlQuery> editQuery, CancellationToken cancellationToken = default)
         where TRow : class, IRow, new()
     {
         if (connection is IRowOperationInterceptor interceptor &&
@@ -396,7 +396,7 @@ public static class EntityConnectionExtensions
     /// <param name="where">The where criteria.</param>
     /// <returns>First entity matching the where criteria.</returns>
     /// <exception cref="ValidationError">No records matching the specified criteria.</exception>
-    public static TRow First<TRow>(this IDbConnection connection, ICriteria where)
+    public static TRow First<TRow>(this IDbConnection connection, ICriteria? where)
         where TRow : class, IRow, new()
     {
         var row = TryFirst<TRow>(connection, where) ?? throw new ValidationError("RecordNotFound", "Query returned no results!");
@@ -410,7 +410,7 @@ public static class EntityConnectionExtensions
     /// <param name="connection">The connection.</param>
     /// <param name="where">The where criteria.</param>
     /// <returns>First entity matching the where criteria, or null if not found.</returns>
-    public static TRow TryFirst<TRow>(this IDbConnection connection, ICriteria where)
+    public static TRow? TryFirst<TRow>(this IDbConnection connection, ICriteria? where)
         where TRow : class, IRow, new()
     {
         if (connection is IRowOperationInterceptor interceptor &&
@@ -451,7 +451,7 @@ public static class EntityConnectionExtensions
     /// <param name="connection">The connection.</param>
     /// <param name="editQuery">The edit query callback.</param>
     /// <returns>First entity matching the criteria, or null if not found.</returns>
-    public static TRow TryFirst<TRow>(this IDbConnection connection, Action<SqlQuery> editQuery)
+    public static TRow? TryFirst<TRow>(this IDbConnection connection, Action<SqlQuery> editQuery)
         where TRow : class, IRow, new()
     {
         if (connection is IRowOperationInterceptor interceptor &&
@@ -478,7 +478,7 @@ public static class EntityConnectionExtensions
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task representing the asynchronous operation. The task result is the first entity matching the where criteria.</returns>
     /// <exception cref="ValidationError">No records matching the specified criteria.</exception>
-    public static async Task<TRow> FirstAsync<TRow>(this IDbConnection connection, ICriteria where, CancellationToken cancellationToken = default)
+    public static async Task<TRow?> FirstAsync<TRow>(this IDbConnection connection, ICriteria? where, CancellationToken cancellationToken = default)
         where TRow : class, IRow, new()
     {
         var row = await TryFirstAsync<TRow>(connection, where, cancellationToken).ConfigureAwait(false)
@@ -494,7 +494,7 @@ public static class EntityConnectionExtensions
     /// <param name="where">The where criteria.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task representing the asynchronous operation. The task result is the first entity matching the where criteria, or null if not found.</returns>
-    public static async Task<TRow> TryFirstAsync<TRow>(this IDbConnection connection, ICriteria where, CancellationToken cancellationToken = default)
+    public static async Task<TRow?> TryFirstAsync<TRow>(this IDbConnection connection, ICriteria? where, CancellationToken cancellationToken = default)
         where TRow : class, IRow, new()
     {
         if (connection is IRowOperationInterceptor interceptor &&
@@ -538,7 +538,7 @@ public static class EntityConnectionExtensions
     /// <param name="editQuery">The edit query callback.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task representing the asynchronous operation. The task result is the first entity matching the criteria, or null if not found.</returns>
-    public static async Task<TRow> TryFirstAsync<TRow>(this IDbConnection connection, Action<SqlQuery> editQuery, CancellationToken cancellationToken = default)
+    public static async Task<TRow?> TryFirstAsync<TRow>(this IDbConnection connection, Action<SqlQuery> editQuery, CancellationToken cancellationToken = default)
         where TRow : class, IRow, new()
     {
         if (connection is IRowOperationInterceptor interceptor &&
@@ -645,7 +645,7 @@ public static class EntityConnectionExtensions
         return new SqlQuery()
                 .From(row)
                 .Select("1")
-                .Where(new Criteria(row.IdField) == new ValueCriteria(id))
+                .Where(new Criteria(row.GetIdField()) == new ValueCriteria(id))
                 .Exists(connection);
     }
 
@@ -668,7 +668,7 @@ public static class EntityConnectionExtensions
         return await new SqlQuery()
                 .From(row)
                 .Select("1")
-                .Where(new Criteria(row.IdField) == new ValueCriteria(id))
+                .Where(new Criteria(row.GetIdField()) == new ValueCriteria(id))
                 .ExistsAsync(connection, cancellationToken: cancellationToken).ConfigureAwait(false);
     }
 
@@ -679,7 +679,7 @@ public static class EntityConnectionExtensions
     /// <param name="connection">The connection.</param>
     /// <param name="where">The where criteria.</param>
     /// <returns>True if a record matching the criteria exists.</returns>
-    public static bool Exists<TRow>(this IDbConnection connection, ICriteria where)
+    public static bool Exists<TRow>(this IDbConnection connection, ICriteria? where)
         where TRow : class, IRow, new()
     {
         if (connection is IRowOperationInterceptor interceptor &&
@@ -701,7 +701,7 @@ public static class EntityConnectionExtensions
     /// <param name="where">The where criteria.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task representing the asynchronous operation. The task result is true if a record matching the criteria exists.</returns>
-    public static async Task<bool> ExistsAsync<TRow>(this IDbConnection connection, ICriteria where, CancellationToken cancellationToken = default)
+    public static async Task<bool> ExistsAsync<TRow>(this IDbConnection connection, ICriteria? where, CancellationToken cancellationToken = default)
         where TRow : class, IRow, new()
     {
         if (connection is IRowOperationInterceptor interceptor &&
@@ -926,7 +926,7 @@ public static class EntityConnectionExtensions
     public static int UpdateById<TRow>(this IDbConnection connection, TRow row, ExpectedRows expectedRows = ExpectedRows.One)
         where TRow : IIdRow
     {
-        var idField = row.IdField;
+        var idField = row.GetIdField();
         var r = (IRow)(object)row;
 
         if (idField.IsNull(r))
@@ -934,7 +934,7 @@ public static class EntityConnectionExtensions
 
         if (connection is IRowOperationInterceptor interceptor &&
             interceptor.ManipulateRow(typeof(TRow), id: idField.AsObject(row), row, expectedRows, getNewId: false) is { HasValue: true } intres)
-            return (int)intres.Value;
+            return (int)intres.Value!;
 
         return row.ToSqlUpdateById()
             .Execute(connection, expectedRows);
@@ -955,7 +955,7 @@ public static class EntityConnectionExtensions
     public static async Task<int> UpdateByIdAsync<TRow>(this IDbConnection connection, TRow row, ExpectedRows expectedRows = ExpectedRows.One, CancellationToken cancellationToken = default)
         where TRow : IIdRow
     {
-        var idField = row.IdField;
+        var idField = row.GetIdField();
         var r = (IRow)(object)row;
 
         if (idField.IsNull(r))
@@ -963,7 +963,7 @@ public static class EntityConnectionExtensions
 
         if (connection is IRowOperationInterceptor interceptor &&
             await interceptor.ManipulateRowAsync(typeof(TRow), id: idField.AsObject(row), row, expectedRows, getNewId: false, cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
-            return (int)intres.Value;
+            return (int)intres.Value!;
 
         return await row.ToSqlUpdateById()
             .ExecuteAsync(connection, expectedRows, cancellationToken: cancellationToken).ConfigureAwait(false);
@@ -988,7 +988,7 @@ public static class EntityConnectionExtensions
 
         var row = new TRow();
         return new SqlDelete(row.Table)
-            .Where(row.IdField == new ValueCriteria(id))
+            .Where(row.GetIdField() == new ValueCriteria(id))
             .Execute(connection, expectedRows);
     }
 
@@ -1012,7 +1012,7 @@ public static class EntityConnectionExtensions
 
         var row = new TRow();
         return await new SqlDelete(row.Table)
-            .Where(row.IdField == new ValueCriteria(id))
+            .Where(row.GetIdField() == new ValueCriteria(id))
             .ExecuteAsync(connection, expectedRows, cancellationToken: cancellationToken).ConfigureAwait(false);
     }
 
@@ -1032,7 +1032,7 @@ public static class EntityConnectionExtensions
         insert.Set(row);
 
         if (row as IIdRow != null)
-            insert.IdentityColumn(row.IdField.Name);
+            insert.IdentityColumn(row.GetIdField().Name);
 
         return insert;
     }
@@ -1050,7 +1050,7 @@ public static class EntityConnectionExtensions
 
         var update = new SqlUpdate(row.Table);
 
-        var idField = row.IdField;
+        var idField = row.GetIdField();
         update.Set(row, idField);
         update.Where(idField == new ValueCriteria(idField.AsSqlValue(row)));
 

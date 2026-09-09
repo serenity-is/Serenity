@@ -78,8 +78,8 @@ public static class EntityQueryExtensions
 
         ArgumentNullException.ThrowIfNull(row);
 
-        HashSet<Field> excludeFields =
-            (exclude != null && exclude.Length > 0) ? new HashSet<Field>(exclude) : null;
+        HashSet<Field>? excludeFields =
+            (exclude != null && exclude.Length > 0) ? [.. exclude] : null;
 
         var fields = row.Fields;
 
@@ -115,8 +115,8 @@ public static class EntityQueryExtensions
 
         ArgumentNullException.ThrowIfNull(row);
 
-        HashSet<Field> excludeFields =
-            (exclude != null && exclude.Length > 0) ? new HashSet<Field>(exclude) : null;
+        HashSet<Field>? excludeFields =
+            (exclude != null && exclude.Length > 0) ? [.. exclude] : null;
 
         var fields = row.Fields;
 
@@ -147,7 +147,7 @@ public static class EntityQueryExtensions
 
         var ext = (ISqlQueryExtensible)query;
 
-        foreach (var field in ((IRow)ext.FirstIntoRow).Fields)
+        foreach (var field in ((IRow)ext.FirstIntoRow!).Fields)
         {
             if (!EntityFieldExtensions.IsTableField(field) &&
                 (field.Flags & FieldFlags.NotMapped) != FieldFlags.NotMapped)
@@ -174,7 +174,7 @@ public static class EntityQueryExtensions
 
         var ext = (ISqlQueryExtensible)query;
 
-        return SelectTableFields(query, (IRow)ext.FirstIntoRow, exclude);
+        return SelectTableFields(query, (IRow)ext.FirstIntoRow!, exclude);
     }
 
     /// <summary>

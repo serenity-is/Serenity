@@ -1,4 +1,4 @@
-﻿namespace Serenity.PropertyGrid;
+namespace Serenity.PropertyGrid;
 
 /// <summary>
 /// Base class for property processors, which sets properties of a PropertyItem
@@ -26,11 +26,11 @@ public abstract class PropertyProcessor : IPropertyProcessor
     public virtual int Priority => 50;
 
     /// <inheritdoc/>
-    public Type Type { get; set; }
+    public Type? Type { get; set; }
 
     /// <inheritdoc/>
-    public IRow BasedOnRow { get; set; }
+    public IRow? BasedOnRow { get; set; }
 
     /// <inheritdoc/>
-    public List<PropertyItem> Items { get; set; }
+    public List<PropertyItem> Items { get; set; } = [];
 }

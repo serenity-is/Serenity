@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 /// <summary>
 /// Interface for fields with an enum type property.
@@ -11,5 +11,5 @@ public interface IEnumTypeField
     /// <value>
     /// The type of the enum.
     /// </value>
-    Type EnumType { get; set; }
+    Type? EnumType { get; set; }
 }

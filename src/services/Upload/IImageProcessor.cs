@@ -47,7 +47,7 @@ public interface IImageProcessor
     /// <returns>
     ///   Generated thumbnail image. Should be disposed by caller.</returns>
     object Scale(object image, int width, int height,
-        ImageScaleMode mode, string backgroundColor, bool inplace);
+        ImageScaleMode mode, string? backgroundColor, bool inplace);
 
     /// <summary>
     /// Saves the image to target stream

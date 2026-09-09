@@ -59,7 +59,7 @@ public class TabularDataReport : IDataOnlyReport
     public TabularDataReport(IEnumerable data, IEnumerable<ReportColumn> columns)
     {
         Data = data ?? throw new ArgumentNullException(nameof(data));
-        ColumnList = (columns ?? throw new ArgumentNullException(nameof(columns))).ToList();
+        ColumnList = [.. (columns ?? throw new ArgumentNullException(nameof(columns)))];
     }
 
     /// <summary>

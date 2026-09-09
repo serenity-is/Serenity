@@ -250,7 +250,7 @@ public static class DisplayOrderHelper
         object? recordID = null, int newDisplayOrder = 1, bool descendingKeyOrder = false,
         bool hasUniqueConstraint = false, CancellationToken cancellationToken = default)
     {
-        return ReorderValuesCoreAsync(connection, row.Table, row.IdField!, row.DisplayOrderField, filter, recordID,
+        return ReorderValuesCoreAsync(connection, row.Table, row.GetIdField(), row.DisplayOrderField, filter, recordID,
             newDisplayOrder, descendingKeyOrder, hasUniqueConstraint, cancellationToken);
     }
 
@@ -598,7 +598,7 @@ public static class DisplayOrderHelper
     public static bool ReorderValues(IDbConnection connection, IDisplayOrderRow row, ICriteria? filter = null,
         object? recordID = null, int newDisplayOrder = 1, bool descendingKeyOrder = false, bool hasUniqueConstraint = false)
     {
-        return ReorderValues(connection, row.Table, row.IdField!, row.DisplayOrderField, filter, recordID,
+        return ReorderValues(connection, row.Table, row.GetIdField(), row.DisplayOrderField, filter, recordID,
             newDisplayOrder, descendingKeyOrder, hasUniqueConstraint);
     }
 

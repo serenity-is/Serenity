@@ -21,7 +21,7 @@ public class SafeCriteriaValidator : BaseCriteriaVisitor
     /// <param name="criteria">The criteria.</param>
     /// <returns>The visited criteria.</returns>
     /// <exception cref="ValidationError">InvalidCriteriaField</exception>
-    protected override BaseCriteria? VisitCriteria(Criteria criteria)
+    protected override BaseCriteria VisitCriteria(Criteria criteria)
     {
         if (string.IsNullOrEmpty(criteria.Expression))
             return base.VisitCriteria(criteria);

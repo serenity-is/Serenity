@@ -22,7 +22,7 @@ public class ImageChecker
     /// If the result is one of GIFImage, JPEGImage, PNGImage, the checking is successful. 
     /// Rest of results are invalid.</returns>
     public ImageCheckResult CheckStream(Stream inputStream, IImageProcessor imageProcessor, bool returnImage,
-        out object image, out ImageFormatInfo formatInfo, ILogger? logger = null)
+        out object? image, out ImageFormatInfo? formatInfo, ILogger? logger = null)
     {
         ArgumentNullException.ThrowIfNull(inputStream);
 
@@ -66,7 +66,7 @@ public class ImageChecker
         {
             // load image validating it
             image = imageProcessor.Load(inputStream, out formatInfo);
-            var (width, height) = imageProcessor.GetImageSize(image);
+            var (width, height) = imageProcessor.GetImageSize(image!);
             Width = width;
             Height = height;
         }

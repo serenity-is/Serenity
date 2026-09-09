@@ -93,7 +93,7 @@ public class DiskUploadStorage : IUploadStorage
                 json[0] == '{' &&
                 json[^1] == '}')
             {
-                return JSON.Parse<Dictionary<string, string>>(json);
+                return JSON.Parse<Dictionary<string, string>>(json)!;
             }
         }
 

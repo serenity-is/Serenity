@@ -15,20 +15,22 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
     IListBehaviorSync, IListBehaviorAsync, IFieldBehavior, IImplicitBehavior
 {
     /// <inheritdoc/>
-    public Field Target { get; set; }
+    public Field? Target { get; set; }
 
     private readonly IDefaultHandlerFactory handlerFactory = handlerFactory ?? throw new ArgumentNullException(nameof(handlerFactory));
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
     private LinkingSetRelationAttribute attr;
     private Type rowType;
     private Field thisKeyField;
     private Criteria thisKeyCriteria;
     private Field itemKeyField;
     private Field filterField;
-    private object filterValue;
+    private object? filterValue;
     private BaseCriteria filterCriteria;
     private BaseCriteria queryCriteria;
     private Func<IRow> rowFactory;
     private Func<IList> listFactory;
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 
     /// <inheritdoc/>
     public bool ActivateFor(IRow row)
@@ -36,9 +38,10 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
         if (Target is null)
             return false;
 
-        attr = Target.GetAttribute<LinkingSetRelationAttribute>();
-        if (attr == null)
+        if (Target.GetAttribute<LinkingSetRelationAttribute>() is not {} attr)
             return false;
+
+        this.attr = attr;
 
         if (row is not IIdRow)
         {
@@ -75,40 +78,29 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
                     Target.PropertyName ?? Target.Name, row.GetType().FullName));
         }
 
-        listFactory = () => (IList)Activator.CreateInstance(listType);
-        rowFactory = () => (IRow)Activator.CreateInstance(rowType);
+        listFactory = () => (IList)Activator.CreateInstance(listType)!;
+        rowFactory = () => (IRow)Activator.CreateInstance(rowType)!;
 
         var detailRow = rowFactory();
 
-        thisKeyField = detailRow.FindFieldByPropertyName(attr.ThisKey) ??
-            detailRow.FindField(attr.ThisKey);
-
-        if (thisKeyField is null)
-            throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
+        thisKeyField = (detailRow.FindFieldByPropertyName(attr.ThisKey) ??
+            detailRow.FindField(attr.ThisKey)) ?? throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
                 "This field is specified for a linking set relation in field '{2}' of row type '{3}'.",
                 attr.ThisKey, detailRow.GetType().FullName,
                 Target.PropertyName ?? Target.Name, row.GetType().FullName));
-
         thisKeyCriteria = new Criteria(thisKeyField.PropertyName ?? thisKeyField.Name);
 
-        itemKeyField = detailRow.FindFieldByPropertyName(attr.ItemKey) ??
-            detailRow.FindField(attr.ItemKey);
-
-        if (itemKeyField is null)
-            throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
+        itemKeyField = (detailRow.FindFieldByPropertyName(attr.ItemKey) ??
+            detailRow.FindField(attr.ItemKey)) ?? throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
                 "This field is specified for a linking set relation in field '{2}' of row type '{3}'.",
                 attr.ItemKey, detailRow.GetType().FullName,
                 Target.PropertyName ?? Target.Name, row.GetType().FullName));
-
         if (!string.IsNullOrEmpty(attr.FilterField))
         {
-            filterField = detailRow.FindFieldByPropertyName(attr.FilterField) ?? detailRow.FindField(attr.FilterField);
-            if (filterField is null)
-                throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
+            filterField = (detailRow.FindFieldByPropertyName(attr.FilterField) ?? detailRow.FindField(attr.FilterField)) ?? throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
                     "This field is specified for a linking set relation as FilterField in field '{2}' of row type '{3}'.",
                     attr.FilterField, detailRow.GetType().FullName,
                     Target.PropertyName ?? Target.Name, row.GetType().FullName));
-
             filterCriteria = new Criteria(filterField.PropertyName ?? filterField.Name);
             filterValue = filterField.ConvertValue(attr.FilterValue, CultureInfo.InvariantCulture);
             if (filterValue == null)
@@ -136,7 +128,7 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
             !attr.HandleEqualityFilter)
             return;
 
-        if (handler.Request.EqualityFilter.TryGetValue(Target.PropertyName, out object value) ||
+        if (handler.Request.EqualityFilter.TryGetValue(Target.PropertyName!, out object? value) ||
             handler.Request.EqualityFilter.TryGetValue(Target.Name, out value))
         {
             if (value == null || value as string == "")
@@ -147,11 +139,11 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
             if (value is not string && value is IEnumerable enumerable)
             {
                 foreach (var val in enumerable)
-                    values.Add(itemKeyField.ConvertValue(val, CultureInfo.InvariantCulture));
+                    values.Add(itemKeyField.ConvertValue(val, CultureInfo.InvariantCulture)!);
             }
             else
             {
-                values.Add(itemKeyField.ConvertValue(value, CultureInfo.InvariantCulture));
+                values.Add(itemKeyField.ConvertValue(value, CultureInfo.InvariantCulture)!);
             }
 
             if (values.Count > 0)
@@ -163,12 +155,13 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
                         .From(ls)
                         .Select("1")
                         .Where(
-                            new Criteria(ls[thisKeyField]) == new Criteria(handler.Row.IdField) &
+                            new Criteria(ls[thisKeyField]) == new Criteria(handler.Row.GetIdField()) &
                             new Criteria(ls[itemKeyField]).In(values))
                         .ToString()));
             }
 
-            handler.IgnoreEqualityFilter(Target.PropertyName);
+            if (Target.PropertyName != null)
+                handler.IgnoreEqualityFilter(Target.PropertyName);
             handler.IgnoreEqualityFilter(Target.Name);
         }
     }
@@ -215,7 +208,7 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
 
     private ListRequest BuildRetrieveListRequest(ListRequest listRequest, IRetrieveRequestHandler handler)
     {
-        var idField = handler.Row.IdField;
+        var idField = handler.Row.GetIdField();
         listRequest.ColumnSelection = ColumnSelection.KeyOnly;
         listRequest.IncludeColumns = [itemKeyField.PropertyName ?? itemKeyField.Name];
         listRequest.Criteria = thisKeyCriteria == new ValueCriteria(idField.AsObject(handler.Row)) & filterCriteria;
@@ -228,7 +221,7 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
         foreach (IRow item in response.Entities)
             list.Add(itemKeyField.AsObject(item));
 
-        Target.AsObject(handler.Row, list);
+        Target!.AsObject(handler.Row, list);
     }
 
     /// <inheritdoc/>
@@ -240,7 +233,7 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
             handler.Response.Entities.IsEmptyOrNull())
             return;
 
-        var idField = handler.Row.IdField;
+        var idField = handler.Row.GetIdField();
 
         var listHandler = handlerFactory.CreateHandler<IListRequestProcessor>(rowType);
         var listRequest = listHandler.CreateRequest();
@@ -284,7 +277,7 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
 
     private async Task OnReturnAsyncCore(IListRequestHandler handler, CancellationToken cancellationToken)
     {
-        var idField = handler.Row.IdField;
+        var idField = handler.Row.GetIdField();
 
         var listHandler = handlerFactory.CreateHandler<IListRequestProcessorAsync>(rowType);
         var listRequest = listHandler.CreateRequest();
@@ -316,23 +309,24 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
 
     private void FillListPart(IListRequestHandler handler, IEnumerable<IRow> part, IListResponse response)
     {
-        var idField = handler.Row.IdField;
+        var idField = handler.Row.GetIdField();
         var lookup = response.Entities.Cast<IRow>()
-            .ToLookup(x => thisKeyField.AsObject(x).ToString());
+            .ToLookup(x => thisKeyField.AsObject(x)!.ToString());
 
         foreach (var row in part)
         {
             var list = listFactory();
-            var matching = lookup[idField.AsObject(row).ToString()];
+            var matching = lookup[idField.AsObject(row)!.ToString()];
             foreach (var x in matching)
                 list.Add(itemKeyField.AsObject(x));
 
-            Target.AsObject(row, list);
+            Target!.AsObject(row, list);
         }
     }
 
     private void InsertDetail(IUnitOfWork uow, object masterId, object itemKey)
     {
+        ArgumentNullException.ThrowIfNull(masterId);
         var detail = rowFactory();
         thisKeyField.AsObject(detail, masterId);
         itemKeyField.AsInvariant(detail, itemKey);
@@ -344,9 +338,11 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
         saveHandler.Process(uow, saveRequest, SaveRequestType.Create);
     }
 
-    private Task InsertDetailAsync(IUnitOfWork uow, object masterId, object itemKey,
+    private Task<SaveResponse> InsertDetailAsync(IUnitOfWork uow, object masterId, object itemKey,
         CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(masterId);
+
         var detail = rowFactory();
         thisKeyField.AsObject(detail, masterId);
         itemKeyField.AsInvariant(detail, itemKey);
@@ -360,23 +356,27 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
 
     private void DeleteDetail(IUnitOfWork uow, object detailId)
     {
+        ArgumentNullException.ThrowIfNull(detailId);
         var deleteHandler = handlerFactory.CreateHandler<IDeleteRequestProcessor>(rowType);
         var deleteRequest = deleteHandler.CreateRequest();
         deleteRequest.EntityId = detailId;
         deleteHandler.Process(uow, deleteRequest);
     }
 
-    private Task DeleteDetailAsync(IUnitOfWork uow, object detailId, CancellationToken cancellationToken = default)
+    private Task<DeleteResponse> DeleteDetailAsync(IUnitOfWork uow, object detailId, CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(detailId);
         var deleteHandler = handlerFactory.CreateHandler<IDeleteRequestProcessorAsync>(rowType);
         var deleteRequest = deleteHandler.CreateRequest();
         deleteRequest.EntityId = detailId;
         return deleteHandler.ProcessAsync(uow, deleteRequest, cancellationToken);
     }
 
-    private void DetailListSave(IUnitOfWork uow, object masterId, IList<IRow> oldRows,
+    private void DetailListSave(IUnitOfWork uow, object masterId, List<IRow> oldRows,
         IList<object> newItemKeys)
     {
+        ArgumentNullException.ThrowIfNull(masterId);
+
         if (oldRows.Count == 0)
         {
             foreach (object itemKey in newItemKeys)
@@ -389,9 +389,9 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
 
         if (newKeys.Count == 0)
         {
-            var rowIdField = ((IIdRow)rowFactory()).IdField;
+            var rowIdField = rowFactory().GetIdField();
             foreach (IRow entity in oldRows)
-                DeleteDetail(uow, rowIdField.AsObject(entity));
+                DeleteDetail(uow, rowIdField.AsObject(entity)!);
 
             return;
         }
@@ -399,13 +399,13 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
         var changes = ComputeDetailChanges(oldRows, newKeys);
 
         foreach (var row in changes.RowsToDelete)
-            DeleteDetail(uow, ((IIdRow)row).IdField.AsObject(row));
+            DeleteDetail(uow, row.GetIdField().AsObject(row)!);
 
         foreach (object itemKey in changes.KeysToInsert)
             InsertDetail(uow, masterId, itemKey);
     }
 
-    private async Task DetailListSaveAsync(IUnitOfWork uow, object masterId, IList<IRow> oldRows,
+    private async Task DetailListSaveAsync(IUnitOfWork uow, object masterId, List<IRow> oldRows,
         IList<object> newItemKeys, CancellationToken cancellationToken = default)
     {
         if (oldRows.Count == 0)
@@ -420,9 +420,9 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
 
         if (newKeys.Count == 0)
         {
-            var rowIdField = ((IIdRow)rowFactory()).IdField;
+            var rowIdField = rowFactory().GetIdField();
             foreach (IRow entity in oldRows)
-                await DeleteDetailAsync(uow, rowIdField.AsObject(entity), cancellationToken).ConfigureAwait(false);
+                await DeleteDetailAsync(uow, rowIdField.AsObject(entity)!, cancellationToken).ConfigureAwait(false);
 
             return;
         }
@@ -430,13 +430,13 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
         var changes = ComputeDetailChanges(oldRows, newKeys);
 
         foreach (var row in changes.RowsToDelete)
-            await DeleteDetailAsync(uow, ((IIdRow)row).IdField.AsObject(row), cancellationToken).ConfigureAwait(false);
+            await DeleteDetailAsync(uow, row.GetIdField().AsObject(row)!, cancellationToken).ConfigureAwait(false);
 
         foreach (object itemKey in changes.KeysToInsert)
             await InsertDetailAsync(uow, masterId, itemKey, cancellationToken).ConfigureAwait(false);
     }
 
-    private DetailChanges ComputeDetailChanges(IList<IRow> oldRows, IList<object> newItemKeys)
+    private DetailChanges ComputeDetailChanges(List<IRow> oldRows, IList<object> newItemKeys)
     {
         var oldByItemKey = BuildOldByItemKey(oldRows);
         var rowsToDelete = new List<IRow>();
@@ -487,7 +487,7 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
         public List<object> KeysToInsert { get; } = keysToInsert;
     }
 
-    private Dictionary<string, IRow> BuildOldByItemKey(IList<IRow> oldRows)
+    private Dictionary<string, IRow> BuildOldByItemKey(List<IRow> oldRows)
     {
         var oldByItemKey = new Dictionary<string, IRow>(oldRows.Count);
         foreach (IRow item in oldRows)
@@ -503,57 +503,58 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
     /// <inheritdoc/>
     public virtual void OnAfterSave(ISaveRequestHandler handler)
     {
-        if (Target.AsObject(handler.Row) is not IList newList)
+        if (Target!.AsObject(handler.Row) is not IList newList)
             return;
 
-        var idField = handler.Row.IdField;
+        var idField = handler.Row.GetIdField();
         var masterId = idField.AsObject(handler.Row);
 
         if (handler.IsCreate)
         {
             foreach (object itemKey in newList)
                 if (itemKey != null)
-                    InsertDetail(handler.UnitOfWork, masterId, itemKey);
+                    InsertDetail(handler.UnitOfWork, masterId!, itemKey);
 
             return;
         }
 
-        var oldRows = GetOldRows(handler, masterId, handler.Connection);
+        var oldRows = GetOldRows(masterId!, handler.Connection);
 
-        DetailListSave(handler.UnitOfWork, masterId, oldRows,
-            newList.Cast<object>().ToList());
+        DetailListSave(handler.UnitOfWork, masterId!, oldRows,
+            [.. newList.Cast<object>()]);
     }
 
     /// <inheritdoc/>
     public override async Task OnAfterSaveAsync(ISaveRequestHandler handler, CancellationToken cancellationToken = default)
     {
-        if (Target.AsObject(handler.Row) is not IList newList)
+        if (Target!.AsObject(handler.Row) is not IList newList)
             return;
 
-        var idField = handler.Row.IdField;
+        var idField = handler.Row.GetIdField();
         var masterId = idField.AsObject(handler.Row);
 
         if (handler.IsCreate)
         {
             foreach (object itemKey in newList)
                 if (itemKey != null)
-                    await InsertDetailAsync(handler.UnitOfWork, masterId, itemKey, cancellationToken).ConfigureAwait(false);
+                    await InsertDetailAsync(handler.UnitOfWork, masterId!, itemKey, cancellationToken).ConfigureAwait(false);
 
             return;
         }
 
-        var oldRows = await GetOldRowsAsync(handler, masterId, handler.Connection, cancellationToken).ConfigureAwait(false);
+        var oldRows = await GetOldRowsAsync(masterId!, handler.Connection, cancellationToken).ConfigureAwait(false);
 
-        await DetailListSaveAsync(handler.UnitOfWork, masterId, oldRows,
-            newList.Cast<object>().ToList(), cancellationToken).ConfigureAwait(false);
+        await DetailListSaveAsync(handler.UnitOfWork, masterId!, oldRows,
+            [.. newList.Cast<object>()], cancellationToken).ConfigureAwait(false);
     }
 
-    private List<IRow> GetOldRows(ISaveRequestHandler handler, object masterId, IDbConnection connection)
+    private List<IRow> GetOldRows(object masterId, IDbConnection connection)
     {
+        ArgumentNullException.ThrowIfNull(masterId);
         var oldRows = new List<IRow>();
 
         var row = rowFactory();
-        var rowIdField = row.IdField;
+        var rowIdField = row.GetIdField();
 
         BuildOldRowsQuery(connection, row, rowIdField, itemKeyField, masterId)
             .ForEach(connection, () =>
@@ -564,13 +565,13 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
         return oldRows;
     }
 
-    private async Task<List<IRow>> GetOldRowsAsync(ISaveRequestHandler handler, object masterId, IDbConnection connection,
+    private async Task<List<IRow>> GetOldRowsAsync(object masterId, IDbConnection connection,
         CancellationToken cancellationToken = default)
     {
         var oldRows = new List<IRow>();
 
         var row = rowFactory();
-        var rowIdField = row.IdField;
+        var rowIdField = row.GetIdField();
 
         await BuildOldRowsQuery(connection, row, rowIdField, itemKeyField, masterId)
             .ForEachAsync(connection, () =>
@@ -604,10 +605,10 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
         if (!attr.ForceCascadeDelete && ServiceQueryHelper.UseSoftDelete(handler.Row))
             return;
 
-        var idField = handler.Row.IdField;
+        var idField = handler.Row.GetIdField();
         var masterId = idField.AsObject(handler.Row);
 
-        var deleteList = GetDeleteList(handler, masterId, handler.Connection);
+        var deleteList = GetDeleteList(masterId!, handler.Connection);
         foreach (var id in deleteList)
             DeleteDetail(handler.UnitOfWork, id);
     }
@@ -622,40 +623,44 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
         if (!attr.ForceCascadeDelete && ServiceQueryHelper.UseSoftDelete(handler.Row))
             return;
 
-        var idField = handler.Row.IdField;
+        var idField = handler.Row.GetIdField();
         var masterId = idField.AsObject(handler.Row);
 
-        var deleteList = await GetDeleteListAsync(handler, masterId, handler.Connection, cancellationToken).ConfigureAwait(false);
+        var deleteList = await GetDeleteListAsync(masterId!, handler.Connection, cancellationToken).ConfigureAwait(false);
         foreach (var id in deleteList)
             await DeleteDetailAsync(handler.UnitOfWork, id, cancellationToken).ConfigureAwait(false);
     }
 
-    private List<object> GetDeleteList(IDeleteRequestHandler handler, object masterId, IDbConnection connection)
+    private List<object> GetDeleteList(object masterId, IDbConnection connection)
     {
+        ArgumentNullException.ThrowIfNull(masterId);
+
         var row = rowFactory();
-        var rowIdField = row.IdField;
+        var rowIdField = row.GetIdField();
 
         var deleteList = new List<object>();
         BuildDeleteListQuery(connection, row, rowIdField, masterId)
             .ForEach(connection, () =>
             {
-                deleteList.Add(rowIdField.AsObject(row));
+                deleteList.Add(rowIdField.AsObject(row)!);
             });
 
         return deleteList;
     }
 
-    private async Task<List<object>> GetDeleteListAsync(IDeleteRequestHandler handler, object masterId, IDbConnection connection,
+    private async Task<List<object>> GetDeleteListAsync(object masterId, IDbConnection connection,
         CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(masterId);
+
         var row = rowFactory();
-        var rowIdField = row.IdField;
+        var rowIdField = row.GetIdField();
 
         var deleteList = new List<object>();
         await BuildDeleteListQuery(connection, row, rowIdField, masterId)
             .ForEachAsync(connection, () =>
             {
-                deleteList.Add(rowIdField.AsObject(row));
+                deleteList.Add(rowIdField.AsObject(row)!);
             }, cancellationToken).ConfigureAwait(false);
 
         return deleteList;
@@ -663,6 +668,8 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
 
     private SqlQuery BuildDeleteListQuery(IDbConnection connection, IRow row, Field rowIdField, object masterId)
     {
+        ArgumentNullException.ThrowIfNull(masterId);
+
         return new SqlQuery()
             .Dialect(connection.GetDialect())
             .From(row)

@@ -108,6 +108,7 @@ public static class EntitySqlHelper
     public static int ForEach(this SqlQuery query, IDbConnection connection,
         Action<IDataReader> callback)
     {
+        ArgumentNullException.ThrowIfNull(callback);
         int count = 0;
 
         if (connection.GetDialect().MultipleResultsets)
@@ -151,6 +152,7 @@ public static class EntitySqlHelper
         IDbConnection connection, TRow? loaderRow = null) where TRow : class, IRow
     {
         var list = new List<TRow>();
+        loaderRow ??= ((query as ISqlQueryExtensible)?.FirstIntoRow as TRow) ?? throw new ArgumentNullException(nameof(loaderRow));
         ForEach(query, connection, delegate ()
         {
             list.Add(loaderRow.Clone());
@@ -171,6 +173,7 @@ public static class EntitySqlHelper
         IDbConnection connection, TRow? loaderRow = null, CancellationToken cancellationToken = default) where TRow : class, IRow
     {
         var list = new List<TRow>();
+        loaderRow ??= ((query as ISqlQueryExtensible)?.FirstIntoRow as TRow) ?? throw new ArgumentNullException(nameof(loaderRow));
         await ForEachAsync(query, connection, delegate ()
         {
             list.Add(loaderRow.Clone());
@@ -289,18 +292,17 @@ public static class EntitySqlHelper
             }
 
             var name = reader.GetName(index);
-            field = row.Fields.FindField(name) ?? row.Fields.FindFieldByPropertyName(name);
 
-            if (field is not null)
+            if ((row.Fields.FindField(name) ?? row.Fields.FindFieldByPropertyName(name)) is Field intoField)
             {
                 try
                 {
-                    field.GetFromReader(reader, index, row);
+                    intoField.GetFromReader(reader, index, row);
                 }
                 catch (Exception ex)
                 {
                     throw new InvalidOperationException(string.Format(FieldReadValueError,
-                        field.PropertyName ?? field.Name, row.GetType().FullName, ex.Message), ex);
+                        intoField.PropertyName ?? intoField.Name, row.GetType().FullName, ex.Message), ex);
                 }
                 continue;
             }

@@ -11,7 +11,7 @@ public class JoinAliasLocator
     /// <param name="expression">The expression.</param>
     /// <returns>The set of aliases found, or <c>null</c> if none are found.</returns>
     /// <exception cref="ArgumentNullException">expression is null.</exception>
-    public static HashSet<string> Locate(string expression)
+    public static HashSet<string>? Locate(string expression)
     {
         ArgumentNullException.ThrowIfNull(expression);
 
@@ -32,7 +32,7 @@ public class JoinAliasLocator
     /// <param name="singleAlias">The single alias.</param>
     /// <returns>The set of aliases found, or <c>null</c> if none are found.</returns>
     /// <exception cref="ArgumentNullException">expression is null.</exception>
-    public static HashSet<string> LocateOptimized(string expression, out string singleAlias)
+    public static HashSet<string>? LocateOptimized(string expression, out string? singleAlias)
     {
         ArgumentNullException.ThrowIfNull(expression);
 
@@ -44,7 +44,7 @@ public class JoinAliasLocator
                 alias = s;
             else if (aliases == null)
             {
-                aliases = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { alias, s };
+                aliases = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { alias!, s };
                 alias = null;
             }
             else
@@ -155,7 +155,7 @@ public class JoinAliasLocator
                         {
                             sb.Length -= alias.Length + 1;
                             sb.Append(replaced);
-                            sb.Append(".");
+                            sb.Append('.');
                         }
                     }
                     startIdent = -1;

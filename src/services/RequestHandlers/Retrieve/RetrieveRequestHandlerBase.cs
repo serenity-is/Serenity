@@ -10,23 +10,17 @@ namespace Serenity.Services;
 /// <typeparam name="TRow">Entity type</typeparam>
 /// <typeparam name="TRetrieveRequest">Retrieve request type</typeparam>
 /// <typeparam name="TRetrieveResponse">Retrieve response type</typeparam>
-public abstract class RetrieveRequestHandlerBase<TRow, TRetrieveRequest, TRetrieveResponse> : IRetrieveRequestHandler
+/// <remarks>
+/// Initializes a new instance of the class.
+/// </remarks>
+/// <param name="context">Request context</param>
+/// <exception cref="ArgumentNullException"><paramref name="context"/> is <c>null</c>.</exception>
+public abstract class RetrieveRequestHandlerBase<TRow, TRetrieveRequest, TRetrieveResponse>(IRequestContext context) : IRetrieveRequestHandler
     where TRow : class, IRow, new()
     where TRetrieveRequest : RetrieveRequest
     where TRetrieveResponse : RetrieveResponse<TRow>, new()
 {
-    private IDbConnection connection;
-
-    /// <summary>
-    /// Initializes a new instance of the class.
-    /// </summary>
-    /// <param name="context">Request context</param>
-    /// <exception cref="ArgumentNullException"><paramref name="context"/> is <c>null</c>.</exception>
-    protected RetrieveRequestHandlerBase(IRequestContext context)
-    {
-        Context = context ?? throw new ArgumentNullException(nameof(context));
-        StateBag = new Dictionary<string, object?>();
-    }
+    private IDbConnection? connection;
 
     /// <summary>
     /// Gets the list of retrieve behaviors.
@@ -190,8 +184,8 @@ public abstract class RetrieveRequestHandlerBase<TRow, TRetrieveRequest, TRetrie
             .Dialect(Connection.GetDialect())
             .From(Row);
 
-        var idField = ((IIdRow)Row).IdField;
-        var id = idField!.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture);
+        var idField = Row.GetIdField();
+        var id = idField.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture);
 
         query.WhereEqual(idField, id);
 
@@ -211,7 +205,7 @@ public abstract class RetrieveRequestHandlerBase<TRow, TRetrieveRequest, TRetrie
     /// <summary>
     /// Gets the request context.
     /// </summary>
-    public IRequestContext Context { get; }
+    public IRequestContext Context { get; } = context ?? throw new ArgumentNullException(nameof(context));
 
     /// <summary>
     /// Gets the localizer from the request context.
@@ -257,7 +251,7 @@ public abstract class RetrieveRequestHandlerBase<TRow, TRetrieveRequest, TRetrie
     /// A state bag for behaviors to preserve state among their methods.
     /// It will be cleared before each request, e.g. Process call.
     /// </summary>
-    public IDictionary<string, object?> StateBag { get; }
+    public IDictionary<string, object?> StateBag { get; } = new Dictionary<string, object?>();
 
     IRow IRetrieveRequestHandler.Row => Row;
     RetrieveRequest IRetrieveRequestHandler.Request => Request;

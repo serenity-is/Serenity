@@ -88,11 +88,9 @@ public class CombinedUploadStorage : IUploadStorage
     public string[] GetFiles(string path, string searchPattern)
     {
         if (UnderSubPath(path))
-            return subStorage.GetFiles(path[subPrefix.Length..], searchPattern)
-                .Select(x => subPrefix + x).ToArray();
+            return [.. subStorage.GetFiles(path[subPrefix.Length..], searchPattern).Select(x => subPrefix + x)];
         else if (IsSubPath(path))
-            return subStorage.GetFiles("", searchPattern)
-                .Select(x => subPrefix + x).ToArray();
+            return [.. subStorage.GetFiles("", searchPattern).Select(x => subPrefix + x)];
             
         return mainStorage.GetFiles(path, searchPattern);
     }

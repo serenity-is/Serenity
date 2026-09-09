@@ -50,7 +50,7 @@ public class PropertyInfoSource : IPropertySource
     }
 
     /// <inheritdoc/>
-    public TAttribute GetAttribute<TAttribute>(AttributeOrigin origin = AttributeOrigin.All)
+    public TAttribute? GetAttribute<TAttribute>(AttributeOrigin origin = AttributeOrigin.All)
         where TAttribute : Attribute
     {
         return wrappedProperty.GetAttribute<TAttribute>(origin) ??

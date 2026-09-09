@@ -8,7 +8,7 @@ namespace Serenity.Services;
 /// <typeparam name="T">Type of the returned entities.</typeparam>
 public class ListResponse<T> : ServiceResponse, IListResponse
 {
-    IList? IListResponse.Entities => Entities;
+    IList IListResponse.Entities => Entities;
 
     /// <summary>
     /// Entities

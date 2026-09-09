@@ -12,7 +12,7 @@ public interface IListResponse
     /// <summary>
     /// List of entities
     /// </summary>
-    IList? Entities { get; }
+    IList Entities { get; }
 
     /// <summary>
     /// Total count of the records. This may be different

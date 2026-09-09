@@ -92,9 +92,9 @@ public class SaveRequestHandler<TRow, TSaveRequest, TSaveResponse> :
         {
             if (Row.IsAnyFieldAssigned)
             {
-                var idField = Row.IdField;
+                var idField = Row.GetIdField();
 
-                if (idField!.IndexCompare(Old!, Row) != 0)
+                if (idField.IndexCompare(Old!, Row) != 0)
                 {
                     var update = new SqlUpdate(Row.Table);
                     update.Set(Row);
@@ -168,7 +168,7 @@ public class SaveRequestHandler<TRow, TSaveRequest, TSaveResponse> :
                 connection: Connection!,
                 row: displayOrderRow,
                 filter: GetDisplayOrderFilter(),
-                recordID: Row.IdField!.AsObject(Row),
+                recordID: Row.GetIdField().AsObject(Row),
                 newDisplayOrder: displayOrderRow.DisplayOrderField[Row]!.Value,
                 hasUniqueConstraint: false);
         }
@@ -181,10 +181,10 @@ public class SaveRequestHandler<TRow, TSaveRequest, TSaveResponse> :
     {
         if (!PrepareQuery().GetFirst(Connection))
         {
-            var idField = Row.IdField;
+            var idField = Row.GetIdField();
             var id = Request.EntityId != null ?
-                idField!.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture)
-                : idField!.AsObject(Row);
+                idField.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture)
+                : idField.AsObject(Row);
 
             throw DataValidation.EntityNotFoundError(Row, id, Localizer);
         }
@@ -239,11 +239,11 @@ public class SaveRequestHandler<TRow, TSaveRequest, TSaveResponse> :
 
         Response = new TSaveResponse();
 
-        Row = (request.Entity ?? throw new ArgumentNullException(nameof(request.Entity))).Clone();
+        Row = ArgumentChecks.NotNull(request.Entity).Clone();
 
         if (requestType == SaveRequestType.Auto)
         {
-            if (Row.IdField!.IsNull(Row))
+            if (Row.GetIdField().IsNull(Row))
                 requestType = SaveRequestType.Create;
             else
                 requestType = SaveRequestType.Update;

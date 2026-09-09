@@ -104,7 +104,7 @@ public sealed class Int64Field(ICollection<Field> collection, string name, Local
                     _setValue(row, Int32Field.ConvertEnumFromInt(EnumType, v));
                 break;
             case Newtonsoft.Json.JsonToken.String:
-                string? s = ((string?)reader.Value!).TrimToNull();
+                string? s = ((string?)reader.Value).TrimToNull();
                 if (s == null)
                     _setValue(row, null);
                 else if (EnumType == null)

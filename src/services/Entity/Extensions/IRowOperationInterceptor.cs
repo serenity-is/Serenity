@@ -18,7 +18,7 @@ public interface IRowOperationInterceptor
     /// <param name="editQuery">Callback to edit the query.</param>
     /// <param name="byIdOrSingle">True if one of the ById/TryById/Single/TrySingle methods is used.</param>
     /// <returns>Entity with the given ID, or null if not found.</returns>
-    OptionalValue<IRow> FindRow(Type rowType, OptionalValue<object> id, ICriteria? where, Action<SqlQuery>? editQuery, bool byIdOrSingle);
+    OptionalValue<IRow> FindRow(Type rowType, OptionalValue<object?> id, ICriteria? where, Action<SqlQuery>? editQuery, bool byIdOrSingle);
 
     /// <summary>
     /// Intercepts EntityConnectionExtensions.List and Count methods.
@@ -38,7 +38,7 @@ public interface IRowOperationInterceptor
     /// <param name="expectedRows">The expected number of rows to be manipulated. Default is 1.</param>
     /// <param name="getNewId">True if InsertAndGetID is called.</param>
     /// <returns>The generated identity value, or null if none was generated.</returns>
-    OptionalValue<long?> ManipulateRow(Type rowType, OptionalValue<object> id, IRow? row, ExpectedRows expectedRows, bool getNewId);
+    OptionalValue<long?> ManipulateRow(Type rowType, OptionalValue<object?> id, IRow? row, ExpectedRows expectedRows, bool getNewId);
 
     /// <summary>
     /// Intercepts the async EntityConnectionExtensions ById/TryById/First/TryFirst/Single/TrySingle methods.
@@ -51,7 +51,7 @@ public interface IRowOperationInterceptor
     /// <param name="byIdOrSingle">True if one of the ById/TryById/Single/TrySingle methods is used.</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Entity with the given ID, or null if not found.</returns>
-    Task<OptionalValue<IRow>> FindRowAsync(Type rowType, OptionalValue<object> id, ICriteria? where, Action<SqlQuery>? editQuery, bool byIdOrSingle, CancellationToken cancellationToken = default)
+    Task<OptionalValue<IRow>> FindRowAsync(Type rowType, OptionalValue<object?> id, ICriteria? where, Action<SqlQuery>? editQuery, bool byIdOrSingle, CancellationToken cancellationToken = default)
         => Task.FromResult(FindRow(rowType, id, where, editQuery, byIdOrSingle));
 
     /// <summary>
@@ -77,6 +77,6 @@ public interface IRowOperationInterceptor
     /// <param name="getNewId">True if InsertAndGetID is called.</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>The generated identity value, or null if none was generated.</returns>
-    Task<OptionalValue<long?>> ManipulateRowAsync(Type rowType, OptionalValue<object> id, IRow? row, ExpectedRows expectedRows, bool getNewId, CancellationToken cancellationToken = default)
+    Task<OptionalValue<long?>> ManipulateRowAsync(Type rowType, OptionalValue<object?> id, IRow? row, ExpectedRows expectedRows, bool getNewId, CancellationToken cancellationToken = default)
         => Task.FromResult(ManipulateRow(rowType, id, row, expectedRows, getNewId));
 }

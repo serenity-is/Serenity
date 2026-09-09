@@ -20,7 +20,7 @@ public abstract class GenericClassField<TValue> : Field where TValue : class
         Func<IRow, TValue?>? getValue = null, Action<IRow, TValue?>? setValue = null)
         : base(collection, type, name, caption, size, flags)
     {
-        _getValue = getValue ?? (r => (TValue)(r.GetIndexedData(index)));
+        _getValue = getValue ?? (r => (TValue?)(r.GetIndexedData(index)));
         _setValue = setValue ?? ((r, v) => r.SetIndexedData(index, v));
     }
 
@@ -77,7 +77,7 @@ public abstract class GenericClassField<TValue> : Field where TValue : class
     }
 
     /// <inheritdoc />
-    public override object AsObjectNoCheck(IRow row)
+    public override object? AsObjectNoCheck(IRow row)
     {
         return _getValue(row);
     }
@@ -89,7 +89,7 @@ public abstract class GenericClassField<TValue> : Field where TValue : class
     /// <param name="value">The value.</param>
     public override void AsObject(IRow row, object? value)
     {
-        _setValue(row, (TValue)value);
+        _setValue(row, (TValue?)value);
         row.OnFieldSet(this);
     }
 

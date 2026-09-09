@@ -10,11 +10,11 @@ public class TemporaryPhysicalFileSystem : PhysicalFileSystem, ITemporaryFileSys
     /// <inheritdoc/>
     public TemporaryFileInfo[] GetTemporaryFileInfos(string path)
     {
-        return new System.IO.DirectoryInfo(path).GetFiles().Select(x => new TemporaryFileInfo
+        return [.. new System.IO.DirectoryInfo(path).GetFiles().Select(x => new TemporaryFileInfo
         {
             Name = x.Name,
             FullName = x.FullName,
             CreationTime = x.CreationTime
-        }).ToArray();
+        })];
     }
 }

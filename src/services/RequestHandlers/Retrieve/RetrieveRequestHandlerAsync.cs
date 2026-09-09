@@ -26,8 +26,8 @@ public class RetrieveRequestHandlerAsync<TRow, TRetrieveRequest, TRetrieveRespon
     public RetrieveRequestHandlerAsync(IRequestContext context) : base(context)
     {
         behaviors = new Lazy<IRetrieveBehaviorAsync[]>(() =>
-            BehaviorProviderExtensions.AutoWrapBehaviors<IRetrieveBehavior, IRetrieveBehaviorSync, IRetrieveBehaviorAsync>(
-                GetBehaviors(), behavior => new SyncToAsyncRetrieveBehaviorWrapper(behavior)).ToArray());
+            [.. BehaviorProviderExtensions.AutoWrapBehaviors<IRetrieveBehavior, IRetrieveBehaviorSync, IRetrieveBehaviorAsync>(
+                GetBehaviors(), behavior => new SyncToAsyncRetrieveBehaviorWrapper(behavior))]);
     }
 
     /// <summary>
@@ -89,7 +89,7 @@ public class RetrieveRequestHandlerAsync<TRow, TRetrieveRequest, TRetrieveRespon
     {
         try
         {
-            if (await Query!.GetFirstAsync(Connection!, cancellationToken).ConfigureAwait(false))
+            if (await Query.GetFirstAsync(Connection, cancellationToken).ConfigureAwait(false))
                 Response.Entity = Row;
             else
                 throw DataValidation.EntityNotFoundError(Row, Request.EntityId, Localizer);

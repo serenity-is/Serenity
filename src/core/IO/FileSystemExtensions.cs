@@ -16,7 +16,7 @@ public static class FileSystemExtensions
     /// <param name="extension">The new extension (with or without a leading period). Specify <c>null</c> to remove
     /// an existing extension from <paramref name="path"/>.</param>
     /// <returns>The modified path.</returns>
-    public static string ChangeExtension(this IFileSystem _, string path, string extension)
+    public static string ChangeExtension(this IFileSystem _, string path, string? extension)
     {
         return System.IO.Path.ChangeExtension(path, extension);
     }

@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Serenity.Data;
 
 /// <summary>
@@ -18,7 +20,8 @@ public abstract class BaseCriteriaVisitor
     /// <param name="criteria">The criteria.</param>
     /// <returns>The visited criteria, which may be a reworked version.</returns>
     /// <exception cref="Exception">Criteria type is unknown.</exception>
-    protected virtual BaseCriteria? Visit(BaseCriteria criteria)
+    [return:NotNullIfNotNull(nameof(criteria))]
+    protected virtual BaseCriteria? Visit(BaseCriteria? criteria)
     {
         if (criteria is null)
             return null;
@@ -49,7 +52,8 @@ public abstract class BaseCriteriaVisitor
     /// </summary>
     /// <param name="criteria">The criteria.</param>
     /// <returns>The visited criteria.</returns>
-    protected virtual BaseCriteria? VisitCriteria(Criteria criteria)
+    [return: NotNullIfNotNull(nameof(criteria))]
+    protected virtual BaseCriteria VisitCriteria(Criteria criteria)
     {
         return criteria;
     }

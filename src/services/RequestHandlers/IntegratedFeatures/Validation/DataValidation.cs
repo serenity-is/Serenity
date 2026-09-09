@@ -110,7 +110,7 @@ public static class DataValidation
         ITextLocalizer? localizer) where T : struct, IComparable<T>
     {
         var value = field.AsObject(row);
-        if (value != null && !Enum.IsDefined(field.EnumType, value))
+        if (value != null && field.EnumType != null && !Enum.IsDefined(field.EnumType, value))
             throw InvalidValueError(row, field, localizer);
     }
 
@@ -122,7 +122,7 @@ public static class DataValidation
     /// <param name="localizer">Text localizer</param>
     public static void ValidateEnum<T>(T value, ITextLocalizer? localizer)
     {
-        if (!Enum.IsDefined(typeof(T), value!))
+        if (value != null && !Enum.IsDefined(typeof(T), value))
             throw ArgumentOutOfRange(typeof(T).Name, localizer);
     }
 

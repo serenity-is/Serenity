@@ -76,7 +76,7 @@ public class ForeignKeyAttribute : Attribute
                         "but it has multiple [Identity] or [PrimaryKey] attributes",
                         rowType.FullName));
 
-                identityOrPrimaryKey = identity.ToArray();
+                identityOrPrimaryKey = [.. identity];
             }
 
             Field = identityOrPrimaryKey[0].GetCustomAttribute<ColumnAttribute>()?.Name ??
@@ -142,6 +142,6 @@ public class ForeignKeyAttribute : Attribute
     {
         get => Dialect != null && Dialect.StartsWith('!');
         set => Dialect = value ? (!NegateDialect ? ("!" + Dialect) : Dialect) :
-            (NegateDialect ? Dialect[1..] : Dialect);
+            (NegateDialect ? Dialect![1..] : Dialect);
     }
 }

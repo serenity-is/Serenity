@@ -20,7 +20,7 @@ public interface IDiskUploadFileSystem : IFileSystem
     /// <param name="maxFilesInDirectory">Max files to keep in directory</param>
     /// <param name="checkFileName">A filename to check existence to confirm the target is a temporary directory.
     /// By default it is ".temporary"</param>
-    void PurgeDirectory(string directoryToClean, TimeSpan? autoExpireTime = null, int? maxFilesInDirectory = null, string checkFileName = null);
+    void PurgeDirectory(string directoryToClean, TimeSpan? autoExpireTime = null, int? maxFilesInDirectory = null, string? checkFileName = null);
 
     /// <summary>
     /// Tries to delete marked files in a directory

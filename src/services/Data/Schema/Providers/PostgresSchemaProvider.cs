@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data.Schema;
+namespace Serenity.Data.Schema;
 
 /// <summary>
 /// PostgreSQL metadata provider.
@@ -90,9 +90,9 @@ public class PostgresSchemaProvider : ISchemaProvider
     private class TableNameSource
     {
 #pragma warning disable IDE1006 // Naming Styles
-        public string table_schema { get; set; }
-        public string table_name { get; set; }
-        public string table_type { get; set; }
+        public string? table_schema { get; set; }
+        public string? table_name { get; set; }
+        public string? table_type { get; set; }
 #pragma warning restore IDE1006 // Naming Styles
     }
 
@@ -107,7 +107,7 @@ public class PostgresSchemaProvider : ISchemaProvider
             .Select(x => new TableName
             {
                 Schema = x.table_schema,
-                Table = x.table_name,
+                Table = x.table_name!,
                 IsView = x.table_type == "VIEW"
             });
     }

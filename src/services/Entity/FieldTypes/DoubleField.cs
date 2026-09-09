@@ -125,7 +125,7 @@ public sealed class DoubleField(ICollection<Field> collection, string name, Loca
                 _setValue(row, v);
                 break;
             case JsonTokenType.String:
-                string s = reader.GetString().TrimToNull();
+                string? s = reader.GetString().TrimToNull();
                 if (s == null)
                     _setValue(row, null);
                 else

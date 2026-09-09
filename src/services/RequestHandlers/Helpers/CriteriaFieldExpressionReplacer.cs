@@ -40,7 +40,8 @@ public class CriteriaFieldExpressionReplacer(IRow row, IPermissionService permis
     /// expressions.
     /// </summary>
     /// <param name="criteria">The criteria</param>
-    public BaseCriteria? Process(BaseCriteria criteria)
+    [return: NotNullIfNotNull(nameof(criteria))]
+    public BaseCriteria? Process(BaseCriteria? criteria)
     {
         return Visit(criteria);
     }
@@ -89,7 +90,7 @@ public class CriteriaFieldExpressionReplacer(IRow row, IPermissionService permis
     }
 
     /// <inheritdoc/>
-    protected override BaseCriteria? VisitCriteria(Criteria criteria)
+    protected override BaseCriteria VisitCriteria(Criteria criteria)
     {
         var result = base.VisitCriteria(criteria);
 

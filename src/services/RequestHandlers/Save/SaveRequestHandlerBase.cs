@@ -244,7 +244,7 @@ public abstract class SaveRequestHandlerBase<TRow, TSaveRequest, TSaveResponse>(
     /// <exception cref="ValidationError">One of the fields has an invalid value</exception>
     protected virtual void ValidateFieldValues()
     {
-        var context = new RowValidationContext(Connection!, Row, Localizer);
+        var context = new RowValidationContext(Connection, Row, Localizer);
 
         foreach (var field in Row.GetFields())
         {
@@ -295,11 +295,11 @@ public abstract class SaveRequestHandlerBase<TRow, TSaveRequest, TSaveResponse>(
     /// </summary>
     protected virtual void ValidateAndClearIdField()
     {
-        var idField = Row.IdField;
-        if (Row.IsAssigned(idField!))
-            Row.ValidateRequired(idField!, Localizer);
+        var idField = Row.GetIdField();
+        if (Row.IsAssigned(idField))
+            Row.ValidateRequired(idField, Localizer);
 
-        if ((idField!.Flags & FieldFlags.Updatable) != FieldFlags.Updatable)
+        if ((idField.Flags & FieldFlags.Updatable) != FieldFlags.Updatable)
             Row.ClearAssignment(idField);
     }
 

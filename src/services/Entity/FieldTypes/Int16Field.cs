@@ -97,7 +97,7 @@ public sealed class Int16Field(ICollection<Field> collection, string name, Local
                     _setValue(row, (short)Int32Field.ConvertEnumFromInt(EnumType, v));
                 break;
             case Newtonsoft.Json.JsonToken.String:
-                string s = ((string?)reader.Value).TrimToNull();
+                string? s = ((string?)reader.Value).TrimToNull();
                 if (s == null)
                     _setValue(row, null);
                 else if (EnumType == null)
@@ -136,7 +136,7 @@ public sealed class Int16Field(ICollection<Field> collection, string name, Local
                     _setValue(row, (short)Int32Field.ConvertEnumFromInt(EnumType, v));
                 break;
             case JsonTokenType.String:
-                string s = reader.GetString().TrimToNull();
+                string? s = reader.GetString().TrimToNull();
                 if (s == null)
                     _setValue(row, null);
                 else if (EnumType == null)

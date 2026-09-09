@@ -36,7 +36,7 @@ public abstract class Join : Alias
                 referencedAliases = aliases;
         }
 
-        var toTableAliases = JoinAliasLocator.Locate(Table);
+        var toTableAliases = Table is null ? null : JoinAliasLocator.Locate(Table);
         if (toTableAliases != null && toTableAliases.Count > 0)
         {
             if (referencedAliases == null)
@@ -64,7 +64,7 @@ public abstract class Join : Alias
     /// <value>
     /// The ON criteria.
     /// </value>
-    public ICriteria OnCriteria => onCriteria;
+    public ICriteria? OnCriteria => onCriteria;
 
     /// <summary>
     /// Gets the referenced aliases.

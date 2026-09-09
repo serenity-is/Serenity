@@ -70,13 +70,13 @@ public class CaptureLogBehavior : BaseSaveDeleteBehaviorAsync, ISaveBehaviorSync
         if (row is IIsActiveDeletedRow isActiveDeletedRow)
         {
             var newRow = row.Clone();
-            ((IIsActiveDeletedRow)newRow).IsActiveField[newRow] = -1;
+            isActiveDeletedRow.IsActiveField[newRow] = -1;
             return newRow;
         }
         else if (row is IIsDeletedRow isDeletedRow)
         {
             var newRow = row.Clone();
-            ((IIsDeletedRow)newRow).IsDeletedField[newRow] = true;
+            isDeletedRow.IsDeletedField[newRow] = true;
             return newRow;
         }
 
@@ -251,7 +251,7 @@ public class CaptureLogBehavior : BaseSaveDeleteBehaviorAsync, ISaveBehaviorSync
 
         var rowFieldPrefixLength = PrefixHelper.DeterminePrefixLength(rowInstance.EnumerateTableFields(), x => x.Name);
         var logFieldPrefixLength = PrefixHelper.DeterminePrefixLength(logRow.EnumerateTableFields(), x => x.Name);
-        var mappedIdFieldName = captureLogAttr.MappedIdField ?? rowInstance.IdField!.Name;
+        var mappedIdFieldName = captureLogAttr.MappedIdField ?? rowInstance.GetIdField().Name;
         var mappedIdField = logRow.FindField(mappedIdFieldName) ?? throw new InvalidOperationException($"Can't locate capture log table " +
                 $"mapped ID field for {logRow.Table}!");
         logRow.TrackAssignments = true;
@@ -278,11 +278,11 @@ public class CaptureLogBehavior : BaseSaveDeleteBehaviorAsync, ISaveBehaviorSync
                     continue;
 
                 if (ReferenceEquals(logField, mappedIdField))
-                    yield return new Tuple<Field, Field>(logField, rowInstance.IdField!);
+                    yield return new Tuple<Field, Field>(logField, rowInstance.GetIdField());
                 else
                 {
                     var name = logField.Name[logFieldPrefixLength..];
-                    name = rowInstance.IdField!.Name[..rowFieldPrefixLength] + name;
+                    name = rowInstance.GetIdField().Name[..rowFieldPrefixLength] + name;
                     var match = rowInstance.FindField(name) ?? throw new InvalidOperationException($"Can't find match in the row for log table field {name}!");
                     yield return new Tuple<Field, Field>(logField, match);
                 }

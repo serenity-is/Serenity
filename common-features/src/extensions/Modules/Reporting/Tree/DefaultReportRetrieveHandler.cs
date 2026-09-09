@@ -33,7 +33,7 @@ public class DefaultReportRetrieveHandler(IPropertyItemProvider propertyItemProv
 
         var response = new ReportRetrieveResult
         {
-            Properties = propertyItemProvider.GetPropertyItemsFor(reportInfo.Type).ToList(),
+            Properties = [.. propertyItemProvider.GetPropertyItemsFor(reportInfo.Type)],
             ReportKey = reportInfo.Key,
             Title = reportInfo.Title
         };

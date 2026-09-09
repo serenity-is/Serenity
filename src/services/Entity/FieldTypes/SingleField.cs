@@ -92,7 +92,7 @@ public sealed class SingleField(ICollection<Field> collection, string name, Loca
                 _setValue(row, Convert.ToSingle(reader.Value, CultureInfo.InvariantCulture));
                 break;
             case Newtonsoft.Json.JsonToken.String:
-                var s = ((string?)reader.Value!).TrimToNull();
+                var s = ((string?)reader.Value).TrimToNull();
                 if (s == null)
                     _setValue(row, null);
                 else

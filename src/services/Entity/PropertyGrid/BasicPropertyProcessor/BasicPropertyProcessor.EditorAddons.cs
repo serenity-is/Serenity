@@ -8,7 +8,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
         if (!attrs.Any())
             return;
 
-        item.EditorAddons = attrs.Select(x =>
+        item.EditorAddons = [.. attrs.Select(x =>
         {
             var addon = new EditorAddonItem
             {
@@ -19,6 +19,6 @@ public partial class BasicPropertyProcessor : PropertyProcessor
             if (p.Count > 0)
                 addon.Params = p;
             return addon;
-        }).ToList();
+        })];
     }
 }

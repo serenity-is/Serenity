@@ -167,7 +167,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
                 if (rowInstance is IIdRow idRow &&
                     !editorParams.ContainsKey("idField"))
                 {
-                    var idField = idRow.IdField;
+                    var idField = idRow.GetIdField();
                     editorParams["idField"] = idField.PropertyName ?? idField.Name;
                 }
 

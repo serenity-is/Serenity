@@ -5,10 +5,10 @@ namespace Serenity.PropertyGrid;
 /// </summary>
 public partial class LocalizablePropertyProcessor : PropertyProcessor
 {
-    private LocalizationRowAttribute localAttr;
-    private ILocalizationRow localRowInstance;
+    private LocalizationRowAttribute? localAttr;
+    private ILocalizationRow? localRowInstance;
     private int localRowPrefixLength;
-    private Field mappedIdField;
+    private Field? mappedIdField;
     private int rowPrefixLength;
 
     /// <inheritdoc/>
@@ -58,16 +58,13 @@ public partial class LocalizablePropertyProcessor : PropertyProcessor
         if (localRowInstance != null)
             return true;
 
-        localRowInstance = (ILocalizationRow)Activator.CreateInstance(localAttr.LocalizationRow);
-        rowPrefixLength = PrefixHelper.DeterminePrefixLength(BasedOnRow.EnumerateTableFields(),
+        localRowInstance = (ILocalizationRow)Activator.CreateInstance(localAttr.LocalizationRow)!;
+        rowPrefixLength = PrefixHelper.DeterminePrefixLength(BasedOnRow!.EnumerateTableFields(),
             x => x.Name);
         localRowPrefixLength = PrefixHelper.DeterminePrefixLength(localRowInstance.EnumerateTableFields(),
             x => x.Name);
-        mappedIdField = localRowInstance.FindField(localAttr.MappedIdField ?? BasedOnRow.IdField.Name);
-        if (mappedIdField is null)
-            throw new InvalidOperationException(string.Format("Can't locate localization table mapped ID field for {0}!",
+        mappedIdField = localRowInstance.FindField(localAttr.MappedIdField ?? BasedOnRow!.GetIdField().Name) ?? throw new InvalidOperationException(string.Format("Can't locate localization table mapped ID field for {0}!",
                 localRowInstance.Table));
-
         return true;
     }
 
@@ -78,6 +75,6 @@ public partial class LocalizablePropertyProcessor : PropertyProcessor
     public bool IsLocalized(Field field)
     {
         return IsEnabled() && LocalizationBehavior.GetLocalizationMatch(field,
-            localRowInstance, localRowPrefixLength, rowPrefixLength) is not null;
+            localRowInstance!, localRowPrefixLength, rowPrefixLength) is not null;
     }
 }

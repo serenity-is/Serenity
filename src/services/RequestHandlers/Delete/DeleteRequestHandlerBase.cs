@@ -109,7 +109,7 @@ public abstract class DeleteRequestHandlerBase<TRow, TDeleteRequest, TDeleteResp
     /// <summary>
     /// Gets the current connection.
     /// </summary>
-    public IDbConnection Connection => UnitOfWork.Connection;
+    public IDbConnection Connection => unitOfWork?.Connection ?? throw PropertyReadError();
 
     /// <summary>
     /// Gets the current unit of work.

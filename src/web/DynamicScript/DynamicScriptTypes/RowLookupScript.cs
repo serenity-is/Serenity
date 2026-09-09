@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 
 namespace Serenity.Web;
 
@@ -63,9 +63,9 @@ public class RowLookupScript<TRow> : LookupScript
 
         var row = new TRow();
 
-        if (row.IdField is not null)
+        if (row.IdField is Field idField)
         {
-            IdField = row.IdField.PropertyName ?? row.IdField.Name;
+            IdField = idField.PropertyName ?? idField.Name;
         }
 
         if (row.NameField is Field nameField)

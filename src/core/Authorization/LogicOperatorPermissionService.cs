@@ -52,7 +52,7 @@ public class LogicOperatorPermissionService(IPermissionService permissionService
         if (!cache.TryGetValue(permission, out string[] rpnTokens))
         {
             var tokens = PermissionExpressionParser.Tokenize(permission);
-            cache[permission] = rpnTokens = PermissionExpressionParser.ShuntingYard(tokens).ToArray();
+            cache[permission] = rpnTokens = [.. PermissionExpressionParser.ShuntingYard(tokens)];
         }
 
         return PermissionExpressionParser.Evaluate(rpnTokens, permissionService.HasPermission);

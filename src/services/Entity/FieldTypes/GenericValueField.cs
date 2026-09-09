@@ -55,7 +55,7 @@ public abstract class GenericValueField<TValue> : Field, IEnumTypeField where TV
     /// <value>
     /// The type of the enum.
     /// </value>
-    public Type EnumType
+    public Type? EnumType
     {
         get { return _enumType; }
         set { _enumType = value; }
@@ -92,7 +92,7 @@ public abstract class GenericValueField<TValue> : Field, IEnumTypeField where TV
     }
 
     /// <inheritdoc/>
-    public override object AsObjectNoCheck(IRow row)
+    public override object? AsObjectNoCheck(IRow row)
     {
         return _getValue(row);
     }

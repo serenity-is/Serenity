@@ -13,7 +13,7 @@ public interface IField
     /// <summary>
     /// The expression (can be equal to name if no expression).
     /// </summary>
-    string? Expression { get; }
+    string Expression { get; }
 
     /// <summary>
     /// Select as column alias. Can be equal to property name or name.

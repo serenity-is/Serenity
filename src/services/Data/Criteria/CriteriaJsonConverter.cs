@@ -94,7 +94,7 @@ public class CriteriaJsonConverter : JsonConverter<BaseCriteria>
     private BaseCriteria ParseValue(JsonElement value)
     {
         if (value.ValueKind == JsonValueKind.String)
-            return new ValueCriteria(value.GetString()!);
+            return new ValueCriteria(value.GetString());
         else if (value.ValueKind == JsonValueKind.Number)
             return new ValueCriteria(value.GetDouble());
         else if (value.ValueKind == JsonValueKind.True)

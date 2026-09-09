@@ -22,7 +22,7 @@ public class UniqueConstraintSaveBehavior(ITextLocalizer localizer) : BaseSaveBe
         if (!attr.Any())
             return false;
 
-        attrList = attr.ToArray();
+        attrList = [.. attr];
         return true;
     }
 
@@ -68,7 +68,7 @@ public class UniqueConstraintSaveBehavior(ITextLocalizer localizer) : BaseSaveBe
         if (attrFields != null)
             return;
 
-        attrFields = attrList!.Select(attr =>
+        attrFields = [.. attrList!.Select(attr =>
         {
             return attr.Fields.Select(x =>
             {
@@ -79,6 +79,6 @@ public class UniqueConstraintSaveBehavior(ITextLocalizer localizer) : BaseSaveBe
                             x, handler.Row.GetType().FullName))
                     : field;
             });
-        }).ToArray();
+        })];
     }
 }

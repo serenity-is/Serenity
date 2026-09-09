@@ -10,7 +10,7 @@ public abstract partial class Field : IFieldWithJoinInfo
 {
     private string? autoTextKey;
     internal LocalText? caption;
-    internal string? expression;
+    internal string expression;
     internal RowFieldsBase? fields;
     internal FieldFlags flags;
     private string? foreignTable;
@@ -236,24 +236,23 @@ public abstract partial class Field : IFieldWithJoinInfo
     /// <summary>
     /// Gets or sets the expression (can be equal to the name if there is no expression).
     /// </summary>
-    public string? Expression
+    public string Expression
     {
         get { return expression; }
         set
         {
-            value = value.TrimToNull();
-            if (expression != value)
+            var newValue = value.TrimToNull();
+            if (expression != newValue)
             {
-                expression = value;
                 referencedAliases = null;
                 joinAlias = null;
                 origin = null;
                 join = null;
 
-                if (value != null)
+                if (newValue != null)
                 {
-                    if (expression != null &&
-                        expression.StartsWith("T0.", StringComparison.OrdinalIgnoreCase) &&
+                    expression = newValue;
+                    if (expression.StartsWith("T0.", StringComparison.OrdinalIgnoreCase) &&
                         SqlSyntax.IsValidQuotedIdentifier(expression[3..]))
                     {
                         if (flags.HasFlag(FieldFlags.Calculated))
@@ -282,7 +281,7 @@ public abstract partial class Field : IFieldWithJoinInfo
                             {
                                 flags |= FieldFlags.Foreign;
 
-                                var split = expression!.Split('.');
+                                var split = expression.Split('.');
                                 if (split?.Length == 2 &&
                                     split[0] == theJoin &&
                                     SqlSyntax.IsValidQuotedIdentifier(split[1]))

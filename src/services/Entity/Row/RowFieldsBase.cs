@@ -2,6 +2,7 @@ using Serenity.Reflection;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection.Emit;
+using System.Runtime.CompilerServices;
 
 namespace Serenity.Data;
 
@@ -474,7 +475,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
                     {
                         field.ForeignTable = foreignKey.Table ??
                             expressionSelector.GetBestMatch(foreignKey.RowType!
-                                .GetCustomAttributes<TableNameAttribute>(), x => x.Dialect).Name;
+                                .GetCustomAttributes<TableNameAttribute>(), x => x.Dialect)!.Name;
                         field.ForeignField = foreignKey.Field;
                     }
 
@@ -549,7 +550,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
 
                         foreach (var propJoinGroup in propJoinAttributes)
                         {
-                            ISqlJoin bestMatch;
+                            ISqlJoin? bestMatch;
                             try
                             {
                                 bestMatch = expressionSelector.GetBestMatch(propJoinGroup, x => x.Dialect);
@@ -563,13 +564,13 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
 
                             if (bestMatch is LeftJoinAttribute lja)
                             {
-                                _ = new LeftJoin(joins, lja.ToTable, lja.Alias,
-                                    new Criteria(lja.Alias, lja.OnCriteria) == new Criteria(field));
+                                _ = new LeftJoin(joins, lja.ToTable!, lja.Alias,
+                                    new Criteria(lja.Alias, lja.OnCriteria!) == new Criteria(field));
                             }
                             else if (bestMatch is InnerJoinAttribute ija)
                             {
-                                _ = new InnerJoin(joins, ija.ToTable, ija.Alias,
-                                    new Criteria(ija.Alias, ija.OnCriteria) == new Criteria(field));
+                                _ = new InnerJoin(joins, ija.ToTable!, ija.Alias,
+                                    new Criteria(ija.Alias, ija.OnCriteria!) == new Criteria(field));
                             }
                         }
 
@@ -604,7 +605,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
 
             foreach (var rowJoinGroup in rowJoinAttributes)
             {
-                ISqlJoin bestMatch;
+                ISqlJoin? bestMatch;
                 try
                 {
                     bestMatch = expressionSelector.GetBestMatch(rowJoinGroup, x => x.Dialect);
@@ -617,9 +618,9 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
                 }
 
                 if (bestMatch is LeftJoinAttribute lja)
-                    _ = new LeftJoin(joins, lja.ToTable, lja.Alias, new Criteria(lja.OnCriteria));
+                    _ = new LeftJoin(joins, lja.ToTable!, lja.Alias, new Criteria(lja.OnCriteria!));
                 else if (bestMatch is InnerJoinAttribute ija)
-                    _ = new InnerJoin(joins, ija.ToTable, ija.Alias, new Criteria(ija.OnCriteria));
+                    _ = new InnerJoin(joins, ija.ToTable!, ija.Alias, new Criteria(ija.OnCriteria!));
                 else if (bestMatch is OuterApplyAttribute oua)
                     _ = new OuterApply(joins, oua.InnerQuery, oua.Alias);
             }
@@ -750,7 +751,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
                     if (string.Compare(field.ForeignTable, join.Table) == 0 &&
                         (join is LeftJoin || join is InnerJoin) &&
                         join.OnCriteria is object &&
-                        join.OnCriteria.ToStringIgnoreParams().Contains(field.Expression!, StringComparison.OrdinalIgnoreCase))
+                        join.OnCriteria.ToStringIgnoreParams().Contains(field.Expression, StringComparison.OrdinalIgnoreCase))
                     {
                         foreach (var f in this)
                             if (string.Compare(f.JoinAlias, join.Name, StringComparison.OrdinalIgnoreCase) == 0 &&
@@ -769,12 +770,22 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
     }
 
     /// <summary>
+    /// Creates an exception indicating that the row fields has not been initialized.
+    /// </summary>
+    /// <param name="property">The property being accessed.</param>
+    /// <returns>The initialization error.</returns>
+    private InvalidOperationException PropertyReadError([CallerMemberName] string? property = default)
+    {
+        return new InvalidOperationException($"Error reading '{property}' of {GetType().Name}. It has not been initialized.");
+    }
+
+    /// <summary>
     /// Gets the name of the table.
     /// </summary>
     /// <value>
     /// The name of the table.
     /// </value>
-    public string TableName => tableName!;
+    public string TableName => tableName ?? throw PropertyReadError();
 
     /// <summary>
     /// Gets the database.
@@ -798,7 +809,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
     /// <value>
     /// The table only.
     /// </value>
-    public string TableOnly => tableOnly!;
+    public string TableOnly => tableOnly ?? throw PropertyReadError();
 
     /// <summary>
     /// Gets or sets the field prefix.
@@ -830,7 +841,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
     /// <value>
     /// The module identifier.
     /// </value>
-    public string? ModuleIdentifier => moduleIdentifier;
+    public string ModuleIdentifier => moduleIdentifier ?? throw PropertyReadError();
 
     /// <summary>
     /// Gets the row identifier.
@@ -856,7 +867,8 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
     /// <value>
     /// The connection key.
     /// </value>
-    public string ConnectionKey => connectionKey!;
+    public string ConnectionKey => connectionKey ?? throw PropertyReadError();
+
 
     /// <summary>
     /// Gets the dialect.
@@ -864,7 +876,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
     /// <value>
     /// The dialect.
     /// </value>
-    public ISqlDialect? Dialect => dialect;
+    public ISqlDialect Dialect => dialect ?? throw PropertyReadError();
 
     /// <summary>
     /// Gets or sets the generation key.
@@ -1025,9 +1037,9 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
     /// </summary>
     /// <param name="fieldName">Name of the field.</param>
     /// <returns></returns>
-    public Field? FindField(string fieldName)
+    public Field? FindField(string? fieldName)
     {
-        if (byName.TryGetValue(fieldName, out Field? field))
+        if (fieldName != null && byName.TryGetValue(fieldName, out Field? field))
             return field;
         else
             return null;
@@ -1040,6 +1052,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
         if (calledRowCreated)
             return;
 
+#pragma warning disable CA2208 // Instantiate argument exceptions correctly
         if (row is IIdRow && idField is null)
             throw new ArgumentOutOfRangeException(nameof(IdField),
                 $"Row type {GetType().FullName} has IIdRow interface but does not have a field with [IdProperty] attribute!");
@@ -1047,6 +1060,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
         if (row is INameRow && nameField is null)
             throw new ArgumentOutOfRangeException(nameof(IdField),
                 $"Row type {GetType().FullName} has INameRow interface but does not have a field with [NameProperty] attribute!");
+#pragma warning restore CA2208 // Instantiate argument exceptions correctly
 
         var readPerm = rowType!.GetCustomAttribute<FieldReadPermissionAttribute>();
         if (readPerm != null && readPerm.Permission != null && !readPerm.ApplyToLookups)
@@ -1074,9 +1088,9 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
     /// </summary>
     /// <param name="propertyName">Name of the property.</param>
     /// <returns></returns>
-    public Field? FindFieldByPropertyName(string propertyName)
+    public Field? FindFieldByPropertyName(string? propertyName)
     {
-        if (byPropertyName.TryGetValue(propertyName, out Field? field))
+        if (propertyName != null && byPropertyName.TryGetValue(propertyName, out Field? field))
             return field;
         else
             return null;

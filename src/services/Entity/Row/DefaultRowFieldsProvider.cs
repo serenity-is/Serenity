@@ -67,7 +67,7 @@ public class DefaultRowFieldsProvider(IServiceProvider serviceProvider) : IRowFi
                 .GetAnnotatedType();
         }
 
-        var dialect = connectionStrings?.TryGetConnectionString(fields.ConnectionKey!)?
+        var dialect = connectionStrings?.TryGetConnectionString(fields.ConnectionKey)?
             .Dialect ?? SqlSettings.DefaultDialect;
 
         fields.Initialize(annotations, dialect);

@@ -10,23 +10,17 @@ namespace Serenity.Services;
 /// <typeparam name="TRow">Entity type</typeparam>
 /// <typeparam name="TUndeleteRequest">Undelete request type</typeparam>
 /// <typeparam name="TUndeleteResponse">Undelete response type</typeparam>
-public abstract class UndeleteRequestHandlerBase<TRow, TUndeleteRequest, TUndeleteResponse> : IUndeleteRequestHandler
+/// <remarks>
+/// Initializes a new instance of the class.
+/// </remarks>
+/// <param name="context">Request context</param>
+/// <exception cref="ArgumentNullException"><paramref name="context"/> is <c>null</c>.</exception>
+public abstract class UndeleteRequestHandlerBase<TRow, TUndeleteRequest, TUndeleteResponse>(IRequestContext context) : IUndeleteRequestHandler
     where TRow : class, IRow, IIdRow, new()
     where TUndeleteRequest : UndeleteRequest
     where TUndeleteResponse : UndeleteResponse, new()
 {
     private IUnitOfWork? unitOfWork;
-
-    /// <summary>
-    /// Initializes a new instance of the class.
-    /// </summary>
-    /// <param name="context">Request context</param>
-    /// <exception cref="ArgumentNullException"><paramref name="context"/> is <c>null</c>.</exception>
-    protected UndeleteRequestHandlerBase(IRequestContext context)
-    {
-        Context = context ?? throw new ArgumentNullException(nameof(context));
-        StateBag = new Dictionary<string, object?>();
-    }
 
     /// <summary>
     /// Gets the list of undelete behaviors.
@@ -74,7 +68,7 @@ public abstract class UndeleteRequestHandlerBase<TRow, TUndeleteRequest, TUndele
             typeof(TRow).GetCustomAttribute<ReadPermissionAttribute>(true);
 
         if (attr != null)
-            Permissions!.ValidatePermission(attr.Permission ?? "?", Localizer);
+            Permissions.ValidatePermission(attr.Permission ?? "?", Localizer);
     }
 
     /// <summary>
@@ -90,7 +84,7 @@ public abstract class UndeleteRequestHandlerBase<TRow, TUndeleteRequest, TUndele
     /// <summary>
     /// Gets the two level cache from the request context.
     /// </summary>
-    public ITwoLevelCache Cache => Context?.Cache;
+    public ITwoLevelCache? Cache => Context?.Cache;
 
     private InvalidOperationException PropertyReadError([CallerMemberName] string? property = default)
     {
@@ -100,27 +94,27 @@ public abstract class UndeleteRequestHandlerBase<TRow, TUndeleteRequest, TUndele
     /// <summary>
     /// Gets the request context.
     /// </summary>
-    public IRequestContext Context { get; }
+    public IRequestContext Context { get; } = context ?? throw new ArgumentNullException(nameof(context));
 
     /// <summary>
     /// Gets the localizer from the request context.
     /// </summary>
-    public ITextLocalizer Localizer => Context?.Localizer;
+    public ITextLocalizer Localizer => Context.Localizer;
 
     /// <summary>
     /// Gets the permission service from the request context.
     /// </summary>
-    public IPermissionService Permissions => Context?.Permissions;
+    public IPermissionService Permissions => Context.Permissions;
 
     /// <summary>
     /// Gets the current user from the request context.
     /// </summary>
-    public ClaimsPrincipal? User => Context?.User;
+    public ClaimsPrincipal? User => Context.User;
 
     /// <summary>
     /// Gets the current connection.
     /// </summary>
-    public IDbConnection Connection => UnitOfWork.Connection;
+    public IDbConnection Connection => unitOfWork?.Connection ?? throw PropertyReadError();
 
     /// <summary>
     /// Gets the current unit of work.
@@ -146,9 +140,9 @@ public abstract class UndeleteRequestHandlerBase<TRow, TUndeleteRequest, TUndele
     /// A state bag for behaviors to preserve state among their methods.
     /// It will be cleared before each request, e.g. Process call.
     /// </summary>
-    public IDictionary<string, object?> StateBag { get; }
+    public IDictionary<string, object?> StateBag { get; } = new Dictionary<string, object?>();
 
-    IRow? IUndeleteRequestHandler.Row => Row;
+    IRow IUndeleteRequestHandler.Row => Row;
     UndeleteRequest IUndeleteRequestHandler.Request => Request;
     UndeleteResponse IUndeleteRequestHandler.Response => Response;
 }

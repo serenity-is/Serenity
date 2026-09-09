@@ -55,7 +55,7 @@ public static class ServiceHelper
         response.Skip = query.Skip();
         response.Take = query.Take();
         if (response.Take == 0)
-            response.TotalCount = response.Entities!.Count + response.Skip;
+            response.TotalCount = response.Entities.Count + response.Skip;
     }
 
     /// <summary>
@@ -78,7 +78,7 @@ public static class ServiceHelper
 
         if (indexFields == null ||
             indexFields.Length == 0)
-            throw new ArgumentNullException("indexField");
+            throw new ArgumentNullException(nameof(indexFields));
 
         if (indexName != null &&
             !exception.Message.Contains(indexName))
@@ -99,17 +99,17 @@ public static class ServiceHelper
         }
 
         var row = newRow.CreateNew();
-        var idField = newRow.IdField;
+        var idField = newRow.GetIdField();
 
         var query = new SqlQuery()
             .Dialect(connection.GetDialect())
-            .From(row).Select(idField!);
+            .From(row).Select(idField);
         foreach (var field in indexFields)
             query.WhereEqual(field, field.AsSqlValue(newRow));
 
         if (!query.GetFirst(connection))
             return false;
 
-        return idField!.IndexCompare(row, newRow) != 0;
+        return idField.IndexCompare(row, newRow) != 0;
     }
 }

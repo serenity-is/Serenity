@@ -20,7 +20,7 @@ public class HtmlReportRenderUrl : IDisposable
     /// <summary>
     /// The generated URL for main page
     /// </summary>
-    public string Url { get; set; }
+    public string? Url { get; set; }
 
     /// <summary>
     /// The generated URL for footer content

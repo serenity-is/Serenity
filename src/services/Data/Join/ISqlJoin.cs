@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data.Mapping;
+namespace Serenity.Data.Mapping;
 
 /// <summary>
 /// Interface for SQL join types.
@@ -19,7 +19,7 @@ public interface ISqlJoin
     /// <value>
     /// The table joined to.
     /// </value>
-    string ToTable { get; }
+    string? ToTable { get; }
 
     /// <summary>
     /// Gets the ON criteria.
@@ -27,7 +27,7 @@ public interface ISqlJoin
     /// <value>
     /// The ON criteria.
     /// </value>
-    string OnCriteria { get; }
+    string? OnCriteria { get; }
 
     /// <summary>
     /// Gets the property prefix.
@@ -35,7 +35,7 @@ public interface ISqlJoin
     /// <value>
     /// The property prefix.
     /// </value>
-    string PropertyPrefix { get; }
+    string? PropertyPrefix { get; }
 
     /// <summary>
     /// Gets or sets the title prefix.
@@ -43,7 +43,7 @@ public interface ISqlJoin
     /// <value>
     /// The title prefix.
     /// </value>
-    string TitlePrefix { get; set; }
+    string? TitlePrefix { get; set; }
 
     /// <summary>
     /// Gets or sets the type of the row.
@@ -51,10 +51,10 @@ public interface ISqlJoin
     /// <value>
     /// The type of the row.
     /// </value>
-    Type RowType { get; set; }
+    Type? RowType { get; set; }
 
     /// <summary>
     /// Gets the dialect.
     /// </summary>
-    public string Dialect { get; }
+    public string? Dialect { get; }
 }

@@ -240,7 +240,7 @@ public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressio
         if (string.IsNullOrEmpty(expression))
             return this;
 
-        var referencedJoins = JoinAliasLocator.LocateOptimized(expression, out string referencedJoin);
+        var referencedJoins = JoinAliasLocator.LocateOptimized(expression, out string? referencedJoin);
 
         if (referencedJoin != null)
             EnsureJoin(referencedJoin);

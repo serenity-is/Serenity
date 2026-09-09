@@ -44,7 +44,7 @@ public sealed class LinkingSetRelationAttribute(Type rowType, string thisKey, st
     /// <value>
     /// The filter field.
     /// </value>
-    public string FilterField { get; set; }
+    public string? FilterField { get; set; }
 
     /// <summary>
     /// Gets or sets the filter value.
@@ -52,7 +52,7 @@ public sealed class LinkingSetRelationAttribute(Type rowType, string thisKey, st
     /// <value>
     /// The filter value.
     /// </value>
-    public object FilterValue { get; set; }
+    public object? FilterValue { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether to preserve existing order of records on save.

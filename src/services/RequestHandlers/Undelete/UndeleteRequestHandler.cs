@@ -26,8 +26,8 @@ public class UndeleteRequestHandler<TRow, TUndeleteRequest, TUndeleteResponse> :
     public UndeleteRequestHandler(IRequestContext context) : base(context)
     {
         behaviors = new Lazy<IUndeleteBehaviorSync[]>(() =>
-            BehaviorProviderExtensions.AutoWrapBehaviors<IUndeleteBehavior, IUndeleteBehaviorAsync, IUndeleteBehaviorSync>(
-                GetBehaviors(), behavior => new AsyncToSyncUndeleteBehaviorWrapper(behavior)).ToArray());
+            [.. BehaviorProviderExtensions.AutoWrapBehaviors<IUndeleteBehavior, IUndeleteBehaviorAsync, IUndeleteBehaviorSync>(
+                GetBehaviors(), behavior => new AsyncToSyncUndeleteBehaviorWrapper(behavior))]);
     }
 
     /// <summary>
@@ -48,7 +48,7 @@ public class UndeleteRequestHandler<TRow, TUndeleteRequest, TUndeleteResponse> :
         {
             var filter = GetDisplayOrderFilter();
             DisplayOrderHelper.ReorderValues(Connection!, displayOrderRow, filter,
-                Row.IdField!.AsObject(Row), displayOrderRow.DisplayOrderField[Row]!.Value, false);
+                Row.GetIdField().AsObject(Row), displayOrderRow.DisplayOrderField[Row]!.Value, false);
         }
 
         foreach (var behavior in behaviors.Value)
@@ -81,8 +81,8 @@ public class UndeleteRequestHandler<TRow, TUndeleteRequest, TUndeleteResponse> :
     /// </summary>
     protected virtual void LoadEntity()
     {
-        var idField = Row.IdField;
-        var id = idField!.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture);
+        var idField = Row.GetIdField();
+        var id = idField.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture);
 
         var query = new SqlQuery()
             .Dialect(Connection.GetDialect())
@@ -122,8 +122,8 @@ public class UndeleteRequestHandler<TRow, TUndeleteRequest, TUndeleteResponse> :
     /// </summary>
     protected virtual void ExecuteUndelete()
     {
-        var idField = Row.IdField;
-        var id = idField!.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture);
+        var idField = Row.GetIdField();
+        var id = idField.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture);
 
         var isActiveDeletedRow = Row as IIsActiveDeletedRow;
         var isDeletedRow = Row as IIsDeletedRow;

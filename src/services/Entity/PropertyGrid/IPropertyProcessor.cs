@@ -37,7 +37,7 @@ public interface IPropertyProcessor
     /// <value>
     /// The type.
     /// </value>
-    Type Type { get; set; }
+    Type? Type { get; set; }
 
     /// <summary>
     /// Gets or sets the based on row.

@@ -71,7 +71,7 @@ public class DefaultUploadProcessor(IImageProcessor imageProcessor, IUploadStora
                 uploadValidator.ValidateFile(options as IUploadFileConstraints ?? new UploadOptions(),
                     stream, filename, out bool isImageExtension);
 
-                object image = null;
+                object? image = null;
                 if (isImageExtension)
                     uploadValidator.ValidateImage(options as IUploadImageConstraints ?? new UploadOptions(),
                         stream, filename, out image);
@@ -96,7 +96,7 @@ public class DefaultUploadProcessor(IImageProcessor imageProcessor, IUploadStora
                     if (result.IsImage)
                     {
                         stream.Close();
-                        result.TemporaryFile = ProcessImage(image, options as IUploadImageOptions ?? new UploadOptions(), result.TemporaryFile);
+                        result.TemporaryFile = ProcessImage(image!, options as IUploadImageOptions ?? new UploadOptions(), result.TemporaryFile);
                     }
                     success = true;
                 }
@@ -148,7 +148,7 @@ public class DefaultUploadProcessor(IImageProcessor imageProcessor, IUploadStora
     /// <param name="imageFile">Main image file</param>
     /// <returns>The resulting image file path</returns>
     /// <exception cref="ArgumentNullException">image or options is null</exception>
-    protected virtual ScaleImageAsResult ScaleMainImage(object image, IUploadImageOptions options, string imageFile)
+    protected virtual ScaleImageAsResult? ScaleMainImage(object image, IUploadImageOptions options, string imageFile)
     {
         ArgumentNullException.ThrowIfNull(image);
         ArgumentNullException.ThrowIfNull(options);
@@ -157,7 +157,7 @@ public class DefaultUploadProcessor(IImageProcessor imageProcessor, IUploadStora
         var (imageWidth, imageHeight) = imageProcessor.GetImageSize(image);
         var scaleSmaller = options.ScaleSmaller == true;
 
-        ScaleImageAsResult result = null;
+        ScaleImageAsResult? result = null;
         if ((options.ScaleWidth > 0 || options.ScaleHeight > 0) &&
             (options.ScaleWidth != imageWidth || options.ScaleHeight != imageHeight) &&
             ((options.ScaleWidth > 0 && (scaleSmaller || options.ScaleWidth < imageWidth)) ||
@@ -192,7 +192,7 @@ public class DefaultUploadProcessor(IImageProcessor imageProcessor, IUploadStora
     /// <param name="options">Upload image options</param>
     /// <param name="imageFile">Main image file</param>
     /// <exception cref="ArgumentNullException">image, options or temporaryFile is null</exception>
-    public virtual ScaleImageAsResult CreateDefaultThumb(object image, IUploadImageOptions options, string imageFile)
+    public virtual ScaleImageAsResult? CreateDefaultThumb(object image, IUploadImageOptions options, string imageFile)
     {
         ArgumentNullException.ThrowIfNull(image);
         ArgumentNullException.ThrowIfNull(options);
@@ -250,7 +250,7 @@ public class DefaultUploadProcessor(IImageProcessor imageProcessor, IUploadStora
                 w < 0 ||
                 h < 0 ||
                 (w == 0 && h == 0))
-                throw new ArgumentOutOfRangeException(nameof(thumbSizes));
+                throw ArgumentExceptions.OutOfRange(options.ThumbSizes);
 
             var thumbFile = UploadPathHelper.GetThumbnailName(imageFile, w, h);
 
@@ -276,7 +276,7 @@ public class DefaultUploadProcessor(IImageProcessor imageProcessor, IUploadStora
     /// and not a thumbnail.</param>
     /// <exception cref="ArgumentNullException">One of inputs is null</exception>
     protected virtual ScaleImageAsResult ScaleImageAs(object image, int width, int height,
-        ImageScaleMode mode, string backgroundColor, ImageEncoderParams encoderParams, string targetFile, string primaryFile)
+        ImageScaleMode mode, string? backgroundColor, ImageEncoderParams encoderParams, string targetFile, string? primaryFile)
     {
         var scaledImage = imageProcessor.Scale(image, width, height, mode, backgroundColor, inplace: false);
         try
@@ -316,7 +316,7 @@ public class DefaultUploadProcessor(IImageProcessor imageProcessor, IUploadStora
         /// <summary>
         /// Resulting filename
         /// </summary>
-        public string Filename { get; set; }
+        public required string Filename { get; set; }
 
         /// <summary>
         /// Resulting image height

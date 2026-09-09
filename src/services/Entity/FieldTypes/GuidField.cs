@@ -122,8 +122,8 @@ public sealed class GuidField(ICollection<Field> collection, string name, LocalT
             return new Guid(str);
         }
 
-        if (source is byte[])
-            return new Guid(source as byte[]);
+        if (source is byte[] byteArray)
+            return new Guid(byteArray);
 
         return Convert.ChangeType(source, typeof(Guid), provider);
     }

@@ -80,8 +80,8 @@ public class DeleteRequestHandler<TRow, TDeleteRequest, TDeleteResponse> :
     /// </summary>
     protected virtual void LoadEntity()
     {
-        var idField = Row.IdField;
-        var id = idField!.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture);
+        var idField = Row.GetIdField();
+        var id = idField.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture);
 
         var query = new SqlQuery()
             .Dialect(Connection.GetDialect())
@@ -124,8 +124,8 @@ public class DeleteRequestHandler<TRow, TDeleteRequest, TDeleteResponse> :
         var isActiveDeletedRow = Row as IIsActiveDeletedRow;
         var isDeletedRow = Row as IIsDeletedRow;
         var deleteLogRow = Row as IDeleteLogRow;
-        var idField = Row.IdField;
-        var id = idField!.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture);
+        var idField = Row.GetIdField();
+        var id = idField.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture);
 
         if (isActiveDeletedRow == null && isDeletedRow == null && deleteLogRow == null)
         {

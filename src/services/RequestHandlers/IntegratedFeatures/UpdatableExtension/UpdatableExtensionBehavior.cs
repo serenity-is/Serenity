@@ -40,7 +40,7 @@ public class UpdatableExtensionBehavior(IDefaultHandlerFactory handlerFactory) :
         var sourceByExpression = row.GetFields().ToLookup(x =>
             BracketLocator.ReplaceBrackets(x.Expression.TrimToEmpty(), BracketRemoverDialect.Instance));
 
-        infoList = attrs.Select(attr =>
+        infoList = [.. attrs.Select(attr =>
         {
             var info = new RelationInfo
             {
@@ -72,14 +72,12 @@ public class UpdatableExtensionBehavior(IDefaultHandlerFactory handlerFactory) :
                             row.GetType().FullName));
                 }
 
-                info.ThisKeyField = row.IdField;
+                info.ThisKeyField = row.GetIdField();
             }
             else
             {
-                info.ThisKeyField = row.FindFieldByPropertyName(attr.ThisKey!) ?? 
-                    row.FindField(attr.ThisKey!);
-                if (info.ThisKeyField is null)
-                    throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
+                info.ThisKeyField = (row.FindFieldByPropertyName(attr.ThisKey!) ??
+                    row.FindField(attr.ThisKey!)) ?? throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
                         "This field is specified for an ExtensionRelation attribute",
                         attr.ThisKey,
                         row.GetType().FullName));
@@ -93,48 +91,37 @@ public class UpdatableExtensionBehavior(IDefaultHandlerFactory handlerFactory) :
                 info.OtherKeyField = ext.FindField(info.ThisKeyField!.Name);
 
                 if (info.OtherKeyField is null && ext is IIdRow)
-                    info.OtherKeyField = row.IdField;
+                    info.OtherKeyField = row.GetIdField();
 
                 if (info.OtherKeyField is null)
                     throw new ArgumentException(string.Format(
-                        "Row type '{1}' has an ExtensionRelation attribute " +
+                        "Row type '{0}' has an ExtensionRelation attribute " +
                         "but its OtherKey is not specified!",
                             row.GetType().FullName));
             }
             else
             {
-                info.OtherKeyField = ext.FindFieldByPropertyName(attr.OtherKey!) ?? ext.FindField(attr.OtherKey!);
-                if (info.OtherKeyField is null)
-                    throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
+                info.OtherKeyField = (ext.FindFieldByPropertyName(attr.OtherKey!) ?? ext.FindField(attr.OtherKey!)) ?? throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
                         "This field is specified for an ExtensionRelation attribute on '{2}'",
                         attr.OtherKey,
                         ext.GetType().FullName,
-                        row.GetType().FullName));
-            }
+                        row.GetType().FullName)); }
 
             if (!string.IsNullOrEmpty(attr.FilterField))
             {
-                info.FilterField = ext.FindFieldByPropertyName(attr.FilterField) ?? ext.FindField(attr.FilterField);
-                if (info.FilterField is null)
-                    throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
+                info.FilterField = (ext.FindFieldByPropertyName(attr.FilterField) ?? ext.FindField(attr.FilterField)) ?? throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
                         "This field is specified as FilterField for an ExtensionRelation attribute on '{2}'",
                         attr.OtherKey,
                         ext.GetType().FullName,
-                        row.GetType().FullName));
-
-                info.FilterValue = info.FilterField.ConvertValue(attr.FilterValue, CultureInfo.InvariantCulture);
+                        row.GetType().FullName)); info.FilterValue = info.FilterField.ConvertValue(attr.FilterValue, CultureInfo.InvariantCulture);
             }
 
             if (!string.IsNullOrEmpty(attr.PresenceField))
             {
-                info.PresenceField = row.FindFieldByPropertyName(attr.PresenceField) ?? row.FindField(attr.PresenceField);
-                if (info.PresenceField is null)
-                    throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
+                info.PresenceField = (row.FindFieldByPropertyName(attr.PresenceField) ?? row.FindField(attr.PresenceField)) ?? throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
                         "This field is specified as PresenceField as an ExtensionRelation attribute.",
                         attr.PresenceField,
-                        row.GetType().FullName));
-
-                info.PresenceValue = attr.PresenceValue;
+                        row.GetType().FullName)); info.PresenceValue = attr.PresenceValue;
             }
 
             var extFields = ext.GetFields();
@@ -213,7 +200,7 @@ public class UpdatableExtensionBehavior(IDefaultHandlerFactory handlerFactory) :
                         ext.GetType().FullName));
 
             return info;
-        }).ToList();
+        })];
 
         return true;
     }
@@ -225,7 +212,7 @@ public class UpdatableExtensionBehavior(IDefaultHandlerFactory handlerFactory) :
         {
             var mappings = info.Mappings!.Where(x => handler.Row.IsAssigned(x.Item1)).ToList();
 
-            if (!mappings.Any())
+            if (mappings.Count == 0)
                 continue;
 
             handler.StateBag["UpdatableExtensionBehavior_Assignments_" + info.Attr!.Alias] = mappings;
@@ -241,7 +228,7 @@ public class UpdatableExtensionBehavior(IDefaultHandlerFactory handlerFactory) :
         {
             var mappings = info.Mappings!.Where(x => handler.Row.IsAssigned(x.Item1)).ToList();
 
-            if (!mappings.Any())
+            if (mappings.Count == 0)
                 continue;
 
             handler.StateBag["UpdatableExtensionBehavior_Assignments_" + info.Attr!.Alias] = mappings;
@@ -299,7 +286,7 @@ public class UpdatableExtensionBehavior(IDefaultHandlerFactory handlerFactory) :
         if (existing.Count == 0)
             return null;
 
-        return ((IRow)existing[0]!).IdField!.AsObject((IRow)existing[0]!);
+        return ((IRow)existing[0]!).GetIdField().AsObject((IRow)existing[0]!);
     }
 
     private static bool CheckPresenceValue(RelationInfo info, IRow row)
@@ -357,7 +344,7 @@ public class UpdatableExtensionBehavior(IDefaultHandlerFactory handlerFactory) :
         var extension = info.RowFactory!();
 
         if (oldID != null)
-            ((IIdRow)extension).IdField!.AsInvariant(extension, oldID);
+            ((IIdRow)extension).GetIdField().AsInvariant(extension, oldID);
 
         info.OtherKeyField!.AsInvariant(extension, thisKey);
         info.FilterField?.AsInvariant(extension, info.FilterValue);
@@ -410,7 +397,7 @@ public class UpdatableExtensionBehavior(IDefaultHandlerFactory handlerFactory) :
         var extension = info.RowFactory!();
 
         if (oldID != null)
-            ((IIdRow)extension).IdField!.AsInvariant(extension, oldID);
+            ((IIdRow)extension).GetIdField().AsInvariant(extension, oldID);
 
         info.OtherKeyField!.AsInvariant(extension, thisKey);
         info.FilterField?.AsInvariant(extension, info.FilterValue);

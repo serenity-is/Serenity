@@ -14,6 +14,7 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
     ISaveBehaviorSync, IDeleteBehaviorSync, IRetrieveBehaviorSync, IRetrieveBehaviorAsync, IImplicitBehavior
 {
     private readonly IDefaultHandlerFactory handlerFactory = handlerFactory ?? throw new ArgumentNullException(nameof(handlerFactory));
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
     private LocalizationRowAttribute attr;
     private int rowPrefixLength;
     private Func<IIdRow> rowFactory;
@@ -26,13 +27,15 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
     private ILocalizationRow localRowInstance;
     private BaseCriteria foreignKeyCriteria;
     private Func<IDictionary> dictionaryFactory;
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 
     /// <inheritdoc/>
     public bool ActivateFor(IRow row)
     {
-        attr = row.GetType().GetCustomAttribute<LocalizationRowAttribute>();
-        if (attr == null)
+        if (row.GetType().GetCustomAttribute<LocalizationRowAttribute>() is not { } attr)
             return false;
+
+        this.attr = attr;
 
         localRowType = attr.LocalizationRow;
         if (!typeof(ILocalizationRow).IsAssignableFrom(localRowType))
@@ -60,8 +63,8 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
         }
 
         var rowType = row.GetType();
-        rowFactory = () => (IIdRow)Activator.CreateInstance(rowType);
-        localRowFactory = () => (ILocalizationRow)Activator.CreateInstance(localRowType);
+        rowFactory = () => (IIdRow)Activator.CreateInstance(rowType)!;
+        localRowFactory = () => (ILocalizationRow)Activator.CreateInstance(localRowType)!;
 
         var localRow = localRowFactory();
         localRowInstance = localRow;
@@ -70,29 +73,23 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
             x => x.Name);
         localRowPrefixLength = PrefixHelper.DeterminePrefixLength(localRow.EnumerateTableFields(),
             x => x.Name);
-        localRowIdField = localRow.IdField;
+        localRowIdField = localRow.GetIdField();
         cultureIdField = localRow.CultureIdField;
 
-        var foreignKeyFieldName = attr.MappedIdField ?? row.IdField.PropertyName;
+        var foreignKeyFieldName = attr.MappedIdField ?? row.GetIdField().PropertyName;
         foreignKeyField = localRow.FindFieldByPropertyName(foreignKeyFieldName) ??
-            localRow.FindField(foreignKeyFieldName);
-
-        if (foreignKeyField is null)
-        {
-            throw new ArgumentException(string.Format(
+            localRow.FindField(foreignKeyFieldName) ?? throw new ArgumentException(string.Format(
                 "Row type '{0}' has a LocalizationRowAttribute, " +
                 "but its localization row type ('{1}') doesn't have a field with name '{2}'!",
                     row.GetType().FullName, localRowType.FullName, foreignKeyFieldName));
-        }
-
         var dictionaryType = typeof(Dictionary<,>).MakeGenericType(typeof(string), row.GetType());
-        dictionaryFactory = () => (IDictionary)Activator.CreateInstance(dictionaryType);
+        dictionaryFactory = () => (IDictionary)Activator.CreateInstance(dictionaryType)!;
 
         foreignKeyCriteria = new Criteria(foreignKeyField.PropertyName ?? foreignKeyField.Name);
         return true;
     }
 
-    private Field GetLocalizationMatch(Field field)
+    private Field? GetLocalizationMatch(Field field)
     {
         return GetLocalizationMatch(field, localRowInstance, localRowPrefixLength, rowPrefixLength);
     }
@@ -104,7 +101,7 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
     /// <param name="localRowInstance">Local row instance</param>
     /// <param name="localRowPrefixLength">Local row field name prefix length</param>
     /// <param name="rowPrefixLength">Row field name prefix length</param>
-    public static Field GetLocalizationMatch(Field field, ILocalizationRow localRowInstance,
+    public static Field? GetLocalizationMatch(Field field, ILocalizationRow localRowInstance,
         int localRowPrefixLength = 0, int rowPrefixLength = 0)
     {
         if (!field.IsTableField())
@@ -121,7 +118,7 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
             searchName = searchName[rowPrefixLength..];
 
         if (localRowPrefixLength > 0)
-            searchName = localRowInstance.IdField.Name[..localRowPrefixLength] + searchName;
+            searchName = localRowInstance.GetIdField().Name[..localRowPrefixLength] + searchName;
 
         var match = localRowInstance.FindField(searchName);
         if (match is null && field.PropertyName != null)
@@ -167,8 +164,11 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
         return match;
     }
 
-    private object GetOldLocalizationRowId(IDbConnection connection, object recordId, string cultureId)
+    private object? GetOldLocalizationRowId(IDbConnection connection, object? recordId, string? cultureId)
     {
+        if (recordId is null || cultureId is null)
+            return null;
+
         var row = localRowInstance.CreateNew();
         if (BuildOldLocalizationRowQuery(row, recordId, cultureId)
                 .GetFirst(connection))
@@ -177,9 +177,12 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
         return null;
     }
 
-    private async Task<object> GetOldLocalizationRowIdAsync(IDbConnection connection, object recordId, string cultureId,
+    private async Task<object?> GetOldLocalizationRowIdAsync(IDbConnection connection, object? recordId, string? cultureId,
         CancellationToken cancellationToken = default)
     {
+        if (recordId is null || cultureId is null)
+            return null;
+
         var row = localRowInstance.CreateNew();
         if (await BuildOldLocalizationRowQuery(row, recordId, cultureId)
                 .GetFirstAsync(connection, cancellationToken).ConfigureAwait(false))
@@ -205,7 +208,7 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
             !handler.Request.IncludeColumns.Contains("Localizations"))
             return;
 
-        var localIdField = handler.Row.IdField;
+        var localIdField = handler.Row.GetIdField();
 
         var listHandler = handlerFactory.CreateHandler<IListRequestProcessor>(localRowType);
         var listRequest = listHandler.CreateRequest();
@@ -228,7 +231,7 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
 
     private async Task OnReturnAsyncCore(IRetrieveRequestHandler handler, CancellationToken cancellationToken)
     {
-        var localIdField = handler.Row.IdField;
+        var localIdField = handler.Row.GetIdField();
 
         var listHandler = handlerFactory.CreateHandler<IListRequestProcessorAsync>(localRowType);
         var listRequest = listHandler.CreateRequest();
@@ -247,9 +250,9 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
     private void FillLocalizations(IRetrieveRequestHandler handler, IListResponse response)
     {
         var row = rowFactory();
-        var rowIdField = row.IdField;
+        var rowIdField = row.GetIdField();
         var fields = row.GetFields();
-        var matches = new Field[fields.Count];
+        var matches = new Field?[fields.Count];
         for (var i = 0; i < fields.Count; i++)
         {
             var field = fields[i];
@@ -284,12 +287,12 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
         handler.Response.Localizations = dictionary;
     }
 
-    private void SaveLocalRow(IUnitOfWork uow, ILocalizationRow localRow, object masterId, object localRowId)
+    private void SaveLocalRow(IUnitOfWork uow, ILocalizationRow localRow, object masterId, object? localRowId)
     {
         localRow = localRow.Clone();
 
         foreignKeyField.AsObject(localRow, masterId);
-        localRow.IdField.AsObject(localRow, localRowId);
+        localRow.GetIdField().AsObject(localRow, localRowId);
 
         var saveHandler = handlerFactory.CreateHandler<ISaveRequestProcessor>(localRowType);
         var saveRequest = saveHandler.CreateRequest();
@@ -297,13 +300,13 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
         saveHandler.Process(uow, saveRequest, localRowId == null ? SaveRequestType.Create : SaveRequestType.Update);
     }
 
-    private async Task SaveLocalRowAsync(IUnitOfWork uow, ILocalizationRow localRow, object masterId, object localRowId,
+    private async Task SaveLocalRowAsync(IUnitOfWork uow, ILocalizationRow localRow, object masterId, object? localRowId,
         CancellationToken cancellationToken = default)
     {
         localRow = localRow.Clone();
 
         foreignKeyField.AsObject(localRow, masterId);
-        localRow.IdField.AsObject(localRow, localRowId);
+        localRow.GetIdField().AsObject(localRow, localRowId);
 
         var saveHandler = handlerFactory.CreateHandler<ISaveRequestProcessorAsync>(localRowType);
         var saveRequest = saveHandler.CreateRequest();
@@ -320,7 +323,7 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
         deleteHandler.Process(uow, deleteRequest);
     }
 
-    private Task DeleteLocalRowAsync(IUnitOfWork uow, object detailId, CancellationToken cancellationToken = default)
+    private Task<DeleteResponse> DeleteLocalRowAsync(IUnitOfWork uow, object detailId, CancellationToken cancellationToken = default)
     {
         var deleteHandler = handlerFactory.CreateHandler<IDeleteRequestProcessorAsync>(localRowType);
         var deleteRequest = deleteHandler.CreateRequest();
@@ -335,7 +338,7 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
         if (localizations == null)
             return;
 
-        var idField = handler.Row.IdField;
+        var idField = handler.Row.GetIdField();
         var masterId = idField.AsObject(handler.Row);
 
         foreach (DictionaryEntry pair in localizations)
@@ -351,12 +354,12 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
 
             bool anyNonEmpty = false;
 
-            foreach (var field in row.GetFields())
+            foreach (var field in row!.GetFields())
             {
                 if (ReferenceEquals(field, idField))
                     continue;
 
-                if (!row.IsAssigned(field))
+                if (!row!.IsAssigned(field))
                     continue;
 
                 var match = GetLocalizationMatch(field) ?? throw new ValidationError("CantLocalize", field.Name, string.Format("{0} field is not localizable!",
@@ -372,7 +375,7 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
             }
 
             if (anyNonEmpty)
-                SaveLocalRow(handler.UnitOfWork, localRow, masterId, oldId);
+                SaveLocalRow(handler.UnitOfWork, localRow, masterId!, oldId);
             else if (oldId != null)
                 DeleteLocalRow(handler.UnitOfWork, oldId);
         }
@@ -385,7 +388,7 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
         if (localizations == null)
             return;
 
-        var idField = handler.Row.IdField;
+        var idField = handler.Row.GetIdField();
         var masterId = idField.AsObject(handler.Row);
 
         foreach (DictionaryEntry pair in localizations)
@@ -401,12 +404,12 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
 
             bool anyNonEmpty = false;
 
-            foreach (var field in row.GetFields())
+            foreach (var field in row!.GetFields())
             {
                 if (ReferenceEquals(field, idField))
                     continue;
 
-                if (!row.IsAssigned(field))
+                if (!row!.IsAssigned(field))
                     continue;
 
                 var match = GetLocalizationMatch(field) ?? throw new ValidationError("CantLocalize", field.Name, string.Format("{0} field is not localizable!",
@@ -422,7 +425,7 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
             }
 
             if (anyNonEmpty)
-                await SaveLocalRowAsync(handler.UnitOfWork, localRow, masterId, oldId, cancellationToken).ConfigureAwait(false);
+                await SaveLocalRowAsync(handler.UnitOfWork, localRow, masterId!, oldId, cancellationToken).ConfigureAwait(false);
             else if (oldId != null)
                 await DeleteLocalRowAsync(handler.UnitOfWork, oldId, cancellationToken).ConfigureAwait(false);
         }
@@ -454,7 +457,7 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
 
     private List<object> GetLocalRowIdList(IDeleteRequestHandler handler)
     {
-        var idField = handler.Row.IdField;
+        var idField = handler.Row.GetIdField();
         var localRow = localRowFactory();
 
         var deleteList = new List<object>();
@@ -466,7 +469,7 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
                     foreignKeyField == new ValueCriteria(idField.AsSqlValue(handler.Row)))
                 .ForEach(handler.Connection, () =>
                 {
-                    deleteList.Add(localRowIdField.AsObject(localRow));
+                    deleteList.Add(localRowIdField.AsObject(localRow)!);
                 });
 
         return deleteList;
@@ -475,7 +478,7 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
     private async Task<List<object>> GetLocalRowIdListAsync(IDeleteRequestHandler handler,
         CancellationToken cancellationToken = default)
     {
-        var idField = handler.Row.IdField;
+        var idField = handler.Row.GetIdField();
         var localRow = localRowFactory();
 
         var deleteList = new List<object>();
@@ -487,7 +490,7 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
                     foreignKeyField == new ValueCriteria(idField.AsSqlValue(handler.Row)))
                 .ForEachAsync(handler.Connection, () =>
                 {
-                    deleteList.Add(localRowIdField.AsObject(localRow));
+                    deleteList.Add(localRowIdField.AsObject(localRow)!);
                 }, cancellationToken).ConfigureAwait(false);
 
         return deleteList;

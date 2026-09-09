@@ -42,5 +42,5 @@ public class OriginAttribute : Attribute
     /// <value>
     /// The property.
     /// </value>
-    public string Property { get; set; }
+    public string? Property { get; set; }
 }

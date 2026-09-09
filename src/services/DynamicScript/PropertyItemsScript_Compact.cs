@@ -34,8 +34,8 @@ public abstract partial class PropertyItemsScript
         {
             var propertyInfos = typeof(PropertyItem).GetProperties(BindingFlags.Public | BindingFlags.Instance)
                 .Where(x => x.Name != nameof(PropertyItem.ExtensionData)).ToArray();
-            propertyNames = propertyInfos.Select(x => x.GetCustomAttribute<JsonPropertyNameAttribute>()?.Name ?? x.Name).ToArray();
-            propertyGetters = propertyInfos.Select(CreatePropertyGetter).ToArray();
+            propertyNames = [.. propertyInfos.Select(x => x.GetCustomAttribute<JsonPropertyNameAttribute>()?.Name ?? x.Name)];
+            propertyGetters = [.. propertyInfos.Select(CreatePropertyGetter)];
             PropertyNames = propertyNames;
             PropertyGetters = propertyGetters;
         }
@@ -73,7 +73,7 @@ public abstract partial class PropertyItemsScript
 
         string mapStr(string s)
         {
-            if (strMap.TryGetValue(s, out string v))
+            if (strMap.TryGetValue(s, out string? v))
                 return v;
             string key;
             do
@@ -115,7 +115,7 @@ public abstract partial class PropertyItemsScript
             sb.Append(':');
         }
 
-        void writeValue(object value)
+        void writeValue(object? value)
         {
             if (value is bool b)
             {
