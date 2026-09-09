@@ -72,9 +72,9 @@ export function canLoadScriptData(name: string) {
 /**
  * Synchronously retrieves a lookup by key.
  * Compat shim for `Q.getLookup`; delegates to `ScriptData.ensure('Lookup.' + key)`.
+ * **deprecated** Prefer `getLookupAsync` or direct `getScriptData` usage. Kept for legacy synchronous callers.
  * @param key - Lookup key (e.g., `"Administration.User"`).
  * @returns The {@link Lookup} instance for the key.
- * @deprecated Prefer `getLookupAsync` or direct `getScriptData` usage. Kept for legacy synchronous callers.
  */
 export function getLookup<TItem>(key: string): Lookup<TItem> {
     return ScriptData.ensure('Lookup.' + key);

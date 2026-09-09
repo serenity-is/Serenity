@@ -5889,9 +5889,9 @@ export declare function canLoadScriptData(name: string): boolean;
 /**
  * Synchronously retrieves a lookup by key.
  * Compat shim for `Q.getLookup`; delegates to `ScriptData.ensure('Lookup.' + key)`.
+ * **deprecated** Prefer `getLookupAsync` or direct `getScriptData` usage. Kept for legacy synchronous callers.
  * @param key - Lookup key (e.g., `"Administration.User"`).
  * @returns The {@link Lookup} instance for the key.
- * @deprecated Prefer `getLookupAsync` or direct `getScriptData` usage. Kept for legacy synchronous callers.
  */
 export declare function getLookup<TItem>(key: string): Lookup<TItem>;
 /**
@@ -14582,6 +14582,11 @@ export declare class MultipleFileUploadEditor<P extends MultipleFileUploadEditor
 	/** Sets whether the value is JSON-encoded.
 	 * @param value - True to JSON-encode the value. */
 	set jsonEncodeValue(value: boolean);
+	/**
+	 * Whether non-image files are allowed.
+	 * @returns True for multiple file editors.
+	 */
+	protected getDefaultAllowNonImage(): boolean;
 }
 /**
  * An editor that uploads and displays multiple images.
@@ -14594,6 +14599,11 @@ export declare class MultipleImageUploadEditor<P extends ImageUploadEditorOption
 	 * @param props - Widget props.
 	 */
 	constructor(props: EditorProps<P>);
+	/**
+	 * Whether non-image files are allowed.
+	 * @returns False for multiple image editors.
+	 */
+	protected getDefaultAllowNonImage(): boolean;
 }
 /**
  * An editor that renders a URL input and auto-prefixes missing schemes on blur.
