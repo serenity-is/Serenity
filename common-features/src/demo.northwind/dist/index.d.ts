@@ -13,7 +13,7 @@ export declare abstract class CategoryRow {
 	static readonly nameProperty = "CategoryName";
 	static readonly localTextPrefix = "Northwind.Category";
 	static readonly lookupKey = "Northwind.Category";
-	/** @deprecated use getLookupAsync instead */
+	/** **deprecated** use getLookupAsync instead */
 	static getLookup(): import("@serenity-is/corelib").Lookup<CategoryRow>;
 	static getLookupAsync(): Promise<import("@serenity-is/corelib").Lookup<CategoryRow>>;
 	static readonly deletePermission = "Northwind:General";
@@ -130,7 +130,7 @@ export declare abstract class CustomerRow {
 	static readonly nameProperty = "CompanyName";
 	static readonly localTextPrefix = "Northwind.Customer";
 	static readonly lookupKey = "Northwind.Customer";
-	/** @deprecated use getLookupAsync instead */
+	/** **deprecated** use getLookupAsync instead */
 	static getLookup(): import("@serenity-is/corelib").Lookup<CustomerRow>;
 	static getLookupAsync(): Promise<import("@serenity-is/corelib").Lookup<CustomerRow>>;
 	static readonly deletePermission = "Northwind:Customer:Delete";
@@ -327,7 +327,7 @@ export declare abstract class EmployeeRow {
 	static readonly nameProperty = "FullName";
 	static readonly localTextPrefix = "Northwind.Employee";
 	static readonly lookupKey = "Northwind.Employee";
-	/** @deprecated use getLookupAsync instead */
+	/** **deprecated** use getLookupAsync instead */
 	static getLookup(): import("@serenity-is/corelib").Lookup<EmployeeRow>;
 	static getLookupAsync(): Promise<import("@serenity-is/corelib").Lookup<EmployeeRow>>;
 	static readonly deletePermission = "Northwind:General";
@@ -572,7 +572,7 @@ export declare abstract class ProductRow {
 	static readonly nameProperty = "ProductName";
 	static readonly localTextPrefix = "Northwind.Product";
 	static readonly lookupKey = "Northwind.Product";
-	/** @deprecated use getLookupAsync instead */
+	/** **deprecated** use getLookupAsync instead */
 	static getLookup(): import("@serenity-is/corelib").Lookup<ProductRow>;
 	static getLookupAsync(): Promise<import("@serenity-is/corelib").Lookup<ProductRow>>;
 	static readonly deletePermission = "Northwind:General";
@@ -696,7 +696,7 @@ export declare abstract class RegionRow {
 	static readonly nameProperty = "RegionDescription";
 	static readonly localTextPrefix = "Northwind.Region";
 	static readonly lookupKey = "Northwind.Region";
-	/** @deprecated use getLookupAsync instead */
+	/** **deprecated** use getLookupAsync instead */
 	static getLookup(): import("@serenity-is/corelib").Lookup<RegionRow>;
 	static getLookupAsync(): Promise<import("@serenity-is/corelib").Lookup<RegionRow>>;
 	static readonly deletePermission = "Northwind:General";
@@ -778,7 +778,7 @@ export declare abstract class ShipperRow {
 	static readonly nameProperty = "CompanyName";
 	static readonly localTextPrefix = "Northwind.Shipper";
 	static readonly lookupKey = "Northwind.Shipper";
-	/** @deprecated use getLookupAsync instead */
+	/** **deprecated** use getLookupAsync instead */
 	static getLookup(): import("@serenity-is/corelib").Lookup<ShipperRow>;
 	static getLookupAsync(): Promise<import("@serenity-is/corelib").Lookup<ShipperRow>>;
 	static readonly deletePermission = "Northwind:General";
@@ -855,7 +855,7 @@ export declare abstract class SupplierRow {
 	static readonly nameProperty = "CompanyName";
 	static readonly localTextPrefix = "Northwind.Supplier";
 	static readonly lookupKey = "Northwind.Supplier";
-	/** @deprecated use getLookupAsync instead */
+	/** **deprecated** use getLookupAsync instead */
 	static getLookup(): import("@serenity-is/corelib").Lookup<SupplierRow>;
 	static getLookupAsync(): Promise<import("@serenity-is/corelib").Lookup<SupplierRow>>;
 	static readonly deletePermission = "Northwind:General";
@@ -922,7 +922,7 @@ export declare abstract class TerritoryRow {
 	static readonly nameProperty = "TerritoryID";
 	static readonly localTextPrefix = "Northwind.Territory";
 	static readonly lookupKey = "Northwind.Territory";
-	/** @deprecated use getLookupAsync instead */
+	/** **deprecated** use getLookupAsync instead */
 	static getLookup(): import("@serenity-is/corelib").Lookup<TerritoryRow>;
 	static getLookupAsync(): Promise<import("@serenity-is/corelib").Lookup<TerritoryRow>>;
 	static readonly deletePermission = "Northwind:General";
