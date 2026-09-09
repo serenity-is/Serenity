@@ -18,8 +18,8 @@ public class SqlCommandDumper
         var sbCommandText = new StringBuilder();
 
         bool initialized = false;
-        PropertyInfo sqlDbTypeProperty = null;
-        PropertyInfo sizeProperty = null;
+        PropertyInfo? sqlDbTypeProperty = null;
+        PropertyInfo? sizeProperty = null;
 
         // params
         foreach (IDbDataParameter parameter in sqc.Parameters)
@@ -117,7 +117,7 @@ public class SqlCommandDumper
     }
 
     private static void LogParameterToSqlBatch(IDbDataParameter param, StringBuilder sbCommandText,
-        PropertyInfo sqlDbTypeProperty, PropertyInfo sizeProperty)
+        PropertyInfo? sqlDbTypeProperty, PropertyInfo? sizeProperty)
     {
         sbCommandText.Append("DECLARE ");
         if (param.Direction == ParameterDirection.ReturnValue)
@@ -167,7 +167,7 @@ public class SqlCommandDumper
         }
     }
 
-    private static void LogQuotedParameterValue(object value, StringBuilder sbCommandText)
+    private static void LogQuotedParameterValue(object? value, StringBuilder sbCommandText)
     {
         try
         {
@@ -182,7 +182,7 @@ public class SqlCommandDumper
                     || value is char[])
                 {
                     sbCommandText.Append('\'');
-                    sbCommandText.Append(value.ToString().Replace("'", "''"));
+                    sbCommandText.Append(value.ToString()!.Replace("'", "''"));
                     sbCommandText.Append('\'');
                 }
                 else if (value is bool)

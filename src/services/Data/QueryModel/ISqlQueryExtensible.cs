@@ -23,9 +23,9 @@ public interface ISqlQueryExtensible
     /// Gets the first into row.
     /// </summary>
     /// <value>
-    /// The first into row.
+    /// The first into row, or <c>null</c> if none.
     /// </value>
-    object FirstIntoRow { get; }
+    object? FirstIntoRow { get; }
 
     /// <summary>
     /// Gets the columns.

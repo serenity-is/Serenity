@@ -10,9 +10,9 @@ namespace Serenity.Data;
 /// Initializes a new instance of the <see cref="ValueCriteria"/> class.
 /// </remarks>
 /// <param name="value">The value.</param>
-public class ValueCriteria(object value) : BaseCriteria
+public class ValueCriteria(object? value) : BaseCriteria
 {
-    private readonly object value = value;
+    private readonly object? value = value;
 
     /// <summary>
     /// Gets the value.
@@ -20,7 +20,7 @@ public class ValueCriteria(object value) : BaseCriteria
     /// <value>
     /// The value.
     /// </value>
-    public object Value => value;
+    public object? Value => value;
 
     /// <summary>
     /// Converts the criteria to string.
@@ -65,7 +65,7 @@ public class ValueCriteria(object value) : BaseCriteria
         }
     }
 
-    private static bool IsIntegerType(object k)
+    private static bool IsIntegerType(object? k)
     {
         if (k == null)
             return false;
@@ -84,7 +84,7 @@ public class ValueCriteria(object value) : BaseCriteria
                k is ulong;
     }
 
-    private static Parameter AddParam(IQueryWithParams query, object value)
+    private static Parameter AddParam(IQueryWithParams query, object? value)
     {
         var param = query.AutoParam();
         query.AddParam(param.Name, value);

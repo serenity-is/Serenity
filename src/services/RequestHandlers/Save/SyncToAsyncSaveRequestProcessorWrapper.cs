@@ -38,13 +38,13 @@ internal class SyncToAsyncSaveRequestProcessorWrapper<TRow>(ISaveRequestProcesso
         return ProcessAsync(uow, request, SaveRequestType.Update, cancellationToken);
     }
 
-    IRow ISaveRequestHandler.Old => handler.Old;
+    IRow? ISaveRequestHandler.Old => handler.Old;
     IRow ISaveRequestHandler.Row => handler.Row;
     bool ISaveRequestHandler.IsCreate => handler.IsCreate;
     bool ISaveRequestHandler.IsUpdate => handler.IsUpdate;
     ISaveRequest ISaveRequestHandler.Request => handler.Request;
     SaveResponse ISaveRequestHandler.Response => handler.Response;
-    IDictionary<string, object> ISaveRequestHandler.StateBag => handler.StateBag;
+    IDictionary<string, object?> ISaveRequestHandler.StateBag => handler.StateBag;
     IDbConnection ISaveRequestHandler.Connection => handler.Connection;
     IUnitOfWork ISaveRequestHandler.UnitOfWork => handler.UnitOfWork;
     IRequestContext ISaveRequestHandler.Context => handler.Context;

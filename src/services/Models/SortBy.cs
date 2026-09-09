@@ -19,7 +19,7 @@ public class SortBy
     /// Creates a SortBy object for the specified field name.
     /// </summary>
     /// <param name="field">The field name.</param>
-    public SortBy(string field)
+    public SortBy(string? field)
     {
         Field = field;
     }
@@ -30,7 +30,7 @@ public class SortBy
     /// </summary>
     /// <param name="field">The field name.</param>
     /// <param name="descending">Whether to sort in descending order.</param>
-    public SortBy(string field, bool descending)
+    public SortBy(string? field, bool descending)
     {
         Field = field;
         Descending = descending;
@@ -39,7 +39,7 @@ public class SortBy
     /// <summary>
     /// Gets/sets the field name
     /// </summary>
-    public string Field { get; set; }
+    public string? Field { get; set; }
 
     /// <summary>
     /// Gets/sets the descending flag

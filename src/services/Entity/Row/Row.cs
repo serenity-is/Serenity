@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Serenity.Data;
 
@@ -20,9 +21,9 @@ public abstract partial class Row<TFields> : IRow, IRow<TFields>
     /// </summary>
     protected readonly TFields fields;
     internal long assignedFieldsMask;
-    internal int[] assignedFieldsArray;
-    internal Hashtable dictionaryData;
-    internal object[] indexedData;
+    internal int[]? assignedFieldsArray;
+    internal Hashtable? dictionaryData;
+    internal object?[]? indexedData;
     internal bool trackAssignments;
     internal bool trackWithChecks;
 
@@ -234,7 +235,7 @@ public abstract partial class Row<TFields> : IRow, IRow<TFields>
     /// </summary>
     /// <param name="fieldName">Name of the field.</param>
     /// <returns>The field with the specified name, or <c>null</c> if not found.</returns>
-    public Field FindField(string fieldName)
+    public Field? FindField(string fieldName)
     {
         return fields.FindField(fieldName);
     }
@@ -244,7 +245,7 @@ public abstract partial class Row<TFields> : IRow, IRow<TFields>
     /// </summary>
     /// <param name="propertyName">Name of the property.</param>
     /// <returns>The field with the specified property name, or <c>null</c> if not found.</returns>
-    public Field FindFieldByPropertyName(string propertyName)
+    public Field? FindFieldByPropertyName(string propertyName)
     {
         return fields.FindFieldByPropertyName(propertyName);
     }
@@ -339,7 +340,7 @@ public abstract partial class Row<TFields> : IRow, IRow<TFields>
     /// </value>
     /// <param name="fieldName">Name of the field.</param>
     /// <returns></returns>
-    object IRow.this[string fieldName]
+    object? IRow.this[string fieldName]
     {
         get
         {
@@ -368,7 +369,7 @@ public abstract partial class Row<TFields> : IRow, IRow<TFields>
     /// </summary>
     /// <param name="key">The key.</param>
     /// <param name="value">The value.</param>
-    void IRow.SetDictionaryData(object key, object value)
+    void IRow.SetDictionaryData(object key, object? value)
     {
         if (value == null)
         {
@@ -400,7 +401,7 @@ public abstract partial class Row<TFields> : IRow, IRow<TFields>
     /// </summary>
     /// <param name="key">The key.</param>
     /// <returns></returns>
-    object IRow.GetDictionaryData(object key)
+    object? IRow.GetDictionaryData(object key)
     {
         if (dictionaryData != null)
             return dictionaryData[key];
@@ -408,7 +409,7 @@ public abstract partial class Row<TFields> : IRow, IRow<TFields>
         return null;
     }
 
-    object IRow.GetIndexedData(int index)
+    object? IRow.GetIndexedData(int index)
     {
         if (indexedData != null)
             return indexedData[index];
@@ -416,7 +417,7 @@ public abstract partial class Row<TFields> : IRow, IRow<TFields>
         return null;
     }
 
-    void IRow.SetIndexedData(int index, object value)
+    void IRow.SetIndexedData(int index, object? value)
     {
         if (value == null)
         {
@@ -489,7 +490,7 @@ public abstract partial class Row<TFields> : IRow, IRow<TFields>
     /// <value>
     /// The identifier field.
     /// </value>
-    Field IRow.IdField => fields.IdField;
+    Field? IRow.IdField => fields.IdField;
 
     /// <summary>
     /// Gets the name field.
@@ -497,5 +498,5 @@ public abstract partial class Row<TFields> : IRow, IRow<TFields>
     /// <value>
     /// The name field.
     /// </value>
-    Field IRow.NameField => fields.NameField;
+    Field? IRow.NameField => fields.NameField;
 }

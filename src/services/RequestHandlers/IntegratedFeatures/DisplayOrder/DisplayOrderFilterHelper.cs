@@ -1,4 +1,4 @@
-﻿namespace Serenity.Services;
+namespace Serenity.Services;
 
 /// <summary>
 /// Display order related helper methods
@@ -11,9 +11,9 @@ public class DisplayOrderFilterHelper
     /// <param name="row">Row class</param>
     public static BaseCriteria GetDisplayOrderFilterFor(IRow row)
     {
-        var flt = Criteria.Empty;
-        if (row as IParentIdRow != null)
-            flt &= new Criteria((row as IParentIdRow).ParentIdField) == Convert.ToInt64((row as IParentIdRow).ParentIdField.AsObject(row));
+        BaseCriteria flt = Criteria.Empty;
+        if (row is IParentIdRow parentRow)
+            flt &= new Criteria(parentRow.ParentIdField) == Convert.ToInt64(parentRow.ParentIdField.AsObject(row));
 
         if (row is IIsActiveRow activeRow)
             flt &= new Criteria(activeRow.IsActiveField) >= 0;

@@ -46,7 +46,7 @@ public class ForeignKeyAttribute : Attribute
     /// <param name="field">If field parameter is not specified, the row type must have a field with 
     /// [Identity] attribute or single property with [PrimaryKey] attribute.
     /// (implementing IIdRow won't help)</param>
-    public ForeignKeyAttribute(Type rowType, string field)
+    public ForeignKeyAttribute(Type rowType, string? field)
     {
         RowType = rowType ?? throw new ArgumentNullException(nameof(rowType));
 
@@ -76,7 +76,7 @@ public class ForeignKeyAttribute : Attribute
                         "but it has multiple [Identity] or [PrimaryKey] attributes",
                         rowType.FullName));
 
-                identityOrPrimaryKey = identity.ToArray();
+                identityOrPrimaryKey = [.. identity];
             }
 
             Field = identityOrPrimaryKey[0].GetCustomAttribute<ColumnAttribute>()?.Name ??
@@ -106,7 +106,7 @@ public class ForeignKeyAttribute : Attribute
     /// <value>
     /// The table.
     /// </value>
-    public string Table { get; private set; }
+    public string? Table { get; private set; }
 
     /// <summary>
     /// Gets the field.
@@ -122,7 +122,7 @@ public class ForeignKeyAttribute : Attribute
     /// <value>
     /// The type of the row.
     /// </value>
-    public Type RowType { get; private set; }
+    public Type? RowType { get; private set; }
 
     /// <summary>
     /// Gets or sets the dialect.
@@ -130,7 +130,7 @@ public class ForeignKeyAttribute : Attribute
     /// <value>
     /// The dialect.
     /// </value>
-    public string Dialect { get; set; }
+    public string? Dialect { get; set; }
 
     /// <summary>
     /// Gets or sets the negating of the dialect.
@@ -142,6 +142,6 @@ public class ForeignKeyAttribute : Attribute
     {
         get => Dialect != null && Dialect.StartsWith('!');
         set => Dialect = value ? (!NegateDialect ? ("!" + Dialect) : Dialect) :
-            (NegateDialect ? Dialect[1..] : Dialect);
+            (NegateDialect ? Dialect![1..] : Dialect);
     }
 }

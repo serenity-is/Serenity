@@ -2,25 +2,14 @@ namespace Serenity.Data;
 
 /// <summary>
 ///   Class to generate queries of form <c>DELETE FROM tablename WHERE [conditions]</c>.</summary>
-public sealed class SqlDelete : QueryWithParams, IFilterableQuery
+/// <remarks>
+///   Creates a new SqlDelete query.</remarks>
+/// <param name="tableName">
+///   Table to delete records from (required).</param>
+public sealed class SqlDelete(string tableName) : QueryWithParams, IFilterableQuery
 {
-    private string _tableName;
-    private StringBuilder _where;
-
-    private void Initialize(string tableName)
-    {
-        _tableName = tableName ?? throw new ArgumentNullException("tableName");
-        _where = new StringBuilder();
-    }
-
-    /// <summary>
-    ///   Creates a new SqlDelete query.</summary>
-    /// <param name="tableName">
-    ///   Table to delete records from (required).</param>
-    public SqlDelete(string tableName)
-    {
-        Initialize(tableName);
-    }
+    private readonly string _tableName = tableName ?? throw new ArgumentNullException(nameof(tableName));
+    private readonly StringBuilder _where = new();
 
     /// <summary>
     ///   Adds a new condition to the WHERE part of the query with an "AND" between.</summary>
@@ -32,7 +21,7 @@ public sealed class SqlDelete : QueryWithParams, IFilterableQuery
     public SqlDelete Where(string condition)
     {
         if (condition == null || condition.Length == 0)
-            throw new ArgumentNullException("condition");
+            throw new ArgumentNullException(nameof(condition));
 
         condition = SqlUpdate.RemoveT0Reference(condition);
 
@@ -65,7 +54,7 @@ public sealed class SqlDelete : QueryWithParams, IFilterableQuery
     public SqlDelete Where(params string[] conditions)
     {
         if (conditions == null || conditions.Length == 0)
-            throw new ArgumentNullException("conditions");
+            throw new ArgumentNullException(nameof(conditions));
 
         foreach (var condition in conditions)
             Where(condition);
@@ -92,7 +81,7 @@ public sealed class SqlDelete : QueryWithParams, IFilterableQuery
     /// <returns>
     ///   Formatted query.</returns>
     /// <exception cref="ArgumentNullException">tableName is null or empty.</exception>
-    public static string Format(string tableName, string where, ISqlDialect dialect = null)
+    public static string Format(string tableName, string where, ISqlDialect? dialect = null)
     {
         if (tableName == null || tableName.Length == 0)
             throw new ArgumentNullException(tableName);

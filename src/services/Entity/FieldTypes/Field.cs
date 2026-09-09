@@ -8,29 +8,29 @@ namespace Serenity.Data;
 /// <seealso cref="IFieldWithJoinInfo" />
 public abstract partial class Field : IFieldWithJoinInfo
 {
-    private string autoTextKey;
-    internal LocalText caption;
+    private string? autoTextKey;
+    internal LocalText? caption;
     internal string expression;
-    internal RowFieldsBase fields;
+    internal RowFieldsBase? fields;
     internal FieldFlags flags;
-    private string foreignTable;
-    private string foreignField;
+    private string? foreignTable;
+    private string? foreignField;
     internal int index;
-    internal Join join;
-    internal string joinAlias;
+    internal Join? join;
+    internal string? joinAlias;
     internal string name;
-    internal string origin;
-    internal string propertyName;
-    internal HashSet<string> referencedAliases;
+    internal string? origin;
+    internal string? propertyName;
+    internal HashSet<string>? referencedAliases;
     private readonly FieldType type;
-    internal object defaultValue;
+    internal object? defaultValue;
     internal SelectLevel minSelectLevel;
     internal int naturalOrder;
-    internal string textualField;
-    private Criteria criteria;
-    internal string readPermission;
-    internal string insertPermission;
-    internal string updatePermission;
+    internal string? textualField;
+    private Criteria? criteria;
+    internal string? readPermission;
+    internal string? insertPermission;
+    internal string? updatePermission;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Field"/> class.
@@ -41,7 +41,7 @@ public abstract partial class Field : IFieldWithJoinInfo
     /// <param name="caption">The caption.</param>
     /// <param name="size">The size.</param>
     /// <param name="flags">The flags.</param>
-    protected Field(ICollection<Field> fields, FieldType type, string name, LocalText caption, int size, FieldFlags flags)
+    protected Field(ICollection<Field>? fields, FieldType type, string name, LocalText? caption, int size, FieldFlags flags)
     {
         this.name = name;
         expression = "T0." + SqlSyntax.AutoBracket(name, (fields as RowFieldsBase)?.dialect);
@@ -62,7 +62,7 @@ public abstract partial class Field : IFieldWithJoinInfo
     /// <value>
     /// The fields.
     /// </value>
-    public RowFieldsBase Fields => fields;
+    public RowFieldsBase Fields => fields!;
 
     /// <summary>
     /// Gets the index.
@@ -95,7 +95,7 @@ public abstract partial class Field : IFieldWithJoinInfo
     /// <value>
     /// The caption.
     /// </value>
-    public LocalText Caption
+    public LocalText? Caption
     {
         get { return caption; }
         set { caption = value; }
@@ -107,7 +107,7 @@ public abstract partial class Field : IFieldWithJoinInfo
     /// <value>
     /// The default value.
     /// </value>
-    public object DefaultValue
+    public object? DefaultValue
     {
         get { return defaultValue; }
         set { defaultValue = value; }
@@ -119,7 +119,7 @@ public abstract partial class Field : IFieldWithJoinInfo
     /// <value>
     /// The referenced aliases.
     /// </value>
-    public HashSet<string> ReferencedAliases
+    public HashSet<string>? ReferencedAliases
     {
         get
         {
@@ -137,7 +137,7 @@ public abstract partial class Field : IFieldWithJoinInfo
     /// <value>
     /// The automatic text key.
     /// </value>
-    public string AutoTextKey => autoTextKey ??= "Db." + fields.LocalTextPrefix + "." + (propertyName ?? name);
+    public string AutoTextKey => autoTextKey ??= "Db." + fields!.LocalTextPrefix + "." + (propertyName ?? name);
 
     /// <summary>
     /// Gets the size.
@@ -173,7 +173,7 @@ public abstract partial class Field : IFieldWithJoinInfo
     /// <value>
     /// The name of the property.
     /// </value>
-    public string PropertyName
+    public string? PropertyName
     {
         get { return propertyName; }
         set { propertyName = value; }
@@ -195,8 +195,7 @@ public abstract partial class Field : IFieldWithJoinInfo
             if (customAttributes != value)
             {
                 customAttributes = value ?? [];
-                if (fields != null)
-                    fields.byAttribute = null;
+                fields?.byAttribute = null;
             }
         }
     }
@@ -242,19 +241,18 @@ public abstract partial class Field : IFieldWithJoinInfo
         get { return expression; }
         set
         {
-            value = value.TrimToNull();
-            if (expression != value)
+            var newValue = value.TrimToNull();
+            if (expression != newValue)
             {
-                expression = value;
                 referencedAliases = null;
                 joinAlias = null;
                 origin = null;
                 join = null;
 
-                if (value != null)
+                if (newValue != null)
                 {
-                    if (expression != null &&
-                        expression.StartsWith("T0.", StringComparison.OrdinalIgnoreCase) &&
+                    expression = newValue;
+                    if (expression.StartsWith("T0.", StringComparison.OrdinalIgnoreCase) &&
                         SqlSyntax.IsValidQuotedIdentifier(expression[3..]))
                     {
                         if (flags.HasFlag(FieldFlags.Calculated))
@@ -284,7 +282,7 @@ public abstract partial class Field : IFieldWithJoinInfo
                                 flags |= FieldFlags.Foreign;
 
                                 var split = expression.Split('.');
-                                if (split.Length == 2 &&
+                                if (split?.Length == 2 &&
                                     split[0] == theJoin &&
                                     SqlSyntax.IsValidQuotedIdentifier(split[1]))
                                 {
@@ -321,7 +319,7 @@ public abstract partial class Field : IFieldWithJoinInfo
     /// <value>
     /// The join alias.
     /// </value>
-    public string JoinAlias => joinAlias;
+    public string? JoinAlias => joinAlias;
 
     /// <summary>
     /// Gets the join.
@@ -329,14 +327,14 @@ public abstract partial class Field : IFieldWithJoinInfo
     /// <value>
     /// The join.
     /// </value>
-    public Join Join
+    public Join? Join
     {
         get
         {
             if (join == null &&
                 joinAlias != null)
             {
-                if (fields.Joins.TryGetValue(joinAlias, out Join theJoin))
+                if (fields!.Joins?.TryGetValue(joinAlias, out Join? theJoin) == true)
                     join = theJoin;
             }
 
@@ -350,7 +348,7 @@ public abstract partial class Field : IFieldWithJoinInfo
     /// <value>
     /// The origin.
     /// </value>
-    public string Origin => origin;
+    public string? Origin => origin;
 
     /// <summary>
     /// Gets or sets the foreign table.
@@ -358,7 +356,7 @@ public abstract partial class Field : IFieldWithJoinInfo
     /// <value>
     /// The foreign table.
     /// </value>
-    public string ForeignTable
+    public string? ForeignTable
     {
         get { return foreignTable; }
         set { foreignTable = value.TrimToNull(); }
@@ -370,7 +368,7 @@ public abstract partial class Field : IFieldWithJoinInfo
     /// <value>
     /// The foreign field.
     /// </value>
-    public string ForeignField
+    public string? ForeignField
     {
         get { return foreignField; }
         set { foreignField = value.TrimToNull(); }
@@ -382,7 +380,7 @@ public abstract partial class Field : IFieldWithJoinInfo
     /// <value>
     /// The foreign join alias.
     /// </value>
-    public Join ForeignJoinAlias
+    public Join? ForeignJoinAlias
     {
         get; set;
     }
@@ -393,7 +391,7 @@ public abstract partial class Field : IFieldWithJoinInfo
     /// <value>
     /// The insert permission.
     /// </value>
-    public string InsertPermission
+    public string? InsertPermission
     {
         get { return insertPermission; }
         set { insertPermission = value; }
@@ -429,7 +427,7 @@ public abstract partial class Field : IFieldWithJoinInfo
     /// <value>
     /// The read permission.
     /// </value>
-    public string ReadPermission
+    public string? ReadPermission
     {
         get { return readPermission; }
         set { readPermission = value; }
@@ -441,7 +439,7 @@ public abstract partial class Field : IFieldWithJoinInfo
     /// <value>
     /// The textual field.
     /// </value>
-    public string TextualField
+    public string? TextualField
     {
         get { return textualField; }
         set { textualField = value; }
@@ -453,7 +451,7 @@ public abstract partial class Field : IFieldWithJoinInfo
     /// <value>
     /// The update permission.
     /// </value>
-    public string UpdatePermission
+    public string? UpdatePermission
     {
         get { return updatePermission; }
         set { updatePermission = value; }
@@ -468,8 +466,7 @@ public abstract partial class Field : IFieldWithJoinInfo
     [Obsolete("This method was used by the old ORM")]
     public LeftJoin ForeignJoin(int? foreignIndex = null)
     {
-        if (string.IsNullOrEmpty(ForeignTable))
-            throw new ArgumentNullException("ForeignTable");
+        ArgumentException.ThrowIfNullOrEmpty(ForeignTable);
 
         string foreignJoin;
         if (foreignIndex == null)
@@ -491,7 +488,7 @@ public abstract partial class Field : IFieldWithJoinInfo
         var sourceAlias = "T0";
         var sourceKeyField = Name;
 
-        var join = new LeftJoin(fields.Joins, ForeignTable, foreignJoin,
+        var join = new LeftJoin(fields!.Joins, ForeignTable, foreignJoin,
             new Criteria(foreignJoin, joinKeyField) == new Criteria(sourceAlias, sourceKeyField));
 
         ForeignJoinAlias = join;
@@ -565,14 +562,14 @@ public abstract partial class Field : IFieldWithJoinInfo
     /// <param name="source">The source.</param>
     /// <param name="provider">The provider.</param>
     /// <returns>The converted value.</returns>
-    public abstract object ConvertValue(object source, IFormatProvider provider);
+    public abstract object? ConvertValue(object? source, IFormatProvider provider);
 
     /// <summary>
     /// Sets the value of this field in specified row as object using ConvertValue with InvariantCulture.
     /// </summary>
     /// <param name="row">The row.</param>
     /// <param name="value">The value to convert and set.</param>
-    public void AsInvariant(IRow row, object value)
+    public void AsInvariant(IRow row, object? value)
     {
         AsObject(row, ConvertValue(value, CultureInfo.InvariantCulture));
     }
@@ -590,7 +587,7 @@ public abstract partial class Field : IFieldWithJoinInfo
     /// </summary>
     /// <param name="row">The row.</param>
     /// <returns>The value of the field in the row as an object.</returns>
-    public object AsObject(IRow row)
+    public object? AsObject(IRow row)
     {
         row.OnFieldGet(this);
         return AsObjectNoCheck(row);
@@ -601,14 +598,14 @@ public abstract partial class Field : IFieldWithJoinInfo
     /// </summary>
     /// <param name="row">The row.</param>
     /// <param name="value">The value.</param>
-    public abstract void AsObject(IRow row, object value);
+    public abstract void AsObject(IRow row, object? value);
 
     /// <summary>
     /// Gets the value of this field in specified row as object, skipping check for assignment
     /// even if TrackWithChecks is true. Use at your own risk!
     /// </summary>
     /// <param name="row">The row.</param>
-    public abstract object AsObjectNoCheck(IRow row);
+    public abstract object? AsObjectNoCheck(IRow row);
 
     /// <summary>
     /// Gets if the field value is null without checking for assignment.
@@ -621,7 +618,7 @@ public abstract partial class Field : IFieldWithJoinInfo
     /// </summary>
     /// <param name="row">The row.</param>
     /// <returns>The value of the field in the row as an SQL value.</returns>
-    public virtual object AsSqlValue(IRow row)
+    public virtual object? AsSqlValue(IRow row)
     {
         return AsObject(row);
     }
@@ -643,7 +640,7 @@ public abstract partial class Field : IFieldWithJoinInfo
     }
 
     /// <summary>
-    /// Gets the criteria.
+    /// Gets the criteria object wrapping this field, it is cached for reuse.
     /// </summary>
     /// <value>
     /// The criteria.
@@ -665,7 +662,7 @@ public abstract partial class Field : IFieldWithJoinInfo
     /// </summary>
     public bool IsLookup { get; internal set; }
 
-    IDictionary<string, Join> IFieldWithJoinInfo.Joins => fields.Joins;
+    IDictionary<string, Join>? IFieldWithJoinInfo.Joins => fields?.Joins;
 
     /// <summary>
     /// Gets the column alias. Can be equal to the property name or the name.
@@ -677,11 +674,11 @@ public abstract partial class Field : IFieldWithJoinInfo
     /// </summary>
     /// <param name="localizer">The localizer.</param>
     /// <returns>The localized title of the field.</returns>
-    public string GetTitle(ITextLocalizer localizer)
+    public string GetTitle(ITextLocalizer? localizer)
     {
         if (caption is null)
         {
-            autoTextKey ??= "Db." + fields.LocalTextPrefix + "." + (propertyName ?? name);
+            autoTextKey ??= "Db." + fields!.LocalTextPrefix + "." + (propertyName ?? name);
             return localizer?.TryGet(autoTextKey) ?? propertyName ?? name;
         }
 
@@ -694,7 +691,7 @@ public abstract partial class Field : IFieldWithJoinInfo
     /// <returns>
     /// A <see cref="string" /> that represents this instance.
     /// </returns>
-    public override string ToString()
+    public override string? ToString()
     {
         return Expression;
     }

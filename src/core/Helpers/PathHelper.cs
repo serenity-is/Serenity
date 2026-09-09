@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
 namespace Serenity;
@@ -7,8 +8,7 @@ namespace Serenity;
 /// </summary>
 public static class PathHelper
 {
-    static readonly char[] invalidChars = Path.GetInvalidFileNameChars()
-        .Where(x => x != '/' && x != '\\').ToArray();
+    static readonly char[] invalidChars = [.. Path.GetInvalidFileNameChars().Where(x => x != '/' && x != '\\')];
 
     /// <summary>
     /// Checks whether the given path is a secure relative path.
@@ -85,6 +85,7 @@ public static class PathHelper
     ///   Filename.</param>
     /// <returns>
     ///   Converted filename.</returns>
+    [return:NotNullIfNotNull(nameof(fileName))]
     public static string? ToUrl(string? fileName)
     {
         if (fileName != null && fileName.IndexOf('\\') >= 0)
@@ -99,7 +100,8 @@ public static class PathHelper
     ///   Filename.</param>
     /// <returns>
     ///   Converted filename.</returns>
-    public static string? ToPath(string? fileName)
+    [return:NotNullIfNotNull(nameof(fileName))]
+    public static string? ToPath( string? fileName)
     {
         var separator = Path.DirectorySeparatorChar;
         var opposite = separator == '/' ? '\\' : '/';

@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data.Mapping;
+namespace Serenity.Data.Mapping;
 
 /// <summary>
 /// LEFT JOIN type.
@@ -70,7 +70,7 @@ public class LeftJoinAttribute : Attribute, ISqlJoin
     /// <value>
     /// The table joined to.
     /// </value>
-    public string ToTable { get; private set; }
+    public string? ToTable { get; private set; }
 
     /// <summary>
     /// Gets the ON criteria.
@@ -78,7 +78,7 @@ public class LeftJoinAttribute : Attribute, ISqlJoin
     /// <value>
     /// The ON criteria.
     /// </value>
-    public string OnCriteria { get; private set; }
+    public string? OnCriteria { get; private set; }
 
     /// <summary>
     /// Gets the property prefix.
@@ -86,7 +86,7 @@ public class LeftJoinAttribute : Attribute, ISqlJoin
     /// <value>
     /// The property prefix.
     /// </value>
-    public string PropertyPrefix { get; set; }
+    public string? PropertyPrefix { get; set; }
 
     /// <summary>
     /// Gets or sets the title prefix.
@@ -94,7 +94,7 @@ public class LeftJoinAttribute : Attribute, ISqlJoin
     /// <value>
     /// The title prefix.
     /// </value>
-    public string TitlePrefix { get; set; }
+    public string? TitlePrefix { get; set; }
 
     /// <summary>
     /// Gets or sets the type of the row.
@@ -102,7 +102,7 @@ public class LeftJoinAttribute : Attribute, ISqlJoin
     /// <value>
     /// The type of the row.
     /// </value>
-    public Type RowType { get; set; }
+    public Type? RowType { get; set; }
 
     /// <summary>
     /// Gets or sets the dialect.
@@ -110,7 +110,7 @@ public class LeftJoinAttribute : Attribute, ISqlJoin
     /// <value>
     /// The dialect.
     /// </value>
-    public string Dialect { get; set; }
+    public string? Dialect { get; set; }
 
     /// <summary>
     /// Gets or sets the negating of the dialect.
@@ -122,6 +122,6 @@ public class LeftJoinAttribute : Attribute, ISqlJoin
     {
         get => Dialect != null && Dialect.StartsWith('!');
         set => Dialect = value ? (!NegateDialect ? ("!" + Dialect) : Dialect) :
-            (NegateDialect ? Dialect[1..] : Dialect);
+            (NegateDialect ? Dialect![1..] : Dialect);
     }
 }

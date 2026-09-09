@@ -20,8 +20,8 @@ public class EnumField<TEnum> : Int32Field
     /// <exception cref="InvalidProgramException">
     /// TEnum is not an enum type or is not based on Int32.
     /// </exception>
-    public EnumField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
-        Func<IRow, int?> getValue = null, Action<IRow, int?> setValue = null)
+    public EnumField(ICollection<Field> collection, string name, LocalText? caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
+        Func<IRow, int?>? getValue = null, Action<IRow, int?>? setValue = null)
         : base(collection, name, caption, size, flags, getValue, setValue)
     {
         if (!typeof(TEnum).IsEnum)

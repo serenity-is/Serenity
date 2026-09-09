@@ -26,8 +26,8 @@ public class UndeleteRequestHandler<TRow, TUndeleteRequest, TUndeleteResponse> :
     public UndeleteRequestHandler(IRequestContext context) : base(context)
     {
         behaviors = new Lazy<IUndeleteBehaviorSync[]>(() =>
-            BehaviorProviderExtensions.AutoWrapBehaviors<IUndeleteBehavior, IUndeleteBehaviorAsync, IUndeleteBehaviorSync>(
-                GetBehaviors(), behavior => new AsyncToSyncUndeleteBehaviorWrapper(behavior)).ToArray());
+            [.. BehaviorProviderExtensions.AutoWrapBehaviors<IUndeleteBehavior, IUndeleteBehaviorAsync, IUndeleteBehaviorSync>(
+                GetBehaviors(), behavior => new AsyncToSyncUndeleteBehaviorWrapper(behavior))]);
     }
 
     /// <summary>
@@ -47,8 +47,8 @@ public class UndeleteRequestHandler<TRow, TUndeleteRequest, TUndeleteResponse> :
         if (Row is IDisplayOrderRow displayOrderRow)
         {
             var filter = GetDisplayOrderFilter();
-            DisplayOrderHelper.ReorderValues(Connection, displayOrderRow, filter,
-                Row.IdField.AsObject(Row), displayOrderRow.DisplayOrderField[Row].Value, false);
+            DisplayOrderHelper.ReorderValues(Connection!, displayOrderRow, filter,
+                Row.GetIdField().AsObject(Row), displayOrderRow.DisplayOrderField[Row]!.Value, false);
         }
 
         foreach (var behavior in behaviors.Value)
@@ -81,7 +81,7 @@ public class UndeleteRequestHandler<TRow, TUndeleteRequest, TUndeleteResponse> :
     /// </summary>
     protected virtual void LoadEntity()
     {
-        var idField = Row.IdField;
+        var idField = Row.GetIdField();
         var id = idField.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture);
 
         var query = new SqlQuery()
@@ -122,7 +122,7 @@ public class UndeleteRequestHandler<TRow, TUndeleteRequest, TUndeleteResponse> :
     /// </summary>
     protected virtual void ExecuteUndelete()
     {
-        var idField = Row.IdField;
+        var idField = Row.GetIdField();
         var id = idField.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture);
 
         var isActiveDeletedRow = Row as IIsActiveDeletedRow;
@@ -187,7 +187,7 @@ public class UndeleteRequestHandler<TRow, TUndeleteRequest, TUndeleteResponse> :
     public TUndeleteResponse Process(IUnitOfWork unitOfWork, TUndeleteRequest request)
     {
         StateBag.Clear();
-        UnitOfWork = unitOfWork ?? throw new ArgumentNullException("unitOfWork");
+        UnitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         Request = request;
         Response = new TUndeleteResponse();
 

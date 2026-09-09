@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data.Schema;
+namespace Serenity.Data.Schema;
 
 /// <summary>
 /// Meta data information for an SQL column.
@@ -11,7 +11,7 @@ public class FieldInfo
     /// <value>
     /// The name of the field.
     /// </value>
-    public string FieldName { get; set; }
+    public required string FieldName { get; set; }
 
     /// <summary>
     /// Gets or sets the size (max length or numeric precision).
@@ -59,7 +59,7 @@ public class FieldInfo
     /// <value>
     /// The primary key schema.
     /// </value>
-    public string PKSchema { get; set; }
+    public string? PKSchema { get; set; }
 
     /// <summary>
     /// Gets or sets the primary key table.
@@ -67,7 +67,7 @@ public class FieldInfo
     /// <value>
     /// The primary key table.
     /// </value>
-    public string PKTable { get; set; }
+    public string? PKTable { get; set; }
 
     /// <summary>
     /// Gets or sets the primary key column.
@@ -75,7 +75,7 @@ public class FieldInfo
     /// <value>
     /// The primary key column.
     /// </value>
-    public string PKColumn { get; set; }
+    public string? PKColumn { get; set; }
 
     /// <summary>
     /// Gets or sets the type of the data.
@@ -83,5 +83,5 @@ public class FieldInfo
     /// <value>
     /// The type of the data.
     /// </value>
-    public string DataType { get; set; }
+    public string? DataType { get; set; }
 }

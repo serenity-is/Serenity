@@ -27,7 +27,7 @@ public class BinaryCriteria : BaseCriteria
         ArgumentNullException.ThrowIfNull(right);
 
         if (op < CriteriaOperator.AND || op > CriteriaOperator.NotLike)
-            throw new ArgumentOutOfRangeException("op");
+            throw new ArgumentOutOfRangeException(nameof(op));
 
         this.left = left;
         this.right = right;

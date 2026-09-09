@@ -26,8 +26,8 @@ public class UndeleteRequestHandlerAsync<TRow, TUndeleteRequest, TUndeleteRespon
     public UndeleteRequestHandlerAsync(IRequestContext context) : base(context)
     {
         behaviors = new Lazy<IUndeleteBehaviorAsync[]>(() =>
-            BehaviorProviderExtensions.AutoWrapBehaviors<IUndeleteBehavior, IUndeleteBehaviorSync, IUndeleteBehaviorAsync>(
-                GetBehaviors(), behavior => new SyncToAsyncUndeleteBehaviorWrapper(behavior)).ToArray());
+            [.. BehaviorProviderExtensions.AutoWrapBehaviors<IUndeleteBehavior, IUndeleteBehaviorSync, IUndeleteBehaviorAsync>(
+                GetBehaviors(), behavior => new SyncToAsyncUndeleteBehaviorWrapper(behavior))]);
     }
 
     /// <summary>
@@ -47,8 +47,8 @@ public class UndeleteRequestHandlerAsync<TRow, TUndeleteRequest, TUndeleteRespon
         if (Row is IDisplayOrderRow displayOrderRow)
         {
             var filter = GetDisplayOrderFilter();
-            await DisplayOrderHelper.ReorderValuesAsync(Connection, displayOrderRow, filter,
-                Row.IdField.AsObject(Row), displayOrderRow.DisplayOrderField[Row].Value,
+            await DisplayOrderHelper.ReorderValuesAsync(Connection!, displayOrderRow, filter,
+                Row.GetIdField().AsObject(Row), displayOrderRow.DisplayOrderField[Row]!.Value,
                 hasUniqueConstraint: false, cancellationToken: cancellationToken).ConfigureAwait(false);
         }
 
@@ -83,7 +83,7 @@ public class UndeleteRequestHandlerAsync<TRow, TUndeleteRequest, TUndeleteRespon
     /// </summary>
     protected virtual async Task LoadEntityAsync(CancellationToken cancellationToken = default)
     {
-        var idField = Row.IdField;
+        var idField = Row.GetIdField();
         var id = idField.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture);
 
         var query = new SqlQuery()
@@ -125,7 +125,7 @@ public class UndeleteRequestHandlerAsync<TRow, TUndeleteRequest, TUndeleteRespon
     /// </summary>
     protected virtual async Task ExecuteUndeleteAsync(CancellationToken cancellationToken = default)
     {
-        var idField = Row.IdField;
+        var idField = Row.GetIdField();
         var id = idField.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture);
 
         var isActiveDeletedRow = Row as IIsActiveDeletedRow;

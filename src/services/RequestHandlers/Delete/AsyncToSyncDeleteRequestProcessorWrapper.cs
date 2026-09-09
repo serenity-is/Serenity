@@ -34,7 +34,7 @@ internal class AsyncToSyncDeleteRequestProcessorWrapper<TRow>(IDeleteRequestProc
     IRow IDeleteRequestHandler.Row => handler.Row;
     DeleteRequest IDeleteRequestHandler.Request => handler.Request;
     DeleteResponse IDeleteRequestHandler.Response => handler.Response;
-    IDictionary<string, object> IDeleteRequestHandler.StateBag => handler.StateBag;
+    IDictionary<string, object?> IDeleteRequestHandler.StateBag => handler.StateBag;
     IDbConnection IDeleteRequestHandler.Connection => handler.Connection;
     IUnitOfWork IDeleteRequestHandler.UnitOfWork => handler.UnitOfWork;
     IRequestContext IDeleteRequestHandler.Context => handler.Context;

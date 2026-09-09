@@ -50,11 +50,11 @@ public class SaveRequestHandlerAsync<TRow, TSaveRequest, TSaveResponse> :
 
         Response = new TSaveResponse();
 
-        Row = (request.Entity ?? throw new ArgumentNullException(nameof(request.Entity))).Clone();
+        Row = ArgumentChecks.NotNull(request.Entity).Clone();
 
         if (requestType == SaveRequestType.Auto)
         {
-            if (Row.IdField.IsNull(Row))
+            if (Row.GetIdField().IsNull(Row))
                 requestType = SaveRequestType.Create;
             else
                 requestType = SaveRequestType.Update;
@@ -145,14 +145,14 @@ public class SaveRequestHandlerAsync<TRow, TSaveRequest, TSaveResponse> :
         {
             if (Row.IsAnyFieldAssigned)
             {
-                var idField = Row.IdField;
+                var idField = Row.GetIdField();
 
-                if (idField.IndexCompare(Old, Row) != 0)
+                if (idField.IndexCompare(Old!, Row) != 0)
                 {
                     var update = new SqlUpdate(Row.Table);
                     update.Set(Row);
-                    update.Where(idField == new ValueCriteria(idField.AsSqlValue(Old)));
-                    await InvokeSaveActionAsync(() => update.ExecuteAsync(Connection, ExpectedRows.One,
+                    update.Where(idField == new ValueCriteria(idField.AsSqlValue(Old!)));
+                    await InvokeSaveActionAsync(() => update.ExecuteAsync(Connection!, ExpectedRows.One,
                         cancellationToken: cancellationToken), cancellationToken).ConfigureAwait(false);
                 }
                 else
@@ -175,7 +175,7 @@ public class SaveRequestHandlerAsync<TRow, TSaveRequest, TSaveResponse> :
                 {
                     var entityId = await Connection.InsertAndGetIDAsync(Row, cancellationToken).ConfigureAwait(false);
                     Response.EntityId = entityId;
-                    Row.IdField.AsInvariant(Row, entityId);
+                    Row.GetIdField().AsInvariant(Row, entityId);
                 }, cancellationToken).ConfigureAwait(false);
             }
             else
@@ -207,21 +207,21 @@ public class SaveRequestHandlerAsync<TRow, TSaveRequest, TSaveResponse> :
             {
                 var filter = GetDisplayOrderFilter();
                 displayOrderRow.DisplayOrderField.AsObject(Row,
-                    await DisplayOrderHelper.GetNextValueAsync(Connection, displayOrderRow, filter, cancellationToken).ConfigureAwait(false));
+                    await DisplayOrderHelper.GetNextValueAsync(Connection!, displayOrderRow, filter, cancellationToken).ConfigureAwait(false));
             }
             else
                 displayOrderFix = true;
         }
         else if (afterSave &&
             ((IsCreate && displayOrderFix) ||
-             (IsUpdate && displayOrderRow.DisplayOrderField[Old] != displayOrderRow.DisplayOrderField[Row])))
+             (IsUpdate && displayOrderRow.DisplayOrderField[Old!] != displayOrderRow.DisplayOrderField[Row])))
         {
             await DisplayOrderHelper.ReorderValuesAsync(
-                connection: Connection,
+                connection: Connection!,
                 row: displayOrderRow,
                 filter: GetDisplayOrderFilter(),
-                recordID: Row.IdField.AsObject(Row),
-                newDisplayOrder: displayOrderRow.DisplayOrderField[Row].Value,
+                recordID: Row.GetIdField().AsObject(Row),
+                newDisplayOrder: displayOrderRow.DisplayOrderField[Row]!.Value,
                 hasUniqueConstraint: false,
                 cancellationToken: cancellationToken).ConfigureAwait(false);
         }
@@ -234,7 +234,7 @@ public class SaveRequestHandlerAsync<TRow, TSaveRequest, TSaveResponse> :
     {
         if (!await (await PrepareQueryAsync(cancellationToken).ConfigureAwait(false)).GetFirstAsync(Connection, cancellationToken).ConfigureAwait(false))
         {
-            var idField = Row.IdField;
+            var idField = Row.GetIdField();
             var id = Request.EntityId != null ?
                 idField.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture)
                 : idField.AsObject(Row);
@@ -258,14 +258,14 @@ public class SaveRequestHandlerAsync<TRow, TSaveRequest, TSaveResponse> :
     /// <returns>The prepared query.</returns>
     protected virtual async Task<SqlQuery> PrepareQueryAsync(CancellationToken cancellationToken = default)
     {
-        var idField = Row.IdField;
+        var idField = Row.GetIdField();
         var id = Request.EntityId != null ?
             idField.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture)
             : idField.AsSqlValue(Row);
 
         var query = new SqlQuery()
             .Dialect(Connection.GetDialect())
-            .From(Old)
+            .From(Old!)
             .SelectTableFields()
             .WhereEqual(idField, id);
 

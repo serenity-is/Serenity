@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Serenity.Data;
 
 /// <summary>
@@ -18,7 +20,8 @@ public abstract class BaseCriteriaVisitor
     /// <param name="criteria">The criteria.</param>
     /// <returns>The visited criteria, which may be a reworked version.</returns>
     /// <exception cref="Exception">Criteria type is unknown.</exception>
-    protected virtual BaseCriteria Visit(BaseCriteria criteria)
+    [return:NotNullIfNotNull(nameof(criteria))]
+    protected virtual BaseCriteria? Visit(BaseCriteria? criteria)
     {
         if (criteria is null)
             return null;
@@ -49,6 +52,7 @@ public abstract class BaseCriteriaVisitor
     /// </summary>
     /// <param name="criteria">The criteria.</param>
     /// <returns>The visited criteria.</returns>
+    [return: NotNullIfNotNull(nameof(criteria))]
     protected virtual BaseCriteria VisitCriteria(Criteria criteria)
     {
         return criteria;
@@ -68,7 +72,7 @@ public abstract class BaseCriteriaVisitor
         if (!Object.ReferenceEquals(left, criteria.LeftOperand) ||
             !Object.ReferenceEquals(right, criteria.RightOperand))
         {
-            return new BinaryCriteria(left, criteria.Operator, right);
+            return new BinaryCriteria(left!, criteria.Operator, right!);
         }
 
         return criteria;
@@ -85,7 +89,7 @@ public abstract class BaseCriteriaVisitor
         var operand = Visit(criteria.Operand);
         if (!Object.ReferenceEquals(operand, criteria.Operand))
         {
-            return new UnaryCriteria(criteria.Operator, operand);
+            return new UnaryCriteria(criteria.Operator, operand!);
         }
 
         return criteria;

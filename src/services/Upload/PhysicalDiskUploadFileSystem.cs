@@ -20,7 +20,7 @@ public class PhysicalDiskUploadFileSystem : PhysicalFileSystem, IDiskUploadFileS
     }
 
     /// <inheritdoc/>
-    public void PurgeDirectory(string directoryToClean, TimeSpan? autoExpireTime = null, int? maxFilesInDirectory = null, string checkFileName = null)
+    public void PurgeDirectory(string directoryToClean, TimeSpan? autoExpireTime = null, int? maxFilesInDirectory = null, string? checkFileName = null)
     {
         TemporaryFileHelper.PurgeDirectory(directoryToClean, 
             autoExpireTime ?? TemporaryFileHelper.DefaultAutoExpireTime, 

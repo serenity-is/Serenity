@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data.Schema;
+namespace Serenity.Data.Schema;
 
 /// <summary>
 /// Table schema/name and view information.
@@ -11,7 +11,7 @@ public class TableName
     /// <value>
     /// The schema.
     /// </value>
-    public string Schema { get; set; }
+    public string? Schema { get; set; }
 
     /// <summary>
     /// Gets or sets the table.
@@ -19,7 +19,7 @@ public class TableName
     /// <value>
     /// The table.
     /// </value>
-    public string Table { get; set; }
+    public required string Table { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether this instance is view.
@@ -35,5 +35,5 @@ public class TableName
     /// <value>
     /// The table name.
     /// </value>
-    public string Tablename => string.IsNullOrEmpty(Schema) ? Table : Schema + "." + Table;
+    public string? Tablename => string.IsNullOrEmpty(Schema) ? Table : Schema + "." + Table;
 }

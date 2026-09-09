@@ -26,8 +26,8 @@ public class RetrieveRequestHandler<TRow, TRetrieveRequest, TRetrieveResponse> :
     public RetrieveRequestHandler(IRequestContext context) : base(context)
     {
         behaviors = new Lazy<IRetrieveBehaviorSync[]>(() =>
-            BehaviorProviderExtensions.AutoWrapBehaviors<IRetrieveBehavior, IRetrieveBehaviorAsync, IRetrieveBehaviorSync>(
-                GetBehaviors(), behavior => new AsyncToSyncRetrieveBehaviorWrapper(behavior)).ToArray());
+            [.. BehaviorProviderExtensions.AutoWrapBehaviors<IRetrieveBehavior, IRetrieveBehaviorAsync, IRetrieveBehaviorSync>(
+                GetBehaviors(), behavior => new AsyncToSyncRetrieveBehaviorWrapper(behavior))]);
     }
 
     /// <summary>
@@ -115,7 +115,7 @@ public class RetrieveRequestHandler<TRow, TRetrieveRequest, TRetrieveResponse> :
     {
         StateBag.Clear();
 
-        Connection = connection ?? throw new ArgumentNullException("connection");
+        Connection = connection ?? throw new ArgumentNullException(nameof(connection));
         Request = request ?? throw new ArgumentNullException(nameof(request));
 
         if (request.EntityId == null)

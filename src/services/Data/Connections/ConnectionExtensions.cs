@@ -87,7 +87,7 @@ public static class ConnectionExtensions
     /// </summary>
     /// <param name="connection">The connection.</param>
     /// <returns>The current transaction for the connection.</returns>
-    public static IDbTransaction GetCurrentActualTransaction(this IDbConnection connection)
+    public static IDbTransaction? GetCurrentActualTransaction(this IDbConnection connection)
     {
         if (connection is IHasCurrentTransaction hct &&
             hct.CurrentTransaction is IHasActualTransaction hat)
@@ -131,7 +131,7 @@ public static class ConnectionExtensions
     /// </summary>
     /// <param name="connection">The connection.</param>
     /// <returns>The logger for the connection (used by static SqlHelper methods).</returns>
-    public static ILogger GetLogger(this IDbConnection connection)
+    public static ILogger? GetLogger(this IDbConnection connection)
     {
         return (connection as IHasLogger)?.Logger;
     }

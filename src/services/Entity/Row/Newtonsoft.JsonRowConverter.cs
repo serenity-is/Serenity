@@ -10,7 +10,7 @@ public class JsonRowConverter : JsonConverter
     /// <summary>
     /// Should serialize extension
     /// </summary>
-    public static Func<IRow, string, bool> ShouldSerializeExtension
+    public static Func<IRow, string, bool>? ShouldSerializeExtension
     {
         get => JsonConverters.RowJsonConverter.ShouldSerializeExtension;
         set => JsonConverters.RowJsonConverter.ShouldSerializeExtension = value;
@@ -19,7 +19,7 @@ public class JsonRowConverter : JsonConverter
     /// <summary>
     /// Should deserialize extension
     /// </summary>
-    public static Func<IRow, string, bool> ShouldDeserializeExtension
+    public static Func<IRow, string, bool>? ShouldDeserializeExtension
     {
         get => JsonConverters.RowJsonConverter.ShouldDeserializeExtension;
         set => JsonConverters.RowJsonConverter.ShouldDeserializeExtension = value;
@@ -33,9 +33,9 @@ public class JsonRowConverter : JsonConverter
     ///   The value.</param>
     /// <param name="serializer">
     ///   The calling serializer.</param>
-    public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+    public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
     {
-        ToJson(writer, (IRow)value, serializer);
+        ToJson(writer, (IRow)value!, serializer);
     }
 
     private static void ToJson(JsonWriter writer, IRow row, JsonSerializer serializer)
@@ -96,12 +96,12 @@ public class JsonRowConverter : JsonConverter
     ///   The calling serializer.</param>
     /// <returns>
     ///   The object value.</returns>
-    public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+    public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
     {
         if (reader.TokenType ==Newtonsoft.Json.JsonToken.Null)
             return null;
 
-        var row = (IRow)Activator.CreateInstance(objectType) ?? 
+        var row = (IRow)Activator.CreateInstance(objectType)! ?? 
             throw new JsonSerializationException(string.Format("No row of type {0} could be created.", objectType.Name));
         row.TrackAssignments = true;
 
@@ -113,7 +113,7 @@ public class JsonRowConverter : JsonConverter
             switch (reader.TokenType)
             {
                 case Newtonsoft.Json.JsonToken.PropertyName:
-                    string fieldName = (string)reader.Value;
+                    string fieldName = (string)reader.Value!;
 
                     if (!reader.Read())
                         throw new JsonSerializationException("Unexpected end when deserializing object.");

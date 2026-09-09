@@ -16,13 +16,13 @@ namespace Serenity.Web;
 /// <param name="logger">Exception logger</param>
 /// <exception cref="ArgumentNullException"><paramref name="imageProcessor"/> or <paramref name="localizer"/> is <c>null</c>.</exception>
 public class DefaultUploadValidator(IImageProcessor imageProcessor, ITextLocalizer localizer,
-    ILogger<DefaultUploadValidator> logger = null,
-    IOptions<UploadSettings> uploadSettings = null) : IUploadValidator
+    ILogger<DefaultUploadValidator>? logger = null,
+    IOptions<UploadSettings>? uploadSettings = null) : IUploadValidator
 {
     private readonly IImageProcessor imageProcessor = imageProcessor ?? throw new ArgumentNullException(nameof(imageProcessor));
     private readonly ITextLocalizer localizer = localizer ?? throw new ArgumentNullException(nameof(localizer));
     private readonly IOptions<UploadSettings> uploadSettings = uploadSettings ?? new UploadSettings();
-    private readonly ILogger<DefaultUploadValidator> logger = logger;
+    private readonly ILogger<DefaultUploadValidator>? logger = logger;
 
     /// <inheritdoc/>
     public void ValidateFile(IUploadFileConstraints constraints, 
@@ -37,7 +37,7 @@ public class DefaultUploadValidator(IImageProcessor imageProcessor, ITextLocaliz
         isImageExtension = false;
         var fileExtension = Path.GetExtension(filename);
 
-        var settings = uploadSettings?.Value;
+        var settings = uploadSettings.Value;
 
         if ((!IsExtensionIn(settings.ExtensionBlacklistExclude, fileExtension) &&
              IsExtensionIn(settings.ExtensionBlacklist, fileExtension)) ||
@@ -80,7 +80,7 @@ public class DefaultUploadValidator(IImageProcessor imageProcessor, ITextLocaliz
 
         var imageExtensions = constraints.ImageExtensions ?? UploadOptions.DefaultImageExtensions;
         if (string.IsNullOrEmpty(imageExtensions) ||
-            !imageExtensions.Split(new char[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries)
+            !imageExtensions.Split([',', ';'], StringSplitOptions.RemoveEmptyEntries)
                 .Select(x => x.Trim())
                 .Any(x => string.Equals(x, fileExtension, StringComparison.OrdinalIgnoreCase)))
         {
@@ -101,12 +101,12 @@ public class DefaultUploadValidator(IImageProcessor imageProcessor, ITextLocaliz
 
     private static readonly char[] extSep = [',', ';'];
 
-    private static bool IsExtensionIn(string extensionList, string extension)
+    private static bool IsExtensionIn(string? extensionList, string extension)
     {
         if (string.IsNullOrEmpty(extensionList))
             return false;
 
-        extension = extension?.Trim();
+        extension = extension.Trim();
 
         foreach (var x in extensionList.Split(extSep, StringSplitOptions.RemoveEmptyEntries))
         {
@@ -123,7 +123,7 @@ public class DefaultUploadValidator(IImageProcessor imageProcessor, ITextLocaliz
 
     /// <inheritdoc/>
     public void ValidateImage(IUploadImageConstraints constraints, Stream stream, 
-        string filename, out object image)
+        string filename, out object? image)
     {
         ArgumentNullException.ThrowIfNull(constraints);
 
@@ -164,7 +164,7 @@ public class DefaultUploadValidator(IImageProcessor imageProcessor, ITextLocaliz
             }
 
             if (constraints.IgnoreExtensionMismatch != true &&
-                !formatInfo.FileExtensions.Any(x => string.Equals(x, fileExtension,
+                !formatInfo!.FileExtensions!.Any(x => string.Equals(x, fileExtension,
                     StringComparison.OrdinalIgnoreCase)))
             {
                 throw new ValidationError(string.Format(CultureInfo.CurrentCulture,

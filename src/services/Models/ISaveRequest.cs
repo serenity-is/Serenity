@@ -1,4 +1,4 @@
-﻿
+
 using System.Collections;
 
 namespace Serenity.Services;
@@ -14,15 +14,15 @@ public interface ISaveRequest
     /// The entity ID to update, should only be
     /// passed for Update requests.
     /// </summary>
-    object EntityId { get; set; }
+    object? EntityId { get; set; }
 
     /// <summary>
     /// Entity to insert / update
     /// </summary>
-    object Entity { get; set; }
+    object? Entity { get; set; }
 
     /// <summary>
     /// Dictionary of translations if required.
     /// </summary>
-    IDictionary Localizations { get; set; }
+    IDictionary? Localizations { get; set; }
 }

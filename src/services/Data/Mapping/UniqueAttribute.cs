@@ -22,7 +22,7 @@ public class UniqueAttribute : SetFieldFlagsAttribute
     /// <value>
     /// The name.
     /// </value>
-    public string Name { get; set; }
+    public string? Name { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether to check this constraint before save.
@@ -54,5 +54,5 @@ public class UniqueAttribute : SetFieldFlagsAttribute
     /// <value>
     /// The error message.
     /// </value>
-    public string ErrorMessage { get; set; }
+    public string? ErrorMessage { get; set; }
 }

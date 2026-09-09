@@ -1,4 +1,4 @@
-﻿namespace Serenity.Reporting;
+namespace Serenity.Reporting;
 
 /// <summary>
 /// Abstraction for a report factory that creates a report by its key
@@ -13,7 +13,7 @@ public interface IReportFactory
     /// <param name="reportParams">Optional JSON options to set in the report</param>
     /// <param name="validatePermission">True if the permission for the report should be validated</param>
     /// <returns>The created report instance.</returns>
-    public IReport Create(string reportKey, string reportParams, bool validatePermission = true);
+    public IReport Create(string reportKey, string? reportParams, bool validatePermission = true);
 
     /// <summary>
     /// Sets options for an externally created report object.

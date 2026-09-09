@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data.Mapping;
+namespace Serenity.Data.Mapping;
 
 /// <summary>
 /// Defines a master detail relation (1-N) between this row and another.
@@ -46,7 +46,7 @@ public sealed class MasterDetailRelationAttribute(string foreignKey) : Attribute
     /// <value>
     /// The include columns type with properties to include.
     /// </value>
-    public Type ColumnsType { get; set; }
+    public Type? ColumnsType { get; set; }
 
     /// <summary>
     /// Gets or sets the comma separated list of include columns.
@@ -55,7 +55,7 @@ public sealed class MasterDetailRelationAttribute(string foreignKey) : Attribute
     /// <value>
     /// The include columns.
     /// </value>
-    public string IncludeColumns { get; set; }
+    public string? IncludeColumns { get; set; }
 
     /// <summary>
     /// Gets or sets the list of include column names as array.
@@ -63,7 +63,7 @@ public sealed class MasterDetailRelationAttribute(string foreignKey) : Attribute
     /// <value>
     /// The include columns.
     /// </value>
-    public string[] IncludeColumnNames { get; set; }
+    public string[]? IncludeColumnNames { get; set; }
 
     /// <summary>
     /// Gets or sets the filter field.
@@ -71,7 +71,7 @@ public sealed class MasterDetailRelationAttribute(string foreignKey) : Attribute
     /// <value>
     /// The filter field.
     /// </value>
-    public string FilterField { get; set; }
+    public string? FilterField { get; set; }
 
     /// <summary>
     /// Gets or sets the filter value.
@@ -79,13 +79,13 @@ public sealed class MasterDetailRelationAttribute(string foreignKey) : Attribute
     /// <value>
     /// The filter value.
     /// </value>
-    public object FilterValue { get; set; }
+    public object? FilterValue { get; set; }
 
     /// <summary>
     /// Optional: override the default behaviour and use a different master id (PK) field 
     /// (i.e. from a unique constraint)
     /// </summary>
-    public string MasterKeyField { get; set; }
+    public string? MasterKeyField { get; set; }
 
     /// <summary>
     /// Forces deletion of linking row records even if master record uses soft delete.

@@ -147,7 +147,7 @@ public abstract class AccountPasswordActionsPageBase<TUserRow> : MembershipPageB
 #endif
 
             var row = new TUserRow();
-            row.IdField.AsInvariant(row, userId);
+            row.GetIdField().AsInvariant(row, userId);
             if (row is IUpdateDateRow updateDateRow)
                 updateDateRow.UpdateDateField[row] = DateTime.UtcNow;
             row.PasswordHashField[row] = hash;
@@ -215,7 +215,7 @@ public abstract class AccountPasswordActionsPageBase<TUserRow> : MembershipPageB
             if (updateRow is IUpdateDateRow updateDateRow && updateDateRow.UpdateDateField is not null)
             {
                 // set update date to make sure only the latest reset token can be used
-                updateRow.IdField.AsObject(updateRow, user.IdField.AsObject(user));
+                updateRow.GetIdField().AsObject(updateRow, user.GetIdField().AsObject(user));
                 updateDateRow.UpdateDateField[user] = DateTime.UtcNow;
                 updateDateRow.UpdateDateField.AsObject(updateRow, updateDateRow.UpdateDateField.AsObject(user));
                 uow.Connection.UpdateById(updateRow);
@@ -259,7 +259,7 @@ public abstract class AccountPasswordActionsPageBase<TUserRow> : MembershipPageB
         return HttpContext.RequestServices.GetDataProtector("ResetPassword").ProtectBinary(bw =>
         {
             bw.Write(DateTime.UtcNow.AddHours(3).ToBinary());
-            bw.Write(Convert.ToString(user.IdField.AsObject(user), CultureInfo.InvariantCulture));
+            bw.Write(Convert.ToString(user.GetIdField().AsObject(user), CultureInfo.InvariantCulture));
             bw.Write(GetNonceFor(user));
         });
     }
@@ -287,7 +287,7 @@ public abstract class AccountPasswordActionsPageBase<TUserRow> : MembershipPageB
             if (dt < DateTime.UtcNow)
                 return Error(ChangePasswordValidationTexts.InvalidResetToken.ToString(localizer));
 
-            userId = new TUserRow().IdField.ConvertValue(br.ReadString(), CultureInfo.InvariantCulture);
+            userId = new TUserRow().GetIdField().ConvertValue(br.ReadString(), CultureInfo.InvariantCulture);
             nonce = br.ReadInt32();
         }
         catch (Exception)
@@ -360,7 +360,7 @@ public abstract class AccountPasswordActionsPageBase<TUserRow> : MembershipPageB
             if (dt < DateTime.UtcNow)
                 throw new ValidationError(ChangePasswordValidationTexts.InvalidResetToken.ToString(localizer));
 
-            var userId = new TUserRow().IdField.ConvertValue(br.ReadString(), CultureInfo.InvariantCulture);
+            var userId = new TUserRow().GetIdField().ConvertValue(br.ReadString(), CultureInfo.InvariantCulture);
             var nonce = br.ReadInt32();
 
             ArgumentNullException.ThrowIfNull(sqlConnections);
@@ -382,7 +382,7 @@ public abstract class AccountPasswordActionsPageBase<TUserRow> : MembershipPageB
                 throw new ValidationError("Sorry, but no changes are allowed in public demo on ADMIN user!");
 #endif
             var row = new TUserRow();
-            row.IdField.AsObject(row, user.IdField.AsObject(user));
+            row.GetIdField().AsObject(row, user.GetIdField().AsObject(user));
             if (row is IUpdateDateRow updateDateRow)
                 updateDateRow.UpdateDateField[row] = DateTime.UtcNow;
             row.PasswordHashField[row] = hash;

@@ -34,7 +34,7 @@ internal class SyncToAsyncUndeleteRequestProcessorWrapper<TRow>(IUndeleteRequest
     IRow IUndeleteRequestHandler.Row => handler.Row;
     UndeleteRequest IUndeleteRequestHandler.Request => handler.Request;
     UndeleteResponse IUndeleteRequestHandler.Response => handler.Response;
-    IDictionary<string, object> IUndeleteRequestHandler.StateBag => handler.StateBag;
+    IDictionary<string, object?> IUndeleteRequestHandler.StateBag => handler.StateBag;
     IDbConnection IUndeleteRequestHandler.Connection => handler.Connection;
     IUnitOfWork IUndeleteRequestHandler.UnitOfWork => handler.UnitOfWork;
     IRequestContext IUndeleteRequestHandler.Context => handler.Context;

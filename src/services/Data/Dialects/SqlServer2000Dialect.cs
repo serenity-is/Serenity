@@ -329,8 +329,8 @@ public class SqlServer2000Dialect : ISqlDialect
     ], StringComparer.OrdinalIgnoreCase);
 
     /// <inheritdoc />
-    public bool IsReservedKeyword(string keyword)
+    public bool IsReservedKeyword(string? keyword)
     {
-        return ReservedKeywords.Contains(keyword);
+        return keyword != null && ReservedKeywords.Contains(keyword);
     }
 }

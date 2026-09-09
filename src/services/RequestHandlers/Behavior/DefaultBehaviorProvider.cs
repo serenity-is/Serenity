@@ -24,7 +24,7 @@ public class DefaultBehaviorProvider(IImplicitBehaviorRegistry implicitBehaviors
     {
         var list = new List<object>();
 
-        var row = (IRow)Activator.CreateInstance(rowType);
+        var row = (IRow)Activator.CreateInstance(rowType)!;
 
         foreach (var type in implicitBehaviors.GetTypes())
         {
@@ -35,10 +35,12 @@ public class DefaultBehaviorProvider(IImplicitBehaviorRegistry implicitBehaviors
             if (behavior == null)
                 continue;
 
-            if (behavior is not IImplicitBehavior implicitBehavior)
+            IImplicitBehavior? implicitBehavior = behavior as IImplicitBehavior;
+            if (implicitBehavior is null)
                 continue;
 
-            if (behavior is not IFieldBehavior fieldBehavior)
+            IFieldBehavior? fieldBehavior = behavior as IFieldBehavior;
+            if (fieldBehavior is null)
             {
                 if (implicitBehavior.ActivateFor(row))
                     list.Add(behavior);
@@ -48,8 +50,8 @@ public class DefaultBehaviorProvider(IImplicitBehaviorRegistry implicitBehaviors
 
             foreach (var field in row.GetFields())
             {
-                (behavior as IFieldBehavior).Target = field;
-                if (implicitBehavior.ActivateFor(row))
+                fieldBehavior!.Target = field;
+                if (implicitBehavior!.ActivateFor(row))
                 {
                     list.Add(behavior);
 

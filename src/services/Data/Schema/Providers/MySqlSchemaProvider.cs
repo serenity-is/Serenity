@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data.Schema;
+namespace Serenity.Data.Schema;
 
 /// <summary>
 /// MySql metadata provider.
@@ -12,16 +12,16 @@ public class MySqlSchemaProvider : ISchemaProvider
     /// <value>
     /// The default schema.
     /// </value>
-    public string DefaultSchema => null;
+    public string? DefaultSchema => null;
 
     private class FieldInfoSource
     {
-        public string ORDINAL_POSITION { get; set; }
-        public string Field { get; set; }
-        public string Null { get; set; }
-        public string Type { get; set; }
-        public string Key { get; set; }
-        public string Extra { get; set; }
+        public string? ORDINAL_POSITION { get; set; }
+        public string? Field { get; set; }
+        public string? Null { get; set; }
+        public string? Type { get; set; }
+        public string? Key { get; set; }
+        public string? Extra { get; set; }
     }
 
     /// <inheritdoc/>
@@ -33,11 +33,11 @@ public class MySqlSchemaProvider : ISchemaProvider
             {
                 var fi = new FieldInfo
                 {
-                    FieldName = src.Field,
+                    FieldName = src.Field!,
                     IsNullable = (src.Null) != "NO"
                 };
                 var dataType = src.Type;
-                var dx = dataType.IndexOf('(');
+                var dx = dataType!.IndexOf('(');
                 if (dx >= 0)
                 {
                     var dxend = dataType.IndexOf(')', dx);
@@ -116,8 +116,8 @@ public class MySqlSchemaProvider : ISchemaProvider
 
     private class TableNameSource
     {
-        public string TABLE_NAME { get; set; }
-        public string TABLE_TYPE { get; set; }
+        public string? TABLE_NAME { get; set; }
+        public string? TABLE_TYPE { get; set; }
     }
 
     /// <inheritdoc/>
@@ -129,7 +129,7 @@ public class MySqlSchemaProvider : ISchemaProvider
                 "ORDER BY TABLE_SCHEMA, TABLE_NAME")
             .Select(x => new TableName
             {
-                Table = x.TABLE_NAME,
+                Table = x.TABLE_NAME!,
                 IsView = x.TABLE_TYPE == "VIEW"
             });
     }

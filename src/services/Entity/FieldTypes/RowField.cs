@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 /// <summary>
 /// Field with a Row value.
@@ -16,8 +16,8 @@
 /// <param name="getValue">The get value.</param>
 /// <param name="setValue">The set value.</param>
 [NotMapped]
-public class RowField<TForeign>(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default | FieldFlags.NotMapped,
-    Func<IRow, TForeign> getValue = null, Action<IRow, TForeign> setValue = null) : CustomClassField<TForeign>(collection, name, caption, size, flags, getValue, setValue) where TForeign : class, IRow
+public class RowField<TForeign>(ICollection<Field> collection, string name, LocalText? caption = null, int size = 0, FieldFlags flags = FieldFlags.Default | FieldFlags.NotMapped,
+    Func<IRow, TForeign?>? getValue = null, Action<IRow, TForeign?>? setValue = null) : CustomClassField<TForeign>(collection, name, caption, size, flags, getValue, setValue) where TForeign : class, IRow
 {
 
     /// <summary>
@@ -52,7 +52,7 @@ public class RowField<TForeign>(ICollection<Field> collection, string name, Loca
     /// </summary>
     /// <param name="value">The value.</param>
     /// <returns>A clone of the value.</returns>
-    protected override TForeign Clone(TForeign value)
+    protected override TForeign? Clone(TForeign? value)
     {
         if (value == null)
             return null;

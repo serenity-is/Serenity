@@ -8,7 +8,7 @@ namespace Serenity.Data;
 /// <seealso cref="DbTransaction" />
 public class WrappedTransaction : DbTransaction, IHasActualTransaction
 {
-    private WrappedConnection wrappedConnection;
+    private WrappedConnection? wrappedConnection;
     private readonly IDbTransaction actualTransaction;
 
     /// <summary>
@@ -31,7 +31,7 @@ public class WrappedTransaction : DbTransaction, IHasActualTransaction
 
     /// <summary>
     ///   Returns the connection associated with this transaction.</summary>
-    protected override DbConnection DbConnection => wrappedConnection;
+    protected override DbConnection? DbConnection => wrappedConnection;
 
     /// <summary>
     ///   Commits actual transaction and sets wrapped transaction for related connection to null.</summary>

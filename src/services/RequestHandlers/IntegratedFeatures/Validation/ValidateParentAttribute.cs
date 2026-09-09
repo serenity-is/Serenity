@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Serenity.Services;
 
 /// <summary>
@@ -23,7 +25,7 @@ public class ValidateParentBehavior(IRowTypeRegistry rowTypeRegistry, ITextLocal
             return;
 
         ServiceHelper.CheckParentNotDeleted(handler.UnitOfWork.Connection,
-            tableName, query => query.Where(criteria), localizer);
+            tableName!, query => query.Where(criteria), localizer);
     }
 
     /// <inheritdoc/>
@@ -33,10 +35,10 @@ public class ValidateParentBehavior(IRowTypeRegistry rowTypeRegistry, ITextLocal
             return;
 
         await ServiceHelper.CheckParentNotDeletedAsync(handler.UnitOfWork.Connection,
-            tableName, query => query.Where(criteria), localizer, cancellationToken).ConfigureAwait(false);
+            tableName!, query => query.Where(criteria), localizer, cancellationToken).ConfigureAwait(false);
     }
 
-    private bool TryGetParentCheck(ISaveRequestHandler handler, out string tableName, out BaseCriteria criteria)
+    private bool TryGetParentCheck(ISaveRequestHandler handler, [MaybeNullWhen(false)] out string? tableName, [MaybeNullWhen(false)] out BaseCriteria? criteria)
     {
         tableName = null;
         criteria = null;
@@ -53,13 +55,13 @@ public class ValidateParentBehavior(IRowTypeRegistry rowTypeRegistry, ITextLocal
         if (parentId == null)
             return false;
 
-        if (isUpdate && parentIdField.IndexCompare(old, row) == 0)
+        if (isUpdate && parentIdField.IndexCompare(old!, row) == 0)
             return false;
 
         if (string.IsNullOrEmpty(parentIdField.ForeignTable))
             return false;
 
-        var foreignRowType = rowTypeRegistry.ByConnectionKey(row.GetFields().ConnectionKey)
+        var foreignRowType = rowTypeRegistry.ByConnectionKey(row.GetFields().ConnectionKey!)
             .FirstOrDefault(x => x.GetCustomAttribute<TableNameAttribute>()?.Name ==
                 parentIdField.ForeignTable);
 
@@ -71,7 +73,7 @@ public class ValidateParentBehavior(IRowTypeRegistry rowTypeRegistry, ITextLocal
             return false;
 
         tableName = foreignRow.Table;
-        criteria = new Criteria(foreignRow.IdField) == new ValueCriteria(parentId) &
+        criteria = new Criteria(foreignRow.GetIdField()) == new ValueCriteria(parentId) &
             new Criteria(iar.IsActiveField) < 0;
 
         return true;

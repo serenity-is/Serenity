@@ -13,7 +13,7 @@ namespace Serenity.Web;
 /// <exception cref="ArgumentNullException"><paramref name="storage"/> is <c>null</c>.</exception>
 [Obsolete("Please inject and use IUploadProcessor interface")]
 #pragma warning disable CS9113 // Parameter is unread.
-public class UploadProcessor(IUploadStorage storage, IExceptionLogger _ = null) : ProcessedUploadInfo
+public class UploadProcessor(IUploadStorage storage, IExceptionLogger? _ = null) : ProcessedUploadInfo
 #pragma warning restore CS9113 // Parameter is unread.
 {
     private readonly IUploadStorage storage = storage ?? throw new ArgumentNullException(nameof(storage));
@@ -31,7 +31,7 @@ public class UploadProcessor(IUploadStorage storage, IExceptionLogger _ = null) 
     /// <summary>
     /// Gets or sets the thumb back color.
     /// </summary>
-    public string ThumbBackColor { get; set; } = null;
+    public string? ThumbBackColor { get; set; } = null;
 
     /// <summary>
     /// Gets or sets the thumb scale mode.
@@ -53,7 +53,7 @@ public class UploadProcessor(IUploadStorage storage, IExceptionLogger _ = null) 
     /// <returns><c>true</c> if the upload was processed successfully.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="fileContent"/> is <c>null</c>.</exception>
     public bool ProcessStream(Stream fileContent, string extension, 
-        ITextLocalizer localizer, IUploadOptions options = null)
+        ITextLocalizer localizer, IUploadOptions? options = null)
     {
         ArgumentNullException.ThrowIfNull(fileContent);
 

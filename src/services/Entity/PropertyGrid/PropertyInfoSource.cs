@@ -16,7 +16,7 @@ public class PropertyInfoSource : IPropertySource
     /// <param name="property">The property.</param>
     /// <param name="basedOnRow">The based on row.</param>
     /// <exception cref="ArgumentNullException">property</exception>
-    public PropertyInfoSource(PropertyInfo property, IRow basedOnRow)
+    public PropertyInfoSource(PropertyInfo property, IRow? basedOnRow)
     {
         Property = property ?? throw new ArgumentNullException(nameof(property));
         wrappedProperty = new WrappedProperty(property);
@@ -41,18 +41,16 @@ public class PropertyInfoSource : IPropertySource
 
         if (ValueType.IsEnum)
             EnumType = ValueType;
-        else if (
-            BasedOnField is not null
-            && BasedOnField is IEnumTypeField)
+        else if (BasedOnField is IEnumTypeField enumTypeField)
         {
-            EnumType = (BasedOnField as IEnumTypeField).EnumType;
+            EnumType = enumTypeField.EnumType;
             if (EnumType != null && !EnumType.IsEnum)
                 EnumType = null;
         }
     }
 
     /// <inheritdoc/>
-    public TAttribute GetAttribute<TAttribute>(AttributeOrigin origin = AttributeOrigin.All)
+    public TAttribute? GetAttribute<TAttribute>(AttributeOrigin origin = AttributeOrigin.All)
         where TAttribute : Attribute
     {
         return wrappedProperty.GetAttribute<TAttribute>(origin) ??
@@ -90,13 +88,13 @@ public class PropertyInfoSource : IPropertySource
     public Type ValueType { get; private set; }
 
     /// <inheritdoc/>
-    public Type EnumType { get; private set; }
+    public Type? EnumType { get; private set; }
 
     /// <inheritdoc/>
-    public IRow BasedOnRow { get; private set; }
+    public IRow? BasedOnRow { get; private set; }
 
     /// <inheritdoc/>
-    public Field BasedOnField { get; private set; }
+    public Field? BasedOnField { get; private set; }
 
     /// <inheritdoc/>
     public string Name => Property.Name;
@@ -105,5 +103,5 @@ public class PropertyInfoSource : IPropertySource
     public Type PropertyType => Property.PropertyType;
 
     /// <inheritdoc/>
-    public Type ReflectedType => Property.ReflectedType;
+    public Type? ReflectedType => Property.ReflectedType;
 }

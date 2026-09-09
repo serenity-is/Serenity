@@ -9,8 +9,8 @@ namespace Serenity.Services;
 /// <param name="localizer">Text localizer</param>
 public class UniqueConstraintSaveBehavior(ITextLocalizer localizer) : BaseSaveBehaviorAsync, ISaveBehaviorSync, IImplicitBehavior
 {
-    private UniqueConstraintAttribute[] attrList;
-    private IEnumerable<Field>[] attrFields;
+    private UniqueConstraintAttribute[]? attrList;
+    private IEnumerable<Field>[]? attrFields;
     private readonly ITextLocalizer localizer = localizer;
 
     /// <inheritdoc/>
@@ -22,7 +22,7 @@ public class UniqueConstraintSaveBehavior(ITextLocalizer localizer) : BaseSaveBe
         if (!attr.Any())
             return false;
 
-        attrList = attr.ToArray();
+        attrList = [.. attr];
         return true;
     }
 
@@ -37,7 +37,7 @@ public class UniqueConstraintSaveBehavior(ITextLocalizer localizer) : BaseSaveBe
         for (var i = 0; i < attrList.Length; i++)
         {
             var attr = attrList[i];
-            var fields = attrFields[i];
+            var fields = attrFields![i];
 
             UniqueFieldSaveBehavior.ValidateUniqueConstraint(handler, fields, localizer, attr.ErrorMessage,
                 attrList[i].IgnoreDeleted ? ServiceQueryHelper.GetNotDeletedCriteria(handler.Row) : Criteria.Empty);
@@ -54,8 +54,8 @@ public class UniqueConstraintSaveBehavior(ITextLocalizer localizer) : BaseSaveBe
 
         for (var i = 0; i < attrList.Length; i++)
         {
-            var attr = attrList[i];
-            var fields = attrFields[i];
+            var attr = attrList![i];
+            var fields = attrFields![i];
 
             await UniqueFieldSaveBehavior.ValidateUniqueConstraintAsync(handler, fields, localizer, attr.ErrorMessage,
                 attrList[i].IgnoreDeleted ? ServiceQueryHelper.GetNotDeletedCriteria(handler.Row) : Criteria.Empty,
@@ -68,7 +68,7 @@ public class UniqueConstraintSaveBehavior(ITextLocalizer localizer) : BaseSaveBe
         if (attrFields != null)
             return;
 
-        attrFields = attrList.Select(attr =>
+        attrFields = [.. attrList!.Select(attr =>
         {
             return attr.Fields.Select(x =>
             {
@@ -79,6 +79,6 @@ public class UniqueConstraintSaveBehavior(ITextLocalizer localizer) : BaseSaveBe
                             x, handler.Row.GetType().FullName))
                     : field;
             });
-        }).ToArray();
+        })];
     }
 }

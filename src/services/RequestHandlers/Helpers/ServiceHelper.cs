@@ -78,7 +78,7 @@ public static class ServiceHelper
 
         if (indexFields == null ||
             indexFields.Length == 0)
-            throw new ArgumentNullException("indexField");
+            throw new ArgumentNullException(nameof(indexFields));
 
         if (indexName != null &&
             !exception.Message.Contains(indexName))
@@ -99,7 +99,7 @@ public static class ServiceHelper
         }
 
         var row = newRow.CreateNew();
-        var idField = newRow.IdField;
+        var idField = newRow.GetIdField();
 
         var query = new SqlQuery()
             .Dialect(connection.GetDialect())

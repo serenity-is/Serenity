@@ -14,7 +14,7 @@ public static partial class Sql
     public static string Sum(string field)
     {
         if (field == null || field.Length == 0)
-            throw new ArgumentNullException("field");
+            throw new ArgumentNullException(nameof(field));
 
         return "SUM(" + field + ")";
     }
@@ -41,7 +41,7 @@ public static partial class Sql
     public static string Count(string field)
     {
         if (field == null || field.Length == 0)
-            throw new ArgumentNullException("field");
+            throw new ArgumentNullException(nameof(field));
         return "COUNT(" + field + ")";
     }
 
@@ -67,7 +67,7 @@ public static partial class Sql
     public static string Count(int joinNumber, string field)
     {
         if (field == null || field.Length == 0)
-            throw new ArgumentNullException("field");
+            throw new ArgumentNullException(nameof(field));
 
         return string.Format("COUNT(T{0}.{1})", joinNumber.ToString(CultureInfo.InvariantCulture), field);
     }
@@ -113,7 +113,7 @@ public static partial class Sql
     public static string Coalesce(this IQueryWithParams query, params object[] values)
     {
         if (values == null || values.Length == 0)
-            throw new ArgumentNullException("values");
+            throw new ArgumentNullException(nameof(values));
 
         StringBuilder sb = new("COALESCE(");
 
@@ -151,7 +151,7 @@ public static partial class Sql
     public static string Min(string field)
     {
         if (field == null || field.Length == 0)
-            throw new ArgumentNullException("field");
+            throw new ArgumentNullException(nameof(field));
 
         return "MIN(" + field + ")";
     }
@@ -180,7 +180,7 @@ public static partial class Sql
     public static string Min(int joinNumber, string field)
     {
         if (field == null || field.Length == 0)
-            throw new ArgumentNullException("field");
+            throw new ArgumentNullException(nameof(field));
 
         return string.Format("MIN(T{0}.{1})", joinNumber.ToString(CultureInfo.InvariantCulture), field);
     }
@@ -194,7 +194,7 @@ public static partial class Sql
     public static string Max(string field)
     {
         if (field == null || field.Length == 0)
-            throw new ArgumentNullException("field");
+            throw new ArgumentNullException(nameof(field));
 
         return "MAX(" + field + ")";
     }
@@ -222,7 +222,7 @@ public static partial class Sql
     public static string Max(int joinNumber, string field)
     {
         if (field == null || field.Length == 0)
-            throw new ArgumentNullException("field");
+            throw new ArgumentNullException(nameof(field));
 
         return string.Format("MAX(T{0}.{1})", joinNumber.ToString(CultureInfo.InvariantCulture), field);
     }
@@ -237,7 +237,7 @@ public static partial class Sql
     public static string Sum(int joinNumber, string field)
     {
         if (field == null || field.Length == 0)
-            throw new ArgumentNullException("field");
+            throw new ArgumentNullException(nameof(field));
 
         return string.Format("SUM(T{0}.{1})", joinNumber.ToString(CultureInfo.InvariantCulture), field);
     }
@@ -251,7 +251,7 @@ public static partial class Sql
     public static string Avg(string field)
     {
         if (field == null || field.Length == 0)
-            throw new ArgumentNullException("field");
+            throw new ArgumentNullException(nameof(field));
 
         return "AVG(" + field + ")";
     }
@@ -279,7 +279,7 @@ public static partial class Sql
     public static string Avg(int joinNumber, string field)
     {
         if (field == null || field.Length == 0)
-            throw new ArgumentNullException("field");
+            throw new ArgumentNullException(nameof(field));
 
         return string.Format("AVG(T{0}.{1})", joinNumber.ToString(CultureInfo.InvariantCulture), field);
     }
@@ -296,10 +296,10 @@ public static partial class Sql
     public static string Convert(string type, string field)
     {
         if (string.IsNullOrEmpty(type))
-            throw new ArgumentNullException("type");
+            throw new ArgumentNullException(nameof(type));
 
         if (string.IsNullOrEmpty(field))
-            throw new ArgumentNullException("field");
+            throw new ArgumentNullException(nameof(field));
 
         return string.Format(" Convert({0},{1}) ", type, field);
     }
@@ -315,7 +315,7 @@ public static partial class Sql
     public static string SubString(string expression, int startIndex, int endIndex)
     {
         if (string.IsNullOrEmpty(expression))
-            throw new ArgumentNullException("expression");
+            throw new ArgumentNullException(nameof(expression));
 
         return string.Format(" substring({0},{1},{2}) ", expression, startIndex, endIndex);
     }
@@ -349,7 +349,7 @@ public static partial class Sql
 
         if (whenThenPairs.Length == 0 ||
             whenThenPairs.Length % 2 == 1)
-            throw new ArgumentOutOfRangeException("whenThenPairs");
+            throw new ArgumentOutOfRangeException(nameof(whenThenPairs));
 
         for (var i = 0; i < whenThenPairs.Length; i += 2)
         {
@@ -377,7 +377,7 @@ public static partial class Sql
     {
         private readonly List<ICriteria> when;
         private readonly List<object> then;
-        private object elseValue;
+        private object? elseValue;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CaseBuilder"/> class.

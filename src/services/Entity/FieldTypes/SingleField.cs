@@ -15,8 +15,8 @@ namespace Serenity.Data;
 /// <param name="flags">The flags.</param>
 /// <param name="getValue">The get value.</param>
 /// <param name="setValue">The set value.</param>
-public sealed class SingleField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
-    Func<IRow, float?> getValue = null, Action<IRow, float?> setValue = null) : GenericValueField<float>(collection, FieldType.Single, name, caption, size, flags, getValue, setValue)
+public sealed class SingleField(ICollection<Field> collection, string name, LocalText? caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
+    Func<IRow, float?>? getValue = null, Action<IRow, float?>? setValue = null) : GenericValueField<float>(collection, FieldType.Single, name, caption, size, flags, getValue, setValue)
 {
 
     /// <summary>
@@ -30,7 +30,7 @@ public sealed class SingleField(ICollection<Field> collection, string name, Loca
     /// <param name="getValue">The get value.</param>
     /// <param name="setValue">The set value.</param>
     /// <returns>A new SingleField instance.</returns>
-    public static SingleField Factory(ICollection<Field> collection, string name, LocalText caption, int size, FieldFlags flags,
+    public static SingleField Factory(ICollection<Field> collection, string name, LocalText? caption, int size, FieldFlags flags,
         Func<IRow, float?> getValue, Action<IRow, float?> setValue)
     {
         return new SingleField(collection, name, caption, size, flags, getValue, setValue);
@@ -92,7 +92,7 @@ public sealed class SingleField(ICollection<Field> collection, string name, Loca
                 _setValue(row, Convert.ToSingle(reader.Value, CultureInfo.InvariantCulture));
                 break;
             case Newtonsoft.Json.JsonToken.String:
-                var s = ((string)reader.Value).TrimToNull();
+                var s = ((string?)reader.Value).TrimToNull();
                 if (s == null)
                     _setValue(row, null);
                 else
@@ -125,7 +125,7 @@ public sealed class SingleField(ICollection<Field> collection, string name, Loca
                 _setValue(row, v);
                 break;
             case JsonTokenType.String:
-                string s = reader.GetString().TrimToNull();
+                string? s = reader.GetString().TrimToNull();
                 if (s == null)
                     _setValue(row, null);
                 else

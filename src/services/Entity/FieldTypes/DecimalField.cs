@@ -15,8 +15,8 @@ namespace Serenity.Data;
 /// <param name="flags">The flags.</param>
 /// <param name="getValue">The get value.</param>
 /// <param name="setValue">The set value.</param>
-public sealed class DecimalField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
-    Func<IRow, decimal?> getValue = null, Action<IRow, decimal?> setValue = null) : GenericValueField<decimal>(collection, FieldType.Decimal, name, caption, size, flags, getValue, setValue)
+public sealed class DecimalField(ICollection<Field> collection, string name, LocalText? caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
+    Func<IRow, decimal?>? getValue = null, Action<IRow, decimal?>? setValue = null) : GenericValueField<decimal>(collection, FieldType.Decimal, name, caption, size, flags, getValue, setValue)
 {
 
     /// <summary>
@@ -30,7 +30,7 @@ public sealed class DecimalField(ICollection<Field> collection, string name, Loc
     /// <param name="getValue">The get value.</param>
     /// <param name="setValue">The set value.</param>
     /// <returns>A new DecimalField instance.</returns>
-    public static DecimalField Factory(ICollection<Field> collection, string name, LocalText caption, int size, FieldFlags flags,
+    public static DecimalField Factory(ICollection<Field> collection, string name, LocalText? caption, int size, FieldFlags flags,
         Func<IRow, decimal?> getValue, Action<IRow, decimal?> setValue)
     {
         return new DecimalField(collection, name, caption, size, flags, getValue, setValue);
@@ -92,7 +92,7 @@ public sealed class DecimalField(ICollection<Field> collection, string name, Loc
                 _setValue(row, Convert.ToDecimal(reader.Value, CultureInfo.InvariantCulture));
                 break;
             case Newtonsoft.Json.JsonToken.String:
-                var s = ((string)reader.Value).TrimToNull();
+                var s = ((string?)reader.Value).TrimToNull();
                 if (s == null)
                     _setValue(row, null);
                 else
@@ -125,7 +125,7 @@ public sealed class DecimalField(ICollection<Field> collection, string name, Loc
                 _setValue(row, v);
                 break;
             case JsonTokenType.String:
-                string s = reader.GetString().TrimToNull();
+                string? s = reader.GetString().TrimToNull();
                 if (s == null)
                     _setValue(row, null);
                 else

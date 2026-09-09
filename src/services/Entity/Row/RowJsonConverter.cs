@@ -9,12 +9,12 @@ public class RowJsonConverter : JsonConverter<IRow>
     /// <summary>
     /// Should serialize extension
     /// </summary>
-    public static Func<IRow, string, bool> ShouldSerializeExtension;
+    public static Func<IRow, string, bool>? ShouldSerializeExtension { get; set; }
 
     /// <summary>
     /// Should deserialize extension
     /// </summary>
-    public static Func<IRow, string, bool> ShouldDeserializeExtension;
+    public static Func<IRow, string, bool>? ShouldDeserializeExtension { get; set; }
 
     /// <inheritdoc/>
     public override void Write(Utf8JsonWriter writer, IRow row, JsonSerializerOptions options)
@@ -73,12 +73,12 @@ public class RowJsonConverter : JsonConverter<IRow>
     }
 
     /// <inheritdoc/>
-    public override IRow Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override IRow? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         if (reader.TokenType == JsonTokenType.Null)
             return null;
 
-        var row = (IRow)Activator.CreateInstance(typeToConvert) ?? 
+        var row = (IRow)Activator.CreateInstance(typeToConvert)! ?? 
             throw new JsonException(string.Format("No row of type {0} could be created.", 
                 typeToConvert.Name));
 
@@ -92,7 +92,7 @@ public class RowJsonConverter : JsonConverter<IRow>
             switch (reader.TokenType)
             {
                 case JsonTokenType.PropertyName:
-                    string fieldName = reader.GetString();
+                    string fieldName = reader.GetString()!;
 
                     if (!reader.Read())
                         throw new JsonException("Unexpected end when deserializing object.");
@@ -117,7 +117,7 @@ public class RowJsonConverter : JsonConverter<IRow>
                     {
                         if (deserializeAsExtension)
                         {
-                            object v = reader.TokenType switch
+                            object? v = reader.TokenType switch
                             {
                                 JsonTokenType.Null => null,
                                 JsonTokenType.False => false,
@@ -125,7 +125,7 @@ public class RowJsonConverter : JsonConverter<IRow>
                                 JsonTokenType.String => reader.GetString(),
                                 JsonTokenType.Number => reader.GetDouble(),
                                 JsonTokenType.StartArray => JsonSerializer.Deserialize<object[]>(ref reader, options),
-                                JsonTokenType.StartObject => JsonSerializer.Deserialize<Dictionary<string, object>>(ref reader, options),
+                                JsonTokenType.StartObject => JsonSerializer.Deserialize<Dictionary<string, object?>>(ref reader, options),
                                 _ => throw new JsonException("Unexpected error while deserializing field extension value!"),
                             };
                             row.SetDictionaryData(fieldName, v);

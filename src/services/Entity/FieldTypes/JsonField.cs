@@ -16,8 +16,8 @@ namespace Serenity.Data;
 /// <param name="flags">The flags.</param>
 /// <param name="getValue">The get value.</param>
 /// <param name="setValue">The set value.</param>
-public class JsonField<TValue>(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
-    Func<IRow, TValue> getValue = null, Action<IRow, TValue> setValue = null) : GenericClassField<TValue>(collection, FieldType.Object, name, caption, size, flags, getValue, setValue)
+public class JsonField<TValue>(ICollection<Field> collection, string name, LocalText? caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
+    Func<IRow, TValue>? getValue = null, Action<IRow, TValue?>? setValue = null) : GenericClassField<TValue>(collection, FieldType.Object, name, caption, size, flags, getValue, setValue)
     where TValue : class
 {
 
@@ -32,8 +32,8 @@ public class JsonField<TValue>(ICollection<Field> collection, string name, Local
     /// <param name="getValue">The get value.</param>
     /// <param name="setValue">The set value.</param>
     /// <returns>A new JsonField instance.</returns>
-    public static JsonField<TValue> Factory(ICollection<Field> collection, string name, LocalText caption, int size, FieldFlags flags,
-        Func<IRow, TValue> getValue, Action<IRow, TValue> setValue)
+    public static JsonField<TValue> Factory(ICollection<Field> collection, string name, LocalText? caption, int size, FieldFlags flags,
+        Func<IRow, TValue> getValue, Action<IRow, TValue?> setValue)
     {
         return new JsonField<TValue>(collection, name, caption, size, flags, getValue, setValue);
     }
@@ -64,14 +64,14 @@ public class JsonField<TValue>(ICollection<Field> collection, string name, Local
     /// <value>
     /// The settings.
     /// </value>
-    public JsonSerializerOptions SerializerOptions { get; set; }
+    public JsonSerializerOptions? SerializerOptions { get; set; }
 
     /// <summary>
     /// Gets the value of this row as an SQL value.
     /// </summary>
     /// <param name="row">The row.</param>
     /// <returns>The value of the field in the row as an SQL value.</returns>
-    public override object AsSqlValue(IRow row)
+    public override object? AsSqlValue(IRow row)
     {
         var value = AsObject(row);
         if (value == null)
@@ -137,7 +137,7 @@ public class JsonField<TValue>(ICollection<Field> collection, string name, Local
                 break;
             case Newtonsoft.Json.JsonToken.String:
                 _setValue(row, Newtonsoft.Json.JsonConvert.DeserializeObject<TValue>(
-                    (string)reader.Value, JsonSettings.StrictIncludeNulls));
+                    (string)reader.Value!, JsonSettings.StrictIncludeNulls));
                 break;
             default:
                 _setValue(row, serializer.Deserialize<TValue>(reader));
@@ -159,7 +159,7 @@ public class JsonField<TValue>(ICollection<Field> collection, string name, Local
                 if (typeof(TValue) == typeof(string))
                     _setValue(row, JsonSerializer.Deserialize<TValue>(ref reader, options));
                 else
-                    _setValue(row, JsonSerializer.Deserialize<TValue>(reader.GetString(), options));
+                    _setValue(row, JsonSerializer.Deserialize<TValue>(reader.GetString()!, options));
                 break;
             default:
                 _setValue(row, JsonSerializer.Deserialize<TValue>(ref reader, options));

@@ -15,8 +15,8 @@ public static class ArgumentExceptions
     /// <param name="paramName">The name of the parameter that caused the exception.</param>
     /// <returns>A new <see cref="ArgumentOutOfRangeException"/> instance.</returns>
 #pragma warning disable IDE0060 // Remove unused parameter
-    public static ArgumentOutOfRangeException OutOfRange(object argument, 
-        [CallerArgumentExpression(nameof(argument))] string paramName = null)
+    public static ArgumentOutOfRangeException OutOfRange(object? argument,
+        [CallerArgumentExpression(nameof(argument))] string? paramName = null)
 #pragma warning restore IDE0060 // Remove unused parameter
     {
         return new(paramName ?? "missingParamName");

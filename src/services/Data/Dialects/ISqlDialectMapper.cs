@@ -10,5 +10,5 @@ public interface ISqlDialectMapper
     /// </summary>
     /// <param name="dialectOrProviderName">The dialect name or provider name.</param>
     /// <returns>The matching <see cref="ISqlDialect"/>, or <c>null</c> if no match is found.</returns>
-    ISqlDialect TryGet(string dialectOrProviderName);
+    ISqlDialect? TryGet(string? dialectOrProviderName);
 }

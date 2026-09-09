@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data.Mapping;
+namespace Serenity.Data.Mapping;
 
 /// <summary>
 /// Adds an OUTER APPLY to the row.
@@ -48,7 +48,7 @@ public class OuterApplyAttribute(string alias, string innerQuery) : Attribute, I
     /// <value>
     /// The property prefix.
     /// </value>
-    public string PropertyPrefix { get; set; }
+    public string? PropertyPrefix { get; set; }
 
     /// <summary>
     /// Gets or sets the title prefix.
@@ -56,7 +56,7 @@ public class OuterApplyAttribute(string alias, string innerQuery) : Attribute, I
     /// <value>
     /// The title prefix.
     /// </value>
-    public string TitlePrefix { get; set; }
+    public string? TitlePrefix { get; set; }
 
     /// <summary>
     /// Gets or sets the type of the row.
@@ -64,10 +64,10 @@ public class OuterApplyAttribute(string alias, string innerQuery) : Attribute, I
     /// <value>
     /// The type of the row.
     /// </value>
-    public Type RowType { get; set; }
+    public Type? RowType { get; set; }
 
     string ISqlJoin.OnCriteria => InnerQuery;
-    string ISqlJoin.ToTable => null;
+    string ISqlJoin.ToTable => null!;
 
     /// <summary>
     /// Gets or sets the dialect.
@@ -75,7 +75,7 @@ public class OuterApplyAttribute(string alias, string innerQuery) : Attribute, I
     /// <value>
     /// The dialect.
     /// </value>
-    public string Dialect { get; set; }
+    public string? Dialect { get; set; }
 
     /// <summary>
     /// Gets or sets the negating of the dialect.
@@ -87,6 +87,6 @@ public class OuterApplyAttribute(string alias, string innerQuery) : Attribute, I
     {
         get => Dialect != null && Dialect.StartsWith('!');
         set => Dialect = value ? (!NegateDialect ? ("!" + Dialect) : Dialect) :
-            (NegateDialect ? Dialect[1..] : Dialect);
+            (NegateDialect ? Dialect![1..] : Dialect);
     }
 }

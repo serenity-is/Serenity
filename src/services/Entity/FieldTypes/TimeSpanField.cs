@@ -15,8 +15,8 @@ namespace Serenity.Data;
 /// <param name="flags">The flags.</param>
 /// <param name="getValue">The get value.</param>
 /// <param name="setValue">The set value.</param>
-public sealed class TimeSpanField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
-    Func<IRow, TimeSpan?> getValue = null, Action<IRow, TimeSpan?> setValue = null) : GenericValueField<TimeSpan>(collection, FieldType.Time, name, caption, size, flags, getValue, setValue)
+public sealed class TimeSpanField(ICollection<Field> collection, string name, LocalText? caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
+    Func<IRow, TimeSpan?>? getValue = null, Action<IRow, TimeSpan?>? setValue = null) : GenericValueField<TimeSpan>(collection, FieldType.Time, name, caption, size, flags, getValue, setValue)
 {
 
     /// <summary>
@@ -30,7 +30,7 @@ public sealed class TimeSpanField(ICollection<Field> collection, string name, Lo
     /// <param name="getValue">The get value.</param>
     /// <param name="setValue">The set value.</param>
     /// <returns>A new TimeSpanField instance.</returns>
-    public static TimeSpanField Factory(ICollection<Field> collection, string name, LocalText caption, int size, FieldFlags flags,
+    public static TimeSpanField Factory(ICollection<Field> collection, string name, LocalText? caption, int size, FieldFlags flags,
         Func<IRow, TimeSpan?> getValue, Action<IRow, TimeSpan?> setValue)
     {
         return new TimeSpanField(collection, name, caption, size, flags, getValue, setValue);
@@ -58,7 +58,7 @@ public sealed class TimeSpanField(ICollection<Field> collection, string name, Lo
             else if (value is DateTime dt)
                 timeSpan = dt.TimeOfDay;
             else
-                timeSpan = TimeSpan.Parse(value.ToString(), CultureInfo.InvariantCulture);
+                timeSpan = TimeSpan.Parse(value.ToString()!, CultureInfo.InvariantCulture);
 
             _setValue(row, timeSpan);
         }
@@ -113,7 +113,7 @@ public sealed class TimeSpanField(ICollection<Field> collection, string name, Lo
                 _setValue(row, value.TimeOfDay);
                 break;
             case Newtonsoft.Json.JsonToken.String:
-                var s = ((string)reader.Value).TrimToNull();
+                var s = ((string?)reader.Value).TrimToNull();
                 if (s == null)
                     _setValue(row, null);
                 else

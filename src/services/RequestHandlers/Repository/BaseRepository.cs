@@ -1,4 +1,4 @@
-﻿namespace Serenity.Services;
+namespace Serenity.Services;
 
 /// <summary>
 /// A base class that can be used for repositories (obsolete, <see cref="BaseRequestHandler"/>)
@@ -35,5 +35,5 @@ public class BaseRepository(IRequestContext context)
     /// <summary>
     /// Gets the user from the request context.
     /// </summary>
-    protected ClaimsPrincipal User => Context.User;
+    protected ClaimsPrincipal? User => Context.User;
 }

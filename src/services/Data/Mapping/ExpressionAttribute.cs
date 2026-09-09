@@ -41,7 +41,7 @@ public class ExpressionAttribute(string value) : BaseExpressionAttribute
     /// <value>
     /// The dialect.
     /// </value>
-    public string Dialect { get; set; }
+    public string? Dialect { get; set; }
 
     /// <summary>
     /// Gets or sets the negating of the dialect.
@@ -53,6 +53,6 @@ public class ExpressionAttribute(string value) : BaseExpressionAttribute
     {
         get => Dialect != null && Dialect.StartsWith('!');
         set => Dialect = value ? (!NegateDialect ? ("!" + Dialect) : Dialect) :
-            (NegateDialect ?  Dialect[1..] : Dialect);
+            (NegateDialect ? Dialect![1..] : Dialect);
     }
 }

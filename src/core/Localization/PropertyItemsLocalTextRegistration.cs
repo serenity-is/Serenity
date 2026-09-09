@@ -120,7 +120,7 @@ public static class PropertyItemsLocalTextRegistration
     /// </summary>
     /// <param name="text">The key or text.</param>
     /// <returns><c>true</c> if the text looks like a local text key; otherwise, <c>false</c>.</returns>
-    public static bool IsLocalTextKeyCandidate(string text)
+    public static bool IsLocalTextKeyCandidate(string? text)
     {
         return !string.IsNullOrEmpty(text) &&
             LocalTextKeyLike.IsMatch(text) &&

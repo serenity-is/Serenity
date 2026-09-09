@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 public partial class SqlQuery
 {
@@ -21,7 +21,7 @@ public partial class SqlQuery
             countRecords = countRecords,
             distinct = distinct,
             omitParens = omitParens,
-            into = new List<object>(into),
+            into = [.. into],
             intoIndex = intoIndex,
             forXml = forXml,
             forJson = forJson,
@@ -65,7 +65,7 @@ public partial class SqlQuery
                 aliasExpressions, StringComparer.OrdinalIgnoreCase);
 
         if (aliasWithJoins != null)
-            aliasWithJoins = new Dictionary<string, IHaveJoins>(
+            clone.aliasWithJoins = new Dictionary<string, IHaveJoins>(
                 aliasWithJoins, StringComparer.OrdinalIgnoreCase);
 
         return clone;

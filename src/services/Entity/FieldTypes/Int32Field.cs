@@ -13,8 +13,8 @@ namespace Serenity.Data;
 /// <param name="flags">The flags.</param>
 /// <param name="getValue">The get value.</param>
 /// <param name="setValue">The set value.</param>
-public class Int32Field(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
-    Func<IRow, int?> getValue = null, Action<IRow, int?> setValue = null) : GenericValueField<int>(collection, FieldType.Int32, name, caption, size, flags, getValue, setValue)
+public class Int32Field(ICollection<Field> collection, string name, LocalText? caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
+    Func<IRow, int?>? getValue = null, Action<IRow, int?>? setValue = null) : GenericValueField<int>(collection, FieldType.Int32, name, caption, size, flags, getValue, setValue)
 {
 
     /// <summary>
@@ -28,7 +28,7 @@ public class Int32Field(ICollection<Field> collection, string name, LocalText ca
     /// <param name="getValue">The get value.</param>
     /// <param name="setValue">The set value.</param>
     /// <returns>A new Int32Field instance.</returns>
-    public static Int32Field Factory(ICollection<Field> collection, string name, LocalText caption, int size, FieldFlags flags,
+    public static Int32Field Factory(ICollection<Field> collection, string name, LocalText? caption, int size, FieldFlags flags,
         Func<IRow, int?> getValue, Action<IRow, int?> setValue)
     {
         return new Int32Field(collection, name, caption, size, flags, getValue, setValue);
@@ -133,7 +133,7 @@ public class Int32Field(ICollection<Field> collection, string name, LocalText ca
                     _setValue(row, (int)ConvertEnumFromInt(EnumType, v));
                 break;
             case Newtonsoft.Json.JsonToken.String:
-                string s = ((string)reader.Value).TrimToNull();
+                string? s = ((string?)reader.Value).TrimToNull();
                 if (s == null)
                     _setValue(row, null);
                 else if (EnumType == null)
@@ -171,7 +171,7 @@ public class Int32Field(ICollection<Field> collection, string name, LocalText ca
                     _setValue(row, (int)ConvertEnumFromInt(EnumType, v));
                 break;
             case JsonTokenType.String:
-                string s = reader.GetString().TrimToNull();
+                string? s = reader.GetString().TrimToNull();
                 if (s == null)
                     _setValue(row, null);
                 else if (EnumType == null)

@@ -92,14 +92,14 @@ public class SaveRequestHandler<TRow, TSaveRequest, TSaveResponse> :
         {
             if (Row.IsAnyFieldAssigned)
             {
-                var idField = Row.IdField;
+                var idField = Row.GetIdField();
 
-                if (idField.IndexCompare(Old, Row) != 0)
+                if (idField.IndexCompare(Old!, Row) != 0)
                 {
                     var update = new SqlUpdate(Row.Table);
                     update.Set(Row);
-                    update.Where(idField == new ValueCriteria(idField.AsSqlValue(Old)));
-                    InvokeSaveAction(() => update.Execute(Connection, ExpectedRows.One));
+                    update.Where(idField == new ValueCriteria(idField.AsSqlValue(Old!)));
+                    InvokeSaveAction(() => update.Execute(Connection!, ExpectedRows.One));
                 }
                 else
                 {
@@ -120,7 +120,7 @@ public class SaveRequestHandler<TRow, TSaveRequest, TSaveResponse> :
                 {
                     var entityId = Connection.InsertAndGetID(Row);
                     Response.EntityId = entityId;
-                    Row.IdField.AsInvariant(Row, entityId);
+                    idField.AsInvariant(Row, entityId);
                 });
             }
             else
@@ -155,21 +155,21 @@ public class SaveRequestHandler<TRow, TSaveRequest, TSaveResponse> :
             {
                 var filter = GetDisplayOrderFilter();
                 displayOrderRow.DisplayOrderField.AsObject(Row,
-                    DisplayOrderHelper.GetNextValue(Connection, displayOrderRow, filter));
+                    DisplayOrderHelper.GetNextValue(Connection!, displayOrderRow, filter));
             }
             else
                 displayOrderFix = true;
         }
         else if (afterSave &&
             ((IsCreate && displayOrderFix) ||
-             (IsUpdate && displayOrderRow.DisplayOrderField[Old] != displayOrderRow.DisplayOrderField[Row])))
+             (IsUpdate && displayOrderRow.DisplayOrderField[Old!] != displayOrderRow.DisplayOrderField[Row])))
         {
             DisplayOrderHelper.ReorderValues(
-                connection: Connection,
+                connection: Connection!,
                 row: displayOrderRow,
                 filter: GetDisplayOrderFilter(),
-                recordID: Row.IdField.AsObject(Row),
-                newDisplayOrder: displayOrderRow.DisplayOrderField[Row].Value,
+                recordID: Row.GetIdField().AsObject(Row),
+                newDisplayOrder: displayOrderRow.DisplayOrderField[Row]!.Value,
                 hasUniqueConstraint: false);
         }
     }
@@ -181,7 +181,7 @@ public class SaveRequestHandler<TRow, TSaveRequest, TSaveResponse> :
     {
         if (!PrepareQuery().GetFirst(Connection))
         {
-            var idField = Row.IdField;
+            var idField = Row.GetIdField();
             var id = Request.EntityId != null ?
                 idField.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture)
                 : idField.AsObject(Row);
@@ -207,12 +207,12 @@ public class SaveRequestHandler<TRow, TSaveRequest, TSaveResponse> :
     {
         var idField = Row.IdField;
         var id = Request.EntityId != null ?
-            idField.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture)
-            : idField.AsSqlValue(Row);
+            idField!.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture)
+            : idField!.AsSqlValue(Row);
 
         var query = new SqlQuery()
             .Dialect(Connection.GetDialect())
-            .From(Old)
+            .From(Old!)
             .SelectTableFields()
             .WhereEqual(idField, id);
 
@@ -239,11 +239,11 @@ public class SaveRequestHandler<TRow, TSaveRequest, TSaveResponse> :
 
         Response = new TSaveResponse();
 
-        Row = (request.Entity ?? throw new ArgumentNullException(nameof(request.Entity))).Clone();
+        Row = ArgumentChecks.NotNull(request.Entity).Clone();
 
         if (requestType == SaveRequestType.Auto)
         {
-            if (Row.IdField.IsNull(Row))
+            if (Row.GetIdField().IsNull(Row))
                 requestType = SaveRequestType.Create;
             else
                 requestType = SaveRequestType.Update;

@@ -80,7 +80,7 @@ public class DeleteRequestHandler<TRow, TDeleteRequest, TDeleteResponse> :
     /// </summary>
     protected virtual void LoadEntity()
     {
-        var idField = Row.IdField;
+        var idField = Row.GetIdField();
         var id = idField.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture);
 
         var query = new SqlQuery()
@@ -124,7 +124,7 @@ public class DeleteRequestHandler<TRow, TDeleteRequest, TDeleteResponse> :
         var isActiveDeletedRow = Row as IIsActiveDeletedRow;
         var isDeletedRow = Row as IIsDeletedRow;
         var deleteLogRow = Row as IDeleteLogRow;
-        var idField = Row.IdField;
+        var idField = Row.GetIdField();
         var id = idField.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture);
 
         if (isActiveDeletedRow == null && isDeletedRow == null && deleteLogRow == null)
@@ -152,7 +152,7 @@ public class DeleteRequestHandler<TRow, TDeleteRequest, TDeleteResponse> :
                 }
                 else
                 {
-                    update.Set(isDeletedRow.IsDeletedField, true);
+                    update.Set(isDeletedRow!.IsDeletedField, true);
                 }
 
                 if (deleteLogRow != null)
@@ -180,7 +180,7 @@ public class DeleteRequestHandler<TRow, TDeleteRequest, TDeleteResponse> :
             else //if (deleteLogRow != null)
             {
                 var update = new SqlUpdate(Row.Table)
-                    .Set(deleteLogRow.DeleteDateField, DateTimeField.ToDateTimeKind(DateTime.Now,
+                    .Set(deleteLogRow!.DeleteDateField, DateTimeField.ToDateTimeKind(DateTime.Now,
                                 deleteLogRow.DeleteDateField.DateTimeKind))
                     .Set(deleteLogRow.DeleteUserIdField, User?.GetIdentifier().TryParseID())
                     .WhereEqual(idField, id)

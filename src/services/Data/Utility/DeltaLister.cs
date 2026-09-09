@@ -29,38 +29,32 @@ public class DeltaLister<TItem>
         Func<TItem, long?> getItemId, DeltaOptions options = DeltaOptions.Default)
     {
         _options = options;
-        _oldItems = oldList ?? throw new ArgumentNullException("oldList");
-        _newItems = newList ?? throw new ArgumentNullException("newList");
-        _getItemId = getItemId ?? throw new ArgumentNullException("getItemId");
+        _oldItems = oldList ?? throw new ArgumentNullException(nameof(oldList));
+        _newItems = newList ?? throw new ArgumentNullException(nameof(newList));
+        _getItemId = getItemId ?? throw new ArgumentNullException(nameof(getItemId));
 
         _oldById = [];
         _newById = [];
 
         foreach (var item in oldList)
         {
-            if (item == null)
-                throw new ArgumentNullException("oldItem");
-
-            var id = getItemId(item) ?? throw new ArgumentNullException("oldItemId");
+            var id = ArgumentChecks.NotNull(getItemId(ArgumentChecks.NotNull(item, "oldItem")), "oldItemId");
             _oldById.Add(id, item);
         }
 
         foreach (var item in newList)
         {
-            if (item == null)
-                throw new ArgumentNullException("newItem");
-
-            var id = getItemId(item);
+            var id = getItemId(ArgumentChecks.NotNull(item, "newItem"));
             if (id != null)
             {
                 if (!_oldById.ContainsKey(id.Value))
                 {
                     if ((_options & DeltaOptions.IgnoreInvalidNewId) != DeltaOptions.IgnoreInvalidNewId)
-                        throw new ArgumentOutOfRangeException("newItemId");
+                        throw ArgumentExceptions.OutOfRange(id, "newItemId");
                 }
 
                 if (_newById.Contains(id.Value))
-                    throw new ArgumentException("newItemId");
+                    throw ArgumentExceptions.OutOfRange(id, "newItemId");
 
                 _newById.Add(id.Value);
             }
@@ -80,7 +74,7 @@ public class DeltaLister<TItem>
             foreach (var item in _oldItems)
             {
                 var id = _getItemId(item);
-                if (!_newById.Contains(id.Value))
+                if (!_newById.Contains(id!.Value))
                     yield return item;
             }
         }
@@ -118,7 +112,7 @@ public class DeltaLister<TItem>
             foreach (var item in _newItems)
             {
                 var id = _getItemId(item);
-                if (id != null && _oldById.TryGetValue(id.Value, out TItem old))
+                if (id != null && _oldById.TryGetValue(id.Value, out TItem? old))
                     yield return new OldNewPair<TItem>(old, item);
             }
         }

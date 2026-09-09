@@ -6,7 +6,7 @@ namespace Serenity.PropertyGrid;
 /// Basic property processor
 /// </summary>
 /// <param name="options">The options.</param>
-public partial class BasicPropertyProcessor(IOptions<PropertyProcessorOptions> options = null) : PropertyProcessor
+public partial class BasicPropertyProcessor(IOptions<PropertyProcessorOptions>? options = null) : PropertyProcessor
 {
     private readonly PropertyProcessorOptions options = options?.Value ?? new();
 

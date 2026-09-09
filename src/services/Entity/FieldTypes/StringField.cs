@@ -15,8 +15,8 @@ namespace Serenity.Data;
 /// <param name="flags">The flags.</param>
 /// <param name="getValue">The get value.</param>
 /// <param name="setValue">The set value.</param>
-public class StringField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
-    Func<IRow, string> getValue = null, Action<IRow, string> setValue = null) : GenericClassField<string>(collection, FieldType.String, name, caption, size, flags, getValue, setValue)
+public class StringField(ICollection<Field> collection, string name, LocalText? caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
+    Func<IRow, string?>? getValue = null, Action<IRow, string?>? setValue = null) : GenericClassField<string>(collection, FieldType.String, name, caption, size, flags, getValue, setValue)
 {
 
     /// <summary>
@@ -30,8 +30,8 @@ public class StringField(ICollection<Field> collection, string name, LocalText c
     /// <param name="getValue">The get value.</param>
     /// <param name="setValue">The set value.</param>
     /// <returns>A new StringField instance.</returns>
-    public static StringField Factory(ICollection<Field> collection, string name, LocalText caption, int size, FieldFlags flags,
-        Func<IRow, string> getValue, Action<IRow, string> setValue)
+    public static StringField Factory(ICollection<Field> collection, string name, LocalText? caption, int size, FieldFlags flags,
+        Func<IRow, string?> getValue, Action<IRow, string?> setValue)
     {
         return new StringField(collection, name, caption, size, flags, getValue, setValue);
     }
@@ -78,7 +78,7 @@ public class StringField(ICollection<Field> collection, string name, LocalText c
                 return 1;
         }
         else
-            return value1.CompareTo(value2);
+            return value1!.CompareTo(value2);
     }
 
     /// <summary>
@@ -110,7 +110,7 @@ public class StringField(ICollection<Field> collection, string name, LocalText c
                 _setValue(row, null);
                 break;
             case Newtonsoft.Json.JsonToken.String:
-                _setValue(row, (string)reader.Value);
+                _setValue(row, (string?)reader.Value);
                 break;
             case Newtonsoft.Json.JsonToken.Integer:
             case Newtonsoft.Json.JsonToken.Float:
@@ -158,7 +158,7 @@ public class StringField(ICollection<Field> collection, string name, LocalText c
                 _setValue(row, v);
                 break;
             case JsonTokenType.String:
-                v = reader.GetString();
+                v = reader.GetString()!;
                 _setValue(row, v);
                 break;
             default:

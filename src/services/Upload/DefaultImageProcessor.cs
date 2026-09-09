@@ -27,7 +27,7 @@ public class DefaultImageProcessor : IImageProcessor
     }
 
     /// <inheritdoc/>
-    public object Load(Stream source, out ImageFormatInfo formatInfo)
+    public object? Load(Stream source, out ImageFormatInfo? formatInfo)
     {
         formatInfo = null;
         var image = Image.Load(source, out var format);
@@ -61,7 +61,7 @@ public class DefaultImageProcessor : IImageProcessor
 
         IImageEncoder encoder = mimeType switch
         {
-            "image/jpeg" => new JpegEncoder() { Quality = ((encoderParams?.Quality ?? 0) == 0) ? null : encoderParams.Quality },
+            "image/jpeg" => new JpegEncoder() { Quality = ((encoderParams?.Quality ?? 0) == 0) ? null : encoderParams!.Quality },
             "image/png" => new PngEncoder(),
             "image/gif" => new GifEncoder(),
             "image/webp" => new WebpEncoder(),
@@ -72,7 +72,7 @@ public class DefaultImageProcessor : IImageProcessor
     }
 
     /// <inheritdoc/>
-    public object Scale(object imageObj, int scaleWidth, int scaleHeight, ImageScaleMode mode, string backgroundColor, bool inplace)
+    public object Scale(object imageObj, int scaleWidth, int scaleHeight, ImageScaleMode mode, string? backgroundColor, bool inplace)
     {
         ArgumentNullException.ThrowIfNull(imageObj);
 

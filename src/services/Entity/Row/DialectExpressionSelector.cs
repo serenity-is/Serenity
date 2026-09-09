@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 /// <summary>
 /// Selects field expressions based on dialect
@@ -32,8 +32,8 @@ public class DialectExpressionSelector(ISqlDialect dialect)
     /// <param name="attributes">The expressions.</param>
     /// <param name="getDialect">The get dialect.</param>
     /// <returns>The best matching attribute, or <c>null</c> if none match.</returns>
-    public TAttribute GetBestMatch<TAttribute>(IEnumerable<TAttribute> attributes, 
-        Func<TAttribute, string> getDialect)
+    public TAttribute? GetBestMatch<TAttribute>(IEnumerable<TAttribute> attributes, 
+        Func<TAttribute, string?> getDialect)
         where TAttribute: class
     {
         var st = dialectServerType;
@@ -43,7 +43,7 @@ public class DialectExpressionSelector(ISqlDialect dialect)
         {
             var d = getDialect(attr);
 
-            if (string.IsNullOrEmpty(getDialect(attr)))
+            if (string.IsNullOrEmpty(d))
                 return (attr, 0);
 
             if (!d.Contains(',', StringComparison.Ordinal))
@@ -77,12 +77,12 @@ public class DialectExpressionSelector(ISqlDialect dialect)
             return null;
 
         if (count == 1)
-            return matches.First().attr;
+            return matches.First().attr!;
 
-        if (matches.Select(x => getDialect(x.attr)).Distinct().Count() == count)
-            return matches.OrderByDescending(x => x.Item2).First().attr;
+        if (matches.Select(x => getDialect(x.attr!)!).Distinct().Count() == count)
+            return matches.OrderByDescending(x => x.Item2).First().attr!;
 
-        var duplicate = matches.GroupBy(x => getDialect(x.attr))
+        var duplicate = matches.GroupBy(x => getDialect(x.attr!)!)
             .Where(x => x.Count() > 1)
             .First();
 

@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data.Mapping;
+namespace Serenity.Data.Mapping;
 
 /// <summary>
 /// Explicitly specifies the database column name for property.
@@ -14,7 +14,7 @@ public class ColumnAttribute : Attribute
     public ColumnAttribute(string name)
     {
         if (string.IsNullOrEmpty(name))
-            throw new ArgumentNullException("name");
+            throw new ArgumentNullException(nameof(name));
 
         Name = name;
     }

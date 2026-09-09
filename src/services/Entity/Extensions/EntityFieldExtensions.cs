@@ -74,16 +74,16 @@ public static class EntityFieldExtensions
     /// <param name="row">The row.</param>
     public static void AutoTrim(this Field field, IRow row)
     {
-        if (field as StringField is not null &&
+        if (field is StringField stringField &&
             (field.Flags & FieldFlags.Trim) == FieldFlags.Trim)
         {
-            string value = (field as StringField)[row];
+            string? value = stringField[row];
 
             if ((field.Flags & FieldFlags.TrimToEmpty) == FieldFlags.TrimToEmpty)
                 value = value.TrimToEmpty();
             else // TrimToNull
                 value = value.TrimToNull();
-            (field as StringField)[row] = value;
+            stringField[row] = value;
         }
     }
 
@@ -118,7 +118,7 @@ public static class EntityFieldExtensions
     /// <typeparam name="TAttribute">The type of the attribute.</typeparam>
     /// <param name="field">The field.</param>
     /// <returns>First attribute with specified type.</returns>
-    public static TAttribute GetAttribute<TAttribute>(this Field field)
+    public static TAttribute? GetAttribute<TAttribute>(this Field field)
         where TAttribute : Attribute
     {
         if (field is null)

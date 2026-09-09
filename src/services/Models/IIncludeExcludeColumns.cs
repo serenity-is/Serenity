@@ -1,4 +1,4 @@
-﻿namespace Serenity.Services;
+namespace Serenity.Services;
 
 /// <summary>
 /// Abstraction for service objects containing
@@ -11,11 +11,11 @@ public interface IIncludeExcludeColumns
     /// Set of include columns. These columns are supposed
     /// to be additionally selected.
     /// </summary>
-    HashSet<string> IncludeColumns { get; set; }
+    HashSet<string>? IncludeColumns { get; set; }
     /// <summary>
     /// Set of exclude columns. These columns should not be
     /// selected even if they are selected by default by 
     /// the select level.
     /// </summary>
-    HashSet<string> ExcludeColumns { get; set; }
+    HashSet<string>? ExcludeColumns { get; set; }
 }

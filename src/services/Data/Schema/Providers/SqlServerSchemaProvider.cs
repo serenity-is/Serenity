@@ -100,9 +100,9 @@ public class SqlServerSchemaProvider : ISchemaProvider
 
     private class TableNameSource
     {
-        public string TABLE_SCHEMA { get; set; }
-        public string TABLE_NAME { get; set; }
-        public string TABLE_TYPE { get; set; }
+        public string? TABLE_SCHEMA { get; set; }
+        public required string TABLE_NAME { get; set; }
+        public string? TABLE_TYPE { get; set; }
     }
 
     /// <inheritdoc/>

@@ -12,7 +12,7 @@ public static class RequestHandlerExtensions
     /// <param name="handler">List handler instance</param>
     public static ListRequest CreateRequest(this IListRequestHandler handler)
     {
-        return (ListRequest)Activator.CreateInstance(handler.GetRequestType());
+        return (ListRequest)Activator.CreateInstance(handler.GetRequestType()!)!;
     }
 
     /// <summary>
@@ -21,7 +21,7 @@ public static class RequestHandlerExtensions
     /// <param name="handler">Retrieve handler instance</param>
     public static RetrieveRequest CreateRequest(this IRetrieveRequestHandler handler)
     {
-        return (RetrieveRequest)Activator.CreateInstance(handler.GetRequestType());
+        return (RetrieveRequest)Activator.CreateInstance(handler.GetRequestType()!)!;
     }
 
     /// <summary>
@@ -30,7 +30,7 @@ public static class RequestHandlerExtensions
     /// <param name="handler">Delete handler instance</param>
     public static DeleteRequest CreateRequest(this IDeleteRequestHandler handler)
     {
-        return (DeleteRequest)Activator.CreateInstance(handler.GetRequestType());
+        return (DeleteRequest)Activator.CreateInstance(handler.GetRequestType()!)!;
     }
 
     /// <summary>
@@ -39,7 +39,7 @@ public static class RequestHandlerExtensions
     /// <param name="handler">Undelete handler instance</param>
     public static UndeleteRequest CreateRequest(this IUndeleteRequestHandler handler)
     {
-        return (UndeleteRequest)Activator.CreateInstance(handler.GetRequestType());
+        return (UndeleteRequest)Activator.CreateInstance(handler.GetRequestType()!)!;
     }
 
     /// <summary>
@@ -48,7 +48,7 @@ public static class RequestHandlerExtensions
     /// <param name="handler">Save handler instance</param>
     public static SaveRequest<TRow> CreateRequest<TRow>(this ISaveRequestHandler handler)
     {
-        return (SaveRequest<TRow>)Activator.CreateInstance(handler.GetRequestType());
+        return (SaveRequest<TRow>)Activator.CreateInstance(handler.GetRequestType()!)!;
     }
 
     /// <summary>
@@ -57,14 +57,14 @@ public static class RequestHandlerExtensions
     /// <param name="handler">Save handler instance</param>
     public static ISaveRequest CreateRequest(this ISaveRequestHandler handler)
     {
-        return (ISaveRequest)Activator.CreateInstance(handler.GetRequestType());
+        return (ISaveRequest)Activator.CreateInstance(handler.GetRequestType()!)!;
     }
 
     /// <summary>
     /// Gets the request type for the handler instance
     /// </summary>
     /// <param name="handler">Handler instance</param>
-    public static Type GetRequestType(this IRequestHandler handler)
+    public static Type? GetRequestType(this IRequestHandler handler)
     {
         ArgumentNullException.ThrowIfNull(handler);
 
@@ -77,7 +77,7 @@ public static class RequestHandlerExtensions
     /// Gets the response type for the handler instance
     /// </summary>
     /// <param name="handler">Handler instance</param>
-    public static Type GetResponseType(this IRequestHandler handler)
+    public static Type? GetResponseType(this IRequestHandler handler)
     {
         ArgumentNullException.ThrowIfNull(handler);
 

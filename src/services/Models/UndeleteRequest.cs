@@ -9,5 +9,5 @@ public class UndeleteRequest : ServiceRequest
     /// <summary>
     /// The entity ID to undelete
     /// </summary>
-    public object EntityId { get; set; }
+    public object? EntityId { get; set; }
 }

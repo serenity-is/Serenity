@@ -1,4 +1,4 @@
-﻿using System.Data.Common;
+using System.Data.Common;
 
 namespace Serenity.Data;
 
@@ -10,9 +10,9 @@ namespace Serenity.Data;
 public class UnitOfWork : IDisposable, IUnitOfWork
 {
     private readonly IDbConnection connection;
-    private IDbTransaction transaction;
-    private Action onCommit;
-    private Action onRollback;
+    private IDbTransaction? transaction;
+    private Action? onCommit;
+    private Action? onRollback;
     private readonly IsolationLevel isolationLevel;
     private bool initialized;
     private bool commited;
@@ -60,7 +60,7 @@ public class UnitOfWork : IDisposable, IUnitOfWork
     /// <exception cref="ArgumentNullException">connection</exception>
     public UnitOfWork(IDbConnection connection, IsolationLevel il, bool deferStart = false)
     {
-        this.connection = connection ?? throw new ArgumentNullException("connection");
+        this.connection = connection ?? throw new ArgumentNullException(nameof(connection));
         isolationLevel = il;
         if (!deferStart || connection.State == ConnectionState.Open)
             Initialize();

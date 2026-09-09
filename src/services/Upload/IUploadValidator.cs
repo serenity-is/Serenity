@@ -27,5 +27,5 @@ public interface IUploadValidator
     /// <param name="filename">File name</param>
     /// <param name="image">Image object</param>
     void ValidateImage(IUploadImageConstraints constraints, Stream stream, 
-        string filename, out object image);
+        string filename, out object? image);
 }

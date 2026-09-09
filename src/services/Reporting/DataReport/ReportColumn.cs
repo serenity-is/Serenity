@@ -1,4 +1,4 @@
-﻿namespace Serenity.Reporting;
+namespace Serenity.Reporting;
 
 /// <summary>
 /// Information about a report column.
@@ -8,12 +8,12 @@ public class ReportColumn
     /// <summary>
     /// Gets or sets the property name or field name of the column.
     /// </summary>
-    public string Name { get; set; }
+    public string? Name { get; set; }
 
     /// <summary>
     /// Gets or sets the title for the column.
     /// </summary>
-    public string Title { get; set; }
+    public string? Title { get; set; }
 
     /// <summary>
     /// Gets or sets the preferred width of the column.
@@ -23,12 +23,12 @@ public class ReportColumn
     /// <summary>
     /// Gets or sets the data type of values for the column.
     /// </summary>
-    public Type DataType { get; set; }
+    public Type? DataType { get; set; }
 
     /// <summary>
     /// Gets or sets the format string to use.
     /// </summary>
-    public string Format { get; set; }
+    public string? Format { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether the text should be wrapped.
@@ -38,5 +38,5 @@ public class ReportColumn
     /// <summary>
     /// Gets or sets the decorator to use for the column.
     /// </summary>
-    public ICellDecorator Decorator { get; set; }
+    public ICellDecorator? Decorator { get; set; }
 }

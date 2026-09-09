@@ -1,4 +1,4 @@
-﻿namespace Serenity.Services;
+namespace Serenity.Services;
 
 /// <summary>
 /// Represents a UndeleteRequestHandler. Is used with UndeleteBehavior objects.
@@ -24,7 +24,7 @@ public interface IUndeleteRequestHandler : IRequestHandler
     /// <summary>
     /// Gets a state bag that can be used as storage within a request handler context.
     /// </summary>
-    IDictionary<string, object> StateBag { get; }
+    IDictionary<string, object?> StateBag { get; }
 
     /// <summary>
     /// Gets the current connection.

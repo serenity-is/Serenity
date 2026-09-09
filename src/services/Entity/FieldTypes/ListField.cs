@@ -15,8 +15,8 @@
 /// <param name="getValue">The get value.</param>
 /// <param name="setValue">The set value.</param>
 [NotMapped]
-public class ListField<TItem>(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default | FieldFlags.NotMapped,
-    Func<IRow, List<TItem>> getValue = null, Action<IRow, List<TItem>> setValue = null) : CustomClassField<List<TItem>>(collection, name, caption, size, flags, getValue, setValue)
+public class ListField<TItem>(ICollection<Field> collection, string name, LocalText? caption = null, int size = 0, FieldFlags flags = FieldFlags.Default | FieldFlags.NotMapped,
+    Func<IRow, List<TItem>>? getValue = null, Action<IRow, List<TItem>?>? setValue = null) : CustomClassField<List<TItem>>(collection, name, caption, size, flags, getValue, setValue)
 {
 
     /// <summary>
@@ -44,8 +44,11 @@ public class ListField<TItem>(ICollection<Field> collection, string name, LocalT
     /// </summary>
     /// <param name="value">The value.</param>
     /// <returns>A clone of the value.</returns>
-    protected override List<TItem> Clone(List<TItem> value)
+    protected override List<TItem>? Clone(List<TItem>? value)
     {
+        if (value is null)
+            return null;
+
         var clone = new List<TItem>();
         foreach (var item in value)
             clone.Add(item);

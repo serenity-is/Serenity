@@ -30,13 +30,13 @@ public class ProcessedUploadInfo
     /// <summary>
     /// Gets or sets the temporary file path.
     /// </summary>
-    public string TemporaryFile { get; set; }
+    public string? TemporaryFile { get; set; }
 
     /// <summary>
     /// Legacy error message. Always null.
     /// </summary>
     [Obsolete("This is always null, as we now throw exceptions on errors")]
-    public string ErrorMessage { get; } = null;
+    public string? ErrorMessage { get; } = null;
 
     /// <summary>
     /// Legacy success flag. Always true.

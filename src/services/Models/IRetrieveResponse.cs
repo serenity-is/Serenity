@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 
 namespace Serenity.Services;
 
@@ -12,10 +12,10 @@ public interface IRetrieveResponse
     /// <summary>
     /// The entity
     /// </summary>
-    object Entity { get; }
+    object? Entity { get; }
 
     /// <summary>
     /// Dictionary containing localizations if requested.
     /// </summary>
-    IDictionary Localizations { get; set; }
+    IDictionary? Localizations { get; set; }
 }

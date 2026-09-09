@@ -173,7 +173,7 @@ public class FileUploadBehavior(IUploadStorage storage, IUploadProcessor uploadP
         if (handler.IsCreate &&
             replaceFields.Values.Any(x => !x.IsTableField()))
         {
-            var idField = ((IIdRow)handler.Row).IdField;
+            var idField = handler.Row.GetIdField();
 
             row = handler.Row.Clone();
             var query = new SqlQuery()
@@ -287,13 +287,11 @@ public class FileUploadBehavior(IUploadStorage storage, IUploadProcessor uploadP
 
                 valueField[handler.Row] = null;
 
-                if (originalNameField is not null)
-                    originalNameField[handler.Row] = null;
+                originalNameField?[handler.Row] = null;
             }
             else
             {
-                if (originalNameField is not null)
-                    originalNameField[handler.Row] = storage.GetOriginalName(newValue).TrimToNull();
+                originalNameField?[handler.Row] = storage.GetOriginalName(newValue).TrimToNull();
 
                 if (handler.IsUpdate)
                     valueField[handler.Row] = CopyTemporaryFile(handler, filesToDelete, newValue).Path;
@@ -368,7 +366,7 @@ public class FileUploadBehavior(IUploadStorage storage, IUploadProcessor uploadP
         var uploadInfo = uploadProcessor.Process(fs, temporaryFile, editorAttr as IUploadOptions);
         temporaryFile = uploadInfo.TemporaryFile;
 
-        var idField = ((IIdRow)handler.Row).IdField;
+        var idField = handler.Row.GetIdField();
         var originalName = storage.GetOriginalName(temporaryFile);
         if (string.IsNullOrEmpty(originalName))
             originalName = Path.GetFileName(temporaryFile);
@@ -424,7 +422,7 @@ public class FileUploadBehavior(IUploadStorage storage, IUploadProcessor uploadP
             valueField[handler.Row] = CopyTemporaryFile(handler, filesToDelete, newValue).Path;
         }
 
-        var idField = handler.Row.IdField;
+        var idField = handler.Row.GetIdField();
         new SqlUpdate(handler.Row.Table)
             .Set(valueField, valueField[handler.Row])
             .Where(idField == new ValueCriteria(idField.AsObject(handler.Row)))

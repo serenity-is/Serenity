@@ -21,7 +21,7 @@ public class HtmlToPdfOptions : IHtmlToPdfOptions
     }
 
     /// <inheritdoc/>
-    public string Url { get; set; }
+    public string? Url { get; set; }
 
     /// <inheritdoc/>
     public List<string> AdditionalUrls { get; set; }
@@ -39,13 +39,13 @@ public class HtmlToPdfOptions : IHtmlToPdfOptions
     public bool PrintBackground { get; set; }
 
     /// <inheritdoc/>
-    public string PageHeight { get; set; }
+    public string? PageHeight { get; set; }
 
     /// <inheritdoc/>
     public string PageSize { get; set; }
 
     /// <inheritdoc/>
-    public string PageWidth { get; set; }
+    public string? PageWidth { get; set; }
 
     /// <inheritdoc/>
     public bool SmartShrinking { get; set; }
@@ -57,22 +57,22 @@ public class HtmlToPdfOptions : IHtmlToPdfOptions
     public bool Landscape { get; set; }
 
     /// <inheritdoc/>
-    public string Zoom { get; set; }
+    public string? Zoom { get; set; }
 
     /// <inheritdoc/>
-    public string MarginLeft { get; set; } = "10mm";
+    public string? MarginLeft { get; set; } = "10mm";
 
     /// <inheritdoc/>
-    public string MarginRight { get; set; } = "10mm";
+    public string? MarginRight { get; set; } = "10mm";
 
     /// <inheritdoc/>
-    public string MarginBottom { get; set; } = "10mm";
+    public string? MarginBottom { get; set; } = "10mm";
 
     /// <inheritdoc/>
-    public string MarginTop { get; set; } = "10mm";
+    public string? MarginTop { get; set; } = "10mm";
 
     /// <inheritdoc/>
-    public string MarginsAll
+    public string? MarginsAll
     {
         set
         {
@@ -84,10 +84,10 @@ public class HtmlToPdfOptions : IHtmlToPdfOptions
     }
 
     /// <inheritdoc/>
-    public string HeaderHtmlUrl { get; set; }
+    public string? HeaderHtmlUrl { get; set; }
 
     /// <inheritdoc/>
-    public string FooterHtmlUrl { get; set; }
+    public string? FooterHtmlUrl { get; set; }
 
     /// <inheritdoc/>
     public Dictionary<string, string> FooterHeaderReplace { get; private set; }
@@ -102,8 +102,8 @@ public class HtmlToPdfOptions : IHtmlToPdfOptions
     public List<string> CustomArgs { get; private set; }
 
     /// <inheritdoc />
-    public Action<object> EditLaunchOptions { get; set; }
+    public Action<object>? EditLaunchOptions { get; set; }
 
     /// <inheritdoc />
-    public Action<object> EditPdfOptions { get; set; }
+    public Action<object>? EditPdfOptions { get; set; }
 }

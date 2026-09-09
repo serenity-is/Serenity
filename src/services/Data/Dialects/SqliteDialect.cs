@@ -133,9 +133,9 @@ public class SqliteDialect : ISqlDialect
     public virtual char ParameterPrefix => '@';
 
     /// <inheritdoc />
-    public virtual bool IsReservedKeyword(string s)
+    public virtual bool IsReservedKeyword(string? s)
     {
-        return ReservedKeywords.Contains(s);
+        return s != null && ReservedKeywords.Contains(s);
     }
 
     internal static readonly HashSet<string> ReservedKeywords = new([

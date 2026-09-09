@@ -1,9 +1,10 @@
-﻿namespace Serenity.Data.Mapping;
+namespace Serenity.Data.Mapping;
 
 /// <summary>
 /// Determines table name for the row.
 /// </summary>
 /// <seealso cref="Attribute" />
+[AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
 public class TableNameAttribute : Attribute
 {
     /// <summary>
@@ -14,7 +15,7 @@ public class TableNameAttribute : Attribute
     public TableNameAttribute(string name)
     {
         if (string.IsNullOrEmpty(name))
-            throw new ArgumentNullException("name");
+            throw new ArgumentNullException(nameof(name));
 
         Name = name;
     }
@@ -45,7 +46,7 @@ public class TableNameAttribute : Attribute
     /// <value>
     /// The dialect.
     /// </value>
-    public string Dialect { get; set; }
+    public string? Dialect { get; set; }
 
     /// <summary>
     /// Gets or sets the negating of the dialect.
@@ -57,6 +58,6 @@ public class TableNameAttribute : Attribute
     {
         get => Dialect != null && Dialect.StartsWith('!');
         set => Dialect = value ? (!NegateDialect ? ("!" + Dialect) : Dialect) :
-            (NegateDialect ? Dialect[1..] : Dialect);
+            (NegateDialect && Dialect != null ? Dialect[1..] : Dialect);
     }
 }

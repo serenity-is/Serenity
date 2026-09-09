@@ -261,7 +261,7 @@ public static partial class StringHelper
     /// <returns>
     ///   <c>true</c> if the collection is empty or null; otherwise, <c>false</c>.
     /// </returns>
-    public static bool IsEmptyOrNull(this ICollection collection)
+    public static bool IsEmptyOrNull(this ICollection? collection)
     {
         return collection == null || collection.Count == 0;
     }

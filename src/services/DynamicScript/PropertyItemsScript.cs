@@ -21,7 +21,7 @@ public abstract partial class PropertyItemsScript(string scriptName, Type type,
             throw new ArgumentNullException(nameof(serviceProvider));
     private readonly IPropertyItemProvider propertyProvider = propertyProvider ??
             throw new ArgumentNullException(nameof(PropertyItemsScript.propertyProvider));
-    private EventHandler scriptChanged;
+    private EventHandler? scriptChanged;
 
     /// <summary>
     /// Checks the name if it is empty or null.
@@ -41,7 +41,7 @@ public abstract partial class PropertyItemsScript(string scriptName, Type type,
     public TimeSpan Expiration { get; set; }
 
     /// <inheritdoc/>
-    public string GroupKey { get; set; }
+    public string? GroupKey { get; set; }
 
     /// <inheritdoc/>
     public void Changed()
@@ -71,7 +71,7 @@ public abstract partial class PropertyItemsScript(string scriptName, Type type,
     {
         var data = new PropertyItemsData
         {
-            Items = propertyProvider.GetPropertyItemsFor(type).ToList(),
+            Items = [.. propertyProvider.GetPropertyItemsFor(type)],
             AdditionalItems = []
         };
 
@@ -79,14 +79,14 @@ public abstract partial class PropertyItemsScript(string scriptName, Type type,
         {
             var instance = ActivatorUtilities.CreateInstance(
                 serviceProvider, type) as ICustomizePropertyItems;
-            instance.Customize(data.Items);
+            instance!.Customize(data.Items);
         }
 
         var basedOnRowAttr = type.GetCustomAttribute<BasedOnRowAttribute>();
         if (basedOnRowAttr != null &&
             basedOnRowAttr.RowType != null)
         {
-            var existing = new HashSet<string>(data.Items.Select(x => x.Name));
+            var existing = new HashSet<string>(data.Items.Where(x => x.Name is not null).Select(x => x.Name!));
             var additional = new HashSet<string>();
             foreach (var item in data.Items)
             {
@@ -97,8 +97,8 @@ public abstract partial class PropertyItemsScript(string scriptName, Type type,
 
             if (additional.Count > 0)
             {
-                data.AdditionalItems = propertyProvider.GetPropertyItemsFor(basedOnRowAttr.RowType,
-                    property => additional.Contains(property.Name)).ToList();
+                data.AdditionalItems = [.. propertyProvider.GetPropertyItemsFor(basedOnRowAttr.RowType,
+                    property => additional.Contains(property.Name))];
             }
         }
 

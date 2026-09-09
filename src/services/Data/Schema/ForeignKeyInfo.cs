@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data.Schema;
+namespace Serenity.Data.Schema;
 
 /// <summary>
 /// SQL metadata for a foreign key.
@@ -11,7 +11,7 @@ public class ForeignKeyInfo
     /// <value>
     /// The name of the foreign key.
     /// </value>
-    public string FKName { get; set; }
+    public required string FKName { get; set; }
 
     /// <summary>
     /// Gets or sets the foreign key column.
@@ -19,7 +19,7 @@ public class ForeignKeyInfo
     /// <value>
     /// The foreign key column.
     /// </value>
-    public string FKColumn { get; set; }
+    public required string FKColumn { get; set; }
 
     /// <summary>
     /// Gets or sets the primary key schema.
@@ -27,7 +27,7 @@ public class ForeignKeyInfo
     /// <value>
     /// The primary key schema.
     /// </value>
-    public string PKSchema { get; set; }
+    public string? PKSchema { get; set; }
 
     /// <summary>
     /// Gets or sets the primary key table.
@@ -35,7 +35,7 @@ public class ForeignKeyInfo
     /// <value>
     /// The primary key table.
     /// </value>
-    public string PKTable { get; set; }
+    public required string PKTable { get; set; }
 
     /// <summary>
     /// Gets or sets the primary key column.
@@ -43,5 +43,5 @@ public class ForeignKeyInfo
     /// <value>
     /// The primary key column.
     /// </value>
-    public string PKColumn { get; set; }
+    public required string PKColumn { get; set; }
 }

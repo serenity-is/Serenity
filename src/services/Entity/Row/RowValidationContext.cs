@@ -1,4 +1,4 @@
-﻿namespace Serenity.Services;
+namespace Serenity.Services;
 
 /// <summary>
 /// A validation context for rows
@@ -19,7 +19,7 @@ public class RowValidationContext(IDbConnection connection, IRow row, ITextLocal
     /// </summary>
     /// <param name="fieldName">Name of the field.</param>
     /// <returns>The value of the field, or <c>null</c> if the field is not found.</returns>
-    public object GetFieldValue(string fieldName)
+    public object? GetFieldValue(string fieldName)
     {
         var field = row.Fields.FindFieldByPropertyName(fieldName) ?? row.Fields.FindField(fieldName);
         if (field is null)
@@ -41,7 +41,7 @@ public class RowValidationContext(IDbConnection connection, IRow row, ITextLocal
     /// <value>
     /// The value.
     /// </value>
-    public object Value { get; set; }
+    public object? Value { get; set; }
     /// <summary>
     /// Localizer
     /// </summary>

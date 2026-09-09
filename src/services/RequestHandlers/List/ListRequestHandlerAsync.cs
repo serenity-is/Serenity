@@ -31,7 +31,7 @@ public class ListRequestHandlerAsync<TRow, TListRequest, TListResponse> :
     }
 
     /// <inheritdoc/>
-    protected override string MapFieldExpression(IField field, SqlQuery query)
+    protected override string? MapFieldExpression(IField field, SqlQuery query)
     {
         foreach (var behavior in behaviors.Value)
         {
@@ -125,7 +125,7 @@ public class ListRequestHandlerAsync<TRow, TListRequest, TListResponse> :
                 if (DistinctFields != null)
                 {
                     foreach (var field in DistinctFields)
-                        Response.Values.Add(field.AsObject(clone));
+                        Response.Values!.Add(field.AsObject(clone)!);
                 }
                 else
                     Response.Entities.Add(clone);

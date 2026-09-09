@@ -70,11 +70,11 @@ public class JsonServiceClient(string baseUrl)
             serviceResponse.Error != null)
         {
             throw new ValidationError(
-                serviceResponse.Error.Code,
+                serviceResponse.Error.Code!,
                 serviceResponse.Error.Arguments,
-                serviceResponse.Error.Message);
+                serviceResponse.Error.Message!);
         }
 
-        return resp;
+        return resp!;
     }
 }

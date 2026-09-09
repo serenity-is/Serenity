@@ -15,8 +15,8 @@ namespace Serenity.Data;
 /// <param name="flags">The flags.</param>
 /// <param name="getValue">The get value.</param>
 /// <param name="setValue">The set value.</param>
-public sealed class DateOnlyField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
-    Func<IRow, DateOnly?> getValue = null, Action<IRow, DateOnly?> setValue = null) : GenericValueField<DateOnly>(collection, FieldType.DateOnly, name, caption, size, flags, getValue, setValue)
+public sealed class DateOnlyField(ICollection<Field> collection, string name, LocalText? caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
+    Func<IRow, DateOnly?>? getValue = null, Action<IRow, DateOnly?>? setValue = null) : GenericValueField<DateOnly>(collection, FieldType.DateOnly, name, caption, size, flags, getValue, setValue)
 {
 
     /// <summary>
@@ -30,7 +30,7 @@ public sealed class DateOnlyField(ICollection<Field> collection, string name, Lo
     /// <param name="getValue">The get value.</param>
     /// <param name="setValue">The set value.</param>
     /// <returns>A new DateOnlyField instance.</returns>
-    public static DateOnlyField Factory(ICollection<Field> collection, string name, LocalText caption, int size, FieldFlags flags,
+    public static DateOnlyField Factory(ICollection<Field> collection, string name, LocalText? caption, int size, FieldFlags flags,
         Func<IRow, DateOnly?> getValue, Action<IRow, DateOnly?> setValue)
     {
         return new DateOnlyField(collection, name, caption, size, flags, getValue, setValue);
@@ -42,7 +42,7 @@ public sealed class DateOnlyField(ICollection<Field> collection, string name, Lo
     /// <param name="source">The source.</param>
     /// <param name="provider">The provider.</param>
     /// <returns>The converted value.</returns>
-    public override object ConvertValue(object source, IFormatProvider provider)
+    public override object? ConvertValue(object? source, IFormatProvider provider)
     {
         if (source is Newtonsoft.Json.Linq.JValue jValue)
             source = jValue.Value;
@@ -95,7 +95,7 @@ public sealed class DateOnlyField(ICollection<Field> collection, string name, Lo
     /// </summary>
     /// <param name="row">The row.</param>
     /// <param name="value">The value.</param>
-    public override void AsObject(IRow row, object value)
+    public override void AsObject(IRow row, object? value)
     {
         if (value == null)
             _setValue(row, null);
@@ -161,7 +161,7 @@ public sealed class DateOnlyField(ICollection<Field> collection, string name, Lo
                 _setValue(row, value);
                 break;
             case Newtonsoft.Json.JsonToken.String:
-                var s = ((string)reader.Value).TrimToNull();
+                var s = ((string?)reader.Value).TrimToNull();
                 if (s == null)
                     _setValue(row, null);
                 else

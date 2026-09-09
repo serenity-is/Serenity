@@ -12,18 +12,18 @@ public class FirebirdSchemaProvider : ISchemaProvider
     /// <value>
     /// The default schema.
     /// </value>
-    public string DefaultSchema => null;
+    public string? DefaultSchema => null;
 
     private class FieldInfoSource
     {
-        public string FIELD_NAME { get; set; }
-        public string FIELD_TYPE { get; set; }
-        public string FIELD_SUB_TYPE { get; set; }
-        public string NUMERIC_SCALE { get; set; }
-        public string NUMERIC_PRECISION { get; set; }
-        public string SIZE { get; set; }
-        public string CHARMAXLENGTH { get; set; }
-        public string COLUMN_NULLABLE { get; set; }
+        public required string FIELD_NAME { get; set; }
+        public required string FIELD_TYPE { get; set; }
+        public required string FIELD_SUB_TYPE { get; set; }
+        public required string NUMERIC_SCALE { get; set; }
+        public required string NUMERIC_PRECISION { get; set; }
+        public required string SIZE { get; set; }
+        public required string CHARMAXLENGTH { get; set; }
+        public required string COLUMN_NULLABLE { get; set; }
     }
 
     /// <inheritdoc/>
@@ -51,7 +51,7 @@ public class FirebirdSchemaProvider : ISchemaProvider
         {
             var fi = new FieldInfo
             {
-                FieldName = src.FIELD_NAME.TrimToNull()
+                FieldName = src.FIELD_NAME.TrimToEmpty()
             };
             var fieldType = src.FIELD_TYPE == null ? 0 : Convert.ToInt32(src.FIELD_TYPE, CultureInfo.InvariantCulture);
             var fieldSubType = src.FIELD_SUB_TYPE == null ? 0 : Convert.ToInt32(src.FIELD_SUB_TYPE, CultureInfo.InvariantCulture);
@@ -101,10 +101,10 @@ public class FirebirdSchemaProvider : ISchemaProvider
             tbl = table
         }).Select(x =>
         {
-            x.FKName = x.FKName.TrimToNull();
-            x.FKColumn = x.FKColumn.TrimToNull();
-            x.PKColumn = x.PKColumn.TrimToNull();
-            x.PKTable = x.PKTable.TrimToNull();
+            x.FKName = x.FKName.TrimToEmpty();
+            x.FKColumn = x.FKColumn.TrimToEmpty();
+            x.PKColumn = x.PKColumn.TrimToEmpty();
+            x.PKTable = x.PKTable.TrimToEmpty();
             return x;
         });
     }
@@ -145,7 +145,8 @@ public class FirebirdSchemaProvider : ISchemaProvider
                 match = match + "%"
             })
             .Take(1)
-            .Select(StringHelper.TrimToNull);
+            .Select(StringHelper.TrimToNull)
+            .OfType<string>();
     }
 
     /// <inheritdoc/>
@@ -158,13 +159,14 @@ public class FirebirdSchemaProvider : ISchemaProvider
                 WHERE CAST(RC.RDB$RELATION_NAME AS VARCHAR(40)) = @tbl 
                     AND RC.RDB$CONSTRAINT_TYPE = 'PRIMARY KEY'
                 ORDER BY ISGMT.RDB$FIELD_POSITION", new { tbl = table })
-                .Select(StringHelper.TrimToNull);
+                .Select(StringHelper.TrimToNull)
+                .OfType<string>();
     }
 
     private class TableNameSource
     {
-        public string NAME { get; set; }
-        public string ISVIEW { get; set; }
+        public required string NAME { get; set; }
+        public required string ISVIEW { get; set; }
     }
 
     /// <inheritdoc/>
@@ -176,7 +178,7 @@ public class FirebirdSchemaProvider : ISchemaProvider
                     WHERE (RDB$SYSTEM_FLAG IS NULL OR RDB$SYSTEM_FLAG = 0)")
             .Select(x => new TableName
             {
-                Table = StringHelper.TrimToNull(x.NAME),
+                Table = StringHelper.TrimToEmpty(x.NAME),
                 IsView = x.ISVIEW != null
             });
     }

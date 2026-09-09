@@ -6,15 +6,15 @@ public abstract partial class PropertyItemsScript
 {
     private static Func<object, object> CreatePropertyGetter(PropertyInfo propertyInfo)
     {
-        MethodInfo getMethodInfo = propertyInfo.GetMethod;
+        MethodInfo getMethodInfo = propertyInfo.GetMethod!;
         return delegate (object obj)
         {
             return getMethodInfo.Invoke(obj, null)!;
         };
     }
 
-    private static string[] PropertyNames = null;
-    private static Func<object, object>[] PropertyGetters = null;
+    private static string[]? PropertyNames = null;
+    private static Func<object, object>[]? PropertyGetters = null;
     private static readonly char[] separators = ['.', '/', '_', ':'];
 
     /// <summary>
@@ -34,8 +34,8 @@ public abstract partial class PropertyItemsScript
         {
             var propertyInfos = typeof(PropertyItem).GetProperties(BindingFlags.Public | BindingFlags.Instance)
                 .Where(x => x.Name != nameof(PropertyItem.ExtensionData)).ToArray();
-            propertyNames = propertyInfos.Select(x => x.GetCustomAttribute<JsonPropertyNameAttribute>()?.Name ?? x.Name).ToArray();
-            propertyGetters = propertyInfos.Select(CreatePropertyGetter).ToArray();
+            propertyNames = [.. propertyInfos.Select(x => x.GetCustomAttribute<JsonPropertyNameAttribute>()?.Name ?? x.Name)];
+            propertyGetters = [.. propertyInfos.Select(CreatePropertyGetter)];
             PropertyNames = propertyNames;
             PropertyGetters = propertyGetters;
         }
@@ -73,7 +73,7 @@ public abstract partial class PropertyItemsScript
 
         string mapStr(string s)
         {
-            if (strMap.TryGetValue(s, out string v))
+            if (strMap.TryGetValue(s, out string? v))
                 return v;
             string key;
             do
@@ -115,7 +115,7 @@ public abstract partial class PropertyItemsScript
             sb.Append(':');
         }
 
-        void writeValue(object value)
+        void writeValue(object? value)
         {
             if (value is bool b)
             {
@@ -160,7 +160,7 @@ public abstract partial class PropertyItemsScript
             {
                 sb.Append(Invariants.ToInvariant(dcm));
             }
-            else if (value is IDictionary<string, object> dict)
+            else if (value is IDictionary<string, object?> dict)
             {
                 sb.Append('{');
                 var first = true;
@@ -216,7 +216,7 @@ public abstract partial class PropertyItemsScript
                 if (value is "String" && (propertyName == "editorType" || propertyName == "filteringType"))
                     continue;
 
-                if (value is IDictionary<string, object> { Count: 0 })
+                if (value is IDictionary<string, object?> { Count: 0 })
                     continue;
 
                 if (firstProp)
@@ -228,7 +228,7 @@ public abstract partial class PropertyItemsScript
                 writeValue(value);
             }
 
-            if (item.ExtensionData != null && item.ExtensionData.Count > 0)
+            if (item.ExtensionData.Count > 0)
             {
                 foreach (var pair in item.ExtensionData)
                 {

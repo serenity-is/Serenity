@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Runtime.CompilerServices;
 
 namespace Serenity.Services;
 
@@ -23,7 +24,7 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(
     /// <summary>
     /// Set of ignored equality filter entries.
     /// </summary>
-    protected HashSet<string> ignoredEqualityFilters;
+    protected HashSet<string>? ignoredEqualityFilters;
 
     /// <summary>
     /// True if the list handler is in lookup access mode, e.g. it only
@@ -45,14 +46,14 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(
     /// <param name="field">Field</param>
     /// <param name="query">Query</param>
     /// <returns>Field itself or mapped field</returns>
-    protected abstract string MapFieldExpression(IField field, SqlQuery query);
+    protected abstract string? MapFieldExpression(IField field, SqlQuery query);
 
     /// <summary>
     /// Gets the native sort order, which includes name field by default,
     /// unless the row has [SortOrder] attributes.
     /// </summary>
     /// <returns>The native sort order, or <c>null</c> if there is none.</returns>
-    protected virtual SortBy[] GetNativeSort()
+    protected virtual SortBy[]? GetNativeSort()
     {
         var sortOrders = Row.GetFields().SortOrders;
         if (!sortOrders.IsEmptyOrNull())
@@ -229,7 +230,7 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(
     protected virtual void ApplyKeyOrder(SqlQuery query)
     {
         if (Row is IIdRow idRow)
-            query.OrderBy(idRow.IdField);
+            query.OrderBy(idRow.GetIdField());
     }
 
     /// <summary>
@@ -240,7 +241,7 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(
     /// <exception cref="ArgumentOutOfRangeException">The containsField has <see cref="SelectLevel.Never" />
     /// or it does not have a <see cref="QuickSearchAttribute"/>
     /// </exception>
-    protected virtual IEnumerable<Field> GetQuickSearchFields(string containsField)
+    protected virtual IEnumerable<Field> GetQuickSearchFields(string? containsField)
     {
         if (containsField == null)
         {
@@ -396,7 +397,7 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(
     /// <param name="containsText">Contains text</param>
     /// <exception cref="ArgumentOutOfRangeException">There are no quick search fields
     /// (<see cref="QuickSearchAttribute"/></exception>
-    protected virtual void ApplyContainsText(SqlQuery query, string containsText)
+    protected virtual void ApplyContainsText(SqlQuery query, string? containsText)
     {
         query.ApplyContainsText(containsText, (text, id) =>
         {
@@ -404,12 +405,12 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(
             if (fields == null || !fields.Any())
                 throw new ArgumentOutOfRangeException(nameof(containsText), "There are no quick search fields defined in " + typeof(TRow).FullName);
 
-            var criteria = Criteria.Empty;
+            BaseCriteria criteria = Criteria.Empty;
 
             bool orFalse = false;
 
             foreach (var field in fields)
-                ApplyFieldContainsText(field, containsText, id, ref criteria, ref orFalse);
+                ApplyFieldContainsText(field, containsText!, id, ref criteria, ref orFalse);
 
             if (orFalse && criteria.IsEmpty)
                 criteria |= new Criteria("1 = 0");
@@ -486,7 +487,7 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(
     /// <param name="field">Field</param>
     /// <param name="value">Equality value. Can be a enumerable for multi value filtering.</param>
     /// <exception cref="ArgumentOutOfRangeException">The field is not allowed to be filtered.</exception>
-    protected virtual void ApplyFieldEqualityFilter(SqlQuery query, Field field, object value)
+    protected virtual void ApplyFieldEqualityFilter(SqlQuery query, Field field, object? value)
     {
         if (field.MinSelectLevel == SelectLevel.Never ||
             field.Flags.HasFlag(FieldFlags.DenyFiltering) ||
@@ -500,13 +501,13 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(
         {
             var values = new List<object>();
             foreach (var val in enumerable)
-                values.Add(field.ConvertValue(val, CultureInfo.InvariantCulture));
+                values.Add(field.ConvertValue(val, CultureInfo.InvariantCulture)!);
             if (values.Count > 0)
                 query.Where(field.In(values));
         }
         else
         {
-            value = field.ConvertValue(value, CultureInfo.InvariantCulture);
+            value = field.ConvertValue(value, CultureInfo.InvariantCulture)!;
             if (value == null)
                 return;
             query.WhereEqual(field, value);
@@ -518,7 +519,7 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(
     /// for null, empty string, or empty IEnumerable.
     /// </summary>
     /// <param name="value">Value to check</param>
-    protected bool IsEmptyEqualityFilterValue(object value)
+    protected bool IsEmptyEqualityFilterValue(object? value)
     {
         if (value == null)
             return true;
@@ -526,8 +527,8 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(
         if (value is string str && str.Length == 0)
             return true;
 
-        if (value is not string && value is IEnumerable &&
-            !(value as IEnumerable).GetEnumerator().MoveNext())
+        if (value is not string && value is IEnumerable enumerable &&
+            !enumerable.GetEnumerator().MoveNext())
             return true;
 
         return false;
@@ -654,14 +655,14 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(
     /// that is not allowed to be selected, like <see cref="FieldFlags.NotMapped"/> and
     /// <see cref="SelectLevel.Never"/> etc.
     /// </summary>
-    public Field[] GetDistinctFields()
+    public Field[]? GetDistinctFields()
     {
         if (!Request.DistinctFields.IsEmptyOrNull())
         {
             Query.Distinct(true);
-            Query.ApplySort(Request.DistinctFields);
+            Query.ApplySort(Request.DistinctFields!);
 
-            var result = Request.DistinctFields.Select(x =>
+            var result = Request.DistinctFields!.Select(x =>
             {
                 if (x == null || string.IsNullOrEmpty(x.Field))
                     return null;
@@ -681,7 +682,7 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(
             if (result.Any(x => x is null))
                 return [];
 
-            return result;
+            return result!;
         }
 
         return null;
@@ -692,10 +693,15 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(
     /// </summary>
     public ITwoLevelCache Cache => Context.Cache;
 
+    private InvalidOperationException PropertyReadError([CallerMemberName] string? property = default)
+    {
+        return new InvalidOperationException($"Error reading '{property}' of {GetType().Name}. The handler has not been initialized.");
+    }
+
     /// <summary>
     /// Gets the request context.
     /// </summary>
-    public IRequestContext Context { get; private set; } = context ?? throw new ArgumentNullException(nameof(context));
+    public IRequestContext Context { get; } = context ?? throw new ArgumentNullException(nameof(context));
 
     /// <summary>
     /// Gets the localizer from the request context.
@@ -710,43 +716,43 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(
     /// <summary>
     /// Gets the current user from the request context.
     /// </summary>
-    public ClaimsPrincipal User => Context.User;
+    public ClaimsPrincipal? User => Context.User;
 
     /// <summary>
     /// Gets the list of distinct fields.
     /// </summary>
-    public Field[] DistinctFields { get; protected set; }
+    public Field[]? DistinctFields { get; protected set; }
 
     /// <summary>
     /// Gets the current connection.
     /// </summary>
-    public IDbConnection Connection { get; protected set; }
+    public IDbConnection Connection { get => field ?? throw PropertyReadError(); protected set; }
 
     /// <summary>
     /// Gets the select query.
     /// </summary>
-    public SqlQuery Query { get; protected set; }
+    public SqlQuery Query { get => field ?? throw PropertyReadError(); protected set; }
 
     /// <summary>
     /// Gets the entity used for querying / metadata lookup.
     /// </summary>
-    public TRow Row { get; protected set; }
+    public TRow Row { get => field ?? throw PropertyReadError(); protected set; }
 
     /// <summary>
     /// Gets the request object.
     /// </summary>
-    public TListRequest Request { get; protected set; }
+    public TListRequest Request { get => field ?? throw PropertyReadError(); protected set; }
 
     /// <summary>
     /// Gets the response object.
     /// </summary>
-    public TListResponse Response { get; protected set; }
+    public TListResponse Response { get => field ?? throw PropertyReadError(); protected set; }
 
     /// <summary>
     /// A state bag for behaviors to preserve state among their methods.
     /// It will be cleared before each request, e.g. Process call.
     /// </summary>
-    public IDictionary<string, object> StateBag { get; private set; } = new Dictionary<string, object>();
+    public IDictionary<string, object?> StateBag { get; } = new Dictionary<string, object?>();
 
     IRow IListRequestHandler.Row => Row;
     ListRequest IListRequestHandler.Request => Request;

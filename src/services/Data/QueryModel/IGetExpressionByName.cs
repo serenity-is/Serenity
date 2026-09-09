@@ -10,5 +10,5 @@ public interface IGetExpressionByName
     /// </summary>
     /// <param name="columnName">Name of the column.</param>
     /// <returns>The expression for the column, or <c>null</c> if not found.</returns>
-    string GetExpression(string columnName);
+    string? GetExpression(string columnName);
 }

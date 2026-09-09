@@ -26,12 +26,12 @@ public class DefaultSqlDialectMapper : ISqlDialectMapper
     /// </summary>
     /// <param name="dialectOrProviderName">The dialect name or provider name.</param>
     /// <returns>The matching <see cref="ISqlDialect"/>, or <c>null</c> if no match is found.</returns>
-    public ISqlDialect TryGet(string dialectOrProviderName)
+    public ISqlDialect? TryGet(string? dialectOrProviderName)
     {
         if (string.IsNullOrEmpty(dialectOrProviderName))
             return null;
 
-        if (DialectByProviderName.TryGetValue(dialectOrProviderName, out ISqlDialect dialect))
+        if (DialectByProviderName.TryGetValue(dialectOrProviderName, out ISqlDialect? dialect))
             return dialect;
 
         var dialectType = Type.GetType("Serenity.Data." + dialectOrProviderName + "Dialect") ??

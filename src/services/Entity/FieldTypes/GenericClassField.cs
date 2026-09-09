@@ -10,17 +10,17 @@ public abstract class GenericClassField<TValue> : Field where TValue : class
     /// <summary>
     /// The get value callback.
     /// </summary>
-    protected internal Func<IRow, TValue> _getValue;
+    protected internal Func<IRow, TValue?> _getValue;
     /// <summary>
     /// The set value callback.
     /// </summary>
-    protected internal Action<IRow, TValue> _setValue;
+    protected internal Action<IRow, TValue?> _setValue;
 
-    internal GenericClassField(ICollection<Field> collection, FieldType type, string name, LocalText caption, int size, FieldFlags flags,
-        Func<IRow, TValue> getValue = null, Action<IRow, TValue> setValue = null)
+    internal GenericClassField(ICollection<Field> collection, FieldType type, string name, LocalText? caption, int size, FieldFlags flags,
+        Func<IRow, TValue?>? getValue = null, Action<IRow, TValue?>? setValue = null)
         : base(collection, type, name, caption, size, flags)
     {
-        _getValue = getValue ?? (r => (TValue)(r.GetIndexedData(index)));
+        _getValue = getValue ?? (r => (TValue?)(r.GetIndexedData(index)));
         _setValue = setValue ?? ((r, v) => r.SetIndexedData(index, v));
     }
 
@@ -40,7 +40,7 @@ public abstract class GenericClassField<TValue> : Field where TValue : class
     /// </summary>
     /// <param name="row">The row.</param>
     /// <returns>The value of the field in the row.</returns>
-    public TValue this[IRow row]
+    public TValue? this[IRow row]
     {
         get
         {
@@ -60,7 +60,7 @@ public abstract class GenericClassField<TValue> : Field where TValue : class
     /// <param name="source">The source.</param>
     /// <param name="provider">The provider.</param>
     /// <returns>The converted value.</returns>
-    public override object ConvertValue(object source, IFormatProvider provider)
+    public override object? ConvertValue(object? source, IFormatProvider provider)
     {
         if (source is Newtonsoft.Json.Linq.JValue jValue)
             source = jValue.Value;
@@ -77,7 +77,7 @@ public abstract class GenericClassField<TValue> : Field where TValue : class
     }
 
     /// <inheritdoc />
-    public override object AsObjectNoCheck(IRow row)
+    public override object? AsObjectNoCheck(IRow row)
     {
         return _getValue(row);
     }
@@ -87,9 +87,9 @@ public abstract class GenericClassField<TValue> : Field where TValue : class
     /// </summary>
     /// <param name="row">The row.</param>
     /// <param name="value">The value.</param>
-    public override void AsObject(IRow row, object value)
+    public override void AsObject(IRow row, object? value)
     {
-        _setValue(row, (TValue)value);
+        _setValue(row, (TValue?)value);
         row.OnFieldSet(this);
     }
 

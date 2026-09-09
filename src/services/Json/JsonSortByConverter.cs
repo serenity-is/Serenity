@@ -15,9 +15,9 @@ public class JsonSortByConverter : JsonConverter
     ///   The value.</param>
     /// <param name="serializer">
     ///   The calling serializer.</param>
-    public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+    public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
     {
-        var sortBy = (SortBy)value;
+        var sortBy = (SortBy)value!;
 
         string s = sortBy.Field ?? string.Empty;
         if (sortBy.Descending)
@@ -37,7 +37,7 @@ public class JsonSortByConverter : JsonConverter
     ///   The calling serializer.</param>
     /// <returns>
     ///   The object value.</returns>
-    public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+    public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
     {
         if (reader.TokenType == JsonToken.Null)
             return null;
@@ -47,7 +47,7 @@ public class JsonSortByConverter : JsonConverter
         if (reader.TokenType != JsonToken.String)
             throw new JsonSerializationException("Unexpected end when deserializing object.");
 
-        var field = ((string)reader.Value).TrimToEmpty();
+        var field = ((string)reader.Value!).TrimToEmpty();
 
         if (field.EndsWith(" DESC", StringComparison.OrdinalIgnoreCase))
         {

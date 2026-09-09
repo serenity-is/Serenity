@@ -8,7 +8,7 @@ internal class OriginPropertyDictionary
     internal Dictionary<string, ISqlJoin> joinPropertyByName;
     internal Dictionary<string, ISqlJoin> rowJoinByAlias;
     internal Dictionary<string, OriginAttribute> originAttrByPropertyName;
-    internal Dictionary<string, Tuple<PropertyInfo, Type>> originPropertyByName;
+    internal Dictionary<string, Tuple<PropertyInfo, Type>>? originPropertyByName;
     internal ILookup<string, KeyValuePair<string, OriginAttribute>> originByAlias;
     internal IDictionary<string, string> prefixByAlias;
 
@@ -45,7 +45,7 @@ internal class OriginPropertyDictionary
         foreach (var attr in rowType.GetCustomAttributes().OfType<ISqlJoin>())
             rowJoinByAlias[attr.Alias] = attr;
 
-        originByAlias = originAttrByPropertyName.ToLookup(x => GetJoinAlias(x.Value), StringComparer.OrdinalIgnoreCase);
+        originByAlias = originAttrByPropertyName.ToLookup(x => GetJoinAlias(x.Value)!, StringComparer.OrdinalIgnoreCase);
         prefixByAlias = originByAlias.ToDictionary(x => x.Key, x =>
         {
             if (joinPropertyByAlias.TryGetValue(x.Key, out var joinProperty))
@@ -58,9 +58,9 @@ internal class OriginPropertyDictionary
                     return joinProperty.propertyName[0..^2];
             }
 
-            if (rowJoinByAlias.TryGetValue(x.Key, out ISqlJoin join))
+            if (rowJoinByAlias.TryGetValue(x.Key, out ISqlJoin? join))
             {
-                if (join.PropertyPrefix != null)
+                if (join!.PropertyPrefix != null)
                     return join.PropertyPrefix;
             }
 
@@ -74,10 +74,10 @@ internal class OriginPropertyDictionary
         if (!string.IsNullOrEmpty(join) &&
             !rowJoinByAlias.ContainsKey(join) &&
             !joinPropertyByAlias.ContainsKey(join) &&
-            joinPropertyByName.TryGetValue(join, out ISqlJoin s))
+            joinPropertyByName.TryGetValue(join, out ISqlJoin? s))
             return s.Alias;
 
-        return join;
+        return join!;
     }
 
     private static string DeterminePrefix(IEnumerable<string> items)
@@ -103,7 +103,7 @@ internal class OriginPropertyDictionary
 
     public static OriginPropertyDictionary GetPropertyDictionary(Type rowType)
     {
-        if (!cache.TryGetValue(rowType, out OriginPropertyDictionary dictionary))
+        if (!cache.TryGetValue(rowType, out OriginPropertyDictionary? dictionary))
         {
             dictionary = new OriginPropertyDictionary(rowType);
             cache[rowType] = dictionary;
@@ -114,7 +114,7 @@ internal class OriginPropertyDictionary
     private Tuple<PropertyInfo, Type> GetOriginProperty(string propertyName, DialectExpressionSelector expressionSelector)
     {
         Type originType;
-        Tuple<PropertyInfo, Type> pi;
+        Tuple<PropertyInfo, Type>? pi;
         var d = originPropertyByName;
         if (d == null)
         {
@@ -147,36 +147,27 @@ internal class OriginPropertyDictionary
     {
         var joinAlias = GetJoinAlias(origin);
 
-        if (joinPropertyByAlias.TryGetValue(joinAlias, out var joinProperty))
+        if (joinPropertyByAlias.TryGetValue(joinAlias!, out var joinProperty))
         {
             var joinPropertyName = joinProperty.propertyName;
             var fk = expressionSelector.GetBestMatch(joinProperty.foreignKeys, x => x.Dialect);
             var lj = joinProperty.join;
-            originRowType = lj.RowType ?? fk.RowType;
-
-            if (originRowType == null)
-            {
-                throw new ArgumentOutOfRangeException("origin", string.Format(
+            originRowType = (lj.RowType ?? fk!.RowType) ?? throw new ArgumentOutOfRangeException(nameof(origin), string.Format(
                     "Property '{0}' on row type '{1}' has a [Origin] attribute, " +
                     "but [ForeignKey] and [LeftJoin] attributes on related join " +
                     "property '{2}' doesn't use a typeof(SomeRow)!",
                         property.Name, rowType.Name, joinPropertyName));
-            }
         }
-        else if (rowJoinByAlias.TryGetValue(joinAlias, out ISqlJoin rowJoin))
+        else if (rowJoinByAlias.TryGetValue(joinAlias!, out ISqlJoin? rowJoin))
         {
-            originRowType = rowJoin.RowType;
-            if (originRowType == null)
-            {
-                throw new ArgumentOutOfRangeException("origin", string.Format(
+            originRowType = rowJoin.RowType ?? throw new ArgumentOutOfRangeException(nameof(origin), string.Format(
                     "Property '{0}' on row type '{1}' has a [Origin] attribute, " +
-                    "but related join declaration on row has no RowType!",
+                    "but related join declaration ({2}) on row has no RowType!",
                         property.Name, rowType.Name, joinAlias));
-            }
         }
         else
         {
-            throw new ArgumentOutOfRangeException("origin", string.Format(
+            throw new ArgumentOutOfRangeException(nameof(origin), string.Format(
                 "Property '{0}' on row type '{1}' has a [Origin] attribute, " +
                 "but declaration of join '{2}' is not found!",
                     property.Name, rowType.Name, joinAlias));
@@ -184,13 +175,13 @@ internal class OriginPropertyDictionary
 
         var originDictionary = GetPropertyDictionary(originRowType);
         string originPropertyName;
-        PropertyInfo originProperty = null;
+        PropertyInfo? originProperty = null;
 
         if (origin.Property != null)
             originPropertyName = origin.Property;
         else
         {
-            var prefix = prefixByAlias[GetJoinAlias(origin)];
+            var prefix = prefixByAlias[GetJoinAlias(origin)!];
             if (prefix != null &&
                 prefix.Length > 0 &&
                 property.Name.StartsWith(prefix) &&
@@ -207,13 +198,13 @@ internal class OriginPropertyDictionary
         if (originProperty == null &&
             !originDictionary.propertyByName.TryGetValue(originPropertyName, out originProperty))
         {
-            throw new ArgumentOutOfRangeException("origin", string.Format(
+            throw new ArgumentOutOfRangeException(nameof(origin), string.Format(
                 "Property '{0}' on row type '{1}' has a [Origin] attribute, " +
                 "but its corresponding property '{2}' on row type '{3}' is not found!",
                     property.Name, rowType.Name, originPropertyName, originRowType.Name));
         }
 
-        return originProperty;
+        return originProperty!;
     }
 
     public string OriginExpression(string propertyName, OriginAttribute origin,
@@ -243,8 +234,8 @@ internal class OriginPropertyDictionary
             {
                 var expression = expressionSelector.GetBestMatch(expressionAttr, 
                     x => x is ExpressionAttribute exp ? exp.Dialect : null);
-                return originDictionary.PrefixAliases(expression.ToString(expressionSelector.Dialect), aliasPrefix,
-                    expressionSelector, extraJoins);
+                return originDictionary.PrefixAliases(expression!.ToString(expressionSelector.Dialect), aliasPrefix,
+                    expressionSelector, extraJoins)!;
             }
             else
             {
@@ -260,7 +251,7 @@ internal class OriginPropertyDictionary
         }
     }
 
-    public TAttr OriginAttribute<TAttr>(string propertyName, 
+    public TAttr? OriginAttribute<TAttr>(string propertyName, 
         DialectExpressionSelector expressionSelector, int recursion = 0)
         where TAttr : Attribute
     {
@@ -270,9 +261,9 @@ internal class OriginPropertyDictionary
         var org = GetOriginProperty(propertyName, expressionSelector);
         var originProperty = org.Item1;
 
-        var attr = originProperty.GetCustomAttribute(typeof(TAttr));
+        var attr = originProperty.GetCustomAttribute<TAttr>();
         if (attr != null)
-            return (TAttr)attr;
+            return attr;
 
         var originOrigin = originProperty.GetCustomAttribute<OriginAttribute>();
         if (originOrigin != null)
@@ -290,7 +281,7 @@ internal class OriginPropertyDictionary
         if (recursion++ > 1000)
             throw new DivideByZeroException("Infinite origin recursion detected!");
 
-        DisplayNameAttribute attr;
+        DisplayNameAttribute? attr;
         string prefix = "";
         var joinAlias = GetJoinAlias(origin);
 
@@ -307,7 +298,7 @@ internal class OriginPropertyDictionary
                     prefix = propJoin.propertyName;
             }
         }
-        else if (rowJoinByAlias.TryGetValue(joinAlias, out ISqlJoin join) &&
+        else if (rowJoinByAlias.TryGetValue(joinAlias, out ISqlJoin? join) &&
             join.TitlePrefix != null)
         {
             prefix = join.TitlePrefix.Length > 0 ? join.TitlePrefix + " " : "";
@@ -338,7 +329,7 @@ internal class OriginPropertyDictionary
         return addPrefix(originProperty.Name);
     }
 
-    internal string PrefixAliases(string expression, string alias,
+    internal string? PrefixAliases(string expression, string alias,
         DialectExpressionSelector expressionSelector, List<Attribute> extraJoins)
     {
         if (string.IsNullOrWhiteSpace(expression))
@@ -351,14 +342,14 @@ internal class OriginPropertyDictionary
 
         var mappedJoins = new Dictionary<string, ISqlJoin>();
 
-        Func<string, string> mapAlias = null;
+        Func<string, string>? mapAlias = null;
 
-        string mapExpression(string x)
+        string? mapExpression(string? x)
         {
             if (x == null)
                 return null;
 
-            return JoinAliasLocator.ReplaceAliases(x, mapAlias);
+            return JoinAliasLocator.ReplaceAliases(x, mapAlias!);
         }
 
         mapAlias = x =>
@@ -366,7 +357,7 @@ internal class OriginPropertyDictionary
             if (x == "t0" || x == "T0")
                 return alias;
 
-            if (mappedJoins.TryGetValue(x, out ISqlJoin sqlJoin))
+            if (mappedJoins.TryGetValue(x, out ISqlJoin? sqlJoin))
                 return sqlJoin.Alias;
 
             if (joinPropertyByAlias.TryGetValue(x, out var propJoin))
@@ -383,7 +374,7 @@ internal class OriginPropertyDictionary
                     var expression = expressionSelector.GetBestMatch(expressionAttr,
                         x => x is ExpressionAttribute exp ? exp.Dialect : null);
                     if (expression != null)
-                        leftExpression = mapExpression(expression.ToString(expressionSelector.Dialect));
+                        leftExpression = mapExpression(expression.ToString(expressionSelector.Dialect))!;
                     else
                     {
                         var origin = propertyInfo.GetCustomAttribute<OriginAttribute>();
@@ -396,18 +387,18 @@ internal class OriginPropertyDictionary
 
                 ISqlJoin srcJoin = propJoin.join;
                 var fkAttr = expressionSelector.GetBestMatch(propJoin.foreignKeys, x => x.Dialect);
-                var criteriax = leftExpression + " = " + newAlias + "." + SqlSyntax.AutoBracket(fkAttr.Field, expressionSelector.Dialect);
+                var criteriax = leftExpression + " = " + newAlias + "." + SqlSyntax.AutoBracket(fkAttr!.Field, expressionSelector.Dialect);
 
                 var frgTable = fkAttr.Table ??
-                    expressionSelector.GetBestMatch(fkAttr.RowType
-                        .GetCustomAttributes<TableNameAttribute>(), x => x.Dialect).Name;
+                    expressionSelector.GetBestMatch(fkAttr.RowType!
+                        .GetCustomAttributes<TableNameAttribute>(), x => x.Dialect)?.Name!;
 
                 if (srcJoin is LeftJoinAttribute)
                     srcJoin = new LeftJoinAttribute(newAlias, frgTable, criteriax);
                 else if (srcJoin is InnerJoinAttribute)
                     srcJoin = new InnerJoinAttribute(newAlias, frgTable, criteriax);
                 else
-                    throw new ArgumentOutOfRangeException("joinType");
+                    throw ArgumentExceptions.OutOfRange(srcJoin, "joinType");
 
                 srcJoin.RowType = fkAttr.RowType ?? propJoin.join.RowType;
                 mappedJoins[x] = srcJoin;
@@ -417,23 +408,23 @@ internal class OriginPropertyDictionary
 
             if (rowJoinByAlias.TryGetValue(x, out sqlJoin))
             {
-                var mappedCriteria = mapExpression(sqlJoin.OnCriteria);
+                var mappedCriteria = mapExpression(sqlJoin.OnCriteria)!;
                 var newAlias = aliasPrefix + x;
                 var rowType = sqlJoin.RowType;
 
                 if (sqlJoin is LeftJoinAttribute lja)
-                    sqlJoin = new LeftJoinAttribute(lja.Alias, lja.ToTable, mappedCriteria);
+                    sqlJoin = new LeftJoinAttribute(lja.Alias, lja!.ToTable!, mappedCriteria);
                 else
                 {
                     var ija = sqlJoin as InnerJoinAttribute;
                     if (ija != null)
                     {
-                        sqlJoin = new InnerJoinAttribute(ija.Alias, ija.ToTable, mappedCriteria);
+                        sqlJoin = new InnerJoinAttribute(ija.Alias, ija!.ToTable!, mappedCriteria);
                     }
                     else
                     {
                         if (sqlJoin is OuterApplyAttribute oaa)
-                            sqlJoin = new OuterApplyAttribute(ija.Alias, mappedCriteria);
+                            sqlJoin = new OuterApplyAttribute(oaa.Alias, mappedCriteria);
                     }
                 }
 

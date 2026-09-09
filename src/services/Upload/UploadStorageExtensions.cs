@@ -13,7 +13,7 @@ public static class UploadStorageExtensions
     /// <param name="uploadStorage">Upload storage</param>
     /// <param name="path">Path</param>
     /// <returns>The thumbnail URL, or <c>null</c> if the path is empty.</returns>
-    public static string GetThumbnailUrl(this IUploadStorage uploadStorage, string path)
+    public static string? GetThumbnailUrl(this IUploadStorage uploadStorage, string path)
     {
         if (string.IsNullOrEmpty(path))
             return null;
@@ -31,7 +31,7 @@ public static class UploadStorageExtensions
     /// </summary>
     /// <param name="uploadStorage">Upload storage</param>
     /// <param name="thumbPath">Thumb file path</param>
-    public static string GetPrimaryFileFromThumb(this IUploadStorage uploadStorage, string thumbPath)
+    public static string? GetPrimaryFileFromThumb(this IUploadStorage uploadStorage, string thumbPath)
     {
         if (!UploadPathHelper.TryParseThumbSuffix(thumbPath,
             out var baseName, out _, out _, out _))
@@ -64,7 +64,7 @@ public static class UploadStorageExtensions
     /// <param name="path">Full source file path</param>
     public static IEnumerable<string> GetThumbnailFiles(this IUploadStorage uploadStorage, string path)
     {
-        var sourceDir = PathHelper.ToUrl(Path.GetDirectoryName(path));
+        var sourceDir = PathHelper.ToUrl(Path.GetDirectoryName(path) ?? "");
         var sourceBase = Path.ChangeExtension(path, null);
 
         foreach (var thumbPath in uploadStorage.GetFiles(sourceDir, 
@@ -108,10 +108,10 @@ public static class UploadStorageExtensions
         ArgumentNullException.ThrowIfNull(uploadStorage);
         ArgumentNullException.ThrowIfNull(options);
 
-        long size = uploadStorage.GetFileSize(options.TemporaryFile);
+        long size = uploadStorage.GetFileSize(options.TemporaryFile!);
         string path = PathHelper.ToUrl(UploadFormatting.FormatFilename(options));
-        path = uploadStorage.CopyFrom(uploadStorage, options.TemporaryFile, path, OverwriteOption.AutoRename);
-        bool hasThumbnail = uploadStorage.FileExists(UploadPathHelper.GetThumbnailName(options.TemporaryFile));
+        path = uploadStorage.CopyFrom(uploadStorage, options.TemporaryFile!, path, OverwriteOption.AutoRename);
+        bool hasThumbnail = uploadStorage.FileExists(UploadPathHelper.GetThumbnailName(options.TemporaryFile!));
 
         var result = new CopyTemporaryFileResult()
         {
@@ -122,7 +122,7 @@ public static class UploadStorageExtensions
         };
 
         options.FilesToDelete?.RegisterNewFile(path);
-        options.FilesToDelete?.RegisterOldFile(options.TemporaryFile);
+        options.FilesToDelete?.RegisterOldFile(options.TemporaryFile!);
         return result;
     }
 
@@ -149,13 +149,13 @@ public static class UploadStorageExtensions
     /// <param name="uploadStorage">Upload storage</param>
     /// <param name="path">File path</param>
     /// <exception cref="ArgumentNullException"><paramref name="uploadStorage"/> is <c>null</c>.</exception>
-    public static string GetOriginalName(this IUploadStorage uploadStorage, string path)
+    public static string? GetOriginalName(this IUploadStorage uploadStorage, string path)
     {
         ArgumentNullException.ThrowIfNull(uploadStorage);
 
         var metadata = uploadStorage.GetFileMetadata(path);
         if (metadata != null &&
-            metadata.TryGetValue(FileMetadataKeys.OriginalName, out string originalName))
+            metadata.TryGetValue(FileMetadataKeys.OriginalName, out string? originalName))
             return originalName;
 
         return null;

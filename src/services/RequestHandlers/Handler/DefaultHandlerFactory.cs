@@ -13,9 +13,9 @@ public class DefaultHandlerFactory(IDefaultHandlerRegistry registry, IHandlerAct
 {
     private readonly IDefaultHandlerRegistry registry = registry ?? throw new ArgumentNullException(nameof(registry));
     private readonly IHandlerActivator activator = activator ?? throw new ArgumentNullException(nameof(activator));
-    private readonly ConcurrentDictionary<(Type rowType, Type handlerInterface), (Type HandlerType, Type WrapperType)> cache = new();
+    private readonly ConcurrentDictionary<(Type rowType, Type handlerInterface), (Type HandlerType, Type? WrapperType)> cache = new();
 
-    private Type ResolveCustomHandler(Type handlerInterface, Type companionInterface, Type rowType)
+    private Type? ResolveCustomHandler(Type handlerInterface, Type? companionInterface, Type rowType)
     {
         var requestHandler = typeof(IRequestHandler<>).MakeGenericType(rowType);
         bool isMatch(Type x) => requestHandler.IsAssignableFrom(x) &&
@@ -44,7 +44,7 @@ public class DefaultHandlerFactory(IDefaultHandlerRegistry registry, IHandlerAct
             $"for row type {rowType.FullName}. Please add [DefaultHandler] to one of them.");
     }
 
-    private (Type HandlerType, Type WrapperType) GetHandlerType((Type rowType, Type handlerInterface) args)
+    private (Type HandlerType, Type? WrapperType) GetHandlerType((Type rowType, Type handlerInterface) args)
     {
         var companionAttr = args.handlerInterface.GetCustomAttribute<CompanionHandlerTypeAttribute>(inherit: true);
         var companionInterface = companionAttr?.CompanionType;
@@ -64,7 +64,7 @@ public class DefaultHandlerFactory(IDefaultHandlerRegistry registry, IHandlerAct
         // behavior requesting a save handler for a row that only has a synchronous custom
         // save handler.
         if (!args.handlerInterface.IsAssignableFrom(handlerType))
-            return (handlerType, companionAttr.WrapperType.MakeGenericType(args.rowType));
+            return (handlerType, companionAttr!.WrapperType.MakeGenericType(args.rowType));
 
         return (handlerType, null);
     }
@@ -79,7 +79,7 @@ public class DefaultHandlerFactory(IDefaultHandlerRegistry registry, IHandlerAct
         var (handlerType, wrapperType) = cache.GetOrAdd((rowType, handlerInterface), GetHandlerType);
         var handler = activator.CreateInstance(handlerType);
         if (wrapperType != null)
-            return Activator.CreateInstance(wrapperType, handler);
+            return Activator.CreateInstance(wrapperType, handler)!;
         return handler;
     }
 }

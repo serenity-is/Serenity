@@ -12,11 +12,11 @@ namespace Serenity.Web;
 /// scripts.</param>
 /// <exception cref="ArgumentNullException">Script parts are null.</exception>
 public class ConcatenatedScript(IEnumerable<Func<string>> scriptParts,
-    string separator = "\r\n;\r\n", Action<IPermissionService, ITextLocalizer> checkRights = null) : DynamicScript
+    string separator = "\r\n;\r\n", Action<IPermissionService, ITextLocalizer>? checkRights = null) : DynamicScript
 {
     private readonly string separator = separator;
     private readonly IEnumerable<Func<string>> scriptParts = scriptParts ?? throw new ArgumentNullException(nameof(scriptParts));
-    private readonly Action<IPermissionService, ITextLocalizer> checkRights = checkRights;
+    private readonly Action<IPermissionService, ITextLocalizer>? checkRights = checkRights;
 
     /// <inheritdoc/>
     public override void CheckRights(IPermissionService permissions, ITextLocalizer localizer)

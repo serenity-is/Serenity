@@ -10,7 +10,7 @@
 /// <param name="connectionString">The connection string.</param>
 /// <param name="providerName">The name of the provider.</param>
 /// <param name="dialect">The SQL dialect.</param>
-public class ConnectionStringInfo(string connectionKey, string connectionString, string providerName, ISqlDialect dialect) : IConnectionString
+public class ConnectionStringInfo(string connectionKey, string? connectionString, string? providerName, ISqlDialect dialect) : IConnectionString
 {
 
     /// <summary>

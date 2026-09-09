@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 /// <summary>
 /// This attribute marks a row so that when it is Inserted/Updated/Deleted
@@ -6,6 +6,7 @@
 /// It doesn't turn on/off caching. A sample of related cached item to a row, might
 /// be its lookup if any.
 /// </summary>
+[AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
 public class TwoLevelCachedAttribute : Attribute
 {
     /// <summary>
@@ -39,7 +40,7 @@ public class TwoLevelCachedAttribute : Attribute
     /// <value>
     /// The generation keys.
     /// </value>
-    public string[] GenerationKeys { get; set; }
+    public string[]? GenerationKeys { get; set; }
 
     /// <summary>
     /// Gets the types of the linked rows.
@@ -47,5 +48,5 @@ public class TwoLevelCachedAttribute : Attribute
     /// <value>
     /// The linked row types.
     /// </value>
-    public Type[] LinkedRows { get; set; }
+    public Type[]? LinkedRows { get; set; }
 }

@@ -8,7 +8,7 @@ namespace Serenity.Reporting;
 public static class ReportColumnConverter
 {
     private static ReportColumn FromMember(MemberInfo member, Type dataType,
-        Field baseField, ITextLocalizer localizer)
+        Field? baseField, ITextLocalizer localizer)
     {
         ArgumentNullException.ThrowIfNull(member);
 
@@ -61,7 +61,7 @@ public static class ReportColumnConverter
     /// <param name="field">The field object</param>
     /// <param name="localizer">Text localizer</param>
     /// <param name="baseField">Base field object</param>
-    public static ReportColumn FromFieldInfo(FieldInfo field, ITextLocalizer localizer, Field baseField = null)
+    public static ReportColumn FromFieldInfo(FieldInfo field, ITextLocalizer localizer, Field? baseField = null)
     {
         return FromMember(field, field.FieldType, baseField, localizer);
     }
@@ -72,7 +72,7 @@ public static class ReportColumnConverter
     /// <param name="property">The property object</param>
     /// <param name="localizer">Text localizer</param>
     /// <param name="baseField">Base field object</param>
-    public static ReportColumn FromPropertyInfo(PropertyInfo property, ITextLocalizer localizer, Field baseField = null)
+    public static ReportColumn FromPropertyInfo(PropertyInfo property, ITextLocalizer localizer, Field? baseField = null)
     {
         return FromMember(property, property.PropertyType, baseField, localizer);
     }
@@ -88,7 +88,7 @@ public static class ReportColumnConverter
     {
         var list = new List<ReportColumn>();
 
-        IRow basedOnRow = null;
+        IRow? basedOnRow = null;
         var basedOnRowAttr = objectType.GetCustomAttribute<BasedOnRowAttribute>();
         if (basedOnRowAttr != null)
             basedOnRow = Activator.CreateInstance(basedOnRowAttr.RowType) as IRow;
@@ -105,10 +105,10 @@ public static class ReportColumnConverter
                 member.GetCustomAttribute<TransformIgnoreAttribute>() != null)
                 continue;
 
-            Field baseField;
+            Field? baseField;
             if (basedOnRow != null)
             {
-                var name = ((MemberInfo)fieldInfo ?? propertyInfo).Name;
+                var name = ((MemberInfo?)fieldInfo ?? propertyInfo)!.Name;
                 baseField = basedOnRow.FindFieldByPropertyName(name) ?? basedOnRow.FindField(name);
             }
             else
@@ -120,7 +120,7 @@ public static class ReportColumnConverter
             if (fieldInfo != null)
                 column = FromFieldInfo(fieldInfo, localizer, baseField);
             else
-                column = FromPropertyInfo(propertyInfo, localizer, baseField);
+                column = FromPropertyInfo(propertyInfo!, localizer, baseField);
 
             var cellDecorator = member.GetCustomAttribute<CellDecoratorAttribute>();
             if (cellDecorator != null)

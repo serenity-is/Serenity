@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 /// <summary>
 /// A criteria object containing a parameter name
@@ -17,10 +17,10 @@ public class ParamCriteria : BaseCriteria
     public ParamCriteria(string name)
     {
         if (string.IsNullOrEmpty(name))
-            throw new ArgumentNullException("name");
+            throw new ArgumentNullException(nameof(name));
 
         if (!name.StartsWith("@"))
-            throw new ArgumentOutOfRangeException("name");
+            throw new ArgumentOutOfRangeException(nameof(name));
 
         this.name = name;
     }

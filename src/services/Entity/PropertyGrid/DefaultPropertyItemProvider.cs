@@ -12,7 +12,7 @@ public partial class DefaultPropertyItemProvider : IPropertyItemProvider, IDispo
     private readonly IServiceProvider provider;
     private readonly ITypeSource typeSource;
     private ObjectFactory[] processorFactories;
-    private IDisposable changeSubscription;
+    private IDisposable? changeSubscription;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DefaultPropertyItemProvider"/> class.
@@ -53,7 +53,7 @@ public partial class DefaultPropertyItemProvider : IPropertyItemProvider, IDispo
     /// <param name="predicate"><inheritdoc/></param>
     /// <exception cref="ArgumentNullException">type is null</exception>
     /// <exception cref="InvalidProgramException">CheckNames is true and there is name mismatch</exception>
-    public IEnumerable<PropertyItem> GetPropertyItemsFor(Type type, Func<PropertyInfo, bool> predicate)
+    public IEnumerable<PropertyItem> GetPropertyItemsFor(Type type, Func<PropertyInfo, bool>? predicate)
     {
         ArgumentNullException.ThrowIfNull(type);
 
@@ -97,7 +97,7 @@ public partial class DefaultPropertyItemProvider : IPropertyItemProvider, IDispo
                         "Please check if the property is named correctly.\n\n" +
                         "To remove this validation, you may set CheckNames to false in the [BasedOnRow] attribute.\n\n" +
                         "To disable checking for this specific property, add an [SkipNameCheck] attribute to the property itself.",
-                        type.FullName, property.Name, basedOnRow.GetType().FullName));
+                        type.FullName, property.Name, basedOnRow!.GetType().FullName));
                 }
                 else if (
                     (!string.IsNullOrEmpty(source.BasedOnField.PropertyName) &&
@@ -112,7 +112,7 @@ public partial class DefaultPropertyItemProvider : IPropertyItemProvider, IDispo
                             "To remove this validation, you may set CheckNames to false in the [BasedOnRow] attribute.\n\n" +
                             "To disable check for this specific property, add an [SkipNameCheck] attribute to the property itself.",
                             type.FullName, property.Name, source.BasedOnField.PropertyName.TrimToNull() ??
-                                source.BasedOnField.Name, basedOnRow.GetType().FullName));
+                                source.BasedOnField.Name, basedOnRow!.GetType().FullName));
                 }
             }
 
@@ -133,7 +133,7 @@ public partial class DefaultPropertyItemProvider : IPropertyItemProvider, IDispo
         return list;
     }
 
-    private static IRow GetBasedOnRow(Type type, out bool checkPropertyNames)
+    private static IRow? GetBasedOnRow(Type type, out bool checkPropertyNames)
     {
         checkPropertyNames = false;
         var basedOnRowAttr = type.GetCustomAttribute<BasedOnRowAttribute>();
@@ -160,6 +160,6 @@ public partial class DefaultPropertyItemProvider : IPropertyItemProvider, IDispo
             checkPropertyNames = basedOnRowAttr.CheckNames;
         }
 
-        return (IRow)Activator.CreateInstance(basedOnRowType);
+        return (IRow)Activator.CreateInstance(basedOnRowType)!;
     }
 }

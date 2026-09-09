@@ -53,7 +53,7 @@ public abstract class BaseUserRetrieveService<TRow>(ITwoLevelCache cache, ISqlCo
         if (!base.IsValidUserId(userId))
             return false;
 
-        idField ??= new TRow().IdField;
+        idField ??= new TRow().GetIdField();
         if (idField is Int32Field)
             return int.TryParse(userId, CultureInfo.InvariantCulture, out _);
 
@@ -72,7 +72,7 @@ public abstract class BaseUserRetrieveService<TRow>(ITwoLevelCache cache, ISqlCo
     /// <param name="id">User ID</param>
     protected override IUserDefinition LoadById(string id)
     {
-        idField ??= new TRow().IdField;
+        idField ??= new TRow().GetIdField();
         using var connection = sqlConnections.NewFor<TRow>();
 
         return LoadByCriteria(connection, new Criteria(idField) == 

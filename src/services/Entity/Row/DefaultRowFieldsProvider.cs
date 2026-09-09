@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Serenity.Reflection;
 
 namespace Serenity.Data;
@@ -52,13 +52,13 @@ public class DefaultRowFieldsProvider(IServiceProvider serviceProvider) : IRowFi
         return CreateType(fieldsType, null);
     }
 
-    private RowFieldsBase CreateType(Type fieldsType, string alias)
+    private RowFieldsBase CreateType(Type fieldsType, string? alias)
     {
         var annotationRegistry = serviceProvider.GetService<IAnnotationTypeRegistry>();
         var connectionStrings = serviceProvider.GetService<IConnectionStrings>();
         var fields = (RowFieldsBase)ActivatorUtilities.CreateInstance(serviceProvider, fieldsType);
 
-        IAnnotatedType annotations = null;
+        IAnnotatedType? annotations = null;
         if (annotationRegistry != null &&
             fieldsType.IsNested &&
             typeof(IRow).IsAssignableFrom(fieldsType.DeclaringType))

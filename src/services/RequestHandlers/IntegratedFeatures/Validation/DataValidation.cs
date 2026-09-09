@@ -16,7 +16,7 @@ public static class DataValidation
     {
         if ((stringField.Flags & FieldFlags.Trim) == FieldFlags.Trim)
         {
-            string value = stringField[row];
+            string? value = stringField[row];
 
             if ((stringField.Flags & FieldFlags.TrimToEmpty) == FieldFlags.TrimToEmpty)
                 value = value.TrimToEmpty();
@@ -34,7 +34,7 @@ public static class DataValidation
     /// <param name="row">Row instance</param>
     /// <param name="field">Field</param>
     /// <param name="localizer">Text localizer</param>
-    public static void ValidateRequired(this IRow row, Field field, ITextLocalizer localizer)
+    public static void ValidateRequired(this IRow row, Field field, ITextLocalizer? localizer)
     {
         var str = field as StringField;
         if ((str is not null && string.IsNullOrEmpty(str[row])) ||
@@ -51,7 +51,7 @@ public static class DataValidation
     /// <param name="row">Row instance</param>
     /// <param name="fields">List of fields</param>
     /// <param name="localizer">Text localizer</param>
-    public static void ValidateRequired(this IRow row, IEnumerable<Field> fields, ITextLocalizer localizer)
+    public static void ValidateRequired(this IRow row, IEnumerable<Field> fields, ITextLocalizer? localizer)
     {
         foreach (var field in fields)
         {
@@ -67,7 +67,7 @@ public static class DataValidation
     /// <param name="row">Row instance</param>
     /// <param name="fields">List of fields</param>
     /// <param name="localizer">Text localizer</param>
-    public static void ValidateRequiredIfModified(this IRow row, IEnumerable<Field> fields, ITextLocalizer localizer)
+    public static void ValidateRequiredIfModified(this IRow row, IEnumerable<Field> fields, ITextLocalizer? localizer)
     {
         foreach (var field in fields)
             if (row.IsAssigned(field))
@@ -82,7 +82,7 @@ public static class DataValidation
     public static void EnsureUniversalTime(IRow row, DateTimeField field)
     {
         if (!field.IsNull(row))
-            field[row] = field[row].Value.ToUniversalTime();
+            field[row] = field[row]!.Value.ToUniversalTime();
     }
 
     /// <summary>
@@ -92,9 +92,10 @@ public static class DataValidation
     /// <param name="field">Field</param>
     /// <param name="enumType">Enum type</param>
     /// <param name="localizer">Text localizer</param>
-    public static void ValidateEnum(IRow row, Field field, Type enumType, ITextLocalizer localizer)
+    public static void ValidateEnum(IRow row, Field field, Type enumType, ITextLocalizer? localizer)
     {
-        if (!Enum.IsDefined(enumType, field.AsObject(row)))
+        var value = field.AsObject(row);
+        if (value != null && !Enum.IsDefined(enumType, value))
             throw InvalidValueError(row, field, localizer);
     }
 
@@ -106,9 +107,10 @@ public static class DataValidation
     /// <param name="field">Field</param>
     /// <param name="localizer">Text localizer</param>
     public static void ValidateEnum<T>(IRow row, GenericValueField<T> field,
-        ITextLocalizer localizer) where T : struct, IComparable<T>
+        ITextLocalizer? localizer) where T : struct, IComparable<T>
     {
-        if (!Enum.IsDefined(field.EnumType, field.AsObject(row)))
+        var value = field.AsObject(row);
+        if (value != null && field.EnumType != null && !Enum.IsDefined(field.EnumType, value))
             throw InvalidValueError(row, field, localizer);
     }
 
@@ -118,9 +120,9 @@ public static class DataValidation
     /// <typeparam name="T">Enum type</typeparam>
     /// <param name="value">Enum value</param>
     /// <param name="localizer">Text localizer</param>
-    public static void ValidateEnum<T>(T value, ITextLocalizer localizer)
+    public static void ValidateEnum<T>(T value, ITextLocalizer? localizer)
     {
-        if (!Enum.IsDefined(typeof(T), value))
+        if (value != null && !Enum.IsDefined(typeof(T), value))
             throw ArgumentOutOfRange(typeof(T).Name, localizer);
     }
 
@@ -132,11 +134,11 @@ public static class DataValidation
     /// <param name="finish">End date</param>
     /// <param name="localizer">Text localizer</param>
     public static void ValidateDateRange(IRow row, DateTimeField start, DateTimeField finish,
-        ITextLocalizer localizer)
+        ITextLocalizer? localizer)
     {
         if (!start.IsNull(row) &&
             !finish.IsNull(row) &&
-            start[row].Value > finish[row].Value)
+            start[row]!.Value > finish[row]!.Value)
         {
             throw InvalidDateRangeError(start, finish, localizer);
         }
@@ -147,7 +149,7 @@ public static class DataValidation
     /// </summary>
     /// <param name="field">Field</param>
     /// <param name="localizer">Text localizer</param>
-    public static ValidationError RequiredError(Field field, ITextLocalizer localizer)
+    public static ValidationError RequiredError(Field field, ITextLocalizer? localizer)
     {
         return RequiredError(field.Name, localizer, field.GetTitle(localizer));
     }
@@ -159,7 +161,7 @@ public static class DataValidation
     /// <param name="localizer">Text localizer</param>
     /// <param name="title">Field title</param>
     /// <returns>The required validation error.</returns>
-    public static ValidationError RequiredError(string name, ITextLocalizer localizer, string title = null)
+    public static ValidationError RequiredError(string name, ITextLocalizer? localizer, string? title = null)
     {
         return new ValidationError("Required", name,
             DataValidationTexts.FieldIsRequired.ToString(localizer),
@@ -172,7 +174,7 @@ public static class DataValidation
     /// <param name="row">Row instance</param>
     /// <param name="field">Field</param>
     /// <param name="localizer">Text localizer</param>
-    public static ValidationError InvalidIdError(IRow row, Field field, ITextLocalizer localizer)
+    public static ValidationError InvalidIdError(IRow row, Field field, ITextLocalizer? localizer)
     {
         return new ValidationError("InvalidId", field.Name,
             DataValidationTexts.FieldInvalidValue.ToString(localizer),
@@ -186,7 +188,7 @@ public static class DataValidation
     /// <param name="value">Value</param>
     /// <param name="localizer">Text localizer</param>
     /// <returns>The invalid ID error.</returns>
-    public static ValidationError InvalidIdError(Field field, long value, ITextLocalizer localizer)
+    public static ValidationError InvalidIdError(Field field, long value, ITextLocalizer? localizer)
     {
         return new ValidationError("InvalidId", field.Name,
             DataValidationTexts.FieldInvalidValue.ToString(localizer),
@@ -199,7 +201,7 @@ public static class DataValidation
     /// <param name="start">Start date</param>
     /// <param name="finish">End date</param>
     /// <param name="localizer">Text localizer</param>
-    public static ValidationError InvalidDateRangeError(DateTimeField start, DateTimeField finish, ITextLocalizer localizer)
+    public static ValidationError InvalidDateRangeError(DateTimeField start, DateTimeField finish, ITextLocalizer? localizer)
     {
         return new ValidationError("InvalidDateRange", start.Name + "," + finish.Name,
             DataValidationTexts.FieldInvalidDateRange.ToString(localizer),
@@ -211,7 +213,7 @@ public static class DataValidation
     /// </summary>
     /// <param name="field">Field</param>
     /// <param name="localizer">Text localizer</param>
-    public static ValidationError ReadOnlyError(Field field, ITextLocalizer localizer)
+    public static ValidationError ReadOnlyError(Field field, ITextLocalizer? localizer)
     {
         return new ValidationError("ReadOnly", field.Name, DataValidationTexts.FieldIsReadOnly.ToString(localizer),
             field.GetTitle(localizer));
@@ -224,7 +226,7 @@ public static class DataValidation
     /// <param name="value">Value</param>
     /// <param name="localizer">Text localizer</param>
     /// <returns>The invalid value error.</returns>
-    public static ValidationError InvalidValueError(Field field, object value, ITextLocalizer localizer)
+    public static ValidationError InvalidValueError(Field field, object value, ITextLocalizer? localizer)
     {
         return new ValidationError("InvalidValue", field.Name,
             DataValidationTexts.FieldInvalidValue.ToString(localizer),
@@ -238,7 +240,7 @@ public static class DataValidation
     /// <param name="field">Field</param>
     /// <param name="localizer">Text localizer</param>
     /// <returns>The invalid value error.</returns>
-    public static ValidationError InvalidValueError(IRow row, Field field, ITextLocalizer localizer)
+    public static ValidationError InvalidValueError(IRow row, Field field, ITextLocalizer? localizer)
     {
         return new ValidationError("InvalidValue", field.Name,
             DataValidationTexts.FieldInvalidValue.ToString(localizer),
@@ -251,7 +253,7 @@ public static class DataValidation
     /// <param name="row">Row instance</param>
     /// <param name="id">ID</param>
     /// <param name="localizer">Text localizer</param>
-    public static ValidationError EntityNotFoundError(IRow row, object id, ITextLocalizer localizer)
+    public static ValidationError EntityNotFoundError(IRow row, object? id, ITextLocalizer? localizer)
     {
         return new ValidationError("EntityNotFound", null, DataValidationTexts.EntityNotFound.ToString(localizer),
             Convert.ToString(id, CultureInfo.CurrentCulture), GetEntitySingular(row.Table, localizer));
@@ -263,7 +265,7 @@ public static class DataValidation
     /// <param name="row">Row instance</param>
     /// <param name="id">ID</param>
     /// <param name="localizer">Text localizer</param>
-    public static ValidationError EntityReadAccessError(IRow row, object id, ITextLocalizer localizer)
+    public static ValidationError EntityReadAccessError(IRow row, object id, ITextLocalizer? localizer)
     {
         return new ValidationError("EntityReadAccessError", null,
             DataValidationTexts.EntityReadAccessViolation.ToString(localizer),
@@ -276,7 +278,7 @@ public static class DataValidation
     /// <param name="row">Row instance</param>
     /// <param name="id">Id</param>
     /// <param name="localizer">Text localizer</param>
-    public static ValidationError EntityWriteAccessError(IRow row, long id, ITextLocalizer localizer)
+    public static ValidationError EntityWriteAccessError(IRow row, long id, ITextLocalizer? localizer)
     {
         return new ValidationError("EntityWriteAccessError", null,
             DataValidationTexts.EntityWriteAccessViolation.ToString(localizer),
@@ -290,7 +292,7 @@ public static class DataValidation
     /// <param name="foreignTable">Foreign table</param>
     /// <param name="localizer">Text localizer</param>
     /// <returns>The related record exist error.</returns>
-    public static ValidationError RelatedRecordExist(string foreignTable, ITextLocalizer localizer)
+    public static ValidationError RelatedRecordExist(string foreignTable, ITextLocalizer? localizer)
     {
         return new ValidationError("RelatedRecordExist", null,
             DataValidationTexts.EntityForeignKeyViolation.ToString(localizer),
@@ -302,7 +304,7 @@ public static class DataValidation
     /// </summary>
     /// <param name="foreignTable">Foreign table</param>
     /// <param name="localizer">Text localizer</param>
-    public static ValidationError ParentRecordDeleted(string foreignTable, ITextLocalizer localizer)
+    public static ValidationError ParentRecordDeleted(string foreignTable, ITextLocalizer? localizer)
     {
         return new ValidationError("ParentRecordDeleted", null,
             DataValidationTexts.EntityHasDeletedParent.ToString(localizer),
@@ -314,7 +316,7 @@ public static class DataValidation
     /// </summary>
     /// <param name="row">Row instance</param>
     /// <param name="localizer">Text localizer</param>
-    public static ValidationError RecordNotActive(IRow row, ITextLocalizer localizer)
+    public static ValidationError RecordNotActive(IRow row, ITextLocalizer? localizer)
     {
         return new ValidationError("RecordNotActive", null,
             DataValidationTexts.EntityIsNotActive.ToString(localizer),
@@ -325,7 +327,7 @@ public static class DataValidation
     /// Returns an unexpected error
     /// </summary>
     /// <param name="localizer">Text localizer</param>
-    public static ValidationError UnexpectedError(ITextLocalizer localizer)
+    public static ValidationError UnexpectedError(ITextLocalizer? localizer)
     {
         return new ValidationError("UnexpectedError", null,
             DataValidationTexts.UnexpectedError.ToString(localizer));
@@ -336,7 +338,7 @@ public static class DataValidation
     /// </summary>
     /// <param name="table">Table prefix</param>
     /// <param name="localizer">Text localizer</param>
-    public static string GetEntitySingular(string table, ITextLocalizer localizer)
+    public static string GetEntitySingular(string table, ITextLocalizer? localizer)
     {
         return localizer?.TryGet("Db." + table + ".EntitySingular") ?? table;
     }
@@ -347,7 +349,7 @@ public static class DataValidation
     /// <param name="argument">Argument name</param>
     /// <param name="localizer">Text localizer</param>
     /// <returns>The argument null error.</returns>
-    public static ValidationError ArgumentNull(string argument, ITextLocalizer localizer)
+    public static ValidationError ArgumentNull(string argument, ITextLocalizer? localizer)
     {
         return new ValidationError("ArgumentNull", argument,
             DataValidationTexts.ArgumentIsNull.ToString(localizer), argument);
@@ -359,7 +361,7 @@ public static class DataValidation
     /// <param name="argument">Argument name</param>
     /// <param name="localizer">Text localizer</param>
     /// <returns>The argument out of range error.</returns>
-    public static ValidationError ArgumentOutOfRange(string argument, ITextLocalizer localizer)
+    public static ValidationError ArgumentOutOfRange(string argument, ITextLocalizer? localizer)
     {
         return new ValidationError("ArgumentOutOfRange", argument,
             DataValidationTexts.ArgumentOutOfRange.ToString(localizer), argument);

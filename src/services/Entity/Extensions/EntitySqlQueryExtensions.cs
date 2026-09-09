@@ -18,17 +18,17 @@ public static class EntitySqlQueryExtensions
     {
         ArgumentNullException.ThrowIfNull(entity);
 
-        if (entity as IRow != null)
+        if (entity is IRow row)
         {
-            var fields = (entity as IRow).Fields;
+            var fields = row.Fields;
             query.From(fields);
             if (!query.IsDialectOverridden)
                 query.Dialect(fields.Dialect);
         }
         else
         {
-            if (entity as IAlias != null && ((entity as IAlias).Name == "t0" || (entity as IAlias).Name == "T0") && (entity as IAlias).Table == entity.Table)
-                query.From(entity as IAlias);
+            if (entity is IAlias alias && (alias.Name == "t0" || alias.Name == "T0") && alias.Table == entity.Table)
+                query.From(alias);
             else
                 query.From(entity.Table, Alias.T0);
         }
@@ -65,7 +65,7 @@ public static class EntitySqlQueryExtensions
         ArgumentNullException.ThrowIfNull(field);
 
         query.EnsureJoinsInExpression(field.Expression);
-        new SqlQuery.Column(query, field.Expression, field.ColumnAlias, field);
+        _ = new SqlQuery.Column(query, field.Expression, field.ColumnAlias, field);
         return query;
     }
 
@@ -93,7 +93,7 @@ public static class EntitySqlQueryExtensions
         ArgumentNullException.ThrowIfNull(columnName);
 
         query.EnsureJoinsInExpression(field.Expression);
-        new SqlQuery.Column(query, field.Expression, columnName, field);
+        _ = new SqlQuery.Column(query, field.Expression, columnName, field);
         return query;
     }
 
@@ -198,11 +198,11 @@ public static class EntitySqlQueryExtensions
     public static SqlQuery SelectAs(this SqlQuery query, string expression, IField intoField)
     {
         if (string.IsNullOrEmpty(expression))
-            throw new ArgumentNullException("field");
+            throw new ArgumentNullException(nameof(expression));
 
         ArgumentNullException.ThrowIfNull(intoField);
 
-        new SqlQuery.Column(query, expression, intoField.ColumnAlias, intoField);
+        _ = new SqlQuery.Column(query, expression, intoField.ColumnAlias, intoField);
         return query;
     }
 

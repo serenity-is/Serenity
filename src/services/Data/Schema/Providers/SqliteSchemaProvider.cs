@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data.Schema;
+namespace Serenity.Data.Schema;
 
 /// <summary>
 /// SQLite metadata provider.
@@ -12,15 +12,15 @@ public class SqliteSchemaProvider : ISchemaProvider
     /// <value>
     /// The default schema.
     /// </value>
-    public string DefaultSchema => null;
+    public string? DefaultSchema => null;
 
     private class FieldInfoSource
     {
 #pragma warning disable IDE1006 // Naming Styles
-        public string name { get; set; }
-        public string type { get; set; }
-        public string notnull { get; set; }
-        public string pk { get; set; }
+        public required string name { get; set; }
+        public string? type { get; set; }
+        public string? notnull { get; set; }
+        public string? pk { get; set; }
 #pragma warning restore IDE1006 // Naming Styles
     }
 
@@ -40,10 +40,10 @@ public class SqliteSchemaProvider : ISchemaProvider
     private class ForeignKeySource
     {
 #pragma warning disable IDE1006 // Naming Styles
-        public string id { get; set; }
-        public string from { get; set; }
-        public string table { get; set; }
-        public string to { get; set; }
+        public required string id { get; set; }
+        public required string from { get; set; }
+        public required string table { get; set; }
+        public required string to { get; set; }
 #pragma warning restore IDE1006 // Naming Styles
     }
 
@@ -64,8 +64,8 @@ public class SqliteSchemaProvider : ISchemaProvider
     {
 #pragma warning disable IDE1006 // Naming Styles
         public int pk { get; set; }
-        public string name { get; set; }
-        public string type { get; set; }
+        public required string name { get; set; }
+        public string? type { get; set; }
 #pragma warning restore IDE1006 // Naming Styles
     }
 
@@ -88,7 +88,7 @@ public class SqliteSchemaProvider : ISchemaProvider
     {
 #pragma warning disable IDE1006 // Naming Styles
         public int pk { get; set; }
-        public string name { get; set; }
+        public required string name { get; set; }
 #pragma warning restore IDE1006 // Naming Styles
     }
 
@@ -104,8 +104,8 @@ public class SqliteSchemaProvider : ISchemaProvider
     private class TableNameSource
     {
 #pragma warning disable IDE1006 // Naming Styles
-        public string name { get; set; }
-        public string type { get; set; }
+        public required string name { get; set; }
+        public string? type { get; set; }
 #pragma warning restore IDE1006 // Naming Styles
     }
 

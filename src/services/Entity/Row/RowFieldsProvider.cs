@@ -8,12 +8,12 @@ namespace Serenity.Data;
 public static class RowFieldsProvider
 {
     private static IRowFieldsProvider defaultProvider;
-    private static readonly AsyncLocal<IRowFieldsProvider> localProvider;
+    private static readonly AsyncLocal<IRowFieldsProvider?> localProvider;
 
     static RowFieldsProvider()
     {
         defaultProvider = FallbackRowFieldsProvider.Instance;
-        localProvider = new AsyncLocal<IRowFieldsProvider>();
+        localProvider = new AsyncLocal<IRowFieldsProvider?>();
     }
 
     /// <summary>
@@ -55,7 +55,7 @@ public static class RowFieldsProvider
     /// </summary>
     /// <param name="provider">Row fields provider. Can be null.</param>
     /// <returns>Old local provider if any.</returns>
-    public static IRowFieldsProvider SetLocal(IRowFieldsProvider provider)
+    public static IRowFieldsProvider? SetLocal(IRowFieldsProvider? provider)
     {
         var old = localProvider.Value;
         localProvider.Value = provider;
@@ -67,7 +67,7 @@ public static class RowFieldsProvider
     /// </summary>
     /// <param name="services">Services. Required.</param>
     /// <returns>Old default provider</returns>
-    public static IRowFieldsProvider SetLocalFrom(IServiceProvider services)
+    public static IRowFieldsProvider? SetLocalFrom(IServiceProvider services)
     {
         return SetLocal((services ?? throw new ArgumentNullException(nameof(services)))
             .GetRequiredService<IRowFieldsProvider>());

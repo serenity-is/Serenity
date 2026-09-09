@@ -14,19 +14,19 @@ public partial class SqlQuery
 
     IEnumerable<Column> ISqlQuery.Columns => columns;
     bool ISqlQuery.Distinct => distinct;
-    string ISqlQuery.ForJson => forJson;
-    string ISqlQuery.ForXml => forXml;
-    string ISqlQuery.From => from?.ToString();
-    string ISqlQuery.GroupBy => groupBy?.ToString();
-    string ISqlQuery.Having => having?.ToString();
+    string? ISqlQuery.ForJson => forJson;
+    string? ISqlQuery.ForXml => forXml;
+    string? ISqlQuery.From => from?.ToString();
+    string? ISqlQuery.GroupBy => groupBy?.ToString();
+    string? ISqlQuery.Having => having?.ToString();
     bool ISqlQuery.OmitParens => omitParens;
-    IEnumerable<string> ISqlQuery.OrderBy => (IEnumerable<string>)orderBy ?? [];
-    IQueryWithParams ISqlQuery.Parent => parent;
+    IEnumerable<string> ISqlQuery.OrderBy => (IEnumerable<string>?)orderBy ?? [];
+    IQueryWithParams? ISqlQuery.Parent => parent;
     int ISqlQuery.Skip => skip;
     int ISqlQuery.Take => take;
-    ISqlQuery ISqlQuery.UnionQuery => unionQuery;
+    ISqlQuery? ISqlQuery.UnionQuery => unionQuery;
     SqlUnionType ISqlQuery.UnionType => unionType;
-    string ISqlQuery.Where => where?.ToString();
+    string? ISqlQuery.Where => where?.ToString();
 
     /// <summary>
     ///   Formats SQL Query as string. If paging is used and skip requested, multiple queries 
@@ -62,7 +62,7 @@ public partial class SqlQuery
 
         var orderBy = query.OrderBy.ToArray();
 
-        string extraWhere = null;
+        string? extraWhere = null;
 
         bool useSkipKeyword = skip > 0 && dialect.CanUseSkipKeyword;
         bool useOffset = (skip > 0 || (take > 0 && !dialect.CanUseSkipKeyword && dialect.UseRowNum)) && 
@@ -71,7 +71,7 @@ public partial class SqlQuery
         bool useRowNumber = skip > 0 && !useSkipKeyword && !useOffset && !useRowNum && dialect.CanUseRowNumber;
         bool useSecondQuery = skip > 0 && !useSkipKeyword && !useRowNum && !useOffset && !useRowNumber;
 
-        void appendFromWhereOrderByGroupByHaving(string extraWhere, bool includeOrderBy)
+        void appendFromWhereOrderByGroupByHaving(string? extraWhere, bool includeOrderBy)
         {
             if (!string.IsNullOrEmpty(query.From))
             {
@@ -285,7 +285,7 @@ public partial class SqlQuery
             sb.Append(skip);
         }
 
-        StringBuilder selCount = null;
+        StringBuilder? selCount = null;
         if (query.Distinct)
             selCount = new StringBuilder();
 
@@ -301,13 +301,13 @@ public partial class SqlQuery
             {
                 sb.Append(",\n");
                 if (query.Distinct)
-                    selCount.Append(',');
+                    selCount!.Append(',');
             }
 
             sb.Append(s.Expression);
 
             if (query.Distinct)
-                selCount.Append(s.Expression);
+                selCount!.Append(s.Expression);
 
             // write alias if any
             if (!string.IsNullOrEmpty(s.ColumnName))
@@ -317,7 +317,7 @@ public partial class SqlQuery
                 sb.Append(quoted);
                 if (query.Distinct)
                 {
-                    selCount.Append(SqlKeywords.As);
+                    selCount!.Append(SqlKeywords.As);
                     selCount.Append(quoted);
                 }
             }

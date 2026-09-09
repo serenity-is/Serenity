@@ -17,9 +17,9 @@ public static class UploadFormatting
     {
         ArgumentNullException.ThrowIfNull(options);
 
-        object groupKey;
+        object? groupKey;
         string s;
-        object identity = options.EntityId;
+        object? identity = options.EntityId;
         if (identity == null)
             groupKey = "_";
         else if (identity is Guid g)
@@ -30,7 +30,7 @@ public static class UploadFormatting
         }
         else
         {
-            s = identity.ToString();
+            s = identity.ToString()!;
             if (long.TryParse(s, out long l))
                 groupKey = l / 1000;
             else if (s.Length == 0)
@@ -40,8 +40,7 @@ public static class UploadFormatting
         }
 
         var originalName = options.OriginalName;
-        if (string.IsNullOrEmpty(originalName))
-            throw new ArgumentNullException(nameof(originalName));
+        ArgumentException.ThrowIfNullOrEmpty(originalName);
 
         var formatted = options.Format;
         if (formatted.Contains("{3}", StringComparison.OrdinalIgnoreCase))

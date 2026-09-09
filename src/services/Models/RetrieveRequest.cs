@@ -8,7 +8,7 @@ public class RetrieveRequest : ServiceRequest, IIncludeExcludeColumns
     /// <summary>
     /// The entity ID to retrieve
     /// </summary>
-    public object EntityId { get; set; }
+    public object? EntityId { get; set; }
 
     /// <summary>
     /// The group of columns to select. This is 
@@ -22,10 +22,10 @@ public class RetrieveRequest : ServiceRequest, IIncludeExcludeColumns
     /// <inheritdoc/>
     [Newtonsoft.Json.JsonConverter(typeof(JsonStringHashSetConverter))]
     [JsonConverter(typeof(JsonConverters.HashSetStringJsonConverter))]
-    public HashSet<string> IncludeColumns { get; set; }
+    public HashSet<string>? IncludeColumns { get; set; }
 
     /// <inheritdoc/>
     [Newtonsoft.Json.JsonConverter(typeof(JsonStringHashSetConverter))]
     [JsonConverter(typeof(JsonConverters.HashSetStringJsonConverter))]
-    public HashSet<string> ExcludeColumns { get; set; }
+    public HashSet<string>? ExcludeColumns { get; set; }
 }

@@ -20,20 +20,20 @@ public class ListRequest : ServiceRequest, IIncludeExcludeColumns
     /// <summary>
     /// Columns to sort returned records by
     /// </summary>
-    public SortBy[] Sort { get; set; }
+    public SortBy[]? Sort { get; set; }
 
     /// <summary>
     /// The text to search in columns with the 
     /// <see cref="QuickSearchAttribute"/>.
     /// </summary>
-    public string ContainsText { get; set; }
+    public string? ContainsText { get; set; }
 
     /// <summary>
     /// If specified, the text is only searched in this 
     /// column. The column should still have a
     /// <see cref="QuickSearchAttribute"/>.
     /// </summary>
-    public string ContainsField { get; set; }
+    public string? ContainsField { get; set; }
 
     /// <summary>
     /// The where criteria for the query. This is passed
@@ -41,7 +41,7 @@ public class ListRequest : ServiceRequest, IIncludeExcludeColumns
     /// </summary>
     [Newtonsoft.Json.JsonConverter(typeof(JsonSafeCriteriaConverter))]
     [JsonConverter(typeof(JsonConverters.SafeCriteriaJsonConverter))]
-    public BaseCriteria Criteria { get; set; }
+    public BaseCriteria? Criteria { get; set; }
 
     /// <summary>
     /// Include the deleted records. Default is false.
@@ -66,7 +66,7 @@ public class ListRequest : ServiceRequest, IIncludeExcludeColumns
     /// Please note that "NULL" values are ignored, so you can't
     /// filter a field with a NULL value.
     /// </summary>
-    public Dictionary<string, object> EqualityFilter { get; set; }
+    public Dictionary<string, object?>? EqualityFilter { get; set; }
 
     /// <summary>
     /// Group of columns to select. This is ColumnSelection.List,
@@ -78,26 +78,26 @@ public class ListRequest : ServiceRequest, IIncludeExcludeColumns
     /// <inheritdoc/>
     [Newtonsoft.Json.JsonConverter(typeof(JsonStringHashSetConverter))]
     [JsonConverter(typeof(JsonConverters.HashSetStringJsonConverter))]
-    public HashSet<string> IncludeColumns { get; set; }
+    public HashSet<string>? IncludeColumns { get; set; }
 
     /// <inheritdoc/>
     [Newtonsoft.Json.JsonConverter(typeof(JsonStringHashSetConverter))]
     [JsonConverter(typeof(JsonConverters.HashSetStringJsonConverter))]
-    public HashSet<string> ExcludeColumns { get; set; }
+    public HashSet<string>? ExcludeColumns { get; set; }
 
     /// <summary>
     /// Distinct set of columns. If set a DISTINCT query
     /// is used, and only these columns can be returned
     /// from the query.
     /// </summary>
-    public SortBy[] DistinctFields { get; set; }
+    public SortBy[]? DistinctFields { get; set; }
 
     /// <summary>
     /// Gets or sets the set of columns to export. 
     /// This should only be used to specify list of columns
     /// for contexts like Excel export etc.
     /// </summary>
-    public List<string> ExportColumns { get; set; }
+    public List<string>? ExportColumns { get; set; }
 
     /// <summary>
     /// Set to "true" to localize fields with the Localize attribute.
@@ -105,5 +105,5 @@ public class ListRequest : ServiceRequest, IIncludeExcludeColumns
     /// expression will be changed to a COALESCE one. To get a localized
     /// version in a specific language, pass the language code as the value.
     /// </summary>
-    public string Localize { get; set; }
+    public string? Localize { get; set; }
 }

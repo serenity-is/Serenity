@@ -16,8 +16,8 @@ namespace Serenity.Data;
 /// <param name="flags">The flags.</param>
 /// <param name="getValue">The get value.</param>
 /// <param name="setValue">The set value.</param>
-public class StreamField(ICollection<Field> collection, string name, LocalText caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
-    Func<IRow, Stream> getValue = null, Action<IRow, Stream> setValue = null) : GenericClassField<Stream>(collection, FieldType.Stream, name, caption, size, flags, getValue, setValue)
+public class StreamField(ICollection<Field> collection, string name, LocalText? caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
+    Func<IRow, Stream?>? getValue = null, Action<IRow, Stream?>? setValue = null) : GenericClassField<Stream>(collection, FieldType.Stream, name, caption, size, flags, getValue, setValue)
 {
 
     /// <summary>
@@ -31,8 +31,8 @@ public class StreamField(ICollection<Field> collection, string name, LocalText c
     /// <param name="getValue">The get value.</param>
     /// <param name="setValue">The set value.</param>
     /// <returns>A new StreamField instance.</returns>
-    public static StreamField Factory(ICollection<Field> collection, string name, LocalText caption, int size, FieldFlags flags,
-        Func<IRow, Stream> getValue, Action<IRow, Stream> setValue)
+    public static StreamField Factory(ICollection<Field> collection, string name, LocalText? caption, int size, FieldFlags flags,
+        Func<IRow, Stream?> getValue, Action<IRow, Stream?> setValue)
     {
         return new StreamField(collection, name, caption, size, flags, getValue, setValue);
     }
@@ -147,10 +147,10 @@ public class StreamField(ICollection<Field> collection, string name, LocalText c
                 _setValue(row, null);
                 break;
             case Newtonsoft.Json.JsonToken.String:
-                _setValue(row, new MemoryStream(Convert.FromBase64String((string)reader.Value)));
+                _setValue(row, new MemoryStream(Convert.FromBase64String((string)reader.Value!)));
                 break;
             case Newtonsoft.Json.JsonToken.Bytes:
-                _setValue(row, new MemoryStream((byte[])reader.Value));
+                _setValue(row, new MemoryStream((byte[])reader.Value!));
                 break;
             default:
                 throw JsonUnexpectedToken(reader);

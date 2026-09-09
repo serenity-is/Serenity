@@ -8,12 +8,12 @@ public class DataScript : DynamicScript, INamedDynamicScript, IGetScriptData
     /// <summary>
     /// Key for the data script.
     /// </summary>
-    protected string key;
+    protected string? key;
 
     /// <summary>
     /// Callback to get the data.
     /// </summary>
-    protected Func<object> getData;
+    protected Func<object?>? getData;
 
     /// <summary>
     /// Creates a new instance of the class.
@@ -38,15 +38,15 @@ public class DataScript : DynamicScript, INamedDynamicScript, IGetScriptData
     public string ScriptName => "RemoteData." + key;
 
     /// <inheritdoc/>
-    public object GetScriptData()
+    public object? GetScriptData()
     {
-        return getData();
+        return getData!();
     }
 
     /// <inheritdoc/>
     public override string GetScript()
     {
-        var data = getData();
+        var data = getData!();
         return string.Format(CultureInfo.CurrentCulture,
             SetScriptDataFormat,
             ScriptName.ToSingleQuoted(),

@@ -1,4 +1,4 @@
-﻿
+
 namespace Serenity.Reporting;
 
 /// <summary>
@@ -10,5 +10,5 @@ public interface IReport
     /// Returns the data for the report.
     /// </summary>
     /// <returns>The report data.</returns>
-    object GetData();
+    object? GetData();
 }

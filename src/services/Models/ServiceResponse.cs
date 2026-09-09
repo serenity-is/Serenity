@@ -1,4 +1,4 @@
-﻿namespace Serenity.Services;
+namespace Serenity.Services;
 
 /// <summary>
 /// The base service response object model for all service response
@@ -9,7 +9,7 @@ public class ServiceResponse
     /// <summary>
     /// The error returned if any.
     /// </summary>
-    public ServiceError Error { get; set; }
+    public ServiceError? Error { get; set; }
 
     /// <summary>
     /// A custom data dictionary. Please consider subclassing the service response
@@ -18,5 +18,5 @@ public class ServiceResponse
     /// Another option could be to add a [JsonExtensionData] but that could open
     /// way to the side effect ignoring typos.
     /// </summary>
-    public Dictionary<string, object> CustomData { get; set; }
+    public Dictionary<string, object?>? CustomData { get; set; }
 }

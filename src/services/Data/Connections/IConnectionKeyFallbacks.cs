@@ -26,7 +26,7 @@ public interface IConnectionKeyFallbacks
     /// </summary>
     /// <param name="connectionKey">The connection key.</param>
     /// <returns>The resolved connection key, or <c>null</c>.</returns>
-    string ResolveConnectionKey(string connectionKey);
+    string? ResolveConnectionKey(string connectionKey);
 
     /// <summary>
     /// Returns all connection keys (including themselves) whose fallback chain resolves to

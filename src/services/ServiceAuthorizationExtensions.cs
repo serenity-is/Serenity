@@ -4,24 +4,21 @@ namespace Serenity.Data;
 ///   Contains static extension methods for DbField and Meta objects.</summary>
 public static class ServiceAuthorizationExtensions
 {
-    private static string GetPermissionFor(Type sourceType, params Type[] attributeTypes)
+    private static string? GetPermissionFor(Type sourceType, params Type[] attributeTypes)
     {
         ArgumentNullException.ThrowIfNull(sourceType);
 
         if (attributeTypes.IsEmptyOrNull())
             throw new ArgumentNullException(nameof(attributeTypes));
 
-        PermissionAttributeBase attr = null;
+        PermissionAttributeBase? attr = null;
         foreach (var attributeType in attributeTypes)
         {
             var lst = sourceType.GetCustomAttributes(attributeType, true);
             if (lst.Length > 0)
             {
-                attr = lst[0] as PermissionAttributeBase;
-                if (attr == null)
-                    throw new ArgumentOutOfRangeException(attributeType.Name +
+                attr = lst[0] as PermissionAttributeBase ?? throw new ArgumentOutOfRangeException(attributeType.Name +
                         " is not a subclass of PermissionAttributeBase!");
-
                 break;
             }
         }

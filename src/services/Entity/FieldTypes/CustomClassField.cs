@@ -17,8 +17,8 @@ namespace Serenity.Data;
 /// <param name="flags">The flags.</param>
 /// <param name="getValue">The get value.</param>
 /// <param name="setValue">The set value.</param>
-public class CustomClassField<TValue>(ICollection<Field> collection, string name, LocalText caption, int size, FieldFlags flags,
-    Func<IRow, TValue> getValue, Action<IRow, TValue> setValue) : GenericClassField<TValue>(collection, FieldType.Object, name, caption, size, flags, getValue, setValue)
+public class CustomClassField<TValue>(ICollection<Field> collection, string name, LocalText? caption, int size, FieldFlags flags,
+    Func<IRow, TValue?>? getValue = null, Action<IRow, TValue?>? setValue = null) : GenericClassField<TValue>(collection, FieldType.Object, name, caption, size, flags, getValue, setValue)
     where TValue : class
 {
 
@@ -87,7 +87,7 @@ public class CustomClassField<TValue>(ICollection<Field> collection, string name
                 return 1;
         }
         else
-            return CompareValues(value1, value2);
+            return CompareValues(value1!, value2!);
     }
 
     /// <summary>
@@ -122,9 +122,9 @@ public class CustomClassField<TValue>(ICollection<Field> collection, string name
     /// <param name="reader">The reader.</param>
     /// <param name="serializer">The serializer.</param>
     /// <returns>The deserialized value.</returns>
-    protected virtual TValue ValueFromJson(Newtonsoft.Json.JsonReader reader, Newtonsoft.Json.JsonSerializer serializer)
+    protected virtual TValue? ValueFromJson(Newtonsoft.Json.JsonReader reader, Newtonsoft.Json.JsonSerializer serializer)
     {
-        return serializer.Deserialize<TValue>(reader);
+        return serializer.Deserialize<TValue?>(reader);
     }
 
     /// <summary>
@@ -159,9 +159,9 @@ public class CustomClassField<TValue>(ICollection<Field> collection, string name
     /// <param name="reader">The reader.</param>
     /// <param name="options">The serializer options.</param>
     /// <returns>The deserialized value.</returns>
-    protected virtual TValue ValueFromJson(ref Utf8JsonReader reader, JsonSerializerOptions options)
+    protected virtual TValue? ValueFromJson(ref Utf8JsonReader reader, JsonSerializerOptions options)
     {
-        return JsonSerializer.Deserialize<TValue>(ref reader, options);
+        return JsonSerializer.Deserialize<TValue?>(ref reader, options);
     }
 
     /// <inheritdoc/>
@@ -207,7 +207,7 @@ public class CustomClassField<TValue>(ICollection<Field> collection, string name
     /// </summary>
     /// <param name="value">The value.</param>
     /// <returns>A clone of the value.</returns>
-    protected virtual TValue Clone(TValue value)
+    protected virtual TValue? Clone(TValue? value)
     {
         return value;
     }

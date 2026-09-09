@@ -10,11 +10,11 @@ namespace Serenity.Services;
 public class UniqueFieldSaveBehavior(ITextLocalizer localizer) : BaseSaveBehaviorAsync, ISaveBehaviorSync, IImplicitBehavior, IFieldBehavior
 {
     /// <inheritdoc/>
-    public Field Target { get; set; }
+    public Field? Target { get; set; }
 
     private readonly ITextLocalizer localizer = localizer;
 
-    private UniqueAttribute attr;
+    private UniqueAttribute? attr;
 
     /// <inheritdoc/>
     public bool ActivateFor(IRow row)
@@ -37,10 +37,10 @@ public class UniqueFieldSaveBehavior(ITextLocalizer localizer) : BaseSaveBehavio
     public virtual void OnBeforeSave(ISaveRequestHandler handler)
     {
         if (attr?.IgnoreNulls == true &&
-            Target.IsNull(handler.Row))
+            Target!.IsNull(handler.Row))
             return;
 
-        ValidateUniqueConstraint(handler, [Target], localizer,
+        ValidateUniqueConstraint(handler, [Target!], localizer,
             attr?.ErrorMessage,
             attr != null && attr.IgnoreDeleted ? ServiceQueryHelper.GetNotDeletedCriteria(handler.Row) : Criteria.Empty);
     }
@@ -49,19 +49,19 @@ public class UniqueFieldSaveBehavior(ITextLocalizer localizer) : BaseSaveBehavio
     public override async Task OnBeforeSaveAsync(ISaveRequestHandler handler, CancellationToken cancellationToken = default)
     {
         if (attr?.IgnoreNulls == true &&
-            Target.IsNull(handler.Row))
+            Target!.IsNull(handler.Row))
             return;
 
-        await ValidateUniqueConstraintAsync(handler, [Target], localizer,
+        await ValidateUniqueConstraintAsync(handler, [Target!], localizer,
             attr?.ErrorMessage,
             attr != null && attr.IgnoreDeleted ? ServiceQueryHelper.GetNotDeletedCriteria(handler.Row) : Criteria.Empty,
             cancellationToken).ConfigureAwait(false);
     }
 
     internal static void ValidateUniqueConstraint(ISaveRequestHandler handler, IEnumerable<Field> fields, 
-        ITextLocalizer localizer, string errorMessage = null, BaseCriteria groupCriteria = null)
+        ITextLocalizer localizer, string? errorMessage = null, BaseCriteria? groupCriteria = null)
     {
-        if (handler.IsUpdate && !fields.Any(x => x.IndexCompare(handler.Old, handler.Row) != 0))
+        if (handler.IsUpdate && !fields.Any(x => x.IndexCompare(handler.Old!, handler.Row) != 0))
             return;
 
         var query = BuildUniqueConstraintQuery(handler, fields, groupCriteria);
@@ -73,10 +73,10 @@ public class UniqueFieldSaveBehavior(ITextLocalizer localizer) : BaseSaveBehavio
     }
 
     internal static async Task ValidateUniqueConstraintAsync(ISaveRequestHandler handler, IEnumerable<Field> fields,
-        ITextLocalizer localizer, string errorMessage = null, BaseCriteria groupCriteria = null,
+        ITextLocalizer localizer, string? errorMessage = null, BaseCriteria? groupCriteria = null,
         CancellationToken cancellationToken = default)
     {
-        if (handler.IsUpdate && !fields.Any(x => x.IndexCompare(handler.Old, handler.Row) != 0))
+        if (handler.IsUpdate && !fields.Any(x => x.IndexCompare(handler.Old!, handler.Row) != 0))
             return;
 
         var query = BuildUniqueConstraintQuery(handler, fields, groupCriteria);
@@ -88,7 +88,7 @@ public class UniqueFieldSaveBehavior(ITextLocalizer localizer) : BaseSaveBehavio
     }
 
     private static SqlQuery BuildUniqueConstraintQuery(ISaveRequestHandler handler,
-        IEnumerable<Field> fields, BaseCriteria groupCriteria)
+        IEnumerable<Field> fields, BaseCriteria? groupCriteria)
     {
         var criteria = groupCriteria ?? Criteria.Empty;
 
@@ -98,10 +98,10 @@ public class UniqueFieldSaveBehavior(ITextLocalizer localizer) : BaseSaveBehavio
             else
                 criteria &= field == new ValueCriteria(field.AsSqlValue(handler.Row));
 
-        var idField = ((IIdRow)handler.Row).IdField;
+        var idField = handler.Row.GetIdField();
 
         if (handler.IsUpdate)
-            criteria &= idField != new ValueCriteria(idField.AsSqlValue(handler.Old));
+            criteria &= idField != new ValueCriteria(idField.AsSqlValue(handler.Old!));
 
         var row = handler.Row.CreateNew();
         return new SqlQuery()
@@ -112,7 +112,7 @@ public class UniqueFieldSaveBehavior(ITextLocalizer localizer) : BaseSaveBehavio
     }
 
     private static ValidationError UniqueViolation(IEnumerable<Field> fields,
-        ITextLocalizer localizer, string errorMessage)
+        ITextLocalizer localizer, string? errorMessage)
     {
         return new ValidationError("UniqueViolation",
             string.Join(", ", fields.Select(x => x.PropertyName ?? x.Name)),

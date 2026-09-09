@@ -20,7 +20,7 @@ public class LocalizationRowAttribute(Type localizationRow) : Attribute
     /// ID field corresponding to this tables ID field.
     /// Can be automatically determined if not specified.
     /// </summary>
-    public string MappedIdField { get; set; }
+    public string? MappedIdField { get; set; }
 
 
     /// <summary>

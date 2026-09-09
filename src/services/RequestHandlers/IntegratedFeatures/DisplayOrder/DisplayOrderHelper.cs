@@ -19,11 +19,11 @@ public static class DisplayOrderHelper
     ///   One more of maximum display order values of records in the group. 
     ///   If none, 1.</returns>
     public static int GetNextValue(IDbConnection connection, string tableName,
-        Field orderField, ICriteria filter)
+        Field orderField, ICriteria? filter)
     {
         ArgumentNullException.ThrowIfNull(connection);
         if (tableName == null || tableName.Length == 0)
-            throw new ArgumentNullException("tableName");
+            throw new ArgumentNullException(nameof(tableName));
         ArgumentNullException.ThrowIfNull(orderField);
 
         using IDataReader reader = new SqlQuery()
@@ -51,7 +51,7 @@ public static class DisplayOrderHelper
     /// <returns>
     ///   One more of maximum display order values of records in the group. 
     ///   If none, 1.</returns>
-    public static int GetNextValue(IDbConnection connection, IDisplayOrderRow row, ICriteria filter = null)
+    public static int GetNextValue(IDbConnection connection, IDisplayOrderRow row, ICriteria? filter = null)
     {
         return GetNextValue(connection, row.Table, row.DisplayOrderField, filter);
     }
@@ -84,12 +84,12 @@ public static class DisplayOrderHelper
     /// <returns>
     ///   If any of the display order values is changed true.</returns>
     public static bool ReorderValues(IDbConnection connection, string tableName, Field keyField, Field orderField,
-        ICriteria filter = null, object recordID = null, int newDisplayOrder = 1,
+        ICriteria? filter = null, object? recordID = null, int newDisplayOrder = 1,
         bool descendingKeyOrder = false, bool hasUniqueConstraint = false)
     {
         ArgumentNullException.ThrowIfNull(connection);
         if (tableName == null || tableName.Length == 0)
-            throw new ArgumentNullException("tableName");
+            throw new ArgumentNullException(nameof(tableName));
         ArgumentNullException.ThrowIfNull(keyField);
         ArgumentNullException.ThrowIfNull(orderField);
 
@@ -110,7 +110,7 @@ public static class DisplayOrderHelper
         query.OrderBy(keyField.Name, desc: descendingKeyOrder);
 
         var orderRecords = new List<OrderRecord>();
-        OrderRecord changing = null;
+        OrderRecord? changing = null;
 
         // read all existing records
         using (IDataReader reader = query.ExecuteReader(connection))
@@ -156,11 +156,11 @@ public static class DisplayOrderHelper
     ///   A task whose result is one more of maximum display order values of records in the group.
     ///   If none, 1.</returns>
     public static async Task<int> GetNextValueAsync(IDbConnection connection, string tableName,
-        Field orderField, ICriteria filter, CancellationToken cancellationToken = default)
+        Field orderField, ICriteria? filter, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(connection);
         if (tableName == null || tableName.Length == 0)
-            throw new ArgumentNullException("tableName");
+            throw new ArgumentNullException(nameof(tableName));
         ArgumentNullException.ThrowIfNull(orderField);
 
         using IDataReader reader = await new SqlQuery()
@@ -189,7 +189,7 @@ public static class DisplayOrderHelper
     /// <returns>
     ///   A task whose result is one more of maximum display order values of records in the group.
     ///   If none, 1.</returns>
-    public static Task<int> GetNextValueAsync(IDbConnection connection, IDisplayOrderRow row, ICriteria filter = null,
+    public static Task<int> GetNextValueAsync(IDbConnection connection, IDisplayOrderRow row, ICriteria? filter = null,
         CancellationToken cancellationToken = default)
     {
         return GetNextValueAsync(connection, row.Table, row.DisplayOrderField, filter, cancellationToken);
@@ -220,7 +220,7 @@ public static class DisplayOrderHelper
     /// <returns>
     ///   A task whose result is true if any of the display order values is changed.</returns>
     public static Task<bool> ReorderValuesAsync(IDbConnection connection, string tableName, Field keyField, Field orderField,
-        ICriteria filter = null, object recordID = null, int newDisplayOrder = 1,
+        ICriteria? filter = null, object? recordID = null, int newDisplayOrder = 1,
         bool descendingKeyOrder = false, bool hasUniqueConstraint = false, CancellationToken cancellationToken = default)
     {
         return ReorderValuesCoreAsync(connection, tableName, keyField, orderField, filter, recordID,
@@ -246,21 +246,21 @@ public static class DisplayOrderHelper
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>
     ///   A task whose result is true if any of the display order values is changed.</returns>
-    public static Task<bool> ReorderValuesAsync(IDbConnection connection, IDisplayOrderRow row, ICriteria filter = null,
-        object recordID = null, int newDisplayOrder = 1, bool descendingKeyOrder = false,
+    public static Task<bool> ReorderValuesAsync(IDbConnection connection, IDisplayOrderRow row, ICriteria? filter = null,
+        object? recordID = null, int newDisplayOrder = 1, bool descendingKeyOrder = false,
         bool hasUniqueConstraint = false, CancellationToken cancellationToken = default)
     {
-        return ReorderValuesCoreAsync(connection, row.Table, row.IdField, row.DisplayOrderField, filter, recordID,
+        return ReorderValuesCoreAsync(connection, row.Table, row.GetIdField(), row.DisplayOrderField, filter, recordID,
             newDisplayOrder, descendingKeyOrder, hasUniqueConstraint, cancellationToken);
     }
 
     private static async Task<bool> ReorderValuesCoreAsync(IDbConnection connection, string tableName, Field keyField, Field orderField,
-        ICriteria filter, object recordID, int newDisplayOrder, bool descendingKeyOrder, bool hasUniqueConstraint,
+        ICriteria? filter, object? recordID, int newDisplayOrder, bool descendingKeyOrder, bool hasUniqueConstraint,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(connection);
         if (tableName == null || tableName.Length == 0)
-            throw new ArgumentNullException("tableName");
+            throw new ArgumentNullException(nameof(tableName));
         ArgumentNullException.ThrowIfNull(keyField);
         ArgumentNullException.ThrowIfNull(orderField);
 
@@ -281,7 +281,7 @@ public static class DisplayOrderHelper
         query.OrderBy(keyField.Name, desc: descendingKeyOrder);
 
         var orderRecords = new List<OrderRecord>();
-        OrderRecord changing = null;
+        OrderRecord? changing = null;
 
         // read all existing records
         using (IDataReader reader = await query.ExecuteReaderAsync(connection, cancellationToken: cancellationToken).ConfigureAwait(false))
@@ -313,7 +313,7 @@ public static class DisplayOrderHelper
             hasUniqueConstraint, cancellationToken).ConfigureAwait(false);
     }
 
-    private static int ComputeNewOrders(List<OrderRecord> orderRecords, OrderRecord changing, int newDisplayOrder)
+    private static int ComputeNewOrders(List<OrderRecord> orderRecords, OrderRecord? changing, int newDisplayOrder)
     {
         // last assigned display order value is the count of records read
         int order = orderRecords.Count;
@@ -383,7 +383,7 @@ public static class DisplayOrderHelper
         ArgumentNullException.ThrowIfNull(connection);
 
         if (string.IsNullOrEmpty(tableName))
-            throw new ArgumentNullException("tableName");
+            throw new ArgumentNullException(nameof(tableName));
 
         ArgumentNullException.ThrowIfNull(keyField);
 
@@ -417,7 +417,7 @@ public static class DisplayOrderHelper
         ArgumentNullException.ThrowIfNull(connection);
 
         if (string.IsNullOrEmpty(tableName))
-            throw new ArgumentNullException("tableName");
+            throw new ArgumentNullException(nameof(tableName));
 
         ArgumentNullException.ThrowIfNull(keyField);
 
@@ -470,7 +470,7 @@ public static class DisplayOrderHelper
                 {
                     byCurrentOrder.Remove(rec.oldOrder);
 
-                    if (byCurrentOrder.TryGetValue(rec.newOrder, out OrderRecord congestion))
+                    if (byCurrentOrder.TryGetValue(rec.newOrder, out OrderRecord? congestion))
                     {
                         var empty = list.Count * 2;
                         while (byCurrentOrder.ContainsKey(empty))
@@ -595,10 +595,10 @@ public static class DisplayOrderHelper
     /// <param name="hasUniqueConstraint">True if the display order field has a unique index</param>
     /// <returns>
     ///   If any of the display order values is changed true.</returns>
-    public static bool ReorderValues(IDbConnection connection, IDisplayOrderRow row, ICriteria filter = null,
-        object recordID = null, int newDisplayOrder = 1, bool descendingKeyOrder = false, bool hasUniqueConstraint = false)
+    public static bool ReorderValues(IDbConnection connection, IDisplayOrderRow row, ICriteria? filter = null,
+        object? recordID = null, int newDisplayOrder = 1, bool descendingKeyOrder = false, bool hasUniqueConstraint = false)
     {
-        return ReorderValues(connection, row.Table, row.IdField, row.DisplayOrderField, filter, recordID,
+        return ReorderValues(connection, row.Table, row.GetIdField(), row.DisplayOrderField, filter, recordID,
             newDisplayOrder, descendingKeyOrder, hasUniqueConstraint);
     }
 
@@ -610,7 +610,7 @@ public static class DisplayOrderHelper
         /// <summary>
         /// Record ID
         /// </summary>
-        public object recordID;
+        public required object recordID;
         /// <summary>
         /// Old order
         /// </summary>

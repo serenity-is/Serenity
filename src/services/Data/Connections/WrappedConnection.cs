@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using System.Data.Common;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Serenity.Data;
 
@@ -12,9 +13,9 @@ public class WrappedConnection : DbConnection, IDbConnection, IHasActualConnecti
 {
     private readonly IDbConnection actualConnection;
     private ISqlDialect dialect;
-    private readonly ILogger logger;
+    private readonly ILogger? logger;
     private bool openedOnce;
-    private WrappedTransaction currentTransaction;
+    private WrappedTransaction? currentTransaction;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="WrappedConnection"/> class.
@@ -22,7 +23,7 @@ public class WrappedConnection : DbConnection, IDbConnection, IHasActualConnecti
     /// <param name="connection">The actual connection.</param>
     /// <param name="dialect">The dialect.</param>
     /// <param name="logger">Optional logger for this connection (generally to be used by static SqlHelper methods)</param>
-    public WrappedConnection(IDbConnection connection, ISqlDialect dialect, ILogger logger = null)
+    public WrappedConnection(IDbConnection connection, ISqlDialect dialect, ILogger? logger = null)
     {
         actualConnection = connection ?? throw new ArgumentNullException(nameof(connection));
         this.dialect = dialect;
@@ -68,7 +69,7 @@ public class WrappedConnection : DbConnection, IDbConnection, IHasActualConnecti
     /// <value>
     /// The current transaction.
     /// </value>
-    public IDbTransaction CurrentTransaction => currentTransaction;
+    public IDbTransaction? CurrentTransaction => currentTransaction;
 
     /// <summary>
     /// Begins a database transaction with the specified <see cref="T:System.Data.IsolationLevel"></see> value.
@@ -145,6 +146,7 @@ public class WrappedConnection : DbConnection, IDbConnection, IHasActualConnecti
     /// <summary>
     /// Gets or sets the string used to open a database.
     /// </summary>
+    [AllowNull]
     public override string ConnectionString
     {
         get
@@ -271,7 +273,7 @@ public class WrappedConnection : DbConnection, IDbConnection, IHasActualConnecti
     /// Gets the associated provider factory for the connection, or <c>null</c> if the actual
     /// connection is not a <see cref="DbConnection"/>.
     /// </summary>
-    protected override DbProviderFactory DbProviderFactory =>
+    protected override DbProviderFactory? DbProviderFactory =>
         actualConnection is DbConnection dbConnection ? DbProviderFactories.GetFactory(dbConnection) : null;
 
     /// <summary>
@@ -307,7 +309,7 @@ public class WrappedConnection : DbConnection, IDbConnection, IHasActualConnecti
     /// <summary>
     /// Gets the logger instance for this connection, if any.
     /// </summary>
-    public ILogger Logger => logger;
+    public ILogger? Logger => logger;
 
     /// <summary>
     /// Disposes the actual connection.
@@ -325,6 +327,7 @@ public class WrappedConnection : DbConnection, IDbConnection, IHasActualConnecti
     /// <returns>A value task that represents the asynchronous operation.</returns>
     public override ValueTask DisposeAsync()
     {
+        GC.SuppressFinalize(this);
         if (actualConnection is DbConnection dbConnection)
             return dbConnection.DisposeAsync();
         actualConnection.Dispose();
