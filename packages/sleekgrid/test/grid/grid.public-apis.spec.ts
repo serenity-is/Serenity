@@ -138,7 +138,7 @@ describe("SleekGrid public API behavior", () => {
             getLength: () => 1,
             getItem: () => ({ first: "a", second: "b" }),
             getItemMetadata: () => metadata
-        };
+        } as any;
         const { grid } = makeGrid(view, {
             formatterFactory: { getFormat: () => factoryFormat },
             defaultFormat
@@ -206,7 +206,7 @@ describe("SleekGrid public API behavior", () => {
             getLength: () => 2,
             getItem: row => row < 2 ? ({ first: "a", second: "b" }) : null,
             getItemMetadata: () => metadata
-        };
+        } as any;
         const { grid } = makeGrid(view, { enableAddRow: true });
         grids.push(grid);
 
@@ -255,7 +255,7 @@ describe("SleekGrid public API behavior", () => {
             getItem: () => ({ first: "a", second: "b" }),
             getGrandTotals: () => ({ first: "all" }),
             onDataChanged: new EventEmitter()
-        };
+        } as any;
         const { grid } = makeGrid(view, { showFooterRow: true }, [
             { ...baseColumns[0], groupTotalsFormat: totalsFormat },
             { ...baseColumns[1], groupTotalsFormatter: legacyTotals }
@@ -321,7 +321,7 @@ describe("SleekGrid public API behavior", () => {
             getLength: () => 2,
             getItem: row => ({ first: `a${row}`, second: `b${row}` }),
             getItemMetadata: () => ({ columns: { first: { colspan: 2 } } })
-        };
+        } as any;
         const nodeFormat = vi.fn(() => {
             const node = document.createElement("strong");
             node.textContent = "node-value";

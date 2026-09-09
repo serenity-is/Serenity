@@ -150,7 +150,7 @@ describe("SleekGrid interaction behavior", () => {
             getLength: () => 1,
             getItem: () => ({ first: "a", second: "b" }),
             getItemMetadata: () => metadata
-        };
+        } as any;
         const { grid } = makeGrid(view, {
             formatterFactory: { getFormatter: () => (() => "compat") as any },
             defaultFormatter: (() => "def") as any
@@ -169,7 +169,7 @@ describe("SleekGrid interaction behavior", () => {
             getLength: () => 1,
             getItem: () => ({ first: "a", second: "b" }),
             getItemMetadata: () => metadata
-        };
+        } as any;
         const { grid } = makeGrid(view, { editorFactory: { getEditor: () => editor } });
         grids.push(grid);
         expect((grid as any).getEditor(0, 0)).toBe(editor);
@@ -515,7 +515,7 @@ describe("SleekGrid interaction behavior", () => {
             getLength: () => 1,
             getItem: () => ({ first: "a", second: "b" }),
             getItemMetadata: () => metadata
-        };
+        } as any;
         const { grid } = makeGrid(view, {
             formatterFactory: { getFormat: () => (() => "factory") as any },
             defaultFormat: (() => "default") as any
@@ -581,7 +581,7 @@ describe("SleekGrid interaction behavior", () => {
             getLength: () => 1,
             getItem: () => ({ first: "a", second: "b" }),
             getItemMetadata: () => metadata
-        };
+        } as any;
         const { grid } = makeGrid(view, { enableCellNavigation: true }, [
             { ...baseColumns[0], focusable: true, tabbable: true },
             { ...baseColumns[1] }

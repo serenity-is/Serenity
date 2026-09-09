@@ -48,7 +48,7 @@ describe("createElement", () => {
         const el = createElement('div', {}, createElement('span', null), 'text');
         expect(el.tagName).toBe('DIV');
         expect(el.childNodes.length).toBe(2);
-        expect(el.childNodes[0].tagName).toBe('SPAN');
+        expect((el.childNodes[0] as HTMLElement).tagName).toBe('SPAN');
         expect(el.childNodes[1].textContent).toBe('text');
     });
 });

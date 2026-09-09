@@ -57,7 +57,7 @@ describe("shadow", () => {
         const ref2 = vi.fn<any>()
         Object(
             <div>
-                <ShadowRootNode ref={ref2} mode="open">
+                <ShadowRootNode ref={ref2 as any} mode="open">
                     world
                 </ShadowRootNode>
             </div>

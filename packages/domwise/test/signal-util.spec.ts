@@ -239,7 +239,7 @@ describe("createDerivedSignal", () => {
         const original = {
             _value: 42,
             peek: () => original._value,
-            subscribe: vi.fn((callback: (v: number) => void) => {
+            subscribe: vi.fn((_: (v: number) => void) => {
                 // NOT calling callback synchronously
                 return () => {};
             }),
