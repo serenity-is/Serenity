@@ -31,7 +31,7 @@ export abstract class EmployeeRow {
     static readonly localTextPrefix = 'Northwind.Employee';
     static readonly lookupKey = 'Northwind.Employee';
 
-    /** @deprecated use getLookupAsync instead */
+    /** **deprecated** use getLookupAsync instead */
     static getLookup() { return getLookup<EmployeeRow>('Northwind.Employee') }
     static async getLookupAsync() { return getLookupAsync<EmployeeRow>('Northwind.Employee') }
 

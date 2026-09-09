@@ -11,7 +11,7 @@ export abstract class LanguageRow {
     static readonly localTextPrefix = 'Administration.Language';
     static readonly lookupKey = 'Administration.Language';
 
-    /** @deprecated use getLookupAsync instead */
+    /** **deprecated** use getLookupAsync instead */
     static getLookup() { return getLookup<LanguageRow>('Administration.Language') }
     static async getLookupAsync() { return getLookupAsync<LanguageRow>('Administration.Language') }
 

@@ -12,7 +12,7 @@ export abstract class ShipperRow {
     static readonly localTextPrefix = 'Northwind.Shipper';
     static readonly lookupKey = 'Northwind.Shipper';
 
-    /** @deprecated use getLookupAsync instead */
+    /** **deprecated** use getLookupAsync instead */
     static getLookup() { return getLookup<ShipperRow>('Northwind.Shipper') }
     static async getLookupAsync() { return getLookupAsync<ShipperRow>('Northwind.Shipper') }
 

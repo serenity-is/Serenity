@@ -11,7 +11,7 @@ export abstract class RegionRow {
     static readonly localTextPrefix = 'Northwind.Region';
     static readonly lookupKey = 'Northwind.Region';
 
-    /** @deprecated use getLookupAsync instead */
+    /** **deprecated** use getLookupAsync instead */
     static getLookup() { return getLookup<RegionRow>('Northwind.Region') }
     static async getLookupAsync() { return getLookupAsync<RegionRow>('Northwind.Region') }
 
