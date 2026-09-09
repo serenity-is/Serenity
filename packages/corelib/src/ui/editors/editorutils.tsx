@@ -1,5 +1,5 @@
-﻿import { FilterPanelTexts, Fluent, PropertyGridTexts, PropertyItem, isArrayLike, isInstanceOfType, parseDecimal, setElementReadOnly } from "../../base";
-import { cast, isTrimmedEmpty, safeCast } from "../../compat";
+import { FilterPanelTexts, Fluent, PropertyGridTexts, PropertyItem, isArrayLike, parseDecimal, setElementReadOnly } from "../../base";
+import { safeCast } from "../../compat";
 import { IBooleanValue, IDoubleValue, IGetEditValue, ISetEditValue, IStringValue, IValidateRequired } from "../../interfaces";
 import { type Widget } from "../widgets/widget";
 import { tryGetWidget } from "../widgets/widgetutils";
@@ -130,7 +130,7 @@ export namespace EditorUtils {
             if (value != null) {
                 value = value.toString();
             }
-            stringValue.set_value(cast(value, String));
+            stringValue.set_value(value);
             return;
         }
 
@@ -149,17 +149,17 @@ export namespace EditorUtils {
         var doubleValue = safeCast(editor, IDoubleValue);
         if (doubleValue != null) {
             var d = source[item.name];
-            if (!!(d == null || isInstanceOfType(d, String) && isTrimmedEmpty(cast(d, String)))) {
+            if (d == null || (typeof d == "string" && !d.trim().length)) {
                 doubleValue.set_value(null);
             }
-            else if (isInstanceOfType(d, String)) {
-                doubleValue.set_value(cast(parseDecimal(cast(d, String)), Number));
+            else if (typeof d === "string") {
+                doubleValue.set_value(parseDecimal(d));
             }
-            else if (isInstanceOfType(d, Boolean)) {
+            else if (typeof d === "boolean") {
                 doubleValue.set_value((!!d ? 1 : 0));
             }
-            else {
-                doubleValue.set_value(cast(d, Number));
+            else if (typeof d === "number") {
+                doubleValue.set_value(d);
             }
             return;
         }

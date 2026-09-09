@@ -424,7 +424,7 @@ describe("RemoteView", () => {
             const result = view.getGrouping();
             expect(result).toHaveLength(1);
             expect(result[0].getter).toBe(groupInfo.getter);
-            expect(result[0].formatter).toBe(groupInfo.formatter);
+            expect((result[0] as any).formatter).toBe(groupInfo.formatter);
             expect(result[0].collapsed).toBe(false);
             expect(result[0].aggregateEmpty ?? false).toBe(false);
         });
@@ -1963,7 +1963,7 @@ describe("RemoteView", () => {
     describe("idField getter", () => {
         it("returns the id property name", () => {
             const view = new RemoteView<any>({ idField: "myId" });
-            expect(view.idField).toBe("myId");
+            expect((view as any).idField).toBe("myId");
         });
     });
 

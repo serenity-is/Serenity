@@ -48,7 +48,7 @@ describe("addDisposingListener", () => {
         addDisposingListener(el, listener, "key1");
         expect(() => {
             addDisposingListener(el, listener, "key2");
-        }).toThrowError("A disposing listener with the same callback but different regKey is already registered on the target element.");
+        }).toThrow("A disposing listener with the same callback but different regKey is already registered on the target element.");
    });
 
     it("should update the regKey when adding the same listener with a new regKey", () => {

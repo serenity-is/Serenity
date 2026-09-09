@@ -1,4 +1,4 @@
-import { Fluent, LookupEditor, confirmDialog, count, formatDate, gridPageInit, htmlEncode, notifyInfo, notifySuccess, stringFormat, toId } from "@serenity-is/corelib";
+import { Fluent, LookupEditor, confirmDialog, formatDate, gridPageInit, notifyInfo, notifySuccess, stringFormat, toId } from "@serenity-is/corelib";
 import { CountryWithFlagFormatter, CustomerDialog, OrderColumns, OrderDialog, OrderGrid, OrderRow } from "@serenity-is/demo.northwind";
 import { Column } from "@serenity-is/sleekgrid";
 import { nsDemoBasicSamples } from "../../ServerTypes/Namespaces";
@@ -62,7 +62,7 @@ export class CustomLinksInGrid extends OrderGrid {
         else if (target.classList.contains("date-link")) {
             e.preventDefault();
 
-            var ordersInSameDate = count(this.view.getItems(), x => x.OrderDate == item.OrderDate);
+            var ordersInSameDate = this.view.getItems().filter(x => x.OrderDate == item.OrderDate).length;
 
             notifyInfo("You clicked an order from date " +
                 formatDate(item.OrderDate) + ". There are " +

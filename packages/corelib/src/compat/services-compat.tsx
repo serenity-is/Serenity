@@ -2,7 +2,7 @@
 
 /**
  * Sets an equality filter value on a list request.
- * Compat shim for the legacy `Q.setEquality` helper. Lazily initializes `request.EqualityFilter` if needed.
+ * Compat shim for the legacy `setEquality` helper. Lazily initializes `request.EqualityFilter` if needed.
  * @param request - The {@link ListRequest} whose `EqualityFilter` map will be mutated.
  * @param field - Field name to set in the equality filter.
  * @param value - Value to assign for the field (any JSON-serializable value, or `null` to clear).
@@ -17,9 +17,8 @@ export function setEquality(request: ListRequest, field: string, value: any) {
 
 /**
  * Options for posting data to a Serenity service endpoint via a hidden form.
- * Compat shim for the legacy `Q.PostToServiceOptions` type.
- * @deprecated Prefer `fetch` / `serviceCall` APIs. Kept for legacy form-post integrations.
- */
+ * Compat shim for the legacy `PostToServiceOptions` type.
+  */
 export interface PostToServiceOptions {
     /** Absolute or app-relative URL to post to. When provided, takes precedence over {@link service}. Resolved via `resolveUrl`. */
     url?: string;
@@ -33,8 +32,8 @@ export interface PostToServiceOptions {
 
 /**
  * Options for posting arbitrary parameters to a URL via a hidden form.
- * Compat shim for the legacy `Q.PostToUrlOptions` type.
- * @deprecated Prefer `fetch` or standard form handling. Kept for legacy file-export / report post flows.
+ * Compat shim for the legacy `PostToUrlOptions` type.
+ * Prefer `fetch` or standard form handling. Kept for legacy file-export / report post flows.
  */
 export interface PostToUrlOptions {
     /** Target URL to post to (app-relative or absolute). Resolved via `resolveUrl`. */
@@ -67,9 +66,9 @@ function postToCommon(url: string, form: HTMLFormElement, target: string) {
 
 /**
  * Posts a service request by creating and submitting a hidden form.
- * Compat shim for `Q.postToService`. Resolves the URL from `options.url` or `options.service`, injects a CSRF token when same-origin, and auto-removes the form after submission.
+ * Compat shim for `postToService`. Resolves the URL from `options.url` or `options.service`, injects a CSRF token when same-origin, and auto-removes the form after submission.
  * @param options - Post options including service/url, request payload, and optional target.
- * @deprecated Prefer `serviceCall` / `fetch` with JSON. Kept for legacy file-download and export scenarios that require form POST.
+ * [DEPRECATED] Prefer `serviceCall` / `fetch` with JSON. Kept for legacy file-download and export scenarios that require form POST.
  */
 export function postToService(options: PostToServiceOptions) {
     postToCommon(options.url ? (resolveUrl(options.url)) : resolveServiceUrl(options.service), <form>
@@ -79,9 +78,9 @@ export function postToService(options: PostToServiceOptions) {
 
 /**
  * Posts arbitrary parameters to a URL by creating and submitting a hidden form.
- * Compat shim for `Q.postToUrl`. Each key in `options.params` becomes a hidden input field.
+ * Compat shim for `postToUrl`. Each key in `options.params` becomes a hidden input field.
  * @param options - Post options including target URL, params map, and optional target window/frame.
- * @deprecated Prefer `fetch` or programmatic form construction. Kept for legacy export / report flows.
+ * [DEPRECATED] Prefer `fetch` or programmatic form construction. Kept for legacy export / report flows.
  */
 export function postToUrl(options: PostToUrlOptions) {
     postToCommon(resolveUrl(options.url), <form>

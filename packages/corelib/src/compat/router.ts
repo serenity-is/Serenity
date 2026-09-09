@@ -18,9 +18,9 @@ export interface HandleRouteEvent extends Event {
 
 /**
  * Contract for the legacy hash-based router.
- * Compat shim for the old `Q.Router` / `Serenity.Router` singleton. The router synchronizes dialog open/close state
+ * Compat shim for the old `Router` / `Serenity.Router` singleton. The router synchronizes dialog open/close state
  * with the URL hash using `"/+/"` delimited segments and fires `handleroute` events on designated handlers.
- * @deprecated Hash-based dialog routing is legacy. Prefer explicit client-side routing or modern dialog state management. Kept for backward compatibility.
+ * [DEPRECATED] Hash-based dialog routing is legacy. Prefer explicit client-side routing or modern dialog state management. Kept for backward compatibility.
  */
 export interface IClassicRouter {
 	/** When `false`, all routing operations become no-ops. */
@@ -72,8 +72,8 @@ const ignoredSelector = '.s-MessageDialog, .s-MessageModal, .s-PromptDialog, .ro
 
 /**
  * Legacy hash-based router that maps dialog stack to `"/+/"` delimited hash segments.
- * Compat shim for the old `Q.Router` implementation. Listens to `hashchange`, dialog open/close, and anchor clicks to keep the URL in sync with visible dialogs and to dispatch `handleroute` events.
- * @deprecated Use explicit routing or state-driven dialog management. Kept solely for backward compatibility with legacy Serenity pages.
+ * Compat shim for the old `Router` implementation. Listens to `hashchange`, dialog open/close, and anchor clicks to keep the URL in sync with visible dialogs and to dispatch `handleroute` events.
+ * [DEPRECATED] Use explicit routing or state-driven dialog management. Kept solely for backward compatibility with legacy Serenity pages.
  */
 export class ClassicRouter implements IClassicRouter {
     private oldURL: string;
@@ -482,7 +482,7 @@ export class ClassicRouter implements IClassicRouter {
 
 /**
  * Singleton instance of the legacy hash router.
- * Compat shim for the global `Q.Router` / `Serenity.Router`. Initialized at module load and wired to `hashchange` and dialog events.
- * @deprecated Prefer not to use hash-based dialog routing in new code. Kept for legacy pages that rely on `Router.resolve()` / `Router.navigate()`.
+ * Compat shim for the global `Router` / `Serenity.Router`. Initialized at module load and wired to `hashchange` and dialog events.
+ * [DEPRECATED] Prefer not to use hash-based dialog routing in new code. Kept for legacy pages that rely on `Router.resolve()` / `Router.navigate()`.
  */
 export const Router = new ClassicRouter() as IClassicRouter;

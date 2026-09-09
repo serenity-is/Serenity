@@ -1,11 +1,11 @@
-﻿
+
 beforeEach(() => {
     vi.resetModules();
 });
 
 describe('initFullHeightGridPage', () => {
     it('works without jQuery', async () => {
-        const initFullHeightGridPage = (await import('./layout')).initFullHeightGridPage;
+        const initFullHeightGridPage = ((await import('./layout')) as any).initFullHeightGridPage;
         const div = document.createElement('div');
         initFullHeightGridPage(div, { noRoute: true });
         expect(document.documentElement.classList.contains('full-height-page')).toBe(true);
@@ -13,7 +13,7 @@ describe('initFullHeightGridPage', () => {
     });
 
     it('works with jQuery and HTML element', async () => {
-        const initFullHeightGridPage = (await import('./layout')).initFullHeightGridPage;
+        const initFullHeightGridPage = ((await import('./layout')) as any).initFullHeightGridPage;
         const div = document.createElement('div');
         initFullHeightGridPage(div, { noRoute: true });
         expect(document.documentElement.classList.contains('full-height-page')).toBe(true);
@@ -21,7 +21,7 @@ describe('initFullHeightGridPage', () => {
     });
 
     it('works with jQuery and jQuery wrapped element', async () => {
-        const initFullHeightGridPage = (await import('./layout')).initFullHeightGridPage;
+        const initFullHeightGridPage = ((await import('./layout')) as any).initFullHeightGridPage;
         const div = document.createElement('div');
         initFullHeightGridPage(div, { noRoute: true });
         expect(document.documentElement.classList.contains('full-height-page')).toBe(true);
@@ -92,7 +92,7 @@ describe('isMobileView', () => {
 
 describe('layoutFillHeightValue', () => {
     it('returns parsed height when jQuery is not available', async () => {
-        const layoutFillHeightValue = (await import('./layout')).layoutFillHeightValue;
+        const layoutFillHeightValue = ((await import('./layout')) as any).layoutFillHeightValue;
         const element = document.createElement('div');
         element.style.height = '100px';
         const result = layoutFillHeightValue(element);
@@ -102,7 +102,7 @@ describe('layoutFillHeightValue', () => {
 
 describe('layoutFillHeight', () => {
     it('sets height style on element', async () => {
-        const layoutFillHeight = (await import('./layout')).layoutFillHeight;
+        const layoutFillHeight = ((await import('./layout')) as any).layoutFillHeight;
         const element = document.createElement('div');
         element.style.height = '50px';
 
@@ -144,7 +144,7 @@ describe('triggerLayoutOnShow', () => {
 
 describe('centerDialog', () => {
     it('centers dialog using jQuery position', async () => {
-        const centerDialog = (await import('./layout')).centerDialog;
+        const centerDialog = ((await import('./layout')) as any).centerDialog;
         const dialog = document.createElement('div');
         dialog.classList.add('ui-dialog');
         document.body.appendChild(dialog);
@@ -168,7 +168,7 @@ describe('centerDialog', () => {
 
 describe('GridPageInit', () => {
     it('initializes grid page with type and props', async () => {
-        const { GridPageInit } = await import('./layout');
+        const { GridPageInit } = (await import('./layout') as any);
         const { Widget } = await import('../ui/widgets/widget');
 
         // Create the expected DOM element
@@ -192,7 +192,7 @@ describe('GridPageInit', () => {
 
 describe('PanelPageInit', () => {
     it('initializes panel page with type and props', async () => {
-        const { PanelPageInit } = await import('./layout');
+        const { PanelPageInit } = (await import('./layout') as any);
         const { Widget } = await import('../ui/widgets/widget');
 
         // Create the expected DOM element
@@ -216,7 +216,7 @@ describe('PanelPageInit', () => {
 
 describe('gridPageInit', () => {
     it('initializes grid with existing widget instance', async () => {
-        const { gridPageInit } = await import('./layout');
+        const { gridPageInit } = await import('./layout') as any;
         const { Widget } = await import('../ui/widgets/widget');
 
         // Create a mock widget instance
@@ -256,7 +256,7 @@ describe('gridPageInit', () => {
 
 describe('panelPageInit', () => {
     it('initializes panel with existing widget instance', async () => {
-        const { panelPageInit } = await import('./layout');
+        const { panelPageInit } = await import('./layout') as any;
         const { Widget } = await import('../ui/widgets/widget');
 
         // Create a mock widget instance
@@ -347,7 +347,7 @@ describe('initFullHeightGridPage additional paths', () => {
     });
 
     it('handles isArrayLike gridDiv', async () => {
-        const initFullHeightGridPage = (await import('./layout')).initFullHeightGridPage;
+        const initFullHeightGridPage = ((await import('./layout')) as any).initFullHeightGridPage;
         const div = document.createElement('div');
         initFullHeightGridPage([div], { noRoute: true });
         expect(document.documentElement.classList.contains('full-height-page')).toBe(true);
@@ -355,7 +355,7 @@ describe('initFullHeightGridPage additional paths', () => {
     });
 
     it('handles domNode object gridDiv', async () => {
-        const initFullHeightGridPage = (await import('./layout')).initFullHeightGridPage;
+        const initFullHeightGridPage = ((await import('./layout')) as any).initFullHeightGridPage;
         const div = document.createElement('div');
         initFullHeightGridPage({ domNode: div }, { noRoute: true });
         expect(document.documentElement.classList.contains('full-height-page')).toBe(true);
@@ -365,7 +365,7 @@ describe('initFullHeightGridPage additional paths', () => {
     it('handles has-layout-event body class', async () => {
         document.body.classList.add('has-layout-event');
         try {
-            const initFullHeightGridPage = (await import('./layout')).initFullHeightGridPage;
+            const initFullHeightGridPage = ((await import('./layout')) as any).initFullHeightGridPage;
             const div = document.createElement('div');
             initFullHeightGridPage(div, { noRoute: true });
             expect(document.documentElement.classList.contains('full-height-page')).toBe(true);
@@ -378,7 +378,7 @@ describe('initFullHeightGridPage additional paths', () => {
         const mockAddResizeHandler = vi.fn();
         (window as any).Metronic = { addResizeHandler: mockAddResizeHandler };
         try {
-            const initFullHeightGridPage = (await import('./layout')).initFullHeightGridPage;
+            const initFullHeightGridPage = ((await import('./layout')) as any).initFullHeightGridPage;
             const div = document.createElement('div');
             initFullHeightGridPage(div, { noRoute: true });
             expect(mockAddResizeHandler).toHaveBeenCalled();
@@ -388,7 +388,7 @@ describe('initFullHeightGridPage additional paths', () => {
     });
 
     it('handles jQuery with s-DataGrid class (setHeight false)', async () => {
-        const initFullHeightGridPage = (await import('./layout')).initFullHeightGridPage;
+        const initFullHeightGridPage = ((await import('./layout')) as any).initFullHeightGridPage;
         const div = document.createElement('div');
         div.classList.add('s-DataGrid');
 
@@ -412,7 +412,7 @@ describe('initFullHeightGridPage additional paths', () => {
     });
 
     it('handles jQuery with setHeight true (no s-DataGrid/s-Panel)', async () => {
-        const initFullHeightGridPage = (await import('./layout')).initFullHeightGridPage;
+        const initFullHeightGridPage = ((await import('./layout')) as any).initFullHeightGridPage;
         const div = document.createElement('div');
 
         // Set jQuery AFTER import to avoid Router constructor interference
@@ -445,7 +445,7 @@ describe('initFullHeightGridPage additional paths', () => {
         // We need to reset the data-fhrouteinit attribute
         document.body.removeAttribute('data-fhrouteinit');
 
-        const initFullHeightGridPage = (await import('./layout')).initFullHeightGridPage;
+        const initFullHeightGridPage = ((await import('./layout')) as any).initFullHeightGridPage;
         const div = document.createElement('div');
         // Call without noRoute - should trigger Router.resolve
         initFullHeightGridPage(div, { noRoute: false });
@@ -453,7 +453,7 @@ describe('initFullHeightGridPage additional paths', () => {
     });
 
     it('disposing callback does not crash', async () => {
-        const initFullHeightGridPage = (await import('./layout')).initFullHeightGridPage;
+        const initFullHeightGridPage = ((await import('./layout')) as any).initFullHeightGridPage;
 
         const div = document.createElement('div');
         document.body.appendChild(div);
@@ -468,7 +468,7 @@ describe('initFullHeightGridPage additional paths', () => {
 
 describe('layoutFillHeightValue with jQuery', () => {
     it('calculates height using jQuery when available', async () => {
-        const layoutFillHeightValue = (await import('./layout')).layoutFillHeightValue;
+        const layoutFillHeightValue = ((await import('./layout')) as any).layoutFillHeightValue;
         const element = document.createElement('div');
         element.style.height = '100px';
 
@@ -509,7 +509,7 @@ describe('layoutFillHeightValue with jQuery', () => {
     });
 
     it('calculates height with non-border-box sizing', async () => {
-        const layoutFillHeightValue = (await import('./layout')).layoutFillHeightValue;
+        const layoutFillHeightValue = ((await import('./layout')) as any).layoutFillHeightValue;
         const element = document.createElement('div');
 
         const parent = document.createElement('div');
@@ -545,7 +545,7 @@ describe('layoutFillHeightValue with jQuery', () => {
     });
 
     it('handles isArrayLike element', async () => {
-        const layoutFillHeightValue = (await import('./layout')).layoutFillHeightValue;
+        const layoutFillHeightValue = ((await import('./layout')) as any).layoutFillHeightValue;
         const element = document.createElement('div');
         element.style.height = '200px';
         const result = layoutFillHeightValue([element]);
@@ -555,7 +555,7 @@ describe('layoutFillHeightValue with jQuery', () => {
 
 describe('layoutFillHeight additional paths', () => {
     it('handles isArrayLike element', async () => {
-        const layoutFillHeight = (await import('./layout')).layoutFillHeight;
+        const layoutFillHeight = ((await import('./layout')) as any).layoutFillHeight;
         const element = document.createElement('div');
         element.style.height = '100px';
 
@@ -571,7 +571,7 @@ describe('layoutFillHeight additional paths', () => {
     });
 
     it('sets height only when it differs from current', async () => {
-        const layoutFillHeight = (await import('./layout')).layoutFillHeight;
+        const layoutFillHeight = ((await import('./layout')) as any).layoutFillHeight;
         const element = document.createElement('div');
         // Mock getComputedStyle to return a known height
         const origGetComputedStyle = globalThis.getComputedStyle;
@@ -608,7 +608,7 @@ describe('triggerLayoutOnShow additional paths', () => {
 
 describe('centerDialog additional paths', () => {
     it('handles isArrayLike element', async () => {
-        const centerDialog = (await import('./layout')).centerDialog;
+        const centerDialog = ((await import('./layout')) as any).centerDialog;
         const dialog = document.createElement('div');
         dialog.classList.add('ui-dialog');
         document.body.appendChild(dialog);
@@ -627,7 +627,7 @@ describe('centerDialog additional paths', () => {
     });
 
     it('does nothing when no ui-dialog parent found', async () => {
-        const centerDialog = (await import('./layout')).centerDialog;
+        const centerDialog = ((await import('./layout')) as any).centerDialog;
         const element = document.createElement('div');
         document.body.appendChild(element);
 
@@ -637,7 +637,7 @@ describe('centerDialog additional paths', () => {
     });
 
     it('adjusts position when left is negative', async () => {
-        const centerDialog = (await import('./layout')).centerDialog;
+        const centerDialog = ((await import('./layout')) as any).centerDialog;
         const dialog = document.createElement('div');
         dialog.classList.add('ui-dialog');
         document.body.appendChild(dialog);
@@ -663,7 +663,7 @@ describe('centerDialog additional paths', () => {
     });
 
     it('adjusts position when top is negative', async () => {
-        const centerDialog = (await import('./layout')).centerDialog;
+        const centerDialog = ((await import('./layout')) as any).centerDialog;
         const dialog = document.createElement('div');
         dialog.classList.add('ui-dialog');
         document.body.appendChild(dialog);

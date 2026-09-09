@@ -250,13 +250,13 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         this._off = removeListener.bind({ jQuery: this._jQuery, uid: this._uid });
         this._trigger = triggerGridEvent.bind(this);
 
-        if (options?.createPreHeaderPanel) {
+        if ((options as any)?.createPreHeaderPanel) {
             // for compat, as draggable grouping plugin expects preHeaderPanel for grouping
             options.groupingPanel ??= true;
-            if (options.groupingPanelHeight == null && options.preHeaderPanelHeight != null)
-                options.groupingPanelHeight = options.preHeaderPanelHeight;
-            if (options.showGroupingPanel == null && options.showPreHeaderPanel != null)
-                options.showGroupingPanel = options.showPreHeaderPanel;
+            if (options.groupingPanelHeight == null && (options as any).preHeaderPanelHeight != null)
+                options.groupingPanelHeight = (options as any).preHeaderPanelHeight;
+            if (options.showGroupingPanel == null && (options as any).showPreHeaderPanel != null)
+                options.showGroupingPanel = (options as any).showPreHeaderPanel;
         }
 
         this._options.rtl = this._options.rtl ??
@@ -366,7 +366,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
             return;
 
         this._groupingPanel = <div hidden={!this._options.showGroupingPanel} class="slick-grouping-panel">
-            {this._options.createPreHeaderPanel && <div class="slick-preheader-panel" />}
+            {(this._options as any).createPreHeaderPanel && <div class="slick-preheader-panel" />}
         </div> as HTMLElement;
 
         this._focusSink1?.insertAdjacentElement("afterend", this._groupingPanel);

@@ -526,7 +526,7 @@ public partial class ServerTypingsGenerator
 
                 var getLookup = ImportFromCorelib("getLookup");
                 var getLookupAsync = ImportFromCorelib("getLookupAsync");
-                cw.IndentedLine("/** **deprecated** use getLookupAsync instead */");
+                cw.IndentedLine("/** [DEPRECATED] use getLookupAsync instead */");
                 cw.IndentedLine($"static getLookup() {{ return {getLookup}<{rowType.Name}>({sq(meta.LookupKey)}) }}");
                 cw.IndentedLine($"static async getLookupAsync() {{ return {getLookupAsync}<{rowType.Name}>({sq(meta.LookupKey)}) }}");
                 sb.AppendLine();

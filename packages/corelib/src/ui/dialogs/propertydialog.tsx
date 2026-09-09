@@ -1,5 +1,5 @@
-﻿import { PropertyItem, PropertyItemsData, cancelDialogButton, getInstanceType, getTypeFullName, nsSerenity, okDialogButton } from "../../base";
-import { ScriptData, getFormData, getFormDataAsync } from "../../compat";
+import { PropertyItem, PropertyItemsData, cancelDialogButton, getInstanceType, getTypeFullName, nsSerenity, okDialogButton } from "../../base";
+import { ScriptData, canLoadScriptData, getFormData, getFormDataAsync } from "../../compat";
 import { Attributes, PanelAttribute, StaticPanelAttribute } from "../../types/attributes";
 import { PropertyGrid, PropertyGridOptions } from "../widgets/propertygrid";
 import { WidgetProps } from "../widgets/widget";
@@ -193,7 +193,7 @@ export class PropertyDialog<TItem, P> extends BaseDialog<P> {
 
         if (this.getFormKey === PropertyDialog.prototype.getFormKey &&
             this.getPropertyItems !== PropertyDialog.prototype.getPropertyItems &&
-            !ScriptData.canLoad('Form.' + formKey)) {
+            !canLoadScriptData('Form.' + formKey)) {
             return {
                 items: this.getPropertyItems(),
                 additionalItems: []

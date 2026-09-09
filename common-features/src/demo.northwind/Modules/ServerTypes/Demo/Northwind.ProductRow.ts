@@ -23,7 +23,7 @@ export abstract class ProductRow {
     static readonly localTextPrefix = 'Northwind.Product';
     static readonly lookupKey = 'Northwind.Product';
 
-    /** **deprecated** use getLookupAsync instead */
+    /** [DEPRECATED] use getLookupAsync instead */
     static getLookup() { return getLookup<ProductRow>('Northwind.Product') }
     static async getLookupAsync() { return getLookupAsync<ProductRow>('Northwind.Product') }
 

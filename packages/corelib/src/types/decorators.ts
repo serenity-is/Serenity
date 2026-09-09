@@ -4,7 +4,7 @@ import { AdvancedFilteringAttribute, CloseButtonAttribute, ElementAttribute, Fil
 
 /**
  * Legacy decorator helpers for Serenity type registration and widget attributes.
- * @deprecated Prefer direct `static [Symbol.typeInfo] = ...` and `static { registerType(this); }` patterns.
+ * [DEPRECATED] Prefer direct `static [Symbol.typeInfo] = ...` and `static { registerType(this); }` patterns.
  */
 export namespace Decorators {
 
@@ -139,7 +139,7 @@ export namespace Decorators {
 
     /**
      * Legacy decorator that attaches an {@link AdvancedFilteringAttribute} to a grid class.
-     * @deprecated Prefer `static override [Symbol.typeInfo]` with {@link AdvancedFilteringAttribute} metadata instead.
+     * [DEPRECATED] Prefer `static override [Symbol.typeInfo]` with {@link AdvancedFilteringAttribute} metadata instead.
      * @param value - Whether advanced filtering should be enabled. Defaults to `true`.
      * @returns Class decorator.
      */

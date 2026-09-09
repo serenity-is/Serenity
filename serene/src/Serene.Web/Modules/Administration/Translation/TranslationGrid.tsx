@@ -1,4 +1,4 @@
-import { confirmDialog, EntityGrid, Fluent, GridUtils, isEmptyOrNull, isTrimmedEmpty, LookupEditor, LookupEditorOptions, notifySuccess, stripDiacritics, ToolButton, trimToEmpty, trimToNull, Widget } from "@serenity-is/corelib";
+import { confirmDialog, EntityGrid, Fluent, GridUtils, LookupEditor, LookupEditorOptions, notifySuccess, stripDiacritics, ToolButton, trimToEmpty, trimToNull, Widget } from "@serenity-is/corelib";
 import { TranslationItem, TranslationTexts } from "@serenity-is/extensions";
 import { Column } from "@serenity-is/sleekgrid";
 import { TranslationService } from "../../ServerTypes/Administration";
@@ -50,7 +50,7 @@ export class TranslationGrid extends EntityGrid<TranslationItem, any> {
                 this.hasChanges = true;
             };
 
-            if (isTrimmedEmpty(item.CustomText) ||
+            if (!item.CustomText?.trim() ||
                 (trimToEmpty(item.CustomText) === trimToEmpty(item.SourceText))) {
                 done();
                 return;
@@ -69,7 +69,7 @@ export class TranslationGrid extends EntityGrid<TranslationItem, any> {
                 this.hasChanges = true;
             };
 
-            if (isTrimmedEmpty(item.CustomText) ||
+            if (!item.CustomText?.trim() ||
                 (trimToEmpty(item.CustomText) === trimToEmpty(item.TargetText))) {
                 done();
                 return;
@@ -220,7 +220,7 @@ export class TranslationGrid extends EntityGrid<TranslationItem, any> {
             return str.toLowerCase().indexOf(searching) >= 0;
         }
 
-        return isEmptyOrNull(searching) || match(item.Key) || match(item.SourceText) ||
+        return !searching || match(item.Key) || match(item.SourceText) ||
             match(item.TargetText) || match(item.CustomText);
     }
 

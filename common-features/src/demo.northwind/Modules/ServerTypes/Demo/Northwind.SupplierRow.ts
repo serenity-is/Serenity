@@ -21,7 +21,7 @@ export abstract class SupplierRow {
     static readonly localTextPrefix = 'Northwind.Supplier';
     static readonly lookupKey = 'Northwind.Supplier';
 
-    /** **deprecated** use getLookupAsync instead */
+    /** [DEPRECATED] use getLookupAsync instead */
     static getLookup() { return getLookup<SupplierRow>('Northwind.Supplier') }
     static async getLookupAsync() { return getLookupAsync<SupplierRow>('Northwind.Supplier') }
 

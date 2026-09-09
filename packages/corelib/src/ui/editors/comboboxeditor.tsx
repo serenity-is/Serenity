@@ -1,6 +1,6 @@
-﻿import { bindThis } from "@serenity-is/domwise";
+import { bindThis } from "@serenity-is/domwise";
 import { Authorization, Fluent, PropertyItem, SelectEditorTexts, isPromiseLike, nsSerenity, setElementReadOnly } from "../../base";
-import { ValidationHelper, isTrimmedEmpty } from "../../compat";
+import { ValidationHelper } from "../../compat";
 import { IEditDialog, IGetEditValue, IReadOnly, ISetEditValue, IStringValue } from "../../interfaces";
 import { DialogType } from "../../types/dialogtype";
 import { DialogTypeRegistry } from "../../types/dialogtyperegistry";
@@ -527,7 +527,7 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
             this.lastCreateTerm = s;
             s = (stripDiacritics(s) ?? '').toLowerCase();
 
-            if (isTrimmedEmpty(s)) {
+            if (!s?.trim().length) {
                 return null;
             }
 
@@ -1063,7 +1063,7 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
         return null;
     }
 
-    /** @deprecated Override getDialogType() instead */
+    /** [DEPRECATED] Override getDialogType() instead */
     protected getDialogTypeKey(): string {
         if (typeof (this.options as ComboboxEditorOptions).dialogType === "string") {
             return (this.options as ComboboxEditorOptions).dialogType as string;

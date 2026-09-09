@@ -1,5 +1,4 @@
-import { Fluent } from "../../base";
-import { ScriptData } from "../../compat";
+import { Fluent, setScriptData } from "../../base";
 import { LookupEditor } from "./lookupeditor";
 
 let oldWindowAlert: any;
@@ -19,7 +18,7 @@ afterEach(() => {
 describe("LookupEditor", () => {
 
     it('throws an error if lookupKey is not registered', () => {
-        ScriptData.set("Lookup.Test", null);
+        setScriptData("Lookup.Test", null);
         var logSpy = vi.spyOn(window.console, 'log').mockImplementation(() => { });
         var oldXHR = window.XMLHttpRequest
         try {
@@ -40,7 +39,7 @@ describe("LookupEditor", () => {
     });
 
     it('doesn\'t throw an error if lookupKey is registered', () => {
-        ScriptData.set("Lookup.Test", {
+        setScriptData("Lookup.Test", {
             items: [{ id: 1, text: "Test" }]
         });
 
@@ -50,7 +49,7 @@ describe("LookupEditor", () => {
     });
 
     it('sets placeholder to default if its null', () => {
-        ScriptData.set("Lookup.Test", {
+        setScriptData("Lookup.Test", {
             items: []
         });
 
@@ -62,7 +61,7 @@ describe("LookupEditor", () => {
     });
 
     it('doesn\'t set placeholder if its not null', () => {
-        ScriptData.set("Lookup.Test", {
+        setScriptData("Lookup.Test", {
             items: []
         });
 
@@ -75,7 +74,7 @@ describe("LookupEditor", () => {
     });
 
     it('creates inplaceAdd button if its enabled', () => {
-        ScriptData.set("Lookup.Test", {
+        setScriptData("Lookup.Test", {
             items: []
         });
 
@@ -88,7 +87,7 @@ describe("LookupEditor", () => {
     });
 
     it('doesn\'t create inplaceAdd button if its disabled', () => {
-        ScriptData.set("Lookup.Test", {
+        setScriptData("Lookup.Test", {
             items: []
         });
 
@@ -100,7 +99,7 @@ describe("LookupEditor", () => {
     });
 
     it('inplaceAdd button has correct text depending on selection', () => {
-        ScriptData.set("Lookup.Test", {
+        setScriptData("Lookup.Test", {
             idField: "id",
             items: [
                 { id: 1, text: "Test" }
@@ -122,7 +121,7 @@ describe("LookupEditor", () => {
     });
 
     it('can load empty lookup', () => {
-        ScriptData.set("Lookup.Test", {
+        setScriptData("Lookup.Test", {
             items: []
         });
 
@@ -134,7 +133,7 @@ describe("LookupEditor", () => {
     });
 
     it('can load lookup with items', () => {
-        ScriptData.set("Lookup.Test", {
+        setScriptData("Lookup.Test", {
             items: [{ id: 1, text: "Test" }]
         });
 
@@ -146,7 +145,7 @@ describe("LookupEditor", () => {
     });
 
     it('can load lookup with multiple items', () => {
-        ScriptData.set("Lookup.Test", {
+        setScriptData("Lookup.Test", {
             items: [
                 { id: 1, text: "Test" },
                 { id: 2, text: "Test2" }
@@ -161,7 +160,7 @@ describe("LookupEditor", () => {
     });
 
     it('appends original lookup item to source', () => {
-        ScriptData.set("Lookup.Test", {
+        setScriptData("Lookup.Test", {
             items: [{ id: 1, text: "Test" }]
         });
 
@@ -174,7 +173,7 @@ describe("LookupEditor", () => {
     });
 
     it('doesn\'t load id if idField is not set', () => {
-        ScriptData.set("Lookup.Test", {
+        setScriptData("Lookup.Test", {
             items: [{ id: 1, text: "Test" }]
         });
 
@@ -187,7 +186,7 @@ describe("LookupEditor", () => {
     });
 
     it('doesn\'t load text if textField is not set', () => {
-        ScriptData.set("Lookup.Test", {
+        setScriptData("Lookup.Test", {
             items: [{ id: 1, text: "Test" }]
         });
 
@@ -200,7 +199,7 @@ describe("LookupEditor", () => {
     });
 
     it('can load lookup with idField', () => {
-        ScriptData.set("Lookup.Test", {
+        setScriptData("Lookup.Test", {
             items: [{ id: 1, text: "Test" }],
             idField: "id"
         });
@@ -214,7 +213,7 @@ describe("LookupEditor", () => {
     });
 
     it('can load lookup with textField', () => {
-        ScriptData.set("Lookup.Test", {
+        setScriptData("Lookup.Test", {
             items: [{ id: 1, text: "Test" }],
             textField: "text"
         });
@@ -228,7 +227,7 @@ describe("LookupEditor", () => {
     });
 
     it('can load lookup with idField and textField', () => {
-        ScriptData.set("Lookup.Test", {
+        setScriptData("Lookup.Test", {
             items: [{ id: 1, text: "Test" }],
             idField: "id",
             textField: "text"
@@ -244,7 +243,7 @@ describe("LookupEditor", () => {
     });
 
     it('can cascade lookup with cascadeField', () => {
-        ScriptData.set("Lookup.Test", {
+        setScriptData("Lookup.Test", {
             items: [
                 { id: 1, text: "Test", parentId: 1 },
                 { id: 2, text: "Test", parentId: 2 }
@@ -261,7 +260,7 @@ describe("LookupEditor", () => {
     });
 
     it('can cascade lookup with cascadeFrom', () => {
-        ScriptData.set("Lookup.Test", {
+        setScriptData("Lookup.Test", {
             idField: "id",
             items: [
                 { id: 1, parentId: 10 },
@@ -269,7 +268,7 @@ describe("LookupEditor", () => {
             ]
         });
 
-        ScriptData.set("Lookup.TestParent", {
+        setScriptData("Lookup.TestParent", {
             idField: "id",
             items: [
                 { id: 10 },
@@ -297,7 +296,7 @@ describe("LookupEditor", () => {
     });
 
     it('can filter lookup', () => {
-        ScriptData.set("Lookup.Test", {
+        setScriptData("Lookup.Test", {
             idField: "id",
             items: [
                 { id: 1, text: "Test" },
@@ -316,7 +315,7 @@ describe("LookupEditor", () => {
     });
 
     it('can update items when scriptData changes', () => {
-        ScriptData.set("Lookup.Test", {
+        setScriptData("Lookup.Test", {
             idField: "id",
             items: [
                 { id: 1, text: "Test" },
@@ -330,7 +329,7 @@ describe("LookupEditor", () => {
 
         expect(editor.items).toHaveLength(2);
 
-        ScriptData.set("Lookup.Test", {
+        setScriptData("Lookup.Test", {
             idField: "id",
             items: [
                 { id: 1, text: "Test" },
@@ -343,7 +342,7 @@ describe("LookupEditor", () => {
     });
 
     it('can update items when scriptData changes and cascadeFrom is set', () => {
-        ScriptData.set("Lookup.Test", {
+        setScriptData("Lookup.Test", {
             idField: "id",
             items: [
                 { id: 1, text: "Test", parentId: 1 },
@@ -351,7 +350,7 @@ describe("LookupEditor", () => {
             ]
         });
 
-        ScriptData.set("Lookup.TestParent", {
+        setScriptData("Lookup.TestParent", {
             idField: "id",
             items: [
                 { id: 1 },
@@ -377,7 +376,7 @@ describe("LookupEditor", () => {
 
         expect(editor.items).toHaveLength(1);
 
-        ScriptData.set("Lookup.Test", {
+        setScriptData("Lookup.Test", {
             idField: "id",
             items: [
                 { id: 1, text: "Test", parentId: 1 },
@@ -390,7 +389,7 @@ describe("LookupEditor", () => {
     });
 
     //    it('can filter items when input value changes', () => {
-    //        ScriptData.set("Lookup.Test", {
+    //        setScriptData("Lookup.Test", {
     //            idField: "id",
     //            items: [
     //                { id: 1, text: "Test" },
@@ -421,7 +420,7 @@ describe("LookupEditor", () => {
     //    });
 
     it('correctly unbinds from scriptData change event on destroy', () => {
-        ScriptData.set("Lookup.Test", {
+        setScriptData("Lookup.Test", {
             idField: "id",
             items: [
                 { id: 1, text: "Test" },
@@ -436,7 +435,7 @@ describe("LookupEditor", () => {
         expect(editor.items).toHaveLength(2);
         editor.destroy();
 
-        ScriptData.set("Lookup.Test", {
+        setScriptData("Lookup.Test", {
             items: []
         });
 
@@ -444,7 +443,7 @@ describe("LookupEditor", () => {
     });
 
     it('throws error if editor is async and items getter or setter is accessed', () => {
-        ScriptData.set("Lookup.Test", { items: [] });
+        setScriptData("Lookup.Test", { items: [] });
 
         const editor = new LookupEditor({
             lookupKey: "Test",
@@ -459,7 +458,7 @@ describe("LookupEditor", () => {
 
 describe("LookupEditor additional behavior", () => {
     it("asyncSearch filters by ids, text, and paging", async () => {
-        ScriptData.set("Lookup.AsyncTest", {
+        setScriptData("Lookup.AsyncTest", {
             idField: "Id",
             textField: "Name",
             items: [
@@ -483,7 +482,7 @@ describe("LookupEditor additional behavior", () => {
     });
 
     it("maps lookup items and handles null text", () => {
-        ScriptData.set("Lookup.MapTest", {
+        setScriptData("Lookup.MapTest", {
             idField: "Id",
             textField: "Name",
             items: [{ Id: 1, Name: null }]
@@ -496,7 +495,7 @@ describe("LookupEditor additional behavior", () => {
     });
 
     it("sets create term on the lookup text field", () => {
-        ScriptData.set("Lookup.CreateTest", {
+        setScriptData("Lookup.CreateTest", {
             idField: "Id",
             textField: "Name",
             items: []
@@ -509,7 +508,7 @@ describe("LookupEditor additional behavior", () => {
     });
 
     it("derives lookup key from a registered editor type", () => {
-        ScriptData.set("Lookup.Explicit", { items: [] });
+        setScriptData("Lookup.Explicit", { items: [] });
         class CustomLookupEditor extends LookupEditor<any> {
             static [Symbol.typeInfo] = this.registerEditor("Test.CustomLookupEditor");
         }
@@ -519,7 +518,7 @@ describe("LookupEditor additional behavior", () => {
     });
 
     it("derives lookup key without an explicit option", () => {
-        ScriptData.set("Lookup.Products", { idField: "Id", textField: "Name", items: [] });
+        setScriptData("Lookup.Products", { idField: "Id", textField: "Name", items: [] });
         class ProductsEditor extends LookupEditor<any> {
             static [Symbol.typeInfo] = this.registerEditor("Test.ProductsEditor");
         }
@@ -529,7 +528,7 @@ describe("LookupEditor additional behavior", () => {
     });
 
     it("returns early from updateItems for async sources", () => {
-        ScriptData.set("AsyncEarly", { items: [{ id: 1, text: "One" }] });
+        setScriptData("AsyncEarly", { items: [{ id: 1, text: "One" }] });
         const editor = new LookupEditor({ lookupKey: "AsyncEarly", async: true } as any);
         expect(() => editor.updateItems()).not.toThrow();
         editor.destroy();
@@ -553,7 +552,7 @@ describe("LookupEditor additional behavior", () => {
     });
 
     it("uses base item text when lookup is null", () => {
-        ScriptData.set("Lookup.BaseText", { items: [] });
+        setScriptData("Lookup.BaseText", { items: [] });
         const editor = new LookupEditor({ lookupKey: "BaseText" } as any);
         expect((editor as any).getItemText({ Name: "Base" }, null)).toBe("");
         expect((editor as any).getIdField()).toBeUndefined();
@@ -561,14 +560,14 @@ describe("LookupEditor additional behavior", () => {
     });
 
     it("uses lookup key as dialog type fallback", () => {
-        ScriptData.set("Lookup.DialogKey", { items: [] });
+        setScriptData("Lookup.DialogKey", { items: [] });
         const editor = new LookupEditor({ lookupKey: "DialogKey" } as any);
         expect((editor as any).getDialogTypeKey()).toBe("DialogKey");
         editor.destroy();
     });
 
     it("reloads lookup when edit dialog data changes", async () => {
-        ScriptData.set("Lookup.ReloadKey", { items: [] });
+        setScriptData("Lookup.ReloadKey", { items: [] });
         const reloadSpy = vi.spyOn(await import("../../compat"), "reloadLookup").mockImplementation((() => { }) as any);
         const editor = new LookupEditor({ lookupKey: "ReloadKey" } as any);
         (editor as any).editDialogDataChange();

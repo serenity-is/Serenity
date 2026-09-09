@@ -1,6 +1,5 @@
 import { Column, FormatterContext, FormatterResult } from "@serenity-is/sleekgrid";
 import { faIcon, formatterTypeInfo, iconClassName, nsSerenity, registerType, resolveUrl, stringFormat } from "../../base";
-import { replaceAll } from "../../compat";
 import { Formatter } from "../../slick";
 import { IInitializeColumn } from "./iinitializecolumn";
 
@@ -48,7 +47,7 @@ export class FileDownloadFormatter implements Formatter, IInitializeColumn {
      * @returns Resolved URL under `~/upload/`.
      */
     static dbFileUrl(filename: string): string {
-        filename = replaceAll((filename ?? ''), '\\', '/');
+        filename = (filename ?? '').replaceAll('\\', '/');
         return resolveUrl('~/upload/') + filename;
     }
 

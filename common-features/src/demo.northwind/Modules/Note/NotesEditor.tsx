@@ -1,4 +1,4 @@
-import { Authorization, EditorWidget, IGetEditValue, ISetEditValue, PropertyItem, Toolbar, confirmDialog, formatDate, formatISODateTimeUTC, insert, sanitizeHtml } from "@serenity-is/corelib";
+import { Authorization, EditorWidget, IGetEditValue, ISetEditValue, PropertyItem, Toolbar, confirmDialog, formatDate, formatISODateTimeUTC, sanitizeHtml } from "@serenity-is/corelib";
 import { NoteRow } from "../ServerTypes/Demo";
 import { nsDemoNorthwind } from "../ServerTypes/Namespaces";
 import { NoteDialog } from "./NoteDialog";
@@ -52,7 +52,7 @@ export class NotesEditor<P = {}> extends EditorWidget<P>
                 return;
 
             this.items = this.items || [];
-            insert(this.items, 0, {
+            this.items.splice(0, 0, {
                 Text: text,
                 InsertUserDisplayName: Authorization.userDefinition.DisplayName,
                 InsertDate: formatISODateTimeUTC(new Date())

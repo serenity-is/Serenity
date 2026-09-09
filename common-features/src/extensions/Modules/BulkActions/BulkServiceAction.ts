@@ -1,4 +1,4 @@
-﻿import { Dictionary, ServiceError, confirmDialog, notifyError, notifySuccess, notifyWarning, stringFormat } from "@serenity-is/corelib";
+﻿import { ServiceError, confirmDialog, notifyError, notifySuccess, notifyWarning, stringFormat } from "@serenity-is/corelib";
 import { BasicProgressDialogTexts, BulkServiceActionTexts } from "../ServerTypes/Texts";
 import { BasicProgressDialog } from "./BasicProgressDialog";
 
@@ -10,7 +10,7 @@ export class BulkServiceAction {
     declare protected progressDialog: BasicProgressDialog;
     declare protected pendingRequests: number;
     declare protected completedRequests: number;
-    declare protected errorByKey: Dictionary<ServiceError>;
+    declare protected errorByKey: Record<string, ServiceError>;
     declare private successCount: number;
     declare private errorCount: number;
     declare public done: () => void;

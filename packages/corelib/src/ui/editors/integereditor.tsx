@@ -1,5 +1,4 @@
 import { formatNumber, nsSerenity, parseInteger } from "../../base";
-import { isTrimmedEmpty } from "../../compat";
 import { IDoubleValue } from "../../interfaces";
 import { AutoNumeric, type AutoNumericOptions } from "./autonumeric";
 import { DecimalEditor } from "./decimaleditor";
@@ -84,7 +83,7 @@ export class IntegerEditor<P extends IntegerEditorOptions = IntegerEditorOptions
         var val: string;
         if (AutoNumeric.hasInstance(this.domNode)) {
             val = AutoNumeric.getValue(this.domNode);
-            if (isTrimmedEmpty(val))
+            if (!val?.trim())
                 return null;
             else
                 return parseInt(val, 10);

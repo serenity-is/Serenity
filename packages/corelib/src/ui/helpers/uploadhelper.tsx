@@ -1,5 +1,4 @@
 import { FileUploadTexts, Fluent, ServiceResponse, Uploader, blockUI, blockUndo, getjQuery, htmlEncode, isArrayLike, notifyError, resolveUrl, round, stringFormat } from "../../base";
-import { replaceAll } from "../../compat";
 
 /**
  * Helper functions for file uploads, image constraints, and file display.
@@ -196,7 +195,7 @@ export namespace UploadHelper {
      * @returns The resolved file URL.
      */
     export function dbFileUrl(filename: string): string {
-        filename = replaceAll(filename ?? '', '\\', '/');
+        filename = (filename ?? '').replaceAll('\\', '/');
         return resolveUrl('~/upload/') + filename;
     }
 

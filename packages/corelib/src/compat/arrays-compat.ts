@@ -3,7 +3,7 @@
  * @param array - Array to test.
  * @param predicate - Function invoked per element; should return `true` for a match.
  * @returns `true` if at least one element matches, otherwise `false`.
- * @deprecated Prefer native `Array.prototype.some` — e.g. `array.some(predicate)`. Retained as a `Q.any` compat shim.
+ * @deprecated Prefer native `Array.prototype.some` — e.g. `array.some(predicate)`. Retained as a `any` compat shim.
  * @example
  * any([1, 2, 3], x => x > 2); // true
  */
@@ -16,7 +16,7 @@ export function any<TItem>(array: TItem[], predicate: (x: TItem) => boolean): bo
  * @param array - Array to count over.
  * @param predicate - Function invoked per element; return `true` to count the element.
  * @returns Number of matching elements.
- * @deprecated Prefer `array.filter(predicate).length` or a manual loop. Retained as a `Q.count` compat shim.
+ * @deprecated Prefer `array.filter(predicate).length` or a manual loop. Retained as a `count` compat shim.
  * @example
  * count([1, 2, 3], x => x % 2 === 1); // 2
  */
@@ -35,7 +35,7 @@ export function count<TItem>(array: TItem[], predicate: (x: TItem) => boolean): 
  * @param predicate - Function invoked per element; return `true` for the desired element.
  * @returns The first matching element.
  * @throws {Error} If no element satisfies the predicate (`"first:No element satisfies the condition."`).
- * @deprecated Prefer `array.find(predicate)` with explicit not-found handling. Retained as a `Q.first` compat shim.
+ * @deprecated Prefer `array.find(predicate)` with explicit not-found handling. Retained as a `first` compat shim.
  * @example
  * first([1, 2, 3], x => x > 1); // 2
  */
@@ -87,7 +87,6 @@ export type GroupByResult<TItem> = {
  * @param getKey - Callback returning the group key for an element; `null`/`undefined` is normalized to `""`.
  * @returns A {@link GroupByResult} with `byKey` dictionary and `inOrder` array. Each group records its `order`, `key`, `items`, and `start` index.
  * @remarks Similar to LINQ `ToLookup` with extra `order`/`start` metadata. Uses `Object.create(null)` so prototype keys are safe.
- * @deprecated Kept as a `Q.groupBy` compat shim; for new code consider `Map`-based grouping or `toGrouping`.
  * @example
  * groupBy([{k:'a'}, {k:'b'}, {k:'a'}], x => x.k).inOrder.length; // 2
  */
@@ -124,7 +123,7 @@ export function groupBy<TItem>(items: TItem[], getKey: (x: TItem) => any): Group
  * @param array - Array to search.
  * @param predicate - Function invoked per element; return `true` for the target element.
  * @returns Zero-based index of the first match, or `-1` if none matches.
- * @deprecated Prefer `Array.prototype.findIndex` — `array.findIndex(predicate)`. Retained as a `Q.indexOf` compat shim (note the predicate overload differs from `Array.indexOf`).
+ * @deprecated Prefer `Array.prototype.findIndex` — `array.findIndex(predicate)`. Retained as a `indexOf` compat shim (note the predicate overload differs from `Array.indexOf`).
  * @example
  * indexOf([1, 2, 3], x => x === 2); // 1
  */
@@ -143,7 +142,7 @@ export function indexOf<TItem>(array: TItem[], predicate: (x: TItem) => boolean)
  * @param item - Item to insert.
  * @throws {Error} If `obj` is neither an array nor exposes `insert`.
  * @remarks If `obj.insert` exists it is delegated to; otherwise `Array.prototype.splice` is used. No return value.
- * @deprecated Prefer `array.splice(index, 0, item)` directly. Retained as a `Q.insert` compat shim.
+ * @deprecated Prefer `array.splice(index, 0, item)` directly. Retained as a `insert` compat shim.
  * @example
  * insert([1, 2, 3], 1, 4); // [1, 4, 2, 3]
  */
@@ -158,7 +157,7 @@ export function insert(obj: any, index: number, item: any): void {
 
 /**
  * Tests whether a value is an array.
- * @remarks Thin re-export of `Array.isArray` for legacy `Q.isArray` call sites.
+ * @remarks Thin re-export of `Array.isArray` for legacy `isArray` call sites.
  * @deprecated Use `Array.isArray` directly.
  * @example
  * isArray([1, 2, 3]); // true
@@ -172,7 +171,7 @@ export const isArray = Array.isArray;
  * @param predicate - Function invoked per element; exactly one element must return `true`.
  * @returns The sole matching element.
  * @throws {Error} If no element matches (`"single:No element satisfies the condition."`) or more than one matches (`"single:sequence contains more than one element."`).
- * @deprecated Retained as a `Q.single` compat shim; prefer explicit `filter` + length check for clarity.
+ * @deprecated Retained as a `single` compat shim; prefer explicit `filter` + length check for clarity.
  * @example
  * single([1, 2, 3], x => x == 2); // 2
  */
@@ -207,7 +206,6 @@ export type Grouping<TItem> = { [key: string]: TItem[] };
  * @param getKey - Callback returning the group key for an element; `null`/`undefined` is normalized to `""`.
  * @returns A {@link Grouping} dictionary whose values are arrays of matching elements. Uses a null-prototype object.
  * @remarks Lighter alternative to {@link groupBy} when ordered metadata is not needed.
- * @deprecated Retained as a `Q.toGrouping` compat shim; new code may prefer `Map`-grouping.
  * @example
  * toGrouping([1, 2, 3], x => x % 2 == 0 ? "even" : "odd"); // { odd: [1, 3], even: [2] }
  */
@@ -230,7 +228,7 @@ export function toGrouping<TItem>(items: TItem[], getKey: (x: TItem) => any): Gr
  * @param array - Array to search.
  * @param predicate - Function invoked per element; return `true` for the desired element.
  * @returns The first matching element, or `undefined` when no match is found.
- * @deprecated Prefer `Array.prototype.find` — `array.find(predicate)`. Retained as a `Q.tryFirst` compat shim.
+ * @deprecated Prefer `Array.prototype.find` — `array.find(predicate)`. Retained as a `tryFirst` compat shim.
  * @example
  * tryFirst([1, 2, 3], x => x == 2); // 2
  * tryFirst([1, 2, 3], x => x == 4); // undefined

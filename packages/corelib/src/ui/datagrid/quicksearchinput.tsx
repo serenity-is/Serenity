@@ -217,8 +217,8 @@ export class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInp
 
         const args = { field: this.field?.name, query: value, done };
         this.options.beforeSearch?.(args);
-        if (this.options.onSearch != null) {
-            this.options.onSearch(args.field, args.query, args.done);
+        if ((this.options as any).onSearch != null) {
+            (this.options as any).onSearch(args.field, args.query, args.done);
         }
         else if (this.options.search != null) {
             this.options.search(args);

@@ -1,5 +1,4 @@
 import { applyFormatterResultToCellNode, FormatterContext, FormatterResult } from "@serenity-is/sleekgrid";
-import { replaceAll } from "../../compat";
 import { Format, IRemoteView } from "../../slick";
 import { skipEditLinkFormatPurposes } from "./editlink";
 
@@ -39,10 +38,10 @@ export namespace SlickFormatting {
 
             const itemId = (ctx.item as any)?.[idField];
             const extraClass = cssClass == null ? '' : cssClass(ctx)
-            const encItemType = encodeURIComponent(replaceAll(itemType, '.', '-'));
+            const encItemType = encodeURIComponent((itemType ?? '').replaceAll('.', '-'));
             const encItemId = itemId != null ? encodeURIComponent(itemId.toString()) : null;
 
-            const link = <a class={[`s-EditLink s-${replaceAll(itemType, '.', '-')}Link`, extraClass]}
+            const link = <a class={[`s-EditLink s-${(itemType ?? '').replaceAll('.', '-')}Link`, extraClass]}
                 href={itemId != null ? '#' + encItemType + '/' + encItemId : null}
                 data-item-type={itemType} data-item-id={itemId} /> as HTMLAnchorElement;
 

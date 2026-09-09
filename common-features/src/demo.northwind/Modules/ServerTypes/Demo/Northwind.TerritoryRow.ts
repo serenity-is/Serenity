@@ -13,7 +13,7 @@ export abstract class TerritoryRow {
     static readonly localTextPrefix = 'Northwind.Territory';
     static readonly lookupKey = 'Northwind.Territory';
 
-    /** **deprecated** use getLookupAsync instead */
+    /** [DEPRECATED] use getLookupAsync instead */
     static getLookup() { return getLookup<TerritoryRow>('Northwind.Territory') }
     static async getLookupAsync() { return getLookupAsync<TerritoryRow>('Northwind.Territory') }
 

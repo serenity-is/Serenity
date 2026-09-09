@@ -1,7 +1,7 @@
 ﻿
 import { bindThis } from "@serenity-is/domwise";
 import { Authorization, EntityGridTexts, Fluent, faIcon, getActiveRequests, getInstanceType, getTypeFullName, isPromiseLike, localText, nsSerenity, resolveUrl, stringFormat } from "../../base";
-import { HandleRouteEvent, Router, replaceAll, safeCast } from "../../compat";
+import { HandleRouteEvent, Router, safeCast } from "../../compat";
 import { IEditDialog } from "../../interfaces";
 import { RemoteViewOptions } from "../../slick";
 import { DialogType } from "../../types/dialogtype";
@@ -343,7 +343,7 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
         if (this._service != null)
             return this._service;
 
-        return this._service = replaceAll(this.getEntityType(), '.', '/');
+        return this._service = (this.getEntityType() ?? '').replaceAll('.', '/');
     }
 
     /**

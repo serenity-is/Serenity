@@ -1,5 +1,5 @@
 import { Authorization, DeleteRequest, DeleteResponse, EntityDialogTexts, Fluent, LanguageList, RetrieveColumnSelection, RetrieveRequest, RetrieveResponse, SaveRequest, SaveResponse, ServiceOptions, TranslationConfig, UndeleteRequest, UndeleteResponse, confirmDialog, getInstanceType, getTypeFullName, localText, notifySuccess, nsSerenity, serviceCall, stringFormat, type PropertyItem, type PropertyItemsData } from "../../base";
-import { ScriptData, ValidationHelper, getFormData, getFormDataAsync, replaceAll, validatorAbortHandler } from "../../compat";
+import { ScriptData, ValidationHelper, canLoadScriptData, getFormData, getFormDataAsync, validatorAbortHandler } from "../../compat";
 import { IEditDialog, IReadOnly } from "../../interfaces";
 import { DataChangeInfo } from "../../types";
 import { Attributes } from "../../types/attributes";
@@ -413,7 +413,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         if (this._service != null)
             return this._service;
 
-        return this._service = replaceAll(this.getEntityType(), '.', '/');
+        return this._service = (this.getEntityType() ?? '').replaceAll('.', '/');
     }
 
     /**
@@ -703,7 +703,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
 
         if (this.getFormKey === EntityDialog.prototype.getFormKey &&
             this.getPropertyItems !== EntityDialog.prototype.getPropertyItems &&
-            !ScriptData.canLoad('Form.' + formKey)) {
+            !canLoadScriptData('Form.' + formKey)) {
             return {
                 items: this.getPropertyItems(),
                 additionalItems: []

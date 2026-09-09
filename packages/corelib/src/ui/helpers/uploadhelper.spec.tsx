@@ -520,7 +520,7 @@ describe("UploadHelper", () => {
 
     describe("colorBox (deprecated alias for lightbox)", () => {
         it("is the same function as lightbox", () => {
-            expect(UploadHelper.colorBox).toBe(UploadHelper.lightbox);
+            expect((UploadHelper as any).colorBox).toBe(UploadHelper.lightbox);
         });
 
         it("uses jQuery colorbox when neither GLightbox nor SimpleLightbox are present", () => {

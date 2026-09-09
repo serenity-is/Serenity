@@ -1,5 +1,6 @@
 import { Config, classTypeInfo, getTypeFullName } from "../../base";
-import { TemplatedWidget, Widget, useIdPrefix } from "./widget";
+import { Widget, useIdPrefix } from "./widget";
+import * as widgetDeprecations from "./widget";
 
 describe('Widget.getCssClass', () => {
     let oldNamespaces: string[];
@@ -566,7 +567,7 @@ describe('Widget.registerEditor', () => {
 
 describe('TemplatedWidget', () => {
     it('is an alias for Widget', () => {
-        expect(TemplatedWidget).toBe(Widget);
+        expect((widgetDeprecations as any).TemplatedWidget).toBe(Widget);
     });
 });
 

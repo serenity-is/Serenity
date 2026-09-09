@@ -1,6 +1,7 @@
-﻿import { Mock } from "vitest";
+import { Mock } from "vitest";
 import * as base from "../base";
-import { postToService, postToUrl, setEquality } from "./services-compat";
+import { postToService, postToUrl } from "./services-compat";
+import * as servicesCompatDeprecations from "./services-compat";
 
 vi.mock(import("../base"), async () => {
     return {
@@ -55,9 +56,9 @@ afterEach(() => {
 describe("setEquality", () => {
     it("sets equality filter on request", () => {
         const request: base.ListRequest = {};
-        setEquality(request, "Field1", 123);
+        (servicesCompatDeprecations as any).setEquality(request, "Field1", 123);
         expect(request.EqualityFilter).toEqual({ Field1: 123 });
-        setEquality(request, "Field2", "Test");
+        (servicesCompatDeprecations as any).setEquality(request, "Field2", "Test");
         expect(request.EqualityFilter).toEqual({ Field1: 123, Field2: "Test" });
     });
 });

@@ -1,5 +1,5 @@
 import * as base from "../base";
-import { ScriptData, canLoadScriptData, getColumns, getColumnsAsync, getColumnsData, getForm, getFormAsync, getFormData, getLookup, reloadLookup } from "./scriptdata-compat";
+import * as scriptDataCompatDeprecations from "./scriptdata-compat";
 
 vi.mock(import("../base"), async () => {
     return {
@@ -24,7 +24,7 @@ afterEach(() => {
 
 describe("ScriptData.reload", () => {
     it("calls getScriptDataHash, setScriptData, ensureScriptDataSync with expected arguments", () => {
-        ScriptData.reload("Test.ScriptKey", true);
+        (scriptDataCompatDeprecations as any).ScriptData.reload("Test.ScriptKey", true);
         expect(base.getScriptDataHash).toHaveBeenCalledExactlyOnceWith("Test.ScriptKey", true);
         expect(base.setScriptData).toHaveBeenCalledExactlyOnceWith("Test.ScriptKey", null);
         expect(base.ensureScriptDataSync).toHaveBeenCalledExactlyOnceWith("Test.ScriptKey", true);
@@ -36,7 +36,7 @@ describe("ScriptData.reloadAsync", () => {
         const mockData = { test: "data" };
         vi.mocked(base.getScriptData).mockResolvedValue(mockData);
         
-        const result = await ScriptData.reloadAsync("Test.ScriptKey");
+        const result = await (scriptDataCompatDeprecations as any).ScriptData.reloadAsync("Test.ScriptKey");
         
         expect(base.getScriptData).toHaveBeenCalledExactlyOnceWith("Test.ScriptKey", true);
         expect(result).toBe(mockData);
@@ -46,7 +46,7 @@ describe("ScriptData.reloadAsync", () => {
 describe("ScriptData.bindToChange", () => {
     it("adds event listener and returns unbind function when document is available", () => {
         const mockOnChange = vi.fn();
-        const unbind = ScriptData.bindToChange("Test.ScriptKey", mockOnChange);
+        const unbind = (scriptDataCompatDeprecations as any).ScriptData.bindToChange("Test.ScriptKey", mockOnChange);
         
         expect(typeof unbind).toBe("function");
         
@@ -60,7 +60,7 @@ describe("ScriptData.bindToChange", () => {
         delete (globalThis as any).document;
         
         try {
-            const result = ScriptData.bindToChange("Test.ScriptKey", vi.fn());
+            const result = (scriptDataCompatDeprecations as any).ScriptData.bindToChange("Test.ScriptKey", vi.fn());
             expect(result).toBeUndefined();
         } finally {
             globalThis.document = originalDocument;
@@ -73,7 +73,7 @@ describe("canLoadScriptData", () => {
         vi.mocked(base.peekScriptData).mockReturnValue({ test: "data" });
         vi.mocked(base.getScriptDataHash).mockReturnValue(null);
         
-        const result = canLoadScriptData("Test.ScriptKey");
+        const result = (scriptDataCompatDeprecations as any).canLoadScriptData("Test.ScriptKey");
         
         expect(base.peekScriptData).toHaveBeenCalledExactlyOnceWith("Test.ScriptKey");
         expect(result).toBe(true);
@@ -83,7 +83,7 @@ describe("canLoadScriptData", () => {
         vi.mocked(base.peekScriptData).mockReturnValue(null);
         vi.mocked(base.getScriptDataHash).mockReturnValue("hash");
         
-        const result = canLoadScriptData("Test.ScriptKey");
+        const result = (scriptDataCompatDeprecations as any).canLoadScriptData("Test.ScriptKey");
         
         expect(base.peekScriptData).toHaveBeenCalledExactlyOnceWith("Test.ScriptKey");
         expect(base.getScriptDataHash).toHaveBeenCalledExactlyOnceWith("Test.ScriptKey");
@@ -94,7 +94,7 @@ describe("canLoadScriptData", () => {
         vi.mocked(base.peekScriptData).mockReturnValue(null);
         vi.mocked(base.getScriptDataHash).mockReturnValue(null);
         
-        const result = canLoadScriptData("Test.ScriptKey");
+        const result = (scriptDataCompatDeprecations as any).canLoadScriptData("Test.ScriptKey");
         
         expect(base.peekScriptData).toHaveBeenCalledExactlyOnceWith("Test.ScriptKey");
         expect(base.getScriptDataHash).toHaveBeenCalledExactlyOnceWith("Test.ScriptKey");
@@ -107,7 +107,7 @@ describe("getLookup", () => {
         const mockLookup = { items: [] };
         vi.mocked(base.ensureScriptDataSync).mockReturnValue(mockLookup);
         
-        const result = getLookup("TestKey");
+        const result = (scriptDataCompatDeprecations as any).getLookup("TestKey");
         
         expect(base.ensureScriptDataSync).toHaveBeenCalledExactlyOnceWith("Lookup.TestKey");
         expect(result).toBe(mockLookup);
@@ -119,7 +119,7 @@ describe("reloadLookup", () => {
         const mockLookup = { items: [] };
         vi.mocked(base.ensureScriptDataSync).mockReturnValue(mockLookup);
         
-        const result = reloadLookup("TestKey");
+        const result = (scriptDataCompatDeprecations as any).reloadLookup("TestKey");
         
         expect(base.getScriptDataHash).toHaveBeenCalledExactlyOnceWith("Lookup.TestKey", true);
         expect(base.setScriptData).toHaveBeenCalledExactlyOnceWith("Lookup.TestKey", null);
@@ -133,7 +133,7 @@ describe("getColumns", () => {
         const mockData = { items: [{ name: "Test" }] };
         vi.mocked(base.ensureScriptDataSync).mockReturnValue(mockData);
         
-        const result = getColumns("TestKey");
+        const result = (scriptDataCompatDeprecations as any).getColumns("TestKey");
         
         expect(base.ensureScriptDataSync).toHaveBeenCalledExactlyOnceWith("Columns.TestKey");
         expect(result).toBe(mockData.items);
@@ -145,7 +145,7 @@ describe("getColumnsAsync", () => {
         const mockData = { items: [{ name: "Test" }], additionalItems: [] };
         vi.mocked(base.getColumnsScript).mockResolvedValue(mockData);
         
-        const result = await getColumnsAsync("TestKey");
+        const result = await (scriptDataCompatDeprecations as any).getColumnsAsync("TestKey");
         
         expect(base.getColumnsScript).toHaveBeenCalledExactlyOnceWith("TestKey");
         expect(result).toBe(mockData.items);
@@ -157,7 +157,7 @@ describe("getColumnsData", () => {
         const mockData = { items: [{ name: "Test" }] };
         vi.mocked(base.ensureScriptDataSync).mockReturnValue(mockData);
         
-        const result = getColumnsData("TestKey");
+        const result = (scriptDataCompatDeprecations as any).getColumnsData("TestKey");
         
         expect(base.ensureScriptDataSync).toHaveBeenCalledExactlyOnceWith("Columns.TestKey");
         expect(result).toBe(mockData);
@@ -169,7 +169,7 @@ describe("getForm", () => {
         const mockData = { items: [{ name: "Test" }] };
         vi.mocked(base.ensureScriptDataSync).mockReturnValue(mockData);
         
-        const result = getForm("TestKey");
+        const result = (scriptDataCompatDeprecations as any).getForm("TestKey");
         
         expect(base.ensureScriptDataSync).toHaveBeenCalledExactlyOnceWith("Form.TestKey");
         expect(result).toBe(mockData.items);
@@ -181,7 +181,7 @@ describe("getFormAsync", () => {
         const mockData = { items: [{ name: "Test" }], additionalItems: [] };
         vi.mocked(base.getFormScript).mockResolvedValue(mockData);
         
-        const result = await getFormAsync("TestKey");
+        const result = await (scriptDataCompatDeprecations as any).getFormAsync("TestKey");
         
         expect(base.getFormScript).toHaveBeenCalledExactlyOnceWith("TestKey");
         expect(result).toBe(mockData.items);
@@ -193,7 +193,7 @@ describe("getFormData", () => {
         const mockData = { items: [{ name: "Test" }] };
         vi.mocked(base.ensureScriptDataSync).mockReturnValue(mockData);
         
-        const result = getFormData("TestKey");
+        const result = (scriptDataCompatDeprecations as any).getFormData("TestKey");
         
         expect(base.ensureScriptDataSync).toHaveBeenCalledExactlyOnceWith("Form.TestKey");
         expect(result).toBe(mockData);

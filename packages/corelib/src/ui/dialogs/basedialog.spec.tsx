@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { addCustomAttribute, Fluent, Dialog } from "../../base";
+import { addCustomAttribute, Fluent } from "../../base";
 import { MaximizableAttribute } from "../../types/attributes";
 import { BaseDialog } from "./basedialog";
 import { DialogExtensions } from "./dialogextensions";
@@ -484,7 +484,7 @@ describe("BaseDialog", () => {
     describe("TemplatedDialog", () => {
         it("is an alias for BaseDialog", async () => {
             const mod = await import("./basedialog");
-            expect(mod.TemplatedDialog).toBe(BaseDialog);
+            expect((mod as any).TemplatedDialog).toBe(BaseDialog);
         });
     });
 });

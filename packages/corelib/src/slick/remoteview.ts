@@ -1510,8 +1510,8 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
             return ctx.escape(ctx.item?.value);
         }
 
-        if (!gi.format && gi.formatter) {
-            const formatter = gi.formatter;
+        if (!gi.format && (gi as any).formatter) {
+            const formatter = (gi as any).formatter;
             gi.format = convertCompatFormatter((_1, _2, _3, _4, item) => formatter(item));
         }
 

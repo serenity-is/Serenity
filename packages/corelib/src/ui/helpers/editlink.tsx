@@ -1,5 +1,3 @@
-import { replaceAll } from "../../compat";
-
 /**
  * Renders an edit link for a given item type and ID.
  * The link will have a CSS class based on the item type and will point to a URL fragment
@@ -36,14 +34,14 @@ export function EditLink(props: {
 }) {
     const cssClass = ['s-EditLink'];
     if (props.itemType) {
-        cssClass.push(`s-${replaceAll(props.itemType, '.', '-')}-Link`);
+        cssClass.push(`s-${(props.itemType ?? "").replaceAll('.', '-')}-Link`);
     }
     if (props.cssClass) {
         cssClass.push(props.cssClass);
     }
 
     return <a class={cssClass}
-        href={"#" + replaceAll(props.itemType ?? "", '.', '-') + '/' + (props.itemId ?? "")}
+        href={"#" + (props.itemType ?? "").replaceAll('.', '-') + '/' + (props.itemId ?? "")}
         data-item-type={props.itemType}
         data-item-id={props.itemId}
         tabindex={props.tabindex ?? (props as any).tabIndex}>

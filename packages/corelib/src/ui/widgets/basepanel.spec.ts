@@ -1,4 +1,4 @@
-import { BasePanel, TemplatedPanel } from "./basepanel";
+import { BasePanel } from "./basepanel";
 import { Toolbar } from "./toolbar";
 
 describe("BasePanel", () => {
@@ -129,7 +129,7 @@ describe("BasePanel", () => {
         panel.destroy();
     });
 
-    it("TemplatedPanel is an alias for BasePanel", () => {
-        expect(TemplatedPanel).toBe(BasePanel);
+    it("TemplatedPanel is an alias for BasePanel", async () => {
+        expect(((await import("./basepanel")) as any).TemplatedPanel).toBe(BasePanel);
     });
 });

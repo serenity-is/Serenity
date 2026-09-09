@@ -1,6 +1,5 @@
 import { bindThis } from "@serenity-is/domwise";
 import { Config, Fluent, FormValidationTexts, nsSerenity, resolveUrl, sanitizeHtml, Validator } from "../../base";
-import { isTrimmedEmpty } from "../../compat";
 import { IReadOnly, IStringValue } from "../../interfaces";
 import { LazyLoadHelper } from "../helpers/lazyloadhelper";
 import { EditorProps, EditorWidget } from "./editorwidget";
@@ -81,7 +80,7 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
 
         let textArea = this.domNode;
         var id = textArea.getAttribute('id');
-        if (isTrimmedEmpty(id)) {
+        if (!id?.trim()) {
             textArea.setAttribute('id', this.uniqueName);
             id = this.uniqueName;
         }
@@ -222,7 +221,7 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
 
     private triggerKeyupEvent: KeyboardEvent;
 
-    /** @deprecated Override and use getCKEditorConfig() */
+    /** [DEPRECATED] Override and use getCKEditorConfig() */
     protected getConfig(): CKEditorConfig {
         return this.getCKEditorConfig();
     }

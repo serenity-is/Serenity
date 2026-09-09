@@ -36,7 +36,7 @@ describe("Decorators", () => {
                 static [Symbol.typeInfo] = {};
             }
 
-            const decorator = Decorators.registerType();
+            const decorator = (Decorators as any).registerType();
             decorator(TestClass);
 
             expect(registerType).toHaveBeenCalledWith(TestClass);
@@ -54,7 +54,7 @@ describe("Decorators", () => {
                 static [Symbol.typeInfo] = interfaceTypeInfo("Interface2");
             }
 
-            const decorator = Decorators.registerClass("TestName", [Interface1, Interface2]);
+            const decorator = (Decorators as any).registerClass("TestName", [Interface1, Interface2]);
             decorator(TestClass);
 
             expect(registerClass).toHaveBeenCalledWith(TestClass, "TestName", [Interface1, Interface2]);
@@ -69,7 +69,7 @@ describe("Decorators", () => {
                 static [Symbol.typeInfo] = interfaceTypeInfo("Interface2");
             }
 
-            const decorator = Decorators.registerClass([Interface1, Interface2]);
+            const decorator = (Decorators as any).registerClass([Interface1, Interface2]);
             decorator(TestClass);
 
             expect(registerClass).toHaveBeenCalledWith(TestClass, null, [Interface1, Interface2]);
@@ -86,7 +86,7 @@ describe("Decorators", () => {
                 static [Symbol.typeInfo] = interfaceTypeInfo("Interface2");
             }
 
-            const decorator = Decorators.registerInterface("TestName", [Interface1, Interface2]);
+            const decorator = (Decorators as any).registerInterface("TestName", [Interface1, Interface2]);
             decorator(TestInterface);
 
             expect(registerInterface).toHaveBeenCalledWith(TestInterface, "TestName", [Interface1, Interface2]);
@@ -101,7 +101,7 @@ describe("Decorators", () => {
                 static [Symbol.typeInfo] = interfaceTypeInfo("Interface2");
             }
 
-            const decorator = Decorators.registerInterface([Interface1, Interface2]);
+            const decorator = (Decorators as any).registerInterface([Interface1, Interface2]);
             decorator(TestInterface);
 
             expect(registerInterface).toHaveBeenCalledWith(TestInterface, null, [Interface1, Interface2]);
@@ -118,7 +118,7 @@ describe("Decorators", () => {
                 static [Symbol.typeInfo] = interfaceTypeInfo("Interface2");
             }
 
-            const decorator = Decorators.registerEditor("TestName", [Interface1, Interface2]);
+            const decorator = (Decorators as any).registerEditor("TestName", [Interface1, Interface2]);
             decorator(TestEditor);
 
             expect(registerEditor).toHaveBeenCalledWith(TestEditor, "TestName", [Interface1, Interface2]);
@@ -133,7 +133,7 @@ describe("Decorators", () => {
                 static [Symbol.typeInfo] = interfaceTypeInfo("Interface2");
             }
 
-            const decorator = Decorators.registerEditor([Interface1, Interface2]);
+            const decorator = (Decorators as any).registerEditor([Interface1, Interface2]);
             decorator(TestEditor);
 
             expect(registerEditor).toHaveBeenCalledWith(TestEditor, null, [Interface1, Interface2]);
@@ -147,7 +147,7 @@ describe("Decorators", () => {
                 Value2: 2
             };
 
-            Decorators.registerEnum(TestEnum, "TestEnumKey", "TestEnumName");
+            (Decorators as any).registerEnum(TestEnum, "TestEnumKey", "TestEnumName");
 
             expect(registerEnum).toHaveBeenCalledWith(TestEnum, "TestEnumName", "TestEnumKey");
             expect(addCustomAttribute).toHaveBeenCalledWith(TestEnum, expect.any(EnumKeyAttribute));
@@ -162,7 +162,7 @@ describe("Decorators", () => {
                 Value2: 2
             };
 
-            Decorators.registerEnumType(TestEnum, "TestName", "TestKey");
+            (Decorators as any).registerEnumType(TestEnum, "TestName", "TestKey");
 
             expect(registerEnum).toHaveBeenCalledWith(TestEnum, "TestName", "TestKey");
         });
@@ -178,7 +178,7 @@ describe("Decorators", () => {
                 static [Symbol.typeInfo] = interfaceTypeInfo("Interface2");
             }
 
-            const decorator = Decorators.registerFormatter("TestName", [Interface1, Interface2]);
+            const decorator = (Decorators as any).registerFormatter("TestName", [Interface1, Interface2]);
             decorator(TestFormatter);
 
             expect(registerFormatter).toHaveBeenCalledWith(TestFormatter, "TestName", [Interface1, Interface2]);
@@ -187,7 +187,7 @@ describe("Decorators", () => {
         it("should call registerFormatter with default interfaces when no params", () => {
             class TestFormatter {}
 
-            const decorator = Decorators.registerFormatter();
+            const decorator = (Decorators as any).registerFormatter();
             decorator(TestFormatter);
 
             expect(registerFormatter).toHaveBeenCalledWith(TestFormatter, null, expect.any(Array));
@@ -198,7 +198,7 @@ describe("Decorators", () => {
         it("should add EnumKeyAttribute with the specified value", () => {
             class TestClass {}
 
-            const decorator = Decorators.enumKey("TestKey");
+            const decorator = (Decorators as any).enumKey("TestKey");
             decorator(TestClass);
 
             expect(addCustomAttribute).toHaveBeenCalledWith(TestClass, expect.any(EnumKeyAttribute));
@@ -210,7 +210,7 @@ describe("Decorators", () => {
         it("should add OptionAttribute for regular property", () => {
             class TestClass {}
 
-            const decorator = Decorators.option();
+            const decorator = (Decorators as any).option();
             decorator(TestClass.prototype, "testProperty");
 
             expect(addTypeMember).toHaveBeenCalledWith(TestClass, {
@@ -225,7 +225,7 @@ describe("Decorators", () => {
         it("should add OptionAttribute for getter/setter property", () => {
             class TestClass {}
 
-            const decorator = Decorators.option();
+            const decorator = (Decorators as any).option();
             decorator(TestClass.prototype, "get_testProperty");
 
             expect(addTypeMember).toHaveBeenCalledWith(TestClass, {
@@ -242,7 +242,7 @@ describe("Decorators", () => {
         it("should add CloseButtonAttribute with default value", () => {
             class TestClass {}
 
-            const decorator = Decorators.closeButton();
+            const decorator = (Decorators as any).closeButton();
             decorator(TestClass);
 
             expect(addCustomAttribute).toHaveBeenCalledWith(TestClass, expect.any(CloseButtonAttribute));
@@ -252,7 +252,7 @@ describe("Decorators", () => {
         it("should add CloseButtonAttribute with specified value", () => {
             class TestClass {}
 
-            const decorator = Decorators.closeButton(false);
+            const decorator = (Decorators as any).closeButton(false);
             decorator(TestClass);
 
             expect(addCustomAttribute).toHaveBeenCalledWith(TestClass, expect.any(CloseButtonAttribute));
@@ -264,7 +264,7 @@ describe("Decorators", () => {
         it("should add EditorAttribute", () => {
             class TestClass {}
 
-            const decorator = Decorators.editor();
+            const decorator = (Decorators as any).editor();
             decorator(TestClass);
 
             expect(addCustomAttribute).toHaveBeenCalledWith(TestClass, expect.any(EditorAttribute));
@@ -275,7 +275,7 @@ describe("Decorators", () => {
         it("should add ElementAttribute with specified value", () => {
             class TestClass {}
 
-            const decorator = Decorators.element("div");
+            const decorator = (Decorators as any).element("div");
             decorator(TestClass);
 
             expect(addCustomAttribute).toHaveBeenCalledWith(TestClass, expect.any(ElementAttribute));
@@ -287,7 +287,7 @@ describe("Decorators", () => {
         it("should add AdvancedFilteringAttribute with default value", () => {
             class TestClass {}
 
-            const decorator = Decorators.advancedFiltering();
+            const decorator = (Decorators as any).advancedFiltering();
             decorator(TestClass);
 
             expect(addCustomAttribute).toHaveBeenCalledWith(TestClass, expect.any(AdvancedFilteringAttribute));
@@ -297,7 +297,7 @@ describe("Decorators", () => {
         it("should add FilterableAttribute with specified value", () => {
             class TestClass {}
 
-            const decorator = Decorators.advancedFiltering(false);
+            const decorator = (Decorators as any).advancedFiltering(false);
             decorator(TestClass);
 
             expect(addCustomAttribute).toHaveBeenCalledWith(TestClass, expect.any(FilterableAttribute));
@@ -309,7 +309,7 @@ describe("Decorators", () => {
         it("should add MaximizableAttribute with default value", () => {
             class TestClass {}
 
-            const decorator = Decorators.maximizable();
+            const decorator = (Decorators as any).maximizable();
             decorator(TestClass);
 
             expect(addCustomAttribute).toHaveBeenCalledWith(TestClass, expect.any(MaximizableAttribute));
@@ -319,7 +319,7 @@ describe("Decorators", () => {
         it("should add MaximizableAttribute with specified value", () => {
             class TestClass {}
 
-            const decorator = Decorators.maximizable(false);
+            const decorator = (Decorators as any).maximizable(false);
             decorator(TestClass);
 
             expect(addCustomAttribute).toHaveBeenCalledWith(TestClass, expect.any(MaximizableAttribute));
@@ -331,7 +331,7 @@ describe("Decorators", () => {
         it("should add PanelAttribute with default value", () => {
             class TestClass {}
 
-            const decorator = Decorators.panel();
+            const decorator = (Decorators as any).panel();
             decorator(TestClass);
 
             expect(addCustomAttribute).toHaveBeenCalledWith(TestClass, expect.any(PanelAttribute));
@@ -341,7 +341,7 @@ describe("Decorators", () => {
         it("should add PanelAttribute with specified value", () => {
             class TestClass {}
 
-            const decorator = Decorators.panel(false);
+            const decorator = (Decorators as any).panel(false);
             decorator(TestClass);
 
             expect(addCustomAttribute).toHaveBeenCalledWith(TestClass, expect.any(PanelAttribute));
@@ -353,7 +353,7 @@ describe("Decorators", () => {
         it("should add ResizableAttribute with default value", () => {
             class TestClass {}
 
-            const decorator = Decorators.resizable();
+            const decorator = (Decorators as any).resizable();
             decorator(TestClass);
 
             expect(addCustomAttribute).toHaveBeenCalledWith(TestClass, expect.any(ResizableAttribute));
@@ -363,7 +363,7 @@ describe("Decorators", () => {
         it("should add ResizableAttribute with specified value", () => {
             class TestClass {}
 
-            const decorator = Decorators.resizable(false);
+            const decorator = (Decorators as any).resizable(false);
             decorator(TestClass);
 
             expect(addCustomAttribute).toHaveBeenCalledWith(TestClass, expect.any(ResizableAttribute));
@@ -375,7 +375,7 @@ describe("Decorators", () => {
         it("should add StaticPanelAttribute with default value", () => {
             class TestClass {}
 
-            const decorator = Decorators.staticPanel();
+            const decorator = (Decorators as any).staticPanel();
             decorator(TestClass);
 
             expect(addCustomAttribute).toHaveBeenCalledWith(TestClass, expect.any(StaticPanelAttribute));
@@ -385,7 +385,7 @@ describe("Decorators", () => {
         it("should add StaticPanelAttribute with specified value", () => {
             class TestClass {}
 
-            const decorator = Decorators.staticPanel(false);
+            const decorator = (Decorators as any).staticPanel(false);
             decorator(TestClass);
 
             expect(addCustomAttribute).toHaveBeenCalledWith(TestClass, expect.any(StaticPanelAttribute));

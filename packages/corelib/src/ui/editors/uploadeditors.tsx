@@ -1,5 +1,5 @@
 import { FileUploadTexts, Fluent, PropertyItem, getjQuery, nsSerenity } from "../../base";
-import { ValidationHelper, isTrimmedEmpty, replaceAll } from "../../compat";
+import { ValidationHelper } from "../../compat";
 import { IGetEditValue, IReadOnly, ISetEditValue, IValidateRequired } from "../../interfaces";
 import { FileUploadConstraints, UploadHelper, UploadInputOptions, UploadedFile } from "../helpers/uploadhelper";
 import { ToolButton, Toolbar } from "../widgets/toolbar";
@@ -152,7 +152,7 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
      */
     protected populate(): void {
         var displayOriginalName = this.options.displayFileName ||
-            !isTrimmedEmpty(this.options.originalNameProperty);
+            !!this.options.originalNameProperty?.trim();
 
         if (this.entity == null) {
             UploadHelper.populateFileSymbols(this.fileSymbols,
@@ -309,7 +309,7 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
 
             if (this.options.displayFileName) {
                 var s = (value.Filename ?? '');
-                var idx = replaceAll(s, '\\', '/').lastIndexOf('/');
+                var idx = (s ?? '').replaceAll('\\', '/').lastIndexOf('/');
                 if (idx >= 0) {
                     value.OriginalName = s.substring(idx + 1);
                 }

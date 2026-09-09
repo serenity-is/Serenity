@@ -139,9 +139,9 @@ export namespace Attributes {
     export function panel(value = true) { return new PanelAttribute(value); }
     /** Creates a {@link StaticPanelAttribute}. @param value - True for static panel (default `true`). */
     export function staticPanel(value = true) { return new StaticPanelAttribute(value); }
-    
+
     Object.keys(Attributes).forEach(key => (Attributes as any)[key].isAttributeFactory = true);
 }
 
-/** @deprecated Use Attributes.advancedFiltering() instead */
+/** [DEPRECATED] Use Attributes.advancedFiltering() instead */
 export const FilterableAttribute = AdvancedFilteringAttribute;

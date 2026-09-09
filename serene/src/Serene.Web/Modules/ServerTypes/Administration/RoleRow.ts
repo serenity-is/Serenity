@@ -11,7 +11,7 @@ export abstract class RoleRow {
     static readonly localTextPrefix = 'Administration.Role';
     static readonly lookupKey = 'Administration.Role';
 
-    /** **deprecated** use getLookupAsync instead */
+    /** [DEPRECATED] use getLookupAsync instead */
     static getLookup() { return getLookup<RoleRow>('Administration.Role') }
     static async getLookupAsync() { return getLookupAsync<RoleRow>('Administration.Role') }
 

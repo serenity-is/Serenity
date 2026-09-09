@@ -1,4 +1,4 @@
-import { StringEditor, WidgetProps, replaceAll } from "@serenity-is/corelib";
+import { StringEditor, WidgetProps } from "@serenity-is/corelib";
 import { nsDemoNorthwind } from "../ServerTypes/Namespaces";
 import { NorthwindValidationTexts } from "../ServerTypes/Texts";
 
@@ -7,7 +7,7 @@ export interface PhoneEditorOptions {
 }
 
 export class PhoneEditor<P extends PhoneEditorOptions = PhoneEditorOptions> extends StringEditor<P> {
-    static override[Symbol.typeInfo] = this.registerEditor(nsDemoNorthwind);
+    static override [Symbol.typeInfo] = this.registerEditor(nsDemoNorthwind);
 
     constructor(props: WidgetProps<P>) {
         super(props);
@@ -65,7 +65,7 @@ export class PhoneEditor<P extends PhoneEditorOptions = PhoneEditorOptions> exte
         if (!phone) {
             return false;
         }
-        phone = replaceAll(replaceAll(phone, ' ', ''), '-', '');
+        phone = (phone ?? "").replaceAll(' ', '').replaceAll('-', '');
         if (phone.length < 10) {
             return false;
         }
@@ -96,20 +96,20 @@ export class PhoneEditor<P extends PhoneEditorOptions = PhoneEditorOptions> exte
         return true;
     }
 
-    static formatPhone(phone) {
+    static formatPhone(phone: string) {
         if (!PhoneEditor.isValidPhone(phone)) {
             return phone;
         }
-        phone = replaceAll(replaceAll(replaceAll(replaceAll(phone, ' ', ''), '-', ''), '(', ''), ')', '');
+        phone = (phone ?? "").replaceAll(' ', '').replaceAll('-', '').replaceAll('(', '').replaceAll(')', '');
         if (phone.startsWith('0')) {
             phone = phone.substring(1);
         }
-        phone = '(' + phone.substr(0, 3) + ') ' + phone.substr(3, 3) + '-' + phone.substr(6, 2) + phone.substr(8, 2);
+        phone = '(' + phone.substring(0, 3) + ') ' + phone.substring(3, 6) + '-' + phone.substring(6, 10);
         return phone;
     }
 
     static formatMulti(phone: string, format: (s: string) => string) {
-        var phones = replaceAll(phone, String.fromCharCode(59), String.fromCharCode(44)).split(String.fromCharCode(44));
+        var phones = (phone ?? "").replaceAll(';', ',').split(String.fromCharCode(44));
         var result = '';
         for (var x of phones) {
             var s = x?.trim();
@@ -125,7 +125,7 @@ export class PhoneEditor<P extends PhoneEditorOptions = PhoneEditorOptions> exte
     static isValidMulti(phone: string, check: (s: string) => boolean) {
         if (!phone)
             return false;
-        var phones = replaceAll(phone, String.fromCharCode(59), String.fromCharCode(44)).split(String.fromCharCode(44));
+        var phones = (phone ?? "").replaceAll(';', ',').split(',');
         var anyValid = false;
         for (var $t1 = 0; $t1 < phones.length; $t1++) {
             var x = phones[$t1];

@@ -15,10 +15,10 @@ interface LayoutTimerReg {
 
 /**
  * Legacy polling-based layout timer that detects size and visibility changes.
- * Compat shim for the old `Q.LayoutTimer` / `Serenity.LayoutTimer` API. Polls registered elements every ~100 ms,
+ * Compat shim for the old `LayoutTimer` / `Serenity.LayoutTimer` API. Polls registered elements every ~100 ms,
  * supports optional debouncing, and fires handlers when width, height, or visibility transitions occur.
  * Prefer `ResizeObserver` or `Fluent.on(..., 'layout')` with CSS-based layouts for new code.
- * @deprecated Kept for backward compatibility with legacy `layoutFillHeight` and `triggerLayoutOnShow` callers. Use `ResizeObserver` instead.
+ * [DEPRECATED] Kept for backward compatibility with legacy `layoutFillHeight` and `triggerLayoutOnShow` callers. Use `ResizeObserver` instead.
  */
 export namespace LayoutTimer {
 
@@ -241,7 +241,7 @@ export namespace LayoutTimer {
  * @param el - Target element or array-like collection (first element is used).
  * @param callback - Function to invoke when visible.
  * @returns The {@link LayoutTimer} registration key, or `null` if already visible / element missing.
- * @deprecated Prefer `IntersectionObserver` or `ResizeObserver`. Kept for legacy `triggerLayoutOnShow` compatibility.
+ * [DEPRECATED] Prefer `IntersectionObserver` or `ResizeObserver`. Kept for legacy `triggerLayoutOnShow` compatibility.
  */
 export function executeOnceWhenVisible(el: HTMLElement | ArrayLike<HTMLElement>, callback: Function): number | null {
     el = isArrayLike(el) ? el[0] : el;
@@ -266,7 +266,7 @@ export function executeOnceWhenVisible(el: HTMLElement | ArrayLike<HTMLElement>,
  * @param callback - Function to invoke each time the element is shown.
  * @param callNowIfVisible - When `true` and the element is already visible, invokes the callback immediately before registering.
  * @returns The {@link LayoutTimer} registration key, or `null` if the element is missing.
- * @deprecated Prefer `IntersectionObserver` / `ResizeObserver`. Kept for legacy `triggerLayoutOnShow` compatibility.
+ * [DEPRECATED] Prefer `IntersectionObserver` / `ResizeObserver`. Kept for legacy `triggerLayoutOnShow` compatibility.
  */
 export function executeEverytimeWhenVisible(el: HTMLElement | ArrayLike<HTMLElement>, callback: Function, callNowIfVisible: boolean): number | null {
     el = isArrayLike(el) ? el[0] : el;

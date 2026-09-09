@@ -210,7 +210,7 @@ function unmockXHR() {
 }
 
 export function mockAdmin() {
-    ScriptData.set("RemoteData.UserData", { Username: "admin", IsAdmin: true });
+    setScriptData("RemoteData.UserData", { Username: "admin", IsAdmin: true });
 }
 
 export function mockGridSize() {

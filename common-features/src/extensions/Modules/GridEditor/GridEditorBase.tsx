@@ -1,7 +1,7 @@
-import { DataChangeInfo, DeleteResponse, DialogType, EditorProps, EntityGrid, Fluent, IGetEditValue, ISetEditValue, PropertyItem, SaveInitiator, SaveRequest, ServiceOptions, ServiceResponse, ToolButton, deepClone, getInstanceType, getTypeFullName, indexOf, serviceCall, type SaveResponse } from "@serenity-is/corelib";
+import { DataChangeInfo, DeleteResponse, DialogType, EditorProps, EntityGrid, IGetEditValue, ISetEditValue, PropertyItem, SaveInitiator, SaveRequest, ServiceOptions, ServiceResponse, ToolButton, deepClone, getInstanceType, getTypeFullName, serviceCall, type SaveResponse } from "@serenity-is/corelib";
+import { bindThis } from "@serenity-is/domwise";
 import { nsExtensions } from "../ServerTypes/Namespaces";
 import { GridEditorDialog } from "./GridEditorDialog";
-import { bindThis } from "@serenity-is/domwise";
 
 export abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid<TEntity, P>
     implements IGetEditValue, ISetEditValue {
@@ -107,7 +107,7 @@ export abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid<TEntity
                 items.push(row);
             }
             else {
-                const index = indexOf(items, x => this.itemId(x) === id);
+                const index = items.findIndex(x => this.itemId(x) === id);
                 items[index] = row;
             }
 

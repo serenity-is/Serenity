@@ -356,7 +356,7 @@ describe("GridUtils", () => {
                 populate: vi.fn(),
                 onDataLoaded: { subscribe: vi.fn(), unsubscribe: vi.fn() }
             };
-            const input = GridUtils.addQuickSearchInput(toolDiv, view as any);
+            const input = (GridUtils as any).addQuickSearchInput(toolDiv, view as any);
             expect(input).toBeTruthy();
         });
 
@@ -369,7 +369,7 @@ describe("GridUtils", () => {
                 onDataLoaded: { subscribe: vi.fn(), unsubscribe: vi.fn() }
             };
             const onChange = vi.fn();
-            const input = GridUtils.addQuickSearchInput(toolDiv, view as any, [{ name: "f1", title: "F1" }], onChange);
+            const input = (GridUtils as any).addQuickSearchInput(toolDiv, view as any, [{ name: "f1", title: "F1" }], onChange);
             expect(input).toBeTruthy();
         });
     });
@@ -378,21 +378,21 @@ describe("GridUtils", () => {
         it("creates quick search with custom search function", () => {
             const container = document.createElement("div");
             const searchFn = vi.fn();
-            const input = GridUtils.addQuickSearchInputCustom(container, searchFn);
+            const input = (GridUtils as any).addQuickSearchInputCustom(container, searchFn);
             expect(input).toBeTruthy();
         });
 
         it("passes fields to custom search", () => {
             const container = document.createElement("div");
             const searchFn = vi.fn();
-            const input = GridUtils.addQuickSearchInputCustom(container, searchFn, [{ name: "f1", title: "F1" }]);
+            const input = (GridUtils as any).addQuickSearchInputCustom(container, searchFn, [{ name: "f1", title: "F1" }]);
             expect(input).toBeTruthy();
         });
 
         it("invokes the custom search with field, query and done", () => {
             const container = document.createElement("div");
             const searchFn = vi.fn();
-            const input = GridUtils.addQuickSearchInputCustom(container, searchFn) as any;
+            const input = (GridUtils as any).addQuickSearchInputCustom(container, searchFn) as any;
             input.searchNow("term");
             expect(searchFn).toHaveBeenCalledWith(undefined, "term", expect.any(Function));
             input.domNode.remove();

@@ -1,4 +1,4 @@
-import { EntityGrid, Lookup, tryFirst } from "@serenity-is/corelib";
+import { EntityGrid, Lookup } from "@serenity-is/corelib";
 import { RoleRow, UserColumns, UserRow, UserService } from "../../ServerTypes/Administration";
 import { nsAdministration } from "../../ServerTypes/Namespaces";
 import { UserDialog } from "./UserDialog";
@@ -27,7 +27,7 @@ export class UserGrid extends EntityGrid<UserRow, any> {
     protected override createColumns() {
         var columns = super.createColumns();
 
-        var roles = tryFirst(columns, x => x.field == UserRow.Fields.Roles);
+        var roles = columns.find(x => x.field == UserRow.Fields.Roles);
         if (roles) {
             var rolesLookup: Lookup<RoleRow>;
             RoleRow.getLookupAsync().then(lookup => {

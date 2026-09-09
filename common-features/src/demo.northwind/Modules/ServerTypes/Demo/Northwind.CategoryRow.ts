@@ -13,7 +13,7 @@ export abstract class CategoryRow {
     static readonly localTextPrefix = 'Northwind.Category';
     static readonly lookupKey = 'Northwind.Category';
 
-    /** **deprecated** use getLookupAsync instead */
+    /** [DEPRECATED] use getLookupAsync instead */
     static getLookup() { return getLookup<CategoryRow>('Northwind.Category') }
     static async getLookupAsync() { return getLookupAsync<CategoryRow>('Northwind.Category') }
 

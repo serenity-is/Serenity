@@ -1,4 +1,4 @@
-﻿import { ToolButton, gridPageInit, indexOf } from "@serenity-is/corelib";
+import { ToolButton, gridPageInit } from "@serenity-is/corelib";
 import { SupplierGrid } from "@serenity-is/demo.northwind";
 import { nsDemoBasicSamples } from "../../ServerTypes/Namespaces";
 
@@ -33,7 +33,7 @@ export class RemovingAddButton extends SupplierGrid {
         // METHOD 3 - recommended
         // remove by splicing, but this time find button index
         // by its css class. it is the best and safer method
-        buttons.splice(indexOf(buttons, x => x.action == "add"), 1);
+        buttons.splice(buttons.findIndex(x => x.action == "add"), 1);
 
         return buttons;
     }

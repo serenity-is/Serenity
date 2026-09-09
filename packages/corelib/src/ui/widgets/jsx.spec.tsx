@@ -257,7 +257,7 @@ it('assign styles with css variables', function () {
 
 it('assign other props', function () {
     const element = (
-        <a href="video.mp4" id="a" referrerPolicy="no-referrer">
+        <a href="video.mp4" id="a" {...{ "referrerPolicy": "no-referrer" }}>
             Download
         </a>
     ) as HTMLElement;

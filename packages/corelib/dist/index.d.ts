@@ -4892,7 +4892,7 @@ export declare const removeValidationRule: typeof Validator.removeCustomRule;
  * @param array - Array to test.
  * @param predicate - Function invoked per element; should return `true` for a match.
  * @returns `true` if at least one element matches, otherwise `false`.
- * @deprecated Prefer native `Array.prototype.some` — e.g. `array.some(predicate)`. Retained as a `Q.any` compat shim.
+ * @deprecated Prefer native `Array.prototype.some` — e.g. `array.some(predicate)`. Retained as a `any` compat shim.
  * @example
  * any([1, 2, 3], x => x > 2); // true
  */
@@ -4902,7 +4902,7 @@ export declare function any<TItem>(array: TItem[], predicate: (x: TItem) => bool
  * @param array - Array to count over.
  * @param predicate - Function invoked per element; return `true` to count the element.
  * @returns Number of matching elements.
- * @deprecated Prefer `array.filter(predicate).length` or a manual loop. Retained as a `Q.count` compat shim.
+ * @deprecated Prefer `array.filter(predicate).length` or a manual loop. Retained as a `count` compat shim.
  * @example
  * count([1, 2, 3], x => x % 2 === 1); // 2
  */
@@ -4913,7 +4913,7 @@ export declare function count<TItem>(array: TItem[], predicate: (x: TItem) => bo
  * @param predicate - Function invoked per element; return `true` for the desired element.
  * @returns The first matching element.
  * @throws {Error} If no element satisfies the predicate (`"first:No element satisfies the condition."`).
- * @deprecated Prefer `array.find(predicate)` with explicit not-found handling. Retained as a `Q.first` compat shim.
+ * @deprecated Prefer `array.find(predicate)` with explicit not-found handling. Retained as a `first` compat shim.
  * @example
  * first([1, 2, 3], x => x > 1); // 2
  */
@@ -4958,7 +4958,6 @@ export type GroupByResult<TItem> = {
  * @param getKey - Callback returning the group key for an element; `null`/`undefined` is normalized to `""`.
  * @returns A {@link GroupByResult} with `byKey` dictionary and `inOrder` array. Each group records its `order`, `key`, `items`, and `start` index.
  * @remarks Similar to LINQ `ToLookup` with extra `order`/`start` metadata. Uses `Object.create(null)` so prototype keys are safe.
- * @deprecated Kept as a `Q.groupBy` compat shim; for new code consider `Map`-based grouping or `toGrouping`.
  * @example
  * groupBy([{k:'a'}, {k:'b'}, {k:'a'}], x => x.k).inOrder.length; // 2
  */
@@ -4968,7 +4967,7 @@ export declare function groupBy<TItem>(items: TItem[], getKey: (x: TItem) => any
  * @param array - Array to search.
  * @param predicate - Function invoked per element; return `true` for the target element.
  * @returns Zero-based index of the first match, or `-1` if none matches.
- * @deprecated Prefer `Array.prototype.findIndex` — `array.findIndex(predicate)`. Retained as a `Q.indexOf` compat shim (note the predicate overload differs from `Array.indexOf`).
+ * @deprecated Prefer `Array.prototype.findIndex` — `array.findIndex(predicate)`. Retained as a `indexOf` compat shim (note the predicate overload differs from `Array.indexOf`).
  * @example
  * indexOf([1, 2, 3], x => x === 2); // 1
  */
@@ -4980,14 +4979,14 @@ export declare function indexOf<TItem>(array: TItem[], predicate: (x: TItem) => 
  * @param item - Item to insert.
  * @throws {Error} If `obj` is neither an array nor exposes `insert`.
  * @remarks If `obj.insert` exists it is delegated to; otherwise `Array.prototype.splice` is used. No return value.
- * @deprecated Prefer `array.splice(index, 0, item)` directly. Retained as a `Q.insert` compat shim.
+ * @deprecated Prefer `array.splice(index, 0, item)` directly. Retained as a `insert` compat shim.
  * @example
  * insert([1, 2, 3], 1, 4); // [1, 4, 2, 3]
  */
 export declare function insert(obj: any, index: number, item: any): void;
 /**
  * Tests whether a value is an array.
- * @remarks Thin re-export of `Array.isArray` for legacy `Q.isArray` call sites.
+ * @remarks Thin re-export of `Array.isArray` for legacy `isArray` call sites.
  * @deprecated Use `Array.isArray` directly.
  * @example
  * isArray([1, 2, 3]); // true
@@ -5000,7 +4999,7 @@ export declare const isArray: (arg: any) => arg is any[];
  * @param predicate - Function invoked per element; exactly one element must return `true`.
  * @returns The sole matching element.
  * @throws {Error} If no element matches (`"single:No element satisfies the condition."`) or more than one matches (`"single:sequence contains more than one element."`).
- * @deprecated Retained as a `Q.single` compat shim; prefer explicit `filter` + length check for clarity.
+ * @deprecated Retained as a `single` compat shim; prefer explicit `filter` + length check for clarity.
  * @example
  * single([1, 2, 3], x => x == 2); // 2
  */
@@ -5019,7 +5018,6 @@ export type Grouping<TItem> = {
  * @param getKey - Callback returning the group key for an element; `null`/`undefined` is normalized to `""`.
  * @returns A {@link Grouping} dictionary whose values are arrays of matching elements. Uses a null-prototype object.
  * @remarks Lighter alternative to {@link groupBy} when ordered metadata is not needed.
- * @deprecated Retained as a `Q.toGrouping` compat shim; new code may prefer `Map`-grouping.
  * @example
  * toGrouping([1, 2, 3], x => x % 2 == 0 ? "even" : "odd"); // { odd: [1, 3], even: [2] }
  */
@@ -5029,38 +5027,38 @@ export declare function toGrouping<TItem>(items: TItem[], getKey: (x: TItem) => 
  * @param array - Array to search.
  * @param predicate - Function invoked per element; return `true` for the desired element.
  * @returns The first matching element, or `undefined` when no match is found.
- * @deprecated Prefer `Array.prototype.find` — `array.find(predicate)`. Retained as a `Q.tryFirst` compat shim.
+ * @deprecated Prefer `Array.prototype.find` — `array.find(predicate)`. Retained as a `tryFirst` compat shim.
  * @example
  * tryFirst([1, 2, 3], x => x == 2); // 2
  * tryFirst([1, 2, 3], x => x == 4); // undefined
  */
 export declare function tryFirst<TItem>(array: TItem[], predicate: (x: TItem) => boolean): TItem;
 /**
- * Legacy `Q.alert` alias.
- * @deprecated Use {@link alertDialog} from `"@serenity-is/corelib"` instead. This re-export is retained for compat with code that imports `Q.alert` / `Serenity.alert`.
+ * Legacy `alert` alias.
+ * @deprecated Use {@link alertDialog} from `"@serenity-is/corelib"` instead. This re-export is retained for compat with code that imports `alert` / `Serenity.alert`.
  * @see {@link alertDialog}
  */
 declare const alert$1: typeof alertDialog;
 /**
- * Legacy `Q.confirm` alias.
+ * Legacy `confirm` alias.
  * @deprecated Use {@link confirmDialog} instead.
  * @see {@link confirmDialog}
  */
 declare const confirm$1: typeof confirmDialog;
 /**
- * Legacy `Q.information` alias.
+ * Legacy `information` alias.
  * @deprecated Use {@link informationDialog} instead.
  * @see {@link informationDialog}
  */
 export declare const information: typeof informationDialog;
 /**
- * Legacy `Q.success` alias.
+ * Legacy `success` alias.
  * @deprecated Use {@link successDialog} instead.
  * @see {@link successDialog}
  */
 export declare const success: typeof successDialog;
 /**
- * Legacy `Q.warning` alias.
+ * Legacy `warning` alias.
  * @deprecated Use {@link warningDialog} instead.
  * @see {@link warningDialog}
  */
@@ -5070,7 +5068,7 @@ export declare const warning: typeof warningDialog;
  * @param a - Input string; if falsy, returned as-is.
  * @returns Lowercased string with Turkish dotted/dotless-I mapping preserved.
  * @remarks Compat shim retained because native `String.prototype.toLocaleLowerCase('tr')` behaves differently across engines; prefer locale-aware APIs for new code.
- * @deprecated Retained for legacy `Q.turkishLocaleToLower` call sites.
+ * @deprecated Retained for legacy `turkishLocaleToLower` call sites.
  * @example
  * turkishLocaleToLower("İSTANBUL"); // "istanbul" with ı handling
  */
@@ -5080,7 +5078,7 @@ export declare function turkishLocaleToLower(a: string): string;
  * @param a - Input string; if falsy, returned as-is.
  * @returns Uppercased string with Turkish dotted/dotless-I mapping preserved.
  * @remarks Compat shim; for new code prefer `toLocaleUpperCase('tr')`.
- * @deprecated Retained for legacy `Q.turkishLocaleToUpper` call sites.
+ * @deprecated Retained for legacy `turkishLocaleToUpper` call sites.
  * @example
  * turkishLocaleToUpper("istanbul"); // handles dotted i
  */
@@ -5092,7 +5090,7 @@ export declare function turkishLocaleToUpper(a: string): string;
  */
 export declare let turkishLocaleCompare: (a: string, b: string) => number;
 /**
- * Legacy alias for {@link stringFormat} (`Q.format`).
+ * Legacy alias for {@link stringFormat} (`format`).
  * @deprecated Use {@link stringFormat} directly.
  * @see {@link stringFormat}
  */
@@ -5107,7 +5105,7 @@ export declare let localeFormat: typeof stringFormatLocale;
  * Formats a duration given in minutes as `"d.hh:mm"` (days, hours, minutes).
  * @param n - Total minutes; `null`/`undefined` yields `""`, `0` yields `"0"`.
  * @returns Formatted string — e.g. `1500` → `"1.01:00"`, `90` → `"01:30"`.
- * @remarks Days are omitted when zero; minutes part `"00:00"` is omitted when zero unless days is also zero. Compat helper from `Q.formatDayHourAndMin`.
+ * @remarks Days are omitted when zero; minutes part `"00:00"` is omitted when zero unless days is also zero. Compat helper from `formatDayHourAndMin`.
  * @example
  * formatDayHourAndMin(1500); // "1.01:00"
  * formatDayHourAndMin(0);    // "0"
@@ -5117,7 +5115,7 @@ export declare function formatDayHourAndMin(n: number): string;
  * Parses a `"hh:mm"` time string into total minutes.
  * @param value - String to parse (accepts `h:mm` or `hh:mm`; surrounding whitespace is trimmed).
  * @returns Total minutes (`h*60+m`), `null` for empty/whitespace input, or `NaN` if the format or range is invalid (hours must be 0–23, minutes 0–59, length 4–5 chars).
- * @remarks Compat helper from `Q.parseHourAndMin`.
+ * @remarks Compat helper from `parseHourAndMin`.
  * @example
  * parseHourAndMin("02:30"); // 150
  * parseHourAndMin("2:05");  // 125
@@ -5127,7 +5125,7 @@ export declare function parseHourAndMin(value: string): number;
  * Parses a `"d.hh:mm"` duration string into total minutes (also accepts plain `"hh:mm"` or day count).
  * @param s - String to parse; whitespace is trimmed.
  * @returns Total minutes, `null` for empty input, or `NaN` for invalid format/range (hours 0–23, minutes 0–59).
- * @remarks Accepts `"d"` (days), `"hh:mm"`, or `"d.hh:mm"` (two-part split on `.`). Delegates the time part to {@link parseHourAndMin}. Compat helper from `Q.parseDayHourAndMin`.
+ * @remarks Accepts `"d"` (days), `"hh:mm"`, or `"d.hh:mm"` (two-part split on `.`). Delegates the time part to {@link parseHourAndMin}. Compat helper from `parseDayHourAndMin`.
  * @example
  * parseDayHourAndMin("1.01:00"); // 1500
  * parseDayHourAndMin("01:30");   // 90
@@ -5136,7 +5134,7 @@ export declare function parseDayHourAndMin(s: string): number;
 /**
  * Appends an empty (placeholder) option to a `<select>` element.
  * @param select - Target `<select>` or array-like/jQuery-like wrapper containing it.
- * @remarks Uses {@link SelectEditorTexts.EmptyItemText} as the display text and `""` as the value; delegates to {@link addOption}. Compat helper from `Q.addEmptyOption`.
+ * @remarks Uses {@link SelectEditorTexts.EmptyItemText} as the display text and `""` as the value; delegates to {@link addOption}. Compat helper from `addEmptyOption`.
  */
 export declare function addEmptyOption(select: ArrayLike<HTMLElement> | HTMLSelectElement): void;
 /**
@@ -5144,19 +5142,19 @@ export declare function addEmptyOption(select: ArrayLike<HTMLElement> | HTMLSele
  * @param select - Target `<select>` or array-like/jQuery-like wrapper containing it.
  * @param key - Value attribute for the option (`null`/`undefined` → `""`).
  * @param text - Display text for the option (`null`/`undefined` → `""`).
- * @remarks Creates an `HTMLOptionElement` via `document.createElement("option")`. No-op if the resolved select element is falsy. Compat helper from `Q.addOption`.
+ * @remarks Creates an `HTMLOptionElement` via `document.createElement("option")`. No-op if the resolved select element is falsy. Compat helper from `addOption`.
  */
 export declare function addOption(select: ArrayLike<HTMLElement> | HTMLSelectElement, key: string, text: string): void;
 /**
  * Legacy alias for {@link htmlEncode}.
- * @deprecated Use {@link htmlEncode} directly (it also encodes quotes). Retained as `Q.attrEncode` compat shim.
+ * @deprecated Use {@link htmlEncode} directly (it also encodes quotes). Retained as `attrEncode` compat shim.
  * @see {@link htmlEncode}
  */
 export declare const attrEncode: typeof htmlEncode;
 /**
  * Removes all child options/content from a `<select>` element.
  * @param select - Target element or array-like/jQuery-like wrapper containing it.
- * @remarks Resolves array-like wrappers via `isArrayLike` and clears with `innerHTML = ''`. No-op if the resolved element is falsy. Compat helper from `Q.clearOptions`.
+ * @remarks Resolves array-like wrappers via `isArrayLike` and clears with `innerHTML = ''`. No-op if the resolved element is falsy. Compat helper from `clearOptions`.
  */
 export declare function clearOptions(select: HTMLElement | ArrayLike<HTMLElement>): void;
 /**
@@ -5165,7 +5163,7 @@ export declare function clearOptions(select: HTMLElement | ArrayLike<HTMLElement
  * @param relativeId - Suffix to append to the source id (with/without leading `_`) when searching.
  * @param context - Scope element for `querySelector`; defaults to the source element's root node. When omitted the search also falls back to `document.getElementById`.
  * @returns The matched `HTMLElement`, or `null` if the source is `null` or no match is found.
- * @remarks Tries `"#" + fromId + relativeId` then `"#" + fromId + "_" + relativeId`, progressively stripping trailing `"_segment"` segments from `fromId` until a match or exhaustion. Compat helper from `Q.findElementWithRelativeId`.
+ * @remarks Tries `"#" + fromId + relativeId` then `"#" + fromId + "_" + relativeId`, progressively stripping trailing `"_segment"` segments from `fromId` until a match or exhaustion. Compat helper from `findElementWithRelativeId`.
  * @example
  * findElementWithRelativeId(document.getElementById("Customer_Name"), "_City"); // finds #Customer_City if present
  */
@@ -5173,14 +5171,14 @@ export declare function findElementWithRelativeId(element: HTMLElement | ArrayLi
 /**
  * Creates a new `<div>` and appends it to `document.body`.
  * @returns The newly created and appended `HTMLDivElement`.
- * @remarks Compat helper from `Q.newBodyDiv`; prefer `document.createElement` + explicit append in new code.
+ * @remarks Compat helper from `newBodyDiv`; prefer `document.createElement` + explicit append in new code.
  */
 export declare function newBodyDiv(): HTMLDivElement;
 /**
  * Returns the outer HTML markup of an element (including the element itself).
  * @param element - Target element, `Element`, or array-like/jQuery-like wrapper containing it.
  * @returns Outer HTML string. For non-Elements, clones the node into a temporary `<i>` wrapper and returns `innerHTML`; yields `""` for falsy targets.
- * @remarks Compat helper from `Q.outerHtml`; for new code prefer `element.outerHTML` directly.
+ * @remarks Compat helper from `outerHtml`; for new code prefer `element.outerHTML` directly.
  */
 export declare function outerHtml(element: Element | ArrayLike<HTMLElement>): string;
 /**
@@ -5540,10 +5538,9 @@ export declare function PanelPageInit<TPanel extends Widget<P>, P>({ type, props
 }): HTMLElement;
 /**
  * Initializes a Serenity grid page that fills the available viewport height.
- * Compat shim for the legacy `Q.gridPageInit` / `Serenity.gridPageInit` API. Accepts either an existing widget instance or a widget class + props.
+ * Compat shim for the legacy `gridPageInit` / `Serenity.gridPageInit` API. Accepts either an existing widget instance or a widget class + props.
  * @param grid - An existing grid widget instance (must expose `domNode`).
  * @returns The same grid widget after full-height layout initialization.
- * @deprecated Use widget construction with {@link initFullHeightGridPage} or modern layout components. Kept for legacy page scripts.
  */
 export declare function gridPageInit<TGrid extends Widget<P>, P>(grid: TGrid & {
 	domNode: HTMLElement;
@@ -5557,10 +5554,9 @@ export declare function gridPageInit<TGrid extends Widget<P>, P>(grid: TGrid & {
 export declare function gridPageInit<TGrid extends Widget<P>, P>(type: CreateWidgetParams<TGrid, P>["type"], props?: WidgetProps<P>): TGrid;
 /**
  * Initializes a Serenity panel page without hash-router integration.
- * Compat shim for the legacy `Q.panelPageInit` / `Serenity.panelPageInit` API. Accepts either an existing panel instance or a widget class + props.
+ * Compat shim for the legacy `panelPageInit` / `Serenity.panelPageInit` API. Accepts either an existing panel instance or a widget class + props.
  * @param panel - An existing panel widget instance (must expose `domNode`).
  * @returns The same panel widget after layout initialization (`noRoute: true`).
- * @deprecated Use direct widget construction with {@link initFullHeightGridPage}. Kept for legacy compatibility.
  */
 export declare function panelPageInit<TGrid extends Widget<P>, P>(panel: TGrid & {
 	domNode: HTMLElement;
@@ -5574,12 +5570,12 @@ export declare function panelPageInit<TGrid extends Widget<P>, P>(panel: TGrid &
 export declare function panelPageInit<TGrid extends Widget<P>, P>(type: CreateWidgetParams<TGrid, P>["type"], props?: WidgetProps<P>): TGrid;
 /**
  * Configures a full-height page layout for a grid or panel container.
- * Compat shim for the legacy `Q.initFullHeightGridPage`. Adds `full-height-page` / `responsive-height` classes, wires resize or `layout` events, and optionally resolves the hash router.
+ * Compat shim for the legacy `initFullHeightGridPage`. Adds `full-height-page` / `responsive-height` classes, wires resize or `layout` events, and optionally resolves the hash router.
  * @param gridDiv - Target container: an {@link HTMLElement}, array-like collection, or an object with a `domNode` property.
  * @param opt - Layout options.
  * @param opt.noRoute - When `true`, skips the one-time {@link Router}.`resolve()` call on initial page load. Defaults to `false`.
  * @param opt.setHeight - When `true` forces height filling via {@link layoutFillHeight}; when `false` disables it; when omitted auto-detects via jQuery and element classes. Defaults to auto.
- * @deprecated Prefer CSS flex / grid layouts or `Fluent` responsive utilities. Kept for legacy full-height pages.
+ * [DEPRECATED] Prefer CSS flex / grid layouts or `Fluent` responsive utilities. Kept for legacy full-height pages.
  */
 export declare function initFullHeightGridPage(gridDiv: HTMLElement | ArrayLike<HTMLElement> | {
 	domNode: HTMLElement;
@@ -5589,17 +5585,17 @@ export declare function initFullHeightGridPage(gridDiv: HTMLElement | ArrayLike<
 }): void;
 /**
  * Calculates the available height for an element to fill its parent.
- * Compat shim for `Q.layoutFillHeightValue`. Sums the outer heights of visible siblings and subtracts from the parent height, adjusting for `box-sizing`.
+ * Compat shim for `layoutFillHeightValue`. Sums the outer heights of visible siblings and subtracts from the parent height, adjusting for `box-sizing`.
  * @param element - Target element or array-like collection (first element is used).
  * @returns The computed fill height in pixels (rounded from computed styles). Returns `0` if the element is not found.
- * @deprecated Use CSS flexbox or `calc()` based layouts. Kept for legacy height calculations that depend on jQuery.
+ * [DEPRECATED] Use CSS flexbox or `calc()` based layouts. Kept for legacy height calculations that depend on jQuery.
  */
 export declare function layoutFillHeightValue(element: HTMLElement | ArrayLike<HTMLElement>): number;
 /**
  * Sets an element's height to fill the remaining vertical space in its parent.
- * Compat shim for `Q.layoutFillHeight`. Computes the value via {@link layoutFillHeightValue} and applies it as an inline `height` style.
+ * Compat shim for `layoutFillHeight`. Computes the value via {@link layoutFillHeightValue} and applies it as an inline `height` style.
  * @param element - Target element or array-like collection (first element is used).
- * @deprecated Prefer CSS flex / grid layouts. Kept for legacy full-height grid pages.
+ * [DEPRECATED] Prefer CSS flex / grid layouts. Kept for legacy full-height grid pages.
  */
 export declare function layoutFillHeight(element: HTMLElement | ArrayLike<HTMLElement>): void;
 /**
@@ -5610,23 +5606,23 @@ export declare function layoutFillHeight(element: HTMLElement | ArrayLike<HTMLEl
 export declare function isMobileView(): boolean;
 /**
  * Triggers a `layout` event each time the element becomes visible.
- * Compat shim for `Q.triggerLayoutOnShow`. Uses {@link executeEverytimeWhenVisible} to fire `Fluent.trigger(element, 'layout')` on visibility transitions.
+ * Compat shim for `triggerLayoutOnShow`. Uses {@link executeEverytimeWhenVisible} to fire `Fluent.trigger(element, 'layout')` on visibility transitions.
  * @param element - Target element or array-like collection (first element is used). No-op if the element is missing.
  */
 export declare function triggerLayoutOnShow(element: HTMLElement | ArrayLike<HTMLElement>): void;
 /**
  * Centers a jQuery UI dialog containing the given element within the viewport.
- * Compat shim for `Q.centerDialog`. Requires jQuery and jQuery UI `position`; clamps negative `left` / `top` to `0`.
+ * Compat shim for `centerDialog`. Requires jQuery and jQuery UI `position`; clamps negative `left` / `top` to `0`.
  * @param el - An element inside the dialog (e.g., `.ui-dialog-content`) or the dialog element itself; array-like collections use the first element.
  * @deprecated Prefer native dialog centering or Bootstrap modal positioning. Kept for legacy jQuery UI dialogs.
  */
 export declare function centerDialog(el: HTMLElement | ArrayLike<HTMLElement>): void;
 /**
  * Legacy polling-based layout timer that detects size and visibility changes.
- * Compat shim for the old `Q.LayoutTimer` / `Serenity.LayoutTimer` API. Polls registered elements every ~100 ms,
+ * Compat shim for the old `LayoutTimer` / `Serenity.LayoutTimer` API. Polls registered elements every ~100 ms,
  * supports optional debouncing, and fires handlers when width, height, or visibility transitions occur.
  * Prefer `ResizeObserver` or `Fluent.on(..., 'layout')` with CSS-based layouts for new code.
- * @deprecated Kept for backward compatibility with legacy `layoutFillHeight` and `triggerLayoutOnShow` callers. Use `ResizeObserver` instead.
+ * [DEPRECATED] Kept for backward compatibility with legacy `layoutFillHeight` and `triggerLayoutOnShow` callers. Use `ResizeObserver` instead.
  */
 export declare namespace LayoutTimer {
 	/**
@@ -5708,7 +5704,7 @@ export declare namespace LayoutTimer {
  * @param el - Target element or array-like collection (first element is used).
  * @param callback - Function to invoke when visible.
  * @returns The {@link LayoutTimer} registration key, or `null` if already visible / element missing.
- * @deprecated Prefer `IntersectionObserver` or `ResizeObserver`. Kept for legacy `triggerLayoutOnShow` compatibility.
+ * [DEPRECATED] Prefer `IntersectionObserver` or `ResizeObserver`. Kept for legacy `triggerLayoutOnShow` compatibility.
  */
 export declare function executeOnceWhenVisible(el: HTMLElement | ArrayLike<HTMLElement>, callback: Function): number | null;
 /**
@@ -5718,7 +5714,7 @@ export declare function executeOnceWhenVisible(el: HTMLElement | ArrayLike<HTMLE
  * @param callback - Function to invoke each time the element is shown.
  * @param callNowIfVisible - When `true` and the element is already visible, invokes the callback immediately before registering.
  * @returns The {@link LayoutTimer} registration key, or `null` if the element is missing.
- * @deprecated Prefer `IntersectionObserver` / `ResizeObserver`. Kept for legacy `triggerLayoutOnShow` compatibility.
+ * [DEPRECATED] Prefer `IntersectionObserver` / `ResizeObserver`. Kept for legacy `triggerLayoutOnShow` compatibility.
  */
 export declare function executeEverytimeWhenVisible(el: HTMLElement | ArrayLike<HTMLElement>, callback: Function, callNowIfVisible: boolean): number | null;
 /**
@@ -5737,9 +5733,9 @@ export interface HandleRouteEvent extends Event {
 }
 /**
  * Contract for the legacy hash-based router.
- * Compat shim for the old `Q.Router` / `Serenity.Router` singleton. The router synchronizes dialog open/close state
+ * Compat shim for the old `Router` / `Serenity.Router` singleton. The router synchronizes dialog open/close state
  * with the URL hash using `"/+/"` delimited segments and fires `handleroute` events on designated handlers.
- * @deprecated Hash-based dialog routing is legacy. Prefer explicit client-side routing or modern dialog state management. Kept for backward compatibility.
+ * [DEPRECATED] Hash-based dialog routing is legacy. Prefer explicit client-side routing or modern dialog state management. Kept for backward compatibility.
  */
 export interface IClassicRouter {
 	/** When `false`, all routing operations become no-ops. */
@@ -5788,8 +5784,8 @@ export interface IClassicRouter {
 }
 /**
  * Legacy hash-based router that maps dialog stack to `"/+/"` delimited hash segments.
- * Compat shim for the old `Q.Router` implementation. Listens to `hashchange`, dialog open/close, and anchor clicks to keep the URL in sync with visible dialogs and to dispatch `handleroute` events.
- * @deprecated Use explicit routing or state-driven dialog management. Kept solely for backward compatibility with legacy Serenity pages.
+ * Compat shim for the old `Router` implementation. Listens to `hashchange`, dialog open/close, and anchor clicks to keep the URL in sync with visible dialogs and to dispatch `handleroute` events.
+ * [DEPRECATED] Use explicit routing or state-driven dialog management. Kept solely for backward compatibility with legacy Serenity pages.
  */
 export declare class ClassicRouter implements IClassicRouter {
 	private oldURL;
@@ -5838,20 +5834,20 @@ export declare class ClassicRouter implements IClassicRouter {
 }
 /**
  * Singleton instance of the legacy hash router.
- * Compat shim for the global `Q.Router` / `Serenity.Router`. Initialized at module load and wired to `hashchange` and dialog events.
- * @deprecated Prefer not to use hash-based dialog routing in new code. Kept for legacy pages that rely on `Router.resolve()` / `Router.navigate()`.
+ * Compat shim for the global `Router` / `Serenity.Router`. Initialized at module load and wired to `hashchange` and dialog events.
+ * [DEPRECATED] Prefer not to use hash-based dialog routing in new code. Kept for legacy pages that rely on `Router.resolve()` / `Router.navigate()`.
  */
 export declare const Router: IClassicRouter;
 /**
  * Legacy `ScriptData` namespace compat shim.
  * Wraps the modern `../base` script-data APIs (`getScriptData`, `setScriptData`, `ensureScriptDataSync`, etc.)
- * under the old `Q.ScriptData` / `Serenity.ScriptData` surface. All members delegate to the new APIs.
- * @deprecated Prefer importing `getScriptData`, `setScriptData`, `ensureScriptDataSync`, `peekScriptData`, etc. directly from `@serenity-is/corelib`. Kept for backward compatibility.
+ * under the old `ScriptData` / `Serenity.ScriptData` surface. All members delegate to the new APIs.
+ * [DEPRECATED] Prefer importing `getScriptData`, `setScriptData`, `ensureScriptDataSync`, `peekScriptData`, etc. directly from `@serenity-is/corelib`. Kept for backward compatibility.
  */
 export declare namespace ScriptData {
 	/** Alias for {@link canLoadScriptData}. @deprecated Use {@link canLoadScriptData} or `peekScriptData` / `getScriptDataHash` directly. */
 	const canLoad: typeof canLoadScriptData;
-	/** Alias for {@link ensureScriptDataSync}. @deprecated Use `ensureScriptDataSync` directly. */
+	/** Alias for {@link ensureScriptDataSync}. [DEPRECATED] Use `ensureScriptDataSync` directly. */
 	const ensure: typeof ensureScriptDataSync;
 	/** Alias for {@link setScriptData}. @deprecated Use `setScriptData` directly. */
 	const set: typeof setScriptData;
@@ -5867,7 +5863,7 @@ export declare namespace ScriptData {
 	 * @param name - Dynamic script name.
 	 * @param dynJS - When `true`, passed through to the underlying `ensure` call (legacy flag).
 	 * @returns The reloaded script data.
-	 * @deprecated Prefer `getScriptData(name, true)` or `getScriptDataAsync`. Kept for legacy callers.
+	 * [DEPRECATED] Prefer `getScriptData(name, true)` or `getScriptDataAsync`. Kept for legacy callers.
 	 */
 	function reload<TData = any>(name: string, dynJS?: boolean): TData;
 	/**
@@ -5880,81 +5876,81 @@ export declare namespace ScriptData {
 }
 /**
  * Checks whether a dynamic script with the given name is available in the cache or is a registered script name.
- * Compat shim for the legacy `Q.canLoadScriptData` global; delegates to `peekScriptData` and `getScriptDataHash`.
+ * Compat shim for the legacy `canLoadScriptData` global; delegates to `peekScriptData` and `getScriptDataHash`.
  * @param name - Dynamic script name (e.g., `"Lookup.Administration.User"`).
  * @returns `true` if the script is already cached or its hash is registered; otherwise `false`.
- * @deprecated Prefer `peekScriptData` / `getScriptDataHash` checks or `getScriptData` directly.
+ * [DEPRECATED] Prefer `peekScriptData` / `getScriptDataHash` checks or `getScriptData` directly.
  */
 export declare function canLoadScriptData(name: string): boolean;
 /**
  * Synchronously retrieves a lookup by key.
- * Compat shim for `Q.getLookup`; delegates to `ScriptData.ensure('Lookup.' + key)`.
- * **deprecated** Prefer `getLookupAsync` or direct `getScriptData` usage. Kept for legacy synchronous callers.
+ * Compat shim for `getLookup`; delegates to `ScriptData.ensure('Lookup.' + key)`.
+ * [DEPRECATED] Prefer `getLookupAsync` or direct `getScriptData` usage. Kept for legacy synchronous callers.
  * @param key - Lookup key (e.g., `"Administration.User"`).
  * @returns The {@link Lookup} instance for the key.
  */
 export declare function getLookup<TItem>(key: string): Lookup<TItem>;
 /**
  * Synchronously reloads a lookup by key.
- * Compat shim for `Q.reloadLookup`; delegates to `ScriptData.reload('Lookup.' + key)`.
+ * Compat shim for `reloadLookup`; delegates to `ScriptData.reload('Lookup.' + key)`.
  * @param key - Lookup key.
  * @returns The reloaded {@link Lookup} instance.
- * @deprecated Prefer `reloadLookupAsync` or `getScriptData(key, true)`.
+ * [DEPRECATED] Prefer `reloadLookupAsync` or `getScriptData(key, true)`.
  */
 export declare function reloadLookup<TItem = any>(key: string): Lookup<TItem>;
 /**
  * Synchronously retrieves column metadata for a row/form key.
- * Compat shim for `Q.getColumns`; delegates to `getColumnsData(key).items`.
+ * Compat shim for `getColumns`; delegates to `getColumnsData(key).items`.
  * @param key - Columns key (usually a row or entity type name).
  * @returns The array of {@link PropertyItem} column definitions, or an empty array if not found.
- * @deprecated Prefer `getColumnsAsync` / `getColumnsScript` for async loading. Kept for legacy synchronous callers.
+ * [DEPRECATED] Prefer `getColumnsAsync` / `getColumnsScript` for async loading. Kept for legacy synchronous callers.
  */
 export declare function getColumns(key: string): PropertyItem[];
 /**
  * Asynchronously retrieves column metadata for a row/form key.
- * Compat shim for `Q.getColumnsAsync`; delegates to `getColumnsScript(key)`.
+ * Compat shim for `getColumnsAsync`; delegates to `getColumnsScript(key)`.
  * @param key - Columns key.
  * @returns A promise resolving to the array of {@link PropertyItem} column definitions.
  */
 export declare function getColumnsAsync(key: string): Promise<PropertyItem[]>;
 /**
  * Synchronously retrieves the full columns data object for a key.
- * Compat shim for `Q.getColumnsData`; delegates to `ScriptData.ensure('Columns.' + key)`.
+ * Compat shim for `getColumnsData`; delegates to `ScriptData.ensure('Columns.' + key)`.
  * @param key - Columns key.
  * @returns The {@link PropertyItemsData} containing `items` and related metadata.
- * @deprecated Prefer `getColumnsDataAsync` / `getColumnsScript`.
+ * [DEPRECATED] Prefer `getColumnsDataAsync` / `getColumnsScript`.
  */
 export declare function getColumnsData(key: string): PropertyItemsData;
-/** Alias for {@link getColumnsScript}. Compat shim for `Q.getColumnsDataAsync`. */
+/** Alias for {@link getColumnsScript}. Compat shim for `getColumnsDataAsync`. */
 export declare const getColumnsDataAsync: typeof getColumnsScript;
 /**
  * Synchronously retrieves form metadata for a key.
- * Compat shim for `Q.getForm`; delegates to `getFormData(key).items`.
+ * Compat shim for `getForm`; delegates to `getFormData(key).items`.
  * @param key - Form key (usually a form type name).
  * @returns The array of {@link PropertyItem} form field definitions, or an empty array if not found.
- * @deprecated Prefer `getFormAsync` / `getFormScript` for async loading.
+ * [DEPRECATED] Prefer `getFormAsync` / `getFormScript` for async loading.
  */
 export declare function getForm(key: string): PropertyItem[];
 /**
  * Asynchronously retrieves form metadata for a key.
- * Compat shim for `Q.getFormAsync`; delegates to `getFormScript(key)`.
+ * Compat shim for `getFormAsync`; delegates to `getFormScript(key)`.
  * @param key - Form key.
  * @returns A promise resolving to the array of {@link PropertyItem} form field definitions.
  */
 export declare function getFormAsync(key: string): Promise<PropertyItem[]>;
 /**
  * Synchronously retrieves the full form data object for a key.
- * Compat shim for `Q.getFormData`; delegates to `ScriptData.ensure('Form.' + key)`.
+ * Compat shim for `getFormData`; delegates to `ScriptData.ensure('Form.' + key)`.
  * @param key - Form key.
  * @returns The {@link PropertyItemsData} containing `items` and related metadata.
- * @deprecated Prefer `getFormDataAsync` / `getFormScript`.
+ * [DEPRECATED] Prefer `getFormDataAsync` / `getFormScript`.
  */
 export declare function getFormData(key: string): PropertyItemsData;
-/** Alias for {@link getFormScript}. Compat shim for `Q.getFormDataAsync`. */
+/** Alias for {@link getFormScript}. Compat shim for `getFormDataAsync`. */
 export declare const getFormDataAsync: typeof getFormScript;
 /**
  * Sets an equality filter value on a list request.
- * Compat shim for the legacy `Q.setEquality` helper. Lazily initializes `request.EqualityFilter` if needed.
+ * Compat shim for the legacy `setEquality` helper. Lazily initializes `request.EqualityFilter` if needed.
  * @param request - The {@link ListRequest} whose `EqualityFilter` map will be mutated.
  * @param field - Field name to set in the equality filter.
  * @param value - Value to assign for the field (any JSON-serializable value, or `null` to clear).
@@ -5963,9 +5959,8 @@ export declare const getFormDataAsync: typeof getFormScript;
 export declare function setEquality(request: ListRequest, field: string, value: any): void;
 /**
  * Options for posting data to a Serenity service endpoint via a hidden form.
- * Compat shim for the legacy `Q.PostToServiceOptions` type.
- * @deprecated Prefer `fetch` / `serviceCall` APIs. Kept for legacy form-post integrations.
- */
+ * Compat shim for the legacy `PostToServiceOptions` type.
+  */
 export interface PostToServiceOptions {
 	/** Absolute or app-relative URL to post to. When provided, takes precedence over {@link service}. Resolved via `resolveUrl`. */
 	url?: string;
@@ -5978,8 +5973,8 @@ export interface PostToServiceOptions {
 }
 /**
  * Options for posting arbitrary parameters to a URL via a hidden form.
- * Compat shim for the legacy `Q.PostToUrlOptions` type.
- * @deprecated Prefer `fetch` or standard form handling. Kept for legacy file-export / report post flows.
+ * Compat shim for the legacy `PostToUrlOptions` type.
+ * Prefer `fetch` or standard form handling. Kept for legacy file-export / report post flows.
  */
 export interface PostToUrlOptions {
 	/** Target URL to post to (app-relative or absolute). Resolved via `resolveUrl`. */
@@ -5991,16 +5986,16 @@ export interface PostToUrlOptions {
 }
 /**
  * Posts a service request by creating and submitting a hidden form.
- * Compat shim for `Q.postToService`. Resolves the URL from `options.url` or `options.service`, injects a CSRF token when same-origin, and auto-removes the form after submission.
+ * Compat shim for `postToService`. Resolves the URL from `options.url` or `options.service`, injects a CSRF token when same-origin, and auto-removes the form after submission.
  * @param options - Post options including service/url, request payload, and optional target.
- * @deprecated Prefer `serviceCall` / `fetch` with JSON. Kept for legacy file-download and export scenarios that require form POST.
+ * [DEPRECATED] Prefer `serviceCall` / `fetch` with JSON. Kept for legacy file-download and export scenarios that require form POST.
  */
 export declare function postToService(options: PostToServiceOptions): void;
 /**
  * Posts arbitrary parameters to a URL by creating and submitting a hidden form.
- * Compat shim for `Q.postToUrl`. Each key in `options.params` becomes a hidden input field.
+ * Compat shim for `postToUrl`. Each key in `options.params` becomes a hidden input field.
  * @param options - Post options including target URL, params map, and optional target window/frame.
- * @deprecated Prefer `fetch` or programmatic form construction. Kept for legacy export / report flows.
+ * [DEPRECATED] Prefer `fetch` or programmatic form construction. Kept for legacy export / report flows.
  */
 export declare function postToUrl(options: PostToUrlOptions): void;
 /**
@@ -6064,7 +6059,7 @@ export declare const trimEnd: (s: string) => any;
 export declare const trimStart: (s: string) => any;
 /**
  * Removes leading and trailing whitespace from a string.
- * @deprecated Use {@link String.prototype.trim} directly — this shim exists only for legacy `Q.trim` call sites.
+ * @deprecated Use {@link String.prototype.trim} directly — this shim exists only for legacy `trim` call sites.
  * @param s - The input string; `null`/`undefined` yields `undefined` (optional-chain semantics).
  * @returns The trimmed string, or `undefined` if `s` is `null`/`undefined`.
  */
@@ -7610,7 +7605,7 @@ export declare namespace Attributes {
 	/** Creates a {@link StaticPanelAttribute}. @param value - True for static panel (default `true`). */
 	function staticPanel(value?: boolean): StaticPanelAttribute;
 }
-/** @deprecated Use Attributes.advancedFiltering() instead */
+/** [DEPRECATED] Use Attributes.advancedFiltering() instead */
 export declare const FilterableAttribute: typeof AdvancedFilteringAttribute;
 /**
  * Operation type for data change capture (used by history / audit features).
@@ -7639,7 +7634,7 @@ export interface DataChangeInfo extends Event {
 }
 /**
  * Legacy decorator helpers for Serenity type registration and widget attributes.
- * @deprecated Prefer direct `static [Symbol.typeInfo] = ...` and `static { registerType(this); }` patterns.
+ * [DEPRECATED] Prefer direct `static [Symbol.typeInfo] = ...` and `static { registerType(this); }` patterns.
  */
 export declare namespace Decorators {
 	/** Legacy decorator that registers a type via `registerType`. @returns Class decorator. */
@@ -7690,7 +7685,7 @@ export declare namespace Decorators {
 	function element(value: string): (target: Function, _context?: any) => void;
 	/**
 	 * Legacy decorator that attaches an {@link AdvancedFilteringAttribute} to a grid class.
-	 * @deprecated Prefer `static override [Symbol.typeInfo]` with {@link AdvancedFilteringAttribute} metadata instead.
+	 * [DEPRECATED] Prefer `static override [Symbol.typeInfo]` with {@link AdvancedFilteringAttribute} metadata instead.
 	 * @param value - Whether advanced filtering should be enabled. Defaults to `true`.
 	 * @returns Class decorator.
 	 */
@@ -9321,7 +9316,7 @@ export declare class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
 	 * @returns The dialog type.
 	 */
 	protected getDialogType(): DialogType | PromiseLike<DialogType>;
-	/** @deprecated Override getDialogType() instead */
+	/** [DEPRECATED] Override getDialogType() instead */
 	protected getDialogTypeKey(): string;
 	/**
 	 * Creates an edit dialog for in-place add.
@@ -13113,7 +13108,7 @@ export declare class HtmlContentEditor<P extends HtmlContentEditorOptions = Html
 	 */
 	protected getCKEditorLanguage(): string;
 	private triggerKeyupEvent;
-	/** @deprecated Override and use getCKEditorConfig() */
+	/** [DEPRECATED] Override and use getCKEditorConfig() */
 	protected getConfig(): CKEditorConfig;
 	/**
 	 * Returns the CKEditor configuration.

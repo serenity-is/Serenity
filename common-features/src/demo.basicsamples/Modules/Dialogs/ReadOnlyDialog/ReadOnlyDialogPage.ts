@@ -1,4 +1,4 @@
-﻿import { EditorUtils, ToolButton, gridPageInit, indexOf } from "@serenity-is/corelib";
+import { EditorUtils, ToolButton, gridPageInit } from "@serenity-is/corelib";
 import { SupplierDialog, SupplierGrid } from "@serenity-is/demo.northwind";
 import { nsDemoBasicSamples } from "../../ServerTypes/Namespaces";
 
@@ -17,7 +17,7 @@ export class ReadOnlyGrid extends SupplierGrid {
      */
     protected override getButtons(): ToolButton[] {
         var buttons = super.getButtons();
-        buttons.splice(indexOf(buttons, x => x.action == "add"), 1);
+        buttons.splice(buttons.findIndex(x => x.action == "add"), 1);
         return buttons;
     }
 }
@@ -35,8 +35,8 @@ export class ReadOnlyDialog extends SupplierDialog {
     protected override getToolbarButtons(): ToolButton[] {
         let buttons = super.getToolbarButtons();
 
-        buttons.splice(indexOf(buttons, x => x.action == "save-and-close"), 1);
-        buttons.splice(indexOf(buttons, x => x.action == "apply-changes"), 1);
+        buttons.splice(buttons.findIndex(x => x.action == "save-and-close"), 1);
+        buttons.splice(buttons.findIndex(x => x.action == "apply-changes"), 1);
 
         // We could also remove delete button here, but for demonstration 
         // purposes we'll hide it in another method (updateInterface)

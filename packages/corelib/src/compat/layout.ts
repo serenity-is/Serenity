@@ -1,4 +1,4 @@
-﻿import { addDisposingListener } from "@serenity-is/domwise";
+import { addDisposingListener } from "@serenity-is/domwise";
 import { Fluent, getjQuery, isArrayLike } from "../base";
 import { type CreateWidgetParams, type Widget, type WidgetProps } from "../ui/widgets/widget";
 import { executeEverytimeWhenVisible, LayoutTimer } from "./layouttimer";
@@ -61,10 +61,9 @@ export function PanelPageInit<TPanel extends Widget<P>, P>({ type, props }: { ty
 
 /**
  * Initializes a Serenity grid page that fills the available viewport height.
- * Compat shim for the legacy `Q.gridPageInit` / `Serenity.gridPageInit` API. Accepts either an existing widget instance or a widget class + props.
+ * Compat shim for the legacy `gridPageInit` / `Serenity.gridPageInit` API. Accepts either an existing widget instance or a widget class + props.
  * @param grid - An existing grid widget instance (must expose `domNode`).
  * @returns The same grid widget after full-height layout initialization.
- * @deprecated Use widget construction with {@link initFullHeightGridPage} or modern layout components. Kept for legacy page scripts.
  */
 export function gridPageInit<TGrid extends Widget<P>, P>(grid: TGrid & { domNode: HTMLElement }): TGrid;
 /**
@@ -80,10 +79,9 @@ export function gridPageInit<TGrid extends Widget<P>, P>(gridOrType: (CreateWidg
 
 /**
  * Initializes a Serenity panel page without hash-router integration.
- * Compat shim for the legacy `Q.panelPageInit` / `Serenity.panelPageInit` API. Accepts either an existing panel instance or a widget class + props.
+ * Compat shim for the legacy `panelPageInit` / `Serenity.panelPageInit` API. Accepts either an existing panel instance or a widget class + props.
  * @param panel - An existing panel widget instance (must expose `domNode`).
  * @returns The same panel widget after layout initialization (`noRoute: true`).
- * @deprecated Use direct widget construction with {@link initFullHeightGridPage}. Kept for legacy compatibility.
  */
 export function panelPageInit<TGrid extends Widget<P>, P>(panel: TGrid & { domNode: HTMLElement }): TGrid;
 /**
@@ -99,12 +97,12 @@ export function panelPageInit<TGrid extends Widget<P>, P>(panelOrType: (CreateWi
 
 /**
  * Configures a full-height page layout for a grid or panel container.
- * Compat shim for the legacy `Q.initFullHeightGridPage`. Adds `full-height-page` / `responsive-height` classes, wires resize or `layout` events, and optionally resolves the hash router.
+ * Compat shim for the legacy `initFullHeightGridPage`. Adds `full-height-page` / `responsive-height` classes, wires resize or `layout` events, and optionally resolves the hash router.
  * @param gridDiv - Target container: an {@link HTMLElement}, array-like collection, or an object with a `domNode` property.
  * @param opt - Layout options.
  * @param opt.noRoute - When `true`, skips the one-time {@link Router}.`resolve()` call on initial page load. Defaults to `false`.
  * @param opt.setHeight - When `true` forces height filling via {@link layoutFillHeight}; when `false` disables it; when omitted auto-detects via jQuery and element classes. Defaults to auto.
- * @deprecated Prefer CSS flex / grid layouts or `Fluent` responsive utilities. Kept for legacy full-height pages.
+ * [DEPRECATED] Prefer CSS flex / grid layouts or `Fluent` responsive utilities. Kept for legacy full-height pages.
  */
 export function initFullHeightGridPage(gridDiv: HTMLElement | ArrayLike<HTMLElement> | { domNode: HTMLElement }, opt?: { noRoute?: boolean, setHeight?: boolean }) {
     const el: HTMLElement = isArrayLike(gridDiv) ? gridDiv[0] : gridDiv instanceof HTMLElement ? gridDiv : gridDiv.domNode;
@@ -148,10 +146,10 @@ export function initFullHeightGridPage(gridDiv: HTMLElement | ArrayLike<HTMLElem
 
 /**
  * Calculates the available height for an element to fill its parent.
- * Compat shim for `Q.layoutFillHeightValue`. Sums the outer heights of visible siblings and subtracts from the parent height, adjusting for `box-sizing`.
+ * Compat shim for `layoutFillHeightValue`. Sums the outer heights of visible siblings and subtracts from the parent height, adjusting for `box-sizing`.
  * @param element - Target element or array-like collection (first element is used).
  * @returns The computed fill height in pixels (rounded from computed styles). Returns `0` if the element is not found.
- * @deprecated Use CSS flexbox or `calc()` based layouts. Kept for legacy height calculations that depend on jQuery.
+ * [DEPRECATED] Use CSS flexbox or `calc()` based layouts. Kept for legacy height calculations that depend on jQuery.
  */
 export function layoutFillHeightValue(element: HTMLElement | ArrayLike<HTMLElement>) {
     let h = 0;
@@ -175,9 +173,9 @@ export function layoutFillHeightValue(element: HTMLElement | ArrayLike<HTMLEleme
 
 /**
  * Sets an element's height to fill the remaining vertical space in its parent.
- * Compat shim for `Q.layoutFillHeight`. Computes the value via {@link layoutFillHeightValue} and applies it as an inline `height` style.
+ * Compat shim for `layoutFillHeight`. Computes the value via {@link layoutFillHeightValue} and applies it as an inline `height` style.
  * @param element - Target element or array-like collection (first element is used).
- * @deprecated Prefer CSS flex / grid layouts. Kept for legacy full-height grid pages.
+ * [DEPRECATED] Prefer CSS flex / grid layouts. Kept for legacy full-height grid pages.
  */
 export function layoutFillHeight(element: HTMLElement | ArrayLike<HTMLElement>) {
     let h = layoutFillHeightValue(element);
@@ -202,7 +200,7 @@ export function isMobileView() {
 
 /**
  * Triggers a `layout` event each time the element becomes visible.
- * Compat shim for `Q.triggerLayoutOnShow`. Uses {@link executeEverytimeWhenVisible} to fire `Fluent.trigger(element, 'layout')` on visibility transitions.
+ * Compat shim for `triggerLayoutOnShow`. Uses {@link executeEverytimeWhenVisible} to fire `Fluent.trigger(element, 'layout')` on visibility transitions.
  * @param element - Target element or array-like collection (first element is used). No-op if the element is missing.
  */
 export function triggerLayoutOnShow(element: HTMLElement | ArrayLike<HTMLElement>) {
@@ -216,7 +214,7 @@ export function triggerLayoutOnShow(element: HTMLElement | ArrayLike<HTMLElement
 
 /**
  * Centers a jQuery UI dialog containing the given element within the viewport.
- * Compat shim for `Q.centerDialog`. Requires jQuery and jQuery UI `position`; clamps negative `left` / `top` to `0`.
+ * Compat shim for `centerDialog`. Requires jQuery and jQuery UI `position`; clamps negative `left` / `top` to `0`.
  * @param el - An element inside the dialog (e.g., `.ui-dialog-content`) or the dialog element itself; array-like collections use the first element.
  * @deprecated Prefer native dialog centering or Bootstrap modal positioning. Kept for legacy jQuery UI dialogs.
  */

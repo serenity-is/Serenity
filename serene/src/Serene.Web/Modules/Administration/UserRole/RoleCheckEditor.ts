@@ -1,4 +1,4 @@
-import { CheckTreeEditor, CheckTreeItem, GridUtils, isEmptyOrNull, stripDiacritics } from "@serenity-is/corelib";
+import { CheckTreeEditor, CheckTreeItem, GridUtils, stripDiacritics } from "@serenity-is/corelib";
 import { RoleRow } from "../../ServerTypes/Administration/RoleRow";
 import { nsAdministration } from "../../ServerTypes/Namespaces";
 
@@ -37,7 +37,7 @@ export class RoleCheckEditor extends CheckTreeEditor<CheckTreeItem<any>, any> {
 
     protected override onViewFilter(item) {
         return super.onViewFilter(item) &&
-            (isEmptyOrNull(this.searchText) ||
+            (!this.searchText ||
                 stripDiacritics(item.text || '')
                     .toUpperCase().indexOf(this.searchText) >= 0);
     }

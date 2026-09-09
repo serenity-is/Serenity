@@ -1,4 +1,4 @@
-import { BaseDialog, DataGrid, DeleteResponse, DialogOptions, DialogType, Dictionary, EditorProps, EmailAddressEditor, EntityDialog, EntityGrid, Formatter, IGetEditValue, ISetEditValue, IconClassName, ListRequest, ListResponse, PasswordEditor, PrefixedContext, PropertyDialog, PropertyItem, RenderableContent, SaveInitiator, SaveResponse, ServiceError, ServiceOptions, ServiceRequest, ServiceResponse, SettingStorage, ToolButton, Widget, WidgetProps } from '@serenity-is/corelib';
+import { BaseDialog, DataGrid, DeleteResponse, DialogOptions, DialogType, EditorProps, EmailAddressEditor, EntityDialog, EntityGrid, Formatter, IGetEditValue, ISetEditValue, IconClassName, ListRequest, ListResponse, PasswordEditor, PrefixedContext, PropertyDialog, PropertyItem, RenderableContent, SaveInitiator, SaveResponse, ServiceError, ServiceOptions, ServiceRequest, ServiceResponse, SettingStorage, ToolButton, Widget, WidgetProps } from '@serenity-is/corelib';
 import { FormatterContext, FormatterResult, GridOptions } from '@serenity-is/sleekgrid';
 
 export interface ChangePasswordForm {
@@ -325,7 +325,7 @@ export declare class BulkServiceAction {
 	protected progressDialog: BasicProgressDialog;
 	protected pendingRequests: number;
 	protected completedRequests: number;
-	protected errorByKey: Dictionary<ServiceError>;
+	protected errorByKey: Record<string, ServiceError>;
 	private successCount;
 	private errorCount;
 	done: () => void;

@@ -3,7 +3,7 @@ import { htmlEncode, isArrayLike, SelectEditorTexts } from "../base";
 /**
  * Appends an empty (placeholder) option to a `<select>` element.
  * @param select - Target `<select>` or array-like/jQuery-like wrapper containing it.
- * @remarks Uses {@link SelectEditorTexts.EmptyItemText} as the display text and `""` as the value; delegates to {@link addOption}. Compat helper from `Q.addEmptyOption`.
+ * @remarks Uses {@link SelectEditorTexts.EmptyItemText} as the display text and `""` as the value; delegates to {@link addOption}. Compat helper from `addEmptyOption`.
  */
 export function addEmptyOption(select: ArrayLike<HTMLElement> | HTMLSelectElement) {
     addOption(select, '', SelectEditorTexts.EmptyItemText);
@@ -14,7 +14,7 @@ export function addEmptyOption(select: ArrayLike<HTMLElement> | HTMLSelectElemen
  * @param select - Target `<select>` or array-like/jQuery-like wrapper containing it.
  * @param key - Value attribute for the option (`null`/`undefined` → `""`).
  * @param text - Display text for the option (`null`/`undefined` → `""`).
- * @remarks Creates an `HTMLOptionElement` via `document.createElement("option")`. No-op if the resolved select element is falsy. Compat helper from `Q.addOption`.
+ * @remarks Creates an `HTMLOptionElement` via `document.createElement("option")`. No-op if the resolved select element is falsy. Compat helper from `addOption`.
  */
 export function addOption(select: ArrayLike<HTMLElement> | HTMLSelectElement, key: string, text: string) {
     const option = document.createElement("option");
@@ -25,7 +25,7 @@ export function addOption(select: ArrayLike<HTMLElement> | HTMLSelectElement, ke
 
 /**
  * Legacy alias for {@link htmlEncode}.
- * @deprecated Use {@link htmlEncode} directly (it also encodes quotes). Retained as `Q.attrEncode` compat shim.
+ * @deprecated Use {@link htmlEncode} directly (it also encodes quotes). Retained as `attrEncode` compat shim.
  * @see {@link htmlEncode}
  */
 export const attrEncode = htmlEncode;
@@ -33,7 +33,7 @@ export const attrEncode = htmlEncode;
 /**
  * Removes all child options/content from a `<select>` element.
  * @param select - Target element or array-like/jQuery-like wrapper containing it.
- * @remarks Resolves array-like wrappers via `isArrayLike` and clears with `innerHTML = ''`. No-op if the resolved element is falsy. Compat helper from `Q.clearOptions`.
+ * @remarks Resolves array-like wrappers via `isArrayLike` and clears with `innerHTML = ''`. No-op if the resolved element is falsy. Compat helper from `clearOptions`.
  */
 export function clearOptions(select: HTMLElement | ArrayLike<HTMLElement>) {
     select = isArrayLike(select) ? select[0] : select;
@@ -47,7 +47,7 @@ export function clearOptions(select: HTMLElement | ArrayLike<HTMLElement>) {
  * @param relativeId - Suffix to append to the source id (with/without leading `_`) when searching.
  * @param context - Scope element for `querySelector`; defaults to the source element's root node. When omitted the search also falls back to `document.getElementById`.
  * @returns The matched `HTMLElement`, or `null` if the source is `null` or no match is found.
- * @remarks Tries `"#" + fromId + relativeId` then `"#" + fromId + "_" + relativeId`, progressively stripping trailing `"_segment"` segments from `fromId` until a match or exhaustion. Compat helper from `Q.findElementWithRelativeId`.
+ * @remarks Tries `"#" + fromId + relativeId` then `"#" + fromId + "_" + relativeId`, progressively stripping trailing `"_segment"` segments from `fromId` until a match or exhaustion. Compat helper from `findElementWithRelativeId`.
  * @example
  * findElementWithRelativeId(document.getElementById("Customer_Name"), "_City"); // finds #Customer_City if present
  */
@@ -92,7 +92,7 @@ export function findElementWithRelativeId(element: HTMLElement | ArrayLike<HTMLE
 /**
  * Creates a new `<div>` and appends it to `document.body`.
  * @returns The newly created and appended `HTMLDivElement`.
- * @remarks Compat helper from `Q.newBodyDiv`; prefer `document.createElement` + explicit append in new code.
+ * @remarks Compat helper from `newBodyDiv`; prefer `document.createElement` + explicit append in new code.
  */
 export function newBodyDiv(): HTMLDivElement {
     const element = document.createElement("div");
@@ -104,7 +104,7 @@ export function newBodyDiv(): HTMLDivElement {
  * Returns the outer HTML markup of an element (including the element itself).
  * @param element - Target element, `Element`, or array-like/jQuery-like wrapper containing it.
  * @returns Outer HTML string. For non-Elements, clones the node into a temporary `<i>` wrapper and returns `innerHTML`; yields `""` for falsy targets.
- * @remarks Compat helper from `Q.outerHtml`; for new code prefer `element.outerHTML` directly.
+ * @remarks Compat helper from `outerHtml`; for new code prefer `element.outerHTML` directly.
  */
 export function outerHtml(element: Element | ArrayLike<HTMLElement>) {
     const el = document.createElement('i');

@@ -1,4 +1,4 @@
-﻿import { Column } from "@serenity-is/sleekgrid";
+import { Column } from "@serenity-is/sleekgrid";
 import { Fluent } from "../../base";
 import { ScriptData } from "../../compat";
 import { DataGrid, omitAllGridPersistenceFlags } from "./datagrid";
@@ -303,7 +303,7 @@ describe("DataGrid accessors", () => {
         const grid = createGrid();
         expect(grid.getGrid()).toBeTruthy();
         expect(grid.sleekGrid).toBe(grid.getGrid());
-        expect(grid.slickGrid).toBe(grid.getGrid());
+        expect((grid as any).slickGrid).toBe(grid.getGrid());
         grid.destroy();
     });
 

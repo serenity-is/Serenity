@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Determines whether a string ends with the specified suffix.
  * @deprecated Use {@link String.prototype.endsWith} directly — e.g. `s.endsWith(suffix)`.
  * @param s - The string to test.
@@ -63,7 +63,7 @@ export function startsWith(s: string, prefix: string): boolean {
  * @returns The single-line, trimmed string.
  */
 export function toSingleLine(str: string) {
-    return replaceAll(replaceAll(trimToEmpty(str), '\r\n', ' '), '\n', ' ').trim();
+    return trimToEmpty(str).replaceAll('\r\n', ' ').replaceAll('\n', ' ').trim();
 }
 
 /**
@@ -88,7 +88,7 @@ export const trimStart = function (s: string) {
 
 /**
  * Removes leading and trailing whitespace from a string.
- * @deprecated Use {@link String.prototype.trim} directly — this shim exists only for legacy `Q.trim` call sites.
+ * @deprecated Use {@link String.prototype.trim} directly — this shim exists only for legacy `trim` call sites.
  * @param s - The input string; `null`/`undefined` yields `undefined` (optional-chain semantics).
  * @returns The trimmed string, or `undefined` if `s` is `null`/`undefined`.
  */
@@ -113,7 +113,7 @@ export function trimToEmpty(s: string) {
 export function trimToNull(s: string) {
     if (s == null)
         return null;
-    s = trim(s);
+    s = s.trim();
     return s.length === 0 ? null : s;
 }
 

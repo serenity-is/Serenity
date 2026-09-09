@@ -27,7 +27,7 @@ export abstract class UserRow {
     static readonly localTextPrefix = 'Administration.User';
     static readonly lookupKey = 'Administration.User';
 
-    /** **deprecated** use getLookupAsync instead */
+    /** [DEPRECATED] use getLookupAsync instead */
     static getLookup() { return getLookup<UserRow>('Administration.User') }
     static async getLookupAsync() { return getLookupAsync<UserRow>('Administration.User') }
 

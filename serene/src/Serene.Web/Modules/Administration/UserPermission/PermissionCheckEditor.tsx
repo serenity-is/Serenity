@@ -1,7 +1,6 @@
 import {
-    Culture, DataGrid,
-    Dictionary, Fluent, GridUtils, Grouping, IGetEditValue, ISetEditValue, SlickFormatting, SlickTreeHelper,
-    ToolButton, WidgetProps, count, getRemoteDataAsync, localText, stripDiacritics, toGrouping, tryGetText
+    Culture, DataGrid, Fluent, GridUtils, Grouping, IGetEditValue, ISetEditValue, SlickFormatting, SlickTreeHelper,
+    ToolButton, WidgetProps, getRemoteDataAsync, localText, stripDiacritics, toGrouping
 } from "@serenity-is/corelib";
 import { Column } from "@serenity-is/sleekgrid";
 import { UserPermissionRow } from "../../ServerTypes/Administration";
@@ -25,7 +24,7 @@ export interface PermissionCheckItem {
 }
 
 export class PermissionCheckEditor<P extends PermissionCheckEditorOptions = PermissionCheckEditorOptions> extends DataGrid<PermissionCheckItem, P> {
-    static override[Symbol.typeInfo] = this.registerEditor(nsAdministration, [IGetEditValue, ISetEditValue]);
+    static override [Symbol.typeInfo] = this.registerEditor(nsAdministration, [IGetEditValue, ISetEditValue]);
 
     protected override getIdProperty() { return "Key"; }
 
@@ -35,7 +34,7 @@ export class PermissionCheckEditor<P extends PermissionCheckEditorOptions = Perm
     constructor(props: WidgetProps<P>) {
         super(props);
 
-        let titleByKey: Dictionary<string> = {};
+        let titleByKey: Record<string, string> = {};
         this.getSortedGroupAndPermissionKeys(titleByKey, (permissionKeys) => {
             if (!this.domNode)
                 return;
@@ -81,7 +80,7 @@ export class PermissionCheckEditor<P extends PermissionCheckEditorOptions = Perm
     private getItemEffectiveClass(item: PermissionCheckItem): string {
         if (item.IsGroup) {
             const desc = this.getDescendants(item, true);
-            const grantCount = count(desc, x => x.GrantRevoke === true || (x.GrantRevoke == null && this.hasByRoleOrImplicitly(x.Key)));
+            const grantCount = desc.filter(x => x.GrantRevoke === true || (x.GrantRevoke == null && this.hasByRoleOrImplicitly(x.Key))).length;
             return (grantCount === desc.length || desc.length === 0) ? 'allow' : (grantCount === 0 ? 'deny' : 'partial');
         }
 
@@ -210,7 +209,7 @@ export class PermissionCheckEditor<P extends PermissionCheckEditorOptions = Perm
         });
     }
 
-    private getSortedGroupAndPermissionKeys(titleByKey: Dictionary<string>, then: (result: string[]) => void) {
+    private getSortedGroupAndPermissionKeys(titleByKey: Record<string, string>, then: (result: string[]) => void) {
         getRemoteDataAsync(RemoteDataKeys.Administration.PermissionKeys).then((keys: string[]) => {
             let titleWithGroup = {};
             for (var s of keys.filter(s => s)) {

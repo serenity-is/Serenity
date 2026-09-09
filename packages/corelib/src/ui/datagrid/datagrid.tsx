@@ -2,7 +2,7 @@ import { bindThis } from "@serenity-is/domwise";
 import { AutoTooltips, Column, ColumnSort, FormatterContext, SleekGrid, type CellMouseEvent, type GridOptions, type GridSortEvent, type ISleekGrid } from "@serenity-is/sleekgrid";
 import { Authorization, Criteria, DataGridTexts, Fluent, ListResponse, cssEscape, debounce, getInstanceType, getTypeFullName, getjQuery, nsSerenity, tryGetText, type PropertyItem, type PropertyItemsData } from "../../base";
 import { PubSub } from "../../base/pubsub";
-import { LayoutTimer, ScriptData, getColumnsData, getColumnsDataAsync, setEquality } from "../../compat";
+import { LayoutTimer, ScriptData, canLoadScriptData, getColumnsData, getColumnsDataAsync } from "../../compat";
 import { IReadOnly } from "../../interfaces";
 import { Format, IRemoteView, PagerOptions, RemoteView, RemoteViewOptions } from "../../slick";
 import { AdvancedFilteringAttribute } from "../../types/attributes";
@@ -877,7 +877,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
      * @param value - Equality value.
      */
     protected setEquality(field: string, value: any): void {
-        setEquality(this.view.params, field, value);
+        (this.view.params.EqualityFilter ??= {})[field] = value;
     }
 
     /**
@@ -1142,7 +1142,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
             itemId: id,
             children: children,
             cssClass: props.cssClass,
-            tabindex: props.tabindex ?? props.tabIndex,
+            tabindex: props.tabindex ?? (props as any).tabIndex,
         })
     }
 
@@ -1171,7 +1171,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
 
         if (this.getColumnsKey === DataGrid.prototype.getColumnsKey &&
             this.getPropertyItems !== DataGrid.prototype.getPropertyItems &&
-            !ScriptData.canLoad('Columns.' + columnsKey)) {
+            !canLoadScriptData('Columns.' + columnsKey)) {
             return {
                 items: this.getPropertyItems(),
                 additionalItems: []

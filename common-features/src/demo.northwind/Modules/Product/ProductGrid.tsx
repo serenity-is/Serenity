@@ -1,4 +1,4 @@
-import { Attributes, Dictionary, EditorUtils, EntityGrid, FormValidationTexts, Lookup, WidgetProps, deepClone, formatNumber, notifyError, parseDecimal, parseInteger, parseQueryString, serviceRequest, toId } from "@serenity-is/corelib";
+import { Attributes, EditorUtils, EntityGrid, FormValidationTexts, Lookup, WidgetProps, deepClone, formatNumber, notifyError, parseDecimal, parseInteger, parseQueryString, serviceRequest, toId } from "@serenity-is/corelib";
 import { ExcelExportHelper, PdfExportHelper } from "@serenity-is/extensions";
 import { Column, FormatterContext, FormatterResult, NonDataRow } from "@serenity-is/sleekgrid";
 import { CategoryRow, ProductColumns, ProductRow, ProductService, SupplierRow } from "../ServerTypes/Demo";
@@ -13,7 +13,7 @@ export class ProductGrid<P = {}> extends EntityGrid<ProductRow, P> {
     protected override getRowDefinition() { return ProductRow; }
     protected override getService() { return ProductService.baseUrl; }
 
-    declare private pendingChanges: Dictionary<any>;
+    declare private pendingChanges: Record<string, any>;
 
     constructor(props: WidgetProps<P>) {
         super(props);
