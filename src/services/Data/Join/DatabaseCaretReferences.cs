@@ -46,7 +46,35 @@ public class DatabaseCaretReferences
     }
 
     /// <summary>
-    /// Temporary workaround as this class has no reference to SQL connection strings
+    /// Temporary workaround as this class has no reference to SQL connection strings.
+    /// Getter returns the local resolver if any is set through
+    /// <see cref="SetLocalGetDatabaseName"/>, otherwise the default one.
+    /// The default resolver should only be set on application start.
+    /// The local resolver should be used for unit tests.
     /// </summary>
-    public static Func<string, string>? GetDatabaseName { get; set; }
+    public static Func<string, string>? GetDatabaseName
+    {
+        get => localGetDatabaseName.Value ?? defaultGetDatabaseName;
+        set => defaultGetDatabaseName = value;
+    }
+
+    /// <summary>
+    /// Sets the local database name resolver for the current thread and async context.
+    /// Useful for background tasks, async methods, and testing to
+    /// set the resolver locally and for auto spawned threads.
+    /// </summary>
+    /// <param name="resolver">The resolver. Can be null.</param>
+    /// <returns>The old local resolver, if any.</returns>
+    public static Func<string, string>? SetLocalGetDatabaseName(Func<string, string>? resolver)
+    {
+        var old = localGetDatabaseName.Value;
+        localGetDatabaseName.Value = resolver;
+        return old;
+    }
+
+    /// <summary>The default database name resolver.</summary>
+    private static Func<string, string>? defaultGetDatabaseName;
+
+    /// <summary>The local database name resolver for the current thread and async context.</summary>
+    private static readonly AsyncLocal<Func<string, string>?> localGetDatabaseName = new();
 }
