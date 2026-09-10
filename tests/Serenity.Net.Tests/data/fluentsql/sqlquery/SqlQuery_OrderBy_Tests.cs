@@ -5,10 +5,10 @@ public partial class SqlQuery_OrderBy_Tests
     [Fact]
     public void OrderByWithEmptyOrNullArgumentsThrowsArgumentNull()
     {
-        Assert.Throws<ArgumentNullException>(() => new SqlQuery().OrderBy((string)null));
+        Assert.Throws<ArgumentNullException>(() => new SqlQuery().OrderBy(null));
         Assert.Throws<ArgumentNullException>(() => new SqlQuery().OrderBy(String.Empty));
-        Assert.Throws<ArgumentNullException>(() => new SqlQuery().OrderBy((Alias)null, "x"));
-        Assert.Throws<ArgumentNullException>(() => new SqlQuery().OrderBy(new Alias("x"), (string)null));
+        Assert.Throws<ArgumentNullException>(() => new SqlQuery().OrderBy(null, "x"));
+        Assert.Throws<ArgumentNullException>(() => new SqlQuery().OrderBy(new Alias("x"), null));
         Assert.Throws<ArgumentNullException>(() => new SqlQuery().OrderBy(new Alias("x"), String.Empty));
     }
 
@@ -63,8 +63,8 @@ public partial class SqlQuery_OrderBy_Tests
     [Fact]
     public void OrderByFirstWithEmptyOrNullArgumentsThrowsArgumentNull()
     {
-        Assert.Throws<ArgumentNullException>(() => new SqlQuery().OrderByFirst((string)null, desc: false));
-        Assert.Throws<ArgumentNullException>(() => new SqlQuery().OrderByFirst((string)null, desc: true));
+        Assert.Throws<ArgumentNullException>(() => new SqlQuery().OrderByFirst(null, desc: false));
+        Assert.Throws<ArgumentNullException>(() => new SqlQuery().OrderByFirst(null, desc: true));
         Assert.Throws<ArgumentNullException>(() => new SqlQuery().OrderByFirst("", desc: false));
         Assert.Throws<ArgumentNullException>(() => new SqlQuery().OrderByFirst("", desc: true));
     }

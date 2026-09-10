@@ -243,19 +243,12 @@ public class AuthorizationExtensionsTests
         }
     }
 
-    private class MockUserProvider : IUserProvider
+    private class MockUserProvider(IUserAccessor accessor, IUserRetrieveService? retriever = null,
+        IUserClaimCreator? claimCreator = null) : IUserProvider
     {
-        private readonly IUserAccessor accessor;
-        private readonly IUserRetrieveService retriever;
-        private readonly IUserClaimCreator claimCreator;
-
-        public MockUserProvider(IUserAccessor accessor, IUserRetrieveService? retriever = null,
-            IUserClaimCreator? claimCreator = null)
-        {
-            this.accessor = accessor;
-            this.retriever = retriever ?? new MockUserRetrieveService();
-            this.claimCreator = claimCreator ?? new MockUserClaimCreator();
-        }
+        private readonly IUserAccessor accessor = accessor;
+        private readonly IUserRetrieveService retriever = retriever ?? new MockUserRetrieveService();
+        private readonly IUserClaimCreator claimCreator = claimCreator ?? new MockUserClaimCreator();
 
         public ClaimsPrincipal User => accessor.User;
         public IUserDefinition ById(string id) => retriever.ById(id);

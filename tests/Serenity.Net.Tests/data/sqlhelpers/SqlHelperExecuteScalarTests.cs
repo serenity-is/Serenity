@@ -22,7 +22,7 @@ public class SqlHelperExecuteScalarTests
     public void ExecuteScalar_InterceptorReturnsEmpty_ExecutesCommand()
     {
         using var connection = new MockDbConnection()
-            .InterceptExecuteScalar(_ => default(OptionalValue<object>))
+            .InterceptExecuteScalar(_ => default)
             .OnDbCommandExecuteScalar(_ => 7);
 
         var result = SqlHelper.ExecuteScalar(connection, "SELECT COUNT(*) FROM [Table]");
@@ -72,7 +72,7 @@ public class SqlHelperExecuteScalarTests
     public void ExecuteScalar_WithQuery_InterceptorReturnsEmpty_ExecutesCommand()
     {
         using var connection = new MockDbConnection()
-            .InterceptExecuteScalar(_ => default(OptionalValue<object>))
+            .InterceptExecuteScalar(_ => default)
             .OnDbCommandExecuteScalar(_ => 9);
 
         var query = new SqlQuery().From("Table").Select("COUNT(*)");
@@ -108,7 +108,7 @@ public class SqlHelperExecuteScalarTests
     public async Task ExecuteScalarAsync_InterceptorReturnsEmpty_ExecutesCommand()
     {
         using var connection = new MockDbConnection()
-            .InterceptExecuteScalar(_ => default(OptionalValue<object>))
+            .InterceptExecuteScalar(_ => default)
             .OnDbCommandExecuteScalar(_ => 7);
 
         var result = await SqlHelper.ExecuteScalarAsync(connection, "SELECT COUNT(*) FROM [Table]",

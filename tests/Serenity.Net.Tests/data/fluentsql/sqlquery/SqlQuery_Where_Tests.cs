@@ -17,7 +17,7 @@ public class SqlQuery_Where_Tests
     [Fact]
     public void WhereWithEmptyOrNullArgumentsThrowsArgumentNull()
     {
-        Assert.Throws<ArgumentNullException>(() => new SqlQuery().Where((string)null));
+        Assert.Throws<ArgumentNullException>(() => new SqlQuery().Where(null));
         Assert.Throws<ArgumentNullException>(() => new SqlQuery().Where(String.Empty));
     }
 }

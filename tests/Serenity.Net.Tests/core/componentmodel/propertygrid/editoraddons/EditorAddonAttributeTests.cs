@@ -2,12 +2,8 @@ namespace Serenity.ComponentModel;
 
 public class EditorAddonAttributeTests
 {
-    private class TestAddonAttribute : EditorAddonAttribute
+    private class TestAddonAttribute(string type) : EditorAddonAttribute(type)
     {
-        public TestAddonAttribute(string type) : base(type)
-        {
-        }
-
         public void SetTestOption(string key, object? value) => SetOption(key, value);
         public TType GetTestOption<TType>(string key) => GetOption<TType>(key);
     }

@@ -97,7 +97,7 @@ public class SqlDebugDumperTests
     [Fact]
     public void Dump_ParameterValueIFormattable_UsesInvariant()
     {
-        var result = SqlDebugDumper.Dump("X = @p1", MakePrm("@p1", (object)5.5d));
+        var result = SqlDebugDumper.Dump("X = @p1", MakePrm("@p1", 5.5d));
 
         Assert.Equal("X = 5.5", result);
     }

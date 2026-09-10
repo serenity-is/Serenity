@@ -85,9 +85,11 @@ public class ValidationErrorTests
     [Fact]
     public void ErrorCode_And_Arguments_AreSettable()
     {
-        var ex = new ValidationError();
-        ex.ErrorCode = "NewCode";
-        ex.Arguments = "NewArgs";
+        var ex = new ValidationError
+        {
+            ErrorCode = "NewCode",
+            Arguments = "NewArgs"
+        };
         Assert.Equal("NewCode", ex.ErrorCode);
         Assert.Equal("NewArgs", ex.Arguments);
     }

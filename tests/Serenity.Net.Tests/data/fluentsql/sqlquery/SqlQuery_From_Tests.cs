@@ -39,11 +39,11 @@ public class SqlQuery_From_Tests
         Assert.Throws<ArgumentNullException>(() => new SqlQuery().From((string)null));
         Assert.Throws<ArgumentNullException>(() => new SqlQuery().From(""));
         Assert.Throws<ArgumentNullException>(() => new SqlQuery().From((Alias)null));
-        Assert.Throws<ArgumentNullException>(() => new SqlQuery().From((string)null, (Alias)null));
-        Assert.Throws<ArgumentNullException>(() => new SqlQuery().From("", (Alias)null));
-        Assert.Throws<ArgumentNullException>(() => new SqlQuery().From("x", (Alias)null));
+        Assert.Throws<ArgumentNullException>(() => new SqlQuery().From((string)null, null));
+        Assert.Throws<ArgumentNullException>(() => new SqlQuery().From("", null));
+        Assert.Throws<ArgumentNullException>(() => new SqlQuery().From("x", null));
         Assert.Throws<ArgumentNullException>(() => new SqlQuery().From((ISqlQuery)null, new Alias("x")));
-        Assert.Throws<ArgumentNullException>(() => new SqlQuery().From(new SqlQuery(), (Alias)null));
+        Assert.Throws<ArgumentNullException>(() => new SqlQuery().From(new SqlQuery(), null));
     }
 
     [Fact]

@@ -88,7 +88,7 @@ public class TimeSpanFieldTests
     {
         var row = NewRow();
         var field = AllFieldsRow.Fields.ATimeSpan;
-        using var reader = new MockDbDataReader([new { ATimeSpan = (string?)"10:30:00" }]);
+        using var reader = new MockDbDataReader([new { ATimeSpan = "10:30:00" }]);
         reader.Read();
         field.GetFromReader(reader, 0, row);
         Assert.Equal(new TimeSpan(10, 30, 0), field[row]);
@@ -113,8 +113,8 @@ public class TimeSpanFieldTests
         var row1 = NewRow();
         var row2 = NewRow();
         var field = AllFieldsRow.Fields.ATimeSpan;
-        field[row1] = v1 == null ? (TimeSpan?)null : TimeSpan.Parse(v1, CultureInfo.InvariantCulture);
-        field[row2] = v2 == null ? (TimeSpan?)null : TimeSpan.Parse(v2, CultureInfo.InvariantCulture);
+        field[row1] = v1 == null ? null : TimeSpan.Parse(v1, CultureInfo.InvariantCulture);
+        field[row2] = v2 == null ? null : TimeSpan.Parse(v2, CultureInfo.InvariantCulture);
         var result = field.IndexCompare(row1, row2);
         Assert.Equal(Math.Sign(expectedSign), Math.Sign(result));
     }

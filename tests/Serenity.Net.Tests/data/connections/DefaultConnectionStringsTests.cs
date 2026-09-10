@@ -152,13 +152,15 @@ public class DefaultConnectionStringsTests
     [Fact]
     public void ResolveConnectionKey_FallsBackToFallbackForOwner()
     {
-        var options = new ConnectionStringOptions();
-        options["Default"] = Entry();
-        options["ProFeatures"] = new ConnectionStringEntry
+        var options = new ConnectionStringOptions
         {
-            ConnectionString = "cs",
-            ProviderName = "System.Data.SqlClient",
-            FallbackFor = "Default"
+            ["Default"] = Entry(),
+            ["ProFeatures"] = new ConnectionStringEntry
+            {
+                ConnectionString = "cs",
+                ProviderName = "System.Data.SqlClient",
+                FallbackFor = "Default"
+            }
         };
 
         var cs = new DefaultConnectionStrings(options);
@@ -170,9 +172,11 @@ public class DefaultConnectionStringsTests
     [Fact]
     public void ConnectionKeyFallbackCycle_ThrowsInvalidOperationException()
     {
-        var options = new ConnectionStringOptions();
-        options["A"] = new ConnectionStringEntry { ConnectionString = "cs", FallbackFor = "B" };
-        options["B"] = new ConnectionStringEntry { ConnectionString = "cs", FallbackFor = "A" };
+        var options = new ConnectionStringOptions
+        {
+            ["A"] = new ConnectionStringEntry { ConnectionString = "cs", FallbackFor = "B" },
+            ["B"] = new ConnectionStringEntry { ConnectionString = "cs", FallbackFor = "A" }
+        };
 
         var cs = new DefaultConnectionStrings(options);
 
@@ -198,10 +202,12 @@ public class DefaultConnectionStringsTests
     [Fact]
     public void GetConnectionKeysResolvingTo_ListsOwners()
     {
-        var options = new ConnectionStringOptions();
-        options["Default"] = Entry();
-        options["Pro"] = new ConnectionStringEntry { ConnectionString = "cs", FallbackFor = "Default" };
-        options["Unrelated"] = Entry();
+        var options = new ConnectionStringOptions
+        {
+            ["Default"] = Entry(),
+            ["Pro"] = new ConnectionStringEntry { ConnectionString = "cs", FallbackFor = "Default" },
+            ["Unrelated"] = Entry()
+        };
 
         var cs = new DefaultConnectionStrings(options);
 

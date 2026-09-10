@@ -2,14 +2,9 @@ namespace Serenity.ComponentModel;
 
 public class BaseUploadEditorAttributeTests
 {
-    private class MyBaseUploadEditorAttribute : BaseUploadEditorAttribute
+    private class MyBaseUploadEditorAttribute(string editorType, bool isMultiple) : BaseUploadEditorAttribute(editorType)
     {
-        public MyBaseUploadEditorAttribute(string editorType, bool isMultiple) : base(editorType)
-        {
-            _isMultiple = isMultiple;
-        }
-
-        private readonly bool _isMultiple;
+        private readonly bool _isMultiple = isMultiple;
         public override bool IsMultiple => _isMultiple;
     }
 

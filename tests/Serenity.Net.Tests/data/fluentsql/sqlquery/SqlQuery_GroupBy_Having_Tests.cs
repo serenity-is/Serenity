@@ -37,7 +37,7 @@ public class SqlQuery_GroupBy_Having_Tests
     [Fact]
     public void HavingWithEmptyOrNullArgumentsThrowsArgumentNull()
     {
-        Assert.Throws<ArgumentNullException>(() => new SqlQuery().Having((string)null));
+        Assert.Throws<ArgumentNullException>(() => new SqlQuery().Having(null));
         Assert.Throws<ArgumentNullException>(() => new SqlQuery().Having(String.Empty));
     }
 

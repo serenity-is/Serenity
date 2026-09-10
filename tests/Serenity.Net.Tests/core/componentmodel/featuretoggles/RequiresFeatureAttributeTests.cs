@@ -18,7 +18,7 @@ public class RequiresFeatureAttributeTests
     [Fact]
     public void Ctor_WithNullStringFeatures_ThrowsArgumentNullException()
     {
-        Assert.Throws<ArgumentNullException>(() => new RequiresFeatureAttribute((string[])null));
+        Assert.Throws<ArgumentNullException>(() => new RequiresFeatureAttribute(null));
     }
 
     [Fact]

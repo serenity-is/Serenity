@@ -113,8 +113,8 @@ public class DateOnlyFieldTests
         var row1 = NewRow();
         var row2 = NewRow();
         var field = AllFieldsRow.Fields.ADateOnly;
-        field[row1] = v1 == null ? (DateOnly?)null : DateOnly.Parse(v1, CultureInfo.InvariantCulture);
-        field[row2] = v2 == null ? (DateOnly?)null : DateOnly.Parse(v2, CultureInfo.InvariantCulture);
+        field[row1] = v1 == null ? null : DateOnly.Parse(v1, CultureInfo.InvariantCulture);
+        field[row2] = v2 == null ? null : DateOnly.Parse(v2, CultureInfo.InvariantCulture);
         var result = field.IndexCompare(row1, row2);
         Assert.Equal(Math.Sign(expectedSign), Math.Sign(result));
     }

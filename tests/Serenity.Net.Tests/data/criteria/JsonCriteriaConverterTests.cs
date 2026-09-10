@@ -45,52 +45,52 @@ public class JsonCriteriaConverterTests
     [Fact]
     public void Write_NullCriteria_WritesNull()
     {
-        Assert.Equal("null", Newtonsoft.Json.JsonConvert.SerializeObject((BaseCriteria?)null, GetSettings()));
+        Assert.Equal("null", Newtonsoft.Json.JsonConvert.SerializeObject(null, GetSettings()));
     }
 
     [Fact]
     public void Write_EmptyCriteria_WritesNull()
     {
-        Assert.Equal("null", Newtonsoft.Json.JsonConvert.SerializeObject((BaseCriteria)Criteria.Empty, GetSettings()));
+        Assert.Equal("null", Newtonsoft.Json.JsonConvert.SerializeObject(Criteria.Empty, GetSettings()));
     }
 
     [Fact]
     public void Write_ValueCriteriaString_WritesString()
     {
-        Assert.Equal("\"test\"", Newtonsoft.Json.JsonConvert.SerializeObject((BaseCriteria)new ValueCriteria("test"), GetSettings()));
+        Assert.Equal("\"test\"", Newtonsoft.Json.JsonConvert.SerializeObject(new ValueCriteria("test"), GetSettings()));
     }
 
     [Fact]
     public void Write_ValueCriteriaArray_IsWrappedInOuterArray()
     {
         Assert.Equal("[[\"a\",\"b\"]]", Newtonsoft.Json.JsonConvert.SerializeObject(
-            (BaseCriteria)new ValueCriteria(new object[] { "a", "b" }), GetSettings()));
+            new ValueCriteria(new object[] { "a", "b" }), GetSettings()));
     }
 
     [Fact]
     public void Write_ValueCriteriaOperatorFirstArray_IsWrapped()
     {
         Assert.Equal("[[\">\",\"a\",\"b\"]]", Newtonsoft.Json.JsonConvert.SerializeObject(
-            (BaseCriteria)new ValueCriteria(new object[] { ">", "a", "b" }), GetSettings()));
+            new ValueCriteria(new object[] { ">", "a", "b" }), GetSettings()));
     }
 
     [Fact]
     public void Write_ParamCriteria_WritesNameAsArray()
     {
-        Assert.Equal("[\"@p1\"]", Newtonsoft.Json.JsonConvert.SerializeObject((BaseCriteria)new ParamCriteria("@p1"), GetSettings()));
+        Assert.Equal("[\"@p1\"]", Newtonsoft.Json.JsonConvert.SerializeObject(new ParamCriteria("@p1"), GetSettings()));
     }
 
     [Fact]
     public void Write_Criteria_WritesExpressionAsArray()
     {
-        Assert.Equal("[\"Name\"]", Newtonsoft.Json.JsonConvert.SerializeObject((BaseCriteria)new Criteria("Name"), GetSettings()));
+        Assert.Equal("[\"Name\"]", Newtonsoft.Json.JsonConvert.SerializeObject(new Criteria("Name"), GetSettings()));
     }
 
     [Fact]
     public void Write_UnaryCriteria_WritesOperatorKeyAndOperand()
     {
         Assert.Equal("[\"is null\",[\"Name\"]]", Newtonsoft.Json.JsonConvert.SerializeObject(
-            (BaseCriteria)new Criteria("Name").IsNull(), GetSettings()));
+            new Criteria("Name").IsNull(), GetSettings()));
     }
 
     [Fact]
@@ -106,7 +106,7 @@ public class JsonCriteriaConverterTests
     public void Write_UnsupportedCriteriaType_ThrowsJsonSerializationException()
     {
         var ex = Assert.Throws<Newtonsoft.Json.JsonSerializationException>(() =>
-            Newtonsoft.Json.JsonConvert.SerializeObject((BaseCriteria)new CustomCriteria(), GetSettings()));
+            Newtonsoft.Json.JsonConvert.SerializeObject(new CustomCriteria(), GetSettings()));
 
         Assert.Contains("Can't serialize criteria of type", ex.Message);
     }
@@ -115,7 +115,7 @@ public class JsonCriteriaConverterTests
     public void Write_GenericListValue_SerializedByNestedSerializer()
     {
         var json = Newtonsoft.Json.JsonConvert.SerializeObject(
-            (BaseCriteria)new ValueCriteria(new List<int> { 1, 2, 3 }), GetSettings());
+            new ValueCriteria(new List<int> { 1, 2, 3 }), GetSettings());
 
         Assert.Equal("[[1,2,3]]", json);
     }
@@ -151,7 +151,7 @@ public class JsonCriteriaConverterTests
         var result = Newtonsoft.Json.JsonConvert.DeserializeObject<BaseCriteria>("[[\"a\",\"b\",true,3]]", GetSettings())!;
 
         var value = Assert.IsType<object[]>(((ValueCriteria)result).Value);
-        Assert.Equal(new object[] { "a", "b", true, 3L }, value);
+        Assert.Equal(["a", "b", true, 3L], value);
     }
 
     [Fact]
@@ -311,7 +311,7 @@ public class JsonCriteriaConverterTests
             new ValueCriteria(new object[] { ">", "a", "b" }))!);
 
         var value = Assert.IsType<object[]>(result.Value);
-        Assert.Equal(new object[] { ">", "a", "b" }, value);
+        Assert.Equal([">", "a", "b"], value);
     }
 
     [Fact]

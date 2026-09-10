@@ -199,7 +199,7 @@ public class CriteriaJsonConverterTests
 
         Assert.IsType<ValueCriteria>(result);
         var value = Assert.IsType<object[]>(((ValueCriteria)result).Value);
-        Assert.Equal(new object[] { "a", "b", true, false, 3.0 }, value);
+        Assert.Equal(["a", "b", true, false, 3.0], value);
     }
 
     [Fact]
@@ -428,7 +428,7 @@ public class CriteriaJsonConverterTests
         var result = Assert.IsType<ValueCriteria>(RoundTrip(criteria));
 
         var value = Assert.IsType<object[]>(result.Value);
-        Assert.Equal(new object[] { ">", "a", "b" }, value);
+        Assert.Equal([">", "a", "b"], value);
     }
 
     [Fact]

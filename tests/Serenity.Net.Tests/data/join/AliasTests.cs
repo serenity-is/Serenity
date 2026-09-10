@@ -67,7 +67,7 @@ public class AliasTests
     [Fact]
     public void Alias_With_Null_Name_Throws_ArgumentNullException()
     {
-        Assert.Throws<ArgumentNullException>(() => new Alias((string)null!));
+        Assert.Throws<ArgumentNullException>(() => new Alias(null!));
     }
 
     [Fact]
@@ -98,7 +98,7 @@ public class AliasTests
     {
         var alias = new Alias("x");
 
-        Assert.Equal("x.FieldName", alias[(IField)new MyField()]);
+        Assert.Equal("x.FieldName", alias[new MyField()]);
     }
 
     [Fact]
@@ -142,7 +142,7 @@ public class AliasTests
     {
         var alias = new Alias("x");
 
-        Assert.Equal("x.FieldName", alias + (IField)new MyField());
+        Assert.Equal("x.FieldName", alias + new MyField());
     }
 
     [Fact]

@@ -45,7 +45,7 @@ public class JsonStringHashSetConverterTests
     [Fact]
     public void Serializes_Null_ToNull()
     {
-        Assert.Equal("null", JsonConvert.SerializeObject((object)null, settings));
+        Assert.Equal("null", JsonConvert.SerializeObject(null, settings));
     }
 
     [Fact]

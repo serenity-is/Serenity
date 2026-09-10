@@ -35,7 +35,7 @@ public class SqlHelperExecuteUpsertTests
     public void ExecuteUpsert_InterceptorReturnsEmpty_ExecutesCommand()
     {
         using var connection = new MockDbConnection { Dialect = SqlServer2012Dialect.Instance }
-            .InterceptExecuteNonQuery(_ => default(OptionalValue<long?>))
+            .InterceptExecuteNonQuery(_ => default)
             .OnDbCommandExecuteNonQuery(_ => 1);
 
         var query = new SqlInsert("Table").SetTo("Id", "1").SetTo("X", "2");

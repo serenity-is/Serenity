@@ -26,7 +26,7 @@ public class SqlHelperExecuteUpdateDeleteTests
     public void ExecuteUpdate_InterceptorReturnsEmpty_ExecutesCommand()
     {
         using var connection = new MockDbConnection()
-            .InterceptExecuteNonQuery(_ => default(OptionalValue<long?>))
+            .InterceptExecuteNonQuery(_ => default)
             .OnDbCommandExecuteNonQuery(_ => 1);
 
         var query = new SqlUpdate("Table").SetTo("X", "1").Where("Id = 1");
@@ -123,7 +123,7 @@ public class SqlHelperExecuteUpdateDeleteTests
     public void ExecuteDelete_InterceptorReturnsEmpty_ExecutesCommand()
     {
         using var connection = new MockDbConnection()
-            .InterceptExecuteNonQuery(_ => default(OptionalValue<long?>))
+            .InterceptExecuteNonQuery(_ => default)
             .OnDbCommandExecuteNonQuery(_ => 1);
 
         var query = new SqlDelete("Table").Where("Id = 1");

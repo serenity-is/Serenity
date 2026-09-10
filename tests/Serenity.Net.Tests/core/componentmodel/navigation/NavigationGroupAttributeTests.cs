@@ -47,8 +47,10 @@ public class NavigationGroupAttributeTests
     [Fact]
     public void DefaultProperty_CanBeSetAndRetrieved()
     {
-        var attribute = new NavigationGroupAttribute("Title");
-        attribute.Default = true;
+        var attribute = new NavigationGroupAttribute("Title")
+        {
+            Default = true
+        };
         Assert.True(attribute.Default);
     }
 }

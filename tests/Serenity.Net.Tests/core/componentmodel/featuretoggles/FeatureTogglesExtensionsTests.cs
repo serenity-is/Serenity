@@ -8,14 +8,9 @@ public class FeatureTogglesExtensionsTests
         Feature2
     }
 
-    private class MockFeatureToggles : IFeatureToggles
+    private class MockFeatureToggles(params string[] enabled) : IFeatureToggles
     {
-        private readonly HashSet<string> enabled;
-
-        public MockFeatureToggles(params string[] enabled)
-        {
-            this.enabled = new HashSet<string>(enabled, StringComparer.Ordinal);
-        }
+        private readonly HashSet<string> enabled = new HashSet<string>(enabled, StringComparer.Ordinal);
 
         public bool IsEnabled(string feature)
         {

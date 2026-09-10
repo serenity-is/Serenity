@@ -23,7 +23,7 @@ public class SqlHelperExecuteNonQueryTests
     public void ExecuteNonQuery_InterceptorReturnsEmpty_ExecutesCommand()
     {
         using var connection = new MockDbConnection()
-            .InterceptExecuteNonQuery(_ => default(OptionalValue<long?>))
+            .InterceptExecuteNonQuery(_ => default)
             .OnDbCommandExecuteNonQuery(_ => 7);
 
         var result = SqlHelper.ExecuteNonQuery(connection, "UPDATE [Table] SET [X] = 1");
@@ -113,7 +113,7 @@ public class SqlHelperExecuteNonQueryTests
     public async Task ExecuteNonQueryAsync_InterceptorReturnsEmpty_ExecutesCommand()
     {
         using var connection = new MockDbConnection()
-            .InterceptExecuteNonQuery(_ => default(OptionalValue<long?>))
+            .InterceptExecuteNonQuery(_ => default)
             .OnDbCommandExecuteNonQuery(_ => 7);
 
         var result = await SqlHelper.ExecuteNonQueryAsync(connection, "UPDATE [Table] SET [X] = 1",

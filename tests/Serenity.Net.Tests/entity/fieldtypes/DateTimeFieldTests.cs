@@ -88,7 +88,7 @@ public class DateTimeFieldTests
     {
         var row = NewRow();
         var field = AllFieldsRow.Fields.ADateTime;
-        using var reader = new MockDbDataReader([new { ADateTime = (string?)"2024-01-15" }]);
+        using var reader = new MockDbDataReader([new { ADateTime = "2024-01-15" }]);
         reader.Read();
         field.GetFromReader(reader, 0, row);
         Assert.Equal(new DateTime(2024, 1, 15), field[row]);
@@ -113,8 +113,8 @@ public class DateTimeFieldTests
         var row1 = NewRow();
         var row2 = NewRow();
         var field = AllFieldsRow.Fields.ADateTime;
-        field[row1] = v1 == null ? (DateTime?)null : DateTime.Parse(v1, CultureInfo.InvariantCulture);
-        field[row2] = v2 == null ? (DateTime?)null : DateTime.Parse(v2, CultureInfo.InvariantCulture);
+        field[row1] = v1 == null ? null : DateTime.Parse(v1, CultureInfo.InvariantCulture);
+        field[row2] = v2 == null ? null : DateTime.Parse(v2, CultureInfo.InvariantCulture);
         var result = field.IndexCompare(row1, row2);
         Assert.Equal(Math.Sign(expectedSign), Math.Sign(result));
     }

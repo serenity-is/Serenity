@@ -13,7 +13,7 @@ public class DeltaListerTests
     {
         Assert.Throws<ArgumentNullException>(() => new DeltaLister<int?>(null!, [], i => i));
         Assert.Throws<ArgumentNullException>(() => new DeltaLister<int?>([], null!, i => i));
-        Assert.Throws<ArgumentNullException>(() => new DeltaLister<int?>([], [], (Func<int?, long?>)null!));
+        Assert.Throws<ArgumentNullException>(() => new DeltaLister<int?>([], [], null!));
     }
 
     [Fact]
@@ -29,7 +29,7 @@ public class DeltaListerTests
     {
         var lister = new DeltaLister<int?>(new int?[] { 2 }.ToList(), new int?[] { 3, 7 }.ToList(), i => i == 7 ? null : i);
 
-        Assert.Equal(new int?[] { 3, 7 }, lister.ItemsToCreate.Cast<int?>().ToArray());
+        Assert.Equal([3, 7], lister.ItemsToCreate.Cast<int?>().ToArray());
     }
 
     [Fact]
@@ -59,7 +59,7 @@ public class DeltaListerTests
     public void NewItemWithUnknownId_Throws_WhenIgnoreInvalidNewIdNotSet()
     {
         Assert.Throws<ArgumentOutOfRangeException>(() =>
-            GetLister([1, 2], [99], (DeltaOptions)0));
+            GetLister([1, 2], [99], 0));
     }
 
     [Fact]

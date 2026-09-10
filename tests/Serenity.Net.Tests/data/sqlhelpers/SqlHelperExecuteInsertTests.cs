@@ -26,7 +26,7 @@ public class SqlHelperExecuteInsertTests
     public void Execute_InterceptorReturnsEmpty_ExecutesCommand()
     {
         using var connection = new MockDbConnection()
-            .InterceptExecuteNonQuery(_ => default(OptionalValue<long?>))
+            .InterceptExecuteNonQuery(_ => default)
             .OnDbCommandExecuteNonQuery(_ => 1);
 
         var query = new SqlInsert("Table").SetTo("X", "1");

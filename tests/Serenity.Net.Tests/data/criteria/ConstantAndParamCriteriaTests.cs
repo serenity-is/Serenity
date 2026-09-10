@@ -17,7 +17,7 @@ public class ConstantAndParamCriteriaTests
     [Fact]
     public void ConstantCriteria_IntArray()
     {
-        Assert.Equal("1,2,3", new ConstantCriteria(new[] { 1, 2, 3 }).ToString());
+        Assert.Equal("1,2,3", new ConstantCriteria([1, 2, 3]).ToString());
     }
 
     [Fact]
@@ -42,7 +42,7 @@ public class ConstantAndParamCriteriaTests
     [Fact]
     public void ConstantCriteria_StringArray()
     {
-        Assert.Equal("N'a',N'b'", new ConstantCriteria(new[] { "a", "b" }).ToString());
+        Assert.Equal("N'a',N'b'", new ConstantCriteria(["a", "b"]).ToString());
     }
 
     [Fact]
@@ -58,7 +58,7 @@ public class ConstantAndParamCriteriaTests
         // Constant criteria never produce parameters, so ToString() works without a query.
         Assert.Equal("5", new ConstantCriteria(5).ToString());
         Assert.Equal("N'x'", new ConstantCriteria("x").ToString());
-        Assert.Equal("1,2,3", new ConstantCriteria(new[] { 1, 2, 3 }).ToString());
+        Assert.Equal("1,2,3", new ConstantCriteria([1, 2, 3]).ToString());
     }
 
     [Fact]
@@ -141,17 +141,12 @@ public class ConstantAndParamCriteriaTests
         }
     }
 
-    private class HookedFunc : FunctionCallCriteria
+    private class HookedFunc(params BaseCriteria[] args) : FunctionCallCriteria(args)
     {
         public bool FunctionNameAppended { get; private set; }
         public bool OpenParenAppended { get; private set; }
         public bool ArgumentsAppended { get; private set; }
         public bool CloseParenAppended { get; private set; }
-
-        public HookedFunc(params BaseCriteria[] args)
-            : base(args)
-        {
-        }
 
         public override string GetFunctionName(ISqlDialect dialect)
         {

@@ -23,7 +23,7 @@ public class SqlHelperExecuteReaderTests
     public void ExecuteReader_InterceptorReturnsEmpty_ExecutesCommand()
     {
         using var connection = new MockDbConnection()
-            .InterceptExecuteReader(_ => default(OptionalValue<IDataReader>))
+            .InterceptExecuteReader(_ => default)
             .OnDbCommandExecuteReader(_ => new MockDbDataReader(new { Id = 2 }));
 
         using var reader = SqlHelper.ExecuteReader(connection, "SELECT * FROM [Table]", null);
@@ -75,7 +75,7 @@ public class SqlHelperExecuteReaderTests
     public void ExecuteReader_WithQuery_InterceptorReturnsEmpty_ExecutesCommand()
     {
         using var connection = new MockDbConnection()
-            .InterceptExecuteReader(_ => default(OptionalValue<IDataReader>))
+            .InterceptExecuteReader(_ => default)
             .OnDbCommandExecuteReader(_ => new MockDbDataReader(new { Id = 4 }));
 
         var query = new SqlQuery().From("Table").Select("Id");
@@ -112,7 +112,7 @@ public class SqlHelperExecuteReaderTests
     public async Task ExecuteReaderAsync_InterceptorReturnsEmpty_ExecutesCommand()
     {
         using var connection = new MockDbConnection()
-            .InterceptExecuteReader(_ => default(OptionalValue<IDataReader>))
+            .InterceptExecuteReader(_ => default)
             .OnDbCommandExecuteReader(_ => new MockDbDataReader(new { Id = 2 }));
 
         using var reader = await SqlHelper.ExecuteReaderAsync(connection, "SELECT * FROM [Table]", null,

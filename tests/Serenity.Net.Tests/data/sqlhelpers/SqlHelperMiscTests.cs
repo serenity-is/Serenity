@@ -382,9 +382,9 @@ public class SqlHelperMiscTests
         public string CommandText { get => inner.CommandText; set => inner.CommandText = value; }
         public int CommandTimeout { get => inner.CommandTimeout; set => inner.CommandTimeout = value; }
         public CommandType CommandType { get => inner.CommandType; set => inner.CommandType = value; }
-        public IDbConnection? Connection { get => ((IDbCommand)inner).Connection; set => ((IDbCommand)inner).Connection = value!; }
+        public IDbConnection? Connection { get => inner.Connection; set => inner.Connection = value!; }
         public IDataParameterCollection Parameters => inner.Parameters;
-        public IDbTransaction? Transaction { get => ((IDbCommand)inner).Transaction; set => ((IDbCommand)inner).Transaction = value!; }
+        public IDbTransaction? Transaction { get => inner.Transaction; set => inner.Transaction = value!; }
         public UpdateRowSource UpdatedRowSource { get => inner.UpdatedRowSource; set => inner.UpdatedRowSource = value; }
 
         public void Cancel() => inner.Cancel();

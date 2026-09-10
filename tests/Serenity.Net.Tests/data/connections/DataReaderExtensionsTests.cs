@@ -90,7 +90,7 @@ public class DataReaderExtensionsTests
     [Fact]
     public void ReadAsync_ForDbReader_DelegatesToNative()
     {
-        var reader = new MockDbDataReader(new object[] { new { A = 1 } });
+        var reader = new MockDbDataReader([new { A = 1 }]);
 
         var sb = new StringBuilder();
         Task<bool> read = ((IDataReader)reader).ReadAsync();
@@ -102,7 +102,7 @@ public class DataReaderExtensionsTests
     [Fact]
     public void NextResultAsync_ForDbReader_DelegatesToNative()
     {
-        var reader = new MockDbDataReader(new object[] { new { A = 1 } });
+        var reader = new MockDbDataReader([new { A = 1 }]);
 
         Assert.False(((IDataReader)reader).NextResultAsync().Result);
     }
@@ -126,7 +126,7 @@ public class DataReaderExtensionsTests
     {
         var reader = new PlainReader();
 
-        Assert.True(((IDataReader)reader).ReadAsync().Result);
+        Assert.True(reader.ReadAsync().Result);
         Assert.Equal(1, reader.ReadCount);
     }
 
@@ -135,7 +135,7 @@ public class DataReaderExtensionsTests
     {
         var reader = new PlainReader();
 
-        Assert.True(((IDataReader)reader).NextResultAsync().Result);
+        Assert.True(reader.NextResultAsync().Result);
         Assert.True(reader.Next);
     }
 

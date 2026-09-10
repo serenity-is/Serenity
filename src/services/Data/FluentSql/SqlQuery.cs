@@ -107,7 +107,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
 
         if (aliasExpressions != null &&
             aliasExpressions.ContainsKey(alias.Name))
-            throw new ArgumentOutOfRangeException("{0} alias is used more than once in the query!");
+            throw new ArgumentOutOfRangeException(string.Format("{0} alias is used more than once in the query!", alias.Name));
 
         From(table);
 
@@ -205,7 +205,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
         ArgumentNullException.ThrowIfNull(alias);
 
         if (string.IsNullOrEmpty(fieldName))
-            throw new ArgumentNullException("field");
+            throw new ArgumentNullException(nameof(fieldName));
 
         return GroupBy(alias.NameDot + fieldName);
     }
@@ -239,7 +239,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     public SqlQuery OrderBy(string expression, bool desc = false)
     {
         if (string.IsNullOrEmpty(expression))
-            throw new ArgumentNullException("field");
+            throw new ArgumentNullException(nameof(expression));
 
         if (desc)
             expression += SqlKeywords.Desc;
@@ -265,7 +265,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
         ArgumentNullException.ThrowIfNull(alias);
 
         if (string.IsNullOrEmpty(fieldName))
-            throw new ArgumentNullException("field");
+            throw new ArgumentNullException(nameof(fieldName));
 
         return OrderBy(alias.NameDot + fieldName, desc);
     }
@@ -610,7 +610,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
 
     IList<object> ISqlQueryExtensible.IntoRows => into;
 
-    private IDictionary<string, IHaveJoins> AliasWithJoins
+    private Dictionary<string, IHaveJoins> AliasWithJoins
     {
         get
         {
@@ -620,7 +620,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
         }
     }
 
-    private IDictionary<string, string> AliasExpressions
+    private Dictionary<string, string> AliasExpressions
     {
         get
         {

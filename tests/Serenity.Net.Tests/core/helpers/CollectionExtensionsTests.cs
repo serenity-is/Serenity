@@ -5,8 +5,7 @@ public class CollectionExtensionsTests
     [Fact]
     public void AddRange_Params_AddsAllItems()
     {
-        ICollection<int> list = new List<int>();
-        list.AddRange(1, 2, 3);
+        ICollection<int> list = [1, 2, 3];
         Assert.Equal([1, 2, 3], list);
     }
 
@@ -20,8 +19,7 @@ public class CollectionExtensionsTests
     [Fact]
     public void AddRange_Enumerable_AddsAllItems()
     {
-        ICollection<int> list = new List<int>();
-        list.AddRange(new List<int> { 4, 5, 6 });
+        ICollection<int> list = [.. new List<int> { 4, 5, 6 }];
         Assert.Equal([4, 5, 6], list);
     }
 

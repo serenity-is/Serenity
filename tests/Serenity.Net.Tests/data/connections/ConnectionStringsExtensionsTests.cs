@@ -20,11 +20,13 @@ public class ConnectionStringsExtensionsTests
     [Fact]
     public void Get_ReturnsConnectionString()
     {
-        var options = new ConnectionStringOptions();
-        options["Default"] = new ConnectionStringEntry
+        var options = new ConnectionStringOptions
         {
-            ConnectionString = "cs",
-            ProviderName = "System.Data.SqlClient"
+            ["Default"] = new ConnectionStringEntry
+            {
+                ConnectionString = "cs",
+                ProviderName = "System.Data.SqlClient"
+            }
         };
         var cs = new DefaultConnectionStrings(options);
 

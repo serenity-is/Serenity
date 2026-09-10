@@ -117,6 +117,6 @@ public class WrappedConnectionTests
         var wrapped = new WrappedConnection(connection, SqlServer2012Dialect.Instance);
 
         wrapped.Dispose();
-        Assert.True(connection.State == ConnectionState.Closed);
+        Assert.Equal(ConnectionState.Closed, connection.State);
     }
 }

@@ -78,7 +78,7 @@ public class JsonTests
     [Fact]
     public void Stringify_WithNullOptions_ThrowsArgumentNullException()
     {
-        Assert.Throws<ArgumentNullException>(() => JSON.Stringify("test", (JsonSerializerOptions)null));
+        Assert.Throws<ArgumentNullException>(() => JSON.Stringify("test", null));
     }
 
     [Fact]

@@ -184,7 +184,7 @@ public class LocalizationBehaviorTests
             {
                 Assert.Equal(SaveRequestType.Update, x.RequestType);
                 var lang = Assert.IsType<LocMainLangRow>(x.Request.Entity);
-                Assert.Equal((long?)123L, lang.Id);
+                Assert.Equal(123L, lang.Id);
                 Assert.Equal("Hello", lang.Description);
                 updated = true;
             },
@@ -217,7 +217,7 @@ public class LocalizationBehaviorTests
             {
                 Assert.Equal(SaveRequestType.Update, x.RequestType);
                 var lang = Assert.IsType<LocMainLangRow>(x.Request.Entity);
-                Assert.Equal((long?)123L, lang.Id);
+                Assert.Equal(123L, lang.Id);
                 Assert.Equal("Hello", lang.Description);
                 updated = true;
             }));

@@ -2,27 +2,16 @@ namespace Serenity.Abstractions;
 
 public class BaseAssemblyTypeSourceTests
 {
-    private class TestTypeSource : BaseAssemblyTypeSource
+    private class TestTypeSource(IFeatureToggles? featureToggles = null, params Assembly[] assemblies) : BaseAssemblyTypeSource(featureToggles)
     {
-        private readonly Assembly[] assemblies;
-
-        public TestTypeSource(IFeatureToggles? featureToggles = null, params Assembly[] assemblies)
-            : base(featureToggles)
-        {
-            this.assemblies = assemblies;
-        }
+        private readonly Assembly[] assemblies = assemblies;
 
         public override IEnumerable<Assembly> GetAssemblies() => assemblies;
     }
 
-    private class MockFeatureToggles : IFeatureToggles
+    private class MockFeatureToggles(params string[] enabled) : IFeatureToggles
     {
-        private readonly HashSet<string> enabled;
-
-        public MockFeatureToggles(params string[] enabled)
-        {
-            this.enabled = new HashSet<string>(enabled, StringComparer.Ordinal);
-        }
+        private readonly HashSet<string> enabled = new HashSet<string>(enabled, StringComparer.Ordinal);
 
         public bool IsEnabled(string feature) => enabled.Contains(feature);
     }

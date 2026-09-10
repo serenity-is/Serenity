@@ -260,13 +260,8 @@ public class RowJsonConverterTests
         }
     }
 
-    private class PropertyNameRow : Row<PropertyNameRow.RowFields>
+    private class PropertyNameRow(PropertyNameRow.RowFields fields) : Row<PropertyNameRow.RowFields>(fields)
     {
-        public PropertyNameRow(RowFields fields)
-            : base(fields)
-        {
-        }
-
         public string? Code { get => fields.Code[this]; set => fields.Code[this] = value; }
 
         public class RowFields : RowFieldsBase

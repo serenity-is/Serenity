@@ -56,6 +56,6 @@ public class TransactionlessUnitOfWorkTests
     {
         using var uow = new TransactionlessUnitOfWork(connection);
 
-        Assert.Same((object?)connection, uow.Connection);
+        Assert.Same(connection, uow.Connection);
     }
 }

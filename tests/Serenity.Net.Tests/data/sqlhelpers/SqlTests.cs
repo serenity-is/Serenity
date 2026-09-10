@@ -119,7 +119,7 @@ public class SqlTests
     [Fact]
     public void Coalesce_Strings_Empty_ThrowsArgumentNullException()
     {
-        Assert.Throws<ArgumentNullException>(() => Sql.Coalesce(new string[0]));
+        Assert.Throws<ArgumentNullException>(() => Sql.Coalesce([]));
     }
 
     [Fact]

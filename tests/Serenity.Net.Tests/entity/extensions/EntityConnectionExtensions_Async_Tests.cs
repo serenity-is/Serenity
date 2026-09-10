@@ -193,7 +193,7 @@ WHERE (T0.[CityId] = @p1)".NormalizeSql(), args.CommandText.NormalizeSql());
             .InterceptExecuteScalar(args =>
             {
                 Assert.Contains("COUNT(", args.CommandText);
-                return (object)441;
+                return 441;
             });
 
         var count = await connection.CountAsync<CityRow>(TestContext.Current.CancellationToken);
@@ -208,7 +208,7 @@ WHERE (T0.[CityId] = @p1)".NormalizeSql(), args.CommandText.NormalizeSql());
             {
                 Assert.Contains("COUNT(", args.CommandText);
                 Assert.Contains("[CountryId]", args.CommandText);
-                return (object)443;
+                return 443;
             });
 
         var count = await connection.CountAsync<CityRow>(

@@ -1707,7 +1707,7 @@ public class PropertyItemTests
     {
         var attribute = new PropertyItem
         {
-            EditorParams = new Dictionary<string, object>()
+            EditorParams = []
         };
 
         bool result = attribute.ShouldSerializeEditorParams();
@@ -1746,7 +1746,7 @@ public class PropertyItemTests
     {
         var attribute = new PropertyItem
         {
-            FormatterParams = new Dictionary<string, object>()
+            FormatterParams = []
         };
 
         bool result = attribute.ShouldSerializeFormatterParams();
@@ -1785,7 +1785,7 @@ public class PropertyItemTests
     {
         var attribute = new PropertyItem
         {
-            FilteringParams = new Dictionary<string, object>()
+            FilteringParams = []
         };
 
         bool result = attribute.ShouldSerializeFilteringParams();
@@ -1824,7 +1824,7 @@ public class PropertyItemTests
     {
         var attribute = new PropertyItem
         {
-            QuickFilterParams = new Dictionary<string, object>()
+            QuickFilterParams = []
         };
 
         bool result = attribute.ShouldSerializeQuickFilterParams();

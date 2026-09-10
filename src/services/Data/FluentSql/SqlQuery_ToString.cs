@@ -431,7 +431,7 @@ public partial class SqlQuery
 
         // sub queries should be enclosed in parenthesis
         if (query.Parent != null && !query.OmitParens)
-            sb.Append(")");
+            sb.Append(')');
 
         return sb.ToString();
     }

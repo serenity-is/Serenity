@@ -2,6 +2,7 @@ namespace Serenity.Data;
 
 public class DialectExpressionSelectorTests
 {
+    [AttributeUsage(AttributeTargets.All)]
     private class TestAttr : Attribute
     {
         public string? Dialect { get; set; }

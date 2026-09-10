@@ -67,16 +67,20 @@ public class RadioButtonEditorAttributeTests
     [Fact]
     public void EnumKey_GetSet_Works()
     {
-        var attr = new RadioButtonEditorAttribute();
-        attr.EnumKey = "MyEnum";
+        var attr = new RadioButtonEditorAttribute
+        {
+            EnumKey = "MyEnum"
+        };
         Assert.Equal("MyEnum", attr.EnumKey);
     }
 
     [Fact]
     public void LookupKey_GetSet_Works()
     {
-        var attr = new RadioButtonEditorAttribute();
-        attr.LookupKey = "MyLookup";
+        var attr = new RadioButtonEditorAttribute
+        {
+            LookupKey = "MyLookup"
+        };
         Assert.Equal("MyLookup", attr.LookupKey);
     }
 }

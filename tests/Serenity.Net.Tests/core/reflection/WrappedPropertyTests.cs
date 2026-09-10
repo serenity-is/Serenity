@@ -3,10 +3,9 @@ namespace Serenity.Reflection;
 public class WrappedPropertyTests
 {
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
-    private class DisplayAttribute : Attribute
+    private class DisplayAttribute(string name) : Attribute
     {
-        public DisplayAttribute(string name) { Name = name; }
-        public string Name { get; }
+        public string Name { get; } = name;
     }
 
     private class EditAttribute : Attribute

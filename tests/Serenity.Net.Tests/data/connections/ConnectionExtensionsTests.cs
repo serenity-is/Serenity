@@ -66,11 +66,11 @@ public class ConnectionExtensionsTests
         var connection = new MockDbConnection();
         using var wrapped = new WrappedConnection(connection, SqlServer2012Dialect.Instance);
 
-        Assert.Null(((IDbConnection)wrapped).GetCurrentActualTransaction());
+        Assert.Null(wrapped.GetCurrentActualTransaction());
 
         var transaction = wrapped.BeginTransaction();
         Assert.Same(((IHasActualTransaction)transaction).ActualTransaction,
-            ((IDbConnection)wrapped).GetCurrentActualTransaction());
+            wrapped.GetCurrentActualTransaction());
 
         transaction.Dispose();
         connection.Dispose();
@@ -127,7 +127,7 @@ public class ConnectionExtensionsTests
     {
         var connection = new NoDialectConnection();
 
-        Assert.Equal(SqlSettings.DefaultDialect, ((IDbConnection)connection).GetDialect());
+        Assert.Equal(SqlSettings.DefaultDialect, connection.GetDialect());
     }
 
     [Fact]

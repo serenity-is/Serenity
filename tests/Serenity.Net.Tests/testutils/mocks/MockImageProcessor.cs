@@ -2,14 +2,9 @@ using System.IO;
 
 namespace Serenity.TestUtils;
 
-public class MockUploadProcessor : IUploadProcessor
+public class MockUploadProcessor(IUploadStorage uploadStorage = null) : IUploadProcessor
 {
-    private readonly IUploadStorage uploadStorage;
-
-    public MockUploadProcessor(IUploadStorage uploadStorage = null)
-    {
-        this.uploadStorage = uploadStorage;
-    }
+    private readonly IUploadStorage uploadStorage = uploadStorage;
 
     public ProcessedUploadInfo Process(Stream fileContent, string filename, IUploadOptions options)
     {

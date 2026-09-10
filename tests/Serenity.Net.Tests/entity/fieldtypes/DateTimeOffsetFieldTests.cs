@@ -88,7 +88,7 @@ public class DateTimeOffsetFieldTests
     {
         var row = NewRow();
         var field = AllFieldsRow.Fields.ADateTimeOffset;
-        using var reader = new MockDbDataReader([new { ADateTimeOffset = (string?)"2024-01-15T10:30:00+02:00" }]);
+        using var reader = new MockDbDataReader([new { ADateTimeOffset = "2024-01-15T10:30:00+02:00" }]);
         reader.Read();
         field.GetFromReader(reader, 0, row);
         Assert.Equal(new DateTimeOffset(2024, 1, 15, 10, 30, 0, TimeSpan.FromHours(2)), field[row]);
@@ -113,8 +113,8 @@ public class DateTimeOffsetFieldTests
         var row1 = NewRow();
         var row2 = NewRow();
         var field = AllFieldsRow.Fields.ADateTimeOffset;
-        field[row1] = v1 == null ? (DateTimeOffset?)null : DateTimeOffset.Parse(v1, CultureInfo.InvariantCulture, DateTimeStyles.None);
-        field[row2] = v2 == null ? (DateTimeOffset?)null : DateTimeOffset.Parse(v2, CultureInfo.InvariantCulture, DateTimeStyles.None);
+        field[row1] = v1 == null ? null : DateTimeOffset.Parse(v1, CultureInfo.InvariantCulture, DateTimeStyles.None);
+        field[row2] = v2 == null ? null : DateTimeOffset.Parse(v2, CultureInfo.InvariantCulture, DateTimeStyles.None);
         var result = field.IndexCompare(row1, row2);
         Assert.Equal(Math.Sign(expectedSign), Math.Sign(result));
     }

@@ -19,8 +19,10 @@ public class VisitedGraphTests
     [Fact]
     public void ContainsKey_ReturnsTrue_ForPresentKey()
     {
-        var graph = new VisitedGraph();
-        graph.Add("key", "value");
+        var graph = new VisitedGraph
+        {
+            { "key", "value" }
+        };
         Assert.True(graph.ContainsKey("key"));
     }
 
@@ -34,8 +36,10 @@ public class VisitedGraphTests
     [Fact]
     public void Indexer_ReturnsValue_ForPresentKey()
     {
-        var graph = new VisitedGraph();
-        graph.Add("key", "value");
+        var graph = new VisitedGraph
+        {
+            { "key", "value" }
+        };
         Assert.Equal("value", graph["key"]);
     }
 }
