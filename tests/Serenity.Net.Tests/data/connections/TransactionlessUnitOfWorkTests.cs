@@ -6,7 +6,7 @@ public class TransactionlessUnitOfWorkTests
 
     [Fact]
     public void Connection_ThrowsOnNull() =>
-        Assert.Throws<ArgumentNullException>(() => new TransactionlessUnitOfWork(null!));
+        Assert.Throws<ArgumentNullException>(() => new TransactionlessUnitOfWork(null));
 
     [Fact]
     public void Commit_RaisesOnCommitEvent()

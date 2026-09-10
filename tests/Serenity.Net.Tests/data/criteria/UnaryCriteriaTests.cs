@@ -6,7 +6,7 @@ public class UnaryCriteriaTests
     public void Constructor_NullOperand_ThrowsArgumentNullException()
     {
         Assert.Throws<ArgumentNullException>(() =>
-            new UnaryCriteria(CriteriaOperator.Paren, null!));
+            new UnaryCriteria(CriteriaOperator.Paren, null));
     }
 
     [Fact]

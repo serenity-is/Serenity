@@ -2,7 +2,7 @@ using System.Threading;
 
 namespace Serenity.Services;
 
-public class CaptureLogBehaviorTests
+public partial class CaptureLogBehaviorTests
 {
     [CaptureLog(typeof(MyLogRow), MappedIdField = "LogId")]
     [TableName("MyRows")]

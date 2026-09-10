@@ -11,9 +11,9 @@ public class DeltaListerTests
     [Fact]
     public void Constructor_NullArguments_ThrowArgumentNullException()
     {
-        Assert.Throws<ArgumentNullException>(() => new DeltaLister<int?>(null!, [], i => i));
-        Assert.Throws<ArgumentNullException>(() => new DeltaLister<int?>([], null!, i => i));
-        Assert.Throws<ArgumentNullException>(() => new DeltaLister<int?>([], [], null!));
+        Assert.Throws<ArgumentNullException>(() => new DeltaLister<int?>(null, [], i => i));
+        Assert.Throws<ArgumentNullException>(() => new DeltaLister<int?>([], null, i => i));
+        Assert.Throws<ArgumentNullException>(() => new DeltaLister<int?>([], [], null));
     }
 
     [Fact]

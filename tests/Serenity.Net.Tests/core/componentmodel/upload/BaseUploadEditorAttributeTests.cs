@@ -198,9 +198,9 @@ public class BaseUploadEditorAttributeTests
     {
         var attribute = new MyBaseUploadEditorAttribute("text", true)
         {
-            ScaleMode = Serenity.Web.ImageScaleMode.StretchToFit
+            ScaleMode = ImageScaleMode.StretchToFit
         };
-        Assert.Equal(Serenity.Web.ImageScaleMode.StretchToFit, attribute.ScaleMode);
+        Assert.Equal(ImageScaleMode.StretchToFit, attribute.ScaleMode);
     }
 
     [Fact]

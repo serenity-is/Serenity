@@ -26,21 +26,21 @@ public class ModifyPermissionAttributeTests
     [Fact]
     public void Constructor_With_Enum()
     {
-        var attribute = new ModifyPermissionAttribute(Serenity.IO.DeleteType.Delete);
+        var attribute = new ModifyPermissionAttribute(IO.DeleteType.Delete);
         Assert.Equal("Delete", attribute.Permission);
     }
 
     [Fact]
     public void Constructor_With_Enum_Enum()
     {
-        var attribute = new ModifyPermissionAttribute(Serenity.IO.DeleteType.Delete, Serenity.IO.DeleteType.TryDelete);
+        var attribute = new ModifyPermissionAttribute(IO.DeleteType.Delete, IO.DeleteType.TryDelete);
         Assert.Equal("Delete:TryDelete", attribute.Permission);
     }
 
     [Fact]
     public void Constructor_With_Enum_Enum_Enum()
     {
-        var attribute = new ModifyPermissionAttribute(Serenity.IO.DeleteType.Delete, Serenity.IO.DeleteType.TryDelete, Serenity.IO.DeleteType.TryDeleteOrMark);
+        var attribute = new ModifyPermissionAttribute(IO.DeleteType.Delete, IO.DeleteType.TryDelete, IO.DeleteType.TryDeleteOrMark);
         Assert.Equal("Delete:TryDelete:TryDeleteOrMark", attribute.Permission);
     }
 

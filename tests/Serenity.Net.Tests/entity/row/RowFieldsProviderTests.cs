@@ -77,7 +77,7 @@ public class RowFieldsProviderTests
     public void SetDefault_NullProvider_ThrowsArgumentNullException()
     {
         // throws before assignment, so no state restoration is required
-        Assert.Throws<ArgumentNullException>(() => RowFieldsProvider.SetDefault(null!));
+        Assert.Throws<ArgumentNullException>(() => RowFieldsProvider.SetDefault(null));
     }
 
     [Fact]
@@ -126,7 +126,7 @@ public class RowFieldsProviderTests
     {
         // throws before the provider is invoked, so no state restoration is required
         Assert.Throws<ArgumentNullException>(() =>
-            RowFieldsProvider.Resolve<IdNameRow.RowFields>(null!));
+            RowFieldsProvider.Resolve<IdNameRow.RowFields>(null));
     }
 
     [Fact]
@@ -180,7 +180,7 @@ public class RowFieldsProviderTests
     [Fact]
     public void SetDefaultFrom_NullServices_ThrowsArgumentNullException()
     {
-        Assert.Throws<ArgumentNullException>(() => RowFieldsProvider.SetDefaultFrom(null!));
+        Assert.Throws<ArgumentNullException>(() => RowFieldsProvider.SetDefaultFrom(null));
     }
 
     [Fact]
@@ -219,6 +219,6 @@ public class RowFieldsProviderTests
     [Fact]
     public void SetLocalFrom_NullServices_ThrowsArgumentNullException()
     {
-        Assert.Throws<ArgumentNullException>(() => RowFieldsProvider.SetLocalFrom(null!));
+        Assert.Throws<ArgumentNullException>(() => RowFieldsProvider.SetLocalFrom(null));
     }
 }

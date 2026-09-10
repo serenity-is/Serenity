@@ -139,7 +139,7 @@ public class SqlHelperExecuteUpdateDeleteTests
         using var connection = new MockDbConnection();
 
         Assert.Throws<ArgumentNullException>(() =>
-            SqlHelper.Execute((SqlDelete)null!, connection));
+            SqlHelper.Execute((SqlDelete)null, connection));
     }
 
     [Fact]

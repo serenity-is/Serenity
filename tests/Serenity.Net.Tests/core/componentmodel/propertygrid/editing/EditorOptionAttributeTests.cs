@@ -13,8 +13,8 @@ public class EditorOptionAttributeTests
     [Fact]
     public void Value_CanBePassed_AsEnum()
     {
-        var attribute = new EditorOptionAttribute("sometext", Serenity.IO.DeleteType.Delete);
-        Assert.Equal(Serenity.IO.DeleteType.Delete, attribute.Value);
+        var attribute = new EditorOptionAttribute("sometext", IO.DeleteType.Delete);
+        Assert.Equal(IO.DeleteType.Delete, attribute.Value);
     }
 
     [Fact]

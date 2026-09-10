@@ -70,12 +70,12 @@ public class WrappedTransactionTests
     }
 
     [Fact]
-    public void CommitAsync_OnDbTransactionDetector()
+    public async Task CommitAsync_OnDbTransactionDetector()
     {
         var (wrapped, connection) = GetWrapped();
 
         var transaction = wrapped.BeginTransaction();
-        transaction.CommitAsync();
+        await transaction.CommitAsync(TestContext.Current.CancellationToken);
 
         Assert.Null(wrapped.CurrentTransaction);
         connection.Dispose();
@@ -83,12 +83,12 @@ public class WrappedTransactionTests
     }
 
     [Fact]
-    public void RollbackAsync_Works()
+    public async Task RollbackAsync_Works()
     {
         var (wrapped, connection) = GetWrapped();
 
         var transaction = wrapped.BeginTransaction();
-        transaction.RollbackAsync();
+        await transaction.RollbackAsync(TestContext.Current.CancellationToken);
 
         Assert.Null(wrapped.CurrentTransaction);
         connection.Dispose();

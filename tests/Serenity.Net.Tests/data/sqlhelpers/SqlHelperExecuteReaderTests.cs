@@ -91,7 +91,7 @@ public class SqlHelperExecuteReaderTests
         using var connection = new MockDbConnection();
 
         Assert.Throws<ArgumentNullException>(() =>
-            SqlHelper.ExecuteReader(null!, connection));
+            SqlHelper.ExecuteReader(null, connection));
     }
 
     [Fact]
@@ -144,7 +144,7 @@ public class SqlHelperExecuteReaderTests
         using var connection = new MockDbConnection();
 
         await Assert.ThrowsAsync<ArgumentNullException>(() =>
-            SqlHelper.ExecuteReaderAsync(null!, connection, cancellationToken: TestContext.Current.CancellationToken));
+            SqlHelper.ExecuteReaderAsync(null, connection, cancellationToken: TestContext.Current.CancellationToken));
     }
 
     [Fact]

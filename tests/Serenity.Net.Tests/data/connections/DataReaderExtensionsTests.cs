@@ -5,7 +5,7 @@ public class DataReaderExtensionsTests
     private static MockDbDataReader Reader(string field, object value)
     {
         var reader = new MockDbDataReader(
-            new List<IDictionary<string, object>> { new Dictionary<string, object> { [field] = value } },
+            [new Dictionary<string, object> { [field] = value }],
             field);
         reader.Read();
         return reader;
@@ -88,54 +88,51 @@ public class DataReaderExtensionsTests
     // Async extensions
 
     [Fact]
-    public void ReadAsync_ForDbReader_DelegatesToNative()
+    public async Task ReadAsync_ForDbReader_DelegatesToNative()
     {
         var reader = new MockDbDataReader([new { A = 1 }]);
 
-        var sb = new StringBuilder();
-        Task<bool> read = ((IDataReader)reader).ReadAsync();
-        Assert.True(read.Result);
-        read = ((IDataReader)reader).ReadAsync();
-        Assert.False(read.Result);
+        Assert.True(await ((IDataReader)reader).ReadAsync(TestContext.Current.CancellationToken));
+        Assert.False(await ((IDataReader)reader).ReadAsync(TestContext.Current.CancellationToken));
     }
 
     [Fact]
-    public void NextResultAsync_ForDbReader_DelegatesToNative()
+    public async Task NextResultAsync_ForDbReader_DelegatesToNative()
     {
         var reader = new MockDbDataReader([new { A = 1 }]);
 
-        Assert.False(((IDataReader)reader).NextResultAsync().Result);
+        Assert.False(await ((IDataReader)reader).NextResultAsync(TestContext.Current.CancellationToken));
     }
 
     [Fact]
     public async Task ReadAsync_NullReader_ThrowsArgumentNullException()
     {
         await Assert.ThrowsAsync<ArgumentNullException>(() =>
-            ((IDataReader)null!).ReadAsync());
+            ((IDataReader)null).ReadAsync(TestContext.Current.CancellationToken));
     }
 
     [Fact]
     public async Task NextResultAsync_NullReader_ThrowsArgumentNullException()
     {
         await Assert.ThrowsAsync<ArgumentNullException>(() =>
-            ((IDataReader)null!).NextResultAsync());
+            ((IDataReader)null).NextResultAsync(TestContext.Current.CancellationToken));
     }
 
     [Fact]
-    public void ReadAsync_ForPlainIDataReader_FallsBackToSync()
+    public async Task ReadAsync_ForPlainIDataReader_FallsBackToSync()
     {
         var reader = new PlainReader();
 
-        Assert.True(reader.ReadAsync().Result);
+        Assert.True(await reader.ReadAsync(TestContext.Current.CancellationToken));
         Assert.Equal(1, reader.ReadCount);
     }
 
     [Fact]
-    public void NextResultAsync_ForPlainIDataReader_FallsBackToSync()
+    public async Task NextResultAsync_ForPlainIDataReader_FallsBackToSync()
     {
         var reader = new PlainReader();
 
-        Assert.True(reader.NextResultAsync().Result);
+        Assert.True(await reader.NextResultAsync(TestContext.Current.CancellationToken));
         Assert.True(reader.Next);
     }
 
@@ -144,7 +141,7 @@ public class DataReaderExtensionsTests
         public int ReadCount;
         public bool Next;
         public int FieldCount => 0;
-        public object this[int i] => null!;
+        public object this[int i] => null;
 #pragma warning disable
         public object this[string name] => throw new NotImplementedException();
         public int Depth => 0;

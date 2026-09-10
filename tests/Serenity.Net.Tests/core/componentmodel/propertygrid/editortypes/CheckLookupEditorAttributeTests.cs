@@ -20,7 +20,7 @@ public class CheckLookupEditorAttributeTests
     [Fact]
     public void Constructor_WithType_ThrowsArgumentNullException_WhenTypeIsNull()
     {
-        Assert.Throws<ArgumentNullException>(() => new CheckLookupEditorAttribute((Type)null!));
+        Assert.Throws<ArgumentNullException>(() => new CheckLookupEditorAttribute((Type)null));
     }
 
     [Fact]

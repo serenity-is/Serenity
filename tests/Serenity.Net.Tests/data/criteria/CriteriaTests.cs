@@ -33,7 +33,7 @@ public class CriteriaTests
     [Fact]
     public void Constructor_WithNullField_ThrowsArgumentNullException()
     {
-        var exception = Assert.Throws<ArgumentNullException>(() => new Criteria((IField)null!));
+        var exception = Assert.Throws<ArgumentNullException>(() => new Criteria((IField)null));
 
         Assert.Equal("field", exception.ParamName);
     }
@@ -51,11 +51,11 @@ public class CriteriaTests
     public void Constructor_WithAliasAndField_NullOrEmptyArguments_ThrowArgumentNullException()
     {
         Assert.Equal("alias", Assert.Throws<ArgumentNullException>(
-            () => new Criteria((string)null!, "Name")).ParamName);
+            () => new Criteria((string)null, "Name")).ParamName);
         Assert.Equal("alias", Assert.Throws<ArgumentNullException>(
             () => new Criteria("", "Name")).ParamName);
         Assert.Equal("field", Assert.Throws<ArgumentNullException>(
-            () => new Criteria("T0", (string)null!)).ParamName);
+            () => new Criteria("T0", (string)null)).ParamName);
         Assert.Equal("field", Assert.Throws<ArgumentNullException>(
             () => new Criteria("T0", "")).ParamName);
     }
@@ -82,7 +82,7 @@ public class CriteriaTests
     [Fact]
     public void Constructor_WithJoinNumberAndNullField_ThrowsArgumentNullException()
     {
-        var exception = Assert.Throws<ArgumentNullException>(() => new Criteria(0, (IField)null!));
+        var exception = Assert.Throws<ArgumentNullException>(() => new Criteria(0, (IField)null));
         Assert.Equal("field", exception.ParamName);
     }
 
@@ -96,7 +96,7 @@ public class CriteriaTests
     public void Constructor_WithNullAliasInstance_ThrowsArgumentNullException()
     {
         var exception = Assert.Throws<ArgumentNullException>(() =>
-            new Criteria((IAlias)null!, AllFieldsRow.Fields.AString));
+            new Criteria((IAlias)null, AllFieldsRow.Fields.AString));
         Assert.Equal("alias", exception.ParamName);
     }
 
@@ -104,7 +104,7 @@ public class CriteriaTests
     public void Constructor_WithAliasInstanceAndNullField_ThrowsArgumentNullException()
     {
         var exception = Assert.Throws<ArgumentNullException>(() =>
-            new Criteria(new Alias("x"), (IField)null!));
+            new Criteria(new Alias("x"), (IField)null));
         Assert.Equal("field", exception.ParamName);
     }
 
@@ -112,7 +112,7 @@ public class CriteriaTests
     public void Constructor_WithNullAliasInstanceAndStringField_ThrowsArgumentNullException()
     {
         var exception = Assert.Throws<ArgumentNullException>(() =>
-            new Criteria((IAlias)null!, "Name"));
+            new Criteria((IAlias)null, "Name"));
         Assert.Equal("alias", exception.ParamName);
     }
 
@@ -120,14 +120,14 @@ public class CriteriaTests
     public void Constructor_WithJoinStringAndNullField_ThrowsArgumentNullException()
     {
         var exception = Assert.Throws<ArgumentNullException>(() =>
-            new Criteria("x", (IField)null!));
+            new Criteria("x", (IField)null));
         Assert.Equal("field", exception.ParamName);
     }
 
     [Fact]
     public void Constructor_WithNullQuery_ThrowsArgumentNullException()
     {
-        var exception = Assert.Throws<ArgumentNullException>(() => new Criteria((ISqlQuery)null!));
+        var exception = Assert.Throws<ArgumentNullException>(() => new Criteria((ISqlQuery)null));
         Assert.Equal("query", exception.ParamName);
     }
 
@@ -141,7 +141,7 @@ public class CriteriaTests
     public void Constructor_WithAliasInstanceAndNullStringField_ThrowsArgumentNullException()
     {
         Assert.Equal("field", Assert.Throws<ArgumentNullException>(
-            () => new Criteria(new Alias("x"), (string)null!)).ParamName);
+            () => new Criteria(new Alias("x"), (string)null)).ParamName);
     }
 
     [Fact]
@@ -169,7 +169,7 @@ public class CriteriaTests
     public void Constructor_WithFieldAndExpression_NullField_ThrowsArgumentNullException()
     {
         Assert.Equal("field", Assert.Throws<ArgumentNullException>(
-            () => new Criteria((IField)null!, "custom")).ParamName);
+            () => new Criteria((IField)null, "custom")).ParamName);
     }
 
     [Fact]
@@ -210,7 +210,7 @@ public class CriteriaTests
     [Fact]
     public void Bracket_NullOrEmpty_ThrowsArgumentNullException()
     {
-        Assert.Throws<ArgumentNullException>(() => Criteria.Bracket(null!));
+        Assert.Throws<ArgumentNullException>(() => Criteria.Bracket(null));
         Assert.Throws<ArgumentNullException>(() => Criteria.Bracket(""));
     }
 

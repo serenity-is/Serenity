@@ -73,7 +73,7 @@ public class DefaultRowFieldsProviderTests
     [Fact]
     public void Constructor_NullServiceProvider_ThrowsArgumentNullException()
     {
-        Assert.Throws<ArgumentNullException>(() => new DefaultRowFieldsProvider(null!));
+        Assert.Throws<ArgumentNullException>(() => new DefaultRowFieldsProvider(null));
     }
 
     [Fact]
@@ -114,7 +114,7 @@ public class DefaultRowFieldsProviderTests
         var provider = CreateProvider();
 
         Assert.Throws<ArgumentNullException>(() =>
-            provider.ResolveWithAlias(typeof(IdNameRow.RowFields), null!));
+            provider.ResolveWithAlias(typeof(IdNameRow.RowFields), null));
     }
 
     [Fact]

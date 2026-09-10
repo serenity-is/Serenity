@@ -73,7 +73,7 @@ public class ConstantAndParamCriteriaTests
     [Fact]
     public void ParamCriteria_NullOrEmptyName_ThrowsArgumentNullException()
     {
-        Assert.Throws<ArgumentNullException>(() => new ParamCriteria(null!));
+        Assert.Throws<ArgumentNullException>(() => new ParamCriteria(null));
         Assert.Throws<ArgumentNullException>(() => new ParamCriteria(""));
     }
 

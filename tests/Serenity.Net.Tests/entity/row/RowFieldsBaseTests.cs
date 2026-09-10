@@ -1,5 +1,3 @@
-using Serenity.Reflection;
-
 namespace Serenity.Data;
 
 public class RowFieldsBaseTests
@@ -172,7 +170,7 @@ public class RowFieldsBaseTests
     [Fact]
     public void ParseDatabaseAndSchema_Variants()
     {
-        Assert.Null(RowFieldsBase.ParseDatabaseAndSchema(null!, out string? db1, out string? schema1));
+        Assert.Null(RowFieldsBase.ParseDatabaseAndSchema(null, out string? db1, out string? schema1));
         Assert.Null(db1);
         Assert.Null(schema1);
 
@@ -243,7 +241,7 @@ public class RowFieldsBaseTests
         var f = new AttributeMetadataRow.RowFields();
         Assert.Equal("MyConn", f.ConnectionKey);
 
-        f.Initialize(null, Serenity.Data.SqlSettings.DefaultDialect);
+        f.Initialize(null, SqlSettings.DefaultDialect);
         Assert.Equal("MyModule", f.ModuleIdentifier);
         Assert.Equal("MyPrefix", f.LocalTextPrefix);
         Assert.Equal("MyConn.AttributeMetadata", f.GenerationKey);
@@ -255,7 +253,7 @@ public class RowFieldsBaseTests
         var f = new PlainRow.RowFields();
         Assert.Equal("Default", f.ConnectionKey);
 
-        f.Initialize(null, Serenity.Data.SqlSettings.DefaultDialect);
+        f.Initialize(null, SqlSettings.DefaultDialect);
         Assert.Equal("Data", f.ModuleIdentifier);
         Assert.Equal("Data.Plain", f.LocalTextPrefix);
         Assert.Equal("Data.Plain", f.RowIdentifier);
@@ -266,9 +264,9 @@ public class RowFieldsBaseTests
     public void Initialize_SecondCall_IsIgnored()
     {
         var f = new PlainRow.RowFields();
-        f.Initialize(null, Serenity.Data.SqlSettings.DefaultDialect);
+        f.Initialize(null, SqlSettings.DefaultDialect);
         Assert.Equal(2, f.Count);
-        f.Initialize(null, Serenity.Data.SqlSettings.DefaultDialect);
+        f.Initialize(null, SqlSettings.DefaultDialect);
         Assert.Equal(2, f.Count);
     }
 
@@ -281,7 +279,7 @@ public class RowFieldsBaseTests
         Assert.Null(f.FindFieldByPropertyName(null));
         Assert.Null(f.FindFieldByPropertyName("Unknown"));
 
-        f.Initialize(null, Serenity.Data.SqlSettings.DefaultDialect);
+        f.Initialize(null, SqlSettings.DefaultDialect);
         Assert.Equal(f.Name, f.FindField("name"));
         Assert.Equal(f.Name, f.FindFieldByPropertyName("Name"));
         Assert.Equal(f.Id, f.FindFieldByPropertyName("Id"));
@@ -291,7 +289,7 @@ public class RowFieldsBaseTests
     public void Modification_AfterInitialization_Throws()
     {
         var f = new PlainRow.RowFields();
-        f.Initialize(null, Serenity.Data.SqlSettings.DefaultDialect);
+        f.Initialize(null, SqlSettings.DefaultDialect);
 
         Assert.Throws<InvalidOperationException>(() => f.RemoveAt(0));
         Assert.Throws<InvalidOperationException>(() => f[0] = f.Id);
@@ -324,7 +322,7 @@ public class RowFieldsBaseTests
     public void GetFieldsByAttribute_CustomAttribute()
     {
         var f = new FlaggedRow.RowFields();
-        f.Initialize(null, Serenity.Data.SqlSettings.DefaultDialect);
+        f.Initialize(null, SqlSettings.DefaultDialect);
 
         var testFields = f.GetFieldsByAttribute(typeof(CustomTestAttribute));
         Assert.Single(testFields);
@@ -340,11 +338,11 @@ public class RowFieldsBaseTests
     public void LookupIncludeAndInferTextualFields()
     {
         var flaggedFields = new FlaggedRow.RowFields();
-        flaggedFields.Initialize(null, Serenity.Data.SqlSettings.DefaultDialect);
+        flaggedFields.Initialize(null, SqlSettings.DefaultDialect);
         Assert.True(flaggedFields.Test2.IsLookup);
 
         var f = new JoinRow.RowFields();
-        f.Initialize(null, Serenity.Data.SqlSettings.DefaultDialect);
+        f.Initialize(null, SqlSettings.DefaultDialect);
 
         Assert.Equal(3, f.Count);
         Assert.Equal("COUNTRY", f.CountryID.ForeignTable);
@@ -442,7 +440,7 @@ public class RowFieldsBaseTests
         Assert.Throws<AmbiguousMatchException>(() =>
         {
             var f = new AmbiguousJoinColumnRow.RowFields();
-            f.Initialize(null, Serenity.Data.SqlSettings.DefaultDialect);
+            f.Initialize(null, SqlSettings.DefaultDialect);
         });
     }
 
@@ -452,7 +450,7 @@ public class RowFieldsBaseTests
         Assert.Throws<AmbiguousMatchException>(() =>
         {
             var f = new AmbiguousExpressionRow.RowFields();
-            f.Initialize(null, Serenity.Data.SqlSettings.DefaultDialect);
+            f.Initialize(null, SqlSettings.DefaultDialect);
         });
     }
 
@@ -460,9 +458,9 @@ public class RowFieldsBaseTests
     public void PrimaryKeys_IdField_AndSortOrders()
     {
         var f = new PrimaryKeyRow.RowFields();
-        f.Initialize(null, Serenity.Data.SqlSettings.DefaultDialect);
+        f.Initialize(null, SqlSettings.DefaultDialect);
 
-        var pks = f.PrimaryKeys!;
+        var pks = f.PrimaryKeys;
         Assert.Single(pks);
         Assert.Equal(f.Id, pks[0]);
         Assert.Equal(f.Id, f.IdField);
@@ -483,11 +481,11 @@ public class RowFieldsBaseTests
 
         var removedName = f.Name;
         f.Remove(removedName);
-        Assert.Equal(1, f.Count);
+        Assert.Single(f);
         Assert.Equal(-1, removedName.Index);
         Assert.Null(removedName.Fields);
 
-        var replaced = new Int32Field(null!, "Replaced");
+        var replaced = new Int32Field(null, "Replaced");
         f[0] = replaced;
         Assert.Equal(0, replaced.Index);
         Assert.Same(f, replaced.Fields);
@@ -522,7 +520,7 @@ public class RowFieldsBaseTests
     public void ReplaceAliasWith_JoinAliasesArePrefixedAndLocked()
     {
         var f = new AliasReplaceJoinRow.RowFields();
-        f.Initialize(null, Serenity.Data.SqlSettings.DefaultDialect);
+        f.Initialize(null, SqlSettings.DefaultDialect);
 
         f.ReplaceAliasWith("base");
 

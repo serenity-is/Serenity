@@ -14,7 +14,7 @@ public class DefaultImplicitBehaviorRegistry : IImplicitBehaviorRegistry
     /// <exception cref="ArgumentNullException"><paramref name="typeSource"/> is <c>null</c>.</exception>
     public DefaultImplicitBehaviorRegistry(ITypeSource typeSource)
     {
-        behaviorTypes = (typeSource ?? throw new ArgumentNullException(nameof(behaviorTypes)))
+        behaviorTypes = (typeSource ?? throw new ArgumentNullException(nameof(typeSource)))
             .GetTypesWithInterface(typeof(IImplicitBehavior))
             .Where(type => !type.IsAbstract && !type.IsInterface);
     }

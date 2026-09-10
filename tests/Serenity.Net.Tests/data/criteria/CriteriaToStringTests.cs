@@ -9,7 +9,7 @@ public class CriteriaToStringTests
     [Fact]
     public void Criteria_JoinNumberConstructor_NullField_ThrowsArgumentNullException()
     {
-        Assert.Throws<ArgumentNullException>(() => new Criteria(7, (string)null!));
+        Assert.Throws<ArgumentNullException>(() => new Criteria(7, (string)null));
     }
 
     [Fact]

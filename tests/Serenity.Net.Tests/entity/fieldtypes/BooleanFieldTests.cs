@@ -34,7 +34,7 @@ public class BooleanFieldTests
     public void Factory_CreatesField()
     {
         var fields = new AllFieldsRow.RowFields();
-        var field = BooleanField.Factory(fields, "Test", null, 0, FieldFlags.Default, null!, null);
+        var field = BooleanField.Factory(fields, "Test", null, 0, FieldFlags.Default, null, null);
         Assert.IsType<BooleanField>(field);
         Assert.Equal("Test", field.Name);
     }
@@ -76,7 +76,7 @@ public class BooleanFieldTests
     public void GetFromReader_NullReader_Throws()
     {
         var row = NewRow();
-        Assert.Throws<ArgumentNullException>(() => AllFieldsRow.Fields.ABoolean.GetFromReader(null!, 0, row));
+        Assert.Throws<ArgumentNullException>(() => AllFieldsRow.Fields.ABoolean.GetFromReader(null, 0, row));
     }
 
     [Theory]
@@ -155,7 +155,7 @@ public class BooleanFieldTests
     public void ValueFromJson_Newtonsoft_NullReader_Throws()
     {
         var row = NewRow();
-        Assert.Throws<ArgumentNullException>(() => AllFieldsRow.Fields.ABoolean.ValueFromJson(null!, row, Newtonsoft.Json.JsonSerializer.CreateDefault()));
+        Assert.Throws<ArgumentNullException>(() => AllFieldsRow.Fields.ABoolean.ValueFromJson(null, row, Newtonsoft.Json.JsonSerializer.CreateDefault()));
     }
 
     [Theory]
@@ -171,7 +171,7 @@ public class BooleanFieldTests
     {
         var row = NewRow();
         var field = AllFieldsRow.Fields.ABoolean;
-        var bytes = System.Text.Encoding.UTF8.GetBytes(json);
+        var bytes = Encoding.UTF8.GetBytes(json);
         var reader = new Utf8JsonReader(bytes);
         reader.Read();
         field.ValueFromJson(ref reader, row, new JsonSerializerOptions());
@@ -183,7 +183,7 @@ public class BooleanFieldTests
     {
         var row = NewRow();
         var field = AllFieldsRow.Fields.ABoolean;
-        var bytes = System.Text.Encoding.UTF8.GetBytes("{\"a\":1}");
+        var bytes = Encoding.UTF8.GetBytes("{\"a\":1}");
         var ex = Record.Exception(() =>
         {
             var reader = new Utf8JsonReader(bytes);
@@ -203,7 +203,7 @@ public class BooleanFieldTests
         using var writer = new Utf8JsonWriter(ms);
         field.ValueToJson(writer, row, new JsonSerializerOptions());
         writer.Flush();
-        Assert.Equal("true", System.Text.Encoding.UTF8.GetString(ms.ToArray()));
+        Assert.Equal("true", Encoding.UTF8.GetString(ms.ToArray()));
     }
 
     [Fact]
@@ -215,7 +215,7 @@ public class BooleanFieldTests
         using var writer = new Utf8JsonWriter(ms);
         field.ValueToJson(writer, row, new JsonSerializerOptions());
         writer.Flush();
-        Assert.Equal("null", System.Text.Encoding.UTF8.GetString(ms.ToArray()));
+        Assert.Equal("null", Encoding.UTF8.GetString(ms.ToArray()));
     }
 
     [Fact]

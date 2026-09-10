@@ -63,7 +63,7 @@ WHERE (T0.[CityId] = @p1)".NormalizeSql(), args.CommandText.NormalizeSql());
             });
 
         var row = await connection.TryByIdAsync<CityRow>(483, TestContext.Current.CancellationToken);
-        Assert.Equal(481, row!.CityId);
+        Assert.Equal(481, row.CityId);
         Assert.Equal("Oslo", row.CityName);
         Assert.Equal(482, row.CountryId);
         Assert.Throws<InvalidOperationException>(() => row.CountryName);
@@ -90,7 +90,7 @@ WHERE (T0.[CityId] = @p1)".NormalizeSql(), args.CommandText.NormalizeSql());
 
         var row = await connection.TryByIdAsync<CityRow>(586, query => query
             .Select(CityRow.Fields.CountryName), TestContext.Current.CancellationToken);
-        Assert.Equal("Norway", row!.CountryName);
+        Assert.Equal("Norway", row.CountryName);
         Assert.Throws<InvalidOperationException>(() => row.CityId);
         Assert.Throws<InvalidOperationException>(() => row.CityName);
         Assert.Throws<InvalidOperationException>(() => row.CountryId);
@@ -140,7 +140,7 @@ WHERE (T0.[CityId] = @p1)".NormalizeSql(), args.CommandText.NormalizeSql());
 
         var row = await connection.SingleAsync<CityRow>(
             new Criteria(CityRow.Fields.CityName) == "Lisbon", TestContext.Current.CancellationToken);
-        Assert.Equal("Lisbon", row!.CityName);
+        Assert.Equal("Lisbon", row.CityName);
     }
 
     [Fact]
@@ -171,7 +171,7 @@ WHERE (T0.[CityId] = @p1)".NormalizeSql(), args.CommandText.NormalizeSql());
 
         var row = await connection.FirstAsync<CityRow>(
             new Criteria(CityRow.Fields.CountryId) == 697, TestContext.Current.CancellationToken);
-        Assert.Equal("Kyoto", row!.CityName);
+        Assert.Equal("Kyoto", row.CityName);
     }
 
     [Fact]

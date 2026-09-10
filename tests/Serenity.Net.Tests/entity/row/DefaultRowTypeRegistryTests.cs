@@ -27,7 +27,7 @@ public class DefaultRowTypeRegistryTests
     [Fact]
     public void Constructor_NullTypeSource_ThrowsArgumentNullException()
     {
-        Assert.Throws<ArgumentNullException>(() => new DefaultRowTypeRegistry(null!));
+        Assert.Throws<ArgumentNullException>(() => new DefaultRowTypeRegistry(null));
     }
 
     [Fact]
@@ -51,7 +51,7 @@ public class DefaultRowTypeRegistryTests
         var typeSource = new MockTypeSource(typeof(IdNameRow), typeof(KeyedRow));
         var registry = new DefaultRowTypeRegistry(typeSource);
 
-        Assert.Empty(registry.ByConnectionKey(null!));
+        Assert.Empty(registry.ByConnectionKey(null));
         Assert.Empty(registry.ByConnectionKey(string.Empty));
     }
 

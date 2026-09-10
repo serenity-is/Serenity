@@ -9,7 +9,7 @@ public class DefaultSqlDialectMapperTests
     {
         var mapper = new DefaultSqlDialectMapper();
 
-        var dialect = mapper.TryGet(providerName)!;
+        var dialect = mapper.TryGet(providerName);
 
         Assert.IsAssignableFrom<ISqlDialect>(dialect);
         Assert.Contains(dialectName, dialect.GetType().Name, StringComparison.OrdinalIgnoreCase);
@@ -20,7 +20,7 @@ public class DefaultSqlDialectMapperTests
     {
         var mapper = new DefaultSqlDialectMapper();
 
-        Assert.Equal(SqliteDialect.Instance.OpenQuote, mapper.TryGet("SqliteDialect")!.OpenQuote);
+        Assert.Equal(SqliteDialect.Instance.OpenQuote, mapper.TryGet("SqliteDialect").OpenQuote);
     }
 
     [Fact]
@@ -28,7 +28,7 @@ public class DefaultSqlDialectMapperTests
     {
         var mapper = new DefaultSqlDialectMapper();
 
-        Assert.Equal(SqlServer2012Dialect.Instance.OpenQuote, mapper.TryGet("SqlServer2012")!.OpenQuote);
+        Assert.Equal(SqlServer2012Dialect.Instance.OpenQuote, mapper.TryGet("SqlServer2012").OpenQuote);
     }
 
     [Theory]
@@ -48,6 +48,6 @@ public class DefaultSqlDialectMapperTests
     [Fact]
     public void TryGet_UpperCaseProviderName_ReturnsDialect()
     {
-        Assert.Equal(PostgresDialect.Instance.OpenQuote, new DefaultSqlDialectMapper().TryGet("NPGSQL")!.OpenQuote);
+        Assert.Equal(PostgresDialect.Instance.OpenQuote, new DefaultSqlDialectMapper().TryGet("NPGSQL").OpenQuote);
     }
 }

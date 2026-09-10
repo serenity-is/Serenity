@@ -1,5 +1,3 @@
-using Microsoft.Extensions.Logging;
-
 namespace Serenity.Data;
 
 public class SqlHelperExecuteNonQueryTests

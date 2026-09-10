@@ -127,7 +127,7 @@ public class EntityConnectionExtensions_InsertUpdateDelete_Tests
     [Fact]
     public void ToSqlInsert_Null_ThrowsArgumentNullException()
     {
-        Assert.Throws<ArgumentNullException>(() => ((IRow)null!).ToSqlInsert());
+        Assert.Throws<ArgumentNullException>(() => ((IRow)null).ToSqlInsert());
     }
 
     [Fact]
@@ -143,7 +143,7 @@ public class EntityConnectionExtensions_InsertUpdateDelete_Tests
     [Fact]
     public void ToSqlUpdateById_Null_ThrowsArgumentNullException()
     {
-        Assert.Throws<ArgumentNullException>(() => ((IIdRow)null!).ToSqlUpdateById());
+        Assert.Throws<ArgumentNullException>(() => ((IIdRow)null).ToSqlUpdateById());
     }
 }
 
@@ -155,7 +155,7 @@ public class EntityConnectionExtensions_InsertUpdateDelete_Async_Tests
         using var connection = new MockDbConnection()
             .OnDbCommandExecuteNonQuery(_ => 1);
 
-        await connection.InsertAsync(new IdNameRow { Name = "X" });
+        await connection.InsertAsync(new IdNameRow { Name = "X" }, TestContext.Current.CancellationToken);
 
         Assert.Equal(1, connection.DbCommandExecuteNonQueryCallCount);
     }
@@ -167,7 +167,7 @@ public class EntityConnectionExtensions_InsertUpdateDelete_Async_Tests
             .InterceptManipulateRow(args => new OptionalValue<long?>(1))
             .OnDbCommandExecuteNonQuery(_ => throw new InvalidOperationException("should not execute"));
 
-        await connection.InsertAsync(new IdNameRow { Name = "X" });
+        await connection.InsertAsync(new IdNameRow { Name = "X" }, TestContext.Current.CancellationToken);
 
         Assert.Equal(0, connection.DbCommandExecuteNonQueryCallCount);
     }
@@ -178,7 +178,7 @@ public class EntityConnectionExtensions_InsertUpdateDelete_Async_Tests
         using var connection = new MockDbConnection()
             .OnDbCommandExecuteReader(_ => new MockDbDataReader(new { ID = 55 }));
 
-        Assert.Equal(55, await connection.InsertAndGetIDAsync(new IdNameRow { Name = "X" }));
+        Assert.Equal(55, await connection.InsertAndGetIDAsync(new IdNameRow { Name = "X" }, TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -187,7 +187,7 @@ public class EntityConnectionExtensions_InsertUpdateDelete_Async_Tests
         using var connection = new MockDbConnection()
             .InterceptManipulateRow(args => new OptionalValue<long?>(101));
 
-        Assert.Equal(101, await connection.InsertAndGetIDAsync(new IdNameRow { Name = "X" }));
+        Assert.Equal(101, await connection.InsertAndGetIDAsync(new IdNameRow { Name = "X" }, TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -196,7 +196,7 @@ public class EntityConnectionExtensions_InsertUpdateDelete_Async_Tests
         using var connection = new MockDbConnection();
 
         await Assert.ThrowsAsync<InvalidOperationException>(() =>
-            connection.UpdateByIdAsync(new IdNameRow()));
+            connection.UpdateByIdAsync(new IdNameRow(), ExpectedRows.One, TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -205,7 +205,7 @@ public class EntityConnectionExtensions_InsertUpdateDelete_Async_Tests
         using var connection = new MockDbConnection()
             .OnDbCommandExecuteNonQuery(_ => 1);
 
-        var result = await connection.UpdateByIdAsync(new IdNameRow { ID = 5, Name = "Y" });
+        var result = await connection.UpdateByIdAsync(new IdNameRow { ID = 5, Name = "Y" }, ExpectedRows.One, TestContext.Current.CancellationToken);
 
         Assert.Equal(1, result);
     }
@@ -216,7 +216,7 @@ public class EntityConnectionExtensions_InsertUpdateDelete_Async_Tests
         using var connection = new MockDbConnection()
             .InterceptManipulateRow(args => new OptionalValue<long?>(7));
 
-        Assert.Equal(7, await connection.UpdateByIdAsync(new IdNameRow { ID = 5, Name = "Y" }));
+        Assert.Equal(7, await connection.UpdateByIdAsync(new IdNameRow { ID = 5, Name = "Y" }, ExpectedRows.One, TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -225,7 +225,7 @@ public class EntityConnectionExtensions_InsertUpdateDelete_Async_Tests
         using var connection = new MockDbConnection()
             .OnDbCommandExecuteNonQuery(_ => 1);
 
-        Assert.Equal(1, await connection.DeleteByIdAsync<IdNameRow>(5));
+        Assert.Equal(1, await connection.DeleteByIdAsync<IdNameRow>(5, ExpectedRows.One, TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -234,7 +234,7 @@ public class EntityConnectionExtensions_InsertUpdateDelete_Async_Tests
         using var connection = new MockDbConnection()
             .InterceptManipulateRow(args => new OptionalValue<long?>(3));
 
-        Assert.Equal(3, await connection.DeleteByIdAsync<IdNameRow>(5));
+        Assert.Equal(3, await connection.DeleteByIdAsync<IdNameRow>(5, ExpectedRows.One, TestContext.Current.CancellationToken));
         Assert.Equal(0, connection.DbCommandExecuteNonQueryCallCount);
     }
 }

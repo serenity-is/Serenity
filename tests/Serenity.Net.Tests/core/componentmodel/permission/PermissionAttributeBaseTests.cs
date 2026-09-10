@@ -34,21 +34,21 @@ public class PermissionAttributeBaseTests
     [Fact]
     public void Constructor_With_Enum()
     {
-        var attribute = new TestPermissionAttributeBase(Serenity.IO.DeleteType.Delete);
+        var attribute = new TestPermissionAttributeBase(IO.DeleteType.Delete);
         Assert.Equal("Delete", attribute.Permission);
     }
 
     [Fact]
     public void Constructor_With_Enum_Enum()
     {
-        var attribute = new TestPermissionAttributeBase(Serenity.IO.DeleteType.Delete, Serenity.IO.DeleteType.TryDelete);
+        var attribute = new TestPermissionAttributeBase(IO.DeleteType.Delete, IO.DeleteType.TryDelete);
         Assert.Equal("Delete:TryDelete", attribute.Permission);
     }
 
     [Fact]
     public void Constructor_With_Enum_Enum_Enum()
     {
-        var attribute = new TestPermissionAttributeBase(Serenity.IO.DeleteType.Delete, Serenity.IO.DeleteType.TryDelete, Serenity.IO.DeleteType.TryDeleteOrMark);
+        var attribute = new TestPermissionAttributeBase(IO.DeleteType.Delete, IO.DeleteType.TryDelete, IO.DeleteType.TryDeleteOrMark);
         Assert.Equal("Delete:TryDelete:TryDeleteOrMark", attribute.Permission);
     }
 

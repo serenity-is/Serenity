@@ -5,7 +5,7 @@ public class T0ReferenceRemoverTests
     [Fact]
     public void RemoveT0Aliases_Null_Throws_ArgumentNullException()
     {
-        Assert.Throws<ArgumentNullException>(() => T0ReferenceRemover.RemoveT0Aliases(null!));
+        Assert.Throws<ArgumentNullException>(() => T0ReferenceRemover.RemoveT0Aliases(null));
     }
 
     [Fact]

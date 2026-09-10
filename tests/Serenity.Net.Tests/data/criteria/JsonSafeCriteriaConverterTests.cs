@@ -23,7 +23,7 @@ public class JsonSafeCriteriaConverterTests
         var container = Newtonsoft.Json.JsonConvert.DeserializeObject<CriteriaContainer>(
             "{\"Criteria\": [\"Name\",\"=\",3]}", GetSettings());
 
-        Assert.IsType<BinaryCriteria>(container!.Criteria);
+        Assert.IsType<BinaryCriteria>(container.Criteria);
     }
 
     [Fact]
@@ -68,10 +68,10 @@ public class JsonSafeCriteriaConverterTests
         var container = Newtonsoft.Json.JsonConvert.DeserializeObject<CriteriaContainer>(
             "{\"Criteria\": null}", GetSettings());
 
-        Assert.Null(container!.Criteria);
+        Assert.Null(container.Criteria);
     }
 
-    private static Newtonsoft.Json.JsonSerializerSettings GetSettings() => null!;
+    private static Newtonsoft.Json.JsonSerializerSettings GetSettings() => null;
 
     private sealed class CriteriaContainer
     {

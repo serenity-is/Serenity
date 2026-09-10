@@ -108,7 +108,7 @@ public class SqlHelperExecuteUpsertTests
         using var connection = new MockDbConnection();
 
         Assert.Throws<ArgumentNullException>(() =>
-            SqlHelper.ExecuteUpsert(null!, connection, ["Id"]));
+            SqlHelper.ExecuteUpsert(null, connection, ["Id"]));
     }
 
     [Fact]
@@ -117,7 +117,7 @@ public class SqlHelperExecuteUpsertTests
         var query = new SqlInsert("Table").SetTo("Id", "1");
 
         Assert.Throws<ArgumentNullException>(() =>
-            query.ExecuteUpsert(null!, ["Id"]));
+            query.ExecuteUpsert(null, ["Id"]));
     }
 
     [Fact]

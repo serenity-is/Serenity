@@ -34,7 +34,7 @@ public class StreamFieldTests
     public void Factory_CreatesField()
     {
         var fields = new AllFieldsRow.RowFields();
-        var field = StreamField.Factory(fields, "Test", null, 0, FieldFlags.Default, null!, null!);
+        var field = StreamField.Factory(fields, "Test", null, 0, FieldFlags.Default, null, null);
         Assert.IsType<StreamField>(field);
         Assert.Equal("Test", field.Name);
     }
@@ -70,14 +70,14 @@ public class StreamFieldTests
         using var reader = new MockDbDataReader(new { AStream = (byte[]?)[1, 2] });
         reader.Read();
         field.GetFromReader(reader, 0, row);
-        Assert.Equal(new byte[] { 1, 2 }, ((System.IO.MemoryStream)field[row]!).ToArray());
+        Assert.Equal(new byte[] { 1, 2 }, ((System.IO.MemoryStream)field[row]).ToArray());
     }
 
     [Fact]
     public void GetFromReader_NullReader_Throws()
     {
         var row = NewRow();
-        Assert.Throws<ArgumentNullException>(() => AllFieldsRow.Fields.AStream.GetFromReader(null!, 0, row));
+        Assert.Throws<ArgumentNullException>(() => AllFieldsRow.Fields.AStream.GetFromReader(null, 0, row));
     }
 
     [Fact]
@@ -103,13 +103,13 @@ public class StreamFieldTests
     [Fact]
     public void CopyStream_NullSource_Throws()
     {
-        Assert.Throws<ArgumentNullException>(() => StreamField.CopyStream(null!, new System.IO.MemoryStream()));
+        Assert.Throws<ArgumentNullException>(() => StreamField.CopyStream(null, new System.IO.MemoryStream()));
     }
 
     [Fact]
     public void CopyStream_NullDest_Throws()
     {
-        Assert.Throws<ArgumentNullException>(() => StreamField.CopyStream(new System.IO.MemoryStream(), null!));
+        Assert.Throws<ArgumentNullException>(() => StreamField.CopyStream(new System.IO.MemoryStream(), null));
     }
 
     [Fact]
@@ -169,7 +169,7 @@ public class StreamFieldTests
         using var reader = new Newtonsoft.Json.JsonTextReader(new System.IO.StringReader("\"AQI=\""));
         reader.Read();
         field.ValueFromJson(reader, row, Newtonsoft.Json.JsonSerializer.CreateDefault());
-        Assert.Equal(new byte[] { 1, 2 }, ((System.IO.MemoryStream)field[row]!).ToArray());
+        Assert.Equal(new byte[] { 1, 2 }, ((System.IO.MemoryStream)field[row]).ToArray());
     }
 
     [Fact]
@@ -186,7 +186,7 @@ public class StreamFieldTests
     public void ValueFromJson_Newtonsoft_NullReader_Throws()
     {
         var row = NewRow();
-        Assert.Throws<ArgumentNullException>(() => AllFieldsRow.Fields.AStream.ValueFromJson(null!, row, Newtonsoft.Json.JsonSerializer.CreateDefault()));
+        Assert.Throws<ArgumentNullException>(() => AllFieldsRow.Fields.AStream.ValueFromJson(null, row, Newtonsoft.Json.JsonSerializer.CreateDefault()));
     }
 
     [Fact]
@@ -194,7 +194,7 @@ public class StreamFieldTests
     {
         var row = NewRow();
         var field = AllFieldsRow.Fields.AStream;
-        var bytes = System.Text.Encoding.UTF8.GetBytes("null");
+        var bytes = Encoding.UTF8.GetBytes("null");
         var reader = new Utf8JsonReader(bytes);
         reader.Read();
         field.ValueFromJson(ref reader, row, new JsonSerializerOptions());
@@ -206,11 +206,11 @@ public class StreamFieldTests
     {
         var row = NewRow();
         var field = AllFieldsRow.Fields.AStream;
-        var bytes = System.Text.Encoding.UTF8.GetBytes("\"AQI=\"");
+        var bytes = Encoding.UTF8.GetBytes("\"AQI=\"");
         var reader = new Utf8JsonReader(bytes);
         reader.Read();
         field.ValueFromJson(ref reader, row, new JsonSerializerOptions());
-        Assert.Equal(new byte[] { 1, 2 }, ((System.IO.MemoryStream)field[row]!).ToArray());
+        Assert.Equal(new byte[] { 1, 2 }, ((System.IO.MemoryStream)field[row]).ToArray());
     }
 
     [Fact]
@@ -218,7 +218,7 @@ public class StreamFieldTests
     {
         var row = NewRow();
         var field = AllFieldsRow.Fields.AStream;
-        var bytes = System.Text.Encoding.UTF8.GetBytes("\"\"");
+        var bytes = Encoding.UTF8.GetBytes("\"\"");
         var reader = new Utf8JsonReader(bytes);
         reader.Read();
         field.ValueFromJson(ref reader, row, new JsonSerializerOptions());
@@ -230,7 +230,7 @@ public class StreamFieldTests
     {
         var row = NewRow();
         var field = AllFieldsRow.Fields.AStream;
-        var bytes = System.Text.Encoding.UTF8.GetBytes("{\"a\":1}");
+        var bytes = Encoding.UTF8.GetBytes("{\"a\":1}");
         var ex = Record.Exception(() =>
         {
             var reader = new Utf8JsonReader(bytes);
@@ -250,7 +250,7 @@ public class StreamFieldTests
         using var writer = new Utf8JsonWriter(ms);
         field.ValueToJson(writer, row, new JsonSerializerOptions());
         writer.Flush();
-        Assert.Equal("\"AQI=\"", System.Text.Encoding.UTF8.GetString(ms.ToArray()));
+        Assert.Equal("\"AQI=\"", Encoding.UTF8.GetString(ms.ToArray()));
     }
 
     [Fact]
@@ -262,7 +262,7 @@ public class StreamFieldTests
         using var writer = new Utf8JsonWriter(ms);
         field.ValueToJson(writer, row, new JsonSerializerOptions());
         writer.Flush();
-        Assert.Equal("null", System.Text.Encoding.UTF8.GetString(ms.ToArray()));
+        Assert.Equal("null", Encoding.UTF8.GetString(ms.ToArray()));
     }
 
     [Fact]
@@ -275,7 +275,7 @@ public class StreamFieldTests
         using var writer = new Utf8JsonWriter(ms);
         field.ValueToJson(writer, row, new JsonSerializerOptions());
         writer.Flush();
-        Assert.Equal("null", System.Text.Encoding.UTF8.GetString(ms.ToArray()));
+        Assert.Equal("null", Encoding.UTF8.GetString(ms.ToArray()));
     }
 
     [Fact]
@@ -341,7 +341,7 @@ public class StreamFieldTests
         var field = AllFieldsRow.Fields.AStream;
         var value = field.AsSqlValue(row);
         Assert.IsType<System.Data.SqlTypes.SqlBinary>(value);
-        Assert.True(((System.Data.SqlTypes.SqlBinary)value!).IsNull);
+        Assert.True(((System.Data.SqlTypes.SqlBinary)value).IsNull);
     }
 
     [Fact]

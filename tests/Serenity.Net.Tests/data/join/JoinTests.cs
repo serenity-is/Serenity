@@ -131,7 +131,7 @@ public class JoinTests
         var join = new LeftJoin("Table", "T1", criteria);
 
         Assert.Contains("T1", join.ReferencedAliases);
-        Assert.Equal("(T1.[x] = @p1)", join.OnCriteria!.ToStringIgnoreParams());
+        Assert.Equal("(T1.[x] = @p1)", join.OnCriteria.ToStringIgnoreParams());
     }
 
     [Fact]

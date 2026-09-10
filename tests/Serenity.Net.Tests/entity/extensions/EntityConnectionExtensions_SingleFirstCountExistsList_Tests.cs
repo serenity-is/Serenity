@@ -23,7 +23,7 @@ public class EntityConnectionExtensions_SingleFirstCountExistsList_Tests
         connection.OnDbCommandExecuteReader(_ => new MockDbDataReader());
 
         await Assert.ThrowsAsync<ValidationError>(() =>
-            connection.SingleAsync<IdNameRow>((ICriteria?)null));
+            connection.SingleAsync<IdNameRow>((ICriteria?)null, cancellationToken: TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -72,7 +72,7 @@ public class EntityConnectionExtensions_SingleFirstCountExistsList_Tests
         using var connection = new MockDbConnection();
         connection.OnDbCommandExecuteReader(_ => new MockDbDataReader(new { ID = 9, Name = "D" }));
 
-        var row = await connection.TrySingleAsync<IdNameRow>(q => q.Select("ID"));
+        var row = await connection.TrySingleAsync<IdNameRow>(q => q.Select("ID"), cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.Equal(9, row.ID);
     }
@@ -112,7 +112,7 @@ public class EntityConnectionExtensions_SingleFirstCountExistsList_Tests
         using var connection = new MockDbConnection();
         connection.OnDbCommandExecuteReader(_ => new MockDbDataReader(new { ID = 2, Name = "B" }));
 
-        Assert.Equal(2, (await connection.TryFirstAsync<IdNameRow>(q => q.Select("ID")))!.ID);
+        Assert.Equal(2, (await connection.TryFirstAsync<IdNameRow>(q => q.Select("ID"), cancellationToken: TestContext.Current.CancellationToken)).ID);
     }
 
     [Fact]
@@ -140,7 +140,7 @@ public class EntityConnectionExtensions_SingleFirstCountExistsList_Tests
             .InterceptListRows(args => args.CountOnly ?
                 new OptionalValue<System.Collections.IList>(new System.Collections.ArrayList()) : default);
 
-        Assert.Equal(0, await connection.CountAsync<IdNameRow>());
+        Assert.Equal(0, await connection.CountAsync<IdNameRow>(cancellationToken: TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -149,7 +149,7 @@ public class EntityConnectionExtensions_SingleFirstCountExistsList_Tests
         using var connection = new MockDbConnection();
         connection.OnDbCommandExecuteScalar(_ => 4);
 
-        Assert.Equal(4, await connection.CountAsync<IdNameRow>(new Criteria("Name") == "A"));
+        Assert.Equal(4, await connection.CountAsync<IdNameRow>(new Criteria("Name") == "A", cancellationToken: TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -185,7 +185,7 @@ public class EntityConnectionExtensions_SingleFirstCountExistsList_Tests
         using var connection = new MockDbConnection()
             .OnDbCommandExecuteReader(_ => new MockDbDataReader(new { s = 1 }));
 
-        Assert.True(await connection.ExistsAsync<IdNameRow>(new Criteria("Name") == "A"));
+        Assert.True(await connection.ExistsAsync<IdNameRow>(new Criteria("Name") == "A", cancellationToken: TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -232,7 +232,7 @@ public class EntityConnectionExtensions_SingleFirstCountExistsList_Tests
         using var connection = new MockDbConnection();
         OnReader(connection, new { ID = 1, Name = "A" }, new { ID = 2, Name = "B" });
 
-        var rows = await connection.ListAsync<IdNameRow>();
+        var rows = await connection.ListAsync<IdNameRow>(cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.Equal(2, rows.Count);
     }
@@ -243,7 +243,7 @@ public class EntityConnectionExtensions_SingleFirstCountExistsList_Tests
         using var connection = new MockDbConnection();
         OnReader(connection, new { ID = 1, Name = "A" });
 
-        var rows = await connection.ListAsync<IdNameRow>(new Criteria("Name") == "A");
+        var rows = await connection.ListAsync<IdNameRow>(new Criteria("Name") == "A", cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.Single(rows);
     }
@@ -254,7 +254,7 @@ public class EntityConnectionExtensions_SingleFirstCountExistsList_Tests
         using var connection = new MockDbConnection();
         OnReader(connection, new { ID = 44 });
 
-        var rows = await connection.ListAsync<IdNameRow>(q => q.Select("ID"));
+        var rows = await connection.ListAsync<IdNameRow>(q => q.Select("ID"), cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.Equal(44, rows[0].ID);
     }

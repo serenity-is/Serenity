@@ -6,14 +6,14 @@ public class BinaryCriteriaTests
     public void Constructor_NullLeftOperand_ThrowsArgumentNullException()
     {
         Assert.Throws<ArgumentNullException>(() =>
-            new BinaryCriteria(null!, CriteriaOperator.AND, new Criteria("B")));
+            new BinaryCriteria(null, CriteriaOperator.AND, new Criteria("B")));
     }
 
     [Fact]
     public void Constructor_NullRightOperand_ThrowsArgumentNullException()
     {
         Assert.Throws<ArgumentNullException>(() =>
-            new BinaryCriteria(new Criteria("A"), CriteriaOperator.AND, null!));
+            new BinaryCriteria(new Criteria("A"), CriteriaOperator.AND, null));
     }
 
     [Fact]

@@ -1,5 +1,4 @@
 using System.Text.Json;
-using Serenity.JsonConverters;
 
 namespace Serenity.JsonConverters;
 
@@ -19,7 +18,7 @@ public class CriteriaJsonConverterTests
     {
         var options = GetOptions();
         var json = JsonSerializer.Serialize(criteria, options);
-        return JsonSerializer.Deserialize<BaseCriteria>(json, options)!;
+        return JsonSerializer.Deserialize<BaseCriteria>(json, options);
     }
 
     // Write
@@ -29,7 +28,7 @@ public class CriteriaJsonConverterTests
     {
         var options = GetOptions();
 
-        Assert.Equal("null", JsonSerializer.Serialize<BaseCriteria>(null!, options));
+        Assert.Equal("null", JsonSerializer.Serialize<BaseCriteria>(null, options));
     }
 
     [Fact]
@@ -170,7 +169,7 @@ public class CriteriaJsonConverterTests
     {
         var options = GetOptions();
 
-        var result = JsonSerializer.Deserialize<BaseCriteria>("[\"some text\"]", options)!;
+        var result = JsonSerializer.Deserialize<BaseCriteria>("[\"some text\"]", options);
 
         Assert.IsType<Criteria>(result);
         Assert.Equal("some text", ((Criteria)result).Expression);
@@ -195,7 +194,7 @@ public class CriteriaJsonConverterTests
     {
         var options = GetOptions();
 
-        var result = JsonSerializer.Deserialize<BaseCriteria>("[[\"a\",\"b\",true,false,3]]", options)!;
+        var result = JsonSerializer.Deserialize<BaseCriteria>("[[\"a\",\"b\",true,false,3]]", options);
 
         Assert.IsType<ValueCriteria>(result);
         var value = Assert.IsType<object[]>(((ValueCriteria)result).Value);
@@ -275,7 +274,7 @@ public class CriteriaJsonConverterTests
     {
         var options = GetOptions();
 
-        var result = JsonSerializer.Deserialize<BaseCriteria>($"[{opKey},\"Name\"]", options)!;
+        var result = JsonSerializer.Deserialize<BaseCriteria>($"[{opKey},\"Name\"]", options);
 
         Assert.IsType<UnaryCriteria>(result);
     }
@@ -320,7 +319,7 @@ public class CriteriaJsonConverterTests
     {
         var options = GetOptions();
 
-        var result = JsonSerializer.Deserialize<BaseCriteria>($"[\"A\",{opKey},\"B\"]", options)!;
+        var result = JsonSerializer.Deserialize<BaseCriteria>($"[\"A\",{opKey},\"B\"]", options);
 
         Assert.IsType<BinaryCriteria>(result);
     }
@@ -369,7 +368,7 @@ public class CriteriaJsonConverterTests
     {
         var options = GetOptions();
 
-        var result = JsonSerializer.Deserialize<BaseCriteria>(json, options)!;
+        var result = JsonSerializer.Deserialize<BaseCriteria>(json, options);
 
         var binary = Assert.IsType<BinaryCriteria>(result);
         Assert.IsType<bool>(Assert.IsType<ValueCriteria>(binary.RightOperand).Value);
@@ -381,7 +380,7 @@ public class CriteriaJsonConverterTests
         // An array like [""] is a string criteria, while a stripped expression is invalid
         var options = GetOptions();
 
-        var result = JsonSerializer.Deserialize<BaseCriteria>("[\"\" ]", options)!;
+        var result = JsonSerializer.Deserialize<BaseCriteria>("[\"\" ]", options);
 
         Assert.Equal("", ((Criteria)result).Expression);
     }
@@ -389,7 +388,7 @@ public class CriteriaJsonConverterTests
     [Fact]
     public void Read_NullToken_DirectConverterCall_ReturnsNull()
     {
-        var bytes = System.Text.Encoding.UTF8.GetBytes("null");
+        var bytes = Encoding.UTF8.GetBytes("null");
         var reader = new Utf8JsonReader(bytes);
         var converter = new CriteriaJsonConverter();
 
@@ -415,7 +414,7 @@ public class CriteriaJsonConverterTests
     [Fact]
     public void RoundTrip_ScalarCriteriaExpression_PreservesCriteria()
     {
-        var result = Assert.IsType<Criteria>(RoundTrip(new Criteria("Name"))!);
+        var result = Assert.IsType<Criteria>(RoundTrip(new Criteria("Name")));
 
         Assert.Equal("Name", result.Expression);
     }

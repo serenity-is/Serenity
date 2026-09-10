@@ -34,7 +34,7 @@ public class BaseCriteriaTests
         var query = new SqlQuery();
 
         Assert.Equal("(Name LIKE @p1)", name.Like("x%").ToString(query));
-        Assert.Equal("x%", query.Params!["@p1"]);
+        Assert.Equal("x%", query.Params["@p1"]);
     }
 
     [Fact]
@@ -55,7 +55,7 @@ public class BaseCriteriaTests
         // Only the mask becomes a parameter; with a fresh query it is @p1.
         var query = new SqlQuery();
         Assert.Equal("(UPPER(Name) LIKE UPPER(@p1))", criteria.ToString(query));
-        Assert.Equal("x%", query.Params!["@p1"]);
+        Assert.Equal("x%", query.Params["@p1"]);
     }
 
     [Fact]
@@ -65,7 +65,7 @@ public class BaseCriteriaTests
         var query = new SqlQuery();
 
         Assert.Equal("(Name NOT LIKE @p1)", name.NotLike("x%").ToString(query));
-        Assert.Equal("x%", query.Params!["@p1"]);
+        Assert.Equal("x%", query.Params["@p1"]);
     }
 
     [Fact]
@@ -75,7 +75,7 @@ public class BaseCriteriaTests
         var query = new SqlQuery();
 
         Assert.Equal("(UPPER(Name) NOT LIKE UPPER(@p1))", name.NotLike("x%", upper: true).ToString(query));
-        Assert.Equal("x%", query.Params!["@p1"]);
+        Assert.Equal("x%", query.Params["@p1"]);
     }
 
     // StartsWith / EndsWith / Contains / NotContains
@@ -87,7 +87,7 @@ public class BaseCriteriaTests
         var query = new SqlQuery();
 
         Assert.Equal("(Name LIKE @p1)", name.StartsWith("x").ToString(query));
-        Assert.Equal("x%", query.Params!["@p1"]);
+        Assert.Equal("x%", query.Params["@p1"]);
     }
 
     [Fact]
@@ -97,7 +97,7 @@ public class BaseCriteriaTests
         var query = new SqlQuery();
 
         Assert.Equal("(Name LIKE @p1)", name.EndsWith("x").ToString(query));
-        Assert.Equal("%x", query.Params!["@p1"]);
+        Assert.Equal("%x", query.Params["@p1"]);
     }
 
     [Fact]
@@ -107,7 +107,7 @@ public class BaseCriteriaTests
         var query = new SqlQuery();
 
         Assert.Equal("(Name LIKE @p1)", name.Contains("x").ToString(query));
-        Assert.Equal("%x%", query.Params!["@p1"]);
+        Assert.Equal("%x%", query.Params["@p1"]);
     }
 
     [Fact]
@@ -117,7 +117,7 @@ public class BaseCriteriaTests
         var query = new SqlQuery();
 
         Assert.Equal("(Name NOT LIKE @p1)", name.NotContains("x").ToString(query));
-        Assert.Equal("%x%", query.Params!["@p1"]);
+        Assert.Equal("%x%", query.Params["@p1"]);
     }
 
     [Fact]
@@ -125,7 +125,7 @@ public class BaseCriteriaTests
     {
         var name = new Criteria("Name");
 
-        var exception = Assert.Throws<ArgumentNullException>(() => name.StartsWith(null!));
+        var exception = Assert.Throws<ArgumentNullException>(() => name.StartsWith(null));
         Assert.Equal("mask", exception.ParamName);
     }
 
@@ -134,7 +134,7 @@ public class BaseCriteriaTests
     {
         var name = new Criteria("Name");
 
-        var exception = Assert.Throws<ArgumentNullException>(() => name.EndsWith(null!));
+        var exception = Assert.Throws<ArgumentNullException>(() => name.EndsWith(null));
         Assert.Equal("mask", exception.ParamName);
     }
 
@@ -143,7 +143,7 @@ public class BaseCriteriaTests
     {
         var name = new Criteria("Name");
 
-        var exception = Assert.Throws<ArgumentNullException>(() => name.Contains(null!));
+        var exception = Assert.Throws<ArgumentNullException>(() => name.Contains(null));
         Assert.Equal("mask", exception.ParamName);
     }
 
@@ -152,7 +152,7 @@ public class BaseCriteriaTests
     {
         var name = new Criteria("Name");
 
-        var exception = Assert.Throws<ArgumentNullException>(() => name.NotContains(null!));
+        var exception = Assert.Throws<ArgumentNullException>(() => name.NotContains(null));
         Assert.Equal("mask", exception.ParamName);
     }
 
@@ -165,9 +165,9 @@ public class BaseCriteriaTests
         var query = new SqlQuery();
 
         Assert.Equal("(Name IN (@p1,@p2,@p3))", name.In(1, 2, 3).ToString(query));
-        Assert.Equal(1, query.Params!["@p1"]);
-        Assert.Equal(2, query.Params!["@p2"]);
-        Assert.Equal(3, query.Params!["@p3"]);
+        Assert.Equal(1, query.Params["@p1"]);
+        Assert.Equal(2, query.Params["@p2"]);
+        Assert.Equal(3, query.Params["@p3"]);
     }
 
     [Fact]
@@ -175,7 +175,7 @@ public class BaseCriteriaTests
     {
         var name = new Criteria("Name");
 
-        var exception = Assert.Throws<ArgumentNullException>(() => name.In((object[])null!));
+        var exception = Assert.Throws<ArgumentNullException>(() => name.In((object[])null));
         Assert.Equal("values", exception.ParamName);
     }
 
@@ -221,7 +221,7 @@ public class BaseCriteriaTests
     {
         var name = new Criteria("Name");
 
-        var exception = Assert.Throws<ArgumentNullException>(() => name.In((BaseCriteria)null!));
+        var exception = Assert.Throws<ArgumentNullException>(() => name.In((BaseCriteria)null));
         Assert.Equal("statement", exception.ParamName);
     }
 
@@ -246,9 +246,9 @@ public class BaseCriteriaTests
 
         var query = new SqlQuery();
         Assert.Equal("(Name IN (@p1,@p2,@p3))", criteria.ToString(query));
-        Assert.Equal(1, query.Params!["@p1"]);
-        Assert.Equal(2, query.Params!["@p2"]);
-        Assert.Equal(3, query.Params!["@p3"]);
+        Assert.Equal(1, query.Params["@p1"]);
+        Assert.Equal(2, query.Params["@p2"]);
+        Assert.Equal(3, query.Params["@p3"]);
     }
 
     [Fact]
@@ -311,7 +311,7 @@ public class BaseCriteriaTests
     {
         var name = new Criteria("Name");
 
-        var exception = Assert.Throws<ArgumentNullException>(() => name.In((ISqlQuery)null!));
+        var exception = Assert.Throws<ArgumentNullException>(() => name.In((ISqlQuery)null));
         Assert.Equal("statement", exception.ParamName);
     }
 
@@ -324,8 +324,8 @@ public class BaseCriteriaTests
         var query = new SqlQuery();
 
         Assert.Equal("(Name NOT IN (@p1,@p2))", name.NotIn(1, 2).ToString(query));
-        Assert.Equal(1, query.Params!["@p1"]);
-        Assert.Equal(2, query.Params!["@p2"]);
+        Assert.Equal(1, query.Params["@p1"]);
+        Assert.Equal(2, query.Params["@p2"]);
     }
 
     [Fact]
@@ -373,7 +373,7 @@ public class BaseCriteriaTests
     {
         var name = new Criteria("Name");
 
-        var exception = Assert.Throws<ArgumentNullException>(() => name.NotIn((object[])null!));
+        var exception = Assert.Throws<ArgumentNullException>(() => name.NotIn((object[])null));
         Assert.Equal("values", exception.ParamName);
     }
 
@@ -390,7 +390,7 @@ public class BaseCriteriaTests
     {
         var name = new Criteria("Name");
 
-        var exception = Assert.Throws<ArgumentNullException>(() => name.NotIn((BaseCriteria)null!));
+        var exception = Assert.Throws<ArgumentNullException>(() => name.NotIn((BaseCriteria)null));
         Assert.Equal("statement", exception.ParamName);
     }
 
@@ -411,7 +411,7 @@ public class BaseCriteriaTests
         var query = new SqlQuery();
 
         Assert.Equal("(Name = @p1)", (name == "x").ToString(query));
-        Assert.Equal("x", query.Params!["@p1"]);
+        Assert.Equal("x", query.Params["@p1"]);
     }
 
     [Fact]
@@ -421,7 +421,7 @@ public class BaseCriteriaTests
         var query = new SqlQuery();
 
         Assert.Equal("(Name != @p1)", (name != "x").ToString(query));
-        Assert.Equal("x", query.Params!["@p1"]);
+        Assert.Equal("x", query.Params["@p1"]);
     }
 
     [Fact]
@@ -431,7 +431,7 @@ public class BaseCriteriaTests
         var query = new SqlQuery();
 
         Assert.Equal("(Name > @p1)", (name > 5).ToString(query));
-        Assert.Equal(5, query.Params!["@p1"]);
+        Assert.Equal(5, query.Params["@p1"]);
     }
 
     [Fact]
@@ -441,7 +441,7 @@ public class BaseCriteriaTests
         var query = new SqlQuery();
 
         Assert.Equal("(Name >= @p1)", (name >= 5).ToString(query));
-        Assert.Equal(5, query.Params!["@p1"]);
+        Assert.Equal(5, query.Params["@p1"]);
     }
 
     [Fact]
@@ -451,7 +451,7 @@ public class BaseCriteriaTests
         var query = new SqlQuery();
 
         Assert.Equal("(Name < @p1)", (name < 5).ToString(query));
-        Assert.Equal(5, query.Params!["@p1"]);
+        Assert.Equal(5, query.Params["@p1"]);
     }
 
     [Fact]
@@ -461,7 +461,7 @@ public class BaseCriteriaTests
         var query = new SqlQuery();
 
         Assert.Equal("(Name <= @p1)", (name <= 5).ToString(query));
-        Assert.Equal(5, query.Params!["@p1"]);
+        Assert.Equal(5, query.Params["@p1"]);
     }
 
     [Fact]
@@ -471,19 +471,19 @@ public class BaseCriteriaTests
 
         var intQuery = new SqlQuery();
         Assert.Equal("(Name = @p1)", (name == 5).ToString(intQuery));
-        Assert.Equal(5, intQuery.Params!["@p1"]);
+        Assert.Equal(5, intQuery.Params["@p1"]);
 
         var longQuery = new SqlQuery();
         Assert.Equal("(Name = @p1)", (name == 5L).ToString(longQuery));
-        Assert.Equal(5L, longQuery.Params!["@p1"]);
+        Assert.Equal(5L, longQuery.Params["@p1"]);
 
         var doubleQuery = new SqlQuery();
         Assert.Equal("(Name = @p1)", (name == 5.5).ToString(doubleQuery));
-        Assert.Equal(5.5, doubleQuery.Params!["@p1"]);
+        Assert.Equal(5.5, doubleQuery.Params["@p1"]);
 
         var decimalQuery = new SqlQuery();
         Assert.Equal("(Name = @p1)", (name == 5.5m).ToString(decimalQuery));
-        Assert.Equal(5.5m, decimalQuery.Params!["@p1"]);
+        Assert.Equal(5.5m, decimalQuery.Params["@p1"]);
     }
 
     [Fact]
@@ -494,16 +494,16 @@ public class BaseCriteriaTests
         var date = new DateTime(2023, 1, 15, 10, 30, 0);
         var dateQuery = new SqlQuery();
         Assert.Equal("(Name = @p1)", (name == date).ToString(dateQuery));
-        Assert.Equal(date, dateQuery.Params!["@p1"]);
+        Assert.Equal(date, dateQuery.Params["@p1"]);
 
         var guid = new Guid("12345678-1234-1234-1234-123456789012");
         var guidQuery = new SqlQuery();
         Assert.Equal("(Name = @p1)", (name == guid).ToString(guidQuery));
-        Assert.Equal(guid, guidQuery.Params!["@p1"]);
+        Assert.Equal(guid, guidQuery.Params["@p1"]);
 
         var enumQuery = new SqlQuery();
         Assert.Equal("(Name = @p1)", (name == TestEnum.A).ToString(enumQuery));
-        Assert.Equal(TestEnum.A, enumQuery.Params!["@p1"]);
+        Assert.Equal(TestEnum.A, enumQuery.Params["@p1"]);
     }
 
     // Comparison operators with criteria / field / parameter
@@ -705,7 +705,7 @@ public class BaseCriteriaTests
         var query = new SqlQuery();
 
         Assert.Equal("(Name = @p1)", (name == "x").ToString(query));
-        Assert.Equal("x", query.Params!["@p1"]);
+        Assert.Equal("x", query.Params["@p1"]);
     }
 
     [Fact]

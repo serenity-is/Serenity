@@ -21,7 +21,7 @@ public class ValueCriteriaTests
         var criteria = new ValueCriteria("test");
 
         Assert.Equal("@p1", criteria.ToString(query));
-        Assert.Equal("test", query.Params!["@p1"]);
+        Assert.Equal("test", query.Params["@p1"]);
     }
 
     [Fact]
@@ -31,7 +31,7 @@ public class ValueCriteriaTests
         var criteria = new ValueCriteria(5);
 
         Assert.Equal("@p1", criteria.ToString(query));
-        Assert.Equal(5, query.Params!["@p1"]);
+        Assert.Equal(5, query.Params["@p1"]);
     }
 
     [Fact]
@@ -42,7 +42,7 @@ public class ValueCriteriaTests
         var criteria = new ValueCriteria(value);
 
         Assert.Equal("@p1", criteria.ToString(query));
-        Assert.Equal(value, query.Params!["@p1"]);
+        Assert.Equal(value, query.Params["@p1"]);
     }
 
     [Fact]
@@ -52,7 +52,7 @@ public class ValueCriteriaTests
         var criteria = new ValueCriteria(null);
 
         Assert.Equal("@p1", criteria.ToString(query));
-        Assert.Null(query.Params!["@p1"]);
+        Assert.Null(query.Params["@p1"]);
     }
 
     [Fact]
@@ -71,8 +71,8 @@ public class ValueCriteriaTests
         var criteria = new ValueCriteria(new object[] { "a", "b" });
 
         Assert.Equal("(@p1,@p2)", criteria.ToString(query));
-        Assert.Equal("a", query.Params!["@p1"]);
-        Assert.Equal("b", query.Params!["@p2"]);
+        Assert.Equal("a", query.Params["@p1"]);
+        Assert.Equal("b", query.Params["@p2"]);
     }
 
     [Fact]
@@ -107,7 +107,7 @@ public class ValueCriteriaTests
         // Only integer and enum items are inlined; strings are always parameterized.
         Assert.Equal("(@p1,@p2,@p3,@p4,@p5,@p6,@p7,@p8,@p9,@p10,@p11,@p12,@p13,@p14,@p15)",
             criteria.ToString(query));
-        Assert.Equal(15, query.Params!.Count);
+        Assert.Equal(15, query.Params.Count);
     }
 
     [Fact]
@@ -118,7 +118,7 @@ public class ValueCriteriaTests
 
         // Collections with 10 or fewer items are always parameterized.
         Assert.Equal("(@p1,@p2,@p3,@p4,@p5)", criteria.ToString(query));
-        Assert.Equal(5, query.Params!.Count);
+        Assert.Equal(5, query.Params.Count);
     }
 
     [Fact]

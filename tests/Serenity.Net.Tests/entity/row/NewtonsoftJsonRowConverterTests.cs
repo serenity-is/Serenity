@@ -154,16 +154,16 @@ public class NewtonsoftJsonRowConverterTests
     {
         try
         {
-            Serenity.JsonConverters.RowJsonConverter.ShouldSerializeExtension = null;
+            JsonConverters.RowJsonConverter.ShouldSerializeExtension = null;
             Func<IRow, string, bool> hook = (_, _) => true;
 
             JsonRowConverter.ShouldSerializeExtension = hook;
 
-            Assert.Same(hook, Serenity.JsonConverters.RowJsonConverter.ShouldSerializeExtension);
+            Assert.Same(hook, JsonConverters.RowJsonConverter.ShouldSerializeExtension);
         }
         finally
         {
-            Serenity.JsonConverters.RowJsonConverter.ShouldSerializeExtension = null;
+            JsonConverters.RowJsonConverter.ShouldSerializeExtension = null;
         }
     }
 
@@ -172,16 +172,16 @@ public class NewtonsoftJsonRowConverterTests
     {
         try
         {
-            Serenity.JsonConverters.RowJsonConverter.ShouldDeserializeExtension = null;
+            JsonConverters.RowJsonConverter.ShouldDeserializeExtension = null;
             Func<IRow, string, bool> hook = (_, _) => true;
 
             JsonRowConverter.ShouldDeserializeExtension = hook;
 
-            Assert.Same(hook, Serenity.JsonConverters.RowJsonConverter.ShouldDeserializeExtension);
+            Assert.Same(hook, JsonConverters.RowJsonConverter.ShouldDeserializeExtension);
         }
         finally
         {
-            Serenity.JsonConverters.RowJsonConverter.ShouldDeserializeExtension = null;
+            JsonConverters.RowJsonConverter.ShouldDeserializeExtension = null;
         }
     }
 

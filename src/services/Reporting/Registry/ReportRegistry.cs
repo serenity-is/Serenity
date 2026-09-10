@@ -20,7 +20,7 @@ public class ReportRegistry : IReportRegistry
     /// <exception cref="ArgumentNullException"><paramref name="typeSource"/>, <paramref name="permissions"/> or <paramref name="localizer"/> is <c>null</c>.</exception>
     public ReportRegistry(ITypeSource typeSource, IPermissionService permissions, ITextLocalizer localizer)
     {
-        types = (typeSource ?? throw new ArgumentNullException(nameof(types)))
+        types = (typeSource ?? throw new ArgumentNullException(nameof(typeSource)))
             .GetTypesWithAttribute(typeof(ReportAttribute));
         this.permissions = permissions ?? throw new ArgumentNullException(nameof(permissions));
         this.localizer = localizer ?? throw new ArgumentNullException(nameof(localizer));

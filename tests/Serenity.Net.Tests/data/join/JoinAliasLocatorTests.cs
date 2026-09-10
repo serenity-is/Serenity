@@ -5,7 +5,7 @@ public class JoinAliasLocatorTests
     [Fact]
     public void Locate_Null_Throws_ArgumentNullException()
     {
-        Assert.Throws<ArgumentNullException>(() => JoinAliasLocator.Locate(null!));
+        Assert.Throws<ArgumentNullException>(() => JoinAliasLocator.Locate(null));
     }
 
     [Fact]

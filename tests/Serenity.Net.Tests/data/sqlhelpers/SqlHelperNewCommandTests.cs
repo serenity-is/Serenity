@@ -5,7 +5,7 @@ public class SqlHelperNewCommandTests
     [Fact]
     public void NewCommand_NullConnection_ThrowsArgumentNullException()
     {
-        Assert.Throws<ArgumentNullException>(() => SqlHelper.NewCommand(null!, "SELECT 1"));
+        Assert.Throws<ArgumentNullException>(() => SqlHelper.NewCommand(null, "SELECT 1"));
     }
 
     [Fact]
@@ -58,10 +58,10 @@ public class SqlHelperNewCommandTests
             new Dictionary<string, object?> { ["@p1"] = 5, ["@p2"] = "test" });
 
         Assert.Equal(2, command.Parameters.Count);
-        Assert.Equal("@p1", ((IDbDataParameter)command.Parameters[0]!).ParameterName);
-        Assert.Equal(5, ((IDbDataParameter)command.Parameters[0]!).Value);
-        Assert.Equal("@p2", ((IDbDataParameter)command.Parameters[1]!).ParameterName);
-        Assert.Equal("test", ((IDbDataParameter)command.Parameters[1]!).Value);
+        Assert.Equal("@p1", ((IDbDataParameter)command.Parameters[0]).ParameterName);
+        Assert.Equal(5, ((IDbDataParameter)command.Parameters[0]).Value);
+        Assert.Equal("@p2", ((IDbDataParameter)command.Parameters[1]).ParameterName);
+        Assert.Equal("test", ((IDbDataParameter)command.Parameters[1]).Value);
     }
 
     [Fact]
@@ -73,6 +73,6 @@ public class SqlHelperNewCommandTests
         using var command = SqlHelper.NewCommand(connection, "SELECT 1",
             new Dictionary<string, object?> { ["@p1"] = 5 });
 
-        Assert.Equal(":p1", ((IDbDataParameter)command.Parameters[0]!).ParameterName);
+        Assert.Equal(":p1", ((IDbDataParameter)command.Parameters[0]).ParameterName);
     }
 }

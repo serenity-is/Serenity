@@ -41,9 +41,9 @@ public class MockDiskUploadFileSystem(string currentDirectory = "") : MockFileSy
 
     public void Delete(string path, Serenity.IO.DeleteType deleteType)
     {
-        if (deleteType == Serenity.IO.DeleteType.Delete)
+        if (deleteType == IO.DeleteType.Delete)
             DeleteFile(path);
-        else if (deleteType == Serenity.IO.DeleteType.TryDelete)
+        else if (deleteType == IO.DeleteType.TryDelete)
             TryDelete(path);
         else
             TryDeleteOrMark(path);

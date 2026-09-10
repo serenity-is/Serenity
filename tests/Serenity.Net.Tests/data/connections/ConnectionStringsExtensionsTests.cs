@@ -5,7 +5,7 @@ public class ConnectionStringsExtensionsTests
     [Fact]
     public void Get_NullConnectionStrings_ThrowsArgumentNullException()
     {
-        Assert.Throws<ArgumentNullException>(() => ((IConnectionStrings)null!).Get("Default"));
+        Assert.Throws<ArgumentNullException>(() => ((IConnectionStrings)null).Get("Default"));
     }
 
     [Fact]

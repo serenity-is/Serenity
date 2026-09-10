@@ -87,7 +87,7 @@ public class SingleFieldTests
     public void GetFromReader_NullReader_Throws()
     {
         var row = NewRow();
-        Assert.Throws<ArgumentNullException>(() => AllFieldsRow.Fields.ASingle.GetFromReader(null!, 0, row));
+        Assert.Throws<ArgumentNullException>(() => AllFieldsRow.Fields.ASingle.GetFromReader(null, 0, row));
     }
 
     [Theory]
@@ -164,7 +164,7 @@ public class SingleFieldTests
     public void ValueFromJson_Newtonsoft_NullReader_Throws()
     {
         var row = NewRow();
-        Assert.Throws<ArgumentNullException>(() => AllFieldsRow.Fields.ASingle.ValueFromJson(null!, row, Newtonsoft.Json.JsonSerializer.CreateDefault()));
+        Assert.Throws<ArgumentNullException>(() => AllFieldsRow.Fields.ASingle.ValueFromJson(null, row, Newtonsoft.Json.JsonSerializer.CreateDefault()));
     }
 
     [Theory]
@@ -178,7 +178,7 @@ public class SingleFieldTests
     {
         var row = NewRow();
         var field = AllFieldsRow.Fields.ASingle;
-        var bytes = System.Text.Encoding.UTF8.GetBytes(json);
+        var bytes = Encoding.UTF8.GetBytes(json);
         var reader = new Utf8JsonReader(bytes);
         reader.Read();
         field.ValueFromJson(ref reader, row, new JsonSerializerOptions());
@@ -190,7 +190,7 @@ public class SingleFieldTests
     {
         var row = NewRow();
         var field = AllFieldsRow.Fields.ASingle;
-        var bytes = System.Text.Encoding.UTF8.GetBytes("{\"a\":1}");
+        var bytes = Encoding.UTF8.GetBytes("{\"a\":1}");
         var ex = Record.Exception(() =>
         {
             var reader = new Utf8JsonReader(bytes);
@@ -210,7 +210,7 @@ public class SingleFieldTests
         using var writer = new Utf8JsonWriter(ms);
         field.ValueToJson(writer, row, new JsonSerializerOptions());
         writer.Flush();
-        Assert.Equal("1.5", System.Text.Encoding.UTF8.GetString(ms.ToArray()));
+        Assert.Equal("1.5", Encoding.UTF8.GetString(ms.ToArray()));
     }
 
     [Fact]
@@ -222,7 +222,7 @@ public class SingleFieldTests
         using var writer = new Utf8JsonWriter(ms);
         field.ValueToJson(writer, row, new JsonSerializerOptions());
         writer.Flush();
-        Assert.Equal("null", System.Text.Encoding.UTF8.GetString(ms.ToArray()));
+        Assert.Equal("null", Encoding.UTF8.GetString(ms.ToArray()));
     }
 
     [Fact]

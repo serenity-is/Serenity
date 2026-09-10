@@ -1,4 +1,3 @@
-using Serenity.JsonConverters;
 using System.Text.Json;
 
 namespace Serenity.JsonConverters;
@@ -31,7 +30,7 @@ public class SafeCriteriaJsonConverterTests
     {
         var options = GetOptions();
 
-        var result = JsonSerializer.Deserialize<BaseCriteria>("[\"Name\",\"=\",\"@p1\"]", options)!;
+        var result = JsonSerializer.Deserialize<BaseCriteria>("[\"Name\",\"=\",\"@p1\"]", options);
 
         var binary = Assert.IsType<BinaryCriteria>(result);
         Assert.Equal("@p1", Assert.IsType<ValueCriteria>(binary.RightOperand).Value);

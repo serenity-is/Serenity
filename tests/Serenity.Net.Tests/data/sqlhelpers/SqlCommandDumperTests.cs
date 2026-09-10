@@ -1,4 +1,3 @@
-using System.Data.Common;
 using Microsoft.Data.SqlClient;
 
 namespace Serenity.Data;
@@ -63,7 +62,7 @@ public class SqlCommandDumperTests
     {
         var command = GetCommand();
         command.CommandText = "SELECT 1";
-        var parameter = new MockDbParameter { DbType = System.Data.DbType.String, ParameterName = "@p1" };
+        var parameter = new MockDbParameter { DbType = DbType.String, ParameterName = "@p1" };
         ((MockDbParameterCollection)command.Parameters).Add(parameter);
 
         var result = SqlCommandDumper.GetCommandText(command);

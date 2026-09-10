@@ -206,7 +206,7 @@ public class BaseCriteriaOperatorOverloadTests
     [Fact]
     public void InStatement_Null_ThrowsArgumentNullException()
     {
-        Assert.Throws<ArgumentNullException>(() => new Criteria("A").InStatement(null!));
+        Assert.Throws<ArgumentNullException>(() => new Criteria("A").InStatement(null));
     }
 
     [Fact]

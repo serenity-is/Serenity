@@ -13,7 +13,7 @@ public class DialectExpressionSelectorTests
     [Fact]
     public void Constructor_NullDialect_Throws()
     {
-        Assert.Throws<ArgumentNullException>(() => new DialectExpressionSelector(null!));
+        Assert.Throws<ArgumentNullException>(() => new DialectExpressionSelector(null));
     }
 
     [Fact]

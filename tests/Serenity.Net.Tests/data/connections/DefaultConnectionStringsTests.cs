@@ -26,7 +26,7 @@ public class DefaultConnectionStringsTests
     [Fact]
     public void Constructor_NullOptions_ThrowsArgumentNullException()
     {
-        Assert.Throws<ArgumentNullException>(() => new DefaultConnectionStrings(null!));
+        Assert.Throws<ArgumentNullException>(() => new DefaultConnectionStrings(null));
     }
 
     [Fact]
@@ -90,7 +90,7 @@ public class DefaultConnectionStringsTests
             }
         });
 
-        Assert.Equal(dialect, settings.TryGetConnectionString("X")!.Dialect);
+        Assert.Equal(dialect, settings.TryGetConnectionString("X").Dialect);
     }
 
     [Fact]
@@ -101,15 +101,15 @@ public class DefaultConnectionStringsTests
             ["Pg"] = Entry(providerName: "Npgsql")
         });
 
-        Assert.Equal(PostgresDialect.Instance, settings.TryGetConnectionString("Pg")!.Dialect);
+        Assert.Equal(PostgresDialect.Instance, settings.TryGetConnectionString("Pg").Dialect);
         Assert.Equal(MySqlDialect.Instance, Create(new()
         {
             ["My"] = Entry(providerName: "MySqlConnector")
-        }).TryGetConnectionString("My")!.Dialect);
+        }).TryGetConnectionString("My").Dialect);
         Assert.Equal(FirebirdDialect.Instance, Create(new()
         {
             ["Fb"] = Entry(providerName: "FirebirdSql.Data.FirebirdClient")
-        }).TryGetConnectionString("Fb")!.Dialect);
+        }).TryGetConnectionString("Fb").Dialect);
     }
 
     [Fact]
@@ -120,7 +120,7 @@ public class DefaultConnectionStringsTests
             ["U"] = Entry(providerName: "Unknown.Provider")
         });
 
-        Assert.Equal(SqlSettings.DefaultDialect, settings.TryGetConnectionString("U")!.Dialect);
+        Assert.Equal(SqlSettings.DefaultDialect, settings.TryGetConnectionString("U").Dialect);
     }
 
     [Fact]
@@ -217,7 +217,7 @@ public class DefaultConnectionStringsTests
     [Fact]
     public void ConnectionStringInfo_ConstructorArgumentChecks()
     {
-        Assert.Throws<ArgumentNullException>(() => new ConnectionStringInfo(null!, "cs", "p", null!));
-        Assert.Throws<ArgumentNullException>(() => new ConnectionStringInfo("k", "cs", "p", null!));
+        Assert.Throws<ArgumentNullException>(() => new ConnectionStringInfo(null, "cs", "p", null));
+        Assert.Throws<ArgumentNullException>(() => new ConnectionStringInfo("k", "cs", "p", null));
     }
 }

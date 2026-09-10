@@ -11,7 +11,7 @@ public class WrappedConnectionTests
     public void Constructor_NullConnection_ThrowsArgumentNullException()
     {
         Assert.Throws<ArgumentNullException>(() =>
-            new WrappedConnection(null!, SqlServer2012Dialect.Instance));
+            new WrappedConnection(null, SqlServer2012Dialect.Instance));
     }
 
     [Fact]
@@ -80,7 +80,7 @@ public class WrappedConnectionTests
     public void CreateCommand_WithoutDialect_UsesActualConnectionCommand()
     {
         using var connection = new MockDbConnection();
-        using var wrapped = new WrappedConnection(connection, null!);
+        using var wrapped = new WrappedConnection(connection, null);
 
         var command = ((IDbConnection)wrapped).CreateCommand();
         Assert.IsType<MockDbCommand>(command);

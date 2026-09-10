@@ -187,7 +187,7 @@ public class SqlConversionsTests
     [Fact]
     public void Translate_Dialect_Null_ThrowsArgumentNullException()
     {
-        Assert.Throws<ArgumentNullException>(() => SqlConversions.Translate("SELECT 1", (ISqlDialect)null!));
+        Assert.Throws<ArgumentNullException>(() => SqlConversions.Translate("SELECT 1", (ISqlDialect)null));
     }
 
     [Fact]
@@ -206,6 +206,6 @@ public class SqlConversionsTests
     public void Translate_Query_Null_ThrowsArgumentNullException()
     {
         Assert.Throws<ArgumentNullException>(() =>
-            SqlConversions.Translate((IQueryWithParams)null!, new MockDbConnection()));
+            SqlConversions.Translate((IQueryWithParams)null, new MockDbConnection()));
     }
 }

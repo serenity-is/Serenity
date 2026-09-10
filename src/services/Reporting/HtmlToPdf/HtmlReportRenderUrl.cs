@@ -60,8 +60,8 @@ public class HtmlReportRenderUrl : IDisposable
     {
         if (!disposed)
         {
-            Cleanup();
             disposed = true;
+            Cleanup();
         }
     }
 
@@ -72,8 +72,8 @@ public class HtmlReportRenderUrl : IDisposable
     {
         if (!disposed)
         {
-            Cleanup();
             disposed = true;
+            Cleanup();
         }
         GC.SuppressFinalize(this);
     }

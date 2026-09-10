@@ -86,7 +86,7 @@ public partial class DefaultUploadProcessorTests
     [Fact]
     public void Throws_WhenFileNameContainsInvalidChars()
     {
-        var invalidChars = System.IO.Path.GetInvalidFileNameChars()
+        var invalidChars = Path.GetInvalidFileNameChars()
             .Where(x => x != '/' && x != '\\').ToArray();
 
         var attr = new ImageUploadEditorAttribute();
@@ -320,18 +320,18 @@ public partial class DefaultUploadProcessorTests
         var white = new Rgb24(255, 255, 255);
         var black = new Rgb24(0, 0, 0);
         
-        Assert.Equal(white, scaledImage[0, 0]!);
-        Assert.Equal(white, scaledImage[0, 1]!);
-        Assert.Equal(white, scaledImage[3, 0]!);
-        Assert.Equal(white, scaledImage[3, 1]!);
-        Assert.Equal(black, scaledImage[4, 0]!);
-        Assert.Equal(black, scaledImage[4, 1]!);
-        Assert.Equal(black, scaledImage[5, 0]!);
-        Assert.Equal(black, scaledImage[5, 1]!);
-        Assert.Equal(white, scaledImage[6, 0]!);
-        Assert.Equal(white, scaledImage[6, 1]!);
-        Assert.Equal(white, scaledImage[10, 0]!);
-        Assert.Equal(white, scaledImage[10, 1]!);
+        Assert.Equal(white, scaledImage[0, 0]);
+        Assert.Equal(white, scaledImage[0, 1]);
+        Assert.Equal(white, scaledImage[3, 0]);
+        Assert.Equal(white, scaledImage[3, 1]);
+        Assert.Equal(black, scaledImage[4, 0]);
+        Assert.Equal(black, scaledImage[4, 1]);
+        Assert.Equal(black, scaledImage[5, 0]);
+        Assert.Equal(black, scaledImage[5, 1]);
+        Assert.Equal(white, scaledImage[6, 0]);
+        Assert.Equal(white, scaledImage[6, 1]);
+        Assert.Equal(white, scaledImage[10, 0]);
+        Assert.Equal(white, scaledImage[10, 1]);
     }
     
     [Fact]
@@ -359,18 +359,18 @@ public partial class DefaultUploadProcessorTests
         var black = new Rgb24(0, 0, 0);
         var white = new Rgb24(255, 255, 255);
         
-        Assert.Equal(black, scaledImage[0, 0]!);
-        Assert.Equal(black, scaledImage[0, 1]!);
-        Assert.Equal(black, scaledImage[3, 0]!);
-        Assert.Equal(black, scaledImage[3, 1]!);
-        Assert.Equal(white, scaledImage[4, 0]!);
-        Assert.Equal(white, scaledImage[4, 1]!);
-        Assert.Equal(white, scaledImage[5, 0]!);
-        Assert.Equal(white, scaledImage[5, 1]!);
-        Assert.Equal(black, scaledImage[6, 0]!);
-        Assert.Equal(black, scaledImage[6, 1]!);
-        Assert.Equal(black, scaledImage[10, 0]!);
-        Assert.Equal(black, scaledImage[10, 1]!);
+        Assert.Equal(black, scaledImage[0, 0]);
+        Assert.Equal(black, scaledImage[0, 1]);
+        Assert.Equal(black, scaledImage[3, 0]);
+        Assert.Equal(black, scaledImage[3, 1]);
+        Assert.Equal(white, scaledImage[4, 0]);
+        Assert.Equal(white, scaledImage[4, 1]);
+        Assert.Equal(white, scaledImage[5, 0]);
+        Assert.Equal(white, scaledImage[5, 1]);
+        Assert.Equal(black, scaledImage[6, 0]);
+        Assert.Equal(black, scaledImage[6, 1]);
+        Assert.Equal(black, scaledImage[10, 0]);
+        Assert.Equal(black, scaledImage[10, 1]);
     }
     
     [Theory]

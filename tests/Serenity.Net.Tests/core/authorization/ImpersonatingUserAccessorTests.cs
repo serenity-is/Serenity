@@ -19,7 +19,7 @@ public class ImpersonatingUserAccessorTests
     public void Ctor_ThrowsArgumentNullException_WhenUserContextIsNull()
     {
         Assert.Throws<ArgumentNullException>(() =>
-            new ImpersonatingUserAccessor(null!, new MockHttpContextItemsAccessor()));
+            new ImpersonatingUserAccessor(null, new MockHttpContextItemsAccessor()));
     }
 
     [Fact]

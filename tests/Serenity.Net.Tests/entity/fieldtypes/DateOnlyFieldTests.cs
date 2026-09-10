@@ -34,7 +34,7 @@ public class DateOnlyFieldTests
     public void Factory_CreatesField()
     {
         var fields = new AllFieldsRow.RowFields();
-        var field = DateOnlyField.Factory(fields, "Test", null, 0, FieldFlags.Default, null!, null!);
+        var field = DateOnlyField.Factory(fields, "Test", null, 0, FieldFlags.Default, null, null);
         Assert.IsType<DateOnlyField>(field);
         Assert.Equal("Test", field.Name);
     }
@@ -98,7 +98,7 @@ public class DateOnlyFieldTests
     public void GetFromReader_NullReader_Throws()
     {
         var row = NewRow();
-        Assert.Throws<ArgumentNullException>(() => AllFieldsRow.Fields.ADateOnly.GetFromReader(null!, 0, row));
+        Assert.Throws<ArgumentNullException>(() => AllFieldsRow.Fields.ADateOnly.GetFromReader(null, 0, row));
     }
 
     [Theory]
@@ -227,7 +227,7 @@ public class DateOnlyFieldTests
     public void ValueFromJson_Newtonsoft_NullReader_Throws()
     {
         var row = NewRow();
-        Assert.Throws<ArgumentNullException>(() => AllFieldsRow.Fields.ADateOnly.ValueFromJson(null!, row, Newtonsoft.Json.JsonSerializer.CreateDefault()));
+        Assert.Throws<ArgumentNullException>(() => AllFieldsRow.Fields.ADateOnly.ValueFromJson(null, row, Newtonsoft.Json.JsonSerializer.CreateDefault()));
     }
 
     [Fact]
@@ -235,7 +235,7 @@ public class DateOnlyFieldTests
     {
         var row = NewRow();
         var field = AllFieldsRow.Fields.ADateOnly;
-        var bytes = System.Text.Encoding.UTF8.GetBytes("null");
+        var bytes = Encoding.UTF8.GetBytes("null");
         var reader = new Utf8JsonReader(bytes);
         reader.Read();
         field.ValueFromJson(ref reader, row, new JsonSerializerOptions());
@@ -249,7 +249,7 @@ public class DateOnlyFieldTests
     {
         var row = NewRow();
         var field = AllFieldsRow.Fields.ADateOnly;
-        var bytes = System.Text.Encoding.UTF8.GetBytes(json);
+        var bytes = Encoding.UTF8.GetBytes(json);
         var reader = new Utf8JsonReader(bytes);
         reader.Read();
         field.ValueFromJson(ref reader, row, new JsonSerializerOptions());
@@ -261,7 +261,7 @@ public class DateOnlyFieldTests
     {
         var row = NewRow();
         var field = AllFieldsRow.Fields.ADateOnly;
-        var bytes = System.Text.Encoding.UTF8.GetBytes("\"   \"");
+        var bytes = Encoding.UTF8.GetBytes("\"   \"");
         var reader = new Utf8JsonReader(bytes);
         reader.Read();
         field.ValueFromJson(ref reader, row, new JsonSerializerOptions());
@@ -273,7 +273,7 @@ public class DateOnlyFieldTests
     {
         var row = NewRow();
         var field = AllFieldsRow.Fields.ADateOnly;
-        var bytes = System.Text.Encoding.UTF8.GetBytes("{\"a\":1}");
+        var bytes = Encoding.UTF8.GetBytes("{\"a\":1}");
         var ex = Record.Exception(() =>
         {
             var reader = new Utf8JsonReader(bytes);
@@ -293,7 +293,7 @@ public class DateOnlyFieldTests
         using var writer = new Utf8JsonWriter(ms);
         field.ValueToJson(writer, row, new JsonSerializerOptions());
         writer.Flush();
-        Assert.Equal("\"2024-01-15\"", System.Text.Encoding.UTF8.GetString(ms.ToArray()));
+        Assert.Equal("\"2024-01-15\"", Encoding.UTF8.GetString(ms.ToArray()));
     }
 
     [Fact]
@@ -305,7 +305,7 @@ public class DateOnlyFieldTests
         using var writer = new Utf8JsonWriter(ms);
         field.ValueToJson(writer, row, new JsonSerializerOptions());
         writer.Flush();
-        Assert.Equal("null", System.Text.Encoding.UTF8.GetString(ms.ToArray()));
+        Assert.Equal("null", Encoding.UTF8.GetString(ms.ToArray()));
     }
 
     [Fact]

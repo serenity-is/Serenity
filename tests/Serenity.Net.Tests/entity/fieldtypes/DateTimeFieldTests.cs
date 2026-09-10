@@ -34,7 +34,7 @@ public class DateTimeFieldTests
     public void Factory_CreatesField()
     {
         var fields = new AllFieldsRow.RowFields();
-        var field = DateTimeField.Factory(fields, "Test", null, 0, FieldFlags.Default, null!, null!);
+        var field = DateTimeField.Factory(fields, "Test", null, 0, FieldFlags.Default, null, null);
         Assert.IsType<DateTimeField>(field);
         Assert.Equal("Test", field.Name);
     }
@@ -98,7 +98,7 @@ public class DateTimeFieldTests
     public void GetFromReader_NullReader_Throws()
     {
         var row = NewRow();
-        Assert.Throws<ArgumentNullException>(() => AllFieldsRow.Fields.ADateTime.GetFromReader(null!, 0, row));
+        Assert.Throws<ArgumentNullException>(() => AllFieldsRow.Fields.ADateTime.GetFromReader(null, 0, row));
     }
 
     [Theory]
@@ -259,7 +259,7 @@ public class DateTimeFieldTests
     public void ValueFromJson_Newtonsoft_NullReader_Throws()
     {
         var row = NewRow();
-        Assert.Throws<ArgumentNullException>(() => AllFieldsRow.Fields.ADateTime.ValueFromJson(null!, row, Newtonsoft.Json.JsonSerializer.CreateDefault()));
+        Assert.Throws<ArgumentNullException>(() => AllFieldsRow.Fields.ADateTime.ValueFromJson(null, row, Newtonsoft.Json.JsonSerializer.CreateDefault()));
     }
 
     [Fact]
@@ -267,7 +267,7 @@ public class DateTimeFieldTests
     {
         var row = NewRow();
         var field = AllFieldsRow.Fields.ADateTime;
-        var bytes = System.Text.Encoding.UTF8.GetBytes("null");
+        var bytes = Encoding.UTF8.GetBytes("null");
         var reader = new Utf8JsonReader(bytes);
         reader.Read();
         field.ValueFromJson(ref reader, row, new JsonSerializerOptions());
@@ -281,7 +281,7 @@ public class DateTimeFieldTests
     {
         var row = NewRow();
         var field = AllFieldsRow.Fields.ADateTime;
-        var bytes = System.Text.Encoding.UTF8.GetBytes(json);
+        var bytes = Encoding.UTF8.GetBytes(json);
         var reader = new Utf8JsonReader(bytes);
         reader.Read();
         field.ValueFromJson(ref reader, row, new JsonSerializerOptions());
@@ -293,7 +293,7 @@ public class DateTimeFieldTests
     {
         var row = NewRow();
         var field = AllFieldsRow.Fields.ADateTime;
-        var bytes = System.Text.Encoding.UTF8.GetBytes("\"   \"");
+        var bytes = Encoding.UTF8.GetBytes("\"   \"");
         var reader = new Utf8JsonReader(bytes);
         reader.Read();
         field.ValueFromJson(ref reader, row, new JsonSerializerOptions());
@@ -305,7 +305,7 @@ public class DateTimeFieldTests
     {
         var row = NewRow();
         var field = AllFieldsRow.Fields.ADateTime;
-        var bytes = System.Text.Encoding.UTF8.GetBytes("{\"a\":1}");
+        var bytes = Encoding.UTF8.GetBytes("{\"a\":1}");
         var ex = Record.Exception(() =>
         {
             var reader = new Utf8JsonReader(bytes);
@@ -325,7 +325,7 @@ public class DateTimeFieldTests
         using var writer = new Utf8JsonWriter(ms);
         field.ValueToJson(writer, row, new JsonSerializerOptions());
         writer.Flush();
-        Assert.Equal("\"2024-01-15T10:30:00.000\"", System.Text.Encoding.UTF8.GetString(ms.ToArray()));
+        Assert.Equal("\"2024-01-15T10:30:00.000\"", Encoding.UTF8.GetString(ms.ToArray()));
     }
 
     [Fact]
@@ -337,7 +337,7 @@ public class DateTimeFieldTests
         using var writer = new Utf8JsonWriter(ms);
         field.ValueToJson(writer, row, new JsonSerializerOptions());
         writer.Flush();
-        Assert.Equal("null", System.Text.Encoding.UTF8.GetString(ms.ToArray()));
+        Assert.Equal("null", Encoding.UTF8.GetString(ms.ToArray()));
     }
 
     [Fact]
@@ -352,7 +352,7 @@ public class DateTimeFieldTests
         using var writer = new Utf8JsonWriter(ms);
         field.ValueToJson(writer, row, new JsonSerializerOptions());
         writer.Flush();
-        Assert.Equal("\"2024-01-15T10:30:00.000Z\"", System.Text.Encoding.UTF8.GetString(ms.ToArray()));
+        Assert.Equal("\"2024-01-15T10:30:00.000Z\"", Encoding.UTF8.GetString(ms.ToArray()));
     }
 
     [Fact]
@@ -549,7 +549,7 @@ public class DateTimeFieldTests
         reader.Read();
         field.GetFromReader(reader, 0, row);
         Assert.Equal(new DateTime(2024, 1, 15, 10, 30, 0), field[row]);
-        Assert.Equal(DateTimeKind.Utc, field[row]!.Value.Kind);
+        Assert.Equal(DateTimeKind.Utc, field[row].Value.Kind);
     }
 
     [Fact]
@@ -563,6 +563,6 @@ public class DateTimeFieldTests
         reader.Read();
         field.GetFromReader(reader, 0, row);
         Assert.Equal(new DateTime(2024, 1, 15, 10, 30, 0), field[row]);
-        Assert.Equal(DateTimeKind.Local, field[row]!.Value.Kind);
+        Assert.Equal(DateTimeKind.Local, field[row].Value.Kind);
     }
 }

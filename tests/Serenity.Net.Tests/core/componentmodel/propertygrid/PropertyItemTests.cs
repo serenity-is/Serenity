@@ -762,9 +762,9 @@ public class PropertyItemTests
     {
         var attribute = new PropertyItem()
         {
-            DefaultValue = Serenity.IO.DeleteType.Delete
+            DefaultValue = IO.DeleteType.Delete
         };
-        Assert.Equal(Serenity.IO.DeleteType.Delete, attribute.DefaultValue);
+        Assert.Equal(IO.DeleteType.Delete, attribute.DefaultValue);
     }
 
     [Fact]
@@ -1237,9 +1237,9 @@ public class PropertyItemTests
     {
         var attribute = new PropertyItem()
         {
-            SummaryType = Serenity.SummaryType.None
+            SummaryType = SummaryType.None
         };
-        Assert.Equal(Serenity.SummaryType.None, attribute.SummaryType);
+        Assert.Equal(SummaryType.None, attribute.SummaryType);
     }
 
     [Fact]

@@ -66,7 +66,7 @@ public class EntityConnectionExtensions_ById_Full_Tests
     [Fact]
     public void TryById_EditQueryInterceptor()
     {
-        SqlQuery editedQuery = null!;
+        SqlQuery editedQuery = null;
         var row = new IdNameRow { ID = 6, Name = "IE" };
         using var connection = new MockDbConnection()
             .InterceptFindRow(args =>
@@ -87,7 +87,7 @@ public class EntityConnectionExtensions_ById_Full_Tests
     {
         using var connection = Reader(new { ID = 777, Name = "Test" });
 
-        var row = await connection.ByIdAsync<IdNameRow>(777);
+        var row = await connection.ByIdAsync<IdNameRow>(777, TestContext.Current.CancellationToken);
 
         Assert.Equal("Test", row.Name);
     }
@@ -98,7 +98,7 @@ public class EntityConnectionExtensions_ById_Full_Tests
         using var connection = new MockDbConnection()
             .OnDbCommandExecuteReader(_ => new MockDbDataReader());
 
-        await Assert.ThrowsAsync<ValidationError>(() => connection.ByIdAsync<IdNameRow>(777));
+        await Assert.ThrowsAsync<ValidationError>(() => connection.ByIdAsync<IdNameRow>(777, TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -107,7 +107,7 @@ public class EntityConnectionExtensions_ById_Full_Tests
         using var connection = new MockDbConnection()
             .OnDbCommandExecuteReader(_ => new MockDbDataReader());
 
-        Assert.Null(await connection.TryByIdAsync<IdNameRow>(777));
+        Assert.Null(await connection.TryByIdAsync<IdNameRow>(777, TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -115,7 +115,7 @@ public class EntityConnectionExtensions_ById_Full_Tests
     {
         using var connection = Reader(new { ID = 777, Name = "Test" });
 
-        var row = await connection.TryByIdAsync<IdNameRow>(777, q => q.Select("ID"));
+        var row = await connection.TryByIdAsync<IdNameRow>(777, q => q.Select("ID"), TestContext.Current.CancellationToken);
 
         Assert.Equal(777, row.ID);
     }
@@ -127,7 +127,7 @@ public class EntityConnectionExtensions_ById_Full_Tests
         using var connection = new MockDbConnection()
             .InterceptFindRow(args => new OptionalValue<IRow>(row));
 
-        Assert.Same(row, await connection.TryByIdAsync<IdNameRow>(8));
+        Assert.Same(row, await connection.TryByIdAsync<IdNameRow>(8, TestContext.Current.CancellationToken));
         Assert.Equal(0, connection.DbCommandCallCount);
     }
 }

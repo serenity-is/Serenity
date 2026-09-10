@@ -18,7 +18,7 @@ public class ValueCriteriaInlineTests
         var result = criteria.ToString(query);
 
         Assert.Equal("(@p1,@p2,@p3,@p4,@p5,@p6,@p7,@p8,@p9,@p10)", result);
-        Assert.NotEmpty(query.Params!);
+        Assert.NotEmpty(query.Params);
     }
 
     [Fact]
@@ -88,7 +88,7 @@ public class ValueCriteriaInlineTests
         Assert.EndsWith(")", result);
         Assert.Contains("@p1", result);
         Assert.Contains("@p11", result);
-        Assert.True(query.Params!.Count == 11);
+        Assert.True(query.Params.Count == 11);
     }
 
     [Fact]
@@ -109,7 +109,7 @@ public class ValueCriteriaInlineTests
         Assert.StartsWith("(", result);
         Assert.EndsWith(")", result);
         // integers among the 11 items are inlined; null, string, char, datetime and double become params
-        int paramCount = query.Params!.Count;
+        int paramCount = query.Params.Count;
         Assert.Equal(5, paramCount);
     }
 
@@ -120,7 +120,7 @@ public class ValueCriteriaInlineTests
         var criteria = new ValueCriteria(new object[] { 1, 2, 3 });
 
         Assert.Equal("(@p1,@p2,@p3)", criteria.ToString(query));
-        Assert.Equal(3, query.Params!.Count);
+        Assert.Equal(3, query.Params.Count);
     }
 
     // Note: dot above covers long/list and others

@@ -41,7 +41,7 @@ public class ListRowAndRowListFieldTests
 
         field.Copy(row1, row2);
 
-        Assert.Equal("x", Assert.Single(field[row2]!));
+        Assert.Equal("x", Assert.Single(field[row2]));
         Assert.True(row2.IsAssigned(field));
     }
 
@@ -82,7 +82,7 @@ public class ListRowAndRowListFieldTests
         var cloned = field[row2];
         Assert.NotNull(cloned);
         Assert.NotSame(field[row1], cloned);
-        Assert.Equal(7, cloned!.ID);
+        Assert.Equal(7, cloned.ID);
         Assert.Equal("n", cloned.Name);
     }
 
@@ -133,7 +133,7 @@ public class ListRowAndRowListFieldTests
         var cloned = field[row2];
         Assert.NotNull(cloned);
         Assert.Same(cloned.GetType(), field[row1].GetType());
-        Assert.Equal(2, cloned!.Count);
+        Assert.Equal(2, cloned.Count);
         Assert.Equal(2, cloned[1].ID);
     }
 
@@ -182,7 +182,7 @@ public class ListRowAndRowListFieldTests
 
         stub.GetFromReader(reader, 0, row);
 
-        Assert.Equal("abc", stored!.Name);
+        Assert.Equal("abc", stored.Name);
     }
 
     [Fact]
@@ -218,7 +218,7 @@ public class ListRowAndRowListFieldTests
         reader = new Newtonsoft.Json.JsonTextReader(new System.IO.StringReader("{\"Name\":\"b\",\"Value\":4}"));
         reader.Read();
         stub.ValueFromJson(reader, row, new Newtonsoft.Json.JsonSerializer());
-        Assert.Equal("b", stored!.Name);
+        Assert.Equal("b", stored.Name);
         Assert.Equal(4, stored.Value);
     }
 
@@ -233,14 +233,14 @@ public class ListRowAndRowListFieldTests
         using var writer = new Utf8JsonWriter(ms);
         stub.ValueToJson(writer, row, new JsonSerializerOptions());
         writer.Flush();
-        Assert.Equal("null", System.Text.Encoding.UTF8.GetString(ms.ToArray()));
+        Assert.Equal("null", Encoding.UTF8.GetString(ms.ToArray()));
 
         stored = new AllFieldsRow.SampleJson { Name = "a", Value = 2 };
         ms.SetLength(0);
         using var writer2 = new Utf8JsonWriter(ms);
         stub.ValueToJson(writer2, row, new JsonSerializerOptions());
         writer2.Dispose();
-        Assert.Equal("{\"Name\":\"a\",\"Value\":2}", System.Text.Encoding.UTF8.GetString(ms.ToArray()));
+        Assert.Equal("{\"Name\":\"a\",\"Value\":2}", Encoding.UTF8.GetString(ms.ToArray()));
 
         var reader = ReadFirst("null");
         stub.ValueFromJson(ref reader, row, new JsonSerializerOptions());
@@ -248,13 +248,13 @@ public class ListRowAndRowListFieldTests
 
         reader = ReadFirst("{\"Name\":\"b\",\"Value\":4}");
         stub.ValueFromJson(ref reader, row, new JsonSerializerOptions());
-        Assert.Equal("b", stored!.Name);
+        Assert.Equal("b", stored.Name);
         Assert.Equal(4, stored.Value);
     }
 
     private static Utf8JsonReader ReadFirst(string json)
     {
-        var raw = System.Text.Encoding.UTF8.GetBytes(json);
+        var raw = Encoding.UTF8.GetBytes(json);
         var reader = new Utf8JsonReader(raw);
         reader.Read();
         return reader;

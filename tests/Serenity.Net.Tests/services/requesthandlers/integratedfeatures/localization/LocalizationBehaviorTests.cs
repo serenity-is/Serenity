@@ -3,7 +3,7 @@ using System.Threading;
 
 namespace Serenity.Services;
 
-public class LocalizationBehaviorTests
+public partial class LocalizationBehaviorTests
 {
     [TableName("LocMains")]
     [LocalizationRow(typeof(LocMainLangRow), MappedIdField = "MasterId")]

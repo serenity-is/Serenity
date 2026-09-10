@@ -63,6 +63,7 @@ public static class ReportColumnConverter
     /// <param name="baseField">Base field object</param>
     public static ReportColumn FromFieldInfo(FieldInfo field, ITextLocalizer localizer, Field? baseField = null)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return FromMember(field, field.FieldType, baseField, localizer);
     }
 
@@ -74,6 +75,7 @@ public static class ReportColumnConverter
     /// <param name="baseField">Base field object</param>
     public static ReportColumn FromPropertyInfo(PropertyInfo property, ITextLocalizer localizer, Field? baseField = null)
     {
+        ArgumentNullException.ThrowIfNull(property);
         return FromMember(property, property.PropertyType, baseField, localizer);
     }
 

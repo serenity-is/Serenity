@@ -13,7 +13,7 @@ public class SqlTests
     [Theory]
     [InlineData(null)]
     [InlineData("")]
-    public void Sum_StringField_NullOrEmpty_ThrowsArgumentNullException(string field)
+    public void Sum_StringField_NullOrEmpty_ThrowsArgumentNullException(string? field)
     {
         Assert.Throws<ArgumentNullException>(() => Sql.Sum(field));
     }
@@ -29,7 +29,7 @@ public class SqlTests
     [Fact]
     public void Sum_IField_Null_ThrowsArgumentNullException()
     {
-        Assert.Throws<ArgumentNullException>(() => Sql.Sum((IField)null!));
+        Assert.Throws<ArgumentNullException>(() => Sql.Sum((IField)null));
     }
 
     [Fact]
@@ -41,7 +41,7 @@ public class SqlTests
     [Theory]
     [InlineData(null)]
     [InlineData("")]
-    public void Sum_JoinNumber_NullOrEmptyField_ThrowsArgumentNullException(string field)
+    public void Sum_JoinNumber_NullOrEmptyField_ThrowsArgumentNullException(string? field)
     {
         Assert.Throws<ArgumentNullException>(() => Sql.Sum(7, field));
     }
@@ -57,7 +57,7 @@ public class SqlTests
     [Theory]
     [InlineData(null)]
     [InlineData("")]
-    public void Count_StringField_NullOrEmpty_ThrowsArgumentNullException(string field)
+    public void Count_StringField_NullOrEmpty_ThrowsArgumentNullException(string? field)
     {
         Assert.Throws<ArgumentNullException>(() => Sql.Count(field));
     }
@@ -73,7 +73,7 @@ public class SqlTests
     [Fact]
     public void Count_IField_Null_ThrowsArgumentNullException()
     {
-        Assert.Throws<ArgumentNullException>(() => Sql.Count((IField)null!));
+        Assert.Throws<ArgumentNullException>(() => Sql.Count((IField)null));
     }
 
     [Fact]
@@ -85,7 +85,7 @@ public class SqlTests
     [Theory]
     [InlineData(null)]
     [InlineData("")]
-    public void Count_JoinNumber_NullOrEmptyField_ThrowsArgumentNullException(string field)
+    public void Count_JoinNumber_NullOrEmptyField_ThrowsArgumentNullException(string? field)
     {
         Assert.Throws<ArgumentNullException>(() => Sql.Count(7, field));
     }
@@ -113,7 +113,7 @@ public class SqlTests
     [Fact]
     public void Coalesce_Strings_Null_ThrowsArgumentNullException()
     {
-        Assert.Throws<ArgumentNullException>(() => Sql.Coalesce((string[])null!));
+        Assert.Throws<ArgumentNullException>(() => Sql.Coalesce((string[])null));
     }
 
     [Fact]
@@ -128,7 +128,7 @@ public class SqlTests
         var query = new SqlQuery();
 
         Assert.Equal("COALESCE(@p1, @p2)", query.Coalesce(1, 2));
-        Assert.Equal(2, query.Params!.Count);
+        Assert.Equal(2, query.Params.Count);
     }
 
     [Fact]
@@ -136,7 +136,7 @@ public class SqlTests
     {
         var query = new SqlQuery();
 
-        Assert.Throws<ArgumentNullException>(() => query.Coalesce(null!));
+        Assert.Throws<ArgumentNullException>(() => query.Coalesce(null));
         Assert.Throws<ArgumentNullException>(() => query.Coalesce([]));
     }
 
@@ -178,7 +178,7 @@ public class SqlTests
     [Theory]
     [InlineData(null)]
     [InlineData("")]
-    public void Min_StringField_NullOrEmpty_ThrowsArgumentNullException(string field)
+    public void Min_StringField_NullOrEmpty_ThrowsArgumentNullException(string? field)
     {
         Assert.Throws<ArgumentNullException>(() => Sql.Min(field));
     }
@@ -200,7 +200,7 @@ public class SqlTests
     [Fact]
     public void Min_IField_Null_ThrowsArgumentNullException()
     {
-        Assert.Throws<ArgumentNullException>(() => Sql.Min((IField)null!));
+        Assert.Throws<ArgumentNullException>(() => Sql.Min((IField)null));
     }
 
     [Fact]
@@ -214,7 +214,7 @@ public class SqlTests
     [Theory]
     [InlineData(null)]
     [InlineData("")]
-    public void Max_StringField_NullOrEmpty_ThrowsArgumentNullException(string field)
+    public void Max_StringField_NullOrEmpty_ThrowsArgumentNullException(string? field)
     {
         Assert.Throws<ArgumentNullException>(() => Sql.Max(field));
     }
@@ -236,7 +236,7 @@ public class SqlTests
     [Fact]
     public void Max_IField_Null_ThrowsArgumentNullException()
     {
-        Assert.Throws<ArgumentNullException>(() => Sql.Max((IField)null!));
+        Assert.Throws<ArgumentNullException>(() => Sql.Max((IField)null));
     }
 
     [Fact]
@@ -250,7 +250,7 @@ public class SqlTests
     [Theory]
     [InlineData(null)]
     [InlineData("")]
-    public void Avg_StringField_NullOrEmpty_ThrowsArgumentNullException(string field)
+    public void Avg_StringField_NullOrEmpty_ThrowsArgumentNullException(string? field)
     {
         Assert.Throws<ArgumentNullException>(() => Sql.Avg(field));
     }
@@ -272,7 +272,7 @@ public class SqlTests
     [Fact]
     public void Avg_IField_Null_ThrowsArgumentNullException()
     {
-        Assert.Throws<ArgumentNullException>(() => Sql.Avg((IField)null!));
+        Assert.Throws<ArgumentNullException>(() => Sql.Avg((IField)null));
     }
 
     [Fact]
@@ -292,7 +292,7 @@ public class SqlTests
     [Theory]
     [InlineData(null)]
     [InlineData("")]
-    public void Convert_NullOrEmptyType_ThrowsArgumentNullException(string type)
+    public void Convert_NullOrEmptyType_ThrowsArgumentNullException(string? type)
     {
         Assert.Throws<ArgumentNullException>(() => Sql.Convert(type, "Field"));
     }
@@ -300,7 +300,7 @@ public class SqlTests
     [Theory]
     [InlineData(null)]
     [InlineData("")]
-    public void Convert_NullOrEmptyField_ThrowsArgumentNullException(string field)
+    public void Convert_NullOrEmptyField_ThrowsArgumentNullException(string? field)
     {
         Assert.Throws<ArgumentNullException>(() => Sql.Convert("DATE", field));
     }
@@ -314,7 +314,7 @@ public class SqlTests
     [Theory]
     [InlineData(null)]
     [InlineData("")]
-    public void SubString_NullOrEmptyExpression_ThrowsArgumentNullException(string expression)
+    public void SubString_NullOrEmptyExpression_ThrowsArgumentNullException(string? expression)
     {
         Assert.Throws<ArgumentNullException>(() => Sql.SubString(expression, 0, 1));
     }
@@ -452,7 +452,7 @@ public class SqlTests
         var result = query.Case(cb =>
         {
             cb.WhenThen(new Criteria("A") == 1, "'R1'");
-            cb.Else(null!);
+            cb.Else(null);
         });
 
         Assert.StartsWith("CASE", result, StringComparison.Ordinal);
@@ -490,7 +490,7 @@ public class SqlTests
         var result = query.Case(cb =>
         {
             cb.WhenThen(new Criteria("A") == 1, "'R1'");
-            cb.Else(null!);
+            cb.Else(null);
         });
 
         // else value null is stored as DBNull, rendered as a param

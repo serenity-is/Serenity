@@ -34,7 +34,7 @@ public class ByteArrayFieldTests
     public void Factory_CreatesField()
     {
         var fields = new AllFieldsRow.RowFields();
-        var field = ByteArrayField.Factory(fields, "Test", null, 0, FieldFlags.Default, null!, null!);
+        var field = ByteArrayField.Factory(fields, "Test", null, 0, FieldFlags.Default, null, null);
         Assert.IsType<ByteArrayField>(field);
         Assert.Equal("Test", field.Name);
     }
@@ -76,7 +76,7 @@ public class ByteArrayFieldTests
     public void GetFromReader_NullReader_Throws()
     {
         var row = NewRow();
-        Assert.Throws<ArgumentNullException>(() => AllFieldsRow.Fields.AByteArray.GetFromReader(null!, 0, row));
+        Assert.Throws<ArgumentNullException>(() => AllFieldsRow.Fields.AByteArray.GetFromReader(null, 0, row));
     }
 
     [Theory]
@@ -160,7 +160,7 @@ public class ByteArrayFieldTests
     public void ValueFromJson_Newtonsoft_NullReader_Throws()
     {
         var row = NewRow();
-        Assert.Throws<ArgumentNullException>(() => AllFieldsRow.Fields.AByteArray.ValueFromJson(null!, row, Newtonsoft.Json.JsonSerializer.CreateDefault()));
+        Assert.Throws<ArgumentNullException>(() => AllFieldsRow.Fields.AByteArray.ValueFromJson(null, row, Newtonsoft.Json.JsonSerializer.CreateDefault()));
     }
 
     [Fact]
@@ -168,7 +168,7 @@ public class ByteArrayFieldTests
     {
         var row = NewRow();
         var field = AllFieldsRow.Fields.AByteArray;
-        var bytes = System.Text.Encoding.UTF8.GetBytes("null");
+        var bytes = Encoding.UTF8.GetBytes("null");
         var reader = new Utf8JsonReader(bytes);
         reader.Read();
         field.ValueFromJson(ref reader, row, new JsonSerializerOptions());
@@ -180,7 +180,7 @@ public class ByteArrayFieldTests
     {
         var row = NewRow();
         var field = AllFieldsRow.Fields.AByteArray;
-        var bytes = System.Text.Encoding.UTF8.GetBytes("\"AQI=\"");
+        var bytes = Encoding.UTF8.GetBytes("\"AQI=\"");
         var reader = new Utf8JsonReader(bytes);
         reader.Read();
         field.ValueFromJson(ref reader, row, new JsonSerializerOptions());
@@ -192,7 +192,7 @@ public class ByteArrayFieldTests
     {
         var row = NewRow();
         var field = AllFieldsRow.Fields.AByteArray;
-        var bytes = System.Text.Encoding.UTF8.GetBytes("\"\"");
+        var bytes = Encoding.UTF8.GetBytes("\"\"");
         var reader = new Utf8JsonReader(bytes);
         reader.Read();
         field.ValueFromJson(ref reader, row, new JsonSerializerOptions());
@@ -204,7 +204,7 @@ public class ByteArrayFieldTests
     {
         var row = NewRow();
         var field = AllFieldsRow.Fields.AByteArray;
-        var bytes = System.Text.Encoding.UTF8.GetBytes("{\"a\":1}");
+        var bytes = Encoding.UTF8.GetBytes("{\"a\":1}");
         var ex = Record.Exception(() =>
         {
             var reader = new Utf8JsonReader(bytes);
@@ -224,7 +224,7 @@ public class ByteArrayFieldTests
         using var writer = new Utf8JsonWriter(ms);
         field.ValueToJson(writer, row, new JsonSerializerOptions());
         writer.Flush();
-        Assert.Equal("\"AQI=\"", System.Text.Encoding.UTF8.GetString(ms.ToArray()));
+        Assert.Equal("\"AQI=\"", Encoding.UTF8.GetString(ms.ToArray()));
     }
 
     [Fact]
@@ -236,7 +236,7 @@ public class ByteArrayFieldTests
         using var writer = new Utf8JsonWriter(ms);
         field.ValueToJson(writer, row, new JsonSerializerOptions());
         writer.Flush();
-        Assert.Equal("null", System.Text.Encoding.UTF8.GetString(ms.ToArray()));
+        Assert.Equal("null", Encoding.UTF8.GetString(ms.ToArray()));
     }
 
     [Fact]
@@ -308,7 +308,7 @@ public class ByteArrayFieldTests
         var field = AllFieldsRow.Fields.AByteArray;
         var value = field.AsSqlValue(row);
         Assert.IsType<System.Data.SqlTypes.SqlBinary>(value);
-        Assert.True(((System.Data.SqlTypes.SqlBinary)value!).IsNull);
+        Assert.True(((System.Data.SqlTypes.SqlBinary)value).IsNull);
     }
 
     [Fact]
@@ -317,6 +317,6 @@ public class ByteArrayFieldTests
         var row = NewRow();
         var field = AllFieldsRow.Fields.AByteArray;
         field[row] = [1, 2];
-        Assert.Equal(new byte[] { 1, 2 }, (byte[])field.AsSqlValue(row)!);
+        Assert.Equal(new byte[] { 1, 2 }, (byte[])field.AsSqlValue(row));
     }
 }

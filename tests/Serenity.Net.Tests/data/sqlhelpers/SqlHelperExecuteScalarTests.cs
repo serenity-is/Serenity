@@ -87,7 +87,7 @@ public class SqlHelperExecuteScalarTests
         using var connection = new MockDbConnection();
 
         Assert.Throws<ArgumentNullException>(() =>
-            SqlHelper.ExecuteScalar(connection, (SqlQuery)null!));
+            SqlHelper.ExecuteScalar(connection, (SqlQuery)null));
     }
 
     [Fact]
@@ -140,7 +140,7 @@ public class SqlHelperExecuteScalarTests
         using var connection = new MockDbConnection();
 
         await Assert.ThrowsAsync<ArgumentNullException>(() =>
-            SqlHelper.ExecuteScalarAsync(connection, (SqlQuery)null!,
+            SqlHelper.ExecuteScalarAsync(connection, (SqlQuery)null,
                 cancellationToken: TestContext.Current.CancellationToken));
     }
 

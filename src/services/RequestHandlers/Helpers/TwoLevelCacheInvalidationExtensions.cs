@@ -43,24 +43,27 @@ public static class TwoLevelCacheInvalidationExtensions
         if (type == null)
             return;
 
-        var attr = type.GetCustomAttribute<TwoLevelCachedAttribute>(true);
-        if (attr == null)
+        var attr = type.GetCustomAttributes<TwoLevelCachedAttribute>(true).ToArray();
+        if (attr.Length == 0)
             return;
 
-        if (attr.GenerationKeys != null)
+        foreach (var a in attr)
         {
-            foreach (var key in attr.GenerationKeys)
+            if (a.GenerationKeys != null)
             {
-                InvalidateOnCommit(cache, uow, key);
+                foreach (var key in a.GenerationKeys)
+                {
+                    InvalidateOnCommit(cache, uow, key);
+                }
             }
-        }
 
-        if (attr.LinkedRows != null)
-        {
-            foreach (var rowType in attr.LinkedRows)
+            if (a.LinkedRows != null)
             {
-                var rowInstance = (IRow)Activator.CreateInstance(rowType)!;
-                InvalidateOnCommit(cache, uow, rowInstance.GetFields().GenerationKey);
+                foreach (var rowType in a.LinkedRows)
+                {
+                    var rowInstance = (IRow)Activator.CreateInstance(rowType)!;
+                    InvalidateOnCommit(cache, uow, rowInstance.GetFields().GenerationKey);
+                }
             }
         }
     }

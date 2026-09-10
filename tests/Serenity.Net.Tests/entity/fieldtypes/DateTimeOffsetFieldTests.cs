@@ -34,7 +34,7 @@ public class DateTimeOffsetFieldTests
     public void Factory_CreatesField()
     {
         var fields = new AllFieldsRow.RowFields();
-        var field = DateTimeOffsetField.Factory(fields, "Test", null, 0, FieldFlags.Default, null!, null!);
+        var field = DateTimeOffsetField.Factory(fields, "Test", null, 0, FieldFlags.Default, null, null);
         Assert.IsType<DateTimeOffsetField>(field);
         Assert.Equal("Test", field.Name);
     }
@@ -98,7 +98,7 @@ public class DateTimeOffsetFieldTests
     public void GetFromReader_NullReader_Throws()
     {
         var row = NewRow();
-        Assert.Throws<ArgumentNullException>(() => AllFieldsRow.Fields.ADateTimeOffset.GetFromReader(null!, 0, row));
+        Assert.Throws<ArgumentNullException>(() => AllFieldsRow.Fields.ADateTimeOffset.GetFromReader(null, 0, row));
     }
 
     [Theory]
@@ -216,7 +216,7 @@ public class DateTimeOffsetFieldTests
     public void ValueFromJson_Newtonsoft_NullReader_Throws()
     {
         var row = NewRow();
-        Assert.Throws<ArgumentNullException>(() => AllFieldsRow.Fields.ADateTimeOffset.ValueFromJson(null!, row, Newtonsoft.Json.JsonSerializer.CreateDefault()));
+        Assert.Throws<ArgumentNullException>(() => AllFieldsRow.Fields.ADateTimeOffset.ValueFromJson(null, row, Newtonsoft.Json.JsonSerializer.CreateDefault()));
     }
 
     [Fact]
@@ -224,7 +224,7 @@ public class DateTimeOffsetFieldTests
     {
         var row = NewRow();
         var field = AllFieldsRow.Fields.ADateTimeOffset;
-        var bytes = System.Text.Encoding.UTF8.GetBytes("null");
+        var bytes = Encoding.UTF8.GetBytes("null");
         var reader = new Utf8JsonReader(bytes);
         reader.Read();
         field.ValueFromJson(ref reader, row, new JsonSerializerOptions());
@@ -236,7 +236,7 @@ public class DateTimeOffsetFieldTests
     {
         var row = NewRow();
         var field = AllFieldsRow.Fields.ADateTimeOffset;
-        var bytes = System.Text.Encoding.UTF8.GetBytes("\"2024-01-15T10:30:00Z\"");
+        var bytes = Encoding.UTF8.GetBytes("\"2024-01-15T10:30:00Z\"");
         var reader = new Utf8JsonReader(bytes);
         reader.Read();
         field.ValueFromJson(ref reader, row, new JsonSerializerOptions());
@@ -248,7 +248,7 @@ public class DateTimeOffsetFieldTests
     {
         var row = NewRow();
         var field = AllFieldsRow.Fields.ADateTimeOffset;
-        var bytes = System.Text.Encoding.UTF8.GetBytes("\"   \"");
+        var bytes = Encoding.UTF8.GetBytes("\"   \"");
         var reader = new Utf8JsonReader(bytes);
         reader.Read();
         field.ValueFromJson(ref reader, row, new JsonSerializerOptions());
@@ -260,7 +260,7 @@ public class DateTimeOffsetFieldTests
     {
         var row = NewRow();
         var field = AllFieldsRow.Fields.ADateTimeOffset;
-        var bytes = System.Text.Encoding.UTF8.GetBytes("{\"a\":1}");
+        var bytes = Encoding.UTF8.GetBytes("{\"a\":1}");
         var ex = Record.Exception(() =>
         {
             var reader = new Utf8JsonReader(bytes);
@@ -280,7 +280,7 @@ public class DateTimeOffsetFieldTests
         using var writer = new Utf8JsonWriter(ms);
         field.ValueToJson(writer, row, new JsonSerializerOptions());
         writer.Flush();
-        Assert.Equal("\"2024-01-15T10:30:00.0000000\\u002B02:00\"", System.Text.Encoding.UTF8.GetString(ms.ToArray()));
+        Assert.Equal("\"2024-01-15T10:30:00.0000000\\u002B02:00\"", Encoding.UTF8.GetString(ms.ToArray()));
     }
 
     [Fact]
@@ -292,7 +292,7 @@ public class DateTimeOffsetFieldTests
         using var writer = new Utf8JsonWriter(ms);
         field.ValueToJson(writer, row, new JsonSerializerOptions());
         writer.Flush();
-        Assert.Equal("null", System.Text.Encoding.UTF8.GetString(ms.ToArray()));
+        Assert.Equal("null", Encoding.UTF8.GetString(ms.ToArray()));
     }
 
     [Fact]

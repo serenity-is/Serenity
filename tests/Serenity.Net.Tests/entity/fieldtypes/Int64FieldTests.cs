@@ -34,7 +34,7 @@ public class Int64FieldTests
     public void Factory_CreatesField()
     {
         var fields = new AllFieldsRow.RowFields();
-        var field = Int64Field.Factory(fields, "Test", null, 0, FieldFlags.Default, null!, null!);
+        var field = Int64Field.Factory(fields, "Test", null, 0, FieldFlags.Default, null, null);
         Assert.IsType<Int64Field>(field);
         Assert.Equal("Test", field.Name);
     }
@@ -76,7 +76,7 @@ public class Int64FieldTests
     public void GetFromReader_NullReader_Throws()
     {
         var row = NewRow();
-        Assert.Throws<ArgumentNullException>(() => AllFieldsRow.Fields.AInt64.GetFromReader(null!, 0, row));
+        Assert.Throws<ArgumentNullException>(() => AllFieldsRow.Fields.AInt64.GetFromReader(null, 0, row));
     }
 
     [Theory]
@@ -166,7 +166,7 @@ public class Int64FieldTests
     public void ValueFromJson_Newtonsoft_NullReader_Throws()
     {
         var row = NewRow();
-        Assert.Throws<ArgumentNullException>(() => AllFieldsRow.Fields.AInt64.ValueFromJson(null!, row, Newtonsoft.Json.JsonSerializer.CreateDefault()));
+        Assert.Throws<ArgumentNullException>(() => AllFieldsRow.Fields.AInt64.ValueFromJson(null, row, Newtonsoft.Json.JsonSerializer.CreateDefault()));
     }
 
     [Theory]
@@ -179,7 +179,7 @@ public class Int64FieldTests
     {
         var row = NewRow();
         var field = AllFieldsRow.Fields.AInt64;
-        var bytes = System.Text.Encoding.UTF8.GetBytes(json);
+        var bytes = Encoding.UTF8.GetBytes(json);
         var reader = new Utf8JsonReader(bytes);
         reader.Read();
         field.ValueFromJson(ref reader, row, new JsonSerializerOptions());
@@ -191,7 +191,7 @@ public class Int64FieldTests
     {
         var row = NewRow();
         var field = AllFieldsRow.Fields.AInt64;
-        var bytes = System.Text.Encoding.UTF8.GetBytes("{\"a\":1}");
+        var bytes = Encoding.UTF8.GetBytes("{\"a\":1}");
         var ex = Record.Exception(() =>
         {
             var reader = new Utf8JsonReader(bytes);
@@ -211,7 +211,7 @@ public class Int64FieldTests
         using var writer = new Utf8JsonWriter(ms);
         field.ValueToJson(writer, row, new JsonSerializerOptions());
         writer.Flush();
-        Assert.Equal("42", System.Text.Encoding.UTF8.GetString(ms.ToArray()));
+        Assert.Equal("42", Encoding.UTF8.GetString(ms.ToArray()));
     }
 
     [Fact]
@@ -223,7 +223,7 @@ public class Int64FieldTests
         using var writer = new Utf8JsonWriter(ms);
         field.ValueToJson(writer, row, new JsonSerializerOptions());
         writer.Flush();
-        Assert.Equal("null", System.Text.Encoding.UTF8.GetString(ms.ToArray()));
+        Assert.Equal("null", Encoding.UTF8.GetString(ms.ToArray()));
     }
 
     [Fact]

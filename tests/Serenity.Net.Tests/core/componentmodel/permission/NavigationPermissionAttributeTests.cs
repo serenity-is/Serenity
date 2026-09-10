@@ -27,21 +27,21 @@ public class NavigationPermissionAttributeTests
     [Fact]
     public void Constructor_With_Enum()
     {
-        var attribute = new NavigationPermissionAttribute(Serenity.IO.DeleteType.Delete);
+        var attribute = new NavigationPermissionAttribute(IO.DeleteType.Delete);
         Assert.Equal("Delete", attribute.Permission);
     }
 
     [Fact]
     public void Constructor_With_Enum_Enum()
     {
-        var attribute = new NavigationPermissionAttribute(Serenity.IO.DeleteType.Delete, Serenity.IO.DeleteType.TryDelete);
+        var attribute = new NavigationPermissionAttribute(IO.DeleteType.Delete, IO.DeleteType.TryDelete);
         Assert.Equal("Delete:TryDelete", attribute.Permission);
     }
 
     [Fact]
     public void Constructor_With_Enum_Enum_Enum()
     {
-        var attribute = new NavigationPermissionAttribute(Serenity.IO.DeleteType.Delete, Serenity.IO.DeleteType.TryDelete, Serenity.IO.DeleteType.TryDeleteOrMark);
+        var attribute = new NavigationPermissionAttribute(IO.DeleteType.Delete, IO.DeleteType.TryDelete, IO.DeleteType.TryDeleteOrMark);
         Assert.Equal("Delete:TryDelete:TryDeleteOrMark", attribute.Permission);
     }
 

@@ -1,5 +1,3 @@
-using Serenity.TestUtils;
-
 namespace Serenity.Data;
 
 public class RowEditableObjectTests
@@ -203,7 +201,7 @@ public class RowEditableObjectTests
         Assert.Equal("Please fix the marked fields on the row.", exception.Message);
         Assert.True(editable.HasErrors);
         Assert.NotNull(editable.ValidationErrors);
-        Assert.Equal("Name is invalid", editable.ValidationErrors!["Name"]);
+        Assert.Equal("Name is invalid", editable.ValidationErrors["Name"]);
         Assert.True(editable.IsEditing);
         Assert.False(postEndedFired);
     }
@@ -321,7 +319,7 @@ public class RowEditableObjectTests
         editable.AddValidationError("Name", "Error 1");
         Assert.True(editable.HasErrors);
         Assert.NotNull(editable.ValidationErrors);
-        Assert.Equal("Error 1", editable.ValidationErrors!["Name"]);
+        Assert.Equal("Error 1", editable.ValidationErrors["Name"]);
 
         editable.AddValidationError(null, "Error 2");
         Assert.Equal("Error 2", editable.ValidationErrors[""]);

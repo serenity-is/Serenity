@@ -1,6 +1,3 @@
-using Serenity.JsonConverters;
-using System.Collections;
-
 namespace Serenity.Data;
 
 public class JsonCriteriaConverterTests
@@ -131,7 +128,7 @@ public class JsonCriteriaConverterTests
     [Fact]
     public void Read_StringExpression_ParsesExpressionCriteria()
     {
-        var result = Newtonsoft.Json.JsonConvert.DeserializeObject<BaseCriteria>("[\"Name\"]", GetSettings())!;
+        var result = Newtonsoft.Json.JsonConvert.DeserializeObject<BaseCriteria>("[\"Name\"]", GetSettings());
 
         Assert.IsType<Criteria>(result);
         Assert.Equal("Name", ((Criteria)result).Expression);
@@ -140,7 +137,7 @@ public class JsonCriteriaConverterTests
     [Fact]
     public void Read_ParamExpression_ParsesParamCriteria()
     {
-        var result = Newtonsoft.Json.JsonConvert.DeserializeObject<BaseCriteria>("[\"@MyParam\"]", GetSettings())!;
+        var result = Newtonsoft.Json.JsonConvert.DeserializeObject<BaseCriteria>("[\"@MyParam\"]", GetSettings());
 
         Assert.Equal("@MyParam", Assert.IsType<ParamCriteria>(result).Name);
     }
@@ -148,7 +145,7 @@ public class JsonCriteriaConverterTests
     [Fact]
     public void Read_NestedArray_ParsesAsValueCriteriaList()
     {
-        var result = Newtonsoft.Json.JsonConvert.DeserializeObject<BaseCriteria>("[[\"a\",\"b\",true,3]]", GetSettings())!;
+        var result = Newtonsoft.Json.JsonConvert.DeserializeObject<BaseCriteria>("[[\"a\",\"b\",true,3]]", GetSettings());
 
         var value = Assert.IsType<object[]>(((ValueCriteria)result).Value);
         Assert.Equal(["a", "b", true, 3L], value);
@@ -157,7 +154,7 @@ public class JsonCriteriaConverterTests
     [Fact]
     public void Read_NestedArrayWithNullJValueItem_AddsNullToValues()
     {
-        var result = Newtonsoft.Json.JsonConvert.DeserializeObject<BaseCriteria>("[[\"a\",null]]", GetSettings())!;
+        var result = Newtonsoft.Json.JsonConvert.DeserializeObject<BaseCriteria>("[[\"a\",null]]", GetSettings());
 
         var value = Assert.IsType<object[]>(((ValueCriteria)result).Value);
         Assert.Equal(2, value.Length);
@@ -209,7 +206,7 @@ public class JsonCriteriaConverterTests
     [InlineData("\"()\"")]
     public void Read_UnaryCriteria_ParsesOperatorAndOperand(string opKey)
     {
-        var result = Newtonsoft.Json.JsonConvert.DeserializeObject<BaseCriteria>($"[{opKey},\"Name\"]", GetSettings())!;
+        var result = Newtonsoft.Json.JsonConvert.DeserializeObject<BaseCriteria>($"[{opKey},\"Name\"]", GetSettings());
 
         Assert.IsType<UnaryCriteria>(result);
     }
@@ -240,7 +237,7 @@ public class JsonCriteriaConverterTests
     [InlineData("\"not like\"")]
     public void Read_BinaryCriteria_ParsesOperandsAndOperator(string opKey)
     {
-        var result = Newtonsoft.Json.JsonConvert.DeserializeObject<BaseCriteria>($"[\"A\",{opKey},\"B\"]", GetSettings())!;
+        var result = Newtonsoft.Json.JsonConvert.DeserializeObject<BaseCriteria>($"[\"A\",{opKey},\"B\"]", GetSettings());
 
         Assert.IsType<BinaryCriteria>(result);
     }
@@ -257,7 +254,7 @@ public class JsonCriteriaConverterTests
     [Fact]
     public void Read_ParamCriteriaInsideBinary_ParseSubValue()
     {
-        var result = Newtonsoft.Json.JsonConvert.DeserializeObject<BaseCriteria>("[\"A\",\"=\",[\"@p3\"]]", GetSettings())!;
+        var result = Newtonsoft.Json.JsonConvert.DeserializeObject<BaseCriteria>("[\"A\",\"=\",[\"@p3\"]]", GetSettings());
 
         var binary = Assert.IsType<BinaryCriteria>(result);
         Assert.Equal("@p3", Assert.IsType<ParamCriteria>(binary.RightOperand).Name);
@@ -288,7 +285,7 @@ public class JsonCriteriaConverterTests
     [Fact]
     public void Read_BoolOperand_ParsesAsValueCriteria()
     {
-        var result = Newtonsoft.Json.JsonConvert.DeserializeObject<BaseCriteria>("[\"Name\",\"=\",true]", GetSettings())!;
+        var result = Newtonsoft.Json.JsonConvert.DeserializeObject<BaseCriteria>("[\"Name\",\"=\",true]", GetSettings());
 
         var binary = Assert.IsType<BinaryCriteria>(result);
         Assert.IsType<bool>(Assert.IsType<ValueCriteria>(binary.RightOperand).Value);
@@ -299,7 +296,7 @@ public class JsonCriteriaConverterTests
     [Fact]
     public void RoundTrip_ScalarCriteriaExpression_PreservesCriteria()
     {
-        var result = Assert.IsType<Criteria>(RoundTrip(new Criteria("Name"))!);
+        var result = Assert.IsType<Criteria>(RoundTrip(new Criteria("Name")));
 
         Assert.Equal("Name", result.Expression);
     }
@@ -308,7 +305,7 @@ public class JsonCriteriaConverterTests
     public void RoundTrip_OperatorFirstArrayValue_DoesNotTurnValueIntoOperator()
     {
         var result = Assert.IsType<ValueCriteria>(RoundTrip(
-            new ValueCriteria(new object[] { ">", "a", "b" }))!);
+            new ValueCriteria(new object[] { ">", "a", "b" })));
 
         var value = Assert.IsType<object[]>(result.Value);
         Assert.Equal([">", "a", "b"], value);
@@ -320,7 +317,7 @@ public class JsonCriteriaConverterTests
         var criteria = new Criteria("Name").StartsWith("a") &
             new Criteria("Age") >= 18;
 
-        var result = Assert.IsType<BinaryCriteria>(RoundTrip(criteria)!);
+        var result = Assert.IsType<BinaryCriteria>(RoundTrip(criteria));
 
         Assert.Equal(CriteriaOperator.AND, result.Operator);
         Assert.IsType<BinaryCriteria>(result.LeftOperand);
@@ -330,7 +327,7 @@ public class JsonCriteriaConverterTests
     [Fact]
     public void RoundTrip_UnaryCriteria_PreservesOperator()
     {
-        var result = Assert.IsType<UnaryCriteria>(RoundTrip(new Criteria("Name").IsNull())!);
+        var result = Assert.IsType<UnaryCriteria>(RoundTrip(new Criteria("Name").IsNull()));
 
         Assert.Equal(CriteriaOperator.IsNull, result.Operator);
     }

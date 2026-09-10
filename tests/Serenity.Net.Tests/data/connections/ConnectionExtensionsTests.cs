@@ -5,7 +5,7 @@ public class ConnectionExtensionsTests
     [Fact]
     public void EnsureOpen_Null_ThrowsArgumentNullException()
     {
-        Assert.Throws<ArgumentNullException>(() => ((IDbConnection)null!).EnsureOpen());
+        Assert.Throws<ArgumentNullException>(() => ((IDbConnection)null).EnsureOpen());
     }
 
     [Fact]
@@ -44,7 +44,7 @@ public class ConnectionExtensionsTests
     {
         using var connection = new MockDbConnection();
 
-        var result = await connection.EnsureOpenAsync();
+        var result = await connection.EnsureOpenAsync(TestContext.Current.CancellationToken);
 
         Assert.Same(connection, (object?)result ?? connection);
         Assert.Equal(1, connection.OpenCalls);
@@ -54,8 +54,8 @@ public class ConnectionExtensionsTests
     public async Task EnsureOpenAsync_AlreadyOpen_DoesNotOpen()
     {
         using var connection = new MockDbConnection();
-        await connection.EnsureOpenAsync();
-        await connection.EnsureOpenAsync();
+        await connection.EnsureOpenAsync(TestContext.Current.CancellationToken);
+        await connection.EnsureOpenAsync(TestContext.Current.CancellationToken);
 
         Assert.Equal(1, connection.OpenCalls);
     }
@@ -104,10 +104,8 @@ public class ConnectionExtensionsTests
         Assert.Throws<ArgumentOutOfRangeException>(() => connection.SetCommandTimeout(15));
     }
 
-    [Theory]
-    [InlineData("NonExisting")]
-    [InlineData(null)]
-    public void GetDialect_UsesMockDialectIfAssigned(string unset)
+    [Fact]
+    public void GetDialect_UsesMockDialectIfAssigned()
     {
         var connection = new MockDbConnection { Dialect = OracleDialect.Instance };
 

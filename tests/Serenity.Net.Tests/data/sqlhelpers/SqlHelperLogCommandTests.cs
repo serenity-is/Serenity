@@ -10,13 +10,13 @@ public class SqlHelperLogCommandTests
         using var connection = new MockDbConnection();
         using var command = connection.CreateCommand();
 
-        Assert.Throws<ArgumentNullException>(() => SqlHelper.LogCommand("Test", command, null!));
+        Assert.Throws<ArgumentNullException>(() => SqlHelper.LogCommand("Test", command, null));
     }
 
     [Fact]
     public void LogCommand_NullCommand_ThrowsArgumentNullException()
     {
-        Assert.Throws<ArgumentNullException>(() => SqlHelper.LogCommand("Test", null!, new MockLogger()));
+        Assert.Throws<ArgumentNullException>(() => SqlHelper.LogCommand("Test", null, new MockLogger()));
     }
 
     [Fact]

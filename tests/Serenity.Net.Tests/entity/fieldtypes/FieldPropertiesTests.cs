@@ -18,10 +18,11 @@ public class FieldPropertiesTests
     }
 
     [Fact]
+    [Obsolete("Test for obsolete method")]
     public void ForeignJoin_CreatesJoinWithAliasFromFieldName()
     {
         var f = new FkNoJoinRow.RowFields();
-        f.Initialize(null, Serenity.Data.SqlSettings.DefaultDialect);
+        f.Initialize(null, SqlSettings.DefaultDialect);
 
         var byId = f.CountryID;
         byId.ForeignTable = "TheCountryTable";
@@ -42,7 +43,7 @@ public class FieldPropertiesTests
     public void BasicProperties_SetGet()
     {
         var f = new ComplexRow.RowFields();
-        f.Initialize(null, Serenity.Data.SqlSettings.DefaultDialect);
+        f.Initialize(null, SqlSettings.DefaultDialect);
         var field = f.Overriden;
 
         field.DefaultValue = "x";
@@ -67,7 +68,7 @@ public class FieldPropertiesTests
     public void ExpressionSetter_ResolvesJoinAliasByFieldName()
     {
         var f = new ComplexRow.RowFields();
-        f.Initialize(null, Serenity.Data.SqlSettings.DefaultDialect);
+        f.Initialize(null, SqlSettings.DefaultDialect);
         var field = f.BasicExpression; // plain propSomeField
 
         field.Expression = "c.Name";
