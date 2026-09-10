@@ -8,8 +8,9 @@ public class MockDbConnection : DbConnection, IRowOperationInterceptor, ISqlOper
 {
     private ConnectionState state = ConnectionState.Closed;
     public override string ConnectionString { get; set; }
+    private string database = string.Empty;
+    public override string Database => database;
     public override int ConnectionTimeout => 0;
-    public override string Database => string.Empty;
     public override string DataSource => throw new NotImplementedException();
     public override string ServerVersion => throw new NotImplementedException();
     public override ConnectionState State => state;
@@ -26,7 +27,7 @@ public class MockDbConnection : DbConnection, IRowOperationInterceptor, ISqlOper
 
     public override void ChangeDatabase(string databaseName)
     {
-        throw new NotImplementedException();
+        database = databaseName;
     }
 
     public override void Close()

@@ -6,7 +6,9 @@ internal class MockDbTransaction(IDbConnection dbConnection) : DbTransaction
 {
     private readonly IDbConnection dbConnection = dbConnection ?? throw new ArgumentNullException(nameof(dbConnection));
 
-    public override IsolationLevel IsolationLevel => throw new NotImplementedException();
+    public IsolationLevel MockIsolationLevel { get; set; } = IsolationLevel.ReadCommitted;
+
+    public override IsolationLevel IsolationLevel => MockIsolationLevel;
 
     protected override DbConnection DbConnection => (DbConnection)dbConnection;
 
