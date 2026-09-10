@@ -46,7 +46,7 @@ public class RetrieveRequestHandlerBehaviorWrappingTests
     private static MockDbConnection CreateConnection()
     {
         return new MockDbConnection()
-            .InterceptExecuteReader(args => new MockDbDataReader(new { Id = 1 }));
+            .InterceptExecuteReader(args => args.ToMockReader(new { Id = 1 }));
     }
 
     [Fact]

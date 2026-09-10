@@ -27,7 +27,7 @@ public class UndeleteRequestHandlerTests_Basic
     public void Undelete_RestoresRow()
     {
         using var connection = new MockDbConnection()
-            .InterceptExecuteReader(_ => new MockDbDataReader(new { ID = 5, Name = "A", IsDeleted = true }))
+            .InterceptExecuteReader(args => args.ToMockReader(new { ID = 5, Name = "A", IsDeleted = true }))
             .InterceptManipulateRow(_ => 1)
             .InterceptExecuteNonQuery(_ => 1);
         var handler = new UndeleteRequestHandler<UndelRow>(Context());

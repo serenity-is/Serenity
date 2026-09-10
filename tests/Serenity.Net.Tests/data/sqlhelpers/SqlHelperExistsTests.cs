@@ -6,7 +6,7 @@ public class SqlHelperExistsTests
     public void Exists_ReaderHasRow_ReturnsTrue()
     {
         using var connection = new MockDbConnection()
-            .InterceptExecuteReader(_ => new MockDbDataReader(new { Id = 1 }));
+            .InterceptExecuteReader(args => args.ToMockReader(new { Id = 1 }));
 
         var query = new SqlQuery().From("Table").Select("Id").Where("Id = 1");
         var result = query.Exists(connection);
@@ -45,7 +45,7 @@ public class SqlHelperExistsTests
     public async Task ExistsAsync_ReaderHasRow_ReturnsTrue()
     {
         using var connection = new MockDbConnection()
-            .InterceptExecuteReader(_ => new MockDbDataReader(new { Id = 1 }));
+            .InterceptExecuteReader(args => args.ToMockReader(new { Id = 1 }));
 
         var query = new SqlQuery().From("Table").Select("Id").Where("Id = 1");
         var result = await query.ExistsAsync(connection,

@@ -4,12 +4,12 @@ public class MockTemporaryFileSystem(string currentDirectory = "") : MockFileSys
 {
     public TemporaryFileInfo[] GetTemporaryFileInfos(string path)
     {
-        return DirectoryInfo.New(path).GetFiles().Select(x => new TemporaryFileInfo
+        return [.. DirectoryInfo.New(path).GetFiles().Select(x => new TemporaryFileInfo
         {
             CreationTime = x.CreationTime,
             FullName = x.FullName,
             Name = x.Name
-        }).ToArray();
+        })];
     }
 
     public new void DeleteFile(string filename)

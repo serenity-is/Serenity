@@ -132,8 +132,8 @@ public class DefaultConnectionStringsTests
             ["Second"] = Entry()
         });
 
-        Assert.Equal(["Default", "Second"], settings.ListConnectionStrings()
-            .Select(i => i.ConnectionKey).OrderBy(i => i).ToArray());
+        Assert.Equal(["Default", "Second"], [.. settings.ListConnectionStrings()
+            .Select(i => i.ConnectionKey).OrderBy(i => i)]);
     }
 
     [Fact]
@@ -211,7 +211,7 @@ public class DefaultConnectionStringsTests
 
         var cs = new DefaultConnectionStrings(options);
 
-        Assert.Equal(["Default"], cs.GetConnectionKeysResolvingTo("Default").OrderBy(k => k).ToArray());
+        Assert.Equal(["Default"], [.. cs.GetConnectionKeysResolvingTo("Default").OrderBy(k => k)]);
     }
 
     [Fact]

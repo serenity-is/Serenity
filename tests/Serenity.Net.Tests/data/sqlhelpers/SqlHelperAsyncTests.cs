@@ -18,7 +18,7 @@ public class SqlHelperAsyncTests
     public async Task ExecuteReaderAsync_Intercepts()
     {
         using var connection = new MockDbConnection()
-            .InterceptExecuteReader(args => new MockDbDataReader(new { Id = 1, Name = "Test" }));
+            .InterceptExecuteReader(args => args.ToMockReader(new { Id = 1, Name = "Test" }));
 
         using var reader = await SqlHelper.ExecuteReaderAsync(connection, "SELECT * FROM [Table]", null, cancellationToken: TestContext.Current.CancellationToken);
         Assert.True(reader.Read());
@@ -55,7 +55,7 @@ public class SqlHelperAsyncTests
     public async Task ExistsAsync_Intercepts()
     {
         using var connection = new MockDbConnection()
-            .InterceptExecuteReader(args => new MockDbDataReader(new { Id = 1 }));
+            .InterceptExecuteReader(args => args.ToMockReader(new { Id = 1 }));
 
         var query = new SqlQuery().From("Table").Select("Id").Where("Id = 1");
         var result = await query.ExistsAsync(connection, cancellationToken: TestContext.Current.CancellationToken);

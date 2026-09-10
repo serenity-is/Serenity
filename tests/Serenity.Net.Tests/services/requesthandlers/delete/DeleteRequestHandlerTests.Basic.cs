@@ -8,7 +8,7 @@ public class DeleteRequestHandlerTests_Basic
     public void Delete_DeletesRow()
     {
         using var connection = new MockDbConnection()
-            .InterceptExecuteReader(_ => new MockDbDataReader(new { ID = 5, Name = "A" }))
+            .InterceptExecuteReader(args => args.ToMockReader(new { ID = 5, Name = "A" }))
             .InterceptManipulateRow(_ => 1)
             .InterceptExecuteNonQuery(_ => 1);
         var handler = new DeleteRequestHandler<IdNameRow>(Context());

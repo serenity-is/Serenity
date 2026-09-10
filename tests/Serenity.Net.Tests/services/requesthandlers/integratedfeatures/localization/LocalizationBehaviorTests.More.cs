@@ -319,7 +319,7 @@ public partial class LocalizationBehaviorTests
         }));
 
         using var connection = new MockDbConnection()
-            .InterceptExecuteReader(args => new MockDbDataReader(new { Id = 123L }));
+            .InterceptExecuteReader(args => args.ToMockReader(new { Id = 123L }));
         var row = new LocMainRow { Id = 7 };
         Assert.True(behavior.ActivateFor(row));
         var handler = CreateSaveHandlerAsync(connection, false, row,

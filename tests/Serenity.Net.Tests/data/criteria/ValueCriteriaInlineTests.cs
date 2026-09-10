@@ -7,7 +7,7 @@ public class ValueCriteriaInlineTests
         A = 1, B, C, D, E, F, G, H, I, J, K
     }
 
-    private static object[] LongList => Enumerable.Range(1, 11).Cast<object>().ToArray();
+    private static object[] LongList => [.. Enumerable.Range(1, 11).Cast<object>()];
 
     [Fact]
     public void ToString_TenValues_UsesParams()
@@ -55,11 +55,11 @@ public class ValueCriteriaInlineTests
         object list = type.Name switch
         {
             "Byte" => Enumerable.Range(1, 11).Select(i => (byte)i).Cast<object>().ToArray(),
-            "SByte" => Enumerable.Range(1, 11).Select(i => (sbyte)i).Cast<object>().ToArray(),
-            "Int16" => Enumerable.Range(1, 11).Select(i => (short)i).Cast<object>().ToArray(),
-            "UInt16" => Enumerable.Range(1, 11).Select(i => (ushort)i).Cast<object>().ToArray(),
-            "UInt32" => Enumerable.Range(1, 11).Select(i => (uint)i).Cast<object>().ToArray(),
-            _ => Enumerable.Range(1, 11).Select(i => (ulong)i).Cast<object>().ToArray()
+            "SByte" => [.. Enumerable.Range(1, 11).Select(i => (sbyte)i).Cast<object>()],
+            "Int16" => [.. Enumerable.Range(1, 11).Select(i => (short)i).Cast<object>()],
+            "UInt16" => [.. Enumerable.Range(1, 11).Select(i => (ushort)i).Cast<object>()],
+            "UInt32" => [.. Enumerable.Range(1, 11).Select(i => (uint)i).Cast<object>()],
+            _ => [.. Enumerable.Range(1, 11).Select(i => (ulong)i).Cast<object>()]
         };
 
         Assert.Equal("(1,2,3,4,5,6,7,8,9,10,11)", new ValueCriteria(list).ToString(query));

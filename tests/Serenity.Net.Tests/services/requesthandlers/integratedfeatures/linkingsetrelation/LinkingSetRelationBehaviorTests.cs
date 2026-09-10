@@ -210,7 +210,7 @@ public class LinkingSetRelationBehaviorTests
         });
 
         using var connection = new MockDbConnection()
-            .InterceptExecuteReader(args => new MockDbDataReader(new { ID = 100L }, new { ID = 200L }));
+            .InterceptExecuteReader(args => args.ToMockReader(new { ID = 100L }, new { ID = 200L }));
         var master = new LkMainRow { ID = 5 };
         var behavior = new LinkingSetRelationBehavior(handlerFactory)
         {
@@ -243,7 +243,7 @@ public class LinkingSetRelationBehaviorTests
         });
 
         using var connection = new MockDbConnection()
-            .InterceptExecuteReader(args => new MockDbDataReader(new { ID = 100L }, new { ID = 200L }));
+            .InterceptExecuteReader(args => args.ToMockReader(new { ID = 100L }, new { ID = 200L }));
         var master = new LkMainRow { ID = 5 };
         var behavior = new LinkingSetRelationBehavior(handlerFactory)
         {
@@ -562,7 +562,7 @@ public class LinkingSetRelationBehaviorTests
 
         var behavior = CreateBehavior(row, row.GetFields().SelectedItems, factory);
         using var connection = new MockDbConnection()
-            .InterceptExecuteReader(_ => new MockDbDataReader(new { ID = 100L }));
+            .InterceptExecuteReader(args => args.ToMockReader(new { ID = 100L }));
 
         behavior.OnBeforeDelete(new MockDeleteHandler<LkFilteredMainRow>
         {
@@ -770,7 +770,7 @@ public class LinkingSetRelationBehaviorTests
         behavior.OnReturn(handler);
     }
 
-    private static MockHandlerFactory SaveDeleteFactory(List<int?> saved, List<object?> deleted, bool async)
+    private static MockHandlerFactory SaveDeleteFactory(List<int?> saved, List<object?> deleted)
     {
         return new MockHandlerFactory((rowType, intf) =>
         {
@@ -790,7 +790,7 @@ public class LinkingSetRelationBehaviorTests
     {
         var saved = new List<int?>();
         var deleted = new List<object?>();
-        var factory = SaveDeleteFactory(saved, deleted, false);
+        var factory = SaveDeleteFactory(saved, deleted);
         using var connection = new MockDbConnection()
             .InterceptExecuteReader(_ => new MockDbDataReader());
         var master = new LkMainRow { ID = 5, SelectedItems = [11, 22] };
@@ -807,7 +807,7 @@ public class LinkingSetRelationBehaviorTests
     {
         var saved = new List<int?>();
         var deleted = new List<object?>();
-        var factory = SaveDeleteFactory(saved, deleted, true);
+        var factory = SaveDeleteFactory(saved, deleted);
         using var connection = new MockDbConnection()
             .InterceptExecuteReader(_ => new MockDbDataReader());
         var master = new LkMainRow { ID = 5, SelectedItems = [11, 22] };
@@ -825,9 +825,9 @@ public class LinkingSetRelationBehaviorTests
     {
         var saved = new List<int?>();
         var deleted = new List<object?>();
-        var factory = SaveDeleteFactory(saved, deleted, false);
+        var factory = SaveDeleteFactory(saved, deleted);
         using var connection = new MockDbConnection()
-            .InterceptExecuteReader(_ => new MockDbDataReader(new { ID = 100L, ItemID = 11 }));
+            .InterceptExecuteReader(args => args.ToMockReader(new { ID = 100L, ItemID = 11 }));
         var master = new LkMainRow { ID = 5, SelectedItems = [] };
         var behavior = CreateBehavior(master, master.GetFields().SelectedItems, factory);
 
@@ -842,9 +842,9 @@ public class LinkingSetRelationBehaviorTests
     {
         var saved = new List<int?>();
         var deleted = new List<object?>();
-        var factory = SaveDeleteFactory(saved, deleted, false);
+        var factory = SaveDeleteFactory(saved, deleted);
         using var connection = new MockDbConnection()
-            .InterceptExecuteReader(_ => new MockDbDataReader(new { ID = 100L, ItemID = 11 }));
+            .InterceptExecuteReader(args => args.ToMockReader(new { ID = 100L, ItemID = 11 }));
         var master = new LkMainRow { ID = 5, SelectedItems = [22] };
         var behavior = CreateBehavior(master, master.GetFields().SelectedItems, factory);
 
@@ -859,7 +859,7 @@ public class LinkingSetRelationBehaviorTests
     {
         var saved = new List<int?>();
         var deleted = new List<object?>();
-        var factory = SaveDeleteFactory(saved, deleted, false);
+        var factory = SaveDeleteFactory(saved, deleted);
         using var connection = new MockDbConnection()
             .InterceptExecuteReader(_ => new MockDbDataReader(
                 new { ID = 100L, ItemID = 11 },

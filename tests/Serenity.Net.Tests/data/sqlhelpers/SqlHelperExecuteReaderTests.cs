@@ -6,7 +6,7 @@ public class SqlHelperExecuteReaderTests
     public void ExecuteReader_InterceptorReturnsReader_DoesNotExecuteCommand()
     {
         using var connection = new MockDbConnection()
-            .InterceptExecuteReader(_ => new MockDbDataReader(new { Id = 1 }))
+            .InterceptExecuteReader(args => args.ToMockReader(new { Id = 1 }))
             .OnDbCommandExecuteReader(_ => throw new InvalidOperationException("should not execute"));
 
         using var reader = SqlHelper.ExecuteReader(connection, "SELECT * FROM [Table]", null);
@@ -61,7 +61,7 @@ public class SqlHelperExecuteReaderTests
     public void ExecuteReader_WithQuery_InterceptorReceivesQuery()
     {
         using var connection = new MockDbConnection()
-            .InterceptExecuteReader(_ => new MockDbDataReader(new { Id = 1 }));
+            .InterceptExecuteReader(args => args.ToMockReader(new { Id = 1 }));
 
         var query = new SqlQuery().From("Table").Select("Id");
         using var reader = query.ExecuteReader(connection);
@@ -98,7 +98,7 @@ public class SqlHelperExecuteReaderTests
     public async Task ExecuteReaderAsync_InterceptorReturnsReader_DoesNotExecuteCommand()
     {
         using var connection = new MockDbConnection()
-            .InterceptExecuteReader(_ => new MockDbDataReader(new { Id = 1 }))
+            .InterceptExecuteReader(args => args.ToMockReader(new { Id = 1 }))
             .OnDbCommandExecuteReader(_ => throw new InvalidOperationException("should not execute"));
 
         using var reader = await SqlHelper.ExecuteReaderAsync(connection, "SELECT * FROM [Table]", null,
@@ -126,7 +126,7 @@ public class SqlHelperExecuteReaderTests
     public async Task ExecuteReaderAsync_WithQuery_InterceptorReceivesQuery()
     {
         using var connection = new MockDbConnection()
-            .InterceptExecuteReader(_ => new MockDbDataReader(new { Id = 1 }));
+            .InterceptExecuteReader(args => args.ToMockReader(new { Id = 1 }));
 
         var query = new SqlQuery().From("Table").Select("Id");
         using var reader = await query.ExecuteReaderAsync(connection,

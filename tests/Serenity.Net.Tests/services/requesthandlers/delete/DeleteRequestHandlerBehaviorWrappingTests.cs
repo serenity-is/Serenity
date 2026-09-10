@@ -46,7 +46,7 @@ public class DeleteRequestHandlerBehaviorWrappingTests
     private static MockDbConnection CreateConnection()
     {
         return new MockDbConnection()
-            .InterceptExecuteReader(args => new MockDbDataReader(new { Id = 1 }))
+            .InterceptExecuteReader(args => args.ToMockReader(new { Id = 1 }))
             .InterceptExecuteNonQuery(args => 1);
     }
 

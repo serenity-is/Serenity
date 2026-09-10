@@ -8,7 +8,7 @@ public class RetrieveRequestHandlerTests_Basic
     public void Retrieve_ReturnsRow()
     {
         using var connection = new MockDbConnection()
-            .InterceptExecuteReader(_ => new MockDbDataReader(new { ID = 5, Name = "A" }));
+            .InterceptExecuteReader(args => args.ToMockReader(new { ID = 5, Name = "A" }));
         var handler = new RetrieveRequestHandler<IdNameRow>(Context());
 
         var response = handler.Retrieve(connection, new RetrieveRequest { EntityId = 5 });
@@ -31,7 +31,7 @@ public class RetrieveRequestHandlerTests_Basic
     public async Task RetrieveAsync_ReturnsRow()
     {
         using var connection = new MockDbConnection()
-            .InterceptExecuteReader(_ => new MockDbDataReader(new { ID = 5, Name = "A" }));
+            .InterceptExecuteReader(args => args.ToMockReader(new { ID = 5, Name = "A" }));
         var handler = new RetrieveRequestHandlerAsync<IdNameRow>(Context());
 
         var response = await handler.RetrieveAsync(connection,

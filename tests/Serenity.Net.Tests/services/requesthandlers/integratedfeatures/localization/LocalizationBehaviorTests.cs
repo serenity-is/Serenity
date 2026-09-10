@@ -254,7 +254,7 @@ public partial class LocalizationBehaviorTests
         }));
 
         using var connection = new MockDbConnection()
-            .InterceptExecuteReader(args => new MockDbDataReader(new { Id = 123L }));
+            .InterceptExecuteReader(args => args.ToMockReader(new { Id = 123L }));
         var row = new LocMainRow { Id = 7 };
         Assert.True(behavior.ActivateFor(row));
         // empty description => not anyNonEmpty => delete old row
@@ -281,7 +281,7 @@ public partial class LocalizationBehaviorTests
         }));
 
         using var connection = new MockDbConnection()
-            .InterceptExecuteReader(args => new MockDbDataReader(new { Id = 11L }, new { Id = 12L }));
+            .InterceptExecuteReader(args => args.ToMockReader(new { Id = 11L }, new { Id = 12L }));
         var row = new LocMainRow { Id = 7 };
         Assert.True(behavior.ActivateFor(row));
         var handler = new MockDeleteHandler<LocMainRow>
@@ -311,7 +311,7 @@ public partial class LocalizationBehaviorTests
         }));
 
         using var connection = new MockDbConnection()
-            .InterceptExecuteReader(args => new MockDbDataReader(new { Id = 11L }, new { Id = 12L }));
+            .InterceptExecuteReader(args => args.ToMockReader(new { Id = 11L }, new { Id = 12L }));
         var row = new LocMainRow { Id = 7 };
         Assert.True(behavior.ActivateFor(row));
         var handler = new MockDeleteHandlerAsync<LocMainRow>

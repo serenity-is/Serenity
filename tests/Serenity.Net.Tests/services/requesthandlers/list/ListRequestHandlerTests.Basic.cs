@@ -8,7 +8,7 @@ public class ListRequestHandlerTests_Basic
     public void List_ReturnsRows()
     {
         using var connection = new MockDbConnection()
-            .InterceptExecuteReader(_ => new MockDbDataReader(new { ID = 1, Name = "A" }))
+            .InterceptExecuteReader(args => args.ToMockReader(new { ID = 1, Name = "A" }))
             .InterceptExecuteNonQuery(_ => 1);
         var handler = new ListRequestHandler<IdNameRow>(Context());
 

@@ -42,7 +42,7 @@ public class SaveRequestHandlerTests_Basic
     public void Update_UpdatesRow()
     {
         using var connection = new MockDbConnection()
-            .InterceptExecuteReader(_ => new MockDbDataReader(new { ID = 5, Name = "Old" })).InterceptManipulateRow(_ => 1);
+            .InterceptExecuteReader(args => args.ToMockReader(new { ID = 5, Name = "Old" })).InterceptManipulateRow(_ => 1);
         var handler = new SaveRequestHandler<IdNameRow>(Context());
 
         var response = handler.Update(new MockUnitOfWork(connection), new SaveRequest<IdNameRow>
@@ -57,7 +57,7 @@ public class SaveRequestHandlerTests_Basic
     public async Task UpdateAsync_UpdatesRow()
     {
         using var connection = new MockDbConnection()
-            .InterceptExecuteReader(_ => new MockDbDataReader(new { ID = 5, Name = "Old" })).InterceptManipulateRow(_ => 1);
+            .InterceptExecuteReader(args => args.ToMockReader(new { ID = 5, Name = "Old" })).InterceptManipulateRow(_ => 1);
         var handler = new SaveRequestHandlerAsync<IdNameRow>(Context());
 
         var response = await handler.UpdateAsync(new MockUnitOfWork(connection), new SaveRequest<IdNameRow>

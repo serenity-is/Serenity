@@ -12,8 +12,7 @@ public class ServiceHelpersTests
 
         private static List<int> SortIds(IEnumerable<Node> nodes)
         {
-            return TreeOrdering.Sort(nodes, x => x.Id, x => x.ParentId)
-                .Select(x => x.Id).ToList();
+            return [.. TreeOrdering.Sort(nodes, x => x.Id, x => x.ParentId).Select(x => x.Id)];
         }
 
         [Fact]

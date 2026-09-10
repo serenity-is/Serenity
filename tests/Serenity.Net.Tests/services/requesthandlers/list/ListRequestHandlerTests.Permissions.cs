@@ -34,7 +34,7 @@ public partial class ListRequestHandlerTests
             {
                 var columns = ((ISqlQueryExtensible)args.Query.AssertNotNull()).Columns.Select(x => x.ColumnName).ToList();
                 Assert.Equal(TestRow.Fields.Count, columns.Count);
-                Assert.Equal(columns, TestRow.Fields.Select(x => x.Name).ToList());
+                Assert.Equal(columns, [.. TestRow.Fields.Select(x => x.Name)]);
                 return new MockDbDataReader();
             });
 

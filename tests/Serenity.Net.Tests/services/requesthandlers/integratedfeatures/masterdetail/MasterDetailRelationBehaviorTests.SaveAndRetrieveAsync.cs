@@ -197,7 +197,7 @@ public partial class MasterDetailRelationBehaviorTests
         });
 
         using var connection = new MockDbConnection()
-            .InterceptExecuteReader(args => new MockDbDataReader(new { DetailID = 100 }, new { DetailID = 200 }));
+            .InterceptExecuteReader(args => args.ToMockReader(new { DetailID = 100 }, new { DetailID = 200 }));
         var master = new Int32MasterRow { ID = 7, Name = "M" };
         var behavior = new MasterDetailRelationBehavior(handlerFactory)
         {
@@ -232,7 +232,7 @@ public partial class MasterDetailRelationBehaviorTests
         });
 
         using var connection = new MockDbConnection()
-            .InterceptExecuteReader(args => new MockDbDataReader(new { DetailID = 100 }, new { DetailID = 200 }));
+            .InterceptExecuteReader(args => args.ToMockReader(new { DetailID = 100 }, new { DetailID = 200 }));
         var master = new Int32MasterRow { ID = 7, Name = "M" };
         var behavior = new MasterDetailRelationBehavior(handlerFactory)
         {

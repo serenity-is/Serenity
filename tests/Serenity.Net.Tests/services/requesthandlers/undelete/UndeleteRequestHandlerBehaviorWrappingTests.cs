@@ -51,7 +51,7 @@ public class UndeleteRequestHandlerBehaviorWrappingTests
     private static MockDbConnection CreateConnection()
     {
         return new MockDbConnection()
-            .InterceptExecuteReader(args => new MockDbDataReader(new { Id = 1, IsDeleted = true }))
+            .InterceptExecuteReader(args => args.ToMockReader(new { Id = 1, IsDeleted = true }))
             .InterceptExecuteNonQuery(args => 1);
     }
 

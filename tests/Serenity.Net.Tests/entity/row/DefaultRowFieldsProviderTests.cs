@@ -196,4 +196,28 @@ public class DefaultRowFieldsProviderTests
 
         Assert.Same(expected, fields.Dialect);
     }
+
+    private class MockAnnotationTypeRegistry : Serenity.Reflection.IAnnotationTypeRegistry
+    {
+        public IEnumerable<Type> GetAnnotationTypesFor(Type type) => Array.Empty<Type>();
+    }
+
+    [Fact]
+    public void Resolve_UsesAnnotationTypeRegistry_ForNestedRowFields()
+    {
+        var provider = CreateProvider(services =>
+            services.AddSingleton<Serenity.Reflection.IAnnotationTypeRegistry>(new MockAnnotationTypeRegistry()));
+
+        var fields = Assert.IsType<IdNameRow.RowFields>(
+            provider.Resolve(typeof(IdNameRow.RowFields)));
+
+        Assert.NotNull(fields);
+    }
+
+    [Fact]
+    public void FallbackProvider_ResolveWithAlias_EmptyAlias_Throws()
+    {
+        Assert.Throws<ArgumentNullException>(() =>
+            FallbackRowFieldsProvider.Instance.ResolveWithAlias(typeof(IdNameRow.RowFields), ""));
+    }
 }

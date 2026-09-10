@@ -80,7 +80,7 @@ public static class UploadPathHelper
             width <= 0)
             return false;
 
-        if (!int.TryParse(suffix[idx..^4], out height) ||
+        if (!int.TryParse(suffix[(idx + 1)..^4], out height) ||
             height <= 0)
             return false;
 

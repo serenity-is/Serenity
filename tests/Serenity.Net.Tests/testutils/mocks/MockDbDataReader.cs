@@ -24,15 +24,58 @@ public class MockDbDataReader : DbDataReader
         ArgumentNullException.ThrowIfNull(items);
 
         this.props = props;
-        values = items.Select(item => props.Select(p =>
-                item.TryGetValue(p, out var o) ? o : null).ToArray()).ToArray();
+        values = [.. items.Select(item => props.Select(p =>
+                item.TryGetValue(p, out var o) ? o : null).ToArray())];
     }
 
-    public MockDbDataReader(params object[] anonymousItems) : this(null, anonymousItems)
+    public MockDbDataReader(params object[] anonymousItems) : this((string?)null, anonymousItems)
     {
     }
 
-    public MockDbDataReader(string commandText, params object[] anonymousItems)
+    public MockDbDataReader(string? commandText, params object[] anonymousItems)
+    {
+        string[]? columnNames = null;
+        if (!string.IsNullOrEmpty(commandText))
+            columnNames = ParseSelectFieldAliases(commandText)?.ToArray();
+
+        (props, values) = MapAnonymousRows(columnNames, anonymousItems);
+    }
+
+    /// <summary>
+    /// Creates a reader with the specified column names in order, mapping each anonymous
+    /// item's properties to them by name (case insensitive). Properties that do not match
+    /// a column are ignored, and columns without a matching property are read as DBNull.
+    /// </summary>
+    /// <param name="columnNames">The column names in reader order.</param>
+    /// <param name="anonymousItems">The anonymous items.</param>
+    public MockDbDataReader(IEnumerable<string> columnNames, object[] anonymousItems)
+    {
+        ArgumentNullException.ThrowIfNull(columnNames);
+
+        (props, values) = MapAnonymousRows([.. columnNames], anonymousItems);
+    }
+
+    /// <summary>
+    /// Creates a reader with the specified column names in order, mapping each dictionary
+    /// entry to them by key (case insensitive). Missing keys are read as DBNull.
+    /// </summary>
+    /// <param name="columnNames">The column names in reader order.</param>
+    /// <param name="items">The dictionary items.</param>
+    public MockDbDataReader(IEnumerable<string> columnNames, IEnumerable<IDictionary<string, object?>> items)
+    {
+        ArgumentNullException.ThrowIfNull(columnNames);
+        ArgumentNullException.ThrowIfNull(items);
+
+        props = [.. columnNames];
+        values = [.. items.Select(item =>
+        {
+            var byName = new Dictionary<string, object?>(item, StringComparer.OrdinalIgnoreCase);
+            return props.Select(p => byName.TryGetValue(p, out var o) ? o : null).ToArray();
+        })];
+    }
+
+    private static (string[] Props, object[][] Values) MapAnonymousRows(
+        string[]? columnNames, object[] anonymousItems)
     {
         if (anonymousItems == null || anonymousItems.Length == 0)
             throw new ArgumentNullException(nameof(anonymousItems));
@@ -42,24 +85,21 @@ public class MockDbDataReader : DbDataReader
             throw new ArgumentOutOfRangeException(nameof(anonymousItems),
                 "All items passed to mock data reader constructor must be of same type!");
 
-        if (!string.IsNullOrEmpty(commandText))
-            props = ParseSelectFieldAliases(commandText)?.ToArray();
+        var properties = sample.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
-        if (props == null)
+        if (columnNames == null)
         {
-            var properties = sample.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
-            props = properties.Select(x => x.Name).ToArray();
-            values = anonymousItems.Select(item => properties.Select(p => p.GetValue(item)).ToArray()).ToArray();
+            var names = properties.Select(x => x.Name).ToArray();
+            var allValues = anonymousItems.Select(item =>
+                properties.Select(p => p.GetValue(item)).ToArray()).ToArray();
+            return (names, allValues);
         }
-        else
-        {
-            var properties = sample.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                .ToDictionary(x => x.Name, StringComparer.OrdinalIgnoreCase);
 
-            var matchingProps = props.Select(x => properties.TryGetValue(x, out var p) ? p : null);
-
-            values = anonymousItems.Select(item => matchingProps.Select(x => x?.GetValue(item)).ToArray()).ToArray();
-        }
+        var byName = properties.ToDictionary(x => x.Name, StringComparer.OrdinalIgnoreCase);
+        var matching = columnNames.Select(x => byName.TryGetValue(x, out var p) ? p : null).ToArray();
+        var mappedValues = anonymousItems.Select(item =>
+            matching.Select(p => p?.GetValue(item)).ToArray()).ToArray();
+        return (columnNames, mappedValues);
     }
 
     public override object this[int i] => values[index][i] ?? DBNull.Value;
@@ -305,4 +345,53 @@ public class MockDbDataReader : DbDataReader
         return result;
     }
 
+}
+
+/// <summary>
+/// Helpers to create <see cref="MockDbDataReader"/> instances aligned to the columns
+/// of the query being intercepted, so tests can supply row values by column name
+/// without worrying about select order or missing columns.
+/// </summary>
+public static class MockDbDataReaderExtensions
+{
+    private static string[]? GetColumnNames(SqlQuery? query)
+    {
+        if (query is not ISqlQueryExtensible ext || ext.Columns.Count == 0)
+            return null;
+
+        return [.. ext.Columns.Select(c =>
+            c.ColumnName ?? (c.IntoField as IField)?.ColumnAlias ?? c.Expression)];
+    }
+
+    /// <summary>
+    /// Creates a reader for the intercepted query, mapping anonymous items to its
+    /// columns by name. Missing columns are read as DBNull.
+    /// </summary>
+    public static MockDbDataReader ToMockReader(this InterceptExecuteReaderArgs args, params object[] anonymousItems)
+    {
+        ArgumentNullException.ThrowIfNull(anonymousItems);
+        var columnNames = GetColumnNames(args?.Query);
+        return columnNames == null
+            ? new MockDbDataReader(anonymousItems)
+            : new MockDbDataReader(columnNames, anonymousItems);
+    }
+
+    /// <summary>
+    /// Creates a reader for the intercepted query, mapping dictionary entries to its
+    /// columns by key. Missing columns are read as DBNull.
+    /// </summary>
+    public static MockDbDataReader ToMockReader(this InterceptExecuteReaderArgs args,
+        IEnumerable<IDictionary<string, object?>> items)
+    {
+        ArgumentNullException.ThrowIfNull(items);
+        var columnNames = GetColumnNames(args?.Query) ?? items.FirstOrDefault()?.Keys.ToArray() ?? [];
+        return new MockDbDataReader(columnNames, items);
+    }
+
+    /// <summary>
+    /// Creates a single row reader for the intercepted query, mapping dictionary entries
+    /// to its columns by key. Missing columns are read as DBNull.
+    /// </summary>
+    public static MockDbDataReader ToMockReader(this InterceptExecuteReaderArgs args, IDictionary<string, object?> item)
+        => args.ToMockReader((IEnumerable<IDictionary<string, object?>>)[item]);
 }
