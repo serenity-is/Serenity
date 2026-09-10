@@ -1,6 +1,3 @@
-using System.IO;
-using System.Text;
-
 namespace Serenity.Data;
 
 public class BinarySerializationTests

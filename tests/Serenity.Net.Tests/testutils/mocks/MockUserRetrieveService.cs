@@ -1,5 +1,3 @@
-using Serenity.Abstractions;
-
 namespace Serenity.TestUtils;
 
 /// <summary>

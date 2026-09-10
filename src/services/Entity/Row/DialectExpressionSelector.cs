@@ -10,6 +10,7 @@ namespace Serenity.Data;
 /// <exception cref="ArgumentNullException">dialect</exception>
 public class DialectExpressionSelector(ISqlDialect dialect)
 {
+    private readonly ISqlDialect dialect = dialect ?? throw new ArgumentNullException(nameof(dialect));
     private readonly string dialectServerType = dialect.ServerType;
     private readonly string dialectTypeName = dialect.GetType().Name;
 

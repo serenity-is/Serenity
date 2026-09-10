@@ -96,7 +96,15 @@ public class MockDbDataReader : DbDataReader
 
     public override long GetBytes(int i, long fieldOffset, byte[] buffer, int bufferoffset, int length)
     {
-        throw new NotImplementedException();
+        if (this[i] is not byte[] data)
+            throw new NotImplementedException();
+
+        if (buffer == null)
+            return data.Length;
+
+        var count = Math.Min(length, data.Length - (int)fieldOffset);
+        Array.Copy(data, (int)fieldOffset, buffer, bufferoffset, count);
+        return count;
     }
 
     public override char GetChar(int i)

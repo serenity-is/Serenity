@@ -1,5 +1,4 @@
 using System.IO;
-using System.Reflection;
 
 namespace Serenity.Localization;
 

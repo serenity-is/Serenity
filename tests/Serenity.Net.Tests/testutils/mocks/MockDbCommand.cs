@@ -2,7 +2,7 @@ using System.Data.Common;
 
 namespace Serenity.TestUtils;
 
-public class MockDbCommand(IDbConnection connection = null) : DbCommand
+public class MockDbCommand(IDbConnection connection = null, DbType? createdParameterDbType = null) : DbCommand
 {
     public override string CommandText { get; set; }
     public override int CommandTimeout { get; set; }
@@ -19,7 +19,10 @@ public class MockDbCommand(IDbConnection connection = null) : DbCommand
 
     protected override DbParameter CreateDbParameter()
     {
-        return new MockDbParameter();
+        var parameter = new MockDbParameter();
+        if (createdParameterDbType.HasValue)
+            parameter.DbType = createdParameterDbType.Value;
+        return parameter;
     }
 
     public MockDbCommand OnExecuteNonQuery(Func<int> func)

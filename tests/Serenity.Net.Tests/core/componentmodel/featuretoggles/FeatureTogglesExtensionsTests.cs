@@ -35,8 +35,8 @@ public class FeatureTogglesExtensionsTests
     public void IsEnabled_WithEnumerable_RequiresAll()
     {
         var toggles = new MockFeatureToggles("A", "B");
-        Assert.True(toggles.IsEnabled(new[] { "A", "B" }));
-        Assert.False(toggles.IsEnabled(new[] { "A", "C" }));
+        Assert.True(toggles.IsEnabled(["A", "B"]));
+        Assert.False(toggles.IsEnabled(["A", "C"]));
     }
 
     [Fact]
@@ -51,9 +51,9 @@ public class FeatureTogglesExtensionsTests
     public void IsEnabled_WithRequireAny_RequiresOne()
     {
         var toggles = new MockFeatureToggles("A");
-        Assert.True(toggles.IsEnabled(new[] { "A", "B" }, requireAny: true));
-        Assert.False(toggles.IsEnabled(new[] { "B", "C" }, requireAny: true));
-        Assert.False(toggles.IsEnabled(new[] { "A", "B" }, requireAny: false));
+        Assert.True(toggles.IsEnabled(["A", "B"], requireAny: true));
+        Assert.False(toggles.IsEnabled(["B", "C"], requireAny: true));
+        Assert.False(toggles.IsEnabled(["A", "B"], requireAny: false));
     }
 
     [Fact]

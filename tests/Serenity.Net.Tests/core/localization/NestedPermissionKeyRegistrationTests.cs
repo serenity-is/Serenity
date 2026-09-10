@@ -1,6 +1,3 @@
-using System.ComponentModel;
-using Serenity.ComponentModel;
-
 namespace Serenity.Localization;
 
 public class NestedPermissionKeyRegistrationTests

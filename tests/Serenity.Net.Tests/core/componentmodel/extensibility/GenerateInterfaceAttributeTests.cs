@@ -6,7 +6,7 @@ public class GenerateInterfaceAttributeTests
     public void RequireFeatures_GetSet_Works()
     {
         var attr = new GenerateInterfaceAttribute { RequireFeatures = ["Feature1"] };
-        Assert.Equal(new[] { "Feature1" }, attr.RequireFeatures);
+        Assert.Equal(["Feature1"], attr.RequireFeatures);
     }
 
     [Fact]

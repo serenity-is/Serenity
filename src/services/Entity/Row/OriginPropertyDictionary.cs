@@ -301,7 +301,7 @@ internal class OriginPropertyDictionary
         else if (rowJoinByAlias.TryGetValue(joinAlias, out ISqlJoin? join) &&
             join.TitlePrefix != null)
         {
-            prefix = join.TitlePrefix.Length > 0 ? join.TitlePrefix + " " : "";
+            prefix = join.TitlePrefix;
         }
 
         string addPrefix(string s)

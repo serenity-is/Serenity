@@ -36,7 +36,7 @@ public class MockDbConnection : DbConnection, IRowOperationInterceptor, ISqlOper
 
     protected override DbCommand CreateDbCommand()
     {
-        var command = new MockDbCommand(this);
+        var command = new MockDbCommand(this, CreatedParameterDbType);
 
         if (onDbCommandExecuteReader != null)
             command.OnExecuteReader(() => 
@@ -67,6 +67,7 @@ public class MockDbConnection : DbConnection, IRowOperationInterceptor, ISqlOper
     }
 
     public int OpenCalls { get; protected set; }
+    public DbType? CreatedParameterDbType { get; set; }
     public int DbCommandExecuteReaderCallCount { get; protected set; } = 0;
     public int DbCommandExecuteNonQueryCallCount { get; protected set; } = 0;
     public int DbCommandExecuteScalarCallCount { get; protected set; } = 0;

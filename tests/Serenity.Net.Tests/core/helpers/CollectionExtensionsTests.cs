@@ -29,7 +29,7 @@ public class CollectionExtensionsTests
     public void AddRange_Enumerable_Throws_WhenListIsNull()
     {
         ICollection<int> list = null;
-        Assert.Throws<ArgumentException>(() => list.AddRange(new[] { 1 }));
+        Assert.Throws<ArgumentException>(() => list.AddRange([1]));
     }
 
     [Fact]

@@ -12,7 +12,7 @@ public class RequiresFeatureAttributeTests
     public void Ctor_WithStringFeatures_SetsFeatures()
     {
         var attr = new RequiresFeatureAttribute("A", "B");
-        Assert.Equal(new[] { "A", "B" }, attr.Features);
+        Assert.Equal(["A", "B"], attr.Features);
     }
 
     [Fact]
@@ -31,7 +31,7 @@ public class RequiresFeatureAttributeTests
     public void Ctor_WithEnumFeatures_SetsFeatureKeys()
     {
         var attr = new RequiresFeatureAttribute(TestFeature.Feature1, TestFeature.Feature2);
-        Assert.Equal(new[] { "Feature1", "Feature2" }, attr.Features);
+        Assert.Equal(["Feature1", "Feature2"], attr.Features);
     }
 
     [Fact]

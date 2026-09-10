@@ -1,5 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
-
 namespace Serenity.Extensions.DependencyInjection;
 
 public class ServiceResolverTests

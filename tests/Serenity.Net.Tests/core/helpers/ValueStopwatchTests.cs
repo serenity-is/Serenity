@@ -1,5 +1,3 @@
-using System.Diagnostics;
-
 namespace Serenity;
 
 public class ValueStopwatchTests

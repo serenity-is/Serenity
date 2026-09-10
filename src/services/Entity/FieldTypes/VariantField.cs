@@ -132,7 +132,7 @@ public class VariantField(ICollection<Field> collection, string name, LocalText?
                 break;
             case JsonTokenType.True:
             case JsonTokenType.False:
-                _setValue(row, reader.TokenType == JsonTokenType.Number);
+                _setValue(row, reader.TokenType == JsonTokenType.True);
                 break;
             case JsonTokenType.Number:
                 if (reader.TryGetInt32(out int intValue))

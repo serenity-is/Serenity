@@ -76,11 +76,12 @@ public class Criteria : BaseCriteria
     /// </exception>
     public Criteria(string alias, string field)
     {
-        if (string.IsNullOrEmpty(field))
-            throw new ArgumentNullException(nameof(field));
-
         if (string.IsNullOrEmpty(alias))
             throw new ArgumentNullException(nameof(alias));
+
+        if (string.IsNullOrEmpty(field))
+            throw new ArgumentNullException(nameof(field));        
+            
         expression = alias + "." + SqlSyntax.AutoBracketValid(field, dialect: null);
     }
 
@@ -109,8 +110,10 @@ public class Criteria : BaseCriteria
     /// </summary>
     /// <param name="alias">The alias.</param>
     /// <param name="field">The field.</param>
+    /// <exception cref="ArgumentNullException">alias or field is null</exception>
     public Criteria(IAlias alias, IField field)
-        : this(alias.Name, field.Name)
+        : this((alias ?? throw new ArgumentNullException(nameof(alias))).Name,
+               (field ?? throw new ArgumentNullException(nameof(field))).Name)
     {
         Field = field;
     }
@@ -121,8 +124,9 @@ public class Criteria : BaseCriteria
     /// </summary>
     /// <param name="alias">The alias.</param>
     /// <param name="field">The field.</param>
+    /// <exception cref="ArgumentNullException">alias is null</exception>
     public Criteria(IAlias alias, string field)
-        : this(alias.Name, field)
+        : this((alias ?? throw new ArgumentNullException(nameof(alias))).Name, field)
     {
     }
 
@@ -132,8 +136,9 @@ public class Criteria : BaseCriteria
     /// </summary>
     /// <param name="joinNumber">The join number.</param>
     /// <param name="field">The field.</param>
+    /// <exception cref="ArgumentNullException">field is null</exception>
     public Criteria(int joinNumber, IField field)
-        : this(joinNumber, field.Name)
+        : this(joinNumber, (field ?? throw new ArgumentNullException(nameof(field))).Name)
     {
         Field = field;
     }
@@ -144,8 +149,9 @@ public class Criteria : BaseCriteria
     /// </summary>
     /// <param name="join">The join.</param>
     /// <param name="field">The field.</param>
+    /// <exception cref="ArgumentNullException">field is null</exception>
     public Criteria(string join, IField field)
-        : this(join, field.Name)
+        : this(join, (field ?? throw new ArgumentNullException(nameof(field))).Name)
     {
         Field = field;
     }
@@ -167,8 +173,9 @@ public class Criteria : BaseCriteria
     /// a query's string representation.
     /// </summary>
     /// <param name="query">The query.</param>
+    /// <exception cref="ArgumentNullException">query is null</exception>
     public Criteria(ISqlQuery query)
-        : this(query.ToString()!)
+        : this((query ?? throw new ArgumentNullException(nameof(query))).ToString()!)
     {
     }
 

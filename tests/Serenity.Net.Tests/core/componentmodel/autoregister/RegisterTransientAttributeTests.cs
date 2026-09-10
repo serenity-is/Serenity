@@ -1,5 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
-
 namespace Serenity.ComponentModel;
 
 public class RegisterTransientAttributeTests
@@ -15,7 +13,7 @@ public class RegisterTransientAttributeTests
     public void Ctor_WithTypes_SetsTypes()
     {
         var attr = new RegisterTransientAttribute(typeof(IService), typeof(IService2));
-        Assert.Equal(new[] { typeof(IService), typeof(IService2) }, attr.Types);
+        Assert.Equal([typeof(IService), typeof(IService2)], attr.Types);
     }
 
     [Fact]
@@ -41,7 +39,7 @@ public class RegisterScopedAttributeTests
     public void Ctor_WithTypes_SetsTypes()
     {
         var attr = new RegisterScopedAttribute(typeof(IService), typeof(IService2));
-        Assert.Equal(new[] { typeof(IService), typeof(IService2) }, attr.Types);
+        Assert.Equal([typeof(IService), typeof(IService2)], attr.Types);
     }
 
     [Fact]

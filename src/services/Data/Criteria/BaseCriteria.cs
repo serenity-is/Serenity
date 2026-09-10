@@ -110,8 +110,11 @@ public abstract class BaseCriteria : ICriteria
     /// <param name="mask">The contains mask.</param>
     /// <param name="upper"><c>true</c> to use the UPPER function on both sides.</param>
     /// <returns>A new binary Contains criteria.</returns>
+    /// <exception cref="ArgumentNullException">mask is null</exception>
     public BaseCriteria Contains(string mask, bool upper = false)
     {
+        ArgumentNullException.ThrowIfNull(mask);
+
         return Like("%" + mask + "%", upper);
     }
 
@@ -121,8 +124,11 @@ public abstract class BaseCriteria : ICriteria
     /// <param name="mask">The contains mask.</param>
     /// <param name="upper"><c>true</c> to use the UPPER function on both sides.</param>
     /// <returns>A new binary Not Contains criteria.</returns>
+    /// <exception cref="ArgumentNullException">mask is null</exception>
     public BaseCriteria NotContains(string mask, bool upper = false)
     {
+        ArgumentNullException.ThrowIfNull(mask);
+
         return NotLike("%" + mask + "%", upper);
     }
 
@@ -166,6 +172,11 @@ public abstract class BaseCriteria : ICriteria
     /// <param name="statement">The statement.</param>
     /// <returns>A new binary IN criteria.</returns>
     /// <exception cref="ArgumentNullException">statement is null or empty</exception>
+    /// <remarks>
+    /// The statement criteria is used as is, without adding parentheses around it.
+    /// Use the <see cref="In(ISqlQuery)"/> overload for subqueries, which wraps
+    /// the query in parentheses, or include them in the criteria expression.
+    /// </remarks>
     public BaseCriteria In(BaseCriteria statement)
     {
         if (statement is null || statement.IsEmpty)
@@ -190,11 +201,20 @@ public abstract class BaseCriteria : ICriteria
     /// <param name="statement">The statement query.</param>
     /// <returns>A new binary IN criteria.</returns>
     /// <exception cref="ArgumentNullException">statement is null</exception>
+    /// <remarks>
+    /// Subqueries created via <see cref="SqlQuery.SubQuery()"/> already enclose
+    /// themselves in parenthesis while rendering, so the statement is only
+    /// wrapped in parenthesis when the query would render without them.
+    /// </remarks>
     public BaseCriteria In(ISqlQuery statement)
     {
         ArgumentNullException.ThrowIfNull(statement);
 
-        return new BinaryCriteria(this, CriteriaOperator.In, new Criteria(statement));
+        var text = statement.Parent != null && !statement.OmitParens
+            ? statement.ToString()!
+            : "(" + statement + ")";
+
+        return new BinaryCriteria(this, CriteriaOperator.In, new Criteria(text));
     }
 
     /// <summary>
@@ -237,6 +257,11 @@ public abstract class BaseCriteria : ICriteria
     /// <param name="statement">The statement.</param>
     /// <returns>A new binary NOT IN criteria.</returns>
     /// <exception cref="ArgumentNullException">statement is null or empty</exception>
+    /// <remarks>
+    /// The statement criteria is used as is, without adding parentheses around it.
+    /// Use the <see cref="NotIn(ISqlQuery)"/> overload for subqueries, which wraps
+    /// the query in parentheses, or include them in the criteria expression.
+    /// </remarks>
     public BaseCriteria NotIn(BaseCriteria statement)
     {
         if (statement is null || statement.IsEmpty)
@@ -248,14 +273,23 @@ public abstract class BaseCriteria : ICriteria
     /// <summary>
     /// Creates a new binary NOT IN criteria containing this criteria as the left operand.
     /// </summary>
-    /// <param name="statement">The statement.</param>
+    /// <param name="statement">The statement query.</param>
     /// <returns>A new binary NOT IN criteria.</returns>
     /// <exception cref="ArgumentNullException">statement is null</exception>
+    /// <remarks>
+    /// Subqueries created via <see cref="SqlQuery.SubQuery()"/> already enclose
+    /// themselves in parenthesis while rendering, so the statement is only
+    /// wrapped in parenthesis when the query would render without them.
+    /// </remarks>
     public BaseCriteria NotIn(ISqlQuery statement)
     {
         ArgumentNullException.ThrowIfNull(statement);
 
-        return new BinaryCriteria(this, CriteriaOperator.NotIn, new Criteria(statement));
+        var text = statement.Parent != null && !statement.OmitParens
+            ? statement.ToString()!
+            : "(" + statement + ")";
+
+        return new BinaryCriteria(this, CriteriaOperator.NotIn, new Criteria(text));
     }
 
     /// <summary>

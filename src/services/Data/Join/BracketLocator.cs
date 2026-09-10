@@ -20,7 +20,7 @@ public static class BracketLocator
         if (expression == null)
             return null;
 
-        bool inQuote = false;
+        char? quoteChar = null;
         int startBracket = -1;
         var sb = new StringBuilder(expression.Length);
         for (var i = 0; i < expression.Length; i++)
@@ -28,25 +28,36 @@ public static class BracketLocator
             var c = expression[i];
             sb.Append(c);
 
-            if (inQuote)
+            if (quoteChar != null)
             {
-                if (c == '\'')
-                    inQuote = false;
+                if (c == quoteChar)
+                    quoteChar = null;
             }
-            else if (c == '\'')
+            else if (c == '\'' || c == '"' || c == '`')
             {
-                inQuote = true;
+                quoteChar = c;
                 startBracket = -1;
             }
             else if (c == '[')
             {
-                startBracket = i;
+                if (startBracket >= 0)
+                {
+                    // a nested bracket like "[a[b]]" can't be a valid bracketed
+                    // identifier, skip replacement for the outer bracket
+                    startBracket = -1;
+                }
+                else
+                {
+                    startBracket = i;
+                }
             }
             else if (c == ']')
             {
-                if (startBracket >= 0 && startBracket < i - 1)
+                var wasStart = startBracket;
+                startBracket = -1;
+                if (wasStart >= 0 && wasStart < i - 1)
                 {
-                    var contents = expression.Substring(startBracket + 1, i - startBracket - 1);
+                    var contents = expression.Substring(wasStart + 1, i - wasStart - 1);
                     var replaced = replace(contents);
                     if (contents != replaced)
                     {
@@ -55,13 +66,11 @@ public static class BracketLocator
                         sb.Append("]");
                     }
                 }
-                else
-                    startBracket = -1;
             }
             else if (c == '_' || c == validChar1 || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9'))
             {
             }
-            else if (startBracket > 0)
+            else if (startBracket >= 0)
             {
                 startBracket = -1;
             }
@@ -82,22 +91,22 @@ public static class BracketLocator
         if (expression == null)
             return null;
 
-        bool inQuote = false;
+        char? quoteChar = null;
         var sb = new StringBuilder(expression.Length);
         for (var i = 0; i < expression.Length; i++)
         {
             var c = expression[i];
 
-            if (inQuote)
+            if (quoteChar != null)
             {
-                if (c == '\'')
-                    inQuote = false;
+                if (c == quoteChar)
+                    quoteChar = null;
 
                 sb.Append(c);
             }
-            else if (c == '\'')
+            else if (c == '\'' || c == '"' || c == '`')
             {
-                inQuote = true;
+                quoteChar = c;
                 sb.Append(c);
             }
             else if (c == '[')

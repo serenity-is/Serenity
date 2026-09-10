@@ -1,5 +1,3 @@
-using System.Security.Principal;
-
 namespace Serenity.Services;
 
 public class DefaultUserClaimCreatorTests
