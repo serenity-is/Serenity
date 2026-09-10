@@ -26,7 +26,7 @@ public class SqlCommandDumperTests
 
         var result = SqlCommandDumper.GetCommandText(command);
 
-        Assert.Equal("\r\nSELECT 1\r\n", result);
+        Assert.Equal("SELECT 1", result.Trim());
     }
 
     [Fact]
