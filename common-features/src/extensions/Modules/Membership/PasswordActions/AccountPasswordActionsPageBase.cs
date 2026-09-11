@@ -121,7 +121,7 @@ public abstract class AccountPasswordActionsPageBase<TUserRow> : MembershipPageB
             ArgumentException.ThrowIfNullOrEmpty(request.OldPassword);
             ArgumentNullException.ThrowIfNull(passwordValidator);
 
-            var username = User.Identity?.Name;
+            var username = User.Identity?.Name ?? "";
 
             var userDefinition = userRetriever.GetUserDefinition(User);
 
@@ -135,8 +135,8 @@ public abstract class AccountPasswordActionsPageBase<TUserRow> : MembershipPageB
                     throw new ValidationError("PasswordConfirmMismatch", localizer.Get("Validation.PasswordConfirm"));
             }
 
-            passwordStrengthValidator.Validate(request.NewPassword);
             request.NewPassword ??= "";
+            passwordStrengthValidator.Validate(request.NewPassword);
 
             var salt = GenerateSalt(membershipOptions.Value);
             var hash = CalculateHash(request.NewPassword, salt);
@@ -227,7 +227,7 @@ public abstract class AccountPasswordActionsPageBase<TUserRow> : MembershipPageB
             var resetLink = UriHelper.Combine(externalUrl, "Account/ResetPassword?t=");
             resetLink += Uri.EscapeDataString(token);
 
-            var displayNameField = (fieldsRow as IDisplayNameRow).DisplayNameField ??
+            var displayNameField = (fieldsRow as IDisplayNameRow)?.DisplayNameField ??
                 fieldsRow.NameField as StringField ??
                 fieldsRow.EmailField;
 
@@ -243,7 +243,7 @@ public abstract class AccountPasswordActionsPageBase<TUserRow> : MembershipPageB
 
             ArgumentNullException.ThrowIfNull(emailSender);
 
-            emailSender.Send(subject: emailSubject, body: emailBody, mailTo: user.EmailField[user]);
+            emailSender.Send(subject: emailSubject, body: emailBody, mailTo: user.EmailField[user]!);
 
             return new ServiceResponse();
         });
@@ -259,7 +259,7 @@ public abstract class AccountPasswordActionsPageBase<TUserRow> : MembershipPageB
         return HttpContext.RequestServices.GetDataProtector("ResetPassword").ProtectBinary(bw =>
         {
             bw.Write(DateTime.UtcNow.AddHours(3).ToBinary());
-            bw.Write(Convert.ToString(user.GetIdField().AsObject(user), CultureInfo.InvariantCulture));
+            bw.Write(Convert.ToString(user.GetIdField().AsObject(user), CultureInfo.InvariantCulture) ?? "");
             bw.Write(GetNonceFor(user));
         });
     }
@@ -287,7 +287,7 @@ public abstract class AccountPasswordActionsPageBase<TUserRow> : MembershipPageB
             if (dt < DateTime.UtcNow)
                 return Error(ChangePasswordValidationTexts.InvalidResetToken.ToString(localizer));
 
-            userId = new TUserRow().GetIdField().ConvertValue(br.ReadString(), CultureInfo.InvariantCulture);
+            userId = new TUserRow().GetIdField().ConvertValue(br.ReadString(), CultureInfo.InvariantCulture)!;
             nonce = br.ReadInt32();
         }
         catch (Exception)
@@ -365,7 +365,7 @@ public abstract class AccountPasswordActionsPageBase<TUserRow> : MembershipPageB
 
             ArgumentNullException.ThrowIfNull(sqlConnections);
 
-            TUserRow user = uow.Connection.TryById<TUserRow>(userId);
+            TUserRow? user = uow.Connection.TryById<TUserRow>(userId!);
             if (user == null || nonce != GetNonceFor(user))
                 throw new ValidationError(ChangePasswordValidationTexts.InvalidResetToken.ToString(localizer));
 

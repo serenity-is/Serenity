@@ -53,7 +53,7 @@ public static partial class HtmlScriptExtensions
     /// <param name="helper">The HTML helper.</param>
     /// <param name="module">The ES module.</param>
     /// <returns>The rendered stylesheet link element, or an empty string if no CSS file exists.</returns>
-    public static HtmlString AutoIncludeModuleCss(this IHtmlHelper helper, string module)
+    public static HtmlString AutoIncludeModuleCss(this IHtmlHelper helper, string? module)
     {
         if (string.IsNullOrEmpty(module))
             return HtmlString.Empty;

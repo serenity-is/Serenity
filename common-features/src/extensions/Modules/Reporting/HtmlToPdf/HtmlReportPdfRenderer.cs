@@ -9,17 +9,17 @@ namespace Serenity.Reporting;
 public class HtmlReportPdfRenderer(
     IHtmlToPdfConverter htmlToPdfConverter,
     IHtmlReportRenderUrlBuilder renderUrlBuilder,
-    IWKHtmlToPdfConverter wkHtmlToPdfConverter = null) : IHtmlReportPdfRenderer
+    IWKHtmlToPdfConverter? wkHtmlToPdfConverter = null) : IHtmlReportPdfRenderer
 {
     /// <summary>
     /// The environment settings used to resolve the internal URL of the web site.
     /// </summary>
-    protected readonly EnvironmentSettings environmentSettings;
+    protected readonly EnvironmentSettings? environmentSettings;
 
     /// <summary>
     /// The HTTP context accessor used to access the current request.
     /// </summary>
-    protected readonly IHttpContextAccessor httpContextAccessor;
+    protected readonly IHttpContextAccessor? httpContextAccessor;
 
     /// <summary>
     /// The HTML to PDF converter used to render the report.
@@ -34,7 +34,7 @@ public class HtmlReportPdfRenderer(
     /// <summary>
     /// The optional WKHtmlToPdf converter used when a report requests it.
     /// </summary>
-    protected readonly IWKHtmlToPdfConverter wkHtmlToPdfConverter = wkHtmlToPdfConverter;
+    protected readonly IWKHtmlToPdfConverter? wkHtmlToPdfConverter = wkHtmlToPdfConverter;
 
     /// <summary>
     /// Forwards the cookies from the render URL to the converter options.

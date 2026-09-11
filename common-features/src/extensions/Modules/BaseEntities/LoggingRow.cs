@@ -54,22 +54,22 @@ public abstract class LoggingRow<TFields> : Row<TFields>, ILoggingRow
 /// <summary>
 /// Fields for a <see cref="LoggingRow{TFields}"/>.
 /// </summary>
-public class LoggingRowFields(string tableName = null, string fieldPrefix = null) : RowFieldsBase(tableName, fieldPrefix)
+public class LoggingRowFields(string? tableName = null, string fieldPrefix = "") : RowFieldsBase(tableName, fieldPrefix)
 {
     /// <summary>
     /// The ID of the user who inserted the row.
     /// </summary>
-    public Int32Field InsertUserId;
+    public Int32Field InsertUserId = null!;
     /// <summary>
     /// The date and time the row was inserted.
     /// </summary>
-    public DateTimeField InsertDate;
+    public DateTimeField InsertDate = null!;
     /// <summary>
     /// The ID of the user who last updated the row.
     /// </summary>
-    public Int32Field UpdateUserId;
+    public Int32Field UpdateUserId = null!;
     /// <summary>
     /// The date and time the row was last updated.
     /// </summary>
-    public DateTimeField UpdateDate;
+    public DateTimeField UpdateDate = null!;
 }

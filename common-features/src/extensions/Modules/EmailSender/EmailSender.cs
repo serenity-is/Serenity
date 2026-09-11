@@ -10,7 +10,7 @@ namespace Serenity.Extensions;
 /// via SMTP, a pickup folder, or an email queue.
 /// </summary>
 public class EmailSender(IWebHostEnvironment host, IOptions<SmtpSettings> settings,
-    IEmailQueue emailQueue = null) : IEmailSender
+    IEmailQueue? emailQueue = null) : IEmailSender
 {
     private readonly IWebHostEnvironment host = host ?? throw new ArgumentNullException(nameof(host));
     private readonly SmtpSettings settings = (settings ?? throw new ArgumentNullException(nameof(settings))).Value;
@@ -37,7 +37,7 @@ public class EmailSender(IWebHostEnvironment host, IOptions<SmtpSettings> settin
             using var client = new SmtpClient();
             client.Connect(settings.Host, settings.Port, settings.SecureSocket);
             if (!string.IsNullOrEmpty(settings.Username))
-                client.Authenticate(settings.Username, settings.Password);
+                client.Authenticate(settings.Username, settings.Password ?? "");
 
             client.Send(message);
             client.Disconnect(true);

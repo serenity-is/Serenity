@@ -8,7 +8,7 @@ public class ExcelImportRequest : ServiceRequest
     /// <summary>
     /// The name of the uploaded Excel file.
     /// </summary>
-    public string FileName { get; set; }
+    public string? FileName { get; set; }
 }
 
 /// <summary>
@@ -27,5 +27,5 @@ public class ExcelImportResponse : ServiceResponse
     /// <summary>
     /// The list of errors encountered during import, if any.
     /// </summary>
-    public List<string> ErrorList { get; set; }
+    public List<string>? ErrorList { get; set; }
 }

@@ -8,12 +8,12 @@ namespace Serenity.Extensions;
 /// </summary>
 public class SiteAbsoluteUrl(
     IOptionsMonitor<EnvironmentSettings> environmentSettings,
-    IHttpContextAccessor httpContextAccessor = null) : ISiteAbsoluteUrl
+    IHttpContextAccessor? httpContextAccessor = null) : ISiteAbsoluteUrl
 {
     /// <summary>
     /// The HTTP context accessor used to resolve the current request's base URI.
     /// </summary>
-    protected readonly IHttpContextAccessor httpContextAccessor = httpContextAccessor;
+    protected readonly IHttpContextAccessor? httpContextAccessor = httpContextAccessor;
 
     /// <summary>
     /// The environment settings used to resolve the internal and external URLs.
@@ -51,7 +51,7 @@ public class SiteAbsoluteUrl(
     /// <summary>
     /// Tries to get the external URL from the current request or the configured site external URL.
     /// </summary>
-    protected virtual string TryGetExternalUrl()
+    protected virtual string? TryGetExternalUrl()
     {
         return httpContextAccessor?.HttpContext?.Request?.GetBaseUri()?.AbsoluteUri ??
             environmentSettings.CurrentValue?.SiteExternalUrl;

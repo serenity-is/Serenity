@@ -30,11 +30,11 @@ public class ReportTree
         /// <summary>
         /// The category key.
         /// </summary>
-        public string Key { get; set; }
+        public string? Key { get; set; }
         /// <summary>
         /// The category title.
         /// </summary>
-        public string Title { get; set; }
+        public string? Title { get; set; }
         /// <summary>
         /// The sub categories.
         /// </summary>
@@ -63,7 +63,7 @@ public class ReportTree
     /// <param name="categoryOrder">The category order.</param>
     /// <returns>The report tree.</returns>
     public static ReportTree FromList(IEnumerable<ReportRegistry.Report> reports, ITextLocalizer localizer,
-        string rootPath = null, string categoryOrder = null)
+        string? rootPath = null, string? categoryOrder = null)
     {
         ArgumentNullException.ThrowIfNull(reports);
 
@@ -76,20 +76,21 @@ public class ReportTree
 
         foreach (var report in reports)
         {
-            if (categoryByKey.TryGetValue(report.Category.Key ?? "", out Category category))
+            var reportCategoryKey = report.Category?.Key ?? "";
+            if (categoryByKey.TryGetValue(reportCategoryKey, out var existing))
             {
-                category.Reports.Add(report);
+                existing.Reports.Add(report);
                 continue;
             }
 
-            var parts = (report.Category.Key ?? "Other")
+            var parts = (report.Category?.Key ?? "Other")
                 .Split(slashSeparator, StringSplitOptions.RemoveEmptyEntries);
 
-            string current = "";
-            category = null;
+            var current = "";
+            Category? category = null;
             foreach (var part in parts)
             {
-                string prior = current;
+                var prior = current;
 
                 if (current.Length > 0)
                     current += "/";
@@ -99,7 +100,7 @@ public class ReportTree
                 if (current.Length <= rootPath.Length)
                     continue;
 
-                if (!categoryByKey.TryGetValue(current ?? "", out category))
+                if (!categoryByKey.TryGetValue(current, out category))
                 {
                     category = new Category
                     {
@@ -108,13 +109,10 @@ public class ReportTree
                     };
                     categoryByKey[current] = category;
 
-                    if (!categoryByKey.TryGetValue(prior, out Category value))
+                    if (!categoryByKey.TryGetValue(prior, out var value))
                         tree.Root.SubCategories.Add(category);
                     else
-                    {
-                        var x = value;
-                        x.SubCategories.Add(category);
-                    }
+                        value.SubCategories.Add(category);
                 }
             }
 
@@ -139,8 +137,8 @@ public class ReportTree
 
             if (x.Key != y.Key)
             {
-                var c1 = order.TryGetValue(x.Key, out int v1) ? (int?)v1 : null;
-                var c2 = order.TryGetValue(y.Key, out int v2) ? (int?)v2 : null;
+                var c1 = order.TryGetValue(x.Key!, out int v1) ? (int?)v1 : null;
+                var c2 = order.TryGetValue(y.Key!, out int v2) ? (int?)v2 : null;
                 if (c1 != null && c2 != null)
                     c = c1.Value - c2.Value;
                 else if (c1 != null)

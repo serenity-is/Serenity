@@ -23,7 +23,7 @@ public abstract class BaseUserRetrieveService<TRow>(ITwoLevelCache cache, ISqlCo
     /// </summary>
     /// <param name="connection">Connection</param>
     /// <param name="criteria">Criteria</param>
-    protected virtual IUserDefinition LoadByCriteria(System.Data.IDbConnection connection, BaseCriteria criteria)
+    protected virtual IUserDefinition? LoadByCriteria(System.Data.IDbConnection connection, BaseCriteria criteria)
     {
         var user = connection.TrySingle<TRow>(criteria);
         if (user != null)
@@ -32,9 +32,9 @@ public abstract class BaseUserRetrieveService<TRow>(ITwoLevelCache cache, ISqlCo
         return null;
     }
 
-    private string cacheGroupKey;
-    private Field idField;
-    private Field nameField;
+    private string cacheGroupKey = null!;
+    private Field idField = null!;
+    private Field nameField = null!;
 
     /// <summary>
     /// Gets the cache group key for user retrieval.
@@ -48,7 +48,7 @@ public abstract class BaseUserRetrieveService<TRow>(ITwoLevelCache cache, ISqlCo
     /// Checks if the specified user ID is valid.
     /// </summary>
     /// <param name="userId">User ID</param>
-    protected override bool IsValidUserId(string userId)
+    protected override bool IsValidUserId(string? userId)
     {
         if (!base.IsValidUserId(userId))
             return false;
@@ -70,7 +70,7 @@ public abstract class BaseUserRetrieveService<TRow>(ITwoLevelCache cache, ISqlCo
     /// Loads the user by the specified ID from database.
     /// </summary>
     /// <param name="id">User ID</param>
-    protected override IUserDefinition LoadById(string id)
+    protected override IUserDefinition? LoadById(string id)
     {
         idField ??= new TRow().GetIdField();
         using var connection = sqlConnections.NewFor<TRow>();
@@ -83,9 +83,9 @@ public abstract class BaseUserRetrieveService<TRow>(ITwoLevelCache cache, ISqlCo
     /// Loads the user by the specified username from database.
     /// </summary>
     /// <param name="username">Username</param>
-    protected override IUserDefinition LoadByUsername(string username)
+    protected override IUserDefinition? LoadByUsername(string username)
     {
-        nameField ??= new TRow().NameField;
+        nameField ??= new TRow().NameField!;
         using var connection = sqlConnections.NewFor<TRow>();
 
         return LoadByCriteria(connection, new Criteria(nameField) ==

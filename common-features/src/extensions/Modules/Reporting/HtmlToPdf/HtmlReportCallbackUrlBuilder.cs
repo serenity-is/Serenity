@@ -11,11 +11,11 @@ namespace Serenity.Reporting;
 /// </summary>
 public class HtmlReportCallbackUrlBuilder(
     ISiteAbsoluteUrl siteAbsoluteUrl,
-    IOptionsMonitor<CookieAuthenticationOptions> cookieOptions = null,
-    IPermissionService permissionService = null,
-    IUserAccessor userAccessor = null,
-    IHttpContextAccessor httpContextAccessor = null,
-    IDataProtectionProvider dataProtectionProvider = null) : IHtmlReportCallbackUrlBuilder
+    IOptionsMonitor<CookieAuthenticationOptions>? cookieOptions = null,
+    IPermissionService? permissionService = null,
+    IUserAccessor? userAccessor = null,
+    IHttpContextAccessor? httpContextAccessor = null,
+    IDataProtectionProvider? dataProtectionProvider = null) : IHtmlReportCallbackUrlBuilder
 {
     /// <summary>
     /// The site absolute URL service used to resolve the internal URL of the web site.
@@ -43,7 +43,7 @@ public class HtmlReportCallbackUrlBuilder(
 
         var attr = report.GetType().GetCustomAttribute<ReportAttribute>(inherit: false);
         if (attr == null || string.IsNullOrEmpty(attr.ReportKey))
-            return report.GetType().FullName;
+            return report.GetType().FullName!;
 
         return attr.ReportKey;
     }
@@ -137,7 +137,7 @@ public class HtmlReportCallbackUrlBuilder(
                     for (var chunkId = 1; chunkId <= chunksCount; chunkId++)
                     {
                         var chunkCookieName = authCookieName + ChunkKeySuffix + chunkId.ToString(CultureInfo.InvariantCulture);
-                        var chunkCookie = request.Cookies[chunkCookieName];
+                        var chunkCookie = request?.Cookies[chunkCookieName];
                         if (!string.IsNullOrEmpty(chunkCookie))
                             yield return new Cookie(chunkCookieName, chunkCookie);
                     }
@@ -167,9 +167,8 @@ public class HtmlReportCallbackUrlBuilder(
 
         var response = new HtmlReportRenderUrl();
 
-        string reportKey = renderOptions.ReportKey;
-        if (string.IsNullOrEmpty(renderOptions.ReportKey))
-            reportKey = GetReportKey(report);
+        string reportKey = string.IsNullOrEmpty(renderOptions.ReportKey) ?
+            GetReportKey(report) : renderOptions.ReportKey;
 
         response.Url = GetSiteInternalUrl();
         response.Url = UriHelper.Combine(response.Url, GetRenderAction(report) +

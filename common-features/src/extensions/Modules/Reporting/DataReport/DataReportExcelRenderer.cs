@@ -21,7 +21,7 @@ public class DataReportExcelRenderer : IDataReportExcelRenderer
 
         var data = new List<object>();
         var input = report.GetData();
-        var list = (input as IEnumerable) ?? new List<object> { input };
+        var list = (input as IEnumerable) ?? new List<object> { input! };
         foreach (var item in list)
             data.Add(item);
 

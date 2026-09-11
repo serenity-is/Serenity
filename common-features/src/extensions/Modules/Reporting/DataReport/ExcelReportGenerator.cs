@@ -23,7 +23,7 @@ public static class ExcelReportGenerator
     /// <param name="autoFitRows">The number of rows to auto-fit.</param>
     /// <returns>The generated Excel package bytes.</returns>
     public static byte[] GeneratePackageBytes(List<ReportColumn> columns, IList rows,
-        string sheetName = "Page1", string tableName = "Table1", XLTableTheme tableStyle = null,
+        string sheetName = "Page1", string tableName = "Table1", XLTableTheme? tableStyle = null,
         int startRow = 1, int startCol = 1, int autoFitRows = 250)
     {
         using var package = GeneratePackage(columns, rows, sheetName, tableName, tableStyle,
@@ -46,7 +46,7 @@ public static class ExcelReportGenerator
     /// <param name="autoFitRows">The number of rows to auto-fit.</param>
     /// <returns>The generated Excel workbook.</returns>
     public static XLWorkbook GeneratePackage(List<ReportColumn> columns, IList rows,
-        string sheetName = "Page1", string tableName = "Table1", XLTableTheme tableStyle = null,
+        string sheetName = "Page1", string tableName = "Table1", XLTableTheme? tableStyle = null,
         int startRow = 1, int startCol = 1, int autoFitRows = 250)
     {
         var workbook = new XLWorkbook();
@@ -66,7 +66,7 @@ public static class ExcelReportGenerator
         typeof(TimeSpan?)
     ];
 
-    private static string FixFormatSpecifier(string format, Type dataType)
+    private static string FixFormatSpecifier(string format, Type? dataType)
     {
         if (string.IsNullOrEmpty(format))
             return format;
@@ -90,16 +90,16 @@ public static class ExcelReportGenerator
     /// <param name="startCol">The starting column.</param>
     /// <param name="autoFitRows">The number of rows to auto-fit.</param>
     public static void PopulateSheet(IXLWorksheet worksheet, List<ReportColumn> columns, IList rows,
-        string tableName = "Table1", XLTableTheme tableStyle = null,
+        string tableName = "Table1", XLTableTheme? tableStyle = null,
         int startRow = 1, int startCol = 1, int autoFitRows = 250)
     {
         ArgumentNullException.ThrowIfNull(columns);
 
         ArgumentNullException.ThrowIfNull(rows);
 
-        Field[] fields = null;
-        TypeAccessor accessor = null;
-        bool[] invalidProperty = null;
+        Field?[]? fields = null;
+        TypeAccessor? accessor = null;
+        bool[]? invalidProperty = null;
 
         var colCount = columns.Count;
 
@@ -178,28 +178,28 @@ public static class ExcelReportGenerator
             {
                 if (row != null)
                 {
-                    var field = fields[c];
+                    var field = fields![c];
                     if (field is not null)
-                        data[c] = field.AsObject(row);
+                        data[c] = field.AsObject(row)!;
                 }
                 else if (obj is IDictionary<string, object>)
                 {
                     var n = columns[c].Name;
                     var dict = obj as IDictionary<string, object>;
-                    if (dict.TryGetValue(n, out object v))
-                        data[c] = v;
+                    if (dict!.TryGetValue(n ?? "", out object? v))
+                        data[c] = v!;
                 }
                 else if (obj is IDictionary)
                 {
                     var n = columns[c].Name;
                     var dict = obj as IDictionary;
-                    if (dict.Contains(n))
-                        data[c] = dict[n];
+                    if (dict!.Contains(n ?? ""))
+                        data[c] = dict[n ?? ""]!;
                 }
                 else if (obj != null)
                 {
-                    if (!invalidProperty[c])
-                        data[c] = accessor[obj, columns[c].Name];
+                    if (invalidProperty != null && !invalidProperty[c])
+                        data[c] = accessor![obj, columns[c].Name ?? ""]!;
                 }
             }
 
@@ -267,10 +267,10 @@ public static class ExcelReportGenerator
                     decorator.Background = null;
                     decorator.Foreground = null;
 
-                    object value = null;
+                    object? value = null;
                     if (obj is IRow row)
                     {
-                        var field = fields[colNum - 1];
+                        var field = fields![colNum - 1];
                         if (field is not null)
                             value = field.AsObject(row);
                     }
@@ -278,20 +278,20 @@ public static class ExcelReportGenerator
                     {
                         var n = col.Name;
                         var dict = obj as IDictionary<string, object>;
-                        if (!dict.TryGetValue(n, out value))
+                        if (dict == null || !dict.TryGetValue(n ?? "", out value))
                             value = null;
                     }
                     else if (obj is IDictionary)
                     {
                         var n = col.Name;
                         var dict = obj as IDictionary;
-                        if (dict.Contains(n))
-                            value = dict[n];
+                        if (dict!.Contains(n ?? ""))
+                            value = dict[n ?? ""];
                     }
                     else if (obj != null)
                     {
-                        if (!invalidProperty[colNum - startCol])
-                            value = accessor[obj, col.Name];
+                        if (invalidProperty == null || !invalidProperty[colNum - startCol])
+                            value = accessor![obj, col.Name ?? ""];
                     }
                     else
                         continue;
@@ -338,7 +338,7 @@ public static class ExcelReportGenerator
     /// <param name="value">The cell value to convert.</param>
     /// <returns>The converted object, or <c>null</c> for a blank cell.</returns>
     /// <exception cref="InvalidCastException">The cell value type is not supported.</exception>
-    public static object AsObject(this XLCellValue value)
+    public static object? AsObject(this XLCellValue value)
     {
         return value.Type switch
         {

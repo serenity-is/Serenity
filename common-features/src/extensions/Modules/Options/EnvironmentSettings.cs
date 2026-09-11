@@ -24,7 +24,7 @@ public class EnvironmentSettings
     /// The default implementation for ISiteAbsoluteUrl.GetExternalUrl() uses this value only when
     /// an HTTP request is not available
     /// </summary>
-    public string SiteExternalUrl { get; set; }
+    public string? SiteExternalUrl { get; set; }
 
 
     /// <summary>
@@ -33,10 +33,10 @@ public class EnvironmentSettings
     /// ISiteAbsoluteUrl.GetInternalUrl() will prefer this over the current request's base uri,
     /// and external URL setting.
     /// </summary>
-    public string SiteInternalUrl { get; set; }
+    public string? SiteInternalUrl { get; set; }
 
     /// <summary>
     /// Optional markup to inject into head, can be used for analytics tags etc.
     /// </summary>
-    public string InjectMarkupToHead { get; set; }
+    public string? InjectMarkupToHead { get; set; }
 }

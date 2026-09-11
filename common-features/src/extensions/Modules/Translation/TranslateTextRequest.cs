@@ -8,12 +8,12 @@ public class TranslateTextRequest : ServiceRequest
     /// <summary>
     /// The source language ID.
     /// </summary>
-    public string SourceLanguageID { get; set; }
+    public string? SourceLanguageID { get; set; }
 
     /// <summary>
     /// The list of texts to translate.
     /// </summary>
-    public List<TranslateTextInput> Inputs { get; set; }
+    public List<TranslateTextInput>? Inputs { get; set; }
 }
 
 /// <summary>
@@ -24,15 +24,15 @@ public class TranslateTextInput
     /// <summary>
     /// The key of the text to translate.
     /// </summary>
-    public string TextKey { get; set; }
+    public string? TextKey { get; set; }
 
     /// <summary>
     /// The target language ID.
     /// </summary>
-    public string TargetLanguageID { get; set; }
+    public string? TargetLanguageID { get; set; }
 
     /// <summary>
     /// The source text to translate.
     /// </summary>
-    public string SourceText { get; set; }
+    public string? SourceText { get; set; }
 }

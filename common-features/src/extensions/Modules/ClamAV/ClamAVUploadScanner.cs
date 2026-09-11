@@ -14,8 +14,8 @@ namespace Serenity.Extensions;
 /// <param name="logger">Logger</param>
 /// <exception cref="ArgumentNullException">One of arguments is null</exception>
 public class ClamAVUploadScanner(IOptionsMonitor<ClamAVSettings> options,
-    ITextLocalizer localizer = null,
-    ILogger<ClamAVUploadScanner> logger = null) : IUploadAVScanner
+    ITextLocalizer? localizer = null,
+    ILogger<ClamAVUploadScanner>? logger = null) : IUploadAVScanner
 {
     private readonly IOptionsMonitor<ClamAVSettings> options = options ?? throw new ArgumentNullException(nameof(options));
 
@@ -51,7 +51,7 @@ public class ClamAVUploadScanner(IOptionsMonitor<ClamAVSettings> options,
                 case ClamScanResults.VirusDetected:
                     logger?.LogError(InformationalException.EventId,
                         "Virus {virus} found in file getting uploaded: {filename}",
-                        scanResult.InfectedFiles.First().VirusName,
+                        scanResult.InfectedFiles!.First().VirusName,
                         filename);
 
                     throw new ValidationError("InfectedFile",

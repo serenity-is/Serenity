@@ -51,7 +51,7 @@ public abstract class BasePermissionKeyLister(ITwoLevelCache cache, ITypeSource 
     protected virtual IEnumerable<string> GetCachedPermissionKeys(bool includeRoles)
     {
         return cache.GetLocalStoreOnly(GetCacheKey(includeRoles), GetCacheDuration(), GetCacheGroupKey(),
-            () => GetPermissionKeys(includeRoles));
+            () => GetPermissionKeys(includeRoles))!;
     }
 
     /// <summary>
@@ -264,13 +264,14 @@ public abstract class BasePermissionKeyLister(ITwoLevelCache cache, ITypeSource 
     /// <param name="member">Member</param>
     /// <param name="getPermission">Permission callback</param>
     protected virtual IEnumerable<string> GetAttributePermissions<TAttr>(MemberInfo member,
-        Func<TAttr, string> getPermission) where TAttr : Attribute
+        Func<TAttr, string?> getPermission) where TAttr : Attribute
     {
         try
         {
             return member.GetCustomAttributes<TAttr>(false)
                 .Select(getPermission)
                 .Where(x => !string.IsNullOrEmpty(x))
+                .OfType<string>()
                 .ToArray();
         }
         catch
@@ -287,13 +288,13 @@ public abstract class BasePermissionKeyLister(ITwoLevelCache cache, ITypeSource 
     /// <param name="type">Type</param>
     /// <param name="getPermission">Permission callback</param>
     protected virtual IEnumerable<string> GetAttributePermissions<TAttr>(Type type,
-        Func<TAttr, string> getPermission) where TAttr : Attribute
+        Func<TAttr, string?> getPermission) where TAttr : Attribute
     {
         try
         {
             return type.GetCustomAttributes<TAttr>(false)
                 .Select(getPermission)
-                .Where(x => !string.IsNullOrEmpty(x))
+                .OfType<string>()
                 .ToArray();
         }
         catch

@@ -14,7 +14,7 @@ namespace Serenity.Extensions;
 public abstract class BasePermissionService(
     IUserAccessor userAccessor,
     IRolePermissionService rolePermissions,
-    IHttpContextItemsAccessor httpContextItemsAccessor = null) : IPermissionService, ITransientGrantor
+    IHttpContextItemsAccessor? httpContextItemsAccessor = null) : IPermissionService, ITransientGrantor
 {
     private readonly IRolePermissionService rolePermissions = rolePermissions ?? throw new ArgumentNullException(nameof(rolePermissions));
     private readonly IUserAccessor userAccessor = userAccessor ?? throw new ArgumentNullException(nameof(userAccessor));
@@ -208,7 +208,7 @@ public abstract class BasePermissionService(
 
                     foreach (var attr in member.GetCustomAttributes<ImplicitPermissionAttribute>())
                     {
-                        if (!result.TryGetValue(key, out HashSet<string> list))
+                        if (!result.TryGetValue(key, out HashSet<string>? list))
                         {
                             list = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                             result[key] = list;
@@ -229,7 +229,7 @@ public abstract class BasePermissionService(
             }
 
             return result;
-        });
+        })!;
     }
 
     /// <inheritdoc/>

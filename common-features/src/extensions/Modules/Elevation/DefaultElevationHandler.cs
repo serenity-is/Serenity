@@ -7,7 +7,7 @@ namespace Serenity.Extensions;
 /// Default implementation of <see cref="IElevationHandler"/>
 /// </summary>
 public class DefaultElevationHandler(IRequestContext context, IHttpContextAccessor httpContextAccessor,
-    IDataProtectionProvider dataProtectionProvider, TimeProvider systemClock = null) : BaseRequestHandler(context), IElevationHandler
+    IDataProtectionProvider dataProtectionProvider, TimeProvider? systemClock = null) : BaseRequestHandler(context), IElevationHandler
 {
     private const string ElevationPurpose = "Elevation";
 

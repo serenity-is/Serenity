@@ -26,7 +26,7 @@ public abstract class BaseRolePermissionService<TRolePermissionRow>(
         return !string.IsNullOrEmpty(role);
     }
 
-    private TRolePermissionRow rolePermissionRow;
+    private TRolePermissionRow? rolePermissionRow;
 
     /// <inheritdoc/>
     public bool HasPermission(string role, string permission)
@@ -70,7 +70,7 @@ public abstract class BaseRolePermissionService<TRolePermissionRow>(
     protected virtual ISet<string> GetCachedRolePermissions(string role)
     {
         return cache.GetLocalStoreOnly(GetCacheKey(role), GetCacheDuration(), GetCacheGroupKey(),
-            () => LoadRolePermissions(role));
+            () => LoadRolePermissions(role))!;
     }
 
     /// <summary>
@@ -85,14 +85,14 @@ public abstract class BaseRolePermissionService<TRolePermissionRow>(
         connection.List<TRolePermissionRow>(q => q
             .Select(rolePermissionRow.PermissionKeyField)
             .Where(rolePermissionRow.RoleKeyOrNameField == role))
-            .ForEach(x => result.Add(x.PermissionKeyField[x]));
+            .ForEach(x => result.Add(x.PermissionKeyField[x]!));
 
         result.Add("Role:" + role);
 
         var implicitPermissions = BasePermissionService.GetImplicitPermissions(cache.Memory, typeSource);
         foreach (var key in result.ToArray())
         {
-            if (implicitPermissions.TryGetValue(key, out HashSet<string> list))
+            if (implicitPermissions.TryGetValue(key, out HashSet<string>? list))
                 foreach (var x in list)
                     result.Add(x);
         }

@@ -9,7 +9,7 @@ public abstract class BaseUserRetrieveService(ITwoLevelCache cache) : IUserRetri
     private readonly ITwoLevelCache cache = cache ?? throw new ArgumentNullException(nameof(cache));
 
     /// <inheritdoc/>
-    public virtual IUserDefinition ById(string id)
+    public virtual IUserDefinition? ById(string id)
     {
         if (!IsValidUserId(id))
             return null;
@@ -18,7 +18,7 @@ public abstract class BaseUserRetrieveService(ITwoLevelCache cache) : IUserRetri
     }
 
     /// <inheritdoc/>
-    public virtual IUserDefinition ByUsername(string username)
+    public virtual IUserDefinition? ByUsername(string username)
     {
         if (!IsValidUsername(username))
             return null;
@@ -47,13 +47,13 @@ public abstract class BaseUserRetrieveService(ITwoLevelCache cache) : IUserRetri
     /// Gets the cache key for the specified username.
     /// </summary>
     /// <param name="username">Username</param>
-    protected virtual string GetUsernameCacheKey(string username) => "UserByName_" + username.ToLowerInvariant();
+    protected virtual string GetUsernameCacheKey(string username) => "UserByName_" + username?.ToLowerInvariant();
 
     /// <summary>
     /// Gets the cached user by the specified ID.
     /// </summary>
     /// <param name="id">User ID</param>
-    protected virtual IUserDefinition GetCachedById(string id)
+    protected virtual IUserDefinition? GetCachedById(string id)
     {
         return cache.GetLocalStoreOnly(GetIdCacheKey(id), GetCacheDuration(), GetCacheGroupKey(),
             () => LoadById(id));
@@ -63,7 +63,7 @@ public abstract class BaseUserRetrieveService(ITwoLevelCache cache) : IUserRetri
     /// Gets the cached user by the specified username.
     /// </summary>
     /// <param name="username">Username</param>
-    protected virtual IUserDefinition GetCachedByUsername(string username)
+    protected virtual IUserDefinition? GetCachedByUsername(string username)
     {
         return cache.GetLocalStoreOnly(GetUsernameCacheKey(username), GetCacheDuration(), GetCacheGroupKey(),
             () => LoadByUsername(username));
@@ -73,25 +73,25 @@ public abstract class BaseUserRetrieveService(ITwoLevelCache cache) : IUserRetri
     /// Checks if the specified user ID is valid. By default, it checks if it is not null or empty.
     /// </summary>
     /// <param name="userId">User ID</param>
-    protected virtual bool IsValidUserId(string userId) => !string.IsNullOrEmpty(userId);
+    protected virtual bool IsValidUserId(string? userId) => !string.IsNullOrEmpty(userId);
 
     /// <summary>
     /// Checks if the specified username is valid. By default, it checks if it is not null or empty.
     /// </summary>
     /// <param name="username">Username</param>
-    protected virtual bool IsValidUsername(string username) => !string.IsNullOrEmpty(username);
+    protected virtual bool IsValidUsername(string? username) => !string.IsNullOrEmpty(username);
 
     /// <summary>
     /// Loads the user by the specified ID from database.
     /// </summary>
     /// <param name="id">User ID</param>
-    protected abstract IUserDefinition LoadById(string id);
+    protected abstract IUserDefinition? LoadById(string id);
 
     /// <summary>
     /// Loads the user by the specified username from database
     /// </summary>
     /// <param name="username">Username</param>
-    protected abstract IUserDefinition LoadByUsername(string username);
+    protected abstract IUserDefinition? LoadByUsername(string username);
 
     /// <inheritdoc/>
     public virtual void RemoveAll()
@@ -100,12 +100,12 @@ public abstract class BaseUserRetrieveService(ITwoLevelCache cache) : IUserRetri
     }
 
     /// <inheritdoc/>
-    public virtual void RemoveCachedUser(string userId, string username)
+    public virtual void RemoveCachedUser(string? userId, string? username)
     {
         if (IsValidUserId(userId))
-            cache.Remove(GetIdCacheKey(userId));
+            cache.Remove(GetIdCacheKey(userId!));
 
         if (IsValidUsername(username))
-            cache.Remove(GetUsernameCacheKey(username));
+            cache.Remove(GetUsernameCacheKey(username!));
     }
 }

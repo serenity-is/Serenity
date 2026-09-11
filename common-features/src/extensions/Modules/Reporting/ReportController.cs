@@ -10,7 +10,7 @@ namespace Serenity.Extensions.Pages;
 [Route("Serenity.Extensions/Report/[action]")]
 public class ReportController(IReportFactory reportFactory,
     IReportRenderer reportRenderer,
-    IReportCallbackInterceptor callbackInterceptor = null) : Controller
+    IReportCallbackInterceptor? callbackInterceptor = null) : Controller
 {
     /// <summary>
     /// The report factory used to create report instances.
@@ -59,7 +59,7 @@ public class ReportController(IReportFactory reportFactory,
 
         ReportRenderResult callback(ReportRenderOptions renderOptions)
         {
-            var report = reportFactory.Create(renderOptions.ReportKey, renderOptions.ReportParams, validatePermission: true);
+            var report = reportFactory.Create(renderOptions.ReportKey!, renderOptions.ReportParams, validatePermission: true);
             return reportRenderer.Render(report, renderOptions);
         }
 
@@ -83,7 +83,7 @@ public class ReportController(IReportFactory reportFactory,
         Response.Headers[HeaderNames.ContentDisposition] = $"{(download ? "attachment" : "inline")};filename=" +
             WebUtility.UrlEncode(downloadName);
 
-        return File(result.ContentBytes, result.MimeType ??
+        return File(result.ContentBytes!, result.MimeType ??
             KnownMimeTypes.Get("_" + result.FileExtension));
     }
 

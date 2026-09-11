@@ -8,7 +8,7 @@ public class GetNextNumberRequest : ServiceRequest
     /// <summary>
     /// The prefix of the number.
     /// </summary>
-    public string Prefix { get; set; }
+    public string? Prefix { get; set; }
     /// <summary>
     /// The total length of the serial number, including the prefix.
     /// </summary>

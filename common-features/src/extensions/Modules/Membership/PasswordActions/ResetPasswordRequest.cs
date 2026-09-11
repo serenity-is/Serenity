@@ -10,15 +10,15 @@ public class ResetPasswordRequest : ServiceRequest
     /// The reset token issued when the reset password email was sent.
     /// </summary>
     [IgnoreUIField]
-    public string Token { get; set; }
+    public string? Token { get; set; }
     /// <summary>
     /// The new password.
     /// </summary>
     [PasswordEditor, Required(true), DisplayName("New Password"), Placeholder("password")]
-    public string NewPassword { get; set; }
+    public string? NewPassword { get; set; }
     /// <summary>
     /// The confirmation of the new password.
     /// </summary>
     [PasswordEditor, Required(true), DisplayName("Confirm Password"), Placeholder("confirm password")]
-    public string ConfirmPassword { get; set; }
+    public string? ConfirmPassword { get; set; }
 }

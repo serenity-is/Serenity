@@ -12,5 +12,5 @@ public class RowEditActionsColumnAttribute : Attribute, IIntrinsicPropertyAttrib
     /// The property attributes applied to the edit actions column.
     /// </summary>
     [DisplayName("Controls.EntityGrid.RowEditActionsTitle"), FixedWidth(40), Focusable(false), ShowSelection(false), Unbound]
-    public virtual object PropertyAttributes { get; }
+    public virtual object PropertyAttributes { get; } = null!;
 }

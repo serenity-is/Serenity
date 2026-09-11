@@ -25,19 +25,19 @@ public sealed class UserPreferenceRow : Row<UserPreferenceRow.RowFields>, IIdRow
     /// The preference type.
     /// </summary>
     [DisplayName("PreferenceType"), Size(100), NotNull]
-    public string PreferenceType { get => fields.PreferenceType[this]; set => fields.PreferenceType[this] = value; }
+    public string? PreferenceType { get => fields.PreferenceType[this]; set => fields.PreferenceType[this] = value; }
 
     /// <summary>
     /// The preference name.
     /// </summary>
     [DisplayName("Name"), Size(100), NotNull, QuickSearch, NameProperty]
-    public string Name { get => fields.Name[this]; set => fields.Name[this] = value; }
+    public string? Name { get => fields.Name[this]; set => fields.Name[this] = value; }
 
     /// <summary>
     /// The preference value.
     /// </summary>
     [DisplayName("Value")]
-    public string Value { get => fields.Value[this]; set => fields.Value[this] = value; }
+    public string? Value { get => fields.Value[this]; set => fields.Value[this] = value; }
 
     /// <summary>
     /// The fields of the <see cref="UserPreferenceRow"/>.
@@ -47,26 +47,26 @@ public sealed class UserPreferenceRow : Row<UserPreferenceRow.RowFields>, IIdRow
         /// <summary>
         /// The user preference ID field.
         /// </summary>
-        public readonly Int32Field UserPreferenceId;
+        public readonly Int32Field UserPreferenceId = null!;
 
         /// <summary>
         /// The ID of the user the preference belongs to.
         /// </summary>
-        public readonly Int32Field UserId;
+        public readonly Int32Field UserId = null!;
 
         /// <summary>
         /// The preference type field.
         /// </summary>
-        public readonly StringField PreferenceType;
+        public readonly StringField PreferenceType = null!;
 
         /// <summary>
         /// The preference name field.
         /// </summary>
-        public readonly StringField Name;
+        public readonly StringField Name = null!;
 
         /// <summary>
         /// The preference value field.
         /// </summary>
-        public readonly StringField Value;
+        public readonly StringField Value = null!;
     }
 }

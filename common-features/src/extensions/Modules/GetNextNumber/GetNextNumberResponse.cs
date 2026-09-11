@@ -12,5 +12,5 @@ public class GetNextNumberResponse : ServiceResponse
     /// <summary>
     /// The serial representation of the number, including the prefix.
     /// </summary>
-    public string Serial { get; set; }
+    public string? Serial { get; set; }
 }

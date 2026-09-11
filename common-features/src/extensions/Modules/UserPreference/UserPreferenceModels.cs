@@ -8,15 +8,15 @@ public class UserPreferenceUpdateRequest : ServiceRequest
     /// <summary>
     /// The preference type.
     /// </summary>
-    public string PreferenceType { get; set; }
+    public string? PreferenceType { get; set; }
     /// <summary>
     /// The preference name.
     /// </summary>
-    public string Name { get; set; }
+    public string? Name { get; set; }
     /// <summary>
     /// The preference value.
     /// </summary>
-    public string Value { get; set; }
+    public string? Value { get; set; }
 }
 
 /// <summary>
@@ -27,11 +27,11 @@ public class UserPreferenceRetrieveRequest : ServiceRequest
     /// <summary>
     /// The preference type.
     /// </summary>
-    public string PreferenceType { get; set; }
+    public string? PreferenceType { get; set; }
     /// <summary>
     /// The preference name.
     /// </summary>
-    public string Name { get; set; }
+    public string? Name { get; set; }
 }
 
 /// <summary>
@@ -42,5 +42,5 @@ public class UserPreferenceRetrieveResponse : ServiceResponse
     /// <summary>
     /// The preference value.
     /// </summary>
-    public string Value { get; set; }
+    public string? Value { get; set; }
 }

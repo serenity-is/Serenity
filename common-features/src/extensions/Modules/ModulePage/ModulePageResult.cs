@@ -8,5 +8,5 @@ public class ModulePageResult : ViewResult
     /// <summary>
     /// Gets the module page model.
     /// </summary>
-    public new ModulePageModel Model => (ModulePageModel)base.Model;
+    public new ModulePageModel Model => (ModulePageModel)base.Model!;
 }

@@ -26,7 +26,7 @@ public static class ModulePageExtensions
     /// <param name="pageTitle">The page title.</param>
     /// <returns>The module page result.</returns>
     public static ModulePageResult GridPage<TRow>(this Controller controller, string module,
-        object options = null, string layout = null, LocalText pageTitle = null)
+        object? options = null, string? layout = null, LocalText? pageTitle = null)
         where TRow: IRow, new()
     {
         return GridPage(controller, module, pageTitle ?? new TRow().Fields.PageTitle(), options, layout: layout);
@@ -42,7 +42,7 @@ public static class ModulePageExtensions
     /// <param name="layout">The layout to use.</param>
     /// <returns>The module page result.</returns>
     public static ModulePageResult GridPage(this Controller controller, string module, LocalText pageTitle,
-        object options = null, string layout = null)
+        object? options = null, string? layout = null)
     {
         return GridPage(controller, new()
         {
@@ -107,7 +107,7 @@ public static class ModulePageExtensions
     /// <param name="layout">The layout to use.</param>
     /// <returns>The module page result.</returns>
     public static ModulePageResult PanelPage(this Controller controller, string module, LocalText pageTitle,
-        object options = null, string layout = null)
+        object? options = null, string? layout = null)
     {
         return PanelPage(controller, new()
         {

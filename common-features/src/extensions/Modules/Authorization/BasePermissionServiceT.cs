@@ -20,7 +20,7 @@ public abstract class BasePermissionService<TUserPermissionRow, TUserRoleRow>(
     ITypeSource typeSource,
     IUserAccessor userAccessor,
     IRolePermissionService rolePermissions,
-    IHttpContextItemsAccessor httpContextItemsAccessor = null) :
+    IHttpContextItemsAccessor? httpContextItemsAccessor = null) :
     BasePermissionService(userAccessor, rolePermissions, httpContextItemsAccessor)
     where TUserPermissionRow : class, IUserPermissionRow, new()
     where TUserRoleRow : class, IUserRoleRow, new()
@@ -39,7 +39,7 @@ public abstract class BasePermissionService<TUserPermissionRow, TUserRoleRow>(
     /// Gets directly assigned permissions for the specified user.
     /// </summary>
     /// <param name="user">User</param>
-    protected virtual IDictionary<string, bool> GetUserPermissions(ClaimsPrincipal user)
+    protected virtual IDictionary<string, bool>? GetUserPermissions(ClaimsPrincipal user)
     {
         if (user == null)
             return null;
@@ -57,7 +57,7 @@ public abstract class BasePermissionService<TUserPermissionRow, TUserRoleRow>(
         return TimeSpan.Zero;
     }
 
-    private TUserPermissionRow userPermissionRow;
+    private TUserPermissionRow? userPermissionRow;
 
     /// <summary>
     /// Gets the cache group key for user permissions.
@@ -84,7 +84,7 @@ public abstract class BasePermissionService<TUserPermissionRow, TUserRoleRow>(
     {
         return cache.GetLocalStoreOnly(GetUserPermissionsCacheKey(user),
             GetUserPermissionsCacheDuration(), GetUserPermissionsCacheGroupKey(), 
-            () => LoadUserPermissions(user));
+            () => LoadUserPermissions(user))!;
     }
 
     /// <summary>
@@ -107,7 +107,7 @@ public abstract class BasePermissionService<TUserPermissionRow, TUserRoleRow>(
 
             if (userPermissionRow.GrantedField is not null)
                 query.Select(userPermissionRow.GrantedField);
-        }).ForEach(x => result[x.PermissionKeyField[x]] = x.GrantedField?[x] ?? true);
+        }).ForEach(x => result[x.PermissionKeyField[x]!] = x.GrantedField?[x] ?? true);
 
         var implicitPermissions = GetImplicitPermissions(cache.Memory, typeSource);
         foreach (var pair in result.ToArray())
@@ -130,7 +130,7 @@ public abstract class BasePermissionService<TUserPermissionRow, TUserRoleRow>(
         return TimeSpan.Zero;
     }
 
-    private TUserRoleRow userRoleRow;
+    private TUserRoleRow? userRoleRow;
 
     /// <summary>
     /// Gets the cache group key for user roles.
@@ -157,7 +157,7 @@ public abstract class BasePermissionService<TUserPermissionRow, TUserRoleRow>(
     {
         return cache.GetLocalStoreOnly(GetUserRolesCacheKey(user),
             GetUserRolesCacheDuration(), GetUserRolesCacheGroupKey(),
-            () => LoadUserRoles(user));
+            () => LoadUserRoles(user))!;
     }
 
     /// <summary>
@@ -167,7 +167,7 @@ public abstract class BasePermissionService<TUserPermissionRow, TUserRoleRow>(
     protected override IEnumerable<string> GetUserRoles(ClaimsPrincipal user)
     {
         if (user == null)
-            return null;
+            return [];
 
         return GetCachedUserRoles(user);
     }
@@ -187,7 +187,7 @@ public abstract class BasePermissionService<TUserPermissionRow, TUserRoleRow>(
         connection.List<TUserRoleRow>(q => q
             .Select(userRoleRow.RoleKeyOrNameField)
             .Where(userRoleRow.UserIdField == new ValueCriteria(userId)))
-                .ForEach(x => result.Add(x.RoleKeyOrNameField[x]));
+                .ForEach(x => result.Add(x.RoleKeyOrNameField[x]!));
 
         return result;
     }

@@ -9,11 +9,11 @@ namespace Serenity.Reporting;
 /// </summary>
 public class HtmlReportCallbackUrlInterceptor(
     ILogger<HtmlReportCallbackUrlBuilder> logger,
-    IPermissionService permissionService = null,
-    IUserAccessor userAccessor = null,
-    IUserClaimCreator userClaimCreator = null,
-    IHttpContextAccessor httpContextAccessor = null,
-    IDataProtectionProvider dataProtectionProvider = null) : IReportCallbackInterceptor
+    IPermissionService? permissionService = null,
+    IUserAccessor? userAccessor = null,
+    IUserClaimCreator? userClaimCreator = null,
+    IHttpContextAccessor? httpContextAccessor = null,
+    IDataProtectionProvider? dataProtectionProvider = null) : IReportCallbackInterceptor
 {
     /// <summary>
     /// Intercepts a report callback, applying impersonation and transient grants from the report auth cookie.
@@ -25,8 +25,8 @@ public class HtmlReportCallbackUrlInterceptor(
     {
         ArgumentNullException.ThrowIfNull(renderOptions);
 
-        IImpersonator impersonator = userAccessor as IImpersonator;
-        ITransientGrantor transientGrantor = permissionService as ITransientGrantor;
+        IImpersonator? impersonator = userAccessor as IImpersonator;
+        ITransientGrantor? transientGrantor = permissionService as ITransientGrantor;
         bool undoImpersonate = false;
         bool undoGrant = false;
         try
@@ -86,9 +86,9 @@ public class HtmlReportCallbackUrlInterceptor(
         finally
         {
             if (undoImpersonate)
-                impersonator.UndoImpersonate();
+                impersonator?.UndoImpersonate();
             if (undoGrant)
-                transientGrantor.UndoGrant();
+                transientGrantor?.UndoGrant();
         }
     }
 }

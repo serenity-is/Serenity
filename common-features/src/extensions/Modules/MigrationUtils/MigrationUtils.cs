@@ -16,7 +16,7 @@ public static class MigrationUtils
     /// </summary>
     public static void CreateTableWithId32(
         this MigrationBase migration, string table, string idField,
-        Action<ICreateTableColumnOptionOrWithColumnSyntax> addColumns, string schema = null, bool checkExists = false, bool primaryKey = true)
+        Action<ICreateTableColumnOptionOrWithColumnSyntax> addColumns, string? schema = null, bool checkExists = false, bool primaryKey = true)
     {
         CreateTableWithId(migration, table, idField, addColumns, schema, 32, checkExists, primaryKey);
     }
@@ -26,14 +26,14 @@ public static class MigrationUtils
     /// </summary>
     public static void CreateTableWithId64(
         this MigrationBase migration, string table, string idField,
-        Action<ICreateTableColumnOptionOrWithColumnSyntax> addColumns, string schema = null, bool checkExists = false, bool primaryKey = true)
+        Action<ICreateTableColumnOptionOrWithColumnSyntax> addColumns, string? schema = null, bool checkExists = false, bool primaryKey = true)
     {
         CreateTableWithId(migration, table, idField, addColumns, schema, 64, checkExists, primaryKey);
     }
 
     private static void CreateTableWithId(
         MigrationBase migration, string table, string idField,
-        Action<ICreateTableColumnOptionOrWithColumnSyntax> addColumns, string schema, int size, bool checkExists = false, bool primaryKey = true)
+        Action<ICreateTableColumnOptionOrWithColumnSyntax> addColumns, string? schema, int size, bool checkExists = false, bool primaryKey = true)
     {
         if (checkExists && (
             (schema != null && migration.Schema.Schema(schema).Table(table).Exists()) ||
@@ -121,8 +121,7 @@ public static class MigrationUtils
                     .OnColumn(builder.Column.Name)
                     .Unique();
             }
-            var type = builder.Column.Type.Value == System.Data.DbType.Int64 ||
-                builder.Column.Type.Value == System.Data.DbType.UInt64 ?
+            var type = builder.Column.Type is System.Data.DbType.Int64 or System.Data.DbType.UInt64 ?
                 "BIGINT" : "INT";
 
             migration.IfDatabase("MySql").Execute.Sql(
@@ -302,7 +301,7 @@ END;", table, id, seq));
             return;
         }
 
-        var cb = DbProviderFactories.GetFactory(cs.ProviderName).CreateConnectionStringBuilder();
+        var cb = DbProviderFactories.GetFactory(cs.ProviderName).CreateConnectionStringBuilder()!;
         cb.ConnectionString = cs.ConnectionString;
 
         if (isFirebird)
@@ -320,7 +319,7 @@ END;", table, id, seq));
             database = Path.GetFullPath(database);
             if (File.Exists(database))
                 return;
-            Directory.CreateDirectory(Path.GetDirectoryName(database));
+            Directory.CreateDirectory(Path.GetDirectoryName(database)!);
 
             using var fbConnection = sqlConnections.New(cb.ConnectionString,
                 cs.ProviderName, cs.Dialect);
@@ -375,8 +374,8 @@ END;", table, id, seq));
         {
             try
             {
-                var filename = Path.Combine(Path.Combine(contentRoot, "App_Data"), catalog);
-                Directory.CreateDirectory(Path.GetDirectoryName(filename));
+                var filename = Path.Combine(Path.Combine(contentRoot, "App_Data"), catalog!);
+                Directory.CreateDirectory(Path.GetDirectoryName(filename)!);
 
                 command = string.Format(CultureInfo.InvariantCulture, @"CREATE DATABASE [{0}] ON PRIMARY (Name = N'{0}', FILENAME = '{1}.mdf') " +
                     "LOG ON (NAME = N'{0}_log', FILENAME = '{1}.ldf')",

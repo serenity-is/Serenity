@@ -9,5 +9,5 @@ public class SendResetPasswordResponse : ServiceResponse
     /// <summary>
     /// The demo reset link, only returned in public demo mode.
     /// </summary>
-    public string DemoLink { get; set; }    
+    public string? DemoLink { get; set; }    
 }
