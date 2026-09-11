@@ -14,11 +14,11 @@ namespace Serenity.Services;
 /// <param name="uploadProcessor">Upload processor</param>
 /// <param name="formatSanitizer">Filename format sanitizer</param>
 /// <exception cref="ArgumentNullException">One of the arguments is null</exception>
-public class FileUploadBehavior(IUploadStorage storage, IUploadProcessor uploadProcessor,
-    IFilenameFormatSanitizer formatSanitizer = null) : BaseSaveDeleteBehavior, IImplicitBehavior, IFieldBehavior
+public class FileUploadBehavior(IUploadStorage? storage, IUploadProcessor? uploadProcessor,
+    IFilenameFormatSanitizer? formatSanitizer = null) : BaseSaveDeleteBehavior, IImplicitBehavior, IFieldBehavior
 {
     /// <inheritdoc/>
-    public Field Target { get; set; }
+    public Field? Target { get; set; }
 
     private const string SplittedFormat = "{1:00000}/{0:00000000}_{2}";
 
@@ -26,25 +26,31 @@ public class FileUploadBehavior(IUploadStorage storage, IUploadProcessor uploadP
     private readonly IUploadStorage storage = storage ?? throw new ArgumentNullException(nameof(storage));
     private readonly IUploadProcessor uploadProcessor = uploadProcessor ?? throw new ArgumentNullException(nameof(uploadProcessor));
 
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
     private IUploadEditor editorAttr;
     private string entityTable;
     private string entityType;
     private string entityProperty;
     private string entityField;
     private string fileNameFormat;
-    private StringField originalNameField;
-    private Dictionary<string, Field> replaceFields;
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+    private StringField? originalNameField;
+    private Dictionary<string, Field>? replaceFields;
 
     /// <inheritdoc/>
     public bool ActivateFor(IRow row)
     {
-        if (Target is null)
+        if (Target is null ||
+            Target.CustomAttributes.OfType<IUploadEditor>().FirstOrDefault() is not { } editorAttr ||
+            editorAttr.DisableDefaultBehavior)
             return false;
 
-        editorAttr = Target.CustomAttributes.OfType<IUploadEditor>().FirstOrDefault();
-        if (editorAttr is null || editorAttr.DisableDefaultBehavior)
-            return false;
+        if (editorAttr is not IUploadOptions)
+            throw new ArgumentException(string.Format(CultureInfo.InvariantCulture,
+                "Field '{0}' on row type '{1}' has a {2} which does not implement IUploadOptions interface!",
+                    entityProperty, row.GetType().FullName, editorAttr.GetType().FullName));
 
+        this.editorAttr = editorAttr;
         entityField = Target.Name;
         entityProperty = Target.PropertyName ?? entityField;
 
@@ -58,7 +64,7 @@ public class FileUploadBehavior(IUploadStorage storage, IUploadProcessor uploadP
                 "Field '{0}' on row type '{1}' has a UploadEditor attribute but Row type doesn't implement IIdRow!",
                     entityProperty, row.GetType().FullName));
 
-        entityType = row.GetType().FullName;
+        entityType = row.GetType().FullName!;
         entityTable = row.Table;
 
         if (!editorAttr.IsMultiple)
@@ -69,7 +75,7 @@ public class FileUploadBehavior(IUploadStorage storage, IUploadProcessor uploadP
                 var nameField = row.FindFieldByPropertyName(originalNameProperty) ??
                     row.FindField(originalNameProperty);
 
-                originalNameField = (StringField)nameField ?? throw new ArgumentException(string.Format(CultureInfo.InvariantCulture,
+                originalNameField = (StringField?)nameField ?? throw new ArgumentException(string.Format(CultureInfo.InvariantCulture,
                     "Field '{0}' on row type '{1}' has a UploadEditor attribute but " +
                     "a field with OriginalNameProperty '{2}' is not found!",
                     Target.PropertyName ?? Target.Name,
@@ -92,7 +98,7 @@ public class FileUploadBehavior(IUploadStorage storage, IUploadProcessor uploadP
         return true;
     }
 
-    private static UploadedFile[] ParseAndValidateJson(string json, string key)
+    private static UploadedFile[] ParseAndValidateJson(string? json, string key)
     {
         json = json.TrimToNull();
 
@@ -100,16 +106,16 @@ public class FileUploadBehavior(IUploadStorage storage, IUploadProcessor uploadP
             !json.EndsWith(']')))
             throw new ArgumentOutOfRangeException(key);
 
-        var list = JSON.Parse<UploadedFile[]>(json ?? "[]");
+        var list = JSON.Parse<UploadedFile[]>(json ?? "[]") ?? [];
 
         if (list.Any(x => string.IsNullOrEmpty(x.Filename)) ||
-            list.GroupBy(x => x.Filename.Trim()).SelectMany(x => x.Skip(1)).Any())
+            list.GroupBy(x => x.Filename!.Trim()).SelectMany(x => x.Skip(1)).Any())
             throw new ArgumentOutOfRangeException(key);
 
         return list;
     }
 
-    internal static Dictionary<string, Field> ParseReplaceFields(string fileNameFormat, IRow row, Field target)
+    internal static Dictionary<string, Field>? ParseReplaceFields(string fileNameFormat, IRow row, Field target)
     {
         if (fileNameFormat.IndexOf('|', StringComparison.Ordinal) < 0)
             return null;
@@ -150,7 +156,7 @@ public class FileUploadBehavior(IUploadStorage storage, IUploadProcessor uploadP
     }
 
     internal static string ProcessReplaceFields(string s,
-        Dictionary<string, Field> replaceFields, 
+        Dictionary<string, Field>? replaceFields, 
         ISaveRequestHandler handler,
         IFilenameFormatSanitizer formatSanitizer)
     {
@@ -202,7 +208,7 @@ public class FileUploadBehavior(IUploadStorage storage, IUploadProcessor uploadP
             else
             {
                 key = key[1..^1];
-                value = Convert.ToString(val ?? "", CultureInfo.InvariantCulture);
+                value = Convert.ToString(val ?? "", CultureInfo.InvariantCulture) ?? "";
             }
 
             value = formatSanitizer.SanitizePlaceholder(key, value);
@@ -235,11 +241,11 @@ public class FileUploadBehavior(IUploadStorage storage, IUploadProcessor uploadP
     /// <inheritdoc/>
     public override void OnBeforeSave(ISaveRequestHandler handler)
     {
-        var valueField = (StringField)Target;
+        var valueField = (StringField)Target!;
         if (!handler.Row.IsAssigned(valueField))
             return;
 
-        var oldValue = (handler.IsCreate ? null : valueField[handler.Old]).TrimToNull();
+        var oldValue = (handler.IsCreate ? null : valueField[handler.Old!]).TrimToNull();
         var newValue = valueField[handler.Row] = valueField[handler.Row].TrimToNull();
         if (oldValue.IsTrimmedSame(newValue))
         {
@@ -248,7 +254,7 @@ public class FileUploadBehavior(IUploadStorage storage, IUploadProcessor uploadP
         }
 
         var filesToDelete = new FilesToDelete(storage);
-        handler.StateBag[GetType().FullName + "_" + Target.Name + "_FilesToDelete"] = filesToDelete;
+        handler.StateBag[GetType().FullName + "_" + Target!.Name + "_FilesToDelete"] = filesToDelete;
         handler.UnitOfWork.RegisterFilesToDelete(filesToDelete);
 
         if (editorAttr.IsMultiple)
@@ -258,8 +264,8 @@ public class FileUploadBehavior(IUploadStorage storage, IUploadProcessor uploadP
 
             foreach (var file in oldFileList)
             {
-                var filename = file.Filename.Trim();
-                if (newFileList.Any(x => string.Compare(x.Filename.Trim(), filename, StringComparison.OrdinalIgnoreCase) == 0))
+                var filename = file.Filename!.Trim();
+                if (newFileList.Any(x => string.Compare(x.Filename!.Trim(), filename, StringComparison.OrdinalIgnoreCase) == 0))
                     continue;
 
                 DeleteOldFile(storage, filesToDelete, filename,
@@ -300,7 +306,7 @@ public class FileUploadBehavior(IUploadStorage storage, IUploadProcessor uploadP
     }
 
     internal static void DeleteOldFile(IUploadStorage storage, FilesToDelete filesToDelete, 
-        string oldFilename, bool copyToHistory)
+        string? oldFilename, bool copyToHistory)
     {
         if (string.IsNullOrEmpty(oldFilename))
             return;
@@ -316,7 +322,7 @@ public class FileUploadBehavior(IUploadStorage storage, IUploadProcessor uploadP
         if (ServiceQueryHelper.UseSoftDelete(handler.Row))
             return;
 
-        var valueField = (StringField)Target;
+        var valueField = (StringField)Target!;
         var oldValue = valueField[handler.Row].TrimToNull();
         if (string.IsNullOrEmpty(oldValue) || (editorAttr.IsMultiple && oldValue == "[]"))
             return;
@@ -338,12 +344,12 @@ public class FileUploadBehavior(IUploadStorage storage, IUploadProcessor uploadP
     }
 
     private string CopyTemporaryFiles(ISaveRequestHandler handler,
-        UploadedFile[] oldFileList, UploadedFile[] newFileList, FilesToDelete filesToDelete)
+        UploadedFile[] oldFileList, UploadedFile[] newFileList, FilesToDelete? filesToDelete)
     {
         foreach (var file in newFileList)
         {
-            var filename = file.Filename.Trim();
-            if (oldFileList.Any(x => string.Compare(x.Filename.Trim(), filename, StringComparison.OrdinalIgnoreCase) == 0))
+            var filename = file.Filename!.Trim();
+            if (oldFileList.Any(x => string.Compare(x.Filename!.Trim(), filename, StringComparison.OrdinalIgnoreCase) == 0))
                 continue;
 
             file.Filename = CopyTemporaryFile(handler, filesToDelete, filename).Path;
@@ -352,7 +358,7 @@ public class FileUploadBehavior(IUploadStorage storage, IUploadProcessor uploadP
         return JSON.Stringify(newFileList, writeNulls: false);
     }
 
-    private CopyTemporaryFileResult CopyTemporaryFile(ISaveRequestHandler handler, IFilesToDelete filesToDelete, 
+    private CopyTemporaryFileResult CopyTemporaryFile(ISaveRequestHandler handler, IFilesToDelete? filesToDelete, 
         string temporaryFile)
     {
         if (string.IsNullOrEmpty(temporaryFile))
@@ -363,8 +369,8 @@ public class FileUploadBehavior(IUploadStorage storage, IUploadProcessor uploadP
 
         UploadPathHelper.CheckFileNameSecurity(temporaryFile);
         using var fs = storage.OpenFile(temporaryFile);
-        var uploadInfo = uploadProcessor.Process(fs, temporaryFile, editorAttr as IUploadOptions);
-        temporaryFile = uploadInfo.TemporaryFile;
+        var uploadInfo = uploadProcessor.Process(fs, temporaryFile, (IUploadOptions)editorAttr);
+        temporaryFile = uploadInfo.TemporaryFile!;
 
         var idField = handler.Row.GetIdField();
         var originalName = storage.GetOriginalName(temporaryFile);
@@ -384,13 +390,13 @@ public class FileUploadBehavior(IUploadStorage storage, IUploadProcessor uploadP
             OriginalName = originalName 
         });
 
-        storage.SetFileMetadata(copyResult.Path, new Dictionary<string, string>
+        storage.SetFileMetadata(copyResult.Path!, new Dictionary<string, string>
         {
             { FileMetadataKeys.EntityTable, entityTable },
             { FileMetadataKeys.EntityType, entityType },
             { FileMetadataKeys.EntityField, entityField },
             { FileMetadataKeys.EntityProperty, entityProperty },
-            { FileMetadataKeys.EntityId, Convert.ToString(entityId, CultureInfo.InvariantCulture) }
+            { FileMetadataKeys.EntityId, Convert.ToString(entityId, CultureInfo.InvariantCulture)! }
         }, overwriteAll: false);
 
         return copyResult;
@@ -402,7 +408,7 @@ public class FileUploadBehavior(IUploadStorage storage, IUploadProcessor uploadP
         if (handler.IsUpdate)
             return;
 
-        var valueField = (StringField)Target;
+        var valueField = (StringField)Target!;
         if (!handler.Row.IsAssigned(valueField))
             return;
 
@@ -410,7 +416,7 @@ public class FileUploadBehavior(IUploadStorage storage, IUploadProcessor uploadP
         if (string.IsNullOrEmpty(newValue) || (editorAttr.IsMultiple && newValue == "[]"))
             return;
 
-        var filesToDelete = handler.StateBag[GetType().FullName + "_" + Target.Name + "_FilesToDelete"] as FilesToDelete;
+        var filesToDelete = handler.StateBag[GetType().FullName + "_" + Target!.Name + "_FilesToDelete"] as FilesToDelete;
 
         if (editorAttr.IsMultiple)
         {

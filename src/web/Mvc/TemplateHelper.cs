@@ -25,8 +25,8 @@ public static class TemplateHelper
     /// <param name="beforeRender">An optional callback which will be passed the view context before rendering starts.</param>
     /// <returns>The rendered view content.</returns>
     /// <exception cref="ArgumentNullException">The view is not found.</exception>
-    public static string RenderViewToString(IServiceProvider serviceProvider, string viewName, object model,
-        Action<ViewContext> beforeRender = null)
+    public static string RenderViewToString(IServiceProvider serviceProvider, string viewName, object? model,
+        Action<ViewContext>? beforeRender = null)
     {
         ArgumentNullException.ThrowIfNull(serviceProvider);
 
@@ -47,7 +47,7 @@ public static class TemplateHelper
         else
         {
 
-            var httpContext = serviceProvider?.GetService<IHttpContextAccessor>()?.HttpContext ??
+            var httpContext = serviceProvider.GetService<IHttpContextAccessor>()?.HttpContext ??
                 new DefaultHttpContext
                 {
                     RequestServices = serviceProvider

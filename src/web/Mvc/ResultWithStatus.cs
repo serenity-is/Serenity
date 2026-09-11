@@ -17,12 +17,12 @@ public class ResultWithStatus<TResponse>(int statusCode, TResponse data) : Statu
     /// <summary>
     /// Gets or sets the content encoding.
     /// </summary>
-    public Encoding ContentEncoding { get; set; }
+    public Encoding? ContentEncoding { get; set; }
 
     /// <summary>
     /// Gets or sets the content type.
     /// </summary>
-    public string ContentType { get; set; }
+    public string? ContentType { get; set; }
 
     /// <summary>
     /// Gets or sets the JSON serializer settings.

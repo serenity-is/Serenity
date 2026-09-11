@@ -8,7 +8,7 @@ public class CssMinifyResult
     /// <summary>
     /// Gets or sets the minified code.
     /// </summary>
-    public string Code { get; set; }
+    public required string Code { get; set; }
 
     /// <summary>
     /// Gets or sets whether minifying had errors.

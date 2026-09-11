@@ -55,7 +55,7 @@ public class LocalTextScript(ILocalTextRegistry registry, string package, string
 
         ArgumentNullException.ThrowIfNull(packages);
 
-        if (!packages.TryGetValue(package, out string includes))
+        if (!packages.TryGetValue(package, out string? includes))
             includes = null;
 
         return GetLocalTextPackageScript(registry, includes, languageId, isPending, package);
@@ -72,7 +72,7 @@ public class LocalTextScript(ILocalTextRegistry registry, string package, string
     /// <returns>The script content.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="registry"/> is <c>null</c>.</exception>
     public static string GetLocalTextPackageScript(ILocalTextRegistry registry, 
-        string includes, string languageId, bool isPending, string packageId = null)
+        string? includes, string languageId, bool isPending, string? packageId = null)
     {
         var list = LocalTextDataScript.GetPackageData(registry, includes, languageId, isPending, packageId).ToList();
         list.Sort((i1, i2) => string.CompareOrdinal(i1.Key, i2.Key));

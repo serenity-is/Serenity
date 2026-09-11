@@ -41,6 +41,8 @@ public abstract class BaseDynamicDataGenerator
                 continue;
 
             var content = scriptManager.GetScriptText(name, json: true);
+            if (content == null)
+                continue;
 
             if (name.StartsWith("Columns.") || name.StartsWith("Form."))
             {

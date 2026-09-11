@@ -28,9 +28,9 @@ public static class ApplicationPartsServiceCollectionExtensions
     /// <returns>The same service collection so that calls can be chained.</returns>
     public static IServiceCollection AddApplicationPartsFeatureToggles(this IServiceCollection services,
         IConfiguration configuration,
-        ApplicationPartManager applicationPartManager = null,
-        object[] disableByDefault = null,
-        Dictionary<string, List<RequiresFeatureAttribute>> dependencyMap = null)
+        ApplicationPartManager? applicationPartManager = null,
+        object[]? disableByDefault = null,
+        Dictionary<string, List<RequiresFeatureAttribute>>? dependencyMap = null)
     {
         ArgumentNullException.ThrowIfNull(services);
 
@@ -43,8 +43,8 @@ public static class ApplicationPartsServiceCollectionExtensions
     }
 
     internal static void ScanFeatureKeySets(IEnumerable<Assembly> assemblies,
-        ref object[] disableByDefault,
-        ref Dictionary<string, List<RequiresFeatureAttribute>> dependencyMap)
+        ref object[]? disableByDefault,
+        ref Dictionary<string, List<RequiresFeatureAttribute>>? dependencyMap)
     {
         var disableSet = new HashSet<string>(disableByDefault?.Select(FeatureTogglesExtensions.ToFeatureKey) ?? []);
         var dependencyMapDict = new Dictionary<string, List<RequiresFeatureAttribute>>();
@@ -98,7 +98,7 @@ public static class ApplicationPartsServiceCollectionExtensions
     /// <param name="topologicalSort">Whether to sort assemblies topologically by references.</param>
     /// <returns>The created <see cref="ApplicationPartsTypeSource"/>.</returns>
     public static ApplicationPartsTypeSource AddApplicationPartsTypeSource(this IServiceCollection collection,
-        ApplicationPartManager partManager = null, IFeatureToggles featureToggles = null, bool topologicalSort = true)
+        ApplicationPartManager? partManager = null, IFeatureToggles? featureToggles = null, bool topologicalSort = true)
     {
         ArgumentNullException.ThrowIfNull(collection);
         if (GetServiceFromCollection<ITypeSource>(collection) != null)
@@ -114,10 +114,10 @@ public static class ApplicationPartsServiceCollectionExtensions
         return typeSource;
     }
 
-    private static T GetServiceFromCollection<T>(IServiceCollection services)
+    private static T? GetServiceFromCollection<T>(IServiceCollection services)
         where T: class
     {
-        return (T)services.LastOrDefault(d => 
-            d.ServiceType == typeof(T))?.ImplementationInstance;
+        return services.LastOrDefault(d => 
+            d.ServiceType == typeof(T))?.ImplementationInstance as T;
     }
 }

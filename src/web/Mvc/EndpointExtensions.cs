@@ -37,8 +37,8 @@ public static class EndpointExtensions
     /// <param name="localizer">The text localizer.</param>
     /// <param name="showDetails"><c>true</c> to show details.</param>
     /// <returns>The converted service response.</returns>
-    public static TResponse ConvertToResponse<TResponse>(this Exception exception, ILogger logger, 
-        ITextLocalizer localizer, bool showDetails)
+    public static TResponse ConvertToResponse<TResponse>(this Exception exception, ILogger? logger, 
+        ITextLocalizer? localizer, bool showDetails)
         where TResponse: ServiceResponse, new()
     {
         logger?.LogError(exception, "Error occurred during service request!");

@@ -100,6 +100,8 @@ public class HtmlReportPdfRenderer(
     /// <inheritdoc/>
     public virtual byte[] Render(IReport report, ReportRenderOptions renderOptions)
     {
+        ArgumentNullException.ThrowIfNull(renderOptions);
+
         var converterOptions = GetConverterOptions(report, renderOptions, out var renderUrl);
         try
         {

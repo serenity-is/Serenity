@@ -18,8 +18,8 @@ public class NavigationHelper
     /// <returns>The list of navigation items.</returns>
     public static List<NavigationItem> GetNavigationItems(IPermissionService permissions, 
         ITypeSource typeSource, IServiceProvider serviceProvider, 
-        Func<string, string> resolveUrl = null, 
-        Func<NavigationItemAttribute, bool> filter = null)
+        Func<string, string>? resolveUrl = null, 
+        Func<NavigationItemAttribute, bool>? filter = null)
     {
         var menuItems = GetNavigationItemAttributes(typeSource, serviceProvider, filter);
         return ConvertToNavigationItems(permissions, menuItems, resolveUrl);
@@ -35,13 +35,13 @@ public class NavigationHelper
     /// <returns>The list of navigation items.</returns>
     /// <exception cref="ArgumentNullException">One of the arguments is <c>null</c>.</exception>
     public static List<NavigationItem> ConvertToNavigationItems(IPermissionService permissions, 
-        ILookup<string, NavigationItemAttribute> attrByCategory, Func<string, string> resolveUrl)
+        ILookup<string, NavigationItemAttribute> attrByCategory, Func<string, string>? resolveUrl)
     {
         ArgumentNullException.ThrowIfNull(permissions);
 
         var result = new List<NavigationItem>();
 
-        void processAttr(NavigationItem parent, NavigationItemAttribute attr, decimal order, int depth)
+        void processAttr(NavigationItem? parent, NavigationItemAttribute attr, decimal order, int depth)
         {
             var item = new NavigationItem();
 
@@ -165,10 +165,10 @@ public class NavigationHelper
 
     private static ILookup<string, NavigationItemAttribute> GetNavigationItemAttributes(
         ITypeSource typeSource, IServiceProvider serviceProvider,
-        Func<NavigationItemAttribute, bool> filter)
+        Func<NavigationItemAttribute, bool>? filter)
     {
         var list = new List<NavigationItemAttribute>();
-        var featureToggles = serviceProvider?.GetService<IFeatureToggles>();
+        var featureToggles = serviceProvider.GetService<IFeatureToggles>();
 
         foreach (NavigationItemAttribute attr in typeSource
             .GetAssemblyAttributes<NavigationItemAttribute>())
@@ -199,7 +199,7 @@ public class NavigationHelper
     }
 
     private static IEnumerable<NavigationItemAttribute> Sort(IEnumerable<NavigationItemAttribute> list,
-        Func<NavigationItemAttribute, string> getCategory)
+        Func<NavigationItemAttribute, string?> getCategory)
     {
         return list.OrderBy(x => getCategory(x) ?? "")
             .ThenBy(x => x.Order);
@@ -264,12 +264,16 @@ public class NavigationHelper
         if (!groups.Any())
             return byCategory;
 
-        var newCategory = new Dictionary<NavigationItemAttribute, string>();
+        var newCategory = new Dictionary<NavigationItemAttribute, string?>();
 
         foreach (var group in groups.Where(x => x.Include != null && !x.Default))
         {
             decimal? minOrder = null;
-            foreach (var pattern in group.Include)
+            var includes = group.Include;
+            if (includes == null)
+                continue;
+
+            foreach (var pattern in includes)
             {
                 if (string.IsNullOrEmpty(pattern))
                     continue;
@@ -348,7 +352,7 @@ public class NavigationHelper
         if (newCategory.Count == 0)
             return byCategory;
 
-        var usedGroupPaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var usedGroupPaths = new HashSet<string?>(StringComparer.OrdinalIgnoreCase);
         foreach (var group in groups)
             usedGroupPaths.Add(group.FullPath);
 
@@ -357,7 +361,7 @@ public class NavigationHelper
 
         string getCategory(NavigationItemAttribute x)
         {
-            return newCategory.TryGetValue(x, out var c) ? c :
+            return newCategory.TryGetValue(x, out var c) && c != null ? c :
                 (x.Category ?? "");
         }
 

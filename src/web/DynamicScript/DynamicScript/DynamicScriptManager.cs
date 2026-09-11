@@ -11,7 +11,7 @@ public partial class DynamicScriptManager : IDynamicScriptManager
 {
     private readonly ConcurrentDictionary<string, IDynamicScript> registeredScripts;
     private readonly ConcurrentDictionary<string, DateTime> scriptLastChange;
-    private Action<string> scriptChanged;
+    private Action<string>? scriptChanged;
 
     private readonly ITwoLevelCache cache;
     private readonly IPermissionService permissions;
@@ -108,7 +108,7 @@ public partial class DynamicScriptManager : IDynamicScriptManager
 
         var groupKey = script.GroupKey;
 
-        ScriptContent scriptContent;
+        ScriptContent? scriptContent;
         if (groupKey == null)
             scriptContent = cache.Memory.Get<ScriptContent>(cacheKey, TimeSpan.Zero, null);
         else
@@ -184,9 +184,9 @@ public partial class DynamicScriptManager : IDynamicScriptManager
         ScriptContent getOrCreate()
         {
             if (groupKey == null)
-                return cache.Memory.Get(cacheKey, script.Expiration, factory);
+                return cache.Memory.Get(cacheKey, script.Expiration, factory)!;
             else
-                return cache.GetLocalStoreOnly(cacheKey, script.Expiration, groupKey, factory);
+                return cache.GetLocalStoreOnly(cacheKey, script.Expiration, groupKey, factory)!;
         };
 
         var scriptContent = getOrCreate();
@@ -219,7 +219,7 @@ public partial class DynamicScriptManager : IDynamicScriptManager
     }
 
     /// <inheritdoc/>
-    public string GetScriptText(string name, bool json)
+    public string? GetScriptText(string name, bool json)
     {
         if (!registeredScripts.TryGetValue(name, out var script))
             return null;
@@ -240,7 +240,7 @@ public partial class DynamicScriptManager : IDynamicScriptManager
     }
 
     /// <inheritdoc/>
-    public IScriptContent ReadScriptContent(string name, bool json)
+    public IScriptContent? ReadScriptContent(string name, bool json)
     {
         if (!registeredScripts.TryGetValue(name, out var script))
             return null;

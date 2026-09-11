@@ -12,19 +12,19 @@ namespace Serenity.Reporting;
 /// <param name="options">The options.</param>
 /// <param name="webHostEnvironment">The host environment.</param>
 /// <param name="fileSystem">The file system.</param>
-public class WKHtmlToPdfConverter(IOptions<WKHtmlToPdfSettings> options = null,
-    IWebHostEnvironment webHostEnvironment = null, IFileSystem fileSystem = null) : IWKHtmlToPdfConverter
+public class WKHtmlToPdfConverter(IOptions<WKHtmlToPdfSettings>? options = null,
+    IWebHostEnvironment? webHostEnvironment = null, IFileSystem? fileSystem = null) : IWKHtmlToPdfConverter
 {
-    private readonly IOptions<WKHtmlToPdfSettings> options = options;
-    private readonly IWebHostEnvironment webHostEnvironment = webHostEnvironment;
+    private readonly IOptions<WKHtmlToPdfSettings>? options = options;
+    private readonly IWebHostEnvironment? webHostEnvironment = webHostEnvironment;
     private readonly IFileSystem fileSystem = fileSystem ?? new PhysicalFileSystem();
-    private string executablePath;
+    private string? executablePath;
 
     /// <summary>
     /// Gets the wkhtmltopdf executable path.
     /// </summary>
     /// <returns>The executable path, or <c>null</c> if not found.</returns>
-    public virtual string GetExecutablePath()
+    public virtual string? GetExecutablePath()
     {
         if (!string.IsNullOrEmpty(executablePath) && 
             fileSystem.FileExists(executablePath))
@@ -45,7 +45,7 @@ public class WKHtmlToPdfConverter(IOptions<WKHtmlToPdfSettings> options = null,
                 ["wkhtmltopdf", "wkhtmltopdf.sh"];
 
         IEnumerable<string> paths = [assemblyPath];
-        string contentRootPath = webHostEnvironment?.ContentRootPath;
+        string? contentRootPath = webHostEnvironment?.ContentRootPath;
         if (!string.IsNullOrEmpty(contentRootPath))
             paths = paths.Concat(
             [

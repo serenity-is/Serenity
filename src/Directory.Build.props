@@ -9,7 +9,7 @@
     <ESBuild>$(MSBuildProjectDirectory)\node_modules\.bin\esbuild</ESBuild>
     <GenerateDocumentationFile Condition="'$(GenerateDocumentationFile)' == ''">true</GenerateDocumentationFile>
     <LangVersion>latest</LangVersion>
-    <Nullable>annotations</Nullable>
+    <Nullable>enable</Nullable>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ProduceReferenceAssembly>true</ProduceReferenceAssembly>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>

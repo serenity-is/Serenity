@@ -59,7 +59,7 @@ public class PageAuthorizeAttribute : TypeFilterAttribute
         if (attributeTypes.IsEmptyOrNull())
             throw new ArgumentNullException(nameof(attributeTypes));
 
-        PermissionAttributeBase attr = null;
+        PermissionAttributeBase? attr = null;
         foreach (var attributeType in attributeTypes)
         {
             var lst = sourceType.GetCustomAttributes(attributeType, true);
@@ -130,10 +130,10 @@ public class PageAuthorizeAttribute : TypeFilterAttribute
     /// <summary>
     /// Gets the permission key.
     /// </summary>
-    public string Permission { get; private set; }
+    public string? Permission { get; private set; }
 
     /// <inheritdoc/>
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         return obj is PageAuthorizeAttribute other &&
             string.Equals(Permission, other.Permission, StringComparison.Ordinal);

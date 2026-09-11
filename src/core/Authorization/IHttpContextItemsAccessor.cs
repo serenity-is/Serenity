@@ -1,4 +1,4 @@
-﻿namespace Serenity.Abstractions;
+namespace Serenity.Abstractions;
 
 /// <summary>
 /// Provides access to the per-request item dictionary, typically backed by
@@ -12,5 +12,5 @@ public interface IHttpContextItemsAccessor
     /// <summary>
     /// Gets the dictionary that can be used as request-scoped storage.
     /// </summary>
-    IDictionary<object, object?> Items { get; }
+    IDictionary<object, object?>? Items { get; }
 }

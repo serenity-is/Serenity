@@ -87,7 +87,7 @@ public class ServiceAuthorizeAttribute : Attribute, IResourceFilter
         if (attributeTypes.IsEmptyOrNull())
             throw new ArgumentNullException(nameof(attributeTypes));
 
-        PermissionAttributeBase attr = null;
+        PermissionAttributeBase? attr = null;
         foreach (var attributeType in attributeTypes)
         {
             var lst = sourceType.GetCustomAttributes(attributeType, true);
@@ -159,14 +159,14 @@ public class ServiceAuthorizeAttribute : Attribute, IResourceFilter
     /// <summary>
     /// Gets the permission key.
     /// </summary>
-    public string Permission { get; private set; }
+    public string? Permission { get; private set; }
 
     /// <summary>
     /// Gets or sets an optional secondary permission to check by OR,
     /// e.g. if this is specified and the user does not have the <see cref="Permission"/>,
     /// the user will still be allowed access if they have the <see cref="OrPermission"/>.
     /// </summary>
-    protected string OrPermission { get; set; }
+    protected string? OrPermission { get; set; }
 
     /// <summary>
     /// Gets or sets whether this attribute should override the controller level attribute if any.

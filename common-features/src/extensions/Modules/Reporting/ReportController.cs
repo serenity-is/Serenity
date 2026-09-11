@@ -49,7 +49,7 @@ public class ReportController(IReportFactory reportFactory,
 
     private ActionResult Execute(string key, string opt, string ext, bool download, bool printing)
     {
-        var options = new ReportRenderOptions
+        var renderOptions = new ReportRenderOptions
         {
             ExportFormat = ext,
             PreviewMode = !download && !printing,
@@ -57,14 +57,14 @@ public class ReportController(IReportFactory reportFactory,
             ReportParams = opt
         };
 
-        ReportRenderResult callback(ReportRenderOptions options)
+        ReportRenderResult callback(ReportRenderOptions renderOptions)
         {
-            var report = reportFactory.Create(options.ReportKey, options.ReportParams, validatePermission: true);
-            return reportRenderer.Render(report, options);
+            var report = reportFactory.Create(renderOptions.ReportKey, renderOptions.ReportParams, validatePermission: true);
+            return reportRenderer.Render(report, renderOptions);
         }
 
         var result = callbackInterceptor != null ?
-            callbackInterceptor.InterceptCallback(options, callback) : callback(options);
+            callbackInterceptor.InterceptCallback(renderOptions, callback) : callback(renderOptions);
 
         if (!string.IsNullOrEmpty(result.RedirectUri))
             return Redirect(result.RedirectUri);

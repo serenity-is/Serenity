@@ -4,7 +4,6 @@
     <TargetFramework>net10.0</TargetFramework>
     <Title>Serenity Platform - Services Library</Title>
     <Description>Contains classes for CRUD service / repository implementations...</Description>
-    <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\core\Serenity.Net.Core.csproj" />

@@ -14,7 +14,7 @@ namespace Serenity.Web;
 /// </summary>
 public sealed class NodeScriptRunner : IDisposable
 {
-    private Process npmProcess;
+    private Process? npmProcess;
     private EventedStreamReader StdOut { get; }
     private EventedStreamReader StdErr { get; }
 
@@ -32,9 +32,9 @@ public sealed class NodeScriptRunner : IDisposable
     /// <param name="applicationStoppingToken">A token that stops the process when the application is shutting down.</param>
     /// <exception cref="ArgumentException">One of the required arguments is null or empty.</exception>
     public NodeScriptRunner(string scriptName, 
-        string arguments = null, string workingDirectory = null,
-        IDictionary<string, string> envVars = null, string pkgManagerCommand = "node", 
-        DiagnosticSource diagnosticSource = null, CancellationToken applicationStoppingToken = default)
+        string? arguments = null, string? workingDirectory = null,
+        IDictionary<string, string>? envVars = null, string pkgManagerCommand = "node", 
+        DiagnosticSource? diagnosticSource = null, CancellationToken applicationStoppingToken = default)
     {
         if (string.IsNullOrEmpty(workingDirectory))
         {
@@ -87,7 +87,7 @@ public sealed class NodeScriptRunner : IDisposable
 
         applicationStoppingToken.Register(((IDisposable)this).Dispose);
 
-        if (diagnosticSource.IsEnabled("Microsoft.AspNetCore.NodeServices.Npm.NpmStarted"))
+        if (diagnosticSource != null && diagnosticSource.IsEnabled("Microsoft.AspNetCore.NodeServices.Npm.NpmStarted"))
         {
             WriteDiagnosticEvent(
                 diagnosticSource,

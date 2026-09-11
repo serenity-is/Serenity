@@ -16,7 +16,7 @@ internal class AutoValidateAntiforgeryIgnoreBearerFilter : IAsyncAuthorizationFi
 
     private readonly IAntiforgery antiforgery;
     private readonly IOptions<AntiforgeryFilterOptions> options;
-    private readonly ILogger logger;
+    private readonly ILogger? logger;
 
     public AutoValidateAntiforgeryIgnoreBearerFilter(
         IAntiforgery antiforgery, 
@@ -69,7 +69,7 @@ internal class AutoValidateAntiforgeryIgnoreBearerFilter : IAsyncAuthorizationFi
             return false;
         }
 
-        string authorization = context.HttpContext.Request.Headers[HeaderNames.Authorization];
+        string? authorization = context.HttpContext.Request.Headers[HeaderNames.Authorization];
         var cookie = context.HttpContext.Request.Headers[HeaderNames.Cookie];
         
         if (!string.IsNullOrEmpty(authorization) && 

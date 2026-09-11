@@ -27,7 +27,9 @@ public class FormScriptRegistration
         foreach (var type in typeSource.GetTypesWithAttribute(typeof(FormScriptAttribute)))
         {
             var attr = type.GetCustomAttribute<FormScriptAttribute>();
-            var key = attr.Key ?? type.FullName;
+            if (attr == null)
+                continue;
+            var key = attr.Key ?? type.FullName!;
             var script = new FormScript(key, type, propertyProvider, serviceProvider);
             scriptManager.Register(script);
             scripts.Add(script);

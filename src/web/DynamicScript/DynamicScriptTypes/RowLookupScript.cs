@@ -20,7 +20,8 @@ public class RowLookupScript<TRow> : LookupScript
     /// <param name="query">The query.</param>
     protected virtual void ApplyOrder(SqlQuery query)
     {
-        var row = (IRow)(query as ISqlQueryExtensible).FirstIntoRow;
+        var ext = (ISqlQueryExtensible)query;
+        var row = (IRow)ext.FirstIntoRow!;
 
         if (row.NameField is not null)
             query.OrderBy(row.NameField);
@@ -34,7 +35,8 @@ public class RowLookupScript<TRow> : LookupScript
     /// <param name="query">The SQL query.</param>
     protected virtual void PrepareQuery(SqlQuery query)
     {
-        var row = (IRow)(query as ISqlQueryExtensible).FirstIntoRow;
+        var ext = (ISqlQueryExtensible)query;
+        var row = (IRow)ext.FirstIntoRow!;
 
         if (row.IdField is not null)
             query.Select(row.IdField);

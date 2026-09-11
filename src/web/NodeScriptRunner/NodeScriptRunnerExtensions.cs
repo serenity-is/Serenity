@@ -26,8 +26,8 @@ public static class NodeScriptRunnerExtensions
     /// <param name="envVars">Optional environment variables to set for the process.</param>
     /// <param name="pkgManagerCommand">The package manager command (defaults to <c>node</c>).</param>
     public static void StartNodeScript(this IApplicationBuilder appBuilder, string scriptName, 
-        string arguments = null, string workingDirectory = null, 
-        IDictionary<string, string> envVars = null, string pkgManagerCommand = "node")
+        string? arguments = null, string? workingDirectory = null, 
+        IDictionary<string, string>? envVars = null, string pkgManagerCommand = "node")
     {
         var applicationStoppingToken = appBuilder.ApplicationServices
             .GetRequiredService<IHostApplicationLifetime>().ApplicationStopping;
@@ -48,14 +48,14 @@ public static class NodeScriptRunnerExtensions
     /// <param name="envVars">Optional environment variables to set for the process.</param>
     /// <param name="pkgManagerCommand">The package manager command (defaults to <c>node</c>).</param>
     public static void UseNodeScriptRunner(this IApplicationBuilder appBuilder,
-        string workingDirectory = null, IDictionary<string, string> envVars = null, string pkgManagerCommand = "node")
+        string? workingDirectory = null, IDictionary<string, string>? envVars = null, string pkgManagerCommand = "node")
     {
         var configuration = appBuilder.ApplicationServices.GetRequiredService<IConfiguration>();
         if (configuration["StartNodeScripts"] is string { Length: > 0 } startNodeScripts)
             foreach (var entry in startNodeScripts.Split(';', StringSplitOptions.RemoveEmptyEntries))
             {
                 string script = entry;
-                string arguments = null;
+                string? arguments = null;
                 var idx = script.IndexOf(' ');
                 if (idx >= 0)
                 {

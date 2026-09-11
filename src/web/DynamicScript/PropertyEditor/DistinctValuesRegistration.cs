@@ -90,11 +90,11 @@ public class DistinctValuesRegistration
             }
         }
 
-        var byRowProperty = list.ToLookup(x => new Tuple<Type, string>(x.RowType, x.PropertyName));
+        var byRowProperty = list.ToLookup(x => new Tuple<Type, string>(x.RowType!, x.PropertyName!));
 
         foreach (var key in byRowProperty)
         {
-            var row = (IRow)Activator.CreateInstance(key.Key.Item1);
+            var row = (IRow)Activator.CreateInstance(key.Key.Item1)!;
 
             var script = (LookupScript)ActivatorUtilities.CreateInstance(serviceProvider,
                 typeof(DistinctValuesScript<>).MakeGenericType(key.Key.Item1), 

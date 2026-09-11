@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using System.Runtime.CompilerServices;
 
 namespace Serenity.Services;
 
@@ -12,9 +13,9 @@ namespace Serenity.Services;
 [HandleServiceException]
 public abstract class ServiceEndpoint : ControllerBase, IActionFilter, IAsyncActionFilter, IDisposable, IAsyncDisposable
 {
-    private IDbConnection connection;
-    private UnitOfWork unitOfWork;
-    private IRequestContext context;
+    private IDbConnection? connection;
+    private UnitOfWork? unitOfWork;
+    private IRequestContext? context;
 
     /// <inheritdoc />
     public void Dispose()
@@ -135,7 +136,7 @@ public abstract class ServiceEndpoint : ControllerBase, IActionFilter, IAsyncAct
         {
             try
             {
-                if (context != null && context.Exception != null)
+                if (context.Exception != null)
                     unitOfWork.Dispose();
                 else
                     unitOfWork.Commit();
@@ -152,7 +153,7 @@ public abstract class ServiceEndpoint : ControllerBase, IActionFilter, IAsyncAct
         connection?.Dispose();
         connection = null;
 
-        context.Result = (context.Result as ActionResult) ?? new Result<object>(context.Result);
+        context.Result = (context.Result as ActionResult) ?? new Result<object?>(context.Result);
     }
 
     /// <summary>
@@ -170,7 +171,7 @@ public abstract class ServiceEndpoint : ControllerBase, IActionFilter, IAsyncAct
         {
             try
             {
-                if (context != null && context.Exception != null)
+                if (context.Exception != null)
                     await unitOfWork.DisposeAsync();
                 else
                     await unitOfWork.CommitAsync();
@@ -195,7 +196,7 @@ public abstract class ServiceEndpoint : ControllerBase, IActionFilter, IAsyncAct
             connection = null;
         }
 
-        context.Result = (context.Result as ActionResult) ?? new Result<object>(context.Result);
+        context.Result = (context.Result as ActionResult) ?? new Result<object?>(context.Result);
     }
 
     /// <summary>
@@ -242,8 +243,7 @@ public abstract class ServiceEndpoint : ControllerBase, IActionFilter, IAsyncAct
         get
         {
             context ??= HttpContext?.RequestServices?.GetRequiredService<IRequestContext>();
-
-            return context;
+            return context ?? throw new InvalidOperationException($"Error reading 'Context' property of {GetType().Name}. The service endpoint has not been initialized.");
         }
         set
         {
@@ -252,17 +252,22 @@ public abstract class ServiceEndpoint : ControllerBase, IActionFilter, IAsyncAct
     }
 
     /// <summary>
+    /// Gets whether a request context (e.g. Context property) is available.
+    /// </summary>
+    protected bool HasRequestContext => (context ??= HttpContext?.RequestServices?.GetService<IRequestContext>()) != null;
+
+    /// <summary>
     /// Gets the cache from the request context.
     /// </summary>
-    protected ITwoLevelCache Cache => Context?.Cache;
+    protected ITwoLevelCache Cache => Context.Cache;
 
     /// <summary>
     /// Gets the localizer from the request context.
     /// </summary>
-    protected ITextLocalizer Localizer => Context?.Localizer;
+    protected ITextLocalizer Localizer => Context.Localizer;
 
     /// <summary>
     /// Gets the permission service from the request context.
     /// </summary>
-    protected IPermissionService Permissions => Context?.Permissions;
+    protected IPermissionService Permissions => Context.Permissions;
 }

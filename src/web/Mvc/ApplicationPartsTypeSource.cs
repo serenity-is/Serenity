@@ -10,7 +10,7 @@ namespace Serenity.Web;
 /// assemblies that reference the Serenity.Net.Web NuGet package (or Serenity.Net.Web.targets).
 /// </summary>
 public class ApplicationPartsTypeSource(ApplicationPartManager partManager,
-    bool topologicalSort = true, IFeatureToggles featureToggles = null)
+    bool topologicalSort = true, IFeatureToggles? featureToggles = null)
     : BaseAssemblyTypeSource(featureToggles)
 {
     /// <summary>
@@ -49,11 +49,11 @@ public class ApplicationPartsTypeSource(ApplicationPartManager partManager,
 
     private class SortCache
     {
-        public Assembly[] Unsorted;
-        public Assembly[] Sorted;
+        public required Assembly[] Unsorted;
+        public required Assembly[] Sorted;
     }
 
-    private SortCache sortCache;
+    private SortCache? sortCache;
 
     /// <inheritdoc />
     public override IEnumerable<Assembly> GetAssemblies()

@@ -1,4 +1,4 @@
-﻿namespace Serenity.Reporting;
+namespace Serenity.Reporting;
 
 /// <summary>
 /// Abstraction for a report renderer that renders a report.
@@ -9,7 +9,7 @@ public interface IReportRenderer
     /// Renders a report.
     /// </summary>
     /// <param name="report">Report object</param>
-    /// <param name="options">Report render options</param>
+    /// <param name="renderOptions">Report render options</param>
     /// <returns>The render result.</returns>
-    public ReportRenderResult Render(IReport report, ReportRenderOptions options);
+    public ReportRenderResult Render(IReport report, ReportRenderOptions renderOptions);
 }

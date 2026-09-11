@@ -7,9 +7,9 @@ namespace Serenity.Web;
 /// </summary>
 public class FileWatcher : IFileWatcher, IDisposable
 {
-    private Action<string> changed;
+    private Action<string>? changed;
     private bool disposed;
-    private readonly FileSystemWatcher watcher;
+    private readonly FileSystemWatcher? watcher;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FileWatcher"/> class.
@@ -30,10 +30,10 @@ public class FileWatcher : IFileWatcher, IDisposable
             IncludeSubdirectories = true,
             NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastWrite
         };
-        watcher.Changed += (s, e) => FileChanged(e.Name);
-        watcher.Created += (s, e) => FileChanged(e.Name);
-        watcher.Deleted += (s, e) => FileChanged(e.Name);
-        watcher.Renamed += (s, e) => FileChanged(e.OldName);
+        watcher.Changed += (s, e) => { if (e.Name is not null) FileChanged(e.Name); };
+        watcher.Created += (s, e) => { if (e.Name is not null) FileChanged(e.Name); };
+        watcher.Deleted += (s, e) => { if (e.Name is not null) FileChanged(e.Name); };
+        watcher.Renamed += (s, e) => { if (e.OldName is not null) FileChanged(e.OldName); };
         watcher.EnableRaisingEvents = true;
     }
 

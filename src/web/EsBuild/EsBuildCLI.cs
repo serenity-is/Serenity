@@ -2,7 +2,7 @@ using System.Diagnostics;
 
 namespace Serenity.Web.EsBuild;
 
-internal class EsBuildCLI(string path = null)
+internal class EsBuildCLI(string? path = null)
 {
     private readonly string path = path ?? new EsBuildDownloader().Download();
 

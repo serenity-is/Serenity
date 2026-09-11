@@ -10,24 +10,24 @@ namespace Serenity.Web;
 /// </summary>
 public partial class CssBundleManager : ICssBundleManager
 {
-    private readonly object sync = new();
+    private readonly Lock sync = new();
 
     private bool isEnabled;
-    private Dictionary<string, string> bundleKeyBySourceUrl;
-    private Dictionary<string, HashSet<string>> bundleKeysBySourceUrl;
-    private HashSet<string> bundleKeys;
-    private Dictionary<string, List<string>> bundleIncludes;
+    private Dictionary<string, string>? bundleKeyBySourceUrl;
+    private Dictionary<string, HashSet<string>>? bundleKeysBySourceUrl;
+    private HashSet<string>? bundleKeys;
+    private Dictionary<string, List<string>>? bundleIncludes;
 
     private const string errorLines = "\r\n/*\r\n!!!ERROR: {0}!!!\r\n*/\r\n";
     private readonly IDynamicScriptManager scriptManager;
     private readonly ICssMinifier cssMinifier;
     private readonly IWebHostEnvironment hostEnvironment;
-    private readonly IHttpContextAccessor contextAccessor;
-    private readonly ILogger<CssBundleManager> logger;
+    private readonly IHttpContextAccessor? contextAccessor;
+    private readonly ILogger<CssBundleManager>? logger;
     private readonly CssBundlingOptions options;
 
     [ThreadStatic]
-    private static HashSet<string> recursionCheck;
+    private static HashSet<string>? recursionCheck;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CssBundleManager"/> class.
@@ -40,11 +40,11 @@ public partial class CssBundleManager : ICssBundleManager
     /// <param name="logger">The exception logger.</param>
     /// <exception cref="ArgumentNullException">One of the required arguments is <c>null</c>.</exception>
     public CssBundleManager(IOptions<CssBundlingOptions> options,
-        IDynamicScriptManager scriptManager, 
+        IDynamicScriptManager scriptManager,
         ICssMinifier cssMinifier,
         IWebHostEnvironment hostEnvironment,
-        IHttpContextAccessor contextAccessor = null, 
-        ILogger<CssBundleManager> logger = null)
+        IHttpContextAccessor? contextAccessor = null,
+        ILogger<CssBundleManager>? logger = null)
     {
         this.options = (options ?? throw new ArgumentNullException(nameof(options))).Value;
         this.scriptManager = scriptManager ?? throw new ArgumentNullException(nameof(scriptManager));
@@ -56,7 +56,7 @@ public partial class CssBundleManager : ICssBundleManager
         Reset();
         scriptManager.ScriptChanged += name =>
         {
-            HashSet<string> bundleKeys;
+            HashSet<string>? bundleKeys;
             lock (sync)
             {
                 if (bundleKeysBySourceUrl == null ||
@@ -87,16 +87,17 @@ public partial class CssBundleManager : ICssBundleManager
                     parts.Any(x => x != null &&
                         x.Contains("{.rtl}", StringComparison.OrdinalIgnoreCase)))
                 {
-                    bundles[key + ".rtl"] = parts.Select(x => x
-                        .Replace("{.rtl}", ".rtl", StringComparison.OrdinalIgnoreCase)).ToArray();
-                    bundles[key] = parts.Select(x => x
-                        .Replace("{.rtl}", "", StringComparison.OrdinalIgnoreCase)).ToArray();
+                    bundles[key + ".rtl"] = [.. parts.Select(x => x
+                        .Replace("{.rtl}", ".rtl", StringComparison.OrdinalIgnoreCase))];
+                    bundles[key] = [.. parts.Select(x => x
+                        .Replace("{.rtl}", "", StringComparison.OrdinalIgnoreCase))];
                 }
             }
 
             bundles = bundles.Keys.ToDictionary(k => k,
                 k => (bundles[k] ?? [])
                     .Select(u => BundleUtils.DoReplacements(u, settings.Replacements))
+                    .OfType<string>()
                     .Where(u => !string.IsNullOrEmpty(u))
                     .ToArray());
 
@@ -136,11 +137,11 @@ public partial class CssBundleManager : ICssBundleManager
 
                 void registerInBundle(string appRelativeUrl)
                 {
-                    if (bundleKey.IndexOf('/', StringComparison.Ordinal) < 0 && 
+                    if (bundleKey.IndexOf('/', StringComparison.Ordinal) < 0 &&
                         !bundleKeyBySourceUrl.ContainsKey(appRelativeUrl))
                         bundleKeyBySourceUrl[appRelativeUrl] = bundleKey;
 
-                    if (!bundleKeysBySourceUrl.TryGetValue(appRelativeUrl, out HashSet<string> bundleKeys))
+                    if (!bundleKeysBySourceUrl.TryGetValue(appRelativeUrl, out HashSet<string>? bundleKeys))
                     {
                         bundleKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                         bundleKeysBySourceUrl[appRelativeUrl] = [];
@@ -221,10 +222,10 @@ public partial class CssBundleManager : ICssBundleManager
                     {
                         var sourceInfo = hostEnvironment.WebRootFileProvider.GetFileInfo(sourcePath);
                         if (!sourceInfo.Exists)
-                            return string.Format(CultureInfo.CurrentCulture, errorLines, 
+                            return string.Format(CultureInfo.CurrentCulture, errorLines,
                                 string.Format(CultureInfo.CurrentCulture, "File {0} is not found!", sourcePath));
 
-                        string code = null;
+                        string? code = null;
 
                         if (minimize &&
                             !noMinimize.Contains(sourceFile) &&
@@ -309,7 +310,7 @@ public partial class CssBundleManager : ICssBundleManager
             isEnabled = true;
         }
     }
-    
+
     /// <inheritdoc/>
     public bool IsEnabled
     {
@@ -343,7 +344,7 @@ public partial class CssBundleManager : ICssBundleManager
         lock (sync)
         {
             var bi = bundleIncludes;
-            if (bi != null && bi.TryGetValue(bundleKey, out List<string> includes) && includes != null)
+            if (bi != null && bi.TryGetValue(bundleKey, out List<string>? includes) && includes != null)
                 return includes;
 
             return [];
@@ -364,7 +365,7 @@ public partial class CssBundleManager : ICssBundleManager
             return contentRelative;
 
         var question = contentRelative.IndexOf('?', StringComparison.Ordinal);
-        string query = null;
+        string? query = null;
         if (question >= 0)
         {
             query = contentRelative[question..];
@@ -387,7 +388,7 @@ public partial class CssBundleManager : ICssBundleManager
             string.IsNullOrEmpty(contentPath))
             return content;
 
-        contentPath = System.IO.Path.GetDirectoryName(contentPath)
+        contentPath = (System.IO.Path.GetDirectoryName(contentPath) ?? "")
             .Replace('\\', '/');
 
         if (string.IsNullOrWhiteSpace(contentPath))
@@ -400,7 +401,7 @@ public partial class CssBundleManager : ICssBundleManager
             contentPath += "/";
 
         var regex = CssUrlRegex();
-        return regex.Replace(content, (Match match) => "url(" +
+        return regex.Replace(content, match => "url(" +
             match.Groups["prefix"].Value +
             RewriteUrl(contentPath, match.Groups["url"].Value, rootPrefix) +
             match.Groups["suffix"].Value + ")");
@@ -409,15 +410,16 @@ public partial class CssBundleManager : ICssBundleManager
     /// <inheritdoc/>
     public string GetCssBundle(string cssUrl)
     {
-        Dictionary<string, string> bySrcUrl;
+        ArgumentNullException.ThrowIfNull(cssUrl);
+        Dictionary<string, string>? bySrcUrl;
         lock (sync)
         {
             bySrcUrl = bundleKeyBySourceUrl;
         }
 
-        string bundleKey;
+        string? bundleKey;
 
-        if (cssUrl != null && cssUrl.StartsWith("dynamic://",
+        if (cssUrl.StartsWith("dynamic://",
             StringComparison.OrdinalIgnoreCase))
         {
             var scriptName = cssUrl[10..];

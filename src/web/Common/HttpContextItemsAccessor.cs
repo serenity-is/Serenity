@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 
 namespace Serenity.Web;
 
@@ -10,11 +10,11 @@ namespace Serenity.Web;
 /// Initializes a new instance of the <see cref="HttpContextItemsAccessor"/> class.
 /// </remarks>
 /// <param name="httpContextAccessor">The HTTP context accessor.</param>
-public class HttpContextItemsAccessor(IHttpContextAccessor httpContextAccessor = null) : IHttpContextItemsAccessor
+public class HttpContextItemsAccessor(IHttpContextAccessor? httpContextAccessor = null) : IHttpContextItemsAccessor
 {
-    private readonly IHttpContextAccessor httpContextAccessor = httpContextAccessor;
+    private readonly IHttpContextAccessor? httpContextAccessor = httpContextAccessor;
 
     /// <inheritdoc/>
-    public IDictionary<object, object> Items => httpContextAccessor?.HttpContext?.Items;
+    public IDictionary<object, object?>? Items => httpContextAccessor?.HttpContext?.Items;
 }
 

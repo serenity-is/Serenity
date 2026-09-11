@@ -15,11 +15,11 @@ public class ContentHashCache : IContentHashCache
 {
     private readonly ConcurrentDictionary<string, string> hashByContentPath;
     private readonly bool cdnEnabled;
-    private readonly string cdnHttp;
-    private readonly string cdnHttps;
+    private readonly string? cdnHttp;
+    private readonly string? cdnHttps;
     private readonly IO.GlobFilter cdnFilter;
     private readonly IWebHostEnvironment hostEnvironment;
-    private readonly IHttpContextAccessor httpContextAccessor;
+    private readonly IHttpContextAccessor? httpContextAccessor;
 
     /// <summary>
     /// CDN settings for the content hash cache.
@@ -34,22 +34,22 @@ public class ContentHashCache : IContentHashCache
         /// <summary>
         /// Gets or sets the CDN URL.
         /// </summary>
-        public string Url { get; set; }
+        public string? Url { get; set; }
 
         /// <summary>
         /// Gets or sets the HTTPS URL for the CDN.
         /// </summary>
-        public string HttpsUrl { get; set; }
+        public string? HttpsUrl { get; set; }
 
         /// <summary>
         /// Gets or sets the list of include patterns.
         /// </summary>
-        public List<string> Include { get; set; }
+        public List<string> Include { get; set; } = [];
 
         /// <summary>
         /// Gets or sets the list of exclude patterns.
         /// </summary>
-        public List<string> Exclude { get; set; }
+        public List<string> Exclude { get; set; } = [];
     }
 
     /// <summary>
@@ -60,7 +60,7 @@ public class ContentHashCache : IContentHashCache
     /// <param name="httpContextAccessor">The HTTP context accessor.</param>
     /// <exception cref="ArgumentNullException"><paramref name="hostEnvironment"/> is <c>null</c>.</exception>
     public ContentHashCache(IOptions<CDNSettings> cdnSettings,
-        IWebHostEnvironment hostEnvironment, IHttpContextAccessor httpContextAccessor = null)
+        IWebHostEnvironment hostEnvironment, IHttpContextAccessor? httpContextAccessor = null)
     {
         this.hostEnvironment = hostEnvironment ?? throw new ArgumentNullException(nameof(hostEnvironment));
         this.httpContextAccessor = httpContextAccessor;
@@ -139,7 +139,7 @@ public class ContentHashCache : IContentHashCache
 
         bool isSecureConnection = httpContextAccessor?.HttpContext?.Request?.IsHttps == true;
 
-        string cdnRoot = isSecureConnection ? cdnHttps : cdnHttp;
+        string cdnRoot = (isSecureConnection ? cdnHttps : cdnHttp) ?? "";
         return UriHelper.Combine(cdnRoot, contentPath);
     }
 
@@ -208,7 +208,7 @@ public class ContentHashCache : IContentHashCache
 
         bool isSecureConnection = httpContextAccessor?.HttpContext?.Request?.IsHttps == true;
 
-        string cdnRoot = isSecureConnection ? cdnHttps : cdnHttp;
+        string cdnRoot = (isSecureConnection ? cdnHttps : cdnHttp) ?? "";
         contentUrl = VirtualPathUtility.ToAbsolute(pathBase, contentUrl);
         return UriHelper.Combine(cdnRoot, contentUrl);
     }

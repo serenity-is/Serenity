@@ -3,28 +3,21 @@ namespace Serenity.Reporting;
 /// <summary>
 /// Default report registry implementation
 /// </summary>
-public class ReportRegistry : IReportRegistry
+/// <remarks>
+/// Initializes a new instance of the class.
+/// </remarks>
+/// <param name="typeSource">The type source to search report types in</param>
+/// <param name="permissions">Permission service</param>
+/// <param name="localizer">Text localizer</param>
+/// <exception cref="ArgumentNullException"><paramref name="typeSource"/>, <paramref name="permissions"/> or <paramref name="localizer"/> is <c>null</c>.</exception>
+public class ReportRegistry(ITypeSource typeSource, IPermissionService permissions, ITextLocalizer localizer) : IReportRegistry
 {
     private Dictionary<string, Report>? reportByKey;
     private Dictionary<string, List<Report>>? reportsByCategory;
-    private readonly IEnumerable<Type> types;
-    private readonly IPermissionService permissions;
-    private readonly ITextLocalizer localizer;
-
-    /// <summary>
-    /// Initializes a new instance of the class.
-    /// </summary>
-    /// <param name="typeSource">The type source to search report types in</param>
-    /// <param name="permissions">Permission service</param>
-    /// <param name="localizer">Text localizer</param>
-    /// <exception cref="ArgumentNullException"><paramref name="typeSource"/>, <paramref name="permissions"/> or <paramref name="localizer"/> is <c>null</c>.</exception>
-    public ReportRegistry(ITypeSource typeSource, IPermissionService permissions, ITextLocalizer localizer)
-    {
-        types = (typeSource ?? throw new ArgumentNullException(nameof(typeSource)))
+    private readonly IEnumerable<Type> types = (typeSource ?? throw new ArgumentNullException(nameof(typeSource)))
             .GetTypesWithAttribute(typeof(ReportAttribute));
-        this.permissions = permissions ?? throw new ArgumentNullException(nameof(permissions));
-        this.localizer = localizer ?? throw new ArgumentNullException(nameof(localizer));
-    }
+    private readonly IPermissionService permissions = permissions ?? throw new ArgumentNullException(nameof(permissions));
+    private readonly ITextLocalizer localizer = localizer ?? throw new ArgumentNullException(nameof(localizer));
 
     /// <summary>
     /// Gets report key for the report type by looking at its ReportAttribute,
@@ -176,12 +169,12 @@ public class ReportRegistry : IReportRegistry
         /// <summary>
         /// Gets the type of the report.
         /// </summary>
-        public Type? Type { get; private set; }
+        public Type Type { get; }
 
         /// <summary>
         /// Gets the report key.
         /// </summary>
-        public string? Key { get; private set; }
+        public string Key { get; private set; }
 
         /// <summary>
         /// Gets the report permission.

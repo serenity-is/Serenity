@@ -18,10 +18,10 @@ namespace Serenity.Web;
 public class ScriptContent(byte[] content, DateTime time, CompressionLevel compressionLevel) : IScriptContent
 {
     private readonly CompressionLevel compressionLevel = compressionLevel;
-    private string hash;
+    private string? hash;
     private readonly byte[] content = content ?? throw new ArgumentNullException(nameof(content));
-    private byte[] gzipContent;
-    private byte[] brotliContent;
+    private byte[]? gzipContent;
+    private byte[]? brotliContent;
 
     /// <summary>
     /// Gets the script generation time.

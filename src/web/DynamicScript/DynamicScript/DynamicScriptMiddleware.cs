@@ -24,13 +24,14 @@ public class DynamicScriptMiddleware(RequestDelegate next)
     /// <param name="context">The HTTP context.</param>
     public Task Invoke(HttpContext context)
     {
-        bool dynJS = context.Request.Path.Value.StartsWith(dynJSPath, StringComparison.OrdinalIgnoreCase);
-        bool dynamicData = !dynJS && context.Request.Path.Value.StartsWith(dynamicDataPath, StringComparison.OrdinalIgnoreCase);
+        string path = context.Request.Path.Value ?? string.Empty;
+        bool dynJS = path.StartsWith(dynJSPath, StringComparison.OrdinalIgnoreCase);
+        bool dynamicData = !dynJS && path.StartsWith(dynamicDataPath, StringComparison.OrdinalIgnoreCase);
 
         if (!dynJS && !dynamicData)
             return next.Invoke(context);
 
-        var scriptKey = context.Request.Path.Value;
+        var scriptKey = path;
         scriptKey = scriptKey[(dynJS ? dynJSPath.Length : dynamicDataPath.Length)..];
 
         string contentType;
@@ -60,7 +61,7 @@ public class DynamicScriptMiddleware(RequestDelegate next)
     /// <param name="json"><c>true</c> to return JSON.</param>
     public async static Task ReturnScript(HttpContext context, string scriptKey, string contentType, bool json)
     {
-        IScriptContent scriptContent;
+        IScriptContent? scriptContent;
         try
         {
             scriptContent = context.RequestServices.GetRequiredService<IDynamicScriptManager>()
@@ -107,10 +108,10 @@ public class DynamicScriptMiddleware(RequestDelegate next)
         responseHeaders.CacheControl = cacheControl;
 
         var supportsBrotli = scriptContent.CanCompress &&
-            context.Request.Headers.AcceptEncoding.Any(x => x.Contains("br", StringComparison.Ordinal));
+            context.Request.Headers.AcceptEncoding.Any(x => x?.Contains("br", StringComparison.Ordinal) == true);
 
         var supportsGzip = !supportsBrotli && scriptContent.CanCompress && 
-            context.Request.Headers.AcceptEncoding.Any(x => x.Contains("gzip", StringComparison.Ordinal));
+            context.Request.Headers.AcceptEncoding.Any(x => x?.Contains("gzip", StringComparison.Ordinal) == true);
 
         byte[] contentBytes;
         if (supportsBrotli)
@@ -141,7 +142,7 @@ public class DynamicScriptMiddleware(RequestDelegate next)
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        string ifModifiedSince = context.Request.Headers.IfModifiedSince;
+        string? ifModifiedSince = context.Request.Headers.IfModifiedSince;
         if (ifModifiedSince != null && ifModifiedSince.Length > 0)
         {
             if (DateTime.TryParseExact(ifModifiedSince, "R", Invariants.DateTimeFormat, DateTimeStyles.None,

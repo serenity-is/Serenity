@@ -158,21 +158,24 @@ public class HtmlReportCallbackUrlBuilder(
     /// Gets the render URL for the specified report and options.
     /// </summary>
     /// <param name="report">The report.</param>
-    /// <param name="options">The render options.</param>
+    /// <param name="renderOptions">The render options.</param>
     /// <returns>The render URL.</returns>
-    public virtual HtmlReportRenderUrl GetRenderUrl(IReport report, ReportRenderOptions options)
+    public virtual HtmlReportRenderUrl GetRenderUrl(IReport report, ReportRenderOptions renderOptions)
     {
+        ArgumentNullException.ThrowIfNull(report);
+        ArgumentNullException.ThrowIfNull(renderOptions);
+
         var response = new HtmlReportRenderUrl();
 
-        string reportKey = options?.ReportKey;
-        if (string.IsNullOrEmpty(options?.ReportKey))
+        string reportKey = renderOptions.ReportKey;
+        if (string.IsNullOrEmpty(renderOptions.ReportKey))
             reportKey = GetReportKey(report);
 
         response.Url = GetSiteInternalUrl();
         response.Url = UriHelper.Combine(response.Url, GetRenderAction(report) +
             "?key=" + Uri.EscapeDataString(reportKey));
 
-        var reportParams = options?.ReportParams ?? JSON.Stringify(report);
+        var reportParams = renderOptions.ReportParams ?? JSON.Stringify(report);
 
         if (!string.IsNullOrEmpty(reportParams))
             response.Url += "&opt=" + Uri.EscapeDataString(reportParams);

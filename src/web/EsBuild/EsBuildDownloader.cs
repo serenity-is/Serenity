@@ -4,13 +4,13 @@ using System.Net.Http;
 
 namespace Serenity.Web.EsBuild;
 
-internal class EsBuildDownloader(IEsBuildPlatformInfo platformInfo = null, HttpClient httpClient = null) : IEsBuildDownloader
+internal class EsBuildDownloader(IEsBuildPlatformInfo? platformInfo = null, HttpClient? httpClient = null) : IEsBuildDownloader
 {
     private readonly IEsBuildPlatformInfo platformInfo = platformInfo ?? new EsBuildPlatformInfo();
     private readonly HttpClient httpClient = httpClient ?? new HttpClient();
     private static readonly SemaphoreSlim sync = new(1);
 
-    public async Task<string> DownloadAsync(string targetDirectory, string version)
+    public async Task<string> DownloadAsync(string? targetDirectory, string? version)
     {
         var executable = platformInfo.Platform switch
         {
@@ -77,7 +77,7 @@ internal class EsBuildDownloader(IEsBuildPlatformInfo platformInfo = null, HttpC
         throw new Exception("Failed to find esbuild executable in the downloaded package.");
     }
 
-    public string Download(string targetDirectory = null, string version = null) => DownloadAsync(targetDirectory, version).Result;
+    public string Download(string? targetDirectory = null, string? version = null) => DownloadAsync(targetDirectory, version).Result;
 
     public async Task<string> GetLatestVersionAsync(string binString)
     {

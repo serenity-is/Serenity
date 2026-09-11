@@ -1,4 +1,4 @@
-﻿
+
 namespace Serenity;
 
 /// <summary>
@@ -11,5 +11,5 @@ public interface ICustomValidator
     /// </summary>
     /// <param name="context">The context.</param>
     /// <returns>The validation error message, or null if the value is valid.</returns>
-    string Validate(IValidationContext context);
+    string? Validate(IValidationContext context);
 }

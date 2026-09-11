@@ -20,8 +20,8 @@ public class DefaultUploadStorage : IUploadStorage
     /// <param name="fileSystem">The file system.</param>
     /// <exception cref="ArgumentNullException">One of the arguments is <c>null</c>.</exception>
     /// <exception cref="ArgumentException"><c>Options.Url</c> or <c>Options.Path</c> is empty.</exception>
-    public DefaultUploadStorage(IOptions<UploadSettings> options, IWebHostEnvironment hostEnvironment = null,
-        IDiskUploadFileSystem fileSystem = null)
+    public DefaultUploadStorage(IOptions<UploadSettings> options, IWebHostEnvironment? hostEnvironment = null,
+        IDiskUploadFileSystem? fileSystem = null)
     {
         var opt = (options ?? throw new ArgumentNullException(nameof(options))).Value;
         ArgumentException.ThrowIfNullOrEmpty(opt.Path, "UploadSettings.Path!");

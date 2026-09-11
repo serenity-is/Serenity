@@ -7,14 +7,14 @@ namespace Serenity.Web;
 /// </summary>
 public abstract class LookupScript : DynamicScript, INamedDynamicScript, IGetScriptData
 {
-    private readonly Dictionary<string, object> lookupParams;
+    private readonly Dictionary<string, object?> lookupParams;
 
     /// <summary>
     /// Data format for a lookup script.
     /// </summary>
     /// <param name="Items">The item list.</param>
     /// <param name="Params">The lookup parameters.</param>
-    public record Data(IEnumerable Items, Dictionary<string, object> Params);
+    public record Data(IEnumerable Items, Dictionary<string, object?> Params);
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LookupScript"/> class.
@@ -63,16 +63,16 @@ public abstract class LookupScript : DynamicScript, INamedDynamicScript, IGetScr
     /// <summary>
     /// Gets the lookup parameters dictionary.
     /// </summary>
-    public Dictionary<string, object> LookupParams => lookupParams;
+    public Dictionary<string, object?> LookupParams => lookupParams;
 
     /// <summary>
     /// Gets or sets the lookup ID field.
     /// </summary>
-    public string IdField
+    public string? IdField
     {
         get
         {
-            if (lookupParams.TryGetValue("idField", out object value) && value != null)
+            if (lookupParams.TryGetValue("idField", out object? value) && value != null)
                 return value.ToString();
 
             return null;
@@ -86,11 +86,11 @@ public abstract class LookupScript : DynamicScript, INamedDynamicScript, IGetScr
     /// <summary>
     /// Gets or sets the lookup text field.
     /// </summary>
-    public string TextField
+    public string? TextField
     {
         get
         {
-            if (lookupParams.TryGetValue("textField", out object value) && value != null)
+            if (lookupParams.TryGetValue("textField", out object? value) && value != null)
                 return value.ToString();
 
             return null;
@@ -105,11 +105,11 @@ public abstract class LookupScript : DynamicScript, INamedDynamicScript, IGetScr
     /// Gets or sets the lookup parent ID field.
     /// </summary>
 
-    public string ParentIdField
+    public string? ParentIdField
     {
         get
         {
-            if (lookupParams.TryGetValue("parentIdField", out object value) && value != null)
+            if (lookupParams.TryGetValue("parentIdField", out object? value) && value != null)
                 return value.ToString();
 
             return null;
@@ -123,7 +123,7 @@ public abstract class LookupScript : DynamicScript, INamedDynamicScript, IGetScr
     /// <summary>
     /// Gets or sets the lookup key.
     /// </summary>
-    public string LookupKey { get; set; }
+    public string? LookupKey { get; set; }
 
     /// <inheritdoc/>
     public string ScriptName => "Lookup." + LookupKey;

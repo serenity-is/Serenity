@@ -26,10 +26,10 @@ public static class ServiceCollectionConfigureExtensions
                 throw new ArgumentOutOfRangeException(nameof(TOptions))));
     }
 
-    private static T GetServiceFromCollection<T>(IServiceCollection services)
+    private static T? GetServiceFromCollection<T>(IServiceCollection services)
         where T : class
     {
-        return (T)services.LastOrDefault(d =>
+        return (T?)services.LastOrDefault(d =>
             d.ServiceType == typeof(T))?.ImplementationInstance;
     }
 
@@ -44,7 +44,7 @@ public static class ServiceCollectionConfigureExtensions
     /// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="config"/> is <c>null</c>, or no <paramref name="typeSource"/> is provided and none is registered.</exception>
     public static IServiceCollection ConfigureSections(this IServiceCollection services,
-        IConfiguration config, ITypeSource typeSource = null, Func<Type, bool> predicate = null)
+        IConfiguration config, ITypeSource? typeSource = null, Func<Type, bool>? predicate = null)
     {
         ArgumentNullException.ThrowIfNull(config);
         typeSource ??= GetServiceFromCollection<ITypeSource>(services) ??

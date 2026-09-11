@@ -10,11 +10,11 @@ namespace Serenity.Web;
 /// Initializes a new instance of the <see cref="HttpContextUserAccessor"/> class.
 /// </remarks>
 /// <param name="httpContextAccessor">The HTTP context accessor.</param>
-public class HttpContextUserAccessor(IHttpContextAccessor httpContextAccessor = null) : IUserAccessor
+public class HttpContextUserAccessor(IHttpContextAccessor? httpContextAccessor = null) : IUserAccessor
 {
-    private readonly IHttpContextAccessor httpContextAccessor = httpContextAccessor;
+    private readonly IHttpContextAccessor? httpContextAccessor = httpContextAccessor;
 
     /// <inheritdoc/>
-    public ClaimsPrincipal User => httpContextAccessor?.HttpContext?.User;
+    public ClaimsPrincipal? User => httpContextAccessor?.HttpContext?.User;
 }
 

@@ -1,4 +1,4 @@
-﻿namespace Serenity.Reporting;
+namespace Serenity.Reporting;
 
 /// <summary>
 /// Interface abstraction to get HTML report render URL
@@ -9,6 +9,6 @@ public interface IHtmlReportRenderUrlBuilder
     /// Gets the render URL for the specified report. The response object implements IDisposable.
     /// </summary>
     /// <param name="report">The report.</param>
-    /// <param name="options">Report render options</param>
-    HtmlReportRenderUrl GetRenderUrl(IReport report, ReportRenderOptions options);
+    /// <param name="renderOptions">Report render options</param>
+    HtmlReportRenderUrl GetRenderUrl(IReport report, ReportRenderOptions renderOptions);
 }

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
@@ -20,7 +20,7 @@ public class HandleControllerExceptionAttribute : ExceptionFilterAttribute
             ViewName = "~/Views/Errors/ValidationError.cshtml",
             ViewData = new ViewDataDictionary<ValidationError>(new EmptyModelMetadataProvider(), context.ModelState)
             {
-                Model = new ValidationError(result.Error.Code, result.Error.Message),
+                Model = new ValidationError(result.Error?.Message ?? "") { ErrorCode = result.Error?.Code }
             }
         };
     }

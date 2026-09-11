@@ -15,7 +15,7 @@ public static partial class HtmlCspExtensions
 {
     const string NonceKey = "HtmlCspExtensions:Nonce";
 
-    private static string CspNonce(IDictionary<object, object> contextItems)
+    private static string CspNonce(IDictionary<object, object?>? contextItems)
     {
         ArgumentNullException.ThrowIfNull(contextItems);
 
@@ -123,7 +123,7 @@ public static partial class HtmlCspExtensions
         "style-src-attr"
     };
 
-    private static void AddCspDirective(IDictionary<object, object> contextItems, string directiveName, params string[] values)
+    private static void AddCspDirective(IDictionary<object, object?>? contextItems, string directiveName, params string[] values)
     {
         ArgumentNullException.ThrowIfNull(contextItems);
         ArgumentNullException.ThrowIfNull(directiveName);
@@ -173,7 +173,7 @@ public static partial class HtmlCspExtensions
             .Replace("&#39;", "'"));
     }
 
-    private static string GetCspDirective(IDictionary<object, object> contextItems, string directiveName, params string[] manualValues)
+    private static string GetCspDirective(IDictionary<object, object?>? contextItems, string directiveName, params string[] manualValues)
     {
         ArgumentNullException.ThrowIfNull(contextItems);
         ArgumentException.ThrowIfNullOrEmpty(directiveName);

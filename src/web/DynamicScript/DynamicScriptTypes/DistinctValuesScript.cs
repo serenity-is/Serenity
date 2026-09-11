@@ -53,7 +53,8 @@ public class DistinctValuesScript<TRow> : LookupScript
     /// <param name="query">The query.</param>
     protected virtual void ApplyOrder(SqlQuery query)
     {
-        var row = (IRow)(query as ISqlQueryExtensible).FirstIntoRow;
+        var ext = (ISqlQueryExtensible)query;
+        var row = (IRow)ext.FirstIntoRow!;
         query.OrderBy(GetFieldFrom(row));
     }
 
@@ -63,7 +64,8 @@ public class DistinctValuesScript<TRow> : LookupScript
     /// <param name="query">The SQL query.</param>
     protected virtual void PrepareQuery(SqlQuery query)
     {
-        var row = (IRow)(query as ISqlQueryExtensible).FirstIntoRow;
+        var ext = (ISqlQueryExtensible)query;
+        var row = (IRow)ext.FirstIntoRow!;
         var field = GetFieldFrom(row);
 
         query.Select(field)
@@ -90,7 +92,7 @@ public class DistinctValuesScript<TRow> : LookupScript
     {
         var loader = new TRow();
         var field = GetFieldFrom(loader);
-        var list = new List<object>();
+        var list = new List<object?>();
 
         var query = new SqlQuery()
             .From(loader);

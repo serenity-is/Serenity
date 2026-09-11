@@ -22,7 +22,7 @@ public partial class EmailEditorAttribute : CustomEditorAttribute, ICustomValida
     /// <summary>
     /// Gets or sets the domain.
     /// </summary>
-    public string Domain
+    public string? Domain
     {
         get { return GetOption<string>("domain"); }
         set { SetOption("domain", value); }
@@ -48,12 +48,12 @@ public partial class EmailEditorAttribute : CustomEditorAttribute, ICustomValida
     /// </summary>
     /// <param name="context">The validation context.</param>
     /// <returns>The validation error text, or <c>null</c> if the value is valid.</returns>
-    public string Validate(IValidationContext context)
+    public string? Validate(IValidationContext context)
     {
         if (context.Value == null)
             return null;
 
-        var value = context.Value.ToString();
+        var value = context.Value.ToString()!;
 
         if (!EmailPattern.IsMatch(value))
             return Web.FormValidationTexts.Email.ToString(context.Localizer);

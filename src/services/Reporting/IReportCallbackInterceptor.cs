@@ -10,5 +10,5 @@ public interface IReportCallbackInterceptor
     /// <summary>
     /// Intercepts ReportController Render action callbacks.
     /// </summary>
-    ReportRenderResult InterceptCallback(ReportRenderOptions options, Func<ReportRenderOptions, ReportRenderResult> action);
+    ReportRenderResult InterceptCallback(ReportRenderOptions renderOptions, Func<ReportRenderOptions, ReportRenderResult> action);
 }

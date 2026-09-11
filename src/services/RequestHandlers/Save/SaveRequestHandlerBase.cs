@@ -271,7 +271,7 @@ public abstract class SaveRequestHandlerBase<TRow, TSaveRequest, TSaveResponse>(
     /// <param name="field">Field</param>
     /// <param name="validator">Custom validator</param>
     /// <returns>The validation error message, or <c>null</c> if the value is valid.</returns>
-    protected virtual string CustomValidate(RowValidationContext context, Field field, ICustomValidator validator)
+    protected virtual string? CustomValidate(RowValidationContext context, Field field, ICustomValidator validator)
     {
         return validator.Validate(context);
     }

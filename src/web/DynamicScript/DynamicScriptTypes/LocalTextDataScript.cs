@@ -31,8 +31,9 @@ public partial class LocalTextDataScript(ILocalTextRegistry localTextRegistry, I
 
     private string GetLanguageId(out string packageId)
     {
-        string languageId = httpContextAccessor?.HttpContext?.Request?.Query["lang"];
-        packageId = ((string)httpContextAccessor?.HttpContext?.Request?.Query["pack"]) ?? "Site";
+        string? languageId = httpContextAccessor?.HttpContext?.Request?.Query["lang"];
+        string? pack = httpContextAccessor?.HttpContext?.Request?.Query["pack"];
+        packageId = pack ?? "Site";
 
         if (localTextPackages?.Value.ContainsKey(packageId) != true)
             packageId = "Site";
@@ -57,7 +58,7 @@ public partial class LocalTextDataScript(ILocalTextRegistry localTextRegistry, I
     /// <returns>A dictionary of local text keys and values.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="registry"/> is <c>null</c>.</exception>
     public static IDictionary<string, string> GetPackageData(ILocalTextRegistry registry,
-        string includes, string languageId, bool isPending, string packageId = null)
+        string? includes, string languageId, bool isPending, string? packageId = null)
     {
         ArgumentNullException.ThrowIfNull(registry);
 

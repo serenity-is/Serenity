@@ -36,12 +36,12 @@ public static class KnownMimeTypes
     ///   The file name whose MIME type will be determined. Only its extension part will be used.</param>
     /// <returns>
     ///   The determined mime type for the given file, or <c>null</c> if unknown.</returns>
-    public static string TryGet(string path)
+    public static string? TryGet(string path)
     {
         ArgumentNullException.ThrowIfNull(path);
 
         string ext = Path.GetExtension(path);
-        if (knownMimeTypes.TryGetValue(ext, out string mimeType))
+        if (knownMimeTypes.TryGetValue(ext, out string? mimeType))
             return mimeType;
 
         if (!contentTypeProvider.TryGetContentType(path, out mimeType))

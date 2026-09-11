@@ -16,7 +16,7 @@ internal static class BundleUtils
         expandVersion.Clear();
     }
 
-    public static string GetLatestVersion(IFileProvider fileProvider, string path, string pattern)
+    public static string? GetLatestVersion(IFileProvider fileProvider, string path, string pattern)
     {
         ArgumentNullException.ThrowIfNull(path);
 
@@ -25,15 +25,15 @@ internal static class BundleUtils
         var regex = new Regex(pattern);
 
         var files = fileProvider.GetDirectoryContents(path);
-        Version maxVersion = null;
-        string maxName = null;
+        Version? maxVersion = null;
+        string? maxName = null;
         foreach (var file in files)
         {
             var match = regex.Match(file.Name);
             if (match.Success &&
                 match.Groups.Count > 1 &&
                 match.Groups[1].Value != null &&
-                Version.TryParse(match.Groups[1].Value, out Version v) &&
+                Version.TryParse(match.Groups[1].Value, out Version? v) &&
                 (maxVersion == null || v >= maxVersion))
             {
                 maxVersion = v;
@@ -55,14 +55,14 @@ internal static class BundleUtils
         if (idx < 0)
             return scriptUrl;
 
-        if (expandVersion.TryGetValue(scriptUrl, out string result))
+        if (expandVersion.TryGetValue(scriptUrl, out string? result))
             return result;
 
         var before = scriptUrl[..idx];
         var extension = System.IO.Path.GetExtension(scriptUrl);
 
         var path = before.StartsWith("~/", StringComparison.Ordinal) ? before[2..] : before;
-        path = System.IO.Path.GetDirectoryName(path);
+        path = System.IO.Path.GetDirectoryName(path) ?? "";
 
         var beforeName = System.IO.Path.GetFileName(before);
 
@@ -74,12 +74,12 @@ internal static class BundleUtils
             return scriptUrl;
         }
 
-        result = PathHelper.ToUrl(System.IO.Path.Combine(System.IO.Path.GetDirectoryName(before), latest));
+        result = PathHelper.ToUrl(System.IO.Path.Combine(System.IO.Path.GetDirectoryName(before) ?? "", latest));
         expandVersion[scriptUrl] = result;
         return result;
     }
 
-    public static string DoReplacements(string scriptUrl, Dictionary<string, object> replacements)
+    public static string? DoReplacements(string scriptUrl, Dictionary<string, object> replacements)
     {
         int idx = 0;
         do
@@ -110,7 +110,7 @@ internal static class BundleUtils
                 return null;
 
             if (replacements == null ||
-                !replacements.TryGetValue(key, out object value))
+                !replacements.TryGetValue(key, out object? value))
             {
                 value = null;
             }
@@ -137,7 +137,7 @@ internal static class BundleUtils
                 if (value is bool b2 && b2 == true)
                     replace = "";
                 else
-                    replace = value.ToString();
+                    replace = value.ToString() ?? "";
             }
 
             scriptUrl = scriptUrl[..idx] + replace + scriptUrl[(end + 1)..];
@@ -158,7 +158,7 @@ internal static class BundleUtils
         {
             var includes = new List<string>();
 
-            if (!bundles.TryGetValue(bundleKey, out string[] sourceFiles) ||
+            if (!bundles.TryGetValue(bundleKey, out string[]? sourceFiles) ||
                 sourceFiles == null ||
                 sourceFiles.Length == 0)
                 return includes;

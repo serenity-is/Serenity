@@ -17,7 +17,7 @@ public static class ForXmlHelper
     /// </summary>
     /// <param name="forXml">The string returned from the <c>FOR XML</c> statement.</param>
     /// <returns>The enumerated row elements.</returns>
-    public static IEnumerable<XElement> Enumerate(string forXml)
+    public static IEnumerable<XElement> Enumerate(string? forXml)
     {
         forXml = forXml.TrimToNull();
         if (forXml == null)
@@ -34,7 +34,7 @@ public static class ForXmlHelper
     /// <param name="forXml">The returned <c>FOR XML</c> data.</param>
     /// <param name="readRow">The action to read a row.</param>
     /// <returns>The list of rows.</returns>
-    public static List<TRow> ToRows<TRow>(string forXml,
+    public static List<TRow> ToRows<TRow>(string? forXml,
         Action<XElement, TRow> readRow) where TRow : class, IRow, new()
     {
         var result = new List<TRow>();
@@ -60,7 +60,7 @@ public static class ForXmlHelper
     /// <param name="e">The <see cref="XElement"/>.</param>
     /// <param name="attr">The attribute name.</param>
     /// <returns>The attribute value, or <c>null</c> if not found.</returns>
-    public static string Attr(this XElement e, string attr)
+    public static string? Attr(this XElement e, string attr)
     {
         if (e == null)
             return null;

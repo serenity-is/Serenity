@@ -1,4 +1,4 @@
-﻿namespace Serenity.Web;
+namespace Serenity.Web;
 
 /// <summary>
 /// Dynamic script manager abstraction.
@@ -48,7 +48,7 @@ public interface IDynamicScriptManager
     /// <param name="name">The registered name.</param>
     /// <param name="json"><c>true</c> to get JSON data.</param>
     /// <returns>The script text.</returns>
-    string GetScriptText(string name, bool json = false);
+    string? GetScriptText(string name, bool json = false);
 
     /// <summary>
     /// Reads the content of a dynamic script.
@@ -56,7 +56,7 @@ public interface IDynamicScriptManager
     /// <param name="name">The registered name.</param>
     /// <param name="json"><c>true</c> to return JSON.</param>
     /// <returns>The script content.</returns>
-    IScriptContent ReadScriptContent(string name, bool json = false);
+    IScriptContent? ReadScriptContent(string name, bool json = false);
 
     /// <summary>
     /// Executes the callback if a script with the name is not already registered.

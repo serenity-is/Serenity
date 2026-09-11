@@ -23,7 +23,7 @@ public class AntiforgeryCookieResultFilterAttribute(IAntiforgery antiforgery) : 
         if (context.Result is ViewResult)
         {
             var tokens = antiforgery.GetAndStoreTokens(context.HttpContext);
-            context.HttpContext.Response.Cookies.Append("CSRF-TOKEN", tokens.RequestToken, 
+            context.HttpContext.Response.Cookies.Append("CSRF-TOKEN", tokens.RequestToken!, 
                 new CookieOptions() { HttpOnly = false, SameSite = SameSiteMode.Lax });
         }
     }

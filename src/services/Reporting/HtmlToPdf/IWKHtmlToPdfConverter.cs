@@ -8,5 +8,5 @@ public interface IWKHtmlToPdfConverter : IHtmlToPdfConverter
     /// <summary>
     /// Gets the path to the wkhtmltopdf executable
     /// </summary>
-    string GetExecutablePath();
+    string? GetExecutablePath();
 }

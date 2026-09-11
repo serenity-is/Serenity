@@ -23,7 +23,7 @@ public class DataScriptRegistration
 
         ArgumentNullException.ThrowIfNull(serviceProvider);
 
-        DataScriptAttribute attr;
+        DataScriptAttribute? attr;
 
         foreach (var type in typeSource.GetTypes())
         {

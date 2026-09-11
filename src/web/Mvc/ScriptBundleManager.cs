@@ -10,24 +10,24 @@ namespace Serenity.Web;
 /// </summary>
 public class ScriptBundleManager : IScriptBundleManager
 {
-    private static readonly object sync = new();
+    private static readonly Lock sync = new();
 
     private bool isEnabled;
-    private Dictionary<string, string> bundleKeyBySourceUrl;
-    private Dictionary<string, HashSet<string>> bundleKeysBySourceUrl;
-    private HashSet<string> bundleKeys;
-    private Dictionary<string, List<string>> bundleIncludes;
+    private Dictionary<string, string>? bundleKeyBySourceUrl;
+    private Dictionary<string, HashSet<string>>? bundleKeysBySourceUrl;
+    private HashSet<string>? bundleKeys;
+    private Dictionary<string, List<string>>? bundleIncludes;
 
     private const string errorLines = "\r\n//\r\n//!!!ERROR: {0}!!!\r\n//\r\n";
     private readonly IScriptMinifier scriptMinifier;
     private readonly IDynamicScriptManager scriptManager;
     private readonly IWebHostEnvironment hostEnvironment;
-    private readonly IHttpContextAccessor contextAccessor;
-    private readonly ILogger<ScriptBundleManager> logger;
+    private readonly IHttpContextAccessor? contextAccessor;
+    private readonly ILogger<ScriptBundleManager>? logger;
     private readonly ScriptBundlingOptions options;
 
     [ThreadStatic]
-    private static HashSet<string> recursionCheck;
+    private static HashSet<string>? recursionCheck;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ScriptBundleManager"/> class.
@@ -43,7 +43,7 @@ public class ScriptBundleManager : IScriptBundleManager
         IScriptMinifier scriptMinifier,
         IDynamicScriptManager scriptManager, 
         IWebHostEnvironment hostEnvironment,
-        IHttpContextAccessor contextAccessor = null, ILogger<ScriptBundleManager> logger = null)
+        IHttpContextAccessor? contextAccessor = null, ILogger<ScriptBundleManager>? logger = null)
     {
         this.options = (options ?? throw new ArgumentNullException(nameof(options))).Value;
         this.scriptMinifier = scriptMinifier ?? throw new ArgumentNullException(nameof(scriptMinifier));
@@ -55,7 +55,7 @@ public class ScriptBundleManager : IScriptBundleManager
         Reset();
         scriptManager.ScriptChanged += name =>
         {
-            HashSet<string> bundleKeys;
+            HashSet<string>? bundleKeys;
             lock (sync)
             {
                 if (bundleKeysBySourceUrl == null ||
@@ -83,6 +83,7 @@ public class ScriptBundleManager : IScriptBundleManager
             bundles = bundles.Keys.ToDictionary(k => k,
                 k => (bundles[k] ?? [])
                     .Select(u => BundleUtils.DoReplacements(u, settings.Replacements))
+                    .OfType<string>()
                     .Where(u => !string.IsNullOrEmpty(u))
                     .ToArray());
 
@@ -123,7 +124,7 @@ public class ScriptBundleManager : IScriptBundleManager
                     if (bundleKey.IndexOf('/', StringComparison.Ordinal) < 0 && !bundleKeyBySourceUrl.ContainsKey(sourceFile))
                         bundleKeyBySourceUrl[sourceFile] = bundleKey;
 
-                    if (!bundleKeysBySourceUrl.TryGetValue(sourceFile, out HashSet<string> bundleKeys))
+                    if (!bundleKeysBySourceUrl.TryGetValue(sourceFile, out HashSet<string>? bundleKeys))
                     {
                         bundleKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                         bundleKeysBySourceUrl[sourceFile] = [];
@@ -318,7 +319,7 @@ public class ScriptBundleManager : IScriptBundleManager
         lock (sync)
         {
             var bi = bundleIncludes;
-            if (bi != null && bi.TryGetValue(bundleKey, out List<string> includes) && includes != null)
+            if (bi != null && bi.TryGetValue(bundleKey, out List<string>? includes) && includes != null)
                 return includes;
 
             return [];
@@ -328,14 +329,16 @@ public class ScriptBundleManager : IScriptBundleManager
     /// <inheritdoc/>
     public string GetScriptBundle(string scriptUrl)
     {
-        Dictionary<string, string> bySrcUrl;
+        ArgumentNullException.ThrowIfNull(scriptUrl);
+
+        Dictionary<string, string>? bySrcUrl;
         lock (sync)
         {
             bySrcUrl = bundleKeyBySourceUrl;
         }
 
-        string bundleKey;
-        if (scriptUrl != null && scriptUrl.StartsWith("dynamic://",
+        string? bundleKey;
+        if (scriptUrl.StartsWith("dynamic://",
             StringComparison.OrdinalIgnoreCase))
         {
             var scriptName = scriptUrl[10..];

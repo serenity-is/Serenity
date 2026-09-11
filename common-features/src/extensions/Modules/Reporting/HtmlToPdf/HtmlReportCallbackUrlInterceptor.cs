@@ -18,11 +18,13 @@ public class HtmlReportCallbackUrlInterceptor(
     /// <summary>
     /// Intercepts a report callback, applying impersonation and transient grants from the report auth cookie.
     /// </summary>
-    /// <param name="options">The render options.</param>
+    /// <param name="renderOptions">The render options.</param>
     /// <param name="action">The callback action.</param>
     /// <returns>The report render result.</returns>
-    public ReportRenderResult InterceptCallback(ReportRenderOptions options, Func<ReportRenderOptions, ReportRenderResult> action)
+    public ReportRenderResult InterceptCallback(ReportRenderOptions renderOptions, Func<ReportRenderOptions, ReportRenderResult> action)
     {
+        ArgumentNullException.ThrowIfNull(renderOptions);
+
         IImpersonator impersonator = userAccessor as IImpersonator;
         ITransientGrantor transientGrantor = permissionService as ITransientGrantor;
         bool undoImpersonate = false;
@@ -79,7 +81,7 @@ public class HtmlReportCallbackUrlInterceptor(
                 logger.LogError(ex, "Error decrypting/applying report auth ticket");
             }
 
-            return action(options);
+            return action(renderOptions);
         }
         finally
         {

@@ -14,9 +14,9 @@ public static partial class HtmlImportMapExtensions
 
     class ImportMap
     {
-        public Dictionary<string, string> Imports { get; set; }
-        public Dictionary<string, Dictionary<string, string>> Scopes { get; set; }
-        public Dictionary<string, string> Integrity { get; set; }
+        public Dictionary<string, string>? Imports { get; set; }
+        public Dictionary<string, Dictionary<string, string>>? Scopes { get; set; }
+        public Dictionary<string, string>? Integrity { get; set; }
     }
 
     /// <summary>
@@ -33,7 +33,7 @@ public static partial class HtmlImportMapExtensions
     /// <param name="csp">Indicates whether to add a Content Security Policy directive for the module address. Set to <see
     /// langword="true"/> to add the directive; otherwise, <see langword="false"/>.</param>
     /// <param name="overwrite"><c>true</c> (default) to overwrite existing entries if any.</param>
-    public static void AddImportMapEntry(this HttpContext context, string specifier, string address, string integrity = null,
+    public static void AddImportMapEntry(this HttpContext context, string specifier, string address, string? integrity = null,
         bool? csp = null, bool overwrite = true)
     {
         ArgumentNullException.ThrowIfNull(context);

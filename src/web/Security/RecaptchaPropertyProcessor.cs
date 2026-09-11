@@ -9,9 +9,9 @@ namespace Serenity.Web;
 /// <remarks>
 /// Initializes a new instance of the <see cref="RecaptchaPropertyProcessor"/> class.
 /// </remarks>
-public class RecaptchaPropertyProcessor(IOptions<RecaptchaSettings> options = null) : PropertyProcessor
+public class RecaptchaPropertyProcessor(IOptions<RecaptchaSettings>? options = null) : PropertyProcessor
 {
-    private readonly IOptions<RecaptchaSettings> options = options;
+    private readonly IOptions<RecaptchaSettings>? options = options;
 
     /// <inheritdoc/>
     public override void Process(IPropertySource source, PropertyItem item)

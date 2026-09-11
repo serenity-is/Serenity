@@ -44,7 +44,7 @@ public class ScriptBundlingOptions : IOptions<ScriptBundlingOptions>
     /// <summary>
     /// Gets or sets a list of relative paths to not minify.
     /// </summary>
-    public string[] NoMinimize { get; set; }
+    public string[]? NoMinimize { get; set; }
 
     /// <summary>
     /// Gets the replacement dictionary for placeholders in bundle contents,

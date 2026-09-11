@@ -77,7 +77,7 @@ public static partial class HtmlScriptExtensions
     /// <param name="options">The options to pass to the module.</param>
     /// <param name="css"><c>true</c> to also include the module's CSS file.</param>
     /// <returns>The rendered module page init script.</returns>
-    public static HtmlString ModulePageInit(this IHtmlHelper html, string module, object options = null, bool css = true)
+    public static HtmlString ModulePageInit(this IHtmlHelper html, string module, object? options = null, bool css = true)
     {
         html.ViewData["ModulePageScript"] ??= module;
         return new HtmlString(
@@ -253,13 +253,12 @@ public static partial class HtmlScriptExtensions
     [GeneratedRegex(@"\?v=[0-9a-zA-Z_-]*$", RegexOptions.Compiled)]
     private static partial Regex EndingWithVersionRegexGen();
 
-    private static bool IsAlreadyIncluded(IDictionary<object, object> contextItems, string url)
+    private static bool IsAlreadyIncluded(IDictionary<object, object?> contextItems, string url)
     {
         if (string.IsNullOrEmpty(url))
             return false;
 
-        var included = (HashSet<string>)contextItems[IncludedScriptsAndCssKey];
-        if (included == null)
+        if (contextItems[IncludedScriptsAndCssKey] is not HashSet<string> included)
         {
             included = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             contextItems[IncludedScriptsAndCssKey] = included;
@@ -295,7 +294,7 @@ public static partial class HtmlScriptExtensions
             return new LocalTextScript(registry, package, includes, languageId, isPending);
         });
 
-        return scriptManager.GetScriptText(scriptName);
+        return scriptManager.GetScriptText(scriptName) ?? "";
     }
 
     /// <summary>

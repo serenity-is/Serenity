@@ -8,7 +8,7 @@ namespace Serenity.Services;
 public class ServiceEndpointModelBinderProvider : IModelBinderProvider
 {
     /// <inheritdoc/>
-    public IModelBinder GetBinder(ModelBinderProviderContext context)
+    public IModelBinder? GetBinder(ModelBinderProviderContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 

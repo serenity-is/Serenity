@@ -11,7 +11,7 @@ namespace Serenity.Reporting;
 /// WKHtmlToPdf converter class.
 /// </remarks>
 /// <param name="options">The list of options.</param>
-public class WKHtmlToPdf(IHtmlToPdfOptions options = null) : IHtmlToPdfOptions
+public class WKHtmlToPdf(IHtmlToPdfOptions? options = null) : IHtmlToPdfOptions
 {
     private readonly IHtmlToPdfOptions options = options ?? new HtmlToPdfOptions();
 
@@ -205,10 +205,10 @@ public class WKHtmlToPdf(IHtmlToPdfOptions options = null) : IHtmlToPdfOptions
     /// <summary>
     /// Gets or sets the path to the wkhtmltopdf executable.
     /// </summary>
-    public string ExecutablePath { get; set; }
+    public string? ExecutablePath { get; set; }
 
     /// <inheritdoc/>
-    public string Url { get => options.Url; set => options.Url = value; }
+    public string? Url { get => options.Url; set => options.Url = value; }
 
     /// <inheritdoc/>
     public List<string> AdditionalUrls => options.AdditionalUrls;
@@ -226,13 +226,13 @@ public class WKHtmlToPdf(IHtmlToPdfOptions options = null) : IHtmlToPdfOptions
     public bool PrintBackground { get => options.PrintBackground; set => options.PrintBackground = value; }
 
     /// <inheritdoc/>
-    public string PageHeight { get => options.PageHeight; set => options.PageHeight = value; }
+    public string? PageHeight { get => options.PageHeight; set => options.PageHeight = value; }
 
     /// <inheritdoc/>
     public string PageSize { get => options.PageSize; set => options.PageSize = value; }
 
     /// <inheritdoc/>
-    public string PageWidth { get => options.PageWidth; set => options.PageWidth = value; }
+    public string? PageWidth { get => options.PageWidth; set => options.PageWidth = value; }
 
     /// <inheritdoc/>
     public bool SmartShrinking { get => options.SmartShrinking; set => options.SmartShrinking = value; }
@@ -244,28 +244,28 @@ public class WKHtmlToPdf(IHtmlToPdfOptions options = null) : IHtmlToPdfOptions
     public bool Landscape { get => options.Landscape; set => options.Landscape = value; }
 
     /// <inheritdoc/>
-    public string Zoom { get => options.Zoom; set => options.Zoom = value; }
+    public string? Zoom { get => options.Zoom; set => options.Zoom = value; }
 
     /// <inheritdoc/>
-    public string MarginLeft { get => options.MarginLeft; set => options.MarginLeft = value; }
+    public string? MarginLeft { get => options.MarginLeft; set => options.MarginLeft = value; }
 
     /// <inheritdoc/>
-    public string MarginRight { get => options.MarginRight; set => options.MarginRight = value; }
+    public string? MarginRight { get => options.MarginRight; set => options.MarginRight = value; }
 
     /// <inheritdoc/>
-    public string MarginBottom { get => options.MarginBottom; set => options.MarginBottom = value; }
+    public string? MarginBottom { get => options.MarginBottom; set => options.MarginBottom = value; }
 
     /// <inheritdoc/>
-    public string MarginTop { get => options.MarginTop; set => options.MarginTop = value; }
+    public string? MarginTop { get => options.MarginTop; set => options.MarginTop = value; }
 
     /// <inheritdoc/>
-    public string MarginsAll { set => options.MarginsAll = value; }
+    public string? MarginsAll { set => options.MarginsAll = value; }
 
     /// <inheritdoc/>
-    public string HeaderHtmlUrl { get => options.HeaderHtmlUrl; set => options.HeaderHtmlUrl = value; }
+    public string? HeaderHtmlUrl { get => options.HeaderHtmlUrl; set => options.HeaderHtmlUrl = value; }
 
     /// <inheritdoc/>
-    public string FooterHtmlUrl { get => options.FooterHtmlUrl; set => options.FooterHtmlUrl = value; }
+    public string? FooterHtmlUrl { get => options.FooterHtmlUrl; set => options.FooterHtmlUrl = value; }
 
     /// <inheritdoc/>
     public Dictionary<string, string> FooterHeaderReplace => options.FooterHeaderReplace;
@@ -282,12 +282,12 @@ public class WKHtmlToPdf(IHtmlToPdfOptions options = null) : IHtmlToPdfOptions
     /// <summary>
     /// Unused for WKHtmlToPdf
     /// </summary>
-    public Action<object> EditLaunchOptions { get => options.EditLaunchOptions; set => options.EditLaunchOptions = value; }
+    public Action<object>? EditLaunchOptions { get => options.EditLaunchOptions; set => options.EditLaunchOptions = value; }
 
     /// <summary>
     /// Unused for WKHtmlToPdf
     /// </summary>
-    public Action<object> EditPdfOptions { get => options.EditPdfOptions; set => options.EditPdfOptions = value; }
+    public Action<object>? EditPdfOptions { get => options.EditPdfOptions; set => options.EditPdfOptions = value; }
 }
 
 /// <summary>
@@ -299,5 +299,5 @@ public class HtmlToPdfConverter : WKHtmlToPdf
     /// <summary>
     /// Compatibility property for <see cref="WKHtmlToPdf.ExecutablePath"/>.
     /// </summary>
-    public string UtilityExePath { get => ExecutablePath; set => ExecutablePath = value; }
+    public string? UtilityExePath { get => ExecutablePath; set => ExecutablePath = value; }
 }

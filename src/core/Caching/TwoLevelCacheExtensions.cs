@@ -129,7 +129,7 @@ public static class TwoLevelCacheExtensions
     /// <param name="loader">The delegate that will be called to generate value, if not found in local cache,
     /// or distributed cache, or all found items are expired.</param>
     public static TItem? GetLocalStoreOnly<TItem>(this ITwoLevelCache cache, string cacheKey, TimeSpan localExpiration,
-        string groupKey, Func<TItem?> loader)
+        string groupKey, Func<TItem?>? loader)
         where TItem : class
     {
         return GetInternal(cache, cacheKey, localExpiration, TimeSpan.FromSeconds(0),
@@ -138,7 +138,7 @@ public static class TwoLevelCacheExtensions
 
     private static TItem? GetInternal<TItem>(ITwoLevelCache cache, string cacheKey,
         TimeSpan localExpiration, TimeSpan remoteExpiration,
-        string groupKey, Func<TItem?> loader, bool localOnly, bool forceReload)
+        string groupKey, Func<TItem?>? loader, bool localOnly, bool forceReload)
         where TItem : class
     {
         ulong? groupGeneration = null;

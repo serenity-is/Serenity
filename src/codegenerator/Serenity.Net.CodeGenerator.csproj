@@ -3,7 +3,8 @@
     <AssemblyName>sergen</AssemblyName>
     <OutputType>Exe</OutputType>
     <OutputPath>$(ArtifactsPath)\bin\$(MSBuildProjectName)</OutputPath>
-    <GenerateDocumentationFile>false</GenerateDocumentationFile>    
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <Nullable>annotations</Nullable>
     <RootNamespace>Serenity.CodeGenerator</RootNamespace>
     <TargetFramework>net10.0</TargetFramework>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>

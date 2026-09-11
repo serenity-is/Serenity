@@ -34,6 +34,8 @@ public class LookupScriptRegistration
                 continue;
 
             var attr = type.GetCustomAttribute<LookupScriptAttribute>();
+            if (attr == null)
+                continue;
             LookupScript script;
 
             if (typeof(IRow).IsAssignableFrom(type))
@@ -67,7 +69,7 @@ public class LookupScriptRegistration
             script.LookupKey = attr.Key ??
                 LookupScriptAttribute.AutoLookupKeyFor(type);
 
-            if (registeredType.TryGetValue(script.LookupKey, out Type otherType))
+            if (registeredType.TryGetValue(script.LookupKey, out Type? otherType))
             {
                 throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture,
                     "Types {0} and {1} has the same lookup key (\"{2}\"). " +

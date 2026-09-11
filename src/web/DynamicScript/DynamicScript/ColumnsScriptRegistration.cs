@@ -27,7 +27,9 @@ public class ColumnsScriptRegistration
         foreach (var type in typeSource.GetTypesWithAttribute(typeof(ColumnsScriptAttribute)))
         {
             var attr = type.GetCustomAttribute<ColumnsScriptAttribute>();
-            var key = attr.Key ?? type.FullName;
+            if (attr == null)
+                continue;
+            var key = attr.Key ?? type.FullName!;
             var script = new ColumnsScript(key, type, propertyProvider, serviceProvider);
             scriptManager.Register(script);
             scripts.Add(script);

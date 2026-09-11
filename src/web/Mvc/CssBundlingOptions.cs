@@ -45,7 +45,7 @@ public class CssBundlingOptions : IOptions<CssBundlingOptions>
     /// <summary>
     /// Gets or sets a list of relative paths to not minify.
     /// </summary>
-    public string[] NoMinimize { get; set; }
+    public string[]? NoMinimize { get; set; }
 
     /// <summary>
     /// Gets or sets the replacement dictionary for placeholders in bundle contents,

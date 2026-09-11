@@ -62,8 +62,8 @@ public class JsonRequestAttribute : ActionFilterAttribute
                 if (context.HttpContext.Request.Body.CanSeek)
                     context.HttpContext.Request.Body.Seek(0, SeekOrigin.Begin);
 
-                var encoding = (string)context.HttpContext.Request.Headers.ContentEncoding ?? "utf-8";
-                object obj;
+                var encoding = (string?)context.HttpContext.Request.Headers.ContentEncoding ?? "utf-8";
+                object? obj;
                 if (string.Equals(encoding, "utf-8", StringComparison.OrdinalIgnoreCase))
                 {
                     obj = await JsonSerializer.DeserializeAsync(context.HttpContext.Request.Body, prm.ParameterType,
@@ -102,14 +102,14 @@ public class JsonRequestAttribute : ActionFilterAttribute
         await next();
     }
 
-    private string FromFormOrQuery(HttpRequest request, string name)
+    private string? FromFormOrQuery(HttpRequest request, string name)
     {
         var allowForm = AllowForm && request.HasFormContentType;
         var allowQuery = AllowQuery;
         if (!allowForm && !allowQuery)
             return null;
 
-        string value;
+        string? value;
         if (allowForm)
         {
             value = request.Form[name];

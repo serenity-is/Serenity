@@ -17,7 +17,7 @@ public class NavigationLinkAttribute : NavigationItemAttribute
     /// <param name="url">The URL.</param>
     /// <param name="permission">The permission.</param>
     /// <param name="icon">The icon.</param>
-    public NavigationLinkAttribute(int order, string path, string url, object permission, string icon = null)
+    public NavigationLinkAttribute(int order, string path, string url, object? permission, string? icon = null)
         : base(order, path, url, permission, icon)
     {
     }
@@ -30,7 +30,7 @@ public class NavigationLinkAttribute : NavigationItemAttribute
     /// <param name="controller">The controller to get the URL and action from.</param>
     /// <param name="icon">The icon.</param>
     /// <param name="action">The action name.</param>
-    public NavigationLinkAttribute(int order, string path, Type controller, string icon = null, string action = "Index")
+    public NavigationLinkAttribute(int order, string path, Type controller, string? icon = null, string action = "Index")
         : this(order, path, GetUrlFromController(controller, action), 
               GetPermissionFromController(controller, action), icon)
     {
@@ -48,7 +48,7 @@ public class NavigationLinkAttribute : NavigationItemAttribute
     /// <param name="url">The URL.</param>
     /// <param name="permission">The permission.</param>
     /// <param name="icon">The icon.</param>
-    public NavigationLinkAttribute(string path, string url, object permission, string icon = null)
+    public NavigationLinkAttribute(string path, string url, object? permission, string? icon = null)
         : base(int.MaxValue, path, url, permission, icon)
     {
     }
@@ -60,7 +60,7 @@ public class NavigationLinkAttribute : NavigationItemAttribute
     /// <param name="controller">The controller to get the URL and action from.</param>
     /// <param name="icon">The icon.</param>
     /// <param name="action">The action name.</param>
-    public NavigationLinkAttribute(string path, Type controller, string icon = null, string action = "Index")
+    public NavigationLinkAttribute(string path, Type controller, string? icon = null, string action = "Index")
         : base(int.MaxValue, path, GetUrlFromController(controller, action), 
             GetPermissionFromController(controller, action), icon)
     {
@@ -103,7 +103,7 @@ public class NavigationLinkAttribute : NavigationItemAttribute
                 "Route attribute for {0} action of {1} controller is not found!",
                     action, controller.FullName));
 
-        string url = (routeAction ?? routeController).Template ?? "";
+        string url = (routeAction ?? routeController)?.Template ?? "";
 
         static bool isRooted(string url)
         {
@@ -158,7 +158,7 @@ public class NavigationLinkAttribute : NavigationItemAttribute
     /// <returns>The permission key, or <c>null</c> if none is found.</returns>
     /// <exception cref="ArgumentNullException">Controller or action is <c>null</c>.</exception>
     /// <exception cref="ArgumentOutOfRangeException">The action name is invalid.</exception>
-    public static string GetPermissionFromController(Type controller, string action)
+    public static string? GetPermissionFromController(Type controller, string action)
     {
         ArgumentNullException.ThrowIfNull(controller);
 
@@ -181,7 +181,7 @@ public class NavigationLinkAttribute : NavigationItemAttribute
     /// <returns>The list of required features, or <c>null</c> if none is found.</returns>
     /// <exception cref="ArgumentNullException">Controller or action is <c>null</c>.</exception>
     /// <exception cref="ArgumentOutOfRangeException">The action name is invalid.</exception>
-    public static string[] GetFeaturesFromController(Type controller, string action, out bool requireAny)
+    public static string[]? GetFeaturesFromController(Type controller, string action, out bool requireAny)
     {
         ArgumentNullException.ThrowIfNull(controller);
 
@@ -197,7 +197,7 @@ public class NavigationLinkAttribute : NavigationItemAttribute
         if (barrier != null && barrier.Features?.Any() == true)
         {
             requireAny = barrier.RequireAny;
-            return barrier.Features.ToArray();
+            return [.. barrier.Features];
         }
 
         return null;

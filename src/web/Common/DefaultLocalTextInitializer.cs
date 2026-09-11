@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting;
 using Serenity.Extensions.DependencyInjection;
 
 namespace Serenity.Web;
@@ -11,8 +11,8 @@ namespace Serenity.Web;
 /// <param name="rowTypeRegistry">The row type registry used to discover row texts.</param>
 /// <param name="webHostEnvironment">The web host environment used to locate the texts folder.</param>
 public class DefaultLocalTextInitializer(ITypeSource typeSource,
-    IRowTypeRegistry rowTypeRegistry = null,
-    IWebHostEnvironment webHostEnvironment = null) : ILocalTextInitializer
+    IRowTypeRegistry? rowTypeRegistry = null,
+    IWebHostEnvironment? webHostEnvironment = null) : ILocalTextInitializer
 {
     /// <inheritdoc/>
     public virtual void Initialize(ILocalTextRegistry registry)
@@ -29,7 +29,7 @@ public class DefaultLocalTextInitializer(ITypeSource typeSource,
     /// <param name="registry">The target registry.</param>
     protected virtual void AddJsonTexts(ILocalTextRegistry registry)
     {
-        ServiceCollectionExtensions.AddJsonTexts(registry,
-            webHostEnvironment?.ContentRootFileProvider, "App_Data/texts", recursive: true);
+        if (webHostEnvironment?.ContentRootFileProvider is { } fileProvider)
+            ServiceCollectionExtensions.AddJsonTexts(registry, fileProvider, "App_Data/texts", recursive: true);
     }
 }

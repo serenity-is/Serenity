@@ -3,9 +3,9 @@ using System.IO;
 
 namespace Serenity.Web.EsBuild;
 
-internal class EsBuildMinifier(ILogger<EsBuildMinifier> logger = null) : ICssMinifier, IScriptMinifier
+internal class EsBuildMinifier(ILogger<EsBuildMinifier>? logger = null) : ICssMinifier, IScriptMinifier
 {
-    private EsBuildCLI cli;
+    private EsBuildCLI? cli;
 
     private EsBuildCLI GetCLI()
     {

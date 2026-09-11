@@ -15,9 +15,9 @@ internal sealed class EventedStreamReader
     public delegate void OnReceivedLineHandler(string line);
     public delegate void OnStreamClosedHandler();
 
-    public event OnReceivedChunkHandler OnReceivedChunk;
-    public event OnReceivedLineHandler OnReceivedLine;
-    public event OnStreamClosedHandler OnStreamClosed;
+    public event OnReceivedChunkHandler? OnReceivedChunk;
+    public event OnReceivedLineHandler? OnReceivedLine;
+    public event OnStreamClosedHandler? OnStreamClosed;
 
     private readonly StreamReader _streamReader;
     private readonly StringBuilder _linesBuffer;
@@ -34,8 +34,8 @@ internal sealed class EventedStreamReader
         var tcs = new TaskCompletionSource<Match>();
         var completionLock = new object();
 
-        OnReceivedLineHandler onReceivedLineHandler = null;
-        OnStreamClosedHandler onStreamClosedHandler = null;
+        OnReceivedLineHandler? onReceivedLineHandler = null;
+        OnStreamClosedHandler? onStreamClosedHandler = null;
 
         void ResolveIfStillPending(Action applyResolution)
         {

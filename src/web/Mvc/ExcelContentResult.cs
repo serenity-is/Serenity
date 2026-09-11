@@ -23,7 +23,7 @@ public static class ExcelContentResult
     /// <param name="data">The data containing Excel file bytes.</param>
     /// <param name="downloadName">The optional download name.</param>
     /// <returns>A <see cref="FileContentResult"/>.</returns>
-    public static FileContentResult Create(byte[] data, string downloadName)
+    public static FileContentResult Create(byte[] data, string? downloadName)
     {
         var result = new FileContentResult(data, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
         {

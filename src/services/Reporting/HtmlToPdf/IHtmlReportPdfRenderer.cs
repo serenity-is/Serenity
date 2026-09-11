@@ -1,4 +1,4 @@
-﻿
+
 namespace Serenity.Reporting;
 
 /// <summary>
@@ -10,6 +10,6 @@ public interface IHtmlReportPdfRenderer
     /// Renders the specified report to PDF.
     /// </summary>
     /// <param name="report">The report.</param>
-    /// <param name="options">Report render options</param>
-    byte[] Render(IReport report, ReportRenderOptions options);
+    /// <param name="renderOptions">Report render options</param>
+    byte[] Render(IReport report, ReportRenderOptions renderOptions);
 }
