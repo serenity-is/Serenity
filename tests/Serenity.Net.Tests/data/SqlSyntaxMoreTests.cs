@@ -69,36 +69,34 @@ public class SqlSyntaxMoreTests
         Assert.Equal("[abc]", SqlSyntax.AutoBracket("[abc]", SqlServer2012Dialect.Instance));
         Assert.Null(SqlSyntax.AutoBracket(null!, SqlServer2012Dialect.Instance));
 
-        var old = SqlSettings.AutoQuotedIdentifiers;
+        var old = SqlSettings.SetLocalDialect(new MockSqlDialect(autoQuotedIdentifiers: false));
         try
         {
-            SqlSettings.AutoQuotedIdentifiers = false;
             Assert.Equal("abc", SqlSyntax.AutoBracket("abc", null));
             Assert.Equal("[select]", SqlSyntax.AutoBracket("select", null));
         }
         finally
         {
-            SqlSettings.AutoQuotedIdentifiers = old;
+            SqlSettings.SetLocalDialect(old);
         }
     }
 
     [Fact]
     public void AutoBracketValid_Checks_Identifier_Validity()
     {
-        var old = SqlSettings.AutoQuotedIdentifiers;
+        var old = SqlSettings.SetLocalDialect(new MockSqlDialect(autoQuotedIdentifiers: false));
         try
         {
-            SqlSettings.AutoQuotedIdentifiers = false;
             Assert.Equal("abc", SqlSyntax.AutoBracketValid("abc", null));
             Assert.Equal("[select]", SqlSyntax.AutoBracketValid("select", null));
 
-            SqlSettings.AutoQuotedIdentifiers = true;
+            SqlSettings.SetLocalDialect(new MockSqlDialect(autoQuotedIdentifiers: true));
             Assert.Equal("[abc]", SqlSyntax.AutoBracketValid("abc", null));
             Assert.Equal("1abc", SqlSyntax.AutoBracketValid("1abc", null));
         }
         finally
         {
-            SqlSettings.AutoQuotedIdentifiers = old;
+            SqlSettings.SetLocalDialect(old);
         }
     }
 }

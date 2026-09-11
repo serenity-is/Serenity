@@ -26,11 +26,35 @@ public static class SqlSettings
 
     /// <summary>
     /// Gets or sets the default command timeout.
+    /// Returns the local timeout if any is set through
+    /// <see cref="SetLocalCommandTimeout"/>, otherwise the default timeout.
+    /// The local timeout should be used for unit tests.
     /// </summary>
     /// <value>
     /// The default command timeout.
     /// </value>
-    public static int? DefaultCommandTimeout { get; set; }
+    public static int? DefaultCommandTimeout
+    {
+        get => localCommandTimeout.Value ?? defaultCommandTimeout;
+        set => defaultCommandTimeout = value;
+    }
+
+    /// <summary>
+    /// Sets the local command timeout for the current thread and async context.
+    /// Useful for background tasks, async methods, and testing to
+    /// set the timeout locally and for auto spawned threads.
+    /// </summary>
+    /// <param name="timeout">The timeout. Can be null.</param>
+    /// <returns>The old local timeout, if any.</returns>
+    public static int? SetLocalCommandTimeout(int? timeout)
+    {
+        var old = localCommandTimeout.Value;
+        localCommandTimeout.Value = timeout;
+        return old;
+    }
+
+    private static int? defaultCommandTimeout;
+    private static readonly AsyncLocal<int?> localCommandTimeout = new();
    
     /// <summary>
     /// Gets or sets the default dialect. Returns the local dialect if any is set through

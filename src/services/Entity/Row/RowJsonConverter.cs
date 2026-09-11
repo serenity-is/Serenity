@@ -7,14 +7,63 @@ namespace Serenity.JsonConverters;
 public class RowJsonConverter : JsonConverter<IRow>
 {
     /// <summary>
-    /// Should serialize extension
+    /// Should serialize extension.
+    /// Returns the local hook if any is set through
+    /// <see cref="SetLocalShouldSerializeExtension"/>, otherwise the default hook.
+    /// The local hook should be used for unit tests.
     /// </summary>
-    public static Func<IRow, string, bool>? ShouldSerializeExtension { get; set; }
+    public static Func<IRow, string, bool>? ShouldSerializeExtension
+    {
+        get => localShouldSerializeExtension.Value ?? defaultShouldSerializeExtension;
+        set => defaultShouldSerializeExtension = value;
+    }
 
     /// <summary>
-    /// Should deserialize extension
+    /// Should deserialize extension.
+    /// Returns the local hook if any is set through
+    /// <see cref="SetLocalShouldDeserializeExtension"/>, otherwise the default hook.
+    /// The local hook should be used for unit tests.
     /// </summary>
-    public static Func<IRow, string, bool>? ShouldDeserializeExtension { get; set; }
+    public static Func<IRow, string, bool>? ShouldDeserializeExtension
+    {
+        get => localShouldDeserializeExtension.Value ?? defaultShouldDeserializeExtension;
+        set => defaultShouldDeserializeExtension = value;
+    }
+
+    /// <summary>
+    /// Sets the local <see cref="ShouldSerializeExtension"/> hook for the current thread
+    /// and async context. Useful for background tasks, async methods, and testing to
+    /// set the hook locally without affecting other threads or tests.
+    /// </summary>
+    /// <param name="value">The hook. Can be null to use the default hook.</param>
+    /// <returns>The old local hook, if any.</returns>
+    public static Func<IRow, string, bool>? SetLocalShouldSerializeExtension(
+        Func<IRow, string, bool>? value)
+    {
+        var old = localShouldSerializeExtension.Value;
+        localShouldSerializeExtension.Value = value;
+        return old;
+    }
+
+    /// <summary>
+    /// Sets the local <see cref="ShouldDeserializeExtension"/> hook for the current thread
+    /// and async context. Useful for background tasks, async methods, and testing to
+    /// set the hook locally without affecting other threads or tests.
+    /// </summary>
+    /// <param name="value">The hook. Can be null to use the default hook.</param>
+    /// <returns>The old local hook, if any.</returns>
+    public static Func<IRow, string, bool>? SetLocalShouldDeserializeExtension(
+        Func<IRow, string, bool>? value)
+    {
+        var old = localShouldDeserializeExtension.Value;
+        localShouldDeserializeExtension.Value = value;
+        return old;
+    }
+
+    private static Func<IRow, string, bool>? defaultShouldSerializeExtension;
+    private static Func<IRow, string, bool>? defaultShouldDeserializeExtension;
+    private static readonly AsyncLocal<Func<IRow, string, bool>?> localShouldSerializeExtension = new();
+    private static readonly AsyncLocal<Func<IRow, string, bool>?> localShouldDeserializeExtension = new();
 
     /// <inheritdoc/>
     public override void Write(Utf8JsonWriter writer, IRow row, JsonSerializerOptions options)

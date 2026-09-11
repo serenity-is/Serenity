@@ -12,9 +12,16 @@ public class DecimalEditorAttributeTests
     [Fact]
     public void Constructor_AllowNegativesByDefault_True_ShouldSetAllowNegatives()
     {
-        DecimalEditorAttribute.AllowNegativesByDefault = true;
-        var attribute = new DecimalEditorAttribute();
-        Assert.True(attribute.AllowNegatives);
+        var old = DecimalEditorAttribute.SetLocalAllowNegativesByDefault(true);
+        try
+        {
+            var attribute = new DecimalEditorAttribute();
+            Assert.True(attribute.AllowNegatives);
+        }
+        finally
+        {
+            DecimalEditorAttribute.SetLocalAllowNegativesByDefault(old);
+        }
     }
 
     [Fact]

@@ -26,6 +26,32 @@ public class JsonRowConverter : JsonConverter
     }
 
     /// <summary>
+    /// Sets the local <see cref="ShouldSerializeExtension"/> hook for the current thread
+    /// and async context. Useful for background tasks, async methods, and testing to
+    /// set the hook locally without affecting other threads or tests.
+    /// </summary>
+    /// <param name="value">The hook. Can be null to use the default hook.</param>
+    /// <returns>The old local hook, if any.</returns>
+    public static Func<IRow, string, bool>? SetLocalShouldSerializeExtension(
+        Func<IRow, string, bool>? value)
+    {
+        return JsonConverters.RowJsonConverter.SetLocalShouldSerializeExtension(value);
+    }
+
+    /// <summary>
+    /// Sets the local <see cref="ShouldDeserializeExtension"/> hook for the current thread
+    /// and async context. Useful for background tasks, async methods, and testing to
+    /// set the hook locally without affecting other threads or tests.
+    /// </summary>
+    /// <param name="value">The hook. Can be null to use the default hook.</param>
+    /// <returns>The old local hook, if any.</returns>
+    public static Func<IRow, string, bool>? SetLocalShouldDeserializeExtension(
+        Func<IRow, string, bool>? value)
+    {
+        return JsonConverters.RowJsonConverter.SetLocalShouldDeserializeExtension(value);
+    }
+
+    /// <summary>
     ///   Writes the JSON representation of the object.</summary>
     /// <param name="writer">
     ///   The <see cref="JsonWriter"/> to write to.</param>

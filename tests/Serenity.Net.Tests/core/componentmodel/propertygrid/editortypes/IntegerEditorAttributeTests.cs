@@ -12,17 +12,31 @@ public class IntegerEditorAttributeTests
     [Fact]
     public void Constructor_AllowNegativesByDefault_True_ShouldSetAllowNegatives()
     {
-        IntegerEditorAttribute.AllowNegativesByDefault = true;
-        var attribute = new IntegerEditorAttribute();
-        Assert.True(attribute.AllowNegatives);
+        var old = IntegerEditorAttribute.SetLocalAllowNegativesByDefault(true);
+        try
+        {
+            var attribute = new IntegerEditorAttribute();
+            Assert.True(attribute.AllowNegatives);
+        }
+        finally
+        {
+            IntegerEditorAttribute.SetLocalAllowNegativesByDefault(old);
+        }
     }
 
     [Fact]
     public void Constructor_AllowNegativesByDefault_False_ShouldNotSetAllowNegatives()
     {
-        IntegerEditorAttribute.AllowNegativesByDefault = false;
-        var attribute = new IntegerEditorAttribute();
-        Assert.False(attribute.AllowNegatives);
+        var old = IntegerEditorAttribute.SetLocalAllowNegativesByDefault(false);
+        try
+        {
+            var attribute = new IntegerEditorAttribute();
+            Assert.False(attribute.AllowNegatives);
+        }
+        finally
+        {
+            IntegerEditorAttribute.SetLocalAllowNegativesByDefault(old);
+        }
     }
 
     [Fact]

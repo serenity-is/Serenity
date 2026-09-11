@@ -172,7 +172,7 @@ public class RowJsonConverterTests
     {
         var row = new IdNameRow { ID = 1 };
         ((IRow)row).SetDictionaryData("Extra", "Value");
-        RowJsonConverter.ShouldSerializeExtension = (_, _) => true;
+        var old = RowJsonConverter.SetLocalShouldSerializeExtension((_, _) => true);
         try
         {
             var json = JsonSerializer.Serialize(row, NewOptions());
@@ -181,7 +181,7 @@ public class RowJsonConverterTests
         }
         finally
         {
-            RowJsonConverter.ShouldSerializeExtension = null;
+            RowJsonConverter.SetLocalShouldSerializeExtension(old);
         }
     }
 
@@ -190,21 +190,21 @@ public class RowJsonConverterTests
     {
         var row = new IdNameRow { ID = 1 };
         ((IRow)row).SetDictionaryData("Extra", "Value");
-        RowJsonConverter.ShouldSerializeExtension = (_, _) => false;
+        var old = RowJsonConverter.SetLocalShouldSerializeExtension((_, _) => false);
         try
         {
             Assert.Equal("""{"ID":1}""", JsonSerializer.Serialize(row, NewOptions()));
         }
         finally
         {
-            RowJsonConverter.ShouldSerializeExtension = null;
+            RowJsonConverter.SetLocalShouldSerializeExtension(old);
         }
     }
 
     [Fact]
     public void ShouldDeserializeExtension_StoresDictionaryData()
     {
-        RowJsonConverter.ShouldDeserializeExtension = (_, key) => key == "Extra";
+        var old = RowJsonConverter.SetLocalShouldDeserializeExtension((_, key) => key == "Extra");
         try
         {
             var row = JsonSerializer.Deserialize<IdNameRow>("""{"ID":1,"Extra":"Value"}""", NewOptions());
@@ -215,7 +215,7 @@ public class RowJsonConverterTests
         }
         finally
         {
-            RowJsonConverter.ShouldDeserializeExtension = null;
+            RowJsonConverter.SetLocalShouldDeserializeExtension(old);
         }
     }
 

@@ -252,10 +252,9 @@ public class WrappedConnectionTests_More
     [Fact]
     public void CreateCommand_DefaultCommandTimeout_Applied()
     {
-        var old = SqlSettings.DefaultCommandTimeout;
+        var old = SqlSettings.SetLocalCommandTimeout(7);
         try
         {
-            SqlSettings.DefaultCommandTimeout = 7;
             using var connection = new MockDbConnection();
             using var wrapped = new WrappedConnection(connection, SqlServer2012Dialect.Instance);
 
@@ -264,7 +263,7 @@ public class WrappedConnectionTests_More
         }
         finally
         {
-            SqlSettings.DefaultCommandTimeout = old;
+            SqlSettings.SetLocalCommandTimeout(old);
         }
     }
 

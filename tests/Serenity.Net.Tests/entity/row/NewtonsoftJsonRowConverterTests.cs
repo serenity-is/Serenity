@@ -152,36 +152,30 @@ public class NewtonsoftJsonRowConverterTests
     [Fact]
     public void ShouldSerializeExtension_DelegatesToRowJsonConverterHook()
     {
+        Func<IRow, string, bool> hook = (_, _) => true;
+        var old = JsonRowConverter.SetLocalShouldSerializeExtension(hook);
         try
         {
-            JsonConverters.RowJsonConverter.ShouldSerializeExtension = null;
-            Func<IRow, string, bool> hook = (_, _) => true;
-
-            JsonRowConverter.ShouldSerializeExtension = hook;
-
             Assert.Same(hook, JsonConverters.RowJsonConverter.ShouldSerializeExtension);
         }
         finally
         {
-            JsonConverters.RowJsonConverter.ShouldSerializeExtension = null;
+            JsonRowConverter.SetLocalShouldSerializeExtension(old);
         }
     }
 
     [Fact]
     public void ShouldDeserializeExtension_DelegatesToRowJsonConverterHook()
     {
+        Func<IRow, string, bool> hook = (_, _) => true;
+        var old = JsonRowConverter.SetLocalShouldDeserializeExtension(hook);
         try
         {
-            JsonConverters.RowJsonConverter.ShouldDeserializeExtension = null;
-            Func<IRow, string, bool> hook = (_, _) => true;
-
-            JsonRowConverter.ShouldDeserializeExtension = hook;
-
             Assert.Same(hook, JsonConverters.RowJsonConverter.ShouldDeserializeExtension);
         }
         finally
         {
-            JsonConverters.RowJsonConverter.ShouldDeserializeExtension = null;
+            JsonRowConverter.SetLocalShouldDeserializeExtension(old);
         }
     }
 
@@ -190,7 +184,7 @@ public class NewtonsoftJsonRowConverterTests
     {
         var row = new IdNameRow { ID = 1 };
         ((IRow)row).SetDictionaryData("Extra", "Value");
-        JsonRowConverter.ShouldSerializeExtension = (_, _) => true;
+        var old = JsonRowConverter.SetLocalShouldSerializeExtension((_, _) => true);
         try
         {
             var json = Newtonsoft.Json.JsonConvert.SerializeObject(row);
@@ -199,7 +193,7 @@ public class NewtonsoftJsonRowConverterTests
         }
         finally
         {
-            JsonRowConverter.ShouldSerializeExtension = null;
+            JsonRowConverter.SetLocalShouldSerializeExtension(old);
         }
     }
 
@@ -208,21 +202,21 @@ public class NewtonsoftJsonRowConverterTests
     {
         var row = new IdNameRow { ID = 1 };
         ((IRow)row).SetDictionaryData("Extra", "Value");
-        JsonRowConverter.ShouldSerializeExtension = (_, _) => false;
+        var old = JsonRowConverter.SetLocalShouldSerializeExtension((_, _) => false);
         try
         {
             Assert.Equal("""{"ID":1}""", Newtonsoft.Json.JsonConvert.SerializeObject(row));
         }
         finally
         {
-            JsonRowConverter.ShouldSerializeExtension = null;
+            JsonRowConverter.SetLocalShouldSerializeExtension(old);
         }
     }
 
     [Fact]
     public void Deserialize_WithShouldDeserializeExtension_StoresDictionaryData()
     {
-        JsonRowConverter.ShouldDeserializeExtension = (_, key) => key == "Extra";
+        var old = JsonRowConverter.SetLocalShouldDeserializeExtension((_, key) => key == "Extra");
         try
         {
             var row = Newtonsoft.Json.JsonConvert.DeserializeObject<IdNameRow>("""{"ID":1,"Extra":"Value"}""");
@@ -233,7 +227,7 @@ public class NewtonsoftJsonRowConverterTests
         }
         finally
         {
-            JsonRowConverter.ShouldDeserializeExtension = null;
+            JsonRowConverter.SetLocalShouldDeserializeExtension(old);
         }
     }
 

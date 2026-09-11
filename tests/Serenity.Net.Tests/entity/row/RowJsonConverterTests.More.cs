@@ -38,7 +38,7 @@ public class RowJsonConverterTestsMore
     [Fact]
     public void ShouldDeserializeExtension_Handles_All_Token_Types()
     {
-        RowJsonConverter.ShouldDeserializeExtension = (_, _) => true;
+        var old = RowJsonConverter.SetLocalShouldDeserializeExtension((_, _) => true);
         try
         {
             var row = JsonSerializer.Deserialize<IdNameRow>(
@@ -55,7 +55,7 @@ public class RowJsonConverterTestsMore
         }
         finally
         {
-            RowJsonConverter.ShouldDeserializeExtension = null;
+            RowJsonConverter.SetLocalShouldDeserializeExtension(old);
         }
     }
 }

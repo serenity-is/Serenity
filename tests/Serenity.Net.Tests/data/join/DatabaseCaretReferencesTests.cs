@@ -25,68 +25,60 @@ public class DatabaseCaretReferencesTests
     [Fact]
     public void Replace_Drops_ConnectionKey_When_No_Database_Name_Resolver()
     {
-        var original = DatabaseCaretReferences.GetDatabaseName;
+        var original = DatabaseCaretReferences.SetLocalGetDatabaseName(null);
         try
         {
-            DatabaseCaretReferences.GetDatabaseName = null;
-
             Assert.Equal("[Table]", DatabaseCaretReferences.Replace("[Db^Table]"));
         }
         finally
         {
-            DatabaseCaretReferences.GetDatabaseName = original;
+            DatabaseCaretReferences.SetLocalGetDatabaseName(original);
         }
     }
 
     [Fact]
     public void Replace_Drops_Reference_Without_ConnectionKey_Even_With_Resolver()
     {
-        var original = DatabaseCaretReferences.GetDatabaseName;
+        var original = DatabaseCaretReferences.SetLocalGetDatabaseName(key => "ActualDb");
         try
         {
-            DatabaseCaretReferences.GetDatabaseName = key => "ActualDb";
-
             Assert.Equal("[Table]", DatabaseCaretReferences.Replace("[^Table]"));
         }
         finally
         {
-            DatabaseCaretReferences.GetDatabaseName = original;
+            DatabaseCaretReferences.SetLocalGetDatabaseName(original);
         }
     }
 
     [Fact]
     public void Replace_Uses_Database_Name_From_Resolver()
     {
-        var original = DatabaseCaretReferences.GetDatabaseName;
+        var original = DatabaseCaretReferences.SetLocalGetDatabaseName(key =>
+        {
+            Assert.Equal("Db", key);
+            return "ActualDb";
+        });
         try
         {
-            DatabaseCaretReferences.GetDatabaseName = key =>
-            {
-                Assert.Equal("Db", key);
-                return "ActualDb";
-            };
-
             Assert.Equal("[ActualDb]", DatabaseCaretReferences.Replace("[Db^Table]"));
         }
         finally
         {
-            DatabaseCaretReferences.GetDatabaseName = original;
+            DatabaseCaretReferences.SetLocalGetDatabaseName(original);
         }
     }
 
     [Fact]
     public void Replace_Falls_Back_To_Table_When_Resolver_Returns_Empty()
     {
-        var original = DatabaseCaretReferences.GetDatabaseName;
+        var original = DatabaseCaretReferences.SetLocalGetDatabaseName(key => "");
         try
         {
-            DatabaseCaretReferences.GetDatabaseName = key => "";
-
             Assert.Equal("[Table]", DatabaseCaretReferences.Replace("[Db^Table]"));
         }
         finally
         {
-            DatabaseCaretReferences.GetDatabaseName = original;
+            DatabaseCaretReferences.SetLocalGetDatabaseName(original);
         }
     }
 
