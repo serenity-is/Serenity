@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using System.Data.Common;
 
 namespace Serenity.Services;
 
@@ -10,7 +11,7 @@ namespace Serenity.Services;
 /// Subclass of controller for service endpoints.
 /// </summary>
 [HandleServiceException]
-public abstract class ServiceEndpoint : ControllerBase, IActionFilter, IAsyncActionFilter, IDisposable
+public abstract class ServiceEndpoint : ControllerBase, IActionFilter, IAsyncActionFilter, IDisposable, IAsyncDisposable
 {
     private IDbConnection connection;
     private UnitOfWork unitOfWork;
@@ -34,6 +35,39 @@ public abstract class ServiceEndpoint : ControllerBase, IActionFilter, IAsyncAct
         unitOfWork = null;
         connection?.Dispose();
         connection = null;
+    }
+
+    /// <inheritdoc />
+    public async ValueTask DisposeAsync()
+    {
+        await DisposeAsync(disposing: true);
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// Releases all resources currently used by this <see cref="Controller"/> instance.
+    /// </summary>
+    /// <param name="disposing"><c>true</c> if this method is being invoked by the <see cref="DisposeAsync()"/> method,
+    /// otherwise <c>false</c>.</param>
+    protected virtual async ValueTask DisposeAsync(bool disposing)
+    {
+        if (unitOfWork != null)
+        {
+            var uow = unitOfWork;
+            unitOfWork = null;
+            await uow.DisposeAsync();
+        }
+
+        if (connection is DbConnection dbConnection)
+        {
+            connection = null;
+            await dbConnection.DisposeAsync();
+        }
+        else
+        {
+            connection?.Dispose();
+            connection = null;
+        }
     }
 
     /// <summary>
@@ -88,6 +122,13 @@ public abstract class ServiceEndpoint : ControllerBase, IActionFilter, IAsyncAct
     /// Called after the action method is invoked.
     /// </summary>
     /// <param name="context">The action executed context.</param>
+    /// <remarks>
+    /// This is the synchronous <see cref="IActionFilter"/> implementation and is normally
+    /// not called by MVC, as <see cref="ServiceEndpoint"/> also implements
+    /// <see cref="IAsyncActionFilter"/> and the async filter is preferred. Unless you are
+    /// explicitly invoking the synchronous filter pipeline, override
+    /// <see cref="OnActionExecutedAsync"/> instead.
+    /// </remarks>
     [NonAction]
     public virtual void OnActionExecuted(ActionExecutedContext context)
     {
@@ -111,6 +152,49 @@ public abstract class ServiceEndpoint : ControllerBase, IActionFilter, IAsyncAct
 
         connection?.Dispose();
         connection = null;
+
+        context.Result = (context.Result as ActionResult) ?? new Result<object>(context.Result);
+    }
+
+    /// <summary>
+    /// Called after the action method is invoked asynchronously.
+    /// </summary>
+    /// <param name="context">The action executed context.</param>
+    /// <remarks>
+    /// This is the async <see cref="IAsyncActionFilter"/> implementation and is the one
+    /// normally called by MVC. Override this method instead of <see cref="OnActionExecuted"/>.
+    /// </remarks>
+    [NonAction]
+    protected virtual async Task OnActionExecutedAsync(ActionExecutedContext context)
+    {
+        if (unitOfWork != null)
+        {
+            try
+            {
+                if (context != null && context.Exception != null)
+                    await unitOfWork.DisposeAsync();
+                else
+                    await unitOfWork.CommitAsync();
+            }
+            catch (InvalidOperationException)
+            {
+                // if a DDL error occurs transaction might turn into a zombie
+                // and we'll get an error here
+            }
+
+            unitOfWork = null;
+        }
+
+        if (connection is DbConnection dbConnection)
+        {
+            connection = null;
+            await dbConnection.DisposeAsync();
+        }
+        else
+        {
+            connection?.Dispose();
+            connection = null;
+        }
 
         context.Result = (context.Result as ActionResult) ?? new Result<object>(context.Result);
     }
@@ -140,14 +224,14 @@ public abstract class ServiceEndpoint : ControllerBase, IActionFilter, IAsyncAct
                 return Awaited(this, task);
             }
 
-            OnActionExecuted(task.Result);
+            return OnActionExecutedAsync(task.Result);
         }
 
         return Task.CompletedTask;
 
         static async Task Awaited(ServiceEndpoint controller, Task<ActionExecutedContext> task)
         {
-            controller.OnActionExecuted(await task);
+            await controller.OnActionExecutedAsync(await task);
         }
     }
 

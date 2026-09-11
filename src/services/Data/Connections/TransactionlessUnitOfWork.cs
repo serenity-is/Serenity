@@ -12,7 +12,7 @@
 /// </remarks>
 /// <param name="connection">The connection.</param>
 /// <exception cref="ArgumentNullException">connection</exception>
-public class TransactionlessUnitOfWork(IDbConnection connection) : IDisposable, IUnitOfWork
+public class TransactionlessUnitOfWork(IDbConnection connection) : IDisposable, IAsyncDisposable, IUnitOfWork
 {
     private readonly IDbConnection connection = connection ?? throw new ArgumentNullException(nameof(connection));
     private Action? onCommit;
@@ -44,6 +44,15 @@ public class TransactionlessUnitOfWork(IDbConnection connection) : IDisposable, 
     }
 
     /// <summary>
+    /// Invokes the rollback events asynchronously, as there is no underlying transaction to roll back.
+    /// </summary>
+    public ValueTask DisposeAsync()
+    {
+        Dispose();
+        return default;
+    }
+
+    /// <summary>
     /// Does nothing other than calling onCommit events as there
     /// is no underlying transaction.
     /// </summary>
@@ -62,6 +71,16 @@ public class TransactionlessUnitOfWork(IDbConnection connection) : IDisposable, 
         {
             onCommit = null;
         }
+    }
+
+    /// <summary>
+    /// Does nothing other than calling onCommit events asynchronously as there
+    /// is no underlying transaction.
+    /// </summary>
+    public Task CommitAsync(CancellationToken cancellationToken = default)
+    {
+        Commit();
+        return Task.CompletedTask;
     }
 
     /// <summary>

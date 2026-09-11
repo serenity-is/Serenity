@@ -189,4 +189,39 @@ public static class EndpointExtensions
 
         return new Result<TResponse>(response);
     }
+
+    /// <summary>
+    /// Executes a callback by passing a unit of work object asynchronously and converts
+    /// any exception raised inside to a service response.
+    /// </summary>
+    /// <typeparam name="TResponse">The response type.</typeparam>
+    /// <param name="controller">The controller.</param>
+    /// <param name="connectionKey">The connection key.</param>
+    /// <param name="handler">The handler callback.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>The action result.</returns>
+    public static async Task<Result<TResponse>> InTransactionAsync<TResponse>(this ControllerBase controller, 
+        string connectionKey, Func<IUnitOfWork, CancellationToken, Task<TResponse>> handler,
+        CancellationToken cancellationToken = default)
+        where TResponse : ServiceResponse, new()
+    {
+        TResponse response;
+        try
+        {
+            var factory = controller.HttpContext.RequestServices.GetRequiredService<ISqlConnections>();
+
+            using var connection = factory.NewByKey(connectionKey);
+            await using var uow = new UnitOfWork(connection);
+            response = await handler(uow, cancellationToken);
+            await uow.CommitAsync(cancellationToken);
+        }
+        catch (Exception exception)
+        {
+            response = exception.ConvertToResponse<TResponse>(controller.HttpContext);
+            controller.HttpContext.Response.Clear();
+            controller.HttpContext.Response.StatusCode = exception is ValidationError ? 400 : 500;
+        }
+
+        return new Result<TResponse>(response);
+    }
 }

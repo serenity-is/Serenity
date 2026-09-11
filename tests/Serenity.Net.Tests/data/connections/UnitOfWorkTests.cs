@@ -1,3 +1,6 @@
+using System.Data.Common;
+using System.Threading;
+
 namespace Serenity.Data;
 
 public class UnitOfWorkTests
@@ -526,6 +529,116 @@ public class UnitOfWorkTests
         Assert.Equal(0, connection.Transaction.RollbackCalls);
     }
 
+    [Fact]
+    public async Task CommitAsync_Uses_DbTransaction_CommitAsync()
+    {
+        using var connection = new UnitOfWorkTestDbConnection();
+        var uow = new UnitOfWork(connection);
+        await uow.CommitAsync(TestContext.Current.CancellationToken);
+        Assert.Equal(1, connection.Transaction.CommitAsyncCalls);
+        Assert.Equal(0, connection.Transaction.CommitCalls);
+    }
+
+    [Fact]
+    public async Task CommitAsync_FallsBackTo_Sync_Commit_For_NonDbTransaction()
+    {
+        using var connection = new UnitOfWorkTestConnection();
+        var uow = new UnitOfWork(connection);
+        await uow.CommitAsync(TestContext.Current.CancellationToken);
+        Assert.Equal(1, connection.Transaction.CommitCalls);
+    }
+
+    [Fact]
+    public async Task CommitAsync_Raises_Error_If_Already_Committed()
+    {
+        using var connection = new UnitOfWorkTestDbConnection();
+        var uow = new UnitOfWork(connection);
+        await uow.CommitAsync(TestContext.Current.CancellationToken);
+        await Assert.ThrowsAsync<InvalidOperationException>(
+            () => uow.CommitAsync(TestContext.Current.CancellationToken));
+        Assert.Equal(1, connection.Transaction.CommitAsyncCalls);
+    }
+
+    [Fact]
+    public async Task CommitAsync_Calls_OnCommit_EvenIf_TransactionNotStarted_WhenDeferStartIsTrue()
+    {
+        using var connection = new UnitOfWorkTestConnection();
+        var uow = new UnitOfWork(connection, deferStart: true);
+        var commitCalls = 0;
+        uow.OnCommit += () => commitCalls++;
+        await uow.CommitAsync(TestContext.Current.CancellationToken);
+        Assert.Null(connection.Transaction);
+        Assert.Equal(1, commitCalls);
+    }
+
+    [Fact]
+    public async Task CommitAsync_DoesNotCall_OnCommit_When_CommitAsync_Raises_An_Error()
+    {
+        using var connection = new UnitOfWorkTestDbConnection();
+        var uow = new UnitOfWork(connection);
+        int commitCalls = 0;
+        uow.OnCommit += () => commitCalls++;
+        connection.Transaction.ThrowOnCommitAsync = true;
+        await Assert.ThrowsAsync<NotImplementedException>(
+            () => uow.CommitAsync(TestContext.Current.CancellationToken));
+        Assert.Equal(0, commitCalls);
+    }
+
+    [Fact]
+    public async Task DisposeAsync_Uses_DbTransaction_DisposeAsync()
+    {
+        using var connection = new UnitOfWorkTestDbConnection();
+        var uow = new UnitOfWork(connection);
+        await uow.DisposeAsync();
+        Assert.Equal(1, connection.Transaction.DisposeAsyncCalls);
+        Assert.Equal(0, connection.Transaction.DisposeCalls);
+    }
+
+    [Fact]
+    public async Task DisposeAsync_FallsBackTo_Sync_Dispose_For_NonDbTransaction()
+    {
+        using var connection = new UnitOfWorkTestConnection();
+        var uow = new UnitOfWork(connection);
+        await uow.DisposeAsync();
+        Assert.Equal(1, connection.Transaction.DisposeCalls);
+    }
+
+    [Fact]
+    public async Task DisposeAsync_Calls_Rollback_And_DoesNot_Dispose_Twice()
+    {
+        using var connection = new UnitOfWorkTestDbConnection();
+        var uow = new UnitOfWork(connection);
+        int rollbackCalls = 0;
+        uow.OnRollback += () => rollbackCalls++;
+        await uow.DisposeAsync();
+        await uow.DisposeAsync();
+        Assert.Equal(1, rollbackCalls);
+        Assert.Equal(1, connection.Transaction.DisposeAsyncCalls);
+    }
+
+    [Fact]
+    public async Task DisposeAsync_Calls_Rollback_Even_When_DisposeAsync_Raises_An_Error()
+    {
+        using var connection = new UnitOfWorkTestDbConnection();
+        var uow = new UnitOfWork(connection);
+        int rollbackCalls = 0;
+        uow.OnRollback += () => rollbackCalls++;
+        connection.Transaction.ThrowOnDisposeAsync = true;
+        await Assert.ThrowsAsync<NotImplementedException>(async () => await uow.DisposeAsync());
+        Assert.Equal(1, rollbackCalls);
+    }
+
+    [Fact]
+    public async Task AwaitUsing_Disposes_Transaction_Asynchronously()
+    {
+        using var connection = new UnitOfWorkTestDbConnection();
+        await using (var uow = new UnitOfWork(connection))
+        {
+        }
+
+        Assert.Equal(1, connection.Transaction.DisposeAsyncCalls);
+    }
+
     private class UnitOfWorkTestConnection : IDbConnection
     {
         public string ConnectionString { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
@@ -625,6 +738,81 @@ public class UnitOfWorkTests
             RollbackCalls++;
             if (ThrowOnRollback) 
                 throw new NotImplementedException();
+        }
+    }
+
+    private class UnitOfWorkTestDbConnection : DbConnection
+    {
+        private ConnectionState state = ConnectionState.Closed;
+
+        public override string ConnectionString { get; set; }
+        public override string Database => throw new NotImplementedException();
+        public override string DataSource => throw new NotImplementedException();
+        public override string ServerVersion => throw new NotImplementedException();
+        public override ConnectionState State => state;
+        public override int ConnectionTimeout => throw new NotImplementedException();
+
+        public UnitOfWorkTestDbTransaction Transaction { get; private set; }
+
+        protected override DbTransaction BeginDbTransaction(IsolationLevel isolationLevel)
+        {
+            if (state != ConnectionState.Open)
+                throw new InvalidOperationException("BeginTransaction called for a closed connection!");
+
+            Transaction ??= new UnitOfWorkTestDbTransaction(this);
+            return Transaction;
+        }
+
+        public override void ChangeDatabase(string databaseName) => throw new NotImplementedException();
+        public override void Close() => state = ConnectionState.Closed;
+        protected override DbCommand CreateDbCommand() => throw new NotImplementedException();
+        public override void Open() => state = ConnectionState.Open;
+    }
+
+    private class UnitOfWorkTestDbTransaction(DbConnection connection) : DbTransaction
+    {
+        private readonly DbConnection connection = connection;
+
+        protected override DbConnection DbConnection => connection;
+        public override IsolationLevel IsolationLevel => IsolationLevel.Unspecified;
+
+        public int CommitCalls { get; private set; }
+        public int CommitAsyncCalls { get; private set; }
+        public int DisposeCalls { get; private set; }
+        public int DisposeAsyncCalls { get; private set; }
+        public bool ThrowOnCommitAsync { get; set; }
+        public bool ThrowOnDisposeAsync { get; set; }
+
+        public override void Commit() => CommitCalls++;
+
+        public override void Rollback()
+        {
+        }
+
+        public override Task CommitAsync(CancellationToken cancellationToken = default)
+        {
+            CommitAsyncCalls++;
+            if (ThrowOnCommitAsync)
+                throw new NotImplementedException();
+
+            return Task.CompletedTask;
+        }
+
+        public override ValueTask DisposeAsync()
+        {
+            DisposeAsyncCalls++;
+            if (ThrowOnDisposeAsync)
+                throw new NotImplementedException();
+
+            return default;
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+                DisposeCalls++;
+
+            base.Dispose(disposing);
         }
     }
 }

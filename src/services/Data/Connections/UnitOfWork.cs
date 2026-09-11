@@ -152,6 +152,39 @@ public class UnitOfWork : IDisposable, IUnitOfWork
     }
 
     /// <summary>
+    /// Rollbacks the transaction if any and calls onRollback event asynchronously.
+    /// </summary>
+    public async ValueTask DisposeAsync()
+    {
+        if (disposed)
+            return;
+
+        UnbindStateChange();
+
+        onCommit = null;
+        try
+        {
+            try
+            {
+                if (transaction is DbTransaction dbTransaction)
+                    await dbTransaction.DisposeAsync().ConfigureAwait(false);
+                else
+                    transaction?.Dispose();
+            }
+            finally
+            {
+                onRollback?.Invoke();
+            }
+        }
+        finally
+        {
+            transaction = null;
+            onRollback = null;
+            disposed = true;
+        }
+    }
+
+    /// <summary>
     /// Commits this transaction.
     /// </summary>
     /// <exception cref="ArgumentNullException">transaction</exception>
@@ -161,6 +194,29 @@ public class UnitOfWork : IDisposable, IUnitOfWork
             throw new InvalidOperationException("Transaction is already committed!");
          
         transaction?.Commit();
+        AfterCommit();
+    }
+
+    /// <summary>
+    /// Commits this transaction asynchronously.
+    /// </summary>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <exception cref="InvalidOperationException">Transaction is already committed!</exception>
+    public async Task CommitAsync(CancellationToken cancellationToken = default)
+    {
+        if (commited)
+            throw new InvalidOperationException("Transaction is already committed!");
+
+        if (transaction is DbTransaction dbTransaction)
+            await dbTransaction.CommitAsync(cancellationToken).ConfigureAwait(false);
+        else
+            transaction?.Commit();
+
+        AfterCommit();
+    }
+
+    private void AfterCommit()
+    {
         commited = true;
 
         onRollback = null;
