@@ -14,7 +14,7 @@ namespace Serenity.Web;
 /// </summary>
 public sealed class NodeScriptRunner : IDisposable
 {
-    private Process? npmProcess;
+    private IStartedProcess? npmProcess;
     private EventedStreamReader StdOut { get; }
     private EventedStreamReader StdErr { get; }
 
@@ -30,11 +30,14 @@ public sealed class NodeScriptRunner : IDisposable
     /// <param name="pkgManagerCommand">The package manager command. Defaults to <c>node</c>.</param>
     /// <param name="diagnosticSource">The diagnostics source used to emit start events.</param>
     /// <param name="applicationStoppingToken">A token that stops the process when the application is shutting down.</param>
+    /// <param name="processFactory">An optional factory used to create the process, mainly for testing.</param>
     /// <exception cref="ArgumentException">One of the required arguments is null or empty.</exception>
-    public NodeScriptRunner(string scriptName, 
+    public NodeScriptRunner(string scriptName,
         string? arguments = null, string? workingDirectory = null,
-        IDictionary<string, string>? envVars = null, string pkgManagerCommand = "node", 
-        DiagnosticSource? diagnosticSource = null, CancellationToken applicationStoppingToken = default)
+        IDictionary<string, string>? envVars = null, string pkgManagerCommand = "node",
+        DiagnosticSource? diagnosticSource = null,
+        Func<ProcessStartInfo, IStartedProcess>? processFactory = null,
+        CancellationToken applicationStoppingToken = default)
     {
         if (string.IsNullOrEmpty(workingDirectory))
         {
@@ -81,7 +84,23 @@ public sealed class NodeScriptRunner : IDisposable
             }
         }
 
-        npmProcess = LaunchNodeProcess(processStartInfo, pkgManagerCommand);
+        try
+        {
+            npmProcess = processFactory?.Invoke(processStartInfo) ??
+                new StartedProcess(Process.Start(processStartInfo) ??
+                    throw new InvalidOperationException("Could not start NPM process!"));
+            npmProcess.EnableRaisingEvents = true;
+        }
+        catch (Exception ex)
+        {
+            var message = $"Failed to start '{pkgManagerCommand}'. To resolve this:.\n\n"
+                        + $"[1] Ensure that '{pkgManagerCommand}' is installed and can be found in one of the PATH directories.\n"
+                        + $"    Current PATH enviroment variable is: {Environment.GetEnvironmentVariable("PATH")}\n"
+                        + "    Make sure the executable is in one of those directories, or update your PATH.\n\n"
+                        + "[2] See the InnerException for further details of the cause.";
+            throw new InvalidOperationException(message, ex);
+        }
+
         StdOut = new EventedStreamReader(npmProcess.StandardOutput);
         StdErr = new EventedStreamReader(npmProcess.StandardError);
 
@@ -157,28 +176,6 @@ public sealed class NodeScriptRunner : IDisposable
 
     private static string StripAnsiColors(string line)
         => AnsiColorRegex.Replace(line, string.Empty);
-
-    private static Process LaunchNodeProcess(ProcessStartInfo startInfo, string commandName)
-    {
-        try
-        {
-            var process = Process.Start(startInfo)!;
-
-            // See equivalent comment in OutOfProcessNodeInstance.cs for why
-            process.EnableRaisingEvents = true;
-
-            return process;
-        }
-        catch (Exception ex)
-        {
-            var message = $"Failed to start '{commandName}'. To resolve this:.\n\n"
-                        + $"[1] Ensure that '{commandName}' is installed and can be found in one of the PATH directories.\n"
-                        + $"    Current PATH enviroment variable is: {Environment.GetEnvironmentVariable("PATH")}\n"
-                        + "    Make sure the executable is in one of those directories, or update your PATH.\n\n"
-                        + "[2] See the InnerException for further details of the cause.";
-            throw new InvalidOperationException(message, ex);
-        }
-    }
 
     void IDisposable.Dispose()
     {

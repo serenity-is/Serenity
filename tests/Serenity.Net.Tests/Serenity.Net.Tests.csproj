@@ -1,4 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RunSettingsFilePath>$(MSBuildProjectDirectory)\coverlet.runsettings</RunSettingsFilePath>
+  </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\web\Serenity.Net.Web.csproj" />
     <PackageReference Include="TSQL.Parser" Version="2.6.0" />

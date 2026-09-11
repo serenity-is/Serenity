@@ -25,9 +25,11 @@ public static class NodeScriptRunnerExtensions
     /// <param name="workingDirectory">The working directory; defaults to the content root path.</param>
     /// <param name="envVars">Optional environment variables to set for the process.</param>
     /// <param name="pkgManagerCommand">The package manager command (defaults to <c>node</c>).</param>
+    /// <param name="processFactory">An optional factory used to create the process, mainly for testing.</param>
     public static void StartNodeScript(this IApplicationBuilder appBuilder, string scriptName, 
         string? arguments = null, string? workingDirectory = null, 
-        IDictionary<string, string>? envVars = null, string pkgManagerCommand = "node")
+        IDictionary<string, string>? envVars = null, string pkgManagerCommand = "node",
+        Func<ProcessStartInfo, IStartedProcess>? processFactory = null)
     {
         var applicationStoppingToken = appBuilder.ApplicationServices
             .GetRequiredService<IHostApplicationLifetime>().ApplicationStopping;
@@ -36,7 +38,7 @@ public static class NodeScriptRunnerExtensions
         workingDirectory ??= appBuilder.ApplicationServices.GetRequiredService<IWebHostEnvironment>().ContentRootPath;
 
         new NodeScriptRunner(scriptName, arguments, workingDirectory, envVars, pkgManagerCommand,
-            diagnosticSource, applicationStoppingToken)
+            diagnosticSource, processFactory, applicationStoppingToken)
                 .AttachToLogger(logger);
     }
 
@@ -47,8 +49,10 @@ public static class NodeScriptRunnerExtensions
     /// <param name="workingDirectory">The working directory; defaults to the content root path.</param>
     /// <param name="envVars">Optional environment variables to set for the process.</param>
     /// <param name="pkgManagerCommand">The package manager command (defaults to <c>node</c>).</param>
+    /// <param name="processFactory">An optional factory used to create the process, mainly for testing.</param>
     public static void UseNodeScriptRunner(this IApplicationBuilder appBuilder,
-        string? workingDirectory = null, IDictionary<string, string>? envVars = null, string pkgManagerCommand = "node")
+        string? workingDirectory = null, IDictionary<string, string>? envVars = null, string pkgManagerCommand = "node",
+        Func<ProcessStartInfo, IStartedProcess>? processFactory = null)
     {
         var configuration = appBuilder.ApplicationServices.GetRequiredService<IConfiguration>();
         if (configuration["StartNodeScripts"] is string { Length: > 0 } startNodeScripts)
@@ -62,7 +66,7 @@ public static class NodeScriptRunnerExtensions
                     arguments = script[idx..].TrimToNull();
                     script = script[0..idx].Trim();
                 }
-                appBuilder.StartNodeScript(script, arguments, workingDirectory, envVars, pkgManagerCommand);
+                appBuilder.StartNodeScript(script, arguments, workingDirectory, envVars, pkgManagerCommand, processFactory);
             }
     }
 }

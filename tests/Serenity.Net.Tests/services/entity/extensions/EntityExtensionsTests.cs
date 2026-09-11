@@ -138,7 +138,7 @@ public class EntityExtensionsTests
     [Fact]
     public void GetIdField_Throws_When_No_Id_Field()
     {
-        Assert.Throws<InvalidOperationException>(() => ((IRow)new NoIdRow()).GetIdField());
+        Assert.Throws<InvalidOperationException>(() => new NoIdRow().GetIdField());
         Assert.Throws<ArgumentNullException>(() => RowExtensions.GetIdField(null!));
     }
 

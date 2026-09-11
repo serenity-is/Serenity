@@ -1,8 +1,4 @@
 #pragma warning disable CS0649
-using System.ComponentModel;
-using Microsoft.Extensions.DependencyInjection;
-using Serenity.PropertyGrid;
-
 namespace Serenity.PropertyGrid;
 
 public class DefaultPropertyItemProviderTests

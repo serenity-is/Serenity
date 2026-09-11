@@ -1,6 +1,5 @@
 #pragma warning disable CS0618
 using System.IO;
-using System.Text;
 
 namespace Serenity.Web;
 

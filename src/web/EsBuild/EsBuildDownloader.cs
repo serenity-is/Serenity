@@ -79,9 +79,11 @@ internal class EsBuildDownloader(IEsBuildPlatformInfo? platformInfo = null, Http
 
     public string Download(string? targetDirectory = null, string? version = null) => DownloadAsync(targetDirectory, version).Result;
 
+    const string KnownLatestVersion = "0.28.2";
+
     public async Task<string> GetLatestVersionAsync(string binString)
     {
-        return await Task.FromResult("0.21.4");
+        return await Task.FromResult(KnownLatestVersion);
         // var response = await _httpClient.GetAsync($"https://registry.npmjs.org/{binString}/latest");
         // response.EnsureSuccessStatusCode();
         //
@@ -91,5 +93,5 @@ internal class EsBuildDownloader(IEsBuildPlatformInfo? platformInfo = null, Http
         // return version;
     }
 
-    public string GetLatestVersionSync(string binString) => GetLatestVersionAsync(binString).Result;
+    public string GetLatestVersionSync(string binString) => KnownLatestVersion;
 }

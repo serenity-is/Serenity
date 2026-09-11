@@ -115,9 +115,9 @@ public class SqlInsertTests
         List<string>? nullList = null;
 
         Assert.Equal("INSERT INTO [T] ([A]) VALUES (1)",
-            SqlInsert.Format("T", new List<string> { "A", "1" }));
+            SqlInsert.Format("T", ["A", "1"]));
         Assert.Throws<ArgumentNullException>(() => SqlInsert.Format("T", nullList!));
-        Assert.Throws<ArgumentOutOfRangeException>(() => SqlInsert.Format("T", new List<string> { "A" }));
+        Assert.Throws<ArgumentOutOfRangeException>(() => SqlInsert.Format("T", ["A"]));
     }
 #pragma warning restore CS0618
 

@@ -197,8 +197,8 @@ public class EntitySqlHelper_Sync_Tests
         var query = CityQuery(row);
         using var reader = new MockDbDataReader(new { CityId = 1 });
 
-        query.GetFromReader(reader, new List<object>());
-        query.GetFromReader(reader, new List<object> { new() });
+        query.GetFromReader(reader, []);
+        query.GetFromReader(reader, [new()]);
     }
 
     [Fact]
@@ -210,7 +210,7 @@ public class EntitySqlHelper_Sync_Tests
             new { CityId = 1, CityName = (string?)null, CountryId = 2 });
         Assert.True(reader.Read());
 
-        CityQuery(city).GetFromReader(reader, new List<object> { other });
+        CityQuery(city).GetFromReader(reader, [other]);
 
         Assert.Equal(1, ((IRow)other).GetDictionaryData("CityId"));
         Assert.Null(((IRow)other).GetDictionaryData("CityName"));
@@ -226,7 +226,7 @@ public class EntitySqlHelper_Sync_Tests
         Assert.True(reader.Read());
 
         var ex = Assert.Throws<InvalidOperationException>(() =>
-            CityQuery(city).GetFromReader(reader, new List<object> { other }));
+            CityQuery(city).GetFromReader(reader, [other]));
         Assert.Contains("CityId", ex.Message);
     }
 }

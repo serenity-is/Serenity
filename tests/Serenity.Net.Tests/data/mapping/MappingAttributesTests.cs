@@ -1,5 +1,3 @@
-using Serenity.TestUtils;
-
 namespace Serenity.Data.Mapping;
 
 public class MappingAttributesTests
@@ -260,7 +258,7 @@ public class MappingAttributesTests
         Assert.True(attr.CheckBeforeSave);
 
         Assert.Throws<ArgumentNullException>(() => new UniqueConstraintAttribute());
-        Assert.Throws<ArgumentNullException>(() => new UniqueConstraintAttribute((string[])null!));
+        Assert.Throws<ArgumentNullException>(() => new UniqueConstraintAttribute(null!));
 
         attr.Name = "C";
         attr.IgnoreDeleted = true;
@@ -386,7 +384,7 @@ public class MappingAttributesTests
         var dialectAttr = new ForeignKeyAttribute(typeof(CityRow), "CityName", ServerType.Sqlite);
         Assert.Equal("Sqlite", dialectAttr.Dialect);
 
-        Assert.Throws<ArgumentNullException>(() => new ForeignKeyAttribute((Type)null!));
+        Assert.Throws<ArgumentNullException>(() => new ForeignKeyAttribute(null!));
         Assert.Throws<ArgumentOutOfRangeException>(() => new ForeignKeyAttribute(typeof(NoTableNameType)));
         Assert.Throws<ArgumentOutOfRangeException>(() => new ForeignKeyAttribute(typeof(NoIdentityType)));
         Assert.Throws<ArgumentOutOfRangeException>(() => new ForeignKeyAttribute(typeof(MultiIdentityType)));
@@ -401,7 +399,7 @@ public class MappingAttributesTests
         var dialect = SqlServer2012Dialect.Instance;
 
         Assert.Throws<ArgumentNullException>(() => BaseExpressionAttribute.ToString("x", null!));
-        Assert.NotNull(BaseExpressionAttribute.ToString((object?)null, dialect));
+        Assert.NotNull(BaseExpressionAttribute.ToString(null, dialect));
         Assert.Equal("abc", BaseExpressionAttribute.ToString("abc", dialect));
         Assert.Equal("5", BaseExpressionAttribute.ToString(5, dialect));
         Assert.Equal("1", BaseExpressionAttribute.ToString(true, dialect));

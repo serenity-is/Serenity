@@ -1,6 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Primitives;
-using Serenity.Abstractions;
 using System.Threading;
 
 namespace Serenity.PropertyGrid;

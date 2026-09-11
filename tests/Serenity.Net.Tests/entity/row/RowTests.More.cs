@@ -100,7 +100,7 @@ public class RowTestsMore
 
         var clone = ((IRow)source).CloneRow();
 
-        Assert.False(((IRow)clone).TrackAssignments);
+        Assert.False(clone.TrackAssignments);
     }
 
     [Fact]
@@ -117,7 +117,7 @@ public class RowTestsMore
         Assert.True(((IEditableRow)clone).IsEditing);
         Assert.NotNull(((IEditableRow)clone).PreviousValues);
         Assert.True(((IEditableRow)clone).HasErrors);
-        Assert.Equal(5, ((IRow)clone).GetDictionaryData("k"));
+        Assert.Equal(5, clone.GetDictionaryData("k"));
     }
 
     [Fact]

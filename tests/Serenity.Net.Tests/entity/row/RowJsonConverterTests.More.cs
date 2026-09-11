@@ -1,5 +1,4 @@
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace Serenity.JsonConverters;
 
@@ -23,7 +22,7 @@ public class RowJsonConverterTestsMore
             writer.Flush();
         }
 
-        Assert.Equal("null", System.Text.Encoding.UTF8.GetString(stream.ToArray()));
+        Assert.Equal("null", Encoding.UTF8.GetString(stream.ToArray()));
     }
 
     [Fact]

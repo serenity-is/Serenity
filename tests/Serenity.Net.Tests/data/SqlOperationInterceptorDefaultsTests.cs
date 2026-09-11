@@ -1,5 +1,3 @@
-using System.Data;
-
 namespace Serenity.Data;
 
 public class SqlOperationInterceptorDefaultsTests

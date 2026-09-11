@@ -3,14 +3,18 @@ using System.IO;
 
 namespace Serenity.Web.EsBuild;
 
-internal class EsBuildMinifier(ILogger<EsBuildMinifier>? logger = null) : ICssMinifier, IScriptMinifier
+internal class EsBuildMinifier(ILogger<EsBuildMinifier>? logger = null,
+    Func<IEsBuildCLI>? cliFactory = null) : ICssMinifier, IScriptMinifier
 {
-    private EsBuildCLI? cli;
+    private IEsBuildCLI? cli;
 
-    private EsBuildCLI GetCLI()
+    private IEsBuildCLI GetCLI()
     {
         if (cli != null)
             return cli;
+
+        if (cliFactory != null)
+            return (cli = cliFactory());
 
         var downloader = new EsBuildDownloader();
         var targetDirectory = Path.Combine(Path.GetTempPath(), ".esbuild");

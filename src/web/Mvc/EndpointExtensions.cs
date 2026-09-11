@@ -24,7 +24,7 @@ public static class EndpointExtensions
         return ConvertToResponse<TResponse>(exception,
             httpContext?.RequestServices?.GetService<ILogger<ServiceEndpoint>>(),
             httpContext?.RequestServices?.GetService<ITextLocalizer>(),
-            string.Equals(httpContext?.RequestServices.GetService<IWebHostEnvironment>()?
+            string.Equals(httpContext?.RequestServices?.GetService<IWebHostEnvironment>()?
                 .EnvironmentName, "development", StringComparison.OrdinalIgnoreCase));
     }
 

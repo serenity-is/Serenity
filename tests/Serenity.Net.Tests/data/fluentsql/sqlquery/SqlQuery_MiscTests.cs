@@ -56,7 +56,7 @@ public class SqlQuery_MiscTests
     [Fact]
     public void GroupBy_Validates_Arguments()
     {
-        Assert.Throws<ArgumentNullException>(() => new SqlQuery().GroupBy((string)null!));
+        Assert.Throws<ArgumentNullException>(() => new SqlQuery().GroupBy(null!));
         Assert.Throws<ArgumentNullException>(() => new SqlQuery().GroupBy(""));
         Assert.Throws<ArgumentNullException>(() => new SqlQuery().GroupBy(new Alias("T", "A"), ""));
         Assert.Throws<ArgumentNullException>(() => new SqlQuery().GroupBy(null!, "x"));

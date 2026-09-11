@@ -1,4 +1,5 @@
 using Serenity.IO;
+using Serenity.Web;
 using System.Diagnostics;
 using System.IO;
 
@@ -153,20 +154,17 @@ public class WKHtmlToPdf(IHtmlToPdfOptions? options = null) : IHtmlToPdfOptions
 
         args.Add(Url);
 
-        var tempFile = Path.GetTempFileName();
+        var tempFile = TempFileNameFactory?.Invoke() ?? Path.GetTempFileName();
         try
         {
             args.Add(tempFile);
 
             var commandLineArgs = CommandLineTools.EscapeArguments([.. args]);
 
-            var process = new Process 
-            { 
-                StartInfo = new ProcessStartInfo(exePath, commandLineArgs)
-                {
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                }
+            var startInfo = new ProcessStartInfo(exePath, commandLineArgs)
+            {
+                UseShellExecute = false,
+                CreateNoWindow = true
             };
 
             Exception invalidOperation(string message)
@@ -177,8 +175,8 @@ public class WKHtmlToPdf(IHtmlToPdfOptions? options = null) : IHtmlToPdfOptions
                 return exception;
             };
 
-            if (!process.Start())
-                throw invalidOperation("An error occurred while starting PDF generator!");
+            var process = ProcessFactory?.Invoke(startInfo) ??
+                new StartedProcess(Process.Start(startInfo) ?? throw invalidOperation("An error occurred while starting PDF generator!"));
 
             if (!process.WaitForExit(TimeoutSeconds * 1000)) // max 300 seconds
                 throw invalidOperation("Timeout while PDF generation!");
@@ -206,6 +204,16 @@ public class WKHtmlToPdf(IHtmlToPdfOptions? options = null) : IHtmlToPdfOptions
     /// Gets or sets the path to the wkhtmltopdf executable.
     /// </summary>
     public string? ExecutablePath { get; set; }
+
+    /// <summary>
+    /// Gets or sets an optional factory used to start the process, mainly for testing.
+    /// </summary>
+    internal Func<ProcessStartInfo, IStartedProcess>? ProcessFactory { get; set; }
+
+    /// <summary>
+    /// Gets or sets an optional factory used to create the temporary output file name, mainly for testing.
+    /// </summary>
+    internal Func<string>? TempFileNameFactory { get; set; }
 
     /// <inheritdoc/>
     public string? Url { get => options.Url; set => options.Url = value; }

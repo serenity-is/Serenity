@@ -60,6 +60,7 @@ public partial class DynamicScriptManager : IDynamicScriptManager
     /// <inheritdoc/>
     public void Register(INamedDynamicScript script)
     {
+        ArgumentNullException.ThrowIfNull(script);
         Register(script.ScriptName, script);
     }
 

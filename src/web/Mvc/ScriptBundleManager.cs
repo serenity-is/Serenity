@@ -127,7 +127,7 @@ public class ScriptBundleManager : IScriptBundleManager
                     if (!bundleKeysBySourceUrl.TryGetValue(sourceFile, out HashSet<string>? bundleKeys))
                     {
                         bundleKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-                        bundleKeysBySourceUrl[sourceFile] = [];
+                        bundleKeysBySourceUrl[sourceFile] = bundleKeys;
                     }
 
                     bundleKeys.Add(bundleKey);

@@ -31,7 +31,7 @@ public class EntityQueryExtensionsTests
     [Fact]
     public void WhereEqual_Throws_For_Null_Row()
     {
-        Assert.Throws<ArgumentNullException>(() => new SqlQuery().WhereEqual((IRow)null!));
+        Assert.Throws<ArgumentNullException>(() => new SqlQuery().WhereEqual(null!));
     }
 
     [Fact]
@@ -56,7 +56,7 @@ public class EntityQueryExtensionsTests
     [Fact]
     public void Set_Row_Throws_For_Null_And_NonTracking()
     {
-        Assert.Throws<ArgumentNullException>(() => new SqlUpdate("T").Set((IRow)null!));
+        Assert.Throws<ArgumentNullException>(() => new SqlUpdate("T").Set(null!));
         var row = new SelRow();
         ((IRow)row).TrackAssignments = false;
         Assert.Throws<ArgumentException>(() => new SqlUpdate("T").Set(row));
@@ -112,7 +112,7 @@ public class EntityQueryExtensionsTests
     public void SelectForeignFields_Throws_For_Nulls()
     {
         Assert.Throws<ArgumentNullException>(() => EntityQueryExtensions.SelectForeignFields(null!, new SelRow()));
-        Assert.Throws<ArgumentNullException>(() => new SqlQuery().SelectForeignFields((IRow)null!));
+        Assert.Throws<ArgumentNullException>(() => new SqlQuery().SelectForeignFields(null!));
     }
 
     [Fact]
@@ -167,22 +167,22 @@ public class EntityQueryExtensionsTests
     public void Select_Field_And_ColumnName()
     {
         var query = new SqlQuery().From(new SelRow());
-        Assert.Same(query, query.Select((IField)SelRow.Fields.Name));
-        Assert.Same(query, query.Select((IField)SelRow.Fields.Name, "C"));
+        Assert.Same(query, query.Select(SelRow.Fields.Name));
+        Assert.Same(query, query.Select(SelRow.Fields.Name, "C"));
     }
 
     [Fact]
     public void Select_Alias_Field()
     {
         var query = new SqlQuery().From(new SelRow());
-        Assert.Same(query, query.Select(Alias.T0, (IField)SelRow.Fields.Name));
-        Assert.Same(query, query.Select(Alias.T0, (IField)SelRow.Fields.Name, "C"));
+        Assert.Same(query, query.Select(Alias.T0, SelRow.Fields.Name));
+        Assert.Same(query, query.Select(Alias.T0, SelRow.Fields.Name, "C"));
     }
 
     [Fact]
     public void Select_Alias_Field_Throws_For_Nulls()
     {
-        Assert.Throws<ArgumentNullException>(() => new SqlQuery().Select((IAlias)null!, (IField)SelRow.Fields.Name));
+        Assert.Throws<ArgumentNullException>(() => new SqlQuery().Select((IAlias)null!, SelRow.Fields.Name));
         Assert.Throws<ArgumentNullException>(() => new SqlQuery().Select(Alias.T0, (IField)null!));
         Assert.Throws<ArgumentNullException>(() => new SqlQuery().Select(Alias.T0, SelRow.Fields.Name, null!));
     }

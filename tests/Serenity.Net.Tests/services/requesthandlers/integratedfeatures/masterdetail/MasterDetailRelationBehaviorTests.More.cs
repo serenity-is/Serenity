@@ -1,6 +1,4 @@
 #pragma warning disable CS0649
-using System.Threading;
-
 namespace Serenity.Services;
 
 public partial class MasterDetailRelationBehaviorTests
@@ -495,7 +493,7 @@ public partial class MasterDetailRelationBehaviorTests
 
         behavior.OnAfterSave(CreateMasterSaveHandler(connection, false, master));
 
-        Assert.Equal([(SaveRequestType.Create, (int?)null)], calls);
+        Assert.Equal([(SaveRequestType.Create, null)], calls);
     }
 
     [Fact]

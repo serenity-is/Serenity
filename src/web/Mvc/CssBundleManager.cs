@@ -66,7 +66,7 @@ public partial class CssBundleManager : ICssBundleManager
 
             if (bundleKeys != null)
                 foreach (var bundleKey in bundleKeys)
-                    scriptManager.Changed("Bundle." + bundleKey);
+                    scriptManager.Changed("CssBundle." + bundleKey);
         };
     }
 
@@ -144,7 +144,7 @@ public partial class CssBundleManager : ICssBundleManager
                     if (!bundleKeysBySourceUrl.TryGetValue(appRelativeUrl, out HashSet<string>? bundleKeys))
                     {
                         bundleKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-                        bundleKeysBySourceUrl[appRelativeUrl] = [];
+                        bundleKeysBySourceUrl[appRelativeUrl] = bundleKeys;
                     }
 
                     bundleKeys.Add(bundleKey);
