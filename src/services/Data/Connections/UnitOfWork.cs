@@ -166,8 +166,8 @@ public class UnitOfWork : IDisposable, IUnitOfWork
         {
             try
             {
-                if (transaction is DbTransaction dbTransaction)
-                    await dbTransaction.DisposeAsync().ConfigureAwait(false);
+                if (transaction is IAsyncDisposable asyncDisposable)
+                    await asyncDisposable.DisposeAsync().ConfigureAwait(false);
                 else
                     transaction?.Dispose();
             }

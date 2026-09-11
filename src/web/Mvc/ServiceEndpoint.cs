@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using System.Data.Common;
 
 namespace Serenity.Services;
 
@@ -58,10 +57,10 @@ public abstract class ServiceEndpoint : ControllerBase, IActionFilter, IAsyncAct
             await uow.DisposeAsync();
         }
 
-        if (connection is DbConnection dbConnection)
+        if (connection is IAsyncDisposable asyncDisposable)
         {
             connection = null;
-            await dbConnection.DisposeAsync();
+            await asyncDisposable.DisposeAsync();
         }
         else
         {
@@ -185,10 +184,10 @@ public abstract class ServiceEndpoint : ControllerBase, IActionFilter, IAsyncAct
             unitOfWork = null;
         }
 
-        if (connection is DbConnection dbConnection)
+        if (connection is IAsyncDisposable asyncDisposable)
         {
             connection = null;
-            await dbConnection.DisposeAsync();
+            await asyncDisposable.DisposeAsync();
         }
         else
         {
