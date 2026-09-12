@@ -24,11 +24,11 @@ public class SiteAbsoluteUrl(
     /// <summary>
     /// Tries to get the internal URL, falling back to the external URL when no internal URL is configured.
     /// </summary>
-    protected virtual string TryGetInternalUrl()
+    protected virtual string? TryGetInternalUrl()
     {
         var url = environmentSettings.CurrentValue?.SiteInternalUrl;
         if (string.IsNullOrEmpty(url))
-            return GetExternalUrl();
+            return TryGetExternalUrl();
 
         return url;
     }

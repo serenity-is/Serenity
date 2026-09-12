@@ -1,7 +1,19 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RunSettingsFilePath>$(MSBuildProjectDirectory)\coverlet.runsettings</RunSettingsFilePath>
+  </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\tests\Serenity.Net.Tests\Serenity.Net.Tests.csproj" />
     <ProjectReference Include="..\..\src\Serene.Web\Serene.Web.csproj" />
+    <Using Include="Microsoft.AspNetCore.Http" />
+    <Using Include="Microsoft.AspNetCore.Mvc" />
+    <Using Include="Microsoft.AspNetCore.Mvc.Filters" />
+    <Using Include="Microsoft.AspNetCore.Routing" />
+    <Using Include="Microsoft.Extensions.Caching.Distributed" />
+    <Using Include="Microsoft.Extensions.Caching.Memory" />
+    <Using Include="Microsoft.Extensions.Logging" />
+    <Using Include="Microsoft.Extensions.Options" />
+    <Using Include="System.Security.Principal" />
     <Using Include="Serenity.TestUtils" />
   </ItemGroup>
 </Project>
