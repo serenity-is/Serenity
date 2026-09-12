@@ -12,6 +12,7 @@ public class BasePermissionKeyListerTests
         [ReadPermission("Role:RolePerm")]
         public int? RoleProperty { get; set; }
 
+#pragma warning disable CA1822 // Mark members as static
         [InsertPermission("Test:MethodPerm")]
         public void SomeMethod()
         {
@@ -26,6 +27,7 @@ public class BasePermissionKeyListerTests
         public void ServiceMethod()
         {
         }
+#pragma warning restore CA1822 // Mark members as static
 
         [UpdatePermission("Test:PropertyPerm")]
         public int? SomeProperty { get; set; }
@@ -41,6 +43,7 @@ public class BasePermissionKeyListerTests
         public const string WithOperators = "Nested:A|Nested:B";
     }
 
+    [AttributeUsage(AttributeTargets.All)]
     private sealed class ThrowingAttribute : Attribute
     {
         public ThrowingAttribute()
@@ -56,13 +59,8 @@ public class BasePermissionKeyListerTests
         public static int? Value { get; set; }
     }
 
-    private class TestPermissionKeyLister : BasePermissionKeyLister
+    private class TestPermissionKeyLister(ITwoLevelCache cache, ITypeSource typeSource) : BasePermissionKeyLister(cache, typeSource)
     {
-        public TestPermissionKeyLister(ITwoLevelCache cache, ITypeSource typeSource)
-            : base(cache, typeSource)
-        {
-        }
-
         public Func<IEnumerable<string>> ExternalFunc { get; set; } = () => [];
         public Func<IEnumerable<string>> RoleKeysFunc { get; set; } = () => [];
 
