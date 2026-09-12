@@ -11,6 +11,7 @@ public class EntityModelInputs : IEntityModelInputs
     public string Module { get; set; }
     public bool Net5Plus { get; set; } = true;
     public bool Net8Plus { get; set; } = true;
+    public bool Nullable { get; set; } = false;
     public bool SchemaIsDatabase { get; set; }
     public string PermissionKey { get; set; }
     public string Schema { get; set; }

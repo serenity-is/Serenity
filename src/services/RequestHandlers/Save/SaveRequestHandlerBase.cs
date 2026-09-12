@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
 namespace Serenity.Services;
@@ -395,11 +396,13 @@ public abstract class SaveRequestHandlerBase<TRow, TSaveRequest, TSaveResponse>(
     /// <summary>
     /// Returns true if this is a Create operation.
     /// </summary>
+    [MemberNotNullWhen(false, nameof(Old))]
     public bool IsCreate => Old == null;
 
     /// <summary>
     /// Returns true if this is an Update operation.
     /// </summary>
+    [MemberNotNullWhen(true, nameof(Old))]
     public bool IsUpdate => Old != null;
 
     /// <summary>

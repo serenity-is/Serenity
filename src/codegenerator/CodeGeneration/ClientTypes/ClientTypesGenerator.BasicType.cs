@@ -29,14 +29,14 @@ public partial class ClientTypesGenerator
             if (!CSharpSyntaxRules.IsValidIdentifier(option.Name, ignoreKeywords: true))
                 continue;
 
-            var typeName = GetMemberTypeName(option.Type);
+            var typeName = GetMemberTypeName(option.Type, out var isValueType);
 
             if (index++ > 0)
                 sb.AppendLine();
             if (!OmitComments)
                 cw.IndentedLine($"/// <summary>Gets or sets the <c>{option.Name}</c> property.</summary>");
             cw.Indented("public ");
-            sb.Append(typeName);
+            sb.Append(AppendNullableQuote(typeName, isValueType));
             sb.Append(' ');
             sb.Append(CSharpSyntaxRules.EscapeIfKeyword(option.Name));
             sb.Append(" { get; set; }");

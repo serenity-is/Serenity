@@ -75,7 +75,14 @@ public class MvcCommand(IProjectFileInfo project, IGeneratorConsole console)
         var outDir = FileSystem.Combine(projectDir,
             PathHelper.ToPath(sergenConfig.MVC.OutDir.TrimToNull() ?? "Imports/MVC"));
 
-        var esmGenerator = new EsmEntryPointsGenerator();
+        var esmGenerator = new EsmEntryPointsGenerator(FileSystem)
+        {
+            ProjectDir = projectDir,
+            RootNamespace = helperNamespace,
+            FileScopedNamespaces = sergenConfig.FileScopedNamespaces == true,
+            InternalAccess = sergenConfig.MVC.InternalAccess == true
+        };
+
         var esmAssetBasePath = Project.GetEsmAssetBasePath();
         if (!string.IsNullOrEmpty(esmAssetBasePath))
             esmGenerator.EsmAssetBasePath = esmAssetBasePath;
@@ -89,9 +96,7 @@ public class MvcCommand(IProjectFileInfo project, IGeneratorConsole console)
             esmGenerator.EntryPoints.AddRange(globs);
         }
 
-        var esmCode = esmGenerator.Generate(FileSystem, projectDir, helperNamespace,
-            fileScopedNamespace: sergenConfig.FileScopedNamespaces == true,
-            internalAccess: sergenConfig.MVC.InternalAccess == true);
+        var esmCode = esmGenerator.Generate();
 
         MultipleOutputHelper.WriteFiles(FileSystem, Console, outDir,
         [

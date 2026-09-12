@@ -26,6 +26,7 @@ public class EntityField
     public List<AttributeTypeRef> ColAttributeList { get; } = [];
     public string ColAttributes => string.Join(", ", ColAttributeList.Select(x => x.ToString(new CodeWriter { IsCSharp = true })));
     public string Expression { get; set; }
+    public bool NullableRefTypes { get; set; }
 
     public string TSEditorType
     {
@@ -44,6 +45,6 @@ public class EntityField
 
     public string PropertyType
     {
-        get { return IsValueType ? DataType + "?" : DataType; }
+        get { return IsValueType || NullableRefTypes ? DataType + "?" : DataType; }
     }
 }

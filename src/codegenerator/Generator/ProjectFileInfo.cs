@@ -12,6 +12,7 @@ public class ProjectFileInfo(IFileSystem fileSystem, string projectFile,
     private string assemblyName;
     private string esmAssetBasePath;
     private Dictionary<string, string> globalUsings;
+    private string nullable;
     private ProjectMSBuildInfo projectMSBuildInfo;
     private string outDir;
     private string rootNamespace;
@@ -60,11 +61,31 @@ public class ProjectFileInfo(IFileSystem fileSystem, string projectFile,
                     return esmAssetBasePath = props.EsmAssetBasePath;
 
                 esmAssetBasePath ??= ExtractPropertyFrom(projectFile, groups =>
-                    groups.Elements("EsmAssetBasePath").LastOrDefault());
+                    groups.Elements("ESMAssetBasePath").LastOrDefault());
             }
         }
 
         return string.IsNullOrEmpty(esmAssetBasePath) ? null : esmAssetBasePath;
+    }
+
+    public string GetNullable()
+    {
+        if (nullable is null)
+        {
+            if (getPropertyArgument?.Invoke("Nullable") is string s && !string.IsNullOrEmpty(s))
+                nullable = s;
+            else
+            {
+                var props = GetProjectProperties();
+                if (!string.IsNullOrEmpty(props.Nullable))
+                    return nullable = props.Nullable;
+
+                nullable ??= ExtractPropertyFrom(projectFile, groups =>
+                    groups.Elements("Nullable").LastOrDefault());
+            }
+        }
+
+        return string.IsNullOrEmpty(nullable) ? null : nullable;
     }
 
     public string GetOutDir()
@@ -207,6 +228,7 @@ public class ProjectFileInfo(IFileSystem fileSystem, string projectFile,
     {
         public string AssemblyName { get; set; }
         public string EsmAssetBasePath { get; set; }
+        public string Nullable { get; set; }
         public string OutDir { get; set; }
         public string RootNamespace { get; set; }
         public string TargetFramework { get; set; }
@@ -238,6 +260,7 @@ public class ProjectFileInfo(IFileSystem fileSystem, string projectFile,
                 "-getItem:Using " +
                 "-getProperty:AssemblyName " +
                 "-getProperty:ESMAssetBasePath " +
+                "-getProperty:Nullable " +
                 "-getProperty:OutDir " +
                 "-getProperty:RootNamespace " +
                 "-getProperty:TargetFramework",

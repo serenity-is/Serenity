@@ -2,17 +2,18 @@ namespace Serenity.CodeGeneration;
 
 public partial class ClientTypesGenerator
 {
-    internal static string GetMemberTypeName(string typeName)
+    internal static string GetMemberTypeName(string typeName, out bool isValueType)
     {
+        isValueType = false;
         if (string.IsNullOrEmpty(typeName))
             return "object";
 
         switch (typeName)
         {
-            case "number": return "double";
+            case "number": isValueType = true; return "double";
             case "string": return "string";
             case "Date": return "DateTime";
-            case "boolean": return "bool";
+            case "boolean": isValueType = true;  return "bool";
         }
 
         var nullablePrefix = "System.Nullable`1";
@@ -24,6 +25,8 @@ public partial class ClientTypesGenerator
         var systemType = Type.GetType(typeName);
         if (systemType == null)
             return "object";
+
+        isValueType = systemType.IsValueType;
 
         if (typeName.StartsWith("System.", StringComparison.Ordinal))
             return CodeWriter.ToCSKeyword(typeName[7..]);
@@ -41,7 +44,7 @@ public partial class ClientTypesGenerator
                 skip.Contains(option.Name))
                 continue;
 
-            var typeName = GetMemberTypeName(option.Type);
+            var typeName = GetMemberTypeName(option.Type, out var isValueType);
 
             string jsName = option.Name;
             string optionName = option.Name;
@@ -53,10 +56,16 @@ public partial class ClientTypesGenerator
                     optionName = optionName[4..];
                 }
 
-                typeName = GetMemberTypeName(emo.Arguments[0].Type);
+                typeName = GetMemberTypeName(emo.Arguments[0].Type, out _);
             }
 
-            sb.AppendLine();
+            if (NullableRefTypes &&
+                !isValueType &&
+                !string.IsNullOrEmpty(typeName) &&
+                !typeName.EndsWith('?'))
+                typeName += '?';
+
+                sb.AppendLine();
             if (!OmitComments)
                 cw.IndentedLine($"/// <summary>Gets or sets the <c>{jsName}</c> option.</summary>");
             cw.Indented("public ");

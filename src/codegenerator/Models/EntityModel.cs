@@ -23,6 +23,7 @@ public class EntityModel
     public bool AspNetCore { get; set; } = true;
     public bool NET5Plus { get; set; } = true;
     public bool NET8Plus { get; set; } = true;
+    public bool Nullable { get; set; } = false;
     public bool DeclareJoinConstants { get; set; }
     public bool EnableGenerateFields { get; set; }
     public bool EnableGenerateInterface { get; set; }
@@ -132,7 +133,7 @@ public class EntityModel
         get
         {
             if (editorVariables.IsEmptyOrNull())
-                editorVariables = Fields.Select((x) => x.TSEditorType).Distinct().Select((x, i) => new EditorVariable(x, i)).ToList();
+                editorVariables = [.. Fields.Select((x) => x.TSEditorType).Distinct().Select((x, i) => new EditorVariable(x, i))];
             return editorVariables;
         }
     }

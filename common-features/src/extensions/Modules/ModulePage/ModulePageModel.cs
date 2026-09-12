@@ -20,7 +20,7 @@ public class ModulePageModel
     /// <summary>
     /// The module name or script path.
     /// </summary>
-    public string? Module { get; set; }
+    public required string Module { get; set; }
     /// <summary>
     /// The page ID.
     /// </summary>

@@ -42,6 +42,7 @@ public class ClientTypesCommand(IProjectFileInfo project, IGeneratorConsole cons
         if (config.IncludeGlobalUsings != null)
             generator.GlobalUsings.AddRange(config.IncludeGlobalUsings);
 
+        generator.NullableProp = Project.GetNullable();
         generator.RootNamespaces.Add(config.RootNamespace);
 
         generator.AddBuiltinTSTypes();

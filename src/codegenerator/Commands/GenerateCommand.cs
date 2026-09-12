@@ -60,7 +60,7 @@ public partial class GenerateCommand(IProjectFileInfo project, IGeneratorConsole
         using (var connection = sqlConnections.NewByKey(connectionKey))
         {
             schemaProvider = SchemaHelper.GetSchemaProvider(connection.GetDialect().ServerType);
-            allTableEntries = schemaProvider.GetTableNames(connection).ToList();
+            allTableEntries = [.. schemaProvider.GetTableNames(connection)];
         }
 
         var allTableNames = allTableEntries.Select(x => x.Tablename).ToList();
@@ -167,6 +167,9 @@ public partial class GenerateCommand(IProjectFileInfo project, IGeneratorConsole
 
             if (config.IncludeGlobalUsings != null)
                 inputs.GlobalUsings.AddRange(config.IncludeGlobalUsings);
+
+            inputs.Nullable = Project.GetNullable() is string s &&
+                !string.Equals(s, "disabled", StringComparison.OrdinalIgnoreCase);
 
             return modelFactory.Create(inputs);
         }

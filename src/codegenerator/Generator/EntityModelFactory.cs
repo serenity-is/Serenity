@@ -39,7 +39,7 @@ public class EntityModelFactory : IEntityModelFactory
         };
     }
 
-    private static EntityField ToEntityField(Data.Schema.FieldInfo fieldInfo, int prefixLength, bool includeFlags)
+    private static EntityField ToEntityField(Data.Schema.FieldInfo fieldInfo, int prefixLength, bool includeFlags, bool nullableRefTypes)
     {
         var fieldType = SchemaHelper.SqlTypeNameToFieldType(fieldInfo.DataType, fieldInfo.Size, out string dataType);
         dataType ??= fieldType;
@@ -53,8 +53,9 @@ public class EntityModelFactory : IEntityModelFactory
             PropertyName = PropertyNameFor(fieldInfo.FieldName[prefixLength..]),
             Title = Inflector.Inflector.Titleize(fieldInfo.FieldName[prefixLength..])?.Trim(),
             Name = fieldInfo.FieldName,
+            NullableRefTypes = nullableRefTypes,
             Size = fieldInfo.Size == 0 ? null : fieldInfo.Size,
-            Scale = fieldInfo.Scale
+            Scale = fieldInfo.Scale,
         };
 
         if (includeFlags)
@@ -240,16 +241,16 @@ public class EntityModelFactory : IEntityModelFactory
         {
             model.RowBaseClass = baseRowMatch;
             model.FieldsBaseClass = baseRowMatch + "Fields";
-            fieldInfos = fieldInfos.Where(f =>
+            fieldInfos = [.. fieldInfos.Where(f =>
             {
                 if (baseRowFieldset.Contains(f.FieldName[prefix..]))
                 {
-                    var ef = ToEntityField(f, prefix, includeFlags: false);
+                    var ef = ToEntityField(f, prefix, includeFlags: false, nullableRefTypes: inputs.Nullable);
                     model.RowBaseFields.Add(ef);
                     return false;
                 }
                 return true;
-            }).ToList();
+            })];
         }
 
         if (inputs.Net5Plus)
@@ -269,7 +270,7 @@ public class EntityModelFactory : IEntityModelFactory
 
         foreach (var fieldInfo in fieldInfos)
         {
-            var tableField = ToEntityField(fieldInfo, prefix, includeFlags: true);
+            var tableField = ToEntityField(fieldInfo, prefix, includeFlags: true, nullableRefTypes: inputs.Nullable);
 
             if (tableField.PropertyName == model.IdField)
             {
@@ -388,7 +389,7 @@ public class EntityModelFactory : IEntityModelFactory
                     !includeForeignFields.Contains(foreignField.FieldName))
                     continue;
 
-                var viewField = ToEntityField(foreignField, foreignPrefixLength, includeFlags: false);
+                var viewField = ToEntityField(foreignField, foreignPrefixLength, includeFlags: false, nullableRefTypes: inputs.Nullable);
 
                 var propName = viewField.PropertyName;
                 viewField.PropertyName = propName.StartsWith(entityJoin.Name, StringComparison.Ordinal) &&

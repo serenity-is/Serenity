@@ -31,6 +31,18 @@ public abstract class CodeGeneratorBase
 
     public readonly HashSet<string> GlobalUsings = [];
 
+    public string NullableProp { get; set; }
+
+    public bool NullableRefTypes => NullableProp == "enable";
+
+    protected string AppendNullableQuote(string type, bool isValueType)
+    {
+        if ((!isValueType && !NullableRefTypes) || (type != null && type.EndsWith('?')))
+            return type;
+
+        return type + "?";
+    }
+
     protected virtual void Reset()
     {
         sb.Clear();
@@ -180,12 +192,12 @@ public abstract class CodeGeneratorBase
                 Name = typeName,
                 IsInterface = true,
                 IsDeclaration = true,
-                Fields = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, string>>(typeName)
+                Fields = [.. Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, string>>(typeName)
                     .Select(x => new ExternalMember
                     {
                         Name = x.Key,
                         Type = x.Value
-                    }).ToList()
+                    })]
             };
         }
 

@@ -1,10 +1,13 @@
 using Microsoft.Extensions.FileSystemGlobbing;
 using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
+using System.Security.Permissions;
 
 namespace Serenity.CodeGeneration;
 
-public class EsmEntryPointsGenerator()
+public class EsmEntryPointsGenerator(IFileSystem fileSystem)
 {
+    private readonly IFileSystem fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
+
     public List<string> EntryPoints { get; } = [
         "Modules/**/*Page.ts",
         "Modules/**/*Page.tsx",
@@ -13,6 +16,10 @@ public class EsmEntryPointsGenerator()
     ];
 
     public string EsmAssetBasePath { get; set; } = "/esm";
+    public bool FileScopedNamespaces { get; set; }
+    public bool InternalAccess { get; set; }
+    public string ProjectDir { get; set; }
+    public string RootNamespace { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether to omit XML doc comments and the auto-generated marker
@@ -20,11 +27,10 @@ public class EsmEntryPointsGenerator()
     /// </summary>
     public bool OmitComments { get; set; }
 
-    public string Generate(IFileSystem fileSystem, string projectDir, 
-        string rootNamespace, bool fileScopedNamespace = false, bool internalAccess = false)
+    public string Generate()
     {
-        ArgumentExceptionHelper.ThrowIfNull(fileSystem);
-        ArgumentExceptionHelper.ThrowIfNull(rootNamespace);
+        ArgumentExceptionHelper.ThrowIfNull(ProjectDir);
+        ArgumentExceptionHelper.ThrowIfNull(RootNamespace);
 
         Matcher matcher = new();
         matcher.AddExclude(".git/**");
@@ -48,12 +54,12 @@ public class EsmEntryPointsGenerator()
         IEnumerable<string> files;
         if (fileSystem is PhysicalFileSystem)
         {
-            var matches = matcher.Execute(new DirectoryInfoWrapper(new System.IO.DirectoryInfo(projectDir))).Files;
+            var matches = matcher.Execute(new DirectoryInfoWrapper(new System.IO.DirectoryInfo(ProjectDir))).Files;
             files = [.. matches.Select(match => match.Path)];
         }
         else
         {
-            var matches = matcher.Execute(new FileSystemDirectoryWrapper(fileSystem, projectDir)).Files;
+            var matches = matcher.Execute(new FileSystemDirectoryWrapper(fileSystem, ProjectDir)).Files;
             files = [.. matches.Select(match => match.Path)];
         }
 
@@ -89,11 +95,11 @@ public class EsmEntryPointsGenerator()
 
         void action()
         {
-            var emitComments = !internalAccess && !OmitComments;
+            var emitComments = !InternalAccess && !OmitComments;
 
             if (emitComments)
                 cw.IndentedLine("/// <summary>Provides paths to ECMAScript module entry points.</summary>");
-            cw.IndentedLine($"{(internalAccess ? "internal" : "public")} static partial class ESM");
+            cw.IndentedLine($"{(InternalAccess ? "internal" : "public")} static partial class ESM");
             cw.InBrace(() =>
             {
                 var firstParts = new HashSet<string>(files.Select(x => normalizeParts(getStrippedName(x).Split('/').First())));
@@ -204,15 +210,15 @@ public class EsmEntryPointsGenerator()
             });
         }
 
-        if (fileScopedNamespace)
+        if (FileScopedNamespaces)
         {
-            cw.IndentedLine("namespace " + rootNamespace + ";");
+            cw.IndentedLine("namespace " + RootNamespace + ";");
             cw.AppendLine();
             action();
         }
         else
         {
-            cw.InNamespace(rootNamespace, action);
+            cw.InNamespace(RootNamespace, action);
         }
 
         return cw.ToString().TrimEnd();

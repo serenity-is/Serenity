@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Serenity.Services;
 
 /// <summary>
@@ -19,11 +21,13 @@ public interface ISaveRequestHandler : IRequestHandler
     /// <summary>
     /// Gets a value indicating whether this is an INSERT operation.
     /// </summary>
+    [MemberNotNullWhen(false, nameof(Old))]
     bool IsCreate { get; }
 
     /// <summary>
     /// Gets a value indicating whether this is an UPDATE operation.
     /// </summary>
+    [MemberNotNullWhen(true, nameof(Old))]
     bool IsUpdate { get; }
 
     /// <summary>

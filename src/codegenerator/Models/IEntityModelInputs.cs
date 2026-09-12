@@ -11,6 +11,7 @@ public interface IEntityModelInputs
     string Module { get; }
     bool Net5Plus { get; }
     bool Net8Plus { get; }
+    bool Nullable { get; }
     bool SchemaIsDatabase { get; }
     string PermissionKey { get; }
     string Schema { get; }
