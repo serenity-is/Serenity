@@ -6,7 +6,8 @@ import {
     PercentCompleteFormatter,
     YesNoFormatter
 } from "../../src/formatters/formatters";
-import { Formatters } from "../../src/formatters";
+
+const Formatters = (await import("../../src/formatters") as any).Formatters;
 
 describe('PercentCompleteFormatter', () => {
     it('returns "-" for null or empty value', () => {

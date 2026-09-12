@@ -64,7 +64,7 @@ describe("GroupItemMetadataProvider constructor", () => {
     it("uses converted compat groupFormatter if passed", () => {
         var groupFormatter: CompatFormatter = () => "compat";
         var provider = new GroupItemMetadataProvider({ groupFormatter });
-        expect(provider.getOptions().groupFormatter === groupFormatter).toBe(true);
+        expect((provider.getOptions() as any).groupFormatter === groupFormatter).toBe(true);
         expect(provider.getOptions().groupFormat as any !== groupFormatter).toBe(true);
         expect(provider.getOptions().groupFormat).toBeDefined();
         expect(provider.getOptions().groupFormat(ctx())).toBe("compat");
@@ -103,7 +103,7 @@ describe("GroupItemMetadataProvider constructor", () => {
     it("uses converted compat totalsFormatter if passed", () => {
         var totalsFormatter: CompatFormatter = () => "compat";
         var provider = new GroupItemMetadataProvider({ totalsFormatter });
-        expect(provider.getOptions().totalsFormatter === totalsFormatter).toBe(true);
+        expect((provider.getOptions() as any).totalsFormatter === totalsFormatter).toBe(true);
         expect(provider.getOptions().totalsFormat as any !== totalsFormatter).toBe(true);
         expect(provider.getOptions().totalsFormat).toBeDefined();
         expect(provider.getOptions().totalsFormat(ctx())).toBe("compat");
