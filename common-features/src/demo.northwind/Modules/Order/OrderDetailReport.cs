@@ -32,7 +32,7 @@ public class OrderDetailReport(ISqlConnections sqlConnections) : IReport, ICusto
                 .Where(od.OrderID == OrderID));
 
             var c = CustomerRow.Fields;
-            data.Customer = connection.TryFirst<CustomerRow>(c.CustomerID == data.Order.CustomerID)
+            data.Customer = connection.TryFirst<CustomerRow>(c.CustomerID == data.Order!.CustomerID!)
                 ?? new CustomerRow();
         }
 
@@ -48,7 +48,7 @@ public class OrderDetailReport(ISqlConnections sqlConnections) : IReport, ICusto
 
 public class OrderDetailReportData
 {
-    public OrderRow Order { get; set; }
-    public List<OrderDetailRow> Details { get; set; }
-    public CustomerRow Customer { get; set; }
+    public OrderRow? Order { get; set; }
+    public List<OrderDetailRow>? Details { get; set; }
+    public CustomerRow? Customer { get; set; }
 }

@@ -34,7 +34,7 @@ public sealed class OrderDetailRow : Row<OrderDetailRow.RowFields>, IIdRow
     public decimal? LineTotal { get => fields.LineTotal[this]; set => fields.LineTotal[this] = value; }
 
     [Origin(jOrder, nameof(OrderRow.CustomerID))]
-    public string OrderCustomerID { get => fields.OrderCustomerID[this]; set => fields.OrderCustomerID[this] = value; }
+    public string? OrderCustomerID { get => fields.OrderCustomerID[this]; set => fields.OrderCustomerID[this] = value; }
 
     [Origin(jOrder, nameof(OrderRow.EmployeeID))]
     public int? OrderEmployeeID { get => fields.OrderEmployeeID[this]; set => fields.OrderEmployeeID[this] = value; }
@@ -43,24 +43,24 @@ public sealed class OrderDetailRow : Row<OrderDetailRow.RowFields>, IIdRow
     public DateTime? OrderDate { get => fields.OrderDate[this]; set => fields.OrderDate[this] = value; }
 
     [Origin(jProduct, nameof(ProductRow.ProductName)), MinSelectLevel(SelectLevel.List), QuickSearch]
-    public string ProductName { get => fields.ProductName[this]; set => fields.ProductName[this] = value; }
+    public string? ProductName { get => fields.ProductName[this]; set => fields.ProductName[this] = value; }
 
     public class RowFields : RowFieldsBase
     {
-        public Int32Field DetailID;
-        public Int32Field OrderID;
-        public Int32Field ProductID;
-        public DecimalField UnitPrice;
-        public Int16Field Quantity;
-        public SingleField Discount;
+        public Int32Field DetailID = null!;
+        public Int32Field OrderID = null!;
+        public Int32Field ProductID = null!;
+        public DecimalField UnitPrice = null!;
+        public Int16Field Quantity = null!;
+        public SingleField Discount = null!;
 
-        public StringField OrderCustomerID;
+        public StringField OrderCustomerID = null!;
 
-        public Int32Field OrderEmployeeID;
-        public DateTimeField OrderDate;
+        public Int32Field OrderEmployeeID = null!;
+        public DateTimeField OrderDate = null!;
 
-        public StringField ProductName;
+        public StringField ProductName = null!;
 
-        public DecimalField LineTotal;
+        public DecimalField LineTotal = null!;
     }
 }

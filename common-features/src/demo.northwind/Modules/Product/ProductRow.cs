@@ -13,11 +13,11 @@ public sealed class ProductRow : Row<ProductRow.RowFields>, IIdRow, INameRow
     public int? ProductID { get => fields.ProductID[this]; set => fields.ProductID[this] = value; }
 
     [DisplayName("Product Name"), Size(40), NotNull, QuickSearch, LookupInclude, NameProperty]
-    public string ProductName { get => fields.ProductName[this]; set => fields.ProductName[this] = value; }
+    public string? ProductName { get => fields.ProductName[this]; set => fields.ProductName[this] = value; }
 
     [DisplayName("Product Image"), Size(100)]
     [ImageUploadEditor(FilenameFormat = "ProductImage/~", CopyToHistory = true)]
-    public string ProductImage { get => fields.ProductImage[this]; set => fields.ProductImage[this] = value; }
+    public string? ProductImage { get => fields.ProductImage[this]; set => fields.ProductImage[this] = value; }
 
     [DisplayName("Discontinued"), NotNull, DefaultValue(false)]
     public bool? Discontinued { get => fields.Discontinued[this]; set => fields.Discontinued[this] = value; }
@@ -31,7 +31,7 @@ public sealed class ProductRow : Row<ProductRow.RowFields>, IIdRow, INameRow
     public int? CategoryID { get => fields.CategoryID[this]; set => fields.CategoryID[this] = value; }
     
     [DisplayName("Quantity Per Unit"), Size(20)]
-    public string QuantityPerUnit { get => fields.QuantityPerUnit[this]; set => fields.QuantityPerUnit[this] = value; }
+    public string? QuantityPerUnit { get => fields.QuantityPerUnit[this]; set => fields.QuantityPerUnit[this] = value; }
 
     [DisplayName("Unit Price"), Scale(4), LookupInclude, SummaryType(SummaryType.Avg)]
     public decimal? UnitPrice { get => fields.UnitPrice[this]; set => fields.UnitPrice[this] = value; }
@@ -46,31 +46,31 @@ public sealed class ProductRow : Row<ProductRow.RowFields>, IIdRow, INameRow
     public short? ReorderLevel { get => fields.ReorderLevel[this]; set => fields.ReorderLevel[this] = value; }
 
     [Origin("sup"), DisplayName("Supplier"), LookupInclude]
-    public string SupplierCompanyName { get => fields.SupplierCompanyName[this]; set => fields.SupplierCompanyName[this] = value; }
+    public string? SupplierCompanyName { get => fields.SupplierCompanyName[this]; set => fields.SupplierCompanyName[this] = value; }
 
     [Origin("sup")]
-    public string SupplierCountry { get => fields.SupplierCountry[this]; set => fields.SupplierCountry[this] = value; }
+    public string? SupplierCountry { get => fields.SupplierCountry[this]; set => fields.SupplierCountry[this] = value; }
 
     [Origin("cat"), DisplayName("Category")]
-    public string CategoryName { get => fields.CategoryName[this]; set => fields.CategoryName[this] = value; }
+    public string? CategoryName { get => fields.CategoryName[this]; set => fields.CategoryName[this] = value; }
 
     public class RowFields : RowFieldsBase
     {
-        public Int32Field ProductID;
-        public StringField ProductName;
-        public StringField ProductImage;
-        public BooleanField Discontinued;
-        public Int32Field SupplierID;
-        public Int32Field CategoryID;
-        public StringField QuantityPerUnit;
-        public DecimalField UnitPrice;
-        public Int16Field UnitsInStock;
-        public Int16Field UnitsOnOrder;
-        public Int16Field ReorderLevel;
+        public Int32Field ProductID = null!;
+        public StringField ProductName = null!;
+        public StringField ProductImage = null!;
+        public BooleanField Discontinued = null!;
+        public Int32Field SupplierID = null!;
+        public Int32Field CategoryID = null!;
+        public StringField QuantityPerUnit = null!;
+        public DecimalField UnitPrice = null!;
+        public Int16Field UnitsInStock = null!;
+        public Int16Field UnitsOnOrder = null!;
+        public Int16Field ReorderLevel = null!;
 
-        public StringField SupplierCompanyName;
-        public StringField SupplierCountry;
+        public StringField SupplierCompanyName = null!;
+        public StringField SupplierCountry = null!;
 
-        public StringField CategoryName;
+        public StringField CategoryName = null!;
     }
 }

@@ -5,9 +5,9 @@ namespace Serenity.Demo.Northwind.Columns;
 public class OrderDetailColumns
 {
     [DeleteRowActionFormatter, RowEditActionsColumn]
-    public object RowEditActions { get; set; }
+    public object? RowEditActions { get; set; }
     [EditLink, Width(200)]
-    public string ProductName { get; set; }
+    public string? ProductName { get; set; }
     [Width(100)]
     public decimal UnitPrice { get; set; }
     [Width(100)]

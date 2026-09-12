@@ -1,32 +1,32 @@
-﻿namespace Serenity.Demo.Northwind.Forms;
+namespace Serenity.Demo.Northwind.Forms;
 
 [FormScript("Northwind.Customer")]
 [BasedOnRow(typeof(CustomerRow), CheckNames = true)]
 public class CustomerForm
 {
     [Category("General")]
-    public string CustomerID { get; set; }
-    public string CompanyName { get; set; }
+    public string? CustomerID { get; set; }
+    public string? CompanyName { get; set; }
     [Category("Contact")]
-    public string ContactName { get; set; }
-    public string ContactTitle { get; set; }
-    public List<int> Representatives { get; set; }
+    public string? ContactName { get; set; }
+    public string? ContactTitle { get; set; }
+    public List<int>? Representatives { get; set; }
 
     [Category("Address")]
-    public string Address { get; set; }
+    public string? Address { get; set; }
     [HalfWidth]
-    public string Country { get; set; }
+    public string? Country { get; set; }
     [HalfWidth]
-    public string City { get; set; }
+    public string? City { get; set; }
     [HalfWidth]
-    public string Region { get; set; }
+    public string? Region { get; set; }
     [HalfWidth]
-    public string PostalCode { get; set; }
+    public string? PostalCode { get; set; }
     [HalfWidth]
-    public string Phone { get; set; }
+    public string? Phone { get; set; }
     [HalfWidth]
-    public string Fax { get; set; }
-    public List<object> NoteList { get; set; }
+    public string? Fax { get; set; }
+    public List<object>? NoteList { get; set; }
 
     // note: these fields are stored in an extension table (CustomerDetails)
     [Category("Details")]
@@ -35,7 +35,7 @@ public class CustomerForm
     [HalfWidth]
     public int? LastContactedBy { get; set; }
     [HalfWidth]
-    public string Email { get; set; }
+    public string? Email { get; set; }
     [HalfWidth]
     public bool? SendBulletin { get; set; }
 }

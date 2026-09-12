@@ -18,10 +18,10 @@ public sealed class ProductLogRow : Row<ProductLogRow.RowFields>, ICaptureLogRow
     public int? ProductID { get => fields.ProductID[this]; set => fields.ProductID[this] = value; }
 
     [Size(40)]
-    public string ProductName { get => fields.ProductName[this]; set => fields.ProductName[this] = value; }
+    public string? ProductName { get => fields.ProductName[this]; set => fields.ProductName[this] = value; }
 
     [Size(100)]
-    public string ProductImage { get => fields.ProductImage[this]; set => fields.ProductImage[this] = value; }
+    public string? ProductImage { get => fields.ProductImage[this]; set => fields.ProductImage[this] = value; }
 
     public bool? Discontinued { get => fields.Discontinued[this]; set => fields.Discontinued[this] = value; }
 
@@ -29,7 +29,7 @@ public sealed class ProductLogRow : Row<ProductLogRow.RowFields>, ICaptureLogRow
 
     public int? CategoryID { get => fields.CategoryID[this]; set => fields.CategoryID[this] = value; }
 
-    public string QuantityPerUnit { get => fields.QuantityPerUnit[this]; set => fields.QuantityPerUnit[this] = value; }
+    public string? QuantityPerUnit { get => fields.QuantityPerUnit[this]; set => fields.QuantityPerUnit[this] = value; }
 
     [Scale(4)]
     public decimal? UnitPrice { get => fields.UnitPrice[this]; set => fields.UnitPrice[this] = value; }
@@ -47,22 +47,22 @@ public sealed class ProductLogRow : Row<ProductLogRow.RowFields>, ICaptureLogRow
 
     public class RowFields : RowFieldsBase
     {
-        public Int64Field ProductLogID;
-        public EnumField<CaptureOperationType> OperationType;
-        public Int32Field ChangingUserId;
-        public DateTimeField ValidFrom;
-        public DateTimeField ValidUntil;
+        public Int64Field ProductLogID = null!;
+        public EnumField<CaptureOperationType> OperationType = null!;
+        public Int32Field ChangingUserId = null!;
+        public DateTimeField ValidFrom = null!;
+        public DateTimeField ValidUntil = null!;
 
-        public Int32Field ProductID;
-        public StringField ProductName;
-        public StringField ProductImage;
-        public BooleanField Discontinued;
-        public Int32Field SupplierID;
-        public Int32Field CategoryID;
-        public StringField QuantityPerUnit;
-        public DecimalField UnitPrice;
-        public Int16Field UnitsInStock;
-        public Int16Field UnitsOnOrder;
-        public Int16Field ReorderLevel;
+        public Int32Field ProductID = null!;
+        public StringField ProductName = null!;
+        public StringField ProductImage = null!;
+        public BooleanField Discontinued = null!;
+        public Int32Field SupplierID = null!;
+        public Int32Field CategoryID = null!;
+        public StringField QuantityPerUnit = null!;
+        public DecimalField UnitPrice = null!;
+        public Int16Field UnitsInStock = null!;
+        public Int16Field UnitsOnOrder = null!;
+        public Int16Field ReorderLevel = null!;
     }
 }

@@ -13,22 +13,22 @@ public sealed class CategoryLangRow : Row<CategoryLangRow.RowFields>, IIdRow, IN
     public int? CategoryId { get => fields.CategoryId[this]; set => fields.CategoryId[this] = value; }
 
     [DisplayName("Language Id"), Column("LanguageID"), NotNull]
-    public string LanguageId { get => fields.LanguageId[this]; set => fields.LanguageId[this] = value; }
+    public string? LanguageId { get => fields.LanguageId[this]; set => fields.LanguageId[this] = value; }
 
     [DisplayName("Category Name"), Size(15), QuickSearch, NameProperty]
-    public string CategoryName { get => fields.CategoryName[this]; set => fields.CategoryName[this] = value; }
+    public string? CategoryName { get => fields.CategoryName[this]; set => fields.CategoryName[this] = value; }
 
     [DisplayName("Description")]
-    public string Description { get => fields.Description[this]; set => fields.Description[this] = value; }
+    public string? Description { get => fields.Description[this]; set => fields.Description[this] = value; }
 
     public StringField CultureIdField => fields.LanguageId;
 
     public class RowFields : RowFieldsBase
     {
-        public Int32Field Id;
-        public Int32Field CategoryId;
-        public StringField LanguageId;
-        public StringField CategoryName;
-        public StringField Description;
+        public Int32Field Id = null!;
+        public Int32Field CategoryId = null!;
+        public StringField LanguageId = null!;
+        public StringField CategoryName = null!;
+        public StringField Description = null!;
     }
 }

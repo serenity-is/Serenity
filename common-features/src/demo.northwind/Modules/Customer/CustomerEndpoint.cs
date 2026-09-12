@@ -51,7 +51,7 @@ public class CustomerEndpoint : ServiceEndpoint
         [FromServices] IExcelExporter exporter, CancellationToken cancellationToken = default)
     {
         var data = (await List(connection, request, handler, cancellationToken).ConfigureAwait(false)).Entities;
-        var bytes = exporter.Export(data, typeof(Columns.CustomerColumns), request.ExportColumns);
+        var bytes = exporter.Export(data, typeof(Columns.CustomerColumns), request.ExportColumns!);
         return ExcelContentResult.Create(bytes, "CustomerList_" +
             DateTime.Now.ToString("yyyyMMdd_HHmmss", CultureInfo.InvariantCulture) + ".xlsx");
     }

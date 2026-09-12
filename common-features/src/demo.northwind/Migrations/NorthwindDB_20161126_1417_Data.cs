@@ -143,7 +143,7 @@ alter sequence Suppliers_seq restart start with 30");
         new("98104", "Seattle", 2)
     ];
 
-    record Employee(int EmployeeID, string LastName, string FirstName, string Title, string TitleOfCourtesy, DateTime BirthDate, DateTime HireDate, string Address, string City, string Region, string PostalCode, string Country, string HomePhone, string Extension, int? ReportsTo, string Notes);
+    record Employee(int EmployeeID, string LastName, string FirstName, string Title, string TitleOfCourtesy, DateTime BirthDate, DateTime HireDate, string? Address, string? City, string? Region, string? PostalCode, string? Country, string? HomePhone, string? Extension, int? ReportsTo, string? Notes);
 
     static readonly Employee[] EmployeeList = [
         new(1, "Davolio", "Nancy", "Sales Representative", "Ms.", new(1948, 12, 08), new(1992, 05, 01), "507 - 20th Ave. E.Apt. 2A", "Seattle", "WA", "98122", "USA", "(206) 555-9857", "5467", null, "Education includes a BA in psychology from Colorado State University in 1970.  She also completed \"The Art of the Cold Call.\" Nancy is a member of Toastmasters International."),
@@ -178,7 +178,7 @@ alter sequence Suppliers_seq restart start with 30");
         new(3, "Federal Shipping", "(503) 555-9931")
     ];
 
-    record Supplier(int SupplierID, string CompanyName, string ContactName, string ContactTitle, string Address, string City, string Region, string PostalCode, string Country, string Phone, string Fax, string HomePage);
+    record Supplier(int SupplierID, string CompanyName, string ContactName, string ContactTitle, string Address, string City, string? Region, string PostalCode, string Country, string Phone, string? Fax, string? HomePage);
 
     static readonly Supplier[] SupplierList = [
         new(01, "Exotic Liquids", "Charlotte Cooper", "Purchasing Manager", "49 Gilbert St.", "London", null, "EC1 4SD", "UK", "(171) 555-2222", null, null),
@@ -294,7 +294,7 @@ alter sequence Suppliers_seq restart start with 30");
         new(77, "Original Frankfurter grüne Soße", 12, 2, "12 boxes", 13.0000m, 32, 0, 15, false)
     ];
 
-    record Customer(string CustomerID, string CompanyName, string ContactName, string ContactTitle, string Address, string City, string Region, string PostalCode, string Country, string Phone, string Fax);
+    record Customer(string CustomerID, string CompanyName, string ContactName, string ContactTitle, string Address, string City, string? Region, string? PostalCode, string Country, string Phone, string? Fax);
 
     static readonly Customer[] CustomerList = [
         new("ALFKI", "Alfreds Futterkiste", "Maria Anders", "Sales Representative", "Obere Str. 57", "Berlin", null, "12209", "Germany", "030-0074321", "030-0076545"),
@@ -444,7 +444,7 @@ alter sequence Suppliers_seq restart start with 30");
         new(9, "55439")
     ];
 
-    record Order(int OrderID, string CustomerID, int EmployeeID, DateTime OrderDate, DateTime RequiredDate, DateTime? ShippedDate, int ShipVia, decimal Freight, string ShipName, string ShipAddress, string ShipCity, string ShipRegion, string ShipPostalCode, string ShipCountry);
+    record Order(int OrderID, string CustomerID, int EmployeeID, DateTime OrderDate, DateTime RequiredDate, DateTime? ShippedDate, int ShipVia, decimal Freight, string ShipName, string ShipAddress, string ShipCity, string? ShipRegion, string? ShipPostalCode, string ShipCountry);
 
     static readonly Order[] OrderList = [
         new (10248, "VINET",5, new(1996, 07, 04), new(1996, 08, 01), new(1996, 07, 16), 3, 32.38m, "Vins et alcools Chevalier", "59 rue de l-Abbaye", "Reims", null, "51100", "France"),

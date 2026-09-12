@@ -12,19 +12,19 @@ public sealed class CategoryRow : Row<CategoryRow.RowFields>, IIdRow, INameRow
     public int? CategoryID { get => fields.CategoryID[this]; set => fields.CategoryID[this] = value; }
 
     [DisplayName("Category Name"), Size(15), NotNull, QuickSearch, NameProperty]
-    public string CategoryName { get => fields.CategoryName[this]; set => fields.CategoryName[this] = value; }
+    public string? CategoryName { get => fields.CategoryName[this]; set => fields.CategoryName[this] = value; }
 
     [DisplayName("Description"), QuickSearch]
-    public string Description { get => fields.Description[this]; set => fields.Description[this] = value; }
+    public string? Description { get => fields.Description[this]; set => fields.Description[this] = value; }
 
     [DisplayName("Picture")]
-    public string PicturePath { get => fields.PicturePath[this]; set => fields.PicturePath[this] = value; }
+    public string? PicturePath { get => fields.PicturePath[this]; set => fields.PicturePath[this] = value; }
 
     public class RowFields : RowFieldsBase
     {
-        public Int32Field CategoryID;
-        public StringField CategoryName;
-        public StringField Description;
-        public StringField PicturePath;
+        public Int32Field CategoryID = null!;
+        public StringField CategoryName = null!;
+        public StringField Description = null!;
+        public StringField PicturePath = null!;
     }
 }

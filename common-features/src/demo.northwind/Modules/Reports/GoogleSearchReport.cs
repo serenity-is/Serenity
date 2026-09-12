@@ -1,4 +1,4 @@
-﻿using Serenity.Reporting;
+using Serenity.Reporting;
 
 namespace Serenity.Demo.Northwind.Reports;
 
@@ -11,10 +11,10 @@ namespace Serenity.Demo.Northwind.Reports;
 public class GoogleSearchReport : IReport, IExternalReport
 {
     [DisplayName("Search Query"), Required(true)]
-    public string Query { get; set; }
+    public string? Query { get; set; }
 
     public object GetData()
     {
-        return "https://www.google.com.tr/search?q=" + Uri.EscapeDataString(Query);
+        return "https://www.google.com.tr/search?q=" + Uri.EscapeDataString(Query!);
     }
 }

@@ -5,9 +5,9 @@
 public class SalesByCategoryColumns
 {
     [Width(150), SortOrder(1)]
-    public string CategoryName { get; set; }
+    public string? CategoryName { get; set; }
     [Width(250)]
-    public string ProductName { get; set; }
+    public string? ProductName { get; set; }
     [Width(150), AlignRight, SortOrder(2, descending: true), DisplayFormat("#,##0.00")]
     public decimal ProductSales { get; set; }
 }

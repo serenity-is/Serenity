@@ -1,4 +1,4 @@
-﻿using Serenity.Reporting;
+using Serenity.Reporting;
 
 namespace Serenity.Demo.Northwind;
 
@@ -23,12 +23,12 @@ public class EmployeeListDecorator(ITwoLevelCache cache, ISqlConnections sqlConn
                 return connection.List<EmployeeRow>(q => q
                     .Select(fld.EmployeeID)
                     .Select(fld.FullName))
-                    .ToDictionary(x => x.EmployeeID.Value);
-            });
+                    .ToDictionary(x => x.EmployeeID!.Value);
+            })!;
 
         Value = string.Join(", ", idList.Select(x =>
         {
-            return byId.TryGetValue(x, out EmployeeRow e) ? e.FullName : x.ToString(CultureInfo.InvariantCulture);
+            return byId.TryGetValue(x, out EmployeeRow? e) ? e.FullName : x.ToString(CultureInfo.InvariantCulture);
         }));
     }
 }

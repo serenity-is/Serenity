@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 
 namespace Serenity.Reporting;
 
@@ -34,5 +34,5 @@ public interface IExcelExporter
     /// <param name="exportColumns">Determines the names and order of
     /// columns to be exported.</param>
     /// <returns>The generated Excel file content.</returns>
-    byte[] Export(IEnumerable data, Type columnsType, IEnumerable<string> exportColumns);
+    byte[] Export(IEnumerable data, Type columnsType, IEnumerable<string>? exportColumns);
 }

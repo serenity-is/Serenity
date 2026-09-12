@@ -7,5 +7,5 @@ public class RegionColumns
     [EditLink, DisplayName("Db.Shared.RecordId"), AlignRight]
     public int RegionID { get; set; }
     [EditLink, Width(300)]
-    public string RegionDescription { get; set; }
+    public string? RegionDescription { get; set; }
 }

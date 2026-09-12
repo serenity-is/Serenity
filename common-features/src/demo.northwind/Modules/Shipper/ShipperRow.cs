@@ -11,15 +11,15 @@ public sealed class ShipperRow : Row<ShipperRow.RowFields>, IIdRow, INameRow
     public int? ShipperID { get => fields.ShipperID[this]; set => fields.ShipperID[this] = value; }
 
     [DisplayName("Company Name"), Size(40), NotNull, QuickSearch, NameProperty]
-    public string CompanyName { get => fields.CompanyName[this]; set => fields.CompanyName[this] = value; }
+    public string? CompanyName { get => fields.CompanyName[this]; set => fields.CompanyName[this] = value; }
 
     [DisplayName("Phone"), Size(24)]
-    public string Phone { get => fields.Phone[this]; set => fields.Phone[this] = value; }
+    public string? Phone { get => fields.Phone[this]; set => fields.Phone[this] = value; }
 
     public class RowFields : RowFieldsBase
     {
-        public Int32Field ShipperID;
-        public StringField CompanyName;
-        public StringField Phone;
+        public Int32Field ShipperID = null!;
+        public StringField CompanyName = null!;
+        public StringField Phone = null!;
     }
 }

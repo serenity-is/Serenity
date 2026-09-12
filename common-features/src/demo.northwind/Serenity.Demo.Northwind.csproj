@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Razor">
   <PropertyGroup>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Migrations\*.sql" />

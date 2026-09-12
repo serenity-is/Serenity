@@ -12,7 +12,7 @@ namespace Serenity.Demo.Northwind.Annotations;
 public sealed class OrderRowAnnotations
 {
     [CustomerEditor]
-    public string CustomerID { get; set; }
+    public string? CustomerID { get; set; }
 
     [AsyncLookupEditor(typeof(EmployeeRow))]
     public int? EmployeeID { get; set; }

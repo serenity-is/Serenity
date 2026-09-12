@@ -41,7 +41,7 @@ public class ExcelExporter(IDataReportExcelRenderer renderer, IServiceProvider s
     /// <param name="columnsType">The type defining the report columns.</param>
     /// <param name="exportColumns">The subset of columns to export.</param>
     /// <returns>The generated Excel file bytes.</returns>
-    public byte[] Export(IEnumerable data, Type columnsType, IEnumerable<string> exportColumns)
+    public byte[] Export(IEnumerable data, Type columnsType, IEnumerable<string>? exportColumns)
     {
         var report = new TabularDataReport(data, columnsType, exportColumns, serviceProvider);
         return renderer.Render(report);

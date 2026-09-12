@@ -8,7 +8,7 @@ public class NotesBehavior(IUserRetrieveService userRetriever,
     IServiceResolver<INoteDeleteHandler> deleteHandlerResolver) : BaseSaveDeleteBehaviorAsync,
     IRetrieveBehaviorAsync, IImplicitBehavior, IFieldBehavior
 {
-    public Field Target { get; set; }
+    public Field? Target { get; set; }
 
     private readonly IUserRetrieveService userRetriever = userRetriever ?? throw new ArgumentNullException(nameof(userRetriever));
     private readonly IServiceResolver<INoteListHandler> listHandlerResolver = listHandlerResolver ?? throw new ArgumentNullException(nameof(listHandlerResolver));
@@ -43,16 +43,16 @@ public class NotesBehavior(IUserRetrieveService userRetriever,
             !handler.ShouldSelectField(Target))
             return;
 
-        var idField = (handler.Row as IIdRow).GetIdField();
+        var idField = handler.Row.GetIdField();
         var fld = NoteRow.Fields;
 
         var listRequest = new ListRequest
         {
             ColumnSelection = ColumnSelection.List,
-            EqualityFilter = new Dictionary<string, object>
+            EqualityFilter = new Dictionary<string, object?>
             {
-                { fld.EntityType.PropertyName, handler.Row.Table },
-                { fld.EntityId.PropertyName, idField.AsObject(handler.Row) ?? -1 }
+                { fld.EntityType.PropertyName!, handler.Row.Table },
+                { fld.EntityId.PropertyName!, idField.AsObject(handler.Row) ?? -1 }
             }
         };
 
@@ -60,7 +60,7 @@ public class NotesBehavior(IUserRetrieveService userRetriever,
             listRequest, cancellationToken).ConfigureAwait(false)).Entities;
 
         var userIdList = notes.Where(x => x.InsertUserId != null)
-            .Select(x => x.InsertUserId.Value).Distinct();
+            .Select(x => x.InsertUserId!.Value).Distinct();
 
         if (userIdList.Any())
         {
@@ -70,7 +70,7 @@ public class NotesBehavior(IUserRetrieveService userRetriever,
 
             foreach (var x in notes)
                 if (x.InsertUserId != null &&
-                    userDisplayNames.TryGetValue(x.InsertUserId.Value, out string s))
+                    userDisplayNames.TryGetValue(x.InsertUserId.Value, out string? s))
                     x.InsertUserDisplayName = s;
         }
 
@@ -152,7 +152,7 @@ public class NotesBehavior(IUserRetrieveService userRetriever,
             var id = rowIdField.AsObject(item);
 
             if (id == null || !oldById.TryGetValue(Convert.ToInt64(id,
-                CultureInfo.InvariantCulture), out NoteRow old))
+                CultureInfo.InvariantCulture), out NoteRow? old))
                 continue;
 
             bool anyChanges = false;
@@ -186,12 +186,12 @@ public class NotesBehavior(IUserRetrieveService userRetriever,
     /// <inheritdoc/>
     public override async Task OnAfterSaveAsync(ISaveRequestHandler handler, CancellationToken cancellationToken = default)
     {
-        if (Target.AsObject(handler.Row) is not List<NoteRow> newList)
+        if (Target!.AsObject(handler.Row) is not List<NoteRow> newList)
             return;
 
         var idField = handler.Row.GetIdField();
         var entityId = Convert.ToString(idField.AsObject(handler.Row),
-            CultureInfo.InvariantCulture);
+            CultureInfo.InvariantCulture)!;
 
         if (handler.IsCreate)
         {
@@ -205,10 +205,10 @@ public class NotesBehavior(IUserRetrieveService userRetriever,
         var listRequest = new ListRequest
         {
             ColumnSelection = ColumnSelection.List,
-            EqualityFilter = new Dictionary<string, object>
+            EqualityFilter = new Dictionary<string, object?>
             {
-                { fld.EntityType.PropertyName, handler.Row.Table },
-                { fld.EntityId.PropertyName, entityId }
+                { fld.EntityType.PropertyName!, handler.Row.Table },
+                { fld.EntityId.PropertyName!, entityId }
             }
         };
 
@@ -235,11 +235,11 @@ public class NotesBehavior(IUserRetrieveService userRetriever,
                 .Select(fld.NoteId)
                 .Where(
                     fld.EntityType == handler.Row.Table &
-                    fld.EntityId == Convert.ToString(idField.AsObject(handler.Row),
-                        CultureInfo.InvariantCulture))
+                    fld.EntityId == Convert.ToString(idField.AsObject(handler.Row)!,
+                        CultureInfo.InvariantCulture)!)
                 .ForEachAsync(handler.Connection, () =>
                 {
-                    deleteList.Add(row.NoteId.Value);
+                    deleteList.Add(row.NoteId!.Value);
                 }, cancellationToken).ConfigureAwait(false);
 
         foreach (var id in deleteList)

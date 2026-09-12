@@ -1,4 +1,4 @@
-﻿using Serenity.Reporting;
+using Serenity.Reporting;
 
 namespace Serenity.Demo.Northwind;
 
@@ -26,8 +26,8 @@ public class SalesByDetailReport(ISqlConnections sqlConnections, ITextLocalizer 
     [BasedOnRow(typeof(SalesByCategoryRow), CheckNames = true)]
     public class Item
     {
-        public string CategoryName { get; set; }
-        public string ProductName { get; set; }
+        public string? CategoryName { get; set; }
+        public string? ProductName { get; set; }
         public decimal ProductSales { get; set; }
     }
 }

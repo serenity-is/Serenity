@@ -33,17 +33,17 @@
             <div class="col-xs-4 invoice-col">
                 To
                 <address>
-                    <strong>@Model.Customer.CompanyName</strong><br>
+                    <strong>@Model.Customer!.CompanyName</strong><br>
                     @Model.Customer.Address
                     Phone: @Model.Customer.Phone<br>
                     Fax: @Model.Customer.Fax
                 </address>
             </div>
             <div class="col-xs-4 invoice-col">
-                <b>Invoice #IX@(Model.Order.OrderID)</b><br>
+                <b>Invoice #IX@(Model.Order!.OrderID)</b><br>
                 <br>
                 <b>Order ID:</b> @Model.Order.OrderID<br>
-                <b>Payment Due:</b> @Model.Order.OrderDate.Value.ToShortDateString()<br>
+                <b>Payment Due:</b> @Model.Order.OrderDate!.Value.ToShortDateString()<br>
             </div>
         </div>
         <div class="row">
@@ -59,7 +59,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var d in Model.Details)
+                        @foreach (var d in Model.Details!)
                         {
                             <tr>
                                 <td>@d.ProductName</td>

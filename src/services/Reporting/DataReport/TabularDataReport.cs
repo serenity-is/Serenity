@@ -88,12 +88,12 @@ public class TabularDataReport : IDataOnlyReport
     /// <param name="serviceProvider">Service provider that will be used to
     /// extract PropertyItems from the columns type</param>
     /// <exception cref="ArgumentNullException"><paramref name="data"/>, <paramref name="columnsType"/>, <paramref name="exportColumns"/> or <paramref name="serviceProvider"/> is <c>null</c>.</exception>
-    public TabularDataReport(IEnumerable data, Type columnsType, IEnumerable<string> exportColumns,
+    public TabularDataReport(IEnumerable data, Type columnsType, IEnumerable<string>? exportColumns,
         IServiceProvider serviceProvider)
     {
         Data = data ?? throw new ArgumentNullException(nameof(data));
         ColumnsType = columnsType ?? throw new ArgumentNullException(nameof(columnsType));
-        ExportColumns = exportColumns ?? throw new ArgumentNullException(nameof(exportColumns));
+        ExportColumns = exportColumns;
         ServiceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
     }
 
@@ -177,13 +177,13 @@ public class TabularDataReport : IDataOnlyReport
 
         foreach (var columnName in exportColumns)
         {
-            if (!propertyItemByName!.TryGetValue(columnName, out PropertyItem? item))
+            if (!((IDictionary<string, PropertyItem>?)null)!.TryGetValue(columnName, out PropertyItem? item))
                 continue;
 
             var basedOnField = basedOnRow == null ? null :
                 (basedOnRow.FindField(columnName) ?? basedOnRow.FindFieldByPropertyName(columnName));
 
-            if (propertyInfos == null || !propertyInfos.TryGetValue(columnName, out PropertyInfo? p))
+            if ((IDictionary<string, PropertyInfo>?)null == null || !((IDictionary<string, PropertyInfo>?)null).TryGetValue(columnName, out PropertyInfo? p))
                 p = null;
 
             list.Add(FromPropertyItem(item, basedOnField, p, serviceProvider, 
