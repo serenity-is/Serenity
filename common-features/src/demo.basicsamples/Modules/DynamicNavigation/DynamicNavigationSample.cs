@@ -1,4 +1,4 @@
-﻿using Serenity.Demo.Northwind;
+using Serenity.Demo.Northwind;
 
 namespace Serenity.Demo.BasicSamples;
 
@@ -21,7 +21,7 @@ public class DynamicNavigationSample(ISqlConnections sqlConnections) : INavigati
             foreach (var category in categories)
                 items.Add(new NavigationLinkAttribute(7970,
                     path: "Basic Samples/Dynamic Navigation/" + 
-                        category.CategoryName.Replace("/", "//", StringComparison.Ordinal),
+                        category.CategoryName!.Replace("/", "//", StringComparison.Ordinal),
                     url: "~/Northwind/Product?cat=" + category.CategoryID,
                     permission: PermissionKeys.General));
         }

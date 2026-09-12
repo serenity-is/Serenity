@@ -10,29 +10,29 @@ namespace Serenity.Demo.BasicSamples.Forms;
 public class PopulateLinkedDataForm
 {
     [Category("Order")]
-    public String CustomerID { get; set; }
+    public string? CustomerID { get; set; }
 
     [Category("Customer Details")]
     [ReadOnly(true)]
-    public String CustomerContactName { get; set; }
+    public string? CustomerContactName { get; set; }
     [ReadOnly(true)]
-    public String CustomerContactTitle { get; set; }
+    public string? CustomerContactTitle { get; set; }
     [ReadOnly(true)]
-    public String CustomerCity { get; set; }
+    public string? CustomerCity { get; set; }
     [ReadOnly(true)]
-    public String CustomerRegion { get; set; }
+    public string? CustomerRegion { get; set; }
     [ReadOnly(true)]
-    public String CustomerCountry { get; set; }
+    public string? CustomerCountry { get; set; }
     [ReadOnly(true)]
-    public String CustomerPhone { get; set; }
+    public string? CustomerPhone { get; set; }
     [ReadOnly(true)]
-    public String CustomerFax { get; set; }
+    public string? CustomerFax { get; set; }
 
     [Category("Order Details")]
     [DefaultValue("now")]
     public DateTime OrderDate { get; set; }
     public DateTime RequiredDate { get; set; }
-    public Int32? EmployeeID { get; set; }
+    public int? EmployeeID { get; set; }
     [OrderDetailsEditor]
-    public List<OrderDetailRow> DetailList { get; set; } 
+    public List<OrderDetailRow>? DetailList { get; set; } 
 }

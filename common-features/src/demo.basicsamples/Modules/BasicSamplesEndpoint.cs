@@ -7,15 +7,17 @@ namespace Serenity.Demo.BasicSamples.Endpoints;
 [ConnectionKey(typeof(OrderRow))]
 public class BasicSamplesEndpoint : ServiceEndpoint
 {
+#pragma warning disable IDE0060 // Remove unused parameter
     public OrdersByShipperResponse OrdersByShipper(IDbConnection connection, OrdersByShipperRequest request)
+#pragma warning restore IDE0060 // Remove unused parameter
     {
         var fld = OrderRow.Fields;
         var year = DateTime.Today.Year;
 
         var response = new OrdersByShipperResponse();
         var shippers = connection.List<ShipperRow>(q => q.SelectTableFields().OrderBy(ShipperRow.Fields.CompanyName));
-        response.ShipperKeys = shippers.Select(x => "s" + x.ShipperID.Value).ToList();
-        response.ShipperLabels = shippers.Select(x => x.CompanyName).ToList();
+        response.ShipperKeys = [.. shippers.Select(x => "s" + x.ShipperID!.Value)];
+        response.ShipperLabels = [.. shippers.Select(x => x.CompanyName)];
 
         var monthExpr = new DatePartAttribute(DateParts.Month, fld.OrderDate.Expression)
             .ToString(connection.GetDialect());
@@ -37,7 +39,7 @@ public class BasicSamplesEndpoint : ServiceEndpoint
         var month = 0;
         for (var i = 0; i < 12; i++)
         {
-            var d = new Dictionary<string, object>
+            var d = new Dictionary<string, object?>
             {
                 ["Month"] = new DateTime(1999, (i + 1), 1)
                     .ToString("MMM", CultureInfo.CurrentCulture)
@@ -45,7 +47,7 @@ public class BasicSamplesEndpoint : ServiceEndpoint
 
             foreach (var p in shippers)
                 d["s" + p.ShipperID] = byMonth.TryGetValue(
-                    new Tuple<int, int>(month, p.ShipperID.Value), out int mc) ? mc : 0;
+                    new Tuple<int, int>(month, p.ShipperID!.Value), out int mc) ? mc : 0;
 
             response.Values.Add(d);
 

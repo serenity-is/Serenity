@@ -1,21 +1,21 @@
-﻿namespace Serenity.Demo.BasicSamples.Forms;
+namespace Serenity.Demo.BasicSamples.Forms;
 
 [FormScript("BasicSamples.LookupFilterByMultiple")]
 [BasedOnRow(typeof(Northwind.ProductRow), CheckNames = true)]
 public class LookupFilterByMultipleForm
 {
     [Category("General")]
-    public String ProductName { get; set; }
-    public String ProductImage { get; set; }
-    public Boolean Discontinued { get; set; }
-    public Int32 SupplierID { get; set; }
+    public string? ProductName { get; set; }
+    public string? ProductImage { get; set; }
+    public bool Discontinued { get; set; }
+    public int SupplierID { get; set; }
     [ProduceSeafoodCategoryEditor]
-    public Int32 CategoryID { get; set; }
+    public int CategoryID { get; set; }
     [Category("Pricing")]
-    public String QuantityPerUnit { get; set; }
-    public Decimal UnitPrice { get; set; }
+    public string? QuantityPerUnit { get; set; }
+    public decimal UnitPrice { get; set; }
     [Category("Status")]
-    public Int16 UnitsInStock { get; set; }
-    public Int16 UnitsOnOrder { get; set; }
-    public Int16 ReorderLevel { get; set; }
+    public short UnitsInStock { get; set; }
+    public short UnitsOnOrder { get; set; }
+    public short ReorderLevel { get; set; }
 }

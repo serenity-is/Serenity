@@ -1,12 +1,12 @@
-﻿namespace Serenity.Demo.BasicSamples.Forms;
+namespace Serenity.Demo.BasicSamples.Forms;
 
 [FormScript("BasicSamples.ChangingLookupText")]
 [BasedOnRow(typeof(Northwind.OrderDetailRow), CheckNames = true)]
 public class ChangingLookupTextForm
 {
     [ChangingLookupTextEditor(Async = true)]
-    public Int32 ProductID { get; set; }
-    public Decimal UnitPrice { get; set; }
-    public Int32 Quantity { get; set; }
-    public Double Discount { get; set; }
+    public int ProductID { get; set; }
+    public decimal UnitPrice { get; set; }
+    public int Quantity { get; set; }
+    public double Discount { get; set; }
 }

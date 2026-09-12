@@ -9,7 +9,7 @@ namespace Serenity.Demo.BasicSamples.Forms;
 [BasedOnRow(typeof(OrderRow), CheckNames = true)]
 public class FilteredLookupInDetailForm
 {
-    public String CustomerID { get; set; }
+    public string? CustomerID { get; set; }
     [DefaultValue("now")]
     public DateTime OrderDate { get; set; }
 
@@ -21,9 +21,9 @@ public class FilteredLookupInDetailForm
     /// it would raise an error on deserialization.
     /// </summary>
     [DisplayName("Category"), LookupEditor(typeof(CategoryRow)), SkipOnSave, SkipNameCheck]
-    public Int32? CategoryID { get; set; }
+    public int? CategoryID { get; set; }
 
     [Category("Order Details")]
     [FilteredLookupDetailEditor]
-    public List<OrderDetailRow> DetailList { get; set; }
+    public List<OrderDetailRow>? DetailList { get; set; }
 }

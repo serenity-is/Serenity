@@ -11,7 +11,7 @@ namespace Serenity.Demo.BasicSamples;
 
 public static class BasicSamplesHelper
 {
-    public static HtmlString BasicSamplesSourceFile(this HtmlHelper helper, string file)
+    public static HtmlString? BasicSamplesSourceFile(this HtmlHelper helper, string file)
     {
         if (file == null || file.Length == 0)
             return null;
@@ -24,7 +24,7 @@ public static class BasicSamplesHelper
 
     public static string GetRepositoryBlobUrl(this HtmlHelper helper)
     {
-        return $"{RepositoryUrl}/blob/{Uri.EscapeDataString(GetCommitId(helper))}/";
+        return $"{RepositoryUrl}/blob/{Uri.EscapeDataString(GetCommitId(helper) ?? "")}/";
     }
 
     private static string GetRelativePathFor(HtmlHelper helper, string file)
@@ -34,12 +34,12 @@ public static class BasicSamplesHelper
         if (module != null && module.Contains("/esm/", StringComparison.OrdinalIgnoreCase))
         {
             var idx = module.IndexOf("/esm/", StringComparison.OrdinalIgnoreCase) + 4;
-            absolutePath = Path.GetDirectoryName(module[idx..]).Replace('\\', '/') + '/';
+            absolutePath = (Path.GetDirectoryName(module[idx..]) ?? "").Replace('\\', '/') + '/';
         }
         else
         {
             var viewLocation = ((RazorView)helper.ViewContext.View).Path;
-            absolutePath = Path.GetDirectoryName(viewLocation).Replace('\\', '/') + '/';
+            absolutePath = (Path.GetDirectoryName(viewLocation) ?? "").Replace('\\', '/') + '/';
         }
         var relative = file.Replace('\\', '/');
         var question = relative.IndexOf('?', StringComparison.Ordinal);
@@ -57,9 +57,9 @@ public static class BasicSamplesHelper
         return relative;
     }
 
-    private static string cachedCommitId;
+    private static string? cachedCommitId;
 
-    private static string GetCommitId(this HtmlHelper helper)
+    private static string? GetCommitId(this HtmlHelper helper)
     {
         if (cachedCommitId != null)
             return cachedCommitId;
@@ -71,7 +71,7 @@ public static class BasicSamplesHelper
 
         var asm = typeof(BasicSamplesHelper).Assembly;
 
-        var infVersion = asm.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
+        var infVersion = asm.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion;
         if (infVersion != null)
         {
             var plus = infVersion.IndexOf('+');
@@ -79,7 +79,7 @@ public static class BasicSamplesHelper
                 return cachedCommitId = infVersion[(plus + 1)..];
         }
 
-        var packageId = asm.GetName().Name.ToLowerInvariant();
+        var packageId = asm.GetName().Name!.ToLowerInvariant();
         var version = asm.GetName().Version;
         try
         {
@@ -126,21 +126,21 @@ public static class BasicSamplesHelper
     }
 
     public static ModulePageResult SampleGridPage(this Controller controller, string module, LocalText pageTitle,
-        object options = null, string layout = null)
+        object? options = null, string? layout = null)
     {
         return controller.GridPage(module, pageTitle, options, layout ??
             MVC.Views.BasicSamplesLayout);
     }
 
     public static ModulePageResult SampleGridPage<TRow>(this Controller controller, string module,
-        object options = null, string layout = null, LocalText pageTitle = null)
+        object? options = null, string? layout = null, LocalText? pageTitle = null)
         where TRow : IRow, new()
     {
         return controller.GridPage<TRow>(module, options, layout ?? MVC.Views.BasicSamplesLayout, pageTitle);
     }
 
     public static ModulePageResult SamplePanelPage(this Controller controller, string module, LocalText pageTitle,
-        object options = null, string layout = null)
+        object? options = null, string? layout = null)
     {
         return controller.PanelPage(module, pageTitle, options, layout ??
             MVC.Views.BasicSamplesLayout);

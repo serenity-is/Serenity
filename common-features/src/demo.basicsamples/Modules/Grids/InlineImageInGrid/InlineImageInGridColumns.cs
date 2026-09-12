@@ -1,15 +1,15 @@
-﻿namespace Serenity.Demo.BasicSamples.Columns;
+namespace Serenity.Demo.BasicSamples.Columns;
 
 [ColumnsScript("BasicSamples.InlineImageInGrid")]
 [BasedOnRow(typeof(Northwind.ProductRow), CheckNames = true)]
 public class InlineImageInGridColumns
 {
     [EditLink, DisplayName("Db.Shared.RecordId"), AlignRight]
-    public String ProductID { get; set; }
+    public string? ProductID { get; set; }
     [EditLink, Width(250)]
-    public String ProductName { get; set; }
+    public string? ProductName { get; set; }
     [InlineImageFormatter, Width(450)]
-    public String ProductImage { get; set; }
+    public string? ProductImage { get; set; }
     [NotMapped, InlineImageFormatter(FileProperty = "ProductImage", Thumb = true), Width(450)]
-    public String ProductThumbnail { get; set; }
+    public string? ProductThumbnail { get; set; }
 }
