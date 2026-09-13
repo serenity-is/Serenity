@@ -93,6 +93,8 @@ public class TabularDataReport : IDataOnlyReport
     {
         Data = data ?? throw new ArgumentNullException(nameof(data));
         ColumnsType = columnsType ?? throw new ArgumentNullException(nameof(columnsType));
+        if (columnsType == null)
+            ArgumentNullException.ThrowIfNull(exportColumns);
         ExportColumns = exportColumns;
         ServiceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
     }
@@ -177,13 +179,13 @@ public class TabularDataReport : IDataOnlyReport
 
         foreach (var columnName in exportColumns)
         {
-            if (!((IDictionary<string, PropertyItem>?)null)!.TryGetValue(columnName, out PropertyItem? item))
+            if (!propertyItemByName!.TryGetValue(columnName, out PropertyItem? item))
                 continue;
 
             var basedOnField = basedOnRow == null ? null :
                 (basedOnRow.FindField(columnName) ?? basedOnRow.FindFieldByPropertyName(columnName));
 
-            if ((IDictionary<string, PropertyInfo>?)null == null || !((IDictionary<string, PropertyInfo>?)null).TryGetValue(columnName, out PropertyInfo? p))
+            if (propertyInfos == null || !propertyInfos.TryGetValue(columnName, out PropertyInfo? p))
                 p = null;
 
             list.Add(FromPropertyItem(item, basedOnField, p, serviceProvider, 

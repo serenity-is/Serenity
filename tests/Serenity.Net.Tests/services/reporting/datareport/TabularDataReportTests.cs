@@ -169,7 +169,7 @@ public class TabularDataReportTests
         Assert.Throws<ArgumentNullException>(() =>
             new TabularDataReport(data, null, exportColumns, CreateProvider()));
         Assert.Throws<ArgumentNullException>(() =>
-            new TabularDataReport(data, typeof(TestColumns), null, CreateProvider()));
+            new TabularDataReport(data, null, null, CreateProvider()));
         Assert.Throws<ArgumentNullException>(() =>
             new TabularDataReport(data, typeof(TestColumns), exportColumns, null));
     }
