@@ -12,11 +12,11 @@ public class ResolveResult
     public string? ActualPath { get; set; }
 }
 
-public partial class TSModuleResolver
+public partial class TSModuleResolver(IFileSystem fileSystem, string tsConfigDir, TSConfig? tsConfig)
 {
-    private readonly IFileSystem fileSystem;
-    private readonly string tsBasePath;
-    private readonly Dictionary<string, string[]> paths;
+    private readonly IFileSystem fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
+    private readonly string tsBasePath = PathHelper.ToPath(tsConfigDir);
+    private readonly Dictionary<string, string[]> paths = tsConfig?.CompilerOptions?.Paths ?? [];
 
     private readonly string[] extensions =
     [
@@ -24,6 +24,22 @@ public partial class TSModuleResolver
         ".tsx",
         ".d.ts"
     ];
+
+    private static readonly string[] jsExtensions =
+    [
+        ".js",
+        ".jsx",
+        ".mjs",
+        ".cjs"
+    ];
+
+    static string? RemoveJSExtension(string? path)
+    {
+        foreach (var ext in jsExtensions)
+            if (path is not null && path.EndsWith(ext, StringComparison.OrdinalIgnoreCase))
+                return path[..^ext.Length];
+        return null;
+    }
 
 #if ISSOURCEGENERATOR
     private static readonly Regex removeMultiSlash = new(@"\/+", RegexOptions.Compiled);
@@ -35,15 +51,6 @@ public partial class TSModuleResolver
 #endif
     private static readonly char[] slashSeparator = ['/'];
 
-    public TSModuleResolver(IFileSystem fileSystem, string tsConfigDir, TSConfig? tsConfig)
-    {
-        this.fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
-
-        tsBasePath = PathHelper.ToPath(tsConfigDir);
-
-        paths = tsConfig?.CompilerOptions?.Paths ?? [];
-    }
-
     private class PackageJson
     {
         public string? Name { get; set; }
@@ -53,6 +60,8 @@ public partial class TSModuleResolver
         public Dictionary<string, string>? PeerDependencies { get; set; }
         public string? Types { get; set; }
         public string? Typings { get; set; }
+        public string? Main { get; set; }
+        public string? Module { get; set; }
     }
 
     static string? RemoveTrailing(string? path)
@@ -107,7 +116,8 @@ public partial class TSModuleResolver
 
     private string? ResolveRelative(string relativePath, string referencedFrom)
     {
-        string relative = removeMultiSlash.Replace(PathHelper.ToUrl(relativePath), "/");
+        relativePath = PathHelper.ToUrl(relativePath);
+        string relative = removeMultiSlash.Replace(relativePath, "/");
 
         var searchBase = relativePath.StartsWith('/') ?
             tsBasePath : fileSystem.GetDirectoryName(RemoveTrailing(referencedFrom)!);
@@ -116,6 +126,10 @@ public partial class TSModuleResolver
             relative = relative[2..];
         else if (!relativePath.StartsWith("../", StringComparison.Ordinal))
             relative = relative[1..];
+
+        var withoutJsExtension = RemoveJSExtension(relative);
+        if (withoutJsExtension is not null)
+            relative = withoutJsExtension;
 
         var withoutSlash = relative.EndsWith('/') ?
             relative[..^1] : relative;
@@ -272,8 +286,10 @@ public partial class TSModuleResolver
                     if (resolvedPath == null)
                     {
                         var searchBase = fileSystem.Combine(nodeModules, PathHelper.ToPath(fileNameOrModule));
-                        var index = fileSystem.Combine(searchBase, "index.d.ts");
-                        if (fileSystem.FileExists(index))
+                        var index = extensions
+                            .Select(ext => fileSystem.Combine(searchBase, "index" + ext))
+                            .FirstOrDefault(fileSystem.FileExists);
+                        if (index is not null)
                         {
                             moduleName = fileNameOrModule;
                             resolvedPath = index;
@@ -349,6 +365,18 @@ public partial class TSModuleResolver
                 moduleName = packageJson.Name ?? TryGetNodePackageName(path) ?? fileSystem.GetFileName(path);
                 return fileSystem.Combine(path, types);
             }
+
+            var main = packageJson.Main ?? packageJson.Module;
+            if (!string.IsNullOrEmpty(main))
+            {
+                var declaration = (RemoveJSExtension(main) ?? main) + ".d.ts";
+                if (fileSystem.FileExists(fileSystem.Combine(path, declaration)))
+                {
+                    moduleName = packageJson.Name ?? TryGetNodePackageName(path) ?? fileSystem.GetFileName(path);
+                    return fileSystem.Combine(path, declaration);
+                }
+            }
+
             return null;
         }
 
@@ -420,9 +448,9 @@ public partial class TSModuleResolver
             return null;
 
         foreach (var directory in fileSystem.GetDirectories(packageRoot)
-            .OrderByDescending(x => Version.TryParse(x, out var version) ? version : new Version(0, 0, 0)))
+            .OrderByDescending(x => Version.TryParse(fileSystem.GetFileName(x), out var version) ? version : new Version(0, 0, 0)))
         {
-            var packageIndex = fileSystem.Combine(packageRoot, value, "dist", "index.d.ts");
+            var packageIndex = fileSystem.Combine(packageRoot, fileSystem.GetFileName(directory), "dist", "index.d.ts");
             if (fileSystem.FileExists(packageIndex))
                 return packageIndex;
         }
