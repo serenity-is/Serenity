@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
 namespace Serenity;
@@ -21,6 +22,7 @@ public static class ArgumentChecks
     /// e.g. <c>"request.Entity"</c>, using
     /// <see cref="CallerArgumentExpressionAttribute"/>.</param>
     /// <returns>The non-null <paramref name="argument"/>.</returns>
+    [return:NotNullIfNotNull(nameof(argument))]
     public static T NotNull<T>(T? argument,
         [CallerArgumentExpression(nameof(argument))] string? paramName = null)
     {
@@ -35,6 +37,7 @@ public static class ArgumentChecks
     /// <see cref="CallerArgumentExpressionAttribute"/>.</param>
     /// <returns>The non-null <paramref name="argument"/>.</returns>
     /// </summary>
+    [return: NotNullIfNotNull(nameof(argument))]
     public static T NotNull<T>(T? argument,
         [CallerArgumentExpression(nameof(argument))] string? paramName = null)
         where T : struct

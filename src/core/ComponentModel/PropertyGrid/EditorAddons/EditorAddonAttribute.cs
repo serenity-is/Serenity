@@ -46,14 +46,13 @@ public class EditorAddonAttribute(string type) : Attribute
     /// <typeparam name="TType">The type of the option.</typeparam>
     /// <param name="key">The key.</param>
     /// <returns>The option value, or the default value of <typeparamref name="TType"/> if not set.</returns>
-    [return: MaybeNull]
     protected TType GetOption<TType>(string key)
     {
         if (options == null)
-            return default;
+            return default!;
 
         if (!options.TryGetValue(key, out object? obj) || obj == null)
-            return default;
+            return default!;
 
         return (TType)obj;
     }

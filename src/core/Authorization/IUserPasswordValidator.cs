@@ -1,4 +1,4 @@
-﻿namespace Serenity.Abstractions;
+namespace Serenity.Abstractions;
 
 /// <summary>
 /// Validates a username and password combination.
@@ -14,5 +14,5 @@ public interface IUserPasswordValidator
     /// <see cref="PasswordValidationResult.Valid"/> when the credentials are valid; otherwise a value
     /// indicating the reason for failure.
     /// </returns>
-    PasswordValidationResult Validate(ref string username, string password);
+    PasswordValidationResult Validate(ref string? username, string? password);
 }

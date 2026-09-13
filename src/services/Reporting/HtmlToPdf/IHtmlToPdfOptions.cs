@@ -38,7 +38,7 @@ public interface IHtmlToPdfOptions
     /// <summary>
     /// Page size constant like "A4", "Letter" etc. Default value is A4
     /// </summary>
-    string PageSize { get; set; }
+    string? PageSize { get; set; }
 
     /// <summary>
     /// Page width like 21cm. Default value is unspecified.

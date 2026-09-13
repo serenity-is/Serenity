@@ -237,7 +237,7 @@ public class WKHtmlToPdf(IHtmlToPdfOptions? options = null) : IHtmlToPdfOptions
     public string? PageHeight { get => options.PageHeight; set => options.PageHeight = value; }
 
     /// <inheritdoc/>
-    public string PageSize { get => options.PageSize; set => options.PageSize = value; }
+    public string? PageSize { get => options.PageSize; set => options.PageSize = value; }
 
     /// <inheritdoc/>
     public string? PageWidth { get => options.PageWidth; set => options.PageWidth = value; }

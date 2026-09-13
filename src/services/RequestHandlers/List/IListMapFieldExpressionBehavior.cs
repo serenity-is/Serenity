@@ -12,5 +12,5 @@ public interface IListMapFieldExpressionBehavior
     /// <param name="handler">List handler</param>
     /// <param name="query">Query</param>
     /// <param name="field">Field</param>
-    string MapFieldExpression(IListRequestHandler handler, SqlQuery query, IField field);
+    string? MapFieldExpression(IListRequestHandler handler, SqlQuery query, IField field);
 }

@@ -9,7 +9,7 @@ public class TranslationItem
     /// <summary>
     /// The local text key.
     /// </summary>
-    public string? Key { get; set; }
+    public required string Key { get; set; }
 
     /// <summary>
     /// The text in the source language.

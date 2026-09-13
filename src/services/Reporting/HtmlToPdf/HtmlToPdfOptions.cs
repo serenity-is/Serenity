@@ -42,7 +42,7 @@ public class HtmlToPdfOptions : IHtmlToPdfOptions
     public string? PageHeight { get; set; }
 
     /// <inheritdoc/>
-    public string PageSize { get; set; }
+    public string? PageSize { get; set; }
 
     /// <inheritdoc/>
     public string? PageWidth { get; set; }
