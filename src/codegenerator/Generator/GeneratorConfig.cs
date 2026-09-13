@@ -135,6 +135,7 @@ public class GeneratorConfig
     /// <summary>Used for Newtonsoft.JSON</summary>
     public bool ShouldSerializeMVC() => MVC != null &&
         (!string.IsNullOrEmpty(MVC.OutDir) ||
+         MVC.AsNamespace ||
          MVC.InternalAccess != null ||
          MVC.SearchViewPaths?.Length > 0 ||
          MVC.StripViewPaths?.Length > 0 ||

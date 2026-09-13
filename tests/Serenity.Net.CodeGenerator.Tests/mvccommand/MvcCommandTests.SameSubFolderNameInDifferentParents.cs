@@ -2,21 +2,6 @@ namespace Serenity.CodeGenerator;
 
 public partial class MvcCommandTests
 {
-
-    MvcCommand CreateCommand(string[] viewPaths, out MockFileSystem fileSystem)
-    {
-        fileSystem = new MockFileSystem();
-        var project = new ProjectFileInfo(fileSystem, @"/Repos/MyTest.Web/MyTest.Web.csproj");
-        var directory = fileSystem.GetDirectoryName(project.ProjectFile);
-        fileSystem.AddFile(project.ProjectFile, "<Project Sdk=\"Microsoft.NET.Sdk.Web\"></Project>");
-        fileSystem.AddFile(fileSystem.Combine(directory, "sergen.json"),
-            "{\"MVC\": {\"UseRootNamespace\": true}}");
-        var command = new MvcCommand(project, new MockGeneratorConsole());
-        foreach (var viewPath in viewPaths)
-            fileSystem.AddFile(fileSystem.Combine(directory, PathHelper.ToPath(viewPath)), "");
-        return command;
-    }
-
     [Fact]
     public void SameSubFolderNameInDifferentParents()
     {
@@ -66,17 +51,15 @@ public partial class MvcCommandTests
             }
             """.ReplaceLineEndings();
 
-        var command = CreateCommand([
+        var command = CreateCommand(new GeneratorConfig(), [
             "Modules/MyModule/A/Same/A1.cshtml",
             "Modules/MyModule/A/Same/A2.cshtml",
             "Modules/MyModule/A/Same/A3.cshtml",
             "Modules/MyModule/B/Same/B1.cshtml",
             "Modules/MyModule/B/Same/B2.cshtml"], out var fileSystem);
 
-        var exitCode = command.Run();
-        Assert.Equal(ExitCodes.Success, exitCode);
+        Assert.Equal(ExitCodes.Success, command.Run());
 
-        var generated = fileSystem.ReadAllText(@"/Repos/MyTest.Web/Imports/MVC/MVC.cs").Trim().ReplaceLineEndings();
-        Assert.Equal(expected, generated);
+        Assert.Equal(expected, ReadMvc(fileSystem).Trim().ReplaceLineEndings());
     }
 }
