@@ -1,4 +1,4 @@
-﻿namespace Serenity.CodeGenerator;
+namespace Serenity.CodeGenerator;
 
 public interface IEntityDataSchema
 {
@@ -15,26 +15,26 @@ public interface IEntityDataSchema
     /// </summary>
     /// <param name="schema">The schema.</param>
     /// <param name="table">The table.</param>
-    IEnumerable<Data.Schema.ForeignKeyInfo> GetForeignKeys(string schema, string table);
+    IEnumerable<Data.Schema.ForeignKeyInfo> GetForeignKeys(string? schema, string table);
 
     /// <summary>
     /// Gets the identity fields.
     /// </summary>
     /// <param name="schema">The schema.</param>
     /// <param name="table">The table.</param>
-    IEnumerable<string> GetIdentityFields(string schema, string table);
+    IEnumerable<string> GetIdentityFields(string? schema, string table);
 
     /// <summary>
     /// Gets the primary key fields.
     /// </summary>
     /// <param name="schema">The schema.</param>
     /// <param name="table">The table.</param>
-    IEnumerable<string> GetPrimaryKeyFields(string schema, string table);
+    IEnumerable<string> GetPrimaryKeyFields(string? schema, string table);
 
     /// <summary>
     /// Gets the field infos.
     /// </summary>
     /// <param name="schema">The schema.</param>
     /// <param name="table">The table.</param>
-    IEnumerable<Data.Schema.FieldInfo> GetFieldInfos(string schema, string table);
+    IEnumerable<Data.Schema.FieldInfo> GetFieldInfos(string? schema, string table);
 }

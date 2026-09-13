@@ -15,7 +15,7 @@ public class SqlServerSchemaProvider : ISchemaProvider
     public string DefaultSchema => "dbo";
 
     /// <inheritdoc/>
-    public IEnumerable<FieldInfo> GetFieldInfos(IDbConnection connection, string schema, string table)
+    public IEnumerable<FieldInfo> GetFieldInfos(IDbConnection connection, string? schema, string table)
     {
         return connection.Query<FieldInfo>(@"
                 SELECT
@@ -38,7 +38,7 @@ public class SqlServerSchemaProvider : ISchemaProvider
     }
 
     /// <inheritdoc/>
-    public IEnumerable<ForeignKeyInfo> GetForeignKeys(IDbConnection connection, string schema, string table)
+    public IEnumerable<ForeignKeyInfo> GetForeignKeys(IDbConnection connection, string? schema, string table)
     {
         return connection.Query<ForeignKeyInfo>(@"
                 SELECT
@@ -65,7 +65,7 @@ public class SqlServerSchemaProvider : ISchemaProvider
     }
 
     /// <inheritdoc/>
-    public IEnumerable<string> GetIdentityFields(IDbConnection connection, string schema, string table)
+    public IEnumerable<string> GetIdentityFields(IDbConnection connection, string? schema, string table)
     {
         return connection.Query<string>(@"
                     SELECT COLUMN_NAME
@@ -80,7 +80,7 @@ public class SqlServerSchemaProvider : ISchemaProvider
     }
 
     /// <inheritdoc/>
-    public IEnumerable<string> GetPrimaryKeyFields(IDbConnection connection, string schema, string table)
+    public IEnumerable<string> GetPrimaryKeyFields(IDbConnection connection, string? schema, string table)
     {
         return connection.Query<string>(
                 "SELECT COLUMN_NAME " +

@@ -15,7 +15,7 @@ public class PostgresSchemaProvider : ISchemaProvider
     public string DefaultSchema => "public";
 
     /// <inheritdoc/>
-    public IEnumerable<FieldInfo> GetFieldInfos(IDbConnection connection, string schema, string table)
+    public IEnumerable<FieldInfo> GetFieldInfos(IDbConnection connection, string? schema, string table)
     {
         return connection.Query<FieldInfo>(@"
                 SELECT  
@@ -36,7 +36,7 @@ public class PostgresSchemaProvider : ISchemaProvider
     }
 
     /// <inheritdoc/>
-    public IEnumerable<ForeignKeyInfo> GetForeignKeys(IDbConnection connection, string schema, string table)
+    public IEnumerable<ForeignKeyInfo> GetForeignKeys(IDbConnection connection, string? schema, string table)
     {
         return connection.Query<ForeignKeyInfo>(@"
                 SELECT
@@ -59,7 +59,7 @@ public class PostgresSchemaProvider : ISchemaProvider
     }
 
     /// <inheritdoc/>
-    public IEnumerable<string> GetIdentityFields(IDbConnection connection, string schema, string table)
+    public IEnumerable<string> GetIdentityFields(IDbConnection connection, string? schema, string table)
     {
         return connection.Query<string>(@"
                 SELECT column_name, column_default 
@@ -73,7 +73,7 @@ public class PostgresSchemaProvider : ISchemaProvider
     }
 
     /// <inheritdoc/>
-    public IEnumerable<string> GetPrimaryKeyFields(IDbConnection connection, string schema, string table)
+    public IEnumerable<string> GetPrimaryKeyFields(IDbConnection connection, string? schema, string table)
     {
         return connection.Query<string>(
             $@"SELECT pg_attribute.attname 

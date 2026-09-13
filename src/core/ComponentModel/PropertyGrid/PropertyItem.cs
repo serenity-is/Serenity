@@ -15,7 +15,7 @@ public class PropertyItem
     /// </value>
     [Newtonsoft.Json.JsonProperty("name")]
     [JsonPropertyName("name")]
-    public string? Name { get; set; }
+    public string Name { get; set; } = null!;
 
     /// <summary>
     /// Gets or sets the title, e.g. label of a form field, 

@@ -20,7 +20,7 @@ public interface ISchemaProvider
     /// <param name="schema">The schema.</param>
     /// <param name="table">The table.</param>
     /// <returns>The list of foreign keys for the table.</returns>
-    IEnumerable<ForeignKeyInfo> GetForeignKeys(IDbConnection connection, string schema, string table);
+    IEnumerable<ForeignKeyInfo> GetForeignKeys(IDbConnection connection, string? schema, string table);
 
     /// <summary>
     /// Gets the identity fields.
@@ -29,7 +29,7 @@ public interface ISchemaProvider
     /// <param name="schema">The schema.</param>
     /// <param name="table">The table.</param>
     /// <returns>The list of identity field names for the table.</returns>
-    IEnumerable<string> GetIdentityFields(IDbConnection connection, string schema, string table);
+    IEnumerable<string> GetIdentityFields(IDbConnection connection, string? schema, string table);
 
     /// <summary>
     /// Gets the primary key fields.
@@ -38,7 +38,7 @@ public interface ISchemaProvider
     /// <param name="schema">The schema.</param>
     /// <param name="table">The table.</param>
     /// <returns>The list of primary key field names for the table.</returns>
-    IEnumerable<string> GetPrimaryKeyFields(IDbConnection connection, string schema, string table);
+    IEnumerable<string> GetPrimaryKeyFields(IDbConnection connection, string? schema, string table);
 
     /// <summary>
     /// Gets the table names.
@@ -54,5 +54,5 @@ public interface ISchemaProvider
     /// <param name="schema">The schema.</param>
     /// <param name="table">The table.</param>
     /// <returns>The list of field metadata for the table.</returns>
-    IEnumerable<FieldInfo> GetFieldInfos(IDbConnection connection, string schema, string table);
+    IEnumerable<FieldInfo> GetFieldInfos(IDbConnection connection, string? schema, string table);
 }

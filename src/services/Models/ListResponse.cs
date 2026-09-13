@@ -21,7 +21,7 @@ public class ListResponse<T> : ServiceResponse, IListResponse
     /// an array of distinct values if multiple distinct fields
     /// are requested.
     /// </summary>
-    public List<object>? Values { get; set; }
+    public List<object?>? Values { get; set; }
 
     /// <inheritdoc/>
     public int TotalCount { get; set; }

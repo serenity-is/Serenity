@@ -91,17 +91,17 @@ public class CustomerDataSchema : IEntityDataSchema
 
     public string DefaultSchema => "dbo";
 
-    public List<(string schema, string table, Data.Schema.FieldInfo item)> FieldInfos { get; } = [];
+    public List<(string? schema, string table, Data.Schema.FieldInfo item)> FieldInfos { get; } = [];
 
-    public IEnumerable<Data.Schema.FieldInfo> GetFieldInfos(string schema, string table)
+    public IEnumerable<Data.Schema.FieldInfo> GetFieldInfos(string? schema, string table)
     {
         return FieldInfos.Where(x => x.schema == schema && x.table == table)
             .Select(x => x.item);
     }
 
-    public List<(string schema, string table, ForeignKeyInfo item)> ForeignKeys { get; } = [];
+    public List<(string? schema, string table, ForeignKeyInfo item)> ForeignKeys { get; } = [];
 
-    public IEnumerable<ForeignKeyInfo> GetForeignKeys(string schema, string table)
+    public IEnumerable<ForeignKeyInfo> GetForeignKeys(string? schema, string table)
     {
         return ForeignKeys.Where(x => x.schema == schema && x.table == table)
             .Select(x => x.item);
@@ -109,14 +109,14 @@ public class CustomerDataSchema : IEntityDataSchema
 
     public Func<string, string, IEnumerable<string>> OnGetIdentityFields;
 
-    public IEnumerable<string> GetIdentityFields(string schema, string table)
+    public IEnumerable<string> GetIdentityFields(string? schema, string table)
     {
         return OnGetIdentityFields?.Invoke(schema, table) ?? [];
     }
 
     public Func<string, string, IEnumerable<string>> OnGetPrimaryKeyFields;
 
-    public IEnumerable<string> GetPrimaryKeyFields(string schema, string table)
+    public IEnumerable<string> GetPrimaryKeyFields(string? schema, string table)
     {
         return OnGetPrimaryKeyFields?.Invoke(schema, table) ?? [];
     }

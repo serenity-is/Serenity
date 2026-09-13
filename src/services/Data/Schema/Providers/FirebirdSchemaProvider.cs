@@ -27,7 +27,7 @@ public class FirebirdSchemaProvider : ISchemaProvider
     }
 
     /// <inheritdoc/>
-    public IEnumerable<FieldInfo> GetFieldInfos(IDbConnection connection, string schema, string table)
+    public IEnumerable<FieldInfo> GetFieldInfos(IDbConnection connection, string? schema, string table)
     {
         return connection.Query<FieldInfoSource>(@"
                 SELECT
@@ -77,7 +77,7 @@ public class FirebirdSchemaProvider : ISchemaProvider
     }
 
     /// <inheritdoc/>
-    public IEnumerable<ForeignKeyInfo> GetForeignKeys(IDbConnection connection, string schema, string table)
+    public IEnumerable<ForeignKeyInfo> GetForeignKeys(IDbConnection connection, string? schema, string table)
     {
         return connection.Query<ForeignKeyInfo>(@"
                 SELECT
@@ -110,7 +110,7 @@ public class FirebirdSchemaProvider : ISchemaProvider
     }
 
     /// <inheritdoc/>
-    public IEnumerable<string> GetIdentityFields(IDbConnection connection, string schema, string table)
+    public IEnumerable<string> GetIdentityFields(IDbConnection connection, string? schema, string table)
     {
         var match = connection.Query<string>(@"
                     SELECT RDB$GENERATOR_NAME
@@ -150,7 +150,7 @@ public class FirebirdSchemaProvider : ISchemaProvider
     }
 
     /// <inheritdoc/>
-    public IEnumerable<string> GetPrimaryKeyFields(IDbConnection connection, string schema, string table)
+    public IEnumerable<string> GetPrimaryKeyFields(IDbConnection connection, string? schema, string table)
     {
         return connection.Query<string>(@"
                 SELECT ISGMT.RDB$FIELD_NAME FROM

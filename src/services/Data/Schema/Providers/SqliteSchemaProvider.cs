@@ -25,7 +25,7 @@ public class SqliteSchemaProvider : ISchemaProvider
     }
 
     /// <inheritdoc/>
-    public IEnumerable<FieldInfo> GetFieldInfos(IDbConnection connection, string schema, string table)
+    public IEnumerable<FieldInfo> GetFieldInfos(IDbConnection connection, string? schema, string table)
     {
         return connection.Query<FieldInfoSource>("PRAGMA table_info([" + table + "])")
             .Select(x => new FieldInfo
@@ -48,7 +48,7 @@ public class SqliteSchemaProvider : ISchemaProvider
     }
 
     /// <inheritdoc/>
-    public IEnumerable<ForeignKeyInfo> GetForeignKeys(IDbConnection connection, string schema, string table)
+    public IEnumerable<ForeignKeyInfo> GetForeignKeys(IDbConnection connection, string? schema, string table)
     {
         return connection.Query<ForeignKeySource>("PRAGMA foreign_key_list([" + table + "])")
             .Select(x => new ForeignKeyInfo
@@ -70,7 +70,7 @@ public class SqliteSchemaProvider : ISchemaProvider
     }
 
     /// <inheritdoc/>
-    public IEnumerable<string> GetIdentityFields(IDbConnection connection, string schema, string table)
+    public IEnumerable<string> GetIdentityFields(IDbConnection connection, string? schema, string table)
     {
         var fields = connection.Query<IdentitySource>("PRAGMA table_info([" + table + "])")
             .Where(x => x.pk > 0);
@@ -93,7 +93,7 @@ public class SqliteSchemaProvider : ISchemaProvider
     }
 
     /// <inheritdoc/>
-    public IEnumerable<string> GetPrimaryKeyFields(IDbConnection connection, string schema, string table)
+    public IEnumerable<string> GetPrimaryKeyFields(IDbConnection connection, string? schema, string table)
     {
         return connection.Query<PrimaryKeySource>("PRAGMA table_info([" + table + "])")
             .Where(x => x.pk > 0)
