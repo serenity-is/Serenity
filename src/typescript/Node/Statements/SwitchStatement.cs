@@ -8,7 +8,7 @@ public class SwitchStatement(IExpression expression, CaseBlock caseBlock, bool p
     public CaseBlock CaseBlock { get; } = caseBlock;
     public bool PossiblyExhaustive { get; } = possiblyExhaustive;
 
-    public IEnumerable<INode> GetRestChildren()
+    public IEnumerable<INode?> GetRestChildren()
     {
         return [Expression, CaseBlock];
     }

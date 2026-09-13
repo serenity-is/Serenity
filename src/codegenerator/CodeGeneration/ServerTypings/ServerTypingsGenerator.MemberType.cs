@@ -2,7 +2,7 @@ namespace Serenity.CodeGeneration;
 
 public partial class ServerTypingsGenerator
 {
-    protected virtual void AppendMappedType(TypeReference type, string codeNamespace)
+    protected virtual void AppendMappedType(TypeReference? type, string? codeNamespace)
     {
         if (type == null)
         {
@@ -29,7 +29,7 @@ public partial class ServerTypingsGenerator
             type is GenericInstanceType &&
             type.MetadataName() == "Nullable`1")
         {
-            type = (type as GenericInstanceType).GenericArguments()[0];
+            type = (type as GenericInstanceType)!.GenericArguments()[0];
             isSystem = type.NamespaceOf() == "System";
         }
 
@@ -112,7 +112,7 @@ public partial class ServerTypingsGenerator
 
         if (type.IsGenericInstanceType(out _))
         {
-            var gi = type as GenericInstanceType;
+            var gi = (type as GenericInstanceType)!;
             if (gi.ElementType().NamespaceOf() == "System.Collections.Generic")
             {
                 if (gi.ElementType().MetadataName() == "List`1" ||
@@ -177,17 +177,17 @@ public partial class ServerTypingsGenerator
 
         if (!string.IsNullOrEmpty(type.Module))
         {
-            return AddModuleImport(type.Module, type.Name, external:
+            return AddModuleImport(type.Module!, type.Name!, external:
                 !type.Module.StartsWith('/') &&
                 !type.Module.StartsWith('.'));
         }
         else if (sourceFile == null || !sourceFile.EndsWith(".d.ts", StringComparison.OrdinalIgnoreCase))
         {
-            var filename = GetTypingFileNameFor(ns, name);
-            name = AddModuleImport(filename, name, external: false);
+            var filename = GetTypingFileNameFor(ns!, name!);
+            name = AddModuleImport(filename, name!, external: false);
             ns = "";
         }
 
-        return !string.IsNullOrEmpty(ns) ? (ns + "." + name) : name;
+        return !string.IsNullOrEmpty(ns) ? (ns + "." + name) : name!;
     }
 }

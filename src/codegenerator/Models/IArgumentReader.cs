@@ -14,13 +14,13 @@ namespace Serenity.CodeGenerator
         /// <returns>A dictionary of key value pairs</returns>
         /// <exception cref="ArgumentException">Keys are specified multiple times</exception>
         Dictionary<string, string> GetDictionary(string[] names, bool requiresValue = true,
-            char[] separators = null);
+            char[]? separators = null);
 
         /// <summary>
         /// Determines the command from first argument which is not a switch
         /// </summary>
         /// <returns>Command, or null if not found</returns>
-        string GetCommand();
+        string? GetCommand();
 
         /// <summary>
         /// Gets the value for a switch that can only be specified once.
@@ -31,7 +31,7 @@ namespace Serenity.CodeGenerator
         /// <returns>The argument value or null if not found</returns>
         /// <exception cref="ArgumentException">The switch is specified multiple times,
         /// or its value is empty and <see cref="requiresValue" /> is true.</exception>
-        string GetString(string[] names, bool requiresValue = true);
+        string? GetString(string[] names, bool requiresValue = true);
 
         /// <summary>
         /// Gets the value for a switch that can be specified multiple times

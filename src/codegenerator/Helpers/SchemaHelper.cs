@@ -11,7 +11,7 @@ public class SchemaHelper
         if (providerType == null || !typeof(ISchemaProvider).GetTypeInfo().IsAssignableFrom(providerType))
             throw new ArgumentOutOfRangeException(nameof(serverType), serverType, "Unknown server type");
 
-        return (ISchemaProvider)Activator.CreateInstance(providerType);
+        return (ISchemaProvider)Activator.CreateInstance(providerType)!;
     }
 
     private static readonly Dictionary<string, string> SqlTypeToFieldTypeMap =
@@ -77,7 +77,7 @@ public class SchemaHelper
             { "xmltype", "String" },
         };
 
-    public static string SqlTypeNameToFieldType(string sqlTypeName, int size, out string dataType)
+    public static string SqlTypeNameToFieldType(string sqlTypeName, int size, out string? dataType)
     {
         dataType = null;
 
@@ -95,7 +95,7 @@ public class SchemaHelper
             dataType = "byte[]";
             return "ByteArray";
         }
-        else if (SqlTypeToFieldTypeMap.TryGetValue(sqlTypeName, out string fieldType))
+        else if (SqlTypeToFieldTypeMap.TryGetValue(sqlTypeName, out string? fieldType))
             return fieldType;
         else
             return "Stream";

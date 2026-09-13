@@ -6,7 +6,7 @@ public class YieldExpression(AsteriskToken asteriskToken, IExpression expression
     public AsteriskToken AsteriskToken { get; } = asteriskToken;
     public IExpression Expression { get; } = expression;
 
-    public IEnumerable<INode> GetRestChildren()
+    public IEnumerable<INode?> GetRestChildren()
     {
         return [AsteriskToken, Expression];
     }

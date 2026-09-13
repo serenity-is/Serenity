@@ -7,7 +7,7 @@ public class ImportAttributes(NodeArray<ImportAttribute> elements, bool multiLin
     public bool MultiLine { get; } = multiLine;
     public SyntaxKind Token { get; } = token;
 
-    public IEnumerable<INode> GetRestChildren()
+    public IEnumerable<INode?> GetRestChildren()
     {
         return Elements;
     }

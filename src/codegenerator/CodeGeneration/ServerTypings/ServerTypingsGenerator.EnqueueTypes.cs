@@ -28,9 +28,7 @@ public partial class ServerTypingsGenerator
                 try
                 {
                     var typeFilter = TypeFilter ?? (type => true);
-                    asmModuleTypes = module.Types
-                        .Where(typeFilter)
-                        .ToArray();
+                    asmModuleTypes = [.. module.Types.Where(typeFilter)];
                 }
                 catch
                 {
@@ -111,17 +109,17 @@ public partial class ServerTypingsGenerator
              type.NamespaceOf()?.EndsWith(".Endpoints", StringComparison.Ordinal) == true);
     }
 
-    private CustomAttribute GetColumnsScriptAttribute(TypeDefinition type)
+    private CustomAttribute? GetColumnsScriptAttribute(TypeDefinition type)
     {
         return TypingsUtils.GetAttr(type, "Serenity.ComponentModel", "ColumnsScriptAttribute", emptyTypes);
     }
 
-    private CustomAttribute GetFormScriptAttribute(TypeDefinition type)
+    private CustomAttribute? GetFormScriptAttribute(TypeDefinition type)
     {
         return TypingsUtils.GetAttr(type, "Serenity.ComponentModel", "FormScriptAttribute", emptyTypes);
     }
 
-    private CustomAttribute GetNestedPermissionKeysAttribute(TypeDefinition type)
+    private CustomAttribute? GetNestedPermissionKeysAttribute(TypeDefinition type)
     {
         return TypingsUtils.GetAttr(type, "Serenity.ComponentModel", "NestedPermissionKeysAttribute", emptyTypes);
     }

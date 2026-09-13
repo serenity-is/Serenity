@@ -6,7 +6,7 @@ public class ModuleBlock(NodeArray<IStatement> statements)
 {
     public NodeArray<IStatement> Statements { get; } = statements;
 
-    public IEnumerable<INode> GetRestChildren()
+    public IEnumerable<INode?> GetRestChildren()
     {
         return Statements;
     }

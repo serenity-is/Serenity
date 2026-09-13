@@ -9,7 +9,7 @@ public class ImportTypeNode(ITypeNode argument, ImportAttributes attributes, IEn
     public IEntityName Qualifier { get; } = qualifier;
     public bool IsTypeOf { get; } = isTypeOf;
 
-    public override IEnumerable<INode> GetRestChildren()
+    public override IEnumerable<INode?> GetRestChildren()
     {
         yield return Argument;
         yield return Attributes;

@@ -2,7 +2,7 @@ namespace Serenity.CodeGeneration;
 
 public partial class ClientTypesGenerator
 {
-    internal static string GetMemberTypeName(string typeName, out bool isValueType)
+    internal static string? GetMemberTypeName(string? typeName, out bool isValueType)
     {
         isValueType = false;
         if (string.IsNullOrEmpty(typeName))
@@ -34,20 +34,20 @@ public partial class ClientTypesGenerator
         return typeName;
     }
 
-    private void GenerateOptionMembers(ExternalType type, HashSet<string> skip)
+    private void GenerateOptionMembers(ExternalType type, HashSet<string>? skip)
     {
         var options = GetOptionMembers(type);
 
         foreach (var option in options.Values)
         {
             if (skip != null &&
-                skip.Contains(option.Name))
+                skip.Contains(option.Name!))
                 continue;
 
             var typeName = GetMemberTypeName(option.Type, out var isValueType);
 
-            string jsName = option.Name;
-            string optionName = option.Name;
+            string jsName = option.Name ?? "";
+            string optionName = option.Name ?? "";
             if (option is ExternalMethod emo && emo.Arguments?.Count == 1)
             {
                 if (jsName.StartsWith("set_", StringComparison.Ordinal))
@@ -88,7 +88,7 @@ public partial class ClientTypesGenerator
     }
 
     private void AddOptionMembers(SortedDictionary<string, ExternalMember> dict,
-        ExternalType fromType, ExternalType optionsType, bool isOptions)
+        ExternalType? fromType, ExternalType? optionsType, bool isOptions)
     {
         List<ExternalMember> members = [];
 
@@ -115,7 +115,7 @@ public partial class ClientTypesGenerator
 
         foreach (var member in members)
         {
-            if (dict.ContainsKey(member.Name))
+            if (dict.ContainsKey(member.Name!))
                 continue;
 
             if (IsComplexMemberTypeName(member.Type))
@@ -133,7 +133,7 @@ public partial class ClientTypesGenerator
                     x.Type == "Serenity.Decorators.displayName")))
                 continue;
 
-            dict[member.Name] = member;
+            dict[member.Name!] = member;
         }
     }
 
@@ -148,16 +148,16 @@ public partial class ClientTypesGenerator
     ];
 
 
-    private ExternalType GetOptionsTypeFor(ExternalType type)
+    private ExternalType? GetOptionsTypeFor(ExternalType type)
     {
         if (type is null)
             return null;
         var constructors = type.Methods?.Where(x => x.IsConstructor == true) ?? [];
         var argument = constructors.Where(x => x.Arguments != null)
-            .SelectMany(x => x.Arguments.Where(x => !PossibleNodeArguments.Contains(x.Type)))
+            .SelectMany(x => x.Arguments!.Where(x => !PossibleNodeArguments.Contains(x.Type!)))
             .FirstOrDefault();
 
-        ExternalType optionsType = null;
+        ExternalType? optionsType = null;
         if (argument != null)
         {
             optionsType = GetScriptTypeFrom(type, argument.Type);
@@ -197,7 +197,7 @@ public partial class ClientTypesGenerator
                 !string.IsNullOrEmpty(x.Extends))?.ToArray();
             if (genericParams != null && genericParams.Length > 0)
             {
-                ExternalGenericParameter genericParam = null;
+                ExternalGenericParameter? genericParam = null;
                 foreach (var candidate in PropsParamCandidates)
                 {
                     if ((genericParam = genericParams.FirstOrDefault(x => x.Name == candidate)) != null)
@@ -216,7 +216,7 @@ public partial class ClientTypesGenerator
                 }
             }
 
-            if ((type = GetBaseType(type)) != null)
+            if ((type = GetBaseType(type)!) != null)
                 return GetOptionsTypeFor(type);
         }
 
@@ -240,12 +240,12 @@ public partial class ClientTypesGenerator
 
             AddOptionMembers(result, type, type, isOptions: false);
         }
-        while ((type = GetBaseType(type)) != null && loop++ < 100);
+        while ((type = GetBaseType(type)!) != null && loop++ < 100);
 
         return result;
     }
 
-    protected static bool IsComplexMemberTypeName(string type)
+    protected static bool IsComplexMemberTypeName(string? type)
     {
         return (type?.StartsWith("System.Func`", StringComparison.Ordinal) == true ||
             type?.StartsWith("System.Action`", StringComparison.Ordinal) == true ||

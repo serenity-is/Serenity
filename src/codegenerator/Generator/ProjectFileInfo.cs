@@ -4,19 +4,19 @@ using System.Xml.Linq;
 namespace Serenity.CodeGenerator;
 
 public class ProjectFileInfo(IFileSystem fileSystem, string projectFile,
-    Func<string, string> getPropertyArgument = null,
-    Action<string> onError = null) : IProjectFileInfo
+    Func<string, string?>? getPropertyArgument = null,
+    Action<string>? onError = null) : IProjectFileInfo
 {
     private readonly IFileSystem fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
     private readonly string projectFile = projectFile ?? throw new ArgumentNullException(nameof(projectFile));
-    private string assemblyName;
-    private string esmAssetBasePath;
-    private Dictionary<string, string> globalUsings;
-    private string nullable;
-    private ProjectMSBuildInfo projectMSBuildInfo;
-    private string outDir;
-    private string rootNamespace;
-    private string targetFramework;
+    private string? assemblyName;
+    private string? esmAssetBasePath;
+    private Dictionary<string, string?>? globalUsings;
+    private string? nullable;
+    private ProjectMSBuildInfo? projectMSBuildInfo;
+    private string? outDir;
+    private string? rootNamespace;
+    private string? targetFramework;
 
     public IFileSystem FileSystem => fileSystem;
     public string ProjectFile => projectFile;
@@ -26,9 +26,9 @@ public class ProjectFileInfo(IFileSystem fileSystem, string projectFile,
     /// <summary>
     /// Callback for tests to validate MSBuild execution arguments
     /// </summary>
-    public Func<ProcessStartInfo, string> ExecuteMSBuild { get; set; }
+    public Func<ProcessStartInfo, string>? ExecuteMSBuild { get; set; }
 
-    public string GetAssemblyName()
+    public string? GetAssemblyName()
     {
         if (assemblyName is null)
         {
@@ -48,7 +48,7 @@ public class ProjectFileInfo(IFileSystem fileSystem, string projectFile,
         return string.IsNullOrEmpty(assemblyName) ? null : assemblyName;
     }
 
-    public string GetEsmAssetBasePath()
+    public string? GetEsmAssetBasePath()
     {
         if (esmAssetBasePath is null)
         {
@@ -68,7 +68,7 @@ public class ProjectFileInfo(IFileSystem fileSystem, string projectFile,
         return string.IsNullOrEmpty(esmAssetBasePath) ? null : esmAssetBasePath;
     }
 
-    public string GetNullable()
+    public string? GetNullable()
     {
         if (nullable is null)
         {
@@ -88,7 +88,7 @@ public class ProjectFileInfo(IFileSystem fileSystem, string projectFile,
         return string.IsNullOrEmpty(nullable) ? null : nullable;
     }
 
-    public string GetOutDir()
+    public string? GetOutDir()
     {
         if (outDir is null)
         {
@@ -113,7 +113,7 @@ public class ProjectFileInfo(IFileSystem fileSystem, string projectFile,
         return string.IsNullOrEmpty(outDir) ? null : PathHelper.ToUrl(outDir);
     }
 
-    public string GetRootNamespace()
+    public string? GetRootNamespace()
     {
         if (rootNamespace is null)
         {
@@ -133,7 +133,7 @@ public class ProjectFileInfo(IFileSystem fileSystem, string projectFile,
         return string.IsNullOrEmpty(rootNamespace) ? null : rootNamespace;
     }
 
-    public string GetTargetFramework()
+    public string? GetTargetFramework()
     {
         if (targetFramework is null)
         {
@@ -154,7 +154,7 @@ public class ProjectFileInfo(IFileSystem fileSystem, string projectFile,
         return string.IsNullOrEmpty(targetFramework) ? null : targetFramework;
     }
 
-    private string ExtractPropertyFrom(string csproj, Func<IEnumerable<XElement>, XElement> extractor)
+    private string? ExtractPropertyFrom(string csproj, Func<IEnumerable<XElement>, XElement?> extractor)
     {
         foreach (var root in EnumerateProjectAndDirectoryBuildProps(csproj))
         {
@@ -195,43 +195,43 @@ public class ProjectFileInfo(IFileSystem fileSystem, string projectFile,
 
     private class ProjectMSBuildInfo
     {
-        public ProjectProperties Properties { get; set; }
-        public ProjectItems Items { get; set; }
+        public ProjectProperties? Properties { get; set; }
+        public ProjectItems? Items { get; set; }
     }
 
     private class ProjectItems
     {
-        public PackageReferenceItem[] PackageReference { get; set; }
-        public ProjectReferenceItem[] ProjectReference { get; set; }
-        public UsingItem[] Using { get; set; }
+        public PackageReferenceItem[]? PackageReference { get; set; }
+        public ProjectReferenceItem[]? ProjectReference { get; set; }
+        public UsingItem[]? Using { get; set; }
     }
 
     private class PackageReferenceItem
     {
-        public string Identity { get; set; }
-        public string Version { get; set; }
+        public string? Identity { get; set; }
+        public string? Version { get; set; }
     }
 
     private class ProjectReferenceItem
     {
-        public string Filename { get; set; }
+        public string? Filename { get; set; }
     }
 
     private class UsingItem
     {
-        public string Identity { get; set; }
-        public string Alias { get; set; }
-        public string Static { get; set; }
+        public string? Identity { get; set; }
+        public string? Alias { get; set; }
+        public string? Static { get; set; }
     }
 
     public class ProjectProperties
     {
-        public string AssemblyName { get; set; }
-        public string EsmAssetBasePath { get; set; }
-        public string Nullable { get; set; }
-        public string OutDir { get; set; }
-        public string RootNamespace { get; set; }
-        public string TargetFramework { get; set; }
+        public string? AssemblyName { get; set; }
+        public string? EsmAssetBasePath { get; set; }
+        public string? Nullable { get; set; }
+        public string? OutDir { get; set; }
+        public string? RootNamespace { get; set; }
+        public string? TargetFramework { get; set; }
     }
 
     private ProjectProperties GetProjectProperties()
@@ -270,7 +270,7 @@ public class ProjectFileInfo(IFileSystem fileSystem, string projectFile,
 
         try
         {
-            string output;
+            string? output;
             if (ExecuteMSBuild != null)
             {
                 output = ExecuteMSBuild(startInfo);
@@ -300,7 +300,7 @@ public class ProjectFileInfo(IFileSystem fileSystem, string projectFile,
         return (projectMSBuildInfo = new());
     }
 
-    public string[] GetAssemblyList(string[] configured)
+    public string[]? GetAssemblyList(string[]? configured)
     {
         ArgumentNullException.ThrowIfNull(onError);
 
@@ -308,8 +308,8 @@ public class ProjectFileInfo(IFileSystem fileSystem, string projectFile,
 
         if (configured == null || configured.Length == 0)
         {
-            string outputDir = GetOutDir();
-            string assemblyName = GetAssemblyName() ??
+            string? outputDir = GetOutDir();
+            string? assemblyName = GetAssemblyName() ??
                 FileSystem.ChangeExtension(fileSystem.GetFileName(projectFile), null);
 
             void couldNotFindError(string expectedPath)
@@ -346,7 +346,7 @@ public class ProjectFileInfo(IFileSystem fileSystem, string projectFile,
                 return [outputPath];
             }
 
-            string targetFramework = GetTargetFramework();
+            string? targetFramework = GetTargetFramework();
             if (string.IsNullOrEmpty(targetFramework))
             {
                 onError("Couldn't read TargetFramework from project file!");
@@ -411,11 +411,11 @@ public class ProjectFileInfo(IFileSystem fileSystem, string projectFile,
     private static readonly char[] semicolonSplitter = [';'];
     private static readonly char[] equalsSplitter = ['='];
 
-    public IDictionary<string, string> GetGlobalUsings()
+    public IDictionary<string, string?> GetGlobalUsings()
     {
         if (globalUsings is null)
         {
-            globalUsings = new Dictionary<string, string>(StringComparer.Ordinal);
+            globalUsings = new Dictionary<string, string?>(StringComparer.Ordinal);
             if (getPropertyArgument?.Invoke("GlobalUsings") is string gs)
             {
                 foreach (var g in gs.Split(semicolonSplitter, StringSplitOptions.RemoveEmptyEntries))
@@ -436,7 +436,7 @@ public class ProjectFileInfo(IFileSystem fileSystem, string projectFile,
                         if (string.IsNullOrEmpty(u.Identity) &&
                             !string.Equals(u.Static, "true", StringComparison.OrdinalIgnoreCase))
                             continue;
-                        globalUsings[u.Identity] = u.Alias;
+                        globalUsings[u.Identity!] = u.Alias;
                     }
             }
         }

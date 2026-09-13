@@ -7,7 +7,7 @@ public class TypePredicateNode(AssertsKeyword assertsModifier, INode parameterNa
     public INode ParameterName { get; } = parameterName; // Identifier | ThisTypeNode
     public ITypeNode Type { get; } = type;
 
-    public IEnumerable<INode> GetRestChildren()
+    public IEnumerable<INode?> GetRestChildren()
     {
         return [AssertsModifier, ParameterName, Type];
     }

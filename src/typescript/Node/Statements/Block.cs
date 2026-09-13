@@ -7,7 +7,7 @@ public class Block(NodeArray<IStatement> statements, bool? multiLine)
     public NodeArray<IStatement> Statements { get; } = statements;
     public bool? MultiLine { get; } = multiLine;
 
-    public IEnumerable<INode> GetRestChildren()
+    public IEnumerable<INode?> GetRestChildren()
     {
         return Statements;
     }

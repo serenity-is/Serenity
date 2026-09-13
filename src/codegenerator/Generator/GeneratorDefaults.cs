@@ -60,14 +60,14 @@ public class GeneratorDefaults
     /// </summary>
     /// <param name="extends">Extends statement like "defaults@9.0.0"</param>
     /// <returns></returns>
-    public static string TryParse(string extends)
+    public static string? TryParse(string extends)
     {
         if (string.IsNullOrEmpty(extends) ||
             !extends.StartsWith("defaults@", StringComparison.Ordinal) ||
-            !Version.TryParse(extends[9..], out Version version))
+            !Version.TryParse(extends[9..], out Version? version))
             return null;
 
-        if (!ByVersion.TryGetValue(version, out string json))
+        if (!ByVersion.TryGetValue(version, out string? json))
             throw new ArgumentOutOfRangeException(
                 $"Can't locate sergen defaults for version {version}!");
 

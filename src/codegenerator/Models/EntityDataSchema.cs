@@ -7,7 +7,7 @@ public class EntityDataSchema(IDbConnection connection) : IEntityDataSchema
     private readonly IDbConnection connection = connection ?? throw new ArgumentNullException(nameof(connection));
     private readonly ISchemaProvider schemaProvider = SchemaHelper.GetSchemaProvider(connection.GetDialect().ServerType);
 
-    public string DefaultSchema => schemaProvider.DefaultSchema;
+    public string? DefaultSchema => schemaProvider.DefaultSchema;
 
     public IEnumerable<Data.Schema.FieldInfo> GetFieldInfos(string? schema, string table)
         => schemaProvider.GetFieldInfos(connection, schema, table);

@@ -2,7 +2,7 @@ namespace Serenity.CodeGeneration;
 
 public abstract class CodeGeneratorBase
 {
-    protected List<GeneratedSource> generatedCode;
+    protected List<GeneratedSource> generatedCode = null!;
     protected StringBuilder sb;
     protected CodeWriter cw;
     private readonly Dictionary<string, ExternalType> tsTypes;
@@ -31,7 +31,7 @@ public abstract class CodeGeneratorBase
 
     public readonly HashSet<string> GlobalUsings = [];
 
-    public string NullableProp { get; set; }
+    public string? NullableProp { get; set; }
 
     public bool NullableRefTypes => NullableProp == "enable";
 
@@ -74,12 +74,12 @@ public abstract class CodeGeneratorBase
             AddTSType(type);
     }
 
-    protected ExternalType GetScriptType(string fullName, bool fallback = true)
+    protected ExternalType? GetScriptType(string? fullName, bool fallback = true)
     {
         if (string.IsNullOrEmpty(fullName))
             return null;
 
-        if (tsTypes.TryGetValue(fullName, out ExternalType type))
+        if (tsTypes.TryGetValue(fullName, out ExternalType? type))
             return type;
 
         if (fallback &&
@@ -122,8 +122,10 @@ public abstract class CodeGeneratorBase
             return [];
     }
 
-    protected string RemoveRootNamespace(string ns, string name)
+    protected string? RemoveRootNamespace(string? ns, string? name)
     {
+        name ??= "";
+
         if (!string.IsNullOrEmpty(ns))
             name = ns + "." + name;
 
@@ -152,7 +154,7 @@ public abstract class CodeGeneratorBase
         return jsName;
     }
 
-    protected static string GetBaseTypeName(ExternalType type)
+    protected static string? GetBaseTypeName(ExternalType type)
     {
         var baseType = type.BaseType;
 
@@ -163,12 +165,12 @@ public abstract class CodeGeneratorBase
         return baseType;
     }
 
-    protected ExternalType GetBaseType(ExternalType type)
+    protected ExternalType? GetBaseType(ExternalType type)
     {
         return GetScriptType(GetBaseTypeName(type));
     }
 
-    protected ExternalType GetScriptTypeFrom(ExternalType fromType, string typeName)
+    protected ExternalType? GetScriptTypeFrom(ExternalType fromType, string? typeName)
     {
         if (typeName == null)
             return null;
@@ -192,7 +194,7 @@ public abstract class CodeGeneratorBase
                 Name = typeName,
                 IsInterface = true,
                 IsDeclaration = true,
-                Fields = [.. Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, string>>(typeName)
+                Fields = [.. (Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, string>>(typeName) ?? [])
                     .Select(x => new ExternalMember
                     {
                         Name = x.Key,
@@ -230,7 +232,7 @@ public abstract class CodeGeneratorBase
         return null;
     }
 
-    protected bool HasBaseType(ExternalType type, params string[] typeNames)
+    protected bool HasBaseType(ExternalType? type, params string[] typeNames)
     {
         int loop = 0;
 
@@ -278,7 +280,7 @@ public abstract class CodeGeneratorBase
         return false;
     }
 
-    protected ExternalAttribute GetAttribute(ExternalType type, bool inherited, params string[] attributeNames)
+    protected ExternalAttribute? GetAttribute(ExternalType type, bool inherited, params string[] attributeNames)
     {
         var attr = type.Attributes?.FirstOrDefault(x => attributeNames.Contains(x.Type, StringComparer.Ordinal));
         if (attr != null)
@@ -288,7 +290,7 @@ public abstract class CodeGeneratorBase
             return null;
 
         int loop = 0;
-        while ((type = GetBaseType(type)) != null)
+        while ((type = GetBaseType(type)!) != null)
         {
             attr = type.Attributes?.FirstOrDefault(x => attributeNames.Contains(x.Type, StringComparer.Ordinal));
             if (attr != null)

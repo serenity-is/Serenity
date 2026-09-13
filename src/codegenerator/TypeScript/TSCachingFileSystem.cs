@@ -86,7 +86,7 @@ public class TSCachingFileSystem(IFileSystem fileSystem) : IFileSystem
         throw new NotImplementedException();
     }
 
-    public string ReadAllText(string path, Encoding encoding = null)
+    public string ReadAllText(string path, Encoding? encoding = null)
     {
         if (string.IsNullOrEmpty(path))
             throw new ArgumentNullException(nameof(path));
@@ -105,7 +105,7 @@ public class TSCachingFileSystem(IFileSystem fileSystem) : IFileSystem
         throw new NotImplementedException();
     }
 
-    public void WriteAllText(string path, string content, Encoding encoding = null)
+    public void WriteAllText(string path, string content, Encoding? encoding = null)
     {
         throw new NotImplementedException();
     }

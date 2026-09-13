@@ -6,7 +6,7 @@ public class DoStatement(IStatement statement, IExpression expression)
 {
     public IExpression Expression { get; } = expression;
 
-    public override IEnumerable<INode> GetRestChildren()
+    public override IEnumerable<INode?> GetRestChildren()
     {
         return [Statement, Expression];
     }

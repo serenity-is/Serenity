@@ -5,7 +5,7 @@ public class LiteralTypeNode(IExpression literal)
 {
     public IExpression Literal { get; set; } = literal;
 
-    public IEnumerable<INode> GetRestChildren()
+    public IEnumerable<INode?> GetRestChildren()
     {
         return [Literal];
     }

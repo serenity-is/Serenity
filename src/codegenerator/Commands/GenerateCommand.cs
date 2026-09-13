@@ -5,7 +5,7 @@ namespace Serenity.CodeGenerator;
 public partial class GenerateCommand(IProjectFileInfo project, IGeneratorConsole console)
     : BaseGeneratorCommand(project, console)
 {
-    public IArgumentReader Arguments { get; set; }
+    public IArgumentReader Arguments { get; set; } = null!;
 
     public override ExitCodes Run()
     {
@@ -64,7 +64,7 @@ public partial class GenerateCommand(IProjectFileInfo project, IGeneratorConsole
         }
 
         var allTableNames = allTableEntries.Select(x => x.Tablename).ToList();
-        var confConnection = config.Connections.FirstOrDefault(x =>
+        var confConnection = config.Connections?.FirstOrDefault(x =>
             string.Compare(x.Key, connectionKey, StringComparison.OrdinalIgnoreCase) == 0);
 
         List<string> selectedTableNames = !string.IsNullOrEmpty(argsTable) ? [argsTable] : SelectTables(allTableNames);
@@ -74,7 +74,7 @@ public partial class GenerateCommand(IProjectFileInfo project, IGeneratorConsole
             return ExitCodes.NoTablesSelected;
         }
 
-        string module = null;
+        string? module = null;
         var permissionKey = argsPermissionKey ?? "Administration:General";
         var inputsList = new List<EntityModelInputs>();
 
@@ -111,8 +111,8 @@ public partial class GenerateCommand(IProjectFileInfo project, IGeneratorConsole
             {
                 ConnectionKey = connectionKey,
                 Config = config,
-                Schema = tableEntry.Schema,
-                Table = tableEntry.Table,
+                Schema = tableEntry.Schema!,
+                Table = tableEntry.Table!,
                 Module = module,
                 Identifier = identifier,
                 PermissionKey = permissionKey
@@ -174,7 +174,7 @@ public partial class GenerateCommand(IProjectFileInfo project, IGeneratorConsole
             return modelFactory.Create(inputs);
         }
 
-        ApplicationMetadata application = null;
+        ApplicationMetadata? application = null;
         try
         {
             var assemblyFiles = Project.GetAssemblyList(config.ServerTypings?.Assemblies);
@@ -206,7 +206,7 @@ public partial class GenerateCommand(IProjectFileInfo project, IGeneratorConsole
         foreach (var inputs in inputsList)
         {
             UpdateConfigTableFor(inputs, confConnection);
-            inputs.Application = application;
+            inputs.Application = application!;
             var model = createModel(inputs);
             var generator = new EntityCodeGenerator(Project, model, inputs.Config, writer);
             generator.Run();

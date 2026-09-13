@@ -18,8 +18,8 @@ public class EsmEntryPointsGenerator(IFileSystem fileSystem)
     public string EsmAssetBasePath { get; set; } = "/esm";
     public bool FileScopedNamespaces { get; set; }
     public bool InternalAccess { get; set; }
-    public string ProjectDir { get; set; }
-    public string RootNamespace { get; set; }
+    public string? ProjectDir { get; set; }
+    public string? RootNamespace { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether to omit XML doc comments and the auto-generated marker
@@ -29,8 +29,8 @@ public class EsmEntryPointsGenerator(IFileSystem fileSystem)
 
     public string Generate()
     {
-        ArgumentExceptionHelper.ThrowIfNull(ProjectDir);
-        ArgumentExceptionHelper.ThrowIfNull(RootNamespace);
+        ArgumentNullException.ThrowIfNull(ProjectDir);
+        ArgumentNullException.ThrowIfNull(RootNamespace);
 
         Matcher matcher = new();
         matcher.AddExclude(".git/**");

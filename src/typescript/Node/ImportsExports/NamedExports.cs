@@ -5,7 +5,7 @@ public class NamedExports(NodeArray<ExportSpecifier> elements)
 {
     public NodeArray<ExportSpecifier> Elements { get; } = elements;
 
-    public IEnumerable<INode> GetRestChildren()
+    public IEnumerable<INode?> GetRestChildren()
     {
         return Elements;
     }

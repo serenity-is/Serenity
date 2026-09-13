@@ -8,7 +8,7 @@ public class JsxNamespacedName(Identifier name, Identifier @namespace)
 
     IDeclarationName IHasNameProperty.Name => Name;
 
-    public IEnumerable<INode> GetRestChildren()
+    public IEnumerable<INode?> GetRestChildren()
     {
         return [Name, Namespace];
     }

@@ -7,7 +7,7 @@ public static partial class TypingsUtils
         return FindByName(classes, ns, name) != null;
     }
 
-    public static CustomAttribute FindAttr(IEnumerable<CustomAttribute> attrList, string ns, string name)
+    public static CustomAttribute? FindAttr(IEnumerable<CustomAttribute>? attrList, string ns, string name)
     {
         if (attrList == null)
             return null;
@@ -19,7 +19,7 @@ public static partial class TypingsUtils
         return null;
     }
 
-    private static TypeReference FindByName(TypeReference[] classes, string ns, string name)
+    private static TypeReference? FindByName(TypeReference[] classes, string ns, string name)
     {
         foreach (var x in classes)
             if (x.MetadataName() == name &&
@@ -30,9 +30,9 @@ public static partial class TypingsUtils
     }
 
 
-    public static CustomAttribute GetAttr(TypeDefinition klass, string ns, string name, TypeReference[] baseClasses = null)
+    public static CustomAttribute? GetAttr(TypeDefinition klass, string ns, string name, TypeReference[]? baseClasses = null)
     {
-        CustomAttribute attr;
+        CustomAttribute? attr;
 
         attr = FindAttr(klass.GetAttributes(), ns, name);
 
@@ -53,7 +53,7 @@ public static partial class TypingsUtils
     }
 
     public static IEnumerable<CustomAttribute> GetAttrs(IEnumerable<CustomAttribute> attrList,
-        string ns, string name, TypeDefinition[] baseClasses = null)
+        string ns, string name, TypeDefinition[]? baseClasses = null)
     {
         if (attrList == null)
             yield break;

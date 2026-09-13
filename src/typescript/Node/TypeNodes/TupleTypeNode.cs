@@ -5,7 +5,7 @@ public class TupleTypeNode(NodeArray<ITypeNode> elementTypes)
 {
     public NodeArray<ITypeNode> ElementTypes { get; set; } = elementTypes;
 
-    public IEnumerable<INode> GetRestChildren()
+    public IEnumerable<INode?> GetRestChildren()
     {
         return ElementTypes;
     }

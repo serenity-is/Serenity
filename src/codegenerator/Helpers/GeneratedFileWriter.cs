@@ -48,7 +48,7 @@ public class GeneratedFileWriter(IFileSystem fileSystem, IGeneratorConsole conso
         if (overwriteAll != null)
             return overwriteAll.Value;
 
-        string answer;
+        string? answer;
         while (true)
         {
             console.Write("Overwrite " + fileSystem.GetFileName(targetFile) + 

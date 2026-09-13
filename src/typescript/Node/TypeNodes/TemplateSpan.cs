@@ -6,7 +6,7 @@ public class TemplateSpan(IExpression expression, ITemplateLiteralLikeNode liter
     public IExpression Expression { get; } = expression;
     public ITemplateLiteralLikeNode Literal { get; } = literal; // TemplateMiddle | TemplateTail
 
-    public IEnumerable<INode> GetRestChildren()
+    public IEnumerable<INode?> GetRestChildren()
     {
         return [Expression, Literal];
     }

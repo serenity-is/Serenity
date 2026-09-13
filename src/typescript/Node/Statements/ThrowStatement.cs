@@ -6,7 +6,7 @@ public class ThrowStatement(IExpression expression)
 {
     public IExpression Expression { get; } = expression;
 
-    public IEnumerable<INode> GetRestChildren()
+    public IEnumerable<INode?> GetRestChildren()
     {
         return [Expression];
     }

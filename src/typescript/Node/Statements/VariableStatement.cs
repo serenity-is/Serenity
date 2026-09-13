@@ -7,7 +7,7 @@ public class VariableStatement(NodeArray<IModifierLike> modifiers, IVariableDecl
     public NodeArray<IModifierLike> Modifiers => modifiers;
     public IVariableDeclarationList DeclarationList { get; } = variableDeclarationList;
 
-    public IEnumerable<INode> GetRestChildren()
+    public IEnumerable<INode?> GetRestChildren()
     {
         return [DeclarationList];
     }

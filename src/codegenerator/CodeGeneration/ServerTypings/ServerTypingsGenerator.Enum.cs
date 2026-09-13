@@ -2,9 +2,9 @@ namespace Serenity.CodeGeneration;
 
 public partial class ServerTypingsGenerator
 {
-    private static string GetEnumKeyFor(TypeDefinition enumType)
+    private static string? GetEnumKeyFor(TypeDefinition enumType)
     {
-        string enumKey = enumType.FullNameOf();
+        string? enumKey = enumType.FullNameOf();
         var enumKeyAttr = TypingsUtils.FindAttr(enumType.GetAttributes(), "Serenity.ComponentModel", "EnumKeyAttribute");
         if (enumKeyAttr != null &&
             enumKeyAttr.ConstructorArguments().Count >= 1 &&

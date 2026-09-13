@@ -18,7 +18,7 @@ public static class TSConfigHelper
         IFileSystem fileSystem, string rootDir,
         CancellationToken cancellationToken = default)
     {
-        ArgumentExceptionHelper.ThrowIfNull(config);
+        ArgumentNullException.ThrowIfNull(config);
 
         if (config.Files != null)
         {
@@ -56,17 +56,20 @@ public static class TSConfigHelper
 
         cancellationToken.ThrowIfCancellationRequested();
 
-        files = files.Concat(GetFilesMatchingPatterns(fileSystem, rootDir, includePatterns, config?.Exclude));
+        files = files.Concat(GetFilesMatchingPatterns(fileSystem, rootDir, includePatterns, config.Exclude));
 
         cancellationToken.ThrowIfCancellationRequested();
 
         return files.Distinct().ToArray();
     }
 
-    public static TSConfig Read(IFileSystem fileSystem, string path)
+    public static TSConfig? Read(IFileSystem fileSystem, string path)
     {
         var config = TryParseJsonFile<TSConfig>(fileSystem, path);
-        var extends = PathHelper.ToPath(config?.Extends ?? "");
+        if (config is null)
+            return null;
+
+        var extends = PathHelper.ToPath(config.Extends ?? "");
         var loop = 0;
         string basePath = path;
         while (!string.IsNullOrEmpty(extends) && loop++ < 10)
@@ -138,10 +141,10 @@ public static class TSConfigHelper
         return config;
     }
 
-    public static T TryParseJsonFile<T>(IFileSystem fileSystem, string path) where T : class
+    public static T? TryParseJsonFile<T>(IFileSystem fileSystem, string path) where T : class
     {
-        ArgumentExceptionHelper.ThrowIfNull(fileSystem);
-        ArgumentExceptionHelper.ThrowIfNull(path);
+        ArgumentNullException.ThrowIfNull(fileSystem);
+        ArgumentNullException.ThrowIfNull(path);
 
         try
         {
@@ -166,7 +169,7 @@ public static class TSConfigHelper
         }
     }
 
-    public static string LocateTSConfigFile(IFileSystem fileSystem, string projectDir)
+    public static string? LocateTSConfigFile(IFileSystem fileSystem, string projectDir)
     {
         foreach (var path in new[]
         {
@@ -226,20 +229,18 @@ public static class TSConfigHelper
     }
 
     private static IEnumerable<string> GetFilesMatchingPatterns(IFileSystem fileSystem,
-        string rootDir, string[] includePatterns, string[] excludePatterns)
+        string rootDir, string[] includePatterns, string[]? excludePatterns)
     {
         List<string> result = [];
 
         if (!fileSystem.DirectoryExists(rootDir))
             return result;
 
-        includePatterns = includePatterns.Select(NormalizePattern)
-            .Where(x => !string.IsNullOrEmpty(x)).ToArray();
+        includePatterns = [.. includePatterns.Select(NormalizePattern).Where(x => !string.IsNullOrEmpty(x))];
 
-        excludePatterns = (excludePatterns ?? []).Select(NormalizePattern)
-            .Where(x => !string.IsNullOrEmpty(x)).ToArray();
+        excludePatterns = [.. (excludePatterns ?? []).Select(NormalizePattern).Where(x => !string.IsNullOrEmpty(x))];
 
-        includePatterns = includePatterns.Where(x =>
+        includePatterns = [.. includePatterns.Where(x =>
         {
             if (x.IndexOfAny(wildcards) < 0 ||
                 x.StartsWith('/') ||
@@ -254,7 +255,7 @@ public static class TSConfigHelper
                 return false;
             }
             return true;
-        }).ToArray();
+        })];
 
         IEnumerable<string> enumerated = [];
 

@@ -2,13 +2,13 @@ namespace Serenity.TypeScript;
 
 public class JSDocParameterTag() : JSDocTag(SyntaxKind.JSDocParameterTag), IGetRestChildren
 {
-    public Identifier PreParameterName { get; set; }
-    public JSDocTypeExpression TypeExpression { get; set; }
-    public Identifier PostParameterName { get; set; }
-    public Identifier ParameterName { get; set; }
+    public Identifier? PreParameterName { get; set; }
+    public JSDocTypeExpression? TypeExpression { get; set; }
+    public Identifier? PostParameterName { get; set; }
+    public Identifier? ParameterName { get; set; }
     public bool IsBracketed { get; set; }
 
-    public override IEnumerable<INode> GetRestChildren()
+    public override IEnumerable<INode?> GetRestChildren()
     {
         foreach (var x in base.GetRestChildren())
             yield return x;

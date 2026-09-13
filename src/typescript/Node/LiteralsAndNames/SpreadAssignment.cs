@@ -5,7 +5,7 @@ public class SpreadAssignment(IExpression expression)
 {
     public IExpression Expression { get; set; } = expression;
 
-    public override IEnumerable<INode> GetRestChildren()
+    public override IEnumerable<INode?> GetRestChildren()
     {
         return [Name, Expression];
     }

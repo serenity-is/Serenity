@@ -9,7 +9,7 @@ public class ImportDeclaration(NodeArray<IModifierLike> modifiers, ImportClause 
     public IExpression ModuleSpecifier { get; } = moduleSpecifier;
     public ImportAttributes Attributes { get; } = attributes;
 
-    public IEnumerable<INode> GetRestChildren()
+    public IEnumerable<INode?> GetRestChildren()
     {
         return [ImportClause, ModuleSpecifier, Attributes];
     }

@@ -8,8 +8,8 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console, IProcessExec
     private readonly IGeneratorConsole Console = console ?? throw new ArgumentNullException(nameof(console));
     private readonly IProcessExecutor ProcessExecutor = processExecutor ?? throw new ArgumentNullException(nameof(processExecutor));
 
-    public Func<string, Func<string, string>, IProjectFileInfo> ProjectFactory { get; set; }
-    public Func<BaseGeneratorCommand, ExitCodes> RunCommandCallback { get; set; }
+    public Func<string, Func<string, string?>, IProjectFileInfo>? ProjectFactory { get; set; }
+    public Func<BaseGeneratorCommand, ExitCodes>? RunCommandCallback { get; set; }
 
     public ExitCodes Run(IArgumentReader arguments)
     {
@@ -59,7 +59,7 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console, IProcessExec
         }
 
         var projectDir = FileSystem.GetDirectoryName(FileSystem.GetFullPath(projectFile));
-        string getPropertyArgument(string name) => propertyArgs.TryGetValue(name, out var value) ? value : 
+        string? getPropertyArgument(string name) => propertyArgs.TryGetValue(name, out var value) ? value : 
             string.Equals(name, "globalusings", StringComparison.OrdinalIgnoreCase) ? globalUsings : null;
 
         var project = ProjectFactory?.Invoke(projectFile, getPropertyArgument)
@@ -78,7 +78,7 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console, IProcessExec
             });
         }
 
-        List<ExternalType> tsTypes = null;
+        List<ExternalType>? tsTypes = null;
 
         void ensureTSTypes()
         {

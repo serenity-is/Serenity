@@ -7,7 +7,7 @@ public class ForInStatement(IForInitializer initializer, IExpression expression,
     public IForInitializer Initializer { get; } = initializer;
     public IExpression Expression { get; } = expression;
 
-    public override IEnumerable<INode> GetRestChildren()
+    public override IEnumerable<INode?> GetRestChildren()
     {
         return [Initializer, Expression, Statement];
     }

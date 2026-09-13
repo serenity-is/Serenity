@@ -6,7 +6,7 @@ public class IndexedAccessTypeNode(ITypeNode objectType, ITypeNode indexType)
     public ITypeNode ObjectType { get; set; } = objectType;
     public ITypeNode IndexType { get; set; } = indexType;
 
-    public IEnumerable<INode> GetRestChildren()
+    public IEnumerable<INode?> GetRestChildren()
     {
         return [ObjectType, IndexType];
     }

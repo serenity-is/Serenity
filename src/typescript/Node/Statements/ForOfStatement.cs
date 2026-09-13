@@ -9,7 +9,7 @@ public class ForOfStatement(AwaitKeyword awaitKeyword, IForInitializer initializ
     public IForInitializer Initializer { get; } = initializer;
     public IExpression Expression { get; } = expression;
 
-    public override IEnumerable<INode> GetRestChildren()
+    public override IEnumerable<INode?> GetRestChildren()
     {
         return [AwaitKeyword, Initializer, Expression, Statement];
     }

@@ -5,12 +5,12 @@ namespace Serenity.CodeGenerator;
 
 public class ExtendsJsonReader
 {
-    public static TConfig Read<TConfig>(IFileSystem fileSystem, 
+    public static TConfig? Read<TConfig>(IFileSystem fileSystem, 
         string path, string extendsProp, JsonSerializerOptions options,
-        Func<string, string> getDefault = null)
+        Func<string, string?>? getDefault = null)
         where TConfig: class, new()
     {
-        string readExtends(JsonDocument doc)
+        string? readExtends(JsonDocument doc)
         {
             if (!doc.RootElement.TryGetProperty(extendsProp, out JsonElement value) ||
                 value.ValueKind != JsonValueKind.String)

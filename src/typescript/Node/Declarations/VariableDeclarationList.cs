@@ -12,7 +12,7 @@ public class VariableDeclarationList(NodeArray<VariableDeclaration> declarations
     public NodeArray<VariableDeclaration> Declarations { get; } = declarations;
     public NodeFlags NodeFlags { get; }
 
-    public IEnumerable<INode> GetRestChildren()
+    public IEnumerable<INode?> GetRestChildren()
     {
         return Declarations;
     }

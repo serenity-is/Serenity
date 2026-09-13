@@ -5,7 +5,7 @@ public class InferTypeNode(TypeParameterDeclaration typeParameter)
 {
     public TypeParameterDeclaration TypeParameter { get; } = typeParameter;
 
-    public IEnumerable<INode> GetRestChildren()
+    public IEnumerable<INode?> GetRestChildren()
     {
         return [TypeParameter];
     }

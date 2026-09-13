@@ -2,7 +2,7 @@ namespace Serenity.TypeScript;
 
 partial class Scanner
 {
-    internal static U IterateCommentRanges<T, U>(bool reduce, string text, int pos, bool trailing, Func<(int pos, int end, SyntaxKind kind, bool hasTrailingNewLine, T state, U memo), U> cb, T state, U initial = default)
+    internal static U IterateCommentRanges<T, U>(bool reduce, string text, int pos, bool trailing, Func<(int pos, int end, SyntaxKind kind, bool hasTrailingNewLine, T state, U memo), U> cb, T state, U initial = default!)
     {
         int pendingPos = 0;
         int pendingEnd = 0;
@@ -117,7 +117,7 @@ partial class Scanner
         return accumulator;
     }
 
-    List<CommentDirective> AppendIfCommentDirective(List<CommentDirective> commentDirectives, string text, Regex commentDirectiveRegEx, int lineStart)
+    List<CommentDirective>? AppendIfCommentDirective(List<CommentDirective>? commentDirectives, string text, Regex commentDirectiveRegEx, int lineStart)
     {
         var type = GetDirectiveFromComment(text.TrimStart(), commentDirectiveRegEx);
         if (type == null)

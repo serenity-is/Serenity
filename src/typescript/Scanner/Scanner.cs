@@ -1,10 +1,10 @@
 namespace Serenity.TypeScript;
 
-public delegate void ErrorCallback(DiagnosticMessage message, int length, object arg0);
+public delegate void ErrorCallback(DiagnosticMessage message, int length, object? arg0);
 
 public partial class Scanner
 {
-    private string text;
+    private string text = null!;
 
     // Current position (end position of text of current token)
     private int pos;
@@ -19,10 +19,10 @@ public partial class Scanner
     private int tokenStart;
 
     private SyntaxKind token;
-    private string tokenValue;
+    private string tokenValue = null!;
     private TokenFlags tokenFlags;
 
-    private List<CommentDirective> commentDirectives;
+    private List<CommentDirective>? commentDirectives;
     private int skipJsDocLeadingAsterisks;
 
     private ScriptKind scriptKind = ScriptKind.Unknown;
@@ -32,10 +32,10 @@ public partial class Scanner
     private LanguageVariant languageVariant;
     private readonly bool skipTrivia;
 
-    private ErrorCallback onError;
+    private ErrorCallback? onError;
 
     public Scanner(ScriptTarget languageVersion, bool skipTrivia, LanguageVariant languageVariant = LanguageVariant.Standard,
-        string textInitial = null, ErrorCallback onError = null, int? start = null, int? length = null)
+        string? textInitial = null, ErrorCallback? onError = null, int? start = null, int? length = null)
     {
         this.languageVersion = languageVersion;
         this.skipTrivia = skipTrivia;
@@ -59,10 +59,10 @@ public partial class Scanner
     public bool IsReservedWord() => token >= SyntaxKindMarker.FirstReservedWord && token <= SyntaxKindMarker.LastReservedWord;
     public bool IsUnterminated() => (tokenFlags & TokenFlags.Unterminated) != 0;
     internal TokenFlags GetNumericLiteralFlags() => tokenFlags & TokenFlags.NumericLiteralFlags;
-    internal IEnumerable<CommentDirective> GetCommentDirectives() => commentDirectives;
+    internal IEnumerable<CommentDirective>? GetCommentDirectives() => commentDirectives;
     internal TokenFlags GetTokenFlags() => tokenFlags;
 
-    private void Error(DiagnosticMessage message, int? errPos = null, int length = 0, object arg0 = null)
+    private void Error(DiagnosticMessage message, int? errPos = null, int length = 0, object? arg0 = null)
     {
         if (onError != null)
         {
@@ -190,8 +190,8 @@ public partial class Scanner
         {
             mainFragment = ScanNumberFragment();
         }
-        string decimalFragment = null;
-        string scientificFragment = null;
+        string? decimalFragment = null;
+        string? scientificFragment = null;
         if (pos < end && text[pos] == CharacterCodes.Dot)
         {
             pos++;
@@ -375,7 +375,7 @@ public partial class Scanner
     {
         var quote = text[pos];
         pos++;
-        StringBuilder result = null;
+        StringBuilder? result = null;
         var start = pos;
         while (true)
         {
@@ -1955,14 +1955,14 @@ public partial class Scanner
         /** The number of all (named and unnamed) capturing groups defined in the regex. */
         var numberOfCapturingGroups = 0;
         /** All named capturing groups defined in the regex. */
-        HashSet<string> groupSpecifiers = null;
+        HashSet<string>? groupSpecifiers = null;
         /** All references to named capturing groups in the regex. */
-        List<RegexGroupNameRef> groupNameReferences = null;
+        List<RegexGroupNameRef>? groupNameReferences = null;
         /** All numeric backreferences within the regex. */
-        List<RegexDecimalEscape> decimalEscapes = null;
+        List<RegexDecimalEscape>? decimalEscapes = null;
         /** A stack of scopes for named capturing groups. @see {scanGroupName} */
-        Stack<HashSet<string>> namedCapturingGroupsScopeStack = [];
-        HashSet<string> topNamedCapturingGroupsScope = null;
+        Stack<HashSet<string>?> namedCapturingGroupsScopeStack = [];
+        HashSet<string>? topNamedCapturingGroupsScope = null;
 
         // Disjunction ::= Alternative ('|' Alternative)*
         void scanDisjunction(bool isInGroup)
@@ -2493,7 +2493,7 @@ public partial class Scanner
                 return;
             }
             var start = pos;
-            string operand = null;
+            string? operand = null;
             switch (text[pos..(pos + 2)])
             {
                 case "--":
@@ -2592,11 +2592,11 @@ public partial class Scanner
                             {
                                 break;
                             }
-                            var minCharacterValue = CodePointAt(operand, 0);
+                            var minCharacterValue = CodePointAt(operand!, 0);
                             var maxCharacterValue = CodePointAt(secondOperand, 0);
                             if (
-                                operand.Length == CharSize(minCharacterValue) &&
-                                secondOperand.Length == CharSize(maxCharacterValue) &&
+                                 operand!.Length == CharSize(minCharacterValue) &&
+                                 secondOperand.Length == CharSize(maxCharacterValue) &&
                                 minCharacterValue > maxCharacterValue)
                             {
                                 Error(Diagnostics.Range_out_of_order_in_character_class, start, pos - start);
@@ -2953,7 +2953,7 @@ public partial class Scanner
                         var propertyNameOrValue = scanWordCharacters();
                         if (CharCodeChecked(pos) == CharacterCodes.Equals)
                         {
-                            var propertyName = NonBinaryUnicodeProperties.TryGetValue(propertyNameOrValue, out string value) ? value : null;
+                            var propertyName = NonBinaryUnicodeProperties.TryGetValue(propertyNameOrValue, out string? value) ? value : null;
                             if (pos == propertyNameOrValueStart)
                             {
                                 Error(Diagnostics.Expected_a_Unicode_property_name);
@@ -3077,7 +3077,7 @@ public partial class Scanner
 
         groupNameReferences?.ForEach(reference =>
         {
-            if (!groupSpecifiers?.Contains(reference.Name) != true)
+            if (!groupSpecifiers?.Contains(reference.Name!) != true)
             {
                 Error(Diagnostics.There_is_no_capturing_group_named_0_in_this_regular_expression, reference.Pos, (reference.End ?? 0) - (reference.Pos ?? 0), reference.Name);
                 if (groupSpecifiers != null)
@@ -3453,7 +3453,7 @@ public partial class Scanner
         }
     }
 
-    internal static bool IsFalsy(object obj)
+    internal static bool IsFalsy(object? obj)
     {
         return obj is null or false or 0 or "" or SyntaxKind.Unknown ||
             (obj is not true and not string && int.TryParse(obj.ToString(), out int i) && i == 0);
@@ -3526,12 +3526,12 @@ public partial class Scanner
         commentDirectives = null;
     }
 
-    public void SetOnError(ErrorCallback errorCallback)
+    public void SetOnError(ErrorCallback? errorCallback)
     {
         onError = errorCallback;
     }
 
-    public void SetText(string newText, int? start = null, int? length = null)
+    public void SetText(string? newText, int? start = null, int? length = null)
     {
         text = newText ?? "";
         end = length == null ? text.Length : (start ?? 0) + (length ?? 0);
@@ -3565,7 +3565,7 @@ public partial class Scanner
         fullStartPos = position;
         tokenStart = position;
         token = SyntaxKind.Unknown;
-        tokenValue = null;
+        tokenValue = null!;
         tokenFlags = TokenFlags.None;
     }
 

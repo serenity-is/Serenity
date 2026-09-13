@@ -8,7 +8,7 @@ public class NamedTupleMember(DotDotDotToken dotDotDotToken, Identifier name, Qu
     public QuestionToken QuestionToken { get; set; } = questionToken;
     public ITypeNode Type { get; set; } = type;
 
-    public IEnumerable<INode> GetRestChildren()
+    public IEnumerable<INode?> GetRestChildren()
     {
         return [DotDotDotToken, Name, QuestionToken, Type];
     }

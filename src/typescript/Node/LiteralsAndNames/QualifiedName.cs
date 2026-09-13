@@ -6,7 +6,7 @@ public class QualifiedName(IEntityName left, Identifier right)
     public IEntityName Left { get; } = left;
     public Identifier Right { get; } = right;
 
-    public IEnumerable<INode> GetRestChildren()
+    public IEnumerable<INode?> GetRestChildren()
     {
         return [Left, Right];
     }

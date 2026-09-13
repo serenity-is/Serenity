@@ -23,8 +23,8 @@ public partial class ServerTypingsGenerator
         });
     }
 
-    void GenerateBasicTypeMembers(TypeDefinition type, TypeReference baseClass, 
-        string codeNamespace)
+    void GenerateBasicTypeMembers(TypeDefinition type, TypeReference? baseClass, 
+        string? codeNamespace)
     {
         void handleMember(TypeReference memberType, string memberName, IEnumerable<CustomAttribute> a)
         {
@@ -38,7 +38,7 @@ public partial class ServerTypingsGenerator
                 if (arg.Type.FullNameOf() == "System.String" &&
                     !string.IsNullOrEmpty(arg.Value as string))
                 {
-                    memberName = arg.Value as string;
+                    memberName = (arg.Value as string)!;
                 }
             }
 
@@ -82,15 +82,15 @@ public partial class ServerTypingsGenerator
             (baseClass == null || !TypingsUtils.IsAssignableFrom(current, baseClass)));
     }
 
-    protected static TypeReference GetBasicTypeBaseClass(TypeDefinition type)
+    protected static TypeReference? GetBasicTypeBaseClass(TypeDefinition type)
     {
         foreach (var t in type.SelfAndBaseClasses())
         {
             if (t.BaseType != null &&
                 t.BaseType.IsGenericInstanceType(out var originalDefinition) &&
-                originalDefinition.NamespaceOf() == "Serenity.Services")
+                originalDefinition!.NamespaceOf() == "Serenity.Services")
             {
-                var n = originalDefinition.MetadataName();
+                var n = originalDefinition!.MetadataName();
                 if (n == "ListResponse`1" || n == "RetrieveResponse`1" || n == "SaveRequest`1")
                     return t.BaseType;
             }

@@ -21,24 +21,24 @@ public partial class ServerTypingsGenerator
 
         public class AttributeInfo
         {
-            public TypeDefinition AnnotatedType { get; set; }
+            public TypeDefinition AnnotatedType { get; set; } = null!;
             public bool Inherited { get; set; }
-            public string[] Namespaces { get; set; }
-            public string[] Properties { get; set; }
+            public string[]? Namespaces { get; set; }
+            public string[]? Properties { get; set; }
         }
     }
 
     protected List<AnnotationTypeInfo> GetAnnotationTypesFor(TypeDefinition type)
     {
         var list = new List<AnnotationTypeInfo>();
-        TypeReference[] baseClasses = null;
+        TypeReference[]? baseClasses = null;
         foreach (var annotationType in annotationTypes)
         {
             var annotationMatch = false;
 
             foreach (var attr in annotationType.Attributes)
             {
-                baseClasses ??= type.EnumerateBaseClasses().ToArray();
+                baseClasses ??= [.. type.EnumerateBaseClasses()];
 
                 if (TypingsUtils.IsOrSubClassOf(attr.AnnotatedType, "System", "Attribute"))
                 {

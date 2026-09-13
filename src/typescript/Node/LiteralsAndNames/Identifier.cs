@@ -3,12 +3,12 @@ namespace Serenity.TypeScript;
 public class Identifier : PrimaryExpressionBase, IDeclaration, IJsxTagNameExpression,
     IEntityName, IPropertyName, IBindingName, IJsxAttributeName, IHasLiteralText, IModuleName, IModuleExportName
 {
-    public Identifier(string text, SyntaxKind? originalKeywordKind = null, bool? hasExtendedUnicodeEscape = null,
+    public Identifier(string? text, SyntaxKind? originalKeywordKind = null, bool? hasExtendedUnicodeEscape = null,
         SyntaxKind kind = SyntaxKind.Identifier)
         : base(kind)
     {
         if (originalKeywordKind == null && !string.IsNullOrEmpty(text))
-            originalKeywordKind = Scanner.StringToToken(text);
+            originalKeywordKind = Scanner.StringToToken(text!);
 
         if (originalKeywordKind == SyntaxKind.Identifier)
             originalKeywordKind = null;
@@ -21,14 +21,14 @@ public class Identifier : PrimaryExpressionBase, IDeclaration, IJsxTagNameExpres
             Flags |= NodeFlags.IdentifierHasExtendedUnicodeEscape;
     }
 
-    public string Text { get; set; }
+    public string? Text { get; set; }
     public SyntaxKind? OriginalKeywordKind { get; set; }
     public bool IsInJsDocNamespace { get; set; }
     public bool HasExtendedUnicodeEscape { get; set; }
 
-    string escapedText;
+    string? escapedText;
 
-    public string EscapedText
+    public string? EscapedText
     {
         get { return Text ?? escapedText; }
         set { escapedText = value; }

@@ -20,7 +20,7 @@ public partial class ServerTypingsGenerator : CodeGeneratorBase
     public Compilation Compilation { get; }
 #else
     public ServerTypingsGenerator(IFileSystem fileSystem, params Assembly[] assemblies)
-        : this(TypingsUtils.ToDefinitions(fileSystem, assemblies?.Select(x => x.Location)))
+        : this(TypingsUtils.ToDefinitions(fileSystem, assemblies.Select(x => x.Location)))
     {
     }
 
@@ -48,11 +48,11 @@ public partial class ServerTypingsGenerator : CodeGeneratorBase
     public Mono.Cecil.AssemblyDefinition[] Assemblies { get; private set; }
 
     /// <summary>Optional predicate for test purposes</summary>
-    public Func<TypeDefinition, bool> TypeFilter { get; set; }
+    public Func<TypeDefinition, bool>? TypeFilter { get; set; }
 #endif
 
     private readonly HashSet<string> visited = [];
-    private Queue<TypeDefinition> generateQueue;
+    private Queue<TypeDefinition> generateQueue = null!;
     protected List<TypeDefinition> lookupScripts = [];
     protected List<GeneratedTypeInfo> generatedTypes = [];
     protected List<AnnotationTypeInfo> annotationTypes = [];
@@ -68,7 +68,7 @@ public partial class ServerTypingsGenerator : CodeGeneratorBase
     protected Dictionary<string, TypeDefinition> scriptDataKeys = [];
     protected Dictionary<string, List<string>> namespaceConstants = [];
 
-    protected static string GetAssemblyNameFor(TypeReference type)
+    protected static string? GetAssemblyNameFor(TypeReference type)
     {
         var assemblyName =
 #if ISSOURCEGENERATOR
@@ -133,8 +133,8 @@ public partial class ServerTypingsGenerator : CodeGeneratorBase
 
     protected class GeneratedTypeInfo
     {
-        public string Namespace { get; set; }
-        public string Name { get; set; }
+        public string? Namespace { get; set; }
+        public string? Name { get; set; }
         public bool Module { get; set; }
         public bool TypeOnly { get; set; }
     }
@@ -145,7 +145,7 @@ public partial class ServerTypingsGenerator : CodeGeneratorBase
         base.AddFile(filename);
     }
 
-    protected void RegisterGeneratedType(string ns, string name, bool typeOnly)
+    protected void RegisterGeneratedType(string? ns, string name, bool typeOnly)
     {
         generatedTypes.Add(new GeneratedTypeInfo
         {
@@ -157,7 +157,7 @@ public partial class ServerTypingsGenerator : CodeGeneratorBase
 
     protected virtual void GenerateCodeFor(TypeDefinition type)
     {
-        void add(Action<TypeDefinition> action, string fileIdentifier = null)
+        void add(Action<TypeDefinition> action, string? fileIdentifier = null)
         {
             var typeNamespace = ScriptNamespaceFor(type);
             var name = fileIdentifier ?? type.Name;
@@ -236,7 +236,7 @@ public partial class ServerTypingsGenerator : CodeGeneratorBase
         if (string.IsNullOrEmpty(typeNamespace))
             return;
 
-        var ns = typeNamespace;
+        string? ns = typeNamespace;
         foreach (var rn in RootNamespaces)
         {
             if (rn == ns)

@@ -3,7 +3,7 @@ namespace Serenity.CodeGenerator;
 public static class Texts
 {
     public static string Help => $"""""
-        Serenity Code Generator {Assembly.GetEntryAssembly().GetName().Version}
+        Serenity Code Generator {Assembly.GetEntryAssembly()?.GetName().Version}
         Usage: sergen [switches] [command]
 
         Commands:

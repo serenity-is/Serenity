@@ -2,9 +2,9 @@ namespace Serenity.TypeScript;
 
 public class JSDocTypeTag() : JSDocTag(SyntaxKind.JSDocTypeTag), IGetRestChildren
 {
-    public JSDocTypeExpression TypeExpression { get; set; }
+    public JSDocTypeExpression? TypeExpression { get; set; }
 
-    public override IEnumerable<INode> GetRestChildren()
+    public override IEnumerable<INode?> GetRestChildren()
     {
         foreach (var x in base.GetRestChildren())
             yield return x;

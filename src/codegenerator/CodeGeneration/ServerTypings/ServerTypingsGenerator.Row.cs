@@ -28,7 +28,7 @@ public partial class ServerTypingsGenerator
     ];
     private static readonly string[] isDeletedRowInterfaces = ["Serenity.Data.IIsDeletedRow", "Serenity.Data.IIsDeletedRow"];
 
-    private void GenerateRowMembers(TypeDefinition rowType, string codeNamespace)
+    private void GenerateRowMembers(TypeDefinition rowType, string? codeNamespace)
     {
         foreach (var property in EnumerateFieldProperties(rowType))
         {
@@ -105,7 +105,7 @@ public partial class ServerTypingsGenerator
                 }
             }
         }
-        while ((rowType = (rowType.BaseType?.Resolve())) != null &&
+        while ((rowType = (rowType.BaseType?.Resolve())!) != null &&
             rowType.FullNameOf() != "Serenity.Data.Row" &&
             rowType.FullNameOf() != "Serenity.Data.Row`1");
     }
@@ -117,12 +117,12 @@ public partial class ServerTypingsGenerator
             foreach (var property in rowType.PropertiesOf().Where(TypingsUtils.IsPublicInstanceProperty))
                 yield return property;
         }
-        while ((rowType = (rowType.BaseType?.Resolve())) != null &&
+        while ((rowType = (rowType.BaseType?.Resolve())!) != null &&
             rowType.FullNameOf() is not "Serenity.Data.Row" and
                 not "Serenity.Data.Row`1");
     }
 
-    private static string ExtractInterfacePropertyFromRow(TypeDefinition rowType, string[] interfaceTypes,
+    private static string? ExtractInterfacePropertyFromRow(TypeDefinition rowType, string[] interfaceTypes,
         string propertyType, string propertyName, string getMethodFullName)
     {
         do
@@ -179,8 +179,8 @@ public partial class ServerTypingsGenerator
                     .SelectMany(x => x.Body.Instructions.Where(z =>
                         z.OpCode == OpCodes.Ldfld &&
                         z.Operand is FieldReference &&
-                        TypingsUtils.IsSubclassOf((z.Operand as FieldReference).DeclaringType, "Serenity.Data", "RowFieldsBase"))
-                        .Select(z => (z.Operand as FieldReference).Name))
+                        TypingsUtils.IsSubclassOf((z.Operand as FieldReference)!.DeclaringType, "Serenity.Data", "RowFieldsBase"))
+                        .Select(z => (z.Operand as FieldReference)!.Name))
                     .FirstOrDefault();
 
                 if (name != null)
@@ -188,14 +188,14 @@ public partial class ServerTypingsGenerator
 #endif
             }
         }
-        while ((rowType = (rowType.BaseType?.Resolve())) != null &&
+        while ((rowType = (rowType.BaseType?.Resolve())!) != null &&
             rowType.FullNameOf() != "Serenity.Data.Row" &&
             rowType.FullNameOf() != "Serenity.Data.Row`1");
 
         return null;
     }
 
-    private static string DetermineModuleIdentifier(TypeDefinition rowType)
+    private static string? DetermineModuleIdentifier(TypeDefinition rowType)
     {
         var moduleAttr = TypingsUtils.GetAttr(rowType, "Serenity.ComponentModel", "ModuleAttribute");
         if (moduleAttr != null)
@@ -226,7 +226,7 @@ public partial class ServerTypingsGenerator
 
     private static string DetermineLocalTextPrefix(TypeDefinition rowType)
     {
-        string localTextPrefix = null;
+        string? localTextPrefix = null;
 
         var fieldsType = rowType.NestedTypes().FirstOrDefault(x =>
                 TypingsUtils.IsSubclassOf(x, "Serenity.Data", "RowFieldsBase"));
@@ -265,7 +265,7 @@ public partial class ServerTypingsGenerator
                     (z.OpCode == OpCodes.Call || z.OpCode == OpCodes.Calli ||
                     z.OpCode == OpCodes.Callvirt) &&
                     z.Operand is MethodReference &&
-                    (z.Operand as MethodReference).FullName ==
+                    (z.Operand as MethodReference)!.FullName ==
                     "System.Void Serenity.Data.RowFieldsBase::set_LocalTextPrefix(System.String)" &&
                     z.Previous.OpCode == OpCodes.Ldstr &&
                     z.Previous.Operand is string)).Select(x => x.Previous.Operand as string)
@@ -287,9 +287,9 @@ public partial class ServerTypingsGenerator
         return DetermineRowIdentifier(rowType);
     }
 
-    private static string DeterminePermission(TypeDefinition rowType, params string[] attributeNames)
+    private static string? DeterminePermission(TypeDefinition rowType, params string[] attributeNames)
     {
-        CustomAttribute permissionAttr = null;
+        CustomAttribute? permissionAttr = null;
         foreach (var attributeName in attributeNames)
         {
             permissionAttr = TypingsUtils.GetAttr(rowType, "Serenity.Data", attributeName + "PermissionAttribute");
@@ -313,7 +313,7 @@ public partial class ServerTypingsGenerator
 
     private static string AutoLookupKeyFor(TypeDefinition type)
     {
-        string module;
+        string? module;
         var moduleAttr = TypingsUtils.GetAttr(type,
             "Serenity.ComponentModel", "ModuleAttribute");
         if (moduleAttr != null)
@@ -350,7 +350,7 @@ public partial class ServerTypingsGenerator
             module + "." + name;
     }
 
-    public string DetermineLookupKey(TypeDefinition rowType)
+    public string? DetermineLookupKey(TypeDefinition rowType)
     {
         var lookupAttr = TypingsUtils.GetAttr(rowType,
             "Serenity.ComponentModel", "LookupScriptAttribute");
@@ -364,7 +364,7 @@ public partial class ServerTypingsGenerator
                 x.BaseType
 #else
                 x.BaseType is GenericInstanceType &&
-                (x.BaseType as GenericInstanceType)
+                (x.BaseType as GenericInstanceType)!
 #endif
                     .GenericArguments().Any(z =>
                     z.Name == rowType.Name && z.NamespaceOf() == rowType.NamespaceOf()) &&
@@ -396,14 +396,14 @@ public partial class ServerTypingsGenerator
             lookupAttr.ConstructorArguments[0].Type.FullNameOf() == "System.Type")
         {
             return AutoLookupKeyFor(
-                (lookupAttr.ConstructorArguments[0].Value as TypeReference).Resolve());
+                (lookupAttr.ConstructorArguments[0].Value as TypeReference)!.Resolve());
         }
 
         if (lookupAttr.ConstructorArguments().Count == 1 &&
             lookupAttr.ConstructorArguments[0].Type.FullNameOf() == "System.Type")
         {
             return AutoLookupKeyFor(
-                (lookupAttr.ConstructorArguments[0].Value as TypeReference).Resolve());
+                (lookupAttr.ConstructorArguments[0].Value as TypeReference)!.Resolve());
         }
 
         if (lookupAttr.ConstructorArguments().Count == 0)
@@ -414,16 +414,16 @@ public partial class ServerTypingsGenerator
 
     protected class RowMetadata
     {
-        public string IdProperty { get; set; }
-        public string NameProperty { get; set; }
-        public string IsActiveProperty { get; set; }
-        public string IsDeletedProperty { get; set; }
-        public string LocalTextPrefix { get; set; }
-        public string LookupKey { get; set; }
-        public string ReadPermission { get; set; }
-        public string DeletePermission { get; set; }
-        public string InsertPermission { get; set; }
-        public string UpdatePermission { get; set; }
+        public string? IdProperty { get; set; }
+        public string? NameProperty { get; set; }
+        public string? IsActiveProperty { get; set; }
+        public string? IsDeletedProperty { get; set; }
+        public string? LocalTextPrefix { get; set; }
+        public string? LookupKey { get; set; }
+        public string? ReadPermission { get; set; }
+        public string? DeletePermission { get; set; }
+        public string? InsertPermission { get; set; }
+        public string? UpdatePermission { get; set; }
     }
 
     protected RowMetadata ExtractRowMetadata(TypeDefinition rowType)
@@ -500,7 +500,7 @@ public partial class ServerTypingsGenerator
 
         string export = "static readonly ";
 
-        static string sq(string s) => s == null ? "null" : s.ToSingleQuoted();
+        static string sq(string? s) => s == null ? "null" : s.ToSingleQuoted();
 
         cw.InBrace(delegate
         {

@@ -2,7 +2,7 @@ namespace Serenity.CodeGeneration;
 
 public partial class ServerTypingsGenerator
 {
-    protected virtual string MakeFriendlyName(TypeReference type, string codeNamespace)
+    protected virtual string MakeFriendlyName(TypeReference type, string? codeNamespace)
     {
         if (type.IsGenericInstanceType(out _))
         {
@@ -19,7 +19,7 @@ public partial class ServerTypingsGenerator
             var nt = (INamedTypeSymbol)type;
             foreach (var argument in nt.TypeArguments)
 #else
-            foreach (var argument in (type as GenericInstanceType).GenericArguments)
+            foreach (var argument in (type as GenericInstanceType)!.GenericArguments)
 #endif
             {
                 if (i++ > 0)
@@ -34,7 +34,7 @@ public partial class ServerTypingsGenerator
 #if ISSOURCEGENERATOR
                 nt.TypeArguments.Length;
 #else
-                (type as GenericInstanceType).GenericArguments.Count;
+                (type as GenericInstanceType)!.GenericArguments.Count;
 #endif
         }
 #if ISSOURCEGENERATOR
@@ -91,10 +91,10 @@ public partial class ServerTypingsGenerator
         if (string.IsNullOrEmpty(containingAssembly) ||
             !assemblyNames.Contains(containingAssembly))
         {
-            ExternalType moduleType = TryFindModuleType(ns?.Length > 0 ? (ns + "." + name) : name, containingAssembly);
+            ExternalType? moduleType = TryFindModuleType(ns?.Length > 0 ? (ns + "." + name) : name, containingAssembly);
             if (moduleType != null)
             {
-                return AddExternalImport(moduleType.Module, nonGeneric);
+                return AddExternalImport(moduleType.Module!, nonGeneric);
             }
             return "unknown";
         }
@@ -110,11 +110,11 @@ public partial class ServerTypingsGenerator
         "object"
     };
 
-    protected virtual void MakeFriendlyReference(TypeReference type, string codeNamespace)
+    protected virtual void MakeFriendlyReference(TypeReference type, string? codeNamespace)
     {
         var ns = ScriptNamespaceFor(type);
-        var name = type.Name;
-        var fullName = ShortenFullName(ns, name, codeNamespace, GetAssemblyNameFor(type));
+        var name = type.Name ?? "";
+        var fullName = ShortenFullName(ns, name, codeNamespace!, GetAssemblyNameFor(type)!);
 
         if (!UnknownAnyObject.Contains(fullName) &&
             type.IsGenericInstanceType(out _))
@@ -130,7 +130,7 @@ public partial class ServerTypingsGenerator
 #if ISSOURCEGENERATOR
             foreach (var argument in (type as INamedTypeSymbol).TypeArguments)
 #else
-            foreach (var argument in (type as GenericInstanceType).GenericArguments)
+            foreach (var argument in (type as GenericInstanceType)!.GenericArguments)
 #endif
             {
                 if (i++ > 0)

@@ -6,7 +6,7 @@ public class IterationStatement(SyntaxKind kind, IStatement statement)
 {
     public IStatement Statement { get; } = statement;
 
-    public virtual IEnumerable<INode> GetRestChildren()
+    public virtual IEnumerable<INode?> GetRestChildren()
     {
         return [Statement];
     }

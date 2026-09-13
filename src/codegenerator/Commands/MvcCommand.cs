@@ -73,7 +73,7 @@ public class MvcCommand(IProjectFileInfo project, IGeneratorConsole console)
         });
 
         var outDir = FileSystem.Combine(projectDir,
-            PathHelper.ToPath(sergenConfig.MVC.OutDir.TrimToNull() ?? "Imports/MVC"));
+            PathHelper.ToPath(sergenConfig!.MVC!.OutDir.TrimToNull() ?? "Imports/MVC"));
 
         var esmGenerator = new EsmEntryPointsGenerator(FileSystem)
         {

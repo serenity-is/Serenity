@@ -41,7 +41,7 @@ public class EntityModelFactory : IEntityModelFactory
 
     private static EntityField ToEntityField(Data.Schema.FieldInfo fieldInfo, int prefixLength, bool includeFlags, bool nullableRefTypes)
     {
-        var fieldType = SchemaHelper.SqlTypeNameToFieldType(fieldInfo.DataType, fieldInfo.Size, out string dataType);
+        var fieldType = SchemaHelper.SqlTypeNameToFieldType(fieldInfo.DataType!, fieldInfo.Size, out string? dataType);
         dataType ??= fieldType;
         dataType = CodeWriter.ToCSKeyword(dataType) ?? dataType;
         var entityField = new EntityField
@@ -93,7 +93,7 @@ public class EntityModelFactory : IEntityModelFactory
              !string.IsNullOrEmpty(inputs.DataSchema.DefaultSchema) &&
              inputs.Schema == inputs.DataSchema.DefaultSchema);
 
-        string normalizeSchema(string name)
+        string? normalizeSchema(string? name)
         {
             if (name != null &&
                 omitSchema && string.Equals(name, inputs.DataSchema.DefaultSchema,
@@ -174,10 +174,10 @@ public class EntityModelFactory : IEntityModelFactory
             }
         }
 
-        string baseRowMatch = null;
-        HashSet<string> baseRowFieldset = null;
+        string? baseRowMatch = null;
+        HashSet<string>? baseRowFieldset = null;
         List<string> baseRowFieldList = [];
-        if (inputs?.Config?.BaseRowClasses is { } baseRowClasses)
+        if (inputs.Config.BaseRowClasses is { } baseRowClasses)
         {
             foreach (var k in inputs.Config.BaseRowClasses)
             {
@@ -187,7 +187,7 @@ public class EntityModelFactory : IEntityModelFactory
                 bool skip = false;
                 foreach (var s in k.Fields ?? [])
                 {
-                    string n = s.TrimToNull();
+                    string? n = s.TrimToNull();
                     if (n == null || !fieldInfos.Any(z => z.FieldName[prefix..] == n))
                     {
                         skip = true;
@@ -226,20 +226,20 @@ public class EntityModelFactory : IEntityModelFactory
         if (!inputs.SkipForeignKeys && inputs.Config.RemoveForeignFields is { } removeFK)
         {
             removeForeignFields.AddRange(removeFK.Select(
-                x => x.TrimToNull()).Where(x => x != null));
+                x => x.TrimToNull()).OfType<string>());
         }
 
         var includeForeignFields = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         if (!inputs.SkipForeignKeys && inputs.Config.IncludeForeignFields is { } includeFK)
         {
             includeForeignFields.AddRange(includeFK.Select(
-                x => x.TrimToNull()).Where(x => x != null));
+                x => x.TrimToNull()).OfType<string>());
         }
 
         if (baseRowFieldset != null &&
             baseRowFieldset.Count > 0)
         {
-            model.RowBaseClass = baseRowMatch;
+            model.RowBaseClass = baseRowMatch!;
             model.FieldsBaseClass = baseRowMatch + "Fields";
             fieldInfos = [.. fieldInfos.Where(f =>
             {
@@ -307,7 +307,7 @@ public class EntityModelFactory : IEntityModelFactory
             if (foreignKeyInfo is null)
                 continue;
 
-            if (tableField.Title.EndsWith(" Id", StringComparison.Ordinal) && tableField.Title.Length > 3)
+            if (tableField.Title?.EndsWith(" Id", StringComparison.Ordinal) == true && tableField.Title.Length > 3)
                 tableField.Title = tableField.Title.SafeSubstring(0, tableField.Title.Length - 3);
 
             tableField.PKSchema = normalizeSchema(foreignKeyInfo.PKSchema);
@@ -327,10 +327,10 @@ public class EntityModelFactory : IEntityModelFactory
             tableField.ForeignJoinAlias = entityJoin.Alias;
             entityJoin.SourceField = tableField.PropertyName;
 
-            var pkRow = inputs.Application?.GetRowByTablename(tableField.PKTable);
+            var pkRow = inputs.Application?.GetRowByTablename(tableField.PKTable!);
             var pkNameProperty = pkRow?.NameProperty;
-            string pkNameFieldName = null;
-            if (pkNameProperty != null &&
+            string? pkNameFieldName = null;
+            if (pkRow != null && pkNameProperty != null &&
                 foreignSelection != GeneratorConfig.FieldSelection.None)
             {
                 var pkNameProp = pkRow.GetProperty(pkNameProperty);
@@ -347,13 +347,13 @@ public class EntityModelFactory : IEntityModelFactory
                         var nameViewField = new EntityField
                         {
                             PropertyName = pkNameProp.PropertyName,
-                            Name = pkNameProp.ColumnName,
+                            Name = pkNameProp.ColumnName!,
                             DataType = "string",
                             FieldType = "String",
                             TSType = "string"
                         };
 
-                        nameViewField.Title = Inflector.Inflector.Titleize(JoinUnderscore(entityJoin.Name,
+                        nameViewField.Title = Inflector.Inflector.Titleize(JoinUnderscore(entityJoin.Name!,
                             nameViewField.Name))?.Trim();
 
                         nameViewField.AttributeList.Add(new("System.ComponentModel.DisplayName",
@@ -407,7 +407,7 @@ public class EntityModelFactory : IEntityModelFactory
                     continue;
                 }
 
-                viewField.Title = Inflector.Inflector.Titleize(JoinUnderscore(entityJoin.Name,
+                viewField.Title = Inflector.Inflector.Titleize(JoinUnderscore(entityJoin.Name!,
                     foreignField.FieldName[foreignPrefixLength..]))?.Trim();
 
                 viewField.AttributeList.Add(new("System.ComponentModel.DisplayName",
@@ -422,13 +422,13 @@ public class EntityModelFactory : IEntityModelFactory
                         new RawCode(entityJoin.Alias) : entityJoin.Alias;
 
                     viewField.AttributeList.Add(new("Serenity.Data.Mapping.Origin",
-                        joinExpr, new NameOfRef(pkRow.FullName, originProp.PropertyName)));
+                        joinExpr, new NameOfRef(pkRow!.FullName, originProp.PropertyName)));
                 }
                 else
                 {
                     object expr = model.DeclareJoinConstants ?
                         new RawCode("$\"{" + entityJoin.Alias + "}.[" + viewField.Name + "]\"") :
-                        (viewField.Expression);
+                        (viewField.Expression!);
 
                     viewField.AttributeList.Add(new("Serenity.Data.Mapping.Expression", expr));
                 }
@@ -457,29 +457,29 @@ public class EntityModelFactory : IEntityModelFactory
             if (!tableField.FlagList.IsEmptyOrNull())
                 attrs.AddRange(tableField.FlagList);
 
-            IRowMetadata pkRow = null;
-            IRowPropertyMetadata pkProperty = null;
+            IRowMetadata? pkRow = null;
+            IRowPropertyMetadata? pkProperty = null;
             bool pkPropertyIsId = false;
             if (!inputs.SkipForeignKeys && !string.IsNullOrEmpty(tableField.PKTable))
             {
-                var pkTable = string.IsNullOrEmpty(tableField.PKSchema) ? tableField.PKTable :
+                var pkTable = string.IsNullOrEmpty(tableField.PKSchema) ? tableField.PKTable! :
                     ("[" + tableField.PKSchema + "].[" + tableField.PKTable + "]");
                 pkRow = inputs.Application?.GetRowByTablename(pkTable);
-                pkProperty = pkRow?.GetTableField(tableField.PKColumn);
-                pkPropertyIsId = pkProperty != null && pkRow.IdProperty == pkProperty.PropertyName;
+                pkProperty = pkRow?.GetTableField(tableField.PKColumn!);
+                pkPropertyIsId = pkProperty != null && pkRow!.IdProperty == pkProperty.PropertyName;
 
                 if (pkRow != null)
                 {
                     if (pkPropertyIsId)
                         attrs.Add(new("Serenity.Data.Mapping.ForeignKey", new TypeOfRef(pkRow.FullName)));
                     else
-                        attrs.Add(new("Serenity.Data.Mapping.ForeignKey", new TypeOfRef(pkRow.FullName), tableField.PKColumn));
+                        attrs.Add(new("Serenity.Data.Mapping.ForeignKey", new TypeOfRef(pkRow.FullName), tableField.PKColumn!));
                 }
                 else
-                    attrs.Add(new("Serenity.Data.Mapping.ForeignKey", pkTable, tableField.PKColumn));
+                    attrs.Add(new("Serenity.Data.Mapping.ForeignKey", pkTable, tableField.PKColumn!));
 
                 object alias = model.DeclareJoinConstants ?
-                    new RawCode(tableField.ForeignJoinAlias) : tableField.ForeignJoinAlias;
+                    new RawCode(tableField.ForeignJoinAlias!) : tableField.ForeignJoinAlias!;
                 attrs.Add(new("Serenity.Data.Mapping.LeftJoin", alias));
             }
 
@@ -507,7 +507,7 @@ public class EntityModelFactory : IEntityModelFactory
                     var route = pkRow.ListServiceRoute;
                     if (!string.IsNullOrEmpty(route))
                     {
-                        var defaultRoute = DefaultListServiceRoute(pkRow.FullName, pkRow.Module);
+                        var defaultRoute = DefaultListServiceRoute(pkRow.FullName, pkRow.Module!);
                         if (defaultRoute != route)
                         {
                             attrs.Add(new("Serenity.ComponentModel.ServiceLookupEditor",

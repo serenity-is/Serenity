@@ -11,14 +11,14 @@ public interface INode : ITextRange
     SyntaxKind Kind { get; set; }
     NodeFlags Flags { get; set; }
 
-    INode Parent { get; set; }
+    INode? Parent { get; set; }
 
     string ToString(bool withPos);
 }
 
 public interface ISyntaxCursor
 {
-    public INode CurrentNode(int pos);
+    public INode? CurrentNode(int pos);
 }
 
 public interface IModifierLike : INode
@@ -51,7 +51,7 @@ public class NodeArray<T> : List<T>, ITextRange
 
 public interface IHasModifierLike : INode
 {
-    NodeArray<IModifierLike> Modifiers { get; }
+    NodeArray<IModifierLike>? Modifiers { get; }
 }
 
 public interface IHasDecorators : IHasModifierLike
@@ -64,12 +64,12 @@ public interface IHasModifiers : IHasModifierLike
 
 public interface IGetRestChildren : INode
 {
-    IEnumerable<INode> GetRestChildren();
+    IEnumerable<INode?> GetRestChildren();
 }
 
 public interface IHasJSDoc : INode
 {
-    JSDocArray JSDoc { get; set; }
+    JSDocArray? JSDoc { get; set; }
 }
 
 public interface IStringLiteralLike : IDeclarationName
@@ -78,7 +78,7 @@ public interface IStringLiteralLike : IDeclarationName
 
 public interface ILiteralLikeNode : INode
 {
-    string Text { get; set; }
+    string? Text { get; set; }
     bool IsUnterminated { get; set; }
     bool HasExtendedUnicodeEscape { get; set; }
     bool IsOctalLiteral { get; set; }
@@ -91,7 +91,7 @@ public interface ILiteralExpression : ILiteralLikeNode, IPrimaryExpression
 
 public interface IHasLiteralText : INode
 {
-    string Text { get; set; }
+    string? Text { get; set; }
 }
 
 public interface IDeclaration : INode
@@ -117,7 +117,7 @@ public interface IBindingName : IDeclarationName
 
 public interface IHasNameProperty : INode
 {
-    IDeclarationName Name { get; }
+    IDeclarationName? Name { get; }
 }
 
 public interface INamedDeclaration : IDeclaration, IHasNameProperty
@@ -159,9 +159,9 @@ public interface IObjectTypeDeclaration : IDeclaration
 
 public interface IFunctionLikeDeclaration : ISignatureDeclaration
 {
-    AsteriskToken AsteriskToken { get; set; }
-    QuestionToken QuestionToken { get; set; }
-    IBlockOrExpression Body { get; set; } // Block | Expression
+    AsteriskToken? AsteriskToken { get; set; }
+    QuestionToken? QuestionToken { get; set; }
+    IBlockOrExpression? Body { get; set; } // Block | Expression
 }
 
 public interface IMethodOrAccessorDeclaration : IFunctionLikeDeclaration, IClassElement, IObjectLiteralElement
@@ -175,8 +175,8 @@ public interface IAccessorDeclaration : IMethodOrAccessorDeclaration, ISignature
 
 public interface IClassLikeDeclaration : INamedDeclaration, IObjectTypeDeclaration, IDeclarationWithTypeParameterChildren
 {
-    NodeArray<HeritageClause> HeritageClauses { get; }
-    NodeArray<IClassElement> Members { get; }
+    NodeArray<HeritageClause>? HeritageClauses { get; }
+    NodeArray<IClassElement>? Members { get; }
 }
 
 public interface IClassElement : INamedDeclaration
@@ -194,7 +194,7 @@ public interface IKeywordTypeNode : ITypeNode
 
 public interface IInferTypeNode : ITypeNode
 {
-    TypeParameterDeclaration TypeParameter { get; }
+    TypeParameterDeclaration? TypeParameter { get; }
 }
 
 public interface IDeclarationStatement : INamedDeclaration, IStatement
@@ -203,8 +203,8 @@ public interface IDeclarationStatement : INamedDeclaration, IStatement
 
 public interface ISignatureDeclaration : INamedDeclaration, IDeclarationWithTypeParameterChildren
 {
-    NodeArray<ParameterDeclaration> Parameters { get; }
-    ITypeNode Type { get; }
+    NodeArray<ParameterDeclaration>? Parameters { get; }
+    ITypeNode? Type { get; }
 }
 
 public interface IFunctionOrConstructorTypeNode : ISignatureDeclaration, ITypeNode
@@ -218,7 +218,7 @@ public interface IBlockOrExpression : INode
 
 public interface IVariableDeclarationList : INode, IForInitializer
 {
-    NodeArray<VariableDeclaration> Declarations { get; }
+    NodeArray<VariableDeclaration>? Declarations { get; }
 }
 
 public interface IIntersectsIncrementalChange : INode
@@ -233,7 +233,7 @@ public interface IJsxAttributeName : IDeclarationName
 
 public interface IBindingPattern : INode, IBindingName
 {
-    NodeArray<IArrayBindingElement> Elements { get; }
+    NodeArray<IArrayBindingElement>? Elements { get; }
 }
 
 public interface IArrayBindingElement : INode
@@ -242,7 +242,7 @@ public interface IArrayBindingElement : INode
 
 public interface IUnionOrIntersectionTypeNode : ITypeNode
 {
-    NodeArray<ITypeNode> Types { get; set; }
+    NodeArray<ITypeNode>? Types { get; set; }
 }
 
 public interface IConciseBody : INode
@@ -251,7 +251,7 @@ public interface IConciseBody : INode
 
 public interface ITemplateLiteralLikeNode : ILiteralLikeNode
 {
-    string RawText { get; }
+    string? RawText { get; }
     TokenFlags? TemplateFlags { get; }
 }
 
@@ -315,7 +315,7 @@ public interface IJsxTagNameExpression : IExpression
 
 public interface IJsxHasTagName : INode
 {
-    IJsxTagNameExpression TagName { get; }
+    IJsxTagNameExpression? TagName { get; }
 }
 
 public interface IJsxChild : INode
@@ -324,7 +324,7 @@ public interface IJsxChild : INode
 
 public interface IBlockLike : INode
 {
-    NodeArray<IStatement> Statements { get; }
+    NodeArray<IStatement>? Statements { get; }
 }
 
 public interface IForInitializer : INode
@@ -333,7 +333,7 @@ public interface IForInitializer : INode
 
 public interface IBreakOrContinueStatement : IStatement
 {
-    Identifier Label { get; }
+    Identifier? Label { get; }
 }
 
 public interface ICaseOrDefaultClause : INode, IBlockLike
@@ -342,7 +342,7 @@ public interface ICaseOrDefaultClause : INode, IBlockLike
 
 public interface IDeclarationWithTypeParameterChildren : INode, IDeclarationWithTypeParameters
 {
-    NodeArray<TypeParameterDeclaration> TypeParameters { get; set; }
+    NodeArray<TypeParameterDeclaration>? TypeParameters { get; set; }
 }
 
 public interface IDeclarationWithTypeParameters : INode
@@ -350,7 +350,7 @@ public interface IDeclarationWithTypeParameters : INode
 }
 public interface IModuleExportName : INode, IDeclarationName
 {
-    string Text { get; }
+    string? Text { get; }
 }
 
 public interface IModuleName : INode, IDeclarationName
@@ -389,7 +389,7 @@ public interface INamedExportBindings : INode, INamedImportsOrExports
 
 public interface IImportOrExportSpecifier : INamedDeclaration
 {
-    IModuleExportName PropertyName { get; }
+    IModuleExportName? PropertyName { get; }
     bool IsTypeOnly { get; }
 }
 
@@ -431,7 +431,7 @@ public interface IJSDocType : ITypeNode
 
 public interface IJSDocTag : INode
 {
-    AtToken AtToken { get; set; }
-    Identifier TagName { get; set; }
-    string Comment { get; set; }
+    AtToken? AtToken { get; set; }
+    Identifier? TagName { get; set; }
+    string? Comment { get; set; }
 }

@@ -154,7 +154,7 @@ public static partial class StringHelper
     /// </summary>
     /// <param name="str">The string.</param>
     /// <returns>Single quoted string.</returns>
-    public static string ToSingleQuoted(this string str)
+    public static string ToSingleQuoted(this string? str)
     {
         if (string.IsNullOrEmpty(str))
             return emptySingleQuote;
@@ -169,7 +169,7 @@ public static partial class StringHelper
     /// </summary>
     /// <param name="str">The string.</param>
     /// <returns>Double quoted string.</returns>
-    public static string ToDoubleQuoted(this string str)
+    public static string ToDoubleQuoted(this string? str)
     {
         if (string.IsNullOrEmpty(str))
             return emptyDoubleQuote;

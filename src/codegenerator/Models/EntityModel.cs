@@ -2,24 +2,24 @@ namespace Serenity.CodeGenerator;
 
 public class EntityModel
 {
-    public string Module { get; set; }
-    public string ConnectionKey { get; set; }
-    public string Permission { get; set; }
-    public string RootNamespace { get; set; }
-    public string ClassName { get; set; }
-    public string RowClassName { get; set; }
-    public string Schema { get; set; }
-    public string Tablename { get; set; }
-    public string Title { get; set; }
-    public string IdField { get; set; }
+    public string? Module { get; set; }
+    public string ConnectionKey { get; set; } = null!;
+    public string? Permission { get; set; } = null!;
+    public string? RootNamespace { get; set; }
+    public string ClassName { get; set; } = null!;
+    public string RowClassName { get; set; } = null!;
+    public string? Schema { get; set; }
+    public string Tablename { get; set; } = null!;
+    public string? Title { get; set; }
+    public string? IdField { get; set; }
     public string RowBaseClass { get; set; } = "Serenity.Data.Row";
     public List<EntityField> RowBaseFields { get; } = [];
     public string FieldsBaseClass { get; set; } = "Serenity.Data.RowFieldsBase";
-    public string ServiceLookupPermission { get; set; }
+    public string? ServiceLookupPermission { get; set; }
     public List<EntityField> Fields { get; } = [];
     public List<EntityJoin> Joins { get; } = [];
-    public string NameField { get; set; }
-    public string FieldPrefix { get; set; }
+    public string? NameField { get; set; }
+    public string FieldPrefix { get; set; } = null!;
     public bool AspNetCore { get; set; } = true;
     public bool NET5Plus { get; set; } = true;
     public bool NET8Plus { get; set; } = true;
@@ -32,8 +32,8 @@ public class EntityModel
     public bool GenerateListExcel { get; set; }
     public HashSet<string> GlobalUsings { get; } = [];
 
-    public string Identity => IdField;
-    public Dictionary<string, object> CustomSettings { get; set; }
+    public string? Identity => IdField;
+    public Dictionary<string, object>? CustomSettings { get; set; }
 
     public IEnumerable<EntityField> FormFields => Fields.Where(f => !f.OmitInForm);
     public IEnumerable<EntityField> GridFields => Fields.Where(f => !f.OmitInGrid);
@@ -109,7 +109,7 @@ public class EntityModel
     public IEnumerable<EntityField> AllFields => Fields.Concat(JoinFields);
     public IEnumerable<EntityField> JoinFields => Joins.SelectMany(x => x.Fields);
 
-    public string NavigationCategory
+    public string? NavigationCategory
     {
         get { return Module; }
     }
@@ -126,7 +126,7 @@ public class EntityModel
 
     public record EditorVariable(string Editor, int Index);
 
-    private List<EditorVariable> editorVariables;
+    private List<EditorVariable> editorVariables = null!;
 
     public List<EditorVariable> EditorVariables
     {

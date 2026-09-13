@@ -6,7 +6,7 @@ public class PostfixUnaryExpression(IExpression operand, SyntaxKind @operator)
     public /*LeftHandSideExpression*/IExpression Operand { get; } = operand;
     public /*PostfixUnaryOperator*/SyntaxKind Operator { get; } = @operator;
 
-    public IEnumerable<INode> GetRestChildren()
+    public IEnumerable<INode?> GetRestChildren()
     {
         return [Operand];
     }

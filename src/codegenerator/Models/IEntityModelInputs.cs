@@ -8,13 +8,13 @@ public interface IEntityModelInputs
     GeneratorConfig Config { get; }
     IEntityDataSchema DataSchema { get; }
     HashSet<string> GlobalUsings { get; }
-    string Module { get; }
+    string? Module { get; }
     bool Net5Plus { get; }
     bool Net8Plus { get; }
     bool Nullable { get; }
     bool SchemaIsDatabase { get; }
-    string PermissionKey { get; }
-    string Schema { get; }
+    string? PermissionKey { get; }
+    string? Schema { get; }
     bool SkipForeignKeys { get; }
     string Table { get; }
     string Tablename => string.IsNullOrEmpty(Schema) ? Table : (Schema + "." + Table);

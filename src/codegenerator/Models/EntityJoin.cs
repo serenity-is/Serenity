@@ -2,8 +2,8 @@
 
 public class EntityJoin
 {
-    public string Name { get; set; }
-    public string SourceField { get; set; }
+    public string Name { get; set; } = null!;
+    public string SourceField { get; set; } = null!;
     public List<EntityField> Fields { get; } = [];
 
     public string Alias => "j" + Name;

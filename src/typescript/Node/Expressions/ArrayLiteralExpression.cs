@@ -6,7 +6,7 @@ public class ArrayLiteralExpression(NodeArray<IExpression> elements, bool multiL
     public NodeArray<IExpression> Elements { get; } = elements;
     public bool MultiLine { get; } = multiLine;
 
-    public IEnumerable<INode> GetRestChildren()
+    public IEnumerable<INode?> GetRestChildren()
     {
         return Elements;
     }

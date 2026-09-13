@@ -59,7 +59,7 @@ public class ApplicationMetadata : IApplicationMetadata
             }
         }
 
-        protected override void AppendMappedType(TypeReference memberType, string codeNamespace)
+        protected override void AppendMappedType(TypeReference? memberType, string? codeNamespace)
         {
         }
     }
@@ -75,9 +75,9 @@ public class ApplicationMetadata : IApplicationMetadata
     }
 
     public List<EntityModel> EntityModels { get; } = [];
-    public string DefaultSchema { get; set; }
+    public string? DefaultSchema { get; set; }
 
-    private string ParseSchemaAndName(string objectName, out string schema)
+    private string? ParseSchemaAndName(string? objectName, out string? schema)
     {
         ArgumentNullException.ThrowIfNull(objectName);
 
@@ -93,13 +93,13 @@ public class ApplicationMetadata : IApplicationMetadata
         return SqlSyntax.Unquote(parts[1]);
     }
 
-    private string NormalizeTablename(string objectName)
+    private string? NormalizeTablename(string? objectName)
     {
         var table = ParseSchemaAndName(objectName, out var schema);
         return table + "." + schema;
     }
 
-    private bool IsEqualIgnoreCase(string objectName1, string objectName2)
+    private bool IsEqualIgnoreCase(string? objectName1, string? objectName2)
     {
         return !string.IsNullOrEmpty(objectName1) &&
             !string.IsNullOrEmpty(objectName2) &&
@@ -107,13 +107,13 @@ public class ApplicationMetadata : IApplicationMetadata
                 NormalizeTablename(objectName2), StringComparison.OrdinalIgnoreCase);
     }
 
-    private readonly Dictionary<string, IRowMetadata> rowByTablename = [];
+    private readonly Dictionary<string, IRowMetadata?> rowByTablename = [];
 
-    public IRowMetadata GetRowByTablename(string tablename)
+    public IRowMetadata? GetRowByTablename(string tablename)
     {
         ArgumentNullException.ThrowIfNull(tablename);
 
-        if (rowByTablename.TryGetValue(tablename, out IRowMetadata metadata))
+        if (rowByTablename.TryGetValue(tablename, out IRowMetadata? metadata))
             return metadata;
 
         foreach (var model in EntityModels)
@@ -131,7 +131,7 @@ public class ApplicationMetadata : IApplicationMetadata
             RowMetadata createRowMetadata()
             {
                 var metadata = new RowMetadata(type);
-                if (scanner.RowTypeToListRoute.TryGetValue(type.FullNameOf(), out string route))
+                if (scanner.RowTypeToListRoute.TryGetValue(type.FullNameOf(), out string? route))
                     metadata.ListServiceRoute = route;
                 rowByTablename[tablename] = metadata;
                 return metadata;
@@ -157,9 +157,9 @@ public class ApplicationMetadata : IApplicationMetadata
         return null;
     }
 
-    private static string GetColumnName(PropertyDefinition x)
+    private static string? GetColumnName(PropertyDefinition x)
     {
-        var attrs = x.GetAttributes();
+        var attrs = x.GetAttributes() ?? [];
         var columnAttr = attrs?.FirstOrDefault(z => z.AttributeType?.Name == "ColumnAttribute" &&
             z.AttributeType.NamespaceOf() == "Serenity.Data.Mapping");
 
@@ -169,11 +169,11 @@ public class ApplicationMetadata : IApplicationMetadata
                 return SqlSyntax.Unquote(c);
         }
 
-        if (attrs.Any(x => x.AttributeType?.Name == "OriginAttribute" &&
+        if (attrs!.Any(x => x.AttributeType?.Name == "OriginAttribute" &&
             x.AttributeType?.NamespaceOf() == "Serenity.Data.Mapping"))
             return null;
 
-        if (attrs.Any(x => x.AttributeType != null &&
+        if (attrs!.Any(x => x.AttributeType != null &&
             TypingsUtils.IsSubclassOf(x.AttributeType, "Serenity.Data.Mapping",
             "BaseExpressionAttribute")))
             return null;
@@ -184,16 +184,16 @@ public class ApplicationMetadata : IApplicationMetadata
     private class RowMetadata(TypeDefinition type) : IRowMetadata
     {
         private readonly TypeDefinition type = type ?? throw new ArgumentNullException(nameof(type));
-        private string idProperty;
-        private string nameProperty;
+        private string? idProperty;
+        private string? nameProperty;
 
-        public string Namespace => type.NamespaceOf();
+        public string? Namespace => type.NamespaceOf();
 
         public string ClassName => type.Name;
 
         public string FullName => type.FullNameOf();
 
-        public string Module => type.GetAttributes()
+        public string? Module => type.GetAttributes()
             .FirstOrDefault(x => x.AttributeType?.Name == "ModuleAttribute" &&
                 x.AttributeType?.NamespaceOf() == "Serenity.ComponentModel")?.ConstructorArguments?.FirstOrDefault().Value as string;
 
@@ -201,16 +201,16 @@ public class ApplicationMetadata : IApplicationMetadata
             .Any(x => x.AttributeType?.Name == "LookupScriptAttribute" &&
                 x.AttributeType?.NamespaceOf() == "Serenity.ComponentModel");
 
-        private readonly Dictionary<string, IRowPropertyMetadata> tableFieldByColumnName = [];
+        private readonly Dictionary<string, IRowPropertyMetadata?> tableFieldByColumnName = [];
 
-        public IRowPropertyMetadata GetTableField(string columnName)
+        public IRowPropertyMetadata? GetTableField(string columnName)
         {
             if (string.IsNullOrEmpty(columnName))
                 return null;
 
             columnName = SqlSyntax.Unquote(columnName);
 
-            if (tableFieldByColumnName.TryGetValue(columnName, out IRowPropertyMetadata metadata))
+            if (tableFieldByColumnName.TryGetValue(columnName, out IRowPropertyMetadata? metadata))
                 return metadata;
 
             var props = type.PropertiesOf().Where(x => string.Equals(GetColumnName(x), columnName,
@@ -222,14 +222,14 @@ public class ApplicationMetadata : IApplicationMetadata
             return tableFieldByColumnName[columnName] = null;
         }
 
-        private readonly Dictionary<string, IRowPropertyMetadata> propertyByName = [];
+        private readonly Dictionary<string, IRowPropertyMetadata?> propertyByName = [];
 
-        public IRowPropertyMetadata GetProperty(string name)
+        public IRowPropertyMetadata? GetProperty(string name)
         {
             if (string.IsNullOrEmpty(name))
                 return null;
 
-            if (propertyByName.TryGetValue(name, out IRowPropertyMetadata metadata))
+            if (propertyByName.TryGetValue(name, out IRowPropertyMetadata? metadata))
                 return metadata;
 
             var prop = type.PropertiesOf().FirstOrDefault(x => x.Name == name);
@@ -239,7 +239,7 @@ public class ApplicationMetadata : IApplicationMetadata
             return propertyByName[name] = null;
         }
 
-        public string IdProperty
+        public string? IdProperty
         {
             get
             {
@@ -255,7 +255,7 @@ public class ApplicationMetadata : IApplicationMetadata
             }
         }
 
-        public string NameProperty
+        public string? NameProperty
         {
             get
             {
@@ -275,11 +275,11 @@ public class ApplicationMetadata : IApplicationMetadata
         {
             private readonly PropertyDefinition property = property ?? throw new ArgumentNullException(nameof(property));
 
-            public string ColumnName => GetColumnName(property);
+            public string? ColumnName => GetColumnName(property);
             public string PropertyName => property.Name;
         }
 
-        public string ListServiceRoute { get; set; }
+        public string? ListServiceRoute { get; set; }
     }
 
     private class EntityModelRowMetadata(EntityModel model) : IRowMetadata
@@ -288,26 +288,26 @@ public class ApplicationMetadata : IApplicationMetadata
 
         public bool HasLookupScriptAttribute => false;
 
-        public string ListServiceRoute => "Services/" + model.ServiceBaseUrl;
+        public string? ListServiceRoute => "Services/" + model.ServiceBaseUrl;
 
-        public string IdProperty => model.IdField;
+        public string? IdProperty => model.IdField;
 
-        public string NameProperty => model.NameField;
+        public string? NameProperty => model.NameField;
 
-        public string Module => model.Module;
+        public string? Module => model.Module;
 
         public string Namespace => model.ModuleNamespace;
 
         public string ClassName => model.RowClassName;
 
-        private readonly Dictionary<string, IRowPropertyMetadata> propertyByName = [];
+        private readonly Dictionary<string, IRowPropertyMetadata?> propertyByName = [];
 
-        public IRowPropertyMetadata GetProperty(string name)
+        public IRowPropertyMetadata? GetProperty(string name)
         {
             if (string.IsNullOrEmpty(name))
                 return null;
 
-            if (propertyByName.TryGetValue(name, out IRowPropertyMetadata metadata))
+            if (propertyByName.TryGetValue(name, out IRowPropertyMetadata? metadata))
                 return metadata;
 
             var prop = model.Fields.FirstOrDefault(x => x.PropertyName == name);
@@ -317,16 +317,16 @@ public class ApplicationMetadata : IApplicationMetadata
             return propertyByName[name] = null;
         }
 
-        private readonly Dictionary<string, IRowPropertyMetadata> tableFieldByColumnName = [];
+        private readonly Dictionary<string, IRowPropertyMetadata?> tableFieldByColumnName = [];
 
-        public IRowPropertyMetadata GetTableField(string columnName)
+        public IRowPropertyMetadata? GetTableField(string columnName)
         {
             if (string.IsNullOrEmpty(columnName))
                 return null;
 
             columnName = SqlSyntax.Unquote(columnName);
 
-            if (tableFieldByColumnName.TryGetValue(columnName, out IRowPropertyMetadata metadata))
+            if (tableFieldByColumnName.TryGetValue(columnName, out IRowPropertyMetadata? metadata))
                 return metadata;
 
             var props = model.Fields.Where(x => string.Equals(x.Name, columnName,

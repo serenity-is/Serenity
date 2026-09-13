@@ -9,7 +9,7 @@ public partial class ServerTypingsGenerator
 {
     const string requestSuffix = "Request";
 
-    private static string AutoDetermineEditorType(TypeReference valueType, TypeReference basedOnFieldType)
+    private static string AutoDetermineEditorType(TypeReference valueType, TypeReference? basedOnFieldType)
     {
         if (TypingsUtils.GetEnumTypeFrom(valueType) != null)
             return "Enum";
@@ -44,7 +44,7 @@ public partial class ServerTypingsGenerator
         return "String";
     }
 
-    private static string GetEditorTypeKeyFrom(TypeReference propertyType, TypeReference basedOnFieldType, CustomAttribute editorTypeAttr)
+    private static string? GetEditorTypeKeyFrom(TypeReference propertyType, TypeReference? basedOnFieldType, CustomAttribute? editorTypeAttr)
     {
         if (editorTypeAttr == null)
             return AutoDetermineEditorType(propertyType, basedOnFieldType);
@@ -69,14 +69,14 @@ public partial class ServerTypingsGenerator
         if (keyConstant != null && keyConstant.Constant() as string != null)
             return keyConstant.Constant() as string;
 
-        string editorType;
+        string? editorType;
 #if !ISSOURCEGENERATOR
         editorType = editorTypeAttr.AttributeType().Resolve().MethodsOf()
             .Where(x => x.IsConstructor())
             .SelectMany(m => m.Body.Instructions
                 .Where(i => i.OpCode == OpCodes.Call &&
                     (i.Operand is Mono.Cecil.MethodReference) &&
-                    (i.Operand as Mono.Cecil.MethodReference).Resolve().IsConstructor &&
+                    (i.Operand as Mono.Cecil.MethodReference)!.Resolve().IsConstructor &&
                     i.Previous.OpCode == OpCodes.Ldstr &&
                     i.Previous.Operand is string)
                 .Select(x => x.Previous.Operand as string)).FirstOrDefault();
@@ -104,7 +104,7 @@ public partial class ServerTypingsGenerator
         return -1;
     }
 
-    private static IEnumerable<string> GetDialogTypeKeyRefs(CustomAttribute editorTypeAttr)
+    private static IEnumerable<string> GetDialogTypeKeyRefs(CustomAttribute? editorTypeAttr)
     {
         if (editorTypeAttr != null)
         {
@@ -139,7 +139,7 @@ public partial class ServerTypingsGenerator
         }
     }
 
-    private ExternalType FindTypeInLookup(ILookup<string, ExternalType> lookup, string key, string suffix, string containingAssembly = null)
+    private ExternalType? FindTypeInLookup(ILookup<string, ExternalType> lookup, string key, string suffix, string? containingAssembly = null)
     {
         var type = lookup[key].FirstOrDefault() ??
             lookup[key + suffix].FirstOrDefault() ??
@@ -164,31 +164,31 @@ public partial class ServerTypingsGenerator
         return type;
     }
 
-    private TypeDefinition GetBasedOnRowAndAnnotations(TypeDefinition type,
-        out ILookup<string, PropertyDefinition> basedOnByName,
-        out List<AnnotationTypeInfo> rowAnnotations)
+    private TypeDefinition? GetBasedOnRowAndAnnotations(TypeDefinition type,
+        out ILookup<string, PropertyDefinition>? basedOnByName,
+        out List<AnnotationTypeInfo>? rowAnnotations)
     {
-        TypeDefinition basedOnRow = null;
+        TypeDefinition? basedOnRow = null;
         var basedOnRowAttr = TypingsUtils.GetAttr(type, "Serenity.ComponentModel", "BasedOnRowAttribute");
         if (basedOnRowAttr != null &&
             basedOnRowAttr.ConstructorArguments().Count > 0 &&
             basedOnRowAttr.ConstructorArguments()[0].Type.FullNameOf() == "System.Type")
-            basedOnRow = (basedOnRowAttr.ConstructorArguments[0].Value as TypeReference).Resolve();
+            basedOnRow = (basedOnRowAttr.ConstructorArguments[0].Value as TypeReference)!.Resolve();
 
         rowAnnotations = basedOnRow != null ? GetAnnotationTypesFor(basedOnRow) : null;
 
         basedOnByName = null;
         if (basedOnRowAttr != null)
         {
-            basedOnByName = EnumerateProperties(basedOnRow).Where(TypingsUtils.IsPublicInstanceProperty)
+            basedOnByName = EnumerateProperties(basedOnRow!).Where(TypingsUtils.IsPublicInstanceProperty)
                 .ToLookup(x => x.Name);
         }
 
         return basedOnRow;
     }
 
-    private static CustomAttribute GetAttribute(PropertyDefinition item, PropertyDefinition basedOnField,
-        IEnumerable<AnnotationTypeInfo> rowAnnotations, string ns, string name)
+    private static CustomAttribute? GetAttribute(PropertyDefinition item, PropertyDefinition? basedOnField,
+        IEnumerable<AnnotationTypeInfo>? rowAnnotations, string ns, string name)
     {
         var attr = TypingsUtils.FindAttr(item.GetAttributesWithIntrinsic(), ns, name);
 
@@ -196,10 +196,10 @@ public partial class ServerTypingsGenerator
         {
             foreach (var annotationType in rowAnnotations)
             {
-                if (!annotationType.PropertyByName.TryGetValue(item.Name, out PropertyDefinition annotation))
+                if (!annotationType.PropertyByName.TryGetValue(item.Name, out PropertyDefinition? annotation))
                     continue;
 
-                attr = TypingsUtils.FindAttr(annotation.GetAttributesWithIntrinsic(), ns, name);
+                attr = TypingsUtils.FindAttr(annotation!.GetAttributesWithIntrinsic(), ns, name);
                 if (attr != null)
                     return attr;
             }
@@ -211,11 +211,11 @@ public partial class ServerTypingsGenerator
         return attr;
     }
 
-    private void TryReferenceEnumType(TypeReference itemType, TypeReference basedOnFieldType, string codeNamespace,
+    private void TryReferenceEnumType(TypeReference? itemType, TypeReference? basedOnFieldType, string codeNamespace,
         HashSet<(string group, string key)> referencedTypeKeys,
         List<(string group, string alias)> referencedTypeAliases)
     {
-        TypeDefinition enumType = null;
+        TypeDefinition? enumType = null;
         if (itemType != null)
             enumType = TypingsUtils.GetEnumTypeFrom(itemType);
         if (enumType is null && basedOnFieldType != null)
@@ -228,11 +228,11 @@ public partial class ServerTypingsGenerator
         if (!referencedTypeKeys.Add(("Enum", enumKey)))
             return;
 
-        string containingAssembly = GetAssemblyNameFor(enumType);
+        string? containingAssembly = GetAssemblyNameFor(enumType);
         if (string.IsNullOrEmpty(containingAssembly) ||
             !assemblyNames.Contains(containingAssembly))
         {
-            ExternalType enumScriptType = TryFindModuleType(enumType.FullNameOf(), containingAssembly) ??
+            ExternalType? enumScriptType = TryFindModuleType(enumType.FullNameOf(), containingAssembly) ??
                 TryFindModuleType(enumKey, containingAssembly);
 
             if (enumScriptType != null)
@@ -240,7 +240,7 @@ public partial class ServerTypingsGenerator
         }
         else
         {
-            var moduleName = GetTypingFileNameFor(ScriptNamespaceFor(enumType), enumType.Name);
+            var moduleName = GetTypingFileNameFor(ScriptNamespaceFor(enumType!), enumType!.Name);
             referencedTypeAliases.Add(("Enum", AddModuleImport(moduleName, enumType.Name, external: false)));
         }
     }
@@ -266,7 +266,7 @@ public partial class ServerTypingsGenerator
                 if (!TypingsUtils.IsPublicInstanceProperty(item))
                     continue;
 
-                PropertyDefinition basedOnField = null;
+                PropertyDefinition? basedOnField = null;
                 if (basedOnByName != null)
                     basedOnField = basedOnByName[item.Name].FirstOrDefault();
 
@@ -277,9 +277,9 @@ public partial class ServerTypingsGenerator
                 var editorTypeAttr = GetAttribute(item, basedOnField, rowAnnotations, "Serenity.ComponentModel", "EditorTypeAttribute");
                 var editorTypeKey = GetEditorTypeKeyFrom(item.PropertyType(), basedOnField?.PropertyType(), editorTypeAttr);
 
-                ExternalType editorScriptType = null;
+                ExternalType? editorScriptType = null;
 
-                editorScriptType = FindTypeInLookup(modularEditorTypeByKey, editorTypeKey, "Editor", containingAssembly: null);
+                editorScriptType = FindTypeInLookup(modularEditorTypeByKey, editorTypeKey!, "Editor", containingAssembly: null);
 
                 foreach (var typeKey in GetDialogTypeKeyRefs(editorTypeAttr))
                 {

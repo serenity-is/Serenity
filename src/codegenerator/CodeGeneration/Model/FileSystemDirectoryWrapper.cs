@@ -57,7 +57,7 @@ public class FileSystemDirectoryWrapper : DirectoryInfoBase
     }
 
     /// <inheritdoc />
-    public override DirectoryInfoBase GetDirectory(string name)
+    public override DirectoryInfoBase? GetDirectory(string name)
     {
         bool isParentPath = string.Equals(name, "..", StringComparison.Ordinal);
 

@@ -5,7 +5,7 @@ public class JsxSpreadAttribute(IExpression expression)
 {
     public IExpression Expression { get; } = expression;
 
-    public override IEnumerable<INode> GetRestChildren()
+    public override IEnumerable<INode?> GetRestChildren()
     {
         return [Name, Expression];
     }

@@ -5,13 +5,13 @@ namespace Serenity.CodeGenerator
         string ProjectFile { get; }
         IFileSystem FileSystem { get; }
 
-        string[] GetAssemblyList(string[] configured);
-        string GetAssemblyName();
-        string GetEsmAssetBasePath();
-        IDictionary<string, string> GetGlobalUsings();
-        string GetNullable();
-        string GetOutDir();
-        string GetRootNamespace();
-        string GetTargetFramework();
+        string[]? GetAssemblyList(string[]? configured);
+        string? GetAssemblyName();
+        string? GetEsmAssetBasePath();
+        IDictionary<string, string?> GetGlobalUsings();
+        string? GetNullable();
+        string? GetOutDir();
+        string? GetRootNamespace();
+        string? GetTargetFramework();
     }
 }

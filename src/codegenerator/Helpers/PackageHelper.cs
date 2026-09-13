@@ -2,13 +2,13 @@ namespace Serenity.CodeGenerator;
 
 public class PackageHelper
 {
-    public static string DeterminePackagesPath(IFileSystem fileSystem, IGeneratorConsole console)
+    public static string? DeterminePackagesPath(IFileSystem fileSystem, IGeneratorConsole console)
     {
-        string userHomeDirectory = Environment.GetEnvironmentVariable("HOME");
+        string? userHomeDirectory = Environment.GetEnvironmentVariable("HOME");
         if (string.IsNullOrEmpty(userHomeDirectory))
             userHomeDirectory = Environment.GetEnvironmentVariable("USERPROFILE");
 
-        var packagesDir = fileSystem.Combine(userHomeDirectory, ".nuget", "packages");
+        var packagesDir = fileSystem.Combine(userHomeDirectory!, ".nuget", "packages");
 
         if (!fileSystem.DirectoryExists(packagesDir))
         {

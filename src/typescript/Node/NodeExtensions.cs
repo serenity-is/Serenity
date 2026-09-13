@@ -2,7 +2,7 @@ namespace Serenity.TypeScript;
 
 public static class NodeExtensions
 {
-    public static SourceFile GetSourceFile(this INode node)
+    public static SourceFile? GetSourceFile(this INode? node)
     {
         while (node != null && node is not SourceFile)
             node = node.Parent;
@@ -25,38 +25,38 @@ public static class NodeExtensions
         return hasModifiersLike.Modifiers.OfType<Decorator>();
     }
 
-    public static string GetText(this INode node, string sourceText = null)
+    public static string? GetText(this INode node, string? sourceText = null)
     {
         if ((sourceText ??= node.GetSourceFile()?.Text) == null)
             return null;
 
-        if (node.Pos == null)
+        if (node.Pos == null || node.End == null)
             return null;
 
-        var pos = Scanner.SkipTrivia(sourceText, node.Pos) ?? node.Pos ?? 0;
+        var pos = Scanner.SkipTrivia(sourceText!, node.Pos) ?? node.Pos ?? 0;
         if (node.End < pos)
             return null;
 
-        return sourceText[pos..node.End.Value];
+        return sourceText![pos..node.End.Value];
     }
 
-    public static string GetTextWithTrivia(this INode node, string sourceText = null)
+    public static string? GetTextWithTrivia(this INode node, string? sourceText = null)
     {
         if ((sourceText ??= node.GetSourceFile()?.Text) == null)
             return null;
 
-        if (node.Pos == null || node.End < node.Pos)
+        if (node.Pos == null || node.End == null || node.End < node.Pos)
             return null;
 
-        return sourceText[(int)node.Pos..(int)node.End];
+        return sourceText![(int)node.Pos..(int)node.End];
     }
 
-    public static INode ForEachChild(this INode node, Func<INode, INode> visitor, bool recursively = false)
+    public static INode? ForEachChild(this INode node, Func<INode, INode?> visitor, bool recursively = false)
     {
         if (node == null)
             return null;
 
-        INode result;
+        INode? result;
 
         if (node is IHasModifierLike hasModifierLike && hasModifierLike.Modifiers != null)
         {

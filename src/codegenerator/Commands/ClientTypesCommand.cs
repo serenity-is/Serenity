@@ -5,7 +5,7 @@ namespace Serenity.CodeGenerator;
 public class ClientTypesCommand(IProjectFileInfo project, IGeneratorConsole console) 
     : BaseGeneratorCommand(project, console)
 {
-    public List<ExternalType> TsTypes { get; set; }
+    public List<ExternalType>? TsTypes { get; set; }
 
     public override ExitCodes Run()
     {
@@ -46,7 +46,7 @@ public class ClientTypesCommand(IProjectFileInfo project, IGeneratorConsole cons
         generator.RootNamespaces.Add(config.RootNamespace);
 
         generator.AddBuiltinTSTypes();
-        foreach (var type in TsTypes)
+        foreach (var type in TsTypes!)
             generator.AddTSType(type);
 
         var outDir = FileSystem.Combine(projectDir, PathHelper.ToPath(

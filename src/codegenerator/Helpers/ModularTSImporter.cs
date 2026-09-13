@@ -3,11 +3,11 @@ using Serenity.CodeGeneration;
 
 namespace Serenity.CodeGenerator;
 
-public class ModularTSImporter(string currentModule)
+public class ModularTSImporter(string? currentModule)
 {
     private readonly List<ModuleImport> moduleImports = [];
     private readonly HashSet<string> moduleImportAliases = [];
-    private readonly string currentModule = currentModule;
+    private readonly string? currentModule = currentModule;
 
     protected string ImportFromTypes(string name)
     {
@@ -33,7 +33,7 @@ public class ModularTSImporter(string currentModule)
 
         var existing = moduleImports.FirstOrDefault(x => x.From == from && x.Name == name && x.External == external);
         if (existing != null)
-            return existing.Alias;
+            return existing.Alias!;
 
         var i = 0; string alias;
         while (moduleImportAliases.Contains(alias = i == 0 ? name : name + "_" + i))
@@ -62,7 +62,7 @@ public class ModularTSImporter(string currentModule)
             .Select(x => "import { " + string.Join(", ", x.Select(y => y.Name)) + " } from '" + x.Key + "';")) + Environment.NewLine + Environment.NewLine;
     }
 
-    private static string FromOrderKey(string from)
+    private static string? FromOrderKey(string? from)
     {
         if (from == null)
             return null;
@@ -105,7 +105,7 @@ public class ModularTSImporter(string currentModule)
         scriptObject.Import("QIMPORT", new ImportFromDelegate(modularTSImporter.ImportFromCorelib));
         scriptObject.Import("GETEDITORVARIABLEINDEX", new EditorVariableIndexDelegate((editor, editors) =>
         {
-            return editors.FirstOrDefault(x => string.Equals(x.Editor, editor, StringComparison.Ordinal)).Index.ToString();
+            return editors.FirstOrDefault(x => string.Equals(x.Editor, editor, StringComparison.Ordinal))!.Index.ToString();
         }));
 
         return scriptObject;

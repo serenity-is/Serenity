@@ -14,7 +14,7 @@ public class GeneratorConfig
     /// See "GeneratorDefaults.cs" file for a list of possible
     /// version values.
     /// </summary>
-    public string Extends { get; set; }
+    public string? Extends { get; set; }
 
     /// <summary>
     /// The root namespace for the target project. It is recommended
@@ -25,7 +25,7 @@ public class GeneratorConfig
     /// Generated code will be placed under this namespace and project's own
     /// types are assumed to be under this namespace as well.
     /// </summary>
-    public string RootNamespace { get; set; }
+    public string? RootNamespace { get; set; }
 
     /// <summary>
     /// Will declare and use jFKTable type of constants for expressions in entities
@@ -61,7 +61,7 @@ public class GeneratorConfig
     /// environment, e.g. for Windows CRLF, for Linux LF. It is recommended
     /// to have "lf" for multi platform projects.
     /// </summary>
-    public string EndOfLine { get; set; }
+    public string? EndOfLine { get; set; }
 
     /// <summary>
     /// If true, prefers file scoped namespaces in generated code
@@ -78,7 +78,7 @@ public class GeneratorConfig
     /// If passed, these global usings will be assumed to be present,
     /// even if not parsed from the project.
     /// </summary>
-    public List<string> IncludeGlobalUsings { get; set; }
+    public List<string>? IncludeGlobalUsings { get; set; }
 
     /// <summary>Used for Newtonsoft.JSON</summary>
     public bool ShouldSerializeIncludeGlobalUsings() => IncludeGlobalUsings != null && IncludeGlobalUsings.Count > 0;
@@ -88,7 +88,7 @@ public class GeneratorConfig
     /// present. Even if they are parsed from the project.
     /// Not implemented yet.
     /// </summary>
-    public List<string> ExcludeGlobalUsings { get; set; }
+    public List<string>? ExcludeGlobalUsings { get; set; }
 
     /// <summary>Used for Newtonsoft.JSON</summary>
     public bool ShouldSerializeExcludeGlobalUsings() => ExcludeGlobalUsings != null && ExcludeGlobalUsings.Count > 0;
@@ -120,7 +120,7 @@ public class GeneratorConfig
     /// <summary>
     /// Client types code generation related configuration
     /// </summary>
-    public ClientTypesConfig ClientTypes { get; set; }
+    public ClientTypesConfig? ClientTypes { get; set; }
 
     /// <summary>Used for Newtonsoft.JSON</summary>
     public bool ShouldSerializeClientTypes() => ClientTypes != null &&
@@ -130,7 +130,7 @@ public class GeneratorConfig
     /// <summary>
     /// MVC (e.g. view locations) related configuration
     /// </summary>
-    public MVCConfig MVC { get; set; }
+    public MVCConfig? MVC { get; set; }
 
     /// <summary>Used for Newtonsoft.JSON</summary>
     public bool ShouldSerializeMVC() => MVC != null &&
@@ -143,13 +143,13 @@ public class GeneratorConfig
     /// <summary>
     /// Server typings code generation related configuration
     /// </summary>
-    public ServerTypingsConfig ServerTypings { get; set; }
+    public ServerTypingsConfig? ServerTypings { get; set; }
 
     /// <summary>
     /// Sergen restore command related configuration
     /// </summary>
     [Obsolete("Sergen no longer supports restoring static content.")]
-    public RestoreConfig Restore { get; set; }
+    public RestoreConfig? Restore { get; set; }
     /// <summary>Used for Newtonsoft.JSON</summary>
     [Obsolete("Only used for JSON serialization of Restore")]
     public bool ShouldSerializeRestore() => Restore != null &&
@@ -159,7 +159,7 @@ public class GeneratorConfig
     /// <summary>
     /// TSBuild related configuration
     /// </summary>
-    public TSBuildConfig TSBuild { get; set; }
+    public TSBuildConfig? TSBuild { get; set; }
 
     /// <summary>Used for Newtonsoft.JSON</summary>
     public bool ShouldSerializeTSBuild() => TSBuild != null &&
@@ -172,7 +172,7 @@ public class GeneratorConfig
     /// work / generated code based on a connection string that 
     /// is not in appsettings.json
     /// </summary>
-    public List<Connection> Connections { get; set; }
+    public List<Connection>? Connections { get; set; }
 
     /// <summary>Used for Newtonsoft.JSON</summary>
     public bool ShouldSerializeConnections() => Connections != null && Connections.Count > 0;
@@ -181,7 +181,7 @@ public class GeneratorConfig
     /// List of base row classes to be used instead of Row.
     /// They are matched by list of base properties.
     /// </summary>
-    public List<BaseRowClass> BaseRowClasses { get; set; }
+    public List<BaseRowClass>? BaseRowClasses { get; set; }
     /// <summary>Used for Newtonsoft.JSON</summary>
     public bool ShouldSerializeBaseRowClasses() =>
         BaseRowClasses != null && BaseRowClasses.Count > 0;
@@ -197,7 +197,7 @@ public class GeneratorConfig
     /// in the foreign table when ForeignSelection is None or NameOnly.
     /// Not so useful if ForeignFieldSelection is All
     /// </summary>
-    public List<string> IncludeForeignFields { get; set; }
+    public List<string>? IncludeForeignFields { get; set; }
 
     /// <summary>Used for Newtonsoft.JSON</summary>
     public bool ShouldSerializeIncludeForeignFields() =>
@@ -210,7 +210,7 @@ public class GeneratorConfig
     /// CustomerModifiedBy etc. won't be generated in OrderRow.
     /// Not so useful if ForeignFieldSelection is None or NameOnly
     /// </summary>
-    public List<string> RemoveForeignFields { get; set; }
+    public List<string>? RemoveForeignFields { get; set; }
 
     /// <summary>Used for Newtonsoft.JSON</summary>
     public bool ShouldSerializeRemoveForeignFields() =>
@@ -222,7 +222,7 @@ public class GeneratorConfig
     /// Their names must match the names at https://github.com/serenity-is/Serenity/tree/master/src/codegenerator/Templates
     /// You may also include additional files to be generated
     /// </summary>
-    public string CustomTemplates { get; set; }
+    public string? CustomTemplates { get; set; }
     /// <summary>Used for Newtonsoft.JSON</summary>
     public bool ShouldSerializeCustomTemplates() =>
         !string.IsNullOrEmpty(CustomTemplates);
@@ -230,7 +230,7 @@ public class GeneratorConfig
     /// <summary>
     /// The relative paths of custom generated files
     /// </summary>
-    public Dictionary<string, string> CustomGenerate { get; set; }
+    public Dictionary<string, string>? CustomGenerate { get; set; }
     /// <summary>Used for Newtonsoft.JSON</summary>
     public bool ShouldSerializeCustomGenerate() =>
         CustomGenerate != null && CustomGenerate.Count > 0;
@@ -238,7 +238,7 @@ public class GeneratorConfig
     /// <summary>
     /// Custom settings to be passed to and used in custom templates
     /// </summary>
-    public Dictionary<string, object> CustomSettings { get; set; }
+    public Dictionary<string, object>? CustomSettings { get; set; }
     /// <summary>Used for Newtonsoft.JSON</summary>
     public bool ShouldSerializeCustomSettings() =>
         CustomSettings != null && CustomSettings.Count > 0;
@@ -247,7 +247,7 @@ public class GeneratorConfig
     /// List of appsettings.json files in order.
     /// Default is appsettings.json, appsettings.machine.json
     /// </summary>
-    public string[] AppSettingFiles { get; set; }
+    public string[]? AppSettingFiles { get; set; }
     /// <summary>Used for Newtonsoft.JSON</summary>
     public bool ShouldSerializeAppSettingFiles() =>
         AppSettingFiles != null && AppSettingFiles.Length > 0;
@@ -289,7 +289,7 @@ public class GeneratorConfig
     /// Upgrade / migration related information used by stargen to determine
     /// the base version of template used, and already applied templates.
     /// </summary>
-    public UpgradeInformation UpgradeInfo { get; set; }
+    public UpgradeInformation? UpgradeInfo { get; set; }
 
     /// <summary>
     /// Holds extension data if any
@@ -298,7 +298,7 @@ public class GeneratorConfig
 #if !ISSOURCEGENERATOR
     [JsonExtensionData]
 #endif
-    public IDictionary<string, object> ExtensionData { get; set; }
+    public IDictionary<string, object>? ExtensionData { get; set; }
 
     public GeneratorConfig()
     {
@@ -320,23 +320,23 @@ public class GeneratorConfig
         /// <summary>
         /// Key of connection
         /// </summary>
-        public string Key { get; set; }
+        public string Key { get; set; } = null!;
         /// <summary>
         /// Connection string
         /// </summary>
-        public string ConnectionString { get; set; }
+        public string ConnectionString { get; set; } = null!;
         /// <summary>
         /// Provider name
         /// </summary>
-        public string ProviderName { get; set; }
+        public string ProviderName { get; set; } = null!;
         /// <summary>
         /// Dialect
         /// </summary>
-        public string Dialect { get; set; }
+        public string Dialect { get; set; } = null!;
         /// <summary>
         /// Generated table information
         /// </summary>
-        public List<Table> Tables { get; set; }
+        public List<Table>? Tables { get; set; }
 
         /// <summary>
         /// Creates a new instance
@@ -363,19 +363,19 @@ public class GeneratorConfig
         /// <summary>
         /// Table name
         /// </summary>
-        public string Tablename { get; set; }
+        public string Tablename { get; set; } = null!;
         /// <summary>
         /// Row identifier without Row suffix
         /// </summary>
-        public string Identifier { get; set; }
+        public string Identifier { get; set; } = null!;
         /// <summary>
         /// Module name
         /// </summary>
-        public string Module { get; set; }
+        public string? Module { get; set; }
         /// <summary>
         /// Permission key
         /// </summary>
-        public string PermissionKey { get; set; }
+        public string? PermissionKey { get; set; }
     }
     
     /// <summary>
@@ -386,11 +386,11 @@ public class GeneratorConfig
         /// <summary>
         /// Class name
         /// </summary>
-        public string ClassName { get; set; }
+        public string? ClassName { get; set; }
         /// <summary>
         /// List of fields that should exists in a table for this base class to be used
         /// </summary>
-        public List<string> Fields { get; set; }
+        public List<string>? Fields { get; set; }
     }
 
     /// <summary>
@@ -403,14 +403,14 @@ public class GeneratorConfig
         /// Specify only if Sergen can't auto determine
         /// your project output file.
         /// </summary>
-        public string[] Assemblies { get; set; }
+        public string[]? Assemblies { get; set; }
         /// <summary>Used for Newtonsoft.JSON</summary>
         public bool ShouldSerializeAssemblies() => Assemblies != null && Assemblies.Length > 0;
 
         /// <summary>
         /// Output directory for server typings generated files. Not used for modules.
         /// </summary>
-        public string OutDir { get; set; }
+        public string? OutDir { get; set; }
 
         /// <summary>Used for Newtonsoft.JSON</summary>
         public bool ShouldSerializeOutDir() => !string.IsNullOrEmpty(OutDir);
@@ -471,7 +471,7 @@ public class GeneratorConfig
         /// <summary>
         /// Output directory for generated client types .cs files
         /// </summary>
-        public string OutDir { get; set; }
+        public string? OutDir { get; set; }
         /// <summary>
         /// Set false to disable the client types source generator in Serenity.Pro.Coder
         /// </summary>
@@ -532,18 +532,18 @@ public class GeneratorConfig
         /// <summary>
         /// Output directory for MVC.cs
         /// </summary>
-        public string OutDir { get; set; }
+        public string? OutDir { get; set; }
         /// <summary>
         /// View paths to search for, defaults to "Modules" and "Views".
         /// "ProjectName" is used instead of "Modules" if Razor SDK is used
         /// for the project, e.g. a Razor class library
         /// </summary>
-        public string[] SearchViewPaths { get; set; }
+        public string[]? SearchViewPaths { get; set; }
         /// <summary>
         /// Strip view paths from generated files. Defaults to "Modules", "Views".
         /// E.g. a subclass for Modules and Views won't be generated.
         /// </summary>
-        public string[] StripViewPaths { get; set; }
+        public string[]? StripViewPaths { get; set; }
         /// <summary>
         /// Set false to disable the view paths source generator in Serenity.Pro.Coder
         /// </summary>
@@ -558,12 +558,12 @@ public class GeneratorConfig
         /// <summary>
         /// List of files (git ignore like) to include while restoring
         /// </summary>
-        public string[] Include { get; set; }
+        public string[]? Include { get; set; }
 
         /// <summary>
         /// List of files (git ignore like) to exclude while restoring
         /// </summary>
-        public string[] Exclude { get; set; }
+        public string[]? Exclude { get; set; }
 
         /// <summary>
         /// Set false to disable namespace typings restore
@@ -581,16 +581,16 @@ public class GeneratorConfig
         /// Initial type of project. Available options are
         /// "Community" e.g. Serene, "Premium" e.g. StartSharp
         /// </summary>
-        public string InitialType { get; set; }
+        public string? InitialType { get; set; }
         /// <summary>
         /// Version this project is created from. Used to determine
         /// which migrations should be applied to project (starting from)
         /// </summary>
-        public string InitialVersion { get; set; }
+        public string? InitialVersion { get; set; }
         /// <summary>
         /// List of already applied upgrades if any
         /// </summary>
-        public string[] AppliedUpgrades { get; set; }
+        public string[]? AppliedUpgrades { get; set; }
         /// <summary>
         /// Extension data for upgrades
         /// </summary>
@@ -598,7 +598,7 @@ public class GeneratorConfig
 #if !ISSOURCEGENERATOR
         [JsonExtensionData]
 #endif
-        public IDictionary<string, object> ExtensionData { get; set; }
+        public IDictionary<string, object>? ExtensionData { get; set; }
     }
 
     public class TSBuildConfig
@@ -607,7 +607,7 @@ public class GeneratorConfig
         /// List of entry point globs, default is "Modules/**/*Page.ts", "Modules/**/*Page.tsx", "Modules/**/ScriptInit.ts", "Modules/**/*.mts".
         /// Include "+" as the first item to append to default list.
         /// </summary>
-        public List<string> EntryPoints { get; set; }
+        public List<string>? EntryPoints { get; set; }
 
         /// <summary>
         /// Should the list of entry points, e.g. ESM be generated, only available with Serenity.Pro.Coder.
@@ -621,6 +621,6 @@ public class GeneratorConfig
 #if !ISSOURCEGENERATOR
         [JsonExtensionData]
 #endif
-        public IDictionary<string, object> ExtensionData { get; set; }
+        public IDictionary<string, object>? ExtensionData { get; set; }
     }
 }

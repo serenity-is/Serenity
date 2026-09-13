@@ -23,7 +23,7 @@ public partial class ServerTypingsGenerator
 
     private static string AutoDataScriptKeyFor(TypeDefinition type)
     {
-        string module;
+        string? module;
         var moduleAttr = TypingsUtils.GetAttr(type,
             "Serenity.ComponentModel", "ModuleAttribute");
         if (moduleAttr != null)

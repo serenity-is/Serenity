@@ -6,7 +6,7 @@ public class ImportAttribute(IDeclarationName name, IExpression value)
     public IDeclarationName Name { get; } = name;
     public IExpression Value { get; } = value;
 
-    public IEnumerable<INode> GetRestChildren()
+    public IEnumerable<INode?> GetRestChildren()
     {
         return [Name, Value];
     }

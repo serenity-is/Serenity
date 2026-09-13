@@ -5,7 +5,7 @@ public class NodeWithTypeArguments(SyntaxKind kind, NodeArray<ITypeNode> typeArg
 {
     public NodeArray<ITypeNode> TypeArguments { get; } = typeArguments;
 
-    public virtual IEnumerable<INode> GetRestChildren()
+    public virtual IEnumerable<INode?> GetRestChildren()
     {
         return TypeArguments ?? [];
     }

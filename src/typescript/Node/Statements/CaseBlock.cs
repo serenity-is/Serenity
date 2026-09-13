@@ -6,7 +6,7 @@ public class CaseBlock(NodeArray<ICaseOrDefaultClause> clauses)
 {
     public NodeArray<ICaseOrDefaultClause> Clauses { get; } = clauses;
 
-    public IEnumerable<INode> GetRestChildren()
+    public IEnumerable<INode?> GetRestChildren()
     {
         if (Clauses != null) foreach (var x in Clauses) yield return x;
     }

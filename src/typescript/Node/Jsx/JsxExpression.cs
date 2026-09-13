@@ -6,7 +6,7 @@ public class JsxExpression(DotDotDotToken dotDotDotToken, IExpression expression
     public DotDotDotToken DotDotDotToken { get; } = dotDotDotToken; // Token<SyntaxKind.DotDotDotToken>
     public IExpression Expression { get; } = expression;
 
-    public IEnumerable<INode> GetRestChildren()
+    public IEnumerable<INode?> GetRestChildren()
     {
         return [DotDotDotToken, Expression];
     }

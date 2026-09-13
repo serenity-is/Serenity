@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using static Serenity.TypeScript.Scanner;
 
 namespace Serenity.TypeScript;
@@ -15,7 +16,7 @@ public class Utilities
         return scriptKind == ScriptKind.TSX || scriptKind == ScriptKind.JSX || scriptKind == ScriptKind.JS ? LanguageVariant.JSX : LanguageVariant.Standard;
     }
 
-    internal static INode ContainsParseError(INode node)
+    internal static INode? ContainsParseError(INode node)
     {
         AggregateChildData(node);
 
@@ -36,7 +37,7 @@ public class Utilities
         }
     }
 
-    internal static bool NodeIsMissing(INode node)
+    internal static bool NodeIsMissing([NotNullWhen(false)] INode? node)
     {
         if (node == null)
             return true;
@@ -45,7 +46,7 @@ public class Utilities
         return node.Pos == node.End && node.Pos >= 0 && node.Kind != SyntaxKind.EndOfFileToken;
     }
 
-    internal static bool NodeIsPresent(INode node)
+    internal static bool NodeIsPresent([NotNullWhen(true)] INode? node)
     {
         return !NodeIsMissing(node);
     }
@@ -255,7 +256,7 @@ public class Utilities
         return path.EndsWith(extension, StringComparison.Ordinal);
     }
 
-    internal static Diagnostic CreateDetachedDiagnostic(string fileName, string sourceText, int start, int length, DiagnosticMessage message, object argument = null)
+    internal static Diagnostic CreateDetachedDiagnostic(string fileName, string sourceText, int start, int length, DiagnosticMessage message, object? argument = null)
     {
 
         if ((start + length) > sourceText.Length)
@@ -273,7 +274,7 @@ public class Utilities
         };
     }
 
-    internal static Diagnostic CreateFileDiagnostic(SourceFile file, int start, int length, DiagnosticMessage message, object argument)
+    internal static Diagnostic CreateFileDiagnostic(SourceFile file, int start, int length, DiagnosticMessage message, object? argument)
     {
         return new Diagnostic
         {
@@ -285,7 +286,7 @@ public class Utilities
         };
     }
 
-    internal static ITemplateLiteralLikeNode CreateTemplateLiteralLikeNode(SyntaxKind kind, string text, string rawText, TokenFlags? templateFlags)
+    internal static ITemplateLiteralLikeNode CreateTemplateLiteralLikeNode(SyntaxKind kind, string? text, string? rawText, TokenFlags? templateFlags)
     {
         if (kind == SyntaxKind.NoSubstitutionTemplateLiteral)
             return new NoSubstitutionTemplateLiteral(text, rawText, templateFlags ?? TokenFlags.None);
@@ -293,7 +294,7 @@ public class Utilities
         return new TemplateLiteralLikeNode(kind, text, rawText, templateFlags);
     }
 
-    internal static ILiteralLikeNode CreateLiteralLikeNode(SyntaxKind kind, string text)
+    internal static ILiteralLikeNode? CreateLiteralLikeNode(SyntaxKind kind, string text)
     {
         return kind switch
         {
@@ -341,7 +342,7 @@ public class Utilities
 #endif
     }
 
-    internal static string IdText(Identifier identifier)
+    internal static string? IdText(Identifier identifier)
     {
         return identifier.Text;
         // return unescapeLeadingUnderscores(identifierOrPrivateName.escapedText);
@@ -392,14 +393,14 @@ public class Utilities
             || node is ExportDeclaration;
     }
 
-    static INode GetImportMetaIfNecessary(SourceFile sourceFile)
+    static INode? GetImportMetaIfNecessary(SourceFile sourceFile)
     {
         return (sourceFile.Flags & NodeFlags.PossiblyContainsImportMeta) != 0 ?
             WalkTreeForImportMeta(sourceFile) :
             null;
     }
 
-    static INode WalkTreeForImportMeta(INode node)
+    static INode? WalkTreeForImportMeta(INode node)
     {
         return IsImportMeta(node) ? node : node.ForEachChild(WalkTreeForImportMeta);
     }
@@ -409,11 +410,11 @@ public class Utilities
         return node is MetaProperty { KeywordToken: SyntaxKind.ImportKeyword } mp && mp.Name?.EscapedText == "meta";
     }
 
-    internal static INode IsFileProbablyExternalModule(SourceFile sourceFile)
+    internal static INode? IsFileProbablyExternalModule(SourceFile sourceFile)
     {
         // Try to use the first top-level import/export when available, then
         // fall back to looking for an 'import.meta' somewhere in the tree if necessary.
-        return sourceFile.Statements.FirstOrDefault(IsAnExternalModuleIndicatorNode) ??
+        return sourceFile.Statements?.FirstOrDefault(IsAnExternalModuleIndicatorNode) ??
             GetImportMetaIfNecessary(sourceFile);
     }
 
@@ -472,7 +473,7 @@ public class Utilities
         };
     }
 
-    internal static bool TagNamesAreEquivalent(IJsxTagNameExpression lhs, IJsxTagNameExpression rhs)
+    internal static bool TagNamesAreEquivalent(IJsxTagNameExpression? lhs, IJsxTagNameExpression? rhs)
     {
         if (lhs == null || rhs == null || lhs.Kind != rhs.Kind)
             return false;

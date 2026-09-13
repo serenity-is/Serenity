@@ -5,7 +5,7 @@ public class ArrayTypeNode(ITypeNode elementType)
 {
     public ITypeNode ElementType { get; set; } = elementType;
 
-    public IEnumerable<INode> GetRestChildren()
+    public IEnumerable<INode?> GetRestChildren()
     {
         return [ElementType];
     }

@@ -8,7 +8,7 @@ public class MetaProperty(SyntaxKind keywordToken, Identifier name)
 
     IDeclarationName IHasNameProperty.Name => Name;
 
-    public IEnumerable<INode> GetRestChildren()
+    public IEnumerable<INode?> GetRestChildren()
     {
         return [Name];
     }

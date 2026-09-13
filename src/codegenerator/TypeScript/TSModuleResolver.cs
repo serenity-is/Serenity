@@ -7,9 +7,9 @@ namespace Serenity.CodeGenerator;
 
 public class ResolveResult
 {
-    public string FullPath { get; set; }
-    public string ModuleName { get; set; }
-    public string ActualPath { get; set; }
+    public string? FullPath { get; set; }
+    public string? ModuleName { get; set; }
+    public string? ActualPath { get; set; }
 }
 
 public partial class TSModuleResolver
@@ -35,7 +35,7 @@ public partial class TSModuleResolver
 #endif
     private static readonly char[] slashSeparator = ['/'];
 
-    public TSModuleResolver(IFileSystem fileSystem, string tsConfigDir, TSConfig tsConfig)
+    public TSModuleResolver(IFileSystem fileSystem, string tsConfigDir, TSConfig? tsConfig)
     {
         this.fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
 
@@ -46,32 +46,32 @@ public partial class TSModuleResolver
 
     private class PackageJson
     {
-        public string Name { get; set; }
-        public Dictionary<string, Dictionary<string, string[]>> TypesVersions { get; set; }
-        public Dictionary<string, string> Dependencies { get; set; }
-        public Dictionary<string, string> DevDependencies { get; set; }
-        public Dictionary<string, string> PeerDependencies { get; set; }
-        public string Types { get; set; }
-        public string Typings { get; set; }
+        public string? Name { get; set; }
+        public Dictionary<string, Dictionary<string, string[]>>? TypesVersions { get; set; }
+        public Dictionary<string, string>? Dependencies { get; set; }
+        public Dictionary<string, string>? DevDependencies { get; set; }
+        public Dictionary<string, string>? PeerDependencies { get; set; }
+        public string? Types { get; set; }
+        public string? Typings { get; set; }
     }
 
-    static string RemoveTrailing(string path)
+    static string? RemoveTrailing(string? path)
     {
         while (path != null && path.Length > 1 &&
             path.EndsWith('\\') ||
-            path.EndsWith('/'))
+            path!.EndsWith('/'))
             path = path[..^1];
         return path;
     }
 
-    static string TryGetNodePackageName(string path)
+    static string? TryGetNodePackageName(string path)
     {
-        path = RemoveTrailing(PathHelper.ToUrl(path));
+        path = RemoveTrailing(PathHelper.ToUrl(path))!;
         var lastNodeIdx = path.LastIndexOf("/node_modules/", StringComparison.Ordinal);
         if (lastNodeIdx <= 0)
             return null;
 
-        var remaining = RemoveTrailing(path[(lastNodeIdx + "/node_modules/".Length)..]);
+        var remaining = RemoveTrailing(path[(lastNodeIdx + "/node_modules/".Length)..])!;
         while (remaining.StartsWith('/'))
             remaining = remaining[1..];
         if (remaining.Length > 0)
@@ -93,9 +93,9 @@ public partial class TSModuleResolver
         return null;
     }
 
-    private readonly ConcurrentDictionary<string, Lazy<PackageJson>> packageJson = new();
+    private readonly ConcurrentDictionary<string, Lazy<PackageJson?>> packageJson = new();
 
-    private PackageJson TryParsePackageJson(string path)
+    private PackageJson? TryParsePackageJson(string path)
     {
         if (string.IsNullOrEmpty(path))
             return null;
@@ -105,12 +105,12 @@ public partial class TSModuleResolver
         return packageJson.GetOrAdd(cacheKey, cacheKey => new(() => TSConfigHelper.TryParseJsonFile<PackageJson>(fileSystem, path))).Value;
     }
 
-    private string ResolveRelative(string relativePath, string referencedFrom)
+    private string? ResolveRelative(string relativePath, string referencedFrom)
     {
         string relative = removeMultiSlash.Replace(PathHelper.ToUrl(relativePath), "/");
 
         var searchBase = relativePath.StartsWith('/') ?
-            tsBasePath : fileSystem.GetDirectoryName(RemoveTrailing(referencedFrom));
+            tsBasePath : fileSystem.GetDirectoryName(RemoveTrailing(referencedFrom)!);
 
         if (relativePath.StartsWith("./", StringComparison.Ordinal))
             relative = relative[2..];
@@ -137,16 +137,16 @@ public partial class TSModuleResolver
                 .FirstOrDefault(fileSystem.FileExists);
     }
 
-    public ResolveResult Resolve(string fileNameOrModule, string referencedFrom)
+    public ResolveResult? Resolve(string? fileNameOrModule, string? referencedFrom)
     {
         if (string.IsNullOrEmpty(fileNameOrModule))
             return null;
 
-        string resolvedPath = null;
-        string moduleName = null;
-        string actualPath = null;
+        string? resolvedPath = null;
+        string? moduleName = null;
+        string? actualPath = null;
 
-        ResolveResult createResult()
+        ResolveResult? createResult()
         {
             if (resolvedPath is null)
                 return null;
@@ -199,7 +199,7 @@ public partial class TSModuleResolver
             return createResult();
         }
 
-        void tryPath(string testBase, ref string moduleName)
+        void tryPath(string testBase, ref string? moduleName)
         {
             if (testBase[^1] != '\\' && testBase[^1] != '/')
                 resolvedPath = extensions
@@ -259,7 +259,7 @@ public partial class TSModuleResolver
         if (resolvedPath is null &&
             !string.IsNullOrEmpty(referencedFrom))
         {
-            var parentDir = fileSystem.GetDirectoryName(RemoveTrailing(referencedFrom));
+            var parentDir = fileSystem.GetDirectoryName(RemoveTrailing(referencedFrom)!);
             while (resolvedPath is null &&
                 !string.IsNullOrEmpty(parentDir))
             {
@@ -283,7 +283,7 @@ public partial class TSModuleResolver
                     else
                         break;
                 }
-                parentDir = fileSystem.GetDirectoryName(RemoveTrailing(parentDir));
+                parentDir = fileSystem.GetDirectoryName(RemoveTrailing(parentDir)!);
             }
         }
 
@@ -293,22 +293,22 @@ public partial class TSModuleResolver
             if (actualPath is not null)
             {
                 moduleName = fileNameOrModule;
-                resolvedPath = fileSystem.Combine(rootPackageJsonFolder, "node_modules", moduleName);
+                resolvedPath = fileSystem.Combine(rootPackageJsonFolder!, "node_modules", moduleName);
             }
         }
 
         return createResult();
     }
 
-    private Dictionary<string, string> allDependencies;
-    private string rootPackageJsonFolder;
+    private Dictionary<string, string>? allDependencies;
+    private string? rootPackageJsonFolder;
 
     private Dictionary<string, string> GetAllDependencies()
     {
         if (allDependencies is not null)
             return allDependencies;
 
-        PackageJson packageJson;
+        PackageJson? packageJson;
         var path = tsBasePath;
         do
         {
@@ -322,7 +322,7 @@ public partial class TSModuleResolver
             rootPackageJsonFolder = path;
 
         Dictionary<string, string> allDeps = [];
-        void addDeps(Dictionary<string, string> source)
+        void addDeps(Dictionary<string, string>? source)
         {
             if (source is not null)
                 foreach (var pair in source)
@@ -336,11 +336,11 @@ public partial class TSModuleResolver
         return (allDependencies = allDeps);
     }
 
-    string TryResolveFromPackageFolder(string path, ref string moduleName)
+    string? TryResolveFromPackageFolder(string path, ref string? moduleName)
     {
         var packageJson = TryParsePackageJson(fileSystem.Combine(path, "package.json"));
 
-        string withPackageJson(ref string moduleName)
+        string? withPackageJson(ref string? moduleName)
         {
             var types = packageJson.Types ?? packageJson.Typings;
             if (!string.IsNullOrEmpty(types) &&
@@ -355,7 +355,7 @@ public partial class TSModuleResolver
         if (packageJson is not null)
             return withPackageJson(ref moduleName);
 
-        var parentDir = fileSystem.GetDirectoryName(RemoveTrailing(path));
+        var parentDir = fileSystem.GetDirectoryName(RemoveTrailing(path)!);
         packageJson = TryParsePackageJson(fileSystem.Combine(parentDir, "package.json"));
 
         if (packageJson is null || fileSystem.GetFileName(parentDir) == "node_modules")
@@ -382,7 +382,7 @@ public partial class TSModuleResolver
         return withPackageJson(ref moduleName);
     }
 
-    private string TryResolveFromDependencies(string moduleName)
+    private string? TryResolveFromDependencies(string moduleName)
     {
         if (string.IsNullOrEmpty(moduleName))
             return null;
@@ -410,7 +410,7 @@ public partial class TSModuleResolver
 
             if (relativePath != null)
             {
-                var packageIndex = fileSystem.Combine(rootPackageJsonFolder, relativePath, "dist", "index.d.ts");
+                var packageIndex = fileSystem.Combine(rootPackageJsonFolder!, relativePath, "dist", "index.d.ts");
                 if (fileSystem.FileExists(packageIndex))
                     return packageIndex;
             }

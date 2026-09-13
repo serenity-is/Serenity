@@ -5,7 +5,7 @@ public class JSDocNamepathType(ITypeNode type)
 {
     public ITypeNode Type { get; } = type;
 
-    public IEnumerable<INode> GetRestChildren()
+    public IEnumerable<INode?> GetRestChildren()
     {
         yield return Type;
     }

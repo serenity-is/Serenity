@@ -5,7 +5,7 @@ public class JsxClosingElement(IJsxTagNameExpression tagName)
 {
     public IJsxTagNameExpression TagName { get; } = tagName;
 
-    public IEnumerable<INode> GetRestChildren()
+    public IEnumerable<INode?> GetRestChildren()
     {
         return [TagName];
     }

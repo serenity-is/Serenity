@@ -9,7 +9,7 @@ public class ConditionalTypeNode(ITypeNode checkType, ITypeNode extendsType,
     public ITypeNode TrueType { get; } = trueType;
     public ITypeNode FalseType { get; } = falseType;
 
-    public IEnumerable<INode> GetRestChildren()
+    public IEnumerable<INode?> GetRestChildren()
     {
         return [CheckType, ExtendsType, TrueType, FalseType];
     }

@@ -3,7 +3,7 @@ namespace Serenity.TypeScript;
 
 internal static class Debug
 {
-    internal static void Assert(bool condition, string message = null, params object[] args)
+    internal static void Assert(bool condition, string? message = null, params object[] args)
     {
         if (!condition)
             throw new ParseException(string.Format(message ?? "Parser assert condition failed!", args));

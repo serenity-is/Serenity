@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Serenity.CodeGenerator;
 
 /// <summary>
@@ -7,8 +9,8 @@ public partial class ArgumentReader(IEnumerable<string> arguments) : IArgumentRe
 {
     private static readonly char[] assignmentChars = [':', '='];
     private static readonly string[] helpSwitches = ["?", "h", "help"];
-    private readonly List<string> arguments = (arguments ??
-        throw new ArgumentNullException(nameof(arguments))).ToList();
+    private readonly List<string> arguments = [.. (arguments ??
+        throw new ArgumentNullException(nameof(arguments)))];
 
     [GeneratedRegex("^(-|--|/)(\\?|([a-zA-Z_][a-zA-Z0-9_-]*)([:=].*)?)$")]
     private static partial Regex IsSwitchRegex();
@@ -23,7 +25,7 @@ public partial class ArgumentReader(IEnumerable<string> arguments) : IArgumentRe
     /// </summary>
     /// <param name="argument">Argument to check</param>
     /// <returns>True if matches switch format</returns>
-    public static bool IsSwitch(string argument)
+    public static bool IsSwitch([NotNullWhen(true)] string? argument)
     {
         return argument != null && IsSwitchRegex().IsMatch(argument);
     }
@@ -38,7 +40,7 @@ public partial class ArgumentReader(IEnumerable<string> arguments) : IArgumentRe
     /// otherwise. Value is null for switches without value,
     /// empty string for switches that is empty after equal sign,
     /// and the value otherwise</returns>
-    public static string ParseSwitch(string argument, out string value)
+    public static string? ParseSwitch(string? argument, out string? value)
     {
         value = null;
 
@@ -70,7 +72,7 @@ public partial class ArgumentReader(IEnumerable<string> arguments) : IArgumentRe
         int i = 0;
         while (i < arguments.Count)
         {
-            var name = ParseSwitch(arguments[i], out string value);
+            var name = ParseSwitch(arguments[i], out string? value);
             if (name != null && names.Contains(name, StringComparer.Ordinal))
             {
                 arguments.RemoveAt(i);
@@ -95,7 +97,7 @@ public partial class ArgumentReader(IEnumerable<string> arguments) : IArgumentRe
                     throw new ArgumentException($"A value is required when using " +
                         $"the switch '{name}'!", name);
 
-                yield return (name, value);
+                yield return (name, value!);
             }
             else
                 i++;
@@ -117,9 +119,9 @@ public partial class ArgumentReader(IEnumerable<string> arguments) : IArgumentRe
     }
 
     /// <inheritdoc/>
-    public string GetCommand()
+    public string? GetCommand()
     {
-        string command = null;
+        string? command = null;
         var commandIndex = arguments.FindIndex(x => !string.IsNullOrEmpty(x) && !IsSwitch(x));
         if (commandIndex >= 0)
         {
@@ -132,9 +134,9 @@ public partial class ArgumentReader(IEnumerable<string> arguments) : IArgumentRe
     }
 
     /// <inheritdoc/>
-    public string GetString(string[] names, bool requiresValue = true)
+    public string? GetString(string[] names, bool requiresValue = true)
     {
-        string result = null;
+        string? result = null;
         foreach (var (name, value) in EnumerateValueArguments(names, requiresValue))
         {
             if (result != null &&
@@ -161,7 +163,7 @@ public partial class ArgumentReader(IEnumerable<string> arguments) : IArgumentRe
 
     /// <inheritdoc/>
     public Dictionary<string, string> GetDictionary(string[] names,
-        bool required = false, char[] separators = null)
+        bool required = false, char[]? separators = null)
     {
         IEnumerable<string> assignments = GetStrings(names, required);
         if (separators != null && separators.Length > 0)
@@ -183,7 +185,7 @@ public partial class ArgumentReader(IEnumerable<string> arguments) : IArgumentRe
                     $"switch '{names[0]}' is empty!", names[0]);
 
             var value = assignment[(eq + 1)..];
-            if (result.TryGetValue(propName, out string existingValue))
+            if (result.TryGetValue(propName, out string? existingValue))
             {
                 if (existingValue != value)
                     throw new ArgumentException($"The '{propName}' value is specified multiple " +

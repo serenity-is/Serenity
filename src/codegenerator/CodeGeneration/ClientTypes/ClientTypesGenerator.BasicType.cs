@@ -15,7 +15,7 @@ public partial class ClientTypesGenerator
         });
     }
     
-    private void GenerateBasicTypeMembers(ExternalType type, HashSet<string> skip)
+    private void GenerateBasicTypeMembers(ExternalType type, HashSet<string>? skip)
     {
         var options = GetBasicTypeMembers(type);
         
@@ -23,10 +23,10 @@ public partial class ClientTypesGenerator
         foreach (var option in options.Values)
         {
             if (skip != null &&
-                skip.Contains(option.Name))
+                skip.Contains(option.Name!))
                 continue;
 
-            if (!CSharpSyntaxRules.IsValidIdentifier(option.Name, ignoreKeywords: true))
+            if (!CSharpSyntaxRules.IsValidIdentifier(option.Name!, ignoreKeywords: true))
                 continue;
 
             var typeName = GetMemberTypeName(option.Type, out var isValueType);
@@ -36,9 +36,9 @@ public partial class ClientTypesGenerator
             if (!OmitComments)
                 cw.IndentedLine($"/// <summary>Gets or sets the <c>{option.Name}</c> property.</summary>");
             cw.Indented("public ");
-            sb.Append(AppendNullableQuote(typeName, isValueType));
+            sb.Append(AppendNullableQuote(typeName!, isValueType));
             sb.Append(' ');
-            sb.Append(CSharpSyntaxRules.EscapeIfKeyword(option.Name));
+            sb.Append(CSharpSyntaxRules.EscapeIfKeyword(option.Name!));
             sb.Append(" { get; set; }");
             sb.AppendLine();
         }
@@ -57,7 +57,7 @@ public partial class ClientTypesGenerator
 
             AddBasicTypeMembers(result, basicType, basicType);
         }
-        while ((basicType = GetBaseType(basicType)) != null && loop++ < 100);
+        while ((basicType = GetBaseType(basicType)!) != null && loop++ < 100);
 
         return result;
     }
@@ -87,13 +87,13 @@ public partial class ClientTypesGenerator
 
         foreach (var member in members)
         {
-            if (dict.ContainsKey(member.Name))
+            if (dict.ContainsKey(member.Name!))
                 continue;
 
             if (IsComplexMemberTypeName(member.Type))
                 continue;
 
-            dict[member.Name] = member;
+            dict[member.Name!] = member;
         }
     }
 }

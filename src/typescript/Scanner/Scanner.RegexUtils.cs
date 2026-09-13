@@ -30,7 +30,7 @@ partial class Scanner
 
     public class RegexGroupNameRef : TextRange
     {
-        public string Name { get; set; }
+        public string? Name { get; set; }
     }
 
     public class RegexDecimalEscape : TextRange

@@ -10,7 +10,7 @@ public class ConditionalExpression(IExpression condition, QuestionToken question
     public ColonToken ColonToken { get; } = colonToken;
     public IExpression WhenFalse { get; } = whenFalse;
 
-    public IEnumerable<INode> GetRestChildren()
+    public IEnumerable<INode?> GetRestChildren()
     {
         return [Condition, QuestionToken, WhenTrue, ColonToken, WhenFalse];
     }

@@ -7,7 +7,7 @@ public class WithStatement(IExpression expression, IStatement statement)
     public IExpression Expression { get; } = expression;
     public IStatement Statement { get; } = statement;
 
-    public IEnumerable<INode> GetRestChildren()
+    public IEnumerable<INode?> GetRestChildren()
     {
         return [Expression, Statement];
     }

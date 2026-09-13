@@ -23,7 +23,7 @@ public class EntityCodeGenerator
         this.model.CustomSettings = config.CustomSettings;
 
         var modulesFolder = fileSystem.Combine(rootDir, "Modules");
-        var typingFolder = fileSystem.Combine(modulesFolder, "ServerTypes", model.Module);
+        var typingFolder = fileSystem.Combine(modulesFolder, "ServerTypes", model.Module ?? "");
         typingPrefix = fileSystem.Combine(typingFolder, model.ClassName);
 
         var mainFolder = modulesFolder;

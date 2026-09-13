@@ -9,9 +9,9 @@ public partial class ServerTypingsGenerator
     private readonly List<ModuleImport> moduleImports = [];
     private readonly HashSet<string> moduleImportAliases = [];
 
-    public string ModulesPathAlias { get; set; } = "@/";
-    public string ModulesPathFolder { get; set; } = "Modules";
-    public string RootPathAlias { get; set; } = "@/../";
+    public string? ModulesPathAlias { get; set; } = "@/";
+    public string? ModulesPathFolder { get; set; } = "Modules";
+    public string? RootPathAlias { get; set; } = "@/../";
 
     protected void ClearImports()
     {
@@ -53,7 +53,7 @@ public partial class ServerTypingsGenerator
         moduleImportAliases.Clear();
     }
 
-    private static string FromOrderKey(string from)
+    private static string? FromOrderKey(string? from)
     {
         if (from == null)
             return null;
@@ -76,12 +76,12 @@ public partial class ServerTypingsGenerator
 
     protected string AddModuleImport(string from, string name, bool external = false)
     {
-        ArgumentExceptionHelper.ThrowIfNull(name);
-        ArgumentExceptionHelper.ThrowIfNull(from);
+        ArgumentNullException.ThrowIfNull(name);
+        ArgumentNullException.ThrowIfNull(from);
 
         var existing = moduleImports.FirstOrDefault(x => x.From == from && x.Name == name && x.External == external);
         if (existing != null)
-            return existing.Alias;
+            return existing.Alias!;
 
         var i = 0; string alias;
         while (moduleImportAliases.Contains(alias = i == 0 ? name : (name + "_" + i)))
@@ -102,8 +102,8 @@ public partial class ServerTypingsGenerator
     public string DetermineModulesRoot(IFileSystem fileSystem, string projectFile,
         string rootNamespace)
     {
-        ArgumentExceptionHelper.ThrowIfNull(fileSystem, nameof(fileSystem));
-        ArgumentExceptionHelper.ThrowIfNull(projectFile, nameof(projectFile));
+        ArgumentNullException.ThrowIfNull(fileSystem, nameof(fileSystem));
+        ArgumentNullException.ThrowIfNull(projectFile, nameof(projectFile));
 
         var projectDir = fileSystem.GetDirectoryName(projectFile);
         var modulesDir = fileSystem.Combine(projectDir, "Modules");
@@ -134,7 +134,7 @@ public partial class ServerTypingsGenerator
 
     protected string GetTypingFileNameFor(string ns, string name)
     {
-        var filename = RemoveRootNamespace(ns, name);
+        var filename = RemoveRootNamespace(ns, name) ?? "";
         var idx = filename.IndexOf('.');
         if (idx >= 0)
             filename = filename[..idx] + '/' + filename[(idx + 1)..];
@@ -142,7 +142,7 @@ public partial class ServerTypingsGenerator
         return filename;
     }
 
-    protected string RelativeModulePath(string fromModule, string toModule)
+    protected string? RelativeModulePath(string fromModule, string? toModule)
     {
         if (string.IsNullOrEmpty(toModule) ||
             toModule.StartsWith('.'))

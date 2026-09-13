@@ -2,13 +2,13 @@ namespace Serenity.CodeGeneration;
 
 public partial class ServerTypingsGenerator
 {
-    protected ILookup<string, ExternalType> modularEditorTypeByKey;
-    protected ILookup<string, ExternalType> modularFormatterTypeByKey;
-    protected ILookup<string, ExternalType> modularDialogTypeByKey;
+    protected ILookup<string, ExternalType> modularEditorTypeByKey = null!;
+    protected ILookup<string, ExternalType> modularFormatterTypeByKey = null!;
+    protected ILookup<string, ExternalType> modularDialogTypeByKey = null!;
 
     protected void InitModularTypeByKey()
     {
-        static string fixRegName(ExternalType type, string text)
+        static string? fixRegName(ExternalType type, string? text)
         {
             if (text != null && text[^1] == '.' && !string.IsNullOrEmpty(type?.Name))
                 return text + type.Name;
@@ -16,7 +16,7 @@ public partial class ServerTypingsGenerator
             return text;
         }
 
-        static (string, string) extractTypeNameViaTypeInfo(ExternalType type)
+        static (string?, string?) extractTypeNameViaTypeInfo(ExternalType type)
         {
             var field = type.Fields?.FirstOrDefault(x =>
                 x.IsStatic == true &&
@@ -61,9 +61,9 @@ public partial class ServerTypingsGenerator
                 }
             }
 
-            return (null, type);
+            return (null!, type);
         }).Where(x => x.key != null)
-            .ToLookup(x => x.key, x => x.type);
+            .ToLookup(x => x.key!, x => x.type);
 
         modularFormatterTypeByKey = TSTypes.Values.Select(type =>
         {
@@ -100,9 +100,9 @@ public partial class ServerTypingsGenerator
                 }
             }
 
-            return (null, type);
+            return (null!, type);
         }).Where(x => x.key != null)
-            .ToLookup(x => x.key, x => x.type);
+            .ToLookup(x => x.key!, x => x.type);
 
         modularDialogTypeByKey = TSTypes.Values.Select(type =>
         {
@@ -132,20 +132,20 @@ public partial class ServerTypingsGenerator
                 }
             }
 
-            return (null, type);
+            return (null!, type);
         }).Where(x => x.key != null)
-            .ToLookup(x => x.key, x => x.type);
+            .ToLookup(x => x.key!, x => x.type);
     }
 
 
-    protected ExternalType TryFindModuleType(string fullName, string containingAssembly)
+    protected ExternalType? TryFindModuleType(string fullName, string? containingAssembly)
     {
         var nonGeneric = fullName;
         var genericIdx = nonGeneric.IndexOf('`', StringComparison.Ordinal);
         if (genericIdx >= 0)
             nonGeneric = nonGeneric[..genericIdx];
 
-        ExternalType scriptType;
+        ExternalType? scriptType;
         if (nonGeneric.Contains(':'))
         {
             scriptType = GetScriptType(nonGeneric);

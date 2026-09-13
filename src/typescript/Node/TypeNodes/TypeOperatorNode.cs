@@ -6,7 +6,7 @@ public class TypeOperatorNode(SyntaxKind op, ITypeNode type)
     public SyntaxKind Operator { get; } = op;
     public ITypeNode Type { get; } = type;
 
-    public IEnumerable<INode> GetRestChildren()
+    public IEnumerable<INode?> GetRestChildren()
     {
         return [Type];
     }

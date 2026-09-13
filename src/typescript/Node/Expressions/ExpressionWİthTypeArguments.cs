@@ -6,7 +6,7 @@ public class ExpressionWithTypeArguments(ILeftHandSideExpression expression, Nod
     public ILeftHandSideExpression Expression { get; } = expression;
     public NodeArray<ITypeNode> TypeArguments { get; } = typeArguments;
 
-    public IEnumerable<INode> GetRestChildren()
+    public IEnumerable<INode?> GetRestChildren()
     {
         yield return Expression;
         if (TypeArguments != null) foreach (var x in TypeArguments) yield return x;

@@ -9,7 +9,7 @@ public class ForStatement(IForInitializer initializer,
     public IExpression Condition { get; } = condition;
     public IExpression Incrementor { get; } = incrementor;
 
-    public override IEnumerable<INode> GetRestChildren()
+    public override IEnumerable<INode?> GetRestChildren()
     {
         return [Initializer, Condition, Incrementor, Statement];
     }

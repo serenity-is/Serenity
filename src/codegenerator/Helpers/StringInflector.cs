@@ -76,7 +76,7 @@ public static partial class Inflector
         private readonly Regex _regex = new(pattern, RegexOptions.IgnoreCase);
         private readonly string _replacement = replacement;
 
-        public string Apply(string word)
+        public string? Apply(string word)
         {
             if (!_regex.IsMatch(word))
             {
@@ -130,8 +130,10 @@ public static partial class Inflector
         {
             for (int i = rules.Count - 1; i >= 0; i--)
             {
-                if ((result = rules[i].Apply(word)) != null)
+                var applied = rules[i].Apply(word);
+                if (applied != null)
                 {
+                    result = applied;
                     break;
                 }
             }

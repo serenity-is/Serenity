@@ -13,10 +13,10 @@ public class DotNetCorePathFinder
         public readonly string Name;
         public readonly string Version;
         public readonly string Type;
-        public readonly string Path;
+        public readonly string? Path;
         public readonly string[] RuntimeComponents;
 
-        public DotNetCorePackageInfo(string fullName, string type, string path, string[] runtimeComponents)
+        public DotNetCorePackageInfo(string fullName, string type, string? path, string[] runtimeComponents)
         {
             var parts = fullName.Split('/');
             Name = parts[0];
@@ -40,20 +40,20 @@ public class DotNetCorePathFinder
         "Microsoft.AspNetCore.All"
     ];
 
-    readonly Dictionary<string, DotNetCorePackageInfo> packages;
+    readonly Dictionary<string, DotNetCorePackageInfo> packages = null!;
     readonly HashSet<string> packageBasePaths = new(StringComparer.Ordinal);
     readonly string assemblyName;
     readonly string basePath;
     readonly Version version;
-    readonly string dotnetBasePath = FindDotNetExeDirectory();
+    readonly string? dotnetBasePath = FindDotNetExeDirectory();
     readonly List<string> searchPaths = [];
-    ILookup<string, string> packageLocationByName;
+    ILookup<string, string>? packageLocationByName;
 
     public DotNetCorePathFinder(string parentAssemblyFileName, string targetFrameworkId, UniversalAssemblyResolver.TargetFrameworkIdentifier targetFramework, 
         Version version)
     {
         assemblyName = Path.GetFileNameWithoutExtension(parentAssemblyFileName);
-        basePath = Path.GetDirectoryName(parentAssemblyFileName);
+        basePath = Path.GetDirectoryName(parentAssemblyFileName)!;
 
         searchPaths.Add(basePath);
 
@@ -99,12 +99,12 @@ public class DotNetCorePathFinder
                 foreach (var item in pk.Value.RuntimeComponents)
                 {
                     var itemPath = Path.GetDirectoryName(item);
-                    var fullPath = Path.Combine(path, pk.Value.Name, pk.Value.Version, itemPath);
+                    var fullPath = Path.Combine(path, pk.Value.Name, pk.Value.Version, itemPath!);
                     if (Directory.Exists(fullPath))
                         packageBasePaths.Add(fullPath);
                     else
                     {
-                        fullPath = Path.Combine(path, pk.Value.Name?.ToLowerInvariant(), pk.Value.Version, itemPath);
+                        fullPath = Path.Combine(path, pk.Value.Name.ToLowerInvariant(), pk.Value.Version, itemPath!);
                         if (Directory.Exists(fullPath))
                             packageBasePaths.Add(fullPath);
                     }
@@ -152,14 +152,14 @@ public class DotNetCorePathFinder
             packageLocationByName = packageBasePaths.Concat(searchPaths).Concat(runtimeDirs).SelectMany(x =>
                 Directory.GetFiles(x, "*.dll")
                     .Concat(Directory.GetFiles(x, "*.exe")))
-                .ToLookup(Path.GetFileNameWithoutExtension, StringComparer.OrdinalIgnoreCase);
+                .ToLookup(x => Path.GetFileNameWithoutExtension(x)!, StringComparer.OrdinalIgnoreCase);
 
             return packageLocationByName;
         }
     }
 
 
-    public string TryResolveDotNetCore(AssemblyNameReference name)
+    public string? TryResolveDotNetCore(AssemblyNameReference name)
     {
         return PackageLocationByName[name.Name].FirstOrDefault();
     }
@@ -172,27 +172,27 @@ public class DotNetCorePathFinder
         {
             case UniversalAssemblyResolver.TargetFrameworkIdentifier.NETCoreApp:
                 identifier = "Microsoft.NETCore.App";
-                identifierExt = "netcoreapp" + version.Major + "." + version.Minor;
+                identifierExt = "netcoreapp" + version!.Major + "." + version.Minor;
                 break;
             case UniversalAssemblyResolver.TargetFrameworkIdentifier.NETStandard:
                 identifier = "NETStandard.Library";
-                identifierExt = "netstandard" + version.Major + "." + version.Minor;
+                identifierExt = "netstandard" + version!.Major + "." + version.Minor;
                 break;
             default:
                 throw new NotSupportedException();
         }
-        return Path.Combine(dotnetBasePath, "packs", identifier + ".Ref", version.ToString(), "ref", identifierExt);
+        return Path.Combine(dotnetBasePath!, "packs", identifier + ".Ref", version!.ToString(), "ref", identifierExt);
     }
 
     static IEnumerable<DotNetCorePackageInfo> LoadPackageInfos(string depsJsonFileName, string targetFramework)
     {
         var dependencies = JObject.Parse(File.ReadAllText(depsJsonFileName));
-        var runtimeInfos = dependencies["targets"][targetFramework].Children().OfType<JProperty>().ToArray();
-        var libraries = dependencies["libraries"].Children().OfType<JProperty>().ToArray();
+        var runtimeInfos = dependencies["targets"]![targetFramework]!.Children().OfType<JProperty>().ToArray();
+        var libraries = dependencies["libraries"]!.Children().OfType<JProperty>().ToArray();
 
         foreach (var library in libraries)
         {
-            var type = library.First()["type"].ToString();
+            var type = library.First()["type"]!.ToString();
             var path = library.First()["path"]?.ToString();
             var rti = runtimeInfos.FirstOrDefault(r => r.Name == library.Name)?.First();
             var runtimeInfo = (rti?["runtime"]?.Children().OfType<JProperty>().Select(i => i.Name) ?? [])
@@ -205,7 +205,7 @@ public class DotNetCorePathFinder
 
     static string GetClosestVersionFolder(string basePath, Version version)
     {
-        string result = null;
+        string? result = null;
         foreach (var folder in new DirectoryInfo(basePath).GetDirectories()
             .Select(d => ConvertToVersion(d.Name)).Where(v => v.Item1 != null).OrderByDescending(v => v.Item1))
         {
@@ -215,16 +215,16 @@ public class DotNetCorePathFinder
         return result ?? version.ToString();
     }
 
-    internal static Tuple<Version, string> ConvertToVersion(string name)
+    internal static Tuple<Version?, string?> ConvertToVersion(string name)
     {
         try
         {
-            return new Tuple<Version, string>(new Version(RemoveTrailingVersionInfo(name)), name);
+            return new Tuple<Version?, string?>(new Version(RemoveTrailingVersionInfo(name)), name);
         }
         catch (Exception ex)
         {
             Trace.TraceWarning(ex.ToString());
-            return new Tuple<Version, string>(null, null);
+            return new Tuple<Version?, string?>(null, null);
         }
     }
 
@@ -239,10 +239,10 @@ public class DotNetCorePathFinder
         return shortName;
     }
 
-    static string FindDotNetExeDirectory()
+    static string? FindDotNetExeDirectory()
     {
         string dotnetExeName = (Environment.OSVersion.Platform == PlatformID.Unix) ? "dotnet" : "dotnet.exe";
-        foreach (var item in Environment.GetEnvironmentVariable("PATH").Split(Path.PathSeparator))
+        foreach (var item in Environment.GetEnvironmentVariable("PATH")!.Split(Path.PathSeparator))
         {
             try
             {
@@ -272,7 +272,7 @@ public class DotNetCorePathFinder
 #pragma warning restore CA2101 // Specify marshaling for P/Invoke string arguments
     static extern void realpath(string path, StringBuilder resolvedPath);
 
-    public static string DetectTargetFrameworkId(AssemblyDefinition assembly)
+    public static string? DetectTargetFrameworkId(AssemblyDefinition assembly)
     {
         ArgumentNullException.ThrowIfNull(assembly);
 
@@ -292,7 +292,7 @@ public class DotNetCorePathFinder
         return string.Empty;
     }
 
-    public static string ReadSerString(byte[] buffer, int position)
+    public static string? ReadSerString(byte[] buffer, int position)
     {
         if (buffer[position] == 0xff)
             return null;

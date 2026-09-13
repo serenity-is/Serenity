@@ -8,7 +8,7 @@ public class NewExpression(IExpression expression, NodeArray<ITypeNode> typeArgu
     public NodeArray<ITypeNode> TypeArguments { get; } = typeArguments;
     public NodeArray<IExpression> Arguments { get; } = argumentsArray;
 
-    public IEnumerable<INode> GetRestChildren()
+    public IEnumerable<INode?> GetRestChildren()
     {
         yield return Expression;
         if (TypeArguments != null) foreach (var x in TypeArguments) yield return x;

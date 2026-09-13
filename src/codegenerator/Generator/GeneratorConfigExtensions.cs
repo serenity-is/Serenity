@@ -14,9 +14,10 @@ public static class GeneratorConfigExtensions
     {
         ArgumentNullException.ThrowIfNull(config);
 
-        config.Connections.Sort((x, y) => string.Compare(x.Key, y.Key, StringComparison.OrdinalIgnoreCase));
-        foreach (var c in config.Connections)
-            c.Tables.Sort((x, y) => string.Compare(x.Tablename, y.Tablename, StringComparison.OrdinalIgnoreCase));
+        config.Connections?.Sort((x, y) => string.Compare(x.Key, y.Key, StringComparison.OrdinalIgnoreCase));
+        if (config.Connections != null)
+            foreach (var c in config.Connections)
+                c.Tables?.Sort((x, y) => string.Compare(x.Tablename, y.Tablename, StringComparison.OrdinalIgnoreCase));
 
         using var sw = new StringWriter();
         using var jw = new Newtonsoft.Json.JsonTextWriter(sw)
@@ -65,13 +66,13 @@ public static class GeneratorConfigExtensions
         if (!string.IsNullOrEmpty(config.RootNamespace))
             return config.RootNamespace;
 
-        string rootNamespace = projectInfo.GetRootNamespace();
+        string? rootNamespace = projectInfo.GetRootNamespace();
         rootNamespace ??= projectInfo.FileSystem.GetFileNameWithoutExtension(projectInfo.ProjectFile);
 
         if (rootNamespace?.EndsWith(".Web", StringComparison.OrdinalIgnoreCase) == true)
             rootNamespace = rootNamespace[0..^4];
 
-        return rootNamespace;
+        return rootNamespace!;
     }
 
     /// <summary>
@@ -90,7 +91,7 @@ public static class GeneratorConfigExtensions
         if (!string.IsNullOrEmpty(filename))
             path = fileSystem.Combine(path, filename);
 
-        GeneratorConfig config;
+        GeneratorConfig? config;
         if (!fileSystem.FileExists(path))
             config = new GeneratorConfig();
         else
@@ -102,7 +103,7 @@ public static class GeneratorConfigExtensions
                 getDefault: GeneratorDefaults.TryParse);
         }
 
-        config.Connections ??= [];
+        config!.Connections ??= [];
         config.RemoveForeignFields ??= [];
         return config;
     }

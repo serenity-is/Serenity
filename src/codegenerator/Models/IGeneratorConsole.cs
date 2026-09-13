@@ -7,7 +7,7 @@ public interface IGeneratorConsole
 #if !ISSOURCEGENERATOR
     T Prompt<T>(Spectre.Console.IPrompt<T> prompt);
 #endif
-    string ReadLine();
+    string? ReadLine();
     void ShowHelp(string message);
     void Write(string message);
     void Write(string message, ConsoleColor color);

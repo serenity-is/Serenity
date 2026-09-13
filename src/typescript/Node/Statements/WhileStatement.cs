@@ -6,7 +6,7 @@ public class WhileStatement(IExpression expression, IStatement statement)
 {
     public IExpression Expression { get; } = expression;
 
-    public override IEnumerable<INode> GetRestChildren()
+    public override IEnumerable<INode?> GetRestChildren()
     {
         return [Expression, Statement];
     }

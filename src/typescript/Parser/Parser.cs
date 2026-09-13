@@ -10,24 +10,24 @@ public class Parser
 {
     private readonly Scanner scanner = new(ScriptTarget.Latest, skipTrivia: true);
     private readonly NodeFlags disAllowInAndDecoratorContext = NodeFlags.DisallowInContext | NodeFlags.DecoratorContext;
-    private string fileName;
+    private string fileName = null!;
     private NodeFlags sourceFlags;
-    private string sourceText;
+    private string? sourceText;
     private ScriptTarget languageVersion;
     private LanguageVariant languageVariant;
-    public List<Diagnostic> parseDiagnostics;
-    private ISyntaxCursor syntaxCursor;
+    public List<Diagnostic> parseDiagnostics = null!;
+    private ISyntaxCursor? syntaxCursor;
 
     private SyntaxKind currentToken;
     private int nodeCount;
-    private HashSet<string> identifiers;
+    private HashSet<string> identifiers = null!;
     private int identifierCount;
 
     // TODO(jakebailey): This type is a lie; this value actually contains the result
     // of ORing a bunch of `1 << ParsingContext.XYZ`.
     private ParsingContext parsingContext;
 
-    private HashSet<int> notParenthesizedArrow;
+    private HashSet<int> notParenthesizedArrow = null!;
 
     // Flags that dictate what parsing context we're in.  For example:
     // Whether or not we are in strict parsing mode.  All that changes in strict parsing mode is
@@ -114,8 +114,8 @@ public class Parser
     }
 
     public SourceFile ParseSourceFile(string fileName, string sourceText, ScriptTarget languageVersion = ScriptTarget.Latest,
-        ISyntaxCursor syntaxCursor = null, bool setParentNodes = true, ScriptKind scriptKind = ScriptKind.Unknown,
-        Action<SourceFile> setExternalModuleIndicatorOverride = null,
+        ISyntaxCursor? syntaxCursor = null, bool setParentNodes = true, ScriptKind scriptKind = ScriptKind.Unknown,
+        Action<SourceFile>? setExternalModuleIndicatorOverride = null,
         JSDocParsingMode jsDocParsingMode = JSDocParsingMode.ParseNone)
     {
         scriptKind = EnsureScriptKind(fileName, scriptKind);
@@ -133,7 +133,7 @@ public class Parser
         return result;
     }
 
-    private void InitializeState(string fileName, string sourceText, ScriptTarget languageVersion, ISyntaxCursor syntaxCursor,
+    private void InitializeState(string fileName, string sourceText, ScriptTarget languageVersion, ISyntaxCursor? syntaxCursor,
         ScriptKind scriptKind, JSDocParsingMode jsDocParsingMode)
     {
         this.fileName = NormalizePath(fileName);
@@ -182,11 +182,11 @@ public class Parser
         syntaxCursor = null;
         languageVariant = LanguageVariant.Standard;
         sourceFlags = 0;
-        parseDiagnostics = null;
+        parseDiagnostics = null!;
         //jsDocDiagnostics = null;
         parsingContext = 0;
-        identifiers = null;
-        notParenthesizedArrow = null;
+        identifiers = null!;
+        notParenthesizedArrow = null!;
         topLevel = true;
     }
 
@@ -209,7 +209,7 @@ public class Parser
         var endHasJSDoc = HasPrecedingJSDocComment();
         var endOfFileToken = WithJSDoc(ParseTokenNode<EndOfFileToken>(), endHasJSDoc);
 
-        var sourceFile = new SourceFile(sourceText, fileName, languageVersion, scriptKind,
+        var sourceFile = new SourceFile(sourceText!, fileName, languageVersion, scriptKind,
             isDeclarationFile, statements, endOfFileToken, sourceFlags);
         
         setExternalModuleIndicator(sourceFile);
@@ -438,14 +438,14 @@ public class Parser
         return InContext(NodeFlags.AwaitContext);
     }
 
-    Diagnostic ParseErrorAtPosition(int start, int length, DiagnosticMessage message, object args)
+    Diagnostic? ParseErrorAtPosition(int start, int length, DiagnosticMessage message, object? args)
     {
-        Diagnostic result = null;
+        Diagnostic? result = null;
         // Don't report another error if it would just be at the same position as the last error.
         var lastError = parseDiagnostics.LastOrDefault();
         if (lastError == null || start == lastError.Start)
         {
-            result = CreateDetachedDiagnostic(fileName, sourceText, start, length, message, args);
+            result = CreateDetachedDiagnostic(fileName, sourceText!, start, length, message, args);
             parseDiagnostics.Add(result);
         }
 
@@ -455,22 +455,22 @@ public class Parser
         return result;
     }
 
-    Diagnostic ParseErrorAtCurrentToken(DiagnosticMessage message, object arg0 = null)
+    Diagnostic? ParseErrorAtCurrentToken(DiagnosticMessage message, object? arg0 = null)
     {
         return ParseErrorAt(scanner.GetTokenStart(), scanner.GetTokenEnd(), message, arg0);
     }
 
-    Diagnostic ParseErrorAt(int start, int end, DiagnosticMessage message, object arg0 = null)
+    Diagnostic? ParseErrorAt(int start, int end, DiagnosticMessage message, object? arg0 = null)
     {
         return ParseErrorAtPosition(start, end - start, message, arg0);
     }
 
-    void ParseErrorAtRange(ITextRange range, DiagnosticMessage message, object arg0 = null)
+    void ParseErrorAtRange(ITextRange range, DiagnosticMessage message, object? arg0 = null)
     {
         ParseErrorAt(range.Pos ?? 0, range.End ?? range.Pos ?? 0, message, arg0);
     }
 
-    void ScanError(DiagnosticMessage message, int length, object arg0 = null)
+    void ScanError(DiagnosticMessage message, int length, object? arg0 = null)
     {
         ParseErrorAtPosition(scanner.GetTokenEnd(), length, message, arg0);
     }
@@ -650,7 +650,7 @@ public class Parser
         return Token() > SyntaxKindMarker.LastReservedWord;
     }
 
-    bool ParseExpected(SyntaxKind kind, DiagnosticMessage diagnosticMessage = null, bool shouldAdvance = true)
+    bool ParseExpected(SyntaxKind kind, DiagnosticMessage? diagnosticMessage = null, bool shouldAdvance = true)
     {
         if (Token() == kind)
         {
@@ -684,19 +684,19 @@ public class Parser
         //   ^^^^^^^^^^^ This block is parsed as a template literal like module`M1`.
         if (node is TaggedTemplateExpression tte)
         {
-            ParseErrorAt(SkipTrivia(sourceText, tte.Template.Pos) ?? 0, tte.Template.End ?? 0, Diagnostics.Module_declaration_names_may_only_use_or_quoted_strings);
+            ParseErrorAt(SkipTrivia(sourceText!, tte.Template.Pos) ?? 0, tte.Template.End ?? 0, Diagnostics.Module_declaration_names_may_only_use_or_quoted_strings);
             return;
         }
 
         // Otherwise, if this isn't a well-known keyword-like identifier, give the generic fallback message.
         var expressionText = node is Identifier id ? IdText(id) : null;
-        if (string.IsNullOrEmpty(expressionText) || !IsIdentifierText(expressionText, languageVersion))
+        if (string.IsNullOrEmpty(expressionText) || !IsIdentifierText(expressionText!, languageVersion))
         {
             ParseErrorAtCurrentToken(Diagnostics._0_expected, TokenToString(SyntaxKind.SemicolonToken));
             return;
         }
 
-        var pos = SkipTrivia(sourceText, node.Pos) ?? 0;
+        var pos = SkipTrivia(sourceText!, node.Pos) ?? 0;
 
         // Some known keywords are likely signs of syntax being used improperly.
         switch (expressionText)
@@ -764,7 +764,7 @@ public class Parser
         }
     }
 
-    void ParseSemicolonAfterPropertyName(IPropertyName name, ITypeNode type, IExpression initializer)
+    void ParseSemicolonAfterPropertyName(IPropertyName name, ITypeNode? type, IExpression? initializer)
     {
         if (Token() == SyntaxKind.AtToken && !scanner.HasPrecedingLineBreak())
         {
@@ -830,7 +830,7 @@ public class Parser
         return false;
     }
 
-    T ParseOptionalToken<T>(SyntaxKind t) where T : class, INode, new()
+    T? ParseOptionalToken<T>(SyntaxKind t) where T : class, INode, new()
     {
         if (Token() == t)
         {
@@ -839,7 +839,7 @@ public class Parser
         return null;
     }
 
-    T ParseExpectedToken<T>(SyntaxKind t, DiagnosticMessage diagnosticMessage = null, string arg0 = null) where T : class, INode, new()
+    T? ParseExpectedToken<T>(SyntaxKind t, DiagnosticMessage? diagnosticMessage = null, string? arg0 = null) where T : class, INode, new()
     {
         return ParseOptionalToken<T>(t) ??
             CreateMissingNode<T>(t, reportAtCurrentPosition: false, diagnosticMessage ?? Diagnostics._0_expected, arg0 ?? TokenToString(t));
@@ -917,12 +917,12 @@ public class Parser
         return node;
     }
 
-    T CreateMissingNode<T>(SyntaxKind kind, bool reportAtCurrentPosition, DiagnosticMessage diagnosticMessage = null, object arg0 = null)
+    T CreateMissingNode<T>(SyntaxKind kind, bool reportAtCurrentPosition, DiagnosticMessage? diagnosticMessage = null, object? arg0 = null)
         where T : INode
     {
         if (reportAtCurrentPosition)
         {
-            ParseErrorAtPosition(scanner.GetTokenFullStart(), 0, diagnosticMessage, arg0);
+            ParseErrorAtPosition(scanner.GetTokenFullStart(), 0, diagnosticMessage!, arg0);
         }
         else if (diagnosticMessage != null)
         {
@@ -937,7 +937,7 @@ public class Parser
             kind == SyntaxKind.MissingDeclaration ? new MissingDeclaration() :
             Activator.CreateInstance(typeof(T));
 
-        return FinishNode((T)result, pos);
+        return FinishNode((T)result!, pos);
     }
 
     string InternIdentifier(string text)
@@ -950,7 +950,7 @@ public class Parser
     // An identifier that starts with two underscores has an extra underscore character prepended to it to avoid issues
     // with magic property names like '__proto__'. The 'identifiers' object is used to share a single string instance for
     // each identifier in order to reduce memory consumption.
-    Identifier CreateIdentifier(bool isIdentifier, DiagnosticMessage diagnosticMessage = null, DiagnosticMessage privateIdentifierDiagnosticMessage = null)
+    Identifier CreateIdentifier(bool isIdentifier, DiagnosticMessage? diagnosticMessage = null, DiagnosticMessage? privateIdentifierDiagnosticMessage = null)
     {
         if (isIdentifier)
         {
@@ -990,17 +990,17 @@ public class Parser
         return CreateMissingNode<Identifier>(SyntaxKind.Identifier, reportAtCurrentPosition, diagnosticMessage ?? defaultMessage, msgArg);
     }
 
-    Identifier ParseBindingIdentifier(DiagnosticMessage privateIdentifierDiagnosticMessage = null)
+    Identifier ParseBindingIdentifier(DiagnosticMessage? privateIdentifierDiagnosticMessage = null)
     {
         return CreateIdentifier(IsBindingIdentifier(), diagnosticMessage: null, privateIdentifierDiagnosticMessage);
     }
 
-    Identifier ParseIdentifier(DiagnosticMessage diagnosticMessage = null, DiagnosticMessage privateIdentifierDiagnosticMessage = null)
+    Identifier ParseIdentifier(DiagnosticMessage? diagnosticMessage = null, DiagnosticMessage? privateIdentifierDiagnosticMessage = null)
     {
         return CreateIdentifier(IsIdentifier(), diagnosticMessage, privateIdentifierDiagnosticMessage);
     }
 
-    Identifier ParseIdentifierName(DiagnosticMessage diagnosticMessage = null)
+    Identifier ParseIdentifierName(DiagnosticMessage? diagnosticMessage = null)
     {
         return CreateIdentifier(TokenIsIdentifierOrKeyword(Token()), diagnosticMessage);
     }
@@ -1031,7 +1031,7 @@ public class Parser
         if (Token() == SyntaxKind.StringLiteral || Token() == SyntaxKind.NumericLiteral || Token() == SyntaxKind.BigIntLiteral)
         {
             var node = ParseLiteralNode<ILiteralExpression>();
-            node.Text = InternIdentifier(node.Text);
+            node.Text = InternIdentifier(node.Text!);
             return (IPropertyName)node;
         }
         if (allowComputedPropertyNames && Token() == SyntaxKind.OpenBracketToken)
@@ -1138,7 +1138,7 @@ public class Parser
         return IsModifierKind(Token()) && TryParse(NextTokenCanFollowModifier);
     }
 
-    NodeArray<TypeParameterDeclaration> ParseTypeParameters()
+    NodeArray<TypeParameterDeclaration>? ParseTypeParameters()
     {
         if (Token() == SyntaxKind.LessThanToken)
         {
@@ -1463,7 +1463,7 @@ public class Parser
         return parseElement();
     }
 
-    INode CurrentNode(ParsingContext parsingContext, int? pos = null)
+    INode? CurrentNode(ParsingContext parsingContext, int? pos = null)
     {
         // If we don't have a cursor or the parsing context isn't reusable, there's nothing to reuse.
         //
@@ -1575,7 +1575,7 @@ public class Parser
                     // may have a method calls "constructor(...)" and we must reparse that
                     // into an actual .ConstructorDeclaration.
                     var methodDeclaration = node as MethodDeclaration;
-                    var nameIsConstructor = methodDeclaration.Name.Kind == SyntaxKind.Identifier &&
+                    var nameIsConstructor = methodDeclaration!.Name!.Kind == SyntaxKind.Identifier &&
                         methodDeclaration.Name is Identifier { EscapedText: "constructor" };
 
                     return !nameIsConstructor;
@@ -1715,7 +1715,7 @@ public class Parser
         return false;
     }
 
-    Diagnostic ParsingContextErrors(ParsingContext context)
+    Diagnostic? ParsingContextErrors(ParsingContext context)
     {
         switch (context)
         {
@@ -1740,7 +1740,7 @@ public class Parser
                 return ParseErrorAtCurrentToken(Diagnostics.Expression_expected);
             case ParsingContext.VariableDeclarations:
                 return IsKeyword(Token())
-                    ? ParseErrorAtCurrentToken(Diagnostics._0_is_not_allowed_as_a_variable_declaration_name, TokenToString(Token())!)
+                    ? ParseErrorAtCurrentToken(Diagnostics._0_is_not_allowed_as_a_variable_declaration_name, TokenToString(Token()))
                     : ParseErrorAtCurrentToken(Diagnostics.Variable_declaration_expected);
             case ParsingContext.ObjectBindingElements:
                 return ParseErrorAtCurrentToken(Diagnostics.Property_destructuring_pattern_expected);
@@ -1756,7 +1756,7 @@ public class Parser
                 return ParseErrorAtCurrentToken(Diagnostics.Parameter_declaration_expected);
             case ParsingContext.Parameters:
                 return IsKeyword(Token())
-                    ? ParseErrorAtCurrentToken(Diagnostics._0_is_not_allowed_as_a_parameter_name, TokenToString(Token())!)
+                    ? ParseErrorAtCurrentToken(Diagnostics._0_is_not_allowed_as_a_parameter_name, TokenToString(Token()))
                     : ParseErrorAtCurrentToken(Diagnostics.Parameter_declaration_expected);
             case ParsingContext.TypeParameters:
                 return ParseErrorAtCurrentToken(Diagnostics.Type_parameter_declaration_expected);
@@ -1787,7 +1787,7 @@ public class Parser
         }
     }
 
-    NodeArray<T> ParseDelimitedList<T>(ParsingContext kind, Func<T> parseElement, bool considerSemicolonAsDelimiter = false) where T : INode
+    NodeArray<T>? ParseDelimitedList<T>(ParsingContext kind, Func<T> parseElement, bool considerSemicolonAsDelimiter = false) where T : INode
     {
         var saveParsingContext = parsingContext;
         parsingContext |= (ParsingContext)(1 << (int)kind);
@@ -1866,7 +1866,7 @@ public class Parser
         return CreateNodeArray(list, listPos, hasTrailingComma: commaStart >= 0);
     }
 
-    static DiagnosticMessage GetExpectedCommaDiagnostic(ParsingContext kind)
+    static DiagnosticMessage? GetExpectedCommaDiagnostic(ParsingContext kind)
     {
         return kind == ParsingContext.EnumMembers ? Diagnostics.An_enum_member_name_must_be_followed_by_a_or : null;
     }
@@ -1889,13 +1889,13 @@ public class Parser
         {
             var result = ParseDelimitedList(kind, parseElement);
             ParseExpected(close);
-            return result;
+            return result!;
         }
 
         return CreateMissingList<T>();
     }
 
-    IEntityName ParseEntityName(bool allowReservedWords, DiagnosticMessage diagnosticMessage = null)
+    IEntityName ParseEntityName(bool allowReservedWords, DiagnosticMessage? diagnosticMessage = null)
     {
         IEntityName entity = allowReservedWords ? ParseIdentifierName(diagnosticMessage) : ParseIdentifier(diagnosticMessage);
         while (ParseOptional(SyntaxKind.DotToken))
@@ -2074,7 +2074,7 @@ public class Parser
         where TLiteral : ILiteralLikeNode
     {
         var pos = GetNodePos();
-        ILiteralLikeNode node = IsTemplateLiteralKind(kind) ? CreateTemplateLiteralLikeNode(kind, scanner.GetTokenValue(),
+        ILiteralLikeNode? node = IsTemplateLiteralKind(kind) ? CreateTemplateLiteralLikeNode(kind, scanner.GetTokenValue(),
             GetTemplateLiteralRawText(kind), scanner.GetTokenFlags() & TokenFlags.TemplateLiteralLikeFlags) :
             // Note that theoretically the following condition would hold true literals like 009,
             // which is not octal. But because of how the scanner separates the tokens, we would
@@ -2088,16 +2088,16 @@ public class Parser
 
         if (scanner.HasExtendedUnicodeEscape())
         {
-            node.HasExtendedUnicodeEscape = true;
+            node!.HasExtendedUnicodeEscape = true;
         }
 
         if (scanner.IsUnterminated())
         {
-            node.IsUnterminated = true;
+            node!.IsUnterminated = true;
         }
 
         NextToken();
-        return (TLiteral)FinishNode(node, pos);
+        return (TLiteral)FinishNode(node!, pos);
     }
 
     // TYPES
@@ -2106,7 +2106,7 @@ public class Parser
         return ParseEntityName(allowReservedWords: true, Diagnostics.Type_expected);
     }
 
-    NodeArray<ITypeNode> ParseTypeArgumentsOfTypeReference()
+    NodeArray<ITypeNode>? ParseTypeArgumentsOfTypeReference()
     {
         if (!scanner.HasPrecedingLineBreak() && ReScanLessThanToken() == SyntaxKind.LessThanToken)
         {
@@ -2120,7 +2120,7 @@ public class Parser
     {
         var pos = GetNodePos();
         return FinishNode(new TypeReferenceNode(ParseEntityNameOfTypeReference(),
-            ParseTypeArgumentsOfTypeReference()), pos);
+            ParseTypeArgumentsOfTypeReference()!), pos);
     }
 
     // If true, we should abort parsing an error function.
@@ -2129,15 +2129,15 @@ public class Parser
         switch (node.Kind)
         {
             case SyntaxKind.TypeReference:
-                return NodeIsMissing((node as TypeReferenceNode).TypeName);
+                return NodeIsMissing((node as TypeReferenceNode)!.TypeName);
             case SyntaxKind.FunctionType:
             case SyntaxKind.ConstructorType:
                 {
                     var n = node as IFunctionOrConstructorTypeNode;
-                    return IsMissingList(n?.Parameters) || TypeHasArrowFunctionBlockingParseError(n?.Type);
+                    return IsMissingList(n!.Parameters!) || TypeHasArrowFunctionBlockingParseError(n!.Type!);
                 }
             case SyntaxKind.ParenthesizedType:
-                return TypeHasArrowFunctionBlockingParseError((node as ParenthesizedTypeNode)?.Type);
+                return TypeHasArrowFunctionBlockingParseError((node as ParenthesizedTypeNode)!.Type);
             default:
                 return false;
         }
@@ -2146,7 +2146,7 @@ public class Parser
     TypePredicateNode ParseThisTypePredicate(ThisTypeNode lhs)
     {
         NextToken();
-        return FinishNode(new TypePredicateNode(null, lhs, ParseType()), lhs.Pos ?? 0);
+        return FinishNode(new TypePredicateNode(null!, lhs, ParseType()), lhs.Pos ?? 0);
     }
 
     ThisTypeNode ParseThisTypeNode()
@@ -2213,13 +2213,13 @@ public class Parser
             var type = ParseReturnType(SyntaxKind.ColonToken, isType: false);
             return WithJSDoc(FinishNode(new JSDocFunctionType(parameters, type), pos), hasJSDoc);
         }
-        return FinishNode(new TypeReferenceNode(ParseIdentifierName(), typeArguments: null), pos);
+        return FinishNode(new TypeReferenceNode(ParseIdentifierName(), typeArguments: null!), pos);
     }
 
     ParameterDeclaration ParseJSDocParameter()
     {
         var pos = GetNodePos();
-        Identifier name = null;
+        Identifier? name = null;
         if (Token() == SyntaxKind.ThisKeyword || Token() == SyntaxKind.NewKeyword)
         {
             name = ParseIdentifierName();
@@ -2229,7 +2229,7 @@ public class Parser
             new ParameterDeclaration(modifiers: null,
                 dotDotDotToken: null,
                 // TODO(rbuckton): JSDoc parameters don't have names (except `this`/`new`), should we manufacture an empty identifier?
-                name: name,
+                name: name!,
                 questionToken: null,
                 type: ParseJSDocType(),
                 initializer: null), pos);
@@ -2242,7 +2242,7 @@ public class Parser
         if (ParseOptional(SyntaxKind.ModuleKeyword))
         {
             // TODO(rbuckton): We never set the type for a JSDocNamepathType. What should we put here?
-            var moduleTag = new JSDocNamepathType(type: null);
+            var moduleTag = new JSDocNamepathType(type: null!);
             while (true)
             {
                 switch (Token())
@@ -2286,7 +2286,7 @@ public class Parser
         var entityName = ParseEntityName(allowReservedWords: true);
         // Make sure we perform ASI to prevent parsing the next line's type arguments as part of an instantiation expression.
         var typeArguments = !scanner.HasPrecedingLineBreak() ? TryParseTypeArguments() : null;
-        return FinishNode(new TypeQueryNode(entityName, typeArguments), pos);
+        return FinishNode(new TypeQueryNode(entityName, typeArguments!), pos);
     }
 
     TypeParameterDeclaration ParseTypeParameter()
@@ -2294,8 +2294,8 @@ public class Parser
         var pos = GetNodePos();
         var modifiers = ParseModifiers(allowDecorators: false, permitConstAsModifier: true);
         var name = ParseIdentifier();
-        ITypeNode constraint = null;
-        IExpression expression = null;
+        ITypeNode? constraint = null;
+        IExpression? expression = null;
         if (ParseOptional(SyntaxKind.ExtendsKeyword))
         {
             // It's not uncommon for people to write improper constraints to a generic.  If the
@@ -2409,7 +2409,7 @@ public class Parser
 
         if (!allowAmbiguity && !IsParameterNameStart())
         {
-            return null;
+            return null!;
         }
 
         node = WithJSDoc(
@@ -2428,7 +2428,7 @@ public class Parser
             return AllowConditionalTypesAnd(ParseTypeOrTypePredicate);
         }
 
-        return null;
+        return null!;
     }
 
     bool ShouldParseReturnType(SyntaxKind returnToken, bool isType)
@@ -2480,7 +2480,7 @@ public class Parser
         SetYieldContext(savedYieldContext);
         SetAwaitContext(savedAwaitContext);
 
-        return parameters;
+        return parameters!;
     }
 
     NodeArray<ParameterDeclaration> ParseParameters(SignatureFlags flags)
@@ -2535,8 +2535,8 @@ public class Parser
         var type = ParseReturnType(SyntaxKind.ColonToken, isType: true);
         ParseTypeMemberSemicolon();
         ITypeElement node = kind == SyntaxKind.CallSignature
-            ? new CallSignatureDeclaration(typeParameters, parameters, type)
-            : new ConstructSignatureDeclaration(typeParameters, parameters, type);
+            ? new CallSignatureDeclaration(typeParameters!, parameters, type)
+            : new ConstructSignatureDeclaration(typeParameters!, parameters, type);
         return WithJSDoc(FinishNode(node, pos), hasJSDoc);
     }
 
@@ -2639,7 +2639,7 @@ public class Parser
             // Although type literal properties cannot not have initializers, we attempt
             // to parse an initializer so we can report in the checker that an interface
             // property or type literal property cannot have an initializer.
-            if (Token() == SyntaxKind.EqualsToken) (node as PropertySignature).Initializer = ParseInitializer();
+            if (Token() == SyntaxKind.EqualsToken) (node as PropertySignature)!.Initializer = ParseInitializer();
         }
         ParseTypeMemberSemicolon();
         return WithJSDoc(FinishNode(node, pos), hasJSDoc);
@@ -2791,7 +2791,7 @@ public class Parser
     {
         var pos = GetNodePos();
         ParseExpected(SyntaxKind.OpenBraceToken);
-        Token readonlyToken = null;
+        Token? readonlyToken = null;
         if (Token() == SyntaxKind.ReadonlyKeyword || Token() == SyntaxKind.PlusToken || Token() == SyntaxKind.MinusToken)
         {
             readonlyToken = ParseTokenNode<ReadonlyKeyword>();
@@ -2804,7 +2804,7 @@ public class Parser
         var typeParameter = ParseMappedTypeParameter();
         var nameType = ParseOptional(SyntaxKind.AsKeyword) ? ParseType() : null;
         ParseExpected(SyntaxKind.CloseBracketToken);
-        Token questionToken = null;
+        Token? questionToken = null;
         if (Token() == SyntaxKind.QuestionToken || Token() == SyntaxKind.PlusToken || Token() == SyntaxKind.MinusToken)
         {
             questionToken = ParseTokenNode<QuestionToken>();
@@ -2817,7 +2817,7 @@ public class Parser
         ParseSemicolon();
         var members = ParseList(ParsingContext.TypeMembers, ParseTypeMember);
         ParseExpected(SyntaxKind.CloseBraceToken);
-        return FinishNode(new MappedTypeNode(readonlyToken, typeParameter, nameType, questionToken, type, members), pos);
+        return FinishNode(new MappedTypeNode(readonlyToken!, typeParameter, nameType!, questionToken!, type, members), pos);
     }
 
     ITypeNode ParseTupleElementType()
@@ -2830,7 +2830,7 @@ public class Parser
         var type = ParseType();
         if (type is JSDocNullableType jsnt && jsnt.Pos == jsnt.Type?.Pos)
         {
-            var node = new OptionalTypeNode(jsnt.Type);
+            var node = new OptionalTypeNode(jsnt.Type!);
             SetTextRange(node, jsnt);
             node.Flags = type.Flags;
             return node;
@@ -2864,7 +2864,7 @@ public class Parser
             var questionToken = ParseOptionalToken<QuestionToken>(SyntaxKind.QuestionToken);
             ParseExpected(SyntaxKind.ColonToken);
             var type = ParseTupleElementType();
-            var node = new NamedTupleMember(dotDotDotToken, name, questionToken, type);
+            var node = new NamedTupleMember(dotDotDotToken!, name, questionToken!, type);
             return WithJSDoc(FinishNode(node, pos), hasJSDoc);
         }
         return ParseTupleElementType();
@@ -2889,7 +2889,7 @@ public class Parser
 
     NodeArray<IModifierLike> ParseModifiersForConstructorType()
     {
-        NodeArray<IModifierLike> modifiers = null;
+        NodeArray<IModifierLike>? modifiers = null;
         if (Token() == SyntaxKind.AbstractKeyword)
         {
             var pos = GetNodePos();
@@ -2897,7 +2897,7 @@ public class Parser
             var modifier = FinishNode(new AbstractKeyword(), pos);
             modifiers = CreateNodeArray(new IModifierLike[] { modifier }, pos);
         }
-        return modifiers;
+        return modifiers!;
     }
 
     IFunctionOrConstructorTypeNode ParseFunctionOrConstructorType()
@@ -2911,15 +2911,15 @@ public class Parser
         var parameters = ParseParameters(SignatureFlags.Type);
         var type = ParseReturnType(SyntaxKind.EqualsGreaterThanToken, isType: false);
         IFunctionOrConstructorTypeNode node = isConstructorType
-            ? new ConstructorTypeNode(modifiers, typeParameters, parameters, type)
-            : new FunctionTypeNode(typeParameters, parameters, type);
+            ? new ConstructorTypeNode(modifiers!, typeParameters!, parameters, type)
+            : new FunctionTypeNode(typeParameters!, parameters, type);
         return WithJSDoc(FinishNode(node, pos), hasJSDoc);
     }
 
     ITypeNode ParseKeywordAndNoDot()
     {
         var node = ParseTokenNode<KeywordTypeNode>();
-        return Token() == SyntaxKind.DotToken ? null : node;
+        return Token() == SyntaxKind.DotToken ? null! : node;
     }
 
     LiteralTypeNode ParseLiteralTypeNode(bool negative = false)
@@ -2953,7 +2953,7 @@ public class Parser
         ParseExpected(SyntaxKind.ImportKeyword);
         ParseExpected(SyntaxKind.OpenParenToken);
         var type = ParseType();
-        ImportAttributes attributes = null;
+        ImportAttributes? attributes = null;
         if (ParseOptional(SyntaxKind.CommaToken))
         {
             var _ = scanner.GetTokenStart();
@@ -2974,7 +2974,7 @@ public class Parser
         ParseExpected(SyntaxKind.CloseParenToken);
         var qualifier = ParseOptional(SyntaxKind.DotToken) ? ParseEntityNameOfTypeReference() : null;
         var typeArguments = ParseTypeArgumentsOfTypeReference();
-        return FinishNode(new ImportTypeNode(type, attributes, qualifier, typeArguments, isTypeOf), pos);
+        return FinishNode(new ImportTypeNode(type, attributes!, qualifier!, typeArguments!, isTypeOf), pos);
     }
 
     bool NextTokenIsNumericOrBigIntLiteral()
@@ -3150,7 +3150,7 @@ public class Parser
                 return constraint;
             }
         }
-        return null;
+        return null!;
     }
 
     TypeParameterDeclaration ParseTypeParameterOfInferType()
@@ -3204,7 +3204,7 @@ public class Parser
             ParseErrorAtRange(type, diagnostic);
             return type;
         }
-        return null;
+        return null!;
     }
 
     ITypeNode ParseUnionOrIntersectionType(SyntaxKind @operator, Func<ITypeNode> parseConstituentType,
@@ -3326,7 +3326,7 @@ public class Parser
         var type = ParseType();
         if (typePredicateVariable != null)
         {
-            return FinishNode(new TypePredicateNode(assertsModifier: null, typePredicateVariable, type), pos);
+            return FinishNode(new TypePredicateNode(assertsModifier: null!, typePredicateVariable, type), pos);
         }
         else
         {
@@ -3342,7 +3342,7 @@ public class Parser
             NextToken();
             return id;
         }
-        return null;
+        return null!;
     }
 
     TypePredicateNode ParseAssertsTypePredicate()
@@ -3351,7 +3351,7 @@ public class Parser
         var assertsModifier = ParseExpectedToken<AssertsKeyword>(SyntaxKind.AssertsKeyword);
         INode parameterName = Token() == SyntaxKind.ThisKeyword ? ParseThisTypeNode() : ParseIdentifier();
         var type = ParseOptional(SyntaxKind.IsKeyword) ? ParseType() : null;
-        return FinishNode(new TypePredicateNode(assertsModifier, parameterName, type), pos);
+        return FinishNode(new TypePredicateNode(assertsModifier!, parameterName, type!), pos);
     }
 
     ITypeNode ParseType()
@@ -3382,7 +3382,7 @@ public class Parser
 
     ITypeNode ParseTypeAnnotation()
     {
-        return ParseOptional(SyntaxKind.ColonToken) ? ParseType() : null;
+        return ParseOptional(SyntaxKind.ColonToken) ? ParseType() : null!;
     }
 
     // EXPRESSIONS
@@ -3469,7 +3469,7 @@ public class Parser
 
         var pos = GetNodePos();
         var expr = ParseAssignmentExpressionOrHigher(allowReturnTypeInArrowFunction: true);
-        Token operatorToken;
+        Token? operatorToken;
         while ((operatorToken = ParseOptionalToken<CommaToken>(SyntaxKind.CommaToken)) != null)
         {
             expr = MakeBinaryExpression(expr, operatorToken, ParseAssignmentExpressionOrHigher(allowReturnTypeInArrowFunction: true), pos);
@@ -3484,7 +3484,7 @@ public class Parser
 
     IExpression ParseInitializer()
     {
-        return ParseOptional(SyntaxKind.EqualsToken) ? ParseAssignmentExpressionOrHigher(allowReturnTypeInArrowFunction: true) : null;
+        return ParseOptional(SyntaxKind.EqualsToken) ? ParseAssignmentExpressionOrHigher(allowReturnTypeInArrowFunction: true) : null!;
     }
 
     IExpression ParseAssignmentExpressionOrHigher(bool allowReturnTypeInArrowFunction)
@@ -3542,7 +3542,7 @@ public class Parser
         // identifier and the current token is an arrow.
         if (expr.Kind == SyntaxKind.Identifier && Token() == SyntaxKind.EqualsGreaterThanToken)
         {
-            return ParseSimpleArrowFunctionExpression(pos, expr as Identifier, allowReturnTypeInArrowFunction, hasJSDoc, asyncModifier: null);
+            return ParseSimpleArrowFunctionExpression(pos, (expr as Identifier)!, allowReturnTypeInArrowFunction, hasJSDoc, asyncModifier: null!);
         }
 
         // Now see if we might be in cases '2' or '3'.
@@ -3615,7 +3615,7 @@ public class Parser
         {
             return FinishNode(
                 new YieldExpression(
-                    ParseOptionalToken<AsteriskToken>(SyntaxKind.AsteriskToken),
+                    ParseOptionalToken<AsteriskToken>(SyntaxKind.AsteriskToken)!,
                     ParseAssignmentExpressionOrHigher(allowReturnTypeInArrowFunction: true)),
                 pos);
         }
@@ -3623,7 +3623,7 @@ public class Parser
         {
             // if the next token is not on the same line as yield.  or we don't have an '*' or
             // the start of an expression, then this is just a simple "yield" expression.
-            return FinishNode(new YieldExpression(asteriskToken: null, expression: null), pos);
+            return FinishNode(new YieldExpression(asteriskToken: null!, expression: null!), pos);
         }
     }
 
@@ -3656,7 +3656,7 @@ public class Parser
         if (triState == Tristate.False)
         {
             // It's definitely not a parenthesized arrow function expression.
-            return null;
+            return null!;
         }
 
         // If we definitely have an arrow function, then we can just parse one, not requiring a
@@ -3840,7 +3840,7 @@ public class Parser
         var tokenPos = scanner.GetTokenStart();
         if (notParenthesizedArrow?.Contains(tokenPos) == true)
         {
-            return null;
+            return null!;
         }
 
         var result = ParseParenthesizedArrowFunctionExpression(allowAmbiguity: false, allowReturnTypeInArrowFunction);
@@ -3849,7 +3849,7 @@ public class Parser
             (notParenthesizedArrow ??= []).Add(tokenPos);
         }
 
-        return result;
+        return result!;
     }
 
     ArrowFunction TryParseAsyncSimpleArrowFunctionExpression(bool allowReturnTypeInArrowFunction)
@@ -3863,10 +3863,10 @@ public class Parser
                 var hasJSDoc = HasPrecedingJSDocComment();
                 var asyncModifier = ParseModifiersForArrowFunction();
                 var expr = ParseBinaryExpressionOrHigher(OperatorPrecedence.Lowest);
-                return ParseSimpleArrowFunctionExpression(pos, expr as Identifier, allowReturnTypeInArrowFunction, hasJSDoc, asyncModifier);
+                return ParseSimpleArrowFunctionExpression(pos, (expr as Identifier)!, allowReturnTypeInArrowFunction, hasJSDoc, asyncModifier);
             }
         }
-        return null;
+        return null!;
     }
 
     Tristate IsUnParenthesizedAsyncArrowFunctionWorker()
@@ -3909,12 +3909,12 @@ public class Parser
         // close paren.
         var typeParameters = ParseTypeParameters();
 
-        NodeArray<ParameterDeclaration> parameters = null;
+        NodeArray<ParameterDeclaration>? parameters = null;
         if (!ParseExpected(SyntaxKind.OpenParenToken))
         {
             if (!allowAmbiguity)
             {
-                return null;
+                return null!;
             }
             parameters = CreateMissingList<ParameterDeclaration>();
         }
@@ -3925,7 +3925,7 @@ public class Parser
                 var maybeParameters = ParseParametersWorker(isAsync, allowAmbiguity);
                 if (maybeParameters == null)
                 {
-                    return null;
+                    return null!;
                 }
                 parameters = maybeParameters;
             }
@@ -3935,7 +3935,7 @@ public class Parser
             }
             if (!ParseExpected(SyntaxKind.CloseParenToken) && !allowAmbiguity)
             {
-                return null;
+                return null!;
             }
         }
 
@@ -3943,7 +3943,7 @@ public class Parser
         var type = ParseReturnType(SyntaxKind.ColonToken, isType: false);
         if (type != null && !allowAmbiguity && TypeHasArrowFunctionBlockingParseError(type))
         {
-            return null;
+            return null!;
         }
 
         // Parsing a signature isn't enough.
@@ -3967,7 +3967,7 @@ public class Parser
         if (!allowAmbiguity && Token() != SyntaxKind.EqualsGreaterThanToken && (hasJSDocFunctionType || Token() != SyntaxKind.OpenBraceToken))
         {
             // Returning undefined here will cause our caller to rewind to where we started from.
-            return null;
+            return null!;
         }
 
         // If we have an arrow, then try to parse the body. Even if not, try to parse if we
@@ -4003,7 +4003,7 @@ public class Parser
             // be a syntax error in JavaScript (as the second colon shouldn't be there).
             if (Token() != SyntaxKind.ColonToken)
             {
-                return null;
+                return null!;
             }
         }
 
@@ -4063,13 +4063,13 @@ public class Parser
 
         // Note: we explicitly 'allowIn' in the whenTrue part of the condition expression, and
         // we do not that for the 'whenFalse' part.
-        ColonToken colonToken = null;
+        ColonToken? colonToken = null;
         return FinishNode(
             new ConditionalExpression(
                 leftOperand,
                 questionToken,
                 DoOutsideOfContext(disAllowInAndDecoratorContext, () => ParseAssignmentExpressionOrHigher(allowReturnTypeInArrowFunction: false)),
-                colonToken = ParseExpectedToken<ColonToken>(SyntaxKind.ColonToken),
+                colonToken = ParseExpectedToken<ColonToken>(SyntaxKind.ColonToken)!,
                 NodeIsPresent(colonToken)
                     ? ParseAssignmentExpressionOrHigher(allowReturnTypeInArrowFunction)
                     : CreateMissingNode<Identifier>(SyntaxKind.Identifier, reportAtCurrentPosition: false, Diagnostics._0_expected, TokenToString(SyntaxKind.ColonToken))),
@@ -4249,7 +4249,7 @@ public class Parser
             var pos = GetNodePos();
             var updateExpression = ParseUpdateExpression();
             return Token() == SyntaxKind.AsteriskAsteriskToken ?
-                ParseBinaryExpressionRest(GetBinaryOperatorPrecedence(Token()), updateExpression, pos) as BinaryExpression :
+                (ParseBinaryExpressionRest(GetBinaryOperatorPrecedence(Token()), updateExpression, pos) as BinaryExpression)! :
                 updateExpression;
         }
 
@@ -4268,7 +4268,7 @@ public class Parser
         var simpleUnaryExpression = ParseSimpleUnaryExpression();
         if (Token() == SyntaxKind.AsteriskAsteriskToken)
         {
-            var pos = SkipTrivia(sourceText, simpleUnaryExpression.Pos) ?? 0;
+            var pos = SkipTrivia(sourceText!, simpleUnaryExpression.Pos) ?? 0;
             var end = simpleUnaryExpression.End ?? 0;
             if (simpleUnaryExpression.Kind == SyntaxKind.TypeAssertionExpression)
             {
@@ -4449,7 +4449,7 @@ public class Parser
         // 3)we have a MemberExpression which either completes the LeftHandSideExpression,
         // or starts the beginning of the first four CallExpression productions.
         var pos = GetNodePos();
-        ILeftHandSideExpression expression = null;
+        ILeftHandSideExpression expression;
         if (Token() == SyntaxKind.ImportKeyword)
         {
             if (LookAhead(NextTokenIsOpenParenOrLessThan))
@@ -4572,7 +4572,7 @@ public class Parser
             allowUnicodeEscapeSequenceInIdentifierName: true)), pos);
     }
 
-    IJsxElementOrSelfClosingOrFragment ParseJsxElementOrSelfClosingElementOrFragment(bool inExpressionContext, int? topInvalidNodePosition = null, INode openingTag = null, bool mustBeUnary = false)
+    IJsxElementOrSelfClosingOrFragment ParseJsxElementOrSelfClosingElementOrFragment(bool inExpressionContext, int? topInvalidNodePosition = null, INode? openingTag = null, bool mustBeUnary = false)
     {
         var pos = GetNodePos();
         var opening = ParseJsxOpeningOrSelfClosingElementOrOpeningFragment(inExpressionContext);
@@ -4582,7 +4582,7 @@ public class Parser
             var children = ParseJsxChildren(opening);
             INode closingElement;
 
-            IJsxChild lastChild = children.Count > 0 ? children[^1] : null;
+            IJsxChild? lastChild = children.Count > 0 ? children[^1] : null;
             if (
                 lastChild?.Kind == SyntaxKind.JsxElement
                 && !TagNamesAreEquivalent((lastChild as JsxElement)?.OpeningElement?.TagName,
@@ -4597,46 +4597,46 @@ public class Parser
                 var end = (lastChild as JsxElement)?.Children?.End;
                 IJsxChild newLast = FinishNode(
                     new JsxElement(
-                        (lastChild as JsxElement)?.OpeningElement,
-                        (lastChild as JsxElement)?.Children,
+                        (lastChild as JsxElement)!.OpeningElement,
+                        (lastChild as JsxElement)!.Children,
                         FinishNode(new JsxClosingElement(FinishNode(new Identifier(""), end ?? 0, end)), end ?? 0, end)
-                    ), (lastChild as JsxElement).OpeningElement?.Pos ?? 0, end);
+                    ), (lastChild as JsxElement)!.OpeningElement?.Pos ?? 0, end);
 
                 children = CreateNodeArray(children.Take(children.Count - 1).Concat([newLast]), children.Pos ?? 0, end);
-                closingElement = (lastChild as JsxElement)?.ClosingElement;
+                closingElement = (lastChild as JsxElement)!.ClosingElement;
             }
             else
             {
-                closingElement = ParseJsxClosingElement((opening as JsxOpeningElement), inExpressionContext);
+                closingElement = ParseJsxClosingElement((opening as JsxOpeningElement)!, inExpressionContext);
                 if (!TagNamesAreEquivalent((opening as IJsxHasTagName)?.TagName, (closingElement as IJsxHasTagName)?.TagName))
                 {
                     if (openingTag is JsxOpeningElement openingElement &&
                         TagNamesAreEquivalent((closingElement as IJsxHasTagName)?.TagName, openingElement.TagName))
                     {
                         // opening incorrectly matched with its parent's closing -- put error on opening
-                        ParseErrorAtRange((opening as IJsxHasTagName)?.TagName, Diagnostics.JSX_element_0_has_no_corresponding_closing_tag,
-                            GetTextOfNodeFromSourceText(sourceText, (opening as IJsxHasTagName)?.TagName));
+                        ParseErrorAtRange((opening as IJsxHasTagName)!.TagName!, Diagnostics.JSX_element_0_has_no_corresponding_closing_tag,
+                            GetTextOfNodeFromSourceText(sourceText!, (opening as IJsxHasTagName)!.TagName!));
                     }
                     else
                     {
                         // other opening/closing mismatches -- put error on closing
-                        ParseErrorAtRange((closingElement as IJsxHasTagName)?.TagName, Diagnostics.Expected_corresponding_JSX_closing_tag_for_0,
-                            GetTextOfNodeFromSourceText(sourceText, (opening as IJsxHasTagName)?.TagName));
+                        ParseErrorAtRange((closingElement as IJsxHasTagName)!.TagName!, Diagnostics.Expected_corresponding_JSX_closing_tag_for_0,
+                            GetTextOfNodeFromSourceText(sourceText!, (opening as IJsxHasTagName)!.TagName!));
                     }
                 }
             }
-            result = FinishNode(new JsxElement(opening as IJsxHasTagName, children, closingElement as JsxClosingElement), pos);
+            result = FinishNode(new JsxElement((opening as IJsxHasTagName)!, children, (closingElement as JsxClosingElement)!), pos);
         }
         else if (opening.Kind == SyntaxKind.JsxOpeningFragment)
         {
-            result = FinishNode(new JsxFragment(opening as JsxOpeningFragment,
+            result = FinishNode(new JsxFragment((opening as JsxOpeningFragment)!,
                 ParseJsxChildren(opening), ParseJsxClosingFragment(inExpressionContext)), pos);
         }
         else
         {
             Debug.Assert(opening.Kind == SyntaxKind.JsxSelfClosingElement);
             // Nothing else to do for self-closing elements
-            result = opening as JsxSelfClosingElement;
+            result = (opening as JsxSelfClosingElement)!;
         }
 
         // If the user writes the invalid code '<div></div><div></div>' in an expression context (i.e. not wrapped in
@@ -4656,7 +4656,7 @@ public class Parser
             {
                 var operatorToken = CreateMissingNode<CommaToken>(SyntaxKind.CommaToken, reportAtCurrentPosition: false);
                 SetTextRangePosWidth(operatorToken, invalidElement.Pos ?? 0, 0);
-                ParseErrorAt(SkipTrivia(sourceText, topBadPos) ?? 0, invalidElement.End ?? 0, Diagnostics.JSX_expressions_must_have_one_parent_element);
+                ParseErrorAt(SkipTrivia(sourceText!, topBadPos) ?? 0, invalidElement.End ?? 0, Diagnostics.JSX_expressions_must_have_one_parent_element);
                 return FinishNode(invalidElement, pos);
                 //return FinishNode(new BinaryExpression(result,  operatorToken, invalidElement), pos);
             }
@@ -4673,7 +4673,7 @@ public class Parser
         return FinishNode(node, pos);
     }
 
-    IJsxChild ParseJsxChild(IJsxOpeningLikeElementOrOpeningFragment openingTag, SyntaxKind token)
+    IJsxChild? ParseJsxChild(IJsxOpeningLikeElementOrOpeningFragment openingTag, SyntaxKind token)
     {
         switch (token)
         {
@@ -4688,10 +4688,10 @@ public class Parser
                 {
                     // We want the error span to cover only 'Foo.Bar' in < Foo.Bar >
                     // or to cover only 'Foo' in < Foo >
-                    var tag = (openingTag as JsxOpeningElement)?.TagName;
-                    var start = Math.Min(SkipTrivia(sourceText, tag.Pos) ?? 0, tag.End ?? tag.Pos ?? 0);
+                    var tag = (openingTag as JsxOpeningElement)!.TagName;
+                    var start = Math.Min(SkipTrivia(sourceText!, tag.Pos) ?? 0, tag.End ?? tag.Pos ?? 0);
                     ParseErrorAt(start, tag.End ?? 0, Diagnostics.JSX_element_0_has_no_corresponding_closing_tag,
-                        GetTextOfNodeFromSourceText(sourceText, (openingTag as JsxOpeningElement)?.TagName));
+                        GetTextOfNodeFromSourceText(sourceText!, (openingTag as JsxOpeningElement)!.TagName));
                 }
                 return null;
             case SyntaxKind.LessThanSlashToken:
@@ -4766,7 +4766,7 @@ public class Parser
             // of regular scanning to avoid treating illegal characters (e.g. '#') as immediate
             // scanning errors
             ScanJsxText();
-            node = new JsxOpeningElement(tagName, typeArguments, attributes);
+            node = new JsxOpeningElement(tagName, typeArguments!, attributes);
         }
         else
         {
@@ -4783,7 +4783,7 @@ public class Parser
                     ScanJsxText();
                 }
             }
-            node = new JsxSelfClosingElement(tagName, typeArguments, attributes);
+            node = new JsxSelfClosingElement(tagName, typeArguments!, attributes);
         }
 
         return FinishNode(node, pos);
@@ -4830,11 +4830,11 @@ public class Parser
         var pos = GetNodePos();
         if (!ParseExpected(SyntaxKind.OpenBraceToken))
         {
-            return null;
+            return null!;
         }
 
-        DotDotDotToken dotDotDotToken = null;
-        IExpression expression = null;
+        DotDotDotToken? dotDotDotToken = null;
+        IExpression? expression = null;
         if (Token() != SyntaxKind.CloseBraceToken)
         {
             if (!inExpressionContext)
@@ -4858,7 +4858,7 @@ public class Parser
             }
         }
 
-        return FinishNode(new JsxExpression(dotDotDotToken, expression), pos);
+        return FinishNode(new JsxExpression(dotDotDotToken!, expression!), pos);
     }
 
     IObjectLiteralElement ParseJsxAttribute()
@@ -4890,7 +4890,7 @@ public class Parser
             }
             ParseErrorAtCurrentToken(Diagnostics.or_JSX_element_expected);
         }
-        return null;
+        return null!;
     }
 
     IJsxAttributeName ParseJsxAttributeName()
@@ -4990,7 +4990,7 @@ public class Parser
         // check for an optional chain in a non-null expression
         if (node is NonNullExpression)
         {
-            var expr = (node as NonNullExpression).Expression;
+            var expr = (node as NonNullExpression)!.Expression;
             while (expr is NonNullExpression nonNullExpr && (expr.Flags & NodeFlags.OptionalChain) == 0)
             {
                 expr = nonNullExpr.Expression;
@@ -5016,7 +5016,7 @@ public class Parser
             allowUnicodeEscapeSequenceInIdentifierName: true);
         var isOptionalChain = questionDotToken != null || TryReParseOptionalChain(expression);
         var propertyAccess = isOptionalChain ?
-            new PropertyAccessChain(expression, questionDotToken, name) :
+            new PropertyAccessChain(expression, questionDotToken!, name) :
             new PropertyAccessExpression(expression, name);
         if (isOptionalChain && propertyAccess.Name is PrivateIdentifier)
         {
@@ -5026,7 +5026,7 @@ public class Parser
         if (expression is ExpressionWithTypeArguments eta && eta.TypeArguments != null)
         {
             pos = eta.TypeArguments.Pos ?? 0 - 1;
-            var end = SkipTrivia(sourceText, eta.TypeArguments.End) ?? 0 + 1;
+            var end = SkipTrivia(sourceText!, eta.TypeArguments.End) ?? 0 + 1;
             ParseErrorAt(pos, end, Diagnostics.An_instantiation_expression_cannot_be_followed_by_a_property_access);
         }
         return FinishNode(propertyAccess, pos);
@@ -5047,7 +5047,7 @@ public class Parser
             if (argument is IStringLiteralLike or NumericLiteral &&
                 argument is IHasLiteralText hasLiteralText)
             {
-                hasLiteralText.Text = InternIdentifier(hasLiteralText.Text);
+                hasLiteralText.Text = InternIdentifier(hasLiteralText.Text!);
             }
             argumentExpression = argument;
         }
@@ -5055,7 +5055,7 @@ public class Parser
         ParseExpected(SyntaxKind.CloseBracketToken);
 
         var indexedAccess = questionDotToken != null || TryReParseOptionalChain(expression) ?
-            new ElementAccessChain(expression, questionDotToken, argumentExpression) :
+            new ElementAccessChain(expression, questionDotToken!, argumentExpression) :
             new ElementAccessExpression(expression, argumentExpression);
         return FinishNode(indexedAccess, pos);
     }
@@ -5064,7 +5064,7 @@ public class Parser
     {
         while (true)
         {
-            QuestionDotToken questionDotToken = null;
+            QuestionDotToken? questionDotToken = null;
             var isPropertyAccess = false;
             if (allowOptionalChain && IsStartOfOptionalPropertyOrElementAccessChain())
             {
@@ -5078,14 +5078,14 @@ public class Parser
 
             if (isPropertyAccess)
             {
-                expression = ParsePropertyAccessExpressionRest(pos, expression, questionDotToken);
+                expression = ParsePropertyAccessExpressionRest(pos, expression, questionDotToken!);
                 continue;
             }
 
             // when in the [Decorator] context, we do not parse ElementAccess as it could be part of a ComputedPropertyName
             if ((questionDotToken != null || !InDecoratorContext()) && ParseOptional(SyntaxKind.OpenBracketToken))
             {
-                expression = ParseElementAccessExpressionRest(pos, expression, questionDotToken);
+                expression = ParseElementAccessExpressionRest(pos, expression, questionDotToken!);
                 continue;
             }
 
@@ -5093,8 +5093,8 @@ public class Parser
             {
                 // Absorb type arguments into TemplateExpression when preceding expression is ExpressionWithTypeArguments
                 expression = (questionDotToken == null) && expression is ExpressionWithTypeArguments ewta ?
-                    ParseTaggedTemplateRest(pos, ewta.Expression, questionDotToken, ewta.TypeArguments) :
-                    ParseTaggedTemplateRest(pos, expression, questionDotToken, typeArguments: null);
+                    ParseTaggedTemplateRest(pos, ewta.Expression, questionDotToken!, ewta.TypeArguments) :
+                    ParseTaggedTemplateRest(pos, expression, questionDotToken!, typeArguments: null!);
                 continue;
             }
 
@@ -5149,7 +5149,7 @@ public class Parser
         while (true)
         {
             expression = ParseMemberExpressionRest(pos, expression, allowOptionalChain: true);
-            NodeArray<ITypeNode> typeArguments = null;
+            NodeArray<ITypeNode>? typeArguments = null;
 
             var questionDotToken = ParseOptionalToken<QuestionDotToken>(SyntaxKind.QuestionDotToken);
             if (questionDotToken != null)
@@ -5172,7 +5172,7 @@ public class Parser
                 }
                 var argumentList = ParseArgumentList();
                 var callExpr = questionDotToken != null || TryReParseOptionalChain(expression) ?
-                    new CallChain(expression, questionDotToken, typeArguments, argumentList) :
+                    new CallChain(expression, questionDotToken!, typeArguments!, argumentList) :
                     new CallExpression(expression, typeArguments, argumentList);
                 expression = FinishNode(callExpr, pos);
                 continue;
@@ -5194,7 +5194,7 @@ public class Parser
         ParseExpected(SyntaxKind.OpenParenToken);
         var result = ParseDelimitedList(ParsingContext.ArgumentExpressions, ParseArgumentExpression);
         ParseExpected(SyntaxKind.CloseParenToken);
-        return result;
+        return result!;
     }
 
     NodeArray<ITypeNode> ParseTypeArgumentsInExpression()
@@ -5202,12 +5202,12 @@ public class Parser
         if ((contextFlags & NodeFlags.JavaScriptFile) != 0)
         {
             // TypeArguments must not be parsed in JavaScript files to avoid ambiguity with binary operators.
-            return null;
+            return null!;
         }
 
         if (ReScanLessThanToken() != SyntaxKind.LessThanToken)
         {
-            return null;
+            return null!;
         }
         NextToken();
 
@@ -5215,7 +5215,7 @@ public class Parser
         if (ReScanGreaterToken() != SyntaxKind.GreaterThanToken)
         {
             // If it doesn't have the closing `>` then it's definitely not an type argument list.
-            return null;
+            return null!;
         }
         NextToken();
 
@@ -5223,7 +5223,7 @@ public class Parser
         // treat it as such. If the type argument list is followed by `(` or a template literal, as in
         // `f<number>(42)`, we favor the type argument interpretation even though JavaScript would view
         // it as a relational expression.
-        return typeArguments != null && CanFollowTypeArgumentsInExpression() ? typeArguments : null;
+        return typeArguments != null && CanFollowTypeArgumentsInExpression() ? typeArguments : null!;
     }
 
     bool CanFollowTypeArgumentsInExpression()
@@ -5343,7 +5343,7 @@ public class Parser
         var multiLine = scanner.HasPrecedingLineBreak();
         var elements = ParseDelimitedList(ParsingContext.ArrayLiteralMembers, ParseArgumentOrArrayLiteralElement);
         ParseExpectedMatchingBrackets(SyntaxKind.OpenBracketToken, SyntaxKind.CloseBracketToken, openBracketParsed, openBracketPosition);
-        return FinishNode(new ArrayLiteralExpression(elements, multiLine), pos);
+        return FinishNode(new ArrayLiteralExpression(elements!, multiLine), pos);
     }
 
     IObjectLiteralElementLike ParseObjectLiteralElement()
@@ -5377,7 +5377,7 @@ public class Parser
 
         if (asteriskToken != null || Token() == SyntaxKind.OpenParenToken || Token() == SyntaxKind.LessThanToken)
         {
-            return ParseMethodDeclaration(pos, hasJSDoc, modifiers, asteriskToken, name, questionToken, exclamationToken);
+            return ParseMethodDeclaration(pos, hasJSDoc, modifiers, asteriskToken!, name, questionToken!, exclamationToken!);
         }
 
         // check if it is short-hand property assignment or normal property assignment
@@ -5391,7 +5391,7 @@ public class Parser
         {
             var equalsToken = ParseOptionalToken<EqualsToken>(SyntaxKind.EqualsToken);
             var objectAssignmentInitializer = equalsToken != null ? AllowInAnd(() => ParseAssignmentExpressionOrHigher(allowReturnTypeInArrowFunction: true)) : null;
-            node = new ShorthandPropertyAssignment(name as Identifier, objectAssignmentInitializer)
+            node = new ShorthandPropertyAssignment((name as Identifier)!, objectAssignmentInitializer)
             {
                 // Save equals token for error reporting.
                 // TODO(rbuckton): Consider manufacturing this when we need to report an error as it is otherwise not useful.
@@ -5426,7 +5426,7 @@ public class Parser
             ParseObjectLiteralElement, considerSemicolonAsDelimiter: true);
         ParseExpectedMatchingBrackets(SyntaxKind.OpenBraceToken, SyntaxKind.CloseBraceToken,
             openBraceParsed, openBracePosition);
-        return FinishNode(new ObjectLiteralExpression(properties, multiLine), pos);
+        return FinishNode(new ObjectLiteralExpression(properties!, multiLine), pos);
     }
 
     FunctionExpression ParseFunctionExpression()
@@ -5458,13 +5458,13 @@ public class Parser
 
         SetDecoratorContext(savedDecoratorContext);
 
-        var node = new FunctionExpression(modifiers, asteriskToken, name, typeParameters, parameters, type, body);
+        var node = new FunctionExpression(modifiers!, asteriskToken!, name!, typeParameters!, parameters, type!, body);
         return WithJSDoc(FinishNode(node, pos), hasJSDoc);
     }
 
     Identifier ParseOptionalBindingIdentifier()
     {
-        return IsBindingIdentifier() ? ParseBindingIdentifier() : null;
+        return IsBindingIdentifier() ? ParseBindingIdentifier() : null!;
     }
 
     IPrimaryExpression ParseNewExpressionOrNewDotTarget()
@@ -5481,7 +5481,7 @@ public class Parser
         ILeftHandSideExpression expression = ParseMemberExpressionRest(expressionPos, ParsePrimaryExpression(),
             allowOptionalChain: false);
 
-        NodeArray<ITypeNode> typeArguments = null;
+        NodeArray<ITypeNode>? typeArguments = null;
 
         // Absorb type arguments into NewExpression when preceding expression is ExpressionWithTypeArguments
         if (expression is ExpressionWithTypeArguments ewta)
@@ -5492,15 +5492,15 @@ public class Parser
         if (Token() == SyntaxKind.QuestionDotToken)
         {
             ParseErrorAtCurrentToken(Diagnostics.Invalid_optional_chain_from_new_expression_Did_you_mean_to_call_0,
-                GetTextOfNodeFromSourceText(sourceText, expression));
+                GetTextOfNodeFromSourceText(sourceText!, expression));
         }
 
         var argumentList = Token() == SyntaxKind.OpenParenToken ? ParseArgumentList() : null;
-        return FinishNode(new NewExpression(expression, typeArguments, argumentList), pos);
+        return FinishNode(new NewExpression(expression, typeArguments!, argumentList!), pos);
     }
 
     // STATEMENTS
-    Block ParseBlock(bool ignoreMissingOpenBrace, DiagnosticMessage diagnosticMessage = null)
+    Block ParseBlock(bool ignoreMissingOpenBrace, DiagnosticMessage? diagnosticMessage = null)
     {
         var pos = GetNodePos();
         var hasJSDoc = HasPrecedingJSDocComment();
@@ -5527,7 +5527,7 @@ public class Parser
         }
     }
 
-    Block ParseFunctionBlock(SignatureFlags flags, DiagnosticMessage diagnosticMessage = null)
+    Block ParseFunctionBlock(SignatureFlags flags, DiagnosticMessage? diagnosticMessage = null)
     {
         var savedYieldContext = InYieldContext();
         SetYieldContext((flags & SignatureFlags.Yield) != 0);
@@ -5631,7 +5631,7 @@ public class Parser
         var awaitToken = ParseOptionalToken<AwaitKeyword>(SyntaxKind.AwaitKeyword);
         ParseExpected(SyntaxKind.OpenParenToken);
 
-        IForInitializer initializer = null;
+        IForInitializer? initializer = null;
         if (Token() != SyntaxKind.SemicolonToken)
         {
             if (Token() == SyntaxKind.VarKeyword || Token() == SyntaxKind.LetKeyword || Token() == SyntaxKind.ConstKeyword ||
@@ -5652,13 +5652,13 @@ public class Parser
         {
             var expression = AllowInAnd(() => ParseAssignmentExpressionOrHigher(allowReturnTypeInArrowFunction: true));
             ParseExpected(SyntaxKind.CloseParenToken);
-            node = new ForOfStatement(awaitToken, initializer, expression, ParseStatement());
+            node = new ForOfStatement(awaitToken!, initializer!, expression, ParseStatement());
         }
         else if (ParseOptional(SyntaxKind.InKeyword))
         {
             var expression = AllowInAnd(ParseExpression);
             ParseExpected(SyntaxKind.CloseParenToken);
-            node = new ForInStatement(initializer, expression, ParseStatement());
+            node = new ForInStatement(initializer!, expression, ParseStatement());
         }
         else
         {
@@ -5671,7 +5671,7 @@ public class Parser
                 ? AllowInAnd(ParseExpression)
                 : null;
             ParseExpected(SyntaxKind.CloseParenToken);
-            node = new ForStatement(initializer, condition, incrementor, ParseStatement());
+            node = new ForStatement(initializer!, condition!, incrementor!, ParseStatement());
         }
 
         return WithJSDoc(FinishNode(node, pos), hasJSDoc);
@@ -5699,7 +5699,7 @@ public class Parser
         ParseExpected(SyntaxKind.ReturnKeyword);
         var expression = CanParseSemicolon() ? null : AllowInAnd(ParseExpression);
         ParseSemicolon();
-        return WithJSDoc(FinishNode(new ReturnStatement(expression), pos), hasJSDoc);
+        return WithJSDoc(FinishNode(new ReturnStatement(expression!), pos), hasJSDoc);
     }
 
     WithStatement ParseWithStatement()
@@ -5802,14 +5802,14 @@ public class Parser
 
         // If we don't have a catch clause, then we must have a finally clause.  Try to parse
         // one out no matter what.
-        Block finallyBlock = null;
+        Block? finallyBlock = null;
         if (catchClause == null || Token() == SyntaxKind.FinallyKeyword)
         {
             ParseExpected(SyntaxKind.FinallyKeyword, Diagnostics.catch_or_finally_expected);
             finallyBlock = ParseBlock(ignoreMissingOpenBrace: false);
         }
 
-        return WithJSDoc(FinishNode(new TryStatement(tryBlock, catchClause, finallyBlock), pos), hasJSDoc);
+        return WithJSDoc(FinishNode(new TryStatement(tryBlock, catchClause!, finallyBlock!), pos), hasJSDoc);
     }
 
     CatchClause ParseCatchClause()
@@ -5817,7 +5817,7 @@ public class Parser
         var pos = GetNodePos();
         ParseExpected(SyntaxKind.CatchKeyword);
 
-        VariableDeclaration variableDeclaration;
+        VariableDeclaration? variableDeclaration;
         if (ParseOptional(SyntaxKind.OpenParenToken))
         {
             variableDeclaration = ParseVariableDeclaration();
@@ -5830,7 +5830,7 @@ public class Parser
         }
 
         var block = ParseBlock(ignoreMissingOpenBrace: false);
-        return FinishNode(new CatchClause(variableDeclaration, block), pos);
+        return FinishNode(new CatchClause(variableDeclaration!, block), pos);
     }
 
     DebuggerStatement ParseDebuggerStatement()
@@ -6103,29 +6103,29 @@ public class Parser
             case SyntaxKind.OpenBraceToken:
                 return ParseBlock(ignoreMissingOpenBrace: false);
             case SyntaxKind.VarKeyword:
-                return ParseVariableStatement(GetNodePos(), HasPrecedingJSDocComment(), modifiers: null);
+                return ParseVariableStatement(GetNodePos(), HasPrecedingJSDocComment(), modifiers: null!);
             case SyntaxKind.LetKeyword:
                 if (IsLetDeclaration())
                 {
-                    return ParseVariableStatement(GetNodePos(), HasPrecedingJSDocComment(), modifiers: null);
+                    return ParseVariableStatement(GetNodePos(), HasPrecedingJSDocComment(), modifiers: null!);
                 }
                 break;
             case SyntaxKind.AwaitKeyword:
                 if (IsAwaitUsingDeclaration())
                 {
-                    return ParseVariableStatement(GetNodePos(), HasPrecedingJSDocComment(), modifiers: null);
+                    return ParseVariableStatement(GetNodePos(), HasPrecedingJSDocComment(), modifiers: null!);
                 }
                 break;
             case SyntaxKind.UsingKeyword:
                 if (IsUsingDeclaration())
                 {
-                    return ParseVariableStatement(GetNodePos(), HasPrecedingJSDocComment(), modifiers: null);
+                    return ParseVariableStatement(GetNodePos(), HasPrecedingJSDocComment(), modifiers: null!);
                 }
                 break;
             case SyntaxKind.FunctionKeyword:
-                return ParseFunctionDeclaration(GetNodePos(), HasPrecedingJSDocComment(), modifiers: null);
+                return ParseFunctionDeclaration(GetNodePos(), HasPrecedingJSDocComment(), modifiers: null!);
             case SyntaxKind.ClassKeyword:
-                return ParseClassDeclaration(GetNodePos(), HasPrecedingJSDocComment(), modifiers: null);
+                return ParseClassDeclaration(GetNodePos(), HasPrecedingJSDocComment(), modifiers: null!);
             case SyntaxKind.IfKeyword:
                 return ParseIfStatement();
             case SyntaxKind.DoKeyword:
@@ -6205,15 +6205,15 @@ public class Parser
                 return node;
             }
 
-            foreach (var m in modifiers)
+            foreach (var m in modifiers!)
             {
                 m.Flags |= NodeFlags.Ambient;
             }
-            return DoInsideOfContext(NodeFlags.Ambient, () => ParseDeclarationWorker(pos, hasJSDoc, modifiers));
+            return DoInsideOfContext(NodeFlags.Ambient, () => ParseDeclarationWorker(pos, hasJSDoc, modifiers!));
         }
         else
         {
-            return ParseDeclarationWorker(pos, hasJSDoc, modifiers);
+            return ParseDeclarationWorker(pos, hasJSDoc, modifiers!);
         }
     }
 
@@ -6226,9 +6226,9 @@ public class Parser
             var node = CurrentNode(parsingContext, pos);
             if (node != null)
             {
-                return ConsumeNode(node) as Statement;
+                return (ConsumeNode(node) as Statement)!;
             }
-            return null;
+            return null!;
         });
     }
 
@@ -6297,19 +6297,19 @@ public class Parser
         return !scanner.HasPrecedingLineBreak() && (IsIdentifier() || Token() == SyntaxKind.StringLiteral);
     }
 
-    Block ParseFunctionBlockOrSemicolon(SignatureFlags flags, DiagnosticMessage diagnosticMessage = null)
+    Block ParseFunctionBlockOrSemicolon(SignatureFlags flags, DiagnosticMessage? diagnosticMessage = null)
     {
         if (Token() != SyntaxKind.OpenBraceToken)
         {
             if ((flags & SignatureFlags.Type) != 0)
             {
                 ParseTypeMemberSemicolon();
-                return null;
+                return null!;
             }
             if (CanParseSemicolon())
             {
                 ParseSemicolon();
-                return null;
+                return null!;
             }
         }
         return ParseFunctionBlock(flags, diagnosticMessage);
@@ -6334,11 +6334,11 @@ public class Parser
         var pos = GetNodePos();
         var dotDotDotToken = ParseOptionalToken<DotDotDotToken>(SyntaxKind.DotDotDotToken);
         var TokenIsIdentifier = IsBindingIdentifier();
-        IPropertyName propertyName = ParsePropertyName();
+        IPropertyName? propertyName = ParsePropertyName();
         IBindingName name;
         if (TokenIsIdentifier && Token() != SyntaxKind.ColonToken)
         {
-            name = propertyName as Identifier;
+            name = (propertyName as Identifier)!;
             propertyName = null;
         }
         else
@@ -6357,7 +6357,7 @@ public class Parser
         var elements = AllowInAnd(() => ParseDelimitedList<IArrayBindingElement>(ParsingContext.ObjectBindingElements,
             ParseObjectBindingElement));
         ParseExpected(SyntaxKind.CloseBraceToken);
-        return FinishNode(new ObjectBindingPattern(elements), pos);
+        return FinishNode(new ObjectBindingPattern(elements!), pos);
     }
 
     ArrayBindingPattern ParseArrayBindingPattern()
@@ -6366,7 +6366,7 @@ public class Parser
         ParseExpected(SyntaxKind.OpenBracketToken);
         var elements = AllowInAnd(() => ParseDelimitedList(ParsingContext.ArrayBindingElements, ParseArrayBindingElement));
         ParseExpected(SyntaxKind.CloseBracketToken);
-        return FinishNode(new ArrayBindingPattern(elements), pos);
+        return FinishNode(new ArrayBindingPattern(elements!), pos);
     }
 
     bool IsBindingIdentifierOrPrivateIdentifierOrPattern()
@@ -6377,7 +6377,7 @@ public class Parser
             || IsBindingIdentifier();
     }
 
-    IBindingName ParseIdentifierOrPattern(DiagnosticMessage privateIdentifierDiagnosticMessage = null)
+    IBindingName ParseIdentifierOrPattern(DiagnosticMessage? privateIdentifierDiagnosticMessage = null)
     {
         if (Token() == SyntaxKind.OpenBracketToken)
         {
@@ -6405,7 +6405,7 @@ public class Parser
         var pos = GetNodePos();
         var hasJSDoc = HasPrecedingJSDocComment();
         var name = ParseIdentifierOrPattern(Diagnostics.Private_identifiers_are_not_allowed_in_variable_declarations);
-        ExclamationToken exclamationToken = null;
+        ExclamationToken? exclamationToken = null;
         if (
             allowExclamation && name.Kind == SyntaxKind.Identifier &&
             Token() == SyntaxKind.ExclamationToken && !scanner.HasPrecedingLineBreak()
@@ -6457,7 +6457,7 @@ public class Parser
         // So we need to look ahead to determine if 'of' should be treated as a keyword in
         // this context.
         // The checker will then give an error that there is an empty declaration list.
-        NodeArray<VariableDeclaration> declarations;
+        NodeArray<VariableDeclaration>? declarations;
         if (Token() == SyntaxKind.OfKeyword && LookAhead(CanFollowContextualOfKeyword))
         {
             declarations = CreateMissingList<VariableDeclaration>();
@@ -6476,7 +6476,7 @@ public class Parser
             SetDisallowInContext(savedDisallowIn);
         }
 
-        return FinishNode(new VariableDeclarationList(declarations, flags), pos);
+        return FinishNode(new VariableDeclarationList(declarations!, flags), pos);
     }
 
     bool CanFollowContextualOfKeyword()
@@ -6509,7 +6509,7 @@ public class Parser
         var type = ParseReturnType(SyntaxKind.ColonToken, isType: false);
         var body = ParseFunctionBlockOrSemicolon(isGenerator | isAsync, Diagnostics.or_expected);
         SetAwaitContext(savedAwaitContext);
-        var node = new FunctionDeclaration(modifiers, asteriskToken, name, typeParameters, parameters, type, body);
+        var node = new FunctionDeclaration(modifiers, asteriskToken!, name, typeParameters!, parameters, type, body);
         return WithJSDoc(FinishNode(node, pos), hasJSDoc);
     }
 
@@ -6525,7 +6525,7 @@ public class Parser
             {
                 var literalNode = ParseLiteralNode<ILiteralExpression>();
                 return literalNode.Text == "constructor" ? literalNode : null;
-            }));
+            })!);
         }
         return default;
     }
@@ -6549,13 +6549,13 @@ public class Parser
                 };
                 return WithJSDoc(FinishNode(node, pos), hasJSDoc);
             }
-            return null;
+            return null!;
         });
     }
 
     MethodDeclaration ParseMethodDeclaration(int pos, bool hasJSDoc, NodeArray<IModifierLike> modifiers, AsteriskToken asteriskToken,
         IPropertyName name, QuestionToken questionToken, ExclamationToken exclamationToken,
-        DiagnosticMessage diagnosticMessage = null)
+        DiagnosticMessage? diagnosticMessage = null)
     {
         var isGenerator = asteriskToken != null ? SignatureFlags.Yield : SignatureFlags.None;
         var isAsync = modifiers?.Any(x => x.Kind == SyntaxKind.AsyncKeyword) == true ? SignatureFlags.Await : SignatureFlags.None;
@@ -6564,11 +6564,11 @@ public class Parser
         var type = ParseReturnType(SyntaxKind.ColonToken, isType: false);
         var body = ParseFunctionBlockOrSemicolon(isGenerator | isAsync, diagnosticMessage);
         var node = new MethodDeclaration(
-            modifiers,
-            asteriskToken,
+            modifiers!,
+            asteriskToken!,
             name,
             questionToken,
-            typeParameters,
+            typeParameters!,
             parameters,
             type,
             body
@@ -6592,7 +6592,7 @@ public class Parser
         var node = new PropertyDeclaration(
             modifiers,
             name,
-            (INode)questionToken ?? exclamationToken,
+            (INode?)questionToken ?? exclamationToken,
             type,
             initializer
         );
@@ -6608,9 +6608,9 @@ public class Parser
         var questionToken = ParseOptionalToken<QuestionToken>(SyntaxKind.QuestionToken);
         if (asteriskToken != null || Token() == SyntaxKind.OpenParenToken || Token() == SyntaxKind.LessThanToken)
         {
-            return ParseMethodDeclaration(pos, hasJSDoc, modifiers, asteriskToken, name, questionToken, exclamationToken: null, Diagnostics.or_expected);
+            return ParseMethodDeclaration(pos, hasJSDoc, modifiers, asteriskToken!, name, questionToken!, exclamationToken: null!, Diagnostics.or_expected);
         }
-        return ParsePropertyDeclaration(pos, hasJSDoc, modifiers, name, questionToken);
+        return ParsePropertyDeclaration(pos, hasJSDoc, modifiers, name, questionToken!);
     }
 
     IAccessorDeclaration ParseAccessorDeclaration(int pos, bool hasJSDoc, NodeArray<IModifierLike> modifiers,
@@ -6754,7 +6754,7 @@ public class Parser
         var pos = GetNodePos();
         if (!ParseOptional(SyntaxKind.AtToken))
         {
-            return null;
+            return null!;
         }
         var expression = DoInDecoratorContext(ParseDecoratorExpression);
         return FinishNode(new Decorator(expression), pos);
@@ -6771,22 +6771,22 @@ public class Parser
             // so that when 'const' is a standalone declaration, we don't issue an error.
             if (!TryParse(NextTokenIsOnSameLineAndCanFollowModifier))
             {
-                return null;
+                return null!;
             }
         }
         else if (stopOnStartOfClassStaticBlock && Token() == SyntaxKind.StaticKeyword && LookAhead(NextTokenIsOpenBrace))
         {
-            return null;
+            return null!;
         }
         else if (hasSeenStaticModifier && Token() == SyntaxKind.StaticKeyword)
         {
-            return null;
+            return null!;
         }
         else
         {
             if (!ParseAnyContextualModifier())
             {
-                return null;
+                return null!;
             }
         }
 
@@ -6803,7 +6803,7 @@ public class Parser
     NodeArray<IModifierLike> ParseModifiers(bool allowDecorators, bool permitConstAsModifier = false, bool stopOnStartOfClassStaticBlock = false)
     {
         var pos = GetNodePos();
-        List<IModifierLike> list = null;
+        List<IModifierLike>? list = null;
         Decorator decorator;
         IModifier modifier;
         var hasSeenStaticModifier = false;
@@ -6859,12 +6859,12 @@ public class Parser
             }
         }
 
-        return list != null ? CreateNodeArray(list, pos) : null;
+        return list != null ? CreateNodeArray(list, pos) : null!;
     }
 
     NodeArray<IModifierLike> ParseModifiersForArrowFunction()
     {
-        NodeArray<IModifierLike> modifiers = null;
+        NodeArray<IModifierLike>? modifiers = null;
         if (Token() == SyntaxKind.AsyncKeyword)
         {
             var pos = GetNodePos();
@@ -6872,7 +6872,7 @@ public class Parser
             var modifier = FinishNode(new AsyncKeyword(), pos);
             modifiers = CreateNodeArray(new IModifierLike[] { modifier }, pos);
         }
-        return modifiers;
+        return modifiers!;
     }
 
     IClassElement ParseClassElement()
@@ -6931,16 +6931,16 @@ public class Parser
             var isAmbient = modifiers?.Any(x => x != null && IsDeclareModifier(x)) == true;
             if (isAmbient)
             {
-                foreach (var m in modifiers)
+                foreach (var m in modifiers!)
                 {
                     m.Flags |= NodeFlags.Ambient;
                 }
                 return DoInsideOfContext(NodeFlags.Ambient,
-                    () => ParsePropertyOrMethodDeclaration(pos, hasJSDoc, modifiers));
+                    () => ParsePropertyOrMethodDeclaration(pos, hasJSDoc, modifiers!));
             }
             else
             {
-                return ParsePropertyOrMethodDeclaration(pos, hasJSDoc, modifiers);
+                return ParsePropertyOrMethodDeclaration(pos, hasJSDoc, modifiers!);
             }
         }
 
@@ -6949,7 +6949,7 @@ public class Parser
             // treat this as a property declaration with a missing name.
             var name = CreateMissingNode<Identifier>(SyntaxKind.Identifier, reportAtCurrentPosition: true,
                 Diagnostics.Declaration_expected);
-            return ParsePropertyDeclaration(pos, hasJSDoc, modifiers, name, questionToken: null);
+            return ParsePropertyDeclaration(pos, hasJSDoc, modifiers, name, questionToken: null!);
         }
 
         // 'isClassMemberStart' should have hinted not to attempt parsing.
@@ -6963,7 +6963,7 @@ public class Parser
         var modifiers = ParseModifiers(allowDecorators: true);
         if (Token() == SyntaxKind.ClassKeyword)
         {
-            return ParseClassDeclarationOrExpression(pos, hasJSDoc, modifiers, SyntaxKind.ClassExpression) as ClassExpression;
+            return (ParseClassDeclarationOrExpression(pos, hasJSDoc, modifiers, SyntaxKind.ClassExpression) as ClassExpression)!;
         }
 
         var missing = CreateMissingNode<MissingDeclaration>(SyntaxKind.MissingDeclaration, reportAtCurrentPosition: true,
@@ -6975,12 +6975,12 @@ public class Parser
 
     ClassExpression ParseClassExpression()
     {
-        return ParseClassDeclarationOrExpression(GetNodePos(), HasPrecedingJSDocComment(), modifiers: null, SyntaxKind.ClassExpression) as ClassExpression;
+        return (ParseClassDeclarationOrExpression(GetNodePos(), HasPrecedingJSDocComment(), modifiers: null!, SyntaxKind.ClassExpression) as ClassExpression)!;
     }
 
     ClassDeclaration ParseClassDeclaration(int pos, bool hasJSDoc, NodeArray<IModifierLike> modifiers)
     {
-        return ParseClassDeclarationOrExpression(pos, hasJSDoc, modifiers, SyntaxKind.ClassDeclaration) as ClassDeclaration;
+        return (ParseClassDeclarationOrExpression(pos, hasJSDoc, modifiers, SyntaxKind.ClassDeclaration) as ClassDeclaration)!;
     }
 
     IClassLikeDeclaration ParseClassDeclarationOrExpression(int pos, bool hasJSDoc, NodeArray<IModifierLike> modifiers,
@@ -7010,8 +7010,8 @@ public class Parser
         }
         SetAwaitContext(savedAwaitContext);
         IClassLikeDeclaration node = kind == SyntaxKind.ClassDeclaration
-            ? new ClassDeclaration(modifiers, name, typeParameters, heritageClauses, members)
-            : new ClassExpression(modifiers, name, typeParameters, heritageClauses, members);
+            ? new ClassDeclaration(modifiers!, name, typeParameters!, heritageClauses, members)
+            : new ClassExpression(modifiers!, name, typeParameters!, heritageClauses, members);
         return WithJSDoc(FinishNode(node, pos), hasJSDoc);
     }
 
@@ -7024,7 +7024,7 @@ public class Parser
         // 'isImplementsClause' helps to disambiguate between these two cases
         return IsBindingIdentifier() && !IsImplementsClause()
             ? CreateIdentifier(IsBindingIdentifier())
-            : null;
+            : null!;
     }
 
     bool IsImplementsClause()
@@ -7042,7 +7042,7 @@ public class Parser
             return ParseList(ParsingContext.HeritageClauses, ParseHeritageClause);
         }
 
-        return null;
+        return null!;
     }
 
     HeritageClause ParseHeritageClause()
@@ -7052,7 +7052,7 @@ public class Parser
         Debug.Assert(tok == SyntaxKind.ExtendsKeyword || tok == SyntaxKind.ImplementsKeyword); // isListElement() should ensure this.
         NextToken();
         var types = ParseDelimitedList(ParsingContext.HeritageClauseElement, ParseExpressionWithTypeArguments);
-        return FinishNode(new HeritageClause(tok, types), pos);
+        return FinishNode(new HeritageClause(tok, types!), pos);
     }
 
     ExpressionWithTypeArguments ParseExpressionWithTypeArguments()
@@ -7061,7 +7061,7 @@ public class Parser
         var expression = ParseLeftHandSideExpressionOrHigher();
         if (expression.Kind == SyntaxKind.ExpressionWithTypeArguments)
         {
-            return expression as ExpressionWithTypeArguments;
+            return (expression as ExpressionWithTypeArguments)!;
         }
         var typeArguments = TryParseTypeArguments();
         return FinishNode(new ExpressionWithTypeArguments(expression, typeArguments), pos);
@@ -7070,7 +7070,7 @@ public class Parser
     NodeArray<ITypeNode> TryParseTypeArguments()
     {
         return Token() == SyntaxKind.LessThanToken ?
-            ParseBracketedList(ParsingContext.TypeArguments, ParseType, SyntaxKind.LessThanToken, SyntaxKind.GreaterThanToken) : null;
+            ParseBracketedList(ParsingContext.TypeArguments, ParseType, SyntaxKind.LessThanToken, SyntaxKind.GreaterThanToken) : null!;
     }
 
     bool IsHeritageClause()
@@ -7127,7 +7127,7 @@ public class Parser
     {
         ParseExpected(SyntaxKind.EnumKeyword);
         var name = ParseIdentifier();
-        NodeArray<EnumMember> members;
+        NodeArray<EnumMember>? members;
         if (ParseExpected(SyntaxKind.OpenBraceToken))
         {
             members = DoOutsideOfYieldAndAwaitContext(() => ParseDelimitedList(ParsingContext.EnumMembers, ParseEnumMember));
@@ -7164,7 +7164,7 @@ public class Parser
         var namespaceFlag = flags & NodeFlags.Namespace;
         var name = (flags & NodeFlags.NestedNamespace) != 0 ? ParseIdentifierName() : ParseIdentifier();
         INamespaceBody body = ParseOptional(SyntaxKind.DotToken)
-            ? ParseModuleOrNamespaceDeclaration(GetNodePos(), hasJSDoc: false, modifiers: null,
+            ? ParseModuleOrNamespaceDeclaration(GetNodePos(), hasJSDoc: false, modifiers: null!,
                 NodeFlags.NestedNamespace | namespaceFlag)
             : ParseModuleBlock();
         var node = new NamespaceDeclaration(modifiers, name, body, flags);
@@ -7184,9 +7184,9 @@ public class Parser
         else
         {
             name = ParseLiteralNode<StringLiteral>();
-            ((StringLiteral)name).Text = InternIdentifier(((StringLiteral)name).Text);
+            ((StringLiteral)name).Text = InternIdentifier(((StringLiteral)name).Text!);
         }
-        ModuleBlock body = null;
+        ModuleBlock? body = null;
         if (Token() == SyntaxKind.OpenBraceToken)
         {
             body = ParseModuleBlock();
@@ -7263,7 +7263,7 @@ public class Parser
         var afterImportPos = scanner.GetTokenFullStart();
 
         // We don't parse the identifier here in await context, instead we will report a grammar error in the checker.
-        Identifier identifier = null;
+        Identifier? identifier = null;
         if (IsIdentifier())
         {
             identifier = ParseIdentifier();
@@ -7285,7 +7285,7 @@ public class Parser
             return ParseImportEqualsDeclaration(pos, hasJSDoc, modifiers, identifier, isTypeOnly);
         }
 
-        var importClause = TryParseImportClause(identifier, afterImportPos, isTypeOnly);
+        var importClause = TryParseImportClause(identifier!, afterImportPos, isTypeOnly);
         var moduleSpecifier = ParseModuleSpecifier();
         var attributes = TryParseImportAttributes();
 
@@ -7299,16 +7299,16 @@ public class Parser
         // ImportDeclaration:
         //  import ImportClause from ModuleSpecifier ;
         //  import ModuleSpecifier;
-        ImportClause importClause = null;
+        ImportClause? importClause = null;
         if (identifier != null || // import id
             Token() == SyntaxKind.AsteriskToken || // import *
             Token() == SyntaxKind.OpenBraceToken // import {
         )
         {
-            importClause = ParseImportClause(identifier, pos, isTypeOnly, skipJsDocLeadingAsterisks);
+            importClause = ParseImportClause(identifier!, pos, isTypeOnly, skipJsDocLeadingAsterisks);
             ParseExpected(SyntaxKind.FromKeyword);
         }
-        return importClause;
+        return importClause!;
     }
 
     ImportAttributes TryParseImportAttributes()
@@ -7319,7 +7319,7 @@ public class Parser
         {
             return ParseImportAttributes(currentToken);
         }
-        return null;
+        return null!;
     }
 
     ImportAttribute ParseImportAttribute()
@@ -7346,7 +7346,7 @@ public class Parser
             var elements = ParseDelimitedList(ParsingContext.ImportAttributes,
                 ParseImportAttribute, considerSemicolonAsDelimiter: true);
             ParseExpected(SyntaxKind.CloseBraceToken);
-            return FinishNode(new ImportAttributes(elements, multiLine, token), pos);
+            return FinishNode(new ImportAttributes(elements!, multiLine, token), pos);
         }
         else
         {
@@ -7389,7 +7389,7 @@ public class Parser
 
         // If there was no default import or if there is comma token after default import
         // parse namespace or named imports
-        INamedImportBindings namedBindings = null;
+        INamedImportBindings? namedBindings = null;
         if (identifier == null ||
             ParseOptional(SyntaxKind.CommaToken))
         {
@@ -7424,7 +7424,7 @@ public class Parser
         if (Token() == SyntaxKind.StringLiteral)
         {
             var result = ParseLiteralNode<StringLiteral>();
-            result.Text = InternIdentifier(result.Text);
+            result.Text = InternIdentifier(result.Text!);
             return result;
         }
         else
@@ -7481,12 +7481,12 @@ public class Parser
     ExportSpecifier ParseExportSpecifier()
     {
         var hasJSDoc = HasPrecedingJSDocComment();
-        return WithJSDoc(ParseImportOrExportSpecifier(SyntaxKind.ExportSpecifier) as ExportSpecifier, hasJSDoc);
+        return WithJSDoc((ParseImportOrExportSpecifier(SyntaxKind.ExportSpecifier) as ExportSpecifier)!, hasJSDoc);
     }
 
     ImportSpecifier ParseImportSpecifier()
     {
-        return ParseImportOrExportSpecifier(SyntaxKind.ImportSpecifier) as ImportSpecifier;
+        return (ParseImportOrExportSpecifier(SyntaxKind.ImportSpecifier) as ImportSpecifier)!;
     }
 
     IImportOrExportSpecifier ParseImportOrExportSpecifier(SyntaxKind kind)
@@ -7502,7 +7502,7 @@ public class Parser
         var checkIdentifierStart = scanner.GetTokenStart();
         var checkIdentifierEnd = scanner.GetTokenEnd();
         var isTypeOnly = false;
-        IModuleExportName propertyName = null;
+        IModuleExportName? propertyName = null;
         var CanParseAsKeyword = true;
         var name = ParseModuleExportName(() => ParseIdentifierName());
         if (name is Identifier identifier && identifier.EscapedText == "type")
@@ -7571,7 +7571,7 @@ public class Parser
             if (name.Kind != SyntaxKind.Identifier)
             {
                 // ImportSpecifier casts "name" to Identifier below, so make sure it's an identifier
-                ParseErrorAt(SkipTrivia(sourceText, name.Pos ?? 0) ?? 0, name.End ?? 0, Diagnostics.Identifier_expected);
+                ParseErrorAt(SkipTrivia(sourceText!, name.Pos ?? 0) ?? 0, name.End ?? 0, Diagnostics.Identifier_expected);
                 var missingNode = CreateMissingNode<Identifier>(SyntaxKind.Identifier, /*reportAtCurrentPosition*/ false);
                 SetTextRangePosEnd(missingNode, name.Pos ?? 0, name.Pos ?? 0);
                 name = missingNode;
@@ -7582,7 +7582,7 @@ public class Parser
             }
         }
         IImportOrExportSpecifier node = kind == SyntaxKind.ImportSpecifier
-            ? new ImportSpecifier(isTypeOnly, propertyName, name as Identifier)
+            ? new ImportSpecifier(isTypeOnly, propertyName, (name as Identifier)!)
             : new ExportSpecifier(isTypeOnly, propertyName, name);
         return FinishNode(node, pos);
 
@@ -7604,9 +7604,9 @@ public class Parser
     {
         var savedAwaitContext = InAwaitContext();
         SetAwaitContext(val: true);
-        INamedExportBindings exportClause = null;
-        IExpression moduleSpecifier = null;
-        ImportAttributes attributes = null;
+        INamedExportBindings? exportClause = null;
+        IExpression? moduleSpecifier = null;
+        ImportAttributes? attributes = null;
         var isTypeOnly = ParseOptional(SyntaxKind.TypeKeyword);
         var namespaceExportPos = GetNodePos();
         if (ParseOptional(SyntaxKind.AsteriskToken))

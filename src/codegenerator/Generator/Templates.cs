@@ -5,16 +5,16 @@ namespace Serenity.CodeGenerator;
 
 public static class Templates
 {
-    public static string TemplatePath { get; set; }
+    public static string? TemplatePath { get; set; }
 
     private static readonly ConcurrentDictionary<string, Template> templateCache = new();
 
     private static Template GetTemplate(IFileSystem fileSystem, string templateKey)
     {
-        if (templateCache.TryGetValue(templateKey, out Template t))
+        if (templateCache.TryGetValue(templateKey, out Template? t))
             return t;
 
-        string template = null;
+        string? template = null;
 
         if (!string.IsNullOrEmpty(TemplatePath))
         {
@@ -33,14 +33,14 @@ public static class Templates
             template = sr.ReadToEnd();
         }
 
-        t = Template.Parse(template);
+        t = Template.Parse(template!);
         templateCache[templateKey] = t;
         return t;
     }
 
 
     public static string Render(IFileSystem fileSystem, string templateKey, object model,
-        Action<CodeWriter> initWriter = null)
+        Action<CodeWriter>? initWriter = null)
     {
         var template = GetTemplate(fileSystem, templateKey);
         try
@@ -51,7 +51,7 @@ public static class Templates
                 RecursiveLimit = 1000,
                 MemberRenamer = x => x.Name
             };
-            context.CurrentGlobal.Import(model,
+            context.CurrentGlobal!.Import(model,
                 ScriptMemberImportFlags.Field | ScriptMemberImportFlags.Property,
                 null, x => x.Name);
 

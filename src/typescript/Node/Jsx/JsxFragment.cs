@@ -8,7 +8,7 @@ public class JsxFragment(JsxOpeningFragment openingFragment, NodeArray<IJsxChild
     public NodeArray<IJsxChild> Children { get; } = children;
     public JsxClosingFragment ClosingFragment { get; } = closingFragment;
 
-    public IEnumerable<INode> GetRestChildren()
+    public IEnumerable<INode?> GetRestChildren()
     {
         yield return OpeningFragment;
         if (Children != null) foreach (var x in Children) yield return x;

@@ -5,11 +5,11 @@ namespace Serenity.CodeGenerator;
 public partial class GenerateCommand
 {
     private static void UpdateConfigTableFor(EntityModelInputs inputs, 
-        GeneratorConfig.Connection confConnection)
+        GeneratorConfig.Connection? confConnection)
     {
         var tableName = string.IsNullOrEmpty(inputs.Schema) ? inputs.Table : (inputs.Schema + "." + inputs.Table);
 
-        var confTable = confConnection?.Tables.FirstOrDefault(x => string.Compare(x.Tablename, tableName,
+        var confTable = confConnection?.Tables?.FirstOrDefault(x => string.Compare(x.Tablename, tableName,
             StringComparison.OrdinalIgnoreCase) == 0);
 
         if (confConnection == null)
@@ -18,7 +18,7 @@ public partial class GenerateCommand
             {
                 Key = inputs.ConnectionKey
             };
-            inputs.Config.Connections.Add(confConnection);
+            (inputs.Config.Connections ??= []).Add(confConnection);
         }
 
         if (confTable == null)
@@ -31,7 +31,7 @@ public partial class GenerateCommand
                 Tablename = string.IsNullOrEmpty(inputs.Schema) ? inputs.Table : (inputs.Schema + "." + inputs.Table)
             };
 
-            confConnection.Tables.Add(confTable);
+            (confConnection.Tables ??= []).Add(confTable);
         }
         else
         {
@@ -66,7 +66,7 @@ public partial class GenerateCommand
     {
         var projectDir = fileSystem.GetDirectoryName(csproj);
         var options = new ConnectionStringOptions();
-        foreach (var x in config.Connections.Where(x => !string.IsNullOrEmpty(x.ConnectionString)))
+        foreach (var x in (config.Connections ?? []).Where(x => !string.IsNullOrEmpty(x.ConnectionString)))
         {
             options[x.Key] = new ConnectionStringEntry
             {
@@ -82,14 +82,14 @@ public partial class GenerateCommand
             if (fileSystem.FileExists(name))
             {
                 var appSettings = JSON.ParseTolerant<AppSettingsFormat>(fileSystem.ReadAllText(path).TrimToNull() ?? "{}");
-                if (appSettings.Data != null)
+                if (appSettings?.Data != null)
                     foreach (var data in appSettings.Data)
                     {
                         // not so nice fix for relative paths, e.g. sqlite etc.
-                        if (data.Value.ConnectionString.Contains("../../..", StringComparison.Ordinal))
+                        if (data.Value.ConnectionString!.Contains("../../..", StringComparison.Ordinal))
                             data.Value.ConnectionString = data.Value
-                                .ConnectionString.Replace("../../..", fileSystem.GetDirectoryName(csproj), StringComparison.Ordinal);
-                        else if (data.Value.ConnectionString.Contains(@"..\..\..\", StringComparison.Ordinal))
+                                .ConnectionString!.Replace("../../..", fileSystem.GetDirectoryName(csproj), StringComparison.Ordinal);
+                        else if (data.Value.ConnectionString!.Contains(@"..\..\..\", StringComparison.Ordinal))
                             data.Value.ConnectionString = data.Value.ConnectionString.Replace(@"..\..\..\",
                                 fileSystem.GetDirectoryName(csproj), StringComparison.Ordinal);
 
@@ -112,8 +112,8 @@ public partial class GenerateCommand
 
         public class ConnectionInfo
         {
-            public string ConnectionString { get; set; }
-            public string ProviderName { get; set; }
+            public string? ConnectionString { get; set; }
+            public string? ProviderName { get; set; }
         }
     }
 

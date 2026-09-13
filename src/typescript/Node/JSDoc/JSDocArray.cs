@@ -11,5 +11,5 @@ public class JSDocArray : List<JSDoc>
     {
     }
 
-    public List<IJSDocTag> JSDocCache { get; set; }
+    public List<IJSDocTag>? JSDocCache { get; set; }
 }

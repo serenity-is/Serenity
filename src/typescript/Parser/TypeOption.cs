@@ -2,8 +2,8 @@ namespace Serenity.TypeScript;
 
 internal struct TypeOption<Type1, Type2>
 {
-    private Type1 value1;
-    private Type2 value2;
+    private Type1 value1 = default!;
+    private Type2 value2 = default!;
     private bool hasValue;
     private bool isType2;
 
@@ -30,8 +30,8 @@ internal struct TypeOption<Type1, Type2>
 
     public Type1 Value1
     {
-        readonly get => hasValue ? value1 : default;
-        set { value1 = value; value2 = default; hasValue = true; isType2 = false;  }
+        readonly get => hasValue ? value1 : default!;
+        set { value1 = value; value2 = default!; hasValue = true; isType2 = false;  }
     }
 
     public readonly bool HasValue2 => hasValue && isType2 == true;
@@ -39,13 +39,13 @@ internal struct TypeOption<Type1, Type2>
     public Type2 Value2
     {
         readonly get => value2;
-        set { value1 = default; value2 = value; hasValue = true; isType2 = true; }
+        set { value1 = default!; value2 = value; hasValue = true; isType2 = true; }
     }
 
     public void Clear()
     {
         hasValue = false;
-        value1 = default;
-        value2 = default;
+        value1 = default!;
+        value2 = default!;
     }
 }

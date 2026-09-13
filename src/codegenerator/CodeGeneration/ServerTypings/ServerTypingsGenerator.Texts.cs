@@ -15,7 +15,7 @@ public partial class ServerTypingsGenerator
                 "NestedLocalTextsAttribute", emptyTypes);
         if (nestedLocalTexts == null)
             return;
-        string prefix = null;
+        string? prefix = null;
 #if ISSOURCEGENERATOR
         prefix = nestedLocalTexts.NamedArguments.FirstOrDefault(x => x.Key == "Prefix").Value.Value as string;
 #else
@@ -73,8 +73,8 @@ public partial class ServerTypingsGenerator
 
     public void SetLocalTextFiltersFrom(IFileSystem fileSystem, string appSettingsFile)
     {
-        ArgumentExceptionHelper.ThrowIfNull(fileSystem, nameof(fileSystem));
-        ArgumentExceptionHelper.ThrowIfNull(appSettingsFile, nameof(appSettingsFile));
+        ArgumentNullException.ThrowIfNull(fileSystem, nameof(fileSystem));
+        ArgumentNullException.ThrowIfNull(appSettingsFile, nameof(appSettingsFile));
 
         if (!LocalTexts || !fileSystem.FileExists(appSettingsFile))
             return;
@@ -88,7 +88,7 @@ public partial class ServerTypingsGenerator
             {
                 foreach (var p in packages.PropertyValues())
                     foreach (var x in p.Values<string>())
-                        LocalTextFilters.Add(x);
+                        LocalTextFilters.Add(x!);
             }
         }
         catch
@@ -106,7 +106,7 @@ public partial class ServerTypingsGenerator
             Indentation = 4
         };
 
-        Regex filter = null;
+        Regex? filter = null;
         if (LocalTextFilters.Count > 0)
         {
             var fb = new StringBuilder("^(");

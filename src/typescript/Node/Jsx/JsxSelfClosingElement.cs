@@ -8,7 +8,7 @@ public class JsxSelfClosingElement(IJsxTagNameExpression tagName, NodeArray<ITyp
     public NodeArray<ITypeNode> TypeArguments { get; } = typeArguments;
     public JsxAttributes Attributes { get; } = attributes;
 
-    public IEnumerable<INode> GetRestChildren()
+    public IEnumerable<INode?> GetRestChildren()
     {
         yield return TagName;
         if (TypeArguments != null) foreach (var x in TypeArguments) yield return x;

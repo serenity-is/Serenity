@@ -59,7 +59,7 @@ public class GeneratorConsole : IGeneratorConsole
         return prompt.Show(Spectre.Console.AnsiConsole.Console);
     }
 
-    public string ReadLine()
+    public string? ReadLine()
     {
         return Console.ReadLine();
     }

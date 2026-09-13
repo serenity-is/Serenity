@@ -9,10 +9,10 @@ public class MultipleOutputHelper
         IGeneratorConsole console,
 #endif
         string outDir, IEnumerable<(string Path, string Text)> filesToWrite,
-        string[] deleteExtraPattern,
-        string endOfLine)
+        string[]? deleteExtraPattern,
+        string? endOfLine)
     {
-        ArgumentExceptionHelper.ThrowIfNull(fileSystem);
+        ArgumentNullException.ThrowIfNull(fileSystem);
 
         outDir = fileSystem.GetFullPath(outDir);
         fileSystem.CreateDirectory(outDir);

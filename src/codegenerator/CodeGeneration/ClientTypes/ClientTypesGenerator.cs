@@ -108,7 +108,7 @@ public partial class ClientTypesGenerator : CodeGeneratorBase
              module.StartsWith('/'));
     }
 
-    private static string GetNamespace(string ns)
+    private static string? GetNamespace(string? ns)
     {
         if (ns == "Serenity")
             return "Serenity.ComponentModel";
@@ -149,7 +149,7 @@ public partial class ClientTypesGenerator : CodeGeneratorBase
                     x.Type?.EndsWith(".registerClass", StringComparison.Ordinal) == true ||
                     x.Type?.EndsWith(".registerEditor", StringComparison.Ordinal) == true ||
                     x.Type?.EndsWith(".registerFormatter", StringComparison.Ordinal) == true)
-                )?.Arguments[0].Value as string ??
+                )?.Arguments![0].Value as string ??
                 type.Fields?.FirstOrDefault(x =>
                     x.IsStatic == true &&
                     x.Value is string &&

@@ -6,7 +6,7 @@ public class TypeQueryNode(IEntityName exprName, NodeArray<ITypeNode> typeArgume
     public IEntityName ExprName { get; } = exprName;
     public NodeArray<ITypeNode> TypeArguments { get; } = typeArguments;
 
-    public IEnumerable<INode> GetRestChildren()
+    public IEnumerable<INode?> GetRestChildren()
     {
         yield return ExprName;
         if (TypeArguments != null)

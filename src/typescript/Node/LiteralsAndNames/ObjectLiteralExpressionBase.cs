@@ -5,7 +5,7 @@ public class ObjectLiteralExpressionBase<T>(SyntaxKind kind, NodeArray<T> proper
 {
     public NodeArray<T> Properties { get; set; } = properties;
 
-    public virtual IEnumerable<INode> GetRestChildren()
+    public virtual IEnumerable<INode?> GetRestChildren()
     {
         if (Properties != null) foreach (var x in Properties) yield return x;
     }

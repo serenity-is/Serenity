@@ -5,7 +5,7 @@ public class NamedImports(NodeArray<ImportSpecifier> elements)
 {
     public NodeArray<ImportSpecifier> Elements { get; } = elements;
 
-    public IEnumerable<INode> GetRestChildren()
+    public IEnumerable<INode?> GetRestChildren()
     {
         return Elements;
     }

@@ -5,7 +5,7 @@ namespace Serenity.CodeGenerator;
 public class ServerTypingsCommand(IProjectFileInfo project, IGeneratorConsole console)
     : BaseGeneratorCommand(project, console)
 {
-    public List<ExternalType> TsTypes { get; set; }
+    public List<ExternalType>? TsTypes { get; set; }
 
     public override ExitCodes Run()
     {
@@ -42,13 +42,13 @@ public class ServerTypingsCommand(IProjectFileInfo project, IGeneratorConsole co
             generator.AssemblyToPackageName[pair.Key] = pair.Value;
 
         string outDir = FileSystem.Combine(generator.DetermineModulesRoot(
-            FileSystem, ProjectFile, config.RootNamespace), "ServerTypes");
+            FileSystem, ProjectFile, config!.RootNamespace), "ServerTypes");
 
         generator.SetLocalTextFiltersFrom(FileSystem, FileSystem.Combine(projectDir, "appsettings.json"));
         generator.RootNamespaces.Add(config.RootNamespace);
 
         generator.AddBuiltinTSTypes();
-        foreach (var type in TsTypes)
+        foreach (var type in TsTypes!)
             generator.AddTSType(type);
 
         var generatedSources = generator.Run();

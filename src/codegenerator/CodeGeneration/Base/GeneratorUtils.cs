@@ -8,7 +8,7 @@ public static class GeneratorUtils
             IsSubclassOf(type, fullName);
     }
 
-    public static bool IsSubclassOf(Type type, string fullName)
+    public static bool IsSubclassOf(Type? type, string fullName)
     {
         if (type == null)
             return false;
@@ -25,7 +25,7 @@ public static class GeneratorUtils
         return false;
     }
 
-    public static Attribute GetAttribute(MemberInfo member, string attributeType)
+    public static Attribute? GetAttribute(MemberInfo member, string attributeType)
     {
         return member.GetCustomAttributes().FirstOrDefault(x => IsEqualOrSubclassOf(x.GetType(), attributeType));
     }
@@ -46,7 +46,7 @@ public static class GeneratorUtils
         return false;
     }
 
-    public static bool GetFirstDerivedOfGenericType(Type type, Type genericType, out Type derivedType)
+    public static bool GetFirstDerivedOfGenericType(Type type, Type genericType, out Type? derivedType)
     {
         if (type.IsGenericType && type.GetGenericTypeDefinition() == genericType)
         {
@@ -64,8 +64,8 @@ public static class GeneratorUtils
     private class PackageJson
     {
 #pragma warning disable IDE1006 // Naming Styles
-        public Dictionary<string, string> dependencies { get; set; }
-        public Dictionary<string, string> devDependencies { get; set; }
+        public Dictionary<string, string>? dependencies { get; set; }
+        public Dictionary<string, string>? devDependencies { get; set; }
 #pragma warning restore IDE1006 // Naming Styles
     }
 
@@ -81,7 +81,7 @@ public static class GeneratorUtils
 
         var packageData = CodeGenerator.TSConfigHelper.TryParseJsonFile<PackageJson>(fileSystem, packageJson);
 
-        foreach (var pair in (packageData.dependencies ?? [])
+        foreach (var pair in (packageData!.dependencies ?? [])
             .Concat(packageData.devDependencies ?? []))
         {
             if (pair.Value == null)

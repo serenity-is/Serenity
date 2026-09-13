@@ -6,7 +6,7 @@ public class TemplateLiteralTypeSpan(ITypeNode type, ITemplateLiteralLikeNode li
     public ITypeNode Type { get; } = type;
     public ITemplateLiteralLikeNode Literal { get; } = literal;
 
-    public IEnumerable<INode> GetRestChildren()
+    public IEnumerable<INode?> GetRestChildren()
     {
         return [Type, Literal];
     }

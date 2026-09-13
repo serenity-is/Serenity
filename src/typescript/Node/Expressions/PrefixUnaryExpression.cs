@@ -6,7 +6,7 @@ public class PrefixUnaryExpression(SyntaxKind @operator, IExpression operand)
     public /*PrefixUnaryOperator*/SyntaxKind Operator { get; } = @operator;
     public /*UnaryExpression*/IExpression Operand { get; } = operand;
 
-    public IEnumerable<INode> GetRestChildren()
+    public IEnumerable<INode?> GetRestChildren()
     {
         return [Operand];
     }

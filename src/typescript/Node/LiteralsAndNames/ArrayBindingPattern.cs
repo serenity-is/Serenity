@@ -5,7 +5,7 @@ public class ArrayBindingPattern(NodeArray<IArrayBindingElement> elements)
 {
     public NodeArray<IArrayBindingElement> Elements { get; } = elements;
 
-    public IEnumerable<INode> GetRestChildren()
+    public IEnumerable<INode?> GetRestChildren()
     {
         return Elements;
     }

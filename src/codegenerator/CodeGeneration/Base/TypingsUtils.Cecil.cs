@@ -93,8 +93,8 @@ public static partial class TypingsUtils
     public static IEnumerable<CustomAttribute> GetAttributes(this PropertyDefinition prop, string ns, string name, bool subAttributes = false)
     {
         return prop.CustomAttributes.Where(x => (x.AttributeType?.Namespace == ns &&
-            x.AttributeType.Name == name) ||
-            (subAttributes && TypingsUtils.IsSubclassOf(x.AttributeType, ns, name)));
+            x.AttributeType?.Name == name) ||
+            (subAttributes && TypingsUtils.IsSubclassOf(x.AttributeType!, ns, name)));
     }
 
     public static IEnumerable<CustomAttribute> GetAttributes(this FieldDefinition field)
@@ -152,7 +152,7 @@ public static partial class TypingsUtils
             return (type.FullName, type.Scope.Name);
     }
 
-    public static TypeDefinition GetEnumTypeFrom(TypeReference type)
+    public static TypeDefinition? GetEnumTypeFrom(TypeReference type)
     {
         type = GetNullableUnderlyingType(type) ?? type;
 
@@ -173,12 +173,12 @@ public static partial class TypingsUtils
         return type != null && type.Resolve()?.IsEnum == true;
     }
 
-    public static TypeReference GetNullableUnderlyingType(TypeReference type)
+    public static TypeReference? GetNullableUnderlyingType(TypeReference type)
     {
-        if (type is GenericInstanceType &&
+        if (type is GenericInstanceType git &&
             type.Name == "Nullable`1" &&
             type.Namespace == "System")
-            return (type as GenericInstanceType).GenericArguments[0];
+            return git.GenericArguments[0];
 
         return null;
     }
@@ -239,11 +239,11 @@ public static partial class TypingsUtils
         return type.IsEnum;
     }
 
-    public static bool IsGenericInstanceType(this TypeReference type, out TypeReference elementType)
+    public static bool IsGenericInstanceType(this TypeReference type, out TypeReference? elementType)
     {
         if (type.IsGenericInstance)
         {
-            elementType = (type as GenericInstanceType).ElementType;
+            elementType = ((GenericInstanceType)type).ElementType;
             return true;
         }
 
@@ -401,7 +401,7 @@ public static partial class TypingsUtils
         var resolver = module.AssemblyResolver as ICSharpCode.Decompiler.UniversalAssemblyResolver;
 
         foreach (var assembly in assemblyLocations)
-            resolver.AddSearchDirectory(fileSystem.GetDirectoryName(assembly));
+            resolver!.AddSearchDirectory(fileSystem.GetDirectoryName(assembly)!);
 
         var assemblyDefinitions = new List<Mono.Cecil.AssemblyDefinition>();
         foreach (var assembly in assemblyLocations)

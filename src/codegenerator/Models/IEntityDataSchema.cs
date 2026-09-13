@@ -8,7 +8,7 @@ public interface IEntityDataSchema
     /// <value>
     /// The default schema.
     /// </value>
-    public string DefaultSchema { get; }
+    public string? DefaultSchema { get; }
 
     /// <summary>
     /// Gets the foreign keys.

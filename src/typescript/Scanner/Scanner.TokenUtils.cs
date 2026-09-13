@@ -56,7 +56,7 @@ partial class Scanner
         return token == SyntaxKind.GreaterThanToken || TokenIsIdentifierOrKeyword(token);
     }
 
-    internal static string TokenToString(SyntaxKind t)
+    internal static string? TokenToString(SyntaxKind t)
     {
         return t >= 0 && (int)t <= tokenStrings.Length ? tokenStrings[(int)t] : null;
     }

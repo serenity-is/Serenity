@@ -4,7 +4,7 @@ namespace Serenity.CodeGenerator;
 
 public class PhysicalProcessExecutor : IProcessExecutor
 {
-    public bool StartAndWaitForExit(Process process, int timeout, out string output, out string errorOutput)
+    public bool StartAndWaitForExit(Process process, int timeout, out string? output, out string? errorOutput)
     {
         try
         {

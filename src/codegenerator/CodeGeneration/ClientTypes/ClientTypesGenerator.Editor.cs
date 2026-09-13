@@ -2,7 +2,7 @@ namespace Serenity.CodeGeneration;
 
 public partial class ClientTypesGenerator
 {
-    private void GenerateEditor(ExternalType type, string name, string key)
+    private void GenerateEditor(ExternalType type, string name, string? key)
     {
         if (!OmitComments)
             cw.IndentedLine($"/// <summary>An attribute that sets the editor type to <c>{key ?? type.FullName}</c> and its options.</summary>");

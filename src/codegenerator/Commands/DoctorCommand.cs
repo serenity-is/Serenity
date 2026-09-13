@@ -24,8 +24,8 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
         (new(10, 4, 0), new(10, 4, 0))
     ];
 
-    public IArgumentReader Arguments { get; set; }
-    public List<ExternalType> TsTypes { get; set; }
+    public IArgumentReader Arguments { get; set; } = null!;
+    public List<ExternalType>? TsTypes { get; set; }
 
     private bool hasErrors;
 
@@ -84,7 +84,7 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
         }
 
         CheckRootNamespace(config.RootNamespace);
-        var sergenVersion = typeof(DoctorCommand).Assembly.GetName().Version;
+        Version sergenVersion = typeof(DoctorCommand).Assembly.GetName().Version!;
         Info("Sergen Version", sergenVersion.ToString());
         CheckSerenityVersion(projectFile, sergenVersion, out Version serenityVersion);
 
@@ -208,7 +208,7 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
         try
         {
             var process = new Process() { StartInfo = startInfo };
-            if (!processExecutor.StartAndWaitForExit(process, 10000, out string output, out _))
+            if (!processExecutor.StartAndWaitForExit(process, 10000, out string? output, out _))
                 output = null;
 
             output = (output ?? "").Trim();
@@ -249,7 +249,7 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
             return;
         }
 
-        if (serenityWeb.Version == null || !Version.TryParse(serenityWeb.Version, out Version serenityWebVersion))
+        if (serenityWeb.Version == null || !Version.TryParse(serenityWeb.Version, out Version? serenityWebVersion))
         {
             Error($"Can't parse Serenity.Net.Web package version ({serenityWeb.Version}) from project file, assuming Sergen version ({sergenVersion})!");
             return;
@@ -259,12 +259,12 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
 
         foreach (var packageRef in metadata.Items.PackageReference)
         {
-            if (packageRef.Identity.StartsWith("Serenity.", StringComparison.Ordinal) &&
+            if (packageRef.Identity!.StartsWith("Serenity.", StringComparison.Ordinal) &&
                 packageRef.Version != null &&
-                Version.TryParse(packageRef.Version, out Version packageVersion) &&
+                Version.TryParse(packageRef.Version, out Version? packageVersion) &&
                 (packageVersion.Major != serenityVersion.Major ||
                  packageVersion.Minor != serenityVersion.Minor ||
-                 packageVersion.Build != serenityVersion.Build))
+                 packageVersion!.Build != serenityVersion.Build))
             {
                 Warning($"Serenity.Net.Web version ({serenityVersion}) " +
                     $"does not match version of the package {packageRef.Identity} ({packageVersion})!");
@@ -311,7 +311,7 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
             }
         };
 
-        if (!processExecutor.StartAndWaitForExit(process, 5000, out string output, out _))
+        if (!processExecutor.StartAndWaitForExit(process, 5000, out string? output, out _))
             output = null;
 
         output = (output ?? "").Trim();
@@ -358,7 +358,7 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
             return;
         }
 
-        PackageJson packageJson;
+        PackageJson? packageJson;
         try
         {
             // todo: use npm ls / pnpm ls to get installed versions?
@@ -374,22 +374,22 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
         CheckTSBuildVersion(packageJson, serenityVersion);
     }
 
-    void CheckTSBuildVersion(PackageJson packageJson, Version serenityVersion)
+    void CheckTSBuildVersion(PackageJson? packageJson, Version serenityVersion)
     { 
-        if (packageJson.devDependencies?.TryGetValue("@serenity-is/tsbuild", out var versionStr) != true &&
-            packageJson.dependencies?.TryGetValue("@serenity-is/tsbuild", out versionStr) != true)
+        if (packageJson?.devDependencies?.TryGetValue("@serenity-is/tsbuild", out var versionStr) != true &&
+            packageJson?.dependencies?.TryGetValue("@serenity-is/tsbuild", out versionStr) != true)
         {
             Warning($"@serenity-is/tsbuild is not found in package.json devDependencies!");
             return;
         }
 
-        if (versionStr.StartsWith("workspace:", StringComparison.Ordinal))
+        if (versionStr!.StartsWith("workspace:", StringComparison.Ordinal))
         {
             Info("@serenity-is/tsbuild Version", versionStr);
             return;
         }
 
-        if (!Version.TryParse(versionStr, out Version version))
+        if (!Version.TryParse(versionStr, out Version? version))
         {
             Warning($"Can't parse @serenity-is/tsbuild dependency version from package.json!");
             return;
@@ -411,7 +411,7 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
         }
         else
         {
-            Info("@serenity-is/tsbuild Version", version.ToString());
+            Info("@serenity-is/tsbuild Version", version!.ToString());
         }
     }
 
@@ -424,7 +424,7 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
             return;
         }
 
-        JsonObject tsConfig = GetTsConfig(tsconfigPath);
+        JsonObject? tsConfig = GetTsConfig(tsconfigPath);
         if (tsConfig == null)
             return;
 
@@ -464,18 +464,18 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
             targetToken == null ||
             targetToken.GetValue<string>() != "esnext")
         {
-            Warning($"module option in tsconfig.json is recommended to be 'esnext' (it is {targetToken.GetValue<string>()})!");
+            Warning($"module option in tsconfig.json is recommended to be 'esnext' (it is {targetToken!.GetValue<string>()})!");
         }
 
         if (!compilerOptions.TryGetPropertyValue("moduleResolution", out targetToken) ||
             targetToken == null ||
             targetToken.GetValue<string>() != "bundler")
         {
-            Warning($"moduleResolution option in tsconfig.json is recommended to be 'bundler' (it is {targetToken.GetValue<string>()})!");
+            Warning($"moduleResolution option in tsconfig.json is recommended to be 'bundler' (it is {targetToken!.GetValue<string>()})!");
         }
     }
 
-    private JsonObject GetTsConfig(string tsconfigPath)
+    private JsonObject? GetTsConfig(string tsconfigPath)
     {
         var npmProcess = new Process()
         {
@@ -489,7 +489,7 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
             }
         };
 
-        if (!processExecutor.StartAndWaitForExit(npmProcess, 50000, out string tscOutput, out _))
+        if (!processExecutor.StartAndWaitForExit(npmProcess, 50000, out string? tscOutput, out _))
             tscOutput = null;
 
         tscOutput = (tscOutput ?? "").Trim();
@@ -512,33 +512,33 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
     private class PackageJson
     {
 #pragma warning disable IDE1006 // Naming Styles
-        public Dictionary<string, string> dependencies { get; set; }
-        public Dictionary<string, string> devDependencies { get; set; }
+        public Dictionary<string, string>? dependencies { get; set; }
+        public Dictionary<string, string>? devDependencies { get; set; }
 #pragma warning restore IDE1006 // Naming Styles
 
     }
 
     private class ProjectMetadataJson
     {
-        public ProjectFileInfo.ProjectProperties Properties { get; set; }
-        public ProjectItems Items { get; set; }
+        public ProjectFileInfo.ProjectProperties? Properties { get; set; }
+        public ProjectItems? Items { get; set; }
     }
 
     private class ProjectItems
     {
-        public PackageReferenceItem[] PackageReference { get; set; }
-        public ProjectReferenceItem[] ProjectReference { get; set; }
+        public PackageReferenceItem[]? PackageReference { get; set; }
+        public ProjectReferenceItem[]? ProjectReference { get; set; }
     }
 
     private class PackageReferenceItem
     {
-        public string Identity { get; set; }
-        public string Version { get; set; }
+        public string? Identity { get; set; }
+        public string? Version { get; set; }
     }
 
     private class ProjectReferenceItem
     {
-        public string Filename { get; set; }
+        public string? Filename { get; set; }
     }
 
     [GeneratedRegex("^[A-Z]")]

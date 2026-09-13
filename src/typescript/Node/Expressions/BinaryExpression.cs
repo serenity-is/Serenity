@@ -7,7 +7,7 @@ public class BinaryExpression(IExpression left, Token operatorToken, IExpression
     public /*BinaryOperator*/Token OperatorToken { get; } = operatorToken;
     public IExpression Right { get; } = right;
 
-    public IEnumerable<INode> GetRestChildren()
+    public IEnumerable<INode?> GetRestChildren()
     {
         return [Left, OperatorToken, Right];
     }

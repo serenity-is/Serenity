@@ -6,7 +6,7 @@ public class AsExpression(IExpression expression, ITypeNode type)
     public IExpression Expression { get; } = expression;
     public ITypeNode Type { get; } = type;
 
-    public IEnumerable<INode> GetRestChildren()
+    public IEnumerable<INode?> GetRestChildren()
     {
         return [Expression, Type];
     }

@@ -75,7 +75,7 @@ public partial class ServerTypingsGenerator
                 if (!TypingsUtils.IsPublicInstanceProperty(item))
                     continue;
 
-                PropertyDefinition basedOnField = null;
+                PropertyDefinition? basedOnField = null;
                 if (basedOnByName != null)
                     basedOnField = basedOnByName[item.Name].FirstOrDefault();
 
@@ -116,7 +116,7 @@ public partial class ServerTypingsGenerator
         RegisterGeneratedType(codeNamespace, identifier, typeOnly: false);
     }
 
-    private static string AutoDetermineFormatterType(TypeReference valueType, TypeReference basedOnFieldType)
+    private static string? AutoDetermineFormatterType(TypeReference valueType, TypeReference? basedOnFieldType)
     {
         if (TypingsUtils.GetEnumTypeFrom(valueType) != null)
             return "Enum";
@@ -147,7 +147,7 @@ public partial class ServerTypingsGenerator
         return null;
     }
 
-    private static string GetFormatterTypeKeyFrom(TypeReference propertyType, TypeReference basedOnFieldType, CustomAttribute formatterTypeAttr)
+    private static string? GetFormatterTypeKeyFrom(TypeReference propertyType, TypeReference? basedOnFieldType, CustomAttribute? formatterTypeAttr)
     {
         if (formatterTypeAttr == null)
             return AutoDetermineFormatterType(propertyType, basedOnFieldType);
@@ -172,14 +172,14 @@ public partial class ServerTypingsGenerator
         if (keyConstant != null && keyConstant.Constant() as string != null)
             return keyConstant.Constant() as string;
 
-        string formatterType;
+        string? formatterType;
 #if !ISSOURCEGENERATOR
             formatterType = formatterTypeAttr.AttributeType().Resolve().MethodsOf()
                 .Where(x => x.IsConstructor())
                 .SelectMany(m => m.Body.Instructions
                     .Where(i => i.OpCode == OpCodes.Call &&
                         (i.Operand is Mono.Cecil.MethodReference) &&
-                        (i.Operand as Mono.Cecil.MethodReference).Resolve().IsConstructor &&
+                        (i.Operand as Mono.Cecil.MethodReference)!.Resolve().IsConstructor &&
                         i.Previous.OpCode == OpCodes.Ldstr &&
                         i.Previous.Operand is string)
                     .Select(x => x.Previous.Operand as string)).FirstOrDefault();

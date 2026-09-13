@@ -11,7 +11,7 @@ public class MappedTypeNode(Token readonlyToken, TypeParameterDeclaration typePa
     public ITypeNode Type { get; } = type;
     public NodeArray<ITypeElement> Members { get; } = members;
 
-    public IEnumerable<INode> GetRestChildren()
+    public IEnumerable<INode?> GetRestChildren()
     {
         yield return ReadonlyToken;
         yield return TypeParameter;

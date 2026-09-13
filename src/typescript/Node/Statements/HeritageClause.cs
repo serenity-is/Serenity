@@ -7,7 +7,7 @@ public class HeritageClause(SyntaxKind token, NodeArray<ExpressionWithTypeArgume
     public SyntaxKind Token { get; set; } = token; //  SyntaxKind.ExtendsKeyword | SyntaxKind.ImplementsKeyword
     public NodeArray<ExpressionWithTypeArguments> Types { get; } = types;
 
-    public IEnumerable<INode> GetRestChildren()
+    public IEnumerable<INode?> GetRestChildren()
     {
         return Types;
     }

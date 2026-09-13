@@ -8,7 +8,7 @@ public class TryStatement(Block tryBlock, CatchClause catchClause, Block finally
     public CatchClause CatchClause { get; } = catchClause;
     public Block FinallyBlock { get; } = finallyBlock;
 
-    public IEnumerable<INode> GetRestChildren()
+    public IEnumerable<INode?> GetRestChildren()
     {
         return [TryBlock, CatchClause, FinallyBlock];
     }

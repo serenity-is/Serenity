@@ -31,7 +31,7 @@ public partial class ServerTypingsGenerator
             foreach (var method in methods)
             {
                 if (methodNames.Contains(method.Name) ||
-                    !IsPublicServiceMethod(method, out TypeReference requestType, out TypeReference responseType, out string requestParam))
+                    !IsPublicServiceMethod(method, out TypeReference? requestType, out TypeReference? responseType, out string? requestParam))
                     continue;
 
                 methodNames.Add(method.Name);
@@ -129,10 +129,10 @@ public partial class ServerTypingsGenerator
         return className + "Service";
     }
 
-    protected static bool IsPublicServiceMethod(MethodDefinition method, out TypeReference requestType, out TypeReference responseType,
-        out string requestParam)
+    protected static bool IsPublicServiceMethod(MethodDefinition method, out TypeReference? requestType, out TypeReference? responseType,
+        out string? requestParam)
     {
-        ArgumentExceptionHelper.ThrowIfNull(method);
+        ArgumentNullException.ThrowIfNull(method);
 
         responseType = null;
         requestType = null;
@@ -197,33 +197,33 @@ public partial class ServerTypingsGenerator
         responseType = method.ReturnType;
         if (responseType != null &&
             responseType.IsGenericInstanceType(out var originalDefinition) &&
-            originalDefinition.FullNameOf().StartsWith("System.Threading.Tasks.Task`1", StringComparison.Ordinal))
+            originalDefinition!.FullNameOf().StartsWith("System.Threading.Tasks.Task`1", StringComparison.Ordinal))
         { 
 #if ISSOURCEGENERATOR
                 responseType = (responseType as INamedTypeSymbol).TypeArguments[0];
 #else
-                responseType = (responseType as GenericInstanceType).GenericArguments[0];
+                responseType = (responseType as GenericInstanceType)!.GenericArguments[0];
 #endif
         }
 
         if (responseType != null &&
             responseType.IsGenericInstanceType(out originalDefinition) &&
-            (originalDefinition.FullNameOf().StartsWith("Serenity.Services.Result`1", StringComparison.Ordinal) ||
-             originalDefinition.FullNameOf().StartsWith("Serenity.Services.ResultWithStatus`1", StringComparison.Ordinal)))
+            (originalDefinition!.FullNameOf().StartsWith("Serenity.Services.Result`1", StringComparison.Ordinal) ||
+             originalDefinition!.FullNameOf().StartsWith("Serenity.Services.ResultWithStatus`1", StringComparison.Ordinal)))
         {
 #if ISSOURCEGENERATOR
             responseType = (responseType as INamedTypeSymbol).TypeArguments[0];
 #else
-            responseType = (responseType as GenericInstanceType).GenericArguments[0];
+            responseType = (responseType as GenericInstanceType)!.GenericArguments[0];
 #endif
         }
 
-        if (TypingsUtils.IsOrSubClassOf(responseType, "System.Web.Mvc", "ActionResult") ||
+        if (TypingsUtils.IsOrSubClassOf(responseType!, "System.Web.Mvc", "ActionResult") ||
             TypingsUtils.IsAssignableFrom("Microsoft.AspNetCore.Mvc.IActionResult",
 #if ISSOURCEGENERATOR
             responseType))
 #else
-            responseType.Resolve()))
+            responseType!.Resolve()))
 #endif
             return false;
         else if (responseType == null || responseType.IsVoid())
@@ -234,7 +234,7 @@ public partial class ServerTypingsGenerator
 
     protected static string GetServiceUrlFromRoute(TypeDefinition controller)
     {
-        ArgumentExceptionHelper.ThrowIfNull(controller);
+        ArgumentNullException.ThrowIfNull(controller);
 
         var route = TypingsUtils.GetAttr(controller, "System.Web.Mvc", "RouteAttribute") ??
             TypingsUtils.GetAttr(controller, "Microsoft.AspNetCore.Mvc", "RouteAttribute");

@@ -4,7 +4,7 @@ public class Node(SyntaxKind kind) : TextRange, INode
 {
     public SyntaxKind Kind { get; set; } = kind;
     public NodeFlags Flags { get; set; }
-    public INode Parent { get; set; }
+    public INode? Parent { get; set; }
 
     public override string ToString()
     {

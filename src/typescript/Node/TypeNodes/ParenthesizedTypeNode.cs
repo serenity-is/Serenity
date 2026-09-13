@@ -5,7 +5,7 @@ public class ParenthesizedTypeNode(ITypeNode type)
 {
     public ITypeNode Type { get; set; } = type;
 
-    public IEnumerable<INode> GetRestChildren()
+    public IEnumerable<INode?> GetRestChildren()
     {
         return [Type];
     }

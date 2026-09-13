@@ -46,7 +46,7 @@ partial class Scanner
         return false;
     }
 
-    private static int ScanConflictMarkerTrivia(string text, int pos, Action<DiagnosticMessage, int?, int, object> error = null)
+    private static int ScanConflictMarkerTrivia(string text, int pos, Action<DiagnosticMessage, int?, int, object?>? error = null)
     {
         error?.Invoke(Diagnostics.Merge_conflict_marker_encountered, pos, mergeConflictMarkerLength, null);
 
@@ -202,7 +202,7 @@ partial class Scanner
 #endif
 
     /** Optionally, get the shebang */
-    private static string GetShebang(string text)
+    private static string? GetShebang(string text)
     {
         var match = shebangTriviaRegex.Match(text);
         if (match.Success && match.Captures.Count > 0)

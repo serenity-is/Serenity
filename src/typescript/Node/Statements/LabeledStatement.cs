@@ -7,7 +7,7 @@ public class LabeledStatement(Identifier label, IStatement statement)
     public Identifier Label { get; } = label;
     public IStatement Statement { get; } = statement;
 
-    public IEnumerable<INode> GetRestChildren()
+    public IEnumerable<INode?> GetRestChildren()
     {
         return [Label, Statement];
     }

@@ -7,7 +7,7 @@ public class CatchClause(VariableDeclaration variableDeclaration, Block block)
     public VariableDeclaration VariableDeclaration { get; set; } = variableDeclaration;
     public Block Block { get; set; } = block;
 
-    public IEnumerable<INode> GetRestChildren()
+    public IEnumerable<INode?> GetRestChildren()
     {
         return [VariableDeclaration, Block];
     }
