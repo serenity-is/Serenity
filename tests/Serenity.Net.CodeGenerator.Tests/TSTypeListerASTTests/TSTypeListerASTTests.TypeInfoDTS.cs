@@ -7,28 +7,30 @@ public partial class TSTypeListerASTTests
     public void Extract_TypeName_From_TypeInfo()
     {
         var fileSystem = new MockFileSystem();
-        fileSystem.AddFile("node_modules/@serenity-is/corelib/dist/index.d.ts", @"
+        fileSystem.AddFile("node_modules/@serenity-is/corelib/dist/index.d.ts", /*lang=typescript*/ """
 
-export type ClassTypeInfo<TypeName> = TypeInfo<TypeName>;
+            export type ClassTypeInfo<TypeName> = TypeInfo<TypeName>;
 
-export class Widget<TOptions = any> {
-	protected static registerClass<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): ClassTypeInfo<TypeName>;
-    static [Symbol.typeInfo]: ClassTypeInfo<""Serenity.Widget"">;
-}
-");
-        fileSystem.AddFile("node_modules/@serenity-is/corelib/package.json", @"{
-    ""name"": ""@serenity-is/corelib"",
-    ""types"": ""dist/index.d.ts""
-}");
+            export class Widget<TOptions = any> {
+            	protected static registerClass<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): ClassTypeInfo<TypeName>;
+                static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.Widget">;
+            }
+            """);
+        fileSystem.AddFile("node_modules/@serenity-is/corelib/package.json", /*lang=json*/ """
+            {
+                "name": "@serenity-is/corelib",
+                "types": "dist/index.d.ts"
+            }
+            """);
 
         var testTS = "test.ts";
-        fileSystem.AddFile(testTS, @"
-import { Widget } from '@serenity-is/corelib';
+        fileSystem.AddFile(testTS, /*lang=typescript*/ """
+            import { Widget } from '@serenity-is/corelib';
 
-export class Type1 extends Widget {
-    static [Symbol.typeInfo] = this.registerClass(""MyNamespace.MyType1"");
-}
-");
+            export class Type1 extends Widget {
+                static [Symbol.typeInfo] = this.registerClass("MyNamespace.MyType1");
+            }
+            """);
 
         var tl = new TSTypeListerAST(fileSystem, tsConfigDir: fileSystem.Directory.GetCurrentDirectory(),
             tsConfig: new TSConfig
@@ -68,29 +70,31 @@ export class Type1 extends Widget {
     public void Extract_TypeName_From_Via_Import_Statement_TypeInfo()
     {
         var fileSystem = new MockFileSystem();
-        fileSystem.AddFile("node_modules/@serenity-is/corelib/dist/index.d.ts", @"
+        fileSystem.AddFile("node_modules/@serenity-is/corelib/dist/index.d.ts", /*lang=typescript*/ """
 
-export type ClassTypeInfo<TypeName> = TypeInfo<TypeName>;
+            export type ClassTypeInfo<TypeName> = TypeInfo<TypeName>;
 
-export class Widget<TOptions = any> {
-	protected static registerClass<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): ClassTypeInfo<TypeName> {
-    }
-    static [Symbol.typeInfo]: ClassTypeInfo<""Serenity.Widget"">;
-}
-");
-        fileSystem.AddFile("node_modules/@serenity-is/corelib/package.json", @"{
-    ""name"": ""@serenity-is/corelib"",
-    ""types"": ""dist/index.d.ts""
-}");
+            export class Widget<TOptions = any> {
+            	protected static registerClass<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): ClassTypeInfo<TypeName> {
+                }
+                static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.Widget">;
+            }
+            """);
+        fileSystem.AddFile("node_modules/@serenity-is/corelib/package.json", /*lang=json*/ """
+            {
+                "name": "@serenity-is/corelib",
+                "types": "dist/index.d.ts"
+            }
+            """);
 
         var testTS = "test.ts";
-        fileSystem.AddFile(testTS, @"
-import { Widget } from '@serenity-is/corelib';
+        fileSystem.AddFile(testTS, /*lang=typescript*/ """
+            import { Widget } from '@serenity-is/corelib';
 
-export class Type1 extends Widget {
-    static [Symbol.typeInfo]: import(""@serenity-is/corelib"").ClassTypeInfo<""MyNamespace.MyType1"">;
-}
-");
+            export class Type1 extends Widget {
+                static [Symbol.typeInfo]: import("@serenity-is/corelib").ClassTypeInfo<"MyNamespace.MyType1">;
+            }
+            """);
 
         var tl = new TSTypeListerAST(fileSystem, tsConfigDir: fileSystem.Directory.GetCurrentDirectory(),
             tsConfig: new TSConfig
@@ -130,28 +134,30 @@ export class Type1 extends Widget {
     public void Extract_TypeName_From_Without_This_TypeInfo()
     {
         var fileSystem = new MockFileSystem();
-        fileSystem.AddFile("node_modules/@serenity-is/corelib/dist/index.d.ts", @"
+        fileSystem.AddFile("node_modules/@serenity-is/corelib/dist/index.d.ts", /*lang=typescript*/ """
 
-export type ClassTypeInfo<TypeName> = TypeInfo<TypeName>;
+            export type ClassTypeInfo<TypeName> = TypeInfo<TypeName>;
 
-export class Widget<TOptions = any> {
-	protected static registerClass<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): ClassTypeInfo<TypeName>;
-    static [Symbol.typeInfo]: ClassTypeInfo<""Serenity.Widget"">;
-}
-");
-        fileSystem.AddFile("node_modules/@serenity-is/corelib/package.json", @"{
-    ""name"": ""@serenity-is/corelib"",
-    ""types"": ""dist/index.d.ts""
-}");
+            export class Widget<TOptions = any> {
+            	protected static registerClass<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): ClassTypeInfo<TypeName>;
+                static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.Widget">;
+            }
+            """);
+        fileSystem.AddFile("node_modules/@serenity-is/corelib/package.json", /*lang=json*/ """
+            {
+                "name": "@serenity-is/corelib",
+                "types": "dist/index.d.ts"
+            }
+            """);
 
         var testTS = "test.ts";
-        fileSystem.AddFile(testTS, @"
-import { Widget } from '@serenity-is/corelib';
+        fileSystem.AddFile(testTS, /*lang=typescript*/ """
+            import { Widget } from '@serenity-is/corelib';
 
-export class Type1 extends Widget {
-    static [Symbol.typeInfo] = classTypeInfo(""MyNamespace.MyType1""); static { registerType(this); }
-}
-");
+            export class Type1 extends Widget {
+                static [Symbol.typeInfo] = classTypeInfo("MyNamespace.MyType1"); static { registerType(this); }
+            }
+            """);
 
         var tl = new TSTypeListerAST(fileSystem, tsConfigDir: fileSystem.Directory.GetCurrentDirectory(),
             tsConfig: new TSConfig
@@ -191,28 +197,30 @@ export class Type1 extends Widget {
     public void Extract_TypeName_With_Namespace_Dot_Only()
     {
         var fileSystem = new MockFileSystem();
-        fileSystem.AddFile("node_modules/@serenity-is/corelib/dist/index.d.ts", @"
+        fileSystem.AddFile("node_modules/@serenity-is/corelib/dist/index.d.ts", /*lang=typescript*/ """
 
-export type ClassTypeInfo<TypeName> = TypeInfo<TypeName>;
+            export type ClassTypeInfo<TypeName> = TypeInfo<TypeName>;
 
-export class Widget<TOptions = any> {
-	protected static registerClass<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): ClassTypeInfo<TypeName>;
-    static [Symbol.typeInfo]: ClassTypeInfo<""Serenity."">;
-}
-");
-        fileSystem.AddFile("node_modules/@serenity-is/corelib/package.json", @"{
-    ""name"": ""@serenity-is/corelib"",
-    ""types"": ""dist/index.d.ts""
-}");
+            export class Widget<TOptions = any> {
+            	protected static registerClass<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): ClassTypeInfo<TypeName>;
+                static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
+            }
+            """);
+        fileSystem.AddFile("node_modules/@serenity-is/corelib/package.json", /*lang=json*/ """
+            {
+                "name": "@serenity-is/corelib",
+                "types": "dist/index.d.ts"
+            }
+            """);
 
         var testTS = "test.ts";
-        fileSystem.AddFile(testTS, @"
-import { Widget } from '@serenity-is/corelib';
+        fileSystem.AddFile(testTS, /*lang=typescript*/ """
+            import { Widget } from '@serenity-is/corelib';
 
-export class Type1 extends Widget {
-    static [Symbol.typeInfo] = classTypeInfo(""MyNamespace.""); static { registerType(this); }
-}
-");
+            export class Type1 extends Widget {
+                static [Symbol.typeInfo] = classTypeInfo("MyNamespace."); static { registerType(this); }
+            }
+            """);
 
         var tl = new TSTypeListerAST(fileSystem, tsConfigDir: fileSystem.Directory.GetCurrentDirectory(),
             tsConfig: new TSConfig
@@ -252,30 +260,32 @@ export class Type1 extends Widget {
     public void Extract_TypeName_With_Imported_NamespacePrefix_Constant()
     {
         var fileSystem = new MockFileSystem();
-        fileSystem.AddFile("node_modules/@serenity-is/corelib/dist/index.d.ts", @"
+        fileSystem.AddFile("node_modules/@serenity-is/corelib/dist/index.d.ts", /*lang=typescript*/ """
 
-export type ClassTypeInfo<TypeName> = TypeInfo<TypeName>;
+            export type ClassTypeInfo<TypeName> = TypeInfo<TypeName>;
 
-export class Widget<TOptions = any> {
-	protected static registerClass<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): ClassTypeInfo<TypeName>;
-}
+            export class Widget<TOptions = any> {
+            	protected static registerClass<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): ClassTypeInfo<TypeName>;
+            }
 
-export const nsSerenity: ""Serenity."" = ""Serenity."";
-export const nsMyNamespace: ""MyNamespace."" = ""MyNamespace."";
-");
-        fileSystem.AddFile("node_modules/@serenity-is/corelib/package.json", @"{
-    ""name"": ""@serenity-is/corelib"",
-    ""types"": ""dist/index.d.ts""
-}");
+            export const nsSerenity: "Serenity." = "Serenity.";
+            export const nsMyNamespace: "MyNamespace." = "MyNamespace.";
+            """);
+        fileSystem.AddFile("node_modules/@serenity-is/corelib/package.json", /*lang=json*/ """
+            {
+                "name": "@serenity-is/corelib",
+                "types": "dist/index.d.ts"
+            }
+            """);
 
         var testTS = "test.ts";
-        fileSystem.AddFile(testTS, @"
-import { Widget, nsMyNamespace } from '@serenity-is/corelib';
+        fileSystem.AddFile(testTS, /*lang=typescript*/ """
+            import { Widget, nsMyNamespace } from '@serenity-is/corelib';
 
-export class Type1 extends Widget {
-    static [Symbol.typeInfo] = classTypeInfo(nsMyNamespace); static { registerType(this); }
-}
-");
+            export class Type1 extends Widget {
+                static [Symbol.typeInfo] = classTypeInfo(nsMyNamespace); static { registerType(this); }
+            }
+            """);
 
         var tl = new TSTypeListerAST(fileSystem, tsConfigDir: fileSystem.Directory.GetCurrentDirectory(),
             tsConfig: new TSConfig
@@ -310,31 +320,33 @@ export class Type1 extends Widget {
     public void Extract_TypeName_With_Local_NamespacePrefix_Constant()
     {
         var fileSystem = new MockFileSystem();
-        fileSystem.AddFile("node_modules/@serenity-is/corelib/dist/index.d.ts", @"
+        fileSystem.AddFile("node_modules/@serenity-is/corelib/dist/index.d.ts", /*lang=typescript*/ """
 
-export type ClassTypeInfo<TypeName> = TypeInfo<TypeName>;
+            export type ClassTypeInfo<TypeName> = TypeInfo<TypeName>;
 
-export class Widget<TOptions = any> {
-	protected static registerClass<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): ClassTypeInfo<TypeName>;
-}
+            export class Widget<TOptions = any> {
+            	protected static registerClass<TypeName>(typeName: StringLiteral<TypeName>, intfAndAttr?: any[]): ClassTypeInfo<TypeName>;
+            }
 
-export const nsSerenity: ""Serenity."" = ""Serenity."";
-");
-        fileSystem.AddFile("node_modules/@serenity-is/corelib/package.json", @"{
-    ""name"": ""@serenity-is/corelib"",
-    ""types"": ""dist/index.d.ts""
-}");
+            export const nsSerenity: "Serenity." = "Serenity.";
+            """);
+        fileSystem.AddFile("node_modules/@serenity-is/corelib/package.json", /*lang=json*/ """
+            {
+                "name": "@serenity-is/corelib",
+                "types": "dist/index.d.ts"
+            }
+            """);
 
         var testTS = "test.ts";
-        fileSystem.AddFile(testTS, @"
-import { Widget, nsMyNamespace } from '@serenity-is/corelib';
+        fileSystem.AddFile(testTS, /*lang=typescript*/ """
+            import { Widget, nsMyNamespace } from '@serenity-is/corelib';
 
-const nsMyNamespace: ""MyNamespace."" = ""MyNamespace."";
+            const nsMyNamespace: "MyNamespace." = "MyNamespace.";
 
-export class Type1 extends Widget {
-    static [Symbol.typeInfo] = classTypeInfo(nsMyNamespace); static { registerType(this); }
-}
-");
+            export class Type1 extends Widget {
+                static [Symbol.typeInfo] = classTypeInfo(nsMyNamespace); static { registerType(this); }
+            }
+            """);
 
         var tl = new TSTypeListerAST(fileSystem, tsConfigDir: fileSystem.Directory.GetCurrentDirectory(),
             tsConfig: new TSConfig

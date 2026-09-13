@@ -9,12 +9,12 @@ public partial class TSTypeListerASTTests
         fileSystem.CreateDirectory(root);
         string myDialog = root + "Modules/Test/MyDialog.ts";
         fileSystem.CreateDirectory(fileSystem.GetDirectoryName(myDialog));
-        fileSystem.WriteAllText(myDialog, @"
-import { EntityDialog } from '@serenity-is/corelib';
+        fileSystem.WriteAllText(myDialog, /*lang=typescript*/ """
+            import { EntityDialog } from '@serenity-is/corelib';
 
-export class MyDialog extends EntityDialog {
-}
-");
+            export class MyDialog extends EntityDialog {
+            }
+            """);
         string corelibPackage = root + "node_modules/@serenity-is/corelib/package.json";
         string corelibIndexTS = root + "node_modules/@serenity-is/corelib/src/index.ts";
         string serenityIndexTS = root + "node_modules/@serenity-is/corelib/src/serenity/index.ts";
@@ -22,36 +22,38 @@ export class MyDialog extends EntityDialog {
         fileSystem.CreateDirectory(fileSystem.GetDirectoryName(serenityIndexTS));
         fileSystem.CreateDirectory(fileSystem.GetDirectoryName(editorTypesTS));
 
-        fileSystem.WriteAllText(corelibPackage, @"{
-    ""name"": ""@serenity-is/corelib"",
-    ""types"": ""src/index.ts"",
-    ""typesVersions"": {
-        ""*"": {
-            ""serenity"": [ ""src/serenity/index.ts"" ]
-        }
-    }
-}");
-        fileSystem.WriteAllText(corelibIndexTS, @"
-export * from ""./serenity"";
-");
+        fileSystem.WriteAllText(corelibPackage, /*lang=json*/ """
+            {
+                "name": "@serenity-is/corelib",
+                "types": "src/index.ts",
+                "typesVersions": {
+                    "*": {
+                        "serenity": [ "src/serenity/index.ts" ]
+                    }
+                }
+            }
+            """);
+        fileSystem.WriteAllText(corelibIndexTS, /*lang=typescript*/ """
+            export * from "./serenity";
+            """);
 
-        fileSystem.WriteAllText(serenityIndexTS, @"
-export * from ""../ui/editors/editortypes"";
-");
+        fileSystem.WriteAllText(serenityIndexTS, /*lang=typescript*/ """
+            export * from "../ui/editors/editortypes";
+            """);
 
-        fileSystem.WriteAllText(editorTypesTS, @"
-import { Decorators } from ""../../decorators"";
-import { IStringValue } from ""../../interfaces"";
-import { Widget } from ""../widgets/widget"";
+        fileSystem.WriteAllText(editorTypesTS, /*lang=typescript*/ """
+            import { Decorators } from "../../decorators";
+            import { IStringValue } from "../../interfaces";
+            import { Widget } from "../widgets/widget";
 
-@Decorators.registerEditor('Serenity.StringEditor', [IStringValue])
-export class StringEditor extends Widget<any> {
-}
+            @Decorators.registerEditor('Serenity.StringEditor', [IStringValue])
+            export class StringEditor extends Widget<any> {
+            }
 
-@Decorators.registerEditor('Serenity.PasswordEditor')
-export class PasswordEditor extends StringEditor {
-}
-");
+            @Decorators.registerEditor('Serenity.PasswordEditor')
+            export class PasswordEditor extends StringEditor {
+            }
+            """);
 
         var tl = new TSTypeListerAST(fileSystem, tsConfigDir: root, tsConfig: new TSConfig
         {

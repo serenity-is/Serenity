@@ -20,31 +20,37 @@ namespace Serenity.CodeGeneration
         [Theory]
         [InlineData(
             typeof(PermissionKeysSample1Depth1),
-    @"export namespace PermissionKeysSample1Depth1 {
-    export const Security = ""Administration:Security"";
-}")]
+            /*lang=typescript*/ """
+            export namespace PermissionKeysSample1Depth1 {
+                export const Security = "Administration:Security";
+            }
+            """)]
         [InlineData(
             typeof(PermissionKeysSample2Depth1),
-    @"export namespace PermissionKeysSample2Depth1 {
-    export const Security = ""Administration:Security"";
-    
-    export namespace PermissionKeysSample2Depth2 {
-        export const Security= ""Administration:Security"";
-    }
-}")]
+            /*lang=typescript*/ """
+            export namespace PermissionKeysSample2Depth1 {
+                export const Security = "Administration:Security";
+
+                export namespace PermissionKeysSample2Depth2 {
+                    export const Security= "Administration:Security";
+                }
+            }
+            """)]
         [InlineData(
             typeof(PermissionKeysSample3Depth1),
-    @"export namespace PermissionKeysSample3Depth1 {
-    export const Security = ""Administration:Security"";
-        
-    export namespace PermissionKeysSample3Depth2 {
-        export const Security =""Administration:Security"";
-            
-        export namespace PermissionKeysSample3Depth3 {
-            export const Security = ""Administration:Security"";
-        }
-    }
-}")]
+            /*lang=typescript*/ """
+            export namespace PermissionKeysSample3Depth1 {
+                export const Security = "Administration:Security";
+
+                export namespace PermissionKeysSample3Depth2 {
+                    export const Security ="Administration:Security";
+
+                    export namespace PermissionKeysSample3Depth3 {
+                        export const Security = "Administration:Security";
+                    }
+                }
+            }
+            """)]
 
         public void PermissionKeys_Generated_Properly(Type classType, string expected)
         {

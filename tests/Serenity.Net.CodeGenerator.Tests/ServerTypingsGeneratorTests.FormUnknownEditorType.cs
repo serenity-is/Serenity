@@ -20,29 +20,31 @@ public partial class ServerTypingsGeneratorTests
         });
         var result = generator.Run();
         var code = Assert.Single(ExceptGenericFiles(result)).Text;
-        Assert.Equal(NormalizeTS(@"import { initFormType, PrefixedContext, Widget } from ""@serenity-is/corelib"";
+        Assert.Equal(NormalizeTS(/*lang=typescript*/ """
+            import { initFormType, PrefixedContext, Widget } from "@serenity-is/corelib";
 
-export interface FormWithUnknownEditor {
-    Test: Widget;
-}
+            export interface FormWithUnknownEditor {
+                Test: Widget;
+            }
 
-export class FormWithUnknownEditor extends PrefixedContext {
-    static readonly formKey = 'FormWithUnknownEditor';
-    declare private static init: boolean;
+            export class FormWithUnknownEditor extends PrefixedContext {
+                static readonly formKey = 'FormWithUnknownEditor';
+                declare private static init: boolean;
 
 
-    constructor(...args: ConstructorParameters<typeof PrefixedContext>) {
-        super(...args);
+                constructor(...args: ConstructorParameters<typeof PrefixedContext>) {
+                    super(...args);
 
-        if (!FormWithUnknownEditor.init) {
-            FormWithUnknownEditor.init = true;
+                    if (!FormWithUnknownEditor.init) {
+                        FormWithUnknownEditor.init = true;
 
-            initFormType(FormWithUnknownEditor, [
-                'Test', Widget
-            ]);
-        }
-    }
-}"), NormalizeTS(code));
+                        initFormType(FormWithUnknownEditor, [
+                            'Test', Widget
+                        ]);
+                    }
+                }
+            }
+            """), NormalizeTS(code));
     }
 }
 

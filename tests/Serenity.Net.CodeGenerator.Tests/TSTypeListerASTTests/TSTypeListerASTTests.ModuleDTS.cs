@@ -6,27 +6,29 @@ public partial class TSTypeListerASTTests
     public void ModuleDTS_Extracts_StringEditor_Without_Decorators()
     {
         var fileSystem = new MockFileSystem();
-        fileSystem.AddFile("node_modules/@serenity-is/corelib/dist/index.d.ts", @"
-declare class Widget<TOptions = any> {
-}
+        fileSystem.AddFile("node_modules/@serenity-is/corelib/dist/index.d.ts", /*lang=typescript*/ """
+            declare class Widget<TOptions = any> {
+            }
 
-declare class StringEditor extends Widget<any> {
-}
+            declare class StringEditor extends Widget<any> {
+            }
 
-export { Widget, StringEditor }
-");
-        fileSystem.AddFile("node_modules/@serenity-is/corelib/package.json", @"{
-    ""name"": ""@serenity-is/corelib"",
-    ""types"": ""dist/index.d.ts""
-}");
+            export { Widget, StringEditor }
+            """);
+        fileSystem.AddFile("node_modules/@serenity-is/corelib/package.json", /*lang=json*/ """
+            {
+                "name": "@serenity-is/corelib",
+                "types": "dist/index.d.ts"
+            }
+            """);
 
         var testTS = "test.ts";
-        fileSystem.AddFile(testTS, @"
-import { StringEditor } from '@serenity-is/corelib';
+        fileSystem.AddFile(testTS, /*lang=typescript*/ """
+            import { StringEditor } from '@serenity-is/corelib';
 
-export class Type1 extends StringEditor {
-}
-");
+            export class Type1 extends StringEditor {
+            }
+            """);
 
         var tl = new TSTypeListerAST(fileSystem, tsConfigDir: fileSystem.Directory.GetCurrentDirectory(),
             tsConfig: new TSConfig
@@ -63,29 +65,31 @@ export class Type1 extends StringEditor {
     public void ModuleDTS_Extracts_StringEditor_Without_Decorators_But_Static_TypeName()
     {
         var fileSystem = new MockFileSystem();
-        fileSystem.AddFile("node_modules/@serenity-is/corelib/dist/index.d.ts", @"
-declare class Widget<TOptions = any> {
-}
+        fileSystem.AddFile("node_modules/@serenity-is/corelib/dist/index.d.ts", /*lang=typescript*/ """
+            declare class Widget<TOptions = any> {
+            }
 
-declare class StringEditor extends Widget<any> {
-    static [Symbol.typeInfo] = this.registerEditor(""Serenity.StringEditor"");
-    static readonly __bool = false;
-}
+            declare class StringEditor extends Widget<any> {
+                static [Symbol.typeInfo] = this.registerEditor("Serenity.StringEditor");
+                static readonly __bool = false;
+            }
 
-export { Widget, StringEditor }
-");
-        fileSystem.AddFile("node_modules/@serenity-is/corelib/package.json", @"{
-    ""name"": ""@serenity-is/corelib"",
-    ""types"": ""dist/index.d.ts""
-}");
+            export { Widget, StringEditor }
+            """);
+        fileSystem.AddFile("node_modules/@serenity-is/corelib/package.json", /*lang=json*/ """
+            {
+                "name": "@serenity-is/corelib",
+                "types": "dist/index.d.ts"
+            }
+            """);
 
         var testTS = "test.ts";
-        fileSystem.AddFile(testTS, @"
-import { StringEditor } from '@serenity-is/corelib';
+        fileSystem.AddFile(testTS, /*lang=typescript*/ """
+            import { StringEditor } from '@serenity-is/corelib';
 
-export class Type1 extends StringEditor {
-}
-");
+            export class Type1 extends StringEditor {
+            }
+            """);
 
         var tl = new TSTypeListerAST(fileSystem, tsConfigDir: fileSystem.Directory.GetCurrentDirectory(), tsConfig: new TSConfig
         {

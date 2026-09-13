@@ -13,46 +13,50 @@ public class GeneratorDefaults
         [new(9, 0, 0)] = v9_0_0
     };
 
-    private const string v6_6_0 = /*lang=json*/ @"{
-  ""DeclareJoinConstants"": true,
-  ""EndOfLine"": ""LF"",
-  ""FileScopedNamespaces"": true,
-  ""ForeignFieldSelection"": ""NameOnly"",
-  ""OmitDefaultSchema"": true,
-  ""SaveGeneratedTables"": false,
-  ""Restore"": {
-    ""Exclude"": [
-      ""**/*""
-    ],
-    ""Typings"": false
-  },
-  ""ServerTypings"": {
-    ""LocalTexts"": true,
-    ""PreferRelativePaths"": true
-  }
-}";
+    private const string v6_6_0 = /*lang=json*/ """
+        {
+          "DeclareJoinConstants": true,
+          "EndOfLine": "LF",
+          "FileScopedNamespaces": true,
+          "ForeignFieldSelection": "NameOnly",
+          "OmitDefaultSchema": true,
+          "SaveGeneratedTables": false,
+          "Restore": {
+            "Exclude": [
+              "**/*"
+            ],
+            "Typings": false
+          },
+          "ServerTypings": {
+            "LocalTexts": true,
+            "PreferRelativePaths": true
+          }
+        }
+        """;
 
-    private const string v9_0_0 = /*lang=json*/ @"{
-  ""DeclareJoinConstants"": true,
-  ""EndOfLine"": ""LF"",
-  ""FileScopedNamespaces"": true,
-  ""ForeignFieldSelection"": ""NameOnly"",
-  ""OmitDefaultSchema"": true,
-  ""SaveGeneratedTables"": false,
-  ""Restore"": {
-    ""Exclude"": [
-      ""**/*""
-    ],
-    ""Typings"": false
-  },
-  ""MVC"": {
-    ""AsNamespace"": true
-  },
-  ""ServerTypings"": {
-    ""LocalTexts"": true,
-    ""PreferRelativePaths"": true
-  }
-}";
+    private const string v9_0_0 = /*lang=json*/ """
+        {
+          "DeclareJoinConstants": true,
+          "EndOfLine": "LF",
+          "FileScopedNamespaces": true,
+          "ForeignFieldSelection": "NameOnly",
+          "OmitDefaultSchema": true,
+          "SaveGeneratedTables": false,
+          "Restore": {
+            "Exclude": [
+              "**/*"
+            ],
+            "Typings": false
+          },
+          "MVC": {
+            "AsNamespace": true
+          },
+          "ServerTypings": {
+            "LocalTexts": true,
+            "PreferRelativePaths": true
+          }
+        }
+        """;
 
     /// <summary>
     /// Tries to parse "defaults@9.0.0" type of extends

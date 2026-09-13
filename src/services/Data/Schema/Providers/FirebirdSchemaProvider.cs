@@ -29,22 +29,23 @@ public class FirebirdSchemaProvider : ISchemaProvider
     /// <inheritdoc/>
     public IEnumerable<FieldInfo> GetFieldInfos(IDbConnection connection, string? schema, string table)
     {
-        return connection.Query<FieldInfoSource>(@"
-                SELECT
-                    rfr.rdb$field_name AS FIELD_NAME,
-                    fld.rdb$field_type AS FIELD_TYPE,
-                    fld.rdb$field_sub_type AS FIELD_SUB_TYPE,
-                    CAST(fld.rdb$field_length AS integer) AS SIZE,
-                    CAST(fld.rdb$field_precision AS integer) AS NUMERIC_PRECISION,
-                    CAST(fld.rdb$field_scale AS integer) AS NUMERIC_SCALE,
-                    CAST(fld.rdb$character_length AS integer) AS CHARMAXLENGTH,
-                    coalesce(fld.rdb$null_flag, rfr.rdb$null_flag) AS COLUMN_NULLABLE
-                FROM rdb$relation_fields rfr
-                    LEFT JOIN rdb$fields fld ON rfr.rdb$field_source = fld.rdb$field_name
-                WHERE
-                    rfr.rdb$relation_name = @tbl
-                ORDER BY 
-                    rfr.rdb$field_position", new
+        return connection.Query<FieldInfoSource>(/*lang=sql*/ """
+            SELECT
+                rfr.rdb$field_name AS FIELD_NAME,
+                fld.rdb$field_type AS FIELD_TYPE,
+                fld.rdb$field_sub_type AS FIELD_SUB_TYPE,
+                CAST(fld.rdb$field_length AS integer) AS SIZE,
+                CAST(fld.rdb$field_precision AS integer) AS NUMERIC_PRECISION,
+                CAST(fld.rdb$field_scale AS integer) AS NUMERIC_SCALE,
+                CAST(fld.rdb$character_length AS integer) AS CHARMAXLENGTH,
+                coalesce(fld.rdb$null_flag, rfr.rdb$null_flag) AS COLUMN_NULLABLE
+            FROM rdb$relation_fields rfr
+                LEFT JOIN rdb$fields fld ON rfr.rdb$field_source = fld.rdb$field_name
+            WHERE
+                rfr.rdb$relation_name = @tbl
+            ORDER BY 
+                rfr.rdb$field_position
+            """, new
         {
             tbl = table
         }).Select(src =>
@@ -79,24 +80,25 @@ public class FirebirdSchemaProvider : ISchemaProvider
     /// <inheritdoc/>
     public IEnumerable<ForeignKeyInfo> GetForeignKeys(IDbConnection connection, string? schema, string table)
     {
-        return connection.Query<ForeignKeyInfo>(@"
-                SELECT
-                    PK.RDB$RELATION_NAME as PKTable,
-                    ISP.RDB$FIELD_NAME as PKColumn,
-                    FK.RDB$CONSTRAINT_NAME as FKName
-                FROM
-                    RDB$RELATION_CONSTRAINTS PK, 
-                    RDB$RELATION_CONSTRAINTS FK, 
-                    RDB$REF_CONSTRAINTS RC, 
-                    RDB$INDEX_SEGMENTS ISP, 
-                    RDB$INDEX_SEGMENTS ISF
-                    WHERE FK.RDB$RELATION_NAME = @tbl
-                    AND FK.RDB$CONSTRAINT_NAME = RC.RDB$CONSTRAINT_NAME
-                    AND PK.RDB$CONSTRAINT_NAME = RC.RDB$CONST_NAME_UQ
-                    AND ISP.RDB$INDEX_NAME = PK.RDB$INDEX_NAME
-                    AND ISF.RDB$INDEX_NAME = FK.RDB$INDEX_NAME
-                    AND ISP.RDB$FIELD_POSITION = ISF.RDB$FIELD_POSITION
-                    ORDER BY ISP.RDB$FIELD_POSITION", new
+        return connection.Query<ForeignKeyInfo>(/*lang=sql*/ """
+            SELECT
+                PK.RDB$RELATION_NAME as PKTable,
+                ISP.RDB$FIELD_NAME as PKColumn,
+                FK.RDB$CONSTRAINT_NAME as FKName
+            FROM
+                RDB$RELATION_CONSTRAINTS PK, 
+                RDB$RELATION_CONSTRAINTS FK, 
+                RDB$REF_CONSTRAINTS RC, 
+                RDB$INDEX_SEGMENTS ISP, 
+                RDB$INDEX_SEGMENTS ISF
+                WHERE FK.RDB$RELATION_NAME = @tbl
+                AND FK.RDB$CONSTRAINT_NAME = RC.RDB$CONSTRAINT_NAME
+                AND PK.RDB$CONSTRAINT_NAME = RC.RDB$CONST_NAME_UQ
+                AND ISP.RDB$INDEX_NAME = PK.RDB$INDEX_NAME
+                AND ISF.RDB$INDEX_NAME = FK.RDB$INDEX_NAME
+                AND ISP.RDB$FIELD_POSITION = ISF.RDB$FIELD_POSITION
+                ORDER BY ISP.RDB$FIELD_POSITION
+            """, new
         {
             tbl = table
         }).Select(x =>
@@ -112,10 +114,11 @@ public class FirebirdSchemaProvider : ISchemaProvider
     /// <inheritdoc/>
     public IEnumerable<string> GetIdentityFields(IDbConnection connection, string? schema, string table)
     {
-        var match = connection.Query<string>(@"
-                    SELECT RDB$GENERATOR_NAME
-                    FROM RDB$GENERATORS
-                    WHERE RDB$SYSTEM_FLAG = 0 AND RDB$GENERATOR_NAME LIKE @genprefix",
+        var match = connection.Query<string>(/*lang=sql*/ """
+            SELECT RDB$GENERATOR_NAME
+            FROM RDB$GENERATORS
+            WHERE RDB$SYSTEM_FLAG = 0 AND RDB$GENERATOR_NAME LIKE @genprefix
+            """,
             new
             {
                 genprefix = "GEN_" + table + "_%"
@@ -133,12 +136,13 @@ public class FirebirdSchemaProvider : ISchemaProvider
             return [];
         }
 
-        return connection.Query<string>(@"
-                    SELECT RDB$FIELD_NAME
-                    FROM RDB$RELATION_FIELDS
-                    WHERE RDB$RELATION_NAME = @tbl
-                    AND RDB$FIELD_NAME LIKE @match
-                    ORDER BY RDB$FIELD_POSITION",
+        return connection.Query<string>(/*lang=sql*/ """
+            SELECT RDB$FIELD_NAME
+            FROM RDB$RELATION_FIELDS
+            WHERE RDB$RELATION_NAME = @tbl
+            AND RDB$FIELD_NAME LIKE @match
+            ORDER BY RDB$FIELD_POSITION
+            """,
             new
             {
                 tbl = table,
@@ -152,13 +156,14 @@ public class FirebirdSchemaProvider : ISchemaProvider
     /// <inheritdoc/>
     public IEnumerable<string> GetPrimaryKeyFields(IDbConnection connection, string? schema, string table)
     {
-        return connection.Query<string>(@"
-                SELECT ISGMT.RDB$FIELD_NAME FROM
-                RDB$RELATION_CONSTRAINTS rc
-                INNER JOIN RDB$INDEX_SEGMENTS ISGMT ON rc.RDB$INDEX_NAME = ISGMT.RDB$INDEX_NAME
-                WHERE CAST(RC.RDB$RELATION_NAME AS VARCHAR(40)) = @tbl 
-                    AND RC.RDB$CONSTRAINT_TYPE = 'PRIMARY KEY'
-                ORDER BY ISGMT.RDB$FIELD_POSITION", new { tbl = table })
+        return connection.Query<string>(/*lang=sql*/ """
+            SELECT ISGMT.RDB$FIELD_NAME FROM
+            RDB$RELATION_CONSTRAINTS rc
+            INNER JOIN RDB$INDEX_SEGMENTS ISGMT ON rc.RDB$INDEX_NAME = ISGMT.RDB$INDEX_NAME
+            WHERE CAST(RC.RDB$RELATION_NAME AS VARCHAR(40)) = @tbl 
+                AND RC.RDB$CONSTRAINT_TYPE = 'PRIMARY KEY'
+            ORDER BY ISGMT.RDB$FIELD_POSITION
+            """, new { tbl = table })
                 .Select(StringHelper.TrimToNull)
                 .OfType<string>();
     }
@@ -172,10 +177,11 @@ public class FirebirdSchemaProvider : ISchemaProvider
     /// <inheritdoc/>
     public IEnumerable<TableName> GetTableNames(IDbConnection connection)
     {
-        return connection.Query<TableNameSource>(@"
-                    SELECT RDB$RELATION_NAME NAME, RDB$VIEW_BLR ISVIEW
-                    FROM RDB$RELATIONS  
-                    WHERE (RDB$SYSTEM_FLAG IS NULL OR RDB$SYSTEM_FLAG = 0)")
+        return connection.Query<TableNameSource>(/*lang=sql*/ """
+            SELECT RDB$RELATION_NAME NAME, RDB$VIEW_BLR ISVIEW
+            FROM RDB$RELATIONS  
+            WHERE (RDB$SYSTEM_FLAG IS NULL OR RDB$SYSTEM_FLAG = 0)
+            """)
             .Select(x => new TableName
             {
                 Table = StringHelper.TrimToEmpty(x.NAME),

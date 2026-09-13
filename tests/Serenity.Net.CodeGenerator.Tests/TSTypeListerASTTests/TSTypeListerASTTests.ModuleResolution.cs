@@ -9,14 +9,14 @@ public partial class TSTypeListerASTTests
     {
         var fileSystem = new MockFileSystem();
         fileSystem.CreateDirectory(root);
-        fileSystem.WriteAllText(root + "a.d.ts", @"
-import { B1 } from './b';
-");
+        fileSystem.WriteAllText(root + "a.d.ts", /*lang=typescript*/ """
+            import { B1 } from './b';
+            """);
 
-        fileSystem.WriteAllText(root + "b.d.ts", @"
-export class B1 {
-}
-");
+        fileSystem.WriteAllText(root + "b.d.ts", /*lang=typescript*/ """
+            export class B1 {
+            }
+            """);
 
         var tl = new TSTypeListerAST(fileSystem, tsConfigDir: root, tsConfig: null);
         tl.AddInputFile(root + "a.d.ts");
@@ -33,16 +33,16 @@ export class B1 {
         fileSystem.CreateDirectory(root);
         string fileA = root + "x/y/a.d.ts";
         fileSystem.CreateDirectory(fileSystem.GetDirectoryName(fileA));
-        fileSystem.WriteAllText(fileA, @"
-import { B1 } from '/z/b';
-");
+        fileSystem.WriteAllText(fileA, /*lang=typescript*/ """
+            import { B1 } from '/z/b';
+            """);
 
         string fileB = root + "z/b.d.ts";
         fileSystem.CreateDirectory(fileSystem.GetDirectoryName(fileB));
-        fileSystem.WriteAllText(fileB, @"
-export class B1 {
-}
-");
+        fileSystem.WriteAllText(fileB, /*lang=typescript*/ """
+            export class B1 {
+            }
+            """);
 
         var tl = new TSTypeListerAST(fileSystem, tsConfigDir: root, tsConfig: null);
         tl.AddInputFile(fileA);
@@ -59,16 +59,16 @@ export class B1 {
         fileSystem.CreateDirectory(root);
         string fileA = root + "x/y/a.d.ts";
         fileSystem.CreateDirectory(fileSystem.GetDirectoryName(fileA));
-        fileSystem.WriteAllText(fileA, @"
-import { B1 } from 'my/b';
-");
+        fileSystem.WriteAllText(fileA, /*lang=typescript*/ """
+            import { B1 } from 'my/b';
+            """);
 
         string fileB = root + "zzz/b.d.ts";
         fileSystem.CreateDirectory(fileSystem.GetDirectoryName(fileB));
-        fileSystem.WriteAllText(fileB, @"
-export class B1 {
-}
-");
+        fileSystem.WriteAllText(fileB, /*lang=typescript*/ """
+            export class B1 {
+            }
+            """);
 
         var tl = new TSTypeListerAST(fileSystem, tsConfigDir: root, tsConfig: new TSConfig
         {
@@ -94,16 +94,16 @@ export class B1 {
         fileSystem.CreateDirectory(root);
         string fileA = root + "x/y/a.d.ts";
         fileSystem.CreateDirectory(fileSystem.GetDirectoryName(fileA));
-        fileSystem.WriteAllText(fileA, @"
-import { B1 } from 'my/b';
-");
+        fileSystem.WriteAllText(fileA, /*lang=typescript*/ """
+            import { B1 } from 'my/b';
+            """);
 
         string fileB = root + "zzz/b.d.ts";
         fileSystem.CreateDirectory(fileSystem.GetDirectoryName(fileB));
-        fileSystem.WriteAllText(fileB, @"
-export class B1 {
-}
-");
+        fileSystem.WriteAllText(fileB, /*lang=typescript*/ """
+            export class B1 {
+            }
+            """);
 
         var tl = new TSTypeListerAST(fileSystem, tsConfigDir: root, tsConfig: new TSConfig
         {
@@ -129,22 +129,24 @@ export class B1 {
         fileSystem.CreateDirectory(root);
         string fileA = root + "x/y/a.d.ts";
         fileSystem.CreateDirectory(fileSystem.GetDirectoryName(fileA));
-        fileSystem.WriteAllText(fileA, @"
-import { B1 } from 'module-a';
-");
+        fileSystem.WriteAllText(fileA, /*lang=typescript*/ """
+            import { B1 } from 'module-a';
+            """);
 
         string moduleAPackage = root + "node_modules/module-a/package.json";
         string moduleAIndexTS = root + "node_modules/module-a/src/index.ts";
         fileSystem.CreateDirectory(fileSystem.GetDirectoryName(moduleAIndexTS));
 
-        fileSystem.WriteAllText(moduleAPackage, @"{
-    ""types"": ""src/index.ts""
-}");
+        fileSystem.WriteAllText(moduleAPackage, /*lang=json*/ """
+            {
+                "types": "src/index.ts"
+            }
+            """);
 
-        fileSystem.WriteAllText(moduleAIndexTS, @"
-export class A1 {
-}
-");
+        fileSystem.WriteAllText(moduleAIndexTS, /*lang=typescript*/ """
+            export class A1 {
+            }
+            """);
 
         var tl = new TSTypeListerAST(fileSystem, tsConfigDir: root, tsConfig: new TSConfig
         {

@@ -6,23 +6,24 @@ public partial class TSTypeListerASTTests
     public void Resolves_Namespace_DecoratorRefs_InSerenityNamespace()
     {
         var fileSystem = new MockFileSystem();
-        fileSystem.WriteAllText("a.ts", @"
-declare namespace Serenity {
-    export class Widget {
-    }
+        fileSystem.WriteAllText("a.ts", /*lang=typescript*/ """
+            declare namespace Serenity {
+                export class Widget {
+                }
 
-    export namespace Decorators {
-        export function registerEditor();
-    }
-}
+                export namespace Decorators {
+                    export function registerEditor();
+                }
+            }
 
 
-namespace Serenity.Sub {
+            namespace Serenity.Sub {
 
-    @Decorators.registerEditor()
-    export class B extends Serenity.Widget {
-    }
-}");
+                @Decorators.registerEditor()
+                export class B extends Serenity.Widget {
+                }
+            }
+            """);
 
         var tl = new TSTypeListerAST(fileSystem, tsConfigDir: "/", tsConfig: null);
         tl.AddInputFile("a.ts");

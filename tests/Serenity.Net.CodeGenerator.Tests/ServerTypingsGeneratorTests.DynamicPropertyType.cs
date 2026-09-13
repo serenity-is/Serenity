@@ -10,9 +10,11 @@ namespace Serenity.CodeGeneration
             var generator = CreateGenerator(typeof(TypeWithDynamicMember));
             var files = generator.Run();
             var actual = Assert.Single(ExceptGenericFiles(files)).Text;
-            Assert.Equal(NormalizeTS(@"export interface TypeWithDynamicMember {
-    SomeDynamic?: any;
-}"), NormalizeTS(actual));
+            Assert.Equal(NormalizeTS(/*lang=typescript*/ """
+                export interface TypeWithDynamicMember {
+                    SomeDynamic?: any;
+                }
+                """), NormalizeTS(actual));
         }
     }
 }

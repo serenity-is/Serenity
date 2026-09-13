@@ -35,11 +35,13 @@ public class EntityConnectionExtensions_ById_Tests
 
         connection.ById<IdNameRow>(777);
         var call = Assert.Single(connection.ExecuteReaderCalls);
-        Assert.Equal(@"SELECT 
-T0.[ID] AS [ID],
-T0.[Name] AS [Name] 
-FROM [IdName] T0 
-WHERE (T0.[ID] = @p1)".NormalizeSql(), call.CommandText.NormalizeSql());
+        Assert.Equal(/*lang=sql*/ """
+            SELECT 
+            T0.[ID] AS [ID],
+            T0.[Name] AS [Name] 
+            FROM [IdName] T0 
+            WHERE (T0.[ID] = @p1)
+            """.NormalizeSql(), call.CommandText.NormalizeSql());
         var param = Assert.Single(call.Parameters);
         Assert.Equal(777, param.Value);
     }

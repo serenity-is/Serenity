@@ -157,15 +157,16 @@ public static class MigrationUtils
             .Execute.Sql("CREATE SEQUENCE " + seq);
 
         migration.IfDatabase("Oracle")
-            .Execute.Sql(string.Format(CultureInfo.InvariantCulture, @"
-CREATE OR REPLACE TRIGGER {2}_TRG
-BEFORE INSERT ON {0}
-FOR EACH ROW
-BEGIN
-	IF :new.{1} IS NULL THEN
-		SELECT {2}.nextval INTO :new.{1} FROM DUAL;
-	END IF;
-END;", table, id, seq));
+            .Execute.Sql(string.Format(CultureInfo.InvariantCulture, /*lang=sql*/ """
+                CREATE OR REPLACE TRIGGER {2}_TRG
+                BEFORE INSERT ON {0}
+                FOR EACH ROW
+                BEGIN
+                	IF :new.{1} IS NULL THEN
+                		SELECT {2}.nextval INTO :new.{1} FROM DUAL;
+                	END IF;
+                END;
+                """, table, id, seq));
 
         migration.IfDatabase("Oracle")
             .Execute.Sql(@"ALTER TRIGGER " + seq + "_TRG ENABLE");

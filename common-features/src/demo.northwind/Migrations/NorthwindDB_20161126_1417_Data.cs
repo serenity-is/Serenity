@@ -33,30 +33,32 @@ public class NorthwindDB_20161126_1417_Data : Migration
         InsertRows("OrderDetails", OrderDetailList, identityInsert: false);
 
         IfDatabase("Postgres")
-            .Execute.Sql(@"
-SELECT setval('""Region_RegionID_seq""', max(""RegionID"")) FROM ""Region"";
-SELECT setval('""Categories_CategoryID_seq""', max(""CategoryID"")) FROM ""Categories"";
-SELECT setval('""Employees_EmployeeID_seq""', max(""EmployeeID"")) FROM ""Employees"";
-SELECT setval('""Orders_OrderID_seq""', max(""OrderID"")) FROM ""Orders"";
-SELECT setval('""Products_ProductID_seq""', max(""ProductID"")) FROM ""Products"";
-SELECT setval('""Shippers_ShipperID_seq""', max(""ShipperID"")) FROM ""Shippers"";
-SELECT setval('""Suppliers_SupplierID_seq""', max(""SupplierID"")) FROM ""Suppliers"";");
+            .Execute.Sql(/*lang=sql*/ """
+                SELECT setval('"Region_RegionID_seq"', max("RegionID")) FROM "Region";
+                SELECT setval('"Categories_CategoryID_seq"', max("CategoryID")) FROM "Categories";
+                SELECT setval('"Employees_EmployeeID_seq"', max("EmployeeID")) FROM "Employees";
+                SELECT setval('"Orders_OrderID_seq"', max("OrderID")) FROM "Orders";
+                SELECT setval('"Products_ProductID_seq"', max("ProductID")) FROM "Products";
+                SELECT setval('"Shippers_ShipperID_seq"', max("ShipperID")) FROM "Shippers";
+                SELECT setval('"Suppliers_SupplierID_seq"', max("SupplierID")) FROM "Suppliers";
+                """);
 
         IfDatabase("Oracle")
-            .Execute.Sql(@"
-alter sequence Region_seq restart start with 5
-;
-alter sequence Categories_seq restart start with 9
-;
-alter sequence Employees_seq restart start with 10
-;
-alter sequence Orders_seq restart start with 11074
-;
-alter sequence Products_seq restart start with 78
-;
-alter sequence Shippers_seq restart start with 4
-;
-alter sequence Suppliers_seq restart start with 30");
+            .Execute.Sql(/*lang=sql*/ """
+                alter sequence Region_seq restart start with 5
+                ;
+                alter sequence Categories_seq restart start with 9
+                ;
+                alter sequence Employees_seq restart start with 10
+                ;
+                alter sequence Orders_seq restart start with 11074
+                ;
+                alter sequence Products_seq restart start with 78
+                ;
+                alter sequence Shippers_seq restart start with 4
+                ;
+                alter sequence Suppliers_seq restart start with 30
+                """);
 
         var o = OrderRow.Fields;
         var dateAdd = "dateadd(day, datediff(day, (select max(orderdate) from Orders), getdate()), ";

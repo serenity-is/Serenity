@@ -6,22 +6,23 @@ public partial class TSTypeListerASTTests
     public void Resolves_Type_Refs_In_Same_Namespace_Same_File()
     {
         var fileSystem = new MockFileSystem();
-        fileSystem.WriteAllText("a.d.ts", @"
-declare namespace jsPDF {
-    interface AutoTableOptions {
-        styles?: AutoTableStyles;
-        columnStyles?: { [dataKey: string]: AutoTableStyles; };
-        margin?: AutoTableMargin;
-    }
+        fileSystem.WriteAllText("a.d.ts", /*lang=typescript*/ """
+            declare namespace jsPDF {
+                interface AutoTableOptions {
+                    styles?: AutoTableStyles;
+                    columnStyles?: { [dataKey: string]: AutoTableStyles; };
+                    margin?: AutoTableMargin;
+                }
 
-    interface AutoTableMargin {
-        bottom?: number;
-    }
+                interface AutoTableMargin {
+                    bottom?: number;
+                }
 
-    interface AutoTableStyles {
-        cellPadding?: number;
-    }
-}");
+                interface AutoTableStyles {
+                    cellPadding?: number;
+                }
+            }
+            """);
         var tl = new TSTypeListerAST(fileSystem, tsConfigDir: "/", null);
         tl.AddInputFile("a.d.ts");
 
@@ -39,19 +40,20 @@ declare namespace jsPDF {
     public void Resolve_Same_Namespace_In_One_File_Multiple()
     {
         var fileSystem = new MockFileSystem();
-        fileSystem.WriteAllText("a.d.ts", @"
-declare namespace Serenity.Extensions {
-    interface ExcelImportRequest extends Serenity.ServiceRequest {
-        FileName?: string;
-    }
-}
-declare namespace Serenity.Extensions {
-    interface ExcelImportResponse extends Serenity.ServiceResponse {
-        Inserted?: number;
-        Updated?: number;
-        ErrorList?: string[];
-    }
-}");
+        fileSystem.WriteAllText("a.d.ts", /*lang=typescript*/ """
+            declare namespace Serenity.Extensions {
+                interface ExcelImportRequest extends Serenity.ServiceRequest {
+                    FileName?: string;
+                }
+            }
+            declare namespace Serenity.Extensions {
+                interface ExcelImportResponse extends Serenity.ServiceResponse {
+                    Inserted?: number;
+                    Updated?: number;
+                    ErrorList?: string[];
+                }
+            }
+            """);
 
         var tl = new TSTypeListerAST(fileSystem, tsConfigDir: "/", tsConfig: null);
         tl.AddInputFile("a.d.ts");
@@ -65,37 +67,39 @@ declare namespace Serenity.Extensions {
     public void BodySkipTest()
     {
         var fileSystem = new MockFileSystem();
-        fileSystem.WriteAllText("a.ts", @"namespace A {
+        fileSystem.WriteAllText("a.ts", /*lang=typescript*/ """
+            namespace A {
 
-    @Serenity.Decorators.registerEditor()
-    export class B extends C {
+                @Serenity.Decorators.registerEditor()
+                export class B extends C {
 
-        public getSelect2Options() {
-            var selec2Options = super.getSelect2Options();
+                    public getSelect2Options() {
+                        var selec2Options = super.getSelect2Options();
 
-            var oldFormatResult = selec2Options.formatResult;
-            var oldFormatSelection = selec2Options.formatSelection;
+                        var oldFormatResult = selec2Options.formatResult;
+                        var oldFormatSelection = selec2Options.formatSelection;
 
-            var isDeletedFormat = (item: Serenity.Select2Item, html: string): string => {
-                if (item?.source.IsActive == -1)
-                    return `<div class='deleted-record'>${html}</div>`;
-                return html;
-            };
+                        var isDeletedFormat = (item: Serenity.Select2Item, html: string): string => {
+                            if (item?.source.IsActive == -1)
+                                return `<div class='deleted-record'>${html}</div>`;
+                            return html;
+                        };
 
-            selec2Options.formatResult = (item: Serenity.Select2Item, p2, p3, p4) => {
-                var formatted = oldFormatResult ? oldFormatResult(item, p2, p3, p4) : item.text;
-                return isDeletedFormat(item, formatted);
-            };
+                        selec2Options.formatResult = (item: Serenity.Select2Item, p2, p3, p4) => {
+                            var formatted = oldFormatResult ? oldFormatResult(item, p2, p3, p4) : item.text;
+                            return isDeletedFormat(item, formatted);
+                        };
 
-            selec2Options.formatSelection = (item: Serenity.Select2Item, p2, p3) => {
-                var formatted = oldFormatSelection ? oldFormatSelection(item, p2, p3) : item?.text;
-                return isDeletedFormat(item, formatted);
-            };
+                        selec2Options.formatSelection = (item: Serenity.Select2Item, p2, p3) => {
+                            var formatted = oldFormatSelection ? oldFormatSelection(item, p2, p3) : item?.text;
+                            return isDeletedFormat(item, formatted);
+                        };
 
-            return selec2Options;
-        }
-    }
-}");
+                        return selec2Options;
+                    }
+                }
+            }
+            """);
 
         var tl = new TSTypeListerAST(fileSystem, tsConfigDir: "/", tsConfig: null);
         tl.AddInputFile("a.ts");
