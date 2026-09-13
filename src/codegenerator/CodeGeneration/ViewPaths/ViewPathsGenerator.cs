@@ -3,6 +3,8 @@ namespace Serenity.CodeGeneration;
 public class ViewPathsGenerator(IFileSystem fileSystem,
     string[] stripViewPaths)
 {
+    private readonly IFileSystem fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
+
     /// <summary>
     /// Gets or sets a value indicating whether to omit XML doc comments
     /// from the generated code (used by tests that don't care about comments).
