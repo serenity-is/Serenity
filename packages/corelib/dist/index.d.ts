@@ -3728,7 +3728,7 @@ declare const transformIncludeTypeNameSymbol: unique symbol;
  * Corresponding types are generated server-side as simple classes; this empty interface exists for typing only.
  */
 export interface TransformInclude<TypeName = ""> {
-	readonly [transformIncludeTypeNameSymbol]: TypeName;
+	readonly [transformIncludeTypeNameSymbol]?: TypeName;
 }
 declare namespace servicesTexts {
 	namespace Controls {
