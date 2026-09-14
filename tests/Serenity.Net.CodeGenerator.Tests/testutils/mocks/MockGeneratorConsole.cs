@@ -63,15 +63,19 @@ public class MockGeneratorConsole : IGeneratorConsole
         WriteCalls.Add((CallType.Exception, null, exception));
     }
 
-    public T Prompt<T>(Spectre.Console.IPrompt<T> prompt)
+    public Queue<object?> PromptResults { get; } = [];
+
+    public virtual T Prompt<T>(Spectre.Console.IPrompt<T> prompt)
     {
         ArgumentNullException.ThrowIfNull(prompt);
         WriteCalls.Add((CallType.Prompt, null, prompt));
-        return default;
+        return PromptResults.Count > 0 ? (T)PromptResults.Dequeue()! : default!;
     }
 
-    public string ReadLine()
+    public Queue<string> ReadLineAnswers { get; } = [];
+
+    public virtual string ReadLine()
     {
-        return "Y";
+        return ReadLineAnswers.Count > 0 ? ReadLineAnswers.Dequeue() : "Y";
     }
 }
