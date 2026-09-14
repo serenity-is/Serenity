@@ -95,7 +95,7 @@ public partial class ServerTypingsGenerator
                 var formatterScriptType = FindTypeInLookup(modularFormatterTypeByKey, formatterTypeKey, "Formatter", containingAssembly: null);
                 if (formatterScriptType != null &&
                     formatterScriptType.Module != "@serenity-is/corelib")
-                    referencedTypeAliases.Add(("Formatter", ReferenceScriptType(formatterScriptType, codeNamespace)));
+                    referencedTypeAliases.Add(("Formatter", ReferenceScriptType(formatterScriptType)));
 
                 TryReferenceEnumType(item.PropertyType(), basedOnField?.PropertyType(), codeNamespace, referencedTypeKeys, referencedTypeAliases);
             }

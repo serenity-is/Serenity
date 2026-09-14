@@ -163,7 +163,7 @@ public partial class ServerTypingsGenerator
         }
     }
 
-    protected string ReferenceScriptType(ExternalType type, string codeNamespace)
+    protected string ReferenceScriptType(ExternalType type)
     {
         if (type.FullName == "Serenity.Widget")
             return "Serenity.Widget<any>";

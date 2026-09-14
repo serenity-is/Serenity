@@ -13,8 +13,7 @@ public partial class ServerTypingsGenerator
         {
             var key = dataScriptAttr.ConstructorArguments().Count > 0 ?
                 dataScriptAttr.ConstructorArguments()[0].Value as string : null;
-            if (key == null)
-                AutoDataScriptKeyFor(type);
+            key ??= AutoDataScriptKeyFor(type);
             key = "RemoteData." + key;
             if (!scriptDataKeys.ContainsKey(key))
                 scriptDataKeys[key] = type;

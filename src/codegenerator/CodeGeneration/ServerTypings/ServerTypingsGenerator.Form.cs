@@ -236,7 +236,7 @@ public partial class ServerTypingsGenerator
                 TryFindModuleType(enumKey, containingAssembly);
 
             if (enumScriptType != null)
-                referencedTypeAliases.Add(("Enum", ReferenceScriptType(enumScriptType, codeNamespace)));
+                referencedTypeAliases.Add(("Enum", ReferenceScriptType(enumScriptType)));
         }
         else
         {
@@ -288,7 +288,7 @@ public partial class ServerTypingsGenerator
 
                     var dialogType = FindTypeInLookup(modularDialogTypeByKey, typeKey, "Dialog", containingAssembly: null);
                     if (dialogType != null)
-                        referencedTypeAliases.Add(("Dialog", ReferenceScriptType(dialogType, codeNamespace)));
+                        referencedTypeAliases.Add(("Dialog", ReferenceScriptType(dialogType)));
                 }
 
                 TryReferenceEnumType(item.PropertyType(), basedOnField?.PropertyType(), codeNamespace, referencedTypeKeys, referencedTypeAliases);
@@ -316,7 +316,7 @@ public partial class ServerTypingsGenerator
                         continue;
                 }
 
-                var editorFullName = ReferenceScriptType(editorScriptType, codeNamespace);
+                var editorFullName = ReferenceScriptType(editorScriptType);
                 var editorShortName = editorFullName;
 
                 propertyNames.Add(item.Name);
