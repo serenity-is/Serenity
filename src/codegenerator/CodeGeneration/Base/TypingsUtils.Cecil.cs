@@ -366,7 +366,7 @@ public static partial class TypingsUtils
         if (assemblyLocations == null || !assemblyLocations.Any())
             return [];
 
-        assemblyLocations = assemblyLocations.Select(x =>
+        assemblyLocations = [.. assemblyLocations.Select(x =>
         {
             if (!fileSystem.FileExists(x))
                 return x;
@@ -390,7 +390,7 @@ public static partial class TypingsUtils
                 return location;
 
             return x;
-        }).ToList();
+        })];
 
         var module = ICSharpCode.Decompiler.UniversalAssemblyResolver
             .LoadMainModule(assemblyLocations.First(), inMemory: true);

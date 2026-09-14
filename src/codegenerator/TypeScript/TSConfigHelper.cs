@@ -36,7 +36,7 @@ public static class TSConfigHelper
         var types = new HashSet<string>(config.CompilerOptions?.Types ??
             [], StringComparer.OrdinalIgnoreCase);
 
-        IEnumerable<string> files = typeRoots.Select(typeRoot =>
+        IEnumerable<string> files = [.. typeRoots.Select(typeRoot =>
         {
             var s = PathHelper.ToUrl(typeRoot);
             if (s.StartsWith("./", StringComparison.Ordinal))
@@ -51,8 +51,7 @@ public static class TSConfigHelper
                 .Where(typing => fileSystem.GetFileName(typing).Contains("serenity", StringComparison.OrdinalIgnoreCase) ||
                     !PathHelper.ToUrl(typing).Contains("/node_modules/", StringComparison.OrdinalIgnoreCase))
                 .Select(typing => fileSystem.Combine(typing, "index.d.ts"))
-                .Where(typing => fileSystem.FileExists(typing)))
-        .ToList();
+                .Where(typing => fileSystem.FileExists(typing)))];
 
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -60,7 +59,7 @@ public static class TSConfigHelper
 
         cancellationToken.ThrowIfCancellationRequested();
 
-        return files.Distinct().ToArray();
+        return [.. files.Distinct()];
     }
 
     public static TSConfig? Read(IFileSystem fileSystem, string path)
@@ -280,7 +279,7 @@ public static class TSConfigHelper
 
                 enumerated = enumerated.Concat(fileSystem.GetFiles(directory, tsMask, recursive: true).Where(HasTSExtension));
             }
-            enumerated = enumerated.ToArray();
+            enumerated = [.. enumerated];
         }
         else
         {

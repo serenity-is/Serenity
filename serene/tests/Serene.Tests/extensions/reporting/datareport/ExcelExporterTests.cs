@@ -31,7 +31,7 @@ public class ExcelExporterTests
         var exporter = new ExcelExporter(renderer, new ServiceCollection().BuildServiceProvider());
 
         var bytes = exporter.Export(new ArrayList { new { Name = "A" } },
-            new List<ReportColumn> { new() { Name = "Name" } });
+            [new() { Name = "Name" }]);
 
         Assert.Equal([1, 2, 3], bytes);
         Assert.NotNull(renderer.Report);

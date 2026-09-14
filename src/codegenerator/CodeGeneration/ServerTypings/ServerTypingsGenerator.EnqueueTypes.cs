@@ -124,7 +124,7 @@ public partial class ServerTypingsGenerator
         return TypingsUtils.GetAttr(type, "Serenity.ComponentModel", "NestedPermissionKeysAttribute", emptyTypes);
     }
 
-    protected static bool IsRowType(TypeReference[] baseTypes, TypeDefinition type)
+    protected static bool IsRowType(TypeReference[] baseTypes)
     {
         return TypingsUtils.Contains(baseTypes, "Serenity.Data", "Row") ||
             TypingsUtils.Contains(baseTypes, "Serenity.Data", "Row`1");
@@ -146,7 +146,7 @@ public partial class ServerTypingsGenerator
 
         return IsServiceRequest(baseTypes, type) ||
             IsServiceResponse(baseTypes, type) ||
-            IsRowType(baseTypes, type) ||
+            IsRowType(baseTypes) ||
             IsServiceEndpoint(baseTypes, type) ||
             GetColumnsScriptAttribute(type) != null ||
             GetFormScriptAttribute(type) != null ||

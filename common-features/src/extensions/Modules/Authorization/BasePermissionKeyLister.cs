@@ -268,11 +268,10 @@ public abstract class BasePermissionKeyLister(ITwoLevelCache cache, ITypeSource 
     {
         try
         {
-            return member.GetCustomAttributes<TAttr>(false)
+            return [.. member.GetCustomAttributes<TAttr>(false)
                 .Select(getPermission)
                 .Where(x => !string.IsNullOrEmpty(x))
-                .OfType<string>()
-                .ToArray();
+                .OfType<string>()];
         }
         catch
         {
@@ -292,10 +291,9 @@ public abstract class BasePermissionKeyLister(ITwoLevelCache cache, ITypeSource 
     {
         try
         {
-            return type.GetCustomAttributes<TAttr>(false)
+            return [.. type.GetCustomAttributes<TAttr>(false)
                 .Select(getPermission)
-                .OfType<string>()
-                .ToArray();
+                .OfType<string>()];
         }
         catch
         {
