@@ -26,46 +26,52 @@ public abstract class BaseDynamicDataGenerator
 
         var services = collection.BuildServiceProvider();
 
-        RowFieldsProvider.SetDefaultFrom(services);
-
-        InitializeScripts(services);
-
-        var dynamicDataFolder = GetDynamicDataFolder();
-        Directory.CreateDirectory(dynamicDataFolder);
-
-        var scriptManager = services.GetRequiredService<IDynamicScriptManager>();
-
-        foreach (var name in scriptManager.GetRegisteredScriptNames())
+        var old = RowFieldsProvider.SetLocalFrom(services);
+        try
         {
-            if (ShouldSkipScript(name))
-                continue;
+            InitializeScripts(services);
 
-            var content = scriptManager.GetScriptText(name, json: true);
-            if (content == null)
-                continue;
+            var dynamicDataFolder = GetDynamicDataFolder();
+            Directory.CreateDirectory(dynamicDataFolder);
 
-            if (name.StartsWith("Columns.") || name.StartsWith("Form."))
-            {
-                content = Newtonsoft.Json.JsonConvert.SerializeObject(
-                    Newtonsoft.Json.JsonConvert.DeserializeObject<PropertyItemsData>(content),
-                    Newtonsoft.Json.Formatting.Indented, JsonSettings.Tolerant);
-            }
-            else
-            {
-                content = Newtonsoft.Json.JsonConvert.SerializeObject(
-                    Newtonsoft.Json.JsonConvert.DeserializeObject(content),
-                    Newtonsoft.Json.Formatting.Indented);
-            }
-            var target = Path.Combine(dynamicDataFolder, name) + ".json";
+            var scriptManager = services.GetRequiredService<IDynamicScriptManager>();
 
-            if (File.Exists(target))
+            foreach (var name in scriptManager.GetRegisteredScriptNames())
             {
-                var existing = File.ReadAllText(target);
-                if (existing == content)
+                if (ShouldSkipScript(name))
                     continue;
-            }
 
-            File.WriteAllText(target, content);
+                var content = scriptManager.GetScriptText(name, json: true);
+                if (content == null)
+                    continue;
+
+                if (name.StartsWith("Columns.") || name.StartsWith("Form."))
+                {
+                    content = Newtonsoft.Json.JsonConvert.SerializeObject(
+                        Newtonsoft.Json.JsonConvert.DeserializeObject<PropertyItemsData>(content),
+                        Newtonsoft.Json.Formatting.Indented, JsonSettings.Tolerant);
+                }
+                else
+                {
+                    content = Newtonsoft.Json.JsonConvert.SerializeObject(
+                        Newtonsoft.Json.JsonConvert.DeserializeObject(content),
+                        Newtonsoft.Json.Formatting.Indented);
+                }
+                var target = Path.Combine(dynamicDataFolder, name) + ".json";
+
+                if (File.Exists(target))
+                {
+                    var existing = File.ReadAllText(target);
+                    if (existing == content)
+                        continue;
+                }
+
+                File.WriteAllText(target, content);
+            }
+        }
+        finally
+        {
+            RowFieldsProvider.SetLocal(old);
         }
     }
 
