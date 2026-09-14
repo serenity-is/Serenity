@@ -15,8 +15,6 @@ public partial class ServerTypingsGenerator(Compilation compilation, Cancellatio
 #else
 public partial class ServerTypingsGenerator : CodeGeneratorBase
 {
-    private readonly CancellationToken cancellationToken;
-
     public ServerTypingsGenerator(IFileSystem fileSystem, params Assembly[] assemblies)
         : this(TypingsUtils.ToDefinitions(fileSystem, assemblies.Select(x => x.Location)))
     {
