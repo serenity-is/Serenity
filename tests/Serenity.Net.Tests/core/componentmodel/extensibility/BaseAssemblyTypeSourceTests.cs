@@ -11,7 +11,7 @@ public class BaseAssemblyTypeSourceTests
 
     private class MockFeatureToggles(params string[] enabled) : IFeatureToggles
     {
-        private readonly HashSet<string> enabled = new HashSet<string>(enabled, StringComparer.Ordinal);
+        private readonly HashSet<string> enabled = new(enabled, StringComparer.Ordinal);
 
         public bool IsEnabled(string feature) => enabled.Contains(feature);
     }

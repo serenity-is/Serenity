@@ -1,10 +1,11 @@
 using Microsoft.AspNetCore.Mvc.Controllers;
-using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Serenity.Services;
 
 public class ServiceEndpointMoreTests
 {
+#pragma warning disable CA1822 // Mark members as static
+#pragma warning disable IDE0060 // Remove unused parameter
     [ConnectionKey("Test")]
     private class TestEndpoint : ServiceEndpoint
     {
@@ -27,11 +28,7 @@ public class ServiceEndpointMoreTests
 
     private class NoKeyEndpoint : ServiceEndpoint
     {
-#pragma warning disable CA1822 // Mark members as static
-#pragma warning disable IDE0060 // Remove unused parameter
         public void UowAction(IUnitOfWork uow)
-#pragma warning restore IDE0060 // Remove unused parameter
-#pragma warning restore CA1822 // Mark members as static
         {
         }
     }
@@ -40,9 +37,7 @@ public class ServiceEndpointMoreTests
     [TransactionSettings(IsolationLevel.ReadCommitted, DeferStart = true)]
     private class SettingsEndpoint : ServiceEndpoint
     {
-#pragma warning disable IDE0060 // Remove unused parameter
         public void UowAction(IUnitOfWork uow)
-#pragma warning restore IDE0060 // Remove unused parameter
         {
         }
     }
@@ -51,8 +46,10 @@ public class ServiceEndpointMoreTests
     {
         public Task ExecuteResultAsync(ActionContext context) => Task.CompletedTask;
     }
+#pragma warning restore IDE0060 // Remove unused parameter
+#pragma warning restore CA1822 // Mark members as static
 
-    private static TestEndpoint CreateEndpoint(string methodName, bool withRequestContext = true)
+    private static TestEndpoint CreateEndpoint(bool withRequestContext = true)
     {
         var services = new ServiceCollection();
         services.AddSingleton<ISqlConnections>(new MockSqlConnections { OnNewByKey = _ => new MockDbConnection() });
@@ -90,7 +87,7 @@ public class ServiceEndpointMoreTests
     [Fact]
     public void OnActionExecuting_With_UnitOfWork_Parameter_Creates_UnitOfWork()
     {
-        var endpoint = CreateEndpoint(nameof(TestEndpoint.UowAction));
+        var endpoint = CreateEndpoint();
         var context = CreateExecutingContext(endpoint, nameof(TestEndpoint.UowAction));
 
         endpoint.OnActionExecuting(context);
@@ -101,7 +98,7 @@ public class ServiceEndpointMoreTests
     [Fact]
     public void OnActionExecuting_With_Connection_Parameter_Sets_Argument()
     {
-        var endpoint = CreateEndpoint(nameof(TestEndpoint.ConnAction));
+        var endpoint = CreateEndpoint();
         var context = CreateExecutingContext(endpoint, nameof(TestEndpoint.ConnAction));
 
         endpoint.OnActionExecuting(context);
@@ -152,7 +149,7 @@ public class ServiceEndpointMoreTests
     [Fact]
     public void OnActionExecuted_Commits_And_Wraps_Result()
     {
-        var endpoint = CreateEndpoint(nameof(TestEndpoint.UowAction));
+        var endpoint = CreateEndpoint();
         var executing = CreateExecutingContext(endpoint, nameof(TestEndpoint.UowAction));
         endpoint.OnActionExecuting(executing);
         int commits = 0;
@@ -169,7 +166,7 @@ public class ServiceEndpointMoreTests
     [Fact]
     public void OnActionExecuted_Disposes_On_Exception()
     {
-        var endpoint = CreateEndpoint(nameof(TestEndpoint.UowAction));
+        var endpoint = CreateEndpoint();
         var executing = CreateExecutingContext(endpoint, nameof(TestEndpoint.UowAction));
         endpoint.OnActionExecuting(executing);
         int rollbacks = 0;
@@ -185,7 +182,7 @@ public class ServiceEndpointMoreTests
     [Fact]
     public void Context_Properties_Return_Request_Context_Services()
     {
-        var endpoint = CreateEndpoint(nameof(TestEndpoint.UowAction));
+        var endpoint = CreateEndpoint();
         var requestContext = endpoint.ContextPublic;
 
         Assert.NotNull(requestContext);
@@ -198,21 +195,21 @@ public class ServiceEndpointMoreTests
     [Fact]
     public void Context_Throws_When_Request_Context_Not_Registered()
     {
-        var endpoint = CreateEndpoint(nameof(TestEndpoint.UowAction), withRequestContext: false);
+        var endpoint = CreateEndpoint(withRequestContext: false);
         Assert.Throws<InvalidOperationException>(() => endpoint.ContextPublic);
     }
 
     [Fact]
     public void Context_Setter_Throws_For_Null()
     {
-        var endpoint = CreateEndpoint(nameof(TestEndpoint.UowAction));
+        var endpoint = CreateEndpoint();
         Assert.Throws<ArgumentNullException>(() => endpoint.SetContext(null!));
     }
 
     [Fact]
     public void Dispose_Releases_Resources()
     {
-        var endpoint = CreateEndpoint(nameof(TestEndpoint.UowAction));
+        var endpoint = CreateEndpoint();
         var context = CreateExecutingContext(endpoint, nameof(TestEndpoint.UowAction));
         endpoint.OnActionExecuting(context);
 

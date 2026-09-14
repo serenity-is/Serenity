@@ -141,6 +141,6 @@ public class DefaultUploadValidatorMoreTests
         public void Save(object image, Stream target, string mimeType, ImageEncoderParams encoderParams) { }
 
         public object Scale(object image, int width, int height, ImageScaleMode mode, string? backgroundColor, bool inplace)
-            => new object();
+            => new();
     }
 }

@@ -96,10 +96,7 @@ public class WrappedTransaction : DbTransaction, IHasActualTransaction
 
     private void DetachConnection()
     {
-        if (wrappedConnection != null)
-        {
-            wrappedConnection.Release(this);
-            wrappedConnection = null;
-        }
+        wrappedConnection?.Release(this);
+        wrappedConnection = null;
     }
 }

@@ -68,7 +68,7 @@ public partial class TranslationRepository(IRequestContext context, IWebHostEnvi
         targetLanguageID ??= "";
         var sourceLanguageID = request.SourceLanguageID.TrimToEmpty();
 
-        result.Entities = new List<TranslationItem>();
+        result.Entities = [];
 
         static string effective(string key)
         {

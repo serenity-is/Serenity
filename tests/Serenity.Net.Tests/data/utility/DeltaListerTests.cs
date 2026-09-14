@@ -5,7 +5,7 @@ public class DeltaListerTests
     private static DeltaLister<int?> GetLister(int?[] oldIds, int?[] newIds,
         DeltaOptions options = DeltaOptions.Default)
     {
-        return new DeltaLister<int?>(oldIds.ToList(), newIds.ToList(), i => i, options);
+        return new DeltaLister<int?>([.. oldIds], [.. newIds], i => i, options);
     }
 
     [Fact]
@@ -27,7 +27,7 @@ public class DeltaListerTests
     [Fact]
     public void ItemsToCreate_AreNewItemsWithoutOldId()
     {
-        var lister = new DeltaLister<int?>(new int?[] { 2 }.ToList(), new int?[] { 3, 7 }.ToList(), i => i == 7 ? null : i);
+        var lister = new DeltaLister<int?>([2], [3, 7], i => i == 7 ? null : i);
 
         Assert.Equal([3, 7], lister.ItemsToCreate.Cast<int?>().ToArray());
     }
@@ -77,7 +77,7 @@ public class DeltaListerTests
     [Fact]
     public void NewItemWithNullItemId_CreatesNotUpdates()
     {
-        var lister = new DeltaLister<int?>(new int?[] { 1 }.ToList(), new int?[] { 2 }.ToList(), i => i == 2 ? null : i);
+        var lister = new DeltaLister<int?>([1], [2], i => i == 2 ? null : i);
 
         Assert.Single(lister.ItemsToCreate);
         Assert.Empty(lister.ItemsToUpdate);

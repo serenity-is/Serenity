@@ -72,8 +72,7 @@ public class UserRoleRepository(IRequestContext context) : BaseRepository(contex
 
         var response = new UserRoleListResponse
         {
-            Entities = GetExisting(connection, request.UserID.Value)
-            .Select(x => x.RoleId.Value).ToList()
+            Entities = [.. GetExisting(connection, request.UserID.Value).Select(x => x.RoleId.Value)]
         };
 
         return response;

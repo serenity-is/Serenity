@@ -2,19 +2,14 @@ using Microsoft.Extensions.Options;
 
 namespace Serenity.TestUtils;
 
-public class MockOptionsMonitor<T> : IOptionsMonitor<T>
+public class MockOptionsMonitor<T>(T value) : IOptionsMonitor<T>
 {
-    public MockOptionsMonitor(T value)
-    {
-        CurrentValue = value;
-    }
-
     public MockOptionsMonitor()
         : this(default!)
     {
     }
 
-    public T CurrentValue { get; set; }
+    public T CurrentValue { get; set; } = value;
 
     public T Get(string? name)
     {

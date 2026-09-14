@@ -277,8 +277,7 @@ public static class ExcelReportGenerator
                     else if (obj is IDictionary<string, object>)
                     {
                         var n = col.Name;
-                        var dict = obj as IDictionary<string, object>;
-                        if (dict == null || !dict.TryGetValue(n ?? "", out value))
+                        if (obj is not IDictionary<string, object> dict || !dict.TryGetValue(n ?? "", out value))
                             value = null;
                     }
                     else if (obj is IDictionary)

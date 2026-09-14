@@ -38,7 +38,7 @@ public class LocalTextScriptTests
     {
         var registry = CreateRegistry();
         Assert.Throws<ArgumentNullException>(() =>
-            LocalTextScript.GetLocalTextPackageScript(registry, new LocalTextPackages(), null!, "en", false));
+            LocalTextScript.GetLocalTextPackageScript(registry, [], null!, "en", false));
         Assert.Throws<ArgumentNullException>(() =>
             LocalTextScript.GetLocalTextPackageScript(registry, null!, "Site", "en", false));
     }

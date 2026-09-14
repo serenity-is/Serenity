@@ -278,7 +278,7 @@ public class RowEditableObjectTests
 
         Assert.Same(row, editable.PreviousValues);
 
-        PropertyChangedEventHandler handler = (s, e) => { };
+        static void handler(object? s, PropertyChangedEventArgs e) { }
         notify.PropertyChanged += handler;
 
         Assert.NotNull(editable.PreviousValues);
@@ -293,7 +293,7 @@ public class RowEditableObjectTests
         var row = new IdNameRow();
         var notify = (INotifyPropertyChanged)row;
         var received = new List<PropertyChangedEventArgs>();
-        PropertyChangedEventHandler handler = (s, e) => received.Add(e);
+        void handler(object? s, PropertyChangedEventArgs e) => received.Add(e);
 
         notify.PropertyChanged += handler;
         row.Name = "Test";

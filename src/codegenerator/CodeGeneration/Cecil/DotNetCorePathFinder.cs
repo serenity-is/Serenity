@@ -234,7 +234,7 @@ public class DotNetCorePathFinder
         int dashIndex = shortName.IndexOf('-', StringComparison.Ordinal);
         if (dashIndex > 0)
         {
-            shortName = shortName.Remove(dashIndex);
+            shortName = shortName[..dashIndex];
         }
         return shortName;
     }

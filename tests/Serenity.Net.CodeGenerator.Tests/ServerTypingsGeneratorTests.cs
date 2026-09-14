@@ -12,9 +12,9 @@ public partial class ServerTypingsGeneratorTests
 
     private static List<GeneratedSource> ExceptGenericFiles(List<GeneratedSource> files)
     {
-        return files.Where(x => x.Filename != "Texts.ts" &&
+        return [.. files.Where(x => x.Filename != "Texts.ts" &&
             x.Filename != "Namespaces.ts" &&
-            x.Filename != "LazyTypeLoader.ts").ToList();
+            x.Filename != "LazyTypeLoader.ts")];
     }
 
     private static ServerTypingsGenerator CreateGenerator(params Type[] types)

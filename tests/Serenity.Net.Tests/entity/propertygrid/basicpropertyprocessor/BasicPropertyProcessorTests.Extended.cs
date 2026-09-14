@@ -183,7 +183,7 @@ public partial class BasicPropertyProcessorTests
             ?? throw new InvalidOperationException("Property not found: " + propName);
         var source = new PropertyInfoSource(prop, row);
         var item = new PropertyItem { Name = propName };
-        (processor ??= new BasicPropertyProcessor()).Process(source, item);
+        (processor ?? new BasicPropertyProcessor()).Process(source, item);
         return item;
     }
 

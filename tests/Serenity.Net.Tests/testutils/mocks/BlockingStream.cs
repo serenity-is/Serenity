@@ -10,7 +10,7 @@ public sealed class BlockingStream : System.IO.Stream
 {
     private readonly Queue<byte[]> chunks = new();
     private readonly SemaphoreSlim available = new(0);
-    private readonly object gate = new();
+    private readonly Lock gate = new();
     private bool completed;
     private byte[]? current;
     private int currentOffset;

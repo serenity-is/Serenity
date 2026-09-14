@@ -85,7 +85,7 @@ public class DataMigrations(ITypeSource typeSource,
                     builder.AddSqlServer();
 
                 builder.WithGlobalConnectionString(cs.ConnectionString);
-                builder.ScanIn(((IGetAssemblies)typeSource).GetAssemblies().ToArray()).For.Migrations();
+                builder.ScanIn([.. ((IGetAssemblies)typeSource).GetAssemblies()]).For.Migrations();
             })
             .BuildServiceProvider();
 

@@ -87,7 +87,7 @@ public class DynamicScriptMiddlewareTests
     [Fact]
     public async Task ReturnScript_Returns_NotFound_When_Content_Null()
     {
-        var (_, manager, context, _) = Create("/DynJS.axd/Unknown.js");
+        var (_, _, context, _) = Create("/DynJS.axd/Unknown.js");
 
         await DynamicScriptMiddleware.ReturnScript(context, "Unknown", "text/javascript", json: false);
 

@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 /// <summary>
 /// A unit of work implementation without an underlying actual transaction.
@@ -32,6 +32,7 @@ public class TransactionlessUnitOfWork(IDbConnection connection) : IDisposable, 
     /// </summary>
     public void Dispose()
     {
+        GC.SuppressFinalize(this);
         onCommit = null;
         try
         {
@@ -48,6 +49,7 @@ public class TransactionlessUnitOfWork(IDbConnection connection) : IDisposable, 
     /// </summary>
     public ValueTask DisposeAsync()
     {
+        GC.SuppressFinalize(this);
         Dispose();
         return default;
     }
@@ -77,7 +79,7 @@ public class TransactionlessUnitOfWork(IDbConnection connection) : IDisposable, 
     /// Does nothing other than calling onCommit events asynchronously as there
     /// is no underlying transaction.
     /// </summary>
-    public Task CommitAsync(CancellationToken cancellationToken = default)
+    public Task CommitAsync(CancellationToken _ = default)
     {
         Commit();
         return Task.CompletedTask;

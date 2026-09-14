@@ -64,7 +64,7 @@ public static class Templates
 
             if (model is EntityModel entityModel)
             {
-                cw.GlobalUsings = new(entityModel.GlobalUsings);
+                cw.GlobalUsings = [.. entityModel.GlobalUsings];
                 cw.FileScopedNamespaces = entityModel.FileScopedNamespaces;
             }
 

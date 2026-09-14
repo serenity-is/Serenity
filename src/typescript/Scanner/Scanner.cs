@@ -989,7 +989,7 @@ public partial class Scanner
                 }
             }
 
-            switch ((int)ch)
+            switch (ch)
             {
                 case CharacterCodes.LineFeed:
                 case CharacterCodes.CarriageReturn:

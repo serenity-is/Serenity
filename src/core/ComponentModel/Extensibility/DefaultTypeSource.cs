@@ -11,7 +11,7 @@ namespace Serenity.Abstractions;
 /// <param name="featureToggles">Feature toggles service used to filter types.</param>
 public class DefaultTypeSource(IEnumerable<Assembly> assemblies, IFeatureToggles? featureToggles = null) : BaseAssemblyTypeSource(featureToggles)
 {
-    private readonly IEnumerable<Assembly> assemblies = (assemblies is Array ? assemblies.Distinct().ToArray() : assemblies) 
+    private readonly IEnumerable<Assembly> assemblies = (assemblies is Array ? [.. assemblies.Distinct()] : assemblies) 
         ?? throw new ArgumentNullException(nameof(assemblies));
 
     /// <inheritdoc />

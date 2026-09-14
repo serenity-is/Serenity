@@ -3,7 +3,7 @@ namespace Serenity.Web;
 [DataScript("Registration.Test")]
 public class RegistrationTestDataScript : DataScript<Dictionary<string, string>>
 {
-    protected override Dictionary<string, string> GetData() => new();
+    protected override Dictionary<string, string> GetData() => [];
 }
 
 public class DataScriptRegistrationTests

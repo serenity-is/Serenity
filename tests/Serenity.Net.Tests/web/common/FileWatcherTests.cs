@@ -39,7 +39,7 @@ public class FileWatcherTests
     {
         var watcher = new FileWatcher("/non/existing/path", "*.txt");
         int calls = 0;
-        Action<string> handler = _ => calls++;
+        void handler(string _) => calls++;
 
         watcher.Changed += handler;
         watcher.Changed -= handler;

@@ -115,7 +115,7 @@ public class UserPermissionRepository(IRequestContext context) : BaseRepository(
 
         return new ListResponse<string>
         {
-            Entities = connection.Query<string>(query).ToList()
+            Entities = [.. connection.Query<string>(query)]
         };
     }
 }

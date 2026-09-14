@@ -11,16 +11,14 @@ namespace Serenity.Services;
 /// is thread-safe. If you need to pass some state between events, 
 /// use handler's StateBag.
 /// </remarks>
-public class SyncToAsyncSaveBehaviorWrapper : ISaveBehaviorAsync, IWrappedBehavior
+/// <remarks>
+/// Initializes a new instance of the class.
+/// </remarks>
+/// <param name="syncBehavior">Synchronous save behavior to wrap</param>
+/// <exception cref="ArgumentNullException"><paramref name="syncBehavior"/> is <c>null</c>.</exception>
+public class SyncToAsyncSaveBehaviorWrapper(ISaveBehaviorSync syncBehavior) : ISaveBehaviorAsync, IWrappedBehavior
 {
-    private readonly ISaveBehaviorSync syncBehavior;
-
-    /// <summary>
-    /// Initializes a new instance of the class.
-    /// </summary>
-    /// <param name="syncBehavior">Synchronous save behavior to wrap</param>
-    /// <exception cref="ArgumentNullException"><paramref name="syncBehavior"/> is <c>null</c>.</exception>
-    public SyncToAsyncSaveBehaviorWrapper(ISaveBehaviorSync syncBehavior) => this.syncBehavior = syncBehavior ?? throw new ArgumentNullException(nameof(syncBehavior));
+    private readonly ISaveBehaviorSync syncBehavior = syncBehavior ?? throw new ArgumentNullException(nameof(syncBehavior));
 
     /// <inheritdoc/>
     public Task OnPrepareQueryAsync(ISaveRequestHandler handler, SqlQuery query, CancellationToken cancellationToken = default)

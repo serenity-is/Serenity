@@ -4,6 +4,8 @@ namespace Serenity.Services;
 
 public class ServiceEndpointActionModelConventionTests
 {
+#pragma warning disable CA1822 // Mark members as static
+#pragma warning disable IDE0060 // Remove unused parameter
     private class TestEndpoint : ServiceEndpoint
     {
         public void Action(ServiceRequest request, IDbConnection connection, IUnitOfWork uow)
@@ -21,14 +23,16 @@ public class ServiceEndpointActionModelConventionTests
         {
         }
     }
+#pragma warning restore IDE0060 // Remove unused parameter
+#pragma warning restore CA1822 // Mark members as static
 
     private static ActionModel CreateActionModel(Type controllerType, string methodName)
     {
         var method = controllerType.GetMethod(methodName)!;
-        var controller = new ControllerModel(controllerType.GetTypeInfo(), new List<object>());
-        var action = new ActionModel(method, new List<object>()) { Controller = controller };
+        var controller = new ControllerModel(controllerType.GetTypeInfo(), []);
+        var action = new ActionModel(method, []) { Controller = controller };
         foreach (var parameter in method.GetParameters())
-            action.Parameters.Add(new ParameterModel(parameter, new List<object>()));
+            action.Parameters.Add(new ParameterModel(parameter, []));
         return action;
     }
 

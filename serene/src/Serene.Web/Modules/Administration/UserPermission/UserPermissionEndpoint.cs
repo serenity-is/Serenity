@@ -28,7 +28,7 @@ public class UserPermissionEndpoint : ServiceEndpoint
     {
         return new ListResponse<string>
         {
-            Entities = permissionKeyLister.ListPermissionKeys(includeRoles: false).ToList()
+            Entities = [.. permissionKeyLister.ListPermissionKeys(includeRoles: false)]
         };
     }
 }

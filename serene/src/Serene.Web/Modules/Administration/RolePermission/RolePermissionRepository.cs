@@ -71,8 +71,7 @@ public class RolePermissionRepository(IRequestContext context) : BaseRepository(
 
         var response = new RolePermissionListResponse
         {
-            Entities = GetExisting(connection, request.RoleID.Value)
-                .Select(x => x.PermissionKey).ToList()
+            Entities = [.. GetExisting(connection, request.RoleID.Value).Select(x => x.PermissionKey)]
         };
 
         return response;

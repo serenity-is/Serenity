@@ -1,3 +1,4 @@
+using System.Threading;
 using Microsoft.Extensions.Logging;
 
 namespace Serenity.TestUtils;
@@ -6,7 +7,7 @@ public class RecordingLogger : ILogger
 {
     public record Entry(LogLevel Level, string Message, Exception? Exception);
 
-    private readonly object gate = new();
+    private readonly Lock gate = new();
     private readonly List<Entry> entries = [];
 
     public List<Entry> Entries

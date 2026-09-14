@@ -93,11 +93,8 @@ public class ServiceAuthorizeAttribute : Attribute, IResourceFilter
             var lst = sourceType.GetCustomAttributes(attributeType, true);
             if (lst.Length > 0)
             {
-                attr = lst[0] as PermissionAttributeBase;
-                if (attr == null)
-                    throw new ArgumentOutOfRangeException(attributeType.Name + 
+                attr = lst[0] as PermissionAttributeBase ?? throw new ArgumentOutOfRangeException(attributeType.Name +
                         " is not a subclass of PermissionAttributeBase!");
-
                 break;
             }
         }

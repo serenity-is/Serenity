@@ -35,7 +35,7 @@ public class CombinedUploadStorageTests
     [Fact]
     public void CopyFrom_RoutesByTargetPath()
     {
-        var (combined, main, sub) = Create();
+        var (combined, _, _) = Create();
         var source = new RecordingUploadStorage();
 
         Assert.Equal("temporary/copied/x.jpg", combined.CopyFrom(source, "s", "temporary/x.jpg", OverwriteOption.AutoRename));
@@ -82,7 +82,7 @@ public class CombinedUploadStorageTests
     [Fact]
     public void GetFileSize_GetFileUrl_OpenFile_RouteBySubPath()
     {
-        var (combined, main, sub) = Create();
+        var (combined, _, _) = Create();
 
         Assert.Equal(42, combined.GetFileSize("temporary/x.jpg"));
         Assert.Equal("/url/x.jpg", combined.GetFileUrl("temporary/x.jpg"));

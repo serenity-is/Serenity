@@ -50,7 +50,7 @@ public class UserCultureProvider : RequestCultureProvider
 
     public static IList<CultureInfo> SupportedCultures
     {
-        get => supportedCultures ??= supportedCultureIdentifiers.Select(x =>
+        get => supportedCultures ??= [.. supportedCultureIdentifiers.Select(x =>
         {
             try
             {
@@ -60,6 +60,6 @@ public class UserCultureProvider : RequestCultureProvider
             {
                 return null;
             }
-        }).Where(x => x != null).ToList();
+        }).Where(x => x != null)];
     }
 }

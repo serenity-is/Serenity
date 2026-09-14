@@ -118,7 +118,7 @@ public class HtmlCspExtensionsTests
     public void GetCspDirective_Removes_Nonces_When_UnsafeInline_Present()
     {
         var html = MockHtmlHelper.Create();
-        var nonce = html.CspNonce();
+        _ = html.CspNonce();
         html.AddCspDirective("script-src", "'unsafe-inline'");
 
         var directive = html.GetCspDirective("script-src").Value;

@@ -27,7 +27,7 @@ public class EntityConnectionExtensions_ById_Tests
     public void Passes_The_RecordId_To_WhereStatement()
     {
         using var connection = new MockDbConnection()
-            .InterceptExecuteReader((InterceptExecuteReaderArgs args) => new MockDbDataReader(new
+            .InterceptExecuteReader(args => new MockDbDataReader(new
             {
                 ID = 777,
                 Name = "Test"

@@ -51,7 +51,7 @@ public static class ApplicationPartsServiceCollectionExtensions
         if (dependencyMap != null)
         {
             foreach (var kvp in dependencyMap)
-                dependencyMapDict[kvp.Key] = new(kvp.Value);
+                dependencyMapDict[kvp.Key] = [.. kvp.Value];
         }
 
         foreach (var assembly in assemblies)

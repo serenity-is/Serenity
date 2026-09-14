@@ -114,7 +114,7 @@ public static class JsonLocalTextRegistration
         if (typeSource is not IGetAssemblies getAssemblies)
             return registry;
 
-        return AddJsonResourceTexts(registry, getAssemblies.GetAssemblies().ToArray());
+        return AddJsonResourceTexts(registry, [.. getAssemblies.GetAssemblies()]);
     }
 
     /// <summary>

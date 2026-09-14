@@ -34,7 +34,7 @@ public class WrappedTransactionTests
     [Fact]
     public void IsolationLevel_DelegatesToActual()
     {
-        var (wrapped, connection) = GetWrapped();
+        var (wrapped, _) = GetWrapped();
 
         var transaction = (WrappedTransaction)wrapped.BeginTransaction(IsolationLevel.ReadCommitted);
 
@@ -47,7 +47,7 @@ public class WrappedTransactionTests
         var (wrapped, connection) = GetWrapped();
 
         var transaction = (WrappedTransaction)wrapped.BeginTransaction();
-        var actualTransaction = transaction.ActualTransaction;
+        _ = transaction.ActualTransaction;
 
         transaction.Dispose();
 

@@ -17,7 +17,7 @@ public class ConfigurationFeatureToggles(IConfiguration configuration,
     Dictionary<string, List<RequiresFeatureAttribute>>? dependencyMap = null) : IFeatureToggles
 {
     private readonly HashSet<string>? disableByDefault = disableByDefault != null ?
-        new HashSet<string>(disableByDefault.Select(FeatureTogglesExtensions.ToFeatureKey)) : null;
+        [.. disableByDefault.Select(FeatureTogglesExtensions.ToFeatureKey)] : null;
 
     private readonly Dictionary<string, List<RequiresFeatureAttribute>>? dependencyMap =
         dependencyMap?.ToDictionary(kvp => kvp.Key, kvp => new List<RequiresFeatureAttribute>(kvp.Value));

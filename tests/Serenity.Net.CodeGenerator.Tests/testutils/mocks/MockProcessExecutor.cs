@@ -5,7 +5,7 @@ namespace Serenity.TestUtils;
 
 public class MockProcessExecutor : IProcessExecutor
 {
-    public List<(Process, int)> Calls = new();
+    public List<(Process, int)> Calls = [];
 
     public bool StartAndWaitForExit(Process process, int timeout, out string output, out string errorOutput)
     {

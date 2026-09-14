@@ -136,7 +136,7 @@ public static class DisplayOrderHelper
             }
         }
 
-        newDisplayOrder = ComputeNewOrders(orderRecords, changing, newDisplayOrder);
+        _ = ComputeNewOrders(orderRecords, changing, newDisplayOrder);
 
         return UpdateOrders(connection, orderRecords, tableName, keyField, orderField, hasUniqueConstraint);
     }
@@ -307,7 +307,7 @@ public static class DisplayOrderHelper
             }
         }
 
-        newDisplayOrder = ComputeNewOrders(orderRecords, changing, newDisplayOrder);
+        _ = ComputeNewOrders(orderRecords, changing, newDisplayOrder);
 
         return await UpdateOrdersAsync(connection, orderRecords, tableName, keyField, orderField,
             hasUniqueConstraint, cancellationToken).ConfigureAwait(false);

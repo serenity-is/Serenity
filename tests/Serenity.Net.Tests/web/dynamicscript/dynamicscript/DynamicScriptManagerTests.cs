@@ -62,9 +62,9 @@ public class DynamicScriptManagerTests
     public void Register_Throws_For_Null_Arguments()
     {
         var manager = Create();
-        Assert.Throws<ArgumentNullException>(() => manager.Register((string)null!, new TestScript()));
+        Assert.Throws<ArgumentNullException>(() => manager.Register(null!, new TestScript()));
         Assert.Throws<ArgumentNullException>(() => manager.Register("x", null!));
-        Assert.Throws<ArgumentNullException>(() => manager.Register((INamedDynamicScript)null!));
+        Assert.Throws<ArgumentNullException>(() => manager.Register(null!));
     }
 
     [Fact]
@@ -257,7 +257,7 @@ public class DynamicScriptManagerTests
     {
         var manager = Create();
         int calls = 0;
-        Action<string> handler = _ => calls++;
+        void handler(string _) => calls++;
 
         manager.ScriptChanged += handler;
         manager.ScriptChanged -= handler;

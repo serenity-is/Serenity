@@ -11,6 +11,8 @@ public class JsonRequestAttributeTests
         public string? Name { get; set; }
     }
 
+#pragma warning disable CA1822 // Mark members as static
+#pragma warning disable IDE0060 // Remove unused parameter
     private class TestController
     {
         public void NoParams()
@@ -28,6 +30,8 @@ public class JsonRequestAttributeTests
         public void TwoNonRequest(MyRequest first, MyRequest second)
         {
         }
+#pragma warning restore IDE0060 // Remove unused parameter
+#pragma warning restore CA1822 // Mark members as static
     }
 
     private static ActionExecutingContext CreateContext(HttpContext httpContext, string methodName)

@@ -104,7 +104,7 @@ public class TransientGrantingPermissionService(IPermissionService? permissionSe
             }
             else
             {
-                grantingStack.Push(new HashSet<string>(permissions));
+                grantingStack.Push([.. permissions]);
             }
         }
         finally

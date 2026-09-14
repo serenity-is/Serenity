@@ -416,8 +416,7 @@ internal class OriginPropertyDictionary
                     sqlJoin = new LeftJoinAttribute(lja.Alias, lja!.ToTable!, mappedCriteria);
                 else
                 {
-                    var ija = sqlJoin as InnerJoinAttribute;
-                    if (ija != null)
+                    if (sqlJoin is InnerJoinAttribute ija)
                     {
                         sqlJoin = new InnerJoinAttribute(ija.Alias, ija!.ToTable!, mappedCriteria);
                     }

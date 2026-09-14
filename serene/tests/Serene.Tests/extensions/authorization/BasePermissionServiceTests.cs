@@ -9,14 +9,9 @@ public class BasePermissionServiceTests
         return new ClaimsPrincipal(new GenericIdentity(name, "Test"));
     }
 
-    private class TestPermissionService : BasePermissionService
+    private class TestPermissionService(IUserAccessor userAccessor, IRolePermissionService rolePermissions,
+        IHttpContextItemsAccessor? itemsAccessor = null) : BasePermissionService(userAccessor, rolePermissions, itemsAccessor)
     {
-        public TestPermissionService(IUserAccessor userAccessor, IRolePermissionService rolePermissions,
-            IHttpContextItemsAccessor? itemsAccessor = null)
-            : base(userAccessor, rolePermissions, itemsAccessor)
-        {
-        }
-
         public Func<ClaimsPrincipal, IEnumerable<string>> RolesFunc { get; set; } = _ => [];
         public Func<ClaimsPrincipal, string, bool?>? DirectPermissionFunc { get; set; }
         public Func<ClaimsPrincipal, bool> SuperAdminFunc { get; set; } = _ => false;
