@@ -383,7 +383,7 @@ public class ProjectFileInfo(IFileSystem fileSystem, string projectFile,
             string assemblyFile2 = assemblyFile1;
             if (binDebugIdx >= 0)
                 assemblyFile2 = string.Concat(assemblyFile1[0..binDebugIdx], "/bin/Release/",
-                    assemblyFile1[(binDebugIdx + "/bin/Release".Length)..]);
+                    assemblyFile1[(binDebugIdx + "/bin/Debug/".Length)..]);
 
             assemblyFiles[i] = assemblyFile1;
 
