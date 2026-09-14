@@ -1,4 +1,5 @@
 {{~f = NET5Plus ? "f" : "F"~}}
+{{~fnull = NullableRefTypes ? " = null!" : ""~}}
 {{USING "Serenity.ComponentModel"}}
 {{USING "Serenity.Data"}}
 {{USING "Serenity.Data.Mapping"}}
@@ -67,11 +68,11 @@ public sealed{{if EnableGenerateFields || EnableRowTemplates}} partial{{end}} cl
     public class RowFields : {{TYPEREF FieldsBaseClass}}
     {
         {{~for x in Fields~}}
-        public {{x.FieldType}}Field {{x.PropertyName}};
+        public {{x.FieldType}}Field {{x.PropertyName}}{{fnull}};
         {{~end~}}
 
         {{~for x in JoinFields~}}
-        public {{x.FieldType}}Field {{x.PropertyName}};
+        public {{x.FieldType}}Field {{x.PropertyName}}{{fnull}};
         {{~end~}}
     }
     {{~end~}}

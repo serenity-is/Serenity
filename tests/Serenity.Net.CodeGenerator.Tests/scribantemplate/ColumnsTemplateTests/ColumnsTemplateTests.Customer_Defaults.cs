@@ -16,7 +16,7 @@ public partial class ColumnsTemplateTests : BaseTemplateTest
             public class CustomerColumns
             {
                 [EditLink, DisplayName("Db.Shared.RecordId"), AlignRight]
-                public int CustomerId { get; set; }
+                public int? CustomerId { get; set; }
                 [EditLink]
                 public string CustomerName { get; set; }
                 public string CityName { get; set; }
@@ -30,5 +30,33 @@ public partial class ColumnsTemplateTests : BaseTemplateTest
         var model = new CustomerEntityModel();
         var actual = RenderTemplate(model);
         AssertEqual(Customer_ExpectedDefaults, actual);
+    }
+
+    const string Customer_ExpectedNullableRefTypes =
+        """""
+        using Serenity.ComponentModel;
+        using System.ComponentModel;
+
+        namespace TestNamespace.TestModule.Columns
+        {
+            [ColumnsScript("TestModule.Customer")]
+            [BasedOnRow(typeof(CustomerRow), CheckNames = true)]
+            public class CustomerColumns
+            {
+                [EditLink, DisplayName("Db.Shared.RecordId"), AlignRight]
+                public int? CustomerId { get; set; }
+                [EditLink]
+                public string? CustomerName { get; set; }
+                public string CityName { get; set; }
+            }
+        }
+        """"";
+
+    [Fact]
+    public void Customer_NullableRefTypes()
+    {
+        var model = new CustomerEntityModel(nullableRefTypes: true);
+        var actual = RenderTemplate(model);
+        AssertEqual(Customer_ExpectedNullableRefTypes, actual);
     }
 }

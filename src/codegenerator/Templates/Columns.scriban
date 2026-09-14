@@ -1,4 +1,4 @@
-﻿{{USING "Serenity.ComponentModel"}}
+{{USING "Serenity.ComponentModel"}}
 
 {{NAMESPACE ColumnsNamespace}}{{capture block~}}
 [ColumnsScript("{{ColumnsKey}}")]
@@ -12,7 +12,7 @@ public class {{ColumnsClassName}}
     {{~if x.TextualField~}}
     public string {{x.TextualField}} { get; set; }
     {{~else~}}
-    public {{TYPEREF x.DataType}} {{x.PropertyName}} { get; set; }
+    public {{TYPEREF x.PropertyType}} {{x.PropertyName}} { get; set; }
     {{~end~}}
     {{~end~}}
 }

@@ -116,6 +116,7 @@ public class EntityModelFactory : IEntityModelFactory
             Module = inputs.Module,
             NET5Plus = inputs.Net5Plus,
             NET8Plus = inputs.Net8Plus,
+            NullableRefTypes = inputs.NullableRefTypes,
             Permission = inputs.PermissionKey,
             RootNamespace = inputs.Config.RootNamespace,
             RowClassName = className + "Row",
@@ -245,7 +246,7 @@ public class EntityModelFactory : IEntityModelFactory
             {
                 if (baseRowFieldset.Contains(f.FieldName[prefix..]))
                 {
-                    var ef = ToEntityField(f, prefix, includeFlags: false, nullableRefTypes: inputs.Nullable);
+                    var ef = ToEntityField(f, prefix, includeFlags: false, nullableRefTypes: inputs.NullableRefTypes);
                     model.RowBaseFields.Add(ef);
                     return false;
                 }
@@ -270,7 +271,7 @@ public class EntityModelFactory : IEntityModelFactory
 
         foreach (var fieldInfo in fieldInfos)
         {
-            var tableField = ToEntityField(fieldInfo, prefix, includeFlags: true, nullableRefTypes: inputs.Nullable);
+            var tableField = ToEntityField(fieldInfo, prefix, includeFlags: true, nullableRefTypes: inputs.NullableRefTypes);
 
             if (tableField.PropertyName == model.IdField)
             {
@@ -389,7 +390,7 @@ public class EntityModelFactory : IEntityModelFactory
                     !includeForeignFields.Contains(foreignField.FieldName))
                     continue;
 
-                var viewField = ToEntityField(foreignField, foreignPrefixLength, includeFlags: false, nullableRefTypes: inputs.Nullable);
+                var viewField = ToEntityField(foreignField, foreignPrefixLength, includeFlags: false, nullableRefTypes: inputs.NullableRefTypes);
 
                 var propName = viewField.PropertyName;
                 viewField.PropertyName = propName.StartsWith(entityJoin.Name, StringComparison.Ordinal) &&

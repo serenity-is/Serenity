@@ -1,4 +1,4 @@
-﻿{{USING "Serenity.ComponentModel"}}
+{{USING "Serenity.ComponentModel"}}
 
 {{NAMESPACE FormNamespace}}{{capture block~}}
 [FormScript("{{FormKey}}")]
@@ -6,7 +6,7 @@
 public class {{FormClassName}}
 {
     {{~for x in FormFields~}}
-    public {{TYPEREF x.DataType}} {{x.PropertyName}} { get; set; }
+    public {{TYPEREF x.PropertyType}} {{x.PropertyName}} { get; set; }
     {{~end~}}
 }
 {{~end}}{{NAMESPACEBLOCK block~}}

@@ -4,7 +4,7 @@ namespace Serenity.CodeGenerator;
 
 public class CustomerEntityModel : EntityModel
 {
-    public CustomerEntityModel(bool joinConstants = false)
+    public CustomerEntityModel(bool joinConstants = false, bool nullableRefTypes = false)
     {
         Module = TestModule;
         ConnectionKey = TestConnection;
@@ -16,6 +16,7 @@ public class CustomerEntityModel : EntityModel
         Tablename = Customer;
         Title = Customer;
         IdField = CustomerId;
+        NullableRefTypes = nullableRefTypes;
         RowBaseClass = "Serenity.Data.Row<CustomerRow.RowFields>";
         NameField = CustomerName;
         FieldPrefix = "";
@@ -142,5 +143,10 @@ public class CustomerEntityModel : EntityModel
                 }
             }
         });
+
+        NullableRefTypes = nullableRefTypes;
+        if (nullableRefTypes)
+            foreach (var field in Fields.Concat(Joins.SelectMany(x => x.Fields)))
+                field.NullableRefTypes = true;
     }
 }

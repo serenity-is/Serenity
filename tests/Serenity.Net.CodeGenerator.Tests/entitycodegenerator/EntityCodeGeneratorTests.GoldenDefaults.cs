@@ -53,7 +53,7 @@ public partial class EntityCodeGeneratorTests
             public class CustomerColumns
             {
                 [EditLink, DisplayName("Db.Shared.RecordId"), AlignRight]
-                public int CustomerId { get; set; }
+                public int? CustomerId { get; set; }
                 [EditLink]
                 public string CustomerName { get; set; }
                 public string CityName { get; set; }
@@ -67,7 +67,7 @@ public partial class EntityCodeGeneratorTests
             public class CustomerForm
             {
                 public string CustomerName { get; set; }
-                public int CityId { get; set; }
+                public int? CityId { get; set; }
             }
             """,
         ["Modules/TestModule/Customer/CustomerPage.cs"] = /*lang=c#*/ """
@@ -334,6 +334,91 @@ public partial class EntityCodeGeneratorTests
             }
             """,
     };
+
+    private static readonly Dictionary<string, string> NullableGoldenOverrides = new()
+    {
+        ["Modules/TestModule/Customer/CustomerColumns.cs"] = """
+            namespace TestNamespace.TestModule.Columns;
+
+            [ColumnsScript("TestModule.Customer")]
+            [BasedOnRow(typeof(CustomerRow), CheckNames = true)]
+            public class CustomerColumns
+            {
+                [EditLink, DisplayName("Db.Shared.RecordId"), AlignRight]
+                public int? CustomerId { get; set; }
+                [EditLink]
+                public string? CustomerName { get; set; }
+                public string CityName { get; set; }
+            }
+            """,
+        ["Modules/TestModule/Customer/CustomerForm.cs"] = """
+            namespace TestNamespace.TestModule.Forms;
+
+            [FormScript("TestModule.Customer")]
+            [BasedOnRow(typeof(CustomerRow), CheckNames = true)]
+            public class CustomerForm
+            {
+                public string? CustomerName { get; set; }
+                public int? CityId { get; set; }
+            }
+            """,
+        ["Modules/TestModule/Customer/CustomerRow.cs"] = """
+            namespace TestNamespace.TestModule;
+
+            [ConnectionKey("TestConnection"), Module("TestModule"), TableName("[test].[Customer]")]
+            [DisplayName("Customer"), InstanceName("Customer")]
+            [ReadPermission("TestPermission")]
+            [ModifyPermission("TestPermission")]
+            [ServiceLookupPermission("TestPermission")]
+            public sealed class CustomerRow : Row<CustomerRow.RowFields>, IIdRow, INameRow
+            {
+                const string jCity = nameof(jCity);
+
+                [DisplayName("Customer Id"), Identity, IdProperty]
+                public int? CustomerId { get => fields.CustomerId[this]; set => fields.CustomerId[this] = value; }
+
+                [DisplayName("Customer Name"), Size(50), NotNull, QuickSearch, NameProperty]
+                public string? CustomerName { get => fields.CustomerName[this]; set => fields.CustomerName[this] = value; }
+
+                [DisplayName("City"), ForeignKey("[test].[City]", "CityId"), LeftJoin(jCity), TextualField(nameof(CityName))]
+                public int? CityId { get => fields.CityId[this]; set => fields.CityId[this] = value; }
+
+                [DisplayName("City City Name"), Expression($"{jCity}.[CityName]")]
+                public string? CityName { get => fields.CityName[this]; set => fields.CityName[this] = value; }
+
+                public class RowFields : RowFieldsBase
+                {
+                    public Int32Field CustomerId = null!;
+                    public StringField CustomerName = null!;
+                    public Int32Field CityId = null!;
+
+                    public StringField CityName = null!;
+                }
+            }
+            """,
+    };
+
+    [Fact]
+    public void Run_With_Defaults9_And_Nullable_Generates_All_Files_Exactly()
+    {
+        var generator = CreateDefaults(out var fileSystem, out var writer, out _, DefaultSergenJson,
+            nullableRefTypes: true);
+
+        generator.Run();
+
+        Assert.Equal(16, writer.Files.Count);
+
+        foreach (var pair in DefaultGoldenFiles)
+        {
+            var path = "/app/" + pair.Key;
+            Assert.True(fileSystem.FileExists(path), "Missing file: " + pair.Key);
+            var expected = NullableGoldenOverrides.TryGetValue(pair.Key, out var overriden) ?
+                overriden : pair.Value;
+            var actual = fileSystem.ReadAllText(path);
+            Assert.True(expected.ReplaceLineEndings() == actual.ReplaceLineEndings(),
+                "Content mismatch in file: " + pair.Key);
+        }
+    }
 
     [Fact]
     public void Run_With_Defaults9_Generates_All_Files_Exactly()

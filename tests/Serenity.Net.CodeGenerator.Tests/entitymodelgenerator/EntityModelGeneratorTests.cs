@@ -20,6 +20,27 @@ public partial class EntityModelFactoryTests
     }
 
     [Fact]
+    public void Customer_PropertyTypes_Reflect_NullableRefTypes()
+    {
+        var generator = new EntityModelFactory();
+        var model = generator.Create(new CustomerEntityInputs());
+
+        Assert.False(model.NullableRefTypes);
+        Assert.Equal("int?", Assert.Single(model.Fields, x => x.PropertyName == CustomerId).PropertyType);
+        Assert.Equal("string", Assert.Single(model.Fields, x => x.PropertyName == CustomerName).PropertyType);
+
+        var nullableInputs = new CustomerEntityInputs
+        {
+            NullableRefTypes = true
+        };
+        var nullableModel = generator.Create(nullableInputs);
+
+        Assert.True(nullableModel.NullableRefTypes);
+        Assert.Equal("int?", Assert.Single(nullableModel.Fields, x => x.PropertyName == CustomerId).PropertyType);
+        Assert.Equal("string?", Assert.Single(nullableModel.Fields, x => x.PropertyName == CustomerName).PropertyType);
+    }
+
+    [Fact]
     public void Customer_Defaults()
     {
         var generator = new EntityModelFactory();

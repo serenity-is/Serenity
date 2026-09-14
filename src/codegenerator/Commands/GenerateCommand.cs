@@ -168,8 +168,7 @@ public partial class GenerateCommand(IProjectFileInfo project, IGeneratorConsole
             if (config.IncludeGlobalUsings != null)
                 inputs.GlobalUsings.AddRange(config.IncludeGlobalUsings);
 
-            inputs.Nullable = Project.GetNullable() is string s &&
-                !string.Equals(s, "disabled", StringComparison.OrdinalIgnoreCase);
+            inputs.NullableRefTypes = Project.GetNullable() == "enable";
 
             return modelFactory.Create(inputs);
         }

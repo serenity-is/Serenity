@@ -2,7 +2,7 @@ namespace Serenity.CodeGenerator;
 
 public partial class EntityCodeGeneratorTests
 {
-    private class MockProjectFileInfo(MockFileSystem fileSystem) : IProjectFileInfo
+    private class MockProjectFileInfo(MockFileSystem fileSystem, string? nullable = null) : IProjectFileInfo
     {
         public string ProjectFile => "/app/My.Web.csproj";
         public IFileSystem FileSystem => fileSystem;
@@ -11,7 +11,7 @@ public partial class EntityCodeGeneratorTests
         public string? GetAssemblyName() => throw new NotSupportedException();
         public string? GetEsmAssetBasePath() => throw new NotSupportedException();
         public IDictionary<string, string?> GetGlobalUsings() => throw new NotSupportedException();
-        public string? GetNullable() => throw new NotSupportedException();
+        public string? GetNullable() => nullable;
         public string? GetOutDir() => throw new NotSupportedException();
         public string? GetRootNamespace() => throw new NotSupportedException();
         public string? GetTargetFramework() => throw new NotSupportedException();
@@ -90,7 +90,8 @@ public partial class EntityCodeGeneratorTests
         out MockFileSystem fileSystem,
         out MockGeneratedFileWriter writer,
         out EntityModel model,
-        string sergenJson)
+        string sergenJson,
+        bool nullableRefTypes = false)
     {
         fileSystem = new MockFileSystem();
         AddFile(fileSystem, "/app/sergen.json", sergenJson);
@@ -99,12 +100,14 @@ public partial class EntityCodeGeneratorTests
 
         var inputs = new CustomerEntityInputs
         {
-            Config = config
+            Config = config,
+            NullableRefTypes = nullableRefTypes
         };
         foreach (var ns in SerenityNetWebGlobalUsings)
             inputs.GlobalUsings.Add(ns);
 
         model = new EntityModelFactory().Create(inputs);
-        return new EntityCodeGenerator(new MockProjectFileInfo(fileSystem), model, config, writer);
+        return new EntityCodeGenerator(new MockProjectFileInfo(fileSystem, nullableRefTypes ? "enable" : null),
+            model, config, writer);
     }
 }
