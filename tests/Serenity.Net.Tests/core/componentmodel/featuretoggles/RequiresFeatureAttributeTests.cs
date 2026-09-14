@@ -24,7 +24,7 @@ public class RequiresFeatureAttributeTests
     [Fact]
     public void Ctor_WithEmptyStringFeatures_ThrowsArgumentNullException()
     {
-        Assert.Throws<ArgumentNullException>(() => new RequiresFeatureAttribute(Array.Empty<string>()));
+        Assert.Throws<ArgumentNullException>(() => new RequiresFeatureAttribute([]));
     }
 
     [Fact]

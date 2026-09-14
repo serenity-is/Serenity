@@ -12,10 +12,8 @@ public class ServiceQueryHelperTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public StringField Name;
-            public Int32Field Age;
-#pragma warning restore CS0649
+            public StringField Name = null;
+            public Int32Field Age = null;
         }
     }
 
@@ -27,9 +25,7 @@ public class ServiceQueryHelperTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int16Field IsActive;
-#pragma warning restore CS0649
+            public Int16Field IsActive = null;
         }
     }
 
@@ -42,9 +38,7 @@ public class ServiceQueryHelperTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int16Field IsActive;
-#pragma warning restore CS0649
+            public Int16Field IsActive = null;
         }
     }
 
@@ -56,9 +50,7 @@ public class ServiceQueryHelperTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public BooleanField IsDeleted;
-#pragma warning restore CS0649
+            public BooleanField IsDeleted = null;
         }
     }
 
@@ -73,10 +65,8 @@ public class ServiceQueryHelperTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field DeleteUserId;
-            public DateTimeField DeleteDate;
-#pragma warning restore CS0649
+            public Int32Field DeleteUserId = null;
+            public DateTimeField DeleteDate = null;
         }
     }
 

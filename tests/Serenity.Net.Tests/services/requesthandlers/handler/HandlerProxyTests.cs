@@ -11,9 +11,7 @@ public class HandlerProxyTests
         public int? ID { get => fields.ID[this]; set => fields.ID[this] = value; }
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field ID;
-#pragma warning restore CS0649
+            public Int32Field ID = null;
         }
     }
 

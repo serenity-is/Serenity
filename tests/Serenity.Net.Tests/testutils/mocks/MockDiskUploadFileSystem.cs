@@ -39,7 +39,7 @@ public class MockDiskUploadFileSystem(string currentDirectory = "") : MockFileSy
             DeleteFile(path);
     }
 
-    public void Delete(string path, Serenity.IO.DeleteType deleteType)
+    public void Delete(string path, IO.DeleteType deleteType)
     {
         if (deleteType == IO.DeleteType.Delete)
             DeleteFile(path);

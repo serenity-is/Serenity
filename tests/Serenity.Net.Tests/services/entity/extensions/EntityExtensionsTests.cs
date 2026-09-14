@@ -30,14 +30,12 @@ public class EntityExtensionsTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field ID;
-            public StringField Name;
-            public StringField NotMappedF;
-            public StringField TrimF;
-            public StringField TrimEmptyF;
-            public Int32Field Defaulted;
-#pragma warning restore CS0649
+            public Int32Field ID = null;
+            public StringField Name = null;
+            public StringField NotMappedF = null;
+            public StringField TrimF = null;
+            public StringField TrimEmptyF = null;
+            public Int32Field Defaulted = null;
         }
     }
 
@@ -48,9 +46,7 @@ public class EntityExtensionsTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public StringField Name;
-#pragma warning restore CS0649
+            public StringField Name = null;
         }
     }
 
@@ -207,7 +203,7 @@ public class EntityExtensionsTests
 
         Assert.Same(field, result);
         Assert.Equal("O.X", field.Expression);
-        Assert.True((field.Flags & FieldFlags.Foreign) == FieldFlags.Foreign);
+        Assert.Equal(FieldFlags.Foreign, (field.Flags & FieldFlags.Foreign));
     }
 
     [Fact]

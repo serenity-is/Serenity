@@ -14,28 +14,23 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
     ISaveBehaviorSync, IDeleteBehaviorSync, IRetrieveBehaviorSync, IRetrieveBehaviorAsync, IImplicitBehavior
 {
     private readonly IDefaultHandlerFactory handlerFactory = handlerFactory ?? throw new ArgumentNullException(nameof(handlerFactory));
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
-    private LocalizationRowAttribute attr;
     private int rowPrefixLength;
-    private Func<IIdRow> rowFactory;
-    private Type localRowType;
-    private Func<ILocalizationRow> localRowFactory;
+    private Func<IIdRow> rowFactory = null!;
+    private Type localRowType = null!;
+    private Func<ILocalizationRow> localRowFactory = null!;
     private int localRowPrefixLength;
-    private Field foreignKeyField;
-    private Field localRowIdField;
-    private StringField cultureIdField;
-    private ILocalizationRow localRowInstance;
-    private BaseCriteria foreignKeyCriteria;
-    private Func<IDictionary> dictionaryFactory;
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+    private Field foreignKeyField = null!;
+    private Field localRowIdField = null!;
+    private StringField cultureIdField = null!;
+    private ILocalizationRow localRowInstance = null!;
+    private BaseCriteria foreignKeyCriteria = null!;
+    private Func<IDictionary> dictionaryFactory = null!;
 
     /// <inheritdoc/>
     public bool ActivateFor(IRow row)
     {
         if (row.GetType().GetCustomAttribute<LocalizationRowAttribute>() is not { } attr)
             return false;
-
-        this.attr = attr;
 
         localRowType = attr.LocalizationRow;
         if (!typeof(ILocalizationRow).IsAssignableFrom(localRowType))

@@ -4,7 +4,7 @@ namespace Serenity.Reporting;
 
 public class WKHtmlToPdfConverterTests
 {
-    private sealed class FakeServerFileSystem : Serenity.IFileSystem
+    private sealed class FakeServerFileSystem : IFileSystem
     {
         public HashSet<string> Files { get; } = new(StringComparer.OrdinalIgnoreCase);
 

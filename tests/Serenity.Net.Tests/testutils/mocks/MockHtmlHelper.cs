@@ -35,7 +35,7 @@ public static class MockHtmlHelper
         var mvcServices = new ServiceCollection();
         mvcServices.AddLogging();
         var diagnosticListener = new System.Diagnostics.DiagnosticListener("MockHtmlHelper");
-        mvcServices.AddSingleton<System.Diagnostics.DiagnosticListener>(diagnosticListener);
+        mvcServices.AddSingleton(diagnosticListener);
         mvcServices.AddSingleton<System.Diagnostics.DiagnosticSource>(diagnosticListener);
         mvcServices.AddMvc();
         var helper = (HtmlHelper)mvcServices.BuildServiceProvider().GetRequiredService<IHtmlHelper>();

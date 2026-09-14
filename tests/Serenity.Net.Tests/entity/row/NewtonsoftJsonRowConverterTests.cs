@@ -4,14 +4,6 @@ namespace Serenity.Data;
 /// <summary>
 /// Tests for the Newtonsoft.Json based <see cref="JsonRowConverter"/>.
 /// </summary>
-/// <remarks>
-/// Both row converter test classes mutate the static ShouldSerializeExtension /
-/// ShouldDeserializeExtension hooks, which are shared by both converters
-/// (this one delegates to <see cref="Serenity.JsonConverters.RowJsonConverter"/>),
-/// so they are placed in the same xUnit collection to avoid races between
-/// parallel test classes.
-/// </remarks>
-[Collection("RowJsonConverterStaticHooks")]
 public class NewtonsoftJsonRowConverterTests
 {
     private static JsonRowConverter NewConverter() => new();

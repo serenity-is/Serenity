@@ -2,7 +2,7 @@ namespace Serenity.Services;
 
 public partial class MultipleFileUploadBehaviorTests
 {
-    public class MultipleTestRow : Row<MultipleTestRow.RowFields>
+    private class MultipleTestRow : Row<MultipleTestRow.RowFields>
     {
         [Identity]
         public int? Id { get => fields.Id[this]; set => fields.Id[this] = value; }
@@ -15,9 +15,9 @@ public partial class MultipleFileUploadBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id;
-            public StringField StringFieldImageUploadEditor;
-            public StringField ImageUploadEditorDisableDefaultBehavior;
+            public Int32Field Id = null;
+            public StringField StringFieldImageUploadEditor = null;
+            public StringField ImageUploadEditorDisableDefaultBehavior = null;
         }
     }
 
@@ -26,7 +26,7 @@ public partial class MultipleFileUploadBehaviorTests
         public override bool IsMultiple => true;
     }
 
-    public class MultipleTestIIdRow : Row<MultipleTestIIdRow.RowFields>, IIdRow
+    private class MultipleTestIIdRow : Row<MultipleTestIIdRow.RowFields>, IIdRow
     {
         [Identity]
         public int? Id { get => fields.Id[this]; set => fields.Id[this] = value; }
@@ -63,21 +63,21 @@ public partial class MultipleFileUploadBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id;
-            public StringField Name;
-            public StringField StringFieldImageUploadEditor;
-            public Int32Field IntegerFieldImageUploadEditor;
-            public StringField ImageUploadEditorCorrectEditorType;
-            public StringField StringFieldExpression;
-            public StringField ImageUploadEditorReplaceField;
-            public StringField ImageUploadEditorInvalidReplaceField;
-            public StringField ImageUploadEditorReplaceFieldNoField;
-            public StringField ImageUploadEditorOriginalName;
-            public StringField ImageUploadEditorCopyToHistory;
+            public Int32Field Id = null;
+            public StringField Name = null;
+            public StringField StringFieldImageUploadEditor = null;
+            public Int32Field IntegerFieldImageUploadEditor = null;
+            public StringField ImageUploadEditorCorrectEditorType = null;
+            public StringField StringFieldExpression = null;
+            public StringField ImageUploadEditorReplaceField = null;
+            public StringField ImageUploadEditorInvalidReplaceField = null;
+            public StringField ImageUploadEditorReplaceFieldNoField = null;
+            public StringField ImageUploadEditorOriginalName = null;
+            public StringField ImageUploadEditorCopyToHistory = null;
         }
     }
 
-    public class MultipleTestIIsActiveDeletedRowRow : Row<MultipleTestIIsActiveDeletedRowRow.RowFields>, IIdRow, IIsActiveDeletedRow
+    private class MultipleTestIIsActiveDeletedRowRow : Row<MultipleTestIIsActiveDeletedRowRow.RowFields>, IIdRow, IIsActiveDeletedRow
     {
         [Identity]
         public int? Id { get => fields.Id[this]; set => fields.Id[this] = value; }
@@ -91,13 +91,13 @@ public partial class MultipleFileUploadBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id;
-            public StringField StringFieldImageUploadEditor;
-            public Int16Field IsActive;
+            public Int32Field Id = null;
+            public StringField StringFieldImageUploadEditor = null;
+            public Int16Field IsActive = null;
         }
     }
 
-    public class MultipleTestIIsDeletedRow : Row<MultipleTestIIsDeletedRow.RowFields>, IIdRow, IIsDeletedRow
+    private class MultipleTestIIsDeletedRow : Row<MultipleTestIIsDeletedRow.RowFields>, IIdRow, IIsDeletedRow
     {
         [Identity]
         public int? Id { get => fields.Id[this]; set => fields.Id[this] = value; }
@@ -111,13 +111,13 @@ public partial class MultipleFileUploadBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id;
-            public StringField StringFieldImageUploadEditor;
-            public BooleanField IsDeleted;
+            public Int32Field Id = null;
+            public StringField StringFieldImageUploadEditor = null;
+            public BooleanField IsDeleted = null;
         }
     }
 
-    public class MultipleTestIDeleteLogRow : Row<MultipleTestIDeleteLogRow.RowFields>, IIdRow, IDeleteLogRow
+    private class MultipleTestIDeleteLogRow : Row<MultipleTestIDeleteLogRow.RowFields>, IIdRow, IDeleteLogRow
     {
         [Identity]
         public int? Id { get => fields.Id[this]; set => fields.Id[this] = value; }
@@ -134,10 +134,10 @@ public partial class MultipleFileUploadBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id;
-            public StringField StringFieldImageUploadEditor;
-            public Int32Field DeleteUserId;
-            public DateTimeField DeleteDate;
+            public Int32Field Id = null;
+            public StringField StringFieldImageUploadEditor = null;
+            public Int32Field DeleteUserId = null;
+            public DateTimeField DeleteDate = null;
         }
     }
 }

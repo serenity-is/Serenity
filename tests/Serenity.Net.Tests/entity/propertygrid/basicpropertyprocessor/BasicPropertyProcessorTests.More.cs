@@ -38,26 +38,24 @@ public partial class BasicPropertyProcessorTests
         [DistinctValuesEditor]
         public string? DistinctField { get => fields.DistinctField[this]; set => fields.DistinctField[this] = value; }
 
-        [DistinctValuesEditor(typeof(MoreServiceRow), "Name")]
+        [DistinctValuesEditor(typeof(MoreServiceRow), nameof(Name))]
         public string? DistinctRtField { get => fields.DistinctRtField[this]; set => fields.DistinctRtField[this] = value; }
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field ID;
-            public StringField Name;
-            public StringField Titled;
-            public StringField Defaulted;
-            public StringField Perms;
-            public StringField Locked;
-            public StringField Computed;
-            public Int32Field IntField;
-            public Int64Field LongField;
-            public DecimalField DecimalField;
-            public DateTimeField DateTimeField;
-            public StringField DistinctField;
-            public StringField DistinctRtField;
-#pragma warning restore CS0649
+            public Int32Field ID = null;
+            public StringField Name = null;
+            public StringField Titled = null;
+            public StringField Defaulted = null;
+            public StringField Perms = null;
+            public StringField Locked = null;
+            public StringField Computed = null;
+            public Int32Field IntField = null;
+            public Int64Field LongField = null;
+            public DecimalField DecimalField = null;
+            public DateTimeField DateTimeField = null;
+            public StringField DistinctField = null;
+            public StringField DistinctRtField = null;
         }
     }
 
@@ -72,10 +70,8 @@ public partial class BasicPropertyProcessorTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field ID;
-            public StringField Name;
-#pragma warning restore CS0649
+            public Int32Field ID = null;
+            public StringField Name = null;
         }
     }
 
@@ -235,21 +231,19 @@ public partial class BasicPropertyProcessorTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public StringField StringSmall;
-            public StringField StringNoSize;
-            public StringField StringLarge;
-            public BooleanField BoolField;
-            public DateTimeField DateField;
-            public DateOnlyField DateOnlyField;
-            public TimeSpanField TimeField;
-            public Int16Field Int16Field;
-            public Int32Field Int32Field;
-            public SingleField SingleField;
-            public DoubleField DoubleField;
-            public DecimalField DecimalField;
-            public GuidField GuidField;
-#pragma warning restore CS0649
+            public StringField StringSmall = null;
+            public StringField StringNoSize = null;
+            public StringField StringLarge = null;
+            public BooleanField BoolField = null;
+            public DateTimeField DateField = null;
+            public DateOnlyField DateOnlyField = null;
+            public TimeSpanField TimeField = null;
+            public Int16Field Int16Field = null;
+            public Int32Field Int32Field = null;
+            public SingleField SingleField = null;
+            public DoubleField DoubleField = null;
+            public DecimalField DecimalField = null;
+            public GuidField GuidField = null;
         }
     }
 

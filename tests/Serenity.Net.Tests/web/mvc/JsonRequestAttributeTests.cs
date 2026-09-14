@@ -169,7 +169,7 @@ public class JsonRequestAttributeTests
         httpContext.Request.Method = "POST";
         httpContext.Request.ContentType = "application/x-www-form-urlencoded";
         httpContext.Features.Set<IFormFeature>(new FormFeature(new FormCollection(
-            new Dictionary<string, Microsoft.Extensions.Primitives.StringValues>
+            new Dictionary<string, StringValues>
             {
                 ["request"] = """{"ID":3}"""
             })));

@@ -38,17 +38,15 @@ public partial class CriteriaFieldExpressionReplacerTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field Id;
-            public StringField Name;
-            public StringField LookupIncludeField;
-            public StringField NormalField;
-            public StringField ExtraReadPermissionField;
-            public StringField ExtraReadPermissionWithLookupIncludeField;
-            public StringField DenyFilteringField;
-            public StringField NotMappedField;
-            public StringField MinSelectLevelNeverField;
-#pragma warning restore CS0649
+            public Int32Field Id = null;
+            public StringField Name = null;
+            public StringField LookupIncludeField = null;
+            public StringField NormalField = null;
+            public StringField ExtraReadPermissionField = null;
+            public StringField ExtraReadPermissionWithLookupIncludeField = null;
+            public StringField DenyFilteringField = null;
+            public StringField NotMappedField = null;
+            public StringField MinSelectLevelNeverField = null;
         }
     }
 }

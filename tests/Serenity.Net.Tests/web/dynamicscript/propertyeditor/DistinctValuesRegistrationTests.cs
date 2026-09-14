@@ -12,10 +12,8 @@ public class DistinctValuesRegistrationTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field Id;
-            public StringField Category;
-#pragma warning restore CS0649
+            public Int32Field Id = null;
+            public StringField Category = null;
         }
     }
 
@@ -30,14 +28,14 @@ public class DistinctValuesRegistrationTests
     [FormScript("Registration.ExplicitForm")]
     private class ExplicitForm
     {
-        [DistinctValuesEditor(typeof(DistinctRow), "Category")]
+        [DistinctValuesEditor(typeof(DistinctRow), nameof(Category))]
         public string? Category { get; set; }
     }
 
     [FormScript("Registration.BadRowForm")]
     private class BadRowForm
     {
-        [DistinctValuesEditor(typeof(string), "Category")]
+        [DistinctValuesEditor(typeof(string), nameof(Category))]
         public string? Category { get; set; }
     }
 

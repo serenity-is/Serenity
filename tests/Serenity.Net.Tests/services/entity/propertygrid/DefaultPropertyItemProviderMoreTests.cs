@@ -11,7 +11,6 @@ public class DefaultPropertyItemProviderMoreTests
         return new DefaultPropertyItemProvider(services.BuildServiceProvider(), new MockTypeSource(types));
     }
 
-#pragma warning disable CS0649
     [TableName("PGRows2")]
     private class Row2 : Row<Row2.RowFields>, IIdRow
     {
@@ -21,11 +20,10 @@ public class DefaultPropertyItemProviderMoreTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field ID;
-            public StringField Name;
+            public Int32Field ID = null;
+            public StringField Name = null;
         }
     }
-#pragma warning restore CS0649
 
     [BasedOnRow(typeof(Row2), CheckNames = true)]
     private class CaseMismatchForm
@@ -44,11 +42,9 @@ public class DefaultPropertyItemProviderMoreTests
         public string Name { get; set; }
     }
 
-    private class ChangeTrackingTypeSource : MockTypeSource, IChangeTokenProvider
+    private class ChangeTrackingTypeSource(params Type[] types) : MockTypeSource(types), IChangeTokenProvider
     {
         private CancellationTokenSource cts = new();
-
-        public ChangeTrackingTypeSource(params Type[] types) : base(types) { }
 
         public IChangeToken GetChangeToken() => new CancellationChangeToken(cts.Token);
 
@@ -97,7 +93,7 @@ public class DefaultPropertyItemProviderMoreTests
 
         typeSource.Fire();
 
-        items = provider.GetPropertyItemsFor(typeof(ChangeForm), null).ToList();
+        items = [.. provider.GetPropertyItemsFor(typeof(ChangeForm), null)];
         Assert.Equal("N", Assert.Single(items).Title);
     }
 }

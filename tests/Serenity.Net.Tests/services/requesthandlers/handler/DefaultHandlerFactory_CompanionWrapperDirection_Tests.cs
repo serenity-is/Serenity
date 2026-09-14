@@ -9,9 +9,7 @@ public class DefaultHandlerFactory_CompanionWrapperDirection_Tests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field ID;
-#pragma warning restore CS0649
+            public Int32Field ID = null;
         }
     }
 

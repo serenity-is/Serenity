@@ -1,4 +1,3 @@
-#pragma warning disable CS0649
 namespace Serenity.Services;
 
 public partial class CaptureLogBehaviorTests
@@ -11,7 +10,7 @@ public partial class CaptureLogBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id;
+            public Int32Field Id = null;
         }
     }
 
@@ -22,7 +21,7 @@ public partial class CaptureLogBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id;
+            public Int32Field Id = null;
         }
     }
 
@@ -38,9 +37,9 @@ public partial class CaptureLogBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id;
-            public StringField Name;
-            public BooleanField IsDeleted;
+            public Int32Field Id = null;
+            public StringField Name = null;
+            public BooleanField IsDeleted = null;
         }
     }
 
@@ -55,8 +54,8 @@ public partial class CaptureLogBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id;
-            public Int16Field IsActive;
+            public Int32Field Id = null;
+            public Int16Field IsActive = null;
         }
     }
 
@@ -73,9 +72,9 @@ public partial class CaptureLogBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id;
-            public Int32Field DeleteUserId;
-            public DateTimeField DeleteDate;
+            public Int32Field Id = null;
+            public Int32Field DeleteUserId = null;
+            public DateTimeField DeleteDate = null;
         }
     }
 
@@ -98,12 +97,12 @@ public partial class CaptureLogBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id;
-            public StringField Name;
-            public DateTimeField InsertDate;
-            public Int32Field InsertUserId;
-            public DateTimeField UpdateDate;
-            public Int32Field UpdateUserId;
+            public Int32Field Id = null;
+            public StringField Name = null;
+            public DateTimeField InsertDate = null;
+            public Int32Field InsertUserId = null;
+            public DateTimeField UpdateDate = null;
+            public Int32Field UpdateUserId = null;
         }
     }
 
@@ -114,7 +113,7 @@ public partial class CaptureLogBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id;
+            public Int32Field Id = null;
         }
     }
 
@@ -127,7 +126,7 @@ public partial class CaptureLogBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id;
+            public Int32Field Id = null;
         }
     }
 
@@ -140,7 +139,7 @@ public partial class CaptureLogBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id;
+            public Int32Field Id = null;
         }
     }
 
@@ -162,12 +161,12 @@ public partial class CaptureLogBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int64Field LogId;
-            public EnumField<CaptureOperationType> OperationType;
-            public Int32Field ChangingUserId;
-            public DateTimeField ValidFrom;
-            public DateTimeField ValidUntil;
-            public StringField Foo;
+            public Int64Field LogId = null;
+            public EnumField<CaptureOperationType> OperationType = null;
+            public Int32Field ChangingUserId = null;
+            public DateTimeField ValidFrom = null;
+            public DateTimeField ValidUntil = null;
+            public StringField Foo = null;
         }
     }
 
@@ -181,8 +180,8 @@ public partial class CaptureLogBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id;
-            public StringField Name;
+            public Int32Field Id = null;
+            public StringField Name = null;
         }
     }
 

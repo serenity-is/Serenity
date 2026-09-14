@@ -188,11 +188,9 @@ public class UpdatableExtensionBehavior_Async_Tests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
             public Int32Field Id;
             public Int32Field DetailId;
             public StringField DetailText;
-#pragma warning restore CS0649
         }
     }
 }

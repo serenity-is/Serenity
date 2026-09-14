@@ -10,9 +10,7 @@ public class ListRequestHandlerAsyncTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field Id;
-#pragma warning restore CS0649
+            public Int32Field Id = null;
         }
     }
 
@@ -24,16 +22,12 @@ public class ListRequestHandlerAsyncTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field Id;
-#pragma warning restore CS0649
+            public Int32Field Id = null;
         }
     }
 
-    private sealed class SkippingAsyncHandler : ListRequestHandlerAsync<AsyncRow>
+    private sealed class SkippingAsyncHandler(IRequestContext context) : ListRequestHandlerAsync<AsyncRow>(context)
     {
-        public SkippingAsyncHandler(IRequestContext context) : base(context) { }
-
         protected override AsyncRow ProcessEntity(AsyncRow row) => null!;
     }
 

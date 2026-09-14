@@ -70,7 +70,7 @@ public class EndpointExtensionTests
         };
 
         int commitCalls = 0;
-        var result = await controller.InTransactionAsync<ServiceResponse>("Test",
+        var result = await controller.InTransactionAsync("Test",
             (uow, ct) =>
             {
                 uow.OnCommit += () => commitCalls++;

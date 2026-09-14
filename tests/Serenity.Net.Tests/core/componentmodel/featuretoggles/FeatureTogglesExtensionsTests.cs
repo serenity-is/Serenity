@@ -38,7 +38,7 @@ public class FeatureTogglesExtensionsTests
     public void IsEnabled_WithEnumerable_ReturnsFalse_WhenEmpty()
     {
         var toggles = new MockFeatureToggles("A");
-        Assert.False(toggles.IsEnabled(Array.Empty<string>()));
+        Assert.False(toggles.IsEnabled([]));
         Assert.False(toggles.IsEnabled((IEnumerable<string>)null));
     }
 

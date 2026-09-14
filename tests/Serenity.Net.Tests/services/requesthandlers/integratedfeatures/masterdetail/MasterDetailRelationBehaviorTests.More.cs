@@ -1,4 +1,3 @@
-#pragma warning disable CS0649
 namespace Serenity.Services;
 
 public partial class MasterDetailRelationBehaviorTests
@@ -15,8 +14,8 @@ public partial class MasterDetailRelationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field ID;
-            public RowListField<Int32DetailRow> DetailList;
+            public Int32Field ID = null;
+            public RowListField<Int32DetailRow> DetailList = null;
         }
     }
 
@@ -32,8 +31,8 @@ public partial class MasterDetailRelationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field ID;
-            public RowListField<Int32DetailRow> DetailList;
+            public Int32Field ID = null;
+            public RowListField<Int32DetailRow> DetailList = null;
         }
     }
 
@@ -51,9 +50,9 @@ public partial class MasterDetailRelationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field ID;
-            public BooleanField IsDeleted;
-            public RowListField<Int32DetailRow> DetailList;
+            public Int32Field ID = null;
+            public BooleanField IsDeleted = null;
+            public RowListField<Int32DetailRow> DetailList = null;
         }
     }
 
@@ -72,9 +71,9 @@ public partial class MasterDetailRelationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field ID;
-            public StringField Code;
-            public RowListField<Int32DetailRow> DetailList;
+            public Int32Field ID = null;
+            public StringField Code = null;
+            public RowListField<Int32DetailRow> DetailList = null;
         }
     }
 
@@ -90,8 +89,8 @@ public partial class MasterDetailRelationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field ID;
-            public RowListField<Int32DetailRow> DetailList;
+            public Int32Field ID = null;
+            public RowListField<Int32DetailRow> DetailList = null;
         }
     }
 
@@ -107,8 +106,8 @@ public partial class MasterDetailRelationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field ID;
-            public RowListField<Int32DetailRow> DetailList;
+            public Int32Field ID = null;
+            public RowListField<Int32DetailRow> DetailList = null;
         }
     }
 
@@ -133,8 +132,8 @@ public partial class MasterDetailRelationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field ID;
-            public RowListField<Int32DetailRow> DetailList;
+            public Int32Field ID = null;
+            public RowListField<Int32DetailRow> DetailList = null;
         }
     }
 
@@ -166,12 +165,12 @@ public partial class MasterDetailRelationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field ID;
-            public Int32Field NotAList;
-            public ListField<int> NotRows;
-            public RowListField<Int32DetailRow> MissingFk;
-            public RowListField<Int32DetailRow> MissingFilter;
-            public RowListField<Int32DetailRow> MissingMasterKey;
+            public Int32Field ID = null;
+            public Int32Field NotAList = null;
+            public ListField<int> NotRows = null;
+            public RowListField<Int32DetailRow> MissingFk = null;
+            public RowListField<Int32DetailRow> MissingFilter = null;
+            public RowListField<Int32DetailRow> MissingMasterKey = null;
         }
     }
 

@@ -1,5 +1,3 @@
-#pragma warning disable CS0649
-
 namespace Serenity.Data;
 
 public class RowTestsMore
@@ -62,6 +60,10 @@ public class RowTestsMore
         {
         }
 
+        public NoFactoryRow(RowFields fields) : base(fields)
+        {
+        }
+
         public class RowFields : RowFieldsBase
         {
             public Int32Field Id;
@@ -86,8 +88,10 @@ public class RowTestsMore
     [Fact]
     public void CreateNew_Without_RowFactory_Throws()
     {
-        var row = new NoFactoryRow();
-        row.GetFields().rowFactory = null;
+        var fields = new NoFactoryRow.RowFields();
+        fields.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect);
+        fields.rowFactory = null;
+        var row = new NoFactoryRow(fields);
 
         Assert.Throws<NotImplementedException>(() => ((IRow)row).CreateNew());
     }

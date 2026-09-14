@@ -13,15 +13,13 @@ public class UndeleteRequestHandlerTests_Basic
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field ID;
-            public StringField Name;
-            public BooleanField IsDeleted;
-#pragma warning restore CS0649
+            public Int32Field ID = null;
+            public StringField Name = null;
+            public BooleanField IsDeleted = null;
         }
     }
 
-    private static IRequestContext Context() => new NullRequestContext().WithPermissions(_ => true);
+    private static NullRequestContext Context() => new NullRequestContext().WithPermissions(_ => true);
 
     [Fact]
     public void Undelete_RestoresRow()

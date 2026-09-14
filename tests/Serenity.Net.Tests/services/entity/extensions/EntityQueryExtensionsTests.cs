@@ -19,12 +19,10 @@ public class EntityQueryExtensionsTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field Id;
-            public StringField Name;
-            public StringField NotMappedF;
-            public StringField ForeignF;
-#pragma warning restore CS0649
+            public Int32Field Id = null;
+            public StringField Name = null;
+            public StringField NotMappedF = null;
+            public StringField ForeignF = null;
         }
     }
 
@@ -87,7 +85,7 @@ public class EntityQueryExtensionsTests
     {
         Assert.Throws<ArgumentNullException>(() => EntityQueryExtensions.SelectTableFields(null!, new SelRow()));
         Assert.Throws<ArgumentNullException>(() => new SqlQuery().SelectTableFields((IRow)null!));
-        Assert.Throws<ArgumentNullException>(() => EntityQueryExtensions.SelectTableFields(null!, Array.Empty<Field>()));
+        Assert.Throws<ArgumentNullException>(() => EntityQueryExtensions.SelectTableFields(null!, []));
     }
 
     [Fact]

@@ -39,7 +39,7 @@ public class ServiceEndpointApplicationModelProviderTests
 
     private static ApplicationModelProviderContext CreateContext(params ControllerModel[] controllers)
     {
-        var context = new ApplicationModelProviderContext(Array.Empty<TypeInfo>());
+        var context = new ApplicationModelProviderContext([]);
         foreach (var controller in controllers)
             context.Result.Controllers.Add(controller);
         return context;

@@ -24,13 +24,11 @@ public class UpdateInsertLogBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field Id;
-            public DateTimeField InsertDate;
-            public DateTimeField UpdateDate;
-            public Int32Field InsertUserId;
-            public Int32Field UpdateUserId;
-#pragma warning restore CS0649
+            public Int32Field Id = null;
+            public DateTimeField InsertDate = null;
+            public DateTimeField UpdateDate = null;
+            public Int32Field InsertUserId = null;
+            public Int32Field UpdateUserId = null;
         }
     }
 
@@ -72,9 +70,7 @@ public class UpdateInsertLogBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field Id;
-#pragma warning restore CS0649
+            public Int32Field Id = null;
         }
     }
 

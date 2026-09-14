@@ -12,8 +12,6 @@ public abstract class IdNameRow<TFields> : Row<TFields>, IIdRow, INameRow
 
 public abstract class IdNameRowFields() : RowFieldsBase()
 {
-#pragma warning disable CS0649
         public Int32Field Id;
         public StringField Name;
-#pragma warning restore CS0649
 }

@@ -1,4 +1,3 @@
-#pragma warning disable CS0649
 #pragma warning disable CS0169
 
 namespace Serenity.Data;
@@ -33,7 +32,7 @@ public class RowFieldsBaseTestsMore
             }
         }
 
-        private int? _Id;
+        private readonly int? _Id;
         public int? Id { get => fields.Id[this]; set => fields.Id[this] = value; }
     }
 
@@ -300,7 +299,7 @@ public class RowFieldsBaseTestsMore
         {
         }
 
-        public FactoryCtorRow(FactoryCtorRow.RowFields fields) : base(fields)
+        public FactoryCtorRow(RowFields fields) : base(fields)
         {
         }
 
@@ -352,8 +351,10 @@ public class RowFieldsBaseTestsMore
     [Fact]
     public void Runtime_Field_Creation_With_Backing_Field_Works()
     {
-        var row = new GenRow();
-        row.Id = 42;
+        var row = new GenRow
+        {
+            Id = 42
+        };
         Assert.Equal(42, row.Id);
         row.Id = null;
         Assert.Null(row.Id);
@@ -524,8 +525,10 @@ public class RowFieldsBaseTestsMore
     [Fact]
     public void FieldPrefix_And_LocalTextPrefix_Setters_Work()
     {
-        var f = new ExtraFieldRow.RowFields();
-        f.FieldPrefix = "f_";
+        var f = new ExtraFieldRow.RowFields
+        {
+            FieldPrefix = "f_"
+        };
         Assert.Equal("f_", f.FieldPrefix);
 
         f.LocalTextPrefix = "Custom";
@@ -573,7 +576,7 @@ public class RowFieldsBaseTestsMore
     [Fact]
     public void ModuleIdentifier_Strips_Entities_Namespace_Suffix()
     {
-        var f = new Serenity.Data.Tests.Entities.EntitiesNamespaceRow.RowFields();
+        var f = new Tests.Entities.EntitiesNamespaceRow.RowFields();
         Assert.Equal("Data.Tests", f.ModuleIdentifier);
     }
 }

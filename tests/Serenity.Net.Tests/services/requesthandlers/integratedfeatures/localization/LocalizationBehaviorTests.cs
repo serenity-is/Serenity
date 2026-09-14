@@ -18,11 +18,9 @@ public partial class LocalizationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field Id;
-            public StringField Name;
-            public StringField Description;
-#pragma warning restore CS0649
+            public Int32Field Id = null;
+            public StringField Name = null;
+            public StringField Description = null;
         }
     }
 
@@ -44,13 +42,11 @@ public partial class LocalizationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int64Field Id;
-            public Int32Field MasterId;
-            public StringField LanguageId;
-            public StringField Name;
-            public StringField Description;
-#pragma warning restore CS0649
+            public Int64Field Id = null;
+            public Int32Field MasterId = null;
+            public StringField LanguageId = null;
+            public StringField Name = null;
+            public StringField Description = null;
         }
     }
 

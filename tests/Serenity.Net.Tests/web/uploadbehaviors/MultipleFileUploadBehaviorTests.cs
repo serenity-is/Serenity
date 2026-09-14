@@ -57,12 +57,14 @@ public partial class MultipleFileUploadBehaviorTests
     [Fact]
     public void ActivateFor_ThrowsArgumentException_WhenTargetType_IsNotStringFieldAndPropertyNameIsNull()
     {
+        var fields = new MultipleTestIIdRow.RowFields();
+        fields.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect);
+        fields.IntegerFieldImageUploadEditor.PropertyName = null;
+
         var sut = new FileUploadBehavior(new MockUploadStorage(), new MockUploadProcessor())
         {
-            Target = MultipleTestIIdRow.Fields.IntegerFieldImageUploadEditor
+            Target = fields.IntegerFieldImageUploadEditor
         };
-
-        sut.Target.PropertyName = null;
 
         var exception = Assert.Throws<ArgumentException>(() => sut.ActivateFor(new MultipleTestIIdRow()));
         Assert.Contains("string", Normalize(exception.Message));
@@ -84,12 +86,14 @@ public partial class MultipleFileUploadBehaviorTests
     [Fact]
     public void ActivateFor_ThrowsArgumentException_WhenRow_DoesNotInherits_IIdRowAndPropertyNameIsNull()
     {
+        var fields = new MultipleTestRow.RowFields();
+        fields.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect);
+        fields.StringFieldImageUploadEditor.PropertyName = null;
+
         var sut = new FileUploadBehavior(new MockUploadStorage(), new MockUploadProcessor())
         {
-            Target = MultipleTestRow.Fields.StringFieldImageUploadEditor
+            Target = fields.StringFieldImageUploadEditor
         };
-
-        sut.Target.PropertyName = null;
 
         var exception = Assert.Throws<ArgumentException>(() => sut.ActivateFor(new MultipleTestRow()));
         Assert.Contains("iidrow", Normalize(exception.Message));

@@ -2,7 +2,7 @@ namespace Serenity.Data;
 
 public class FieldPropertiesTests
 {
-    public class FkNoJoinRow : Row<FkNoJoinRow.RowFields>
+    private class FkNoJoinRow : Row<FkNoJoinRow.RowFields>
     {
         public class RowFields : RowFieldsBase
         {

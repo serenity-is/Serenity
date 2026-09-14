@@ -60,26 +60,24 @@ public partial class ListRequestHandlerTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field Id;
-            public StringField Name;
-            public StringField ExplicitQ;
-            public Int32Field IntQ;
-            public Int16Field ShortQ;
-            public Int64Field LongQ;
-            public StringField StartsQ;
-            public StringField FullTextQ;
-            public StringField Sorted;
-            public StringField Unsortable;
-            public StringField NotMappedF;
-            public StringField DenyFilterF;
-            public StringField NeverF;
-            public StringField AlwaysF;
-            public StringField ExplicitF;
-            public StringField DetailsF;
-            public StringField ForeignF;
-            public StringField NormalF;
-#pragma warning restore CS0649
+            public Int32Field Id = null;
+            public StringField Name = null;
+            public StringField ExplicitQ = null;
+            public Int32Field IntQ = null;
+            public Int16Field ShortQ = null;
+            public Int64Field LongQ = null;
+            public StringField StartsQ = null;
+            public StringField FullTextQ = null;
+            public StringField Sorted = null;
+            public StringField Unsortable = null;
+            public StringField NotMappedF = null;
+            public StringField DenyFilterF = null;
+            public StringField NeverF = null;
+            public StringField AlwaysF = null;
+            public StringField ExplicitF = null;
+            public StringField DetailsF = null;
+            public StringField ForeignF = null;
+            public StringField NormalF = null;
         }
     }
 
@@ -93,17 +91,13 @@ public partial class ListRequestHandlerTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field Id;
-            public StringField Name;
-#pragma warning restore CS0649
+            public Int32Field Id = null;
+            public StringField Name = null;
         }
     }
 
-    private class CovListHandler : ListRequestHandler<CovRow>
+    private class CovListHandler(IRequestContext context) : ListRequestHandler<CovRow>(context)
     {
-        public CovListHandler(IRequestContext context) : base(context) { }
-
         public void Setup(IDbConnection connection, ListRequest? request = null)
         {
             Connection = connection;
@@ -154,10 +148,8 @@ public partial class ListRequestHandlerTests
         public void CallApplyEquality(SqlQuery query) => ApplyEqualityFilter(query);
     }
 
-    private class SkippingListHandler : ListRequestHandler<NoQuickSearchRow>
+    private class SkippingListHandler(IRequestContext context) : ListRequestHandler<NoQuickSearchRow>(context)
     {
-        public SkippingListHandler(IRequestContext context) : base(context) { }
-
         protected override NoQuickSearchRow ProcessEntity(NoQuickSearchRow row) => null!;
     }
 

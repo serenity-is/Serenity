@@ -1,4 +1,3 @@
-#pragma warning disable CS0649
 using Serenity.PropertyGrid;
 
 namespace Serenity.Web;
@@ -29,7 +28,7 @@ public class PropertyItemsScriptTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id;
+            public Int32Field Id = null;
         }
     }
 

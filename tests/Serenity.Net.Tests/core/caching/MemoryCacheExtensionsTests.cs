@@ -105,7 +105,7 @@ public class MemoryCacheExtensionsTests
     {
         var cache = NewCache();
         cache.Set("key", DBNull.Value);
-        var result = cache.Get<string>("key", TimeSpan.FromMinutes(1), () => "loaded");
+        var result = cache.Get("key", TimeSpan.FromMinutes(1), () => "loaded");
         Assert.Null(result);
     }
 

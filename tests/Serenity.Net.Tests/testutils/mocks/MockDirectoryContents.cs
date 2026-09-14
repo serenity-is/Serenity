@@ -9,7 +9,7 @@ public class MockDirectoryContents(System.IO.Abstractions.IFileSystem fileSystem
     public System.IO.Abstractions.IFileSystem FileSystem { get; } = fileSystem;
     public string Path { get; } = path;
 
-    public IEnumerator<Microsoft.Extensions.FileProviders.IFileInfo> GetEnumerator()
+    public IEnumerator<IFileInfo> GetEnumerator()
     {
         return FileSystem.Directory.GetDirectories(Path)
             .Select(x => new MockFileInfo(FileSystem, x, true))

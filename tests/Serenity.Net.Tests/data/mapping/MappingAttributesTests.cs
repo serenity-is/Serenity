@@ -229,7 +229,7 @@ public class MappingAttributesTests
     {
         Assert.NotNull(new TwoLevelCachedAttribute());
         Assert.Equal(new[] { "a", "b" }, new TwoLevelCachedAttribute("a", "b").GenerationKeys);
-        Assert.Equal(new[] { typeof(string) }, new TwoLevelCachedAttribute(typeof(string)).LinkedRows);
+        Assert.Equal([typeof(string)], new TwoLevelCachedAttribute(typeof(string)).LinkedRows);
     }
 
     [Fact]

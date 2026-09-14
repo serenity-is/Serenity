@@ -25,11 +25,18 @@ public class PropertyInfoSourceTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field ID;
-            public EnumField<MyEnum> EnumProp;
-            public EnumField<MyEnum> EnumMapped;
-#pragma warning restore CS0649
+            public Int32Field ID = null;
+            public EnumField<MyEnum> EnumProp = null;
+            public EnumField<MyEnum> EnumMapped = null;
+        }
+
+        public SourceRow()
+        {
+        }
+
+        public SourceRow(RowFields fields)
+            : base(fields)
+        {
         }
     }
 
@@ -75,19 +82,13 @@ public class PropertyInfoSourceTests
     [Fact]
     public void EnumType_IsNull_WhenNotAnEnum()
     {
-        var field = SourceRow.Fields.EnumMapped;
-        var original = field.EnumType;
-        try
-        {
-            field.EnumType = typeof(int);
-            var source = new PropertyInfoSource(typeof(SourceForm).GetProperty(nameof(SourceForm.EnumMapped)),
-                new SourceRow());
-            Assert.Null(source.EnumType);
-        }
-        finally
-        {
-            field.EnumType = original;
-        }
+        var fields = new SourceRow.RowFields();
+        fields.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect);
+        var field = fields.EnumMapped;
+        field.EnumType = typeof(int);
+        var source = new PropertyInfoSource(typeof(SourceForm).GetProperty(nameof(SourceForm.EnumMapped)),
+            new SourceRow(fields));
+        Assert.Null(source.EnumType);
     }
 
     [Fact]

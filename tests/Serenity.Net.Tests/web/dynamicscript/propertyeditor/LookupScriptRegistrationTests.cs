@@ -15,10 +15,8 @@ public class LookupScriptRegistrationTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field Id;
-            public StringField Name;
-#pragma warning restore CS0649
+            public Int32Field Id = null;
+            public StringField Name = null;
         }
     }
 
@@ -65,9 +63,7 @@ public class LookupScriptRegistrationTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field Id;
-#pragma warning restore CS0649
+            public Int32Field Id = null;
         }
     }
 
@@ -86,9 +82,7 @@ public class LookupScriptRegistrationTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field Id;
-#pragma warning restore CS0649
+            public Int32Field Id = null;
         }
     }
 

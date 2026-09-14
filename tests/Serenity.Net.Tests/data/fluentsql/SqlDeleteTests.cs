@@ -28,7 +28,7 @@ public class SqlDeleteTests
         Assert.Contains("A = 1", delete.ToString());
 
         Assert.Throws<ArgumentNullException>(() => new SqlDelete("T").Where((string[])null!));
-        Assert.Throws<ArgumentNullException>(() => new SqlDelete("T").Where(Array.Empty<string>()));
+        Assert.Throws<ArgumentNullException>(() => new SqlDelete("T").Where([]));
     }
 
     [Fact]

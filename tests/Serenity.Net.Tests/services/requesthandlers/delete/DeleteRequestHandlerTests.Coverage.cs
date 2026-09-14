@@ -14,10 +14,8 @@ public partial class DeleteRequestHandlerTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field Id;
-            public BooleanField IsDeleted;
-#pragma warning restore CS0649
+            public Int32Field Id = null;
+            public BooleanField IsDeleted = null;
         }
     }
 
@@ -33,10 +31,8 @@ public partial class DeleteRequestHandlerTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field Id;
-            public Int16Field IsActive;
-#pragma warning restore CS0649
+            public Int32Field Id = null;
+            public Int16Field IsActive = null;
         }
     }
 
@@ -54,11 +50,9 @@ public partial class DeleteRequestHandlerTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field Id;
-            public DateTimeField DeleteDate;
-            public Int64Field DeleteUserId;
-#pragma warning restore CS0649
+            public Int32Field Id = null;
+            public DateTimeField DeleteDate = null;
+            public Int64Field DeleteUserId = null;
         }
     }
 
@@ -78,12 +72,10 @@ public partial class DeleteRequestHandlerTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field Id;
-            public BooleanField IsDeleted;
-            public DateTimeField UpdateDate;
-            public Int64Field UpdateUserId;
-#pragma warning restore CS0649
+            public Int32Field Id = null;
+            public BooleanField IsDeleted = null;
+            public DateTimeField UpdateDate = null;
+            public Int64Field UpdateUserId = null;
         }
     }
 
@@ -103,12 +95,10 @@ public partial class DeleteRequestHandlerTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field Id;
-            public BooleanField IsDeleted;
-            public DateTimeField DeleteDate;
-            public Int64Field DeleteUserId;
-#pragma warning restore CS0649
+            public Int32Field Id = null;
+            public BooleanField IsDeleted = null;
+            public DateTimeField DeleteDate = null;
+            public Int64Field DeleteUserId = null;
         }
     }
 
@@ -124,10 +114,8 @@ public partial class DeleteRequestHandlerTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field Id;
-            public Int32Field Order;
-#pragma warning restore CS0649
+            public Int32Field Id = null;
+            public Int32Field Order = null;
         }
     }
 
@@ -141,7 +129,7 @@ public partial class DeleteRequestHandlerTests
         }
     }
 
-    private static IRequestContext CovDeleteContext() =>
+    private static NullRequestContext CovDeleteContext() =>
         new NullRequestContext().WithPermissions(_ => true);
 
     private static MockDbConnection CovDeleteConnection() =>

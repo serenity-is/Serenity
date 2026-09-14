@@ -23,13 +23,20 @@ public class RowCreationTests
     [Fact]
     public void Can_Create_Row_With_Initialized_Fields_With_DefaultScope()
     {
-        RowFieldsProvider.SetLocal(FallbackRowFieldsProvider.Instance);
-        var fields = new ComplexRow.RowFields();
-        fields.Initialize(annotations: null, dialect: SqlServer2012Dialect.Instance);
-        new ComplexRow(fields)
+        var old = RowFieldsProvider.SetLocal(FallbackRowFieldsProvider.Instance);
+        try
         {
-            BasicExpression = "test"
-        }.ToString();
+            var fields = new ComplexRow.RowFields();
+            fields.Initialize(annotations: null, dialect: SqlServer2012Dialect.Instance);
+            new ComplexRow(fields)
+            {
+                BasicExpression = "test"
+            }.ToString();
+        }
+        finally
+        {
+            RowFieldsProvider.SetLocal(old);
+        }
     }
 
     [Fact]

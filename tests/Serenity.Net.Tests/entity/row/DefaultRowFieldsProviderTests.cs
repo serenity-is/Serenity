@@ -18,9 +18,7 @@ public class DefaultRowFieldsProviderTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field ID;
-#pragma warning restore CS0649
+            public Int32Field ID = null;
         }
     }
 
@@ -31,9 +29,7 @@ public class DefaultRowFieldsProviderTests
 
         public class RowFields(ITestDependency dependency) : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field ID;
-#pragma warning restore CS0649
+            public Int32Field ID = null;
 
             public ITestDependency? Dependency { get; } = dependency;
         }
@@ -197,16 +193,16 @@ public class DefaultRowFieldsProviderTests
         Assert.Same(expected, fields.Dialect);
     }
 
-    private class MockAnnotationTypeRegistry : Serenity.Reflection.IAnnotationTypeRegistry
+    private class MockAnnotationTypeRegistry : Reflection.IAnnotationTypeRegistry
     {
-        public IEnumerable<Type> GetAnnotationTypesFor(Type type) => Array.Empty<Type>();
+        public IEnumerable<Type> GetAnnotationTypesFor(Type type) => [];
     }
 
     [Fact]
     public void Resolve_UsesAnnotationTypeRegistry_ForNestedRowFields()
     {
         var provider = CreateProvider(services =>
-            services.AddSingleton<Serenity.Reflection.IAnnotationTypeRegistry>(new MockAnnotationTypeRegistry()));
+            services.AddSingleton<Reflection.IAnnotationTypeRegistry>(new MockAnnotationTypeRegistry()));
 
         var fields = Assert.IsType<IdNameRow.RowFields>(
             provider.Resolve(typeof(IdNameRow.RowFields)));

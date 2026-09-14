@@ -16,7 +16,7 @@ public partial class DefaultUploadProcessorTests
         IImageFormat format = null, Configuration configuration = null, Rgba32? color = null)
     {
         using var image = new Image<Rgba32>(configuration ?? Configuration.Default, width, height, color ?? new Rgba32(255, 255, 255));
-        using var stream = new System.IO.MemoryStream();
+        using var stream = new MemoryStream();
 
         image.Save(stream, format ?? PngFormat.Instance);
 

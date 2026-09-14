@@ -18,7 +18,7 @@ public class ExcelContentResultTests
     [Fact]
     public void Create_Uses_Provided_Download_Name()
     {
-        var result = ExcelContentResult.Create(new byte[] { 1 }, "custom.xlsx");
+        var result = ExcelContentResult.Create([1], "custom.xlsx");
 
         Assert.Equal("custom.xlsx", result.FileDownloadName);
     }

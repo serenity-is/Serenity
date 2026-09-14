@@ -12,10 +12,8 @@ public class RequestHandlerTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field ID;
-            public StringField Name;
-#pragma warning restore CS0649
+            public Int32Field ID = null;
+            public StringField Name = null;
         }
     }
 

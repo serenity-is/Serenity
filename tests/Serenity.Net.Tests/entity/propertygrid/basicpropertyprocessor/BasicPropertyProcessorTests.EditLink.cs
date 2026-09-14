@@ -2,7 +2,6 @@ namespace Serenity.PropertyGrid;
 
 public partial class BasicPropertyProcessorTests
 {
-#pragma warning disable CS0649
     private class EditLinkRow : Row<EditLinkRow.RowFields>, IIdRow
     {
         [Identity, IdProperty]
@@ -15,12 +14,20 @@ public partial class BasicPropertyProcessorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field ID;
-            public StringField Name;
-            public Int32Field CityId;
+            public Int32Field ID = null;
+            public StringField Name = null;
+            public Int32Field CityId = null;
+        }
+
+        public EditLinkRow()
+        {
+        }
+
+        public EditLinkRow(RowFields fields)
+            : base(fields)
+        {
         }
     }
-#pragma warning restore CS0649
 
     private class EditLinkForm
     {
@@ -38,24 +45,17 @@ public partial class BasicPropertyProcessorTests
         return (string?)method.Invoke(null, [field]);
     }
 
-    private static void ResetEditLinkFields()
+    private static EditLinkRow NewEditLinkRow()
     {
-        var nameField = EditLinkRow.Fields.Name;
-        nameField.PropertyName = null;
-        nameField.ReferencedAliases = null;
-        nameField.join = null;
-
-        var cityField = EditLinkRow.Fields.CityId;
-        cityField.PropertyName = null;
-        cityField.TextualField = null;
-        cityField.ForeignJoinAlias = null;
+        var fields = new EditLinkRow.RowFields();
+        fields.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect);
+        return new EditLinkRow(fields);
     }
 
     [Fact]
     public void EditLink_Sets_ItemType_CssClass_And_No_IdField()
     {
-        ResetEditLinkFields();
-        var item = Process<EditLinkForm>(nameof(EditLinkForm.Name), new EditLinkRow());
+        var item = Process<EditLinkForm>(nameof(EditLinkForm.Name), NewEditLinkRow());
 
         Assert.True(item.EditLink);
         Assert.Equal("MyItem", item.EditLinkItemType);
@@ -66,7 +66,7 @@ public partial class BasicPropertyProcessorTests
     [Fact]
     public void EditLink_False_Does_Not_Enable()
     {
-        var item = Process<EditLinkForm>(nameof(EditLinkForm.ID), new EditLinkRow());
+        var item = Process<EditLinkForm>(nameof(EditLinkForm.ID), NewEditLinkRow());
         Assert.NotEqual(true, item.EditLink);
     }
 
@@ -79,22 +79,22 @@ public partial class BasicPropertyProcessorTests
     [Fact]
     public void AutoDetermineIdField_Returns_Null_Without_Single_ReferencedAlias()
     {
-        ResetEditLinkFields();
-        Assert.Null(AutoDetermineIdField(EditLinkRow.Fields.Name));
+        var fields = NewEditLinkRow().GetFields();
+        Assert.Null(AutoDetermineIdField(fields.Name));
 
-        EditLinkRow.Fields.Name.ReferencedAliases = ["T0", "T1"];
-        Assert.Null(AutoDetermineIdField(EditLinkRow.Fields.Name));
+        fields.Name.ReferencedAliases = ["T0", "T1"];
+        Assert.Null(AutoDetermineIdField(fields.Name));
     }
 
     [Fact]
     public void AutoDetermineIdField_Finds_Field_By_TextualField()
     {
-        ResetEditLinkFields();
-        var nameField = EditLinkRow.Fields.Name;
+        var fields = NewEditLinkRow().GetFields();
+        var nameField = fields.Name;
         nameField.PropertyName = "Name";
         nameField.ReferencedAliases = ["T0"];
 
-        var cityField = EditLinkRow.Fields.CityId;
+        var cityField = fields.CityId;
         cityField.PropertyName = "CityId";
         cityField.TextualField = "Name";
         cityField.ForeignJoinAlias = new LeftJoin("Cities", "City", new Criteria("1=1"));
@@ -105,14 +105,14 @@ public partial class BasicPropertyProcessorTests
     [Fact]
     public void AutoDetermineIdField_Finds_Field_By_Join_Name()
     {
-        ResetEditLinkFields();
-        var nameField = EditLinkRow.Fields.Name;
+        var fields = NewEditLinkRow().GetFields();
+        var nameField = fields.Name;
         nameField.PropertyName = "Name";
 
         var join = new LeftJoin("Cities", "City", new Criteria("1=1"));
         nameField.join = join;
 
-        var cityField = EditLinkRow.Fields.CityId;
+        var cityField = fields.CityId;
         cityField.PropertyName = "CityId";
         cityField.ForeignJoinAlias = join;
 

@@ -36,7 +36,7 @@ public class CriteriaJsonConverterTests
     {
         var options = GetOptions();
 
-        Assert.Equal("null", JsonSerializer.Serialize<BaseCriteria>(Criteria.Empty, options));
+        Assert.Equal("null", JsonSerializer.Serialize(Criteria.Empty, options));
     }
 
     [Fact]
@@ -94,7 +94,7 @@ public class CriteriaJsonConverterTests
     {
         var options = GetOptions();
 
-        Assert.Equal("[\"is null\",[\"Name\"]]", JsonSerializer.Serialize<BaseCriteria>(
+        Assert.Equal("[\"is null\",[\"Name\"]]", JsonSerializer.Serialize(
             new Criteria("Name").IsNull(), options));
     }
 
@@ -466,7 +466,7 @@ public class CriteriaJsonConverterTests
 
     private sealed class CustomCriteria : BaseCriteria
     {
-        public override void ToString(StringBuilder sb, Serenity.Data.IQueryWithParams query)
+        public override void ToString(StringBuilder sb, IQueryWithParams query)
         {
             throw new NotImplementedException();
         }

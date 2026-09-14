@@ -8,11 +8,11 @@ public class NullDbConnection : IDbConnection
     public int ConnectionTimeout => 0;
     public string Database => "!Database!";
     public ConnectionState State => isOpen ? ConnectionState.Open : ConnectionState.Closed;
-    public IDbTransaction BeginTransaction() => throw new System.NotImplementedException();
-    public IDbTransaction BeginTransaction(IsolationLevel il) => throw new System.NotImplementedException();
-    public void ChangeDatabase(string databaseName) => throw new System.NotImplementedException();
+    public IDbTransaction BeginTransaction() => throw new NotImplementedException();
+    public IDbTransaction BeginTransaction(IsolationLevel il) => throw new NotImplementedException();
+    public void ChangeDatabase(string databaseName) => throw new NotImplementedException();
     public void Close() { isOpen = false; }
-    public IDbCommand CreateCommand() => throw new System.NotImplementedException();
+    public IDbCommand CreateCommand() => throw new NotImplementedException();
 
     public void Dispose()
     {

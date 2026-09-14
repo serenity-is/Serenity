@@ -17,10 +17,10 @@ public class NavigationHelperMoreTests
     [Fact]
     public void ByCategory_Creates_Missing_Parent_Menus()
     {
-        var lookup = NavigationHelper.ByCategory(new NavigationItemAttribute[]
-        {
+        var lookup = NavigationHelper.ByCategory(
+        [
             new NavigationLinkAttribute(1, "A/B", "~/b", null)
-        });
+        ]);
 
         var parent = Assert.Single(lookup[""]);
         Assert.Equal("A", parent.Title);
@@ -30,11 +30,11 @@ public class NavigationHelperMoreTests
     [Fact]
     public void ByCategory_Does_Not_Create_Parent_When_Present()
     {
-        var lookup = NavigationHelper.ByCategory(new NavigationItemAttribute[]
-        {
+        var lookup = NavigationHelper.ByCategory(
+        [
             new NavigationMenuAttribute(1, "A"),
             new NavigationLinkAttribute(2, "A/B", "~/b", null)
-        });
+        ]);
 
         Assert.Single(lookup[""]);
         Assert.Equal("A", lookup[""].Single().Title);
@@ -49,7 +49,7 @@ public class NavigationHelperMoreTests
         };
         var link = new NavigationLinkAttribute(1, "A/B", "~/b", null);
 
-        var lookup = NavigationHelper.ByCategory(new NavigationItemAttribute[] { group, link });
+        var lookup = NavigationHelper.ByCategory([group, link]);
 
         Assert.Contains(link, lookup["Group"]);
     }
@@ -60,7 +60,7 @@ public class NavigationHelperMoreTests
         var group = new NavigationGroupAttribute(1, "Group") { Default = true };
         var link = new NavigationLinkAttribute(2, "B", "~/b", null);
 
-        var lookup = NavigationHelper.ByCategory(new NavigationItemAttribute[] { group, link });
+        var lookup = NavigationHelper.ByCategory([group, link]);
 
         Assert.Contains(link, lookup["Group"]);
     }
@@ -71,7 +71,7 @@ public class NavigationHelperMoreTests
         var group = new NavigationGroupAttribute(1, "Group") { Include = ["A/B"] };
         var link = new NavigationLinkAttribute(1, "A/B", "~/b", null);
 
-        var lookup = NavigationHelper.ByCategory(new NavigationItemAttribute[] { group, link });
+        var lookup = NavigationHelper.ByCategory([group, link]);
 
         Assert.Contains(link, lookup["Group"]);
     }
@@ -83,7 +83,7 @@ public class NavigationHelperMoreTests
         var linkB = new NavigationLinkAttribute(2, "B", "~/b", null);
         var linkC = new NavigationLinkAttribute(3, "C", "~/c", null);
 
-        var lookup = NavigationHelper.ByCategory(new NavigationItemAttribute[] { group, linkB, linkC });
+        var lookup = NavigationHelper.ByCategory([group, linkB, linkC]);
 
         Assert.Contains(linkB, lookup[""]);
         Assert.Contains(linkC, lookup["Group"]);
@@ -106,7 +106,7 @@ public class NavigationHelperMoreTests
         var group = new NavigationGroupAttribute(int.MaxValue, "Group") { Include = ["A/"] };
         var link = new NavigationLinkAttribute(5, "A/B", "~/b", null);
 
-        NavigationHelper.ByCategory(new NavigationItemAttribute[] { group, link });
+        NavigationHelper.ByCategory([group, link]);
 
         Assert.Equal(5m, group.Order);
     }
@@ -121,10 +121,12 @@ public class NavigationHelperMoreTests
     [Fact]
     public void ConvertToNavigationItems_Includes_Authorized_Sections()
     {
-        var link = new NavigationLinkAttribute(1, "A", "~/a", "P");
-        link.IconClass = " icon ";
-        link.ItemClass = " item ";
-        link.Target = " _blank ";
+        var link = new NavigationLinkAttribute(1, "A", "~/a", "P")
+        {
+            IconClass = " icon ",
+            ItemClass = " item ",
+            Target = " _blank "
+        };
 
         var items = NavigationHelper.ConvertToNavigationItems(
             new MockPermissions(_ => true), NavigationHelper.ByCategory([link]), url => "/resolved" + url[1..]);
@@ -196,7 +198,7 @@ public class NavigationHelperMoreTests
         {
             RequireFeatures = ["Feature"]
         };
-        var typeSource = new MockTypeSource(new Attribute[] { link });
+        var typeSource = new MockTypeSource([link]);
         var services = new ServiceCollection()
             .AddSingleton<IFeatureToggles>(new MockFeatureToggles { IsEnabledCallback = _ => false })
             .BuildServiceProvider();
@@ -211,7 +213,7 @@ public class NavigationHelperMoreTests
     public void GetNavigationItems_Applies_Filter()
     {
         var link = new NavigationLinkAttribute(1, "A", "~/a", null);
-        var typeSource = new MockTypeSource(new Attribute[] { link });
+        var typeSource = new MockTypeSource([link]);
         var services = new ServiceCollection().BuildServiceProvider();
 
         var items = NavigationHelper.GetNavigationItems(

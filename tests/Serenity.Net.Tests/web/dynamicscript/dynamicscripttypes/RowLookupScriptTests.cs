@@ -19,12 +19,10 @@ public class RowLookupScriptTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field Id;
-            public StringField Name;
-            public Int32Field ParentId;
-            public StringField Code;
-#pragma warning restore CS0649
+            public Int32Field Id = null;
+            public StringField Name = null;
+            public Int32Field ParentId = null;
+            public StringField Code = null;
         }
     }
 

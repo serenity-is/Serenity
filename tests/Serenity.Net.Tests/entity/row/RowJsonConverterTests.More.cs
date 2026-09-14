@@ -2,7 +2,6 @@ using System.Text.Json;
 
 namespace Serenity.JsonConverters;
 
-[Collection("RowJsonConverterStaticHooks")]
 public class RowJsonConverterTestsMore
 {
     private static JsonSerializerOptions NewOptions(JsonSerializerOptions? options = null)

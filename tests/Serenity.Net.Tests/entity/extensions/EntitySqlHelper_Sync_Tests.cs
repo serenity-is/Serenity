@@ -239,8 +239,6 @@ public class OtherCityRow : Row<OtherCityRow.RowFields>, IIdRow
 
     public class RowFields : RowFieldsBase
     {
-#pragma warning disable CS0649
-        public Int32Field CityId;
-#pragma warning restore CS0649
+        public Int32Field CityId = null;
     }
 }

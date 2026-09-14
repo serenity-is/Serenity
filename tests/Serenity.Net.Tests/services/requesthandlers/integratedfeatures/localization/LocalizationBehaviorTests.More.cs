@@ -1,4 +1,3 @@
-#pragma warning disable CS0649
 namespace Serenity.Services;
 
 public partial class LocalizationBehaviorTests
@@ -11,7 +10,7 @@ public partial class LocalizationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id;
+            public Int32Field Id = null;
         }
     }
 
@@ -24,7 +23,7 @@ public partial class LocalizationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id;
+            public Int32Field Id = null;
         }
     }
 
@@ -37,7 +36,7 @@ public partial class LocalizationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id;
+            public Int32Field Id = null;
         }
     }
 
@@ -50,7 +49,7 @@ public partial class LocalizationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id;
+            public Int32Field Id = null;
         }
     }
 
@@ -67,10 +66,10 @@ public partial class LocalizationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id;
-            public StringField Name;
-            public Int32Field Temp;
-            public StringField Secret;
+            public Int32Field Id = null;
+            public StringField Name = null;
+            public Int32Field Temp = null;
+            public StringField Secret = null;
         }
     }
 
@@ -85,8 +84,8 @@ public partial class LocalizationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id;
-            public StringField Secret;
+            public Int32Field Id = null;
+            public StringField Secret = null;
         }
     }
 
@@ -102,10 +101,10 @@ public partial class LocalizationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int64Field Id;
-            public Int32Field MasterId;
-            public StringField LanguageId;
-            public StringField Secret;
+            public Int64Field Id = null;
+            public Int32Field MasterId = null;
+            public StringField LanguageId = null;
+            public StringField Secret = null;
         }
     }
 
@@ -121,9 +120,9 @@ public partial class LocalizationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id;
-            public StringField Name;
-            public BooleanField IsDeleted;
+            public Int32Field Id = null;
+            public StringField Name = null;
+            public BooleanField IsDeleted = null;
         }
     }
 

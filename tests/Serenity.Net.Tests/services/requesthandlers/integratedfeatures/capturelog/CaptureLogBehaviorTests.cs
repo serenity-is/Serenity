@@ -15,10 +15,8 @@ public partial class CaptureLogBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field Id;
-            public StringField Name;
-#pragma warning restore CS0649
+            public Int32Field Id = null;
+            public StringField Name = null;
         }
     }
 
@@ -40,13 +38,11 @@ public partial class CaptureLogBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int64Field LogId;
-            public EnumField<CaptureOperationType> OperationType;
-            public Int32Field ChangingUserId;
-            public DateTimeField ValidFrom;
-            public DateTimeField ValidUntil;
-#pragma warning restore CS0649
+            public Int64Field LogId = null;
+            public EnumField<CaptureOperationType> OperationType = null;
+            public Int32Field ChangingUserId = null;
+            public DateTimeField ValidFrom = null;
+            public DateTimeField ValidUntil = null;
         }
     }
 

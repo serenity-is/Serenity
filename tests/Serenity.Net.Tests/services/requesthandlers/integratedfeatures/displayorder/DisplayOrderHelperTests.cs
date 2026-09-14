@@ -13,10 +13,8 @@ public class DisplayOrderHelperTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field ID;
-            public Int32Field Order;
-#pragma warning restore CS0649
+            public Int32Field ID = null;
+            public Int32Field Order = null;
         }
     }
 

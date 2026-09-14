@@ -1,4 +1,3 @@
-#pragma warning disable CS0649
 namespace Serenity.PropertyGrid;
 
 public class DefaultPropertyItemProviderTests
@@ -38,8 +37,8 @@ public class DefaultPropertyItemProviderTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field ID;
-            public StringField Name;
+            public Int32Field ID = null;
+            public StringField Name = null;
         }
     }
 

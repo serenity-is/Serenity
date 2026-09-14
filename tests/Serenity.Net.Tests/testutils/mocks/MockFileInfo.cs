@@ -1,6 +1,6 @@
 namespace Serenity.TestUtils;
 
-public class MockFileInfo(System.IO.Abstractions.IFileSystem fileSystem, string path, bool isDirectory) : Microsoft.Extensions.FileProviders.IFileInfo
+public class MockFileInfo(System.IO.Abstractions.IFileSystem fileSystem, string path, bool isDirectory) : IFileInfo
 {
     public System.IO.Abstractions.IFileSystem FileSystem { get; } = fileSystem;
     public string Path { get; } = path;

@@ -18,20 +18,18 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
     public Field? Target { get; set; }
 
     private readonly IDefaultHandlerFactory handlerFactory = handlerFactory ?? throw new ArgumentNullException(nameof(handlerFactory));
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
-    private MasterDetailRelationAttribute attr;
-    private Func<IList> rowListFactory;
-    private Func<IRow> rowFactory;
-    private Type rowType;
-    private Field foreignKeyField;
-    private BaseCriteria foreignKeyCriteria;
-    private Field filterField;
-    private Field masterKeyField;
-    private object? filterValue;
-    private BaseCriteria filterCriteria;
-    private BaseCriteria queryCriteria;
-    private HashSet<string> includeColumns;
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+    private MasterDetailRelationAttribute attr = null!;
+    private Func<IList> rowListFactory = null!;
+    private Func<IRow> rowFactory = null!;
+    private Type rowType = null!;
+    private Field foreignKeyField = null!;
+    private BaseCriteria foreignKeyCriteria = null!;
+    private Field filterField = null!;
+    private Field masterKeyField = null!;
+    private object? filterValue = null!;
+    private BaseCriteria filterCriteria = null!;
+    private BaseCriteria queryCriteria = null!;
+    private HashSet<string> includeColumns = null!;
 
     /// <inheritdoc/>
     public bool ActivateFor(IRow row)

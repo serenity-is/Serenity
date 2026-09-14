@@ -12,10 +12,8 @@ public class ReportColumnConverterTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public StringField Name;
-            public DateTimeField Created;
-#pragma warning restore CS0649
+            public StringField Name = null;
+            public DateTimeField Created = null;
         }
     }
 
@@ -51,9 +49,7 @@ public class ReportColumnConverterTests
         [DisplayName("Display Title")]
         public string? WithDisplay { get; set; }
 
-#pragma warning disable CS0649
-        public string? ExtraField;
-#pragma warning restore CS0649
+        public string? ExtraField = null;
     }
 
     private class NoBaseColumns

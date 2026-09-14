@@ -1,10 +1,8 @@
 namespace Serenity.Services;
 
-#pragma warning disable CS0649
-
 public class SaveRequestHandlerAsyncTests_Coverage
 {
-    private static IRequestContext Context(IBehaviorProvider? behaviors = null) =>
+    private static NullRequestContext Context(IBehaviorProvider? behaviors = null) =>
         new NullRequestContext(behaviors).WithPermissions(_ => true);
 
     private class CoverRow : Row<CoverRow.RowFields>, IIdRow, INameRow
@@ -17,8 +15,8 @@ public class SaveRequestHandlerAsyncTests_Coverage
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id;
-            public StringField Name;
+            public Int32Field Id = null;
+            public StringField Name = null;
         }
     }
 
@@ -32,8 +30,8 @@ public class SaveRequestHandlerAsyncTests_Coverage
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id;
-            public StringField Name;
+            public Int32Field Id = null;
+            public StringField Name = null;
         }
     }
 
@@ -48,18 +46,14 @@ public class SaveRequestHandlerAsyncTests_Coverage
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id;
-            public Int32Field Order;
+            public Int32Field Id = null;
+            public Int32Field Order = null;
         }
     }
 
-    private class TestAsyncHandler<TRow> : SaveRequestHandlerAsync<TRow, SaveRequest<TRow>, SaveResponse>
+    private class TestAsyncHandler<TRow>(IRequestContext context) : SaveRequestHandlerAsync<TRow, SaveRequest<TRow>, SaveResponse>(context)
         where TRow : class, IRow, IIdRow, new()
     {
-        public TestAsyncHandler(IRequestContext context) : base(context)
-        {
-        }
-
         public void SetRow(TRow row) => Row = row;
         public TRow CurrentRow => Row;
     }
@@ -326,5 +320,3 @@ public class SaveRequestHandlerAsyncTests_Coverage
         Assert.Equal(3, handler.CurrentRow.Order);
     }
 }
-
-#pragma warning restore CS0649

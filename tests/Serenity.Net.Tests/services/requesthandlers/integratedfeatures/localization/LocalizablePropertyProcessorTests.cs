@@ -19,12 +19,10 @@ public class LocalizablePropertyProcessorTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field Id;
-            public StringField Name;
-            public StringField Description;
-            public StringField Secret;
-#pragma warning restore CS0649
+            public Int32Field Id = null;
+            public StringField Name = null;
+            public StringField Description = null;
+            public StringField Secret = null;
         }
     }
 
@@ -42,13 +40,11 @@ public class LocalizablePropertyProcessorTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int64Field Id;
-            public Int32Field MasterId;
-            public StringField LanguageId;
-            public StringField Name;
-            public StringField Description;
-#pragma warning restore CS0649
+            public Int64Field Id = null;
+            public Int32Field MasterId = null;
+            public StringField LanguageId = null;
+            public StringField Name = null;
+            public StringField Description = null;
         }
     }
 
@@ -61,10 +57,8 @@ public class LocalizablePropertyProcessorTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field Id;
-            public StringField Name;
-#pragma warning restore CS0649
+            public Int32Field Id = null;
+            public StringField Name = null;
         }
     }
 
@@ -76,9 +70,7 @@ public class LocalizablePropertyProcessorTests
         public int? Id { get => fields.Id[this]; set => fields.Id[this] = value; }
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field Id;
-#pragma warning restore CS0649
+            public Int32Field Id = null;
         }
     }
 

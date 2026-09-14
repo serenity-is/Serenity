@@ -16,10 +16,8 @@ public class ValidateParentBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field Id;
-            public Int16Field IsActive;
-#pragma warning restore CS0649
+            public Int32Field Id = null;
+            public Int16Field IsActive = null;
         }
     }
 
@@ -36,10 +34,8 @@ public class ValidateParentBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field Id;
-            public Int32Field ParentId;
-#pragma warning restore CS0649
+            public Int32Field Id = null;
+            public Int32Field ParentId = null;
         }
     }
 

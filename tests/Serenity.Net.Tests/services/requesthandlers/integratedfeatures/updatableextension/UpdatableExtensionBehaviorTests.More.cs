@@ -13,11 +13,9 @@ public class UpdatableExtensionBehaviorTests_More
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
             public Int32Field Id;
             public StringField Text;
             public Int32Field Kind;
-#pragma warning restore CS0649
         }
     }
 
@@ -28,9 +26,7 @@ public class UpdatableExtensionBehaviorTests_More
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
             public StringField Text;
-#pragma warning restore CS0649
         }
     }
 
@@ -45,12 +41,10 @@ public class UpdatableExtensionBehaviorTests_More
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
             public Int32Field Id;
             public Int32Field DetailId;
             public StringField Text;
             public Int32Field Kind;
-#pragma warning restore CS0649
         }
     }
 
@@ -62,9 +56,7 @@ public class UpdatableExtensionBehaviorTests_More
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
             public Int32Field Id;
-#pragma warning restore CS0649
         }
     }
 
@@ -77,9 +69,7 @@ public class UpdatableExtensionBehaviorTests_More
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
             public Int32Field Id;
-#pragma warning restore CS0649
         }
     }
 
@@ -94,10 +84,8 @@ public class UpdatableExtensionBehaviorTests_More
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
             public Int32Field Id;
             public StringField DetailText;
-#pragma warning restore CS0649
         }
     }
 
@@ -112,10 +100,8 @@ public class UpdatableExtensionBehaviorTests_More
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
             public Int32Field Id;
             public StringField DetailText;
-#pragma warning restore CS0649
         }
     }
 
@@ -131,11 +117,9 @@ public class UpdatableExtensionBehaviorTests_More
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
             public Int32Field Id;
             public Int32Field DetailId;
             public StringField DetailText;
-#pragma warning restore CS0649
         }
     }
 
@@ -152,11 +136,9 @@ public class UpdatableExtensionBehaviorTests_More
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
             public Int32Field Id;
             public Int32Field DetailId;
             public StringField DetailText;
-#pragma warning restore CS0649
         }
     }
 
@@ -173,11 +155,9 @@ public class UpdatableExtensionBehaviorTests_More
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
             public Int32Field Id;
             public Int32Field DetailId;
             public StringField DetailText;
-#pragma warning restore CS0649
         }
     }
 
@@ -192,10 +172,8 @@ public class UpdatableExtensionBehaviorTests_More
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
             public Int32Field Id;
             public Int32Field DetailId;
-#pragma warning restore CS0649
         }
     }
 
@@ -212,11 +190,9 @@ public class UpdatableExtensionBehaviorTests_More
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
             public Int32Field Id;
             public Int32Field DetailId;
             public Int32Field DetailInt;
-#pragma warning restore CS0649
         }
     }
 
@@ -231,10 +207,8 @@ public class UpdatableExtensionBehaviorTests_More
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
             public Int32Field Id;
             public StringField DetailText;
-#pragma warning restore CS0649
         }
     }
 
@@ -251,11 +225,9 @@ public class UpdatableExtensionBehaviorTests_More
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
             public Int32Field Id;
             public Int32Field DetailId;
             public StringField DetailText;
-#pragma warning restore CS0649
         }
     }
 
@@ -272,11 +244,9 @@ public class UpdatableExtensionBehaviorTests_More
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
             public Int32Field Id;
             public Int32Field DetailId;
             public StringField DetailText;
-#pragma warning restore CS0649
         }
     }
 
@@ -294,12 +264,10 @@ public class UpdatableExtensionBehaviorTests_More
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
             public Int32Field Id;
             public Int32Field DetailId;
             public Int32Field Kind;
             public StringField DetailText;
-#pragma warning restore CS0649
         }
     }
 
@@ -317,12 +285,10 @@ public class UpdatableExtensionBehaviorTests_More
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
             public Int32Field Id;
             public Int32Field DetailId;
             public Int32Field Kind;
             public StringField DetailText;
-#pragma warning restore CS0649
         }
     }
 

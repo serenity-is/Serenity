@@ -1,10 +1,8 @@
 namespace Serenity.Services;
 
-#pragma warning disable CS0649
-
 public class UndeleteRequestHandlerTests_Coverage
 {
-    private static IRequestContext Context(IBehaviorProvider? behaviors = null,
+    private static NullRequestContext Context(IBehaviorProvider? behaviors = null,
         Func<string, bool>? hasPermission = null) =>
         new NullRequestContext(behaviors).WithPermissions(hasPermission ?? (_ => true));
 
@@ -18,8 +16,8 @@ public class UndeleteRequestHandlerTests_Coverage
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id;
-            public BooleanField IsDeleted;
+            public Int32Field Id = null;
+            public BooleanField IsDeleted = null;
         }
     }
 
@@ -33,8 +31,8 @@ public class UndeleteRequestHandlerTests_Coverage
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id;
-            public Int16Field IsActive;
+            public Int32Field Id = null;
+            public Int16Field IsActive = null;
         }
     }
 
@@ -50,9 +48,9 @@ public class UndeleteRequestHandlerTests_Coverage
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id;
-            public DateTimeField DeleteDate;
-            public Int64Field DeleteUserId;
+            public Int32Field Id = null;
+            public DateTimeField DeleteDate = null;
+            public Int64Field DeleteUserId = null;
         }
     }
 
@@ -70,10 +68,10 @@ public class UndeleteRequestHandlerTests_Coverage
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id;
-            public BooleanField IsDeleted;
-            public DateTimeField DeleteDate;
-            public Int64Field DeleteUserId;
+            public Int32Field Id = null;
+            public BooleanField IsDeleted = null;
+            public DateTimeField DeleteDate = null;
+            public Int64Field DeleteUserId = null;
         }
     }
 
@@ -85,7 +83,7 @@ public class UndeleteRequestHandlerTests_Coverage
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id;
+            public Int32Field Id = null;
         }
     }
 
@@ -101,9 +99,9 @@ public class UndeleteRequestHandlerTests_Coverage
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id;
-            public BooleanField IsDeleted;
-            public Int32Field Order;
+            public Int32Field Id = null;
+            public BooleanField IsDeleted = null;
+            public Int32Field Order = null;
         }
     }
 
@@ -117,8 +115,8 @@ public class UndeleteRequestHandlerTests_Coverage
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id;
-            public BooleanField IsDeleted;
+            public Int32Field Id = null;
+            public BooleanField IsDeleted = null;
         }
     }
 
@@ -132,8 +130,8 @@ public class UndeleteRequestHandlerTests_Coverage
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id;
-            public BooleanField IsDeleted;
+            public Int32Field Id = null;
+            public BooleanField IsDeleted = null;
         }
     }
 
@@ -147,25 +145,19 @@ public class UndeleteRequestHandlerTests_Coverage
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id;
-            public BooleanField IsDeleted;
+            public Int32Field Id = null;
+            public BooleanField IsDeleted = null;
         }
     }
 
-    private class SyncHandler<TRow> : UndeleteRequestHandler<TRow, UndeleteRequest, UndeleteResponse>
+    private class SyncHandler<TRow>(IRequestContext context) : UndeleteRequestHandler<TRow, UndeleteRequest, UndeleteResponse>(context)
         where TRow : class, IRow, IIdRow, new()
     {
-        public SyncHandler(IRequestContext context) : base(context)
-        {
-        }
     }
 
-    private class AsyncHandler<TRow> : UndeleteRequestHandlerAsync<TRow, UndeleteRequest, UndeleteResponse>
+    private class AsyncHandler<TRow>(IRequestContext context) : UndeleteRequestHandlerAsync<TRow, UndeleteRequest, UndeleteResponse>(context)
         where TRow : class, IRow, IIdRow, new()
     {
-        public AsyncHandler(IRequestContext context) : base(context)
-        {
-        }
     }
 
     private class TrackingBehavior : BaseUndeleteBehavior
@@ -192,8 +184,8 @@ public class UndeleteRequestHandlerTests_Coverage
         return connection;
     }
 
-    private static IBehaviorProvider Behaviors(BaseUndeleteBehavior behavior) =>
-        new MockBehaviorProvider((_, _, _) => new object[] { behavior });
+    private static MockBehaviorProvider Behaviors(BaseUndeleteBehavior behavior) =>
+        new((_, _, _) => new object[] { behavior });
 
     // ---- base / sync ----
 
@@ -617,5 +609,3 @@ public class UndeleteRequestHandlerTests_Coverage
         Assert.NotNull(response);
     }
 }
-
-#pragma warning restore CS0649

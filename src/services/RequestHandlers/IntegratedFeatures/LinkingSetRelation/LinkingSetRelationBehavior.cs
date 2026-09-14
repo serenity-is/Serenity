@@ -18,19 +18,17 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
     public Field? Target { get; set; }
 
     private readonly IDefaultHandlerFactory handlerFactory = handlerFactory ?? throw new ArgumentNullException(nameof(handlerFactory));
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
-    private LinkingSetRelationAttribute attr;
-    private Type rowType;
-    private Field thisKeyField;
-    private Criteria thisKeyCriteria;
-    private Field itemKeyField;
-    private Field filterField;
-    private object? filterValue;
-    private BaseCriteria filterCriteria;
-    private BaseCriteria queryCriteria;
-    private Func<IRow> rowFactory;
-    private Func<IList> listFactory;
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+    private LinkingSetRelationAttribute attr = null!;
+    private Type rowType = null!;
+    private Field thisKeyField = null!;
+    private Criteria thisKeyCriteria = null!;
+    private Field itemKeyField = null!;
+    private Field filterField = null!;
+    private object? filterValue = null!;
+    private BaseCriteria filterCriteria = null!;
+    private BaseCriteria queryCriteria = null!;
+    private Func<IRow> rowFactory = null!;
+    private Func<IList> listFactory = null!;
 
     /// <inheritdoc/>
     public bool ActivateFor(IRow row)

@@ -16,10 +16,8 @@ public class LinkingSetRelationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field ID;
-            public ListField<int> SelectedItems;
-#pragma warning restore CS0649
+            public Int32Field ID = null;
+            public ListField<int> SelectedItems = null;
         }
     }
 
@@ -37,11 +35,9 @@ public class LinkingSetRelationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int64Field ID;
-            public Int32Field MasterID;
-            public Int32Field ItemID;
-#pragma warning restore CS0649
+            public Int64Field ID = null;
+            public Int32Field MasterID = null;
+            public Int32Field ItemID = null;
         }
     }
 
@@ -272,12 +268,10 @@ public class LinkingSetRelationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int64Field ID;
-            public Int32Field MasterID;
-            public Int32Field ItemID;
-            public Int32Field KindID;
-#pragma warning restore CS0649
+            public Int64Field ID = null;
+            public Int32Field MasterID = null;
+            public Int32Field ItemID = null;
+            public Int32Field KindID = null;
         }
     }
 
@@ -293,10 +287,8 @@ public class LinkingSetRelationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field ID;
-            public ListField<int> SelectedItems;
-#pragma warning restore CS0649
+            public Int32Field ID = null;
+            public ListField<int> SelectedItems = null;
         }
     }
 
@@ -312,10 +304,8 @@ public class LinkingSetRelationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field ID;
-            public ListField<int> SelectedItems;
-#pragma warning restore CS0649
+            public Int32Field ID = null;
+            public ListField<int> SelectedItems = null;
         }
     }
 
@@ -331,10 +321,8 @@ public class LinkingSetRelationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field ID;
-            public ListField<int> SelectedItems;
-#pragma warning restore CS0649
+            public Int32Field ID = null;
+            public ListField<int> SelectedItems = null;
         }
     }
 
@@ -350,10 +338,8 @@ public class LinkingSetRelationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field ID;
-            public ListField<int> SelectedItems;
-#pragma warning restore CS0649
+            public Int32Field ID = null;
+            public ListField<int> SelectedItems = null;
         }
     }
 
@@ -369,10 +355,8 @@ public class LinkingSetRelationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field ID;
-            public ListField<int> SelectedItems;
-#pragma warning restore CS0649
+            public Int32Field ID = null;
+            public ListField<int> SelectedItems = null;
         }
     }
 
@@ -390,11 +374,9 @@ public class LinkingSetRelationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field ID;
-            public BooleanField IsDeleted;
-            public ListField<int> SelectedItems;
-#pragma warning restore CS0649
+            public Int32Field ID = null;
+            public BooleanField IsDeleted = null;
+            public ListField<int> SelectedItems = null;
         }
     }
 
@@ -410,10 +392,8 @@ public class LinkingSetRelationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field ID;
-            public ListField<int> SelectedItems;
-#pragma warning restore CS0649
+            public Int32Field ID = null;
+            public ListField<int> SelectedItems = null;
         }
     }
 
@@ -429,10 +409,8 @@ public class LinkingSetRelationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field ID;
-            public Int32Field SelectedItems;
-#pragma warning restore CS0649
+            public Int32Field ID = null;
+            public Int32Field SelectedItems = null;
         }
     }
 
@@ -444,10 +422,8 @@ public class LinkingSetRelationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field MasterID;
-            public Int32Field ItemID;
-#pragma warning restore CS0649
+            public Int32Field MasterID = null;
+            public Int32Field ItemID = null;
         }
     }
 
@@ -479,14 +455,12 @@ public class LinkingSetRelationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field ID;
-            public ListField<int> BadRowType;
-            public ListField<int> NotIdRowType;
-            public ListField<int> MissingThisKey;
-            public ListField<int> MissingItemKey;
-            public ListField<int> MissingFilterField;
-#pragma warning restore CS0649
+            public Int32Field ID = null;
+            public ListField<int> BadRowType = null;
+            public ListField<int> NotIdRowType = null;
+            public ListField<int> MissingThisKey = null;
+            public ListField<int> MissingItemKey = null;
+            public ListField<int> MissingFilterField = null;
         }
     }
 

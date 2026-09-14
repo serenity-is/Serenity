@@ -125,7 +125,7 @@ public partial class BasicPropertyProcessorTests
     }
 
     [LocalTextPrefix("MyRow")]
-    public class DisplayWithRowRow : Row<DisplayWithRowRow.RowFields>
+    private class DisplayWithRowRow : Row<DisplayWithRowRow.RowFields>
     {
         public string FormOnly { get; set; }
 
@@ -156,12 +156,12 @@ public partial class BasicPropertyProcessorTests
 
         public class RowFields : RowFieldsBase
         {
-            public StringField FormOnly;
-            public StringField FormOnlyTextKey;
-            public StringField FormOverride;
-            public StringField FormOverrideTextKey;
-            public StringField RowOnly;
-            public StringField RowOnlyTextKey;
+            public StringField FormOnly = null;
+            public StringField FormOnlyTextKey = null;
+            public StringField FormOverride = null;
+            public StringField FormOverrideTextKey = null;
+            public StringField RowOnly = null;
+            public StringField RowOnlyTextKey = null;
         }
     }
 

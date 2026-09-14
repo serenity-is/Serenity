@@ -1,49 +1,59 @@
 namespace Serenity.Services;
 
-[ReadPermission("Test.RetrievePermission")]
-public class RetrievePermissionRow : Row<RetrievePermissionRow.RowFields>
-{
-    [Identity, IdProperty]
-    public int? Id { get => fields.Id[this]; set => fields.Id[this] = value; }
-
-    public class RowFields : RowFieldsBase
-    {
-        public Int32Field Id;
-    }
-}
-
-[TableName("RetrieveBase")]
-public class RetrieveBaseRow : Row<RetrieveBaseRow.RowFields>
-{
-    [Identity, IdProperty]
-    public int? Id { get => fields.Id[this]; set => fields.Id[this] = value; }
-
-    [NameProperty]
-    public string Name { get => fields.Name[this]; set => fields.Name[this] = value; }
-
-    [Column("external_name")]
-    public int? External { get => fields.External[this]; set => fields.External[this] = value; }
-
-    public class RowFields : RowFieldsBase
-    {
-        public Int32Field Id;
-        public StringField Name;
-        public Int32Field External;
-    }
-}
 
 public class RetrieveRequestHandlerBaseTests
 {
+    [ReadPermission("Test.RetrievePermission")]
+    private class RetrievePermissionRow : Row<RetrievePermissionRow.RowFields>
+    {
+        [Identity, IdProperty]
+        public int? Id { get => fields.Id[this]; set => fields.Id[this] = value; }
+
+        public class RowFields : RowFieldsBase
+        {
+            public Int32Field Id = null;
+        }
+    }
+
+    [TableName("RetrieveBase")]
+    private class RetrieveBaseRow : Row<RetrieveBaseRow.RowFields>
+    {
+        [Identity, IdProperty]
+        public int? Id { get => fields.Id[this]; set => fields.Id[this] = value; }
+
+        [NameProperty]
+        public string Name { get => fields.Name[this]; set => fields.Name[this] = value; }
+
+        [Column("external_name")]
+        public int? External { get => fields.External[this]; set => fields.External[this] = value; }
+
+        public class RowFields : RowFieldsBase
+        {
+            public Int32Field Id = null;
+            public StringField Name = null;
+            public Int32Field External = null;
+        }
+
+        public RetrieveBaseRow()
+        {
+        }
+
+        public RetrieveBaseRow(RowFields fields)
+            : base(fields)
+        {
+        }
+    }
+
     private static NullRequestContext Context(Func<string, bool>? hasPermission = null) =>
         new NullRequestContext().WithPermissions(hasPermission ?? (_ => true));
 
     private class TestHandler(IRequestContext context) : RetrieveRequestHandlerBase<RetrieveBaseRow, RetrieveRequest, RetrieveResponse<RetrieveBaseRow>>(context)
     {
-        public void Init(IDbConnection connection, SqlQuery query, RetrieveRequest request)
+        public void Init(IDbConnection connection, SqlQuery query, RetrieveRequest request, RetrieveBaseRow.RowFields fields)
         {
             Connection = connection;
             Query = query;
-            Row = new RetrieveBaseRow();
+            Row = new RetrieveBaseRow(fields);
             Request = request;
             Response = new RetrieveResponse<RetrieveBaseRow>();
         }
@@ -69,13 +79,14 @@ public class RetrieveRequestHandlerBaseTests
     {
         var handler = new TestHandler(context ?? Context());
         handler.Init(connection ?? new MockDbConnection(), query ?? new SqlQuery(),
-            request ?? new RetrieveRequest { EntityId = 1 });
+            request ?? new RetrieveRequest { EntityId = 1 }, NewFields());
         return handler;
     }
 
     private static RetrieveBaseRow.RowFields NewFields()
     {
-        var fields = RetrieveBaseRow.Fields;
+        var fields = new RetrieveBaseRow.RowFields();
+        fields.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect);
         foreach (var field in new Field[] { fields.Id, fields.Name, fields.External })
         {
             field.Flags = FieldFlags.None;
@@ -105,7 +116,7 @@ public class RetrieveRequestHandlerBaseTests
     public void AllowSelectField_RespectsNeverAndPermissions()
     {
         var handler = Handler(Context(_ => true));
-        var fields = NewFields();
+        var fields = handler.Row.GetFields();
 
         Assert.True(handler.Allow(fields.Id));
 
@@ -116,78 +127,72 @@ public class RetrieveRequestHandlerBaseTests
         fields.Id.ReadPermission = "Some.Permission";
         Assert.False(Handler(Context(_ => false)).Allow(fields.Id));
         Assert.True(handler.Allow(fields.Id));
-        NewFields();
     }
 
     [Fact]
     public void ShouldSelectField_Auto_NotMapped_BecomesDetails()
     {
         var handler = Handler(request: new RetrieveRequest { ColumnSelection = RetrieveColumnSelection.Details });
-        var fields = NewFields();
+        var fields = handler.Row.GetFields();
         fields.Id.Flags = FieldFlags.NotMapped;
 
         Assert.True(handler.Should(fields.Id));
-        NewFields();
     }
 
     [Fact]
     public void ShouldSelectField_Auto_Lookup_BecomesLookup()
     {
         var handler = Handler(request: new RetrieveRequest { ColumnSelection = RetrieveColumnSelection.Lookup });
-        var fields = NewFields();
+        var fields = handler.Row.GetFields();
         fields.Id.IsLookup = true;
 
         Assert.True(handler.Should(fields.Id));
-        NewFields();
     }
 
     [Fact]
     public void ShouldSelectField_Auto_Foreign_BecomesDetails()
     {
         var handler = Handler(request: new RetrieveRequest { ColumnSelection = RetrieveColumnSelection.List });
-        var fields = NewFields();
+        var fields = handler.Row.GetFields();
         fields.Name.Flags = FieldFlags.Foreign;
 
         Assert.False(handler.Should(fields.Name));
 
         fields.Name.Flags = FieldFlags.None;
         Assert.True(handler.Should(fields.Name));
-        NewFields();
     }
 
     [Fact]
     public void ShouldSelectField_AlwaysAndNever()
     {
         var handler = Handler();
-        var fields = NewFields();
+        var fields = handler.Row.GetFields();
 
         fields.Id.MinSelectLevel = SelectLevel.Always;
         Assert.True(handler.Should(fields.Id));
 
         fields.Id.MinSelectLevel = SelectLevel.Never;
         Assert.False(handler.Should(fields.Id));
-        NewFields();
     }
 
     [Fact]
     public void ShouldSelectField_ExcludeColumns_ByNameAndProperty()
     {
         var handler = Handler();
-        var fields = NewFields();
+        var fields = handler.Row.GetFields();
 
         handler.Request.ExcludeColumns = ["external_name"];
         Assert.False(handler.Should(fields.External));
 
         handler.Request.ExcludeColumns = ["External"];
         Assert.False(handler.Should(fields.External));
-        NewFields();
     }
 
     [Fact]
     public void ShouldSelectField_IncludeColumns_ByNameAndProperty()
     {
         var handler = Handler(request: new RetrieveRequest { ColumnSelection = RetrieveColumnSelection.List });
-        var fields = NewFields();
+        var fields = handler.Row.GetFields();
         fields.External.MinSelectLevel = SelectLevel.Details;
 
         Assert.False(handler.Should(fields.External));
@@ -197,7 +202,6 @@ public class RetrieveRequestHandlerBaseTests
 
         handler.Request.IncludeColumns = ["External"];
         Assert.True(handler.Should(fields.External));
-        NewFields();
     }
 
     [Theory]
@@ -210,27 +214,25 @@ public class RetrieveRequestHandlerBaseTests
     public void ShouldSelectField_ColumnSelection(RetrieveColumnSelection selection, bool expected)
     {
         var handler = Handler(request: new RetrieveRequest { ColumnSelection = selection });
-        var fields = NewFields();
+        var fields = handler.Row.GetFields();
 
         Assert.Equal(expected, handler.Should(fields.Id));
-        NewFields();
     }
 
     [Fact]
     public void ShouldSelectField_DefaultSelection_WhenUnknown()
     {
         var handler = Handler(request: new RetrieveRequest { ColumnSelection = (RetrieveColumnSelection)99 });
-        var fields = NewFields();
+        var fields = handler.Row.GetFields();
 
         Assert.False(handler.Should(fields.Id));
-        NewFields();
     }
 
     [Fact]
     public void IsIncluded_ByFieldAndColumn()
     {
         var handler = Handler();
-        var fields = NewFields();
+        var fields = handler.Row.GetFields();
 
         Assert.False(handler.Included(fields.Id));
         Assert.False(handler.Included("Id"));
@@ -238,18 +240,16 @@ public class RetrieveRequestHandlerBaseTests
         handler.Request.IncludeColumns = ["Id"];
         Assert.True(handler.Included(fields.Id));
         Assert.True(handler.Included("Id"));
-        NewFields();
     }
 
     [Fact]
     public void IsIncluded_PropertyName()
     {
         var handler = Handler();
-        var fields = NewFields();
+        var fields = handler.Row.GetFields();
         handler.Request.IncludeColumns = ["External"];
 
         Assert.True(handler.Included(fields.External));
-        NewFields();
     }
 
     [Fact]
@@ -257,7 +257,7 @@ public class RetrieveRequestHandlerBaseTests
     {
         var handler = Handler();
         var query = new SqlQuery();
-        var fields = NewFields();
+        var fields = handler.Row.GetFields();
 
         handler.Select(query, fields.Id);
 
@@ -269,14 +269,13 @@ public class RetrieveRequestHandlerBaseTests
     {
         var handler = Handler(request: new RetrieveRequest { ColumnSelection = RetrieveColumnSelection.Details });
         var query = new SqlQuery();
-        var fields = NewFields();
+        var fields = handler.Row.GetFields();
         fields.Name.Flags = FieldFlags.NotMapped;
         fields.External.Flags = FieldFlags.NotMapped;
 
         handler.SelectAll(query);
 
         Assert.Single(((ISqlQueryExtensible)query).Columns);
-        NewFields();
     }
 
     [Fact]

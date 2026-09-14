@@ -291,8 +291,7 @@ public class SchemaProvidersTests
     {
         using var connection = new MockDbConnection()
             .OnDbCommandExecuteReader(cmd => new MockDbDataReader(
-                new[]
-                {
+                [
                     new Dictionary<string, object>
                     {
                         ["id"] = "1",
@@ -300,7 +299,7 @@ public class SchemaProvidersTests
                         ["table"] = "T",
                         ["to"] = "ID"
                     }
-                },
+                ],
                 "id", "from", "table", "to"));
 
         var fk = Assert.Single(new SqliteSchemaProvider().GetForeignKeys(connection, null, "T"));

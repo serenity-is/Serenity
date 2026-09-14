@@ -14,10 +14,8 @@ public class JsonFieldTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field ID;
-            public JsonField<SampleJson> AJson;
-#pragma warning restore CS0649
+            public Int32Field ID = null;
+            public JsonField<SampleJson> AJson = null;
 
             public RowFields()
             {

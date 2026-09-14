@@ -16,10 +16,8 @@ public class UndeleteRequestHandlerBehaviorWrappingTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field Id;
-            public BooleanField IsDeleted;
-#pragma warning restore CS0649
+            public Int32Field Id = null;
+            public BooleanField IsDeleted = null;
         }
     }
 

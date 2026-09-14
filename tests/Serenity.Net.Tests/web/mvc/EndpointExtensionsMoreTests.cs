@@ -97,7 +97,7 @@ public class EndpointExtensionsMoreTests
     public void ExecuteMethod_Returns_Handler_Result()
     {
         var controller = CreateController();
-        var result = controller.ExecuteMethod<ServiceResponse>(() => new ServiceResponse());
+        var result = controller.ExecuteMethod(() => new ServiceResponse());
 
         Assert.NotNull(result.Data);
         Assert.Null(result.Data.Error);
@@ -129,7 +129,7 @@ public class EndpointExtensionsMoreTests
     public async Task ExecuteMethodAsync_Returns_Handler_Result()
     {
         var controller = CreateController();
-        var result = await controller.ExecuteMethodAsync<ServiceResponse>(() => Task.FromResult(new ServiceResponse()));
+        var result = await controller.ExecuteMethodAsync(() => Task.FromResult(new ServiceResponse()));
 
         Assert.NotNull(result.Data);
         Assert.Null(result.Data.Error);
@@ -156,7 +156,7 @@ public class EndpointExtensionsMoreTests
         });
 
         IDbConnection? passed = null;
-        var result = controller.UseConnection<ServiceResponse>("Test", c =>
+        var result = controller.UseConnection("Test", c =>
         {
             passed = c;
             return new ServiceResponse();
@@ -193,7 +193,7 @@ public class EndpointExtensionsMoreTests
         });
 
         int commitCalls = 0;
-        var result = controller.InTransaction<ServiceResponse>("Test", uow =>
+        var result = controller.InTransaction("Test", uow =>
         {
             uow.OnCommit += () => commitCalls++;
             return new ServiceResponse();

@@ -17,8 +17,10 @@ public class StartedSystemProcessTests
         startInfo.RedirectStandardError = true;
 
         var process = Process.Start(startInfo)!;
-        var started = new StartedProcess(process);
-        started.EnableRaisingEvents = true;
+        var started = new StartedProcess(process)
+        {
+            EnableRaisingEvents = true
+        };
 
         Assert.NotNull(started.StandardOutput);
         Assert.NotNull(started.StandardError);

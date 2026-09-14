@@ -26,14 +26,12 @@ public class FileUploadBehavior(IUploadStorage? storage, IUploadProcessor? uploa
     private readonly IUploadStorage storage = storage ?? throw new ArgumentNullException(nameof(storage));
     private readonly IUploadProcessor uploadProcessor = uploadProcessor ?? throw new ArgumentNullException(nameof(uploadProcessor));
 
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
-    private IUploadEditor editorAttr;
-    private string entityTable;
-    private string entityType;
-    private string entityProperty;
-    private string entityField;
-    private string fileNameFormat;
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+    private IUploadEditor editorAttr = null!;
+    private string entityTable = null!;
+    private string entityType = null!;
+    private string entityProperty = null!;
+    private string entityField = null!;
+    private string fileNameFormat = null!;
     private StringField? originalNameField;
     private Dictionary<string, Field>? replaceFields;
 

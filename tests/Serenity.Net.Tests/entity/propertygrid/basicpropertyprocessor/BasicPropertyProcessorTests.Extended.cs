@@ -120,10 +120,8 @@ public partial class BasicPropertyProcessorTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field ID;
-            public StringField Name;
-#pragma warning restore CS0649
+            public Int32Field ID = null;
+            public StringField Name = null;
         }
     }
 
@@ -153,15 +151,13 @@ public partial class BasicPropertyProcessorTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field ID;
-            public StringField Name;
-            public StringField Locked;
-            public StringField Computed;
-            public Int32Field IntField;
-            public Int16Field ShortField;
-            public DateTimeField DateTimeField;
-#pragma warning restore CS0649
+            public Int32Field ID = null;
+            public StringField Name = null;
+            public StringField Locked = null;
+            public StringField Computed = null;
+            public Int32Field IntField = null;
+            public Int16Field ShortField = null;
+            public DateTimeField DateTimeField = null;
         }
     }
 

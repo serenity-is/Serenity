@@ -37,6 +37,15 @@ public class SaveRequestHandlerTests_Coverage
         Int16Field IIsActiveRow.IsActiveField => fields.IsActive;
         BooleanField IIsDeletedRow.IsDeletedField => fields.IsDeleted;
 
+        public CoverRow()
+        {
+        }
+
+        public CoverRow(RowFields fields)
+            : base(fields)
+        {
+        }
+
         public class RowFields : RowFieldsBase
         {
             public Int32Field Id;
@@ -97,26 +106,28 @@ public class SaveRequestHandlerTests_Coverage
         return handler;
     }
 
+    private static CoverRow NewCoverRow()
+    {
+        var fields = new CoverRow.RowFields();
+        fields.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect);
+        return new CoverRow(fields);
+    }
+
     [Fact]
     public void ClearNonTableAssignments_Clears_NonTable_Fields()
     {
         var handler = NewHandler();
-        var row = new CoverRow { Name = "A", NotMapped = "X" };
+        var row = NewCoverRow();
+        row.Name = "A";
+        row.NotMapped = "X";
         handler.SetRow(row);
         var nonTable = row.GetFields().NotMapped;
         nonTable.Flags |= FieldFlags.Calculated;
 
-        try
-        {
-            handler.DoClearNonTableAssignments();
+        handler.DoClearNonTableAssignments();
 
-            Assert.False(row.IsAssigned(nonTable));
-            Assert.True(row.IsAssigned(row.GetFields().Name));
-        }
-        finally
-        {
-            nonTable.Flags &= ~FieldFlags.Calculated;
-        }
+        Assert.False(row.IsAssigned(nonTable));
+        Assert.True(row.IsAssigned(row.GetFields().Name));
     }
 
     [Fact]
@@ -147,22 +158,17 @@ public class SaveRequestHandlerTests_Coverage
     public void HandleNonEditable_Update_NonTable_Clears()
     {
         var handler = NewHandler();
-        var row = new CoverRow { Name = "New" };
-        var old = new CoverRow { Name = "Old" };
+        var row = NewCoverRow();
+        row.Name = "New";
+        var old = NewCoverRow();
+        old.Name = "Old";
         handler.SetRow(row);
         handler.SetOld(old);
         var field = row.GetFields().Name;
         field.Flags |= FieldFlags.Foreign;
 
-        try
-        {
-            handler.DoHandleNonEditable(field);
-            Assert.False(row.IsAssigned(field));
-        }
-        finally
-        {
-            field.Flags &= ~FieldFlags.Foreign;
-        }
+        handler.DoHandleNonEditable(field);
+        Assert.False(row.IsAssigned(field));
     }
 
     [Fact]
@@ -191,21 +197,15 @@ public class SaveRequestHandlerTests_Coverage
     public void HandleNonEditable_Create_NonTable_Clears()
     {
         var handler = NewHandler();
-        var row = new CoverRow { Name = "New" };
+        var row = NewCoverRow();
+        row.Name = "New";
         handler.SetRow(row);
         var field = row.GetFields().Name;
         field.Flags |= FieldFlags.Foreign;
 
-        try
-        {
-            handler.DoHandleNonEditable(field);
-            Assert.Null(row.Name);
-            Assert.False(row.IsAssigned(field));
-        }
-        finally
-        {
-            field.Flags &= ~FieldFlags.Foreign;
-        }
+        handler.DoHandleNonEditable(field);
+        Assert.Null(row.Name);
+        Assert.False(row.IsAssigned(field));
     }
 
     [Fact]
@@ -225,20 +225,13 @@ public class SaveRequestHandlerTests_Coverage
     public void SetTrimToEmptyFields_Sets_Empty_String()
     {
         var handler = NewHandler();
-        var row = new CoverRow();
+        var row = NewCoverRow();
         handler.SetRow(row);
         var field = row.GetFields().TrimEmpty;
         field.Flags |= FieldFlags.TrimToEmpty | FieldFlags.NotNull;
 
-        try
-        {
-            handler.DoSetTrimToEmptyFields();
-            Assert.Equal("", row.TrimEmpty);
-        }
-        finally
-        {
-            field.Flags &= ~(FieldFlags.TrimToEmpty | FieldFlags.NotNull);
-        }
+        handler.DoSetTrimToEmptyFields();
+        Assert.Equal("", row.TrimEmpty);
     }
 
     [Fact]

@@ -54,7 +54,7 @@ public class TransientGrantingPermissionServiceTests
         var service = new TransientGrantingPermissionService(Allowed());
         Assert.Throws<ArgumentNullException>(() => service.Grant(null));
         Assert.Throws<ArgumentNullException>(() => service.Grant());
-        Assert.Throws<ArgumentNullException>(() => service.Grant(Array.Empty<string>()));
+        Assert.Throws<ArgumentNullException>(() => service.Grant([]));
     }
 
     [Fact]

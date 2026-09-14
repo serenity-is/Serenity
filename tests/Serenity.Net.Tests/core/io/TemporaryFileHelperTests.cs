@@ -64,7 +64,7 @@ public class TemporaryFileHelperTests
         fileSystem.File.Delete(tempPath);
         fileSystem.Directory.CreateDirectory(tempPath);
         fileSystem.Directory.SetCurrentDirectory(tempPath);
-        fileSystem.AddFile(".temporary", new MockFile(Array.Empty<byte>()));
+        fileSystem.AddFile(".temporary", new MockFile([]));
         return fileSystem;
     }
 
@@ -74,10 +74,10 @@ public class TemporaryFileHelperTests
         var fileSystem = CreateTestFileSystem();
         var tempPath = fileSystem.Directory.GetCurrentDirectory();
         fileSystem.DeleteFile(".temporary");
-        fileSystem.AddFile("file1.txt", new MockFile(Array.Empty<byte>()) { CreationTime = DateTime.Now.AddDays(-2) });
-        fileSystem.AddFile("file2.txt", new MockFile(Array.Empty<byte>()) { CreationTime = DateTime.Now.AddDays(-3) });
-        fileSystem.AddFile("file3.txt", new MockFile(Array.Empty<byte>()) { CreationTime = DateTime.Now.AddHours(-23) });
-        fileSystem.AddFile("file4.txt", new MockFile(Array.Empty<byte>()) { CreationTime = DateTime.Now.AddHours(1) });
+        fileSystem.AddFile("file1.txt", new MockFile([]) { CreationTime = DateTime.Now.AddDays(-2) });
+        fileSystem.AddFile("file2.txt", new MockFile([]) { CreationTime = DateTime.Now.AddDays(-3) });
+        fileSystem.AddFile("file3.txt", new MockFile([]) { CreationTime = DateTime.Now.AddHours(-23) });
+        fileSystem.AddFile("file4.txt", new MockFile([]) { CreationTime = DateTime.Now.AddHours(1) });
         TemporaryFileHelper.PurgeDirectoryDefault(tempPath, fileSystem);
         Assert.Collection(fileSystem.GetFiles(tempPath)
             .Select(fileSystem.GetFileName)
@@ -93,10 +93,10 @@ public class TemporaryFileHelperTests
     {
         var fileSystem = CreateTestFileSystem();
         var tempPath = fileSystem.Directory.GetCurrentDirectory();
-        fileSystem.AddFile("file1.txt", new MockFile(Array.Empty<byte>()) { CreationTime = DateTime.Now.AddDays(-2) });
-        fileSystem.AddFile("file2.txt", new MockFile(Array.Empty<byte>()) { CreationTime = DateTime.Now.AddDays(-3) });
-        fileSystem.AddFile("file3.txt", new MockFile(Array.Empty<byte>()) { CreationTime = DateTime.Now.AddHours(-23) });
-        fileSystem.AddFile("file4.txt", new MockFile(Array.Empty<byte>()) { CreationTime = DateTime.Now.AddHours(1) });
+        fileSystem.AddFile("file1.txt", new MockFile([]) { CreationTime = DateTime.Now.AddDays(-2) });
+        fileSystem.AddFile("file2.txt", new MockFile([]) { CreationTime = DateTime.Now.AddDays(-3) });
+        fileSystem.AddFile("file3.txt", new MockFile([]) { CreationTime = DateTime.Now.AddHours(-23) });
+        fileSystem.AddFile("file4.txt", new MockFile([]) { CreationTime = DateTime.Now.AddHours(1) });
         TemporaryFileHelper.PurgeDirectoryDefault(tempPath, fileSystem);
         Assert.Collection(fileSystem.GetFiles(tempPath)
             .Select(fileSystem.GetFileName)
@@ -112,7 +112,7 @@ public class TemporaryFileHelperTests
         var fileSystem = CreateTestFileSystem();
         var tempPath = fileSystem.Directory.GetCurrentDirectory();
         for (var i = 1; i <= 1002; i++)
-            fileSystem.AddFile($"file{i:0000}.txt", new MockFile(Array.Empty<byte>()) { CreationTime = DateTime.Now.AddHours(-2).AddSeconds(i) });
+            fileSystem.AddFile($"file{i:0000}.txt", new MockFile([]) { CreationTime = DateTime.Now.AddHours(-2).AddSeconds(i) });
         TemporaryFileHelper.PurgeDirectoryDefault(tempPath, fileSystem);
         var files = fileSystem.GetFiles(tempPath)
             .Select(fileSystem.GetFileName)
@@ -130,10 +130,10 @@ public class TemporaryFileHelperTests
     {
         var fileSystem = CreateTestFileSystem();
         var tempPath = fileSystem.Directory.GetCurrentDirectory();
-        fileSystem.AddFile("file1.txt", new MockFile(Array.Empty<byte>()) { CreationTime = DateTime.Now.AddDays(-2) });
-        fileSystem.AddFile("file2.txt", new MockFile(Array.Empty<byte>()) { CreationTime = DateTime.Now.AddMinutes(-65) });
-        fileSystem.AddFile("file3.txt", new MockFile(Array.Empty<byte>()) { CreationTime = DateTime.Now.AddMinutes(-30) });
-        fileSystem.AddFile("file4.txt", new MockFile(Array.Empty<byte>()) { CreationTime = DateTime.Now.AddHours(1) });
+        fileSystem.AddFile("file1.txt", new MockFile([]) { CreationTime = DateTime.Now.AddDays(-2) });
+        fileSystem.AddFile("file2.txt", new MockFile([]) { CreationTime = DateTime.Now.AddMinutes(-65) });
+        fileSystem.AddFile("file3.txt", new MockFile([]) { CreationTime = DateTime.Now.AddMinutes(-30) });
+        fileSystem.AddFile("file4.txt", new MockFile([]) { CreationTime = DateTime.Now.AddHours(1) });
         TemporaryFileHelper.PurgeDirectory(tempPath, TimeSpan.FromHours(1), 999999, ".temporary", fileSystem);
         Assert.Collection(fileSystem.GetFiles(tempPath)
             .Select(fileSystem.GetFileName)
@@ -149,7 +149,7 @@ public class TemporaryFileHelperTests
         var fileSystem = CreateTestFileSystem();
         var tempPath = fileSystem.Directory.GetCurrentDirectory();
         for (var i = 1; i <= 12; i++)
-            fileSystem.AddFile($"file{i:00}.txt", new MockFile(Array.Empty<byte>()) { CreationTime = DateTime.Now.AddHours(-2).AddSeconds(i) });
+            fileSystem.AddFile($"file{i:00}.txt", new MockFile([]) { CreationTime = DateTime.Now.AddHours(-2).AddSeconds(i) });
         TemporaryFileHelper.PurgeDirectory(tempPath, TimeSpan.Zero, 10, ".temporary", fileSystem);
         var files = fileSystem.GetFiles(tempPath)
             .Select(fileSystem.GetFileName)
@@ -167,10 +167,10 @@ public class TemporaryFileHelperTests
     {
         var fileSystem = CreateTestFileSystem();
         var tempPath = fileSystem.Directory.GetCurrentDirectory();
-        fileSystem.AddFile("file1.txt", new MockFile(Array.Empty<byte>()) { CreationTime = DateTime.Now.AddDays(-2) });
-        fileSystem.AddFile("file2.txt", new MockFile(Array.Empty<byte>()) { CreationTime = DateTime.Now.AddDays(-3) });
-        fileSystem.AddFile("file3.txt", new MockFile(Array.Empty<byte>()) { CreationTime = DateTime.Now.AddHours(-23) });
-        fileSystem.AddFile("file4.txt", new MockFile(Array.Empty<byte>()) { CreationTime = DateTime.Now.AddHours(1) });
+        fileSystem.AddFile("file1.txt", new MockFile([]) { CreationTime = DateTime.Now.AddDays(-2) });
+        fileSystem.AddFile("file2.txt", new MockFile([]) { CreationTime = DateTime.Now.AddDays(-3) });
+        fileSystem.AddFile("file3.txt", new MockFile([]) { CreationTime = DateTime.Now.AddHours(-23) });
+        fileSystem.AddFile("file4.txt", new MockFile([]) { CreationTime = DateTime.Now.AddHours(1) });
         TemporaryFileHelper.PurgeDirectory(tempPath, TimeSpan.FromMinutes(5), 1, ".checkme", fileSystem);
         Assert.Collection(fileSystem.GetFiles(tempPath)
             .Select(fileSystem.GetFileName)
@@ -187,10 +187,10 @@ public class TemporaryFileHelperTests
     {
         var fileSystem = CreateTestFileSystem();
         var tempPath = fileSystem.Directory.GetCurrentDirectory();
-        fileSystem.AddFile("file1.txt", new MockFile(Array.Empty<byte>()) { CreationTime = DateTime.Now.AddDays(-2) });
-        fileSystem.AddFile("file2.txt", new MockFile(Array.Empty<byte>()) { CreationTime = DateTime.Now.AddDays(-3) });
-        fileSystem.AddFile("file3.txt", new MockFile(Array.Empty<byte>()) { CreationTime = DateTime.Now.AddHours(-23) });
-        fileSystem.AddFile("file4.txt", new MockFile(Array.Empty<byte>()) { CreationTime = DateTime.Now.AddHours(1) });
+        fileSystem.AddFile("file1.txt", new MockFile([]) { CreationTime = DateTime.Now.AddDays(-2) });
+        fileSystem.AddFile("file2.txt", new MockFile([]) { CreationTime = DateTime.Now.AddDays(-3) });
+        fileSystem.AddFile("file3.txt", new MockFile([]) { CreationTime = DateTime.Now.AddHours(-23) });
+        fileSystem.AddFile("file4.txt", new MockFile([]) { CreationTime = DateTime.Now.AddHours(1) });
         TemporaryFileHelper.PurgeDirectory(tempPath, TimeSpan.FromHours(1), 1, checkFileName: null, fileSystem);
         var x = Assert.Single(fileSystem.GetFiles(tempPath).Select(fileSystem.GetFileName));
         Assert.Equal("file4.txt", x);
@@ -201,10 +201,10 @@ public class TemporaryFileHelperTests
     {
         var fileSystem = CreateTestFileSystem();
         var tempPath = fileSystem.Directory.GetCurrentDirectory();
-        fileSystem.AddFile("file1.txt", new MockFile(Array.Empty<byte>()) { CreationTime = DateTime.Now.AddDays(-2) });
-        fileSystem.AddFile("file2.txt", new MockFile(Array.Empty<byte>()) { CreationTime = DateTime.Now.AddDays(-3) });
-        fileSystem.AddFile("file3.txt", new MockFile(Array.Empty<byte>()) { CreationTime = DateTime.Now.AddHours(-23) });
-        fileSystem.AddFile("file4.txt", new MockFile(Array.Empty<byte>()) { CreationTime = DateTime.Now.AddHours(1) });
+        fileSystem.AddFile("file1.txt", new MockFile([]) { CreationTime = DateTime.Now.AddDays(-2) });
+        fileSystem.AddFile("file2.txt", new MockFile([]) { CreationTime = DateTime.Now.AddDays(-3) });
+        fileSystem.AddFile("file3.txt", new MockFile([]) { CreationTime = DateTime.Now.AddHours(-23) });
+        fileSystem.AddFile("file4.txt", new MockFile([]) { CreationTime = DateTime.Now.AddHours(1) });
         TemporaryFileHelper.PurgeDirectory(tempPath, TimeSpan.FromHours(1), 1, checkFileName: "", fileSystem);
         var x = Assert.Single(fileSystem.GetFiles(tempPath).Select(fileSystem.GetFileName));
         Assert.Equal("file4.txt", x);
@@ -215,10 +215,10 @@ public class TemporaryFileHelperTests
     {
         var fileSystem = CreateTestFileSystem();
         var tempPath = fileSystem.Directory.GetCurrentDirectory();
-        fileSystem.AddFile("file1.cantdeletethis", new MockFile(Array.Empty<byte>()) { CreationTime = DateTime.Now.AddDays(-2) });
-        fileSystem.AddFile("file2.txt", new MockFile(Array.Empty<byte>()) { CreationTime = DateTime.Now.AddDays(-3) });
-        fileSystem.AddFile("file3.cantdeletethis", new MockFile(Array.Empty<byte>()) { CreationTime = DateTime.Now.AddHours(-23) });
-        fileSystem.AddFile("file4.txt", new MockFile(Array.Empty<byte>()) { CreationTime = DateTime.Now.AddHours(1) });
+        fileSystem.AddFile("file1.cantdeletethis", new MockFile([]) { CreationTime = DateTime.Now.AddDays(-2) });
+        fileSystem.AddFile("file2.txt", new MockFile([]) { CreationTime = DateTime.Now.AddDays(-3) });
+        fileSystem.AddFile("file3.cantdeletethis", new MockFile([]) { CreationTime = DateTime.Now.AddHours(-23) });
+        fileSystem.AddFile("file4.txt", new MockFile([]) { CreationTime = DateTime.Now.AddHours(1) });
         TemporaryFileHelper.PurgeDirectory(tempPath, TimeSpan.FromDays(1), 2, checkFileName: ".temporary", fileSystem);
         Assert.Collection(fileSystem.GetFiles(tempPath)
             .Select(fileSystem.GetFileName)
@@ -234,7 +234,7 @@ public class TemporaryFileHelperTests
     {
         var fileSystem = CreateTestFileSystem();
         var tempPath = fileSystem.Directory.GetCurrentDirectory();
-        fileSystem.AddFile("file.txt", new MockFile(Array.Empty<byte>()));
+        fileSystem.AddFile("file.txt", new MockFile([]));
         TemporaryFileHelper.TryDelete(fileSystem.Combine(tempPath, "file.txt"), fileSystem);
         Assert.False(fileSystem.FileExists(fileSystem.Combine(tempPath, "file.txt")));
     }
@@ -252,8 +252,8 @@ public class TemporaryFileHelperTests
     {
         var fileSystem = CreateTestFileSystem();
         var tempPath = fileSystem.Directory.GetCurrentDirectory();
-        fileSystem.AddFile("file.txt", new MockFile(Array.Empty<byte>()));
-        fileSystem.AddFile("file.txt.delete", new MockFile(Array.Empty<byte>()));
+        fileSystem.AddFile("file.txt", new MockFile([]));
+        fileSystem.AddFile("file.txt.delete", new MockFile([]));
         TemporaryFileHelper.Delete(fileSystem.Combine(tempPath, "file.txt"), fileSystem);
         Assert.False(fileSystem.FileExists(fileSystem.Combine(tempPath, "file.txt")));
         Assert.False(fileSystem.FileExists(fileSystem.Combine(tempPath, "file.txt.delete")));
@@ -264,7 +264,7 @@ public class TemporaryFileHelperTests
     {
         var fileSystem = CreateTestFileSystem();
         var tempPath = fileSystem.Directory.GetCurrentDirectory();
-        fileSystem.AddFile("file.txt", new MockFile(Array.Empty<byte>()));
+        fileSystem.AddFile("file.txt", new MockFile([]));
         TemporaryFileHelper.Delete(fileSystem.Combine(tempPath, "file.txt"), DeleteType.Delete, fileSystem);
         Assert.False(fileSystem.FileExists(fileSystem.Combine(tempPath, "file.txt")));
     }
@@ -274,7 +274,7 @@ public class TemporaryFileHelperTests
     {
         var fileSystem = CreateTestFileSystem();
         var tempPath = fileSystem.Directory.GetCurrentDirectory();
-        fileSystem.AddFile("file.txt", new MockFile(Array.Empty<byte>()));
+        fileSystem.AddFile("file.txt", new MockFile([]));
         TemporaryFileHelper.Delete(fileSystem.Combine(tempPath, "file.txt"), DeleteType.TryDelete, fileSystem);
         Assert.False(fileSystem.FileExists(fileSystem.Combine(tempPath, "file.txt")));
     }
@@ -284,7 +284,7 @@ public class TemporaryFileHelperTests
     {
         var fileSystem = CreateTestFileSystem();
         var tempPath = fileSystem.Directory.GetCurrentDirectory();
-        fileSystem.AddFile("file.cantdeletethis", new MockFile(Array.Empty<byte>()));
+        fileSystem.AddFile("file.cantdeletethis", new MockFile([]));
         TemporaryFileHelper.Delete(fileSystem.Combine(tempPath, "file.cantdeletethis"), DeleteType.TryDeleteOrMark, fileSystem);
         Assert.True(fileSystem.FileExists(fileSystem.Combine(tempPath, "file.cantdeletethis.delete")));
     }
@@ -294,7 +294,7 @@ public class TemporaryFileHelperTests
     {
         var fileSystem = CreateTestFileSystem();
         var tempPath = fileSystem.Directory.GetCurrentDirectory();
-        fileSystem.AddFile("file.cantdeletethis", new MockFile(Array.Empty<byte>()));
+        fileSystem.AddFile("file.cantdeletethis", new MockFile([]));
         TemporaryFileHelper.TryDeleteOrMark(fileSystem.Combine(tempPath, "file.cantdeletethis"), fileSystem);
         Assert.True(fileSystem.FileExists(fileSystem.Combine(tempPath, "file.cantdeletethis.delete")));
     }
@@ -305,7 +305,7 @@ public class TemporaryFileHelperTests
         var fileSystem = CreateTestFileSystem();
         var tempPath = fileSystem.Directory.GetCurrentDirectory();
         var filePath = fileSystem.Combine(tempPath, "file.txt");
-        fileSystem.AddFile("file.txt", new MockFile(Array.Empty<byte>()));
+        fileSystem.AddFile("file.txt", new MockFile([]));
         var fileTime = fileSystem.GetLastWriteTimeUtc(filePath).ToFileTimeUtc();
         fileSystem.AddFile("file.txt.delete", new MockFile(fileTime.ToInvariant()));
 

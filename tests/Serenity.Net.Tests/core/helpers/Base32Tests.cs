@@ -11,7 +11,7 @@ public class Base32Tests
     {
         var data = new byte[] { 1, 2, 3, 4, 5, 6 };
 
-        Assert.Equal<byte>(data, Base32.Decode(Base32.Encode(data)));
+        Assert.Equal(data, Base32.Decode(Base32.Encode(data)));
 
         int length;
         do
@@ -19,11 +19,11 @@ public class Base32Tests
             length = GetRandomByteArray(1)[0];
         } while (length % 5 == 0);
         data = GetRandomByteArray(length);
-        Assert.Equal<byte>(data, Base32.Decode(Base32.Encode(data)));
+        Assert.Equal(data, Base32.Decode(Base32.Encode(data)));
 
         length = GetRandomByteArray(1)[0] * 5;
         data = GetRandomByteArray(length);
-        Assert.Equal<byte>(data, Base32.Decode(Base32.Encode(data)));
+        Assert.Equal(data, Base32.Decode(Base32.Encode(data)));
     }
 
     private static readonly RandomNumberGenerator rng = RandomNumberGenerator.Create();

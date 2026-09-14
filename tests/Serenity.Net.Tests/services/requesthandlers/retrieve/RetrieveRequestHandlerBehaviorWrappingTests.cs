@@ -12,9 +12,7 @@ public class RetrieveRequestHandlerBehaviorWrappingTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field Id;
-#pragma warning restore CS0649
+            public Int32Field Id = null;
         }
     }
 

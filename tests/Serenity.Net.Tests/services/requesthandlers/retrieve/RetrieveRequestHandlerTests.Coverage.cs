@@ -2,7 +2,6 @@ namespace Serenity.Services;
 
 public class RetrieveRequestHandlerTests_Coverage
 {
-#pragma warning disable CS0649
     [TableName("CoverRetRows")]
     private class CoverRow : Row<CoverRow.RowFields>, IIdRow
     {
@@ -11,10 +10,9 @@ public class RetrieveRequestHandlerTests_Coverage
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id;
+            public Int32Field Id = null;
         }
     }
-#pragma warning restore CS0649
 
     private sealed class ExceptionBehavior : IRetrieveBehaviorSync, IRetrieveExceptionBehavior
     {

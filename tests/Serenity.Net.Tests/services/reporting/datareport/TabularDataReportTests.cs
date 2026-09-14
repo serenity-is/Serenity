@@ -21,12 +21,10 @@ public class TabularDataReportTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field ID;
-            public StringField Name;
-            public DateTimeField Created;
-            public EnumField<TestEnum> Enum;
-#pragma warning restore CS0649
+            public Int32Field ID = null;
+            public StringField Name = null;
+            public DateTimeField Created = null;
+            public EnumField<TestEnum> Enum = null;
         }
     }
 
@@ -114,7 +112,7 @@ public class TabularDataReportTests
     public void Constructor_With_Columns_Throws_For_Null_Data()
     {
         Assert.Throws<ArgumentNullException>(() =>
-            new TabularDataReport(null, new[] { new ReportColumn { Name = "A" } }));
+            new TabularDataReport(null, [new ReportColumn { Name = "A" }]));
     }
 
     [Fact]
@@ -128,7 +126,7 @@ public class TabularDataReportTests
     public void Constructor_With_Columns_Uses_Provided_Columns()
     {
         var data = new object[] { 1, 2 };
-        var report = new TabularDataReport(data, new[] { new ReportColumn { Name = "A" } });
+        var report = new TabularDataReport(data, [new ReportColumn { Name = "A" }]);
 
         Assert.Same(data, report.GetData());
 

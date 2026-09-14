@@ -9,9 +9,7 @@ public class DisplayOrderFilterHelperTests
         public int? ID { get => fields.ID[this]; set => fields.ID[this] = value; }
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field ID;
-#pragma warning restore CS0649
+            public Int32Field ID = null;
         }
     }
 
@@ -26,10 +24,8 @@ public class DisplayOrderFilterHelperTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field ID;
-            public Int32Field ParentId;
-#pragma warning restore CS0649
+            public Int32Field ID = null;
+            public Int32Field ParentId = null;
         }
     }
 
@@ -44,10 +40,8 @@ public class DisplayOrderFilterHelperTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field ID;
-            public Int16Field IsActive;
-#pragma warning restore CS0649
+            public Int32Field ID = null;
+            public Int16Field IsActive = null;
         }
     }
 
@@ -62,10 +56,8 @@ public class DisplayOrderFilterHelperTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field ID;
-            public BooleanField IsDeleted;
-#pragma warning restore CS0649
+            public Int32Field ID = null;
+            public BooleanField IsDeleted = null;
         }
     }
 
@@ -84,12 +76,10 @@ public class DisplayOrderFilterHelperTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field ID;
-            public Int32Field ParentId;
-            public Int16Field IsActive;
-            public BooleanField IsDeleted;
-#pragma warning restore CS0649
+            public Int32Field ID = null;
+            public Int32Field ParentId = null;
+            public Int16Field IsActive = null;
+            public BooleanField IsDeleted = null;
         }
     }
 

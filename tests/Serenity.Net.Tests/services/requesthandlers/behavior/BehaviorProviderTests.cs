@@ -49,11 +49,9 @@ public class BehaviorProviderTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field ID;
-            public StringField Name;
-            public StringField Extra;
-#pragma warning restore CS0649
+            public Int32Field ID = null;
+            public StringField Name = null;
+            public StringField Extra = null;
         }
     }
 
@@ -65,11 +63,9 @@ public class BehaviorProviderTests
 
         public class RowFields : RowFieldsBase
         {
-#pragma warning disable CS0649
-            public Int32Field ID;
-            public StringField Name;
-            public StringField Extra;
-#pragma warning restore CS0649
+            public Int32Field ID = null;
+            public StringField Name = null;
+            public StringField Extra = null;
         }
     }
 

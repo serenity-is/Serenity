@@ -44,7 +44,7 @@ public class SqlHelperMiscTests
             .OnDbCommandExecuteNonQuery(_ =>
             {
                 if (++calls == 1)
-                    throw new System.Data.SqlException(10054);
+                    throw new SqlException(10054);
                 return 7;
             });
 
@@ -60,9 +60,9 @@ public class SqlHelperMiscTests
     {
         using var connection = new OpenedOnceConnection();
         connection.Open();
-        connection.OnDbCommandExecuteNonQuery(_ => throw new System.Data.SqlException(10054));
+        connection.OnDbCommandExecuteNonQuery(_ => throw new SqlException(10054));
 
-        var ex = Assert.Throws<System.Data.SqlException>(() =>
+        var ex = Assert.Throws<SqlException>(() =>
             SqlHelper.ExecuteNonQuery(connection, "DELETE FROM T"));
 
         Assert.Equal("DELETE FROM T", ex.Data["sql_command_text"]);
@@ -77,7 +77,7 @@ public class SqlHelperMiscTests
             .OnDbCommandExecuteNonQuery(_ =>
             {
                 if (++calls == 1)
-                    throw new System.Data.SqlException(10054);
+                    throw new SqlException(10054);
                 return 3;
             });
 
@@ -97,7 +97,7 @@ public class SqlHelperMiscTests
             .OnDbCommandExecuteReader(_ =>
             {
                 if (++calls == 1)
-                    throw new System.Data.SqlException(10054);
+                    throw new SqlException(10054);
                 return new MockDbDataReader(new { X = 1 });
             });
 
@@ -116,7 +116,7 @@ public class SqlHelperMiscTests
             .OnDbCommandExecuteScalar(_ =>
             {
                 if (++calls == 1)
-                    throw new System.Data.SqlException(10054);
+                    throw new SqlException(10054);
                 return 42;
             });
 
@@ -135,7 +135,7 @@ public class SqlHelperMiscTests
             .OnDbCommandExecuteNonQuery(_ =>
             {
                 if (++calls == 1)
-                    throw new System.Data.SqlException(10054);
+                    throw new SqlException(10054);
                 return 5;
             });
         using var connection = new PlainDbConnection(inner);
@@ -299,7 +299,7 @@ public class SqlHelperMiscTests
             .OnDbCommandExecuteReader(_ =>
             {
                 if (++calls == 1)
-                    throw new System.Data.SqlException(10054);
+                    throw new SqlException(10054);
                 return new MockDbDataReader(new { X = 1 });
             });
 
@@ -319,7 +319,7 @@ public class SqlHelperMiscTests
             .OnDbCommandExecuteScalar(_ =>
             {
                 if (++calls == 1)
-                    throw new System.Data.SqlException(10054);
+                    throw new SqlException(10054);
                 return 42;
             });
 
