@@ -6,19 +6,17 @@ using System.Collections.Immutable;
 using System.Threading;
 #endif
 
+#if ISSOURCEGENERATOR
+public partial class ServerTypingsGenerator(Compilation compilation, CancellationToken cancellationToken) : CodeGeneratorBase
+{
+    private readonly CancellationToken cancellationToken = cancellationToken;
+
+    public Compilation Compilation { get; } = compilation ?? throw new ArgumentNullException(nameof(compilation));
+#else
 public partial class ServerTypingsGenerator : CodeGeneratorBase
 {
-#if ISSOURCEGENERATOR
     private readonly CancellationToken cancellationToken;
 
-    public ServerTypingsGenerator(Compilation compilation, CancellationToken cancellationToken)
-    {
-        Compilation = compilation ?? throw new ArgumentNullException(nameof(compilation));
-        this.cancellationToken = cancellationToken;
-    }
-
-    public Compilation Compilation { get; }
-#else
     public ServerTypingsGenerator(IFileSystem fileSystem, params Assembly[] assemblies)
         : this(TypingsUtils.ToDefinitions(fileSystem, assemblies.Select(x => x.Location)))
     {
@@ -187,7 +185,7 @@ public partial class ServerTypingsGenerator : CodeGeneratorBase
         if (formScriptAttr != null)
         {
             var formIdentifier = type.Name;
-            var isServiceRequest = IsServiceRequest(baseTypes, type);
+            var isServiceRequest = IsServiceRequest(baseTypes);
             if (formIdentifier.EndsWith(requestSuffix, StringComparison.Ordinal) && isServiceRequest)
                 formIdentifier = formIdentifier[..^requestSuffix.Length] + "Form";
 
@@ -215,7 +213,7 @@ public partial class ServerTypingsGenerator : CodeGeneratorBase
             return;
         }
 
-        if (IsRowType(baseTypes, type))
+        if (IsRowType(baseTypes))
         {
             var metadata = ExtractRowMetadata(type);
 

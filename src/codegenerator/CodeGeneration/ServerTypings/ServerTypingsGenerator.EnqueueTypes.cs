@@ -130,12 +130,12 @@ public partial class ServerTypingsGenerator
             TypingsUtils.Contains(baseTypes, "Serenity.Data", "Row`1");
     }
 
-    protected static bool IsServiceRequest(TypeReference[] baseTypes, TypeDefinition type)
+    protected static bool IsServiceRequest(TypeReference[] baseTypes)
     {
         return TypingsUtils.Contains(baseTypes, ServicesNS, "ServiceRequest");
     }
     
-    protected static bool IsServiceResponse(TypeReference[] baseTypes, TypeDefinition type)
+    protected static bool IsServiceResponse(TypeReference[] baseTypes)
     {
         return TypingsUtils.Contains(baseTypes, ServicesNS, "ServiceResponse");
     }   
@@ -144,8 +144,8 @@ public partial class ServerTypingsGenerator
     {
         var baseTypes = type.EnumerateBaseClasses().ToArray();
 
-        return IsServiceRequest(baseTypes, type) ||
-            IsServiceResponse(baseTypes, type) ||
+        return IsServiceRequest(baseTypes) ||
+            IsServiceResponse(baseTypes) ||
             IsRowType(baseTypes) ||
             IsServiceEndpoint(baseTypes, type) ||
             GetColumnsScriptAttribute(type) != null ||

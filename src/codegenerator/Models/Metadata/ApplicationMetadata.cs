@@ -23,7 +23,7 @@ public class ApplicationMetadata : IApplicationMetadata
 
             var baseTypes = type.EnumerateBaseClasses().ToArray();
 
-            if (IsRowType(baseTypes, type))
+            if (IsRowType(baseTypes))
             {
                 RowTypes.Add(type);
             }
