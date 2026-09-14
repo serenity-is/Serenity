@@ -189,15 +189,37 @@ public partial class ClientTypesGenerator : CodeGeneratorBase
         else if (isBasicType)
         {
             var ns = GetNamespace(type.Namespace);
-            if (string.IsNullOrEmpty(ns))
+            var name = type.Name ?? "";
+
+            var transformIncludeName = type.TransformIncludeTypeName?.Trim();
+
+            if (!string.IsNullOrEmpty(transformIncludeName))
             {
-                ns = RootNamespaces.FirstOrDefault(x => x != "Serenity") ?? "App";
+                if (transformIncludeName.EndsWith('.'))
+                {
+                    ns = GetNamespace(transformIncludeName[..^1]);
+                }
+                else
+                {
+                    var idx = transformIncludeName.LastIndexOf('.');
+                    if (idx > 0)
+                    {
+                        ns = GetNamespace(transformIncludeName[..idx]);
+                        name = transformIncludeName[(idx + 1)..];
+                    }
+                    else
+                        name = transformIncludeName;
+                }
             }
+
+            if (string.IsNullOrEmpty(ns))
+                ns = RootNamespaces.FirstOrDefault(x => x != "Serenity") ?? "App";
+
             cw.InNamespace(ns, () =>
             {
-                GenerateBasicType(type);
+                GenerateBasicType(type, name);
             });
-            AddFile(RemoveRootNamespace(ns, type.Name) + ".generated.cs");
+            AddFile(RemoveRootNamespace(ns, name) + ".generated.cs");
         }
     }
 }

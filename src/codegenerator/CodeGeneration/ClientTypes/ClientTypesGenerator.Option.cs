@@ -29,7 +29,10 @@ public partial class ClientTypesGenerator
         isValueType = systemType.IsValueType;
 
         if (typeName.StartsWith("System.", StringComparison.Ordinal))
-            return CodeWriter.ToCSKeyword(typeName[7..]);
+        {
+            var shortName = typeName[7..];
+            return CodeWriter.ToCSKeyword(shortName) ?? shortName;
+        }
 
         return typeName;
     }
@@ -95,7 +98,10 @@ public partial class ClientTypesGenerator
         if (optionsType == null)
             return;
 
-        if (optionsType.IsIntersectionType == true && optionsType.Interfaces != null)
+        if (optionsType.Interfaces != null &&
+            (optionsType.IsIntersectionType == true || optionsType.IsInterface == true) &&
+            optionsType.Name != "LookupEditorOptions" &&
+            optionsType.Name != "ServiceLookupEditorOptions")
         {
             foreach (var intersectedTypeName in optionsType.Interfaces)
             {
@@ -166,9 +172,8 @@ public partial class ClientTypesGenerator
                  argument.Type == "Serenity.WidgetProps" ||
                  argument.Type == "@serenity-is/corelib:EditorProps" ||
                  argument.Type == "Serenity.EditorProps" ||
-                 (optionsType == null && 
-                  (argument.Type == "WidgetProps" || 
-                   argument.Type == "EditorProps"))))
+                 argument.Type == "WidgetProps" ||
+                 argument.Type == "EditorProps"))
             {
                 var genericParam = type.GenericParameters?.FirstOrDefault(x => x.Name == argument.GenericArguments);
                 if (genericParam != null)

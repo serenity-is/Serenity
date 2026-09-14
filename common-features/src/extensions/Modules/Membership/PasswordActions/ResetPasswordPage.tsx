@@ -2,6 +2,7 @@ import { PropertyPanel, TransformInclude, WidgetProps, informationDialog, resolv
 import { ResetPasswordForm } from "../../ServerTypes/Extensions/ResetPasswordForm";
 import { ResetPasswordRequest } from "../../ServerTypes/Extensions/ResetPasswordRequest";
 import { ResetPasswordResponse } from "../../ServerTypes/Extensions/ResetPasswordResponse";
+import { nsExtensions } from "../../ServerTypes/Namespaces";
 import { ExtensionsTexts, ResetPasswordFormTexts } from "../../ServerTypes/Texts";
 import { AccountPanelTitle } from "../AccountPanelTitle";
 import { addPasswordStrengthValidation } from "../PasswordStrength/PasswordStrengthValidation";
@@ -10,7 +11,7 @@ export default function pageInit(opt: ResetPasswordOptions) {
     new ResetPasswordPanel({ element: '#PanelDiv', class: 's-full-page justify-content-center s-Form', ...opt });
 }
 
-export interface ResetPasswordOptions extends TransformInclude {
+export interface ResetPasswordOptions extends TransformInclude<typeof nsExtensions> {
     token: string;
     minPasswordLength: number;
 }

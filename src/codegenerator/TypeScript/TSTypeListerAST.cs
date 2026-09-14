@@ -534,6 +534,44 @@ public class TSTypeListerAST
         return result.Count == 0 ? null : result;
     }
 
+    string? GetTransformIncludeTypeName(InterfaceDeclaration node)
+    {
+        if (node.HeritageClauses == null)
+            return null;
+
+        foreach (var heritage in node.HeritageClauses)
+        {
+            if (heritage.Token != SyntaxKind.ExtendsKeyword ||
+                heritage.Types == null)
+                continue;
+
+            foreach (var type in heritage.Types)
+            {
+                var name = GetTypeReferenceExpression(type);
+                if (name != "TransformInclude" &&
+                    name?.EndsWith(":TransformInclude", StringComparison.Ordinal) != true)
+                    continue;
+
+                if (type.TypeArguments is { Count: 1 })
+                    return GetInterfaceGenericArgumentValue(type.TypeArguments[0]);
+            }
+        }
+
+        return null;
+    }
+
+    string? GetInterfaceGenericArgumentValue(ITypeNode arg)
+    {
+        if (arg is TypeQueryNode typeQuery &&
+            typeQuery.ExprName is IExpression expr)
+            return GetLiteralValue(expr, isTypeInfo: true) as string;
+
+        if (arg is LiteralTypeNode literalType)
+            return GetLiteralValue(literalType.Literal, isTypeInfo: true) as string;
+
+        return GetText(arg);
+    }
+
     List<ExternalGenericParameter>? TypeParametersToExternal(NodeArray<TypeParameterDeclaration>? p)
     {
         if (p == null || p.Count == 0)
@@ -852,6 +890,7 @@ public class TSTypeListerAST
         if (result.Methods != null && result.Methods.Count == 0)
             result.Methods = null;
         result.Interfaces = GetBaseInterfaces(intf);
+        result.TransformIncludeTypeName = GetTransformIncludeTypeName(intf);
         var decorators = intf.GetDecorators();
         if (decorators.Any())
             result.Attributes = [.. decorators.Select(x => DecoratorToExternalAttribute(x)!)];

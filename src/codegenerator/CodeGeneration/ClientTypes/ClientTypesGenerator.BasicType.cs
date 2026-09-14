@@ -2,12 +2,12 @@ namespace Serenity.CodeGeneration;
 
 public partial class ClientTypesGenerator
 {
-    private void GenerateBasicType(ExternalType type)
+    private void GenerateBasicType(ExternalType type, string name)
     {
         if (!OmitComments)
             cw.IndentedLine($"/// <summary>A class that mirrors the <c>{type.Name}</c> script type.</summary>");
         cw.Indented("public partial class ");
-        sb.AppendLine(type.Name);
+        sb.AppendLine(name);
         
         cw.InBrace(delegate
         {
@@ -70,7 +70,7 @@ public partial class ClientTypesGenerator
         if (basicType == null)
             return;
 
-        if (basicType.IsIntersectionType == true && basicType.Interfaces != null)
+        if (basicType.Interfaces != null)
         {
             foreach (var intersectedTypeName in basicType.Interfaces)
             {

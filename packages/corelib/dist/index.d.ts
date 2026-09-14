@@ -3722,11 +3722,13 @@ export declare function registerType(type: {
 	[Symbol.typeInfo]: TypeInfo<any>;
 	name: string;
 }): void;
+declare const transformIncludeTypeNameSymbol: unique symbol;
 /**
- * Marker interface used to include column transforms in generated row metadata.
- * Implementations are generated server-side; this empty interface exists for typing only.
+ * Marker interface used to include a basic interface type during code generation (sergen clienttypes).
+ * Corresponding types are generated server-side as simple classes; this empty interface exists for typing only.
  */
-export interface TransformInclude {
+export interface TransformInclude<TypeName = ""> {
+	readonly [transformIncludeTypeNameSymbol]: TypeName;
 }
 declare namespace servicesTexts {
 	namespace Controls {

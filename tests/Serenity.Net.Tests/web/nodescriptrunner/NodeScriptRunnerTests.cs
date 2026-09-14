@@ -176,9 +176,9 @@ public class NodeScriptRunnerTests
         stdErrStream.Write("Error: bad\nWarning: warn\nWarn: warn2\nplain\n");
         stdErrStream.Complete();
 
-        var deadline = DateTime.UtcNow.AddSeconds(20);
+        var deadline = DateTime.UtcNow.AddSeconds(10);
         while (logger.Entries.Count < 6 && DateTime.UtcNow < deadline)
-            await Task.Delay(25, TestContext.Current.CancellationToken);
+            await Task.Delay(5, TestContext.Current.CancellationToken);
 
         Assert.Contains(logger.Entries, e => e.Level == LogLevel.Information && e.Message.Trim() == "info line");
         Assert.Contains(logger.Entries, e => e.Message.Trim() == "red line");
