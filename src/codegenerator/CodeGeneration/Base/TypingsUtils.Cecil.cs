@@ -43,7 +43,7 @@ public static partial class TypingsUtils
         return type.GetElementType();
     }
 
-    private static readonly Dictionary<(string, string), List<TypeReference>> BaseClassCache = [];
+    private static readonly ConcurrentDictionary<(string, string), List<TypeReference>> BaseClassCache = [];
 
     public static IEnumerable<TypeReference> EnumerateBaseClasses(this TypeReference typeRef)
     {
@@ -51,23 +51,21 @@ public static partial class TypingsUtils
             return [];
 
         var key = GetCacheKey(typeRef);
-        if (BaseClassCache.TryGetValue(key, out var cached))
-            return cached;
-
-        var list = new List<TypeReference>();
-
-        if (typeRef is not TypeDefinition typeDef)
-            typeDef = typeRef.Resolve();
-
-        var baseType = typeDef?.BaseType;
-        if (baseType != null)
+        return BaseClassCache.GetOrAdd(key, key =>
         {
-            list.Add(baseType);
-            list.AddRange(EnumerateBaseClasses(baseType));
-        }
+            var list = new List<TypeReference>();
 
-        BaseClassCache[key] = list;
-        return list;
+            if (typeRef is not TypeDefinition typeDef)
+                typeDef = typeRef.Resolve();
+
+            var baseType = typeDef?.BaseType;
+            if (baseType != null)
+            {
+                list.Add(baseType);
+                list.AddRange(EnumerateBaseClasses(baseType));
+            }
+            return list;
+        });
     }
 
     public static TypeReference FieldType(this FieldDefinition field)
