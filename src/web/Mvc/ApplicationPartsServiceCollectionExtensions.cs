@@ -25,19 +25,23 @@ public static class ApplicationPartsServiceCollectionExtensions
     /// <param name="dependencyMap">Feature dependency map. Features are dictionary
     /// keys and the list of features that they depend on (all must be enabled)
     /// for that feature to be enabled.</param>
+    /// <param name="tryPartRecovery">Whether to try recovering application parts when they
+    /// were not discovered at build time. Defaults to <c>true</c>.</param>
     /// <returns>The same service collection so that calls can be chained.</returns>
     public static IServiceCollection AddApplicationPartsFeatureToggles(this IServiceCollection services,
         IConfiguration configuration,
         ApplicationPartManager? applicationPartManager = null,
         object[]? disableByDefault = null,
-        Dictionary<string, List<RequiresFeatureAttribute>>? dependencyMap = null)
+        Dictionary<string, List<RequiresFeatureAttribute>>? dependencyMap = null,
+        bool tryPartRecovery = true)
     {
         ArgumentNullException.ThrowIfNull(services);
 
         applicationPartManager ??= GetServiceFromCollection<ApplicationPartManager>(services)
             ?? services.AddMvcCore().PartManager;
 
-        var tempSource = new ApplicationPartsTypeSource(applicationPartManager, topologicalSort: true, featureToggles: null);
+        var tempSource = new ApplicationPartsTypeSource(applicationPartManager,
+            topologicalSort: true, featureToggles: null, tryPartRecovery: tryPartRecovery);
         ScanFeatureKeySets(tempSource.GetAssemblies(), ref disableByDefault, ref dependencyMap);
         return CoreServiceCollectionExtensions.AddFeatureToggles(services, configuration, disableByDefault, dependencyMap);
     }
@@ -96,9 +100,12 @@ public static class ApplicationPartsServiceCollectionExtensions
     /// <param name="partManager">The <see cref="ApplicationPartManager"/> instance.</param>
     /// <param name="featureToggles">The feature toggles.</param>
     /// <param name="topologicalSort">Whether to sort assemblies topologically by references.</param>
+    /// <param name="tryPartRecovery">Whether to try recovering application parts when they
+    /// were not discovered at build time. Defaults to <c>true</c>.</param>
     /// <returns>The created <see cref="ApplicationPartsTypeSource"/>.</returns>
     public static ApplicationPartsTypeSource AddApplicationPartsTypeSource(this IServiceCollection collection,
-        ApplicationPartManager? partManager = null, IFeatureToggles? featureToggles = null, bool topologicalSort = true)
+        ApplicationPartManager? partManager = null, IFeatureToggles? featureToggles = null, bool topologicalSort = true,
+        bool tryPartRecovery = true)
     {
         ArgumentNullException.ThrowIfNull(collection);
         if (GetServiceFromCollection<ITypeSource>(collection) != null)
@@ -109,7 +116,7 @@ public static class ApplicationPartsServiceCollectionExtensions
 
         featureToggles ??= GetServiceFromCollection<IFeatureToggles>(collection);
 
-        var typeSource = new ApplicationPartsTypeSource(partManager, topologicalSort, featureToggles);
+        var typeSource = new ApplicationPartsTypeSource(partManager, topologicalSort, featureToggles, tryPartRecovery);
         collection.AddSingleton<ITypeSource>(typeSource);
         return typeSource;
     }
