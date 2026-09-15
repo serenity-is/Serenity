@@ -5,7 +5,7 @@ public partial class ClientTypesGenerator
     internal static string? GetMemberTypeName(string? typeName, out bool isValueType)
     {
         isValueType = false;
-        if (string.IsNullOrEmpty(typeName))
+        if (typeName is null or "")
             return "object";
 
         switch (typeName)
@@ -64,7 +64,7 @@ public partial class ClientTypesGenerator
 
             if (NullableRefTypes &&
                 !isValueType &&
-                !string.IsNullOrEmpty(typeName) &&
+                typeName is { Length: > 0 } &&
                 !typeName.EndsWith('?'))
                 typeName += '?';
 

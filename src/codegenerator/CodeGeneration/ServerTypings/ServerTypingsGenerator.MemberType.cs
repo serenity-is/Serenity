@@ -80,9 +80,8 @@ public partial class ServerTypingsGenerator
 
         if (type.IsArray())
         {
-            var elementType = type.ElementType();
-            if (elementType.NamespaceOf() == "Serenity.Services" &&
-                elementType.Name == "SortBy")
+            if (type.ElementType() is { } et && et.NamespaceOf() == "Serenity.Services" &&
+                et.Name == "SortBy")
             {
                 sb.Append("string[]");
                 return;
@@ -96,7 +95,7 @@ public partial class ServerTypingsGenerator
             return;
         }
 
-        if (isSystem && 
+        if (isSystem &&
             name == "Object")
         {
             sb.Append("any");
@@ -110,32 +109,26 @@ public partial class ServerTypingsGenerator
             return;
         }
 
-        if (type.IsGenericInstanceType(out _))
+        if (type.IsGenericInstanceType(out _) &&
+            type is GenericInstanceType genericInstanceType &&
+            genericInstanceType.ElementType() is { } elementType &&
+                elementType.NamespaceOf() == "System.Collections.Generic")
         {
-            var gi = (type as GenericInstanceType)!;
-            if (gi.ElementType().NamespaceOf() == "System.Collections.Generic")
+            if (elementType.MetadataName() is "List`1" or "HashSet`1" or "IList`1" or "IEnumerable`1" or "ISet`1")
             {
-                if (gi.ElementType().MetadataName() == "List`1" ||
-                    gi.ElementType().MetadataName() == "HashSet`1" ||
-                    gi.ElementType().MetadataName() == "IList`1" ||
-                    gi.ElementType().MetadataName() == "IEnumerable`1" ||
-                    gi.ElementType().MetadataName() == "ISet`1")
-                {
-                    AppendMappedType(gi.GenericArguments()[0], codeNamespace);
-                    sb.Append("[]");
-                    return;
-                }
+                AppendMappedType(genericInstanceType.GenericArguments()[0], codeNamespace);
+                sb.Append("[]");
+                return;
+            }
 
-                if (gi.ElementType().MetadataName() == "Dictionary`2" ||
-                    gi.ElementType().MetadataName() == "IDictionary`2")
-                {
-                    sb.Append("{ [key: ");
-                    AppendMappedType(gi.GenericArguments()[0], codeNamespace);
-                    sb.Append("]: ");
-                    AppendMappedType(gi.GenericArguments()[1], codeNamespace);
-                    sb.Append(" }");
-                    return;
-                }
+            if (elementType.MetadataName() is "Dictionary`2" or "IDictionary`2")
+            {
+                sb.Append("{ [key: ");
+                AppendMappedType(genericInstanceType.GenericArguments()[0], codeNamespace);
+                sb.Append("]: ");
+                AppendMappedType(genericInstanceType.GenericArguments()[1], codeNamespace);
+                sb.Append(" }");
+                return;
             }
         }
 
@@ -175,9 +168,9 @@ public partial class ServerTypingsGenerator
         var name = type.Name;
         var sourceFile = type.SourceFile;
 
-        if (!string.IsNullOrEmpty(type.Module))
+        if (type.Module is { Length: > 0 })
         {
-            return AddModuleImport(type.Module!, type.Name!, external:
+            return AddModuleImport(type.Module, type.Name!, external:
                 !type.Module.StartsWith('/') &&
                 !type.Module.StartsWith('.'));
         }

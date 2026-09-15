@@ -66,9 +66,8 @@ public partial class TSModuleResolver(IFileSystem fileSystem, string tsConfigDir
 
     static string? RemoveTrailing(string? path)
     {
-        while (path != null && path.Length > 1 &&
-            path.EndsWith('\\') ||
-            path!.EndsWith('/'))
+        while (path is not null &&
+            ((path.Length > 1 && path.EndsWith('\\')) || path.EndsWith('/')))
             path = path[..^1];
         return path;
     }
@@ -153,7 +152,7 @@ public partial class TSModuleResolver(IFileSystem fileSystem, string tsConfigDir
 
     public ResolveResult? Resolve(string? fileNameOrModule, string? referencedFrom)
     {
-        if (string.IsNullOrEmpty(fileNameOrModule))
+        if (fileNameOrModule is null or "")
             return null;
 
         string? resolvedPath = null;
@@ -198,7 +197,7 @@ public partial class TSModuleResolver(IFileSystem fileSystem, string tsConfigDir
             };
         }
 
-        if (string.IsNullOrEmpty(referencedFrom))
+        if (referencedFrom is null or "")
         {
             resolvedPath = fileNameOrModule;
             if (!fileSystem.FileExists(resolvedPath))
@@ -359,7 +358,7 @@ public partial class TSModuleResolver(IFileSystem fileSystem, string tsConfigDir
         string? withPackageJson(ref string? moduleName)
         {
             var types = packageJson.Types ?? packageJson.Typings;
-            if (!string.IsNullOrEmpty(types) &&
+            if (types is { Length: > 0 } &&
                 fileSystem.FileExists(fileSystem.Combine(path, types)))
             {
                 moduleName = packageJson.Name ?? TryGetNodePackageName(path) ?? fileSystem.GetFileName(path);

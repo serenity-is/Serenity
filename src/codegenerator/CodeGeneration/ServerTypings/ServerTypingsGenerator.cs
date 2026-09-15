@@ -227,9 +227,9 @@ public partial class ServerTypingsGenerator : CodeGeneratorBase
         add(GenerateBasicType);
     }
 
-    protected virtual void AddNamespaceConstant(string typeNamespace)
+    protected virtual void AddNamespaceConstant(string? typeNamespace)
     {
-        if (string.IsNullOrEmpty(typeNamespace))
+        if (typeNamespace is null or "")
             return;
 
         string? ns = typeNamespace;

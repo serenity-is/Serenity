@@ -140,7 +140,7 @@ public partial class ServerTypingsGenerator
                 {
                     if (!(method.ExplicitInterfaceImplementations.Any(intfImpl =>
                         interfaceTypes.Any(intfType =>
-                            intfImpl.ReceiverType.FullNameOf() == intfType &&
+                            intfImpl.ReceiverType?.FullNameOf() == intfType &&
                             intfImpl.Name == "get_" + propertyName)) ||
                         (method.MethodKind == Microsoft.CodeAnalysis.MethodKind.PropertyGet &&
                          method.DeclaredAccessibility == Microsoft.CodeAnalysis.Accessibility.Public &&
@@ -224,7 +224,7 @@ public partial class ServerTypingsGenerator
             moduleIdentifier + "." + name;
     }
 
-    private static string DetermineLocalTextPrefix(TypeDefinition rowType)
+    private static string? DetermineLocalTextPrefix(TypeDefinition rowType)
     {
         string? localTextPrefix = null;
 
@@ -319,7 +319,7 @@ public partial class ServerTypingsGenerator
         if (moduleAttr != null)
         {
             if (moduleAttr.ConstructorArguments().Count == 1 &&
-                moduleAttr.ConstructorArguments()[0].Type.FullNameOf() == "System.String")
+                moduleAttr.ConstructorArguments()[0].Type?.FullNameOf() == "System.String")
                 module = moduleAttr.ConstructorArguments[0].Value as string;
             else
                 module = null;
@@ -378,9 +378,9 @@ public partial class ServerTypingsGenerator
             }
         }
         else if (lookupAttr.ConstructorArguments().Count > 0 &&
-            lookupAttr.ConstructorArguments()[0].Type.FullNameOf() == "System.Type")
+            lookupAttr.ConstructorArguments()[0].Type?.FullNameOf() == "System.Type")
         {
-            autoFrom = ((TypeReference)lookupAttr.ConstructorArguments[0].Value).Resolve();
+            autoFrom = ((TypeReference)lookupAttr.ConstructorArguments[0].Value!).Resolve();
             lookupAttr = TypingsUtils.GetAttr(autoFrom,
                 "Serenity.ComponentModel", "LookupScriptAttribute");
         }
@@ -389,18 +389,18 @@ public partial class ServerTypingsGenerator
             return null;
 
         if (lookupAttr.ConstructorArguments().Count == 1 &&
-            lookupAttr.ConstructorArguments[0].Type.FullNameOf() == "System.String")
+            lookupAttr.ConstructorArguments[0].Type?.FullNameOf() == "System.String")
             return lookupAttr.ConstructorArguments[0].Value as string;
 
         if (lookupAttr.ConstructorArguments().Count == 1 &&
-            lookupAttr.ConstructorArguments[0].Type.FullNameOf() == "System.Type")
+            lookupAttr.ConstructorArguments[0].Type?.FullNameOf() == "System.Type")
         {
             return AutoLookupKeyFor(
                 (lookupAttr.ConstructorArguments[0].Value as TypeReference)!.Resolve());
         }
 
         if (lookupAttr.ConstructorArguments().Count == 1 &&
-            lookupAttr.ConstructorArguments[0].Type.FullNameOf() == "System.Type")
+            lookupAttr.ConstructorArguments[0].Type?.FullNameOf() == "System.Type")
         {
             return AutoLookupKeyFor(
                 (lookupAttr.ConstructorArguments[0].Value as TypeReference)!.Resolve());

@@ -97,7 +97,7 @@ public partial class ServerTypingsGenerator
                     formatterScriptType.Module != "@serenity-is/corelib")
                     referencedTypeAliases.Add(("Formatter", ReferenceScriptType(formatterScriptType)));
 
-                TryReferenceEnumType(item.PropertyType(), basedOnField?.PropertyType(), codeNamespace, referencedTypeKeys, referencedTypeAliases);
+                TryReferenceEnumType(item.PropertyType(), basedOnField?.PropertyType(), referencedTypeKeys, referencedTypeAliases);
             }
         });
 
@@ -152,22 +152,22 @@ public partial class ServerTypingsGenerator
         if (formatterTypeAttr == null)
             return AutoDetermineFormatterType(propertyType, basedOnFieldType);
 
-        if (formatterTypeAttr.AttributeType().FullNameOf() == "Serenity.ComponentModel.FormatterTypeAttribute" ||
-            formatterTypeAttr.AttributeType().FullNameOf() == "Serenity.ComponentModel.CustomFormatterAttribute")
+        if (formatterTypeAttr.AttributeType()?.FullNameOf() is "Serenity.ComponentModel.FormatterTypeAttribute" 
+            or "Serenity.ComponentModel.CustomFormatterAttribute")
         {
             if (formatterTypeAttr.ConstructorArguments().Count == 1 &&
-                formatterTypeAttr.ConstructorArguments[0].Type.FullNameOf() == "System.String" &&
+                formatterTypeAttr.ConstructorArguments[0].Type?.FullNameOf() == "System.String" &&
                 formatterTypeAttr.ConstructorArguments[0].Value is string)
                 return formatterTypeAttr.ConstructorArguments[0].Value as string;
         }
 
-        var keyConstant = formatterTypeAttr.AttributeType().Resolve().FieldsOf().FirstOrDefault(x =>
+        var keyConstant = formatterTypeAttr.AttributeType()?.Resolve().FieldsOf().FirstOrDefault(x =>
             x.IsStatic &&
             x.IsPublic() &&
             x.Name == "Key" &&
             x.HasConstant() &&
             x.Constant() is string &&
-            x.DeclaringType().FullNameOf() == formatterTypeAttr.AttributeType().FullNameOf());
+            x.DeclaringType().FullNameOf() == formatterTypeAttr.AttributeType()?.FullNameOf());
 
         if (keyConstant != null && keyConstant.Constant() as string != null)
             return keyConstant.Constant() as string;
@@ -188,8 +188,8 @@ public partial class ServerTypingsGenerator
                 return formatterType;
 #endif
 
-        formatterType = formatterTypeAttr.AttributeType().FullNameOf();
-        if (formatterType.EndsWith("Attribute", StringComparison.Ordinal))
+        formatterType = formatterTypeAttr.AttributeType()?.FullNameOf();
+        if (formatterType?.EndsWith("Attribute", StringComparison.Ordinal) == true)
             formatterType = formatterType[..^"Attribute".Length];
 
         return formatterType;

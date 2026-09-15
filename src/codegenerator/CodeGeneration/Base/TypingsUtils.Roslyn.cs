@@ -5,23 +5,23 @@ namespace Serenity.Reflection;
 
 public static partial class TypingsUtils
 {
-    public static object ArgumentValue(this KeyValuePair<string, TypedConstant> keyValuePair)
+    public static object? ArgumentValue(this KeyValuePair<string, TypedConstant> keyValuePair)
     {
         return keyValuePair.Value.Kind == TypedConstantKind.Array ?
             keyValuePair.Value.Values : keyValuePair.Value.Value;
     }
 
-    public static TypeDefinition AttributeType(this CustomAttribute attributeData)
+    public static TypeDefinition? AttributeType(this CustomAttribute attributeData)
     {
         return attributeData.AttributeClass;
     }
 
-    public static object Constant(this FieldDefinition fieldSymbol)
+    public static object? Constant(this FieldDefinition fieldSymbol)
     {
         return fieldSymbol.ConstantValue;
     }
 
-    public static MethodDefinition Constructor(this CustomAttribute attributeData)
+    public static MethodDefinition? Constructor(this CustomAttribute attributeData)
     {
         return attributeData.AttributeConstructor;
     }
@@ -41,7 +41,7 @@ public static partial class TypingsUtils
         return typeSymbol.ContainingType;
     }
 
-    public static TypeDefinition ElementType(this TypeDefinition type)
+    public static TypeDefinition? ElementType(this TypeDefinition type)
     {
         if (type is IArrayTypeSymbol ats)
             return ats.ElementType;
@@ -52,7 +52,7 @@ public static partial class TypingsUtils
         return null;
     }
 
-    public static IEnumerable<TypeReference> EnumerateBaseClasses(this TypeReference typeRef)
+    public static IEnumerable<TypeReference> EnumerateBaseClasses(this TypeReference? typeRef)
     {
         if (typeRef == null)
             yield break;
@@ -102,7 +102,7 @@ public static partial class TypingsUtils
         }
     }
 
-    public static TypeDefinition GetEnumTypeFrom(TypeReference type)
+    public static TypeDefinition? GetEnumTypeFrom(TypeReference type)
     {
         type = GetNullableUnderlyingType(type) ?? type;
         if (type.TypeKind == TypeKind.Enum)
@@ -111,7 +111,7 @@ public static partial class TypingsUtils
         return null;
     }
 
-    public static TypeReference GetNullableUnderlyingType(TypeReference type)
+    public static TypeReference? GetNullableUnderlyingType(TypeReference type)
     {
         if (type is GenericInstanceType namedType &&
             namedType.IsGenericType &&
@@ -167,7 +167,7 @@ public static partial class TypingsUtils
     }
 
 
-    public static bool IsAssignableFrom(TypeReference baseType, TypeReference type)
+    public static bool IsAssignableFrom(TypeReference? baseType, TypeReference? type)
     {
         if (baseType == null || type == null)
             return false;
@@ -191,7 +191,7 @@ public static partial class TypingsUtils
         return type.TypeKind == TypeKind.Enum;
     }
 
-    public static bool IsGenericInstanceType(this TypeDefinition typeSymbol, out GenericInstanceType originalDefinition)
+    public static bool IsGenericInstanceType(this TypeDefinition typeSymbol, out GenericInstanceType? originalDefinition)
     {
         if (typeSymbol is GenericInstanceType nt &&
             nt.IsGenericType && !nt.TypeArguments.Any(x => x.TypeKind == TypeKind.TypeParameter))
@@ -281,13 +281,13 @@ public static partial class TypingsUtils
         return attributeData.NamedArguments;
     }
 
-    public static string NamespaceOf(this ISymbol symbol)
+    public static string? NamespaceOf(this ISymbol symbol)
     {
         if (symbol.ContainingNamespace == null ||
             string.IsNullOrEmpty(symbol.ContainingNamespace.Name))
             return null;
 
-        string restOfResult = symbol.ContainingNamespace.NamespaceOf();
+        string? restOfResult = symbol.ContainingNamespace.NamespaceOf();
         string result = symbol.ContainingNamespace.Name;
 
         if (restOfResult != null)
@@ -323,7 +323,7 @@ public static partial class TypingsUtils
             yield return td;
     }
 
-    public static object Value(this TypedConstant constant)
+    public static object? Value(this TypedConstant constant)
     {
         return constant.Kind == TypedConstantKind.Array ?
             constant.Values : constant.Value;

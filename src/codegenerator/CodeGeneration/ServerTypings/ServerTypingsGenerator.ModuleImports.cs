@@ -132,7 +132,7 @@ public partial class ServerTypingsGenerator
         return modulesDir;
     }
 
-    protected string GetTypingFileNameFor(string ns, string name)
+    protected string GetTypingFileNameFor(string? ns, string name)
     {
         var filename = RemoveRootNamespace(ns, name) ?? "";
         var idx = filename.IndexOf('.');
@@ -144,12 +144,12 @@ public partial class ServerTypingsGenerator
 
     protected string? RelativeModulePath(string fromModule, string? toModule)
     {
-        if (string.IsNullOrEmpty(toModule) ||
+        if (toModule is null or "" ||
             toModule.StartsWith('.'))
             return toModule;
 
         if (toModule.StartsWith("@/") &&
-            !string.IsNullOrEmpty(ModulesPathFolder))
+            ModulesPathFolder is { Length: > 0 })
             toModule = "/" + ModulesPathFolder + "/" + toModule;
 
         if (!toModule.StartsWith('/'))
@@ -165,11 +165,11 @@ public partial class ServerTypingsGenerator
                 return "../" + toModule;
         }
 
-        if (!string.IsNullOrEmpty(ModulesPathFolder) &&
-            !string.IsNullOrEmpty(ModulesPathAlias) &&
-            toModule.StartsWith("/" + ModulesPathFolder + "/", StringComparison.Ordinal))
+        if (ModulesPathFolder is { Length: > 0 } modulesPathFolder &&
+            ModulesPathAlias is { Length: > 0 } modulesPathAlias &&
+            toModule.StartsWith("/" + modulesPathFolder + "/", StringComparison.Ordinal))
         {
-            return ModulesPathAlias + toModule[(ModulesPathFolder.Length + 2)..];
+            return modulesPathAlias + toModule[(modulesPathFolder.Length + 2)..];
         }
 
         if (!string.IsNullOrEmpty(RootPathAlias))

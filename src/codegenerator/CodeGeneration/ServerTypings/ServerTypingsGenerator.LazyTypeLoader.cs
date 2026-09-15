@@ -24,7 +24,7 @@ public partial class ServerTypingsGenerator
                 if (type == null)
                     continue;
 
-                if (string.IsNullOrEmpty(type.Module))
+                if (type.Module is null or "")
                     continue;
 
                 // these are currently loaded via appsettings.bundles.json

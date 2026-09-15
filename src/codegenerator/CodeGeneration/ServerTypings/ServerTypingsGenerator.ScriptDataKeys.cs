@@ -28,7 +28,7 @@ public partial class ServerTypingsGenerator
         if (moduleAttr != null)
         {
             if (moduleAttr.ConstructorArguments().Count == 1 &&
-                moduleAttr.ConstructorArguments()[0].Type.FullNameOf() == "System.String")
+                moduleAttr.ConstructorArguments()[0].Type?.FullNameOf() == "System.String")
                 module = moduleAttr.ConstructorArguments[0].Value as string;
             else
                 module = null;

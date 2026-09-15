@@ -8,8 +8,8 @@ public partial class ServerTypingsGenerator
         var visitedForAnnotations = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
 #if ISSOURCEGENERATOR
-        if (!string.IsNullOrEmpty(Compilation.AssemblyName))
-            assemblyNames.Add(Compilation.AssemblyName);
+        if (Compilation.AssemblyName is { Length: > 0 } assemblyName)
+            assemblyNames.Add(assemblyName);
 
         var types = Compilation.GetSymbolsWithName(s => true, SymbolFilter.Type).OfType<TypeReference>().ToArray();
 

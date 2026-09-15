@@ -8,7 +8,7 @@ public partial class ServerTypingsGenerator
         var enumKeyAttr = TypingsUtils.FindAttr(enumType.GetAttributes(), "Serenity.ComponentModel", "EnumKeyAttribute");
         if (enumKeyAttr != null &&
             enumKeyAttr.ConstructorArguments().Count >= 1 &&
-            enumKeyAttr.ConstructorArguments()[0].Type.FullNameOf() == "System.String")
+            enumKeyAttr.ConstructorArguments()[0].Type?.FullNameOf() == "System.String")
             enumKey = enumKeyAttr.ConstructorArguments[0].Value as string;
         return enumKey;
     }
@@ -30,7 +30,7 @@ public partial class ServerTypingsGenerator
                 (!x.HasCustomAttributes() ||
                     (TypingsUtils.FindAttr(x.GetAttributes(), "Serenity.ComponentModel", "IgnoreUIFieldAttribute") == null &&
                      TypingsUtils.FindAttr(x.GetAttributes(), "Serenity.ComponentModel", "TransformIgnoreAttribute") == null)));
-            fields = fields.OrderBy(x => Convert.ToInt64(x.Constant(), CultureInfo.InvariantCulture));
+            fields = fields.OrderBy(x => Convert.ToInt64(x.Constant()!, CultureInfo.InvariantCulture));
 
             var inserted = 0;
             foreach (var field in fields)
@@ -40,7 +40,7 @@ public partial class ServerTypingsGenerator
 
                 cw.Indented(field.Name);
                 sb.Append(" = ");
-                sb.Append(Convert.ToInt64(field.Constant(), CultureInfo.InvariantCulture));
+                sb.Append(Convert.ToInt64(field.Constant()!, CultureInfo.InvariantCulture));
                 inserted++;
             }
 

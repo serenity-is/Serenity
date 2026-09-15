@@ -100,9 +100,9 @@ public partial class ClientTypesGenerator : CodeGeneratorBase
         }
     }
 
-    private static bool IsLocalModule(string module)
+    private static bool IsLocalModule(string? module)
     {
-        return !string.IsNullOrEmpty(module) &&
+        return module is { Length: > 0 } &&
             (module.StartsWith("./", StringComparison.Ordinal) ||
              module.StartsWith("../", StringComparison.Ordinal) ||
              module.StartsWith('/'));
@@ -193,7 +193,7 @@ public partial class ClientTypesGenerator : CodeGeneratorBase
 
             var transformIncludeName = type.TransformIncludeTypeName?.Trim();
 
-            if (!string.IsNullOrEmpty(transformIncludeName))
+            if (transformIncludeName is { Length: > 0 })
             {
                 if (transformIncludeName.EndsWith('.'))
                 {

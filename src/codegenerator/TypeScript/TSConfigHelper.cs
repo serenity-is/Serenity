@@ -71,7 +71,7 @@ public static class TSConfigHelper
         var extends = PathHelper.ToPath(config.Extends ?? "");
         var loop = 0;
         string basePath = path;
-        while (!string.IsNullOrEmpty(extends) && loop++ < 10)
+        while (extends is { Length: > 0 } && loop++ < 10)
         {
             var baseDir = fileSystem.GetDirectoryName(basePath);
             basePath = fileSystem.Combine(baseDir, extends);

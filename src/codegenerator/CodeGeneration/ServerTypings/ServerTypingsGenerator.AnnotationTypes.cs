@@ -79,7 +79,7 @@ public partial class ServerTypingsGenerator
                             type.NamespaceOf() != null)
                         {
                             if (type.NamespaceOf() == ns[0..^2] ||
-                                type.NamespaceOf().StartsWith(ns[0..^1], StringComparison.OrdinalIgnoreCase))
+                                type.NamespaceOf()?.StartsWith(ns[0..^1], StringComparison.OrdinalIgnoreCase) == true)
                             {
                                 namespaceMatch = true;
                                 break;
@@ -123,7 +123,7 @@ public partial class ServerTypingsGenerator
         {
             var attrInfo = new AnnotationTypeInfo.AttributeInfo();
             if (attr.ConstructorArguments()?.FirstOrDefault(x =>
-                x.Type.FullNameOf() == "System.Type").Value is not TypeReference annotatedType)
+                x.Type?.FullNameOf() == "System.Type").Value is not TypeReference annotatedType)
                 continue;
 
             attrInfo.AnnotatedType = annotatedType.Resolve();

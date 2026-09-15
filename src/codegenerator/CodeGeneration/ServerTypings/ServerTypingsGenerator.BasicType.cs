@@ -35,7 +35,7 @@ public partial class ServerTypingsGenerator
                 jsonProperty.HasConstructorArguments())
             {
                 var arg = jsonProperty.ConstructorArguments.First();
-                if (arg.Type.FullNameOf() == "System.String" &&
+                if (arg.Type?.FullNameOf() == "System.String" &&
                     !string.IsNullOrEmpty(arg.Value as string))
                 {
                     memberName = (arg.Value as string)!;

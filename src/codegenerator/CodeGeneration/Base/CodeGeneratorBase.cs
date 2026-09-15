@@ -76,7 +76,7 @@ public abstract class CodeGeneratorBase
 
     protected ExternalType? GetScriptType(string? fullName, bool fallback = true)
     {
-        if (string.IsNullOrEmpty(fullName))
+        if (fullName is null or "")
             return null;
 
         if (tsTypes.TryGetValue(fullName, out ExternalType? type))
@@ -158,7 +158,7 @@ public abstract class CodeGeneratorBase
     {
         var baseType = type.BaseType;
 
-        if (string.IsNullOrEmpty(baseType))
+        if (baseType is null or "")
             return null;
 
         SplitGenericArguments(ref baseType);

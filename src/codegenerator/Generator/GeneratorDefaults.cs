@@ -64,9 +64,9 @@ public class GeneratorDefaults
     /// </summary>
     /// <param name="extends">Extends statement like "defaults@9.0.0"</param>
     /// <returns></returns>
-    public static string? TryParse(string extends)
+    public static string? TryParse(string? extends)
     {
-        if (string.IsNullOrEmpty(extends) ||
+        if (extends is null or "" ||
             !extends.StartsWith("defaults@", StringComparison.Ordinal) ||
             !Version.TryParse(extends[9..], out Version? version))
             return null;

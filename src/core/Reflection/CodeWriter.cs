@@ -158,7 +158,7 @@ public class CodeWriter(StringBuilder sb, int tabSize)
     /// </summary>
     /// <param name="ns">Namespace</param>
     /// <param name="action">Action</param>
-    public void InNamespace(string ns, Action action)
+    public void InNamespace(string? ns, Action action)
     {
         var oldNamespace = CurrentNamespace;
         CurrentNamespace = ns;

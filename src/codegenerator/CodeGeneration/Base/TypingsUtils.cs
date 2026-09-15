@@ -7,7 +7,7 @@ public static partial class TypingsUtils
         return FindByName(classes, ns, name) != null;
     }
 
-    public static CustomAttribute? FindAttr(IEnumerable<CustomAttribute>? attrList, string ns, string name)
+    public static CustomAttribute? FindAttr(IEnumerable<CustomAttribute>? attrList, string? ns, string name)
     {
         if (attrList == null)
             return null;
@@ -30,7 +30,7 @@ public static partial class TypingsUtils
     }
 
 
-    public static CustomAttribute? GetAttr(TypeDefinition klass, string ns, string name, TypeReference[]? baseClasses = null)
+    public static CustomAttribute? GetAttr(TypeDefinition klass, string? ns, string name, TypeReference[]? baseClasses = null)
     {
         CustomAttribute? attr;
 
@@ -75,8 +75,11 @@ public static partial class TypingsUtils
         yield break;
     }
 
-    public static bool IsAssignableFrom(string baseTypeFullName, TypeDefinition type)
+    public static bool IsAssignableFrom(string baseTypeFullName, TypeDefinition? type)
     {
+        if (type is null)
+            return false;
+
         Queue<TypeDefinition> queue = new();
         queue.Enqueue(type);
 
@@ -99,8 +102,11 @@ public static partial class TypingsUtils
         return false;
     }
 
-    public static bool IsOrSubClassOf(TypeReference typeRef, string ns, string name)
+    public static bool IsOrSubClassOf(TypeReference? typeRef, string? ns, string name)
     {
+        if (typeRef is null)
+            return false;
+
         if (typeRef.Name == name &&
             typeRef.NamespaceOf() == ns)
             return true;

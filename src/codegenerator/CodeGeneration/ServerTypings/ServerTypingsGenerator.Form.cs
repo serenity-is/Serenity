@@ -49,22 +49,22 @@ public partial class ServerTypingsGenerator
         if (editorTypeAttr == null)
             return AutoDetermineEditorType(propertyType, basedOnFieldType);
 
-        if (editorTypeAttr.AttributeType().FullNameOf() == "Serenity.ComponentModel.EditorTypeAttribute" ||
-            editorTypeAttr.AttributeType().FullNameOf() == "Serenity.ComponentModel.CustomEditorAttribute")
+        if (editorTypeAttr.AttributeType()?.FullNameOf() is "Serenity.ComponentModel.EditorTypeAttribute"
+                or "Serenity.ComponentModel.CustomEditorAttribute")
         {
             if (editorTypeAttr.ConstructorArguments().Count == 1 &&
-                editorTypeAttr.ConstructorArguments[0].Type.FullNameOf() == "System.String" &&
+                editorTypeAttr.ConstructorArguments[0].Type?.FullNameOf() == "System.String" &&
                 editorTypeAttr.ConstructorArguments[0].Value is string)
                 return editorTypeAttr.ConstructorArguments[0].Value as string;
         }
 
-        var keyConstant = editorTypeAttr.AttributeType().Resolve().FieldsOf().FirstOrDefault(x =>
+        var keyConstant = editorTypeAttr.AttributeType()?.Resolve().FieldsOf().FirstOrDefault(x =>
             x.IsStatic &&
             x.IsPublic() &&
             x.Name == "Key" &&
             x.HasConstant() &&
             x.Constant() is string &&
-            x.DeclaringType().FullNameOf() == editorTypeAttr.AttributeType().FullNameOf());
+            x.DeclaringType().FullNameOf() == editorTypeAttr.AttributeType()?.FullNameOf());
 
         if (keyConstant != null && keyConstant.Constant() as string != null)
             return keyConstant.Constant() as string;
@@ -85,8 +85,8 @@ public partial class ServerTypingsGenerator
             return editorType;
 #endif
 
-        editorType = editorTypeAttr.AttributeType().FullNameOf();
-        if (editorType.EndsWith("Attribute", StringComparison.Ordinal))
+        editorType = editorTypeAttr.AttributeType()?.FullNameOf();
+        if (editorType?.EndsWith("Attribute", StringComparison.Ordinal) == true)
             editorType = editorType[..^"Attribute".Length];
 
         return editorType;
@@ -109,7 +109,7 @@ public partial class ServerTypingsGenerator
         if (editorTypeAttr != null)
         {
             var dialogType = editorTypeAttr.NamedArguments().FirstOrDefault(x => string.Equals(x.Name(), "DialogType")).ArgumentValue() as string;
-            if (!string.IsNullOrEmpty(dialogType))
+            if (dialogType is { Length: > 0 })
                 yield return dialogType;
             else
             {
@@ -172,7 +172,7 @@ public partial class ServerTypingsGenerator
         var basedOnRowAttr = TypingsUtils.GetAttr(type, "Serenity.ComponentModel", "BasedOnRowAttribute");
         if (basedOnRowAttr != null &&
             basedOnRowAttr.ConstructorArguments().Count > 0 &&
-            basedOnRowAttr.ConstructorArguments()[0].Type.FullNameOf() == "System.Type")
+            basedOnRowAttr.ConstructorArguments()[0].Type?.FullNameOf() == "System.Type")
             basedOnRow = (basedOnRowAttr.ConstructorArguments[0].Value as TypeReference)!.Resolve();
 
         rowAnnotations = basedOnRow != null ? GetAnnotationTypesFor(basedOnRow) : null;
@@ -211,7 +211,7 @@ public partial class ServerTypingsGenerator
         return attr;
     }
 
-    private void TryReferenceEnumType(TypeReference? itemType, TypeReference? basedOnFieldType, string codeNamespace,
+    private void TryReferenceEnumType(TypeReference? itemType, TypeReference? basedOnFieldType,
         HashSet<(string group, string key)> referencedTypeKeys,
         List<(string group, string alias)> referencedTypeAliases)
     {
@@ -229,7 +229,7 @@ public partial class ServerTypingsGenerator
             return;
 
         string? containingAssembly = GetAssemblyNameFor(enumType);
-        if (string.IsNullOrEmpty(containingAssembly) ||
+        if (containingAssembly is null or "" ||
             !assemblyNames.Contains(containingAssembly))
         {
             ExternalType? enumScriptType = TryFindModuleType(enumType.FullNameOf(), containingAssembly) ??
@@ -291,7 +291,7 @@ public partial class ServerTypingsGenerator
                         referencedTypeAliases.Add(("Dialog", ReferenceScriptType(dialogType)));
                 }
 
-                TryReferenceEnumType(item.PropertyType(), basedOnField?.PropertyType(), codeNamespace, referencedTypeKeys, referencedTypeAliases);
+                TryReferenceEnumType(item.PropertyType(), basedOnField?.PropertyType(), referencedTypeKeys, referencedTypeAliases);
 
                 if (editorScriptType is null)
                 {

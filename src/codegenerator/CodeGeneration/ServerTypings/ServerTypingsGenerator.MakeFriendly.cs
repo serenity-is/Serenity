@@ -80,7 +80,7 @@ public partial class ServerTypingsGenerator
         }
     }
 
-    public virtual string ShortenFullName(string ns, string name, string codeNamespace,
+    public virtual string ShortenFullName(string? ns, string name, string codeNamespace,
         string containingAssembly)
     {
         var nonGeneric = name;
@@ -128,7 +128,7 @@ public partial class ServerTypingsGenerator
 
             int i = 0;
 #if ISSOURCEGENERATOR
-            foreach (var argument in (type as INamedTypeSymbol).TypeArguments)
+            foreach (var argument in (type as INamedTypeSymbol)!.TypeArguments)
 #else
             foreach (var argument in (type as GenericInstanceType)!.GenericArguments)
 #endif
@@ -150,23 +150,26 @@ public partial class ServerTypingsGenerator
         }
     }
 
-    protected virtual string ScriptNamespaceFor(TypeReference type)
+    protected virtual string? ScriptNamespaceFor(TypeReference type)
     {
         var ns = type.NamespaceOf() ?? "";
-        if (string.IsNullOrEmpty(ns) && type.IsNested())
+        if (ns is null or "" && type.IsNested())
             ns = type.DeclaringType().NamespaceOf();
 
-        if (ns.EndsWith(".Entities", StringComparison.Ordinal))
-            return ns[..^".Entities".Length];
+        if (ns is not null)
+        {
+            if (ns.EndsWith(".Entities", StringComparison.Ordinal))
+                return ns[..^".Entities".Length];
 
-        if (ns.EndsWith(".Endpoints", StringComparison.Ordinal))
-            return ns[..^".Endpoints".Length];
+            if (ns.EndsWith(".Endpoints", StringComparison.Ordinal))
+                return ns[..^".Endpoints".Length];
 
-        if (ns.EndsWith(".Forms", StringComparison.Ordinal))
-            return ns[..^".Forms".Length];
+            if (ns.EndsWith(".Forms", StringComparison.Ordinal))
+                return ns[..^".Forms".Length];
 
-        if (ns.EndsWith(".Columns", StringComparison.Ordinal))
-            return ns[..^".Columns".Length];
+            if (ns.EndsWith(".Columns", StringComparison.Ordinal))
+                return ns[..^".Columns".Length];
+        }
 
         return ns;
     }

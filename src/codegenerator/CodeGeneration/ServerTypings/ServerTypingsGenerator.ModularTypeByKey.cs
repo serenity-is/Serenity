@@ -10,7 +10,7 @@ public partial class ServerTypingsGenerator
     {
         static string? fixRegName(ExternalType type, string? text)
         {
-            if (text != null && text[^1] == '.' && !string.IsNullOrEmpty(type?.Name))
+            if (text != null && text[^1] == '.' && type?.Name is { Length: > 0 })
                 return text + type.Name;
 
             return text;
@@ -161,7 +161,7 @@ public partial class ServerTypingsGenerator
             nonGeneric = nonGeneric[(dotIdx + 1)..];
         }
 
-        if (!string.IsNullOrEmpty(containingAssembly))
+        if (containingAssembly is { Length: > 0 })
         {
             if (SerenityNetAssemblies.Contains(containingAssembly))
             {
