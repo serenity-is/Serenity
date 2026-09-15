@@ -13,11 +13,11 @@ public partial class ServerTypingsGenerator
         cw.InBrace(delegate
         {
             var serviceUrl = GetServiceUrlFromRoute(type);
-            serviceUrl ??= ScriptNamespaceFor(type).Replace(".", "/", StringComparison.Ordinal);
+            serviceUrl ??= ScriptNamespaceFor(type)?.Replace(".", "/", StringComparison.Ordinal);
 
-            cw.Indented("export const baseUrl = '");
-            sb.Append(serviceUrl);
-            sb.AppendLine("';");
+            cw.Indented("export const baseUrl = ");
+            sb.Append(serviceUrl.ToSingleQuoted());
+            sb.AppendLine(";");
             sb.AppendLine();
 
             var methods = type.MethodsOf().Where(method => method.IsPublic() &&
@@ -70,11 +70,8 @@ public partial class ServerTypingsGenerator
                         sb.AppendLine(",");
 
                     cw.Indented(methodName);
-                    sb.Append(": \"");
-                    sb.Append(serviceUrl);
-                    sb.Append('/');
-                    sb.Append(methodName);
-                    sb.Append('"');
+                    sb.Append(": ");
+                    sb.Append((serviceUrl + "/" +  methodName).ToDoubleQuoted());
 
                     inserted++;
                 }
