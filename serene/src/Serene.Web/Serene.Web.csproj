@@ -6,6 +6,7 @@
     <TypeScriptNoEmitOnError>false</TypeScriptNoEmitOnError>
     <GenerateComputedBuildStaticWebAssetsDependsOn>RunTSBuild;$(GenerateComputedBuildStaticWebAssetsDependsOn)</GenerateComputedBuildStaticWebAssetsDependsOn>
     <CompressionExcludePatterns>$(CompressionExcludePatterns);**\*.map;**\*.txt</CompressionExcludePatterns>
+    <Nullable>annotations</Nullable>
     <!--#if (IsNotTemplate)-->
     <CommonSrc>..\..\..\common-features\src\</CommonSrc>
     <EnableDefaultCompressedItems>false</EnableDefaultCompressedItems>
