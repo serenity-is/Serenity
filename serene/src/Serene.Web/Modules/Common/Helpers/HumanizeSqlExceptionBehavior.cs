@@ -12,13 +12,13 @@ public class HumanizeSqlExceptionBehavior : BaseSaveDeleteBehavior, IImplicitBeh
     public override void OnException(ISaveRequestHandler handler, Exception exception)
     {
         if (exception is SqlException)
-            SqlExceptionHelper.HandleSavePrimaryKeyException(exception, handler.Context!.Localizer,
+            SqlExceptionHelper.HandleSavePrimaryKeyException(exception, handler.Context.Localizer,
                 handler.Row?.IdField?.GetTitle(handler.Context?.Localizer) ?? "ID");
     }
 
     public override void OnException(IDeleteRequestHandler handler, Exception exception)
     {
         if (exception is SqlException)
-            SqlExceptionHelper.HandleDeleteForeignKeyException(exception, handler.Context!.Localizer);
+            SqlExceptionHelper.HandleDeleteForeignKeyException(exception, handler.Context.Localizer);
     }
 }
