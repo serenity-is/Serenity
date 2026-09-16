@@ -871,6 +871,15 @@ export type GridLayoutRefs = {
 	};
 };
 /**
+ * Factory for the reactive signals and derived layout refs that drive pinning and frozen rows.
+ * Generates computed visibility signals, bounded pinning/frozen counters and live getters/setters on `refs.config`.
+ * @returns Object containing `signals` and `refs` wired for mutual recalculation.
+ */
+export declare function createGridSignalsAndRefs(): {
+	signals: GridSignals;
+	refs: GridLayoutRefs;
+};
+/**
  * Minimal host surface exposed to {@link LayoutEngine} implementations.
  * Narrower than {@link ISleekGrid}; only what layouts need is exposed.
  */
@@ -2602,9 +2611,7 @@ export declare class FrozenLayout implements LayoutEngine {
 /**
  * Header shell component for a single band. Hosts the column-header container
  * and hides automatically when the band is empty or the header is hidden.
- * @param props.band - Target band key.
- * @param props.refs - Layout refs owning the `headerCols` node.
- * @param props.signals - Visibility/pinning signals.
+ * @param props - Component props containing band, refs, and signals.
  */
 export declare const Header: ({ band, refs, signals }: {
 	band: BandKey;
@@ -2613,9 +2620,7 @@ export declare const Header: ({ band, refs, signals }: {
 }) => JSXElement;
 /**
  * Header-row (filter row) shell for a single band.
- * @param props.band - Target band key.
- * @param props.refs - Layout refs owning the `headerRowCols` node.
- * @param props.signals - Visibility/pinning signals.
+ * @param props - Component props containing band, refs, and signals.
  */
 export declare const HeaderRow: ({ band, refs, signals }: {
 	band: BandKey;
@@ -2624,8 +2629,7 @@ export declare const HeaderRow: ({ band, refs, signals }: {
 }) => JSXElement;
 /**
  * Top panel container attached to the main band; hidden when `hideTopPanel` is true.
- * @param props.refs - Layout refs owning `topPanel`.
- * @param props.signals - Visibility signals.
+ * @param props - Component props containing refs and signals.
  */
 export declare const TopPanel: ({ refs, signals }: {
 	refs: GridLayoutRefs;
@@ -2634,10 +2638,7 @@ export declare const TopPanel: ({ refs, signals }: {
 /**
  * Scrollable viewport + canvas pair for a single `band`/`pane` cell.
  * Hidden when the corresponding frozen/pinned count is `0`.
- * @param props.band - Horizontal band key.
- * @param props.pane - Vertical pane key.
- * @param props.refs - Layout refs owning `canvas[pane]`.
- * @param props.signals - Pinning/frozen count signals.
+ * @param props - Component props containing band, pane, refs, and signals.
  */
 export declare const Viewport: ({ band, pane, refs, signals }: {
 	band: BandKey;
@@ -2647,9 +2648,7 @@ export declare const Viewport: ({ band, pane, refs, signals }: {
 }) => JSXElement;
 /**
  * Footer row shell for a single band.
- * @param props.band - Target band key.
- * @param props.refs - Layout refs owning the `footerRowCols` node.
- * @param props.signals - Visibility/pinning signals.
+ * @param props - Component props containing band, refs, and signals.
  */
 export declare const FooterRow: ({ band, refs, signals }: {
 	band: BandKey;
