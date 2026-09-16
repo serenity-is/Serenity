@@ -1,4 +1,4 @@
-﻿namespace Serenity;
+namespace Serenity;
 
 /// <summary>
 /// Represents the core identity information for a user.
@@ -24,7 +24,7 @@ public interface IUserDefinition
     /// <summary>
     /// Gets the email address of the user.
     /// </summary>
-    string Email { get; }
+    string? Email { get; }
     /// <summary>
     /// Gets a value indicating whether the user is active (1 = active, 0 = disabled, -1 = deleted).
     /// </summary>
