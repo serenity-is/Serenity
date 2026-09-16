@@ -14,8 +14,8 @@ public partial class DeleteRequestHandlerTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
-            public BooleanField IsDeleted = null;
+            public Int32Field Id = null!;
+            public BooleanField IsDeleted = null!;
         }
     }
 
@@ -31,8 +31,8 @@ public partial class DeleteRequestHandlerTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
-            public Int16Field IsActive = null;
+            public Int32Field Id = null!;
+            public Int16Field IsActive = null!;
         }
     }
 
@@ -50,9 +50,9 @@ public partial class DeleteRequestHandlerTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
-            public DateTimeField DeleteDate = null;
-            public Int64Field DeleteUserId = null;
+            public Int32Field Id = null!;
+            public DateTimeField DeleteDate = null!;
+            public Int64Field DeleteUserId = null!;
         }
     }
 
@@ -72,10 +72,10 @@ public partial class DeleteRequestHandlerTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
-            public BooleanField IsDeleted = null;
-            public DateTimeField UpdateDate = null;
-            public Int64Field UpdateUserId = null;
+            public Int32Field Id = null!;
+            public BooleanField IsDeleted = null!;
+            public DateTimeField UpdateDate = null!;
+            public Int64Field UpdateUserId = null!;
         }
     }
 
@@ -95,10 +95,10 @@ public partial class DeleteRequestHandlerTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
-            public BooleanField IsDeleted = null;
-            public DateTimeField DeleteDate = null;
-            public Int64Field DeleteUserId = null;
+            public Int32Field Id = null!;
+            public BooleanField IsDeleted = null!;
+            public DateTimeField DeleteDate = null!;
+            public Int64Field DeleteUserId = null!;
         }
     }
 
@@ -114,8 +114,8 @@ public partial class DeleteRequestHandlerTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
-            public Int32Field Order = null;
+            public Int32Field Id = null!;
+            public Int32Field Order = null!;
         }
     }
 

@@ -239,6 +239,6 @@ public class OtherCityRow : Row<OtherCityRow.RowFields>, IIdRow
 
     public class RowFields : RowFieldsBase
     {
-        public Int32Field CityId = null;
+        public Int32Field CityId = null!;
     }
 }

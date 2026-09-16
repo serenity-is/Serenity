@@ -26,11 +26,11 @@ public partial class ListRequestHandlerTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
-            public StringField Name = null;
-            public StringField LookupIncludeField = null;
-            public StringField NormalField = null;
-            public StringField ExtraSpecialField = null;
+            public Int32Field Id = null!;
+            public StringField Name = null!;
+            public StringField LookupIncludeField = null!;
+            public StringField NormalField = null!;
+            public StringField ExtraSpecialField = null!;
         }
     }
 }

@@ -60,24 +60,24 @@ public partial class ListRequestHandlerTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
-            public StringField Name = null;
-            public StringField ExplicitQ = null;
-            public Int32Field IntQ = null;
-            public Int16Field ShortQ = null;
-            public Int64Field LongQ = null;
-            public StringField StartsQ = null;
-            public StringField FullTextQ = null;
-            public StringField Sorted = null;
-            public StringField Unsortable = null;
-            public StringField NotMappedF = null;
-            public StringField DenyFilterF = null;
-            public StringField NeverF = null;
-            public StringField AlwaysF = null;
-            public StringField ExplicitF = null;
-            public StringField DetailsF = null;
-            public StringField ForeignF = null;
-            public StringField NormalF = null;
+            public Int32Field Id = null!;
+            public StringField Name = null!;
+            public StringField ExplicitQ = null!;
+            public Int32Field IntQ = null!;
+            public Int16Field ShortQ = null!;
+            public Int64Field LongQ = null!;
+            public StringField StartsQ = null!;
+            public StringField FullTextQ = null!;
+            public StringField Sorted = null!;
+            public StringField Unsortable = null!;
+            public StringField NotMappedF = null!;
+            public StringField DenyFilterF = null!;
+            public StringField NeverF = null!;
+            public StringField AlwaysF = null!;
+            public StringField ExplicitF = null!;
+            public StringField DetailsF = null!;
+            public StringField ForeignF = null!;
+            public StringField NormalF = null!;
         }
     }
 
@@ -91,8 +91,8 @@ public partial class ListRequestHandlerTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
-            public StringField Name = null;
+            public Int32Field Id = null!;
+            public StringField Name = null!;
         }
     }
 

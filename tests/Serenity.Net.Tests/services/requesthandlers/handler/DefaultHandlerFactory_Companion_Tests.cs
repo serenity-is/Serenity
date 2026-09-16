@@ -11,7 +11,7 @@ public class DefaultHandlerFactory_Companion_Tests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field ID = null;
+            public Int32Field ID = null!;
         }
     }
 

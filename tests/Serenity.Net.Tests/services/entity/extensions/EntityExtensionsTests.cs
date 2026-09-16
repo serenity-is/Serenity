@@ -30,12 +30,12 @@ public class EntityExtensionsTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field ID = null;
-            public StringField Name = null;
-            public StringField NotMappedF = null;
-            public StringField TrimF = null;
-            public StringField TrimEmptyF = null;
-            public Int32Field Defaulted = null;
+            public Int32Field ID = null!;
+            public StringField Name = null!;
+            public StringField NotMappedF = null!;
+            public StringField TrimF = null!;
+            public StringField TrimEmptyF = null!;
+            public Int32Field Defaulted = null!;
         }
     }
 
@@ -46,7 +46,7 @@ public class EntityExtensionsTests
 
         public class RowFields : RowFieldsBase
         {
-            public StringField Name = null;
+            public StringField Name = null!;
         }
     }
 

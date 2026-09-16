@@ -21,9 +21,9 @@ public class TabularDataReportTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field ID = null;
-            public StringField Name = null;
-            public DateTimeField Created = null;
+            public Int32Field ID = null!;
+            public StringField Name = null!;
+            public DateTimeField Created = null!;
             public EnumField<TestEnum> Enum = null;
         }
     }

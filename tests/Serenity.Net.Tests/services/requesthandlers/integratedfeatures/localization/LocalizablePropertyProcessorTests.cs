@@ -19,10 +19,10 @@ public class LocalizablePropertyProcessorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
-            public StringField Name = null;
-            public StringField Description = null;
-            public StringField Secret = null;
+            public Int32Field Id = null!;
+            public StringField Name = null!;
+            public StringField Description = null!;
+            public StringField Secret = null!;
         }
     }
 
@@ -40,11 +40,11 @@ public class LocalizablePropertyProcessorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int64Field Id = null;
-            public Int32Field MasterId = null;
-            public StringField LanguageId = null;
-            public StringField Name = null;
-            public StringField Description = null;
+            public Int64Field Id = null!;
+            public Int32Field MasterId = null!;
+            public StringField LanguageId = null!;
+            public StringField Name = null!;
+            public StringField Description = null!;
         }
     }
 
@@ -57,8 +57,8 @@ public class LocalizablePropertyProcessorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
-            public StringField Name = null;
+            public Int32Field Id = null!;
+            public StringField Name = null!;
         }
     }
 
@@ -70,7 +70,7 @@ public class LocalizablePropertyProcessorTests
         public int? Id { get => fields.Id[this]; set => fields.Id[this] = value; }
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
+            public Int32Field Id = null!;
         }
     }
 

@@ -18,7 +18,7 @@ public class DefaultRowFieldsProviderTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field ID = null;
+            public Int32Field ID = null!;
         }
     }
 
@@ -29,7 +29,7 @@ public class DefaultRowFieldsProviderTests
 
         public class RowFields(ITestDependency dependency) : RowFieldsBase
         {
-            public Int32Field ID = null;
+            public Int32Field ID = null!;
 
             public ITestDependency? Dependency { get; } = dependency;
         }

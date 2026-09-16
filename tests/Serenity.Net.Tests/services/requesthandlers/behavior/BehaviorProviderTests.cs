@@ -49,9 +49,9 @@ public class BehaviorProviderTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field ID = null;
-            public StringField Name = null;
-            public StringField Extra = null;
+            public Int32Field ID = null!;
+            public StringField Name = null!;
+            public StringField Extra = null!;
         }
     }
 
@@ -63,9 +63,9 @@ public class BehaviorProviderTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field ID = null;
-            public StringField Name = null;
-            public StringField Extra = null;
+            public Int32Field ID = null!;
+            public StringField Name = null!;
+            public StringField Extra = null!;
         }
     }
 

@@ -10,7 +10,7 @@ public partial class LocalizationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
+            public Int32Field Id = null!;
         }
     }
 
@@ -23,7 +23,7 @@ public partial class LocalizationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
+            public Int32Field Id = null!;
         }
     }
 
@@ -36,7 +36,7 @@ public partial class LocalizationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
+            public Int32Field Id = null!;
         }
     }
 
@@ -49,7 +49,7 @@ public partial class LocalizationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
+            public Int32Field Id = null!;
         }
     }
 
@@ -66,10 +66,10 @@ public partial class LocalizationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
-            public StringField Name = null;
-            public Int32Field Temp = null;
-            public StringField Secret = null;
+            public Int32Field Id = null!;
+            public StringField Name = null!;
+            public Int32Field Temp = null!;
+            public StringField Secret = null!;
         }
     }
 
@@ -84,8 +84,8 @@ public partial class LocalizationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
-            public StringField Secret = null;
+            public Int32Field Id = null!;
+            public StringField Secret = null!;
         }
     }
 
@@ -101,10 +101,10 @@ public partial class LocalizationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int64Field Id = null;
-            public Int32Field MasterId = null;
-            public StringField LanguageId = null;
-            public StringField Secret = null;
+            public Int64Field Id = null!;
+            public Int32Field MasterId = null!;
+            public StringField LanguageId = null!;
+            public StringField Secret = null!;
         }
     }
 
@@ -120,9 +120,9 @@ public partial class LocalizationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
-            public StringField Name = null;
-            public BooleanField IsDeleted = null;
+            public Int32Field Id = null!;
+            public StringField Name = null!;
+            public BooleanField IsDeleted = null!;
         }
     }
 

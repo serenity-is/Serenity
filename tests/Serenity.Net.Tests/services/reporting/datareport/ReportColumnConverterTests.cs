@@ -12,8 +12,8 @@ public class ReportColumnConverterTests
 
         public class RowFields : RowFieldsBase
         {
-            public StringField Name = null;
-            public DateTimeField Created = null;
+            public StringField Name = null!;
+            public DateTimeField Created = null!;
         }
     }
 

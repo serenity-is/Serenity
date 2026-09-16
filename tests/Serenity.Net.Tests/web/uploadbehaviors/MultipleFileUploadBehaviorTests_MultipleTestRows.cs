@@ -15,9 +15,9 @@ public partial class MultipleFileUploadBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
-            public StringField StringFieldImageUploadEditor = null;
-            public StringField ImageUploadEditorDisableDefaultBehavior = null;
+            public Int32Field Id = null!;
+            public StringField StringFieldImageUploadEditor = null!;
+            public StringField ImageUploadEditorDisableDefaultBehavior = null!;
         }
     }
 
@@ -63,17 +63,17 @@ public partial class MultipleFileUploadBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
-            public StringField Name = null;
-            public StringField StringFieldImageUploadEditor = null;
-            public Int32Field IntegerFieldImageUploadEditor = null;
-            public StringField ImageUploadEditorCorrectEditorType = null;
-            public StringField StringFieldExpression = null;
-            public StringField ImageUploadEditorReplaceField = null;
-            public StringField ImageUploadEditorInvalidReplaceField = null;
-            public StringField ImageUploadEditorReplaceFieldNoField = null;
-            public StringField ImageUploadEditorOriginalName = null;
-            public StringField ImageUploadEditorCopyToHistory = null;
+            public Int32Field Id = null!;
+            public StringField Name = null!;
+            public StringField StringFieldImageUploadEditor = null!;
+            public Int32Field IntegerFieldImageUploadEditor = null!;
+            public StringField ImageUploadEditorCorrectEditorType = null!;
+            public StringField StringFieldExpression = null!;
+            public StringField ImageUploadEditorReplaceField = null!;
+            public StringField ImageUploadEditorInvalidReplaceField = null!;
+            public StringField ImageUploadEditorReplaceFieldNoField = null!;
+            public StringField ImageUploadEditorOriginalName = null!;
+            public StringField ImageUploadEditorCopyToHistory = null!;
         }
     }
 
@@ -91,9 +91,9 @@ public partial class MultipleFileUploadBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
-            public StringField StringFieldImageUploadEditor = null;
-            public Int16Field IsActive = null;
+            public Int32Field Id = null!;
+            public StringField StringFieldImageUploadEditor = null!;
+            public Int16Field IsActive = null!;
         }
     }
 
@@ -111,9 +111,9 @@ public partial class MultipleFileUploadBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
-            public StringField StringFieldImageUploadEditor = null;
-            public BooleanField IsDeleted = null;
+            public Int32Field Id = null!;
+            public StringField StringFieldImageUploadEditor = null!;
+            public BooleanField IsDeleted = null!;
         }
     }
 
@@ -134,10 +134,10 @@ public partial class MultipleFileUploadBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
-            public StringField StringFieldImageUploadEditor = null;
-            public Int32Field DeleteUserId = null;
-            public DateTimeField DeleteDate = null;
+            public Int32Field Id = null!;
+            public StringField StringFieldImageUploadEditor = null!;
+            public Int32Field DeleteUserId = null!;
+            public DateTimeField DeleteDate = null!;
         }
     }
 }

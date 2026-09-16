@@ -10,7 +10,7 @@ public partial class DeleteRequestHandlerTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
+            public Int32Field Id = null!;
         }
     }
 

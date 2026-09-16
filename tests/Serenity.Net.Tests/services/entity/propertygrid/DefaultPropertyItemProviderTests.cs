@@ -37,8 +37,8 @@ public class DefaultPropertyItemProviderTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field ID = null;
-            public StringField Name = null;
+            public Int32Field ID = null!;
+            public StringField Name = null!;
         }
     }
 

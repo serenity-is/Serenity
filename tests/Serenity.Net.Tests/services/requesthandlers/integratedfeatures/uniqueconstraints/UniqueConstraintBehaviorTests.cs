@@ -15,8 +15,8 @@ public class UniqueConstraintBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
-            public StringField Name = null;
+            public Int32Field Id = null!;
+            public StringField Name = null!;
         }
     }
 

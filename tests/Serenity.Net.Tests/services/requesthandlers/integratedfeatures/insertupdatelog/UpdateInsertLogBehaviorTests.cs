@@ -24,11 +24,11 @@ public class UpdateInsertLogBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
-            public DateTimeField InsertDate = null;
-            public DateTimeField UpdateDate = null;
-            public Int32Field InsertUserId = null;
-            public Int32Field UpdateUserId = null;
+            public Int32Field Id = null!;
+            public DateTimeField InsertDate = null!;
+            public DateTimeField UpdateDate = null!;
+            public Int32Field InsertUserId = null!;
+            public Int32Field UpdateUserId = null!;
         }
     }
 
@@ -70,7 +70,7 @@ public class UpdateInsertLogBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
+            public Int32Field Id = null!;
         }
     }
 

@@ -19,10 +19,10 @@ public class RowLookupScriptTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
-            public StringField Name = null;
-            public Int32Field ParentId = null;
-            public StringField Code = null;
+            public Int32Field Id = null!;
+            public StringField Name = null!;
+            public Int32Field ParentId = null!;
+            public StringField Code = null!;
         }
     }
 

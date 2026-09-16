@@ -16,8 +16,8 @@ public class UndeleteRequestHandlerTests_Coverage
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
-            public BooleanField IsDeleted = null;
+            public Int32Field Id = null!;
+            public BooleanField IsDeleted = null!;
         }
     }
 
@@ -31,8 +31,8 @@ public class UndeleteRequestHandlerTests_Coverage
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
-            public Int16Field IsActive = null;
+            public Int32Field Id = null!;
+            public Int16Field IsActive = null!;
         }
     }
 
@@ -48,9 +48,9 @@ public class UndeleteRequestHandlerTests_Coverage
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
-            public DateTimeField DeleteDate = null;
-            public Int64Field DeleteUserId = null;
+            public Int32Field Id = null!;
+            public DateTimeField DeleteDate = null!;
+            public Int64Field DeleteUserId = null!;
         }
     }
 
@@ -68,10 +68,10 @@ public class UndeleteRequestHandlerTests_Coverage
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
-            public BooleanField IsDeleted = null;
-            public DateTimeField DeleteDate = null;
-            public Int64Field DeleteUserId = null;
+            public Int32Field Id = null!;
+            public BooleanField IsDeleted = null!;
+            public DateTimeField DeleteDate = null!;
+            public Int64Field DeleteUserId = null!;
         }
     }
 
@@ -83,7 +83,7 @@ public class UndeleteRequestHandlerTests_Coverage
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
+            public Int32Field Id = null!;
         }
     }
 
@@ -99,9 +99,9 @@ public class UndeleteRequestHandlerTests_Coverage
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
-            public BooleanField IsDeleted = null;
-            public Int32Field Order = null;
+            public Int32Field Id = null!;
+            public BooleanField IsDeleted = null!;
+            public Int32Field Order = null!;
         }
     }
 
@@ -115,8 +115,8 @@ public class UndeleteRequestHandlerTests_Coverage
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
-            public BooleanField IsDeleted = null;
+            public Int32Field Id = null!;
+            public BooleanField IsDeleted = null!;
         }
     }
 
@@ -130,8 +130,8 @@ public class UndeleteRequestHandlerTests_Coverage
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
-            public BooleanField IsDeleted = null;
+            public Int32Field Id = null!;
+            public BooleanField IsDeleted = null!;
         }
     }
 
@@ -145,8 +145,8 @@ public class UndeleteRequestHandlerTests_Coverage
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
-            public BooleanField IsDeleted = null;
+            public Int32Field Id = null!;
+            public BooleanField IsDeleted = null!;
         }
     }
 

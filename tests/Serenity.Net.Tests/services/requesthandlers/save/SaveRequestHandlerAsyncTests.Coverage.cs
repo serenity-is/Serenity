@@ -15,8 +15,8 @@ public class SaveRequestHandlerAsyncTests_Coverage
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
-            public StringField Name = null;
+            public Int32Field Id = null!;
+            public StringField Name = null!;
         }
     }
 
@@ -30,8 +30,8 @@ public class SaveRequestHandlerAsyncTests_Coverage
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
-            public StringField Name = null;
+            public Int32Field Id = null!;
+            public StringField Name = null!;
         }
     }
 
@@ -46,8 +46,8 @@ public class SaveRequestHandlerAsyncTests_Coverage
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
-            public Int32Field Order = null;
+            public Int32Field Id = null!;
+            public Int32Field Order = null!;
         }
     }
 

@@ -15,8 +15,8 @@ public partial class CaptureLogBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
-            public StringField Name = null;
+            public Int32Field Id = null!;
+            public StringField Name = null!;
         }
     }
 
@@ -38,11 +38,11 @@ public partial class CaptureLogBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int64Field LogId = null;
+            public Int64Field LogId = null!;
             public EnumField<CaptureOperationType> OperationType = null;
-            public Int32Field ChangingUserId = null;
-            public DateTimeField ValidFrom = null;
-            public DateTimeField ValidUntil = null;
+            public Int32Field ChangingUserId = null!;
+            public DateTimeField ValidFrom = null!;
+            public DateTimeField ValidUntil = null!;
         }
     }
 

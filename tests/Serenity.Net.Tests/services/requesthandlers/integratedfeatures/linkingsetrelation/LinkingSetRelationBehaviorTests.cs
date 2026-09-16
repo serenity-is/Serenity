@@ -16,7 +16,7 @@ public class LinkingSetRelationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field ID = null;
+            public Int32Field ID = null!;
             public ListField<int> SelectedItems = null;
         }
     }
@@ -35,9 +35,9 @@ public class LinkingSetRelationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int64Field ID = null;
-            public Int32Field MasterID = null;
-            public Int32Field ItemID = null;
+            public Int64Field ID = null!;
+            public Int32Field MasterID = null!;
+            public Int32Field ItemID = null!;
         }
     }
 
@@ -268,10 +268,10 @@ public class LinkingSetRelationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int64Field ID = null;
-            public Int32Field MasterID = null;
-            public Int32Field ItemID = null;
-            public Int32Field KindID = null;
+            public Int64Field ID = null!;
+            public Int32Field MasterID = null!;
+            public Int32Field ItemID = null!;
+            public Int32Field KindID = null!;
         }
     }
 
@@ -287,7 +287,7 @@ public class LinkingSetRelationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field ID = null;
+            public Int32Field ID = null!;
             public ListField<int> SelectedItems = null;
         }
     }
@@ -304,7 +304,7 @@ public class LinkingSetRelationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field ID = null;
+            public Int32Field ID = null!;
             public ListField<int> SelectedItems = null;
         }
     }
@@ -321,7 +321,7 @@ public class LinkingSetRelationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field ID = null;
+            public Int32Field ID = null!;
             public ListField<int> SelectedItems = null;
         }
     }
@@ -338,7 +338,7 @@ public class LinkingSetRelationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field ID = null;
+            public Int32Field ID = null!;
             public ListField<int> SelectedItems = null;
         }
     }
@@ -355,7 +355,7 @@ public class LinkingSetRelationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field ID = null;
+            public Int32Field ID = null!;
             public ListField<int> SelectedItems = null;
         }
     }
@@ -374,8 +374,8 @@ public class LinkingSetRelationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field ID = null;
-            public BooleanField IsDeleted = null;
+            public Int32Field ID = null!;
+            public BooleanField IsDeleted = null!;
             public ListField<int> SelectedItems = null;
         }
     }
@@ -392,7 +392,7 @@ public class LinkingSetRelationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field ID = null;
+            public Int32Field ID = null!;
             public ListField<int> SelectedItems = null;
         }
     }
@@ -409,8 +409,8 @@ public class LinkingSetRelationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field ID = null;
-            public Int32Field SelectedItems = null;
+            public Int32Field ID = null!;
+            public Int32Field SelectedItems = null!;
         }
     }
 
@@ -422,8 +422,8 @@ public class LinkingSetRelationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field MasterID = null;
-            public Int32Field ItemID = null;
+            public Int32Field MasterID = null!;
+            public Int32Field ItemID = null!;
         }
     }
 
@@ -455,7 +455,7 @@ public class LinkingSetRelationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field ID = null;
+            public Int32Field ID = null!;
             public ListField<int> BadRowType = null;
             public ListField<int> NotIdRowType = null;
             public ListField<int> MissingThisKey = null;

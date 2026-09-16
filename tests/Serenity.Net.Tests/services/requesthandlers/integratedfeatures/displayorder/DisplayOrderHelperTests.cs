@@ -13,8 +13,8 @@ public class DisplayOrderHelperTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field ID = null;
-            public Int32Field Order = null;
+            public Int32Field ID = null!;
+            public Int32Field Order = null!;
         }
     }
 

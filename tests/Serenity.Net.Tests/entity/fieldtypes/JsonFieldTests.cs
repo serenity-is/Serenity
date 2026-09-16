@@ -14,7 +14,7 @@ public class JsonFieldTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field ID = null;
+            public Int32Field ID = null!;
             public JsonField<SampleJson> AJson = null;
 
             public RowFields()

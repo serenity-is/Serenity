@@ -9,7 +9,7 @@ public class DisplayOrderFilterHelperTests
         public int? ID { get => fields.ID[this]; set => fields.ID[this] = value; }
         public class RowFields : RowFieldsBase
         {
-            public Int32Field ID = null;
+            public Int32Field ID = null!;
         }
     }
 
@@ -24,8 +24,8 @@ public class DisplayOrderFilterHelperTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field ID = null;
-            public Int32Field ParentId = null;
+            public Int32Field ID = null!;
+            public Int32Field ParentId = null!;
         }
     }
 
@@ -40,8 +40,8 @@ public class DisplayOrderFilterHelperTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field ID = null;
-            public Int16Field IsActive = null;
+            public Int32Field ID = null!;
+            public Int16Field IsActive = null!;
         }
     }
 
@@ -56,8 +56,8 @@ public class DisplayOrderFilterHelperTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field ID = null;
-            public BooleanField IsDeleted = null;
+            public Int32Field ID = null!;
+            public BooleanField IsDeleted = null!;
         }
     }
 
@@ -76,10 +76,10 @@ public class DisplayOrderFilterHelperTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field ID = null;
-            public Int32Field ParentId = null;
-            public Int16Field IsActive = null;
-            public BooleanField IsDeleted = null;
+            public Int32Field ID = null!;
+            public Int32Field ParentId = null!;
+            public Int16Field IsActive = null!;
+            public BooleanField IsDeleted = null!;
         }
     }
 

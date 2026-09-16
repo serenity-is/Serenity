@@ -25,7 +25,7 @@ public class PropertyInfoSourceTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field ID = null;
+            public Int32Field ID = null!;
             public EnumField<MyEnum> EnumProp = null;
             public EnumField<MyEnum> EnumMapped = null;
         }

@@ -10,7 +10,7 @@ public partial class CaptureLogBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
+            public Int32Field Id = null!;
         }
     }
 
@@ -21,7 +21,7 @@ public partial class CaptureLogBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
+            public Int32Field Id = null!;
         }
     }
 
@@ -37,9 +37,9 @@ public partial class CaptureLogBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
-            public StringField Name = null;
-            public BooleanField IsDeleted = null;
+            public Int32Field Id = null!;
+            public StringField Name = null!;
+            public BooleanField IsDeleted = null!;
         }
     }
 
@@ -54,8 +54,8 @@ public partial class CaptureLogBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
-            public Int16Field IsActive = null;
+            public Int32Field Id = null!;
+            public Int16Field IsActive = null!;
         }
     }
 
@@ -72,9 +72,9 @@ public partial class CaptureLogBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
-            public Int32Field DeleteUserId = null;
-            public DateTimeField DeleteDate = null;
+            public Int32Field Id = null!;
+            public Int32Field DeleteUserId = null!;
+            public DateTimeField DeleteDate = null!;
         }
     }
 
@@ -97,12 +97,12 @@ public partial class CaptureLogBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
-            public StringField Name = null;
-            public DateTimeField InsertDate = null;
-            public Int32Field InsertUserId = null;
-            public DateTimeField UpdateDate = null;
-            public Int32Field UpdateUserId = null;
+            public Int32Field Id = null!;
+            public StringField Name = null!;
+            public DateTimeField InsertDate = null!;
+            public Int32Field InsertUserId = null!;
+            public DateTimeField UpdateDate = null!;
+            public Int32Field UpdateUserId = null!;
         }
     }
 
@@ -113,7 +113,7 @@ public partial class CaptureLogBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
+            public Int32Field Id = null!;
         }
     }
 
@@ -126,7 +126,7 @@ public partial class CaptureLogBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
+            public Int32Field Id = null!;
         }
     }
 
@@ -139,7 +139,7 @@ public partial class CaptureLogBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
+            public Int32Field Id = null!;
         }
     }
 
@@ -161,12 +161,12 @@ public partial class CaptureLogBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int64Field LogId = null;
+            public Int64Field LogId = null!;
             public EnumField<CaptureOperationType> OperationType = null;
-            public Int32Field ChangingUserId = null;
-            public DateTimeField ValidFrom = null;
-            public DateTimeField ValidUntil = null;
-            public StringField Foo = null;
+            public Int32Field ChangingUserId = null!;
+            public DateTimeField ValidFrom = null!;
+            public DateTimeField ValidUntil = null!;
+            public StringField Foo = null!;
         }
     }
 
@@ -180,8 +180,8 @@ public partial class CaptureLogBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
-            public StringField Name = null;
+            public Int32Field Id = null!;
+            public StringField Name = null!;
         }
     }
 

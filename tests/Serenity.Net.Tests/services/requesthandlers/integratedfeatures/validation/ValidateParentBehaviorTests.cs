@@ -16,8 +16,8 @@ public class ValidateParentBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
-            public Int16Field IsActive = null;
+            public Int32Field Id = null!;
+            public Int16Field IsActive = null!;
         }
     }
 
@@ -34,8 +34,8 @@ public class ValidateParentBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
-            public Int32Field ParentId = null;
+            public Int32Field Id = null!;
+            public Int32Field ParentId = null!;
         }
     }
 

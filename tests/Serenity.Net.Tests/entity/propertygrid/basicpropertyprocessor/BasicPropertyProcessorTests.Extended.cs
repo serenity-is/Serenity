@@ -120,8 +120,8 @@ public partial class BasicPropertyProcessorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field ID = null;
-            public StringField Name = null;
+            public Int32Field ID = null!;
+            public StringField Name = null!;
         }
     }
 
@@ -151,13 +151,13 @@ public partial class BasicPropertyProcessorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field ID = null;
-            public StringField Name = null;
-            public StringField Locked = null;
-            public StringField Computed = null;
-            public Int32Field IntField = null;
-            public Int16Field ShortField = null;
-            public DateTimeField DateTimeField = null;
+            public Int32Field ID = null!;
+            public StringField Name = null!;
+            public StringField Locked = null!;
+            public StringField Computed = null!;
+            public Int32Field IntField = null!;
+            public Int16Field ShortField = null!;
+            public DateTimeField DateTimeField = null!;
         }
     }
 

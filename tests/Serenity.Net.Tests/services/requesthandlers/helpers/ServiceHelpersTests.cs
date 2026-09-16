@@ -97,7 +97,7 @@ public class ServiceHelpersTests
 
             public class RowFields : RowFieldsBase
             {
-                public Int32Field ID = null;
+                public Int32Field ID = null!;
             }
         }
 
@@ -107,7 +107,7 @@ public class ServiceHelpersTests
 
             public class RowFields : RowFieldsBase
             {
-                public Int32Field ID = null;
+                public Int32Field ID = null!;
             }
         }
 
@@ -117,7 +117,7 @@ public class ServiceHelpersTests
 
             public class RowFields : RowFieldsBase
             {
-                public Int32Field ID = null;
+                public Int32Field ID = null!;
             }
         }
 

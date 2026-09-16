@@ -22,13 +22,13 @@ public class DataValidationTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field ID = null;
-            public StringField Name = null;
-            public Int32Field Number = null;
-            public DateTimeField Date = null;
-            public Int32Field WithDefault = null;
-            public DateTimeField Start = null;
-            public DateTimeField Finish = null;
+            public Int32Field ID = null!;
+            public StringField Name = null!;
+            public Int32Field Number = null!;
+            public DateTimeField Date = null!;
+            public Int32Field WithDefault = null!;
+            public DateTimeField Start = null!;
+            public DateTimeField Finish = null!;
         }
 
         public TestRow()

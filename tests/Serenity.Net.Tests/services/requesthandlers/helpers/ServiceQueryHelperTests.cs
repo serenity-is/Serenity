@@ -12,8 +12,8 @@ public class ServiceQueryHelperTests
 
         public class RowFields : RowFieldsBase
         {
-            public StringField Name = null;
-            public Int32Field Age = null;
+            public StringField Name = null!;
+            public Int32Field Age = null!;
         }
     }
 
@@ -25,7 +25,7 @@ public class ServiceQueryHelperTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int16Field IsActive = null;
+            public Int16Field IsActive = null!;
         }
     }
 
@@ -38,7 +38,7 @@ public class ServiceQueryHelperTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int16Field IsActive = null;
+            public Int16Field IsActive = null!;
         }
     }
 
@@ -50,7 +50,7 @@ public class ServiceQueryHelperTests
 
         public class RowFields : RowFieldsBase
         {
-            public BooleanField IsDeleted = null;
+            public BooleanField IsDeleted = null!;
         }
     }
 
@@ -65,8 +65,8 @@ public class ServiceQueryHelperTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field DeleteUserId = null;
-            public DateTimeField DeleteDate = null;
+            public Int32Field DeleteUserId = null!;
+            public DateTimeField DeleteDate = null!;
         }
     }
 

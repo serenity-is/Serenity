@@ -14,7 +14,7 @@ public partial class MasterDetailRelationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field ID = null;
+            public Int32Field ID = null!;
             public RowListField<Int32DetailRow> DetailList = null;
         }
     }
@@ -31,7 +31,7 @@ public partial class MasterDetailRelationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field ID = null;
+            public Int32Field ID = null!;
             public RowListField<Int32DetailRow> DetailList = null;
         }
     }
@@ -50,8 +50,8 @@ public partial class MasterDetailRelationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field ID = null;
-            public BooleanField IsDeleted = null;
+            public Int32Field ID = null!;
+            public BooleanField IsDeleted = null!;
             public RowListField<Int32DetailRow> DetailList = null;
         }
     }
@@ -71,8 +71,8 @@ public partial class MasterDetailRelationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field ID = null;
-            public StringField Code = null;
+            public Int32Field ID = null!;
+            public StringField Code = null!;
             public RowListField<Int32DetailRow> DetailList = null;
         }
     }
@@ -89,7 +89,7 @@ public partial class MasterDetailRelationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field ID = null;
+            public Int32Field ID = null!;
             public RowListField<Int32DetailRow> DetailList = null;
         }
     }
@@ -106,7 +106,7 @@ public partial class MasterDetailRelationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field ID = null;
+            public Int32Field ID = null!;
             public RowListField<Int32DetailRow> DetailList = null;
         }
     }
@@ -132,7 +132,7 @@ public partial class MasterDetailRelationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field ID = null;
+            public Int32Field ID = null!;
             public RowListField<Int32DetailRow> DetailList = null;
         }
     }
@@ -165,8 +165,8 @@ public partial class MasterDetailRelationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field ID = null;
-            public Int32Field NotAList = null;
+            public Int32Field ID = null!;
+            public Int32Field NotAList = null!;
             public ListField<int> NotRows = null;
             public RowListField<Int32DetailRow> MissingFk = null;
             public RowListField<Int32DetailRow> MissingFilter = null;

@@ -11,8 +11,8 @@ public class ServiceHelperTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field ID = null;
-            public Int32Field Number = null;
+            public Int32Field ID = null!;
+            public Int32Field Number = null!;
         }
     }
 

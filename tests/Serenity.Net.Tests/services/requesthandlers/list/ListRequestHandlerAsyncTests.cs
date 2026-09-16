@@ -10,7 +10,7 @@ public class ListRequestHandlerAsyncTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
+            public Int32Field Id = null!;
         }
     }
 
@@ -22,7 +22,7 @@ public class ListRequestHandlerAsyncTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
+            public Int32Field Id = null!;
         }
     }
 

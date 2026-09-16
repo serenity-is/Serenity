@@ -12,8 +12,8 @@ public class DistinctValuesRegistrationTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
-            public StringField Category = null;
+            public Int32Field Id = null!;
+            public StringField Category = null!;
         }
     }
 

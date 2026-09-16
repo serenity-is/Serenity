@@ -13,9 +13,9 @@ public class UndeleteRequestHandlerTests_Basic
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field ID = null;
-            public StringField Name = null;
-            public BooleanField IsDeleted = null;
+            public Int32Field ID = null!;
+            public StringField Name = null!;
+            public BooleanField IsDeleted = null!;
         }
     }
 

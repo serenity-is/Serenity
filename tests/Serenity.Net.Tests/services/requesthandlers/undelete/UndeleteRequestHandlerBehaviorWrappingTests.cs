@@ -16,8 +16,8 @@ public class UndeleteRequestHandlerBehaviorWrappingTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
-            public BooleanField IsDeleted = null;
+            public Int32Field Id = null!;
+            public BooleanField IsDeleted = null!;
         }
     }
 

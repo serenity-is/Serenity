@@ -11,7 +11,7 @@ public class RequestProcessorWrapperTests
         public int? ID { get => fields.ID[this]; set => fields.ID[this] = value; }
         public class RowFields : RowFieldsBase
         {
-            public Int32Field ID = null;
+            public Int32Field ID = null!;
         }
     }
 

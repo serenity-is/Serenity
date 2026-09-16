@@ -19,10 +19,10 @@ public class EntityQueryExtensionsTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
-            public StringField Name = null;
-            public StringField NotMappedF = null;
-            public StringField ForeignF = null;
+            public Int32Field Id = null!;
+            public StringField Name = null!;
+            public StringField NotMappedF = null!;
+            public StringField ForeignF = null!;
         }
     }
 

@@ -38,15 +38,15 @@ public partial class CriteriaFieldExpressionReplacerTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
-            public StringField Name = null;
-            public StringField LookupIncludeField = null;
-            public StringField NormalField = null;
-            public StringField ExtraReadPermissionField = null;
-            public StringField ExtraReadPermissionWithLookupIncludeField = null;
-            public StringField DenyFilteringField = null;
-            public StringField NotMappedField = null;
-            public StringField MinSelectLevelNeverField = null;
+            public Int32Field Id = null!;
+            public StringField Name = null!;
+            public StringField LookupIncludeField = null!;
+            public StringField NormalField = null!;
+            public StringField ExtraReadPermissionField = null!;
+            public StringField ExtraReadPermissionWithLookupIncludeField = null!;
+            public StringField DenyFilteringField = null!;
+            public StringField NotMappedField = null!;
+            public StringField MinSelectLevelNeverField = null!;
         }
     }
 }

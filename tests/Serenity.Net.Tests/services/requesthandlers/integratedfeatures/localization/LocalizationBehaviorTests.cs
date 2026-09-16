@@ -18,9 +18,9 @@ public partial class LocalizationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id = null;
-            public StringField Name = null;
-            public StringField Description = null;
+            public Int32Field Id = null!;
+            public StringField Name = null!;
+            public StringField Description = null!;
         }
     }
 
@@ -42,11 +42,11 @@ public partial class LocalizationBehaviorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int64Field Id = null;
-            public Int32Field MasterId = null;
-            public StringField LanguageId = null;
-            public StringField Name = null;
-            public StringField Description = null;
+            public Int64Field Id = null!;
+            public Int32Field MasterId = null!;
+            public StringField LanguageId = null!;
+            public StringField Name = null!;
+            public StringField Description = null!;
         }
     }
 

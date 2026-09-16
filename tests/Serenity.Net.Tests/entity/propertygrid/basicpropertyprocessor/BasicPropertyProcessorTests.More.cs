@@ -43,19 +43,19 @@ public partial class BasicPropertyProcessorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field ID = null;
-            public StringField Name = null;
-            public StringField Titled = null;
-            public StringField Defaulted = null;
-            public StringField Perms = null;
-            public StringField Locked = null;
-            public StringField Computed = null;
-            public Int32Field IntField = null;
-            public Int64Field LongField = null;
-            public DecimalField DecimalField = null;
-            public DateTimeField DateTimeField = null;
-            public StringField DistinctField = null;
-            public StringField DistinctRtField = null;
+            public Int32Field ID = null!;
+            public StringField Name = null!;
+            public StringField Titled = null!;
+            public StringField Defaulted = null!;
+            public StringField Perms = null!;
+            public StringField Locked = null!;
+            public StringField Computed = null!;
+            public Int32Field IntField = null!;
+            public Int64Field LongField = null!;
+            public DecimalField DecimalField = null!;
+            public DateTimeField DateTimeField = null!;
+            public StringField DistinctField = null!;
+            public StringField DistinctRtField = null!;
         }
     }
 
@@ -70,8 +70,8 @@ public partial class BasicPropertyProcessorTests
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field ID = null;
-            public StringField Name = null;
+            public Int32Field ID = null!;
+            public StringField Name = null!;
         }
     }
 
@@ -231,19 +231,19 @@ public partial class BasicPropertyProcessorTests
 
         public class RowFields : RowFieldsBase
         {
-            public StringField StringSmall = null;
-            public StringField StringNoSize = null;
-            public StringField StringLarge = null;
-            public BooleanField BoolField = null;
-            public DateTimeField DateField = null;
-            public DateOnlyField DateOnlyField = null;
-            public TimeSpanField TimeField = null;
-            public Int16Field Int16Field = null;
-            public Int32Field Int32Field = null;
-            public SingleField SingleField = null;
-            public DoubleField DoubleField = null;
-            public DecimalField DecimalField = null;
-            public GuidField GuidField = null;
+            public StringField StringSmall = null!;
+            public StringField StringNoSize = null!;
+            public StringField StringLarge = null!;
+            public BooleanField BoolField = null!;
+            public DateTimeField DateField = null!;
+            public DateOnlyField DateOnlyField = null!;
+            public TimeSpanField TimeField = null!;
+            public Int16Field Int16Field = null!;
+            public Int32Field Int32Field = null!;
+            public SingleField SingleField = null!;
+            public DoubleField DoubleField = null!;
+            public DecimalField DecimalField = null!;
+            public GuidField GuidField = null!;
         }
     }
 
