@@ -47,7 +47,7 @@ public partial class ColumnsTemplateTests : BaseTemplateTest
                 public int? CustomerId { get; set; }
                 [EditLink]
                 public string? CustomerName { get; set; }
-                public string CityName { get; set; }
+                public string? CityName { get; set; }
             }
         }
         """"";

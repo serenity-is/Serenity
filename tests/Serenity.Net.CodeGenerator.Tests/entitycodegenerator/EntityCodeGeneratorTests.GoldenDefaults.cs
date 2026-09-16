@@ -348,7 +348,7 @@ public partial class EntityCodeGeneratorTests
                 public int? CustomerId { get; set; }
                 [EditLink]
                 public string? CustomerName { get; set; }
-                public string CityName { get; set; }
+                public string? CityName { get; set; }
             }
             """,
         ["Modules/TestModule/Customer/CustomerForm.cs"] = """
@@ -415,8 +415,7 @@ public partial class EntityCodeGeneratorTests
             var expected = NullableGoldenOverrides.TryGetValue(pair.Key, out var overriden) ?
                 overriden : pair.Value;
             var actual = fileSystem.ReadAllText(path);
-            Assert.True(expected.ReplaceLineEndings() == actual.ReplaceLineEndings(),
-                "Content mismatch in file: " + pair.Key);
+            Assert.Equal(expected.ReplaceLineEndings(), actual.ReplaceLineEndings());
         }
     }
 
@@ -434,8 +433,7 @@ public partial class EntityCodeGeneratorTests
             var path = "/app/" + pair.Key;
             Assert.True(fileSystem.FileExists(path), "Missing file: " + pair.Key);
             var actual = fileSystem.ReadAllText(path);
-            Assert.True(pair.Value.ReplaceLineEndings() == actual.ReplaceLineEndings(),
-                "Content mismatch in file: " + pair.Key);
+            Assert.Equal(pair.Value.ReplaceLineEndings(), actual.ReplaceLineEndings());
         }
     }
 }

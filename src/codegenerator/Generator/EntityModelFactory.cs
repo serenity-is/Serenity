@@ -350,8 +350,10 @@ public class EntityModelFactory : IEntityModelFactory
                             PropertyName = pkNameProp.PropertyName,
                             Name = pkNameProp.ColumnName!,
                             DataType = "string",
+                            IsValueType = false,
                             FieldType = "String",
-                            TSType = "string"
+                            TSType = "string",
+                            NullableRefTypes = inputs.NullableRefTypes
                         };
 
                         nameViewField.Title = Inflector.Inflector.Titleize(JoinUnderscore(entityJoin.Name!,

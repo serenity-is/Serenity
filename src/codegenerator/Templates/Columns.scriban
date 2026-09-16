@@ -10,7 +10,7 @@ public class {{ColumnsClassName}}
     [{{ATTRREF x.ColAttributeList}}]
     {{~end~}}
     {{~if x.TextualField~}}
-    public string {{x.TextualField}} { get; set; }
+    public {{NullableRefTypes ? "string?" : "string"}} {{x.TextualField}} { get; set; }
     {{~else~}}
     public {{TYPEREF x.PropertyType}} {{x.PropertyName}} { get; set; }
     {{~end~}}
