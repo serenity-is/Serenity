@@ -17,7 +17,7 @@ namespace Serenity.Data;
 /// <param name="getValue">The get value.</param>
 /// <param name="setValue">The set value.</param>
 public class JsonField<TValue>(ICollection<Field> collection, string name, LocalText? caption = null, int size = 0, FieldFlags flags = FieldFlags.Default,
-    Func<IRow, TValue>? getValue = null, Action<IRow, TValue?>? setValue = null) : GenericClassField<TValue>(collection, FieldType.Object, name, caption, size, flags, getValue, setValue)
+    Func<IRow, TValue?>? getValue = null, Action<IRow, TValue?>? setValue = null) : GenericClassField<TValue>(collection, FieldType.Object, name, caption, size, flags, getValue, setValue)
     where TValue : class
 {
 
@@ -33,7 +33,7 @@ public class JsonField<TValue>(ICollection<Field> collection, string name, Local
     /// <param name="setValue">The set value.</param>
     /// <returns>A new JsonField instance.</returns>
     public static JsonField<TValue> Factory(ICollection<Field> collection, string name, LocalText? caption, int size, FieldFlags flags,
-        Func<IRow, TValue> getValue, Action<IRow, TValue?> setValue)
+        Func<IRow, TValue?> getValue, Action<IRow, TValue?> setValue)
     {
         return new JsonField<TValue>(collection, name, caption, size, flags, getValue, setValue);
     }

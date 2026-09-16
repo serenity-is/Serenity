@@ -122,7 +122,7 @@ public class ReportRegistry(ITypeSource typeSource, IPermissionService permissio
         foreach (var k in reportsByCategory!)
             if (string.IsNullOrEmpty(categoryKey) ||
                 string.Compare(k.Key, categoryKey, StringComparison.OrdinalIgnoreCase) == 0 ||
-                (k.Key + "/").StartsWith((categoryKey ?? ""), StringComparison.OrdinalIgnoreCase))
+                (k.Key + "/").StartsWith(categoryKey ?? "", StringComparison.OrdinalIgnoreCase))
             {
                 foreach (var report in k.Value)
                     if (report.Permission == null || permissions.HasPermission(report.Permission))

@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data.Mapping;
+namespace Serenity.Data.Mapping;
 
 /// <summary>
 /// Dialect specific SQL expression for UTC date/time.
@@ -8,7 +8,7 @@ public class SqlUtcNowAttribute : BaseExpressionAttribute
     /// <inheritdoc />
     public override string Translate(ISqlDialect dialect)
     {
-        return (dialect.ServerType) switch
+        return dialect.ServerType switch
         {
             nameof(ServerType.Firebird) => "DATEDIFF(second, timestamp '1/1/1970 00:00:00', current_timestamp)",
             nameof(ServerType.MySql) => "UTC_TIMESTAMP",

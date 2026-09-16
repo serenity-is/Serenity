@@ -20,7 +20,7 @@ public abstract class GenericClassField<TValue> : Field where TValue : class
         Func<IRow, TValue?>? getValue = null, Action<IRow, TValue?>? setValue = null)
         : base(collection, type, name, caption, size, flags)
     {
-        _getValue = getValue ?? (r => (TValue?)(r.GetIndexedData(index)));
+        _getValue = getValue ?? (r => (TValue?)r.GetIndexedData(index));
         _setValue = setValue ?? ((r, v) => r.SetIndexedData(index, v));
     }
 

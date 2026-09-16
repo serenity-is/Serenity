@@ -1278,7 +1278,7 @@ public abstract class BaseCriteria : ICriteria
 
         public Parameter AutoParam()
         {
-            return new Parameter((next++).IndexParam());
+            return new Parameter(next++.IndexParam());
         }
 
         public IDictionary<string, object?>? Params => null;

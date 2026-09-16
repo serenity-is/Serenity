@@ -72,11 +72,11 @@ public static class UploadFormatting
     /// <param name="bytes">File size in bytes</param>
     public static string FileSizeDisplay(int bytes)
     {
-        var byteSize = (Math.Round(bytes * 100m / 1024m) * 0.01m);
+        var byteSize = Math.Round(bytes * 100m / 1024m) * 0.01m;
         var suffix = "KB";
         if (byteSize > 1000)
         {
-            byteSize = (Math.Round(byteSize * 0.001m * 100m) * 0.01m);
+            byteSize = Math.Round(byteSize * 0.001m * 100m) * 0.01m;
             suffix = "MB";
         }
 

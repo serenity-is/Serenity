@@ -34,7 +34,7 @@ public class MySqlSchemaProvider : ISchemaProvider
                 var fi = new FieldInfo
                 {
                     FieldName = src.Field!,
-                    IsNullable = (src.Null) != "NO"
+                    IsNullable = src.Null != "NO"
                 };
                 var dataType = src.Type;
                 var dx = dataType!.IndexOf('(');

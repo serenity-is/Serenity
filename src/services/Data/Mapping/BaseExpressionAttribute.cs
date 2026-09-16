@@ -87,7 +87,7 @@ public abstract class BaseExpressionAttribute : Attribute
             !t1.IsAbstract &&
             typeof(BaseExpressionAttribute).IsAssignableFrom(t1))
         {
-            var instance = (BaseExpressionAttribute)(Activator.CreateInstance(t1)!);
+            var instance = (BaseExpressionAttribute)Activator.CreateInstance(t1)!;
             return instance.ToString(dialect);
         }
 

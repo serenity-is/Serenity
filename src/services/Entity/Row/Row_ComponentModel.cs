@@ -40,8 +40,8 @@ public abstract partial class Row<TFields> : IEditableRow
 
     bool IEditableRow.IsFieldChanged(Field field)
     {
-        return (originalValues != null &&
-                field.IndexCompare(originalValues, this) != 0);
+        return originalValues != null &&
+                field.IndexCompare(originalValues, this) != 0;
     }
 
     event PropertyChangedEventHandler? INotifyPropertyChanged.PropertyChanged

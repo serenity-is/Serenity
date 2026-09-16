@@ -13,7 +13,7 @@ public static class RowExtensions
     /// <returns>A clone of the row.</returns>
     public static TRow Clone<TRow>(this TRow row) where TRow : IRow
     {
-        return (TRow)(row.CloneRow());
+        return (TRow)row.CloneRow();
     }
 
     /// <summary>

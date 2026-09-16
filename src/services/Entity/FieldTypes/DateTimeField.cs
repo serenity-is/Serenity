@@ -226,9 +226,9 @@ public sealed class DateTimeField(ICollection<Field> collection, string name, Lo
             if (DateTimeKind == DateTimeKind.Local)
                 dt = dt.ToUniversalTime();
             writer.WriteValue(dt.ToString(
-                (DateTimeKind == System.DateTimeKind.Unspecified ?
+                DateTimeKind == System.DateTimeKind.Unspecified ?
                     DateHelper.ISODateTimeFormatLocal :
-                    DateHelper.ISODateTimeFormatUTC), CultureInfo.InvariantCulture));
+                    DateHelper.ISODateTimeFormatUTC, CultureInfo.InvariantCulture));
         }
         else
             writer.WriteNull();
@@ -318,9 +318,9 @@ public sealed class DateTimeField(ICollection<Field> collection, string name, Lo
             if (DateTimeKind == DateTimeKind.Local)
                 dt = dt.ToUniversalTime();
             writer.WriteStringValue(dt.ToString(
-                (DateTimeKind == DateTimeKind.Unspecified ?
+                DateTimeKind == DateTimeKind.Unspecified ?
                     DateHelper.ISODateTimeFormatLocal :
-                    DateHelper.ISODateTimeFormatUTC), CultureInfo.InvariantCulture));
+                    DateHelper.ISODateTimeFormatUTC, CultureInfo.InvariantCulture));
         }
     }
 }

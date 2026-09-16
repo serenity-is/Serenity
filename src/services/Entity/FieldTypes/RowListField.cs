@@ -16,7 +16,7 @@ namespace Serenity.Data;
 /// <param name="setValue">The set value.</param>
 [NotMapped]
 public class RowListField<TForeign>(ICollection<Field> collection, string name, LocalText? caption = null, int size = 0, FieldFlags flags = FieldFlags.Default | FieldFlags.NotMapped,
-    Func<IRow, List<TForeign>>? getValue = null, Action<IRow, List<TForeign>?>? setValue = null) : CustomClassField<List<TForeign>>(collection, name, caption, size, flags, getValue, setValue) where TForeign : class, IRow
+    Func<IRow, List<TForeign>?>? getValue = null, Action<IRow, List<TForeign>?>? setValue = null) : CustomClassField<List<TForeign>>(collection, name, caption, size, flags, getValue, setValue) where TForeign : class, IRow
 {
 
     /// <summary>

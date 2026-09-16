@@ -204,7 +204,7 @@ public static class SqlSyntax
 
     private static bool ShouldAutoQuote(ISqlDialect? dialect)
     {
-        return (dialect?.AutoQuotedIdentifiers ?? SqlSettings.DefaultDialect?.AutoQuotedIdentifiers ?? SqlSettings.AutoQuotedIdentifiers);
+        return dialect?.AutoQuotedIdentifiers ?? SqlSettings.DefaultDialect?.AutoQuotedIdentifiers ?? SqlSettings.AutoQuotedIdentifiers;
     }
 
     private static bool IsKeywordFor(string? s, ISqlDialect? dialect)

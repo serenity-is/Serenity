@@ -113,8 +113,8 @@ public partial class BasicPropertyProcessor : PropertyProcessor
 
                 if ((item.EditorParams.ContainsKey("allowNegatives") &&
                      Convert.ToBoolean(item.EditorParams["allowNegatives"] ?? false) == true) ||
-                    (!item.EditorParams.ContainsKey("allowNegatives") &&
-                    DecimalEditorAttribute.AllowNegativesByDefault) &&
+                    !item.EditorParams.ContainsKey("allowNegatives") &&
+                    DecimalEditorAttribute.AllowNegativesByDefault &&
                     item.EditorParams["maxValue"] != null)
                     item.EditorParams["minValue"] = -Convert.ToInt64(item.EditorParams["maxValue"]) - 1;
             }

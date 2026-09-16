@@ -891,7 +891,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
             if (generationKey != null)
                 return generationKey;
 
-            generationKey = (connectionKey + "." + TableName);
+            generationKey = connectionKey + "." + TableName;
             return generationKey;
         }
         set

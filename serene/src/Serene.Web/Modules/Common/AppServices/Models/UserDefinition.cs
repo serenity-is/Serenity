@@ -4,7 +4,7 @@ namespace Serene;
 public class UserDefinition : IUserDefinition, IHasPassword
 {
     public string Id { get { return UserId.ToInvariant(); } }
-    public required string DisplayName { get; set; }
+    public string DisplayName { get => field ?? Username; set; }
     public string? Email { get; set; }
     public string? UserImage { get; set; }
     public required short IsActive { get; set; }
