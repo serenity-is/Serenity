@@ -643,10 +643,12 @@ export declare namespace Criteria {
 	 * Accepts either `"A >= @p1"` with a params object, or a tagged template
 	 * `` Criteria.parse`A >= ${value}` ``. See {@link parseCriteria} for details.
 	 * @example
+	 * ```ts
 	 * Criteria.parse("A >= @p1 and B < @p2", { p1: 5, p2: 4 });
+	 * ```
 	 * @example
 	 * let a = 5, b = 4;
-	 * Criteria.parse`A >= ${a} and B < ${b}`;
+	 * Criteria.parse`A >= ${a} and B < ${b}`;`
 	 */
 	const parse: typeof parseCriteria;
 }
