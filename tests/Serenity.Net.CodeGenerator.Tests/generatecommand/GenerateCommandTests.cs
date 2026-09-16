@@ -10,7 +10,8 @@ public partial class GenerateCommandTests
 
     private class MockProjectFileInfo(MockFileSystem fileSystem,
         IDictionary<string, string?>? globalUsings = null,
-        string[]? assemblyList = null) : IProjectFileInfo
+        string[]? assemblyList = null,
+        string? nullable = null) : IProjectFileInfo
     {
         public string ProjectFile => GenerateCommandTests.projectFile;
         public IFileSystem FileSystem => fileSystem;
@@ -18,7 +19,7 @@ public partial class GenerateCommandTests
         public string? GetAssemblyName() => null;
         public string? GetEsmAssetBasePath() => null;
         public IDictionary<string, string?> GetGlobalUsings() => globalUsings ?? new Dictionary<string, string?>();
-        public string? GetNullable() => null;
+        public string? GetNullable() => nullable;
         public string? GetOutDir() => null;
         public string? GetRootNamespace() => "My";
         public string? GetTargetFramework() => "net8.0";
@@ -42,9 +43,10 @@ public partial class GenerateCommandTests
     private static GenerateCommand CreateCommand(MockFileSystem fileSystem,
         MockGeneratorConsole console, string[] args,
         IDictionary<string, string?>? globalUsings = null,
-        string[]? assemblyList = null)
+        string[]? assemblyList = null,
+        string? nullable = null)
     {
-        return new GenerateCommand(new MockProjectFileInfo(fileSystem, globalUsings, assemblyList), console)
+        return new GenerateCommand(new MockProjectFileInfo(fileSystem, globalUsings, assemblyList, nullable), console)
         {
             Arguments = new ArgumentReader(args)
         };

@@ -36,12 +36,12 @@ public partial class RowTemplateTests
 
                 public class RowFields : RowFieldsBase
                 {
-                    public Int32Field CustomerId;
-                    public StringField CustomerName;
-                    public Int32Field CityId;
+                    public Int32Field CustomerId = null;
+                    public StringField CustomerName = null;
+                    public Int32Field CityId = null;
 
-                    public StringField CityName;
-                    public Int32Field CityCountryId;
+                    public StringField CityName = null;
+                    public Int32Field CityCountryId = null;
                 }
             }
         }

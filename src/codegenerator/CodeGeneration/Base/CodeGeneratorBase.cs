@@ -33,7 +33,26 @@ public abstract class CodeGeneratorBase
 
     public string? NullableProp { get; set; }
 
-    public bool NullableRefTypes => NullableProp == "enable";
+    /// <summary>
+    /// Gets a value indicating whether nullable annotations should be emitted for
+    /// reference types. This is true for both `enable` and `annotations` values of
+    /// the Nullable MSBuild property, so that generated code is annotation correct
+    /// even when warnings are not enabled yet.
+    /// </summary>
+    public bool NullableRefTypes => NullableProp is "enable" or "annotations";
+
+    /// <summary>
+    /// Gets the nullable directive that should be emitted at the top of a
+    /// transformed / generated file. For `enable` this is `enable`, for
+    /// `annotations` this is `enable annotations` (enables the annotation
+    /// context without turning on nullable warnings). Otherwise null.
+    /// </summary>
+    public string? NullableDirective => NullableProp switch
+    {
+        "enable" => "enable",
+        "annotations" => "enable annotations",
+        _ => null
+    };
 
     protected string AppendNullableQuote(string type, bool isValueType)
     {

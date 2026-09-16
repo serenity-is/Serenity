@@ -35,10 +35,12 @@ public partial class ClientTypesGeneratorTests
         Assert.Contains("public object UnknownProp", text);
     }
 
-    [Fact]
-    public void Editor_Options_Use_Nullable_Ref_Types_When_Enabled()
+    [Theory]
+    [InlineData("enable")]
+    [InlineData("annotations")]
+    public void Editor_Options_Use_Nullable_Ref_Types_When_Enabled(string nullableProp)
     {
-        var files = Generate("enable", true, ("Modules/TestEditor.ts", /*lang=typescript*/ """
+        var files = Generate(nullableProp, true, ("Modules/TestEditor.ts", /*lang=typescript*/ """
             import { Decorators, Widget } from "@serenity-is/corelib"
 
             @Decorators.registerEditor('MyProject.MyTest.TestEditor')

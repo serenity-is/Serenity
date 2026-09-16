@@ -28,10 +28,12 @@ public partial class ClientTypesGeneratorTests
             """.ReplaceLineEndings(), text);
     }
 
-    [Fact]
-    public void BasicType_NullableRefTypes_Enabled()
+    [Theory]
+    [InlineData("enable", "#nullable enable")]
+    [InlineData("annotations", "#nullable enable annotations")]
+    public void BasicType_NullableRefTypes_Enabled(string nullableProp, string expectedDirective)
     {
-        var files = Generate("enable", true, ("Modules/TestOptions.ts", /*lang=typescript*/ """
+        var files = Generate(nullableProp, true, ("Modules/TestOptions.ts", /*lang=typescript*/ """
             import { TransformInclude } from "@serenity-is/corelib"
 
             export interface TestOptions extends TransformInclude {
@@ -41,8 +43,8 @@ public partial class ClientTypesGeneratorTests
             """));
 
         var text = Read(files, "TestOptions.generated.cs");
-        Assert.Equal("""
-            #nullable enable
+        Assert.Equal($$"""
+            {{expectedDirective}}
 
             namespace MyProject
             {

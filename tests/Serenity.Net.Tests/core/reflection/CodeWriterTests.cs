@@ -59,6 +59,32 @@ public class CodeWriterTests
         Assert.Equal("// Generated file\n\n#pragma warning disable CS0618, CS1591\n\nclass Test { }\n\n#pragma warning restore CS0618, CS1591", actual);
     }
 
+    [Theory]
+    [InlineData("enable", "#nullable enable\n\nclass Test { }")]
+    [InlineData("enable annotations", "#nullable enable annotations\n\nclass Test { }")]
+    public void ToString_Includes_Nullable_Directive_When_Set(string directive, string expected)
+    {
+        var cw = new CodeWriter
+        {
+            NullableDirective = directive
+        };
+        cw.Append("class Test { }");
+
+        var actual = cw.ToString().Replace("\r", "");
+        Assert.Equal(expected, actual);
+    }
+
+    [Fact]
+    public void ToString_Does_Not_Include_Nullable_Directive_When_Null()
+    {
+        var cw = new CodeWriter();
+        cw.Append("class Test { }");
+
+        var actual = cw.ToString().Replace("\r", "");
+        Assert.Equal("class Test { }", actual);
+        Assert.DoesNotContain("#nullable", actual);
+    }
+
     [Fact]
     public void ToString_Adds_Pragma_Restore_At_End_When_Suppressions_Exist()
     {

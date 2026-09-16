@@ -26,8 +26,10 @@ public partial class ClientTypesCommandTests
         return (command, fileSystem, console);
     }
 
-    [Fact]
-    public void Run_Generates_Client_Types_In_Default_OutDir()
+    [Theory]
+    [InlineData("enable", "#nullable enable")]
+    [InlineData("annotations", "#nullable enable annotations")]
+    public void Run_Generates_Client_Types_In_Default_OutDir(string nullableProp, string expectedDirective)
     {
         var config = new GeneratorConfig()
         {
@@ -39,7 +41,7 @@ public partial class ClientTypesCommandTests
             getProperty: name => name switch
             {
                 "GlobalUsings" => "My.A=My.Alias;My.B",
-                "Nullable" => "enable",
+                "Nullable" => nullableProp,
                 _ => null
             },
             tsTypes: new ExternalType
@@ -59,6 +61,7 @@ public partial class ClientTypesCommandTests
         Assert.Contains("Imports/ClientTypes", generatedFile.Replace('\\', '/'));
         var text = fileSystem.ReadAllText(generatedFile);
 
+        Assert.Contains(expectedDirective, text);
         Assert.Contains("public partial class TestOptions", text);
         Assert.Contains("public string? funcProp", text);
     }

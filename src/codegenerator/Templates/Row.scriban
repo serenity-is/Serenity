@@ -1,5 +1,5 @@
 {{~f = NET5Plus ? "f" : "F"~}}
-{{~fnull = NullableRefTypes ? " = null!" : ""~}}
+{{~fnull = NullableRefTypes ? " = null!" : " = null"~}}
 {{USING "Serenity.ComponentModel"}}
 {{USING "Serenity.Data"}}
 {{USING "Serenity.Data.Mapping"}}

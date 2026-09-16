@@ -190,6 +190,54 @@ public partial class GenerateCommandTests
             StringComparison.Ordinal);
     }
 
+    private static string GenerateRowText(string? nullable)
+    {
+        using var db = new MemorySqliteDb("MyTable");
+
+        var fileSystem = new MockFileSystem();
+        AddConfig(fileSystem, SqliteConfig(db.ConnectionString));
+        var console = new MockGeneratorConsole();
+        var command = CreateCommand(fileSystem, console,
+            ["--cnk", "Default", "--tbl", "MyTable", "--mod", "Test",
+             "--cls", "MyTable", "--pms", "Test:Permission", "--wtg", "R"],
+            nullable: nullable);
+
+        var result = command.Run();
+
+        Assert.Equal(ExitCodes.Success, result);
+        var rowFile = fileSystem.GetFiles(projectDir, "*.cs", recursive: true)
+            .Single(x => x.EndsWith("MyTableRow.cs", StringComparison.OrdinalIgnoreCase));
+        return fileSystem.ReadAllText(rowFile);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("disable")]
+    [InlineData("unknown")]
+    public void Generate_Without_Nullable_Does_Not_Annotate_Row(string? nullable)
+    {
+        var text = GenerateRowText(nullable);
+
+        // user owned sergen g output should have neither nullable annotations nor a directive
+        Assert.DoesNotContain("#nullable", text);
+        Assert.DoesNotContain("= null!", text);
+    }
+
+    [Theory]
+    [InlineData("enable")]
+    [InlineData("annotations")]
+    public void Generate_With_Nullable_Annotates_Row_Without_Directive(string? nullable)
+    {
+        var text = GenerateRowText(nullable);
+
+        // even for annotations, sergen g output should be annotation correct,
+        // so that it does not break when the user later switches to enable.
+        // It should not emit a directive as it is user owned and may be edited.
+        Assert.DoesNotContain("#nullable", text);
+        Assert.Contains("= null!", text);
+    }
+
     [Fact]
     public void Generate_Ignores_ApplicationMetadataErrors_WhenAssemblyInvalid()
     {

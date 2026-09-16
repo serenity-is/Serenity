@@ -168,7 +168,7 @@ public partial class GenerateCommand(IProjectFileInfo project, IGeneratorConsole
             if (config.IncludeGlobalUsings != null)
                 inputs.GlobalUsings.AddRange(config.IncludeGlobalUsings);
 
-            inputs.NullableRefTypes = Project.GetNullable() == "enable";
+            inputs.NullableRefTypes = Project.GetNullable() is "enable" or "annotations";
 
             return modelFactory.Create(inputs);
         }
