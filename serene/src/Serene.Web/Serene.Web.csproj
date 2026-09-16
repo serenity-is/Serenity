@@ -12,6 +12,7 @@
     <EnableDefaultCompressedItems>false</EnableDefaultCompressedItems>
     <SerenitySrc>..\..\..\src\</SerenitySrc>
     <DefineConstants>$(DefineConstants);Northwind;BasicSamples</DefineConstants>
+    <Nullable>enable</Nullable>
     <UseProjectRefs Condition="!Exists('$(SerenitySrc)..\Serenity.slnx')">false</UseProjectRefs>
     <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
     <!--#endif-->
