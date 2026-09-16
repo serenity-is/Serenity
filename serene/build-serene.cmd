@@ -42,8 +42,7 @@ echo *** INSTALLING THE DOTNET NEW TEMPLATE ***
 dotnet new install vsix\.nupkg\Serene.Templates*.nupkg
 
 echo *** CREATING PROJECT FROM DOTNET NEW TEMPLATE ***
-for /F "usebackq tokens=1,2 delims==" %%i in (`wmic os get LocalDateTime /VALUE 2^>NUL`) do if '.%%i.'=='.LocalDateTime.' set ldt=%%j
-set ldt=%ldt:~0,4%%ldt:~4,2%%ldt:~6,2%_%ldt:~8,2%%ldt:~10,2%%ldt:~12,2%
+for /f "usebackq tokens=*" %%i in (`powershell -NoProfile -Command "Get-Date -Format yyyyMMdd_HHmmss"`) do set ldt=%%i
 mkdir .\.vs
 cd .\.vs
 dotnet new serene -n SereneTest_%ldt%
