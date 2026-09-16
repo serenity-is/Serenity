@@ -5,18 +5,18 @@ namespace Serene.Administration.Forms;
 public class UserForm
 {
     [LabelWidth(200, UntilNext = true)]
-    public string Username { get; set; }
-    public string DisplayName { get; set; }
+    public string? Username { get; set; }
+    public string? DisplayName { get; set; }
     [EmailAddressEditor]
-    public string Email { get; set; }
+    public string? Email { get; set; }
     [LookupEditor(typeof(RoleRow), Multiple = true)]
-    public List<int> Roles { get; set; }
-    public string UserImage { get; set; }
+    public List<int>? Roles { get; set; }
+    public string? UserImage { get; set; }
     [PasswordEditor, Required(true)]
-    public string Password { get; set; }
+    public string? Password { get; set; }
     [PasswordEditor, Required(true)]
-    public string PasswordConfirm { get; set; }
+    public string? PasswordConfirm { get; set; }
     [SkipOnSave]
-    public string Source { get; set; }
+    public string? Source { get; set; }
     public bool IsActive { get; set;  }
 }

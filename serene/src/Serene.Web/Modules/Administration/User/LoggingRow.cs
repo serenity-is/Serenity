@@ -31,10 +31,10 @@ public abstract class LoggingRow<TFields> : Row<TFields>, ILoggingRow
     Field IUpdateUserIdRow.UpdateUserIdField => fields.UpdateUserId;
 }
 
-public class LoggingRowFields(string tableName = null, string fieldPrefix = null) : RowFieldsBase(tableName, fieldPrefix)
+public class LoggingRowFields(string? tableName = null, string fieldPrefix = "") : RowFieldsBase(tableName, fieldPrefix)
 {
-    public Int32Field InsertUserId;
-    public DateTimeField InsertDate;
-    public Int32Field UpdateUserId;
-    public DateTimeField UpdateDate;
+    public Int32Field InsertUserId = null!;
+    public DateTimeField InsertDate = null!;
+    public Int32Field UpdateUserId = null!;
+    public DateTimeField UpdateDate = null!;
 }

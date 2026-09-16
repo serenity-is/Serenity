@@ -13,16 +13,16 @@ public sealed class UserPermissionRow : Row<UserPermissionRow.RowFields>, IIdRow
     public int? UserId { get => fields.UserId[this]; set => fields.UserId[this] = value; }
 
     [DisplayName("Permission Key"), Size(100), NotNull, QuickSearch, NameProperty]
-    public string PermissionKey { get => fields.PermissionKey[this]; set => fields.PermissionKey[this] = value; }
+    public string? PermissionKey { get => fields.PermissionKey[this]; set => fields.PermissionKey[this] = value; }
 
     [DisplayName("Grant")]
     public bool? Granted { get => fields.Granted[this]; set => fields.Granted[this] = value; }
 
     [DisplayName("User Username"), Expression("jUser.[Username]")]
-    public string Username { get => fields.Username[this]; set => fields.Username[this] = value; }
+    public string? Username { get => fields.Username[this]; set => fields.Username[this] = value; }
 
     [DisplayName("User Display Name"), Expression("jUser.[DisplayName]")]
-    public string User { get => fields.User[this]; set => fields.User[this] = value; }
+    public string? User { get => fields.User[this]; set => fields.User[this] = value; }
 
     Field IUserPermissionRow.UserIdField => fields.UserId;
     StringField IUserPermissionRow.PermissionKeyField => fields.PermissionKey;
@@ -30,12 +30,12 @@ public sealed class UserPermissionRow : Row<UserPermissionRow.RowFields>, IIdRow
 
     public class RowFields : RowFieldsBase
     {
-        public Int64Field UserPermissionId;
-        public Int32Field UserId;
-        public StringField PermissionKey;
-        public BooleanField Granted;
+        public Int64Field UserPermissionId = null!;
+        public Int32Field UserId = null!;
+        public StringField PermissionKey = null!;
+        public BooleanField Granted = null!;
 
-        public StringField Username;
-        public StringField User;
+        public StringField Username = null!;
+        public StringField User = null!;
     }
 }

@@ -3,15 +3,15 @@ using Serene.Administration;
 namespace Serene.AppServices;
 
 public class UserPasswordValidator(ITwoLevelCache cache, ISqlConnections sqlConnections, IUserRetrieveService userRetriever,
-    ILogger<UserPasswordValidator> log = null, IDirectoryService directoryService = null) : IUserPasswordValidator
+    ILogger<UserPasswordValidator>? log = null, IDirectoryService? directoryService = null) : IUserPasswordValidator
 {
     protected readonly ITwoLevelCache cache = cache ?? throw new ArgumentNullException(nameof(cache));
     protected readonly ISqlConnections sqlConnections = sqlConnections ?? throw new ArgumentNullException(nameof(sqlConnections));
     protected readonly IUserRetrieveService userRetriever = userRetriever ?? throw new ArgumentNullException(nameof(userRetriever));
-    protected readonly IDirectoryService directoryService = directoryService;
-    protected readonly ILogger<UserPasswordValidator> Log = log;
+    protected readonly IDirectoryService? directoryService = directoryService;
+    protected readonly ILogger<UserPasswordValidator>? Log = log;
 
-    public PasswordValidationResult Validate(ref string username, string password)
+    public PasswordValidationResult Validate(ref string? username, string? password)
     {
         if (string.IsNullOrWhiteSpace(username))
             return PasswordValidationResult.EmptyUsername;
@@ -27,7 +27,7 @@ public class UserPasswordValidator(ITwoLevelCache cache, ISqlConnections sqlConn
         return ValidateFirstTimeUser(ref username, password);
     }
 
-    private PasswordValidationResult ValidateExistingUser(ref string username, string password, UserDefinition user)
+    private PasswordValidationResult ValidateExistingUser(ref string? username, string password, UserDefinition user)
     {
         username = user.Username;
 
@@ -38,11 +38,11 @@ public class UserPasswordValidator(ITwoLevelCache cache, ISqlConnections sqlConn
         }
 
         // prevent more than 50 invalid login attempts in 30 minutes
-        var throttler = new Throttler(cache.Memory, "ValidateUser:" + username.ToLowerInvariant(), TimeSpan.FromMinutes(30), 50);
+        var throttler = new Throttler(cache.Memory, "ValidateUser:" + username!.ToLowerInvariant(), TimeSpan.FromMinutes(30), 50);
         if (!throttler.Check())
             return PasswordValidationResult.Throttle;
 
-        bool validatePassword() => UserHelper.CalculateHash(password, user.PasswordSalt)
+        bool validatePassword() => UserHelper.CalculateHash(password, user.PasswordSalt!)
             .Equals(user.PasswordHash, StringComparison.OrdinalIgnoreCase);
 
         if (user.Source == "site" || user.Source == "sign" || directoryService == null)
@@ -102,8 +102,8 @@ public class UserPasswordValidator(ITwoLevelCache cache, ISqlConnections sqlConn
 
         try
         {
-            string salt = user.PasswordSalt.TrimToNull();
-            var hash = UserHelper.GenerateHash(password, ref salt);
+            string? salt = user.PasswordSalt.TrimToNull();
+            var hash = UserHelper.GenerateHash(password!, ref salt);
             var displayName = entry.FirstName + " " + entry.LastName;
             var email = entry.Email.TrimToNull() ?? user.Email ?? (username + "@yourdefaultdomain.com");
 
@@ -132,9 +132,9 @@ public class UserPasswordValidator(ITwoLevelCache cache, ISqlConnections sqlConn
         }
     }
 
-    private PasswordValidationResult ValidateFirstTimeUser(ref string username, string password)
+    private PasswordValidationResult ValidateFirstTimeUser(ref string? username, string password)
     {
-        var throttler = new Throttler(cache.Memory, "ValidateUser:" + username.ToLowerInvariant(), TimeSpan.FromMinutes(30), 50);
+        var throttler = new Throttler(cache.Memory, "ValidateUser:" + username!.ToLowerInvariant(), TimeSpan.FromMinutes(30), 50);
         if (!throttler.Check())
             return PasswordValidationResult.Throttle;
 
@@ -158,7 +158,7 @@ public class UserPasswordValidator(ITwoLevelCache cache, ISqlConnections sqlConn
 
         try
         {
-            string salt = null;
+            string? salt = null;
             var hash = UserHelper.GenerateHash(password, ref salt);
             var displayName = entry.FirstName + " " + entry.LastName;
             var email = entry.Email.TrimToNull() ?? (username + "@yourdefaultdomain.com");
@@ -178,7 +178,7 @@ public class UserPasswordValidator(ITwoLevelCache cache, ISqlConnections sqlConn
                 InsertDate = DateTime.Now,
                 InsertUserId = 1,
                 LastDirectoryUpdate = DateTime.Now
-            });
+            })!.Value;
 
             uow.Commit();
 

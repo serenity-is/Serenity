@@ -4,5 +4,5 @@
 [BasedOnRow(typeof(RoleRow), CheckNames = true)]
 public class RoleForm
 {
-    public string RoleName { get; set; }
+    public string? RoleName { get; set; }
 }

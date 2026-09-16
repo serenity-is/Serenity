@@ -1,38 +1,39 @@
 using Microsoft.Data.SqlClient;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Serene.Common;
 
 public class ForeignKeyExceptionInfo
 {
-    public string TableName { get; set; }
+    public string? TableName { get; set; }
 }
 
 public class PrimaryKeyExceptionInfo
 {
-    public string TableName { get; set; }
+    public string? TableName { get; set; }
 }
 
 public static class SqlExceptionHelper
 {
     public static void HandleDeleteForeignKeyException(Exception e, ITextLocalizer localizer)
     {
-        if (IsForeignKeyException(e, out ForeignKeyExceptionInfo fk))
+        if (IsForeignKeyException(e, out ForeignKeyExceptionInfo? fk))
             throw new ValidationError(string.Format(CultureInfo.CurrentCulture, SqlExceptionHelperTexts.DeleteForeignKeyError.ToString(localizer), fk.TableName));
     }
 
     public static void HandleSavePrimaryKeyException(Exception e, ITextLocalizer localizer, string fieldName = "ID")
     {
-        if (IsPrimaryKeyException(e, out PrimaryKeyExceptionInfo fk))
+        if (IsPrimaryKeyException(e, out PrimaryKeyExceptionInfo? fk))
             throw new ValidationError(string.Format(CultureInfo.CurrentCulture, SqlExceptionHelperTexts.SavePrimaryKeyError.ToString(localizer), fk.TableName, fieldName));
     }
 
-    public static bool IsForeignKeyException(Exception e, out ForeignKeyExceptionInfo fk)
+    public static bool IsForeignKeyException(Exception e, [NotNullWhen(true)] out ForeignKeyExceptionInfo? fk)
     {
         // sample message: The DELETE statement conflicted with the REFERENCE constraint "FK_SomeTable_SomeFieldID". The conflict occurred in database "DBSome", table "dbo.SomeTable", column 'SomeFieldID'.
 
-        if (e as SqlException != null && (e as SqlException).Errors.Count > 0 && (e as SqlException).Errors[0].Number == 547)
+        if (e is SqlException sqlException && sqlException.Errors.Count > 0 && sqlException.Errors[0].Number == 547)
         {
-            var msg = (e as SqlException).Errors[0].Message;
+            var msg = sqlException.Errors[0].Message;
             fk = new ForeignKeyExceptionInfo
             {
                 TableName = "???"
@@ -59,7 +60,7 @@ public static class SqlExceptionHelper
         return false;
     }
 
-    public static bool IsPrimaryKeyException(Exception e, out PrimaryKeyExceptionInfo pk)
+    public static bool IsPrimaryKeyException(Exception e, [NotNullWhen(true)] out PrimaryKeyExceptionInfo? pk)
     {
         // sample: Violation of PRIMARY KEY constraint 'PK_SomeTable'. Cannot insert duplicate key in object 'dbo.SomeTable'. The duplicate key value is (7005950).
 

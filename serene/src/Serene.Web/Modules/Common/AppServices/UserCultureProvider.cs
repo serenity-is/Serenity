@@ -5,7 +5,7 @@ namespace Serene.AppServices;
 
 public class UserCultureProvider : RequestCultureProvider
 {
-    public override Task<ProviderCultureResult> DetermineProviderCultureResult(HttpContext httpContext)
+    public override Task<ProviderCultureResult?> DetermineProviderCultureResult(HttpContext httpContext)
     {
         var culture = httpContext.Request.Cookies["LanguagePreference"];
         if (string.IsNullOrEmpty(culture) ||
@@ -14,13 +14,13 @@ public class UserCultureProvider : RequestCultureProvider
 
         if (culture.Length == 2)
         {
-            if (TwoLetterToFourLetter.TryGetValue(culture, out string code))
+            if (TwoLetterToFourLetter.TryGetValue(culture, out string? code))
                 culture = code;
             else
                 culture = culture + "-" + culture.ToUpperInvariant();
         }
 
-        return Task.FromResult(new ProviderCultureResult(culture));
+        return Task.FromResult<ProviderCultureResult?>(new ProviderCultureResult(culture));
     }
 
     private static readonly Dictionary<string, string> TwoLetterToFourLetter =
@@ -32,7 +32,7 @@ public class UserCultureProvider : RequestCultureProvider
         { "fa", "fa-IR" }
     };
 
-    private static List<CultureInfo> supportedCultures;
+    private static List<CultureInfo>? supportedCultures;
     private static readonly string[] supportedCultureIdentifiers = [
         "de-DE",
         "en-US",
@@ -60,6 +60,6 @@ public class UserCultureProvider : RequestCultureProvider
             {
                 return null;
             }
-        }).Where(x => x != null)];
+        }).OfType<CultureInfo>()];
     }
 }

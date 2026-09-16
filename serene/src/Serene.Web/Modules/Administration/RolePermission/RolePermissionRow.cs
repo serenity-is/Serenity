@@ -13,20 +13,20 @@ public sealed class RolePermissionRow : Row<RolePermissionRow.RowFields>, IIdRow
     public int? RoleId { get => fields.RoleId[this]; set => fields.RoleId[this] = value; }
 
     [DisplayName("Permission Key"), Size(100), NotNull, QuickSearch, NameProperty]
-    public string PermissionKey { get => fields.PermissionKey[this]; set => fields.PermissionKey[this] = value; }
+    public string? PermissionKey { get => fields.PermissionKey[this]; set => fields.PermissionKey[this] = value; }
 
     [DisplayName("Role Role Name"), Expression("jRole.[RoleName]")]
-    public string RoleName { get => fields.RoleName[this]; set => fields.RoleName[this] = value; }
+    public string? RoleName { get => fields.RoleName[this]; set => fields.RoleName[this] = value; }
 
     public StringField RoleKeyOrNameField => fields.RoleName;
     public StringField PermissionKeyField => fields.PermissionKey;
 
     public class RowFields : RowFieldsBase
     {
-        public Int64Field RolePermissionId;
-        public Int32Field RoleId;
-        public StringField PermissionKey;
+        public Int64Field RolePermissionId = null!;
+        public Int32Field RoleId = null!;
+        public StringField PermissionKey = null!;
 
-        public StringField RoleName;
+        public StringField RoleName = null!;
     }
 }

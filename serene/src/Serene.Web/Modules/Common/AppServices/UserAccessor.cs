@@ -9,7 +9,7 @@ public class UserAccessor(IHttpContextAccessor httpContextAccessor) : IUserAcces
         new HttpContextUserAccessor(httpContextAccessor),
         new HttpContextItemsAccessor(httpContextAccessor));
 
-    public ClaimsPrincipal User => impersonator.User;
+    public ClaimsPrincipal? User => impersonator.User;
 
     public void Impersonate(ClaimsPrincipal user)
     {

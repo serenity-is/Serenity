@@ -1,11 +1,11 @@
-﻿namespace Serenity.Navigation;
+namespace Serenity.Navigation;
 
 public class NavigationModel : INavigationModel
 {
-    private NavigationItem activeItem;
-    private List<NavigationItem> activePath;
+    private NavigationItem? activeItem;
+    private List<NavigationItem>? activePath;
 
-    public NavigationItem ActiveItem
+    public NavigationItem? ActiveItem
     {
         get => activeItem;
         set
@@ -15,7 +15,7 @@ public class NavigationModel : INavigationModel
         }
     }
 
-    public List<NavigationItem> Items { get; set; }
+    public List<NavigationItem> Items { get; set; } = [];
     IEnumerable<NavigationItem> INavigationModel.Items => Items;
 
     IEnumerable<NavigationItem> INavigationModel.ActivePath

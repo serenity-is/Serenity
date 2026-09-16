@@ -16,7 +16,7 @@ public class RolePermissionRepository(IRequestContext context) : BaseRepository(
         var roleID = request.RoleID.Value;
         var oldList = new HashSet<string>(
             GetExisting(uow.Connection, roleID)
-            .Select(x => x.PermissionKey), StringComparer.OrdinalIgnoreCase);
+            .Select(x => x.PermissionKey!), StringComparer.OrdinalIgnoreCase);
 
         var newList = new HashSet<string>([.. request.Permissions],
             StringComparer.OrdinalIgnoreCase);
@@ -71,7 +71,7 @@ public class RolePermissionRepository(IRequestContext context) : BaseRepository(
 
         var response = new RolePermissionListResponse
         {
-            Entities = [.. GetExisting(connection, request.RoleID.Value).Select(x => x.PermissionKey)]
+            Entities = [.. GetExisting(connection, request.RoleID.Value).Select(x => x.PermissionKey!)]
         };
 
         return response;

@@ -19,11 +19,11 @@ public class UserPermissionRepository(IRequestContext context) : BaseRepository(
         var userID = request.UserID.Value;
         var oldList = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
         foreach (var p in GetExisting(uow.Connection, userID))
-            oldList[p.PermissionKey] = p.Granted.Value;
+            oldList[p.PermissionKey!] = p.Granted!.Value;
 
         var newList = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
         foreach (var p in request.Permissions)
-            newList[p.PermissionKey] = p.Granted ?? false;
+            newList[p.PermissionKey!] = p.Granted ?? false;
 
         if (oldList.Count == newList.Count &&
             oldList.All(x => newList.ContainsKey(x.Key) && newList[x.Key] == x.Value))

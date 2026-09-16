@@ -15,7 +15,7 @@ public static class RoleHelper
                 ArgumentNullException.ThrowIfNull(sqlConnections);
 
                 using var connection = sqlConnections.NewFor<MyRow>();
-                return connection.List<MyRow>().ToDictionary(x => x.RoleId.Value);
-            });
+                return connection.List<MyRow>().ToDictionary(x => x.RoleId!.Value);
+            })!;
     }
 }

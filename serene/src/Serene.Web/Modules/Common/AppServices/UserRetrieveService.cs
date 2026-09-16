@@ -9,13 +9,13 @@ public class UserRetrieveService(ITwoLevelCache cache, ISqlConnections sqlConnec
     {
         return new UserDefinition
         {
-            UserId = user.UserId.Value,
-            Username = user.Username,
-            Email = user.Email,
+            UserId = user.UserId!.Value,
+            Username = user.Username!,
+            Email = user.Email!,
             UserImage = user.UserImage,
-            DisplayName = user.DisplayName,
-            IsActive = user.IsActive.Value,
-            Source = user.Source,
+            DisplayName = user.DisplayName!,
+            IsActive = user.IsActive!.Value,
+            Source = user.Source!,
             PasswordHash = user.PasswordHash,
             PasswordSalt = user.PasswordSalt,
             UpdateDate = user.UpdateDate,

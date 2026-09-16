@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 @{
     Func<string, HtmlString> json = x => new HtmlString(Serenity.JSON.Stringify(x));
-var hideNav = (string)Context.Request.Query["hideNav"] == "1";
+var hideNav = (string?)Context.Request.Query["hideNav"] == "1";
 var sidebarPaneCollapsed = Context?.Request?.Cookies?["SidebarPaneCollapsed"] == "1" ? " s-sidebar-pane-collapsed" : "";
 }
 <html lang="@System.Globalization.CultureInfo.CurrentUICulture.Name" class="@(hideNav ? " no-navigation" : "")">

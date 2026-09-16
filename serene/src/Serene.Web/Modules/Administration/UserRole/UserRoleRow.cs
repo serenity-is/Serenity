@@ -20,13 +20,13 @@ public sealed class UserRoleRow : Row<UserRoleRow.RowFields>, IIdRow, IUserRoleR
     public int? RoleId { get => fields.RoleId[this]; set => fields.RoleId[this] = value; }
 
     [DisplayName("Username"), Expression($"{jUser}.[Username]")]
-    public string Username { get => fields.Username[this]; set => fields.Username[this] = value; }
+    public string? Username { get => fields.Username[this]; set => fields.Username[this] = value; }
 
     [DisplayName("User Display Name"), Expression($"{jUser}.[DisplayName]")]
-    public string User { get => fields.User[this]; set => fields.User[this] = value; }
+    public string? User { get => fields.User[this]; set => fields.User[this] = value; }
 
     [DisplayName("Role"), Expression($"{jRole}.[RoleName]")]
-    public string RoleName { get => fields.RoleName[this]; set => fields.RoleName[this] = value; }
+    public string? RoleName { get => fields.RoleName[this]; set => fields.RoleName[this] = value; }
 
     public Field UserIdField => fields.UserId;
 
@@ -34,12 +34,12 @@ public sealed class UserRoleRow : Row<UserRoleRow.RowFields>, IIdRow, IUserRoleR
 
     public class RowFields : RowFieldsBase
     {
-        public Int64Field UserRoleId;
-        public Int32Field UserId;
-        public Int32Field RoleId;
+        public Int64Field UserRoleId = null!;
+        public Int32Field UserId = null!;
+        public Int32Field RoleId = null!;
 
-        public StringField Username;
-        public StringField User;
-        public StringField RoleName;
+        public StringField Username = null!;
+        public StringField User = null!;
+        public StringField RoleName = null!;
     }
 }

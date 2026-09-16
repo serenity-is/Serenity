@@ -20,7 +20,7 @@ public static class UserHelper
         return displayName.TrimToNull() ?? throw DataValidation.RequiredError(Fld.DisplayName, localizer);
     }
 
-    public static string ValidatePassword(string password, ITextLocalizer localizer)
+    public static string ValidatePassword(string? password, ITextLocalizer localizer)
     {
         password = password.TrimToNull();
 
@@ -37,13 +37,13 @@ public static class UserHelper
         return SiteMembershipProvider.ComputeSHA512(password + salt);
     }
 
-    public static string GenerateHash(string password, ref string salt)
+    public static string GenerateHash(string password, ref string? salt)
     {
         salt ??= Serenity.IO.TemporaryFileHelper.RandomFileCode()[..5];
         return CalculateHash(password, salt);
     }
 
-    public static Task<MyRow> GetUserAsync(IDbConnection connection, BaseCriteria filter,
+    public static Task<MyRow?> GetUserAsync(IDbConnection connection, BaseCriteria filter,
         CancellationToken cancellationToken = default)
     {
         return connection.TryFirstAsync<MyRow>(query => query

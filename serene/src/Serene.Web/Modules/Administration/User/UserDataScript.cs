@@ -42,7 +42,7 @@ public class UserDataScript(ITwoLevelCache cache, IPermissionService permissions
                                 // this is recommended for security / performance reasons...
                                 return true;
                             }).ToArray();
-                    });
+                    })!;
 
                 foreach (var permissionKey in permissionsUsedFromScript)
                 {

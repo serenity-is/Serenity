@@ -24,15 +24,15 @@ public class UserDeleteHandler(IRequestContext context,
         await base.OnBeforeDeleteAsync(cancellationToken).ConfigureAwait(false);
 
         await new SqlDelete(UserPreferenceRow.Fields.TableName)
-            .Where(UserPreferenceRow.Fields.UserId == Row.UserId.Value)
+            .Where(UserPreferenceRow.Fields.UserId == Row.UserId!.Value)
             .ExecuteAsync(Connection, ExpectedRows.Ignore, cancellationToken: cancellationToken).ConfigureAwait(false);
 
         await new SqlDelete(UserRoleRow.Fields.TableName)
-            .Where(UserRoleRow.Fields.UserId == Row.UserId.Value)
+            .Where(UserRoleRow.Fields.UserId == Row.UserId!.Value)
             .ExecuteAsync(Connection, ExpectedRows.Ignore, cancellationToken: cancellationToken).ConfigureAwait(false);
 
         await new SqlDelete(UserPermissionRow.Fields.TableName)
-            .Where(UserPermissionRow.Fields.UserId == Row.UserId.Value)
+            .Where(UserPermissionRow.Fields.UserId == Row.UserId!.Value)
             .ExecuteAsync(Connection, ExpectedRows.Ignore, cancellationToken: cancellationToken).ConfigureAwait(false);
     }
 }

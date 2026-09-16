@@ -21,7 +21,7 @@ public partial class TranslationRepository(IRequestContext context, IWebHostEnvi
 
     private static readonly Regex IsoLanguageIdRegex = IsoLanguageIdRegexGen();
 
-    private static string NormalizeLanguageID(string languageID)
+    private static string NormalizeLanguageID(string? languageID)
     {
         languageID = languageID.TrimToNull();
         if (languageID == null)
@@ -33,7 +33,7 @@ public partial class TranslationRepository(IRequestContext context, IWebHostEnvi
         return languageID;
     }
 
-    public static string GetUserTextsFilePath(IWebHostEnvironment hostEnvironment, string languageID)
+    public static string GetUserTextsFilePath(IWebHostEnvironment hostEnvironment, string? languageID)
     {
         languageID = NormalizeLanguageID(languageID);
         if (string.IsNullOrEmpty(languageID))
@@ -56,7 +56,7 @@ public partial class TranslationRepository(IRequestContext context, IWebHostEnvi
         if (File.Exists(textsFilePath))
         {
             var json = JSON.Parse<Dictionary<string, JToken>>(File.ReadAllText(textsFilePath));
-            JsonLocalTextRegistration.ProcessNestedDictionary(json, "", customTranslations);
+            JsonLocalTextRegistration.ProcessNestedDictionary(json!, "", customTranslations);
             foreach (var key in customTranslations.Keys)
                 availableKeys.Add(key);
         }
@@ -70,7 +70,7 @@ public partial class TranslationRepository(IRequestContext context, IWebHostEnvi
 
         result.Entities = [];
 
-        static string effective(string key)
+        static string? effective(string key)
         {
             if (key.StartsWith("Navigation.", StringComparison.Ordinal))
             {
@@ -88,7 +88,7 @@ public partial class TranslationRepository(IRequestContext context, IWebHostEnvi
 
         foreach (var key in sorted)
         {
-            if (!customTranslations.TryGetValue(key, out string customText))
+            if (!customTranslations.TryGetValue(key, out string? customText))
                 customText = null;
 
             result.Entities.Add(new TranslationItem
@@ -117,7 +117,7 @@ public partial class TranslationRepository(IRequestContext context, IWebHostEnvi
             {
                 var category = member.GetCustomAttribute<CategoryAttribute>();
                 if (category != null && !category.Category.IsEmptyOrNull())
-                    result.Add("Forms." + attr.Key + ".Categories." + category.Category);
+                    result.Add("Forms." + attr!.Key + ".Categories." + category.Category);
             }
         }
 
@@ -135,7 +135,7 @@ public partial class TranslationRepository(IRequestContext context, IWebHostEnvi
         var translations = List(new TranslationListRequest
         {
             SourceLanguageID = request.TargetLanguageID,
-        }).Entities.ToDictionary(x => x.Key, x => x.CustomText);
+        }).Entities.ToDictionary(x => x.Key!, x => x.CustomText);
 
         foreach (var item in request.Translations)
             translations[item.Key] = item.Value;
@@ -148,7 +148,7 @@ public partial class TranslationRepository(IRequestContext context, IWebHostEnvi
         string json = JSON.StringifyIndented(result);
 
         var textsFilePath = GetUserTextsFilePath(HostEnvironment, request.TargetLanguageID);
-        Directory.CreateDirectory(Path.GetDirectoryName(textsFilePath));
+        Directory.CreateDirectory(Path.GetDirectoryName(textsFilePath)!);
         File.WriteAllText(textsFilePath, json);
 
         (LocalTextRegistry as IRemoveAll)?.RemoveAll();

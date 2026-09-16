@@ -19,13 +19,13 @@ public class NavigationModelFactory(
     private readonly ITypeSource typeSource = typeSource ?? throw new ArgumentNullException(nameof(typeSource));
     private readonly IUserAccessor userAccessor = userAccessor ?? throw new ArgumentNullException(nameof(userAccessor));
 
-    private string ToAbsolute(string url)
+    private string? ToAbsolute(string? url)
     {
         return url != null && url.StartsWith("~/", StringComparison.Ordinal) ?
             VirtualPathUtility.ToAbsolute(httpContextAccessor.HttpContext, url) : url;
     }
 
-    private static string NormalizeUrl(string url)
+    private static string? NormalizeUrl(string? url)
     {
         if (url == null)
             return null;
@@ -48,7 +48,8 @@ public class NavigationModelFactory(
                 (userAccessor.User?.GetIdentifier() ?? "-1"),
                 TimeSpan.Zero,
                 UserPermissionRow.Fields.GenerationKey,
-                () => NavigationHelper.GetNavigationItems(permissions, typeSource, serviceProvider, ToAbsolute))
+                () => NavigationHelper.GetNavigationItems(permissions, typeSource, serviceProvider,
+                    url => ToAbsolute(url)!))!
         };
 
         CalcActivePath(model);
@@ -65,9 +66,9 @@ public class NavigationModelFactory(
             return;
         }
 
-        string bestMatch = null;
+        string? bestMatch = null;
         int bestMatchLength = 0;
-        NavigationItem bestLink = null;
+        NavigationItem? bestLink = null;
 
         foreach (var item in model.Items)
             SearchActivePath(item, currentUrl, ref bestMatch, ref bestMatchLength, ref bestLink);
@@ -76,7 +77,7 @@ public class NavigationModelFactory(
     }
 
     private void SearchActivePath(NavigationItem link, string currentUrl,
-        ref string bestMatch, ref int bestMatchLength, ref NavigationItem bestLink)
+        ref string? bestMatch, ref int bestMatchLength, ref NavigationItem? bestLink)
     {
         ArgumentNullException.ThrowIfNull(link);
 
@@ -86,7 +87,7 @@ public class NavigationModelFactory(
         {
             url = ToAbsolute(url);
             url = NormalizeUrl(url);
-            if (url.StartsWith(currentUrl, StringComparison.OrdinalIgnoreCase) &&
+            if (url!.StartsWith(currentUrl, StringComparison.OrdinalIgnoreCase) &&
                 string.Compare(NormalizeUrl(url.Split('?')[0]),
                 NormalizeUrl(currentUrl.Split('?')[0]), StringComparison.OrdinalIgnoreCase) == 0)
             {

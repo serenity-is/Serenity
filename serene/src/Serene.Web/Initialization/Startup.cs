@@ -150,7 +150,7 @@ public partial class Startup
         app.ApplicationServices.GetRequiredService<IDataMigrations>().Initialize();
     }
 
-    public static Action<IApplicationBuilder> ConfigureTestPipeline { get; set; }
+    public static Action<IApplicationBuilder>? ConfigureTestPipeline { get; set; }
 
     public static void RegisterDataProviders()
     {

@@ -9,7 +9,7 @@ public class UserSaveHandler(IRequestContext context, IOptions<EnvironmentSettin
 {
     private static MyRow.RowFields Fld { get { return MyRow.Fields; } }
 
-    private string password;
+    private string? password;
     private readonly IOptions<EnvironmentSettings> environmentOptions = environmentOptions ??
         throw new ArgumentNullException(nameof(environmentOptions));
 
@@ -53,18 +53,18 @@ public class UserSaveHandler(IRequestContext context, IOptions<EnvironmentSettin
             environmentOptions.CheckPublicDemo(Row.UserId);
 
             if (Row.Username != Old.Username)
-                Row.Username = await ValidateUsernameAsync(Connection, Row.Username, Old.UserId.Value,
+                Row.Username = await ValidateUsernameAsync(Connection, Row.Username!, Old.UserId!.Value,
                     Localizer, cancellationToken).ConfigureAwait(false);
 
             if (Row.DisplayName != Old.DisplayName)
-                Row.DisplayName = UserHelper.ValidateDisplayName(Row.DisplayName, Localizer);
+                Row.DisplayName = UserHelper.ValidateDisplayName(Row.DisplayName!, Localizer);
         }
 
         if (IsCreate)
         {
-            Row.Username = await ValidateUsernameAsync(Connection, Row.Username, null,
+            Row.Username = await ValidateUsernameAsync(Connection, Row.Username!, null,
                 Localizer, cancellationToken).ConfigureAwait(false);
-            Row.DisplayName = UserHelper.ValidateDisplayName(Row.DisplayName, Localizer);
+            Row.DisplayName = UserHelper.ValidateDisplayName(Row.DisplayName!, Localizer);
         }
 
         if (IsCreate || (Row.IsAssigned(Fld.Password) && !Row.Password.IsEmptyOrNull()))
@@ -74,7 +74,7 @@ public class UserSaveHandler(IRequestContext context, IOptions<EnvironmentSettin
                 throw new ValidationError("PasswordConfirmMismatch", "PasswordConfirm",
                     ChangePasswordValidationTexts.PasswordConfirmMismatch.ToString(Localizer));
 
-            password = Row.Password = UserHelper.ValidatePassword(Row.Password, Localizer);
+            password = Row.Password = UserHelper.ValidatePassword(Row.Password!, Localizer);
         }
     }
 
@@ -90,8 +90,8 @@ public class UserSaveHandler(IRequestContext context, IOptions<EnvironmentSettin
 
         if (IsCreate || !Row.Password.IsEmptyOrNull())
         {
-            string salt = null;
-            Row.PasswordHash = UserHelper.GenerateHash(password, ref salt);
+            string? salt = null;
+            Row.PasswordHash = UserHelper.GenerateHash(password!, ref salt);
             Row.PasswordSalt = salt;
         }
     }

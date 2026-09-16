@@ -36,8 +36,8 @@ public partial class AccountPage : Controller
             }
 
             using var uow = new UnitOfWork(connection);
-            string salt = null;
-            var hash = UserHelper.GenerateHash(request.Password, ref salt);
+            string? salt = null;
+            var hash = UserHelper.GenerateHash(request.Password!, ref salt);
             var displayName = request.DisplayName.TrimToEmpty();
             var email = request.Email;
             var username = request.Email;
@@ -55,7 +55,7 @@ public partial class AccountPage : Controller
                 InsertDate = DateTime.Now,
                 InsertUserId = 1,
                 LastDirectoryUpdate = DateTime.Now
-            });
+            })!.Value;
 
             byte[] bytes;
             using (var ms = new MemoryStream())
@@ -165,13 +165,13 @@ public partial class AccountPage : Controller
 
         uow.Connection.UpdateById(new UserRow
         {
-            UserId = user.UserId.Value,
+            UserId = user.UserId!.Value,
             IsActive = 1
         });
 
         Cache.InvalidateOnCommit(uow, UserRow.Fields);
         uow.Commit();
 
-        return new RedirectResult("~/Account/Login?activated=" + Uri.EscapeDataString(user.Email));
+        return new RedirectResult("~/Account/Login?activated=" + Uri.EscapeDataString(user.Email!));
     }
 }

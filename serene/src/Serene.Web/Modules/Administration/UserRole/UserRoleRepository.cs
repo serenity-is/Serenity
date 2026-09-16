@@ -18,7 +18,7 @@ public class UserRoleRepository(IRequestContext context) : BaseRepository(contex
         var userID = request.UserID.Value;
         var oldList = new HashSet<int>(
             GetExisting(uow.Connection, userID)
-            .Select(x => x.RoleId.Value));
+            .Select(x => x.RoleId!.Value));
 
         var newList = new HashSet<int>([.. request.Roles]);
 
@@ -72,7 +72,7 @@ public class UserRoleRepository(IRequestContext context) : BaseRepository(contex
 
         var response = new UserRoleListResponse
         {
-            Entities = [.. GetExisting(connection, request.UserID.Value).Select(x => x.RoleId.Value)]
+            Entities = [.. GetExisting(connection, request.UserID.Value).Select(x => x.RoleId!.Value)]
         };
 
         return response;

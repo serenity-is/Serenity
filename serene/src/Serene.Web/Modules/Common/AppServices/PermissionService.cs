@@ -8,7 +8,7 @@ public class PermissionService(ITwoLevelCache cache,
     ITypeSource typeSource,
     IUserAccessor userAccessor,
     IRolePermissionService rolePermissions,
-    IHttpContextItemsAccessor httpContextItemsAccessor = null) :
+    IHttpContextItemsAccessor? httpContextItemsAccessor = null) :
     BasePermissionService<UserPermissionRow, UserRoleRow>(cache, sqlConnections, typeSource,
         userAccessor, rolePermissions, httpContextItemsAccessor)
 {

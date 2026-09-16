@@ -52,7 +52,7 @@ public partial class AccountPage(ITwoLevelCache cache, ITextLocalizer localizer)
             var result = passwordValidator.Validate(ref username, request.Password);
             if (result == PasswordValidationResult.Valid)
             {
-                var principal = userClaimCreator.CreatePrincipal(username, authType: "Password");
+                var principal = userClaimCreator.CreatePrincipal(username!, authType: "Password");
                 HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal).GetAwaiter().GetResult();
                 return new ServiceResponse();
             }

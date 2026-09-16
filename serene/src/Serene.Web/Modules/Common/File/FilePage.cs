@@ -20,7 +20,7 @@ public class FilePage(IUploadStorage uploadStorage, IUploadProcessor uploadProce
     {
         var response = this.ExecuteMethod(() => HandleUploadRequest(HttpContext));
 
-        if (!((string)Request.Headers.Accept ?? "").Contains("json", StringComparison.Ordinal))
+        if (!((string?)Request.Headers.Accept ?? "").Contains("json", StringComparison.Ordinal))
             response.ContentType = "text/plain";
 
         return response;
@@ -46,7 +46,7 @@ public class FilePage(IUploadStorage uploadStorage, IUploadProcessor uploadProce
             uploaded = 1,
             fileName = response.TemporaryFile,
             url = VirtualPathUtility.ToAbsolute(HttpContext,
-                uploadStorage.GetFileUrl(response.TemporaryFile))
+                uploadStorage.GetFileUrl(response.TemporaryFile!))
         });
     }
 
@@ -75,7 +75,7 @@ public class FilePage(IUploadStorage uploadStorage, IUploadProcessor uploadProce
         var uploadInfo = uploadProcessor.Process(file.OpenReadStream(),
             file.FileName, uploadOptions);
 
-        uploadStorage.SetOriginalName(uploadInfo.TemporaryFile, file.FileName);
+        uploadStorage.SetOriginalName(uploadInfo.TemporaryFile!, file.FileName);
 
         return new UploadResponse()
         {
@@ -89,7 +89,7 @@ public class FilePage(IUploadStorage uploadStorage, IUploadProcessor uploadProce
 
     private class UploadResponse : ServiceResponse
     {
-        public string TemporaryFile { get; set; }
+        public string? TemporaryFile { get; set; }
         public long Size { get; set; }
         public bool IsImage { get; set; }
         public int Width { get; set; }

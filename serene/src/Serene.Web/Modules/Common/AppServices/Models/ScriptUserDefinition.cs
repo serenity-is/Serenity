@@ -7,8 +7,8 @@
 [ScriptInclude]
 public class ScriptUserDefinition
 {
-    public string Username { get; set; }
-    public string DisplayName { get; set; }
+    public string? Username { get; set; }
+    public string? DisplayName { get; set; }
     public bool IsAdmin { get; set; }
-    public Dictionary<string, bool> Permissions { get; set; }
+    public Dictionary<string, bool>? Permissions { get; set; }
 }

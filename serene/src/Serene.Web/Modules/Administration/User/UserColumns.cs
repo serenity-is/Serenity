@@ -5,15 +5,15 @@
 public class UserColumns
 {
     [EditLink, AlignRight, Width(55)]
-    public string UserId { get; set; }
+    public string? UserId { get; set; }
     [EditLink, Width(150)]
-    public string Username { get; set; }
+    public string? Username { get; set; }
     [Width(150)]
-    public string DisplayName { get; set; }
+    public string? DisplayName { get; set; }
     [Width(250)]
-    public string Email { get; set; }
+    public string? Email { get; set; }
     [Width(80)]
-    public string Source { get; set; }
+    public string? Source { get; set; }
     [QuickFilter, Width(300)]
-    public string Roles { get; set; }
+    public string? Roles { get; set; }
 }
