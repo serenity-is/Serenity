@@ -1,6 +1,7 @@
 import { DeleteRequest, DeleteResponse, Dialog, RetrieveRequest, RetrieveResponse, SaveRequest, SaveResponse } from "@serenity-is/corelib";
 import { EntityDialogWrapper, mockAdmin, mockDynamicData, mockFetch, typeText, unmockFetch } from "test-utils";
 import { RoleDialog } from "../../../Modules/Administration/Role/RoleDialog";
+import * as RolePermissionModule from "../../../Modules/Administration/RolePermission/RolePermissionDialog";
 import { RoleService, RoleRow, RoleForm } from "../../../Modules/ServerTypes/Administration";
 
 beforeAll(() => {
@@ -105,6 +106,23 @@ describe("RoleDialog", () => {
         });
         await dlg.clickDeleteButton();
         expect(fetchSpy.requests.length).toBe(1);
+    });
+
+    it("disables the edit-permissions button for a new entity and enables it when loaded", () => {
+        const dlg = new EntityDialogWrapper(new RoleDialog());
+        dlg.actual.loadNewAndOpenDialog();
+        expect(dlg.actual["toolbar"].findButton("edit-permissions").hasClass("disabled")).toBe(true);
+
+        dlg.actual.loadEntityAndOpenDialog({ RoleId: 7, RoleName: "MyRole" });
+        expect(dlg.actual["toolbar"].findButton("edit-permissions").hasClass("disabled")).toBe(false);
+    });
+
+    it("opens the role permission dialog from the edit-permissions button", () => {
+        const spy = vi.spyOn(RolePermissionModule, "RolePermissionDialog").mockResolvedValue(undefined);
+        const dlg = new EntityDialogWrapper(new RoleDialog());
+        dlg.actual.loadEntityAndOpenDialog({ RoleId: 7, RoleName: "MyRole" });
+        dlg.actual["toolbar"].findButton("edit-permissions").click();
+        expect(spy).toHaveBeenCalledWith({ roleID: 7, roleName: "MyRole" });
     });
 
 });
