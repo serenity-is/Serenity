@@ -7,9 +7,9 @@ export default defineConfig({
         globals: true,
         coverage: {
             provider: "v8",
-            all: true,
             include: ["src/**/*.{ts,tsx}"],
             reporter: ["text", "html"]
-        }
+        },
+        pool: "vmThreads"
     }
 })

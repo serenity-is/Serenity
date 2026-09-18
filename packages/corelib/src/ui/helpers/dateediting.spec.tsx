@@ -768,9 +768,11 @@ describe("jQueryDatepickerZIndexWorkaround", () => {
 describe("jQueryDatepickerInitialization", () => {
     let mockRegional: any;
     let originalCulture: any;
+    let originalLang: string;
 
     beforeEach(() => {
         originalCulture = { ...Culture };
+        originalLang = document.documentElement.lang;
         mockRegional = {
             en: {},
             fr: {},
@@ -785,12 +787,7 @@ describe("jQueryDatepickerInitialization", () => {
         (globalThis as any).$ = mock$;
         (globalThis as any).jQuery = mock$;
 
-        // Mock document
-        (globalThis as any).document = {
-            documentElement: {
-                lang: 'en'
-            }
-        };
+        document.documentElement.lang = 'en';
     });
 
     afterEach(() => {
@@ -798,7 +795,7 @@ describe("jQueryDatepickerInitialization", () => {
         vi.restoreAllMocks();
         delete (globalThis as any).$;
         delete (globalThis as any).jQuery;
-        delete (globalThis as any).document;
+        document.documentElement.lang = originalLang;
     });
 
     it("should return false if jQuery datepicker regional is not available", () => {

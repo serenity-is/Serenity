@@ -46,6 +46,7 @@ export default (opt) => {
                 Number(process.versions.node.split('.')[0]) >= 25 ? '--no-webstorage' : null
             ].filter(x => x != null),
             globals: true,
+            pool: "vmThreads",
             provide
         }
     });

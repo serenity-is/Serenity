@@ -55,11 +55,9 @@ describe("ResetPasswordPage", () => {
             opt.onSuccess?.({ RedirectHome: true });
             return { then: () => { } } as any;
         });
-        const locationSpy = vi.spyOn(window, "location", "get").mockReturnValue({ href: "" } as any);
         (document.querySelector("button[type=submit]") as HTMLElement).click();
         expect(serviceCall).toHaveBeenCalled();
         panel.destroy();
-        locationSpy.mockRestore();
     });
 
     it("does not submit when validation fails", () => {

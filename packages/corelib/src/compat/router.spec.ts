@@ -50,13 +50,11 @@ describe("ClassicRouter.navigate", () => {
 
     beforeEach(() => {
         oldLocation = window.location.href;
-        window.history = {
-            back: vi.fn(),
-            ...window.history
-        };
+        vitest.spyOn(window.history, 'back').mockImplementation(() => {});
     });
 
     afterEach(() => {
+        vitest.restoreAllMocks();
         changeJSDOMURL(oldLocation);
     });
 
@@ -199,28 +197,15 @@ describe("ClassicRouter.dialog", () => {
 });
 
 describe("ClassicRouter.resolve", () => {
-    let originalLocation: Location;
-    let mockLocation: any;
+    let originalURL: string;
 
     beforeEach(() => {
-        originalLocation = window.location;
-        mockLocation = {
-            href: "http://example.com/page",
-            hash: "",
-            replace: vi.fn(),
-            assign: vi.fn()
-        };
-        Object.defineProperty(window, 'location', {
-            value: mockLocation,
-            writable: true
-        });
+        originalURL = window.location.href;
+        changeJSDOMURL("http://example.com/page");
     });
 
     afterEach(() => {
-        Object.defineProperty(window, 'location', {
-            value: originalLocation,
-            writable: true
-        });
+        changeJSDOMURL(originalURL);
     });
 
     it("should not resolve when disabled", () => {
@@ -231,19 +216,19 @@ describe("ClassicRouter.resolve", () => {
 
     it("should handle empty hash", () => {
         const router = createRouter();
-        mockLocation.hash = "";
+        changeJSDOMURL("http://example.com/page");
         expect(() => router.resolve()).not.toThrow();
     });
 
     it("should handle hash with # prefix", () => {
         const router = createRouter();
-        mockLocation.hash = "#test";
+        changeJSDOMURL("http://example.com/page#test");
         expect(() => router.resolve()).not.toThrow();
     });
 
     it("should handle complex routes", () => {
         const router = createRouter();
-        mockLocation.hash = "#edit/123/+/details";
+        changeJSDOMURL("http://example.com/page#edit/123/+/details");
         expect(() => router.resolve()).not.toThrow();
     });
 
