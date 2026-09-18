@@ -1,19 +1,6 @@
 import vitestDefaults from "test-utils/vitest-defaults";
 
-const defaults = vitestDefaults({
+export default vitestDefaults({
     name: "northwind",
     projectRoot: import.meta.dirname
 });
-
-export default {
-    ...defaults,
-    test: {
-        ...defaults.test,
-        coverage: {
-            provider: "v8",
-            all: true,
-            include: ["Modules/**/*.{ts,tsx}"],
-            reporter: ["text", "html"]
-        }
-    }
-}

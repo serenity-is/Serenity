@@ -1,5 +1,6 @@
 import { mockAdmin, mockDynamicData, mockGridSize } from "test-utils";
-import { InlineActionGrid } from "../../Modules/Grids/InlineActionButtons/InlineActionButtonsPage";
+import initPage, { InlineActionGrid } from "../../Modules/Grids/InlineActionButtons/InlineActionButtonsPage";
+import * as corelib from "@serenity-is/corelib";
 import { Fluent, confirmDialog } from "@serenity-is/corelib";
 import { CustomerService } from "@serenity-is/demo.northwind";
 
@@ -56,6 +57,12 @@ function createInlineActionGrid(): InlineActionGrid {
 }
 
 describe("Inline Action Buttons", () => {
+    it("initializes the page", () => {
+        const spy = vi.spyOn(corelib, "gridPageInit").mockReturnValue({} as any);
+        initPage();
+        expect(spy).toHaveBeenCalledWith(InlineActionGrid);
+    });
+
     it("should call edit item when clicking view-details action", () => {
         const grid = createInlineActionGrid();
         const editSpy = (grid as any).editItem = vi.fn();
@@ -81,17 +88,32 @@ describe("Inline Action Buttons", () => {
         expect(orderLoadEntitySpy).toHaveBeenLastCalledWith({ CustomerID: "A1357" });
     });
 
+    it("should ignore clicks when the default is already prevented", () => {
+        const grid = createInlineActionGrid();
+        const spy = vi.spyOn(Fluent, "isDefaultPrevented").mockReturnValue(true);
+        const deleteSpy = vi.spyOn(CustomerService, "Delete").mockImplementation((() => null) as any);
+        grid.element.findAll<HTMLAnchorElement>(".inline-action[data-action=delete-row]")[0].click();
+        expect(deleteSpy).not.toHaveBeenCalled();
+        spy.mockRestore();
+        grid.destroy();
+    });
+
     it("should confirm and delete the customer when clicking delete-row action", () => {
         const grid = createInlineActionGrid();
         var actions = grid.element.findAll<HTMLAnchorElement>(".inline-action[data-action=delete-row]");
         expect(actions.length).toBe(2);
 
-        const deleteSpy = vi.spyOn(CustomerService, "Delete").mockImplementation(() => null);
+        const deleteSpy = vi.spyOn(CustomerService, "Delete").mockImplementation(((request: any, onSuccess: any) => {
+            onSuccess?.();
+            return null as any;
+        }) as any);
+        const refresh = vi.spyOn(grid, "refresh").mockImplementation((() => { }) as any);
 
         actions[1].click();
         expect(confirmDialog).toHaveBeenCalledTimes(1);
         expect(deleteSpy).toHaveBeenCalledTimes(1);
         expect(deleteSpy).toHaveBeenLastCalledWith({ EntityId: "A2468" }, expect.anything());
+        expect(refresh).toHaveBeenCalled();
         actions[0].click();
         expect(confirmDialog).toHaveBeenCalledTimes(2);
         expect(deleteSpy).toHaveBeenLastCalledWith({ EntityId: "A1357" }, expect.anything());

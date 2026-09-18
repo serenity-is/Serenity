@@ -6,9 +6,8 @@ export default defineConfig({
         environment: "jsdom",
         globals: true,
         coverage: {
-            provider: "v8",
             include: ["src/**/*.{ts,tsx}"],
-            reporter: ["text", "html"]
+            reporter: ["json", "html", "text"]
         },
         pool: "vmThreads"
     }

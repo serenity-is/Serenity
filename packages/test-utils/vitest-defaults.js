@@ -47,7 +47,11 @@ export default (opt) => {
             ].filter(x => x != null),
             globals: true,
             pool: "vmThreads",
-            provide
+            provide,
+            coverage: {
+                reporter: ["json", "html", "text"],
+                include: ["Modules/**/*.{ts,tsx}"]
+            }
         }
     });
 }
