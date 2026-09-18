@@ -12,7 +12,7 @@ export default (opt) => {
     const projectRoot = resolve(opt?.projectRoot ?? "./");
 
     if ((opt?.dynamicData ?? true)) {
-        const isWebProject = projectRoot.indexOf('Serene.Web') || projectRoot.indexOf('StartSharp.Web') >= 0;
+        const isWebProject = projectRoot.indexOf('Serene.Web') >= 0 || projectRoot.indexOf('StartSharp.Web') >= 0;
         if ((isWebProject && !existsSync(resolve(`./dynamic-data/Columns.Administration.Language.json`))) ||
             (!isWebProject && !existsSync(resolve(`${testUtils}/dynamic-data/Columns.Administration.Language.json`)))) {
             if (projectRoot.indexOf('Serene.Web') >= 0 || !tryProject(`${serenityRoot}/..`, "StartSharp"))
@@ -42,6 +42,9 @@ export default (opt) => {
         test: {
             name: opt?.name,
             environment: "jsdom",
+            execArgv: [
+                Number(process.versions.node.split('.')[0]) >= 25 ? '--no-webstorage' : null
+            ].filter(x => x != null),
             globals: true,
             provide
         }
