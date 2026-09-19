@@ -15,9 +15,9 @@ export class FilterDisplayBar<P = {}> extends FilterWidgetBase<P> {
      * @returns The rendered content.
      */
     protected override renderContents(): any {
-        var openFilterDialog = (e: Event) => {
+        const openFilterDialog = (e: Event) => {
             e.preventDefault();
-            var dialog = new FilterDialog({});
+            const dialog = new FilterDialog({});
             dialog.get_filterPanel().set_store(this.get_store());
             dialog.dialogOpen(null);
         };
@@ -44,7 +44,7 @@ export class FilterDisplayBar<P = {}> extends FilterWidgetBase<P> {
     protected override filterStoreChanged() {
         super.filterStoreChanged();
 
-        var displayText = this.get_store().get_displayText()?.trim() || null;
+        let displayText = this.get_store().get_displayText()?.trim() || null;
 
         this.element.findFirst('.current').toggle(displayText != null);
         this.element.findFirst('.reset').toggle(displayText != null);

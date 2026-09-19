@@ -175,9 +175,9 @@ describe('H', () => {
     });
 
     it('should call ref method with the element reference', () => {
-        var divRef: HTMLSpanElement;
-        var spanRef: HTMLSpanElement;
-        var element = H('div', {
+        let divRef: HTMLSpanElement;
+        let spanRef: HTMLSpanElement;
+        const element = H('div', {
             ref: el => divRef = el, children:
                 H('span', { ref: el => spanRef = el })
         });
@@ -188,13 +188,13 @@ describe('H', () => {
     });
 
     it('converts className attribute to class', () => {
-        var element = H('div', { className: 'test' });
+        const element = H('div', { className: 'test' });
         expect(element).toBeDefined();
         expect(element.className).toBe('test');
     });
 
     it('can set className property via class', () => {
-        var element = H('div', { class: 'test' });
+        const element = H('div', { class: 'test' });
         expect(element).toBeDefined();
         expect(element.className).toBe('test');
     });
@@ -209,7 +209,7 @@ describe('disableSelection', () => {
 
     it('should disable selection on the element', () => {
         const element: HTMLDivElement = document.createElement('div');
-        var func: Function;
+        let func: Function;
         element.addEventListener = (_: any, listener: any) => func = listener;
 
         disableSelection(element);

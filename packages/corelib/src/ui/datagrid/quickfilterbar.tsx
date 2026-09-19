@@ -51,9 +51,9 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
 
         this.domNode.classList.add('quick-filters-bar', 'clear');
 
-        var filters = this.options.filters;
-        for (var f = 0; f < filters.length; f++) {
-            var filter = filters[f];
+        const filters = this.options.filters;
+        for (let f = 0; f < filters.length; f++) {
+            const filter = filters[f];
             this.add(filter);
         }
 
@@ -94,7 +94,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
 
         const qfElement = this.domNode.appendChild(<div class="quick-filter-item" data-qffield={opt.field}></div>) as HTMLDivElement;
 
-        var title = tryGetText(opt.title) ?? opt.title;
+        let title = tryGetText(opt.title) ?? opt.title;
         if (title == null) {
             title = this.options.getTitle ? this.options.getTitle(opt) : null;
             if (title == null) {
@@ -126,7 +126,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
             Fluent.addClass(qfElement, opt.cssClass);
         }
 
-        var widget = Widget.create({
+        const widget = Widget.create({
             type: opt.type,
             options: {
                 element: el => {
@@ -143,17 +143,17 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
         });
         opt.init?.(widget);
 
-        var submitHandler = (request: ListRequest) => {
+        const submitHandler = (request: ListRequest) => {
 
             if (qfElement.classList.contains('ignore')) {
                 return;
             }
 
             request.EqualityFilter = request.EqualityFilter || {};
-            var value = EditorUtils.getValue(widget);
-            var active = !!value?.toString();
+            const value = EditorUtils.getValue(widget);
+            const active = !!value?.toString();
             if (opt.handler != null) {
-                var args = {
+                const args = {
                     field: opt.field,
                     request: request,
                     equalityFilter: request.EqualityFilter,
@@ -202,7 +202,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
      * @returns A quick filter definition for a date range.
      */
     public static dateRange(field: string, title?: string): QuickFilter<DateEditor, DateTimeEditorOptions> {
-        var end: DateEditor = null;
+        let end: DateEditor = null;
         return {
             field: field,
             type: DateEditor,
@@ -213,7 +213,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
                 el.after(<span class="range-separator">-</span>);
             },
             handler: function (args) {
-                var date1 = parseDate(args.widget.value);
+                let date1 = parseDate(args.widget.value);
                 if (date1) {
                     if (isNaN(date1.valueOf())) {
                         notifyWarning(FormValidationTexts.DateInvalid, '', null);
@@ -226,7 +226,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
                     }
                 }
 
-                var date2 = parseDate(end.value);
+                let date2 = parseDate(end.value);
                 if (date2) {
                     if (isNaN(date2?.valueOf())) {
                         notifyWarning(FormValidationTexts.DateInvalid, '', null);
@@ -234,7 +234,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
                         date2 = null;
                     }
                     else {
-                        var next = new Date(end.valueAsDate.valueOf());
+                        const next = new Date(end.valueAsDate.valueOf());
                         next.setDate(next.getDate() + 1);
                         args.request.Criteria = Criteria.and(args.request.Criteria,
                             Criteria(args.field).lt(formatDate(next, 'yyyy-MM-dd')));
@@ -244,12 +244,12 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
                 args.active = !!(date1 || date2);
             },
             displayText: function (w, l) {
-                var v1 = EditorUtils.getDisplayText(w);
-                var v2 = EditorUtils.getDisplayText(end);
+                const v1 = EditorUtils.getDisplayText(w);
+                const v2 = EditorUtils.getDisplayText(end);
                 if (!v1 && !v2)
                     return null;
-                var text1 = l + ' >= ' + v1;
-                var text2 = l + ' <= ' + v2;
+                const text1 = l + ' >= ' + v1;
+                const text2 = l + ' <= ' + v2;
                 if (v1 && v2) {
                     return text1 + ' ' + (FilterPanelTexts.asTry().And ?? 'and') + ' ' + text2;
                 }
@@ -292,7 +292,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
      * @returns A quick filter definition for a date-time range.
      */
     public static dateTimeRange(field: string, title?: string, useUtc?: boolean): QuickFilter<DateTimeEditor, DateTimeEditorOptions> {
-        var end: DateTimeEditor = null;
+        let end: DateTimeEditor = null;
 
         return {
             field: field,
@@ -310,7 +310,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
                 Fluent.on(w.domNode.parentElement?.querySelector('.time'), "change", () => Fluent.trigger(w.domNode, "change"));
             },
             handler: function (args) {
-                var date1 = parseDate(args.widget.value);
+                let date1 = parseDate(args.widget.value);
                 if (date1) {
                     if (isNaN(date1?.valueOf())) {
                         notifyWarning(FormValidationTexts.DateInvalid, '', null);
@@ -323,7 +323,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
                     }
                 }
 
-                var date2 = parseDate(end.value);
+                let date2 = parseDate(end.value);
                 if (date2) {
                     if (isNaN(date2?.valueOf())) {
                         notifyWarning(FormValidationTexts.DateInvalid, '', null);
@@ -339,13 +339,13 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
                 args.active = !!(date1 || date2);
             },
             displayText: function (w, l) {
-                var v1 = EditorUtils.getDisplayText(w);
-                var v2 = EditorUtils.getDisplayText(end);
+                const v1 = EditorUtils.getDisplayText(w);
+                const v2 = EditorUtils.getDisplayText(end);
                 if (!v1 && !v2) {
                     return null;
                 }
-                var text1 = l + ' >= ' + v1;
-                var text2 = l + ' <= ' + v2;
+                const text1 = l + ' >= ' + v1;
+                const text2 = l + ' <= ' + v2;
                 if (v1 && v2) {
                     return text1 + ' ' + (FilterPanelTexts.asTry().And ?? 'and') + ' ' + text2;
                 }
@@ -391,16 +391,16 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
      * @returns A quick filter definition for a boolean value.
      */
     public static boolean(field: string, title?: string, yes?: string, no?: string): QuickFilter<SelectEditor, SelectEditorOptions> {
-        var opt: SelectEditorOptions = {};
-        var items = [];
+        const opt: SelectEditorOptions = {};
+        const items = [];
 
-        var trueText = yes;
+        let trueText = yes;
         if (trueText == null) {
             trueText = (FilterPanelTexts.OperatorNames as any).true;
         }
         items.push(['1', trueText]);
 
-        var falseText = no;
+        let falseText = no;
         if (falseText == null) {
             falseText = (FilterPanelTexts.OperatorNames as any).false;
         }

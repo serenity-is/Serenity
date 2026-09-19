@@ -14,7 +14,7 @@ export class OrderDialog<P = {}> extends EntityDialog<OrderRow, P> {
     protected form = new OrderForm(this);
 
     protected override getToolbarButtons() {
-        var buttons = super.getToolbarButtons();
+        const buttons = super.getToolbarButtons();
 
         buttons.push(ReportHelper.createToolButton({
             title: 'Invoice',

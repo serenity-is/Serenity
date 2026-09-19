@@ -21,15 +21,15 @@ export class TreeGridMixin<TItem> {
      * @param options - Hierarchy configuration including grid reference and parent id accessor.
      */
     constructor(private options: TreeGridMixinOptions<TItem>) {
-        var dg = this.dataGrid = options.grid;
-        var idProperty = (dg as any).getIdProperty();
-        var getId = (item: TItem) => (item as any)[idProperty];
+        const dg = this.dataGrid = options.grid;
+        const idProperty = (dg as any).getIdProperty();
+        const getId = (item: TItem) => (item as any)[idProperty];
 
-        var gridContainer = dg.domNode.querySelector('.grid-container');
+        const gridContainer = dg.domNode.querySelector('.grid-container');
         if (gridContainer) {
             Fluent.on(gridContainer, "click", (e) => {
                 if ((e.target as HTMLElement).classList.contains('s-TreeToggle')) {
-                    var src = dg.sleekGrid.getCellFromEvent(e);
+                    const src = dg.sleekGrid.getCellFromEvent(e);
                     if (src.cell >= 0 &&
                         src.row >= 0) {
                         SlickTreeHelper.toggleClick<TItem>(e as any, src.row, src.cell, dg.view, getId);
@@ -49,7 +49,7 @@ export class TreeGridMixin<TItem> {
         });
 
         if (options.toggleField) {
-            var col = dg.allColumns?.find(x => x.field == options.toggleField || x.id == options.toggleField) as Column<TItem>;
+            const col = dg.allColumns?.find(x => x.field == options.toggleField || x.id == options.toggleField) as Column<TItem>;
             if (col) {
                 col.format = SlickFormatting.treeToggle(() => dg.view, getId,
                     col.format || ((ctx: FormatterContext<TItem>) => ctx.escape()));
@@ -88,25 +88,25 @@ export class TreeGridMixin<TItem> {
      * @param getParentId a delegate to get parent ID of a record
      */
     static applyTreeOrdering<TItem>(items: TItem[], getId: (item: TItem) => any, getParentId: (item: TItem) => any): TItem[] {
-        var result: TItem[] = [];
+        const result: TItem[] = [];
 
-        var byId = toGrouping(items, getId);
-        var byParentId = toGrouping(items, getParentId);
-        var visited: Record<string, boolean> = {};
+        const byId = toGrouping(items, getId);
+        const byParentId = toGrouping(items, getParentId);
+        const visited: Record<string, boolean> = {};
 
         function takeChildren(theParentId: any) {
             if (visited[theParentId])
                 return;
 
             visited[theParentId] = true;
-            for (var child of (byParentId[theParentId] || [])) {
+            for (const child of (byParentId[theParentId] || [])) {
                 result.push(child);
                 takeChildren(getId(child));
             }
         }
 
-        for (var item of items) {
-            var parentId = getParentId(item);
+        for (const item of items) {
+            const parentId = getParentId(item);
             if (parentId == null ||
                 !((byId[parentId] || []).length)) {
                 result.push(item);

@@ -232,7 +232,7 @@ export class EventEmitter<TArgs = any, TEvent = {}> {
      * @param fn - Handler to remove; must be the exact function reference passed to {@link EventEmitter.subscribe}.
      */
     unsubscribe(fn: EventCallback<TArgs, TEvent>): void {
-        for (var i = this._handlers.length - 1; i >= 0; i--) {
+        for (let i = this._handlers.length - 1; i >= 0; i--) {
             if (this._handlers[i] === fn) {
                 this._handlers.splice(i, 1);
             }
@@ -249,7 +249,7 @@ export class EventEmitter<TArgs = any, TEvent = {}> {
     notify(args?: TArgs, e?: TEvent, scope?: object): EventData<TArgs, TEvent> {
         const sed = new EventDataWrapper<TArgs, TEvent>(e, args);
         scope = scope || this;
-        for (var i = 0; i < this._handlers.length && !(sed.isPropagationStopped() || sed.isImmediatePropagationStopped()); i++) {
+        for (let i = 0; i < this._handlers.length && !(sed.isPropagationStopped() || sed.isImmediatePropagationStopped()); i++) {
             const returnValue = this._handlers[i].call(scope, sed, args);
             sed.addReturnValue(returnValue);
         }
@@ -300,7 +300,7 @@ export class EventSubscriber {
      * @returns `this` for chaining.
      */
     unsubscribe<TArgs, TEvent>(event: EventEmitter<TArgs, TEvent>, handler: EventCallback<TArgs, TEvent>): this {
-        var i = this._handlers.length;
+        let i = this._handlers.length;
         while (i--) {
             if (this._handlers[i].event === event &&
                 this._handlers[i].handler === handler) {
@@ -318,7 +318,7 @@ export class EventSubscriber {
      * @returns `this` for chaining.
      */
     unsubscribeAll(): EventSubscriber {
-        var i = this._handlers.length;
+        let i = this._handlers.length;
         while (i--) {
             this._handlers[i].event.unsubscribe(this._handlers[i].handler);
         }

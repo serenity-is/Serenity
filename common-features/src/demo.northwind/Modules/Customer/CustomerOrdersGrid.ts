@@ -23,8 +23,8 @@ export class CustomerOrdersGrid<P = {}> extends OrderGrid<P> {
     }
 
     protected override getButtons() {
-        var buttons = super.getButtons();
-        var addButton = buttons.find(x => x.action === 'add');
+        const buttons = super.getButtons();
+        const addButton = buttons.find(x => x.action === 'add');
         if (addButton)
             addButton.disabled = () => !this.customerID;
         return buttons;

@@ -49,7 +49,7 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
      */
     protected handleRoute(e: HandleRouteEvent): void {
 
-        let route = Fluent.eventProp(e, "route");
+        const route = Fluent.eventProp(e, "route");
         if (typeof route !== "string")
             return;
 
@@ -59,9 +59,9 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
             return;
         }
 
-        var oldRequests = getActiveRequests();
+        const oldRequests = getActiveRequests();
 
-        var parts = route.split('/');
+        const parts = route.split('/');
         if (parts.length === 2 && parts[0] === 'edit') {
             e.preventDefault();
             this.editItem(decodeURIComponent(parts[1]));
@@ -82,8 +82,8 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
 
         Fluent.off(document, "." + this.uniqueName + "_routerfix");
 
-        let evParts: string[] = Fluent.eventProp(e, "parts");
-        let evIndex = Fluent.eventProp(e, "index");
+        const evParts: string[] = Fluent.eventProp(e, "parts");
+        const evIndex = Fluent.eventProp(e, "index");
 
         if (getActiveRequests() > oldRequests &&
             evParts != null && evIndex != null && evIndex >= 0 && evIndex < evParts.length - 1 &&
@@ -124,7 +124,7 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
      * @returns Local text prefix key.
      */
     protected override getLocalTextPrefix(): string {
-        var result = super.getLocalTextPrefix();
+        const result = super.getLocalTextPrefix();
 
         if (result != null ||
             this.getRowDefinition())
@@ -143,9 +143,9 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
         if (this._entityType != null)
             return this._entityType;
 
-        var name = getTypeFullName(getInstanceType(this));
+        let name = getTypeFullName(getInstanceType(this));
 
-        var px = name.indexOf('.');
+        const px = name.indexOf('.');
         if (px >= 0) {
             name = name.substring(px + 1);
         }
@@ -202,7 +202,7 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
      */
     protected override getButtons(): ToolButton[] {
 
-        var buttons: ToolButton[] = [];
+        const buttons: ToolButton[] = [];
         buttons.push({
             title: this.getAddButtonCaption(),
             action: 'add',
@@ -291,7 +291,7 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
      */
     protected override editItem(entityOrId: any): void {
         this.createEntityDialog(this.getItemType(), dlg => {
-            var dialog = safeCast(dlg, IEditDialog);
+            const dialog = safeCast(dlg, IEditDialog);
             if (dialog != null) {
                 dialog.load(entityOrId, () => {
                     dialog.dialogOpen(this.openDialogsAsPanel ?? DataGrid.defaultOptions.openDialogsAsPanel);
@@ -319,7 +319,7 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
         }
 
         this.createEntityDialog(itemType, dlg => {
-            var dialog = safeCast(dlg, IEditDialog);
+            const dialog = safeCast(dlg, IEditDialog);
             if (dialog != null) {
                 dialog.load(entityOrId, () => {
                     dialog.dialogOpen(this.openDialogsAsPanel ?? DataGrid.defaultOptions.openDialogsAsPanel);
@@ -367,7 +367,7 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
      * @returns Remote view options with URL populated.
      */
     protected override getViewOptions(): RemoteViewOptions {
-        var opt = super.getViewOptions();
+        const opt = super.getViewOptions();
         opt.url = this.getServiceUrl();
         return opt;
     }
@@ -387,7 +387,7 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
      */
     protected routeDialog(itemType: string, dialog: Widget<any>) {
         Router && Router.dialog && Router.dialog(this.domNode, dialog.domNode, () => {
-            var hash = '';
+            let hash = '';
 
             if (itemType !== this.getItemType())
                 hash = itemType + '/';
@@ -503,7 +503,7 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
         const dialogType = this.getDialogTypeFor(itemType);
 
         const then = (dialogType: any) => {
-            var dialog = Widget.create({
+            const dialog = Widget.create({
                 type: dialogType,
                 options: this.getDialogOptionsFor(itemType)
             });

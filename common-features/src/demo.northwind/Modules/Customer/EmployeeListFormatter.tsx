@@ -11,14 +11,14 @@ export class EmployeeListFormatter implements Formatter {
 
     format(ctx: FormatterContext): FormatterResult {
 
-        let idList = ctx.value as string[];
+        const idList = ctx.value as string[];
         if (!idList || !idList.length)
             return "";
 
-        let byId = lookup?.itemById;
+        const byId = lookup?.itemById;
         if (byId) {
             return <>{idList.map(x => {
-                var z = byId[x];
+                const z = byId[x];
                 return z == null ? x : z.FullName;
             }).join(", ")}</>;
         }

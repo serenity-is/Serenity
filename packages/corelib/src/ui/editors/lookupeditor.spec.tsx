@@ -19,8 +19,8 @@ describe("LookupEditor", () => {
 
     it('throws an error if lookupKey is not registered', () => {
         setScriptData("Lookup.Test", null);
-        var logSpy = vi.spyOn(window.console, 'log').mockImplementation(() => { });
-        var oldXHR = window.XMLHttpRequest
+        const logSpy = vi.spyOn(window.console, 'log').mockImplementation(() => { });
+        const oldXHR = window.XMLHttpRequest
         try {
             window.XMLHttpRequest = class {
                 open() { }

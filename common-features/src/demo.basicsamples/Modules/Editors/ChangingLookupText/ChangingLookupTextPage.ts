@@ -5,7 +5,7 @@ import { ChangingLookupTextForm } from "../../ServerTypes/Demo";
 import { nsDemoBasicSamples } from "../../ServerTypes/Namespaces";
 
 export default function pageInit() {
-    var dlg = new ChangingLookupTextDialog({});
+    const dlg = new ChangingLookupTextDialog({});
     dlg.loadNewAndOpenDialog();
     tryGetWidget(dlg.domNode.querySelector(".field.ProductID .editor"), ComboboxEditor)?.openDropdown();
 }
@@ -44,16 +44,16 @@ export class ChangingLookupTextDialog<P = {}> extends GridEditorDialog<OrderDeta
         this.form = new ChangingLookupTextForm(this);
 
         this.form.ProductID.changeSelect2(async e => {
-            var productID = toId(this.form.ProductID.value);
+            const productID = toId(this.form.ProductID.value);
             if (productID != null) {
                 this.form.UnitPrice.value = (await ProductRow.getLookupAsync()).itemById[productID].UnitPrice;
             }
         });
 
         this.form.Discount.addValidationRule(this.uniqueName, e => {
-            var price = this.form.UnitPrice.value;
-            var quantity = this.form.Quantity.value;
-            var discount = this.form.Discount.value;
+            const price = this.form.UnitPrice.value;
+            const quantity = this.form.Quantity.value;
+            const discount = this.form.Discount.value;
             if (price != null && quantity != null && discount != null &&
                 discount > 0 && discount >= price * quantity) {
                 return "Discount can't be higher than total price!";
@@ -62,7 +62,7 @@ export class ChangingLookupTextDialog<P = {}> extends GridEditorDialog<OrderDeta
     }
 
     protected override getDialogOptions() {
-        var opt = super.getDialogOptions();
+        const opt = super.getDialogOptions();
         opt.modal = false;
         return opt;
     }

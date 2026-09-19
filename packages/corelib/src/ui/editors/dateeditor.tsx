@@ -38,10 +38,10 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
     constructor(props: EditorProps<P>) {
         super(props);
 
-        let $ = getjQuery();
+        const $ = getjQuery();
         // @ts-ignore
         if (typeof flatpickr !== "undefined" && (DateEditor.useFlatpickr || !$?.fn?.datepicker)) {
-            var options = this.getFlatpickrOptions(this.domNode);
+            const options = this.getFlatpickrOptions(this.domNode);
             // @ts-ignore
             flatpickr(this.domNode, options);
             this.createFlatPickrTrigger();
@@ -84,7 +84,7 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
         Fluent.on(this.domNode, 'change.' + this.uniqueName, DateEditor.dateInputChange);
 
         addValidationRule(this.domNode, () => {
-            var value = this.get_value();
+            const value = this.get_value();
             if (!value) {
                 return null;
             }
@@ -136,7 +136,7 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
      * @returns The date value, or null when empty.
      */
     get_value(): string {
-        var value = this.domNode?.value?.trim();
+        const value = this.domNode?.value?.trim();
         if (!value) {
             return null;
         }
@@ -220,7 +220,7 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
 
         if (value !== this.get_readOnly()) {
             setElementReadOnly(this.domNode, value);
-            let trg = this.element.nextSibling(".ui-datepicker-trigger").getNode();
+            const trg = this.element.nextSibling(".ui-datepicker-trigger").getNode();
             trg && ((trg as HTMLElement).style.opacity = value ? "0.1" : "1");
         }
     }
@@ -333,7 +333,7 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
      * @returns Flatpickr options.
      */
     public getFlatpickrOptions(input: HTMLElement): any {
-        var opt: any = {
+        const opt: any = {
             clickOpens: false,
             allowInput: true,
             dateFormat: Culture.dateOrder.split('').join(Culture.dateSeparator).replace('y', 'Y'),
@@ -349,7 +349,7 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
             opt.appendTo = this.domNode.closest(".modal");
         else {
             setTimeout(() => {
-                var modal = this.domNode?.closest(".modal");
+                const modal = this.domNode?.closest(".modal");
                 if (modal && !opt.static && !opt.appendTo && this.domNode &&
                     (this.domNode as any)._flatpickr &&
                     (this.domNode as any)._flatpickr.calendarContainer &&
@@ -375,7 +375,7 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
      * Applies a z-index workaround for the jQuery UI datepicker popup.
      * @param el - The input element or array-like collection. */
     public static uiPickerZIndexWorkaround(el: HTMLElement | ArrayLike<HTMLElement>) {
-        let input = isArrayLike(el) ? el[0] : el;
+        const input = isArrayLike(el) ? el[0] : el;
         if (!input)
             return;
         jQueryDatepickerZIndexWorkaround(input as HTMLInputElement);

@@ -86,7 +86,7 @@ describe('options.frozenColumns', () => {
     });
 
     it('sets the first visible column to frozen when 1', () => {
-        var cols = threeCols();
+        const cols = threeCols();
         cols[0].visible = false;
         const grid = new SleekGrid(container(), [], cols, {
             enableColumnReorder: false,
@@ -115,7 +115,7 @@ describe('options.frozenColumns', () => {
     });
 
     it('sets the first two visible column to frozen when 2', () => {
-        var cols = threeCols();
+        const cols = threeCols();
         cols[0].visible = false;
         const grid = new SleekGrid(container(), [], cols, {
             enableColumnReorder: false,
@@ -225,7 +225,7 @@ describe('options.frozenColumns', () => {
     });
 
     it("moves frozen columns to the left on init", () => {
-        var cols = threeCols();
+        const cols = threeCols();
         cols[1].frozen = true;
         cols[2].frozen = true;
         const div = container();

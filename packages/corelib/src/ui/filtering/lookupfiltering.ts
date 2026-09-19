@@ -21,7 +21,7 @@ export class LookupFiltering extends BaseEditorFiltering<LookupEditor> {
      * @returns The operators.
      */
     getOperators(): FilterOperator[] {
-        var ops = [{ key: FilterOperators.EQ }, { key: FilterOperators.NE }, { key: FilterOperators.contains }, { key: FilterOperators.startsWith }]
+        const ops = [{ key: FilterOperators.EQ }, { key: FilterOperators.NE }, { key: FilterOperators.contains }, { key: FilterOperators.startsWith }]
         return this.appendNullableOperators(ops);
     }
 
@@ -30,7 +30,7 @@ export class LookupFiltering extends BaseEditorFiltering<LookupEditor> {
      * @returns True when eq or ne.
      */
     protected override useEditor(): boolean {
-        var op = this.get_operator().key;
+        const op = this.get_operator().key;
         return op == FilterOperators.EQ || op == FilterOperators.NE;
     }
 

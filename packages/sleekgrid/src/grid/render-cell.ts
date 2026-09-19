@@ -36,7 +36,7 @@ export function renderCell<TItem>(this: void, { activeCell, activeRow, cell, cel
     }
 
     // if there is a corresponding row (if not, this is the Add New row or this data hasn't been loaded yet)
-    var fmtResult: FormatterResult;
+    let fmtResult: FormatterResult;
     const ctx = formatterContext<TItem>({
         cell,
         column,
@@ -67,17 +67,17 @@ export function renderCell<TItem>(this: void, { activeCell, activeRow, cell, cel
         if (ctx.addClass?.length)
             sb.push(' data-fmtcls="' + escapeHtml(ctx.addClass) + '"');
 
-        var attrs = ctx.addAttrs;
+        const attrs = ctx.addAttrs;
         if (attrs != null) {
-            var ks = [];
-            for (var k in attrs) {
+            const ks = [];
+            for (const k in attrs) {
                 sb.push(k + '="' + escapeHtml(attrs[k]) + '"');
                 ks.push(k);
             }
             sb.push(' data-fmtatt="' + escapeHtml(ks.join(',')) + '"');
         }
 
-        var toolTip = ctx.tooltip;
+        const toolTip = ctx.tooltip;
         if (toolTip != null && toolTip.length)
             sb.push('tooltip="' + escapeHtml(toolTip) + '"');
 

@@ -42,7 +42,7 @@ export class CascadedWidgetLink<TParent extends Widget<any>> {
             return null;
         }
 
-        var parent = tryGetWidget(findElementWithRelativeId(this.widget.domNode, this._parentID), this.parentType);
+        const parent = tryGetWidget(findElementWithRelativeId(this.widget.domNode, this._parentID), this.parentType);
 
         if (parent != null) {
             this._parentNode = parent.domNode;

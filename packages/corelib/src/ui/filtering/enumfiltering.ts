@@ -21,7 +21,7 @@ export class EnumFiltering extends BaseEditorFiltering<EnumEditor> {
      * @returns The operators.
      */
     getOperators() {
-        var op = [{ key: FilterOperators.EQ }, { key: FilterOperators.NE }];
+        const op = [{ key: FilterOperators.EQ }, { key: FilterOperators.NE }];
         return this.appendNullableOperators(op);
     }
 

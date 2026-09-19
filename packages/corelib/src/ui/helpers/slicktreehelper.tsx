@@ -14,8 +14,8 @@ export namespace SlickTreeHelper {
      * @returns True if the item is visible, otherwise false.
      */
     export function filterCustom<TItem>(item: TItem, getParent: (x: TItem) => any): boolean {
-        var parent = getParent(item);
-        var loop = 0;
+        let parent = getParent(item);
+        let loop = 0;
         while (parent != null) {
             if (!!parent._collapsed) {
                 return false;
@@ -41,7 +41,7 @@ export namespace SlickTreeHelper {
     export function filterById<TItem>(item: TItem, view: IRemoteView<TItem>,
         getParentId: (x: TItem) => any): boolean {
         return filterCustom(item, function (x) {
-            var parentId = getParentId(x);
+            const parentId = getParentId(x);
             if (parentId == null) {
                 return null;
             }
@@ -57,7 +57,7 @@ export namespace SlickTreeHelper {
      */
     export function setCollapsed<TItem>(items: TItem[], collapsed: boolean): void {
         if (items != null) {
-            for (var item of items) {
+            for (const item of items) {
                 (item as any)._collapsed = collapsed;
             }
         }
@@ -83,12 +83,12 @@ export namespace SlickTreeHelper {
      */
     export function setIndents<TItem>(items: TItem[], getId: (x: TItem) => any,
         getParentId: (x: TItem) => any, setCollapsed?: boolean): void {
-        var depth = 0;
-        var depths: Record<any, any> = {};
-        for (var line = 0; line < items.length; line++) {
-            var item = items[line];
+        let depth = 0;
+        const depths: Record<any, any> = {};
+        for (let line = 0; line < items.length; line++) {
+            const item = items[line];
             if (line > 0) {
-                var parentId = getParentId(item);
+                const parentId = getParentId(item);
                 if (parentId != null && parentId === getId(items[line - 1])) {
                     depth += 1;
                 }
@@ -127,7 +127,7 @@ export namespace SlickTreeHelper {
         if (!e || !e.target || Fluent.isDefaultPrevented(e)) 
             return;
 
-        var target = e.target as HTMLElement;
+        const target = e.target as HTMLElement;
         if (!target.classList.contains('s-TreeToggle')) {
             return;
         }
@@ -135,7 +135,7 @@ export namespace SlickTreeHelper {
         e.preventDefault();
 
         if (target.classList.contains('s-TreeCollapse') || target.classList.contains('s-TreeExpand')) {
-            var item = view.getItem(row) as any;
+            const item = view.getItem(row) as any;
             if (item != null) {
                 if (!item._collapsed) {
                     item._collapsed = true;

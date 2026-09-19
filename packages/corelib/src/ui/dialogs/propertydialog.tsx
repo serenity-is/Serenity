@@ -82,7 +82,7 @@ export class PropertyDialog<TItem, P> extends BaseDialog<P> {
      * @returns Dialog options.
      */
     protected override getDialogOptions() {
-        var opt = super.getDialogOptions();
+        const opt = super.getDialogOptions();
         opt.width = 400;
         return opt;
     }
@@ -136,11 +136,11 @@ export class PropertyDialog<TItem, P> extends BaseDialog<P> {
      * Initializes the property grid from the PropertyGrid element.
      */
     protected initPropertyGrid() {
-        var pgDiv = this.findById('PropertyGrid');
+        const pgDiv = this.findById('PropertyGrid');
         if (!pgDiv) {
             return;
         }
-        var pgOptions = this.getPropertyGridOptions();
+        const pgOptions = this.getPropertyGridOptions();
         this.propertyGrid = (new PropertyGrid({ element: pgDiv, ...pgOptions })).init();
     }
 
@@ -149,8 +149,8 @@ export class PropertyDialog<TItem, P> extends BaseDialog<P> {
      * @returns The form key.
      */
     protected getFormKey(): string {
-        var name = getTypeFullName(getInstanceType(this));
-        var px = name.indexOf('.');
+        let name = getTypeFullName(getInstanceType(this));
+        const px = name.indexOf('.');
         if (px >= 0) {
             name = name.substring(px + 1);
         }
@@ -189,7 +189,7 @@ export class PropertyDialog<TItem, P> extends BaseDialog<P> {
      * @returns The property items data.
      */
     protected getPropertyItemsData(): PropertyItemsData {
-        var formKey = this.getFormKey();
+        const formKey = this.getFormKey();
 
         if (this.getFormKey === PropertyDialog.prototype.getFormKey &&
             this.getPropertyItems !== PropertyDialog.prototype.getPropertyItems &&
@@ -212,7 +212,7 @@ export class PropertyDialog<TItem, P> extends BaseDialog<P> {
      * @returns A promise resolving to the property items data.
      */
     protected async getPropertyItemsDataAsync(): Promise<PropertyItemsData> {
-        var formKey = this.getFormKey();
+        const formKey = this.getFormKey();
         if (formKey) {
             return await getFormDataAsync(formKey);
         }
@@ -225,7 +225,7 @@ export class PropertyDialog<TItem, P> extends BaseDialog<P> {
      * @returns The saved entity.
      */
     protected getSaveEntity(): TItem {
-        var entity = new Object();
+        const entity = new Object();
         if (this.propertyGrid) {
             this.propertyGrid.save(entity);
         }

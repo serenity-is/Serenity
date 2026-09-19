@@ -67,13 +67,13 @@ export class AutoTooltips implements GridPlugin {
     }
 
     private handleMouseEnter = (e: MouseEvent) => {
-        var cell = this.grid.getCellFromEvent(e);
+        const cell = this.grid.getCellFromEvent(e);
         if (!cell)
             return;
-        var node = this.grid.getCellNode(cell.row, cell.cell);
+        let node = this.grid.getCellNode(cell.row, cell.cell);
         if (!node)
             return;
-        var text;
+        let text;
         if (!node.title || this.options.replaceExisting) {
             if (node.clientWidth < node.scrollWidth) {
                 text = node.textContent?.trim() ?? "";
@@ -90,9 +90,9 @@ export class AutoTooltips implements GridPlugin {
     }
 
     private handleHeaderMouseEnter = (e: HeaderColumnEvent) => {
-        var column = e.column;
+        const column = e.column;
         if (column && !column.toolTip) {
-            var node = (e.target as HTMLElement).closest(".slick-header-column") as HTMLElement;
+            const node = (e.target as HTMLElement).closest(".slick-header-column") as HTMLElement;
             node && (node.title = (node.clientWidth < node.scrollWidth ? (typeof column.name === "string" ? column.name : "") : ""));
         }
     }

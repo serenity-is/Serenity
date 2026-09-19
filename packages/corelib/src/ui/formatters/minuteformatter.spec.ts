@@ -3,13 +3,13 @@ import { MinuteFormatter } from "./minuteformatter";
 
 describe("MinuteFormatter", () => {
     it("shows empty string if value is null", () => {
-        var formatter = new MinuteFormatter();
+        const formatter = new MinuteFormatter();
         expect(formatter.format(ctx({ value: null }))).toBe("");
         expect(formatter.format(ctx({ value: NaN }))).toBe("");
     })
 
     it("shows correctly formatted minute", () => {
-        var formatter = new MinuteFormatter();
+        const formatter = new MinuteFormatter();
 
         expect(formatter.format(ctx({ value: 0 }))).toBe("00:00");
         expect(formatter.format(ctx({ value: 12 }))).toBe("00:12");
@@ -19,7 +19,7 @@ describe("MinuteFormatter", () => {
     })
 
     it("returns empty for empty or non-finite values", () => {
-        var formatter = new MinuteFormatter();
+        const formatter = new MinuteFormatter();
         expect(formatter.format(ctx({ value: "" as any }))).toBe("");
         expect(formatter.format(ctx({ value: undefined as any }))).toBe("");
         expect(formatter.format(ctx({ value: Infinity as any }))).toBe("");

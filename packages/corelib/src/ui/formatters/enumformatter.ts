@@ -22,7 +22,7 @@ export class EnumFormatter implements Formatter {
      * @returns Localized enum text or a placeholder element when the enum type loads asynchronously.
      */
     format(ctx: FormatterContext): FormatterResult {
-        var enumType = EnumTypeRegistry.getOrLoad(this.enumKey);
+        const enumType = EnumTypeRegistry.getOrLoad(this.enumKey);
         if (isPromiseLike(enumType)) {
             const node = document.createElement("span");
             enumType.then(resolved => {
@@ -54,8 +54,8 @@ export class EnumFormatter implements Formatter {
             return '';
         }
 
-        var name = Enum.toString(enumType, value);
-        var enumKey = getCustomAttribute(enumType, EnumKeyAttribute, false)?.value ??
+        const name = Enum.toString(enumType, value);
+        const enumKey = getCustomAttribute(enumType, EnumKeyAttribute, false)?.value ??
             getTypeFullName(enumType);
         return EnumFormatter.getText(enumKey, name);
     }

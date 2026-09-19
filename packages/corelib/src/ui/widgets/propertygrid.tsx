@@ -83,7 +83,7 @@ export function PropertyFieldEditor(props: {
                 if (item.editorAddons?.length) {
                     wrappedNode = document.createDocumentFragment();
                     wrappedNode.appendChild(el);
-                    for (var wrapper of item.editorAddons) {
+                    for (const wrapper of item.editorAddons) {
                         const wrapperComponent = (typeof wrapper.type === "function" ? wrapper.type : getType(wrapper.type)) as (props: any) => void;
                         if (typeof wrapperComponent !== "function")
                             throw `Invalid editor addon type: ${wrapper.type} for property: "${item.name}"`;
@@ -136,7 +136,7 @@ export function PropertyFieldLineBreak(props: {
     if (!klass || klass.indexOf('line-break') < 0)
         return null;
 
-    var splitted = klass.split(' ');
+    const splitted = klass.split(' ');
     if (splitted.indexOf('line-break-xs') >= 0) {
         return createLineBreak("line-break");
     }
@@ -219,7 +219,7 @@ export function PropertyCategory(props: { category?: string, children?: any, col
     const { category, children, collapsed, localTextPrefix } = props;
     if (category) {
         let key = category;
-        let idx = category.lastIndexOf('.Categories.');
+        const idx = category.lastIndexOf('.Categories.');
         if (idx >= 0) {
             key = category.substring(idx + 12);
         }
@@ -295,11 +295,11 @@ export function PropertyCategories(props: {
     props.container && props.container.appendChild(categoriesDiv);
 
     const { items, fieldElements, idPrefix, localTextPrefix } = props;
-    var categoryEl: HTMLElement = null;
-    var priorCategory = null;
-    for (var i = 0; i < items.length; i++) {
-        var item = items[i];
-        var category = item.category ?? '';
+    let categoryEl: HTMLElement = null;
+    let priorCategory = null;
+    for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+        const category = item.category ?? '';
 
         if (!categoryEl || priorCategory !== category) {
             categoryEl = categoriesDiv.appendChild(<PropertyCategory category={category} localTextPrefix={localTextPrefix}
@@ -374,20 +374,20 @@ export function PropertyTabs(props: {
     const tabList = parentNode.appendChild(PropertyTabList());
     const tabPanes = parentNode.appendChild(PropertyTabPanes());
 
-    var tabIndex = 0;
-    var i = 0;
+    let tabIndex = 0;
+    let i = 0;
     while (i < itemsWithTab.length) {
-        var title = itemsWithTab[i].tab?.trim() ?? '';
-        var withSameTab = [];
+        const title = itemsWithTab[i].tab?.trim() ?? '';
+        const withSameTab = [];
 
-        var j = i;
+        let j = i;
         do {
             withSameTab.push(itemsWithTab[j]);
         } while (++j < itemsWithTab.length &&
             (itemsWithTab[j].tab?.trim() ?? '') === title);
         i = j;
 
-        var paneId = (paneIdPrefix ?? idPrefix ?? "") + 'Tab' + tabIndex;
+        const paneId = (paneIdPrefix ?? idPrefix ?? "") + 'Tab' + tabIndex;
 
         tabList.appendChild(PropertyTabItem({ title, active: tabIndex === 0, paneId, localTextPrefix }));
 
@@ -452,7 +452,7 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
     override destroy() {
 
         if (this.fieldElements) {
-            for (var fieldElement of this.fieldElements) {
+            for (const fieldElement of this.fieldElements) {
                 if (fieldElement) {
                     fieldElement.editorWidget?.destroy();
                     delete fieldElement.editorWidget;
@@ -498,9 +498,9 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
      * @param callback - Callback receiving the property item and editor widget.
      */
     enumerateItems(callback: (p1: PropertyItem, p2: Widget<any>) => void): void {
-        for (let fieldElement of this.fieldElements) {
-            var item = fieldElement.propertyItem;
-            var editor = fieldElement.editorWidget;
+        for (const fieldElement of this.fieldElements) {
+            const item = fieldElement.propertyItem;
+            const editor = fieldElement.editorWidget;
             if (!editor && fieldElement.editorPromise)
                 throw new Error(`Editor for "${item.name}" is not loaded yet.`);
             callback(item, editor);
@@ -534,7 +534,7 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
      * @param mode - The grid mode, used to apply insert defaults.
      */
     static loadFieldValue(source: any, fieldElement: PropertyFieldElement, mode?: PropertyGridMode) {
-        var item = fieldElement.propertyItem;
+        const item = fieldElement.propertyItem;
         if (!!(mode === PropertyGridMode.insert && item.defaultValue != null) &&
             typeof (source[item.name]) === 'undefined') {
             source[item.name] = item.defaultValue;
@@ -543,7 +543,7 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
         if (item.unbound ?? item.skipOnLoad)
             return;
 
-        var editor = fieldElement.editorWidget;
+        const editor = fieldElement.editorWidget;
         if (!editor && fieldElement.editorPromise) {
             fieldElement.editorPromise.then(() => {
                 fieldElement.editorWidget && EditorUtils.loadValue(fieldElement.editorWidget, item, source);
@@ -560,7 +560,7 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
      */
     load(source: any): void {
         const mode = this.get_mode();
-        for (let fieldElement of this.fieldElements) {
+        for (const fieldElement of this.fieldElements) {
             PropertyGrid.loadFieldValue(source, fieldElement, mode);
         }
     }
@@ -574,9 +574,9 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
      *   result of {@link PropertyGrid.canModifyItem}.
      */
     static saveFieldValue(target: any, fieldElement: PropertyFieldElement, canModify?: boolean): void {
-        var item = fieldElement.propertyItem;
+        const item = fieldElement.propertyItem;
         if ((item.unbound ?? item.skipOnSave ?? (item as any).oneWay) !== true && (canModify ?? PropertyGrid.canModifyItem(item))) {
-            var editor = fieldElement.editorWidget;
+            const editor = fieldElement.editorWidget;
             if (!editor && fieldElement.editorPromise)
                 throw new Error(`Editor for "${item.name}" is not loaded yet.`);
 
@@ -592,7 +592,7 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
     save(target?: any): any {
         if (target == null)
             target = Object.create(null);
-        for (let fieldElement of this.fieldElements) {
+        for (const fieldElement of this.fieldElements) {
             PropertyGrid.saveFieldValue(target, fieldElement, !!this.canModifyItem(fieldElement.propertyItem));
         }
         return target;
@@ -603,7 +603,7 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
      * @returns True if all commits succeeded, false if any editor rejected.
      */
     async commitEdits(): Promise<boolean> {
-        for (let fieldElement of this.fieldElements) {
+        for (const fieldElement of this.fieldElements) {
             if (fieldElement.editorWidget &&
                 typeof (fieldElement.editorWidget as any).commitEdits === "function") {
                 const result = await (fieldElement.editorWidget as any).commitEdits();
@@ -681,10 +681,10 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
      * @param canModify - Whether the item may be modified.
      */
     static updateFieldElement(fieldElement: PropertyFieldElement, mode?: PropertyGridMode, canModify?: boolean) {
-        var item = fieldElement.propertyItem;
+        const item = fieldElement.propertyItem;
         canModify ??= PropertyGrid.canModifyItem(item, mode);
-        var readOnly = item.readOnly === true || !canModify;
-        var editor = fieldElement.editorWidget;
+        const readOnly = item.readOnly === true || !canModify;
+        const editor = fieldElement.editorWidget;
         const then = (editor: Widget<any>) => {
             if (!editor)
                 return;
@@ -694,7 +694,7 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
             if (item.visible === false || item.readPermission != null ||
                 item.insertPermission != null || item.updatePermission != null ||
                 item.hideOnInsert === true || item.hideOnUpdate === true) {
-                var hidden = (item.readPermission != null &&
+                const hidden = (item.readPermission != null &&
                     !Authorization.hasPermission(item.readPermission)) ||
                     item.visible === false ||
                     (mode === PropertyGridMode.insert && item.hideOnInsert === true) ||
@@ -725,7 +725,7 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
      * Refreshes the read-only/required state and visibility of all fields.
      */
     updateInterface() {
-        for (let fieldElement of this.fieldElements) {
+        for (const fieldElement of this.fieldElements) {
             this.updateFieldElement(fieldElement);
         }
     }
@@ -758,7 +758,7 @@ function extractTabKey(title: string) {
     if (!title)
         return null;
 
-    let idx = title.lastIndexOf('.Tabs.');
+    const idx = title.lastIndexOf('.Tabs.');
     if (idx >= 0) {
         return title.substring(idx + 6);
     }

@@ -13,13 +13,13 @@ export class PhoneEditor<P extends PhoneEditorOptions = PhoneEditorOptions> exte
         super(props);
 
         this.addValidationRule(this.uniqueName, e => {
-            var value = this.get_value()?.trim();
+            const value = this.get_value()?.trim();
             if (!value)
                 return null;
             return PhoneEditor.validate(value, this.props?.multiple);
         });
 
-        let input = this.domNode as HTMLInputElement;
+        const input = this.domNode as HTMLInputElement;
         input.addEventListener('change', e => {
             this.formatValue();
         });
@@ -36,7 +36,7 @@ export class PhoneEditor<P extends PhoneEditorOptions = PhoneEditorOptions> exte
     }
 
     protected getFormattedValue(): string {
-        var value = (this.domNode as HTMLInputElement)?.value;
+        const value = (this.domNode as HTMLInputElement)?.value;
         if (!value)
             return null;
         if (this.props?.multiple) {
@@ -54,7 +54,7 @@ export class PhoneEditor<P extends PhoneEditorOptions = PhoneEditorOptions> exte
     }
 
     static validate(phone: string, isMultiple: boolean) {
-        var valid = (isMultiple ? PhoneEditor.isValidMulti(phone, PhoneEditor.isValidPhone) : PhoneEditor.isValidPhone(phone));
+        const valid = (isMultiple ? PhoneEditor.isValidMulti(phone, PhoneEditor.isValidPhone) : PhoneEditor.isValidPhone(phone));
         if (valid) {
             return null;
         }
@@ -86,8 +86,8 @@ export class PhoneEditor<P extends PhoneEditorOptions = PhoneEditorOptions> exte
             return false;
         }
 
-        for (var i = 0; i < phone.length; i++) {
-            var c = phone.charAt(i);
+        for (let i = 0; i < phone.length; i++) {
+            const c = phone.charAt(i);
             if (c < '0' || c > '9') {
                 return false;
             }
@@ -109,10 +109,10 @@ export class PhoneEditor<P extends PhoneEditorOptions = PhoneEditorOptions> exte
     }
 
     static formatMulti(phone: string, format: (s: string) => string) {
-        var phones = (phone ?? "").replaceAll(';', ',').split(String.fromCharCode(44));
-        var result = '';
-        for (var x of phones) {
-            var s = x?.trim();
+        const phones = (phone ?? "").replaceAll(';', ',').split(String.fromCharCode(44));
+        let result = '';
+        for (const x of phones) {
+            const s = x?.trim();
             if (!s)
                 continue;
             if (result.length > 0)
@@ -125,11 +125,11 @@ export class PhoneEditor<P extends PhoneEditorOptions = PhoneEditorOptions> exte
     static isValidMulti(phone: string, check: (s: string) => boolean) {
         if (!phone)
             return false;
-        var phones = (phone ?? "").replaceAll(';', ',').split(',');
-        var anyValid = false;
-        for (var $t1 = 0; $t1 < phones.length; $t1++) {
-            var x = phones[$t1];
-            var s = x?.trim();
+        const phones = (phone ?? "").replaceAll(';', ',').split(',');
+        let anyValid = false;
+        for (let $t1 = 0; $t1 < phones.length; $t1++) {
+            const x = phones[$t1];
+            const s = x?.trim();
             if (!s)
                 continue;
             if (!check(s))

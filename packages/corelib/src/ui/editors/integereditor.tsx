@@ -60,7 +60,7 @@ export class IntegerEditor<P extends IntegerEditorOptions = IntegerEditorOptions
      * @returns AutoNumeric options.
      */
     protected getAutoNumericOptions(): AutoNumericOptions {
-        var numericOptions: AutoNumericOptions = Object.assign({}, DecimalEditor.defaultAutoNumericOptions(), {
+        const numericOptions: AutoNumericOptions = Object.assign({}, DecimalEditor.defaultAutoNumericOptions(), {
             vMin: this.options.minValue ?? (this.options.allowNegatives ? (this.options.maxValue != null ? ("-" + Math.abs(this.options.maxValue)) : '-2147483647') : '0'),
             vMax: this.options.maxValue ?? 2147483647,
             aSep: null
@@ -80,7 +80,7 @@ export class IntegerEditor<P extends IntegerEditorOptions = IntegerEditorOptions
      * @returns The value, or null when empty.
      */
     get_value(): number {
-        var val: string;
+        let val: string;
         if (AutoNumeric.hasInstance(this.domNode)) {
             val = AutoNumeric.getValue(this.domNode);
             if (!val?.trim())

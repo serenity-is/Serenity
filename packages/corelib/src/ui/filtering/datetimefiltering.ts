@@ -32,7 +32,7 @@ export class DateTimeFiltering extends BaseEditorFiltering<DateEditor> {
      * @returns The criteria with display text.
      */
     override getCriteria() {
-        var result: CriteriaWithText = {};
+        const result: CriteriaWithText = {};
 
         switch (this.get_operator().key) {
             case 'eq':
@@ -42,14 +42,14 @@ export class DateTimeFiltering extends BaseEditorFiltering<DateEditor> {
             case 'gt':
             case 'ge': {
                 {
-                    var text = this.getEditorText();
+                    const text = this.getEditorText();
                     result.displayText = this.displayText(this.get_operator(), [text]);
-                    var date = parseISODateTime(this.getEditorValue());
+                    let date = parseISODateTime(this.getEditorValue());
                     date = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-                    var next = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1);
-                    var criteria = Criteria(this.getCriteriaField());
-                    var dateValue = formatDate(date, 'yyyy-MM-dd');
-                    var nextValue = formatDate(next, 'yyyy-MM-dd');
+                    const next = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1);
+                    const criteria = Criteria(this.getCriteriaField());
+                    const dateValue = formatDate(date, 'yyyy-MM-dd');
+                    const nextValue = formatDate(next, 'yyyy-MM-dd');
                     switch (this.get_operator().key) {
                         case 'eq': {
                             result.criteria = Criteria.and(criteria.ge(dateValue), criteria.lt(nextValue));

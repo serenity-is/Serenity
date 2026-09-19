@@ -24,9 +24,9 @@ export class MinuteFormatter implements Formatter {
         if (value == null || (value as any) === '' || !isFinite(value))
             return '';
 
-        var hour = Math.floor(value / 60);
-        var minute = value - hour * 60;
-        var hourStr, minuteStr;
+        const hour = Math.floor(value / 60);
+        const minute = value - hour * 60;
+        let hourStr, minuteStr;
 
         if (hour < 10)
             hourStr = '0' + hour;

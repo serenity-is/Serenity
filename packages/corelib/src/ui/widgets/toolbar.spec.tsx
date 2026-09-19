@@ -3,15 +3,15 @@ import { Toolbar, ToolbarButton, ToolButton } from "./toolbar";
 describe("ToolButton", () => {
     it('clicking .tool-button directly calls onClick if it does not have disabled class', function () {
         const onClick = vi.fn();
-        var btn = <ToolbarButton onClick={onClick}></ToolbarButton> as HTMLElement;
+        const btn = <ToolbarButton onClick={onClick}></ToolbarButton> as HTMLElement;
         btn.click();
         expect(onClick).toHaveBeenCalledTimes(1);
     });
 
     it('clicking .button-inner calls onClick if tool-button element does not have disabled class', function () {
         const onClick = vi.fn();
-        var btn = <ToolbarButton onClick={onClick}></ToolbarButton> as HTMLElement;
-        var inner = btn.querySelector<HTMLElement>(".button-inner");
+        const btn = <ToolbarButton onClick={onClick}></ToolbarButton> as HTMLElement;
+        const inner = btn.querySelector<HTMLElement>(".button-inner");
         expect(inner).not.toBeNull();
         inner.click();
         expect(onClick).toHaveBeenCalledTimes(1);
@@ -19,7 +19,7 @@ describe("ToolButton", () => {
 
     it('clicking .tool-button directly does not call onClick if it has disabled class', function () {
         const onClick = vi.fn();
-        var btn = <ToolbarButton onClick={onClick}></ToolbarButton> as HTMLElement;
+        const btn = <ToolbarButton onClick={onClick}></ToolbarButton> as HTMLElement;
         btn.classList.add("disabled");
         btn.click();
         expect(onClick).not.toHaveBeenCalled();
@@ -27,9 +27,9 @@ describe("ToolButton", () => {
 
     it('clicking .button-inner does not call onClick if tool-button element has disabled class', function () {
         const onClick = vi.fn();
-        var btn = <ToolbarButton onClick={onClick}></ToolbarButton> as HTMLElement;
+        const btn = <ToolbarButton onClick={onClick}></ToolbarButton> as HTMLElement;
         btn.classList.add("disabled");
-        var inner = btn.querySelector<HTMLElement>(".button-inner");
+        const inner = btn.querySelector<HTMLElement>(".button-inner");
         expect(inner).not.toBeNull();
         inner.click();
         expect(onClick).not.toHaveBeenCalled();
@@ -37,52 +37,52 @@ describe("ToolButton", () => {
 
     it("can use ref with jsx", function () {
         const ref = vi.fn();
-        var btn = <ToolbarButton ref={ref}></ToolbarButton> as HTMLElement;
+        const btn = <ToolbarButton ref={ref}></ToolbarButton> as HTMLElement;
         expect(ref).toHaveBeenCalledTimes(1);
         expect(ref).toHaveBeenCalledWith(btn);
     });
 
     it("can use ref without jsx", function () {
         const ref = vi.fn();
-        var btn = ToolbarButton({ ref }) as HTMLElement;
+        const btn = ToolbarButton({ ref }) as HTMLElement;
         expect(ref).toHaveBeenCalledTimes(1);
         expect(ref).toHaveBeenCalledWith(btn);
     });
 
     it('renders with icon class when icon is specified', function () {
-        var btn = ToolbarButton({ icon: "fa fa-plus" }) as HTMLElement;
+        const btn = ToolbarButton({ icon: "fa fa-plus" }) as HTMLElement;
         expect(btn.classList.contains("icon-tool-button")).toBe(true);
         expect(btn.querySelector("i")).not.toBeNull();
     });
 
     it('renders no-text class when no title is provided', function () {
-        var btn = ToolbarButton({}) as HTMLElement;
+        const btn = ToolbarButton({}) as HTMLElement;
         expect(btn.classList.contains("no-text")).toBe(true);
     });
 
     it('does not add no-text class when title is provided', function () {
-        var btn = ToolbarButton({ title: "Click Me" }) as HTMLElement;
+        const btn = ToolbarButton({ title: "Click Me" }) as HTMLElement;
         expect(btn.classList.contains("no-text")).toBe(false);
     });
 
     it('sets data-action attribute', function () {
-        var btn = ToolbarButton({ action: "save" }) as HTMLElement;
+        const btn = ToolbarButton({ action: "save" }) as HTMLElement;
         expect(btn.dataset.action).toBe("save");
     });
 
     it('hides button when visible is false', function () {
-        var btn = ToolbarButton({ visible: false }) as HTMLElement;
+        const btn = ToolbarButton({ visible: false }) as HTMLElement;
         expect(btn.hidden).toBe(true);
     });
 
     it('adds disabled class when disabled is true', function () {
-        var btn = ToolbarButton({ disabled: true }) as HTMLElement;
+        const btn = ToolbarButton({ disabled: true }) as HTMLElement;
         expect(btn.classList.contains("disabled")).toBe(true);
     });
 
     it('handles visible as a function', function () {
         const visibleFn = vi.fn(() => true);
-        var btn = ToolbarButton({ visible: visibleFn }) as HTMLElement;
+        const btn = ToolbarButton({ visible: visibleFn }) as HTMLElement;
         // The updateInterface event should trigger the function
         btn.dispatchEvent(new Event("updateInterface"));
         expect(visibleFn).toHaveBeenCalled();
@@ -91,14 +91,14 @@ describe("ToolButton", () => {
 
     it('handles disabled as a function', function () {
         const disabledFn = vi.fn(() => true);
-        var btn = ToolbarButton({ disabled: disabledFn }) as HTMLElement;
+        const btn = ToolbarButton({ disabled: disabledFn }) as HTMLElement;
         btn.dispatchEvent(new Event("updateInterface"));
         expect(disabledFn).toHaveBeenCalled();
         expect(btn.classList.contains("disabled")).toBe(true);
     });
 
     it('sets hint as title attribute', function () {
-        var btn = ToolbarButton({ hint: "Tooltip text" }) as HTMLElement;
+        const btn = ToolbarButton({ hint: "Tooltip text" }) as HTMLElement;
         expect(btn.title).toBe("Tooltip text");
     });
 });

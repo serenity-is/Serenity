@@ -4,12 +4,12 @@ import { EditorUtils } from "../editors/editorutils";
 import { type EditorProps } from "../editors/editorwidget";
 import { WidgetProps } from "./widgetutils";
 
-export let isFragmentWorkaround = Symbol();
+export const isFragmentWorkaround = Symbol();
 
 export function ensureParentOrFragment(node: HTMLElement): HTMLElement {
     if (!node || node.parentNode)
         return node;
-    let fragment = document.createDocumentFragment();
+    const fragment = document.createDocumentFragment();
     fragment.appendChild(node);
     (fragment as any)[isFragmentWorkaround] = true;
     return node;
@@ -41,11 +41,11 @@ export function handleElementProp(type: { createDefaultElement(): HTMLElement },
 }
 
 export function createElementFor(type: { createDefaultElement(): HTMLElement }) {
-    var elementAttr = getCustomAttribute(type, ElementAttribute);
+    const elementAttr = getCustomAttribute(type, ElementAttribute);
     if (elementAttr) {
         // legacy attribute, unfortunately has to take precedence
         let node: HTMLElement;
-        let wrap = document.createElement("div");
+        const wrap = document.createElement("div");
         wrap.innerHTML = elementAttr.value;
         node = wrap.children[0] as HTMLElement;
         if (!node) {
@@ -61,7 +61,7 @@ export function createElementFor(type: { createDefaultElement(): HTMLElement }) 
 }
 
 export function setElementProps(widget: { domNode: HTMLElement }, props: EditorProps<{}>): void {
-    let el = widget.domNode;
+    const el = widget.domNode;
     if (!el || !props)
         return;
 

@@ -60,7 +60,7 @@ export class BulkServiceAction {
         this.errorByKey = {};
         this.queue = this.keys.slice();
         this.queueIndex = 0;
-        var parallelRequests = this.getParallelRequests();
+        let parallelRequests = this.getParallelRequests();
         while (parallelRequests-- > 0) {
             this.executeNextBatch();
         }
@@ -70,7 +70,7 @@ export class BulkServiceAction {
         this.pendingRequests--;
         this.completedRequests++;
 
-        var title = this.progressDialog.cancelled ? BasicProgressDialogTexts.CancelTitle : BasicProgressDialogTexts.PleaseWait;
+        let title = this.progressDialog.cancelled ? BasicProgressDialogTexts.CancelTitle : BasicProgressDialogTexts.PleaseWait;
 
         title += ' (';
         if (this.successCount > 0) {
@@ -105,8 +105,8 @@ export class BulkServiceAction {
     }
 
     protected executeNextBatch() {
-        var batchSize = this.getBatchSize();
-        var batch = [];
+        const batchSize = this.getBatchSize();
+        const batch = [];
         while (true) {
             if (batch.length >= batchSize) {
                 break;

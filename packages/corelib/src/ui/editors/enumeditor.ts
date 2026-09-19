@@ -38,22 +38,22 @@ export class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions> extends
     protected override updateItems(): void | PromiseLike<void> {
         this.clearItems();
 
-        var enumType = this.options.enumType || EnumTypeRegistry.getOrLoad(this.options.enumKey);
+        const enumType = this.options.enumType || EnumTypeRegistry.getOrLoad(this.options.enumKey);
 
         const then = (enumType: any) => {
             if (enumType == null)
                 return;
 
-            var enumKey = this.options.enumKey;
+            let enumKey = this.options.enumKey;
 
             if (enumKey == null && enumType != null) {
                 enumKey = getCustomAttribute(enumType, EnumKeyAttribute, false)?.value ?? 
                     getTypeFullName(enumType);
             }
 
-            var values = Enum.getValues(enumType);
-            for (var x of values) {
-                var name = Enum.toString(enumType, x);
+            const values = Enum.getValues(enumType);
+            for (const x of values) {
+                const name = Enum.toString(enumType, x);
                 this.addOption(String(x),
                     localText("Enums." + enumKey + "." + name, name), null, false);
             }

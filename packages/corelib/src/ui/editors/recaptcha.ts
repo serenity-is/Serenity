@@ -29,19 +29,19 @@ export class Recaptcha<P extends RecaptchaOptions = RecaptchaOptions> extends Ed
         this.domNode.classList.add('g-recaptcha');
         this.domNode.setAttribute('data-sitekey', this.options.siteKey);
         if (!!((window as any)['grecaptcha'] == null && !document.querySelector('script#RecaptchaInclude'))) {
-            var src = 'https://www.google.com/recaptcha/api.js';
-            var lng = this.options.language;
+            let src = 'https://www.google.com/recaptcha/api.js';
+            let lng = this.options.language;
             if (lng == null) {
                 lng = document.documentElement.getAttribute('lang') ?? '';
             }
             src += '?hl=' + lng;
-            var script = document.createElement("script");
+            const script = document.createElement("script");
             script.setAttribute('id', 'RecaptchaInclude');
             script.setAttribute('src', src);
             document.head.append(script);
         }
 
-        var valInput = document.createElement("input");
+        const valInput = document.createElement("input");
         Fluent(valInput).insertBefore(this.domNode);
         valInput.setAttribute('id', this.uniqueName + '_validate');
         valInput.value = 'x';

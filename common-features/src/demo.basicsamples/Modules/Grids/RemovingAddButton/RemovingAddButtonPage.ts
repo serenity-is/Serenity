@@ -15,7 +15,7 @@ export class RemovingAddButton extends SupplierGrid {
         // call base method to get list of buttons
         // by default, base entity grid adds a few buttons, 
         // add, refresh, column selection in order.
-        var buttons = super.getButtons();
+        const buttons = super.getButtons();
 
         // here is several methods to remove add button
         // only one is enabled, others are commented

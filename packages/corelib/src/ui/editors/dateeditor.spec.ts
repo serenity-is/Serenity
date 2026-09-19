@@ -17,19 +17,19 @@ const newEditor = async (opt: DateEditorOptions) => new (await import("./dateedi
 function commonTests() {
 
     it("gets current value correctly", async () => {
-        var editor = await newEditor({});
+        const editor = await newEditor({});
         editor.domNode.value = "2020-01-01";
         expect(editor.value).toEqual("2020-01-01");
     })
 
     it("sets value to empty string if it is set to null", async () => {
-        var editor = await newEditor({});
+        const editor = await newEditor({});
         editor.value = null;
         expect(editor.value).toEqual(null);
     })
 
     it("sets value to now if given value is now or today", async () => {
-        var editor = await newEditor({});
+        const editor = await newEditor({});
         vi.useFakeTimers({ now: new Date(2020, 0, 1) });
         editor.value = "now";
         expect(editor.value).toEqual("2020-01-01");
@@ -38,20 +38,20 @@ function commonTests() {
     })
 
     it("gets current value correctly", async () => {
-        var editor = await newEditor({});
+        const editor = await newEditor({});
         editor.domNode.value = "2020-01-01";
 
         expect(editor.value).toEqual("2020-01-01");
     })
 
     it("sets value when valueAsDate used", async () => {
-        var editor = await newEditor({});
+        const editor = await newEditor({});
         editor.valueAsDate = new Date(2020, 0, 1);
         expect(editor.get_value()).toEqual("2020-01-01");
     })
 
     it("sets value when valueAsDate used", async () => {
-        var editor = await newEditor({});
+        const editor = await newEditor({});
         editor.domNode.value = "2020-01-01";
         expect(editor.valueAsDate).toEqual(new Date(2020, 0, 1));
     })
@@ -61,7 +61,7 @@ function commonTests() {
 describe("DateEditor_WithDefaultHtmlInput", () => {
 
     it("uses default date input if flatpicker or jquery date picker is not found", async () => {
-        var editor = await newEditor({});
+        const editor = await newEditor({});
         expect(editor.domNode.getAttribute("type")).toBe("date");
     });
 
@@ -227,9 +227,9 @@ describe("DateEditor additional behavior", () => {
 describe("DateEditor_WithFlatPicker", () => {
 
     it("uses flatpickr date if it is found", async () => {
-        var old = (window as any).flatpickr;
+        const old = (window as any).flatpickr;
         (window as any).flatpickr = vi.fn().mockImplementation(() => old);
-        var editor = await newEditor({});
+        const editor = await newEditor({});
         expect(editor.domNode.getAttribute("type")).toBe("text");
         expect((window as any).flatpickr).toHaveBeenCalled();
     });
@@ -241,10 +241,10 @@ describe("DateEditor_WithFlatPicker", () => {
 describe("DateEditor_WithJQueryDatePicker", () => {
 
     it("uses jquery date if it is found", async () => {
-        let $ = mockJQuery({
+        const $ = mockJQuery({
             datepicker: vi.fn().mockImplementation(function () { return this })
         });
-        var editor = await newEditor({});
+        const editor = await newEditor({});
         expect(editor.domNode.getAttribute("type")).toBe("text");
         expect($.fn.datepicker).toHaveBeenCalled();
     })

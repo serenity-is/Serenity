@@ -7,7 +7,7 @@ import "./EntityDialogAsPanelPage.css";
 export default (model: number | OrderRow) => {
 
     // first create a new dialog, store it in globalThis, e.g. window so that sample can access it from outsite the module
-    var myDialogAsPanel = new EntityDialogAsPanel();
+    const myDialogAsPanel = new EntityDialogAsPanel();
 
     // load a new entity if url doesn't contain an ID, or load order with ID specified in page URL
     // here we use done event in second parameter, to be sure operation succeeded before showing the panel

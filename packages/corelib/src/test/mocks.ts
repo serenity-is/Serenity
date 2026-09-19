@@ -82,9 +82,9 @@ export function mockJQuery(fn: any = {}) {
 
     jQuery.fn = fn;
     jQuery.Event = (name: string, prm: any) => {
-        var ev: any = new Event(name);
+        let ev: any = new Event(name);
         if (prm) {
-            for (var i in prm) {
+            for (let i in prm) {
                 if (i != "type" && i != "target") {
                     ev[i] = prm[i];
                 }
@@ -119,23 +119,23 @@ export type MockFetchInfo = {
     responseHeaders: Record<string, string>;
 }
 
-var orgFetch: any;
-var fetchSpy: Mock<(url: string, init: RequestInit) => Promise<any>> & { requests: MockFetchInfo[] }
-var fetchMap: Record<string, (info: MockFetchInfo) => any> = {};
+let orgFetch: any;
+let fetchSpy: Mock<(url: string, init: RequestInit) => Promise<any>> & { requests: MockFetchInfo[] }
+let fetchMap: Record<string, (info: MockFetchInfo) => any> = {};
 
 export function mockFetch(map?: { [urlOrService: string]: ((info: MockFetchInfo) => any) }) {
     if (!fetchSpy) {
         orgFetch = (window as any).fetch;
         fetchSpy = (window as any).fetch = vi.fn(async (url: string, init: RequestInit) => {
-            var callback = fetchMap[url] ?? fetchMap["*"];
+            let callback = fetchMap[url] ?? fetchMap["*"];
             if (!callback) {
                 console.error(`Fetch is not configured on the mock fetch implementation: (${url})!`);
                 throw `Fetch is not configured on the mock fetch implementation: (${url})!`;
             }
 
-            var requestData = init && typeof init.body == "string" ? JSON.parse(init.body) : null;
+            let requestData = init && typeof init.body == "string" ? JSON.parse(init.body) : null;
 
-            var info: MockFetchInfo = {
+            let info: MockFetchInfo = {
                 url: url,
                 init: init,
                 requestData,
@@ -152,15 +152,15 @@ export function mockFetch(map?: { [urlOrService: string]: ((info: MockFetchInfo)
 
             fetchSpy.requests.push(info);
 
-            var responseData = callback(info);
+            const responseData = callback(info);
             return new JsonResponse(responseData, info);
         }) as any;
         fetchSpy.requests = [];
     }
 
     if (map) {
-        for (var key of Object.keys(map)) {
-            var url = key == "*" ? "*" : resolveServiceUrl(key);
+        for (const key of Object.keys(map)) {
+            let url = key == "*" ? "*" : resolveServiceUrl(key);
             fetchMap[url] = map[key];
         }
     }
@@ -210,7 +210,7 @@ class JsonResponse {
     }
 }
 
-var xhrOriginal: any;
+let xhrOriginal: any;
 
 class MockXHR {
     declare public _info: MockFetchInfo;
@@ -235,14 +235,14 @@ class MockXHR {
     }
 
     send(body?: Document | XMLHttpRequestBodyInit): void {
-        var url = this._info?.url;
-        var callback = fetchMap[url] ?? fetchMap["*"];
+        let url = this._info?.url;
+        let callback = fetchMap[url] ?? fetchMap["*"];
         if (!callback) {
             console.error(`URL is not configured on the mock XHR implementation: (${url})!`);
             throw `URL is not configured on the mock XHR implementation: (${url})!`;
         }
 
-        var requestData = typeof body == "string" ? JSON.parse(body) : null;
+        let requestData = typeof body == "string" ? JSON.parse(body) : null;
 
         this._info = {
             url: url,

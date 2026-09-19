@@ -43,14 +43,14 @@ export class SelectEditor<P extends SelectEditorOptions = SelectEditorOptions> e
      * Loads the configured items into the editor.
      */
     override updateItems() {
-        var items = this.getItems();
+        const items = this.getItems();
         this.clearItems();
 
         if (items.length > 0) {
-            var isStrings = typeof (items[0]) === 'string';
-            for (var item of items) {
-                var key = isStrings ? item : item[0];
-                var text = isStrings ? item : (item[1] ?? item[0]);
+            const isStrings = typeof (items[0]) === 'string';
+            for (const item of items) {
+                const key = isStrings ? item : item[0];
+                const text = isStrings ? item : (item[1] ?? item[0]);
                 this.addOption(key, text, item, false);
             }
         }

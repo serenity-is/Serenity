@@ -21,23 +21,23 @@ export namespace ExcelExportHelper {
             icon: faIcon("file-excel"),
             onClick: function () {
 
-                let grid = options.grid;
+                const grid = options.grid;
                 if ((options.onViewSubmit && !options.onViewSubmit()) ||
                     (!options.onViewSubmit && !grid.prepareSubmit())) {
                     return;
                 }
 
-                var request = deepClone(grid.getView().params) as ListRequest;
+                let request = deepClone(grid.getView().params) as ListRequest;
                 request.Take = 0;
                 request.Skip = 0;
-                var sortBy = grid.getView().sortBy;
+                const sortBy = grid.getView().sortBy;
                 if (sortBy) {
                     request.Sort = sortBy;
                 }
 
                 request.ExportColumns = [];
-                let columns = grid.getGrid().getColumns();
-                for (let column of columns) {
+                const columns = grid.getGrid().getColumns();
+                for (const column of columns) {
                     request.ExportColumns.push(column.id || column.field);
                 }
 

@@ -35,7 +35,7 @@ export class PromptDialog<P extends PromptDialogOptions = PromptDialogOptions> e
             toggleClass(this.domNode, this.options.cssClass);
 
         if (this.options.message) {
-            var msg = document.createElement("div");
+            const msg = document.createElement("div");
             msg.classList.add("message");
             this.byId("PropertyGrid").prepend(msg);
             if ((this.options as any).isHtml &&

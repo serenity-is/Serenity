@@ -33,11 +33,11 @@ describe("GroupItemMetadataProvider.defaults", () => {
 
 describe("GroupItemMetadataProvider constructor", () => {
     it("uses options passed", () => {
-        var old = GroupItemMetadataProvider.defaults.groupLevelPrefix;
+        const old = GroupItemMetadataProvider.defaults.groupLevelPrefix;
         try {
             GroupItemMetadataProvider.defaults.groupLevelPrefix = "x-";
-            var provider = new GroupItemMetadataProvider({ totalsCssClass: "y" });
-            var options = provider.getOptions();
+            const provider = new GroupItemMetadataProvider({ totalsCssClass: "y" });
+            const options = provider.getOptions();
             expect(options.enableExpandCollapse).toBe(true);
             expect(options.groupLevelPrefix).toBe("x-");
             expect(options.totalsCssClass).toBe("y");
@@ -49,21 +49,21 @@ describe("GroupItemMetadataProvider constructor", () => {
     });
 
     it("uses groupFormat if passed", () => {
-        var groupFormat: ColumnFormat = () => "ok";
-        var provider = new GroupItemMetadataProvider({ groupFormat });
+        const groupFormat: ColumnFormat = () => "ok";
+        const provider = new GroupItemMetadataProvider({ groupFormat });
         expect(provider.getOptions().groupFormat === groupFormat).toBe(true);
     });
 
     it("uses groupFormat if both groupFormat and compat groupFormatter passed", () => {
-        var groupFormat: ColumnFormat = () => "ok";
-        var groupFormatter: CompatFormatter = () => "ok";
-        var provider = new GroupItemMetadataProvider({ groupFormat, groupFormatter });
+        const groupFormat: ColumnFormat = () => "ok";
+        const groupFormatter: CompatFormatter = () => "ok";
+        const provider = new GroupItemMetadataProvider({ groupFormat, groupFormatter });
         expect(provider.getOptions().groupFormat === groupFormat).toBe(true);
     });
 
     it("uses converted compat groupFormatter if passed", () => {
-        var groupFormatter: CompatFormatter = () => "compat";
-        var provider = new GroupItemMetadataProvider({ groupFormatter });
+        const groupFormatter: CompatFormatter = () => "compat";
+        const provider = new GroupItemMetadataProvider({ groupFormatter });
         expect((provider.getOptions() as any).groupFormatter === groupFormatter).toBe(true);
         expect(provider.getOptions().groupFormat as any !== groupFormatter).toBe(true);
         expect(provider.getOptions().groupFormat).toBeDefined();
@@ -72,12 +72,12 @@ describe("GroupItemMetadataProvider constructor", () => {
 
 
     it("uses defaultGroupFormat if none passed", () => {
-        var old = GroupItemMetadataProvider.defaultGroupFormat;
+        const old = GroupItemMetadataProvider.defaultGroupFormat;
         try {
             GroupItemMetadataProvider.defaultGroupFormat = (ctx, o) => { opt = o; return ""; }
-            var opt: any = null;
-            var provider = new GroupItemMetadataProvider();
-            var format = provider.getOptions().groupFormat;
+            let opt: any = null;
+            const provider = new GroupItemMetadataProvider();
+            const format = provider.getOptions().groupFormat;
             expect(format).toBeDefined();
             format(ctx());
             expect(opt === provider.getOptions()).toBe(true);
@@ -88,21 +88,21 @@ describe("GroupItemMetadataProvider constructor", () => {
     });
 
     it("uses totalsFormat if passed", () => {
-        var totalsFormat: ColumnFormat = () => "ok";
-        var provider = new GroupItemMetadataProvider({ totalsFormat });
+        const totalsFormat: ColumnFormat = () => "ok";
+        const provider = new GroupItemMetadataProvider({ totalsFormat });
         expect(provider.getOptions().totalsFormat === totalsFormat).toBe(true);
     });
 
     it("uses totalsFormat if both totalsFormat and compat totalsFormatter passed", () => {
-        var totalsFormat: ColumnFormat = () => "ok";
-        var totalsFormatter: CompatFormatter = () => "ok";
-        var provider = new GroupItemMetadataProvider({ totalsFormat, totalsFormatter });
+        const totalsFormat: ColumnFormat = () => "ok";
+        const totalsFormatter: CompatFormatter = () => "ok";
+        const provider = new GroupItemMetadataProvider({ totalsFormat, totalsFormatter });
         expect(provider.getOptions().totalsFormat === totalsFormat).toBe(true);
     });
 
     it("uses converted compat totalsFormatter if passed", () => {
-        var totalsFormatter: CompatFormatter = () => "compat";
-        var provider = new GroupItemMetadataProvider({ totalsFormatter });
+        const totalsFormatter: CompatFormatter = () => "compat";
+        const provider = new GroupItemMetadataProvider({ totalsFormatter });
         expect((provider.getOptions() as any).totalsFormatter === totalsFormatter).toBe(true);
         expect(provider.getOptions().totalsFormat as any !== totalsFormatter).toBe(true);
         expect(provider.getOptions().totalsFormat).toBeDefined();
@@ -110,12 +110,12 @@ describe("GroupItemMetadataProvider constructor", () => {
     });
 
     it("uses defaultTotalsFormat if none passed", () => {
-        var old = GroupItemMetadataProvider.defaultTotalsFormat;
+        const old = GroupItemMetadataProvider.defaultTotalsFormat;
         try {
             GroupItemMetadataProvider.defaultTotalsFormat = (ctx, o) => { called = true; return ""; }
-            var called = false;
-            var provider = new GroupItemMetadataProvider();
-            var format = provider.getOptions().totalsFormat;
+            let called = false;
+            const provider = new GroupItemMetadataProvider();
+            const format = provider.getOptions().totalsFormat;
             expect(format).toBeDefined();
             format(ctx());
             expect(called).toBe(true);
@@ -129,8 +129,8 @@ describe("GroupItemMetadataProvider constructor", () => {
 
 describe("GroupItemMetadataProvider.setOptions", () => {
     it("merges current options with passed ones", () => {
-        var provider = new GroupItemMetadataProvider({ totalsCssClass: "y", groupCssClass: "z" });
-        var options = provider.getOptions();
+        const provider = new GroupItemMetadataProvider({ totalsCssClass: "y", groupCssClass: "z" });
+        const options = provider.getOptions();
         expect(options.totalsCssClass).toBe("y");
         expect(options.groupCssClass).toBe("z");
         provider.setOptions({ totalsCssClass: "w"});
@@ -140,7 +140,7 @@ describe("GroupItemMetadataProvider.setOptions", () => {
 });
 
 function mockEvent(args: any) {
-    var ev = {
+    const ev = {
         stopImmediatePropagationCalls: 0,
         stopImmediatePropagation: function() {
             ev.stopImmediatePropagationCalls++;
@@ -159,7 +159,7 @@ function mockEvent(args: any) {
                     ev.target.classNames.push(s);
                 },
                 remove: function(s: string) {
-                    var idx = ev.target.classNames.indexOf(s);
+                    const idx = ev.target.classNames.indexOf(s);
                     expect(idx >= 0).toBe(true);
                     ev.target.classNames.splice(idx, 1);
                 }
@@ -171,12 +171,12 @@ function mockEvent(args: any) {
 }
 
 function mockGrid() {
-    var grid = {
+    const grid = {
         onClickList: <any[]>[],
         onClick: {
             subscribe: function(f: any) { grid.onClickList.push(f); },
             unsubscribe: function(f: any) {
-                var idx = grid.onClickList.indexOf(f);
+                const idx = grid.onClickList.indexOf(f);
                 expect(idx >= 0).toBe(true);
                 grid.onClickList.splice(idx, 1);
             }
@@ -185,7 +185,7 @@ function mockGrid() {
         onKeyDown: {
             subscribe: function(f: any) { grid.onKeyDownList.push(f); },
             unsubscribe: function(f: any) {
-                var idx = grid.onKeyDownList.indexOf(f);
+                const idx = grid.onKeyDownList.indexOf(f);
                 expect(idx >= 0).toBe(true);
                 grid.onKeyDownList.splice(idx, 1);
             }
@@ -204,7 +204,7 @@ function mockGrid() {
             if (row < 0)
                 return null;
             if (row === 1 || row == 3) {
-                var group = new Group();
+                const group = new Group();
                 group.groupingKey = "gk" + row;
                 group.collapsed = row === 1;
                 return group;
@@ -242,8 +242,8 @@ function mockGrid() {
 describe("GroupItemMetadataProvider.init", () => {
 
     it("attaches to onClick", () => {
-        var plugin = new GroupItemMetadataProvider();
-        var grid = mockGrid();
+        const plugin = new GroupItemMetadataProvider();
+        const grid = mockGrid();
         plugin.init(grid);
         expect(grid.onClickList.length).toBe(1);
         plugin.destroy();
@@ -251,8 +251,8 @@ describe("GroupItemMetadataProvider.init", () => {
     });
 
     it("attaches to onKeyDown", () => {
-        var plugin = new GroupItemMetadataProvider();
-        var grid = mockGrid();
+        const plugin = new GroupItemMetadataProvider();
+        const grid = mockGrid();
         plugin.init(grid);
         expect(grid.onKeyDownList.length).toBe(1);
         plugin.destroy();
@@ -264,9 +264,9 @@ describe("GroupItemMetadataProvider.init", () => {
 describe("GroupItemMetadataProvider.handleGridClick", () => {
 
     it("ignores when args does not include grid", () => {
-        var plugin = new GroupItemMetadataProvider();
-        var grid = mockGrid();
-        var event = mockEvent({});
+        const plugin = new GroupItemMetadataProvider();
+        const grid = mockGrid();
+        const event = mockEvent({});
         plugin.handleGridClick(event);
         expect(grid.getDataItemCalls).toBe(0);
         expect(event.stopImmediatePropagationCalls).toBe(0);
@@ -274,9 +274,9 @@ describe("GroupItemMetadataProvider.handleGridClick", () => {
     });
 
     it("uses initializing grid when args does not include grid", () => {
-        var plugin = new GroupItemMetadataProvider();
-        var grid = mockGrid();
-        var event = mockEvent({ row: -1 });
+        const plugin = new GroupItemMetadataProvider();
+        const grid = mockGrid();
+        const event = mockEvent({ row: -1 });
         plugin.init(grid);
         plugin.handleGridClick(event);
         expect(grid.getDataItemCalls).toBe(1);
@@ -285,9 +285,9 @@ describe("GroupItemMetadataProvider.handleGridClick", () => {
     });
 
     it("ignores when no item for args.row", () => {
-        var plugin = new GroupItemMetadataProvider();
-        var grid = mockGrid();
-        var event = mockEvent({ row: -1 });
+        const plugin = new GroupItemMetadataProvider();
+        const grid = mockGrid();
+        const event = mockEvent({ row: -1 });
         plugin.init(grid);
         plugin.handleGridClick(event);
         expect(grid.getDataItemCalls).toBe(1);
@@ -296,9 +296,9 @@ describe("GroupItemMetadataProvider.handleGridClick", () => {
     });
 
     it("ignores when item at args.row is not an instance of Group", () => {
-        var plugin = new GroupItemMetadataProvider();
-        var grid = mockGrid();
-        var event = mockEvent({ row: 333 });
+        const plugin = new GroupItemMetadataProvider();
+        const grid = mockGrid();
+        const event = mockEvent({ row: 333 });
         plugin.init(grid);
         plugin.handleGridClick(event);
         expect(grid.getDataItemCalls).toBe(1);
@@ -307,9 +307,9 @@ describe("GroupItemMetadataProvider.handleGridClick", () => {
     });
 
     it("ignores when event target does not contain toggle class", () => {
-        var plugin = new GroupItemMetadataProvider();
-        var grid = mockGrid();
-        var event = mockEvent({ row: 1 });
+        const plugin = new GroupItemMetadataProvider();
+        const grid = mockGrid();
+        const event = mockEvent({ row: 1 });
         event.target.classNames = ["xyz"];
         plugin.init(grid);
         plugin.handleGridClick(event);
@@ -319,9 +319,9 @@ describe("GroupItemMetadataProvider.handleGridClick", () => {
     });
 
     it("calls stopImmediatePropagation, preventDefault and setRefreshHints", () => {
-        var plugin = new GroupItemMetadataProvider();
-        var grid = mockGrid();
-        var event = mockEvent({ row: 1 });
+        const plugin = new GroupItemMetadataProvider();
+        const grid = mockGrid();
+        const event = mockEvent({ row: 1 });
         plugin.init(grid);
         plugin.handleGridClick(event);
         expect(grid.getDataItemCalls).toBe(1);
@@ -332,9 +332,9 @@ describe("GroupItemMetadataProvider.handleGridClick", () => {
     });
 
     it("calls stopImmediatePropagation, preventDefault and setRefreshHints", () => {
-        var plugin = new GroupItemMetadataProvider();
-        var grid = mockGrid();
-        var event = mockEvent({ row: 1 });
+        const plugin = new GroupItemMetadataProvider();
+        const grid = mockGrid();
+        const event = mockEvent({ row: 1 });
         plugin.init(grid);
         plugin.handleGridClick(event);
         expect(grid.getDataItemCalls).toBe(1);
@@ -345,9 +345,9 @@ describe("GroupItemMetadataProvider.handleGridClick", () => {
     });
 
     it("calls expandGroup if collapsed is true", () => {
-        var plugin = new GroupItemMetadataProvider();
-        var grid = mockGrid();
-        var event = mockEvent({ row: 1 });
+        const plugin = new GroupItemMetadataProvider();
+        const grid = mockGrid();
+        const event = mockEvent({ row: 1 });
         plugin.init(grid);
         plugin.handleGridClick(event);
         expect(grid.__data.collapseGroupCalls.length).toBe(0);
@@ -356,9 +356,9 @@ describe("GroupItemMetadataProvider.handleGridClick", () => {
     });
 
     it("calls collapseGroup if collapsed is falsy", () => {
-        var plugin = new GroupItemMetadataProvider();
-        var grid = mockGrid();
-        var event = mockEvent({ row: 3 });
+        const plugin = new GroupItemMetadataProvider();
+        const grid = mockGrid();
+        const event = mockEvent({ row: 3 });
         plugin.init(grid);
         plugin.handleGridClick(event);
         expect(grid.__data.expandGroupCalls.length).toBe(0);

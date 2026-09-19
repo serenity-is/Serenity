@@ -22,7 +22,7 @@ export class ProductGrid<P = {}> extends EntityGrid<ProductRow, P> {
     }
 
     protected override getButtons() {
-        var buttons = super.getButtons();
+        const buttons = super.getButtons();
 
         buttons.push(ExcelExportHelper.createToolButton({
             grid: this,
@@ -100,7 +100,7 @@ export class ProductGrid<P = {}> extends EntityGrid<ProductRow, P> {
         pending && pending[idField] !== undefined && (klass += ' dirty');
 
         const value = this.getEffectiveValue(ctx.item, idField) as string;
-        let markup = <select class={klass} data-field={idField} style={{ width: '100%', maxWidth: '100%' }}>
+        const markup = <select class={klass} data-field={idField} style={{ width: '100%', maxWidth: '100%' }}>
             <option value=''>--</option>;
             {lookup.items.map(c => <option value={c[lookup.idField]} selected={c[lookup.idField] == value}>
                 {c[lookup.textField]}
@@ -146,14 +146,14 @@ export class ProductGrid<P = {}> extends EntityGrid<ProductRow, P> {
         const txt = input.value?.trim() || null;
         let pending = this.pendingChanges[item.ProductID];
 
-        var effective = this.getEffectiveValue(item, field);
-        var oldText: string;
+        const effective = this.getEffectiveValue(item, field);
+        let oldText: string;
         if (input.classList.contains("numeric"))
             oldText = formatNumber(effective, '0.##');
         else
             oldText = effective as string;
 
-        var value: any;
+        let value: any;
         if (field === 'UnitPrice') {
             value = parseDecimal(txt ?? '');
             if (value == null || isNaN(value)) {
@@ -164,7 +164,7 @@ export class ProductGrid<P = {}> extends EntityGrid<ProductRow, P> {
             }
         }
         else if (input.classList.contains("numeric")) {
-            var i = parseInteger(txt ?? '');
+            const i = parseInteger(txt ?? '');
             if (isNaN(i) || i > 32767 || i < 0) {
                 notifyError(FormValidationTexts.Integer, '', null);
                 input.value = oldText;
@@ -209,7 +209,7 @@ export class ProductGrid<P = {}> extends EntityGrid<ProductRow, P> {
         // you could write a batch update service
         const keys = Object.keys(this.pendingChanges);
         let current = -1;
-        let self = this;
+        const self = this;
 
         (function saveNext() {
             if (++current >= keys.length) {
@@ -217,8 +217,8 @@ export class ProductGrid<P = {}> extends EntityGrid<ProductRow, P> {
                 return;
             }
 
-            var key = keys[current];
-            var entity = deepClone(self.pendingChanges[key]);
+            const key = keys[current];
+            const entity = deepClone(self.pendingChanges[key]);
             entity.ProductID = key;
             serviceRequest(ProductService.Methods.Update, {
                 EntityId: key,

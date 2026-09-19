@@ -16,7 +16,7 @@ export class OrderGrid<P = {}> extends EntityGrid<OrderRow, P> {
     declare protected shippingStateFilter: EnumEditor;
 
     protected override getQuickFilters() {
-        var filters = super.getQuickFilters();
+        const filters = super.getQuickFilters();
 
         filters.push({
             type: LookupEditor,
@@ -42,7 +42,7 @@ export class OrderGrid<P = {}> extends EntityGrid<OrderRow, P> {
     }
 
     protected override getButtons(): ToolButton[] {
-        var buttons = super.getButtons();
+        const buttons = super.getButtons();
 
         buttons.push(ExcelExportHelper.createToolButton({
             grid: this,
@@ -58,7 +58,7 @@ export class OrderGrid<P = {}> extends EntityGrid<OrderRow, P> {
     }
 
     protected override createColumns() {
-        var columns = new OrderColumns(super.createColumns());
+        const columns = new OrderColumns(super.createColumns());
 
         columns.PrintInvoice.format = () => <a class="inline-action" data-action="print-invoice" title="invoice">
             <i class={faIcon("file-pdf", "red")}></i></a>;
@@ -72,8 +72,8 @@ export class OrderGrid<P = {}> extends EntityGrid<OrderRow, P> {
         if (Fluent.isDefaultPrevented(e))
             return;
 
-        var item = this.itemAt(row);
-        let action = (e.target as HTMLElement)?.closest(".inline-action")?.getAttribute("data-action");
+        const item = this.itemAt(row);
+        const action = (e.target as HTMLElement)?.closest(".inline-action")?.getAttribute("data-action");
         if (action) {
             e.preventDefault();
             if (action == "print-invoice") {
@@ -92,7 +92,7 @@ export class OrderGrid<P = {}> extends EntityGrid<OrderRow, P> {
     }
 
     protected override addButtonClick() {
-        var eq = this.view.params.EqualityFilter;
+        const eq = this.view.params.EqualityFilter;
         this.editItem({
             CustomerID: eq ? eq.CustomerID : null
         });

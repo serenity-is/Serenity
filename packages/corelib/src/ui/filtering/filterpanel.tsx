@@ -32,7 +32,7 @@ export class FilterFieldSelect<P extends FilterFieldSelectOptions = FilterFieldS
     constructor(props: WidgetProps<P>) {
         super(props);
 
-        for (var field of this.options.fields) {
+        for (const field of this.options.fields) {
             this.addOption(field.name, localText(field.title, field.title ?? field.name), field);
         }
     }
@@ -54,7 +54,7 @@ export class FilterFieldSelect<P extends FilterFieldSelectOptions = FilterFieldS
      * @returns Combobox options.
      */
     override getComboboxOptions() {
-        var opt = super.getComboboxOptions();
+        const opt = super.getComboboxOptions();
         opt.allowClear = false;
         return opt;
     }
@@ -73,8 +73,8 @@ export class FilterOperatorSelect extends ComboboxEditor<any, FilterOperator> {
     constructor(props: WidgetProps<{ source: FilterOperator[] }>) {
         super(props);
 
-        for (var op of this.options.source) {
-            var title = op.title ?? (FilterPanelTexts.OperatorNames.asTry() as any)[op.key] ?? op.key;
+        for (const op of this.options.source) {
+            const title = op.title ?? (FilterPanelTexts.OperatorNames.asTry() as any)[op.key] ?? op.key;
             this.addOption(op.key, title, op);
         }
 
@@ -95,7 +95,7 @@ export class FilterOperatorSelect extends ComboboxEditor<any, FilterOperator> {
      * @returns Combobox options.
      */
     override getComboboxOptions() {
-        var opt = super.getComboboxOptions();
+        const opt = super.getComboboxOptions();
         opt.allowClear = false;
         return opt;
     }
@@ -158,30 +158,30 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
     updateRowsFromStore() {
         Fluent(this.rowsDiv).empty();
 
-        var items = this.get_store().get_items();
-        for (var item of items) {
+        const items = this.get_store().get_items();
+        for (const item of items) {
             this.addEmptyRow(false);
 
-            var rowDiv = this.rowsDiv.lastElementChild as HTMLElement;
+            const rowDiv = this.rowsDiv.lastElementChild as HTMLElement;
 
-            var divl = rowDiv.querySelector("div.l");
+            const divl = rowDiv.querySelector("div.l");
             divl.querySelector('.leftparen').classList.toggle('active', !!item.leftParen);
             divl.querySelector('.rightparen').classList.toggle('active', !!item.rightParen);
-            var andor = divl.querySelector('.andor');
+            const andor = divl.querySelector('.andor');
             andor.classList.toggle('or', !!item.isOr);
             andor.textContent = localText((!!item.isOr ? 'Controls.FilterPanel.Or' :
                 'Controls.FilterPanel.And'));
 
-            var fieldSelect = getWidgetFrom(rowDiv.querySelector('div.f input.field-select'), FilterFieldSelect);
+            const fieldSelect = getWidgetFrom(rowDiv.querySelector('div.f input.field-select'), FilterFieldSelect);
 
             fieldSelect.value = item.field;
             this.rowFieldChange(rowDiv);
-            var operatorSelect = getWidgetFrom(rowDiv.querySelector(':scope div.o > input.op-select'), FilterOperatorSelect);
+            const operatorSelect = getWidgetFrom(rowDiv.querySelector(':scope div.o > input.op-select'), FilterOperatorSelect);
 
             operatorSelect.set_value(item.operator);
             this.rowOperatorChange(rowDiv);
 
-            var filtering = this.getFilteringFor(rowDiv);
+            const filtering = this.getFilteringFor(rowDiv);
             if (filtering != null) {
                 filtering.set_operator({ key: item.operator });
                 filtering.loadState(item.state);
@@ -270,32 +270,33 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
     search() {
         this.rowsDiv.querySelectorAll(":scope > div.v > span.error").forEach(x => x.remove());
 
-        var filterLines = [];
-        var errorText = null;
-        for (var i = 0; i < this.rowsDiv.children.length; i++) {
-            var row = this.rowsDiv.children[i] as HTMLElement;
-            var filtering = this.getFilteringFor(row);
+        const filterLines = [];
+        let errorText = null;
+        let row: HTMLElement;
+        for (let i = 0; i < this.rowsDiv.children.length; i++) {
+            row = this.rowsDiv.children[i] as HTMLElement;
+            const filtering = this.getFilteringFor(row);
             if (filtering == null) {
                 continue;
             }
 
-            var field = this.getFieldFor(row);
-            var op = getWidgetFrom(row.querySelector('div.o input.op-select'), FilterOperatorSelect).value;
+            const field = this.getFieldFor(row);
+            const op = getWidgetFrom(row.querySelector('div.o input.op-select'), FilterOperatorSelect).value;
 
             if (op == null || op.length === 0) {
                 errorText = FilterPanelTexts.InvalidOperator;
                 break;
             }
 
-            var line: FilterLine = {};
+            const line: FilterLine = {};
             line.field = field.name;
             line.operator = op;
-            var divL = row.querySelector("div.l");
+            const divL = row.querySelector("div.l");
             line.isOr = !!divL.querySelector('a.andor.or');
             line.leftParen = !!row.querySelector('div.l a.leftparen.active');
             line.rightParen = !!row.querySelector('div.l a.rightparen.active');
             filtering.set_operator({ key: op });
-            var criteria;
+            let criteria;
             try {
                 criteria = filtering.getCriteria();
             }
@@ -316,7 +317,7 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
             return;
         }
 
-        var items = this.get_store().get_items();
+        const items = this.get_store().get_items();
         items.length = 0;
         items.push.apply(items, filterLines);
         this.get_store().raiseChanged();
@@ -357,13 +358,13 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
      * @returns The empty row element, or null.
      */
     protected findEmptyRow(): HTMLElement {
-        var result: HTMLElement = null;
+        let result: HTMLElement = null;
 
         Array.from(this.rowsDiv.children).forEach(function (row: HTMLElement) {
-            var fieldInput = row.querySelector<HTMLInputElement>('div.f input.field-select');
+            const fieldInput = row.querySelector<HTMLInputElement>('div.f input.field-select');
             if (!fieldInput)
                 return;
-            var val = fieldInput.value;
+            const val = fieldInput.value;
             if (!val) {
                 result = row;
                 return false;
@@ -421,7 +422,7 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
      * @param e - The change event.
      */
     protected onRowFieldChange(e: Event) {
-        var row = (e.target as HTMLElement).closest('div.filter-line');
+        const row = (e.target as HTMLElement).closest('div.filter-line');
         this.rowFieldChange(row as any);
         row.querySelector<HTMLInputElement>('div.o input.op-select')?.focus();
     }
@@ -453,17 +454,17 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
      * @param row - The row element.
      */
     protected populateOperatorList(row: HTMLElement): void {
-        var opDiv = row.querySelector<HTMLElement>('div.o');
+        const opDiv = row.querySelector<HTMLElement>('div.o');
         Fluent(opDiv).empty();
 
-        var filtering = this.getFilteringFor(row);
+        const filtering = this.getFilteringFor(row);
         if (filtering == null)
             return;
 
         const hidden = opDiv.appendChild(<input type="hidden" class="op-select" /> as HTMLInputElement);
 
-        var operators = filtering.getOperators();
-        var opSelect = new FilterOperatorSelect({ element: hidden, source: operators });
+        const operators = filtering.getOperators();
+        const opSelect = new FilterOperatorSelect({ element: hidden, source: operators });
         opSelect.changeSelect2(bindThis(this).onRowOperatorChange);
     }
 
@@ -476,7 +477,7 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
         if (!row) {
             return null;
         }
-        var select = getWidgetFrom(row.querySelector('div.f input.field-select'), FilterFieldSelect);
+        const select = getWidgetFrom(row.querySelector('div.f input.field-select'), FilterFieldSelect);
 
         if (!select || !select.value) {
             return null;
@@ -491,20 +492,20 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
      * @returns The filtering handler, or null.
      */
     protected getFilteringFor(row: HTMLElement): IFiltering {
-        var field = this.getFieldFor(row);
+        const field = this.getFieldFor(row);
 
         if (field == null)
             return null;
 
-        var filtering = (row as any).__Filtering as IFiltering;
+        let filtering = (row as any).__Filtering as IFiltering;
 
         if (filtering != null)
             return filtering;
 
-        var filteringType = FilteringTypeRegistry.get(
+        const filteringType = FilteringTypeRegistry.get(
             (field.filteringType ?? 'String'));
 
-        var editorDiv = row.querySelector<HTMLElement>('div.v');
+        const editorDiv = row.querySelector<HTMLElement>('div.v');
         filtering = new (filteringType as any)(field.filteringParams ?? {}) as IFiltering;
         ReflectionOptionsSetter.set(filtering, field.filteringParams);
         filtering.set_container(editorDiv);
@@ -518,7 +519,7 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
      * @param e - The change event.
      */
     protected onRowOperatorChange(e: Event) {
-        var row = (e.target as HTMLElement).closest('div.filter-line');
+        const row = (e.target as HTMLElement).closest('div.filter-line');
         this.rowOperatorChange(row as any);
         row.querySelectorAll<HTMLElement>('div.v input, div.v textarea, div.v select').forEach(el => {
             if (Fluent.isVisibleLike(el)) {
@@ -538,22 +539,22 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
             return;
         }
 
-        var editorDiv = row.querySelector<HTMLElement>('div.v');
+        const editorDiv = row.querySelector<HTMLElement>('div.v');
         Fluent(editorDiv).empty();
-        var filtering = this.getFilteringFor(row);
+        const filtering = this.getFilteringFor(row);
         if (filtering == null)
             return;
 
-        var operatorSelect = getWidgetFrom(row.querySelector('div.o input.op-select'), FilterOperatorSelect);
+        const operatorSelect = getWidgetFrom(row.querySelector('div.o input.op-select'), FilterOperatorSelect);
 
         if (!operatorSelect.get_value())
             return;
 
-        var ops = filtering.getOperators().filter(function (x) {
+        const ops = filtering.getOperators().filter(function (x) {
             return x.key === operatorSelect.value;
         });
 
-        var op = ((ops.length > 0) ? ops[0] : null);
+        const op = ((ops.length > 0) ? ops[0] : null);
         if (op == null)
             return;
 
@@ -567,7 +568,7 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
      */
     protected deleteRowClick(e: Event): void {
         e.preventDefault();
-        var row = (e.target as HTMLElement).closest('div.filter-line');
+        const row = (e.target as HTMLElement).closest('div.filter-line');
         row.remove();
 
         if (!this.rowsDiv.childElementCount) {
@@ -592,7 +593,7 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
      */
     protected andOrClick(e: Event): void {
         e.preventDefault();
-        var andor = e.target as HTMLElement;
+        const andor = e.target as HTMLElement;
         andor.classList.toggle('or');
         andor.textContent = FilterPanelTexts[(andor.classList.contains('or') ? 'Or' : 'And')];
     }
@@ -611,13 +612,13 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
      * Updates the parenthesis indicators for all rows.
      */
     protected updateParens() {
-        var rows = Array.from(this.rowsDiv.children)
-        var inParen = false;
+        const rows = Array.from(this.rowsDiv.children)
+        let inParen = false;
         rows.forEach((row: HTMLElement, index) => {
 
             row.classList.remove('paren-start');
             row.classList.remove('paren-end');
-            var divL = row.querySelector<HTMLElement>('div.l');
+            const divL = row.querySelector<HTMLElement>('div.l');
             if (!divL)
                 return;
             divL.hidden = ((rows.length === 1) ? true : false);
@@ -628,8 +629,8 @@ export class FilterPanel<P = {}> extends FilterWidgetBase<P> {
                 divL.querySelectorAll<HTMLElement>('a.lefparen, a.andor').forEach(el => el.hidden = false);
             }
 
-            var lp = divL.querySelector('a.leftparen');
-            var rp = divL.querySelector('a.rightparen');
+            const lp = divL.querySelector('a.leftparen');
+            const rp = divL.querySelector('a.rightparen');
             if (rp.classList.contains('active') && inParen) {
                 inParen = false;
                 if (index > 0) {

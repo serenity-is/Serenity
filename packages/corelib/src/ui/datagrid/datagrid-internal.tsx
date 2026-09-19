@@ -18,7 +18,7 @@ export function getDefaultSortBy(this: void, sleekGrid: ISleekGrid): string[] {
     if (!sleekGrid)
         return [];
 
-    var columns = sleekGrid.getColumns().filter(function (x) {
+    const columns = sleekGrid.getColumns().filter(function (x) {
         return x.sortOrder && x.sortOrder !== 0 && x.field != null;
     });
 
@@ -27,9 +27,9 @@ export function getDefaultSortBy(this: void, sleekGrid: ISleekGrid): string[] {
             return Math.abs(x1.sortOrder) < Math.abs(y.sortOrder) ? -1 : (Math.abs(x1.sortOrder) > Math.abs(y.sortOrder) ? 1 : 0);
         });
 
-        var list = [];
-        for (var i = 0; i < columns.length; i++) {
-            var col = columns[i];
+        const list = [];
+        for (let i = 0; i < columns.length; i++) {
+            const col = columns[i];
             list.push(col.field + ((col.sortOrder < 0) ? ' DESC' : ''));
         }
 
@@ -44,7 +44,7 @@ export function getItemCssClass(this: void, item: any, activeFieldName: string, 
         return null;
 
     if (activeFieldName) {
-        var value = (item as any)[activeFieldName];
+        const value = (item as any)[activeFieldName];
         if (value == null) {
             return null;
         }
@@ -112,11 +112,11 @@ export function propertyItemToQuickFilter(item: PropertyItem): QuickFilter<any, 
 export function sleekGridOnSort(this: void, view: IRemoteView<any>, p: ArgsSort) {
     view.populateLock();
     try {
-        var sortBy = [];
-        var col: any;
+        const sortBy = [];
+        let col: any;
         if (!!p.multiColumnSort) {
-            for (var i = 0; i < p.sortCols.length; i++) {
-                var x = p.sortCols[i];
+            for (let i = 0; i < p.sortCols.length; i++) {
+                const x = p.sortCols[i];
                 col = x.sortCol;
                 if (col == null) {
                     col = {};

@@ -13,7 +13,7 @@ export class CustomLinksInGrid extends OrderGrid {
      * You could also write them as formatter classes, and use them at server side
      */
     protected override createColumns(): Column[] {
-        var columns = new OrderColumns(super.createColumns());
+        const columns = new OrderColumns(super.createColumns());
 
         columns.CustomerCompanyName && (columns.CustomerCompanyName.format =
             ctx => <a href="#" class="customer-link">{ctx.value}</a>);
@@ -41,10 +41,10 @@ export class CustomLinksInGrid extends OrderGrid {
         }
 
         // get reference to current item
-        var item = this.itemAt(row);
+        const item = this.itemAt(row);
 
         // get reference to clicked element
-        var target = e.target as HTMLElement;
+        const target = e.target as HTMLElement;
 
         if (target.classList.contains("customer-link")) {
             e.preventDefault();
@@ -62,7 +62,7 @@ export class CustomLinksInGrid extends OrderGrid {
         else if (target.classList.contains("date-link")) {
             e.preventDefault();
 
-            var ordersInSameDate = this.view.getItems().filter(x => x.OrderDate == item.OrderDate).length;
+            const ordersInSameDate = this.view.getItems().filter(x => x.OrderDate == item.OrderDate).length;
 
             notifyInfo("You clicked an order from date " +
                 formatDate(item.OrderDate) + ". There are " +
@@ -84,7 +84,7 @@ export class CustomLinksInGrid extends OrderGrid {
             e.preventDefault();
 
             notifySuccess("Let's filter the grid to orders from " + item.ShipCountry);
-            var countryFilter = this.findQuickFilter(LookupEditor,
+            const countryFilter = this.findQuickFilter(LookupEditor,
                 OrderRow.Fields.ShipCountry);
             countryFilter.value = item.ShipCountry;
             this.refresh();
@@ -105,9 +105,9 @@ export class CustomLinksInGrid extends OrderGrid {
         // check that this is an edit link click, not add button, ID is always a string
         if (typeof entityOrId == "string") {
             // convert ID to an integer, and find order with that ID
-            var item = this.view.getItemById(toId(entityOrId));
+            const item = this.view.getItemById(toId(entityOrId));
             // date is a ISO string, so need to parse it first
-            var date = formatDate(item.OrderDate);
+            const date = formatDate(item.OrderDate);
 
             // ask for confirmation
             confirmDialog(stringFormat("You clicked edit link for order with ID: {0} and Date: {1}. Should i open that order?",

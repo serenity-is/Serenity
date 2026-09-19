@@ -25,11 +25,11 @@ export class UserGrid extends EntityGrid<UserRow, any> {
     }
 
     protected override createColumns() {
-        var columns = super.createColumns();
+        const columns = super.createColumns();
 
-        var roles = columns.find(x => x.field == UserRow.Fields.Roles);
+        const roles = columns.find(x => x.field == UserRow.Fields.Roles);
         if (roles) {
-            var rolesLookup: Lookup<RoleRow>;
+            let rolesLookup: Lookup<RoleRow>;
             RoleRow.getLookupAsync().then(lookup => {
                 rolesLookup = lookup;
                 this.sleekGrid.invalidate();
@@ -39,7 +39,7 @@ export class UserGrid extends EntityGrid<UserRow, any> {
                 if (!rolesLookup)
                     return <i class="fa fa-spinner"></i>;
 
-                var roleList = (ctx.value || []).map(x => (rolesLookup.itemById[x] || {}).RoleName || "");
+                const roleList = (ctx.value || []).map(x => (rolesLookup.itemById[x] || {}).RoleName || "");
                 roleList.sort();
                 return roleList.map(x => ctx.escape(x)).join(", ");
             };

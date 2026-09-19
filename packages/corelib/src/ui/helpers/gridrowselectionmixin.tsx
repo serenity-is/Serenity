@@ -63,8 +63,8 @@ export class GridRowSelectionMixin {
             return;
         const grid = this.grid;
         e.preventDefault();
-        var item = grid.getView().getItem(e.row);
-        var id = item[this.idField].toString();
+        const item = grid.getView().getItem(e.row);
+        const id = item[this.idField].toString();
 
         if (this.include[id]) {
             delete this.include[id];
@@ -73,7 +73,7 @@ export class GridRowSelectionMixin {
             this.include[id] = true;
         }
 
-        for (var i = 0; i < (grid.getView() as any).getLength(); i++) {
+        for (let i = 0; i < (grid.getView() as any).getLength(); i++) {
             grid.getGrid().updateRow(i);
         }
 
@@ -94,9 +94,9 @@ export class GridRowSelectionMixin {
             clearKeys(this.include);
         }
         else {
-            var items = grid.getView().getItems();
-            for (var x of items.filter(bindThis(this).isSelectable)) {
-                var id1 = x[this.idField];
+            const items = grid.getView().getItems();
+            for (const x of items.filter(bindThis(this).isSelectable)) {
+                const id1 = x[this.idField];
                 this.include[id1] = true;
             }
         }
@@ -110,11 +110,11 @@ export class GridRowSelectionMixin {
      * current selection.
      */
     updateSelectAll(): void {
-        var selectAllButton = this.grid.getElement()
+        const selectAllButton = this.grid.getElement()
             .querySelector('.select-all-header .slick-column-name .select-all-items');
 
         if (selectAllButton) {
-            var keys = Object.keys(this.include);
+            const keys = Object.keys(this.include);
             selectAllButton.classList.toggle('checked',
                 keys.length > 0 &&
                 this.grid.getView().getItems().filter(
@@ -144,7 +144,7 @@ export class GridRowSelectionMixin {
      * @param keys - The keys of the items to select.
      */
     selectKeys(keys: string[]): void {
-        for (var k of keys) {
+        for (const k of keys) {
             this.include[k] = true;
         }
 
@@ -185,7 +185,7 @@ export class GridRowSelectionMixin {
      */
     setSelectedKeys(keys: string[]): void {
         this.clear();
-        for (var k of keys) {
+        for (const k of keys) {
             this.include[k] = true;
         }
 
@@ -217,12 +217,12 @@ export class GridRowSelectionMixin {
             headerCssClass: 'select-all-header',
             sortable: false,
             format: function (ctx) {
-                var item = ctx.item;
-                var mixin = getMixin();
+                const item = ctx.item;
+                const mixin = getMixin();
                 if (!mixin || !mixin.isSelectable(item)) {
                     return '';
                 }
-                var isChecked = mixin.include[ctx.item[mixin.idField]];
+                const isChecked = mixin.include[ctx.item[mixin.idField]];
                 return <span class={'select-item check-box no-float' + (isChecked ? ' checked' : '')}></span>;
             },
             ...columnOptions

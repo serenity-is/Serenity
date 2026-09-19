@@ -38,7 +38,7 @@ describe("ComboboxEditor async behavior", () => {
     }
 
     it("should preserve order for async initSelection", async () => {
-        var combo = new ReverseAsyncCombo({
+        const combo = new ReverseAsyncCombo({
         });
         combo.values = ["3", "2", "1"];
         expect(combo.values).toStrictEqual(["3", "2", "1"]);
@@ -49,7 +49,7 @@ describe("ComboboxEditor async behavior", () => {
     it("should preserve order when some items not found for async initSelection", async () => {
         vi.useFakeTimers();
         try {
-            var combo = new ReverseAsyncCombo({
+            const combo = new ReverseAsyncCombo({
                 filter: x => x !== "2"
             });
             combo.values = ["3", "2", "1"];

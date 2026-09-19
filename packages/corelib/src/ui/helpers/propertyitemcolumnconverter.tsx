@@ -16,11 +16,11 @@ export namespace PropertyItemColumnConverter {
      * @returns The resulting column definitions.
      */
     export function toColumns(items: PropertyItem[]): Column[] {
-        var result: Column[] = [];
+        const result: Column[] = [];
         if (items == null) {
             return result;
         }
-        for (var i = 0; i < items.length; i++) {
+        for (let i = 0; i < items.length; i++) {
             result.push(PropertyItemColumnConverter.toColumn(items[i]));
         }
         return result;
@@ -35,7 +35,7 @@ export namespace PropertyItemColumnConverter {
         const isAlwaysHidden = item.filterOnly === true ||
             (item.readPermission != null && !Authorization.hasPermission(item.readPermission));
 
-        var result: Column = {
+        const result: Column = {
             field: item.unbound ? null : item.name,
             id: item.unbound ? item.name : null,
             sourceItem: item,
@@ -55,7 +55,7 @@ export namespace PropertyItemColumnConverter {
             visible: !isAlwaysHidden && item.visible !== false
         };
 
-        var name = tryGetText(item.title);
+        let name = tryGetText(item.title);
         if (name == null)
             name = item.title;
         result.name = name;
@@ -82,7 +82,7 @@ export namespace PropertyItemColumnConverter {
         let loadError: string;
 
         const then = (formatterType: FormatterType) => {
-            var formatter = new formatterType(item.formatterParams ?? {});
+            const formatter = new formatterType(item.formatterParams ?? {});
 
             if (item.formatterParams != null) {
                 ReflectionOptionsSetter.set(formatter, item.formatterParams);

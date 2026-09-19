@@ -22,10 +22,10 @@ export class SlickPager<P extends PagerOptions = PagerOptions> extends Widget<P>
     constructor(props: WidgetProps<P>) {
         super(props);
 
-        let opt = this.options;
+        const opt = this.options;
         opt.showRowsPerPage ??= true;
         opt.rowsPerPageOptions ??= [20, 100, 500, 2000];
-        var v = opt.view; if (!v) throw new Error("SlickPager requires view option to be set!");
+        const v = opt.view; if (!v) throw new Error("SlickPager requires view option to be set!");
 
         const p = "slick-pg-";
         const Group = ({ id, children }: { id: string, children: any }) => <div class={`${p}grp ${p}grp-${id}`}>{children}</div> as HTMLDivElement;
@@ -83,15 +83,15 @@ export class SlickPager<P extends PagerOptions = PagerOptions> extends Widget<P>
      */
     _changePage(ctype: string) { //change page
 
-        var view = this.options.view;
+        const view = this.options.view;
 
         if (!view || view.loading)
             return true;
 
-        var info = view.getPagingInfo();
-        var pages = (!info.rowsPerPage || !info.totalCount) ? 1 : Math.ceil(info.totalCount / info.rowsPerPage);
+        const info = view.getPagingInfo();
+        const pages = (!info.rowsPerPage || !info.totalCount) ? 1 : Math.ceil(info.totalCount / info.rowsPerPage);
 
-        var newp: number;
+        let newp: number;
 
         switch (ctype) {
             case 'first': newp = 1; break;
@@ -99,7 +99,7 @@ export class SlickPager<P extends PagerOptions = PagerOptions> extends Widget<P>
             case 'next': if (info.page < pages) newp = parseInt(info.page as any) + 1; break;
             case 'last': newp = pages; break;
             case 'input':
-                var nv = parseInt(this.currentPage.value);
+                let nv = parseInt(this.currentPage.value);
                 if (isNaN(nv))
                     nv = 1;
                 else if (nv < 1)
@@ -128,20 +128,20 @@ export class SlickPager<P extends PagerOptions = PagerOptions> extends Widget<P>
      */
     _updatePager() {
 
-        var view = this.options.view;
-        var info = view.getPagingInfo();
-        var pages = (!info.rowsPerPage || !info.totalCount) ? 1 : Math.ceil(info.totalCount / info.rowsPerPage);
+        const view = this.options.view;
+        const info = view.getPagingInfo();
+        const pages = (!info.rowsPerPage || !info.totalCount) ? 1 : Math.ceil(info.totalCount / info.rowsPerPage);
 
         this.currentPage.value = info.page?.toString();
         this.totalPages.textContent = "" + pages;
 
-        var r1 = (info.page - 1) * info.rowsPerPage + 1;
-        var r2 = r1 + info.rowsPerPage - 1;
+        const r1 = (info.page - 1) * info.rowsPerPage + 1;
+        let r2 = r1 + info.rowsPerPage - 1;
 
         if (info.totalCount < r2)
             r2 = info.totalCount;
 
-        var stat: string;
+        let stat: string;
 
         if (info.loading) {
             stat = PagerTexts.LoadingStatus;

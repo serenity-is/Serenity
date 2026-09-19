@@ -82,7 +82,7 @@ export abstract class BaseEditorFiltering<TEditor extends Widget<any>> extends B
      * @returns The editor options.
      */
     getEditorOptions() {
-        var opt = deepClone(this.get_field().editorParams || {});
+        const opt = deepClone(this.get_field().editorParams || {});
         delete opt['cascadeFrom'];
         // currently can't support cascadeFrom in filtering
         return Object.assign(opt, this.get_field().filteringParams);
@@ -123,7 +123,7 @@ export abstract class BaseEditorFiltering<TEditor extends Widget<any>> extends B
      */
     override getEditorValue() {
         if (this.useEditor()) {
-            var value = EditorUtils.getValue(this.editor);
+            const value = EditorUtils.getValue(this.editor);
 
             if (value == null || (typeof value == "string" && value.trim().length === 0))
                 throw this.argumentNull();

@@ -71,7 +71,7 @@ export class OtherFormOneBarDialog<P = {}> extends OrderDialog<P> {
         }
         else {
             // Get current tab
-            var currTab = TabsExtensions.activeTabKey(this.tabs);
+            const currTab = TabsExtensions.activeTabKey(this.tabs);
 
             // Select the correct tab and validate to see the error message in tab
             TabsExtensions.selectTab(this.tabs, "Customer")
@@ -83,7 +83,7 @@ export class OtherFormOneBarDialog<P = {}> extends OrderDialog<P> {
             TabsExtensions.selectTab(this.tabs, currTab)
 
             // prepare an empty entity to serialize customer details into
-            var c: CustomerRow = {};
+            const c: CustomerRow = {};
             this.customerPropertyGrid.save(c);
 
             return CustomerService.Update({

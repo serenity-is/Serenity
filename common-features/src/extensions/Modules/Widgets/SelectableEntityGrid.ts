@@ -6,7 +6,7 @@ export class SelectableEntityGrid<TItem, TOptions> extends EntityGrid<TItem, TOp
     static override[Symbol.typeInfo] = this.registerClass(nsExtensions);
 
     protected override getSlickOptions(): GridOptions {
-        var opt = super.getSlickOptions();
+        const opt = super.getSlickOptions();
         opt.enableTextSelectionOnCells = true;
         opt.selectedCellCssClass = "slick-row-selected";
         opt.enableCellNavigation = true;

@@ -24,7 +24,7 @@ describe("EnumFormatter", () => {
             Value1 = 1
         };
         registerEnum(TestEnum, "TestEnum", "TestEnum");
-        var formatter = new EnumFormatter();
+        const formatter = new EnumFormatter();
         formatter.enumKey = "TestEnum";
         expect(formatter.format(ctx({ value: null }))).toBe("");
     });
@@ -34,7 +34,7 @@ describe("EnumFormatter", () => {
             Value1 = 1
         };
         registerEnum(TestEnum, "TestEnum", "TestEnum");
-        var formatter = new EnumFormatter();
+        const formatter = new EnumFormatter();
         formatter.enumKey = "TestEnum";
         expect(formatter.format(ctx({ value: 1 }))).toBe("Enums.TestEnum.Value1");
     });
@@ -45,7 +45,7 @@ describe("EnumFormatter", () => {
         };
         addCustomAttribute(TestEnum, new EnumKeyAttribute("TestEnum2"));
         registerEnum(TestEnum, "TestEnum");
-        var formatter = new EnumFormatter();
+        const formatter = new EnumFormatter();
         formatter.enumKey = "TestEnum";
         expect(formatter.format(ctx({ value: 1 }))).toBe("Enums.TestEnum2.Value1");
     });
@@ -55,7 +55,7 @@ describe("EnumFormatter", () => {
             Value1 = 1
         };
         registerEnum(TestEnum, "TestEnum", "TestEnum");
-        var value = EnumFormatter.getName(EnumTypeRegistry.get("TestEnum"), 1);
+        const value = EnumFormatter.getName(EnumTypeRegistry.get("TestEnum"), 1);
         expect(value).toBe("Value1");
     })
 

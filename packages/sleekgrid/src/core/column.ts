@@ -173,13 +173,13 @@ export interface ItemMetadata<TItem = any> {
  * @param defaults - Default values to fall back to for missing properties.
  */
 export function initColumnProps(columns: Column[], defaults: Partial<Column<any>>): void {
-    var usedIds: { [key: string]: boolean } = {};
+    const usedIds: { [key: string]: boolean } = {};
 
-    for (var i = 0; i < columns.length; i++) {
-        var m = columns[i];
+    for (let i = 0; i < columns.length; i++) {
+        const m = columns[i];
 
         if (defaults != null) {
-            for (var k in defaults) {
+            for (const k in defaults) {
                 if ((m as any)[k] === undefined)
                     (m as any)[k] = (defaults as any)[k];
             }
@@ -195,7 +195,7 @@ export function initColumnProps(columns: Column[], defaults: Partial<Column<any>
             usedIds[m.id]) {
             const prefix = m.id != null && m.id.length ? m.id :
                 m.field != null ? m.field : ('col');
-            var x = 0;
+            let x = 0;
             while (usedIds[(m.id = prefix + (x == 0 ? "" : '_' + x.toString()))]) x++;
         }
 

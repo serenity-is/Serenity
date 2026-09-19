@@ -21,14 +21,14 @@ export class FilterStore {
         this.fields = fields.slice();
 
         this.get_fields().sort(function (x, y) {
-            var titleX = tryGetText(x.title);
+            let titleX = tryGetText(x.title);
             if (titleX == null) {
                 titleX = x.title;
                 if (titleX == null)
                     titleX = x.name;
             }
 
-            var titleY = tryGetText(y.title);
+            let titleY = tryGetText(y.title);
             if (titleY == null) {
                 titleY = y.title;
                 if (titleY == null)
@@ -40,7 +40,7 @@ export class FilterStore {
 
         this.fieldByName = {};
 
-        for (var field of fields) {
+        for (const field of fields) {
             this.get_fieldByName()[field.name] = field;
         }
     }
@@ -55,13 +55,13 @@ export class FilterStore {
         if (items == null)
             return [''];
 
-        var inParens = false;
-        var currentBlock = [''];
-        var isBlockOr = false;
-        var criteria = [''];
+        let inParens = false;
+        let currentBlock = [''];
+        let isBlockOr = false;
+        let criteria = [''];
 
-        for (var i = 0; i < items.length; i++) {
-            var line = items[i];
+        for (let i = 0; i < items.length; i++) {
+            const line = items[i];
 
             if (line.leftParen || inParens && line.rightParen) {
 
@@ -112,11 +112,11 @@ export class FilterStore {
         if (items == null)
             return '';
 
-        var inParens = false;
-        var displayText = '';
+        let inParens = false;
+        let displayText = '';
 
-        for (var i = 0; i < items.length; i++) {
-            var line = items[i];
+        for (let i = 0; i < items.length; i++) {
+            const line = items[i];
 
             if (inParens && (line.rightParen || line.leftParen)) {
                 displayText += ')';

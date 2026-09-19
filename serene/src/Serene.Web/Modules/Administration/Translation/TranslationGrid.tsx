@@ -22,7 +22,7 @@ export class TranslationGrid extends EntityGrid<TranslationItem, any> {
 
         this.element.on('keyup.' + this.uniqueName + ' change.' + this.uniqueName,
             'input.custom-text', e => {
-                var value = trimToNull(Fluent(e.target).val());
+                let value = trimToNull(Fluent(e.target).val());
                 if (value === '') {
                     value = null;
                 }
@@ -38,7 +38,7 @@ export class TranslationGrid extends EntityGrid<TranslationItem, any> {
             return;
         }
 
-        let item = this.itemAt(row);
+        const item = this.itemAt(row);
         let done: () => void;
 
         if (Fluent(e.target).hasClass('source-text')) {
@@ -82,7 +82,7 @@ export class TranslationGrid extends EntityGrid<TranslationItem, any> {
 
     protected override createColumns(): Column[] {
 
-        var columns: Column[] = [];
+        const columns: Column[] = [];
         columns.push({
             field: 'Key',
             name: TranslationTexts.Key,
@@ -112,7 +112,7 @@ export class TranslationGrid extends EntityGrid<TranslationItem, any> {
     protected override createToolbarExtensions(): void {
         super.createToolbarExtensions();
 
-        let opt: LookupEditorOptions = {
+        const opt: LookupEditorOptions = {
             lookupKey: 'Administration.Language'
         };
 
@@ -150,8 +150,8 @@ export class TranslationGrid extends EntityGrid<TranslationItem, any> {
     }
 
     protected saveChanges(language: string): PromiseLike<any> {
-        var translations: { [key: string]: string } = {};
-        for (let item of this.getItems()) {
+        const translations: { [key: string]: string } = {};
+        for (const item of this.getItems()) {
             translations[item.Key] = item.CustomText;
         }
 
@@ -169,7 +169,7 @@ export class TranslationGrid extends EntityGrid<TranslationItem, any> {
 
     protected override setViewParams() {
         super.setViewParams();
-        var request = this.view.params;
+        const request = this.view.params;
         request.SourceLanguageID = this.sourceLanguage.value;
         this.targetLanguageKey = this.targetLanguage.value || '';
         request.TargetLanguageID = this.targetLanguageKey;
@@ -210,8 +210,8 @@ export class TranslationGrid extends EntityGrid<TranslationItem, any> {
             return true;
         }
 
-        var sd = stripDiacritics;
-        var searching = sd(this.searchText).toLowerCase();
+        const sd = stripDiacritics;
+        const searching = sd(this.searchText).toLowerCase();
 
         function match(str: string) {
             if (!str)

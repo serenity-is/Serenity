@@ -37,7 +37,7 @@ describe('EventEmitter', () => {
 
     it('can subscribe to an event more than once', () => {
         const event = new EventEmitter();
-        let isEventCalled = [false, false];
+        const isEventCalled = [false, false];
 
         event.subscribe(() => {
             isEventCalled[0] = true;
@@ -290,7 +290,7 @@ describe('EventSubscriber', () => {
     });
 
     it('automatically subscribes multiple handlers to the event', function () {
-        let isEventCalled = [false, false];
+        const isEventCalled = [false, false];
 
         const event = new EventEmitter();
         const subscriber = new EventSubscriber();
@@ -439,7 +439,7 @@ describe('EventDataWrapper', () => {
 
     it('returns original object when it is empty', () => {
         const e = {};
-        var result = new EventDataWrapper(e);
+        const result = new EventDataWrapper(e);
         expect(result.nativeEvent).toBe(e);
     });
 

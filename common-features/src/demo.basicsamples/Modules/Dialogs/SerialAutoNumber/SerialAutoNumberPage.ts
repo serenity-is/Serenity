@@ -37,13 +37,13 @@ export class SerialAutoNumberDialog extends CustomerDialog {
 
     private getNextNumber() {
 
-        var val = this.form.CustomerID.value?.trim();
+        const val = this.form.CustomerID.value?.trim();
 
         // we will only get next number when customer ID is empty or 1 character in length
         if (!val || val.length <= 1) {
 
             // if no customer ID yet (new record mode probably) use 'C' as a prefix
-            var prefix = (val || 'C').toUpperCase();
+            const prefix = (val || 'C').toUpperCase();
 
             // call our service, see CustomerEndpoint.cs and CustomerRepository.cs
             CustomerService.GetNextNumber({

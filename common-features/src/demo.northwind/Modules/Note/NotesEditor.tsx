@@ -15,7 +15,7 @@ export class NotesEditor<P = {}> extends EditorWidget<P>
     declare private noteList: HTMLUListElement;
 
     protected override renderContents(): any {
-        let id = this.useIdPrefix();
+        const id = this.useIdPrefix();
         return (<div>
             <Toolbar id={id.Toolbar} buttons={[{
                 title: 'Add Note',
@@ -44,10 +44,10 @@ export class NotesEditor<P = {}> extends EditorWidget<P>
     }
 
     protected addClick() {
-        var dlg = new NoteDialog({});
+        const dlg = new NoteDialog({});
         dlg.dialogTitle = 'Add Note';
         dlg.okClick = () => {
-            var text = dlg.text?.trim();
+            const text = dlg.text?.trim();
             if (!text)
                 return;
 
@@ -68,13 +68,13 @@ export class NotesEditor<P = {}> extends EditorWidget<P>
 
     protected editClick(e) {
         e.preventDefault();
-        var index = e.target.dataset.index;
-        var old = this.items[index];
-        var dlg = new NoteDialog({});
+        const index = e.target.dataset.index;
+        const old = this.items[index];
+        const dlg = new NoteDialog({});
         dlg.dialogTitle = 'Edit Note';
         dlg.text = old.Text;
         dlg.okClick = () => {
-            var text = dlg.text?.trim();;
+            const text = dlg.text?.trim();;
             if (!text)
                 return;
 
@@ -89,7 +89,7 @@ export class NotesEditor<P = {}> extends EditorWidget<P>
 
     public deleteClick(e) {
         e.preventDefault();
-        var index = e.target.dataset.index;
+        const index = e.target.dataset.index;
         confirmDialog('Delete this note?', () => {
             this.items.splice(index, 1);
             this.updateContent();

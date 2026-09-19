@@ -81,7 +81,7 @@ export class EmailEditor<P extends EmailEditorOptions = EmailEditorOptions> exte
 
         Validator.addMethod('emailuser', function (value, element) {
 
-            var domain = Fluent(element).nextSibling(".emaildomain").getNode();
+            const domain = Fluent(element).nextSibling(".emaildomain").getNode();
             if (domain && domain.getAttribute('readonly') == null) {
 
                 if (Validator.optional(element) && Validator.optional(domain as ValidatableElement)) {
@@ -101,8 +101,8 @@ export class EmailEditor<P extends EmailEditorOptions = EmailEditorOptions> exte
      * @returns The email value.
      */
     get_value(): string {
-        var value = this.domNode.value;
-        var domainValue = this.domain.value;
+        const value = this.domNode.value;
+        const domainValue = this.domain.value;
         if (!value) {
             if (this.options.readOnlyDomain || !domainValue) {
                 return '';
@@ -132,10 +132,10 @@ export class EmailEditor<P extends EmailEditorOptions = EmailEditorOptions> exte
             this.domNode.value = "";
         }
         else {
-            var idx = value.indexOf('@');
+            const idx = value.indexOf('@');
             if (idx >= 0) {
-                var user = value.substring(0, idx);
-                var domain = value.substring(idx + 1);
+                const user = value.substring(0, idx);
+                const domain = value.substring(idx + 1);
                 if (!this.options.readOnlyDomain) {
                     this.domain.value = domain;
                     this.domNode.value = user;

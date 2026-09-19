@@ -9,9 +9,9 @@ export async function UserPermissionDialog(props: { userID: number, username: st
     const permissions = (await UserPermissionService.List({ UserID: props.userID })).Entities;
     const rolePermissions = (await UserPermissionService.ListRolePermissions({ UserID: props.userID })).Entities;
 
-    let implicitPermissions = await getRemoteDataAsync<Record<string, string[]>>(RemoteDataKeys.Administration.ImplicitPermissions);
+    const implicitPermissions = await getRemoteDataAsync<Record<string, string[]>>(RemoteDataKeys.Administration.ImplicitPermissions);
 
-    var checkEditor: PermissionCheckEditor;
+    let checkEditor: PermissionCheckEditor;
     new Dialog({
         dialogClass: "s-UserPermissionDialog",
         title: stringFormat(UserPermissionDialogTexts.DialogTitle, props.username),

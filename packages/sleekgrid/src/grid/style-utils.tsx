@@ -14,7 +14,7 @@ let scrollbarDimensions: { width: number, height: number };
  * @returns Absolute box with `top`/`left`/`right`/`bottom`/`width`/`height`/`visible`.
  */
 export function absBox(elem: HTMLElement): Position {
-    var box: Position = {
+    const box: Position = {
         top: elem.offsetTop,
         left: elem.offsetLeft,
         bottom: 0,
@@ -28,7 +28,7 @@ export function absBox(elem: HTMLElement): Position {
     box.right = box.left + box.width;
 
     // walk up the tree
-    var offsetParent = elem.offsetParent;
+    let offsetParent = elem.offsetParent;
     while ((elem = elem.parentNode as HTMLElement) != document.body && elem != null) {
         if (box.visible && elem.scrollHeight != elem.offsetHeight && getComputedStyle(elem).overflowY !== "visible") {
             box.visible = box.bottom > elem.scrollTop && box.top < elem.scrollTop + elem.clientHeight;
@@ -62,13 +62,13 @@ export function absBox(elem: HTMLElement): Position {
 export function getInnerWidth(el: HTMLElement): number {
     if (!el)
         return 0;
-    var style = getComputedStyle(el);
-    var width = parsePx(style.width) ?? 0;
+    const style = getComputedStyle(el);
+    let width = parsePx(style.width) ?? 0;
     if (style.boxSizing != 'border-box')
         return Math.max(0, width);
 
-    var p = ["border-left-width", "border-right-width", "padding-left", "padding-right"];
-    for (var val of p)
+    const p = ["border-left-width", "border-right-width", "padding-left", "padding-right"];
+    for (const val of p)
         width -= parsePx(style.getPropertyValue(val)) || 0;
 
     return Math.max(width, 0);
@@ -272,8 +272,8 @@ export function applyColumnWidths(this: void, { cols, cssColRulesL, cssColRulesR
             x = 0;
         }
         w = cols[c].width;
-        let startVal = x + "px";
-        let endVal = (c <= refs.pinnedStartLast ? refs.start.canvasWidth : c >= refs.pinnedEndFirst ? refs.end.canvasWidth : refs.main.canvasWidth) - x - w + "px";
+        const startVal = x + "px";
+        const endVal = (c <= refs.pinnedStartLast ? refs.start.canvasWidth : c >= refs.pinnedEndFirst ? refs.end.canvasWidth : refs.main.canvasWidth) - x - w + "px";
         if (!cssColRulesL) {
             setStyleProp(styles, startVar + c, startVal);
             setStyleProp(styles, endVar + c, endVal);

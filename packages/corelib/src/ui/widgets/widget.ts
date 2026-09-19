@@ -104,12 +104,12 @@ export class Widget<P = {}> {
      * @returns The space-separated CSS class string.
      */
     protected getCssClass(): string {
-        var type = getInstanceType(this);
-        var classList: string[] = [];
-        var fullClass = getTypeFullName(type).replace(/\./g, '-');
+        const type = getInstanceType(this);
+        const classList: string[] = [];
+        const fullClass = getTypeFullName(type).replace(/\./g, '-');
         classList.push(fullClass);
 
-        for (let k of Config.rootNamespaces) {
+        for (const k of Config.rootNamespaces) {
             if (fullClass.startsWith(k + '-')) {
                 classList.push(fullClass.substring(k.length + 1));
                 break;
@@ -200,12 +200,12 @@ export class Widget<P = {}> {
      * @returns The created widget instance.
      */
     public static create<TWidget extends Widget<P>, P>(params: CreateWidgetParams<TWidget, P>) {
-        let props: WidgetProps<P> = params.options ?? ({} as any);
-        let node = handleElementProp(params.type as any, props);
+        const props: WidgetProps<P> = params.options ?? ({} as any);
+        const node = handleElementProp(params.type as any, props);
         params.container && (isArrayLike(params.container) ? params.container[0] : params.container)?.appendChild(node);
         params.element?.(Fluent(node));
         props.element = node;
-        let widget = new params.type(props as any);
+        const widget = new params.type(props as any);
         widget.init();
         params.init?.(widget);
         return widget;
@@ -251,8 +251,8 @@ export class Widget<P = {}> {
      * this method should not be overridden. Override renderContents() instead.
      */
     public render(): any {
-        let el = this.init().domNode;
-        let parent = el?.parentNode;
+        const el = this.init().domNode;
+        const parent = el?.parentNode;
         if (parent instanceof DocumentFragment &&
             parent.childNodes.length > 1 &&
             (parent as any)[isFragmentWorkaround])
@@ -266,11 +266,11 @@ export class Widget<P = {}> {
     internalRenderContents() {
         const queue = (this as any)[afterRenderSymbol];
         if (queue) {
-            let contents = this.renderContents();
+            const contents = this.renderContents();
             if (this.domNode && contents)
                 appendToNode(this.domNode, contents);
             delete (this as any)[afterRenderSymbol];
-            for (var callback of queue) callback();
+            for (const callback of queue) callback();
         }
     }
 
@@ -292,7 +292,7 @@ export class Widget<P = {}> {
         if (typeof (this as any).getTemplate !== "function")
             return;
 
-        var template = (this as any).getTemplate();
+        let template = (this as any).getTemplate();
         if (typeof template !== "string")
             return;
 

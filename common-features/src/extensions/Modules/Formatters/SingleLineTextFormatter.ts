@@ -10,7 +10,7 @@ export class SingleLineTextFormatter implements Formatter {
     }
 
     public static formatValue(value: string) {
-        var div = document.createElement("div");
+        const div = document.createElement("div");
         div.innerHTML = value ?? '';
         return htmlEncode(toSingleLine(div.textContent));
     }

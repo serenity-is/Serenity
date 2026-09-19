@@ -3,7 +3,7 @@ import { HardcodedValuesForm } from "../../ServerTypes/Demo";
 import { nsDemoBasicSamples } from "../../ServerTypes/Namespaces";
 
 export default function pageInit() {
-    var dlg = new HardcodedValuesDialog({});
+    const dlg = new HardcodedValuesDialog({});
     dlg.dialogOpen();
     dlg.element.findFirst('.field.SomeValue .editor').tryGetWidget(ComboboxEditor)?.openDropdown();
 
@@ -66,7 +66,7 @@ export class HardcodedValuesDialog<P = {}> extends PropertyDialog<any, P> {
     }
 
     protected override getDialogOptions() {
-        var opt = super.getDialogOptions();
+        const opt = super.getDialogOptions();
         opt.modal = false;
         return opt;
     }

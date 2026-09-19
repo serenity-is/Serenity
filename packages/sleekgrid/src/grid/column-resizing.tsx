@@ -60,8 +60,8 @@ export function setupColumnResize<TItem>(this: void, { absoluteColMinWidth, cont
     const docMouseMove = (e: MouseEvent) => {
         if (resizingCell == null)
             return;
-        var dist;
-        var thisPageX = e.pageX;
+        let dist;
+        const thisPageX = e.pageX;
         dist = Math.min(maxPageX, Math.max(minPageX, thisPageX)) - pageX;
 
         if (options.rtl) {
@@ -149,7 +149,7 @@ export function setupColumnResize<TItem>(this: void, { absoluteColMinWidth, cont
  * @returns `true` when any `rerenderOnResize` column changed width (re-render required).
  */
 export function autosizeColumns(cols: Column[], availWidth: number, absoluteColMinWidth: number): boolean {
-    var i, c,
+    let i, c,
         widths = [],
         shrinkLeeway = 0,
         total = 0,
@@ -167,15 +167,15 @@ export function autosizeColumns(cols: Column[], availWidth: number, absoluteColM
     // shrink
     prevTotal = total;
     while (total > availWidth && shrinkLeeway) {
-        var shrinkProportion = (total - availWidth) / shrinkLeeway;
+        const shrinkProportion = (total - availWidth) / shrinkLeeway;
         for (i = 0; i < cols.length && total > availWidth; i++) {
             c = cols[i];
-            var width = widths[i];
+            const width = widths[i];
             if (!c.resizable || width <= c.minWidth || width <= absoluteColMinWidth) {
                 continue;
             }
-            var absMinWidth = Math.max(c.minWidth, absoluteColMinWidth);
-            var shrinkSize = Math.floor(shrinkProportion * (width - absMinWidth)) || 1;
+            const absMinWidth = Math.max(c.minWidth, absoluteColMinWidth);
+            let shrinkSize = Math.floor(shrinkProportion * (width - absMinWidth)) || 1;
             shrinkSize = Math.min(shrinkSize, width - absMinWidth);
             total -= shrinkSize;
             shrinkLeeway -= shrinkSize;
@@ -190,11 +190,11 @@ export function autosizeColumns(cols: Column[], availWidth: number, absoluteColM
     // grow
     prevTotal = total;
     while (total < availWidth) {
-        var growProportion = availWidth / total;
+        const growProportion = availWidth / total;
         for (i = 0; i < cols.length && total < availWidth; i++) {
             c = cols[i];
-            var currentWidth = widths[i];
-            var growSize;
+            const currentWidth = widths[i];
+            let growSize;
 
             if (!c.resizable || c.maxWidth <= currentWidth) {
                 growSize = 0;
@@ -210,7 +210,7 @@ export function autosizeColumns(cols: Column[], availWidth: number, absoluteColM
         prevTotal = total;
     }
 
-    var reRender = false;
+    let reRender = false;
     for (i = 0; i < cols.length; i++) {
         if (cols[i].rerenderOnResize && cols[i].width != widths[i]) {
             reRender = true;
@@ -228,7 +228,7 @@ function shrinkOrStretchColumn({ absoluteColMinWidth, cols, dist, cell: cell, fo
     dist: number,
     forceFit: boolean
 }): void {
-    var c: Column, j: number, x: number, actualMinWidth: number;
+    let c: Column, j: number, x: number, actualMinWidth: number;
 
     if (dist < 0) { // shrink column
         x = dist;
@@ -308,7 +308,7 @@ function calcMinMaxPageXOnDragStart({ absoluteColMinWidth, cols, cell, forceFit,
     pageX: number,
     rtl?: boolean
 }): { maxPageX: number; minPageX: number; } {
-    var shrinkLeewayOnRight = null, stretchLeewayOnRight = null, j: number, c: Column;
+    let shrinkLeewayOnRight = null, stretchLeewayOnRight = null, j: number, c: Column;
     if (forceFit) {
         shrinkLeewayOnRight = 0;
         stretchLeewayOnRight = 0;
@@ -327,7 +327,7 @@ function calcMinMaxPageXOnDragStart({ absoluteColMinWidth, cols, cell, forceFit,
             }
         }
     }
-    var shrinkLeewayOnLeft = 0, stretchLeewayOnLeft = 0;
+    let shrinkLeewayOnLeft = 0, stretchLeewayOnLeft = 0;
     for (j = 0; j <= cell; j++) {
         // columns on left only affect minPageX
         c = cols[j];

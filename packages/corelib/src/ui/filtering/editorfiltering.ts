@@ -40,7 +40,7 @@ export class EditorFiltering extends BaseEditorFiltering<Widget<any>> {
      * @returns The operators.
      */
     getOperators(): FilterOperator[] {
-        var list = [];
+        const list = [];
 
         list.push({ key: FilterOperators.EQ });
         list.push({ key: FilterOperators.NE });
@@ -67,7 +67,7 @@ export class EditorFiltering extends BaseEditorFiltering<Widget<any>> {
      * @returns True when an editor is used.
      */
     protected override useEditor() {
-        var op = this.get_operator().key;
+        const op = this.get_operator().key;
 
         return op === FilterOperators.EQ ||
             op === FilterOperators.NE ||
@@ -83,7 +83,7 @@ export class EditorFiltering extends BaseEditorFiltering<Widget<any>> {
      */
     override createEditor() {
         if (this.useEditor()) {
-            var editorType = EditorTypeRegistry.get(this.editorType ?? 'String') as typeof Widget<{}>;
+            const editorType = EditorTypeRegistry.get(this.editorType ?? 'String') as typeof Widget<{}>;
 
             this.editor = new editorType({
                 element: el => this.get_container().append(el),

@@ -34,12 +34,12 @@ export class PermissionCheckEditor<P extends PermissionCheckEditorOptions = Perm
     constructor(props: WidgetProps<P>) {
         super(props);
 
-        let titleByKey: Record<string, string> = {};
+        const titleByKey: Record<string, string> = {};
         this.getSortedGroupAndPermissionKeys(titleByKey, (permissionKeys) => {
             if (!this.domNode)
                 return;
 
-            let items = permissionKeys.map(key => ({
+            const items = permissionKeys.map(key => ({
                 Key: key,
                 ParentKey: this.getParentKey(key),
                 Title: titleByKey[key],
@@ -88,7 +88,7 @@ export class PermissionCheckEditor<P extends PermissionCheckEditorOptions = Perm
     }
 
     protected override createColumns(): Column[] {
-        let columns: Column[] = [{
+        const columns: Column[] = [{
             name: UserPermissionDialogTexts.Permission,
             field: 'Title',
             format: SlickFormatting.treeToggle(() => this.view, x => x.Key, ctx => <span class={["effective-permission", this.getItemEffectiveClass(ctx.item)]}>{ctx.value}</span>),
@@ -141,12 +141,12 @@ export class PermissionCheckEditor<P extends PermissionCheckEditorOptions = Perm
         const result: PermissionCheckItem[] = [];
         const stack = [item];
         while (stack.length > 0) {
-            let i = stack.pop();
-            let children = this.byParentKey[i.Key];
+            const i = stack.pop();
+            const children = this.byParentKey[i.Key];
             if (!children)
                 continue;
 
-            for (let child of children) {
+            for (const child of children) {
                 if (!excludeGroups || !child.IsGroup) {
                     result.push(child);
                 }
@@ -172,8 +172,8 @@ export class PermissionCheckEditor<P extends PermissionCheckEditorOptions = Perm
         if (grant || target.hasClass('revoke')) {
             e.preventDefault();
 
-            let item = this.itemAt(row);
-            let checkedOrPartial = target.hasClass('checked') || target.hasClass('partial');
+            const item = this.itemAt(row);
+            const checkedOrPartial = target.hasClass('checked') || target.hasClass('partial');
             grant = checkedOrPartial ? null : grant !== checkedOrPartial;
 
             if (item.IsGroup)
@@ -211,8 +211,8 @@ export class PermissionCheckEditor<P extends PermissionCheckEditorOptions = Perm
 
     private getSortedGroupAndPermissionKeys(titleByKey: Record<string, string>, then: (result: string[]) => void) {
         getRemoteDataAsync(RemoteDataKeys.Administration.PermissionKeys).then((keys: string[]) => {
-            let titleWithGroup = {};
-            for (var s of keys.filter(s => s)) {
+            const titleWithGroup = {};
+            for (let s of keys.filter(s => s)) {
                 if (s.charAt(s.length - 1) == ':') {
                     s = s.substring(0, s.length - 1);
                     if (s.length === 0) {
@@ -225,12 +225,12 @@ export class PermissionCheckEditor<P extends PermissionCheckEditorOptions = Perm
                 }
 
                 titleByKey[s] = localText("Permission." + s, s);
-                let parts = s.split(':');
+                const parts = s.split(':');
                 let group = '';
                 let groupTitle = '';
                 for (let i = 0; i < parts.length - 1; i++) {
                     group = group + parts[i] + ':';
-                    let txt = localText("Permission." + group, parts[i]);
+                    const txt = localText("Permission." + group, parts[i]);
                     titleByKey[group] = txt;
                     groupTitle = groupTitle + titleByKey[group] + ':';
                     titleWithGroup[group] = groupTitle;
@@ -258,7 +258,7 @@ export class PermissionCheckEditor<P extends PermissionCheckEditorOptions = Perm
     set value(value: UserPermissionRow[]) {
         this._value = (value || []);
         this.view.getItems().forEach(x => { x.GrantRevoke = null });
-        for (let item of this._value) {
+        for (const item of this._value) {
             const r = this.view.getItemById(item.PermissionKey);
             r && (r.GrantRevoke = item.Granted ?? true);
         }

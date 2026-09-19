@@ -39,27 +39,27 @@ export class RadioButtonEditor<P extends RadioButtonEditorOptions = RadioButtonE
         }
 
         if (this.options.lookupKey) {
-            var lookup = getLookup(this.options.lookupKey);
-            for (var item of lookup.items) {
-                var textValue = (item as any)[lookup.textField];
-                var text = (textValue == null ? '' : textValue.toString());
-                var idValue = (item as any)[lookup.idField];
-                var id = (idValue == null ? '' : idValue.toString());
+            const lookup = getLookup(this.options.lookupKey);
+            for (const item of lookup.items) {
+                const textValue = (item as any)[lookup.textField];
+                const text = (textValue == null ? '' : textValue.toString());
+                const idValue = (item as any)[lookup.idField];
+                const id = (idValue == null ? '' : idValue.toString());
                 this.addRadio(id, text);
             }
         }
         else {
-            var enumType = this.options.enumType || EnumTypeRegistry.getOrLoad(this.options.enumKey);
+            const enumType = this.options.enumType || EnumTypeRegistry.getOrLoad(this.options.enumKey);
             const then = (enumType: any) => {
-                var enumKey = this.options.enumKey;
+                let enumKey = this.options.enumKey;
                 if (enumKey == null && enumType != null) {
                     enumKey = getCustomAttribute(enumType, EnumKeyAttribute, false)?.value ??
                         getTypeFullName(enumType);
                 }
 
-                var values = this.getEnumValues(enumType);
-                for (var x of values) {
-                    var name = Enum.toString(enumType, x);
+                const values = this.getEnumValues(enumType);
+                for (const x of values) {
+                    const name = Enum.toString(enumType, x);
                     this.addRadio(x.toString(), localText("Enums." + enumKey + "." + name, name));
                 }
 
@@ -82,7 +82,7 @@ export class RadioButtonEditor<P extends RadioButtonEditorOptions = RadioButtonE
      * @returns The enum values.
      */
     protected getEnumValues(enumType: any): any[] {
-        var values = Enum.getValues(enumType);
+        const values = Enum.getValues(enumType);
         if (values.length || enumType == null)
             return values;
 
@@ -134,8 +134,8 @@ export class RadioButtonEditor<P extends RadioButtonEditorOptions = RadioButtonE
         if (value === this.get_value())
             return;
 
-        var inputs = this.element.findAll<HTMLInputElement>('input');
-        var checks = inputs.filter(x => x.checked);
+        const inputs = this.element.findAll<HTMLInputElement>('input');
+        let checks = inputs.filter(x => x.checked);
         if (checks.length > 0) {
             (checks[0] as HTMLInputElement).checked = false;
         }

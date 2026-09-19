@@ -24,17 +24,17 @@ export class DateYearEditor<P extends DateYearEditorOptions = DateYearEditorOpti
      * @returns The list of year strings.
      */
     override getItems() {
-        var opt = this.options as DateYearEditorOptions;
+        const opt = this.options as DateYearEditorOptions;
 
         if (opt.items != null && opt.items.length >= 1) {
             return opt.items;
         }
 
-        var years = [];
-        var minYear = (new Date()).getFullYear();
-        var maxYear = (new Date()).getFullYear();
+        const years = [];
+        let minYear = (new Date()).getFullYear();
+        let maxYear = (new Date()).getFullYear();
 
-        var minYearText = (opt.minYear ?? '-10').toString();
+        const minYearText = (opt.minYear ?? '-10').toString();
         if (minYearText.startsWith('-')) {
             minYear -= parseInt(minYearText.substring(1), 10);
         }
@@ -45,7 +45,7 @@ export class DateYearEditor<P extends DateYearEditorOptions = DateYearEditorOpti
             minYear = parseInt(minYearText, 10);
         }
 
-        var maxYearText = (opt.maxYear ?? '+10').toString();
+        const maxYearText = (opt.maxYear ?? '+10').toString();
         if (maxYearText.startsWith('-')) {
             maxYear -= parseInt(maxYearText.substring(1), 10);
         }
@@ -57,12 +57,12 @@ export class DateYearEditor<P extends DateYearEditorOptions = DateYearEditorOpti
         }
 
         if (opt.descending) {
-            for (var i = maxYear; i >= minYear; i--) {
+            for (let i = maxYear; i >= minYear; i--) {
                 years.push(i.toString());
             }
         }
         else {
-            for (var i1 = minYear; i1 <= maxYear; i1++) {
+            for (let i1 = minYear; i1 <= maxYear; i1++) {
                 years.push(i1.toString());
             }
         }

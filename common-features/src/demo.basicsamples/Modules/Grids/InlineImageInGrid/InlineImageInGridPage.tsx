@@ -14,12 +14,12 @@ export class InlineImageFormatter implements Formatter, IInitializeColumn {
 
     format(ctx: FormatterContext): FormatterResult {
 
-        var file = (this.props?.fileProperty ? ctx.item[this.props.fileProperty] : ctx.value) as string;
+        let file = (this.props?.fileProperty ? ctx.item[this.props.fileProperty] : ctx.value) as string;
         if (!file || !file.length)
             return "";
 
         if (this.props?.thumb) {
-            var parts = file.split('.');
+            const parts = file.split('.');
             file = parts.slice(0, parts.length - 1).join('.') + '_t.jpg';
         }
 
@@ -44,7 +44,7 @@ export class InlineImageInGrid<P = {}> extends EntityGrid<ProductRow, P> {
     protected override getService() { return ProductService.baseUrl; }
 
     protected override getSlickOptions(): GridOptions {
-        let opt = super.getSlickOptions();
+        const opt = super.getSlickOptions();
         opt.rowHeight = 150;
         return opt;
     }

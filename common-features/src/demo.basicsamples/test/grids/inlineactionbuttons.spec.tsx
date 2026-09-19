@@ -67,7 +67,7 @@ describe("Inline Action Buttons", () => {
         const grid = createInlineActionGrid();
         const editSpy = (grid as any).editItem = vi.fn();
 
-        var actions = grid.element.findAll<HTMLAnchorElement>(".inline-action[data-action=view-details]");
+        const actions = grid.element.findAll<HTMLAnchorElement>(".inline-action[data-action=view-details]");
         expect(actions.length).toBe(2);
         actions[1].click();
         expect(editSpy).toHaveBeenCalledTimes(1);
@@ -78,7 +78,7 @@ describe("Inline Action Buttons", () => {
 
     it("should create a new order dialog when clicking new-order action", () => {
         const grid = createInlineActionGrid();
-        var actions = grid.element.findAll<HTMLAnchorElement>(".inline-action[data-action=new-order]");
+        const actions = grid.element.findAll<HTMLAnchorElement>(".inline-action[data-action=new-order]");
         expect(actions.length).toBe(2);
 
         actions[1].click();
@@ -100,7 +100,7 @@ describe("Inline Action Buttons", () => {
 
     it("should confirm and delete the customer when clicking delete-row action", () => {
         const grid = createInlineActionGrid();
-        var actions = grid.element.findAll<HTMLAnchorElement>(".inline-action[data-action=delete-row]");
+        const actions = grid.element.findAll<HTMLAnchorElement>(".inline-action[data-action=delete-row]");
         expect(actions.length).toBe(2);
 
         const deleteSpy = vi.spyOn(CustomerService, "Delete").mockImplementation(((request: any, onSuccess: any) => {

@@ -21,7 +21,7 @@ export class ReportPage<P = {}> extends Widget<P> {
     }
 
     protected updateMatchFlags(text: string) {
-        var liList = this.domNode.querySelectorAll('.report-list li');
+        const liList = this.domNode.querySelectorAll('.report-list li');
         liList.forEach(x => x.classList.remove('non-match'));
         text = text?.trim();
         if (!text)
@@ -29,9 +29,9 @@ export class ReportPage<P = {}> extends Widget<P> {
 
         text = stripDiacritics(text).toUpperCase();
 
-        var reportItems = Array.from(liList).filter(x => x.classList.contains('report-item'));
+        const reportItems = Array.from(liList).filter(x => x.classList.contains('report-item'));
         reportItems.forEach(function (el) {
-            var title = stripDiacritics((el.textContent ?? '').toUpperCase());
+            const title = stripDiacritics((el.textContent ?? '').toUpperCase());
             if (title.indexOf(text) < 0) {
                 el.classList.add('non-match');
             }
@@ -46,8 +46,8 @@ export class ReportPage<P = {}> extends Widget<P> {
             return parents;
         }
 
-        var matchingItems = reportItems.filter(x => !x.classList.contains('non-match'));
-        var visibles = [...matchingItems];
+        const matchingItems = reportItems.filter(x => !x.classList.contains('non-match'));
+        let visibles = [...matchingItems];
         matchingItems.forEach(x => visibles.push(...parents(x as HTMLElement, 'li')));
         visibles = visibles.filter((x, i) => visibles.indexOf(x) === i);
         visibles.forEach(v => {
@@ -61,7 +61,7 @@ export class ReportPage<P = {}> extends Widget<P> {
             }
         });
 
-        var nonVisibles = Array.from(liList).filter(x => visibles.indexOf(x) < 0);
+        const nonVisibles = Array.from(liList).filter(x => visibles.indexOf(x) < 0);
         nonVisibles.forEach(x => x.classList.add('non-match'));
     }
 

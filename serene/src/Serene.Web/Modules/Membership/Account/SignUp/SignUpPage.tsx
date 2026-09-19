@@ -39,7 +39,7 @@ class SignUpPanel extends PropertyPanel<SignUpRequest, any> {
             return;
         }
 
-        var request = this.propertyGrid.save();
+        const request = this.propertyGrid.save();
         delete request.ConfirmEmail;
         delete request.ConfirmPassword;
 

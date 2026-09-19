@@ -30,7 +30,7 @@ export class StaticTextBlockDialog<P = {}> extends PropertyDialog<any, P> {
     }
 
     protected override getDialogOptions() {
-        var opt = super.getDialogOptions();
+        const opt = super.getDialogOptions();
         opt.width = 650;
         opt.modal = false;
         return opt;

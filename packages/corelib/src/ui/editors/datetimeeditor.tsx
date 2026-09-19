@@ -32,7 +32,7 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
 
         this.domNode.classList.add('s-DateTimeEditor');
 
-        let $ = getjQuery();
+        const $ = getjQuery();
         if (this.options.inputOnly) {
             this.domNode.classList.add('dateTimeQ');
             // just a basic input, usually read only display
@@ -47,7 +47,7 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
         else if ($?.fn?.datepicker) {
             this.domNode.classList.add('dateQ');
 
-            let $ = getjQuery();
+            const $ = getjQuery();
             $(this.domNode).datepicker({
                 showOn: 'button',
                 beforeShow: () => {
@@ -65,7 +65,7 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
             });
 
             this.time = <select class="editor s-DateTimeEditor time" /> as HTMLSelectElement;
-            var after = this.domNode.nextElementSibling as HTMLElement;
+            let after = this.domNode.nextElementSibling as HTMLElement;
             if (after?.classList.contains("ui-datepicker-trigger")) {
                 Fluent(this.time).insertAfter(after);
             }
@@ -84,17 +84,17 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
                 Fluent.trigger(this.domNode, 'change');
             });
 
-            var timeOpt = DateTimeEditor.getTimeOptions(
+            const timeOpt = DateTimeEditor.getTimeOptions(
                 (this.options.startHour ?? 0), 0,
                 (this.options.endHour ?? 23), 59,
                 (this.options.intervalMinutes ?? 5));
 
-            for (var t of timeOpt) {
+            for (const t of timeOpt) {
                 addOption(this.time, t, t);
             }
 
             addValidationRule(this.domNode, e1 => {
-                var value = this.get_value();
+                const value = this.get_value();
                 if (!value) {
                     return null;
                 }
@@ -119,7 +119,7 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
             if (this.get_readOnly() || e.key !== " ")
                 return;
 
-            var input = this.domNode as HTMLInputElement;
+            const input = this.domNode as HTMLInputElement;
             if (input && !(input.value?.trim()?.length) ||
                 input.selectionStart === 0 && input.selectionEnd === input.value?.length) {
                 e.preventDefault();
@@ -131,7 +131,7 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
             if (this.get_readOnly())
                 return;
 
-            var before = this.domNode.value;
+            const before = this.domNode.value;
             DateEditor.dateInputKeyup(e as any);
             if (before != this.domNode.value)
                 this.lastSetValue = null;
@@ -185,7 +185,7 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
      * @returns Flatpickr options.
      */
     getFlatpickrOptions(): any {
-        var opt: any = {
+        const opt: any = {
             clickOpens: false,
             allowInput: true,
             enableTime: true,
@@ -206,7 +206,7 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
             opt.appendTo = this.domNode.closest(".modal");
         else {
             setTimeout(() => {
-                var modal = this.domNode?.closest(".modal");
+                const modal = this.domNode?.closest(".modal");
                 if (modal && !opt.static && !opt.appendTo && this.domNode &&
                     (this.domNode as any)._flatpickr &&
                     (this.domNode as any)._flatpickr.calendarContainer &&
@@ -234,15 +234,15 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
      * @returns The value, or null when empty.
      */
     get_value(): string {
-        var value = this.domNode?.value?.trim();
+        const value = this.domNode?.value?.trim();
         if (value != null && value.length === 0) {
             return null;
         }
 
-        var result: string;
+        let result: string;
         if (this.time) {
-            var datePart = formatDate(value, 'yyyy-MM-dd');
-            var timePart = this.time.value;
+            const datePart = formatDate(value, 'yyyy-MM-dd');
+            const timePart = this.time.value;
             result = datePart + 'T' + timePart + ':00.000';
         }
         else
@@ -285,7 +285,7 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
             }
         }
         else {
-            var val = ((value.toLowerCase() === 'now') ? new Date() : parseISODateTime(value));
+            let val = ((value.toLowerCase() === 'now') ? new Date() : parseISODateTime(value));
             if (this.time) {
                 val = DateTimeEditor.roundToMinutes(val, (this.options.intervalMinutes ?? 5));
                 this.domNode.value = formatDate(val, null);
@@ -450,10 +450,10 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
         if (value !== this.get_readOnly()) {
             setElementReadOnly(this.domNode, value);
 
-            let trg = this.element.nextSibling(".ui-datepicker-trigger").getNode();
+            const trg = this.element.nextSibling(".ui-datepicker-trigger").getNode();
             trg && ((trg as HTMLElement).style.opacity = value ? "0.1" : "1");
 
-            let now = this.element.nextSibling(".inplace-now").getNode();
+            const now = this.element.nextSibling(".inplace-now").getNode();
             now && ((now as HTMLElement).style.opacity = value ? "0.1" : "1");
 
             this.time && setElementReadOnly(this.time, value);
@@ -467,7 +467,7 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
      * @returns The rounded date with seconds and milliseconds zeroed. */
     static roundToMinutes(date: Date, minutesStep: number) {
         date = new Date(date.getTime());
-        var m = trunc(round(date.getMinutes() / minutesStep) * minutesStep);
+        const m = trunc(round(date.getMinutes() / minutesStep) * minutesStep);
         date.setMinutes(m);
         date.setSeconds(0);
         date.setMilliseconds(0);
@@ -484,20 +484,20 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
      * @returns Array of "HH:mm" time strings. */
     static getTimeOptions = function (fromHour: number, fromMin: number,
         toHour: number, toMin: number, stepMins: number) {
-        var list = [];
+        const list = [];
         if (toHour >= 23) {
             toHour = 23;
         }
         if (toMin >= 60) {
             toMin = 59;
         }
-        var hour = fromHour;
-        var min = fromMin;
+        let hour = fromHour;
+        let min = fromMin;
         while (true) {
             if (hour > toHour || hour === toHour && min > toMin) {
                 break;
             }
-            var t = ((hour >= 10) ? '' : '0') + hour + ':' + ((min >= 10) ? '' : '0') + min;
+            const t = ((hour >= 10) ? '' : '0') + hour + ':' + ((min >= 10) ? '' : '0') + min;
             list.push(t);
             min += stepMins;
             if (min >= 60) {

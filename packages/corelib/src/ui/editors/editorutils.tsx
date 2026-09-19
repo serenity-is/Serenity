@@ -17,17 +17,17 @@ export namespace EditorUtils {
      */
     export function getDisplayText(editor: Widget<any>): string {
 
-        var combobox = Combobox.getInstance(editor.domNode);
+        const combobox = Combobox.getInstance(editor.domNode);
 
         if (combobox) {
-            var data = combobox.getSelectedItems();
+            const data = combobox.getSelectedItems();
             if (!data)
                 return '';
 
             return data.map(x => x.text).join(", ");
         }
 
-        var value = getValue(editor);
+        const value = getValue(editor);
         if (value == null) {
             return '';
         }
@@ -42,7 +42,7 @@ export namespace EditorUtils {
         return value.toString();
     }
 
-    var dummy: PropertyItem = { name: '_' };
+    const dummy: PropertyItem = { name: '_' };
 
     /**
      * Returns the current value of an editor.
@@ -50,7 +50,7 @@ export namespace EditorUtils {
      * @returns The value.
      */
     export function getValue(editor: Widget<any>): any {
-        var target: Record<string, any> = {};
+        const target: Record<string, any> = {};
         saveValue(editor, dummy, target);
         return target['_'];
     }
@@ -63,28 +63,28 @@ export namespace EditorUtils {
      */
     export function saveValue(editor: Widget<any>, item: PropertyItem, target: any): void {
 
-        var getEditValue = safeCast(editor, IGetEditValue);
+        const getEditValue = safeCast(editor, IGetEditValue);
 
         if (getEditValue != null) {
             getEditValue.getEditValue(item, target);
             return;
         }
 
-        var stringValue = safeCast(editor, IStringValue);
+        const stringValue = safeCast(editor, IStringValue);
         if (stringValue != null) {
             target[item.name] = stringValue.get_value();
             return;
         }
 
-        var booleanValue = safeCast(editor, IBooleanValue);
+        const booleanValue = safeCast(editor, IBooleanValue);
         if (booleanValue != null) {
             target[item.name] = booleanValue.get_value();
             return;
         }
 
-        var doubleValue = safeCast(editor, IDoubleValue);
+        const doubleValue = safeCast(editor, IDoubleValue);
         if (doubleValue != null) {
-            var value = doubleValue.get_value();
+            const value = doubleValue.get_value();
             target[item.name] = (isNaN(value) ? null : value);
             return;
         }
@@ -106,7 +106,7 @@ export namespace EditorUtils {
      * @param value - The value to set.
      */
     export function setValue(editor: Widget<any>, value: any): void {
-        var source = { _: value };
+        const source = { _: value };
         loadValue(editor, dummy, source);
     }
 
@@ -118,15 +118,15 @@ export namespace EditorUtils {
      */
     export function loadValue(editor: Widget<any>, item: PropertyItem, source: any): void {
 
-        var setEditValue = safeCast(editor, ISetEditValue);
+        const setEditValue = safeCast(editor, ISetEditValue);
         if (setEditValue != null) {
             setEditValue.setEditValue(source, item);
             return;
         }
 
-        var stringValue = safeCast(editor, IStringValue);
+        const stringValue = safeCast(editor, IStringValue);
         if (stringValue != null) {
-            var value = source[item.name];
+            let value = source[item.name];
             if (value != null) {
                 value = value.toString();
             }
@@ -134,9 +134,9 @@ export namespace EditorUtils {
             return;
         }
 
-        var booleanValue = safeCast(editor, IBooleanValue);
+        const booleanValue = safeCast(editor, IBooleanValue);
         if (booleanValue != null) {
-            var value1 = source[item.name];
+            const value1 = source[item.name];
             if (typeof (value1) === 'number') {
                 booleanValue.set_value(value1 > 0);
             }
@@ -146,9 +146,9 @@ export namespace EditorUtils {
             return;
         }
 
-        var doubleValue = safeCast(editor, IDoubleValue);
+        const doubleValue = safeCast(editor, IDoubleValue);
         if (doubleValue != null) {
-            var d = source[item.name];
+            const d = source[item.name];
             if (d == null || (typeof d == "string" && !d.trim().length)) {
                 doubleValue.set_value(null);
             }
@@ -170,7 +170,7 @@ export namespace EditorUtils {
         }
 
         if (Fluent.isInputLike(editor.domNode)) {
-            var v = source[item.name];
+            const v = source[item.name];
             editor.domNode.value = v ?? '';
             return;
         }
@@ -186,7 +186,7 @@ export namespace EditorUtils {
      */
     export function setReadonly(elements: Element | Widget<any> | ArrayLike<Element | Widget>, value: boolean) {
         elements = isArrayLike(elements) ? elements : [elements];
-        for (var i = 0; i < elements.length; i++) {
+        for (let i = 0; i < elements.length; i++) {
             let el = elements[i];
             if (el == null)
                 continue;
@@ -223,16 +223,16 @@ export namespace EditorUtils {
      * @param isRequired - Whether the field is required.
      */
     export function setRequired(widget: Widget<any>, isRequired: boolean): void {
-        var req = safeCast(widget, IValidateRequired);
+        const req = safeCast(widget, IValidateRequired);
         if (req != null) {
             req.set_required(isRequired);
         }
         else if (Fluent.isInputLike(widget.domNode)) {
             widget.domNode.classList.toggle('required', !!isRequired);
         }
-        var gridField = widget.domNode.closest('.field');
-        var hasSupItem = gridField?.querySelector('sup');
-        var caption = gridField?.querySelector('.caption');
+        const gridField = widget.domNode.closest('.field');
+        const hasSupItem = gridField?.querySelector('sup');
+        const caption = gridField?.querySelector('.caption');
         if (isRequired && !hasSupItem && caption) {
             Fluent(<sup title={PropertyGridTexts.RequiredHint}>*</sup>)
                 .prependTo(caption);
@@ -266,7 +266,7 @@ export namespace EditorUtils {
 
         container.classList.add('readonly-container');
         container.querySelectorAll(".editor:not(.container-readonly)").forEach((el: HTMLElement) => {
-            var w = tryGetWidget(el) as any;
+            const w = tryGetWidget(el) as any;
             if (w != null) {
                 if (w['get_readOnly']) {
                     if (w['get_readOnly']())

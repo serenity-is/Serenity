@@ -117,10 +117,10 @@ export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P
             .addClass("s-Toolbar clearfix")
             .append(group);
 
-        var buttons = this.options.buttons || [];
-        var currentCount = 0;
-        for (var i = 0; i < buttons.length; i++) {
-            var button = buttons[i];
+        const buttons = this.options.buttons || [];
+        let currentCount = 0;
+        for (let i = 0; i < buttons.length; i++) {
+            const button = buttons[i];
             if (button.separator && currentCount > 0) {
                 group = group.parentElement.appendChild(<div class="tool-group" />);
                 currentCount = 0;
@@ -175,7 +175,7 @@ export class Toolbar<P extends ToolbarOptions = ToolbarOptions> extends Widget<P
             container.appendChild(<div class="separator" />);
         }
 
-        let button = ToolbarButton(tb);
+        const button = ToolbarButton(tb);
         container.append(button);
 
         if (tb.hotkey && window['Mousetrap' as any] != null) {

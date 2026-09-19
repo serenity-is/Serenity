@@ -12,7 +12,7 @@ export function simpleArrayEquals(arr1: number[], arr2: number[]): boolean {
         return false;
     arr1 = arr1.slice().sort();
     arr2 = arr2.slice().sort();
-    for (var i = 0; i < arr1.length; i++) {
+    for (let i = 0; i < arr1.length; i++) {
         if (arr1[i] !== arr2[i])
             return false;
     }

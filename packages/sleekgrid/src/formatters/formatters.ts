@@ -29,7 +29,7 @@ export function PercentCompleteBarFormatter(ctx: FormatterContext): FormatterRes
     if (ctx.value == null || ctx.value === "")
         return "";
 
-    var color;
+    let color;
     if (ctx.value < 30)
         color = "red";
     else if (ctx.value < 70)

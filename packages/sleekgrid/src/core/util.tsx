@@ -10,8 +10,8 @@ export function addCssClass(el: Element, cls: string): void {
         return;
 
     if (cls.indexOf(' ') >= 0) {
-        var arr = cls.split(' ').map(x => x.trim()).filter(x => x.length);
-        for (var a of arr)
+        const arr = cls.split(' ').map(x => x.trim()).filter(x => x.length);
+        for (const a of arr)
             el.classList.add(a);
     }
     else
@@ -169,8 +169,8 @@ export function removeCssClass(el: Element, cls: string): void {
         return;
 
     if (cls.indexOf(' ') >= 0) {
-        var arr = cls.split(' ').map(x => x.trim()).filter(x => x.length);
-        for (var a of arr)
+        const arr = cls.split(' ').map(x => x.trim()).filter(x => x.length);
+        for (const a of arr)
             el.classList.remove(a);
     }
     else
@@ -183,7 +183,7 @@ export function removeCssClass(el: Element, cls: string): void {
  * @returns Numeric pixel value or `0` when parsing fails.
  */
 export function parsePx(str: string): number {
-    var value = parseFloat(str);
+    const value = parseFloat(str);
     if (isNaN(value))
         return 0;
     return value;

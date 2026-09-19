@@ -68,9 +68,9 @@ export abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> ext
             return this.options.lookupKey;
         }
 
-        var key = getTypeFullName(getInstanceType(this));
+        let key = getTypeFullName(getInstanceType(this));
 
-        var idx = key.indexOf('.');
+        const idx = key.indexOf('.');
         if (idx >= 0) {
             key = key.substring(idx + 1);
         }
@@ -127,7 +127,7 @@ export abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> ext
         if (lookup == null)
             return super.itemText(item);
 
-        var textValue = (item as any)[lookup.textField];
+        const textValue = (item as any)[lookup.textField];
         return textValue == null ? '' : textValue.toString();
     }
 
@@ -164,8 +164,8 @@ export abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> ext
 
         this.clearItems();
         this.lookup = this.getLookup();
-        var items = this.getItems(this.lookup);
-        for (var item of items)
+        const items = this.getItems(this.lookup);
+        for (const item of items)
             this.addItem(this.mapItem(item));
     }
 
@@ -176,7 +176,7 @@ export abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> ext
      */
     protected override async asyncSearch(query: ComboboxSearchQuery): Promise<ComboboxSearchResult<TItem>> {
         this.lookup = await this.getLookupAsync();
-        var items = this.getItems(this.lookup);
+        let items = this.getItems(this.lookup);
 
         if (query.idList != null) {
             items = items.filter(x => query.idList.indexOf(this.itemId(x)) >= 0);
@@ -197,7 +197,7 @@ export abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> ext
      * @returns The dialog type key.
      */
     protected override getDialogTypeKey() {
-        var dialogTypeKey = super.getDialogTypeKey();
+        const dialogTypeKey = super.getDialogTypeKey();
         if (dialogTypeKey)
             return dialogTypeKey;
 

@@ -68,9 +68,9 @@ export namespace SlickFormatting {
             const toggle = <span class="s-TreeToggle" /> as HTMLSpanElement;
             const id = getId(ctx.item);
             const idx = view.getIdxById(id);
-            let next = view.getItemByIdx(idx + 1);
+            const next = view.getItemByIdx(idx + 1);
             if (next != null) {
-                var nextIndent = next._indent ?? 0;
+                const nextIndent = next._indent ?? 0;
                 if (nextIndent > indent) {
                     if (!!(ctx.item as any)._collapsed) {
                         toggle.classList.add("s-TreeExpand");

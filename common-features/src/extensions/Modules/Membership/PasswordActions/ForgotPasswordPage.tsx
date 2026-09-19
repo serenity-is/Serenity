@@ -17,7 +17,7 @@ export class ForgotPasswordPanel<P = {}> extends PropertyPanel<ForgotPasswordReq
         if (!this.validateForm())
             return;
 
-        var request = this.getSaveEntity();
+        const request = this.getSaveEntity();
         serviceCall({
             url: resolveUrl('~/Account/ForgotPassword'),
             request: request,

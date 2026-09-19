@@ -4,7 +4,7 @@ import { LoginFormTexts } from "../../../ServerTypes/Texts";
 import { AccountPanelTitle } from "../AccountPanelTitle";
 
 export default function pageInit(opt?: { activated: string }) {
-    var loginPanel = new LoginPanel({ element: '#LoginPanel' });
+    const loginPanel = new LoginPanel({ element: '#LoginPanel' });
 
     if (opt?.activated) {
         loginPanel.form.Username.value = opt.activated;
@@ -26,7 +26,7 @@ class LoginPanel extends PropertyPanel<LoginRequest, any> {
         if (!this.validateForm())
             return;
 
-        var request = this.getSaveEntity();
+        const request = this.getSaveEntity();
 
         serviceCall({
             url: resolveUrl('~/Account/Login'),

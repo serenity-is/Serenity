@@ -5,7 +5,7 @@ export namespace DialogUtils {
 
     export function pendingChangesConfirmation(element: ArrayLike<HTMLElement> | HTMLElement, hasPendingChanges: () => boolean) {
 
-        var el = isArrayLike(element) ? element[0] : element;
+        const el = isArrayLike(element) ? element[0] : element;
         if (!el)
             return;
         Dialog.onClose(el, (result, e: Event) => {

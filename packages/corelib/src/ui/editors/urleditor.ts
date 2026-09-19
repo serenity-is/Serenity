@@ -22,14 +22,14 @@ export class URLEditor<P = {}> extends StringEditor<P> {
         this.domNode.setAttribute("title", "URL should be entered in format: 'http://www.site.com/page'.");
 
         Fluent.on(this.domNode, "blur." + this.uniqueName, e => {
-            var validator = ValidationHelper.getValidator(this.domNode);
+            const validator = ValidationHelper.getValidator(this.domNode);
             if (validator == null)
                 return;
 
             if (!this.domNode.classList.contains("error"))
                 return;
 
-            var value = this.domNode.value?.trim();
+            let value = this.domNode.value?.trim();
             if (!value)
                 return;
 

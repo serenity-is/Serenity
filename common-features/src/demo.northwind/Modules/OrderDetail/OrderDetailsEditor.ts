@@ -15,7 +15,7 @@ export class OrderDetailsEditor<P = {}> extends GridEditorBase<OrderDetailRow, P
     protected override async validateEntity(row: OrderDetailRow, id: any) {
         row.ProductID = toId(row.ProductID);
 
-        var sameProduct = this.view.getItems().find(x => x.ProductID === row.ProductID);
+        const sameProduct = this.view.getItems().find(x => x.ProductID === row.ProductID);
         if (sameProduct && this.itemId(sameProduct) !== id) {
             alertDialog('This product is already in order details!');
             return false;

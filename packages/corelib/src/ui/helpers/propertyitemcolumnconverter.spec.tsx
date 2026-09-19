@@ -28,7 +28,7 @@ describe('PropertyItemColumnConverter', () => {
 
     describe('toColumn', () => {
         it('tries to load a localText with the items name as key', () => {
-            var converted = PropertyItemColumnConverter.toColumn({
+            const converted = PropertyItemColumnConverter.toColumn({
                 name: null,
                 title: 'Test.Local.Text.Key'
             });
@@ -37,7 +37,7 @@ describe('PropertyItemColumnConverter', () => {
 
             addLocalText('Test.Local.Text.Key', 'translated');
 
-            var converted2 = PropertyItemColumnConverter.toColumn({
+            const converted2 = PropertyItemColumnConverter.toColumn({
                 name: null,
                 title: 'Test.Local.Text.Key'
             });
@@ -184,7 +184,7 @@ describe('PropertyItemColumnConverter', () => {
         });
 
         it('should pass date formatter to slick column', () => {
-            var converted = PropertyItemColumnConverter.toColumn({
+            const converted = PropertyItemColumnConverter.toColumn({
                 name: null,
                 title: 'Test.Local.Text.Key',
                 formatterType: DateFormatter,
@@ -196,12 +196,12 @@ describe('PropertyItemColumnConverter', () => {
             Culture.dateTimeFormat = 'dd/MM/yyyy HH:mm:ss';
 
             expect(converted.format).toBeDefined();
-            var formattedDate = converted.format.call(null, { value: '2021-01-01T00:00:00' });
+            const formattedDate = converted.format.call(null, { value: '2021-01-01T00:00:00' });
             expect(formattedDate).toBe('01/01/2021');
         });
 
         it('should pass date time formatter parameters to slick formatter', () => {
-            var converted = PropertyItemColumnConverter.toColumn({
+            const converted = PropertyItemColumnConverter.toColumn({
                 name: null,
                 title: 'Test.Local.Text.Key',
                 formatterType: DateTimeFormatter,
@@ -216,7 +216,7 @@ describe('PropertyItemColumnConverter', () => {
             Culture.dateTimeFormat = 'dd/MM/yyyy HH:mm:ss';
 
             expect(converted.format).toBeDefined();
-            var formattedDate = converted.format.call(null, { value: '2021-01-01T00:00:00' });
+            const formattedDate = converted.format.call(null, { value: '2021-01-01T00:00:00' });
             expect(formattedDate).toBe('01/01/2021 00:00');
         });
 

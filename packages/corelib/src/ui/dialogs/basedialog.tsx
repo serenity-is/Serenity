@@ -112,7 +112,7 @@ export class BaseDialog<P> extends Widget<P> {
             width: Math.min(window.innerWidth, 920),
             providerOptions: (type) => {
                 if (type === "uidialog") {
-                    var opt: any = {};
+                    const opt: any = {};
                     applyCssSizes(opt, this.getCssClass());
                     opt.resizable = this.getCustomAttribute(ResizableAttribute)?.value;
                     return opt;
@@ -138,7 +138,7 @@ export class BaseDialog<P> extends Widget<P> {
      * Initializes jQuery UI dialog-specific behavior.
      */
     protected initUIDialog(): void {
-        let element = getjQuery()(this.domNode);
+        const element = getjQuery()(this.domNode);
         DialogExtensions.dialogResizable(element);
         Fluent.on(window, "resize." + this.uniqueName, () => {
             if (element.width() > 0 && element.height() > 0)
@@ -157,7 +157,7 @@ export class BaseDialog<P> extends Widget<P> {
      */
     public dialogOpen(asPanel?: boolean): void {
         if (!this.dialog) {
-            let opt = this.getDialogOptions();
+            const opt = this.getDialogOptions();
             if (asPanel != null)
                 opt.preferPanel = asPanel;
             this.dialog = new Dialog(opt);
@@ -198,11 +198,11 @@ export class BaseDialog<P> extends Widget<P> {
      * Initializes the toolbar from the Toolbar element.
      */
     protected initToolbar(): void {
-        var toolbarDiv = this.findById('Toolbar');
+        const toolbarDiv = this.findById('Toolbar');
         if (!toolbarDiv)
             return;
 
-        var hotkeyContext = this.domNode.closest('.ui-dialog') ??
+        const hotkeyContext = this.domNode.closest('.ui-dialog') ??
             this.domNode.closest('.modal') ?? this.domNode;
 
         this.toolbar = new Toolbar({ element: toolbarDiv, buttons: this.getToolbarButtons(), hotkeyContext }).init();
@@ -220,9 +220,9 @@ export class BaseDialog<P> extends Widget<P> {
      * Initializes the form validator.
      */
     protected initValidator(): void {
-        var form = this.findById('Form');
+        const form = this.findById('Form');
         if (form instanceof HTMLFormElement) {
-            var valOptions = this.getValidatorOptions();
+            const valOptions = this.getValidatorOptions();
             this.validator = new Validator(form, validateOptions(valOptions));
         }
     }
@@ -259,7 +259,7 @@ export class BaseDialog<P> extends Widget<P> {
         document.dispatchEvent(new Event('click'));
 
         window.setTimeout(() => {
-            let domNode = this.domNode;
+            const domNode = this.domNode;
             this.destroy();
             if (domNode) {
                 Fluent.remove(domNode);
@@ -302,7 +302,7 @@ export class BaseDialog<P> extends Widget<P> {
      * Initializes the tabs from the Tabs element.
      */
     protected initTabs(): void {
-        var tabsDiv = this.findById('Tabs');
+        const tabsDiv = this.findById('Tabs');
         if (!tabsDiv)
             return;
         this.tabs = TabsExtensions.initialize(tabsDiv, bindThis(this).arrange);

@@ -190,10 +190,10 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
      * @returns The criteria with display text.
      */
     public getCriteria(): CriteriaWithText {
-        var result: CriteriaWithText = {};
-        var text: string;
-        var field = Criteria(this.getCriteriaField());
-        var op = this.get_operator().key;
+        const result: CriteriaWithText = {};
+        let text: string;
+        const field = Criteria(this.getCriteriaField());
+        const op = this.get_operator().key;
         switch (op) {
             case 'true': {
                 result.displayText = this.displayText(this.get_operator(), []);
@@ -255,7 +255,7 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
      * @param state - The persisted state.
      */
     loadState(state: any) {
-        var input = this.get_container().querySelector<HTMLInputElement>(Fluent.inputLikeSelector);
+        const input = this.get_container().querySelector<HTMLInputElement>(Fluent.inputLikeSelector);
         input && (input.value = state);
     }
 
@@ -273,7 +273,7 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
             case 'le':
             case 'gt':
             case 'ge': {
-                var input = this.get_container().querySelector<HTMLInputElement>(Fluent.inputLikeSelector);
+                const input = this.get_container().querySelector<HTMLInputElement>(Fluent.inputLikeSelector);
                 return input?.value;
             }
         }
@@ -305,15 +305,15 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
      * @returns The editor value.
      */
     getEditorValue() {
-        var inputs = this.get_container().querySelectorAll<HTMLInputElement>(Fluent.inputLikeSelector + ":not(.select2-focusser)");
+        const inputs = this.get_container().querySelectorAll<HTMLInputElement>(Fluent.inputLikeSelector + ":not(.select2-focusser)");
         if (inputs.length !== 1) {
             throw new Error(stringFormat("Couldn't find input in filter container for {0}",
                 (this.field.title ?? this.field.name)));
         }
-        let input = inputs[0];
+        const input = inputs[0];
 
-        var value;
-        let combobox = Combobox.getInstance(input);
+        let value;
+        const combobox = Combobox.getInstance(input);
         if (combobox) {
             value = combobox.isMultiple ? combobox.getValues().join(",") : combobox.getValue();
         }
@@ -332,12 +332,12 @@ export abstract class BaseFiltering implements IFiltering, IQuickFiltering {
      */
     getEditorText(): string {
 
-        var input = this.get_container().querySelector<HTMLInputElement>(Fluent.inputLikeSelector + ":not(.select2-focusser):not(.select2-input)");
+        const input = this.get_container().querySelector<HTMLInputElement>(Fluent.inputLikeSelector + ":not(.select2-focusser):not(.select2-input)");
         if (!input) {
             return this.get_container().textContent?.trim();
         }
-        var value;
-        let combobox = Combobox.getInstance(input);
+        let value;
+        const combobox = Combobox.getInstance(input);
         if (combobox) {
             value = combobox.getSelectedItems()?.map(x => x.text).join(", ");
         }

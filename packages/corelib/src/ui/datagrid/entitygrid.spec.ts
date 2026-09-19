@@ -23,7 +23,7 @@ describe('EntityGrid.getIdProperty', () => {
         class DefaultGrid extends EntityGrid<any, any> {
         }
 
-        var grid = new DefaultGrid({});
+        const grid = new DefaultGrid({});
         expect(getIdProperty(grid)).toBe("ID");
     });
 
@@ -32,7 +32,7 @@ describe('EntityGrid.getIdProperty', () => {
             getIdProperty() { return "subClassId" };
         }
 
-        var grid = new SubClassGrid({});
+        const grid = new SubClassGrid({});
         expect(getIdProperty(grid)).toBe("subClassId");
     });
 
@@ -45,7 +45,7 @@ describe('EntityGrid.getIdProperty', () => {
             getRowDefinition() { return TestRow; }
         }
 
-        var grid = new TestRowGrid({});
+        const grid = new TestRowGrid({});
         expect(getIdProperty(grid)).toBe("idForTestRow");
     });
 
@@ -58,7 +58,7 @@ describe('EntityGrid.getIdProperty', () => {
             getRowDefinition() { return TestRow; }
         }
 
-        var grid = new TestRowGrid({});
+        const grid = new TestRowGrid({});
         expect(getIdProperty(grid)).toBe("");
     });
 });
@@ -72,7 +72,7 @@ describe('EntityGrid.getIsActiveProperty', () => {
         class DefaultGrid extends EntityGrid<any, any> {
         }
 
-        var grid = new DefaultGrid({});
+        const grid = new DefaultGrid({});
         expect(getIsActiveProperty(grid)).toBe("");
     });
 
@@ -81,7 +81,7 @@ describe('EntityGrid.getIsActiveProperty', () => {
             getIsActiveProperty() { return "subClassIsActive" };
         }
 
-        var grid = new SubClassGrid({});
+        const grid = new SubClassGrid({});
         expect(getIsActiveProperty(grid)).toBe("subClassIsActive");
     });
 
@@ -94,7 +94,7 @@ describe('EntityGrid.getIsActiveProperty', () => {
             getRowDefinition() { return TestRow; }
         }
 
-        var grid = new TestRowGrid({});
+        const grid = new TestRowGrid({});
         expect(getIsActiveProperty(grid)).toBe("activeForTestRow");
     });
 
@@ -107,7 +107,7 @@ describe('EntityGrid.getIsActiveProperty', () => {
             getRowDefinition() { return TestRow; }
         }
 
-        var grid = new TestRowGrid({});
+        const grid = new TestRowGrid({});
         expect(getIsActiveProperty(grid)).toBe("");
     });
 });
@@ -121,7 +121,7 @@ describe('EntityGrid.getLocalTextDbPrefix', () => {
         class DefaultGrid extends EntityGrid<any, any> {
         }
 
-        var grid = new DefaultGrid({});
+        const grid = new DefaultGrid({});
         expect(getLocalTextDbPrefix(grid)).toBe("Db.Default.");
     });
 
@@ -130,7 +130,7 @@ describe('EntityGrid.getLocalTextDbPrefix', () => {
             static [Symbol.typeInfo] = this.registerClass('MyProject.TestModule.DefaultGrid');
         }
 
-        var grid = new DefaultGrid({});
+        const grid = new DefaultGrid({});
         expect(getLocalTextDbPrefix(grid)).toBe("Db.TestModule.Default.");
     });
 
@@ -139,7 +139,7 @@ describe('EntityGrid.getLocalTextDbPrefix', () => {
             static [Symbol.typeInfo] = this.registerClass('MyProject.MyModule.Some.DefaultGrid');
         }
 
-        var grid = new DefaultGrid({});
+        const grid = new DefaultGrid({});
         expect(getLocalTextDbPrefix(grid)).toBe("Db.MyModule.Some.Default.");
     });
 
@@ -148,7 +148,7 @@ describe('EntityGrid.getLocalTextDbPrefix', () => {
             getLocalTextDbPrefix() { return "My.Prefix." };
         }
 
-        var grid = new SubClassGrid({});
+        const grid = new SubClassGrid({});
         expect(getLocalTextDbPrefix(grid)).toBe("My.Prefix.");
     });
 
@@ -157,7 +157,7 @@ describe('EntityGrid.getLocalTextDbPrefix', () => {
             getLocalTextPrefix() { return "MySubClassPrefix" };
         }
 
-        var grid = new SubClassGrid({});
+        const grid = new SubClassGrid({});
         expect(getLocalTextDbPrefix(grid)).toBe("Db.MySubClassPrefix.");
     });
 
@@ -170,7 +170,7 @@ describe('EntityGrid.getLocalTextDbPrefix', () => {
             getRowDefinition() { return TestRow; }
         }
 
-        var grid = new TestRowGrid({});
+        const grid = new TestRowGrid({});
         expect(getLocalTextDbPrefix(grid)).toBe("Db.prefixForTestRow.");
     });
 
@@ -183,7 +183,7 @@ describe('EntityGrid.getLocalTextDbPrefix', () => {
             getRowDefinition() { return TestRow; }
         }
 
-        var grid = new TestRowGrid({});
+        const grid = new TestRowGrid({});
         expect(getLocalTextDbPrefix(grid)).toBe("");
     });
 });
@@ -197,7 +197,7 @@ describe('EntityGrid.getLocalTextPrefix', () => {
         class DefaultGrid extends EntityGrid<any, any> {
         }
 
-        var grid = new DefaultGrid({});
+        const grid = new DefaultGrid({});
         expect(getLocalTextPrefix(grid)).toBe("Default");
     });
 
@@ -206,7 +206,7 @@ describe('EntityGrid.getLocalTextPrefix', () => {
             static [Symbol.typeInfo] = this.registerClass('MyProject.TestModule.DefaultGrid');
         }
 
-        var grid = new DefaultGrid({});
+        const grid = new DefaultGrid({});
         expect(getLocalTextPrefix(grid)).toBe("TestModule.Default");
     });
 
@@ -215,7 +215,7 @@ describe('EntityGrid.getLocalTextPrefix', () => {
             static [Symbol.typeInfo] = this.registerClass('MyProject.MyModule.Some.DefaultGrid');
         }
 
-        var grid = new DefaultGrid({});
+        const grid = new DefaultGrid({});
         expect(getLocalTextPrefix(grid)).toBe("MyModule.Some.Default");
     });
 
@@ -224,7 +224,7 @@ describe('EntityGrid.getLocalTextPrefix', () => {
             getLocalTextPrefix() { return "subClassPrefix" };
         }
 
-        var grid = new SubClassGrid({});
+        const grid = new SubClassGrid({});
         expect(getLocalTextPrefix(grid)).toBe("subClassPrefix");
     });
 
@@ -237,7 +237,7 @@ describe('EntityGrid.getLocalTextPrefix', () => {
             getRowDefinition() { return TestRow; }
         }
 
-        var grid = new TestRowGrid({});
+        const grid = new TestRowGrid({});
         expect(getLocalTextPrefix(grid)).toBe("prefixForTestRow");
     });
 
@@ -250,7 +250,7 @@ describe('EntityGrid.getLocalTextPrefix', () => {
             getRowDefinition() { return TestRow; }
         }
 
-        var grid = new TestRowGrid({});
+        const grid = new TestRowGrid({});
         expect(getLocalTextPrefix(grid)).toBeUndefined();
     });
 });

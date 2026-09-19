@@ -16,7 +16,7 @@ export class ReadOnlyGrid extends SupplierGrid {
      * Removing add button from grid using its css class
      */
     protected override getButtons(): ToolButton[] {
-        var buttons = super.getButtons();
+        const buttons = super.getButtons();
         buttons.splice(buttons.findIndex(x => x.action == "add"), 1);
         return buttons;
     }
@@ -33,7 +33,7 @@ export class ReadOnlyDialog extends SupplierDialog {
      * apply changes buttons. 
      */
     protected override getToolbarButtons(): ToolButton[] {
-        let buttons = super.getToolbarButtons();
+        const buttons = super.getToolbarButtons();
 
         buttons.splice(buttons.findIndex(x => x.action == "save-and-close"), 1);
         buttons.splice(buttons.findIndex(x => x.action == "apply-changes"), 1);
@@ -100,10 +100,10 @@ export class ReadOnlyDialog extends SupplierDialog {
         else {
             // entitySingular is type of record this dialog edits. something like 'Supplier'.
             // you could hardcode it, but this is for demonstration
-            var entityType = super.getEntitySingular();
+            const entityType = super.getEntitySingular();
 
             // get name field value of record this dialog edits
-            let name = this.getEntityNameFieldValue() || "";
+            const name = this.getEntityNameFieldValue() || "";
 
             // you could use format with a local text, but again demo...
             return 'View ' + entityType + " (" + name + ")";

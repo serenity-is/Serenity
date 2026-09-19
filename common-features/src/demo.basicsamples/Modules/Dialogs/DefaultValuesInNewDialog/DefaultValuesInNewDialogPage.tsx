@@ -36,7 +36,7 @@ export class DefaultValuesInNewGrid extends OrderGrid {
 
     protected override getButtons() {
         // preserving default New Item button
-        var buttons = super.getButtons();
+        const buttons = super.getButtons();
 
         buttons.push({
             title: 'Add Order from the Queen',
@@ -61,19 +61,19 @@ export class DefaultValuesInNewGrid extends OrderGrid {
             onClick: async () => {
                 // we could use EditItem here too, but for demonstration
                 // purposes we are manually creating dialog this time
-                var dlg = new OrderDialog();
+                const dlg = new OrderDialog();
 
                 // let grid watch for changes to manually created dialog, 
                 // so when a new item is saved, grid can refresh itself
                 this.initDialog(dlg);
 
                 // get a reference to product Chai
-                var chai = (await ProductRow.getLookupAsync()).items
+                const chai = (await ProductRow.getLookupAsync()).items
                     .filter(x => x.ProductName === 'Chai')[0];
 
                 // LoadEntityAndOpenDialog, loads an OrderRow 
                 // to dialog and opens it
-                var lauraCallahanID = (await EmployeeRow.getLookupAsync()).items
+                const lauraCallahanID = (await EmployeeRow.getLookupAsync()).items
                     .filter(x => x.FullName === 'Laura Callahan')[0].EmployeeID;
 
                 dlg.loadEntityAndOpenDialog({

@@ -199,7 +199,7 @@ export interface Select2Options {
     shouldFocusInput?: (p1: any) => boolean;
 }
 
-var lastMousePosition = { x: 0, y: 0 };
+const lastMousePosition = { x: 0, y: 0 };
 
 // Grouped by target: the value is the concatenation of every source character that
 // transliterates to that target (e.g. all glyphs that normalize to "A"). The reverse
@@ -307,18 +307,18 @@ function getSpecialDiacritics(): Record<string, string> {
     return specialDiacritics;
 }
 
-const nextUid = (function () { var counter = 1; return function () { return counter++; }; }());
+const nextUid = (function () { let counter = 1; return function () { return counter++; }; }());
 
 
 function reinsertElement(element: HTMLElement) {
-    var placeholder = document.createTextNode('');
+    const placeholder = document.createTextNode('');
     Fluent(placeholder).insertBefore(element);
     Fluent(element).insertBefore(placeholder as any);
     placeholder.remove();
 }
 
 function indexOf(value: any, array: any[]) {
-    var i = 0, l = array.length;
+    let i = 0, l = array.length;
     for (; i < l; i = i + 1) {
         if (equal(value, array[i])) return i;
     }
@@ -328,8 +328,8 @@ function indexOf(value: any, array: any[]) {
 let scrollBarDimensions: { width: number, height: number } = null;
 
 function getOffset(el: Element) {
-    var box = el.getBoundingClientRect();
-    var docElem = document.documentElement;
+    const box = el.getBoundingClientRect();
+    const docElem = document.documentElement;
     return {
         top: box.top + window.scrollY - docElem.clientTop,
         left: box.left + window.scrollX - docElem.clientLeft
@@ -337,11 +337,11 @@ function getOffset(el: Element) {
 }
 
 function measureScrollbar() {
-    var $template = document.createElement("div");
+    const $template = document.createElement("div");
     $template.classList.add("select2-measure-scrollbar");
     document.body.appendChild($template);
 
-    var dim = {
+    const dim = {
         width: $template.offsetWidth - $template.clientWidth,
         height: $template.offsetHeight - $template.clientHeight
     };
@@ -373,7 +373,7 @@ function equal(a: any, b: any): boolean {
  * @param separator
  */
 function splitVal(string: string, separator: string) {
-    var val, i, l;
+    let val, i, l;
     if (string === null || string.length < 1) return [];
     val = string.split(separator);
     for (i = 0, l = val.length; i < l; i = i + 1) val[i] = val[i].trim();
@@ -381,7 +381,7 @@ function splitVal(string: string, separator: string) {
 }
 
 function parsePx(str: string) {
-    var value = parseFloat(str);
+    const value = parseFloat(str);
     if (isNaN(value))
         return 0;
     return value;
@@ -391,10 +391,10 @@ function getSideBorderPadding(el: Element) {
     if (!el)
         return 0;
 
-    var style = getComputedStyle(el);
-    var p = ["border-left-width", "border-right-width", "padding-left", "padding-right"];
-    var delta = 0;
-    for (var val of p)
+    const style = getComputedStyle(el);
+    const p = ["border-left-width", "border-right-width", "padding-left", "padding-right"];
+    let delta = 0;
+    for (const val of p)
         delta += parsePx(style.getPropertyValue(val)) || 0;
     return delta;
 }
@@ -410,14 +410,14 @@ function getOuterHeightWithMargins(el: Element) {
 }
 
 function installKeyUpChangeEvent(element: HTMLElement) {
-    var key = "keyupChangeValue";
+    const key = "keyupChangeValue";
     Fluent.on(element, "keydown", function () {
         if (element.dataset[key] === undefined) {
             element.dataset[key] = (element as any).value;
         }
     });
     Fluent.on(element, "keyup", function () {
-        var val = element.dataset[key];
+        const val = element.dataset[key];
         if (val !== undefined && (element as any).value !== val) {
             delete element.dataset[key];
             Fluent.trigger(element, "keyup-change");
@@ -434,7 +434,7 @@ function installKeyUpChangeEvent(element: HTMLElement) {
  */
 function installFilteredMouseMove(element: HTMLElement) {
     Fluent.on(element, "mousemove", function (e) {
-        var lastpos = lastMousePosition;
+        const lastpos = lastMousePosition;
         if (lastpos === undefined || lastpos.x !== e.pageX || lastpos.y !== e.pageY) {
             Fluent.trigger(e.target, "mousemove-filtered", { pageX: e.pageX, pageY: e.pageY });
         }
@@ -442,7 +442,7 @@ function installFilteredMouseMove(element: HTMLElement) {
 }
 
 function installDebouncedScroll(threshold: number, element: Element) {
-    var notify = debounce(function (args?: any) { Fluent.trigger(element, "scroll-debounced", args); }, threshold);
+    const notify = debounce(function (args?: any) { Fluent.trigger(element, "scroll-debounced", args); }, threshold);
     Fluent.on(element, "scroll", function (e) {
         if (e.target === element) notify();
     });
@@ -455,13 +455,13 @@ function focus($el: HTMLElement) {
         of the current event has finished - which seems like the only reliable way
         to set focus */
     window.setTimeout(function () {
-        var el = $el, pos = ($el as any).value?.length || 0;
+        const el = $el, pos = ($el as any).value?.length || 0;
 
         $el.focus();
 
         /* make sure el received focus so we do not error out when trying to manipulate the caret.
             sometimes modals or others listeners may steal it after its set */
-        var isVisible = (el.offsetWidth > 0 || el.offsetHeight > 0);
+        const isVisible = (el.offsetWidth > 0 || el.offsetHeight > 0);
         if (isVisible && el === document.activeElement) {
 
             /* after the focus is set move the caret to the end */
@@ -490,7 +490,7 @@ let sizer: HTMLDivElement;
 
 function measureTextWidth(e: Element) {
     if (!sizer) {
-        var style = getComputedStyle(e, null);
+        const style = getComputedStyle(e, null);
         sizer = document.createElement("div");
         Object.assign(sizer.style, {
             position: "absolute",
@@ -513,7 +513,7 @@ function measureTextWidth(e: Element) {
 }
 
 function syncCssClasses(dest: Element, src: Element, adapter: (kls: string) => string) {
-    var classes: string, replacements: string[] = [], adapted;
+    let classes: string, replacements: string[] = [], adapted;
 
     classes = dest.getAttribute("class")?.trim();
 
@@ -547,7 +547,7 @@ function syncCssClasses(dest: Element, src: Element, adapter: (kls: string) => s
 }
 
 function defaultEscapeMarkup(markup: string) {
-    var replace_map: Record<string, string> = {
+    const replace_map: Record<string, string> = {
         '\\': '&#92;',
         '&': '&amp;',
         '<': '&lt;',
@@ -588,7 +588,7 @@ export class Select2 {
 
         opts = Object.assign({}, opts);
 
-        var multiple: boolean;
+        let multiple: boolean;
         if (opts.element.tagName.toLowerCase() === "select") {
             multiple = opts.element.multiple;
         } else {
@@ -596,7 +596,7 @@ export class Select2 {
             if ("tags" in opts) { opts.multiple = multiple = true; }
         }
 
-        var select2 = multiple ? new MultiSelect2() : new SingleSelect2();
+        const select2 = multiple ? new MultiSelect2() : new SingleSelect2();
         select2.init(opts);
     }
 
@@ -805,7 +805,7 @@ export class Select2 {
         createSearchChoicePosition: 'top',
         shouldFocusInput: function (instance) {
             // Attempt to detect touch devices
-            var supportsTouchEvents = (('ontouchstart' in window) ||
+            const supportsTouchEvents = (('ontouchstart' in window) ||
                 ('msMaxTouchPoints' in navigator));
 
             // Only devices which support touch events should be special cased
@@ -876,7 +876,7 @@ export class Select2 {
  *      Example: {results:[{id:1, text:'Red'},{id:2, text:'Blue'}], more:true}
  */
 function ajax(options: Select2AjaxOptions) {
-    var timeout: number, // current scheduled but not yet executed request
+    let timeout: number, // current scheduled but not yet executed request
         quietMillis = options.quietMillis || 100,
         ajaxUrl = options.url,
         self = this;
@@ -884,7 +884,7 @@ function ajax(options: Select2AjaxOptions) {
     return function (query: Select2QueryOptions) {
         clearTimeout(timeout);
         timeout = window.setTimeout(function () {
-            var data = options.data, // ajax data function
+            let data = options.data, // ajax data function
                 url = ajaxUrl, // ajax url string or function
                 // deprecated - to be removed in 4.0  - use params instead
                 deprecated = {
@@ -909,11 +909,11 @@ function ajax(options: Select2AjaxOptions) {
                 onSuccess: function (response: any) {
                     // TODO - replace query.page with query so users have access to term, page, etc.
                     // added query as third paramter to keep backwards compatibility
-                    var results = options.results(response, query.page, query);
+                    const results = options.results(response, query.page, query);
                     query.callback(results);
                 },
                 onError: function (response: any, info: any) {
-                    var results: Select2Result = {
+                    const results: Select2Result = {
                         errorInfo: info,
                         hasError: true,
                         results: response
@@ -942,7 +942,7 @@ function ajax(options: Select2AjaxOptions) {
  * the text.
  */
 function local(options: any) {
-    var data: any = options, // data elements
+    let data: any = options, // data elements
         dataText: string,
         tmp: any,
         text = function (item: Select2Item) { return "" + item.text; }; // function used to retrieve the text portion of a data item that is matched against the search
@@ -957,7 +957,7 @@ function local(options: any) {
         data = function () { return tmp; };
     }
 
-    var dataItem = data();
+    const dataItem = data();
     if (dataItem.text) {
         text = dataItem.text;
         // if text is not a function we assume it to be a key name
@@ -968,14 +968,14 @@ function local(options: any) {
     }
 
     return function (query: Select2QueryOptions) {
-        var t = query.term, filtered = { results: [] as any[] }, process: any;
+        let t = query.term, filtered = { results: [] as any[] }, process: any;
         if (t === "") {
             query.callback(data());
             return;
         }
 
         process = function (datum: any, collection: any[]) {
-            var group: any, attr: string;
+            let group: any, attr: string;
             datum = datum[0];
             if (datum.children) {
                 group = {};
@@ -1001,13 +1001,13 @@ function local(options: any) {
 
 // TODO javadoc
 function tags(data: any) {
-    var isFunc = typeof data === "function";
+    const isFunc = typeof data === "function";
     return function (query: Select2QueryOptions) {
-        var t = query.term, filtered = { results: [] as any[] };
-        var result = isFunc ? data(query) : data;
+        const t = query.term, filtered = { results: [] as any[] };
+        const result = isFunc ? data(query) : data;
         if (Array.isArray(result)) {
             result.forEach(function (item: Select2Item) {
-                var isObject = item.text !== undefined,
+                const isObject = item.text !== undefined,
                     text = isObject ? item.text : item;
                 if (t === "" || query.matcher(t, text)) {
                     filtered.results.push(isObject ? item : { id: item, text: item });
@@ -1043,14 +1043,14 @@ function checkFormatter(formatter: any, formatterName: string) {
  */
 function evaluate(val: any, context: any, ..._: any[]): any {
     if (typeof val === "function") {
-        var args = Array.prototype.slice.call(arguments, 2);
+        const args = Array.prototype.slice.call(arguments, 2);
         return val.apply(context, args);
     }
     return val;
 }
 
 function countResults(results: any[]) {
-    var count = 0;
+    let count = 0;
     results.forEach(function (item) {
         if (item.children) {
             count += countResults(item.children);
@@ -1073,7 +1073,7 @@ function countResults(results: any[]) {
  * @return undefined/null to leave the current input unchanged, or a string to change the input to the returned value
  */
 function defaultTokenizer(input: string, selection: string | any[], selectCallback: (arg0: any) => void, opts: { createSearchChoice: { call: (arg0: any, arg1: any, arg2: any) => any; }; tokenSeparators: string | any[]; id: (arg0: any) => null; }) {
-    var original = input, // store the original so we can compare and know if we need to tell the search to update its text
+    let original = input, // store the original so we can compare and know if we need to tell the search to update its text
         dupe = false, // check for whether a token we extracted represents a duplicate selected choice
         token, // token
         index, // position at which the separator was found
@@ -1115,7 +1115,7 @@ function defaultTokenizer(input: string, selection: string | any[], selectCallba
 }
 
 function cleanupElements() {
-    var self = this;
+    const self = this;
 
     Array.from(arguments).forEach(function (element) {
         Fluent.remove(self[element]);
@@ -1162,7 +1162,7 @@ abstract class AbstractSelect2 {
     abstract val(value?: string | string[]): string | string[];
 
     init(opts: Select2Options) {
-        var results: HTMLElement, search: HTMLInputElement;
+        let results: HTMLElement, search: HTMLInputElement;
 
         // prepare options
         this.opts = opts = this.prepareOpts(opts);
@@ -1269,11 +1269,11 @@ abstract class AbstractSelect2 {
             this.search.setAttribute("maxlength", "" + opts.maximumInputLength);
         }
 
-        var disabled = opts.element.disabled;
+        let disabled = opts.element.disabled;
         if (disabled === undefined) disabled = false;
         this.enable(!disabled);
 
-        var readonly = (opts.element as any).readOnly;
+        let readonly = (opts.element as any).readOnly;
         if (readonly === undefined) readonly = false;
         this.readonly(readonly);
 
@@ -1288,7 +1288,7 @@ abstract class AbstractSelect2 {
     }
 
     destroy() {
-        var element = this.opts.element, select2 = (element as any)?.select2, self = this;
+        const element = this.opts.element, select2 = (element as any)?.select2, self = this;
 
         this.close();
 
@@ -1388,7 +1388,7 @@ abstract class AbstractSelect2 {
     }
 
     protected prepareOpts(opts: Select2Options): Select2Options {
-        var element: HTMLInputElement | HTMLSelectElement, select: HTMLSelectElement, idKey: string, ajaxUrl: string, self = this;
+        let element: HTMLInputElement | HTMLSelectElement, select: HTMLSelectElement, idKey: string, ajaxUrl: string, self = this;
 
         element = opts.element;
 
@@ -1407,16 +1407,16 @@ abstract class AbstractSelect2 {
 
         opts = Object.assign({}, {
             populateResults: function (this: AbstractSelect2, container, results, query) {
-                var id = this.opts.id;
+                const id = this.opts.id;
 
-                let populate = function (results: Select2Item[], container: HTMLElement, depth: number) {
+                const populate = function (results: Select2Item[], container: HTMLElement, depth: number) {
 
-                    var i, l, result, selectable, disabled, compound, node, label, innerContainer, formatted;
+                    let i, l, result, selectable, disabled, compound, node, label, innerContainer, formatted;
 
                     results = opts.sortResults(results, container, query);
 
                     // collect the created nodes for bulk append
-                    var nodes: HTMLElement[] = [];
+                    const nodes: HTMLElement[] = [];
                     for (i = 0, l = results.length; i < l; i = i + 1) {
 
                         result = results[i];
@@ -1485,12 +1485,12 @@ abstract class AbstractSelect2 {
 
         if (select) {
             opts.query = (query: Select2QueryOptions) => {
-                var data: Select2Result = { results: [], more: false },
+                let data: Select2Result = { results: [], more: false },
                     term = query.term,
                     children;
 
-                let process = function (element: HTMLElement, collection: Select2Item[]) {
-                    var group: Select2Item;
+                const process = function (element: HTMLElement, collection: Select2Item[]) {
+                    let group: Select2Item;
                     if (element instanceof HTMLOptionElement) {
                         if (query.matcher(term, element.textContent, element)) {
                             collection.push(self.optionToData(element));
@@ -1508,7 +1508,7 @@ abstract class AbstractSelect2 {
 
                 // ignore the placeholder option if there is one
                 if (this.getPlaceholder() !== undefined && children.length > 0) {
-                    var placeholderOption = this.getPlaceholderOption();
+                    const placeholderOption = this.getPlaceholderOption();
                     if (placeholderOption) {
                         children = children.filter(x => x !== placeholderOption);
                     }
@@ -1538,9 +1538,9 @@ abstract class AbstractSelect2 {
                     }
                     if (opts.initSelection === undefined) {
                         opts.initSelection = function (element, callback) {
-                            var data: Select2Item[] = [];
+                            const data: Select2Item[] = [];
                             splitVal((element as any).value, opts.separator).forEach(function (id) {
-                                var obj = { id: id, text: id },
+                                let obj = { id: id, text: id },
                                     tags = opts.tags;
                                 if (typeof tags === "function") tags = tags();
                                 tags.forEach(function (tag: any) { if (equal(tag.id, obj.id)) { obj = tag; return false; } });
@@ -1583,11 +1583,11 @@ abstract class AbstractSelect2 {
     private handleMonitorSync() {
         // sync enabled state
         const el = this.opts.element;
-        var disabled = el.disabled;
+        let disabled = el.disabled;
         if (disabled === undefined) disabled = false;
         this.enable(!disabled);
 
-        var readonly = (el as any).readOnly;
+        let readonly = (el as any).readOnly;
         if (readonly === undefined) readonly = false;
         this.readonly(readonly);
 
@@ -1602,7 +1602,7 @@ abstract class AbstractSelect2 {
      * Monitor the original element for changes and update select2 accordingly
      */
     protected monitorSource(): void {
-        var el = this.opts.element, observer;
+        let el = this.opts.element, observer;
 
         const boundThis = bindThis(this);
         Fluent.on(el, "change.select2", boundThis.handleMonitorChange);
@@ -1625,8 +1625,8 @@ abstract class AbstractSelect2 {
     }
 
     protected triggerSelect(data: Select2Item): boolean {
-        var evt = { val: this.id(data), object: data, choice: data };
-        var event = Fluent.trigger(this.opts.element, "select2-selecting", evt);
+        const evt = { val: this.id(data), object: data, choice: data };
+        const event = Fluent.trigger(this.opts.element, "select2-selecting", evt);
         return !Fluent.isDefaultPrevented(event);
     }
 
@@ -1657,7 +1657,7 @@ abstract class AbstractSelect2 {
     }
 
     protected enableInterface(): boolean {
-        var enabled = this._enabled && !this._readonly,
+        const enabled = this._enabled && !this._readonly,
             disabled = !enabled;
 
         if (enabled === this.enabledInterface) return false;
@@ -1696,7 +1696,7 @@ abstract class AbstractSelect2 {
     }
 
     positionDropdown() {
-        var dropdown = this.dropdown,
+        let dropdown = this.dropdown,
             offset = getOffset(this.container),
             height = this.container.offsetHeight,
             width = this.container.offsetWidth,
@@ -1805,7 +1805,7 @@ abstract class AbstractSelect2 {
 
         if (this._enabled === false || this._readonly === true) return false;
 
-        var event = Fluent.trigger(this.opts.element, "select2-opening");
+        const event = Fluent.trigger(this.opts.element, "select2-opening");
         return !Fluent.isDefaultPrevented(event);
     }
 
@@ -1840,7 +1840,7 @@ abstract class AbstractSelect2 {
      * Performs the opening of the dropdown
      */
     protected opening() {
-        var cid = this.containerEventName,
+        let cid = this.containerEventName,
             scroll = "scroll." + cid,
             resize = "resize." + cid,
             orient = "orientationchange." + cid,
@@ -1850,7 +1850,7 @@ abstract class AbstractSelect2 {
 
         this.clearDropdownAlignmentPreference();
 
-        var dropdownParent = (typeof this.opts.dropdownParent === "function" ?
+        const dropdownParent = (typeof this.opts.dropdownParent === "function" ?
             this.opts.dropdownParent(this.opts.element) : null) ?? document?.body;
 
         if (dropdownParent && this.dropdown !== dropdownParent.lastElementChild) {
@@ -1869,7 +1869,7 @@ abstract class AbstractSelect2 {
                 // Prevent IE from generating a click event on the body
                 reinsertElement(mask);
 
-                var dropdown = document.getElementById("select2-drop"), self;
+                let dropdown = document.getElementById("select2-drop"), self;
                 if (dropdown) {
                     self = (dropdown as any).select2;
                     if (self.opts.selectOnBlur) {
@@ -1902,10 +1902,10 @@ abstract class AbstractSelect2 {
 
         // attach listeners to events that can change the position of the container and thus require
         // the position of the dropdown to be updated as well so it does not come unglued from the container
-        var that = this;
+        const that = this;
 
-        var parent = this.container.parentElement;
-        var parents = [];
+        let parent = this.container.parentElement;
+        const parents = [];
         while (parent) {
             parents.push(parent);
             parent = parent.parentElement;
@@ -1924,13 +1924,13 @@ abstract class AbstractSelect2 {
     close(): void {
         if (!this.opened()) return;
 
-        var cid = this.containerEventName,
+        const cid = this.containerEventName,
             scroll = "scroll." + cid,
             resize = "resize." + cid,
             orient = "orientationchange." + cid;
 
-        var parent = this.container.parentElement;
-        var parents = [];
+        let parent = this.container.parentElement;
+        const parents = [];
         while (parent) {
             parents.push(parent);
             parent = parent.parentElement;
@@ -1977,7 +1977,7 @@ abstract class AbstractSelect2 {
     }
 
     protected ensureHighlightVisible() {
-        var results = this.results, index, child, hb, rb, y, more, topOffset;
+        let results = this.results, index, child, hb, rb, y, more, topOffset;
 
         index = this.highlight();
 
@@ -1993,7 +1993,7 @@ abstract class AbstractSelect2 {
             return;
         }
 
-        var children = this.findHighlightableChoices().map(x => x.querySelector('.select2-result-label'));
+        const children = this.findHighlightableChoices().map(x => x.querySelector('.select2-result-label'));
 
         child = children[index] as HTMLElement;
         if (!child)
@@ -2028,12 +2028,12 @@ abstract class AbstractSelect2 {
     }
 
     protected moveHighlight(delta: number) {
-        var choices = this.findHighlightableChoices(),
+        let choices = this.findHighlightableChoices(),
             index = this.highlight();
 
         while (index > -1 && index < choices.length) {
             index += delta;
-            var choice = choices[index];
+            const choice = choices[index];
             if (choice && choice.classList.contains("select2-result-selectable") && !choice.classList.contains("select2-disabled") && !choice.classList.contains("select2-selected")) {
                 this.highlight(index);
                 break;
@@ -2042,7 +2042,7 @@ abstract class AbstractSelect2 {
     }
 
     protected highlight(index?: number) {
-        var choices = this.findHighlightableChoices(),
+        let choices = this.findHighlightableChoices(),
             choice,
             data;
 
@@ -2086,9 +2086,9 @@ abstract class AbstractSelect2 {
     }
 
     protected highlightUnderEvent(event: Event) {
-        var el = (event.target as any)?.closest?.(".select2-result-selectable") as HTMLElement;
+        const el = (event.target as any)?.closest?.(".select2-result-selectable") as HTMLElement;
         if (el && !el.classList.contains("select2-highlighted")) {
-            var choices = this.findHighlightableChoices();
+            const choices = this.findHighlightableChoices();
             this.highlight(choices.indexOf(el));
         } else if (!el) {
             // if we are over an unselectable item remove all highlights
@@ -2097,7 +2097,7 @@ abstract class AbstractSelect2 {
     }
 
     protected loadMoreIfNeeded() {
-        var results = this.results,
+        let results = this.results,
             more = results.querySelector<HTMLElement>("li.select2-more-results"),
             below, // pixels the element is below the scroll fold, below==0 is when the element is starting to be visible
             page = this.resultsPage + 1,
@@ -2128,7 +2128,7 @@ abstract class AbstractSelect2 {
 
                         if (data.more === true) {
                             results.appendChild(more);
-                            var loadMore = evaluate(self.opts.formatLoadMore, self.opts.element, page + 1);
+                            const loadMore = evaluate(self.opts.formatLoadMore, self.opts.element, page + 1);
                             Fluent.empty(more);
                             if (loadMore instanceof Node)
                                 more.appendChild(loadMore);
@@ -2174,7 +2174,7 @@ abstract class AbstractSelect2 {
      * @param initial whether or not this is the call to this method right after the dropdown has been opened
      */
     protected updateResults(initial?: boolean) {
-        var search = this.search,
+        let search = this.search,
             results = this.results,
             opts = this.opts,
             data,
@@ -2204,7 +2204,7 @@ abstract class AbstractSelect2 {
         function createLi(klass: string, html?: Select2FormatResult) {
             if (klass == null && html === undefined)
                 return;
-            var li = document.createElement("li");
+            const li = document.createElement("li");
             li.classList.add(klass);
             if (html instanceof Node)
                 li.appendChild(html);
@@ -2218,7 +2218,7 @@ abstract class AbstractSelect2 {
             self.dropdown?.classList.add("select2-position-fixed");
             try {
                 Fluent.empty(results);
-                var li = createLi(klass, html);
+                const li = createLi(klass, html);
                 if (li != null)
                     results.appendChild(li);
                 postRender();
@@ -2229,7 +2229,7 @@ abstract class AbstractSelect2 {
 
         queryNumber = ++this.queryCount;
 
-        var maxSelSize = this.getMaximumSelectionSize();
+        const maxSelSize = this.getMaximumSelectionSize();
         if (maxSelSize >= 1) {
             data = this.data();
             if (Array.isArray(data) && data.length >= maxSelSize && checkFormatter(opts.formatSelectionTooBig, "formatSelectionTooBig")) {
@@ -2281,7 +2281,7 @@ abstract class AbstractSelect2 {
             context: null,
             matcher: opts.matcher,
             callback: (data: Select2Result) => {
-                var def: Select2Item; // default choice
+                let def: Select2Item; // default choice
 
                 // ignore old responses
                 if (queryNumber != this.queryCount) {
@@ -2368,7 +2368,7 @@ abstract class AbstractSelect2 {
             this.clearTouchMoved();
             return;
         }
-        var index = this.highlight(),
+        const index = this.highlight(),
             highlighted = this.results.querySelector(".select2-highlighted"),
             data = (highlighted?.closest('.select2-result') as any)?.select2data;
 
@@ -2381,7 +2381,7 @@ abstract class AbstractSelect2 {
     }
 
     protected getPlaceholder() {
-        var placeholderOption;
+        let placeholderOption;
         return this.opts.element.getAttribute("placeholder") ||
             this.opts.element.dataset.placeholder ||
             this.opts.placeholder ||
@@ -2390,7 +2390,7 @@ abstract class AbstractSelect2 {
 
     protected getPlaceholderOption(): HTMLOptionElement {
         if (this.select) {
-            var firstOption = this.select.querySelector<HTMLOptionElement>(':scope > option');
+            const firstOption = this.select.querySelector<HTMLOptionElement>(':scope > option');
             if (this.opts.placeholderOption !== undefined) {
                 //Determine the placeholder option based on the specified placeholderOption setting
                 return (this.opts.placeholderOption === "first" && firstOption) ||
@@ -2410,7 +2410,7 @@ abstract class AbstractSelect2 {
      */
     protected initContainerWidth() {
         function resolveContainerWidth(this: AbstractSelect2) {
-            var style, attrs, matches, i, l, attr;
+            let style, attrs, matches, i, l, attr;
 
             if (this.opts.width === "off") {
                 return null;
@@ -2447,7 +2447,7 @@ abstract class AbstractSelect2 {
             }
         };
 
-        var width = resolveContainerWidth.call(this);
+        const width = resolveContainerWidth.call(this);
         if (width !== null) {
             this.container.style.width = width;
         }
@@ -2480,7 +2480,7 @@ class SingleSelect2 extends AbstractSelect2 {
     }
 
     protected override enableInterface() {
-        var result = super.enableInterface();
+        const result = super.enableInterface();
         if (result) {
             this.focusser.disabled = !this.isInterfaceEnabled();
         }
@@ -2488,7 +2488,7 @@ class SingleSelect2 extends AbstractSelect2 {
     }
 
     protected override opening() {
-        var el, len;
+        let el, len;
 
         if (this.opts.minimumResultsForSearch >= 0) {
             this.showSearch(true);
@@ -2573,7 +2573,7 @@ class SingleSelect2 extends AbstractSelect2 {
 
     override initContainer() {
 
-        var selection: HTMLElement,
+        let selection: HTMLElement,
             container = this.container,
             dropdown = this.dropdown,
             idSuffix = nextUid(),
@@ -2604,7 +2604,7 @@ class SingleSelect2 extends AbstractSelect2 {
         this.focusser.previousElementSibling.setAttribute('for', this.focusser.getAttribute('id'));
 
         // Ensure the original element retains an accessible name
-        var originalTitle = this.opts.element.getAttribute("title");
+        const originalTitle = this.opts.element.getAttribute("title");
         this.opts.element.setAttribute("title", (originalTitle || (elementLabel?.textContent ?? "")));
 
         this.focusser.setAttribute("tabindex", this.elementTabIndex);
@@ -2762,13 +2762,13 @@ class SingleSelect2 extends AbstractSelect2 {
     }
 
     protected clear(triggerChange?: boolean) {
-        var data = (this.selection as any)?.select2data;
+        const data = (this.selection as any)?.select2data;
         if (data) { // guard against queued quick consecutive clicks
-            var evt = Fluent.trigger(this.opts.element, "select2-clearing");
+            const evt = Fluent.trigger(this.opts.element, "select2-clearing");
             if (Fluent.isDefaultPrevented(evt)) {
                 return;
             }
-            var placeholderOption = this.getPlaceholderOption();
+            const placeholderOption = this.getPlaceholderOption();
             this.opts.element.value = placeholderOption ? placeholderOption.value : "";
             Fluent.empty(this.selection.querySelector(".select2-chosen"));
             delete (this.selection as any).select2data;
@@ -2790,7 +2790,7 @@ class SingleSelect2 extends AbstractSelect2 {
             this.close();
             this.setPlaceholder();
         } else {
-            var self = this;
+            const self = this;
             this.opts.initSelection.call(null, this.opts.element, function (selected: Select2Item) {
                 if (!self.container)
                     return;
@@ -2805,7 +2805,7 @@ class SingleSelect2 extends AbstractSelect2 {
     }
 
     protected isPlaceholderOptionSelected() {
-        var placeholderOption;
+        let placeholderOption;
         if (this.getPlaceholder() === undefined) return false; // no placeholder specified so no option should be considered
         return ((placeholderOption = this.getPlaceholderOption()) !== undefined && placeholderOption.selected)
             || (this.opts.element.value === "")
@@ -2815,24 +2815,24 @@ class SingleSelect2 extends AbstractSelect2 {
 
     protected override prepareOpts(opts: Select2Options) {
         opts = super.prepareOpts(opts);
-        var self = this;
+        const self = this;
 
         if (opts.element.tagName.toLowerCase() === "select") {
             // install the selection initializer
             opts.initSelection = function (element, callback) {
-                var selected = element.querySelector<HTMLOptionElement>("option:checked:not(:disabled)");
+                const selected = element.querySelector<HTMLOptionElement>("option:checked:not(:disabled)");
                 // a single select box always has a value, no need to null check 'selected'
                 callback(self.optionToData(selected));
             };
         } else if ("data" in opts) {
             // install default initSelection when applied to hidden input and data is local
             opts.initSelection = opts.initSelection || function (element, callback) {
-                var id = (element as HTMLInputElement).value;
+                const id = (element as HTMLInputElement).value;
                 //search in data by id, storing the actual matching item
-                var match: Select2Item = null;
+                let match: Select2Item = null;
                 opts.query({
                     matcher: function (term, text, el) {
-                        var is_match = equal(id, opts.id(el));
+                        const is_match = equal(id, opts.id(el));
                         if (is_match) {
                             match = el;
                         }
@@ -2860,14 +2860,14 @@ class SingleSelect2 extends AbstractSelect2 {
     }
 
     protected setPlaceholder() {
-        var placeholder = this.getPlaceholder();
+        const placeholder = this.getPlaceholder();
 
         if (this.isPlaceholderOptionSelected() && placeholder !== undefined) {
 
             // check for a placeholder option if attached to a select
             if (this.select && this.getPlaceholderOption() === undefined) return;
 
-            var chosen = this.selection.querySelector(".select2-chosen");
+            const chosen = this.selection.querySelector(".select2-chosen");
             chosen && (chosen.textContent = placeholder);
 
             this.selection.classList.add("select2-default");
@@ -2877,7 +2877,7 @@ class SingleSelect2 extends AbstractSelect2 {
     }
 
     protected override postprocessResults(data: Select2Result, initial: boolean, noHighlightUpdate?: boolean) {
-        var selected = 0, self = this;
+        let selected = 0, self = this;
 
         // find the selected element in the result list
 
@@ -2900,7 +2900,7 @@ class SingleSelect2 extends AbstractSelect2 {
         // hide the search box if this is the first we got the results and there are enough of them for search
 
         if (initial === true) {
-            var min = this.opts.minimumResultsForSearch;
+            const min = this.opts.minimumResultsForSearch;
             if (min >= 0) {
                 this.showSearch(countResults(data.results) >= min);
             }
@@ -2923,7 +2923,7 @@ class SingleSelect2 extends AbstractSelect2 {
 
         if (!this.triggerSelect(data)) { return; }
 
-        var old = this.opts.element.value,
+        const old = this.opts.element.value,
             oldData = this.data();
 
         this.opts.element.value = this.id(data);
@@ -2947,7 +2947,7 @@ class SingleSelect2 extends AbstractSelect2 {
 
         if (!this.selection)
             return;
-        var container = this.selection.querySelector<HTMLElement>(".select2-chosen"), formatted, cssClass;
+        let container = this.selection.querySelector<HTMLElement>(".select2-chosen"), formatted, cssClass;
 
         (this.selection as any).select2data = data;
 
@@ -2974,7 +2974,7 @@ class SingleSelect2 extends AbstractSelect2 {
     }
 
     override val(val?: string, triggerChange?: boolean): string {
-        var data = null,
+        let data = null,
             self = this,
             oldData = this.data();
 
@@ -2988,7 +2988,7 @@ class SingleSelect2 extends AbstractSelect2 {
 
         if (this.select) {
             this.select.value = val ?? "";
-            var selected = this.select.querySelector<HTMLOptionElement>("option:checked");
+            const selected = this.select.querySelector<HTMLOptionElement>("option:checked");
             if (selected)
                 data = self.optionToData(selected);
             this.updateSelection(data);
@@ -3023,7 +3023,7 @@ class SingleSelect2 extends AbstractSelect2 {
     }
 
     data(value?: Select2Item): (void | Select2Item) {
-        var data,
+        let data,
             triggerChange = false;
 
         if (arguments.length === 0) {
@@ -3068,7 +3068,7 @@ class MultiSelect2 extends AbstractSelect2 {
 
     protected override prepareOpts(opts: Select2Options) {
         opts = super.prepareOpts(opts);
-        var self = this;
+        const self = this;
 
         // TODO validate placeholder is a string if specified
 
@@ -3076,7 +3076,7 @@ class MultiSelect2 extends AbstractSelect2 {
             // install the selection initializer
             opts.initSelection = function (element, callback) {
 
-                var data: Select2Item[] = [];
+                const data: Select2Item[] = [];
 
                 element.querySelectorAll<HTMLOptionElement>("option:checked:not(:disabled)").forEach(elm => {
                     data.push(self.optionToData(elm));
@@ -3086,12 +3086,12 @@ class MultiSelect2 extends AbstractSelect2 {
         } else if ("data" in opts) {
             // install default initSelection when applied to hidden input and data is local
             opts.initSelection = opts.initSelection || function (element: HTMLInputElement, callback) {
-                var ids = splitVal(element.value, opts.separator);
+                const ids = splitVal(element.value, opts.separator);
                 //search in data by array of ids, storing matching items in a list
-                var matches: Select2Item[] = [];
+                const matches: Select2Item[] = [];
                 opts.query({
                     matcher: function (term, text, el) {
-                        var is_match = ids.some(id => equal(id, opts.id(el)));
+                        const is_match = ids.some(id => equal(id, opts.id(el)));
                         if (is_match) {
                             matches.push(el);
                         }
@@ -3100,11 +3100,11 @@ class MultiSelect2 extends AbstractSelect2 {
                     callback: typeof callback !== "function" ? () => { } : function () {
                         // reorder matches based on the order they appear in the ids array because right now
                         // they are in the order in which they appear in data array
-                        var ordered = [];
-                        for (var i = 0; i < ids.length; i++) {
-                            var id = ids[i];
-                            for (var j = 0; j < matches.length; j++) {
-                                var match = matches[j];
+                        const ordered = [];
+                        for (let i = 0; i < ids.length; i++) {
+                            const id = ids[i];
+                            for (let j = 0; j < matches.length; j++) {
+                                const match = matches[j];
                                 if (equal(id, opts.id(match))) {
                                     ordered.push(match);
                                     matches.splice(j, 1);
@@ -3123,7 +3123,7 @@ class MultiSelect2 extends AbstractSelect2 {
 
     protected selectChoice(choice: HTMLElement) {
 
-        var selected = this.container.querySelector(".select2-search-choice-focus");
+        const selected = this.container.querySelector(".select2-search-choice-focus");
         if (selected && choice && choice === selected) {
 
         } else {
@@ -3156,13 +3156,13 @@ class MultiSelect2 extends AbstractSelect2 {
 
     protected override initContainer() {
 
-        var selector = ".select2-choices";
+        const selector = ".select2-choices";
 
         this.searchContainer = this.container.querySelector(".select2-search-field");
-        var selection: HTMLElement;
+        let selection: HTMLElement;
         this.selection = selection = this.container.querySelector(selector);
 
-        var _this = this;
+        const _this = this;
         Fluent.on(this.selection, "click", ".select2-search-choice:not(.select2-locked)", (e: Event) => {
             //killEvent(e);
             _this.search.focus();
@@ -3190,14 +3190,14 @@ class MultiSelect2 extends AbstractSelect2 {
             if (!this.isInterfaceEnabled()) return;
 
             ++this.keydowns;
-            var selected = selection.querySelector<HTMLElement>(".select2-search-choice-focus");
-            var prev = Fluent(selected).prevSibling(".select2-search-choice:not(.select2-locked)").getNode();
-            var next = Fluent(selected).nextSibling(".select2-search-choice:not(.select2-locked)").getNode();
-            var pos = getCursorInfo(this.search);
+            const selected = selection.querySelector<HTMLElement>(".select2-search-choice-focus");
+            const prev = Fluent(selected).prevSibling(".select2-search-choice:not(.select2-locked)").getNode();
+            const next = Fluent(selected).nextSibling(".select2-search-choice:not(.select2-locked)").getNode();
+            const pos = getCursorInfo(this.search);
 
             if (selected &&
                 (e.key == "ArrowLeft" || e.key == "ArrowRight" || e.key == "Backspace" || e.key == "Delete" || e.key == "Enter")) {
-                var selectedChoice = selected;
+                let selectedChoice = selected;
                 if (e.key == "ArrowLeft" && prev) {
                     selectedChoice = prev;
                 }
@@ -3331,7 +3331,7 @@ class MultiSelect2 extends AbstractSelect2 {
     }
 
     protected override enableInterface() {
-        var result = super.enableInterface();
+        const result = super.enableInterface();
         if (result) {
             this.search.disabled = !this.isInterfaceEnabled();
         }
@@ -3346,7 +3346,7 @@ class MultiSelect2 extends AbstractSelect2 {
             this.clearSearch();
         }
         if (this.select || this.opts.element.value !== "") {
-            var self = this;
+            const self = this;
             this.opts.initSelection.call(null, this.opts.element, function (data: Select2Item[]) {
                 if (!self.container)
                     return;
@@ -3361,7 +3361,7 @@ class MultiSelect2 extends AbstractSelect2 {
     }
 
     protected override clearSearch() {
-        var placeholder = this.getPlaceholder(),
+        const placeholder = this.getPlaceholder(),
             maxWidth = this.getMaxSearchWidth();
 
         if (placeholder !== undefined && this.getVal().length === 0 && !this.search.classList.contains("select2-focused")) {
@@ -3422,7 +3422,7 @@ class MultiSelect2 extends AbstractSelect2 {
     }
 
     protected updateSelection(data: Select2Item[]) {
-        var ids: string[] = [], filtered: Select2Item[] = [], self = this;
+        const ids: string[] = [], filtered: Select2Item[] = [], self = this;
 
         // filter out duplicates
         data.forEach(function (x) {
@@ -3441,7 +3441,7 @@ class MultiSelect2 extends AbstractSelect2 {
     }
 
     protected override tokenize(): string {
-        var input = this.search.value;
+        let input = this.search.value;
         input = this.opts.tokenizer.call(this, input, this.data(), bindThis(this).onSelect, this.opts);
         if (input != null && input != undefined) {
             this.search.value = input ?? "";
@@ -3509,8 +3509,8 @@ class MultiSelect2 extends AbstractSelect2 {
     }
 
     protected addSelectedChoice(data: Select2Item) {
-        var enableChoice = !data.locked;
-        var choice = document.createElement("li"),
+        const enableChoice = !data.locked;
+        let choice = document.createElement("li"),
             id = this.id(data),
             val = this.getVal(),
             formatted,
@@ -3519,7 +3519,7 @@ class MultiSelect2 extends AbstractSelect2 {
         choice.classList.add("select2-search-choice");
         choice.appendChild(document.createElement("div"));
         if (enableChoice) {
-            var a = choice.appendChild(document.createElement("a"));
+            const a = choice.appendChild(document.createElement("a"));
             a.classList.add("select2-search-choice-close");
             a.setAttribute("href", "#");
             a.setAttribute("tabindex", "-1");
@@ -3528,7 +3528,7 @@ class MultiSelect2 extends AbstractSelect2 {
             choice.classList.add("select2-locked");
         }
 
-        var div = choice.querySelector("div");
+        const div = choice.querySelector("div");
         formatted = this.opts.formatSelection(data, div, this.opts.escapeMarkup);
         if (formatted != undefined) {
             if (formatted instanceof Node)
@@ -3542,7 +3542,7 @@ class MultiSelect2 extends AbstractSelect2 {
         }
 
         if (enableChoice) {
-            var close = choice.querySelector(".select2-search-choice-close");
+            const close = choice.querySelector(".select2-search-choice-close");
             Fluent.on(close, "mousedown", killEvent);
             ["click", "dblclick"].forEach(ev => Fluent.on(close, ev, (e) => {
                 if (!this.isInterfaceEnabled()) return;
@@ -3569,7 +3569,7 @@ class MultiSelect2 extends AbstractSelect2 {
     }
 
     protected unselect(selected: HTMLElement) {
-        var val = this.getVal(),
+        let val = this.getVal(),
             data,
             index;
         selected = selected?.closest(".select2-search-choice") as HTMLElement;
@@ -3586,7 +3586,7 @@ class MultiSelect2 extends AbstractSelect2 {
             return;
         }
 
-        var evt = Fluent.trigger(this.opts.element, "select2-removing", { val: this.id(data), choice: data });
+        const evt = Fluent.trigger(this.opts.element, "select2-removing", { val: this.id(data), choice: data });
 
         if (Fluent.isDefaultPrevented(evt)) {
             return false;
@@ -3607,13 +3607,13 @@ class MultiSelect2 extends AbstractSelect2 {
     }
 
     protected override postprocessResults(data?: Select2Result, initial?: boolean, noHighlightUpdate?: boolean) {
-        var val = this.getVal(),
+        const val = this.getVal(),
             choices = this.results.querySelectorAll(".select2-result"),
             compound = this.results.querySelectorAll(".select2-result-with-children"),
             self = this;
 
         choices.forEach(function (choice) {
-            var id = self.id((choice as any).select2data);
+            const id = self.id((choice as any).select2data);
             if (indexOf(id, val) >= 0) {
                 choice.classList.add("select2-selected");
                 // mark all children of the selected parent as selected
@@ -3637,8 +3637,8 @@ class MultiSelect2 extends AbstractSelect2 {
         if (!this.opts.createSearchChoice && !Array.from(choices).some(x => x.matches('.select2-result:not(.select2-selected)'))) {
             if (!data || data && !data.more && !this.results.querySelector(".select2-no-results")) {
                 if (checkFormatter(self.opts.formatNoMatches, "formatNoMatches")) {
-                    var noResults = evaluate(self.opts.formatNoMatches, self.opts.element, self.search.value);
-                    var li = document.createElement("li");
+                    const noResults = evaluate(self.opts.formatNoMatches, self.opts.element, self.search.value);
+                    const li = document.createElement("li");
                     li.classList.add("select2-no-results");
                     if (noResults instanceof Node)
                         li.appendChild(noResults);
@@ -3655,7 +3655,7 @@ class MultiSelect2 extends AbstractSelect2 {
     }
 
     protected resizeSearch() {
-        var minimumWidth, left, maxWidth, containerLeft, searchWidth,
+        let minimumWidth, left, maxWidth, containerLeft, searchWidth,
             sideBorderPadding = getSideBorderPadding(this.search);
 
         minimumWidth = measureTextWidth(this.search) + 10;
@@ -3683,7 +3683,7 @@ class MultiSelect2 extends AbstractSelect2 {
     }
 
     protected getVal(): string[] {
-        var val;
+        let val;
         if (this.select) {
             val = Array.from(this.select.selectedOptions).map(x => x.value);
             return val === null ? [] : val;
@@ -3696,47 +3696,47 @@ class MultiSelect2 extends AbstractSelect2 {
     protected setVal(val: string[]) {
         if (this.select) {
             val ??= [];
-            var opt = this.select.options;
-            for (var i = 0; i < opt.length; i++) {
-                var o = opt.item(i);
+            const opt = this.select.options;
+            for (let i = 0; i < opt.length; i++) {
+                const o = opt.item(i);
                 o.selected = val.includes(o.value);
             }
         } else {
-            var unique = val || [];
+            let unique = val || [];
             unique = unique.filter((x, i) => unique.indexOf(x) === i);
             this.opts.element.value = (unique.length === 0 ? "" : unique.join(this.opts.separator));
         }
     }
 
     protected buildChangeDetails(old: Select2Item[], current: Select2Item[]) {
-        var current = current.slice(0),
-            old = old.slice(0);
+        const currentCopy = current.slice(0),
+            oldCopy = old.slice(0);
 
         // remove intersection from each array
-        for (var i = 0; i < current.length; i++) {
-            for (var j = 0; j < old.length; j++) {
-                if (equal(this.opts.id(current[i]), this.opts.id(old[j]))) {
-                    current.splice(i, 1);
+        for (let i = 0; i < currentCopy.length; i++) {
+            for (let j = 0; j < oldCopy.length; j++) {
+                if (equal(this.opts.id(currentCopy[i]), this.opts.id(oldCopy[j]))) {
+                    currentCopy.splice(i, 1);
                     if (i > 0) {
                         i--;
                     }
-                    old.splice(j, 1);
+                    oldCopy.splice(j, 1);
                     j--;
                 }
             }
         }
 
-        return { added: current, removed: old };
+        return { added: currentCopy, removed: oldCopy };
     }
 
     val(val?: string[], triggerChange?: boolean) {
-        var self = this;
+        const self = this;
 
         if (arguments.length === 0) {
             return this.getVal();
         }
 
-        var oldData = this.data();
+        let oldData = this.data();
         if (!oldData) oldData = [];
 
         // val is an id. !val is true for [undefined,null,'',0] - 0 is legal
@@ -3764,7 +3764,7 @@ class MultiSelect2 extends AbstractSelect2 {
             }
 
             this.opts.initSelection(this.opts.element, function (data) {
-                var ids = data.map(self.id);
+                const ids = data.map(self.id);
                 self.setVal(ids);
                 self.updateSelection(data);
                 self.clearSearch();
@@ -3789,7 +3789,7 @@ class MultiSelect2 extends AbstractSelect2 {
 
     protected onSortEnd() {
 
-        var val: string[] = [], self = this;
+        const val: string[] = [], self = this;
 
         // show search and move it to the end of the list
         this.searchContainer.hidden = false;
@@ -3809,9 +3809,9 @@ class MultiSelect2 extends AbstractSelect2 {
     data(): Select2Item[];
     data(values: Select2Item[], triggerChange?: boolean): void;
     data(values?: Select2Item[], triggerChange?: boolean): Select2Item[] | void {
-        var self = this, ids, old;
+        let self = this, ids, old;
         if (arguments.length === 0) {
-            var result: Select2Item[] = [];
+            const result: Select2Item[] = [];
             this.selection
                 .querySelectorAll(":scope > .select2-search-choice")
                 .forEach(x => result.push((x as any).select2data));
@@ -3848,7 +3848,7 @@ const safeStyleProperties = [
 ];
 
 function copyStyle(from: CSSStyleDeclaration, to: CSSStyleDeclaration) {
-    for (var prop of safeStyleProperties) {
+    for (const prop of safeStyleProperties) {
         if (from.getPropertyValue(prop)) {
             to.setProperty(prop, from.getPropertyValue(prop));
         }

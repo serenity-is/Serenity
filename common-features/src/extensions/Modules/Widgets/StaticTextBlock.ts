@@ -15,7 +15,7 @@ export class StaticTextBlock<P extends StaticTextBlockOptions = StaticTextBlockO
 
         // hide the caption label for this editor if in a form. ugly hack
         if (this.options.hideLabel) {
-            let label = this.domNode.closest('.field')?.querySelector('.caption') as HTMLLabelElement;
+            const label = this.domNode.closest('.field')?.querySelector('.caption') as HTMLLabelElement;
             label && (label.hidden = true);
         }
 
@@ -23,7 +23,7 @@ export class StaticTextBlock<P extends StaticTextBlockOptions = StaticTextBlockO
     }
 
     private updateElementContent() {
-        var txt = this.options.text ?? this.value;
+        let txt = this.options.text ?? this.value;
 
         // if isLocalText is set, text is actually a local text key
         if (this.options.isLocalText)

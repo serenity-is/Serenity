@@ -122,7 +122,7 @@ export class Combobox<TItem = any> {
     }
 
     private createSelect2(opt: ComboboxOptions) {
-        var select2Opt: Select2Options = {
+        let select2Opt: Select2Options = {
             element: this.el,
             multiple: opt.multiple,
             placeholder: opt.placeholder || null,
@@ -131,8 +131,8 @@ export class Combobox<TItem = any> {
         }
 
         select2Opt.query = (query: any) => {
-            var pageSize = opt.pageSize;
-            var searchQuery: ComboboxSearchQuery = {
+            const pageSize = opt.pageSize;
+            const searchQuery: ComboboxSearchQuery = {
                 searchTerm: query.term?.trim() || null,
                 skip: (query.page - 1) * pageSize,
                 take: pageSize,
@@ -141,7 +141,7 @@ export class Combobox<TItem = any> {
 
             this.abortPendingQuery();
 
-            var select2 = Select2.getInstance(this.el);
+            const select2 = Select2.getInstance(this.el);
 
             function setActive(value: boolean) {
                 select2?.search?.classList.toggle('select2-active', value);
@@ -168,7 +168,7 @@ export class Combobox<TItem = any> {
                         });
                     }
 
-                    var searchResult = opt.search(searchQuery);
+                    const searchResult = opt.search(searchQuery);
                     if (isPromiseLike(searchResult)) {
                         searchResult.then(then, cleanup);
                     }
@@ -187,16 +187,16 @@ export class Combobox<TItem = any> {
         }
 
         select2Opt.initSelection = (element: ArrayLike<HTMLElement> | HTMLElement, callback: any) => {
-            var el = isArrayLike(element) ? element[0] : element;
-            var val = (el as any).value;
+            const el = isArrayLike(element) ? element[0] : element;
+            const val = (el as any).value;
             if (val == null || val == '') {
                 callback(null);
                 return;
             }
 
-            var isMultiple = opt.multiple;
-            var idList = isMultiple ? (val as string).split(',') : [val as string];
-            var searchQuery: ComboboxSearchQuery = {
+            const isMultiple = opt.multiple;
+            const idList = isMultiple ? (val as string).split(',') : [val as string];
+            const searchQuery: ComboboxSearchQuery = {
                 idList: idList,
                 initSelection: true
             };
@@ -217,7 +217,7 @@ export class Combobox<TItem = any> {
                         callback(null);
                 }
                 else {
-                    var item = result.items[0];
+                    const item = result.items[0];
                     callback(item);
                 }
             }
@@ -227,7 +227,7 @@ export class Combobox<TItem = any> {
             (el as any).initSelectionLoading && (el as any).initSelectionLoading?.abort?.();
             searchQuery.signal = ((el as any).initSelectionLoading = new AbortController()).signal;
             try {
-                let searchResult = opt.search(searchQuery);
+                const searchResult = opt.search(searchQuery);
                 if (isPromiseLike(searchResult)) {
                     searchResult.then(then, cleanup);
                 }
@@ -338,7 +338,7 @@ export class Combobox<TItem = any> {
         if (!this.el)
             return false;
 
-        var select2 = Select2.getInstance(this.el);
+        const select2 = Select2.getInstance(this.el);
         if (select2)
             return select2.isMultiple;
 
@@ -350,9 +350,9 @@ export class Combobox<TItem = any> {
      * @returns The selected item.
      */
     getSelectedItem(): ComboboxItem {
-        var select2 = Select2.getInstance(this.el);
+        const select2 = Select2.getInstance(this.el);
         if (select2) {
-            var item = select2.data;
+            const item = select2.data;
             if (Array.isArray(item))
                 return item[0];
             return item;
@@ -364,9 +364,9 @@ export class Combobox<TItem = any> {
      * @returns The selected items.
      */
     getSelectedItems(): ComboboxItem[] {
-        var select2 = Select2.getInstance(this.el);
+        const select2 = Select2.getInstance(this.el);
         if (select2) {
-            var item = select2.data;
+            const item = select2.data;
             if (Array.isArray(item))
                 return item;
 
@@ -387,9 +387,9 @@ export class Combobox<TItem = any> {
         if (!this.el)
             return null;
 
-        var select2 = Select2.getInstance(this.el);
+        const select2 = Select2.getInstance(this.el);
         if (select2) {
-            var val = select2.val;
+            const val = select2.val;
             if (Array.isArray(val))
                 return val.join(',');
 
@@ -408,7 +408,7 @@ export class Combobox<TItem = any> {
             return [];
 
         let val: any;
-        let select2 = Select2.getInstance(this.el);
+        const select2 = Select2.getInstance(this.el);
         if (select2)
             val = select2.val;
         else
@@ -435,7 +435,7 @@ export class Combobox<TItem = any> {
         if (value == this.getValue())
             return;
 
-        var val: any = value;
+        let val: any = value;
         if (value && this.isMultiple) {
             val = value.split(String.fromCharCode(44))
                 .map(x => x?.trim() || null)
@@ -444,7 +444,7 @@ export class Combobox<TItem = any> {
 
         this.el.dataset.comboboxsettingvalue = "true";
         try {
-            let select2 = Select2.getInstance(this.el);
+            const select2 = Select2.getInstance(this.el);
             if (select2) {
                 select2.val = val;
             }

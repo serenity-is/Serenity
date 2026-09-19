@@ -43,8 +43,8 @@ export namespace GridUtils {
     export function addIncludeDeletedToggle(toolDiv: HTMLElement | ArrayLike<HTMLElement>,
         view: IRemoteView<any>, hint?: string, initial?: boolean): void {
 
-        var includeDeleted = initial ?? false;
-        var oldSubmit = view.onSubmit;
+        let includeDeleted = initial ?? false;
+        let oldSubmit = view.onSubmit;
         view.onSubmit = function (v) {
             v.params.IncludeDeleted = includeDeleted;
             if (oldSubmit != null) {
@@ -104,14 +104,14 @@ export namespace GridUtils {
             let oldSubmit = view.onSubmit;
             view.onSubmit = function (v) {
                 if (input) {
-                    var searchText = input.get_value();
+                    const searchText = input.get_value();
                     if (searchText && searchText.length > 0) {
                         v.params.ContainsText = searchText;
                     }
                     else {
                         delete v.params['ContainsText'];
                     }
-                    var searchField = input.get_field()?.name;
+                    const searchField = input.get_field()?.name;
                     if (searchField != null && searchField.length > 0) {
                         v.params.ContainsField = searchField;
                     }
@@ -196,9 +196,9 @@ export namespace GridUtils {
     export function makeOrderable(grid: ISleekGrid,
         handleMove: (rows: number[], insertBefore: number) => void): void {
 
-        var moveRowsPlugin = new RowMoveManager({ cancelEditOnDrag: true });
+        const moveRowsPlugin = new RowMoveManager({ cancelEditOnDrag: true });
         moveRowsPlugin.onBeforeMoveRows.subscribe(function (e, data) {
-            for (var i = 0; !!(i < data.rows.length); i++) {
+            for (let i = 0; !!(i < data.rows.length); i++) {
                 if (!!(data.rows[i] === data.insertBefore ||
                     data.rows[i] === data.insertBefore - 1)) {
                     e.stopPropagation();
@@ -240,8 +240,8 @@ export namespace GridUtils {
                 return;
             }
 
-            var order: number;
-            var index = insertBefore;
+            let order: number;
+            const index = insertBefore;
             if (index < 0) {
                 order = 1;
             }
@@ -261,8 +261,8 @@ export namespace GridUtils {
                 }
             }
 
-            var i = 0;
-            var next: any = null;
+            let i = 0;
+            let next: any = null;
             next = function () {
                 serviceRequest(service, getUpdateRequest(getId(dataGrid.getGrid().getDataItem(rows[i])), order++),
                     () => {

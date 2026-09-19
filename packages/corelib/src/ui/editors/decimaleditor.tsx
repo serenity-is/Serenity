@@ -74,7 +74,7 @@ export class DecimalEditor<P extends DecimalEditorOptions = DecimalEditorOptions
      * @returns AutoNumeric options.
      */
     protected getAutoNumericOptions(): AutoNumericOptions {
-        var numericOptions: AutoNumericOptions = Object.assign({}, DecimalEditor.defaultAutoNumericOptions(), {
+        const numericOptions: AutoNumericOptions = Object.assign({}, DecimalEditor.defaultAutoNumericOptions(), {
             vMin: this.options.minValue ?? (this.options.allowNegatives ? (this.options.maxValue != null ? toNegativeValue(this.options.maxValue) : '-999999999999.99') : '0.00'),
             vMax: this.options.maxValue ?? '999999999999.99'
         });
@@ -101,7 +101,7 @@ export class DecimalEditor<P extends DecimalEditorOptions = DecimalEditorOptions
      * @returns The value, or null when empty.
      */
     get_value(): number {
-        var val;
+        let val;
         if (AutoNumeric.hasInstance(this.domNode)) {
             val = AutoNumeric.getValue(this.domNode);
 

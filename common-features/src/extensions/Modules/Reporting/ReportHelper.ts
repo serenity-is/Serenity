@@ -29,7 +29,7 @@ export namespace ReportHelper {
     }
 
     export function execute(options: ReportExecuteOptions) {
-        var opt = options.getParams ? options.getParams() : options.params;
+        const opt = options.getParams ? options.getParams() : options.params;
 
         postToUrl({
             url: '~/Serenity.Extensions/Report/' + (options.download ? 'Download' : 'Render'),

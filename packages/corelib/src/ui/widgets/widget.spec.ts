@@ -15,7 +15,7 @@ describe('Widget.getCssClass', () => {
 
     it('returns class name without root namespace', function () {
         Config.rootNamespaces = [];
-        var generatedClassNames = Widget.prototype["getCssClass"].call({
+        const generatedClassNames = Widget.prototype["getCssClass"].call({
             constructor: {
                 [Symbol.typeInfo]: classTypeInfo("Serenity.Demo.Northwind.CustomerGrid")
             }
@@ -24,7 +24,7 @@ describe('Widget.getCssClass', () => {
     });
 
     it('works with serenity root namespaces', function () {
-        var generatedClassNames = Widget.prototype["getCssClass"].call({
+        const generatedClassNames = Widget.prototype["getCssClass"].call({
             constructor: {
                 [Symbol.typeInfo]: classTypeInfo("Serenity.Demo.Northwind.CustomerGrid")
             }
@@ -34,7 +34,7 @@ describe('Widget.getCssClass', () => {
 
     it('works with project root namespaces', function () {
         Config.rootNamespaces.push("StartSharp");
-        var generatedClassNames = Widget.prototype["getCssClass"].call({
+        const generatedClassNames = Widget.prototype["getCssClass"].call({
             constructor: {
                 [Symbol.typeInfo]: classTypeInfo("StartSharp.Demo.Northwind.CustomerGrid")
             }
@@ -44,7 +44,7 @@ describe('Widget.getCssClass', () => {
 
     it('works without root namespaces for project widget', function () {
         Config.rootNamespaces = [];
-        var generatedClassNames = Widget.prototype["getCssClass"].call({
+        const generatedClassNames = Widget.prototype["getCssClass"].call({
             constructor: {
                 [Symbol.typeInfo]: classTypeInfo("StartSharp.Demo.Northwind.CustomerGrid")
             }
@@ -53,7 +53,7 @@ describe('Widget.getCssClass', () => {
     });
 
     it('deduplicates class names', function () {
-        var generatedClassNames = Widget.prototype["getCssClass"].call({
+        const generatedClassNames = Widget.prototype["getCssClass"].call({
             constructor: {
                 [Symbol.typeInfo]: classTypeInfo("Dup.Dup.Something")
             }
@@ -574,7 +574,7 @@ describe('TemplatedWidget', () => {
 describe('useIdPrefix', () => {
 
     it('uses passed prefix', () => {
-        var id = useIdPrefix('my_');
+        const id = useIdPrefix('my_');
 
         expect(id._).toBe('my__');
         expect(id._x).toBe('my__x');
@@ -584,7 +584,7 @@ describe('useIdPrefix', () => {
     });
 
     it('handles hashes differently for in-page href generation', () => {
-        var id = useIdPrefix('my_');
+        const id = useIdPrefix('my_');
 
         expect(id["#_"]).toBe('#my__');
         expect(id["#_x"]).toBe('#my__x');

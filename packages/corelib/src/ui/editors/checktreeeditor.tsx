@@ -84,16 +84,16 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
      * Loads the tree items into the view.
      */
     protected updateItems(): void {
-        var items = this.getTreeItems();
-        var itemById: Record<any, TItem> = Object.create(null) as any;
-        for (var i = 0; i < items.length; i++) {
-            var item = items[i];
+        const items = this.getTreeItems();
+        const itemById: Record<any, TItem> = Object.create(null) as any;
+        for (let i = 0; i < items.length; i++) {
+            const item = items[i];
             item.children = [];
             if (item.id) {
                 itemById[item.id] = item;
             }
             if (item.parentId) {
-                var parent = itemById[item.parentId];
+                const parent = itemById[item.parentId];
                 if (parent != null) {
                     parent.children.push(item);
                 }
@@ -122,7 +122,7 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
      * @param property - The property item.
      */
     setEditValue(source: any, property: PropertyItem): void {
-        var value = source[property.name];
+        const value = source[property.name];
         this.set_value(value);
     }
 
@@ -131,13 +131,13 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
      * @returns Tool button definitions.
      */
     protected override getButtons(): ToolButton[] {
-        var selectAllText = this.getSelectAllText();
+        const selectAllText = this.getSelectAllText();
         if (!selectAllText) {
             return null;
         }
 
-        var self = this;
-        var buttons: ToolButton[] = [];
+        const self = this;
+        const buttons: ToolButton[] = [];
         buttons.push(GridSelectAllButtonHelper.define(function () {
             return self;
         }, function (x) {
@@ -200,8 +200,8 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
             return false;
         }
 
-        var items = this.view.getItems();
-        var self = this;
+        const items = this.view.getItems();
+        const self = this;
         return SlickTreeHelper.filterCustom(item, function (x) {
             if (x.parentId == null) {
                 return null;
@@ -209,8 +209,8 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
 
             if (self.itemById == null) {
                 self.itemById = Object.create(null);
-                for (var i = 0; i < items.length; i++) {
-                    var o = items[i];
+                for (let i = 0; i < items.length; i++) {
+                    const o = items[i];
                     if (o.id != null) {
                         self.itemById[o.id] = o;
                     }
@@ -264,16 +264,16 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
             return;
         }
 
-        var target = e.target as HTMLElement;
+        const target = e.target as HTMLElement;
         if (target.classList.contains('check-box')) {
             e.preventDefault();
 
             if (this._readOnly)
                 return;
 
-            var checkedOrPartial = target.classList.contains('checked') || target.classList.contains('partial');
-            var item = this.itemAt(row);
-            var anyChanged = item.isSelected !== !checkedOrPartial;
+            const checkedOrPartial = target.classList.contains('checked') || target.classList.contains('partial');
+            const item = this.itemAt(row);
+            let anyChanged = item.isSelected !== !checkedOrPartial;
             this.view.beginUpdate();
             try {
                 if (item.isSelected !== !checkedOrPartial) {
@@ -307,28 +307,28 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
      * Updates the selection flags for all items.
      */
     protected updateFlags(): void {
-        var view = this.view;
-        var items = view.getItems();
-        var threeState = this.isThreeStateHierarchy();
+        const view = this.view;
+        const items = view.getItems();
+        const threeState = this.isThreeStateHierarchy();
         if (!threeState) {
             return;
         }
         view.beginUpdate();
         try {
-            for (var i = 0; i < items.length; i++) {
-                var item = items[i];
+            for (let i = 0; i < items.length; i++) {
+                const item = items[i];
                 if (item.children == null || item.children.length === 0) {
-                    var allsel = this.getDescendantsSelected(item);
+                    const allsel = this.getDescendantsSelected(item);
                     if (allsel !== item.isAllDescendantsSelected) {
                         item.isAllDescendantsSelected = allsel;
                         view.updateItem(item.id, item);
                     }
                     continue;
                 }
-                var allSelected = this.allDescendantsSelected(item);
-                var selected = allSelected || this.anyDescendantsSelected(item);
+                const allSelected = this.allDescendantsSelected(item);
+                const selected = allSelected || this.anyDescendantsSelected(item);
                 if (allSelected !== item.isAllDescendantsSelected || selected !== item.isSelected) {
-                    var selectedChange = item.isSelected !== selected;
+                    const selectedChange = item.isSelected !== selected;
                     item.isAllDescendantsSelected = allSelected;
                     item.isSelected = selected;
                     view.updateItem(item.id, item);
@@ -359,9 +359,9 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
      * @returns True when any item changed.
      */
     protected setAllSubTreeSelected(item: TItem, selected: boolean): boolean {
-        var result = false;
-        for (var i = 0; i < item.children.length; i++) {
-            var sub = item.children[i];
+        let result = false;
+        for (let i = 0; i < item.children.length; i++) {
+            const sub = item.children[i];
             if (sub.isSelected !== selected) {
                 result = true;
                 sub.isSelected = selected;
@@ -380,8 +380,8 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
      * @returns True when all items are selected.
      */
     protected allItemsSelected() {
-        for (var i = 0; i < this.rowCount(); i++) {
-            var row = this.itemAt(i);
+        for (let i = 0; i < this.rowCount(); i++) {
+            const row = this.itemAt(i);
             if (!row.isSelected) {
                 return false;
             }
@@ -397,8 +397,8 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
      */
     protected allDescendantsSelected(item: TItem): boolean {
         if (item.children.length > 0) {
-            for (var i = 0; i < item.children.length; i++) {
-                var sub = item.children[i];
+            for (let i = 0; i < item.children.length; i++) {
+                const sub = item.children[i];
                 if (!sub.isSelected) {
                     return false;
                 }
@@ -426,8 +426,8 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
      */
     protected anyDescendantsSelected(item: TItem): boolean {
         if (item.children.length > 0) {
-            for (var i = 0; i < item.children.length; i++) {
-                var sub = item.children[i];
+            for (let i = 0; i < item.children.length; i++) {
+                const sub = item.children[i];
                 if (sub.isSelected) {
                     return true;
                 }
@@ -444,8 +444,8 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
      * @returns The columns.
      */
     protected override createColumns(): Column[] {
-        var self = this;
-        var columns: Column[] = [];
+        const self = this;
+        const columns: Column[] = [];
         columns.push({
             field: 'text', name: 'Record', width: 80, format: SlickFormatting.treeToggle(function () {
                 return self.view;
@@ -480,7 +480,7 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
      * @returns Grid options.
      */
     protected override getSlickOptions(): GridOptions {
-        var opt = super.getSlickOptions();
+        const opt = super.getSlickOptions();
         opt.forceFitColumns = true;
         return opt;
     }
@@ -492,11 +492,11 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
         if (!this.moveSelectedUp()) {
             return;
         }
-        var oldIndexes: Record<string, number> = Object.create(null);
-        var list = this.view.getItems();
-        var i = 0;
-        for (var $t1 = 0; $t1 < list.length; $t1++) {
-            var x = list[$t1];
+        const oldIndexes: Record<string, number> = Object.create(null);
+        const list = this.view.getItems();
+        let i = 0;
+        for (let $t1 = 0; $t1 < list.length; $t1++) {
+            const x = list[$t1];
             oldIndexes[x.id] = i++;
         }
         list.sort(function (x1, y) {
@@ -506,7 +506,7 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
             if (y.isSelected && !x1.isSelected) {
                 return 1;
             }
-            var c = Culture.stringCompare(x1.text, y.text);
+            const c = Culture.stringCompare(x1.text, y.text);
             if (c !== 0) {
                 return c;
             }
@@ -546,9 +546,9 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
     }
 
     private get_value(): string[] {
-        var list = [];
-        var items = this.view.getItems();
-        for (var i = 0; i < items.length; i++) {
+        const list = [];
+        const items = this.view.getItems();
+        for (let i = 0; i < items.length; i++) {
             if (items[i].isSelected) {
                 list.push(items[i].id);
             }
@@ -566,7 +566,7 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
      * @param value - Comma-delimited string or array of ids to select. */
     private set_value(value: string | string[]) {
 
-        var selected: Record<string, boolean> = Object.create(null);
+        const selected: Record<string, boolean> = Object.create(null);
         if (value != null) {
             if (typeof value == "string") {
                 value = value.split(',')
@@ -574,17 +574,17 @@ export class CheckTreeEditor<TItem extends CheckTreeItem<TItem>, P = {}> extends
                     .filter(x => !!x);
             }
 
-            for (var i = 0; i < value.length; i++) {
+            for (let i = 0; i < value.length; i++) {
                 selected[value[i]] = true;
             }
         }
 
         this.view.beginUpdate();
         try {
-            var items = this.view.getItems();
-            for (var i1 = 0; i1 < items.length; i1++) {
-                var item = items[i1];
-                var select = selected[item.id];
+            const items = this.view.getItems();
+            for (let i1 = 0; i1 < items.length; i1++) {
+                const item = items[i1];
+                const select = selected[item.id];
                 if (select !== item.isSelected) {
                     item.isSelected = select;
                     this.view.updateItem(item.id, item);
@@ -704,7 +704,7 @@ export class CheckLookupEditor<TItem extends CheckTreeItem<TItem> = any, P exten
 
     protected cascadeItems(items: TItem[]) {
 
-        var val = this.get_cascadeValue();
+        const val = this.get_cascadeValue();
 
         if (val == null || val === '') {
 
@@ -715,27 +715,27 @@ export class CheckLookupEditor<TItem extends CheckTreeItem<TItem> = any, P exten
             return items;
         }
 
-        var key = val.toString();
-        var fld = this.get_cascadeField();
+        const key = val.toString();
+        const fld = this.get_cascadeField();
 
         return items.filter(x => {
-            var itemKey = (x as any)[fld];
+            const itemKey = (x as any)[fld];
             return !!(itemKey != null && itemKey.toString() === key);
         });
     }
 
     protected filterItems(items: TItem[]) {
-        var val = this.get_filterValue();
+        const val = this.get_filterValue();
 
         if (val == null || val === '') {
             return items;
         }
 
-        var key = val.toString();
-        var fld = this.get_filterField();
+        const key = val.toString();
+        const fld = this.get_filterField();
 
         return items.filter(x => {
-            var itemKey = (x as any)[fld];
+            const itemKey = (x as any)[fld];
             return !!(itemKey != null && itemKey.toString() === key);
         });
     }
@@ -745,8 +745,8 @@ export class CheckLookupEditor<TItem extends CheckTreeItem<TItem> = any, P exten
     }
 
     protected override getTreeItems() {
-        var lookup = getLookup<TItem>(this.options.lookupKey);
-        var items = this.getLookupItems(lookup);
+        const lookup = getLookup<TItem>(this.options.lookupKey);
+        const items = this.getLookupItems(lookup);
         return items.map(item => ({
             id: ((item as any)[lookup.idField] ?? "").toString(),
             text: ((item as any)[lookup.textField] ?? "").toString(),

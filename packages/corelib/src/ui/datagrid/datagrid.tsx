@@ -144,7 +144,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
 
         this.setTitle(this.getInitialTitle());
 
-        var buttons = this.getButtons();
+        const buttons = this.getButtons();
         if (buttons != null) {
             this.createToolbar(buttons);
         }
@@ -206,7 +206,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
 
         this.initialSettings = this.getCurrentSettings(null);
 
-        var restoreResult = this.restoreSettings(null, null);
+        const restoreResult = this.restoreSettings(null, null);
         if ((restoreResult as any)?.then)
             (restoreResult as Promise<void>).then(() => window.setTimeout(() => this.initialPopulate(), 0));
         else
@@ -242,9 +242,9 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         if (!this.domNode || !Fluent.isVisibleLike(this.domNode) || !this.slickContainer || !this._grid)
             return;
 
-        var responsiveHeight = this.domNode.classList.contains('responsive-height');
-        var madeAutoHeight = this._grid != null && this._grid.getOptions().autoHeight;
-        var shouldAutoHeight = responsiveHeight && window.innerWidth < 768;
+        const responsiveHeight = this.domNode.classList.contains('responsive-height');
+        const madeAutoHeight = this._grid != null && this._grid.getOptions().autoHeight;
+        const shouldAutoHeight = responsiveHeight && window.innerWidth < 768;
 
         if (shouldAutoHeight) {
             if (!madeAutoHeight) {
@@ -451,7 +451,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
      * @returns Row metadata object.
      */
     protected getItemMetadata(item: TItem, index: number): any {
-        var itemClass = this.getItemCssClass(item, index);
+        const itemClass = this.getItemCssClass(item, index);
         if (!itemClass) {
             return new Object();
         }
@@ -466,12 +466,12 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     protected postProcessColumns(columns: Column[]): Column[] {
         SlickHelper.setDefaults(columns, this.getLocalTextDbPrefix());
 
-        var delta = this.getColumnWidthDelta();
-        var scale = this.getColumnWidthScale();
+        const delta = this.getColumnWidthDelta();
+        let scale = this.getColumnWidthScale();
         if (scale < 0)
             scale = 1;
         if (delta !== 0 || scale !== 1) {
-            for (var col of columns) {
+            for (const col of columns) {
                 if (typeof col.width === "number")
                     col.width = Math.round(col.width * scale + delta);
                 if (typeof col.minWidth === "number")
@@ -504,7 +504,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
      * Performs the initial data population, optionally waiting until visible.
      */
     protected initialPopulate(): void {
-        var self = this;
+        const self = this;
         if (this.populateWhenVisible()) {
             LazyLoadHelper.executeEverytimeWhenShown(this.domNode, function () {
                 self.refreshIfNeeded();
@@ -596,13 +596,13 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
      * Applies the default sort order to the grid and view.
      */
     protected setInitialSortOrder(): void {
-        var sortBy = this.getDefaultSortBy();
+        const sortBy = this.getDefaultSortBy();
 
         if (this.view) {
             this.view.sortBy = Array.prototype.slice.call(sortBy);
         }
 
-        var mapped = sortBy.map(function (s): ColumnSort {
+        const mapped = sortBy.map(function (s): ColumnSort {
             if (s && s.toLowerCase().endsWith(' desc')) {
                 return {
                     columnId: s.substr(0, s.length - 5).trimEnd(),
@@ -751,7 +751,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
             return;
         }
 
-        var target = e.target as HTMLElement;
+        let target = e.target as HTMLElement;
         if (!target.classList.contains('s-EditLink')) {
             target = target.closest('a');
         }
@@ -844,14 +844,14 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
      * @param include - Map to populate with column field names.
      */
     protected getIncludeColumns(include: { [key: string]: boolean }): void {
-        var columns = this._grid.getColumns();
-        for (var column of columns) {
+        const columns = this._grid.getColumns();
+        for (const column of columns) {
             if (column.field) {
                 include[column.field] = true;
             }
 
             if (column.referencedFields) {
-                for (var x of column.referencedFields) {
+                for (const x of column.referencedFields) {
                     include[x] = true;
                 }
             }
@@ -864,7 +864,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     protected setCriteriaParameter(): void {
         delete this.view.params['Criteria'];
         if (this.filterBar) {
-            var criteria = this.filterBar.get_store().get_activeCriteria();
+            const criteria = this.filterBar.get_store().get_activeCriteria();
             if (!Criteria.isEmpty(criteria)) {
                 this.view.params.Criteria = criteria;
             }
@@ -884,10 +884,10 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
      * Sets the IncludeColumns view parameter from the grid columns.
      */
     protected setIncludeColumnsParameter(): void {
-        var include = {};
+        const include = {};
         this.getIncludeColumns(include);
-        var array = [];
-        for (var key of Object.keys(include)) {
+        const array = [];
+        for (const key of Object.keys(include)) {
             array.push(key);
         }
         this.view.params.IncludeColumns = array;
@@ -936,7 +936,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
      * @returns The remote view instance.
      */
     protected createView(): IRemoteView<TItem> {
-        var opt = this.getViewOptions();
+        const opt = this.getViewOptions();
         return new RemoteView<TItem>(opt) as any;
     }
 
@@ -1012,7 +1012,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
      * @returns Remote view options.
      */
     protected getViewOptions() {
-        var opt: RemoteViewOptions = {};
+        const opt: RemoteViewOptions = {};
         opt.idField = this.getIdProperty();
         opt.sortBy = this.getDefaultSortBy();
 
@@ -1167,7 +1167,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
      * @returns The property items data.
      */
     protected getPropertyItemsData(): PropertyItemsData {
-        var columnsKey = this.getColumnsKey();
+        const columnsKey = this.getColumnsKey();
 
         if (this.getColumnsKey === DataGrid.prototype.getColumnsKey &&
             this.getPropertyItems !== DataGrid.prototype.getPropertyItems &&
@@ -1191,7 +1191,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
      * @returns A promise resolving to the property items data.
      */
     protected async getPropertyItemsDataAsync(): Promise<PropertyItemsData> {
-        var columnsKey = this.getColumnsKey();
+        const columnsKey = this.getColumnsKey();
         if (columnsKey) {
             return await getColumnsDataAsync(columnsKey);
         }
@@ -1230,9 +1230,9 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
      * @returns The grid columns.
      */
     protected propertyItemsToColumns(propertyItems: PropertyItem[]): Column[] {
-        var columns = PropertyItemColumnConverter.toColumns(propertyItems);
-        for (var i = 0; i < propertyItems.length; i++) {
-            var item = propertyItems[i];
+        const columns = PropertyItemColumnConverter.toColumns(propertyItems);
+        for (let i = 0; i < propertyItems.length; i++) {
+            const item = propertyItems[i];
             if (item.editLink) {
                 this.wrapFormatterWithEditLink(columns[i], item);
             }
@@ -1245,7 +1245,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
      * @returns Grid options.
      */
     protected getSlickOptions(): GridOptions {
-        var opt: GridOptions = {};
+        const opt: GridOptions = {};
         opt.multiSelect = false;
         opt.multiColumnSort = true;
         opt.enableCellNavigation = false;
@@ -1407,7 +1407,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
      * @returns The local text prefix, or undefined.
      */
     protected getLocalTextPrefix(): string {
-        var rowDefinition = this.getRowDefinition();
+        const rowDefinition = this.getRowDefinition();
         if (rowDefinition)
             return rowDefinition.localTextPrefix;
 
@@ -1424,7 +1424,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         if (this._idProperty != null)
             return this._idProperty;
 
-        var rowDefinition = this.getRowDefinition();
+        const rowDefinition = this.getRowDefinition();
         if (rowDefinition)
             return this._idProperty = rowDefinition.idProperty ?? '';
 
@@ -1449,7 +1449,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         if (this._isActiveProperty != null)
             return this._isActiveProperty;
 
-        var rowDefinition = this.getRowDefinition();
+        const rowDefinition = this.getRowDefinition();
         if (rowDefinition)
             return this._isActiveProperty = rowDefinition.isActiveProperty ?? '';
 
@@ -1483,9 +1483,9 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
      * @returns The localized text, or null if not found.
      */
     protected determineText(getKey: (prefix: string) => string) {
-        var localTextPrefix = this.getLocalTextDbPrefix();
+        const localTextPrefix = this.getLocalTextDbPrefix();
         if (localTextPrefix) {
-            var local = tryGetText(getKey(localTextPrefix));
+            const local = tryGetText(getKey(localTextPrefix));
             if (local != null) {
                 return local;
             }
@@ -1603,8 +1603,8 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     protected getPersistenceKey(): string {
         if ((this as any).getPersistanceKey) return ((this as any).getPersistanceKey); // compat
 
-        var key = 'GridSettings:';
-        var path = window.location.pathname;
+        let key = 'GridSettings:';
+        const path = window.location.pathname;
         if (path) {
             key += path.substring(1).split(String.fromCharCode(47)).slice(0, 2).join('/') + ':';
         }
@@ -1628,7 +1628,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
      * @returns The persisted settings, or a promise resolving to them.
      */
     protected getPersistedSettings(): PersistedGridSettings | Promise<PersistedGridSettings> {
-        var storage = this.getPersistenceStorage();
+        const storage = this.getPersistenceStorage();
         if (storage == null)
             return null;
 
@@ -1639,7 +1639,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
             return null;
         }
 
-        var jsonOrPromise = storage.getItem(this.getPersistenceKey());
+        const jsonOrPromise = storage.getItem(this.getPersistenceKey());
         if ((jsonOrPromise as any)?.then)
             return (jsonOrPromise as Promise<string>).then(json => fromJson(json));
 
@@ -1656,7 +1656,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         if (settings != null)
             return this.restoreSettingsFrom(settings, flags);
 
-        var settingsOrPromise = this.getPersistedSettings();
+        const settingsOrPromise = this.getPersistedSettings();
         if ((settingsOrPromise as any)?.then)
             return (settingsOrPromise as Promise<PersistedGridSettings>).then((s) => this.restoreSettingsFrom(s));
 
@@ -1737,12 +1737,12 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         if (this._persistenceLock > 0)
             return;
 
-        var storage = this.getPersistenceStorage();
+        const storage = this.getPersistenceStorage();
         if (!storage) {
             return;
         }
 
-        var settings = this.getCurrentSettings(flags);
+        const settings = this.getCurrentSettings(flags);
         return storage.setItem(this.getPersistenceKey(), JSON.stringify(settings));
     }
 

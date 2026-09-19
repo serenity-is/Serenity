@@ -12,17 +12,17 @@ export function columnSortHandler(this: Pick<ISleekGrid, "getColumnFromNode" | "
     "getColumnById" | "getSortColumns" | "setSortColumns" | "onSort"> & {
         getOptions: () => { multiColumnSort: boolean }
     }, e: MouseEvent): void {
-    var tgt = e.target as Element;
+    const tgt = e.target as Element;
     if (tgt.classList.contains("slick-resizable-handle")) {
         return;
     }
 
-    var colNode = tgt.closest(".slick-header-column");
+    const colNode = tgt.closest(".slick-header-column");
     if (!colNode) {
         return;
     }
 
-    var column = this.getColumnFromNode(colNode);
+    const column = this.getColumnFromNode(colNode);
     if (column.sortable) {
         if (!this.getEditorLock().commitCurrentEdit()) {
             return;
@@ -96,19 +96,20 @@ export function sortToDesiredOrderAndKeepRest(columns: Column[], idOrder: string
     if (idOrder.length == 0)
         return columns;
 
-    var orderById: { [key: string]: number } = {},
+    const orderById: { [key: string]: number } = {},
         colIdxById: { [key: string]: number } = {},
         result: Column[] = [];
+    let i: number;
 
-    for (var i = 0; i < idOrder.length; i++)
+    for (i = 0; i < idOrder.length; i++)
         orderById[idOrder[i]] = i;
 
     for (i = 0; i < columns.length; i++)
         colIdxById[columns[i].id] = i;
 
     function takeFrom(i: number) {
-        for (var j = i; j < columns.length; j++) {
-            var c = columns[j];
+        for (let j = i; j < columns.length; j++) {
+            const c = columns[j];
             if (i != j && orderById[c.id] != null)
                 break;
             result.push(c);
@@ -119,14 +120,14 @@ export function sortToDesiredOrderAndKeepRest(columns: Column[], idOrder: string
     if (orderById[columns[0].id] == null)
         takeFrom(0);
 
-    for (var id of idOrder) {
+    for (const id of idOrder) {
         i = colIdxById[id];
         if (i != null)
             takeFrom(i);
     }
 
     for (i = 0; i < columns.length; i++) {
-        var c = columns[i];
+        const c = columns[i];
         if (colIdxById[c.id] != null) {
             result.push(c);
             colIdxById[c.id] = null;

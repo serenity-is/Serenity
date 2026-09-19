@@ -2,12 +2,12 @@ import { addClass, getjQuery } from "../../base";
 import { isMobileView, layoutFillHeight } from "../../compat";
 
 function getCssSize(element: HTMLElement, name: string): number {
-    var cssSize = getComputedStyle(element).getPropertyValue(name);
+    let cssSize = getComputedStyle(element).getPropertyValue(name);
     if (cssSize == null || !cssSize.endsWith('px'))
         return null;
 
     cssSize = cssSize.substring(0, cssSize.length - 2);
-    let i = parseInt(cssSize, 10);
+    const i = parseInt(cssSize, 10);
     if (i == null || isNaN(i) || i == 0)
         return null;
 
@@ -16,13 +16,13 @@ function getCssSize(element: HTMLElement, name: string): number {
 
 export function applyCssSizes(opt: any, dialogClass: string) {
     let size: number;
-    let dialog = document.createElement("div");
+    const dialog = document.createElement("div");
     try {
         dialog.hidden = true;
         addClass(dialog, dialogClass);
         document.body.append(dialog);
 
-        var sizeHelper = document.createElement("div");
+        const sizeHelper = document.createElement("div");
         sizeHelper.classList.add("size");
         dialog.append(sizeHelper);
         size = getCssSize(sizeHelper, 'minWidth');
@@ -47,26 +47,26 @@ export function applyCssSizes(opt: any, dialogClass: string) {
 };
 
 export function handleUIDialogResponsive(domNode: HTMLElement) {
-    let $ = getjQuery();
+    const $ = getjQuery();
     if (!$)
         return;
 
-    var uiDialog = $(domNode).closest('.ui-dialog');
+    const uiDialog = $(domNode).closest('.ui-dialog');
     if (!uiDialog.length)
         return;
 
-    var dlg = ($(domNode) as any)?.dialog();
+    const dlg = ($(domNode) as any)?.dialog();
     if (!dlg)
         return;
 
     if (isMobileView()) {
-        var data = $(domNode).data('responsiveData');
+        let data = $(domNode).data('responsiveData');
         if (!data) {
             data = {};
             data.draggable = dlg.dialog('option', 'draggable');
             data.resizable = dlg.dialog('option', 'resizable');
             data.position = dlg.css('position');
-            var pos = uiDialog.position();
+            const pos = uiDialog.position();
             data.left = pos.left;
             data.top = pos.top;
             data.width = uiDialog.width();
@@ -82,7 +82,7 @@ export function handleUIDialogResponsive(domNode: HTMLElement) {
         layoutFillHeight(domNode);
     }
     else {
-        var d = $(domNode).data('responsiveData');
+        const d = $(domNode).data('responsiveData');
         if (d) {
             dlg.dialog('option', 'draggable', d.draggable);
             dlg.dialog('option', 'resizable', d.resizable);

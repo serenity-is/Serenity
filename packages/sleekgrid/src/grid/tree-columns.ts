@@ -18,7 +18,7 @@ export interface TreeColumnsGrid {
 function filter(node: TreeColumn[], condition: (col: TreeColumn) => boolean) {
 
     return node.filter(function (column: TreeColumn) {
-        var valid = condition(column);
+        const valid = condition(column);
 
         if (valid && column.columns)
             column.columns = filter(column.columns, condition);
@@ -29,7 +29,7 @@ function filter(node: TreeColumn[], condition: (col: TreeColumn) => boolean) {
 
 function sort(columns: TreeColumn[], grid: TreeColumnsGrid) {
     columns.sort((a, b) => {
-        var indexA = getOrDefault(grid.getColumnIndex(a.id)),
+        const indexA = getOrDefault(grid.getColumnIndex(a.id)),
             indexB = getOrDefault(grid.getColumnIndex(b.id));
 
         return indexA - indexB;
@@ -46,7 +46,7 @@ function getOrDefault(value: any) {
 
 function getDepth(node: any): number {
     if (node.length) {
-        for (var i in node) {
+        for (const i in node) {
             return getDepth(node[i]);
         }
     }
@@ -57,7 +57,7 @@ function getDepth(node: any): number {
 }
 
 function getColumnsInDepth(node: any, depth: number, current?: number) {
-    var columns: TreeColumn[] = [];
+    let columns: TreeColumn[] = [];
     current = current || 0;
 
     if (depth == current) {
@@ -75,7 +75,7 @@ function getColumnsInDepth(node: any, depth: number, current?: number) {
         return node;
     }
     else {
-        for (var i in node) {
+        for (const i in node) {
             if (node[i].columns) {
                 columns = columns.concat(getColumnsInDepth(node[i].columns, depth, current + 1));
             }
@@ -86,11 +86,11 @@ function getColumnsInDepth(node: any, depth: number, current?: number) {
 }
 
 function extractColumns(node: any): TreeColumn[] {
-    var result: TreeColumn[] = [];
+    let result: TreeColumn[] = [];
 
     if (node.hasOwnProperty('length')) {
 
-        for (var i = 0; i < node.length; i++)
+        for (let i = 0; i < node.length; i++)
             result = result.concat(extractColumns(node[i]));
     }
     else {
@@ -147,7 +147,7 @@ export class TreeColumns {
      */
     hasDepth(): boolean {
 
-        for (var i in this.treeColumns) {
+        for (const i in this.treeColumns) {
             if (this.treeColumns[i].hasOwnProperty('columns')) {
                 return true;
             }

@@ -24,19 +24,19 @@ export class FileDownloadFormatter implements Formatter, IInitializeColumn {
      * @returns Anchor element markup or an empty string if the value is empty.
      */
     format(ctx: FormatterContext): FormatterResult {
-        var dbFile = ctx.value as string;
+        const dbFile = ctx.value as string;
         if (!dbFile)
             return '';
 
-        var downloadUrl = FileDownloadFormatter.dbFileUrl(dbFile);
-        var originalName = this.originalNameProperty ?
+        const downloadUrl = FileDownloadFormatter.dbFileUrl(dbFile);
+        let originalName = this.originalNameProperty ?
             ctx.item[this.originalNameProperty] as string : null;
 
         originalName = (originalName ?? '');
-        var text = stringFormat((this.displayFormat ?? '{0}'),
+        const text = stringFormat((this.displayFormat ?? '{0}'),
             originalName, dbFile, downloadUrl);
 
-        var iconClass = iconClassName(this.iconClass ?? faIcon("download"));
+        const iconClass = iconClassName(this.iconClass ?? faIcon("download"));
 
         return <a class="file-download-link" target="_blank" href={downloadUrl}><i class={iconClass}></i> {text}</a>;
     }

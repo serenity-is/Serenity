@@ -72,8 +72,8 @@ export class EntityLocalizer {
 
         pgOptions.idPrefix = idPrefix + 'Localization_';
 
-        var items: PropertyItem[] = [];
-        for (var item of pgOptions.items) {
+        const items: PropertyItem[] = [];
+        for (const item of pgOptions.items) {
 
             if (item.localizable === true) {
                 items.push(Object.assign({} as PropertyItem, item, {
@@ -83,7 +83,7 @@ export class EntityLocalizer {
                     defaultValue: null
                 }));
 
-                for (var lang of langs) {
+                for (const lang of langs) {
                     items.push(Object.assign({} as PropertyItem, item, {
                         name: lang.id + '$' + item.name,
                         title: lang.text,
@@ -185,7 +185,7 @@ export class EntityLocalizer {
             return false;
         }
 
-        var newValue = this.getLocalizationGridValue();
+        const newValue = this.getLocalizationGridValue();
         return JSON.stringify(this.lastValue) != JSON.stringify(newValue);
     }
 
@@ -198,7 +198,7 @@ export class EntityLocalizer {
         }
 
         if (this.isLocalizationModeAndChanged()) {
-            var newValue = this.getLocalizationGridValue();
+            const newValue = this.getLocalizationGridValue();
             this.lastValue = newValue;
             this.pendingValue = newValue;
         }
@@ -254,9 +254,9 @@ export class EntityLocalizer {
         });
 
         this.grid.enumerateItems((item1, widget1) => {
-            var idx = item1.name.indexOf('$');
+            const idx = item1.name.indexOf('$');
             if (idx >= 0 && Fluent.isInputLike(widget1.domNode)) {
-                var hint = valueByName[item1.name.substring(idx + 1)];
+                const hint = valueByName[item1.name.substring(idx + 1)];
                 if (hint != null && hint.length > 0) {
                     widget1.element.attr('title', hint).attr('placeholder', hint);
                 }
@@ -269,10 +269,10 @@ export class EntityLocalizer {
      * @returns The localization values.
      */
     protected getLocalizationGridValue(): any {
-        var value: any = {};
+        const value: any = {};
         this.grid.save(value);
 
-        for (var k of Object.keys(value)) {
+        for (const k of Object.keys(value)) {
             if (k.indexOf('$') < 0) {
                 delete value[k];
             }
@@ -300,14 +300,14 @@ export class EntityLocalizer {
             return null;
         }
 
-        var result: { [key: string]: any } = {};
-        var langs = this.options.getLanguages();
+        const result: { [key: string]: any } = {};
+        const langs = this.options.getLanguages();
 
-        for (var lang of langs) {
-            var entity: any = {};
-            var prefix = lang.id + '$';
+        for (const lang of langs) {
+            const entity: any = {};
+            const prefix = lang.id + '$';
 
-            for (var k of Object.keys(this.pendingValue)) {
+            for (const k of Object.keys(this.pendingValue)) {
                 if (k.startsWith(prefix))
                     entity[k.substring(prefix.length)] = this.pendingValue[k];
             }

@@ -7,8 +7,8 @@ export { };
  * tabs and Bootstrap-style tabs.
  */
 export namespace TabsExtensions {
-    var navLinkSelector = ":scope > ul > li > a.nav-link, :scope > li > a.nav-link, :scope > a.nav-link, :scope > ul > li > a.ui-tabs-anchor, :scope > li > a.ui-tabs-anchor";
-    var navLinkSelectorActive = ":scope > ul > li > a.nav-link.active, :scope > li > a.nav-link.active, :scope > a.nav-link.active, :scope > ul > li.ui-tabs-active > a, :scope > li.ui-tabs-active > a";
+    const navLinkSelector = ":scope > ul > li > a.nav-link, :scope > li > a.nav-link, :scope > a.nav-link, :scope > ul > li > a.ui-tabs-anchor, :scope > li > a.ui-tabs-anchor";
+    const navLinkSelectorActive = ":scope > ul > li > a.nav-link.active, :scope > li > a.nav-link.active, :scope > a.nav-link.active, :scope > ul > li.ui-tabs-active > a, :scope > li.ui-tabs-active > a";
 
     /**
      * Enables or disables a tab.
@@ -21,11 +21,11 @@ export namespace TabsExtensions {
         if (!tabs || typeof tabs === "string")
             return;
 
-        var index: number;
+        let index: number;
         if (typeof tabKey === "number")
             index = tabKey;
         else {
-            var ibk = indexByKey(tabs);
+            const ibk = indexByKey(tabs);
             if (!ibk)
                 return;
             index = ibk[tabKey];
@@ -34,12 +34,12 @@ export namespace TabsExtensions {
             }
         }
 
-        let $ = getjQuery();
+        const $ = getjQuery();
         if (!$ || !$(tabs)?.data?.().uiTabs) {
-            var anchors = Array.from(tabs.querySelectorAll<HTMLElement>(navLinkSelector));
+            const anchors = Array.from(tabs.querySelectorAll<HTMLElement>(navLinkSelector));
             if (index < anchors.length) {
                 if (isDisabled && anchors[index].classList.contains("active")) {
-                    var newIndex = anchors.findIndex((x, i) => i !== index && !x.classList.contains("disabled"));
+                    const newIndex = anchors.findIndex((x, i) => i !== index && !x.classList.contains("disabled"));
                     if (newIndex >= 0)
                         anchors[newIndex].click();
                 }
@@ -67,11 +67,11 @@ export namespace TabsExtensions {
         if (!tabs || typeof tabs === "string")
             return;
 
-        var index: number;
+        let index: number;
         if (typeof tabKey === "number")
             index = tabKey;
         else {
-            var ibk = indexByKey(tabs);
+            const ibk = indexByKey(tabs);
             if (!ibk)
                 return;
             index = ibk[tabKey];
@@ -80,12 +80,12 @@ export namespace TabsExtensions {
             }
         }
 
-        let $ = getjQuery();
+        const $ = getjQuery();
         if (!$ || !$(tabs).data?.().uiTabs) {
-            var anchors = Array.from(tabs.querySelectorAll<HTMLAnchorElement>(navLinkSelector));
+            const anchors = Array.from(tabs.querySelectorAll<HTMLAnchorElement>(navLinkSelector));
             if (index < anchors.length) {
                 if (!visible && anchors[index].classList.contains("active")) {
-                    var newIndex = anchors.findIndex((x, i) => i !== index && !x.classList.contains("disabled") && getComputedStyle(x).display !== "none");
+                    const newIndex = anchors.findIndex((x, i) => i !== index && !x.classList.contains("disabled") && getComputedStyle(x).display !== "none");
                     if (newIndex >= 0)
                         anchors[newIndex].click();
                 }
@@ -111,7 +111,7 @@ export namespace TabsExtensions {
         if (!tabs || typeof tabs === "string")
             return;
 
-        let $ = getjQuery();
+        const $ = getjQuery();
         if (!$ || !$(tabs).data?.().uiTabs) {
             return extractTabKey(tabs.querySelector<HTMLAnchorElement>(navLinkSelectorActive));
         }
@@ -125,12 +125,12 @@ export namespace TabsExtensions {
     function extractTabKey(el: HTMLAnchorElement) {
         if (!el)
             return "";
-        var tabKey = el.dataset.tabkey;
+        const tabKey = el.dataset.tabkey;
         if (tabKey)
             return tabKey;
-        var href = el.getAttribute('href') ?? '';
-        var prefix = '_Tab';
-        var lastIndex = href.lastIndexOf(prefix);
+        const href = el.getAttribute('href') ?? '';
+        const prefix = '_Tab';
+        const lastIndex = href.lastIndexOf(prefix);
         if (lastIndex >= 0) {
             return href.substring(lastIndex + prefix.length);
         }
@@ -143,7 +143,7 @@ export namespace TabsExtensions {
      * @returns A record mapping tab keys to indexes.
      */
     export function indexByKey(tabs: ArrayLike<HTMLElement> | HTMLElement): Record<string, number> {
-        var indexByKey: Record<string, number> = {};
+        const indexByKey: Record<string, number> = {};
         tabs = isArrayLike(tabs) ? tabs[0] : tabs;
         if (!tabs)
             return indexByKey;
@@ -165,11 +165,11 @@ export namespace TabsExtensions {
         if (!tabs || typeof tabs === "string")
             return;
 
-        var index: number;
+        let index: number;
         if (typeof tabKey === "number")
             index = tabKey;
         else {
-            var ibk = indexByKey(tabs);
+            const ibk = indexByKey(tabs);
             if (!ibk)
                 return;
             index = ibk[tabKey];
@@ -177,9 +177,9 @@ export namespace TabsExtensions {
                 return;
             }
         }
-        var $ = getjQuery();
+        const $ = getjQuery();
         if (!$ || !$(tabs)?.data?.().uiTabs) {
-            var anchors = Array.from(tabs.querySelectorAll<HTMLAnchorElement>(navLinkSelector));
+            const anchors = Array.from(tabs.querySelectorAll<HTMLAnchorElement>(navLinkSelector));
             if (index < anchors.length) {
                 anchors[index].click();
             }
@@ -202,16 +202,16 @@ export namespace TabsExtensions {
         if (!tabs || typeof tabs === "string")
             return null;
 
-        let $ = getjQuery();
+        const $ = getjQuery();
         if ($?.fn?.tabs) {
-            var t = $(tabs).tabs?.({});
+            const t = $(tabs).tabs?.({});
             if (activeChange)
                 t?.on('tabsactivate', activeChange);
             return Fluent(tabs);
         }
         else {
             // emulate UI tabs with bootstrap
-            let ul = tabs.matches("ul") ? tabs : tabs.querySelector(":scope > ul");
+            const ul = tabs.matches("ul") ? tabs : tabs.querySelector(":scope > ul");
             if (ul && !ul.classList.contains("nav-tabs") && !ul.classList.contains("nav-underline")) {
                 ul.classList.add("nav", "nav-tabs");
 
@@ -220,7 +220,7 @@ export namespace TabsExtensions {
                 ul.querySelectorAll(":scope > li").forEach(li => {
                     li.classList.add("nav-item");
 
-                    let a = li.querySelector(":scope > a") as HTMLLinkElement;
+                    const a = li.querySelector(":scope > a") as HTMLLinkElement;
                     if (a) {
                         a.classList.add("nav-link");
                         a.dataset.bsToggle = "tab";
@@ -266,7 +266,7 @@ export namespace TabsExtensions {
         if (!tabs || typeof tabs === "string")
             return;
 
-        let $ = getjQuery();
+        const $ = getjQuery();
         if ($?.(tabs).data?.().uiTabs) {
             $(tabs)?.tabs?.("destroy");
             return;

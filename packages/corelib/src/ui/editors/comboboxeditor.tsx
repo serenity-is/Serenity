@@ -88,15 +88,15 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
     constructor(props: EditorProps<P>) {
         super(props);
 
-        let hidden = this.domNode;
+        const hidden = this.domNode;
 
         this._items = [];
         this._itemById = Object.create(null);
-        var emptyItemText = this.emptyItemText();
+        const emptyItemText = this.emptyItemText();
         if (emptyItemText != null) {
             hidden.setAttribute('placeholder', emptyItemText);
         }
-        var comboboxOptions = this.getComboboxOptions();
+        const comboboxOptions = this.getComboboxOptions();
         comboboxOptions.element = hidden;
         this.combobox = new Combobox(comboboxOptions);
         hidden.setAttribute('type', 'text');
@@ -181,7 +181,7 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
      * @returns The item id.
      */
     protected itemId(item: TItem): string {
-        var value = (item as any)[this.getIdField()];
+        const value = (item as any)[this.getIdField()];
         if (value == null)
             return '';
         return value.toString();
@@ -201,7 +201,7 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
      * @returns The item text.
      */
     protected itemText(item: TItem): string {
-        var value = (item as any)[this.getTextField()];
+        const value = (item as any)[this.getTextField()];
         if (value == null)
             return '';
         return value.toString();
@@ -268,8 +268,8 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
      * @returns Combobox options.
      */
     protected getComboboxOptions(): ComboboxOptions {
-        var emptyItemText = this.emptyItemText();
-        var opt: ComboboxOptions = {
+        const emptyItemText = this.emptyItemText();
+        const opt: ComboboxOptions = {
             multiple: this.isMultiple(),
             placeholder: emptyItemText || null,
             allowClear: this.allowClear(),
@@ -282,7 +282,7 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
 
                 if (query.initSelection) {
                     const itemById: typeof this._itemById = Object.create(null);
-                    for (var x of items) {
+                    for (const x of items) {
                         itemById[x.id] = x;
                     }
                     const newItems = (query.idList || []).map(id => itemById[id]).filter(x => x != null);
@@ -299,7 +299,7 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
 
                 if (this.isAutoComplete() && query.idList &&
                     items.length < query.idList.length) {
-                    for (var v of query.idList) {
+                    for (const v of query.idList) {
                         if (!items.some(z => z.id == v)) {
                             items.push({
                                 id: v,
@@ -310,7 +310,7 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
                 }
 
                 this._itemById ??= {};
-                for (var x of items)
+                for (const x of items)
                     this._itemById[x.id] = x;
 
                 return mappedResult;
@@ -329,9 +329,9 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
                 if (this.isAutoComplete() && query.idList &&
                     items.length < query.idList.length) {
                     this._itemById ??= {};
-                    for (var v of query.idList) {
+                    for (const v of query.idList) {
                         if (!items.some(z => z.id == v)) {
-                            var item = {
+                            const item = {
                                 id: v,
                                 text: v
                             };
@@ -384,7 +384,7 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
 
         this._items = value || [];
         this._itemById = Object.create(null);
-        for (var item of this._items)
+        for (const item of this._items)
             this._itemById[item.id] = item;
     }
 
@@ -447,7 +447,7 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
      * @param editTitle - Title for the edit button.
      */
     protected addInplaceCreate(addTitle: string, editTitle: string) {
-        var self = this;
+        const self = this;
         addTitle = (addTitle ?? SelectEditorTexts.InplaceAdd);
         editTitle = (editTitle ?? SelectEditorTexts.InplaceEdit);
         const inplaceButton = (<a class="inplace-button inplace-create" title={addTitle} onClick={e => {
@@ -459,7 +459,7 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
         this.domNode.classList.add("has-inplace-button");
 
         this.element.on("change", () => {
-            var isNew = this.isMultiple() || !this.get_value();
+            const isNew = this.isMultiple() || !this.get_value();
             inplaceButton.title = (isNew ? addTitle : editTitle);
             inplaceButton.classList.toggle('edit', !isNew);
         });
@@ -468,7 +468,7 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
             if ((e.target.dataset.comboboxsettingvalue))
                 return;
             if (this.isMultiple()) {
-                var values = this.get_values();
+                const values = this.get_values();
                 if (values.length > 0 && values[values.length - 1] == (-2147483648).toString()) {
                     this.set_values(values.slice(0, values.length - 1));
                     this.inplaceCreateClick(e);
@@ -482,12 +482,12 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
 
         if (this.isMultiple()) {
             Fluent.on(this.getComboboxContainer(), 'dblclick.' + this.uniqueName, '.select2-search-choice', (e3: Event) => {
-                var q = Fluent(e3.target);
+                let q = Fluent(e3.target);
                 if (!q.hasClass('select2-search-choice')) {
                     q = q.closest('.select2-search-choice');
                 }
-                var index = Array.from(q.parent().getNode()?.children || []).indexOf(q.getNode());
-                var values1 = this.get_values();
+                const index = Array.from(q.parent().getNode()?.children || []).indexOf(q.getNode());
+                const values1 = this.get_values();
                 if (index == null || index < 0 || index >= this.get_values().length) {
                     return;
                 }
@@ -532,7 +532,7 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
             }
 
             if ((this._items || []).some((x: ComboboxItem<TItem>) => {
-                var text = getName ? getName(x.source) : x.text;
+                const text = getName ? getName(x.source) : x.text;
                 return stripDiacritics((text ?? '')).toLowerCase() == s;
             }))
                 return null;
@@ -573,7 +573,7 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
      * @param property - The property item.
      */
     setEditValue(source: any, property: PropertyItem) {
-        var val = source[property.name];
+        const val = source[property.name];
         if (Array.isArray(val)) {
             this.set_values(val);
         }
@@ -633,9 +633,9 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
 
         term = stripDiacritics(term).toUpperCase();
 
-        var contains: TItem[] = [];
+        const contains: TItem[] = [];
         function filter(item: TItem): boolean {
-            var text = getText(item);
+            let text = getText(item);
             if (text == null || !text.length)
                 return false;
             text = stripDiacritics(text).toUpperCase();
@@ -691,9 +691,9 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
      * @returns The selected item, or null.
      */
     get selectedItem(): TItem {
-        let selectedValue = this.get_value();
+        const selectedValue = this.get_value();
         if (selectedValue && this._itemById) {
-            let item = this._itemById[selectedValue];
+            const item = this._itemById[selectedValue];
             if (item)
                 return item.source;
         }
@@ -705,11 +705,11 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
      * @returns The selected items.
      */
     get selectedItems(): TItem[] {
-        let selectedValues = this.values;
-        var result = [];
-        for (var value of selectedValues) {
+        const selectedValues = this.values;
+        const result = [];
+        for (const value of selectedValues) {
             if (value && this._itemById) {
-                let item = this._itemById[value];
+                const item = this._itemById[value];
                 if (item && item.source)
                     result.push(item.source);
                 else
@@ -754,7 +754,7 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
      * @returns The text.
      */
     protected get_text(): string {
-        var combobox = Combobox.getInstance(this.domNode);
+        const combobox = Combobox.getInstance(this.domNode);
         if (combobox)
             return combobox.getSelectedItems()?.map(x => x.text).join(", ");
 
@@ -777,9 +777,9 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
     }
 
     private updateInplaceReadOnly(): void {
-        var readOnly = this.get_readOnly() &&
+        const readOnly = this.get_readOnly() &&
             (this.isMultiple() || !this.value);
-        let el = this.element.nextSibling(".inplace-create").getNode();
+        const el = this.element.nextSibling(".inplace-create").getNode();
         if (el) {
             el.setAttribute('disabled', (readOnly ? 'disabled' : ''));
             el.style.opacity = (readOnly ? '0.1' : '');
@@ -1000,7 +1000,7 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
      */
     protected cascadeItems(items: TItem[]) {
 
-        var val = this.get_cascadeValue();
+        const val = this.get_cascadeValue();
 
         if (val == null || val === '') {
 
@@ -1011,11 +1011,11 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
             return items;
         }
 
-        var key = val.toString();
-        var fld = this.get_cascadeField();
+        const key = val.toString();
+        const fld = this.get_cascadeField();
 
         return items.filter(x => {
-            var itemKey = (x as any)[fld];
+            const itemKey = (x as any)[fld];
             return !!(itemKey != null && itemKey.toString() === key);
         });
     }
@@ -1026,17 +1026,17 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
      * @returns The filtered items.
      */
     protected filterItems(items: TItem[]) {
-        var val = this.get_filterValue();
+        const val = this.get_filterValue();
 
         if (val == null || val === '') {
             return items;
         }
 
-        var key = val.toString();
-        var fld = this.get_filterField();
+        const key = val.toString();
+        const fld = this.get_filterField();
 
         return items.filter(x => {
-            var itemKey = (x as any)[fld];
+            const itemKey = (x as any)[fld];
             return !!(itemKey != null && itemKey.toString() === key);
         });
     }
@@ -1079,7 +1079,7 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
     protected createEditDialog(callback: (dlg: IEditDialog) => void): void {
         const dialogType = this.getDialogType();
         const then = (dialogType: DialogType) => {
-            var dialog = new dialogType({}).init?.();
+            const dialog = new dialogType({}).init?.();
             callback?.(dialog as unknown as IEditDialog);
         }
         isPromiseLike(dialogType) ? dialogType.then(then) : then(dialogType);
@@ -1162,10 +1162,10 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
 
                 if ((dci.operationType === 'create' || dci.operationType === 'update') &&
                     dci.entityId != null) {
-                    var id = dci.entityId.toString();
+                    const id = dci.entityId.toString();
 
                     if (this.isMultiple()) {
-                        var values = this.get_values().slice();
+                        const values = this.get_values().slice();
                         if (values.indexOf(id) < 0) {
                             values.push(id);
                         }
@@ -1179,10 +1179,10 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
                 }
                 else if (this.isMultiple() && dci.operationType === 'delete' &&
                     dci.entityId != null) {
-                    var id1 = dci.entityId.toString();
-                    var values1 = this.get_values().slice();
+                    const id1 = dci.entityId.toString();
+                    const values1 = this.get_values().slice();
 
-                    var idx1 = values1.indexOf(id1);
+                    const idx1 = values1.indexOf(id1);
                     if (idx1 >= 0)
                         values1.splice(idx1, 1);
 
@@ -1193,14 +1193,14 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
                 }
             }, true);
 
-            var editItem = (e as any)['editItem'];
+            const editItem = (e as any)['editItem'];
             if (editItem != null) {
                 dialog.load(editItem, () => {
                     (dialog as any).dialogOpen(this.openDialogAsPanel);
                 });
             }
             else if (this.isMultiple() || !this.get_value()) {
-                var entity: TItem = {} as any;
+                const entity: TItem = {} as any;
                 this.setTermOnNewEntity(entity, this.lastCreateTerm?.trim() ?? '', dialog);
                 this.initNewEntity(entity);
                 dialog.load(entity, () => {

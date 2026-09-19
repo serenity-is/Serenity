@@ -30,7 +30,7 @@ export class GroupingAndSummariesInGrid<P = {}> extends EntityGrid<ProductRow, P
     }
 
     protected override createColumns() {
-        var columns = new ProductColumns(super.createColumns());
+        const columns = new ProductColumns(super.createColumns());
 
         columns.UnitsOnOrder && (columns.UnitsOnOrder.groupTotalsFormat = (ctx) =>
             (ctx.item.max ? ('max: ' + ctx.escape(ctx.item.max[columns.UnitsOnOrder.field] ?? '')) : ''));
@@ -42,7 +42,7 @@ export class GroupingAndSummariesInGrid<P = {}> extends EntityGrid<ProductRow, P
     }
 
     protected override getSlickOptions() {
-        var opt = super.getSlickOptions();
+        const opt = super.getSlickOptions();
         opt.showFooterRow = true;
         return opt;
     }

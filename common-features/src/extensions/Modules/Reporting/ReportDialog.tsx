@@ -65,7 +65,7 @@ export class ReportDialog<P extends ReportDialogOptions = ReportDialogOptions> e
             return;
         }
 
-        var opt = {};
+        const opt = {};
         this.propertyGrid.save(opt);
         ReportHelper.execute({
             download: download,

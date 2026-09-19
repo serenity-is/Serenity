@@ -19,7 +19,7 @@ export namespace SubDialogHelper {
      */
     export function bindToDataChange(dialog: any, owner: Widget<any>,
         dataChange: (ev: DataChangeInfo) => void, useTimeout?: boolean): any {
-        var uniqueName = (owner as Widget<any>)["uniqueName"];
+        const uniqueName = (owner as Widget<any>)["uniqueName"];
         dialog.element.on('ondatachange.' + uniqueName, function (e: DataChangeInfo) {
             if (typeof e.operationType === "undefined" &&
                 (e as any).originalEvent &&
@@ -79,7 +79,7 @@ export namespace SubDialogHelper {
      */
     export function cascade(cascadedDialog: { domNode: HTMLElement }, ofElement: HTMLElement | ArrayLike<HTMLElement>): any {
         Fluent.one(cascadedDialog.domNode, 'dialogopen', function (e: Event) {
-            var $ = getjQuery();
+            const $ = getjQuery();
             if ($ && $.fn && $.fn.dialog) {
                 $(cascadedDialog.domNode).dialog('option', 'position', cascadedDialogOffset(ofElement));
             }

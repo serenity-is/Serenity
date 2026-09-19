@@ -38,10 +38,10 @@ export class CloneableEntityDialog extends ProductDialog {
 
     /** Overriding this method is optional to customize cloned entity */
     protected override getCloningEntity() {
-        var clone = super.getCloningEntity();
+        const clone = super.getCloningEntity();
 
         // add (Clone) suffix if it's not already added
-        var suffix = ' (Clone)';
+        const suffix = ' (Clone)';
         if (!(clone.ProductName || '').endsWith(suffix)) {
             clone.ProductName = (clone.ProductName || '') + suffix;
         }

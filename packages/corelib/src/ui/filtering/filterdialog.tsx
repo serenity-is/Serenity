@@ -48,7 +48,7 @@ export class FilterDialog<P = {}> extends BaseDialog<P> {
      * @returns Dialog options.
      */
     protected override getDialogOptions() {
-        var opt = super.getDialogOptions();
+        const opt = super.getDialogOptions();
         opt.fullScreen = "lg-down";
         return opt;
     }

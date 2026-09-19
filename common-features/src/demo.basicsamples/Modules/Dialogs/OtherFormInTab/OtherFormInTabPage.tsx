@@ -68,7 +68,7 @@ export class OtherFormInTabDialog<P = {}> extends OrderDialog<P> {
             return;
 
         // prepare an empty entity to serialize customer details into
-        var c: CustomerRow = {};
+        const c: CustomerRow = {};
         this.customerPropertyGrid.save(c);
 
         CustomerService.Update({

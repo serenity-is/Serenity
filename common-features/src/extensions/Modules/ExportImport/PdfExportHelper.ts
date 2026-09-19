@@ -29,7 +29,7 @@ export namespace PdfExportHelper {
     function toAutoTableColumns(srcColumns: Column[], columnStyles: { [dataKey: string]: jsPDF.AutoTableStyles; },
         columnTitles: { [key: string]: string }) {
         return srcColumns.map(src => {
-            let col: jsPDF.AutoTableColumn = {
+            const col: jsPDF.AutoTableColumn = {
                 dataKey: src.id || src.field,
                 title: src.name || ''
             };
@@ -37,7 +37,7 @@ export namespace PdfExportHelper {
             if (columnTitles && columnTitles[col.dataKey] != null)
                 col.title = columnTitles[col.dataKey];
 
-            let style: jsPDF.AutoTableStyles = {};
+            const style: jsPDF.AutoTableStyles = {};
             if ((src.cssClass || '').indexOf("align-right") >= 0)
                 style.halign = 'right';
             else if ((src.cssClass || '').indexOf("align-center") >= 0)
@@ -50,10 +50,10 @@ export namespace PdfExportHelper {
     }
 
     function toAutoTableData(sleekGrid: ISleekGrid, entities: any[], keys: string[], srcColumns: Column[]) {
-        let el = document.createElement('span');
+        const el = document.createElement('span');
         let row = 0;
         return entities.map(item => {
-            let dst = [];
+            const dst = [];
             for (let cell = 0; cell < srcColumns.length; cell++) {
                 const col = srcColumns[cell];
                 const format = sleekGrid.getFormatter(row, col);
@@ -61,7 +61,7 @@ export namespace PdfExportHelper {
                 ctx.purpose = "pdf-export";
                 ctx.item = item;
                 ctx.value = item[col.field];
-                let fmtResult: FormatterResult = format ? (format(ctx) ?? "") : '';
+                const fmtResult: FormatterResult = format ? (format(ctx) ?? "") : '';
                 if (typeof fmtResult === "string" && (!fmtResult.length && (fmtResult.indexOf('<') < 0 || fmtResult.indexOf('&') < 0))) {
                     dst.push(fmtResult);
                 }
@@ -100,44 +100,44 @@ export namespace PdfExportHelper {
             return;
         }
 
-        var request = deepClone(dataGrid.view.params) as ListRequest;
+        const request = deepClone(dataGrid.view.params) as ListRequest;
         request.Take = 0;
         request.Skip = 0;
 
-        var sortBy = dataGrid.view.sortBy;
+        const sortBy = dataGrid.view.sortBy;
         if (sortBy != null)
             request.Sort = sortBy;
 
-        var gridColumns = dataGrid.columns;
+        let gridColumns = dataGrid.columns;
         gridColumns = gridColumns.filter(x => x.id !== "__select__");
 
         request.IncludeColumns = [];
-        for (var column of gridColumns)
+        for (const column of gridColumns)
             request.IncludeColumns.push(column.id || column.field);
 
         serviceCall({
             url: dataGrid.view.url,
             request: request,
             onSuccess: response => autoTableImport(({ jsPDF }) => {
-                let doc = new jsPDF('l', 'pt');
-                let srcColumns = gridColumns;
-                let columnStyles: { [dataKey: string]: jsPDF.AutoTableStyles; } = {};
-                let columns = toAutoTableColumns(srcColumns, columnStyles, options.columnTitles);
-                var keys = columns.map(x => x.dataKey);
-                let entities = (<ListResponse<any>>response).Entities || [];
-                let data = toAutoTableData(dataGrid.sleekGrid, entities, keys, srcColumns);
+                const doc = new jsPDF('l', 'pt');
+                const srcColumns = gridColumns;
+                const columnStyles: { [dataKey: string]: jsPDF.AutoTableStyles; } = {};
+                const columns = toAutoTableColumns(srcColumns, columnStyles, options.columnTitles);
+                const keys = columns.map(x => x.dataKey);
+                const entities = (<ListResponse<any>>response).Entities || [];
+                const data = toAutoTableData(dataGrid.sleekGrid, entities, keys, srcColumns);
 
                 doc.setFontSize(options.titleFontSize || 10);
                 doc.setFont('helvetica', 'bold');
-                let reportTitle = options.reportTitle || dataGrid.getTitle() || "Report";
+                const reportTitle = options.reportTitle || dataGrid.getTitle() || "Report";
 
                 doc.autoTableText(reportTitle, doc.internal.pageSize.width / 2,
                     options.titleTop || 25, { halign: 'center' });
 
-                var totalPagesExp = "{{T}}";
+                const totalPagesExp = "{{T}}";
 
-                let pageNumbers = options.pageNumbers == null || options.pageNumbers;
-                var autoOptions = Object.assign({
+                const pageNumbers = options.pageNumbers == null || options.pageNumbers;
+                const autoOptions = Object.assign({
                     margin: { top: 25, left: 25, right: 25, bottom: pageNumbers ? 25 : 30 },
                     startY: 60,
                     styles: {
@@ -149,11 +149,11 @@ export namespace PdfExportHelper {
                     columnStyles: columnStyles
                 }, options.tableOptions);
 
-                var footer: (data: any) => void;
-                var header: (data: any) => void;
+                let footer: (data: any) => void;
+                let header: (data: any) => void;
                 if (pageNumbers) {
                     footer = function (data) {
-                        var str = (data.pageNumber ?? data.pageCount)?.toString() ?? "?";
+                        let str = (data.pageNumber ?? data.pageCount)?.toString() ?? "?";
                         // Total page number plugin only available in jspdf v1.0+
                         if (typeof doc.putTotalPages === 'function') {
                             str = str + " / " + totalPagesExp;
@@ -196,7 +196,7 @@ export namespace PdfExportHelper {
 
 
                 if (!options.output || options.output == "file") {
-                    var fileName = options.fileName || options.reportTitle || "{0}_{1}.pdf";
+                    let fileName = options.fileName || options.reportTitle || "{0}_{1}.pdf";
                     fileName = stringFormat(fileName, dataGrid.getTitle() || "report",
                         formatDate(new Date(), "yyyyMMdd_HHmm"));
                     doc.save(fileName);
@@ -206,7 +206,7 @@ export namespace PdfExportHelper {
                 if (options.autoPrint)
                     doc.autoPrint();
 
-                var output = options.output;
+                let output = options.output;
                 if (output == 'newwindow' || '_blank')
                     output = 'dataurlnewwindow';
                 else if (output == 'window')

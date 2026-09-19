@@ -97,7 +97,7 @@ export class ColumnPickerDialog<P extends ColumnPickerDialogOptions = ColumnPick
         this.defaultOrder ??= this.columns.map(x => x.id);
         this.defaultVisible ??= this.columns.filter(x => x.visible !== false).map(x => x.id);
         this.colById = {};
-        for (let c of this.columns) {
+        for (const c of this.columns) {
             this.colById[c.id] = c;
         }
 
@@ -105,7 +105,7 @@ export class ColumnPickerDialog<P extends ColumnPickerDialogOptions = ColumnPick
 
         this.toggleColumnsHandler = opt.toggleColumns ?? ((columnIds: string[], show?: boolean) => {
             const toggledColumns: Column[] = [];
-            for (let columnId of columnIds) {
+            for (const columnId of columnIds) {
                 const column = this.colById[columnId];
                 if (!column)
                     continue;
@@ -275,15 +275,15 @@ export class ColumnPickerDialog<P extends ColumnPickerDialogOptions = ColumnPick
     protected handleRestoreDefaults() {
         this.reorderColumns(this.defaultOrder, this.defaultVisible, true);
 
-        let liByKey: { [key: string]: HTMLElement } = {};
+        const liByKey: { [key: string]: HTMLElement } = {};
         Array.from(this.list.childNodes)
             .forEach((el: HTMLElement) => {
                 liByKey[el.dataset.key] = el;
             });
 
         let last: HTMLElement = null;
-        for (let id of this.defaultOrder) {
-            let li = liByKey[id];
+        for (const id of this.defaultOrder) {
+            const li = liByKey[id];
             if (!li)
                 continue;
 
@@ -293,16 +293,16 @@ export class ColumnPickerDialog<P extends ColumnPickerDialogOptions = ColumnPick
                 Fluent(li).insertAfter(last);
 
             last = li;
-            let key: string = li.dataset.key;
+            const key: string = li.dataset.key;
             delete liByKey[key];
         }
 
-        for (let key in liByKey)
+        for (const key in liByKey)
             this.list.append(liByKey[key]);
 
         if (this.defaultVisible) {
             this.list.querySelectorAll<HTMLInputElement>("input.toggle-visibility").forEach(input => input.checked = false);
-            for (let id of this.defaultVisible) {
+            for (const id of this.defaultVisible) {
                 const li = this.list.querySelector<HTMLElement>(`li[data-key='${id}']`);
                 if (li) {
                     const input = li.querySelector<HTMLInputElement>("input.toggle-visibility");
@@ -358,7 +358,7 @@ export class ColumnPickerDialog<P extends ColumnPickerDialogOptions = ColumnPick
             this.list.style.height = "";
         }
         let found = false;
-        for (let li of Array.from(this.list.children)) {
+        for (const li of Array.from(this.list.children)) {
             const colId = (li as HTMLElement).dataset.key;
             const col = this.colById[colId];
             const title = stripDiacritics(!col ? "" : (this.getTitle(col) ?? "").toLowerCase());
@@ -406,7 +406,7 @@ export class ColumnPickerDialog<P extends ColumnPickerDialogOptions = ColumnPick
      * @returns Dialog options.
      */
     protected override getDialogOptions() {
-        var opt = super.getDialogOptions();
+        const opt = super.getDialogOptions();
         opt.size = "sm";
         opt.width = 300;
         return opt;

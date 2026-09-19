@@ -38,7 +38,7 @@ export class ResetPasswordPanel extends PropertyPanel<ResetPasswordRequest, Rese
         if (!this.validateForm())
             return;
 
-        var request = this.getSaveEntity();
+        const request = this.getSaveEntity();
         request.Token = this.tokenInput.value;
         serviceCall({
             url: resolveUrl('~/Account/ResetPassword'),

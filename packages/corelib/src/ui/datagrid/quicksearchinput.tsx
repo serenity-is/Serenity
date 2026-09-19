@@ -115,7 +115,7 @@ export class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInp
             return;
         }
 
-        var value = this.get_value();
+        const value = this.get_value();
         if (value == this.lastValue && (!this.fieldChanged || !value)) {
             this.fieldChanged = false;
             return;
@@ -127,7 +127,7 @@ export class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInp
             clearTimeout(this.timer);
         }
 
-        var self = this;
+        const self = this;
         this.timer = window.setTimeout(function () {
             self.searchNow(value);
         }, this.options.typeDelay ?? 500);
@@ -198,16 +198,16 @@ export class QuickSearchInput<P extends QuickSearchInputOptions = QuickSearchInp
         this.domNode.parentElement?.classList.toggle(
             (this.options.filteredParentClass ?? 's-QuickSearchFiltered'), value.length > 0);
 
-        let klass = this.options.loadingParentClass ?? 's-QuickSearchLoading';
+        const klass = this.options.loadingParentClass ?? 's-QuickSearchLoading';
         this.domNode.classList.add(klass);
         this.domNode.parentElement?.classList.add(klass);
 
-        var done = (results: boolean) => {
+        const done = (results: boolean) => {
             this.domNode.classList.remove(klass);
             this.domNode.parentElement?.classList.remove(klass);
 
             if (!results) {
-                var el = this.domNode.closest('.s-QuickSearchBar')?.querySelector<HTMLElement>('.quick-search-icon i');
+                const el = this.domNode.closest('.s-QuickSearchBar')?.querySelector<HTMLElement>('.quick-search-icon i');
                 if (el) {
                     el.classList.add('s-shake-effect');
                     setTimeout(() => el.classList.remove('s-shake-effect'), 2000);

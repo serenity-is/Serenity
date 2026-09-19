@@ -88,7 +88,7 @@ abstract class BaseCellEdit {
      */
     validate(): ValidationResult {
         if (this._args.column.validator) {
-            var validationResults = this._args.column.validator(this._input.value, this._args);
+            const validationResults = this._args.column.validator(this._input.value, this._args);
             if (!validationResults.valid) {
                 return validationResults;
             }
@@ -158,7 +158,7 @@ export class FloatCellEdit extends TextCellEdit {
      */
     getDecimalPlaces(): number {
         // returns the number of fixed decimal places or null
-        var rtn = this._args.column.editorFixedDecimalPlaces;
+        let rtn = this._args.column.editorFixedDecimalPlaces;
         if (typeof rtn === 'undefined') {
             rtn = FloatCellEdit.DefaultDecimalPlaces;
         }
@@ -168,7 +168,7 @@ export class FloatCellEdit extends TextCellEdit {
     loadValue(item: any): void {
         this._defaultValue = item[this._args.column.field] ?? "";
 
-        var decPlaces = this.getDecimalPlaces();
+        const decPlaces = this.getDecimalPlaces();
         if (decPlaces !== null
             && (this._defaultValue || this._defaultValue === 0)
             && (this._defaultValue as any).toFixed) {
@@ -181,7 +181,7 @@ export class FloatCellEdit extends TextCellEdit {
     }
 
     serializeValue(): any {
-        var rtn = parseFloat(this._input.value) as any;
+        let rtn = parseFloat(this._input.value) as any;
         if (FloatCellEdit.AllowEmptyValue) {
             if (!rtn && rtn !== 0)
                 rtn = '';
@@ -189,7 +189,7 @@ export class FloatCellEdit extends TextCellEdit {
             rtn = rtn || 0;
         }
 
-        var decPlaces = this.getDecimalPlaces();
+        const decPlaces = this.getDecimalPlaces();
         if (decPlaces !== null
             && (rtn || rtn === 0)
             && rtn.toFixed) {
@@ -482,8 +482,8 @@ export class LongTextCellEdit extends BaseCellEdit {
             this._args.grid.navigateNext();
         } else if (e.key === "Left" || e.key === "ArrowLeft" || e.key === "Right" || e.key === "ArrowRight") {
             if (this._args.editorCellNavOnLRKeys) {
-                var cursorPosition = (e.target as HTMLInputElement).selectionStart;
-                var textLength = (e.target as HTMLInputElement).value.length;
+                const cursorPosition = (e.target as HTMLInputElement).selectionStart;
+                const textLength = (e.target as HTMLInputElement).value.length;
                 if ((e.key === "Left" || e.key === "ArrowLeft") && cursorPosition === 0) {
                     this._args.grid.navigatePrev();
                 }
@@ -542,7 +542,7 @@ function addCompositeChangeListener(editor: Editor, args: EditorOptions, input: 
 }
 
 function triggerCompositeEditorChange(editor: Editor, args: EditorOptions) {
-    var activeCell = args.grid.getActiveCell();
+    const activeCell = args.grid.getActiveCell();
 
     // when valid, we'll also apply the new value to the dataContext item object
     if (editor.validate().valid)
@@ -563,8 +563,8 @@ function triggerCompositeEditorChange(editor: Editor, args: EditorOptions) {
 * and to the right cell if it's at the end. Otherwise, move the cursor within the text
 */
 function handleKeydownLRNav(e: KeyboardEvent): void {
-    var cursorPosition = this.selectionStart;
-    var textLength = this.value.length;
+    const cursorPosition = this.selectionStart;
+    const textLength = this.value.length;
     if (((e.key === "Left" || e.key === "ArrowLeft") && cursorPosition > 0) ||
         (e.key === "Right" || e.key === "ArrowRight") && cursorPosition < textLength - 1) {
         e.stopImmediatePropagation();

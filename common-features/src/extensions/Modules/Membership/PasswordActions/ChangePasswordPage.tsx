@@ -30,7 +30,7 @@ class ChangePasswordPanel<P = {}> extends PropertyPanel<ChangePasswordRequest, P
         if (!this.validateForm())
             return;
 
-        var request = this.getSaveEntity();
+        const request = this.getSaveEntity();
         serviceCall({
             url: resolveUrl('~/Account/ChangePassword'),
             request: request,

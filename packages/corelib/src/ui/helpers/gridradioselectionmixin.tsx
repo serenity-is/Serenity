@@ -40,20 +40,20 @@ export class GridRadioSelectionMixin {
         grid.getGrid().onClick.subscribe((e, p) => {
             if ((e.target as HTMLElement).classList.contains('rad-select-item')) {
                 e.preventDefault();
-                var item = grid.getView().getItem(p.row);
+                const item = grid.getView().getItem(p.row);
 
                 if (!this.isSelectable(item)) {
                     return;
                 }
 
-                var id = item[this.idField].toString();
+                const id = item[this.idField].toString();
 
-                var wasSelected = this.include[id] == true;
+                const wasSelected = this.include[id] == true;
                 clearKeys(this.include);
                 if (!wasSelected)
                     this.include[id] = true;
 
-                for (var i = 0; i < (grid.getView() as any).getLength(); i++) {
+                for (let i = 0; i < (grid.getView() as any).getLength(); i++) {
                     grid.getGrid().updateRow(i);
                 }
             }
@@ -86,7 +86,7 @@ export class GridRadioSelectionMixin {
      * @returns The selected key, or null.
      */
     getSelectedKey(): string {
-        var items = Object.keys(this.include);
+        const items = Object.keys(this.include);
         if (items != null && items.length > 0) {
             return items[0];
         }
@@ -99,7 +99,7 @@ export class GridRadioSelectionMixin {
      * @returns The selected key as an int32, or null.
      */
     getSelectedAsInt32(): number | null {
-        var items = Object.keys(this.include).map(function (x) {
+        const items = Object.keys(this.include).map(function (x) {
             return parseInt(x, 10);
         });
 
@@ -115,7 +115,7 @@ export class GridRadioSelectionMixin {
      * @returns The selected key as an int64, or null.
      */
     getSelectedAsInt64(): number | null {
-        var items = Object.keys(this.include).map(function (x) {
+        const items = Object.keys(this.include).map(function (x) {
             return parseInt(x, 10);
         });
 

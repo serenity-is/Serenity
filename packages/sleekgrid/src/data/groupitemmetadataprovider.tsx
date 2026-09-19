@@ -109,7 +109,7 @@ export class GroupItemMetadataProvider implements GridPlugin {
         // as ctx.value is set by the grid to ctx.item["__groupdisplaycolumnfield__"],
         // so never use or rely on ctx.value here!
         opt ??= GroupItemMetadataProvider.defaults;
-        let group = ctx.item as Group;
+        const group = ctx.item as Group;
         let fmtResultTitle: FormatterResult;
         if (group?.formatValue) {
             fmtResultTitle = group.formatValue(ctx);
@@ -122,7 +122,7 @@ export class GroupItemMetadataProvider implements GridPlugin {
             return fmtResultTitle;
         }
 
-        let indentation = group.level * opt.groupIndentation;
+        const indentation = group.level * opt.groupIndentation;
         const titleSpan = <span class={opt.groupTitleCssClass} data-level={group.level.toString()}>
             {fmtResultTitle}
         </span> as HTMLElement;
@@ -201,10 +201,10 @@ export class GroupItemMetadataProvider implements GridPlugin {
      * @param e - Cell mouse event from the grid's `onClick`.
      */
     handleGridClick = (e: CellMouseEvent): void => {
-        let grid = e?.grid ?? this.grid;
+        const grid = e?.grid ?? this.grid;
         if (!grid)
             return;
-        var item = grid.getDataItem(e.row);
+        const item = grid.getDataItem(e.row);
         if (!item ||
             !(item instanceof Group) ||
             !this.options.toggleCssClass ||
@@ -214,7 +214,7 @@ export class GroupItemMetadataProvider implements GridPlugin {
         e.stopImmediatePropagation();
         e.preventDefault();
 
-        var range = grid.getRenderedRange();
+        const range = grid.getRenderedRange();
         grid.getData().setRefreshHints?.({
             ignoreDiffsBefore: range.top,
             ignoreDiffsAfter: range.bottom + 1
@@ -235,15 +235,15 @@ export class GroupItemMetadataProvider implements GridPlugin {
             (e.key !== " " && e.key !== "-" && e.key !== "+"))
             return;
 
-        let grid = e?.grid ?? this.grid;
+        const grid = e?.grid ?? this.grid;
         if (!grid)
             return;
 
-        var activeCell = grid.getActiveCell();
+        const activeCell = grid.getActiveCell();
         if (!activeCell)
             return;
 
-        var item = grid.getDataItem(activeCell.row);
+        const item = grid.getDataItem(activeCell.row);
         if (!item || !(item instanceof Group))
             return;
 
@@ -254,7 +254,7 @@ export class GroupItemMetadataProvider implements GridPlugin {
             (e.key == "-" && item.collapsed))
             return;
 
-        var range = (grid.getRenderedRange as any)();
+        const range = (grid.getRenderedRange as any)();
         grid.getData().setRefreshHints?.({
             ignoreDiffsBefore: range.top,
             ignoreDiffsAfter: range.bottom + 1
@@ -286,9 +286,9 @@ export class GroupItemMetadataProvider implements GridPlugin {
             return result;
         }
 
-        var cols = this.grid.getColumns();
-        var col1: Column;
-        for (var idx = 0; idx < cols.length; idx++) {
+        const cols = this.grid.getColumns();
+        let col1: Column;
+        for (let idx = 0; idx < cols.length; idx++) {
             col1 = cols[idx];
             if (!this.options.hasSummaryType?.(cols[idx])) {
                 result.cell = idx;
@@ -297,8 +297,8 @@ export class GroupItemMetadataProvider implements GridPlugin {
         }
 
         result.colspan = 0;
-        for (var idx = result.cell + 1; idx < cols.length; idx++) {
-            var col2 = cols[idx];
+        for (let idx = result.cell + 1; idx < cols.length; idx++) {
+            const col2 = cols[idx];
             if (!this.options.hasSummaryType?.(col2) &&
                 (!!(col1?.frozen) === !!(col2?.frozen))) {
                 result.colspan++;

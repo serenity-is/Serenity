@@ -17,7 +17,7 @@ export class GridFilteredByCriteria<P = {}> extends EntityGrid<ProductRow, P> {
 
         // view object is the data source for grid (SlickRemoteView)
         // this is an EntityGrid so its Params object is a ListRequest
-        var request = this.view.params as ListRequest;
+        const request = this.view.params as ListRequest;
 
         // list request has a Criteria parameter
         // we AND criteria here to existing one because 

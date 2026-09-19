@@ -24,10 +24,10 @@ export namespace UploadHelper {
         input: HTMLInputElement,
         uploader: Uploader
     } {
-        let container = isArrayLike(options.container) ? options.container[0] : options.container;
+        const container = isArrayLike(options.container) ? options.container[0] : options.container;
         if (!container)
             throw new Error("UploadHelper.createUploadInput: container is required!");
-        let progress = Fluent(isArrayLike(options.progress) ? options.progress[0] : options.progress);
+        const progress = Fluent(isArrayLike(options.progress) ? options.progress[0] : options.progress);
         const button = container.closest(".tool-button") ?? container.closest("button") ?? container;
         button.classList.add("fileinput-button");
 
@@ -44,7 +44,7 @@ export namespace UploadHelper {
         const input = container.appendChild(<input type="file" name={options.inputName + '[]'} data-url={resolveUrl(uploadUrl)} multiple={!!options.allowMultiple} />) as HTMLInputElement;
 
         const setProgress = (percent: number) => {
-            let bar = progress.children()[0];
+            const bar = progress.children()[0];
             bar && (bar.style.width = (percent ?? 0).toString() + '%');
         }
 
@@ -72,7 +72,7 @@ export namespace UploadHelper {
             },
             batchProgress: data => {
                 if (typeof data.loaded == "number" && data.total > 0) {
-                    var percent = data.loaded / data.total * 100;
+                    const percent = data.loaded / data.total * 100;
                     setProgress(percent);
                 }
             }
@@ -143,14 +143,14 @@ export namespace UploadHelper {
      * @returns The formatted size string.
      */
     export function fileSizeDisplay(bytes: number): string {
-        var byteSize = round(bytes * 100 / 1024) * 0.01;
-        var suffix = 'KB';
+        let byteSize = round(bytes * 100 / 1024) * 0.01;
+        let suffix = 'KB';
         if (byteSize >= 1024) {
             byteSize = round(byteSize * 100 / 1024) * 0.01;
             suffix = 'MB';
         }
-        var sizeParts = byteSize.toString().split(String.fromCharCode(46));
-        var value;
+        const sizeParts = byteSize.toString().split(String.fromCharCode(46));
+        let value;
         if (sizeParts.length > 1) {
             value = sizeParts[0] + '.' + sizeParts[1].substring(0, 2);
         }
@@ -182,7 +182,7 @@ export namespace UploadHelper {
      */
     export function thumbFileName(filename: string): string {
         filename = filename ?? '';
-        var idx = filename.lastIndexOf('.');
+        const idx = filename.lastIndexOf('.');
         if (idx >= 0) {
             filename = filename.substring(0, idx);
         }
@@ -237,7 +237,7 @@ export namespace UploadHelper {
             return;
         }
 
-        let $ = getjQuery();
+        const $ = getjQuery();
         if (!$)
             return;
         $(link).colorbox?.({
@@ -263,12 +263,12 @@ export namespace UploadHelper {
      */
     export function populateFileSymbols(c: HTMLElement | ArrayLike<HTMLElement>, items: UploadedFile[],
         displayOriginalName?: boolean, urlPrefix?: string): void {
-        let container = isArrayLike(c) ? c[0] : c;
+        const container = isArrayLike(c) ? c[0] : c;
         if (!container)
             return;
         items = items || [];
         container.innerHTML = "";
-        for (var index = 0; index < items.length; index++) {
+        for (let index = 0; index < items.length; index++) {
             const item = items[index];
             const isImage = hasImageExtension(item.Filename);
             const originalName = item.OriginalName ?? '';

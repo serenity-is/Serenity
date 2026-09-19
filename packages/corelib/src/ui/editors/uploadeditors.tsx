@@ -54,7 +54,7 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
 
         this.progress = this.toolbar.domNode.appendChild(<div class="upload-progress"><div /></div> as HTMLElement);
 
-        var uio = this.getUploadInputOptions();
+        const uio = this.getUploadInputOptions();
         this.uploadInput = UploadHelper.addUploadInput(uio);
         if (this.options.readOnly)
             this.set_readOnly(true);
@@ -88,7 +88,7 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
                     return;
                 }
 
-                var newEntity: UploadedFile = {
+                const newEntity: UploadedFile = {
                     OriginalName: name,
                     Filename: response.TemporaryFile
                 };
@@ -151,7 +151,7 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
      * Populates the file symbols from the current entity.
      */
     protected populate(): void {
-        var displayOriginalName = this.options.displayFileName ||
+        const displayOriginalName = this.options.displayFileName ||
             !!this.options.originalNameProperty?.trim();
 
         if (this.entity == null) {
@@ -171,8 +171,8 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
      * Updates the interface to reflect the current state.
      */
     protected updateInterface(): void {
-        var addButton = this.toolbar.findButton('add-file-button');
-        var delButton = this.toolbar.findButton('delete-button');
+        const addButton = this.toolbar.findButton('add-file-button');
+        const delButton = this.toolbar.findButton('delete-button');
         addButton.toggleClass('disabled', this.get_readOnly());
         delButton.toggleClass('disabled', this.get_readOnly() ||
             this.entity == null);
@@ -192,7 +192,7 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
      */
     set_readOnly(value: boolean): void {
         if (this.get_readOnly() !== value) {
-            let $ = getjQuery();
+            const $ = getjQuery();
             if (value) {
                 this.uploadInput.attr('disabled', 'disabled');
                 try {
@@ -236,7 +236,7 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
         if (this.entity == null) {
             return null;
         }
-        var copy = Object.assign(Object.create(null), this.entity);
+        const copy = Object.assign(Object.create(null), this.entity);
         return copy;
     }
 
@@ -254,9 +254,9 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
      */
     set_value(value: UploadedFile): void {
         if (typeof value === "string") {
-            var stringValue = (value as string).trim();
+            const stringValue = (value as string).trim();
             if (stringValue) {
-                var idx = stringValue.indexOf('/');
+                let idx = stringValue.indexOf('/');
                 if (idx < 0)
                     idx = stringValue.indexOf('\\');
                 value = {
@@ -303,13 +303,13 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
      * @param property - The property item.
      */
     setEditValue(source: any, property: PropertyItem) {
-        var value: UploadedFile = {};
+        const value: UploadedFile = {};
         value.Filename = source[property.name];
         if (!this.options.originalNameProperty) {
 
             if (this.options.displayFileName) {
-                var s = (value.Filename ?? '');
-                var idx = (s ?? '').replaceAll('\\', '/').lastIndexOf('/');
+                const s = (value.Filename ?? '');
+                const idx = (s ?? '').replaceAll('\\', '/').lastIndexOf('/');
                 if (idx >= 0) {
                     value.OriginalName = s.substring(idx + 1);
                 }
@@ -417,7 +417,7 @@ export class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions 
      * @returns Upload input options.
      */
     protected getUploadInputOptions(): UploadInputOptions {
-        var addFileButton = this.toolbar.findButton('add-file-button');
+        const addFileButton = this.toolbar.findButton('add-file-button');
 
         return {
             container: addFileButton,
@@ -431,7 +431,7 @@ export class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions 
                 if (!UploadHelper.checkImageConstraints(response, this.options)) {
                     return;
                 }
-                var newEntity = { OriginalName: name, Filename: response.TemporaryFile };
+                const newEntity = { OriginalName: name, Filename: response.TemporaryFile };
                 this.entities.push(newEntity);
                 this.populate();
 
@@ -472,7 +472,7 @@ export class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions 
             true, this.options.urlPrefix);
 
         this.fileSymbols.childNodes.forEach((e, i) => {
-            var x = i;
+            const x = i;
             Fluent(<a class="delete" />).appendTo(Fluent(e).children().find(x => x.matches('.filename')))
                 .on("click", ev => {
                     ev.preventDefault();
@@ -490,7 +490,7 @@ export class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions 
      * Updates the interface to reflect the current state.
      */
     protected updateInterface(): void {
-        var addButton = this.toolbar.findButton('add-file-button');
+        const addButton = this.toolbar.findButton('add-file-button');
         addButton.toggleClass('disabled', this.get_readOnly());
         this.fileSymbols.querySelectorAll('a.delete').forEach(x => Fluent(x).toggle(!this.get_readOnly()));
     }
@@ -509,7 +509,7 @@ export class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions 
      */
     set_readOnly(value: boolean): void {
         if (this.get_readOnly() !== value) {
-            let $ = getjQuery();
+            const $ = getjQuery();
             if (value) {
                 this.uploadInput.attr('disabled', 'disabled');
                 try {
@@ -601,9 +601,9 @@ export class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions 
      * @param property - The property item.
      */
     setEditValue(source: any, property: PropertyItem) {
-        var val = source[property.name];
+        const val = source[property.name];
         if (typeof val == "string") {
-            var json = val.trim();
+            const json = val.trim();
             if (json.startsWith('[') && json.endsWith(']')) {
                 this.set_value(JSON.parse(json));
             }

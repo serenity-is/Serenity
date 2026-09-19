@@ -5,18 +5,18 @@ export function dateInputChangeHandler(e: Event) {
     if (Culture.dateOrder !== 'dmy' && Culture.dateOrder !== 'mdy')
         return;
 
-    var input = e.target as HTMLInputElement;
+    const input = e.target as HTMLInputElement;
     if (input?.getAttribute("type") === "date")
         return;
 
-    var val = input.value ?? '';
+    let val = input.value ?? '';
     if (val.length >= 6 && val.length <= 8 && /^[0-9]*$/.test(val)) {
         input.value = val.substring(0, 2) + Culture.dateSeparator + val.substring(2, 4) + Culture.dateSeparator + val.substring(4);
     }
 
     val = input.value ?? '';
     if (val.length >= 5) {
-        var d = parseDate(val);
+        const d = parseDate(val);
         if (d && !isNaN(d.valueOf()))
             input.value = formatDate(d, null) ?? '';
     }
@@ -28,7 +28,7 @@ function isDigit(c: string): boolean {
 
 export function dateInputKeyupHandler(e: KeyboardEvent) {
 
-    var input = e.target as HTMLInputElement;
+    const input = e.target as HTMLInputElement;
     if (input?.getAttribute("type") == "date") {
         // for browser date editors, format might not match culture setting
         return;
@@ -37,7 +37,7 @@ export function dateInputKeyupHandler(e: KeyboardEvent) {
     if (input.getAttribute('readonly') != null || input.getAttribute("disabled") != null)
         return;
 
-    var val: string = input.value ?? '';
+    let val: string = input.value ?? '';
     if (!!(val.length === 0 || input.selectionEnd !== val.length))
         return;
 
@@ -174,7 +174,7 @@ export function dateInputKeyupHandler(e: KeyboardEvent) {
 }
 
 export function flatPickrTrigger(input: HTMLInputElement): HTMLElement {
-    var button = document.createElement("button");
+    const button = document.createElement("button");
     button.type = "button";
     button.classList.add("ui-datepicker-trigger");
     const listener = () => {
@@ -191,32 +191,32 @@ export function flatPickrTrigger(input: HTMLInputElement): HTMLElement {
 }
 
 export function jQueryDatepickerZIndexWorkaround(input: HTMLInputElement) {
-    let $ = getjQuery();
+    const $ = getjQuery();
     if (!$)
         return;
-    let dialog = input?.closest('.ui-dialog');
+    const dialog = input?.closest('.ui-dialog');
     if (!dialog)
         return;
-    var dialogIndex = parseInt(getComputedStyle(dialog).zIndex, 10);
+    const dialogIndex = parseInt(getComputedStyle(dialog).zIndex, 10);
     if (isNaN(dialogIndex))
         return;
     setTimeout(() => {
-        let widget = $(input).datepicker('widget');
+        const widget = $(input).datepicker('widget');
         if (!widget || !widget.length)
             return;
-        let zIndex = parseInt(widget.css('z-index'));
+        const zIndex = parseInt(widget.css('z-index'));
         if (!isNaN(zIndex) && zIndex <= dialogIndex)
             widget.css('z-index', dialogIndex + 1);
     }, 0);
 }
 
 export function jQueryDatepickerInitialization(): boolean {
-    let $ = getjQuery();
+    const $ = getjQuery();
     if (!$?.datepicker?.regional?.en)
         return false;
 
-    let order = Culture.dateOrder;
-    let s = Culture.dateSeparator;
+    const order = Culture.dateOrder;
+    const s = Culture.dateSeparator;
     let culture = typeof document === "undefined" ? 'en' : (document.documentElement.lang || 'en').toLowerCase();
     if (!$.datepicker.regional[culture]) {
         culture = culture.split('-')[0];

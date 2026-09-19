@@ -17,7 +17,7 @@ describe("EnumTypeRegistry", () => {
         }
         registerEnum(OrderShippingState, 'Serenity.Demo.Northwind.OrderShippingState', 'Northwind.OrderShippingState');
 
-        var type = EnumTypeRegistry.tryGet("Northwind.OrderShippingState");
+        const type = EnumTypeRegistry.tryGet("Northwind.OrderShippingState");
         expect(type).toBeTruthy();
         expect(type === OrderShippingState).toBe(true);
     });

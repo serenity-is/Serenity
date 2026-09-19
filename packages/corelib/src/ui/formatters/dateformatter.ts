@@ -27,7 +27,7 @@ export class DateFormatter implements Formatter {
             return '';
         }
 
-        var date: Date;
+        let date: Date;
 
         if (value instanceof Date) {
             date = value;

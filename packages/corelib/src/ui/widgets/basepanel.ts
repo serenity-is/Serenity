@@ -86,7 +86,7 @@ export class BasePanel<P = {}> extends Widget<P> {
      * Initializes the tabs from the `Tabs` div, if present.
      */
     protected initTabs(): void {
-        var tabsDiv = this.findById('Tabs');
+        const tabsDiv = this.findById('Tabs');
         if (!tabsDiv)
             return;
         this.tabs = TabsExtensions.initialize(tabsDiv, null);
@@ -96,7 +96,7 @@ export class BasePanel<P = {}> extends Widget<P> {
      * Initializes the toolbar from the `Toolbar` div, if present.
      */
     protected initToolbar(): void {
-        var toolbarDiv = this.findById('Toolbar');
+        const toolbarDiv = this.findById('Toolbar');
         if (!toolbarDiv)
             return;
         this.toolbar = new Toolbar({ buttons: this.getToolbarButtons(), element: toolbarDiv }).init();
@@ -106,9 +106,9 @@ export class BasePanel<P = {}> extends Widget<P> {
      * Initializes the form validator from the `Form` element, if present.
      */
     protected initValidator(): void {
-        var form = this.findById<HTMLFormElement>('Form');
+        const form = this.findById<HTMLFormElement>('Form');
         if (form) {
-            var valOptions = this.getValidatorOptions();
+            const valOptions = this.getValidatorOptions();
             this.validator = new Validator(form, validateOptions(valOptions));
         }
     }

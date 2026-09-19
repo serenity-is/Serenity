@@ -14,12 +14,12 @@ export namespace GridSelectAllButtonHelper {
      * @param getSelected - A function that returns whether an item is selected.
      */
     export function update(grid: IDataGrid, getSelected: (p1: any) => boolean): void {
-        var toolbar = grid.getElement().querySelector('.s-Toolbar');
+        const toolbar = grid.getElement().querySelector('.s-Toolbar');
         if (!toolbar) {
             return;
         }
-        var btn = getWidgetFrom(toolbar, Toolbar).findButton('select-all-button');
-        var items = grid.getView().getItems();
+        const btn = getWidgetFrom(toolbar, Toolbar).findButton('select-all-button');
+        const items = grid.getView().getItems();
         btn.toggleClass('checked', items.length > 0 && !items.some(function (x) {
             return !getSelected(x);
         }));
@@ -48,13 +48,13 @@ export namespace GridSelectAllButtonHelper {
             action: "select-all",
             cssClass: 'select-all-button',
             onClick: function (e: Event) {
-                var grid = getGrid();
-                var view = grid.getView();
-                var btn = (e.target as HTMLElement).closest('.select-all-button');
-                var makeSelected = !btn?.classList.contains('checked');
+                const grid = getGrid();
+                const view = grid.getView();
+                const btn = (e.target as HTMLElement).closest('.select-all-button');
+                const makeSelected = !btn?.classList.contains('checked');
                 view.beginUpdate();
                 try {
-                    for (var item of view.getItems()) {
+                    for (const item of view.getItems()) {
                         setSelected(item, makeSelected);
                         view.updateItem(getId(item), item);
                     }

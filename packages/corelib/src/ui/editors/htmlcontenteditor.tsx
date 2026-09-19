@@ -78,8 +78,8 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
         this.element.addClass("s-HtmlContentEditor");
         this._ckInstanceReady = false;
 
-        let textArea = this.domNode;
-        var id = textArea.getAttribute('id');
+        const textArea = this.domNode;
+        let id = textArea.getAttribute('id');
         if (!id?.trim()) {
             textArea.setAttribute('id', this.uniqueName);
             id = this.uniqueName;
@@ -204,9 +204,9 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
         if (!(window as any)['CKEDITOR'])
             return 'en';
 
-        var CKEDITOR = (window as any)['CKEDITOR'];
+        const CKEDITOR = (window as any)['CKEDITOR'];
 
-        var lang = document.documentElement.getAttribute('lang')?.trim() || 'en';
+        let lang = document.documentElement.getAttribute('lang')?.trim() || 'en';
         if (!!CKEDITOR.lang.languages[lang]) {
             return lang;
         }
@@ -451,7 +451,7 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
      * @returns The base path.
      */
     static getCKEditorBasePath(): string {
-        var path = HtmlContentEditor.CKEditorBasePath;
+        let path = HtmlContentEditor.CKEditorBasePath;
         if (path == null) {
             // @ts-ignore
             if (typeof CKEDITOR_BASEPATH !== "undefined" && CKEDITOR_BASEPATH)
@@ -472,7 +472,7 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
             return then();
         }
 
-        var script = document.querySelector('#CKEditorScript');
+        const script = document.querySelector('#CKEditorScript');
         if (script) {
             return script.addEventListener("load", then);
         }
@@ -503,7 +503,7 @@ export class HtmlNoteContentEditor<P extends HtmlContentEditorOptions = HtmlCont
     }
 
     protected override getCKEditorConfig(): CKEditorConfig {
-        var config = super.getCKEditorConfig();
+        const config = super.getCKEditorConfig();
         (config as any).removeButtons += ',Cut,Copy,Paste,BulletedList,NumberedList,' +
             'Indent,Outdent,SpecialChar,Subscript,Superscript,Styles,' +
             'PasteText,PasteFromWord,Strike,Link,Unlink,CreatePlaceholder,' +
@@ -560,7 +560,7 @@ export class HtmlReportContentEditor<P extends HtmlContentEditorOptions = HtmlCo
     }
 
     protected override getCKEditorConfig(): CKEditorConfig {
-        var config = super.getCKEditorConfig();
+        const config = super.getCKEditorConfig();
         (config as any).removeButtons += ',Cut,Copy,Paste,BulletedList,NumberedList,' +
             'Indent,Outdent,SpecialChar,Subscript,Superscript,Styles,' +
             'PasteText,PasteFromWord,Strike,Link,Unlink,CreatePlaceholder,' +

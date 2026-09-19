@@ -49,10 +49,10 @@ export class PropertyPanel<TItem, P> extends BasePanel<P> {
      * Initializes the property grid from the `PropertyGrid` div, if present.
      */
     protected initPropertyGrid() {
-        var pgDiv = this.findById('PropertyGrid');
+        const pgDiv = this.findById('PropertyGrid');
         if (!pgDiv)
             return;
-        var pgOptions = this.getPropertyGridOptions();
+        const pgOptions = this.getPropertyGridOptions();
         this.propertyGrid = (new PropertyGrid({ element: pgDiv, ...pgOptions })).init();
     }
 
@@ -71,8 +71,8 @@ export class PropertyPanel<TItem, P> extends BasePanel<P> {
      * @returns The form key (e.g. "MyPanel" for "MyModule.MyPanel").
      */
     protected getFormKey(): string {
-        var name = getTypeFullName(getInstanceType(this));
-        var px = name.indexOf('.');
+        let name = getTypeFullName(getInstanceType(this));
+        const px = name.indexOf('.');
         if (px >= 0) {
             name = name.substring(px + 1);
         }
@@ -101,7 +101,7 @@ export class PropertyPanel<TItem, P> extends BasePanel<P> {
      * @returns The property items to render.
      */
     protected getPropertyItems(): PropertyItem[] {
-        var formKey = this.getFormKey();
+        const formKey = this.getFormKey();
         return getForm(formKey);
     }
 
@@ -110,7 +110,7 @@ export class PropertyPanel<TItem, P> extends BasePanel<P> {
      * @returns The saved entity.
      */
     protected getSaveEntity(): TItem {
-        var entity = new Object();
+        const entity = new Object();
         if (this.propertyGrid) {
             this.propertyGrid.save(entity);
         }

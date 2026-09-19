@@ -25,7 +25,7 @@ export class ViewWithoutIDGrid<P = {}> extends EntityGrid<SalesByCategoryRow, P>
 
         // there is no __id property in SalesByCategoryRow but 
         // this is javascript and we can set any property of an object
-        for (var x of response.Entities) {
+        for (const x of response.Entities) {
             (x as any).__id = this.nextId++;
         }
         return response;

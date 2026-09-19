@@ -48,11 +48,11 @@ export abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptio
      * @returns The dialog type key.
      */
     protected override getDialogTypeKey() {
-        var dialogTypeKey = super.getDialogTypeKey();
+        const dialogTypeKey = super.getDialogTypeKey();
         if (dialogTypeKey)
             return dialogTypeKey;
 
-        var service = this.getService();
+        let service = this.getService();
         if (service.startsWith("~/Services/"))
             service = service.substring("~/Services/".length);
 
@@ -75,7 +75,7 @@ export abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptio
      * @returns The service URL.
      */
     protected getServiceUrl() {
-        var url = this.getService();
+        const url = this.getService();
         if (url == null)
             throw new Error("ServiceLookupEditor requires 'service' option to be configured!");
 
@@ -87,13 +87,13 @@ export abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptio
      * @returns The include columns.
      */
     protected getIncludeColumns() {
-        var include = this.options.includeColumns?.slice() || [];
-        var idField = this.getIdField();
+        const include = this.options.includeColumns?.slice() || [];
+        const idField = this.getIdField();
 
         if (idField && include.indexOf(idField) < 0)
             include.push(idField);
 
-        var textField = this.getTextField();
+        const textField = this.getTextField();
         if (textField && include.indexOf(textField) < 0)
             include.push(textField);
 
@@ -114,7 +114,7 @@ export abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptio
      */
     protected getCascadeCriteria(): any[] {
 
-        var val = this.get_cascadeValue();
+        const val = this.get_cascadeValue();
 
         if (val == null || val === '') {
 
@@ -125,7 +125,7 @@ export abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptio
             return null;
         }
 
-        var fld = this.get_cascadeField();
+        const fld = this.get_cascadeField();
 
         return Criteria(fld).eq(val);
     }
@@ -135,13 +135,13 @@ export abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptio
      * @returns The filter criteria.
      */
     protected getFilterCriteria(): any[] {
-        var val = this.get_filterValue();
+        const val = this.get_filterValue();
 
         if (val == null || val === '') {
             return null;
         }
 
-        var fld = this.get_filterField();
+        const fld = this.get_filterField();
         return [[fld], '=', val];
     }
 
@@ -157,7 +157,7 @@ export abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptio
         if (idList.length == 0)
             return ['0', '=', '1'];
 
-        var idField = this.getIdField();
+        const idField = this.getIdField();
         if (idField == null)
             throw new Error("ServiceLookupEditor requires 'idField' option to be configured!");
 
@@ -182,7 +182,7 @@ export abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptio
      */
     protected getListRequest(query: ComboboxSearchQuery): ListRequest {
 
-        var request: ListRequest = {};
+        const request: ListRequest = {};
 
         if (query.searchTerm)
             request.ContainsText = query.searchTerm;
@@ -231,7 +231,7 @@ export abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptio
      */
     protected canSearch(byId: boolean) {
         if (!byId && this.get_cascadeField()) {
-            var val = this.get_cascadeValue();
+            const val = this.get_cascadeValue();
             if (val == null || val === '')
                 return false;
         }
@@ -252,10 +252,10 @@ export abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptio
             });
         }
 
-        var opt = this.getServiceCallOptions(query);
-        var response = await serviceCall(opt);
-        var itemsPlus1 = response.Entities || [];
-        var items = itemsPlus1;
+        const opt = this.getServiceCallOptions(query);
+        const response = await serviceCall(opt);
+        const itemsPlus1 = response.Entities || [];
+        let items = itemsPlus1;
 
         if (query.take && query.checkMore)
             items = items.slice(0, query.take);

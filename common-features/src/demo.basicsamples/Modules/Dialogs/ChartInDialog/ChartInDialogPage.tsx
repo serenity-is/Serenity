@@ -12,7 +12,7 @@ const chartColors = ['#4E79A7', '#A0CBE8', '#F28E2B', '#FFBE7D', '#59A14F', '#8C
     '#E15759', '#FF9D9A', '#79706E', '#BAB0AC', '#D37295', '#FABFD2', '#B07AA1', '#D4A6C8', '#9D7660', '#D7B5A6'];
 
 export default () => {
-    let buttonClick = () => new ChartInDialog().dialogOpen();
+    const buttonClick = () => new ChartInDialog().dialogOpen();
 
     document.getElementById("PanelDiv").append(
         <button class="btn btn-block btn-primary" onClick={buttonClick}>Launch Dialog</button>);
@@ -51,7 +51,7 @@ export class ChartInDialog<P = {}> extends BaseDialog<P> {
     }
 
     protected override getDialogOptions() {
-        var opt = super.getDialogOptions();
+        const opt = super.getDialogOptions();
         opt.title = 'Orders by Shipper';
         opt.modal = false;
         opt.backdrop = true;

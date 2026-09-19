@@ -13,7 +13,7 @@ export class StringFiltering extends BaseFiltering {
      * @returns The operators.
      */
     getOperators(): FilterOperator[] {
-        var ops = [
+        const ops = [
             { key: FilterOperators.contains },
             { key: FilterOperators.startsWith },
             { key: FilterOperators.EQ },

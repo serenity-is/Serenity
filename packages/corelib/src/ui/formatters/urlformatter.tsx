@@ -25,7 +25,7 @@ export class UrlFormatter implements Formatter, IInitializeColumn {
      * @returns Anchor element markup or an empty string if the URL is empty.
      */
     format(ctx: FormatterContext): FormatterResult {
-        var url = (this.urlProperty ?
+        let url = (this.urlProperty ?
             (ctx.item[this.urlProperty] ?? '').toString() :
             (ctx.value ?? '').toString());
 
@@ -38,7 +38,7 @@ export class UrlFormatter implements Formatter, IInitializeColumn {
         url = resolveUrl(url);
         url = sanitizeUrl(url);
 
-        var display = (this.displayProperty ?
+        let display = (this.displayProperty ?
             (ctx.item[this.displayProperty] ?? '').toString() :
             (ctx.value ?? '').toString());
 

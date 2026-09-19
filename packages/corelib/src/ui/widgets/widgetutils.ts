@@ -1,6 +1,6 @@
 ﻿import { Fluent, SNoInfer, getInstanceType, getTypeFullName, getjQuery, isArrayLike, isAssignableFrom, notifyError } from "../../base";
 
-let elementMap: WeakMap<Element, { [key: string]: { domNode: HTMLElement } }> = new WeakMap();
+const elementMap: WeakMap<Element, { [key: string]: { domNode: HTMLElement } }> = new WeakMap();
 
 /**
  * Returns the widget name for a type, derived from its full type name with
@@ -20,9 +20,9 @@ export function getWidgetName(type: Function): string {
 export function associateWidget(widget: { domNode: HTMLElement }) {
     if (!widget || !widget.domNode)
         return;
-    let type = getInstanceType(widget);
-    let name = getWidgetName(type);
-    var widgets = elementMap.get(widget.domNode);
+    const type = getInstanceType(widget);
+    const name = getWidgetName(type);
+    const widgets = elementMap.get(widget.domNode);
     if (widgets) {
         if (widgets[name])
             throw new Error(`The element already has widget '${name}'!`);
@@ -43,9 +43,9 @@ export function associateWidget(widget: { domNode: HTMLElement }) {
 export function deassociateWidget(widget: { domNode: HTMLElement }) {
     if (!widget || !widget.domNode)
         return;
-    let type = getInstanceType(widget);
-    let name = getWidgetName(type);
-    var widgets = elementMap.get(widget.domNode);
+    const type = getInstanceType(widget);
+    const name = getWidgetName(type);
+    const widgets = elementMap.get(widget.domNode);
     if (widgets) {
         delete widgets[name];
         if (!Object.keys(widgets).length)
@@ -72,23 +72,23 @@ export function tryGetWidget<TWidget>(element: Element | ArrayLike<HTMLElement> 
     if (!element)
         return null;
 
-    let widgets = elementMap.get(element);
+    const widgets = elementMap.get(element);
     if (!widgets)
         return null;
 
-    var keys = Object.keys(widgets);
+    const keys = Object.keys(widgets);
     if (!keys.length)
         return null;
 
     if (!type)
         return (widgets[keys[0]] ?? null) as TWidget;
 
-    var name = getWidgetName(type);
-    var widget = widgets[name];
+    const name = getWidgetName(type);
+    let widget = widgets[name];
     if (widget)
         return widgets[name] as TWidget;
 
-    for (var key of Object.keys(widgets)) {
+    for (const key of Object.keys(widgets)) {
         widget = widgets[key];
         if (widget && isAssignableFrom(type, getInstanceType(widget)))
             return widget as TWidget;
@@ -115,9 +115,9 @@ export function getWidgetFrom<TWidget>(element: ArrayLike<HTMLElement> | Element
     if (!element)
         throw new Error(`Searching for widget of type '${getTypeFullName(type) ?? "Widget"}' on a non-existent element! (${selector ?? 'unknown'})`);
 
-    var widget = tryGetWidget(element, type);
+    const widget = tryGetWidget(element, type);
     if (!widget) {
-        var message = `Element (${selector ?? 'unknown'}) has no widget of type '${getTypeFullName(type) ?? "Widget"}'! If you have recently changed ` +
+        const message = `Element (${selector ?? 'unknown'}) has no widget of type '${getTypeFullName(type) ?? "Widget"}'! If you have recently changed ` +
             "editor type of a property in a form class, or changed data type in row (which also changes " +
             "editor type) your script side Form definition might be out of date. Make sure your project " +
             "builds successfully and transformations are executed.";

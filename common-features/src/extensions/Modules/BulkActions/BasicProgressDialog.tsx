@@ -60,14 +60,14 @@ export class BasicProgressDialog<P = {}> extends BaseDialog<P> {
     }
 
     protected override getDialogOptions() {
-        var opt = super.getDialogOptions();
+        const opt = super.getDialogOptions();
         opt.width = 600;
         return opt;
     }
 
     protected override initDialog() {
         super.initDialog();
-        var close = this.domNode.closest('.ui-dialog')?.querySelector('.ui-dialog-titlebar-close') as HTMLElement;
+        const close = this.domNode.closest('.ui-dialog')?.querySelector('.ui-dialog-titlebar-close') as HTMLElement;
         close && (close.hidden = true);
     }
 

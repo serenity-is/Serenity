@@ -411,7 +411,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
 
         const scrollContainerX = this.getScrollContainerX();
         this.getViewports().forEach(vp => {
-            var scrollTicking = false;
+            let scrollTicking = false;
             this._on(vp, "scroll", (e) => {
                 if (!scrollTicking) {
                     scrollTicking = true;
@@ -454,7 +454,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
 
         [this._focusSink1, this._focusSink2].forEach(fs => this._on(fs, "keydown", boundThis.handleKeyDown));
 
-        var canvases = Array.from<HTMLElement>(this.getCanvases());
+        const canvases = Array.from<HTMLElement>(this.getCanvases());
         canvases.forEach(canvas => {
             this._on(canvas, "keydown", boundThis.handleKeyDown)
             this._on(canvas, "click", boundThis.handleClick)
@@ -513,7 +513,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
      * @param plugin - Plugin instance previously passed to {@link SleekGrid.registerPlugin}.
      */
     unregisterPlugin(plugin: GridPlugin): void {
-        for (var i = this._plugins.length; i >= 0; i--) {
+        for (let i = this._plugins.length; i >= 0; i--) {
             if (this._plugins[i] === plugin) {
                 if (this._plugins[i].destroy) {
                     this._plugins[i].destroy();
@@ -530,7 +530,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
      * @returns Matching plugin or `undefined`.
      */
     getPluginByName(name: string): GridPlugin {
-        for (var i = this._plugins.length - 1; i >= 0; i--) {
+        for (let i = this._plugins.length - 1; i >= 0; i--) {
             if (this._plugins[i].pluginName === name)
                 return this._plugins[i];
         }
@@ -630,7 +630,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
      */
     getCanvasNode(row?: number, cell?: number): HTMLElement {
         const refs = this._refs;
-        let band = this.getBandRefsForCell(cell);
+        const band = this.getBandRefsForCell(cell);
         if (row != null) {
             const { frozenBottomFirst, frozenTopLast } = this._refs;
             if (frozenBottomFirst >= 0 && row >= frozenBottomFirst)
@@ -707,7 +707,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     }
 
     private adjustPinnedColsLimit() {
-        let colCount = this._cols.length;
+        const colCount = this._cols.length;
         let pinnedAvail = colCount;
         const config = this._refs.config;
         let pinnedStartCols = config.pinnedStartCols > 0 ? Math.min(config.pinnedStartCols, pinnedAvail) : 0;
@@ -804,7 +804,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
 
     private unbindAncestorScrollEvents(): void {
         if (this._boundAncestorScroll) {
-            for (var x of this._boundAncestorScroll)
+            for (const x of this._boundAncestorScroll)
                 this._off(x, 'scroll', bindThis(this).handleActiveCellPositionChange);
         }
         this._boundAncestorScroll = [];
@@ -821,13 +821,13 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
             return;
         }
 
-        var idx = this.getColumnIndex(columnId);
+        const idx = this.getColumnIndex(columnId);
         if (idx == null) {
             return;
         }
 
-        var columnDef = this._cols[idx];
-        var header = this.getHeaderColumn(idx);
+        const columnDef = this._cols[idx];
+        const header = this.getHeaderColumn(idx);
         if (!header)
             return;
 
@@ -953,7 +953,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         this._mapBands(band => band.footerRowCols).forEach(frc => {
             frc.querySelectorAll(".slick-footerrow-column")
                 .forEach((el) => {
-                    var columnDef = this.getColumnFromNode(el);
+                    const columnDef = this.getColumnFromNode(el);
                     if (columnDef) {
                         this._trigger(this.onBeforeFooterRowCellDestroy, {
                             node: el as HTMLElement,
@@ -965,12 +965,12 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
             this._emptyNode(frc);
         });
 
-        var cols = this._cols;
-        for (var i = 0; i < cols.length; i++) {
+        const cols = this._cols;
+        for (let i = 0; i < cols.length; i++) {
             const footerRowColsNode = this.getBandRefsForCell(i).footerRowCols;
             if (!footerRowColsNode)
                 continue;
-            var m = cols[i];
+            const m = cols[i];
 
             const footerRowCell = <div class={"slick-footerrow-column l" + i + " r" + i} /> as HTMLElement;
             footerRowCell.dataset.c = i.toString();
@@ -994,7 +994,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         this._mapBands(band => band.headerCols).forEach(hc => {
             hc.querySelectorAll(".slick-header-column")
                 .forEach((el) => {
-                    var columnDef = this.getColumnFromNode(el);
+                    const columnDef = this.getColumnFromNode(el);
                     if (columnDef) {
                         this._trigger(this.onBeforeHeaderCellDestroy, {
                             node: el as HTMLElement,
@@ -1011,7 +1011,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         this._mapBands(band => band.headerRowCols).forEach(hrc => {
             hrc.querySelectorAll(".slick-headerrow-column")
                 .forEach((el) => {
-                    var columnDef = this.getColumnFromNode(el);
+                    const columnDef = this.getColumnFromNode(el);
                     if (columnDef) {
                         this._trigger(this.onBeforeHeaderRowCellDestroy, {
                             node: el as HTMLElement,
@@ -1152,7 +1152,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
                     return;
                 }
 
-                let reorderedCols: Column<TItem>[] = [];
+                const reorderedCols: Column<TItem>[] = [];
                 this._mapBands(band => band.headerCols).forEach((headerCols, i) => {
                     if (!headerCols.contains(e.item))
                         return;
@@ -1287,7 +1287,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
 
         this._trigger(this.onBeforeDestroy);
 
-        var i = this._plugins.length;
+        let i = this._plugins.length;
         while (i--) {
             this.unregisterPlugin(this._plugins[i]);
         }
@@ -1333,11 +1333,11 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         this._eventDisposer?.abort();
         this._colResizeDisposer?.abort();
 
-        for (var k in this) {
+        for (const k in this) {
             if (!Object.prototype.hasOwnProperty.call(this, k))
                 continue;
             if (k.startsWith('on')) {
-                var ev: any = this[k];
+                const ev: any = this[k];
                 if ((ev as EventEmitter)?.clear && (ev as EventEmitter)?.subscribe)
                     (ev as EventEmitter)?.clear();
             }
@@ -1389,10 +1389,10 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
      * Auto-fits resizable column widths to the available viewport width.
      */
     autosizeColumns(): void {
-        var vpi = this._viewportInfo,
+        const vpi = this._viewportInfo,
             availWidth = vpi.hasVScroll ? vpi.width - this._scrollDims.width : vpi.width;
 
-        var reRender = autosizeColumns(this._cols, availWidth, this._absoluteColMinWidth);
+        const reRender = autosizeColumns(this._cols, availWidth, this._absoluteColMinWidth);
 
         this.applyColumnHeaderWidths();
         this.updateCanvasWidth(true);
@@ -1405,11 +1405,11 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     private applyColumnHeaderWidths(): void {
         if (!this._initialized) { return; }
 
-        var h: HTMLElement;
-        for (var i = 0, cols = this._cols, colCount = cols.length, diff = this._headerColumnWidthDiff; i < colCount; i++) {
+        let h: HTMLElement;
+        for (let i = 0, cols = this._cols, colCount = cols.length, diff = this._headerColumnWidthDiff; i < colCount; i++) {
             h = this.getHeaderColumn(i);
             if (h) {
-                var target = cols[i].width - diff;
+                const target = cols[i].width - diff;
                 if (h.offsetWidth !== target) {
                     h.style.width = target + 'px'
                 }
@@ -1435,7 +1435,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     setSortColumns(cols: ColumnSort[]): void {
         this._sortColumns = cols || [];
 
-        var headerColumnEls: Element[] = [];
+        let headerColumnEls: Element[] = [];
         this._mapBands(band => band.headerCols).forEach(el => headerColumnEls = headerColumnEls.concat(Array.from(el.children)));
         headerColumnEls.forEach(hel => {
             hel.classList.remove("slick-header-column-sorted");
@@ -1447,9 +1447,9 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
             if (col.sortAsc == null) {
                 col.sortAsc = true;
             }
-            var columnIndex = this.getColumnIndex(col.columnId);
+            const columnIndex = this.getColumnIndex(col.columnId);
             if (columnIndex != null) {
-                var header = headerColumnEls[columnIndex];
+                const header = headerColumnEls[columnIndex];
                 if (header) {
                     header.classList.add("slick-header-column-sorted");
                     const si = header.querySelector(".slick-sort-indicator");
@@ -1471,16 +1471,16 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     }
 
     private handleSelectedRangesChanged = (e: EventData, ranges: CellRange[]): void => {
-        var previousSelectedRows = this._selectedRows.slice(0); // shallow copy previously selected rows for later comparison
+        const previousSelectedRows = this._selectedRows.slice(0); // shallow copy previously selected rows for later comparison
         this._selectedRows = [];
-        var hash: any = Object.create(null), cols = this._cols;
-        for (var i = 0; i < ranges.length; i++) {
-            for (var j = ranges[i].fromRow; j <= ranges[i].toRow; j++) {
+        let hash: any = Object.create(null), cols = this._cols;
+        for (let i = 0; i < ranges.length; i++) {
+            for (let j = ranges[i].fromRow; j <= ranges[i].toRow; j++) {
                 if (!hash[j]) {  // prevent duplicates
                     this._selectedRows.push(j);
                     hash[j] = Object.create(null);
                 }
-                for (var k = ranges[i].fromCell; k <= ranges[i].toCell; k++) {
+                for (let k = ranges[i].fromCell; k <= ranges[i].toCell; k++) {
                     if (this.canCellBeSelected(j, k)) {
                         const cid = cols[k].id;
                         if (!isPollutingKey(j as any) && !isPollutingKey(cid)) {
@@ -1494,9 +1494,9 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         this.setCellCssStyles(this._options.selectedCellCssClass, hash);
 
         if (!simpleArrayEquals(previousSelectedRows, this._selectedRows)) {
-            var caller = e && (e as any).detail && (e as any).detail.caller || 'click';
-            var newSelectedAdditions = this._selectedRows.filter(i => previousSelectedRows.indexOf(i) < 0);
-            var newSelectedDeletions = previousSelectedRows.filter(i => this._selectedRows.indexOf(i) < 0);
+            const caller = e && (e as any).detail && (e as any).detail.caller || 'click';
+            const newSelectedAdditions = this._selectedRows.filter(i => previousSelectedRows.indexOf(i) < 0);
+            const newSelectedDeletions = previousSelectedRows.filter(i => this._selectedRows.indexOf(i) < 0);
 
             this._trigger(this.onSelectedRowsChanged, {
                 rows: this.getSelectedRows(),
@@ -1509,13 +1509,13 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
 
         this._selectedRows = [];
         hash = Object.create(null), cols = this._cols;
-        for (var i = 0; i < ranges.length; i++) {
-            for (var j = ranges[i].fromRow; j <= ranges[i].toRow; j++) {
+        for (let i = 0; i < ranges.length; i++) {
+            for (let j = ranges[i].fromRow; j <= ranges[i].toRow; j++) {
                 if (!hash[j]) {  // prevent duplicates
                     this._selectedRows.push(j);
                     hash[j] = Object.create(null);
                 }
-                for (var k = ranges[i].fromCell; k <= ranges[i].toCell; k++) {
+                for (let k = ranges[i].fromCell; k <= ranges[i].toCell; k++) {
                     if (this.canCellBeSelected(j, k)) {
                         const cid = cols[k].id;
                         if (!isPollutingKey(j as any) && !isPollutingKey(cid)) {
@@ -1544,9 +1544,9 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     private updateViewColLeftRight(): void {
         this._colLeft = [];
         this._colRight = [];
-        var x = 0, r: number, cols = this._cols, c: number, l: number = cols.length;
+        let x = 0, r: number, cols = this._cols, c: number, l: number = cols.length;
         const { pinnedStartLast, pinnedEndFirst } = this._refs;
-        for (var c = 0; c < l; c++) {
+        for (let c = 0; c < l; c++) {
             if (pinnedStartLast + 1 === c || pinnedEndFirst === c)
                 x = 0;
             r = x + cols[c].width;
@@ -1560,7 +1560,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         const allCols = this._allCols;
         let col: Column;
         let cols: Column[] = [];
-        var colById: { [key: string]: number } = {};
+        const colById: { [key: string]: number } = {};
         for (col of allCols) {
             if (col.visible !== false)
                 cols.push(col);
@@ -1993,14 +1993,14 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         y = Math.max(y, 0);
         y = Math.min(y, vpi.virtualHeight - Math.round(this.getScrollContainerY().clientHeight) + ((vpi.hasHScroll || this.hasPinnedCols()) ? this._scrollDims.height : 0));
 
-        var oldOffset = this._pageOffset;
+        const oldOffset = this._pageOffset;
 
         this._page = Math.min(this._numberOfPages - 1, Math.floor(y / this._pageHeight));
         this._pageOffset = Math.round(this._page * this._jumpinessCoefficient);
-        var newScrollTop = y - this._pageOffset;
+        const newScrollTop = y - this._pageOffset;
 
         if (this._pageOffset != oldOffset) {
-            var range = this.getVisibleRange(newScrollTop);
+            const range = this.getVisibleRange(newScrollTop);
             this.cleanupRows(range);
             this.updateRowPositions();
         }
@@ -2026,7 +2026,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
             if (itemMetadata) {
                 const colsMetadata = itemMetadata.columns;
                 if (colsMetadata) {
-                    var columnMetadata: ColumnMetadata = colsMetadata[column.id] || colsMetadata[this.getColumnIndex(column.id)];
+                    const columnMetadata: ColumnMetadata = colsMetadata[column.id] || colsMetadata[this.getColumnIndex(column.id)];
                     if (columnMetadata) {
                         if (columnMetadata.format)
                             return columnMetadata.format;
@@ -2047,17 +2047,17 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         if ((column as any).formatter)
             return convertCompatFormatter((column as any).formatter);
 
-        var opt = this._options;
+        const opt = this._options;
 
-        var factory = opt.formatterFactory;
+        const factory = opt.formatterFactory;
         if (factory) {
             if (factory.getFormat) {
-                var format = factory.getFormat(column);
+                const format = factory.getFormat(column);
                 if (format)
                     return format;
             }
             else if (factory.getFormatter) {
-                var compat = factory.getFormatter(column);
+                const compat = factory.getFormatter(column);
                 if (compat)
                     return convertCompatFormatter(compat);
             }
@@ -2112,9 +2112,9 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     }
 
     private getEditor(row: number, cell: number): EditorClass {
-        var column = this._cols[cell];
-        var itemMetadata = (this._data as IDataView).getItemMetadata?.(row) as ItemMetadata;
-        var colsMetadata = itemMetadata && itemMetadata.columns;
+        const column = this._cols[cell];
+        const itemMetadata = (this._data as IDataView).getItemMetadata?.(row) as ItemMetadata;
+        const colsMetadata = itemMetadata && itemMetadata.columns;
 
         if (colsMetadata && colsMetadata[column.id] && colsMetadata[column.id].editor !== undefined) {
             return colsMetadata[column.id].editor;
@@ -2139,8 +2139,8 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     }
 
     private cleanupRows(rangeToKeep: ViewRange): void {
-        var i: number;
-        for (var x in this._rowsCache) {
+        let i: number;
+        for (const x in this._rowsCache) {
             i = parseInt(x, 10);
             if (i !== this._activeRow && (i < rangeToKeep.top || i > rangeToKeep.bottom)
                 && !this.isFrozenRow(i))
@@ -2167,7 +2167,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         if (this._currentEditor) {
             this.makeActiveCellNormal();
         }
-        for (var row in this._rowsCache) {
+        for (const row in this._rowsCache) {
             this.removeRowFromCache(parseInt(row, 10));
         }
 
@@ -2176,15 +2176,15 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
 
     private queuePostProcessedRowForCleanup(cacheEntry: CachedRow, row: number): void {
 
-        var postProcessedRow = this._postProcessedRows[row];
+        const postProcessedRow = this._postProcessedRows[row];
         if (!postProcessedRow)
             return;
 
         this._postProcessGroupId++;
 
         // store and detach node for later async cleanup
-        for (var x in postProcessedRow) {
-            var columnIdx = parseInt(x, 10);
+        for (const x in postProcessedRow) {
+            const columnIdx = parseInt(x, 10);
             this._postProcessCleanupQueue.push({
                 groupId: this._postProcessGroupId,
                 cellNode: cacheEntry.cellNodesByColumnIdx[columnIdx | 0],
@@ -2216,7 +2216,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     }
 
     private removeRowFromCache(row: number): void {
-        var cacheEntry = this._rowsCache[row];
+        const cacheEntry = this._rowsCache[row];
         if (!cacheEntry) {
             return;
         }
@@ -2239,7 +2239,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
      * @param rows - View row indices to invalidate.
      */
     invalidateRows(rows: number[]): void {
-        var i, rl;
+        let i, rl;
         if (!rows || !rows.length) {
             return;
         }
@@ -2270,7 +2270,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
      * @param cell - Cell/column index.
      */
     updateCell(row: number, cell: number): void {
-        var cellNode = this.getCellNode(row, cell);
+        const cellNode = this.getCellNode(row, cell);
         if (!cellNode)
             return;
 
@@ -2300,17 +2300,17 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
      * @param row - View row index.
      */
     updateRow(row: number): void {
-        var cacheEntry = this._rowsCache[row];
+        const cacheEntry = this._rowsCache[row];
         if (!cacheEntry) {
             return;
         }
 
         this.ensureCellNodesInRowsCache(row);
 
-        var d = this.getDataItem(row);
+        const d = this.getDataItem(row);
 
-        for (var x in cacheEntry.cellNodesByColumnIdx) {
-            var cell = parseInt(x, 10);
+        for (const x in cacheEntry.cellNodesByColumnIdx) {
+            const cell = parseInt(x, 10);
             if (row === this._activeRow && cell === this._activeCell && this._currentEditor) {
                 this._currentEditor.loadValue(d);
             }
@@ -2341,7 +2341,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
             }
         } else {
 
-            var style = getComputedStyle(this._container);
+            const style = getComputedStyle(this._container);
             vs.height =
                 parsePx(style.height)
                 - parsePx(style.paddingTop)
@@ -2416,18 +2416,18 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
             return;
         }
 
-        var dataLengthIncludingAddNew = this.getDataLengthIncludingAddNew();
-        var scrollCanvas = this._refs.main.canvas.body;
-        var oldH = Math.round(parsePx(getComputedStyle(scrollCanvas).height));
+        const dataLengthIncludingAddNew = this.getDataLengthIncludingAddNew();
+        const scrollCanvas = this._refs.main.canvas.body;
+        const oldH = Math.round(parsePx(getComputedStyle(scrollCanvas).height));
 
         let numberOfRows = dataLengthIncludingAddNew + (this._options.leaveSpaceForNewRows ? this._viewportInfo.numVisibleRows - 1 : 0);
         this._refs.config.dataLength = this.getDataLength();
         const { frozenTopRows, frozenBottomRows } = this._refs;
         numberOfRows -= frozenTopRows + frozenBottomRows;
 
-        var tempViewportH = Math.floor(parsePx(getComputedStyle(this.getScrollContainerY()).height));
+        const tempViewportH = Math.floor(parsePx(getComputedStyle(this.getScrollContainerY()).height));
         const vpi = this._viewportInfo;
-        var oldViewportHasVScroll = vpi.hasVScroll;
+        const oldViewportHasVScroll = vpi.hasVScroll;
         // with autoHeight, we do not need to accommodate the vertical scroll bar
         vpi.hasVScroll = !this._options.autoHeight && (numberOfRows * this._options.rowHeight > tempViewportH);
 
@@ -2435,9 +2435,9 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
 
         // remove the rows that are now outside of the data range
         // this helps avoid redundant calls to .removeRow() when the size of the data decreased by thousands of rows
-        var l = dataLengthIncludingAddNew - 1;
-        for (var x in this._rowsCache) {
-            var i = parseInt(x, 10);
+        const l = dataLengthIncludingAddNew - 1;
+        for (const x in this._rowsCache) {
+            const i = parseInt(x, 10);
             if (i >= l) {
                 this.removeRowFromCache(i);
             }
@@ -2469,7 +2469,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
             this._scrollTop = this.getScrollContainerY().scrollTop;
         }
 
-        var oldScrollTopInRange = (this._scrollTop + this._pageOffset <= vpi.virtualHeight - tempViewportH);
+        const oldScrollTopInRange = (this._scrollTop + this._pageOffset <= vpi.virtualHeight - tempViewportH);
 
         if (vpi.virtualHeight == 0 || this._scrollTop == 0) {
             this._page = this._pageOffset = 0;
@@ -2545,14 +2545,14 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
      * @param viewportLeft - Optional scroll left override.
      */
     getRenderedRange(viewportTop?: number, viewportLeft?: number): ViewRange {
-        var range = this.getVisibleRange(viewportTop, viewportLeft);
+        const range = this.getVisibleRange(viewportTop, viewportLeft);
         if (this._options.renderAllRows) {
             range.top = 0;
             range.bottom = this.getDataLengthIncludingAddNew() - 1;
         }
         else {
-            var buffer = Math.round(this._viewportInfo.height / this._options.rowHeight);
-            var minBuffer = this._options.minBuffer || 3;
+            const buffer = Math.round(this._viewportInfo.height / this._options.rowHeight);
+            const minBuffer = this._options.minBuffer || 3;
             if (this._vScrollDir == -1) {
                 range.top -= buffer;
                 range.bottom += minBuffer;
@@ -2584,13 +2584,13 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     }
 
     private ensureCellNodesInRowsCache(row: number): void {
-        var cacheEntry = this._rowsCache[row];
+        const cacheEntry = this._rowsCache[row];
         if (cacheEntry && cacheEntry.cellRenderQueue.length) {
             for (const rowNode of [cacheEntry.rowNodeE, cacheEntry.rowNodeC, cacheEntry.rowNodeS]) {
-                var lastChild = rowNode?.lastElementChild;
+                let lastChild = rowNode?.lastElementChild;
                 while (lastChild && cacheEntry.cellRenderQueue.length) {
-                    var columnIdx = cacheEntry.cellRenderQueue.pop();
-                    var element = cacheEntry.cellRenderContent.pop();
+                    const columnIdx = cacheEntry.cellRenderQueue.pop();
+                    const element = cacheEntry.cellRenderContent.pop();
 
                     cacheEntry.cellNodesByColumnIdx[columnIdx] = lastChild as HTMLElement;
                     if (element instanceof Node)
@@ -2610,20 +2610,20 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         if (this.isFrozenRow(row))
             return;
 
-        var cacheEntry = this._rowsCache[row];
+        const cacheEntry = this._rowsCache[row];
 
         // Remove cells outside the range.
         const cellsToRemove = [], { pinnedStartLast, pinnedEndFirst } = this._refs;
-        for (var x in cacheEntry.cellNodesByColumnIdx) {
+        for (const x in cacheEntry.cellNodesByColumnIdx) {
 
-            var i = parseInt(x, 10);
+            const i = parseInt(x, 10);
 
             // Ignore frozen columns
             if (i <= pinnedStartLast || i >= pinnedEndFirst) {
                 continue;
             }
 
-            var colspan = cacheEntry.cellColSpans[i], cols = this._cols;
+            const colspan = cacheEntry.cellColSpans[i], cols = this._cols;
             if (this._colLeft[i] > rangeToKeep.rightPx || this._colRight[Math.min(cols.length - 1, i + colspan - 1)] < rangeToKeep.leftPx) {
                 if (!(row == this._activeRow && i === this._activeCell)) {
                     cellsToRemove.push(i);
@@ -2631,7 +2631,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
             }
         }
 
-        var cellToRemove, node;
+        let cellToRemove, node;
         this._postProcessGroupId++;
         while ((cellToRemove = cellsToRemove.pop()) != null) {
             node = cacheEntry.cellNodesByColumnIdx[cellToRemove];
@@ -2651,15 +2651,15 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     }
 
     private cleanUpAndRenderCells(range: ViewRange) {
-        var cacheEntry;
-        var processedRows = [];
-        var cellsAdded;
-        var colspan;
-        var cols = this._cols;
+        let cacheEntry;
+        const processedRows = [];
+        let cellsAdded;
+        let colspan;
+        const cols = this._cols;
 
         const args = this.createRowCellRenderArgs(null, -1); // cell != null indicates cell rendering mode
 
-        for (var row = range.top, btm = range.bottom; row <= btm; row++) {
+        for (let row = range.top, btm = range.bottom; row <= btm; row++) {
             args.cachedRow = cacheEntry = this._rowsCache[row];
             if (!cacheEntry) {
                 continue;
@@ -2673,11 +2673,11 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
             // Render missing cells.
             cellsAdded = 0;
 
-            var itemMetadata = (this._data as IDataView).getItemMetadata?.(row);
-            var colsMetadata = itemMetadata && itemMetadata.columns;
+            const itemMetadata = (this._data as IDataView).getItemMetadata?.(row);
+            const colsMetadata = itemMetadata && itemMetadata.columns;
 
             // TODO:  shorten this loop (index? heuristics? binary search?)
-            for (var cell = 0, colCount = cols.length; cell < colCount; cell++) {
+            for (let cell = 0, colCount = cols.length; cell < colCount; cell++) {
                 // Cells to the right are outside the range.
                 if (this._colLeft[cell] > range.rightPx) {
                     break;
@@ -2689,7 +2689,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
                     continue;
                 }
 
-                var colMetadata: ColumnMetadata = null;
+                let colMetadata: ColumnMetadata = null;
                 colspan = 1;
                 if (colsMetadata) {
                     colMetadata = colsMetadata[cols[cell].id] || colsMetadata[cell];
@@ -2721,17 +2721,17 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
             return;
         }
 
-        var x = document.createElement("div");
+        const x = document.createElement("div");
         x.innerHTML = args.sb.join("");
 
-        var processedRow;
-        var node: HTMLElement;
+        let processedRow;
+        let node: HTMLElement;
         const { pinnedStartLast, pinnedEndFirst } = args.frozenPinned;
         while ((processedRow = processedRows.pop()) != null) {
             cacheEntry = this._rowsCache[processedRow];
-            var columnIdx;
+            let columnIdx;
             while ((columnIdx = cacheEntry.cellRenderQueue.pop()) != null) {
-                var element = cacheEntry.cellRenderContent.pop();
+                const element = cacheEntry.cellRenderContent.pop();
                 node = x.lastElementChild as HTMLElement;
                 if (element instanceof Node)
                     node.appendChild(element);
@@ -2819,7 +2819,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         const s = document.createElement("div"), c = document.createElement("div"), e = document.createElement("div");
         s.innerHTML = args.sbStart.join(""); c.innerHTML = args.sbCenter.join(""); e.innerHTML = args.sbEnd.join("");
 
-        for (let row of rows) {
+        for (const row of rows) {
             const cache = this._rowsCache[row];
             function append(canvas: GridBandRefs["canvas"], rowNode: HTMLElement) {
                 canvas[row <= frozenTopLast ? "top" : row >= frozenBottomFirst ? "bottom" : "body"]?.appendChild(rowNode);
@@ -2872,10 +2872,10 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
 
     private invalidatePostProcessingResults(row: number): void {
         if (this._options.enableAsyncPostRenderCleanup) {
-            var postProcessed = this._postProcessedRows[row];
+            const postProcessed = this._postProcessedRows[row];
             if (postProcessed) {
                 // change status of columns to be re-rendered
-                for (var columnIdx in postProcessed) {
+                for (const columnIdx in postProcessed) {
                     if (isPollutingKey(columnIdx)) continue;
                     postProcessed[columnIdx] = 'C';
                 }
@@ -2891,9 +2891,9 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     }
 
     private updateRowPositions(): void {
-        for (var row in this._rowsCache) {
-            var c = this._rowsCache[row];
-            var p = this.getRowTop(parseInt(row, 10)) + "px";
+        for (const row in this._rowsCache) {
+            const c = this._rowsCache[row];
+            const p = this.getRowTop(parseInt(row, 10)) + "px";
             c.rowNodeS && (c.rowNodeS.style.top = p);
             c.rowNodeC && (c.rowNodeC.style.top = p);
             c.rowNodeE && (c.rowNodeE.style.top = p);
@@ -2904,13 +2904,13 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         if (!this._options.showFooterRow || !this._initialized)
             return;
 
-        var totals: IGroupTotals;
+        let totals: IGroupTotals;
         if (this._data && (this._data as IDataView).getGrandTotals)
             totals = (this._data as IDataView).getGrandTotals();
         totals = totals ?? {};
 
-        var cols = this._cols;
-        for (var m of cols) {
+        const cols = this._cols;
+        for (const m of cols) {
             if (m.id != void 0) {
                 const formatter = this.getTotalsFormatter(m);
                 if (!formatter)
@@ -2936,8 +2936,8 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         if (this._hRender) {
             clearTimeout(this._hRender);
         }
-        var visible = this.getVisibleRange();
-        var rendered = this.getRenderedRange();
+        const visible = this.getVisibleRange();
+        const rendered = this.getRenderedRange();
 
         // remove rows no longer in the viewport
         this.cleanupRows(rendered);
@@ -2984,7 +2984,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         if (this._ignoreScrollUntil >= new Date().getTime())
             return;
 
-        var scrollLeft = (e.target as HTMLElement).scrollLeft;
+        const scrollLeft = (e.target as HTMLElement).scrollLeft;
         if (scrollLeft != this.getScrollContainerX().scrollLeft) {
             this.getScrollContainerX().scrollLeft = scrollLeft;
         }
@@ -3040,8 +3040,8 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
             this._scrollLeft = this.getScrollContainerX().scrollLeft;
         }
 
-        var vScrollDist = Math.abs(this._scrollTop - this._scrollTopPrev);
-        var hScrollDist = Math.abs(this._scrollLeft - this._scrollLeftPrev);
+        const vScrollDist = Math.abs(this._scrollTop - this._scrollTopPrev);
+        const hScrollDist = Math.abs(this._scrollLeft - this._scrollLeftPrev);
 
         if (hScrollDist || vScrollDist)
             this._ignoreScrollUntil = new Date().getTime() + 100;
@@ -3072,7 +3072,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
                 if (vScrollDist < this._viewportInfo.height) {
                     this.scrollTo(this._scrollTop + this._pageOffset);
                 } else {
-                    var oldOffset = this._pageOffset;
+                    const oldOffset = this._pageOffset;
                     if (vpi.realScrollHeight == vpi.height) {
                         this._page = 0;
                     } else {
@@ -3113,11 +3113,11 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     }
 
     private asyncPostProcessRows() {
-        var dataLength = this.getDataLength();
-        var cols = this._cols;
+        const dataLength = this.getDataLength();
+        const cols = this._cols;
         while (this._postProcessFromRow <= this._postProcessToRow) {
-            var row = (this._vScrollDir >= 0) ? this._postProcessFromRow++ : this._postProcessToRow--;
-            var cacheEntry = this._rowsCache[row];
+            const row = (this._vScrollDir >= 0) ? this._postProcessFromRow++ : this._postProcessToRow--;
+            const cacheEntry = this._rowsCache[row];
             if (!cacheEntry || row >= dataLength) {
                 continue;
             }
@@ -3127,14 +3127,14 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
             }
 
             this.ensureCellNodesInRowsCache(row);
-            for (var x in cacheEntry.cellNodesByColumnIdx) {
-                var columnIdx = parseInt(x, 10);
+            for (const x in cacheEntry.cellNodesByColumnIdx) {
+                const columnIdx = parseInt(x, 10);
 
-                var m = cols[columnIdx];
-                var processedStatus = this._postProcessedRows[row][columnIdx]; // C=cleanup and re-render, R=render
+                const m = cols[columnIdx];
+                const processedStatus = this._postProcessedRows[row][columnIdx]; // C=cleanup and re-render, R=render
                 if (processedStatus !== 'R') {
                     if (m.asyncPostRender || m.asyncPostRenderCleanup) {
-                        var node = cacheEntry.cellNodesByColumnIdx[columnIdx];
+                        const node = cacheEntry.cellNodesByColumnIdx[columnIdx];
                         if (node) {
                             m.asyncPostRender && m.asyncPostRender(node, row, this.getDataItem(row), m, processedStatus === 'C');
                         }
@@ -3151,18 +3151,18 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     }
 
     private asyncPostProcessCleanupRows(): void {
-        var cols = this._cols;
+        const cols = this._cols;
         while (this._postProcessCleanupQueue?.length > 0) {
-            var groupId = this._postProcessCleanupQueue[0].groupId;
+            const groupId = this._postProcessCleanupQueue[0].groupId;
 
             // loop through all queue members with this groupID
             while (this._postProcessCleanupQueue.length > 0 && this._postProcessCleanupQueue[0].groupId == groupId) {
-                var entry = this._postProcessCleanupQueue.shift();
+                const entry = this._postProcessCleanupQueue.shift();
                 entry.rowNodeS?.remove();
                 entry.rowNodeC?.remove();
                 entry.rowNodeE?.remove();
                 if (entry.cellNode != null) {
-                    var column = cols[entry.columnIdx];
+                    const column = cols[entry.columnIdx];
                     if (column && column.asyncPostRenderCleanup) {
                         column.asyncPostRenderCleanup(entry.cellNode, entry.rowIdx, column);
                         this._removeNode(entry.cellNode);
@@ -3179,8 +3179,8 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     }
 
     private updateCellCssStylesOnRenderedRows(addedHash: CellStylesHash, removedHash: CellStylesHash) {
-        var node, columnId, addedRowHash, removedRowHash;
-        for (var row in this._rowsCache) {
+        let node, columnId, addedRowHash, removedRowHash;
+        for (const row in this._rowsCache) {
             removedRowHash = removedHash && removedHash[row];
             addedRowHash = addedHash && addedHash[row];
 
@@ -3247,7 +3247,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
      * @param hash - New hash.
      */
     setCellCssStyles(key: string, hash: CellStylesHash): void {
-        var prevHash = this._cellCssClasses[key];
+        const prevHash = this._cellCssClasses[key];
 
         this._cellCssClasses[key] = hash;
         this.updateCellCssStylesOnRenderedRows(hash, prevHash);
@@ -3271,8 +3271,8 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
      */
     flashCell(row: number, cell: number, speed?: number): void {
         speed = speed || 100;
-        var klass = this._options.cellFlashingCssClass;
-        var cellNode = this._rowsCache[row] && this.getCellNode(row, cell);
+        const klass = this._options.cellFlashingCssClass;
+        const cellNode = this._rowsCache[row] && this.getCellNode(row, cell);
         if (!cellNode)
             return;
 
@@ -3292,7 +3292,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     // Interactivity
 
     private handleDragInit(e: UIEvent, dd: DragPosition): boolean {
-        var cell = this.getCellFromEvent(e);
+        const cell = this.getCellFromEvent(e);
         if (!cell || !this.cellExists(cell.row, cell.cell)) {
             return false;
         }
@@ -3309,7 +3309,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     }
 
     private handleDragStart(e: DragEvent, dd: DragPosition): boolean {
-        var cell = this.getCellFromEvent(e);
+        const cell = this.getCellFromEvent(e);
         if (!cell || !this.cellExists(cell.row, cell.cell)) {
             return false;
         }
@@ -3333,7 +3333,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
 
     private handleKeyDown(e: KeyboardEvent): void {
         const sge = this._trigger(this.onKeyDown, { row: this._activeRow, cell: this._activeCell }, e);
-        var handled = sge.isImmediatePropagationStopped();
+        let handled = sge.isImmediatePropagationStopped();
 
         if (!handled) {
             if (!e.shiftKey && !e.altKey) {
@@ -3430,7 +3430,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     }
 
     private getTextSelection() {
-        var selection = null;
+        let selection = null;
 
         if (window.getSelection && window.getSelection().rangeCount > 0) {
             selection = window.getSelection().getRangeAt(0);
@@ -3441,7 +3441,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
 
     private setTextSelection(selection: Range) {
         if (window.getSelection && selection) {
-            var target = window.getSelection();
+            const target = window.getSelection();
             target.removeAllRanges();
             target.addRange(selection);
         }
@@ -3453,7 +3453,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
             // don't steal it back - keyboard events will still bubble up
             // IE9+ seems to default DIVs to tabIndex=0 instead of -1, so check for cell clicks directly.
             if (e.target != document.activeElement || (e.target as HTMLElement)?.classList?.contains?.("slick-cell")) {
-                var selection = this.getTextSelection();
+                const selection = this.getTextSelection();
                 this.setFocus();
                 if (selection && this._options.enableTextSelectionOnCells) {
                     this.setTextSelection(selection);
@@ -3461,7 +3461,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
             }
         }
 
-        var cell = this.getCellFromEvent(e as any);
+        const cell = this.getCellFromEvent(e as any);
         if (!cell || (this._currentEditor != null && this._activeRow == cell.row && this._activeCell == cell.cell)) {
             return;
         }
@@ -3474,16 +3474,16 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         if (this.canCellBeActive(cell.row, cell.cell)) {
             if (!this.getEditorLock().isActive() || this.getEditorLock().commitCurrentEdit()) {
 
-                var preClickModeOn = (e.target && (e.target as HTMLElement).classList.contains(preClickClassName));
-                var column = this._cols[cell.cell];
-                var suppressActiveCellChangedEvent = !!(this._options.editable && column && column.editor && this._options.suppressActiveCellChangeOnEdit);
+                const preClickModeOn = (e.target && (e.target as HTMLElement).classList.contains(preClickClassName));
+                const column = this._cols[cell.cell];
+                const suppressActiveCellChangedEvent = !!(this._options.editable && column && column.editor && this._options.suppressActiveCellChangeOnEdit);
                 this.setActiveCellInternal(this.getCellNode(cell.row, cell.cell), null, preClickModeOn, suppressActiveCellChangedEvent, e);
             }
         }
     }
 
     private handleContextMenu(e: MouseEvent): void {
-        var cellEl = (e.target as HTMLElement).closest(".slick-cell");
+        const cellEl = (e.target as HTMLElement).closest(".slick-cell");
         if (!cellEl) {
             return;
         }
@@ -3497,7 +3497,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     }
 
     private handleDblClick(e: MouseEvent): void {
-        var cell = this.getCellFromEvent(e as any);
+        const cell = this.getCellFromEvent(e as any);
         if (!cell || (this._currentEditor != null && this._activeRow == cell.row && this._activeCell == cell.cell)) {
             return;
         }
@@ -3523,14 +3523,14 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     }
 
     private handleHeaderContextMenu(e: MouseEvent): void {
-        var header = (e.target as Element)?.closest?.(".slick-header-column");
-        var column = this.getColumnFromNode(header);
+        const header = (e.target as Element)?.closest?.(".slick-header-column");
+        const column = this.getColumnFromNode(header);
         column && this._trigger(this.onHeaderContextMenu, { column }, e);
     }
 
     private handleHeaderClick(e: MouseEvent): void {
-        var header = (e.target as Element)?.closest?.(".slick-header-column");
-        var column = this.getColumnFromNode(header);
+        const header = (e.target as Element)?.closest?.(".slick-header-column");
+        const column = this.getColumnFromNode(header);
         column && this._trigger(this.onHeaderClick, { column: column }, e);
     }
 
@@ -3552,11 +3552,11 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
      * @param y - Vertical pixel offset.
      */
     getCellFromPoint(x: number, y: number): { row: number; cell: number; } {
-        var row = this.getRowFromPosition(y);
-        var cell = 0;
-        var cols = this._cols;
-        var w = 0;
-        for (var i = 0; i < cols.length && w < x; i++) {
+        const row = this.getRowFromPosition(y);
+        let cell = 0;
+        const cols = this._cols;
+        let w = 0;
+        for (let i = 0; i < cols.length && w < x; i++) {
             w += cols[i].width;
             cell++;
         }
@@ -3576,12 +3576,12 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         if (cellNode == null)
             return null;
 
-        var c = (cellNode as HTMLElement).dataset.c;
+        const c = (cellNode as HTMLElement).dataset.c;
         if (c != null)
             return parseInt(c, 10);
 
         // read column number from .l<columnNumber> CSS class
-        var cls = /\sl(\d+)\s/.exec(' ' + cellNode.className + ' ');
+        const cls = /\sl(\d+)\s/.exec(' ' + cellNode.className + ' ');
         if (!cls) {
             return null;
         }
@@ -3596,7 +3596,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         if (cellNode == null)
             return null;
 
-        var cell = this.getCellFromNode(cellNode);
+        const cell = this.getCellFromNode(cellNode);
         if (cell === null && this._jQuery)
             return this._jQuery(cell).data("column") as Column<TItem>;
 
@@ -3612,8 +3612,8 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
             const srow = (rowNode as HTMLElement).dataset?.row;
             if (srow != null)
                 return parseInt(srow, 10);
-            for (var row in this._rowsCache) {
-                var c = this._rowsCache[row];
+            for (const row in this._rowsCache) {
+                const c = this._rowsCache[row];
                 if (c.rowNodeS === rowNode || c.rowNodeC === rowNode || c.rowNodeE === rowNode)
                     return parseInt(row, 10);
             }
@@ -3626,8 +3626,8 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
      * @param e - DOM event whose `target` lies inside the desired cell.
      */
     getCellFromEvent(e: any): { row: number; cell: number; } {
-        var row, cell;
-        var cellEl = (e.target as HTMLElement).closest(".slick-cell") as HTMLElement;
+        let row, cell;
+        const cellEl = (e.target as HTMLElement).closest(".slick-cell") as HTMLElement;
         if (!cellEl) {
             return null;
         }
@@ -3656,16 +3656,16 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         }
 
         const cols = this._cols, { pinnedStartLast, pinnedEndFirst } = this._refs;
-        var y1 = this.getRowTop(row);
-        var y2 = y1 + this._options.rowHeight - 1;
-        var x1 = 0;
-        for (var i = 0; i < cell; i++) {
+        const y1 = this.getRowTop(row);
+        const y2 = y1 + this._options.rowHeight - 1;
+        let x1 = 0;
+        for (let i = 0; i < cell; i++) {
             x1 += cols[i].width;
             if (i === pinnedStartLast + 1 || i === pinnedEndFirst) {
                 x1 = 0;
             }
         }
-        var x2 = x1 + cols[cell].width;
+        const x2 = x1 + cols[cell].width;
 
         return this._options.rtl ? {
             top: y1,
@@ -3718,7 +3718,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         if (cell <= pinnedStartLast || cell >= pinnedEndFirst)
             return;
 
-        var colspan = this.getColspan(row, cell);
+        const colspan = this.getColspan(row, cell);
         this.internalScrollColumnIntoView(this._colLeft[cell], this._colRight[cell + (colspan > 1 ? colspan - 1 : 0)]);
     }
 
@@ -3732,10 +3732,10 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
 
     private internalScrollColumnIntoView(left: number, right: number): void {
 
-        var scrollRight = this._scrollLeft + parsePx(getComputedStyle(this.getScrollContainerX()).width) -
+        const scrollRight = this._scrollLeft + parsePx(getComputedStyle(this.getScrollContainerX()).width) -
             (this._viewportInfo.hasVScroll ? this._scrollDims.width : 0);
 
-        var target;
+        let target;
         if (left < this._scrollLeft)
             target = left;
         else if (right > scrollRight)
@@ -3752,7 +3752,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         if (this._activeCellNode) {
             this.makeActiveCellNormal();
             this._activeCellNode.classList.remove("active");
-            var c = this._rowsCache[this._activeRow];
+            const c = this._rowsCache[this._activeRow];
             if (c) {
                 c.rowNodeS && c.rowNodeS.classList.remove("active");
                 c.rowNodeC && c.rowNodeC.classList.remove("active");
@@ -3768,7 +3768,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
 
             if (this._options.showCellSelection) {
                 this._activeCellNode.classList.add("active");
-                var c = this._rowsCache[this._activeRow];
+                const c = this._rowsCache[this._activeRow];
                 if (c) {
                     c.rowNodeS?.classList.add("active");
                     c.rowNodeC?.classList.add("active");
@@ -3810,7 +3810,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
                 (document as any).selection.empty();
             } catch (e) { }
         } else if (window.getSelection) {
-            var sel = window.getSelection();
+            const sel = window.getSelection();
             if (sel && sel.removeAllRanges) {
                 sel.removeAllRanges();
             }
@@ -3818,7 +3818,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     }
 
     private isCellPotentiallyEditable(row: number, cell: number): boolean {
-        var dataLength = this.getDataLength();
+        const dataLength = this.getDataLength();
         // is the data for this row loaded?
         if (row < dataLength && !this.getDataItem(row)) {
             return false;
@@ -3883,8 +3883,8 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
             return;
         }
 
-        var columnDef = this._cols[this._activeCell];
-        var item = this.getDataItem(this._activeRow);
+        const columnDef = this._cols[this._activeCell];
+        const item = this.getDataItem(this._activeRow);
 
         const sge = this._trigger(this.onBeforeEditCell, { row: this._activeRow, cell: this._activeCell, item: item, column: columnDef });
         if (sge.isDefaultPrevented() ||
@@ -3896,16 +3896,16 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         this.getEditorLock().activate(this._editController);
         this._activeCellNode.classList.add("editable");
 
-        var useEditor = editor || this.getEditor(this._activeRow, this._activeCell);
+        const useEditor = editor || this.getEditor(this._activeRow, this._activeCell);
 
         // don't clear the cell if a custom editor is passed through
         if (!editor && !useEditor.suppressClearOnEdit) {
             this._activeCellNode.innerHTML = "";
         }
 
-        var itemMetadata = (this._data as IDataView).getItemMetadata?.(this._activeRow) as ItemMetadata;
-        var colsMetadata = itemMetadata && itemMetadata.columns;
-        var columnMetadata = colsMetadata && (colsMetadata[columnDef.id] || colsMetadata[this._activeCell]);
+        const itemMetadata = (this._data as IDataView).getItemMetadata?.(this._activeRow) as ItemMetadata;
+        const colsMetadata = itemMetadata && itemMetadata.columns;
+        const columnMetadata = colsMetadata && (colsMetadata[columnDef.id] || colsMetadata[this._activeCell]);
 
         const boundThis = bindThis(this);
         this._currentEditor = new useEditor({
@@ -3972,7 +3972,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         this._trigger(this.onActiveCellPositionChanged, {});
 
         if (this._currentEditor) {
-            var cellBox = this.getActiveCellPosition();
+            const cellBox = this.getActiveCellPosition();
             if (this._currentEditor.show && this._currentEditor.hide) {
                 if (!cellBox.visible) {
                     this._currentEditor.hide();
@@ -4031,13 +4031,13 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         const { frozenTopLast } = this._refs;
         if (!this.isFrozenRow(row)) {
 
-            var viewportScrollH = Math.round(parsePx(getComputedStyle(this.getScrollContainerY()).height));
+            const viewportScrollH = Math.round(parsePx(getComputedStyle(this.getScrollContainerY()).height));
 
             const rowNumber = frozenTopLast >= 0 ? (row - frozenTopLast + 1) : row;
 
             // if frozen row on top subtract number of frozen row
-            var rowAtTop = rowNumber * this._options.rowHeight;
-            var rowAtBottom = (rowNumber + 1) * this._options.rowHeight
+            const rowAtTop = rowNumber * this._options.rowHeight;
+            const rowAtBottom = (rowNumber + 1) * this._options.rowHeight
                 - viewportScrollH
                 + (this._viewportInfo.hasHScroll ? this._scrollDims.height : 0);
 
@@ -4064,13 +4064,13 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     }
 
     private scrollPage(dir: number): void {
-        var deltaRows = dir * this._viewportInfo.numVisibleRows;
+        const deltaRows = dir * this._viewportInfo.numVisibleRows;
         this.scrollTo((this.getRowFromPosition(this._scrollTop) + deltaRows) * this._options.rowHeight);
         this.render();
 
         if (this._options.enableCellNavigation && this._activeRow != null) {
-            var row = this._activeRow + deltaRows;
-            var dataLengthIncludingAddNew = this.getDataLengthIncludingAddNew();
+            let row = this._activeRow + deltaRows;
+            const dataLengthIncludingAddNew = this.getDataLengthIncludingAddNew();
             if (row >= dataLengthIncludingAddNew) {
                 row = dataLengthIncludingAddNew - 1;
             }
@@ -4078,8 +4078,8 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
                 row = 0;
             }
 
-            var cell = 0, prevCell = null;
-            var prevActivePosX = this._activePosX;
+            let cell = 0, prevCell = null;
+            const prevActivePosX = this._activePosX;
             while (cell <= this._activePosX) {
                 if (this.canCellBeActive(row, cell)) {
                     prevCell = cell;
@@ -4130,7 +4130,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
      * @returns `true` (always reported as handled).
      */
     navigateToRow(row: number): boolean {
-        var dataLength = this.getDataLength();
+        const dataLength = this.getDataLength();
         if (!dataLength) {
             return true;
         }
@@ -4143,8 +4143,8 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         this.scrollCellIntoView(row, 0, true);
 
         if (this._options.enableCellNavigation && this._activeRow != null) {
-            var cell = 0, prevCell = null;
-            var prevActivePosX = this._activePosX;
+            let cell = 0, prevCell = null;
+            const prevActivePosX = this._activePosX;
             while (cell <= this._activePosX) {
                 if (this.canCellBeActive(row, cell))
                     prevCell = cell;
@@ -4168,14 +4168,14 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
      * @param cell - Cell index.
      */
     getColspan(row: number, cell: number): number {
-        var itemMetadata = (this._data as IDataView).getItemMetadata?.(row) as ItemMetadata;
+        const itemMetadata = (this._data as IDataView).getItemMetadata?.(row) as ItemMetadata;
         if (!itemMetadata || !itemMetadata.columns) {
             return 1;
         }
 
-        var cols = this._cols;
-        var columnData = cols[cell] && (itemMetadata.columns[cols[cell].id] || itemMetadata.columns[cell]);
-        var colspan = (columnData && columnData.colspan);
+        const cols = this._cols;
+        const columnData = cols[cell] && (itemMetadata.columns[cols[cell].id] || itemMetadata.columns[cell]);
+        let colspan = (columnData && columnData.colspan);
         if (colspan === "*") {
             colspan = cols.length - cell;
         } else {
@@ -4284,14 +4284,14 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
             });
         }
 
-        var pos = this._cellNavigator.navigate(dir, this._activeRow, this._activeCell, this._activePosX);
+        const pos = this._cellNavigator.navigate(dir, this._activeRow, this._activeCell, this._activePosX);
         if (pos) {
             const { frozenBottomFirst } = this._refs;
             if (frozenBottomFirst != Infinity && pos.row == this.getDataLength()) {
                 return;
             }
 
-            var isAddNewRow = (pos.row == this.getDataLength());
+            const isAddNewRow = (pos.row == this.getDataLength());
 
             if (!this.isFrozenRow(pos.row)) {
                 this.scrollCellIntoView(pos.row, pos.cell, !isAddNewRow);
@@ -4326,7 +4326,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
      */
     setActiveCell(row: number, cell: number): void {
         if (!this._initialized) { return; }
-        var cols = this._cols;
+        const cols = this._cols;
         if (row > this.getDataLength() || row < 0 || cell >= cols.length || cell < 0) {
             return;
         }
@@ -4365,13 +4365,13 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
      * @param tab - When `true`, additionally checks `tabbable`.
      */
     canCellBeActive(row: number, cell: number, tab?: boolean): boolean {
-        var cols = this._cols;
+        const cols = this._cols;
         if (!this._options.enableCellNavigation || row >= this.getDataLengthIncludingAddNew() ||
             row < 0 || cell >= cols.length || cell < 0) {
             return false;
         }
 
-        var rowMetadata = (this._data as IDataView).getItemMetadata?.(row);
+        const rowMetadata = (this._data as IDataView).getItemMetadata?.(row);
         if (rowMetadata && typeof rowMetadata.focusable === "boolean") {
             if (!rowMetadata.focusable)
                 return false;
@@ -4382,7 +4382,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
             return true;
         }
 
-        var colsMetadata = rowMetadata && rowMetadata.columns;
+        const colsMetadata = rowMetadata && rowMetadata.columns;
         if (colsMetadata && cols[cell] && colsMetadata[cols[cell].id] && typeof colsMetadata[cols[cell].id].focusable === "boolean") {
             if (!(colsMetadata[cols[cell].id].focusable))
                 return false;
@@ -4417,17 +4417,17 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
      * @param cell - Cell index.
      */
     canCellBeSelected(row: number, cell: number): boolean {
-        var cols = this._cols;
+        const cols = this._cols;
         if (row >= this.getDataLength() || row < 0 || cell >= cols.length || cell < 0) {
             return false;
         }
 
-        var itemMetadata = (this._data as IDataView).getItemMetadata?.(row);
+        const itemMetadata = (this._data as IDataView).getItemMetadata?.(row);
         if (itemMetadata && typeof itemMetadata.selectable === "boolean") {
             return itemMetadata.selectable;
         }
 
-        var columnMetadata = itemMetadata && itemMetadata.columns && (itemMetadata.columns[cols[cell].id] || itemMetadata.columns[cell]);
+        const columnMetadata = itemMetadata && itemMetadata.columns && (itemMetadata.columns[cols[cell].id] || itemMetadata.columns[cell]);
         if (columnMetadata && typeof columnMetadata.selectable === "boolean") {
             return columnMetadata.selectable;
         }
@@ -4453,7 +4453,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
 
         this.scrollCellIntoView(row, cell, false);
 
-        var newCell = this.getCellNode(row, cell);
+        const newCell = this.getCellNode(row, cell);
 
         // if selecting the 'add new' row, start editing right away
         this.setActiveCellInternal(newCell, forceEdit || (row === this.getDataLength()) || this._options.autoEdit);
@@ -4474,17 +4474,17 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
      * @returns `true` when the commit succeeds (or no edit was active).
      */
     commitCurrentEdit(opt?: { forceValueChange?: boolean }): boolean {
-        var item = this.getDataItem(this._activeRow);
-        var column = this._cols[this._activeCell];
-        var self = this;
+        const item = this.getDataItem(this._activeRow);
+        const column = this._cols[this._activeCell];
+        const self = this;
 
         if (this._currentEditor) {
             if (this._currentEditor.isValueChanged({ commitEdit: true }) || opt?.forceValueChange) {
-                var validationResults = this._currentEditor.validate();
+                const validationResults = this._currentEditor.validate();
 
                 if (validationResults.valid) {
                     if (this._activeRow < this.getDataLength()) {
-                        var editCommand: EditCommand = {
+                        const editCommand: EditCommand = {
                             row: this._activeRow,
                             cell: self._activeCell,
                             editor: this._currentEditor,
@@ -4519,7 +4519,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
                         }
 
                     } else {
-                        var newItem = {} as TItem;
+                        const newItem = {} as TItem;
                         this._currentEditor.applyValue(newItem, this._currentEditor.serializeValue());
                         this.makeActiveCellNormal();
                         this._trigger(this.onAddNewRow, { item: newItem, column: column });
@@ -4562,9 +4562,9 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     }
 
     private rowsToRanges(rows: number[]): CellRange[] {
-        var ranges = [];
-        var lastCell = this._cols.length - 1;
-        for (var i = 0; i < rows.length; i++) {
+        const ranges = [];
+        const lastCell = this._cols.length - 1;
+        for (let i = 0; i < rows.length; i++) {
             ranges.push(new CellRange(rows[i], 0, rows[i], lastCell));
         }
         return ranges;

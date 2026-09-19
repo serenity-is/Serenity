@@ -195,7 +195,7 @@ export function convertCompatFormatter(compatFormatter: CompatFormatter): Column
         return null;
 
     return function (ctx: FormatterContext): FormatterResult {
-        var fmtResult = compatFormatter(ctx.row, ctx.cell, ctx.value, ctx.column, ctx.item, ctx.grid);
+        const fmtResult = compatFormatter(ctx.row, ctx.cell, ctx.value, ctx.column, ctx.item, ctx.grid);
         if (fmtResult != null && typeof fmtResult !== 'string' && Object.prototype.toString.call(fmtResult) === '[object Object]') {
             ctx.addClass = fmtResult.addClasses;
             ctx.tooltip = fmtResult.toolTip;
@@ -215,21 +215,21 @@ export function convertCompatFormatter(compatFormatter: CompatFormatter): Column
  */
 export function applyFormatterResultToCellNode(ctx: FormatterContext, fmtResult: FormatterResult, node: HTMLElement, opt?: { contentOnly?: boolean }): void {
     if (!opt?.contentOnly) {
-        var oldFmtAtt = node.dataset.fmtatt as string;
+        const oldFmtAtt = node.dataset.fmtatt as string;
         if (oldFmtAtt?.length > 0) {
-            for (var k of oldFmtAtt.split(','))
+            for (const k of oldFmtAtt.split(','))
                 node.removeAttribute(k);
             delete node.dataset.fmtatt;
         }
 
-        var oldFmtCls = node.dataset.fmtcls;
+        const oldFmtCls = node.dataset.fmtcls;
         if (oldFmtCls?.length && (ctx.addClass != oldFmtCls)) {
             removeCssClass(node, oldFmtCls);
             if (!ctx.addClass?.length)
                 delete node.dataset.fmtcls;
         }
 
-        var oldTooltip = node.getAttribute('tooltip');
+        const oldTooltip = node.getAttribute('tooltip');
         if (oldTooltip != null && ctx.tooltip != oldTooltip)
             node.removeAttribute('tooltip');
 
@@ -249,9 +249,9 @@ export function applyFormatterResultToCellNode(ctx: FormatterContext, fmtResult:
 
     if (!opt?.contentOnly) {
         if (ctx.addAttrs != null) {
-            var keys = Object.keys(ctx.addAttrs);
+            const keys = Object.keys(ctx.addAttrs);
             if (keys.length) {
-                for (var k of keys) {
+                for (const k of keys) {
                     node.setAttribute(k, ctx.addAttrs[k]);
                 }
                 node.dataset.fmtatt = keys.join(',');

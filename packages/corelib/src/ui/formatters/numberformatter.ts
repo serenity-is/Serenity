@@ -42,7 +42,7 @@ export class NumberFormatter implements Formatter {
             return htmlEncode(formatNumber(value, format));
         }
 
-        var dbl = parseDecimal(value.toString());
+        const dbl = parseDecimal(value.toString());
         if (dbl == null || isNaN(dbl))
             return value?.toString() ?? '';
 

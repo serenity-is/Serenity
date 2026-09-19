@@ -19,7 +19,7 @@ describe("AutoTooltips.defaults", () => {
 });
 
 function mockGrid() {
-    var grid = {
+    const grid = {
         node: {
             title: <string>null,
             textContent: "text-content",
@@ -30,7 +30,7 @@ function mockGrid() {
         onMouseEnter: {
             subscribe: function(f: any) { grid.onMouseEnterList.push(f); },
             unsubscribe: function(f: any) {
-                var idx = grid.onMouseEnterList.indexOf(f);
+                const idx = grid.onMouseEnterList.indexOf(f);
                 expect(idx >= 0).toBe(true);
                 grid.onMouseEnterList.splice(idx, 1);
             }
@@ -39,7 +39,7 @@ function mockGrid() {
         onHeaderMouseEnter: {
             subscribe: function(f: any) { grid.onHeaderMouseEnterList.push(f); },
             unsubscribe: function(f: any) {
-                var idx = grid.onHeaderMouseEnterList.indexOf(f);
+                const idx = grid.onHeaderMouseEnterList.indexOf(f);
                 expect(idx >= 0).toBe(true);
                 grid.onHeaderMouseEnterList.splice(idx, 1);
             }
@@ -61,8 +61,8 @@ function mockGrid() {
 describe("AutoTooltips.enableForCells", () => {
 
     it("attaches to onMouseEnter when enableForCells not specified", () => {
-        var plugin = new AutoTooltips();
-        var grid = mockGrid();
+        const plugin = new AutoTooltips();
+        const grid = mockGrid();
         plugin.init(grid as any);
         expect(grid.onMouseEnterList.length).toBe(1);
         plugin.destroy();
@@ -70,8 +70,8 @@ describe("AutoTooltips.enableForCells", () => {
     });
 
     it("attaches to onMouseEnter when enableForCells is true", () => {
-        var plugin = new AutoTooltips({ enableForCells: true });
-        var grid = mockGrid();
+        const plugin = new AutoTooltips({ enableForCells: true });
+        const grid = mockGrid();
         plugin.init(grid as any);
         expect(grid.onMouseEnterList.length).toBe(1);
         plugin.destroy();
@@ -79,8 +79,8 @@ describe("AutoTooltips.enableForCells", () => {
     });
 
     it("does not attach to onMouseEnter when enableForCells is false", () => {
-        var plugin = new AutoTooltips({ enableForCells: false });
-        var grid = mockGrid();
+        const plugin = new AutoTooltips({ enableForCells: false });
+        const grid = mockGrid();
         plugin.init(grid as any);
         expect(grid.onMouseEnterList.length).toBe(0);
         plugin.destroy();
@@ -92,8 +92,8 @@ describe("AutoTooltips.enableForCells", () => {
 describe("AutoTooltips.enableForHeaderCells", () => {
 
     it("attaches to onHeaderMouseEnter when enableForCells is true", () => {
-        var plugin = new AutoTooltips({ enableForHeaderCells: true });
-        var grid = mockGrid();
+        const plugin = new AutoTooltips({ enableForHeaderCells: true });
+        const grid = mockGrid();
         plugin.init(grid as any);
         expect(grid.onHeaderMouseEnterList.length).toBe(1);
         plugin.destroy();
@@ -101,8 +101,8 @@ describe("AutoTooltips.enableForHeaderCells", () => {
     });
 
     it("does not attache to onHeaderMouseEnter when enableForHeaderCells not specified", () => {
-        var plugin = new AutoTooltips();
-        var grid = mockGrid();
+        const plugin = new AutoTooltips();
+        const grid = mockGrid();
         plugin.init(grid as any);
         expect(grid.onHeaderMouseEnterList.length).toBe(0);
         plugin.destroy();
@@ -110,8 +110,8 @@ describe("AutoTooltips.enableForHeaderCells", () => {
     });
 
     it("does not attach to onHeaderMouseEnter when enableForHeaderCells is false", () => {
-        var plugin = new AutoTooltips({ enableForHeaderCells: false });
-        var grid = mockGrid();
+        const plugin = new AutoTooltips({ enableForHeaderCells: false });
+        const grid = mockGrid();
         plugin.init(grid as any);
         expect(grid.onHeaderMouseEnterList.length).toBe(0);
         plugin.destroy();
@@ -122,10 +122,10 @@ describe("AutoTooltips.enableForHeaderCells", () => {
 
 describe("AutoTooltips cell mouse enter event handler", () => {
     it("ignores when no cell at event pos", () => {
-        var plugin = new AutoTooltips({ enableForCells: true });
-        var grid = mockGrid();
+        const plugin = new AutoTooltips({ enableForCells: true });
+        const grid = mockGrid();
         plugin.init(grid as any);
-        var handler = grid.onMouseEnterList[0];
+        const handler = grid.onMouseEnterList[0];
         expect(handler).toBeDefined();
         handler({ cell: null });
         expect(grid.getCellFromEventCalls).toBe(1);
@@ -134,10 +134,10 @@ describe("AutoTooltips cell mouse enter event handler", () => {
     });
 
     it("ignores when no cell node at event pos", () => {
-        var plugin = new AutoTooltips({ enableForCells: true });
-        var grid = mockGrid();
+        const plugin = new AutoTooltips({ enableForCells: true });
+        const grid = mockGrid();
         plugin.init(grid as any);
-        var handler = grid.onMouseEnterList[0];
+        const handler = grid.onMouseEnterList[0];
         expect(handler).toBeDefined();
         handler({ cell: { row: 999, cell: 9999 } });
         expect(grid.getCellFromEventCalls).toBe(1);
@@ -146,11 +146,11 @@ describe("AutoTooltips cell mouse enter event handler", () => {
     });
 
     it("ignores when node has title and replaceExisting is false", () => {
-        var plugin = new AutoTooltips({ enableForCells: true, replaceExisting: false });
-        var grid = mockGrid();
+        const plugin = new AutoTooltips({ enableForCells: true, replaceExisting: false });
+        const grid = mockGrid();
         grid.node.title = "hasTitle";
         plugin.init(grid as any);
-        var handler = grid.onMouseEnterList[0];
+        const handler = grid.onMouseEnterList[0];
         expect(handler).toBeDefined();
         handler({});
         expect(grid.getCellFromEventCalls).toBe(1);
@@ -159,49 +159,49 @@ describe("AutoTooltips cell mouse enter event handler", () => {
     });
 
     it("sets title to empty string when there is no overflow", () => {
-        var plugin = new AutoTooltips({ enableForCells: true });
-        var grid = mockGrid();
+        const plugin = new AutoTooltips({ enableForCells: true });
+        const grid = mockGrid();
         grid.node.title = "title-before";
         grid.node.textContent = "nooverflow-text";
         grid.node.scrollWidth = grid.node.clientWidth;
         plugin.init(grid as any);
-        var handler = grid.onMouseEnterList[0];
+        const handler = grid.onMouseEnterList[0];
         expect(handler).toBeDefined();
         handler({});
         expect(grid.node.title).toBe("");
     });
 
     it("applies textContent as title when there is overflow", () => {
-        var plugin = new AutoTooltips({ enableForCells: true });
-        var grid = mockGrid();
+        const plugin = new AutoTooltips({ enableForCells: true });
+        const grid = mockGrid();
         grid.node.textContent = "overflowed-text";
         grid.node.scrollWidth = grid.node.clientWidth + 10;
         plugin.init(grid as any);
-        var handler = grid.onMouseEnterList[0];
+        const handler = grid.onMouseEnterList[0];
         expect(handler).toBeDefined();
         handler({});
         expect(grid.node.title).toBe("overflowed-text");
     });
 
     it("truncates the title with an ellipsis when maxToolTipLength is exceeded", () => {
-        var plugin = new AutoTooltips({ enableForCells: true, maxToolTipLength: 10 });
-        var grid = mockGrid();
+        const plugin = new AutoTooltips({ enableForCells: true, maxToolTipLength: 10 });
+        const grid = mockGrid();
         grid.node.textContent = "this is a very long text";
         grid.node.scrollWidth = grid.node.clientWidth + 10;
         plugin.init(grid as any);
-        var handler = grid.onMouseEnterList[0];
+        const handler = grid.onMouseEnterList[0];
         expect(handler).toBeDefined();
         handler({});
         expect(grid.node.title).toBe("this is...");
     });
 
     it("does not truncate when maxToolTipLength is set but text fits", () => {
-        var plugin = new AutoTooltips({ enableForCells: true, maxToolTipLength: 100 });
-        var grid = mockGrid();
+        const plugin = new AutoTooltips({ enableForCells: true, maxToolTipLength: 100 });
+        const grid = mockGrid();
         grid.node.textContent = "short-text";
         grid.node.scrollWidth = grid.node.clientWidth + 10;
         plugin.init(grid as any);
-        var handler = grid.onMouseEnterList[0];
+        const handler = grid.onMouseEnterList[0];
         expect(handler).toBeDefined();
         handler({});
         expect(grid.node.title).toBe("short-text");
@@ -221,10 +221,10 @@ function makeHeaderCol(overrides: any = {}) {
 describe("AutoTooltips header mouse enter event handler", () => {
 
     it("sets title to column name when header overflows and column has no toolTip", () => {
-        var plugin = new AutoTooltips({ enableForHeaderCells: true });
-        var grid = mockGrid();
+        const plugin = new AutoTooltips({ enableForHeaderCells: true });
+        const grid = mockGrid();
         plugin.init(grid as any);
-        var handler = grid.onHeaderMouseEnterList[0];
+        const handler = grid.onHeaderMouseEnterList[0];
         expect(handler).toBeDefined();
         const headerCol = makeHeaderCol();
         handler({ column: { name: "colname" }, target: headerCol });
@@ -232,10 +232,10 @@ describe("AutoTooltips header mouse enter event handler", () => {
     });
 
     it("sets title to empty string when header does not overflow", () => {
-        var plugin = new AutoTooltips({ enableForHeaderCells: true });
-        var grid = mockGrid();
+        const plugin = new AutoTooltips({ enableForHeaderCells: true });
+        const grid = mockGrid();
         plugin.init(grid as any);
-        var handler = grid.onHeaderMouseEnterList[0];
+        const handler = grid.onHeaderMouseEnterList[0];
         expect(handler).toBeDefined();
         const headerCol = makeHeaderCol({ scrollWidth: 10 });
         handler({ column: { name: "colname" }, target: headerCol });
@@ -243,10 +243,10 @@ describe("AutoTooltips header mouse enter event handler", () => {
     });
 
     it("sets title to empty string when column name is not a string", () => {
-        var plugin = new AutoTooltips({ enableForHeaderCells: true });
-        var grid = mockGrid();
+        const plugin = new AutoTooltips({ enableForHeaderCells: true });
+        const grid = mockGrid();
         plugin.init(grid as any);
-        var handler = grid.onHeaderMouseEnterList[0];
+        const handler = grid.onHeaderMouseEnterList[0];
         expect(handler).toBeDefined();
         const headerCol = makeHeaderCol();
         handler({ column: { name: 123 }, target: headerCol });
@@ -254,10 +254,10 @@ describe("AutoTooltips header mouse enter event handler", () => {
     });
 
     it("does nothing when column already has a toolTip", () => {
-        var plugin = new AutoTooltips({ enableForHeaderCells: true });
-        var grid = mockGrid();
+        const plugin = new AutoTooltips({ enableForHeaderCells: true });
+        const grid = mockGrid();
         plugin.init(grid as any);
-        var handler = grid.onHeaderMouseEnterList[0];
+        const handler = grid.onHeaderMouseEnterList[0];
         expect(handler).toBeDefined();
         const headerCol = makeHeaderCol();
         handler({ column: { name: "colname", toolTip: "existing" }, target: headerCol });
@@ -265,10 +265,10 @@ describe("AutoTooltips header mouse enter event handler", () => {
     });
 
     it("does nothing when there is no column", () => {
-        var plugin = new AutoTooltips({ enableForHeaderCells: true });
-        var grid = mockGrid();
+        const plugin = new AutoTooltips({ enableForHeaderCells: true });
+        const grid = mockGrid();
         plugin.init(grid as any);
-        var handler = grid.onHeaderMouseEnterList[0];
+        const handler = grid.onHeaderMouseEnterList[0];
         expect(handler).toBeDefined();
         const headerCol = makeHeaderCol();
         handler({ column: null, target: headerCol });
@@ -276,10 +276,10 @@ describe("AutoTooltips header mouse enter event handler", () => {
     });
 
     it("does nothing when no header column node is found", () => {
-        var plugin = new AutoTooltips({ enableForHeaderCells: true });
-        var grid = mockGrid();
+        const plugin = new AutoTooltips({ enableForHeaderCells: true });
+        const grid = mockGrid();
         plugin.init(grid as any);
-        var handler = grid.onHeaderMouseEnterList[0];
+        const handler = grid.onHeaderMouseEnterList[0];
         expect(handler).toBeDefined();
         const target = document.createElement("div");
         handler({ column: { name: "colname" }, target });

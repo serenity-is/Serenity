@@ -13,9 +13,9 @@ export class InlineActionGrid extends CustomerGrid {
     static override[Symbol.typeInfo] = this.registerClass(nsDemoBasicSamples);
 
     protected override createColumns() {
-        var columns = super.createColumns();
+        const columns = super.createColumns();
 
-        let inlineAction = (actionKey: string, hint, iconClass: string): Column => ({
+        const inlineAction = (actionKey: string, hint, iconClass: string): Column => ({
             id: "inline_action_" + actionKey,
             name: '',
             width: 24,
@@ -37,8 +37,8 @@ export class InlineActionGrid extends CustomerGrid {
         if (Fluent.isDefaultPrevented(e))
             return;
 
-        var item = this.itemAt(row);
-        var action = (e.target as HTMLElement).closest(".inline-action")?.getAttribute("data-action");
+        const item = this.itemAt(row);
+        const action = (e.target as HTMLElement).closest(".inline-action")?.getAttribute("data-action");
         if (action) {
             e.preventDefault();
 
@@ -60,7 +60,7 @@ export class InlineActionGrid extends CustomerGrid {
                 }
 
                 case newOrderAction: {
-                    var dlg = new OrderDialog();
+                    const dlg = new OrderDialog();
                     this.initDialog(dlg);
                     dlg.loadEntityAndOpenDialog({
                         CustomerID: item.CustomerID

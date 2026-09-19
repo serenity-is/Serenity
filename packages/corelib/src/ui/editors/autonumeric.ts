@@ -4,7 +4,7 @@ import { Fluent } from "../../base";
 * Adapted from autoNumeric.js 1.9.22 by Bob Knothe / Sokolov Yura, https://github.com/BobKnothe/autoNumeric, removing jQuery dependency
 */
 function getElementSelection(that: HTMLInputElement) {
-    var position: { start?: number, end?: number, length?: number } = {};
+    const position: { start?: number, end?: number, length?: number } = {};
     position.start = that.selectionStart;
     position.end = that.selectionEnd;
     position.length = position.end - position.start;
@@ -169,7 +169,7 @@ function runCallbacks(input: HTMLInputElement & { autoNumeric?: AutoNumericOptio
      * val = option value example val=0123456789
      */
     Object.keys(settings).forEach(function (k) {
-        var val = (settings as any)[k];
+        const val = (settings as any)[k];
         if (typeof val === 'function')
             (settings as any)[k] = val(input, settings, k);
     });
@@ -189,7 +189,7 @@ function autoCode(input: HTMLInputElement, settings: AutoNumericOptions) {
     runCallbacks(input, settings);
     settings.oEvent = null;
     settings.tagList = ['B', 'CAPTION', 'CITE', 'CODE', 'DD', 'DEL', 'DIV', 'DFN', 'DT', 'EM', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'INS', 'KDB', 'LABEL', 'LI', 'OUTPUT', 'P', 'Q', 'S', 'SAMPLE', 'SPAN', 'STRONG', 'TD', 'TH', 'U', 'VAR'];
-    var vmax = settings.vMax.toString().split('.'),
+    const vmax = settings.vMax.toString().split('.'),
         vmin = (!settings.vMin && settings.vMin !== 0) ? [] : settings.vMin.toString().split('.');
     convertKeyToNumber(settings, 'vMax');
     convertKeyToNumber(settings, 'vMin');
@@ -201,7 +201,7 @@ function autoCode(input: HTMLInputElement, settings: AutoNumericOptions) {
     vmin[0] = vmin[0].replace('-', '');
     settings.mInt = Math.max(vmax[0].length, vmin[0].length, 1);
     if (settings.mDec === null) {
-        var vmaxLength = 0,
+        let vmaxLength = 0,
             vminLength = 0;
         if (vmax[1]) {
             vmaxLength = vmax[1].length;
@@ -219,11 +219,11 @@ function autoCode(input: HTMLInputElement, settings: AutoNumericOptions) {
         }
     }
     /** cache regexps for autoStrip */
-    var aNegReg = settings.aNeg ? '([-\\' + settings.aNeg + ']?)' : '(-?)';
+    const aNegReg = settings.aNeg ? '([-\\' + settings.aNeg + ']?)' : '(-?)';
     settings.aNegRegAutoStrip = aNegReg;
     settings.skipFirstAutoStrip = new RegExp(aNegReg + '[^-' + (settings.aNeg ? '\\' + settings.aNeg : '') + '\\' + settings.aDec + '\\d]' + '.*?(\\d|\\' + settings.aDec + '\\d)');
     settings.skipLastAutoStrip = new RegExp('(\\d\\' + settings.aDec + '?)[^\\' + settings.aDec + '\\d]\\D*$');
-    var allowed = '-' + settings.aNum + '\\' + settings.aDec;
+    const allowed = '-' + settings.aNum + '\\' + settings.aDec;
     settings.allowedAutoStrip = new RegExp('[^' + allowed + ']', 'gi');
     settings.numRegAutoStrip = new RegExp(aNegReg + '(?:\\' + settings.aDec + '?(\\d+\\' + settings.aDec + '\\d+)|(\\d*(?:\\' + settings.aDec + '\\d*)?))');
     return settings;
@@ -244,10 +244,10 @@ function autoStrip(s: string, settings: AutoNumericOptions, strip_zero?: string 
     if (settings.altDec) {
         s = s.replace(settings.altDec, settings.aDec);
     } /** get only number string */
-    var m = s.match(settings.numRegAutoStrip);
+    const m = s.match(settings.numRegAutoStrip);
     s = m ? [m[1], m[2], m[3]].join('') : '';
     if ((settings.lZero === 'allow' || settings.lZero === 'keep') && strip_zero !== 'strip') {
-        var parts = [],
+        let parts = [],
             nSign = '';
         parts = s.split(settings.aDec);
         if (parts[0].indexOf('-') !== -1) {
@@ -260,7 +260,7 @@ function autoStrip(s: string, settings: AutoNumericOptions, strip_zero?: string 
         s = nSign + parts.join(settings.aDec);
     }
     if ((strip_zero && settings.lZero === 'deny') || (strip_zero && settings.lZero === 'allow' && settings.allowLeading === false)) {
-        var strip_reg = new RegExp('^' + settings.aNegRegAutoStrip + '0*(\\d' + (strip_zero === 'leading' ? ')' : '|$)'));
+        const strip_reg = new RegExp('^' + settings.aNegRegAutoStrip + '0*(\\d' + (strip_zero === 'leading' ? ')' : '|$)'));
         s = s.replace(strip_reg, '$1$2');
     }
     return s;
@@ -270,7 +270,7 @@ function autoStrip(s: string, settings: AutoNumericOptions, strip_zero?: string 
  * places or removes brackets on negative values
  */
 function negativeBracket(s: string, nBracket: string, oEvent: string) { /** oEvent = settings.oEvent */
-    var pBracket = nBracket.split(',');
+    const pBracket = nBracket.split(',');
     if (oEvent === 'set' || oEvent === 'focusout') {
         s = s.replace('-', '');
         s = pBracket[0] + s + pBracket[1];
@@ -286,7 +286,7 @@ function negativeBracket(s: string, nBracket: string, oEvent: string) { /** oEve
  */
 function truncateDecimal(s: string, aDec: string, mDec: number) {
     if (aDec && mDec) {
-        var parts = s.split(aDec);
+        const parts = s.split(aDec);
         /** truncate decimal part to satisfying length
          * cause we would round it anyway */
         if (parts[1] && parts[1].length > mDec) {
@@ -315,7 +315,7 @@ function fixNumber(s: string, aDec: string, aNeg: string) {
  */
 function checkValue(value: any, settings: AutoNumericOptions) {
     if (value) {
-        var checkSmall = +value;
+        const checkSmall = +value;
         if (checkSmall < 0.000001 && checkSmall > -1) {
             value = +value;
             if (value < 0.000001 && value > 0) {
@@ -328,12 +328,12 @@ function checkValue(value: any, settings: AutoNumericOptions) {
             }
             value = value.toString();
         } else {
-            var parts = value.split('.');
+            const parts = value.split('.');
             if (parts[1] !== undefined) {
                 if (+parts[1] === 0) {
                     value = parts[0];
                 } else {
-                    let dec = parts[1];
+                    const dec = parts[1];
                     let trailingZeros = 0;
                     for (let i = dec.length - 1; i >= 0; i--) {
                         if (dec.charAt(i) !== '0') break;
@@ -369,7 +369,7 @@ function autoCheck(s: string, settings: AutoNumericOptions) {
     s = autoStrip(s, settings);
     s = truncateDecimal(s, settings.aDec, settings.mDec);
     s = fixNumber(s, settings.aDec, settings.aNeg);
-    var value = +s;
+    const value = +s;
     return value >= settings.vMin && value <= settings.vMax;
 }
 
@@ -394,12 +394,12 @@ function checkEmpty(iv: string, settings: AutoNumericOptions, signOnEmpty?: bool
  */
 function autoGroup(iv: string, settings: AutoNumericOptions) {
     iv = autoStrip(iv, settings);
-    var testNeg = iv.replace(',', '.'),
+    const testNeg = iv.replace(',', '.'),
         empty = checkEmpty(iv, settings, true);
     if (empty !== null) {
         return empty;
     }
-    var digitalGroup: any = '';
+    let digitalGroup: any = '';
     if (settings.dGroup === "2") {
         digitalGroup = /(\d)((\d)(\d{2}?)+)$/;
     } else if (settings.dGroup === "4") {
@@ -407,11 +407,11 @@ function autoGroup(iv: string, settings: AutoNumericOptions) {
     } else {
         digitalGroup = /(\d)((\d{3}?)+)$/;
     } /** splits the string at the decimal string */
-    var ivSplit = iv.split(settings.aDec);
+    let ivSplit = iv.split(settings.aDec);
     if (settings.altDec && ivSplit.length === 1) {
         ivSplit = iv.split(settings.altDec);
     } /** assigns the whole number to the a varibale (s) */
-    var s = ivSplit[0];
+    let s = ivSplit[0];
     if (settings.aSep) {
         while (digitalGroup.test(s)) { /** re-inserts the thousand sepparator via a regualer expression */
             s = s.replace(digitalGroup, '$1' + settings.aSep + '$2');
@@ -426,7 +426,7 @@ function autoGroup(iv: string, settings: AutoNumericOptions) {
         iv = s;
     }
     if (settings.aSign) {
-        var has_aNeg = iv.indexOf(settings.aNeg) !== -1;
+        const has_aNeg = iv.indexOf(settings.aNeg) !== -1;
         iv = iv.replace(settings.aNeg, '');
         iv = settings.pSign === 'p' ? settings.aSign + iv : iv + settings.aSign;
         if (has_aNeg) {
@@ -451,12 +451,12 @@ function autoRound(iv: string, settings: AutoNumericOptions) { /** value to stri
     if (settings.mRound === 'CHF') {
         iv = (Math.round(iv as any * 20) / 20).toString();
     }
-    var ivRounded = '',
+    let ivRounded = '',
         i = 0,
         nSign = '',
         rDec = (typeof (settings.aPad) === 'boolean' || settings.aPad === null) ? (settings.aPad ? settings.mDec : 0) : +settings.aPad;
-    var truncateZeros = function (ivRounded: string) { /** truncate not needed zeros */
-        var regex = (rDec === 0) ? (/(\.(?:\d*[1-9])?)0*$/) : rDec === 1 ? (/(\.\d(?:\d*[1-9])?)0*$/) : new RegExp('(\\.\\d{' + rDec + '}(?:\\d*[1-9])?)0*$');
+    const truncateZeros = function (ivRounded: string) { /** truncate not needed zeros */
+        const regex = (rDec === 0) ? (/(\.(?:\d*[1-9])?)0*$/) : rDec === 1 ? (/(\.\d(?:\d*[1-9])?)0*$/) : new RegExp('(\\.\\d{' + rDec + '}(?:\\d*[1-9])?)0*$');
         ivRounded = ivRounded.replace(regex, '$1'); /** If there are no decimal places, we don't need a decimal point at the end */
         if (rDec === 0) {
             ivRounded = ivRounded.replace(/\.$/, '');
@@ -476,7 +476,7 @@ function autoRound(iv: string, settings: AutoNumericOptions) { /** value to stri
     if ((+iv > 0 && settings.lZero !== 'keep') || (iv.length > 0 && settings.lZero === 'allow')) { /** trims leading zero's if needed */
         iv = iv.replace(/^0*(\d)/, '$1');
     }
-    var dPos = iv.lastIndexOf('.'), /** virtual decimal position */
+    let dPos = iv.lastIndexOf('.'), /** virtual decimal position */
         vdPos = (dPos === -1) ? iv.length - 1 : dPos, /** checks decimal places to determine if rounding is required */
         cDec = (iv.length - 1) - vdPos; /** check if no rounding is required */
     if (cDec <= settings.mDec) {
@@ -485,7 +485,7 @@ function autoRound(iv: string, settings: AutoNumericOptions) { /** value to stri
             if (dPos === -1) {
                 ivRounded += '.';
             }
-            var zeros = '000000';
+            let zeros = '000000';
             while (cDec < rDec) {
                 zeros = zeros.substring(0, rDec - cDec);
                 ivRounded += zeros;
@@ -505,7 +505,7 @@ function autoRound(iv: string, settings: AutoNumericOptions) { /** value to stri
         }
 
     } /** rounded length of the string after rounding */
-    var rLength = dPos + settings.mDec,
+    let rLength = dPos + settings.mDec,
         tRound = +iv.charAt(rLength + 1),
         ivArray: any[] = iv.substring(0, rLength + 1).split(''),
         odd = (iv.charAt(rLength) === '.') ? ((iv.charAt(rLength - 1) as any) % 2) : ((iv.charAt(rLength) as any) % 2),
@@ -622,14 +622,14 @@ class AutoNumericHolder {
     }
 
     getBeforeAfter() {
-        var value = this.value,
+        const value = this.value,
             left = value.substring(0, this.selection.start),
             right = value.substring(this.selection.end, value.length);
         return [left, right];
     }
 
     getBeforeAfterStriped() {
-        var parts = this.getBeforeAfter();
+        const parts = this.getBeforeAfter();
         parts[0] = autoStrip(parts[0], this.settingsClone);
         parts[1] = autoStrip(parts[1], this.settingsClone);
         return parts;
@@ -639,19 +639,19 @@ class AutoNumericHolder {
      * strip parts from excess characters and leading zeroes
      */
     normalizeParts(left: string, right: string) {
-        var settingsClone = this.settingsClone;
+        const settingsClone = this.settingsClone;
         right = autoStrip(right, settingsClone); /** if right is not empty and first character is not aDec, */
         /** we could strip all zeros, otherwise only leading */
-        var strip = right.match(/^\d/) ? true : 'leading';
+        const strip = right.match(/^\d/) ? true : 'leading';
         left = autoStrip(left, settingsClone, strip); /** prevents multiple leading zeros from being entered */
         if ((left === '' || left === settingsClone.aNeg) && settingsClone.lZero === 'deny') {
             if (right > '') {
                 right = right.replace(/^0*(\d)/, '$1');
             }
         }
-        var new_value = left + right; /** insert zero if has leading dot */
+        let new_value = left + right; /** insert zero if has leading dot */
         if (settingsClone.aDec) {
-            var m = new_value.match(new RegExp('^' + settingsClone.aNegRegAutoStrip + '\\' + settingsClone.aDec));
+            const m = new_value.match(new RegExp('^' + settingsClone.aNegRegAutoStrip + '\\' + settingsClone.aDec));
             if (m) {
                 left = left.replace(m[1], m[1] + '0');
                 new_value = left + right;
@@ -667,7 +667,7 @@ class AutoNumericHolder {
      * set part of number to value keeping position of cursor
      */
     setValueParts(left: string, right: string) {
-        var settingsClone = this.settingsClone,
+        let settingsClone = this.settingsClone,
             parts = this.normalizeParts(left, right),
             new_value = parts.join(''),
             position = parts[0].length;
@@ -695,16 +695,16 @@ class AutoNumericHolder {
      * returns sign position of a formatted value
      */
     signPosition() {
-        var settingsClone = this.settingsClone,
+        const settingsClone = this.settingsClone,
             aSign = settingsClone.aSign,
             that = this.that;
         if (aSign) {
-            var aSignLen = aSign.length;
+            const aSignLen = aSign.length;
             if (settingsClone.pSign === 'p') {
-                var hasNeg = settingsClone.aNeg && that.value && that.value.charAt(0) === settingsClone.aNeg;
+                const hasNeg = settingsClone.aNeg && that.value && that.value.charAt(0) === settingsClone.aNeg;
                 return hasNeg ? [1, aSignLen + 1] : [0, aSignLen];
             }
-            var valueLen = that.value.length;
+            const valueLen = that.value.length;
             return [valueLen - aSignLen, valueLen];
         }
         return [1000, -1];
@@ -715,7 +715,7 @@ class AutoNumericHolder {
      * prevents partial deletion/copying/overwriting of a sign
      */
     expandSelectionOnSign(setReal?: boolean) {
-        var sign_position = this.signPosition(),
+        const sign_position = this.signPosition(),
             selection = this.selection;
         if (selection.start < sign_position[1] && selection.end > sign_position[0]) { /** if selection catches something except sign and catches only space from sign */
             if ((selection.start < sign_position[0] || selection.end > sign_position[1]) && this.value.substring(Math.max(selection.start, sign_position[0]), Math.min(selection.end, sign_position[1])).match(/^\s*$/)) { /** then select without empty space */
@@ -735,7 +735,7 @@ class AutoNumericHolder {
      */
     checkPaste() {
         if (this.valuePartsBeforePaste !== undefined) {
-            var parts = this.getBeforeAfter(),
+            const parts = this.getBeforeAfter(),
                 oldParts = this.valuePartsBeforePaste;
             delete this.valuePartsBeforePaste; /** try to strip pasted value first */
             parts[0] = parts[0].substring(0, oldParts[0].length) + autoStrip(parts[0].substring(oldParts[0].length), this.settingsClone);
@@ -751,7 +751,7 @@ class AutoNumericHolder {
      * if returns true, futher processing is not performed
      */
     skipAlways(e: Event) {
-        var kdCode = this.kdCode,
+        const kdCode = this.kdCode,
             which = this.which,
             ctrlKey = this.ctrlKey,
             cmdKey = this.cmdKey,
@@ -788,7 +788,7 @@ class AutoNumericHolder {
             return true;
         }
         if (kdCode === 37 || kdCode === 39) { /** jump over thousand separator */
-            var aSep = this.settingsClone.aSep,
+            const aSep = this.settingsClone.aSep,
                 start = this.selection.start,
                 value = this.that.value;
             if (e.type === 'keydown' && aSep && !this.shiftKey) {
@@ -811,7 +811,7 @@ class AutoNumericHolder {
      * returns true if processing performed
      */
     processAllways() {
-        var parts; /** process backspace or delete */
+        let parts; /** process backspace or delete */
         if (this.kdCode === 8 || this.kdCode === 46) {
             if (!this.selection.length) {
                 parts = this.getBeforeAfterStriped();
@@ -836,7 +836,7 @@ class AutoNumericHolder {
      * returns true if processing performed
      */
     processKeypress() {
-        var settingsClone = this.settingsClone,
+        let settingsClone = this.settingsClone,
             cCode = String.fromCharCode(this.which),
             parts = this.getBeforeAfterStriped(),
             left = parts[0],
@@ -896,11 +896,11 @@ class AutoNumericHolder {
      * formatting of just processed value with keeping of cursor position
      */
     formatQuick() {
-        var settingsClone = this.settingsClone,
+        const settingsClone = this.settingsClone,
             parts = this.getBeforeAfterStriped(),
             leftLength = this.value;
         if ((settingsClone.aSep === '' || (settingsClone.aSep !== '' && leftLength.indexOf(settingsClone.aSep) === -1)) && (settingsClone.aSign === '' || (settingsClone.aSign !== '' && leftLength.indexOf(settingsClone.aSign) === -1))) {
-            var subParts = [],
+            let subParts = [],
                 nSign = '';
             subParts = leftLength.split(settingsClone.aDec);
             if (subParts[0].indexOf('-') > -1) {
@@ -913,20 +913,20 @@ class AutoNumericHolder {
             }
             parts[0] = nSign + parts[0];
         }
-        var value = autoGroup(this.value, this.settingsClone),
+        let value = autoGroup(this.value, this.settingsClone),
             position = value.length;
         if (value) {
             /** prepare regexp which searches for cursor position from unformatted left part */
-            var left_ar = parts[0].split(''),
+            let left_ar = parts[0].split(''),
                 i = 0;
             for (i; i < left_ar.length; i += 1) { /** thanks Peter Kovari */
                 if (!left_ar[i].match('\\d')) {
                     left_ar[i] = '\\' + left_ar[i];
                 }
             }
-            var leftReg = new RegExp('^.*?' + left_ar.join('.*?'));
+            const leftReg = new RegExp('^.*?' + left_ar.join('.*?'));
             /** search cursor position in formatted value */
-            var newLeft = value.match(leftReg);
+            const newLeft = value.match(leftReg);
             if (newLeft) {
                 position = newLeft[0].length;
                 /** if we are just before sign which is in prefix position */
@@ -947,12 +947,12 @@ class AutoNumericHolder {
 }
 
 function getHolder(that: HTMLInputElement, settings?: AutoNumericOptions, update?: boolean) {
-    var data = AutoNumeric.getSettings(that);
+    let data = AutoNumeric.getSettings(that);
     if (!data) {
         data = {};
         (that as any).autoNumeric = data;
     }
-    var holder = data.holder;
+    let holder = data.holder;
     if ((holder === undefined && settings) || update) {
         holder = new AutoNumericHolder(that, settings);
         data.holder = holder;
@@ -994,7 +994,7 @@ export class AutoNumeric {
         if (!input) {
             throw new Error("autoNumeric called with null element!");
         }
-        var settings: AutoNumericOptions = AutoNumeric.getSettings(input), /** attempt to grab 'autoNumeric' settings, if they don't exist returns "undefined". */
+        let settings: AutoNumericOptions = AutoNumeric.getSettings(input), /** attempt to grab 'autoNumeric' settings, if they don't exist returns "undefined". */
             tagData: Record<string, string> = {}; /** attempt to grab HTML5 data, if they don't exist we'll get "undefined".*/
         Object.keys(input.dataset).forEach(key => tagData[key] = input.dataset[key]);
         if (typeof settings !== 'object') { /** If we couldn't grab settings, create them from defaults and passed options. */
@@ -1007,13 +1007,13 @@ export class AutoNumeric {
             return;
         }
         settings.runOnce = false;
-        var holder = getHolder(input, settings);
+        let holder = getHolder(input, settings);
         if (!settings.tagList?.includes(input.tagName) && input.tagName !== 'INPUT') {
             throw new Error("The <" + input.tagName + "> is not supported by autoNumeric()");
         }
         if (settings.runOnce === false && settings.aForm) {/** routine to format default value on page load */
             if (input.matches('input[type=text], input[type=hidden], input[type=tel], input:not([type])')) {
-                var setValue = true;
+                let setValue = true;
                 if (input.value === '' && settings.wEmpty === 'empty') {
                     input.value = '';
                     setValue = false;
@@ -1065,7 +1065,7 @@ export class AutoNumeric {
             });
 
             Fluent.on(input, 'keypress.autoNumeric', function (e) {
-                var holder = getHolder(input),
+                const holder = getHolder(input),
                     processed = holder.processed;
                 holder.init(e);
                 holder.settings.oEvent = 'keypress';
@@ -1085,10 +1085,10 @@ export class AutoNumeric {
             });
 
             Fluent.on(input, 'keyup.autoNumeric', function (e) {
-                var holder = getHolder(input);
+                const holder = getHolder(input);
                 holder.init(e);
                 holder.settings.oEvent = 'keyup';
-                var skip = holder.skipAlways(e);
+                const skip = holder.skipAlways(e);
                 holder.kdCode = 0;
                 delete holder.valuePartsBeforePaste;
                 if (input.value === holder.settings.aSign) { /** added to properly place the caret when only the currency is present */
@@ -1114,15 +1114,15 @@ export class AutoNumeric {
                 if (input.matches('[readonly]') || input.matches('[disabled]'))
                     return;
 
-                var holder = getHolder(input);
+                const holder = getHolder(input);
                 holder.settingsClone.oEvent = 'focusin';
                 if (holder.settingsClone.nBracket !== null) {
-                    var checkVal = input.value;
+                    const checkVal = input.value;
                     input.value = negativeBracket(checkVal, holder.settingsClone.nBracket, holder.settingsClone.oEvent);
                 }
                 holder.inVal = input.value;
                 holder.dirty = false;
-                var onempty = checkEmpty(holder.inVal, holder.settingsClone, true);
+                const onempty = checkEmpty(holder.inVal, holder.settingsClone, true);
                 if (onempty !== null) {
                     input.value = onempty ?? "";
                     if (holder.settings.pSign === 's') {
@@ -1138,12 +1138,12 @@ export class AutoNumeric {
                 if (input.matches('[readonly]') || input.matches('[disabled]'))
                     return;
 
-                var holder = getHolder(input),
+                let holder = getHolder(input),
                     settingsClone = holder.settingsClone,
                     value = input.value,
                     origValue = value;
                 holder.settingsClone.oEvent = 'focusout';
-                var strip_zero = ''; /** added to control leading zero */
+                let strip_zero = ''; /** added to control leading zero */
                 if (settingsClone.lZero === 'allow') { /** added to control leading zero */
                     settingsClone.allowLeading = false;
                     strip_zero = 'leading';
@@ -1159,7 +1159,7 @@ export class AutoNumeric {
                         value = '';
                     }
                 }
-                var groupedValue = checkEmpty(value, settingsClone, false);
+                let groupedValue = checkEmpty(value, settingsClone, false);
                 if (groupedValue === null) {
                     groupedValue = autoGroup(value, settingsClone);
                 }
@@ -1193,11 +1193,11 @@ export class AutoNumeric {
      * @param options - The options to update.
      */
     static updateOptions(input: HTMLInputElement, options: AutoNumericOptions) {
-        var settings = AutoNumeric.getSettings(input);
+        let settings = AutoNumeric.getSettings(input);
         if (typeof settings !== 'object') {
             throw new Error("You must initialize autoNumeric('init', {options}) prior to calling the 'update' method");
         }
-        var strip = AutoNumeric.getValue(input);
+        const strip = AutoNumeric.getValue(input);
         settings = Object.assign(settings, options);
         getHolder(input, settings, true);
         if (settings.aDec === settings.aSep) {
@@ -1217,7 +1217,7 @@ export class AutoNumeric {
      * @returns The formatted value.
      */
     static setValue(input: HTMLInputElement, valueIn: number | string) {
-        var settings = AutoNumeric.getSettings(input),
+        let settings = AutoNumeric.getSettings(input),
             value = valueIn.toString(),
             testValue = valueIn.toString();
         if (typeof settings !== 'object') {
@@ -1259,12 +1259,12 @@ export class AutoNumeric {
      * @returns The numeric value as a string.
      */
     static getValue(input: HTMLInputElement): string {
-        var settings = AutoNumeric.getSettings(input);
+        const settings = AutoNumeric.getSettings(input);
         if (typeof settings !== 'object') {
             throw new Error("You must initialize autoNumeric('init', {options}) prior to calling the 'get' method");
         }
         settings.oEvent = 'get';
-        var getValue = '';
+        let getValue = '';
         /** determine the element type then use .eq(0) selector to grab the value of the first element in selector */
         if (input.matches('input[type=text], input[type=hidden], input[type=tel], input:not([type])')) { /**added hidden type */
             getValue = input.value;

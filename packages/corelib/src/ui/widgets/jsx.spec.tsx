@@ -584,8 +584,8 @@ describe('jsx: interpolation', () => {
 describe('jsx: widget integration', () => {
 
     it('can create input directly', () => {
-        var ed: StringEditor;
-        var el = <StringEditor ref={x => ed = x} readOnly={true} /> as HTMLElement;
+        let ed: StringEditor;
+        const el = <StringEditor ref={x => ed = x} readOnly={true} /> as HTMLElement;
         expect(el.tagName).toBe('INPUT');
         expect(el.classList.contains('s-StringEditor')).toBe(true);
         expect(ed).toBeDefined();
@@ -595,29 +595,29 @@ describe('jsx: widget integration', () => {
     });
 
     it('can create PropertyGrid', () => {
-        var pg: PropertyGrid;
-        var el = <PropertyGrid items={[]} ref={w => pg = w} />;
+        let pg: PropertyGrid;
+        const el = <PropertyGrid items={[]} ref={w => pg = w} />;
         expect(pg?.domNode).toBe(el);
     });
 
     it('can create PropertyGrid', () => {
-        var pg: PropertyGrid;
-        var el = <PropertyGrid items={[]} ref={w => pg = w} />;
+        let pg: PropertyGrid;
+        const el = <PropertyGrid items={[]} ref={w => pg = w} />;
         expect(pg?.domNode).toBe(el);
     });
 
     it('can create FileUploadEditor with JSX', () => {
-        var el = <FileUploadEditor readOnly={true} />;
+        const el = <FileUploadEditor readOnly={true} />;
         expect(el).toBeTruthy();
-        let input = el.querySelector("input[type=file]");
+        const input = el.querySelector("input[type=file]");
         expect(input).toBeTruthy();
         expect(input.getAttribute("disabled")).toBe("disabled");
     });
 
     it('can create FileUploadEditor without JSX and no init call', () => {
-        var el = new FileUploadEditor({ readOnly: true }).domNode;
+        const el = new FileUploadEditor({ readOnly: true }).domNode;
         expect(el).toBeTruthy();
-        let input = el.querySelector("input[type=file]");
+        const input = el.querySelector("input[type=file]");
         expect(input).toBeTruthy();
         expect(input.getAttribute("disabled")).toBe("disabled");
     });

@@ -39,7 +39,7 @@ export class TimeEditorBase<P extends TimeEditorBaseOptions> extends EditorWidge
     constructor(props: EditorProps<P>) {
         super(props);
 
-        let input = this.element;
+        const input = this.element;
         input.addClass('editor hour');
 
         if (!this.options.noEmptyOption) {
@@ -55,7 +55,7 @@ export class TimeEditorBase<P extends TimeEditorBaseOptions> extends EditorWidge
         this.minutes = Fluent(select).insertAfter(input);
         this.minutes.on("change", () => Fluent.trigger(this.domNode, "change"));
 
-        for (var m = 0; m <= 59; m += (this.options.intervalMinutes || 5)) {
+        for (let m = 0; m <= 59; m += (this.options.intervalMinutes || 5)) {
             addOption(this.minutes, "" + m, zeroPad(m, 2));
         }
     }
@@ -97,8 +97,8 @@ export class TimeEditorBase<P extends TimeEditorBaseOptions> extends EditorWidge
     /** Returns the combined time value in HH:mm format.
      * @returns The time string, or null when empty. */
     public get hourAndMin(): string {
-        var hour = this.hour;
-        var minute = this.minute;
+        const hour = this.hour;
+        const minute = this.minute;
         if (hour == null || minute == null) {
             return null;
         }
@@ -120,7 +120,7 @@ export class TimeEditorBase<P extends TimeEditorBaseOptions> extends EditorWidge
             return;
         }
 
-        var parts = value.split(':');
+        const parts = value.split(':');
         this.domNode.value = "" + parseInt(parts[0], 10);
         this.minutes.val("" + parseInt(parts[1], 10));
     }
@@ -169,8 +169,8 @@ export class TimeEditor<P extends TimeEditorOptions = TimeEditorOptions> extends
      * @returns The value, or null when empty.
      */
     public get value(): number {
-        var hour = this.hour;
-        var minute = this.minute;
+        const hour = this.hour;
+        const minute = this.minute;
         if (hour == null || minute == null) {
             return null;
         }
@@ -202,7 +202,7 @@ export class TimeEditor<P extends TimeEditorOptions = TimeEditorOptions> extends
         }
         else {
             value /= (this.options.multiplier || 1);
-            var hour = Math.floor(value / 60);
+            const hour = Math.floor(value / 60);
             this.domNode.value = "" + hour;
             this.minutes.val("" + (value % 60));
         }
