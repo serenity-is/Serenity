@@ -4,9 +4,11 @@ public abstract class BaseTemplateTest
 {
     protected abstract string TemplateName { get; }
 
+    protected Templates templates = new();
+
     protected string RenderTemplate(EntityModel model)
     {
-        return Templates.Render(new MockFileSystem(), TemplateName, model);
+        return templates.Render(new MockFileSystem(), TemplateName, model);
     }
 
     protected void AssertEqual(string expected, string actual)

@@ -5,7 +5,7 @@ public partial class EntityCodeGeneratorTests
     [Fact]
     public void Run_GenerateUI_Merges_Navigation_Into_Existing_File()
     {
-        var generator = Create(out var fs, out _, out _, out var config);
+        var generator = Create(out var fs, out _, out _, out _, out var config);
         config.GenerateUI = true;
         var navigationFile = "/app/Modules/TestModule/TestModuleNavigation.cs";
         AddFile(fs, navigationFile, """
@@ -33,7 +33,7 @@ public partial class EntityCodeGeneratorTests
     [Fact]
     public void Run_GenerateUI_Does_Not_Duplicate_Usings_On_Repeated_Navigation()
     {
-        var generator = Create(out var fs, out _, out _, out var config);
+        var generator = Create(out var fs, out _, out _, out _, out var config);
         config.GenerateUI = true;
         var navigationFile = "/app/Modules/TestModule/TestModuleNavigation.cs";
         AddFile(fs, navigationFile, """

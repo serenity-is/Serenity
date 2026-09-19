@@ -32,8 +32,10 @@ public partial class GenerateCommand(IProjectFileInfo project, IGeneratorConsole
 
         Arguments.ThrowIfRemaining();
 
+        var templates = new Templates();
+
         if (!string.IsNullOrEmpty(config.CustomTemplates))
-            Templates.TemplatePath = FileSystem.Combine(projectDir, config.CustomTemplates);
+            templates.TemplatePath = FileSystem.Combine(projectDir, config.CustomTemplates);
 
         Console.WriteLine("Table Code Generation", ConsoleColor.DarkGreen);
         Console.WriteLine();
@@ -207,7 +209,7 @@ public partial class GenerateCommand(IProjectFileInfo project, IGeneratorConsole
             UpdateConfigTableFor(inputs, confConnection);
             inputs.Application = application!;
             var model = createModel(inputs);
-            var generator = new EntityCodeGenerator(Project, model, inputs.Config, writer);
+            var generator = new EntityCodeGenerator(Project, model, inputs.Config, templates, writer);
             generator.Run();
         }
 

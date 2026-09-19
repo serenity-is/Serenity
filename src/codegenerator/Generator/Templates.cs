@@ -3,13 +3,13 @@ using Scriban.Runtime;
 
 namespace Serenity.CodeGenerator;
 
-public static class Templates
+public class Templates
 {
-    public static string? TemplatePath { get; set; }
+    public string? TemplatePath { get; set; }
 
-    private static readonly ConcurrentDictionary<string, Template> templateCache = new();
+    private readonly ConcurrentDictionary<string, Template> templateCache = new();
 
-    private static Template GetTemplate(IFileSystem fileSystem, string templateKey)
+    private Template GetTemplate(IFileSystem fileSystem, string templateKey)
     {
         if (templateCache.TryGetValue(templateKey, out Template? t))
             return t;
@@ -39,7 +39,7 @@ public static class Templates
     }
 
 
-    public static string Render(IFileSystem fileSystem, string templateKey, object model,
+    public string Render(IFileSystem fileSystem, string templateKey, object model,
         Action<CodeWriter>? initWriter = null)
     {
         var template = GetTemplate(fileSystem, templateKey);

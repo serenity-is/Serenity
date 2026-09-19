@@ -5,7 +5,7 @@ public partial class EntityCodeGeneratorTests
     [Fact]
     public void Run_GenerateRow_Creates_ModuleReExport_Index()
     {
-        var generator = Create(out var fileSystem, out _, out _, out var config);
+        var generator = Create(out var fileSystem, out _, out _, out _, out var config);
         config.GenerateRow = true;
 
         generator.Run();
@@ -18,7 +18,7 @@ public partial class EntityCodeGeneratorTests
     [Fact]
     public void Run_Does_Not_Duplicate_ModuleReExport_Entries()
     {
-        var generator = Create(out var fileSystem, out _, out _, out var config);
+        var generator = Create(out var fileSystem, out _, out _, out _, out var config);
         config.GenerateRow = true;
         config.GenerateService = true;
 
@@ -35,7 +35,7 @@ public partial class EntityCodeGeneratorTests
     [Fact]
     public void Run_Skips_ModuleReExport_Index_When_Disabled()
     {
-        var generator = Create(out var fileSystem, out _, out _, out var config);
+        var generator = Create(out var fileSystem, out _, out _, out _, out var config);
         config.GenerateRow = true;
         config.ServerTypings = new GeneratorConfig.ServerTypingsConfig()
         {
@@ -50,7 +50,7 @@ public partial class EntityCodeGeneratorTests
     [Fact]
     public void Run_GenerateUI_With_Empty_Module_Uses_Common_Navigation_Path()
     {
-        var generator = Create(out var fileSystem, out _, out var model, out var config);
+        var generator = Create(out var fileSystem, out _, out _, out var model, out var config);
         config.GenerateUI = true;
         model.Module = null;
 

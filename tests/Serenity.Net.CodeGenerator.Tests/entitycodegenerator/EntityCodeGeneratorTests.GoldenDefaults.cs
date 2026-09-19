@@ -401,7 +401,7 @@ public partial class EntityCodeGeneratorTests
     [Fact]
     public void Run_With_Defaults9_And_Nullable_Generates_All_Files_Exactly()
     {
-        var generator = CreateDefaults(out var fileSystem, out var writer, out _, DefaultSergenJson,
+        var generator = CreateDefaults(out var fileSystem, out _, out var writer, out _, DefaultSergenJson,
             nullableRefTypes: true);
 
         generator.Run();
@@ -422,7 +422,7 @@ public partial class EntityCodeGeneratorTests
     [Fact]
     public void Run_With_Defaults9_Generates_All_Files_Exactly()
     {
-        var generator = CreateDefaults(out var fileSystem, out var writer, out _, DefaultSergenJson);
+        var generator = CreateDefaults(out var fileSystem, out _, out var writer, out _, DefaultSergenJson);
 
         generator.Run();
 

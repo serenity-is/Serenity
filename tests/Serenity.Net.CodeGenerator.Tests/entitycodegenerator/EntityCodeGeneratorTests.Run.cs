@@ -6,7 +6,15 @@ public partial class EntityCodeGeneratorTests
     public void Ctor_Throws_For_Null_Project()
     {
         Assert.Throws<ArgumentNullException>(() => new EntityCodeGenerator(null!,
-            new EntityModel(), new GeneratorConfig(), new MockGeneratedFileWriter(new MockFileSystem())));
+            new EntityModel(), new GeneratorConfig(), new Templates(), new MockGeneratedFileWriter(new MockFileSystem())));
+    }
+
+    [Fact]
+    public void Ctor_Throws_For_Null_Templates()
+    {
+        Assert.Throws<ArgumentNullException>(() => new EntityCodeGenerator(
+            new MockProjectFileInfo(new MockFileSystem()),
+            new EntityModel(), new GeneratorConfig(), null!, new MockGeneratedFileWriter(new MockFileSystem())));
     }
 
     [Fact]
@@ -14,7 +22,7 @@ public partial class EntityCodeGeneratorTests
     {
         Assert.Throws<ArgumentNullException>(() => new EntityCodeGenerator(
             new MockProjectFileInfo(new MockFileSystem()),
-            new EntityModel(), new GeneratorConfig(), null!));
+            new EntityModel(), new GeneratorConfig(), new Templates(), null!));
     }
 
     [Fact]
@@ -22,13 +30,13 @@ public partial class EntityCodeGeneratorTests
     {
         Assert.Throws<ArgumentNullException>(() => new EntityCodeGenerator(
             new MockProjectFileInfo(new MockFileSystem()),
-            null!, new GeneratorConfig(), new MockGeneratedFileWriter(new MockFileSystem())));
+            null!, new GeneratorConfig(), new Templates(), new MockGeneratedFileWriter(new MockFileSystem())));
     }
 
     [Fact]
     public void Run_Generates_Nothing_When_All_Options_Are_Disabled()
     {
-        var generator = Create(out _, out var writer, out _, out _);
+        var generator = Create(out _, out _, out var writer, out _, out _);
 
         generator.Run();
 
@@ -38,7 +46,7 @@ public partial class EntityCodeGeneratorTests
     [Fact]
     public void Run_GenerateRow_Writes_Row_And_Row_Typing()
     {
-        var generator = Create(out var fs, out var writer, out var model, out var config);
+        var generator = Create(out var fs, out _, out var writer, out var model, out var config);
         config.GenerateRow = true;
 
         generator.Run();
@@ -54,7 +62,7 @@ public partial class EntityCodeGeneratorTests
     [Fact]
     public void Run_GenerateService_Writes_Handlers_Endpoint_And_Service_Typing()
     {
-        var generator = Create(out _, out var writer, out _, out var config);
+        var generator = Create(out _, out _, out var writer, out _, out var config);
         config.GenerateService = true;
 
         generator.Run();
@@ -71,7 +79,7 @@ public partial class EntityCodeGeneratorTests
     [Fact]
     public void Run_GenerateUI_Writes_UI_Files_And_Navigation()
     {
-        var generator = Create(out _, out var writer, out _, out var config);
+        var generator = Create(out _, out _, out var writer, out _, out var config);
         config.GenerateUI = true;
 
         generator.Run();

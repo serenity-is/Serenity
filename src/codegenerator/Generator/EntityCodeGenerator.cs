@@ -10,13 +10,15 @@ public class EntityCodeGenerator
     private readonly string mainPrefix;
     private readonly string typingPrefix;
     private static readonly char[] slashNSeparator = ['\n'];
+    private readonly Templates templates;
 
-    public EntityCodeGenerator(IProjectFileInfo project, EntityModel model, GeneratorConfig config, IGeneratedFileWriter writer)
+    public EntityCodeGenerator(IProjectFileInfo project, EntityModel model, GeneratorConfig config, Templates templates, IGeneratedFileWriter writer)
     {
         ArgumentNullException.ThrowIfNull(project);
         fileSystem = project.FileSystem;
         this.writer = writer ?? throw new ArgumentNullException(nameof(EntityCodeGenerator.writer));
         this.model = model ?? throw new ArgumentNullException(nameof(model));
+        this.templates = templates ?? throw new ArgumentNullException(nameof(templates));
 
         rootDir = fileSystem.GetDirectoryName(fileSystem.GetFullPath(project.ProjectFile));
         this.config = config;
@@ -35,7 +37,7 @@ public class EntityCodeGenerator
 
     void Add(string targetFile, string template)
     {
-        var content = Templates.Render(fileSystem, template, model);
+        var content = templates.Render(fileSystem, template, model);
         writer.WriteAllText(targetFile, content);
         if (targetFile.StartsWith(typingPrefix) &&
             !string.IsNullOrEmpty(model.Module) &&
@@ -124,7 +126,7 @@ public class EntityCodeGenerator
             "Modules/" + model.ModuleSlash + model.Module + "Navigation.cs");
         file = PathHelper.ToPath(file);
 
-        string code = Templates.Render(fileSystem, "NavigationLink", model);
+        string code = templates.Render(fileSystem, "NavigationLink", model);
 
         if (fileSystem.FileExists(file))
         {

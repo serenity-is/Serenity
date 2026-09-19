@@ -43,6 +43,7 @@ public partial class EntityCodeGeneratorTests
 
     private static EntityCodeGenerator Create(
         out MockFileSystem fileSystem,
+        out Templates templates,
         out MockGeneratedFileWriter writer,
         out EntityModel model,
         out GeneratorConfig config)
@@ -50,6 +51,7 @@ public partial class EntityCodeGeneratorTests
         fileSystem = new MockFileSystem();
         writer = new MockGeneratedFileWriter(fileSystem);
         model = new EntityModelFactory().Create(new CustomerEntityInputs());
+        templates = new Templates();
         config = new GeneratorConfig()
         {
             RootNamespace = CustomerEntityInputs.TestNamespace,
@@ -59,7 +61,7 @@ public partial class EntityCodeGeneratorTests
             GenerateUI = false,
             GenerateCustom = false
         };
-        return new EntityCodeGenerator(new MockProjectFileInfo(fileSystem), model, config, writer);
+        return new EntityCodeGenerator(new MockProjectFileInfo(fileSystem), model, config, templates, writer);
     }
 
     public static readonly string[] SerenityNetWebGlobalUsings =
@@ -88,6 +90,7 @@ public partial class EntityCodeGeneratorTests
 
     private static EntityCodeGenerator CreateDefaults(
         out MockFileSystem fileSystem,
+        out Templates templates,
         out MockGeneratedFileWriter writer,
         out EntityModel model,
         string sergenJson,
@@ -97,6 +100,7 @@ public partial class EntityCodeGeneratorTests
         AddFile(fileSystem, "/app/sergen.json", sergenJson);
         var config = fileSystem.LoadGeneratorConfig("/app");
         writer = new MockGeneratedFileWriter(fileSystem);
+        templates = new Templates();
 
         var inputs = new CustomerEntityInputs
         {
@@ -108,6 +112,6 @@ public partial class EntityCodeGeneratorTests
 
         model = new EntityModelFactory().Create(inputs);
         return new EntityCodeGenerator(new MockProjectFileInfo(fileSystem, nullableRefTypes ? "enable" : null),
-            model, config, writer);
+            model, config, templates, writer);
     }
 }
