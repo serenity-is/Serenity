@@ -159,7 +159,7 @@ export class EventDataWrapper<TArgs, TEvent = {}> implements IEventData<TArgs, T
      */
     stopPropagation(): void {
         this._isPropagationStopped = true;
-        this._nativeEvent?.stopPropagation();
+        this._nativeEvent?.stopPropagation?.();
     }
 
     /**
@@ -175,7 +175,7 @@ export class EventDataWrapper<TArgs, TEvent = {}> implements IEventData<TArgs, T
      */
     stopImmediatePropagation(): void {
         this._isImmediatePropagationStopped = true;
-        this._nativeEvent?.stopImmediatePropagation();
+        this._nativeEvent?.stopImmediatePropagation?.();
     }
 
     /**
