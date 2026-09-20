@@ -1018,17 +1018,9 @@ inMathMLNamespace(() => {
   // All JSX elements here are created in the MathML namespace
 });
 
-inHTMLNamespace(() => {h, useImperativeHandle } from "@serenity-is/domwise";
-
-// Classic createElement API (like React.createElement)
-// Children are passed as additional arguments (rest params).
-const el = createElement("div", { class: "foo" }, "child1", "child2");
-
-// h is an alias for createElement
-const el2 = h("span", { class: "bar" }, "text");
-
-// If attr is a string or array, it is treated as the first child:
-const el3 = createElement("div", "only child
+inHTMLNamespace(() => {
+  // Explicitly create elements in the HTML namespace
+});
 ```
 
 ---
@@ -1038,10 +1030,17 @@ const el3 = createElement("div", "only child
 For projects migrating from or integrating with React codebases:
 
 ```tsx
-import { createElement, useImperativeHandle } from "@serenity-is/domwise";
+import { createElement, h, useImperativeHandle } from "@serenity-is/domwise";
 
-// Classic createElement API (like React.createElement)
+// Classic createElement API (like React.createElement).
+// Children are passed as additional arguments (rest params).
 const el = createElement("div", { class: "foo" }, "child1", "child2");
+
+// `h` is an alias for createElement
+const el2 = h("span", { class: "bar" }, "text");
+
+// If `attr` is a string or array, it is treated as the first child:
+const el3 = createElement("div", "only child");
 
 // useImperativeHandle (simplified — sets ref.current immediately)
 useImperativeHandle(myRef, () => ({ focus: () => console.log("focused") }));
