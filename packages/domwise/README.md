@@ -825,13 +825,26 @@ removeDisposingListener(el, null, "myKey");
 
 ### Lifecycle Root
 
-The lifecycle root tracks the current disposal context, enabling automatic cleanup of signal subscriptions when the parent element is disposed.
+The lifecycle root is a manual disposal context you can install while creating
+signal subscriptions outside the normal JSX tree. It is **not** set
+automatically during JSX creation. `observeSignal(..., { useLifecycleRoot: true })`
+captures the current root and exposes it as `args.lifecycleRoot` for the callback.
 
 ```tsx
-import { currentLifecycleRoot } from "@serenity-is/domwise";
+import { currentLifecycleRoot, withLifecycleRoot } from "@serenity-is/domwise";
 
-// Get the current lifecycle root (set automatically during JSX creation)
+// Read the current root (null if none is set)
 const root = currentLifecycleRoot();
+
+// Preferred: scope the root and restore it afterwards, even on error
+withLifecycleRoot(someElement, () => {
+  // observeSignal(..., { useLifecycleRoot: true }) captures someElement here
+});
+
+// Manual set/restore (returns the previous root) if you need finer control
+const prev = currentLifecycleRoot(someElement);
+// ... work ...
+currentLifecycleRoot(prev);
 ```
 
 ---

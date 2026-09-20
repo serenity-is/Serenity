@@ -1,4 +1,4 @@
-import { addDisposingListener, currentLifecycleRoot, dispatchDisposingEvent, getDisposingListeners, invokeDisposingListeners, removeDisposingListener } from "../src/disposing-listener";
+import { addDisposingListener, currentLifecycleRoot, dispatchDisposingEvent, getDisposingListeners, invokeDisposingListeners, removeDisposingListener, withLifecycleRoot } from "../src/disposing-listener";
 
 let el: HTMLElement;
 
@@ -308,5 +308,35 @@ describe("currentLifecycleRoot", () => {
         currentLifecycleRoot(root);
         currentLifecycleRoot(null as any);
         expect(currentLifecycleRoot()).toBeNull();
+    });
+});
+
+describe("withLifecycleRoot", () => {
+    it("installs the root for the duration and restores the previous one", () => {
+        const root = document.createElement("div");
+        const result = withLifecycleRoot(root, () => currentLifecycleRoot());
+        expect(result).toBe(root);
+        expect(currentLifecycleRoot()).toBeNull();
+    });
+
+    it("restores the previous root, including for nested calls", () => {
+        const outer = document.createElement("div");
+        const inner = document.createElement("div");
+        currentLifecycleRoot(outer);
+        withLifecycleRoot(inner, () => {
+            expect(currentLifecycleRoot()).toBe(inner);
+        });
+        expect(currentLifecycleRoot()).toBe(outer);
+        currentLifecycleRoot(null as any);
+    });
+
+    it("restores the root even when the callback throws", () => {
+        const outer = document.createElement("div");
+        currentLifecycleRoot(outer);
+        expect(() => withLifecycleRoot(document.createElement("div"), () => {
+            throw new Error("boom");
+        })).toThrow("boom");
+        expect(currentLifecycleRoot()).toBe(outer);
+        currentLifecycleRoot(null as any);
     });
 });

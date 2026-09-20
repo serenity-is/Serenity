@@ -184,11 +184,16 @@ export function removeDisposingListener<T extends EventTarget>(target: T | null 
 }
 
 /**
- * Gets or sets the current JSX lifecycle root element used to scope signal subscriptions.
+ * Gets or sets the current lifecycle root element used to scope signal subscriptions.
  *
  * The lifecycle root is the `EventTarget` whose `disposing` event will dispose
  * effects created during JSX construction (e.g. via `observeSignal` with
  * `useLifecycleRoot: true`).
+ *
+ * This value is **not** set automatically during JSX creation. It is stored on
+ * `globalThis`, so callers that install a root should restore the previous one;
+ * prefer {@link withLifecycleRoot} which restores it even when the callback
+ * throws.
  *
  * @param args - When provided, the first element is installed as the new lifecycle root.
  * When called with no arguments the current root (or `null` if none) is returned.
@@ -201,4 +206,26 @@ export function currentLifecycleRoot(...args: Element[]): Element | null {
         return prev;
     }
     return (globalThis as any)[lifecycleRootSymbol] || null;
+}
+
+/**
+ * Runs `fn` with the lifecycle root temporarily set to `root`, restoring the
+ * previous root afterwards even if `fn` throws.
+ *
+ * Use this instead of calling {@link currentLifecycleRoot} directly so that a
+ * thrown error cannot leave a stale root in the global state.
+ *
+ * @typeParam T - Return type of `fn`.
+ * @param root - Root to install for the duration of `fn` (`null`/`undefined` clears it).
+ * @param fn - Callback executed while the root is installed.
+ * @returns The value returned by `fn`.
+ */
+export function withLifecycleRoot<T>(root: Element | null | undefined, fn: () => T): T {
+    const prev = currentLifecycleRoot(root as Element);
+    try {
+        return fn();
+    }
+    finally {
+        currentLifecycleRoot(prev as Element);
+    }
 }

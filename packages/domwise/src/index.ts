@@ -11,7 +11,7 @@ export { bindThis } from "./bind-this";
 export { className } from "./class-name";
 export { createElement, createElement as h, useImperativeHandle } from "./compat-api";
 export { Component } from "./component";
-export { addDisposingListener, currentLifecycleRoot, dispatchDisposingEvent, invokeDisposingListeners, removeDisposingListener } from "./disposing-listener";
+export { addDisposingListener, currentLifecycleRoot, dispatchDisposingEvent, invokeDisposingListeners, removeDisposingListener, withLifecycleRoot } from "./disposing-listener";
 export { Fragment } from "./fragment";
 export * from "./hooks";
 export * from "./in-namespace-uri";
