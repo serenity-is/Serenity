@@ -26,7 +26,7 @@ const mappedKeys: Map<string, string> = new Map<string, string>([
     ["minLength", "minlength"],
     ["maxLength", "maxlength"],
     ["readOnly", "readonly"],
-    ["reffererPolicy", "referrerpolicy"],
+    ["referrerPolicy", "referrerpolicy"],
     ["rowSpan", "rowspan"],
     ["spellCheck", "spellcheck"],
     ["tabIndex", "tabindex"],
