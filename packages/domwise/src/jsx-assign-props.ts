@@ -45,11 +45,13 @@ export function assignProp(node: JSXElement, key: string, value: any, prev?: any
                     }
                 });
             }
-            Object.entries(value).forEach(([dataKey, dataValue]) => {
-                if (dataValue != null) {
-                    node.dataset[dataKey] = dataValue as string;
-                }
-            })
+            if (value != null) {
+                Object.entries(value).forEach(([dataKey, dataValue]) => {
+                    if (dataValue != null) {
+                        node.dataset[dataKey] = dataValue as string;
+                    }
+                })
+            }
             return;
 
         case "textContent":
@@ -139,11 +141,13 @@ export function assignProp(node: JSXElement, key: string, value: any, prev?: any
                     }
                 });
             }
-            Object.entries(value).forEach(([eventName, eventHandler]) => {
-                if (prev == null || prev[eventName] !== eventHandler) {
-                    node.addEventListener(eventName, eventHandler as any, useCapture);
-                }
-            });
+            if (value != null) {
+                Object.entries(value).forEach(([eventName, eventHandler]) => {
+                    if (prev == null || prev[eventName] !== eventHandler) {
+                        node.addEventListener(eventName, eventHandler as any, useCapture);
+                    }
+                });
+            }
             return;
 
         case "xlinkActuate":

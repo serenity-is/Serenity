@@ -66,6 +66,41 @@ describe("assignProps", () => {
         expect(element.dataset.third).toBe("more");
     });
 
+    it("handles dataset property set to null", () => {
+        assignProps(element, { dataset: { test: "value" } });
+        expect(element.dataset.test).toBe("value");
+        expect(() => assignProps(element, { dataset: null })).not.toThrow();
+    });
+
+    it("clears dataset when signal becomes null", () => {
+        const sig = mockSignal<any>({ test: "value", other: "data" });
+        assignProps(element, { dataset: sig });
+        expect(element.dataset.test).toBe("value");
+        expect(element.dataset.other).toBe("data");
+
+        sig.value = null;
+        expect(element.dataset.test).toBeUndefined();
+        expect(element.dataset.other).toBeUndefined();
+    });
+
+    it("handles on / onCapture set to null", () => {
+        expect(() => assignProps(element, { on: null })).not.toThrow();
+        expect(() => assignProps(element, { on: undefined })).not.toThrow();
+        expect(() => assignProps(element, { onCapture: null })).not.toThrow();
+    });
+
+    it("clears on listeners when signal becomes null", () => {
+        const handler = vi.fn();
+        const sig = mockSignal<any>({ click: handler });
+        assignProps(element, { on: sig });
+        element.click();
+        expect(handler).toHaveBeenCalledTimes(1);
+
+        sig.value = null;
+        element.click();
+        expect(handler).toHaveBeenCalledTimes(1);
+    });
+
     it("handles textContent property", () => {
         assignProps(element, { textContent: "Hello World" });
         expect(element.textContent).toBe("Hello World");
