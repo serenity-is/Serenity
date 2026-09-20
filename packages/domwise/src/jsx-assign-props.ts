@@ -15,6 +15,7 @@ function normalizeAttribute(s: string, separator: string) {
 }
 
 const mappedKeys: Map<string, string> = new Map<string, string>([
+    ["acceptCharset", "accept-charset"],
     ["autoComplete", "autocomplete"],
     ["autoFocus", "autofocus"],
     ["className", "class"],
@@ -22,6 +23,7 @@ const mappedKeys: Map<string, string> = new Map<string, string>([
     ["contentEditable", "contenteditable"],
     ["formNoValidate", "formnovalidate"],
     ["htmlFor", "for"],
+    ["httpEquiv", "http-equiv"],
     ["innerText", "textContent"],
     ["minLength", "minlength"],
     ["maxLength", "maxlength"],
