@@ -169,50 +169,13 @@ export function assignProp(node: JSXElement, key: string, value: any, prev?: any
         // fallthrough
     }
 
-    if (typeof value === "function") {
-        if (key[0] === "o" && key[1] === "n") {
-            if (prev != null && prev === value)
-                return;
+    if (key[0] === "o" && key[1] === "n" && (typeof value === "function" || typeof prev === "function")) {
+        assignEventProp(node, key, value, prev);
+        return;
+    }
 
-            let attribute = key.toLowerCase();
-            const useCapture = attribute.endsWith("capture");
-            let eventName;
-            if (!useCapture && ((node as any)[attribute] === null || (prev != null && (node as any)[attribute] === prev))) {
-                // use property when possible jsx-dom PR #17
-                (node as any)[attribute] = value;
-                addDisposingListener(node, nodeEventPropDisposer.bind(node, attribute));
-            } else if (useCapture) {
-                eventName = attribute.substring(2, attribute.length - 7);
-                if (prev != null) {
-                    node.removeEventListener(eventName, prev, true);
-                }
-                node.addEventListener(eventName, value, true);
-            } else {
-                if (attribute in window) {
-                    // standard event
-                    // the JSX attribute could have been "onMouseOver" and the
-                    // member name "onmouseover" is on the window's prototype
-                    // so let's add the listener "mouseover", which is all lowercased
-                    const standardEventName = attribute.substring(2);
-                    eventName = standardEventName;
-                } else {
-                    // custom event
-                    // the JSX attribute could have been "onMyCustomEvent"
-                    // so let's trim off the "on" prefix and lowercase the first character
-                    // and add the listener "myCustomEvent"
-                    // except for the first character, we keep the event name case
-                    const customEventName = attribute[2] + key.slice(3);
-                    eventName = customEventName;
-                }
-                if (prev != null) {
-                    node.removeEventListener(eventName, prev);
-                }
-                node.addEventListener(eventName, value);
-            }
-        }
-        else {
-            console.warn(`A function was provided for JSX ${node.tagName} element ${key} which does not start with "on":`, value, node.tagName);
-        }
+    if (typeof value === "function") {
+        console.warn(`A function was provided for JSX ${node.tagName} element ${key} which does not start with "on":`, value, node.tagName);
         return;
     }
 
@@ -277,6 +240,62 @@ export function assignProps(node: JSXElement, props: Record<string, any>): void 
         else {
             assignProp(node, key, value);
         }
+    }
+}
+
+function getEventName(key: string, attribute: string): { eventName: string, useCapture: boolean } {
+    const useCapture = attribute.endsWith("capture");
+    if (useCapture) {
+        return { eventName: attribute.substring(2, attribute.length - 7), useCapture };
+    }
+    if (attribute in window) {
+        // standard event
+        // the JSX attribute could have been "onMouseOver" and the
+        // member name "onmouseover" is on the window's prototype
+        // so let's add the listener "mouseover", which is all lowercased
+        return { eventName: attribute.substring(2), useCapture };
+    }
+    // custom event
+    // the JSX attribute could have been "onMyCustomEvent"
+    // so let's trim off the "on" prefix and lowercase the first character
+    // and add the listener "myCustomEvent"
+    // except for the first character, we keep the event name case
+    return { eventName: attribute[2] + key.slice(3), useCapture };
+}
+
+function assignEventProp(node: JSXElement, key: string, value: any, prev?: any): void {
+    const attribute = key.toLowerCase();
+    const current = (node as any)[attribute];
+    const { eventName, useCapture } = getEventName(key, attribute);
+
+    if (prev != null && prev !== value) {
+        if (current === prev) {
+            // previously installed as a DOM property, clear it directly
+            (node as any)[attribute] = null;
+        } else if (useCapture) {
+            node.removeEventListener(eventName, prev, true);
+        } else {
+            node.removeEventListener(eventName, prev);
+        }
+    }
+
+    if (typeof value !== "function") {
+        // no new handler, previous one (if any) was cleared above
+        return;
+    }
+
+    if (prev === value) {
+        return;
+    }
+
+    if (!useCapture && (current === null || (prev != null && current === prev))) {
+        // use property when possible jsx-dom PR #17
+        (node as any)[attribute] = value;
+        addDisposingListener(node, nodeEventPropDisposer.bind(node, attribute));
+    } else if (useCapture) {
+        node.addEventListener(eventName, value, true);
+    } else {
+        node.addEventListener(eventName, value);
     }
 }
 

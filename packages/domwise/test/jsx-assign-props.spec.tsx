@@ -346,6 +346,47 @@ describe("assignProps", () => {
         expect(addEventListenerSpy).toHaveBeenNthCalledWith(3, "mycustom", handler2, true);
     });
 
+    it("clears a reactive property event handler when signal becomes null", () => {
+        const handler = vi.fn();
+        const handlerSignal = mockSignal<((e: Event) => void) | null>(handler);
+
+        assignProps(element, { onClick: handlerSignal });
+        element.click();
+        expect(handler).toHaveBeenCalledTimes(1);
+        expect(element.onclick).toBe(handler);
+
+        handlerSignal.value = null;
+        expect(element.onclick).toBeNull();
+        element.click();
+        expect(handler).toHaveBeenCalledTimes(1);
+    });
+
+    it("clears a reactive custom event handler when signal becomes null", () => {
+        const handler = vi.fn();
+        const handlerSignal = mockSignal<((e: Event) => void) | null>(handler);
+
+        assignProps(element, { onMycustom: handlerSignal });
+        element.dispatchEvent(new Event("mycustom"));
+        expect(handler).toHaveBeenCalledTimes(1);
+
+        handlerSignal.value = null;
+        element.dispatchEvent(new Event("mycustom"));
+        expect(handler).toHaveBeenCalledTimes(1);
+    });
+
+    it("clears a reactive capture event handler when signal becomes null", () => {
+        const handler = vi.fn();
+        const handlerSignal = mockSignal<((e: Event) => void) | null>(handler);
+
+        assignProps(element, { onMycustomCapture: handlerSignal });
+        element.dispatchEvent(new Event("mycustom"));
+        expect(handler).toHaveBeenCalledTimes(1);
+
+        handlerSignal.value = null;
+        element.dispatchEvent(new Event("mycustom"));
+        expect(handler).toHaveBeenCalledTimes(1);
+    });
+
     it("handles xlink attributes", () => {
         const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
         assignProps(svg, { xlinkHref: "test.svg" });
