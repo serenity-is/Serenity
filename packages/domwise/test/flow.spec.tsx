@@ -111,6 +111,128 @@ describe("Show", () => {
         invokeDisposingListeners(signalResult.value as Element);
         expect(whenSignal.listeners).toHaveLength(0);
     });
+
+    it("disposes previous function-slot content on switch", () => {
+        const inner = mockSignal("a");
+        const whenSignal = mockSignal<boolean>(true);
+        const result = <Show when={whenSignal}>{() => <span>{inner}</span>}</Show>;
+        const host = <div>{result}</div>;
+        document.body.appendChild(host);
+        expect(inner.listeners).toHaveLength(1);
+
+        whenSignal.value = false;
+        expect(inner.listeners).toHaveLength(0);
+    });
+
+    it("does not dispose plain children on switch", () => {
+        const inner = mockSignal("a");
+        const whenSignal = mockSignal<boolean>(true);
+        const children = <span>{inner}</span>;
+        const result = <Show when={whenSignal} fallback={new Comment()}>{children}</Show>;
+        const host = <div>{result}</div>;
+        document.body.appendChild(host);
+        expect(inner.listeners).toHaveLength(1);
+
+        whenSignal.value = false;
+        expect(inner.listeners).toHaveLength(1);
+
+        whenSignal.value = true;
+        expect(inner.listeners).toHaveLength(1);
+    });
+
+    it("does not dispose function-slot content when autoDispose is false", () => {
+        const inner = mockSignal("a");
+        const whenSignal = mockSignal<boolean>(true);
+        const result = <Show when={whenSignal} autoDispose={false}>{() => <span>{inner}</span>}</Show>;
+        const host = <div>{result}</div>;
+        document.body.appendChild(host);
+        expect(inner.listeners).toHaveLength(1);
+
+        whenSignal.value = false;
+        expect(inner.listeners).toHaveLength(1);
+    });
+
+    it("skips lifecycle management when autoDispose is false", () => {
+        const whenSignal = mockSignal<boolean>(true);
+        const children = <div>Content</div>;
+        const result = <Show when={whenSignal} autoDispose={false}>{children}</Show>;
+        const signalResult = result as unknown as SignalLike<any>;
+        expect(whenSignal.listeners).toHaveLength(1);
+
+        invokeDisposingListeners(signalResult.value as Element);
+        expect(whenSignal.listeners).toHaveLength(1);
+    });
+
+    it("disposes hidden plain branches when the shown element is disposed", () => {
+        const whenSignal = mockSignal<boolean>(true);
+        const childrenSignal = mockSignal("child");
+        const fallbackSignal = mockSignal("fallback");
+        const children = <span>{childrenSignal}</span>;
+        const fallback = <em>{fallbackSignal}</em>;
+        const result = <Show when={whenSignal} fallback={fallback}>{children}</Show>;
+        const host = <div>{result}</div>;
+        document.body.appendChild(host);
+        expect(childrenSignal.listeners).toHaveLength(1);
+        expect(fallbackSignal.listeners).toHaveLength(1);
+
+        whenSignal.value = false;
+        expect(childrenSignal.listeners).toHaveLength(1); // hidden, not disposed on switch
+        expect(fallbackSignal.listeners).toHaveLength(1);
+
+        invokeDisposingListeners(host, { descendants: true });
+        expect(childrenSignal.listeners).toHaveLength(0); // hidden branch disposed with owner
+        expect(fallbackSignal.listeners).toHaveLength(0);
+    });
+
+    it("does not dispose hidden branches on teardown when autoDispose is false", () => {
+        const whenSignal = mockSignal<boolean>(true);
+        const childrenSignal = mockSignal("child");
+        const fallbackSignal = mockSignal("fallback");
+        const children = <span>{childrenSignal}</span>;
+        const fallback = <em>{fallbackSignal}</em>;
+        const result = <Show when={whenSignal} fallback={fallback} autoDispose={false}>{children}</Show>;
+        const host = <div>{result}</div>;
+        document.body.appendChild(host);
+
+        whenSignal.value = false;
+        invokeDisposingListeners(host, { descendants: true });
+        expect(childrenSignal.listeners).toHaveLength(1); // Show held branch left untouched
+        expect(fallbackSignal.listeners).toHaveLength(0); // shown branch cleaned by owner walk
+    });
+
+    it("disposes factory fragment branches on switch, including sibling nodes", () => {
+        const a = mockSignal("a");
+        const b = mockSignal("b");
+        const whenSignal = mockSignal<boolean>(true);
+        const result = <Show when={whenSignal}>{() => {
+            const fragment = document.createDocumentFragment();
+            fragment.append(<span>{a}</span>, <span>{b}</span>);
+            return fragment;
+        }}</Show>;
+        const host = <div>{result}</div>;
+        document.body.appendChild(host);
+        expect(a.listeners).toHaveLength(1);
+        expect(b.listeners).toHaveLength(1);
+
+        whenSignal.value = false;
+        expect(a.listeners).toHaveLength(0);
+        expect(b.listeners).toHaveLength(0);
+    });
+
+    it("disposes factory array branches on switch", () => {
+        const a = mockSignal("a");
+        const b = mockSignal("b");
+        const whenSignal = mockSignal<boolean>(true);
+        const result = <Show when={whenSignal}>{() => [<span>{a}</span>, <span>{b}</span>]}</Show>;
+        const host = <div>{result}</div>;
+        document.body.appendChild(host);
+        expect(a.listeners).toHaveLength(1);
+        expect(b.listeners).toHaveLength(1);
+
+        whenSignal.value = false;
+        expect(a.listeners).toHaveLength(0);
+        expect(b.listeners).toHaveLength(0);
+    });
 });
 
 export { };

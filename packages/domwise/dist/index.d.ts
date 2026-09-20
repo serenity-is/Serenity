@@ -2795,11 +2795,29 @@ export declare function ShadowRootNode({ children, ref, ...attr }: ShadowRootIni
  * a derived signal node so the DOM updates reactively; its lifecycle is
  * bound to the rendered node so the subscription is disposed with it.
  *
+ * When a slot is a function, its result is considered owned by `Show`: the
+ * previous result is disposed (via its `disposing` listeners) when the branch
+ * changes, since a new result is produced on every evaluation and the old one
+ * can never be reused. Plain (non-function) children are caller-owned and are
+ * never disposed on switch, as the same instance is reused each time. When the
+ * currently shown element is disposed, any branch held by `Show` (including a
+ * hidden plain branch) is disposed as well. Fragments and arrays are disposed
+ * through a snapshot of their rendered nodes, anchored to their first live
+ * node.
+ *
+ * @remarks
+ * A `DocumentFragment` is one-shot: appending it moves its children out and
+ * leaves the fragment empty. To switch branches properly, pass fragments from
+ * the function form (`{() => buildFragment()}`) so a fresh fragment is produced
+ * on every switch. A directly passed fragment renders only once and inserts
+ * nothing when the branch is shown again.
+ *
  * @typeParam TWhen - Type of the condition value.
  * @param props - Props bag.
  * @param props.when - Condition; truthiness controls which branch is shown. May be a plain value or a signal.
  * @param props.fallback - Content rendered when `when` is falsy. May be children or a function `(when) => children`.
  * @param props.children - Content rendered when `when` is truthy. May be children or a function `(when) => children`.
+ * @param props.autoDispose - When `true` (default), disposes previous function-slot results on switch and disposes held branches when the shown element is disposed. Pass `false` to opt out of all disposal/lifecycle handling.
  * @returns A `JSXElement` (or derived-signal node) representing the active branch.
  * @example
  * ```tsx
@@ -2812,6 +2830,7 @@ export declare function Show<TWhen>(props: {
 	when: SignalOrValue<TWhen | undefined | null>;
 	fallback?: ComponentChildren | ((when: SignalOrValue<TWhen | undefined | null>) => ComponentChildren);
 	children: ComponentChildren | ((when: SignalOrValue<TWhen | undefined | null>) => ComponentChildren);
+	autoDispose?: boolean;
 }): JSXElement;
 /**
  * A type guard that checks if an object is signal-like, meaning it has `subscribe` and `peek` methods,
