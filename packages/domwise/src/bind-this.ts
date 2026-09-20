@@ -9,7 +9,17 @@ const bindThisHandler: ProxyHandler<any> = {
 
         const m = target[property as keyof typeof target];
         if (typeof m === 'function') {
-            return (target[property as keyof typeof target] = m.bind(target));
+            const bound = m.bind(target);
+            // cache the bound function as a non-enumerable own property so it
+            // stays invisible to Object.keys/for...in, mirroring how class
+            // prototype methods are non-enumerable
+            Object.defineProperty(target, property, {
+                value: bound,
+                enumerable: false,
+                writable: true,
+                configurable: true
+            });
+            return bound;
         }
 
         return m;

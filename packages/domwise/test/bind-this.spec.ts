@@ -50,6 +50,22 @@ describe("bindThis", () => {
         expect(bound.getValue).toBe(boundMethod);
     });
 
+    it("should cache bound methods as non-enumerable own properties", () => {
+        const instance = new TestClass();
+        const bound = bindThis(instance);
+
+        const boundMethod = bound.getValue;
+        expect(instance.hasOwnProperty("getValue")).toBe(true);
+        expect(bound.getValue).toBe(boundMethod);
+        expect(Object.getOwnPropertyDescriptor(instance, "getValue")?.enumerable).toBe(false);
+        expect(Object.keys(instance)).not.toContain("getValue");
+
+        const forInKeys: string[] = [];
+        for (const key in instance)
+            forInKeys.push(key);
+        expect(forInKeys).not.toContain("getValue");
+    });
+
     it("should bind methods with correct this context", () => {
         const instance = new TestClass();
         const bound = bindThis(instance);
