@@ -20,7 +20,8 @@ export { MathMLNamespace } from "./mathml-consts";
 export * from "./prop-hook";
 export { createRef, setRef } from "./ref";
 export { ShadowRootNode } from "./shadow";
-export { derivedSignal, isSignalLike, observeSignal } from "./signal-util";
+export { Show } from "./show";
+export { derivedSignal, isReadonlySignal, isSignalLike, isWritableSignal, observeSignal } from "./signal-util";
 export * from "./signals";
 export { SVGNamespace } from "./svg-consts";
 

@@ -2787,12 +2787,53 @@ export declare function ShadowRootNode({ children, ref, ...attr }: ShadowRootIni
 	children?: ComponentChildren;
 }): any;
 /**
+ * Conditional rendering helper similar to Solid's `<Show>`.
+ *
+ * Renders `children` when `when` is truthy, otherwise renders `fallback`.
+ * Either slot may be a plain `ComponentChildren` value or a function that
+ * receives the `when` signal/value. When `when` is a signal, the output is
+ * a derived signal node so the DOM updates reactively; its lifecycle is
+ * bound to the rendered node so the subscription is disposed with it.
+ *
+ * @typeParam TWhen - Type of the condition value.
+ * @param props - Props bag.
+ * @param props.when - Condition; truthiness controls which branch is shown. May be a plain value or a signal.
+ * @param props.fallback - Content rendered when `when` is falsy. May be children or a function `(when) => children`.
+ * @param props.children - Content rendered when `when` is truthy. May be children or a function `(when) => children`.
+ * @returns A `JSXElement` (or derived-signal node) representing the active branch.
+ * @example
+ * ```tsx
+ * const loggedIn = signal(false);
+ * <Show when={loggedIn} fallback="Please sign in">Welcome!</Show>
+ * <Show when={loggedIn}>{() => <Dashboard user={loggedIn.value} />}</Show>
+ * ```
+ */
+export declare function Show<TWhen>(props: {
+	when: SignalOrValue<TWhen | undefined | null>;
+	fallback?: ComponentChildren | ((when: SignalOrValue<TWhen | undefined | null>) => ComponentChildren);
+	children: ComponentChildren | ((when: SignalOrValue<TWhen | undefined | null>) => ComponentChildren);
+}): JSXElement;
+/**
  * A type guard that checks if an object is signal-like, meaning it has `subscribe` and `peek` methods,
  * and a `value` property.
  * @param obj - The object to check.
  * @returns `true` if the object is signal-like.
  */
 export declare function isSignalLike<T = any>(obj: any): obj is SignalLike<T>;
+/**
+ * A type guard that checks if an object is a writable signal, meaning it passes the `isSignalLike` check
+ * and the `value` property has a setter or is writable.
+ * @param obj - The object to check.
+ * @returns `true` if the object is a writable signal.
+ */
+export declare function isWritableSignal<T>(obj: any): obj is Signal<T>;
+/**
+ * A type guard that checks if an object is a readonly (computed) signal, meaning it passes the `isSignalLike` check
+ * but the `value` property is not writable.
+ * @param obj - The object to check.
+ * @returns `true` if the object is a readonly signal.
+ */
+export declare function isReadonlySignal<T = any>(obj: any): obj is Computed<T>;
 type SignalObserveArgs<T> = {
 	/** `true` on the initial synchronous invocation right after subscription; `false` thereafter. */
 	isInitial: boolean;
