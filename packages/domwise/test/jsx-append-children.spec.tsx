@@ -19,6 +19,55 @@ describe("appendChildren", () => {
         expect(container.contains(child2)).toBe(true);
     });
 
+    it("appends iterable (Set) children", () => {
+        const child1 = document.createElement("span");
+        const child2 = document.createElement("b");
+        appendChildren(container, new Set([child1, child2]) as any);
+        expect(container.children.length).toBe(2);
+        expect(container.contains(child1)).toBe(true);
+        expect(container.contains(child2)).toBe(true);
+    });
+
+    it("does not throw for non-iterable array-like children", () => {
+        expect(() => appendChildren(container, { length: 2 } as any)).not.toThrow();
+        expect(container.childNodes.length).toBe(0);
+    });
+
+    it("expands a signal value that is an array and replaces the range on change", () => {
+        const sig = mockSignal<any>(["a", "b"]);
+        appendChildren(container, sig as any);
+        expect(container.textContent).toBe("ab");
+        expect(Array.from(container.childNodes).filter(n => n.nodeType === Node.TEXT_NODE).length).toBe(2);
+
+        sig.value = ["c", "d", "e"];
+        expect(container.textContent).toBe("cde");
+
+        sig.value = "text";
+        expect(container.textContent).toBe("text");
+
+        sig.value = ["x", "y"];
+        expect(container.textContent).toBe("xy");
+    });
+
+    it("expands a signal value that is a Set", () => {
+        const sig = mockSignal<any>(new Set(["x", "y"]));
+        appendChildren(container, sig as any);
+        expect(container.textContent).toBe("xy");
+    });
+
+    it("expands a signal value that is an array of nodes", () => {
+        const span = document.createElement("span");
+        const b = document.createElement("b");
+        const sig = mockSignal<any>([span, b]);
+        appendChildren(container, sig as any);
+        expect(container.contains(span)).toBe(true);
+        expect(container.contains(b)).toBe(true);
+
+        sig.value = [b];
+        expect(container.contains(span)).toBe(false);
+        expect(container.contains(b)).toBe(true);
+    });
+
     it("appends string children as text nodes", () => {
         appendChildren(container, "hello world");
         expect(container.textContent).toBe("hello world");

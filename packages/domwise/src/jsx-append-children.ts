@@ -23,6 +23,14 @@ function isFragmentWithPlaceholder(node: Node): node is DocumentFragment {
     return node instanceof DocumentFragment && isPlaceholder(node.firstChild);
 }
 
+function isChildCollection(value: any): boolean {
+    if (value == null || typeof value === "string" || typeof value === "number" || typeof value === "function")
+        return false;
+    if (value instanceof Node)
+        return false;
+    return Array.isArray(value) || isArrayLike(value) || typeof value[Symbol.iterator] === "function";
+}
+
 function replaceNode(oldNode: Node, newNode: Node) {
     if (typeof (oldNode as any).replaceWith === "function")
         (oldNode as any).replaceWith(newNode);
@@ -30,15 +38,26 @@ function replaceNode(oldNode: Node, newNode: Node) {
         (oldNode.parentNode)?.replaceChild(newNode, oldNode);
 }
 
+function wrapFragment(fragment: DocumentFragment): Node {
+    ++fragmentPlaceholderIdx;
+    fragment.prepend(document.createComment(placeholderPrefix + fragmentPlaceholderIdx));
+    fragment.append(document.createComment(placeholderPrefix + fragmentPlaceholderIdx));
+    return fragment;
+}
+
 function wrapAsNode(value: any): Node {
     if (value instanceof DocumentFragment) {
-        ++fragmentPlaceholderIdx;
-        value.prepend(document.createComment(placeholderPrefix + fragmentPlaceholderIdx));
-        value.append(document.createComment(placeholderPrefix + fragmentPlaceholderIdx));
-        return value;
+        return wrapFragment(value);
     }
     if (value instanceof Node) {
         return value;
+    }
+    if (isChildCollection(value)) {
+        // arrays / iterables / collections are expanded into a range so they
+        // can be replaced as a whole when the signal value changes
+        const fragment = document.createDocumentFragment();
+        appendChildren(fragment, value);
+        return wrapFragment(fragment);
     }
     if (!isVisibleChild(value)) {
         return document.createComment("");
@@ -88,11 +107,7 @@ export function appendChildren(
     children: ComponentChildren,
 ): void {
     if (!isVisibleChild(children)) return;
-    if (isArrayLike(children)) {
-        for (const child of [...(children as any[])]) {
-            appendChildren(parent, child);
-        }
-    } else if (isString(children) || isNumber(children)) {
+    if (isString(children) || isNumber(children)) {
         appendChild(parent, document.createTextNode(children as any));
     } else if (isElement(children)) {
         appendChild(parent, children);
@@ -102,5 +117,10 @@ export function appendChildren(
         setRef(children.ref, shadowRoot);
     } else if (isSignalLike(children)) {
         appendChildrenWithSignal(parent, children);
+    } else if (isChildCollection(children)) {
+        // Array.from handles both iterables (arrays, Set, ...) and array-likes
+        // (NodeList, HTMLCollection, { length }) without throwing
+        for (const child of Array.from(children as any))
+            appendChildren(parent, child as ComponentChildren);
     }
 }
