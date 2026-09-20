@@ -385,6 +385,20 @@ describe("jsx-dom main", () => {
             expect(button.className).toBe("defaultClass")
         })
 
+        it("applies defaultProps when a prop is explicitly undefined", () => {
+            const Button = (props: any) => <div className={props.className} />
+            Button.defaultProps = { className: "defaultClass" }
+            const button = <Button className={undefined} />
+            expect(button.className).toBe("defaultClass")
+        })
+
+        it("does not override defaultProps with a provided value", () => {
+            const Button = (props: any) => <div className={props.className} />
+            Button.defaultProps = { className: "defaultClass" }
+            const button = <Button className="custom" />
+            expect(button.className).toBe("custom")
+        })
+
         it("supports defaultProps in class components", () => {
             class Button extends Component<{ className: string }> {
                 static defaultProps = { className: "defaultClass" }

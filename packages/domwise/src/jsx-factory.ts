@@ -85,7 +85,12 @@ export function jsx(tag: any, props?: { children?: ComponentChildren, [key: stri
     } else if (typeof tag === "function") {
         // Custom elements.
         if (isObject(tag.defaultProps)) {
-            attr = { ...tag.defaultProps, ...attr }
+            // treat an explicitly passed `undefined` as "use the default",
+            // matching React's defaultProps behavior
+            for (const key of Object.keys(tag.defaultProps)) {
+                if (attr[key] === undefined)
+                    attr[key] = tag.defaultProps[key];
+            }
         }
 
         node = isComponentClass(tag)
