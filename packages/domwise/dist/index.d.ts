@@ -2791,7 +2791,7 @@ export declare function ShadowRootNode({ children, ref, ...attr }: ShadowRootIni
  *
  * Renders `children` when `when` is truthy, otherwise renders `fallback`.
  * Either slot may be a plain `ComponentChildren` value or a function that
- * receives the `when` signal/value. When `when` is a signal, the output is
+ * receives the resolved `when` value. When `when` is a signal, the output is
  * a derived signal node so the DOM updates reactively; its lifecycle is
  * bound to the rendered node so the subscription is disposed with it.
  *
@@ -2828,8 +2828,8 @@ export declare function ShadowRootNode({ children, ref, ...attr }: ShadowRootIni
  */
 export declare function Show<TWhen>(props: {
 	when: SignalOrValue<TWhen | undefined | null>;
-	fallback?: ComponentChildren | ((when: SignalOrValue<TWhen | undefined | null>) => ComponentChildren);
-	children: ComponentChildren | ((when: SignalOrValue<TWhen | undefined | null>) => ComponentChildren);
+	fallback?: ComponentChildren | ((when: TWhen | undefined | null) => ComponentChildren);
+	children: ComponentChildren | ((when: TWhen | undefined | null) => ComponentChildren);
 	autoDispose?: boolean;
 }): JSXElement;
 /**

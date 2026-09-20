@@ -51,9 +51,9 @@ function appendChildrenWithSignal(parent: Node, signal: SignalLike<any>) {
     observeSignal(signal, (args) => {
         if (args.isInitial) {
             prevNode = wrapAsNode(args.newValue);
-            let prevNodeNew = isFragmentWithPlaceholder(prevNode) ? prevNode.firstChild! : prevNode;
+            const prevNodeNew = isFragmentWithPlaceholder(prevNode) ? prevNode.firstChild! : prevNode;
             appendChildren(parent, prevNode as any);
-            args.lifecycleNode = (prevNode = prevNodeNew) ?? parent;
+            prevNode = prevNodeNew ?? parent;
             return;
         }
 
@@ -71,9 +71,14 @@ function appendChildrenWithSignal(parent: Node, signal: SignalLike<any>) {
                 }
             }
         }
-        let prevNodeNew = isFragmentWithPlaceholder(newNode) ? newNode.firstChild! : newNode;
+        const prevNodeNew = isFragmentWithPlaceholder(newNode) ? newNode.firstChild! : newNode;
         replaceNode(prevNode, newNode);
-        args.lifecycleNode = (prevNode = prevNodeNew) ?? parent;
+        prevNode = prevNodeNew ?? parent;
+    }, {
+        // scope the subscription to the parent, not the rendered content: the
+        // content may be disposed by an owner (e.g. Show disposing a factory
+        // branch) while this subscription must keep rendering subsequent values
+        lifecycleNode: parent
     });
 
 }

@@ -67,7 +67,7 @@ function contentToDispose(content: any): object | null {
  *
  * Renders `children` when `when` is truthy, otherwise renders `fallback`.
  * Either slot may be a plain `ComponentChildren` value or a function that
- * receives the `when` signal/value. When `when` is a signal, the output is
+ * receives the resolved `when` value. When `when` is a signal, the output is
  * a derived signal node so the DOM updates reactively; its lifecycle is
  * bound to the rendered node so the subscription is disposed with it.
  *
@@ -104,8 +104,8 @@ function contentToDispose(content: any): object | null {
  */
 export function Show<TWhen>(props: {
     when: SignalOrValue<TWhen | undefined | null>;
-    fallback?: ComponentChildren | ((when: SignalOrValue<TWhen | undefined | null>) => ComponentChildren);
-    children: ComponentChildren | ((when: SignalOrValue<TWhen | undefined | null>) => ComponentChildren);
+    fallback?: ComponentChildren | ((when: TWhen | undefined | null) => ComponentChildren);
+    children: ComponentChildren | ((when: TWhen | undefined | null) => ComponentChildren);
     autoDispose?: boolean;
 }): JSXElement {
     const autoDispose = props.autoDispose !== false;
@@ -139,11 +139,11 @@ export function Show<TWhen>(props: {
             addDisposingListener(teardownNode, disposeAll);
     }
 
-    function getContent(flag: any): JSXElement {
-        let content = flag ? props.children : props.fallback;
+    function getContent(whenValue: any): JSXElement {
+        let content = whenValue ? props.children : props.fallback;
         const isFactory = typeof content === "function";
         if (isFactory)
-            content = (content as (when: any) => ComponentChildren)(props.when);
+            content = (content as (when: any) => ComponentChildren)(whenValue);
         content ??= new Text("");
         if (autoDispose && content != null && typeof content === "object") {
             contentNodes.add(content);
@@ -199,5 +199,5 @@ export function Show<TWhen>(props: {
         return sig as unknown as JSXElement;
     }
 
-    return getContent(!!props.when);
+    return getContent(props.when);
 }

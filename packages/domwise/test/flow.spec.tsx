@@ -88,6 +88,39 @@ describe("Show", () => {
         expect(signalResult.value).toBeInstanceOf(HTMLDivElement);
     });
 
+    it("passes the resolved when value to function children", () => {
+        const user = mockSignal<{ name: string } | null>({ name: "Alice" });
+        let received: any;
+        const result = <Show when={user}>{(u: any) => { received = u; return <b>{u?.name}</b>; }}</Show>;
+        const host = <div>{result}</div>;
+        document.body.appendChild(host);
+
+        expect(received).toEqual({ name: "Alice" });
+        expect(host.textContent).toBe("Alice");
+
+        user.value = { name: "Bob" };
+        expect(received).toEqual({ name: "Bob" });
+        expect(host.textContent).toBe("Bob");
+    });
+
+    it("passes the resolved when value to function fallback", () => {
+        const user = mockSignal<string | null>(null);
+        let received: any;
+        const result = <Show when={user} fallback={(u: any) => { received = u; return <i>none</i>; }}><div>has</div></Show>;
+        const host = <div>{result}</div>;
+        document.body.appendChild(host);
+
+        expect(received).toBeNull();
+        expect(host.textContent).toBe("none");
+    });
+
+    it("passes the static when value to function children", () => {
+        let received: any;
+        const result = <Show when={42}>{(v: any) => { received = v; return <span>{v}</span>; }}</Show>;
+        expect(received).toBe(42);
+        expect((result as unknown as Element).textContent).toBe("42");
+    });
+
     it("should clean up subscriptions on dispose of children element", () => {
         const whenSignal = mockSignal<boolean>(true);
         const children = <div>Content</div>;
