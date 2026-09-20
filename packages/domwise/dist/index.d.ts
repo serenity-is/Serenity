@@ -2538,10 +2538,11 @@ export declare function addDisposingListener<T extends EventTarget>(target: T | 
  * Removes a previously registered disposing listener from an element.
  *
  * This removes the entry from the internal disposing-listener registry, not a
- * direct DOM `EventListener`. A listener matches when either its `handler`
- * reference equals the stored callback or its `regKey` equals the stored key.
- * When the last listener is removed the underlying `disposing` DOM listener
- * is also detached from the target.
+ * direct DOM `EventListener`. When both `handler` and `regKey` are provided, a
+ * listener matches only when **both** its callback reference and its `regKey`
+ * match. When only one is provided, matching uses that one (by `regKey`, or by
+ * callback reference). When the last listener is removed the underlying
+ * `disposing` DOM listener is also detached from the target.
  *
  * @typeParam T - Type of the target event target.
  * @param target - Element/event target to remove the listener from. No-op when `null`/`undefined`.
@@ -2551,17 +2552,35 @@ export declare function addDisposingListener<T extends EventTarget>(target: T | 
  */
 export declare function removeDisposingListener<T extends EventTarget>(target: T | null | undefined, handler: (() => void) | undefined | null, regKey?: string | undefined | null): T | null | undefined;
 /**
- * Gets or sets the current JSX lifecycle root element used to scope signal subscriptions.
+ * Gets or sets the current lifecycle root element used to scope signal subscriptions.
  *
  * The lifecycle root is the `EventTarget` whose `disposing` event will dispose
  * effects created during JSX construction (e.g. via `observeSignal` with
  * `useLifecycleRoot: true`).
+ *
+ * This value is **not** set automatically during JSX creation. It is stored on
+ * `globalThis`, so callers that install a root should restore the previous one;
+ * prefer {@link withLifecycleRoot} which restores it even when the callback
+ * throws.
  *
  * @param args - When provided, the first element is installed as the new lifecycle root.
  * When called with no arguments the current root (or `null` if none) is returned.
  * @returns The current lifecycle root, or the previous root when a new one is being set. Returns `null` if none is set.
  */
 export declare function currentLifecycleRoot(...args: Element[]): Element | null;
+/**
+ * Runs `fn` with the lifecycle root temporarily set to `root`, restoring the
+ * previous root afterwards even if `fn` throws.
+ *
+ * Use this instead of calling {@link currentLifecycleRoot} directly so that a
+ * thrown error cannot leave a stale root in the global state.
+ *
+ * @typeParam T - Return type of `fn`.
+ * @param root - Root to install for the duration of `fn` (`null`/`undefined` clears it).
+ * @param fn - Callback executed while the root is installed.
+ * @returns The value returned by `fn`.
+ */
+export declare function withLifecycleRoot<T>(root: Element | null | undefined, fn: () => T): T;
 /**
  * Creates a `DocumentFragment` containing the given children.
  *

@@ -119,6 +119,33 @@ describe("removeDisposingListener", () => {
         expect(listener2).toHaveBeenCalledOnce();
     });
 
+    it("requires both handler and regKey to match when both are provided", () => {
+        const listener1 = vi.fn();
+        const listener2 = vi.fn();
+        const listener3 = vi.fn();
+        addDisposingListener(el, listener1, "key1");
+        addDisposingListener(el, listener2, "key1");
+        addDisposingListener(el, listener3, "key2");
+
+        removeDisposingListener(el, listener1, "key1");
+        el.dispatchEvent(new Event("disposing"));
+        expect(listener1).not.toHaveBeenCalled();
+        expect(listener2).toHaveBeenCalledOnce();
+        expect(listener3).toHaveBeenCalledOnce();
+    });
+
+    it("does not remove unrelated listeners when handler and regKey do not both match", () => {
+        const listener2 = vi.fn();
+        const listener3 = vi.fn();
+        addDisposingListener(el, listener2, "key1");
+        addDisposingListener(el, listener3, "key2");
+
+        removeDisposingListener(el, listener3, "key1");
+        el.dispatchEvent(new Event("disposing"));
+        expect(listener2).toHaveBeenCalledOnce();
+        expect(listener3).toHaveBeenCalledOnce();
+    });
+
     it("should remove all listeners with the same callback when regKey is not used", () => {
         const listener = vi.fn();
         addDisposingListener(el, listener, "key1");

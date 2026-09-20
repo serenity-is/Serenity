@@ -149,10 +149,11 @@ export function addDisposingListener<T extends EventTarget>(target: T | null | u
  * Removes a previously registered disposing listener from an element.
  *
  * This removes the entry from the internal disposing-listener registry, not a
- * direct DOM `EventListener`. A listener matches when either its `handler`
- * reference equals the stored callback or its `regKey` equals the stored key.
- * When the last listener is removed the underlying `disposing` DOM listener
- * is also detached from the target.
+ * direct DOM `EventListener`. When both `handler` and `regKey` are provided, a
+ * listener matches only when **both** its callback reference and its `regKey`
+ * match. When only one is provided, matching uses that one (by `regKey`, or by
+ * callback reference). When the last listener is removed the underlying
+ * `disposing` DOM listener is also detached from the target.
  *
  * @typeParam T - Type of the target event target.
  * @param target - Element/event target to remove the listener from. No-op when `null`/`undefined`.
@@ -168,8 +169,11 @@ export function removeDisposingListener<T extends EventTarget>(target: T | null 
     if (listeners) {
         for (let index = listeners.length - 1; index >= 0; index--) {
             const listener = listeners[index];
-            if ((regKey && listener.regKey === regKey) ||
-                (handler && handler === listener.callback)) {
+            const matches = handler && regKey
+                // both provided: require both to match
+                ? (handler === listener.callback && listener.regKey === regKey)
+                : (regKey ? listener.regKey === regKey : handler === listener.callback);
+            if (matches) {
                 listeners.splice(index, 1);
             }
         }
