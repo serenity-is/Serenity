@@ -178,6 +178,11 @@ export function observeSignal<T>(signal: SignalLike<T>, callback: ObserveSignalC
     const args = new SignalObserveArgsImpl(signal, lifecycleRoot, opt?.lifecycleNode);
     const disposer = args.signal.subscribe(function (this: { dispose: EffectDisposer }, value: T) {
         args.newValue = value;
+        // Some SignalLike implementations invoke the subscribe callback with
+        // `this` bound to an object exposing `dispose` (the convention of
+        // @preact/signals-core's `effect`, though NOT its `subscribe`, which
+        // calls the callback without a receiver). Prefer it when present;
+        // otherwise the disposer returned by `subscribe` is used below.
         if (args.isInitial && this?.dispose) {
             args.effectDisposer = this.dispose.bind(this);
         }
