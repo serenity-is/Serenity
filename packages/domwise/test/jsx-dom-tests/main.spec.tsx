@@ -678,12 +678,14 @@ describe("jsx-dom main", () => {
 
         expect(element.outerHTML).toBe('<a href="#">Download</a>');
 
-        expect(addEventListener.mock.calls.length).toBe(2);
-        expect(addEventListener.mock.calls[0]).toEqual([
+        // ignore the internal "disposing" lifecycle listener registration
+        const calls = addEventListener.mock.calls.filter(call => call[0] !== 'disposing');
+        expect(calls.length).toBe(2);
+        expect(calls[0]).toEqual([
             'remoteinput',
             handler,
         ]);
-        expect(addEventListener.mock.calls[1]).toEqual([
+        expect(calls[1]).toEqual([
             'remoteinput',
             handler,
         ]);

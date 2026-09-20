@@ -1,5 +1,5 @@
 import type { JSXElement } from "../types";
-import { addDisposingListener } from "./disposing-listener";
+import { addDisposingListener, removeDisposingListener } from "./disposing-listener";
 import { assignClass } from "./jsx-assign-class";
 import { assignStyle } from "./jsx-assign-style";
 import { initPropHookSymbol } from "./prop-hook";
@@ -272,6 +272,7 @@ function getEventName(key: string, attribute: string): { eventName: string, useC
 function assignEventProp(node: JSXElement, key: string, value: any, prev?: any): void {
     const attribute = key.toLowerCase();
     const current = (node as any)[attribute];
+    const regKey = "domwise:event:" + attribute;
     const { eventName, useCapture } = getEventName(key, attribute);
 
     if (prev != null && prev !== value) {
@@ -283,6 +284,7 @@ function assignEventProp(node: JSXElement, key: string, value: any, prev?: any):
         } else {
             node.removeEventListener(eventName, prev);
         }
+        removeDisposingListener(node, null, regKey);
     }
 
     if (typeof value !== "function") {
@@ -297,14 +299,12 @@ function assignEventProp(node: JSXElement, key: string, value: any, prev?: any):
     if (!useCapture && (current === null || (prev != null && current === prev))) {
         // use property when possible jsx-dom PR #17
         (node as any)[attribute] = value;
-        addDisposingListener(node, nodeEventPropDisposer.bind(node, attribute));
+        addDisposingListener(node, () => { (node as any)[attribute] = null; }, regKey);
     } else if (useCapture) {
         node.addEventListener(eventName, value, true);
+        addDisposingListener(node, () => { node.removeEventListener(eventName, value, true); }, regKey);
     } else {
         node.addEventListener(eventName, value);
+        addDisposingListener(node, () => { node.removeEventListener(eventName, value); }, regKey);
     }
-}
-
-function nodeEventPropDisposer(this: { [key: string]: any }, key: string) {
-    this[key] = null;
 }

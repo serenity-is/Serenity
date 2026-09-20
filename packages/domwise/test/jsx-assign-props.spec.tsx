@@ -1,4 +1,5 @@
 import { usePropBinding } from "../src";
+import { getDisposingListeners, invokeDisposingListeners } from "../src/disposing-listener";
 import { assignProp, assignProps } from "../src/jsx-assign-props";
 import { signal } from "../src/signals";
 import { mockSignal } from "./mocks/mock-signal";
@@ -420,6 +421,43 @@ describe("assignProps", () => {
         handlerSignal.value = null;
         element.dispatchEvent(new Event("mycustom"));
         expect(handler).toHaveBeenCalledTimes(1);
+    });
+
+    it("does not accumulate disposing listeners on repeated event handler updates", () => {
+        const button = document.createElement("button");
+        const handlers = [vi.fn(), vi.fn(), vi.fn(), vi.fn()];
+        const handlerSignal = mockSignal<any>(handlers[0]);
+
+        assignProps(button, { onClick: handlerSignal });
+        const baseline = getDisposingListeners().get(button)?.length ?? 0;
+
+        for (let i = 1; i < handlers.length; i++)
+            handlerSignal.value = handlers[i];
+
+        expect(getDisposingListeners().get(button)?.length ?? 0).toBe(baseline);
+        button.click();
+        expect(handlers[0]).not.toHaveBeenCalled();
+        expect(handlers[3]).toHaveBeenCalledTimes(1);
+    });
+
+    it("removes addEventListener-based handlers on dispose", () => {
+        const handler = vi.fn();
+        assignProps(element, { onMycustom: handler });
+        element.dispatchEvent(new Event("mycustom"));
+        expect(handler).toHaveBeenCalledTimes(1);
+
+        invokeDisposingListeners(element);
+        element.dispatchEvent(new Event("mycustom"));
+        expect(handler).toHaveBeenCalledTimes(1);
+    });
+
+    it("nulls property event handlers on dispose", () => {
+        const handler = vi.fn();
+        assignProps(element, { onClick: handler });
+        expect(element.onclick).toBe(handler);
+
+        invokeDisposingListeners(element);
+        expect(element.onclick).toBeNull();
     });
 
     it("handles xlink attributes", () => {
