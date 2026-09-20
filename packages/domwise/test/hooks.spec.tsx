@@ -97,6 +97,21 @@ describe("useClassList", () => {
         expect(accessor()).toBeFalsy();
     });
 
+    it("does not throw and returns defaults after element is disposed", () => {
+        const accessor = useClassList(["test"]);
+        const el = document.createElement("div");
+        accessor[initPropHookSymbol](el, "class");
+        el.dispatchEvent(new Event("disposing"));
+
+        expect(() => accessor.add("x")).not.toThrow();
+        expect(() => accessor.remove("x")).not.toThrow();
+        expect(() => accessor.toggle("x")).not.toThrow();
+        expect(accessor.contains("x")).toBe(false);
+        expect(accessor.toggle("x")).toBe(false);
+        expect(accessor.value).toBe("");
+        expect(accessor.size).toBe(0);
+    });
+
     it("throws error when used with non-class attribute", () => {
         const classes = useClassList(['test']);
         const el = document.createElement('div');

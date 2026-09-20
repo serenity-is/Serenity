@@ -53,22 +53,22 @@ export function useClassList(initialValue?: ClassNames): BasicClassList {
                 list = node?.classList ?? list;
             },
             get size() {
-                return list.length
+                return list?.length ?? 0
             },
             get value() {
-                return list.value
+                return list?.value ?? ""
             },
             add(...tokens: string[]) {
-                list.add(...tokens)
+                list?.add(...tokens)
             },
             remove(...tokens: string[]) {
-                list.remove(...tokens)
+                list?.remove(...tokens)
             },
             toggle(token: string, force?: boolean) {
-                list.toggle(token, force)
+                return list?.toggle(token, force) ?? false
             },
             contains(token: string) {
-                return list.contains(token)
+                return list?.contains(token) ?? false
             },
         })
     )
