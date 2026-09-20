@@ -71,7 +71,7 @@ export function jsx(tag: any, props?: { children?: ComponentChildren, [key: stri
 
         if (node instanceof window.HTMLSelectElement && attr.value != null) {
             const value = isSignalLike(attr.value) ? attr.value.peek() : attr.value;
-            if (attr.multiple === true && Array.isArray(value)) {
+            if (node.multiple && Array.isArray(value)) {
                 const values = value.map((v) => String(v));
                 node
                     .querySelectorAll("option")

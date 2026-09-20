@@ -3,6 +3,7 @@ import { Component } from "../../src/component"
 import { useRef, useText } from "../../src/hooks"
 import { Fragment, jsx } from "../../src/jsx-runtime"
 import { createRef } from "../../src/ref"
+import { signal } from "../../src/signals"
 import type { HTMLElementTags, Ref } from "../../types"
 
 describe("jsx-dom main", () => {
@@ -475,6 +476,21 @@ describe("jsx-dom main", () => {
             expect(selectDeep.querySelector<HTMLOptionElement>("[value=A]").selected).toBe(true)
             expect(selectDeep.querySelector<HTMLOptionElement>("[value=B]").selected).toBe(true)
             expect(selectDeep.querySelector<HTMLOptionElement>("[value=C]").selected).toBe(false)
+        })
+
+        it("supports value attribute on select with multiple as a signal", () => {
+            const multiple = signal(true)
+            const select = (
+                <select multiple={multiple} value={["B", "C"]}>
+                    <option value="A" selected></option>
+                    <option value="B" selected></option>
+                    <option value="C"></option>
+                </select>
+            ) as HTMLSelectElement
+
+            expect(select.querySelector<HTMLOptionElement>("[value=A]").selected).toBe(false)
+            expect(select.querySelector<HTMLOptionElement>("[value=B]").selected).toBe(true)
+            expect(select.querySelector<HTMLOptionElement>("[value=C]").selected).toBe(true)
         })
     })
 
