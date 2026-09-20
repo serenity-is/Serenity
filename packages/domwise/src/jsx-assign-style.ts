@@ -1,5 +1,6 @@
 import type { JSXElement } from "../types";
 import { isSignalLike, observeSignal } from "./signal-util";
+import { disposeScopedSubscriptions, getScopedOwner } from "./subscription-owner";
 import { isNumber, isObject, isString } from "./util";
 
 /**
@@ -113,7 +114,16 @@ function clearPrevStyle(node: JSXElement, prev?: any): void {
     }
 }
 
+function normalizeStyleValue(val: any): any {
+    // false / true / null / undefined clear the property, matching
+    // how a whole style object is cleared
+    return val == null || val === false || val === true ? "" : val;
+}
+
 export function assignStyle(node: JSXElement, value?: any, prev?: boolean | any): void {
+    // drop per-key signal bindings from a previously assigned style
+    disposeScopedSubscriptions(node, "style");
+
     if (value == null || value === false || value === true) {
         clearPrevStyle(node, prev);
         return;
@@ -135,14 +145,16 @@ export function assignStyle(node: JSXElement, value?: any, prev?: boolean | any)
         else
             clearPrevStyle(node, prev);
 
+        let owner: EventTarget | undefined;
         Object.entries(value).forEach(([key, val]) => {
             if (isSignalLike(val)) {
-                observeSignal(val, args => setStylePropValue(node, key, args.newValue), {
-                    lifecycleNode: node
+                owner ??= getScopedOwner(node, "style");
+                observeSignal(val, args => setStylePropValue(node, key, normalizeStyleValue(args.newValue)), {
+                    lifecycleNode: owner
                 });
             }
             else {
-                setStylePropValue(node, key, val);
+                setStylePropValue(node, key, normalizeStyleValue(val));
             }
         });
         return;

@@ -1,6 +1,7 @@
 import type { JSXElement } from "../types";
 import { className } from "./class-name";
 import { isSignalLike, observeSignal } from "./signal-util";
+import { disposeScopedSubscriptions, getScopedOwner } from "./subscription-owner";
 import { isArrayLike, isObject } from "./util";
 
 function unsignalizePrevClass(prev: any): any {
@@ -42,12 +43,17 @@ function clearPrevClass(node: JSXElement, prev?: any): void {
 }
 
 export function assignClass(node: JSXElement, value?: any, prev?: any): void {
+    // drop per-key signal bindings from a previously assigned class
+    disposeScopedSubscriptions(node, "class");
+
     if (value == null || value === false) {
         clearPrevClass(node, prev);
         return;
     }
 
     prev = unsignalizePrevClass(prev);
+
+    let owner: EventTarget | undefined;
 
     if (isArrayLike(value)) {
         value = Array.from(value).map(x => {
@@ -60,7 +66,7 @@ export function assignClass(node: JSXElement, value?: any, prev?: any): void {
                     }
                     applyClassName(node, args.newValue, args.prevValue);
                 }, {
-                    lifecycleNode: node
+                    lifecycleNode: owner ??= getScopedOwner(node, "class")
                 });
             }
             return val;
@@ -77,7 +83,7 @@ export function assignClass(node: JSXElement, value?: any, prev?: any): void {
                     }
                     applyClassName(node, Boolean(args.newValue) && key, Boolean(args.prevValue) && key)
                 }, {
-                    lifecycleNode: node
+                    lifecycleNode: owner ??= getScopedOwner(node, "class")
                 });
             }
         });

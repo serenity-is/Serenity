@@ -185,4 +185,33 @@ describe("signal integration", () => {
         invokeDisposingListeners(div, { descendants: true });
         expect(signal.unsubscribe).toHaveBeenCalledOnce();
     });
+
+    it("clears a style property when its signal becomes false", () => {
+        const color = mockSignal<any>("red");
+        const div = <div style={{ color }} />;
+        expect(div.style.color).toBe("red");
+        color.value = false;
+        expect(div.style.color).toBe("");
+    });
+
+    it("stops per-key style signal updates after outer style is replaced", () => {
+        const color = mockSignal("red");
+        const styleSignal = mockSignal<any>({ color });
+        const div = <div style={styleSignal} />;
+        expect(div.style.color).toBe("red");
+
+        styleSignal.value = "color: blue";
+        expect(div.style.color).toBe("blue");
+
+        color.value = "green";
+        expect(div.style.color).toBe("blue");
+    });
+
+    it("disposes per-key style signals when element is disposed", () => {
+        const color = mockSignal("red");
+        const div = <div style={{ color }} />;
+        expect(color.listeners).toHaveLength(1);
+        invokeDisposingListeners(div, { descendants: true });
+        expect(color.listeners).toHaveLength(0);
+    });
 })

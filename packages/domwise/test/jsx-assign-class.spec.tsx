@@ -1,3 +1,4 @@
+import { invokeDisposingListeners } from "../src/disposing-listener";
 import { assignClass } from "../src/jsx-assign-class";
 import { mockSignal } from "./mocks/mock-signal";
 
@@ -65,6 +66,26 @@ describe("assignClass", () => {
 
         sig.value = true;
         expect(element.classList.contains("foo")).toBe(true);
+    });
+
+    it("stops applying class signal after class is replaced", () => {
+        const active = mockSignal(false);
+        assignClass(element, { active });
+        expect(element.classList.contains("active")).toBe(false);
+
+        assignClass(element, "other", { active });
+        expect(element.classList.contains("other")).toBe(true);
+
+        active.value = true;
+        expect(element.classList.contains("active")).toBe(false);
+    });
+
+    it("disposes per-key class signals when element is disposed", () => {
+        const active = mockSignal(true);
+        assignClass(element, { active });
+        expect(active.listeners).toHaveLength(1);
+        invokeDisposingListeners(element, { descendants: true });
+        expect(active.listeners).toHaveLength(0);
     });
 
     it("clears previous classes when value is null, false, or true", () => {
