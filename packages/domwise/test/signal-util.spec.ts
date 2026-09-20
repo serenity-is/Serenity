@@ -233,6 +233,51 @@ describe("createDerivedSignal", () => {
         expect(derived.value).toBe(20);
     });
 
+    it("reuses the source constructor and keeps the writable derived signal reactive", () => {
+        class CustomSignal {
+            private _subs = new Set<(v: any) => void>();
+            constructor(public value: any) { }
+            peek() { return this.value; }
+            subscribe(cb: (v: any) => void) {
+                this._subs.add(cb);
+                cb(this.value);
+                return () => this._subs.delete(cb);
+            }
+            setValue(v: any) {
+                this.value = v;
+                this._subs.forEach(cb => cb(v));
+            }
+        }
+
+        const input = new CustomSignal(1);
+        const derived = derivedSignal(input, v => v * 10);
+        expect(derived).toBeInstanceOf(CustomSignal);
+        expect(derived.value).toBe(10);
+
+        input.setValue(2);
+        expect(derived.value).toBe(20);
+
+        derived.derivedDisposer?.();
+        input.setValue(3);
+        expect(derived.value).toBe(20);
+    });
+
+    it("propagates subscribe errors without retrying the fallback path", () => {
+        let subscribeCalls = 0;
+        class BadSignal {
+            constructor(public value: any) { }
+            peek() { return this.value; }
+            subscribe() {
+                subscribeCalls++;
+                throw new Error("subscribe failed");
+            }
+        }
+
+        const input = new BadSignal(1);
+        expect(() => derivedSignal(input, v => v)).toThrow("subscribe failed");
+        expect(subscribeCalls).toBe(1);
+    });
+
     it("should handle subscribe that does not call back synchronously", () => {
         // A signal-like without a special constructor (constructor === {}.constructor)
         // that does NOT call subscribe callback synchronously

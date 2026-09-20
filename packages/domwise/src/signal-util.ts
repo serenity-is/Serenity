@@ -232,24 +232,36 @@ export function derivedSignal<TDerived, TInput = any>(input: SignalLike<TInput>,
     const callback = () => fn(input.value);
 
     if (typeof input.constructor === "function" && input.constructor !== {}.constructor) {
+        // Try to reuse the source signal's constructor so the derived signal
+        // belongs to the same library/instance as the input (important when
+        // multiple copies of a signal library are loaded). Only the constructor
+        // call is guarded: an unusable constructor falls back, but errors from
+        // subscribing must not be swallowed.
+        let derived: any;
         try {
-            let derived = new (input.constructor as any)(callback);
-            let disposer: EffectDisposer | null | undefined;
-            if (isSignalLike(derived)) {
-                if (derived.peek() === callback) {
-                    disposer = input.subscribe(() => {
-                        (derived as any).value = callback();
-                    });
-                }
-                if (disposer) {
+            derived = new (input.constructor as any)(callback);
+        }
+        catch {
+            derived = undefined;
+        }
+        if (isSignalLike(derived)) {
+            // A writable signal constructor stores `callback` as the initial
+            // value rather than computing from it, so drive it from the source
+            // signal's own `subscribe` (the only portable "effect" reachable on
+            // an instance). A computed constructor tracks the input itself.
+            if (isWritableSignal(derived)) {
+                (derived as Signal<TDerived>).value = callback();
+                const disposeInput = input.subscribe(() => {
+                    derived.value = callback();
+                });
+                if (disposeInput) {
                     (derived as DerivedSignalLike<TDerived>).derivedDisposer = function () {
-                        disposer!();
-                        delete (derived as DerivedSignalLike<TDerived>).derivedDisposer;
+                        disposeInput();
+                        delete (derived as any).derivedDisposer;
                     }
                 }
-                return derived;
             }
-        } catch (error) {
+            return derived;
         }
     }
 
