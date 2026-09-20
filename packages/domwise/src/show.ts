@@ -88,6 +88,11 @@ function contentToDispose(content: any): object | null {
  * on every switch. A directly passed fragment renders only once and inserts
  * nothing when the branch is shown again.
  *
+ * Branch values that are not DOM nodes (e.g. a raw string or number) have no
+ * node for `Show` to bind its lifecycle to, so they cannot be disposed by
+ * `Show` itself. Their subscription cleanup is handled by the layer that
+ * inserts the returned derived signal (normally `appendChildren`).
+ *
  * @typeParam TWhen - Type of the condition value.
  * @param props - Props bag.
  * @param props.when - Condition; truthiness controls which branch is shown. May be a plain value or a signal.

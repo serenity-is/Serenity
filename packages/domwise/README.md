@@ -586,6 +586,11 @@ children out and leaves it empty, so a directly provided fragment renders only
 once and inserts nothing when the branch is shown again. The function form
 produces a fresh fragment on every switch.
 
+Branch values that are not DOM nodes (for example a raw string or number) have
+no node for `Show` to bind its lifecycle to, so `Show` cannot dispose them
+itself. Their subscription cleanup is handled by the code that inserts the
+returned derived signal (normally `appendChildren`).
+
 ---
 
 ## Fragments
