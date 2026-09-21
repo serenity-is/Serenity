@@ -1,3 +1,4 @@
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { CellRange, EventEmitter, type Column, type Editor, type EditorClass, type EditorOptions, type GridPlugin, type IDataView, type ItemMetadata, type SelectionModel, type ValidationResult } from "../../src/core";
 import { SleekGrid } from "../../src/grid";
 

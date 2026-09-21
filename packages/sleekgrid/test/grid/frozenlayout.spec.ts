@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from "vitest";
 import { FrozenLayout } from "../../src/layouts/frozen-layout";
 import { mockLayoutHost } from "../mocks/mock-layout-host";
 
@@ -114,8 +115,8 @@ describe("FrozenLayout", () => {
             expect(isHidden(host.container.querySelector(".slick-headerrow"))).toBe(true);
 
             // toggle to true
-           //host.opt.showHeaderRow = true;
-           //expect(isVisible(host.container.querySelector(".slick-headerrow"))).toBe(true);
+            //host.opt.showHeaderRow = true;
+            //expect(isVisible(host.container.querySelector(".slick-headerrow"))).toBe(true);
 
             // toggle back to false
             //host.opt.showHeaderRow = false;

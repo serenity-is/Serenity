@@ -1,3 +1,4 @@
+import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Column } from "../../src/core";
 import { SleekGrid } from "../../src/grid";
 

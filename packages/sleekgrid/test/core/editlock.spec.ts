@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { EditController, EditorLock, GlobalEditorLock } from "../../src/core/editing";
 
 describe('EditLock', () => {
@@ -78,8 +79,8 @@ describe('EditLock', () => {
         const editorLock = new EditorLock();
 
         editorLock.activate({
-           commitCurrentEdit: () => true,
-           cancelCurrentEdit: () => true
+            commitCurrentEdit: () => true,
+            cancelCurrentEdit: () => true
         });
 
         expect(() => editorLock.activate(null as EditController))

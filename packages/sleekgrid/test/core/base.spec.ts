@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { NonDataRow, preClickClassName } from "../../src/core/base";
 
 describe('NonDataRow', () => {

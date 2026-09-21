@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { AutoTooltips } from "../../src/plugins/autotooltips";
 
 describe("AutoTooltips.defaults", () => {
@@ -28,8 +29,8 @@ function mockGrid() {
         },
         onMouseEnterList: <any[]>[],
         onMouseEnter: {
-            subscribe: function(f: any) { grid.onMouseEnterList.push(f); },
-            unsubscribe: function(f: any) {
+            subscribe: function (f: any) { grid.onMouseEnterList.push(f); },
+            unsubscribe: function (f: any) {
                 const idx = grid.onMouseEnterList.indexOf(f);
                 expect(idx >= 0).toBe(true);
                 grid.onMouseEnterList.splice(idx, 1);
@@ -37,19 +38,19 @@ function mockGrid() {
         },
         onHeaderMouseEnterList: <any[]>[],
         onHeaderMouseEnter: {
-            subscribe: function(f: any) { grid.onHeaderMouseEnterList.push(f); },
-            unsubscribe: function(f: any) {
+            subscribe: function (f: any) { grid.onHeaderMouseEnterList.push(f); },
+            unsubscribe: function (f: any) {
                 const idx = grid.onHeaderMouseEnterList.indexOf(f);
                 expect(idx >= 0).toBe(true);
                 grid.onHeaderMouseEnterList.splice(idx, 1);
             }
         },
-        getCellFromEvent: function(e: any) {
+        getCellFromEvent: function (e: any) {
             grid.getCellFromEventCalls++;
             return e.cell === undefined ? { row: 7, cell: 3 } : e.cell;
         },
         getCellFromEventCalls: 0,
-        getCellNode: function(row: number, cell: number) {
+        getCellNode: function (row: number, cell: number) {
             grid.getCellNodeCalls++;
             return row == 7 && cell == 3 ? grid.node : null
         },

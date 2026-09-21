@@ -1,4 +1,6 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { EventEmitter, type EditorOptions } from "../../src/core";
+import { Editors } from "../../src/editors";
 import {
     CheckboxCellEdit,
     DateCellEdit,
@@ -9,7 +11,6 @@ import {
     TextCellEdit,
     YesNoSelectCellEdit
 } from "../../src/editors/editors";
-import { Editors } from "../../src/editors";
 
 // ---------------------------------------------------------------------------
 // helpers

@@ -1,4 +1,5 @@
-﻿import { Column, columnDefaults } from "../../src/core/column";
+﻿import { describe, expect, it, vi } from "vitest";
+import { Column, columnDefaults } from "../../src/core/column";
 import { gridDefaults, GridOptions } from "../../src/core/gridoptions";
 import { BasicLayout, LayoutHost, SleekGrid } from "../../src/grid/";
 

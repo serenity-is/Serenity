@@ -1,6 +1,7 @@
-import { renderCell } from "../../src/grid/render-cell";
-import type { CellRenderArgs } from "../../src/grid/render-args";
+import { describe, expect, it, vi } from "vitest";
 import type { CachedRow } from "../../src/grid/internal";
+import type { CellRenderArgs } from "../../src/grid/render-args";
+import { renderCell } from "../../src/grid/render-cell";
 
 function makeCachedRow(): CachedRow {
     return { cellColSpans: [], cellNodesByColumnIdx: {}, cellRenderQueue: [], cellRenderContent: [] } as CachedRow;

@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { TreeColumns, type TreeColumn } from "../../src/grid/tree-columns";
 
 describe('TreeColumns', () => {
@@ -6,13 +7,17 @@ describe('TreeColumns', () => {
     // c: (visible, no children)
     function makeTree(): TreeColumn[] {
         return [
-            { id: "a", visible: true, columns: [
-                { id: "a1", visible: true },
-                { id: "a2", visible: false }
-            ] },
-            { id: "b", visible: false, columns: [
-                { id: "b1", visible: true }
-            ] },
+            {
+                id: "a", visible: true, columns: [
+                    { id: "a1", visible: true },
+                    { id: "a2", visible: false }
+                ]
+            },
+            {
+                id: "b", visible: false, columns: [
+                    { id: "b1", visible: true }
+                ]
+            },
             { id: "c", visible: true }
         ];
     }

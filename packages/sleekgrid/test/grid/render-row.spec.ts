@@ -1,6 +1,7 @@
-import { renderRow } from "../../src/grid/render-row";
-import type { RowRenderArgs } from "../../src/grid/render-args";
+import { describe, expect, it } from "vitest";
 import type { CachedRow } from "../../src/grid/internal";
+import type { RowRenderArgs } from "../../src/grid/render-args";
+import { renderRow } from "../../src/grid/render-row";
 
 function cols() {
     return [{ id: "c0", field: "c0" }, { id: "c1", field: "c1" }, { id: "c2", field: "c2" }];

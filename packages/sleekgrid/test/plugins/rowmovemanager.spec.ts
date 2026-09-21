@@ -1,7 +1,8 @@
+import { afterEach, describe, expect, it } from "vitest";
 import { EditorLock } from "../../src/core/editing";
+import { SleekGrid } from "../../src/grid/sleekgrid";
 import { RowMoveManager, type ArgsMoveRows } from "../../src/plugins/rowmovemanager";
 import { RowSelectionModel } from "../../src/plugins/rowselectionmodel";
-import { SleekGrid } from "../../src/grid/sleekgrid";
 
 function makeData(n: number) {
     const data: any[] = [];

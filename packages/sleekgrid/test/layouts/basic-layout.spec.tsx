@@ -1,5 +1,6 @@
-import { mockLayoutHost } from "../mocks/mock-layout-host";
+import { describe, expect, it } from "vitest";
 import { BasicLayout } from "../../src/grid";
+import { mockLayoutHost } from "../mocks/mock-layout-host";
 
 describe("BasicLayout", () => {
     it("can be destroyed after initialization", () => {

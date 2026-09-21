@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from "vitest";
 import { EventEmitter } from "../../src/core/event";
 import { addListener, removeListener, triggerGridEvent } from "../../src/grid/event-utils";
 

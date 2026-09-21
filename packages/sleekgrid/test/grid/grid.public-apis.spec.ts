@@ -1,6 +1,7 @@
-import { EventEmitter } from "../../src/core/event";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Column, ColumnMetadata, IDataView, ItemMetadata } from "../../src/core";
-import { BasicLayout, FrozenLayout, SleekGrid } from "../../src/grid";
+import { EventEmitter } from "../../src/core/event";
+import { FrozenLayout, SleekGrid } from "../../src/grid";
 
 interface Row {
     first: string;

@@ -1,3 +1,4 @@
+import { vi } from "vitest";
 import { EventEmitter } from "../../src/core";
 import type { Column } from "../../src/core/column";
 import type { RowCell } from "../../src/core/editing";

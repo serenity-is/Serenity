@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from "vitest";
 import { autosizeColumns, setupColumnResize } from "../../src/grid/column-resizing";
 
 function makeHeaderBand(colCount: number): HTMLElement {

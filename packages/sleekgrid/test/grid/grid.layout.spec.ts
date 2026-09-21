@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { ViewportInfo } from "../../src/core";
 import { GridOptions } from "../../src/core/gridoptions";
 import { BasicLayout, SleekGrid } from "../../src/grid/";

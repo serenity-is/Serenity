@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { type Column } from "../../src/core";
 import { SleekGrid } from "../../src/grid";
 

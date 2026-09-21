@@ -1,6 +1,7 @@
+import { describe, expect, it } from "vitest";
 import { CellRange } from "../../src/core";
-import { RowSelectionModel } from "../../src/plugins/rowselectionmodel";
 import { SleekGrid } from "../../src/grid/sleekgrid";
+import { RowSelectionModel } from "../../src/plugins/rowselectionmodel";
 
 function makeData(n: number) {
     const data: any[] = [];

@@ -1,3 +1,4 @@
+import { afterEach, describe, expect, it, vi } from "vitest";
 import type { CellStylesHash, Column, IDataView, ItemMetadata } from "../../src/core";
 import { BasicLayout, FrozenLayout, SleekGrid } from "../../src/grid";
 

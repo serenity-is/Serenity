@@ -1,4 +1,5 @@
-﻿import { Column } from "../../src/core/column";
+﻿import { describe, expect, it } from "vitest";
+import { Column } from "../../src/core/column";
 import { SleekGrid } from "../../src/grid/sleekgrid";
 import { FrozenLayout } from "../../src/layouts/frozen-layout";
 
@@ -152,15 +153,15 @@ describe('options.frozenColumns', () => {
         //const paneTopLeft = div.querySelector(`.${slickPaneTop}.${slickPaneStart}`) as HTMLDivElement;
         //expect(paneTopLeft).toBeDefined();
         //expect(paneTopLeft.hidden).toBe(false);
-//
+        //
         //const paneTopRight = div.querySelector(`.${slickPaneTop}.${slickPaneMain}`) as HTMLDivElement;
         //expect(paneTopRight).toBeDefined();
         //expect(paneTopRight.hidden).toBe(false);
-//
+        //
         //const paneBottomLeft = div.querySelector(`.${slickPaneBottom}.${slickPaneStart}`) as HTMLDivElement;
         //expect(paneBottomLeft).toBeDefined();
         //expect(paneBottomLeft.hidden).toBe(true);
-//
+        //
         //const paneBottomRight = div.querySelector(`.${slickPaneBottom}.${slickPaneMain}`) as HTMLDivElement;
         //expect(paneBottomRight).toBeDefined();
         //expect(paneBottomRight.hidden).toBe(true);
@@ -211,17 +212,17 @@ describe('options.frozenColumns', () => {
         const viewportTopRight = div.querySelector(`.${slickPaneTop}.${slickPaneMain} > .slick-viewport`) as HTMLDivElement;
         expect(viewportTopLeft).toBeDefined();
         expect(viewportTopRight).toBeDefined();
-       //expect(grid.getScrollContainerX()).toBe(viewportTopLeft);
-       //expect(grid.getScrollContainerY()).toBe(viewportTopLeft);
-       //grid.setOptions({
-       //    frozenColumns: 2
-       //});
-       //expect(grid.getScrollContainerX()).toBe(viewportTopRight);
-       //expect(grid.getScrollContainerY()).toBe(viewportTopRight);
-       //const cols2 = grid.getColumns();
-       //expect(cols2[0].frozen).toBe(true);
-       //expect(cols2[1].frozen).toBe(true);
-       //expect(cols2[2].frozen).toBeFalsy();
+        //expect(grid.getScrollContainerX()).toBe(viewportTopLeft);
+        //expect(grid.getScrollContainerY()).toBe(viewportTopLeft);
+        //grid.setOptions({
+        //    frozenColumns: 2
+        //});
+        //expect(grid.getScrollContainerX()).toBe(viewportTopRight);
+        //expect(grid.getScrollContainerY()).toBe(viewportTopRight);
+        //const cols2 = grid.getColumns();
+        //expect(cols2[0].frozen).toBe(true);
+        //expect(cols2[1].frozen).toBe(true);
+        //expect(cols2[2].frozen).toBeFalsy();
     });
 
     it("moves frozen columns to the left on init", () => {

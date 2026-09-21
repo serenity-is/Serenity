@@ -1,5 +1,6 @@
-import { addCssClass, basicDOMSanitizer, disableSelection, escapeHtml, removeCssClass } from "../../src/core/util";
 import { jsx as H } from "@serenity-is/domwise";
+import { describe, expect, it } from "vitest";
+import { addCssClass, basicDOMSanitizer, disableSelection, escapeHtml, removeCssClass } from "../../src/core/util";
 
 describe('addCssClass', () => {
     it('should not do anything if classes to add is null or undefined', () => {

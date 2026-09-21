@@ -1,5 +1,6 @@
-import type { Editor, EditorClass, EditorOptions, ValidationResult } from "../../src/core/editing";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Column } from "../../src/core";
+import type { Editor, EditorClass, EditorOptions, ValidationResult } from "../../src/core/editing";
 import { SleekGrid } from "../../src/grid";
 
 interface EditRow {

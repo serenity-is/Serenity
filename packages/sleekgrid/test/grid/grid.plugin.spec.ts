@@ -1,3 +1,4 @@
+import { expect, it } from "vitest";
 import type { ISleekGrid } from "../../src/core";
 import type { GridPlugin } from "../../src/core/grid-plugin";
 import { SleekGrid } from "../../src/grid/sleekgrid";
@@ -21,7 +22,7 @@ it('should be able to get plugin by name if it exists', () => {
     const grid = new SleekGrid(document.createElement('div'), [], [], {});
 
     const plugin: GridPlugin = {
-        init: (_grid: ISleekGrid) => {},
+        init: (_grid: ISleekGrid) => { },
         pluginName: 'test'
     }
 
@@ -35,7 +36,7 @@ it('should be able to unregister a plugin', () => {
 
     let pluginDestroyCalled = false;
     const plugin: GridPlugin = {
-        init: (_grid: ISleekGrid) => {},
+        init: (_grid: ISleekGrid) => { },
         destroy: () => {
             pluginDestroyCalled = true;
         },
@@ -56,7 +57,7 @@ it('should call plugin.destroy if it exists', () => {
 
     let pluginDestroyCalled = false;
     const plugin: GridPlugin = {
-        init: (_grid: ISleekGrid) => {},
+        init: (_grid: ISleekGrid) => { },
         destroy: () => {
             pluginDestroyCalled = true;
         }

@@ -1,4 +1,5 @@
-﻿import { Column, initColumnProps, titleize } from "../../src/core/column";
+﻿import { describe, expect, it } from "vitest";
+import { Column, initColumnProps, titleize } from "../../src/core/column";
 
 describe("initColumnProps", () => {
     it('should set defaults of the columns', () => {

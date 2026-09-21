@@ -1,3 +1,4 @@
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { Column } from "../../src/core";
 import { SleekGrid } from "../../src/grid";
 
@@ -118,7 +119,7 @@ describe('RTL Mode', () => {
 
       const header = grid.getHeaderColumn(columns[0].id);
       mockOffsetWidth(header, 150);
-      
+
       const resizeHandle = header?.querySelector('.slick-resizable-handle') as HTMLElement;
       expect(resizeHandle).toBeTruthy();
 
@@ -152,7 +153,7 @@ describe('RTL Mode', () => {
 
     // Test each column (0, 1, 2)
     for (let i = 0; i < columns.length; i++) {
-      
+
       // Reset all column widths to 150
       columns.forEach(c => c.width = 150);
       mockHeadersToCurrentWidths();

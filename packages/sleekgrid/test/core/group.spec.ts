@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { Group, GroupTotals } from "../../src/core/group";
 
 describe('Group', () => {

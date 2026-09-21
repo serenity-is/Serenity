@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { formatterContext as ctx } from "../../src/core/formatting";
 import {
     CheckBoxFormatter,

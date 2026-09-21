@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { CellNavigator, type CellNavigatorHost } from "../../src/grid/cellnavigator";
 
 interface HostOptions {

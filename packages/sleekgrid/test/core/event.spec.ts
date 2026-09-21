@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import * as deprecatedWorkaround from "../../src/core/event";
 import { EventDataWrapper, EventEmitter, EventSubscriber, type EventData } from "../../src/core/event";
 

@@ -4,7 +4,6 @@ export default defineConfig({
     test: {
         name: "sleekgrid",
         environment: "jsdom",
-        globals: true,
         coverage: {
             include: ["src/**/*.{ts,tsx}"],
             reporter: ["json", "html", "text"]

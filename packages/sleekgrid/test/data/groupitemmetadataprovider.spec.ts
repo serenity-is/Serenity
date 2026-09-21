@@ -1,4 +1,5 @@
-import { ColumnFormat, CompatFormatter, formatterContext as ctx, Group, GroupTotals, type ISleekGrid } from "../../src/core";
+import { describe, expect, it, vi } from "vitest";
+import { ColumnFormat, CompatFormatter, formatterContext as ctx, Group, GroupTotals } from "../../src/core";
 import { GroupItemMetadataProvider } from "../../src/data/groupitemmetadataprovider";
 
 describe("GroupItemMetadataProvider.defaults", () => {
