@@ -14,7 +14,7 @@ export default defineConfig({
             excludeAfterRemap: true
         },
         execArgv: [
-            Number(process.versions.node.split('.')[0]) >= 25 ? '--no-webstorage' : null
+            Number((globalThis as any).process.versions.node.split('.')[0]) >= 25 ? '--no-webstorage' : null
         ].filter(x => x != null),
         pool: "vmThreads",
         globals: true
