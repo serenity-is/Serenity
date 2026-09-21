@@ -11,7 +11,6 @@ export default defineConfig({
                 "src/index.ts"
             ],
             excludeAfterRemap: true
-        },
-        globals: true
+        }
     }
 })

@@ -1,4 +1,3 @@
-// @ts-ignore
 import { beforeEach, describe, expect, it, type Mock, vi } from "vitest";
 import { alertDialog, iframeDialog } from "./dialogs";
 import { ErrorHandling } from "./errorhandling";
