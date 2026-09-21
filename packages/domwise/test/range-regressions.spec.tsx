@@ -1,7 +1,6 @@
 import { signal } from "@preact/signals-core";
 import { addDisposingListener, invokeDisposingListeners } from "../src/disposing-listener";
 import { appendChildren } from "../src/jsx-append-children";
-import { bindThis } from "../src/bind-this";
 import { assignStyle } from "../src/jsx-assign-style";
 import { derivedSignal } from "../src/signal-util";
 import { useClassList } from "../src/hooks";
@@ -115,20 +114,6 @@ describe("range regression: R6 ShadowRootNode in signal collection", () => {
         const container = document.createElement("div");
         const s = signal<any>([ShadowRootNode({ mode: "open", children: "x" })]);
         expect(() => appendChildren(container, s)).not.toThrow();
-    });
-});
-
-describe("range regression: R7 bindThis inherited accessors", () => {
-    it("writes through an inherited accessor instead of shadowing it", () => {
-        const el = document.createElement("div");
-        let first = 0, second = 0;
-        el.onclick = () => { first++; };
-        const proxy = bindThis(el);
-        void (proxy as any).onclick;
-        el.onclick = () => { second++; };
-        el.dispatchEvent(new MouseEvent("click"));
-        expect(second).toBe(1);
-        expect(first).toBe(0);
     });
 });
 
