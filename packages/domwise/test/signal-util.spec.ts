@@ -297,6 +297,30 @@ describe("createDerivedSignal", () => {
         expect(derived).toBeDefined();
         expect(derived.value).toBe(84);
     });
+
+    it("evaluates the transform once at creation and once per change", () => {
+        const source = signal(1);
+        let calls = 0;
+        const derived = derivedSignal(source, value => { calls++; return value * 2; });
+        expect(calls).toBe(1);
+        expect(derived.value).toBe(2);
+
+        source.value = 2;
+        expect(derived.value).toBe(4);
+        expect(calls).toBe(2);
+    });
+
+    it("derives through a chained derived signal", () => {
+        const source = mockSignal(1);
+        const first = derivedSignal(source, value => value * 2);
+        const second = derivedSignal(first as any, value => value + 1);
+        expect(first.value).toBe(2);
+        expect(second.value).toBe(3);
+
+        source.value = 5;
+        expect(first.value).toBe(10);
+        expect(second.value).toBe(11);
+    });
 });
 
 describe("PrimitiveComputed", () => {

@@ -160,6 +160,100 @@ describe("assignProps", () => {
         expect(select.value).toBe("c");
     });
 
+    it("follows the input value signal after the user edits the field and through null", () => {
+        const value = mockSignal<any>("x");
+        const input = <input value={value} /> as HTMLInputElement;
+        document.body.appendChild(input);
+        expect(input.value).toBe("x");
+
+        input.value = "typed";
+        value.value = "y";
+        expect(input.value).toBe("y");
+
+        value.value = null;
+        expect(input.value).toBe("");
+    });
+
+    it("reflects the initial input value as an attribute for serialization", () => {
+        const input = <input value="18" /> as HTMLInputElement;
+        expect(input.value).toBe("18");
+        expect(input.getAttribute("value")).toBe("18");
+        expect(input.outerHTML).toContain('value="18"');
+    });
+
+    it("tracks the input value attribute on signal updates", () => {
+        const value = mockSignal<any>("x");
+        const input = <input value={value} /> as HTMLInputElement;
+        expect(input.getAttribute("value")).toBe("x");
+
+        value.value = "y";
+        expect(input.value).toBe("y");
+        expect(input.getAttribute("value")).toBe("y");
+    });
+
+    it("does not clear the default selection when select value is null", () => {
+        const select = document.createElement("select");
+        select.innerHTML = '<option value="a">a</option><option value="b">b</option>';
+        assignProps(select, { value: null } as any);
+        expect(select.value).toBe("a");
+    });
+
+    it("applies a prop-hook value on a select after its options exist", () => {
+        const binding = usePropBinding("b");
+        const select = <select value={binding}><option value="a">a</option><option value="b">b</option></select> as HTMLSelectElement;
+        expect(select.value).toBe("b");
+    });
+
+    it("keeps following the checked signal after the user toggles the checkbox", () => {
+        const checked = mockSignal(false);
+        const input = <input type="checkbox" checked={checked} /> as HTMLInputElement;
+        document.body.appendChild(input);
+        expect(input.checked).toBe(false);
+
+        checked.value = true;
+        expect(input.checked).toBe(true);
+
+        input.click(); // user unchecks
+        expect(input.checked).toBe(false);
+
+        checked.value = false;
+        checked.value = true;
+        expect(input.checked).toBe(true);
+    });
+
+    it("accepts truthy non-boolean checked values", () => {
+        const cb = document.createElement("input");
+        cb.type = "checkbox";
+        assignProps(cb, { checked: 1 } as any);
+        expect(cb.checked).toBe(true);
+        assignProps(cb, { checked: "yes" } as any);
+        expect(cb.checked).toBe(true);
+    });
+
+    it("reflects checked to the attribute and survives form.reset()", () => {
+        const form = document.createElement("form");
+        const input = document.createElement("input");
+        input.type = "checkbox";
+        form.appendChild(input);
+        document.body.appendChild(form);
+
+        assignProps(input, { checked: true });
+        expect(input.checked).toBe(true);
+        expect(input.getAttribute("checked")).not.toBeNull();
+        expect(input.defaultChecked).toBe(true);
+
+        input.checked = false; // simulate user interaction
+        form.reset();
+        expect(input.checked).toBe(true);
+    });
+
+    it("falls back to the attribute for checked on non-input elements", () => {
+        const div = document.createElement("div");
+        assignProps(div, { checked: true } as any);
+        expect(div.hasAttribute("checked")).toBe(true);
+        expect((div as any).checked).toBeUndefined();
+    });
+
     it("handles spellcheck property", () => {
         const input = document.createElement("input");
         assignProps(input, { spellcheck: true });
@@ -187,6 +281,15 @@ describe("assignProps", () => {
 
         assignProps(element, { draggable: "" });
         expect(element.getAttribute("draggable")).toBe("false"); // Remains since prev is undefined
+    });
+
+    it("removes the draggable attribute when the value becomes null", () => {
+        const draggable = mockSignal<any>("true");
+        assignProps(element, { draggable });
+        draggable.value = false;
+        expect(element.getAttribute("draggable")).toBe("false");
+        draggable.value = null;
+        expect(element.hasAttribute("draggable")).toBe(false);
     });
 
     it("handles contenteditable property", () => {
@@ -526,11 +629,42 @@ describe("assignProps", () => {
         expect(element.onclick).toBeNull();
     });
 
+    it("removes on-map listeners when the element is disposed", () => {
+        const handler = vi.fn();
+        assignProps(element, { on: { click: handler } });
+        element.dispatchEvent(new Event("click"));
+        expect(handler).toHaveBeenCalledTimes(1);
+
+        invokeDisposingListeners(element);
+        element.dispatchEvent(new Event("click"));
+        expect(handler).toHaveBeenCalledTimes(1);
+    });
+
+    it("does not accumulate disposing entries on repeated on-map assignments", () => {
+        const handler = () => { };
+        assignProps(element, { on: { click: handler } });
+        const count = (getDisposingListeners().get(element) ?? []).length;
+
+        assignProps(element, { on: { click: handler } });
+        assignProps(element, { on: { click: handler } });
+        expect((getDisposingListeners().get(element) ?? []).length).toBe(count);
+    });
+
     it("handles xlink attributes", () => {
         const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
         assignProps(svg, { xlinkHref: "test.svg" });
         // Check that some attribute is set (namespace support may vary in test environment)
         expect(svg.hasAttribute("xlink:href") || svg.getAttribute("xlink:href") === "test.svg").toBe(true);
+    });
+
+    it("removes the xlinkHref attribute when the value becomes null", () => {
+        const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        const href = mockSignal<any>("#id");
+        assignProps(svg, { xlinkHref: href });
+        expect(svg.getAttributeNS("http://www.w3.org/1999/xlink", "href")).toBe("#id");
+
+        href.value = null;
+        expect(svg.getAttributeNS("http://www.w3.org/1999/xlink", "href")).toBeFalsy();
     });
 
     it("handles xmlnsXlink attribute", () => {
@@ -575,6 +709,14 @@ describe("assignProps", () => {
         assignProps(element, { className: "test-class", htmlFor: "test-id" });
         expect(element.className).toBe("test-class");
         expect(element.getAttribute("for")).toBe("test-id");
+    });
+
+    it("compiles capture-phase handlers and boolean/number dataset values", () => {
+        const capture = <div onTouchStartCapture={() => { }} onAnimationEndCapture={() => { }} onGotPointerCapture={() => { }} />;
+        expect(capture).toBeDefined();
+
+        const dataset = <div dataset={{ flag: true, count: 3 }} />;
+        expect(dataset).toBeDefined();
     });
 });
 

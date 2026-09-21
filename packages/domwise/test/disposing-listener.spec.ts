@@ -1,4 +1,6 @@
 import { addDisposingListener, currentLifecycleRoot, dispatchDisposingEvent, getDisposingListeners, invokeDisposingListeners, removeDisposingListener, withLifecycleRoot } from "../src/disposing-listener";
+import { observeSignal } from "../src/signal-util";
+import { signal } from "../src/signals";
 
 let el: HTMLElement;
 
@@ -275,6 +277,29 @@ describe("invokeDisposingListeners", () => {
         expect(listener).toHaveBeenCalledOnce();
         // Not an Element, so no descendants logic
     });
+
+    it("reaches nodes inside a shadow root", () => {
+        const host = document.createElement("div");
+        const shadow = host.attachShadow({ mode: "open" });
+        const inner = document.createElement("span");
+        shadow.appendChild(inner);
+
+        const cb = vi.fn();
+        addDisposingListener(inner, cb);
+        invokeDisposingListeners(host, { descendants: true });
+        expect(cb).toHaveBeenCalledTimes(1);
+    });
+
+    it("reaches nodes inside template content", () => {
+        const template = document.createElement("template");
+        const inner = document.createElement("span");
+        template.content.appendChild(inner);
+
+        const cb = vi.fn();
+        addDisposingListener(inner, cb);
+        invokeDisposingListeners(template, { descendants: true });
+        expect(cb).toHaveBeenCalledTimes(1);
+    });
 });
 
 describe("dispatchDisposingEvent", () => {
@@ -306,6 +331,21 @@ describe("dispatchDisposingEvent", () => {
         delete (globalThis as any).CustomEvent;
         expect(() => dispatchDisposingEvent(el)).not.toThrow();
         globalThis.CustomEvent = originalCustomEvent;
+    });
+
+    it("does not disarm an ancestor listener when a bubbling event passes through", () => {
+        const parent = document.createElement("div");
+        const child = document.createElement("span");
+        parent.appendChild(child);
+
+        const cb = vi.fn();
+        addDisposingListener(parent, cb);
+
+        dispatchDisposingEvent(child, { bubbles: true });
+        expect(cb).not.toHaveBeenCalled();
+
+        dispatchDisposingEvent(parent);
+        expect(cb).toHaveBeenCalledTimes(1);
     });
 });
 
@@ -365,5 +405,39 @@ describe("withLifecycleRoot", () => {
         })).toThrow("boom");
         expect(currentLifecycleRoot()).toBe(outer);
         currentLifecycleRoot(null as any);
+    });
+
+    it("registers the subscription disposer on the lifecycle root", () => {
+        const root = document.createElement("div");
+        const sig = signal(1);
+        const cb = vi.fn();
+        withLifecycleRoot(root, () => {
+            observeSignal(sig, cb, { useLifecycleRoot: true });
+        });
+        cb.mockClear();
+
+        sig.value = 2;
+        expect(cb).toHaveBeenCalledTimes(1);
+
+        invokeDisposingListeners(root);
+        cb.mockClear();
+        sig.value = 3;
+        expect(cb).not.toHaveBeenCalled();
+    });
+
+    it("does not leave entries after create/dispose cycles under a root", () => {
+        const root = document.createElement("div");
+        const before = (getDisposingListeners().get(root) ?? []).length;
+
+        for (let i = 0; i < 3; i++) {
+            const node = document.createElement("div");
+            const sig = signal(1);
+            withLifecycleRoot(root, () => {
+                observeSignal(sig, () => { }, { useLifecycleRoot: true, lifecycleNode: node });
+            });
+            invokeDisposingListeners(node);
+        }
+
+        expect((getDisposingListeners().get(root) ?? []).length).toBe(before);
     });
 });

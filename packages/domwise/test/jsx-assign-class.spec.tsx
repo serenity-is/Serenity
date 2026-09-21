@@ -1,5 +1,6 @@
 import { invokeDisposingListeners } from "../src/disposing-listener";
 import { assignClass } from "../src/jsx-assign-class";
+import { signal } from "../src/signals";
 import { mockSignal } from "./mocks/mock-signal";
 
 let element: HTMLElement;
@@ -128,5 +129,22 @@ describe("assignClass", () => {
         expect(element.classList.contains("a")).toBe(false);
         expect(element.classList.contains("x")).toBe(false);
         expect(element.classList.contains("b")).toBe(true);
+    });
+
+    it("accepts a non-array iterable", () => {
+        assignClass(element, new Set(["a", "b"]));
+        expect(element.classList.contains("a")).toBe(true);
+        expect(element.classList.contains("b")).toBe(true);
+    });
+
+    it("splits whitespace-separated class strings", () => {
+        assignClass(element, "btn\n  btn-primary");
+        expect(element.classList.contains("btn")).toBe(true);
+        expect(element.classList.contains("btn-primary")).toBe(true);
+    });
+
+    it("compiles an array containing a signal entry", () => {
+        const cls = <div class={["a", signal(false)]} />;
+        expect(cls).toBeDefined();
     });
 });

@@ -1,5 +1,7 @@
+import { appendChildren } from "../../src/jsx-append-children"
 import { createRef } from "../../src/ref"
 import { ShadowRootNode } from "../../src/shadow"
+import { signal } from "../../src/signals"
 
 describe("shadow", () => {
 
@@ -66,5 +68,11 @@ describe("shadow", () => {
         expect(ref2.mock.calls).toHaveLength(1)
         expect(ref2.mock.calls[0]).to.have.lengthOf(1)
         expect(ref2.mock.calls[0][0]).to.be.instanceOf(ShadowRoot)
+    })
+
+    it("does not throw for a ShadowRootNode in a signal-valued collection", () => {
+        const container = document.createElement("div")
+        const collection = signal<any>([ShadowRootNode({ mode: "open", children: "x" })])
+        expect(() => appendChildren(container, collection)).not.toThrow()
     })
 })

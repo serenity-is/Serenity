@@ -1,4 +1,5 @@
 
+import { addDisposingListener, invokeDisposingListeners } from "../src/disposing-listener";
 import { appendChildren } from "../src/jsx-append-children";
 import { mockSignal } from "./mocks/mock-signal";
 
@@ -447,5 +448,81 @@ describe("appendChildren signal child replacement disposal", () => {
         shown.value = "b";
         shown.value = "c";
         expect(container.textContent).toBe("c");
+    });
+
+    it("matches a fragment end placeholder by identity, not text", () => {
+        const shown = mockSignal<any>(null);
+        const host = document.createElement("div");
+        appendChildren(host, shown);
+
+        const fragment = document.createDocumentFragment();
+        fragment.append(document.createElement("b"));
+        shown.value = fragment;
+
+        const start = host.firstChild as Comment;
+        const realEnd = host.lastChild as Comment;
+        expect(start.data.startsWith("__domwisefrag_")).toBe(true);
+
+        // decoy with identical text placed before the real end
+        host.insertBefore(document.createComment(start.data), realEnd);
+
+        shown.value = "done";
+        expect(host.textContent).toBe("done");
+        expect(host.childNodes.length).toBe(1);
+    });
+
+    it("keeps a caller-owned element's bindings alive across replacements", () => {
+        const parent = document.createElement("div");
+        const cls = mockSignal("c1");
+        const a = <span class={cls}>A</span> as HTMLSpanElement;
+        const b = document.createElement("span"); b.textContent = "B";
+        // widget-teardown shape: disposing listener detaches its own node
+        addDisposingListener(a, () => a.parentNode?.removeChild(a));
+
+        const which = mockSignal<any>(a);
+        appendChildren(parent, which);
+        expect(parent.innerHTML).toBe('<span class="c1">A</span>');
+
+        which.value = b;
+        expect(parent.innerHTML).toBe("<span>B</span>");
+
+        // the binding stays live even while the element is detached
+        cls.value = "c1b";
+        expect(a.className).toBe("c1b");
+
+        which.value = a;
+        expect(parent.innerHTML).toBe('<span class="c1b">A</span>');
+    });
+});
+
+describe("appendChildren fragment disposal", () => {
+    it("disposes a signal child rendered inside a fragment", () => {
+        const s = mockSignal("a");
+        const host = <div><>{s}</></div>;
+        document.body.appendChild(host);
+        expect(host.textContent).toBe("a");
+
+        invokeDisposingListeners(host, { descendants: true });
+        expect(s.listeners.length).toBe(0);
+        s.value = "b";
+        expect(host.textContent).toBe("a");
+    });
+
+    it("disposes a signal child inside a fragment with siblings", () => {
+        const s = mockSignal("a");
+        const host = <div>{<><i>x</i>{s}</>}</div>;
+        document.body.appendChild(host);
+        invokeDisposingListeners(host, { descendants: true });
+        expect(s.listeners.length).toBe(0);
+    });
+
+    it("disposes an inner signal of a signal-valued collection in a fragment", () => {
+        const inner = mockSignal("v");
+        const outer = mockSignal<any>(["pre", inner]);
+        const host = <div><>{outer}</></div>;
+        document.body.appendChild(host);
+        invokeDisposingListeners(host, { descendants: true });
+        expect(inner.listeners.length).toBe(0);
+        expect(outer.listeners.length).toBe(0);
     });
 });

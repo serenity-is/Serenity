@@ -48,6 +48,12 @@ describe("useClassList", () => {
         expect(classes.contains('test')).toBe(false);
     });
 
+    it("returns the new state from toggle", () => {
+        const classes = useClassList('a');
+        expect(classes.toggle('b')).toBe(true);
+        expect(classes.toggle('b')).toBe(false);
+    });
+
     it("applies classes to element when called as function", () => {
         const classes = useClassList(['initial']);
         classes.add('added');

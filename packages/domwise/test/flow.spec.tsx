@@ -290,6 +290,46 @@ describe("Show", () => {
         invokeDisposingListeners(host, { descendants: true });
         expect(whenSignal.listeners).toHaveLength(0);
     });
+
+    it("invokes a factory child once at mount", () => {
+        let calls = 0;
+        const whenSignal = mockSignal(true);
+        const result = <Show when={whenSignal}>{() => { calls++; return <b>on</b>; }}</Show>;
+        const host = <div>{result}</div>;
+        document.body.appendChild(host);
+        expect(calls).toBe(1);
+        expect(host.textContent).toBe("on");
+    });
+
+    it("does not accumulate nodes across repeated primitive switches", () => {
+        const whenSignal = mockSignal<boolean>(true);
+        const result = <Show when={whenSignal} fallback="off">on</Show>;
+        const host = <div>{result}</div>;
+        document.body.appendChild(host);
+        for (let i = 0; i < 50; i++)
+            whenSignal.value = !whenSignal.value;
+        expect(host.childNodes.length).toBe(1);
+    });
+
+    it("disposes iterable factory branches on teardown", () => {
+        const whenSignal = mockSignal<boolean>(true);
+        const a = mockSignal("a");
+        const b = mockSignal("b");
+        const result = <Show when={whenSignal}>{() => new Set([<span>{a}</span>, <span>{b}</span>])}</Show>;
+        const host = <div>{result}</div>;
+        document.body.appendChild(host);
+        expect(a.listeners).toHaveLength(1);
+        expect(b.listeners).toHaveLength(1);
+
+        invokeDisposingListeners(host, { descendants: true });
+        expect(a.listeners).toHaveLength(0);
+        expect(b.listeners).toHaveLength(0);
+    });
+
+    it("compiles a fallback-only Show without a children prop", () => {
+        const show = <Show when={mockSignal(true)} fallback="off" />;
+        expect(show).toBeDefined();
+    });
 });
 
 export { };
