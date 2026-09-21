@@ -2898,11 +2898,7 @@ export declare function isWritableSignal<T>(obj: any): obj is Signal<T>;
  * @returns `true` if the object is a readonly signal.
  */
 export declare function isReadonlySignal<T = any>(obj: any): obj is Computed<T>;
-/**
- * Arguments passed to the {@link observeSignal} callback on each invocation.
- * @typeParam T - Type of the observed signal's value.
- */
-export type SignalObserveArgs<T> = {
+type SignalObserveArgs<T> = {
 	/** `true` on the initial synchronous invocation right after subscription; `false` thereafter. */
 	isInitial: boolean;
 	/** Value from the previous callback invocation. `undefined` on the initial call. */
@@ -2935,12 +2931,7 @@ export type SignalObserveArgs<T> = {
 	 */
 	set lifecycleNode(value: EventTarget | null | undefined);
 };
-/**
- * Callback invoked by {@link observeSignal} on subscription and on each signal change.
- * @typeParam T - Type of the observed signal's value.
- * @param args - Mutable {@link SignalObserveArgs} describing the change.
- */
-export type ObserveSignalCallback<T> = (args: SignalObserveArgs<T>) => void;
+type ObserveSignalCallback<T> = (args: SignalObserveArgs<T>) => void;
 /**
  * Subscribes to a signal and invokes `callback` immediately and on every subsequent change.
  *
@@ -2979,12 +2970,7 @@ export declare function observeSignal<T>(signal: SignalLike<T>, callback: Observ
 	 */
 	disposeDerivedSignal?: boolean;
 }): EffectDisposer | null | undefined;
-/**
- * A derived/computed signal that also exposes a `derivedDisposer` to tear down
- * the subscription to its source signal.
- * @typeParam T - Type of the derived value.
- */
-export interface DerivedSignalLike<T> extends SignalLike<T> {
+interface DerivedSignalLike<T> extends SignalLike<T> {
 	/** Optional disposer that unsubscribes the derived signal from its source. */
 	derivedDisposer?: () => void;
 }
@@ -3006,38 +2992,6 @@ export interface DerivedSignalLike<T> extends SignalLike<T> {
  * @throws {Error} When `input` is not signal-like.
  */
 export declare function derivedSignal<TDerived, TInput = any>(input: SignalLike<TInput>, fn: (value: TInput) => TDerived): DerivedSignalLike<TDerived>;
-/**
- * Minimal computed-like signal used as a fallback when the source signal's
- * constructor cannot produce a derived instance. Re-computes `fn()` on
- * `update()` and notifies subscribers.
- * @typeParam T - Type of the computed value.
- */
-export declare class PrimitiveComputed<T> {
-	#private;
-	/**
-	 * Creates the primitive computed.
-	 * @param fn - Computation that produces the derived value. Invoked immediately to seed `value`.
-	 */
-	constructor(fn: () => T);
-	/**
-	 * Re-evaluates `fn()` and notifies subscribers when the result has changed.
-	 * @param force - When `true`, notifies subscribers even when the value is referentially equal.
-	 */
-	update(force?: boolean): void;
-	/**
-	 * Subscribes to value changes. The callback is invoked immediately with the current value.
-	 * @param callback - Function called with each new value.
-	 * @returns A disposer that removes the subscription.
-	 */
-	subscribe(callback: (value: T) => void): EffectDisposer;
-	/**
-	 * Returns the current value without creating a tracking dependency.
-	 * @returns The current computed value.
-	 */
-	peek(): T;
-	/** Current computed value. */
-	get value(): T;
-}
 /**
  * Options for creating a signal via {@link signal} / {@link computed}.
  * Re-exported from `@preact/signals-core`.
