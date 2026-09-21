@@ -1,7 +1,8 @@
 import type { ComponentChildren, SignalLike } from "../types";
+import { invokeDisposingListeners } from "./disposing-listener";
 import { setRef } from "./ref";
 import { isShadowRoot } from "./shadow";
-import { isSignalLike, observeSignal } from "./signal-util";
+import { isSignalLike, observeSignal, retainSignalValuesSymbol } from "./signal-util";
 import { isArrayLike, isElement, isNumber, isString, isVisibleChild } from "./util";
 
 function appendChild(parent: Node, child: Node) {
@@ -38,10 +39,17 @@ function replaceNode(oldNode: Node, newNode: Node) {
         (oldNode.parentNode)?.replaceChild(newNode, oldNode);
 }
 
+const fragmentEndNodes = new WeakMap<Comment, Comment>();
+
 function wrapFragment(fragment: DocumentFragment): Node {
     ++fragmentPlaceholderIdx;
-    fragment.prepend(document.createComment(placeholderPrefix + fragmentPlaceholderIdx));
-    fragment.append(document.createComment(placeholderPrefix + fragmentPlaceholderIdx));
+    const start = document.createComment(placeholderPrefix + fragmentPlaceholderIdx);
+    const end = document.createComment(placeholderPrefix + fragmentPlaceholderIdx);
+    fragment.prepend(start);
+    fragment.append(end);
+    // remember the end node so replacement matches by identity, not by the
+    // placeholder text (which can collide across copies of the library)
+    fragmentEndNodes.set(start, end);
     return fragment;
 }
 
@@ -65,8 +73,16 @@ function wrapAsNode(value: any): Node {
     return document.createTextNode(value);
 }
 
+function disposeSubtree(node: Node | null | undefined) {
+    if (node && node instanceof EventTarget)
+        invokeDisposingListeners(node, { descendants: true });
+}
+
 function appendChildrenWithSignal(parent: Node, signal: SignalLike<any>) {
     let prevNode: Node;
+    // Values produced by an owning signal (e.g. Show) are reused or disposed by
+    // their producer, so the renderer must not dispose the outgoing value.
+    const disposeOutgoing = !(signal as any)[retainSignalValuesSymbol];
     // A DocumentFragment is emptied as soon as it is inserted, so it can never
     // receive a `disposing` event. Anchor the subscription to a placeholder
     // comment that travels with the content into the real DOM instead, so the
@@ -89,13 +105,27 @@ function appendChildrenWithSignal(parent: Node, signal: SignalLike<any>) {
 
         const newNode = wrapAsNode(args.newValue);
         if (isPlaceholder(prevNode)) {
-            let n: Node | null;
-            while (n = prevNode.nextSibling) {
-                n.parentNode?.removeChild(n);
-                if (n instanceof Comment && n.data === prevNode.data) {
+            // collect the whole range first: disposal may mutate the DOM, so the
+            // live sibling walk must finish before anything is removed
+            const endNode = fragmentEndNodes.get(prevNode);
+            const range: Node[] = [];
+            let n: Node | null = prevNode.nextSibling;
+            while (n) {
+                range.push(n);
+                if (endNode ? n === endNode : (n instanceof Comment && n.data === prevNode.data))
                     break;
-                }
+                n = n.nextSibling;
             }
+            for (const node of range) {
+                node.parentNode?.removeChild(node);
+                if (disposeOutgoing)
+                    disposeSubtree(node);
+            }
+            if (disposeOutgoing)
+                disposeSubtree(prevNode);
+        }
+        else if (disposeOutgoing && prevNode !== parent) {
+            disposeSubtree(prevNode);
         }
         const prevNodeNew = isFragmentWithPlaceholder(newNode) ? newNode.firstChild! : newNode;
         replaceNode(prevNode, newNode);

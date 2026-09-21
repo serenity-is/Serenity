@@ -406,3 +406,39 @@ describe("appendChildren", () => {
     });
 
 });
+
+describe("appendChildren signal child replacement disposal", () => {
+    it("disposes the outgoing element's subscriptions when replaced", () => {
+        const inner = mockSignal("old");
+        const host = document.createElement("div");
+        const shown = mockSignal<any>(<span>{inner}</span>);
+        appendChildren(host, shown);
+        expect(inner.listeners).toHaveLength(1);
+
+        shown.value = <span>new</span>;
+        expect(inner.listeners).toHaveLength(0);
+        expect(host.textContent).toBe("new");
+    });
+
+    it("disposes a fragment range's subscriptions when replaced", () => {
+        const inner = mockSignal("old");
+        const fragment = document.createDocumentFragment();
+        fragment.append(<b>{inner}</b>, document.createElement("i"));
+        const host = document.createElement("div");
+        const shown = mockSignal<any>(fragment);
+        appendChildren(host, shown);
+        expect(inner.listeners).toHaveLength(1);
+
+        shown.value = "plain";
+        expect(inner.listeners).toHaveLength(0);
+        expect(host.textContent).toBe("plain");
+    });
+
+    it("keeps the signal observer alive across its own replacements", () => {
+        const shown = mockSignal<any>("a");
+        appendChildren(container, shown);
+        shown.value = "b";
+        shown.value = "c";
+        expect(container.textContent).toBe("c");
+    });
+});

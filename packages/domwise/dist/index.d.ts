@@ -215,15 +215,19 @@ export type ExcludeMethods<T> = Pick<T, {
  */
 export type StyleAttributes = Partial<ExcludeMethods<RemoveIndex<Omit<CSSStyleDeclaration, "length" | "parentRules">>>>;
 /** CSSStyleDeclaration contains methods, readonly properties and an index signature, which we all need to filter out. */
-export type StylePropertiesBase = Partial<Pick<CSSStyleDeclaration, {
+export type StylePropertyKeys = {
 	[K in keyof CSSStyleDeclaration]: K extends string ? CSSStyleDeclaration[K] extends string ? K : never : never;
-}[keyof CSSStyleDeclaration]>>;
+}[keyof CSSStyleDeclaration];
 /**
  * Style properties for the `style` JSX attribute, where each CSS property may
- * be a plain value or a signal-like value that updates reactively.
+ * be a string (e.g. `"14px"`), a number (raw value, or `px` for non-unitless
+ * properties), or a signal-like value that updates reactively. CSS custom
+ * properties (`--*`) are supported too.
  */
 export type StyleProperties = {
-	[K in keyof StylePropertiesBase]: SignalOrValue<StylePropertiesBase[K]>;
+	[K in StylePropertyKeys]?: SignalOrValue<string | number | undefined>;
+} & {
+	[key: `--${string}`]: SignalOrValue<string | number | undefined>;
 };
 type DOMElement = Element;
 interface EventHandler<T, E extends Event> {
@@ -734,7 +738,7 @@ export interface ElementAttributes<T> extends CustomDomAttributes<T>, DirectiveA
 	nonce?: PropValue<string | RemoveAttribute>;
 	part?: PropValue<string | RemoveAttribute>;
 	slot?: PropValue<string | RemoveAttribute>;
-	style?: PropValue<CSSProperties | string | RemoveAttribute>;
+	style?: PropValue<CSSProperties | CSSProperties[] | string | RemoveAttribute>;
 	tabindex?: PropValue<number | string | RemoveAttribute>;
 }
 interface SVGAttributes<T> extends ElementAttributes<T> {
@@ -1417,7 +1421,7 @@ type ImagePreserveAspectRatio = SVGPreserveAspectRatioValue | "defer none" | "de
 type SVGUnits = "userSpaceOnUse" | "objectBoundingBox";
 interface StylableSVGAttributes {
 	class?: ElementAttributes<Element>["class"];
-	style?: PropValue<CSSProperties | string | RemoveAttribute>;
+	style?: PropValue<CSSProperties | CSSProperties[] | string | RemoveAttribute>;
 }
 interface TransformableSVGAttributes {
 	transform?: PropValue<string | RemoveAttribute>;
@@ -2523,8 +2527,7 @@ export declare function invokeDisposingListeners(node: EventTarget, opt?: {
  * stored in an internal `WeakMap` and invoked when a `disposing` event is
  * dispatched on `target` (via {@link dispatchDisposingEvent} or
  * {@link invokeDisposingListeners}). The first registration on a given target
- * also installs a one-shot `disposing` event listener to drive the callback
- * list. Duplicate `handler` references are ignored (with optional `regKey`
+ * also installs a `disposing` event listener to drive the callback list. Duplicate `handler` references are ignored (with optional `regKey`
  * tracking), so calling this multiple times with the same callback is safe.
  *
  * @typeParam T - Type of the target event target.
@@ -2832,10 +2835,9 @@ export declare function ShadowRootNode({ children, ref, ...attr }: ShadowRootIni
  * on every switch. A directly passed fragment renders only once and inserts
  * nothing when the branch is shown again.
  *
- * Branch values that are not DOM nodes (e.g. a raw string or number) have no
- * node for `Show` to bind its lifecycle to, so they cannot be disposed by
- * `Show` itself. Their subscription cleanup is handled by the layer that
- * inserts the returned derived signal (normally `appendChildren`).
+ * Primitive branch values (string, number, boolean) are rendered through a
+ * `Text` node so `Show` still has a node to anchor the branch lifecycle and the
+ * derived signal's subscription to `when`.
  *
  * @typeParam TWhen - Type of the condition value.
  * @param props - Props bag.
@@ -2928,7 +2930,7 @@ type ObserveSignalCallback<T> = (args: SignalObserveArgs<T>) => void;
  * @param opt - Optional lifecycle wiring.
  * @param opt.useLifecycleRoot - When `true`, captures {@link currentLifecycleRoot} at call time as the lifecycle root.
  * @param opt.lifecycleNode - Explicit node whose `disposing` event will dispose the subscription.
- * @param opt.derivedLifecycleNode - Optional separate node whose `disposing` event disposes the derived signal's own `derivedDisposer`. Defaults to `lifecycleNode`.
+ * @param opt.disposeDerivedSignal - When `true`, the observed signal's own `derivedDisposer` is also registered on the lifecycle node. Use only when the caller created the derived signal and owns its lifetime (e.g. `Show`); consumers of a shared derived signal must leave it alone.
  * @returns A disposer function for the subscription, or `null`/`undefined` if the signal does not expose one.
  */
 export declare function observeSignal<T>(signal: SignalLike<T>, callback: ObserveSignalCallback<T>, opt?: {
@@ -2943,12 +2945,12 @@ export declare function observeSignal<T>(signal: SignalLike<T>, callback: Observ
 	 */
 	lifecycleNode?: EventTarget;
 	/**
-	 * Optional DOM node that owns the derived signal itself. When a prop binding
-	 * is disposed (but the node lives on), the derived signal's `derivedDisposer`
-	 * stays registered here so the signal keeps tracking its source. Defaults to
-	 * `lifecycleNode`.
+	 * When `true`, the signal's `derivedDisposer` (the subscription from a
+	 * derived signal to its source) is registered on the lifecycle node too.
+	 * Defaults to `false` so that disposing one consumer of a shared derived
+	 * signal does not tear it down for the others.
 	 */
-	derivedLifecycleNode?: EventTarget;
+	disposeDerivedSignal?: boolean;
 }): EffectDisposer | null | undefined;
 interface DerivedSignalLike<T> extends SignalLike<T> {
 	/** Optional disposer that unsubscribes the derived signal from its source. */

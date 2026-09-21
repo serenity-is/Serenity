@@ -120,7 +120,22 @@ function normalizeStyleValue(val: any): any {
     return val == null || val === false || val === true ? "" : val;
 }
 
+function mergeStyleArray(value: any): any {
+    if (!Array.isArray(value))
+        return value;
+    // merge arrays left-to-right, later objects overriding earlier ones
+    const merged: Record<string, any> = {};
+    for (const item of value) {
+        if (item && typeof item === "object")
+            Object.assign(merged, item);
+    }
+    return merged;
+}
+
 export function assignStyle(node: JSXElement, value?: any, prev?: boolean | any): void {
+    value = mergeStyleArray(value);
+    prev = mergeStyleArray(prev);
+
     // drop per-key signal bindings from a previously assigned style
     disposeScopedSubscriptions(node, "style");
 
@@ -150,10 +165,7 @@ export function assignStyle(node: JSXElement, value?: any, prev?: boolean | any)
             if (isSignalLike(val)) {
                 owner ??= getScopedOwner(node, "style");
                 observeSignal(val, args => setStylePropValue(node, key, normalizeStyleValue(args.newValue)), {
-                    lifecycleNode: owner,
-                    // the derived signal belongs to the node, not to this
-                    // particular prop assignment: keep it alive across re-assign
-                    derivedLifecycleNode: node
+                    lifecycleNode: owner
                 });
             }
             else {

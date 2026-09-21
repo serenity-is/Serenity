@@ -266,6 +266,30 @@ describe("Show", () => {
         expect(a.listeners).toHaveLength(0);
         expect(b.listeners).toHaveLength(0);
     });
+
+    it("disposes the when subscription for a primitive branch on host teardown", () => {
+        const whenSignal = mockSignal<boolean>(true);
+        const result = <Show when={whenSignal} fallback="off">on</Show>;
+        const host = <div>{result}</div>;
+        document.body.appendChild(host);
+        expect(host.textContent).toBe("on");
+        expect(whenSignal.listeners).toHaveLength(1);
+
+        invokeDisposingListeners(host, { descendants: true });
+        expect(whenSignal.listeners).toHaveLength(0);
+    });
+
+    it("disposes the when subscription for a fragment branch on host teardown", () => {
+        const whenSignal = mockSignal<boolean>(true);
+        const result = <Show when={whenSignal} fallback="off">{<><b>x</b><i>y</i></>}</Show>;
+        const host = <div>{result}</div>;
+        document.body.appendChild(host);
+        expect(host.textContent).toBe("xy");
+        expect(whenSignal.listeners).toHaveLength(1);
+
+        invokeDisposingListeners(host, { descendants: true });
+        expect(whenSignal.listeners).toHaveLength(0);
+    });
 });
 
 export { };

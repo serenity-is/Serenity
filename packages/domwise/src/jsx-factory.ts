@@ -7,7 +7,7 @@ import { MathMLNamespace, mathMLOnlyTags } from "./mathml-consts"
 import { setRef } from "./ref"
 import { SVGNamespace, svgOnlyTags } from "./svg-consts"
 import { isSignalLike } from "./signal-util"
-import { isComponentClass, isObject, isString } from "./util"
+import { isComponentClass, isObject, isPropHook, isString } from "./util"
 
 type DataKeys = `data-${string}`
 
@@ -70,7 +70,12 @@ export function jsx(tag: any, props?: { children?: ComponentChildren, [key: stri
         appendChildren(node, children)
 
         if (node instanceof window.HTMLSelectElement && attr.value != null) {
-            const value = isSignalLike(attr.value) ? attr.value.peek() : attr.value;
+            const rawValue = attr.value;
+            // unwrap signals and prop hooks so the assignment below writes the
+            // actual value instead of the signal/hook function
+            const value = isSignalLike(rawValue) ? rawValue.peek()
+                : isPropHook(rawValue) ? (rawValue as any)()
+                    : rawValue;
             if (node.multiple && Array.isArray(value)) {
                 const values = value.map((v) => String(v));
                 node

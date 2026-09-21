@@ -4,15 +4,19 @@ import { isSignalLike, observeSignal } from "./signal-util";
 import { disposeScopedSubscriptions, getScopedOwner } from "./subscription-owner";
 import { isArrayLike, isObject } from "./util";
 
+function isIterable(value: any): boolean {
+    return isObject(value) && typeof value[Symbol.iterator] === "function";
+}
+
 function unsignalizePrevClass(prev: any): any {
     if (prev == null)
         return prev;
 
-    if (isArrayLike(prev)) {
+    if (isArrayLike(prev) || isIterable(prev)) {
         prev = Array.from(prev).map(item => {
             if (isSignalLike(item))
                 return item.peek();
-            if (isArrayLike(item))
+            if (isArrayLike(item) || isIterable(item))
                 return unsignalizePrevClass(item);
             return item;
         });
@@ -34,7 +38,7 @@ function clearPrevClass(node: JSXElement, prev?: any): void {
 
     prev = unsignalizePrevClass(prev);
 
-    const prevClassNames = (className(prev) ?? "").split(" ");
+    const prevClassNames = (className(prev) ?? "").split(/[\t\n\f\r ]+/);
     for (let cls of prevClassNames) {
         if (cls) {
             node.classList.remove(cls);
@@ -55,7 +59,7 @@ export function assignClass(node: JSXElement, value?: any, prev?: any): void {
 
     let owner: EventTarget | undefined;
 
-    if (isArrayLike(value)) {
+    if (isArrayLike(value) || isIterable(value)) {
         value = Array.from(value).map(x => {
             let val = x;
             if (isSignalLike(x)) {
@@ -66,8 +70,7 @@ export function assignClass(node: JSXElement, value?: any, prev?: any): void {
                     }
                     applyClassName(node, args.newValue, args.prevValue);
                 }, {
-                    lifecycleNode: owner ??= getScopedOwner(node, "class"),
-                    derivedLifecycleNode: node
+                    lifecycleNode: owner ??= getScopedOwner(node, "class")
                 });
             }
             return val;
@@ -84,8 +87,7 @@ export function assignClass(node: JSXElement, value?: any, prev?: any): void {
                     }
                     applyClassName(node, Boolean(args.newValue) && key, Boolean(args.prevValue) && key)
                 }, {
-                    lifecycleNode: owner ??= getScopedOwner(node, "class"),
-                    derivedLifecycleNode: node
+                    lifecycleNode: owner ??= getScopedOwner(node, "class")
                 });
             }
         });
@@ -95,9 +97,9 @@ export function assignClass(node: JSXElement, value?: any, prev?: any): void {
 }
 
 function applyClassName(node: JSXElement, value: any, prev?: any): void {
-    const newList = (className(value) ?? "").split(" ");
+    const newList = (className(value) ?? "").split(/[\t\n\f\r ]+/);
     if (prev) {
-        const prevList = (className(prev) ?? "").split(" ");
+        const prevList = (className(prev) ?? "").split(/[\t\n\f\r ]+/);
         for (let cls of prevList) {
             if (cls && !newList.includes(cls)) {
                 node.classList.remove(cls);

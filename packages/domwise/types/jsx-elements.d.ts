@@ -573,7 +573,7 @@ interface ElementAttributes<T>
     nonce?: PropValue<string | RemoveAttribute>;
     part?: PropValue<string | RemoveAttribute>;
     slot?: PropValue<string | RemoveAttribute>;
-    style?: PropValue<CSSProperties | string | RemoveAttribute>;
+    style?: PropValue<CSSProperties | CSSProperties[] | string | RemoveAttribute>;
     tabindex?: PropValue<number | string | RemoveAttribute>;
 }
 /** Global `SVGElement` interface keys only. */
@@ -1326,7 +1326,7 @@ type SVGUnits = "userSpaceOnUse" | "objectBoundingBox";
 
 interface StylableSVGAttributes {
     class?: ElementAttributes<Element>["class"];
-    style?: PropValue<CSSProperties | string | RemoveAttribute>;
+    style?: PropValue<CSSProperties | CSSProperties[] | string | RemoveAttribute>;
 }
 interface TransformableSVGAttributes {
     transform?: PropValue<string | RemoveAttribute>;

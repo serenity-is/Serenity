@@ -2,6 +2,14 @@ import { type Computed, type EffectDisposer, type Signal, type SignalLike } from
 import { addDisposingListener, currentLifecycleRoot, removeDisposingListener } from "./disposing-listener";
 
 /**
+ * Internal marker set on a signal whose values are owned and managed by its
+ * producer (e.g. `Show`). When replacing the rendered value, the renderer must
+ * not dispose the outgoing value; the producer handles its lifecycle itself.
+ * Uses `Symbol.for` so multiple copies of the library agree on the marker.
+ */
+export const retainSignalValuesSymbol: symbol = Symbol.for("Serenity.domwise.retainSignalValues");
+
+/**
  * A type guard that checks if an object is signal-like, meaning it has `subscribe` and `peek` methods,
  * and a `value` property.
  * @param obj - The object to check.
@@ -93,36 +101,45 @@ class SignalObserveArgsImpl<T> implements SignalObserveArgs<T> {
     declare hasChanged: boolean;
     #dispose: EffectDisposer | undefined;
     #node: EventTarget | null | undefined;
-    #derivedNode: EventTarget | null | undefined;
+    #disposeDerivedSignal: boolean;
     declare lifecycleRoot: EventTarget | null | undefined;
 
-    constructor(signal: SignalLike<T>, lifecycleRoot: EventTarget | null | undefined, lifecycleNode: EventTarget | null | undefined, derivedLifecycleNode?: EventTarget | null | undefined) {
+    constructor(signal: SignalLike<T>, lifecycleRoot: EventTarget | null | undefined, lifecycleNode: EventTarget | null | undefined, disposeDerivedSignal?: boolean) {
         this.signal = signal;
         this.isInitial = true;
         this.hasChanged = false;
         this.lifecycleRoot = lifecycleRoot;
         this.#node = lifecycleNode;
-        this.#derivedNode = derivedLifecycleNode;
+        this.#disposeDerivedSignal = !!disposeDerivedSignal;
     }
 
     get lifecycleNode(): EventTarget | null | undefined {
         return this.#node;
     }
 
-    #effectiveDerivedNode(): EventTarget | null | undefined {
-        // fall back to the effect node so that moving `lifecycleNode` also moves
-        // the derived disposer unless a separate node was requested
-        return this.#derivedNode ?? this.#node;
+    #targets(): EventTarget[] {
+        const targets: EventTarget[] = [];
+        if (this.#node)
+            targets.push(this.#node);
+        if (this.lifecycleRoot && this.lifecycleRoot !== this.#node)
+            targets.push(this.lifecycleRoot);
+        return targets;
     }
 
     #delDispose() {
-        removeDisposingListener(this.#node, this.effectDisposer);
-        removeDisposingListener(this.#effectiveDerivedNode(), (this.signal as DerivedSignalLike<T>)?.derivedDisposer);
+        for (const target of this.#targets()) {
+            removeDisposingListener(target, this.effectDisposer);
+            if (this.#disposeDerivedSignal)
+                removeDisposingListener(target, (this.signal as DerivedSignalLike<T>)?.derivedDisposer);
+        }
     }
 
     #addDispose() {
-        addDisposingListener(this.#node, this.effectDisposer);
-        addDisposingListener(this.#effectiveDerivedNode(), (this.signal as DerivedSignalLike<T>)?.derivedDisposer);
+        for (const target of this.#targets()) {
+            addDisposingListener(target, this.effectDisposer);
+            if (this.#disposeDerivedSignal)
+                addDisposingListener(target, (this.signal as DerivedSignalLike<T>)?.derivedDisposer);
+        }
     }
 
     get effectDisposer(): EffectDisposer | undefined {
@@ -167,7 +184,7 @@ export type ObserveSignalCallback<T> = (args: SignalObserveArgs<T>) => void;
  * @param opt - Optional lifecycle wiring.
  * @param opt.useLifecycleRoot - When `true`, captures {@link currentLifecycleRoot} at call time as the lifecycle root.
  * @param opt.lifecycleNode - Explicit node whose `disposing` event will dispose the subscription.
- * @param opt.derivedLifecycleNode - Optional separate node whose `disposing` event disposes the derived signal's own `derivedDisposer`. Defaults to `lifecycleNode`.
+ * @param opt.disposeDerivedSignal - When `true`, the observed signal's own `derivedDisposer` is also registered on the lifecycle node. Use only when the caller created the derived signal and owns its lifetime (e.g. `Show`); consumers of a shared derived signal must leave it alone.
  * @returns A disposer function for the subscription, or `null`/`undefined` if the signal does not expose one.
  */
 export function observeSignal<T>(signal: SignalLike<T>, callback: ObserveSignalCallback<T>, opt?: {
@@ -182,16 +199,16 @@ export function observeSignal<T>(signal: SignalLike<T>, callback: ObserveSignalC
      */
     lifecycleNode?: EventTarget,
     /**
-     * Optional DOM node that owns the derived signal itself. When a prop binding
-     * is disposed (but the node lives on), the derived signal's `derivedDisposer`
-     * stays registered here so the signal keeps tracking its source. Defaults to
-     * `lifecycleNode`.
+     * When `true`, the signal's `derivedDisposer` (the subscription from a
+     * derived signal to its source) is registered on the lifecycle node too.
+     * Defaults to `false` so that disposing one consumer of a shared derived
+     * signal does not tear it down for the others.
      */
-    derivedLifecycleNode?: EventTarget
+    disposeDerivedSignal?: boolean
 }): EffectDisposer | null | undefined {
 
     const lifecycleRoot = opt?.useLifecycleRoot ? currentLifecycleRoot() : void 0;
-    const args = new SignalObserveArgsImpl(signal, lifecycleRoot, opt?.lifecycleNode, opt?.derivedLifecycleNode);
+    const args = new SignalObserveArgsImpl(signal, lifecycleRoot, opt?.lifecycleNode, opt?.disposeDerivedSignal);
     const disposer = args.signal.subscribe(function (this: { dispose: EffectDisposer }, value: T) {
         args.newValue = value;
         // Some SignalLike implementations invoke the subscribe callback with
@@ -252,7 +269,9 @@ export function derivedSignal<TDerived, TInput = any>(input: SignalLike<TInput>,
 
     const callback = () => fn(input.value);
 
-    if (typeof input.constructor === "function" && input.constructor !== {}.constructor) {
+    // A PrimitiveComputed does not track signal reads, so reusing its
+    // constructor would produce a frozen value; use the subscription fallback.
+    if (!(input as any)[primitiveComputedBrand] && typeof input.constructor === "function" && input.constructor !== {}.constructor) {
         // Try to reuse the source signal's constructor so the derived signal
         // belongs to the same library/instance as the input (important when
         // multiple copies of a signal library are loaded). Only the constructor
@@ -312,6 +331,8 @@ export function derivedSignal<TDerived, TInput = any>(input: SignalLike<TInput>,
     return primitive;
 }
 
+const primitiveComputedBrand: symbol = Symbol.for("Serenity.domwise.primitiveComputed");
+
 /**
  * Minimal computed-like signal used as a fallback when the source signal's
  * constructor cannot produce a derived instance. Re-computes `fn()` on
@@ -328,6 +349,7 @@ export class PrimitiveComputed<T> {
      * @param fn - Computation that produces the derived value. Invoked immediately to seed `value`.
      */
     constructor(fn: () => T) {
+        (this as any)[primitiveComputedBrand] = true;
         this.#fn = fn;
         this.update(true);
     }

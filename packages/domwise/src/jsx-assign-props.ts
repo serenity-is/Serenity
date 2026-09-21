@@ -77,27 +77,41 @@ export function assignProp(node: JSXElement, key: string, value: any, prev?: any
             return;
 
         case "value":
-            if (value == null) {
-                if (prev != null) {
-                    (node as any)[key] = null;
-                }
-                return;
-            }
-            else if (node instanceof window.HTMLSelectElement) {
+            if (node instanceof window.HTMLSelectElement) {
                 if (node.multiple && Array.isArray(value)) {
                     const values = value.map(v => String(v));
                     node.querySelectorAll("option")
                         .forEach(option => (option.selected = values.includes(option.value)));
-                    return;
+                } else {
+                    node.value = value == null ? "" : value;
                 }
-                node.value = value;
                 return;
-            } else if (node instanceof window.HTMLTextAreaElement) {
-                node.value = value;
+            } else if (node instanceof window.HTMLTextAreaElement ||
+                (node instanceof window.HTMLInputElement && (node as HTMLInputElement).type !== "file")) {
+                // `value` is a property for text-like inputs/textarea: an
+                // attribute binding stops reaching the field once the user
+                // edits it (or when the value is reset through a signal).
+                // A `null` with no previous value is a no-op (uncontrolled).
+                if (value == null && prev == null)
+                    return;
+                (node as HTMLInputElement | HTMLTextAreaElement).value = value == null ? "" : value;
                 return;
             }
-            // use attribute for other elements
+            if (value == null) {
+                if (prev != null)
+                    node.removeAttribute("value");
+                return;
+            }
+            // other elements (option, button, li, progress, ...): attribute
             break;
+
+        case "checked":
+        case "indeterminate":
+        case "muted":
+            // boolean *properties* so the value keeps following the prop even
+            // after the user interacts with the control
+            (node as any)[key] = value === true || value === "" || value === "true" || value === key;
+            return;
 
         case "class":
             assignClass(node, value, prev);
@@ -249,24 +263,43 @@ export function assignProps(node: JSXElement, props: Record<string, any>): void 
     }
 }
 
+// Standard DOM event names (lowercase), derived from the `on*` keys of
+// `EventHandlersWindow` / `EventHandlersElement` in types/jsx-elements.d.ts.
+// Kept static so event names do not depend on what the current environment
+// happens to define (jsdom vs browser vs server).
+const standardEventNames = new Set<string>(
+    (`abort afterprint animationcancel animationend animationiteration animationstart auxclick ` +
+        `beforecopy beforecut beforeinput beforematch beforepaste beforeprint beforetoggle beforeunload beforexrselect ` +
+        `blur cancel canplay canplaythrough change click close command compositionend compositionstart compositionupdate ` +
+        `contentvisibilityautostatechange contextlost contextmenu contextrestored copy cuechange cut dblclick ` +
+        `drag dragend dragenter dragexit dragleave dragover dragstart drop durationchange emptied ended error ` +
+        `focus focusin focusout formdata fullscreenchange fullscreenerror gamepadconnected gamepaddisconnected ` +
+        `gotpointercapture hashchange input invalid keydown keypress keyup languagechange load loadeddata loadedmetadata ` +
+        `loadstart lostpointercapture message messageerror mousedown mouseenter mouseleave mousemove mouseout mouseover ` +
+        `mouseup offline online pagehide pagereveal pageshow pageswap paste pause play playing pointercancel pointerdown ` +
+        `pointerenter pointerleave pointermove pointerout pointerover pointerrawupdate pointerup popstate progress ` +
+        `ratechange rejectionhandled reset resize scroll scrollend scrollsnapchange scrollsnapchanging ` +
+        `securitypolicyviolation seeked seeking select selectionchange selectstart slotchange stalled storage submit ` +
+        `suspend timeupdate toggle touchcancel touchend touchmove touchstart transitioncancel transitionend transitionrun ` +
+        `transitionstart unhandledrejection unload volumechange waiting wheel`).split(" ")
+);
+
 function getEventName(key: string, attribute: string): { eventName: string, useCapture: boolean } {
-    const useCapture = attribute.endsWith("capture");
-    if (useCapture) {
-        return { eventName: attribute.substring(2, attribute.length - 7), useCapture };
-    }
-    if (attribute in window) {
-        // standard event
-        // the JSX attribute could have been "onMouseOver" and the
-        // member name "onmouseover" is on the window's prototype
-        // so let's add the listener "mouseover", which is all lowercased
-        return { eventName: attribute.substring(2), useCapture };
-    }
-    // custom event
-    // the JSX attribute could have been "onMyCustomEvent"
-    // so let's trim off the "on" prefix and lowercase the first character
-    // and add the listener "myCustomEvent"
-    // except for the first character, we keep the event name case
-    return { eventName: attribute[2] + key.slice(3), useCapture };
+    // `attribute` is the lowercased JSX key, e.g. "onfocusin"
+    const name = attribute.substring(2);
+    if (standardEventNames.has(name))
+        return { eventName: name, useCapture: false };
+
+    // e.g. "onclickcapture" -> capture-phase "click". Standard events whose
+    // own name ends in "capture" (gotpointercapture / lostpointercapture) were
+    // already returned above, so they are not mistaken for capture phase.
+    const captureSuffix = "capture";
+    if (name.endsWith(captureSuffix))
+        return { eventName: name.substring(0, name.length - captureSuffix.length), useCapture: true };
+
+    // custom event: trim the "on" prefix, lowercase the first character and
+    // keep the rest of the case (e.g. "onMyCustomEvent" -> "myCustomEvent")
+    return { eventName: attribute[2] + key.slice(3), useCapture: false };
 }
 
 function assignEventProp(node: JSXElement, key: string, value: any, prev?: any): void {

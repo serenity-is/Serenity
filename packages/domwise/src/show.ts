@@ -1,7 +1,7 @@
 import type { ComponentChildren, JSXElement, SignalOrValue } from "../types";
 import { addDisposingListener, invokeDisposingListeners, removeDisposingListener } from "./disposing-listener";
 import { isChildCollection } from "./jsx-append-children";
-import { derivedSignal, isSignalLike, observeSignal } from "./signal-util";
+import { derivedSignal, isSignalLike, observeSignal, retainSignalValuesSymbol } from "./signal-util";
 
 function disposeContent(content: any): void {
     if (content == null)
@@ -88,10 +88,9 @@ function contentToDispose(content: any): object | null {
  * on every switch. A directly passed fragment renders only once and inserts
  * nothing when the branch is shown again.
  *
- * Branch values that are not DOM nodes (e.g. a raw string or number) have no
- * node for `Show` to bind its lifecycle to, so they cannot be disposed by
- * `Show` itself. Their subscription cleanup is handled by the layer that
- * inserts the returned derived signal (normally `appendChildren`).
+ * Primitive branch values (string, number, boolean) are rendered through a
+ * `Text` node so `Show` still has a node to anchor the branch lifecycle and the
+ * derived signal's subscription to `when`.
  *
  * @typeParam TWhen - Type of the condition value.
  * @param props - Props bag.
@@ -149,7 +148,12 @@ export function Show<TWhen>(props: {
         const isFactory = typeof content === "function";
         if (isFactory)
             content = (content as (when: any) => ComponentChildren)(whenValue);
-        content ??= new Text("");
+        // give primitive branches a DOM node so Show has an anchor to bind the
+        // branch lifecycle (and the derived signal's disposer) to
+        if (content == null || typeof content === "boolean")
+            content = new Text("");
+        else if (typeof content !== "object")
+            content = document.createTextNode(String(content));
         if (autoDispose && content != null && typeof content === "object") {
             contentNodes.add(content);
             if (!contentDisposables.has(content)) {
@@ -170,6 +174,10 @@ export function Show<TWhen>(props: {
 
     if (isSignalLike(props.when)) {
         const sig = derivedSignal<JSXElement>(props.when, getContent);
+        // Show owns the derived signal: it both reuses/disposes the branch
+        // values itself (so the renderer must not) and owns the derived
+        // signal's subscription to its source
+        (sig as any)[retainSignalValuesSymbol] = true;
         observeSignal(sig, function(args) {
             if (!autoDispose)
                 return;
@@ -200,6 +208,8 @@ export function Show<TWhen>(props: {
             }
 
             moveTeardown(nextAnchor);
+        }, {
+            disposeDerivedSignal: true
         });
         return sig as unknown as JSXElement;
     }

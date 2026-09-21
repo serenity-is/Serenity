@@ -1,6 +1,7 @@
 import { usePropBinding } from "../src";
 import { getDisposingListeners, invokeDisposingListeners } from "../src/disposing-listener";
 import { assignProp, assignProps } from "../src/jsx-assign-props";
+import { derivedSignal } from "../src/signal-util";
 import { signal } from "../src/signals";
 import { mockSignal } from "./mocks/mock-signal";
 
@@ -226,6 +227,71 @@ describe("assignProps", () => {
         expect(handler).toHaveBeenCalled();
     });
 
+    it("derives lowercase names for camelCase standard events", () => {
+        const handler = vi.fn();
+        assignProps(element, { onFocusIn: handler });
+        element.dispatchEvent(new Event("focusin"));
+        expect(handler).toHaveBeenCalledTimes(1);
+    });
+
+    it("does not treat gotpointercapture as a capture-phase event", () => {
+        const handler = vi.fn();
+        const addEventListenerSpy = vi.spyOn(element, "addEventListener");
+        assignProps(element, { onGotPointerCapture: handler });
+
+        expect(addEventListenerSpy).not.toHaveBeenCalledWith("gotpointer", handler, true);
+        element.dispatchEvent(new Event("gotpointercapture"));
+        expect(handler).toHaveBeenCalledTimes(1);
+    });
+
+    it("keeps capture phase for standard onClickCapture", () => {
+        const handler = vi.fn();
+        const addEventListenerSpy = vi.spyOn(element, "addEventListener");
+        assignProps(element, { onClickCapture: handler });
+
+        expect(addEventListenerSpy).toHaveBeenCalledWith("click", handler, true);
+    });
+
+    it("uses lowercase event names for the reported camelCase handlers", () => {
+        const cases: [string, string][] = [
+            ["onFocusIn", "focusin"],
+            ["onFocusOut", "focusout"],
+            ["onCompositionStart", "compositionstart"],
+            ["onCompositionUpdate", "compositionupdate"],
+            ["onCompositionEnd", "compositionend"],
+            ["onFullscreenChange", "fullscreenchange"],
+            ["onFullscreenError", "fullscreenerror"],
+            ["onBeforeCopy", "beforecopy"],
+            ["onTouchStart", "touchstart"],
+            ["onAnimationStart", "animationstart"],
+            ["onTransitionEnd", "transitionend"],
+            ["onSelectionChange", "selectionchange"],
+            ["onGotPointerCapture", "gotpointercapture"],
+            ["onLostPointerCapture", "lostpointercapture"]
+        ];
+        for (const [attr, eventName] of cases) {
+            const el = document.createElement("div");
+            const handler = vi.fn();
+            assignProp(el, attr, handler as any);
+            el.dispatchEvent(new Event(eventName));
+            expect(handler, `${attr} should listen to ${eventName}`).toHaveBeenCalledTimes(1);
+        }
+    });
+
+    it("does not dispose a shared derived signal when one consumer is disposed", () => {
+        const src = signal(1);
+        const d = derivedSignal(src, v => "v" + v);
+        const a = document.createElement("div");
+        const b = document.createElement("div");
+        assignProps(a, { title: d });
+        assignProps(b, { title: d });
+        expect(b.getAttribute("title")).toBe("v1");
+
+        invokeDisposingListeners(a, { descendants: true });
+        src.value = 2;
+        expect(b.getAttribute("title")).toBe("v2");
+    });
+
     it("handles update of on property with prev signal value", () => {
         const handler1 = vi.fn();
         const handler2 = vi.fn();
@@ -240,7 +306,7 @@ describe("assignProps", () => {
 
         expect(removeEventListenerSpy).not.toHaveBeenCalled();
         expect(addEventListenerSpy).toHaveBeenCalledTimes(4);
-        expect(addEventListenerSpy).toHaveBeenNthCalledWith(1, "disposing", expect.any(Function), { once: true });
+        expect(addEventListenerSpy).toHaveBeenNthCalledWith(1, "disposing", expect.any(Function));
         expect(addEventListenerSpy).toHaveBeenNthCalledWith(2, "click", handler1, false);
         expect(addEventListenerSpy).toHaveBeenNthCalledWith(3, "close", handler2, false);
         expect(addEventListenerSpy).toHaveBeenNthCalledWith(4, "beforeInput", handler3, false);
@@ -271,7 +337,7 @@ describe("assignProps", () => {
 
         expect(removeEventListenerSpy).not.toHaveBeenCalled();
         expect(addEventListenerSpy).toHaveBeenCalledTimes(4);
-        expect(addEventListenerSpy).toHaveBeenNthCalledWith(1, "disposing", expect.any(Function), { once: true });
+        expect(addEventListenerSpy).toHaveBeenNthCalledWith(1, "disposing", expect.any(Function));
         expect(addEventListenerSpy).toHaveBeenNthCalledWith(2, "click", handler1, false);
         expect(addEventListenerSpy).toHaveBeenNthCalledWith(3, "close", handler2, false);
         expect(addEventListenerSpy).toHaveBeenNthCalledWith(4, "beforeInput", handler3, false);
@@ -301,7 +367,7 @@ describe("assignProps", () => {
 
         expect(removeEventListenerSpy).not.toHaveBeenCalled();
         expect(addEventListenerSpy).toHaveBeenCalledTimes(1);
-        expect(addEventListenerSpy).toHaveBeenNthCalledWith(1, "disposing", expect.any(Function), { once: true });
+        expect(addEventListenerSpy).toHaveBeenNthCalledWith(1, "disposing", expect.any(Function));
         // direct property assignment for event with a corresponding property
         expect(element.onclick).toBe(handler1);
 
@@ -324,7 +390,7 @@ describe("assignProps", () => {
 
         expect(removeEventListenerSpy).not.toHaveBeenCalled();
         expect(addEventListenerSpy).toHaveBeenCalledTimes(1);
-        expect(addEventListenerSpy).toHaveBeenNthCalledWith(1, "disposing", expect.any(Function), { once: true });
+        expect(addEventListenerSpy).toHaveBeenNthCalledWith(1, "disposing", expect.any(Function));
         // direct property assignment for event with a corresponding property
         expect(element.onclick).toBe(handler1);
 
@@ -347,7 +413,7 @@ describe("assignProps", () => {
 
         expect(removeEventListenerSpy).not.toHaveBeenCalled();
         expect(addEventListenerSpy).toHaveBeenCalledTimes(2);
-        expect(addEventListenerSpy).toHaveBeenNthCalledWith(1, "disposing", expect.any(Function), { once: true });
+        expect(addEventListenerSpy).toHaveBeenNthCalledWith(1, "disposing", expect.any(Function));
         expect(addEventListenerSpy).toHaveBeenNthCalledWith(2, "mycustom", handler1);
 
         handlerSignal.value = handler2;
@@ -371,7 +437,7 @@ describe("assignProps", () => {
 
         expect(removeEventListenerSpy).not.toHaveBeenCalled();
         expect(addEventListenerSpy).toHaveBeenCalledTimes(2);
-        expect(addEventListenerSpy).toHaveBeenNthCalledWith(1, "disposing", expect.any(Function), { once: true });
+        expect(addEventListenerSpy).toHaveBeenNthCalledWith(1, "disposing", expect.any(Function));
         expect(addEventListenerSpy).toHaveBeenNthCalledWith(2, "mycustom", handler1, true);
 
         handlerSignal.value = handler2;

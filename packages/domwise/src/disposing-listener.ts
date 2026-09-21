@@ -76,17 +76,9 @@ export function invokeDisposingListeners(node: EventTarget, opt?: {
         }
     }
 
-    if (opt?.descendants && node instanceof Element && node.hasChildNodes()) {
+    if (opt?.descendants) {
         const descendants: Node[] = [];
-        const iterator = document.createNodeIterator(
-            node as Node,
-            NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT | NodeFilter.SHOW_COMMENT);
-        let currentNode: Node | null;
-        while (currentNode = iterator.nextNode()) {
-            if (currentNode !== node) {
-                descendants.push(currentNode);
-            }
-        }
+        collectDescendants(node as unknown as Node, descendants);
         for (let i = 0; i < descendants.length; i++) {
             invokeFor(descendants[i] as EventTarget);
         }
@@ -98,14 +90,34 @@ export function invokeDisposingListeners(node: EventTarget, opt?: {
 };
 
 /**
+ * Collects all descendant nodes of `root`, descending into shadow roots,
+ * `<template>` content and `DocumentFragment`s (which a `NodeIterator` does
+ * not reach).
+ */
+function collectDescendants(root: Node, out: Node[]): void {
+    if (!root || typeof root.nodeType !== "number")
+        return;
+    const shadowRoot = (root as any).shadowRoot as Node | null | undefined;
+    if (shadowRoot)
+        collectDescendants(shadowRoot, out);
+    if ((root as any).content instanceof DocumentFragment)
+        collectDescendants((root as any).content, out);
+    let child = root.firstChild;
+    while (child) {
+        out.push(child);
+        collectDescendants(child, out);
+        child = child.nextSibling;
+    }
+};
+
+/**
  * Registers a disposing listener for an element.
  *
  * The `handler` is not added as a direct DOM event listener; instead it is
  * stored in an internal `WeakMap` and invoked when a `disposing` event is
  * dispatched on `target` (via {@link dispatchDisposingEvent} or
  * {@link invokeDisposingListeners}). The first registration on a given target
- * also installs a one-shot `disposing` event listener to drive the callback
- * list. Duplicate `handler` references are ignored (with optional `regKey`
+ * also installs a `disposing` event listener to drive the callback list. Duplicate `handler` references are ignored (with optional `regKey`
  * tracking), so calling this multiple times with the same callback is safe.
  *
  * @typeParam T - Type of the target event target.
@@ -127,7 +139,7 @@ export function addDisposingListener<T extends EventTarget>(target: T | null | u
             callback: handler!,
             regKey
         }]);
-        target.addEventListener("disposing", disposingEventListener, { once: true });
+        target.addEventListener("disposing", disposingEventListener);
         return target;
     }
     const existing = listeners.find(x => x.callback === handler);

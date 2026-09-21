@@ -31,7 +31,13 @@ export function createElement(tag: any, attr: any, ...children: any[]): JSXEleme
         ({ children, ...attr } = attr);
     }
 
-    return jsx(tag, { ...attr, children });
+    // normalize like React.createElement: no children -> undefined,
+    // a lone child -> the child itself (not a one-element array)
+    const normalizedChildren = children.length === 0 ? undefined
+        : children.length === 1 ? children[0]
+            : children;
+
+    return jsx(tag, { ...attr, children: normalizedChildren });
 }
 
 /**

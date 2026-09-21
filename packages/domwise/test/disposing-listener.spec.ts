@@ -40,7 +40,7 @@ describe("addDisposingListener", () => {
         addDisposingListener(el, listener1);
         addDisposingListener(el, listener2);
         expect(el.addEventListener).toHaveBeenCalledOnce();
-        expect(el.addEventListener).toHaveBeenCalledWith("disposing", expect.any(Function), { once: true });
+        expect(el.addEventListener).toHaveBeenCalledWith("disposing", expect.any(Function));
     });
 
     it("should throw an error when adding the same listener with a different regKey", () => {
