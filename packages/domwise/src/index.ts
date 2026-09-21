@@ -21,8 +21,7 @@ export * from "./prop-hook";
 export { createRef, setRef } from "./ref";
 export { ShadowRootNode } from "./shadow";
 export { Show } from "./show";
-export { derivedSignal, isReadonlySignal, isSignalLike, isWritableSignal, observeSignal, PrimitiveComputed } from "./signal-util";
-export type { DerivedSignalLike, ObserveSignalCallback, SignalObserveArgs } from "./signal-util";
+export { derivedSignal, isReadonlySignal, isSignalLike, isWritableSignal, observeSignal } from "./signal-util";
 export * from "./signals";
 export { SVGNamespace } from "./svg-consts";
 

@@ -1,4 +1,4 @@
-import { Show, signal, type DerivedSignalLike, type ObserveSignalCallback, type SignalObserveArgs } from "../src";
+import { Show, signal } from "../src";
 
 describe("typing regressions", () => {
     it("compiles the fixed typings", () => {
@@ -19,11 +19,5 @@ describe("typing regressions", () => {
         // L9: generated capture-phase handlers
         const cap = <div onTouchStartCapture={() => { }} onAnimationEndCapture={() => { }} onGotPointerCapture={() => { }} />;
         expect(cap).toBeDefined();
-
-        // L14: signal utility types are exported
-        const cb: ObserveSignalCallback<number> = () => { };
-        const args = null as unknown as SignalObserveArgs<number>;
-        const derived = null as unknown as DerivedSignalLike<number>;
-        expect(cb && args && derived).toBeDefined();
     });
 });
