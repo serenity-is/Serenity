@@ -408,16 +408,23 @@ describe("appendChildren", () => {
 });
 
 describe("appendChildren signal child replacement disposal", () => {
-    it("disposes the outgoing element's subscriptions when replaced", () => {
+    it("does not dispose caller-owned element values when replaced", () => {
         const inner = mockSignal("old");
+        const reusable = <span>{inner}</span>;
         const host = document.createElement("div");
-        const shown = mockSignal<any>(<span>{inner}</span>);
+        const shown = mockSignal<any>(reusable);
         appendChildren(host, shown);
         expect(inner.listeners).toHaveLength(1);
 
         shown.value = <span>new</span>;
-        expect(inner.listeners).toHaveLength(0);
+        expect(inner.listeners).toHaveLength(1); // caller-owned, kept alive
         expect(host.textContent).toBe("new");
+
+        // reusing the instance later still works
+        shown.value = reusable;
+        expect(host.textContent).toBe("old");
+        inner.value = "updated";
+        expect(host.textContent).toBe("updated");
     });
 
     it("disposes a fragment range's subscriptions when replaced", () => {

@@ -102,6 +102,8 @@ class SignalObserveArgsImpl<T> implements SignalObserveArgs<T> {
     #dispose: EffectDisposer | undefined;
     #node: EventTarget | null | undefined;
     #disposeDerivedSignal: boolean;
+    #effectReg: (() => void) | undefined;
+    #derivedReg: (() => void) | undefined;
     declare lifecycleRoot: EventTarget | null | undefined;
 
     constructor(signal: SignalLike<T>, lifecycleRoot: EventTarget | null | undefined, lifecycleNode: EventTarget | null | undefined, disposeDerivedSignal?: boolean) {
@@ -126,19 +128,41 @@ class SignalObserveArgsImpl<T> implements SignalObserveArgs<T> {
         return targets;
     }
 
-    #delDispose() {
+    #getEffectReg(): () => void {
+        return this.#effectReg ??= () => {
+            // unregister from every target (node and lifecycle root) so a
+            // disposed node does not leave a dead entry on a long-lived root
+            this.#unregister();
+            this.#dispose?.();
+        };
+    }
+
+    #getDerivedReg(): (() => void) | undefined {
+        if (!this.#disposeDerivedSignal)
+            return undefined;
+        return this.#derivedReg ??= () => {
+            this.#unregister();
+            (this.signal as DerivedSignalLike<T>)?.derivedDisposer?.();
+        };
+    }
+
+    #unregister() {
         for (const target of this.#targets()) {
-            removeDisposingListener(target, this.effectDisposer);
-            if (this.#disposeDerivedSignal)
-                removeDisposingListener(target, (this.signal as DerivedSignalLike<T>)?.derivedDisposer);
+            removeDisposingListener(target, this.#effectReg);
+            removeDisposingListener(target, this.#derivedReg);
         }
     }
 
+    #delDispose() {
+        this.#unregister();
+    }
+
     #addDispose() {
+        const effectReg = this.#getEffectReg();
+        const derivedReg = this.#getDerivedReg();
         for (const target of this.#targets()) {
-            addDisposingListener(target, this.effectDisposer);
-            if (this.#disposeDerivedSignal)
-                addDisposingListener(target, (this.signal as DerivedSignalLike<T>)?.derivedDisposer);
+            addDisposingListener(target, effectReg);
+            addDisposingListener(target, derivedReg);
         }
     }
 

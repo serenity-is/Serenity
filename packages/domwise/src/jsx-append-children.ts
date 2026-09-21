@@ -104,6 +104,7 @@ function appendChildrenWithSignal(parent: Node, signal: SignalLike<any>) {
         }
 
         const newNode = wrapAsNode(args.newValue);
+        let toDispose: Node[] | undefined;
         if (isPlaceholder(prevNode)) {
             // collect the whole range first: disposal may mutate the DOM, so the
             // live sibling walk must finish before anything is removed
@@ -116,20 +117,23 @@ function appendChildrenWithSignal(parent: Node, signal: SignalLike<any>) {
                     break;
                 n = n.nextSibling;
             }
-            for (const node of range) {
+            for (const node of range)
                 node.parentNode?.removeChild(node);
-                if (disposeOutgoing)
-                    disposeSubtree(node);
-            }
             if (disposeOutgoing)
-                disposeSubtree(prevNode);
+                toDispose = [prevNode, ...range];
         }
-        else if (disposeOutgoing && prevNode !== parent) {
-            disposeSubtree(prevNode);
-        }
+        // A direct element/node value is caller-owned and may be reused (e.g.
+        // `computed(() => cond ? a : b)`), so it is deliberately not disposed.
+        // Only renderer-created wrapper ranges (fragments/collections) are.
+        // swap first, then dispose: a disposing listener may detach its own node,
+        // and replacing a detached node would silently do nothing
         const prevNodeNew = isFragmentWithPlaceholder(newNode) ? newNode.firstChild! : newNode;
         replaceNode(prevNode, newNode);
         prevNode = prevNodeNew ?? parent;
+        if (toDispose) {
+            for (const node of toDispose)
+                disposeSubtree(node);
+        }
     }, {
         // scope the subscription to the parent, not the rendered content: the
         // content may be disposed by an owner (e.g. Show disposing a factory

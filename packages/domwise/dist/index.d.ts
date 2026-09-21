@@ -2531,7 +2531,7 @@ export declare function dispatchDisposingEvent(target: EventTarget, opt?: {
  *
  * @param node - Target whose disposing listeners should be invoked. No-op when falsy.
  * @param opt - Optional behavior flags.
- * @param opt.descendants - When `true`, also invokes listeners registered on descendant elements/text/comment nodes found via `createNodeIterator`.
+ * @param opt.descendants - When `true`, also invokes listeners registered on descendant nodes, descending into shadow roots, `<template>` content and `DocumentFragment`s as well as elements/text/comments.
  * @param opt.excludeSelf - When `true`, skips listeners registered directly on `node` itself (only descendants are invoked, in combination with `descendants`).
  */
 export declare function invokeDisposingListeners(node: EventTarget, opt?: {

@@ -14,6 +14,12 @@ function normalizeAttribute(s: string, separator: string) {
     return s.replace(/[A-Z]/g, match => separator + match.toLowerCase());
 }
 
+function coerceBoolean(value: any): boolean {
+    // matches the old attribute-path behavior: any present, non-false value
+    // checks the control (e.g. 1, "yes", "checked", {})
+    return value != null && value !== false && value !== "false";
+}
+
 function setNamespacedAttribute(node: JSXElement, ns: string, key: string, value: any): void {
     const qualified = normalizeAttribute(key, ":");
     if (value == null || value === false) {
@@ -95,6 +101,10 @@ export function assignProp(node: JSXElement, key: string, value: any, prev?: any
                     node.querySelectorAll("option")
                         .forEach(option => (option.selected = values.includes(option.value)));
                 } else {
+                    // a null with no previous value is a no-op: leave the
+                    // browser's default selection alone
+                    if (value == null && prev == null)
+                        return;
                     node.value = value == null ? "" : value;
                 }
                 return;
@@ -108,9 +118,9 @@ export function assignProp(node: JSXElement, key: string, value: any, prev?: any
                     return;
                 const stringValue = value == null ? "" : String(value);
                 (node as HTMLInputElement | HTMLTextAreaElement).value = stringValue;
-                if (prev == null && node instanceof window.HTMLInputElement) {
-                    // also reflect the initial value as an attribute so the
-                    // serialized markup (SSR / form reset / snapshots) shows it
+                if (node instanceof window.HTMLInputElement) {
+                    // keep the attribute in sync so serialized markup, CSS
+                    // [value=...] and form.reset() reflect the current value
                     node.setAttribute("value", stringValue);
                 }
                 return;
@@ -124,12 +134,35 @@ export function assignProp(node: JSXElement, key: string, value: any, prev?: any
             break;
 
         case "checked":
+            if (node instanceof window.HTMLInputElement) {
+                const checked = coerceBoolean(value);
+                node.checked = checked;
+                if (checked)
+                    node.setAttribute("checked", "");
+                else
+                    node.removeAttribute("checked");
+                return;
+            }
+            break;
+
         case "indeterminate":
+            if (node instanceof window.HTMLInputElement) {
+                node.indeterminate = coerceBoolean(value);
+                return;
+            }
+            break;
+
         case "muted":
-            // boolean *properties* so the value keeps following the prop even
-            // after the user interacts with the control
-            (node as any)[key] = value === true || value === "" || value === "true" || value === key;
-            return;
+            if (node instanceof window.HTMLMediaElement) {
+                const muted = coerceBoolean(value);
+                node.muted = muted;
+                if (muted)
+                    node.setAttribute("muted", "");
+                else
+                    node.removeAttribute("muted");
+                return;
+            }
+            break;
 
         case "class":
             assignClass(node, value, prev);
@@ -181,6 +214,9 @@ export function assignProp(node: JSXElement, key: string, value: any, prev?: any
                 Object.entries(value).forEach(([eventName, eventHandler]) => {
                     if (prev == null || prev[eventName] !== eventHandler) {
                         node.addEventListener(eventName, eventHandler as any, useCapture);
+                        // drop any prior disposer for the same event/phase so
+                        // repeated assignments don't accumulate entries
+                        removeDisposingListener(node, null, onRegKey(eventName));
                         addDisposingListener(node, () => node.removeEventListener(eventName, eventHandler as any, useCapture), onRegKey(eventName));
                     }
                 });
