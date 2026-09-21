@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { isWritableSignal } from "../src/signal-util";
 import { useSignal, useUpdatableComputed } from "../src/signals";
 

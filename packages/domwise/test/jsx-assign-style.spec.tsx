@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { invokeDisposingListeners } from "../src/disposing-listener";
 import { assignStyle } from "../src/jsx-assign-style";
 import { derivedSignal } from "../src/signal-util";

@@ -1,5 +1,6 @@
-import { assignProp } from "../../src/jsx-assign-props"
-import { SVGNamespace } from "../../src/svg-consts"
+import { describe, expect, it } from "vitest";
+import { assignProp } from "../../src/jsx-assign-props";
+import { SVGNamespace } from "../../src/svg-consts";
 
 describe("SVG", () => {
     const namespace = SVGNamespace

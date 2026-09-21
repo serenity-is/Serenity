@@ -13,7 +13,6 @@ export default defineConfig({
             ],
             excludeAfterRemap: true
         },
-        globals: true,
         pool: "vmThreads"
     }
 })

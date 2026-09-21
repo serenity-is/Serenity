@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { initPropHookSymbol } from "../src/prop-hook";
 import { isArrayLike, isComponentClass, isElement, isNumber, isObject, isPropHook, isString, isVisibleChild } from "../src/util";
 

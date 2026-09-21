@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { invokeDisposingListeners } from "../src/disposing-listener";
 import { assignClass } from "../src/jsx-assign-class";
 import { signal } from "../src/signals";

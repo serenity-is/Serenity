@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { addDisposingListener, currentLifecycleRoot, dispatchDisposingEvent, getDisposingListeners, invokeDisposingListeners, removeDisposingListener, withLifecycleRoot } from "../src/disposing-listener";
 import { observeSignal } from "../src/signal-util";
 import { signal } from "../src/signals";

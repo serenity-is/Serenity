@@ -1,3 +1,4 @@
+import { describe, it, expect } from "vitest";
 import { Component, initComponentClass } from "../src/component";
 
 describe("Component", () => {

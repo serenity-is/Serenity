@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { className } from "../src/class-name";
 
 describe("className", () => {

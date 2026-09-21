@@ -1,3 +1,4 @@
+import { describe, it, expect, vi } from "vitest";
 import { createElement, useImperativeHandle } from "../../src/compat-api"
 import { Component } from "../../src/component"
 import { useRef, useText } from "../../src/hooks"

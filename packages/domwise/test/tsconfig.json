@@ -16,9 +16,7 @@
     ],
     "exactOptionalPropertyTypes": false,
     "strict": false,
-    "types": [
-      "vitest/globals"
-    ]
+    "types": []
   },
   "include": [
     "."

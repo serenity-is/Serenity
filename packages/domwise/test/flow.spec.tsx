@@ -331,5 +331,3 @@ describe("Show", () => {
         expect(show).toBeDefined();
     });
 });
-
-export { };

@@ -1,3 +1,4 @@
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { useClassList, usePropBinding, useRef, useText } from "../src/hooks";
 import { initPropHookSymbol } from "../src/prop-hook";
 

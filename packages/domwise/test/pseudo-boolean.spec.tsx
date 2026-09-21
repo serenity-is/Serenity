@@ -1,3 +1,5 @@
+import { describe, expect, it, vi } from "vitest";
+
 describe("supports pseudo-boolean ('true', 'false') attribute values for some attributes", () => {
 
     it("supports contenteditable with pseudo-boolean values", () => {
@@ -97,5 +99,3 @@ describe("supports pseudo-boolean ('true', 'false') attribute values for some at
         expect((<input spellcheck={false}>Test</input> as HTMLInputElement).spellcheck).toBe(false);
     });
 });
-
-export { };

@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { inHTMLNamespace, inMathMLNamespace, inNamespaceURI, inSVGNamespace } from "../src/in-namespace-uri";
 import { MathMLNamespace } from "../src/mathml-consts";
 import { SVGNamespace } from "../src/svg-consts";

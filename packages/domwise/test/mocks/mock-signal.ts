@@ -1,3 +1,4 @@
+import { vi } from "vitest";
 import type { SignalLike } from "../../types";
 
 export function mockSignal<T>(initialValue: T): SignalLike<T> & {

@@ -1,3 +1,5 @@
+import { describe, expect, it } from "vitest";
+
 describe("supports lowercase attribute variants by default but also allows some uppercase", () => {
 
     it("supports for and htmlFor", () => {
@@ -30,6 +32,4 @@ describe("supports lowercase attribute variants by default but also allows some 
         expect((<input minLength={5}>Test</input> as HTMLInputElement).minLength).toBe(5);
         expect((<input minLength="5">Test</input> as HTMLInputElement).minLength).toBe(5);
     });
-})
-
-export { };
+});

@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from "vitest";
 import { derivedSignal, isReadonlySignal, isSignalLike, isWritableSignal, observeSignal, PrimitiveComputed } from "../src/signal-util";
 import { computed, signal } from "../src/signals";
 import { mockSignal } from "./mocks/mock-signal";

@@ -1,7 +1,8 @@
-import { appendChildren } from "../../src/jsx-append-children"
-import { createRef } from "../../src/ref"
-import { ShadowRootNode } from "../../src/shadow"
-import { signal } from "../../src/signals"
+import { describe, expect, it, vi } from "vitest";
+import { appendChildren } from "../../src/jsx-append-children";
+import { createRef } from "../../src/ref";
+import { ShadowRootNode } from "../../src/shadow";
+import { signal } from "../../src/signals";
 
 describe("shadow", () => {
 

@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { Fragment } from "../src/fragment";
 
 describe("Fragment", () => {

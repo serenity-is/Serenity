@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { usePropBinding } from "../src";
 import { getDisposingListeners, invokeDisposingListeners } from "../src/disposing-listener";
 import { assignProp, assignProps } from "../src/jsx-assign-props";
