@@ -333,10 +333,8 @@ const fallbackEventNameRe =
 
 function isStandardEvent(name: string): boolean {
     const prop = "on" + name;
-    // HTMLElement.prototype inherits Element.prototype, so it covers both
-    return (typeof window !== "undefined" && prop in window) ||
-        (typeof HTMLElement !== "undefined" && prop in HTMLElement.prototype) ||
-        fallbackEventNameRe.test(name);
+    // HTMLElement.prototype also covers Element.prototype via inheritance
+    return prop in window || prop in HTMLElement.prototype || fallbackEventNameRe.test(name);
 }
 
 function getEventName(key: string, attribute: string): { eventName: string, useCapture: boolean } {
