@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { DecimalEditor } from "../editors/decimaleditor";
 import { DecimalFiltering } from "./decimalfiltering";
 

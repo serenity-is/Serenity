@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import * as deprecations from "./html-compat";
 import { addEmptyOption, addOption, clearOptions, findElementWithRelativeId, newBodyDiv, outerHtml } from "./html-compat";
 

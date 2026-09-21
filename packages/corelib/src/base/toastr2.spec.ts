@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { Toastr } from './toastr2';
 
 describe('Toastr', () => {

@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { IntegerEditor } from "../editors/integereditor";
 import { IntegerFiltering } from "./integerfiltering";
 

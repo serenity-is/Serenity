@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { Fluent } from "../../base";
 import { AutoNumeric, AutoNumericOptions } from "./autonumeric";
 

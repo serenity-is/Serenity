@@ -1,4 +1,4 @@
-import { FileUploadTexts, Fluent } from "../../base";
+import { describe, expect, it, vi } from "vitest";
 import { UploadHelper } from "./uploadhelper";
 
 // Mock Uploader to capture its constructor options

@@ -163,5 +163,5 @@ export class DecimalEditor<P extends DecimalEditorOptions = DecimalEditorOptions
             aSep: ((Culture.decimalSeparator === '.') ? ',' : '.'),
             aPad: true
         };
-    }   
+    }
 }

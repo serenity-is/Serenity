@@ -3,7 +3,6 @@ import { Column, type ISleekGrid } from "@serenity-is/sleekgrid";
 import { ColumnPickerDialogTexts, DialogButton, faIcon, Fluent, localText, nsSerenity, tryGetText } from "../../base";
 import { Router } from "../../compat/router";
 import type { IRemoteView } from "../../slick";
-import { Attributes } from "../../types";
 import { BaseDialog } from "../dialogs/basedialog";
 import { stripDiacritics } from "../editors/combobox";
 import { GridUtils } from "../helpers/gridutils";

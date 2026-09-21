@@ -8,9 +8,7 @@
     "noImplicitOverride": false,
     "rootDir": "./src",
     "tsBuildInfoFile": "./out/tsconfig.test.tsbuildinfo",
-    "types": [
-      "vitest/globals"
-    ]
+    "types": []
   },
   "include": [
     "./src/base/globals.d.ts",

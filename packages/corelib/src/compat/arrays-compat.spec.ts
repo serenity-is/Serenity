@@ -1,4 +1,5 @@
-﻿import * as arraysDeprecations from "./arrays-compat";
+﻿import { describe, expect, it, vi } from "vitest";
+import * as arraysDeprecations from "./arrays-compat";
 
 describe("any", () => {
     it('returns false for empty array', function () {

@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { LookupEditor } from "../editors/lookupeditor";
 import { LookupFiltering } from "./lookupfiltering";
 

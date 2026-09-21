@@ -34,7 +34,7 @@ export namespace AggregatorTypeRegistry {
     export function register(cls: IAggregatorConstructor) {
         if (!cls.aggregateKey)
             throw new Error("Aggregator class must have a static aggregateKey property to be registered.");
-        
+
         byKey[cls.aggregateKey] = cls;
         if (cls.summaryType != null && cls.summaryType !== SummaryType.Disabled && cls.summaryType !== SummaryType.None)
             byKey[cls.summaryType] = cls;

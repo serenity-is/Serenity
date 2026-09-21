@@ -1,13 +1,13 @@
 import { invokeDisposingListeners } from "@serenity-is/domwise";
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Widget } from "../widgets/widget";
 import { CascadedWidgetLink } from "./cascadedwidgetlink";
 
 class ParentWidget extends Widget<any> {
-    static override [Symbol.typeInfo] = this.registerClass("Test.ParentWidget");
+    static override[Symbol.typeInfo] = this.registerClass("Test.ParentWidget");
 }
 class ChildWidget extends Widget<any> {
-    static override [Symbol.typeInfo] = this.registerClass("Test.ChildWidget");
+    static override[Symbol.typeInfo] = this.registerClass("Test.ChildWidget");
 }
 
 describe("CascadedWidgetLink", () => {

@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { IQuickFiltering } from "./iquickfiltering";
 
 describe("IQuickFiltering", () => {

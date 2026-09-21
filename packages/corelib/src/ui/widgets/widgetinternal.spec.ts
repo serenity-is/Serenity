@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from "vitest";
 import { addCustomAttribute } from "../../base";
 import { ElementAttribute } from "../../types/attributes";
 import { Widget } from "./widget";
@@ -25,7 +26,7 @@ describe("ensureParentOrFragment", () => {
 
 describe("createElementFor", () => {
     it("creates default element when type has no ElementAttribute", () => {
-        class SimpleWidget extends Widget {}
+        class SimpleWidget extends Widget { }
         const el = createElementFor(SimpleWidget);
         expect(el).toBeInstanceOf(HTMLElement);
         expect(el.tagName).toBe("DIV");
@@ -66,7 +67,7 @@ describe("createElementFor", () => {
 
 describe("handleElementProp", () => {
     it("creates default element when element prop is not provided", () => {
-        class TestWidget extends Widget {}
+        class TestWidget extends Widget { }
         const el = handleElementProp(TestWidget, {});
         expect(el).toBeInstanceOf(HTMLElement);
         expect(el.tagName).toBe("DIV");

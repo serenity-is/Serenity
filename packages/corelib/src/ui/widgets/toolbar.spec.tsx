@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from "vitest";
 import { Toolbar, ToolbarButton, ToolButton } from "./toolbar";
 
 describe("ToolButton", () => {

@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { AnyIconClass, IconClassName, KnownIconClass, bgColor, faIcon, fabIcon, iconClassName, textColor } from './icons';
 
 describe('bgColor', () => {

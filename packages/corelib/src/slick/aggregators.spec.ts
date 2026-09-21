@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from "vitest";
 import { Aggregators } from "./aggregators";
 import { SummaryType } from "../base";
 
@@ -96,7 +97,7 @@ describe("Aggregators", () => {
             const groupTotals: any = {};
             avg.storeResult(groupTotals);
 
-            expect(groupTotals.avg).toEqual({ price: null});
+            expect(groupTotals.avg).toEqual({ price: null });
         });
     });
 

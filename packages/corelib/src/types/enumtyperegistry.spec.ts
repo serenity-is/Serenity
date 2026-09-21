@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { addCustomAttribute, EnumKeyAttribute, getGlobalTypeRegistry, registerEnum } from "../base";
 import { EnumTypeRegistry } from "./enumtyperegistry";
 

@@ -47,7 +47,7 @@ export class HtmlContentEditor<P extends HtmlContentEditorOptions = HtmlContentE
     static tiptapModule: TiptapModule | (() => (TiptapModule | Promise<TiptapModule>)) = async () => {
         try {
             return await import(`${tiptapModuleName}`);
-        } catch { 
+        } catch {
             return await import(resolveUrl("~/Serenity.Assets/tiptap/tiptap.bundle.js"));
         }
     }

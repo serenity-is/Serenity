@@ -1,4 +1,5 @@
-﻿import { defaultNotifyOptions, notifyError, notifyInfo, notifySuccess, notifyWarning, positionToastContainer } from "./notify";
+﻿import { beforeEach, describe, expect, it, vi } from "vitest";
+import { defaultNotifyOptions, notifyError, notifyInfo, notifySuccess, notifyWarning, positionToastContainer } from "./notify";
 
 vi.mock("./toastr2", () => ({
     __esModule: true,

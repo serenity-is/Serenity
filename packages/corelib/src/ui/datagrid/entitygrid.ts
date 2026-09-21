@@ -400,7 +400,7 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
             return hash;
         });
     }
-    
+
     /**
      * Returns the permission key required to insert a row.
      * @returns Insert permission or undefined if none is configured.

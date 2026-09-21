@@ -1,7 +1,8 @@
-import { Decorators } from "./decorators";
-import { AdvancedFilteringAttribute, CloseButtonAttribute, ElementAttribute, FilterableAttribute, MaximizableAttribute, OptionAttribute, PanelAttribute, ResizableAttribute, StaticPanelAttribute } from "./attributes";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { EditorAttribute, EnumKeyAttribute, addCustomAttribute, interfaceTypeInfo, registerClass, registerEditor, registerEnum, registerFormatter, registerInterface, registerType } from "../base";
 import { addTypeMember } from "../compat";
+import { AdvancedFilteringAttribute, CloseButtonAttribute, ElementAttribute, FilterableAttribute, MaximizableAttribute, OptionAttribute, PanelAttribute, ResizableAttribute, StaticPanelAttribute } from "./attributes";
+import { Decorators } from "./decorators";
 
 vi.mock("../base", async (importOriginal) => {
     const actual = await importOriginal() as any;

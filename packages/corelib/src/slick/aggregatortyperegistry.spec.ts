@@ -1,5 +1,6 @@
-import { AggregatorTypeRegistry } from "./aggregatortyperegistry";
+import { describe, expect, it } from "vitest";
 import { SummaryType } from "../base";
+import { AggregatorTypeRegistry } from "./aggregatortyperegistry";
 
 describe('AggregatorTypeRegistry', () => {
 
@@ -45,10 +46,10 @@ describe('AggregatorTypeRegistry', () => {
     it('should allow registering custom aggregators', () => {
         class CustomAggregator {
             static aggregateKey = 'custom';
-            constructor(public field: string) {}
-            init() {}
-            accumulate() {}
-            storeResult() {}
+            constructor(public field: string) { }
+            init() { }
+            accumulate() { }
+            storeResult() { }
         }
 
         AggregatorTypeRegistry.register(CustomAggregator);
@@ -60,10 +61,10 @@ describe('AggregatorTypeRegistry', () => {
         // First, register a custom one
         class TempAggregator {
             static aggregateKey = 'temp';
-            constructor(public field: string) {}
-            init() {}
-            accumulate() {}
-            storeResult() {}
+            constructor(public field: string) { }
+            init() { }
+            accumulate() { }
+            storeResult() { }
         }
         AggregatorTypeRegistry.register(TempAggregator);
         expect(AggregatorTypeRegistry.tryGet('temp')).toBe(TempAggregator);
@@ -77,5 +78,5 @@ describe('AggregatorTypeRegistry', () => {
         // Standard ones should be back
         expect(AggregatorTypeRegistry.tryGet('sum')).toBeDefined();
     });
-    
+
 });

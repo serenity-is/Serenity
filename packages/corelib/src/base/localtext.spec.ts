@@ -1,4 +1,5 @@
-﻿import { localTextTableSymbol } from './symbols';
+﻿import { afterEach, describe, expect, it } from "vitest";
+import { localTextTableSymbol } from './symbols';
 import { getGlobalObject } from './system';
 
 const mockLocalTextTable = (localTexts: Record<string, any>) => {

@@ -1,4 +1,4 @@
-import { Criteria } from "../../base";
+import { describe, expect, it } from "vitest";
 import { DateTimeEditor } from "../editors/datetimeeditor";
 import { DateTimeFiltering } from "./datetimefiltering";
 

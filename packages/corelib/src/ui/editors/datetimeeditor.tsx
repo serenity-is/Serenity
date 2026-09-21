@@ -145,7 +145,7 @@ export class DateTimeEditor<P extends DateTimeEditorOptions = DateTimeEditorOpti
                 this.set_minValue(minValue);
             if (maxValue != null)
                 this.set_maxValue(maxValue);
-        }        
+        }
 
         if (!this.options.inputOnly) {
             (this.time ?? this.domNode).after(

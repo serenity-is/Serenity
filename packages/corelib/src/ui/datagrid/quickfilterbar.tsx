@@ -85,7 +85,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
      */
     public add<TWidget extends Widget<any>, TOptions>(opt: QuickFilter<TWidget, TOptions>): TWidget {
 
-        if (opt == null) 
+        if (opt == null)
             throw new Error("QuickFilterBar.add(): 'opt' argument is null!");
 
         if (opt.separator) {

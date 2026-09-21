@@ -1,4 +1,5 @@
-﻿import { Config, getGlobalTypeRegistry, getType, isPromiseLike } from "../base";
+﻿import { beforeEach, describe, expect, it, vi } from "vitest";
+import { Config, getGlobalTypeRegistry, getType, isPromiseLike } from "../base";
 import { BaseTypeRegistry } from "./basetyperegistry";
 
 vi.mock("../base", async () => {
@@ -44,7 +45,7 @@ describe("BaseTypeRegistry", () => {
         protected override getSecondaryTypeKey(type: any) {
             return (type as any).secondaryTypeKey;
         }
-        
+
         protected override isMatchingType(type: any) {
             return type[Symbol.typeInfo]?.typeName?.startsWith("Test");
         }
@@ -74,7 +75,7 @@ describe("BaseTypeRegistry", () => {
 
         // Mock getTypes to return our test types
         vi.mocked(getGlobalTypeRegistry).mockReturnValue({
-            TestType1: TestType1, 
+            TestType1: TestType1,
             TestType2: TestType2,
             TestEditor: TestEditor,
             TestDialog: TestDialog

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const { findElementWithRelativeId, tryGetWidget } = vi.hoisted(() => ({
     findElementWithRelativeId: vi.fn(),
@@ -18,10 +18,10 @@ import { Widget } from "../widgets/widget";
 import { CascadedWidgetLink } from "./cascadedwidgetlink";
 
 class ParentWidget extends Widget<any> {
-    static override [Symbol.typeInfo] = this.registerClass("Test.MockParentWidget");
+    static override[Symbol.typeInfo] = this.registerClass("Test.MockParentWidget");
 }
 class ChildWidget extends Widget<any> {
-    static override [Symbol.typeInfo] = this.registerClass("Test.MockChildWidget");
+    static override[Symbol.typeInfo] = this.registerClass("Test.MockChildWidget");
 }
 
 describe("CascadedWidgetLink resolved parent", () => {

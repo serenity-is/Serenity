@@ -1,6 +1,7 @@
+import { describe, expect, it, vi } from "vitest";
+import { Combobox } from "../editors/combobox";
 import { BaseFiltering } from "./basefiltering";
 import { FilterOperator } from "./filteroperator";
-import { Combobox } from "../editors/combobox";
 
 describe("BaseFiltering", () => {
     describe("getters/setters", () => {

@@ -730,7 +730,7 @@ export namespace Fluent {
                 element.classList.contains("hidden") ||
                 (element as any).style?.display === "none"));
 
-            if ("hidden" in element)    
+            if ("hidden" in element)
                 element.hidden = hidden;
 
             if (!hidden) {
@@ -1096,7 +1096,7 @@ Fluent.prototype.show = function (this: FluentThis) {
 }
 
 Fluent.prototype.style = function (this: FluentThis, callback: (css: CSSStyleDeclaration) => void) {
-    if (this.el && ((typeof CSSStyleDeclaration !== "undefined" && this.el.style instanceof CSSStyleDeclaration) || 
+    if (this.el && ((typeof CSSStyleDeclaration !== "undefined" && this.el.style instanceof CSSStyleDeclaration) ||
         (typeof CSSStyleDeclaration === "undefined" && typeof this.el.style === "object" && this.el.style != null)))
         callback(this.el.style);
     return this;

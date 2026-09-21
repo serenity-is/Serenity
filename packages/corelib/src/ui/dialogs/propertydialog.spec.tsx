@@ -1,9 +1,9 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { addCustomAttribute, PropertyItemsData, PropertyItem } from "../../base";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { addCustomAttribute, PropertyItem, PropertyItemsData } from "../../base";
 import { ScriptData } from "../../compat";
 import { StaticPanelAttribute } from "../../types/attributes";
-import { PropertyDialog } from "./propertydialog";
 import "../editors/stringeditor";
+import { PropertyDialog } from "./propertydialog";
 
 // Helper to access protected members
 function getDialogOptions(dialog: PropertyDialog<any, any>): any {

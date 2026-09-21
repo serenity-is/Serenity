@@ -1,7 +1,8 @@
 ﻿import type { FormatterContext } from "@serenity-is/sleekgrid";
+import * as sleekgrid from "@serenity-is/sleekgrid";
+import { describe, expect, it, vi } from "vitest";
 import { Config } from "./config";
 import { addClass, appendToNode, cssEscape, getElementReadOnly, getReturnUrl, htmlEncode, isSafeReturnUrl, parseQueryString, removeClass, sanitizeHtml, sanitizeUrl, setElementReadOnly, toggleClass } from "./html";
-import * as sleekgrid from "@serenity-is/sleekgrid";
 
 vi.mock("@serenity-is/sleekgrid", async (importActual) => {
     return {

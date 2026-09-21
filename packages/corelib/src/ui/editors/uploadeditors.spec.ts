@@ -260,7 +260,7 @@ describe("MultipleFileUploadEditor", () => {
         const editor = create({ allowNonImage: false });
         expect(editor["options"]?.allowNonImage).toBe(false);
         editor.destroy();
-        
+
         const editor2 = create({ allowNonImage: true });
         expect(editor2["options"]?.allowNonImage).toBe(true);
         editor2.destroy();
@@ -375,7 +375,7 @@ describe("MultipleImageUploadEditor", () => {
         document.body.innerHTML = "";
     });
 
-        it("defaults allowNonImage to false", () => {
+    it("defaults allowNonImage to false", () => {
         const editor = new MultipleImageUploadEditor({ element: el => document.body.appendChild(el) } as any);
         expect(editor["options"]?.allowNonImage).toBe(false);
         editor.destroy();
@@ -385,7 +385,7 @@ describe("MultipleImageUploadEditor", () => {
         const editor = new MultipleImageUploadEditor({ element: el => document.body.appendChild(el), allowNonImage: false } as any);
         expect(editor["options"]?.allowNonImage).toBe(false);
         editor.destroy();
-        
+
         const editor2 = new MultipleImageUploadEditor({ element: el => document.body.appendChild(el), allowNonImage: true } as any);
         expect(editor2["options"]?.allowNonImage).toBe(true);
         editor2.destroy();

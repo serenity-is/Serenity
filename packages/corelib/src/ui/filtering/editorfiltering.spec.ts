@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { Widget } from "../widgets/widget";
 import { EditorFiltering } from "./editorfiltering";
 

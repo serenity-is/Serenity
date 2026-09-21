@@ -6,9 +6,9 @@ import { type FilterLine } from "../filtering/filterline";
 import type { FilterStore } from "../filtering/filterstore";
 import { type Widget } from "../widgets/widget";
 import { tryGetWidget } from "../widgets/widgetutils";
+import type { DataGridEvent } from "./datagrid";
 import { QuickFilterBar } from "./quickfilterbar";
 import { QuickSearchField, QuickSearchInput } from "./quicksearchinput";
-import type { DataGridEvent } from "./datagrid";
 
 /**
  * Minimal storage abstraction used for grid persistence.

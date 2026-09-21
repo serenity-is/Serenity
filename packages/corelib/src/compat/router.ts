@@ -23,47 +23,47 @@ export interface HandleRouteEvent extends Event {
  * [DEPRECATED] Hash-based dialog routing is legacy. Prefer explicit client-side routing or modern dialog state management. Kept for backward compatibility.
  */
 export interface IClassicRouter {
-	/** When `false`, all routing operations become no-ops. */
-	enabled: boolean;
-	/**
-	 * Navigates to a new hash, optionally attempting `history.back()` when the URL matches the previous one.
-	 * @param newHash - Hash string with or without leading `#`. Empty string clears the hash.
-	 * @param tryBack - When `true`, uses `history.back()` if the target matches {@link ClassicRouter.oldURL}.
-	 * @param silent - When `true`, suppresses the subsequent `hashchange` handling via {@link ignoreHashChange}.
-	 */
-	navigate(newHash: string, tryBack?: boolean, silent?: boolean): void;
-	/**
-	 * Replaces the current hash without adding a history entry (silent navigation).
-	 * @param newHash - Target hash (with or without `#`).
-	 * @param tryBack - When `true`, prefers `history.back()` if applicable.
-	 */
-	replace(newHash: string, tryBack?: boolean): void;
-	/**
-	 * Replaces only the last `"/+/"` segment of the current hash.
-	 * @param newHash - Replacement for the last segment; when empty/falsy the last segment is removed.
-	 * @param tryBack - When `true`, prefers `history.back()` if applicable.
-	 */
-	replaceLast(newHash: string, tryBack?: boolean): void;
-	/**
-	 * Registers a dialog open for hash tracking. The actual hash mutation is deferred until the dialog is confirmed open.
-	 * @param owner - Owner element that triggered the dialog (array-like collections use the first element).
-	 * @param element - Dialog content element whose `data-qroute` / `data-qprhash` attributes will be managed.
-	 * @param dialogHash - Factory returning the hash segment for this dialog (e.g., `"!a1"`).
-	 */
-	dialog(owner: HTMLElement | ArrayLike<HTMLElement>, element: HTMLElement | ArrayLike<HTMLElement>, dialogHash: () => string): void;
-	/** Regex used to heuristically detect whether a single hash segment might represent a dialog route (e.g., `new`, `edit/…`, `!…`). */
-	mightBeRouteRegex: RegExp;
-	/**
-	 * Resolves the current (or provided) hash by closing/opening dialogs and dispatching `handleroute`.
-	 * @param newHash - Hash to resolve; defaults to `window.location.hash` when omitted.
-	 * @returns A status string: `"disabled"` if the router is disabled, `"skipped"` if a recent anchor click looks like a non-route hash, `"shebang"` for `!` prefixed routes, `"missinghandler"` when a handler element cannot be found, or `"calledhandler"` when a `handleroute` event was dispatched.
-	 */
-	resolve(newHash?: string): "disabled" | "skipped" | "shebang" | "missinghandler" | "calledhandler";
-	/**
-	 * Temporarily ignores the next `hashchange` event(s).
-	 * @param expiration - Duration in milliseconds to ignore hash changes. Defaults to `1000`.
-	 */
-	ignoreHashChange(expiration?: number): void;
+    /** When `false`, all routing operations become no-ops. */
+    enabled: boolean;
+    /**
+     * Navigates to a new hash, optionally attempting `history.back()` when the URL matches the previous one.
+     * @param newHash - Hash string with or without leading `#`. Empty string clears the hash.
+     * @param tryBack - When `true`, uses `history.back()` if the target matches {@link ClassicRouter.oldURL}.
+     * @param silent - When `true`, suppresses the subsequent `hashchange` handling via {@link ignoreHashChange}.
+     */
+    navigate(newHash: string, tryBack?: boolean, silent?: boolean): void;
+    /**
+     * Replaces the current hash without adding a history entry (silent navigation).
+     * @param newHash - Target hash (with or without `#`).
+     * @param tryBack - When `true`, prefers `history.back()` if applicable.
+     */
+    replace(newHash: string, tryBack?: boolean): void;
+    /**
+     * Replaces only the last `"/+/"` segment of the current hash.
+     * @param newHash - Replacement for the last segment; when empty/falsy the last segment is removed.
+     * @param tryBack - When `true`, prefers `history.back()` if applicable.
+     */
+    replaceLast(newHash: string, tryBack?: boolean): void;
+    /**
+     * Registers a dialog open for hash tracking. The actual hash mutation is deferred until the dialog is confirmed open.
+     * @param owner - Owner element that triggered the dialog (array-like collections use the first element).
+     * @param element - Dialog content element whose `data-qroute` / `data-qprhash` attributes will be managed.
+     * @param dialogHash - Factory returning the hash segment for this dialog (e.g., `"!a1"`).
+     */
+    dialog(owner: HTMLElement | ArrayLike<HTMLElement>, element: HTMLElement | ArrayLike<HTMLElement>, dialogHash: () => string): void;
+    /** Regex used to heuristically detect whether a single hash segment might represent a dialog route (e.g., `new`, `edit/…`, `!…`). */
+    mightBeRouteRegex: RegExp;
+    /**
+     * Resolves the current (or provided) hash by closing/opening dialogs and dispatching `handleroute`.
+     * @param newHash - Hash to resolve; defaults to `window.location.hash` when omitted.
+     * @returns A status string: `"disabled"` if the router is disabled, `"skipped"` if a recent anchor click looks like a non-route hash, `"shebang"` for `!` prefixed routes, `"missinghandler"` when a handler element cannot be found, or `"calledhandler"` when a `handleroute` event was dispatched.
+     */
+    resolve(newHash?: string): "disabled" | "skipped" | "shebang" | "missinghandler" | "calledhandler";
+    /**
+     * Temporarily ignores the next `hashchange` event(s).
+     * @param expiration - Duration in milliseconds to ignore hash changes. Defaults to `1000`.
+     */
+    ignoreHashChange(expiration?: number): void;
     /** Removes all event listeners registered by the router and releases resources. */
     destroy(): void;
 }

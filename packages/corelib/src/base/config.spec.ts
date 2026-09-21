@@ -1,4 +1,5 @@
-﻿import { Config, resetApplicationPath } from "./config";
+﻿import { afterEach, describe, expect, it } from "vitest";
+import { Config, resetApplicationPath } from "./config";
 
 afterEach(() => {
     document.head.childNodes.forEach(el => el.remove());

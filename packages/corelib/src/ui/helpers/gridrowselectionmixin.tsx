@@ -88,7 +88,7 @@ export class GridRowSelectionMixin {
             return;
 
         e.preventDefault();
-        
+
         const grid = this.grid;
         if (Object.keys(this.include).length > 0) {
             clearKeys(this.include);

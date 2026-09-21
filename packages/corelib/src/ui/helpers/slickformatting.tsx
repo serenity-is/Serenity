@@ -6,7 +6,7 @@ import { skipEditLinkFormatPurposes } from "./editlink";
  * Formatting helpers for sleek grids.
  */
 export namespace SlickFormatting {
-    
+
     /**
      * Returns a formatter that renders an edit link for an item.
      * @typeParam TItem - The type of the row item.

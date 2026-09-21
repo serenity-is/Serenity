@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { confirmDialog, informationDialog, successDialog, warningDialog } from "../base";
 
 describe("informationDialog", () => {

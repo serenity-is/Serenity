@@ -1,4 +1,5 @@
 import { FunctionComponent, type ComponentChildren } from '@serenity-is/domwise';
+import { describe, expect, it, vi } from "vitest";
 import { StringEditor } from '../editors/stringeditor';
 import { FileUploadEditor } from '../editors/uploadeditors';
 import { PropertyGrid } from './propertygrid';

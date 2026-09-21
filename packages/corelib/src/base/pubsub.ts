@@ -16,7 +16,7 @@ export class PubSub<TEvent = {}> {
         }
     }
 
-    notify(e: TEvent, opt?: { isCancelled: (e: TEvent) => boolean}): void {
+    notify(e: TEvent, opt?: { isCancelled: (e: TEvent) => boolean }): void {
         for (let handler of this.#handlers) {
             handler(e);
             if (opt?.isCancelled(e)) {

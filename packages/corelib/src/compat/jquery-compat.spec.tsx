@@ -1,5 +1,6 @@
-﻿import { isMobileView } from "./layout";
+﻿import { afterEach, describe, expect, it, vi } from "vitest";
 import { jQueryPatch } from "./jquery-compat";
+import { isMobileView } from "./layout";
 
 vi.mock("./layout", async (importOriginal) => {
     const actual: any = await importOriginal();

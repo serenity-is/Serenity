@@ -1,5 +1,5 @@
 import { Authorization, DeleteRequest, DeleteResponse, EntityDialogTexts, Fluent, LanguageList, RetrieveColumnSelection, RetrieveRequest, RetrieveResponse, SaveRequest, SaveResponse, ServiceOptions, TranslationConfig, UndeleteRequest, UndeleteResponse, confirmDialog, getInstanceType, getTypeFullName, localText, notifySuccess, nsSerenity, serviceCall, stringFormat, type PropertyItem, type PropertyItemsData } from "../../base";
-import { ScriptData, ValidationHelper, canLoadScriptData, getFormData, getFormDataAsync, validatorAbortHandler } from "../../compat";
+import { ValidationHelper, canLoadScriptData, getFormData, getFormDataAsync, validatorAbortHandler } from "../../compat";
 import { IEditDialog, IReadOnly } from "../../interfaces";
 import { DataChangeInfo } from "../../types";
 import { Attributes } from "../../types/attributes";

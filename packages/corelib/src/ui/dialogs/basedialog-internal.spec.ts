@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { applyCssSizes, handleUIDialogResponsive } from "./basedialog-internal";
 
 // Mock compat module to control isMobileView
@@ -276,26 +276,26 @@ describe("handleUIDialogResponsive", () => {
                     scrollTop: vi.fn(),
                     closest: vi.fn((sel: string) => {
                         if (sel === '.ui-dialog') {
-                        return {
-                            length: 1,
-                            [0]: mockUiDialog,
-                            position: vi.fn(() => ({ left: 100, top: 50 })),
-                            width: vi.fn(() => 800),
-                            height: vi.fn(() => 600),
-                            addClass: addClassSpy,
-                            removeClass: vi.fn(),
-                            css: cssSpy,
-                            find: vi.fn(() => ({
-                                first: vi.fn(() => ({ insertBefore: vi.fn(), appendTo: vi.fn() }))
-                            })),
-                            data: vi.fn((k: string) => undefined),
-                            removeData: vi.fn()
-                        } as any;
-                    }
-                    return { length: 0 };
-                })
-            }
-        }) as any;
+                            return {
+                                length: 1,
+                                [0]: mockUiDialog,
+                                position: vi.fn(() => ({ left: 100, top: 50 })),
+                                width: vi.fn(() => 800),
+                                height: vi.fn(() => 600),
+                                addClass: addClassSpy,
+                                removeClass: vi.fn(),
+                                css: cssSpy,
+                                find: vi.fn(() => ({
+                                    first: vi.fn(() => ({ insertBefore: vi.fn(), appendTo: vi.fn() }))
+                                })),
+                                data: vi.fn((k: string) => undefined),
+                                removeData: vi.fn()
+                            } as any;
+                        }
+                        return { length: 0 };
+                    })
+                }
+            }) as any;
             mock$.fn = {};
             (window as any).jQuery = mock$;
 

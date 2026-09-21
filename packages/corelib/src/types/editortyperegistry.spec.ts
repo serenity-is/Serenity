@@ -1,4 +1,5 @@
-﻿import { Config, getGlobalTypeRegistry, hasCustomAttribute, isAssignableFrom, notifyError, registerClass } from "../base";
+﻿import { beforeEach, describe, expect, it, vi } from "vitest";
+import { Config, getGlobalTypeRegistry, hasCustomAttribute, isAssignableFrom, notifyError, registerClass } from "../base";
 import { Widget } from "../ui/widgets/widget";
 import { EditorTypeRegistry } from "./editortyperegistry";
 

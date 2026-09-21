@@ -1,4 +1,5 @@
-﻿import { Config, ISlickFormatter, getGlobalTypeRegistry, isAssignableFrom, notifyError, registerClass } from "../base";
+﻿import { beforeEach, describe, expect, it, vi } from "vitest";
+import { Config, ISlickFormatter, getGlobalTypeRegistry, isAssignableFrom, notifyError, registerClass } from "../base";
 import { FormatterTypeRegistry } from "./formattertyperegistry";
 
 vi.mock("../base", async (importActual) => {

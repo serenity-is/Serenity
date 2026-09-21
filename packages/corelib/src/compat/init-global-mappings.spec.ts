@@ -1,3 +1,4 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { initGlobalMappings, initFlatpickrLocale, initNProgress } from "./init-global-mappings";
 import { Fluent } from "../base";
 

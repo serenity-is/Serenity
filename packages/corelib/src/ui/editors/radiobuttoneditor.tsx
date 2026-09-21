@@ -1,4 +1,4 @@
-﻿import { Enum, EnumKeyAttribute, getCustomAttribute, getType, getTypeFullName, isPromiseLike, localText, nsSerenity } from "../../base";
+﻿import { Enum, EnumKeyAttribute, getCustomAttribute, getTypeFullName, isPromiseLike, localText, nsSerenity } from "../../base";
 import { getLookup } from "../../compat";
 import { IReadOnly, IStringValue } from "../../interfaces";
 import { EnumTypeRegistry } from "../../types/enumtyperegistry";

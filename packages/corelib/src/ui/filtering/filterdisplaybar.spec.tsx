@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from "vitest";
 import { FilterPanelTexts, Fluent } from "../../base";
 import { FilterDialog } from "./filterdialog";
 import { FilterDisplayBar } from "./filterdisplaybar";
@@ -103,7 +104,7 @@ describe("FilterDisplayBar", () => {
     });
 
     it("edit link click opens filter dialog via openFilterDialog", () => {
-        const dialogOpenSpy = vi.spyOn(FilterDialog.prototype, "dialogOpen").mockImplementation(() => {});
+        const dialogOpenSpy = vi.spyOn(FilterDialog.prototype, "dialogOpen").mockImplementation(() => { });
         const setStoreSpy = vi.fn();
         vi.spyOn(FilterDialog.prototype, "get_filterPanel").mockReturnValue({ set_store: setStoreSpy } as any);
 

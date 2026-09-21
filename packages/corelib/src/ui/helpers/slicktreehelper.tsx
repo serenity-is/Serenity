@@ -124,14 +124,14 @@ export namespace SlickTreeHelper {
      */
     export function toggleClick<TItem>(e: Event, row: number, cell: number,
         view: IRemoteView<TItem>, getId: (x: TItem) => any): void {
-        if (!e || !e.target || Fluent.isDefaultPrevented(e)) 
+        if (!e || !e.target || Fluent.isDefaultPrevented(e))
             return;
 
         const target = e.target as HTMLElement;
         if (!target.classList.contains('s-TreeToggle')) {
             return;
         }
-        
+
         e.preventDefault();
 
         if (target.classList.contains('s-TreeCollapse') || target.classList.contains('s-TreeExpand')) {

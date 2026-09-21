@@ -114,7 +114,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
     private totalCount: number = null;
     private totalRows = 0;
     private updated: Record<string, boolean> = null;
-    
+
     /** Additional parameters to send with service requests. */
     public params: Record<string, any>;
     /** The page number to seek to when loading data. */

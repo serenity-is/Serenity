@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from "vitest";
 import { getjQuery } from "../../base";
 import { Widget } from "../widgets/widget";
 import { SubDialogHelper } from "./subdialoghelper";

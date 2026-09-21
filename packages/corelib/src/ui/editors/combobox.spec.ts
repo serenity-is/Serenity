@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { Combobox, stripDiacritics } from "./combobox";
 
 describe("Combobox", () => {

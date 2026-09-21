@@ -67,7 +67,7 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
             if (this.get_readOnly() || e.key !== " ") {
                 return;
             }
-            
+
             e.preventDefault();
             if (this.get_valueAsDate() != today()) {
                 this.setToToday(true);
@@ -118,7 +118,7 @@ export class DateEditor<P extends DateEditorOptions = DateEditorOptions> extends
     setToToday(triggerChange?: boolean) {
         this.set_valueAsDate(today());
         triggerChange && Fluent.trigger(this.domNode, 'change');
-    }    
+    }
 
     /**
      * Cleans up the date picker instance.

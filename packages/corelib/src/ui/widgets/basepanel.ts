@@ -12,7 +12,7 @@ import { Widget, WidgetProps } from "./widget";
  */
 export class BasePanel<P = {}> extends Widget<P> {
     static override[Symbol.typeInfo] = this.registerClass(nsSerenity);
-    
+
     /**
      * Creates a panel, initializing the validator, tabs and toolbar.
      * @param props - Widget props forwarded to {@link Widget}.

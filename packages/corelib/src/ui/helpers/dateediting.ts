@@ -108,7 +108,7 @@ export function dateInputKeyupHandler(e: KeyboardEvent) {
     }
 
     if (Culture.dateOrder !== 'dmy')
-        return;    
+        return;
 
     if (!(val.length < 6 && (e.key >= '0' && e.key <= '9' || e.key >= 'Numpad0' && e.key <= 'Numpad9') &&
         isDigit(val[val.length - 1])))

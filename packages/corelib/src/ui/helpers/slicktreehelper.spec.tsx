@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from "vitest";
 import { SlickTreeHelper } from "./slicktreehelper";
 
 describe("SlickTreeHelper", () => {

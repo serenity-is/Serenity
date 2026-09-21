@@ -1,5 +1,5 @@
 import { Column } from "@serenity-is/sleekgrid";
-import { Authorization, faIcon, isPromiseLike, SummaryType, tryGetText, type PropertyItem } from "../../base";
+import { Authorization, faIcon, isPromiseLike, tryGetText, type PropertyItem } from "../../base";
 import { FormatterType } from "../../types/formattertype";
 import { FormatterTypeRegistry } from "../../types/formattertyperegistry";
 import { IInitializeColumn } from "../formatters/iinitializecolumn";

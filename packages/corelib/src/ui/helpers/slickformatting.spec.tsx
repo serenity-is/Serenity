@@ -1,4 +1,5 @@
 import { formatterContext as ctx } from "@serenity-is/sleekgrid";
+import { describe, expect, it, vi } from "vitest";
 import { SlickFormatting } from "./slickformatting";
 
 describe('SlickFormatting.itemLink', () => {

@@ -1,7 +1,8 @@
-import { Combobox, ComboboxSearchQuery, ComboboxSearchResult } from "./combobox";
-import { ComboboxEditor } from "./comboboxeditor";
+import { describe, expect, it, vi } from "vitest";
 import { DialogTypeRegistry } from "../../types/dialogtyperegistry";
 import { SubDialogHelper } from "../helpers/subdialoghelper";
+import { Combobox, ComboboxSearchQuery, ComboboxSearchResult } from "./combobox";
+import { ComboboxEditor } from "./comboboxeditor";
 
 describe("ComboboxEditor async behavior", () => {
 

@@ -1,9 +1,10 @@
-import { Fluent, FilterPanelTexts } from "../../base";
-import { FilterPanel, FilterFieldSelect, FilterOperatorSelect } from "./filterpanel";
-import { FilterOperator } from "./filteroperator";
-import { StringFiltering } from "./stringfiltering";
-import { FilteringTypeRegistry } from "./filteringtyperegistry";
+import { describe, expect, it, vi } from "vitest";
+import { FilterPanelTexts, Fluent } from "../../base";
 import { getWidgetFrom } from "../widgets/widget";
+import { FilteringTypeRegistry } from "./filteringtyperegistry";
+import { FilterOperator } from "./filteroperator";
+import { FilterFieldSelect, FilterOperatorSelect, FilterPanel } from "./filterpanel";
+import { StringFiltering } from "./stringfiltering";
 
 describe("FilterPanel", () => {
     it("is registered with typeInfo", () => {

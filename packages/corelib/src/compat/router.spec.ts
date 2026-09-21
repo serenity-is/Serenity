@@ -1,4 +1,4 @@
-import type { MockInstance } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, type MockInstance, vi, vitest } from "vitest";
 import { Fluent } from "../base";
 import { ClassicRouter, type IClassicRouter } from "./router";
 

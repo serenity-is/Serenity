@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import * as deprecations from "./system-compat";
 import { addTypeMember, clearKeys, deepClone, getTypeMembers, getTypes, today, TypeMemberKind } from "./system-compat";
 

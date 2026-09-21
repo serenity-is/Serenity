@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from "vitest";
 import * as deprecations from "./strings-compat";
 import * as stringsCompatDeprecations from "./strings-compat";
 import { trimToEmpty, zeroPad } from "./strings-compat";

@@ -1,4 +1,4 @@
-import { vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { serviceCall } from "../base";
 import { Aggregators } from "./aggregators";
 import { RemoteView } from "./remoteview";
@@ -10,24 +10,24 @@ vi.mock("../base", async (importActual) => ({
 }));
 
 vi.mock("@serenity-is/sleekgrid", () => ({
-    EventEmitter: vi.fn().mockImplementation(function() {
+    EventEmitter: vi.fn().mockImplementation(function () {
         const handlers: any[] = [];
         this.subscribe = vi.fn((handler: any) => {
             handlers.push(handler);
         });
         this.unsubscribe = vi.fn();
-        this.notify = vi.fn(function(...args: any[]) {
+        this.notify = vi.fn(function (...args: any[]) {
             for (const handler of handlers) {
                 handler(...args);
             }
         });
     }),
     EventDataWrapper: vi.fn(),
-    GroupItemMetadataProvider: vi.fn().mockImplementation(function() {
+    GroupItemMetadataProvider: vi.fn().mockImplementation(function () {
         this.getGroupRowMetadata = vi.fn(),
-        this.getTotalsRowMetadata = vi.fn()
+            this.getTotalsRowMetadata = vi.fn()
     }),
-    Group: vi.fn().mockImplementation(function() {
+    Group: vi.fn().mockImplementation(function () {
         this.__group = true;
         this.__nonDataRow = true;
         this.value = null;
@@ -37,11 +37,11 @@ vi.mock("@serenity-is/sleekgrid", () => ({
         this.groups = [];
         this.collapsed = false;
         this.totals = null;
-        this.equals = vi.fn(function(other: any) {
+        this.equals = vi.fn(function (other: any) {
             return this.value === other.value && this.level === other.level;
         });
     }),
-    GroupTotals: vi.fn().mockImplementation(function() {
+    GroupTotals: vi.fn().mockImplementation(function () {
         this.__groupTotals = true;
         this.__nonDataRow = true;
         this.initialized = false;

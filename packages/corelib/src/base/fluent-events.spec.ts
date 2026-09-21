@@ -1,3 +1,4 @@
+import { afterEach, beforeEach, describe, expect, it, test, vi } from "vitest";
 import { addDisposingListener, invokeDisposingListeners, removeDisposingListener } from "@serenity-is/domwise";
 import { addListener, notifyDisposingNode, getEventRegistry, triggerEvent, removeListener } from "./fluent-events";
 
@@ -74,7 +75,7 @@ describe("notifyDisposingNode", () => {
         expect(invokeDisposingListeners).toHaveBeenCalledExactlyOnceWith(element, void 0);
         expect(disposing2).not.toHaveBeenCalled();
     });
-    
+
     it("removes all element listeners from registry after disposing", () => {
         const test = vi.fn();
         addListener(element, "test", test);

@@ -13,9 +13,9 @@ export const nsSerenity: "Serenity." = "Serenity.";
 export const SerenityNS: "Serenity" = "Serenity";
 
 declare global {
-  interface SymbolConstructor {
-    readonly typeInfo: unique symbol;
-  }
+    interface SymbolConstructor {
+        readonly typeInfo: unique symbol;
+    }
 }
 
 export { isAddRowSymbol } from "./symbols";
@@ -258,7 +258,7 @@ export abstract class CustomAttribute {
  * By default the enum's full name is used as the key; this attribute allows an alternative key.
  */
 export class EnumKeyAttribute extends CustomAttribute {
-    static override [Symbol.typeInfo] = classTypeInfo(nsSerenity); static { registerType(this); }
+    static override[Symbol.typeInfo] = classTypeInfo(nsSerenity); static { registerType(this); }
 
     /**
      * Creates a new enum-key attribute.
@@ -442,15 +442,15 @@ export type SNoInfer<T> = [T][T extends any ? 0 : never];
  * Attribute that marks a class as a Serenity editor.
  * Added automatically by {@link registerEditor} / {@link editorTypeInfo}. Can also be applied manually via `classTypeInfo`.
  */
-export class EditorAttribute extends CustomAttribute { 
-    static override [Symbol.typeInfo] = classTypeInfo(nsSerenity); static { registerType(this); }
+export class EditorAttribute extends CustomAttribute {
+    static override[Symbol.typeInfo] = classTypeInfo(nsSerenity); static { registerType(this); }
 }
 
 /**
  * Marker interface for SleekGrid / DataGrid formatters.
  * Formatters implementing this interface declare a `format(ctx)` method and are registered via {@link registerFormatter} / {@link formatterTypeInfo}.
  */
-export abstract class ISlickFormatter { 
+export abstract class ISlickFormatter {
     static [Symbol.typeInfo] = interfaceTypeInfo(nsSerenity); static { registerType(this); }
 }
 
@@ -703,6 +703,6 @@ declare const transformIncludeTypeNameSymbol: unique symbol;
  * Marker interface used to include a basic interface type during code generation (sergen clienttypes).
  * Corresponding types are generated server-side as simple classes; this empty interface exists for typing only.
  */
-export interface TransformInclude<TypeName = ""> { 
+export interface TransformInclude<TypeName = ""> {
     readonly [transformIncludeTypeNameSymbol]?: TypeName;
 }

@@ -1,7 +1,7 @@
-import { Mock } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, Mock, vi } from "vitest";
 import * as base from "../base";
-import { postToService, postToUrl } from "./services-compat";
 import * as servicesCompatDeprecations from "./services-compat";
+import { postToService, postToUrl } from "./services-compat";
 
 vi.mock(import("../base"), async () => {
     return {

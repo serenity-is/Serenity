@@ -1,3 +1,4 @@
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { Authorization, Fluent, PropertyItemsData, Validator } from "../../base";
 import { ScriptData } from "../../compat";
 import { SubDialogHelper } from "../helpers/subdialoghelper";

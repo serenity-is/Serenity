@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { addTypeMember, TypeMemberKind } from "../../compat/system-compat";
 import { OptionAttribute } from "../../types/attributes";
 import { ReflectionOptionsSetter } from "./reflectionoptionssetter";

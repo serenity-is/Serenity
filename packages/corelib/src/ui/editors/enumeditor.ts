@@ -47,7 +47,7 @@ export class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions> extends
             let enumKey = this.options.enumKey;
 
             if (enumKey == null && enumType != null) {
-                enumKey = getCustomAttribute(enumType, EnumKeyAttribute, false)?.value ?? 
+                enumKey = getCustomAttribute(enumType, EnumKeyAttribute, false)?.value ??
                     getTypeFullName(enumType);
             }
 

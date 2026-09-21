@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { BooleanFiltering } from "../filtering/booleanfiltering";
 import { DateFiltering } from "../filtering/datefiltering";
 import { DateTimeFiltering } from "../filtering/datetimefiltering";
@@ -16,11 +16,13 @@ describe("getDefaultSortBy", () => {
     });
 
     it("sorts columns by absolute sortOrder", () => {
-        const grid = { getColumns: vi.fn(() => [
-            { field: "A", sortOrder: 2 },
-            { field: "B", sortOrder: -1 },
-            { field: "C", sortOrder: 3 }
-        ]) } as any;
+        const grid = {
+            getColumns: vi.fn(() => [
+                { field: "A", sortOrder: 2 },
+                { field: "B", sortOrder: -1 },
+                { field: "C", sortOrder: 3 }
+            ])
+        } as any;
         expect(getDefaultSortBy(grid)).toEqual(["B DESC", "A", "C"]);
     });
 });

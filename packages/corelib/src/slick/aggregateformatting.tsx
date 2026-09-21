@@ -26,7 +26,7 @@ export namespace AggregateFormatting {
         const field = column?.field;
         if (!totals)
             return "";
-    
+
         const summaryType = column.summaryType ?? column?.sourceItem?.summaryType;
         if (!column?.field || summaryType === SummaryType.Disabled) {
             return <span class="aggregate-disabled"></span>;
@@ -74,14 +74,14 @@ export namespace AggregateFormatting {
             const cellItem = new NonDataRow();
             (cellItem as any)[field] = value;
             try {
-                fmtResult = formatter(formatterContext({ 
+                fmtResult = formatter(formatterContext({
                     grid: ctx.grid,
                     escape: ctx.escape,
                     sanitizer: ctx.sanitizer,
-                    column, 
-                    item: cellItem, 
-                    value, 
-                    purpose: ctx.purpose ?? "group-totals" 
+                    column,
+                    item: cellItem,
+                    value,
+                    purpose: ctx.purpose ?? "group-totals"
                 }));
             }
             catch (e) {

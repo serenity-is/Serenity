@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { PrefixedContext } from "./prefixedcontext";
 import { Widget } from "./widget";
 
@@ -119,7 +120,7 @@ describe("PrefixedContext", () => {
             div.id = "my_testWidget";
             document.body.appendChild(div);
 
-            class TestWidget extends Widget {}
+            class TestWidget extends Widget { }
             const widget = new TestWidget({ element: div });
 
             const ctx = new PrefixedContext("my_");
@@ -137,7 +138,7 @@ describe("PrefixedContext", () => {
             container.appendChild(inner);
             document.body.appendChild(container);
 
-            class TestWidget extends Widget {}
+            class TestWidget extends Widget { }
             const widget = new TestWidget({ element: inner });
 
             const ctx = new PrefixedContext({ idPrefix: "my_", domNode: container });
@@ -155,7 +156,7 @@ describe("PrefixedContext", () => {
             container.appendChild(inner);
             document.body.appendChild(container);
 
-            class TestWidget extends Widget {}
+            class TestWidget extends Widget { }
             const widget = new TestWidget({ element: inner });
 
             const ctx = new PrefixedContext("my_", container);

@@ -1,5 +1,5 @@
 ﻿import { Column, FormatterContext } from "@serenity-is/sleekgrid";
-import { Fluent, ListResponse } from "../../base";
+import { Fluent } from "../../base";
 import { toGrouping } from "../../compat";
 import { SlickFormatting } from "../helpers/slickformatting";
 import { SlickTreeHelper } from "../helpers/slicktreehelper";

@@ -1,4 +1,4 @@
-﻿import { EditorAttribute, hasCustomAttribute, htmlEncode, isAssignableFrom, notifyError } from "../base";
+﻿import { EditorAttribute, hasCustomAttribute, isAssignableFrom, notifyError } from "../base";
 import { Widget } from "../ui/widgets/widget";
 import { BaseTypeRegistry } from "./basetyperegistry";
 import { EditorType } from "./editortype";

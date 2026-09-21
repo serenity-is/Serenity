@@ -1,4 +1,4 @@
-import { htmlEncode, isAssignableFrom, notifyError } from "../../base";
+import { isAssignableFrom, notifyError } from "../../base";
 import { BaseTypeRegistry } from "../../types/basetyperegistry";
 import { IFiltering } from "./ifiltering";
 

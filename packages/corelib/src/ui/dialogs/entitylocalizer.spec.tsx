@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Fluent, PropertyItem, TranslationConfig } from "../../base";
 import { EntityLocalizer, EntityLocalizerOptions } from "./entitylocalizer";
 // Import StringEditor to register it in the editor registry, needed by PropertyGrid
@@ -50,7 +50,7 @@ describe("EntityLocalizer", () => {
         it("creates instance with localization grid when localizable items exist", () => {
             const pgDiv = document.createElement("div");
             pgDiv.id = "pg";
-            
+
             const items: PropertyItem[] = [
                 { name: "Name", title: "Name", localizable: true },
                 { name: "Description", title: "Description" }
@@ -101,7 +101,7 @@ describe("EntityLocalizer", () => {
 
         it("handles languages list and creates target language selector", () => {
             const pgDiv = document.createElement("div");
-            
+
             const items: PropertyItem[] = [
                 { name: "Name", title: "Name", localizable: true }
             ];
@@ -143,7 +143,7 @@ describe("EntityLocalizer", () => {
             const localizer = new EntityLocalizer(opt);
             const destroySpy = vi.fn();
             localizer["grid"] = { destroy: destroySpy } as any;
-            
+
             localizer.destroy();
             expect(destroySpy).toHaveBeenCalled();
             expect(localizer["grid"]).toBeNull();
@@ -156,7 +156,7 @@ describe("EntityLocalizer", () => {
             const localizer = new EntityLocalizer(opt);
             localizer["pendingValue"] = { some: "value" };
             localizer["lastValue"] = { some: "value" };
-            
+
             localizer.clearValue();
             expect(localizer["pendingValue"]).toBeNull();
             expect(localizer["lastValue"]).toBeNull();
@@ -175,7 +175,7 @@ describe("EntityLocalizer", () => {
         it("handles click when not in localization mode", () => {
             const pgDiv = document.createElement("div");
             const button = document.createElement("button");
-            
+
             const items: PropertyItem[] = [
                 { name: "Name", title: "Name", localizable: true }
             ];
@@ -201,7 +201,7 @@ describe("EntityLocalizer", () => {
             const pgDiv = document.createElement("div");
             const button = document.createElement("button");
             button.classList.add("pressed"); // Already in localization mode
-            
+
             const items: PropertyItem[] = [
                 { name: "Name", title: "Name", localizable: true }
             ];
@@ -230,9 +230,9 @@ describe("EntityLocalizer", () => {
                 getLanguages: vi.fn(() => [{ id: "en", text: "English" }])
             });
             const localizer = new EntityLocalizer(opt);
-            
+
             localizer["pendingValue"] = { "en$Name": "English Name" };
-            
+
             const req: any = {};
             localizer.editSaveRequest(req);
             expect(req.Localizations).toBeDefined();
@@ -243,9 +243,9 @@ describe("EntityLocalizer", () => {
         it("does not modify request when pendingValue is null", () => {
             const opt = createMockOptions();
             const localizer = new EntityLocalizer(opt);
-            
+
             localizer["pendingValue"] = null;
-            
+
             const req: any = { Entity: {} };
             localizer.editSaveRequest(req);
             expect(req.Localizations).toBeUndefined();
@@ -256,7 +256,7 @@ describe("EntityLocalizer", () => {
         it("returns early when not enabled", () => {
             const opt = createMockOptions();
             const localizer = new EntityLocalizer(opt);
-            
+
             expect(() => localizer.updateInterface()).not.toThrow();
         });
     });

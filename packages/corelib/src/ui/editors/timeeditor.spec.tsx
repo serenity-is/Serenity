@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { EditorUtils } from "./editorutils";
 import { TimeEditor, TimeSpanEditor } from "./timeeditor";
 

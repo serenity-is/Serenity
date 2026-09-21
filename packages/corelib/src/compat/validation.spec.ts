@@ -1,4 +1,5 @@
-﻿import { Fluent, notifyError, Tooltip, Validator } from "../base";
+﻿import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { Fluent, notifyError, Tooltip, Validator } from "../base";
 import { validateOptions, ValidationHelper, validatorAbortHandler } from "./validation";
 
 // Mock the imported functions
@@ -6,7 +7,7 @@ vi.mock("../base", () => ({
     Fluent: {
         trigger: vi.fn()
     },
-    Tooltip: vi.fn().mockImplementation(function() {
+    Tooltip: vi.fn().mockImplementation(function () {
         this.show = vi.fn().mockReturnThis();
         this.delayedDispose = vi.fn().mockReturnThis();
     }),
@@ -87,8 +88,8 @@ describe("validatorAbortHandler", () => {
     it("removes abortHandler and sets submitHandler to return false", () => {
         const validator = {
             settings: {
-                abortHandler: () => {},
-                submitHandler: () => {}
+                abortHandler: () => { },
+                submitHandler: () => { }
             }
         };
 
@@ -142,13 +143,13 @@ describe("validateOptions", () => {
     });
 
     it("errorPlacement finds field by closest div.field", () => {
-        const mockElement = { 
+        const mockElement = {
             getAttribute: vi.fn().mockReturnValue(null),
             closest: mockClosest
         };
-        const mockField = { 
-            querySelector: vi.fn().mockReturnValue(null), 
-            append: mockAppend 
+        const mockField = {
+            querySelector: vi.fn().mockReturnValue(null),
+            append: mockAppend
         };
         const mockLabel = document.createElement("div");
 
@@ -321,7 +322,7 @@ describe("ValidationHelper", () => {
         });
 
         it("returns false if abortHandler exists", () => {
-            mockValidator.settings.abortHandler = () => {};
+            mockValidator.settings.abortHandler = () => { };
 
             const result = ValidationHelper.asyncSubmit(mockForm, validateBeforeSave, submitHandler);
 
@@ -376,7 +377,7 @@ describe("ValidationHelper", () => {
         });
 
         it("returns false if abortHandler exists", () => {
-            mockValidator.settings.abortHandler = () => {};
+            mockValidator.settings.abortHandler = () => { };
 
             const result = ValidationHelper.submit(mockForm, validateBeforeSave, submitHandler);
 

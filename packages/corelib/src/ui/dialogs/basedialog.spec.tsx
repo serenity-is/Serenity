@@ -1,9 +1,9 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { addCustomAttribute, Fluent } from "../../base";
 import { MaximizableAttribute } from "../../types/attributes";
+import { TabsExtensions } from "../helpers/tabsextensions";
 import { BaseDialog } from "./basedialog";
 import { DialogExtensions } from "./dialogextensions";
-import { TabsExtensions } from "../helpers/tabsextensions";
 
 // Returns the event handler registered through the jQuery mock for the given event prefix.
 function getCapturedHandler(jq: any, prefix: string): Function {

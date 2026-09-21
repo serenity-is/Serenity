@@ -1,6 +1,6 @@
 import { EventEmitter, Group, GroupItemMetadataProvider, GroupTotals, IDataView, ISleekGrid, type ItemMetadata } from "@serenity-is/sleekgrid";
 import { ListResponse, ServiceOptions } from "../base";
-import type { ArgsRecalcRows, ArgsRemoteView, ArgsGroupToggle, ArgsPagingInfo, ArgsRowCountChanged, ArgsRowsOrCountChanged } from "./remoteview";
+import type { ArgsGroupToggle, ArgsPagingInfo, ArgsRecalcRows, ArgsRemoteView, ArgsRowCountChanged, ArgsRowsOrCountChanged } from "./remoteview";
 import { GroupInfo, PagingOptions, SummaryOptions } from "./slicktypes";
 
 /**

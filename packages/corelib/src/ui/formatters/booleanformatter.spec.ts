@@ -1,4 +1,5 @@
 import { formatterContext as ctx } from "@serenity-is/sleekgrid";
+import { describe, expect, it } from "vitest";
 import { BooleanFormatter } from "./booleanformatter";
 
 describe("BooleanFormatter", () => {
@@ -74,4 +75,5 @@ describe("BooleanFormatter", () => {
         formatter.falseText = "F";
         expect(formatter.trueText).toBe("T");
         expect(formatter.falseText).toBe("F");
-    });})
+    });
+})

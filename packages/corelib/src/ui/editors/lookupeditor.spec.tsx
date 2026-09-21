@@ -1,3 +1,4 @@
+import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { Fluent, setScriptData } from "../../base";
 import { LookupEditor } from "./lookupeditor";
 

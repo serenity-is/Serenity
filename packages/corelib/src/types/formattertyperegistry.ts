@@ -1,4 +1,4 @@
-﻿import { ISlickFormatter, htmlEncode, isAssignableFrom, notifyError } from "../base";
+﻿import { ISlickFormatter, isAssignableFrom, notifyError } from "../base";
 import { BaseTypeRegistry } from "./basetyperegistry";
 import { FormatterType } from "./formattertype";
 

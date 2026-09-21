@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { BooleanFiltering } from "./booleanfiltering";
 import { FilteringTypeRegistry } from "./filteringtyperegistry";
 import { StringFiltering } from "./stringfiltering";

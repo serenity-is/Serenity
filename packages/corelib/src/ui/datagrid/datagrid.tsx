@@ -2,7 +2,7 @@ import { bindThis } from "@serenity-is/domwise";
 import { AutoTooltips, Column, ColumnSort, FormatterContext, SleekGrid, type CellMouseEvent, type GridOptions, type GridSortEvent, type ISleekGrid } from "@serenity-is/sleekgrid";
 import { Authorization, Criteria, DataGridTexts, Fluent, ListResponse, cssEscape, debounce, getInstanceType, getTypeFullName, getjQuery, nsSerenity, tryGetText, type PropertyItem, type PropertyItemsData } from "../../base";
 import { PubSub } from "../../base/pubsub";
-import { LayoutTimer, ScriptData, canLoadScriptData, getColumnsData, getColumnsDataAsync } from "../../compat";
+import { LayoutTimer, canLoadScriptData, getColumnsData, getColumnsDataAsync } from "../../compat";
 import { IReadOnly } from "../../interfaces";
 import { Format, IRemoteView, PagerOptions, RemoteView, RemoteViewOptions } from "../../slick";
 import { AdvancedFilteringAttribute } from "../../types/attributes";

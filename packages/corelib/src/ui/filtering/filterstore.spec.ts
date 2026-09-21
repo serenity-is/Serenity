@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from "vitest";
 import { FilterLine } from "./filterline";
 import { FilterStore } from "./filterstore";
 
@@ -204,7 +205,7 @@ describe("FilterStore", () => {
             expect(handler).not.toHaveBeenCalled();
         });
     });
-   
+
     describe("integration", () => {
         it("handles complex filter scenario", () => {
             const store = new FilterStore([

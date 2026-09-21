@@ -1,3 +1,4 @@
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { setScriptData } from "../../base";
 import { mockFetch, unmockFetch } from "../../test/mocks";
 import { PropertyGrid } from "./propertygrid";
@@ -63,7 +64,7 @@ describe("PropertyPanel", () => {
     });
 
     it("getFormKey strips 'Panel' suffix when no namespace", () => {
-        class SomePanel extends PropertyPanel<any, {}> {}
+        class SomePanel extends PropertyPanel<any, {}> { }
         const panel = new SomePanel({});
         const formKey = (panel as any).getFormKey();
         expect(formKey).toBe("Some");

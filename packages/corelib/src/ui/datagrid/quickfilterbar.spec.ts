@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Fluent } from "../../base";
 import { DateEditor } from "../editors/dateeditor";
 import { EditorUtils } from "../editors/editorutils";
@@ -8,7 +8,7 @@ import { QuickFilterBar } from "./quickfilterbar";
 import { invokeDisposingListeners } from "@serenity-is/domwise";
 
 class TestWidget extends Widget<any> {
-    static override [Symbol.typeInfo] = this.registerClass("Test.TestWidget");
+    static override[Symbol.typeInfo] = this.registerClass("Test.TestWidget");
     static override createDefaultElement() { return document.createElement("input"); }
 }
 

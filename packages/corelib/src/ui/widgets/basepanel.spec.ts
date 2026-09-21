@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from "vitest";
 import { BasePanel } from "./basepanel";
 import { Toolbar } from "./toolbar";
 

@@ -298,9 +298,9 @@ export class Toastr {
         const container = this.getContainer(opt, true);
 
         let intervalId: number = null;
-        const toastEl = <div/> as HTMLElement;
-        const titleEl = <div/> as HTMLElement;
-        const messageEl = <div/> as HTMLElement;
+        const toastEl = <div /> as HTMLElement;
+        const titleEl = <div /> as HTMLElement;
+        const messageEl = <div /> as HTMLElement;
         const closeEl = !opt.closeButton ? null :
             opt.closeButton instanceof HTMLElement ? opt.closeButton : <button type="button">&times;</button> as HTMLElement;
 

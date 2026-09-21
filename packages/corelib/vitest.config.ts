@@ -16,7 +16,6 @@ export default defineConfig({
         execArgv: [
             Number((globalThis as any).process.versions.node.split('.')[0]) >= 25 ? '--no-webstorage' : null
         ].filter(x => x != null),
-        pool: "vmThreads",
-        globals: true
+        pool: "vmThreads"
     }
 })

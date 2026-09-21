@@ -1,6 +1,7 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Config, classTypeInfo, getTypeFullName } from "../../base";
-import { Widget, useIdPrefix } from "./widget";
 import * as widgetDeprecations from "./widget";
+import { Widget, useIdPrefix } from "./widget";
 
 describe('Widget.getCssClass', () => {
     let oldNamespaces: string[];

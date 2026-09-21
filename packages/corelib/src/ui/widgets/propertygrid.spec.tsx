@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from "vitest";
 import { addLocalText, PropertyItem, setScriptData } from "../../base";
 import {
     PropertyCategories,
@@ -20,7 +21,7 @@ import { Widget } from "./widget";
 
 // A simple test editor for PropertyFieldEditor tests
 class TestEditor extends Widget {
-    static override [Symbol.typeInfo] = this.registerClass("Test.TestEditor");
+    static override[Symbol.typeInfo] = this.registerClass("Test.TestEditor");
     static override createDefaultElement() { return document.createElement("input"); }
 }
 

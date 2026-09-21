@@ -1,4 +1,5 @@
 import type { Mock } from "vitest";
+import { vi } from "vitest";
 import { resolveServiceUrl } from "../base/services";
 
 export function mockJQuery(fn: any = {}) {

@@ -1,3 +1,4 @@
+import { afterEach, describe, expect, it } from "vitest";
 import { implementedInterfacesSymbol, isAssignableFromSymbol, isInstanceOfTypeSymbol } from "./symbols";
 import { CustomAttribute, EditorAttribute, Enum, ISlickFormatter, addCustomAttribute, classTypeInfo, editorTypeInfo, fieldsProxy, formatterTypeInfo, getBaseType, getCustomAttribute, getCustomAttributes, getInstanceType, getType, getTypeFullName, getTypeNameProp, getTypeShortName, hasCustomAttribute, initFormType, interfaceTypeInfo, isAssignableFrom, isEnum, isInstanceOfType, registerClass, registerEditor, registerEnum, registerFormatter, registerInterface, registerType, type InterfaceType, type InterfaceTypeInfo } from "./system";
 import { ensureTypeInfo, getGlobalTypeRegistry, peekTypeInfo } from "./system-internal";
@@ -74,7 +75,7 @@ describe("Enum.toString", () => {
 });
 
 namespace Module1 {
-    export class ISome { 
+    export class ISome {
         declare static [Symbol.typeInfo]: InterfaceTypeInfo<"ISome">;
     }
 
@@ -82,7 +83,7 @@ namespace Module1 {
 }
 
 namespace CopyModule1 {
-    export class ISome { 
+    export class ISome {
         declare static [Symbol.typeInfo]: InterfaceTypeInfo<"ISome">;
     }
     registerInterface(ISome, "ISome");
@@ -118,7 +119,7 @@ describe("isAssignableFrom", () => {
     });
 
     it("interfaces with same class names but different registration names won't match", function () {
-        class ISome { 
+        class ISome {
             declare static [Symbol.typeInfo]: InterfaceTypeInfo<"ISomeDiff">;
         }
         registerInterface(ISome, "ISomeDiff")
@@ -128,7 +129,7 @@ describe("isAssignableFrom", () => {
     });
 
     it("classes that are not registered as interfaces won't match", function () {
-        class ISome extends CustomAttribute { 
+        class ISome extends CustomAttribute {
         }
         class X { }
         registerClass(X, "X", [ISome])
@@ -211,7 +212,7 @@ describe("registerClass", () => {
         class Intf2 {
             static [Symbol.typeInfo] = interfaceTypeInfo("Intf2");
         }
-        
+
         class Test {
         }
 

@@ -47,7 +47,7 @@ export function notifyDisposingNode(node: EventTarget, opt?: {
 
     const eventRegistry = getEventRegistry();
 
-    function invokeFor(el: EventTarget) {   
+    function invokeFor(el: EventTarget) {
         const events = eventRegistry.get(el);
         if (!events)
             return;

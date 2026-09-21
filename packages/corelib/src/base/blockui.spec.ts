@@ -1,4 +1,5 @@
-﻿import { blockUI, blockUndo } from "./blockui";
+﻿import { describe, expect, it } from "vitest";
+import { blockUI, blockUndo } from "./blockui";
 
 describe("blockUI", () => {
 

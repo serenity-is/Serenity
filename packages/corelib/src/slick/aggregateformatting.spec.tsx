@@ -1,4 +1,5 @@
 import { formatterContext, gridDefaults } from "@serenity-is/sleekgrid";
+import { describe, expect, it, vi } from "vitest";
 import { AggregateFormatting } from "./aggregateformatting";
 
 // Mock localText to return simple names for testing

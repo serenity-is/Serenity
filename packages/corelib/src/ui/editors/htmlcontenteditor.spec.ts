@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from "vitest";
 import { Validator } from "../../base";
 import { HtmlContentEditor, HtmlNoteContentEditor, HtmlReportContentEditor } from "./htmlcontenteditor";
 
@@ -95,10 +96,10 @@ describe("HtmlContextEditor", () => {
             setEditable: vi.fn(),
             destroy: vi.fn()
         };
-            const FakeEditor = function (this: any, options: any) {
-                Object.assign(tiptapEditor, { options });
-                return tiptapEditor;
-            };
+        const FakeEditor = function (this: any, options: any) {
+            Object.assign(tiptapEditor, { options });
+            return tiptapEditor;
+        };
         const previousModule = HtmlContentEditor.tiptapModule;
         HtmlContentEditor.tiptapModule = { Editor: FakeEditor } as any;
         const textarea = document.createElement("textarea");

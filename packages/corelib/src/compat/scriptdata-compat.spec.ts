@@ -1,4 +1,5 @@
 // @vitest-environment node
+import { afterEach, describe, expect, it, vi } from "vitest";
 import * as base from "../base";
 import * as scriptDataCompatDeprecations from "./scriptdata-compat";
 

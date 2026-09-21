@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { CriteriaWithText } from "./criteriawithtext";
 
 describe("CriteriaWithText", () => {

@@ -1,3 +1,4 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { mockJQuery, unmockBSAndJQuery } from "../test/mocks";
 import { Tooltip } from "./tooltip";
 

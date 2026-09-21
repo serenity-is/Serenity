@@ -65,7 +65,7 @@ export interface UIDialogMaximizerProps {
  * into a plain class. Requires jQuery UI dialogs; it throws an error without them.
  */
 export class UIDialogMaximizer extends Widget<UIDialogMaximizerProps> {
-    static override [Symbol.typeInfo] = this.registerClass(nsSerenity);
+    static override[Symbol.typeInfo] = this.registerClass(nsSerenity);
 
     /** Default options for the maximizer. */
     static readonly defaults: UIDialogMaximizerProps = {
@@ -165,7 +165,7 @@ export class UIDialogMaximizer extends Widget<UIDialogMaximizerProps> {
         this.restoreSnapshot();
         this.setMaximized(false);
     }
-    
+
     private restoreSnapshot(): void {
         if (!this.maximized)
             return;

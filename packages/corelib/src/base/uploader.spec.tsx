@@ -1,3 +1,4 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import * as dialogs from "./dialogs";
 import * as notify from "./notify";
 import { Uploader, UploaderBatch } from "./uploader";

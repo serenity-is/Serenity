@@ -1,13 +1,13 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 import { EntityDialogTexts } from "../../base";
 import {
-    saveAndCloseToolButton,
     applyChangesToolButton,
+    cloneToolButton,
     deleteToolButton,
-    undeleteToolButton,
     editToolButton,
     localizationToolButton,
-    cloneToolButton
+    saveAndCloseToolButton,
+    undeleteToolButton
 } from "./entitytoolbuttons";
 
 describe("saveAndCloseToolButton", () => {

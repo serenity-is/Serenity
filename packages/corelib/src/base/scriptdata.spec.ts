@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { Lookup } from "./lookup";
 import { notifyError } from "./notify";
 import { ensureScriptDataSync, fetchScriptData, getColumnsScript, getFormScript, getLookupAsync, getRemoteDataAsync, getScriptData, getScriptDataHash, handleScriptDataError, peekScriptData, scriptDataHooks, setRegisteredScripts, setScriptData } from "./scriptdata";
@@ -685,7 +686,7 @@ describe("ensureScriptDataSync", () => {
             status: 200,
             responseText: JSON.stringify(lookupData)
         };
-        vi.spyOn(window, "XMLHttpRequest").mockImplementation(function() { return xhrMock as any; });
+        vi.spyOn(window, "XMLHttpRequest").mockImplementation(function () { return xhrMock as any; });
         const data = ensureScriptDataSync("Lookup.Test") as Lookup<any>;
         expect(data instanceof Lookup).toBe(true);
         expect(data.items).toEqual([{
@@ -711,7 +712,7 @@ describe("ensureScriptDataSync", () => {
             status: 200,
             responseText: JSON.stringify(testData)
         };
-        vi.spyOn(window, "XMLHttpRequest").mockImplementation(function() { return xhrMock as any; });
+        vi.spyOn(window, "XMLHttpRequest").mockImplementation(function () { return xhrMock as any; });
 
         const result = ensureScriptDataSync("TestKey");
         expect(xhrMock.open).toHaveBeenCalledWith("GET", expect.stringContaining("/DynamicData/TestKey"), false);
@@ -726,7 +727,7 @@ describe("ensureScriptDataSync", () => {
             status: 200,
             responseText: JSON.stringify(null)
         };
-        vi.spyOn(window, "XMLHttpRequest").mockImplementation(function() { return xhrMock as any; });
+        vi.spyOn(window, "XMLHttpRequest").mockImplementation(function () { return xhrMock as any; });
         const logSpy = vi.spyOn(console, "log").mockImplementation(() => { });
 
         expect(() => ensureScriptDataSync("TestKey")).toThrow("Cannot load dynamic data: TestKey!")
@@ -744,7 +745,7 @@ describe("ensureScriptDataSync", () => {
             responseText: `(function() {
             })();`
         };
-        vi.spyOn(window, "XMLHttpRequest").mockImplementation(function() { return xhrMock as any; });
+        vi.spyOn(window, "XMLHttpRequest").mockImplementation(function () { return xhrMock as any; });
         const appendChildSpy = vi.spyOn(window.document.head, "appendChild").mockImplementation(() => {
             const s = Symbol.for('Serenity.scriptData');
             globalThis[s] ??= {};
@@ -771,7 +772,7 @@ describe("ensureScriptDataSync", () => {
             status: 500,
             statusText: "Server Error"
         };
-        vi.spyOn(window, "XMLHttpRequest").mockImplementation(function() { return xhrMock as any; });
+        vi.spyOn(window, "XMLHttpRequest").mockImplementation(function () { return xhrMock as any; });
         const logSpy = vi.spyOn(console, "log").mockImplementation(() => { });
 
         expect(() => ensureScriptDataSync("TestKey")).toThrow("An error occurred while trying to load dynamic data: \"TestKey\"!.");

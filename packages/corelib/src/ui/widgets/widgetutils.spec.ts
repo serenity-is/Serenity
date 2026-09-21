@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { Fluent } from "../../base";
 import { Widget } from "./widget";
 import { associateWidget, deassociateWidget, getWidgetFrom, getWidgetName, tryGetWidget, useIdPrefix } from "./widgetutils";
@@ -12,7 +13,7 @@ describe("getWidgetName", () => {
     });
 
     it("handles types without type info", () => {
-        class SimpleWidget {}
+        class SimpleWidget { }
         const name = getWidgetName(SimpleWidget);
         expect(name).toBe("SimpleWidget");
     });

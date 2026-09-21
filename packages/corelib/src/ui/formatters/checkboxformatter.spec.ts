@@ -1,4 +1,5 @@
 import { formatterContext as ctx } from "@serenity-is/sleekgrid";
+import { describe, expect, it } from "vitest";
 import { CheckboxFormatter } from "./checkboxformatter";
 
 describe("CheckboxFormatter", () => {

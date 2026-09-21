@@ -1,4 +1,5 @@
-﻿import { Config, getGlobalTypeRegistry, isAssignableFrom, notifyError, registerClass } from "../base";
+﻿import { beforeEach, describe, expect, it, vi } from "vitest";
+import { Config, getGlobalTypeRegistry, isAssignableFrom, notifyError, registerClass } from "../base";
 import { IDialog } from "../interfaces";
 import { DialogTypeRegistry } from "./dialogtyperegistry";
 
@@ -62,7 +63,7 @@ beforeEach(() => {
     const mockIsAssignableFrom = vi.mocked(isAssignableFrom);
     mockIsAssignableFrom.mockImplementation((baseType: any, derivedType: any) => {
         return baseType === IDialog &&
-               (derivedType === TestDialog1 ||
+            (derivedType === TestDialog1 ||
                 derivedType === TestDialog2 ||
                 derivedType === TestDialogWithSuffix);
     });
@@ -227,7 +228,7 @@ describe("DialogTypeRegistry", () => {
 
         const type2 = DialogTypeRegistry.tryGet("AnotherDialog");
         expect(type2).toBe(TestDialogWithSuffix);
-    });    
+    });
 
     it('can find type registered after initialization', function () {
         const typeRegistry = getGlobalTypeRegistry();

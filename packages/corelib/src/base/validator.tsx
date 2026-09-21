@@ -360,7 +360,7 @@ export class Validator {
         onkeyup: function (element: ValidatableElement, event: KeyboardEvent, validator: Validator) {
 
             // Avoid revalidate the field when pressing one of the following keys
-            if ((event.key === "Tab" && Validator.elementValue(element) === "") || 
+            if ((event.key === "Tab" && Validator.elementValue(element) === "") ||
                 Validator.excludedModifierKeys.has(event.key)) {
                 return;
             } else if (element.name in validator.submitted || element.name in validator.invalid) {

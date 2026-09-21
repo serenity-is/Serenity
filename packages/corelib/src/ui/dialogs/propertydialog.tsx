@@ -1,6 +1,6 @@
 import { PropertyItem, PropertyItemsData, cancelDialogButton, getInstanceType, getTypeFullName, nsSerenity, okDialogButton } from "../../base";
-import { ScriptData, canLoadScriptData, getFormData, getFormDataAsync } from "../../compat";
-import { Attributes, PanelAttribute, StaticPanelAttribute } from "../../types/attributes";
+import { canLoadScriptData, getFormData, getFormDataAsync } from "../../compat";
+import { Attributes, StaticPanelAttribute } from "../../types/attributes";
 import { PropertyGrid, PropertyGridOptions } from "../widgets/propertygrid";
 import { WidgetProps } from "../widgets/widget";
 import { BaseDialog } from "./basedialog";

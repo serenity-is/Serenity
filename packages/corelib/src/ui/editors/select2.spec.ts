@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { Select2 } from "./select2";
 
 describe("Select2 wrapper", () => {
@@ -147,10 +147,12 @@ describe("Select2 wrapper", () => {
             element,
             multiple: true,
             initSelection: (_element, callback) => callback([]),
-            query: query => query.callback({ results: [
-                { id: "1", text: "One" },
-                { id: "2", text: "Two" }
-            ], more: false })
+            query: query => query.callback({
+                results: [
+                    { id: "1", text: "One" },
+                    { id: "2", text: "Two" }
+                ], more: false
+            })
         });
         select.data = [{ id: "1", text: "One" }, { id: "2", text: "Two" }] as any;
         select.val = ["1", "2"];
@@ -166,10 +168,12 @@ describe("Select2 wrapper", () => {
         new Select2({
             element,
             initSelection: (_element, callback) => callback(null),
-            query: query => query.callback({ results: [
-                { id: "1", text: "One" },
-                { id: "2", text: "Two" }
-            ], more: false })
+            query: query => query.callback({
+                results: [
+                    { id: "1", text: "One" },
+                    { id: "2", text: "Two" }
+                ], more: false
+            })
         });
         const internal: any = (element as any).select2;
         expect(() => internal.postprocessResults({ results: [{ id: "1", text: "One" }], more: false }, true)).not.toThrow();
@@ -184,10 +188,12 @@ describe("Select2 wrapper", () => {
             element,
             multiple: true,
             initSelection: (_element, callback) => callback([]),
-            query: query => query.callback({ results: [
-                { id: "1", text: "One" },
-                { id: "2", text: "Two" }
-            ], more: false })
+            query: query => query.callback({
+                results: [
+                    { id: "1", text: "One" },
+                    { id: "2", text: "Two" }
+                ], more: false
+            })
         });
         const internal: any = (element as any).select2;
         expect(() => internal.postprocessResults({ results: [{ id: "1", text: "One" }], more: false }, true)).not.toThrow();
@@ -258,10 +264,12 @@ describe("Select2 wrapper", () => {
         const input = document.createElement("input");
         input.value = "2";
         document.body.appendChild(input);
-        new Select2({ element: input, data: [
-            [{ id: "1", text: "One" }],
-            [{ id: "2", text: "Two" }]
-        ] } as any);
+        new Select2({
+            element: input, data: [
+                [{ id: "1", text: "One" }],
+                [{ id: "2", text: "Two" }]
+            ]
+        } as any);
         const internal: any = (input as any).select2;
         const callback = vi.fn();
         internal.opts.initSelection(input, callback);
@@ -526,10 +534,12 @@ describe("Select2 wrapper", () => {
         new Select2({
             element: input,
             initSelection: (_e, callback) => callback(null),
-            query: query => query.callback({ results: [
-                { id: "1", text: "One" },
-                { id: "2", text: "Two", disabled: true }
-            ], more: false })
+            query: query => query.callback({
+                results: [
+                    { id: "1", text: "One" },
+                    { id: "2", text: "Two", disabled: true }
+                ], more: false
+            })
         } as any);
         const internal: any = (input as any).select2;
         internal.open();
@@ -595,10 +605,12 @@ describe("Select2 wrapper", () => {
             element: input,
             multiple: true,
             initSelection: (_e, callback) => callback([]),
-            query: query => query.callback({ results: [
-                { id: "1", text: "One" },
-                { id: "2", text: "Two", locked: true }
-            ], more: false })
+            query: query => query.callback({
+                results: [
+                    { id: "1", text: "One" },
+                    { id: "2", text: "Two", locked: true }
+                ], more: false
+            })
         } as any);
         const internal: any = (input as any).select2;
         internal.addSelectedChoice({ id: "1", text: "One" });
@@ -701,9 +713,9 @@ describe("Select2 wrapper", () => {
         };
 
         assertKeyupChange(internal.search);
-    internal.close();
+        internal.close();
         assertKeyupChange(internal.focusser);
-    expect(internal.opened()).toBe(true);
+        expect(internal.opened()).toBe(true);
         internal.destroy();
     });
 
@@ -740,11 +752,13 @@ describe("Select2 wrapper", () => {
         new Select2({
             element: input,
             initSelection: (_e, callback) => callback(null),
-            query: query => query.callback({ results: [
-                { id: "1", text: "One" },
-                { id: "2", text: "Two" },
-                { id: "3", text: "Three", disabled: true }
-            ], more: false })
+            query: query => query.callback({
+                results: [
+                    { id: "1", text: "One" },
+                    { id: "2", text: "Two" },
+                    { id: "3", text: "Three", disabled: true }
+                ], more: false
+            })
         } as any);
         const internal: any = (input as any).select2;
         internal.open();

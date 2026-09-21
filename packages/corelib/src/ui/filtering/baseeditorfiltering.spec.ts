@@ -1,10 +1,11 @@
+import { describe, expect, it } from "vitest";
 import { Widget } from "../widgets/widget";
 import { BaseEditorFiltering } from "./baseeditorfiltering";
 import { FilterOperator } from "./filteroperator";
 
 describe("BaseEditorFiltering", () => {
     class TestWidget extends Widget<any> {
-        static override [Symbol.typeInfo] = this.registerClass("Serenity.TestEditor");
+        static override[Symbol.typeInfo] = this.registerClass("Serenity.TestEditor");
         private _value = "testValue";
         get value() { return this._value; }
         set value(v: string) { this._value = v; }
