@@ -66,7 +66,8 @@ export function assignClass(node: JSXElement, value?: any, prev?: any): void {
                     }
                     applyClassName(node, args.newValue, args.prevValue);
                 }, {
-                    lifecycleNode: owner ??= getScopedOwner(node, "class")
+                    lifecycleNode: owner ??= getScopedOwner(node, "class"),
+                    derivedLifecycleNode: node
                 });
             }
             return val;
@@ -83,7 +84,8 @@ export function assignClass(node: JSXElement, value?: any, prev?: any): void {
                     }
                     applyClassName(node, Boolean(args.newValue) && key, Boolean(args.prevValue) && key)
                 }, {
-                    lifecycleNode: owner ??= getScopedOwner(node, "class")
+                    lifecycleNode: owner ??= getScopedOwner(node, "class"),
+                    derivedLifecycleNode: node
                 });
             }
         });

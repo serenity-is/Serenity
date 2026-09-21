@@ -1,6 +1,7 @@
 import { addDisposingListener, invokeDisposingListeners } from "./disposing-listener";
 
 const scopedOwners = new WeakMap<EventTarget, Map<string, EventTarget>>();
+const ownerBridges = new WeakMap<EventTarget, () => void>();
 
 /**
  * Returns a stable `EventTarget` used to scope the signal subscriptions of a
@@ -27,8 +28,13 @@ export function getScopedOwner(node: EventTarget, prop: string): EventTarget {
         const created = new EventTarget();
         owners.set(prop, created);
         owner = created;
-        addDisposingListener(node, () => invokeDisposingListeners(created), "domwise:owner:" + prop);
+        ownerBridges.set(created, () => invokeDisposingListeners(created));
     }
+    // (Re-)establish the node -> owner bridge. This is idempotent because
+    // addDisposingListener de-duplicates by callback identity, and re-adding
+    // restores the bridge when the node was disposed earlier (which removes it)
+    // so subscriptions bound afterwards can still be released.
+    addDisposingListener(node, ownerBridges.get(owner)!, "domwise:owner:" + prop);
     return owner;
 }
 

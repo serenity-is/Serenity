@@ -1,7 +1,7 @@
 import type { ComponentChildren, JSXElement, SignalOrValue } from "../types";
 import { addDisposingListener, invokeDisposingListeners, removeDisposingListener } from "./disposing-listener";
+import { isChildCollection } from "./jsx-append-children";
 import { derivedSignal, isSignalLike, observeSignal } from "./signal-util";
-import { isArrayLike } from "./util";
 
 function disposeContent(content: any): void {
     if (content == null)
@@ -14,8 +14,8 @@ function disposeContent(content: any): void {
     else if (content instanceof EventTarget) {
         invokeDisposingListeners(content, { descendants: true });
     }
-    else if (isArrayLike(content)) {
-        for (const child of Array.from(content as any[]))
+    else if (isChildCollection(content)) {
+        for (const child of Array.from(content as any))
             disposeContent(child);
     }
 }
@@ -39,8 +39,8 @@ function findAnchor(content: any): EventTarget | null {
     }
     if (content instanceof EventTarget)
         return content;
-    if (isArrayLike(content)) {
-        for (const child of Array.from(content as any[])) {
+    if (isChildCollection(content)) {
+        for (const child of Array.from(content as any)) {
             const anchor = findAnchor(child);
             if (anchor)
                 return anchor;

@@ -34,8 +34,9 @@ export interface BasicClassList extends PropHook<Element> {
      * Toggles a token, optionally forcing the presence or absence.
      * @param token - Class name to toggle.
      * @param force - When provided, forces add (`true`) or remove (`false`).
+     * @returns `true` if the token is now present, otherwise `false`.
      */
-    toggle(token: string, force?: boolean): void
+    toggle(token: string, force?: boolean): boolean
     /**
      * Checks whether the list contains the given token.
      * @param token - Class name to test.

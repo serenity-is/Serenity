@@ -23,7 +23,7 @@ function isFragmentWithPlaceholder(node: Node): node is DocumentFragment {
     return node instanceof DocumentFragment && isPlaceholder(node.firstChild);
 }
 
-function isChildCollection(value: any): boolean {
+export function isChildCollection(value: any): boolean {
     if (value == null || typeof value === "string" || typeof value === "number" || typeof value === "function")
         return false;
     if (value instanceof Node)
@@ -67,6 +67,13 @@ function wrapAsNode(value: any): Node {
 
 function appendChildrenWithSignal(parent: Node, signal: SignalLike<any>) {
     let prevNode: Node;
+    // A DocumentFragment is emptied as soon as it is inserted, so it can never
+    // receive a `disposing` event. Anchor the subscription to a placeholder
+    // comment that travels with the content into the real DOM instead, so the
+    // subscription is still torn down when the host is disposed.
+    const anchor = parent instanceof DocumentFragment ? document.createComment("") : null;
+    if (anchor)
+        parent.appendChild(anchor);
     observeSignal(signal, (args) => {
         if (args.isInitial) {
             prevNode = wrapAsNode(args.newValue);
@@ -97,7 +104,7 @@ function appendChildrenWithSignal(parent: Node, signal: SignalLike<any>) {
         // scope the subscription to the parent, not the rendered content: the
         // content may be disposed by an owner (e.g. Show disposing a factory
         // branch) while this subscription must keep rendering subsequent values
-        lifecycleNode: parent
+        lifecycleNode: anchor ?? parent
     });
 
 }
@@ -112,9 +119,16 @@ export function appendChildren(
     } else if (isElement(children)) {
         appendChild(parent, children);
     } else if (isShadowRoot(children)) {
-        const shadowRoot = (parent as HTMLElement).attachShadow(children.attr);
-        appendChildren(shadowRoot, children.children);
-        setRef(children.ref, shadowRoot);
+        if (parent instanceof Element) {
+            const shadowRoot = (parent as HTMLElement).attachShadow(children.attr);
+            appendChildren(shadowRoot, children.children);
+            setRef(children.ref, shadowRoot);
+        } else {
+            // no host element to attach to (e.g. a ShadowRootNode inside a
+            // signal collection rendered through a DocumentFragment): render
+            // the children directly instead of failing with a TypeError
+            appendChildren(parent, children.children);
+        }
     } else if (isSignalLike(children)) {
         appendChildrenWithSignal(parent, children);
     } else if (isChildCollection(children)) {

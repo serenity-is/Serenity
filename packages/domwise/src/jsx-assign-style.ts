@@ -150,7 +150,10 @@ export function assignStyle(node: JSXElement, value?: any, prev?: boolean | any)
             if (isSignalLike(val)) {
                 owner ??= getScopedOwner(node, "style");
                 observeSignal(val, args => setStylePropValue(node, key, normalizeStyleValue(args.newValue)), {
-                    lifecycleNode: owner
+                    lifecycleNode: owner,
+                    // the derived signal belongs to the node, not to this
+                    // particular prop assignment: keep it alive across re-assign
+                    derivedLifecycleNode: node
                 });
             }
             else {

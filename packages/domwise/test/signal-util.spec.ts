@@ -267,7 +267,7 @@ describe("createDerivedSignal", () => {
         class BadSignal {
             constructor(public value: any) { }
             peek() { return this.value; }
-            subscribe() {
+            subscribe(): () => void {
                 subscribeCalls++;
                 throw new Error("subscribe failed");
             }

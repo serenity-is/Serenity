@@ -86,9 +86,11 @@ export function jsx(tag: any, props?: { children?: ComponentChildren, [key: stri
         // Custom elements.
         if (isObject(tag.defaultProps)) {
             // treat an explicitly passed `undefined` as "use the default",
-            // matching React's defaultProps behavior
+            // matching React's defaultProps behavior. Use an own-property check
+            // so keys that collide with Object.prototype members (e.g.
+            // `toString`) still resolve to the default.
             for (const key of Object.keys(tag.defaultProps)) {
-                if (attr[key] === undefined)
+                if (!Object.prototype.hasOwnProperty.call(attr, key) || attr[key] === undefined)
                     attr[key] = tag.defaultProps[key];
             }
         }

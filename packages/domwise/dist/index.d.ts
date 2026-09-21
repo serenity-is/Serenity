@@ -32,8 +32,9 @@ export interface BasicClassList extends PropHook<Element> {
 	 * Toggles a token, optionally forcing the presence or absence.
 	 * @param token - Class name to toggle.
 	 * @param force - When provided, forces add (`true`) or remove (`false`).
+	 * @returns `true` if the token is now present, otherwise `false`.
 	 */
-	toggle(token: string, force?: boolean): void;
+	toggle(token: string, force?: boolean): boolean;
 	/**
 	 * Checks whether the list contains the given token.
 	 * @param token - Class name to test.
@@ -2927,6 +2928,7 @@ type ObserveSignalCallback<T> = (args: SignalObserveArgs<T>) => void;
  * @param opt - Optional lifecycle wiring.
  * @param opt.useLifecycleRoot - When `true`, captures {@link currentLifecycleRoot} at call time as the lifecycle root.
  * @param opt.lifecycleNode - Explicit node whose `disposing` event will dispose the subscription.
+ * @param opt.derivedLifecycleNode - Optional separate node whose `disposing` event disposes the derived signal's own `derivedDisposer`. Defaults to `lifecycleNode`.
  * @returns A disposer function for the subscription, or `null`/`undefined` if the signal does not expose one.
  */
 export declare function observeSignal<T>(signal: SignalLike<T>, callback: ObserveSignalCallback<T>, opt?: {
@@ -2940,6 +2942,13 @@ export declare function observeSignal<T>(signal: SignalLike<T>, callback: Observ
 	 * subscription via {@link addDisposingListener}.
 	 */
 	lifecycleNode?: EventTarget;
+	/**
+	 * Optional DOM node that owns the derived signal itself. When a prop binding
+	 * is disposed (but the node lives on), the derived signal's `derivedDisposer`
+	 * stays registered here so the signal keeps tracking its source. Defaults to
+	 * `lifecycleNode`.
+	 */
+	derivedLifecycleNode?: EventTarget;
 }): EffectDisposer | null | undefined;
 interface DerivedSignalLike<T> extends SignalLike<T> {
 	/** Optional disposer that unsubscribes the derived signal from its source. */
