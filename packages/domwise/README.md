@@ -18,7 +18,7 @@ See [NOTICE.md](./NOTICE.md) for licensing information about used libraries.
 ## Table of Contents
 
 - [Installation](#installation)
-- [Usage in Serene/StartSharp Applications](#usage-in-serene-startsharp-applications)
+- [Usage in Serene/StartSharp Applications](#usage-in-serenestartsharp-applications)
 - [Quick Start](#quick-start)
 - [Why Not Virtual DOM?](#why-not-virtual-dom)
 - [JSX Syntax](#jsx-syntax)
@@ -85,7 +85,7 @@ yarn add @serenity-is/domwise
 pnpm add @serenity-is/domwise
 ```
 
-> **Note:** The direct `npm install @serenity-is/domwise` shown in the previous section is only needed when using DomWise outside of a Serene/StartSharp project, or if you require a standalone installation. See [Usage in Serene/StartSharp Application](#usage-in-serenestartsharp-application)
+> **Note:** The direct `npm install @serenity-is/domwise` shown in the previous section is only needed when using DomWise outside of a Serene/StartSharp project, or if you require a standalone installation. See [Usage in Serene/StartSharp Applications](#usage-in-serenestartsharp-applications)
 
 ---
 
@@ -442,9 +442,11 @@ const value = signal("mid");
 </div>
 ```
 
+When a signal value is itself a `DocumentFragment`, it is one-shot: appending it moves its children out and leaves it empty, so re-assigning the same fragment instance renders nothing. Create a fresh fragment for each value.
+
 ### Signal API
 
-DomWise re-exports the full `@preact/signals-core` API:
+DomWise re-exports a subset of `@preact/signals-core` — `signal`, `computed`, `effect`, `batch` and `untracked` — not the whole API:
 
 ```tsx
 import { signal, computed, effect, batch, untracked } from "@serenity-is/domwise";
@@ -470,7 +472,7 @@ import { useSignal, useUpdatableComputed } from "@serenity-is/domwise";
 // Create a writable signal
 const sig = useSignal(42);
 
-// Manually updatable computed — only recalculates when update() is called
+// Manually updatable computed — recalculates on update() and when dependencies change
 const { computed: cmp, update } = useUpdatableComputed();
 const derived = cmp(() => expensiveCalculation(data));
 update(); // Forces recalculation
@@ -770,7 +772,7 @@ count.value++; // 1
 
 ### useUpdatableComputed
 
-Creates computed signals that only recalculate when `update()` is explicitly called — useful for batching dependent recalculations.
+Creates computed signals that can be recalculated explicitly with `update()`. Note that it also recomputes whenever a signal read inside `fn` changes; `update()` forces a recalculation even when no dependency changed.
 
 ```tsx
 import { useUpdatableComputed } from "@serenity-is/domwise";
@@ -1108,7 +1110,7 @@ This system ensures that your npm dependencies are always kept in sync with the 
 
 ## Browser Support
 
-All modern browsers that support ES2019+ features. Internet Explorer is not supported.
+All modern browsers that support ES2022+ features. Internet Explorer is not supported.
 
 ---
 

@@ -43,13 +43,14 @@ export interface BasicClassList extends PropHook<Element> {
 	contains(token: string): boolean;
 }
 export type ClassName = string | {
-	[key: string]: boolean;
-} | false | null | undefined | ClassName[];
+	[key: string]: boolean | SignalLike<boolean | string | null | undefined>;
+} | false | null | undefined | SignalLike<string | boolean | null | undefined> | ClassName[];
 /**
  * A value that can be used as a `class` attribute: a string, an array of class
- * names, an iterable, a dictionary of boolean flags, or a `DOMTokenList`.
+ * names (which may contain signals), an iterable, a dictionary of boolean flags,
+ * or a `DOMTokenList`.
  */
-export type ClassNames = ClassName | Iterable<string> | DOMTokenList;
+export type ClassNames = ClassName | Iterable<ClassName> | DOMTokenList;
 /**
  * A mutable reference container with a `current` property.
  * @typeParam T - The type of the referenced value.
@@ -158,7 +159,10 @@ export interface CustomDomAttributes<T> {
 	/** Compatibility event map for capture-phase handlers. */
 	onCapture?: Record<string, Function>;
 }
-export interface ElementAttributes<T> {
+type CapturePhaseEventHandlers<T> = {
+	[K in keyof EventHandlersElement<T> & `on${string}` as `${K}Capture`]?: EventHandlersElement<T>[K];
+};
+export interface ElementAttributes<T> extends CapturePhaseEventHandlers<T> {
 	className?: ElementAttributes<T>["class"];
 	tabIndex?: PropValue<number | string | RemoveAttribute>;
 	namespaceURI?: string | undefined;
@@ -170,12 +174,15 @@ export interface ElementAttributes<T> {
 interface HTMLAttributes<T> {
 	contentEditable?: PropValue<EnumeratedPseudoBoolean | EnumeratedAcceptsEmpty | "plaintext-only" | "inherit" | RemoveAttribute>;
 	dataset?: {
-		[key: string]: string;
+		[key: string]: string | number | boolean | null | undefined;
 	} | undefined;
 	spellCheck?: PropValue<EnumeratedPseudoBoolean | EnumeratedAcceptsEmpty | RemoveAttribute>;
 }
 interface SVGAttributes<T> {
 	tabIndex?: PropValue<number | string | RemoveAttribute>;
+	dataset?: {
+		[key: string]: string | number | boolean | null | undefined;
+	} | undefined;
 }
 interface AnchorHTMLAttributes<T> {
 	/** @deprecated use referrerpolicy */
@@ -2310,17 +2317,11 @@ export namespace JSX {
 	}
 }
 /**
- * A class-based JSX component. Extend `Component` or implement this interface
- * and override `render` to return a `JSXElement`.
+ * An instance of a class-based JSX component created by the JSX factory.
  * @typeParam P - The type of the component's props.
  * @typeParam T - The type of the DOM node the component renders.
  */
-export interface ComponentClass<P = {}, T extends Node = JSXElement> {
-	/**
-	 * Constructs the component with the given props.
-	 * @param props - Props including optional `children`.
-	 */
-	new (props: P): ComponentClass<P, T>;
+export interface ComponentInstance<P = {}, T extends Node = JSXElement> {
 	/**
 	 * Renders the component.
 	 * @returns The rendered `JSXElement` or `null`.
@@ -2332,6 +2333,23 @@ export interface ComponentClass<P = {}, T extends Node = JSXElement> {
 	readonly props?: P & {
 		children?: ComponentChildren;
 	};
+	/** Optional display name used in devtools / error messages. */
+	displayName?: string | undefined;
+}
+/**
+ * A class-based JSX component. Extend `Component` or implement this interface
+ * and override `render` to return a `JSXElement`.
+ * @typeParam P - The type of the component's props.
+ * @typeParam T - The type of the DOM node the component renders.
+ */
+export interface ComponentClass<P = {}, T extends Node = JSXElement> {
+	/**
+	 * Constructs the component with the given props.
+	 * @param props - Props including optional `children`.
+	 */
+	new (props: P): ComponentInstance<P, T>;
+	/** Optional default prop values merged in by the JSX factory before construction. */
+	defaultProps?: Partial<P> | undefined;
 	/** Optional display name used in devtools / error messages. */
 	displayName?: string | undefined;
 }
@@ -2856,7 +2874,7 @@ export declare function ShadowRootNode({ children, ref, ...attr }: ShadowRootIni
 export declare function Show<TWhen>(props: {
 	when: SignalOrValue<TWhen | undefined | null>;
 	fallback?: ComponentChildren | ((when: TWhen | undefined | null) => ComponentChildren);
-	children: ComponentChildren | ((when: TWhen | undefined | null) => ComponentChildren);
+	children?: ComponentChildren | ((when: TWhen | undefined | null) => ComponentChildren);
 	autoDispose?: boolean;
 }): JSXElement;
 /**
@@ -2880,7 +2898,11 @@ export declare function isWritableSignal<T>(obj: any): obj is Signal<T>;
  * @returns `true` if the object is a readonly signal.
  */
 export declare function isReadonlySignal<T = any>(obj: any): obj is Computed<T>;
-type SignalObserveArgs<T> = {
+/**
+ * Arguments passed to the {@link observeSignal} callback on each invocation.
+ * @typeParam T - Type of the observed signal's value.
+ */
+export type SignalObserveArgs<T> = {
 	/** `true` on the initial synchronous invocation right after subscription; `false` thereafter. */
 	isInitial: boolean;
 	/** Value from the previous callback invocation. `undefined` on the initial call. */
@@ -2913,7 +2935,12 @@ type SignalObserveArgs<T> = {
 	 */
 	set lifecycleNode(value: EventTarget | null | undefined);
 };
-type ObserveSignalCallback<T> = (args: SignalObserveArgs<T>) => void;
+/**
+ * Callback invoked by {@link observeSignal} on subscription and on each signal change.
+ * @typeParam T - Type of the observed signal's value.
+ * @param args - Mutable {@link SignalObserveArgs} describing the change.
+ */
+export type ObserveSignalCallback<T> = (args: SignalObserveArgs<T>) => void;
 /**
  * Subscribes to a signal and invokes `callback` immediately and on every subsequent change.
  *
@@ -2952,7 +2979,12 @@ export declare function observeSignal<T>(signal: SignalLike<T>, callback: Observ
 	 */
 	disposeDerivedSignal?: boolean;
 }): EffectDisposer | null | undefined;
-interface DerivedSignalLike<T> extends SignalLike<T> {
+/**
+ * A derived/computed signal that also exposes a `derivedDisposer` to tear down
+ * the subscription to its source signal.
+ * @typeParam T - Type of the derived value.
+ */
+export interface DerivedSignalLike<T> extends SignalLike<T> {
 	/** Optional disposer that unsubscribes the derived signal from its source. */
 	derivedDisposer?: () => void;
 }
@@ -2974,6 +3006,38 @@ interface DerivedSignalLike<T> extends SignalLike<T> {
  * @throws {Error} When `input` is not signal-like.
  */
 export declare function derivedSignal<TDerived, TInput = any>(input: SignalLike<TInput>, fn: (value: TInput) => TDerived): DerivedSignalLike<TDerived>;
+/**
+ * Minimal computed-like signal used as a fallback when the source signal's
+ * constructor cannot produce a derived instance. Re-computes `fn()` on
+ * `update()` and notifies subscribers.
+ * @typeParam T - Type of the computed value.
+ */
+export declare class PrimitiveComputed<T> {
+	#private;
+	/**
+	 * Creates the primitive computed.
+	 * @param fn - Computation that produces the derived value. Invoked immediately to seed `value`.
+	 */
+	constructor(fn: () => T);
+	/**
+	 * Re-evaluates `fn()` and notifies subscribers when the result has changed.
+	 * @param force - When `true`, notifies subscribers even when the value is referentially equal.
+	 */
+	update(force?: boolean): void;
+	/**
+	 * Subscribes to value changes. The callback is invoked immediately with the current value.
+	 * @param callback - Function called with each new value.
+	 * @returns A disposer that removes the subscription.
+	 */
+	subscribe(callback: (value: T) => void): EffectDisposer;
+	/**
+	 * Returns the current value without creating a tracking dependency.
+	 * @returns The current computed value.
+	 */
+	peek(): T;
+	/** Current computed value. */
+	get value(): T;
+}
 /**
  * Options for creating a signal via {@link signal} / {@link computed}.
  * Re-exported from `@preact/signals-core`.

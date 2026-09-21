@@ -362,12 +362,14 @@ it('attach event listeners but drop the dash after on', function () {
 
     expect(element.outerHTML).toBe('<a href="#">Download</a>');
 
-    expect(addEventListener.mock.calls.length).toBe(2);
-    expect(addEventListener.mock.calls[0]).toEqual([
+    // domwise also installs a global "disposing" listener to clean up handlers
+    const listenerCalls = addEventListener.mock.calls.filter(call => call[0] !== 'disposing');
+    expect(listenerCalls.length).toBe(2);
+    expect(listenerCalls[0]).toEqual([
         'remoteinput',
         handler,
     ]);
-    expect(addEventListener.mock.calls[1]).toEqual([
+    expect(listenerCalls[1]).toEqual([
         'remoteinput',
         handler,
     ]);

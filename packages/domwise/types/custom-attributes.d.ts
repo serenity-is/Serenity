@@ -22,7 +22,12 @@ export interface CustomDomAttributes<T> {
 }
 
 declare module "./jsx-elements" {
-    interface ElementAttributes<T> {
+    /** Capture-phase variants of every standard event handler (`onClickCapture`, ...). */
+    type CapturePhaseEventHandlers<T> = {
+        [K in keyof EventHandlersElement<T> & `on${string}` as `${K}Capture`]?: EventHandlersElement<T>[K];
+    };
+
+    interface ElementAttributes<T> extends CapturePhaseEventHandlers<T> {
         className?: ElementAttributes<T>["class"];
         tabIndex?: PropValue<number | string | RemoveAttribute>;
         namespaceURI?: string | undefined;
@@ -34,12 +39,13 @@ declare module "./jsx-elements" {
 
     interface HTMLAttributes<T> {
         contentEditable?: PropValue<EnumeratedPseudoBoolean | EnumeratedAcceptsEmpty | "plaintext-only" | "inherit" | RemoveAttribute>;
-        dataset?: { [key: string]: string } | undefined
+        dataset?: { [key: string]: string | number | boolean | null | undefined } | undefined
         spellCheck?: PropValue<EnumeratedPseudoBoolean | EnumeratedAcceptsEmpty | RemoveAttribute>;
     }
 
     interface SVGAttributes<T> {
         tabIndex?: PropValue<number | string | RemoveAttribute>;
+        dataset?: { [key: string]: string | number | boolean | null | undefined } | undefined
     }
 
     interface AnchorHTMLAttributes<T> {

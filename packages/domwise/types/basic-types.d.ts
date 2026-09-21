@@ -45,12 +45,13 @@ export interface BasicClassList extends PropHook<Element> {
     contains(token: string): boolean
 }
 
-type ClassName = string | { [key: string]: boolean } | false | null | undefined | ClassName[]
+type ClassName = string | { [key: string]: boolean | SignalLike<boolean | string | null | undefined> } | false | null | undefined | SignalLike<string | boolean | null | undefined> | ClassName[]
 /**
  * A value that can be used as a `class` attribute: a string, an array of class
- * names, an iterable, a dictionary of boolean flags, or a `DOMTokenList`.
+ * names (which may contain signals), an iterable, a dictionary of boolean flags,
+ * or a `DOMTokenList`.
  */
-export type ClassNames = ClassName | Iterable<string> | DOMTokenList;
+export type ClassNames = ClassName | Iterable<ClassName> | DOMTokenList;
 
 /**
  * A mutable reference container with a `current` property.

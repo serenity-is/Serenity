@@ -109,7 +109,7 @@ function contentToDispose(content: any): object | null {
 export function Show<TWhen>(props: {
     when: SignalOrValue<TWhen | undefined | null>;
     fallback?: ComponentChildren | ((when: TWhen | undefined | null) => ComponentChildren);
-    children: ComponentChildren | ((when: TWhen | undefined | null) => ComponentChildren);
+    children?: ComponentChildren | ((when: TWhen | undefined | null) => ComponentChildren);
     autoDispose?: boolean;
 }): JSXElement {
     const autoDispose = props.autoDispose !== false;
@@ -150,12 +150,20 @@ export function Show<TWhen>(props: {
             content = (content as (when: any) => ComponentChildren)(whenValue);
         // give primitive branches a DOM node so Show has an anchor to bind the
         // branch lifecycle (and the derived signal's disposer) to
-        if (content == null || typeof content === "boolean")
+        let normalizedPrimitive = false;
+        if (content == null || typeof content === "boolean") {
             content = new Text("");
-        else if (typeof content !== "object")
+            normalizedPrimitive = true;
+        } else if (typeof content !== "object") {
             content = document.createTextNode(String(content));
+            normalizedPrimitive = true;
+        }
         if (autoDispose && content != null && typeof content === "object") {
-            contentNodes.add(content);
+            // a fresh Text is produced for every primitive evaluation; keep it
+            // out of the strong set so repeated switches don't accumulate
+            // placeholders, but still record its anchor/disposable weakly
+            if (!normalizedPrimitive)
+                contentNodes.add(content);
             if (!contentDisposables.has(content)) {
                 const disposable = contentToDispose(content);
                 if (disposable != null)

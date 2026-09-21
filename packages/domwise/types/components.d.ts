@@ -2,6 +2,25 @@ import type { Ref } from "./basic-types";
 import type { ComponentChildren, JSXElement } from "./jsx-namespace";
 
 /**
+ * An instance of a class-based JSX component created by the JSX factory.
+ * @typeParam P - The type of the component's props.
+ * @typeParam T - The type of the DOM node the component renders.
+ */
+export interface ComponentInstance<P = {}, T extends Node = JSXElement> {
+    /**
+     * Renders the component.
+     * @returns The rendered `JSXElement` or `null`.
+     */
+    render(): JSXElement | null
+    /** Optional default prop values merged in by the JSX factory before construction. */
+    defaultProps?: Partial<P> | undefined
+    /** Props passed to the instance, including optional `children`. */
+    readonly props?: P & { children?: ComponentChildren }
+    /** Optional display name used in devtools / error messages. */
+    displayName?: string | undefined
+}
+
+/**
  * A class-based JSX component. Extend `Component` or implement this interface
  * and override `render` to return a `JSXElement`.
  * @typeParam P - The type of the component's props.
@@ -12,16 +31,9 @@ export interface ComponentClass<P = {}, T extends Node = JSXElement> {
      * Constructs the component with the given props.
      * @param props - Props including optional `children`.
      */
-    new(props: P): ComponentClass<P, T>
-    /**
-     * Renders the component.
-     * @returns The rendered `JSXElement` or `null`.
-     */
-    render(): JSXElement | null
+    new(props: P): ComponentInstance<P, T>
     /** Optional default prop values merged in by the JSX factory before construction. */
     defaultProps?: Partial<P> | undefined
-    /** Props passed to the instance, including optional `children`. */
-    readonly props?: P & { children?: ComponentChildren }
     /** Optional display name used in devtools / error messages. */
     displayName?: string | undefined
 }

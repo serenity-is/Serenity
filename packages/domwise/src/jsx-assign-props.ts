@@ -14,6 +14,18 @@ function normalizeAttribute(s: string, separator: string) {
     return s.replace(/[A-Z]/g, match => separator + match.toLowerCase());
 }
 
+function setNamespacedAttribute(node: JSXElement, ns: string, key: string, value: any): void {
+    const qualified = normalizeAttribute(key, ":");
+    if (value == null || value === false) {
+        // `null`/`undefined`/`false` remove the attribute instead of
+        // stringifying it (e.g. `xlink:href="undefined"`)
+        node.removeAttributeNS(ns, qualified.substring(qualified.indexOf(":") + 1));
+        node.removeAttribute(qualified);
+        return;
+    }
+    node.setAttributeNS(ns, qualified, value);
+}
+
 const mappedKeys: Map<string, string> = new Map<string, string>([
     ["acceptCharset", "accept-charset"],
     ["autoComplete", "autocomplete"],
@@ -94,7 +106,13 @@ export function assignProp(node: JSXElement, key: string, value: any, prev?: any
                 // A `null` with no previous value is a no-op (uncontrolled).
                 if (value == null && prev == null)
                     return;
-                (node as HTMLInputElement | HTMLTextAreaElement).value = value == null ? "" : value;
+                const stringValue = value == null ? "" : String(value);
+                (node as HTMLInputElement | HTMLTextAreaElement).value = stringValue;
+                if (prev == null && node instanceof window.HTMLInputElement) {
+                    // also reflect the initial value as an attribute so the
+                    // serialized markup (SSR / form reset / snapshots) shows it
+                    node.setAttribute("value", stringValue);
+                }
                 return;
             }
             if (value == null) {
@@ -150,10 +168,12 @@ export function assignProp(node: JSXElement, key: string, value: any, prev?: any
         case "on":
         case "onCapture":
             const useCapture = key === "onCapture";
+            const onRegKey = (eventName: string) => "domwise:onevent:" + (useCapture ? "capture:" : "") + eventName;
             if (prev != null) {
                 Object.entries(prev).forEach(([eventName, eventHandler]) => {
                     if (value == null || value[eventName] !== eventHandler) {
                         node.removeEventListener(eventName, eventHandler as any, useCapture);
+                        removeDisposingListener(node, null, onRegKey(eventName));
                     }
                 });
             }
@@ -161,6 +181,7 @@ export function assignProp(node: JSXElement, key: string, value: any, prev?: any
                 Object.entries(value).forEach(([eventName, eventHandler]) => {
                     if (prev == null || prev[eventName] !== eventHandler) {
                         node.addEventListener(eventName, eventHandler as any, useCapture);
+                        addDisposingListener(node, () => node.removeEventListener(eventName, eventHandler as any, useCapture), onRegKey(eventName));
                     }
                 });
             }
@@ -173,17 +194,20 @@ export function assignProp(node: JSXElement, key: string, value: any, prev?: any
         case "xlinkShow":
         case "xlinkTitle":
         case "xlinkType":
-            node.setAttributeNS(XLinkNamespace, normalizeAttribute(key, ":"), value);
+            setNamespacedAttribute(node, XLinkNamespace, key, value);
             return;
 
         case "xmlnsXlink":
-            node.setAttribute("xmlns:xlink", value);
+            if (value == null || value === false)
+                node.removeAttribute("xmlns:xlink");
+            else
+                node.setAttribute("xmlns:xlink", value);
             return;
 
         case "xmlBase":
         case "xmlLang":
         case "xmlSpace":
-            node.setAttributeNS(XMLNamespace, normalizeAttribute(key, ":"), value);
+            setNamespacedAttribute(node, XMLNamespace, key, value);
             return;
 
         // fallthrough
@@ -213,7 +237,7 @@ export function assignProp(node: JSXElement, key: string, value: any, prev?: any
         node.removeAttribute(key);
     }
 
-    if (prev !== false && prev != null) {
+    if (prev != null) {
         if (prev === value) {
             return;
         }

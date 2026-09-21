@@ -2,7 +2,7 @@ import { usePropBinding } from "../src";
 import { addDisposingListener, dispatchDisposingEvent, invokeDisposingListeners, withLifecycleRoot } from "../src/disposing-listener";
 import { appendChildren } from "../src/jsx-append-children";
 import { assignClass } from "../src/jsx-assign-class";
-import { assignProp } from "../src/jsx-assign-props";
+import { assignProp, assignProps } from "../src/jsx-assign-props";
 import { createElement } from "../src/compat-api";
 import { derivedSignal, observeSignal } from "../src/signal-util";
 import { signal } from "../src/signals";
@@ -29,6 +29,13 @@ describe("M3: input value is a property", () => {
         input.value = "test value";
         assignProp(input, "value", null); // prev undefined -> no-op
         expect(input.value).toBe("test value");
+    });
+
+    it("reflects the initial input value as an attribute for serialization", () => {
+        const input = <input value="18" /> as HTMLInputElement;
+        expect(input.value).toBe("18");
+        expect(input.getAttribute("value")).toBe("18");
+        expect(input.outerHTML).toContain('value="18"');
     });
 });
 
@@ -225,5 +232,48 @@ describe("M14/M15: style arrays, numbers and custom properties", () => {
         expect(el.style.fontSize).toBe("16px");
         size.value = 20;
         expect(el.style.fontSize).toBe("20px");
+    });
+});
+
+describe("L15/L16/L18/L19", () => {
+    it("L15: removes on-map listeners when the element is disposed", () => {
+        const el = document.createElement("div");
+        const handler = vi.fn();
+        assignProps(el, { on: { click: handler } });
+        el.dispatchEvent(new Event("click"));
+        expect(handler).toHaveBeenCalledTimes(1);
+
+        invokeDisposingListeners(el);
+        el.dispatchEvent(new Event("click"));
+        expect(handler).toHaveBeenCalledTimes(1);
+    });
+
+    it("L16: repeated primitive switches leave a single node", () => {
+        const when = mockSignal<boolean>(true);
+        const host = <div><Show when={when} fallback="off">on</Show></div>;
+        document.body.appendChild(host);
+        for (let i = 0; i < 50; i++)
+            when.value = !when.value;
+        expect(host.childNodes.length).toBe(1);
+    });
+
+    it("L18: draggable false then null removes the attribute", () => {
+        const el = document.createElement("div");
+        const sig = mockSignal<any>("true");
+        assignProps(el, { draggable: sig });
+        sig.value = false;
+        expect(el.getAttribute("draggable")).toBe("false");
+        sig.value = null;
+        expect(el.hasAttribute("draggable")).toBe(false);
+    });
+
+    it("L19: xlinkHref null removes the namespaced attribute", () => {
+        const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        const sig = mockSignal<any>("#id");
+        assignProps(svg, { xlinkHref: sig });
+        expect(svg.getAttributeNS("http://www.w3.org/1999/xlink", "href")).toBe("#id");
+
+        sig.value = null;
+        expect(svg.getAttributeNS("http://www.w3.org/1999/xlink", "href")).toBeFalsy();
     });
 });
