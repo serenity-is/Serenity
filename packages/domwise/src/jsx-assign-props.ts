@@ -323,31 +323,26 @@ export function assignProps(node: JSXElement, props: Record<string, any>): void 
     }
 }
 
-// Standard DOM event names (lowercase), derived from the `on*` keys of
-// `EventHandlersWindow` / `EventHandlersElement` in types/jsx-elements.d.ts.
-// Kept static so event names do not depend on what the current environment
-// happens to define (jsdom vs browser vs server).
-const standardEventNames = new Set<string>(
-    (`abort afterprint animationcancel animationend animationiteration animationstart auxclick ` +
-        `beforecopy beforecut beforeinput beforematch beforepaste beforeprint beforetoggle beforeunload beforexrselect ` +
-        `blur cancel canplay canplaythrough change click close command compositionend compositionstart compositionupdate ` +
-        `contentvisibilityautostatechange contextlost contextmenu contextrestored copy cuechange cut dblclick ` +
-        `drag dragend dragenter dragexit dragleave dragover dragstart drop durationchange emptied ended error ` +
-        `focus focusin focusout formdata fullscreenchange fullscreenerror gamepadconnected gamepaddisconnected ` +
-        `gotpointercapture hashchange input invalid keydown keypress keyup languagechange load loadeddata loadedmetadata ` +
-        `loadstart lostpointercapture message messageerror mousedown mouseenter mouseleave mousemove mouseout mouseover ` +
-        `mouseup offline online pagehide pagereveal pageshow pageswap paste pause play playing pointercancel pointerdown ` +
-        `pointerenter pointerleave pointermove pointerout pointerover pointerrawupdate pointerup popstate progress ` +
-        `ratechange rejectionhandled reset resize scroll scrollend scrollsnapchange scrollsnapchanging ` +
-        `securitypolicyviolation seeked seeking select selectionchange selectstart slotchange stalled storage submit ` +
-        `suspend timeupdate toggle touchcancel touchend touchmove touchstart transitioncancel transitionend transitionrun ` +
-        `transitionstart unhandledrejection unload volumechange waiting wheel`).split(" ")
-);
+// Standard events that some engines don't expose as an `on*` property, so the
+// runtime property probe in `isStandardEvent` misses them (Chrome lacks
+// focusin/focusout, composition* and touch*; jsdom lacks those plus more).
+// Compressed as a regex to keep the bundle small; only consulted when the
+// probe fails.
+const fallbackEventNameRe =
+    /^(?:animation(?:cancel|end|iteration|start)|before(?:copy|cut|paste|xrselect)|command|composition(?:end|start|update)|contentvisibilityautostatechange|dragexit|focus(?:in|out)|fullscreen(?:change|error)|gamepad(?:dis)?connected|page(?:reveal|swap)|scrollsnapchang(?:e|ing)|select(?:ionchange|start)|touch(?:cancel|end|move|start)|transition(?:cancel|end|run|start))$/;
+
+function isStandardEvent(name: string): boolean {
+    const prop = "on" + name;
+    // HTMLElement.prototype inherits Element.prototype, so it covers both
+    return (typeof window !== "undefined" && prop in window) ||
+        (typeof HTMLElement !== "undefined" && prop in HTMLElement.prototype) ||
+        fallbackEventNameRe.test(name);
+}
 
 function getEventName(key: string, attribute: string): { eventName: string, useCapture: boolean } {
     // `attribute` is the lowercased JSX key, e.g. "onfocusin"
     const name = attribute.substring(2);
-    if (standardEventNames.has(name))
+    if (isStandardEvent(name))
         return { eventName: name, useCapture: false };
 
     // e.g. "onclickcapture" -> capture-phase "click". Standard events whose
