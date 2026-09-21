@@ -2,6 +2,7 @@ import * as corelib from "@serenity-is/corelib";
 import { DeleteRequest, DeleteResponse, RetrieveRequest, RetrieveResponse, SaveRequest, SaveResponse } from "@serenity-is/corelib";
 import { DialogUtils } from "@serenity-is/extensions";
 import { EntityDialogWrapper, mockAdmin, mockDynamicData, mockFetch, mockRowLookup, typeText } from "test-utils";
+import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { CustomerDialog } from "../../Modules/Customer/CustomerDialog";
 import { CustomerForm, CustomerRow, CustomerService } from "../../Modules/ServerTypes/Demo";
 

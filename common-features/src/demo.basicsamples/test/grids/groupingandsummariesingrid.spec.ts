@@ -1,6 +1,7 @@
 import * as corelib from "@serenity-is/corelib";
 import { ProductColumns, ProductDialog, ProductRow, ProductService } from "@serenity-is/demo.northwind";
 import { mockDynamicData, mockFetch, mockGridSize, unmockFetch } from "test-utils";
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import initPage, { GroupingAndSummariesInGrid } from "../../Modules/Grids/GroupingAndSummariesInGrid/GroupingAndSummariesInGridPage";
 
 beforeAll(() => {

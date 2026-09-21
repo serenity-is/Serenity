@@ -1,3 +1,4 @@
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { makeModalDraggable, makeModalMaximizable } from "../../Modules/Dialogs/ChartInDialog/modal-utils";
 
 function createModal() {
@@ -110,7 +111,7 @@ describe("makeModalDraggable", () => {
     it("skips dragging when the dialog is fullscreen", () => {
         const { modal, header } = createModal();
         vi.spyOn(modal, "getBoundingClientRect").mockReturnValue({
-            width: window.innerWidth, height: window.innerHeight, left: 0, top: 0, right: 0, bottom: 0, x: 0, y: 0, toJSON: () => ({ })
+            width: window.innerWidth, height: window.innerHeight, left: 0, top: 0, right: 0, bottom: 0, x: 0, y: 0, toJSON: () => ({})
         } as any);
         makeModalDraggable(createDialog(header));
 

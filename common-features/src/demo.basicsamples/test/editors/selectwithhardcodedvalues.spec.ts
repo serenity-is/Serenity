@@ -1,8 +1,9 @@
 import * as corelib from "@serenity-is/corelib";
 import { PropertyDialog } from "@serenity-is/corelib";
 import { EntityDialogWrapper, mockAdmin, mockDynamicData, mockFetch, mockGridSize, unmockFetch } from "test-utils";
-import { HardcodedValuesForm } from "../../Modules/ServerTypes/Demo";
+import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import initPage, { HardcodedValuesDialog, HardcodedValuesEditor } from "../../Modules/Editors/SelectWithHardcodedValues/SelectWithHardcodedValuesPage";
+import { HardcodedValuesForm } from "../../Modules/ServerTypes/Demo";
 
 beforeAll(() => {
     mockDynamicData();

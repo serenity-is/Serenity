@@ -1,5 +1,6 @@
 import { DeleteRequest, DeleteResponse, Dialog, RetrieveRequest, RetrieveResponse, SaveRequest, SaveResponse } from "@serenity-is/corelib";
 import { EntityDialogWrapper, mockAdmin, mockDynamicData, mockFetch, typeText, unmockFetch } from "test-utils";
+import { afterEach, beforeAll, describe, expect, it } from "vitest";
 import { LanguageDialog } from "../../../Modules/Administration/Language/LanguageDialog";
 import { LanguageForm, LanguageRow, LanguageService } from "../../../Modules/ServerTypes/Administration";
 
@@ -103,7 +104,7 @@ describe("LanguageDialog", () => {
                 expect(info.data).toStrictEqual({
                     EntityId: "en"
                 } satisfies DeleteRequest);
-                return { } satisfies DeleteResponse;
+                return {} satisfies DeleteResponse;
             }
         });
         await dlg.clickDeleteButton();

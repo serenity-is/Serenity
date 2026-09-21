@@ -1,4 +1,5 @@
 import { Dialog, DialogTexts, Fluent } from "@serenity-is/corelib";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { PromptDialog } from "../../Modules/Widgets/PromptDialog";
 
 function clickButton(dlg: PromptDialog, text: string) {

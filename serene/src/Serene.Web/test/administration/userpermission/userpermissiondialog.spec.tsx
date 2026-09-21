@@ -1,5 +1,6 @@
 import { setScriptData } from "@serenity-is/corelib";
 import { mockAdmin, mockDynamicData, mockFetch, unmockFetch } from "test-utils";
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { UserPermissionDialog } from "../../../Modules/Administration/UserPermission/UserPermissionDialog";
 import { UserPermissionService } from "../../../Modules/ServerTypes/Administration";
 import { RemoteDataKeys } from "../../../Modules/ServerTypes/RemoteDataKeys";

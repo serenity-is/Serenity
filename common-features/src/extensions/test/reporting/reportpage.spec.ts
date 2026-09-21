@@ -1,5 +1,6 @@
-import { ReportPage } from "../../Modules/Reporting/ReportPage";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { ReportDialog } from "../../Modules/Reporting/ReportDialog";
+import { ReportPage } from "../../Modules/Reporting/ReportPage";
 
 function makePage() {
     const el = document.createElement("div");

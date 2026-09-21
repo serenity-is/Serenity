@@ -1,13 +1,14 @@
+import { describe, expect, it } from "vitest";
 import * as Extensions from "../../Modules/ServerTypes/Extensions";
-import * as Reporting from "../../Modules/ServerTypes/Reporting";
-import * as Namespaces from "../../Modules/ServerTypes/Namespaces";
-import * as RemoteDataKeys from "../../Modules/ServerTypes/RemoteDataKeys";
-import * as Texts from "../../Modules/ServerTypes/Texts";
-import { UserPreferenceRow } from "../../Modules/ServerTypes/Extensions/UserPreferenceRow";
-import { UserPreferenceService } from "../../Modules/ServerTypes/Extensions/UserPreferenceService";
 import { ChangePasswordForm } from "../../Modules/ServerTypes/Extensions/ChangePasswordForm";
 import { ForgotPasswordForm } from "../../Modules/ServerTypes/Extensions/ForgotPasswordForm";
 import { ResetPasswordForm } from "../../Modules/ServerTypes/Extensions/ResetPasswordForm";
+import { UserPreferenceRow } from "../../Modules/ServerTypes/Extensions/UserPreferenceRow";
+import { UserPreferenceService } from "../../Modules/ServerTypes/Extensions/UserPreferenceService";
+import * as Namespaces from "../../Modules/ServerTypes/Namespaces";
+import * as RemoteDataKeys from "../../Modules/ServerTypes/RemoteDataKeys";
+import * as Reporting from "../../Modules/ServerTypes/Reporting";
+import * as Texts from "../../Modules/ServerTypes/Texts";
 
 describe("ServerTypes barrels", () => {
     it("loads all Extensions exports", () => {

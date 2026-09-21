@@ -1,4 +1,5 @@
 import { EntityDialog } from "@serenity-is/corelib";
+import { vi } from "vitest";
 import { waitForAjaxRequests } from "./waitutils";
 
 export class EntityDialogWrapper<TDialog extends EntityDialog<any, any>> {
@@ -12,7 +13,7 @@ export class EntityDialogWrapper<TDialog extends EntityDialog<any, any>> {
             throw "Delete button not found in the dialog!";
         if (button.hasClass("disabled"))
             throw "Delete button is disabled!";
-        const spy = ((globalThis as any).vitest || (globalThis as any).jest).spyOn(window, "confirm").mockReturnValue(true);
+        const spy = vi.spyOn(window, "confirm").mockReturnValue(true);
         button.click();
         spy.mockRestore();
         return waitForAjaxRequests();

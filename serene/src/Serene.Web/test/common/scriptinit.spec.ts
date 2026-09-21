@@ -1,3 +1,5 @@
+import { describe, expect, it, vi } from "vitest";
+
 describe("ScriptInit", () => {
     it("localizes using the full culture when available", async () => {
         vi.resetModules();

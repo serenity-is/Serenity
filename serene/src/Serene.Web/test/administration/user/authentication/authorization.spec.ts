@@ -1,5 +1,6 @@
 import { setScriptData } from "@serenity-is/corelib";
 import { mockAdmin } from "test-utils";
+import { describe, expect, it } from "vitest";
 import { hasPermission, userDefinition } from "../../../../Modules/Administration/User/Authentication/Authorization";
 
 describe("Authorization", () => {

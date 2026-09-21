@@ -4,9 +4,7 @@
     "outDir": "../out/test",
     "skipLibCheck": true,
     "typeRoots": null,
-    "types": [
-      "vitest/globals"
-    ]
+    "types": []
   },
   "include": [
     "../Modules",

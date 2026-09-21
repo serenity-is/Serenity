@@ -1,5 +1,6 @@
 import * as corelib from "@serenity-is/corelib";
 import { mockFetch, unmockFetch } from "test-utils";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import pageInit from "../../../Modules/Membership/PasswordActions/SetPasswordPage";
 
 beforeEach(() => {

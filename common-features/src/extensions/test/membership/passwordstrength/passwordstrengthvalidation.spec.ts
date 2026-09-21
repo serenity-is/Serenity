@@ -1,5 +1,6 @@
 import * as corelib from "@serenity-is/corelib";
 import { PasswordEditor } from "@serenity-is/corelib";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { addPasswordStrengthValidation, getPasswordStrengthRules } from "../../../Modules/Membership/PasswordStrength/PasswordStrengthValidation";
 
 function rules(overrides: any = {}) {

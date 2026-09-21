@@ -1,4 +1,5 @@
 import * as corelib from "@serenity-is/corelib";
+import { describe, expect, it, vi } from "vitest";
 import { UserGrid } from "../../../Modules/Administration/User/UserGrid";
 import initPage from "../../../Modules/Administration/User/UserPage";
 

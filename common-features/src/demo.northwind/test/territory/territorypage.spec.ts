@@ -1,5 +1,6 @@
 import * as corelib from "@serenity-is/corelib";
 import { mockDynamicData, mockFetch, mockGridSize, unmockFetch } from "test-utils";
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { TerritoryGrid } from "../../Modules/Territory/TerritoryGrid";
 import initPage from "../../Modules/Territory/TerritoryPage";
 

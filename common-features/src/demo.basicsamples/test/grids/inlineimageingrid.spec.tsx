@@ -2,6 +2,7 @@ import * as corelib from "@serenity-is/corelib";
 import { ProductDialog, ProductRow, ProductService } from "@serenity-is/demo.northwind";
 import { formatterContext } from "@serenity-is/sleekgrid";
 import { mockDynamicData, mockFetch, mockGridSize, unmockFetch } from "test-utils";
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import initPage, { InlineImageFormatter, InlineImageInGrid } from "../../Modules/Grids/InlineImageInGrid/InlineImageInGridPage";
 import { InlineImageInGridColumns } from "../../Modules/ServerTypes/Demo";
 

@@ -1,4 +1,4 @@
-import { Lookup, ScriptData, scriptDataHooks, setScriptData, type LookupOptions } from "@serenity-is/corelib";
+import { Lookup, scriptDataHooks, setScriptData, type LookupOptions } from "@serenity-is/corelib";
 import { inject, Mock, vi } from "vitest";
 
 let orgFetchScriptData: any;

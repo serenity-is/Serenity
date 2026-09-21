@@ -1,6 +1,6 @@
 import * as corelib from "@serenity-is/corelib";
-import { PropertyPanel } from "@serenity-is/corelib";
 import { mockFetch, unmockFetch } from "test-utils";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import pageInit, { ForgotPasswordPanel } from "../../../Modules/Membership/PasswordActions/ForgotPasswordPage";
 
 beforeEach(() => {

@@ -1,4 +1,5 @@
 import * as corelib from "@serenity-is/corelib";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { BulkServiceAction } from "../../Modules/BulkActions/BulkServiceAction";
 import { BasicProgressDialogTexts, BulkServiceActionTexts } from "../../Modules/ServerTypes/Texts";
 

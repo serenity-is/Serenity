@@ -1,7 +1,8 @@
 import { DeleteRequest, DeleteResponse, RetrieveRequest, RetrieveResponse, SaveRequest, SaveResponse } from "@serenity-is/corelib";
 import { EntityDialogWrapper, mockAdmin, mockDynamicData, mockFetch, typeText, unmockFetch } from "test-utils";
-import { ShipperDialog } from "../../Modules/Shipper/ShipperDialog";
+import { afterEach, beforeAll, describe, expect, it } from "vitest";
 import { ShipperForm, ShipperRow, ShipperService } from "../../Modules/ServerTypes/Demo";
+import { ShipperDialog } from "../../Modules/Shipper/ShipperDialog";
 
 beforeAll(() => {
     mockDynamicData();

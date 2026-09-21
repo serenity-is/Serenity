@@ -1,6 +1,7 @@
-import { DialogUtils } from "../../Modules/Widgets/DialogUtils";
 import * as corelib from "@serenity-is/corelib";
 import { Fluent } from "@serenity-is/corelib";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { DialogUtils } from "../../Modules/Widgets/DialogUtils";
 
 describe("DialogUtils.pendingChangesConfirmation", () => {
     let el: HTMLElement;

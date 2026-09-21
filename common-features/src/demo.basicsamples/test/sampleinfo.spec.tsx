@@ -1,3 +1,4 @@
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { SampleInfo, SampleSourceLink, getSamplePagePath } from "../Modules/sample-info";
 
 function resetDom() {

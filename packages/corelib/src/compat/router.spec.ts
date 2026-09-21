@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, type MockInstance, vi, vitest } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, type MockInstance, vi } from "vitest";
 import { Fluent } from "../base";
 import { ClassicRouter, type IClassicRouter } from "./router";
 
@@ -50,11 +50,11 @@ describe("ClassicRouter.navigate", () => {
 
     beforeEach(() => {
         oldLocation = window.location.href;
-        vitest.spyOn(window.history, 'back').mockImplementation(() => {});
+        vi.spyOn(window.history, 'back').mockImplementation(() => {});
     });
 
     afterEach(() => {
-        vitest.restoreAllMocks();
+        vi.restoreAllMocks();
         changeJSDOMURL(oldLocation);
     });
 

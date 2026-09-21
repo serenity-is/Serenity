@@ -1,8 +1,8 @@
-import * as corelib from "@serenity-is/corelib";
 import { DecimalEditor } from "@serenity-is/corelib";
 import { OrderDetailRow, ProductRow } from "@serenity-is/demo.northwind";
 import { GridEditorDialog } from "@serenity-is/extensions";
 import { EntityDialogWrapper, mockAdmin, mockDynamicData, mockFetch, mockGridSize, mockRowLookup, unmockFetch } from "test-utils";
+import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import initPage, { ChangingLookupTextDialog, ChangingLookupTextEditor } from "../../Modules/Editors/ChangingLookupText/ChangingLookupTextPage";
 import { ChangingLookupTextForm } from "../../Modules/ServerTypes/Demo";
 

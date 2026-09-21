@@ -1,4 +1,5 @@
 import { Dialog, StringEditor } from "@serenity-is/corelib";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { PromptDialog } from "../../Modules/Widgets/PromptDialog";
 
 afterEach(() => {

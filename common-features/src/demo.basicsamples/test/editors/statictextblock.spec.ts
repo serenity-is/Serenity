@@ -1,8 +1,8 @@
-import * as corelib from "@serenity-is/corelib";
 import { PropertyDialog } from "@serenity-is/corelib";
 import { EntityDialogWrapper, mockAdmin, mockDynamicData, mockFetch, mockGridSize, unmockFetch } from "test-utils";
-import { StaticTextBlockForm } from "../../Modules/ServerTypes/Demo";
+import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import initPage, { StaticTextBlockDialog } from "../../Modules/Editors/StaticTextBlock/StaticTextBlockPage";
+import { StaticTextBlockForm } from "../../Modules/ServerTypes/Demo";
 
 beforeAll(() => {
     mockDynamicData();

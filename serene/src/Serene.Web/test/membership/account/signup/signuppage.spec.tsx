@@ -1,5 +1,6 @@
 import * as corelib from "@serenity-is/corelib";
 import { mockDynamicData, typeText } from "test-utils";
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import pageInit from "../../../../Modules/Membership/Account/SignUp/SignUpPage";
 import { SignUpForm } from "../../../../Modules/ServerTypes/Membership";
 

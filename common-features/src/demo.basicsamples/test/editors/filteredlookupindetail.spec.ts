@@ -1,13 +1,14 @@
 import * as corelib from "@serenity-is/corelib";
-import { OrderDetailDialog, OrderDetailForm, OrderGrid, OrderRow, OrderService, ProductRow } from "@serenity-is/demo.northwind";
+import { OrderDetailDialog, OrderGrid, OrderRow, OrderService, ProductRow } from "@serenity-is/demo.northwind";
 import { EntityDialogWrapper, mockAdmin, mockDynamicData, mockFetch, mockGridSize, unmockFetch } from "test-utils";
-import { FilteredLookupInDetailForm } from "../../Modules/ServerTypes/Demo";
+import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import initPage, {
     FilteredLookupDetailEditor,
     FilteredLookupInDetailDialog,
     FilteredLookupInDetailGrid,
     FilteredLookupOrderDetailDialog
 } from "../../Modules/Editors/FilteredLookupInDetail/FilteredLookupInDetailPage";
+import { FilteredLookupInDetailForm } from "../../Modules/ServerTypes/Demo";
 
 beforeAll(() => {
     mockDynamicData();

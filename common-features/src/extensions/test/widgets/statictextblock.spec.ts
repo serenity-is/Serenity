@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { StaticTextBlock } from "../../Modules/Widgets/StaticTextBlock";
 
 describe("StaticTextBlock", () => {

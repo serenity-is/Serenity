@@ -1,4 +1,5 @@
 import * as corelib from "@serenity-is/corelib";
+import { describe, expect, it, vi } from "vitest";
 import { TranslationGrid } from "../../../Modules/Administration/Translation/TranslationGrid";
 import initPage from "../../../Modules/Administration/Translation/TranslationPage";
 

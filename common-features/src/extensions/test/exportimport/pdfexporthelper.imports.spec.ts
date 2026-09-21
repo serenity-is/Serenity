@@ -1,4 +1,5 @@
 import * as corelib from "@serenity-is/corelib";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { PdfExportHelper } from "../../Modules/ExportImport/PdfExportHelper";
 
 const state = vi.hoisted(() => ({

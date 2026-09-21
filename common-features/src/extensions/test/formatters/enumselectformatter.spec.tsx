@@ -1,5 +1,5 @@
 import { registerEnum } from "@serenity-is/corelib";
-import { EnumTypeRegistry } from "@serenity-is/corelib";
+import { beforeEach, describe, expect, it } from "vitest";
 import { EnumSelectFormatter } from "../../Modules/Formatters/EnumSelectFormatter";
 
 enum TestEnum {

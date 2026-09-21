@@ -1,5 +1,6 @@
 import * as corelib from "@serenity-is/corelib";
 import { mockDynamicData, mockFetch, unmockDynamicData, unmockFetch } from "test-utils";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import pageInit, { ResetPasswordPanel } from "../../../Modules/Membership/PasswordActions/ResetPasswordPage";
 
 beforeEach(() => {

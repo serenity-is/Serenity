@@ -1,6 +1,7 @@
+import { Dialog, DialogTexts } from "@serenity-is/corelib";
+import { describe, expect, it, vi } from "vitest";
 import { BasicProgressDialog } from "../../Modules/BulkActions/BasicProgressDialog";
 import { BasicProgressDialogTexts } from "../../Modules/ServerTypes/Texts";
-import { Dialog, DialogTexts } from "@serenity-is/corelib";
 
 describe("BasicProgressDialog", () => {
     it("sets the default title from texts", () => {

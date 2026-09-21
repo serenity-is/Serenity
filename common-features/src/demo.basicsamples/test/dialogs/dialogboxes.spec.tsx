@@ -1,5 +1,6 @@
 import * as corelib from "@serenity-is/corelib";
 import { mockDynamicData } from "test-utils";
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import initPage from "../../Modules/Dialogs/DialogBoxes/DialogBoxesPage";
 
 beforeAll(() => {

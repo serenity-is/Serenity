@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { SingleLineTextFormatter } from "../../Modules/Formatters/SingleLineTextFormatter";
 
 describe("SingleLineTextFormatter", () => {

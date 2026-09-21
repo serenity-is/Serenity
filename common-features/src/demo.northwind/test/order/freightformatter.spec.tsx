@@ -1,4 +1,5 @@
 import { formatterContext } from "@serenity-is/sleekgrid";
+import { describe, expect, it } from "vitest";
 import { FreightFormatter } from "../../Modules/Order/FreightFormatter";
 
 function render(result: any): string {

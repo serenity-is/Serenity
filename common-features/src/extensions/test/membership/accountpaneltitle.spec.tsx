@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { AccountPanelTitle } from "../../Modules/Membership/AccountPanelTitle";
 
 describe("AccountPanelTitle", () => {
