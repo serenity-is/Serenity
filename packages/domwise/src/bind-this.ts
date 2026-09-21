@@ -1,17 +1,6 @@
 
 const hasOwnProperty = Object.hasOwnProperty;
 
-function findPropertyDescriptor(target: any, property: string | symbol): PropertyDescriptor | undefined {
-    let current = Object.getPrototypeOf(target);
-    while (current) {
-        const descriptor = Object.getOwnPropertyDescriptor(current, property);
-        if (descriptor)
-            return descriptor;
-        current = Object.getPrototypeOf(current);
-    }
-    return undefined;
-}
-
 const bindThisHandler: ProxyHandler<any> = {
     get: (target: Record<string, any>, property: string | symbol) => {
         if (hasOwnProperty.call(target, property)) {
@@ -21,14 +10,6 @@ const bindThisHandler: ProxyHandler<any> = {
         const m = target[property as keyof typeof target];
         if (typeof m === 'function') {
             const bound = m.bind(target);
-            const descriptor = findPropertyDescriptor(target, property);
-            if (descriptor && (descriptor.get || descriptor.set)) {
-                // inherited accessor (e.g. a DOM event-handler IDL attribute):
-                // write through it instead of shadowing it with an own data
-                // property, which would leave the accessor's own behavior dead
-                (target as any)[property] = bound;
-                return bound;
-            }
             // cache the bound function as a non-enumerable own property so it
             // stays invisible to Object.keys/for...in, mirroring how class
             // prototype methods are non-enumerable
