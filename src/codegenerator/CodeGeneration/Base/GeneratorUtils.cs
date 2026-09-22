@@ -113,7 +113,7 @@ public static class GeneratorUtils
             else
                 continue;
 
-            var csprojFiles = fileSystem.GetFiles(path, "*.csproj", recursive: false);
+            var csprojFiles = fileSystem.DirectoryExists(path) ? fileSystem.GetFiles(path, "*.csproj", recursive: false) : [];
             if (csprojFiles.Length == 1)
                 result[fileSystem.GetFileNameWithoutExtension(csprojFiles[0])] = pair.Key;
         }
