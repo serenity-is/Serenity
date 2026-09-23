@@ -25,7 +25,7 @@ public abstract class LoggingRow<TFields> : Row<TFields>, ILoggingRow
     /// Gets or sets the ID of the user who inserted the row.
     /// </summary>
     [NotNull, Insertable(false), Updatable(false)]
-    public int? InsertUserId { get => fields.InsertUserId[this]; set => fields.InsertUserId[this] = value; }
+    public object? InsertUserId { get => fields.InsertUserId.AsObject(this); set => fields.InsertUserId.AsObject(this, value); }
 
     /// <summary>
     /// Gets or sets the date and time the row was inserted.
@@ -37,7 +37,7 @@ public abstract class LoggingRow<TFields> : Row<TFields>, ILoggingRow
     /// Gets or sets the ID of the user who last updated the row.
     /// </summary>
     [Insertable(false), Updatable(false)]
-    public int? UpdateUserId { get => fields.UpdateUserId[this]; set => fields.UpdateUserId[this] = value; }
+    public object? UpdateUserId { get => fields.UpdateUserId.AsObject(this); set => fields.UpdateUserId.AsObject(this, value); }
 
     /// <summary>
     /// Gets or sets the date and time the row was last updated.
@@ -54,12 +54,28 @@ public abstract class LoggingRow<TFields> : Row<TFields>, ILoggingRow
 /// <summary>
 /// Fields for a <see cref="LoggingRow{TFields}"/>.
 /// </summary>
-public class LoggingRowFields(string? tableName = null, string fieldPrefix = "") : RowFieldsBase(tableName, fieldPrefix)
+/// <remarks>
+/// Initializes a new instance of the <see cref="LoggingRowFields"/> class.
+/// </remarks>
+/// <param name="tableName">Tablename</param>
+/// <param name="fieldPrefix">Field prefix</param>
+/// <param name="userRowOptions">User row settings</param>
+public class LoggingRowFields(IOptions<UserRowSettings>? userRowOptions = null, string? tableName = null, string fieldPrefix = "")
+    : RowFieldsBase(tableName, fieldPrefix)
 {
+    /// <inheritdoc/>
+    protected override Type GetFieldTypeToCreate(System.Reflection.FieldInfo fieldInfo, Reflection.IPropertyInfo? property)
+    {
+        if (fieldInfo.Name == nameof(InsertUserId) || fieldInfo.Name == nameof(UpdateUserId))
+            return userRowOptions?.Value?.IdFieldType ?? typeof(Int32Field);
+
+        return base.GetFieldTypeToCreate(fieldInfo, property);
+    }
+
     /// <summary>
     /// The ID of the user who inserted the row.
     /// </summary>
-    public Int32Field InsertUserId = null!;
+    public Field InsertUserId = null!;
     /// <summary>
     /// The date and time the row was inserted.
     /// </summary>
@@ -67,7 +83,7 @@ public class LoggingRowFields(string? tableName = null, string fieldPrefix = "")
     /// <summary>
     /// The ID of the user who last updated the row.
     /// </summary>
-    public Int32Field UpdateUserId = null!;
+    public Field UpdateUserId = null!;
     /// <summary>
     /// The date and time the row was last updated.
     /// </summary>

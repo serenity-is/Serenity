@@ -69,6 +69,7 @@ public class DataMigrations(ITypeSource typeSource,
                     .Select(x => x + "DB").ToArray() ?? [databaseKey + "DB"];
                 options.IncludeUntaggedMigrations = databaseKey == "Default";
             })
+            .Configure<UserRowSettings>(options => options.RowType = typeof(Administration.UserRow))
             .ConfigureRunner(builder =>
             {
                 if (serverType == OracleDialect.Instance.ServerType)

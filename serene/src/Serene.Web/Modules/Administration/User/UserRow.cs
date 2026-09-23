@@ -1,4 +1,6 @@
-﻿namespace Serene.Administration;
+using Serenity.Extensions.Entities;
+
+namespace Serene.Administration;
 
 [ConnectionKey("Default"), Module("Administration"), TableName("Users")]
 [DisplayName("Users"), InstanceName("User")]
@@ -54,7 +56,7 @@ public sealed class UserRow : Serenity.Extensions.Entities.LoggingRow<UserRow.Ro
     StringField IPasswordRow.PasswordHashField => fields.PasswordHash;
     StringField IPasswordRow.PasswordSaltField => fields.PasswordSalt;
 
-    public class RowFields : Serenity.Extensions.Entities.LoggingRowFields
+    public class RowFields(IOptions<UserRowSettings>? userRowOptions = null) : LoggingRowFields(userRowOptions)
     {
         public Int32Field UserId = null!;
         public StringField Username = null!;

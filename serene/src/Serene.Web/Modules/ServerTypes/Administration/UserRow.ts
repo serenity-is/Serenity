@@ -14,9 +14,9 @@ export interface UserRow {
     Password?: string;
     PasswordConfirm?: string;
     Roles?: number[];
-    InsertUserId?: number;
+    InsertUserId?: any;
     InsertDate?: string;
-    UpdateUserId?: number;
+    UpdateUserId?: any;
     UpdateDate?: string;
 }
 

@@ -51,6 +51,8 @@ public partial class Startup
         }
 
         services.AddAntiforgery(options => options.HeaderName = "X-CSRF-TOKEN");
+        services.Configure<JsonOptions>(options => JSON.Defaults.Populate(options.JsonSerializerOptions));
+        services.Configure<UserRowSettings>(options => options.RowType = typeof(Administration.UserRow));
 
         services.AddControllersWithViews(options =>
         {
@@ -58,8 +60,6 @@ public partial class Startup
             options.Filters.Add<AntiforgeryCookieResultFilterAttribute>();
         });
         services.AddServiceEndpointConventions();
-
-        services.Configure<JsonOptions>(options => JSON.Defaults.Populate(options.JsonSerializerOptions));
 
         services.AddAuthentication(o =>
         {

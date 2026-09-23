@@ -234,6 +234,18 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
     }
 
     /// <summary>
+    /// Gets the type of the field to create when a Field member is null. This can be overridden to provide custom field types for specific properties,
+    /// especially when the field's type is Field, which is abstract and cannot be instantiated directly. By default, it returns the field's declared type.
+    /// </summary>
+    /// <param name="fieldInfo">The field information.</param>
+    /// <param name="property">The property information.</param>
+    /// <returns>The type of the field to create. Return a subclass of Field, or this field will be skipped.</returns>
+    protected virtual Type GetFieldTypeToCreate(FieldInfo fieldInfo, IPropertyInfo? property)
+    {
+        return fieldInfo.FieldType;
+    }
+
+    /// <summary>
     /// Initializes the specified annotations.
     /// </summary>
     /// <param name="annotations">The annotations.</param>
@@ -268,73 +280,304 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
 
             foreach (var fieldInfo in GetType().GetFields(BindingFlags.Instance | BindingFlags.Public))
             {
-                if (fieldInfo.FieldType.IsSubclassOf(typeof(Field)))
+                if (fieldInfo.FieldType != typeof(Field) &&
+                    !fieldInfo.FieldType.IsSubclassOf(typeof(Field)))
+                    continue;
+
+                var field = (Field?)fieldInfo.GetValue(this);
+
+                if (!rowProperties.TryGetValue(fieldInfo.Name, out IPropertyInfo? property))
+                    property = null;
+
+                var fieldType = fieldInfo.FieldType;
+                if (field is null)
                 {
-                    var field = (Field?)fieldInfo.GetValue(this);
+                    fieldType = GetFieldTypeToCreate(fieldInfo, property);
+                    if (fieldType is null ||
+                        !fieldType.IsSubclassOf(typeof(Field)) ||
+                         fieldType.IsAbstract)
+                        continue;
+                }
 
-                    if (!rowProperties.TryGetValue(fieldInfo.Name, out IPropertyInfo? property))
-                        property = null;
+                ColumnAttribute? column = null;
+                DisplayNameAttribute? display = null;
+                SizeAttribute? size = null;
+                BaseExpressionAttribute? expression = null;
+                ScaleAttribute? scale = null;
+                MinSelectLevelAttribute? selectLevel = null;
+                ForeignKeyAttribute? foreignKey = null;
+                LeftJoinAttribute? leftJoin = null;
+                InnerJoinAttribute? innerJoin = null;
+                DefaultValueAttribute? defaultValue = null;
+                TextualFieldAttribute? textualField = null;
+                DateTimeKindAttribute? dateTimeKind = null;
 
-                    ColumnAttribute? column = null;
-                    DisplayNameAttribute? display = null;
-                    SizeAttribute? size = null;
-                    BaseExpressionAttribute? expression = null;
-                    ScaleAttribute? scale = null;
-                    MinSelectLevelAttribute? selectLevel = null;
-                    ForeignKeyAttribute? foreignKey = null;
-                    LeftJoinAttribute? leftJoin = null;
-                    InnerJoinAttribute? innerJoin = null;
-                    DefaultValueAttribute? defaultValue = null;
-                    TextualFieldAttribute? textualField = null;
-                    DateTimeKindAttribute? dateTimeKind = null;
+                PermissionAttributeBase? readPermission;
+                PermissionAttributeBase? insertPermission;
+                PermissionAttributeBase? updatePermission;
 
-                    PermissionAttributeBase? readPermission;
-                    PermissionAttributeBase? insertPermission;
-                    PermissionAttributeBase? updatePermission;
+                FieldFlags addFlags = 0;
+                FieldFlags removeFlags = 0;
 
-                    FieldFlags addFlags = 0;
-                    FieldFlags removeFlags = 0;
+                OriginPropertyDictionary? propertyDictionary = null;
 
-                    OriginPropertyDictionary? propertyDictionary = null;
+                if (property != null)
+                {
+                    var origin = property.GetAttribute<OriginAttribute>();
 
-                    if (property != null)
+                    column = property.GetAttribute<ColumnAttribute>();
+                    display = property.GetAttribute<DisplayNameAttribute>();
+                    size = property.GetAttribute<SizeAttribute>();
+
+                    var expressions = property.GetAttributes<BaseExpressionAttribute>();
+                    if (expressions.Any())
                     {
-                        var origin = property.GetAttribute<OriginAttribute>();
-
-                        column = property.GetAttribute<ColumnAttribute>();
-                        display = property.GetAttribute<DisplayNameAttribute>();
-                        size = property.GetAttribute<SizeAttribute>();
-
-                        var expressions = property.GetAttributes<BaseExpressionAttribute>();
-                        if (expressions.Any())
-                        {
-                            try
-                            {
-                                expression = expressionSelector.GetBestMatch(expressions, x => x is ExpressionAttribute exp ? exp.Dialect : null);
-                            }
-                            catch (AmbiguousMatchException ex)
-                            {
-                                throw new AmbiguousMatchException(string.Format(
-                                    "Error while determining expression for row type {0}, property '{1}'",
-                                    rowType!.FullName, property.Name), ex);
-                            }
-                        }
-
-                        scale = property.GetAttribute<ScaleAttribute>();
-                        selectLevel = property.GetAttribute<MinSelectLevelAttribute>();
-                        foreignKey = property.GetAttribute<ForeignKeyAttribute>();
-
                         try
                         {
-                            leftJoin = expressionSelector.GetBestMatch(
-                                property.GetAttributes<LeftJoinAttribute>()
-                                    .Where(x => x.ToTable == null && x.OnCriteria == null),
-                                x => x.Dialect);
+                            expression = expressionSelector.GetBestMatch(expressions, x => x is ExpressionAttribute exp ? exp.Dialect : null);
+                        }
+                        catch (AmbiguousMatchException ex)
+                        {
+                            throw new AmbiguousMatchException(string.Format(
+                                "Error while determining expression for row type {0}, property '{1}'",
+                                rowType!.FullName, property.Name), ex);
+                        }
+                    }
 
-                            innerJoin = expressionSelector.GetBestMatch(
-                                property.GetAttributes<InnerJoinAttribute>()
-                                    .Where(x => x.ToTable == null && x.OnCriteria == null),
-                                x => x.Dialect);
+                    scale = property.GetAttribute<ScaleAttribute>();
+                    selectLevel = property.GetAttribute<MinSelectLevelAttribute>();
+                    foreignKey = property.GetAttribute<ForeignKeyAttribute>();
+
+                    try
+                    {
+                        leftJoin = expressionSelector.GetBestMatch(
+                            property.GetAttributes<LeftJoinAttribute>()
+                                .Where(x => x.ToTable == null && x.OnCriteria == null),
+                            x => x.Dialect);
+
+                        innerJoin = expressionSelector.GetBestMatch(
+                            property.GetAttributes<InnerJoinAttribute>()
+                                .Where(x => x.ToTable == null && x.OnCriteria == null),
+                            x => x.Dialect);
+                    }
+                    catch (AmbiguousMatchException ex)
+                    {
+                        throw new AmbiguousMatchException(string.Format(
+                            "Error while determining join attributes for row type {0}, property '{1}'",
+                                rowType!.FullName, property.Name), ex);
+                    }
+
+                    defaultValue = property.GetAttribute<DefaultValueAttribute>();
+                    textualField = property.GetAttribute<TextualFieldAttribute>();
+                    dateTimeKind = property.GetAttribute<DateTimeKindAttribute>();
+                    readPermission = property.GetAttribute<ReadPermissionAttribute>() ?? (PermissionAttributeBase?)fieldsReadPerm;
+                    insertPermission = property.GetAttribute<InsertPermissionAttribute>() ?? fieldsInsertPerm ??
+                        property.GetAttribute<ModifyPermissionAttribute>() ?? fieldsModifyPerm ?? readPermission ?? fieldsReadPerm;
+                    updatePermission = property.GetAttribute<UpdatePermissionAttribute>() ?? fieldsUpdatePerm ??
+                        property.GetAttribute<ModifyPermissionAttribute>() ?? fieldsModifyPerm ?? readPermission ?? fieldsReadPerm;
+
+                    if (origin != null)
+                    {
+                        propertyDictionary ??= OriginPropertyDictionary.GetPropertyDictionary(rowType!);
+                        try
+                        {
+                            if (!expressions.Any() && expression == null)
+                                expression = new ExpressionAttribute(propertyDictionary.OriginExpression(
+                                    property.Name, origin, expressionSelector, "", rowCustomAttributes));
+
+                            display ??= new DisplayNameAttribute(propertyDictionary.OriginDisplayName(
+                                    property.Name, origin, expressionSelector));
+
+                            size ??= propertyDictionary.OriginAttribute<SizeAttribute>(
+                                    property.Name, expressionSelector);
+
+                            scale ??= propertyDictionary.OriginAttribute<ScaleAttribute>(
+                                    property.Name, expressionSelector);
+                        }
+                        catch (DivideByZeroException)
+                        {
+                            throw new InvalidProgramException(string.Format(
+                                "Infinite recursion detected while determining origins " +
+                                "for property '{0}' on row type '{1}'",
+                                property.Name, rowType!.FullName));
+                        }
+                    }
+
+                    var insertable = property.GetAttribute<InsertableAttribute>();
+                    var updatable = property.GetAttribute<UpdatableAttribute>();
+
+                    if (insertable != null && !insertable.Value)
+                        removeFlags |= FieldFlags.Insertable;
+
+                    if (updatable != null && !updatable.Value)
+                        removeFlags |= FieldFlags.Updatable;
+
+                    foreach (var attr in property.GetAttributes<SetFieldFlagsAttribute>())
+                    {
+                        addFlags |= attr.Add;
+                        removeFlags |= attr.Remove;
+                    }
+                }
+                else
+                {
+                    readPermission = fieldsReadPerm;
+                    insertPermission = fieldsInsertPerm ?? fieldsModifyPerm ?? fieldsReadPerm;
+                    updatePermission = fieldsUpdatePerm ?? fieldsUpdatePerm ?? fieldsReadPerm;
+                }
+
+                if (fieldType.GetCustomAttribute<NotMappedAttribute>() != null)
+                    addFlags |= FieldFlags.NotMapped;
+
+                if (field is null)
+                {
+                    if (property == null)
+                    {
+                        throw new InvalidProgramException(string.Format(
+                            "Field {0} in type {1} is null and has no corresponding property in entity!",
+                                fieldInfo.Name, rowType!.Name));
+                    }
+
+                    object?[] prm =
+                    [
+                        this, // owner
+                        column == null ? property.Name : (column.Name.TrimToNull() ?? property.Name),
+                        display != null ? new LocalText(display.DisplayName) : null,
+                        size != null ? size.Value : 0,
+                        (FieldFlags.Default ^ removeFlags) | addFlags,
+                        null,
+                        null,
+                    ];
+                    if (rowFields.TryGetValue("_" + property.Name, out FieldInfo? storage) ||
+                        rowFields.TryGetValue("m_" + property.Name, out storage) ||
+                        rowFields.TryGetValue(property.Name, out storage))
+                    {
+                        prm[5] = CreateFieldGetMethod(storage);
+                        prm[6] = CreateFieldSetMethod(storage);
+                    }
+
+                    field = (Field)Activator.CreateInstance(fieldType, prm)!;
+                    fieldInfo.SetValue(this, field);
+                }
+                else
+                {
+                    if (size != null && size.Value != field.Size)
+                        field.Size = size.Value;
+
+                    if (display != null)
+                        field.Caption = new LocalText(display.DisplayName);
+
+                    if (addFlags != 0 || removeFlags != 0)
+                        field.Flags = (field.Flags ^ removeFlags) | addFlags;
+
+                    if (column != null && string.Compare(column.Name, field.Name, StringComparison.OrdinalIgnoreCase) != 0)
+                        throw new InvalidProgramException(string.Format(
+                            "Field name '{0}' in type {1} can't be overridden by Column name attribute!",
+                                fieldInfo.Name, rowType!.FullName));
+                }
+
+                if (scale != null)
+                {
+                    field.Scale = scale.Value;
+                }
+
+                if (defaultValue != null)
+                {
+                    field.DefaultValue = defaultValue.Value;
+                }
+
+                if (selectLevel != null)
+                {
+                    field.MinSelectLevel = selectLevel.Value;
+                }
+
+                if (expression != null)
+                {
+                    field.Expression = expression.ToString(dialect);
+                }
+
+                if (foreignKey != null)
+                {
+                    field.ForeignTable = foreignKey.Table ??
+                        expressionSelector.GetBestMatch(foreignKey.RowType!
+                            .GetCustomAttributes<TableNameAttribute>(), x => x.Dialect)!.Name;
+                    field.ForeignField = foreignKey.Field;
+                }
+
+                if ((leftJoin != null || innerJoin != null) && string.IsNullOrEmpty(field.ForeignTable))
+                    throw new InvalidProgramException(string.Format("Property {0} of row type {1} has a [LeftJoin] or [InnerJoin] attribute " +
+                        "but its foreign table is undefined. Make sure it has a valid [ForeignKey] attribute!",
+                            fieldInfo.Name, rowType!.FullName));
+
+                if ((leftJoin != null || innerJoin != null) && string.IsNullOrEmpty(field.ForeignField))
+                    throw new InvalidProgramException(string.Format("Property {0} of row type {1} has a [LeftJoin] or [InnerJoin] attribute " +
+                        "but its foreign field is undefined. Make sure it has a valid [ForeignKey] attribute!",
+                            fieldInfo.Name, rowType!.FullName));
+
+                if (leftJoin != null)
+                {
+                    field.ForeignJoinAlias = new LeftJoin(joins, field.ForeignTable!, leftJoin.Alias,
+                        new Criteria(leftJoin.Alias, field.ForeignField!) == new Criteria(field));
+                }
+
+                if (innerJoin != null)
+                {
+                    field.ForeignJoinAlias = new InnerJoin(joins, field.ForeignTable!, innerJoin.Alias,
+                        new Criteria(innerJoin.Alias, field.ForeignField!) == new Criteria(field));
+                }
+
+                if (textualField != null)
+                {
+                    field.textualField = textualField.Value;
+                }
+
+                if (dateTimeKind != null && field is DateTimeField dtf)
+                {
+                    dtf.DateTimeKind = dateTimeKind.Value;
+                }
+
+                if (readPermission != null)
+                {
+                    field.readPermission = readPermission.Permission ?? "?";
+                }
+
+                if (insertPermission != null)
+                {
+                    field.insertPermission = insertPermission.Permission ?? "?";
+                }
+
+                if (updatePermission != null)
+                {
+                    field.updatePermission = updatePermission.Permission ?? "?";
+                }
+
+                if (property != null)
+                {
+                    if (property.PropertyType != null &&
+                        field is IEnumTypeField enumTypeField)
+                    {
+                        if (property.PropertyType.IsEnum)
+                        {
+                            enumTypeField.EnumType = property.PropertyType;
+                        }
+                        else
+                        {
+                            var nullableType = Nullable.GetUnderlyingType(property.PropertyType);
+                            if (nullableType != null && nullableType.IsEnum)
+                                enumTypeField.EnumType = nullableType;
+                        }
+                    }
+
+                    var propJoinAttributes = ((IEnumerable<ISqlJoin>)property.GetAttributes<LeftJoinAttribute>())
+                        .Concat(property.GetAttributes<InnerJoinAttribute>())
+                        .Where(x => x.ToTable != null && x.OnCriteria != null)
+                        .GroupBy(x => x.Alias, StringComparer.OrdinalIgnoreCase);
+
+                    foreach (var propJoinGroup in propJoinAttributes)
+                    {
+                        ISqlJoin? bestMatch;
+                        try
+                        {
+                            bestMatch = expressionSelector.GetBestMatch(propJoinGroup, x => x.Dialect);
                         }
                         catch (AmbiguousMatchException ex)
                         {
@@ -343,260 +586,40 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
                                     rowType!.FullName, property.Name), ex);
                         }
 
-                        defaultValue = property.GetAttribute<DefaultValueAttribute>();
-                        textualField = property.GetAttribute<TextualFieldAttribute>();
-                        dateTimeKind = property.GetAttribute<DateTimeKindAttribute>();
-                        readPermission = property.GetAttribute<ReadPermissionAttribute>() ?? (PermissionAttributeBase?)fieldsReadPerm;
-                        insertPermission = property.GetAttribute<InsertPermissionAttribute>() ?? fieldsInsertPerm ??
-                            property.GetAttribute<ModifyPermissionAttribute>() ?? fieldsModifyPerm ?? readPermission ?? fieldsReadPerm;
-                        updatePermission = property.GetAttribute<UpdatePermissionAttribute>() ?? fieldsUpdatePerm ??
-                            property.GetAttribute<ModifyPermissionAttribute>() ?? fieldsModifyPerm ?? readPermission ?? fieldsReadPerm;
-
-                        if (origin != null)
+                        if (bestMatch is LeftJoinAttribute lja)
                         {
-                            propertyDictionary ??= OriginPropertyDictionary.GetPropertyDictionary(rowType!);
-                            try
-                            {
-                                if (!expressions.Any() && expression == null)
-                                    expression = new ExpressionAttribute(propertyDictionary.OriginExpression(
-                                        property.Name, origin, expressionSelector, "", rowCustomAttributes));
-
-                                display ??= new DisplayNameAttribute(propertyDictionary.OriginDisplayName(
-                                        property.Name, origin, expressionSelector));
-
-                                size ??= propertyDictionary.OriginAttribute<SizeAttribute>(
-                                        property.Name, expressionSelector);
-
-                                scale ??= propertyDictionary.OriginAttribute<ScaleAttribute>(
-                                        property.Name, expressionSelector);
-                            }
-                            catch (DivideByZeroException)
-                            {
-                                throw new InvalidProgramException(string.Format(
-                                    "Infinite recursion detected while determining origins " +
-                                    "for property '{0}' on row type '{1}'",
-                                    property.Name, rowType!.FullName));
-                            }
+                            _ = new LeftJoin(joins, lja.ToTable!, lja.Alias,
+                                new Criteria(lja.Alias, lja.OnCriteria!) == new Criteria(field));
                         }
-
-                        var insertable = property.GetAttribute<InsertableAttribute>();
-                        var updatable = property.GetAttribute<UpdatableAttribute>();
-
-                        if (insertable != null && !insertable.Value)
-                            removeFlags |= FieldFlags.Insertable;
-
-                        if (updatable != null && !updatable.Value)
-                            removeFlags |= FieldFlags.Updatable;
-
-                        foreach (var attr in property.GetAttributes<SetFieldFlagsAttribute>())
+                        else if (bestMatch is InnerJoinAttribute ija)
                         {
-                            addFlags |= attr.Add;
-                            removeFlags |= attr.Remove;
+                            _ = new InnerJoin(joins, ija.ToTable!, ija.Alias,
+                                new Criteria(ija.Alias, ija.OnCriteria!) == new Criteria(field));
                         }
                     }
-                    else
-                    {
-                        readPermission = fieldsReadPerm;
-                        insertPermission = fieldsInsertPerm ?? fieldsModifyPerm ?? fieldsReadPerm;
-                        updatePermission = fieldsUpdatePerm ?? fieldsUpdatePerm ?? fieldsReadPerm;
-                    }
 
-                    if (fieldInfo.FieldType.GetCustomAttribute<NotMappedAttribute>() != null)
-                        addFlags |= FieldFlags.NotMapped;
+                    field.PropertyName = property.Name;
+                    byPropertyName[field.PropertyName] = field;
 
-                    if (field is null)
-                    {
-                        if (property == null)
-                        {
-                            throw new InvalidProgramException(string.Format(
-                                "Field {0} in type {1} is null and has no corresponding property in entity!",
-                                    fieldInfo.Name, rowType!.Name));
-                        }
+                    field.customAttributes = [.. property.GetAttributes<Attribute>()];
+                }
 
-                        object?[] prm =
-                        [
-                            this, // owner
-                            column == null ? property.Name : (column.Name.TrimToNull() ?? property.Name),
-                            display != null ? new LocalText(display.DisplayName) : null,
-                            size != null ? size.Value : 0,
-                            (FieldFlags.Default ^ removeFlags) | addFlags,
-                            null,
-                            null,
-                        ];
-                        if (rowFields.TryGetValue("_" + property.Name, out FieldInfo? storage) ||
-                            rowFields.TryGetValue("m_" + property.Name, out storage) ||
-                            rowFields.TryGetValue(property.Name, out storage))
-                        {
-                            prm[5] = CreateFieldGetMethod(storage);
-                            prm[6] = CreateFieldSetMethod(storage);
-                        }
+                var idFieldAttribute = field.GetAttribute<IdPropertyAttribute>();
+                if (idFieldAttribute != null)
+                {
+                    if (idField is not null)
+                        throw new InvalidProgramException($"{rowType!.FullName} have multiple [IdProperty] attributes!");
 
-                        field = (Field)Activator.CreateInstance(fieldInfo.FieldType, prm)!;
-                        fieldInfo.SetValue(this, field);
-                    }
-                    else
-                    {
-                        if (size != null && size.Value != field.Size)
-                            field.Size = size.Value;
+                    idField = field;
+                }
 
-                        if (display != null)
-                            field.Caption = new LocalText(display.DisplayName);
+                var nameFieldAttribute = field.GetAttribute<NamePropertyAttribute>();
+                if (nameFieldAttribute != null)
+                {
+                    if (nameField is not null)
+                        throw new InvalidProgramException($"{rowType!.FullName} have multiple [NameProperty] attributes!");
 
-                        if (addFlags != 0 || removeFlags != 0)
-                            field.Flags = (field.Flags ^ removeFlags) | addFlags;
-
-                        if (column != null && string.Compare(column.Name, field.Name, StringComparison.OrdinalIgnoreCase) != 0)
-                            throw new InvalidProgramException(string.Format(
-                                "Field name '{0}' in type {1} can't be overridden by Column name attribute!",
-                                    fieldInfo.Name, rowType!.FullName));
-                    }
-
-                    if (scale != null)
-                    {
-                        field.Scale = scale.Value;
-                    }
-
-                    if (defaultValue != null)
-                    {
-                        field.DefaultValue = defaultValue.Value;
-                    }
-
-                    if (selectLevel != null)
-                    {
-                        field.MinSelectLevel = selectLevel.Value;
-                    }
-
-                    if (expression != null)
-                    {
-                        field.Expression = expression.ToString(dialect);
-                    }
-
-                    if (foreignKey != null)
-                    {
-                        field.ForeignTable = foreignKey.Table ??
-                            expressionSelector.GetBestMatch(foreignKey.RowType!
-                                .GetCustomAttributes<TableNameAttribute>(), x => x.Dialect)!.Name;
-                        field.ForeignField = foreignKey.Field;
-                    }
-
-                    if ((leftJoin != null || innerJoin != null) && string.IsNullOrEmpty(field.ForeignTable))
-                        throw new InvalidProgramException(string.Format("Property {0} of row type {1} has a [LeftJoin] or [InnerJoin] attribute " +
-                            "but its foreign table is undefined. Make sure it has a valid [ForeignKey] attribute!",
-                                fieldInfo.Name, rowType!.FullName));
-
-                    if ((leftJoin != null || innerJoin != null) && string.IsNullOrEmpty(field.ForeignField))
-                        throw new InvalidProgramException(string.Format("Property {0} of row type {1} has a [LeftJoin] or [InnerJoin] attribute " +
-                            "but its foreign field is undefined. Make sure it has a valid [ForeignKey] attribute!",
-                                fieldInfo.Name, rowType!.FullName));
-
-                    if (leftJoin != null)
-                    {
-                        field.ForeignJoinAlias = new LeftJoin(joins, field.ForeignTable!, leftJoin.Alias,
-                            new Criteria(leftJoin.Alias, field.ForeignField!) == new Criteria(field));
-                    }
-
-                    if (innerJoin != null)
-                    {
-                        field.ForeignJoinAlias = new InnerJoin(joins, field.ForeignTable!, innerJoin.Alias,
-                            new Criteria(innerJoin.Alias, field.ForeignField!) == new Criteria(field));
-                    }
-
-                    if (textualField != null)
-                    {
-                        field.textualField = textualField.Value;
-                    }
-
-                    if (dateTimeKind != null && field is DateTimeField dtf)
-                    {
-                        dtf.DateTimeKind = dateTimeKind.Value;
-                    }
-
-                    if (readPermission != null)
-                    {
-                        field.readPermission = readPermission.Permission ?? "?";
-                    }
-
-                    if (insertPermission != null)
-                    {
-                        field.insertPermission = insertPermission.Permission ?? "?";
-                    }
-
-                    if (updatePermission != null)
-                    {
-                        field.updatePermission = updatePermission.Permission ?? "?";
-                    }
-
-                    if (property != null)
-                    {
-                        if (property.PropertyType != null &&
-                            field is IEnumTypeField enumTypeField)
-                        {
-                            if (property.PropertyType.IsEnum)
-                            {
-                                enumTypeField.EnumType = property.PropertyType;
-                            }
-                            else
-                            {
-                                var nullableType = Nullable.GetUnderlyingType(property.PropertyType);
-                                if (nullableType != null && nullableType.IsEnum)
-                                    enumTypeField.EnumType = nullableType;
-                            }
-                        }
-
-                        var propJoinAttributes = ((IEnumerable<ISqlJoin>)property.GetAttributes<LeftJoinAttribute>())
-                            .Concat(property.GetAttributes<InnerJoinAttribute>())
-                            .Where(x => x.ToTable != null && x.OnCriteria != null)
-                            .GroupBy(x => x.Alias, StringComparer.OrdinalIgnoreCase);
-
-                        foreach (var propJoinGroup in propJoinAttributes)
-                        {
-                            ISqlJoin? bestMatch;
-                            try
-                            {
-                                bestMatch = expressionSelector.GetBestMatch(propJoinGroup, x => x.Dialect);
-                            }
-                            catch (AmbiguousMatchException ex)
-                            {
-                                throw new AmbiguousMatchException(string.Format(
-                                    "Error while determining join attributes for row type {0}, property '{1}'",
-                                        rowType!.FullName, property.Name), ex);
-                            }
-
-                            if (bestMatch is LeftJoinAttribute lja)
-                            {
-                                _ = new LeftJoin(joins, lja.ToTable!, lja.Alias,
-                                    new Criteria(lja.Alias, lja.OnCriteria!) == new Criteria(field));
-                            }
-                            else if (bestMatch is InnerJoinAttribute ija)
-                            {
-                                _ = new InnerJoin(joins, ija.ToTable!, ija.Alias,
-                                    new Criteria(ija.Alias, ija.OnCriteria!) == new Criteria(field));
-                            }
-                        }
-
-                        field.PropertyName = property.Name;
-                        byPropertyName[field.PropertyName] = field;
-
-                        field.customAttributes = [.. property.GetAttributes<Attribute>()];
-                    }
-
-                    var idFieldAttribute = field.GetAttribute<IdPropertyAttribute>();
-                    if (idFieldAttribute != null)
-                    {
-                        if (idField is not null)
-                            throw new InvalidProgramException($"{rowType!.FullName} have multiple [IdProperty] attributes!");
-
-                        idField = field;
-                    }
-
-                    var nameFieldAttribute = field.GetAttribute<NamePropertyAttribute>();
-                    if (nameFieldAttribute != null)
-                    {
-                        if (nameField is not null)
-                            throw new InvalidProgramException($"{rowType!.FullName} have multiple [NameProperty] attributes!");
-
-                        nameField = field;
-                    }
+                    nameField = field;
                 }
             }
 
