@@ -7,7 +7,7 @@ namespace Serene.Administration;
 [ReadPermission(PermissionKeys.Security)]
 [ModifyPermission(PermissionKeys.Security)]
 [LookupScript(Permission = PermissionKeys.Security)]
-public sealed class UserRow : Serenity.Extensions.Entities.LoggingRow<UserRow.RowFields>, IIdRow, INameRow, IIsActiveRow, IDisplayNameRow, IEmailRow, IPasswordRow
+public sealed class UserRow : LoggingRow<UserRow.RowFields>, IIdRow, INameRow, IIsActiveRow, IDisplayNameRow, IEmailRow, IPasswordRow
 {
     [DisplayName("User Id"), Identity, IdProperty]
     public int? UserId { get => fields.UserId[this]; set => fields.UserId[this] = value; }
