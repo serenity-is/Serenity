@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Options;
+
 namespace Serenity.Data;
 
 public class DefaultRowFieldsProviderTests
@@ -168,6 +170,19 @@ public class DefaultRowFieldsProviderTests
             provider.Resolve(typeof(DependencyRow.RowFields)));
 
         Assert.Same(dependency, fields.Dependency);
+    }
+
+    [Fact]
+    public void Resolve_UsesUserEntityOptionsFromServices()
+    {
+        var options = new UserEntityOptions { IdFieldType = typeof(GuidField) };
+        var provider = CreateProvider(services =>
+            services.AddSingleton<IOptions<UserEntityOptions>>(options));
+
+        var fields = Assert.IsType<RowFieldsBaseTests.AbstractFieldRow.RowFields>(
+            provider.Resolve(typeof(RowFieldsBaseTests.AbstractFieldRow.RowFields)));
+
+        Assert.IsType<GuidField>(fields.UserId);
     }
 
     [Fact]

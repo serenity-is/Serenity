@@ -4,6 +4,44 @@ public class OriginPropertyTests
 {
     #region Rows used in tests
 
+    [TableName("UsersFromRow")]
+    public class ConfiguredUserRow : Row<ConfiguredUserRow.RowFields>
+    {
+        public class RowFields : RowFieldsBase
+        {
+            public StringField UserKey = null!;
+            public Field ManagerId = null!;
+            public StringField Username = null!;
+            public StringField ManagerUsername = null!;
+        }
+
+        [IdProperty, Column("UserKey"), Size(40)]
+        public string? UserId { get => fields.UserKey[this]; set => fields.UserKey[this] = value; }
+
+        [UserIdFieldType, UserIdJoinKey, LeftJoin("jManager")]
+        public object? ManagerId { get => fields.ManagerId.AsObject(this); set => fields.ManagerId.AsObject(this, value); }
+
+        [Origin("jManager", nameof(Username))]
+        public string? ManagerUsername { get => fields.ManagerUsername[this]; set => fields.ManagerUsername[this] = value; }
+
+        public string? Username { get => fields.Username[this]; set => fields.Username[this] = value; }
+    }
+
+    public class ConfiguredUserOriginRow : Row<ConfiguredUserOriginRow.RowFields>
+    {
+        public class RowFields : RowFieldsBase
+        {
+            public Field UserId = null!;
+            public StringField ManagerUsername = null!;
+        }
+
+        [UserIdFieldType, UserIdJoinKey, LeftJoin("jUser")]
+        public object? UserId { get => fields.UserId.AsObject(this); set => fields.UserId.AsObject(this, value); }
+
+        [Origin("jUser", nameof(ConfiguredUserRow.ManagerUsername))]
+        public string? ManagerUsername { get => fields.ManagerUsername[this]; set => fields.ManagerUsername[this] = value; }
+    }
+
     /// <summary>
     /// Origin row used by most tests. Contains properties with display name,
     /// size, scale, a renamed column and a nested origin (RegionName) to
@@ -351,6 +389,38 @@ public class OriginPropertyTests
     }
 
     #endregion
+
+    [Fact]
+    public void Origin_UserIdJoinKey_UsesConfiguredNamesInNestedJoin()
+    {
+        var options = new UserEntityOptions { RowType = typeof(ConfiguredUserRow) };
+
+        Assert.Equal(typeof(StringField), options.IdFieldType);
+        Assert.Equal("UserKey", options.IdColumnName);
+        Assert.Equal(40, options.IdColumnSize);
+
+        foreach (var (table, idColumn) in new[]
+        {
+            ("ConfiguredUsers", "ConfiguredUserKey"),
+            ("AlternateUsers", "AlternateUserKey")
+        })
+        {
+            options.TableName = table;
+            options.IdColumnName = idColumn;
+            var fields = new ConfiguredUserOriginRow.RowFields();
+            fields.Initialize(annotations: null, dialect: SqlServer2012Dialect.Instance,
+                userEntityOptions: options);
+
+            Assert.IsType<StringField>(fields.UserId);
+            Assert.Equal(table, fields.UserId.ForeignTable);
+            Assert.Equal(idColumn, fields.UserId.ForeignField);
+            Assert.Equal("jUser_jManager.[Username]", fields.ManagerUsername.Expression);
+
+            var managerJoin = fields.Joins["jUser_jManager"];
+            Assert.Equal(table, managerJoin.Table);
+            Assert.Contains(idColumn, managerJoin.OnCriteria!.ToString());
+        }
+    }
 
     [Fact]
     public void Origin_Expression_Uses_Join_Alias_And_Origin_Property_Name()

@@ -91,9 +91,31 @@ public class MigrationUtilsTests
         public override void Down() => Delete.Table("TableD");
     }
 
-    private static void RunMigrations(string dbFile)
+    [MigrationKey(20240101_0006)]
+    public class UserIdTypeHelpers(IOptions<UserEntityOptions> userEntityOptions) : Migration
+    {
+        public override void Up()
+        {
+            Create.Table(userEntityOptions.Value.TableName)
+                .WithColumn(userEntityOptions.Value.IdColumnName).AsUserIdType(userEntityOptions).PrimaryKey();
+
+            Create.Table("UserIdReferences")
+                .WithColumn("Id").AsInt32().PrimaryKey()
+                .WithColumn("UserId").AsUserIdType(userEntityOptions).NotNullable()
+                    .UserIdForeignKey(userEntityOptions, "FK_UserIdReferences_Users");
+        }
+
+        public override void Down()
+        {
+            Delete.Table("UserIdReferences");
+            Delete.Table(userEntityOptions.Value.TableName);
+        }
+    }
+
+    private static void RunMigrations(string dbFile, Action<UserEntityOptions>? configureOptions = null)
     {
         using var services = new ServiceCollection()
+            .Configure<UserEntityOptions>(options => configureOptions?.Invoke(options))
             .AddFluentMigratorCore()
             .ConfigureRunner(rb => rb
                 .AddSQLite()
@@ -106,14 +128,14 @@ public class MigrationUtilsTests
         runner.MigrateUp();
     }
 
-    private static void WithMigrations(Action action)
+    private static void WithMigrations(Action<string> action, Action<UserEntityOptions>? configureOptions = null)
     {
         var dbFile = System.IO.Path.Combine(System.IO.Path.GetTempPath(),
             "fm_" + Guid.NewGuid().ToString("N") + ".db");
         try
         {
-            RunMigrations(dbFile);
-            action();
+            RunMigrations(dbFile, configureOptions);
+            action(dbFile);
         }
         finally
         {
@@ -132,7 +154,7 @@ public class MigrationUtilsTests
     [Fact]
     public void Sqlite_Migrations_Exercise_Helpers()
     {
-        WithMigrations(() =>
+        WithMigrations(_ =>
         {
             Assert.True(IsSqliteResult);
             Assert.False(IsOracleResult);
@@ -144,6 +166,43 @@ public class MigrationUtilsTests
             Assert.True(IsDatabasePredicateResult);
             Assert.True(IfTrueResult);
             Assert.False(IfFalseResult);
+        });
+    }
+
+    [Fact]
+    public void UserId_Migration_Helpers_UseConfiguredSchema()
+    {
+        WithMigrations(dbFile =>
+        {
+            using var connection = new Microsoft.Data.Sqlite.SqliteConnection(
+                "Data Source=" + dbFile + ";Pooling=False");
+            connection.Open();
+
+            using var command = connection.CreateCommand();
+            command.CommandText = "PRAGMA table_info('UserIdReferences')";
+            string? userIdType = null;
+            using (var columns = command.ExecuteReader())
+            {
+                while (columns.Read())
+                {
+                    if (columns["name"] as string == "UserId")
+                        userIdType = columns["type"] as string;
+                }
+            }
+
+            Assert.Equal("TEXT", userIdType?.ToUpperInvariant());
+
+            command.CommandText = "PRAGMA foreign_key_list('UserIdReferences')";
+            using var foreignKeys = command.ExecuteReader();
+            Assert.True(foreignKeys.Read());
+            Assert.Equal("ConfiguredUsers", foreignKeys["table"] as string);
+            Assert.Equal("UserKey", foreignKeys["to"] as string);
+        }, options =>
+        {
+            options.TableName = "ConfiguredUsers";
+            options.IdColumnName = "UserKey";
+            options.IdFieldType = typeof(StringField);
+            options.IdColumnSize = 37;
         });
     }
 

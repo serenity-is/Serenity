@@ -27,6 +27,26 @@ public class LoggingRowTests
     }
 
     [Fact]
+    public void UserIdFields_UseConfiguredFieldType()
+    {
+        var fields = new TestLoggingRow.RowFields();
+        fields.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect,
+            userEntityOptions: new UserEntityOptions { IdFieldType = typeof(GuidField) });
+
+        Assert.IsType<GuidField>(fields.InsertUserId);
+        Assert.IsType<GuidField>(fields.UpdateUserId);
+
+        var row = new TestLoggingRow(fields);
+        var insertedBy = Guid.NewGuid();
+        var updatedBy = Guid.NewGuid();
+        row.InsertUserId = insertedBy;
+        row.UpdateUserId = updatedBy;
+
+        Assert.Equal(insertedBy, row.InsertUserId);
+        Assert.Equal(updatedBy, row.UpdateUserId);
+    }
+
+    [Fact]
     public void Properties_Roundtrip()
     {
         var date = new DateTime(2024, 1, 2, 3, 4, 5, DateTimeKind.Utc);

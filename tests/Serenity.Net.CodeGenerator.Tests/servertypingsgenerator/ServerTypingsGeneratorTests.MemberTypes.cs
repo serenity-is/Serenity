@@ -22,6 +22,7 @@ namespace Serenity.CodeGeneration
             Assert.Contains("DateTimeOffsetValue?: string;", code);
             Assert.Contains("GuidValue?: string;", code);
             Assert.Contains("ObjectValue?: any;", code);
+            Assert.Contains("UserId?: any;", code);
             Assert.Contains("DynamicValue?: any;", code);
             Assert.Contains("ArrayValue?: number[];", code);
             Assert.Contains("StreamValue?: number[];", code);
@@ -49,6 +50,8 @@ namespace ServerTypingsTest.MemberTypes
         public DateTimeOffset DateTimeOffsetValue { get; set; }
         public Guid GuidValue { get; set; }
         public object ObjectValue { get; set; }
+        [Serenity.Data.Mapping.UserIdFieldType]
+        public object? UserId { get; set; }
         public dynamic DynamicValue { get; set; }
         public int[] ArrayValue { get; set; }
         public System.IO.Stream StreamValue { get; set; }
