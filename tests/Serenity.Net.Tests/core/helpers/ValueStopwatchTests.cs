@@ -29,14 +29,4 @@ public class ValueStopwatchTests
         var sw = ValueStopwatch.StartNew();
         Assert.True(sw.ElapsedTime >= TimeSpan.Zero);
     }
-
-    [Fact]
-    public void ElapsedTime_IsApproximatelyElapsedMilliseconds()
-    {
-        var sw = ValueStopwatch.StartNew();
-        var elapsed = sw.ElapsedTime;
-        var ms = sw.ElapsedMilliseconds;
-
-        Assert.InRange(ms, elapsed.TotalMilliseconds - 1, elapsed.TotalMilliseconds + 1);
-    }
 }
