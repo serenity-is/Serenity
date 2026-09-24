@@ -44,19 +44,21 @@ public class DataMigrations(ITypeSource typeSource,
         Microsoft.Data.SqlClient.SqlConnection.ClearAllPools();
     }
 
-    private void RunMigrations(string databaseKey)
+    /// <summary>
+    /// Adds FluentMigrator services to the service collection for the specified database key and connection string.
+    /// </summary>
+    /// <param name="collection">Service collection</param>
+    /// <param name="databaseKey">Database key</param>
+    /// <param name="cs">Connection string</param>
+    public IServiceCollection AddMigratorServices(IServiceCollection collection, string databaseKey, IConnectionString cs)
     {
-        var cs = sqlConnections.TryGetConnectionString(databaseKey) ??
-            throw new ArgumentOutOfRangeException(nameof(databaseKey));
         string serverType = cs.Dialect.ServerType;
         bool isOracle = serverType.StartsWith("Oracle", StringComparison.OrdinalIgnoreCase);
-        bool isFirebird = serverType.StartsWith("Firebird", StringComparison.OrdinalIgnoreCase);
 
         var conventionSet = new DefaultConventionSet(defaultSchemaName: null,
             Path.GetDirectoryName(typeof(DataMigrations).Assembly.Location));
 
-        var serviceProvider = new ServiceCollection()
-            .AddLogging(lb => lb.AddFluentMigratorConsole())
+        return collection.AddLogging(lb => lb.AddFluentMigratorConsole())
             .AddFluentMigratorCore()
             .AddSingleton<IConventionSet>(conventionSet)
             .Configure<ProcessorOptions>(options =>
@@ -88,9 +90,18 @@ public class DataMigrations(ITypeSource typeSource,
                 builder.WithGlobalConnectionString(cs.ConnectionString);
                 builder.ScanIn([.. ((IGetAssemblies)typeSource).GetAssemblies()]).For.Migrations();
             })
-            .Configure<UserEntityOptions>(options => options.AssignFrom(userEntityOptions))
+            .Configure<UserEntityOptions>(options => options.AssignFrom(userEntityOptions));
+    }
+
+    private void RunMigrations(string databaseKey)
+    {
+        var cs = sqlConnections.TryGetConnectionString(databaseKey) ??
+            throw new ArgumentOutOfRangeException(nameof(databaseKey));
+
+        var serviceProvider = AddMigratorServices(new ServiceCollection(), databaseKey, cs)
             .BuildServiceProvider();
 
+        bool isFirebird = cs.Dialect.ServerType.StartsWith("Firebird", StringComparison.OrdinalIgnoreCase);
         var culture = CultureInfo.CurrentCulture;
         try
         {
