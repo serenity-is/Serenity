@@ -22,7 +22,7 @@ public class FieldPropertiesTests
     public void ForeignJoin_CreatesJoinWithAliasFromFieldName()
     {
         var f = new FkNoJoinRow.RowFields();
-        f.Initialize(null, SqlSettings.DefaultDialect);
+        f.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect, userEntityOptions: null);
 
         var byId = f.CountryID;
         byId.ForeignTable = "TheCountryTable";
@@ -43,7 +43,7 @@ public class FieldPropertiesTests
     public void BasicProperties_SetGet()
     {
         var f = new ComplexRow.RowFields();
-        f.Initialize(null, SqlSettings.DefaultDialect);
+        f.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect, userEntityOptions: null);
         var field = f.Overriden;
 
         field.DefaultValue = "x";
@@ -68,7 +68,7 @@ public class FieldPropertiesTests
     public void ExpressionSetter_ResolvesJoinAliasByFieldName()
     {
         var f = new ComplexRow.RowFields();
-        f.Initialize(null, SqlSettings.DefaultDialect);
+        f.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect, userEntityOptions: null);
         var field = f.BasicExpression; // plain propSomeField
 
         field.Expression = "c.Name";

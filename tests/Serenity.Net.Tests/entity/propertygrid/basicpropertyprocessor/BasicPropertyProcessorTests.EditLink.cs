@@ -48,7 +48,7 @@ public partial class BasicPropertyProcessorTests
     private static EditLinkRow NewEditLinkRow()
     {
         var fields = new EditLinkRow.RowFields();
-        fields.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect);
+        fields.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect, userEntityOptions: null);
         return new EditLinkRow(fields);
     }
 

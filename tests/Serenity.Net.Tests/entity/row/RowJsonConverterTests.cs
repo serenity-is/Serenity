@@ -107,7 +107,7 @@ public class RowJsonConverterTests
     public void Serialize_UsesPropertyName_OverFieldName()
     {
         var fields = new PropertyNameRow.RowFields();
-        fields.Initialize(annotations: null, dialect: SqlServer2012Dialect.Instance);
+        fields.Initialize(annotations: null, dialect: SqlServer2012Dialect.Instance, userEntityOptions: null);
         fields.Code.PropertyName = "CustomCode";
         var row = new PropertyNameRow(fields) { Code = "X" };
 

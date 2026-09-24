@@ -342,7 +342,7 @@ public class RowFieldsBaseTestsMore
     public void Extra_Field_Without_Property_Uses_Field_Level_Permissions()
     {
         var f = new ExtraFieldRow.RowFields();
-        f.Initialize(null, SqlSettings.DefaultDialect);
+        f.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect, userEntityOptions: null);
 
         Assert.Same(f.Extra, f.FindField("Extra"));
         Assert.Null(f.FindFieldByPropertyName("Extra"));
@@ -364,28 +364,28 @@ public class RowFieldsBaseTestsMore
     public void Field_Column_Name_Mismatch_Throws()
     {
         Assert.Throws<InvalidProgramException>(() =>
-            new ColumnMismatchRow.RowFields().Initialize(null, SqlSettings.DefaultDialect));
+            new ColumnMismatchRow.RowFields().Initialize(annotations: null, dialect: SqlSettings.DefaultDialect, userEntityOptions: null));
     }
 
     [Fact]
     public void Multiple_IdProperty_Throws()
     {
         Assert.Throws<InvalidProgramException>(() =>
-            new MultipleIdRow.RowFields().Initialize(null, SqlSettings.DefaultDialect));
+            new MultipleIdRow.RowFields().Initialize(annotations: null, dialect: SqlSettings.DefaultDialect, userEntityOptions: null));
     }
 
     [Fact]
     public void Multiple_NameProperty_Throws()
     {
         Assert.Throws<InvalidProgramException>(() =>
-            new MultipleNameRow.RowFields().Initialize(null, SqlSettings.DefaultDialect));
+            new MultipleNameRow.RowFields().Initialize(annotations: null, dialect: SqlSettings.DefaultDialect, userEntityOptions: null));
     }
 
     [Fact]
     public void IdField_Inferred_From_Single_PrimaryKey()
     {
         var f = new PrimaryKeyOnlyRow.RowFields();
-        f.Initialize(null, SqlSettings.DefaultDialect);
+        f.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect, userEntityOptions: null);
 
         Assert.Same(f.Id, f.IdField);
         var pk = Assert.Single(f.PrimaryKeys!);
@@ -396,7 +396,7 @@ public class RowFieldsBaseTestsMore
     public void Enum_Property_Types_Are_Assigned_To_Fields()
     {
         var f = new EnumRow.RowFields();
-        f.Initialize(null, SqlSettings.DefaultDialect);
+        f.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect, userEntityOptions: null);
 
         Assert.Equal(typeof(TestStatus), f.Status.EnumType);
         Assert.Equal(typeof(TestStatus), f.StatusN.EnumType);
@@ -429,21 +429,21 @@ public class RowFieldsBaseTestsMore
     public void LeftJoin_Without_ForeignTable_Throws()
     {
         Assert.Throws<InvalidProgramException>(() =>
-            new LeftJoinNoForeignRow.RowFields().Initialize(null, SqlSettings.DefaultDialect));
+            new LeftJoinNoForeignRow.RowFields().Initialize(annotations: null, dialect: SqlSettings.DefaultDialect, userEntityOptions: null));
     }
 
     [Fact]
     public void LeftJoin_Without_ForeignField_Throws()
     {
         Assert.Throws<InvalidProgramException>(() =>
-            new JoinNoForeignFieldRow.RowFields().Initialize(null, SqlSettings.DefaultDialect));
+            new JoinNoForeignFieldRow.RowFields().Initialize(annotations: null, dialect: SqlSettings.DefaultDialect, userEntityOptions: null));
     }
 
     [Fact]
     public void InnerJoin_Creates_Join_With_OnCriteria()
     {
         var f = new InnerJoinRow.RowFields();
-        f.Initialize(null, SqlSettings.DefaultDialect);
+        f.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect, userEntityOptions: null);
 
         Assert.Single(f.Joins);
         Assert.NotNull(f.CountryID.ForeignJoinAlias);
@@ -453,7 +453,7 @@ public class RowFieldsBaseTestsMore
     public void TextualField_Attribute_Is_Assigned()
     {
         var f = new TextualFieldRow.RowFields();
-        f.Initialize(null, SqlSettings.DefaultDialect);
+        f.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect, userEntityOptions: null);
 
         Assert.Equal("CountryName", f.CountryID.TextualField);
     }
@@ -462,14 +462,14 @@ public class RowFieldsBaseTestsMore
     public void Ambiguous_Property_Join_Attributes_Throw()
     {
         Assert.Throws<AmbiguousMatchException>(() =>
-            new AmbiguousPropJoinRow.RowFields().Initialize(null, SqlSettings.DefaultDialect));
+            new AmbiguousPropJoinRow.RowFields().Initialize(annotations: null, dialect: SqlSettings.DefaultDialect, userEntityOptions: null));
     }
 
     [Fact]
     public void ReplaceAliasWith_Handles_Row_Level_Joins_And_Null_Criteria()
     {
         var f = new RowLevelJoinRow.RowFields();
-        f.Initialize(null, SqlSettings.DefaultDialect);
+        f.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect, userEntityOptions: null);
 
         f.Joins.Add("manual", new LeftJoin("Other", "manual", null));
 
@@ -510,7 +510,7 @@ public class RowFieldsBaseTestsMore
     public void FieldCollection_Modification_After_Initialization_Throws()
     {
         var f = new ExtraFieldRow.RowFields();
-        f.Initialize(null, SqlSettings.DefaultDialect);
+        f.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect, userEntityOptions: null);
 
         Assert.Throws<InvalidOperationException>(() => f.Add(new Int32Field(null, "X")));
     }
@@ -553,14 +553,14 @@ public class RowFieldsBaseTestsMore
     public void Null_Field_Without_Property_Throws()
     {
         Assert.Throws<InvalidProgramException>(() =>
-            new BadGenRow.RowFields().Initialize(null, SqlSettings.DefaultDialect));
+            new BadGenRow.RowFields().Initialize(annotations: null, dialect: SqlSettings.DefaultDialect, userEntityOptions: null));
     }
 
     [Fact]
     public void ReplaceAliasWith_Keeps_Unknown_Aliases()
     {
         var f = new UnknownAliasRow.RowFields();
-        f.Initialize(null, SqlSettings.DefaultDialect);
+        f.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect, userEntityOptions: null);
         f.ReplaceAliasWith("base");
 
         Assert.Equal("x.field", f.Country.Expression);

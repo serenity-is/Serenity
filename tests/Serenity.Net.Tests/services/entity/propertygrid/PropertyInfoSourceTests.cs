@@ -83,7 +83,7 @@ public class PropertyInfoSourceTests
     public void EnumType_IsNull_WhenNotAnEnum()
     {
         var fields = new SourceRow.RowFields();
-        fields.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect);
+        fields.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect, userEntityOptions: null);
         var field = fields.EnumMapped;
         field.EnumType = typeof(int);
         var source = new PropertyInfoSource(typeof(SourceForm).GetProperty(nameof(SourceForm.EnumMapped)),

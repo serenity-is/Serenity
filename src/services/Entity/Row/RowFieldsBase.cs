@@ -30,6 +30,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
     internal Type? rowType;
     internal IAnnotatedType? annotations;
     internal ISqlDialect? dialect;
+    internal UserEntityOptions? userEntityOptions;
     internal string? moduleIdentifier;
     internal string? connectionKey;
     internal string? generationKey;
@@ -41,6 +42,8 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
     internal string alias;
     internal string aliasDot;
     internal bool aliasLocked;
+
+    private static readonly ConcurrentDictionary<Type, Type> fieldValueTypeCache = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RowFieldsBase"/> class.
@@ -242,6 +245,9 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
     /// <returns>The type of the field to create. Return a subclass of Field, or this field will be skipped.</returns>
     protected virtual Type? GetFieldTypeToCreate(FieldInfo fieldInfo, IPropertyInfo? property)
     {
+        if (fieldInfo.FieldType == typeof(Field) && property?.GetAttribute<UserIdFieldTypeAttribute>() is not null)
+            return userEntityOptions?.IdFieldType ?? typeof(Int32Field);
+
         return fieldInfo.FieldType;
     }
 
@@ -250,10 +256,11 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
     /// </summary>
     /// <param name="annotations">The annotations.</param>
     /// <param name="dialect">The dialect.</param>
+    /// <param name="userEntityOptions">The user entity options.</param>
     /// <exception cref="ArgumentNullException">dialect</exception>
     /// <exception cref="InvalidProgramException">
     /// </exception>
-    public void Initialize(IAnnotatedType? annotations, ISqlDialect dialect)
+    public void Initialize(IAnnotatedType? annotations, ISqlDialect dialect, UserEntityOptions? userEntityOptions)
     {
         if (isInitialized)
             return;
@@ -261,6 +268,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
         lock (initializeLock)
         {
             this.annotations = annotations;
+            this.userEntityOptions = userEntityOptions;
             GetRowFieldsAndProperties(out Dictionary<string, FieldInfo> rowFields, out Dictionary<string, IPropertyInfo> rowProperties);
 
             this.dialect = dialect ?? throw new ArgumentNullException(nameof(dialect));
@@ -378,7 +386,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
 
                     if (origin != null)
                     {
-                        propertyDictionary ??= OriginPropertyDictionary.GetPropertyDictionary(rowType!);
+                        propertyDictionary ??= OriginPropertyDictionary.GetPropertyDictionary(rowType!, userEntityOptions);
                         try
                         {
                             if (!expressions.Any() && expression == null)
@@ -451,8 +459,17 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
                         rowFields.TryGetValue("m_" + property.Name, out storage) ||
                         rowFields.TryGetValue(property.Name, out storage))
                     {
-                        prm[5] = CreateFieldGetMethod(storage);
-                        prm[6] = CreateFieldSetMethod(storage);
+                        if (fieldInfo.FieldType == typeof(Field) && storage.FieldType == typeof(object))
+                        {
+                            var valueType = GetFieldValueType(fieldType);
+                            prm[5] = CreateFieldGetMethod(storage, valueType);
+                            prm[6] = CreateFieldSetMethod(storage, valueType);
+                        }
+                        else
+                        {
+                            prm[5] = CreateFieldGetMethod(storage);
+                            prm[6] = CreateFieldSetMethod(storage);
+                        }
                     }
 
                     field = (Field)Activator.CreateInstance(fieldType, prm)!;
@@ -496,11 +513,14 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
                 }
 
                 if (foreignKey != null)
-                {
-                    field.ForeignTable = foreignKey.Table ??
-                        expressionSelector.GetBestMatch(foreignKey.RowType!
+                { 
+                    string? foreignKeyTable = foreignKey is UserIdJoinKeyAttribute ? userEntityOptions?.TableName ?? "Users" : foreignKey.Table;
+                    string? foreignKeyField = foreignKey is UserIdJoinKeyAttribute ? userEntityOptions?.IdColumnName ?? "UserId" : foreignKey.Field;
+
+                    field.ForeignTable = foreignKeyTable ??
+                        expressionSelector.GetBestMatch(((foreignKey is UserIdJoinKeyAttribute ? userEntityOptions?.RowType : null) ?? foreignKey.RowType!)
                             .GetCustomAttributes<TableNameAttribute>(), x => x.Dialect)!.Name;
-                    field.ForeignField = foreignKey.Field;
+                    field.ForeignField = foreignKeyField;
                 }
 
                 if ((leftJoin != null || innerJoin != null) && string.IsNullOrEmpty(field.ForeignTable))
@@ -747,6 +767,58 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
         return getter.CreateDelegate(typeof(Func<,>).MakeGenericType(typeof(IRow), fieldInfo.FieldType));
     }
 
+    private static Type GetFieldValueType(Type fieldType)
+    {
+        return fieldValueTypeCache.GetOrAdd(fieldType, FindFieldValueType);
+    }
+
+    private static Type FindFieldValueType(Type fieldType)
+    {
+        foreach (var constructor in fieldType.GetConstructors())
+        {
+            var parameters = constructor.GetParameters();
+            if (parameters.Length != 7 ||
+                parameters[0].ParameterType != typeof(ICollection<Field>) ||
+                parameters[1].ParameterType != typeof(string) ||
+                parameters[2].ParameterType != typeof(LocalText) ||
+                parameters[3].ParameterType != typeof(int) ||
+                parameters[4].ParameterType != typeof(FieldFlags))
+                continue;
+
+            var getterType = parameters[5].ParameterType;
+            var setterType = parameters[6].ParameterType;
+            if (!getterType.IsGenericType ||
+                getterType.GetGenericTypeDefinition() != typeof(Func<,>) ||
+                !setterType.IsGenericType ||
+                setterType.GetGenericTypeDefinition() != typeof(Action<,>))
+                continue;
+
+            var getterArguments = getterType.GetGenericArguments();
+            var setterArguments = setterType.GetGenericArguments();
+            if (getterArguments[0] == typeof(IRow) &&
+                setterArguments[0] == typeof(IRow) &&
+                getterArguments[1] == setterArguments[1])
+                return getterArguments[1];
+        }
+
+        throw new InvalidProgramException($"Field type {fieldType.FullName} must have a constructor with Func<IRow, TValue> and Action<IRow, TValue> parameters.");
+    }
+
+    private static Delegate CreateFieldGetMethod(FieldInfo fieldInfo, Type valueType)
+    {
+        Type[] arguments = [typeof(IRow)];
+        var getter = new DynamicMethod(string.Concat("_Get", fieldInfo.Name, "_"),
+            valueType, arguments, fieldInfo.DeclaringType!);
+
+        ILGenerator generator = getter.GetILGenerator();
+        generator.Emit(OpCodes.Ldarg_0);
+        generator.Emit(OpCodes.Castclass, fieldInfo.DeclaringType!);
+        generator.Emit(OpCodes.Ldfld, fieldInfo);
+        generator.Emit(valueType.IsValueType ? OpCodes.Unbox_Any : OpCodes.Castclass, valueType);
+        generator.Emit(OpCodes.Ret);
+        return getter.CreateDelegate(typeof(Func<,>).MakeGenericType(typeof(IRow), valueType));
+    }
+
     private static Delegate CreateFieldSetMethod(FieldInfo fieldInfo)
     {
         Type[] arguments = [typeof(IRow), fieldInfo.FieldType];
@@ -760,6 +832,23 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
         generator.Emit(OpCodes.Stfld, fieldInfo);
         generator.Emit(OpCodes.Ret);
         return getter.CreateDelegate(typeof(Action<,>).MakeGenericType(typeof(IRow), fieldInfo.FieldType));
+    }
+
+    private static Delegate CreateFieldSetMethod(FieldInfo fieldInfo, Type valueType)
+    {
+        Type[] arguments = [typeof(IRow), valueType];
+        var setter = new DynamicMethod(string.Concat("_Set", fieldInfo.Name, "_"),
+            null, arguments, fieldInfo.DeclaringType!);
+
+        ILGenerator generator = setter.GetILGenerator();
+        generator.Emit(OpCodes.Ldarg_0);
+        generator.Emit(OpCodes.Castclass, fieldInfo.DeclaringType!);
+        generator.Emit(OpCodes.Ldarg_1);
+        if (valueType.IsValueType)
+            generator.Emit(OpCodes.Box, valueType);
+        generator.Emit(OpCodes.Stfld, fieldInfo);
+        generator.Emit(OpCodes.Ret);
+        return setter.CreateDelegate(typeof(Action<,>).MakeGenericType(typeof(IRow), valueType));
     }
 
     private void InferTextualFields()

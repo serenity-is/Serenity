@@ -1,4 +1,4 @@
-﻿namespace Serenity.Extensions.Entities;
+namespace Serenity.Extensions.Entities;
 
 /// <summary>
 /// Row for user preferences.
@@ -18,8 +18,8 @@ public sealed class UserPreferenceRow : Row<UserPreferenceRow.RowFields>, IIdRow
     /// <summary>
     /// The ID of the user the preference belongs to.
     /// </summary>
-    [DisplayName("User ID")]
-    public int? UserId { get => fields.UserId[this]; set => fields.UserId[this] = value; }
+    [DisplayName("User ID"), UserIdFieldType]
+    public object? UserId { get => fields.UserId.AsObject(this); set => fields.UserId.AsObject(this, value); }
 
     /// <summary>
     /// The preference type.
@@ -52,7 +52,7 @@ public sealed class UserPreferenceRow : Row<UserPreferenceRow.RowFields>, IIdRow
         /// <summary>
         /// The ID of the user the preference belongs to.
         /// </summary>
-        public readonly Int32Field UserId = null!;
+        public readonly Field UserId = null!;
 
         /// <summary>
         /// The preference type field.

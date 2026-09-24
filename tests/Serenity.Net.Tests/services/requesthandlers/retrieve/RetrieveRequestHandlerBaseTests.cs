@@ -86,7 +86,7 @@ public class RetrieveRequestHandlerBaseTests
     private static RetrieveBaseRow.RowFields NewFields()
     {
         var fields = new RetrieveBaseRow.RowFields();
-        fields.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect);
+        fields.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect, userEntityOptions: null);
         foreach (var field in new Field[] { fields.Id, fields.Name, fields.External })
         {
             field.Flags = FieldFlags.None;

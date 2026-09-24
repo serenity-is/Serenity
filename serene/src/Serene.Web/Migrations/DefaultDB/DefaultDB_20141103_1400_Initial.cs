@@ -7,8 +7,11 @@ public class DefaultDB_20141103_1400_Initial(IOptions<UserEntityOptions>? userEn
 {
     public override void Up()
     {
-        Create.Table("Users")
-            .WithColumn("UserId").AsUserIdType(userEntityOptions).IdentityKey(this)
+        var usersTable = userEntityOptions?.Value?.TableName ?? "Users";
+
+        Create.Table(usersTable)
+            .WithColumn(userEntityOptions?.Value?.IdColumnName ?? "UserId").AsUserIdType(userEntityOptions).IdentityKey(this)
+            // For GUID or string user IDs, replace `IdentityKey()` call above with `PrimaryKey()` and provide IDs through the application’s chosen strategy.
             .WithColumn("Username").AsString(100).NotNullable().Unique("IX_Users_Username")
             .WithColumn("DisplayName").AsString(100).NotNullable()
             .WithColumn("Email").AsString(100).Nullable()
@@ -23,7 +26,7 @@ public class DefaultDB_20141103_1400_Initial(IOptions<UserEntityOptions>? userEn
             .WithColumn("UpdateUserId").AsUserIdType(userEntityOptions).Nullable()
             .WithColumn("IsActive").AsInt16().NotNullable().WithDefaultValue(1);
 
-        Insert.IntoTable("Users").Row(new
+        Insert.IntoTable(usersTable).Row(new
         {
             Username = "admin",
             DisplayName = "admin",

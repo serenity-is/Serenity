@@ -13,7 +13,7 @@ public class RowCreationTests
     public void Can_Create_Row_With_Initialized_Fields()
     {
         var fields = new ComplexRow.RowFields();
-        fields.Initialize(annotations: null, dialect: SqlServer2012Dialect.Instance);
+        fields.Initialize(annotations: null, dialect: SqlServer2012Dialect.Instance, userEntityOptions: null);
         new ComplexRow(fields)
         {
             BasicExpression = "test"
@@ -27,7 +27,7 @@ public class RowCreationTests
         try
         {
             var fields = new ComplexRow.RowFields();
-            fields.Initialize(annotations: null, dialect: SqlServer2012Dialect.Instance);
+            fields.Initialize(annotations: null, dialect: SqlServer2012Dialect.Instance, userEntityOptions: null);
             new ComplexRow(fields)
             {
                 BasicExpression = "test"
@@ -43,11 +43,11 @@ public class RowCreationTests
     public void Can_Create_Two_Rows_With_Different_Field_Names()
     {
         var fields1 = new ComplexRow.RowFields();
-        fields1.Initialize(annotations: null, dialect: SqlServer2012Dialect.Instance);
+        fields1.Initialize(annotations: null, dialect: SqlServer2012Dialect.Instance, userEntityOptions: null);
         fields1.BasicExpression.Expression = "Test1";
         var row1 = new ComplexRow(fields1);
         var fields2 = new ComplexRow.RowFields();
-        fields2.Initialize(annotations: null, dialect: SqlServer2012Dialect.Instance);
+        fields2.Initialize(annotations: null, dialect: SqlServer2012Dialect.Instance, userEntityOptions: null);
         fields2.BasicExpression.Expression = "Test2";
         var row2 = new ComplexRow(fields2);
         Assert.Equal("Test1", row1.GetFields().BasicExpression.Expression);

@@ -356,7 +356,7 @@ public class OriginPropertyTests
     public void Origin_Expression_Uses_Join_Alias_And_Origin_Property_Name()
     {
         var fields = new OriginBasicRow.RowFields();
-        fields.Initialize(null, SqlServer2012Dialect.Instance);
+        fields.Initialize(annotations: null, dialect: SqlServer2012Dialect.Instance, userEntityOptions: null);
 
         Assert.Equal("Country.[Name]", fields.CountryName.Expression);
         Assert.Equal("Country.[Name]", fields.CountryNameByProperty.Expression);
@@ -369,7 +369,7 @@ public class OriginPropertyTests
     public void Origin_Expression_Uses_Column_Name_Of_Origin_Property()
     {
         var fields = new OriginColumnRow.RowFields();
-        fields.Initialize(null, SqlServer2012Dialect.Instance);
+        fields.Initialize(annotations: null, dialect: SqlServer2012Dialect.Instance, userEntityOptions: null);
 
         Assert.Equal("cc.[CustomCol]", fields.CountryName.Expression);
         Assert.Equal("CountryID Renamed", fields.CountryName.Caption?.Key);
@@ -384,7 +384,7 @@ public class OriginPropertyTests
     public void Origin_DisplayName_Is_Prefixed_With_Join_Property_Name()
     {
         var fields = new OriginDisplayNameRow.RowFields();
-        fields.Initialize(null, SqlServer2012Dialect.Instance);
+        fields.Initialize(annotations: null, dialect: SqlServer2012Dialect.Instance, userEntityOptions: null);
 
         // no TitlePrefix / DisplayName on join property -> property name is used
         Assert.Equal("CountryID Country Name", fields.CountryName.Caption?.Key);
@@ -403,7 +403,7 @@ public class OriginPropertyTests
     public void Origin_Expression_For_Nested_Origin_Prefixes_Join_Aliases()
     {
         var fields = new OriginNestedRow.RowFields();
-        fields.Initialize(null, SqlServer2012Dialect.Instance);
+        fields.Initialize(annotations: null, dialect: SqlServer2012Dialect.Instance, userEntityOptions: null);
 
         // CountryRow.RegionName has [Origin("jr", "Title")] so the origin of
         // the origin is resolved with a prefixed join alias
@@ -417,7 +417,7 @@ public class OriginPropertyTests
     public void Origin_Propagates_Size_And_Scale_Attributes()
     {
         var fields = new OriginAttributePropagationRow.RowFields();
-        fields.Initialize(null, SqlServer2012Dialect.Instance);
+        fields.Initialize(annotations: null, dialect: SqlServer2012Dialect.Instance, userEntityOptions: null);
 
         Assert.Equal("ap.[Code]", fields.CountryCode.Expression);
         Assert.Equal(100, fields.CountryCode.Size);
@@ -431,7 +431,7 @@ public class OriginPropertyTests
     {
         var ex = Assert.Throws<ArgumentOutOfRangeException>(() =>
         {
-            new OriginMissingJoinRow.RowFields().Initialize(null, SqlServer2012Dialect.Instance);
+            new OriginMissingJoinRow.RowFields().Initialize(annotations: null, dialect: SqlServer2012Dialect.Instance, userEntityOptions: null);
         });
 
         Assert.Contains(nameof(OriginMissingJoinRow), ex.Message);
@@ -445,7 +445,7 @@ public class OriginPropertyTests
     {
         var ex = Assert.Throws<ArgumentOutOfRangeException>(() =>
         {
-            new OriginNoRowTypeRow.RowFields().Initialize(null, SqlServer2012Dialect.Instance);
+            new OriginNoRowTypeRow.RowFields().Initialize(annotations: null, dialect: SqlServer2012Dialect.Instance, userEntityOptions: null);
         });
 
         Assert.Contains(nameof(OriginNoRowTypeRow), ex.Message);
@@ -458,7 +458,7 @@ public class OriginPropertyTests
     {
         var ex = Assert.Throws<ArgumentOutOfRangeException>(() =>
         {
-            new OriginRowJoinNoRowTypeRow.RowFields().Initialize(null, SqlServer2012Dialect.Instance);
+            new OriginRowJoinNoRowTypeRow.RowFields().Initialize(annotations: null, dialect: SqlServer2012Dialect.Instance, userEntityOptions: null);
         });
 
         Assert.Contains(nameof(OriginRowJoinNoRowTypeRow), ex.Message);
@@ -470,7 +470,7 @@ public class OriginPropertyTests
     public void Origin_Property_Prefix_Is_Determined_From_Join_Property_ID_Suffix()
     {
         var fields = new OriginPrefixRow.RowFields();
-        fields.Initialize(null, SqlServer2012Dialect.Instance);
+        fields.Initialize(annotations: null, dialect: SqlServer2012Dialect.Instance, userEntityOptions: null);
 
         // join property is "CountryID" so "Country" prefix is stripped
         Assert.Equal("p9.[Name]", fields.CountryName.Expression);
@@ -481,7 +481,7 @@ public class OriginPropertyTests
     public void Origin_Property_Prefix_Is_Determined_From_Common_Prefix_Of_Origin_Properties()
     {
         var fields = new OriginPrefixFromPropertiesRow.RowFields();
-        fields.Initialize(null, SqlServer2012Dialect.Instance);
+        fields.Initialize(annotations: null, dialect: SqlServer2012Dialect.Instance, userEntityOptions: null);
 
         // join property "CountryRef" has no ID suffix so the common prefix of
         // the origin property names ("CountryName", "CountryCode") is used
@@ -493,7 +493,7 @@ public class OriginPropertyTests
     public void Origin_Property_Prefix_Is_Taken_From_Join_PropertyPrefix()
     {
         var fields = new OriginPrefixAttributeRow.RowFields();
-        fields.Initialize(null, SqlServer2012Dialect.Instance);
+        fields.Initialize(annotations: null, dialect: SqlServer2012Dialect.Instance, userEntityOptions: null);
 
         Assert.Equal("p9c.[Name]", fields.PfxName.Expression);
     }

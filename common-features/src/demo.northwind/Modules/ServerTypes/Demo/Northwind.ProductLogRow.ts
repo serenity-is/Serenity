@@ -3,7 +3,7 @@
 export interface ProductLogRow {
     ProductLogID?: number;
     OperationType?: CaptureOperationType;
-    ChangingUserId?: number;
+    ChangingUserId?: any;
     ValidFrom?: string;
     ValidUntil?: string;
     ProductID?: number;

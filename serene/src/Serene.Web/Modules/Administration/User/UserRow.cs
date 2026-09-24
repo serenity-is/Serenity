@@ -56,7 +56,7 @@ public sealed class UserRow : Serenity.Extensions.Entities.LoggingRow<UserRow.Ro
     StringField IPasswordRow.PasswordHashField => fields.PasswordHash;
     StringField IPasswordRow.PasswordSaltField => fields.PasswordSalt;
 
-    public class RowFields(IOptions<UserEntityOptions>? userEntityOptions = null) : LoggingRowFields(userEntityOptions)
+    public class RowFields() : LoggingRowFields()
     {
         public Int32Field UserId = null!;
         public StringField Username = null!;

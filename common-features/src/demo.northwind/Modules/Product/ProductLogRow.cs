@@ -8,7 +8,9 @@ public sealed class ProductLogRow : Row<ProductLogRow.RowFields>, ICaptureLogRow
 
     public CaptureOperationType? OperationType { get => fields.OperationType[this]; set => fields.OperationType[this] = value; }
 
-    public int? ChangingUserId { get => fields.ChangingUserId[this]; set => fields.ChangingUserId[this] = value; }
+
+    [UserIdFieldType]
+    public object? ChangingUserId { get => fields.ChangingUserId.AsObject(this); set => fields.ChangingUserId.AsObject(this, value); }
 
     public DateTime? ValidFrom { get => fields.ValidFrom[this]; set => fields.ValidFrom[this] = value; }
 
@@ -49,7 +51,7 @@ public sealed class ProductLogRow : Row<ProductLogRow.RowFields>, ICaptureLogRow
     {
         public Int64Field ProductLogID = null!;
         public EnumField<CaptureOperationType> OperationType = null!;
-        public Int32Field ChangingUserId = null!;
+        public Field ChangingUserId = null!;
         public DateTimeField ValidFrom = null!;
         public DateTimeField ValidUntil = null!;
 

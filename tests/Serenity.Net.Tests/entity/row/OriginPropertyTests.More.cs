@@ -106,7 +106,7 @@ public class OriginPropertyTestsMore
     public void Row_Join_PropertyPrefix_Is_Used_For_Origin_Alias()
     {
         var fields = new OriginRowJoinPrefixRow.RowFields();
-        fields.Initialize(null, SqlServer2012Dialect.Instance);
+        fields.Initialize(annotations: null, dialect: SqlServer2012Dialect.Instance, userEntityOptions: null);
 
         Assert.Equal("rj.[Name]", fields.CountryName.Expression);
     }
@@ -115,7 +115,7 @@ public class OriginPropertyTestsMore
     public void Origin_Without_Property_Uses_Property_Name_When_No_Prefix()
     {
         var fields = new OriginSinglePropertyRow.RowFields();
-        fields.Initialize(null, SqlServer2012Dialect.Instance);
+        fields.Initialize(annotations: null, dialect: SqlServer2012Dialect.Instance, userEntityOptions: null);
 
         Assert.Equal("sp.[Name]", fields.Name.Expression);
     }
@@ -124,7 +124,7 @@ public class OriginPropertyTestsMore
     public void Origin_Property_Not_Found_Throws()
     {
         var ex = Assert.Throws<ArgumentOutOfRangeException>(() =>
-            new OriginMissingPropertyRow.RowFields().Initialize(null, SqlServer2012Dialect.Instance));
+            new OriginMissingPropertyRow.RowFields().Initialize(annotations: null, dialect: SqlServer2012Dialect.Instance, userEntityOptions: null));
 
         Assert.Contains("'MissingProperty'", ex.Message);
     }
@@ -133,7 +133,7 @@ public class OriginPropertyTestsMore
     public void Origin_Expression_Uses_Expression_Attribute_Of_Origin_Property()
     {
         var fields = new OriginFromExpressionRow.RowFields();
-        fields.Initialize(null, SqlServer2012Dialect.Instance);
+        fields.Initialize(annotations: null, dialect: SqlServer2012Dialect.Instance, userEntityOptions: null);
 
         Assert.Equal("X", fields.CountryName.Expression);
     }
@@ -141,7 +141,7 @@ public class OriginPropertyTestsMore
     [Fact]
     public void PrefixAliases_Guards_Arguments()
     {
-        var dictionary = OriginPropertyDictionary.GetPropertyDictionary(typeof(OriginPropertyTests.CountryRow));
+        var dictionary = OriginPropertyDictionary.GetPropertyDictionary(typeof(OriginPropertyTests.CountryRow), userEntityOptions: null);
         var selector = new DialectExpressionSelector(SqlServer2012Dialect.Instance);
 
         Assert.Equal("  ", dictionary.PrefixAliases("  ", "a", selector, []));
@@ -207,7 +207,7 @@ public class OriginPropertyTestsMore
     public void PrefixAliases_Maps_Row_And_Property_Join_Aliases()
     {
         var fields = new OriginFromJoinsExpressionRow.RowFields();
-        fields.Initialize(null, SqlServer2012Dialect.Instance);
+        fields.Initialize(annotations: null, dialect: SqlServer2012Dialect.Instance, userEntityOptions: null);
 
         Assert.Contains("eo_lj", fields.CountryName.Expression);
         Assert.Contains("eo_ij", fields.CountryName.Expression);

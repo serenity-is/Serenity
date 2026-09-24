@@ -21,7 +21,7 @@ public class LoggingRowTests
     public void Constructor_With_Fields_Sets_Fields()
     {
         var fields = new TestLoggingRow.RowFields();
-        fields.Initialize(null, SqlSettings.DefaultDialect);
+        fields.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect, userEntityOptions: null);
         var row = new TestLoggingRow(fields);
         Assert.Same(fields, row.GetFields());
     }

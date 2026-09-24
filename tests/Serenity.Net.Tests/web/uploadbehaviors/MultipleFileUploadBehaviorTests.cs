@@ -58,7 +58,7 @@ public partial class MultipleFileUploadBehaviorTests
     public void ActivateFor_ThrowsArgumentException_WhenTargetType_IsNotStringFieldAndPropertyNameIsNull()
     {
         var fields = new MultipleTestIIdRow.RowFields();
-        fields.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect);
+        fields.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect, userEntityOptions: null);
         fields.IntegerFieldImageUploadEditor.PropertyName = null;
 
         var sut = new FileUploadBehavior(new MockUploadStorage(), new MockUploadProcessor())
@@ -87,7 +87,7 @@ public partial class MultipleFileUploadBehaviorTests
     public void ActivateFor_ThrowsArgumentException_WhenRow_DoesNotInherits_IIdRowAndPropertyNameIsNull()
     {
         var fields = new MultipleTestRow.RowFields();
-        fields.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect);
+        fields.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect, userEntityOptions: null);
         fields.StringFieldImageUploadEditor.PropertyName = null;
 
         var sut = new FileUploadBehavior(new MockUploadStorage(), new MockUploadProcessor())

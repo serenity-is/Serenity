@@ -5,7 +5,7 @@ export interface NoteRow {
     EntityType?: string;
     EntityId?: string;
     Text?: string;
-    InsertUserId?: number;
+    InsertUserId?: any;
     InsertDate?: string;
     InsertUserDisplayName?: string;
 }

@@ -9,7 +9,7 @@ public sealed class UserPermissionRow : Row<UserPermissionRow.RowFields>, IIdRow
     [DisplayName("User Permission Id"), Identity, IdProperty]
     public long? UserPermissionId { get => fields.UserPermissionId[this]; set => fields.UserPermissionId[this] = value; }
 
-    [DisplayName("User Id"), NotNull, ForeignKey("Users", "UserId"), LeftJoin("jUser")]
+    [DisplayName("User Id"), NotNull, ForeignKey(typeof(UserRow)), LeftJoin("jUser")]
     public int? UserId { get => fields.UserId[this]; set => fields.UserId[this] = value; }
 
     [DisplayName("Permission Key"), Size(100), NotNull, QuickSearch, NameProperty]

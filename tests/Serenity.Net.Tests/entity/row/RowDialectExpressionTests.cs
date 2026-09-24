@@ -46,7 +46,7 @@ public class RowDialectExpressionTests
     {
         var ex = Assert.Throws<AmbiguousMatchException>(() =>
         {
-            new DuplicateLeftJoinNoDialectRow.RowFields().Initialize(null, SqlServer2012Dialect.Instance);
+            new DuplicateLeftJoinNoDialectRow.RowFields().Initialize(annotations: null, dialect: SqlServer2012Dialect.Instance, userEntityOptions: null);
         });
 
         Assert.Contains(nameof(DuplicateLeftJoinNoDialectRow), ex.Message);
@@ -57,7 +57,7 @@ public class RowDialectExpressionTests
     public void Uses_One_Of_LeftJoins_If_Dialect_For_Same_Alias_Joins_Are_Different()
     {
         var fields = new DuplicateLeftJoinDifferentDialectWithForeignKeyLeftJoinRow.RowFields();
-        fields.Initialize(null, SqlServer2012Dialect.Instance);
+        fields.Initialize(annotations: null, dialect: SqlServer2012Dialect.Instance, userEntityOptions: null);
 
         var join = Assert.Contains("a", fields.Joins);
         Assert.Equal("z", join.Table);
@@ -68,7 +68,7 @@ public class RowDialectExpressionTests
     public void Should_Use_Sqlite_Dialect_On_ForeignKey_LeftJoin()
     {
         var fields = new DuplicateLeftJoinDifferentDialectWithForeignKeyLeftJoinRow.RowFields();
-        fields.Initialize(null, SqliteDialect.Instance);
+        fields.Initialize(annotations: null, dialect: SqliteDialect.Instance, userEntityOptions: null);
 
         var join = Assert.Contains("y", fields.Joins);
         Assert.Equal("a", join.Table);
@@ -79,7 +79,7 @@ public class RowDialectExpressionTests
     public void Should_Use_SqlServer_Dialect_On_ForeignKey_LeftJoin()
     {
         var fields = new DuplicateLeftJoinDifferentDialectWithForeignKeyLeftJoinRow.RowFields();
-        fields.Initialize(null, SqlServer2012Dialect.Instance);
+        fields.Initialize(annotations: null, dialect: SqlServer2012Dialect.Instance, userEntityOptions: null);
 
         var join = Assert.Contains("z", fields.Joins);
         Assert.Equal("a", join.Table);
@@ -90,7 +90,7 @@ public class RowDialectExpressionTests
     public void Uses_Matching_Dialect_LeftJoin_On_Property()
     {
         var fields = new DuplicateLeftJoinDifferentDialectWithForeignKeyLeftJoinRow.RowFields();
-        fields.Initialize(null, SqliteDialect.Instance);
+        fields.Initialize(annotations: null, dialect: SqliteDialect.Instance, userEntityOptions: null);
 
         var join = Assert.Contains("y", fields.Joins);
         Assert.Equal("a", join.Table);
@@ -101,7 +101,7 @@ public class RowDialectExpressionTests
     public void Can_Negate_Matching_Dialect_On_SqlServer_LeftJoin()
     {
         var fields = new DuplicateLeftJoinDifferentDialectWithForeignKeyLeftJoinRow.RowFields();
-        fields.Initialize(null, SqlServer2012Dialect.Instance);
+        fields.Initialize(annotations: null, dialect: SqlServer2012Dialect.Instance, userEntityOptions: null);
 
         var join = Assert.Contains("b", fields.Joins);
         Assert.Equal("y", join.Table);
@@ -112,7 +112,7 @@ public class RowDialectExpressionTests
     public void Can_Negate_Matching_Dialect_On_MySql_LeftJoin()
     {
         var fields = new DuplicateLeftJoinDifferentDialectWithForeignKeyLeftJoinRow.RowFields();
-        fields.Initialize(null, MySqlDialect.Instance);
+        fields.Initialize(annotations: null, MySqlDialect.Instance, userEntityOptions: null);
 
         var join = Assert.Contains("b", fields.Joins);
         Assert.Equal("w", join.Table);
@@ -123,7 +123,7 @@ public class RowDialectExpressionTests
     public void Can_Negate_Matching_Dialect_On_SqlServer_LeftJoin_On_Property()
     {
         var fields = new DuplicateLeftJoinDifferentDialectWithForeignKeyLeftJoinRow.RowFields();
-        fields.Initialize(null, SqlServer2012Dialect.Instance);
+        fields.Initialize(annotations: null, dialect: SqlServer2012Dialect.Instance, userEntityOptions: null);
 
         var join = Assert.Contains("q", fields.Joins);
         Assert.Equal("w", join.Table);
@@ -134,7 +134,7 @@ public class RowDialectExpressionTests
     public void Can_Negate_Matching_Dialect_On_MySql_LeftJoin_On_Property()
     {
         var fields = new DuplicateLeftJoinDifferentDialectWithForeignKeyLeftJoinRow.RowFields();
-        fields.Initialize(null, MySqlDialect.Instance);
+        fields.Initialize(annotations: null, MySqlDialect.Instance, userEntityOptions: null);
 
         var join = Assert.Contains("q", fields.Joins);
         Assert.Equal("z", join.Table);
@@ -145,7 +145,7 @@ public class RowDialectExpressionTests
     public void Uses_One_Of_InnerJoins_If_Dialect_For_Same_Alias_Joins_Are_Different()
     {
         var fields = new DuplicateLeftJoinDifferentDialectWithForeignKeyLeftJoinRow.RowFields();
-        fields.Initialize(null, SqlServer2012Dialect.Instance);
+        fields.Initialize(annotations: null, dialect: SqlServer2012Dialect.Instance, userEntityOptions: null);
 
         var join = Assert.Contains("inner", fields.Joins);
         Assert.Equal("b", join.Table);
@@ -156,7 +156,7 @@ public class RowDialectExpressionTests
     public void Uses_One_Of_OuterApplys_If_Dialect_For_Same_Alias_Joins_Are_Different()
     {
         var fields = new DuplicateLeftJoinDifferentDialectWithForeignKeyLeftJoinRow.RowFields();
-        fields.Initialize(null, SqlServer2012Dialect.Instance);
+        fields.Initialize(annotations: null, dialect: SqlServer2012Dialect.Instance, userEntityOptions: null);
 
         var join = Assert.Contains("outer", fields.Joins);
         Assert.Equal("(w)", join.Table);
@@ -166,7 +166,7 @@ public class RowDialectExpressionTests
     public void Can_Negate_One_Of_InnerJoins_If_Dialect_For_Same_Alias_Joins_Are_Different()
     {
         var fields = new DuplicateLeftJoinDifferentDialectWithForeignKeyLeftJoinRow.RowFields();
-        fields.Initialize(null, SqlServer2012Dialect.Instance);
+        fields.Initialize(annotations: null, dialect: SqlServer2012Dialect.Instance, userEntityOptions: null);
 
         var join = Assert.Contains("inner negate", fields.Joins);
         Assert.Equal("y", join.Table);
@@ -177,7 +177,7 @@ public class RowDialectExpressionTests
     public void Can_Negate_One_Of_OuterApplys_If_Dialect_For_Same_Alias_Joins_Are_Different()
     {
         var fields = new DuplicateLeftJoinDifferentDialectWithForeignKeyLeftJoinRow.RowFields();
-        fields.Initialize(null, SqlServer2012Dialect.Instance);
+        fields.Initialize(annotations: null, dialect: SqlServer2012Dialect.Instance, userEntityOptions: null);
 
         var join = Assert.Contains("outer negate", fields.Joins);
         Assert.Equal("(y)", join.Table);
@@ -188,7 +188,7 @@ public class RowDialectExpressionTests
     public void Uses_One_Of_InnerJoins_If_Dialect_For_Same_Alias_Joins_Are_Different_On_Property()
     {
         var fields = new DuplicateLeftJoinDifferentDialectWithForeignKeyLeftJoinRow.RowFields();
-        fields.Initialize(null, SqlServer2012Dialect.Instance);
+        fields.Initialize(annotations: null, dialect: SqlServer2012Dialect.Instance, userEntityOptions: null);
 
         var join = Assert.Contains("e", fields.Joins);
         Assert.Equal("z", join.Table);
@@ -199,7 +199,7 @@ public class RowDialectExpressionTests
     public void Can_Negate_One_Of_InnerJoins_If_Dialect_For_Same_Alias_Joins_Are_Different_On_Property()
     {
         var fields = new DuplicateLeftJoinDifferentDialectWithForeignKeyLeftJoinRow.RowFields();
-        fields.Initialize(null, SqlServer2012Dialect.Instance);
+        fields.Initialize(annotations: null, dialect: SqlServer2012Dialect.Instance, userEntityOptions: null);
 
         var join = Assert.Contains("w", fields.Joins);
         Assert.Equal("w", join.Table);

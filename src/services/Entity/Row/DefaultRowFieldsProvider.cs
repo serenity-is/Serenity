@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Serenity.Reflection;
 
 namespace Serenity.Data;
@@ -70,7 +71,7 @@ public class DefaultRowFieldsProvider(IServiceProvider serviceProvider) : IRowFi
         var dialect = connectionStrings?.TryGetConnectionString(fields.ConnectionKey)?
             .Dialect ?? SqlSettings.DefaultDialect;
 
-        fields.Initialize(annotations, dialect);
+        fields.Initialize(annotations, dialect, serviceProvider.GetService<IOptions<UserEntityOptions>>()?.Value);
 
         if (alias != null)
             fields.ReplaceAliasWith(alias);

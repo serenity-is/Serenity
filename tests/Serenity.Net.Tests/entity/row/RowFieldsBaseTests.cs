@@ -4,6 +4,25 @@ public class RowFieldsBaseTests
 {
     #region test rows
 
+    public class AbstractFieldRow : Row<AbstractFieldRow.RowFields>
+    {
+        private object? _UserId;
+        internal object? StoredUserId => _UserId;
+
+        public class RowFields : RowFieldsBase
+        {
+            public Field UserId = null!;
+        }
+
+        public AbstractFieldRow(RowFields fields) : base(fields)
+        {
+            _UserId = null;
+        }
+
+        [Serenity.Data.Mapping.UserIdFieldType]
+        public object? UserId { get => fields.UserId.AsObject(this); set => fields.UserId.AsObject(this, value); }
+    }
+
     public class PlainRow : Row<PlainRow.RowFields>
     {
         public class RowFields : RowFieldsBase
@@ -168,6 +187,36 @@ public class RowFieldsBaseTests
     #endregion
 
     [Fact]
+    public void Initialize_AbstractFieldWithGuidValueType()
+    {
+        var fields = new AbstractFieldRow.RowFields();
+        fields.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect,
+            userEntityOptions: new UserEntityOptions { IdFieldType = typeof(GuidField) });
+        var row = new AbstractFieldRow(fields);
+        var expected = Guid.NewGuid();
+
+        row.UserId = expected;
+
+        Assert.Equal(expected, row.StoredUserId);
+        Assert.Equal(expected, Assert.IsType<Guid>(row.UserId));
+    }
+
+    [Fact]
+    public void Initialize_AbstractFieldWithStringValueType()
+    {
+        var fields = new AbstractFieldRow.RowFields();
+        fields.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect,
+            userEntityOptions: new UserEntityOptions { IdFieldType = typeof(StringField) });
+        var row = new AbstractFieldRow(fields);
+        const string expected = "user-id";
+
+        row.UserId = expected;
+
+        Assert.Equal(expected, row.StoredUserId);
+        Assert.Equal(expected, Assert.IsType<string>(row.UserId));
+    }
+
+    [Fact]
     public void ParseDatabaseAndSchema_Variants()
     {
         Assert.Null(RowFieldsBase.ParseDatabaseAndSchema(null, out string? db1, out string? schema1));
@@ -241,7 +290,7 @@ public class RowFieldsBaseTests
         var f = new AttributeMetadataRow.RowFields();
         Assert.Equal("MyConn", f.ConnectionKey);
 
-        f.Initialize(null, SqlSettings.DefaultDialect);
+        f.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect, userEntityOptions: null);
         Assert.Equal("MyModule", f.ModuleIdentifier);
         Assert.Equal("MyPrefix", f.LocalTextPrefix);
         Assert.Equal("MyConn.AttributeMetadata", f.GenerationKey);
@@ -253,7 +302,7 @@ public class RowFieldsBaseTests
         var f = new PlainRow.RowFields();
         Assert.Equal("Default", f.ConnectionKey);
 
-        f.Initialize(null, SqlSettings.DefaultDialect);
+        f.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect, userEntityOptions: null);
         Assert.Equal("Data", f.ModuleIdentifier);
         Assert.Equal("Data.Plain", f.LocalTextPrefix);
         Assert.Equal("Data.Plain", f.RowIdentifier);
@@ -264,9 +313,9 @@ public class RowFieldsBaseTests
     public void Initialize_SecondCall_IsIgnored()
     {
         var f = new PlainRow.RowFields();
-        f.Initialize(null, SqlSettings.DefaultDialect);
+        f.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect, userEntityOptions: null);
         Assert.Equal(2, f.Count);
-        f.Initialize(null, SqlSettings.DefaultDialect);
+        f.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect, userEntityOptions: null);
         Assert.Equal(2, f.Count);
     }
 
@@ -279,7 +328,7 @@ public class RowFieldsBaseTests
         Assert.Null(f.FindFieldByPropertyName(null));
         Assert.Null(f.FindFieldByPropertyName("Unknown"));
 
-        f.Initialize(null, SqlSettings.DefaultDialect);
+        f.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect, userEntityOptions: null);
         Assert.Equal(f.Name, f.FindField("name"));
         Assert.Equal(f.Name, f.FindFieldByPropertyName("Name"));
         Assert.Equal(f.Id, f.FindFieldByPropertyName("Id"));
@@ -289,7 +338,7 @@ public class RowFieldsBaseTests
     public void Modification_AfterInitialization_Throws()
     {
         var f = new PlainRow.RowFields();
-        f.Initialize(null, SqlSettings.DefaultDialect);
+        f.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect, userEntityOptions: null);
 
         Assert.Throws<InvalidOperationException>(() => f.RemoveAt(0));
         Assert.Throws<InvalidOperationException>(() => f[0] = f.Id);
@@ -322,7 +371,7 @@ public class RowFieldsBaseTests
     public void GetFieldsByAttribute_CustomAttribute()
     {
         var f = new FlaggedRow.RowFields();
-        f.Initialize(null, SqlSettings.DefaultDialect);
+        f.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect, userEntityOptions: null);
 
         var testFields = f.GetFieldsByAttribute(typeof(CustomTestAttribute));
         Assert.Single(testFields);
@@ -338,11 +387,11 @@ public class RowFieldsBaseTests
     public void LookupIncludeAndInferTextualFields()
     {
         var flaggedFields = new FlaggedRow.RowFields();
-        flaggedFields.Initialize(null, SqlSettings.DefaultDialect);
+        flaggedFields.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect, userEntityOptions: null);
         Assert.True(flaggedFields.Test2.IsLookup);
 
         var f = new JoinRow.RowFields();
-        f.Initialize(null, SqlSettings.DefaultDialect);
+        f.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect, userEntityOptions: null);
 
         Assert.Equal(3, f.Count);
         Assert.Equal("COUNTRY", f.CountryID.ForeignTable);
@@ -440,7 +489,7 @@ public class RowFieldsBaseTests
         Assert.Throws<AmbiguousMatchException>(() =>
         {
             var f = new AmbiguousJoinColumnRow.RowFields();
-            f.Initialize(null, SqlSettings.DefaultDialect);
+            f.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect, userEntityOptions: null);
         });
     }
 
@@ -450,7 +499,7 @@ public class RowFieldsBaseTests
         Assert.Throws<AmbiguousMatchException>(() =>
         {
             var f = new AmbiguousExpressionRow.RowFields();
-            f.Initialize(null, SqlSettings.DefaultDialect);
+            f.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect, userEntityOptions: null);
         });
     }
 
@@ -458,7 +507,7 @@ public class RowFieldsBaseTests
     public void PrimaryKeys_IdField_AndSortOrders()
     {
         var f = new PrimaryKeyRow.RowFields();
-        f.Initialize(null, SqlSettings.DefaultDialect);
+        f.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect, userEntityOptions: null);
 
         var pks = f.PrimaryKeys;
         Assert.Single(pks);
@@ -520,7 +569,7 @@ public class RowFieldsBaseTests
     public void ReplaceAliasWith_JoinAliasesArePrefixedAndLocked()
     {
         var f = new AliasReplaceJoinRow.RowFields();
-        f.Initialize(null, SqlSettings.DefaultDialect);
+        f.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect, userEntityOptions: null);
 
         f.ReplaceAliasWith("base");
 

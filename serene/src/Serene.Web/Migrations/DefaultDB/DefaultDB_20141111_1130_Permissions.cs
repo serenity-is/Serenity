@@ -10,7 +10,7 @@ public class DefaultDB_20141111_1130_Permissions(IOptions<UserEntityOptions>? us
         Create.Table("UserPermissions")
             .WithColumn("UserPermissionId").AsInt64().IdentityKey(this)
             .WithColumn("UserId").AsUserIdType(userEntityOptions).NotNullable()
-                .ForeignKey("FK_UserPermissions_UserId", "Users", "UserId")
+                .UserIdForeignKey(userEntityOptions, "FK_UserPermissions_UserId")
             .WithColumn("PermissionKey").AsString(100).NotNullable()
             .WithColumn("Granted").AsBoolean().NotNullable().WithDefaultValue(true);
 
@@ -39,7 +39,7 @@ public class DefaultDB_20141111_1130_Permissions(IOptions<UserEntityOptions>? us
         Create.Table("UserRoles")
             .WithColumn("UserRoleId").AsInt64().IdentityKey(this)
             .WithColumn("UserId").AsUserIdType(userEntityOptions).NotNullable()
-                .ForeignKey("FK_UserRoles_UserId", "Users", "UserId")
+                .UserIdForeignKey(userEntityOptions, "FK_UserRoles_UserId")
             .WithColumn("RoleId").AsInt32().NotNullable()
                 .ForeignKey("FK_UserRoles_RoleId", "Roles", "RoleId");
 

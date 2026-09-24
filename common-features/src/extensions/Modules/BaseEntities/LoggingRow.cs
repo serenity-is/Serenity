@@ -24,7 +24,7 @@ public abstract class LoggingRow<TFields> : Row<TFields>, ILoggingRow
     /// <summary>
     /// Gets or sets the ID of the user who inserted the row.
     /// </summary>
-    [NotNull, Insertable(false), Updatable(false)]
+    [NotNull, Insertable(false), Updatable(false), UserIdFieldType]
     public object? InsertUserId { get => fields.InsertUserId.AsObject(this); set => fields.InsertUserId.AsObject(this, value); }
 
     /// <summary>
@@ -36,7 +36,7 @@ public abstract class LoggingRow<TFields> : Row<TFields>, ILoggingRow
     /// <summary>
     /// Gets or sets the ID of the user who last updated the row.
     /// </summary>
-    [Insertable(false), Updatable(false)]
+    [Insertable(false), Updatable(false), UserIdFieldType]
     public object? UpdateUserId { get => fields.UpdateUserId.AsObject(this); set => fields.UpdateUserId.AsObject(this, value); }
 
     /// <summary>
@@ -59,19 +59,9 @@ public abstract class LoggingRow<TFields> : Row<TFields>, ILoggingRow
 /// </remarks>
 /// <param name="tableName">Tablename</param>
 /// <param name="fieldPrefix">Field prefix</param>
-/// <param name="userEntityOptions">User entity options</param>
-public class LoggingRowFields(IOptions<UserEntityOptions>? userEntityOptions = null, string? tableName = null, string fieldPrefix = "")
+public class LoggingRowFields(string? tableName = null, string fieldPrefix = "")
     : RowFieldsBase(tableName, fieldPrefix)
 {
-    /// <inheritdoc/>
-    protected override Type? GetFieldTypeToCreate(System.Reflection.FieldInfo fieldInfo, Reflection.IPropertyInfo? property)
-    {
-        if (fieldInfo.Name is nameof(InsertUserId) or nameof(UpdateUserId))
-            return userEntityOptions?.Value?.IdFieldType ?? typeof(Int32Field);
-
-        return base.GetFieldTypeToCreate(fieldInfo, property);
-    }
-
     /// <summary>
     /// The ID of the user who inserted the row.
     /// </summary>

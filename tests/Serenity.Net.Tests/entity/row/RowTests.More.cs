@@ -89,7 +89,7 @@ public class RowTestsMore
     public void CreateNew_Without_RowFactory_Throws()
     {
         var fields = new NoFactoryRow.RowFields();
-        fields.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect);
+        fields.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect, userEntityOptions: null);
         fields.rowFactory = null;
         var row = new NoFactoryRow(fields);
 

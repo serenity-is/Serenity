@@ -55,7 +55,7 @@ public class FallbackRowFieldsProvider : IRowFieldsProvider
     private static RowFieldsBase CreateType(Type fieldsType, string? alias)
     {
         var fields = (RowFieldsBase)Activator.CreateInstance(fieldsType)!;
-        fields.Initialize(annotations: null, SqlSettings.DefaultDialect);
+        fields.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect, userEntityOptions: null);
 
         if (alias != null)
             fields.ReplaceAliasWith(alias);

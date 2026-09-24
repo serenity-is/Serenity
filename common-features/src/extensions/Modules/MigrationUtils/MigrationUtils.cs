@@ -413,10 +413,27 @@ public static class MigrationUtils
         else if (fieldType == typeof(Int64Field))
             return syntax.AsInt64();
         else if (fieldType == typeof(StringField))
-            return syntax.AsString(userEntityOptions?.Value?.IdFieldSize ?? 100);
+            return syntax.AsString(userEntityOptions?.Value?.IdColumnSize ?? 100);
         else if (fieldType == typeof(GuidField))
             return syntax.AsGuid();
             
         throw new InvalidOperationException("UserEntityOptions.IdFieldType is not supported: " + fieldType.FullName);
+    }
+
+    /// <summary>
+    /// Sets the foreign key for a user ID column based on the UserEntityOptions, linking it to the "Users" table and "UserId" column.
+    /// </summary>
+    /// <typeparam name="TNext">TNext</typeparam>
+    /// <typeparam name="TNextFk">TNextFk</typeparam>
+    /// <param name="syntax">The column option syntax</param>
+    /// <param name="userEntityOptions">User entity options</param>
+    /// <param name="foreignKeyName">Foreign key name</param>
+    /// <returns>The column option syntax with the foreign key applied</returns>
+    public static TNextFk UserIdForeignKey<TNext, TNextFk>(this IColumnOptionSyntax<TNext, TNextFk> syntax,
+        IOptions<UserEntityOptions>? userEntityOptions, string foreignKeyName)
+        where TNext : FluentMigrator.Infrastructure.IFluentSyntax
+        where TNextFk : FluentMigrator.Infrastructure.IFluentSyntax
+    {
+        return syntax.ForeignKey(foreignKeyName, userEntityOptions?.Value?.TableName ?? "Users", userEntityOptions?.Value?.IdColumnName ?? "UserId");
     }
 }

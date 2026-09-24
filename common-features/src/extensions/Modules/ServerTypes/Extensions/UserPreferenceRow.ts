@@ -2,7 +2,7 @@
 
 export interface UserPreferenceRow {
     UserPreferenceId?: number;
-    UserId?: number;
+    UserId?: any;
     PreferenceType?: string;
     Name?: string;
     Value?: string;

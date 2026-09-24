@@ -44,7 +44,7 @@ public class DataValidationTests
     private static TestRow NewRow()
     {
         var fields = new TestRow.RowFields();
-        fields.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect);
+        fields.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect, userEntityOptions: null);
         return new TestRow(fields);
     }
 

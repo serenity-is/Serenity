@@ -109,7 +109,7 @@ public class SaveRequestHandlerTests_Coverage
     private static CoverRow NewCoverRow()
     {
         var fields = new CoverRow.RowFields();
-        fields.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect);
+        fields.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect, userEntityOptions: null);
         return new CoverRow(fields);
     }
 

@@ -3,6 +3,7 @@ namespace Serenity.Data;
 internal class OriginPropertyDictionary
 {
     internal Type rowType;
+    internal UserEntityOptions? userEntityOptions;
     internal Dictionary<string, PropertyInfo> propertyByName;
     internal Dictionary<string, (string propertyName, ForeignKeyAttribute[] foreignKeys, ISqlJoin join)> joinPropertyByAlias;
     internal Dictionary<string, ISqlJoin> joinPropertyByName;
@@ -12,11 +13,13 @@ internal class OriginPropertyDictionary
     internal ILookup<string, KeyValuePair<string, OriginAttribute>> originByAlias;
     internal IDictionary<string, string> prefixByAlias;
 
-    internal static ConcurrentDictionary<Type, OriginPropertyDictionary> cache = new();
+    internal static ConcurrentDictionary<(Type rowType, Type? userRowType, string userTable, string? userIdColumn), 
+        OriginPropertyDictionary> cache = new();
 
-    public OriginPropertyDictionary(Type rowType)
+    public OriginPropertyDictionary(Type rowType, UserEntityOptions? userEntityOptions)
     {
         this.rowType = rowType;
+        this.userEntityOptions = userEntityOptions;
         rowJoinByAlias = new Dictionary<string, ISqlJoin>(StringComparer.OrdinalIgnoreCase);
 
         propertyByName = new Dictionary<string, PropertyInfo>(StringComparer.OrdinalIgnoreCase);
@@ -101,14 +104,14 @@ internal class OriginPropertyDictionary
         return prefix;
     }
 
-    public static OriginPropertyDictionary GetPropertyDictionary(Type rowType)
+    public static OriginPropertyDictionary GetPropertyDictionary(Type rowType, UserEntityOptions? userEntityOptions)
     {
-        if (!cache.TryGetValue(rowType, out OriginPropertyDictionary? dictionary))
-        {
-            dictionary = new OriginPropertyDictionary(rowType);
-            cache[rowType] = dictionary;
-        }
-        return dictionary;
+        var cacheKey = (rowType,
+            userEntityOptions?.RowType,
+            userEntityOptions?.TableName ?? "Users",
+            userEntityOptions?.IdColumnName ?? "UserId");
+
+        return cache.GetOrAdd(cacheKey, _ => new OriginPropertyDictionary(rowType, userEntityOptions));
     }
 
     private Tuple<PropertyInfo, Type> GetOriginProperty(string propertyName, DialectExpressionSelector expressionSelector)
@@ -152,7 +155,7 @@ internal class OriginPropertyDictionary
             var joinPropertyName = joinProperty.propertyName;
             var fk = expressionSelector.GetBestMatch(joinProperty.foreignKeys, x => x.Dialect);
             var lj = joinProperty.join;
-            originRowType = (lj.RowType ?? fk!.RowType) ?? throw new ArgumentOutOfRangeException(nameof(origin), string.Format(
+            originRowType = (lj.RowType ?? (fk is UserIdJoinKeyAttribute ? userEntityOptions?.RowType : null) ?? fk!.RowType) ?? throw new ArgumentOutOfRangeException(nameof(origin), string.Format(
                     "Property '{0}' on row type '{1}' has a [Origin] attribute, " +
                     "but [ForeignKey] and [LeftJoin] attributes on related join " +
                     "property '{2}' doesn't use a typeof(SomeRow)!",
@@ -173,7 +176,7 @@ internal class OriginPropertyDictionary
                     property.Name, rowType.Name, joinAlias));
         }
 
-        var originDictionary = GetPropertyDictionary(originRowType);
+        var originDictionary = GetPropertyDictionary(originRowType, userEntityOptions);
         string originPropertyName;
         PropertyInfo? originProperty = null;
 
@@ -227,7 +230,7 @@ internal class OriginPropertyDictionary
             return aliasPrefix + "." + SqlSyntax.AutoBracket(columnAttr.Name, expressionSelector.Dialect);
         else
         {
-            var originDictionary = GetPropertyDictionary(org.Item2);
+            var originDictionary = GetPropertyDictionary(org.Item2, userEntityOptions);
 
             var expressionAttr = originProperty.GetCustomAttributes<BaseExpressionAttribute>();
             if (expressionAttr.Any())
@@ -268,7 +271,7 @@ internal class OriginPropertyDictionary
         var originOrigin = originProperty.GetCustomAttribute<OriginAttribute>();
         if (originOrigin != null)
         {
-            var originDictionary = GetPropertyDictionary(org.Item2);
+            var originDictionary = GetPropertyDictionary(org.Item2, userEntityOptions);
             return originDictionary.OriginAttribute<TAttr>(originProperty.Name, expressionSelector, recursion + 1);
         }
 
@@ -322,7 +325,7 @@ internal class OriginPropertyDictionary
         var originOrigin = originProperty.GetCustomAttribute<OriginAttribute>();
         if (originOrigin != null)
         {
-            var originDictionary = GetPropertyDictionary(org.Item2);
+            var originDictionary = GetPropertyDictionary(org.Item2, userEntityOptions);
             return addPrefix(originDictionary.OriginDisplayName(originProperty.Name, originOrigin, expressionSelector));
         }
 
@@ -387,10 +390,12 @@ internal class OriginPropertyDictionary
 
                 ISqlJoin srcJoin = propJoin.join;
                 var fkAttr = expressionSelector.GetBestMatch(propJoin.foreignKeys, x => x.Dialect);
-                var criteriax = leftExpression + " = " + newAlias + "." + SqlSyntax.AutoBracket(fkAttr!.Field, expressionSelector.Dialect);
+                var fkAttrTable = fkAttr is UserIdJoinKeyAttribute ? userEntityOptions?.TableName ?? "Users" : fkAttr!.Table;
+                var fkAttrField = fkAttr is UserIdJoinKeyAttribute ? userEntityOptions?.IdColumnName ?? "UserId" : fkAttr!.Field;
+                var criteriax = leftExpression + " = " + newAlias + "." + SqlSyntax.AutoBracket(fkAttrField, expressionSelector.Dialect);
 
-                var frgTable = fkAttr.Table ??
-                    expressionSelector.GetBestMatch(fkAttr.RowType!
+                var frgTable = fkAttrTable ??
+                    expressionSelector.GetBestMatch(((fkAttr is UserIdJoinKeyAttribute ? userEntityOptions?.RowType : null) ?? fkAttr.RowType!)
                         .GetCustomAttributes<TableNameAttribute>(), x => x.Dialect)?.Name!;
 
                 if (srcJoin is LeftJoinAttribute)
@@ -400,7 +405,7 @@ internal class OriginPropertyDictionary
                 else
                     throw ArgumentExceptions.OutOfRange(srcJoin, "joinType");
 
-                srcJoin.RowType = fkAttr.RowType ?? propJoin.join.RowType;
+                srcJoin.RowType = (fkAttr is UserIdJoinKeyAttribute ? userEntityOptions?.RowType : null) ?? fkAttr.RowType ?? propJoin.join.RowType;
                 mappedJoins[x] = srcJoin;
                 extraJoins.Add((Attribute)srcJoin);
                 return newAlias;

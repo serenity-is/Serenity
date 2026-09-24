@@ -60,17 +60,17 @@ public class NotesBehavior(IUserRetrieveService userRetriever,
             listRequest, cancellationToken).ConfigureAwait(false)).Entities;
 
         var userIdList = notes.Where(x => x.InsertUserId != null)
-            .Select(x => x.InsertUserId!.Value).Distinct();
+            .Select(x => x.InsertUserId!).Distinct();
 
         if (userIdList.Any())
         {
             var userDisplayNames = userIdList.ToDictionary(x => x,
-                x => userRetriever.ById(x.ToString(
-                    CultureInfo.InvariantCulture))?.DisplayName);
+                x => userRetriever.ById(Convert.ToString(x,
+                    CultureInfo.InvariantCulture)!)?.DisplayName);
 
             foreach (var x in notes)
                 if (x.InsertUserId != null &&
-                    userDisplayNames.TryGetValue(x.InsertUserId.Value, out string? s))
+                    userDisplayNames.TryGetValue(x.InsertUserId!, out string? s))
                     x.InsertUserDisplayName = s;
         }
 

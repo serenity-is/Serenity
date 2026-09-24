@@ -18,8 +18,8 @@ public sealed class NoteRow : Row<NoteRow.RowFields>, IIdRow, INameRow, IInsertL
     [DisplayName("Text"), NotNull, QuickSearch]
     public string? Text { get => fields.Text[this]; set => fields.Text[this] = value; }
 
-    [DisplayName("Insert User Id"), NotNull, Insertable(false), Updatable(false)]
-    public int? InsertUserId { get => fields.InsertUserId[this]; set => fields.InsertUserId[this] = value; }
+    [DisplayName("Insert User Id"), UserIdFieldType, NotNull, Insertable(false), Updatable(false)]
+    public object? InsertUserId { get => fields.InsertUserId.AsObject(this); set => fields.InsertUserId.AsObject(this, value); }
 
     [DisplayName("Insert User"), NotMapped]
     public string? InsertUserDisplayName { get => fields.InsertUserDisplayName[this]; set => fields.InsertUserDisplayName[this] = value; }
@@ -37,7 +37,7 @@ public sealed class NoteRow : Row<NoteRow.RowFields>, IIdRow, INameRow, IInsertL
         public StringField EntityType = null!;
         public StringField EntityId = null!;
         public StringField Text = null!;
-        public Int32Field InsertUserId = null!;
+        public Field InsertUserId = null!;
         public DateTimeField InsertDate = null!;
         public StringField InsertUserDisplayName = null!;
     }
