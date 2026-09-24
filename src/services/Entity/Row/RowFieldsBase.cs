@@ -240,7 +240,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
     /// <param name="fieldInfo">The field information.</param>
     /// <param name="property">The property information.</param>
     /// <returns>The type of the field to create. Return a subclass of Field, or this field will be skipped.</returns>
-    protected virtual Type GetFieldTypeToCreate(FieldInfo fieldInfo, IPropertyInfo? property)
+    protected virtual Type? GetFieldTypeToCreate(FieldInfo fieldInfo, IPropertyInfo? property)
     {
         return fieldInfo.FieldType;
     }

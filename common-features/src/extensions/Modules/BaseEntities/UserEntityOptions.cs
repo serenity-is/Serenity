@@ -5,7 +5,7 @@ namespace Serenity.Data;
 /// <summary>
 /// Configures user row settings for the application. This class is used to specify the type of the user row and its ID field.
 /// </summary>
-public class UserRowSettings : IOptions<UserRowSettings>
+public class UserEntityOptions : IOptions<UserEntityOptions>
 {
     /// <summary>
     /// Gets or sets the type of the user row. This is used to determine which row type represents users in the system.
@@ -27,6 +27,7 @@ public class UserRowSettings : IOptions<UserRowSettings>
                 }
 
                 IdFieldName = idProperty.GetCustomAttribute<ColumnAttribute>()?.Name ?? idProperty.Name;
+                IdFieldSize = idProperty.GetCustomAttribute<SizeAttribute>()?.Value;
 
                 var valueType = Nullable.GetUnderlyingType(idProperty.PropertyType) ?? idProperty.PropertyType;
 
@@ -50,10 +51,29 @@ public class UserRowSettings : IOptions<UserRowSettings>
     public string? IdFieldName { get; set; } = "UserId";
 
     /// <summary>
+    /// Gets or sets the size of the ID field in the user row. Only meaningful for string columns.
+    /// </summary>
+    public int? IdFieldSize { get; set; }
+
+    /// <summary>
     /// Gets or sets the type of the ID field in the user row. This is used to determine the data type of the unique identifier for users.
     /// </summary>
     public Type? IdFieldType { get; set; } = typeof(Int32Field);
 
     /// <inheritdoc />
-    public UserRowSettings Value => this;
+    public UserEntityOptions Value => this;
+
+    /// <summary>
+    /// Assigns the values from another <see cref="UserEntityOptions"/> instance to this instance. This method is used to copy the configuration settings from one instance to another.
+    /// </summary>
+    /// <param name="from"></param>
+    public void AssignFrom(IOptions<UserEntityOptions>? from)
+    {
+        if (from?.Value is not { } other)
+            return;
+        RowType = other.RowType;
+        IdFieldName = other.IdFieldName;
+        IdFieldSize = other.IdFieldSize;
+        IdFieldType = other.IdFieldType;
+    }
 }

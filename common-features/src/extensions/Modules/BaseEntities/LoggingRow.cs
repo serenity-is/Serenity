@@ -59,15 +59,15 @@ public abstract class LoggingRow<TFields> : Row<TFields>, ILoggingRow
 /// </remarks>
 /// <param name="tableName">Tablename</param>
 /// <param name="fieldPrefix">Field prefix</param>
-/// <param name="userRowOptions">User row settings</param>
-public class LoggingRowFields(IOptions<UserRowSettings>? userRowOptions = null, string? tableName = null, string fieldPrefix = "")
+/// <param name="userEntityOptions">User entity options</param>
+public class LoggingRowFields(IOptions<UserEntityOptions>? userEntityOptions = null, string? tableName = null, string fieldPrefix = "")
     : RowFieldsBase(tableName, fieldPrefix)
 {
     /// <inheritdoc/>
-    protected override Type GetFieldTypeToCreate(System.Reflection.FieldInfo fieldInfo, Reflection.IPropertyInfo? property)
+    protected override Type? GetFieldTypeToCreate(System.Reflection.FieldInfo fieldInfo, Reflection.IPropertyInfo? property)
     {
-        if (fieldInfo.Name == nameof(InsertUserId) || fieldInfo.Name == nameof(UpdateUserId))
-            return userRowOptions?.Value?.IdFieldType ?? typeof(Int32Field);
+        if (fieldInfo.Name is nameof(InsertUserId) or nameof(UpdateUserId))
+            return userEntityOptions?.Value?.IdFieldType ?? typeof(Int32Field);
 
         return base.GetFieldTypeToCreate(fieldInfo, property);
     }

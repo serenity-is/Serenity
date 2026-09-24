@@ -3,13 +3,13 @@ using FluentMigrator;
 namespace Serene.Migrations.DefaultDB;
 
 [DefaultDB, MigrationKey(20160515_0726)]
-public class DefaultDB_20160515_0726_UserPreferences : AutoReversingMigration
+public class DefaultDB_20160515_0726_UserPreferences(IOptions<UserEntityOptions>? userEntityOptions = null) : AutoReversingMigration
 {
     public override void Up()
     {
         Create.Table("UserPreferences")
             .WithColumn("UserPreferenceId").AsInt32().IdentityKey(this)
-            .WithColumn("UserId").AsInt64().NotNullable()
+            .WithColumn("UserId").AsUserIdType(userEntityOptions).NotNullable()
             .WithColumn("PreferenceType").AsString(100).NotNullable()
             .WithColumn("Name").AsString(200).NotNullable()
             .WithColumn("Value").AsString(int.MaxValue).Nullable();

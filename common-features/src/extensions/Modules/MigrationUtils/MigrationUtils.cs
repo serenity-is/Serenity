@@ -397,4 +397,26 @@ public static class MigrationUtils
         command = string.Format(CultureInfo.InvariantCulture, createDatabaseQuery, catalog);
         serverConnection.Execute(command);
     }
+
+    /// <summary>
+    /// Sets the column type based on the UserEntityOptions.IdFieldType, which can be Int32Field, Int64Field, StringField, or GuidField.
+    /// </summary>
+    /// <param name="syntax">The column syntax to set the type for.</param>
+    /// <param name="userEntityOptions">User entity options, will default to Int32Field if null.</param>
+    /// <exception cref="InvalidOperationException">Thrown when the UserEntityOptions.IdFieldType is not supported.</exception>
+    public static ICreateTableColumnOptionOrWithColumnSyntax AsUserIdType(this ICreateTableColumnAsTypeSyntax syntax,
+        IOptions<UserEntityOptions>? userEntityOptions)
+    {
+        var fieldType = userEntityOptions?.Value?.IdFieldType;
+        if (fieldType is null || fieldType == typeof(Int32Field))
+            return syntax.AsInt32();
+        else if (fieldType == typeof(Int64Field))
+            return syntax.AsInt64();
+        else if (fieldType == typeof(StringField))
+            return syntax.AsString(userEntityOptions?.Value?.IdFieldSize ?? 100);
+        else if (fieldType == typeof(GuidField))
+            return syntax.AsGuid();
+            
+        throw new InvalidOperationException("UserEntityOptions.IdFieldType is not supported: " + fieldType.FullName);
+    }
 }

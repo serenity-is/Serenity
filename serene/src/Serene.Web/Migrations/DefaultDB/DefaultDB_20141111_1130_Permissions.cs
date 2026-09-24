@@ -3,13 +3,13 @@ using FluentMigrator;
 namespace Serene.Migrations.DefaultDB;
 
 [DefaultDB, MigrationKey(20141111_1130)]
-public class DefaultDB_20141111_1130_Permissions : AutoReversingMigration
+public class DefaultDB_20141111_1130_Permissions(IOptions<UserEntityOptions>? userEntityOptions = null) : AutoReversingMigration
 {
     public override void Up()
     {
         Create.Table("UserPermissions")
             .WithColumn("UserPermissionId").AsInt64().IdentityKey(this)
-            .WithColumn("UserId").AsInt32().NotNullable()
+            .WithColumn("UserId").AsUserIdType(userEntityOptions).NotNullable()
                 .ForeignKey("FK_UserPermissions_UserId", "Users", "UserId")
             .WithColumn("PermissionKey").AsString(100).NotNullable()
             .WithColumn("Granted").AsBoolean().NotNullable().WithDefaultValue(true);
@@ -38,7 +38,7 @@ public class DefaultDB_20141111_1130_Permissions : AutoReversingMigration
 
         Create.Table("UserRoles")
             .WithColumn("UserRoleId").AsInt64().IdentityKey(this)
-            .WithColumn("UserId").AsInt32().NotNullable()
+            .WithColumn("UserId").AsUserIdType(userEntityOptions).NotNullable()
                 .ForeignKey("FK_UserRoles_UserId", "Users", "UserId")
             .WithColumn("RoleId").AsInt32().NotNullable()
                 .ForeignKey("FK_UserRoles_RoleId", "Roles", "RoleId");

@@ -3,7 +3,7 @@ using FluentMigrator;
 namespace Serenity.Demo.Northwind.Migrations;
 
 [NorthwindDB, MigrationKey(20141123_1551)]
-public class NorthwindDB_20141123_1551_Initial : Migration
+public class NorthwindDB_20141123_1551_Initial(IOptions<UserEntityOptions>? userEntityOptions = null) : Migration
 {
     public override void Up()
     {
@@ -171,13 +171,13 @@ public class NorthwindDB_20141123_1551_Initial : Migration
             .WithColumn("EntityType").AsString(100).NotNullable()
             .WithColumn("EntityID").AsString().NotNullable()
             .WithColumn("Text").AsString(int.MaxValue).NotNullable()
-            .WithColumn("InsertUserId").AsInt32().Nullable()
+            .WithColumn("InsertUserId").AsUserIdType(userEntityOptions).Nullable()
             .WithColumn("InsertDate").AsDateTime().NotNullable();
 
         Create.Table("ProductLog")
             .WithColumn("ProductLogID").AsInt64().IdentityKey(this)
             .WithColumn("OperationType").AsInt16().NotNullable()
-            .WithColumn("ChangingUserId").AsInt32().Nullable()
+            .WithColumn("ChangingUserId").AsUserIdType(userEntityOptions).Nullable()
             .WithColumn("ValidFrom").AsDateTime().NotNullable()
             .WithColumn("ValidUntil").AsDateTime().NotNullable()
             .WithColumn("ProductID").AsInt32().NotNullable()

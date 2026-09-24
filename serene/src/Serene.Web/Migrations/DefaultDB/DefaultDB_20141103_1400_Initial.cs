@@ -3,12 +3,12 @@ using FluentMigrator;
 namespace Serene.Migrations.DefaultDB;
 
 [DefaultDB, MigrationKey(20141103_1400)]
-public class DefaultDB_20141103_1400_Initial : AutoReversingMigration
+public class DefaultDB_20141103_1400_Initial(IOptions<UserEntityOptions>? userEntityOptions = null) : AutoReversingMigration
 {
     public override void Up()
     {
         Create.Table("Users")
-            .WithColumn("UserId").AsInt32().IdentityKey(this)
+            .WithColumn("UserId").AsUserIdType(userEntityOptions).IdentityKey(this)
             .WithColumn("Username").AsString(100).NotNullable().Unique("IX_Users_Username")
             .WithColumn("DisplayName").AsString(100).NotNullable()
             .WithColumn("Email").AsString(100).Nullable()
@@ -18,9 +18,9 @@ public class DefaultDB_20141103_1400_Initial : AutoReversingMigration
             .WithColumn("LastDirectoryUpdate").AsDateTime().Nullable()
             .WithColumn("UserImage").AsString(100).Nullable()
             .WithColumn("InsertDate").AsDateTime().NotNullable()
-            .WithColumn("InsertUserId").AsInt32().NotNullable()
+            .WithColumn("InsertUserId").AsUserIdType(userEntityOptions).NotNullable()
             .WithColumn("UpdateDate").AsDateTime().Nullable()
-            .WithColumn("UpdateUserId").AsInt32().Nullable()
+            .WithColumn("UpdateUserId").AsUserIdType(userEntityOptions).Nullable()
             .WithColumn("IsActive").AsInt16().NotNullable().WithDefaultValue(1);
 
         Insert.IntoTable("Users").Row(new

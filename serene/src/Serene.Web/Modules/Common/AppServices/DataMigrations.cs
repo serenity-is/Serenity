@@ -10,7 +10,8 @@ namespace Serene.AppServices;
 
 public class DataMigrations(ITypeSource typeSource,
     ISqlConnections sqlConnections,
-    IWebHostEnvironment hostEnvironment) : IDataMigrations
+    IWebHostEnvironment hostEnvironment,
+    IOptions<UserEntityOptions> userEntityOptions) : IDataMigrations
 {
     private static readonly string[] databaseKeys = [
         "Default"
@@ -69,7 +70,6 @@ public class DataMigrations(ITypeSource typeSource,
                     .Select(x => x + "DB").ToArray() ?? [databaseKey + "DB"];
                 options.IncludeUntaggedMigrations = databaseKey == "Default";
             })
-            .Configure<UserRowSettings>(options => options.RowType = typeof(Administration.UserRow))
             .ConfigureRunner(builder =>
             {
                 if (serverType == OracleDialect.Instance.ServerType)
@@ -88,6 +88,7 @@ public class DataMigrations(ITypeSource typeSource,
                 builder.WithGlobalConnectionString(cs.ConnectionString);
                 builder.ScanIn([.. ((IGetAssemblies)typeSource).GetAssemblies()]).For.Migrations();
             })
+            .Configure<UserEntityOptions>(options => options.AssignFrom(userEntityOptions))
             .BuildServiceProvider();
 
         var culture = CultureInfo.CurrentCulture;
