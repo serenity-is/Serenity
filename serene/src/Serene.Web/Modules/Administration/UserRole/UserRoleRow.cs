@@ -1,6 +1,6 @@
 namespace Serene.Administration;
 
-[DefaultConnection, Module("Administration"), TableName("UserRoles")]
+[DefaultConnection, AdministrationModule, TableName("UserRoles")]
 [DisplayName("UserRoles"), InstanceName("UserRoles")]
 [ReadPermission(PermissionKeys.Security)]
 [ModifyPermission(PermissionKeys.Security)]

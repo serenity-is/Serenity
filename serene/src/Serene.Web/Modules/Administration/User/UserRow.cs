@@ -2,7 +2,7 @@ using Serenity.Extensions.Entities;
 
 namespace Serene.Administration;
 
-[DefaultConnection, Module("Administration"), TableName("Users")]
+[DefaultConnection, AdministrationModule, TableName("Users")]
 [DisplayName("Users"), InstanceName("User")]
 [ReadPermission(PermissionKeys.Security)]
 [ModifyPermission(PermissionKeys.Security)]
