@@ -44,52 +44,35 @@ public partial class ServerTypingsGenerator
         return "String";
     }
 
-    private static string? GetEditorTypeKeyFrom(TypeReference propertyType, TypeReference? basedOnFieldType, CustomAttribute? editorTypeAttr)
+    private string? GetEditorTypeFromAttribute(CustomAttribute editorTypeAttr)
+    {
+        if (editorTypeAttr.AttributeType() is not { } attributeType)
+            return null;
+
+        string attrFullName = attributeType.FullNameOf();
+
+        if (attrFullName is "Serenity.ComponentModel.EditorTypeAttribute"
+                or "Serenity.ComponentModel.CustomEditorAttribute" &&
+                GetAttributeKeyViaConstuctorArgument(editorTypeAttr) is string ctorArgKey)
+            return ctorArgKey;
+
+        if ((GetAttributeKeyViaKeyConstant(attributeType) ??
+             GetAttributeKeyViaBaseCtorCall(attributeType)) is string typeKey)
+            return typeKey;
+
+        if (attrFullName is not null &&
+            attrFullName.EndsWith("Attribute", StringComparison.Ordinal))
+            return attrFullName[..^"Attribute".Length];
+
+        return attrFullName;
+    }
+
+    private string? GetEditorTypeKeyFrom(TypeReference propertyType, TypeReference? basedOnFieldType, CustomAttribute? editorTypeAttr)
     {
         if (editorTypeAttr == null)
             return AutoDetermineEditorType(propertyType, basedOnFieldType);
 
-        if (editorTypeAttr.AttributeType()?.FullNameOf() is "Serenity.ComponentModel.EditorTypeAttribute"
-                or "Serenity.ComponentModel.CustomEditorAttribute")
-        {
-            if (editorTypeAttr.ConstructorArguments().Count == 1 &&
-                editorTypeAttr.ConstructorArguments[0].Type?.FullNameOf() == "System.String" &&
-                editorTypeAttr.ConstructorArguments[0].Value is string)
-                return editorTypeAttr.ConstructorArguments[0].Value as string;
-        }
-
-        var keyConstant = editorTypeAttr.AttributeType()?.Resolve().FieldsOf().FirstOrDefault(x =>
-            x.IsStatic &&
-            x.IsPublic() &&
-            x.Name == "Key" &&
-            x.HasConstant() &&
-            x.Constant() is string &&
-            x.DeclaringType().FullNameOf() == editorTypeAttr.AttributeType()?.FullNameOf());
-
-        if (keyConstant != null && keyConstant.Constant() as string != null)
-            return keyConstant.Constant() as string;
-
-        string? editorType;
-#if !ISSOURCEGENERATOR
-        editorType = editorTypeAttr.AttributeType().Resolve().MethodsOf()
-            .Where(x => x.IsConstructor())
-            .SelectMany(m => m.Body.Instructions
-                .Where(i => i.OpCode == OpCodes.Call &&
-                    (i.Operand is Mono.Cecil.MethodReference) &&
-                    (i.Operand as Mono.Cecil.MethodReference)!.Resolve().IsConstructor &&
-                    i.Previous.OpCode == OpCodes.Ldstr &&
-                    i.Previous.Operand is string)
-                .Select(x => x.Previous.Operand as string)).FirstOrDefault();
-
-        if (editorType != null)
-            return editorType;
-#endif
-
-        editorType = editorTypeAttr.AttributeType()?.FullNameOf();
-        if (editorType?.EndsWith("Attribute", StringComparison.Ordinal) == true)
-            editorType = editorType[..^"Attribute".Length];
-
-        return editorType;
+        return GetEditorTypeFromAttribute(editorTypeAttr);
     }
 
     public static int IndexOf<T>(IEnumerable<T> source, Func<T, bool> predicate)
