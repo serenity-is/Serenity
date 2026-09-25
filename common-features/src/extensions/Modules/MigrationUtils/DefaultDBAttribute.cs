@@ -9,7 +9,7 @@ public class DefaultDBAttribute : TargetDBAttribute
     /// Initializes a new instance of the <see cref="DefaultDBAttribute"/> class.
     /// </summary>
     public DefaultDBAttribute()
-        : base("Default")
+        : base(DefaultConnectionAttribute.Key)
     {
     }
 }

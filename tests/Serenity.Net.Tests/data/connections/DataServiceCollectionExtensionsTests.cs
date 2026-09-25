@@ -45,13 +45,13 @@ public class DataServiceCollectionExtensionsTests
         var config = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>
             {
-                ["Data:Default:ConnectionString"] = "cs",
-                ["Data:Default:ProviderName"] = "pn",
-                ["Data:Default:Dialect"] = "SqlServer"
+                [$"Data:{DefaultConnectionAttribute.Key}:ConnectionString"] = "cs",
+                [$"Data:{DefaultConnectionAttribute.Key}:ProviderName"] = "pn",
+                [$"Data:{DefaultConnectionAttribute.Key}:Dialect"] = "SqlServer"
             })
             .Build();
 
-        var entry = config.GetDataConnectionString("Default");
+        var entry = config.GetDataConnectionString(DefaultConnectionAttribute.Key);
         Assert.Equal("cs", entry.ConnectionString);
         Assert.Equal("pn", entry.ProviderName);
         Assert.Equal("SqlServer", entry.Dialect);

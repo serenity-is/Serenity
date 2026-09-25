@@ -56,7 +56,7 @@ public class DefaultSqlConnectionsTests
     {
         var items = entries ?? new()
         {
-            ["Default"] = Info("Default")
+            [DefaultConnectionAttribute.Key] = Info(DefaultConnectionAttribute.Key)
         };
         return new DefaultSqlConnections(new SimpleConnectionStrings(items), profiler);
     }
@@ -72,7 +72,7 @@ public class DefaultSqlConnectionsTests
     {
         var connections = CreateSubtle();
 
-        Assert.Equal(["Default"], connections.ListConnectionStrings().Select(x => x.ConnectionKey));
+        Assert.Equal([DefaultConnectionAttribute.Key], connections.ListConnectionStrings().Select(x => x.ConnectionKey));
     }
 
     [Fact]
@@ -124,10 +124,10 @@ public class DefaultSqlConnectionsTests
         var provider = RegisterProvider();
         var connections = CreateSubtle(new()
         {
-            ["Default"] = Info("Default", "cs", provider)
+            [DefaultConnectionAttribute.Key] = Info(DefaultConnectionAttribute.Key, "cs", provider)
         });
 
-        var connection = connections.NewByKey("Default");
+        var connection = connections.NewByKey(DefaultConnectionAttribute.Key);
 
         Assert.IsType<WrappedConnection>(connection);
     }
@@ -145,7 +145,7 @@ public class DefaultSqlConnectionsTests
     {
         var connections = CreateSubtle();
 
-        Assert.NotNull(connections.TryGetConnectionString("Default"));
+        Assert.NotNull(connections.TryGetConnectionString(DefaultConnectionAttribute.Key));
         Assert.Null(connections.TryGetConnectionString("Missing"));
     }
 
@@ -154,7 +154,7 @@ public class DefaultSqlConnectionsTests
     {
         var connections = CreateSubtle();
 
-        Assert.Equal(["Default"], connections.GetConnectionKeyFallbacks("Default"));
+        Assert.Equal([DefaultConnectionAttribute.Key], connections.GetConnectionKeyFallbacks(DefaultConnectionAttribute.Key));
         Assert.Throws<ArgumentNullException>(() => connections.GetConnectionKeyFallbacks(null!));
         Assert.Throws<ArgumentException>(() => connections.GetConnectionKeyFallbacks(""));
     }
@@ -164,7 +164,7 @@ public class DefaultSqlConnectionsTests
     {
         var options = new ConnectionStringOptions
         {
-            ["Default"] = new ConnectionStringEntry
+            [DefaultConnectionAttribute.Key] = new ConnectionStringEntry
             {
                 ConnectionString = "cs",
                 ProviderName = "p",
@@ -174,7 +174,7 @@ public class DefaultSqlConnectionsTests
 
         var connections = new DefaultSqlConnections(new DefaultConnectionStrings(options));
 
-        Assert.Contains("Default", connections.GetConnectionKeyFallbacks("Base"));
+        Assert.Contains(DefaultConnectionAttribute.Key, connections.GetConnectionKeyFallbacks("Base"));
         Assert.True(connections.GetConnectionKeyFallbacks("Base").Any());
     }
 
@@ -183,17 +183,17 @@ public class DefaultSqlConnectionsTests
     {
         var withoutFallback = CreateSubtle();
 
-        Assert.Equal("Default", withoutFallback.ResolveConnectionKey("Default"));
+        Assert.Equal(DefaultConnectionAttribute.Key, withoutFallback.ResolveConnectionKey(DefaultConnectionAttribute.Key));
         Assert.Null(withoutFallback.ResolveConnectionKey("Missing"));
         Assert.Throws<ArgumentException>(() => withoutFallback.ResolveConnectionKey(""));
 
         var options = new ConnectionStringOptions
         {
-            ["Default"] = new ConnectionStringEntry { ConnectionString = "cs", ProviderName = "p" }
+            [DefaultConnectionAttribute.Key] = new ConnectionStringEntry { ConnectionString = "cs", ProviderName = "p" }
         };
         var withFallback = new DefaultSqlConnections(new DefaultConnectionStrings(options));
 
-        Assert.Equal("Default", withFallback.ResolveConnectionKey("Default"));
+        Assert.Equal(DefaultConnectionAttribute.Key, withFallback.ResolveConnectionKey(DefaultConnectionAttribute.Key));
         Assert.Null(withFallback.ResolveConnectionKey("Missing"));
     }
 
@@ -202,17 +202,17 @@ public class DefaultSqlConnectionsTests
     {
         var withoutFallback = CreateSubtle();
 
-        Assert.Equal(["Default"], withoutFallback.GetConnectionKeysResolvingTo("Default"));
+        Assert.Equal([DefaultConnectionAttribute.Key], withoutFallback.GetConnectionKeysResolvingTo(DefaultConnectionAttribute.Key));
         Assert.Empty(withoutFallback.GetConnectionKeysResolvingTo("Missing"));
         Assert.Throws<ArgumentException>(() => withoutFallback.GetConnectionKeysResolvingTo(""));
 
         var options = new ConnectionStringOptions
         {
-            ["Default"] = new ConnectionStringEntry { ConnectionString = "cs", ProviderName = "p" }
+            [DefaultConnectionAttribute.Key] = new ConnectionStringEntry { ConnectionString = "cs", ProviderName = "p" }
         };
         var withFallback = new DefaultSqlConnections(new DefaultConnectionStrings(options));
 
-        Assert.Equal(["Default"], withFallback.GetConnectionKeysResolvingTo("Default"));
+        Assert.Equal([DefaultConnectionAttribute.Key], withFallback.GetConnectionKeysResolvingTo(DefaultConnectionAttribute.Key));
         Assert.Empty(withFallback.GetConnectionKeysResolvingTo("Missing"));
     }
 }

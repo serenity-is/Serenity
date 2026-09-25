@@ -1,6 +1,6 @@
 namespace Serene.Administration;
 
-[ConnectionKey("Default"), Module("Administration"), TableName("UserPermissions")]
+[DefaultConnection, Module("Administration"), TableName("UserPermissions")]
 [DisplayName("UserPermissions"), InstanceName("UserPermissions")]
 [ReadPermission(PermissionKeys.Security)]
 [ModifyPermission(PermissionKeys.Security)]

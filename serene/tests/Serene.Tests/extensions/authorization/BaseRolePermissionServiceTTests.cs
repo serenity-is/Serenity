@@ -5,7 +5,7 @@ namespace Serenity.Extensions;
 
 public class BaseRolePermissionServiceTTests
 {
-    [ConnectionKey("Default")]
+    [DefaultConnection]
     private class MockRolePermissionRow : Row<MockRolePermissionRow.RowFields>, IRolePermissionRow
     {
         public string? RoleKeyOrName { get => fields.RoleKeyOrName[this]; set => fields.RoleKeyOrName[this] = value; }

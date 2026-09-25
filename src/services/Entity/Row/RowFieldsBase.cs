@@ -166,7 +166,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
         if (connectionKeyAttr != null)
             connectionKey = connectionKeyAttr.Value;
         else
-            connectionKey = "Default";
+            connectionKey = DefaultConnectionAttribute.Key;
     }
 
     private void DetermineModuleIdentifier()

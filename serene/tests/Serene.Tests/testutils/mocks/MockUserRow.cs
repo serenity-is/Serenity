@@ -1,6 +1,6 @@
 namespace Serenity.TestUtils;
 
-[ConnectionKey("Default")]
+[DefaultConnection]
 public class MockUserRow : Row<MockUserRow.RowFields>, IIdRow, IEmailRow, IPasswordRow,
     IUpdateDateRow, IInsertDateRow, IDisplayNameRow, INameRow
 {

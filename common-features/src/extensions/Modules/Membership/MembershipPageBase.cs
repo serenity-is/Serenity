@@ -85,5 +85,5 @@ public abstract class MembershipPageBase<TUserRow> : Controller
     /// Gets the connection key for the user row type.
     /// </summary>
     /// <returns>The connection key.</returns>
-    protected virtual string GetConnectionKey() => typeof(TUserRow).GetCustomAttribute<ConnectionKeyAttribute>(inherit: false)?.Value ?? "Default";
+    protected virtual string GetConnectionKey() => typeof(TUserRow).GetCustomAttribute<ConnectionKeyAttribute>(inherit: false)?.Value ?? DefaultConnectionAttribute.Key;
 }

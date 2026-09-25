@@ -3,7 +3,7 @@ namespace Serenity.Extensions.Entities;
 /// <summary>
 /// Row for user preferences.
 /// </summary>
-[ConnectionKey("Default"), Module("Common"), TableName("UserPreferences")]
+[DefaultConnection, Module("Common"), TableName("UserPreferences")]
 [DisplayName("User Preferences"), InstanceName("UserPreference")]
 [ReadPermission("")]
 [ModifyPermission("")]

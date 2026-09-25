@@ -14,7 +14,7 @@ public class DataMigrations(ITypeSource typeSource,
     IOptions<UserEntityOptions> userEntityOptions) : IDataMigrations
 {
     private static readonly string[] databaseKeys = [
-        "Default"
+        DefaultConnectionAttribute.Key
 #if (Northwind)
         , "Northwind"
 #endif
@@ -70,7 +70,7 @@ public class DataMigrations(ITypeSource typeSource,
                 options.Tags = (sqlConnections as IConnectionKeyFallbacks)?
                     .GetConnectionKeysResolvingTo(databaseKey)?
                     .Select(x => x + "DB").ToArray() ?? [databaseKey + "DB"];
-                options.IncludeUntaggedMigrations = databaseKey == "Default";
+                options.IncludeUntaggedMigrations = databaseKey == DefaultConnectionAttribute.Key;
             })
             .ConfigureRunner(builder =>
             {

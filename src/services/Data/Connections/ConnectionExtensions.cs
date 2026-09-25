@@ -10,7 +10,7 @@ public static class ConnectionExtensions
     /// <summary>
     /// The default connection key, which is an optional name.
     /// </summary>
-    public const string DefaultConnectionKey = "Default";
+    public const string DefaultConnectionKey = DefaultConnectionAttribute.Key;
 
     /// <summary>
     /// Creates a new connection for the specified class, determining

@@ -34,16 +34,16 @@ public class DefaultConnectionStringsTests
     {
         var settings = Create(new()
         {
-            ["Default"] = Entry()
+            [DefaultConnectionAttribute.Key] = Entry()
         });
 
-        var info = settings.TryGetConnectionString("Default");
+        var info = settings.TryGetConnectionString(DefaultConnectionAttribute.Key);
         Assert.NotNull(info);
-        Assert.Equal("Default", info.ConnectionKey);
+        Assert.Equal(DefaultConnectionAttribute.Key, info.ConnectionKey);
         Assert.Equal("cs", info.ConnectionString);
         Assert.Equal("System.Data.SqlClient", info.ProviderName);
 
-        Assert.Same(info, settings.TryGetConnectionString("Default"));
+        Assert.Same(info, settings.TryGetConnectionString(DefaultConnectionAttribute.Key));
     }
 
     [Fact]
@@ -128,11 +128,11 @@ public class DefaultConnectionStringsTests
     {
         var settings = Create(new()
         {
-            ["Default"] = Entry(),
+            [DefaultConnectionAttribute.Key] = Entry(),
             ["Second"] = Entry()
         });
 
-        Assert.Equal(["Default", "Second"], [.. settings.ListConnectionStrings()
+        Assert.Equal([DefaultConnectionAttribute.Key, "Second"], [.. settings.ListConnectionStrings()
             .Select(i => i.ConnectionKey).OrderBy(i => i)]);
     }
 
@@ -141,7 +141,7 @@ public class DefaultConnectionStringsTests
     {
         var settings = Create(new()
         {
-            ["Default"] = Entry(connectionString: null)
+            [DefaultConnectionAttribute.Key] = Entry(connectionString: null)
         });
 
         Assert.Throws<ArgumentNullException>(() => settings.ListConnectionStrings().ToList());
@@ -154,12 +154,12 @@ public class DefaultConnectionStringsTests
     {
         var options = new ConnectionStringOptions
         {
-            ["Default"] = Entry(),
+            [DefaultConnectionAttribute.Key] = Entry(),
             ["ProFeatures"] = new ConnectionStringEntry
             {
                 ConnectionString = "cs",
                 ProviderName = "System.Data.SqlClient",
-                FallbackFor = "Default"
+                FallbackFor = DefaultConnectionAttribute.Key
             }
         };
 
@@ -204,14 +204,14 @@ public class DefaultConnectionStringsTests
     {
         var options = new ConnectionStringOptions
         {
-            ["Default"] = Entry(),
-            ["Pro"] = new ConnectionStringEntry { ConnectionString = "cs", FallbackFor = "Default" },
+            [DefaultConnectionAttribute.Key] = Entry(),
+            ["Pro"] = new ConnectionStringEntry { ConnectionString = "cs", FallbackFor = DefaultConnectionAttribute.Key },
             ["Unrelated"] = Entry()
         };
 
         var cs = new DefaultConnectionStrings(options);
 
-        Assert.Equal(["Default"], [.. cs.GetConnectionKeysResolvingTo("Default").OrderBy(k => k)]);
+        Assert.Equal([DefaultConnectionAttribute.Key], [.. cs.GetConnectionKeysResolvingTo(DefaultConnectionAttribute.Key).OrderBy(k => k)]);
     }
 
     [Fact]

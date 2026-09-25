@@ -103,6 +103,6 @@ public class MembershipPageBaseTests
     [Fact]
     public void GetConnectionKey_Returns_Attribute_Value()
     {
-        Assert.Equal("Default", CreatePage().CallGetConnectionKey());
+        Assert.Equal(DefaultConnectionAttribute.Key, CreatePage().CallGetConnectionKey());
     }
 }

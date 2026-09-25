@@ -95,11 +95,11 @@ public class ConnectionKeyFallbackTests
 
     [Fact]
     public void Attribute_Ctor_Throws_OnNullKey()
-        => Assert.Throws<ArgumentNullException>(() => new ConnectionKeyFallbackAttribute(null, "Default"));
+        => Assert.Throws<ArgumentNullException>(() => new ConnectionKeyFallbackAttribute(null, DefaultConnectionAttribute.Key));
 
     [Fact]
     public void Attribute_Ctor_Throws_OnEmptyKey()
-        => Assert.Throws<ArgumentException>(() => new ConnectionKeyFallbackAttribute("", "Default"));
+        => Assert.Throws<ArgumentException>(() => new ConnectionKeyFallbackAttribute("", DefaultConnectionAttribute.Key));
 
     [Fact]
     public void Attribute_Ctor_Throws_OnEmptyFallback()
@@ -108,38 +108,38 @@ public class ConnectionKeyFallbackTests
     [Fact]
     public void GetConnectionKeyFallbacks_ReturnsDeclaredChain()
     {
-        var cs = Create(["Default"], new ConnectionKeyFallbackAttribute("AnotherKey", "Default"));
-        Assert.Equal(["AnotherKey", "Default"], cs.GetConnectionKeyFallbacks("AnotherKey"));
+        var cs = Create([DefaultConnectionAttribute.Key], new ConnectionKeyFallbackAttribute("AnotherKey", DefaultConnectionAttribute.Key));
+        Assert.Equal(["AnotherKey", DefaultConnectionAttribute.Key], cs.GetConnectionKeyFallbacks("AnotherKey"));
     }
 
     [Fact]
     public void GetConnectionKeyFallbacks_ReturnsOnlySelf_WhenNoFallback()
     {
-        var cs = Create(["Default"]);
-        Assert.Equal(["Default"], cs.GetConnectionKeyFallbacks("Default"));
+        var cs = Create([DefaultConnectionAttribute.Key]);
+        Assert.Equal([DefaultConnectionAttribute.Key], cs.GetConnectionKeyFallbacks(DefaultConnectionAttribute.Key));
     }
 
     [Fact]
     public void GetConnectionKeyFallbacks_MultiLevel()
     {
-        var cs = Create(["Default"],
+        var cs = Create([DefaultConnectionAttribute.Key],
             new ConnectionKeyFallbackAttribute("SomeKey", "AnotherKey"),
-            new ConnectionKeyFallbackAttribute("AnotherKey", "Default"));
-        Assert.Equal(["SomeKey", "AnotherKey", "Default"],
+            new ConnectionKeyFallbackAttribute("AnotherKey", DefaultConnectionAttribute.Key));
+        Assert.Equal(["SomeKey", "AnotherKey", DefaultConnectionAttribute.Key],
             cs.GetConnectionKeyFallbacks("SomeKey"));
     }
 
     [Fact]
     public void GetConnectionKeyFallbacks_IsCaseInsensitive()
     {
-        var cs = Create(["Default"], new ConnectionKeyFallbackAttribute("AnotherKey", "Default"));
-        Assert.Equal(["anotherkey", "Default"], cs.GetConnectionKeyFallbacks("anotherkey"));
+        var cs = Create([DefaultConnectionAttribute.Key], new ConnectionKeyFallbackAttribute("AnotherKey", DefaultConnectionAttribute.Key));
+        Assert.Equal(["anotherkey", DefaultConnectionAttribute.Key], cs.GetConnectionKeyFallbacks("anotherkey"));
     }
 
     [Fact]
     public void GetConnectionKeyFallbacks_Throws_OnCycle()
     {
-        var cs = Create(["Default"],
+        var cs = Create([DefaultConnectionAttribute.Key],
             new ConnectionKeyFallbackAttribute("A", "B"),
             new ConnectionKeyFallbackAttribute("B", "A"));
         var ex = Assert.Throws<InvalidOperationException>(() => cs.GetConnectionKeyFallbacks("A"));
@@ -149,7 +149,7 @@ public class ConnectionKeyFallbackTests
     [Fact]
     public void Methods_Throw_OnNullKey()
     {
-        var cs = Create(["Default"], new ConnectionKeyFallbackAttribute("AnotherKey", "Default"));
+        var cs = Create([DefaultConnectionAttribute.Key], new ConnectionKeyFallbackAttribute("AnotherKey", DefaultConnectionAttribute.Key));
         Assert.Throws<ArgumentNullException>(() => cs.GetConnectionKeyFallbacks(null));
         Assert.Throws<ArgumentNullException>(() => cs.ResolveConnectionKey(null));
         Assert.Throws<ArgumentNullException>(() => cs.GetConnectionKeysResolvingTo(null));
@@ -158,7 +158,7 @@ public class ConnectionKeyFallbackTests
     [Fact]
     public void Methods_Throw_OnEmptyKey()
     {
-        var cs = Create(["Default"], new ConnectionKeyFallbackAttribute("AnotherKey", "Default"));
+        var cs = Create([DefaultConnectionAttribute.Key], new ConnectionKeyFallbackAttribute("AnotherKey", DefaultConnectionAttribute.Key));
         Assert.Throws<ArgumentException>(() => cs.GetConnectionKeyFallbacks(""));
         Assert.Throws<ArgumentException>(() => cs.ResolveConnectionKey(""));
         Assert.Throws<ArgumentException>(() => cs.GetConnectionKeysResolvingTo(""));
@@ -167,43 +167,43 @@ public class ConnectionKeyFallbackTests
     [Fact]
     public void ResolveConnectionKey_ReturnsConfiguredKey_WhenNoFallback()
     {
-        var cs = Create(["Default"]);
-        Assert.Equal("Default", cs.ResolveConnectionKey("Default"));
+        var cs = Create([DefaultConnectionAttribute.Key]);
+        Assert.Equal(DefaultConnectionAttribute.Key, cs.ResolveConnectionKey(DefaultConnectionAttribute.Key));
     }
 
     [Fact]
     public void ResolveConnectionKey_UsesFallback_WhenLogicalKeyNotConfigured()
     {
-        var cs = Create(["Default"], new ConnectionKeyFallbackAttribute("AnotherKey", "Default"));
-        Assert.Equal("Default", cs.ResolveConnectionKey("AnotherKey"));
+        var cs = Create([DefaultConnectionAttribute.Key], new ConnectionKeyFallbackAttribute("AnotherKey", DefaultConnectionAttribute.Key));
+        Assert.Equal(DefaultConnectionAttribute.Key, cs.ResolveConnectionKey("AnotherKey"));
     }
 
     [Fact]
     public void ResolveConnectionKey_ReturnsLogicalKey_WhenItIsConfigured()
     {
-        var cs = Create(["Default", "AnotherKey"], new ConnectionKeyFallbackAttribute("AnotherKey", "Default"));
+        var cs = Create([DefaultConnectionAttribute.Key, "AnotherKey"], new ConnectionKeyFallbackAttribute("AnotherKey", DefaultConnectionAttribute.Key));
         Assert.Equal("AnotherKey", cs.ResolveConnectionKey("AnotherKey"));
     }
 
     [Fact]
     public void ResolveConnectionKey_ReturnsNull_WhenNoneConfigured()
     {
-        var cs = Create(["Default"], new ConnectionKeyFallbackAttribute("AnotherKey", "Other"));
+        var cs = Create([DefaultConnectionAttribute.Key], new ConnectionKeyFallbackAttribute("AnotherKey", "Other"));
         Assert.Null(cs.ResolveConnectionKey("AnotherKey"));
     }
 
     [Fact]
     public void ResolveConnectionKey_IsCaseInsensitive()
     {
-        var cs = Create(["Default", "ANOTHERKEY"], new ConnectionKeyFallbackAttribute("AnotherKey", "Default"));
+        var cs = Create([DefaultConnectionAttribute.Key, "ANOTHERKEY"], new ConnectionKeyFallbackAttribute("AnotherKey", DefaultConnectionAttribute.Key));
         Assert.Equal("anotherkey", cs.ResolveConnectionKey("anotherkey"));
     }
 
     [Fact]
     public void BuildFallbackMap_LastDeclarationWins()
     {
-        var cs = Create(["Default", "Other"],
-            new ConnectionKeyFallbackAttribute("AnotherKey", "Default"),
+        var cs = Create([DefaultConnectionAttribute.Key, "Other"],
+            new ConnectionKeyFallbackAttribute("AnotherKey", DefaultConnectionAttribute.Key),
             new ConnectionKeyFallbackAttribute("AnotherKey", "Other"));
         Assert.Equal("Other", cs.ResolveConnectionKey("AnotherKey"));
     }
@@ -211,72 +211,72 @@ public class ConnectionKeyFallbackTests
     [Fact]
     public void GetConnectionKeysResolvingTo_ReturnsConfiguredKeys()
     {
-        var cs = Create(["Default"], new ConnectionKeyFallbackAttribute("AnotherKey", "Default"));
-        var result = cs.GetConnectionKeysResolvingTo("Default").OrderBy(x => x).ToArray();
-        Assert.Equal(["AnotherKey", "Default"], result);
+        var cs = Create([DefaultConnectionAttribute.Key], new ConnectionKeyFallbackAttribute("AnotherKey", DefaultConnectionAttribute.Key));
+        var result = cs.GetConnectionKeysResolvingTo(DefaultConnectionAttribute.Key).OrderBy(x => x).ToArray();
+        Assert.Equal(["AnotherKey", DefaultConnectionAttribute.Key], result);
     }
 
     [Fact]
     public void GetConnectionKeysResolvingTo_ExcludesKeysResolvingToConfiguredSelf()
     {
-        var cs = Create(["Default", "AnotherKey"], new ConnectionKeyFallbackAttribute("AnotherKey", "Default"));
-        var result = cs.GetConnectionKeysResolvingTo("Default").OrderBy(x => x).ToArray();
-        Assert.Equal(["Default"], result);
+        var cs = Create([DefaultConnectionAttribute.Key, "AnotherKey"], new ConnectionKeyFallbackAttribute("AnotherKey", DefaultConnectionAttribute.Key));
+        var result = cs.GetConnectionKeysResolvingTo(DefaultConnectionAttribute.Key).OrderBy(x => x).ToArray();
+        Assert.Equal([DefaultConnectionAttribute.Key], result);
     }
 
     [Fact]
     public void TryGetConnectionString_ResolvesFallback_AndReturnsRegisteredKey()
     {
-        var cs = Create(["Default"], new ConnectionKeyFallbackAttribute("AnotherKey", "Default"));
+        var cs = Create([DefaultConnectionAttribute.Key], new ConnectionKeyFallbackAttribute("AnotherKey", DefaultConnectionAttribute.Key));
         var info = cs.TryGetConnectionString("AnotherKey");
         Assert.NotNull(info);
-        Assert.Equal("Default", info.ConnectionKey);
+        Assert.Equal(DefaultConnectionAttribute.Key, info.ConnectionKey);
         Assert.Equal("Server=.;Database=Test;", info.ConnectionString);
     }
 
     [Fact]
     public void TryGetConnectionString_ReturnsNull_WhenNoFallbackOrConfig()
     {
-        var cs = Create(["Default"], new ConnectionKeyFallbackAttribute("AnotherKey", "Other"));
+        var cs = Create([DefaultConnectionAttribute.Key], new ConnectionKeyFallbackAttribute("AnotherKey", "Other"));
         Assert.Null(cs.TryGetConnectionString("AnotherKey"));
     }
 
     [Fact]
     public void ListConnectionStrings_DoesNotIncludeLogicalFallbackKeys()
     {
-        var cs = Create(["Default"], new ConnectionKeyFallbackAttribute("AnotherKey", "Default"));
+        var cs = Create([DefaultConnectionAttribute.Key], new ConnectionKeyFallbackAttribute("AnotherKey", DefaultConnectionAttribute.Key));
         var keys = cs.ListConnectionStrings().Select(x => x.ConnectionKey).ToArray();
-        Assert.Equal(["Default"], keys);
+        Assert.Equal([DefaultConnectionAttribute.Key], keys);
     }
 
     [Fact]
     public void DefaultSqlConnections_Degrades_WhenInnerDoesNotSupportFallbacks()
     {
-        var sqlConnections = new DefaultSqlConnections(new BasicConnectionStrings("Default"));
+        var sqlConnections = new DefaultSqlConnections(new BasicConnectionStrings(DefaultConnectionAttribute.Key));
         var fallbacks = Assert.IsType<IConnectionKeyFallbacks>(sqlConnections, exactMatch: false);
 
         Assert.Equal(["AnotherKey"], fallbacks.GetConnectionKeyFallbacks("AnotherKey"));
-        Assert.Equal("Default", fallbacks.ResolveConnectionKey("Default"));
+        Assert.Equal(DefaultConnectionAttribute.Key, fallbacks.ResolveConnectionKey(DefaultConnectionAttribute.Key));
         Assert.Null(fallbacks.ResolveConnectionKey("Other"));
-        Assert.Equal(["Default"], fallbacks.GetConnectionKeysResolvingTo("Default"));
+        Assert.Equal([DefaultConnectionAttribute.Key], fallbacks.GetConnectionKeysResolvingTo(DefaultConnectionAttribute.Key));
     }
 
     [Fact]
     public void DefaultSqlConnections_Forwards_WhenInnerSupportsFallbacks()
     {
-        var inner = Create(["Default"], new ConnectionKeyFallbackAttribute("AnotherKey", "Default"));
+        var inner = Create([DefaultConnectionAttribute.Key], new ConnectionKeyFallbackAttribute("AnotherKey", DefaultConnectionAttribute.Key));
         var sqlConnections = new DefaultSqlConnections(inner);
         var fallbacks = Assert.IsType<IConnectionKeyFallbacks>(sqlConnections, exactMatch: false);
 
-        Assert.Equal(["AnotherKey", "Default"], fallbacks.GetConnectionKeyFallbacks("AnotherKey"));
-        Assert.Equal("Default", fallbacks.ResolveConnectionKey("AnotherKey"));
+        Assert.Equal(["AnotherKey", DefaultConnectionAttribute.Key], fallbacks.GetConnectionKeyFallbacks("AnotherKey"));
+        Assert.Equal(DefaultConnectionAttribute.Key, fallbacks.ResolveConnectionKey("AnotherKey"));
     }
 
     [Fact]
     public void GetFallbackMap_BuildsLazilyAndCaches()
     {
-        var cs = new CountingConnectionStrings(Options.Create(TestOptions(["Default"])),
-            new FakeTypeSource(new ConnectionKeyFallbackAttribute("AnotherKey", "Default")));
+        var cs = new CountingConnectionStrings(Options.Create(TestOptions([DefaultConnectionAttribute.Key])),
+            new FakeTypeSource(new ConnectionKeyFallbackAttribute("AnotherKey", DefaultConnectionAttribute.Key)));
 
         Assert.Equal(0, cs.BuildCount);
         cs.GetConnectionKeyFallbacks("AnotherKey");
@@ -288,8 +288,8 @@ public class ConnectionKeyFallbackTests
     [Fact]
     public void GetFallbackMap_InvalidateRebuilds()
     {
-        var cs = new CountingConnectionStrings(Options.Create(TestOptions(["Default"])),
-            new FakeTypeSource(new ConnectionKeyFallbackAttribute("AnotherKey", "Default")));
+        var cs = new CountingConnectionStrings(Options.Create(TestOptions([DefaultConnectionAttribute.Key])),
+            new FakeTypeSource(new ConnectionKeyFallbackAttribute("AnotherKey", DefaultConnectionAttribute.Key)));
 
         cs.GetConnectionKeyFallbacks("AnotherKey");
         Assert.Equal(1, cs.BuildCount);
@@ -302,8 +302,8 @@ public class ConnectionKeyFallbackTests
     [Fact]
     public void GetFallbackMap_OverrideCanAvoidCaching()
     {
-        var cs = new NoCacheConnectionStrings(Options.Create(TestOptions(["Default"])),
-            new FakeTypeSource(new ConnectionKeyFallbackAttribute("AnotherKey", "Default")));
+        var cs = new NoCacheConnectionStrings(Options.Create(TestOptions([DefaultConnectionAttribute.Key])),
+            new FakeTypeSource(new ConnectionKeyFallbackAttribute("AnotherKey", DefaultConnectionAttribute.Key)));
 
         cs.GetConnectionKeyFallbacks("AnotherKey");
         cs.GetConnectionKeyFallbacks("AnotherKey");
@@ -313,17 +313,17 @@ public class ConnectionKeyFallbackTests
     [Fact]
     public void FallbackFor_ConfigCreatesMapping()
     {
-        var cs = CreateWithFallbacks(new() { ["Default"] = "ProFeatures" });
-        Assert.Equal(["ProFeatures", "Default"], cs.GetConnectionKeyFallbacks("ProFeatures"));
-        Assert.Equal("Default", cs.ResolveConnectionKey("ProFeatures"));
-        Assert.Equal("Default", cs.TryGetConnectionString("ProFeatures")?.ConnectionKey);
+        var cs = CreateWithFallbacks(new() { [DefaultConnectionAttribute.Key] = "ProFeatures" });
+        Assert.Equal(["ProFeatures", DefaultConnectionAttribute.Key], cs.GetConnectionKeyFallbacks("ProFeatures"));
+        Assert.Equal(DefaultConnectionAttribute.Key, cs.ResolveConnectionKey("ProFeatures"));
+        Assert.Equal(DefaultConnectionAttribute.Key, cs.TryGetConnectionString("ProFeatures")?.ConnectionKey);
     }
 
     [Fact]
     public void FallbackFor_ConfigOverridesAssemblyAttribute()
     {
         var cs = CreateWithFallbacks(new() { ["MyConn"] = "ProFeatures" },
-            new ConnectionKeyFallbackAttribute("ProFeatures", "Default"));
+            new ConnectionKeyFallbackAttribute("ProFeatures", DefaultConnectionAttribute.Key));
         Assert.Equal("MyConn", cs.ResolveConnectionKey("ProFeatures"));
     }
 
@@ -338,9 +338,9 @@ public class ConnectionKeyFallbackTests
     [Fact]
     public void FallbackFor_IgnoresBlankAndWhitespace()
     {
-        var cs = CreateWithFallbacks(new() { ["Default"] = "ProFeatures; ;  " });
-        Assert.Equal("Default", cs.ResolveConnectionKey("ProFeatures"));
-        Assert.Equal(["ProFeatures", "Default"], cs.GetConnectionKeyFallbacks("ProFeatures"));
+        var cs = CreateWithFallbacks(new() { [DefaultConnectionAttribute.Key] = "ProFeatures; ;  " });
+        Assert.Equal(DefaultConnectionAttribute.Key, cs.ResolveConnectionKey("ProFeatures"));
+        Assert.Equal(["ProFeatures", DefaultConnectionAttribute.Key], cs.GetConnectionKeyFallbacks("ProFeatures"));
     }
 
     [Fact]
@@ -348,7 +348,7 @@ public class ConnectionKeyFallbackTests
     {
         var cs = CreateWithFallbacks(new()
         {
-            ["Default"] = "ProFeatures",
+            [DefaultConnectionAttribute.Key] = "ProFeatures",
             ["MyConn"] = "ProFeatures"
         });
         var ex = Assert.Throws<InvalidOperationException>(() => cs.GetConnectionKeyFallbacks("ProFeatures"));
@@ -358,8 +358,8 @@ public class ConnectionKeyFallbackTests
     [Fact]
     public void FallbackFor_DuplicateInSameEntry_NoConflict()
     {
-        var cs = CreateWithFallbacks(new() { ["Default"] = "ProFeatures;ProFeatures" });
-        Assert.Equal("Default", cs.ResolveConnectionKey("ProFeatures"));
+        var cs = CreateWithFallbacks(new() { [DefaultConnectionAttribute.Key] = "ProFeatures;ProFeatures" });
+        Assert.Equal(DefaultConnectionAttribute.Key, cs.ResolveConnectionKey("ProFeatures"));
     }
 
     [Fact]

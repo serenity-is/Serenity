@@ -24,7 +24,7 @@ public class DataMigrationsTests
             Options.Create(configured));
 
         using var serviceProvider = migrations.AddMigratorServices(
-            new ServiceCollection(), "Default", connectionString).BuildServiceProvider();
+            new ServiceCollection(), DefaultConnectionAttribute.Key, connectionString).BuildServiceProvider();
         var options = serviceProvider.GetRequiredService<IOptions<UserEntityOptions>>().Value;
 
         Assert.Same(configured.RowType, options.RowType);
@@ -37,7 +37,7 @@ public class DataMigrationsTests
     private sealed class TestConnectionString : IConnectionString
     {
         public ISqlDialect Dialect => SqliteDialect.Instance;
-        public string ConnectionKey => "Default";
+        public string ConnectionKey => DefaultConnectionAttribute.Key;
         public string ConnectionString => "Data Source=:memory:";
         public string ProviderName => "Microsoft.Data.Sqlite";
     }

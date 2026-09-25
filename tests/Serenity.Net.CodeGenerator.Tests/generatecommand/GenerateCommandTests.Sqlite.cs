@@ -12,7 +12,7 @@ public partial class GenerateCommandTests
         };
         config.Connections!.Add(new GeneratorConfig.Connection
         {
-            Key = "Default",
+            Key = DefaultConnectionAttribute.Key,
             ConnectionString = connectionString,
             ProviderName = "Microsoft.Data.Sqlite",
             Dialect = "Sqlite"
@@ -31,7 +31,7 @@ public partial class GenerateCommandTests
         AddConfig(fileSystem, config);
         var console = new MockGeneratorConsole();
         var command = CreateCommand(fileSystem, console,
-            ["--cnk", "Default", "--tbl", "MyTable", "--mod", "Test",
+            ["--cnk", DefaultConnectionAttribute.Key, "--tbl", "MyTable", "--mod", "Test",
              "--cls", "MyTable", "--pms", "Test:Permission", "--wtg", "*"]);
 
         var result = command.Run();
@@ -65,7 +65,7 @@ public partial class GenerateCommandTests
         console.PromptResults.Enqueue("Test:Permission");
         console.PromptResults.Enqueue(new List<string> { "Row" });
 
-        var command = CreateCommand(fileSystem, console, ["--cnk", "Default"]);
+        var command = CreateCommand(fileSystem, console, ["--cnk", DefaultConnectionAttribute.Key]);
 
         var result = command.Run();
 
@@ -90,7 +90,7 @@ public partial class GenerateCommandTests
         var console = new MockGeneratorConsole();
         console.PromptResults.Enqueue(new List<string>());
 
-        var command = CreateCommand(fileSystem, console, ["--cnk", "Default"]);
+        var command = CreateCommand(fileSystem, console, ["--cnk", DefaultConnectionAttribute.Key]);
 
         var result = command.Run();
 
@@ -110,7 +110,7 @@ public partial class GenerateCommandTests
         var console = new MockGeneratorConsole();
 
         var command = CreateCommand(fileSystem, console,
-            ["--cnk", "Default", "--tbl", "Missing"]);
+            ["--cnk", DefaultConnectionAttribute.Key, "--tbl", "Missing"]);
 
         var result = command.Run();
 
@@ -138,7 +138,7 @@ public partial class GenerateCommandTests
         AddFile(fileSystem, projectDir + "/appsettings.json", $$"""
             {
                 "Data": {
-                    "Default": {
+                    "{{DefaultConnectionAttribute.Key}}": {
                         "ConnectionString": "{{db.ConnectionString}}",
                         "ProviderName": "Microsoft.Data.Sqlite"
                     }
@@ -153,7 +153,7 @@ public partial class GenerateCommandTests
         };
 
         var command = CreateCommand(fileSystem, console,
-            ["--cnk", "Default", "--tbl", "MyTable", "--mod", "Test",
+            ["--cnk", DefaultConnectionAttribute.Key, "--tbl", "MyTable", "--mod", "Test",
              "--cls", "MyTable", "--pms", "Test:Permission", "--wtg", "R"],
             globalUsings, [typeof(GenerateCommand).Assembly.Location]);
 
@@ -180,7 +180,7 @@ public partial class GenerateCommandTests
         AddConfig(fileSystem, config);
         var console = new MockGeneratorConsole();
         var command = CreateCommand(fileSystem, console,
-            ["--cnk", "Default", "--tbl", "MyTable", "--mod", "Test",
+            ["--cnk", DefaultConnectionAttribute.Key, "--tbl", "MyTable", "--mod", "Test",
              "--cls", "MyTable", "--pms", "Test:Permission", "--wtg", "R"]);
 
         var result = command.Run();
@@ -198,7 +198,7 @@ public partial class GenerateCommandTests
         AddConfig(fileSystem, SqliteConfig(db.ConnectionString));
         var console = new MockGeneratorConsole();
         var command = CreateCommand(fileSystem, console,
-            ["--cnk", "Default", "--tbl", "MyTable", "--mod", "Test",
+            ["--cnk", DefaultConnectionAttribute.Key, "--tbl", "MyTable", "--mod", "Test",
              "--cls", "MyTable", "--pms", "Test:Permission", "--wtg", "R"],
             nullable: nullable);
 
@@ -247,7 +247,7 @@ public partial class GenerateCommandTests
         AddConfig(fileSystem, SqliteConfig(db.ConnectionString));
         var console = new MockGeneratorConsole();
         var command = CreateCommand(fileSystem, console,
-            ["--cnk", "Default", "--tbl", "MyTable", "--mod", "Test",
+            ["--cnk", DefaultConnectionAttribute.Key, "--tbl", "MyTable", "--mod", "Test",
              "--cls", "MyTable", "--pms", "Test:Permission", "--wtg", "R"],
             assemblyList: ["/no/such/assembly.dll"]);
 

@@ -19,7 +19,7 @@ public partial class AccountPage : Controller
         [FromServices] IPermissionKeyLister permissionKeyLister,
         [FromServices] IUserRetrieveService userRetriever)
     {
-        return this.UseConnection("Default", connection =>
+        return this.UseConnection(UserRow.Fields.ConnectionKey, connection =>
         {
             ArgumentNullException.ThrowIfNull(request);
             ArgumentException.ThrowIfNullOrWhiteSpace(request.Email);
@@ -138,7 +138,7 @@ public partial class AccountPage : Controller
     {
         ArgumentNullException.ThrowIfNull(sqlConnections);
 
-        using var connection = sqlConnections.NewByKey("Default");
+        using var connection = sqlConnections.NewFor<UserRow>();
         using var uow = new UnitOfWork(connection);
         int userId;
         try

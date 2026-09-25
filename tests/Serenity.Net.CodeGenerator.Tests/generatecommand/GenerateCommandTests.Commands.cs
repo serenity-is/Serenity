@@ -36,7 +36,7 @@ public partial class GenerateCommandTests
         var config = new GeneratorConfig();
         config.Connections!.Add(new GeneratorConfig.Connection
         {
-            Key = "Default",
+            Key = DefaultConnectionAttribute.Key,
             ConnectionString = "Data Source=test.db",
             ProviderName = "Microsoft.Data.Sqlite"
         });
@@ -59,7 +59,7 @@ public partial class GenerateCommandTests
         var config = new GeneratorConfig();
         config.Connections!.Add(new GeneratorConfig.Connection
         {
-            Key = "Default",
+            Key = DefaultConnectionAttribute.Key,
             ConnectionString = "Data Source=test.db",
             ProviderName = "Microsoft.Data.Sqlite"
         });

@@ -210,7 +210,7 @@ public class MigrationUtilsTests
         string providerName = "Microsoft.Data.Sqlite") : IConnectionString
     {
         public ISqlDialect Dialect { get; } = dialect;
-        public string ConnectionKey => "Default";
+        public string ConnectionKey => DefaultConnectionAttribute.Key;
         public string ConnectionString { get; } = connectionString;
         public string ProviderName { get; } = providerName;
     }
@@ -266,7 +266,7 @@ public class MigrationUtilsTests
                 "Server=.;Database=mydb;Trusted_Connection=True;", "Microsoft.Data.SqlClient"),
             connection);
 
-        MigrationUtils.EnsureDatabase("Default", null!, connections);
+        MigrationUtils.EnsureDatabase(DefaultConnectionAttribute.Key, null!, connections);
     }
 
     [Fact]
@@ -286,7 +286,7 @@ public class MigrationUtilsTests
                     "Microsoft.Data.SqlClient"),
                 connection);
 
-            MigrationUtils.EnsureDatabase("Default", root, connections);
+            MigrationUtils.EnsureDatabase(DefaultConnectionAttribute.Key, root, connections);
 
             Assert.True(System.IO.Directory.Exists(System.IO.Path.Combine(root, "App_Data")));
         }
@@ -302,7 +302,7 @@ public class MigrationUtilsTests
     {
         EnsureSqliteProviderRegistered();
         var connections = new FakeSqlConnections(new FakeConnectionString(OracleDialect.Instance));
-        MigrationUtils.EnsureDatabase("Default", null!, connections);
+        MigrationUtils.EnsureDatabase(DefaultConnectionAttribute.Key, null!, connections);
     }
 
     [Fact]
@@ -311,7 +311,7 @@ public class MigrationUtilsTests
         EnsureSqliteProviderRegistered();
         var connections = new FakeSqlConnections(
             new FakeConnectionString(FirebirdDialect.Instance, "Data Source=foo.fdb"));
-        MigrationUtils.EnsureDatabase("Default", null!, connections);
+        MigrationUtils.EnsureDatabase(DefaultConnectionAttribute.Key, null!, connections);
     }
 
     [Fact]
@@ -322,7 +322,7 @@ public class MigrationUtilsTests
         try
         {
             var connections = new FakeSqlConnections(new FakeConnectionString(SqliteDialect.Instance));
-            MigrationUtils.EnsureDatabase("Default", root, connections);
+            MigrationUtils.EnsureDatabase(DefaultConnectionAttribute.Key, root, connections);
             Assert.True(System.IO.Directory.Exists(System.IO.Path.Combine(root, "App_Data")));
         }
         finally

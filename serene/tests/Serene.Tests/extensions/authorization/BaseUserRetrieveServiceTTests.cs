@@ -2,7 +2,7 @@ namespace Serenity.Extensions;
 
 public class BaseUserRetrieveServiceTTests
 {
-    [ConnectionKey("Default")]
+    [DefaultConnection]
     private class IntUserRow : Row<IntUserRow.RowFields>, IIdRow, INameRow
     {
         [IdProperty]
@@ -17,7 +17,7 @@ public class BaseUserRetrieveServiceTTests
         }
     }
 
-    [ConnectionKey("Default")]
+    [DefaultConnection]
     private class Int64UserRow : Row<Int64UserRow.RowFields>, IIdRow, INameRow
     {
         [IdProperty]
@@ -32,7 +32,7 @@ public class BaseUserRetrieveServiceTTests
         }
     }
 
-    [ConnectionKey("Default")]
+    [DefaultConnection]
     private class GuidUserRow : Row<GuidUserRow.RowFields>, IIdRow, INameRow
     {
         [IdProperty]
@@ -47,7 +47,7 @@ public class BaseUserRetrieveServiceTTests
         }
     }
 
-    [ConnectionKey("Default")]
+    [DefaultConnection]
     private class StringUserRow : Row<StringUserRow.RowFields>, IIdRow, INameRow
     {
         [IdProperty]

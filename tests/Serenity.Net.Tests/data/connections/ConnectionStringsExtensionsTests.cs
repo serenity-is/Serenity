@@ -5,7 +5,7 @@ public class ConnectionStringsExtensionsTests
     [Fact]
     public void Get_NullConnectionStrings_ThrowsArgumentNullException()
     {
-        Assert.Throws<ArgumentNullException>(() => ((IConnectionStrings)null).Get("Default"));
+        Assert.Throws<ArgumentNullException>(() => ((IConnectionStrings)null).Get(DefaultConnectionAttribute.Key));
     }
 
     [Fact]
@@ -14,7 +14,7 @@ public class ConnectionStringsExtensionsTests
         var options = new ConnectionStringOptions();
         var cs = new DefaultConnectionStrings(options);
 
-        Assert.Throws<ArgumentOutOfRangeException>(() => cs.Get("Default"));
+        Assert.Throws<ArgumentOutOfRangeException>(() => cs.Get(DefaultConnectionAttribute.Key));
     }
 
     [Fact]
@@ -22,7 +22,7 @@ public class ConnectionStringsExtensionsTests
     {
         var options = new ConnectionStringOptions
         {
-            ["Default"] = new ConnectionStringEntry
+            [DefaultConnectionAttribute.Key] = new ConnectionStringEntry
             {
                 ConnectionString = "cs",
                 ProviderName = "System.Data.SqlClient"
@@ -30,6 +30,6 @@ public class ConnectionStringsExtensionsTests
         };
         var cs = new DefaultConnectionStrings(options);
 
-        Assert.Equal("Default", cs.Get("Default").ConnectionKey);
+        Assert.Equal(DefaultConnectionAttribute.Key, cs.Get(DefaultConnectionAttribute.Key).ConnectionKey);
     }
 }

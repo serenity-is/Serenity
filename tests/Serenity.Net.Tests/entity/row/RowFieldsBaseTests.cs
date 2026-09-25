@@ -300,7 +300,7 @@ public class RowFieldsBaseTests
     public void DefaultMetadata_WithoutAttributes()
     {
         var f = new PlainRow.RowFields();
-        Assert.Equal("Default", f.ConnectionKey);
+        Assert.Equal(DefaultConnectionAttribute.Key, f.ConnectionKey);
 
         f.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect, userEntityOptions: null);
         Assert.Equal("Data", f.ModuleIdentifier);

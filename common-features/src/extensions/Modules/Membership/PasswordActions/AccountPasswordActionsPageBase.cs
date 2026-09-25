@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.DataProtection;
+using System.Reflection;
 
 namespace Serenity.Extensions;
 
@@ -115,7 +116,9 @@ public abstract class AccountPasswordActionsPageBase<TUserRow> : MembershipPageB
         [FromServices] IOptions<EnvironmentSettings> environmentOptions,
         [FromServices] ITextLocalizer localizer)
     {
-        return this.InTransaction("Default", uow =>
+        var connectionKey = typeof(TUserRow).GetCustomAttribute<ConnectionKeyAttribute>()?.Value ?? DefaultConnectionAttribute.Key;
+
+        return this.InTransaction(connectionKey, uow =>
         {
             ArgumentNullException.ThrowIfNull(request);
             ArgumentException.ThrowIfNullOrEmpty(request.OldPassword);

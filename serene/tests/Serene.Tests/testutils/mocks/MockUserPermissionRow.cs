@@ -1,6 +1,6 @@
 namespace Serenity.TestUtils;
 
-[ConnectionKey("Default")]
+[DefaultConnection]
 public sealed class MockUserPermissionRow : Row<MockUserPermissionRow.RowFields>, IUserPermissionRow
 {
     public int? UserId { get => fields.UserId[this]; set => fields.UserId[this] = value; }

@@ -1,6 +1,6 @@
 namespace Serene.Administration;
 
-[ConnectionKey("Default"), Module("Administration"), TableName("Languages")]
+[DefaultConnection, Module("Administration"), TableName("Languages")]
 [DisplayName("Languages"), InstanceName("Language")]
 [ReadPermission(PermissionKeys.Translation)]
 [ModifyPermission(PermissionKeys.Translation)]
