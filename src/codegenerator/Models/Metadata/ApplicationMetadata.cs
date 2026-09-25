@@ -193,9 +193,7 @@ public class ApplicationMetadata : IApplicationMetadata
 
         public string FullName => type.FullNameOf();
 
-        public string? Module => type.GetAttributes()
-            .FirstOrDefault(x => x.AttributeType?.Name == "ModuleAttribute" &&
-                x.AttributeType?.NamespaceOf() == "Serenity.ComponentModel")?.ConstructorArguments?.FirstOrDefault().Value as string;
+        public string? Module => TypingsUtils.GetModuleKeyForType(type);
 
         public bool HasLookupScriptAttribute => type.GetAttributes()
             .Any(x => x.AttributeType?.Name == "LookupScriptAttribute" &&

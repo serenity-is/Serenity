@@ -44,6 +44,20 @@ public partial class ServerTypingsGenerator
         return "String";
     }
 
+#if ISSOURCEGENERATOR
+    private string? GetAttributeKeyViaBaseCtorCall(TypeReference attributeType)
+    {
+        return TypingsUtils.GetAttributeKeyViaBaseCtorCall(attributeType, Compilation, cancellationToken);
+    }
+#else
+#pragma warning disable CA1822 // Mark members as static
+    private string? GetAttributeKeyViaBaseCtorCall(TypeReference attributeType)
+    {
+        return TypingsUtils.GetAttributeKeyViaBaseCtorCall(attributeType);
+    }
+#pragma warning restore CA1822 // Mark members as static
+#endif
+
     private string? GetEditorTypeFromAttribute(CustomAttribute editorTypeAttr)
     {
         if (editorTypeAttr.AttributeType() is not { } attributeType)
@@ -53,10 +67,10 @@ public partial class ServerTypingsGenerator
 
         if (attrFullName is "Serenity.ComponentModel.EditorTypeAttribute"
                 or "Serenity.ComponentModel.CustomEditorAttribute" &&
-                GetAttributeKeyViaConstuctorArgument(editorTypeAttr) is string ctorArgKey)
+                TypingsUtils.GetAttributeKeyViaConstructorArgument(editorTypeAttr) is string ctorArgKey)
             return ctorArgKey;
 
-        if ((GetAttributeKeyViaKeyConstant(attributeType) ??
+        if ((TypingsUtils.GetAttributeKeyViaKeyConstant(attributeType) ??
              GetAttributeKeyViaBaseCtorCall(attributeType)) is string typeKey)
             return typeKey;
 
@@ -87,7 +101,7 @@ public partial class ServerTypingsGenerator
         return -1;
     }
 
-    private static IEnumerable<string> GetDialogTypeKeyRefs(CustomAttribute? editorTypeAttr)
+    private IEnumerable<string> GetDialogTypeKeyRefs(CustomAttribute? editorTypeAttr)
     {
         if (editorTypeAttr != null)
         {

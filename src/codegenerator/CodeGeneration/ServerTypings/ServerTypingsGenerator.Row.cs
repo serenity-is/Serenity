@@ -195,11 +195,19 @@ public partial class ServerTypingsGenerator
         return null;
     }
 
-    private static string? DetermineModuleIdentifier(TypeDefinition rowType)
+    private string? GetModuleKeyForType(TypeDefinition rowType)
     {
-        var moduleAttr = TypingsUtils.GetAttr(rowType, "Serenity.ComponentModel", "ModuleAttribute");
-        if (moduleAttr != null)
-            return moduleAttr.ConstructorArguments[0].Value as string;
+#if ISSOURCEGENERATOR
+        return TypingsUtils.GetModuleKeyForType(rowType, compilation, cancellationToken);
+#else
+        return TypingsUtils.GetModuleKeyForType(rowType);
+#endif
+    }
+
+    private string? DetermineRowModuleIdentifier(TypeDefinition rowType)
+    { 
+        if (GetModuleKeyForType(rowType) is string moduleKey)
+            return moduleKey;
 
         var ns = rowType.NamespaceOf() ?? "";
 
@@ -213,18 +221,18 @@ public partial class ServerTypingsGenerator
         return ns;
     }
 
-    private static string DetermineRowIdentifier(TypeDefinition rowType)
+    private string DetermineRowIdentifier(TypeDefinition rowType)
     {
         var name = rowType.Name;
         if (name.EndsWith("Row", StringComparison.Ordinal))
             name = name[0..^3];
 
-        var moduleIdentifier = DetermineModuleIdentifier(rowType);
+        var moduleIdentifier = DetermineRowModuleIdentifier(rowType);
         return string.IsNullOrEmpty(moduleIdentifier) ? name :
             moduleIdentifier + "." + name;
     }
 
-    private static string? DetermineLocalTextPrefix(TypeDefinition rowType)
+    private string? DetermineLocalTextPrefix(TypeDefinition rowType)
     {
         string? localTextPrefix = null;
 
@@ -311,20 +319,10 @@ public partial class ServerTypingsGenerator
 #endif
     }
 
-    private static string AutoLookupKeyFor(TypeDefinition type)
+    private string AutoLookupKeyFor(TypeDefinition type)
     {
-        string? module;
-        var moduleAttr = TypingsUtils.GetAttr(type,
-            "Serenity.ComponentModel", "ModuleAttribute");
-        if (moduleAttr != null)
-        {
-            if (moduleAttr.ConstructorArguments().Count == 1 &&
-                moduleAttr.ConstructorArguments()[0].Type?.FullNameOf() == "System.String")
-                module = moduleAttr.ConstructorArguments[0].Value as string;
-            else
-                module = null;
-        }
-        else
+        string? module = GetModuleKeyForType(type);
+        if (module is null)
         {
             module = type.NamespaceOf() ?? "";
 

@@ -328,5 +328,29 @@ public static partial class TypingsUtils
         return constant.Kind == TypedConstantKind.Array ?
             constant.Values : constant.Value;
     }
+
+    public static string? GetAttributeKeyViaBaseCtorCall(TypeReference attributeType,
+        Compilation compilation,
+        System.Threading.CancellationToken cancellationToken)
+    {
+        foreach (var constructor in attributeType.Resolve().MethodsOf().Where(x => x.IsConstructor()))
+        {
+            foreach (var syntaxReference in constructor.DeclaringSyntaxReferences)
+            {
+                if (syntaxReference.GetSyntax(cancellationToken) is not Microsoft.CodeAnalysis.CSharp.Syntax.ConstructorDeclarationSyntax
+                    { Initializer: { } initializer } constructorSyntax)
+                    continue;
+
+                var semanticModel = compilation.GetSemanticModel(constructorSyntax.SyntaxTree);
+                foreach (var argument in initializer.ArgumentList.Arguments.Reverse())
+                {
+                    var constant = semanticModel.GetConstantValue(argument.Expression, cancellationToken);
+                    if (constant.HasValue && constant.Value is string key)
+                        return key;
+                }
+            }
+        }
+        return null;
+    }
 }
 #endif

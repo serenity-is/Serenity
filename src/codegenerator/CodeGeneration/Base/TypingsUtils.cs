@@ -126,4 +126,51 @@ public static partial class TypingsUtils
             b.Name == name &&
             b.NamespaceOf() == ns);
     }
+
+    public static string? GetAttributeKeyViaConstructorArgument(CustomAttribute attr)
+    {
+        if (attr.ConstructorArguments() is { Count: 1 } args &&
+            args[0] is { } arg &&
+            arg.Value is string value &&
+            arg.Type?.FullNameOf() == "System.String")
+            return value;
+
+        return null;
+    }
+
+    public static string? GetAttributeKeyViaKeyConstant(TypeReference attributeType)
+    {
+        return attributeType.Resolve().FieldsOf().FirstOrDefault(x =>
+            x.IsStatic &&
+            x.IsPublic() &&
+            x.Name == "Key" &&
+            x.HasConstant() &&
+            x.Constant() is string &&
+            x.DeclaringType().FullNameOf() == attributeType.FullNameOf())?.Constant() as string;
+    }
+
+#if ISSOURCEGENERATOR
+    public static string? GetModuleKeyForType(TypeDefinition rowType, Microsoft.CodeAnalysis.Compilation compilation, System.Threading.CancellationToken cancellationToken)
+#else
+    public static string? GetModuleKeyForType(TypeDefinition rowType)
+#endif
+    {
+        var moduleAttr = GetAttr(rowType, "Serenity.ComponentModel", "ModuleAttribute");
+        if (moduleAttr is null || moduleAttr.AttributeType() is not { } attributeType)
+            return null;
+
+        if (attributeType.FullNameOf() is "Serenity.ComponentModel.ModuleAttribute" &&
+            GetAttributeKeyViaConstructorArgument(moduleAttr) is string ctorArgKey)
+            return ctorArgKey;
+
+        if ((GetAttributeKeyViaKeyConstant(attributeType) ??
+#if ISSOURCEGENERATOR
+            GetAttributeKeyViaBaseCtorCall(attributeType, compilation, cancellationToken)) is string typeKey)
+#else
+            GetAttributeKeyViaBaseCtorCall(attributeType)) is string typeKey)
+#endif
+            return typeKey;
+
+        return null;
+    }
 }

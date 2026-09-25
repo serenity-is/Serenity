@@ -1,4 +1,4 @@
-﻿namespace Serenity.ComponentModel;
+namespace Serenity.ComponentModel;
 
 /// <summary>
 /// Sets the module name for the row. The module name is usually the folder name
@@ -9,6 +9,7 @@
 /// Initializes a new instance of the <see cref="ModuleAttribute"/> class.
 /// </remarks>
 /// <param name="module">The module.</param>
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Interface | AttributeTargets.Enum, AllowMultiple = false, Inherited = true)]
 public class ModuleAttribute(string module) : Attribute
 {
 

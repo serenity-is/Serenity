@@ -4,6 +4,7 @@ namespace Serenity.Data;
 /// Determines the connection key used for a class.
 /// </summary>
 /// <seealso cref="Attribute" />
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Interface | AttributeTargets.Enum | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
 public class ConnectionKeyAttribute : Attribute
 {
     /// <summary>

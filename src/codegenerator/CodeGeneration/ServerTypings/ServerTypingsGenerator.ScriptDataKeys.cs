@@ -20,20 +20,10 @@ public partial class ServerTypingsGenerator
         }
     }
 
-    private static string AutoDataScriptKeyFor(TypeDefinition type)
+    private string AutoDataScriptKeyFor(TypeDefinition type)
     {
-        string? module;
-        var moduleAttr = TypingsUtils.GetAttr(type,
-            "Serenity.ComponentModel", "ModuleAttribute");
-        if (moduleAttr != null)
-        {
-            if (moduleAttr.ConstructorArguments().Count == 1 &&
-                moduleAttr.ConstructorArguments()[0].Type?.FullNameOf() == "System.String")
-                module = moduleAttr.ConstructorArguments[0].Value as string;
-            else
-                module = null;
-        }
-        else
+        string? module = GetModuleKeyForType(type);
+        if (module is null)
         {
             module = type.NamespaceOf() ?? "";
             if (module.EndsWith(".Scripts", StringComparison.Ordinal))

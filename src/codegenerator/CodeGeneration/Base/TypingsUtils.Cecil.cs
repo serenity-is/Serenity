@@ -418,5 +418,21 @@ public static partial class TypingsUtils
     {
         return n.Value;
     }
+
+    public static string? GetAttributeKeyViaBaseCtorCall(TypeReference attributeType)
+    {
+        if (attributeType.Resolve().MethodsOf()
+                    .Where(x => x.IsConstructor())
+                    .SelectMany(m => m.Body.Instructions
+                        .Where(i => i.OpCode == Mono.Cecil.Cil.OpCodes.Call &&
+                            (i.Operand is Mono.Cecil.MethodReference) &&
+                            (i.Operand as Mono.Cecil.MethodReference)!.Resolve().IsConstructor &&
+                            i.Previous.OpCode == Mono.Cecil.Cil.OpCodes.Ldstr &&
+                            i.Previous.Operand is string)
+                        .Select(x => x.Previous.Operand as string)).FirstOrDefault() is string key)
+            return key;
+        return null;
+    }
+
 }
 #endif
