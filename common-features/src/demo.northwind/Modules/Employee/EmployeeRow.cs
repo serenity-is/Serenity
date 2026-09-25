@@ -2,7 +2,7 @@ using System.IO;
 
 namespace Serenity.Demo.Northwind;
 
-[ConnectionKey("Northwind"), Module("Northwind"), TableName("Employees")]
+[NorthwindConnection, NorthwindModule, TableName("Employees")]
 [DisplayName("Employees"), InstanceName("Employee")]
 [ReadPermission(PermissionKeys.General)]
 [ModifyPermission(PermissionKeys.General)]

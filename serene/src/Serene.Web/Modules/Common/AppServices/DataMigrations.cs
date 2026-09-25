@@ -14,9 +14,9 @@ public class DataMigrations(ITypeSource typeSource,
     IOptions<UserEntityOptions> userEntityOptions) : IDataMigrations
 {
     private static readonly string[] databaseKeys = [
-        DefaultConnectionAttribute.Key
+        DefaultConnectionAttribute.Key,
 #if (Northwind)
-        , "Northwind"
+        Serenity.Demo.Northwind.NorthwindConnectionAttribute.Key,
 #endif
     ];
 

@@ -1,6 +1,6 @@
 ﻿namespace Serenity.Demo.Northwind.Lookups;
 
-[LookupScript, Module("Northwind")]
+[LookupScript, NorthwindModule]
 public class CustomerLookup : RowLookupScript<CustomerRow>
 {
     public CustomerLookup(ISqlConnections sqlConnections)

@@ -1,6 +1,6 @@
 namespace Serenity.Demo.Northwind;
 
-[ConnectionKey("Northwind"), Module("Northwind"), TableName("ProductLog")]
+[NorthwindConnection, NorthwindModule, TableName("ProductLog")]
 public sealed class ProductLogRow : Row<ProductLogRow.RowFields>, ICaptureLogRow
 {
     [Identity, IdProperty]

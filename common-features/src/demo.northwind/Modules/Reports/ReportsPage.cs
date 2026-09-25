@@ -14,6 +14,6 @@ public class ReportsPage(IReportRegistry reportRegistry, IRequestContext context
     public ActionResult Index([FromServices] IReportTreeFactory reportTreeFactory)
     {
         return View(Extensions.MVC.Views.Reporting.ReportPage,
-            reportTreeFactory.BuildReportTree("Northwind"));
+            reportTreeFactory.BuildReportTree(NorthwindConnectionAttribute.Key));
     }
 }

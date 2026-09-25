@@ -1,6 +1,6 @@
 namespace Serenity.Demo.Northwind;
 
-[ConnectionKey("Northwind"), Module("Northwind"), TableName("EmployeeTerritories")]
+[NorthwindConnection, NorthwindModule, TableName("EmployeeTerritories")]
 [DisplayName("EmployeeTerritories"), InstanceName("EmployeeTerritories")]
 [ReadPermission(PermissionKeys.General)]
 [ModifyPermission(PermissionKeys.General)]

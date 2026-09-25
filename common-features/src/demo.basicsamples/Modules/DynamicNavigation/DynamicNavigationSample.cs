@@ -15,7 +15,7 @@ public class DynamicNavigationSample(ISqlConnections sqlConnections) : INavigati
         };
 
         // Add product categories as dynamic navigation items for demo purpose
-        using (var connection = SqlConnections.NewByKey("Northwind"))
+        using (var connection = SqlConnections.NewFor<CategoryRow>())
         {
             var categories = connection.List<CategoryRow>();
             foreach (var category in categories)
