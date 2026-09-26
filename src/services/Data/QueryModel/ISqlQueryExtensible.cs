@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 /// <summary>
 /// Extensible SQL query interface. Used to abstract Serenity.Data.Row dependency from SqlQuery.
@@ -14,10 +14,15 @@ public interface ISqlQueryExtensible
     IList<object> IntoRows { get; }
 
     /// <summary>
+    /// Gets the currently selected into row.
+    /// </summary>
+    object? CurrentIntoRow { get; }
+
+    /// <summary>
     /// Selects the into row.
     /// </summary>
-    /// <param name="into">The into.</param>
-    void IntoRowSelection(object into);
+    /// <param name="into">The into row.</param>
+    void IntoRowSelection(object? into);
 
     /// <summary>
     /// Gets the first into row.

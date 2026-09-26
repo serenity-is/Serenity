@@ -615,6 +615,9 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
 
     IList<object> ISqlQueryExtensible.IntoRows => into;
 
+    object? ISqlQueryExtensible.CurrentIntoRow =>
+        intoIndex >= 0 && intoIndex < into.Count ? into[intoIndex] : null;
+
     private Dictionary<string, IHaveJoins> AliasWithJoins
     {
         get
@@ -631,7 +634,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
             delegate (Column s) { return s.IntoField == field; });
     }
 
-    void ISqlQueryExtensible.IntoRowSelection(object row)
+    void ISqlQueryExtensible.IntoRowSelection(object? row)
     {
         if (row == null)
             intoIndex = -1;

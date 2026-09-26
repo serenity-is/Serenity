@@ -336,6 +336,86 @@ public static class EntitySqlQueryExtensions
     }
 
     /// <summary>
+    /// Selects fields from an already joined foreign row into a row-valued property.
+    /// </summary>
+    /// <remarks>Nested calls to <see cref="SelectIntoForeignRow{TFields}"/> are not currently supported.</remarks>
+    /// <typeparam name="TFields">The fields type of the foreign row.</typeparam>
+    /// <param name="query">The query.</param>
+    /// <param name="foreignRowField">The row field representing the foreign row.</param>
+    /// <param name="configure">Configures selected fields for the foreign row.</param>
+    /// <returns>The query itself.</returns>
+    /// <exception cref="ArgumentNullException">query, foreignRowField, or configure is null.</exception>
+    /// <exception cref="ArgumentException">The field is not row-valued or does not belong to the current into row.</exception>
+    /// <exception cref="InvalidOperationException">The foreign row metadata is invalid or there is no current into row.</exception>
+    public static SqlQuery SelectIntoForeignRow<TFields>(this SqlQuery query, Field foreignRowField, Action<TFields, SqlQuery> configure)
+        where TFields: RowFieldsBase
+    {
+        ArgumentNullException.ThrowIfNull(query);
+        ArgumentNullException.ThrowIfNull(foreignRowField);
+        ArgumentNullException.ThrowIfNull(configure);
+
+        var foreignRowType = foreignRowField.ValueType;
+        if (!typeof(IRow).IsAssignableFrom(foreignRowType) || foreignRowType.IsAbstract || foreignRowType.IsInterface)
+            throw new ArgumentException("The field must hold a concrete row value, such as RowField<TRow>.", nameof(foreignRowField));
+
+        var extensible = (ISqlQueryExtensible)query;
+        if (extensible.CurrentIntoRow is not IRow row)
+            throw new InvalidOperationException("A current into row must be selected before selecting into a foreign row.");
+
+        if (row.Fields.GetType() != foreignRowField.Fields.GetType())
+            throw new ArgumentException("The foreign row field must belong to the current into row type.", nameof(foreignRowField));
+
+        if (foreignRowField.GetAttribute<ForeignRowAttribute>()?.ForeignKeyProperty is not string fkPropertyName)
+            throw new InvalidOperationException("The foreign row field must have a ForeignRowAttribute with a valid foreign key property.");
+
+        if ((row.Fields.FindFieldByPropertyName(fkPropertyName) ??
+             row.Fields.FindField(fkPropertyName)) is not Field fkField)
+            throw new InvalidOperationException("The ForeignRowAttribute does not match a property or field on the current into row.");
+
+        var foreignJoin = fkField.ForeignJoinAlias ??
+            throw new InvalidOperationException("The foreign key field must have a ForeignJoinAlias.");
+        var alias = foreignJoin.Name;
+        if (string.IsNullOrEmpty(alias))
+            throw new InvalidOperationException("The foreign key field's ForeignJoinAlias must have a name.");
+
+        IRow foreignRow;
+        if (foreignRowField.AsObjectNoCheck(row) is IRow existingForeignRow)
+            foreignRow = existingForeignRow;
+        else
+        {
+            if (Activator.CreateInstance(foreignRowType) is not IRow newForeignRow)
+                throw new InvalidOperationException("The foreign row field value type must be constructible as an IRow.");
+
+            foreignRow = newForeignRow;
+            foreignRowField.AsObject(row, foreignRow);
+        }
+
+        if (!string.Equals(fkField.ForeignTable, foreignRow.Table, StringComparison.OrdinalIgnoreCase))
+            throw new InvalidOperationException("The foreign key target table does not match the foreign row field type.");
+
+        if (foreignRow.Fields is not TFields foreignFields)
+            throw new ArgumentException("TFields must match the fields type of the foreign row field.", nameof(foreignRowField));
+
+        query.EnsureJoin(foreignJoin);
+
+        if (!string.Equals(alias, foreignFields.AliasName, StringComparison.Ordinal))
+            foreignFields = (TFields)RowFieldsProvider.Current.ResolveWithAlias(typeof(TFields), alias);
+
+        var previousIntoRow = extensible.CurrentIntoRow;
+        extensible.IntoRowSelection(foreignRow);
+        try
+        {
+            configure(foreignFields, query);
+        }
+        finally
+        {
+            extensible.IntoRowSelection(previousIntoRow);
+        }
+
+        return query;
+    }
+
+    /// <summary>
     /// Adds a field's expression to the order by list.
     /// </summary>
     /// <param name="query">The query.</param>
