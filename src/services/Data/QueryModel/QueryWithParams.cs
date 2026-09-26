@@ -242,7 +242,7 @@ public class QueryWithParams : IQueryWithParams
     /// Gets an automatically generated alias that is not already used in this query tree.
     /// </summary>
     /// <returns>The alias.</returns>
-    public string AutoAlias()
+    internal string AutoAlias()
     {
         if (parent is not null)
             return parent.AutoAlias();

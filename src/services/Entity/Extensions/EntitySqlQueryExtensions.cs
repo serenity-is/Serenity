@@ -159,14 +159,14 @@ public static class EntitySqlQueryExtensions
     /// <param name="configure">An optional callback to configure the aliased fields and subquery.</param>
     /// <returns>The created subquery.</returns>
     /// <exception cref="ArgumentNullException">query or fields is null.</exception>
-    public static SqlQuery SubQueryFrom<TFields>(this SqlQuery query, TFields fields, Action<TFields, SqlQuery>? configure = null)
+    public static SqlQuery SubQueryFrom<TFields>(this QueryWithParams query, TFields fields, Action<TFields, SqlQuery>? configure = null)
         where TFields : RowFieldsBase
     {
         ArgumentNullException.ThrowIfNull(query);
         ArgumentNullException.ThrowIfNull(fields);
         if (fields.AliasName is "T0")
             fields = fields.As(query.AutoAlias());
-        return query.SubQuery().From(fields, configure!);
+        return query.CreateSubQuery<SqlQuery>().From(fields, configure!);
     }
 
     /// <summary>

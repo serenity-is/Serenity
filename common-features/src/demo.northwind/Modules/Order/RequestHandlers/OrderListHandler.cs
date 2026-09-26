@@ -13,15 +13,12 @@ public class OrderListHandler(IRequestContext context) :
 
         if (Request.ProductID != null)
         {
-            var od = OrderDetailRow.Fields.As("od");
-
             query.Where(Criteria.Exists(
-                query.SubQuery()
+                query.SubQueryFrom(OrderDetailRow.Fields, (od, subquery) => subquery
                     .Select("1")
-                    .From(od)
                     .Where(
                         od.OrderID == MyRow.Fields.OrderID &
-                        od.ProductID == Request.ProductID.Value)
+                        od.ProductID == Request.ProductID.Value))
                     .ToString()));
         }
     }

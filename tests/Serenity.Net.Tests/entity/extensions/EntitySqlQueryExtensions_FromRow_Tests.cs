@@ -63,4 +63,32 @@ public partial class EntitySqlQueryExtensions_FromRow_Tests
         Assert.Equal(Normalize.Sql("SELECT T0.[ComplexID] AS [ID] FROM [ComplexTable] T0 WHERE (T0.[ComplexID] IN (SELECT T1.[ComplexID] AS [ID] FROM [ComplexTable] T1))"),
             Normalize.Sql(query.ToString()));
     }
+
+    [Fact]
+    public void SubQueryFromUsesUniqueAliasesForSqlQuery()
+    {
+        AssertSubQueryFromUsesUniqueAliases(new SqlQuery());
+    }
+
+    [Fact]
+    public void SubQueryFromUsesUniqueAliasesForSqlDelete()
+    {
+        AssertSubQueryFromUsesUniqueAliases(new SqlDelete("ComplexTable"));
+    }
+
+    [Fact]
+    public void SubQueryFromUsesUniqueAliasesForSqlInsert()
+    {
+        AssertSubQueryFromUsesUniqueAliases(new SqlInsert("ComplexTable"));
+    }
+
+    private static void AssertSubQueryFromUsesUniqueAliases(QueryWithParams query)
+    {
+        var aliases = new List<string?>();
+
+        query.SubQueryFrom(ComplexRow.Fields, (fields, _) => aliases.Add(fields.AliasName));
+        query.SubQueryFrom(ComplexRow.Fields, (fields, _) => aliases.Add(fields.AliasName));
+
+        Assert.Equal(new string?[] { "T1", "T2" }, aliases);
+    }
 }
