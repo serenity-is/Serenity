@@ -49,7 +49,6 @@ public class BasePermissionServiceTMoreTests
         using var connection = new MockDbConnection()
             .InterceptListRows(args =>
             {
-                args.EditQuery(new SqlQuery());
                 if (args.Type == typeof(MockUserPermissionRow))
                 {
                     return new OptionalValue<System.Collections.IList>(new List<MockUserPermissionRow>
@@ -82,7 +81,6 @@ public class BasePermissionServiceTMoreTests
         using var connection = new MockDbConnection()
             .InterceptListRows(args =>
             {
-                args.EditQuery(new SqlQuery());
                 if (args.Type == typeof(MockUserRoleRow))
                 {
                     return new OptionalValue<System.Collections.IList>(new List<MockUserRoleRow>
@@ -124,7 +122,6 @@ public class BasePermissionServiceTMoreTests
         using var connection = new MockDbConnection()
             .InterceptListRows(args =>
             {
-                args.EditQuery(new SqlQuery());
                 if (args.Type == typeof(MockUserPermissionRow))
                 {
                     loadCount++;
@@ -154,7 +151,6 @@ public class BasePermissionServiceTMoreTests
         using var connection = new MockDbConnection()
             .InterceptListRows(args =>
             {
-                args.EditQuery(new SqlQuery());
                 if (args.Type == typeof(MockUserPermissionRow))
                 {
                     return new OptionalValue<System.Collections.IList>(new List<MockUserPermissionRow>

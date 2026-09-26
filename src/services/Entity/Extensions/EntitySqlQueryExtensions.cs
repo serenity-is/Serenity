@@ -397,4 +397,52 @@ public static class EntitySqlQueryExtensions
 
         return query;
     }
+
+    extension(SqlDelete)
+    {
+        /// <summary>
+        /// Creates a new SqlDelete query from a fields object and allows for additional configuration.</summary>
+        /// <typeparam name="TFields"></typeparam>
+        /// <param name="fields"></param>
+        /// <param name="configure">Configure callback that will receive fields and this SqlDelete instance.</param>
+        public static SqlDelete From<TFields>(TFields fields, Action<TFields, SqlDelete>? configure = null)
+            where TFields : RowFieldsBase
+        {
+            var query = new SqlDelete(fields.TableName);
+            configure?.Invoke(fields, query);
+            return query;
+        }
+    }
+
+    extension(SqlInsert)
+    {
+        /// <summary>
+        /// Creates a new SqlInsert query from a fields object and allows for additional configuration.</summary>
+        /// <typeparam name="TFields"></typeparam>
+        /// <param name="fields"></param>
+        /// <param name="configure">Configure callback that will receive fields and this SqlInsert instance.</param>
+        public static SqlInsert Into<TFields>(TFields fields, Action<TFields, SqlInsert>? configure = null)
+            where TFields : RowFieldsBase
+        {
+            var query = new SqlInsert(fields.TableName);
+            configure?.Invoke(fields, query);
+            return query;
+        }
+    }
+
+    extension(SqlUpdate)
+    {
+        /// <summary>
+        /// Creates a new SqlUpdate query from a fields object and allows for additional configuration.</summary>
+        /// <typeparam name="TFields"></typeparam>
+        /// <param name="fields"></param>
+        /// <param name="configure">Configure callback that will receive fields and this SqlUpdate instance.</param>
+        public static SqlUpdate Table<TFields>(TFields fields, Action<TFields, SqlUpdate>? configure = null)
+            where TFields : RowFieldsBase
+        {
+            var query = new SqlUpdate(fields.TableName);
+            configure?.Invoke(fields, query);
+            return query;
+        }
+    }
 }

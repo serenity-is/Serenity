@@ -92,13 +92,13 @@ public class UserPermissionRepository(IRequestContext context) : BaseRepository(
         return new ListResponse<string>
         {
             Entities = [.. connection.Query<string>(
-                new SqlQuery().From(new RolePermissionRow(), (rp, query) => query
-                    .Select(rp.PermissionKey)
+                new SqlQuery().From(new RolePermissionRow(), (fields, query) => query
+                    .Select(fields.PermissionKey)
                     .Distinct(true)
-                    .OrderBy(rp.PermissionKey)
-                    .Where(rp.RoleId.In(query.SubQueryFrom(UserRoleRow.Fields, (ur, subquery) => subquery
-                        .Select(ur.RoleId)
-                        .Where(ur.UserId == ArgumentChecks.NotNull(request.UserID)))))))]
+                    .OrderBy(fields.PermissionKey)
+                    .Where(fields.RoleId.In(query.SubQueryFrom(UserRoleRow.Fields, (urFields, urQuery) => urQuery
+                        .Select(urFields.RoleId)
+                        .Where(urFields.UserId == ArgumentChecks.NotNull(request.UserID)))))))]
         };
     }
 }

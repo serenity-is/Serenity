@@ -137,8 +137,12 @@ public class EntityConnectionExtensions_SingleFirstCountExistsList_Tests
     public async Task CountAsync_Interceptor()
     {
         using var connection = new MockDbConnection()
-            .InterceptListRows(args => args.CountOnly ?
-                new OptionalValue<System.Collections.IList>(new System.Collections.ArrayList()) : default);
+            .InterceptListRows(args =>
+            {
+                Assert.True(args.CountOnly);
+                Assert.Contains("COUNT", args.Query.ToString().ToUpperInvariant());
+                return new OptionalValue<System.Collections.IList>(new System.Collections.ArrayList());
+            });
 
         Assert.Equal(0, await connection.CountAsync<IdNameRow>(cancellationToken: TestContext.Current.CancellationToken));
     }
@@ -235,6 +239,27 @@ public class EntityConnectionExtensions_SingleFirstCountExistsList_Tests
         var rows = await connection.ListAsync<IdNameRow>(cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.Equal(2, rows.Count);
+    }
+
+    [Fact]
+    public async Task ListAsync_WithEditQuery_InterceptorReceivesConfiguredQuery()
+    {
+        SqlQuery? callbackQuery = null;
+        var expected = new List<IdNameRow>();
+        using var connection = new MockDbConnection()
+            .InterceptListRows(args =>
+            {
+                Assert.Same(callbackQuery, args.Query);
+                return new OptionalValue<System.Collections.IList>(expected);
+            });
+
+        var rows = await connection.ListAsync<IdNameRow>(query =>
+        {
+            callbackQuery = query;
+            query.Select("ID");
+        }, TestContext.Current.CancellationToken);
+
+        Assert.Same(expected, rows);
     }
 
     [Fact]

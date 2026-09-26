@@ -3,6 +3,28 @@ using System.Collections;
 namespace Serenity.Data;
 
 /// <summary>
+/// Arguments for intercepting entity list and count operations.
+/// </summary>
+/// <param name="RowType">The type of the row.</param>
+/// <param name="Query">The fully configured query.</param>
+public sealed record ListRowsArgs(Type RowType, SqlQuery Query)
+{
+    /// <summary>
+    /// True when the query is for a count operation.
+    /// </summary>
+    public bool CountOnly { get; init; }
+}
+
+/// <summary>
+/// Arguments for intercepting entity find operations.
+/// </summary>
+/// <param name="RowType">The type of the row.</param>
+/// <param name="Id">The identifier, if the operation is by ID.</param>
+/// <param name="Query">The fully configured query.</param>
+/// <param name="ByIdOrSingle">True when a single row is expected.</param>
+public sealed record FindRowArgs(Type RowType, OptionalValue<object?> Id, SqlQuery Query, bool ByIdOrSingle);
+
+/// <summary>
 /// An interface that allows you to intercept SQL operations on entities. Note that this does not
 /// intercept all SQL operations, only the ones that are done through EntityConnectionExtensions.
 /// This interface should be implemented by the mock connection class used in tests.
@@ -12,22 +34,15 @@ public interface IRowOperationInterceptor
     /// <summary>
     /// Intercepts EntityConnectionExtensions's ById/TryById/First/TryFirst/Single/TrySingle methods.
     /// </summary>
-    /// <param name="rowType">Type of the row.</param>
-    /// <param name="id">The identifier if one of the ById methods is used.</param>
-    /// <param name="where">The where criteria for the First/TryFirst/Single/TrySingle methods.</param>
-    /// <param name="editQuery">Callback to edit the query.</param>
-    /// <param name="byIdOrSingle">True if one of the ById/TryById/Single/TrySingle methods is used.</param>
+    /// <param name="args">The find operation arguments.</param>
     /// <returns>Entity with the given ID, or null if not found.</returns>
-    OptionalValue<IRow> FindRow(Type rowType, OptionalValue<object?> id, ICriteria? where, Action<SqlQuery>? editQuery, bool byIdOrSingle);
+    OptionalValue<IRow> FindRow(FindRowArgs args);
 
     /// <summary>
     /// Intercepts EntityConnectionExtensions.List and Count methods.
     /// </summary>
-    /// <param name="rowType">Type of the row.</param>
-    /// <param name="where">The where criteria.</param>
-    /// <param name="editQuery">The edit query callback.</param>
-    /// <param name="countOnly">True if intercepting the Count method.</param>
-    OptionalValue<IList> ListRows(Type rowType, ICriteria? where, Action<SqlQuery>? editQuery, bool countOnly);
+    /// <param name="args">The list operation arguments.</param>
+    OptionalValue<IList> ListRows(ListRowsArgs args);
 
     /// <summary>
     /// Intercepts EntityConnectionExtensions.DeleteById method.
@@ -44,27 +59,20 @@ public interface IRowOperationInterceptor
     /// Intercepts the async EntityConnectionExtensions ById/TryById/First/TryFirst/Single/TrySingle methods.
     /// The default implementation forwards to <see cref="FindRow"/>.
     /// </summary>
-    /// <param name="rowType">Type of the row.</param>
-    /// <param name="id">The identifier if one of the ById methods is used.</param>
-    /// <param name="where">The where criteria for the First/TryFirst/Single/TrySingle methods.</param>
-    /// <param name="editQuery">Callback to edit the query.</param>
-    /// <param name="byIdOrSingle">True if one of the ById/TryById/Single/TrySingle methods is used.</param>
+    /// <param name="args">The find operation arguments.</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Entity with the given ID, or null if not found.</returns>
-    Task<OptionalValue<IRow>> FindRowAsync(Type rowType, OptionalValue<object?> id, ICriteria? where, Action<SqlQuery>? editQuery, bool byIdOrSingle, CancellationToken cancellationToken = default)
-        => Task.FromResult(FindRow(rowType, id, where, editQuery, byIdOrSingle));
+    Task<OptionalValue<IRow>> FindRowAsync(FindRowArgs args, CancellationToken cancellationToken = default)
+        => Task.FromResult(FindRow(args));
 
     /// <summary>
     /// Intercepts the async EntityConnectionExtensions List and Count methods.
     /// The default implementation forwards to <see cref="ListRows"/>.
     /// </summary>
-    /// <param name="rowType">Type of the row.</param>
-    /// <param name="where">The where criteria.</param>
-    /// <param name="editQuery">The edit query callback.</param>
-    /// <param name="countOnly">True if intercepting the Count method.</param>
+    /// <param name="args">The list operation arguments.</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    Task<OptionalValue<IList>> ListRowsAsync(Type rowType, ICriteria? where, Action<SqlQuery>? editQuery, bool countOnly, CancellationToken cancellationToken = default)
-        => Task.FromResult(ListRows(rowType, where, editQuery, countOnly));
+    Task<OptionalValue<IList>> ListRowsAsync(ListRowsArgs args, CancellationToken cancellationToken = default)
+        => Task.FromResult(ListRows(args));
 
     /// <summary>
     /// Intercepts the async EntityConnectionExtensions DeleteById/Insert/Update methods.

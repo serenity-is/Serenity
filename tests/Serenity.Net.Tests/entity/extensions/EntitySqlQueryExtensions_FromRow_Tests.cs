@@ -15,14 +15,10 @@ public partial class EntitySqlQueryExtensions_FromRow_Tests
     [Fact]
     public void FromAndSubQueryFromAssignUniqueAliasesAndConfigureChild()
     {
-        var query = new SqlQuery().From(ComplexRow.Fields.As("rp"), (fields, sql) =>
-        {
-            var subQuery = sql.SubQueryFrom(ComplexRow.Fields, (subFields, sub) =>
-                sub.Select(subFields.ID));
-
-            sql.Select(fields.ID)
-                .Where(fields.ID.In(subQuery));
-        });
+        var query = new SqlQuery().From(ComplexRow.Fields.As("rp"), (fields, query) => query
+            .Select(fields.ID)
+                .Where(fields.ID.In(query.SubQueryFrom(ComplexRow.Fields, (subFields, subquery) =>
+                    subquery.Select(subFields.ID)))));
 
         Assert.Equal(Normalize.Sql("SELECT rp.[ComplexID] AS [ID] FROM [ComplexTable] rp WHERE (rp.[ComplexID] IN (SELECT T1.[ComplexID] AS [ID] FROM [ComplexTable] T1))"),
             Normalize.Sql(query.ToString()));
@@ -31,19 +27,19 @@ public partial class EntitySqlQueryExtensions_FromRow_Tests
     [Fact]
     public void NestedSubQueryFromContinuesAliasSequence()
     {
-        var query = new SqlQuery().From(new ComplexRow(), (fields, sql) =>
+        var query = new SqlQuery().From(new ComplexRow(), (fields, query) =>
         {
-            var subQuery = sql.SubQueryFrom(ComplexRow.Fields, (subFields, subSql) =>
+            var subquery = query.SubQueryFrom(ComplexRow.Fields, (subFields, subquery) =>
             {
-                var nestedQuery = subSql.SubQueryFrom(ComplexRow.Fields, (nestedFields, nestedSql) =>
-                    nestedSql.Select(nestedFields.ID));
+                var nestedQuery = subquery.SubQueryFrom(ComplexRow.Fields, (nestedFields, nestedQuery) =>
+                    nestedQuery.Select(nestedFields.ID));
 
-                subSql.Select(subFields.ID)
+                subquery.Select(subFields.ID)
                     .Where(subFields.ID.In(nestedQuery));
             });
 
-            sql.Select(fields.ID)
-                .Where(fields.ID.In(subQuery));
+            query.Select(fields.ID)
+                .Where(fields.ID.In(subquery));
         });
 
         Assert.Equal(Normalize.Sql("SELECT T0.[ComplexID] AS [ID] FROM [ComplexTable] T0 WHERE (T0.[ComplexID] IN (SELECT T1.[ComplexID] AS [ID] FROM [ComplexTable] T1 WHERE (T1.[ComplexID] IN (SELECT T2.[ComplexID] AS [ID] FROM [ComplexTable] T2))))"),
@@ -54,11 +50,11 @@ public partial class EntitySqlQueryExtensions_FromRow_Tests
     public void SubQueryCanAllocateAliasBeforeRootSourceIsAdded()
     {
         var query = new SqlQuery();
-        var subQuery = query.SubQueryFrom(ComplexRow.Fields, (fields, sql) =>
-            sql.Select(fields.ID));
+        var subquery = query.SubQueryFrom(ComplexRow.Fields, (subFields, subquery) =>
+            subquery.Select(subFields.ID));
 
-        query.From(new ComplexRow(), (fields, sql) =>
-            sql.Select(fields.ID).Where(fields.ID.In(subQuery)));
+        query.From(new ComplexRow(), (fields, query) =>
+            query.Select(fields.ID).Where(fields.ID.In(subquery)));
 
         Assert.Equal(Normalize.Sql("SELECT T0.[ComplexID] AS [ID] FROM [ComplexTable] T0 WHERE (T0.[ComplexID] IN (SELECT T1.[ComplexID] AS [ID] FROM [ComplexTable] T1))"),
             Normalize.Sql(query.ToString()));

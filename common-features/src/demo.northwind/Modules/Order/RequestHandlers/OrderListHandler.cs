@@ -1,4 +1,4 @@
-﻿using MyRow = Serenity.Demo.Northwind.OrderRow;
+using MyRow = Serenity.Demo.Northwind.OrderRow;
 
 namespace Serenity.Demo.Northwind;
 
@@ -14,11 +14,11 @@ public class OrderListHandler(IRequestContext context) :
         if (Request.ProductID != null)
         {
             query.Where(Criteria.Exists(
-                query.SubQueryFrom(OrderDetailRow.Fields, (od, subquery) => subquery
+                query.SubQueryFrom(OrderDetailRow.Fields, (detailFields, detailQuery) => detailQuery
                     .Select("1")
                     .Where(
-                        od.OrderID == MyRow.Fields.OrderID &
-                        od.ProductID == Request.ProductID.Value))
+                        detailFields.OrderID == MyRow.Fields.OrderID &
+                        detailFields.ProductID == Request.ProductID.Value))
                     .ToString()));
         }
     }

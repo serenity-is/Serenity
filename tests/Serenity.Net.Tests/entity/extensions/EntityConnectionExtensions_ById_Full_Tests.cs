@@ -66,17 +66,20 @@ public class EntityConnectionExtensions_ById_Full_Tests
     [Fact]
     public void TryById_EditQueryInterceptor()
     {
-        SqlQuery editedQuery = null;
+        SqlQuery? editedQuery = null;
         var row = new IdNameRow { ID = 6, Name = "IE" };
         using var connection = new MockDbConnection()
             .InterceptFindRow(args =>
             {
-                editedQuery = new SqlQuery();
-                args.EditQuery(editedQuery);
+                Assert.Same(editedQuery, args.Query);
                 return new OptionalValue<IRow>(row);
             });
 
-        var result = connection.TryById<IdNameRow>(6, q => q.Select("ID"));
+        var result = connection.TryById<IdNameRow>(6, q =>
+        {
+            editedQuery = q;
+            q.Select("ID");
+        });
 
         Assert.Same(row, result);
         Assert.Equal(0, connection.DbCommandCallCount);

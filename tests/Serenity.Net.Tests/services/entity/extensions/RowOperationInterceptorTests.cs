@@ -6,12 +6,10 @@ public class RowOperationInterceptorTests
 {
     private sealed class TestInterceptor : IRowOperationInterceptor
     {
-        public OptionalValue<IRow> FindRow(Type rowType, OptionalValue<object?> id,
-            ICriteria? where, Action<SqlQuery>? editQuery, bool byIdOrSingle)
+        public OptionalValue<IRow> FindRow(FindRowArgs args)
             => new(new IdNameRow());
 
-        public OptionalValue<IList> ListRows(Type rowType, ICriteria? where,
-            Action<SqlQuery>? editQuery, bool countOnly)
+        public OptionalValue<IList> ListRows(ListRowsArgs args)
             => new(new List<IRow>());
 
         public OptionalValue<long?> ManipulateRow(Type rowType, OptionalValue<object?> id,
@@ -24,12 +22,13 @@ public class RowOperationInterceptorTests
     {
         IRowOperationInterceptor interceptor = new TestInterceptor();
 
-        var row = await interceptor.FindRowAsync(typeof(IdNameRow), 1,
-            null, null, true, TestContext.Current.CancellationToken);
+        var row = await interceptor.FindRowAsync(
+            new FindRowArgs(typeof(IdNameRow), 1, new SqlQuery(), ByIdOrSingle: true),
+            TestContext.Current.CancellationToken);
         Assert.True(row.HasValue);
 
-        var list = await interceptor.ListRowsAsync(typeof(IdNameRow), null,
-            null, false, TestContext.Current.CancellationToken);
+        var list = await interceptor.ListRowsAsync(
+            new ListRowsArgs(typeof(IdNameRow), new SqlQuery()), TestContext.Current.CancellationToken);
         Assert.True(list.HasValue);
 
         var manipulated = await interceptor.ManipulateRowAsync(typeof(IdNameRow), 1,

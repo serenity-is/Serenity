@@ -38,15 +38,16 @@ public static class EntityConnectionExtensions
     public static TRow? TryById<TRow>(this IDbConnection connection, object id)
         where TRow : class, IRow, IIdRow, new()
     {
+        var row = new TRow() { TrackWithChecks = true };
+        var query = new SqlQuery().From(row)
+            .SelectTableFields()
+            .Where(new Criteria(row.GetIdField()) == new ValueCriteria(id));
+
         if (connection is IRowOperationInterceptor interceptor &&
-            interceptor.FindRow(typeof(TRow), id, where: null, editQuery: null, byIdOrSingle: true) is { HasValue: true } intres)
+            interceptor.FindRow(new FindRowArgs(typeof(TRow), id, query, ByIdOrSingle: true)) is { HasValue: true } intres)
             return (TRow)intres.Value;
 
-        var row = new TRow() { TrackWithChecks = true };
-        if (new SqlQuery().From(row)
-                .SelectTableFields()
-                .Where(new Criteria(row.GetIdField()) == new ValueCriteria(id))
-                .GetSingle(connection))
+        if (query.GetSingle(connection))
             return row;
 
         return null;
@@ -66,6 +67,7 @@ public static class EntityConnectionExtensions
     public static TRow ById<TRow>(this IDbConnection connection, object id, Action<SqlQuery> editQuery)
         where TRow : class, IRow, IIdRow, new()
     {
+        ArgumentNullException.ThrowIfNull(editQuery);
         var row = TryById<TRow>(connection, id, editQuery) 
             ?? throw new ValidationError("RecordNotFound", string.Format(
                 "Can't locate '{0}' record with ID {1}!", new TRow().Table, id));
@@ -85,15 +87,16 @@ public static class EntityConnectionExtensions
     public static TRow? TryById<TRow>(this IDbConnection connection, object id, Action<SqlQuery> editQuery)
         where TRow : class, IRow, IIdRow, new()
     {
-        if (connection is IRowOperationInterceptor interceptor &&
-            interceptor.FindRow(typeof(TRow), id, where: null, editQuery, byIdOrSingle: true) is { HasValue: true } intres)
-            return (TRow)intres.Value;
-
+        ArgumentNullException.ThrowIfNull(editQuery);
         var row = new TRow() { TrackWithChecks = true };
         var query = new SqlQuery().From(row)
             .Where(new Criteria(row.GetIdField()) == new ValueCriteria(id));
 
         editQuery(query);
+
+        if (connection is IRowOperationInterceptor interceptor &&
+            interceptor.FindRow(new FindRowArgs(typeof(TRow), id, query, ByIdOrSingle: true)) is { HasValue: true } intres)
+            return (TRow)intres.Value;
 
         if (query.GetSingle(connection))
             return row;
@@ -135,15 +138,16 @@ public static class EntityConnectionExtensions
     public static async Task<TRow?> TryByIdAsync<TRow>(this IDbConnection connection, object id, CancellationToken cancellationToken = default)
         where TRow : class, IRow, IIdRow, new()
     {
+        var row = new TRow() { TrackWithChecks = true };
+        var query = new SqlQuery().From(row)
+                .SelectTableFields()
+                .Where(new Criteria(row.GetIdField()) == new ValueCriteria(id));
+
         if (connection is IRowOperationInterceptor interceptor &&
-            await interceptor.FindRowAsync(typeof(TRow), id, where: null, editQuery: null, byIdOrSingle: true, cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
+            await interceptor.FindRowAsync(new FindRowArgs(typeof(TRow), id, query, ByIdOrSingle: true), cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
             return (TRow)intres.Value;
 
-        var row = new TRow() { TrackWithChecks = true };
-        if (await new SqlQuery().From(row)
-                .SelectTableFields()
-                .Where(new Criteria(row.GetIdField()) == new ValueCriteria(id))
-                .GetSingleAsync(connection, cancellationToken).ConfigureAwait(false))
+        if (await query.GetSingleAsync(connection, cancellationToken).ConfigureAwait(false))
             return row;
 
         return null;
@@ -164,6 +168,7 @@ public static class EntityConnectionExtensions
     public static async Task<TRow> ByIdAsync<TRow>(this IDbConnection connection, object id, Action<SqlQuery> editQuery, CancellationToken cancellationToken = default)
         where TRow : class, IRow, IIdRow, new()
     {
+        ArgumentNullException.ThrowIfNull(editQuery);
         var row = await TryByIdAsync<TRow>(connection, id, editQuery, cancellationToken).ConfigureAwait(false)
             ?? throw new ValidationError("RecordNotFound", string.Format(
                 "Can't locate '{0}' record with ID {1}!", new TRow().Table, id));
@@ -184,15 +189,16 @@ public static class EntityConnectionExtensions
     public static async Task<TRow?> TryByIdAsync<TRow>(this IDbConnection connection, object id, Action<SqlQuery> editQuery, CancellationToken cancellationToken = default)
         where TRow : class, IRow, IIdRow, new()
     {
-        if (connection is IRowOperationInterceptor interceptor &&
-            await interceptor.FindRowAsync(typeof(TRow), id, where: null, editQuery, byIdOrSingle: true, cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
-            return (TRow)intres.Value;
-
+        ArgumentNullException.ThrowIfNull(editQuery);
         var row = new TRow() { TrackWithChecks = true };
         var query = new SqlQuery().From(row)
             .Where(new Criteria(row.GetIdField()) == new ValueCriteria(id));
 
         editQuery(query);
+
+        if (connection is IRowOperationInterceptor interceptor &&
+            await interceptor.FindRowAsync(new FindRowArgs(typeof(TRow), id, query, ByIdOrSingle: true), cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
+            return (TRow)intres.Value;
 
         if (await query.GetSingleAsync(connection, cancellationToken).ConfigureAwait(false))
             return row;
@@ -233,15 +239,16 @@ public static class EntityConnectionExtensions
     public static TRow? TrySingle<TRow>(this IDbConnection connection, ICriteria? where)
         where TRow : class, IRow, new()
     {
+        var row = new TRow() { TrackWithChecks = true };
+        var query = new SqlQuery().From(row)
+                .SelectTableFields()
+                .Where(where);
+
         if (connection is IRowOperationInterceptor interceptor &&
-            interceptor.FindRow(typeof(TRow), id: default, where, editQuery: null, byIdOrSingle: true) is { HasValue: true } intres)
+            interceptor.FindRow(new FindRowArgs(typeof(TRow), default, query, ByIdOrSingle: true)) is { HasValue: true } intres)
             return (TRow)intres.Value;
 
-        var row = new TRow() { TrackWithChecks = true };
-        if (new SqlQuery().From(row)
-                .SelectTableFields()
-                .Where(where)
-                .GetSingle(connection))
+        if (query.GetSingle(connection))
             return row;
 
         return null;
@@ -260,6 +267,7 @@ public static class EntityConnectionExtensions
     public static TRow Single<TRow>(this IDbConnection connection, Action<SqlQuery> editQuery)
         where TRow : class, IRow, new()
     {
+        ArgumentNullException.ThrowIfNull(editQuery);
         var row = TrySingle<TRow>(connection, editQuery) ?? throw new ValidationError("RecordNotFound", "Query returned no results!");
         return row;
     }
@@ -276,14 +284,15 @@ public static class EntityConnectionExtensions
     public static TRow? TrySingle<TRow>(this IDbConnection connection, Action<SqlQuery> editQuery)
         where TRow : class, IRow, new()
     {
-        if (connection is IRowOperationInterceptor interceptor &&
-            interceptor.FindRow(typeof(TRow), id: default, where: null, editQuery, byIdOrSingle: true) is { HasValue: true } intres)
-            return (TRow)intres.Value;
-
+        ArgumentNullException.ThrowIfNull(editQuery);
         var row = new TRow() { TrackWithChecks = true };
         var query = new SqlQuery().From(row);
 
         editQuery(query);
+
+        if (connection is IRowOperationInterceptor interceptor &&
+            interceptor.FindRow(new FindRowArgs(typeof(TRow), default, query, ByIdOrSingle: true)) is { HasValue: true } intres)
+            return (TRow)intres.Value;
 
         if (query.GetSingle(connection))
             return row;
@@ -327,15 +336,16 @@ public static class EntityConnectionExtensions
     public static async Task<TRow?> TrySingleAsync<TRow>(this IDbConnection connection, ICriteria? where, CancellationToken cancellationToken = default)
         where TRow : class, IRow, new()
     {
+        var row = new TRow() { TrackWithChecks = true };
+        var query = new SqlQuery().From(row)
+                .SelectTableFields()
+                .Where(where);
+
         if (connection is IRowOperationInterceptor interceptor &&
-            await interceptor.FindRowAsync(typeof(TRow), id: default, where, editQuery: null, byIdOrSingle: true, cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
+            await interceptor.FindRowAsync(new FindRowArgs(typeof(TRow), default, query, ByIdOrSingle: true), cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
             return (TRow)intres.Value;
 
-        var row = new TRow() { TrackWithChecks = true };
-        if (await new SqlQuery().From(row)
-                .SelectTableFields()
-                .Where(where)
-                .GetSingleAsync(connection, cancellationToken).ConfigureAwait(false))
+        if (await query.GetSingleAsync(connection, cancellationToken).ConfigureAwait(false))
             return row;
 
         return null;
@@ -355,6 +365,7 @@ public static class EntityConnectionExtensions
     public static async Task<TRow> SingleAsync<TRow>(this IDbConnection connection, Action<SqlQuery> editQuery, CancellationToken cancellationToken = default)
         where TRow : class, IRow, new()
     {
+        ArgumentNullException.ThrowIfNull(editQuery);
         var row = await TrySingleAsync<TRow>(connection, editQuery, cancellationToken).ConfigureAwait(false)
             ?? throw new ValidationError("RecordNotFound", "Query returned no results!");
         return row;
@@ -373,14 +384,15 @@ public static class EntityConnectionExtensions
     public static async Task<TRow?> TrySingleAsync<TRow>(this IDbConnection connection, Action<SqlQuery> editQuery, CancellationToken cancellationToken = default)
         where TRow : class, IRow, new()
     {
-        if (connection is IRowOperationInterceptor interceptor &&
-            await interceptor.FindRowAsync(typeof(TRow), id: default, where: null, editQuery, byIdOrSingle: true, cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
-            return (TRow)intres.Value;
-
+        ArgumentNullException.ThrowIfNull(editQuery);
         var row = new TRow() { TrackWithChecks = true };
         var query = new SqlQuery().From(row);
 
         editQuery(query);
+
+        if (connection is IRowOperationInterceptor interceptor &&
+            await interceptor.FindRowAsync(new FindRowArgs(typeof(TRow), default, query, ByIdOrSingle: true), cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
+            return (TRow)intres.Value;
 
         if (await query.GetSingleAsync(connection, cancellationToken).ConfigureAwait(false))
             return row;
@@ -413,15 +425,16 @@ public static class EntityConnectionExtensions
     public static TRow? TryFirst<TRow>(this IDbConnection connection, ICriteria? where)
         where TRow : class, IRow, new()
     {
+        var row = new TRow() { TrackWithChecks = true };
+        var query = new SqlQuery().From(row)
+                .SelectTableFields()
+                .Where(where);
+
         if (connection is IRowOperationInterceptor interceptor &&
-            interceptor.FindRow(typeof(TRow), id: default, where, editQuery: null, byIdOrSingle: false) is { HasValue: true } intres)
+            interceptor.FindRow(new FindRowArgs(typeof(TRow), default, query, ByIdOrSingle: false)) is { HasValue: true } intres)
             return (TRow)intres.Value;
 
-        var row = new TRow() { TrackWithChecks = true };
-        if (new SqlQuery().From(row)
-                .SelectTableFields()
-                .Where(where)
-                .GetFirst(connection))
+        if (query.GetFirst(connection))
             return row;
 
         return null;
@@ -439,6 +452,7 @@ public static class EntityConnectionExtensions
     public static TRow First<TRow>(this IDbConnection connection, Action<SqlQuery> editQuery)
         where TRow : class, IRow, new()
     {
+        ArgumentNullException.ThrowIfNull(editQuery);
         var row = TryFirst<TRow>(connection, editQuery) ?? throw new ValidationError("RecordNotFound", "Query returned no results!");
         return row;
     }
@@ -454,14 +468,15 @@ public static class EntityConnectionExtensions
     public static TRow? TryFirst<TRow>(this IDbConnection connection, Action<SqlQuery> editQuery)
         where TRow : class, IRow, new()
     {
-        if (connection is IRowOperationInterceptor interceptor &&
-            interceptor.FindRow(typeof(TRow), id: default, where: null, editQuery, byIdOrSingle: false) is { HasValue: true } intres)
-            return (TRow)intres.Value;
-
+        ArgumentNullException.ThrowIfNull(editQuery);
         var row = new TRow() { TrackWithChecks = true };
         var query = new SqlQuery().From(row);
 
         editQuery(query);
+
+        if (connection is IRowOperationInterceptor interceptor &&
+            interceptor.FindRow(new FindRowArgs(typeof(TRow), default, query, ByIdOrSingle: false)) is { HasValue: true } intres)
+            return (TRow)intres.Value;
 
         if (query.GetFirst(connection))
             return row;
@@ -497,15 +512,16 @@ public static class EntityConnectionExtensions
     public static async Task<TRow?> TryFirstAsync<TRow>(this IDbConnection connection, ICriteria? where, CancellationToken cancellationToken = default)
         where TRow : class, IRow, new()
     {
+        var row = new TRow() { TrackWithChecks = true };
+        var query = new SqlQuery().From(row)
+                .SelectTableFields()
+                .Where(where);
+
         if (connection is IRowOperationInterceptor interceptor &&
-            await interceptor.FindRowAsync(typeof(TRow), id: default, where, editQuery: null, byIdOrSingle: false, cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
+            await interceptor.FindRowAsync(new FindRowArgs(typeof(TRow), default, query, ByIdOrSingle: false), cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
             return (TRow)intres.Value;
 
-        var row = new TRow() { TrackWithChecks = true };
-        if (await new SqlQuery().From(row)
-                .SelectTableFields()
-                .Where(where)
-                .GetFirstAsync(connection, cancellationToken).ConfigureAwait(false))
+        if (await query.GetFirstAsync(connection, cancellationToken).ConfigureAwait(false))
             return row;
 
         return null;
@@ -524,6 +540,7 @@ public static class EntityConnectionExtensions
     public static async Task<TRow> FirstAsync<TRow>(this IDbConnection connection, Action<SqlQuery> editQuery, CancellationToken cancellationToken = default)
         where TRow : class, IRow, new()
     {
+        ArgumentNullException.ThrowIfNull(editQuery);
         var row = await TryFirstAsync<TRow>(connection, editQuery, cancellationToken).ConfigureAwait(false)
             ?? throw new ValidationError("RecordNotFound", "Query returned no results!");
         return row;
@@ -541,14 +558,15 @@ public static class EntityConnectionExtensions
     public static async Task<TRow?> TryFirstAsync<TRow>(this IDbConnection connection, Action<SqlQuery> editQuery, CancellationToken cancellationToken = default)
         where TRow : class, IRow, new()
     {
-        if (connection is IRowOperationInterceptor interceptor &&
-            await interceptor.FindRowAsync(typeof(TRow), id: default, where: null, editQuery, byIdOrSingle: false, cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
-            return (TRow)intres.Value;
-
+        ArgumentNullException.ThrowIfNull(editQuery);
         var row = new TRow() { TrackWithChecks = true };
         var query = new SqlQuery().From(row);
 
         editQuery(query);
+
+        if (connection is IRowOperationInterceptor interceptor &&
+            await interceptor.FindRowAsync(new FindRowArgs(typeof(TRow), default, query, ByIdOrSingle: false), cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
+            return (TRow)intres.Value;
 
         if (await query.GetFirstAsync(connection, cancellationToken).ConfigureAwait(false))
             return row;
@@ -578,16 +596,16 @@ public static class EntityConnectionExtensions
     public static int Count<TRow>(this IDbConnection connection, ICriteria? where)
         where TRow : class, IRow, new()
     {
+        var row = new TRow() { TrackWithChecks = true };
+        var query = new SqlQuery().From(row)
+            .Select(Sql.Count())
+            .Where(where);
+
         if (connection is IRowOperationInterceptor interceptor &&
-            interceptor.ListRows(typeof(TRow), where, editQuery: null, countOnly: true) is { HasValue: true } intres)
+            interceptor.ListRows(new ListRowsArgs(typeof(TRow), query) { CountOnly = true }) is { HasValue: true } intres)
             return intres.Value?.Count ?? 0;
 
-        var row = new TRow() { TrackWithChecks = true };
-
-        return Convert.ToInt32(SqlHelper.ExecuteScalar(connection,
-            new SqlQuery().From(row)
-                .Select(Sql.Count())
-                .Where(where)));
+        return Convert.ToInt32(SqlHelper.ExecuteScalar(connection, query));
     }
 
     /// <summary>
@@ -614,16 +632,16 @@ public static class EntityConnectionExtensions
     public static async Task<int> CountAsync<TRow>(this IDbConnection connection, ICriteria? where, CancellationToken cancellationToken = default)
         where TRow : class, IRow, new()
     {
+        var row = new TRow() { TrackWithChecks = true };
+        var query = new SqlQuery().From(row)
+            .Select(Sql.Count())
+            .Where(where);
+
         if (connection is IRowOperationInterceptor interceptor &&
-            await interceptor.ListRowsAsync(typeof(TRow), where, editQuery: null, countOnly: true, cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
+            await interceptor.ListRowsAsync(new ListRowsArgs(typeof(TRow), query) { CountOnly = true }, cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
             return intres.Value?.Count ?? 0;
 
-        var row = new TRow() { TrackWithChecks = true };
-
-        return Convert.ToInt32(await SqlHelper.ExecuteScalarAsync(connection,
-            new SqlQuery().From(row)
-                .Select(Sql.Count())
-                .Where(where),
+        return Convert.ToInt32(await SqlHelper.ExecuteScalarAsync(connection, query,
             cancellationToken: cancellationToken).ConfigureAwait(false));
     }
 
@@ -637,16 +655,17 @@ public static class EntityConnectionExtensions
     public static bool ExistsById<TRow>(this IDbConnection connection, object id)
         where TRow : class, IRow, IIdRow, new()
     {
-        if (connection is IRowOperationInterceptor interceptor &&
-            interceptor.FindRow(typeof(TRow), id, where: null, editQuery: null, byIdOrSingle: false) is { HasValue: true } intres)
-            return intres.Value != null;
-
         var row = new TRow();
-        return new SqlQuery()
+        var query = new SqlQuery()
                 .From(row)
                 .Select("1")
-                .Where(new Criteria(row.GetIdField()) == new ValueCriteria(id))
-                .Exists(connection);
+                .Where(new Criteria(row.GetIdField()) == new ValueCriteria(id));
+
+        if (connection is IRowOperationInterceptor interceptor &&
+            interceptor.FindRow(new FindRowArgs(typeof(TRow), id, query, ByIdOrSingle: false)) is { HasValue: true } intres)
+            return intres.Value != null;
+
+        return query.Exists(connection);
     }
 
     /// <summary>
@@ -660,16 +679,17 @@ public static class EntityConnectionExtensions
     public static async Task<bool> ExistsByIdAsync<TRow>(this IDbConnection connection, object id, CancellationToken cancellationToken = default)
         where TRow : class, IRow, IIdRow, new()
     {
-        if (connection is IRowOperationInterceptor interceptor &&
-            await interceptor.FindRowAsync(typeof(TRow), id, where: null, editQuery: null, byIdOrSingle: false, cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
-            return intres.Value != null;
-
         var row = new TRow();
-        return await new SqlQuery()
+        var query = new SqlQuery()
                 .From(row)
                 .Select("1")
-                .Where(new Criteria(row.GetIdField()) == new ValueCriteria(id))
-                .ExistsAsync(connection, cancellationToken: cancellationToken).ConfigureAwait(false);
+                .Where(new Criteria(row.GetIdField()) == new ValueCriteria(id));
+
+        if (connection is IRowOperationInterceptor interceptor &&
+            await interceptor.FindRowAsync(new FindRowArgs(typeof(TRow), id, query, ByIdOrSingle: false), cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
+            return intres.Value != null;
+
+        return await query.ExistsAsync(connection, cancellationToken: cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -682,15 +702,16 @@ public static class EntityConnectionExtensions
     public static bool Exists<TRow>(this IDbConnection connection, ICriteria? where)
         where TRow : class, IRow, new()
     {
+        var row = new TRow() { TrackWithChecks = true };
+        var query = new SqlQuery().From(row)
+                .Select("1")
+                .Where(where);
+
         if (connection is IRowOperationInterceptor interceptor &&
-            interceptor.FindRow(typeof(TRow), id: default, where: null, editQuery: null, byIdOrSingle: false) is { HasValue: true } intres)
+            interceptor.FindRow(new FindRowArgs(typeof(TRow), default, query, ByIdOrSingle: false)) is { HasValue: true } intres)
             return intres.Value != null;
 
-        var row = new TRow() { TrackWithChecks = true };
-        return new SqlQuery().From(row)
-                .Select("1")
-                .Where(where)
-                .Exists(connection);
+        return query.Exists(connection);
     }
 
     /// <summary>
@@ -704,15 +725,16 @@ public static class EntityConnectionExtensions
     public static async Task<bool> ExistsAsync<TRow>(this IDbConnection connection, ICriteria? where, CancellationToken cancellationToken = default)
         where TRow : class, IRow, new()
     {
+        var row = new TRow() { TrackWithChecks = true };
+        var query = new SqlQuery().From(row)
+                .Select("1")
+                .Where(where);
+
         if (connection is IRowOperationInterceptor interceptor &&
-            await interceptor.FindRowAsync(typeof(TRow), id: default, where: null, editQuery: null, byIdOrSingle: false, cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
+            await interceptor.FindRowAsync(new FindRowArgs(typeof(TRow), default, query, ByIdOrSingle: false), cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
             return intres.Value != null;
 
-        var row = new TRow() { TrackWithChecks = true };
-        return await new SqlQuery().From(row)
-                .Select("1")
-                .Where(where)
-                .ExistsAsync(connection, cancellationToken: cancellationToken).ConfigureAwait(false);
+        return await query.ExistsAsync(connection, cancellationToken: cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -741,15 +763,16 @@ public static class EntityConnectionExtensions
     public static List<TRow> List<TRow>(this IDbConnection connection, ICriteria? where)
         where TRow : class, IRow, new()
     {
+        var row = new TRow() { TrackWithChecks = true };
+        var query = new SqlQuery().From(row)
+                .SelectTableFields()
+                .Where(where);
+
         if (connection is IRowOperationInterceptor interceptor &&
-            interceptor.ListRows(typeof(TRow), where, editQuery: null, countOnly: false) is { HasValue: true } intres)
+            interceptor.ListRows(new ListRowsArgs(typeof(TRow), query)) is { HasValue: true } intres)
             return (List<TRow>)intres.Value;
 
-        var row = new TRow() { TrackWithChecks = true };
-        return new SqlQuery().From(row)
-                .SelectTableFields()
-                .Where(where)
-                .List(connection, row);
+        return query.List(connection, row);
     }
 
     /// <summary>
@@ -763,14 +786,14 @@ public static class EntityConnectionExtensions
     public static List<TRow> List<TRow>(this IDbConnection connection, Action<SqlQuery> editQuery)
         where TRow : class, IRow, new()
     {
-        if (connection is IRowOperationInterceptor interceptor &&
-            interceptor.ListRows(typeof(TRow), where: null, editQuery, countOnly: false) is { HasValue: true } intres)
-            return (List<TRow>)intres.Value;
-
+        ArgumentNullException.ThrowIfNull(editQuery);
         var row = new TRow() { TrackWithChecks = true };
         var query = new SqlQuery().From(row);
-
         editQuery(query);
+
+        if (connection is IRowOperationInterceptor interceptor &&
+            interceptor.ListRows(new ListRowsArgs(typeof(TRow), query)) is { HasValue: true } intres)
+            return (List<TRow>)intres.Value;
 
         return query.List(connection, row);
     }
@@ -803,15 +826,16 @@ public static class EntityConnectionExtensions
     public static async Task<List<TRow>> ListAsync<TRow>(this IDbConnection connection, ICriteria? where, CancellationToken cancellationToken = default)
         where TRow : class, IRow, new()
     {
+        var row = new TRow() { TrackWithChecks = true };
+        var query = new SqlQuery().From(row)
+                .SelectTableFields()
+                .Where(where);
+
         if (connection is IRowOperationInterceptor interceptor &&
-            await interceptor.ListRowsAsync(typeof(TRow), where, editQuery: null, countOnly: false, cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
+            await interceptor.ListRowsAsync(new ListRowsArgs(typeof(TRow), query), cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
             return (List<TRow>)intres.Value;
 
-        var row = new TRow() { TrackWithChecks = true };
-        return await new SqlQuery().From(row)
-                .SelectTableFields()
-                .Where(where)
-                .ListAsync(connection, row, cancellationToken).ConfigureAwait(false);
+        return await query.ListAsync(connection, row, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -826,14 +850,14 @@ public static class EntityConnectionExtensions
     public static async Task<List<TRow>> ListAsync<TRow>(this IDbConnection connection, Action<SqlQuery> editQuery, CancellationToken cancellationToken = default)
         where TRow : class, IRow, new()
     {
-        if (connection is IRowOperationInterceptor interceptor &&
-            await interceptor.ListRowsAsync(typeof(TRow), where: null, editQuery, countOnly: false, cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
-            return (List<TRow>)intres.Value;
-
+        ArgumentNullException.ThrowIfNull(editQuery);
         var row = new TRow() { TrackWithChecks = true };
         var query = new SqlQuery().From(row);
-
         editQuery(query);
+
+        if (connection is IRowOperationInterceptor interceptor &&
+            await interceptor.ListRowsAsync(new ListRowsArgs(typeof(TRow), query), cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
+            return (List<TRow>)intres.Value;
 
         return await query.ListAsync(connection, row, cancellationToken).ConfigureAwait(false);
     }

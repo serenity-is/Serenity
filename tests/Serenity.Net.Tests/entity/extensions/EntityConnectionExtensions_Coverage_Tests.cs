@@ -4,7 +4,7 @@ namespace Serenity.Data;
 
 public class EntityConnectionExtensions_Coverage_Tests
 {
-    private static IRow Row(int id = 1, string name = "A") => new IdNameRow { ID = id, Name = name };
+    private static IdNameRow Row(int id = 1, string name = "A") => new() { ID = id, Name = name };
 
     private static MockDbConnection FindRowInterceptor(IRow? value) =>
         new MockDbConnection().InterceptFindRow(_ => new OptionalValue<IRow>(value!));
