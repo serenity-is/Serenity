@@ -12,7 +12,7 @@ namespace Serenity.Data;
 /// <seealso cref="Collection{Field}" />
 /// <seealso cref="IAlias" />
 /// <seealso cref="IHaveJoins" />
-public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins
+public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins, IHasDialect
 {
     internal Dictionary<string, Field> byName;
     internal Dictionary<string, Field> byPropertyName;

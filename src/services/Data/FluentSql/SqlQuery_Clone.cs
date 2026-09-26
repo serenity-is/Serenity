@@ -60,9 +60,7 @@ public partial class SqlQuery
             foreach (var pair in Params)
                 clone.AddParam(pair.Key, pair.Value);
 
-        if (aliasExpressions != null)
-            clone.aliasExpressions = new Dictionary<string, string>(
-                aliasExpressions, StringComparer.OrdinalIgnoreCase);
+        CloneAliasExpressionsTo(clone);
 
         if (aliasWithJoins != null)
             clone.aliasWithJoins = new Dictionary<string, IHaveJoins>(

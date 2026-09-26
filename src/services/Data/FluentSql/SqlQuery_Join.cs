@@ -48,7 +48,7 @@ public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressio
         string expression = sb.ToString();
 
         if (!string.IsNullOrEmpty(join.Name) &&
-            aliasExpressions != null && aliasExpressions.TryGetValue(join.Name, out string? existingExpression))
+            GetAliasExpression(join.Name) is string existingExpression)
         {
             if (expression == existingExpression)
                 return this;
@@ -64,7 +64,7 @@ public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressio
 
         if (!string.IsNullOrEmpty(join.Name))
         {
-            AliasExpressions[join.Name] = expression;
+            SetAliasExpression(join.Name, expression);
 
             if (join is IHaveJoins haveJoins)
                 AliasWithJoins[join.Name] = haveJoins;
@@ -263,7 +263,7 @@ public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressio
         ArgumentNullException.ThrowIfNull(join);
 
         var joinAlias = join.Name;
-        if (aliasExpressions != null && aliasExpressions.ContainsKey(joinAlias))
+        if (GetAliasExpression(joinAlias) is not null)
             return this;
 
         if (join.Joins != null &&

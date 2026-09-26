@@ -11,7 +11,6 @@ namespace Serenity.Data;
 /// <seealso cref="ISqlQueryExtensible" />
 public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IGetExpressionByName, ISqlQueryExtensible
 {
-    private Dictionary<string, string>? aliasExpressions;
     private Dictionary<string, IHaveJoins>? aliasWithJoins;
     private List<Column> columns;
     private bool countRecords;
@@ -105,16 +104,21 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     {
         ArgumentNullException.ThrowIfNull(alias);
 
-        if (aliasExpressions != null &&
-            aliasExpressions.ContainsKey(alias.Name))
+        if (string.IsNullOrEmpty(table))
+            throw new ArgumentNullException(nameof(table));
+
+        if (GetAliasExpression(alias.Name) is not null)
             throw new ArgumentOutOfRangeException(string.Format("{0} alias is used more than once in the query!", alias.Name));
+
+        if (alias is IHasDialect hasDialect && !IsDialectOverridden)
+            Dialect(hasDialect.Dialect);
 
         From(table);
 
         from.Append(' ');
         from.Append(alias.Name);
 
-        AliasExpressions.Add(alias.Name, table + " " + alias.Name);
+        SetAliasExpression(alias.Name, table + " " + alias.Name);
 
         if (alias is IHaveJoins haveJoins)
             AliasWithJoins[alias.Name] = haveJoins;
@@ -515,12 +519,13 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
         unionQuery.countRecords = false;
         unionQuery.omitParens = true;
         unionQuery.parent = this;
+        unionQuery.ResetAliasExpressions(localOnly: true);
         unionQuery.parameters = null;
 
         this.unionType = unionType;
         columns = [];
         from = new StringBuilder();
-        aliasExpressions = null;
+        ResetAliasExpressions(localOnly: true);
         aliasWithJoins = null;
         distinct = false;
         having = null;
@@ -617,16 +622,6 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
             aliasWithJoins ??= new Dictionary<string, IHaveJoins>(StringComparer.OrdinalIgnoreCase);
 
             return aliasWithJoins;
-        }
-    }
-
-    private Dictionary<string, string> AliasExpressions
-    {
-        get
-        {
-            aliasExpressions ??= new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-
-            return aliasExpressions;
         }
     }
 

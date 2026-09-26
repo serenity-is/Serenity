@@ -10,6 +10,8 @@ namespace Serenity.Data;
 [DebuggerDisplay("{DebugText}")]
 public class QueryWithParams : IQueryWithParams
 {
+    private System.Collections.Generic.Dictionary<string, string>? aliasExpressions;
+
     /// <summary>
     /// The dialect.
     /// </summary>
@@ -153,11 +155,107 @@ public class QueryWithParams : IQueryWithParams
     public TQuery CreateSubQuery<TQuery>()
         where TQuery : QueryWithParams, new()
     {
-        var subQuery = new TQuery
+        return new TQuery
         {
             parent = this
         };
-        return subQuery;
+    }
+
+    /// <summary>
+    /// Gets the source expression registered for an alias.
+    /// </summary>
+    /// <param name="alias">The alias.</param>
+    /// <returns>The source expression, or null when the alias is not registered.</returns>
+    protected string? GetAliasExpression(string alias)
+    {
+        ArgumentNullException.ThrowIfNull(alias);
+
+        if (parent is not null)
+            return parent.GetAliasExpression(alias);
+
+        return aliasExpressions is not null && aliasExpressions.TryGetValue(alias, out var expression) ? expression : null;
+    }
+
+    /// <summary>
+    /// Gets a value indicating whether this query tree has an alias registered.
+    /// </summary>
+    /// <param name="alias">The alias to check.</param>
+    public bool HasAlias(string alias)
+    {
+        if (string.IsNullOrEmpty(alias))
+            return false;
+
+        if (parent is not null)
+            return parent.HasAlias(alias);
+
+        return aliasExpressions is not null && aliasExpressions.ContainsKey(alias);
+    }
+
+    /// <summary>
+    /// Sets the source expression for an alias.
+    /// </summary>
+    /// <param name="alias">The alias.</param>
+    /// <param name="expression">The source expression.</param>
+    protected void SetAliasExpression(string alias, string expression)
+    {
+        ArgumentNullException.ThrowIfNull(alias);
+        ArgumentNullException.ThrowIfNull(expression);
+
+        if (parent is not null)
+        {
+            parent.SetAliasExpression(alias, expression);
+            return;
+        }
+
+        aliasExpressions ??= new(StringComparer.OrdinalIgnoreCase);
+        aliasExpressions[alias] = expression;
+    }
+
+    /// <summary>
+    /// Clears the alias expressions registered in this query. If <paramref name="localOnly"/> is false, 
+    /// clears the alias expressions in the root query.
+    /// </summary>
+    protected void ResetAliasExpressions(bool localOnly)
+    {
+        if (parent is not null && !localOnly)
+        {
+            parent.ResetAliasExpressions(localOnly: false);
+            return;
+        }
+
+        aliasExpressions = null;
+    }
+
+    /// <summary>
+    /// Copies this query's local alias expressions to another query.
+    /// </summary>
+    /// <param name="target">The target query.</param>
+    protected void CloneAliasExpressionsTo(QueryWithParams target)
+    {
+        ArgumentNullException.ThrowIfNull(target);
+
+        if (parent is null && target.parent is null && aliasExpressions is not null)
+            target.aliasExpressions = new(aliasExpressions, StringComparer.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// Gets an automatically generated alias that is not already used in this query tree.
+    /// </summary>
+    /// <returns>The alias.</returns>
+    public string AutoAlias()
+    {
+        if (parent is not null)
+            return parent.AutoAlias();
+
+        var index = 1;
+        string candidate;
+        do
+        {
+            candidate = "T" + index++;
+        }
+        while (aliasExpressions is not null && aliasExpressions.ContainsKey(candidate));
+
+        return candidate;
     }
 
     ISqlDialect IQueryWithParams.Dialect => dialect;

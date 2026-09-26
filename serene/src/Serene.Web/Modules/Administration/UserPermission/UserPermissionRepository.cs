@@ -11,18 +11,14 @@ public class UserPermissionRepository(IRequestContext context) : BaseRepository(
     public SaveResponse Update(IUnitOfWork uow, UserPermissionUpdateRequest request)
     {
         ArgumentNullException.ThrowIfNull(request);
-        if (request.UserID is null)
-            throw new ArgumentNullException(nameof(request.UserID));
-        if (request.Permissions is null)
-            throw new ArgumentNullException(nameof(request.Permissions));
 
-        var userID = request.UserID.Value;
+        var userID = ArgumentChecks.NotNull(request.UserID);
         var oldList = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
         foreach (var p in GetExisting(uow.Connection, userID))
             oldList[p.PermissionKey!] = p.Granted!.Value;
 
         var newList = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-        foreach (var p in request.Permissions)
+        foreach (var p in ArgumentChecks.NotNull(request.Permissions))
             newList[p.PermissionKey!] = p.Granted ?? false;
 
         if (oldList.Count == newList.Count &&
@@ -43,7 +39,7 @@ public class UserPermissionRepository(IRequestContext context) : BaseRepository(
 
         foreach (var k in newList.Keys)
         {
-            if (!oldList.ContainsKey(k))
+            if (!oldList.TryGetValue(k, out bool value))
             {
                 uow.Connection.Insert(new MyRow
                 {
@@ -52,7 +48,7 @@ public class UserPermissionRepository(IRequestContext context) : BaseRepository(
                     Granted = newList[k]
                 });
             }
-            else if (oldList[k] != newList[k])
+            else if (value != newList[k])
             {
                 new SqlUpdate(Fld.TableName)
                     .Where(
@@ -80,12 +76,10 @@ public class UserPermissionRepository(IRequestContext context) : BaseRepository(
     public ListResponse<MyRow> List(IDbConnection connection, UserPermissionListRequest request)
     {
         ArgumentNullException.ThrowIfNull(request);
-        if (request.UserID is null)
-            throw new ArgumentNullException(nameof(request.UserID));
 
         var response = new ListResponse<MyRow>
         {
-            Entities = GetExisting(connection, request.UserID.Value)
+            Entities = GetExisting(connection, ArgumentChecks.NotNull(request.UserID))
         };
 
         return response;
@@ -94,28 +88,17 @@ public class UserPermissionRepository(IRequestContext context) : BaseRepository(
     public ListResponse<string> ListRolePermissions(IDbConnection connection, UserPermissionListRequest request)
     {
         ArgumentNullException.ThrowIfNull(request);
-        if (request.UserID is null)
-            throw new ArgumentNullException(nameof(request.UserID));
-
-        var rp = RolePermissionRow.Fields.As("rp");
-        var ur = UserRoleRow.Fields.As("ur");
-
-        var query = new SqlQuery()
-            .From(rp)
-            .Select(rp.PermissionKey)
-            .Distinct(true)
-            .OrderBy(rp.PermissionKey);
-
-        query.Where(rp.RoleId.In(
-            query.SubQuery()
-                .From(ur)
-                .Select(ur.RoleId)
-                .Where(ur.UserId == request.UserID.Value)
-        ));
 
         return new ListResponse<string>
         {
-            Entities = [.. connection.Query<string>(query)]
+            Entities = [.. connection.Query<string>(
+                new SqlQuery().From(new RolePermissionRow(), (rp, sql) => sql
+                    .Select(rp.PermissionKey)
+                    .Distinct(true)
+                    .OrderBy(rp.PermissionKey)
+                    .Where(rp.RoleId.In(sql.SubQueryFrom(UserRoleRow.Fields, (ur, sub) => sub
+                        .Select(ur.RoleId)
+                        .Where(ur.UserId == ArgumentChecks.NotNull(request.UserID)))))))]
         };
     }
 }
