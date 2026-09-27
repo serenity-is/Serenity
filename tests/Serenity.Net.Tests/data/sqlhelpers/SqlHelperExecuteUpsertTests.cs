@@ -8,13 +8,18 @@ public class SqlHelperExecuteUpsertTests
         using var connection = new MockDbConnection { Dialect = SqlServer2012Dialect.Instance }
             .InterceptExecuteNonQuery(args => 1);
 
-        var query = new SqlInsert("Table").SetTo("Id", "1").SetTo("X", "2");
-        var result = query.ExecuteUpsert(connection, ["Id"]);
+        var query = new SqlInsert("Table").SetTo("Id", "1").SetTo("X", "@p1");
+        query.SetParam("@p1", 1);
+        var parameters = new Dictionary<string, object?> { ["@p1"] = 2 };
+        var result = query.ExecuteUpsert(connection, ["Id"], parameters: parameters);
 
         Assert.Equal(1, result);
         var call = Assert.Single(connection.ExecuteNonQueryCalls);
         Assert.Contains("INSERT INTO", call.CommandText);
         Assert.Contains("NOT EXISTS", call.CommandText);
+        Assert.Equal(2, call.Parameters!["@p1"]);
+        Assert.Equal(1, query.Params!["@p1"]);
+        Assert.Single(parameters);
     }
 
     [Fact]
@@ -92,14 +97,22 @@ public class SqlHelperExecuteUpsertTests
     {
         var calls = 0;
         using var connection = new MockDbConnection { Dialect = new UnknownUpsertDialect() }
-            .OnDbCommandExecuteNonQuery(_ => ++calls <= 1 ? 0 : 1);
+            .OnDbCommandExecuteNonQuery(command =>
+            {
+                Assert.Equal(2, command.Parameters["@p1"].Value);
+                return ++calls <= 1 ? 0 : 1;
+            });
 
-        var query = new SqlInsert("Table").SetTo("Id", "1").SetTo("X", "2");
-        var result = query.ExecuteUpsert(connection, ["Id"]);
+        var query = new SqlInsert("Table").SetTo("Id", "1").SetTo("X", "@p1");
+        query.SetParam("@p1", 1);
+        var parameters = new Dictionary<string, object?> { ["@p1"] = 2 };
+        var result = query.ExecuteUpsert(connection, ["Id"], parameters: parameters);
 
         // update affects 0 rows so insert is executed too
         Assert.Equal(1, result);
         Assert.Equal(2, connection.DbCommandExecuteNonQueryCallCount);
+        Assert.Equal(1, query.Params!["@p1"]);
+        Assert.Single(parameters);
     }
 
     [Fact]
@@ -126,8 +139,10 @@ public class SqlHelperExecuteUpsertTests
         using var connection = new MockDbConnection { Dialect = SqlServer2012Dialect.Instance }
             .InterceptExecuteNonQuery(args => 1);
 
-        var query = new SqlInsert("Table").SetTo("Id", "1").SetTo("X", "2");
-        var result = await query.ExecuteUpsertAsync(connection, ["Id"],
+        var query = new SqlInsert("Table").SetTo("Id", "1").SetTo("X", "@p1");
+        query.SetParam("@p1", 1);
+        var parameters = new Dictionary<string, object?> { ["@p1"] = 2 };
+        var result = await query.ExecuteUpsertAsync(connection, ["Id"], parameters: parameters,
             cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.Equal(1, result);
@@ -135,6 +150,9 @@ public class SqlHelperExecuteUpsertTests
         Assert.Contains("INSERT INTO", call.CommandText);
         Assert.Contains("NOT EXISTS", call.CommandText);
         Assert.True(call.IsAsync);
+        Assert.Equal(2, call.Parameters!["@p1"]);
+        Assert.Equal(1, query.Params!["@p1"]);
+        Assert.Single(parameters);
     }
 
     [Fact]

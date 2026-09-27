@@ -13,12 +13,17 @@ public class SqlHelperExecuteUpdateDeleteTests
             })
             .OnDbCommandExecuteNonQuery(_ => throw new InvalidOperationException("should not execute"));
 
-        var query = new SqlUpdate("Table").SetTo("X", "1").Where("Id = 1");
-        var result = query.Execute(connection);
+        var query = new SqlUpdate("Table").SetTo("X", "@p1").Where("Id = 1");
+        query.SetParam("@p1", 1);
+        var parameters = new Dictionary<string, object?> { ["@p1"] = 2 };
+        var result = query.Execute(connection, parameters: parameters);
 
         Assert.Equal(1, result);
         var call = Assert.Single(connection.ExecuteNonQueryCalls);
         Assert.Same(query, call.Query);
+        Assert.Equal(2, call.Parameters!["@p1"]);
+        Assert.Equal(1, query.Params!["@p1"]);
+        Assert.Single(parameters);
         Assert.Equal(0, connection.DbCommandExecuteNonQueryCallCount);
     }
 
@@ -80,10 +85,17 @@ public class SqlHelperExecuteUpdateDeleteTests
             .InterceptExecuteNonQuery(args => 1)
             .OnDbCommandExecuteNonQuery(_ => throw new InvalidOperationException("should not execute"));
 
-        var query = new SqlUpdate("Table").SetTo("X", "1").Where("Id = 1");
-        var result = await query.ExecuteAsync(connection, cancellationToken: TestContext.Current.CancellationToken);
+        var query = new SqlUpdate("Table").SetTo("X", "@p1").Where("Id = 1");
+        query.SetParam("@p1", 1);
+        var parameters = new Dictionary<string, object?> { ["@p1"] = 2 };
+        var result = await query.ExecuteAsync(connection, parameters: parameters,
+            cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.Equal(1, result);
+        var call = Assert.Single(connection.ExecuteNonQueryCalls);
+        Assert.Equal(2, call.Parameters!["@p1"]);
+        Assert.Equal(1, query.Params!["@p1"]);
+        Assert.Single(parameters);
         Assert.Equal(0, connection.DbCommandExecuteNonQueryCallCount);
     }
 
@@ -110,12 +122,17 @@ public class SqlHelperExecuteUpdateDeleteTests
             })
             .OnDbCommandExecuteNonQuery(_ => throw new InvalidOperationException("should not execute"));
 
-        var query = new SqlDelete("Table").Where("Id = 1");
-        var result = query.Execute(connection);
+        var query = new SqlDelete("Table").Where("Id = @p1");
+        query.SetParam("@p1", 1);
+        var parameters = new Dictionary<string, object?> { ["@p1"] = 2 };
+        var result = query.Execute(connection, parameters: parameters);
 
         Assert.Equal(1, result);
         var call = Assert.Single(connection.ExecuteNonQueryCalls);
         Assert.Same(query, call.Query);
+        Assert.Equal(2, call.Parameters!["@p1"]);
+        Assert.Equal(1, query.Params!["@p1"]);
+        Assert.Single(parameters);
         Assert.Equal(0, connection.DbCommandExecuteNonQueryCallCount);
     }
 
@@ -160,10 +177,17 @@ public class SqlHelperExecuteUpdateDeleteTests
             .InterceptExecuteNonQuery(args => 1)
             .OnDbCommandExecuteNonQuery(_ => throw new InvalidOperationException("should not execute"));
 
-        var query = new SqlDelete("Table").Where("Id = 1");
-        var result = await query.ExecuteAsync(connection, cancellationToken: TestContext.Current.CancellationToken);
+        var query = new SqlDelete("Table").Where("Id = @p1");
+        query.SetParam("@p1", 1);
+        var parameters = new Dictionary<string, object?> { ["@p1"] = 2 };
+        var result = await query.ExecuteAsync(connection, parameters: parameters,
+            cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.Equal(1, result);
+        var call = Assert.Single(connection.ExecuteNonQueryCalls);
+        Assert.Equal(2, call.Parameters!["@p1"]);
+        Assert.Equal(1, query.Params!["@p1"]);
+        Assert.Single(parameters);
         Assert.Equal(0, connection.DbCommandExecuteNonQueryCallCount);
     }
 

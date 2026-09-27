@@ -147,7 +147,7 @@ public static class EntityConnectionExtensions
             await interceptor.FindRowAsync(new FindRowArgs(typeof(TRow), id, query, ByIdOrSingle: true), cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
             return (TRow)intres.Value;
 
-        if (await query.GetSingleAsync(connection, cancellationToken).ConfigureAwait(false))
+        if (await query.GetSingleAsync(connection, cancellationToken: cancellationToken).ConfigureAwait(false))
             return row;
 
         return null;
@@ -200,7 +200,7 @@ public static class EntityConnectionExtensions
             await interceptor.FindRowAsync(new FindRowArgs(typeof(TRow), id, query, ByIdOrSingle: true), cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
             return (TRow)intres.Value;
 
-        if (await query.GetSingleAsync(connection, cancellationToken).ConfigureAwait(false))
+        if (await query.GetSingleAsync(connection, cancellationToken: cancellationToken).ConfigureAwait(false))
             return row;
 
         return null;
@@ -345,7 +345,7 @@ public static class EntityConnectionExtensions
             await interceptor.FindRowAsync(new FindRowArgs(typeof(TRow), default, query, ByIdOrSingle: true), cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
             return (TRow)intres.Value;
 
-        if (await query.GetSingleAsync(connection, cancellationToken).ConfigureAwait(false))
+        if (await query.GetSingleAsync(connection, cancellationToken: cancellationToken).ConfigureAwait(false))
             return row;
 
         return null;
@@ -394,7 +394,7 @@ public static class EntityConnectionExtensions
             await interceptor.FindRowAsync(new FindRowArgs(typeof(TRow), default, query, ByIdOrSingle: true), cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
             return (TRow)intres.Value;
 
-        if (await query.GetSingleAsync(connection, cancellationToken).ConfigureAwait(false))
+        if (await query.GetSingleAsync(connection, cancellationToken: cancellationToken).ConfigureAwait(false))
             return row;
 
         return null;
@@ -521,7 +521,7 @@ public static class EntityConnectionExtensions
             await interceptor.FindRowAsync(new FindRowArgs(typeof(TRow), default, query, ByIdOrSingle: false), cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
             return (TRow)intres.Value;
 
-        if (await query.GetFirstAsync(connection, cancellationToken).ConfigureAwait(false))
+        if (await query.GetFirstAsync(connection, cancellationToken: cancellationToken).ConfigureAwait(false))
             return row;
 
         return null;
@@ -568,7 +568,7 @@ public static class EntityConnectionExtensions
             await interceptor.FindRowAsync(new FindRowArgs(typeof(TRow), default, query, ByIdOrSingle: false), cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
             return (TRow)intres.Value;
 
-        if (await query.GetFirstAsync(connection, cancellationToken).ConfigureAwait(false))
+        if (await query.GetFirstAsync(connection, cancellationToken: cancellationToken).ConfigureAwait(false))
             return row;
 
         return null;
@@ -835,7 +835,7 @@ public static class EntityConnectionExtensions
             await interceptor.ListRowsAsync(new ListRowsArgs(typeof(TRow), query), cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
             return (List<TRow>)intres.Value;
 
-        return await query.ListAsync(connection, row, cancellationToken).ConfigureAwait(false);
+        return await query.ListAsync(connection, row, cancellationToken: cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -859,7 +859,7 @@ public static class EntityConnectionExtensions
             await interceptor.ListRowsAsync(new ListRowsArgs(typeof(TRow), query), cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
             return (List<TRow>)intres.Value;
 
-        return await query.ListAsync(connection, row, cancellationToken).ConfigureAwait(false);
+        return await query.ListAsync(connection, row, cancellationToken: cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>

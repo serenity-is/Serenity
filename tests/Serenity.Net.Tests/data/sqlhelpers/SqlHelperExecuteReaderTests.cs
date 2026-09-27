@@ -72,6 +72,27 @@ public class SqlHelperExecuteReaderTests
     }
 
     [Fact]
+    public void ExecuteReader_WithQuery_UsesProvidedParameters()
+    {
+        var parameters = new Dictionary<string, object?> { ["@p1"] = 2 };
+        using var connection = new MockDbConnection()
+            .InterceptExecuteReader(args => args.ToMockReader(new { Id = 1 }));
+
+        var query = new SqlQuery().From("Table").Select("Id");
+        query.SetParam("@p1", 1);
+        query.SetParam("@p2", 3);
+        using var reader = query.ExecuteReader(connection, parameters);
+
+        Assert.True(reader.Read());
+        var call = Assert.Single(connection.ExecuteReaderCalls);
+        Assert.NotSame(parameters, call.Parameters);
+        Assert.Equal(2, call.Parameters!["@p1"]);
+        Assert.Equal(3, call.Parameters["@p2"]);
+        Assert.Single(parameters);
+        Assert.Equal(1, query.Params!["@p1"]);
+    }
+
+    [Fact]
     public void ExecuteReader_WithQuery_InterceptorReturnsEmpty_ExecutesCommand()
     {
         using var connection = new MockDbConnection()
@@ -136,6 +157,30 @@ public class SqlHelperExecuteReaderTests
         var call = Assert.Single(connection.ExecuteReaderCalls);
         Assert.Same(query, call.Query);
         Assert.True(call.IsAsync);
+    }
+
+    [Fact]
+    public async Task ExecuteReaderAsync_WithQuery_UsesProvidedParameters()
+    {
+        var parameters = new Dictionary<string, object?> { ["@p1"] = 2 };
+        using var connection = new MockDbConnection()
+            .InterceptExecuteReader(args => args.ToMockReader(new { Id = 1 }));
+
+        var query = new SqlQuery().From("Table").Select("Id");
+        query.SetParam("@p1", 1);
+        query.SetParam("@p2", 3);
+        using var reader = await query.ExecuteReaderAsync(connection, parameters,
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.True(reader.Read());
+        var call = Assert.Single(connection.ExecuteReaderCalls);
+        Assert.NotSame(parameters, call.Parameters);
+        Assert.Equal(2, call.Parameters!["@p1"]);
+        Assert.Equal(3, call.Parameters["@p2"]);
+        Assert.Single(parameters);
+        Assert.Same(query, call.Query);
+        Assert.True(call.IsAsync);
+        Assert.Equal(1, query.Params!["@p1"]);
     }
 
     [Fact]

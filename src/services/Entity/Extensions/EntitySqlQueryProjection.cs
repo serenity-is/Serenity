@@ -32,12 +32,14 @@ public static class EntitySqlQueryProjection
 	/// <param name="connection">The connection.</param>
 	/// <param name="projection">A flat projection built from direct row field accesses.</param>
 	/// <param name="buffered">Whether to buffer all results before returning.</param>
+	/// <param name="parameters">Values that override the source query's parameters for this execution.</param>
 	/// <returns>The projected results.</returns>
 	public static IEnumerable<TResult> QueryProjected<TRow, TResult>(this SqlQuery query,
-		IDbConnection connection, Expression<Func<TRow, TResult>> projection, bool buffered = true)
+		IDbConnection connection, Expression<Func<TRow, TResult>> projection, bool buffered = true,
+		IDictionary<string, object?>? parameters = null)
 		where TRow : class, IRow
 	{
-		return QueryProjectedCore<TResult>(query, connection, projection, buffered);
+		return QueryProjectedCore<TResult>(query, connection, projection, buffered, parameters);
 	}
 
 	/// <summary>
@@ -48,12 +50,14 @@ public static class EntitySqlQueryProjection
 	/// <param name="query">The query to execute.</param>
 	/// <param name="connection">The connection.</param>
 	/// <param name="projection">A flat projection built from direct row field accesses.</param>
+	/// <param name="parameters">Values that override the source query's parameters for this execution.</param>
 	/// <returns>The projected results.</returns>
 	public static List<TResult> ListProjected<TRow, TResult>(this SqlQuery query,
-		IDbConnection connection, Expression<Func<TRow, TResult>> projection)
+		IDbConnection connection, Expression<Func<TRow, TResult>> projection,
+		IDictionary<string, object?>? parameters = null)
 		where TRow : class, IRow
 	{
-		return [.. QueryProjectedCore<TResult>(query, connection, projection, buffered: false)];
+		return [.. QueryProjectedCore<TResult>(query, connection, projection, buffered: false, parameters)];
 	}
 
 	/// <summary>
@@ -68,13 +72,15 @@ public static class EntitySqlQueryProjection
 	/// <param name="connection">The connection.</param>
 	/// <param name="projection">A flat projection built from direct row field accesses.</param>
 	/// <param name="buffered">Whether to buffer all results before returning.</param>
+	/// <param name="parameters">Values that override the source query's parameters for this execution.</param>
 	/// <returns>The projected results.</returns>
 	public static IEnumerable<TResult> QueryProjected<TRow1, TRow2, TResult>(this SqlQuery query,
-		IDbConnection connection, Expression<Func<TRow1, TRow2, TResult>> projection, bool buffered = true)
+		IDbConnection connection, Expression<Func<TRow1, TRow2, TResult>> projection, bool buffered = true,
+		IDictionary<string, object?>? parameters = null)
 		where TRow1 : class, IRow
 		where TRow2 : class, IRow
 	{
-		return QueryProjectedCore<TResult>(query, connection, projection, buffered);
+		return QueryProjectedCore<TResult>(query, connection, projection, buffered, parameters);
 	}
 
 	/// <summary>
@@ -86,13 +92,47 @@ public static class EntitySqlQueryProjection
 	/// <param name="query">The query to execute.</param>
 	/// <param name="connection">The connection.</param>
 	/// <param name="projection">A flat projection built from direct row field accesses.</param>
+	/// <param name="parameters">Values that override the source query's parameters for this execution.</param>
 	/// <returns>The projected results.</returns>
 	public static List<TResult> ListProjected<TRow1, TRow2, TResult>(this SqlQuery query,
-		IDbConnection connection, Expression<Func<TRow1, TRow2, TResult>> projection)
+		IDbConnection connection, Expression<Func<TRow1, TRow2, TResult>> projection,
+		IDictionary<string, object?>? parameters = null)
 		where TRow1 : class, IRow
 		where TRow2 : class, IRow
 	{
-		return [.. QueryProjectedCore<TResult>(query, connection, projection, buffered: false)];
+		return [.. QueryProjectedCore<TResult>(query, connection, projection, buffered: false, parameters)];
+	}
+
+	/// <summary>
+	/// Prepares a reusable flat projection. The source query must be a root query without existing SELECT columns.
+	/// </summary>
+	/// <typeparam name="TRow">The row type of the query's single into row.</typeparam>
+	/// <typeparam name="TResult">The flat projection result type.</typeparam>
+	/// <param name="query">The query to prepare.</param>
+	/// <param name="projection">A flat projection built from row field accesses or SQL expressions.</param>
+	/// <returns>A reusable projection that can be executed with different parameter values.</returns>
+	public static IProjectedQuery<TResult> AsReusableProjected<TRow, TResult>(this SqlQuery query,
+		Expression<Func<TRow, TResult>> projection)
+		where TRow : class, IRow
+	{
+		return CreateReusableProjection<TResult>(query, projection);
+	}
+
+	/// <summary>
+	/// Prepares a reusable flat projection. The source query must be a root query without existing SELECT columns.
+	/// </summary>
+	/// <typeparam name="TRow1">The row type of the query's first into row.</typeparam>
+	/// <typeparam name="TRow2">The row type of the query's second into row.</typeparam>
+	/// <typeparam name="TResult">The flat projection result type.</typeparam>
+	/// <param name="query">The query to prepare.</param>
+	/// <param name="projection">A flat projection built from row field accesses or SQL expressions.</param>
+	/// <returns>A reusable projection that can be executed with different parameter values.</returns>
+	public static IProjectedQuery<TResult> AsReusableProjected<TRow1, TRow2, TResult>(this SqlQuery query,
+		Expression<Func<TRow1, TRow2, TResult>> projection)
+		where TRow1 : class, IRow
+		where TRow2 : class, IRow
+	{
+		return CreateReusableProjection<TResult>(query, projection);
 	}
 
 	/// <summary>
@@ -103,16 +143,18 @@ public static class EntitySqlQueryProjection
 	/// <param name="query">The query to execute.</param>
 	/// <param name="connection">The connection.</param>
 	/// <param name="projection">A flat projection built from direct row field accesses.</param>
+	/// <param name="parameters">Values that override the source query's parameters for this execution.</param>
 	/// <param name="cancellationToken">The cancellation token.</param>
 	/// <returns>A task representing the asynchronous operation. The task result is the projected list.</returns>
 	public static Task<List<TResult>> ListProjectedAsync<TRow, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow, TResult>> projection,
+		IDictionary<string, object?>? parameters = null,
 		CancellationToken cancellationToken = default)
 		where TRow : class, IRow
 	{
 		ArgumentNullException.ThrowIfNull(connection);
 		var prepared = PrepareProjection<TResult>(query, projection);
-		return BufferProjectedAsync(prepared.Query, connection, prepared.Materializer, cancellationToken);
+		return BufferProjectedAsync(prepared.Query, connection, prepared.Materializer, parameters, cancellationToken);
 	}
 
 	/// <summary>
@@ -124,17 +166,19 @@ public static class EntitySqlQueryProjection
 	/// <param name="query">The query to execute.</param>
 	/// <param name="connection">The connection.</param>
 	/// <param name="projection">A flat projection built from direct row field accesses.</param>
+	/// <param name="parameters">Values that override the source query's parameters for this execution.</param>
 	/// <param name="cancellationToken">The cancellation token.</param>
 	/// <returns>A task representing the asynchronous operation. The task result is the projected list.</returns>
 	public static Task<List<TResult>> ListProjectedAsync<TRow1, TRow2, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow1, TRow2, TResult>> projection,
+		IDictionary<string, object?>? parameters = null,
 		CancellationToken cancellationToken = default)
 		where TRow1 : class, IRow
 		where TRow2 : class, IRow
 	{
 		ArgumentNullException.ThrowIfNull(connection);
 		var prepared = PrepareProjection<TResult>(query, projection);
-		return BufferProjectedAsync(prepared.Query, connection, prepared.Materializer, cancellationToken);
+		return BufferProjectedAsync(prepared.Query, connection, prepared.Materializer, parameters, cancellationToken);
 	}
 
 	/// <summary>
@@ -146,16 +190,18 @@ public static class EntitySqlQueryProjection
 	/// <param name="query">The query to execute.</param>
 	/// <param name="connection">The connection.</param>
 	/// <param name="projection">A flat projection built from direct row field accesses.</param>
+	/// <param name="parameters">Values that override the source query's parameters for this execution.</param>
 	/// <param name="cancellationToken">The cancellation token.</param>
 	/// <returns>An asynchronous stream of projected results.</returns>
 	public static IAsyncEnumerable<TResult> QueryProjectedAsync<TRow, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow, TResult>> projection,
+		IDictionary<string, object?>? parameters = null,
 		CancellationToken cancellationToken = default)
 		where TRow : class, IRow
 	{
 		ArgumentNullException.ThrowIfNull(connection);
 		var prepared = PrepareProjection<TResult>(query, projection);
-		return EnumerateProjectedAsync(prepared.Query, connection, prepared.Materializer, cancellationToken);
+		return EnumerateProjectedAsync(prepared.Query, connection, prepared.Materializer, parameters, cancellationToken);
 	}
 
 	/// <summary>
@@ -168,25 +214,28 @@ public static class EntitySqlQueryProjection
 	/// <param name="query">The query to execute.</param>
 	/// <param name="connection">The connection.</param>
 	/// <param name="projection">A flat projection built from direct row field accesses.</param>
+	/// <param name="parameters">Values that override the source query's parameters for this execution.</param>
 	/// <param name="cancellationToken">The cancellation token.</param>
 	/// <returns>An asynchronous stream of projected results.</returns>
 	public static IAsyncEnumerable<TResult> QueryProjectedAsync<TRow1, TRow2, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow1, TRow2, TResult>> projection,
+		IDictionary<string, object?>? parameters = null,
 		CancellationToken cancellationToken = default)
 		where TRow1 : class, IRow
 		where TRow2 : class, IRow
 	{
 		ArgumentNullException.ThrowIfNull(connection);
 		var prepared = PrepareProjection<TResult>(query, projection);
-		return EnumerateProjectedAsync(prepared.Query, connection, prepared.Materializer, cancellationToken);
+		return EnumerateProjectedAsync(prepared.Query, connection, prepared.Materializer, parameters, cancellationToken);
 	}
 
 	private static IEnumerable<TResult> QueryProjectedCore<TResult>(SqlQuery query,
-		IDbConnection connection, LambdaExpression projection, bool buffered)
+		IDbConnection connection, LambdaExpression projection, bool buffered,
+		IDictionary<string, object?>? parameters)
 	{
 		ArgumentNullException.ThrowIfNull(connection);
 		var prepared = PrepareProjection<TResult>(query, projection);
-		var results = EnumerateProjected(prepared.Query, connection, prepared.Materializer);
+		var results = EnumerateProjected(prepared.Query, connection, prepared.Materializer, parameters);
 		return buffered ? [.. results] : results;
 	}
 
@@ -264,30 +313,44 @@ public static class EntitySqlQueryProjection
 		return new PreparedProjection<TResult>(projectedQuery, materializer);
 	}
 
-	private static IEnumerable<TResult> EnumerateProjected<TResult>(SqlQuery query,
-		IDbConnection connection, Func<IDataReader, TResult> materializer)
+	private static ReusableProjectedQuery<TResult> CreateReusableProjection<TResult>(SqlQuery query,
+		LambdaExpression projection)
 	{
-		using var reader = query.ExecuteReader(connection);
+		ArgumentNullException.ThrowIfNull(query);
+		if (((ISqlQuery)query).Parent is not null)
+			throw new NotSupportedException("Reusable projections require a root SqlQuery with independent parameters.");
+
+		var prepared = PrepareProjection<TResult>(query, projection);
+		return new ReusableProjectedQuery<TResult>(prepared.Query, prepared.Materializer);
+	}
+
+	internal static IEnumerable<TResult> EnumerateProjected<TResult>(SqlQuery query,
+		IDbConnection connection, Func<IDataReader, TResult> materializer,
+		IDictionary<string, object?>? parameters = null)
+	{
+		using var reader = query.ExecuteReader(connection, parameters);
 		while (reader.Read())
 			yield return materializer(reader);
 	}
 
-	private static async Task<List<TResult>> BufferProjectedAsync<TResult>(SqlQuery query,
-		IDbConnection connection, Func<IDataReader, TResult> materializer, CancellationToken cancellationToken)
+	internal static async Task<List<TResult>> BufferProjectedAsync<TResult>(SqlQuery query,
+		IDbConnection connection, Func<IDataReader, TResult> materializer,
+		IDictionary<string, object?>? parameters, CancellationToken cancellationToken)
 	{
 		var results = new List<TResult>();
-		await foreach (var result in EnumerateProjectedAsync(query, connection, materializer, cancellationToken)
+		await foreach (var result in EnumerateProjectedAsync(query, connection, materializer, parameters, cancellationToken)
 			.ConfigureAwait(false))
 			results.Add(result);
 
 		return results;
 	}
 
-	private static async IAsyncEnumerable<TResult> EnumerateProjectedAsync<TResult>(SqlQuery query,
+	internal static async IAsyncEnumerable<TResult> EnumerateProjectedAsync<TResult>(SqlQuery query,
 		IDbConnection connection, Func<IDataReader, TResult> materializer,
+		IDictionary<string, object?>? parameters = null,
 		[EnumeratorCancellation] CancellationToken cancellationToken = default)
 	{
-		using var reader = await query.ExecuteReaderAsync(connection, cancellationToken: cancellationToken)
+		using var reader = await query.ExecuteReaderAsync(connection, parameters, cancellationToken: cancellationToken)
 			.ConfigureAwait(false);
 		while (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
 			yield return materializer(reader);
@@ -480,4 +543,98 @@ public static class EntitySqlQueryProjection
 		}
 	}
 
+}
+
+/// <summary>
+/// A prepared projected query that reuses its compiled materializer and prepared SQL query.
+/// Each execution uses an independent parameter dictionary and can run concurrently.
+/// </summary>
+/// <typeparam name="TResult">The flat projection result type.</typeparam>
+internal sealed class ReusableProjectedQuery<TResult> : IProjectedQuery<TResult>
+{
+	private readonly SqlQuery preparedQuery;
+	private readonly Func<IDataReader, TResult> materializer;
+
+	internal ReusableProjectedQuery(SqlQuery preparedQuery,
+		Func<IDataReader, TResult> materializer)
+	{
+		this.preparedQuery = preparedQuery;
+		this.materializer = materializer;
+	}
+
+	public IEnumerable<TResult> Query(IDbConnection connection,
+		IReadOnlyDictionary<string, object?>? parameters = null, bool buffered = true)
+	{
+		ArgumentNullException.ThrowIfNull(connection);
+		return buffered ? List(connection, parameters) : Enumerate(connection, parameters);
+	}
+
+	/// <summary>
+	/// Executes the prepared projection and buffers its results.
+	/// Parameters are reset to the values captured when the projection was prepared, then overridden by <paramref name="parameters"/>.
+	/// </summary>
+	/// <param name="connection">The connection.</param>
+	/// <param name="parameters">Optional parameter values to override for this execution.</param>
+	/// <returns>The projected results.</returns>
+	public List<TResult> List(IDbConnection connection,
+		IReadOnlyDictionary<string, object?>? parameters = null)
+	{
+		ArgumentNullException.ThrowIfNull(connection);
+		return [.. Enumerate(connection, parameters)];
+	}
+
+	public IAsyncEnumerable<TResult> QueryAsync(IDbConnection connection,
+		IReadOnlyDictionary<string, object?>? parameters = null, CancellationToken cancellationToken = default)
+	{
+		ArgumentNullException.ThrowIfNull(connection);
+		return EnumerateAsync(connection, parameters, cancellationToken);
+	}
+
+	/// <summary>
+	/// Asynchronously executes the prepared projection and buffers its results.
+	/// Parameters are reset to the values captured when the projection was prepared, then overridden by <paramref name="parameters"/>.
+	/// </summary>
+	/// <param name="connection">The connection.</param>
+	/// <param name="parameters">Optional parameter values to override for this execution.</param>
+	/// <param name="cancellationToken">The cancellation token.</param>
+	/// <returns>A task representing the asynchronous operation. The task result is the projected list.</returns>
+	public async Task<List<TResult>> ListAsync(IDbConnection connection,
+		IReadOnlyDictionary<string, object?>? parameters = null, CancellationToken cancellationToken = default)
+	{
+		ArgumentNullException.ThrowIfNull(connection);
+		var results = new List<TResult>();
+		await foreach (var result in EnumerateAsync(connection, parameters, cancellationToken).ConfigureAwait(false))
+			results.Add(result);
+		return results;
+	}
+
+	private static Dictionary<string, object?> CreateParameterOverrides(
+		IReadOnlyDictionary<string, object?>? overrides)
+	{
+		var parameters = new Dictionary<string, object?>();
+
+		if (overrides is not null)
+			foreach (var (name, value) in overrides)
+				parameters.Add(name, value);
+
+		return parameters;
+	}
+
+	private IEnumerable<TResult> Enumerate(IDbConnection connection,
+		IReadOnlyDictionary<string, object?>? parameters)
+	{
+		using var reader = preparedQuery.ExecuteReader(connection, CreateParameterOverrides(parameters));
+		while (reader.Read())
+			yield return materializer(reader);
+	}
+
+	private async IAsyncEnumerable<TResult> EnumerateAsync(IDbConnection connection,
+		IReadOnlyDictionary<string, object?>? parameters,
+		[EnumeratorCancellation] CancellationToken cancellationToken)
+	{
+		using var reader = await preparedQuery.ExecuteReaderAsync(connection,
+			CreateParameterOverrides(parameters), cancellationToken: cancellationToken).ConfigureAwait(false);
+		while (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
+			yield return materializer(reader);
+	}
 }

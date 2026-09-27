@@ -411,22 +411,25 @@ public static class SqlHelper
     /// </summary>
     /// <param name="query">The query.</param>
     /// <param name="connection">The connection.</param>
+    /// <param name="parameters">Values that override the query's parameters for this execution.</param>
     /// <param name="logger">The logger.</param>
     /// <returns>The generated identity value, or null if none was generated.</returns>
     /// <exception cref="ArgumentNullException">query.IdentityColumn is null.</exception>
     /// <exception cref="NotImplementedException">The connection dialect doesn't support returning the inserted identity.</exception>
-    public static long? ExecuteAndGetID(this SqlInsert query, IDbConnection connection, ILogger? logger = null)
+    public static long? ExecuteAndGetID(this SqlInsert query, IDbConnection connection,
+        IDictionary<string, object?>? parameters = null, ILogger? logger = null)
     {
         string queryText = query.ToString();
+        parameters = MergeQueryParameters(query.Params, parameters);
 
         if (connection is ISqlOperationInterceptor interceptor &&
-            interceptor.ExecuteNonQuery(queryText, query.Params, ExpectedRows.One, query, getNewId: true) is { HasValue: true } intres)
+            interceptor.ExecuteNonQuery(queryText, parameters, ExpectedRows.One, query, getNewId: true) is { HasValue: true } intres)
             return intres.Value;
 
         var dialect = connection.GetDialect();
         if (dialect.UseReturningIdentity || dialect.UseReturningIntoVar)
         {
-            using var command = CreateReturningIdentityCommand(query, connection, queryText, dialect, out var param);
+            using var command = CreateReturningIdentityCommand(query, connection, queryText, dialect, parameters, out var param);
             InternalExecuteNonQuery(command, logger);
             return Convert.ToInt64(param.Value);
         }
@@ -435,7 +438,7 @@ public static class SqlHelper
         {
             queryText += ";\nSELECT " + dialect.ScopeIdentityExpression + " AS IDCOLUMNVALUE";
 
-            using IDataReader reader = InternalExecuteReader(connection, queryText, query.Params, logger);
+            using IDataReader reader = InternalExecuteReader(connection, queryText, parameters, logger);
             return reader.Read() ? ReadIdentityValue(reader) : null;
         }
 
@@ -448,23 +451,27 @@ public static class SqlHelper
     /// </summary>
     /// <param name="query">The query.</param>
     /// <param name="connection">The connection.</param>
+    /// <param name="parameters">Values that override the query's parameters for this execution.</param>
     /// <param name="logger">The logger.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the generated identity value, or null if none was generated.</returns>
     /// <exception cref="ArgumentNullException">query.IdentityColumn is null.</exception>
     /// <exception cref="NotImplementedException">The connection dialect doesn't support returning the inserted identity.</exception>
-    public static async Task<long?> ExecuteAndGetIDAsync(this SqlInsert query, IDbConnection connection, ILogger? logger = null, CancellationToken cancellationToken = default)
+    public static async Task<long?> ExecuteAndGetIDAsync(this SqlInsert query, IDbConnection connection,
+        IDictionary<string, object?>? parameters = null, ILogger? logger = null,
+        CancellationToken cancellationToken = default)
     {
         string queryText = query.ToString();
+        parameters = MergeQueryParameters(query.Params, parameters);
 
         if (connection is ISqlOperationInterceptor interceptor &&
-            await interceptor.ExecuteNonQueryAsync(queryText, query.Params, ExpectedRows.One, query, getNewId: true, cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
+            await interceptor.ExecuteNonQueryAsync(queryText, parameters, ExpectedRows.One, query, getNewId: true, cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
             return intres.Value;
 
         var dialect = connection.GetDialect();
         if (dialect.UseReturningIdentity || dialect.UseReturningIntoVar)
         {
-            using var command = CreateReturningIdentityCommand(query, connection, queryText, dialect, out var param);
+            using var command = CreateReturningIdentityCommand(query, connection, queryText, dialect, parameters, out var param);
             await InternalExecuteNonQueryAsync(command, logger, cancellationToken).ConfigureAwait(false);
             return Convert.ToInt64(param.Value);
         }
@@ -473,7 +480,7 @@ public static class SqlHelper
         {
             queryText += ";\nSELECT " + dialect.ScopeIdentityExpression + " AS IDCOLUMNVALUE";
 
-            using IDataReader reader = await InternalExecuteReaderAsync(connection, queryText, query.Params, logger, cancellationToken).ConfigureAwait(false);
+            using IDataReader reader = await InternalExecuteReaderAsync(connection, queryText, parameters, logger, cancellationToken).ConfigureAwait(false);
             return await reader.ReadAsync(cancellationToken).ConfigureAwait(false) ? ReadIdentityValue(reader) : null;
         }
 
@@ -500,7 +507,8 @@ public static class SqlHelper
         return affectedRows;
     }
 
-    private static IDbCommand CreateReturningIdentityCommand(SqlInsert query, IDbConnection connection, string queryText, ISqlDialect dialect, out IDbDataParameter param)
+    private static IDbCommand CreateReturningIdentityCommand(SqlInsert query, IDbConnection connection,
+        string queryText, ISqlDialect dialect, IDictionary<string, object?>? parameters, out IDbDataParameter param)
     {
         string identityColumn = query.IdentityColumn() ?? throw new ArgumentNullException("query.IdentityColumn");
         queryText += " RETURNING " + SqlSyntax.AutoBracket(identityColumn, dialect);
@@ -508,7 +516,7 @@ public static class SqlHelper
         if (dialect.UseReturningIntoVar)
             queryText += " INTO " + dialect.ParameterPrefix + identityColumn;
 
-        var command = NewCommand(connection, queryText, query.Params);
+        var command = NewCommand(connection, queryText, parameters);
         param = command.CreateParameter();
         param.Direction = dialect.UseReturningIntoVar ? ParameterDirection.ReturnValue : ParameterDirection.Output;
         param.ParameterName = identityColumn;
@@ -549,15 +557,18 @@ public static class SqlHelper
     /// </summary>
     /// <param name="query">The query.</param>
     /// <param name="connection">The connection.</param>
+    /// <param name="parameters">Values that override the query's parameters for this execution.</param>
     /// <param name="logger">The logger.</param>
-    public static void Execute(this SqlInsert query, IDbConnection connection, ILogger? logger = null)
+    public static void Execute(this SqlInsert query, IDbConnection connection,
+        IDictionary<string, object?>? parameters = null, ILogger? logger = null)
     {
         string commandText = query.ToString();
+        parameters = MergeQueryParameters(query.Params, parameters);
         if (connection is ISqlOperationInterceptor interceptor &&
-            interceptor.ExecuteNonQuery(commandText, query.Params, ExpectedRows.One, query, getNewId: false) is { HasValue: true })
+            interceptor.ExecuteNonQuery(commandText, parameters, ExpectedRows.One, query, getNewId: false) is { HasValue: true })
             return;
 
-        using var command = NewCommand(connection, commandText, query.Params);
+        using var command = NewCommand(connection, commandText, parameters);
         InternalExecuteNonQuery(command, logger);
     }
 
@@ -566,17 +577,21 @@ public static class SqlHelper
     /// </summary>
     /// <param name="query">The query.</param>
     /// <param name="connection">The connection.</param>
+    /// <param name="parameters">Values that override the query's parameters for this execution.</param>
     /// <param name="logger">The logger.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
-    public static async Task ExecuteAsync(this SqlInsert query, IDbConnection connection, ILogger? logger = null, CancellationToken cancellationToken = default)
+    public static async Task ExecuteAsync(this SqlInsert query, IDbConnection connection,
+        IDictionary<string, object?>? parameters = null, ILogger? logger = null,
+        CancellationToken cancellationToken = default)
     {
         string commandText = query.ToString();
+        parameters = MergeQueryParameters(query.Params, parameters);
         if (connection is ISqlOperationInterceptor interceptor &&
-            await interceptor.ExecuteNonQueryAsync(commandText, query.Params, ExpectedRows.One, query, getNewId: false, cancellationToken).ConfigureAwait(false) is { HasValue: true })
+            await interceptor.ExecuteNonQueryAsync(commandText, parameters, ExpectedRows.One, query, getNewId: false, cancellationToken).ConfigureAwait(false) is { HasValue: true })
             return;
 
-        using var command = NewCommand(connection, commandText, query.Params);
+        using var command = NewCommand(connection, commandText, parameters);
         await InternalExecuteNonQueryAsync(command, logger, cancellationToken).ConfigureAwait(false);
     }
 
@@ -588,10 +603,12 @@ public static class SqlHelper
     /// <param name="connection">The connection.</param>
     /// <param name="keyFields">List of key fields (e.g. primary key columns) used to match an existing record.</param>
     /// <param name="expectedRows">The expected rows. Used to validate the expected number of affected rows.</param>
+    /// <param name="parameters">Values that override the query's parameters for this execution.</param>
     /// <param name="logger">The logger.</param>
     /// <returns>The number of affected rows.</returns>
     public static int ExecuteUpsert(this SqlInsert query, IDbConnection connection,
-        IEnumerable<string> keyFields, ExpectedRows expectedRows = ExpectedRows.Ignore, ILogger? logger = null)
+        IEnumerable<string> keyFields, ExpectedRows expectedRows = ExpectedRows.Ignore,
+        IDictionary<string, object?>? parameters = null, ILogger? logger = null)
     {
         ArgumentNullException.ThrowIfNull(query);
         ArgumentNullException.ThrowIfNull(connection);
@@ -608,17 +625,19 @@ public static class SqlHelper
         {
             // Unknown dialect: fall back to a non-atomic update-then-insert.
             var update = CreateUpsertFallbackUpdate(query, keyFields);
-            if (update.Execute(connection, ExpectedRows.ZeroOrOne, logger) != 1)
-                query.Execute(connection, logger);
+            if (update.Execute(connection, ExpectedRows.ZeroOrOne,
+                parameters: parameters, logger: logger) != 1)
+                query.Execute(connection, parameters, logger);
 
             return CheckExpectedRows(expectedRows, 1);
         }
 
+        parameters = MergeQueryParameters(query.Params, parameters);
         if (connection is ISqlOperationInterceptor interceptor &&
-            interceptor.ExecuteNonQuery(commandText, query.Params, expectedRows, query, getNewId: false) is { HasValue: true } intres)
+            interceptor.ExecuteNonQuery(commandText, parameters, expectedRows, query, getNewId: false) is { HasValue: true } intres)
             return (int)intres.Value!;
 
-        using var command = NewCommand(connection, commandText, query.Params);
+        using var command = NewCommand(connection, commandText, parameters);
         return CheckExpectedRows(expectedRows, InternalExecuteNonQuery(command, logger));
     }
 
@@ -630,11 +649,14 @@ public static class SqlHelper
     /// <param name="connection">The connection.</param>
     /// <param name="keyFields">List of key fields (e.g. primary key columns) used to match an existing record.</param>
     /// <param name="expectedRows">The expected rows. Used to validate the expected number of affected rows.</param>
+    /// <param name="parameters">Values that override the query's parameters for this execution.</param>
     /// <param name="logger">The logger.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the number of affected rows.</returns>
     public static async Task<int> ExecuteUpsertAsync(this SqlInsert query, IDbConnection connection,
-        IEnumerable<string> keyFields, ExpectedRows expectedRows = ExpectedRows.Ignore, ILogger? logger = null, CancellationToken cancellationToken = default)
+        IEnumerable<string> keyFields, ExpectedRows expectedRows = ExpectedRows.Ignore,
+        IDictionary<string, object?>? parameters = null, ILogger? logger = null,
+        CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(query);
         ArgumentNullException.ThrowIfNull(connection);
@@ -651,17 +673,20 @@ public static class SqlHelper
         {
             // Unknown dialect: fall back to a non-atomic update-then-insert.
             var update = CreateUpsertFallbackUpdate(query, keyFields);
-            if (await update.ExecuteAsync(connection, ExpectedRows.ZeroOrOne, logger, cancellationToken).ConfigureAwait(false) != 1)
-                await query.ExecuteAsync(connection, logger, cancellationToken).ConfigureAwait(false);
+            if (await update.ExecuteAsync(connection, ExpectedRows.ZeroOrOne,
+                parameters: parameters, logger: logger, cancellationToken: cancellationToken).ConfigureAwait(false) != 1)
+                await query.ExecuteAsync(connection, parameters, logger,
+                    cancellationToken).ConfigureAwait(false);
 
             return CheckExpectedRows(expectedRows, 1);
         }
 
+        parameters = MergeQueryParameters(query.Params, parameters);
         if (connection is ISqlOperationInterceptor interceptor &&
-            await interceptor.ExecuteNonQueryAsync(commandText, query.Params, expectedRows, query, getNewId: false, cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
+            await interceptor.ExecuteNonQueryAsync(commandText, parameters, expectedRows, query, getNewId: false, cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
             return (int)intres.Value!;
 
-        using var command = NewCommand(connection, commandText, query.Params);
+        using var command = NewCommand(connection, commandText, parameters);
         return CheckExpectedRows(expectedRows, await InternalExecuteNonQueryAsync(command, logger, cancellationToken).ConfigureAwait(false));
     }
 
@@ -671,16 +696,20 @@ public static class SqlHelper
     /// <param name="query">The query.</param>
     /// <param name="connection">The connection.</param>
     /// <param name="expectedRows">The expected rows. Used to validate the expected number of affected rows.</param>
+    /// <param name="parameters">Values that override the query's parameters for this execution.</param>
     /// <param name="logger">The logger.</param>
     /// <returns>The number of affected rows.</returns>
-    public static int Execute(this SqlUpdate query, IDbConnection connection, ExpectedRows expectedRows = ExpectedRows.One, ILogger? logger = null)
+    public static int Execute(this SqlUpdate query, IDbConnection connection,
+        ExpectedRows expectedRows = ExpectedRows.One, IDictionary<string, object?>? parameters = null,
+        ILogger? logger = null)
     {
         string commandText = query.ToString();
+        parameters = MergeQueryParameters(query.Params, parameters);
         if (connection is ISqlOperationInterceptor interceptor &&
-            interceptor.ExecuteNonQuery(commandText, query.Params, ExpectedRows.One, query, getNewId: false) is { HasValue: true } intres)
+            interceptor.ExecuteNonQuery(commandText, parameters, ExpectedRows.One, query, getNewId: false) is { HasValue: true } intres)
             return (int)intres.Value!;
 
-        using var command = NewCommand(connection, commandText, query.Params);
+        using var command = NewCommand(connection, commandText, parameters);
         return CheckExpectedRows(expectedRows, InternalExecuteNonQuery(command, logger));
     }
 
@@ -690,17 +719,21 @@ public static class SqlHelper
     /// <param name="query">The query.</param>
     /// <param name="connection">The connection.</param>
     /// <param name="expectedRows">The expected rows. Used to validate the expected number of affected rows.</param>
+    /// <param name="parameters">Values that override the query's parameters for this execution.</param>
     /// <param name="logger">The logger.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the number of affected rows.</returns>
-    public static async Task<int> ExecuteAsync(this SqlUpdate query, IDbConnection connection, ExpectedRows expectedRows = ExpectedRows.One, ILogger? logger = null, CancellationToken cancellationToken = default)
+    public static async Task<int> ExecuteAsync(this SqlUpdate query, IDbConnection connection,
+        ExpectedRows expectedRows = ExpectedRows.One, IDictionary<string, object?>? parameters = null,
+        ILogger? logger = null, CancellationToken cancellationToken = default)
     {
         string commandText = query.ToString();
+        parameters = MergeQueryParameters(query.Params, parameters);
         if (connection is ISqlOperationInterceptor interceptor &&
-            await interceptor.ExecuteNonQueryAsync(commandText, query.Params, ExpectedRows.One, query, getNewId: false, cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
+            await interceptor.ExecuteNonQueryAsync(commandText, parameters, ExpectedRows.One, query, getNewId: false, cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
             return (int)intres.Value!;
 
-        using var command = NewCommand(connection, commandText, query.Params);
+        using var command = NewCommand(connection, commandText, parameters);
         return CheckExpectedRows(expectedRows, await InternalExecuteNonQueryAsync(command, logger, cancellationToken).ConfigureAwait(false));
     }
 
@@ -710,21 +743,25 @@ public static class SqlHelper
     /// <param name="query">The query.</param>
     /// <param name="connection">The connection.</param>
     /// <param name="expectedRows">The expected rows. Used to validate the expected number of affected rows.</param>
+    /// <param name="parameters">Values that override the query's parameters for this execution.</param>
     /// <param name="logger">The logger.</param>
     /// <returns>
     /// The number of affected rows.
     /// </returns>
-    public static int Execute(this SqlDelete query, IDbConnection connection, ExpectedRows expectedRows = ExpectedRows.One, ILogger? logger = null)
+    public static int Execute(this SqlDelete query, IDbConnection connection,
+        ExpectedRows expectedRows = ExpectedRows.One, IDictionary<string, object?>? parameters = null,
+        ILogger? logger = null)
     {
         ArgumentNullException.ThrowIfNull(query);
 
         var commandText = query.ToString();
+        parameters = MergeQueryParameters(query.Params, parameters);
 
         if (connection is ISqlOperationInterceptor interceptor &&
-            interceptor.ExecuteNonQuery(commandText, query.Params, expectedRows, query, getNewId: false) is { HasValue: true } intres)
+            interceptor.ExecuteNonQuery(commandText, parameters, expectedRows, query, getNewId: false) is { HasValue: true } intres)
             return (int)intres.Value!;
 
-        using var command = NewCommand(connection, commandText, query.Params);
+        using var command = NewCommand(connection, commandText, parameters);
         return CheckExpectedRows(expectedRows, InternalExecuteNonQuery(command, logger));
     }
 
@@ -734,20 +771,24 @@ public static class SqlHelper
     /// <param name="query">The query.</param>
     /// <param name="connection">The connection.</param>
     /// <param name="expectedRows">The expected rows. Used to validate the expected number of affected rows.</param>
+    /// <param name="parameters">Values that override the query's parameters for this execution.</param>
     /// <param name="logger">The logger.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the number of affected rows.</returns>
-    public static async Task<int> ExecuteAsync(this SqlDelete query, IDbConnection connection, ExpectedRows expectedRows = ExpectedRows.One, ILogger? logger = null, CancellationToken cancellationToken = default)
+    public static async Task<int> ExecuteAsync(this SqlDelete query, IDbConnection connection,
+        ExpectedRows expectedRows = ExpectedRows.One, IDictionary<string, object?>? parameters = null,
+        ILogger? logger = null, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(query);
 
         var commandText = query.ToString();
+        parameters = MergeQueryParameters(query.Params, parameters);
 
         if (connection is ISqlOperationInterceptor interceptor &&
-            await interceptor.ExecuteNonQueryAsync(commandText, query.Params, expectedRows, query, getNewId: false, cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
+            await interceptor.ExecuteNonQueryAsync(commandText, parameters, expectedRows, query, getNewId: false, cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
             return (int)intres.Value!;
 
-        using var command = NewCommand(connection, commandText, query.Params);
+        using var command = NewCommand(connection, commandText, parameters);
         return CheckExpectedRows(expectedRows, await InternalExecuteNonQueryAsync(command, logger, cancellationToken).ConfigureAwait(false));
     }
 
@@ -884,18 +925,25 @@ public static class SqlHelper
     /// </summary>
     /// <param name="query">The query.</param>
     /// <param name="connection">The connection.</param>
+    /// <param name="parameters">Parameter values that override the query's parameters, or the query's parameters when null.</param>
     /// <param name="logger">The logger.</param>
     /// <returns>A data reader with the results.</returns>
-    public static IDataReader ExecuteReader(this SqlQuery query, IDbConnection connection, ILogger? logger = null)
+    /// <remarks>
+    /// When overrides are supplied, they are merged over the query parameters into a new dictionary.
+    /// Neither input dictionary is modified.
+    /// </remarks>
+    public static IDataReader ExecuteReader(this SqlQuery query, IDbConnection connection,
+        IDictionary<string, object?>? parameters = null, ILogger? logger = null)
     {
         ArgumentNullException.ThrowIfNull(query);
 
         var commandText = query.ToString();
+        parameters = MergeQueryParameters(query.Params, parameters);
         if (connection is ISqlOperationInterceptor interceptor &&
-            interceptor.ExecuteReader(commandText, query.Params, query) is { HasValue: true } intres)
+            interceptor.ExecuteReader(commandText, parameters, query) is { HasValue: true } intres)
             return intres.Value;
 
-        return InternalExecuteReader(connection, commandText, query.Params, logger);
+        return InternalExecuteReader(connection, commandText, parameters, logger);
     }
 
     /// <summary>
@@ -903,19 +951,43 @@ public static class SqlHelper
     /// </summary>
     /// <param name="query">The query.</param>
     /// <param name="connection">The connection.</param>
+    /// <param name="parameters">Parameter values that override the query's parameters, or the query's parameters when null.</param>
     /// <param name="logger">The logger.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains a data reader with the results.</returns>
-    public static async Task<IDataReader> ExecuteReaderAsync(this SqlQuery query, IDbConnection connection, ILogger? logger = null, CancellationToken cancellationToken = default)
+    /// <remarks>
+    /// When overrides are supplied, they are merged over the query parameters into a new dictionary.
+    /// Neither input dictionary is modified.
+    /// </remarks>
+    public static async Task<IDataReader> ExecuteReaderAsync(this SqlQuery query, IDbConnection connection,
+        IDictionary<string, object?>? parameters = null, ILogger? logger = null,
+        CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(query);
 
         var commandText = query.ToString();
+        parameters = MergeQueryParameters(query.Params, parameters);
         if (connection is ISqlOperationInterceptor interceptor &&
-            await interceptor.ExecuteReaderAsync(commandText, query.Params, query, cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
+            await interceptor.ExecuteReaderAsync(commandText, parameters, query, cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
             return intres.Value;
 
-        return await InternalExecuteReaderAsync(connection, commandText, query.Params, logger, cancellationToken).ConfigureAwait(false);
+        return await InternalExecuteReaderAsync(connection, commandText, parameters, logger, cancellationToken).ConfigureAwait(false);
+    }
+
+    internal static IDictionary<string, object?>? MergeQueryParameters(
+        IDictionary<string, object?>? queryParameters, IDictionary<string, object?>? overrides)
+    {
+        if (overrides is null)
+            return queryParameters;
+
+        var parameters = queryParameters is null
+            ? new Dictionary<string, object?>()
+            : new Dictionary<string, object?>(queryParameters);
+
+        foreach (var (name, value) in overrides)
+            parameters[name] = value;
+
+        return parameters;
     }
 
     private static object? InternalExecuteScalar(IDbConnection connection, string commandText, IDictionary<string, object?>? param, ILogger? logger)
@@ -1049,19 +1121,22 @@ public static class SqlHelper
     /// </summary>
     /// <param name="connection">The connection.</param>
     /// <param name="query">The select query.</param>
+    /// <param name="parameters">Parameter values that override the query's parameters.</param>
     /// <param name="logger">The logger.</param>
     /// <returns>The scalar value.</returns>
     /// <exception cref="ArgumentNullException">selectQuery is null.</exception>
-    public static object? ExecuteScalar(IDbConnection connection, SqlQuery query, ILogger? logger = null)
+    public static object? ExecuteScalar(IDbConnection connection, SqlQuery query,
+        IDictionary<string, object?>? parameters = null, ILogger? logger = null)
     {
         ArgumentNullException.ThrowIfNull(query);
 
         string commandText = query.ToString();
+        parameters = MergeQueryParameters(query.Params, parameters);
         if (connection is ISqlOperationInterceptor interceptor &&
-            interceptor.ExecuteScalar(commandText, query.Params, query) is { HasValue: true } intres)
+            interceptor.ExecuteScalar(commandText, parameters, query) is { HasValue: true } intres)
             return intres.Value;
 
-        return InternalExecuteScalar(connection, commandText, query.Params, logger);
+        return InternalExecuteScalar(connection, commandText, parameters, logger);
     }
 
     /// <summary>
@@ -1069,20 +1144,24 @@ public static class SqlHelper
     /// </summary>
     /// <param name="connection">The connection.</param>
     /// <param name="query">The select query.</param>
+    /// <param name="parameters">Parameter values that override the query's parameters.</param>
     /// <param name="logger">The logger.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the scalar value.</returns>
     /// <exception cref="ArgumentNullException">selectQuery is null.</exception>
-    public static async Task<object?> ExecuteScalarAsync(IDbConnection connection, SqlQuery query, ILogger? logger = null, CancellationToken cancellationToken = default)
+    public static async Task<object?> ExecuteScalarAsync(IDbConnection connection, SqlQuery query,
+        IDictionary<string, object?>? parameters = null, ILogger? logger = null,
+        CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(query);
 
         string commandText = query.ToString();
+        parameters = MergeQueryParameters(query.Params, parameters);
         if (connection is ISqlOperationInterceptor interceptor &&
-            await interceptor.ExecuteScalarAsync(commandText, query.Params, query, cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
+            await interceptor.ExecuteScalarAsync(commandText, parameters, query, cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
             return intres.Value;
 
-        return await InternalExecuteScalarAsync(connection, commandText, query.Params, logger, cancellationToken).ConfigureAwait(false);
+        return await InternalExecuteScalarAsync(connection, commandText, parameters, logger, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -1090,11 +1169,13 @@ public static class SqlHelper
     /// </summary>
     /// <param name="query">The query.</param>
     /// <param name="connection">The connection.</param>
+    /// <param name="parameters">Parameter values that override the query's parameters.</param>
     /// <param name="logger">The logger.</param>
     /// <returns>True if the query returns at least one result.</returns>
-    public static bool Exists(this SqlQuery query, IDbConnection connection, ILogger? logger = null)
+    public static bool Exists(this SqlQuery query, IDbConnection connection,
+        IDictionary<string, object?>? parameters = null, ILogger? logger = null)
     {
-        using var reader = ExecuteReader(query, connection, logger);
+        using var reader = ExecuteReader(query, connection, parameters, logger);
         return reader.Read();
     }
 
@@ -1103,12 +1184,16 @@ public static class SqlHelper
     /// </summary>
     /// <param name="query">The query.</param>
     /// <param name="connection">The connection.</param>
+    /// <param name="parameters">Parameter values that override the query's parameters.</param>
     /// <param name="logger">The logger.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task that represents the asynchronous operation. The task result is true if the query returns at least one result.</returns>
-    public static async Task<bool> ExistsAsync(this SqlQuery query, IDbConnection connection, ILogger? logger = null, CancellationToken cancellationToken = default)
+    public static async Task<bool> ExistsAsync(this SqlQuery query, IDbConnection connection,
+        IDictionary<string, object?>? parameters = null, ILogger? logger = null,
+        CancellationToken cancellationToken = default)
     {
-        using var reader = await ExecuteReaderAsync(query, connection, logger, cancellationToken).ConfigureAwait(false);
+        using var reader = await ExecuteReaderAsync(query, connection, parameters, logger,
+            cancellationToken: cancellationToken).ConfigureAwait(false);
         return await reader.ReadAsync(cancellationToken).ConfigureAwait(false);
     }
 }

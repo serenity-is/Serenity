@@ -129,7 +129,7 @@ public class ListRequestHandlerAsync<TRow, TListRequest, TListResponse> :
                 }
                 else
                     Response.Entities.Add(clone);
-            }, cancellationToken).ConfigureAwait(false);
+            }, cancellationToken: cancellationToken).ConfigureAwait(false);
         }
         catch (Exception exception)
         {

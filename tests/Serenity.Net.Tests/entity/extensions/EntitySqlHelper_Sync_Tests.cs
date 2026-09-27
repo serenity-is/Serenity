@@ -70,8 +70,8 @@ public class EntitySqlHelper_Sync_Tests
                 new { CityId = 1, CityName = "A", CountryId = 2 }));
         var token = TestContext.Current.CancellationToken;
 
-        Assert.True(await CityQuery(row).GetFirstAsync(connection, token));
-        Assert.True(await CityQuery(row).GetSingleAsync(connection, token));
+        Assert.True(await CityQuery(row).GetFirstAsync(connection, cancellationToken: token));
+        Assert.True(await CityQuery(row).GetSingleAsync(connection, cancellationToken: token));
     }
 
     [Fact]
@@ -116,12 +116,23 @@ public class EntitySqlHelper_Sync_Tests
 
         var query = CityQuery(row).Dialect(MySqlDialect.Instance);
         query.CountRecords = true;
+        query.SetParam("@p1", 1);
+        query.SetParam("@p2", 3);
+        var parameters = new Dictionary<string, object?> { ["@p1"] = 2 };
 
         var seen = new List<string>();
-        var count = query.ForEach(connection, () => seen.Add(row.CityName));
+        var count = query.ForEach(connection, () => seen.Add(row.CityName), parameters);
 
         Assert.Equal(42, count);
         Assert.Equal(["A"], seen);
+        var scalarCall = Assert.Single(connection.ExecuteScalarCalls);
+        var readerCall = Assert.Single(connection.ExecuteReaderCalls);
+        Assert.Equal(2, scalarCall.Parameters!["@p1"]);
+        Assert.Equal(3, scalarCall.Parameters["@p2"]);
+        Assert.Equal(2, readerCall.Parameters!["@p1"]);
+        Assert.Equal(3, readerCall.Parameters["@p2"]);
+        Assert.Equal(1, query.Params!["@p1"]);
+        Assert.Single(parameters);
     }
 
     [Fact]
@@ -166,7 +177,7 @@ public class EntitySqlHelper_Sync_Tests
                 new { CityId = 1, CityName = "A", CountryId = 2 }));
 
         var list = await CityQuery(row).ListAsync<CityRow>(connection, null,
-            TestContext.Current.CancellationToken);
+            cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.Single(list);
     }
@@ -185,7 +196,7 @@ public class EntitySqlHelper_Sync_Tests
 
         var seen = new List<string>();
         var count = await query.ForEachAsync(connection, () => seen.Add(row.CityName),
-            TestContext.Current.CancellationToken);
+            cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.Equal(42, count);
     }

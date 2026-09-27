@@ -543,7 +543,7 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
                 .ForEachAsync(handler.Connection, () =>
                 {
                     oldList.Add(row.Clone());
-                }, cancellationToken).ConfigureAwait(false);
+                }, cancellationToken: cancellationToken).ConfigureAwait(false);
         }
         else
         {
@@ -626,7 +626,7 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
             .ForEachAsync(handler.Connection, () =>
             {
                 deleteList.Add(rowIdField.AsObject(row)!);
-            }, cancellationToken).ConfigureAwait(false);
+            }, cancellationToken: cancellationToken).ConfigureAwait(false);
 
         return deleteList;
     }

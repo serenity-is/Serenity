@@ -240,7 +240,7 @@ public class NotesBehavior(IUserRetrieveService userRetriever,
                 .ForEachAsync(handler.Connection, () =>
                 {
                     deleteList.Add(row.NoteId!.Value);
-                }, cancellationToken).ConfigureAwait(false);
+                }, cancellationToken: cancellationToken).ConfigureAwait(false);
 
         foreach (var id in deleteList)
             await DeleteNoteAsync(handler.UnitOfWork, id, cancellationToken).ConfigureAwait(false);

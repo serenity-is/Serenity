@@ -180,7 +180,7 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
 
         var row = localRowInstance.CreateNew();
         if (await BuildOldLocalizationRowQuery(row, recordId, cultureId)
-                .GetFirstAsync(connection, cancellationToken).ConfigureAwait(false))
+                .GetFirstAsync(connection, cancellationToken: cancellationToken).ConfigureAwait(false))
             return localRowIdField.AsObject(row);
 
         return null;
@@ -486,7 +486,7 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
                 .ForEachAsync(handler.Connection, () =>
                 {
                     deleteList.Add(localRowIdField.AsObject(localRow)!);
-                }, cancellationToken).ConfigureAwait(false);
+                }, cancellationToken: cancellationToken).ConfigureAwait(false);
 
         return deleteList;
     }

@@ -93,7 +93,7 @@ public class UndeleteRequestHandlerAsync<TRow, TUndeleteRequest, TUndeleteRespon
 
         await PrepareQueryAsync(query, cancellationToken).ConfigureAwait(false);
 
-        if (!await query.GetFirstAsync(Connection, cancellationToken).ConfigureAwait(false))
+        if (!await query.GetFirstAsync(Connection, cancellationToken: cancellationToken).ConfigureAwait(false))
             throw DataValidation.EntityNotFoundError(Row, id, Localizer);
     }
 

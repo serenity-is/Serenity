@@ -208,6 +208,81 @@ public partial class EntitySqlQueryExtensions_FromRow_Tests
     }
 
     [Fact]
+    public void ReusableProjectedQueryReusesPreparedQueryAndOverridesParams()
+    {
+        var parameterValues = new List<object?>();
+        using var connection = new MockDbConnection()
+            .OnDbCommandExecuteReader(command =>
+            {
+                parameterValues.Add(((System.Data.Common.DbParameter)command.Parameters[0]).Value);
+                return new MockDbDataReader(new { ID = 17 });
+            });
+
+        var query = new SqlQuery().From(new SelfNavigationRow());
+        query.SetParam("p1", 1);
+        var extensible = (ISqlQueryExtensible)query;
+        var currentIntoRow = extensible.CurrentIntoRow;
+        var projected = query.AsReusableProjected((SelfNavigationRow source) => new { ID = source.ID });
+
+        Assert.Equal(17, Assert.Single(projected.List(connection)).ID);
+        Assert.Equal(17, Assert.Single(projected.List(connection,
+            new Dictionary<string, object?> { ["p1"] = 2 })).ID);
+        Assert.Equal(17, Assert.Single(projected.List(connection)).ID);
+
+        Assert.Equal(new object?[] { 1, 2, 1 }, parameterValues);
+        Assert.Equal(1, query.Params!["p1"]);
+        Assert.Empty(extensible.Columns);
+        Assert.Same(currentIntoRow, extensible.CurrentIntoRow);
+        Assert.Equal(17, Assert.Single(projected.Query(connection, buffered: false)).ID);
+    }
+
+    [Fact]
+    public async Task ReusableProjectedQueryStreamsAsync()
+    {
+        using var connection = new MockDbConnection()
+            .OnDbCommandExecuteReader(_ => new MockDbDataReader(new { ID = 17 }, new { ID = 23 }));
+
+        var projected = new SqlQuery()
+            .From(new SelfNavigationRow())
+            .AsReusableProjected((SelfNavigationRow source) => new { ID = source.ID });
+        var ids = new List<int?>();
+
+        await foreach (var result in projected.QueryAsync(connection,
+            cancellationToken: TestContext.Current.CancellationToken))
+            ids.Add(result.ID);
+
+        Assert.Equal(new int?[] { 17, 23 }, ids);
+    }
+
+    [Fact]
+    public async Task ReusableProjectedQueryAllowsParallelExecutions()
+    {
+        var query = new SqlQuery().From(new SelfNavigationRow());
+        query.SetParam("p1", 0);
+        var projected = query.AsReusableProjected((SelfNavigationRow source) => new { ID = source.ID });
+
+        var executions = await Task.WhenAll(new[] { 1, 2 }.Select(value => Task.Run(() =>
+        {
+            var observedParameter = 0;
+            using var connection = new MockDbConnection()
+                .OnDbCommandExecuteReader(command =>
+                {
+                    observedParameter = Convert.ToInt32(
+                        ((System.Data.Common.DbParameter)command.Parameters[0]).Value);
+                    return new MockDbDataReader(new { ID = 17 });
+                });
+
+            var result = Assert.Single(projected.List(connection,
+                new Dictionary<string, object?> { ["p1"] = value }));
+            return (observedParameter, result.ID);
+        })));
+
+        Assert.Equal(new[] { 1, 2 }, executions.Select(execution => execution.observedParameter).Order());
+        Assert.All(executions, execution => Assert.Equal(17, execution.ID));
+        Assert.Equal(0, query.Params!["p1"]);
+    }
+
+    [Fact]
     public void QueryProjectedUnbufferedStartsOnEnumerationAndDisposesReaderOnEarlyExit()
     {
         MockDbDataReader? dataReader = null;

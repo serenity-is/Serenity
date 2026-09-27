@@ -61,11 +61,15 @@ public class SqlHelperExecuteScalarTests
             .InterceptExecuteScalar(_ => 42);
 
         var query = new SqlQuery().From("Table").Select("COUNT(*)");
-        var result = SqlHelper.ExecuteScalar(connection, query);
+        query.SetParam("@p1", 1);
+        var parameters = new Dictionary<string, object?> { ["@p1"] = 2 };
+        var result = SqlHelper.ExecuteScalar(connection, query, parameters);
 
         Assert.Equal(42, result);
         var call = Assert.Single(connection.ExecuteScalarCalls);
         Assert.Same(query, call.Query);
+        Assert.Equal(2, call.Parameters!["@p1"]);
+        Assert.Equal(1, query.Params!["@p1"]);
     }
 
     [Fact]
@@ -125,13 +129,18 @@ public class SqlHelperExecuteScalarTests
             .InterceptExecuteScalar(_ => 42);
 
         var query = new SqlQuery().From("Table").Select("COUNT(*)");
+        query.SetParam("@p1", 1);
+        var parameters = new Dictionary<string, object?> { ["@p1"] = 2 };
         var result = await SqlHelper.ExecuteScalarAsync(connection, query,
+            parameters,
             cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.Equal(42, result);
         var call = Assert.Single(connection.ExecuteScalarCalls);
         Assert.Same(query, call.Query);
         Assert.True(call.IsAsync);
+        Assert.Equal(2, call.Parameters!["@p1"]);
+        Assert.Equal(1, query.Params!["@p1"]);
     }
 
     [Fact]

@@ -8,12 +8,16 @@ public class SqlHelperExistsTests
         using var connection = new MockDbConnection()
             .InterceptExecuteReader(args => args.ToMockReader(new { Id = 1 }));
 
-        var query = new SqlQuery().From("Table").Select("Id").Where("Id = 1");
-        var result = query.Exists(connection);
+        var query = new SqlQuery().From("Table").Select("Id").Where("Id = @p1");
+        query.SetParam("@p1", 1);
+        var parameters = new Dictionary<string, object?> { ["@p1"] = 2 };
+        var result = query.Exists(connection, parameters);
 
         Assert.True(result);
         var call = Assert.Single(connection.ExecuteReaderCalls);
         Assert.Same(query, call.Query);
+        Assert.Equal(2, call.Parameters!["@p1"]);
+        Assert.Equal(1, query.Params!["@p1"]);
     }
 
     [Fact]
@@ -47,13 +51,17 @@ public class SqlHelperExistsTests
         using var connection = new MockDbConnection()
             .InterceptExecuteReader(args => args.ToMockReader(new { Id = 1 }));
 
-        var query = new SqlQuery().From("Table").Select("Id").Where("Id = 1");
-        var result = await query.ExistsAsync(connection,
+        var query = new SqlQuery().From("Table").Select("Id").Where("Id = @p1");
+        query.SetParam("@p1", 1);
+        var parameters = new Dictionary<string, object?> { ["@p1"] = 2 };
+        var result = await query.ExistsAsync(connection, parameters,
             cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.True(result);
         var call = Assert.Single(connection.ExecuteReaderCalls);
         Assert.True(call.IsAsync);
+        Assert.Equal(2, call.Parameters!["@p1"]);
+        Assert.Equal(1, query.Params!["@p1"]);
     }
 
     [Fact]

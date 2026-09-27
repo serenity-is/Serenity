@@ -232,7 +232,7 @@ public class SaveRequestHandlerAsync<TRow, TSaveRequest, TSaveResponse> :
     /// </summary>
     protected virtual async Task LoadOldEntityAsync(CancellationToken cancellationToken = default)
     {
-        if (!await (await PrepareQueryAsync(cancellationToken).ConfigureAwait(false)).GetFirstAsync(Connection, cancellationToken).ConfigureAwait(false))
+        if (!await (await PrepareQueryAsync(cancellationToken).ConfigureAwait(false)).GetFirstAsync(Connection, cancellationToken: cancellationToken).ConfigureAwait(false))
         {
             var idField = Row.GetIdField();
             var id = Request.EntityId != null ?

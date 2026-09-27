@@ -14,12 +14,17 @@ public class SqlHelperExecuteAndGetIDTests
             })
             .OnDbCommandExecuteNonQuery(_ => throw new InvalidOperationException("should not execute"));
 
-        var query = new SqlInsert("Table").SetTo("X", "1");
-        var result = query.ExecuteAndGetID(connection);
+        var query = new SqlInsert("Table").SetTo("X", "@p1");
+        query.SetParam("@p1", 1);
+        var parameters = new Dictionary<string, object?> { ["@p1"] = 2 };
+        var result = query.ExecuteAndGetID(connection, parameters);
 
         Assert.Equal(42, result);
         var call = Assert.Single(connection.ExecuteNonQueryCalls);
         Assert.True(call.GetNewId);
+        Assert.Equal(2, call.Parameters!["@p1"]);
+        Assert.Equal(1, query.Params!["@p1"]);
+        Assert.Single(parameters);
     }
 
     [Fact]
@@ -30,15 +35,20 @@ public class SqlHelperExecuteAndGetIDTests
             .OnDbCommandExecuteReader(cmd =>
             {
                 commandText = cmd.CommandText;
+                Assert.Equal(2, cmd.Parameters["@p1"].Value);
                 return new MockDbDataReader(new { IDCOLUMNVALUE = (long?)123 });
             });
 
-        var query = new SqlInsert("Table").SetTo("X", "1");
-        var result = query.ExecuteAndGetID(connection);
+        var query = new SqlInsert("Table").SetTo("X", "@p1");
+        query.SetParam("@p1", 1);
+        var parameters = new Dictionary<string, object?> { ["@p1"] = 2 };
+        var result = query.ExecuteAndGetID(connection, parameters);
 
         Assert.Equal(123, result);
         Assert.Equal(1, connection.DbCommandExecuteReaderCallCount);
         Assert.Contains("SCOPE_IDENTITY() AS IDCOLUMNVALUE", commandText);
+        Assert.Equal(1, query.Params!["@p1"]);
+        Assert.Single(parameters);
     }
 
     [Fact]
@@ -135,27 +145,40 @@ public class SqlHelperExecuteAndGetIDTests
             .InterceptExecuteNonQuery(args => 42)
             .OnDbCommandExecuteNonQuery(_ => throw new InvalidOperationException("should not execute"));
 
-        var query = new SqlInsert("Table").SetTo("X", "1");
-        var result = await query.ExecuteAndGetIDAsync(connection,
+        var query = new SqlInsert("Table").SetTo("X", "@p1");
+        query.SetParam("@p1", 1);
+        var parameters = new Dictionary<string, object?> { ["@p1"] = 2 };
+        var result = await query.ExecuteAndGetIDAsync(connection, parameters,
             cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.Equal(42, result);
         var call = Assert.Single(connection.ExecuteNonQueryCalls);
         Assert.True(call.GetNewId);
         Assert.True(call.IsAsync);
+        Assert.Equal(2, call.Parameters!["@p1"]);
+        Assert.Equal(1, query.Params!["@p1"]);
+        Assert.Single(parameters);
     }
 
     [Fact]
     public async Task ExecuteAndGetIDAsync_WithScopeIdentityDialect_ReadsIdentityFromReader()
     {
         using var connection = new MockDbConnection { Dialect = SqlServer2012Dialect.Instance }
-            .OnDbCommandExecuteReader(_ => new MockDbDataReader(new { IDCOLUMNVALUE = (long?)123 }));
+            .OnDbCommandExecuteReader(cmd =>
+            {
+                Assert.Equal(2, cmd.Parameters["@p1"].Value);
+                return new MockDbDataReader(new { IDCOLUMNVALUE = (long?)123 });
+            });
 
-        var query = new SqlInsert("Table").SetTo("X", "1");
-        var result = await query.ExecuteAndGetIDAsync(connection,
+        var query = new SqlInsert("Table").SetTo("X", "@p1");
+        query.SetParam("@p1", 1);
+        var parameters = new Dictionary<string, object?> { ["@p1"] = 2 };
+        var result = await query.ExecuteAndGetIDAsync(connection, parameters,
             cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.Equal(123, result);
+        Assert.Equal(1, query.Params!["@p1"]);
+        Assert.Single(parameters);
     }
 
     [Fact]

@@ -575,7 +575,7 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
             .ForEachAsync(connection, () =>
             {
                 oldRows.Add(row.Clone());
-            }, cancellationToken).ConfigureAwait(false);
+            }, cancellationToken: cancellationToken).ConfigureAwait(false);
 
         return oldRows;
     }
@@ -659,7 +659,7 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
             .ForEachAsync(connection, () =>
             {
                 deleteList.Add(rowIdField.AsObject(row)!);
-            }, cancellationToken).ConfigureAwait(false);
+            }, cancellationToken: cancellationToken).ConfigureAwait(false);
 
         return deleteList;
     }

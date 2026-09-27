@@ -20,7 +20,7 @@ public class EntitySqlHelper_Async_Tests
 
         var seen = new List<string>();
         var count = await query.ForEachAsync(connection, () => seen.Add(row.CityName),
-            TestContext.Current.CancellationToken);
+            cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.Equal(0, count);
         Assert.Equal(["Amsterdam", "Brussels"], seen);
@@ -46,7 +46,7 @@ public class EntitySqlHelper_Async_Tests
         var count = await query.ForEachAsync(connection, reader =>
         {
             citiesViaReader.Add(reader.IsDBNull(1) ? "" : reader.GetString(1));
-        }, TestContext.Current.CancellationToken);
+        }, cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.Equal(0, count);
         Assert.Equal(["Zurich", "Geneva"], citiesViaReader);
@@ -64,7 +64,7 @@ public class EntitySqlHelper_Async_Tests
 
         var seen = new List<string>();
         var count = await query.ForEachAsync(connection, () => seen.Add(row.CityName),
-            TestContext.Current.CancellationToken);
+            cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.Equal(0, count);
         Assert.Empty(seen);
