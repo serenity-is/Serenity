@@ -22,6 +22,8 @@ public partial class SqlQuery
             distinct = distinct,
             omitParens = omitParens,
             into = [.. into],
+            fromSources = [.. fromSources],
+            intoSources = [.. intoSources],
             intoIndex = intoIndex,
             forXml = forXml,
             forJson = forJson,

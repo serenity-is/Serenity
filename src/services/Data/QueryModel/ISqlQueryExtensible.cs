@@ -47,3 +47,10 @@ public interface ISqlQueryExtensible
     /// <returns>The index of the select into field, or -1 if not found.</returns>
     int GetSelectIntoIndex(IField field);
 }
+
+internal interface ISqlQueryProjectionExtensible : ISqlQueryExtensible
+{
+    IList<object> FromSources { get; }
+    void IntoRowSelection(object? into, object? source);
+    object? GetIntoRowSource(int index);
+}

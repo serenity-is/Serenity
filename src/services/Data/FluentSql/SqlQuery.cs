@@ -9,7 +9,8 @@ namespace Serenity.Data;
 /// <seealso cref="IGetExpressionByName" />
 /// <seealso cref="ISqlQuery" />
 /// <seealso cref="ISqlQueryExtensible" />
-public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IGetExpressionByName, ISqlQueryExtensible
+public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IGetExpressionByName,
+    ISqlQueryExtensible, ISqlQueryProjectionExtensible
 {
     private Dictionary<string, IHaveJoins>? aliasWithJoins;
     private List<Column> columns;
@@ -27,6 +28,8 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     private StringBuilder? where;
     private int intoIndex = -1;
     private List<object> into = [];
+    private List<object> fromSources = [];
+    private List<object?> intoSources = [];
     private SqlQuery? unionQuery;
     private SqlUnionType unionType;
 
@@ -122,6 +125,8 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
 
         if (alias is IHaveJoins haveJoins)
             AliasWithJoins[alias.Name] = haveJoins;
+
+        fromSources.Add(alias);
 
         return this;
     }
@@ -538,6 +543,8 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
         where = null;
         intoIndex = -1;
         into = [];
+        fromSources = [];
+        intoSources = [];
         return this;
     }
 
@@ -615,6 +622,11 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
 
     IList<object> ISqlQueryExtensible.IntoRows => into;
 
+    IList<object> ISqlQueryProjectionExtensible.FromSources => fromSources;
+
+    object? ISqlQueryProjectionExtensible.GetIntoRowSource(int index) =>
+        index >= 0 && index < intoSources.Count ? intoSources[index] : null;
+
     object? ISqlQueryExtensible.CurrentIntoRow =>
         intoIndex >= 0 && intoIndex < into.Count ? into[intoIndex] : null;
 
@@ -634,7 +646,12 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
             delegate (Column s) { return s.IntoField == field; });
     }
 
-    void ISqlQueryExtensible.IntoRowSelection(object? row)
+    void ISqlQueryExtensible.IntoRowSelection(object? row) => IntoRowSelection(row, null);
+
+    void ISqlQueryProjectionExtensible.IntoRowSelection(object? row, object? source) =>
+        IntoRowSelection(row, source);
+
+    private void IntoRowSelection(object? row, object? source)
     {
         if (row == null)
             intoIndex = -1;
@@ -644,8 +661,12 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
             if (intoIndex == -1)
             {
                 into.Add(row);
+                intoSources.Add(null);
                 intoIndex = into.Count - 1;
             }
+
+            if (source != null)
+                intoSources[intoIndex] = source;
         }
     }
 

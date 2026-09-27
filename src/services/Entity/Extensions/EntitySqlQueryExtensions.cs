@@ -178,10 +178,46 @@ public static class EntitySqlQueryExtensions
     /// <returns>The query itself.</returns>
     public static SqlQuery Into(this SqlQuery query, IEntity into)
     {
-        var ext = (ISqlQueryExtensible)query;
-        ext.IntoRowSelection(into);
+        ArgumentNullException.ThrowIfNull(query);
+        ArgumentNullException.ThrowIfNull(into);
+
+        var extensible = (ISqlQueryProjectionExtensible)query;
+        extensible.IntoRowSelection(into, FindIntoSource(extensible, into));
 
         return query;
+    }
+
+    private static object? FindIntoSource(ISqlQueryProjectionExtensible extensible, IEntity entity)
+    {
+        if (entity is not IRow row)
+            return null;
+
+        var existingIndex = extensible.IntoRows.IndexOf(entity);
+        if (existingIndex >= 0 && extensible.GetIntoRowSource(existingIndex) is object existingSource)
+            return existingSource;
+
+        foreach (var source in extensible.FromSources)
+        {
+            if (source is not RowFieldsBase fields ||
+                fields.GetType() != row.Fields.GetType() ||
+                !string.Equals(((IAlias)fields).Table, row.Table, StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            var alreadyAssigned = false;
+            for (var index = 0; index < extensible.IntoRows.Count; index++)
+            {
+                if (ReferenceEquals(extensible.GetIntoRowSource(index), source))
+                {
+                    alreadyAssigned = true;
+                    break;
+                }
+            }
+
+            if (!alreadyAssigned)
+                return source;
+        }
+
+        return null;
     }
 
     /// <summary>
