@@ -15,7 +15,11 @@ namespace Serenity.Data;
 /// </remarks>
 public static class EntitySqlQueryProjection
 {
-	private readonly record struct ProjectionColumn(Expression ProjectionExpression, Field Field, string Name, int Index);
+	private readonly record struct PreparedProjection<TResult>(SqlQuery Query,
+		Func<IDataReader, TResult> Materializer);
+
+	private readonly record struct ProjectionColumn(Expression ProjectionExpression, Field? Field,
+		string SqlExpression, string Name, int Index);
 
 	/// <summary>
 	/// Executes the query and materializes each result row into the specified flat projection.
@@ -107,8 +111,8 @@ public static class EntitySqlQueryProjection
 		where TRow : class, IRow
 	{
 		ArgumentNullException.ThrowIfNull(connection);
-		var materializer = PrepareProjection<TResult>(query, projection);
-		return BufferProjectedAsync(query, connection, materializer, cancellationToken);
+		var prepared = PrepareProjection<TResult>(query, projection);
+		return BufferProjectedAsync(prepared.Query, connection, prepared.Materializer, cancellationToken);
 	}
 
 	/// <summary>
@@ -129,8 +133,8 @@ public static class EntitySqlQueryProjection
 		where TRow2 : class, IRow
 	{
 		ArgumentNullException.ThrowIfNull(connection);
-		var materializer = PrepareProjection<TResult>(query, projection);
-		return BufferProjectedAsync(query, connection, materializer, cancellationToken);
+		var prepared = PrepareProjection<TResult>(query, projection);
+		return BufferProjectedAsync(prepared.Query, connection, prepared.Materializer, cancellationToken);
 	}
 
 	/// <summary>
@@ -150,8 +154,8 @@ public static class EntitySqlQueryProjection
 		where TRow : class, IRow
 	{
 		ArgumentNullException.ThrowIfNull(connection);
-		var materializer = PrepareProjection<TResult>(query, projection);
-		return EnumerateProjectedAsync(query, connection, materializer, cancellationToken);
+		var prepared = PrepareProjection<TResult>(query, projection);
+		return EnumerateProjectedAsync(prepared.Query, connection, prepared.Materializer, cancellationToken);
 	}
 
 	/// <summary>
@@ -173,25 +177,27 @@ public static class EntitySqlQueryProjection
 		where TRow2 : class, IRow
 	{
 		ArgumentNullException.ThrowIfNull(connection);
-		var materializer = PrepareProjection<TResult>(query, projection);
-		return EnumerateProjectedAsync(query, connection, materializer, cancellationToken);
+		var prepared = PrepareProjection<TResult>(query, projection);
+		return EnumerateProjectedAsync(prepared.Query, connection, prepared.Materializer, cancellationToken);
 	}
 
 	private static IEnumerable<TResult> QueryProjectedCore<TResult>(SqlQuery query,
 		IDbConnection connection, LambdaExpression projection, bool buffered)
 	{
 		ArgumentNullException.ThrowIfNull(connection);
-		var materializer = PrepareProjection<TResult>(query, projection);
-		var results = EnumerateProjected(query, connection, materializer);
+		var prepared = PrepareProjection<TResult>(query, projection);
+		var results = EnumerateProjected(prepared.Query, connection, prepared.Materializer);
 		return buffered ? [.. results] : results;
 	}
 
-	private static Func<IDataReader, TResult> PrepareProjection<TResult>(SqlQuery query, LambdaExpression projection)
+	private static PreparedProjection<TResult> PrepareProjection<TResult>(SqlQuery query,
+		LambdaExpression projection)
 	{
 		ArgumentNullException.ThrowIfNull(query);
 		ArgumentNullException.ThrowIfNull(projection);
 
-		var extensible = (ISqlQueryExtensible)query;
+		var projectedQuery = query.Clone();
+		var extensible = (ISqlQueryExtensible)projectedQuery;
 		if (extensible.Columns.Count != 0)
 			throw new InvalidOperationException("QueryProjected requires a query without existing SELECT columns.");
 
@@ -223,11 +229,19 @@ public static class EntitySqlQueryProjection
 		var selectedColumns = new List<ProjectionColumn>(columns.Count);
 		foreach (var column in columns)
 		{
+			if (TryGetSqlExpression(column.Expression, out var sqlExpression))
+			{
+				selectedColumns.Add(new ProjectionColumn(column.Expression, null, sqlExpression,
+					column.Name, selectedColumns.Count));
+				continue;
+			}
+
 			var path = GetFieldPath(column.Expression, projection.Parameters);
-			var sourceFields = ((ISqlQueryProjectionExtensible)query).GetIntoRowSource(path.ParameterIndex) as RowFieldsBase ??
+			var sourceFields = ((ISqlQueryProjectionExtensible)projectedQuery).GetIntoRowSource(path.ParameterIndex) as RowFieldsBase ??
 				sourceRows[path.ParameterIndex].Fields;
-			var field = ResolveField(query, sourceFields, path.MemberNames);
-			selectedColumns.Add(new ProjectionColumn(column.Expression, field, column.Name, selectedColumns.Count));
+			var field = ResolveField(projectedQuery, sourceFields, path.MemberNames);
+			selectedColumns.Add(new ProjectionColumn(column.Expression, field, field.Expression,
+				column.Name, selectedColumns.Count));
 		}
 
 		var readerParameter = Expression.Parameter(typeof(IDataReader), "reader");
@@ -245,9 +259,9 @@ public static class EntitySqlQueryProjection
 
 		extensible.IntoRowSelection(null);
 		foreach (var column in selectedColumns)
-			query.Select(column.Field.Expression, column.Name);
+			projectedQuery.Select(column.SqlExpression, column.Name);
 
-		return materializer;
+		return new PreparedProjection<TResult>(projectedQuery, materializer);
 	}
 
 	private static IEnumerable<TResult> EnumerateProjected<TResult>(SqlQuery query,
@@ -323,6 +337,41 @@ public static class EntitySqlQueryProjection
 	}
 
 	private readonly record struct FieldPath(int ParameterIndex, string[] MemberNames);
+
+	private static bool TryGetSqlExpression(Expression expression, out string sqlExpression)
+	{
+		expression = StripConvert(expression);
+		if (expression is not MethodCallExpression methodCall ||
+			methodCall.Method.DeclaringType != typeof(Sql) ||
+			methodCall.Method.Name != nameof(Sql.Expr) ||
+			!methodCall.Method.IsGenericMethod ||
+			methodCall.Arguments.Count != 1)
+		{
+			sqlExpression = null!;
+			return false;
+		}
+
+		if (GetCapturedValue(methodCall.Arguments[0]) is not string value || string.IsNullOrWhiteSpace(value))
+			throw new NotSupportedException("Sql.Expr requires a non-empty SQL string literal or captured string variable.");
+
+		sqlExpression = value;
+		return true;
+	}
+
+	private static object? GetCapturedValue(Expression expression)
+	{
+		expression = StripConvert(expression);
+		if (expression is ConstantExpression constant)
+			return constant.Value;
+
+		if (expression is MemberExpression { Member: FieldInfo field } member)
+		{
+			var target = member.Expression is null ? null : GetCapturedValue(member.Expression);
+			return field.GetValue(target);
+		}
+
+		throw new NotSupportedException("Sql.Expr requires a SQL string literal or captured string variable.");
+	}
 
 	private static FieldPath GetFieldPath(Expression expression, ReadOnlyCollection<ParameterExpression> parameters)
 	{
@@ -406,10 +455,10 @@ public static class EntitySqlQueryProjection
 	private static readonly MethodInfo ReadProjectedValueMethod = typeof(EntitySqlQueryProjection)
 		.GetMethod(nameof(ReadProjectedValue), BindingFlags.NonPublic | BindingFlags.Static)!;
 
-	private static object? ReadProjectedValue(IDataReader reader, int index, Field field)
+	private static object? ReadProjectedValue(IDataReader reader, int index, Field? field)
 	{
 		var value = reader.IsDBNull(index) ? null : reader.GetValue(index);
-		return field.ConvertValue(value, CultureInfo.InvariantCulture);
+		return field is null ? value : field.ConvertValue(value, CultureInfo.InvariantCulture);
 	}
 
 	private sealed class ProjectionReaderVisitor(ParameterExpression reader,
@@ -424,7 +473,7 @@ public static class EntitySqlQueryProjection
 			{
 				var column = matches.Dequeue();
 				return Expression.Convert(Expression.Call(ReadProjectedValueMethod,
-					reader, Expression.Constant(column.Index), Expression.Constant(column.Field)), node.Type);
+					reader, Expression.Constant(column.Index), Expression.Constant(column.Field, typeof(Field))), node.Type);
 			}
 
 			return base.Visit(node);

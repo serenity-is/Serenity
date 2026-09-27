@@ -6,6 +6,22 @@ namespace Serenity.Data;
 public static partial class Sql
 {
     /// <summary>
+    /// Marks a SQL expression as a projected value in a <c>QueryProjected</c> selector.
+    /// </summary>
+    /// <typeparam name="T">The CLR type returned by the SQL expression.</typeparam>
+    /// <param name="expression">The SQL expression.</param>
+    /// <returns>This method is only interpreted from a projection expression tree.</returns>
+    /// <exception cref="ArgumentNullException">expression is null or whitespace.</exception>
+    /// <exception cref="InvalidOperationException">This marker is used outside a projection selector.</exception>
+    public static T Expr<T>(string expression)
+    {
+        if (string.IsNullOrWhiteSpace(expression))
+            throw new ArgumentNullException(nameof(expression));
+
+        throw new InvalidOperationException("Sql.Expr can only be used in a QueryProjected selector.");
+    }
+
+    /// <summary>
     /// Creates a SUM() expression.
     /// </summary>
     /// <param name="field">The field.</param>

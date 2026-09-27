@@ -160,14 +160,15 @@ public partial class EntitySqlQueryExtensions_FromRow_Tests
 
         var row = new SelfNavigationRow();
         var query = new SqlQuery().From(row);
+        var extensible = (ISqlQueryExtensible)query;
+        var currentIntoRow = extensible.CurrentIntoRow;
         var result = query.ListProjected(connection,
             (SelfNavigationRow source) => new { PersonID = source.ID }).Single();
 
         Assert.Equal(17, result.PersonID);
         Assert.Contains("AS [PersonID]", commandText);
-        var column = Assert.Single(((ISqlQueryExtensible)query).Columns);
-        Assert.Equal(-1, column.IntoRowIndex);
-        Assert.Null(column.IntoField);
+        Assert.Empty(extensible.Columns);
+        Assert.Same(currentIntoRow, extensible.CurrentIntoRow);
     }
 
     [Fact]
@@ -184,6 +185,26 @@ public partial class EntitySqlQueryExtensions_FromRow_Tests
         Assert.Equal(1, connection.DbCommandExecuteReaderCallCount);
         Assert.True(dataReader!.IsClosed);
         Assert.Equal(17, Assert.Single(result).ID);
+    }
+
+    [Fact]
+    public void ListProjectedMapsCapturedSqlExpression()
+    {
+        string? commandText = null;
+        var expression = "CAST(17 AS INT)";
+        using var connection = new MockDbConnection()
+            .OnDbCommandExecuteReader(command =>
+            {
+                commandText = command.CommandText;
+                return new MockDbDataReader(new { SomeProp = 17 });
+            });
+
+        var query = new SqlQuery().From(new SelfNavigationRow());
+        var result = query.ListProjected(connection,
+            (SelfNavigationRow source) => new { SomeProp = Sql.Expr<int?>(expression) }).Single();
+
+        Assert.Equal((int?)17, result.SomeProp);
+        Assert.Contains("CAST(17 AS INT) AS [SomeProp]", commandText);
     }
 
     [Fact]
