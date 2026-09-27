@@ -104,6 +104,53 @@ public static class EntitySqlQueryProjection
 	}
 
 	/// <summary>
+	/// Executes the query and materializes each result row into the specified flat projection.
+	/// When <paramref name="buffered"/> is false, the data reader remains open until enumeration
+	/// completes or the enumerator is disposed.
+	/// </summary>
+	/// <typeparam name="TRow1">The row type of the query's first into row.</typeparam>
+	/// <typeparam name="TRow2">The row type of the query's second into row.</typeparam>
+	/// <typeparam name="TRow3">The row type of the query's third into row.</typeparam>
+	/// <typeparam name="TResult">The flat projection result type.</typeparam>
+	/// <param name="query">The query to execute.</param>
+	/// <param name="connection">The connection.</param>
+	/// <param name="projection">A flat projection built from direct row field accesses.</param>
+	/// <param name="buffered">Whether to buffer all results before returning.</param>
+	/// <param name="parameters">Values that override the source query's parameters for this execution.</param>
+	/// <returns>The projected results.</returns>
+	public static IEnumerable<TResult> QueryProjected<TRow1, TRow2, TRow3, TResult>(this SqlQuery query,
+		IDbConnection connection, Expression<Func<TRow1, TRow2, TRow3, TResult>> projection, bool buffered = true,
+		IDictionary<string, object?>? parameters = null)
+		where TRow1 : class, IRow
+		where TRow2 : class, IRow
+		where TRow3 : class, IRow
+	{
+		return QueryProjectedCore<TResult>(query, connection, projection, buffered, parameters);
+	}
+
+	/// <summary>
+	/// Executes the query and materializes each result row into the specified flat projection.
+	/// </summary>
+	/// <typeparam name="TRow1">The row type of the query's first into row.</typeparam>
+	/// <typeparam name="TRow2">The row type of the query's second into row.</typeparam>
+	/// <typeparam name="TRow3">The row type of the query's third into row.</typeparam>
+	/// <typeparam name="TResult">The flat projection result type.</typeparam>
+	/// <param name="query">The query to execute.</param>
+	/// <param name="connection">The connection.</param>
+	/// <param name="projection">A flat projection built from direct row field accesses.</param>
+	/// <param name="parameters">Values that override the source query's parameters for this execution.</param>
+	/// <returns>The projected results.</returns>
+	public static List<TResult> ListProjected<TRow1, TRow2, TRow3, TResult>(this SqlQuery query,
+		IDbConnection connection, Expression<Func<TRow1, TRow2, TRow3, TResult>> projection,
+		IDictionary<string, object?>? parameters = null)
+		where TRow1 : class, IRow
+		where TRow2 : class, IRow
+		where TRow3 : class, IRow
+	{
+		return [.. QueryProjectedCore<TResult>(query, connection, projection, buffered: false, parameters)];
+	}
+
+	/// <summary>
 	/// Prepares a reusable flat projection. The source query must be a root query without existing SELECT columns.
 	/// </summary>
 	/// <typeparam name="TRow">The row type of the query's single into row.</typeparam>
@@ -131,6 +178,25 @@ public static class EntitySqlQueryProjection
 		Expression<Func<TRow1, TRow2, TResult>> projection)
 		where TRow1 : class, IRow
 		where TRow2 : class, IRow
+	{
+		return CreateReusableProjection<TResult>(query, projection);
+	}
+
+	/// <summary>
+	/// Prepares a reusable flat projection. The source query must be a root query without existing SELECT columns.
+	/// </summary>
+	/// <typeparam name="TRow1">The row type of the query's first into row.</typeparam>
+	/// <typeparam name="TRow2">The row type of the query's second into row.</typeparam>
+	/// <typeparam name="TRow3">The row type of the query's third into row.</typeparam>
+	/// <typeparam name="TResult">The flat projection result type.</typeparam>
+	/// <param name="query">The query to prepare.</param>
+	/// <param name="projection">A flat projection built from row field accesses or SQL expressions.</param>
+	/// <returns>A reusable projection that can be executed with different parameter values.</returns>
+	public static IProjectedQuery<TResult> AsReusableProjected<TRow1, TRow2, TRow3, TResult>(this SqlQuery query,
+		Expression<Func<TRow1, TRow2, TRow3, TResult>> projection)
+		where TRow1 : class, IRow
+		where TRow2 : class, IRow
+		where TRow3 : class, IRow
 	{
 		return CreateReusableProjection<TResult>(query, projection);
 	}
@@ -182,6 +248,32 @@ public static class EntitySqlQueryProjection
 	}
 
 	/// <summary>
+	/// Asynchronously executes the query and buffers the flat projection results.
+	/// </summary>
+	/// <typeparam name="TRow1">The row type of the query's first into row.</typeparam>
+	/// <typeparam name="TRow2">The row type of the query's second into row.</typeparam>
+	/// <typeparam name="TRow3">The row type of the query's third into row.</typeparam>
+	/// <typeparam name="TResult">The flat projection result type.</typeparam>
+	/// <param name="query">The query to execute.</param>
+	/// <param name="connection">The connection.</param>
+	/// <param name="projection">A flat projection built from direct row field accesses.</param>
+	/// <param name="parameters">Values that override the source query's parameters for this execution.</param>
+	/// <param name="cancellationToken">The cancellation token.</param>
+	/// <returns>A task representing the asynchronous operation. The task result is the projected list.</returns>
+	public static Task<List<TResult>> ListProjectedAsync<TRow1, TRow2, TRow3, TResult>(this SqlQuery query,
+		IDbConnection connection, Expression<Func<TRow1, TRow2, TRow3, TResult>> projection,
+		IDictionary<string, object?>? parameters = null,
+		CancellationToken cancellationToken = default)
+		where TRow1 : class, IRow
+		where TRow2 : class, IRow
+		where TRow3 : class, IRow
+	{
+		ArgumentNullException.ThrowIfNull(connection);
+		var prepared = PrepareProjection<TResult>(query, projection);
+		return BufferProjectedAsync(prepared.Query, connection, prepared.Materializer, parameters, cancellationToken);
+	}
+
+	/// <summary>
 	/// Asynchronously streams the flat projection results. The data reader remains open until
 	/// enumeration completes, is cancelled, or the async enumerator is disposed.
 	/// </summary>
@@ -223,6 +315,33 @@ public static class EntitySqlQueryProjection
 		CancellationToken cancellationToken = default)
 		where TRow1 : class, IRow
 		where TRow2 : class, IRow
+	{
+		ArgumentNullException.ThrowIfNull(connection);
+		var prepared = PrepareProjection<TResult>(query, projection);
+		return EnumerateProjectedAsync(prepared.Query, connection, prepared.Materializer, parameters, cancellationToken);
+	}
+
+	/// <summary>
+	/// Asynchronously streams the flat projection results. The data reader remains open until
+	/// enumeration completes, is cancelled, or the async enumerator is disposed.
+	/// </summary>
+	/// <typeparam name="TRow1">The row type of the query's first into row.</typeparam>
+	/// <typeparam name="TRow2">The row type of the query's second into row.</typeparam>
+	/// <typeparam name="TRow3">The row type of the query's third into row.</typeparam>
+	/// <typeparam name="TResult">The flat projection result type.</typeparam>
+	/// <param name="query">The query to execute.</param>
+	/// <param name="connection">The connection.</param>
+	/// <param name="projection">A flat projection built from direct row field accesses.</param>
+	/// <param name="parameters">Values that override the source query's parameters for this execution.</param>
+	/// <param name="cancellationToken">The cancellation token.</param>
+	/// <returns>An asynchronous stream of projected results.</returns>
+	public static IAsyncEnumerable<TResult> QueryProjectedAsync<TRow1, TRow2, TRow3, TResult>(this SqlQuery query,
+		IDbConnection connection, Expression<Func<TRow1, TRow2, TRow3, TResult>> projection,
+		IDictionary<string, object?>? parameters = null,
+		CancellationToken cancellationToken = default)
+		where TRow1 : class, IRow
+		where TRow2 : class, IRow
+		where TRow3 : class, IRow
 	{
 		ArgumentNullException.ThrowIfNull(connection);
 		var prepared = PrepareProjection<TResult>(query, projection);

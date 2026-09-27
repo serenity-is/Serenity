@@ -278,6 +278,36 @@ public class EntitySqlQueryProjection_Tests
         Assert.Contains("T1.[ID] AS [SecondID]", commandText);
     }
 
+    [Fact]
+    public void ListProjectedSupportsThreeSourceRows()
+    {
+        string? commandText = null;
+        using var connection = new MockDbConnection()
+            .OnDbCommandExecuteReader(command =>
+            {
+                commandText = command.CommandText;
+                return new MockDbDataReader(new { FirstID = 17, SecondID = 23, ThirdID = 31 });
+            });
+
+        var first = new SelfNavigationRow();
+        var second = new SelfNavigationRow();
+        var third = new SelfNavigationRow();
+        var query = new SqlQuery().From(first)
+            .From(SelfNavigationRow.Fields.As("T1")).Into(second)
+            .From(SelfNavigationRow.Fields.As("T2")).Into(third);
+
+        var result = query.ListProjected(connection,
+            (SelfNavigationRow firstSource, SelfNavigationRow secondSource, SelfNavigationRow thirdSource) =>
+                new { FirstID = firstSource.ID, SecondID = secondSource.ID, ThirdID = thirdSource.ID }).Single();
+
+        Assert.Equal(17, result.FirstID);
+        Assert.Equal(23, result.SecondID);
+        Assert.Equal(31, result.ThirdID);
+        Assert.Contains("T0.[ID] AS [FirstID]", commandText);
+        Assert.Contains("T1.[ID] AS [SecondID]", commandText);
+        Assert.Contains("T2.[ID] AS [ThirdID]", commandText);
+    }
+
     public sealed class FlatProjectionResult
     {
         public int? FirstID { get; set; }
