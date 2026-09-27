@@ -9,58 +9,36 @@ namespace Serenity.Data;
 public sealed class SqlDelete(string tableName) : QueryWithParams, IFilterableQuery
 {
     private readonly string _tableName = tableName ?? throw new ArgumentNullException(nameof(tableName));
-    private readonly StringBuilder _where = new();
+    private readonly List<ICriteria> whereCriteria = [];
+    private readonly StringBuilder whereClause = new();
 
     /// <summary>
-    ///   Adds a new condition to the WHERE part of the query with an "AND" between.</summary>
-    /// <param name="condition">
-    ///   Condition.</param>
+    ///   Adds a criteria to the WHERE part of the query with an "AND" between.</summary>
+    /// <param name="criteria">Condition criteria.</param>
     /// <returns>
     ///   SqlDelete object itself.</returns>
-    /// <exception cref="ArgumentNullException">condition is null or empty.</exception>
-    public SqlDelete Where(string condition)
+    public SqlDelete Where(ICriteria? criteria)
     {
-        if (condition == null || condition.Length == 0)
-            throw new ArgumentNullException(nameof(condition));
+        if (criteria is null || criteria.IsEmpty)
+            return this;
 
-        condition = SqlUpdate.RemoveT0Reference(condition);
-
-        if (_where.Length > 0)
-            _where.Append(SqlKeywords.And);
-
-        _where.Append(condition);
+        var sql = criteria.ToString(this);
+        if (whereCriteria.Count > 0)
+            whereClause.Append(SqlKeywords.And);
+        whereClause.Append(sql);
+        whereCriteria.Add(criteria);
 
         return this;
     }
 
     /// <summary>
-    ///   Adds a new condition to the WHERE part of the query with an "AND" between.</summary>
-    /// <param name="condition">
-    ///   Condition.</param>
-    /// <returns>
-    ///   SqlDelete object itself.</returns>
-    void IFilterableQuery.Where(string condition)
-    {
-        Where(condition);
-    }
+    /// Gets the WHERE criteria through <see cref="IFilterableQuery"/>.
+    /// </summary>
+    IReadOnlyList<ICriteria> IFilterableQuery.GetWhereCriteria() => whereCriteria.AsReadOnly();
 
-    /// <summary>
-    ///   Adds new conditions to the WHERE part of the query with an "AND" between.</summary>
-    /// <param name="conditions">
-    ///   Conditions.</param>
-    /// <returns>
-    ///   SqlDelete object itself.</returns>
-    /// <exception cref="ArgumentNullException">conditions is null or empty.</exception>
-    public SqlDelete Where(params string[] conditions)
-    {
-        if (conditions == null || conditions.Length == 0)
-            throw new ArgumentNullException(nameof(conditions));
+    string IFilterableQuery.GetWhereClause() => SqlUpdate.RemoveT0Reference(whereClause.ToString());
 
-        foreach (var condition in conditions)
-            Where(condition);
-
-        return this;
-    }
+    void IFilterableQuery.Where(ICriteria? criteria) => Where(criteria);
 
     /// <summary>
     ///   Gets string representation of the query.</summary>
@@ -68,7 +46,7 @@ public sealed class SqlDelete(string tableName) : QueryWithParams, IFilterableQu
     ///   String representation of the query.</returns>
     public override string ToString()
     {
-        return Format(_tableName, _where.ToString(), dialect);
+        return Format(_tableName, ((IFilterableQuery)this).GetWhereClause(), dialect);
     }
 
     /// <summary>

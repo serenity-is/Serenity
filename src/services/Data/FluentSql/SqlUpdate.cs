@@ -9,7 +9,9 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
 {
     private readonly string tableName;
     private readonly List<FieldExpressionPair> fieldExpressions = [];
-    private readonly List<string> where = [];
+    private readonly List<ICriteria> whereCriteria = [];
+    private readonly List<string> whereConditions = [];
+    private readonly StringBuilder whereClause = new();
 
     /// <summary>
     ///   Creates a new SqlUpdate query.</summary>
@@ -44,16 +46,12 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
     /// <returns>The list of WHERE conditions.</returns>
     public IReadOnlyList<string> GetWhereConditions()
     {
-        return where;
+        return whereConditions.Select(RemoveT0Reference).ToArray();
     }
 
-    /// <summary>
-    ///   Returns the WHERE clause (excluding WHERE keyword).</summary>
-    /// <returns>The WHERE clause, or an empty string if there are no conditions.</returns>
-    public string GetWhereClause()
-    {
-        return string.Join(SqlKeywords.And, where);
-    }
+    string IFilterableQuery.GetWhereClause() => string.Join(SqlKeywords.And, GetWhereConditions());
+
+    IReadOnlyList<ICriteria> IFilterableQuery.GetWhereCriteria() => whereCriteria.AsReadOnly();
 
     /// <summary>
     ///   Sets field value to the expression.</summary>
@@ -178,18 +176,21 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
     }
 
     /// <summary>
-    ///   Adds a condition to WHERE clause of the query.</summary>
-    /// <param name="condition">
-    ///   Condition.</param>
+    ///   Adds a criteria to WHERE clause of the query.</summary>
+    /// <param name="criteria">Condition criteria.</param>
     /// <returns>
     ///   SqlUpdate object itself.</returns>
-    /// <exception cref="ArgumentNullException">condition is null or empty.</exception>
-    public SqlUpdate Where(string condition)
+    public SqlUpdate Where(ICriteria? criteria)
     {
-        if (condition == null || condition.Length == 0)
-            throw new ArgumentNullException(nameof(condition));
+        if (criteria is null || criteria.IsEmpty)
+            return this;
 
-        where.Add(RemoveT0Reference(condition));
+        var sql = criteria.ToString(this);
+        if (whereCriteria.Count > 0)
+            whereClause.Append(SqlKeywords.And);
+        whereClause.Append(sql);
+        whereCriteria.Add(criteria);
+        whereConditions.Add(sql);
 
         return this;
     }
@@ -229,16 +230,7 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
         return expression;
     }
 
-    /// <summary>
-    ///   Adds a condition to WHERE clause of the query.</summary>
-    /// <param name="condition">
-    ///   Condition.</param>
-    /// <returns>
-    ///   SqlUpdate object itself.</returns>
-    void IFilterableQuery.Where(string condition)
-    {
-        Where(condition);
-    }
+    void IFilterableQuery.Where(ICriteria? criteria) => Where(criteria);
 
     /// <summary>
     ///   Clones this SqlUpdate query.</summary>
@@ -248,7 +240,10 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
     {
         SqlUpdate clone = new(tableName);
         clone.fieldExpressions.AddRange(fieldExpressions);
-        clone.where.AddRange(where);
+        clone.whereCriteria.AddRange(whereCriteria);
+        clone.whereConditions.AddRange(whereConditions);
+        clone.whereClause.Append(whereClause);
+        clone.nextAutoParam = nextAutoParam;
         CloneParams(clone);
         return clone;
     }
@@ -259,7 +254,7 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
     ///   String representation.</returns>
     public override string ToString()
     {
-        return Format(tableName, GetWhereClause(), fieldExpressions, dialect);
+        return Format(tableName, ((IFilterableQuery)this).GetWhereClause(), fieldExpressions, dialect);
     }
 
     /// <summary>

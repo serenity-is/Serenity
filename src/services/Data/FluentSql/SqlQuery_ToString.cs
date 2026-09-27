@@ -26,7 +26,7 @@ public partial class SqlQuery
     int ISqlQuery.Take => take;
     ISqlQuery? ISqlQuery.UnionQuery => unionQuery;
     SqlUnionType ISqlQuery.UnionType => unionType;
-    string? ISqlQuery.Where => where?.ToString();
+    string? ISqlQuery.Where => whereCriteria.Count == 0 ? null : whereClause.ToString();
 
     /// <summary>
     ///   Formats SQL Query as string. If paging is used and skip requested, multiple queries 
@@ -43,6 +43,7 @@ public partial class SqlQuery
         if (dialect is ISqlQueryToString sqlQueryToString)
             return sqlQueryToString.ToString(query);
 
+        var whereClause = query.Where;
         var sb = new StringBuilder();
 
         if (query.UnionQuery != null)
@@ -79,16 +80,16 @@ public partial class SqlQuery
                 sb.Append(query.From);
             }
 
-            if (extraWhere != null || !string.IsNullOrEmpty(query.Where))
+            if (extraWhere != null || !string.IsNullOrEmpty(whereClause))
             {
                 sb.Append(SqlKeywords.Where);
 
-                if (!string.IsNullOrEmpty(query.Where))
-                    sb.Append(query.Where);
+                if (!string.IsNullOrEmpty(whereClause))
+                    sb.Append(whereClause);
 
                 if (extraWhere != null)
                 {
-                    if (!string.IsNullOrEmpty(query.Where))
+                    if (!string.IsNullOrEmpty(whereClause))
                         sb.Append(" AND ");
                     sb.Append(extraWhere);
                 }

@@ -533,7 +533,7 @@ public static class SqlHelper
         foreach (var pair in query.GetFieldExpressions())
         {
             if (keySet.Contains(pair.Field))
-                update.Where((new Criteria(pair.Field) == new Criteria(pair.Expression)).ToString());
+                update.Where(new Criteria(pair.Field) == new Criteria(pair.Expression));
             else
                 update.SetTo(pair.Field, pair.Expression);
         }

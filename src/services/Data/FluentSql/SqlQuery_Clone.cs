@@ -24,6 +24,8 @@ public partial class SqlQuery
             into = [.. into],
             fromSources = [.. fromSources],
             intoSources = [.. intoSources],
+            whereCriteria = [.. whereCriteria],
+            whereClause = new StringBuilder(whereClause.ToString()),
             intoIndex = intoIndex,
             forXml = forXml,
             forJson = forJson,
@@ -41,9 +43,6 @@ public partial class SqlQuery
         }
 
         clone.from = new StringBuilder(from.ToString());
-        if (where != null)
-            clone.where = new StringBuilder(where.ToString());
-
         if (orderBy != null)
         {
             clone.orderBy = [];

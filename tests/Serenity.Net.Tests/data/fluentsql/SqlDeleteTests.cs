@@ -22,29 +22,44 @@ public class SqlDeleteTests
     }
 
     [Fact]
-    public void Where_Params_Adds_Conditions_And_Validates()
-    {
-        var delete = new SqlDelete("T").Where("A = 1", "B = 2");
-        Assert.Contains("A = 1", delete.ToString());
-
-        Assert.Throws<ArgumentNullException>(() => new SqlDelete("T").Where((string[])null!));
-        Assert.Throws<ArgumentNullException>(() => new SqlDelete("T").Where([]));
-    }
-
-    [Fact]
     public void Explicit_Where_Works()
     {
         var delete = new SqlDelete("T");
-        ((IFilterableQuery)delete).Where("A = 1");
+        var criteria = new Criteria("A = 1");
+        ((IFilterableQuery)delete).Where(criteria);
+        Assert.Same(criteria, Assert.Single(((IFilterableQuery)delete).GetWhereCriteria()));
         Assert.Contains("A = 1", delete.ToString());
+    }
+
+    [Fact]
+    public void Where_StringExtension_CreatesCriteria()
+    {
+        var delete = new SqlDelete("T").Where("A = 1");
+
+        Assert.IsType<Criteria>(Assert.Single(((IFilterableQuery)delete).GetWhereCriteria()));
     }
 
     [Fact]
     public void Where_Removes_T0_Reference()
     {
         var delete = new SqlDelete("T").Where("T0.A = 1");
+        Assert.Equal("A = 1", ((IFilterableQuery)delete).GetWhereClause());
         Assert.Contains("A = 1", delete.ToString());
         Assert.DoesNotContain("T0.", delete.ToString());
+    }
+
+    [Fact]
+    public void Where_Renders_Parameters_Once()
+    {
+        var delete = new SqlDelete("T").Where(new Criteria("A") == 5);
+        Assert.Equal(1, delete.ParamCount);
+
+        var where = ((IFilterableQuery)delete).GetWhereClause();
+
+        Assert.Equal(1, delete.ParamCount);
+        Assert.Equal(where, ((IFilterableQuery)delete).GetWhereClause());
+        Assert.Contains(where, delete.ToString());
+        Assert.Equal(1, delete.ParamCount);
     }
 
     [Fact]

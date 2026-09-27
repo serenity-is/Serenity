@@ -21,7 +21,7 @@ public class SqlUpdateTests
         Assert.Equal("Name", update.GetFieldExpressions()[0].Field);
         Assert.Equal("@p1", update.GetFieldExpressions()[0].Expression);
         Assert.Empty(update.GetWhereConditions());
-        Assert.Equal("", update.GetWhereClause());
+        Assert.Equal("", ((IFilterableQuery)update).GetWhereClause());
     }
 
     [Fact]
@@ -99,16 +99,40 @@ public class SqlUpdateTests
         var update = new SqlUpdate("T").Where("A = 1").Where("B = 2");
 
         Assert.Equal(2, update.GetWhereConditions().Count);
-        Assert.Equal("A = 1 AND B = 2", update.GetWhereClause());
-        Assert.Throws<ArgumentNullException>(() => new SqlUpdate("T").Where(null!));
+        Assert.Equal("A = 1 AND B = 2", ((IFilterableQuery)update).GetWhereClause());
+        Assert.Equal("A = 1 AND B = 2", ((IFilterableQuery)update).GetWhereClause());
+        Assert.Throws<ArgumentNullException>(() => new SqlUpdate("T").Where((string)null!));
         Assert.Throws<ArgumentNullException>(() => new SqlUpdate("T").Where(""));
+    }
+
+    [Fact]
+    public void Where_Renders_Parameters_Once_And_Clone_Preserves_Counter()
+    {
+        var update = new SqlUpdate("T").Where(new Criteria("A") == 5);
+        Assert.Equal(1, update.ParamCount);
+
+        var where = ((IFilterableQuery)update).GetWhereClause();
+
+        Assert.Equal(1, update.ParamCount);
+        Assert.Equal(where, ((IFilterableQuery)update).GetWhereClause());
+        Assert.Equal(1, update.ParamCount);
+
+        var clone = update.Clone().Where(new Criteria("B") == 6);
+        Assert.Equal(2, clone.ParamCount);
+        Assert.Equal(1, update.ParamCount);
+
+        var cloneWhere = ((IFilterableQuery)clone).GetWhereClause();
+        Assert.Equal(cloneWhere, ((IFilterableQuery)clone).GetWhereClause());
+        Assert.Equal(2, clone.ParamCount);
     }
 
     [Fact]
     public void Explicit_Where_Works()
     {
         var update = new SqlUpdate("T");
-        ((IFilterableQuery)update).Where("A = 1");
+        var criteria = new Criteria("A = 1");
+        ((IFilterableQuery)update).Where(criteria);
+        Assert.Same(criteria, Assert.Single(((IFilterableQuery)update).GetWhereCriteria()));
         Assert.Single(update.GetWhereConditions());
     }
 
@@ -127,6 +151,7 @@ public class SqlUpdateTests
     {
         var update = new SqlUpdate("T").Where("T0.ID = 5");
         Assert.Equal("ID = 5", update.GetWhereConditions()[0]);
+        Assert.Equal("ID = 5", ((IFilterableQuery)update).GetWhereClause());
     }
 
     [Fact]

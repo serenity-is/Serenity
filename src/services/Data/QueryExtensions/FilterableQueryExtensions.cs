@@ -7,7 +7,7 @@ namespace Serenity.Data;
 public static class FilterableQueryExtensions
 {
     /// <summary>
-    ///   Adds a filter to query.
+    ///   Adds a filter string to query.
     /// </summary>
     /// <typeparam name="T">
     ///   Query class.
@@ -16,18 +16,18 @@ public static class FilterableQueryExtensions
     ///   Query.
     /// </param>
     /// <param name="filter">
-    ///   Filter.
+    ///   Filter string.
     /// </param>
     /// <returns>
     ///   Query itself.
     /// </returns>
-    public static T Where<T>(this T self, ICriteria? filter) where T : IFilterableQuery
+    public static T Where<T>(this T self, string filter) where T : IFilterableQuery
     {
-        if (filter is object && !filter.IsEmpty)
-        {
-            var statement = filter.ToString(self);
-            self.Where(statement);
-        }
+        ArgumentNullException.ThrowIfNull(self);
+        if (string.IsNullOrEmpty(filter))
+            throw new ArgumentNullException(nameof(filter));
+
+        self.Where(new Criteria(filter));
         return self;
     }
 

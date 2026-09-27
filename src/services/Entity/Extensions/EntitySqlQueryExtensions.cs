@@ -179,10 +179,9 @@ public static class EntitySqlQueryExtensions
     public static SqlQuery Into(this SqlQuery query, IEntity into)
     {
         ArgumentNullException.ThrowIfNull(query);
-        ArgumentNullException.ThrowIfNull(into);
 
         var extensible = (ISqlQueryProjectionExtensible)query;
-        extensible.IntoRowSelection(into, FindIntoSource(extensible, into));
+        extensible.IntoRowSelection(into, into is null ? null : FindIntoSource(extensible, into));
 
         return query;
     }

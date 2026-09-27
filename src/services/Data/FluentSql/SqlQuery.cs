@@ -25,7 +25,8 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     private string? forJson;
     private int skip;
     private int take;
-    private StringBuilder? where;
+    private List<ICriteria> whereCriteria = [];
+    private StringBuilder whereClause = new();
     private int intoIndex = -1;
     private List<object> into = [];
     private List<object> fromSources = [];
@@ -540,7 +541,8 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
         forJson = null;
         skip = 0;
         take = 0;
-        where = null;
+        whereCriteria = [];
+        whereClause = new StringBuilder();
         intoIndex = -1;
         into = [];
         fromSources = [];
@@ -549,35 +551,30 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     }
 
     /// <summary>
-    /// Adds an expression to WHERE clause. If query already has a WHERE
-    /// clause, inserts AND between existing one and new one.
+    /// Adds a criteria to the WHERE clause.
     /// </summary>
-    /// <param name="expression">An expression</param>
+    /// <param name="criteria">The criteria to add.</param>
     /// <returns>The query itself.</returns>
-    /// <exception cref="ArgumentNullException">expression is null or empty.</exception>
-    public SqlQuery Where(string expression)
+    public SqlQuery Where(ICriteria? criteria)
     {
-        if (string.IsNullOrEmpty(expression))
-            throw new ArgumentNullException(expression);
+        if (criteria is null || criteria.IsEmpty)
+            return this;
 
-        if (where == null)
-            where = new StringBuilder(expression);
-        else
-            where.Append(SqlKeywords.And).Append(expression);
-
-        EnsureJoinsInExpression(expression);
+        EnsureJoinsInExpression(criteria.ToStringIgnoreParams());
+        var sql = criteria.ToString(this);
+        if (whereCriteria.Count > 0)
+            whereClause.Append(SqlKeywords.And);
+        whereClause.Append(sql);
+        whereCriteria.Add(criteria);
 
         return this;
     }
 
-    /// <summary>
-    /// Implements IDBFilterable.Where, by calling original Where method.
-    /// </summary>
-    /// <param name="expression">An expression</param>
-    void IFilterableQuery.Where(string expression)
-    {
-        Where(expression);
-    }
+    string IFilterableQuery.GetWhereClause() => whereClause.ToString();
+
+    void IFilterableQuery.Where(ICriteria? criteria) => Where(criteria);
+
+    IReadOnlyList<ICriteria> IFilterableQuery.GetWhereCriteria() => whereCriteria.AsReadOnly();
 
     /// <summary>
     /// Sets the dialect (SQL server type / version) for query.
