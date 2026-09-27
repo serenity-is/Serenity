@@ -5,8 +5,8 @@ public partial class EntitySqlQueryExtensions_FromRow_Tests
     [Fact]
     public void FromAssignsRootAliasT0()
     {
-        var query = new SqlQuery().From(new ComplexRow(), (fields, sql) =>
-            sql.Select(fields.ID));
+        var query = new SqlQuery().From(new ComplexRow(), out var fields);
+        query.Select(fields.ID);
 
         Assert.Equal(Normalize.Sql("SELECT T0.[ComplexID] AS [ID] FROM [ComplexTable] T0"),
             Normalize.Sql(query.ToString()));
@@ -15,10 +15,9 @@ public partial class EntitySqlQueryExtensions_FromRow_Tests
     [Fact]
     public void FromAndSubQueryFromAssignUniqueAliasesAndConfigureChild()
     {
-        var query = new SqlQuery().From(ComplexRow.Fields.As("rp"), (fields, query) => query
-            .Select(fields.ID)
-                .Where(fields.ID.In(query.SubQueryFrom(ComplexRow.Fields, (subFields, subquery) =>
-                    subquery.Select(subFields.ID)))));
+        var query = new SqlQuery().From(ComplexRow.Fields.As("rp"), out var fields);
+        query.Select(fields.ID)
+            .Where(fields.ID.In(query.SubQueryFrom(ComplexRow.Fields, out var subFields).Select(subFields.ID)));
 
         Assert.Equal(Normalize.Sql("SELECT rp.[ComplexID] AS [ID] FROM [ComplexTable] rp WHERE (rp.[ComplexID] IN (SELECT T1.[ComplexID] AS [ID] FROM [ComplexTable] T1))"),
             Normalize.Sql(query.ToString()));
@@ -27,20 +26,15 @@ public partial class EntitySqlQueryExtensions_FromRow_Tests
     [Fact]
     public void NestedSubQueryFromContinuesAliasSequence()
     {
-        var query = new SqlQuery().From(new ComplexRow(), (fields, query) =>
-        {
-            var subquery = query.SubQueryFrom(ComplexRow.Fields, (subFields, subquery) =>
-            {
-                var nestedQuery = subquery.SubQueryFrom(ComplexRow.Fields, (nestedFields, nestedQuery) =>
-                    nestedQuery.Select(nestedFields.ID));
+        var query = new SqlQuery().From(new ComplexRow(), out var fields);
+        var subquery = query.SubQueryFrom(ComplexRow.Fields, out var subFields);
+        var nestedQuery = subquery.SubQueryFrom(ComplexRow.Fields, out var nestedFields);
+        nestedQuery.Select(nestedFields.ID);
+        subquery.Select(subFields.ID)
+            .Where(subFields.ID.In(nestedQuery));
 
-                subquery.Select(subFields.ID)
-                    .Where(subFields.ID.In(nestedQuery));
-            });
-
-            query.Select(fields.ID)
-                .Where(fields.ID.In(subquery));
-        });
+        query.Select(fields.ID)
+            .Where(fields.ID.In(subquery));
 
         Assert.Equal(Normalize.Sql("SELECT T0.[ComplexID] AS [ID] FROM [ComplexTable] T0 WHERE (T0.[ComplexID] IN (SELECT T1.[ComplexID] AS [ID] FROM [ComplexTable] T1 WHERE (T1.[ComplexID] IN (SELECT T2.[ComplexID] AS [ID] FROM [ComplexTable] T2))))"),
             Normalize.Sql(query.ToString()));
@@ -50,11 +44,11 @@ public partial class EntitySqlQueryExtensions_FromRow_Tests
     public void SubQueryCanAllocateAliasBeforeRootSourceIsAdded()
     {
         var query = new SqlQuery();
-        var subquery = query.SubQueryFrom(ComplexRow.Fields, (subFields, subquery) =>
-            subquery.Select(subFields.ID));
+        var subquery = query.SubQueryFrom(ComplexRow.Fields, out var subFields);
+        subquery.Select(subFields.ID);
 
-        query.From(new ComplexRow(), (fields, query) =>
-            query.Select(fields.ID).Where(fields.ID.In(subquery)));
+        query.From(new ComplexRow(), out var fields);
+        query.Select(fields.ID).Where(fields.ID.In(subquery));
 
         Assert.Equal(Normalize.Sql("SELECT T0.[ComplexID] AS [ID] FROM [ComplexTable] T0 WHERE (T0.[ComplexID] IN (SELECT T1.[ComplexID] AS [ID] FROM [ComplexTable] T1))"),
             Normalize.Sql(query.ToString()));
@@ -78,14 +72,18 @@ public partial class EntitySqlQueryExtensions_FromRow_Tests
         AssertSubQueryFromUsesUniqueAliases(new SqlInsert("ComplexTable"));
     }
 
+    private static readonly string?[] expectedAliases = ["T1", "T2"];
+
     private static void AssertSubQueryFromUsesUniqueAliases(QueryWithParams query)
     {
         var aliases = new List<string?>();
 
-        query.SubQueryFrom(ComplexRow.Fields, (fields, _) => aliases.Add(fields.AliasName));
-        query.SubQueryFrom(ComplexRow.Fields, (fields, _) => aliases.Add(fields.AliasName));
+        query.SubQueryFrom(ComplexRow.Fields, out var fields1);
+        aliases.Add(fields1.AliasName);
+        query.SubQueryFrom(ComplexRow.Fields, out var fields2);
+        aliases.Add(fields2.AliasName);
 
-        Assert.Equal(new string?[] { "T1", "T2" }, aliases);
+        Assert.Equal(expectedAliases, aliases);
     }
 
 }

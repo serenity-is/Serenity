@@ -88,16 +88,15 @@ public static class EntitySqlQueryExtensions
     /// <typeparam name="TFields">The row fields type.</typeparam>
     /// <param name="query">The query.</param>
     /// <param name="fields">The fields whose table is added to the query.</param>
-    /// <param name="configure">An action to configure the aliased fields and query.</param>
+    /// <param name="aliased">The fields instance used as the FROM source, with the alias used by this query.</param>
     /// <returns>The query itself.</returns>
     /// <exception cref="ArgumentNullException">query or fields is null.</exception>
-    public static SqlQuery From<TFields>(this SqlQuery query, TFields fields, Action<TFields, SqlQuery> configure)
+    public static SqlQuery From<TFields>(this SqlQuery query, TFields fields, out TFields aliased)
         where TFields : RowFieldsBase
     {
         ArgumentNullException.ThrowIfNull(query);
-        fields = AdjustAlias(query, fields);
-        query.From(fields);
-        configure?.Invoke(fields, query);
+        aliased = AdjustAlias(query, fields);
+        query.From(aliased);
         return query;
     }
 
@@ -108,19 +107,34 @@ public static class EntitySqlQueryExtensions
     /// <param name="query">The query</param>
     /// <typeparam name="TFields">The row fields type.</typeparam>
     /// <param name="row">The row whose table is added to the query.</param>
-    /// <param name="configure">An optional callback to configure the aliased fields and query.</param>
     /// <returns>The query itself.</returns>
     /// <exception cref="ArgumentNullException">query or row is null.</exception>
     /// <exception cref="InvalidOperationException">The query already has an INTO target.</exception>
-    public static SqlQuery From<TFields>(this SqlQuery query, IRow<TFields> row, Action<TFields, SqlQuery>? configure = null)
+    public static SqlQuery From<TFields>(this SqlQuery query, IRow<TFields> row)
+        where TFields : RowFieldsBase
+    {
+        return query.From(row, out _);
+    }
+
+    /// <summary>
+    /// Adds the row as a FROM source, returns its possibly adjusted fields, and sets it as the query's INTO target.
+    /// Applies the row fields' dialect if the query dialect has not been overridden.
+    /// </summary>
+    /// <param name="query">The query.</param>
+    /// <param name="row">The row whose fields are added to the query.</param>
+    /// <param name="aliased">The fields instance used as the FROM source, with the alias used by this query.</param>
+    /// <typeparam name="TFields">The row fields type.</typeparam>
+    /// <returns>The query itself.</returns>
+    /// <exception cref="ArgumentNullException">query or row is null.</exception>
+    /// <exception cref="InvalidOperationException">The query already has an INTO target.</exception>
+    public static SqlQuery From<TFields>(this SqlQuery query, IRow<TFields> row, out TFields aliased)
         where TFields : RowFieldsBase
     {
         ArgumentNullException.ThrowIfNull(query);
         ArgumentNullException.ThrowIfNull(row);
         CheckNoIntoRow(query);
-        var fields = AdjustAlias(query, row.Fields);
-        query.From(fields).Into(row);
-        configure?.Invoke(fields, query);
+        aliased = AdjustAlias(query, row.Fields);
+        query.From(aliased).Into(row);
         return query;
     }
 
@@ -132,20 +146,36 @@ public static class EntitySqlQueryExtensions
     /// <typeparam name="TFields">The row fields type.</typeparam>
     /// <param name="row">The row whose table is added to the query.</param>
     /// <param name="alias">The alias to use for the row.</param>
-    /// <param name="configure">An optional callback to configure the aliased fields and query.</param>
     /// <returns>The query itself.</returns>
     /// <exception cref="ArgumentNullException">query or row is null.</exception>
     /// <exception cref="InvalidOperationException">The query already has an INTO target.</exception>
-    public static SqlQuery From<TFields>(this SqlQuery query, IRow<TFields> row, string alias, Action<TFields, SqlQuery>? configure = null)
+    public static SqlQuery From<TFields>(this SqlQuery query, IRow<TFields> row, string alias)
+        where TFields : RowFieldsBase
+    {
+        return query.From(row, alias, out _);
+    }
+
+    /// <summary>
+    /// Adds the row as a FROM source using the specified alias, returns its aliased fields, and sets it as the query's INTO target.
+    /// Applies the row fields' dialect if the query dialect has not been overridden.
+    /// </summary>
+    /// <param name="query">The query.</param>
+    /// <param name="row">The row whose fields are added to the query.</param>
+    /// <param name="alias">The alias to use for the row.</param>
+    /// <param name="aliased">The fields instance used as the FROM source, with the alias used by this query.</param>
+    /// <typeparam name="TFields">The row fields type.</typeparam>
+    /// <returns>The query itself.</returns>
+    /// <exception cref="ArgumentNullException">query or row is null.</exception>
+    /// <exception cref="InvalidOperationException">The query already has an INTO target.</exception>
+    public static SqlQuery From<TFields>(this SqlQuery query, IRow<TFields> row, string alias,
+        out TFields aliased)
         where TFields : RowFieldsBase
     {
         ArgumentNullException.ThrowIfNull(query);
         ArgumentNullException.ThrowIfNull(row);
         CheckNoIntoRow(query);
-        var fields = row.Fields;
-        fields = alias != null ? fields.As(alias) : AdjustAlias(query, fields);
-        query.From(fields).Into(row);
-        configure?.Invoke(fields, query);
+        aliased = alias != null ? row.Fields.As(alias) : AdjustAlias(query, row.Fields);
+        query.From(aliased).Into(row);
         return query;
     }
 
@@ -156,17 +186,34 @@ public static class EntitySqlQueryExtensions
     /// <typeparam name="TFields">The row fields type.</typeparam>
     /// <param name="query">The query.</param>
     /// <param name="fields">The fields.</param>
-    /// <param name="configure">An optional callback to configure the aliased fields and subquery.</param>
+    /// <param name="aliased">The fields instance used as the FROM source by the created subquery, with its actual alias.</param>
     /// <returns>The created subquery.</returns>
     /// <exception cref="ArgumentNullException">query or fields is null.</exception>
-    public static SqlQuery SubQueryFrom<TFields>(this QueryWithParams query, TFields fields, Action<TFields, SqlQuery>? configure = null)
+    public static SqlQuery SubQueryFrom<TFields>(this QueryWithParams query, TFields fields, out TFields aliased)
         where TFields : RowFieldsBase
     {
         ArgumentNullException.ThrowIfNull(query);
         ArgumentNullException.ThrowIfNull(fields);
         if (fields.AliasName is "T0")
             fields = fields.As(query.AutoAlias());
-        return query.CreateSubQuery<SqlQuery>().From(fields, configure!);
+        var subquery = query.CreateSubQuery<SqlQuery>();
+        subquery.From(fields, out aliased);
+        return subquery;
+    }
+
+    /// <summary>
+    /// Returns the query and assigns the same instance to a reference for use within a fluent chain.
+    /// </summary>
+    /// <typeparam name="TQuery">The concrete query type.</typeparam>
+    /// <param name="query">The query.</param>
+    /// <param name="reference">Receives the same query instance.</param>
+    /// <returns>The query itself.</returns>
+    public static TQuery WithSelf<TQuery>(this TQuery query, out TQuery reference)
+        where TQuery : QueryWithParams
+    {
+        ArgumentNullException.ThrowIfNull(query);
+        reference = query;
+        return query;
     }
 
     /// <summary>
@@ -511,53 +558,5 @@ public static class EntitySqlQueryExtensions
             GroupBy(query, f);
 
         return query;
-    }
-
-    extension(SqlDelete)
-    {
-        /// <summary>
-        /// Creates a new SqlDelete query from a fields object and allows for additional configuration.</summary>
-        /// <typeparam name="TFields"></typeparam>
-        /// <param name="fields"></param>
-        /// <param name="configure">Configure callback that will receive fields and this SqlDelete instance.</param>
-        public static SqlDelete From<TFields>(TFields fields, Action<TFields, SqlDelete>? configure = null)
-            where TFields : RowFieldsBase
-        {
-            var query = new SqlDelete(fields.TableName);
-            configure?.Invoke(fields, query);
-            return query;
-        }
-    }
-
-    extension(SqlInsert)
-    {
-        /// <summary>
-        /// Creates a new SqlInsert query from a fields object and allows for additional configuration.</summary>
-        /// <typeparam name="TFields"></typeparam>
-        /// <param name="fields"></param>
-        /// <param name="configure">Configure callback that will receive fields and this SqlInsert instance.</param>
-        public static SqlInsert Into<TFields>(TFields fields, Action<TFields, SqlInsert>? configure = null)
-            where TFields : RowFieldsBase
-        {
-            var query = new SqlInsert(fields.TableName);
-            configure?.Invoke(fields, query);
-            return query;
-        }
-    }
-
-    extension(SqlUpdate)
-    {
-        /// <summary>
-        /// Creates a new SqlUpdate query from a fields object and allows for additional configuration.</summary>
-        /// <typeparam name="TFields"></typeparam>
-        /// <param name="fields"></param>
-        /// <param name="configure">Configure callback that will receive fields and this SqlUpdate instance.</param>
-        public static SqlUpdate Table<TFields>(TFields fields, Action<TFields, SqlUpdate>? configure = null)
-            where TFields : RowFieldsBase
-        {
-            var query = new SqlUpdate(fields.TableName);
-            configure?.Invoke(fields, query);
-            return query;
-        }
     }
 }

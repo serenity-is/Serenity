@@ -8,15 +8,13 @@ public class EntitySqlQueryProjection_IntoForeignRowTests
     public void IntoForeignRowUsesCurrentIntoRowForSelfReferences()
     {
         var row = new SelfNavigationRow();
-        var query = new SqlQuery().From(row, (fields, query) =>
-        {
-            query.Select(fields.ID);
-            query.IntoForeignRow<SelfNavigationRow.RowFields>(fields.Manager, (foreignFields, foreignQuery) =>
-                foreignQuery.Select(foreignFields.ID));
-            query.IntoForeignRow<SelfNavigationRow.RowFields>(fields.Mentor, (foreignFields, foreignQuery) =>
-                foreignQuery.Select(foreignFields.ID));
-            query.Select(fields.ManagerID);
-        });
+        var query = new SqlQuery().From(row, out var fields);
+        query.Select(fields.ID);
+        query.IntoForeignRow<SelfNavigationRow.RowFields>(fields.Manager, (foreignFields, foreignQuery) =>
+            foreignQuery.Select(foreignFields.ID));
+        query.IntoForeignRow<SelfNavigationRow.RowFields>(fields.Mentor, (foreignFields, foreignQuery) =>
+            foreignQuery.Select(foreignFields.ID));
+        query.Select(fields.ManagerID);
 
         var extensible = (ISqlQueryExtensible)query;
         Assert.Same(row, extensible.CurrentIntoRow);
@@ -32,12 +30,10 @@ public class EntitySqlQueryProjection_IntoForeignRowTests
     public void IntoForeignRowLoadsValuesIntoNestedRow()
     {
         var row = new SelfNavigationRow();
-        var query = new SqlQuery().From(row, (fields, query) =>
-        {
-            query.Select(fields.ID, "ParentID");
-            query.IntoForeignRow<SelfNavigationRow.RowFields>(fields.Manager, (foreignFields, foreignQuery) =>
-                foreignQuery.Select(foreignFields.ID, "ManagerID"));
-        });
+        var query = new SqlQuery().From(row, out var fields);
+        query.Select(fields.ID, "ParentID");
+        query.IntoForeignRow<SelfNavigationRow.RowFields>(fields.Manager, (foreignFields, foreignQuery) =>
+            foreignQuery.Select(foreignFields.ID, "ManagerID"));
 
         using var reader = new MockDbDataReader(["ParentID", "ManagerID"], [new { ParentID = 10, ManagerID = 20 }]);
         Assert.True(reader.Read());
