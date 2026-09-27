@@ -373,7 +373,7 @@ public static class EntitySqlQueryExtensions
     /// <summary>
     /// Selects fields from an already joined foreign row into a row-valued property.
     /// </summary>
-    /// <remarks>Nested calls to <see cref="SelectIntoForeignRow{TFields}"/> are not currently supported.</remarks>
+    /// <remarks>Nested calls to <see cref="IntoForeignRow{TFields}"/> are not currently supported.</remarks>
     /// <typeparam name="TFields">The fields type of the foreign row.</typeparam>
     /// <param name="query">The query.</param>
     /// <param name="foreignRowField">The row field representing the foreign row.</param>
@@ -382,7 +382,7 @@ public static class EntitySqlQueryExtensions
     /// <exception cref="ArgumentNullException">query, foreignRowField, or configure is null.</exception>
     /// <exception cref="ArgumentException">The field is not row-valued or does not belong to the current into row.</exception>
     /// <exception cref="InvalidOperationException">The foreign row metadata is invalid or there is no current into row.</exception>
-    public static SqlQuery SelectIntoForeignRow<TFields>(this SqlQuery query, Field foreignRowField, Action<TFields, SqlQuery> configure)
+    public static SqlQuery IntoForeignRow<TFields>(this SqlQuery query, Field foreignRowField, Action<TFields, SqlQuery> configure)
         where TFields: RowFieldsBase
     {
         ArgumentNullException.ThrowIfNull(query);

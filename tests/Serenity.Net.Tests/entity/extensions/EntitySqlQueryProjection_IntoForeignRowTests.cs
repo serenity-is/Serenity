@@ -5,15 +5,15 @@ using Serenity.Data.Mapping;
 public class EntitySqlQueryProjection_IntoForeignRowTests
 {
     [Fact]
-    public void SelectIntoForeignRowUsesCurrentIntoRowForSelfReferences()
+    public void IntoForeignRowUsesCurrentIntoRowForSelfReferences()
     {
         var row = new SelfNavigationRow();
         var query = new SqlQuery().From(row, (fields, query) =>
         {
             query.Select(fields.ID);
-            query.SelectIntoForeignRow<SelfNavigationRow.RowFields>(fields.Manager, (foreignFields, foreignQuery) =>
+            query.IntoForeignRow<SelfNavigationRow.RowFields>(fields.Manager, (foreignFields, foreignQuery) =>
                 foreignQuery.Select(foreignFields.ID));
-            query.SelectIntoForeignRow<SelfNavigationRow.RowFields>(fields.Mentor, (foreignFields, foreignQuery) =>
+            query.IntoForeignRow<SelfNavigationRow.RowFields>(fields.Mentor, (foreignFields, foreignQuery) =>
                 foreignQuery.Select(foreignFields.ID));
             query.Select(fields.ManagerID);
         });
@@ -29,13 +29,13 @@ public class EntitySqlQueryProjection_IntoForeignRowTests
     }
 
     [Fact]
-    public void SelectIntoForeignRowLoadsValuesIntoNestedRow()
+    public void IntoForeignRowLoadsValuesIntoNestedRow()
     {
         var row = new SelfNavigationRow();
         var query = new SqlQuery().From(row, (fields, query) =>
         {
             query.Select(fields.ID, "ParentID");
-            query.SelectIntoForeignRow<SelfNavigationRow.RowFields>(fields.Manager, (foreignFields, foreignQuery) =>
+            query.IntoForeignRow<SelfNavigationRow.RowFields>(fields.Manager, (foreignFields, foreignQuery) =>
                 foreignQuery.Select(foreignFields.ID, "ManagerID"));
         });
 
@@ -50,24 +50,24 @@ public class EntitySqlQueryProjection_IntoForeignRowTests
     }
 
     [Fact]
-    public void SelectIntoForeignRowRestoresCurrentIntoRowWhenConfigureThrows()
+    public void IntoForeignRowRestoresCurrentIntoRowWhenConfigureThrows()
     {
         var row = new SelfNavigationRow();
         var query = new SqlQuery().From(row);
 
-        Assert.Throws<InvalidOperationException>(() => query.SelectIntoForeignRow<SelfNavigationRow.RowFields>(
+        Assert.Throws<InvalidOperationException>(() => query.IntoForeignRow<SelfNavigationRow.RowFields>(
             SelfNavigationRow.Fields.Manager, (_, _) => throw new InvalidOperationException()));
 
         Assert.Same(row, ((ISqlQueryExtensible)query).CurrentIntoRow);
     }
 
     [Fact]
-    public void SelectIntoForeignRowRejectsNonRowField()
+    public void IntoForeignRowRejectsNonRowField()
     {
         var row = new SelfNavigationRow();
         var query = new SqlQuery().From(row);
 
-        Assert.Throws<ArgumentException>(() => query.SelectIntoForeignRow<SelfNavigationRow.RowFields>(
+        Assert.Throws<ArgumentException>(() => query.IntoForeignRow<SelfNavigationRow.RowFields>(
             SelfNavigationRow.Fields.ID, (_, _) => { }));
     }
 
