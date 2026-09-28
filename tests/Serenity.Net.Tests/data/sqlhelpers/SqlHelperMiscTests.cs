@@ -1,3 +1,5 @@
+using System.Data.SqlClient;
+
 namespace Serenity.Data;
 
 public class SqlHelperMiscTests
@@ -53,6 +55,42 @@ public class SqlHelperMiscTests
         Assert.Equal(7, result);
         Assert.Equal(2, calls);
         Assert.Equal(2, connection.OpenCalls);
+    }
+
+    [Fact]
+    public void ExecuteNonQuery_WithMicrosoftSqlClientPoolException_ClosesReopensAndRetries()
+    {
+        var calls = 0;
+        using var connection = new MockDbConnection()
+            .OnDbCommandExecuteNonQuery(_ =>
+            {
+                if (++calls == 1)
+                    throw new Microsoft.Data.SqlClient.SqlException(10054);
+                return 7;
+            });
+
+        var result = SqlHelper.ExecuteNonQuery(connection, "DELETE FROM T");
+
+        Assert.Equal(7, result);
+        Assert.Equal(2, calls);
+        Assert.Equal(2, connection.OpenCalls);
+    }
+
+    [Fact]
+    public void ExecuteNonQuery_WithNonPoolMicrosoftSqlClientException_DoesNotRetry()
+    {
+        var calls = 0;
+        using var connection = new MockDbConnection()
+            .OnDbCommandExecuteNonQuery(_ =>
+            {
+                calls++;
+                throw new Microsoft.Data.SqlClient.SqlException(2627);
+            });
+
+        Assert.Throws<Microsoft.Data.SqlClient.SqlException>(() =>
+            SqlHelper.ExecuteNonQuery(connection, "DELETE FROM T"));
+
+        Assert.Equal(1, calls);
     }
 
     [Fact]

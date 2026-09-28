@@ -245,8 +245,8 @@ public static class SqlHelper
             (connection is IHasCurrentTransaction hct && hct.CurrentTransaction != null))
             return false;
 
-        if (exceptionType.FullName == "Microsoft.Data.SqlException" ||
-            exceptionType.FullName == "System.Data.SqlException" &&
+        if ((exceptionType.FullName == "Microsoft.Data.SqlClient.SqlException" ||
+            exceptionType.FullName == "System.Data.SqlClient.SqlException") &&
             exceptionType.GetProperty("Number")?.GetValue(exception) is 10054)
         {
             var sqlConnectionType = exceptionType.Assembly.GetType(exceptionType.FullName.Replace("Exception", "Connection"));
