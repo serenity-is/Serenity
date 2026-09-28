@@ -46,4 +46,18 @@ public partial class ServerTypingsGeneratorTests
         return generator;
     }
 
+    [Fact]
+    public void Generates_Root_Namespace_Constants_Without_Server_Types()
+    {
+        var generator = CreateGenerator();
+        generator.TypeFilter = _ => false;
+
+        var result = generator.Run();
+        var code = Assert.Single(result, x => x.Filename == "Namespaces.ts").Text;
+
+        Assert.Contains("export const ServerTypingsTestNS: \"ServerTypingsTest\" = \"ServerTypingsTest\";", code);
+        Assert.Contains("export const nsServerTypingsTest: \"ServerTypingsTest.\" = \"ServerTypingsTest.\";", code);
+        Assert.Equal(code.Trim().Length, generator.GetRootNamespacesOnlyOutputLength());
+    }
+
 }

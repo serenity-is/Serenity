@@ -227,7 +227,7 @@ public partial class ServerTypingsGenerator : CodeGeneratorBase
         add(GenerateBasicType);
     }
 
-    protected virtual void AddNamespaceConstant(string? typeNamespace)
+    protected virtual void AddNamespaceConstant(string? typeNamespace, bool includeRootNamespace = false)
     {
         if (typeNamespace is null or "")
             return;
@@ -237,7 +237,8 @@ public partial class ServerTypingsGenerator : CodeGeneratorBase
         {
             if (rn == ns)
             {
-                ns = null;
+                if (!includeRootNamespace)
+                    ns = null;
                 break;
             }
 
