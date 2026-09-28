@@ -29,18 +29,24 @@ export function triggerGridEvent<TArgs extends ArgsGrid, TEventData = {}>(this: 
  * @param args - Options (`capture`, `oneOff`, `signal`, `passive`).
  */
 export function addListener<K extends keyof HTMLElementEventMap>(this: {
-    jQuery: (el: HTMLElement) => { on: (type: string, listener: any) => void },
+    jQuery: (el: HTMLElement) => { on: (type: string, listener: any) => void, one: (type: string, listener: any) => void },
     eventDisposer: AbortController,
     uid: string
 }, el: HTMLElement, type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, args?: { capture?: boolean, oneOff?: boolean, signal?: AbortSignal, passive?: boolean }): void {
     // can't use jQuery on with options, so we fallback to native addEventListener
     if (!args?.capture && !args?.signal && !args?.passive && this.jQuery) {
-        this.jQuery(el).on(type + "." + this.uid, listener as any);
+        const jquery = this.jQuery(el);
+        if (args?.oneOff)
+            jquery.one(type + "." + this.uid, listener as any);
+        else
+            jquery.on(type + "." + this.uid, listener as any);
     }
     else {
+        const { oneOff, ...options } = args ?? {};
         el.addEventListener(type, listener, {
             signal: this.eventDisposer?.signal,
-            ...args
+            ...options,
+            once: oneOff
         });
     }
 }

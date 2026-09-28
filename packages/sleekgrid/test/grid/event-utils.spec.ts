@@ -42,7 +42,7 @@ describe('triggerGridEvent', () => {
 
 describe('addListener', () => {
     function makeJQuery() {
-        const jq = { on: vi.fn((_type: any, _handler: any) => jq), off: vi.fn(() => jq) };
+        const jq = { on: vi.fn((_type: any, _handler: any) => jq), one: vi.fn((_type: any, _handler: any) => jq), off: vi.fn(() => jq) };
         const $ = vi.fn(() => jq);
         return { jq, $ };
     }
@@ -55,6 +55,16 @@ describe('addListener', () => {
         addListener.call(self, el, "click", listener);
         expect($).toHaveBeenCalledWith(el);
         expect(jq.on).toHaveBeenCalledWith("click.uid1", listener);
+    });
+
+    it('uses jQuery.one with the uid namespaced type when oneOff is requested', () => {
+        const { jq, $ } = makeJQuery();
+        const el = document.createElement("div");
+        const listener = vi.fn();
+        const self = { jQuery: $, eventDisposer: new AbortController(), uid: "uid1" } as any;
+        addListener.call(self, el, "click", listener, { oneOff: true });
+        expect(jq.one).toHaveBeenCalledWith("click.uid1", listener);
+        expect(jq.on).not.toHaveBeenCalled();
     });
 
     it('falls back to native addEventListener with capture when requested', () => {
@@ -101,6 +111,16 @@ describe('addListener', () => {
         const listener = vi.fn();
         const self = { eventDisposer: new AbortController(), uid: "u" } as any;
         addListener.call(self, el, "click", listener);
+        el.dispatchEvent(new MouseEvent("click"));
+        expect(listener).toHaveBeenCalledTimes(1);
+    });
+
+    it('dispatches to the listener once through the native path when oneOff is requested', () => {
+        const el = document.createElement("div");
+        const listener = vi.fn();
+        const self = { eventDisposer: new AbortController(), uid: "u" } as any;
+        addListener.call(self, el, "click", listener, { oneOff: true });
+        el.dispatchEvent(new MouseEvent("click"));
         el.dispatchEvent(new MouseEvent("click"));
         expect(listener).toHaveBeenCalledTimes(1);
     });
