@@ -2,3 +2,5 @@
 export const nsAdministration: "Serene.Administration." = "Serene.Administration.";
 export const MembershipNS: "Serene.Membership" = "Serene.Membership";
 export const nsMembership: "Serene.Membership." = "Serene.Membership.";
+export const SereneNS: "Serene" = "Serene";
+export const nsSerene: "Serene." = "Serene.";
