@@ -79,7 +79,8 @@ public class EntitySqlQueryProjection_Tests
         query.SetParam("p1", 1);
         var extensible = (ISqlQueryExtensible)query;
         var currentIntoRow = extensible.CurrentIntoRow;
-        var projected = query.AsReusableProjected((SelfNavigationRow source) => new { ID = source.ID });
+        var projected = query.AsReusableProjected(
+            (SelfNavigationRow source) => new { ID = source.ID }, [SelfNavigationRow.Fields]);
 
         Assert.Equal(17, Assert.Single(projected.List(connection)).ID);
         Assert.Equal(17, Assert.Single(projected.List(connection,
@@ -149,7 +150,8 @@ public class EntitySqlQueryProjection_Tests
 
         var query = new SqlQuery().From(new SelfNavigationRow());
         var result = query.QueryProjected(connection,
-            (SelfNavigationRow source) => new { ID = source.ID }, buffered: false);
+            (SelfNavigationRow source) => new { ID = source.ID },
+            [SelfNavigationRow.Fields], buffered: false);
 
         Assert.Equal(0, connection.DbCommandExecuteReaderCallCount);
         using (var enumerator = result.GetEnumerator())
@@ -174,6 +176,7 @@ public class EntitySqlQueryProjection_Tests
         var query = new SqlQuery().From(new SelfNavigationRow());
         var result = await query.ListProjectedAsync(connection,
             (SelfNavigationRow source) => new { ID = source.ID },
+            [SelfNavigationRow.Fields],
             cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.Equal(new int?[] { 17, 23 }, result.Select(item => item.ID));
@@ -193,13 +196,13 @@ public class EntitySqlQueryProjection_Tests
             });
 
         var first = new SelfNavigationRow();
-        var second = new SelfNavigationRow();
+        var secondFields = SelfNavigationRow.Fields.As("T1");
         var query = new SqlQuery().From(first)
-            .From(SelfNavigationRow.Fields.As("T1"))
-            .Into(second);
+            .From(secondFields);
         var results = query.QueryProjectedAsync(connection,
             (SelfNavigationRow firstSource, SelfNavigationRow secondSource) =>
                 new { FirstID = firstSource.ID, SecondID = secondSource.ID },
+            [SelfNavigationRow.Fields, secondFields],
             cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.Equal(0, connection.DbCommandExecuteReaderCallCount);
@@ -259,10 +262,9 @@ public class EntitySqlQueryProjection_Tests
             });
 
         var first = new SelfNavigationRow();
-        var second = new SelfNavigationRow();
+        var secondFields = SelfNavigationRow.Fields.As("T1");
         var query = new SqlQuery().From(first)
-            .From(SelfNavigationRow.Fields.As("T1"))
-            .Into(second);
+            .From(secondFields);
 
         var result = query.ListProjected(connection,
             (SelfNavigationRow firstSource, SelfNavigationRow secondSource) =>
@@ -270,7 +272,7 @@ public class EntitySqlQueryProjection_Tests
                 {
                     FirstID = firstSource.ID,
                     SecondID = secondSource.ID
-                }).Single();
+                }, [SelfNavigationRow.Fields, secondFields]).Single();
 
         Assert.Equal(17, result.FirstID);
         Assert.Equal(23, result.SecondID);
@@ -290,15 +292,16 @@ public class EntitySqlQueryProjection_Tests
             });
 
         var first = new SelfNavigationRow();
-        var second = new SelfNavigationRow();
-        var third = new SelfNavigationRow();
+        var secondFields = SelfNavigationRow.Fields.As("T1");
+        var thirdFields = SelfNavigationRow.Fields.As("T2");
         var query = new SqlQuery().From(first)
-            .From(SelfNavigationRow.Fields.As("T1")).Into(second)
-            .From(SelfNavigationRow.Fields.As("T2")).Into(third);
+            .From(secondFields)
+            .From(thirdFields);
 
         var result = query.ListProjected(connection,
             (SelfNavigationRow firstSource, SelfNavigationRow secondSource, SelfNavigationRow thirdSource) =>
-                new { FirstID = firstSource.ID, SecondID = secondSource.ID, ThirdID = thirdSource.ID }).Single();
+                new { FirstID = firstSource.ID, SecondID = secondSource.ID, ThirdID = thirdSource.ID },
+            [SelfNavigationRow.Fields, secondFields, thirdFields]).Single();
 
         Assert.Equal(17, result.FirstID);
         Assert.Equal(23, result.SecondID);
@@ -306,6 +309,110 @@ public class EntitySqlQueryProjection_Tests
         Assert.Contains("T0.[ID] AS [FirstID]", commandText);
         Assert.Contains("T1.[ID] AS [SecondID]", commandText);
         Assert.Contains("T2.[ID] AS [ThirdID]", commandText);
+    }
+
+    [Fact]
+    public void ListProjectedInfersUniqueTypedJoinSourceWithoutInto()
+    {
+        string? commandText = null;
+        using var connection = new MockDbConnection()
+            .OnDbCommandExecuteReader(command =>
+            {
+                commandText = command.CommandText;
+                return new MockDbDataReader(new { ManagerID = 23 });
+            });
+
+        var managerFields = SelfNavigationRow.Fields.As("Manager");
+        var query = new SqlQuery().From(new ComplexRow())
+            .LeftJoin(managerFields,
+                new Criteria("Manager", "ID") == new Criteria(0, "ComplexID"));
+
+        var result = query.ListProjected(connection,
+            (SelfNavigationRow manager) => new { ManagerID = manager.ID }).Single();
+
+        Assert.Equal(23, result.ManagerID);
+        Assert.Contains("LEFT JOIN [SelfNavigation] Manager", commandText);
+        Assert.Contains("Manager.[ID] AS [ManagerID]", commandText);
+    }
+
+    [Fact]
+    public void ListProjectedInfersSourcesFromRowAndAliasedFieldsWithoutInto()
+    {
+        string? commandText = null;
+        using var connection = new MockDbConnection()
+            .OnDbCommandExecuteReader(command =>
+            {
+                commandText = command.CommandText;
+                return new MockDbDataReader(new { RootID = 17, JoinedID = 23 });
+            });
+
+        var joinedFields = SelfNavigationRow.Fields.As("T1");
+        var query = new SqlQuery().From(new ComplexRow())
+            .From(joinedFields);
+
+        var result = query.ListProjected(connection,
+            (ComplexRow root, SelfNavigationRow joined) =>
+                new { RootID = root.ID, JoinedID = joined.ID }).Single();
+
+        Assert.Equal(17, result.RootID);
+        Assert.Equal(23, result.JoinedID);
+        Assert.Contains("T0.[ComplexID] AS [RootID]", commandText);
+        Assert.Contains("T1.[ID] AS [JoinedID]", commandText);
+    }
+
+    [Fact]
+    public void ListProjectedInfersSourcesFromFieldsOnlyWithoutInto()
+    {
+        string? commandText = null;
+        using var connection = new MockDbConnection()
+            .OnDbCommandExecuteReader(command =>
+            {
+                commandText = command.CommandText;
+                return new MockDbDataReader(new { RootID = 17, JoinedID = 23 });
+            });
+
+        var rootFields = ComplexRow.Fields;
+        var joinedFields = SelfNavigationRow.Fields.As("T1");
+        var query = new SqlQuery().From(rootFields).From(joinedFields);
+
+        var result = query.ListProjected(connection,
+            (ComplexRow root, SelfNavigationRow joined) =>
+                new { RootID = root.ID, JoinedID = joined.ID }).Single();
+
+        Assert.Equal(17, result.RootID);
+        Assert.Equal(23, result.JoinedID);
+        Assert.Contains("T0.[ComplexID] AS [RootID]", commandText);
+        Assert.Contains("T1.[ID] AS [JoinedID]", commandText);
+    }
+
+    [Fact]
+    public void ListProjectedRejectsAmbiguousInferenceAndAllowsExplicitSources()
+    {
+        string? commandText = null;
+        using var connection = new MockDbConnection()
+            .OnDbCommandExecuteReader(command =>
+            {
+                commandText = command.CommandText;
+                return new MockDbDataReader(new { FirstID = 17, SecondID = 23 });
+            });
+
+        var secondFields = SelfNavigationRow.Fields.As("T1");
+        var query = new SqlQuery().From(new SelfNavigationRow())
+            .InnerJoin(secondFields,
+                new Criteria("T1", "ID") == new Criteria(0, "ID"));
+
+        Assert.Throws<InvalidOperationException>(() => query.ListProjected(connection,
+            (SelfNavigationRow source) => new { ID = source.ID }));
+
+        var result = query.ListProjected(connection,
+            (SelfNavigationRow firstSource, SelfNavigationRow secondSource) =>
+                new { FirstID = firstSource.ID, SecondID = secondSource.ID },
+            [SelfNavigationRow.Fields, secondFields]).Single();
+
+        Assert.Equal(17, result.FirstID);
+        Assert.Equal(23, result.SecondID);
+        Assert.Contains("T0.[ID] AS [FirstID]", commandText);
+        Assert.Contains("T1.[ID] AS [SecondID]", commandText);
     }
 
     public sealed class FlatProjectionResult

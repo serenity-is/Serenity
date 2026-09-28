@@ -536,13 +536,19 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins, IHas
                 if (leftJoin != null)
                 {
                     field.ForeignJoinAlias = new LeftJoin(joins, field.ForeignTable!, leftJoin.Alias,
-                        new Criteria(leftJoin.Alias, field.ForeignField!) == new Criteria(field));
+                        new Criteria(leftJoin.Alias, field.ForeignField!) == new Criteria(field))
+                    {
+                        RowType = (foreignKey is UserIdJoinKeyAttribute ? userEntityOptions?.RowType : null) ?? foreignKey?.RowType
+                    };
                 }
 
                 if (innerJoin != null)
                 {
                     field.ForeignJoinAlias = new InnerJoin(joins, field.ForeignTable!, innerJoin.Alias,
-                        new Criteria(innerJoin.Alias, field.ForeignField!) == new Criteria(field));
+                        new Criteria(innerJoin.Alias, field.ForeignField!) == new Criteria(field))
+                    {
+                        RowType = (foreignKey is UserIdJoinKeyAttribute ? userEntityOptions?.RowType : null) ?? foreignKey?.RowType
+                    };
                 }
 
                 if (textualField != null)
@@ -609,12 +615,18 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins, IHas
                         if (bestMatch is LeftJoinAttribute lja)
                         {
                             _ = new LeftJoin(joins, lja.ToTable!, lja.Alias,
-                                new Criteria(lja.Alias, lja.OnCriteria!) == new Criteria(field));
+                                new Criteria(lja.Alias, lja.OnCriteria!) == new Criteria(field))
+                            {
+                                RowType = lja.RowType
+                            };
                         }
                         else if (bestMatch is InnerJoinAttribute ija)
                         {
                             _ = new InnerJoin(joins, ija.ToTable!, ija.Alias,
-                                new Criteria(ija.Alias, ija.OnCriteria!) == new Criteria(field));
+                                new Criteria(ija.Alias, ija.OnCriteria!) == new Criteria(field))
+                            {
+                                RowType = ija.RowType
+                            };
                         }
                     }
 
@@ -661,11 +673,20 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins, IHas
                 }
 
                 if (bestMatch is LeftJoinAttribute lja)
-                    _ = new LeftJoin(joins, lja.ToTable!, lja.Alias, new Criteria(lja.OnCriteria!));
+                    _ = new LeftJoin(joins, lja.ToTable!, lja.Alias, new Criteria(lja.OnCriteria!))
+                    {
+                        RowType = lja.RowType
+                    };
                 else if (bestMatch is InnerJoinAttribute ija)
-                    _ = new InnerJoin(joins, ija.ToTable!, ija.Alias, new Criteria(ija.OnCriteria!));
+                    _ = new InnerJoin(joins, ija.ToTable!, ija.Alias, new Criteria(ija.OnCriteria!))
+                    {
+                        RowType = ija.RowType
+                    };
                 else if (bestMatch is OuterApplyAttribute oua)
-                    _ = new OuterApply(joins, oua.InnerQuery, oua.Alias);
+                    _ = new OuterApply(joins, oua.InnerQuery, oua.Alias)
+                    {
+                        RowType = oua.RowType
+                    };
             }
 
             primaryKeys = [.. this.Where(x => x.flags.HasFlag(FieldFlags.PrimaryKey))];

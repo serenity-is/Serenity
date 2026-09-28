@@ -10,8 +10,10 @@ namespace Serenity.Data;
 /// </summary>
 /// <remarks>
 /// Projection selectors currently support flat anonymous types, constructor projections,
-/// and object initializers whose values are direct row field accesses. Unbuffered results
-/// keep the data reader open until enumeration completes or the enumerator is disposed.
+/// and object initializers whose values are direct row field accesses. Sources are inferred
+/// from query row fields when each selector parameter has one unique match, or can be supplied
+/// explicitly. Unbuffered results keep the data reader open until enumeration completes or
+/// the enumerator is disposed.
 /// </remarks>
 public static class EntitySqlQueryProjection
 {
@@ -23,10 +25,10 @@ public static class EntitySqlQueryProjection
 
 	/// <summary>
 	/// Executes the query and materializes each result row into the specified flat projection.
-	/// The query must not already have SELECT columns, and its into rows must match the selector
-	/// parameters in count and compatible row type.
+	/// The query must not already have SELECT columns. Each selector parameter must match one
+	/// unambiguous row-fields source in the query, or sources can be supplied explicitly.
 	/// </summary>
-	/// <typeparam name="TRow">The row type of the query's single into row.</typeparam>
+	/// <typeparam name="TRow">The row type of the projected source.</typeparam>
 	/// <typeparam name="TResult">The flat projection result type.</typeparam>
 	/// <param name="query">The query to execute.</param>
 	/// <param name="connection">The connection.</param>
@@ -45,7 +47,7 @@ public static class EntitySqlQueryProjection
 	/// <summary>
 	/// Executes the query and materializes each result row into the specified flat projection.
 	/// </summary>
-	/// <typeparam name="TRow">The row type of the query's single into row.</typeparam>
+	/// <typeparam name="TRow">The row type of the projected source.</typeparam>
 	/// <typeparam name="TResult">The flat projection result type.</typeparam>
 	/// <param name="query">The query to execute.</param>
 	/// <param name="connection">The connection.</param>
@@ -65,8 +67,8 @@ public static class EntitySqlQueryProjection
 	/// When <paramref name="buffered"/> is false, the data reader remains open until enumeration
 	/// completes or the enumerator is disposed.
 	/// </summary>
-	/// <typeparam name="TRow1">The row type of the query's first into row.</typeparam>
-	/// <typeparam name="TRow2">The row type of the query's second into row.</typeparam>
+	/// <typeparam name="TRow1">The row type of the first projected source.</typeparam>
+	/// <typeparam name="TRow2">The row type of the second projected source.</typeparam>
 	/// <typeparam name="TResult">The flat projection result type.</typeparam>
 	/// <param name="query">The query to execute.</param>
 	/// <param name="connection">The connection.</param>
@@ -86,8 +88,8 @@ public static class EntitySqlQueryProjection
 	/// <summary>
 	/// Executes the query and materializes each result row into the specified flat projection.
 	/// </summary>
-	/// <typeparam name="TRow1">The row type of the query's first into row.</typeparam>
-	/// <typeparam name="TRow2">The row type of the query's second into row.</typeparam>
+	/// <typeparam name="TRow1">The row type of the first projected source.</typeparam>
+	/// <typeparam name="TRow2">The row type of the second projected source.</typeparam>
 	/// <typeparam name="TResult">The flat projection result type.</typeparam>
 	/// <param name="query">The query to execute.</param>
 	/// <param name="connection">The connection.</param>
@@ -108,9 +110,9 @@ public static class EntitySqlQueryProjection
 	/// When <paramref name="buffered"/> is false, the data reader remains open until enumeration
 	/// completes or the enumerator is disposed.
 	/// </summary>
-	/// <typeparam name="TRow1">The row type of the query's first into row.</typeparam>
-	/// <typeparam name="TRow2">The row type of the query's second into row.</typeparam>
-	/// <typeparam name="TRow3">The row type of the query's third into row.</typeparam>
+	/// <typeparam name="TRow1">The row type of the first projected source.</typeparam>
+	/// <typeparam name="TRow2">The row type of the second projected source.</typeparam>
+	/// <typeparam name="TRow3">The row type of the third projected source.</typeparam>
 	/// <typeparam name="TResult">The flat projection result type.</typeparam>
 	/// <param name="query">The query to execute.</param>
 	/// <param name="connection">The connection.</param>
@@ -131,9 +133,9 @@ public static class EntitySqlQueryProjection
 	/// <summary>
 	/// Executes the query and materializes each result row into the specified flat projection.
 	/// </summary>
-	/// <typeparam name="TRow1">The row type of the query's first into row.</typeparam>
-	/// <typeparam name="TRow2">The row type of the query's second into row.</typeparam>
-	/// <typeparam name="TRow3">The row type of the query's third into row.</typeparam>
+	/// <typeparam name="TRow1">The row type of the first projected source.</typeparam>
+	/// <typeparam name="TRow2">The row type of the second projected source.</typeparam>
+	/// <typeparam name="TRow3">The row type of the third projected source.</typeparam>
 	/// <typeparam name="TResult">The flat projection result type.</typeparam>
 	/// <param name="query">The query to execute.</param>
 	/// <param name="connection">The connection.</param>
@@ -153,7 +155,7 @@ public static class EntitySqlQueryProjection
 	/// <summary>
 	/// Prepares a reusable flat projection. The source query must be a root query without existing SELECT columns.
 	/// </summary>
-	/// <typeparam name="TRow">The row type of the query's single into row.</typeparam>
+	/// <typeparam name="TRow">The row type of the projected source.</typeparam>
 	/// <typeparam name="TResult">The flat projection result type.</typeparam>
 	/// <param name="query">The query to prepare.</param>
 	/// <param name="projection">A flat projection built from row field accesses or SQL expressions.</param>
@@ -168,8 +170,8 @@ public static class EntitySqlQueryProjection
 	/// <summary>
 	/// Prepares a reusable flat projection. The source query must be a root query without existing SELECT columns.
 	/// </summary>
-	/// <typeparam name="TRow1">The row type of the query's first into row.</typeparam>
-	/// <typeparam name="TRow2">The row type of the query's second into row.</typeparam>
+	/// <typeparam name="TRow1">The row type of the first projected source.</typeparam>
+	/// <typeparam name="TRow2">The row type of the second projected source.</typeparam>
 	/// <typeparam name="TResult">The flat projection result type.</typeparam>
 	/// <param name="query">The query to prepare.</param>
 	/// <param name="projection">A flat projection built from row field accesses or SQL expressions.</param>
@@ -185,9 +187,9 @@ public static class EntitySqlQueryProjection
 	/// <summary>
 	/// Prepares a reusable flat projection. The source query must be a root query without existing SELECT columns.
 	/// </summary>
-	/// <typeparam name="TRow1">The row type of the query's first into row.</typeparam>
-	/// <typeparam name="TRow2">The row type of the query's second into row.</typeparam>
-	/// <typeparam name="TRow3">The row type of the query's third into row.</typeparam>
+	/// <typeparam name="TRow1">The row type of the first projected source.</typeparam>
+	/// <typeparam name="TRow2">The row type of the second projected source.</typeparam>
+	/// <typeparam name="TRow3">The row type of the third projected source.</typeparam>
 	/// <typeparam name="TResult">The flat projection result type.</typeparam>
 	/// <param name="query">The query to prepare.</param>
 	/// <param name="projection">A flat projection built from row field accesses or SQL expressions.</param>
@@ -204,7 +206,7 @@ public static class EntitySqlQueryProjection
 	/// <summary>
 	/// Asynchronously executes the query and buffers the flat projection results.
 	/// </summary>
-	/// <typeparam name="TRow">The row type of the query's single into row.</typeparam>
+	/// <typeparam name="TRow">The row type of the projected source.</typeparam>
 	/// <typeparam name="TResult">The flat projection result type.</typeparam>
 	/// <param name="query">The query to execute.</param>
 	/// <param name="connection">The connection.</param>
@@ -226,8 +228,8 @@ public static class EntitySqlQueryProjection
 	/// <summary>
 	/// Asynchronously executes the query and buffers the flat projection results.
 	/// </summary>
-	/// <typeparam name="TRow1">The row type of the query's first into row.</typeparam>
-	/// <typeparam name="TRow2">The row type of the query's second into row.</typeparam>
+	/// <typeparam name="TRow1">The row type of the first projected source.</typeparam>
+	/// <typeparam name="TRow2">The row type of the second projected source.</typeparam>
 	/// <typeparam name="TResult">The flat projection result type.</typeparam>
 	/// <param name="query">The query to execute.</param>
 	/// <param name="connection">The connection.</param>
@@ -250,9 +252,9 @@ public static class EntitySqlQueryProjection
 	/// <summary>
 	/// Asynchronously executes the query and buffers the flat projection results.
 	/// </summary>
-	/// <typeparam name="TRow1">The row type of the query's first into row.</typeparam>
-	/// <typeparam name="TRow2">The row type of the query's second into row.</typeparam>
-	/// <typeparam name="TRow3">The row type of the query's third into row.</typeparam>
+	/// <typeparam name="TRow1">The row type of the first projected source.</typeparam>
+	/// <typeparam name="TRow2">The row type of the second projected source.</typeparam>
+	/// <typeparam name="TRow3">The row type of the third projected source.</typeparam>
 	/// <typeparam name="TResult">The flat projection result type.</typeparam>
 	/// <param name="query">The query to execute.</param>
 	/// <param name="connection">The connection.</param>
@@ -277,7 +279,7 @@ public static class EntitySqlQueryProjection
 	/// Asynchronously streams the flat projection results. The data reader remains open until
 	/// enumeration completes, is cancelled, or the async enumerator is disposed.
 	/// </summary>
-	/// <typeparam name="TRow">The row type of the query's single into row.</typeparam>
+	/// <typeparam name="TRow">The row type of the projected source.</typeparam>
 	/// <typeparam name="TResult">The flat projection result type.</typeparam>
 	/// <param name="query">The query to execute.</param>
 	/// <param name="connection">The connection.</param>
@@ -300,8 +302,8 @@ public static class EntitySqlQueryProjection
 	/// Asynchronously streams the flat projection results. The data reader remains open until
 	/// enumeration completes, is cancelled, or the async enumerator is disposed.
 	/// </summary>
-	/// <typeparam name="TRow1">The row type of the query's first into row.</typeparam>
-	/// <typeparam name="TRow2">The row type of the query's second into row.</typeparam>
+	/// <typeparam name="TRow1">The row type of the first projected source.</typeparam>
+	/// <typeparam name="TRow2">The row type of the second projected source.</typeparam>
 	/// <typeparam name="TResult">The flat projection result type.</typeparam>
 	/// <param name="query">The query to execute.</param>
 	/// <param name="connection">The connection.</param>
@@ -325,9 +327,9 @@ public static class EntitySqlQueryProjection
 	/// Asynchronously streams the flat projection results. The data reader remains open until
 	/// enumeration completes, is cancelled, or the async enumerator is disposed.
 	/// </summary>
-	/// <typeparam name="TRow1">The row type of the query's first into row.</typeparam>
-	/// <typeparam name="TRow2">The row type of the query's second into row.</typeparam>
-	/// <typeparam name="TRow3">The row type of the query's third into row.</typeparam>
+	/// <typeparam name="TRow1">The row type of the first projected source.</typeparam>
+	/// <typeparam name="TRow2">The row type of the second projected source.</typeparam>
+	/// <typeparam name="TRow3">The row type of the third projected source.</typeparam>
 	/// <typeparam name="TResult">The flat projection result type.</typeparam>
 	/// <param name="query">The query to execute.</param>
 	/// <param name="connection">The connection.</param>
@@ -348,18 +350,150 @@ public static class EntitySqlQueryProjection
 		return EnumerateProjectedAsync(prepared.Query, connection, prepared.Materializer, parameters, cancellationToken);
 	}
 
-	private static IEnumerable<TResult> QueryProjectedCore<TResult>(SqlQuery query,
-		IDbConnection connection, LambdaExpression projection, bool buffered,
-		IDictionary<string, object?>? parameters)
+	/// <summary>Executes a projection using the specified row-fields source aliases.</summary>
+	public static IEnumerable<TResult> QueryProjected<TRow, TResult>(this SqlQuery query,
+		IDbConnection connection, Expression<Func<TRow, TResult>> projection,
+		IReadOnlyList<RowFieldsBase> sources, bool buffered = true,
+		IDictionary<string, object?>? parameters = null)
+		where TRow : class, IRow =>
+		QueryProjectedCore<TResult>(query, connection, projection, buffered, parameters, sources);
+
+	/// <summary>Executes a projection using the specified row-fields source aliases.</summary>
+	public static IEnumerable<TResult> QueryProjected<TRow1, TRow2, TResult>(this SqlQuery query,
+		IDbConnection connection, Expression<Func<TRow1, TRow2, TResult>> projection,
+		IReadOnlyList<RowFieldsBase> sources, bool buffered = true,
+		IDictionary<string, object?>? parameters = null)
+		where TRow1 : class, IRow where TRow2 : class, IRow =>
+		QueryProjectedCore<TResult>(query, connection, projection, buffered, parameters, sources);
+
+	/// <summary>Executes a projection using the specified row-fields source aliases.</summary>
+	public static IEnumerable<TResult> QueryProjected<TRow1, TRow2, TRow3, TResult>(this SqlQuery query,
+		IDbConnection connection, Expression<Func<TRow1, TRow2, TRow3, TResult>> projection,
+		IReadOnlyList<RowFieldsBase> sources, bool buffered = true,
+		IDictionary<string, object?>? parameters = null)
+		where TRow1 : class, IRow where TRow2 : class, IRow where TRow3 : class, IRow =>
+		QueryProjectedCore<TResult>(query, connection, projection, buffered, parameters, sources);
+
+	/// <summary>Executes and buffers a projection using the specified row-fields source aliases.</summary>
+	public static List<TResult> ListProjected<TRow, TResult>(this SqlQuery query,
+		IDbConnection connection, Expression<Func<TRow, TResult>> projection,
+		IReadOnlyList<RowFieldsBase> sources, IDictionary<string, object?>? parameters = null)
+		where TRow : class, IRow =>
+		[.. QueryProjectedCore<TResult>(query, connection, projection, buffered: false, parameters, sources)];
+
+	/// <summary>Executes and buffers a projection using the specified row-fields source aliases.</summary>
+	public static List<TResult> ListProjected<TRow1, TRow2, TResult>(this SqlQuery query,
+		IDbConnection connection, Expression<Func<TRow1, TRow2, TResult>> projection,
+		IReadOnlyList<RowFieldsBase> sources, IDictionary<string, object?>? parameters = null)
+		where TRow1 : class, IRow where TRow2 : class, IRow =>
+		[.. QueryProjectedCore<TResult>(query, connection, projection, buffered: false, parameters, sources)];
+
+	/// <summary>Executes and buffers a projection using the specified row-fields source aliases.</summary>
+	public static List<TResult> ListProjected<TRow1, TRow2, TRow3, TResult>(this SqlQuery query,
+		IDbConnection connection, Expression<Func<TRow1, TRow2, TRow3, TResult>> projection,
+		IReadOnlyList<RowFieldsBase> sources, IDictionary<string, object?>? parameters = null)
+		where TRow1 : class, IRow where TRow2 : class, IRow where TRow3 : class, IRow =>
+		[.. QueryProjectedCore<TResult>(query, connection, projection, buffered: false, parameters, sources)];
+
+	/// <summary>Prepares a reusable projection using the specified row-fields source aliases.</summary>
+	public static IProjectedQuery<TResult> AsReusableProjected<TRow, TResult>(this SqlQuery query,
+		Expression<Func<TRow, TResult>> projection, IReadOnlyList<RowFieldsBase> sources)
+		where TRow : class, IRow => CreateReusableProjection<TResult>(query, projection, sources);
+
+	/// <summary>Prepares a reusable projection using the specified row-fields source aliases.</summary>
+	public static IProjectedQuery<TResult> AsReusableProjected<TRow1, TRow2, TResult>(this SqlQuery query,
+		Expression<Func<TRow1, TRow2, TResult>> projection, IReadOnlyList<RowFieldsBase> sources)
+		where TRow1 : class, IRow where TRow2 : class, IRow => CreateReusableProjection<TResult>(query, projection, sources);
+
+	/// <summary>Prepares a reusable projection using the specified row-fields source aliases.</summary>
+	public static IProjectedQuery<TResult> AsReusableProjected<TRow1, TRow2, TRow3, TResult>(this SqlQuery query,
+		Expression<Func<TRow1, TRow2, TRow3, TResult>> projection, IReadOnlyList<RowFieldsBase> sources)
+		where TRow1 : class, IRow where TRow2 : class, IRow where TRow3 : class, IRow => CreateReusableProjection<TResult>(query, projection, sources);
+
+	/// <summary>Executes and buffers a projection asynchronously using the specified row-fields source aliases.</summary>
+	public static Task<List<TResult>> ListProjectedAsync<TRow, TResult>(this SqlQuery query,
+		IDbConnection connection, Expression<Func<TRow, TResult>> projection,
+		IReadOnlyList<RowFieldsBase> sources, IDictionary<string, object?>? parameters = null,
+		CancellationToken cancellationToken = default)
+		where TRow : class, IRow
 	{
 		ArgumentNullException.ThrowIfNull(connection);
-		var prepared = PrepareProjection<TResult>(query, projection);
+		var prepared = PrepareProjection<TResult>(query, projection, sources);
+		return BufferProjectedAsync(prepared.Query, connection, prepared.Materializer, parameters, cancellationToken);
+	}
+
+	/// <summary>Executes and buffers a projection asynchronously using the specified row-fields source aliases.</summary>
+	public static Task<List<TResult>> ListProjectedAsync<TRow1, TRow2, TResult>(this SqlQuery query,
+		IDbConnection connection, Expression<Func<TRow1, TRow2, TResult>> projection,
+		IReadOnlyList<RowFieldsBase> sources, IDictionary<string, object?>? parameters = null,
+		CancellationToken cancellationToken = default)
+		where TRow1 : class, IRow where TRow2 : class, IRow
+	{
+		ArgumentNullException.ThrowIfNull(connection);
+		var prepared = PrepareProjection<TResult>(query, projection, sources);
+		return BufferProjectedAsync(prepared.Query, connection, prepared.Materializer, parameters, cancellationToken);
+	}
+
+	/// <summary>Executes and buffers a projection asynchronously using the specified row-fields source aliases.</summary>
+	public static Task<List<TResult>> ListProjectedAsync<TRow1, TRow2, TRow3, TResult>(this SqlQuery query,
+		IDbConnection connection, Expression<Func<TRow1, TRow2, TRow3, TResult>> projection,
+		IReadOnlyList<RowFieldsBase> sources, IDictionary<string, object?>? parameters = null,
+		CancellationToken cancellationToken = default)
+		where TRow1 : class, IRow where TRow2 : class, IRow where TRow3 : class, IRow
+	{
+		ArgumentNullException.ThrowIfNull(connection);
+		var prepared = PrepareProjection<TResult>(query, projection, sources);
+		return BufferProjectedAsync(prepared.Query, connection, prepared.Materializer, parameters, cancellationToken);
+	}
+
+	/// <summary>Streams a projection asynchronously using the specified row-fields source aliases.</summary>
+	public static IAsyncEnumerable<TResult> QueryProjectedAsync<TRow, TResult>(this SqlQuery query,
+		IDbConnection connection, Expression<Func<TRow, TResult>> projection,
+		IReadOnlyList<RowFieldsBase> sources, IDictionary<string, object?>? parameters = null,
+		CancellationToken cancellationToken = default)
+		where TRow : class, IRow
+	{
+		ArgumentNullException.ThrowIfNull(connection);
+		var prepared = PrepareProjection<TResult>(query, projection, sources);
+		return EnumerateProjectedAsync(prepared.Query, connection, prepared.Materializer, parameters, cancellationToken);
+	}
+
+	/// <summary>Streams a projection asynchronously using the specified row-fields source aliases.</summary>
+	public static IAsyncEnumerable<TResult> QueryProjectedAsync<TRow1, TRow2, TResult>(this SqlQuery query,
+		IDbConnection connection, Expression<Func<TRow1, TRow2, TResult>> projection,
+		IReadOnlyList<RowFieldsBase> sources, IDictionary<string, object?>? parameters = null,
+		CancellationToken cancellationToken = default)
+		where TRow1 : class, IRow where TRow2 : class, IRow
+	{
+		ArgumentNullException.ThrowIfNull(connection);
+		var prepared = PrepareProjection<TResult>(query, projection, sources);
+		return EnumerateProjectedAsync(prepared.Query, connection, prepared.Materializer, parameters, cancellationToken);
+	}
+
+	/// <summary>Streams a projection asynchronously using the specified row-fields source aliases.</summary>
+	public static IAsyncEnumerable<TResult> QueryProjectedAsync<TRow1, TRow2, TRow3, TResult>(this SqlQuery query,
+		IDbConnection connection, Expression<Func<TRow1, TRow2, TRow3, TResult>> projection,
+		IReadOnlyList<RowFieldsBase> sources, IDictionary<string, object?>? parameters = null,
+		CancellationToken cancellationToken = default)
+		where TRow1 : class, IRow where TRow2 : class, IRow where TRow3 : class, IRow
+	{
+		ArgumentNullException.ThrowIfNull(connection);
+		var prepared = PrepareProjection<TResult>(query, projection, sources);
+		return EnumerateProjectedAsync(prepared.Query, connection, prepared.Materializer, parameters, cancellationToken);
+	}
+
+	private static IEnumerable<TResult> QueryProjectedCore<TResult>(SqlQuery query,
+		IDbConnection connection, LambdaExpression projection, bool buffered,
+		IDictionary<string, object?>? parameters, IReadOnlyList<RowFieldsBase>? sources = null)
+	{
+		ArgumentNullException.ThrowIfNull(connection);
+		var prepared = PrepareProjection<TResult>(query, projection, sources);
 		var results = EnumerateProjected(prepared.Query, connection, prepared.Materializer, parameters);
 		return buffered ? [.. results] : results;
 	}
 
 	private static PreparedProjection<TResult> PrepareProjection<TResult>(SqlQuery query,
-		LambdaExpression projection)
+		LambdaExpression projection, IReadOnlyList<RowFieldsBase>? sources = null)
 	{
 		ArgumentNullException.ThrowIfNull(query);
 		ArgumentNullException.ThrowIfNull(projection);
@@ -369,22 +503,7 @@ public static class EntitySqlQueryProjection
 		if (extensible.Columns.Count != 0)
 			throw new InvalidOperationException("QueryProjected requires a query without existing SELECT columns.");
 
-		if (projection.Parameters.Count != extensible.IntoRows.Count)
-			throw new InvalidOperationException("The projection parameter count must match the query's into row count.");
-
-		var sourceRows = new IRow[projection.Parameters.Count];
-		for (var index = 0; index < sourceRows.Length; index++)
-		{
-			if (extensible.IntoRows[index] is not IRow row)
-				throw new InvalidOperationException("Every query into row used by ListProjected must implement IRow.");
-
-			if (!projection.Parameters[index].Type.IsAssignableFrom(row.GetType()))
-				throw new InvalidOperationException(string.Format(
-					"Projection parameter {0} has type '{1}', which is not compatible with query into row type '{2}'.",
-					index, projection.Parameters[index].Type.FullName, row.GetType().FullName));
-
-			sourceRows[index] = row;
-		}
+		var projectionSources = ResolveProjectionSources(projectedQuery, projection.Parameters, sources);
 
 		var columns = GetProjectionColumns(projection.Body);
 		var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -405,9 +524,8 @@ public static class EntitySqlQueryProjection
 			}
 
 			var path = GetFieldPath(column.Expression, projection.Parameters);
-			var sourceFields = ((ISqlQueryProjectionExtensible)projectedQuery).GetIntoRowSource(path.ParameterIndex) as RowFieldsBase ??
-				sourceRows[path.ParameterIndex].Fields;
-			var field = ResolveField(projectedQuery, sourceFields, path.MemberNames);
+			var field = ResolveField(projectedQuery,
+				projectionSources[path.ParameterIndex], path.MemberNames);
 			selectedColumns.Add(new ProjectionColumn(column.Expression, field, field.Expression,
 				column.Name, selectedColumns.Count));
 		}
@@ -432,14 +550,135 @@ public static class EntitySqlQueryProjection
 		return new PreparedProjection<TResult>(projectedQuery, materializer);
 	}
 
+	private static RowFieldsBase[] ResolveProjectionSources(SqlQuery query,
+		ReadOnlyCollection<ParameterExpression> parameters, IReadOnlyList<RowFieldsBase>? explicitSources)
+	{
+		var candidates = GetProjectionSources(query);
+		if (explicitSources is not null)
+		{
+			if (explicitSources.Count != parameters.Count)
+				throw new ArgumentException("The source fields count must match the projection parameter count.", nameof(explicitSources));
+
+			var result = new RowFieldsBase[parameters.Count];
+			for (var index = 0; index < parameters.Count; index++)
+			{
+				var fields = explicitSources[index] ?? throw new ArgumentException(
+					"Projection source fields cannot be null.", nameof(explicitSources));
+				if (!candidates.Any(candidate =>
+					string.Equals(candidate.AliasName, fields.AliasName, StringComparison.OrdinalIgnoreCase) &&
+					candidate.GetType() == fields.GetType()))
+					throw new ArgumentException(string.Format(
+						"Projection source alias '{0}' is not present in the query.", fields.AliasName), nameof(explicitSources));
+
+				EnsureCompatibleSource(parameters[index], fields, index);
+				result[index] = fields;
+			}
+
+			return result;
+		}
+
+		var assignments = new RowFieldsBase[parameters.Count];
+		var current = new RowFieldsBase[parameters.Count];
+		var usedAliases = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+		var matchCount = 0;
+
+		void FindMatches(int parameterIndex)
+		{
+			if (matchCount > 1)
+				return;
+
+			if (parameterIndex == parameters.Count)
+			{
+				matchCount++;
+				if (matchCount == 1)
+					Array.Copy(current, assignments, current.Length);
+				return;
+			}
+
+			var parameterType = parameters[parameterIndex].Type;
+			foreach (var fields in candidates)
+			{
+				var rowType = fields.GetType().DeclaringType;
+				if (rowType is null || !parameterType.IsAssignableFrom(rowType) ||
+					!usedAliases.Add(fields.AliasName))
+					continue;
+
+				current[parameterIndex] = fields;
+				FindMatches(parameterIndex + 1);
+				usedAliases.Remove(fields.AliasName);
+			}
+		}
+
+		FindMatches(0);
+		if (matchCount == 1)
+			return assignments;
+
+		throw new InvalidOperationException(matchCount == 0
+			? "No unique mapping was found between projection parameters and query row-fields sources."
+			: "Projection parameters match multiple query row-fields sources; supply source fields explicitly.");
+	}
+
+	private static IReadOnlyList<RowFieldsBase> GetProjectionSources(SqlQuery query)
+	{
+		var extensible = (ISqlQueryExtensible)query;
+		var sources = new List<RowFieldsBase>();
+		var sourceAliases = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+		void AddSource(RowFieldsBase fields)
+		{
+			if (sourceAliases.Add(fields.AliasName))
+				sources.Add(fields);
+		}
+
+		void AddMetadataJoins(RowFieldsBase fields)
+		{
+			foreach (var join in fields.Joins.Values)
+			{
+				if (!query.HasAlias(join.Name) || join.RowType is not Type rowType)
+					continue;
+
+				var fieldsType = rowType.GetNestedType("RowFields",
+					BindingFlags.Public | BindingFlags.NonPublic);
+				if (fieldsType is null)
+					continue;
+
+				var joinedFields = RowFieldsProvider.Current.ResolveWithAlias(fieldsType, join.Name);
+				if (sourceAliases.Add(join.Name))
+				{
+					sources.Add(joinedFields);
+					AddMetadataJoins(joinedFields);
+				}
+			}
+		}
+
+		foreach (var source in extensible.FromSources.Concat(extensible.JoinSources))
+			if (source is RowFieldsBase fields)
+			{
+				AddSource(fields);
+				AddMetadataJoins(fields);
+			}
+
+		return sources;
+	}
+
+	private static void EnsureCompatibleSource(ParameterExpression parameter,
+		RowFieldsBase fields, int index)
+	{
+		var rowType = fields.GetType().DeclaringType;
+		if (rowType is null || !parameter.Type.IsAssignableFrom(rowType))
+			throw new ArgumentException(string.Format(
+				"Projection source {0} has row type '{1}', which is not compatible with projection parameter type '{2}'.",
+				index, rowType?.FullName ?? fields.GetType().FullName, parameter.Type.FullName), "sources");
+	}
+
 	private static ReusableProjectedQuery<TResult> CreateReusableProjection<TResult>(SqlQuery query,
-		LambdaExpression projection)
+		LambdaExpression projection, IReadOnlyList<RowFieldsBase>? sources = null)
 	{
 		ArgumentNullException.ThrowIfNull(query);
 		if (((ISqlQuery)query).Parent is not null)
 			throw new NotSupportedException("Reusable projections require a root SqlQuery with independent parameters.");
 
-		var prepared = PrepareProjection<TResult>(query, projection);
+		var prepared = PrepareProjection<TResult>(query, projection, sources);
 		return new ReusableProjectedQuery<TResult>(prepared.Query, prepared.Materializer);
 	}
 

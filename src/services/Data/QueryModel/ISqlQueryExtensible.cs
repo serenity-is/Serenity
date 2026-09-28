@@ -46,11 +46,14 @@ public interface ISqlQueryExtensible
     /// <param name="field">The field.</param>
     /// <returns>The index of the select into field, or -1 if not found.</returns>
     int GetSelectIntoIndex(IField field);
-}
 
-internal interface ISqlQueryProjectionExtensible : ISqlQueryExtensible
-{
-    IList<object> FromSources { get; }
-    void IntoRowSelection(object? into, object? source);
-    object? GetIntoRowSource(int index);
+    /// <summary>
+    /// Gets the aliased sources added to the FROM clause.
+    /// </summary>
+    IEnumerable<object> FromSources { get; }
+
+    /// <summary>
+    /// Gets the sources registered for resolving joins by alias.
+    /// </summary>
+    IEnumerable<object> JoinSources { get; }
 }

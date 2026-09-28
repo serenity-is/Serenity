@@ -23,7 +23,6 @@ public partial class SqlQuery
             omitParens = omitParens,
             into = [.. into],
             fromSources = [.. fromSources],
-            intoSources = [.. intoSources],
             whereCriteria = [.. whereCriteria],
             whereClause = new StringBuilder(whereClause.ToString()),
             intoIndex = intoIndex,
