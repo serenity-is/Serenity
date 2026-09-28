@@ -11,7 +11,7 @@ public class ParamCriteria : BaseCriteria
     /// <summary>
     /// Initializes a new instance of the <see cref="ParamCriteria"/> class.
     /// </summary>
-    /// <param name="name">The parameter name. Should not start with @.</param>
+    /// <param name="name">The parameter name. Should start with @.</param>
     /// <exception cref="ArgumentNullException">name is null or empty</exception>
     /// <exception cref="ArgumentOutOfRangeException">name starts with @.</exception>
     public ParamCriteria(string name)
@@ -19,7 +19,7 @@ public class ParamCriteria : BaseCriteria
         if (string.IsNullOrEmpty(name))
             throw new ArgumentNullException(nameof(name));
 
-        if (!name.StartsWith("@"))
+        if (!name.StartsWith('@'))
             throw new ArgumentOutOfRangeException(nameof(name));
 
         this.name = name;
@@ -36,10 +36,11 @@ public class ParamCriteria : BaseCriteria
     }
 
     /// <summary>
-    /// Gets the parameter name.
+    /// Gets the parameter name including the @ symbol.
     /// </summary>
     /// <value>
     /// The parameter name.
     /// </value>
     public string Name => name;
+
 }
