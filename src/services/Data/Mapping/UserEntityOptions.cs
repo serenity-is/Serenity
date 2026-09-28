@@ -34,12 +34,12 @@ public class UserEntityOptions : IOptions<UserEntityOptions>
                     throw new ArgumentException("UserRowSettings.RowType must have a property with the [IdProperty] attribute.");
                 }
 
-                IdColumnName = idProperty.GetCustomAttribute<ColumnAttribute>()?.Name ?? idProperty.Name;
-                IdColumnSize = idProperty.GetCustomAttribute<SizeAttribute>()?.Value;
+                var idColumnName = idProperty.GetCustomAttribute<ColumnAttribute>()?.Name ?? idProperty.Name;
+                var idColumnSize = idProperty.GetCustomAttribute<SizeAttribute>()?.Value;
 
                 var valueType = Nullable.GetUnderlyingType(idProperty.PropertyType) ?? idProperty.PropertyType;
 
-                IdFieldType = valueType switch
+                var idFieldType = valueType switch
                 {
                     Type t when t == typeof(int) => typeof(Int32Field),
                     Type t when t == typeof(long) => typeof(Int64Field),
@@ -47,6 +47,16 @@ public class UserEntityOptions : IOptions<UserEntityOptions>
                     Type t when t == typeof(string) => typeof(StringField),
                     _ => throw new ArgumentException("UserRowSettings.RowType must have an Id property of type int, long, Guid or string.")
                 };
+
+                IdColumnName = idColumnName;
+                IdColumnSize = idColumnSize;
+                IdFieldType = idFieldType;
+            }
+            else if (field is not null)
+            {
+                IdColumnName = null;
+                IdColumnSize = null;
+                IdFieldType = typeof(Int32Field);
             }
 
             field = value;

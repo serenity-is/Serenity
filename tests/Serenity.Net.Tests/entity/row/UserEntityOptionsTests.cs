@@ -74,6 +74,50 @@ public class UserEntityOptionsTests
         Assert.Null(options.IdColumnSize);
     }
 
+    [Fact]
+    public void ClearingRowType_ResetsInferredIdMetadataToDefaults()
+    {
+        var options = new UserEntityOptions { RowType = typeof(OriginPropertyTests.ConfiguredUserRow) };
+
+        options.RowType = null;
+
+        Assert.Null(options.RowType);
+        Assert.Equal("Users", options.TableName);
+        Assert.Equal("UserId", options.IdColumnName);
+        Assert.Null(options.IdColumnSize);
+        Assert.Equal(typeof(Int32Field), options.IdFieldType);
+    }
+
+    [Fact]
+    public void SettingNullRowTypeOnFreshOptions_PreservesCustomIdMetadata()
+    {
+        var options = new UserEntityOptions
+        {
+            IdColumnName = "CustomUserKey",
+            IdColumnSize = 80,
+            IdFieldType = typeof(GuidField)
+        };
+
+        options.RowType = null;
+
+        Assert.Equal("CustomUserKey", options.IdColumnName);
+        Assert.Equal(80, options.IdColumnSize);
+        Assert.Equal(typeof(GuidField), options.IdFieldType);
+    }
+
+    [Fact]
+    public void SettingInvalidRowType_DoesNotPartiallyUpdateIdMetadata()
+    {
+        var options = new UserEntityOptions { RowType = typeof(OriginPropertyTests.ConfiguredUserRow) };
+
+        Assert.Throws<ArgumentException>(() => options.RowType = typeof(UnsupportedIdUserRow));
+
+        Assert.Same(typeof(OriginPropertyTests.ConfiguredUserRow), options.RowType);
+        Assert.Equal("UserKey", options.IdColumnName);
+        Assert.Equal(40, options.IdColumnSize);
+        Assert.Equal(typeof(StringField), options.IdFieldType);
+    }
+
     [Theory]
     [InlineData(typeof(string), "UserRowSettings.RowType must be a type that implements IRow.")]
     [InlineData(typeof(NoIdUserRow), "UserRowSettings.RowType must have a property with the [IdProperty] attribute.")]
