@@ -11,7 +11,9 @@ public class MultipleOutputHelper
         string outDir, IEnumerable<(string Path, string Text)> filesToWrite,
         string[]? deleteExtraPattern,
         string? endOfLine,
-        bool designTimeBuild = false)
+        bool designTimeBuild = false,
+        string[]? designTimeCoreFiles = null,
+        bool allowDesignTimeDeletion = true)
     {
         ArgumentNullException.ThrowIfNull(fileSystem);
 
@@ -23,13 +25,6 @@ public class MultipleOutputHelper
             StringComparer.OrdinalIgnoreCase);
         var extraPatterns = deleteExtraPattern ?? [];
         var outRoot = PathHelper.ToUrl(outDir).TrimEnd('/') + '/';
-        var existingFileCount = designTimeBuild && extraPatterns.Length > 0
-            ? extraPatterns.SelectMany(x => fileSystem.GetFiles(outDir, x, recursive: true))
-                .Select(PathHelper.ToUrl)
-                .Where(x => x?.StartsWith(outRoot, StringComparison.Ordinal) == true)
-                .Distinct(StringComparer.OrdinalIgnoreCase)
-                .Count()
-            : 0;
 
         foreach (var (path, txt) in outputFiles)
         {
@@ -63,22 +58,45 @@ public class MultipleOutputHelper
         if (extraPatterns.Length == 0)
             return;
 
-        if (designTimeBuild && generated.Count < existingFileCount)
+        // Keep stale outputs while compiler errors can temporarily hide generated types.
+        if (designTimeBuild && !allowDesignTimeDeletion)
             return;
 
-        var filesToDelete = extraPatterns.SelectMany(
-                x => fileSystem.GetFiles(outDir, x, recursive: true))
-            .Distinct();
+        var filesToDelete = extraPatterns.SelectMany(x => fileSystem.GetFiles(outDir, x, recursive: true))
+            .Distinct()
+            .Where(file =>
+            {
+                var filePath = PathHelper.ToUrl(file);
+                return filePath.StartsWith(outRoot, StringComparison.Ordinal) &&
+                    !generated.Contains(filePath[outRoot.Length..]);
+            })
+            .ToArray();
+
+        if (designTimeBuild)
+        {
+            var coreFiles = new HashSet<string>((designTimeCoreFiles ?? [])
+                .Select(PathHelper.ToUrl).OfType<string>(), StringComparer.OrdinalIgnoreCase);
+            var nonCoreFilesToDelete = filesToDelete.Where(file =>
+            {
+                var filePath = PathHelper.ToUrl(file);
+                return !coreFiles.Contains(filePath[outRoot.Length..]);
+            }).ToArray();
+            var generatedNonCoreFileCount = generated.Count(file => !coreFiles.Contains(file));
+
+            // A single stale type file is a likely intentional edit; multiple missing files may indicate partial discovery.
+            if (nonCoreFilesToDelete.Length != 1 || generatedNonCoreFileCount == 0)
+                return;
+
+            filesToDelete = nonCoreFilesToDelete;
+        }
 
         foreach (var file in filesToDelete)
-            if (PathHelper.ToUrl(file).StartsWith(outRoot) &&
-                !generated.Contains(PathHelper.ToUrl(file)[outRoot.Length..]))
-            {
+        {
 #if !ISSOURCEGENERATOR
-                console.Write("Deleting: ", ConsoleColor.Yellow);
-                console.WriteLine(fileSystem.GetFileName(file));
+            console.Write("Deleting: ", ConsoleColor.Yellow);
+            console.WriteLine(fileSystem.GetFileName(file));
 #endif
-                fileSystem.DeleteFile(file);
-            }
+            fileSystem.DeleteFile(file);
+        }
     }
 }
