@@ -8,15 +8,21 @@ param(
 $ErrorActionPreference = 'Continue'
 
 function Stop-WithError {
-    param([string] $Message = 'An error occurred during the build process.')
+    param(
+        [string] $Message = 'An error occurred during the build process.',
+        [int] $ExitCode = 1
+    )
     Write-Host "ERROR: $Message"
-    Write-Host "ERROR CODE: $LASTEXITCODE"
-    Read-Host 'Press Enter to exit'
-    exit 0
+    Write-Host "ERROR CODE: $ExitCode"
+    if (-not [Console]::IsInputRedirected) {
+        Read-Host 'Press Enter to exit' | Out-Null
+    }
+    exit $ExitCode
 }
 
 function Assert-ExitCode {
-    if ($LASTEXITCODE -ge 1) { Stop-WithError }
+    param([int] $ExitCode = $LASTEXITCODE)
+    if ($ExitCode -ne 0) { Stop-WithError -ExitCode $ExitCode }
 }
 
 function Invoke-DotnetRun {
@@ -25,9 +31,10 @@ function Invoke-DotnetRun {
     $proc = Start-Process -FilePath $dotnet -ArgumentList 'run' -WorkingDirectory $WorkingDirectory -NoNewWindow -PassThru
     if ([Console]::IsInputRedirected) {
         $proc.WaitForExit()
-        return
+        return $proc.ExitCode
     }
 
+    $stoppedByUser = $false
     $controlC = [Console]::TreatControlCAsInput
     [Console]::TreatControlCAsInput = $true
     try {
@@ -36,6 +43,7 @@ function Invoke-DotnetRun {
                 $key = [Console]::ReadKey($true)
                 if (($key.Modifiers -band [ConsoleModifiers]::Control) -and ($key.Key -eq [ConsoleKey]::C)) {
                     & taskkill /PID $proc.Id /T /F 2>&1 | Out-Null
+                    $stoppedByUser = $true
                     break
                 }
             }
@@ -46,6 +54,9 @@ function Invoke-DotnetRun {
     finally {
         [Console]::TreatControlCAsInput = $controlC
     }
+
+    if ($stoppedByUser) { return 0 }
+    return $proc.ExitCode
 }
 
 $root = $PSScriptRoot
@@ -54,8 +65,7 @@ Set-Location -LiteralPath $root
 # check_dependencies
 $dotnet = Join-Path $env:ProgramFiles 'dotnet\dotnet.exe'
 if (-not (Test-Path -LiteralPath $dotnet)) {
-    Write-Host 'ERROR: dotnet not found. Please install dotnet to continue.'
-    exit 0
+    Stop-WithError -Message 'dotnet not found. Please install dotnet to continue.'
 }
 
 $vsInstallDir = $env:VS2026INSTALLDIR
@@ -65,8 +75,7 @@ if ([string]::IsNullOrEmpty($vsInstallDir)) {
 
 $msbuild = Join-Path $vsInstallDir 'MSBuild\Current\Bin\msbuild.exe'
 if (-not (Test-Path -LiteralPath $msbuild)) {
-    Write-Host "ERROR: `"$msbuild`" not found. Please install Visual Studio to continue."
-    exit 0
+    Stop-WithError -Message "`"$msbuild`" not found. Please install Visual Studio to continue."
 }
 
 # run_build
@@ -89,6 +98,7 @@ Write-Host '*** UNINSTALLING THE DOTNET NEW TEMPLATE ***'
 & $dotnet new uninstall Serene.Templates
 Write-Host '*** INSTALLING THE DOTNET NEW TEMPLATE ***'
 & $dotnet new install (Join-Path $root 'vsix\.nupkg\Serene.Templates*.nupkg')
+Assert-ExitCode
 
 Write-Host '*** CREATING PROJECT FROM DOTNET NEW TEMPLATE ***'
 $ldt = Get-Date -Format 'yyyyMMdd_HHmmss'
@@ -105,18 +115,19 @@ $webDir = Join-Path $vsDir "$projectName\$projectName.Web"
 Set-Location -LiteralPath $webDir
 
 Write-Host '*** RUNNING THE PROJECT FIRST TIME ***'
-Invoke-DotnetRun -WorkingDirectory $webDir
+Assert-ExitCode -ExitCode (Invoke-DotnetRun -WorkingDirectory $webDir)
 
 Write-Host '*** GENERATING CODE FOR VERSIONINFO TABLE ***'
 & $dotnet sergen g --connection-key Default --table dbo.VersionInfo --module Default --identifier VersionInfo --permission Administration:General -what '*'
 Assert-ExitCode
 
 Write-Host '*** RUNNING THE PROJECT SECOND TIME ***'
-Invoke-DotnetRun -WorkingDirectory $webDir
+Assert-ExitCode -ExitCode (Invoke-DotnetRun -WorkingDirectory $webDir)
 
 Write-Host '*** DROPPING THE TEST DATABASE ***'
 $query = "DECLARE @kill varchar(8000) = ''; SELECT @kill = @kill + 'kill ' + CONVERT(varchar(5), session_id) + ';' FROM sys.dm_exec_sessions WHERE database_id in (db_id('SereneTest_${ldt}_Default_v1'), db_id('SereneTest_${ldt}_Northwind_v1')) AND is_user_process = 1; EXEC(@kill);DROP DATABASE SereneTest_${ldt}_Default_v1;DROP DATABASE SereneTest_${ldt}_Northwind_v1"
 & sqlcmd -S '(localdb)\MSSqlLocalDB' -Q $query
+Assert-ExitCode
 
 Set-Location -LiteralPath $vsDir
 Remove-Item -LiteralPath (Join-Path $vsDir $projectName) -Recurse -Force
