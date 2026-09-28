@@ -38,7 +38,7 @@ public static class EntitySqlQueryProjection
 	/// <returns>The projected results.</returns>
 	public static IEnumerable<TResult> QueryProjected<TRow, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow, TResult>> projection, bool buffered = true,
-		IDictionary<string, object?>? parameters = null)
+		IReadOnlyDictionary<string, object?>? parameters = null)
 		where TRow : class, IRow
 	{
 		return QueryProjectedCore<TResult>(query, connection, projection, buffered, parameters);
@@ -56,7 +56,7 @@ public static class EntitySqlQueryProjection
 	/// <returns>The projected results.</returns>
 	public static List<TResult> ListProjected<TRow, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow, TResult>> projection,
-		IDictionary<string, object?>? parameters = null)
+		IReadOnlyDictionary<string, object?>? parameters = null)
 		where TRow : class, IRow
 	{
 		return [.. QueryProjectedCore<TResult>(query, connection, projection, buffered: false, parameters)];
@@ -78,7 +78,7 @@ public static class EntitySqlQueryProjection
 	/// <returns>The projected results.</returns>
 	public static IEnumerable<TResult> QueryProjected<TRow1, TRow2, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow1, TRow2, TResult>> projection, bool buffered = true,
-		IDictionary<string, object?>? parameters = null)
+		IReadOnlyDictionary<string, object?>? parameters = null)
 		where TRow1 : class, IRow
 		where TRow2 : class, IRow
 	{
@@ -98,7 +98,7 @@ public static class EntitySqlQueryProjection
 	/// <returns>The projected results.</returns>
 	public static List<TResult> ListProjected<TRow1, TRow2, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow1, TRow2, TResult>> projection,
-		IDictionary<string, object?>? parameters = null)
+		IReadOnlyDictionary<string, object?>? parameters = null)
 		where TRow1 : class, IRow
 		where TRow2 : class, IRow
 	{
@@ -122,7 +122,7 @@ public static class EntitySqlQueryProjection
 	/// <returns>The projected results.</returns>
 	public static IEnumerable<TResult> QueryProjected<TRow1, TRow2, TRow3, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow1, TRow2, TRow3, TResult>> projection, bool buffered = true,
-		IDictionary<string, object?>? parameters = null)
+		IReadOnlyDictionary<string, object?>? parameters = null)
 		where TRow1 : class, IRow
 		where TRow2 : class, IRow
 		where TRow3 : class, IRow
@@ -144,7 +144,7 @@ public static class EntitySqlQueryProjection
 	/// <returns>The projected results.</returns>
 	public static List<TResult> ListProjected<TRow1, TRow2, TRow3, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow1, TRow2, TRow3, TResult>> projection,
-		IDictionary<string, object?>? parameters = null)
+		IReadOnlyDictionary<string, object?>? parameters = null)
 		where TRow1 : class, IRow
 		where TRow2 : class, IRow
 		where TRow3 : class, IRow
@@ -216,7 +216,7 @@ public static class EntitySqlQueryProjection
 	/// <returns>A task representing the asynchronous operation. The task result is the projected list.</returns>
 	public static Task<List<TResult>> ListProjectedAsync<TRow, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow, TResult>> projection,
-		IDictionary<string, object?>? parameters = null,
+		IReadOnlyDictionary<string, object?>? parameters = null,
 		CancellationToken cancellationToken = default)
 		where TRow : class, IRow
 	{
@@ -239,7 +239,7 @@ public static class EntitySqlQueryProjection
 	/// <returns>A task representing the asynchronous operation. The task result is the projected list.</returns>
 	public static Task<List<TResult>> ListProjectedAsync<TRow1, TRow2, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow1, TRow2, TResult>> projection,
-		IDictionary<string, object?>? parameters = null,
+		IReadOnlyDictionary<string, object?>? parameters = null,
 		CancellationToken cancellationToken = default)
 		where TRow1 : class, IRow
 		where TRow2 : class, IRow
@@ -264,7 +264,7 @@ public static class EntitySqlQueryProjection
 	/// <returns>A task representing the asynchronous operation. The task result is the projected list.</returns>
 	public static Task<List<TResult>> ListProjectedAsync<TRow1, TRow2, TRow3, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow1, TRow2, TRow3, TResult>> projection,
-		IDictionary<string, object?>? parameters = null,
+		IReadOnlyDictionary<string, object?>? parameters = null,
 		CancellationToken cancellationToken = default)
 		where TRow1 : class, IRow
 		where TRow2 : class, IRow
@@ -289,7 +289,7 @@ public static class EntitySqlQueryProjection
 	/// <returns>An asynchronous stream of projected results.</returns>
 	public static IAsyncEnumerable<TResult> QueryProjectedAsync<TRow, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow, TResult>> projection,
-		IDictionary<string, object?>? parameters = null,
+		IReadOnlyDictionary<string, object?>? parameters = null,
 		CancellationToken cancellationToken = default)
 		where TRow : class, IRow
 	{
@@ -313,7 +313,7 @@ public static class EntitySqlQueryProjection
 	/// <returns>An asynchronous stream of projected results.</returns>
 	public static IAsyncEnumerable<TResult> QueryProjectedAsync<TRow1, TRow2, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow1, TRow2, TResult>> projection,
-		IDictionary<string, object?>? parameters = null,
+		IReadOnlyDictionary<string, object?>? parameters = null,
 		CancellationToken cancellationToken = default)
 		where TRow1 : class, IRow
 		where TRow2 : class, IRow
@@ -339,7 +339,7 @@ public static class EntitySqlQueryProjection
 	/// <returns>An asynchronous stream of projected results.</returns>
 	public static IAsyncEnumerable<TResult> QueryProjectedAsync<TRow1, TRow2, TRow3, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow1, TRow2, TRow3, TResult>> projection,
-		IDictionary<string, object?>? parameters = null,
+		IReadOnlyDictionary<string, object?>? parameters = null,
 		CancellationToken cancellationToken = default)
 		where TRow1 : class, IRow
 		where TRow2 : class, IRow
@@ -354,7 +354,7 @@ public static class EntitySqlQueryProjection
 	public static IEnumerable<TResult> QueryProjected<TRow, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow, TResult>> projection,
 		IReadOnlyList<RowFieldsBase> sources, bool buffered = true,
-		IDictionary<string, object?>? parameters = null)
+		IReadOnlyDictionary<string, object?>? parameters = null)
 		where TRow : class, IRow =>
 		QueryProjectedCore<TResult>(query, connection, projection, buffered, parameters, sources);
 
@@ -362,7 +362,7 @@ public static class EntitySqlQueryProjection
 	public static IEnumerable<TResult> QueryProjected<TRow1, TRow2, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow1, TRow2, TResult>> projection,
 		IReadOnlyList<RowFieldsBase> sources, bool buffered = true,
-		IDictionary<string, object?>? parameters = null)
+		IReadOnlyDictionary<string, object?>? parameters = null)
 		where TRow1 : class, IRow where TRow2 : class, IRow =>
 		QueryProjectedCore<TResult>(query, connection, projection, buffered, parameters, sources);
 
@@ -370,28 +370,28 @@ public static class EntitySqlQueryProjection
 	public static IEnumerable<TResult> QueryProjected<TRow1, TRow2, TRow3, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow1, TRow2, TRow3, TResult>> projection,
 		IReadOnlyList<RowFieldsBase> sources, bool buffered = true,
-		IDictionary<string, object?>? parameters = null)
+		IReadOnlyDictionary<string, object?>? parameters = null)
 		where TRow1 : class, IRow where TRow2 : class, IRow where TRow3 : class, IRow =>
 		QueryProjectedCore<TResult>(query, connection, projection, buffered, parameters, sources);
 
 	/// <summary>Executes and buffers a projection using the specified row-fields source aliases.</summary>
 	public static List<TResult> ListProjected<TRow, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow, TResult>> projection,
-		IReadOnlyList<RowFieldsBase> sources, IDictionary<string, object?>? parameters = null)
+		IReadOnlyList<RowFieldsBase> sources, IReadOnlyDictionary<string, object?>? parameters = null)
 		where TRow : class, IRow =>
 		[.. QueryProjectedCore<TResult>(query, connection, projection, buffered: false, parameters, sources)];
 
 	/// <summary>Executes and buffers a projection using the specified row-fields source aliases.</summary>
 	public static List<TResult> ListProjected<TRow1, TRow2, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow1, TRow2, TResult>> projection,
-		IReadOnlyList<RowFieldsBase> sources, IDictionary<string, object?>? parameters = null)
+		IReadOnlyList<RowFieldsBase> sources, IReadOnlyDictionary<string, object?>? parameters = null)
 		where TRow1 : class, IRow where TRow2 : class, IRow =>
 		[.. QueryProjectedCore<TResult>(query, connection, projection, buffered: false, parameters, sources)];
 
 	/// <summary>Executes and buffers a projection using the specified row-fields source aliases.</summary>
 	public static List<TResult> ListProjected<TRow1, TRow2, TRow3, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow1, TRow2, TRow3, TResult>> projection,
-		IReadOnlyList<RowFieldsBase> sources, IDictionary<string, object?>? parameters = null)
+		IReadOnlyList<RowFieldsBase> sources, IReadOnlyDictionary<string, object?>? parameters = null)
 		where TRow1 : class, IRow where TRow2 : class, IRow where TRow3 : class, IRow =>
 		[.. QueryProjectedCore<TResult>(query, connection, projection, buffered: false, parameters, sources)];
 
@@ -413,7 +413,7 @@ public static class EntitySqlQueryProjection
 	/// <summary>Executes and buffers a projection asynchronously using the specified row-fields source aliases.</summary>
 	public static Task<List<TResult>> ListProjectedAsync<TRow, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow, TResult>> projection,
-		IReadOnlyList<RowFieldsBase> sources, IDictionary<string, object?>? parameters = null,
+		IReadOnlyList<RowFieldsBase> sources, IReadOnlyDictionary<string, object?>? parameters = null,
 		CancellationToken cancellationToken = default)
 		where TRow : class, IRow
 	{
@@ -425,7 +425,7 @@ public static class EntitySqlQueryProjection
 	/// <summary>Executes and buffers a projection asynchronously using the specified row-fields source aliases.</summary>
 	public static Task<List<TResult>> ListProjectedAsync<TRow1, TRow2, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow1, TRow2, TResult>> projection,
-		IReadOnlyList<RowFieldsBase> sources, IDictionary<string, object?>? parameters = null,
+		IReadOnlyList<RowFieldsBase> sources, IReadOnlyDictionary<string, object?>? parameters = null,
 		CancellationToken cancellationToken = default)
 		where TRow1 : class, IRow where TRow2 : class, IRow
 	{
@@ -437,7 +437,7 @@ public static class EntitySqlQueryProjection
 	/// <summary>Executes and buffers a projection asynchronously using the specified row-fields source aliases.</summary>
 	public static Task<List<TResult>> ListProjectedAsync<TRow1, TRow2, TRow3, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow1, TRow2, TRow3, TResult>> projection,
-		IReadOnlyList<RowFieldsBase> sources, IDictionary<string, object?>? parameters = null,
+		IReadOnlyList<RowFieldsBase> sources, IReadOnlyDictionary<string, object?>? parameters = null,
 		CancellationToken cancellationToken = default)
 		where TRow1 : class, IRow where TRow2 : class, IRow where TRow3 : class, IRow
 	{
@@ -449,7 +449,7 @@ public static class EntitySqlQueryProjection
 	/// <summary>Streams a projection asynchronously using the specified row-fields source aliases.</summary>
 	public static IAsyncEnumerable<TResult> QueryProjectedAsync<TRow, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow, TResult>> projection,
-		IReadOnlyList<RowFieldsBase> sources, IDictionary<string, object?>? parameters = null,
+		IReadOnlyList<RowFieldsBase> sources, IReadOnlyDictionary<string, object?>? parameters = null,
 		CancellationToken cancellationToken = default)
 		where TRow : class, IRow
 	{
@@ -461,7 +461,7 @@ public static class EntitySqlQueryProjection
 	/// <summary>Streams a projection asynchronously using the specified row-fields source aliases.</summary>
 	public static IAsyncEnumerable<TResult> QueryProjectedAsync<TRow1, TRow2, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow1, TRow2, TResult>> projection,
-		IReadOnlyList<RowFieldsBase> sources, IDictionary<string, object?>? parameters = null,
+		IReadOnlyList<RowFieldsBase> sources, IReadOnlyDictionary<string, object?>? parameters = null,
 		CancellationToken cancellationToken = default)
 		where TRow1 : class, IRow where TRow2 : class, IRow
 	{
@@ -473,7 +473,7 @@ public static class EntitySqlQueryProjection
 	/// <summary>Streams a projection asynchronously using the specified row-fields source aliases.</summary>
 	public static IAsyncEnumerable<TResult> QueryProjectedAsync<TRow1, TRow2, TRow3, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow1, TRow2, TRow3, TResult>> projection,
-		IReadOnlyList<RowFieldsBase> sources, IDictionary<string, object?>? parameters = null,
+		IReadOnlyList<RowFieldsBase> sources, IReadOnlyDictionary<string, object?>? parameters = null,
 		CancellationToken cancellationToken = default)
 		where TRow1 : class, IRow where TRow2 : class, IRow where TRow3 : class, IRow
 	{
@@ -484,7 +484,7 @@ public static class EntitySqlQueryProjection
 
 	private static IEnumerable<TResult> QueryProjectedCore<TResult>(SqlQuery query,
 		IDbConnection connection, LambdaExpression projection, bool buffered,
-		IDictionary<string, object?>? parameters, IReadOnlyList<RowFieldsBase>? sources = null)
+		IReadOnlyDictionary<string, object?>? parameters, IReadOnlyList<RowFieldsBase>? sources = null)
 	{
 		ArgumentNullException.ThrowIfNull(connection);
 		var prepared = PrepareProjection<TResult>(query, projection, sources);
@@ -684,7 +684,7 @@ public static class EntitySqlQueryProjection
 
 	internal static IEnumerable<TResult> EnumerateProjected<TResult>(SqlQuery query,
 		IDbConnection connection, Func<IDataReader, TResult> materializer,
-		IDictionary<string, object?>? parameters = null)
+		IReadOnlyDictionary<string, object?>? parameters = null)
 	{
 		using var reader = query.ExecuteReader(connection, parameters);
 		while (reader.Read())
@@ -693,7 +693,7 @@ public static class EntitySqlQueryProjection
 
 	internal static async Task<List<TResult>> BufferProjectedAsync<TResult>(SqlQuery query,
 		IDbConnection connection, Func<IDataReader, TResult> materializer,
-		IDictionary<string, object?>? parameters, CancellationToken cancellationToken)
+		IReadOnlyDictionary<string, object?>? parameters, CancellationToken cancellationToken)
 	{
 		var results = new List<TResult>();
 		await foreach (var result in EnumerateProjectedAsync(query, connection, materializer, parameters, cancellationToken)
@@ -705,7 +705,7 @@ public static class EntitySqlQueryProjection
 
 	internal static async IAsyncEnumerable<TResult> EnumerateProjectedAsync<TResult>(SqlQuery query,
 		IDbConnection connection, Func<IDataReader, TResult> materializer,
-		IDictionary<string, object?>? parameters = null,
+		IReadOnlyDictionary<string, object?>? parameters = null,
 		[EnumeratorCancellation] CancellationToken cancellationToken = default)
 	{
 		using var reader = await query.ExecuteReaderAsync(connection, parameters, cancellationToken: cancellationToken)

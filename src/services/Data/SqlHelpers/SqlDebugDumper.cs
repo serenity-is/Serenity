@@ -14,7 +14,7 @@ public class SqlDebugDumper
     /// <param name="parameters">The parameters.</param>
     /// <param name="dialect">The dialect.</param>
     /// <returns>The debug version of the SQL.</returns>
-    public static string? Dump(string? sql, IDictionary<string, object?>? parameters, ISqlDialect? dialect = null)
+    public static string? Dump(string? sql, IReadOnlyDictionary<string, object?>? parameters, ISqlDialect? dialect = null)
     {
         if (parameters == null)
             return sql;

@@ -282,5 +282,5 @@ public class QueryWithParams : IQueryWithParams
     /// <value>
     /// The debug text.
     /// </value>
-    public string? DebugText => SqlDebugDumper.Dump(ToString(), Params, dialect);
+    public string? DebugText => SqlDebugDumper.Dump(ToString(), parameters, dialect);
 }

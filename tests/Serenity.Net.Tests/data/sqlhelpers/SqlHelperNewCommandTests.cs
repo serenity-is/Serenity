@@ -65,6 +65,21 @@ public class SqlHelperNewCommandTests
     }
 
     [Fact]
+    public void NewCommand_WithReadOnlyParams_AddsParameters()
+    {
+        using var connection = new MockDbConnection();
+        IReadOnlyDictionary<string, object?> parameters =
+            new System.Collections.ObjectModel.ReadOnlyDictionary<string, object?>(
+                new Dictionary<string, object?> { ["@p1"] = 5 });
+
+        using var command = SqlHelper.NewCommand(connection, "SELECT 1", parameters);
+
+        Assert.Single(command.Parameters);
+        Assert.Equal("@p1", ((IDbDataParameter)command.Parameters[0]).ParameterName);
+        Assert.Equal(5, ((IDbDataParameter)command.Parameters[0]).Value);
+    }
+
+    [Fact]
     public void NewCommand_WithParams_UsesConnectionDialect()
     {
         // Oracle is the only built-in dialect with a non-@ parameter prefix

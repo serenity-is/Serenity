@@ -14,7 +14,7 @@ public static class EntitySqlHelper
     /// <param name="parameters">Values that override the query's parameters for this execution.</param>
     /// <returns>True if any rows were returned.</returns>
     public static bool GetFirst(this SqlQuery query, IDbConnection connection,
-        IDictionary<string, object?>? parameters = null)
+        IReadOnlyDictionary<string, object?>? parameters = null)
     {
         using var reader = query.ExecuteReader(connection, parameters);
         if (!reader.Read())
@@ -34,7 +34,7 @@ public static class EntitySqlHelper
     /// <returns>True if any results were returned from the data reader.</returns>
     /// <exception cref="InvalidOperationException">Query returned more than one result!</exception>
     public static bool GetSingle(this SqlQuery query, IDbConnection connection,
-        IDictionary<string, object?>? parameters = null)
+        IReadOnlyDictionary<string, object?>? parameters = null)
     {
         using IDataReader reader = query.ExecuteReader(connection, parameters);
         if (!reader.Read())
@@ -58,7 +58,7 @@ public static class EntitySqlHelper
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task that represents the asynchronous operation. The task result is true if any rows were returned.</returns>
     public static async Task<bool> GetFirstAsync(this SqlQuery query, IDbConnection connection,
-        IDictionary<string, object?>? parameters = null, CancellationToken cancellationToken = default)
+        IReadOnlyDictionary<string, object?>? parameters = null, CancellationToken cancellationToken = default)
     {
         using var reader = await query.ExecuteReaderAsync(connection, parameters,
             cancellationToken: cancellationToken).ConfigureAwait(false);
@@ -93,7 +93,7 @@ public static class EntitySqlHelper
     /// <returns>A task that represents the asynchronous operation. The task result is true if any results were returned from the data reader.</returns>
     /// <exception cref="InvalidOperationException">Query returned more than one result!</exception>
     public static async Task<bool> GetSingleAsync(this SqlQuery query, IDbConnection connection,
-        IDictionary<string, object?>? parameters = null, CancellationToken cancellationToken = default)
+        IReadOnlyDictionary<string, object?>? parameters = null, CancellationToken cancellationToken = default)
     {
         using IDataReader reader = await query.ExecuteReaderAsync(connection, parameters,
             cancellationToken: cancellationToken).ConfigureAwait(false);
@@ -130,7 +130,7 @@ public static class EntitySqlHelper
     /// <param name="parameters">Values that override the query's parameters for this execution.</param>
     /// <returns>Number of returned results.</returns>
     public static int ForEach(this SqlQuery query, IDbConnection connection,
-        Action callBack, IDictionary<string, object?>? parameters = null)
+        Action callBack, IReadOnlyDictionary<string, object?>? parameters = null)
     {
         return ForEach(query, connection, _ => callBack(), parameters);
     }
@@ -144,7 +144,7 @@ public static class EntitySqlHelper
     /// <param name="parameters">Values that override the query's parameters for this execution.</param>
     /// <returns>Number of returned results.</returns>
     public static int ForEach(this SqlQuery query, IDbConnection connection,
-        Action<IDataReader> callback, IDictionary<string, object?>? parameters = null)
+        Action<IDataReader> callback, IReadOnlyDictionary<string, object?>? parameters = null)
     {
         ArgumentNullException.ThrowIfNull(callback);
         int count = 0;
@@ -190,7 +190,7 @@ public static class EntitySqlHelper
     /// <returns>List of rows.</returns>
     public static List<TRow> List<TRow>(this SqlQuery query,
         IDbConnection connection, TRow? loaderRow = null,
-        IDictionary<string, object?>? parameters = null) where TRow : class, IRow
+        IReadOnlyDictionary<string, object?>? parameters = null) where TRow : class, IRow
     {
         var list = new List<TRow>();
         loaderRow ??= ((query as ISqlQueryExtensible)?.FirstIntoRow as TRow) ?? throw new ArgumentNullException(nameof(loaderRow));
@@ -213,7 +213,7 @@ public static class EntitySqlHelper
     /// <returns>A task representing the asynchronous operation. The task result is the list of rows.</returns>
     public static async Task<List<TRow>> ListAsync<TRow>(this SqlQuery query,
         IDbConnection connection, TRow? loaderRow = null,
-        IDictionary<string, object?>? parameters = null, CancellationToken cancellationToken = default) where TRow : class, IRow
+        IReadOnlyDictionary<string, object?>? parameters = null, CancellationToken cancellationToken = default) where TRow : class, IRow
     {
         var list = new List<TRow>();
         loaderRow ??= ((query as ISqlQueryExtensible)?.FirstIntoRow as TRow) ?? throw new ArgumentNullException(nameof(loaderRow));
@@ -250,7 +250,7 @@ public static class EntitySqlHelper
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task representing the asynchronous operation. The task result is the number of returned results.</returns>
     public static Task<int> ForEachAsync(this SqlQuery query, IDbConnection connection,
-        Action callBack, IDictionary<string, object?>? parameters = null,
+        Action callBack, IReadOnlyDictionary<string, object?>? parameters = null,
         CancellationToken cancellationToken = default)
     {
         return ForEachAsync(query, connection, _ => callBack(), parameters, cancellationToken);
@@ -281,7 +281,7 @@ public static class EntitySqlHelper
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task representing the asynchronous operation. The task result is the number of returned results.</returns>
     public static async Task<int> ForEachAsync(this SqlQuery query, IDbConnection connection,
-        Action<IDataReader> callback, IDictionary<string, object?>? parameters = null,
+        Action<IDataReader> callback, IReadOnlyDictionary<string, object?>? parameters = null,
         CancellationToken cancellationToken = default)
     {
         int count = 0;

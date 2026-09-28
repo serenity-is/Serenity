@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Data.Common;
 using System.Threading;
+using Serenity.Services;
 
 namespace Serenity.TestUtils;
 
@@ -123,11 +124,10 @@ public class MockDbConnection : DbConnection, IRowOperationInterceptor, ISqlOper
 
     public readonly List<InterceptFindRowArgs> FindRowCalls = [];
 
-    public OptionalValue<IRow> FindRow(FindRowArgs args)
+    public OptionalValue<IRow> FindRow(InterceptFindRowArgs args)
     {
-        var interceptArgs = new InterceptFindRowArgs(args.RowType, args.Id, args.Query, args.ByIdOrSingle);
-        FindRowCalls.Add(interceptArgs);
-        return interceptFindRow?.Invoke(interceptArgs) ?? default;
+        FindRowCalls.Add(args);
+        return interceptFindRow?.Invoke(args) ?? default;
     }
 
     protected Func<InterceptListRowsArgs, OptionalValue<IList>> interceptListRows;
@@ -140,11 +140,10 @@ public class MockDbConnection : DbConnection, IRowOperationInterceptor, ISqlOper
 
     public readonly List<InterceptListRowsArgs> ListRowsCalls = [];
 
-    public OptionalValue<IList> ListRows(ListRowsArgs args)
+    public OptionalValue<IList> ListRows(InterceptListRowsArgs args)
     {
-        var interceptArgs = new InterceptListRowsArgs(args.RowType, args.Query, args.CountOnly);
-        ListRowsCalls.Add(interceptArgs);
-        return interceptListRows?.Invoke(interceptArgs) ?? default;
+        ListRowsCalls.Add(args);
+        return interceptListRows?.Invoke(args) ?? default;
     }
 
     protected Func<InterceptManipulateRowArgs, OptionalValue<long?>> interceptManipulateRow;
@@ -157,9 +156,8 @@ public class MockDbConnection : DbConnection, IRowOperationInterceptor, ISqlOper
 
     public readonly List<InterceptManipulateRowArgs> ManipulateRowCalls = [];
 
-    public OptionalValue<long?> ManipulateRow(Type rowType, OptionalValue<object> id, IRow row, ExpectedRows expectedRows, bool getNewId)
+    public OptionalValue<long?> ManipulateRow(InterceptManipulateRowArgs args)
     {
-        var args = new InterceptManipulateRowArgs(rowType, id, row, expectedRows, getNewId);
         ManipulateRowCalls.Add(args);
         return interceptManipulateRow?.Invoke(args) ?? default;
     }
@@ -174,9 +172,8 @@ public class MockDbConnection : DbConnection, IRowOperationInterceptor, ISqlOper
 
     public readonly List<InterceptExecuteNonQueryArgs> ExecuteNonQueryCalls = [];
 
-    public OptionalValue<long?> ExecuteNonQuery(string commandText, IDictionary<string, object?>? parameters, ExpectedRows expectedRows, IQueryWithParams query, bool getNewId)
+    public OptionalValue<long?> ExecuteNonQuery(InterceptExecuteNonQueryArgs args)
     {
-        var args = new InterceptExecuteNonQueryArgs(commandText, parameters, expectedRows, query, getNewId);
         ExecuteNonQueryCalls.Add(args);
         return interceptExecuteNonQuery?.Invoke(args) ?? default;
     }
@@ -192,9 +189,8 @@ public class MockDbConnection : DbConnection, IRowOperationInterceptor, ISqlOper
 
     public readonly List<InterceptExecuteReaderArgs> ExecuteReaderCalls = [];
 
-    public OptionalValue<IDataReader> ExecuteReader(string commandText, IDictionary<string, object?>? parameters, SqlQuery query)
+    public OptionalValue<IDataReader> ExecuteReader(InterceptExecuteReaderArgs args)
     {
-        var args = new InterceptExecuteReaderArgs(commandText, parameters, query);
         ExecuteReaderCalls.Add(args);
         return interceptExecuteReader?.Invoke(args) ?? default;
     }
@@ -209,59 +205,58 @@ public class MockDbConnection : DbConnection, IRowOperationInterceptor, ISqlOper
 
     public readonly List<InterceptExecuteScalarArgs> ExecuteScalarCalls = [];
 
-    public OptionalValue<object> ExecuteScalar(string commandText, IDictionary<string, object?>? parameters, SqlQuery query)
+    public OptionalValue<object> ExecuteScalar(InterceptExecuteScalarArgs args)
     {
-        var args = new InterceptExecuteScalarArgs(commandText, parameters, query);
         ExecuteScalarCalls.Add(args);
         return interceptExecuteScalar?.Invoke(args) ?? default;
     }
 
-    public async Task<OptionalValue<IRow>> FindRowAsync(FindRowArgs args, CancellationToken cancellationToken = default)
+    public async Task<OptionalValue<IRow>> FindRowAsync(InterceptFindRowArgs args)
     {
         await Task.CompletedTask.ConfigureAwait(false);
-        var interceptArgs = new InterceptFindRowArgs(args.RowType, args.Id, args.Query, args.ByIdOrSingle, IsAsync: true);
+        var interceptArgs = args with { IsAsync = true };
         FindRowCalls.Add(interceptArgs);
         return interceptFindRow?.Invoke(interceptArgs) ?? default;
     }
 
-    public async Task<OptionalValue<IList>> ListRowsAsync(ListRowsArgs args, CancellationToken cancellationToken = default)
+    public async Task<OptionalValue<IList>> ListRowsAsync(InterceptListRowsArgs args)
     {
         await Task.CompletedTask.ConfigureAwait(false);
-        var interceptArgs = new InterceptListRowsArgs(args.RowType, args.Query, args.CountOnly, IsAsync: true);
+        var interceptArgs = args with { IsAsync = true };
         ListRowsCalls.Add(interceptArgs);
         return interceptListRows?.Invoke(interceptArgs) ?? default;
     }
 
-    public async Task<OptionalValue<long?>> ManipulateRowAsync(Type rowType, OptionalValue<object> id, IRow row, ExpectedRows expectedRows, bool getNewId, CancellationToken cancellationToken = default)
+    public async Task<OptionalValue<long?>> ManipulateRowAsync(InterceptManipulateRowArgs args)
     {
         await Task.CompletedTask.ConfigureAwait(false);
-        var args = new InterceptManipulateRowArgs(rowType, id, row, expectedRows, getNewId, IsAsync: true);
-        ManipulateRowCalls.Add(args);
-        return interceptManipulateRow?.Invoke(args) ?? default;
+        var asyncArgs = args with { IsAsync = true };
+        ManipulateRowCalls.Add(asyncArgs);
+        return interceptManipulateRow?.Invoke(asyncArgs) ?? default;
     }
 
-    public async Task<OptionalValue<long?>> ExecuteNonQueryAsync(string commandText, IDictionary<string, object?>? parameters, ExpectedRows expectedRows, IQueryWithParams query, bool getNewId, CancellationToken cancellationToken = default)
+    public async Task<OptionalValue<long?>> ExecuteNonQueryAsync(InterceptExecuteNonQueryArgs args)
     {
         await Task.CompletedTask.ConfigureAwait(false);
-        var args = new InterceptExecuteNonQueryArgs(commandText, parameters, expectedRows, query, getNewId, IsAsync: true);
-        ExecuteNonQueryCalls.Add(args);
-        return interceptExecuteNonQuery?.Invoke(args) ?? default;
+        var asyncArgs = args with { IsAsync = true };
+        ExecuteNonQueryCalls.Add(asyncArgs);
+        return interceptExecuteNonQuery?.Invoke(asyncArgs) ?? default;
     }
 
-    public async Task<OptionalValue<IDataReader>> ExecuteReaderAsync(string commandText, IDictionary<string, object?>? parameters, SqlQuery query, CancellationToken cancellationToken = default)
+    public async Task<OptionalValue<IDataReader>> ExecuteReaderAsync(InterceptExecuteReaderArgs args)
     {
         await Task.CompletedTask.ConfigureAwait(false);
-        var args = new InterceptExecuteReaderArgs(commandText, parameters, query, IsAsync: true);
-        ExecuteReaderCalls.Add(args);
-        return interceptExecuteReader?.Invoke(args) ?? default;
+        var asyncArgs = args with { IsAsync = true };
+        ExecuteReaderCalls.Add(asyncArgs);
+        return interceptExecuteReader?.Invoke(asyncArgs) ?? default;
     }
 
-    public async Task<OptionalValue<object>> ExecuteScalarAsync(string commandText, IDictionary<string, object?>? parameters, SqlQuery query, CancellationToken cancellationToken = default)
+    public async Task<OptionalValue<object>> ExecuteScalarAsync(InterceptExecuteScalarArgs args)
     {
         await Task.CompletedTask.ConfigureAwait(false);
-        var args = new InterceptExecuteScalarArgs(commandText, parameters, query, IsAsync: true);
-        ExecuteScalarCalls.Add(args);
-        return interceptExecuteScalar?.Invoke(args) ?? default;
+        var asyncArgs = args with { IsAsync = true };
+        ExecuteScalarCalls.Add(asyncArgs);
+        return interceptExecuteScalar?.Invoke(asyncArgs) ?? default;
     }
 
     
@@ -274,9 +269,3 @@ public class MockDbConnection : DbConnection, IRowOperationInterceptor, ISqlOper
     public ISqlDialect Dialect { get; set; }
 }
 
-public record InterceptFindRowArgs(Type Type, OptionalValue<object?> Id, SqlQuery Query, bool ByIdOrSingle, bool IsAsync = false);
-public record InterceptListRowsArgs(Type Type, SqlQuery Query, bool CountOnly, bool IsAsync = false);
-public record InterceptManipulateRowArgs(Type Type, OptionalValue<object> Id, IRow Row, ExpectedRows ExpectedRows, bool GetNewId, bool IsAsync = false);
-public record InterceptExecuteNonQueryArgs(string CommandText, IDictionary<string, object?>? Parameters, ExpectedRows ExpectedRows, IQueryWithParams Query, bool GetNewId, bool IsAsync = false);
-public record InterceptExecuteReaderArgs(string CommandText, IDictionary<string, object?>? Parameters, SqlQuery Query, bool IsAsync = false);
-public record InterceptExecuteScalarArgs(string CommandText, IDictionary<string, object?>? Parameters, SqlQuery Query, bool IsAsync = false);

@@ -44,7 +44,7 @@ public static class EntityConnectionExtensions
             .Where(new Criteria(row.GetIdField()) == new ValueCriteria(id));
 
         if (connection is IRowOperationInterceptor interceptor &&
-            interceptor.FindRow(new FindRowArgs(typeof(TRow), id, query, ByIdOrSingle: true)) is { HasValue: true } intres)
+            interceptor.FindRow(new InterceptFindRowArgs(typeof(TRow), id, query, ByIdOrSingle: true)) is { HasValue: true } intres)
             return (TRow)intres.Value;
 
         if (query.GetSingle(connection))
@@ -95,7 +95,7 @@ public static class EntityConnectionExtensions
         editQuery(query);
 
         if (connection is IRowOperationInterceptor interceptor &&
-            interceptor.FindRow(new FindRowArgs(typeof(TRow), id, query, ByIdOrSingle: true)) is { HasValue: true } intres)
+            interceptor.FindRow(new InterceptFindRowArgs(typeof(TRow), id, query, ByIdOrSingle: true)) is { HasValue: true } intres)
             return (TRow)intres.Value;
 
         if (query.GetSingle(connection))
@@ -144,7 +144,8 @@ public static class EntityConnectionExtensions
                 .Where(new Criteria(row.GetIdField()) == new ValueCriteria(id));
 
         if (connection is IRowOperationInterceptor interceptor &&
-            await interceptor.FindRowAsync(new FindRowArgs(typeof(TRow), id, query, ByIdOrSingle: true), cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
+            await interceptor.FindRowAsync(new InterceptFindRowArgs(typeof(TRow), id, query, ByIdOrSingle: true)
+                { CancellationToken = cancellationToken, IsAsync = true }).ConfigureAwait(false) is { HasValue: true } intres)
             return (TRow)intres.Value;
 
         if (await query.GetSingleAsync(connection, cancellationToken: cancellationToken).ConfigureAwait(false))
@@ -197,7 +198,8 @@ public static class EntityConnectionExtensions
         editQuery(query);
 
         if (connection is IRowOperationInterceptor interceptor &&
-            await interceptor.FindRowAsync(new FindRowArgs(typeof(TRow), id, query, ByIdOrSingle: true), cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
+            await interceptor.FindRowAsync(new InterceptFindRowArgs(typeof(TRow), id, query, ByIdOrSingle: true)
+                { CancellationToken = cancellationToken, IsAsync = true }).ConfigureAwait(false) is { HasValue: true } intres)
             return (TRow)intres.Value;
 
         if (await query.GetSingleAsync(connection, cancellationToken: cancellationToken).ConfigureAwait(false))
@@ -245,7 +247,7 @@ public static class EntityConnectionExtensions
                 .Where(where);
 
         if (connection is IRowOperationInterceptor interceptor &&
-            interceptor.FindRow(new FindRowArgs(typeof(TRow), default, query, ByIdOrSingle: true)) is { HasValue: true } intres)
+            interceptor.FindRow(new InterceptFindRowArgs(typeof(TRow), default, query, ByIdOrSingle: true)) is { HasValue: true } intres)
             return (TRow)intres.Value;
 
         if (query.GetSingle(connection))
@@ -291,7 +293,7 @@ public static class EntityConnectionExtensions
         editQuery(query);
 
         if (connection is IRowOperationInterceptor interceptor &&
-            interceptor.FindRow(new FindRowArgs(typeof(TRow), default, query, ByIdOrSingle: true)) is { HasValue: true } intres)
+            interceptor.FindRow(new InterceptFindRowArgs(typeof(TRow), default, query, ByIdOrSingle: true)) is { HasValue: true } intres)
             return (TRow)intres.Value;
 
         if (query.GetSingle(connection))
@@ -342,7 +344,8 @@ public static class EntityConnectionExtensions
                 .Where(where);
 
         if (connection is IRowOperationInterceptor interceptor &&
-            await interceptor.FindRowAsync(new FindRowArgs(typeof(TRow), default, query, ByIdOrSingle: true), cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
+            await interceptor.FindRowAsync(new InterceptFindRowArgs(typeof(TRow), default, query, ByIdOrSingle: true)
+                { CancellationToken = cancellationToken, IsAsync = true }).ConfigureAwait(false) is { HasValue: true } intres)
             return (TRow)intres.Value;
 
         if (await query.GetSingleAsync(connection, cancellationToken: cancellationToken).ConfigureAwait(false))
@@ -391,7 +394,8 @@ public static class EntityConnectionExtensions
         editQuery(query);
 
         if (connection is IRowOperationInterceptor interceptor &&
-            await interceptor.FindRowAsync(new FindRowArgs(typeof(TRow), default, query, ByIdOrSingle: true), cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
+            await interceptor.FindRowAsync(new InterceptFindRowArgs(typeof(TRow), default, query, ByIdOrSingle: true)
+                { CancellationToken = cancellationToken, IsAsync = true }).ConfigureAwait(false) is { HasValue: true } intres)
             return (TRow)intres.Value;
 
         if (await query.GetSingleAsync(connection, cancellationToken: cancellationToken).ConfigureAwait(false))
@@ -431,7 +435,7 @@ public static class EntityConnectionExtensions
                 .Where(where);
 
         if (connection is IRowOperationInterceptor interceptor &&
-            interceptor.FindRow(new FindRowArgs(typeof(TRow), default, query, ByIdOrSingle: false)) is { HasValue: true } intres)
+            interceptor.FindRow(new InterceptFindRowArgs(typeof(TRow), default, query, ByIdOrSingle: false)) is { HasValue: true } intres)
             return (TRow)intres.Value;
 
         if (query.GetFirst(connection))
@@ -475,7 +479,7 @@ public static class EntityConnectionExtensions
         editQuery(query);
 
         if (connection is IRowOperationInterceptor interceptor &&
-            interceptor.FindRow(new FindRowArgs(typeof(TRow), default, query, ByIdOrSingle: false)) is { HasValue: true } intres)
+            interceptor.FindRow(new InterceptFindRowArgs(typeof(TRow), default, query, ByIdOrSingle: false)) is { HasValue: true } intres)
             return (TRow)intres.Value;
 
         if (query.GetFirst(connection))
@@ -518,7 +522,8 @@ public static class EntityConnectionExtensions
                 .Where(where);
 
         if (connection is IRowOperationInterceptor interceptor &&
-            await interceptor.FindRowAsync(new FindRowArgs(typeof(TRow), default, query, ByIdOrSingle: false), cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
+            await interceptor.FindRowAsync(new InterceptFindRowArgs(typeof(TRow), default, query, ByIdOrSingle: false)
+                { CancellationToken = cancellationToken, IsAsync = true }).ConfigureAwait(false) is { HasValue: true } intres)
             return (TRow)intres.Value;
 
         if (await query.GetFirstAsync(connection, cancellationToken: cancellationToken).ConfigureAwait(false))
@@ -565,7 +570,8 @@ public static class EntityConnectionExtensions
         editQuery(query);
 
         if (connection is IRowOperationInterceptor interceptor &&
-            await interceptor.FindRowAsync(new FindRowArgs(typeof(TRow), default, query, ByIdOrSingle: false), cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
+            await interceptor.FindRowAsync(new InterceptFindRowArgs(typeof(TRow), default, query, ByIdOrSingle: false)
+                { CancellationToken = cancellationToken, IsAsync = true }).ConfigureAwait(false) is { HasValue: true } intres)
             return (TRow)intres.Value;
 
         if (await query.GetFirstAsync(connection, cancellationToken: cancellationToken).ConfigureAwait(false))
@@ -602,7 +608,7 @@ public static class EntityConnectionExtensions
             .Where(where);
 
         if (connection is IRowOperationInterceptor interceptor &&
-            interceptor.ListRows(new ListRowsArgs(typeof(TRow), query) { CountOnly = true }) is { HasValue: true } intres)
+            interceptor.ListRows(new InterceptListRowsArgs(typeof(TRow), query, CountOnly: true)) is { HasValue: true } intres)
             return intres.Value?.Count ?? 0;
 
         return Convert.ToInt32(SqlHelper.ExecuteScalar(connection, query));
@@ -638,7 +644,8 @@ public static class EntityConnectionExtensions
             .Where(where);
 
         if (connection is IRowOperationInterceptor interceptor &&
-            await interceptor.ListRowsAsync(new ListRowsArgs(typeof(TRow), query) { CountOnly = true }, cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
+            await interceptor.ListRowsAsync(new InterceptListRowsArgs(typeof(TRow), query, CountOnly: true)
+                { CancellationToken = cancellationToken, IsAsync = true }).ConfigureAwait(false) is { HasValue: true } intres)
             return intres.Value?.Count ?? 0;
 
         return Convert.ToInt32(await SqlHelper.ExecuteScalarAsync(connection, query,
@@ -662,7 +669,7 @@ public static class EntityConnectionExtensions
                 .Where(new Criteria(row.GetIdField()) == new ValueCriteria(id));
 
         if (connection is IRowOperationInterceptor interceptor &&
-            interceptor.FindRow(new FindRowArgs(typeof(TRow), id, query, ByIdOrSingle: false)) is { HasValue: true } intres)
+            interceptor.FindRow(new InterceptFindRowArgs(typeof(TRow), id, query, ByIdOrSingle: false)) is { HasValue: true } intres)
             return intres.Value != null;
 
         return query.Exists(connection);
@@ -686,7 +693,8 @@ public static class EntityConnectionExtensions
                 .Where(new Criteria(row.GetIdField()) == new ValueCriteria(id));
 
         if (connection is IRowOperationInterceptor interceptor &&
-            await interceptor.FindRowAsync(new FindRowArgs(typeof(TRow), id, query, ByIdOrSingle: false), cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
+            await interceptor.FindRowAsync(new InterceptFindRowArgs(typeof(TRow), id, query, ByIdOrSingle: false)
+                { CancellationToken = cancellationToken, IsAsync = true }).ConfigureAwait(false) is { HasValue: true } intres)
             return intres.Value != null;
 
         return await query.ExistsAsync(connection, cancellationToken: cancellationToken).ConfigureAwait(false);
@@ -708,7 +716,7 @@ public static class EntityConnectionExtensions
                 .Where(where);
 
         if (connection is IRowOperationInterceptor interceptor &&
-            interceptor.FindRow(new FindRowArgs(typeof(TRow), default, query, ByIdOrSingle: false)) is { HasValue: true } intres)
+            interceptor.FindRow(new InterceptFindRowArgs(typeof(TRow), default, query, ByIdOrSingle: false)) is { HasValue: true } intres)
             return intres.Value != null;
 
         return query.Exists(connection);
@@ -731,7 +739,8 @@ public static class EntityConnectionExtensions
                 .Where(where);
 
         if (connection is IRowOperationInterceptor interceptor &&
-            await interceptor.FindRowAsync(new FindRowArgs(typeof(TRow), default, query, ByIdOrSingle: false), cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
+            await interceptor.FindRowAsync(new InterceptFindRowArgs(typeof(TRow), default, query, ByIdOrSingle: false)
+                { CancellationToken = cancellationToken, IsAsync = true }).ConfigureAwait(false) is { HasValue: true } intres)
             return intres.Value != null;
 
         return await query.ExistsAsync(connection, cancellationToken: cancellationToken).ConfigureAwait(false);
@@ -769,7 +778,7 @@ public static class EntityConnectionExtensions
                 .Where(where);
 
         if (connection is IRowOperationInterceptor interceptor &&
-            interceptor.ListRows(new ListRowsArgs(typeof(TRow), query)) is { HasValue: true } intres)
+            interceptor.ListRows(new InterceptListRowsArgs(typeof(TRow), query, CountOnly: false)) is { HasValue: true } intres)
             return (List<TRow>)intres.Value;
 
         return query.List(connection, row);
@@ -792,7 +801,7 @@ public static class EntityConnectionExtensions
         editQuery(query);
 
         if (connection is IRowOperationInterceptor interceptor &&
-            interceptor.ListRows(new ListRowsArgs(typeof(TRow), query)) is { HasValue: true } intres)
+            interceptor.ListRows(new InterceptListRowsArgs(typeof(TRow), query, CountOnly: false)) is { HasValue: true } intres)
             return (List<TRow>)intres.Value;
 
         return query.List(connection, row);
@@ -832,7 +841,8 @@ public static class EntityConnectionExtensions
                 .Where(where);
 
         if (connection is IRowOperationInterceptor interceptor &&
-            await interceptor.ListRowsAsync(new ListRowsArgs(typeof(TRow), query), cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
+            await interceptor.ListRowsAsync(new InterceptListRowsArgs(typeof(TRow), query, CountOnly: false)
+                { CancellationToken = cancellationToken, IsAsync = true }).ConfigureAwait(false) is { HasValue: true } intres)
             return (List<TRow>)intres.Value;
 
         return await query.ListAsync(connection, row, cancellationToken: cancellationToken).ConfigureAwait(false);
@@ -856,7 +866,8 @@ public static class EntityConnectionExtensions
         editQuery(query);
 
         if (connection is IRowOperationInterceptor interceptor &&
-            await interceptor.ListRowsAsync(new ListRowsArgs(typeof(TRow), query), cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
+            await interceptor.ListRowsAsync(new InterceptListRowsArgs(typeof(TRow), query, CountOnly: false)
+                { CancellationToken = cancellationToken, IsAsync = true }).ConfigureAwait(false) is { HasValue: true } intres)
             return (List<TRow>)intres.Value;
 
         return await query.ListAsync(connection, row, cancellationToken: cancellationToken).ConfigureAwait(false);
@@ -873,7 +884,7 @@ public static class EntityConnectionExtensions
         where TRow : IRow
     {
         if (connection is IRowOperationInterceptor interceptor &&
-            interceptor.ManipulateRow(typeof(TRow), id: default, row, ExpectedRows.Ignore, getNewId: false) is { HasValue: true })
+            interceptor.ManipulateRow(new InterceptManipulateRowArgs(typeof(TRow), default, row, ExpectedRows.Ignore, GetNewId: false)) is { HasValue: true })
             return;
 
         ToSqlInsert(row).Execute(connection);
@@ -892,7 +903,8 @@ public static class EntityConnectionExtensions
         where TRow : IRow
     {
         if (connection is IRowOperationInterceptor interceptor &&
-            await interceptor.ManipulateRowAsync(typeof(TRow), id: default, row, ExpectedRows.Ignore, getNewId: false, cancellationToken).ConfigureAwait(false) is { HasValue: true })
+            await interceptor.ManipulateRowAsync(new InterceptManipulateRowArgs(typeof(TRow), default, row, ExpectedRows.Ignore, GetNewId: false)
+                { CancellationToken = cancellationToken, IsAsync = true }).ConfigureAwait(false) is { HasValue: true })
             return;
 
         await ToSqlInsert(row).ExecuteAsync(connection, cancellationToken: cancellationToken).ConfigureAwait(false);
@@ -911,7 +923,7 @@ public static class EntityConnectionExtensions
         where TRow: IRow
     {
         if (connection is IRowOperationInterceptor interceptor &&
-            interceptor.ManipulateRow(typeof(TRow), id: default, row, ExpectedRows.Ignore, getNewId: true) is { HasValue: true } intres)
+            interceptor.ManipulateRow(new InterceptManipulateRowArgs(typeof(TRow), default, row, ExpectedRows.Ignore, GetNewId: true)) is { HasValue: true } intres)
             return intres.Value;
 
         return ToSqlInsert(row).ExecuteAndGetID(connection);
@@ -931,7 +943,8 @@ public static class EntityConnectionExtensions
         where TRow : IRow
     {
         if (connection is IRowOperationInterceptor interceptor &&
-            await interceptor.ManipulateRowAsync(typeof(TRow), id: default, row, ExpectedRows.Ignore, getNewId: true, cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
+            await interceptor.ManipulateRowAsync(new InterceptManipulateRowArgs(typeof(TRow), default, row, ExpectedRows.Ignore, GetNewId: true)
+                { CancellationToken = cancellationToken, IsAsync = true }).ConfigureAwait(false) is { HasValue: true } intres)
             return intres.Value;
 
         return await ToSqlInsert(row).ExecuteAndGetIDAsync(connection, cancellationToken: cancellationToken).ConfigureAwait(false);
@@ -957,7 +970,7 @@ public static class EntityConnectionExtensions
             throw new InvalidOperationException("ID field of row has null value!");
 
         if (connection is IRowOperationInterceptor interceptor &&
-            interceptor.ManipulateRow(typeof(TRow), id: idField.AsObject(row), row, expectedRows, getNewId: false) is { HasValue: true } intres)
+            interceptor.ManipulateRow(new InterceptManipulateRowArgs(typeof(TRow), idField.AsObject(row), row, expectedRows, GetNewId: false)) is { HasValue: true } intres)
             return (int)intres.Value!;
 
         return row.ToSqlUpdateById()
@@ -986,7 +999,8 @@ public static class EntityConnectionExtensions
             throw new InvalidOperationException("ID field of row has null value!");
 
         if (connection is IRowOperationInterceptor interceptor &&
-            await interceptor.ManipulateRowAsync(typeof(TRow), id: idField.AsObject(row), row, expectedRows, getNewId: false, cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
+            await interceptor.ManipulateRowAsync(new InterceptManipulateRowArgs(typeof(TRow), idField.AsObject(row), row, expectedRows, GetNewId: false)
+                { CancellationToken = cancellationToken, IsAsync = true }).ConfigureAwait(false) is { HasValue: true } intres)
             return (int)intres.Value!;
 
         return await row.ToSqlUpdateById()
@@ -1007,7 +1021,7 @@ public static class EntityConnectionExtensions
         where TRow : class, IRow, IIdRow, new()
     {
         if (connection is IRowOperationInterceptor interceptor &&
-            interceptor.ManipulateRow(typeof(TRow), id, row: null, expectedRows, getNewId: false) is { HasValue: true } intres)
+            interceptor.ManipulateRow(new InterceptManipulateRowArgs(typeof(TRow), id, null, expectedRows, GetNewId: false)) is { HasValue: true } intres)
             return (int)intres.Value!;
 
         var row = new TRow();
@@ -1031,7 +1045,8 @@ public static class EntityConnectionExtensions
         where TRow : class, IRow, IIdRow, new()
     {
         if (connection is IRowOperationInterceptor interceptor &&
-            await interceptor.ManipulateRowAsync(typeof(TRow), id, row: null, expectedRows, getNewId: false, cancellationToken).ConfigureAwait(false) is { HasValue: true } intres)
+            await interceptor.ManipulateRowAsync(new InterceptManipulateRowArgs(typeof(TRow), id, null, expectedRows, GetNewId: false)
+                { CancellationToken = cancellationToken, IsAsync = true }).ConfigureAwait(false) is { HasValue: true } intres)
             return (int)intres.Value!;
 
         var row = new TRow();
