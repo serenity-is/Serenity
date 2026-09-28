@@ -18,7 +18,7 @@ describe("FrozenLayout", () => {
         expect(layout.supportFrozenRows).toBe(true);
     });
 
-    it("adjusts frozen rows for omitted and bottom-frozen options", () => {
+    it("leaves rows unfrozen for unsupported bottom-freezing", () => {
         const host = mockLayoutHost();
         const layout = new FrozenLayout();
 
@@ -30,6 +30,9 @@ describe("FrozenLayout", () => {
         host.opt.frozenBottom = true;
         layout.afterSetOptions({ frozenBottom: true } as any);
         expect(host.refs.config.frozenTopRows).toBe(0);
+        host.opt.frozenBottom = false;
+        layout.afterSetOptions({ frozenBottom: false } as any);
+        expect(host.refs.config.frozenTopRows).toBe(3);
     });
 
     it("reorders columns only when frozen columns change without explicit columns", () => {

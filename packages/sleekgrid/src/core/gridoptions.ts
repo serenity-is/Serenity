@@ -203,7 +203,8 @@ export interface GridOptions<TItem = any> {
     formatterFactory?: FormatterFactory;
 
     /**
-     * Defaults to `false`. If `true`, places frozen rows at the bottom edge of the grid.
+     * Defaults to `false`. If `true`, requests frozen rows at the bottom edge of the grid.
+     * Layouts without bottom-frozen row support leave `frozenRows` unfrozen.
      */
     frozenBottom?: boolean | number;
 
@@ -214,8 +215,9 @@ export interface GridOptions<TItem = any> {
     frozenColumns?: number;
 
     /**
-     * Defaults to `undefined`. If specified, freezes the given number of rows at the top or bottom
-     * edge (if frozenBottom === true).
+     * Defaults to `undefined`. If specified, freezes the given number of rows at the top, or at the
+     * bottom when `frozenBottom` is `true` and the layout supports bottom-frozen rows. Otherwise,
+     * those rows are left unfrozen when `frozenBottom` is `true`.
      */
     frozenRows?: number;
 

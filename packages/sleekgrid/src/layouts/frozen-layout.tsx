@@ -7,7 +7,8 @@ import type { GridLayoutRefs } from "./layout-refs";
 /**
  * Frozen/pinned layout providing pinned columns and frozen top panes.
  * Renders `start`/`main` bands with `top`/`body` panes and handles
- * `frozenRows`/`frozenBottom` and legacy `frozenColumns` options.
+ * `frozenRows` and legacy `frozenColumns` options.
+ * Bottom-frozen rows are unsupported; when requested, `frozenRows` are left unfrozen.
  */
 export class FrozenLayout implements LayoutEngine {
     /** Host provided during {@link FrozenLayout.init}. */
@@ -73,7 +74,8 @@ export class FrozenLayout implements LayoutEngine {
     }
 
     /**
-     * Syncs `refs.config.frozenTopRows` from `frozenRows`/`frozenBottom` grid options.
+     * Syncs `refs.config.frozenTopRows` from `frozenRows`, leaving rows unfrozen
+     * when bottom-freezing is requested because this layout has no bottom pane.
      */
     public adjustFrozenRowsOption(): void {
         const { frozenRows, frozenBottom } = this.host.getOptions();
