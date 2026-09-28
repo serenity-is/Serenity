@@ -91,7 +91,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins, IHas
                 "RowFields {0}'s declaring row type {1} must be a subclass of Row!", fieldsType.Name, rowType!.Name));
 
         var constructor = rowType.GetConstructors().FirstOrDefault(x => x.GetParameters().Length == 1 &&
-            x.GetParameters()[0].GetType().IsSubclassOf(typeof(RowFieldsBase)));
+            typeof(RowFieldsBase).IsAssignableFrom(x.GetParameters()[0].ParameterType));
 
         if (constructor != null)
             rowFactory = () => (IRow)Activator.CreateInstance(rowType, this)!;

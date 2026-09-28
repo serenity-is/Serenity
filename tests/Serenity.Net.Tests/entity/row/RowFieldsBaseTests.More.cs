@@ -295,10 +295,6 @@ public class RowFieldsBaseTestsMore
             }
         }
 
-        public FactoryCtorRow() : base()
-        {
-        }
-
         public FactoryCtorRow(RowFields fields) : base(fields)
         {
         }
@@ -538,9 +534,13 @@ public class RowFieldsBaseTestsMore
     [Fact]
     public void Row_Factory_Uses_Fields_Constructor()
     {
-        var row = new FactoryCtorRow();
+        var fields = new FactoryCtorRow.RowFields();
+        fields.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect,
+            userEntityOptions: null);
+        var row = new FactoryCtorRow(fields);
         var created = ((IRow)row).CreateNew();
         Assert.IsType<FactoryCtorRow>(created);
+        Assert.Same(fields, ((IRow)created).Fields);
     }
 
     [Fact]
