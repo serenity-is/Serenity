@@ -10,19 +10,29 @@ public class MultipleOutputHelper
 #endif
         string outDir, IEnumerable<(string Path, string Text)> filesToWrite,
         string[]? deleteExtraPattern,
-        string? endOfLine)
+        string? endOfLine,
+        bool designTimeBuild = false)
     {
         ArgumentNullException.ThrowIfNull(fileSystem);
 
         outDir = fileSystem.GetFullPath(outDir);
         fileSystem.CreateDirectory(outDir);
 
-        var generated = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var outputFiles = filesToWrite.ToArray();
+        var generated = new HashSet<string>(outputFiles.Select(x => PathHelper.ToUrl(x.Path)),
+            StringComparer.OrdinalIgnoreCase);
+        var extraPatterns = deleteExtraPattern ?? [];
+        var outRoot = PathHelper.ToUrl(outDir).TrimEnd('/') + '/';
+        var existingFileCount = designTimeBuild && extraPatterns.Length > 0
+            ? extraPatterns.SelectMany(x => fileSystem.GetFiles(outDir, x, recursive: true))
+                .Select(PathHelper.ToUrl)
+                .Where(x => x?.StartsWith(outRoot, StringComparison.Ordinal) == true)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .Count()
+            : 0;
 
-        foreach (var (path, txt) in filesToWrite)
+        foreach (var (path, txt) in outputFiles)
         {
-            generated.Add(PathHelper.ToUrl(path));
-
             var outFile = fileSystem.Combine(outDir, path);
             bool exists = fileSystem.FileExists(outFile);
             if (exists)
@@ -50,14 +60,16 @@ public class MultipleOutputHelper
             fileSystem.WriteAllText(outFile, text, utf8);
         }
 
-        if (deleteExtraPattern?.Length is null or 0)
+        if (extraPatterns.Length == 0)
             return;
 
-        var filesToDelete = deleteExtraPattern.SelectMany(
+        if (designTimeBuild && generated.Count < existingFileCount)
+            return;
+
+        var filesToDelete = extraPatterns.SelectMany(
                 x => fileSystem.GetFiles(outDir, x, recursive: true))
             .Distinct();
 
-        var outRoot = PathHelper.ToUrl(outDir).TrimEnd('/') + '/';
         foreach (var file in filesToDelete)
             if (PathHelper.ToUrl(file).StartsWith(outRoot) &&
                 !generated.Contains(PathHelper.ToUrl(file)[outRoot.Length..]))
