@@ -177,6 +177,20 @@ public class SqlUpdateTests
     }
 
     [Fact]
+    public void Clone_Copies_Dialect_For_RegeneratedQuery()
+    {
+        var update = new SqlUpdate("T")
+            .Dialect(PostgresDialect.Instance)
+            .SetTo("A", "1");
+        var clone = update.Clone().SetTo("B", "2");
+
+        Assert.Same(PostgresDialect.Instance, clone.Dialect());
+        Assert.True(clone.IsDialectOverridden);
+        Assert.Equal(SqlUpdate.Format("T", string.Empty, clone.GetFieldExpressions(), PostgresDialect.Instance),
+            clone.ToString());
+    }
+
+    [Fact]
     public void ToString_Formats_Update()
     {
         var update = new SqlUpdate("T").SetTo("A", "@a").Where("B = 1");

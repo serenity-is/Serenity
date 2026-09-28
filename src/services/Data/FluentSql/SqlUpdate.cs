@@ -244,6 +244,8 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
         clone.whereConditions.AddRange(whereConditions);
         clone.whereClause.Append(whereClause);
         clone.nextAutoParam = nextAutoParam;
+        clone.dialect = dialect;
+        clone.dialectOverridden = dialectOverridden;
         CloneParams(clone);
         return clone;
     }

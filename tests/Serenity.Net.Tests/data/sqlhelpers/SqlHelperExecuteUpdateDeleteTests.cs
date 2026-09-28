@@ -8,7 +8,7 @@ public class SqlHelperExecuteUpdateDeleteTests
         using var connection = new MockDbConnection()
             .InterceptExecuteNonQuery(args =>
             {
-                Assert.Equal(ExpectedRows.One, args.ExpectedRows);
+                Assert.Equal(ExpectedRows.ZeroOrOne, args.ExpectedRows);
                 return 1;
             })
             .OnDbCommandExecuteNonQuery(_ => throw new InvalidOperationException("should not execute"));
@@ -16,7 +16,7 @@ public class SqlHelperExecuteUpdateDeleteTests
         var query = new SqlUpdate("Table").SetTo("X", "@p1").Where("Id = 1");
         query.SetParam("@p1", 1);
         var parameters = new Dictionary<string, object?> { ["@p1"] = 2 };
-        var result = query.Execute(connection, parameters: parameters);
+        var result = query.Execute(connection, ExpectedRows.ZeroOrOne, parameters);
 
         Assert.Equal(1, result);
         var call = Assert.Single(connection.ExecuteNonQueryCalls);
@@ -82,13 +82,17 @@ public class SqlHelperExecuteUpdateDeleteTests
     public async Task ExecuteUpdateAsync_InterceptorHandles_DoesNotExecuteCommand()
     {
         using var connection = new MockDbConnection()
-            .InterceptExecuteNonQuery(args => 1)
+            .InterceptExecuteNonQuery(args =>
+            {
+                Assert.Equal(ExpectedRows.ZeroOrOne, args.ExpectedRows);
+                return 1;
+            })
             .OnDbCommandExecuteNonQuery(_ => throw new InvalidOperationException("should not execute"));
 
         var query = new SqlUpdate("Table").SetTo("X", "@p1").Where("Id = 1");
         query.SetParam("@p1", 1);
         var parameters = new Dictionary<string, object?> { ["@p1"] = 2 };
-        var result = await query.ExecuteAsync(connection, parameters: parameters,
+        var result = await query.ExecuteAsync(connection, ExpectedRows.ZeroOrOne, parameters,
             cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.Equal(1, result);
