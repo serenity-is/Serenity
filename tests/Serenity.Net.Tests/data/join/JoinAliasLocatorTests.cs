@@ -133,6 +133,56 @@ public class JoinAliasLocatorTests
     }
 
     [Fact]
+    public void ReplaceAliases_Rewrites_Criteria_Tree_And_Preserves_Parameters()
+    {
+        var parameter = new ParamCriteria("@id");
+        var criteria = new BinaryCriteria(
+            new BinaryCriteria(new Criteria("T0.Id"), CriteriaOperator.EQ, new Criteria("T0.ParentId")),
+            CriteriaOperator.AND,
+            new BinaryCriteria(new Criteria("T1.Id"), CriteriaOperator.EQ, parameter));
+
+        var result = Assert.IsType<BinaryCriteria>(JoinAliasLocator.ReplaceAliases(criteria, alias =>
+            alias == "T0" ? "j0" : alias == "T1" ? "j1" : alias));
+
+        var left = Assert.IsType<BinaryCriteria>(result.LeftOperand);
+        Assert.Equal("j0.Id", Assert.IsType<Criteria>(left.LeftOperand).Expression);
+        Assert.Equal("j0.ParentId", Assert.IsType<Criteria>(left.RightOperand).Expression);
+
+        var right = Assert.IsType<BinaryCriteria>(result.RightOperand);
+        Assert.Equal("j1.Id", Assert.IsType<Criteria>(right.LeftOperand).Expression);
+        Assert.Same(parameter, right.RightOperand);
+    }
+
+    [Fact]
+    public void ReplaceAliases_Rewrites_FunctionCall_Arguments_Without_Mutating_Original()
+    {
+        var originalArgument = new Criteria("T0.Name");
+        var original = new UpperFunctionCriteria(originalArgument);
+
+        var result = Assert.IsType<UpperFunctionCriteria>(JoinAliasLocator.ReplaceAliases(original,
+            alias => alias == "T0" ? "T1" : alias));
+
+        Assert.NotSame(original, result);
+        Assert.Equal("T1.Name", Assert.IsType<Criteria>(result.Arguments[0]).Expression);
+        Assert.Same(originalArgument, original.Arguments[0]);
+    }
+
+    [Fact]
+    public void ReplaceAliases_Uses_FunctionCall_Clone_Hook()
+    {
+        var originalArgument = new Criteria("T0.Name");
+        var original = new CustomFunctionCriteria("custom state", originalArgument);
+
+        var result = Assert.IsType<CustomFunctionCriteria>(JoinAliasLocator.ReplaceAliases(original,
+            alias => alias == "T0" ? "T1" : alias));
+
+        Assert.NotSame(original, result);
+        Assert.Equal("custom state", result.State);
+        Assert.Equal("T1.Name", Assert.IsType<Criteria>(result.Arguments[0]).Expression);
+        Assert.Same(originalArgument, original.Arguments[0]);
+    }
+
+    [Fact]
     public void ReplaceAliases_Keeps_Expression_When_Replacement_Is_Same()
     {
         Assert.Equal("T0.Field",
@@ -167,5 +217,18 @@ public class JoinAliasLocatorTests
         Assert.Equal("X.Y.c",
             JoinAliasLocator.ReplaceAliases("a.b.c",
                 s => s == "a" ? "X" : s == "b" ? "Y" : s));
+    }
+
+    private sealed class CustomFunctionCriteria(string state, params BaseCriteria[] arguments)
+        : FunctionCallCriteria(arguments)
+    {
+        public string State { get; } = state;
+
+        public override string GetFunctionName(ISqlDialect dialect) => "CUSTOM";
+
+        protected internal override FunctionCallCriteria CloneWithArguments(BaseCriteria[] arguments)
+        {
+            return new CustomFunctionCriteria(State, arguments);
+        }
     }
 }

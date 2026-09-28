@@ -1322,7 +1322,17 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins, IHas
                 mapExpression(join.Value.Table)!,
                 mapAlias(join.Value.Name),
                 onCriteria,
-                join.Value.GetKeyword());
+                join.Value.GetKeyword())
+            {
+                RowType = join.Value.RowType
+            };
+        }
+
+        foreach (var field in this)
+        {
+            if (field.ForeignJoinAlias is Join foreignJoin &&
+                joins.TryGetValue(mapAlias(foreignJoin.Name), out Join? replacedJoin))
+                field.ForeignJoinAlias = replacedJoin;
         }
 
         alias = newAlias;

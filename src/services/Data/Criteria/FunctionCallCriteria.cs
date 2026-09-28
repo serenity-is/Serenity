@@ -6,12 +6,27 @@ namespace Serenity.Data;
 /// <param name="arguments">The arguments.</param>
 public abstract class FunctionCallCriteria(params BaseCriteria[] arguments) : BaseCriteria
 {
-    private readonly BaseCriteria[] arguments = arguments;
+    private BaseCriteria[] arguments = arguments;
 
     /// <summary>
     /// Gets the arguments.
     /// </summary>
     public BaseCriteria[] Arguments => arguments;
+
+    /// <summary>
+    /// Creates a copy of this function criteria with the specified arguments.
+    /// </summary>
+    /// <param name="arguments">The arguments for the copy.</param>
+    /// <returns>A copy of this function criteria.</returns>
+    /// <exception cref="ArgumentNullException">arguments is null.</exception>
+    protected internal virtual FunctionCallCriteria CloneWithArguments(BaseCriteria[] arguments)
+    {
+        ArgumentNullException.ThrowIfNull(arguments);
+
+        var clone = (FunctionCallCriteria)MemberwiseClone();
+        clone.arguments = arguments;
+        return clone;
+    }
 
     /// <inheritdoc/>
     public override void ToString(StringBuilder sb, IQueryWithParams query)

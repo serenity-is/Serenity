@@ -167,4 +167,50 @@ public class JoinAliasLocator
 
         return sb.ToString();
     }
+
+    /// <summary>
+    /// Replaces aliases in the criteria tree while preserving its structure.
+    /// </summary>
+    /// <param name="criteria">The criteria.</param>
+    /// <param name="replace">The alias replacement function.</param>
+    /// <returns>The criteria with aliases replaced.</returns>
+    /// <exception cref="ArgumentNullException">criteria or replace is null.</exception>
+    public static BaseCriteria ReplaceAliases(BaseCriteria criteria, Func<string, string> replace)
+    {
+        ArgumentNullException.ThrowIfNull(criteria);
+        ArgumentNullException.ThrowIfNull(replace);
+
+        return new CriteriaAliasReplacer(replace).Rewrite(criteria);
+    }
+
+    private sealed class CriteriaAliasReplacer(Func<string, string> replace) : BaseCriteriaVisitor
+    {
+        public BaseCriteria Rewrite(BaseCriteria criteria)
+        {
+            return Visit(criteria)!;
+        }
+
+        protected override BaseCriteria VisitCriteria(Criteria criteria)
+        {
+            var expression = JoinAliasLocator.ReplaceAliases(criteria.Expression, replace);
+            return expression == criteria.Expression ? criteria : new Criteria(expression);
+        }
+
+        protected override BaseCriteria VisitFunctionCall(FunctionCallCriteria criteria)
+        {
+            var arguments = criteria.Arguments;
+            BaseCriteria[]? rewrittenArguments = null;
+            for (var i = 0; i < arguments.Length; i++)
+            {
+                var argument = Visit(arguments[i]);
+                if (!ReferenceEquals(argument, arguments[i]))
+                {
+                    rewrittenArguments ??= arguments.ToArray();
+                    rewrittenArguments[i] = argument!;
+                }
+            }
+
+            return rewrittenArguments is null ? criteria : criteria.CloneWithArguments(rewrittenArguments);
+        }
+    }
 }
