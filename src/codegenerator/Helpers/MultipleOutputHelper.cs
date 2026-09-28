@@ -83,7 +83,9 @@ public class MultipleOutputHelper
             }).ToArray();
             var generatedNonCoreFileCount = generated.Count(file => !coreFiles.Contains(file));
 
-            // A single stale type file is a likely intentional edit; multiple missing files may indicate partial discovery.
+            // Allow one stale type file to be deleted when other non-core types were generated, so intentional
+            // removals and renames are reflected during design-time builds. Multiple stale files or no generated
+            // non-core types may indicate incomplete discovery, so preserve existing outputs in those cases.
             if (nonCoreFilesToDelete.Length != 1 || generatedNonCoreFileCount == 0)
                 return;
 
