@@ -5,6 +5,34 @@ using Serenity.Data.Mapping;
 public class EntitySqlQueryProjection_Tests
 {
     [Fact]
+    public void FluentJoinOverloadsBuildCriteriaWithAllocatedAliases()
+    {
+        var query = new SqlQuery().From(SelfNavigationRow.Fields, out var sourceFields);
+
+        var leftResult = query.LeftJoin(SelfNavigationRow.Fields,
+            fields => new Criteria(sourceFields.ID) == new Criteria(fields.ManagerID),
+            out var leftFields);
+        var rightResult = query.RightJoin(SelfNavigationRow.Fields,
+            fields => new Criteria(sourceFields.ID) == new Criteria(fields.MentorID),
+            out var rightFields);
+        var innerResult = query.InnerJoin(SelfNavigationRow.Fields,
+            fields => new Criteria(sourceFields.ID) == new Criteria(fields.ID),
+            out var innerFields);
+
+        Assert.Same(query, leftResult);
+        Assert.Same(query, rightResult);
+        Assert.Same(query, innerResult);
+        Assert.Equal("T1", leftFields.AliasName);
+        Assert.Equal("T2", rightFields.AliasName);
+        Assert.Equal("T3", innerFields.AliasName);
+
+        var sql = query.ToString();
+        Assert.Contains("LEFT JOIN [SelfNavigation] T1 ON (T0.[ID] = T1.[ManagerID])", sql);
+        Assert.Contains("RIGHT JOIN [SelfNavigation] T2 ON (T0.[ID] = T2.[MentorID])", sql);
+        Assert.Contains("INNER JOIN [SelfNavigation] T3 ON (T0.[ID] = T3.[ID])", sql);
+    }
+
+    [Fact]
     public void ListProjectedMapsFlatAnonymousProjectionWithoutIntoFieldTargets()
     {
         string? commandText = null;

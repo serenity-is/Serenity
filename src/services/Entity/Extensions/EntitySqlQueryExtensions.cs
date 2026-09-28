@@ -5,7 +5,7 @@ namespace Serenity.Data;
 /// <summary>
 ///   Extensions for <see cref="SqlQuery"/> related to entities.
 /// </summary>
-public static class EntitySqlQueryExtensions
+public static partial class EntitySqlQueryExtensions
 {
     private static TFields AdjustAlias<TFields>(SqlQuery query, TFields fields)
         where TFields : RowFieldsBase
