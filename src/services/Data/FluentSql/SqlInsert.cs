@@ -300,7 +300,7 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
             keyValues.Add(keyValue);
         }
 
-        var keyFieldsSet = new HashSet<string>(keyFieldList);
+        var keyFieldsSet = new HashSet<string>(keyFieldList, StringComparer.OrdinalIgnoreCase);
         var nonKeyFields = new List<string>();
         var nonKeyValues = new List<string>();
         for (int i = 0; i < fieldCount; i++)

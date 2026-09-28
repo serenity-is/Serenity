@@ -140,6 +140,23 @@ public class SqlInsert_Upsert_Tests
     }
 
     [Fact]
+    public void FormatUpsert_MatchesKeyFieldsCaseInsensitively()
+    {
+        var sql = SqlInsert.FormatUpsert("T",
+            [new("UserId", "@p1"), new("Name", "@p2")], ["userid"], SqliteDialect.Instance);
+
+        Assert.Equal(
+            Normalize.Sql(
+                """
+                INSERT INTO [T] ([UserId], [Name])
+                VALUES (@p1, @p2)
+                ON CONFLICT ([userid])
+                DO UPDATE SET [Name] = excluded.[Name]
+                """),
+            Normalize.Sql(sql));
+    }
+
+    [Fact]
     public void FormatUpsert_ThrowsArgumentNullException_ForNullOrEmptyTable()
     {
         Assert.Throws<ArgumentNullException>(() =>
