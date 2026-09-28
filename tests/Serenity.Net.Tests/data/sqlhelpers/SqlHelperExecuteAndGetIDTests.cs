@@ -97,6 +97,24 @@ public class SqlHelperExecuteAndGetIDTests
     }
 
     [Fact]
+    public void ExecuteAndGetID_WithClonedInsertAndReturningIdentityDialect_ExecutesReturningCommand()
+    {
+        using var connection = new MockDbConnection { Dialect = PostgresDialect.Instance }
+            .OnDbCommandExecuteNonQuery(cmd =>
+            {
+                cmd.Parameters["Id"].Value = 1L;
+                return 1;
+            });
+
+        var query = new SqlInsert("Table").SetTo("X", "1").IdentityColumn("Id").Clone();
+
+        var result = query.ExecuteAndGetID(connection);
+
+        Assert.Equal(1, result);
+        Assert.Equal(1, connection.DbCommandExecuteNonQueryCallCount);
+    }
+
+    [Fact]
     public void ExecuteAndGetID_WithReturningIdentityDialect_MissingIdentityColumn_Throws()
     {
         using var connection = new MockDbConnection { Dialect = PostgresDialect.Instance }

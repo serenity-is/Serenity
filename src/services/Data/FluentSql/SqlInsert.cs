@@ -139,6 +139,10 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
     {
         SqlInsert clone = new(tableName);
         clone.fieldExpressions.AddRange(fieldExpressions);
+        clone.identityColumn = identityColumn;
+        clone.dialect = dialect;
+        clone.dialectOverridden = dialectOverridden;
+        clone.nextAutoParam = nextAutoParam;
         CloneParams(clone);
         clone.cachedQuery = cachedQuery;
         return clone;

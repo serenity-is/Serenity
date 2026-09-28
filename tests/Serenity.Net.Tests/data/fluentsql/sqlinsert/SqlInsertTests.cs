@@ -85,6 +85,37 @@ public class SqlInsertTests
     }
 
     [Fact]
+    public void Clone_Copies_AutoParameterCounter()
+    {
+        var insert = new SqlInsert("T");
+        var first = insert.AddParam(1);
+        insert.SetTo("A", first.Name);
+
+        var clone = insert.Clone();
+        var second = clone.AddParam(2);
+
+        Assert.Equal("@p2", second.Name);
+        Assert.Equal(2, clone.ParamCount);
+        Assert.Equal(1, insert.ParamCount);
+    }
+
+    [Fact]
+    public void Clone_Copies_Dialect_For_RegeneratedQuery()
+    {
+        var insert = new SqlInsert("T")
+            .Dialect(PostgresDialect.Instance)
+            .SetTo("A", "1");
+        _ = insert.ToString();
+
+        var clone = insert.Clone().SetTo("B", "2");
+
+        Assert.Same(PostgresDialect.Instance, clone.Dialect());
+        Assert.True(clone.IsDialectOverridden);
+        Assert.Equal(SqlInsert.Format("T", clone.GetFieldExpressions(), PostgresDialect.Instance),
+            clone.ToString());
+    }
+
+    [Fact]
     public void ToString_Uses_Cache()
     {
         var insert = new SqlInsert("T").SetTo("A", "1");
