@@ -50,7 +50,7 @@ public static partial class EntitySqlQueryExtensions
 				throw new InvalidOperationException($"{fieldDescription} must specify a foreign table.");
 			var foreignField = foreignKeyField.ForeignField ??
 				throw new InvalidOperationException($"{fieldDescription} must specify a foreign field.");
-			onCriteria = new Criteria(alias, foreignField) == new Criteria(foreignKeyField);
+			onCriteria = new Criteria(alias, foreignField) == foreignKeyField;
 		}
 
 		return addJoin((IAlias)aliased, onCriteria);

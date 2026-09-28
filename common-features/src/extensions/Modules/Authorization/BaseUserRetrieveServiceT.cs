@@ -75,7 +75,7 @@ public abstract class BaseUserRetrieveService<TRow>(ITwoLevelCache cache, ISqlCo
         idField ??= new TRow().GetIdField();
         using var connection = sqlConnections.NewFor<TRow>();
 
-        return LoadByCriteria(connection, new Criteria(idField) == 
+        return LoadByCriteria(connection, idField == 
             new ValueCriteria(idField.ConvertValue(id, CultureInfo.InvariantCulture)));
     }
 
@@ -88,7 +88,7 @@ public abstract class BaseUserRetrieveService<TRow>(ITwoLevelCache cache, ISqlCo
         nameField ??= new TRow().NameField!;
         using var connection = sqlConnections.NewFor<TRow>();
 
-        return LoadByCriteria(connection, new Criteria(nameField) ==
+        return LoadByCriteria(connection, nameField == 
             new ValueCriteria(nameField.ConvertValue(username, CultureInfo.InvariantCulture)));
     }
 }

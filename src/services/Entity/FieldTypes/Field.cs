@@ -27,7 +27,7 @@ public abstract partial class Field : IFieldWithJoinInfo
     internal SelectLevel minSelectLevel;
     internal int naturalOrder;
     internal string? textualField;
-    private Criteria? criteria;
+    internal Criteria? criteria;
     internal string? readPermission;
     internal string? insertPermission;
     internal string? updatePermission;

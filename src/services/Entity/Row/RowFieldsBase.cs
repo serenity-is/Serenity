@@ -536,7 +536,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins, IHas
                 if (leftJoin != null)
                 {
                     field.ForeignJoinAlias = new LeftJoin(joins, field.ForeignTable!, leftJoin.Alias,
-                        new Criteria(leftJoin.Alias, field.ForeignField!) == new Criteria(field))
+                        new Criteria(leftJoin.Alias, field.ForeignField!) == field)
                     {
                         RowType = (foreignKey is UserIdJoinKeyAttribute ? userEntityOptions?.RowType : null) ?? foreignKey?.RowType
                     };
@@ -545,7 +545,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins, IHas
                 if (innerJoin != null)
                 {
                     field.ForeignJoinAlias = new InnerJoin(joins, field.ForeignTable!, innerJoin.Alias,
-                        new Criteria(innerJoin.Alias, field.ForeignField!) == new Criteria(field))
+                        new Criteria(innerJoin.Alias, field.ForeignField!) == field)
                     {
                         RowType = (foreignKey is UserIdJoinKeyAttribute ? userEntityOptions?.RowType : null) ?? foreignKey?.RowType
                     };
@@ -615,7 +615,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins, IHas
                         if (bestMatch is LeftJoinAttribute lja)
                         {
                             _ = new LeftJoin(joins, lja.ToTable!, lja.Alias,
-                                new Criteria(lja.Alias, lja.OnCriteria!) == new Criteria(field))
+                                new Criteria(lja.Alias, lja.OnCriteria!) == field)
                             {
                                 RowType = lja.RowType
                             };
@@ -623,7 +623,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins, IHas
                         else if (bestMatch is InnerJoinAttribute ija)
                         {
                             _ = new InnerJoin(joins, ija.ToTable!, ija.Alias,
-                                new Criteria(ija.Alias, ija.OnCriteria!) == new Criteria(field))
+                                new Criteria(ija.Alias, ija.OnCriteria!) == field)
                             {
                                 RowType = ija.RowType
                             };
@@ -1287,6 +1287,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins, IHas
         foreach (var field in this)
         {
             field.expression = mapExpression(field.expression);
+            field.criteria = null;
 
             if (field.referencedAliases != null && field.ReferencedAliases!.Count > 0)
             {

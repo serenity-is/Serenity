@@ -41,7 +41,7 @@ public static class EntityConnectionExtensions
         var row = new TRow() { TrackWithChecks = true };
         var query = new SqlQuery().From(row)
             .SelectTableFields()
-            .Where(new Criteria(row.GetIdField()) == new ValueCriteria(id));
+            .Where(row.GetIdField() == new ValueCriteria(id));
 
         if (connection is IRowOperationInterceptor interceptor &&
             interceptor.FindRow(new InterceptFindRowArgs(typeof(TRow), id, query, ByIdOrSingle: true)) is { HasValue: true } intres)
@@ -90,7 +90,7 @@ public static class EntityConnectionExtensions
         ArgumentNullException.ThrowIfNull(editQuery);
         var row = new TRow() { TrackWithChecks = true };
         var query = new SqlQuery().From(row)
-            .Where(new Criteria(row.GetIdField()) == new ValueCriteria(id));
+            .Where(row.GetIdField() == new ValueCriteria(id));
 
         editQuery(query);
 
@@ -141,7 +141,7 @@ public static class EntityConnectionExtensions
         var row = new TRow() { TrackWithChecks = true };
         var query = new SqlQuery().From(row)
                 .SelectTableFields()
-                .Where(new Criteria(row.GetIdField()) == new ValueCriteria(id));
+            .Where(row.GetIdField() == new ValueCriteria(id));
 
         if (connection is IRowOperationInterceptor interceptor &&
             await interceptor.FindRowAsync(new InterceptFindRowArgs(typeof(TRow), id, query, ByIdOrSingle: true)
@@ -193,7 +193,7 @@ public static class EntityConnectionExtensions
         ArgumentNullException.ThrowIfNull(editQuery);
         var row = new TRow() { TrackWithChecks = true };
         var query = new SqlQuery().From(row)
-            .Where(new Criteria(row.GetIdField()) == new ValueCriteria(id));
+            .Where(row.GetIdField() == new ValueCriteria(id));
 
         editQuery(query);
 
@@ -666,7 +666,7 @@ public static class EntityConnectionExtensions
         var query = new SqlQuery()
                 .From(row)
                 .Select("1")
-                .Where(new Criteria(row.GetIdField()) == new ValueCriteria(id));
+            .Where(row.GetIdField() == new ValueCriteria(id));
 
         if (connection is IRowOperationInterceptor interceptor &&
             interceptor.FindRow(new InterceptFindRowArgs(typeof(TRow), id, query, ByIdOrSingle: false)) is { HasValue: true } intres)
@@ -690,7 +690,7 @@ public static class EntityConnectionExtensions
         var query = new SqlQuery()
                 .From(row)
                 .Select("1")
-                .Where(new Criteria(row.GetIdField()) == new ValueCriteria(id));
+            .Where(row.GetIdField() == new ValueCriteria(id));
 
         if (connection is IRowOperationInterceptor interceptor &&
             await interceptor.FindRowAsync(new InterceptFindRowArgs(typeof(TRow), id, query, ByIdOrSingle: false)

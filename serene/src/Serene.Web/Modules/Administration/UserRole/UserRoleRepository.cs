@@ -1,12 +1,10 @@
-﻿using System.Data;
+using System.Data;
 using MyRow = Serene.Administration.UserRoleRow;
 
 namespace Serene.Administration.Repositories;
 
 public class UserRoleRepository(IRequestContext context) : BaseRepository(context)
 {
-    private static MyRow.RowFields Fld { get { return MyRow.Fields; } }
-
     public SaveResponse Update(IUnitOfWork uow, UserRoleUpdateRequest request)
     {
         ArgumentNullException.ThrowIfNull(request);
@@ -22,6 +20,8 @@ public class UserRoleRepository(IRequestContext context) : BaseRepository(contex
 
         var newList = new HashSet<int>([.. request.Roles]);
 
+        var fld = MyRow.Fields;
+
         if (oldList.SetEquals(newList))
             return new SaveResponse();
 
@@ -30,10 +30,10 @@ public class UserRoleRepository(IRequestContext context) : BaseRepository(contex
             if (newList.Contains(k))
                 continue;
 
-            new SqlDelete(Fld.TableName)
+            new SqlDelete(fld.TableName)
                 .Where(
-                    new Criteria(Fld.UserId) == userID &
-                    new Criteria(Fld.RoleId) == k)
+                    fld.UserId == userID &
+                    fld.RoleId == k)
                 .Execute(uow.Connection);
         }
 
@@ -49,7 +49,7 @@ public class UserRoleRepository(IRequestContext context) : BaseRepository(contex
             });
         }
 
-        Cache.InvalidateOnCommit(uow, Fld);
+        Cache.InvalidateOnCommit(uow, fld);
         Cache.InvalidateOnCommit(uow, UserPermissionRow.Fields);
 
         return new SaveResponse();
@@ -57,22 +57,22 @@ public class UserRoleRepository(IRequestContext context) : BaseRepository(contex
 
     private List<MyRow> GetExisting(IDbConnection connection, int userId)
     {
+        var fld = MyRow.Fields;
         return connection.List<MyRow>(q =>
         {
-            q.Select(Fld.UserRoleId, Fld.RoleId)
-                .Where(new Criteria(Fld.UserId) == userId);
+            q.Select(fld.UserRoleId, fld.RoleId)
+                .Where(fld.UserId == userId);
         });
     }
 
     public UserRoleListResponse List(IDbConnection connection, UserRoleListRequest request)
     {
         ArgumentNullException.ThrowIfNull(request);
-        if (request.UserID is null)
-            throw new ArgumentNullException(nameof(request.UserID));
 
         var response = new UserRoleListResponse
         {
-            Entities = [.. GetExisting(connection, request.UserID.Value).Select(x => x.RoleId!.Value)]
+            Entities = [.. GetExisting(connection, ArgumentChecks.NotNull(request.UserID))
+                .Select(x => x.RoleId!.Value)]
         };
 
         return response;

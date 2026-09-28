@@ -10,13 +10,13 @@ public class EntitySqlQueryProjection_Tests
         var query = new SqlQuery().From(SelfNavigationRow.Fields, out var sourceFields);
 
         var leftResult = query.LeftJoin(SelfNavigationRow.Fields,
-            fields => new Criteria(sourceFields.ID) == new Criteria(fields.ManagerID),
+            fields => sourceFields.ID == fields.ManagerID,
             out var leftFields);
         var rightResult = query.RightJoin(SelfNavigationRow.Fields,
-            fields => new Criteria(sourceFields.ID) == new Criteria(fields.MentorID),
+            fields => sourceFields.ID == fields.MentorID,
             out var rightFields);
         var innerResult = query.InnerJoin(SelfNavigationRow.Fields,
-            fields => new Criteria(sourceFields.ID) == new Criteria(fields.ID),
+            fields => sourceFields.ID == fields.ID,
             out var innerFields);
 
         Assert.Same(query, leftResult);

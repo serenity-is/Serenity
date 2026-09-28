@@ -6,14 +6,13 @@ namespace Serene.Administration.Repositories;
 
 public class UserPermissionRepository(IRequestContext context) : BaseRepository(context)
 {
-    private static MyRow.RowFields Fld { get { return MyRow.Fields; } }
-
     public SaveResponse Update(IUnitOfWork uow, UserPermissionUpdateRequest request)
     {
         ArgumentNullException.ThrowIfNull(request);
 
         var userID = ArgumentChecks.NotNull(request.UserID);
         var oldList = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+        var fld = MyRow.Fields;
         foreach (var p in GetExisting(uow.Connection, userID))
             oldList[p.PermissionKey!] = p.Granted!.Value;
 
@@ -30,10 +29,10 @@ public class UserPermissionRepository(IRequestContext context) : BaseRepository(
             if (newList.ContainsKey(k))
                 continue;
 
-            new SqlDelete(Fld.TableName)
+            new SqlDelete(fld.TableName)
                 .Where(
-                    new Criteria(Fld.UserId) == userID &
-                    new Criteria(Fld.PermissionKey) == k)
+                    fld.UserId == userID &
+                    fld.PermissionKey == k)
                 .Execute(uow.Connection);
         }
 
@@ -50,26 +49,27 @@ public class UserPermissionRepository(IRequestContext context) : BaseRepository(
             }
             else if (value != newList[k])
             {
-                new SqlUpdate(Fld.TableName)
+                new SqlUpdate(fld.TableName)
                     .Where(
-                        Fld.UserId == userID &
-                        Fld.PermissionKey == k)
-                    .Set(Fld.Granted, newList[k])
+                        fld.UserId == userID &
+                        fld.PermissionKey == k)
+                    .Set(fld.Granted, newList[k])
                     .Execute(uow.Connection);
             }
         }
 
-        Cache.InvalidateOnCommit(uow, Fld);
+        Cache.InvalidateOnCommit(uow, fld);
 
         return new SaveResponse();
     }
 
     private static List<MyRow> GetExisting(IDbConnection connection, int userId)
     {
+        var fld = MyRow.Fields;
         return connection.List<MyRow>(q =>
         {
-            q.Select(Fld.UserPermissionId, Fld.PermissionKey, Fld.Granted)
-                .Where(new Criteria(Fld.UserId) == userId);
+            q.Select(fld.UserPermissionId, fld.PermissionKey, fld.Granted)
+                .Where(fld.UserId == userId);
         });
     }
 

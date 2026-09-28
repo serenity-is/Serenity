@@ -73,8 +73,8 @@ public class ValidateParentBehavior(IRowTypeRegistry rowTypeRegistry, ITextLocal
             return false;
 
         tableName = foreignRow.Table;
-        criteria = new Criteria(foreignRow.GetIdField()) == new ValueCriteria(parentId) &
-            new Criteria(iar.IsActiveField) < 0;
+        criteria = foreignRow.GetIdField() == new ValueCriteria(parentId) &
+            iar.IsActiveField < 0;
 
         return true;
     }

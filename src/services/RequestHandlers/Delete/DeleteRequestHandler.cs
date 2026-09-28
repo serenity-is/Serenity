@@ -184,7 +184,7 @@ public class DeleteRequestHandler<TRow, TDeleteRequest, TDeleteResponse> :
                                 deleteLogRow.DeleteDateField.DateTimeKind))
                     .Set(deleteLogRow.DeleteUserIdField, User?.GetIdentifier().TryParseID())
                     .WhereEqual(idField, id)
-                    .Where(new Criteria(deleteLogRow.DeleteUserIdField).IsNull());
+                    .Where(deleteLogRow.DeleteUserIdField.IsNull());
 
                 InvokeDeleteAction(() =>
                 {

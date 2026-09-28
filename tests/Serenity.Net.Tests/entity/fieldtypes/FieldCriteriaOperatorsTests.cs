@@ -56,6 +56,7 @@ public class FieldCriteriaOperatorsTests
     {
         Field field = f.AInt32;
 
+        Assert.Equal("(x = T0.[AInt32])", (new Criteria("x") == field).ToString());
         AssertOp(field == new Criteria("x"), "=");
         AssertOp(field == new DateTime(2020, 1, 1), "=");
         AssertOp(field == 5.5m, "=");
@@ -72,6 +73,7 @@ public class FieldCriteriaOperatorsTests
     {
         Field field = f.AInt32;
 
+        Assert.Equal("(x != T0.[AInt32])", (new Criteria("x") != field).ToString());
         AssertOp(field != new Criteria("x"), "!=");
         AssertOp(field != new DateTime(2020, 1, 1), "!=");
         AssertOp(field != 5.5m, "!=");
@@ -159,6 +161,18 @@ public class FieldCriteriaOperatorsTests
         Assert.Equal($"({self} <= {other})", (field <= field2).ToString());
         Assert.Equal($"({self} > {other})", (field > field2).ToString());
         Assert.Equal($"({self} >= {other})", (field >= field2).ToString());
+    }
+
+    [Fact]
+    public void FieldComparisons_ThrowArgumentNullException_ForNullFields()
+    {
+        Field field = f.AInt32;
+        Field nullField = null!;
+
+        Assert.Throws<ArgumentNullException>(() => _ = nullField == field);
+        Assert.Throws<ArgumentNullException>(() => _ = field == nullField);
+        Assert.Throws<ArgumentNullException>(() => _ = nullField < field);
+        Assert.Throws<ArgumentNullException>(() => _ = field < nullField);
     }
 
     [Fact]

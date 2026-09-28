@@ -117,7 +117,21 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator ==(Field field, BaseCriteria criteria)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria == criteria;
+    }
+
+    /// <summary>
+    /// Implements the operator ==.
+    /// </summary>
+    /// <param name="criteria">The criteria.</param>
+    /// <param name="field">The field.</param>
+    /// <returns>The result of the operator.</returns>
+    public static BaseCriteria operator ==(BaseCriteria criteria, Field field)
+    {
+        ArgumentNullException.ThrowIfNull(criteria);
+        ArgumentNullException.ThrowIfNull(field);
+        return criteria == field.Criteria;
     }
 
     /// <summary>
@@ -130,6 +144,7 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator ==(Field field, DateTime value)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria == value;
     }
 
@@ -143,6 +158,7 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator ==(Field field, decimal value)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria == value;
     }
 
@@ -156,6 +172,7 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator ==(Field field, double value)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria == value;
     }
 
@@ -169,6 +186,8 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator ==(Field field, Field field2)
     {
+        ArgumentNullException.ThrowIfNull(field);
+        ArgumentNullException.ThrowIfNull(field2);
         return field.Criteria == field2.Criteria;
     }
 
@@ -182,6 +201,7 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator ==(Field field, Guid value)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria == value;
     }
 
@@ -195,6 +215,7 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator ==(Field field, int value)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria == value;
     }
 
@@ -208,6 +229,7 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator ==(Field field, long value)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria == value;
     }
 
@@ -221,6 +243,7 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator ==(Field field, Parameter param)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria == param;
     }
 
@@ -234,6 +257,7 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator ==(Field field, string value)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria == value;
     }
 
@@ -247,7 +271,21 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator !=(Field field, BaseCriteria criteria)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria != criteria;
+    }
+
+    /// <summary>
+    /// Implements the operator !=.
+    /// </summary>
+    /// <param name="criteria">The criteria.</param>
+    /// <param name="field">The field.</param>
+    /// <returns>The result of the operator.</returns>
+    public static BaseCriteria operator !=(BaseCriteria criteria, Field field)
+    {
+        ArgumentNullException.ThrowIfNull(criteria);
+        ArgumentNullException.ThrowIfNull(field);
+        return criteria != field.Criteria;
     }
 
     /// <summary>
@@ -260,6 +298,7 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator !=(Field field, DateTime value)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria != value;
     }
 
@@ -273,6 +312,7 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator !=(Field field, decimal value)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria != value;
     }
 
@@ -286,6 +326,7 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator !=(Field field, double value)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria != value;
     }
 
@@ -299,6 +340,8 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator !=(Field field, Field field2)
     {
+        ArgumentNullException.ThrowIfNull(field);
+        ArgumentNullException.ThrowIfNull(field2);
         return field.Criteria != field2.Criteria;
     }
 
@@ -312,6 +355,7 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator !=(Field field, Guid value)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria != value;
     }
 
@@ -325,6 +369,7 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator !=(Field field, int value)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria != value;
     }
 
@@ -338,6 +383,7 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator !=(Field field, long value)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria != value;
     }
 
@@ -351,6 +397,7 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator !=(Field field, Parameter param)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria != param;
     }
 
@@ -364,6 +411,7 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator !=(Field field, string value)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria != value;
     }
 
@@ -377,6 +425,7 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator <(Field field, BaseCriteria criteria)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria < criteria;
     }
 
@@ -390,6 +439,7 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator <(Field field, DateTime value)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria < value;
     }
 
@@ -403,6 +453,7 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator <(Field field, decimal value)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria < value;
     }
 
@@ -416,6 +467,7 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator <(Field field, double value)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria < value;
     }
 
@@ -429,6 +481,8 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator <(Field field, Field field2)
     {
+        ArgumentNullException.ThrowIfNull(field);
+        ArgumentNullException.ThrowIfNull(field2);
         return field.Criteria < field2.Criteria;
     }
 
@@ -442,6 +496,7 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator <(Field field, Guid value)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria < value;
     }
 
@@ -455,6 +510,7 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator <(Field field, int value)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria < value;
     }
 
@@ -468,6 +524,7 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator <(Field field, long value)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria < value;
     }
 
@@ -481,6 +538,7 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator <(Field field, Parameter param)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria < param;
     }
 
@@ -494,6 +552,7 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator <(Field field, string value)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria < value;
     }
 
@@ -507,6 +566,7 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator <=(Field field, BaseCriteria criteria)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria <= criteria;
     }
 
@@ -520,6 +580,7 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator <=(Field field, DateTime value)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria <= value;
     }
 
@@ -533,6 +594,7 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator <=(Field field, decimal value)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria <= value;
     }
 
@@ -546,6 +608,7 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator <=(Field field, double value)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria <= value;
     }
 
@@ -559,6 +622,8 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator <=(Field field, Field field2)
     {
+        ArgumentNullException.ThrowIfNull(field);
+        ArgumentNullException.ThrowIfNull(field2);
         return field.Criteria <= field2.Criteria;
     }
 
@@ -572,6 +637,7 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator <=(Field field, Guid value)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria <= value;
     }
 
@@ -585,6 +651,7 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator <=(Field field, int value)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria <= value;
     }
 
@@ -598,6 +665,7 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator <=(Field field, long value)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria <= value;
     }
 
@@ -611,6 +679,7 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator <=(Field field, Parameter param)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria <= param;
     }
 
@@ -624,6 +693,7 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator <=(Field field, string value)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria <= value;
     }
 
@@ -637,6 +707,7 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator >(Field field, BaseCriteria criteria)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria > criteria;
     }
 
@@ -650,6 +721,7 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator >(Field field, DateTime value)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria > value;
     }
 
@@ -663,6 +735,7 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator >(Field field, decimal value)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria > value;
     }
 
@@ -676,6 +749,7 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator >(Field field, double value)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria > value;
     }
 
@@ -689,6 +763,8 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator >(Field field, Field field2)
     {
+        ArgumentNullException.ThrowIfNull(field);
+        ArgumentNullException.ThrowIfNull(field2);
         return field.Criteria > field2.Criteria;
     }
 
@@ -702,6 +778,7 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator >(Field field, Guid value)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria > value;
     }
 
@@ -715,6 +792,7 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator >(Field field, int value)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria > value;
     }
 
@@ -728,6 +806,7 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator >(Field field, long value)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria > value;
     }
 
@@ -741,6 +820,7 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator >(Field field, Parameter param)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria > param;
     }
 
@@ -754,6 +834,7 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator >(Field field, string value)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria > value;
     }
 
@@ -767,6 +848,7 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator >=(Field field, BaseCriteria criteria)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria >= criteria;
     }
 
@@ -780,6 +862,7 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator >=(Field field, DateTime value)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria >= value;
     }
 
@@ -793,6 +876,7 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator >=(Field field, decimal value)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria >= value;
     }
 
@@ -806,6 +890,7 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator >=(Field field, double value)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria >= value;
     }
 
@@ -819,6 +904,8 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator >=(Field field, Field field2)
     {
+        ArgumentNullException.ThrowIfNull(field);
+        ArgumentNullException.ThrowIfNull(field2);
         return field.Criteria >= field2.Criteria;
     }
 
@@ -832,6 +919,7 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator >=(Field field, Guid value)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria >= value;
     }
 
@@ -845,6 +933,7 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator >=(Field field, int value)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria >= value;
     }
 
@@ -858,6 +947,7 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator >=(Field field, long value)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria >= value;
     }
 
@@ -871,6 +961,7 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator >=(Field field, Parameter param)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria >= param;
     }
 
@@ -884,6 +975,7 @@ public abstract partial class Field
     /// </returns>
     public static BaseCriteria operator >=(Field field, string value)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return field.Criteria >= value;
     }
 

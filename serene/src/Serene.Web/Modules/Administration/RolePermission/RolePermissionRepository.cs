@@ -5,8 +5,6 @@ namespace Serene.Administration.Repositories;
 
 public class RolePermissionRepository(IRequestContext context) : BaseRepository(context)
 {
-    private static MyRow.RowFields Fld { get { return MyRow.Fields; } }
-
     public SaveResponse Update(IUnitOfWork uow, RolePermissionUpdateRequest request)
     {
         ArgumentNullException.ThrowIfNull(request);
@@ -24,15 +22,16 @@ public class RolePermissionRepository(IRequestContext context) : BaseRepository(
         if (oldList.SetEquals(newList))
             return new SaveResponse();
 
+        var fld = MyRow.Fields;
         foreach (var k in oldList)
         {
             if (newList.Contains(k))
                 continue;
 
-            new SqlDelete(Fld.TableName)
+            new SqlDelete(fld.TableName)
                 .Where(
-                    new Criteria(Fld.RoleId) == roleID &
-                    new Criteria(Fld.PermissionKey) == k)
+                    fld.RoleId == roleID &
+                    fld.PermissionKey == k)
                 .Execute(uow.Connection);
         }
 
@@ -48,7 +47,7 @@ public class RolePermissionRepository(IRequestContext context) : BaseRepository(
             });
         }
 
-        Cache.InvalidateOnCommit(uow, Fld);
+        Cache.InvalidateOnCommit(uow, fld);
         Cache.InvalidateOnCommit(uow, UserPermissionRow.Fields);
 
         return new SaveResponse();
@@ -58,8 +57,9 @@ public class RolePermissionRepository(IRequestContext context) : BaseRepository(
     {
         return connection.List<MyRow>(q =>
         {
-            q.Select(Fld.RolePermissionId, Fld.PermissionKey)
-                .Where(new Criteria(Fld.RoleId) == roleId);
+            var fld = MyRow.Fields;
+            q.Select(fld.RolePermissionId, fld.PermissionKey)
+                .Where(fld.RoleId == roleId);
         });
     }
 

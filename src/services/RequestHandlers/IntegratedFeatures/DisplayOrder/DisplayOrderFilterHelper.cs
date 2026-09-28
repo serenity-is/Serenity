@@ -13,10 +13,10 @@ public class DisplayOrderFilterHelper
     {
         BaseCriteria flt = Criteria.Empty;
         if (row is IParentIdRow parentRow)
-            flt &= new Criteria(parentRow.ParentIdField) == Convert.ToInt64(parentRow.ParentIdField.AsObject(row));
+            flt &= parentRow.ParentIdField == Convert.ToInt64(parentRow.ParentIdField.AsObject(row));
 
         if (row is IIsActiveRow activeRow)
-            flt &= new Criteria(activeRow.IsActiveField) >= 0;
+            flt &= activeRow.IsActiveField >= 0;
         else
         {
             if (row is IIsDeletedRow deletedRow)

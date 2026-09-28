@@ -1,4 +1,4 @@
-﻿namespace Serenity.Demo.Northwind.Lookups;
+namespace Serenity.Demo.Northwind.Lookups;
 
 [LookupScript, NorthwindModule]
 public class SupplierCountryLookup : RowLookupScript<SupplierRow>
@@ -15,8 +15,8 @@ public class SupplierCountryLookup : RowLookupScript<SupplierRow>
         query.Distinct(true)
             .Select(fld.Country)
             .Where(
-                new Criteria(fld.Country) != "" &
-                new Criteria(fld.Country).IsNotNull());
+                fld.Country != "" &
+                fld.Country.IsNotNull());
     }
 
     protected override void ApplyOrder(SqlQuery query)

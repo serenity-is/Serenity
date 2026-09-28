@@ -1,4 +1,4 @@
-﻿namespace Serenity.Demo.Northwind.Lookups;
+namespace Serenity.Demo.Northwind.Lookups;
 
 [LookupScript, NorthwindModule]
 public class CustomerCityLookup : RowLookupScript<CustomerRow>
@@ -16,10 +16,10 @@ public class CustomerCityLookup : RowLookupScript<CustomerRow>
             .Select(fld.Country)
             .Select(fld.City)
             .Where(
-                new Criteria(fld.Country) != "" &
-                new Criteria(fld.Country).IsNotNull() &
-                new Criteria(fld.City) != "" &
-                new Criteria(fld.City).IsNotNull());
+                fld.Country != "" &
+                fld.Country.IsNotNull() &
+                fld.City != "" &
+                fld.City.IsNotNull());
     }
 
     protected override void ApplyOrder(SqlQuery query)

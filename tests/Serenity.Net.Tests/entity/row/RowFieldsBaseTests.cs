@@ -368,6 +368,20 @@ public class RowFieldsBaseTests
     }
 
     [Fact]
+    public void ReplaceAliasWith_Clears_Cached_Field_Criteria()
+    {
+        var f = new PlainRow.RowFields();
+        var criteria = f.Id.Criteria;
+
+        Assert.Equal("T0.[Id]", criteria.ToString());
+
+        f.ReplaceAliasWith("t1");
+
+        Assert.NotSame(criteria, f.Id.Criteria);
+        Assert.Equal("t1.[Id]", f.Id.Criteria.ToString());
+    }
+
+    [Fact]
     public void GetFieldsByAttribute_CustomAttribute()
     {
         var f = new FlaggedRow.RowFields();

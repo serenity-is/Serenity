@@ -145,7 +145,7 @@ public class EntityConnectionExtensions_Async_Tests
             });
 
         var row = await connection.SingleAsync<CityRow>(
-            new Criteria(CityRow.Fields.CityName) == "Lisbon", TestContext.Current.CancellationToken);
+            CityRow.Fields.CityName == "Lisbon", TestContext.Current.CancellationToken);
         Assert.Equal("Lisbon", row.CityName);
     }
 
@@ -156,7 +156,7 @@ public class EntityConnectionExtensions_Async_Tests
             .InterceptExecuteReader(_ => new MockDbDataReader());
 
         Assert.Null(await connection.TrySingleAsync<CityRow>(
-            new Criteria(CityRow.Fields.CityName) == "Zion", TestContext.Current.CancellationToken));
+            CityRow.Fields.CityName == "Zion", TestContext.Current.CancellationToken));
     }
 
     // ---------- FirstAsync / TryFirstAsync ----------
@@ -176,7 +176,7 @@ public class EntityConnectionExtensions_Async_Tests
             });
 
         var row = await connection.FirstAsync<CityRow>(
-            new Criteria(CityRow.Fields.CountryId) == 697, TestContext.Current.CancellationToken);
+            CityRow.Fields.CountryId == 697, TestContext.Current.CancellationToken);
         Assert.Equal("Kyoto", row.CityName);
     }
 
@@ -187,7 +187,7 @@ public class EntityConnectionExtensions_Async_Tests
             .InterceptExecuteReader(_ => new MockDbDataReader());
 
         Assert.Null(await connection.TryFirstAsync<CityRow>(
-            new Criteria(CityRow.Fields.CityName) == "Eldoria", TestContext.Current.CancellationToken));
+            CityRow.Fields.CityName == "Eldoria", TestContext.Current.CancellationToken));
     }
 
     // ---------- CountAsync ----------
@@ -218,7 +218,7 @@ public class EntityConnectionExtensions_Async_Tests
             });
 
         var count = await connection.CountAsync<CityRow>(
-            new Criteria(CityRow.Fields.CountryId) == 444, TestContext.Current.CancellationToken);
+            CityRow.Fields.CountryId == 444, TestContext.Current.CancellationToken);
         Assert.Equal(443, count);
     }
 
@@ -257,7 +257,7 @@ public class EntityConnectionExtensions_Async_Tests
             });
 
         Assert.True(await connection.ExistsAsync<CityRow>(
-            new Criteria(CityRow.Fields.CityName) == "Seoul", TestContext.Current.CancellationToken));
+            CityRow.Fields.CityName == "Seoul", TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -267,7 +267,7 @@ public class EntityConnectionExtensions_Async_Tests
             .InterceptExecuteReader(_ => new MockDbDataReader());
 
         Assert.False(await connection.ExistsAsync<CityRow>(
-            new Criteria(CityRow.Fields.CityName) == "Metropolis", TestContext.Current.CancellationToken));
+            CityRow.Fields.CityName == "Metropolis", TestContext.Current.CancellationToken));
     }
 
     // ---------- ListAsync ----------

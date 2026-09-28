@@ -7,8 +7,6 @@ public interface IUserSaveHandler : ISaveHandlerAsync<MyRow> { }
 public class UserSaveHandler(IRequestContext context, IOptions<EnvironmentSettings> environmentOptions)
     : SaveRequestHandlerAsync<MyRow>(context), IUserSaveHandler
 {
-    private static MyRow.RowFields Fld { get { return MyRow.Fields; } }
-
     private string? password;
     private readonly IOptions<EnvironmentSettings> environmentOptions = environmentOptions ??
         throw new ArgumentNullException(nameof(environmentOptions));
@@ -19,22 +17,24 @@ public class UserSaveHandler(IRequestContext context, IOptions<EnvironmentSettin
 
         if (!Permissions.HasPermission(PermissionKeys.Security))
         {
-            editable.Remove(Fld.Source);
-            editable.Remove(Fld.IsActive);
+            var fld = MyRow.Fields; 
+            editable.Remove(fld.Source);
+            editable.Remove(fld.IsActive);
         }
     }
 
     private static async Task<string> ValidateUsernameAsync(IDbConnection connection, string username,
         int? existingUserId, ITextLocalizer localizer, CancellationToken cancellationToken = default)
     {
-        username = username.TrimToNull() ?? throw DataValidation.RequiredError(Fld.Username, localizer);
+        var fld = MyRow.Fields;
+        username = username.TrimToNull() ?? throw DataValidation.RequiredError(fld.Username, localizer);
         if (!UserHelper.IsValidUsername(username))
             throw new ValidationError("InvalidUsername", "Username",
                 "Usernames should start with letters, only contain letters and numbers!");
 
         var existing = await UserHelper.GetUserAsync(connection,
-            new Criteria(Fld.Username) == username |
-            new Criteria(Fld.Username) == username.Replace('I', 'İ'),
+            fld.Username == username |
+            fld.Username == username.Replace('I', 'İ'),
             cancellationToken).ConfigureAwait(false);
 
         if (existing != null && existingUserId != existing.UserId)
@@ -67,9 +67,10 @@ public class UserSaveHandler(IRequestContext context, IOptions<EnvironmentSettin
             Row.DisplayName = UserHelper.ValidateDisplayName(Row.DisplayName!, Localizer);
         }
 
-        if (IsCreate || (Row.IsAssigned(Fld.Password) && !Row.Password.IsEmptyOrNull()))
+        var fld = MyRow.Fields;
+        if (IsCreate || (Row.IsAssigned(fld.Password) && !Row.Password.IsEmptyOrNull()))
         {
-            if (Row.IsAssigned(Fld.PasswordConfirm) && !Row.PasswordConfirm.IsEmptyOrNull() &&
+            if (Row.IsAssigned(fld.PasswordConfirm) && !Row.PasswordConfirm.IsEmptyOrNull() &&
                 Row.Password != Row.PasswordConfirm)
                 throw new ValidationError("PasswordConfirmMismatch", "PasswordConfirm",
                     ChangePasswordValidationTexts.PasswordConfirmMismatch.ToString(Localizer));
@@ -100,6 +101,6 @@ public class UserSaveHandler(IRequestContext context, IOptions<EnvironmentSettin
     {
         await base.AfterSaveAsync(cancellationToken).ConfigureAwait(false);
 
-        Cache.InvalidateOnCommit(UnitOfWork, Fld);
+        Cache.InvalidateOnCommit(UnitOfWork, MyRow.Fields);
     }
 }

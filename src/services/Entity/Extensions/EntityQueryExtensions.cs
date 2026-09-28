@@ -26,7 +26,7 @@ public static class EntityQueryExtensions
             throw new ArgumentException("row must be in TrackAssignments mode to determine modified fields.");
         foreach (var field in row.Fields)
             if (row.IsAssigned(field))
-                self.Where(new Criteria(field) == self.AddParam(field.AsSqlValue(row)));
+                self.Where(field == self.AddParam(field.AsSqlValue(row)));
 
         return self;
     }

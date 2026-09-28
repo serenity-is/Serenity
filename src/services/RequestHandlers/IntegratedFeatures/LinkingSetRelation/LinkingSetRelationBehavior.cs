@@ -153,7 +153,7 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
                         .From(ls)
                         .Select("1")
                         .Where(
-                            new Criteria(ls[thisKeyField]) == new Criteria(handler.Row.GetIdField()) &
+                            new Criteria(ls[thisKeyField]) == handler.Row.GetIdField() &
                             new Criteria(ls[itemKeyField]).In(values))
                         .ToString()));
             }
