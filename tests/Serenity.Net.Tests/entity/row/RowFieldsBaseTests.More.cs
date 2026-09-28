@@ -1,5 +1,7 @@
 #pragma warning disable CS0169
 
+using System.Threading;
+
 namespace Serenity.Data;
 
 public class RowFieldsBaseTestsMore
@@ -34,6 +36,26 @@ public class RowFieldsBaseTestsMore
 
         private readonly int? _Id;
         public int? Id { get => fields.Id[this]; set => fields.Id[this] = value; }
+    }
+
+    public class ConcurrentInitRow : Row<ConcurrentInitRow.RowFields>
+    {
+        public class RowFields : RowFieldsBase
+        {
+            public Int32Field Id;
+            public int InitializeCount;
+
+            public RowFields()
+            {
+                Id = new Int32Field(this, "Id");
+            }
+
+            protected override void AfterInitialize()
+            {
+                Interlocked.Increment(ref InitializeCount);
+                Thread.Sleep(100);
+            }
+        }
     }
 
     public class ColumnMismatchRow : Row<ColumnMismatchRow.RowFields>
@@ -541,6 +563,30 @@ public class RowFieldsBaseTestsMore
         var created = ((IRow)row).CreateNew();
         Assert.IsType<FactoryCtorRow>(created);
         Assert.Same(fields, ((IRow)created).Fields);
+    }
+
+    [Fact]
+    public async Task Initialize_ConcurrentCalls_InitializesOnce()
+    {
+        const int concurrency = 8;
+        var fields = new ConcurrentInitRow.RowFields();
+        var cancellationToken = TestContext.Current.CancellationToken;
+        using var ready = new CountdownEvent(concurrency);
+        using var start = new ManualResetEventSlim();
+        var tasks = Enumerable.Range(0, concurrency).Select(_ => Task.Run(() =>
+        {
+            ready.Signal();
+            start.Wait(cancellationToken);
+            fields.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect,
+                userEntityOptions: null);
+        })).ToArray();
+
+        var allReady = ready.Wait(TimeSpan.FromSeconds(10), cancellationToken);
+        start.Set();
+        Assert.True(allReady);
+        await Task.WhenAll(tasks);
+
+        Assert.Equal(1, fields.InitializeCount);
     }
 
     [Fact]

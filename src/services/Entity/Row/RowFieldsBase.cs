@@ -267,6 +267,9 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins, IHas
 
         lock (initializeLock)
         {
+            if (isInitialized)
+                return;
+
             this.annotations = annotations;
             this.userEntityOptions = userEntityOptions;
             GetRowFieldsAndProperties(out Dictionary<string, FieldInfo> rowFields, out Dictionary<string, IPropertyInfo> rowProperties);
@@ -710,9 +713,9 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins, IHas
 
             InferTextualFields();
             AfterInitialize();
-        }
 
-        isInitialized = true;
+            isInitialized = true;
+        }
     }
 
     /// <summary>
