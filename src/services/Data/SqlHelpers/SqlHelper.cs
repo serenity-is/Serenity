@@ -715,7 +715,7 @@ public static class SqlHelper
         parameters = MergeQueryParameters(query.Params, parameters);
         if (connection is ISqlOperationInterceptor interceptor &&
             interceptor.ExecuteNonQuery(new InterceptExecuteNonQueryArgs(commandText, parameters,
-                ExpectedRows.One, query, false)) is { HasValue: true } intres)
+                expectedRows, query, false)) is { HasValue: true } intres)
             return (int)intres.Value!;
 
         using var command = NewCommand(connection, commandText, parameters);
@@ -740,7 +740,7 @@ public static class SqlHelper
         parameters = MergeQueryParameters(query.Params, parameters);
         if (connection is ISqlOperationInterceptor interceptor &&
             await interceptor.ExecuteNonQueryAsync(new InterceptExecuteNonQueryArgs(commandText, parameters,
-                ExpectedRows.One, query, false) { CancellationToken = cancellationToken, IsAsync = true }).ConfigureAwait(false) is { HasValue: true } intres)
+                expectedRows, query, false) { CancellationToken = cancellationToken, IsAsync = true }).ConfigureAwait(false) is { HasValue: true } intres)
             return (int)intres.Value!;
 
         using var command = NewCommand(connection, commandText, parameters);
