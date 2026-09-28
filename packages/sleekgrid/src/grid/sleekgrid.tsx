@@ -634,9 +634,9 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         if (row != null) {
             const { frozenBottomFirst, frozenTopLast } = this._refs;
             if (frozenBottomFirst >= 0 && row >= frozenBottomFirst)
-                return band.canvas.top;
-            if (frozenTopLast != Infinity && row <= frozenTopLast)
                 return band.canvas.bottom;
+            if (frozenTopLast != Infinity && row <= frozenTopLast)
+                return band.canvas.top;
         }
         return band.canvas.body;
     }

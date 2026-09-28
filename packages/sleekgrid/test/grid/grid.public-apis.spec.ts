@@ -123,6 +123,8 @@ describe("SleekGrid public API behavior", () => {
         expect(grid.getCanvases().length).toBeGreaterThan(0);
         expect(grid.getViewportNode()).toBeDefined();
         expect(grid.getCanvasNode()).toBeDefined();
+        expect(grid.getCanvasNode(0)).toBeDefined();
+        expect(grid.getViewportNode(0)).toBeDefined();
         expect(grid.getCanvasNode(99)).toBeDefined();
         expect(grid.getScrollBarDimensions().width).toBeGreaterThanOrEqual(0);
         expect(grid.getDisplayedScrollbarDimensions().width).toBeGreaterThanOrEqual(0);
