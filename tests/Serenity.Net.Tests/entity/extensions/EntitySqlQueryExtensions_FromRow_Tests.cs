@@ -13,6 +13,36 @@ public partial class EntitySqlQueryExtensions_FromRow_Tests
     }
 
     [Fact]
+    public void FromCanUseT0AfterCustomAliasedFirstSource()
+    {
+        var query = new SqlQuery().From("Anchor", new Alias("Anchor", "AnchorAlias"));
+
+        query.From(ComplexRow.Fields, out var fields);
+
+        Assert.Equal("T0", fields.AliasName);
+    }
+
+    [Fact]
+    public void FromRecognizesLowercaseT0AsDefaultAliasWhenT0IsOccupied()
+    {
+        var query = new SqlQuery().From("Anchor", new Alias("Anchor", "t0"));
+
+        query.From(ComplexRow.Fields, out var fields);
+
+        Assert.Equal("T1", fields.AliasName);
+    }
+
+    [Fact]
+    public void FromRecognizesLowercaseFieldsAliasAsT0WhenOccupied()
+    {
+        var query = new SqlQuery().From("Anchor", new Alias("Anchor", "T0"));
+
+        query.From(ComplexRow.Fields.As("t0"), out var fields);
+
+        Assert.Equal("T1", fields.AliasName);
+    }
+
+    [Fact]
     public void FromAndSubQueryFromAssignUniqueAliasesAndConfigureChild()
     {
         var query = new SqlQuery().From(ComplexRow.Fields.As("rp"), out var fields);

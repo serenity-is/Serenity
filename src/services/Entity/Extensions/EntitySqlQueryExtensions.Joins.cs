@@ -2,11 +2,12 @@ namespace Serenity.Data;
 
 public static partial class EntitySqlQueryExtensions
 {
-	private static SqlQuery JoinVia<TFields>(SqlQuery query, Field foreignKeyField,
+	private static SqlQuery JoinVia<TFields>(SqlQuery query, TFields fields, Field foreignKeyField,
 		out TFields aliased, Func<IAlias, ICriteria, SqlQuery> addJoin)
 		where TFields : RowFieldsBase
 	{
 		ArgumentNullException.ThrowIfNull(query);
+		ArgumentNullException.ThrowIfNull(fields);
 		ArgumentNullException.ThrowIfNull(foreignKeyField);
 
 		var fieldName = foreignKeyField.PropertyName ?? foreignKeyField.Name;
@@ -25,10 +26,10 @@ public static partial class EntitySqlQueryExtensions
 
 		if (targetRowType != typeof(TFields).DeclaringType)
 			throw new ArgumentException($"{fieldDescription} targets row type '{targetRowType.FullName}', which does not match " +
-				$"the supplied target fields type '{typeof(TFields).FullName}'.", nameof(TFields));
+				$"the supplied target fields type '{typeof(TFields).FullName}'.", nameof(fields));
 
-		var alias = query.AutoAlias();
-		aliased = (TFields)RowFieldsProvider.Current.ResolveWithAlias(typeof(TFields), alias);
+		aliased = AdjustAlias(query, fields);
+		var alias = aliased.AliasName;
 
 		string table;
 		ICriteria onCriteria;
@@ -60,14 +61,15 @@ public static partial class EntitySqlQueryExtensions
 	/// </summary>
 	/// <typeparam name="TFields">The referenced row fields type.</typeparam>
 	/// <param name="query">The query.</param>
+	/// <param name="fields">The referenced row fields, used to infer and validate the target type.</param>
 	/// <param name="foreignKeyField">The foreign key field.</param>
 	/// <param name="aliased">Receives the referenced fields with the alias used by this query.</param>
 	/// <returns>The query itself.</returns>
-	public static SqlQuery LeftJoinVia<TFields>(this SqlQuery query, Field foreignKeyField, out TFields aliased)
+	public static SqlQuery LeftJoinVia<TFields>(this SqlQuery query, TFields fields, Field foreignKeyField, out TFields aliased)
 		where TFields : RowFieldsBase
 	{
 		ArgumentNullException.ThrowIfNull(query);
-		return JoinVia(query, foreignKeyField, out aliased, query.LeftJoin);
+		return JoinVia(query, fields, foreignKeyField, out aliased, query.LeftJoin);
 	}
 
 	/// <summary>
@@ -75,14 +77,15 @@ public static partial class EntitySqlQueryExtensions
 	/// </summary>
 	/// <typeparam name="TFields">The referenced row fields type.</typeparam>
 	/// <param name="query">The query.</param>
+	/// <param name="fields">The referenced row fields, used to infer and validate the target type.</param>
 	/// <param name="foreignKeyField">The foreign key field.</param>
 	/// <param name="aliased">Receives the referenced fields with the alias used by this query.</param>
 	/// <returns>The query itself.</returns>
-	public static SqlQuery RightJoinVia<TFields>(this SqlQuery query, Field foreignKeyField, out TFields aliased)
+	public static SqlQuery RightJoinVia<TFields>(this SqlQuery query, TFields fields, Field foreignKeyField, out TFields aliased)
 		where TFields : RowFieldsBase
 	{
 		ArgumentNullException.ThrowIfNull(query);
-		return JoinVia(query, foreignKeyField, out aliased, query.RightJoin);
+		return JoinVia(query, fields, foreignKeyField, out aliased, query.RightJoin);
 	}
 
 	/// <summary>
@@ -90,14 +93,15 @@ public static partial class EntitySqlQueryExtensions
 	/// </summary>
 	/// <typeparam name="TFields">The referenced row fields type.</typeparam>
 	/// <param name="query">The query.</param>
+	/// <param name="fields">The referenced row fields, used to infer and validate the target type.</param>
 	/// <param name="foreignKeyField">The foreign key field.</param>
 	/// <param name="aliased">Receives the referenced fields with the alias used by this query.</param>
 	/// <returns>The query itself.</returns>
-	public static SqlQuery InnerJoinVia<TFields>(this SqlQuery query, Field foreignKeyField, out TFields aliased)
+	public static SqlQuery InnerJoinVia<TFields>(this SqlQuery query, TFields fields, Field foreignKeyField, out TFields aliased)
 		where TFields : RowFieldsBase
 	{
 		ArgumentNullException.ThrowIfNull(query);
-		return JoinVia(query, foreignKeyField, out aliased, query.InnerJoin);
+		return JoinVia(query, fields, foreignKeyField, out aliased, query.InnerJoin);
 	}
 
 	private static SqlQuery JoinWithFields<TFields>(SqlQuery query, TFields fields,

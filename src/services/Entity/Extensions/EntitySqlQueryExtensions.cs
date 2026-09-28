@@ -7,11 +7,26 @@ namespace Serenity.Data;
 /// </summary>
 public static partial class EntitySqlQueryExtensions
 {
-    private static TFields AdjustAlias<TFields>(SqlQuery query, TFields fields)
+    private static bool IsT0Alias(string? alias)
+    {
+        return string.Equals(alias, "T0", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static TFields AdjustAlias<TFields>(QueryWithParams query, TFields fields)
         where TFields : RowFieldsBase
     {
         ArgumentNullException.ThrowIfNull(fields);
-        if (fields.AliasName is "T0" && query.HasAlias("T0"))
+        if (IsT0Alias(fields.AliasName))
+            fields = fields.As(query.AutoAlias());
+
+        return fields;
+    }
+
+    private static TFields AdjustFromAlias<TFields>(SqlQuery query, TFields fields)
+        where TFields : RowFieldsBase
+    {
+        ArgumentNullException.ThrowIfNull(fields);
+        if (IsT0Alias(fields.AliasName) && query.HasAlias("T0"))
             fields = fields.As(query.AutoAlias());
 
         return fields;
@@ -37,7 +52,7 @@ public static partial class EntitySqlQueryExtensions
         ArgumentNullException.ThrowIfNull(query);
         ArgumentNullException.ThrowIfNull(fields);
 
-        fields = AdjustAlias(query, fields);
+        fields = AdjustFromAlias(query, fields);
         var alias = (IAlias)fields;
 
         ArgumentException.ThrowIfNullOrEmpty(alias.Table);
@@ -70,7 +85,7 @@ public static partial class EntitySqlQueryExtensions
         
         if (entity is IRow row)
         {
-            var fields = AdjustAlias(query, row.Fields);
+            var fields = AdjustFromAlias(query, row.Fields);
             query.From(fields);
         }
         else if (entity is IAlias alias && (alias.Name == "t0" || alias.Name == "T0") && alias.Table == entity.Table)
@@ -95,7 +110,7 @@ public static partial class EntitySqlQueryExtensions
         where TFields : RowFieldsBase
     {
         ArgumentNullException.ThrowIfNull(query);
-        aliased = AdjustAlias(query, fields);
+        aliased = AdjustFromAlias(query, fields);
         query.From(aliased);
         return query;
     }
@@ -133,7 +148,7 @@ public static partial class EntitySqlQueryExtensions
         ArgumentNullException.ThrowIfNull(query);
         ArgumentNullException.ThrowIfNull(row);
         CheckNoIntoRow(query);
-        aliased = AdjustAlias(query, row.Fields);
+        aliased = AdjustFromAlias(query, row.Fields);
         query.From(aliased).Into(row);
         return query;
     }
@@ -174,7 +189,7 @@ public static partial class EntitySqlQueryExtensions
         ArgumentNullException.ThrowIfNull(query);
         ArgumentNullException.ThrowIfNull(row);
         CheckNoIntoRow(query);
-        aliased = alias != null ? row.Fields.As(alias) : AdjustAlias(query, row.Fields);
+        aliased = alias != null ? row.Fields.As(alias) : AdjustFromAlias(query, row.Fields);
         query.From(aliased).Into(row);
         return query;
     }
@@ -194,8 +209,7 @@ public static partial class EntitySqlQueryExtensions
     {
         ArgumentNullException.ThrowIfNull(query);
         ArgumentNullException.ThrowIfNull(fields);
-        if (fields.AliasName is "T0")
-            fields = fields.As(query.AutoAlias());
+        fields = AdjustAlias(query, fields);
         var subquery = query.CreateSubQuery<SqlQuery>();
         subquery.From(fields, out aliased);
         return subquery;
