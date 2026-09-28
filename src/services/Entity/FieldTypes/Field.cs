@@ -276,7 +276,12 @@ public abstract partial class Field : IFieldWithJoinInfo
                             var theJoin = enumerator.Current;
 
                             if (theJoin == "t0" || theJoin == "T0")
-                                flags = flags ^ FieldFlags.Foreign | FieldFlags.Calculated;
+                            {
+                                if (flags.HasFlag(FieldFlags.Foreign))
+                                    flags -= FieldFlags.Foreign;
+
+                                flags |= FieldFlags.Calculated;
+                            }
                             else
                             {
                                 flags |= FieldFlags.Foreign;

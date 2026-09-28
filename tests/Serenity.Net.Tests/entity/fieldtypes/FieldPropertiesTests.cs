@@ -85,4 +85,18 @@ public class FieldPropertiesTests
         Assert.Equal("Complex(x + y)", field.Expression);
         Assert.True(field.Flags.HasFlag(FieldFlags.Calculated));
     }
+
+    [Fact]
+    public void ExpressionSetter_T0CalculatedExpression_IsNotForeign()
+    {
+        var fields = new ComplexRow.RowFields();
+        fields.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect,
+            userEntityOptions: null);
+        var field = fields.BasicExpression;
+
+        field.Expression = "COALESCE(T0.Simple, 0)";
+
+        Assert.True(field.Flags.HasFlag(FieldFlags.Calculated));
+        Assert.False(field.Flags.HasFlag(FieldFlags.Foreign));
+    }
 }
