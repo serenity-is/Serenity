@@ -53,6 +53,30 @@ public class DefaultConnectionStringsTests
     }
 
     [Fact]
+    public void TryGetConnectionString_IsCaseInsensitive()
+    {
+        var settings = Create(new()
+        {
+            [DefaultConnectionAttribute.Key] = Entry()
+        });
+
+        var lower = settings.TryGetConnectionString(DefaultConnectionAttribute.Key.ToLowerInvariant());
+        var upper = settings.TryGetConnectionString(DefaultConnectionAttribute.Key.ToUpperInvariant());
+
+        Assert.NotNull(lower);
+        Assert.Same(lower, upper);
+    }
+
+    [Fact]
+    public void TryGetConnectionString_NullOrEmpty_Throws()
+    {
+        var settings = Create();
+
+        Assert.ThrowsAny<ArgumentException>(() => settings.TryGetConnectionString(null!));
+        Assert.ThrowsAny<ArgumentException>(() => settings.TryGetConnectionString(""));
+    }
+
+    [Fact]
     public void TryGetConnectionString_UsesDialectByName()
     {
         var settings = Create(new()

@@ -19,7 +19,7 @@ public class DefaultConnectionStrings(IOptions<ConnectionStringOptions> options,
     /// <summary>The SQL dialect mapper.</summary>
     protected readonly ISqlDialectMapper sqlDialectMapper = sqlDialectMapper ?? new DefaultSqlDialectMapper();
     /// <summary>The cached dictionary of connection string infos.</summary>
-    protected readonly ConcurrentDictionary<string, ConnectionStringInfo> byKey = new();
+    protected readonly ConcurrentDictionary<string, ConnectionStringInfo> byKey = new(StringComparer.OrdinalIgnoreCase);
     /// <summary>The lazily built connection key fallback map.</summary>
     /// <remarks>
     /// Built on first access via <see cref="GetFallbackMap"/>. A derived implementation can
@@ -27,6 +27,7 @@ public class DefaultConnectionStrings(IOptions<ConnectionStringOptions> options,
     /// <c>null</c> to invalidate it so it is rebuilt on the next access.
     /// </remarks>
     protected Dictionary<string, string>? fallbackMap;
+    private readonly Lock fallbackLock = new();
 
     /// <summary>
     /// Determines the dialect for a connection.
@@ -58,6 +59,8 @@ public class DefaultConnectionStrings(IOptions<ConnectionStringOptions> options,
     /// <returns>The connection string, or <c>null</c> if not found.</returns>
     public virtual IConnectionString? TryGetConnectionString(string connectionKey)
     {
+        ArgumentException.ThrowIfNullOrEmpty(connectionKey);
+
         if (byKey.TryGetValue(connectionKey, out ConnectionStringInfo? info))
             return info;
 
@@ -74,8 +77,7 @@ public class DefaultConnectionStrings(IOptions<ConnectionStringOptions> options,
         info = new ConnectionStringInfo(resolvedKey, entry.ConnectionString, entry.ProviderName,
             DetermineDialect(resolvedKey, entry));
 
-        byKey[resolvedKey] = info;
-        return info;
+        return byKey.GetOrAdd(resolvedKey, info);
     }
 
     /// <summary>
@@ -89,7 +91,7 @@ public class DefaultConnectionStrings(IOptions<ConnectionStringOptions> options,
     /// </remarks>
     public virtual IEnumerable<IConnectionString> ListConnectionStrings()
     {
-        return options.Value.Keys.Select(TryGetConnectionString).OfType<IConnectionString>();
+        return options.Value.Keys.Select(TryGetConnectionString).OfType<IConnectionString>().ToList();
     }
 
     /// <inheritdoc/>
@@ -161,14 +163,20 @@ public class DefaultConnectionStrings(IOptions<ConnectionStringOptions> options,
     /// </summary>
     protected virtual Dictionary<string, string> GetFallbackMap()
     {
-        var map = fallbackMap;
-        if (map is not null)
+        if (fallbackMap is { } map)
             return map;
 
-        map = BuildFallbackMap(typeSource);
-        ApplyConfigFallbacks(map);
-        fallbackMap = map;
-        return fallbackMap;
+        lock (fallbackLock)
+        {
+            map = fallbackMap;
+            if (map is not null)
+                return map;
+
+            map = BuildFallbackMap(typeSource);
+            ApplyConfigFallbacks(map);
+            fallbackMap = map;
+            return map;
+        }
     }
 
     /// <summary>
