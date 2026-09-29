@@ -70,7 +70,21 @@ public class DefaultSqlConnections(IConnectionStrings connectionStrings, IConnec
     protected virtual IDbConnection WrapConnection(IDbConnection connection, string providerName, ISqlDialect dialect)
     {
         if (profiler != null)
-            return new WrappedConnection(profiler.Profile(connection), dialect, loggerFactory?.CreateLogger<ISqlConnections>());
+        {
+            var profiled = profiler.Profile(connection);
+            try
+            {
+                return new WrappedConnection(profiled, dialect, loggerFactory?.CreateLogger<ISqlConnections>());
+            }
+            catch
+            {
+                // Profile() may return a wrapper owning the raw connection;
+                // don't orphan either if the outer wrap fails.
+                if (!ReferenceEquals(profiled, connection))
+                    (profiled as IDisposable)?.Dispose();
+                throw;
+            }
+        }
 
         return new WrappedConnection(connection, dialect, loggerFactory?.CreateLogger<ISqlConnections>());
     }

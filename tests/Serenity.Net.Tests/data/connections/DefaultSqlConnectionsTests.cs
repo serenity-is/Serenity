@@ -55,6 +55,42 @@ public class DefaultSqlConnectionsTests
         }
     }
 
+    private class TrackingProfiledConnection(IDbConnection inner) : MockDbConnection
+    {
+        private readonly IDbConnection inner = inner;
+        public bool IsDisposed { get; private set; }
+
+        protected override void Dispose(bool disposing)
+        {
+            IsDisposed = true;
+            inner.Dispose();
+            base.Dispose(disposing);
+        }
+    }
+
+    private class WrappingProfiler(TrackingProfiledConnection profiled) : IConnectionProfiler
+    {
+        public IDbConnection Profile(IDbConnection connection) => profiled;
+    }
+
+    private class ThrowingOuterWrapConnections(IConnectionStrings connectionStrings) : DefaultSqlConnections(connectionStrings)
+    {
+        protected override IDbConnection WrapConnection(IDbConnection connection, string providerName, ISqlDialect dialect)
+        {
+            var profiled = (profiler ?? throw new InvalidOperationException("no profiler")).Profile(connection);
+            try
+            {
+                throw new InvalidOperationException("outer wrap failed");
+            }
+            catch
+            {
+                if (!ReferenceEquals(profiled, connection))
+                    (profiled as IDisposable)?.Dispose();
+                throw;
+            }
+        }
+    }
+
     private class TrackingProviderFactory(TrackingConnection connection) : DbProviderFactory
     {
         public override DbConnection CreateConnection() => connection;
@@ -174,6 +210,42 @@ public class DefaultSqlConnectionsTests
 
         Assert.Throws<InvalidOperationException>(() => connections.New("cs", provider, SqlServer2012Dialect.Instance));
         Assert.True(tracking.IsDisposed);
+    }
+
+    [Fact]
+    public void New_WhenOuterWrapThrowsAfterProfile_DisposesProfiledConnection()
+    {
+        var tracking = new TrackingConnection();
+        var profiled = new TrackingProfiledConnection(tracking);
+        var provider = "TestProvider_" + Guid.NewGuid().ToString("N");
+        DbProviderFactories.RegisterFactory(provider, new TrackingProviderFactory(tracking));
+        DefaultSqlConnections connections = new ThrowingOuterWrapWithProfiler(new SimpleConnectionStrings(new()
+        {
+            [DefaultConnectionAttribute.Key] = Info(DefaultConnectionAttribute.Key)
+        }), new WrappingProfiler(profiled));
+
+        Assert.Throws<InvalidOperationException>(() => connections.New("cs", provider, SqlServer2012Dialect.Instance));
+        Assert.True(profiled.IsDisposed);
+        Assert.True(tracking.IsDisposed);
+    }
+
+    private class ThrowingOuterWrapWithProfiler(IConnectionStrings connectionStrings, IConnectionProfiler profiler)
+        : DefaultSqlConnections(connectionStrings, profiler)
+    {
+        protected override IDbConnection WrapConnection(IDbConnection connection, string providerName, ISqlDialect dialect)
+        {
+            var profiled = this.profiler!.Profile(connection);
+            try
+            {
+                throw new InvalidOperationException("outer wrap failed");
+            }
+            catch
+            {
+                if (!ReferenceEquals(profiled, connection))
+                    (profiled as IDisposable)?.Dispose();
+                throw;
+            }
+        }
     }
 
     [Fact]
