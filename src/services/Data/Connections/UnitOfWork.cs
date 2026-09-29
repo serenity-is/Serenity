@@ -17,6 +17,7 @@ public class UnitOfWork : IDisposable, IUnitOfWork
     private bool initialized;
     private bool commited;
     private bool disposed;
+    private Exception? initializationError;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UnitOfWork"/> class.
@@ -98,9 +99,24 @@ public class UnitOfWork : IDisposable, IUnitOfWork
         initialized = true;
         UnbindStateChange();
 
-        connection.EnsureOpen();
-        transaction = isolationLevel == IsolationLevel.Unspecified ? connection.BeginTransaction()
-            : connection.BeginTransaction(isolationLevel);
+        try
+        {
+            connection.EnsureOpen();
+            transaction = isolationLevel == IsolationLevel.Unspecified ? connection.BeginTransaction()
+                : connection.BeginTransaction(isolationLevel);
+        }
+        catch (Exception ex)
+        {
+            initializationError = ex;
+            throw;
+        }
+    }
+
+    private void ThrowIfInitializationFailed()
+    {
+        if (initializationError is not null)
+            throw new InvalidOperationException("UnitOfWork initialization failed. See inner exception for details.",
+                initializationError);
     }
 
     /// <summary>
@@ -117,6 +133,7 @@ public class UnitOfWork : IDisposable, IUnitOfWork
                 connection is not DbConnection)
                 Initialize();
 
+            ThrowIfInitializationFailed();
             return connection;
         }
     }
@@ -192,7 +209,8 @@ public class UnitOfWork : IDisposable, IUnitOfWork
     {
         if (commited)
             throw new InvalidOperationException("Transaction is already committed!");
-         
+
+        ThrowIfInitializationFailed();
         transaction?.Commit();
         AfterCommit();
     }
@@ -207,6 +225,7 @@ public class UnitOfWork : IDisposable, IUnitOfWork
         if (commited)
             throw new InvalidOperationException("Transaction is already committed!");
 
+        ThrowIfInitializationFailed();
         if (transaction is DbTransaction dbTransaction)
             await dbTransaction.CommitAsync(cancellationToken).ConfigureAwait(false);
         else

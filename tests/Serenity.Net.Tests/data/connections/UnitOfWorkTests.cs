@@ -452,6 +452,38 @@ public class UnitOfWorkTests
         Assert.Equal(1, connection.Transaction?.CommitCalls);
     }
 
+    private class FailingOpenConnection : UnitOfWorkTestConnection
+    {
+        public Exception OpenError { get; } = new InvalidOperationException("cannot open");
+
+        public override void Open()
+        {
+            throw OpenError;
+        }
+    }
+
+    [Fact]
+    public void Deferred_ConnectionRead_Throws_When_Open_Fails_And_Keeps_Throwing()
+    {
+        using var connection = new FailingOpenConnection();
+        var uow = new UnitOfWork(connection, deferStart: true);
+        var first = Assert.ThrowsAny<Exception>(() => uow.Connection);
+        Assert.Same(connection.OpenError, first.InnerException ?? first);
+        var second = Assert.Throws<InvalidOperationException>(() => uow.Connection);
+        Assert.Same(connection.OpenError, second.InnerException);
+        Assert.True(uow.Initialized);
+    }
+
+    [Fact]
+    public void Deferred_Commit_Throws_When_Initialization_Failed()
+    {
+        using var connection = new FailingOpenConnection();
+        var uow = new UnitOfWork(connection, deferStart: true);
+        Assert.ThrowsAny<Exception>(() => uow.Connection);
+        var ex = Assert.Throws<InvalidOperationException>(uow.Commit);
+        Assert.Same(connection.OpenError, ex.InnerException);
+    }
+
     [Fact]
     public void Commit_DoesNot_Raise_Error_If_DeferStartTrue_AndTransactionNotStarted()
     {
@@ -675,7 +707,7 @@ public class UnitOfWorkTests
 
         public UnitOfWorkTestTransaction Transaction { get; set; }
 
-        public void Open()
+        public virtual void Open()
         {
             if (State == ConnectionState.Open)
                 throw new InvalidOperationException("Open called for an open connection!");
