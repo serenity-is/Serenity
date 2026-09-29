@@ -85,7 +85,15 @@ public class DefaultSqlConnections(IConnectionStrings connectionStrings, IConnec
     public virtual IDbConnection New(string connectionString, string providerName, ISqlDialect dialect)
     {
         var connection = CreateConnection(connectionString, providerName, dialect);
-        return WrapConnection(connection, providerName, dialect);
+        try
+        {
+            return WrapConnection(connection, providerName, dialect);
+        }
+        catch
+        {
+            connection.Dispose();
+            throw;
+        }
     }
 
     /// <summary>

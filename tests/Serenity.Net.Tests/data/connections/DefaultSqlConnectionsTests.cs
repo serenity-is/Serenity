@@ -32,6 +32,34 @@ public class DefaultSqlConnectionsTests
         }
     }
 
+    private class ThrowingProfiler : IConnectionProfiler
+    {
+        public IDbConnection Profile(IDbConnection connection) =>
+            throw new InvalidOperationException("profile failed");
+    }
+
+    private class ThrowingWrapConnections(IConnectionStrings connectionStrings) : DefaultSqlConnections(connectionStrings)
+    {
+        protected override IDbConnection WrapConnection(IDbConnection connection, string providerName, ISqlDialect dialect) =>
+            throw new InvalidOperationException("wrap failed");
+    }
+
+    private class TrackingConnection : MockDbConnection
+    {
+        public bool IsDisposed { get; private set; }
+
+        protected override void Dispose(bool disposing)
+        {
+            IsDisposed = true;
+            base.Dispose(disposing);
+        }
+    }
+
+    private class TrackingProviderFactory(TrackingConnection connection) : DbProviderFactory
+    {
+        public override DbConnection CreateConnection() => connection;
+    }
+
     private class SimpleConnectionStrings(Dictionary<string, IConnectionString> items) : IConnectionStrings
     {
         public IConnectionString? TryGetConnectionString(string connectionKey) =>
@@ -116,6 +144,36 @@ public class DefaultSqlConnectionsTests
         var connections = CreateSubtle();
 
         Assert.Throws<InvalidOperationException>(() => connections.New("cs", provider, SqlServer2012Dialect.Instance));
+    }
+
+    [Fact]
+    public void New_WhenWrapThrows_DisposesRawConnectionAndRethrows()
+    {
+        var tracking = new TrackingConnection();
+        var provider = "TestProvider_" + Guid.NewGuid().ToString("N");
+        DbProviderFactories.RegisterFactory(provider, new TrackingProviderFactory(tracking));
+        var connections = new ThrowingWrapConnections(new SimpleConnectionStrings(new()
+        {
+            [DefaultConnectionAttribute.Key] = Info(DefaultConnectionAttribute.Key)
+        }));
+
+        Assert.Throws<InvalidOperationException>(() => connections.New("cs", provider, SqlServer2012Dialect.Instance));
+        Assert.True(tracking.IsDisposed);
+    }
+
+    [Fact]
+    public void New_WhenProfilerThrows_DisposesRawConnectionAndRethrows()
+    {
+        var tracking = new TrackingConnection();
+        var provider = "TestProvider_" + Guid.NewGuid().ToString("N");
+        DbProviderFactories.RegisterFactory(provider, new TrackingProviderFactory(tracking));
+        var connections = new DefaultSqlConnections(new SimpleConnectionStrings(new()
+        {
+            [DefaultConnectionAttribute.Key] = Info(DefaultConnectionAttribute.Key)
+        }), new ThrowingProfiler());
+
+        Assert.Throws<InvalidOperationException>(() => connections.New("cs", provider, SqlServer2012Dialect.Instance));
+        Assert.True(tracking.IsDisposed);
     }
 
     [Fact]
