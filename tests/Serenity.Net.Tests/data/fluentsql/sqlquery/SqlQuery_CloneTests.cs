@@ -50,6 +50,43 @@ public class SqlQuery_CloneTests
     }
 
     [Fact]
+    public void Clone_DeepClones_And_Reparents_UnionQuery()
+    {
+        var query = new SqlQuery().Select("a").From("t").Union();
+        query.Select("b").From("u");
+        var originalSql = query.ToString();
+
+        var clone = query.Clone();
+        var cloneUnion = (SqlQuery)((ISqlQuery)clone).UnionQuery!;
+        var originalUnion = ((ISqlQuery)query).UnionQuery;
+
+        Assert.NotSame(originalUnion, cloneUnion);
+        Assert.Same(clone, ((ISqlQuery)cloneUnion).Parent);
+
+        cloneUnion.Select("c");
+
+        Assert.Equal(originalSql, query.ToString());
+        Assert.NotEqual(originalSql, clone.ToString());
+        Assert.Contains("a,\nc", clone.ToString());
+    }
+
+    [Fact]
+    public void Clone_FrozenClone_Prevents_UnionQueryMutation_WithoutChangingSource()
+    {
+        var query = new SqlQuery().Select("a").From("t").Union();
+        query.Select("b").From("u");
+        var originalSql = query.ToString();
+
+        var clone = query.Clone();
+        ((IQueryWithParams)clone).Freeze();
+        var cloneUnion = (SqlQuery)((ISqlQuery)clone).UnionQuery!;
+
+        Assert.Throws<InvalidOperationException>(() => cloneUnion.Select("c"));
+        Assert.Equal(originalSql, query.ToString());
+        Assert.Equal(originalSql, clone.ToString());
+    }
+
+    [Fact]
     public void Clone_Copies_Alias_Expressions_And_AliasWithJoins()
     {
         var query = new SqlQuery().From("Base").Select("x")

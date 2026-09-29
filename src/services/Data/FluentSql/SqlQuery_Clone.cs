@@ -28,10 +28,15 @@ public partial class SqlQuery
             intoIndex = intoIndex,
             forXml = forXml,
             forJson = forJson,
-            unionQuery = unionQuery,
             unionType = unionType,
             nextAutoParam = nextAutoParam
         };
+
+        if (unionQuery != null)
+        {
+            clone.unionQuery = unionQuery.Clone();
+            clone.unionQuery.parent = clone;
+        }
 
         Column s;
         for (int i = 0; i < columns.Count; i++)
