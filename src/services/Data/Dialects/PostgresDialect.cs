@@ -33,7 +33,8 @@ public class PostgresDialect : ISqlDialect
     public virtual string DateTimeFormat => "\\'yyyy'-'MM'-'ddTHH':'mm':'ss'.'fff\\'";
 
     /// <inheritdoc/>
-    public virtual bool IsLikeCaseSensitive => false;
+    /// <remarks>PostgreSQL LIKE is case-sensitive (ILIKE is the insensitive variant).</remarks>
+    public virtual bool IsLikeCaseSensitive => true;
 
     /// <inheritdoc/>
     public virtual bool MultipleResultsets => false;
