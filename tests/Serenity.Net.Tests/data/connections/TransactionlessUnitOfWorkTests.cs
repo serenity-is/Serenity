@@ -52,6 +52,31 @@ public class TransactionlessUnitOfWorkTests
     }
 
     [Fact]
+    public void Dispose_AfterCommit_DoesNotRaiseOnRollback()
+    {
+        int commitCalled = 0;
+        int rollbackCalled = 0;
+        var uow = new TransactionlessUnitOfWork(connection);
+        uow.OnCommit += () => commitCalled++;
+        uow.OnRollback += () => rollbackCalled++;
+        uow.Commit();
+        uow.Dispose();
+        Assert.Equal(1, commitCalled);
+        Assert.Equal(0, rollbackCalled);
+    }
+
+    [Fact]
+    public async Task DisposeAsync_AfterCommit_DoesNotRaiseOnRollback()
+    {
+        int rollbackCalled = 0;
+        var uow = new TransactionlessUnitOfWork(connection);
+        uow.OnRollback += () => rollbackCalled++;
+        await uow.CommitAsync(TestContext.Current.CancellationToken);
+        await uow.DisposeAsync();
+        Assert.Equal(0, rollbackCalled);
+    }
+
+    [Fact]
     public void ExposesConnection()
     {
         using var uow = new TransactionlessUnitOfWork(connection);

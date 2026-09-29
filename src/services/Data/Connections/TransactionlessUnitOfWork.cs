@@ -64,6 +64,7 @@ public class TransactionlessUnitOfWork(IDbConnection connection) : IDisposable, 
             throw new InvalidOperationException("Commit is already called!");
 
         commitCalled = true;
+        onRollback = null;
 
         try
         {
