@@ -149,7 +149,7 @@ public class SqlCommandDumperTests
     }
 
     [Fact]
-    public void GetCommandText_ExceptionInParameterValue_WritesExceptionComment()
+    public void GetCommandText_ByteArrayParameter_RendersHex()
     {
         MockDbCommand command = GetCommand();
         command.CommandText = "SELECT 1";
@@ -158,8 +158,26 @@ public class SqlCommandDumperTests
 
         var result = SqlCommandDumper.GetCommandText(command);
 
+        Assert.Contains("0x0102", result, StringComparison.Ordinal);
+        Assert.DoesNotContain("Exception occurred while converting parameter", result, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void GetCommandText_ExceptionInParameterValue_WritesExceptionComment()
+    {
+        MockDbCommand command = GetCommand();
+        command.CommandText = "SELECT 1";
+
+        command.Parameters.Add(new SqlParameter { ParameterName = "@o", DbValue = new ThrowingValue(), SqlDbType = SqlDbType.NVarChar, Size = 10, Direction = ParameterDirection.Input });
+
+        var result = SqlCommandDumper.GetCommandText(command);
+
         Assert.Contains("Exception occurred while converting parameter", result, StringComparison.Ordinal);
-        Assert.Contains("FormatException", result, StringComparison.Ordinal);
+    }
+
+    private sealed class ThrowingValue
+    {
+        public override string ToString() => throw new InvalidOperationException("boom");
     }
 
     public override string ToString() => "SqlCommandDumperTestsCustomValue";

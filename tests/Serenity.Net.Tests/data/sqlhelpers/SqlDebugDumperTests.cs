@@ -79,18 +79,18 @@ public class SqlDebugDumperTests
     }
 
     [Fact]
-    public void Dump_ParameterValueByteArray_ThrowsDueToInvalidH2Format()
+    public void Dump_ParameterValueByteArray_RendersHex()
     {
-        Assert.Throws<FormatException>(() =>
+        Assert.Equal("X = 0x01020a",
             SqlDebugDumper.Dump("X = @p1", MakePrm("@p1", new byte[] { 1, 2, 10 })));
     }
 
     [Fact]
-    public void Dump_ParameterValueMemoryStream_ThrowsDueToInvalidH2Format()
+    public void Dump_ParameterValueMemoryStream_RendersHex()
     {
         var ms = new System.IO.MemoryStream([1, 3]);
 
-        Assert.Throws<FormatException>(() =>
+        Assert.Equal("X = 0x0103",
             SqlDebugDumper.Dump("X = @p1", MakePrm("@p1", ms)));
     }
 

@@ -231,7 +231,7 @@ public class SqlCommandDumper
                         sbCommandText.Append("0x");
                         for (int i = 0; i < data.Length; i++)
                         {
-                            sbCommandText.Append(data[i].ToString("h2"));
+                            sbCommandText.Append(data[i].ToString("x2"));
                         }
                     }
                 }

@@ -82,7 +82,7 @@ public class SqlDebugDumper
         {
             StringBuilder sb = new("0x");
             for (int i = 0; i < data.Length; i++)
-                sb.Append(data[i].ToString("h2"));
+                sb.Append(data[i].ToString("x2"));
             return sb.ToString();
         }
 
