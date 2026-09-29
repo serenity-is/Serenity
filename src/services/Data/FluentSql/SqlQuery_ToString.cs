@@ -9,10 +9,10 @@ public partial class SqlQuery
     ///   Formatted SELECT statement.</returns>
     public override string ToString()
     {
-        return ToString(this, dialect);
+        return cachedToString ??= ToString(this, dialect);
     }
 
-    IEnumerable<Column> ISqlQuery.Columns => columns;
+    IReadOnlyList<Column> ISqlQuery.Columns => columns.AsReadOnly();
     bool ISqlQuery.Distinct => distinct;
     string? ISqlQuery.ForJson => forJson;
     string? ISqlQuery.ForXml => forXml;
@@ -20,7 +20,7 @@ public partial class SqlQuery
     string? ISqlQuery.GroupBy => groupBy?.ToString();
     string? ISqlQuery.Having => having?.ToString();
     bool ISqlQuery.OmitParens => omitParens;
-    IEnumerable<string> ISqlQuery.OrderBy => (IEnumerable<string>?)orderBy ?? [];
+    IReadOnlyList<string> ISqlQuery.OrderBy => orderBy?.AsReadOnly() ?? (IReadOnlyList<string>)[];
     IQueryWithParams? ISqlQuery.Parent => parent;
     int ISqlQuery.Skip => skip;
     int ISqlQuery.Take => take;

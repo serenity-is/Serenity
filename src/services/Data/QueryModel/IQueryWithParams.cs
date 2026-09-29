@@ -26,6 +26,16 @@ public interface IQueryWithParams
     Parameter AutoParam();
 
     /// <summary>
+    /// Gets a value indicating whether parameters have been frozen.
+    /// </summary>
+    bool IsParamsFrozen { get; }
+
+    /// <summary>
+    /// Freezes the query's parameters so they can no longer be added or changed.
+    /// </summary>
+    void FreezeParams();
+
+    /// <summary>
     /// Gets the dialect.
     /// </summary>
     /// <value>
@@ -39,5 +49,5 @@ public interface IQueryWithParams
     /// <value>
     /// The parameters.
     /// </value>
-    IDictionary<string, object?>? Params { get; }
+    IReadOnlyDictionary<string, object?>? Params { get; }
 }

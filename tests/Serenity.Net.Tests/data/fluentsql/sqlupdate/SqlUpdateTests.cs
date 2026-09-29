@@ -203,6 +203,34 @@ public class SqlUpdateTests
     }
 
     [Fact]
+    public void ToString_Caches_And_Invalidates_For_Mutations()
+    {
+        (string Name, Action<SqlUpdate> Mutate)[] mutations =
+        [
+            ("SetTo", update => update.SetTo("B", "2")),
+            ("SetTo interface", update => ((ISetFieldByStatement)update).SetTo("B", "2")),
+            ("SetNull", update => update.SetNull("B")),
+            ("Where", update => update.Where(new Criteria("B") == 2)),
+            ("Dialect", update => update.Dialect(PostgresDialect.Instance))
+        ];
+
+        foreach (var (name, mutate) in mutations)
+        {
+            var update = new SqlUpdate("T").SetTo("A", "1");
+            var first = update.ToString();
+
+            Assert.Same(first, update.ToString());
+
+            mutate(update);
+            var updated = update.ToString();
+
+            Assert.NotSame(first, updated);
+            Assert.Same(updated, update.ToString());
+            Assert.True(updated.Length > 0, $"{name} produced an empty query.");
+        }
+    }
+
+    [Fact]
     public void Format_Formats_Update()
     {
         var pairs = new List<FieldExpressionPair>

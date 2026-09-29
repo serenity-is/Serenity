@@ -13,7 +13,7 @@ public interface ISqlQuery : IQueryWithParams, IChainable
     /// <value>
     /// The columns.
     /// </value>
-    IEnumerable<SqlQuery.Column> Columns { get; }
+    IReadOnlyList<SqlQuery.Column> Columns { get; }
 
     /// <summary>
     /// Gets if to count records.
@@ -58,7 +58,7 @@ public interface ISqlQuery : IQueryWithParams, IChainable
     /// <summary>
     /// Gets order by list.
     /// </summary>
-    IEnumerable<string> OrderBy { get; }
+    IReadOnlyList<string> OrderBy { get; }
 
     /// <summary>
     /// Gets access to parent query if any.

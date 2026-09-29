@@ -27,6 +27,7 @@ public sealed class SqlDelete(string tableName) : QueryWithParams, IFilterableQu
             whereClause.Append(SqlKeywords.And);
         whereClause.Append(sql);
         whereCriteria.Add(criteria);
+        InvalidateToString();
 
         return this;
     }
@@ -46,7 +47,7 @@ public sealed class SqlDelete(string tableName) : QueryWithParams, IFilterableQu
     ///   String representation of the query.</returns>
     public override string ToString()
     {
-        return Format(_tableName, ((IFilterableQuery)this).GetWhereClause(), dialect);
+        return cachedToString ??= Format(_tableName, ((IFilterableQuery)this).GetWhereClause(), dialect);
     }
 
     /// <summary>

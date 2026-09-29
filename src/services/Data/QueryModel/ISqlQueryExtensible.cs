@@ -36,9 +36,9 @@ public interface ISqlQueryExtensible
     /// Gets the columns.
     /// </summary>
     /// <value>
-    /// The columns.
+    /// Read-only view of the columns.
     /// </value>
-    IList<SqlQuery.Column> Columns { get; }
+    IReadOnlyList<SqlQuery.Column> Columns { get; }
 
     /// <summary>
     /// Gets the index of the select into.

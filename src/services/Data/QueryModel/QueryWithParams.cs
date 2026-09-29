@@ -1,5 +1,5 @@
+using System.Collections.ObjectModel;
 using System.Diagnostics;
-using Dictionary = System.Collections.Generic.Dictionary<string, object?>;
 
 namespace Serenity.Data;
 
@@ -10,7 +10,12 @@ namespace Serenity.Data;
 [DebuggerDisplay("{DebugText}")]
 public class QueryWithParams : IQueryWithParams
 {
-    private System.Collections.Generic.Dictionary<string, string>? aliasExpressions;
+    private Dictionary<string, string>? aliasExpressions;
+
+    /// <summary>
+    /// The cached SQL string.
+    /// </summary>
+    protected string? cachedToString;
 
     /// <summary>
     /// The dialect.
@@ -30,7 +35,7 @@ public class QueryWithParams : IQueryWithParams
     /// <summary>
     /// The parameters.
     /// </summary>
-    protected Dictionary? parameters;
+    protected IDictionary<string, object?>? parameters;
 
     /// <summary>
     /// The next auto param counter.
@@ -51,17 +56,16 @@ public class QueryWithParams : IQueryWithParams
     /// <param name="target">The target.</param>
     protected void CloneParams(QueryWithParams target)
     {
-        if (parameters != null)
-        {
-            var p = new Dictionary();
-            foreach (var pair in parameters)
-                p.Add(pair.Key, pair.Value);
+        target.parameters = parameters != null ? new Dictionary<string, object?>(parameters) : null;
+    }
 
-            target.parameters = p;
-        }
-        else {
-            target.parameters = null;
-        }
+    /// <summary>
+    /// Invalidates this query's cached SQL and that of its parent query.
+    /// </summary>
+    protected void InvalidateToString()
+    {
+        cachedToString = null;
+        parent?.InvalidateToString();
     }
 
     /// <summary>
@@ -77,9 +81,10 @@ public class QueryWithParams : IQueryWithParams
             return;
         }
 
-        parameters ??= [];
+        if (IsParamsFrozen)
+            throw new InvalidOperationException("Query parameters have been frozen.");
 
-        parameters.Add(name, value);
+        (parameters ??= new Dictionary<string, object?>()).Add(name, value);
     }
 
     /// <summary>
@@ -95,9 +100,10 @@ public class QueryWithParams : IQueryWithParams
             return;
         }
 
-        parameters ??= [];
+        if (IsParamsFrozen)
+            throw new InvalidOperationException("Query parameters have been frozen.");
 
-        parameters[name] = value;
+        (parameters ??= new Dictionary<string, object?>())[name] = value;
     }
 
     /// <summary>
@@ -106,16 +112,21 @@ public class QueryWithParams : IQueryWithParams
     /// <value>
     /// The parameters.
     /// </value>
-    public IDictionary<string, object?>? Params
+    public IReadOnlyDictionary<string, object?>? Params
     {
         get
         {
             if (parent != null)
                 return parent.Params;
 
-            return parameters;
+            return (IReadOnlyDictionary<string, object?>?)parameters;
         }
     }
+
+    /// <summary>
+    /// Gets a value indicating whether parameters have been frozen.
+    /// </summary>
+    public bool IsParamsFrozen => parent?.IsParamsFrozen ?? parameters?.IsReadOnly == true;
 
     /// <summary>
     /// Gets the parameter count.
@@ -159,6 +170,20 @@ public class QueryWithParams : IQueryWithParams
         {
             parent = this
         };
+    }
+
+    void IQueryWithParams.FreezeParams()
+    {
+        if (parent is not null)
+        {
+            ((IQueryWithParams)parent).FreezeParams();
+            return;
+        }
+
+        if (parameters?.IsReadOnly == true)
+            return;
+
+        parameters = (parameters ?? new Dictionary<string, object?>()).AsReadOnly();
     }
 
     /// <summary>
@@ -282,5 +307,5 @@ public class QueryWithParams : IQueryWithParams
     /// <value>
     /// The debug text.
     /// </value>
-    public string? DebugText => SqlDebugDumper.Dump(ToString(), parameters, dialect);
+    public string? DebugText => SqlDebugDumper.Dump(ToString(), Params, dialect);
 }

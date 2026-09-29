@@ -126,6 +126,20 @@ public class SqlInsertTests
     }
 
     [Fact]
+    public void Dialect_Change_Invalidates_ToString_Cache()
+    {
+        var insert = new SqlInsert("T").SetTo("A", "1");
+        var beforeDialectChange = insert.ToString();
+
+        insert.Dialect(PostgresDialect.Instance);
+        var afterDialectChange = insert.ToString();
+
+        Assert.NotSame(beforeDialectChange, afterDialectChange);
+        Assert.Equal(SqlInsert.Format("T", insert.GetFieldExpressions(), PostgresDialect.Instance),
+            afterDialectChange);
+    }
+
+    [Fact]
     public void Dialect_Throws_For_Null()
     {
         Assert.Throws<ArgumentNullException>(() => new SqlInsert("T").Dialect(null!));

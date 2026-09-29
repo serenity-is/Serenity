@@ -1259,7 +1259,13 @@ public abstract class BaseCriteria : ICriteria
             throw new InvalidOperationException("Criteria should not have parameters!");
         }
 
-        public IDictionary<string, object?>? Params => null;
+        public bool IsParamsFrozen => false;
+
+        public void FreezeParams()
+        {
+        }
+
+        public IReadOnlyDictionary<string, object?>? Params => null;
 
         public ISqlDialect Dialect => SqlSettings.DefaultDialect;
     }
@@ -1281,7 +1287,13 @@ public abstract class BaseCriteria : ICriteria
             return new Parameter(next++.IndexParam());
         }
 
-        public IDictionary<string, object?>? Params => null;
+        public bool IsParamsFrozen => false;
+
+        public void FreezeParams()
+        {
+        }
+
+        public IReadOnlyDictionary<string, object?>? Params => null;
 
         public ISqlDialect Dialect => SqlSettings.DefaultDialect;
     }

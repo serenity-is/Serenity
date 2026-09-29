@@ -49,6 +49,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     /// <returns>The query itself.</returns>
     public SqlQuery Distinct(bool distinct)
     {
+        InvalidateToString();
         this.distinct = distinct;
 
         return this;
@@ -61,6 +62,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     /// <returns>The query itself.</returns>
     public SqlQuery ForXml(string forXml)
     {
+        InvalidateToString();
         this.forXml = forXml;
         return this;
     }
@@ -72,6 +74,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     /// <returns>The query itself.</returns>
     public SqlQuery ForJson(string forJson = "AUTO")
     {
+        InvalidateToString();
         this.forJson = forJson;
         return this;
     }
@@ -87,6 +90,8 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     {
         if (string.IsNullOrEmpty(table))
             throw new ArgumentNullException(nameof(table));
+
+        InvalidateToString();
 
         if (from.Length > 0)
             from.Append(", ");
@@ -193,6 +198,8 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
         if (string.IsNullOrEmpty(expression))
             throw new ArgumentNullException(nameof(expression));
 
+        InvalidateToString();
+
         if (groupBy == null || groupBy.Length == 0)
             groupBy = new StringBuilder(expression);
         else
@@ -230,6 +237,8 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
         if (string.IsNullOrEmpty(expression))
             throw new ArgumentNullException(nameof(expression));
 
+        InvalidateToString();
+
         if (having == null)
             having = new StringBuilder(expression);
         else
@@ -253,6 +262,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
         if (desc)
             expression += SqlKeywords.Desc;
 
+        InvalidateToString();
         orderBy ??= [];
 
         orderBy.Add(expression);
@@ -300,6 +310,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
         if (desc)
             expression += SqlKeywords.Desc;
 
+        InvalidateToString();
         orderBy ??= [];
 
         string search = (expression ?? "").Trim();
@@ -334,7 +345,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
         if (string.IsNullOrEmpty(expression))
             throw new ArgumentNullException(nameof(expression));
 
-        columns.Add(new Column(expression, null, intoIndex, null));
+        AddColumn(new Column(expression, null, intoIndex, null));
 
         EnsureJoinsInExpression(expression);
 
@@ -357,7 +368,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
 
         string expression = alias.NameDot + fieldName;
 
-        columns.Add(new Column(expression, null, intoIndex, null));
+        AddColumn(new Column(expression, null, intoIndex, null));
 
         EnsureJoinsInExpression(expression);
 
@@ -379,7 +390,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
         if (string.IsNullOrEmpty(columnName))
             throw new ArgumentNullException(nameof(columnName));
 
-        columns.Add(new Column(expression, columnName, intoIndex, null));
+        AddColumn(new Column(expression, columnName, intoIndex, null));
 
         EnsureJoinsInExpression(expression);
 
@@ -405,7 +416,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
 
         var expression = alias.NameDot + fieldName;
 
-        columns.Add(new Column(expression, columnName, intoIndex, null));
+        AddColumn(new Column(expression, columnName, intoIndex, null));
 
         EnsureJoinsInExpression(expression);
 
@@ -474,6 +485,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     /// <returns>The query itself.</returns>
     public SqlQuery Skip(int skipRows)
     {
+        InvalidateToString();
         skip = skipRows;
         return this;
     }
@@ -504,6 +516,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     /// <returns>The query itself.</returns>
     public SqlQuery Take(int rowCount)
     {
+        InvalidateToString();
         take = rowCount;
         return this;
     }
@@ -520,6 +533,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     /// <returns>The query itself.</returns>
     public SqlQuery Union(SqlUnionType unionType = SqlUnionType.Union)
     {
+        InvalidateToString();
         unionQuery = Clone();
         unionQuery.countRecords = false;
         unionQuery.omitParens = true;
@@ -560,6 +574,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
 
         EnsureJoinsInExpression(criteria.ToStringIgnoreParams());
         var sql = criteria.ToString(this);
+        InvalidateToString();
         if (whereCriteria.Count > 0)
             whereClause.Append(SqlKeywords.And);
         whereClause.Append(sql);
@@ -583,6 +598,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     public SqlQuery Dialect(ISqlDialect dialect)
     {
         this.dialect = dialect ?? throw new ArgumentNullException(nameof(dialect));
+        InvalidateToString();
         dialectOverridden = true;
 
         return this;
@@ -596,6 +612,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     /// <returns>The query itself.</returns>
     public SqlQuery OmitParens(bool value = true)
     {
+        InvalidateToString();
         omitParens = value;
         return this;
     }
@@ -608,12 +625,19 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     public bool CountRecords
     {
         get { return countRecords; }
-        set { countRecords = value; }
+        set
+        {
+            if (countRecords != value)
+            {
+                countRecords = value;
+                InvalidateToString();
+            }
+        }
     }
 
     object? ISqlQueryExtensible.FirstIntoRow => into.Count > 0 ? into[0] : null;
 
-    IList<Column> ISqlQueryExtensible.Columns => columns;
+    IReadOnlyList<Column> ISqlQueryExtensible.Columns => columns.AsReadOnly();
 
     IList<object> ISqlQueryExtensible.IntoRows => into;
 
@@ -624,7 +648,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
         get
         {
             if (aliasWithJoins is null)
-                return Enumerable.Empty<object>();
+                return [];
 
             return aliasWithJoins.Values;
         }
@@ -666,6 +690,12 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
         }
     }
 
+    private void AddColumn(Column column)
+    {
+        columns.Add(column);
+        InvalidateToString();
+    }
+
     /// <summary>
     /// Holds information about a column in SELECT clause.
     /// </summary>
@@ -697,7 +727,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
         public Column(SqlQuery query, string expression, string? columnName, object? intoField)
             : this(expression, columnName, query.intoIndex, intoField)
         {
-            query.columns.Add(this);
+            query.AddColumn(this);
         }
     }
 }

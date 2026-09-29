@@ -989,16 +989,12 @@ public static class SqlHelper
     }
 
     internal static IReadOnlyDictionary<string, object?>? MergeQueryParameters(
-        IDictionary<string, object?>? queryParameters, IReadOnlyDictionary<string, object?>? overrides)
+        IReadOnlyDictionary<string, object?>? queryParameters, IReadOnlyDictionary<string, object?>? overrides)
     {
         if (overrides is null)
-            return queryParameters is IReadOnlyDictionary<string, object?> readOnlyQueryParameters
-                ? readOnlyQueryParameters
-                : queryParameters?.AsReadOnly();
+            return queryParameters;
 
-        var parameters = queryParameters is null
-            ? new Dictionary<string, object?>()
-            : new Dictionary<string, object?>(queryParameters);
+        var parameters = queryParameters is null ? [] : new Dictionary<string, object?>(queryParameters);
 
         foreach (var (name, value) in overrides)
             parameters[name] = value;

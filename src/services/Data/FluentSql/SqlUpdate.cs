@@ -70,6 +70,7 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
             throw new ArgumentNullException(expression);
 
         fieldExpressions.Add(new FieldExpressionPair(field, expression));
+        InvalidateToString();
         return this;
     }
 
@@ -89,6 +90,7 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
             throw new ArgumentNullException(expression);
 
         fieldExpressions.Add(new FieldExpressionPair(field, expression));
+        InvalidateToString();
     }
 
     /// <summary>
@@ -118,6 +120,7 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
             throw new ArgumentNullException(field);
 
         fieldExpressions.Add(new FieldExpressionPair(field, SqlKeywords.Null));
+        InvalidateToString();
         return this;
     }
 
@@ -191,6 +194,7 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
         whereClause.Append(sql);
         whereCriteria.Add(criteria);
         whereConditions.Add(sql);
+        InvalidateToString();
 
         return this;
     }
@@ -205,6 +209,7 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
     {
         this.dialect = dialect ?? throw new ArgumentNullException(nameof(dialect));
         dialectOverridden = true;
+        InvalidateToString();
 
         return this;
     }
@@ -247,6 +252,7 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
         clone.dialect = dialect;
         clone.dialectOverridden = dialectOverridden;
         CloneParams(clone);
+        clone.cachedToString = cachedToString;
         return clone;
     }
 
@@ -256,7 +262,7 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
     ///   String representation.</returns>
     public override string ToString()
     {
-        return Format(tableName, ((IFilterableQuery)this).GetWhereClause(), fieldExpressions, dialect);
+        return cachedToString ??= Format(tableName, ((IFilterableQuery)this).GetWhereClause(), fieldExpressions, dialect);
     }
 
     /// <summary>

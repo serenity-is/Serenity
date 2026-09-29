@@ -8,7 +8,6 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
     private readonly string tableName;
     private readonly List<FieldExpressionPair> fieldExpressions = [];
     private string? identityColumn;
-    private string? cachedQuery;
 
     /// <summary>
     ///   Creates a new SqlInsert query.</summary>
@@ -77,7 +76,7 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
             throw new ArgumentNullException(expression);
 
         fieldExpressions.Add(new FieldExpressionPair(field, expression));
-        cachedQuery = null;
+        InvalidateToString();
         return this;
     }
 
@@ -97,7 +96,7 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
             throw new ArgumentNullException(expression);
 
         fieldExpressions.Add(new FieldExpressionPair(field, expression));
-        cachedQuery = null;
+        InvalidateToString();
     }
 
     /// <summary>
@@ -112,7 +111,6 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
     {
         ArgumentNullException.ThrowIfNull(field);
 
-        cachedQuery = null;
         return SetTo(field.Name, expression);
     }
 
@@ -129,7 +127,7 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
             throw new ArgumentNullException(field);
 
         fieldExpressions.Add(new FieldExpressionPair(field, SqlKeywords.Null));
-        cachedQuery = null;
+        InvalidateToString();
         return this;
     }
 
@@ -144,7 +142,7 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
         clone.dialectOverridden = dialectOverridden;
         clone.nextAutoParam = nextAutoParam;
         CloneParams(clone);
-        clone.cachedQuery = cachedQuery;
+        clone.cachedToString = cachedToString;
         return clone;
     }
 
@@ -158,6 +156,7 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
     {
         this.dialect = dialect ?? throw new ArgumentNullException(nameof(dialect));
         dialectOverridden = true;
+        InvalidateToString();
 
         return this;
     }
@@ -168,12 +167,7 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
     ///   String representation.</returns>
     public override string ToString()
     {
-        if (cachedQuery != null)
-            return cachedQuery;
-
-        cachedQuery = Format(tableName, fieldExpressions, dialect);
-
-        return cachedQuery;
+        return cachedToString ??= Format(tableName, fieldExpressions, dialect);
     }
 
     /// <summary>

@@ -63,6 +63,27 @@ public class SqlDeleteTests
     }
 
     [Fact]
+    public void ToString_Caches_And_Invalidates_When_Where_Changes()
+    {
+        var delete = new SqlDelete("T");
+        var initial = delete.ToString();
+
+        Assert.Same(initial, delete.ToString());
+
+        delete.Where(new Criteria("A") == 5);
+        var withWhere = delete.ToString();
+
+        Assert.NotSame(initial, withWhere);
+        Assert.Contains("WHERE (A =", withWhere);
+        Assert.Same(withWhere, delete.ToString());
+
+        var parameterName = Assert.Single(delete.Params!).Key;
+        delete.SetParam(parameterName, 6);
+
+        Assert.Same(withWhere, delete.ToString());
+    }
+
+    [Fact]
     public void ToString_And_Format_Work()
     {
         Assert.Equal("DELETE FROM [T]", new SqlDelete("T").ToString());
