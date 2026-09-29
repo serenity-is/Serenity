@@ -88,6 +88,7 @@ public class SqlDeleteTests
     {
         Assert.Equal("DELETE FROM [T]", new SqlDelete("T").ToString());
         Assert.Equal("DELETE FROM [T]", SqlDelete.Format("T", ""));
+        Assert.Equal("DELETE FROM [T]", SqlDelete.Format("T", null));
         Assert.Equal("DELETE FROM [T] WHERE A = 1", SqlDelete.Format("T", "A = 1"));
         Assert.Throws<ArgumentNullException>(() => SqlDelete.Format(null!, ""));
         Assert.Throws<ArgumentException>(() => SqlDelete.Format("", ""));

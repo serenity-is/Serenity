@@ -251,6 +251,11 @@ public class SqlUpdateTests
             new("A", "@a")
         }));
 
+        Assert.Equal("UPDATE [T] SET [A] = @a", SqlUpdate.Format("T", null, new List<FieldExpressionPair>
+        {
+            new("A", "@a")
+        }));
+
         Assert.Throws<ArgumentNullException>(() => SqlUpdate.Format(null!, "x", pairs));
         Assert.Throws<ArgumentException>(() => SqlUpdate.Format("", "x", pairs));
         Assert.Throws<ArgumentNullException>(() => SqlUpdate.Format("T", "x", (IEnumerable<FieldExpressionPair>)null!));

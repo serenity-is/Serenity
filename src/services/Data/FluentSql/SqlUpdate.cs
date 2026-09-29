@@ -295,14 +295,14 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
     /// <returns>Formatted UPDATE query.</returns>
     /// <exception cref="ArgumentException">tableName is null or empty.</exception>
     /// <exception cref="ArgumentNullException">fieldExpressions is null.</exception>
-    public static string Format(string tableName, string where,
+    public static string Format(string tableName, string? where,
         IEnumerable<FieldExpressionPair> fieldExpressions, ISqlDialect? dialect = null)
     {
         ArgumentException.ThrowIfNullOrEmpty(tableName);
         ArgumentNullException.ThrowIfNull(fieldExpressions);
 
         var list = fieldExpressions.ToList();
-        StringBuilder sb = new("UPDATE ", 64 + where.Length + list.Count * 16);
+        StringBuilder sb = new("UPDATE ", 64 + (where?.Length ?? 0) + list.Count * 16);
         sb.Append(SqlSyntax.AutoBracketValid(tableName, dialect));
         sb.Append(" SET ");
         var i = 0;
