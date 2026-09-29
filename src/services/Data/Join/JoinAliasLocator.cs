@@ -195,22 +195,5 @@ public class JoinAliasLocator
             var expression = JoinAliasLocator.ReplaceAliases(criteria.Expression, replace);
             return expression == criteria.Expression ? criteria : new Criteria(expression);
         }
-
-        protected override BaseCriteria VisitFunctionCall(FunctionCallCriteria criteria)
-        {
-            var arguments = criteria.Arguments;
-            BaseCriteria[]? rewrittenArguments = null;
-            for (var i = 0; i < arguments.Length; i++)
-            {
-                var argument = Visit(arguments[i]);
-                if (!ReferenceEquals(argument, arguments[i]))
-                {
-                    rewrittenArguments ??= arguments.ToArray();
-                    rewrittenArguments[i] = argument!;
-                }
-            }
-
-            return rewrittenArguments is null ? criteria : criteria.CloneWithArguments(rewrittenArguments);
-        }
     }
 }

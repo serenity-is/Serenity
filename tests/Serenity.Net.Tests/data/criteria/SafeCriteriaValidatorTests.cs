@@ -72,6 +72,25 @@ public class SafeCriteriaValidatorTests
     }
 
     [Fact]
+    public void Validate_FunctionCallCriteria_ThrowsUnsupportedCriteriaType()
+    {
+        var exception = Assert.Throws<ValidationError>(
+            () => new SafeCriteriaValidator().Validate(new UpperFunctionCriteria(new Criteria("Name"))));
+
+        Assert.Equal("UnsupportedCriteriaType", exception.ErrorCode);
+    }
+
+    [Fact]
+    public void Validate_FunctionCallCriteriaWithInvalidField_DoesNotBypassValidation()
+    {
+        // rejected as function call before any nested field could be inspected
+        var exception = Assert.Throws<ValidationError>(
+            () => new SafeCriteriaValidator().Validate(new UpperFunctionCriteria(new Criteria("bad expr"))));
+
+        Assert.Equal("UnsupportedCriteriaType", exception.ErrorCode);
+    }
+
+    [Fact]
     public void Validate_IsNullCriteria_DoesNotThrow()
     {
         new SafeCriteriaValidator().Validate(new Criteria("Name").IsNull());

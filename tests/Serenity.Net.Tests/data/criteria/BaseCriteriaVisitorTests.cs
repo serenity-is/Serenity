@@ -150,7 +150,7 @@ public class BaseCriteriaVisitorTests
         var result = visitor.VisitPublic(criteria);
 
         Assert.Same(criteria, result);
-        Assert.Equal(["FunctionCall"], visitor.Visited);
+        Assert.Equal(["FunctionCall", "Criteria:Name"], visitor.Visited);
     }
 
     [Fact]
@@ -209,7 +209,7 @@ public class BaseCriteriaVisitorTests
     }
 
     [Fact]
-    public void VisitFunctionCall_DoesNotDescendIntoArguments()
+    public void VisitFunctionCall_DescendsIntoArguments()
     {
         var visitor = new RecordingVisitor();
         var criteria = new UpperFunctionCriteria(new ValueCriteria("x"));
@@ -217,7 +217,23 @@ public class BaseCriteriaVisitorTests
         var result = visitor.VisitPublic(criteria);
 
         Assert.Same(criteria, result);
-        // Only the function call itself is visited; its arguments are not descended into.
-        Assert.Equal(["FunctionCall"], visitor.Visited);
+        // The function call itself is visited, and its arguments are descended into.
+        Assert.Equal(["FunctionCall", "Value"], visitor.Visited);
+    }
+
+    [Fact]
+    public void VisitFunctionCall_RebuildsCriteriaWhenArgumentIsReplaced()
+    {
+        var visitor = new CriteriaReplacingVisitor();
+        var original = new UpperFunctionCriteria(new Criteria("Name"));
+
+        var result = visitor.VisitPublic(original);
+
+        var rebuilt = Assert.IsType<UpperFunctionCriteria>(result);
+        Assert.NotSame(original, rebuilt);
+        Assert.Equal("Replaced", Assert.IsType<Criteria>(rebuilt.Arguments[0]).Expression);
+
+        // Original criteria tree is left unchanged.
+        Assert.Equal("Name", Assert.IsType<Criteria>(original.Arguments[0]).Expression);
     }
 }

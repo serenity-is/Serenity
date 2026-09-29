@@ -45,4 +45,16 @@ public class SafeCriteriaValidator : BaseCriteriaVisitor
         throw new ValidationError("UnsupportedCriteriaType",
             "Param type criterias is not supported!");
     }
+
+    /// <summary>
+    /// Visits the function call criteria.
+    /// </summary>
+    /// <param name="criteria">The criteria.</param>
+    /// <returns>The visited function call criteria.</returns>
+    /// <exception cref="ValidationError">UnsupportedCriteriaType - Function call type criterias is not supported!</exception>
+    protected override BaseCriteria VisitFunctionCall(FunctionCallCriteria criteria)
+    {
+        throw new ValidationError("UnsupportedCriteriaType",
+            "Function call type criterias is not supported!");
+    }
 }

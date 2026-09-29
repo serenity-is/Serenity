@@ -102,7 +102,23 @@ public abstract class BaseCriteriaVisitor
     /// <returns>The visited function call criteria.</returns>
     protected virtual BaseCriteria VisitFunctionCall(FunctionCallCriteria criteria)
     {
-        return criteria;
+        var arguments = criteria.Arguments;
+        if (arguments is null || arguments.Length == 0)
+            return criteria;
+
+        BaseCriteria[]? rewritten = null;
+        for (var i = 0; i < arguments.Length; i++)
+        {
+            var argument = arguments[i];
+            var visited = Visit(argument);
+            if (!ReferenceEquals(visited, argument))
+            {
+                rewritten ??= (BaseCriteria[])arguments.Clone();
+                rewritten[i] = visited!;
+            }
+        }
+
+        return rewritten is null ? criteria : criteria.CloneWithArguments(rewritten);
     }
 
     /// <summary>
