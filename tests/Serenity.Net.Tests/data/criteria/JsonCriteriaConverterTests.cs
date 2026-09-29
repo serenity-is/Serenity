@@ -46,9 +46,35 @@ public class JsonCriteriaConverterTests
     }
 
     [Fact]
-    public void Write_EmptyCriteria_WritesNull()
+    public void Write_EmptyCriteria_WritesEmptyArray()
     {
-        Assert.Equal("null", Newtonsoft.Json.JsonConvert.SerializeObject(Criteria.Empty, GetSettings()));
+        Assert.Equal("[]", Newtonsoft.Json.JsonConvert.SerializeObject(Criteria.Empty, GetSettings()));
+    }
+
+    [Fact]
+    public void Read_EmptyArray_ReturnsEmptyCriteria()
+    {
+        var result = Newtonsoft.Json.JsonConvert.DeserializeObject<BaseCriteria>("[]", GetSettings());
+
+        Assert.True(result is not null && result.IsEmpty);
+    }
+
+    [Fact]
+    public void Read_NestedEmptyArray_ThrowsJsonSerializationException()
+    {
+        Assert.Throws<Newtonsoft.Json.JsonSerializationException>(() =>
+            Newtonsoft.Json.JsonConvert.DeserializeObject<BaseCriteria>("[\"A\",\"=\",[]]", GetSettings()));
+    }
+
+    [Theory]
+    [InlineData("\"test\"", "test")]
+    [InlineData("5", 5L)]
+    [InlineData("true", true)]
+    public void Read_ScalarRoot_ParsesAsValueCriteria(string json, object expected)
+    {
+        var result = Newtonsoft.Json.JsonConvert.DeserializeObject<BaseCriteria>(json, GetSettings());
+
+        Assert.Equal(expected, Assert.IsType<ValueCriteria>(result).Value);
     }
 
     [Fact]
@@ -169,15 +195,6 @@ public class JsonCriteriaConverterTests
             Newtonsoft.Json.JsonConvert.DeserializeObject<BaseCriteria>("[[{\"x\":1}]]", GetSettings()));
 
         Assert.Contains("as Criteria value", ex.Message);
-    }
-
-    [Fact]
-    public void Read_EmptyArray_ThrowsJsonSerializationException()
-    {
-        var ex = Assert.Throws<Newtonsoft.Json.JsonSerializationException>(() =>
-            Newtonsoft.Json.JsonConvert.DeserializeObject<BaseCriteria>("[]", GetSettings()));
-
-        Assert.Equal("Can't deserialize empty array as Criteria", ex.Message);
     }
 
     [Fact]

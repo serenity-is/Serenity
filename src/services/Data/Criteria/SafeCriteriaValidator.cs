@@ -10,8 +10,11 @@ public class SafeCriteriaValidator : BaseCriteriaVisitor
     /// Validates the specified criteria.
     /// </summary>
     /// <param name="criteria">The criteria.</param>
-    public void Validate(BaseCriteria criteria)
+    public void Validate(BaseCriteria? criteria)
     {
+        if (criteria is null || criteria.IsEmpty)
+            return;
+
         Visit(criteria);
     }
 
@@ -24,13 +27,29 @@ public class SafeCriteriaValidator : BaseCriteriaVisitor
     protected override BaseCriteria VisitCriteria(Criteria criteria)
     {
         if (string.IsNullOrEmpty(criteria.Expression))
-            return base.VisitCriteria(criteria);
+            throw new ValidationError("InvalidCriteriaField",
+                "Empty criteria field name is not allowed!");
 
         if (!SqlSyntax.IsValidIdentifier(criteria.Expression))
             throw new ValidationError("InvalidCriteriaField",
                 string.Format("{0} is not a valid field name!", criteria.Expression));
 
         return base.VisitCriteria(criteria);
+    }
+
+    /// <summary>
+    /// Visits the value criteria.
+    /// </summary>
+    /// <param name="criteria">The criteria.</param>
+    /// <returns>The visited value criteria.</returns>
+    /// <exception cref="ValidationError">UnsupportedCriteriaType - Criteria values can't contain nested criteria!</exception>
+    protected override BaseCriteria VisitValue(ValueCriteria criteria)
+    {
+        if (criteria.Value is BaseCriteria)
+            throw new ValidationError("UnsupportedCriteriaType",
+                "Criteria values can't contain nested criteria!");
+
+        return base.VisitValue(criteria);
     }
 
     /// <summary>

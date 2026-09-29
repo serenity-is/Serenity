@@ -92,6 +92,10 @@ public class CriteriaFieldExpressionReplacer(IRow row, IPermissionService permis
     /// <inheritdoc/>
     protected override BaseCriteria VisitCriteria(Criteria criteria)
     {
+        if (string.IsNullOrEmpty(criteria.Expression))
+            throw new ValidationError("InvalidCriteriaField", (string?)null,
+                "Empty criteria field name is not allowed!");
+
         var result = base.VisitCriteria(criteria);
 
         if (result is Criteria critResult)

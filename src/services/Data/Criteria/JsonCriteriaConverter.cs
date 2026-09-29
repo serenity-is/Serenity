@@ -30,10 +30,17 @@ public class JsonCriteriaConverter : JsonConverter
 
     private static void ToJson(JsonWriter writer, BaseCriteria? criteria, JsonSerializer serializer)
     {
-        if (criteria is null ||
-            criteria.IsEmpty)
+        if (criteria is null)
         {
             writer.WriteNull();
+            return;
+        }
+
+        if (criteria.IsEmpty)
+        {
+            // Empty criteria is [] (JSON null stays C# null), so the two stay distinct.
+            writer.WriteStartArray();
+            writer.WriteEndArray();
             return;
         }
 
@@ -103,31 +110,51 @@ public class JsonCriteriaConverter : JsonConverter
     /// <returns>The object value.</returns>
     public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
     {
-        if (reader.TokenType == JsonToken.Null)
+        if (reader.TokenType == JsonToken.Null ||
+            reader.TokenType == JsonToken.Undefined)
             return null;
 
+        if (reader.TokenType is JsonToken.String or JsonToken.Integer or
+            JsonToken.Float or JsonToken.Boolean or JsonToken.Bytes or
+            JsonToken.Date)
+        {
+            // Write emits scalar ValueCriteria as bare scalars (e.g. "test", 5),
+            // so accept them back as ValueCriteria for round-trip symmetry.
+            var token = serializer.Deserialize<JToken>(reader);
+            if (token is null || token.Type == JTokenType.Null || token.Type == JTokenType.Undefined)
+                return null;
+            if (token is JValue scalar)
+                return new ValueCriteria(scalar.Value);
+            throw new JsonSerializationException(string.Format("Can't deserialize {0} as Criteria", token.ToString()));
+        }
+
         var value = serializer.Deserialize<JArray>(reader);
-        return Parse(value);
+        return Parse(value, allowEmpty: true);
     }
 
     private BaseCriteria ParseValue(JToken value)
     {
         if (value is JValue jvalue)
+        {
+            if (jvalue.Type == JTokenType.Null || jvalue.Type == JTokenType.Undefined)
+                return new ValueCriteria(null);
             return new ValueCriteria(jvalue.Value);
+        }
 
         if (value is JArray array)
-            return Parse(array);
+            return Parse(array, allowEmpty: false);
 
         throw new JsonSerializationException(string.Format("Can't deserialize {0} as Criteria value", value.ToString()));
     }
 
-    private BaseCriteria Parse(JArray? array)
+    private BaseCriteria Parse(JArray? array, bool allowEmpty)
     {
-        if (array == null)
-            return Criteria.Empty;
-
-        if (array.Count == 0)
-            throw new JsonSerializationException("Can't deserialize empty array as Criteria");
+        if (array == null || array.Count == 0)
+        {
+            if (allowEmpty)
+                return Criteria.Empty;
+            throw new JsonSerializationException("Can't deserialize empty array as nested Criteria");
+        }
 
         if (array.Count == 1)
         {
@@ -136,8 +163,11 @@ public class JsonCriteriaConverter : JsonConverter
                 var list = new List<object?>();
                 foreach (var item in jArray)
                 {
-                    if (item == null)
-                        throw new ArgumentNullException("item");
+                    if (item is null || item.Type == JTokenType.Null || item.Type == JTokenType.Undefined)
+                    {
+                        list.Add(null);
+                        continue;
+                    }
 
                     if (item is not JValue)
                         throw new JsonSerializationException(string.Format("Can't deserialize {0} as Criteria value", item.ToString()));
@@ -151,9 +181,9 @@ public class JsonCriteriaConverter : JsonConverter
             if (array[0] is not JValue jValue || jValue.Value is not string)
                 throw new JsonSerializationException(string.Format("Couldn't deserialize string criteria: {0}", array.ToString()));
 
-            var value = (string?)((JValue)array[0]).Value ?? 
+            var value = (string?)((JValue)array[0]).Value ??
                 throw new JsonSerializationException(string.Format("Null Criteria expression: {0}", array.ToString()));
-            if (value.StartsWith("@"))
+            if (value.StartsWith("@", StringComparison.Ordinal))
                 return new ParamCriteria(value);
 
             return new Criteria(value);

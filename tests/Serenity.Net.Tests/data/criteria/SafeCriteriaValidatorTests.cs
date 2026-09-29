@@ -9,10 +9,29 @@ public class SafeCriteriaValidatorTests
     }
 
     [Fact]
-    public void Validate_EmptyCriteria_DoesNotThrow()
+    public void Validate_EmptyCriteriaAtRoot_DoesNotThrow()
     {
-        // Empty expression passes validation without a field name check.
+        // Empty root criteria means "no filter" and is skipped without visiting.
         new SafeCriteriaValidator().Validate(Criteria.Empty);
+        new SafeCriteriaValidator().Validate(null);
+    }
+
+    [Fact]
+    public void Validate_EmptyCriteriaAsNestedOperand_ThrowsValidationError()
+    {
+        var exception = Assert.Throws<ValidationError>(
+            () => new SafeCriteriaValidator().Validate(new Criteria("Name") == Criteria.Empty));
+
+        Assert.Equal("InvalidCriteriaField", exception.ErrorCode);
+    }
+
+    [Fact]
+    public void Validate_CriteriaValueContainingNestedCriteria_ThrowsValidationError()
+    {
+        var exception = Assert.Throws<ValidationError>(
+            () => new SafeCriteriaValidator().Validate(new Criteria("Name") == new ValueCriteria(new Criteria("X"))));
+
+        Assert.Equal("UnsupportedCriteriaType", exception.ErrorCode);
     }
 
     [Fact]

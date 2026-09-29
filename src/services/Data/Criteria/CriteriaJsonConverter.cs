@@ -18,10 +18,17 @@ public class CriteriaJsonConverter : JsonConverter<BaseCriteria>
     /// <inheritdoc/>
     public override void Write(Utf8JsonWriter writer, BaseCriteria criteria, JsonSerializerOptions options)
     {
-        if (criteria is null ||
-            criteria.IsEmpty)
+        if (criteria is null)
         {
             writer.WriteNullValue();
+            return;
+        }
+
+        if (criteria.IsEmpty)
+        {
+            // Empty criteria is [] (JSON null stays C# null), so the two stay distinct.
+            writer.WriteStartArray();
+            writer.WriteEndArray();
             return;
         }
 
@@ -87,8 +94,25 @@ public class CriteriaJsonConverter : JsonConverter<BaseCriteria>
         if (reader.TokenType == JsonTokenType.Null)
             return null;
 
+        if (reader.TokenType is JsonTokenType.String or JsonTokenType.Number or
+            JsonTokenType.True or JsonTokenType.False)
+        {
+            // Write emits scalar ValueCriteria as bare scalars (e.g. "test", 5),
+            // so accept them back as ValueCriteria for round-trip symmetry.
+            var element = JsonSerializer.Deserialize<JsonElement>(ref reader, options);
+            return element.ValueKind switch
+            {
+                JsonValueKind.String => new ValueCriteria(element.GetString()),
+                JsonValueKind.Number => new ValueCriteria(element.GetDouble()),
+                JsonValueKind.True => new ValueCriteria(true),
+                JsonValueKind.False => new ValueCriteria(false),
+                JsonValueKind.Null or JsonValueKind.Undefined => null,
+                _ => throw new JsonException(string.Format("Can't deserialize {0} as Criteria", element.ToString()))
+            };
+        }
+
         var value = JsonSerializer.Deserialize<JsonElement[]>(ref reader, options);
-        return Parse(value);
+        return Parse(value, allowEmpty: true);
     }
 
     private BaseCriteria ParseValue(JsonElement value)
@@ -101,30 +125,38 @@ public class CriteriaJsonConverter : JsonConverter<BaseCriteria>
             return new ValueCriteria(true);
         else if (value.ValueKind == JsonValueKind.False)
             return new ValueCriteria(false);
+        else if (value.ValueKind == JsonValueKind.Null ||
+            value.ValueKind == JsonValueKind.Undefined)
+            return new ValueCriteria(null);
 
         if (value.ValueKind == JsonValueKind.Array)
-            return Parse(JsonSerializer.Deserialize<JsonElement[]>(value));
+            return Parse(JsonSerializer.Deserialize<JsonElement[]>(value), allowEmpty: false);
 
         throw new JsonException(string.Format("Can't deserialize {0} as Criteria value", value.ToString()));
     }
 
-    private BaseCriteria Parse(JsonElement[]? array)
+    private BaseCriteria Parse(JsonElement[]? array, bool allowEmpty)
     {
-        if (array == null)
-            return Criteria.Empty;
-
-        if (array.Length == 0)
-            throw new JsonException("Can't deserialize empty array as Criteria");
+        if (array == null || array.Length == 0)
+        {
+            if (allowEmpty)
+                return Criteria.Empty;
+            throw new JsonException("Can't deserialize empty array as nested Criteria");
+        }
 
         if (array.Length == 1)
         {
             if (array[0] is { ValueKind: JsonValueKind.Array } jArray)
             {
-                var list = new List<object>();
+                var list = new List<object?>();
                 foreach (var item in jArray.EnumerateArray())
                 {
-                    if (item.ValueKind == JsonValueKind.Null)
-                        throw new ArgumentNullException("item");
+                    if (item.ValueKind == JsonValueKind.Null ||
+                        item.ValueKind == JsonValueKind.Undefined)
+                    {
+                        list.Add(null);
+                        continue;
+                    }
 
                     if (item.ValueKind == JsonValueKind.String)
                             list.Add(item.GetString()!);

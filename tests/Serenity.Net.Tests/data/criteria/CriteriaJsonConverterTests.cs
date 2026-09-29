@@ -24,19 +24,19 @@ public class CriteriaJsonConverterTests
     // Write
 
     [Fact]
-    public void Write_NullCriteria_WritesNullValue()
+    public void Write_EmptyCriteria_WritesEmptyArray()
+    {
+        var options = GetOptions();
+
+        Assert.Equal("[]", JsonSerializer.Serialize(Criteria.Empty, options));
+    }
+
+    [Fact]
+    public void Write_NullCriteria_WritesNull()
     {
         var options = GetOptions();
 
         Assert.Equal("null", JsonSerializer.Serialize<BaseCriteria>(null, options));
-    }
-
-    [Fact]
-    public void Write_EmptyCriteria_WritesNullValue()
-    {
-        var options = GetOptions();
-
-        Assert.Equal("null", JsonSerializer.Serialize(Criteria.Empty, options));
     }
 
     [Fact]
@@ -202,40 +202,63 @@ public class CriteriaJsonConverterTests
     }
 
     [Fact]
-    public void Read_NestedArrayWithNullItem_ThrowsArgumentNullException()
+    public void Read_NestedArrayWithNullValueItem_AddsNullToValues()
     {
         var options = GetOptions();
 
-        Assert.Throws<ArgumentNullException>(() =>
-            JsonSerializer.Deserialize<BaseCriteria>("[[\"a\",null]]", options));
+        var result = JsonSerializer.Deserialize<BaseCriteria>("[[\"a\",null]]", options);
+
+        var value = Assert.IsType<object?[]>(((ValueCriteria)result!).Value);
+        Assert.Equal(2, value.Length);
+        Assert.Equal("a", value[0]);
+        Assert.Null(value[1]);
     }
 
     [Fact]
-    public void Read_NestedArrayWithObjectItem_ThrowsJsonException()
+    public void Read_EmptyArray_ReturnsEmptyCriteria()
     {
         var options = GetOptions();
 
-        var ex = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<BaseCriteria>("[[{\"x\":1}]]", options));
+        var result = JsonSerializer.Deserialize<BaseCriteria>("[]", options);
 
-        Assert.Contains("as Criteria value", ex.Message);
+        Assert.True(result is not null && result.IsEmpty);
     }
 
     [Fact]
-    public void Read_EmptyArray_ThrowsJsonException()
+    public void Read_NullToken_DeserializesAsNull()
     {
         var options = GetOptions();
 
-        var ex = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<BaseCriteria>("[]", options));
+        Assert.Null(JsonSerializer.Deserialize<BaseCriteria>("null", options));
+    }
 
-        Assert.Equal("Can't deserialize empty array as Criteria", ex.Message);
+    [Fact]
+    public void Read_NestedEmptyArray_ThrowsJsonException()
+    {
+        var options = GetOptions();
+
+        Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<BaseCriteria>("[\"A\",\"=\",[]]", options));
     }
 
     [Theory]
-    [InlineData("\"string criteria\"")]
-    [InlineData("5")]
-    public void Read_NonArrayRoot_ThrowsJsonException(string json)
+    [InlineData("\"string criteria\"", "string criteria")]
+    [InlineData("5", 5.0)]
+    [InlineData("true", true)]
+    [InlineData("false", false)]
+    public void Read_ScalarRoot_ParsesAsValueCriteria(string json, object expected)
+    {
+        var options = GetOptions();
+
+        var result = JsonSerializer.Deserialize<BaseCriteria>(json, options);
+
+        Assert.Equal(expected, Assert.IsType<ValueCriteria>(result!).Value);
+    }
+
+    [Theory]
+    [InlineData("{}")]
+    [InlineData("[\"A\",\"=\",{\"x\":1}]")]
+    public void Read_ObjectRootOrOperand_ThrowsJsonException(string json)
     {
         var options = GetOptions();
 
@@ -335,17 +358,6 @@ public class CriteriaJsonConverterTests
         Assert.Contains("Invalid Criteria format", ex.Message);
     }
 
-    [Fact]
-    public void Read_BinaryOperatorValueNullOperand_ThrowsJsonException()
-    {
-        var options = GetOptions();
-
-        var ex = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<BaseCriteria>("[\"A\",\"=\",null]", options));
-
-        Assert.Contains("as Criteria value", ex.Message);
-    }
-
     [Theory]
     [InlineData("[5,\"Name\"]", "Couldn't deserialize unary criteria")]
     [InlineData("[\"A\",5,\"B\"]", "Couldn't deserialize unary criteria")]
@@ -375,38 +387,56 @@ public class CriteriaJsonConverterTests
     }
 
     [Fact]
-    public void Read_NullCriteriaExpression_ThrowsJsonException()
+    public void Read_EmptyStringExpression_DeserializesButValidatorRejects()
     {
-        // An array like [""] is a string criteria, while a stripped expression is invalid
+        // Converter itself still parses; SafeCriteriaValidator rejects empty nested criteria.
         var options = GetOptions();
 
-        var result = JsonSerializer.Deserialize<BaseCriteria>("[\"\" ]", options);
+        var result = JsonSerializer.Deserialize<BaseCriteria>("[\"\"]", options);
 
-        Assert.Equal("", ((Criteria)result).Expression);
+        Assert.Equal("", ((Criteria)result!).Expression);
     }
 
     [Fact]
-    public void Read_NullToken_DirectConverterCall_ReturnsNull()
+    public void Read_NullToken_DirectConverterCall_ReturnsEmpty()
     {
+        // Note: reader is not advanced here (TokenType.None), so this exercises
+        // the Deserialize-then-Parse path, which maps null input to empty criteria.
+        // The framework path with a positioned Null token returns C# null instead.
         var bytes = Encoding.UTF8.GetBytes("null");
         var reader = new Utf8JsonReader(bytes);
         var converter = new CriteriaJsonConverter();
 
         var result = converter.Read(ref reader, typeof(BaseCriteria), GetOptions());
 
-        // "null" parses into an empty criteria rather than a null instance
         Assert.False(result is null || !result.IsEmpty);
     }
 
     [Fact]
-    public void Read_ObjectElementInBinary_ThrowsJsonException()
+    public void Read_BinaryOperatorValueNullOperand_ParsesAsNullValueCriteria()
     {
         var options = GetOptions();
 
-        var ex = Assert.Throws<JsonException>(() =>
-            JsonSerializer.Deserialize<BaseCriteria>("[\"A\",\"=\",{\"x\":1}]", options));
+        var result = JsonSerializer.Deserialize<BaseCriteria>("[\"A\",\"=\",null]", options);
 
-        Assert.Contains("as Criteria value", ex.Message);
+        var binary = Assert.IsType<BinaryCriteria>(result);
+        Assert.Null(Assert.IsType<ValueCriteria>(binary.RightOperand).Value);
+    }
+
+    [Fact]
+    public void RoundTrip_EmptyCriteria_PreservesEmpty()
+    {
+        var result = RoundTrip(Criteria.Empty);
+
+        Assert.True(result is not null && result.IsEmpty);
+    }
+
+    [Fact]
+    public void RoundTrip_ScalarValueCriteria_PreservesValue()
+    {
+        var result = Assert.IsType<ValueCriteria>(RoundTrip(new ValueCriteria("test")));
+
+        Assert.Equal("test", result.Value);
     }
 
     // Round trips

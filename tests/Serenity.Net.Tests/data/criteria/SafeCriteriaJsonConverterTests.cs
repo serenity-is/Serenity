@@ -55,6 +55,25 @@ public class SafeCriteriaJsonConverterTests
     }
 
     [Fact]
+    public void Read_EmptyArray_ReturnsEmptyCriteria()
+    {
+        var options = GetOptions();
+
+        var result = JsonSerializer.Deserialize<BaseCriteria>("[]", options);
+
+        Assert.True(result is not null && result.IsEmpty);
+    }
+
+    [Fact]
+    public void Read_NestedEmptyArray_ThrowsJsonException()
+    {
+        var options = GetOptions();
+
+        Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<BaseCriteria>("[\"A\",\"=\",[]]", options));
+    }
+
+    [Fact]
     public void Write_WritesSameAsBaseConverter()
     {
         var options = GetOptions();
