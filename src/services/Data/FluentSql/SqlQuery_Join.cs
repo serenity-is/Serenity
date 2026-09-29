@@ -43,6 +43,8 @@ public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressio
     {
         ArgumentNullException.ThrowIfNull(join);
 
+        BeforeModify();
+
         var sb = new StringBuilder();
         JoinToString(join, sb, modifySelf: false);
         string expression = sb.ToString();
@@ -56,8 +58,6 @@ public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressio
             throw new InvalidOperationException(string.Format("Query already has a join '{0}' with expression '{1}'. " +
                 "Attempted join expression is '{2}'", join.Name, existingExpression, expression));
         }
-
-        BeforeModify();
 
         if (from.Length > 0)
             from.Append(" \n");
@@ -92,6 +92,8 @@ public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressio
         if (string.IsNullOrEmpty(toTable))
             throw new ArgumentNullException("alias.table");
 
+        BeforeModify();
+
         var join = new LeftJoin(toTable, alias.Name, onCriteria);
 
         Join(join);
@@ -117,6 +119,8 @@ public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressio
 
         if (string.IsNullOrEmpty(alias.Table))
             throw new ArgumentNullException("alias.table");
+
+        BeforeModify();
 
         var join = new LeftJoin(alias.Table, alias.Name, onCriteria);
 
@@ -147,6 +151,8 @@ public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressio
         if (string.IsNullOrEmpty(toTable))
             throw new ArgumentNullException("alias.table");
 
+        BeforeModify();
+
         var join = new RightJoin(toTable, alias.Name, onCriteria);
 
         Join(join);
@@ -175,6 +181,8 @@ public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressio
         if (string.IsNullOrEmpty(alias.Table))
             throw new ArgumentNullException("alias.table");
 
+        BeforeModify();
+
         var join = new RightJoin(alias.Table, alias.Name, onCriteria);
 
         Join(join);
@@ -202,6 +210,8 @@ public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressio
 
         if (string.IsNullOrEmpty(alias.Table))
             throw new ArgumentNullException("alias.table");
+
+        BeforeModify();
 
         var join = new InnerJoin(alias.Table, alias.Name, onCriteria);
 
@@ -242,6 +252,8 @@ public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressio
         if (string.IsNullOrEmpty(expression))
             return this;
 
+        BeforeModify();
+
         var referencedJoins = JoinAliasLocator.LocateOptimized(expression, out string? referencedJoin);
 
         if (referencedJoin != null)
@@ -263,6 +275,8 @@ public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressio
     public SqlQuery EnsureJoin(Join join)
     {
         ArgumentNullException.ThrowIfNull(join);
+
+        BeforeModify();
 
         var joinAlias = join.Name;
         if (GetAliasExpression(joinAlias) is not null)

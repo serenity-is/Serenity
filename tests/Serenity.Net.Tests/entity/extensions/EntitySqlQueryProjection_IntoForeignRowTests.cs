@@ -58,6 +58,18 @@ public class EntitySqlQueryProjection_IntoForeignRowTests
     }
 
     [Fact]
+    public void IntoForeignRowOnFrozenQueryDoesNotChangeRow()
+    {
+        var row = new SelfNavigationRow();
+        var query = new SqlQuery().From(row);
+        query.Freeze();
+
+        Assert.Throws<InvalidOperationException>(() => query.IntoForeignRow<SelfNavigationRow.RowFields>(
+            SelfNavigationRow.Fields.Manager, (_, _) => { }));
+        Assert.Null(row.Manager);
+    }
+
+    [Fact]
     public void IntoForeignRowRejectsNonRowField()
     {
         var row = new SelfNavigationRow();

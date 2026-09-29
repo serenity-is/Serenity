@@ -61,13 +61,11 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
     ///   Field expression, required.</param>
     /// <returns>
     ///   SqlUpdate object itself.</returns>
-    /// <exception cref="ArgumentNullException">field or expression is null or empty.</exception>
+    /// <exception cref="ArgumentException">field or expression is null or empty.</exception>
     public SqlUpdate SetTo(string field, string expression)
     {
-        if (field == null || field.Length == 0)
-            throw new ArgumentNullException(field);
-        if (expression == null || expression.Length == 0)
-            throw new ArgumentNullException(expression);
+        ArgumentException.ThrowIfNullOrEmpty(field);
+        ArgumentException.ThrowIfNullOrEmpty(expression);
 
         BeforeModify();
         fieldExpressions.Add(new FieldExpressionPair(field, expression));
@@ -84,10 +82,8 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
     ///   SqlUpdate object itself.</returns>
     void ISetFieldByStatement.SetTo(string field, string expression)
     {
-        if (field == null || field.Length == 0)
-            throw new ArgumentNullException(field);
-        if (expression == null || expression.Length == 0)
-            throw new ArgumentNullException(expression);
+        ArgumentException.ThrowIfNullOrEmpty(field);
+        ArgumentException.ThrowIfNullOrEmpty(expression);
 
         BeforeModify();
         fieldExpressions.Add(new FieldExpressionPair(field, expression));
@@ -113,11 +109,10 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
     ///   Field (required).</param>
     /// <returns>
     ///   SqlUpdate object itself.</returns>
-    /// <exception cref="ArgumentNullException">field is null or empty.</exception>
+    /// <exception cref="ArgumentException">field is null or empty.</exception>
     public SqlUpdate SetNull(string field)
     {
-        if (field == null || field.Length == 0)
-            throw new ArgumentNullException(field);
+        ArgumentException.ThrowIfNullOrEmpty(field);
 
         BeforeModify();
         fieldExpressions.Add(new FieldExpressionPair(field, SqlKeywords.Null));
@@ -134,6 +129,7 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
     ///   SqlUpdate object itself.</returns>
     public SqlUpdate Inc(string field, int value)
     {
+        ArgumentException.ThrowIfNullOrEmpty(field);
         return SetTo(field, field + (value >= 0 ? " + " : "") + value.ToString(CultureInfo.InvariantCulture));
     }
 
@@ -148,7 +144,6 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
     public SqlUpdate Inc(IField field, int value)
     {
         ArgumentNullException.ThrowIfNull(field);
-
         return Inc(field.Name, value);
     }
 
@@ -162,6 +157,7 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
     ///   SqlUpdate object itself.</returns>
     public SqlUpdate Dec(string field, int value)
     {
+        ArgumentException.ThrowIfNullOrEmpty(field);
         return Inc(field, -value);
     }
 
@@ -175,6 +171,7 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
     ///   SqlUpdate object itself.</returns>
     public SqlUpdate Dec(IField field, int value)
     {
+        ArgumentNullException.ThrowIfNull(field);
         return Inc(field, -value);
     }
 
@@ -211,7 +208,6 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
         BeforeModify();
         this.dialect = dialect;
         dialectOverridden = true;
-
         return this;
     }
 
@@ -297,13 +293,12 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
     /// <param name="where">WHERE clause (can be null).</param>
     /// <param name="dialect">Target dialect</param>
     /// <returns>Formatted UPDATE query.</returns>
-    /// <exception cref="ArgumentNullException">tableName or fieldExpressions is null.</exception>
+    /// <exception cref="ArgumentException">tableName is null or empty.</exception>
+    /// <exception cref="ArgumentNullException">fieldExpressions is null.</exception>
     public static string Format(string tableName, string where,
         IEnumerable<FieldExpressionPair> fieldExpressions, ISqlDialect? dialect = null)
     {
-        if (tableName == null || tableName.Length == 0)
-            throw new ArgumentNullException(tableName);
-
+        ArgumentException.ThrowIfNullOrEmpty(tableName);
         ArgumentNullException.ThrowIfNull(fieldExpressions);
 
         var list = fieldExpressions.ToList();

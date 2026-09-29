@@ -2,6 +2,14 @@ namespace Serenity.Data;
 
 public class SqlTests
 {
+    private static void AssertNullOrEmptyThrows(string? value, Action action)
+    {
+        if (value is null)
+            Assert.Throws<ArgumentNullException>(action);
+        else
+            Assert.Throws<ArgumentException>(action);
+    }
+
     // Sum
 
     [Fact]
@@ -15,7 +23,7 @@ public class SqlTests
     [InlineData("")]
     public void Sum_StringField_NullOrEmpty_ThrowsArgumentNullException(string? field)
     {
-        Assert.Throws<ArgumentNullException>(() => Sql.Sum(field));
+        AssertNullOrEmptyThrows(field, () => Sql.Sum(field));
     }
 
     [Fact]
@@ -43,7 +51,7 @@ public class SqlTests
     [InlineData("")]
     public void Sum_JoinNumber_NullOrEmptyField_ThrowsArgumentNullException(string? field)
     {
-        Assert.Throws<ArgumentNullException>(() => Sql.Sum(7, field));
+        AssertNullOrEmptyThrows(field, () => Sql.Sum(7, field));
     }
 
     // Count
@@ -59,7 +67,7 @@ public class SqlTests
     [InlineData("")]
     public void Count_StringField_NullOrEmpty_ThrowsArgumentNullException(string? field)
     {
-        Assert.Throws<ArgumentNullException>(() => Sql.Count(field));
+        AssertNullOrEmptyThrows(field, () => Sql.Count(field));
     }
 
     [Fact]
@@ -87,7 +95,7 @@ public class SqlTests
     [InlineData("")]
     public void Count_JoinNumber_NullOrEmptyField_ThrowsArgumentNullException(string? field)
     {
-        Assert.Throws<ArgumentNullException>(() => Sql.Count(7, field));
+        AssertNullOrEmptyThrows(field, () => Sql.Count(7, field));
     }
 
     [Fact]
@@ -180,7 +188,7 @@ public class SqlTests
     [InlineData("")]
     public void Min_StringField_NullOrEmpty_ThrowsArgumentNullException(string? field)
     {
-        Assert.Throws<ArgumentNullException>(() => Sql.Min(field));
+        AssertNullOrEmptyThrows(field, () => Sql.Min(field));
     }
 
     [Fact]
@@ -216,7 +224,7 @@ public class SqlTests
     [InlineData("")]
     public void Max_StringField_NullOrEmpty_ThrowsArgumentNullException(string? field)
     {
-        Assert.Throws<ArgumentNullException>(() => Sql.Max(field));
+        AssertNullOrEmptyThrows(field, () => Sql.Max(field));
     }
 
     [Fact]
@@ -252,7 +260,7 @@ public class SqlTests
     [InlineData("")]
     public void Avg_StringField_NullOrEmpty_ThrowsArgumentNullException(string? field)
     {
-        Assert.Throws<ArgumentNullException>(() => Sql.Avg(field));
+        AssertNullOrEmptyThrows(field, () => Sql.Avg(field));
     }
 
     [Fact]
@@ -294,7 +302,7 @@ public class SqlTests
     [InlineData("")]
     public void Convert_NullOrEmptyType_ThrowsArgumentNullException(string? type)
     {
-        Assert.Throws<ArgumentNullException>(() => Sql.Convert(type, "Field"));
+        AssertNullOrEmptyThrows(type, () => Sql.Convert(type, "Field"));
     }
 
     [Theory]
@@ -302,7 +310,7 @@ public class SqlTests
     [InlineData("")]
     public void Convert_NullOrEmptyField_ThrowsArgumentNullException(string? field)
     {
-        Assert.Throws<ArgumentNullException>(() => Sql.Convert("DATE", field));
+        AssertNullOrEmptyThrows(field, () => Sql.Convert("DATE", field));
     }
 
     [Fact]
@@ -316,7 +324,7 @@ public class SqlTests
     [InlineData("")]
     public void SubString_NullOrEmptyExpression_ThrowsArgumentNullException(string? expression)
     {
-        Assert.Throws<ArgumentNullException>(() => Sql.SubString(expression, 0, 1));
+        AssertNullOrEmptyThrows(expression, () => Sql.SubString(expression, 0, 1));
     }
 
     // Case (string-based)

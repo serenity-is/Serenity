@@ -162,7 +162,7 @@ public class SqlInsert_Upsert_Tests
         Assert.Throws<ArgumentNullException>(() =>
             SqlInsert.FormatUpsert(null, [new("A", "@p1")], ["A"], SqliteDialect.Instance));
 
-        Assert.Throws<ArgumentNullException>(() =>
+        Assert.Throws<ArgumentException>(() =>
             SqlInsert.FormatUpsert("", [new("A", "@p1")], ["A"], SqliteDialect.Instance));
     }
 

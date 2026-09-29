@@ -26,9 +26,9 @@ public class SqlInsertTests
         var insert = new SqlInsert("T");
 
         Assert.Throws<ArgumentNullException>(() => insert.SetTo((string)null!, "1"));
-        Assert.Throws<ArgumentNullException>(() => insert.SetTo("", "1"));
+        Assert.Throws<ArgumentException>(() => insert.SetTo("", "1"));
         Assert.Throws<ArgumentNullException>(() => insert.SetTo("A", null!));
-        Assert.Throws<ArgumentNullException>(() => insert.SetTo("A", ""));
+        Assert.Throws<ArgumentException>(() => insert.SetTo("A", ""));
 
         Assert.Same(insert, insert.SetTo("A", "1"));
         Assert.Single(insert.GetFieldExpressions());
@@ -40,9 +40,9 @@ public class SqlInsertTests
         ISetFieldByStatement insert = new SqlInsert("T");
 
         Assert.Throws<ArgumentNullException>(() => insert.SetTo(null!, "1"));
-        Assert.Throws<ArgumentNullException>(() => insert.SetTo("", "1"));
+        Assert.Throws<ArgumentException>(() => insert.SetTo("", "1"));
         Assert.Throws<ArgumentNullException>(() => insert.SetTo("A", null!));
-        Assert.Throws<ArgumentNullException>(() => insert.SetTo("A", ""));
+        Assert.Throws<ArgumentException>(() => insert.SetTo("A", ""));
 
         insert.SetTo("A", "1");
         Assert.Single(((SqlInsert)insert).GetFieldExpressions());
@@ -67,7 +67,7 @@ public class SqlInsertTests
         var insert = new SqlInsert("T");
 
         Assert.Throws<ArgumentNullException>(() => insert.SetNull(null!));
-        Assert.Throws<ArgumentNullException>(() => insert.SetNull(""));
+        Assert.Throws<ArgumentException>(() => insert.SetNull(""));
 
         Assert.Same(insert, insert.SetNull("A"));
         var pair = Assert.Single(insert.GetFieldExpressions());

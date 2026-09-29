@@ -63,6 +63,23 @@ public class EntitySqlQueryExtensions_Joins_Tests
         Assert.Contains(typeof(OtherTargetRow.RowFields).FullName!, error.Message);
     }
 
+    [Fact]
+    public void JoinWithFieldsDoesNotInvokeCriteriaFactoryForFrozenQuery()
+    {
+        var query = new SqlQuery().From(ForeignKeyOnlyRow.Fields, out _);
+        query.Freeze();
+        var criteriaFactoryCalled = false;
+
+        Assert.Throws<InvalidOperationException>(() => query.LeftJoin(SelfNavigationRow.Fields,
+            fields =>
+            {
+                criteriaFactoryCalled = true;
+                return new Criteria(fields.ID) == 1;
+            }, out _));
+
+        Assert.False(criteriaFactoryCalled);
+    }
+
     [TableName("ForeignKeyOnly")]
     public sealed class ForeignKeyOnlyRow : Row<ForeignKeyOnlyRow.RowFields>
     {

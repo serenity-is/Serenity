@@ -9,6 +9,7 @@ public static partial class EntitySqlQueryExtensions
 		ArgumentNullException.ThrowIfNull(query);
 		ArgumentNullException.ThrowIfNull(fields);
 		ArgumentNullException.ThrowIfNull(foreignKeyField);
+		CheckNotFrozen(query);
 
 		var fieldName = foreignKeyField.PropertyName ?? foreignKeyField.Name;
 		var sourceFieldsType = foreignKeyField.Fields.GetType();
@@ -109,8 +110,10 @@ public static partial class EntitySqlQueryExtensions
 		Func<IAlias, ICriteria, SqlQuery> addJoin)
 		where TFields : RowFieldsBase
 	{
+		ArgumentNullException.ThrowIfNull(query);
 		ArgumentNullException.ThrowIfNull(fields);
 		ArgumentNullException.ThrowIfNull(onCriteria);
+		CheckNotFrozen(query);
 
 		aliased = AdjustAlias(query, fields);
 		return addJoin((IAlias)aliased, onCriteria(aliased));

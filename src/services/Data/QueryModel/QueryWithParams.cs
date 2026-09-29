@@ -57,6 +57,9 @@ public class QueryWithParams : IQueryWithParams
     /// <param name="target">The target.</param>
     protected void CloneParams(QueryWithParams target)
     {
+        ArgumentNullException.ThrowIfNull(target);
+        target.BeforeModify();
+
         target.parameters = parameters != null ? new Dictionary<string, object?>(parameters) : null;
     }
 
@@ -251,9 +254,16 @@ public class QueryWithParams : IQueryWithParams
         ArgumentNullException.ThrowIfNull(alias);
         ArgumentNullException.ThrowIfNull(expression);
 
+        BeforeModify();
+
+        SetAliasExpressionCore(alias, expression);
+    }
+
+    private void SetAliasExpressionCore(string alias, string expression)
+    {
         if (parent is not null)
         {
-            parent.SetAliasExpression(alias, expression);
+            parent.SetAliasExpressionCore(alias, expression);
             return;
         }
 
@@ -267,9 +277,16 @@ public class QueryWithParams : IQueryWithParams
     /// </summary>
     protected void ResetAliasExpressions(bool localOnly)
     {
+        BeforeModify();
+
+        ResetAliasExpressionsCore(localOnly);
+    }
+
+    private void ResetAliasExpressionsCore(bool localOnly)
+    {
         if (parent is not null && !localOnly)
         {
-            parent.ResetAliasExpressions(localOnly: false);
+            parent.ResetAliasExpressionsCore(localOnly: false);
             return;
         }
 
@@ -285,7 +302,10 @@ public class QueryWithParams : IQueryWithParams
         ArgumentNullException.ThrowIfNull(target);
 
         if (parent is null && target.parent is null && aliasExpressions is not null)
+        {
+            target.BeforeModify();
             target.aliasExpressions = new(aliasExpressions, StringComparer.OrdinalIgnoreCase);
+        }
     }
 
     /// <summary>

@@ -93,12 +93,17 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
 
         BeforeModify();
 
+        AppendFromTable(table);
+
+        return this;
+    }
+
+    private void AppendFromTable(string table)
+    {
         if (from.Length > 0)
             from.Append(", ");
 
         from.Append(SqlSyntax.AutoBracketValid(table, dialect));
-
-        return this;
     }
 
     /// <summary>
@@ -115,13 +120,28 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
         if (string.IsNullOrEmpty(table))
             throw new ArgumentNullException(nameof(table));
 
+        BeforeModify();
+
+        return FromAliasedTable(table, alias);
+    }
+
+    private SqlQuery FromAliasedTable(string table, IAlias alias)
+    {
+        if (string.IsNullOrEmpty(table))
+            throw new ArgumentNullException(nameof(table));
+
         if (GetAliasExpression(alias.Name) is not null)
             throw new ArgumentOutOfRangeException(string.Format("{0} alias is used more than once in the query!", alias.Name));
 
         if (alias is IHasDialect hasDialect && !IsDialectOverridden)
-            Dialect(hasDialect.Dialect);
+        {
+            var aliasDialect = hasDialect.Dialect;
+            ArgumentNullException.ThrowIfNull(aliasDialect);
+            dialect = aliasDialect;
+            dialectOverridden = true;
+        }
 
-        From(table);
+        AppendFromTable(table);
 
         from.Append(' ');
         from.Append(alias.Name);
@@ -165,7 +185,9 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
 
         ArgumentNullException.ThrowIfNull(alias);
 
-        return From(subQuery.ToString()!, alias);
+        BeforeModify();
+
+        return FromAliasedTable(subQuery.ToString()!, alias);
     }
 
     /// <summary>
@@ -259,10 +281,11 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
         if (string.IsNullOrEmpty(expression))
             throw new ArgumentNullException(nameof(expression));
 
+        BeforeModify();
+
         if (desc)
             expression += SqlKeywords.Desc;
 
-        BeforeModify();
         orderBy ??= [];
 
         orderBy.Add(expression);
@@ -307,10 +330,11 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
         if (string.IsNullOrEmpty(expression))
             throw new ArgumentNullException(nameof(expression));
 
+        BeforeModify();
+
         if (desc)
             expression += SqlKeywords.Desc;
 
-        BeforeModify();
         orderBy ??= [];
 
         string search = (expression ?? "").Trim();
@@ -436,6 +460,8 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
         if (string.IsNullOrEmpty(columnName))
             throw new ArgumentNullException(nameof(columnName));
 
+        BeforeModify();
+
         Select(expression.ToString()!, columnName);
 
         return this;
@@ -450,6 +476,8 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     {
         ArgumentNullException.ThrowIfNull(expression);
 
+        BeforeModify();
+
         Select(expression.ToString()!);
 
         return this;
@@ -463,6 +491,8 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     /// <remarks>No aliases are used for the fields or expressions.</remarks>
     public SqlQuery SelectMany(params string[] expressions)
     {
+        ArgumentNullException.ThrowIfNull(expressions);
+
         foreach (var s in expressions)
             Select(s);
 

@@ -155,6 +155,23 @@ public class SqlQuery_JoinTests
     }
 
     [Fact]
+    public void EnsureJoin_And_Join_Aliases_Throw_When_Query_Is_Frozen()
+    {
+        var alias = new AliasWithJoins("Table", "T1");
+        var query = new SqlQuery().From("Base").LeftJoin(alias, null);
+        query.Freeze();
+
+        Assert.Throws<InvalidOperationException>(() =>
+            query.Join(new LeftJoin("Table", "T1", null)));
+        Assert.Throws<InvalidOperationException>(() =>
+            query.EnsureJoin(new LeftJoin("Table", "T1", null)));
+        Assert.Throws<InvalidOperationException>(() =>
+            query.EnsureJoinsInExpression("T1.Id"));
+        Assert.Throws<InvalidOperationException>(() =>
+            query.LeftJoin(new AliasWithJoins("Table", "T1"), null));
+    }
+
+    [Fact]
     public void EnsureJoin_Recurses_Into_Referenced_Joins()
     {
         var joins = new Dictionary<string, Join>();

@@ -68,13 +68,11 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
     ///   Field expression, required.</param>
     /// <returns>
     ///   SqlInsert object itself.</returns>
-    /// <exception cref="ArgumentNullException">field or expression is null or empty.</exception>
+    /// <exception cref="ArgumentException">field or expression is null or empty.</exception>
     public SqlInsert SetTo(string field, string expression)
     {
-        if (field == null || field.Length == 0)
-            throw new ArgumentNullException(field);
-        if (expression == null || expression.Length == 0)
-            throw new ArgumentNullException(expression);
+        ArgumentException.ThrowIfNullOrEmpty(field);
+        ArgumentException.ThrowIfNullOrEmpty(expression);
 
         BeforeModify();
         fieldExpressions.Add(new FieldExpressionPair(field, expression));
@@ -91,10 +89,8 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
     ///   SqlInsert object itself.</returns>
     void ISetFieldByStatement.SetTo(string field, string expression)
     {
-        if (field == null || field.Length == 0)
-            throw new ArgumentNullException(field);
-        if (expression == null || expression.Length == 0)
-            throw new ArgumentNullException(expression);
+        ArgumentException.ThrowIfNullOrEmpty(field);
+        ArgumentException.ThrowIfNullOrEmpty(expression);
 
         BeforeModify();
         fieldExpressions.Add(new FieldExpressionPair(field, expression));
@@ -111,7 +107,6 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
     public SqlInsert SetTo(IField field, string expression)
     {
         ArgumentNullException.ThrowIfNull(field);
-
         return SetTo(field.Name, expression);
     }
 
@@ -121,12 +116,10 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
     ///   Field (required).</param>
     /// <returns>
     ///   SqlInsert object itself.</returns>
-    /// <exception cref="ArgumentNullException">field is null or empty.</exception>
+    /// <exception cref="ArgumentException">field is null or empty.</exception>
     public SqlInsert SetNull(string field)
     {
-        if (string.IsNullOrEmpty(field))
-            throw new ArgumentNullException(field);
-
+        ArgumentException.ThrowIfNullOrEmpty(field);
         BeforeModify();
         fieldExpressions.Add(new FieldExpressionPair(field, SqlKeywords.Null));
         return this;
@@ -181,7 +174,8 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
     /// <param name="dialect">Target dialect</param>
     /// <returns>
     ///   Formatted query.</returns>
-    /// <exception cref="ArgumentNullException">tableName or fieldExpressions is null.</exception>
+    /// <exception cref="ArgumentException">tableName is null or empty.</exception>
+    /// <exception cref="ArgumentNullException">fieldExpressions is null.</exception>
     /// <exception cref="ArgumentOutOfRangeException">fieldExpressions has an odd number of elements.</exception>
     [Obsolete("Use overload with IEnumerable<FieldExpressionPair>")]
     public static string Format(string tableName, List<string> fieldExpressions, ISqlDialect? dialect = null)
@@ -206,12 +200,11 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
     /// <param name="dialect">Target dialect</param>
     /// <returns>
     ///   Formatted query.</returns>
-    /// <exception cref="ArgumentNullException">tableName or fieldExpressions is null.</exception>
+    /// <exception cref="ArgumentException">tableName is null or empty.</exception>
+    /// <exception cref="ArgumentNullException">fieldExpressions is null.</exception>
     public static string Format(string tableName, IEnumerable<FieldExpressionPair> fieldExpressions, ISqlDialect? dialect = null)
     {
-        if (tableName == null || tableName.Length == 0)
-            throw new ArgumentNullException(tableName);
-
+        ArgumentException.ThrowIfNullOrEmpty(tableName);
         ArgumentNullException.ThrowIfNull(fieldExpressions);
 
         var list = fieldExpressions.ToList();
@@ -252,12 +245,13 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
     /// <param name="dialect">Target dialect</param>
     /// <returns>
     ///   Formatted UPSERT query.</returns>
+    /// <exception cref="ArgumentException">tableName is null or empty.</exception>
+    /// <exception cref="ArgumentNullException">fieldExpressions or keyFields is null.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">keyFields is empty.</exception>
     public static string FormatUpsert(string tableName, IEnumerable<FieldExpressionPair> fieldExpressions,
         IEnumerable<string> keyFields, ISqlDialect? dialect = null)
     {
-        if (tableName == null || tableName.Length == 0)
-            throw new ArgumentNullException(nameof(tableName));
-
+        ArgumentException.ThrowIfNullOrEmpty(tableName);
         ArgumentNullException.ThrowIfNull(fieldExpressions);
         ArgumentNullException.ThrowIfNull(keyFields);
 
@@ -276,7 +270,7 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
         foreach (var pair in list)
         {
             var field = pair.Field;
-            if (field == null || field.Length == 0)
+            if (string.IsNullOrEmpty(field))
                 throw new ArgumentException("Field name is null or empty!", nameof(fieldExpressions));
 
             fields.Add(SqlSyntax.AutoBracket(field, dialect));

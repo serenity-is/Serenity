@@ -26,11 +26,10 @@ public static partial class Sql
     /// </summary>
     /// <param name="field">The field.</param>
     /// <returns>The SUM() expression.</returns>
-    /// <exception cref="ArgumentNullException">field is null or empty.</exception>
+    /// <exception cref="ArgumentException">field is null or empty.</exception>
     public static string Sum(string field)
     {
-        if (field == null || field.Length == 0)
-            throw new ArgumentNullException(nameof(field));
+        ArgumentException.ThrowIfNullOrEmpty(field);
 
         return "SUM(" + field + ")";
     }
@@ -53,11 +52,10 @@ public static partial class Sql
     /// </summary>
     /// <param name="field">The field.</param>
     /// <returns>The COUNT() expression.</returns>
-    /// <exception cref="ArgumentNullException">field is null or empty.</exception>
+    /// <exception cref="ArgumentException">field is null or empty.</exception>
     public static string Count(string field)
     {
-        if (field == null || field.Length == 0)
-            throw new ArgumentNullException(nameof(field));
+        ArgumentException.ThrowIfNullOrEmpty(field);
         return "COUNT(" + field + ")";
     }
 
@@ -79,11 +77,10 @@ public static partial class Sql
     /// <param name="joinNumber">The join number.</param>
     /// <param name="field">The field.</param>
     /// <returns>The COUNT() expression.</returns>
-    /// <exception cref="ArgumentNullException">field is null or empty.</exception>
+    /// <exception cref="ArgumentException">field is null or empty.</exception>
     public static string Count(int joinNumber, string field)
     {
-        if (field == null || field.Length == 0)
-            throw new ArgumentNullException(nameof(field));
+        ArgumentException.ThrowIfNullOrEmpty(field);
 
         return string.Format("COUNT(T{0}.{1})", joinNumber.ToString(CultureInfo.InvariantCulture), field);
     }
@@ -102,11 +99,11 @@ public static partial class Sql
     /// </summary>
     /// <param name="statements">The statements.</param>
     /// <returns>The COALESCE() expression.</returns>
-    /// <exception cref="ArgumentNullException">fields is null or empty.</exception>
+    /// <exception cref="ArgumentNullException">statements is null or empty.</exception>
     public static string Coalesce(params string[] statements)
     {
         if (statements == null || statements.Length == 0)
-            throw new ArgumentNullException("fields");
+            throw new ArgumentNullException(nameof(statements));
 
         StringBuilder sb = new("COALESCE(");
         sb.Append(statements[0]);
@@ -163,11 +160,10 @@ public static partial class Sql
     /// </summary>
     /// <param name="field">The field.</param>
     /// <returns>The MIN() expression.</returns>
-    /// <exception cref="ArgumentNullException">field is null or empty.</exception>
+    /// <exception cref="ArgumentException">field is null or empty.</exception>
     public static string Min(string field)
     {
-        if (field == null || field.Length == 0)
-            throw new ArgumentNullException(nameof(field));
+        ArgumentException.ThrowIfNullOrEmpty(field);
 
         return "MIN(" + field + ")";
     }
@@ -192,11 +188,10 @@ public static partial class Sql
     /// <param name="joinNumber">The join number.</param>
     /// <param name="field">The field.</param>
     /// <returns>The MIN() expression.</returns>
-    /// <exception cref="ArgumentNullException">field is null or empty.</exception>
+    /// <exception cref="ArgumentException">field is null or empty.</exception>
     public static string Min(int joinNumber, string field)
     {
-        if (field == null || field.Length == 0)
-            throw new ArgumentNullException(nameof(field));
+        ArgumentException.ThrowIfNullOrEmpty(field);
 
         return string.Format("MIN(T{0}.{1})", joinNumber.ToString(CultureInfo.InvariantCulture), field);
     }
@@ -206,11 +201,10 @@ public static partial class Sql
     /// </summary>
     /// <param name="field">The field.</param>
     /// <returns>The MAX() expression.</returns>
-    /// <exception cref="ArgumentNullException">field is null or empty.</exception>
+    /// <exception cref="ArgumentException">field is null or empty.</exception>
     public static string Max(string field)
     {
-        if (field == null || field.Length == 0)
-            throw new ArgumentNullException(nameof(field));
+        ArgumentException.ThrowIfNullOrEmpty(field);
 
         return "MAX(" + field + ")";
     }
@@ -234,11 +228,10 @@ public static partial class Sql
     /// <param name="joinNumber">The join number.</param>
     /// <param name="field">The field.</param>
     /// <returns>The MAX() expression.</returns>
-    /// <exception cref="ArgumentNullException">field is null or empty.</exception>
+    /// <exception cref="ArgumentException">field is null or empty.</exception>
     public static string Max(int joinNumber, string field)
     {
-        if (field == null || field.Length == 0)
-            throw new ArgumentNullException(nameof(field));
+        ArgumentException.ThrowIfNullOrEmpty(field);
 
         return string.Format("MAX(T{0}.{1})", joinNumber.ToString(CultureInfo.InvariantCulture), field);
     }
@@ -249,11 +242,10 @@ public static partial class Sql
     /// <param name="joinNumber">The join number.</param>
     /// <param name="field">The field.</param>
     /// <returns>The SUM() expression.</returns>
-    /// <exception cref="ArgumentNullException">field is null or empty.</exception>
+    /// <exception cref="ArgumentException">field is null or empty.</exception>
     public static string Sum(int joinNumber, string field)
     {
-        if (field == null || field.Length == 0)
-            throw new ArgumentNullException(nameof(field));
+        ArgumentException.ThrowIfNullOrEmpty(field);
 
         return string.Format("SUM(T{0}.{1})", joinNumber.ToString(CultureInfo.InvariantCulture), field);
     }
@@ -263,11 +255,10 @@ public static partial class Sql
     /// </summary>
     /// <param name="field">The field.</param>
     /// <returns>The AVG() expression.</returns>
-    /// <exception cref="ArgumentNullException">field is null or empty.</exception>
+    /// <exception cref="ArgumentException">field is null or empty.</exception>
     public static string Avg(string field)
     {
-        if (field == null || field.Length == 0)
-            throw new ArgumentNullException(nameof(field));
+        ArgumentException.ThrowIfNullOrEmpty(field);
 
         return "AVG(" + field + ")";
     }
@@ -291,11 +282,10 @@ public static partial class Sql
     /// <param name="joinNumber">The join number.</param>
     /// <param name="field">The field.</param>
     /// <returns>The AVG() expression.</returns>
-    /// <exception cref="ArgumentNullException">field is null or empty.</exception>
+    /// <exception cref="ArgumentException">field is null or empty.</exception>
     public static string Avg(int joinNumber, string field)
     {
-        if (field == null || field.Length == 0)
-            throw new ArgumentNullException(nameof(field));
+        ArgumentException.ThrowIfNullOrEmpty(field);
 
         return string.Format("AVG(T{0}.{1})", joinNumber.ToString(CultureInfo.InvariantCulture), field);
     }
@@ -306,16 +296,13 @@ public static partial class Sql
     /// <param name="type">The type.</param>
     /// <param name="field">The field.</param>
     /// <returns>The Convert() expression.</returns>
-    /// <exception cref="ArgumentNullException">
+    /// <exception cref="ArgumentException">
     /// type or field is null or empty.
     /// </exception>
     public static string Convert(string type, string field)
     {
-        if (string.IsNullOrEmpty(type))
-            throw new ArgumentNullException(nameof(type));
-
-        if (string.IsNullOrEmpty(field))
-            throw new ArgumentNullException(nameof(field));
+        ArgumentException.ThrowIfNullOrEmpty(type);
+        ArgumentException.ThrowIfNullOrEmpty(field);
 
         return string.Format(" Convert({0},{1}) ", type, field);
     }
@@ -327,11 +314,10 @@ public static partial class Sql
     /// <param name="startIndex">The start index.</param>
     /// <param name="endIndex">The end index.</param>
     /// <returns>The SUBSTRING() expression.</returns>
-    /// <exception cref="ArgumentNullException">expression is null or empty.</exception>
+    /// <exception cref="ArgumentException">expression is null or empty.</exception>
     public static string SubString(string expression, int startIndex, int endIndex)
     {
-        if (string.IsNullOrEmpty(expression))
-            throw new ArgumentNullException(nameof(expression));
+        ArgumentException.ThrowIfNullOrEmpty(expression);
 
         return string.Format(" substring({0},{1},{2}) ", expression, startIndex, endIndex);
     }

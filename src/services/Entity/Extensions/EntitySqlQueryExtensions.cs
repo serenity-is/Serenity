@@ -35,10 +35,18 @@ public static partial class EntitySqlQueryExtensions
     private static void CheckNoIntoRow(SqlQuery query)
     {
         ArgumentNullException.ThrowIfNull(query);
+        CheckNotFrozen(query);
+
         if (((ISqlQueryExtensible)query).FirstIntoRow is not null)
             throw new InvalidOperationException(
                 "The query already has an INTO row. Row-based From overloads can only be called once. " +
                 "To add another source and materialize it, use query.From(secondRow.Fields.As(\"T2\")).Into(secondRow).");
+    }
+
+    private static void CheckNotFrozen(QueryWithParams query)
+    {
+        if (query.IsFrozen)
+            throw new InvalidOperationException("Query has been frozen.");
     }
 
     /// <summary>
@@ -51,6 +59,8 @@ public static partial class EntitySqlQueryExtensions
     {
         ArgumentNullException.ThrowIfNull(query);
         ArgumentNullException.ThrowIfNull(fields);
+
+        CheckNotFrozen(query);
 
         fields = AdjustFromAlias(query, fields);
         var alias = (IAlias)fields;
@@ -80,6 +90,7 @@ public static partial class EntitySqlQueryExtensions
     /// <exception cref="InvalidOperationException">The query already has an INTO row.</exception>
     public static SqlQuery From(this SqlQuery query, IEntity entity)
     {
+        ArgumentNullException.ThrowIfNull(query);
         ArgumentNullException.ThrowIfNull(entity);
         CheckNoIntoRow(query);
         
@@ -110,6 +121,9 @@ public static partial class EntitySqlQueryExtensions
         where TFields : RowFieldsBase
     {
         ArgumentNullException.ThrowIfNull(query);
+        ArgumentNullException.ThrowIfNull(fields);
+        CheckNotFrozen(query);
+
         aliased = AdjustFromAlias(query, fields);
         query.From(aliased);
         return query;
@@ -209,6 +223,8 @@ public static partial class EntitySqlQueryExtensions
     {
         ArgumentNullException.ThrowIfNull(query);
         ArgumentNullException.ThrowIfNull(fields);
+        CheckNotFrozen(query);
+
         fields = AdjustAlias(query, fields);
         var subquery = query.CreateSubQuery<SqlQuery>();
         subquery.From(fields, out aliased);
@@ -258,6 +274,7 @@ public static partial class EntitySqlQueryExtensions
     /// <returns>The query itself.</returns>
     public static SqlQuery Select(this SqlQuery query, IField field)
     {
+        ArgumentNullException.ThrowIfNull(query);
         ArgumentNullException.ThrowIfNull(field);
 
         query.EnsureJoinsInExpression(field.Expression);
@@ -284,6 +301,7 @@ public static partial class EntitySqlQueryExtensions
     /// </exception>
     public static SqlQuery Select(this SqlQuery query, IField field, string columnName)
     {
+        ArgumentNullException.ThrowIfNull(query);
         ArgumentNullException.ThrowIfNull(field);
 
         ArgumentNullException.ThrowIfNull(columnName);
@@ -367,6 +385,7 @@ public static partial class EntitySqlQueryExtensions
     /// <exception cref="ArgumentNullException">fields is null.</exception>
     public static SqlQuery Select(this SqlQuery query, params IField[] fields)
     {
+        ArgumentNullException.ThrowIfNull(query);
         ArgumentNullException.ThrowIfNull(fields);
 
         foreach (IField field in fields)
@@ -389,6 +408,8 @@ public static partial class EntitySqlQueryExtensions
     /// <exception cref="ArgumentNullException">expression is null or empty, or intoField is null.</exception>
     public static SqlQuery SelectAs(this SqlQuery query, string expression, IField intoField)
     {
+        ArgumentNullException.ThrowIfNull(query);
+
         if (string.IsNullOrEmpty(expression))
             throw new ArgumentNullException(nameof(expression));
 
@@ -416,6 +437,7 @@ public static partial class EntitySqlQueryExtensions
         ArgumentNullException.ThrowIfNull(query);
         ArgumentNullException.ThrowIfNull(foreignRowField);
         ArgumentNullException.ThrowIfNull(configure);
+        CheckNotFrozen(query);
 
         var foreignRowType = foreignRowField.ValueType;
         if (!typeof(IRow).IsAssignableFrom(foreignRowType) || foreignRowType.IsAbstract || foreignRowType.IsInterface)

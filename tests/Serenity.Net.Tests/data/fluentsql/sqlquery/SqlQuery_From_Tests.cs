@@ -81,6 +81,17 @@ public class SqlQuery_From_Tests
     }
 
     [Fact]
+    public void FromOnFrozenQueryThrowsBeforeCheckingDuplicateAlias()
+    {
+        var query = new SqlQuery()
+            .From("TestTable", new Alias("x"));
+        query.Freeze();
+
+        Assert.Throws<InvalidOperationException>(() =>
+            query.From("AnotherTable", new Alias("x")));
+    }
+
+    [Fact]
     public void FromWithOnlyAliasWorks()
     {
         var query = new SqlQuery()

@@ -28,9 +28,9 @@ public class SqlUpdateTests
     public void SetTo_Throws_For_Null_Field_Or_Expression()
     {
         Assert.Throws<ArgumentNullException>(() => new SqlUpdate("T").SetTo((string)null!, "@p"));
-        Assert.Throws<ArgumentNullException>(() => new SqlUpdate("T").SetTo("", "@p"));
+        Assert.Throws<ArgumentException>(() => new SqlUpdate("T").SetTo("", "@p"));
         Assert.Throws<ArgumentNullException>(() => new SqlUpdate("T").SetTo("F", null!));
-        Assert.Throws<ArgumentNullException>(() => new SqlUpdate("T").SetTo("F", ""));
+        Assert.Throws<ArgumentException>(() => new SqlUpdate("T").SetTo("F", ""));
     }
 
     [Fact]
@@ -42,9 +42,9 @@ public class SqlUpdateTests
         Assert.Single(((SqlUpdate)update).GetFieldExpressions());
 
         Assert.Throws<ArgumentNullException>(() => update.SetTo(null!, "@p"));
-        Assert.Throws<ArgumentNullException>(() => update.SetTo("", "@p"));
+        Assert.Throws<ArgumentException>(() => update.SetTo("", "@p"));
         Assert.Throws<ArgumentNullException>(() => update.SetTo("F", null!));
-        Assert.Throws<ArgumentNullException>(() => update.SetTo("F", ""));
+        Assert.Throws<ArgumentException>(() => update.SetTo("F", ""));
     }
 
     [Fact]
@@ -65,7 +65,7 @@ public class SqlUpdateTests
 
         Assert.Equal(SqlKeywords.Null, update.GetFieldExpressions()[0].Expression);
         Assert.Throws<ArgumentNullException>(() => new SqlUpdate("T").SetNull(null!));
-        Assert.Throws<ArgumentNullException>(() => new SqlUpdate("T").SetNull(""));
+        Assert.Throws<ArgumentException>(() => new SqlUpdate("T").SetNull(""));
     }
 
     [Fact]
@@ -252,7 +252,7 @@ public class SqlUpdateTests
         }));
 
         Assert.Throws<ArgumentNullException>(() => SqlUpdate.Format(null!, "x", pairs));
-        Assert.Throws<ArgumentNullException>(() => SqlUpdate.Format("", "x", pairs));
+        Assert.Throws<ArgumentException>(() => SqlUpdate.Format("", "x", pairs));
         Assert.Throws<ArgumentNullException>(() => SqlUpdate.Format("T", "x", (IEnumerable<FieldExpressionPair>)null!));
     }
 

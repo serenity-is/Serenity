@@ -59,11 +59,10 @@ public sealed class SqlDelete(string tableName) : QueryWithParams, IFilterableQu
     /// <param name="dialect">Target dialect</param>
     /// <returns>
     ///   Formatted query.</returns>
-    /// <exception cref="ArgumentNullException">tableName is null or empty.</exception>
+    /// <exception cref="ArgumentException">tableName is null or empty.</exception>
     public static string Format(string tableName, string where, ISqlDialect? dialect = null)
     {
-        if (tableName == null || tableName.Length == 0)
-            throw new ArgumentNullException(tableName);
+        ArgumentException.ThrowIfNullOrEmpty(tableName);
 
         StringBuilder sb = new("DELETE FROM ", 24 + where.Length);
         sb.Append(SqlSyntax.AutoBracketValid(tableName, dialect));
