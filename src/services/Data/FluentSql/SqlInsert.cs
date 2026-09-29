@@ -37,6 +37,7 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
     /// <returns>The SqlInsert object itself.</returns>
     public SqlInsert IdentityColumn(string value)
     {
+        BeforeModify();
         identityColumn = value;
         return this;
     }
@@ -47,7 +48,7 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
     /// <returns>The list of field and value expression pairs.</returns>
     public IReadOnlyList<FieldExpressionPair> GetFieldExpressions()
     {
-        return fieldExpressions;
+        return fieldExpressions.AsReadOnly();
     }
 
     /// <summary>
@@ -75,8 +76,8 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
         if (expression == null || expression.Length == 0)
             throw new ArgumentNullException(expression);
 
+        BeforeModify();
         fieldExpressions.Add(new FieldExpressionPair(field, expression));
-        InvalidateToString();
         return this;
     }
 
@@ -95,8 +96,8 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
         if (expression == null || expression.Length == 0)
             throw new ArgumentNullException(expression);
 
+        BeforeModify();
         fieldExpressions.Add(new FieldExpressionPair(field, expression));
-        InvalidateToString();
     }
 
     /// <summary>
@@ -126,8 +127,8 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
         if (string.IsNullOrEmpty(field))
             throw new ArgumentNullException(field);
 
+        BeforeModify();
         fieldExpressions.Add(new FieldExpressionPair(field, SqlKeywords.Null));
-        InvalidateToString();
         return this;
     }
 
@@ -154,9 +155,10 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
     /// <exception cref="ArgumentNullException">dialect is null.</exception>
     public SqlInsert Dialect(ISqlDialect dialect)
     {
-        this.dialect = dialect ?? throw new ArgumentNullException(nameof(dialect));
+        ArgumentNullException.ThrowIfNull(dialect);
+        BeforeModify();
+        this.dialect = dialect;
         dialectOverridden = true;
-        InvalidateToString();
 
         return this;
     }

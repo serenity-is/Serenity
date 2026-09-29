@@ -22,12 +22,12 @@ public sealed class SqlDelete(string tableName) : QueryWithParams, IFilterableQu
         if (criteria is null || criteria.IsEmpty)
             return this;
 
+        BeforeModify();
         var sql = criteria.ToString(this);
         if (whereCriteria.Count > 0)
             whereClause.Append(SqlKeywords.And);
         whereClause.Append(sql);
         whereCriteria.Add(criteria);
-        InvalidateToString();
 
         return this;
     }

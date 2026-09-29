@@ -49,7 +49,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     /// <returns>The query itself.</returns>
     public SqlQuery Distinct(bool distinct)
     {
-        InvalidateToString();
+        BeforeModify();
         this.distinct = distinct;
 
         return this;
@@ -62,7 +62,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     /// <returns>The query itself.</returns>
     public SqlQuery ForXml(string forXml)
     {
-        InvalidateToString();
+        BeforeModify();
         this.forXml = forXml;
         return this;
     }
@@ -74,7 +74,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     /// <returns>The query itself.</returns>
     public SqlQuery ForJson(string forJson = "AUTO")
     {
-        InvalidateToString();
+        BeforeModify();
         this.forJson = forJson;
         return this;
     }
@@ -91,7 +91,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
         if (string.IsNullOrEmpty(table))
             throw new ArgumentNullException(nameof(table));
 
-        InvalidateToString();
+        BeforeModify();
 
         if (from.Length > 0)
             from.Append(", ");
@@ -198,7 +198,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
         if (string.IsNullOrEmpty(expression))
             throw new ArgumentNullException(nameof(expression));
 
-        InvalidateToString();
+        BeforeModify();
 
         if (groupBy == null || groupBy.Length == 0)
             groupBy = new StringBuilder(expression);
@@ -237,7 +237,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
         if (string.IsNullOrEmpty(expression))
             throw new ArgumentNullException(nameof(expression));
 
-        InvalidateToString();
+        BeforeModify();
 
         if (having == null)
             having = new StringBuilder(expression);
@@ -262,7 +262,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
         if (desc)
             expression += SqlKeywords.Desc;
 
-        InvalidateToString();
+        BeforeModify();
         orderBy ??= [];
 
         orderBy.Add(expression);
@@ -310,7 +310,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
         if (desc)
             expression += SqlKeywords.Desc;
 
-        InvalidateToString();
+        BeforeModify();
         orderBy ??= [];
 
         string search = (expression ?? "").Trim();
@@ -485,7 +485,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     /// <returns>The query itself.</returns>
     public SqlQuery Skip(int skipRows)
     {
-        InvalidateToString();
+        BeforeModify();
         skip = skipRows;
         return this;
     }
@@ -516,7 +516,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     /// <returns>The query itself.</returns>
     public SqlQuery Take(int rowCount)
     {
-        InvalidateToString();
+        BeforeModify();
         take = rowCount;
         return this;
     }
@@ -533,7 +533,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     /// <returns>The query itself.</returns>
     public SqlQuery Union(SqlUnionType unionType = SqlUnionType.Union)
     {
-        InvalidateToString();
+        BeforeModify();
         unionQuery = Clone();
         unionQuery.countRecords = false;
         unionQuery.omitParens = true;
@@ -572,9 +572,9 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
         if (criteria is null || criteria.IsEmpty)
             return this;
 
+        BeforeModify();
         EnsureJoinsInExpression(criteria.ToStringIgnoreParams());
         var sql = criteria.ToString(this);
-        InvalidateToString();
         if (whereCriteria.Count > 0)
             whereClause.Append(SqlKeywords.And);
         whereClause.Append(sql);
@@ -597,8 +597,9 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     /// <exception cref="ArgumentNullException">dialect is null.</exception>
     public SqlQuery Dialect(ISqlDialect dialect)
     {
-        this.dialect = dialect ?? throw new ArgumentNullException(nameof(dialect));
-        InvalidateToString();
+        ArgumentNullException.ThrowIfNull(dialect);
+        BeforeModify();
+        this.dialect = dialect;
         dialectOverridden = true;
 
         return this;
@@ -612,7 +613,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     /// <returns>The query itself.</returns>
     public SqlQuery OmitParens(bool value = true)
     {
-        InvalidateToString();
+        BeforeModify();
         omitParens = value;
         return this;
     }
@@ -629,8 +630,8 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
         {
             if (countRecords != value)
             {
+                BeforeModify();
                 countRecords = value;
-                InvalidateToString();
             }
         }
     }
@@ -639,9 +640,9 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
 
     IReadOnlyList<Column> ISqlQueryExtensible.Columns => columns.AsReadOnly();
 
-    IList<object> ISqlQueryExtensible.IntoRows => into;
+    IReadOnlyList<object> ISqlQueryExtensible.IntoRows => into.AsReadOnly();
 
-    IEnumerable<object> ISqlQueryExtensible.FromSources => fromSources;
+    IReadOnlyList<object> ISqlQueryExtensible.FromSources => fromSources.AsReadOnly();
 
     IEnumerable<object> ISqlQueryExtensible.JoinSources
     {
@@ -677,6 +678,8 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
 
     private void IntoRowSelection(object? row)
     {
+        BeforeModify();
+
         if (row == null)
             intoIndex = -1;
         else
@@ -692,8 +695,8 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
 
     private void AddColumn(Column column)
     {
+        BeforeModify();
         columns.Add(column);
-        InvalidateToString();
     }
 
     /// <summary>

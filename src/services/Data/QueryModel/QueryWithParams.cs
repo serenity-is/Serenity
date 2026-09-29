@@ -11,6 +11,7 @@ namespace Serenity.Data;
 public class QueryWithParams : IQueryWithParams
 {
     private Dictionary<string, string>? aliasExpressions;
+    private bool isFrozen;
 
     /// <summary>
     /// The cached SQL string.
@@ -62,10 +63,15 @@ public class QueryWithParams : IQueryWithParams
     /// <summary>
     /// Invalidates this query's cached SQL and that of its parent query.
     /// </summary>
-    protected void InvalidateToString()
+    protected void BeforeModify()
     {
+        if (parent != null)
+            parent.BeforeModify();
+
+        if (isFrozen)
+            throw new InvalidOperationException("Query has been frozen.");
+
         cachedToString = null;
-        parent?.InvalidateToString();
     }
 
     /// <summary>
@@ -119,7 +125,7 @@ public class QueryWithParams : IQueryWithParams
             if (parent != null)
                 return parent.Params;
 
-            return (IReadOnlyDictionary<string, object?>?)parameters;
+            return parameters is null ? null : new ReadOnlyDictionary<string, object?>(parameters);
         }
     }
 
@@ -127,6 +133,11 @@ public class QueryWithParams : IQueryWithParams
     /// Gets a value indicating whether parameters have been frozen.
     /// </summary>
     public bool IsParamsFrozen => parent?.IsParamsFrozen ?? parameters?.IsReadOnly == true;
+
+    /// <summary>
+    /// Gets a value indicating whether this query or one of its parents has been frozen.
+    /// </summary>
+    public bool IsFrozen => isFrozen || parent?.IsFrozen == true;
 
     /// <summary>
     /// Gets the parameter count.
@@ -154,6 +165,9 @@ public class QueryWithParams : IQueryWithParams
         if (parent != null)
             return parent.AutoParam();
 
+        if (isFrozen)
+            throw new InvalidOperationException("Query has been frozen.");
+
         return new Parameter((++nextAutoParam).IndexParam());
     }
 
@@ -172,13 +186,24 @@ public class QueryWithParams : IQueryWithParams
         };
     }
 
+    void IQueryWithParams.Freeze()
+    {
+        if (parent is not null)
+            throw new InvalidOperationException("Freeze cannot be called on a subquery.");
+
+        _ = ToString();
+
+        if (isFrozen)
+            return;
+
+        ((IQueryWithParams)this).FreezeParams();
+        isFrozen = true;
+    }
+
     void IQueryWithParams.FreezeParams()
     {
         if (parent is not null)
-        {
-            ((IQueryWithParams)parent).FreezeParams();
-            return;
-        }
+            throw new InvalidOperationException("FreezeParams cannot be called on a subquery.");
 
         if (parameters?.IsReadOnly == true)
             return;

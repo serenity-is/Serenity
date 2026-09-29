@@ -123,6 +123,8 @@ public class SqlInsertTests
         var second = insert.ToString();
 
         Assert.Same(first, second);
+        Assert.Throws<NotSupportedException>(() =>
+            ((IList<FieldExpressionPair>)insert.GetFieldExpressions()).Add(new("B", "2")));
     }
 
     [Fact]

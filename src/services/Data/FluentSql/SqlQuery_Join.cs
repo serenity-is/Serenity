@@ -57,7 +57,7 @@ public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressio
                 "Attempted join expression is '{2}'", join.Name, existingExpression, expression));
         }
 
-        InvalidateToString();
+        BeforeModify();
 
         if (from.Length > 0)
             from.Append(" \n");

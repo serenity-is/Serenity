@@ -64,12 +64,36 @@ public class EntitySqlQueryProjection_Tests
             .OnDbCommandExecuteReader(_ => dataReader = new MockDbDataReader(new { ID = 17 }));
 
         var query = new SqlQuery().From(new SelfNavigationRow());
+        var extensible = (ISqlQueryExtensible)query;
         var result = query.QueryProjected(connection,
             (SelfNavigationRow source) => new { ID = source.ID });
 
         Assert.Equal(1, connection.DbCommandExecuteReaderCallCount);
         Assert.True(dataReader!.IsClosed);
         Assert.Equal(17, Assert.Single(result).ID);
+        Assert.False(query.IsFrozen);
+        Assert.Empty(extensible.Columns);
+    }
+
+    [Fact]
+    public void QueryProjectedCanTakeOwnershipAndRejectsFrozenSources()
+    {
+        using var connection = new MockDbConnection()
+            .OnDbCommandExecuteReader(_ => new MockDbDataReader(new { ID = 17 }));
+
+        var query = new SqlQuery().From(new SelfNavigationRow());
+        var extensible = (ISqlQueryExtensible)query;
+        var result = query.QueryProjected(connection,
+            (SelfNavigationRow source) => new { ID = source.ID }, takeOwnership: true);
+
+        Assert.Equal(17, Assert.Single(result).ID);
+        Assert.Single(extensible.Columns);
+
+        var frozenQuery = new SqlQuery().From(new SelfNavigationRow());
+        frozenQuery.Freeze();
+        Assert.Throws<InvalidOperationException>(() => frozenQuery.QueryProjected(connection,
+            (SelfNavigationRow source) => new { ID = source.ID }, takeOwnership: true));
+        Assert.Empty(((ISqlQueryExtensible)frozenQuery).Columns);
     }
 
     [Fact]
@@ -108,7 +132,7 @@ public class EntitySqlQueryProjection_Tests
         var extensible = (ISqlQueryExtensible)query;
         var currentIntoRow = extensible.CurrentIntoRow;
         var projected = query.AsReusableProjected(
-            (SelfNavigationRow source) => new { ID = source.ID }, [SelfNavigationRow.Fields]);
+            (SelfNavigationRow source) => new { ID = source.ID }, [SelfNavigationRow.Fields], takeOwnership: false);
 
         Assert.Equal(17, Assert.Single(projected.List(connection)).ID);
         Assert.Equal(17, Assert.Single(projected.List(connection,
@@ -117,6 +141,7 @@ public class EntitySqlQueryProjection_Tests
 
         Assert.Equal(new object?[] { 1, 2, 1 }, parameterValues);
         Assert.Equal(1, query.Params!["p1"]);
+        Assert.False(query.IsFrozen);
         Assert.Empty(extensible.Columns);
         Assert.Same(currentIntoRow, extensible.CurrentIntoRow);
         Assert.Equal(17, Assert.Single(projected.Query(connection, buffered: false)).ID);
@@ -141,11 +166,15 @@ public class EntitySqlQueryProjection_Tests
     }
 
     [Fact]
-    public async Task ReusableProjectedQueryAllowsParallelExecutions()
+    public async Task ReusableProjectedQueryClonesSourceByDefaultAndAllowsParallelExecutions()
     {
         var query = new SqlQuery().From(new SelfNavigationRow());
         query.SetParam("p1", 0);
+        var extensible = (ISqlQueryExtensible)query;
         var projected = query.AsReusableProjected((SelfNavigationRow source) => new { ID = source.ID });
+
+        Assert.False(query.IsFrozen);
+        Assert.Empty(extensible.Columns);
 
         var executions = await Task.WhenAll(new[] { 1, 2 }.Select(value => Task.Run(() =>
         {
@@ -166,6 +195,44 @@ public class EntitySqlQueryProjection_Tests
         Assert.Equal(new[] { 1, 2 }, executions.Select(execution => execution.observedParameter).Order());
         Assert.All(executions, execution => Assert.Equal(17, execution.ID));
         Assert.Equal(0, query.Params!["p1"]);
+    }
+
+    [Fact]
+    public void ReusableProjectedQueryCanTakeOwnershipAndFreezesSource()
+    {
+        var query = new SqlQuery().From(new SelfNavigationRow());
+        var extensible = (ISqlQueryExtensible)query;
+
+        var projected = query.AsReusableProjected(
+            (SelfNavigationRow source) => new { ID = source.ID }, takeOwnership: true);
+
+        Assert.NotNull(projected);
+        Assert.True(query.IsFrozen);
+        Assert.Single(extensible.Columns);
+        Assert.Throws<InvalidOperationException>(() => query.Select("OtherColumn"));
+    }
+
+    [Fact]
+    public void ReusableProjectedQueryClonesFrozenSourceByDefaultAndRejectsTakingOwnership()
+    {
+        using var connection = new MockDbConnection()
+            .OnDbCommandExecuteReader(_ => new MockDbDataReader(new { ID = 17 }));
+
+        var query = new SqlQuery().From(new SelfNavigationRow());
+        query.Freeze();
+        var originalSql = query.ToString();
+        var extensible = (ISqlQueryExtensible)query;
+
+        var projected = query.AsReusableProjected(
+            (SelfNavigationRow source) => new { ID = source.ID }, [SelfNavigationRow.Fields]);
+
+        Assert.True(query.IsFrozen);
+        Assert.Empty(extensible.Columns);
+        Assert.Equal(originalSql, query.ToString());
+        Assert.Equal(17, Assert.Single(projected.List(connection)).ID);
+        Assert.Throws<InvalidOperationException>(() => query.AsReusableProjected(
+            (SelfNavigationRow source) => new { ID = source.ID }, takeOwnership: true));
+        Assert.Empty(extensible.Columns);
     }
 
     [Fact]

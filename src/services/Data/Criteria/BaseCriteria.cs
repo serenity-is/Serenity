@@ -1261,6 +1261,12 @@ public abstract class BaseCriteria : ICriteria
 
         public bool IsParamsFrozen => false;
 
+        public bool IsFrozen => false;
+
+        public void Freeze()
+        {
+        }
+
         public void FreezeParams()
         {
         }
@@ -1288,6 +1294,12 @@ public abstract class BaseCriteria : ICriteria
         }
 
         public bool IsParamsFrozen => false;
+
+        public bool IsFrozen => false;
+
+        public void Freeze()
+        {
+        }
 
         public void FreezeParams()
         {

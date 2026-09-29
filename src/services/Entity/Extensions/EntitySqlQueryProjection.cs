@@ -35,13 +35,15 @@ public static class EntitySqlQueryProjection
 	/// <param name="projection">A flat projection built from direct row field accesses.</param>
 	/// <param name="buffered">Whether to buffer all results before returning.</param>
 	/// <param name="parameters">Values that override the source query's parameters for this execution.</param>
+	/// <param name="takeOwnership">Whether to prepare the source query in place instead of cloning it. The source must not be frozen.</param>
 	/// <returns>The projected results.</returns>
 	public static IEnumerable<TResult> QueryProjected<TRow, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow, TResult>> projection, bool buffered = true,
-		IReadOnlyDictionary<string, object?>? parameters = null)
+		IReadOnlyDictionary<string, object?>? parameters = null, bool takeOwnership = false)
 		where TRow : class, IRow
 	{
-		return QueryProjectedCore<TResult>(query, connection, projection, buffered, parameters);
+		return QueryProjectedCore<TResult>(query, connection, projection, buffered, parameters,
+			takeOwnership: takeOwnership);
 	}
 
 	/// <summary>
@@ -53,13 +55,15 @@ public static class EntitySqlQueryProjection
 	/// <param name="connection">The connection.</param>
 	/// <param name="projection">A flat projection built from direct row field accesses.</param>
 	/// <param name="parameters">Values that override the source query's parameters for this execution.</param>
+	/// <param name="takeOwnership">Whether to prepare the source query in place instead of cloning it. The source must not be frozen.</param>
 	/// <returns>The projected results.</returns>
 	public static List<TResult> ListProjected<TRow, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow, TResult>> projection,
-		IReadOnlyDictionary<string, object?>? parameters = null)
+		IReadOnlyDictionary<string, object?>? parameters = null, bool takeOwnership = false)
 		where TRow : class, IRow
 	{
-		return [.. QueryProjectedCore<TResult>(query, connection, projection, buffered: false, parameters)];
+		return [.. QueryProjectedCore<TResult>(query, connection, projection, buffered: false, parameters,
+			takeOwnership: takeOwnership)];
 	}
 
 	/// <summary>
@@ -75,14 +79,16 @@ public static class EntitySqlQueryProjection
 	/// <param name="projection">A flat projection built from direct row field accesses.</param>
 	/// <param name="buffered">Whether to buffer all results before returning.</param>
 	/// <param name="parameters">Values that override the source query's parameters for this execution.</param>
+	/// <param name="takeOwnership">Whether to prepare the source query in place instead of cloning it. The source must not be frozen.</param>
 	/// <returns>The projected results.</returns>
 	public static IEnumerable<TResult> QueryProjected<TRow1, TRow2, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow1, TRow2, TResult>> projection, bool buffered = true,
-		IReadOnlyDictionary<string, object?>? parameters = null)
+		IReadOnlyDictionary<string, object?>? parameters = null, bool takeOwnership = false)
 		where TRow1 : class, IRow
 		where TRow2 : class, IRow
 	{
-		return QueryProjectedCore<TResult>(query, connection, projection, buffered, parameters);
+		return QueryProjectedCore<TResult>(query, connection, projection, buffered, parameters,
+			takeOwnership: takeOwnership);
 	}
 
 	/// <summary>
@@ -95,14 +101,16 @@ public static class EntitySqlQueryProjection
 	/// <param name="connection">The connection.</param>
 	/// <param name="projection">A flat projection built from direct row field accesses.</param>
 	/// <param name="parameters">Values that override the source query's parameters for this execution.</param>
+	/// <param name="takeOwnership">Whether to prepare the source query in place instead of cloning it. The source must not be frozen.</param>
 	/// <returns>The projected results.</returns>
 	public static List<TResult> ListProjected<TRow1, TRow2, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow1, TRow2, TResult>> projection,
-		IReadOnlyDictionary<string, object?>? parameters = null)
+		IReadOnlyDictionary<string, object?>? parameters = null, bool takeOwnership = false)
 		where TRow1 : class, IRow
 		where TRow2 : class, IRow
 	{
-		return [.. QueryProjectedCore<TResult>(query, connection, projection, buffered: false, parameters)];
+		return [.. QueryProjectedCore<TResult>(query, connection, projection, buffered: false, parameters,
+			takeOwnership: takeOwnership)];
 	}
 
 	/// <summary>
@@ -119,15 +127,17 @@ public static class EntitySqlQueryProjection
 	/// <param name="projection">A flat projection built from direct row field accesses.</param>
 	/// <param name="buffered">Whether to buffer all results before returning.</param>
 	/// <param name="parameters">Values that override the source query's parameters for this execution.</param>
+	/// <param name="takeOwnership">Whether to prepare the source query in place instead of cloning it. The source must not be frozen.</param>
 	/// <returns>The projected results.</returns>
 	public static IEnumerable<TResult> QueryProjected<TRow1, TRow2, TRow3, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow1, TRow2, TRow3, TResult>> projection, bool buffered = true,
-		IReadOnlyDictionary<string, object?>? parameters = null)
+		IReadOnlyDictionary<string, object?>? parameters = null, bool takeOwnership = false)
 		where TRow1 : class, IRow
 		where TRow2 : class, IRow
 		where TRow3 : class, IRow
 	{
-		return QueryProjectedCore<TResult>(query, connection, projection, buffered, parameters);
+		return QueryProjectedCore<TResult>(query, connection, projection, buffered, parameters,
+			takeOwnership: takeOwnership);
 	}
 
 	/// <summary>
@@ -141,15 +151,17 @@ public static class EntitySqlQueryProjection
 	/// <param name="connection">The connection.</param>
 	/// <param name="projection">A flat projection built from direct row field accesses.</param>
 	/// <param name="parameters">Values that override the source query's parameters for this execution.</param>
+	/// <param name="takeOwnership">Whether to prepare the source query in place instead of cloning it. The source must not be frozen.</param>
 	/// <returns>The projected results.</returns>
 	public static List<TResult> ListProjected<TRow1, TRow2, TRow3, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow1, TRow2, TRow3, TResult>> projection,
-		IReadOnlyDictionary<string, object?>? parameters = null)
+		IReadOnlyDictionary<string, object?>? parameters = null, bool takeOwnership = false)
 		where TRow1 : class, IRow
 		where TRow2 : class, IRow
 		where TRow3 : class, IRow
 	{
-		return [.. QueryProjectedCore<TResult>(query, connection, projection, buffered: false, parameters)];
+		return [.. QueryProjectedCore<TResult>(query, connection, projection, buffered: false, parameters,
+			takeOwnership: takeOwnership)];
 	}
 
 	/// <summary>
@@ -159,12 +171,13 @@ public static class EntitySqlQueryProjection
 	/// <typeparam name="TResult">The flat projection result type.</typeparam>
 	/// <param name="query">The query to prepare.</param>
 	/// <param name="projection">A flat projection built from row field accesses or SQL expressions.</param>
+	/// <param name="takeOwnership">Whether to prepare the source query in place. If false, a clone is prepared; an already-frozen source cannot be taken over.</param>
 	/// <returns>A reusable projection that can be executed with different parameter values.</returns>
 	public static IProjectedQuery<TResult> AsReusableProjected<TRow, TResult>(this SqlQuery query,
-		Expression<Func<TRow, TResult>> projection)
+		Expression<Func<TRow, TResult>> projection, bool takeOwnership = false)
 		where TRow : class, IRow
 	{
-		return CreateReusableProjection<TResult>(query, projection);
+		return CreateReusableProjection<TResult>(query, projection, takeOwnership: takeOwnership);
 	}
 
 	/// <summary>
@@ -175,13 +188,14 @@ public static class EntitySqlQueryProjection
 	/// <typeparam name="TResult">The flat projection result type.</typeparam>
 	/// <param name="query">The query to prepare.</param>
 	/// <param name="projection">A flat projection built from row field accesses or SQL expressions.</param>
+	/// <param name="takeOwnership">Whether to prepare the source query in place. If false, a clone is prepared; an already-frozen source cannot be taken over.</param>
 	/// <returns>A reusable projection that can be executed with different parameter values.</returns>
 	public static IProjectedQuery<TResult> AsReusableProjected<TRow1, TRow2, TResult>(this SqlQuery query,
-		Expression<Func<TRow1, TRow2, TResult>> projection)
+		Expression<Func<TRow1, TRow2, TResult>> projection, bool takeOwnership = false)
 		where TRow1 : class, IRow
 		where TRow2 : class, IRow
 	{
-		return CreateReusableProjection<TResult>(query, projection);
+		return CreateReusableProjection<TResult>(query, projection, takeOwnership: takeOwnership);
 	}
 
 	/// <summary>
@@ -193,14 +207,15 @@ public static class EntitySqlQueryProjection
 	/// <typeparam name="TResult">The flat projection result type.</typeparam>
 	/// <param name="query">The query to prepare.</param>
 	/// <param name="projection">A flat projection built from row field accesses or SQL expressions.</param>
+	/// <param name="takeOwnership">Whether to prepare the source query in place. If false, a clone is prepared; an already-frozen source cannot be taken over.</param>
 	/// <returns>A reusable projection that can be executed with different parameter values.</returns>
 	public static IProjectedQuery<TResult> AsReusableProjected<TRow1, TRow2, TRow3, TResult>(this SqlQuery query,
-		Expression<Func<TRow1, TRow2, TRow3, TResult>> projection)
+		Expression<Func<TRow1, TRow2, TRow3, TResult>> projection, bool takeOwnership = false)
 		where TRow1 : class, IRow
 		where TRow2 : class, IRow
 		where TRow3 : class, IRow
 	{
-		return CreateReusableProjection<TResult>(query, projection);
+		return CreateReusableProjection<TResult>(query, projection, takeOwnership: takeOwnership);
 	}
 
 	/// <summary>
@@ -213,15 +228,16 @@ public static class EntitySqlQueryProjection
 	/// <param name="projection">A flat projection built from direct row field accesses.</param>
 	/// <param name="parameters">Values that override the source query's parameters for this execution.</param>
 	/// <param name="cancellationToken">The cancellation token.</param>
+	/// <param name="takeOwnership">Whether to prepare the source query in place instead of cloning it. The source must not be frozen.</param>
 	/// <returns>A task representing the asynchronous operation. The task result is the projected list.</returns>
 	public static Task<List<TResult>> ListProjectedAsync<TRow, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow, TResult>> projection,
 		IReadOnlyDictionary<string, object?>? parameters = null,
-		CancellationToken cancellationToken = default)
+		CancellationToken cancellationToken = default, bool takeOwnership = false)
 		where TRow : class, IRow
 	{
 		ArgumentNullException.ThrowIfNull(connection);
-		var prepared = PrepareProjection<TResult>(query, projection);
+		var prepared = PrepareProjection<TResult>(query, projection, takeOwnership: takeOwnership);
 		return BufferProjectedAsync(prepared.Query, connection, prepared.Materializer, parameters, cancellationToken);
 	}
 
@@ -236,16 +252,17 @@ public static class EntitySqlQueryProjection
 	/// <param name="projection">A flat projection built from direct row field accesses.</param>
 	/// <param name="parameters">Values that override the source query's parameters for this execution.</param>
 	/// <param name="cancellationToken">The cancellation token.</param>
+	/// <param name="takeOwnership">Whether to prepare the source query in place instead of cloning it. The source must not be frozen.</param>
 	/// <returns>A task representing the asynchronous operation. The task result is the projected list.</returns>
 	public static Task<List<TResult>> ListProjectedAsync<TRow1, TRow2, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow1, TRow2, TResult>> projection,
 		IReadOnlyDictionary<string, object?>? parameters = null,
-		CancellationToken cancellationToken = default)
+		CancellationToken cancellationToken = default, bool takeOwnership = false)
 		where TRow1 : class, IRow
 		where TRow2 : class, IRow
 	{
 		ArgumentNullException.ThrowIfNull(connection);
-		var prepared = PrepareProjection<TResult>(query, projection);
+		var prepared = PrepareProjection<TResult>(query, projection, takeOwnership: takeOwnership);
 		return BufferProjectedAsync(prepared.Query, connection, prepared.Materializer, parameters, cancellationToken);
 	}
 
@@ -261,17 +278,18 @@ public static class EntitySqlQueryProjection
 	/// <param name="projection">A flat projection built from direct row field accesses.</param>
 	/// <param name="parameters">Values that override the source query's parameters for this execution.</param>
 	/// <param name="cancellationToken">The cancellation token.</param>
+	/// <param name="takeOwnership">Whether to prepare the source query in place instead of cloning it. The source must not be frozen.</param>
 	/// <returns>A task representing the asynchronous operation. The task result is the projected list.</returns>
 	public static Task<List<TResult>> ListProjectedAsync<TRow1, TRow2, TRow3, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow1, TRow2, TRow3, TResult>> projection,
 		IReadOnlyDictionary<string, object?>? parameters = null,
-		CancellationToken cancellationToken = default)
+		CancellationToken cancellationToken = default, bool takeOwnership = false)
 		where TRow1 : class, IRow
 		where TRow2 : class, IRow
 		where TRow3 : class, IRow
 	{
 		ArgumentNullException.ThrowIfNull(connection);
-		var prepared = PrepareProjection<TResult>(query, projection);
+		var prepared = PrepareProjection<TResult>(query, projection, takeOwnership: takeOwnership);
 		return BufferProjectedAsync(prepared.Query, connection, prepared.Materializer, parameters, cancellationToken);
 	}
 
@@ -286,15 +304,16 @@ public static class EntitySqlQueryProjection
 	/// <param name="projection">A flat projection built from direct row field accesses.</param>
 	/// <param name="parameters">Values that override the source query's parameters for this execution.</param>
 	/// <param name="cancellationToken">The cancellation token.</param>
+	/// <param name="takeOwnership">Whether to prepare the source query in place instead of cloning it. The source must not be frozen.</param>
 	/// <returns>An asynchronous stream of projected results.</returns>
 	public static IAsyncEnumerable<TResult> QueryProjectedAsync<TRow, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow, TResult>> projection,
 		IReadOnlyDictionary<string, object?>? parameters = null,
-		CancellationToken cancellationToken = default)
+		CancellationToken cancellationToken = default, bool takeOwnership = false)
 		where TRow : class, IRow
 	{
 		ArgumentNullException.ThrowIfNull(connection);
-		var prepared = PrepareProjection<TResult>(query, projection);
+		var prepared = PrepareProjection<TResult>(query, projection, takeOwnership: takeOwnership);
 		return EnumerateProjectedAsync(prepared.Query, connection, prepared.Materializer, parameters, cancellationToken);
 	}
 
@@ -310,16 +329,17 @@ public static class EntitySqlQueryProjection
 	/// <param name="projection">A flat projection built from direct row field accesses.</param>
 	/// <param name="parameters">Values that override the source query's parameters for this execution.</param>
 	/// <param name="cancellationToken">The cancellation token.</param>
+	/// <param name="takeOwnership">Whether to prepare the source query in place instead of cloning it. The source must not be frozen.</param>
 	/// <returns>An asynchronous stream of projected results.</returns>
 	public static IAsyncEnumerable<TResult> QueryProjectedAsync<TRow1, TRow2, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow1, TRow2, TResult>> projection,
 		IReadOnlyDictionary<string, object?>? parameters = null,
-		CancellationToken cancellationToken = default)
+		CancellationToken cancellationToken = default, bool takeOwnership = false)
 		where TRow1 : class, IRow
 		where TRow2 : class, IRow
 	{
 		ArgumentNullException.ThrowIfNull(connection);
-		var prepared = PrepareProjection<TResult>(query, projection);
+		var prepared = PrepareProjection<TResult>(query, projection, takeOwnership: takeOwnership);
 		return EnumerateProjectedAsync(prepared.Query, connection, prepared.Materializer, parameters, cancellationToken);
 	}
 
@@ -336,17 +356,18 @@ public static class EntitySqlQueryProjection
 	/// <param name="projection">A flat projection built from direct row field accesses.</param>
 	/// <param name="parameters">Values that override the source query's parameters for this execution.</param>
 	/// <param name="cancellationToken">The cancellation token.</param>
+	/// <param name="takeOwnership">Whether to prepare the source query in place instead of cloning it. The source must not be frozen.</param>
 	/// <returns>An asynchronous stream of projected results.</returns>
 	public static IAsyncEnumerable<TResult> QueryProjectedAsync<TRow1, TRow2, TRow3, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow1, TRow2, TRow3, TResult>> projection,
 		IReadOnlyDictionary<string, object?>? parameters = null,
-		CancellationToken cancellationToken = default)
+		CancellationToken cancellationToken = default, bool takeOwnership = false)
 		where TRow1 : class, IRow
 		where TRow2 : class, IRow
 		where TRow3 : class, IRow
 	{
 		ArgumentNullException.ThrowIfNull(connection);
-		var prepared = PrepareProjection<TResult>(query, projection);
+		var prepared = PrepareProjection<TResult>(query, projection, takeOwnership: takeOwnership);
 		return EnumerateProjectedAsync(prepared.Query, connection, prepared.Materializer, parameters, cancellationToken);
 	}
 
@@ -354,71 +375,89 @@ public static class EntitySqlQueryProjection
 	public static IEnumerable<TResult> QueryProjected<TRow, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow, TResult>> projection,
 		IReadOnlyList<RowFieldsBase> sources, bool buffered = true,
-		IReadOnlyDictionary<string, object?>? parameters = null)
+		IReadOnlyDictionary<string, object?>? parameters = null, bool takeOwnership = false)
 		where TRow : class, IRow =>
-		QueryProjectedCore<TResult>(query, connection, projection, buffered, parameters, sources);
+		QueryProjectedCore<TResult>(query, connection, projection, buffered, parameters, sources, takeOwnership);
 
 	/// <summary>Executes a projection using the specified row-fields source aliases.</summary>
 	public static IEnumerable<TResult> QueryProjected<TRow1, TRow2, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow1, TRow2, TResult>> projection,
 		IReadOnlyList<RowFieldsBase> sources, bool buffered = true,
-		IReadOnlyDictionary<string, object?>? parameters = null)
+		IReadOnlyDictionary<string, object?>? parameters = null, bool takeOwnership = false)
 		where TRow1 : class, IRow where TRow2 : class, IRow =>
-		QueryProjectedCore<TResult>(query, connection, projection, buffered, parameters, sources);
+		QueryProjectedCore<TResult>(query, connection, projection, buffered, parameters, sources, takeOwnership);
 
 	/// <summary>Executes a projection using the specified row-fields source aliases.</summary>
 	public static IEnumerable<TResult> QueryProjected<TRow1, TRow2, TRow3, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow1, TRow2, TRow3, TResult>> projection,
 		IReadOnlyList<RowFieldsBase> sources, bool buffered = true,
-		IReadOnlyDictionary<string, object?>? parameters = null)
+		IReadOnlyDictionary<string, object?>? parameters = null, bool takeOwnership = false)
 		where TRow1 : class, IRow where TRow2 : class, IRow where TRow3 : class, IRow =>
-		QueryProjectedCore<TResult>(query, connection, projection, buffered, parameters, sources);
+		QueryProjectedCore<TResult>(query, connection, projection, buffered, parameters, sources, takeOwnership);
 
 	/// <summary>Executes and buffers a projection using the specified row-fields source aliases.</summary>
 	public static List<TResult> ListProjected<TRow, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow, TResult>> projection,
-		IReadOnlyList<RowFieldsBase> sources, IReadOnlyDictionary<string, object?>? parameters = null)
+		IReadOnlyList<RowFieldsBase> sources, IReadOnlyDictionary<string, object?>? parameters = null,
+		bool takeOwnership = false)
 		where TRow : class, IRow =>
-		[.. QueryProjectedCore<TResult>(query, connection, projection, buffered: false, parameters, sources)];
+		[.. QueryProjectedCore<TResult>(query, connection, projection, buffered: false, parameters, sources, takeOwnership)];
 
 	/// <summary>Executes and buffers a projection using the specified row-fields source aliases.</summary>
 	public static List<TResult> ListProjected<TRow1, TRow2, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow1, TRow2, TResult>> projection,
-		IReadOnlyList<RowFieldsBase> sources, IReadOnlyDictionary<string, object?>? parameters = null)
+		IReadOnlyList<RowFieldsBase> sources, IReadOnlyDictionary<string, object?>? parameters = null,
+		bool takeOwnership = false)
 		where TRow1 : class, IRow where TRow2 : class, IRow =>
-		[.. QueryProjectedCore<TResult>(query, connection, projection, buffered: false, parameters, sources)];
+		[.. QueryProjectedCore<TResult>(query, connection, projection, buffered: false, parameters, sources, takeOwnership)];
 
 	/// <summary>Executes and buffers a projection using the specified row-fields source aliases.</summary>
 	public static List<TResult> ListProjected<TRow1, TRow2, TRow3, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow1, TRow2, TRow3, TResult>> projection,
-		IReadOnlyList<RowFieldsBase> sources, IReadOnlyDictionary<string, object?>? parameters = null)
+		IReadOnlyList<RowFieldsBase> sources, IReadOnlyDictionary<string, object?>? parameters = null,
+		bool takeOwnership = false)
 		where TRow1 : class, IRow where TRow2 : class, IRow where TRow3 : class, IRow =>
-		[.. QueryProjectedCore<TResult>(query, connection, projection, buffered: false, parameters, sources)];
+		[.. QueryProjectedCore<TResult>(query, connection, projection, buffered: false, parameters, sources, takeOwnership)];
 
 	/// <summary>Prepares a reusable projection using the specified row-fields source aliases.</summary>
+	/// <param name="query">The query to prepare.</param>
+	/// <param name="projection">A flat projection built from row field accesses or SQL expressions.</param>
+	/// <param name="sources">The row-fields sources for the projection parameters.</param>
+	/// <param name="takeOwnership">Whether to prepare the source query in place. If false, a clone is prepared; a frozen source cannot be taken over.</param>
+	/// <returns>A reusable projection that can be executed with different parameter values.</returns>
 	public static IProjectedQuery<TResult> AsReusableProjected<TRow, TResult>(this SqlQuery query,
-		Expression<Func<TRow, TResult>> projection, IReadOnlyList<RowFieldsBase> sources)
-		where TRow : class, IRow => CreateReusableProjection<TResult>(query, projection, sources);
+		Expression<Func<TRow, TResult>> projection, IReadOnlyList<RowFieldsBase> sources, bool takeOwnership = false)
+		where TRow : class, IRow => CreateReusableProjection<TResult>(query, projection, sources, takeOwnership);
 
 	/// <summary>Prepares a reusable projection using the specified row-fields source aliases.</summary>
+	/// <param name="query">The query to prepare.</param>
+	/// <param name="projection">A flat projection built from row field accesses or SQL expressions.</param>
+	/// <param name="sources">The row-fields sources for the projection parameters.</param>
+	/// <param name="takeOwnership">Whether to prepare the source query in place. If false, a clone is prepared; a frozen source cannot be taken over.</param>
+	/// <returns>A reusable projection that can be executed with different parameter values.</returns>
 	public static IProjectedQuery<TResult> AsReusableProjected<TRow1, TRow2, TResult>(this SqlQuery query,
-		Expression<Func<TRow1, TRow2, TResult>> projection, IReadOnlyList<RowFieldsBase> sources)
-		where TRow1 : class, IRow where TRow2 : class, IRow => CreateReusableProjection<TResult>(query, projection, sources);
+		Expression<Func<TRow1, TRow2, TResult>> projection, IReadOnlyList<RowFieldsBase> sources, bool takeOwnership = false)
+		where TRow1 : class, IRow where TRow2 : class, IRow => CreateReusableProjection<TResult>(query, projection, sources, takeOwnership);
 
 	/// <summary>Prepares a reusable projection using the specified row-fields source aliases.</summary>
+	/// <param name="query">The query to prepare.</param>
+	/// <param name="projection">A flat projection built from row field accesses or SQL expressions.</param>
+	/// <param name="sources">The row-fields sources for the projection parameters.</param>
+	/// <param name="takeOwnership">Whether to prepare the source query in place. If false, a clone is prepared; a frozen source cannot be taken over.</param>
+	/// <returns>A reusable projection that can be executed with different parameter values.</returns>
 	public static IProjectedQuery<TResult> AsReusableProjected<TRow1, TRow2, TRow3, TResult>(this SqlQuery query,
-		Expression<Func<TRow1, TRow2, TRow3, TResult>> projection, IReadOnlyList<RowFieldsBase> sources)
-		where TRow1 : class, IRow where TRow2 : class, IRow where TRow3 : class, IRow => CreateReusableProjection<TResult>(query, projection, sources);
+		Expression<Func<TRow1, TRow2, TRow3, TResult>> projection, IReadOnlyList<RowFieldsBase> sources, bool takeOwnership = false)
+		where TRow1 : class, IRow where TRow2 : class, IRow where TRow3 : class, IRow => CreateReusableProjection<TResult>(query, projection, sources, takeOwnership);
 
 	/// <summary>Executes and buffers a projection asynchronously using the specified row-fields source aliases.</summary>
 	public static Task<List<TResult>> ListProjectedAsync<TRow, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow, TResult>> projection,
 		IReadOnlyList<RowFieldsBase> sources, IReadOnlyDictionary<string, object?>? parameters = null,
-		CancellationToken cancellationToken = default)
+		CancellationToken cancellationToken = default, bool takeOwnership = false)
 		where TRow : class, IRow
 	{
 		ArgumentNullException.ThrowIfNull(connection);
-		var prepared = PrepareProjection<TResult>(query, projection, sources);
+		var prepared = PrepareProjection<TResult>(query, projection, sources, takeOwnership);
 		return BufferProjectedAsync(prepared.Query, connection, prepared.Materializer, parameters, cancellationToken);
 	}
 
@@ -426,11 +465,11 @@ public static class EntitySqlQueryProjection
 	public static Task<List<TResult>> ListProjectedAsync<TRow1, TRow2, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow1, TRow2, TResult>> projection,
 		IReadOnlyList<RowFieldsBase> sources, IReadOnlyDictionary<string, object?>? parameters = null,
-		CancellationToken cancellationToken = default)
+		CancellationToken cancellationToken = default, bool takeOwnership = false)
 		where TRow1 : class, IRow where TRow2 : class, IRow
 	{
 		ArgumentNullException.ThrowIfNull(connection);
-		var prepared = PrepareProjection<TResult>(query, projection, sources);
+		var prepared = PrepareProjection<TResult>(query, projection, sources, takeOwnership);
 		return BufferProjectedAsync(prepared.Query, connection, prepared.Materializer, parameters, cancellationToken);
 	}
 
@@ -438,11 +477,11 @@ public static class EntitySqlQueryProjection
 	public static Task<List<TResult>> ListProjectedAsync<TRow1, TRow2, TRow3, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow1, TRow2, TRow3, TResult>> projection,
 		IReadOnlyList<RowFieldsBase> sources, IReadOnlyDictionary<string, object?>? parameters = null,
-		CancellationToken cancellationToken = default)
+		CancellationToken cancellationToken = default, bool takeOwnership = false)
 		where TRow1 : class, IRow where TRow2 : class, IRow where TRow3 : class, IRow
 	{
 		ArgumentNullException.ThrowIfNull(connection);
-		var prepared = PrepareProjection<TResult>(query, projection, sources);
+		var prepared = PrepareProjection<TResult>(query, projection, sources, takeOwnership);
 		return BufferProjectedAsync(prepared.Query, connection, prepared.Materializer, parameters, cancellationToken);
 	}
 
@@ -450,11 +489,11 @@ public static class EntitySqlQueryProjection
 	public static IAsyncEnumerable<TResult> QueryProjectedAsync<TRow, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow, TResult>> projection,
 		IReadOnlyList<RowFieldsBase> sources, IReadOnlyDictionary<string, object?>? parameters = null,
-		CancellationToken cancellationToken = default)
+		CancellationToken cancellationToken = default, bool takeOwnership = false)
 		where TRow : class, IRow
 	{
 		ArgumentNullException.ThrowIfNull(connection);
-		var prepared = PrepareProjection<TResult>(query, projection, sources);
+		var prepared = PrepareProjection<TResult>(query, projection, sources, takeOwnership);
 		return EnumerateProjectedAsync(prepared.Query, connection, prepared.Materializer, parameters, cancellationToken);
 	}
 
@@ -462,11 +501,11 @@ public static class EntitySqlQueryProjection
 	public static IAsyncEnumerable<TResult> QueryProjectedAsync<TRow1, TRow2, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow1, TRow2, TResult>> projection,
 		IReadOnlyList<RowFieldsBase> sources, IReadOnlyDictionary<string, object?>? parameters = null,
-		CancellationToken cancellationToken = default)
+		CancellationToken cancellationToken = default, bool takeOwnership = false)
 		where TRow1 : class, IRow where TRow2 : class, IRow
 	{
 		ArgumentNullException.ThrowIfNull(connection);
-		var prepared = PrepareProjection<TResult>(query, projection, sources);
+		var prepared = PrepareProjection<TResult>(query, projection, sources, takeOwnership);
 		return EnumerateProjectedAsync(prepared.Query, connection, prepared.Materializer, parameters, cancellationToken);
 	}
 
@@ -474,31 +513,35 @@ public static class EntitySqlQueryProjection
 	public static IAsyncEnumerable<TResult> QueryProjectedAsync<TRow1, TRow2, TRow3, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow1, TRow2, TRow3, TResult>> projection,
 		IReadOnlyList<RowFieldsBase> sources, IReadOnlyDictionary<string, object?>? parameters = null,
-		CancellationToken cancellationToken = default)
+		CancellationToken cancellationToken = default, bool takeOwnership = false)
 		where TRow1 : class, IRow where TRow2 : class, IRow where TRow3 : class, IRow
 	{
 		ArgumentNullException.ThrowIfNull(connection);
-		var prepared = PrepareProjection<TResult>(query, projection, sources);
+		var prepared = PrepareProjection<TResult>(query, projection, sources, takeOwnership);
 		return EnumerateProjectedAsync(prepared.Query, connection, prepared.Materializer, parameters, cancellationToken);
 	}
 
 	private static IEnumerable<TResult> QueryProjectedCore<TResult>(SqlQuery query,
 		IDbConnection connection, LambdaExpression projection, bool buffered,
-		IReadOnlyDictionary<string, object?>? parameters, IReadOnlyList<RowFieldsBase>? sources = null)
+		IReadOnlyDictionary<string, object?>? parameters, IReadOnlyList<RowFieldsBase>? sources = null,
+		bool takeOwnership = false)
 	{
 		ArgumentNullException.ThrowIfNull(connection);
-		var prepared = PrepareProjection<TResult>(query, projection, sources);
+		var prepared = PrepareProjection<TResult>(query, projection, sources, takeOwnership);
 		var results = EnumerateProjected(prepared.Query, connection, prepared.Materializer, parameters);
 		return buffered ? [.. results] : results;
 	}
 
 	private static PreparedProjection<TResult> PrepareProjection<TResult>(SqlQuery query,
-		LambdaExpression projection, IReadOnlyList<RowFieldsBase>? sources = null)
+		LambdaExpression projection, IReadOnlyList<RowFieldsBase>? sources = null, bool takeOwnership = false)
 	{
 		ArgumentNullException.ThrowIfNull(query);
 		ArgumentNullException.ThrowIfNull(projection);
 
-		var projectedQuery = query.Clone();
+		if (takeOwnership && query.IsFrozen)
+			throw new InvalidOperationException("Cannot take ownership of a frozen query.");
+
+		var projectedQuery = takeOwnership ? query : query.Clone();
 		var extensible = (ISqlQueryExtensible)projectedQuery;
 		if (extensible.Columns.Count != 0)
 			throw new InvalidOperationException("QueryProjected requires a query without existing SELECT columns.");
@@ -672,13 +715,15 @@ public static class EntitySqlQueryProjection
 	}
 
 	private static ReusableProjectedQuery<TResult> CreateReusableProjection<TResult>(SqlQuery query,
-		LambdaExpression projection, IReadOnlyList<RowFieldsBase>? sources = null)
+		LambdaExpression projection, IReadOnlyList<RowFieldsBase>? sources = null, bool takeOwnership = false)
 	{
 		ArgumentNullException.ThrowIfNull(query);
 		if (((ISqlQuery)query).Parent is not null)
 			throw new NotSupportedException("Reusable projections require a root SqlQuery with independent parameters.");
 
-		var prepared = PrepareProjection<TResult>(query, projection, sources);
+		var prepared = PrepareProjection<TResult>(query, projection, sources, takeOwnership);
+		prepared.Query.Freeze();
+
 		return new ReusableProjectedQuery<TResult>(prepared.Query, prepared.Materializer);
 	}
 

@@ -228,6 +228,10 @@ public class SqlUpdateTests
             Assert.Same(updated, update.ToString());
             Assert.True(updated.Length > 0, $"{name} produced an empty query.");
         }
+
+        var updateForView = new SqlUpdate("T").SetTo("A", "1");
+        Assert.Throws<NotSupportedException>(() =>
+            ((IList<FieldExpressionPair>)updateForView.GetFieldExpressions()).Add(new("B", "2")));
     }
 
     [Fact]

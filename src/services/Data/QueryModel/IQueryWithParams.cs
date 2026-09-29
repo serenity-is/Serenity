@@ -31,6 +31,16 @@ public interface IQueryWithParams
     bool IsParamsFrozen { get; }
 
     /// <summary>
+    /// Gets a value indicating whether this query or one of its parents has been frozen.
+    /// </summary>
+    bool IsFrozen { get; }
+
+    /// <summary>
+    /// Freezes the query and its parameters, and prepares its SQL text for reuse.
+    /// </summary>
+    void Freeze();
+
+    /// <summary>
     /// Freezes the query's parameters so they can no longer be added or changed.
     /// </summary>
     void FreezeParams();

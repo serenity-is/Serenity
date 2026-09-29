@@ -44,7 +44,7 @@ public partial class SqlQuery
         if (string.IsNullOrEmpty(containsAlias))
             throw new ArgumentNullException(nameof(containsAlias));
 
-        InvalidateToString();
+        BeforeModify();
 
         if (from.Length > 0)
             from.Append(" \n");

@@ -63,6 +63,25 @@ public class SqlQuery_ToStringTests
     }
 
     [Fact]
+    public void Freeze_Warms_ToString_Cache_And_Prevents_Mutations()
+    {
+        var dialect = new QueryToStringDialect();
+        var query = new SqlQuery()
+            .Dialect(dialect)
+            .Select("c")
+            .From("t");
+
+        Assert.Same(query, query.Freeze());
+
+        Assert.Equal(1, dialect.CallCount);
+        Assert.Equal("CUSTOM", query.ToString());
+        Assert.Equal(1, dialect.CallCount);
+        Assert.Throws<InvalidOperationException>(() => query.Select("d"));
+        Assert.Throws<InvalidOperationException>(() => query.SetParam("p1", 1));
+        Assert.Equal(1, dialect.CallCount);
+    }
+
+    [Fact]
     public void ToString_Invalidates_For_Query_Shape_Mutations()
     {
         (string Name, Action<SqlQuery> Mutate)[] mutations =
@@ -188,6 +207,8 @@ public class SqlQuery_ToStringTests
         query.OrderBy("c");
         Assert.Single(sqlQuery.OrderBy);
         Assert.Throws<NotSupportedException>(() => ((IList<string>)sqlQuery.OrderBy).Add("d"));
+        Assert.Throws<NotSupportedException>(() => ((IList<object>)extensible.IntoRows).Add(new object()));
+        Assert.Throws<NotSupportedException>(() => ((IList<object>)extensible.FromSources).Add(new object()));
     }
 
     [Fact]

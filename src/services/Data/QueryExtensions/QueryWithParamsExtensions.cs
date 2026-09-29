@@ -6,6 +6,19 @@ namespace Serenity.Data;
 public static class QueryWithParamsExtensions
 {
     /// <summary>
+    /// Freezes the query and its parameters, and prepares its SQL text for reuse.
+    /// </summary>
+    /// <typeparam name="TQuery">The query type.</typeparam>
+    /// <param name="self">The query.</param>
+    /// <returns>The query itself.</returns>
+    public static TQuery Freeze<TQuery>(this TQuery self) where TQuery : IQueryWithParams
+    {
+        ArgumentNullException.ThrowIfNull(self);
+        self.Freeze();
+        return self;
+    }
+
+    /// <summary>
     /// Freezes the query's parameters so they can no longer be added or changed.
     /// </summary>
     /// <typeparam name="TQuery">The query type.</typeparam>

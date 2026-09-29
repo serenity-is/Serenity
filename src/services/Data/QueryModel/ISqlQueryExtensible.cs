@@ -11,7 +11,7 @@ public interface ISqlQueryExtensible
     /// <value>
     /// The into rows.
     /// </value>
-    IList<object> IntoRows { get; }
+    IReadOnlyList<object> IntoRows { get; }
 
     /// <summary>
     /// Gets the currently selected into row.
@@ -50,7 +50,7 @@ public interface ISqlQueryExtensible
     /// <summary>
     /// Gets the aliased sources added to the FROM clause.
     /// </summary>
-    IEnumerable<object> FromSources { get; }
+    IReadOnlyList<object> FromSources { get; }
 
     /// <summary>
     /// Gets the sources registered for resolving joins by alias.

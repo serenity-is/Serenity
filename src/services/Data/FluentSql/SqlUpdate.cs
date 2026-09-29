@@ -38,7 +38,7 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
     /// <returns>The list of field and value expression pairs.</returns>
     public IReadOnlyList<FieldExpressionPair> GetFieldExpressions()
     {
-        return fieldExpressions;
+        return fieldExpressions.AsReadOnly();
     }
 
     /// <summary>
@@ -69,8 +69,8 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
         if (expression == null || expression.Length == 0)
             throw new ArgumentNullException(expression);
 
+        BeforeModify();
         fieldExpressions.Add(new FieldExpressionPair(field, expression));
-        InvalidateToString();
         return this;
     }
 
@@ -89,8 +89,8 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
         if (expression == null || expression.Length == 0)
             throw new ArgumentNullException(expression);
 
+        BeforeModify();
         fieldExpressions.Add(new FieldExpressionPair(field, expression));
-        InvalidateToString();
     }
 
     /// <summary>
@@ -119,8 +119,8 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
         if (field == null || field.Length == 0)
             throw new ArgumentNullException(field);
 
+        BeforeModify();
         fieldExpressions.Add(new FieldExpressionPair(field, SqlKeywords.Null));
-        InvalidateToString();
         return this;
     }
 
@@ -188,13 +188,13 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
         if (criteria is null || criteria.IsEmpty)
             return this;
 
+        BeforeModify();
         var sql = criteria.ToString(this);
         if (whereCriteria.Count > 0)
             whereClause.Append(SqlKeywords.And);
         whereClause.Append(sql);
         whereCriteria.Add(criteria);
         whereConditions.Add(sql);
-        InvalidateToString();
 
         return this;
     }
@@ -207,9 +207,10 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
     /// <exception cref="ArgumentNullException">dialect is null.</exception>
     public SqlUpdate Dialect(ISqlDialect dialect)
     {
-        this.dialect = dialect ?? throw new ArgumentNullException(nameof(dialect));
+        ArgumentNullException.ThrowIfNull(dialect);
+        BeforeModify();
+        this.dialect = dialect;
         dialectOverridden = true;
-        InvalidateToString();
 
         return this;
     }
