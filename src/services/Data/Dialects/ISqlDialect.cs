@@ -13,7 +13,12 @@ public interface ISqlDialect
     public bool? AutoQuotedIdentifiers => null;
 
     /// <summary>
-    /// Gets a value indicating whether the server supports CONCAT.
+    /// Gets a value indicating whether the server supports the CONCAT() function
+    /// (used by <c>ConcatAttribute</c> to decide between <c>CONCAT(...)</c>
+    /// and an infix operator). This does not imply <see cref="ConcatOperator"/>
+    /// is available: e.g. MySQL supports <c>CONCAT()</c> but has no infix
+    /// concatenation operator (<c>||</c> is logical OR there unless
+    /// PIPES_AS_CONCAT mode is on).
     /// </summary>
     /// <value>
     ///   <c>true</c> if the server supports CONCAT function; otherwise, <c>false</c>.
@@ -58,6 +63,12 @@ public interface ISqlDialect
     /// <value>
     /// The CONCAT operator keyword.
     /// </value>
+    /// <remarks>
+    /// Dialects without an infix concatenation operator (e.g. MySQL, which
+    /// concatenates via the <c>CONCAT()</c> function) throw
+    /// <see cref="NotImplementedException"/>. Check <see cref="CanUseConcat"/>
+    /// for <c>CONCAT()</c> function support instead; it is independent of this member.
+    /// </remarks>
     string ConcatOperator { get; }
 
     /// <summary>
