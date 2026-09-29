@@ -42,17 +42,23 @@ public class PostgresSchemaProvider : ISchemaProvider
         return connection.Query<ForeignKeyInfo>(/*lang=sql*/ """
             SELECT
                 o.conname AS FKName,
-                (SELECT a.attname FROM pg_attribute a WHERE a.attrelid = m.oid AND a.attnum = o.conkey[1] AND a.attisdropped = false) AS FKColumn,
-                (SELECT nspname FROM pg_namespace WHERE oid=f.relnamespace) AS PKSchema,
+                fa.attname AS FKColumn,
+                (SELECT nspname FROM pg_namespace WHERE oid = f.relnamespace) AS PKSchema,
                 f.relname AS PKTable,
-                (SELECT a.attname FROM pg_attribute a WHERE a.attrelid = f.oid AND a.attnum = o.confkey[1] AND a.attisdropped = false) AS PKColumn
+                pa.attname AS PKColumn
             FROM
-                pg_constraint o LEFT JOIN pg_class c ON c.oid = o.conrelid
-                LEFT JOIN pg_class f ON f.oid = o.confrelid LEFT JOIN pg_class m ON m.oid = o.conrelid
+                pg_constraint o
+                JOIN pg_class m ON m.oid = o.conrelid
+                JOIN pg_class f ON f.oid = o.confrelid
+                JOIN LATERAL unnest(o.conkey) WITH ORDINALITY AS fk_col(attnum, ord) ON true
+                JOIN pg_attribute fa ON fa.attrelid = m.oid AND fa.attnum = fk_col.attnum AND fa.attisdropped = false
+                JOIN LATERAL unnest(o.confkey) WITH ORDINALITY AS pk_col(attnum, ord) ON pk_col.ord = fk_col.ord
+                JOIN pg_attribute pa ON pa.attrelid = f.oid AND pa.attnum = pk_col.attnum AND pa.attisdropped = false
             WHERE
-                o.contype = 'f' AND o.conrelid IN (SELECT oid FROM pg_class c WHERE c.relkind = 'r')
-                AND (SELECT nspname FROM pg_namespace WHERE oid=m.relnamespace) = @sma
+                o.contype = 'f' AND m.relkind = 'r'
+                AND (SELECT nspname FROM pg_namespace WHERE oid = m.relnamespace) = @sma
                 AND m.relname = @tbl
+            ORDER BY fk_col.ord
             """, new
         {
             sma = schema,

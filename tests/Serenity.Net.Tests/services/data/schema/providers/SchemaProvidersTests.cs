@@ -103,6 +103,28 @@ public class SchemaProvidersTests
     }
 
     [Fact]
+    public void Postgres_GetForeignKeys_Expands_All_Key_Columns()
+    {
+        string? sql = null;
+        using var connection = new MockDbConnection()
+            .OnDbCommandExecuteReader(cmd =>
+            {
+                sql = cmd.CommandText;
+                return new MockDbDataReader(
+                    new { FKName = "FK_T", FKColumn = "A_ID", PKSchema = "public", PKTable = "T", PKColumn = "A" },
+                    new { FKName = "FK_T", FKColumn = "B_ID", PKSchema = "public", PKTable = "T", PKColumn = "B" });
+            });
+
+        var fks = new PostgresSchemaProvider().GetForeignKeys(connection, "public", "T").ToList();
+
+        // composite FKs come back as one row per column pair, not just conkey[1]
+        Assert.DoesNotContain("conkey[1]", sql, StringComparison.Ordinal);
+        Assert.Contains("unnest", sql, StringComparison.OrdinalIgnoreCase);
+        Assert.Equal(2, fks.Count);
+        Assert.Equal(["A_ID", "B_ID"], fks.Select(x => x.FKColumn).ToList());
+    }
+
+    [Fact]
     public void Postgres_GetIdentityFields_Maps_Fields()
     {
         using var connection = new MockDbConnection()
@@ -246,6 +268,25 @@ public class SchemaProvidersTests
                 new { FKName = "FK_T", FKColumn = "T_ID", PKSchema = "dbo", PKTable = "T", PKColumn = "ID" }));
 
         Assert.Single(new OracleSchemaProvider().GetForeignKeys(connection, "dbo", "T"));
+    }
+
+    [Fact]
+    public void Oracle_GetForeignKeys_Scopes_On_FK_Owner_With_Position()
+    {
+        string? sql = null;
+        using var connection = new MockDbConnection()
+            .OnDbCommandExecuteReader(cmd =>
+            {
+                sql = cmd.CommandText;
+                return new MockDbDataReader(
+                    new { FKName = "FK_T", FKColumn = "T_ID", PKSchema = "dbo", PKTable = "T", PKColumn = "ID" });
+            });
+
+        Assert.Single(new OracleSchemaProvider().GetForeignKeys(connection, "dbo", "T"));
+
+        Assert.DoesNotContain("user_cons_columns", sql, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("a.owner", sql, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("a.position", sql, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
@@ -512,13 +553,31 @@ public class SchemaProvidersTests
     {
         using var connection = new MockDbConnection()
             .OnDbCommandExecuteReader(cmd => new MockDbDataReader(
-                new { PKTable = " T ", PKColumn = " ID ", FKName = " FK " }));
+                new { PKTable = " T ", PKColumn = " ID ", FKName = " FK ", FKColumn = " T_ID " }));
 
         var fk = Assert.Single(new FirebirdSchemaProvider().GetForeignKeys(connection, null, "T"));
         Assert.Equal("FK", fk.FKName);
+        Assert.Equal("T_ID", fk.FKColumn);
         Assert.Equal("T", fk.PKTable);
         Assert.Equal("ID", fk.PKColumn);
-        Assert.Equal("", fk.FKColumn);
+    }
+
+    [Fact]
+    public void Firebird_GetForeignKeys_Selects_FKColumn()
+    {
+        string? sql = null;
+        using var connection = new MockDbConnection()
+            .OnDbCommandExecuteReader(cmd =>
+            {
+                sql = cmd.CommandText;
+                return new MockDbDataReader(
+                    new { PKTable = "T", PKColumn = "ID", FKName = "FK", FKColumn = "T_ID" });
+            });
+
+        var fk = Assert.Single(new FirebirdSchemaProvider().GetForeignKeys(connection, null, "T"));
+
+        Assert.Contains("FKColumn", sql, StringComparison.OrdinalIgnoreCase);
+        Assert.Equal("T_ID", fk.FKColumn);
     }
 
     [Fact]

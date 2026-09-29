@@ -84,7 +84,8 @@ public class FirebirdSchemaProvider : ISchemaProvider
             SELECT
                 PK.RDB$RELATION_NAME as PKTable,
                 ISP.RDB$FIELD_NAME as PKColumn,
-                FK.RDB$CONSTRAINT_NAME as FKName
+                FK.RDB$CONSTRAINT_NAME as FKName,
+                ISF.RDB$FIELD_NAME as FKColumn
             FROM
                 RDB$RELATION_CONSTRAINTS PK, 
                 RDB$RELATION_CONSTRAINTS FK, 

@@ -41,19 +41,21 @@ public class OracleSchemaProvider : ISchemaProvider
     public IEnumerable<ForeignKeyInfo> GetForeignKeys(IDbConnection connection, string? schema, string table)
     {
         return connection.Query<ForeignKeyInfo>(/*lang=sql*/ """
-            SELECT 
-                a.constraint_name FKName,                     
+            SELECT
+                a.constraint_name FKName,
                 a.column_name FKColumn,
                 c.r_owner PKSchema,
                 c_pk.table_name PKTable,
                 uc.column_name PKColumn
             FROM all_cons_columns a
-            JOIN all_constraints c ON a.owner = c.owner AND a.constraint_name = c.constraint_name
-            JOIN all_constraints c_pk ON c.r_owner = c_pk.owner AND c.r_constraint_name = c_pk.constraint_name
-            JOIN user_cons_columns uc ON uc.constraint_name = c.r_constraint_name
-            WHERE c.constraint_type = 'R' 
+            JOIN all_constraints c ON c.owner = a.owner AND c.constraint_name = a.constraint_name
+            JOIN all_constraints c_pk ON c_pk.owner = c.r_owner AND c_pk.constraint_name = c.r_constraint_name
+            JOIN all_cons_columns uc ON uc.owner = c_pk.owner AND uc.constraint_name = c_pk.constraint_name
+                AND uc.position = a.position
+            WHERE c.constraint_type = 'R'
+                AND a.owner = :sma
                 AND a.table_name = :tbl
-                AND c.r_owner = :sma
+            ORDER BY a.position
             """, new
         {
             sma = schema,
