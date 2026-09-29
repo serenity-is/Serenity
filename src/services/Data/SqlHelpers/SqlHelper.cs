@@ -813,28 +813,43 @@ public static class SqlHelper
         try
         {
             IDbCommand command = NewCommand(connection, commandText, param);
-            var stopwatch = ValueStopwatch.StartNew();
+            // The wrapper takes command ownership on success; otherwise dispose here.
+            var transferred = false;
             try
             {
-                logger ??= connection.GetLogger();
-                 
-                if (logger?.IsEnabled(LogLevel.Debug) == true)
-                    LogCommand("ExecuteReader", command, logger);
+                var stopwatch = ValueStopwatch.StartNew();
+                try
+                {
+                    logger ??= connection.GetLogger();
 
-                var result = command.ExecuteReader();
+                    if (logger?.IsEnabled(LogLevel.Debug) == true)
+                        LogCommand("ExecuteReader", command, logger);
 
-                if (logger?.IsEnabled(LogLevel.Debug) == true)
-                    logger.LogDebug("SQL - {method}[{uid}] - END - {ElapsedMilliseconds} ms",
-                        "ExecuteReader", command.GetHashCode(), stopwatch.ElapsedMilliseconds);
+                    var result = new CommandOwningDataReader(command.ExecuteReader(), command);
+                    transferred = true;
 
-                return result;
+                    if (logger?.IsEnabled(LogLevel.Debug) == true)
+                        logger.LogDebug("SQL - {method}[{uid}] - END - {ElapsedMilliseconds} ms",
+                            "ExecuteReader", command.GetHashCode(), stopwatch.ElapsedMilliseconds);
+
+                    return result;
+                }
+                catch (Exception ex)
+                {
+                    if (CheckConnectionPoolException(connection, ex))
+                    {
+                        var retry = new CommandOwningDataReader(command.ExecuteReader(), command);
+                        transferred = true;
+                        return retry;
+                    }
+                    else
+                        throw;
+                }
             }
-            catch (Exception ex)
+            finally
             {
-                if (CheckConnectionPoolException(connection, ex))
-                    return command.ExecuteReader();
-                else
-                    throw;
+                if (!transferred)
+                    command.Dispose();
             }
         }
         catch (Exception ex)
@@ -881,28 +896,45 @@ public static class SqlHelper
         try
         {
             IDbCommand command = NewCommand(connection, commandText, param);
-            var stopwatch = ValueStopwatch.StartNew();
+            // The wrapper takes command ownership on success; otherwise dispose here.
+            var transferred = false;
             try
             {
-                logger ??= connection.GetLogger();
+                var stopwatch = ValueStopwatch.StartNew();
+                try
+                {
+                    logger ??= connection.GetLogger();
 
-                if (logger?.IsEnabled(LogLevel.Debug) == true)
-                    LogCommand("ExecuteReader", command, logger);
+                    if (logger?.IsEnabled(LogLevel.Debug) == true)
+                        LogCommand("ExecuteReader", command, logger);
 
-                var result = await ExecuteReaderAsync(command, cancellationToken).ConfigureAwait(false);
+                    var result = new CommandOwningDataReader(
+                        await ExecuteReaderAsync(command, cancellationToken).ConfigureAwait(false), command);
+                    transferred = true;
 
-                if (logger?.IsEnabled(LogLevel.Debug) == true)
-                    logger.LogDebug("SQL - {method}[{uid}] - END - {ElapsedMilliseconds} ms",
-                        "ExecuteReader", command.GetHashCode(), stopwatch.ElapsedMilliseconds);
+                    if (logger?.IsEnabled(LogLevel.Debug) == true)
+                        logger.LogDebug("SQL - {method}[{uid}] - END - {ElapsedMilliseconds} ms",
+                            "ExecuteReader", command.GetHashCode(), stopwatch.ElapsedMilliseconds);
 
-                return result;
+                    return result;
+                }
+                catch (Exception ex)
+                {
+                    if (await CheckConnectionPoolExceptionAsync(connection, ex, cancellationToken).ConfigureAwait(false))
+                    {
+                        var retry = new CommandOwningDataReader(
+                            await ExecuteReaderAsync(command, cancellationToken).ConfigureAwait(false), command);
+                        transferred = true;
+                        return retry;
+                    }
+                    else
+                        throw;
+                }
             }
-            catch (Exception ex)
+            finally
             {
-                if (await CheckConnectionPoolExceptionAsync(connection, ex, cancellationToken).ConfigureAwait(false))
-                    return await ExecuteReaderAsync(command, cancellationToken).ConfigureAwait(false);
-                else
-                    throw;
+                if (!transferred)
+                    command.Dispose();
             }
         }
         catch (Exception ex)

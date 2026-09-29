@@ -76,4 +76,17 @@ public class MockDbCommand(IDbConnection connection = null, DbType? createdParam
     public override void Prepare()
     {
     }
+
+    /// <summary>
+    /// Gets the number of times Dispose was called.
+    /// </summary>
+    public int DisposeCalls { get; private set; }
+
+    /// <inheritdoc/>
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+            DisposeCalls++;
+        base.Dispose(disposing);
+    }
 }
