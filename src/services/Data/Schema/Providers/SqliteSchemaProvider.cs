@@ -14,6 +14,25 @@ public class SqliteSchemaProvider : ISchemaProvider
     /// </value>
     public string? DefaultSchema => null;
 
+    /// <summary>
+    /// Builds a PRAGMA statement with an escaped table reference.
+    /// PRAGMAs take no bound parameters, so the name is interpolated
+    /// double-quoted with <c>"</c> escaped as <c>""</c> (verified against
+    /// SQLite: brackets don't support a <c>]]</c> escape, and single
+    /// quotes are parsed as string literals). A non-empty schema qualifies
+    /// the PRAGMA for attached databases (<c>PRAGMA "schema".name(...)</c>).
+    /// </summary>
+    private static string PragmaTableRef(string pragma, string? schema, string table)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(table);
+
+        var tableRef = "\"" + table.Replace("\"", "\"\"") + "\"";
+        if (string.IsNullOrEmpty(schema))
+            return "PRAGMA " + pragma + "(" + tableRef + ")";
+
+        return "PRAGMA \"" + schema.Replace("\"", "\"\"") + "\"." + pragma + "(" + tableRef + ")";
+    }
+
     private class FieldInfoSource
     {
 #pragma warning disable IDE1006 // Naming Styles
@@ -27,7 +46,9 @@ public class SqliteSchemaProvider : ISchemaProvider
     /// <inheritdoc/>
     public IEnumerable<FieldInfo> GetFieldInfos(IDbConnection connection, string? schema, string table)
     {
-        return connection.Query<FieldInfoSource>("PRAGMA table_info([" + table + "])")
+        ArgumentNullException.ThrowIfNull(connection);
+
+        return connection.Query<FieldInfoSource>(PragmaTableRef("table_info", schema, table))
             .Select(x => new FieldInfo
             {
                 FieldName = x.name,
@@ -50,7 +71,9 @@ public class SqliteSchemaProvider : ISchemaProvider
     /// <inheritdoc/>
     public IEnumerable<ForeignKeyInfo> GetForeignKeys(IDbConnection connection, string? schema, string table)
     {
-        return connection.Query<ForeignKeySource>("PRAGMA foreign_key_list([" + table + "])")
+        ArgumentNullException.ThrowIfNull(connection);
+
+        return connection.Query<ForeignKeySource>(PragmaTableRef("foreign_key_list", schema, table))
             .Select(x => new ForeignKeyInfo
             {
                 FKName = x.id.ToString(),
@@ -72,14 +95,29 @@ public class SqliteSchemaProvider : ISchemaProvider
     /// <inheritdoc/>
     public IEnumerable<string> GetIdentityFields(IDbConnection connection, string? schema, string table)
     {
-        var fields = connection.Query<IdentitySource>("PRAGMA table_info([" + table + "])")
-            .Where(x => x.pk > 0);
+        ArgumentNullException.ThrowIfNull(connection);
 
-        if (fields.Count() == 1 &&
-            fields.First().type == "INTEGER")
+        var fields = connection.Query<IdentitySource>(PragmaTableRef("table_info", schema, table))
+            .Where(x => x.pk > 0)
+            .ToList();
+
+        // A single INTEGER PRIMARY KEY is a rowid alias (comparison is
+        // case-insensitive as the declared type text keeps its case).
+        if (fields.Count == 1 &&
+            string.Equals(fields[0].type, "INTEGER", StringComparison.OrdinalIgnoreCase))
         {
-            return [fields.First().name];
-        };
+            return [fields[0].name];
+        }
+
+        // ROWID tables have an implicit rowid, WITHOUT ROWID tables don't.
+        var master = string.IsNullOrEmpty(schema) ? "sqlite_master"
+            : "\"" + schema.Replace("\"", "\"\"") + "\".sqlite_master";
+        var createSql = connection.Query<string>(
+            "SELECT sql FROM " + master + " WHERE type = 'table' AND name = @tbl",
+            new { tbl = table }).FirstOrDefault();
+        if (createSql is not null &&
+            createSql.Contains("WITHOUT ROWID", StringComparison.OrdinalIgnoreCase))
+            return [];
 
         return ["ROWID"];
     }
@@ -95,7 +133,9 @@ public class SqliteSchemaProvider : ISchemaProvider
     /// <inheritdoc/>
     public IEnumerable<string> GetPrimaryKeyFields(IDbConnection connection, string? schema, string table)
     {
-        return connection.Query<PrimaryKeySource>("PRAGMA table_info([" + table + "])")
+        ArgumentNullException.ThrowIfNull(connection);
+
+        return connection.Query<PrimaryKeySource>(PragmaTableRef("table_info", schema, table))
             .Where(x => x.pk > 0)
             .OrderBy(x => x.pk)
             .Select(x => x.name);
@@ -112,8 +152,11 @@ public class SqliteSchemaProvider : ISchemaProvider
     /// <inheritdoc/>
     public IEnumerable<TableName> GetTableNames(IDbConnection connection)
     {
+        ArgumentNullException.ThrowIfNull(connection);
+
         return connection.Query<TableNameSource>(
-                "SELECT name, type FROM sqlite_master WHERE type='table' or type='view' " +
+                "SELECT name, type FROM sqlite_master WHERE (type='table' or type='view') " +
+                "AND name NOT LIKE 'sqlite_%' " +
                 "ORDER BY name")
             .Select(x => new TableName
             {

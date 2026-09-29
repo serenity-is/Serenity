@@ -346,9 +346,79 @@ public class SchemaProvidersTests
     public void Sqlite_GetIdentityFields_Returns_RowId_When_No_PrimaryKey()
     {
         using var connection = new MockDbConnection()
-            .OnDbCommandExecuteReader(cmd => new MockDbDataReader());
+            .OnDbCommandExecuteReader(cmd => cmd.CommandText.Contains("sqlite_master")
+                ? new MockDbDataReader(new { sql = "CREATE TABLE T (A TEXT)" })
+                : new MockDbDataReader());
 
         Assert.Equal(["ROWID"], new SqliteSchemaProvider().GetIdentityFields(connection, null, "T").ToList());
+    }
+
+    [Fact]
+    public void Sqlite_GetIdentityFields_Matches_Integer_CaseInsensitively()
+    {
+        using var connection = new MockDbConnection()
+            .OnDbCommandExecuteReader(cmd => new MockDbDataReader(
+                new { pk = 1, name = "Id", type = "integer" }));
+
+        Assert.Equal(["Id"], new SqliteSchemaProvider().GetIdentityFields(connection, null, "T").ToList());
+    }
+
+    [Fact]
+    public void Sqlite_GetIdentityFields_Returns_Empty_For_Without_RowId_Table()
+    {
+        using var connection = new MockDbConnection()
+            .OnDbCommandExecuteReader(cmd => cmd.CommandText.Contains("sqlite_master")
+                ? new MockDbDataReader(new { sql = "CREATE TABLE C (A TEXT, B TEXT, PRIMARY KEY (A, B)) WITHOUT ROWID" })
+                : new MockDbDataReader(
+                    new { pk = 1, name = "A", type = "TEXT" },
+                    new { pk = 2, name = "B", type = "TEXT" }));
+
+        Assert.Empty(new SqliteSchemaProvider().GetIdentityFields(connection, null, "C"));
+    }
+
+    [Fact]
+    public void Sqlite_Pragma_Escapes_Quotes_And_Qualifies_Schema()
+    {
+        string? sql = null;
+        using var connection = new MockDbConnection()
+            .OnDbCommandExecuteReader(cmd =>
+            {
+                sql = cmd.CommandText;
+                return new MockDbDataReader();
+            });
+
+        new SqliteSchemaProvider().GetFieldInfos(connection, null, "a\"b").ToList();
+        Assert.Equal("PRAGMA table_info(\"a\"\"b\")", sql);
+
+        new SqliteSchemaProvider().GetFieldInfos(connection, "aux", "T").ToList();
+        Assert.Equal("PRAGMA \"aux\".table_info(\"T\")", sql);
+    }
+
+    [Fact]
+    public void Sqlite_Pragma_NullOrEmptyTable_Throws()
+    {
+        using var connection = new MockDbConnection();
+
+        Assert.ThrowsAny<ArgumentException>(() => new SqliteSchemaProvider().GetFieldInfos(connection, null, null!));
+        Assert.ThrowsAny<ArgumentException>(() => new SqliteSchemaProvider().GetFieldInfos(connection, null, ""));
+        Assert.Throws<ArgumentNullException>(() => new SqliteSchemaProvider().GetFieldInfos(null!, null, "T"));
+    }
+
+    [Fact]
+    public void Sqlite_GetTableNames_Excludes_Sqlite_Internals()
+    {
+        string? sql = null;
+        using var connection = new MockDbConnection()
+            .OnDbCommandExecuteReader(cmd =>
+            {
+                sql = cmd.CommandText;
+                return new MockDbDataReader(
+                    new { name = "T", type = "table" });
+            });
+
+        new SqliteSchemaProvider().GetTableNames(connection).ToList();
+
+        Assert.Contains("sqlite_%", sql, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
