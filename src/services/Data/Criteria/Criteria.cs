@@ -28,7 +28,7 @@ public class Criteria : BaseCriteria
     /// <summary>
     /// Gets a reference to the <see cref="IField"/> object passed to the constructor.
     /// </summary>
-    public static IField? Field { get; private set; }
+    public IField? Field { get; private set; }
 
     /// <summary>
     /// Creates an empty criteria.
