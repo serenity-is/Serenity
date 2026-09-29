@@ -146,12 +146,21 @@ public class SchemaProvidersTests
     [Fact]
     public void MySql_GetFieldInfos_Parses_Types_And_Keys()
     {
+        string? sql = null;
         using var connection = new MockDbConnection()
-            .OnDbCommandExecuteReader(cmd => new MockDbDataReader(
-                new { ORDINAL_POSITION = "1", Field = "Name", Null = "NO", Type = "varchar(50)", Key = "PRI", Extra = "auto_increment" },
-                new { ORDINAL_POSITION = "2", Field = "Amount", Null = "YES", Type = "decimal(10,2)", Key = "", Extra = "" }));
+            .OnDbCommandExecuteReader(cmd =>
+            {
+                sql = cmd.CommandText;
+                return new MockDbDataReader(
+                    new { COLUMN_NAME = "Name", IS_NULLABLE = "NO", DATA_TYPE = "varchar", CHARACTER_MAXIMUM_LENGTH = (long?)50, NUMERIC_PRECISION = (long?)null, NUMERIC_SCALE = (long?)null, COLUMN_KEY = "PRI", EXTRA = "auto_increment" },
+                    new { COLUMN_NAME = "Amount", IS_NULLABLE = "YES", DATA_TYPE = "decimal", CHARACTER_MAXIMUM_LENGTH = (long?)null, NUMERIC_PRECISION = (long?)10, NUMERIC_SCALE = (long?)2, COLUMN_KEY = "", EXTRA = "" },
+                    new { COLUMN_NAME = "Status", IS_NULLABLE = "YES", DATA_TYPE = "enum", CHARACTER_MAXIMUM_LENGTH = (long?)null, NUMERIC_PRECISION = (long?)null, NUMERIC_SCALE = (long?)null, COLUMN_KEY = "", EXTRA = "" });
+            });
 
         var fields = new MySqlSchemaProvider().GetFieldInfos(connection, "db", "T").ToList();
+
+        Assert.Contains("information_schema.COLUMNS", sql, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("SHOW FULL COLUMNS", sql, StringComparison.OrdinalIgnoreCase);
 
         Assert.Equal("varchar", fields[0].DataType);
         Assert.Equal(50, fields[0].Size);
@@ -163,6 +172,10 @@ public class SchemaProvidersTests
         Assert.Equal(10, fields[1].Size);
         Assert.Equal(2, fields[1].Scale);
         Assert.True(fields[1].IsNullable);
+
+        Assert.Equal("enum", fields[2].DataType);
+        Assert.Equal(0, fields[2].Size);
+        Assert.Equal(0, fields[2].Scale);
     }
 
     [Fact]
