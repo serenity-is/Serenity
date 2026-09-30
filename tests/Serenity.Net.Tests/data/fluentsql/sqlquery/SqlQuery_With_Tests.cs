@@ -3,14 +3,11 @@ namespace Serenity.Data;
 public class SqlQuery_With_Tests
 {
     [Fact]
-    public void WithPassesAndReturnsTheQueryItself()
+    public void WithSelfPassesAndReturnsTheQueryItself()
     {
         var query = new SqlQuery();
-        var afterWith = query.With(insideWidth =>
-        {
-            Assert.Equal(query, insideWidth);
-        });
-
+        var afterWith = query.WithSelf(out var me);
+        Assert.Equal(query, me);
         Assert.Equal(query, afterWith);
     }
 }

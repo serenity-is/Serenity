@@ -49,15 +49,16 @@ public class SqlQuery_SubQuery_Tests
     }
 
     [Fact]
-    public void SubQueryCanBeUsedAsCriteriaUsingWith()
+    public void SubQueryCanBeUsedAsCriteriaUsingWithSelf()
     {
         var query = new SqlQuery()
             .From("ParentTable")
             .Select("ParentColumn")
-            .With(me => me.Where(new Criteria(me.SubQuery()
+            .WithSelf(out var me)
+            .Where(new Criteria(me.SubQuery()
                 .From("SubTable")
                 .Take(1)
-                .Select("SubColumn")) >= 1));
+                .Select("SubColumn")) >= 1);
 
         Assert.Equal(
             Normalize.Sql(

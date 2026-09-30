@@ -4,8 +4,7 @@ namespace Serenity.Data;
 /// SqlQuery interface.
 /// </summary>
 /// <seealso cref="IQueryWithParams" />
-/// <seealso cref="IChainable" />
-public interface ISqlQuery : IQueryWithParams, IChainable
+public interface ISqlQuery : IQueryWithParams
 {
     /// <summary>
     /// Gets the columns.

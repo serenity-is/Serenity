@@ -108,11 +108,11 @@ public class SqlQuery_From_Tests
     [Fact]
     public void FromWithSubQueryAndAliasWorks()
     {
-        var query = new SqlQuery().With(me => me
+        var query = new SqlQuery().WithSelf(out var me)
             .From(me.SubQuery()
                 .From("SubTable")
                 .Select("SubColumn"), new Alias("sub"))
-            .Select("SubColumn"));
+            .Select("SubColumn");
 
         Assert.Equal(
             Normalize.Sql(
