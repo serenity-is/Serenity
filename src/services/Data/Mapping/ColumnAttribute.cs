@@ -4,6 +4,7 @@ namespace Serenity.Data.Mapping;
 /// Explicitly specifies the database column name for property.
 /// Use this attribute if matching column name in database is different than the property name.
 /// </summary>
+[AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
 public class ColumnAttribute : Attribute
 {
     /// <summary>

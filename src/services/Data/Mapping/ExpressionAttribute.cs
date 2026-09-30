@@ -7,6 +7,10 @@ namespace Serenity.Data.Mapping;
 /// </summary>
 /// <remarks>
 /// Specifies SQL expression this property corresponds to.
+/// Multiple attributes are allowed for dialect-specific variants. Resolution
+/// needs no declaration ordering: DialectExpressionSelector.GetBestMatch picks
+/// the most specific matching dialect, and throws AmbiguousMatchException when
+/// two attributes match the same dialect.
 /// </remarks>
 /// <param name="value">An SQL expression like (T0.Firstname + ' ' + T0.LastName)</param>
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]

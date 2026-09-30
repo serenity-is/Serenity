@@ -81,6 +81,40 @@ public class MappingAttributesTests
     }
 
     [Fact]
+    public void ColumnAttribute_Usage_Is_Property_Only_Single_Use()
+    {
+        var usage = typeof(ColumnAttribute).GetCustomAttribute<AttributeUsageAttribute>();
+
+        Assert.NotNull(usage);
+        Assert.Equal(AttributeTargets.Property, usage.ValidOn);
+        Assert.False(usage.AllowMultiple);
+    }
+
+    [Fact]
+    public void SizeAttribute_Rejects_Negative_Value()
+    {
+        Assert.Equal(10, new SizeAttribute(10).Value);
+        Assert.Throws<ArgumentOutOfRangeException>(() => new SizeAttribute(-1));
+
+        var attr = new SizeAttribute(10);
+        Assert.Throws<ArgumentOutOfRangeException>(() => attr.Value = -1);
+        attr.Value = 20;
+        Assert.Equal(20, attr.Value);
+    }
+
+    [Fact]
+    public void ScaleAttribute_Rejects_Negative_Value()
+    {
+        Assert.Equal(2, new ScaleAttribute(2).Value);
+        Assert.Throws<ArgumentOutOfRangeException>(() => new ScaleAttribute(-1));
+
+        var attr = new ScaleAttribute(2);
+        Assert.Throws<ArgumentOutOfRangeException>(() => attr.Value = -1);
+        attr.Value = 4;
+        Assert.Equal(4, attr.Value);
+    }
+
+    [Fact]
     public void ConnectionKeyAttribute_String_Constructor()
     {
         var attr = new ConnectionKeyAttribute("K");
