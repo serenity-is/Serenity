@@ -20,6 +20,34 @@ public class DapperCoreSyncTests
     }
 
     [Fact]
+    public void Query_T_ISqlQuery_OracleDialect_TranslatesPrefix_AndBindsParameter()
+    {
+        // Translate() rewrites @Id to :Id in the SQL text while DynamicParameters
+        // keeps the @Id key. Dapper matches them via its prefix-stripping Clean,
+        // so no key normalization is needed here. This test locks that contract.
+
+        string? capturedText = null;
+        var capturedParams = new List<(string Name, object? Value)>();
+
+        using var connection = new MockDbConnection { Dialect = OracleDialect.Instance }
+            .OnDbCommandExecuteReader(command =>
+            {
+                capturedText = command.CommandText;
+                foreach (IDbDataParameter p in command.Parameters)
+                    capturedParams.Add((p.ParameterName, p.Value));
+                return new MockDbDataReader(new { Id = 1 });
+            });
+
+        var list = connection.Query<TestRow>(CreateQuery()).ToList();
+
+        Assert.Single(list);
+        Assert.Contains(":Id", capturedText, StringComparison.Ordinal);
+        var bound = Assert.Single(capturedParams);
+        Assert.Equal("Id", bound.Name);
+        Assert.Equal(1, bound.Value);
+    }
+
+    [Fact]
     public void Execute_WithAmbientTransaction_EnlistsCommand()
     {
         using var actual = new MockDbConnection();
