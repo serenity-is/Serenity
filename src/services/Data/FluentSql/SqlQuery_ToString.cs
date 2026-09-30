@@ -74,8 +74,10 @@ public partial class SqlQuery
 
         // OFFSET / FETCH (2012+) and ROW_NUMBER() (2005/2008) both require ORDER BY
         // in SQL Server. Fail fast with the same error as the fallback path instead
-        // of generating SQL the server rejects with Msg 102.
-        if ((useOffset || useRowNumber) && orderBy.Length == 0 && dialect is SqlServer2000Dialect)
+        // of generating SQL the server rejects with Msg 102. ServerType (not a type
+        // check) so custom SQL Server dialects are covered too.
+        if ((useOffset || useRowNumber) && orderBy.Length == 0 &&
+            dialect.ServerType == nameof(ServerType.SqlServer))
             throw new InvalidOperationException("A query must be ordered by unique fields " +
                 "to be able to skip records!");
 
