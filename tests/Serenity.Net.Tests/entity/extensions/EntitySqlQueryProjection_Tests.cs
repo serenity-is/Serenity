@@ -128,7 +128,7 @@ public class EntitySqlQueryProjection_Tests
             });
 
         var query = new SqlQuery().From(new SelfNavigationRow());
-        query.SetParam("p1", 1);
+        query.SetParam("@p1", 1);
         var extensible = (ISqlQueryExtensible)query;
         var currentIntoRow = extensible.CurrentIntoRow;
         var projected = query.AsReusableProjected(
@@ -136,11 +136,11 @@ public class EntitySqlQueryProjection_Tests
 
         Assert.Equal(17, Assert.Single(projected.List(connection)).ID);
         Assert.Equal(17, Assert.Single(projected.List(connection,
-            new Dictionary<string, object?> { ["p1"] = 2 })).ID);
+            new Dictionary<string, object?> { ["@p1"] = 2 })).ID);
         Assert.Equal(17, Assert.Single(projected.List(connection)).ID);
 
         Assert.Equal(new object?[] { 1, 2, 1 }, parameterValues);
-        Assert.Equal(1, query.Params!["p1"]);
+        Assert.Equal(1, query.Params!["@p1"]);
         Assert.False(query.IsFrozen);
         Assert.Empty(extensible.Columns);
         Assert.Same(currentIntoRow, extensible.CurrentIntoRow);
@@ -169,7 +169,7 @@ public class EntitySqlQueryProjection_Tests
     public async Task ReusableProjectedQueryClonesSourceByDefaultAndAllowsParallelExecutions()
     {
         var query = new SqlQuery().From(new SelfNavigationRow());
-        query.SetParam("p1", 0);
+        query.SetParam("@p1", 0);
         var extensible = (ISqlQueryExtensible)query;
         var projected = query.AsReusableProjected((SelfNavigationRow source) => new { ID = source.ID });
 
@@ -188,13 +188,13 @@ public class EntitySqlQueryProjection_Tests
                 });
 
             var result = Assert.Single(projected.List(connection,
-                new Dictionary<string, object?> { ["p1"] = value }));
+                new Dictionary<string, object?> { ["@p1"] = value }));
             return (observedParameter, result.ID);
         })));
 
         Assert.Equal(new[] { 1, 2 }, executions.Select(execution => execution.observedParameter).Order());
         Assert.All(executions, execution => Assert.Equal(17, execution.ID));
-        Assert.Equal(0, query.Params!["p1"]);
+        Assert.Equal(0, query.Params!["@p1"]);
     }
 
     [Fact]

@@ -363,6 +363,10 @@ public abstract class BaseCriteria : ICriteria
     /// <returns>
     /// The result of the operator.
     /// </returns>
+    /// <remarks>
+    /// A null value is intentionally not mapped to IS NULL: it renders as a
+    /// NULL parameter ("= NULL", i.e. SQL UNKNOWN). Use IsNull() for null checks.
+    /// </remarks>
     public static BaseCriteria operator ==(BaseCriteria criteria1, string value)
     {
         return new BinaryCriteria(criteria1, CriteriaOperator.EQ, new ValueCriteria(value));
@@ -424,10 +428,14 @@ public abstract class BaseCriteria : ICriteria
     /// Implements the operator ==.
     /// </summary>
     /// <param name="criteria1">The criteria1.</param>
-    /// <param name="value">The value.</param>
+    /// <param name="value">The value. Can be null (as <see cref="Enum"/> is a reference type).</param>
     /// <returns>
     /// The result of the operator.
     /// </returns>
+    /// <remarks>
+    /// A null value is intentionally not mapped to IS NULL: it renders as a
+    /// NULL parameter ("= NULL", i.e. SQL UNKNOWN). Use IsNull() for null checks.
+    /// </remarks>
     public static BaseCriteria operator ==(BaseCriteria criteria1, Enum value)
     {
         return new BinaryCriteria(criteria1, CriteriaOperator.EQ, new ValueCriteria(value));
@@ -493,6 +501,10 @@ public abstract class BaseCriteria : ICriteria
     /// <returns>
     /// The result of the operator.
     /// </returns>
+    /// <remarks>
+    /// A null value is intentionally not mapped to IS NOT NULL: it renders as
+    /// a NULL parameter ("<> NULL", i.e. SQL UNKNOWN). Use IsNotNull() for null checks.
+    /// </remarks>
     public static BaseCriteria operator !=(BaseCriteria criteria1, string value)
     {
         return new BinaryCriteria(criteria1, CriteriaOperator.NE, new ValueCriteria(value));
@@ -554,10 +566,14 @@ public abstract class BaseCriteria : ICriteria
     /// Implements the operator !=.
     /// </summary>
     /// <param name="criteria1">The criteria1.</param>
-    /// <param name="value">The value.</param>
+    /// <param name="value">The value. Can be null (as <see cref="Enum"/> is a reference type).</param>
     /// <returns>
     /// The result of the operator.
     /// </returns>
+    /// <remarks>
+    /// A null value is intentionally not mapped to IS NOT NULL: it renders as
+    /// a NULL parameter ("<> NULL", i.e. SQL UNKNOWN). Use IsNotNull() for null checks.
+    /// </remarks>
     public static BaseCriteria operator !=(BaseCriteria criteria1, Enum value)
     {
         return new BinaryCriteria(criteria1, CriteriaOperator.NE, new ValueCriteria(value));

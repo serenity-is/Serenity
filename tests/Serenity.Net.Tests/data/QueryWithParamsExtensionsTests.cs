@@ -6,10 +6,31 @@ public class QueryWithParamsExtensionsTests
     public void SetParam_Sets_By_Parameter_Name()
     {
         var query = new SqlQuery();
-        var result = query.SetParam(new Parameter("p1"), 5);
+        var result = query.SetParam(new Parameter("@p1"), 5);
 
         Assert.Same(query, result);
-        Assert.Equal(5, query.Params["p1"]);
+        Assert.Equal(5, query.Params["@p1"]);
+    }
+
+    [Fact]
+    public void SetParam_And_AddParam_Reject_Names_Without_At_Prefix()
+    {
+        var query = new SqlQuery();
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => query.SetParam("p1", 5));
+        Assert.Throws<ArgumentOutOfRangeException>(() => query.AddParam("p1", 5));
+        Assert.Throws<ArgumentOutOfRangeException>(() => new Parameter("p1"));
+        Assert.Throws<ArgumentNullException>(() => query.SetParam("", 5));
+    }
+
+    [Theory]
+    [InlineData("@")]
+    [InlineData("@ ")]
+    [InlineData("@\t")]
+    public void Parameter_Rejects_AtOnly_And_Blank_Names(string name)
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() => new Parameter(name));
+        Assert.Throws<ArgumentOutOfRangeException>(() => new ParamCriteria(name));
     }
 
     [Fact]
@@ -26,7 +47,7 @@ public class QueryWithParamsExtensionsTests
     public void FreezeParams_Returns_Query_And_Prevents_Parameter_Mutations()
     {
         var query = new SqlQuery();
-        query.SetParam("p1", 5);
+        query.SetParam("@p1", 5);
         Assert.False(((IQueryWithParams)query).IsParamsFrozen);
         var parameters = query.Params!;
         Assert.Throws<NotSupportedException>(() =>
@@ -37,9 +58,9 @@ public class QueryWithParamsExtensionsTests
         Assert.Same(query, frozen);
         Assert.Same(query, frozen.FreezeParams());
         Assert.True(((IQueryWithParams)query).IsParamsFrozen);
-        Assert.Equal(5, query.Params["p1"]);
-        Assert.Throws<InvalidOperationException>(() => query.AddParam("p2", 6));
-        Assert.Throws<InvalidOperationException>(() => query.SetParam("p1", 6));
+        Assert.Equal(5, query.Params["@p1"]);
+        Assert.Throws<InvalidOperationException>(() => query.AddParam("@p2", 6));
+        Assert.Throws<InvalidOperationException>(() => query.SetParam("@p1", 6));
         Assert.Same(query, query.Select("c"));
     }
 
@@ -89,7 +110,7 @@ public class QueryWithParamsExtensionsTests
     public void FreezeParams_Throws_On_SubQuery()
     {
         var query = new SqlQuery();
-        query.SetParam("p1", 5);
+        query.SetParam("@p1", 5);
         var subQuery = query.SubQuery();
 
         Assert.False(((IQueryWithParams)subQuery).IsParamsFrozen);
@@ -98,20 +119,20 @@ public class QueryWithParamsExtensionsTests
         Assert.Equal("FreezeParams cannot be called on a subquery.", exception.Message);
         Assert.False(((IQueryWithParams)query).IsParamsFrozen);
         Assert.False(((IQueryWithParams)subQuery).IsParamsFrozen);
-        query.SetParam("p1", 6);
-        Assert.Equal(6, query.Params["p1"]);
+        query.SetParam("@p1", 6);
+        Assert.Equal(6, query.Params["@p1"]);
     }
 
     [Fact]
     public void FreezeParams_Can_Be_Called_Through_IQueryWithParams()
     {
         var query = new SqlQuery();
-        query.SetParam("p1", 5);
+        query.SetParam("@p1", 5);
         IQueryWithParams queryWithParams = query;
 
         queryWithParams.FreezeParams();
 
         Assert.True(queryWithParams.IsParamsFrozen);
-        Assert.Throws<InvalidOperationException>(() => query.SetParam("p1", 6));
+        Assert.Throws<InvalidOperationException>(() => query.SetParam("@p1", 6));
     }
 }

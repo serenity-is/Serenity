@@ -13,16 +13,11 @@ public class ParamCriteria : BaseCriteria
     /// </summary>
     /// <param name="name">The parameter name. Should start with @.</param>
     /// <exception cref="ArgumentNullException">name is null or empty</exception>
-    /// <exception cref="ArgumentOutOfRangeException">name starts with @.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">name doesn't start with "@",
+    /// or has nothing but whitespace after it.</exception>
     public ParamCriteria(string name)
     {
-        if (string.IsNullOrEmpty(name))
-            throw new ArgumentNullException(nameof(name));
-
-        if (!name.StartsWith('@'))
-            throw new ArgumentOutOfRangeException(nameof(name));
-
-        this.name = name;
+        this.name = Parameter.CheckName(name);
     }
 
     /// <summary>

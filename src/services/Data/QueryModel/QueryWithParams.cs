@@ -77,13 +77,20 @@ public class QueryWithParams : IQueryWithParams
         cachedToString = null;
     }
 
+    private static void CheckParamName(string name)
+    {
+        Parameter.CheckName(name);
+    }
+
     /// <summary>
     /// Adds the parameter.
     /// </summary>
-    /// <param name="name">The name.</param>
+    /// <param name="name">The name. Must start with "@".</param>
     /// <param name="value">The value.</param>
     public void AddParam(string name, object? value)
     {
+        CheckParamName(name);
+
         if (parent != null)
         {
             parent.AddParam(name, value);
@@ -99,10 +106,12 @@ public class QueryWithParams : IQueryWithParams
     /// <summary>
     /// Sets the parameter.
     /// </summary>
-    /// <param name="name">The name.</param>
+    /// <param name="name">The name. Must start with "@".</param>
     /// <param name="value">The value.</param>
     public void SetParam(string name, object? value)
     {
+        CheckParamName(name);
+
         if (parent != null)
         {
             parent.SetParam(name, value);

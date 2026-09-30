@@ -77,7 +77,7 @@ public class SqlQuery_ToStringTests
         Assert.Equal("CUSTOM", query.ToString());
         Assert.Equal(1, dialect.CallCount);
         Assert.Throws<InvalidOperationException>(() => query.Select("d"));
-        Assert.Throws<InvalidOperationException>(() => query.SetParam("p1", 1));
+        Assert.Throws<InvalidOperationException>(() => query.SetParam("@p1", 1));
         Assert.Equal(1, dialect.CallCount);
     }
 

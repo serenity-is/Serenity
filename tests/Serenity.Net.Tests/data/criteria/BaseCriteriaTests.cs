@@ -751,6 +751,80 @@ public class BaseCriteriaTests
         Assert.Equal(name.GetHashCode(), name.GetHashCode());
     }
 
+    // Null handling: null is never mapped to IS NULL (use IsNull() for that).
+    // A null *value* renders as "= NULL" (SQL UNKNOWN, matching SQL behavior),
+    // while null criteria / field / parameter objects throw. Statically typing
+    // the null sides below is what selects each overload (bare `== null` does
+    // not compile, which is intentional).
+
+    [Fact]
+    public void Equal_NullStringValue_Renders_Equals_Null_Param()
+    {
+        var query = new SqlQuery();
+        var result = new Criteria("Name") == (string)null;
+
+        var binary = Assert.IsType<BinaryCriteria>(result);
+        Assert.Equal(CriteriaOperator.EQ, binary.Operator);
+        Assert.Null(Assert.IsType<ValueCriteria>(binary.RightOperand).Value);
+        Assert.Equal("(Name = @p1)", result.ToString(query));
+        Assert.Null(query.Params["@p1"]);
+    }
+
+    [Fact]
+    public void NotEqual_NullStringValue_Renders_NotEquals_Null_Param()
+    {
+        var query = new SqlQuery();
+        var result = new Criteria("Name") != (string)null;
+
+        Assert.Equal(CriteriaOperator.NE, Assert.IsType<BinaryCriteria>(result).Operator);
+        Assert.Equal("(Name != @p1)", result.ToString(query));
+        Assert.Null(query.Params["@p1"]);
+    }
+
+    [Fact]
+    public void Equal_NullCriteria_ThrowsArgumentNullException()
+    {
+        BaseCriteria left = new Criteria("Name");
+        BaseCriteria right = null!;
+
+        Assert.Throws<ArgumentNullException>(() => left == right);
+        Assert.Throws<ArgumentNullException>(() => left != right);
+        Assert.Throws<ArgumentNullException>(() => right == left);
+    }
+
+    [Fact]
+    public void Equal_NullField_ThrowsArgumentNullException()
+    {
+        var criteria = new Criteria("Name");
+        Field field = null!;
+
+        Assert.Throws<ArgumentNullException>(() => criteria == field);
+        Assert.Throws<ArgumentNullException>(() => field == criteria);
+    }
+
+    [Fact]
+    public void Comparison_DefaultParameter_ThrowsArgumentNullException()
+    {
+        // Parameter is a struct and cannot be null; default has a null name,
+        // which the ParamCriteria constructor rejects.
+        BaseCriteria left = new Criteria("Name");
+        var param = default(Parameter);
+
+        Assert.Throws<ArgumentNullException>(() => left == param);
+        Assert.Throws<ArgumentNullException>(() => left != param);
+        Assert.Throws<ArgumentNullException>(() => left > param);
+        Assert.Throws<ArgumentNullException>(() => left >= param);
+        Assert.Throws<ArgumentNullException>(() => left < param);
+        Assert.Throws<ArgumentNullException>(() => left <= param);
+    }
+
+    [Fact]
+    public void Parameter_NullOrEmptyName_ThrowsArgumentNullException()
+    {
+        Assert.Throws<ArgumentNullException>(() => new Parameter(null!));
+        Assert.Throws<ArgumentNullException>(() => new Parameter(""));
+    }
+
     [Fact]
     public void ToStringIgnoreParams_ConcurrentCalls_AreDeterministic()
     {

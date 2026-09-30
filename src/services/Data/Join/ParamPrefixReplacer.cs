@@ -38,7 +38,15 @@ public static class ParamPrefixReplacer
             }
             else if (c == '@')
             {
-                sb.Append(paramPrefix);
+                // "@@" is a server-variable escape (e.g. T-SQL @@ROWCOUNT),
+                // not a parameter: leave the pair untouched.
+                if (i + 1 < expression.Length && expression[i + 1] == '@')
+                {
+                    sb.Append(c);
+                    sb.Append(expression[++i]);
+                }
+                else
+                    sb.Append(paramPrefix);
             }
             else
                 sb.Append(c);

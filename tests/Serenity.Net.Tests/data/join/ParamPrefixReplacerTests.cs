@@ -62,4 +62,23 @@ public class ParamPrefixReplacerTests
         Assert.Equal("x = @p1",
             ParamPrefixReplacer.Replace("x = @p1", '@'));
     }
+
+    [Fact]
+    public void Replace_Does_Not_Touch_Double_AtSign()
+    {
+        // "@@" denotes server variables (e.g. T-SQL @@ROWCOUNT), not parameters.
+        Assert.Equal("IF @@ROWCOUNT = 0",
+            ParamPrefixReplacer.Replace("IF @@ROWCOUNT = 0", ':'));
+        Assert.Equal("IF @@ROWCOUNT = 0",
+            ParamPrefixReplacer.Replace("IF @@ROWCOUNT = 0", '@'));
+        Assert.Equal("x = :p1 AND @@ROWCOUNT = 0",
+            ParamPrefixReplacer.Replace("x = @p1 AND @@ROWCOUNT = 0", ':'));
+    }
+
+    [Fact]
+    public void Replace_Trailing_AtSign_Is_Replaced()
+    {
+        Assert.Equal("x:",
+            ParamPrefixReplacer.Replace("x@", ':'));
+    }
 }
