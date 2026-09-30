@@ -9,37 +9,42 @@ public class DeltaLister<TItem>
     private readonly DeltaOptions _options;
     private readonly Dictionary<long, TItem> _oldById;
     private readonly HashSet<long> _newById;
-    private readonly IEnumerable<TItem> _oldItems;
-    private readonly IEnumerable<TItem> _newItems;
-    private readonly Func<TItem, long?> _getItemId;
+    private readonly List<(TItem Item, long? Id)> _oldEntries;
+    private readonly List<(TItem Item, long? Id)> _newEntries;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DeltaLister{TItem}"/> class.
     /// </summary>
     /// <param name="oldList">The old list.</param>
     /// <param name="newList">The new list.</param>
-    /// <param name="getItemId">The function used to get the identifier of an item.</param>
+    /// <param name="getItemId">The function used to get the identifier of an item.
+    /// Invoked exactly once per item, in the constructor.</param>
     /// <param name="options">The options.</param>
     /// <exception cref="ArgumentNullException">
     /// oldList, newList, getItemId, oldItem, oldItemId or newItem is null.
     /// </exception>
     /// <exception cref="ArgumentOutOfRangeException">newItemId is not present in the old list.</exception>
-    /// <exception cref="ArgumentException">newItemId is duplicated in the new list.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">newItemId is duplicated in the new list.</exception>
+    /// <exception cref="ArgumentException">An id is duplicated in the old list.</exception>
     public DeltaLister(IEnumerable<TItem> oldList, IEnumerable<TItem> newList,
         Func<TItem, long?> getItemId, DeltaOptions options = DeltaOptions.Default)
     {
         _options = options;
-        _oldItems = oldList ?? throw new ArgumentNullException(nameof(oldList));
-        _newItems = newList ?? throw new ArgumentNullException(nameof(newList));
-        _getItemId = getItemId ?? throw new ArgumentNullException(nameof(getItemId));
+        ArgumentNullException.ThrowIfNull(oldList);
+        ArgumentNullException.ThrowIfNull(newList);
+        ArgumentNullException.ThrowIfNull(getItemId);
 
         _oldById = [];
         _newById = [];
+        _oldEntries = [];
+        _newEntries = [];
 
         foreach (var item in oldList)
         {
             var id = ArgumentChecks.NotNull(getItemId(ArgumentChecks.NotNull(item, "oldItem")), "oldItemId");
-            _oldById.Add(id, item);
+            if (!_oldById.TryAdd(id, item))
+                throw new ArgumentException($"Duplicate id {id} in old list.", nameof(oldList));
+            _oldEntries.Add((item, id));
         }
 
         foreach (var item in newList)
@@ -58,6 +63,7 @@ public class DeltaLister<TItem>
 
                 _newById.Add(id.Value);
             }
+            _newEntries.Add((item, id));
         }
     }
 
@@ -71,9 +77,8 @@ public class DeltaLister<TItem>
     {
         get
         {
-            foreach (var item in _oldItems)
+            foreach (var (item, id) in _oldEntries)
             {
-                var id = _getItemId(item);
                 if (!_newById.Contains(id!.Value))
                     yield return item;
             }
@@ -90,9 +95,8 @@ public class DeltaLister<TItem>
     {
         get
         {
-            foreach (var item in _newItems)
+            foreach (var (item, id) in _newEntries)
             {
-                var id = _getItemId(item);
                 if (id == null || !_oldById.ContainsKey(id.Value))
                     yield return item;
             }
@@ -109,9 +113,8 @@ public class DeltaLister<TItem>
     {
         get
         {
-            foreach (var item in _newItems)
+            foreach (var (item, id) in _newEntries)
             {
-                var id = _getItemId(item);
                 if (id != null && _oldById.TryGetValue(id.Value, out TItem? old))
                     yield return new OldNewPair<TItem>(old, item);
             }

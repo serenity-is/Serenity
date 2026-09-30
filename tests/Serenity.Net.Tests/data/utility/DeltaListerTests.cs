@@ -19,7 +19,7 @@ public class DeltaListerTests
     [Fact]
     public void ItemsToDelete_AreOldItemsNotInNewList()
     {
-        var lister = GetLister([1, 2, 3], [2, 3, 4]);
+        var lister = GetLister([1, 2, 3], [2, 3, 4], DeltaOptions.IgnoreInvalidNewId);
 
         Assert.Equal([1], lister.ItemsToDelete.Cast<int?>().ToArray());
     }
@@ -27,7 +27,8 @@ public class DeltaListerTests
     [Fact]
     public void ItemsToCreate_AreNewItemsWithoutOldId()
     {
-        var lister = new DeltaLister<int?>([2], [3, 7], i => i == 7 ? null : i);
+        var lister = new DeltaLister<int?>([2], [3, 7], i => i == 7 ? null : i,
+            DeltaOptions.IgnoreInvalidNewId);
 
         Assert.Equal([3, 7], lister.ItemsToCreate.Cast<int?>().ToArray());
     }
@@ -47,9 +48,16 @@ public class DeltaListerTests
     }
 
     [Fact]
-    public void NewItemWithUnknownId_AllowedByDefaultOption()
+    public void NewItemWithUnknownId_ThrowsByDefaultOption()
     {
-        var lister = GetLister([1], [99]);
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            GetLister([1], [99]));
+    }
+
+    [Fact]
+    public void NewItemWithUnknownId_Allowed_WhenIgnoreInvalidNewIdSet()
+    {
+        var lister = GetLister([1], [99], DeltaOptions.IgnoreInvalidNewId);
 
         Assert.Single(lister.ItemsToCreate);
         Assert.Single(lister.ItemsToDelete);
@@ -60,6 +68,33 @@ public class DeltaListerTests
     {
         Assert.Throws<ArgumentOutOfRangeException>(() =>
             GetLister([1, 2], [99], 0));
+    }
+
+    [Fact]
+    public void DuplicatedOldItemId_ThrowsArgumentException_WithId()
+    {
+        var ex = Assert.Throws<ArgumentException>(() => GetLister([2, 2], []));
+
+        Assert.Contains("2", ex.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void GetItemId_InvokedOncePerItem()
+    {
+        var calls = 0;
+        var lister = new DeltaLister<int?>([1, 2], [2], i =>
+        {
+            calls++;
+            return i;
+        });
+
+        Assert.Equal(3, calls);
+        _ = lister.ItemsToDelete.ToList();
+        _ = lister.ItemsToCreate.ToList();
+        _ = lister.ItemsToUpdate.ToList();
+        _ = lister.ItemsToDelete.ToList();
+
+        Assert.Equal(3, calls);
     }
 
     [Fact]
