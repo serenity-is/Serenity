@@ -6,8 +6,9 @@ namespace Serenity.Data;
 /// Unit of work implementation.
 /// </summary>
 /// <seealso cref="IDisposable" />
+/// <seealso cref="IAsyncDisposable" />
 /// <seealso cref="IUnitOfWork" />
-public class UnitOfWork : IDisposable, IUnitOfWork
+public class UnitOfWork : IDisposable, IAsyncDisposable, IUnitOfWork
 {
     private readonly IDbConnection connection;
     private IDbTransaction? transaction;
