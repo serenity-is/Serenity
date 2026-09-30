@@ -448,6 +448,11 @@ public static partial class Sql
         /// <returns>
         /// A <see cref="string" /> that represents this instance.
         /// </returns>
+        /// <remarks>
+        /// Embedded queries are rendered as text only: their parameters are not
+        /// merged. Pass sub-queries created from this query (e.g. via SubQuery()),
+        /// which share its parameter storage, instead of standalone queries.
+        /// </remarks>
         /// <exception cref="InvalidOperationException">
         /// There should be at least one WHEN/THEN pair.
         /// or
