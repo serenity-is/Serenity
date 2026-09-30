@@ -515,6 +515,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     /// <returns>The query itself.</returns>
     public SqlQuery Skip(int skipRows)
     {
+        ArgumentOutOfRangeException.ThrowIfNegative(skipRows);
         BeforeModify();
         skip = skipRows;
         return this;
@@ -546,6 +547,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     /// <returns>The query itself.</returns>
     public SqlQuery Take(int rowCount)
     {
+        ArgumentOutOfRangeException.ThrowIfNegative(rowCount);
         BeforeModify();
         take = rowCount;
         return this;

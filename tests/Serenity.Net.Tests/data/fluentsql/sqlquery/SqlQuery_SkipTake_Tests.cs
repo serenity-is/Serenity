@@ -3,6 +3,18 @@ namespace Serenity.Data;
 public class SqlQuery_SkipTake_Tests
 {
     [Fact]
+    public void Skip_Negative_ThrowsArgumentOutOfRangeException()
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() => new SqlQuery().Skip(-1));
+    }
+
+    [Fact]
+    public void Take_Negative_ThrowsArgumentOutOfRangeException()
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() => new SqlQuery().Take(-1));
+    }
+
+    [Fact]
     public void SkipThrowsExceptionIfNoOrderByForSql2000Dialect()
     {
         var query = new SqlQuery()
