@@ -201,4 +201,13 @@ public class SqlInsertTests
     {
         public void SetAlias(string alias, string expression) => SetAliasExpression(alias, expression);
     }
+
+    [Fact]
+    public void Freeze_Prevents_Modification()
+    {
+        var insert = new SqlInsert("T").SetTo("A", "1");
+        insert.Freeze();
+
+        Assert.Throws<InvalidOperationException>(() => insert.SetTo("B", "2"));
+    }
 }

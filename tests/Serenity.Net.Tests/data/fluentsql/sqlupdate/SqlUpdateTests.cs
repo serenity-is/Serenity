@@ -292,4 +292,13 @@ public class SqlUpdateTests
     {
         public void SetAlias(string alias, string expression) => SetAliasExpression(alias, expression);
     }
+
+    [Fact]
+    public void Freeze_Prevents_Modification()
+    {
+        var update = new SqlUpdate("T").SetTo("A", "1");
+        update.Freeze();
+
+        Assert.Throws<InvalidOperationException>(() => update.SetTo("B", "2"));
+    }
 }

@@ -95,6 +95,15 @@ public class SqlDeleteTests
     }
 
     [Fact]
+    public void Freeze_Prevents_Modification()
+    {
+        var delete = new SqlDelete("T").Where(new Criteria("A") == 5);
+        delete.Freeze();
+
+        Assert.Throws<InvalidOperationException>(() => delete.Where(new Criteria("B") == 6));
+    }
+
+    [Fact]
     public void Clone_Copies_Where_Params_And_Text()
     {
         var delete = new SqlDelete("T").Where(new Criteria("A") == 5);
