@@ -21,7 +21,7 @@ public static class SetFieldByStatementExtensions
     /// <returns>
     ///   Object itself.
     /// </returns>
-    public static T Set<T>(this T self, string field, object value) where T : ISetFieldByStatement
+    public static T Set<T>(this T self, string field, object? value) where T : ISetFieldByStatement
     {
         var param = self.AddParam(value);
         self.SetTo(field, param.Name);
