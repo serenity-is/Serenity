@@ -45,7 +45,7 @@ public class MySqlDialect : ISqlDialect
     public virtual bool NeedsExecuteBlockStatement => false;
 
     /// <inheritdoc/>
-    public virtual string OffsetFormat => " OFFSET {0}";
+    public virtual string OffsetFormat => " LIMIT 18446744073709551615 OFFSET {0}";
 
     /// <inheritdoc/>
     public virtual string OffsetFetchFormat => " LIMIT {1} OFFSET {0}";

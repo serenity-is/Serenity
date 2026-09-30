@@ -283,6 +283,32 @@ public class SqlQuery_ToStringTests
     }
 
     [Fact]
+    public void ToString_Offset_Without_Take_For_MySql()
+    {
+        var sql = new SqlQuery()
+            .Dialect(MySqlDialect.Instance)
+            .Select("c")
+            .From("t")
+            .Skip(5)
+            .ToString();
+
+        Assert.Contains("LIMIT 18446744073709551615 OFFSET 5", sql);
+    }
+
+    [Fact]
+    public void ToString_Offset_Without_Take_For_Sqlite()
+    {
+        var sql = new SqlQuery()
+            .Dialect(SqliteDialect.Instance)
+            .Select("c")
+            .From("t")
+            .Skip(5)
+            .ToString();
+
+        Assert.Contains("LIMIT -1 OFFSET 5", sql);
+    }
+
+    [Fact]
     public void ToString_Offset_Without_Take_For_Postgres()
     {
         var sql = new SqlQuery()
