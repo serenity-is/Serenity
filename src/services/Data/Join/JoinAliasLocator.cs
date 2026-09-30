@@ -63,45 +63,72 @@ public class JoinAliasLocator
     /// <returns><c>true</c> if the expression was processed successfully.</returns>
     public static bool EnumerateAliases(string expression, Action<string> alias)
     {
-        bool inQuote = false;
+        // Skip regions (quoted strings / identifiers and -- / /* */ comments) use
+        // the same rules as BracketLocator: comment markers only apply outside
+        // quotes, quotes don't span comments, block comments don't nest, and only
+        // '\n' ends a line comment. A '' inside a string is parity-neutral for this
+        // toggle scanner, so it needs no special case.
+        char? quoteChar = null;
+        bool inLineComment = false;
+        bool inBlockComment = false;
         int startIdent = -1;
         for (var i = 0; i < expression.Length; i++)
         {
             var c = expression[i];
 
-            if (inQuote)
+            if (inBlockComment)
             {
-                if (c == '\'')
+                if (c == '*' && i + 1 < expression.Length && expression[i + 1] == '/')
                 {
-                    inQuote = false;
+                    i++;
+                    inBlockComment = false;
                 }
+            }
+            else if (inLineComment)
+            {
+                if (c == '\n')
+                    inLineComment = false;
+            }
+            else if (quoteChar != null)
+            {
+                if (c == quoteChar)
+                    quoteChar = null;
+            }
+            else if (c == '\'' || c == '"' || c == '`')
+            {
+                quoteChar = c;
+                startIdent = -1;
+            }
+            else if (c == '-' && i + 1 < expression.Length && expression[i + 1] == '-')
+            {
+                i++;
+                startIdent = -1;
+                inLineComment = true;
+            }
+            else if (c == '/' && i + 1 < expression.Length && expression[i + 1] == '*')
+            {
+                i++;
+                startIdent = -1;
+                inBlockComment = true;
+            }
+            else if (c == '_' || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'))
+            {
+                if (startIdent < 0)
+                    startIdent = i;
+            }
+            else if (c >= '0' && c <= '9')
+            {
+            }
+            else if (c == '.')
+            {
+                if (startIdent >= 0 && startIdent < i)
+                {
+                    alias(expression[startIdent..i]);
+                }
+                startIdent = -1;
             }
             else
-            {
-                if (c == '\'')
-                {
-                    inQuote = true;
-                    startIdent = -1;
-                }
-                else if (c == '_' || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'))
-                {
-                    if (startIdent < 0)
-                        startIdent = i;
-                }
-                else if (c >= '0' && c <= '9')
-                {
-                }
-                else if (c == '.')
-                {
-                    if (startIdent >= 0 && startIdent < i)
-                    {
-                        alias(expression[startIdent..i]);
-                    }
-                    startIdent = -1;
-                }
-                else
-                    startIdent = -1;
-            }
+                startIdent = -1;
         }
 
         return true;
@@ -115,7 +142,10 @@ public class JoinAliasLocator
     /// <returns>The expression with aliases replaced.</returns>
     public static string ReplaceAliases(string expression, Func<string, string> replace)
     {
-        bool inQuote = false;
+        // Skip regions use the same rules as EnumerateAliases above.
+        char? quoteChar = null;
+        bool inLineComment = false;
+        bool inBlockComment = false;
         int startIdent = -1;
         var sb = new StringBuilder();
         for (var i = 0; i < expression.Length; i++)
@@ -123,46 +153,66 @@ public class JoinAliasLocator
             var c = expression[i];
             sb.Append(c);
 
-            if (inQuote)
+            if (inBlockComment)
             {
-                if (c == '\'')
+                if (c == '*' && i + 1 < expression.Length && expression[i + 1] == '/')
                 {
-                    inQuote = false;
+                    sb.Append(expression[++i]);
+                    inBlockComment = false;
                 }
+            }
+            else if (inLineComment)
+            {
+                if (c == '\n')
+                    inLineComment = false;
+            }
+            else if (quoteChar != null)
+            {
+                if (c == quoteChar)
+                    quoteChar = null;
+            }
+            else if (c == '\'' || c == '"' || c == '`')
+            {
+                quoteChar = c;
+                startIdent = -1;
+            }
+            else if (c == '-' && i + 1 < expression.Length && expression[i + 1] == '-')
+            {
+                sb.Append(expression[++i]);
+                startIdent = -1;
+                inLineComment = true;
+            }
+            else if (c == '/' && i + 1 < expression.Length && expression[i + 1] == '*')
+            {
+                sb.Append(expression[++i]);
+                startIdent = -1;
+                inBlockComment = true;
+            }
+            else if (c == '_' || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'))
+            {
+                if (startIdent < 0)
+                    startIdent = i;
+            }
+            else if (c >= '0' && c <= '9')
+            {
+            }
+            else if (c == '.')
+            {
+                if (startIdent >= 0 && startIdent < i)
+                {
+                    var alias = expression[startIdent..i];
+                    var replaced = replace(alias);
+                    if (alias != replaced)
+                    {
+                        sb.Length -= alias.Length + 1;
+                        sb.Append(replaced);
+                        sb.Append('.');
+                    }
+                }
+                startIdent = -1;
             }
             else
-            {
-                if (c == '\'')
-                {
-                    inQuote = true;
-                    startIdent = -1;
-                }
-                else if (c == '_' || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'))
-                {
-                    if (startIdent < 0)
-                        startIdent = i;
-                }
-                else if (c >= '0' && c <= '9')
-                {
-                }
-                else if (c == '.')
-                {
-                    if (startIdent >= 0 && startIdent < i)
-                    {
-                        var alias = expression[startIdent..i];
-                        var replaced = replace(alias);
-                        if (alias != replaced)
-                        {
-                            sb.Length -= alias.Length + 1;
-                            sb.Append(replaced);
-                            sb.Append('.');
-                        }
-                    }
-                    startIdent = -1;
-                }
-                else
-                    startIdent = -1;
-            }
+                startIdent = -1;
         }
 
         return sb.ToString();

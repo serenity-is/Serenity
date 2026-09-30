@@ -219,6 +219,49 @@ public class JoinAliasLocatorTests
                 s => s == "a" ? "X" : s == "b" ? "Y" : s));
     }
 
+    [Fact]
+    public void Locate_Ignores_Alias_In_Line_Comment()
+    {
+        var aliases = JoinAliasLocator.Locate("-- t0.x\nT1.y");
+
+        Assert.Equal("T1", Assert.Single(aliases!));
+    }
+
+    [Fact]
+    public void Locate_Ignores_Alias_In_Block_Comment()
+    {
+        var aliases = JoinAliasLocator.Locate("/* t0.x */ T1.y");
+
+        Assert.Equal("T1", Assert.Single(aliases!));
+    }
+
+    [Fact]
+    public void Locate_Ignores_Alias_In_Double_Quotes()
+    {
+        Assert.Null(JoinAliasLocator.Locate("\"t0.x\""));
+    }
+
+    [Fact]
+    public void Locate_Ignores_Alias_In_Backticks()
+    {
+        Assert.Null(JoinAliasLocator.Locate("`t0.x`"));
+    }
+
+    [Fact]
+    public void Locate_Still_Finds_Alias_After_Comment()
+    {
+        var aliases = JoinAliasLocator.Locate("/* x */ T0.a = '--' ");
+
+        Assert.Equal("T0", Assert.Single(aliases!));
+    }
+
+    [Fact]
+    public void ReplaceAliases_Ignores_Alias_In_Comment()
+    {
+        Assert.Equal("-- t0.x\nT2.y",
+            JoinAliasLocator.ReplaceAliases("-- t0.x\nT1.y", s => s == "T1" ? "T2" : s));
+    }
+
     private sealed class CustomFunctionCriteria(string state, params BaseCriteria[] arguments)
         : FunctionCallCriteria(arguments)
     {

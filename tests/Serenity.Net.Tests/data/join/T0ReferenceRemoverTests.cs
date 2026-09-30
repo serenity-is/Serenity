@@ -73,4 +73,22 @@ public class T0ReferenceRemoverTests
     {
         Assert.Equal("Field", T0ReferenceRemover.RemoveT0Aliases("Field"));
     }
+
+    [Fact]
+    public void RemoveT0Aliases_Keeps_Quoted_Dotted_Identifier()
+    {
+        Assert.Equal("\"t0.b\"", T0ReferenceRemover.RemoveT0Aliases("\"t0.b\""));
+    }
+
+    [Fact]
+    public void RemoveT0Aliases_Keeps_T0_In_Block_Comment()
+    {
+        Assert.Equal("a /* t0.b */", T0ReferenceRemover.RemoveT0Aliases("T0.a /* t0.b */"));
+    }
+
+    [Fact]
+    public void RemoveT0Aliases_Keeps_T0_In_Line_Comment()
+    {
+        Assert.Equal("a -- t0.b", T0ReferenceRemover.RemoveT0Aliases("T0.a -- t0.b"));
+    }
 }
