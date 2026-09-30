@@ -202,7 +202,7 @@ public class SqlCommandDumper
                     || value is double
                     || value is decimal)
                 {
-                    sbCommandText.Append(value.ToString());
+                    sbCommandText.Append(((IFormattable)value).ToString(null, CultureInfo.InvariantCulture));
                 }
                 else if (value is DateTime dt)
                 {

@@ -41,6 +41,50 @@ public class SqlDebugDumperTests
     }
 
     [Fact]
+    public void Dump_DoesNotReplace_Param_In_String_Literal()
+    {
+        var result = SqlDebugDumper.Dump("X = '@p1' AND Y = @p1", MakePrm("@p1", 1));
+
+        Assert.Equal("X = '@p1' AND Y = 1", result);
+    }
+
+    [Fact]
+    public void Dump_DoesNotReplace_Param_In_Comments()
+    {
+        var result = SqlDebugDumper.Dump("-- @p1\nX = @p1 /* @p1 */", MakePrm("@p1", 1));
+
+        Assert.Equal("-- @p1\nX = 1 /* @p1 */", result);
+    }
+
+    [Fact]
+    public void Dump_DoesNotReplace_ParamPrefix_Of_Longer_Name()
+    {
+        var prm = new Dictionary<string, object?> { ["@Id"] = 1, ["@Id2"] = 2 };
+
+        var result = SqlDebugDumper.Dump("X = @Id AND Y = @Id2", prm);
+
+        Assert.Equal("X = 1 AND Y = 2", result);
+    }
+
+    [Fact]
+    public void Dump_DoesNotRescan_Inserted_Replacement()
+    {
+        var prm = new Dictionary<string, object?> { ["@a"] = "@b", ["@b"] = 1 };
+
+        var result = SqlDebugDumper.Dump("X = @a", prm);
+
+        Assert.Equal("X = N'@b'", result);
+    }
+
+    [Fact]
+    public void Dump_Keeps_DoubleAt_Variables()
+    {
+        var result = SqlDebugDumper.Dump("X = @p1 AND @@ROWCOUNT = 0", MakePrm("@p1", 1));
+
+        Assert.Equal("X = 1 AND @@ROWCOUNT = 0", result);
+    }
+
+    [Fact]
     public void Dump_ParameterValues_Conversion()
     {
         Assert.Equal("X = NULL", SqlDebugDumper.Dump("X = @p1", MakePrm("@p1", null)));

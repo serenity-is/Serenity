@@ -1,4 +1,5 @@
 using Microsoft.Data.SqlClient;
+using System.Globalization;
 
 namespace Serenity.Data;
 
@@ -173,6 +174,30 @@ public class SqlCommandDumperTests
         var result = SqlCommandDumper.GetCommandText(command);
 
         Assert.Contains("Exception occurred while converting parameter", result, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void GetCommandText_NumericParameter_UsesInvariantCulture()
+    {
+        var current = CultureInfo.CurrentCulture;
+        CultureInfo.CurrentCulture = new CultureInfo("tr-TR");
+        try
+        {
+            MockDbCommand command = GetCommand();
+            command.CommandText = "SELECT 1";
+
+            command.Parameters.Add(new SqlParameter { ParameterName = "@d", DbValue = 3.14m, SqlDbType = SqlDbType.Decimal, Direction = ParameterDirection.Input });
+            command.Parameters.Add(new SqlParameter { ParameterName = "@f", DbValue = 1.5, SqlDbType = SqlDbType.Float, Direction = ParameterDirection.Input });
+
+            var result = SqlCommandDumper.GetCommandText(command);
+
+            Assert.Contains("@d DECIMAL = 3.14", result, StringComparison.Ordinal);
+            Assert.Contains("@f FLOAT = 1.5", result, StringComparison.Ordinal);
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = current;
+        }
     }
 
     private sealed class ThrowingValue

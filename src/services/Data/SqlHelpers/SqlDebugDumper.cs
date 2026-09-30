@@ -19,19 +19,77 @@ public class SqlDebugDumper
         if (parameters == null)
             return sql;
 
-        var param = parameters.ToList();
-        for (var i = 0; i < param.Count; i++)
+        var lookup = new Dictionary<string, object?>(StringComparer.Ordinal);
+        foreach (var pair in parameters)
+            lookup[pair.Key.StartsWith("@") ? pair.Key : "@" + pair.Key] = pair.Value;
+
+        // Token-aware replacement: StringBuilder.Replace would also hit parameter
+        // names inside string literals and comments, and the prefix of longer names
+        // (e.g. @Id inside @Id2 or inside an inserted replacement value). Scan once
+        // instead, replacing only whole @name tokens outside skip regions. Skip rules
+        // match the Join scanners: ' " ` quotes, -- and /* */ comments, '\n'-only
+        // line comment end. A lone @ (as in @@ROWCOUNT) is copied verbatim.
+        var source = sql ?? "";
+        var sb = new StringBuilder(source.Length);
+        char? quoteChar = null;
+        bool inLineComment = false;
+        bool inBlockComment = false;
+        for (var i = 0; i < source.Length; i++)
         {
-            var name = param[i].Key;
-            if (!name.StartsWith("@"))
-                param[i] = new KeyValuePair<string, object?>("@" + name, param[i].Value);
+            var c = source[i];
+            if (inBlockComment)
+            {
+                sb.Append(c);
+                if (c == '*' && i + 1 < source.Length && source[i + 1] == '/')
+                {
+                    sb.Append(source[++i]);
+                    inBlockComment = false;
+                }
+            }
+            else if (inLineComment)
+            {
+                sb.Append(c);
+                if (c == '\n')
+                    inLineComment = false;
+            }
+            else if (quoteChar != null)
+            {
+                sb.Append(c);
+                if (c == quoteChar)
+                    quoteChar = null;
+            }
+            else if (c == '\'' || c == '"' || c == '`')
+            {
+                sb.Append(c);
+                quoteChar = c;
+            }
+            else if (c == '-' && i + 1 < source.Length && source[i + 1] == '-')
+            {
+                sb.Append(c);
+                sb.Append(source[++i]);
+                inLineComment = true;
+            }
+            else if (c == '/' && i + 1 < source.Length && source[i + 1] == '*')
+            {
+                sb.Append(c);
+                sb.Append(source[++i]);
+                inBlockComment = true;
+            }
+            else if (c == '@' && i + 1 < source.Length && IsParamStart(source[i + 1]))
+            {
+                var j = i + 2;
+                while (j < source.Length && IsParamChar(source[j]))
+                    j++;
+                var token = source[i..j];
+                if (lookup.TryGetValue(token, out var value))
+                    sb.Append(DumpParameterValue(value, dialect));
+                else
+                    sb.Append(token);
+                i = j - 1;
+            }
+            else
+                sb.Append(c);
         }
-
-        param.Sort((x, y) => y.Key.Length.CompareTo(x.Key.Length));
-
-        var sb = new StringBuilder(sql ?? "");
-        foreach (var pair in param)
-            sb.Replace(pair.Key, DumpParameterValue(pair.Value, dialect));
 
         var text = DatabaseCaretReferences.Replace(sb.ToString());
 
@@ -46,6 +104,10 @@ public class SqlDebugDumper
 
         return text;
     }
+
+    private static bool IsParamStart(char c) => c == '_' || char.IsLetter(c);
+
+    private static bool IsParamChar(char c) => c == '_' || char.IsLetterOrDigit(c);
 
     private static string DumpParameterValue(object? value, ISqlDialect? dialect = null)
     {
