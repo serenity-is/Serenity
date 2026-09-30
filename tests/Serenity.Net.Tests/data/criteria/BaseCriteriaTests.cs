@@ -123,12 +123,22 @@ public class BaseCriteriaTests
     }
 
     [Fact]
+    public void Contains_EscapesLikeSpecialsInMask()
+    {
+        var name = new Criteria("Name");
+        var query = new SqlQuery();
+
+        Assert.Equal("(Name LIKE @p1 ESCAPE '!')", name.Contains("a%b").ToString(query));
+        Assert.Equal("%a!%b%", query.Params["@p1"]);
+    }
+
+    [Fact]
     public void StartsWith_NullMask_ThrowsArgumentNullException()
     {
         var name = new Criteria("Name");
 
         var exception = Assert.Throws<ArgumentNullException>(() => name.StartsWith(null));
-        Assert.Equal("mask", exception.ParamName);
+        Assert.Equal("text", exception.ParamName);
     }
 
     [Fact]
@@ -137,7 +147,7 @@ public class BaseCriteriaTests
         var name = new Criteria("Name");
 
         var exception = Assert.Throws<ArgumentNullException>(() => name.EndsWith(null));
-        Assert.Equal("mask", exception.ParamName);
+        Assert.Equal("text", exception.ParamName);
     }
 
     [Fact]
@@ -146,7 +156,7 @@ public class BaseCriteriaTests
         var name = new Criteria("Name");
 
         var exception = Assert.Throws<ArgumentNullException>(() => name.Contains(null));
-        Assert.Equal("mask", exception.ParamName);
+        Assert.Equal("text", exception.ParamName);
     }
 
     [Fact]
@@ -155,7 +165,7 @@ public class BaseCriteriaTests
         var name = new Criteria("Name");
 
         var exception = Assert.Throws<ArgumentNullException>(() => name.NotContains(null));
-        Assert.Equal("mask", exception.ParamName);
+        Assert.Equal("text", exception.ParamName);
     }
 
     // In

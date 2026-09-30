@@ -81,6 +81,11 @@ public class CriteriaJsonConverter : JsonConverter<BaseCriteria>
             Write(writer, binary.LeftOperand, options);
             writer.WriteStringValue(OperatorToKey[(int)binary.Operator]);
             Write(writer, binary.RightOperand, options);
+            // The flag is only ever set when the mask needs it (see the
+            // BinaryCriteria constructor), so older 3-element readers keep
+            // working otherwise.
+            if (binary.LikeEscapeChar is char escapeChar)
+                writer.WriteStringValue(escapeChar.ToString());
             writer.WriteEndArray();
             return;
         }
@@ -213,6 +218,34 @@ public class CriteriaJsonConverter : JsonConverter<BaseCriteria>
                 throw new JsonException(string.Format("Invalid Criteria format: {0}", array.ToString()));
 
             return new BinaryCriteria(ParseValue(array[0]), op, ParseValue(array[2]));
+        }
+
+        if (array.Length == 4)
+        {
+            if (array[1].ValueKind != JsonValueKind.String)
+                throw new JsonException(string.Format("Couldn't deserialize binary criteria: {0}", array.ToString()));
+
+            var opStr = array[1].GetString();
+
+            if (!KeyToOperator.TryGetValue(opStr!, out CriteriaOperator op))
+                throw new JsonException(string.Format("Unknown Criteria operator: {0}", opStr));
+
+            if (op != CriteriaOperator.Like && op != CriteriaOperator.NotLike)
+                throw new JsonException(string.Format("Invalid Criteria format: {0}", array.ToString()));
+
+            if (array[3].ValueKind != JsonValueKind.String ||
+                array[3].GetString() is not string escapeStr ||
+                escapeStr.Length != 1)
+                throw new JsonException(string.Format("Invalid Criteria escape character: {0}", array.ToString()));
+
+            try
+            {
+                return new BinaryCriteria(ParseValue(array[0]), op, ParseValue(array[2]), escapeStr[0]);
+            }
+            catch (ArgumentException ex)
+            {
+                throw new JsonException(string.Format("Invalid Criteria escape character: {0}", array.ToString()), ex);
+            }
         }
 
         throw new JsonException(string.Format("Can't deserialize {0} as Criteria item", array[0].ToString()));

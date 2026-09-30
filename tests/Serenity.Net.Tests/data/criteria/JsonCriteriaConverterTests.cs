@@ -281,7 +281,7 @@ public class JsonCriteriaConverterTests
     [InlineData("[5,\"Name\"]", "Couldn't deserialize unary criteria")]
     [InlineData("[\"A\",5,\"B\"]", "Couldn't deserialize unary criteria")]
     [InlineData("[\"A\",\"xyz\",\"B\"]", "Unknown Criteria operator")]
-    [InlineData("[\"A\",\"=\",\"B\",\"C\"]", "Can't deserialize")]
+    [InlineData("[\"A\",\"=\",\"B\",\"C\"]", "Invalid Criteria format")]
     public void Read_MalformedArrayShapes_ThrowJsonSerializationException(string json, string messagePart)
     {
         var ex = Assert.Throws<Newtonsoft.Json.JsonSerializationException>(() =>

@@ -29,25 +29,35 @@ export class CriteriaBuilder extends Array {
     /**
      * Creates a `LIKE '%value%'` (contains) criteria.
      *
+     * The value is treated as literal text: LIKE special characters are
+     * escaped (see {@link escapeLikeWildcards}) and a 4-element array with
+     * `ESCAPE '!'` is produced only when escaping was necessary, otherwise
+     * a plain 3-element array, so older servers keep working.
+     *
      * @param value - Substring to search for. Wrapped with `%` on both sides.
-     * @returns Criteria `[field, "like", "%value%"]`.
+     * @returns Criteria `[field, "like", "%value%"]` or `[field, "like", "%value%", "!"]`.
      * @example
      * Criteria("Name").contains("ser"); // [["Name"], "like", "%ser%"]
      */
     contains(value: string): Array<any> {
-        return [this, 'like', '%' + value + '%'];
+        return this.likeEscaped('%' + escapeLikeWildcards(value) + '%');
     }
 
     /**
      * Creates a `LIKE '%value'` (ends-with) criteria.
      *
+     * The value is treated as literal text: LIKE special characters are
+     * escaped (see {@link escapeLikeWildcards}) and a 4-element array with
+     * `ESCAPE '!'` is produced only when escaping was necessary, otherwise
+     * a plain 3-element array, so older servers keep working.
+     *
      * @param value - Suffix to match. Prefixed with `%`.
-     * @returns Criteria `[field, "like", "%value"]`.
+     * @returns Criteria `[field, "like", "%value"]` or `[field, "like", "%value", "!"]`.
      * @example
      * Criteria("Email").endsWith("@example.com");
      */
     endsWith(value: string): Array<any> {
-        return [this, 'like', '%' + value];
+        return this.likeEscaped('%' + escapeLikeWildcards(value));
     }
 
     /**
@@ -155,15 +165,41 @@ export class CriteriaBuilder extends Array {
     }
 
     /**
+     * Creates a `LIKE ... ESCAPE '!'` criteria with a pre-escaped mask.
+     *
+     * The mask must already be escaped (see {@link escapeLikeWildcards});
+     * it is used as is. A 4-element array is produced only when the mask
+     * contains the escape character, otherwise a plain 3-element array,
+     * so older servers keep working. For literal values prefer
+     * {@link CriteriaBuilder.contains}, {@link CriteriaBuilder.startsWith}
+     * or {@link CriteriaBuilder.endsWith}.
+     *
+     * @param mask - LIKE mask, already escaped for `!`.
+     * @returns Criteria `[field, "like", mask]` or `[field, "like", mask, "!"]`.
+     * @example
+     * Criteria("Name").likeEscaped("%a!%b%"); // [["Name"], "like", "%a!%b%", "!"]
+     */
+    likeEscaped(mask: string): Array<any> {
+        if (mask != null && mask.indexOf('!') >= 0)
+            return [this, 'like', mask, '!'];
+        return [this, 'like', mask];
+    }
+
+    /**
      * Creates a `LIKE 'value%'` (starts-with) criteria.
      *
+     * The value is treated as literal text: LIKE special characters are
+     * escaped (see {@link escapeLikeWildcards}) and a 4-element array with
+     * `ESCAPE '!'` is produced only when escaping was necessary, otherwise
+     * a plain 3-element array, so older servers keep working.
+     *
      * @param value - Prefix to match. Suffixed with `%`.
-     * @returns Criteria `[field, "like", "value%"]`.
+     * @returns Criteria `[field, "like", "value%"]` or `[field, "like", "value%", "!"]`.
      * @example
      * Criteria("Name").startsWith("Jo"); // [["Name"], "like", "Jo%"]
      */
     startsWith(value: string): Array<any> {
-        return [this, 'like', value + '%'];
+        return this.likeEscaped(escapeLikeWildcards(value) + '%');
     }
 
     /**
@@ -185,6 +221,53 @@ export class CriteriaBuilder extends Array {
     notLike(value: any): Array<any> {
         return [this, 'not like', value];
     }
+
+    /**
+     * Creates a `NOT LIKE ... ESCAPE '!'` criteria with a pre-escaped mask.
+     *
+     * The mask must already be escaped (see {@link escapeLikeWildcards});
+     * it is used as is. A 4-element array is produced only when the mask
+     * contains the escape character, otherwise a plain 3-element array.
+     *
+     * @param mask - LIKE mask, already escaped for `!`.
+     * @returns Criteria `[field, "not like", mask]` or `[field, "not like", mask, "!"]`.
+     * @example
+     * Criteria("Name").notLikeEscaped("%a!%b%"); // [["Name"], "not like", "%a!%b%", "!"]
+     */
+    notLikeEscaped(mask: string): Array<any> {
+        if (mask != null && mask.indexOf('!') >= 0)
+            return [this, 'not like', mask, '!'];
+        return [this, 'not like', mask];
+    }
+}
+
+/**
+ * Escapes a literal value for use in a LIKE pattern with the `!` escape character.
+ *
+ * The escape character itself is escaped first, then `%`, `_` and `[`.
+ * A `]` outside a `[...]` class is literal on all supported dialects, so it is left as is.
+ * The result must be used with `ESCAPE '!'` declared (see
+ * {@link CriteriaBuilder.likeEscaped}), otherwise the escape character
+ * matches itself instead of escaping.
+ *
+ * @param value - The literal value to escape.
+ * @returns The escaped value, with no `%` affixes added.
+ * @example
+ * escapeLikeWildcards("50%"); // "50!%"
+ */
+export function escapeLikeWildcards(value: string): string {
+    if (value == null)
+        return value;
+
+    const escape = '!';
+    let result = '';
+    for (let i = 0; i < value.length; i++) {
+        const c = value.charAt(i);
+        if (c === escape || c === '%' || c === '_' || c === '[')
+            result += escape;
+        result += c;
+    }
+    return result;
 }
 
 const TOKEN_IDENTIFIER = 1;
@@ -193,8 +276,12 @@ const TOKEN_VALUE = 3;
 const TOKEN_PARAM = 4;
 
 interface Token {
+    /** token */
     t: number;
+    /** value */
     v: any;
+    /** extra information, e.g., escape character for LIKE patterns */
+    x?: any;
 }
 
 interface ParseError {
@@ -500,6 +587,35 @@ function tokenize(expression: string): Token[] {
                     v: 'like'
                 });
             }
+            else if (w === 'escape') {
+                // ESCAPE 'x' is only valid immediately after a LIKE pattern:
+                // [..., like | not like, pattern]
+                const prevToken = tokens.length ? tokens[tokens.length - 1] : null;
+                const prevOp = tokens.length > 1 ? tokens[tokens.length - 2] : null;
+                if (!prevToken || (prevToken.t !== TOKEN_VALUE && prevToken.t !== TOKEN_PARAM) ||
+                    !prevOp || prevOp.t !== TOKEN_OPERATOR ||
+                    (prevOp.v !== 'like' && prevOp.v !== 'not like'))
+                    throw new ParseError(expression, 'unexpected "escape" keyword', index);
+
+                index = end + 1;
+                skipWhiteSpace();
+
+                if (index >= l || expression.charAt(index) !== "'")
+                    throw new ParseError(expression, 'expected escape character', index);
+
+                readString();
+                if (v.length !== 1)
+                    throw new ParseError(expression, 'escape character must be a single character', index);
+
+                tokens.push({
+                    t: TOKEN_OPERATOR,
+                    v: 'escape',
+                    x: v
+                });
+
+                index = end;
+                continue;
+            }
             else {
                 tokens.push({
                     t: TOKEN_IDENTIFIER,
@@ -616,6 +732,7 @@ const operatorPrecedence: Record<string, number> = {
     '!=': 4,
     'like': 5,
     'not like': 5,
+    'escape': 5,
     'in': 5,
     'not in': 5,
     'is null': 5,
@@ -716,6 +833,21 @@ function rpnTokensToCriteria(rpnTokens: Token[], getParam?: (name: string) => an
 
                             stack.push([token.v, stack.pop()]);
                             break;
+                        case 'escape': {
+                            // Folds into the LIKE criteria built just before it:
+                            // [field, like, mask] + '!' => [field, like, mask, '!']
+                            if (!stack.length)
+                                throw new Error(`"escape" requires a preceding LIKE pattern!`);
+
+                            const likeCriteria = stack.pop();
+                            if (!Array.isArray(likeCriteria) || likeCriteria.length !== 3 ||
+                                (likeCriteria[1] !== 'like' && likeCriteria[1] !== 'not like'))
+                                throw new Error(`"escape" requires a preceding LIKE pattern!`);
+
+                            likeCriteria.push(token.x);
+                            stack.push(likeCriteria);
+                            break;
+                        }
                         default:
                             if (stack.length < 2)
                                 throw new Error(`Binary operator "${token.v}" requires two values!`);

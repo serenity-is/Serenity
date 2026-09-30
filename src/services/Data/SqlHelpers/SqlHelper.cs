@@ -441,7 +441,7 @@ public static class SqlHelper
         {
             queryText += ";\nSELECT " + dialect.ScopeIdentityExpression + " AS IDCOLUMNVALUE";
 
-            using IDataReader reader = InternalExecuteReader(connection, queryText, parameters, logger);
+            using var reader = InternalExecuteReader(connection, queryText, parameters, logger);
             return reader.Read() ? ReadIdentityValue(reader) : null;
         }
 
@@ -804,7 +804,7 @@ public static class SqlHelper
         return CheckExpectedRows(expectedRows, await InternalExecuteNonQueryAsync(command, logger, cancellationToken).ConfigureAwait(false));
     }
 
-    private static IDataReader InternalExecuteReader(IDbConnection connection, string commandText, IReadOnlyDictionary<string, object?>? param, ILogger? logger)
+    private static CommandOwningDataReader InternalExecuteReader(IDbConnection connection, string commandText, IReadOnlyDictionary<string, object?>? param, ILogger? logger)
     {
         ArgumentNullException.ThrowIfNull(connection);
 

@@ -4,21 +4,16 @@ namespace Serenity.Data;
 /// A criteria object containing a parameter name
 /// </summary>
 /// <seealso cref="BaseCriteria" />
-public class ParamCriteria : BaseCriteria
+/// <remarks>
+/// Initializes a new instance of the <see cref="ParamCriteria"/> class.
+/// </remarks>
+/// <param name="name">The parameter name. Should start with @.</param>
+/// <exception cref="ArgumentNullException">name is null or empty</exception>
+/// <exception cref="ArgumentOutOfRangeException">name doesn't start with "@",
+/// or has nothing but whitespace after it.</exception>
+public class ParamCriteria(string name) : BaseCriteria
 {
-    private readonly string name;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ParamCriteria"/> class.
-    /// </summary>
-    /// <param name="name">The parameter name. Should start with @.</param>
-    /// <exception cref="ArgumentNullException">name is null or empty</exception>
-    /// <exception cref="ArgumentOutOfRangeException">name doesn't start with "@",
-    /// or has nothing but whitespace after it.</exception>
-    public ParamCriteria(string name)
-    {
-        this.name = Parameter.CheckName(name);
-    }
+    private readonly string name = Parameter.CheckName(name);
 
     /// <summary>
     /// Converts the criteria to string.

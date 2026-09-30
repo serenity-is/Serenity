@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { Criteria } from "./criteria";
+import { Criteria, escapeLikeWildcards } from "./criteria";
 
 describe("Criteria.isEmpty", () => {
     it('returns true for null, undefined, empty array and array with one empty string', () => {
@@ -133,6 +133,31 @@ describe("Criteria function", () => {
         expect(Criteria('a').contains('b')).toEqual([['a'], 'like', '%b%']);
     });
 
+    it('should escape like specials in contains, startsWith and endsWith', () => {
+        expect(Criteria('a').contains('50%')).toEqual([['a'], 'like', '%50!%%', '!']);
+        expect(Criteria('a').startsWith('a_b')).toEqual([['a'], 'like', 'a!_b%', '!']);
+        expect(Criteria('a').endsWith('a[b')).toEqual([['a'], 'like', '%a![b', '!']);
+        expect(Criteria('a').contains('a]b')).toEqual([['a'], 'like', '%a]b%']);
+    });
+
+    it('should handle likeEscaped and notLikeEscaped operators', () => {
+        expect(Criteria('a').likeEscaped('%abc%')).toEqual([['a'], 'like', '%abc%']);
+        expect(Criteria('a').likeEscaped('%a!%b%')).toEqual([['a'], 'like', '%a!%b%', '!']);
+        expect(Criteria('a').notLikeEscaped('%abc%')).toEqual([['a'], 'not like', '%abc%']);
+        expect(Criteria('a').notLikeEscaped('%a!%b%')).toEqual([['a'], 'not like', '%a!%b%', '!']);
+    });
+
+    it('escapeLikeWildcards escapes specials', () => {
+        expect(escapeLikeWildcards('abc')).toBe('abc');
+        expect(escapeLikeWildcards('')).toBe('');
+        expect(escapeLikeWildcards('50%')).toBe('50!%');
+        expect(escapeLikeWildcards('a_b')).toBe('a!_b');
+        expect(escapeLikeWildcards('a[b')).toBe('a![b');
+        expect(escapeLikeWildcards('a]b')).toBe('a]b');
+        expect(escapeLikeWildcards('a!b')).toBe('a!!b');
+        expect(escapeLikeWildcards('!')).toBe('!!');
+    });
+
     it('should handle is null operators', () => {
         expect(Criteria('a').isNull()).toEqual(['is null', ['a']]);
         expect(Criteria('a').isNotNull()).toEqual(['is not null', ['a']]);
@@ -216,6 +241,36 @@ describe("Criteria.parse", () => {
         expect((Criteria.parse`a not like ${'%a%'}`)).toEqual(
             [['a'], 'not like', '%a%']
         );
+    });
+
+    it('can parse like with escape clause', () => {
+        expect((Criteria.parse("a like '%a!%%' escape '!'"))).toEqual(
+            [['a'], 'like', '%a!%%', '!']
+        );
+
+        expect((Criteria.parse("a not like '%a!%%' escape '!'"))).toEqual(
+            [['a'], 'not like', '%a!%%', '!']
+        );
+
+        expect((Criteria.parse("A LIKE '%a!%%' ESCAPE '/'"))).toEqual(
+            [['A'], 'like', '%a!%%', '/']
+        );
+
+        expect((Criteria.parse("a like '%a!%%' escape '!' and b = 1"))).toEqual(
+            [[['a'], 'like', '%a!%%', '!'], 'and', [['b'], '=', 1]]
+        );
+
+        expect((Criteria.parse("(a like '%a!%%' escape '!')"))).toEqual(
+            [['a'], 'like', '%a!%%', '!']
+        );
+    });
+
+    it('should throw for misplaced or invalid escape clause', () => {
+        expect(() => Criteria.parse("a = 'x' escape '!'")).toThrow('unexpected "escape" keyword');
+        expect(() => Criteria.parse("escape '!'")).toThrow('unexpected "escape" keyword');
+        expect(() => Criteria.parse("a like '%a%' escape")).toThrow('expected escape character');
+        expect(() => Criteria.parse("a like '%a%' escape '!!'")).toThrow('single character');
+        expect(() => Criteria.parse("a like '%a%' escape 5")).toThrow('expected escape character');
     });
 
     it('can parse expression with not', () => {

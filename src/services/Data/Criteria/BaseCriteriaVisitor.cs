@@ -72,6 +72,8 @@ public abstract class BaseCriteriaVisitor
         if (!Object.ReferenceEquals(left, criteria.LeftOperand) ||
             !Object.ReferenceEquals(right, criteria.RightOperand))
         {
+            if (criteria.LikeEscapeChar is char likeEscapeChar)
+                return new BinaryCriteria(left!, criteria.Operator, right!, likeEscapeChar);
             return new BinaryCriteria(left!, criteria.Operator, right!);
         }
 

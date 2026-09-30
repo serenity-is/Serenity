@@ -23,7 +23,7 @@ public abstract partial class Field
     /// <summary>
     /// Creates a new "the Field LIKE mask" criteria.
     /// </summary>
-    /// <param name="mask">The mask.</param>
+    /// <param name="mask">The raw LIKE mask.</param>
     /// <param name="upper">True to use the UPPER function on both sides.</param>
     /// <returns>The LIKE criteria.</returns>
     public BaseCriteria Like(string mask, bool upper = false)
@@ -42,47 +42,73 @@ public abstract partial class Field
     }
 
     /// <summary>
+    /// Creates a new "the Field LIKE mask ESCAPE 'x'" criteria.
+    /// The mask must already be escaped (see <see cref="Criteria.EscapeLikeWildcards"/>).
+    /// </summary>
+    /// <param name="mask">The LIKE mask, already escaped for the given escape character.</param>
+    /// <param name="upper">True to use the UPPER function on both sides.</param>
+    /// <param name="escape">The LIKE escape character. Default is '!'.</param>
+    /// <returns>The LIKE criteria.</returns>
+    public BaseCriteria LikeEscaped(string mask, bool upper = false, char escape = '!')
+    {
+        return Criteria.LikeEscaped(mask, upper, escape);
+    }
+
+    /// <summary>
+    /// Creates a new "the Field NOT LIKE mask ESCAPE 'x'" criteria.
+    /// The mask must already be escaped (see <see cref="Criteria.EscapeLikeWildcards"/>).
+    /// </summary>
+    /// <param name="mask">The LIKE mask, already escaped for the given escape character.</param>
+    /// <param name="upper">True to use the UPPER function on both sides.</param>
+    /// <param name="escape">The LIKE escape character. Default is '!'.</param>
+    /// <returns>The NOT LIKE criteria.</returns>
+    public BaseCriteria NotLikeEscaped(string mask, bool upper = false, char escape = '!')
+    {
+        return Criteria.NotLikeEscaped(mask, upper, escape);
+    }
+
+    /// <summary>
     /// Creates a new "the Field STARTS WITH mask" criteria.
     /// </summary>
-    /// <param name="mask">The mask.</param>
+    /// <param name="text">The literal text to search for.</param>
     /// <param name="upper">True to use the UPPER function on both sides.</param>
     /// <returns>The STARTS WITH criteria.</returns>
-    public BaseCriteria StartsWith(string mask, bool upper = false)
+    public BaseCriteria StartsWith(string text, bool upper = false)
     {
-        return Criteria.StartsWith(mask, upper);
+        return Criteria.StartsWith(text, upper);
     }
 
     /// <summary>
     /// Creates a new "the Field ENDS WITH mask" criteria.
     /// </summary>
-    /// <param name="mask">The mask.</param>
+    /// <param name="text">The literal text to search for.</param>
     /// <param name="upper">True to use the UPPER function on both sides.</param>
     /// <returns>The ENDS WITH criteria.</returns>
-    public BaseCriteria EndsWith(string mask, bool upper = false)
+    public BaseCriteria EndsWith(string text, bool upper = false)
     {
-        return Criteria.EndsWith(mask, upper);
+        return Criteria.EndsWith(text, upper);
     }
 
     /// <summary>
     /// Creates a new "the Field CONTAINS mask" criteria.
     /// </summary>
-    /// <param name="mask">The mask.</param>
+    /// <param name="text">The literal text to search for.</param>
     /// <param name="upper">True to use the UPPER function on both sides.</param>
     /// <returns>The CONTAINS criteria.</returns>
-    public BaseCriteria Contains(string mask, bool upper = false)
+    public BaseCriteria Contains(string text, bool upper = false)
     {
-        return Criteria.Contains(mask, upper);
+        return Criteria.Contains(text, upper);
     }
 
     /// <summary>
     /// Creates a new "the Field NOT CONTAINS mask" criteria.
     /// </summary>
-    /// <param name="mask">The mask.</param>
+    /// <param name="text">The literal text to search for.</param>
     /// <param name="upper">True to use the UPPER function on both sides.</param>
     /// <returns>The NOT CONTAINS criteria.</returns>
-    public BaseCriteria NotContains(string mask, bool upper = false)
+    public BaseCriteria NotContains(string text, bool upper = false)
     {
-        return Criteria.NotContains(mask, upper);
+        return Criteria.NotContains(text, upper);
     }
 
     /// <summary>

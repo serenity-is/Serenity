@@ -150,7 +150,7 @@ public static partial class Sql
             }
         }
 
-        sb.Append(")");
+        sb.Append(')');
 
         return sb.ToString();
     }

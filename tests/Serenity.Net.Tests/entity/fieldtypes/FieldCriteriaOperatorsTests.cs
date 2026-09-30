@@ -28,6 +28,13 @@ public class FieldCriteriaOperatorsTests
     }
 
     [Fact]
+    public void LikeEscaped_NotLikeEscaped()
+    {
+        Assert.Equal("(T0.[AString] LIKE @p1 ESCAPE '!')", f.AString.LikeEscaped("%a!%b%").ToString(new SqlQuery()));
+        Assert.Equal("(T0.[AString] NOT LIKE @p1 ESCAPE '!')", f.AString.NotLikeEscaped("%a!%b%").ToString(new SqlQuery()));
+    }
+
+    [Fact]
     public void StartsWith_EndsWith_Contains()
     {
         Assert.Equal("(T0.[AString] LIKE @p1)", f.AString.StartsWith("x").ToString(new SqlQuery()));

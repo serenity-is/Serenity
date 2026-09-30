@@ -93,6 +93,11 @@ public class JsonCriteriaConverter : JsonConverter
             ToJson(writer, binary.LeftOperand, serializer);
             writer.WriteValue(OperatorToKey[(int)binary.Operator]);
             ToJson(writer, binary.RightOperand, serializer);
+            // The flag is only ever set when the mask needs it (see the
+            // BinaryCriteria constructor), so older 3-element readers keep
+            // working otherwise.
+            if (binary.LikeEscapeChar is char escapeChar)
+                writer.WriteValue(escapeChar.ToString());
             writer.WriteEndArray();
             return;
         }
@@ -183,7 +188,7 @@ public class JsonCriteriaConverter : JsonConverter
 
             var value = (string?)((JValue)array[0]).Value ??
                 throw new JsonSerializationException(string.Format("Null Criteria expression: {0}", array.ToString()));
-            if (value.StartsWith("@", StringComparison.Ordinal))
+            if (value.StartsWith('@'))
                 return new ParamCriteria(value);
 
             return new Criteria(value);
@@ -219,6 +224,33 @@ public class JsonCriteriaConverter : JsonConverter
                 throw new JsonSerializationException(string.Format("Invalid Criteria format: {0}", array.ToString()));
 
             return new BinaryCriteria(ParseValue(array[0]), op, ParseValue(array[2]));
+        }
+
+        if (array.Count == 4)
+        {
+            if (array[1] is not JValue opValue || opValue.Value is not string)
+                throw new JsonSerializationException(string.Format("Couldn't deserialize binary criteria: {0}", array.ToString()));
+
+            var opStr = (string)opValue.Value!;
+
+            if (!KeyToOperator.TryGetValue(opStr, out CriteriaOperator op))
+                throw new JsonSerializationException(string.Format("Unknown Criteria operator: {0}", opStr));
+
+            if (op != CriteriaOperator.Like && op != CriteriaOperator.NotLike)
+                throw new JsonSerializationException(string.Format("Invalid Criteria format: {0}", array.ToString()));
+
+            if (array[3] is not JValue escapeValue || escapeValue.Value is not string escapeStr ||
+                escapeStr.Length != 1)
+                throw new JsonSerializationException(string.Format("Invalid Criteria escape character: {0}", array.ToString()));
+
+            try
+            {
+                return new BinaryCriteria(ParseValue(array[0]), op, ParseValue(array[2]), escapeStr[0]);
+            }
+            catch (ArgumentException ex)
+            {
+                throw new JsonSerializationException(string.Format("Invalid Criteria escape character: {0}", array.ToString()), ex);
+            }
         }
 
         throw new JsonSerializationException(string.Format("Can't deserialize {0} as Criteria item", array[0].ToString()));

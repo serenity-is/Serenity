@@ -43,8 +43,11 @@ public abstract class BaseCriteria : ICriteria
 
     /// <summary>
     /// Creates a new binary Like criteria containing this criteria as the left operand.
+    /// The mask is a raw LIKE pattern: %, _ and [...] act as wildcards and are not escaped.
+    /// For literal values see <see cref="Contains"/>, <see cref="StartsWith"/> or
+    /// <see cref="EndsWith"/>.
     /// </summary>
-    /// <param name="mask">The LIKE mask.</param>
+    /// <param name="mask">The raw LIKE pattern.</param>
     /// <param name="upper"><c>true</c> to use the UPPER function on both sides.</param>
     /// <returns>A new binary Like criteria.</returns>
     public BaseCriteria Like(string mask, bool upper = false)
@@ -59,9 +62,34 @@ public abstract class BaseCriteria : ICriteria
     }
 
     /// <summary>
-    /// Creates a new binary Not Like criteria containing this criteria as the left operand.
+    /// Creates a new binary Like criteria containing this criteria as the left operand,
+    /// with an ESCAPE clause. The mask must already be escaped for the given escape
+    /// character (see <see cref="Criteria.EscapeLikeWildcards"/>); it is used as is.
+    /// For literal values prefer <see cref="Contains"/>, <see cref="StartsWith"/> or
+    /// <see cref="EndsWith"/>; for raw patterns without ESCAPE see
+    /// <see cref="Like(string, bool)"/>.
     /// </summary>
-    /// <param name="mask">The like mask.</param>
+    /// <param name="mask">The LIKE mask, already escaped for the given escape character.</param>
+    /// <param name="upper"><c>true</c> to use the UPPER function on both sides.</param>
+    /// <param name="escape">The LIKE escape character, appended as ESCAPE 'x'. Default is '!'.</param>
+    /// <returns>A new binary Like criteria.</returns>
+    public BaseCriteria LikeEscaped(string mask, bool upper = false, char escape = '!')
+    {
+        var left = this;
+        if (upper)
+            left = new UpperFunctionCriteria(left);
+        BaseCriteria right = new ValueCriteria(mask);
+        if (upper)
+            right = new UpperFunctionCriteria(right);
+        return new BinaryCriteria(left, CriteriaOperator.Like, right, escape);
+    }
+
+    /// <summary>
+    /// Creates a new binary Not Like criteria containing this criteria as the left operand.
+    /// The mask is a raw LIKE pattern: %, _ and [...] act as wildcards and are not escaped.
+    /// For literal values see <see cref="NotContains"/>.
+    /// </summary>
+    /// <param name="mask">The raw like pattern.</param>
     /// <param name="upper"><c>true</c> to use the UPPER function on both sides.</param>
     /// <returns>A new binary Not Like criteria.</returns>
     public BaseCriteria NotLike(string mask, bool upper = false)
@@ -76,59 +104,93 @@ public abstract class BaseCriteria : ICriteria
     }
 
     /// <summary>
-    /// Creates a new binary Starts With (LIKE '...%') criteria containing this criteria as the left operand.
+    /// Creates a new binary Not Like criteria containing this criteria as the left operand,
+    /// with an ESCAPE clause. The mask must already be escaped for the given escape
+    /// character (see <see cref="Criteria.EscapeLikeWildcards"/>); it is used as is.
+    /// For literal values prefer <see cref="NotContains"/>; for raw patterns without
+    /// ESCAPE see <see cref="NotLike(string, bool)"/>.
     /// </summary>
-    /// <param name="mask">The starts with mask.</param>
+    /// <param name="mask">The LIKE mask, already escaped for the given escape character.</param>
+    /// <param name="upper"><c>true</c> to use the UPPER function on both sides.</param>
+    /// <param name="escape">The LIKE escape character, appended as ESCAPE 'x'. Default is '!'.</param>
+    /// <returns>A new binary Not Like criteria.</returns>
+    public BaseCriteria NotLikeEscaped(string mask, bool upper = false, char escape = '!')
+    {
+        var left = this;
+        if (upper)
+            left = new UpperFunctionCriteria(left);
+        BaseCriteria right = new ValueCriteria(mask);
+        if (upper)
+            right = new UpperFunctionCriteria(right);
+        return new BinaryCriteria(left, CriteriaOperator.NotLike, right, escape);
+    }
+
+    /// <summary>
+    /// Creates a new binary Starts With (LIKE '...%') criteria containing this criteria as the left operand.
+    /// The text is treated as a literal value: LIKE special characters (%, _, [) in it are
+    /// escaped and an ESCAPE '!' clause is appended. For intentional wildcards use
+    /// <see cref="Like(string, bool)"/> instead.
+    /// </summary>
+    /// <param name="text">The literal text to search for.</param>
     /// <param name="upper"><c>true</c> to use the UPPER function on both sides.</param>
     /// <returns>A new binary Starts With criteria.</returns>
-    /// <exception cref="ArgumentNullException">mask is null</exception>
-    public BaseCriteria StartsWith(string mask, bool upper = false)
+    /// <exception cref="ArgumentNullException">text is null</exception>
+    public BaseCriteria StartsWith(string text, bool upper = false)
     {
-        ArgumentNullException.ThrowIfNull(mask);
+        ArgumentNullException.ThrowIfNull(text);
 
-        return Like(mask + "%", upper);
+        return LikeEscaped(Criteria.EscapeLikeWildcards(text) + "%", upper);
     }
 
     /// <summary>
     /// Creates a new binary Ends With (LIKE '%...') criteria containing this criteria as the left operand.
+    /// The text is treated as a literal value: LIKE special characters (%, _, [) in it are
+    /// escaped and an ESCAPE '!' clause is appended. For intentional wildcards use
+    /// <see cref="Like(string, bool)"/> instead.
     /// </summary>
-    /// <param name="mask">The ends with mask.</param>
+    /// <param name="text">The literal text to search for.</param>
     /// <param name="upper"><c>true</c> to use the UPPER function on both sides.</param>
     /// <returns>A new binary Ends With criteria.</returns>
-    /// <exception cref="ArgumentNullException">mask is null</exception>
-    public BaseCriteria EndsWith(string mask, bool upper = false)
+    /// <exception cref="ArgumentNullException">text is null</exception>
+    public BaseCriteria EndsWith(string text, bool upper = false)
     {
-        ArgumentNullException.ThrowIfNull(mask);
+        ArgumentNullException.ThrowIfNull(text);
 
-        return Like("%" + mask, upper);
+        return LikeEscaped("%" + Criteria.EscapeLikeWildcards(text), upper);
     }
 
     /// <summary>
     /// Creates a new binary Contains criteria (LIKE '%...%') containing this criteria as the left operand.
+    /// The text is treated as a literal value: LIKE special characters (%, _, [) in it are
+    /// escaped and an ESCAPE '!' clause is appended. For intentional wildcards use
+    /// <see cref="Like(string, bool)"/> instead.
     /// </summary>
-    /// <param name="mask">The contains mask.</param>
+    /// <param name="text">The literal text to search for.</param>
     /// <param name="upper"><c>true</c> to use the UPPER function on both sides.</param>
     /// <returns>A new binary Contains criteria.</returns>
-    /// <exception cref="ArgumentNullException">mask is null</exception>
-    public BaseCriteria Contains(string mask, bool upper = false)
+    /// <exception cref="ArgumentNullException">text is null</exception>
+    public BaseCriteria Contains(string text, bool upper = false)
     {
-        ArgumentNullException.ThrowIfNull(mask);
+        ArgumentNullException.ThrowIfNull(text);
 
-        return Like("%" + mask + "%", upper);
+        return LikeEscaped("%" + Criteria.EscapeLikeWildcards(text) + "%", upper);
     }
 
     /// <summary>
     /// Creates a new binary Not Contains criteria (NOT LIKE '%...%') containing this criteria as the left operand.
+    /// The text is treated as a literal value: LIKE special characters (%, _, [) in it are
+    /// escaped and an ESCAPE '!' clause is appended. For intentional wildcards use
+    /// <see cref="NotLike(string, bool)"/> instead.
     /// </summary>
-    /// <param name="mask">The contains mask.</param>
+    /// <param name="text">The literal text to search for.</param>
     /// <param name="upper"><c>true</c> to use the UPPER function on both sides.</param>
     /// <returns>A new binary Not Contains criteria.</returns>
-    /// <exception cref="ArgumentNullException">mask is null</exception>
-    public BaseCriteria NotContains(string mask, bool upper = false)
+    /// <exception cref="ArgumentNullException">text is null</exception>
+    public BaseCriteria NotContains(string text, bool upper = false)
     {
-        ArgumentNullException.ThrowIfNull(mask);
+        ArgumentNullException.ThrowIfNull(text);
 
-        return NotLike("%" + mask + "%", upper);
+        return NotLikeEscaped("%" + Criteria.EscapeLikeWildcards(text) + "%", upper);
     }
 
     /// <summary>
@@ -503,7 +565,7 @@ public abstract class BaseCriteria : ICriteria
     /// </returns>
     /// <remarks>
     /// A null value is intentionally not mapped to IS NOT NULL: it renders as
-    /// a NULL parameter ("<> NULL", i.e. SQL UNKNOWN). Use IsNotNull() for null checks.
+    /// a NULL parameter ("&lt;&gt; NULL", i.e. SQL UNKNOWN). Use IsNotNull() for null checks.
     /// </remarks>
     public static BaseCriteria operator !=(BaseCriteria criteria1, string value)
     {
@@ -572,7 +634,7 @@ public abstract class BaseCriteria : ICriteria
     /// </returns>
     /// <remarks>
     /// A null value is intentionally not mapped to IS NOT NULL: it renders as
-    /// a NULL parameter ("<> NULL", i.e. SQL UNKNOWN). Use IsNotNull() for null checks.
+    /// a NULL parameter ("&lt;&gt; NULL", i.e. SQL UNKNOWN). Use IsNotNull() for null checks.
     /// </remarks>
     public static BaseCriteria operator !=(BaseCriteria criteria1, Enum value)
     {

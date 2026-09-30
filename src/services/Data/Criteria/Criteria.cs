@@ -98,9 +98,7 @@ public class Criteria : BaseCriteria
         if (string.IsNullOrEmpty(field))
             throw new ArgumentNullException(nameof(field));
 
-        if (joinNumber < 0)
-            throw new ArgumentOutOfRangeException(nameof(joinNumber));
-
+        ArgumentOutOfRangeException.ThrowIfNegative(joinNumber);
         expression = joinNumber.TableAliasDot() + SqlSyntax.AutoBracketValid(field, dialect: null);
     }
 
@@ -216,6 +214,39 @@ public class Criteria : BaseCriteria
     public static BaseCriteria Exists(string expression)
     {
         return new UnaryCriteria(CriteriaOperator.Exists, new Criteria(expression));
+    }
+
+    /// <summary>
+    /// Escapes a literal value for use in a LIKE pattern with the given escape character.
+    /// The escape character itself is escaped first, then %, _ and [.
+    /// A ] outside a [...] class is literal on all supported dialects, so it is left as is.
+    /// The result must be used with ESCAPE 'x' declared (see
+    /// <see cref="BinaryCriteria.LikeEscapeChar"/>), otherwise the escape
+    /// character matches itself instead of escaping.
+    /// </summary>
+    /// <param name="value">The literal value to escape.</param>
+    /// <param name="escape">The escape character. Must not be %, _ or a quote. Default is '!'.</param>
+    /// <returns>The escaped value, with no % affixes added.</returns>
+    /// <exception cref="ArgumentNullException">value is null.</exception>
+    /// <exception cref="ArgumentException">The escape character is a LIKE wildcard (%, _) or a quote.</exception>
+    public static string EscapeLikeWildcards(string value, char escape = '!')
+    {
+        ArgumentNullException.ThrowIfNull(value);
+
+        if (escape == '%' || escape == '_' || escape == '\'')
+            throw new ArgumentException("Escape character can't be a LIKE wildcard (%, _) or a quote.", nameof(escape));
+
+        if (value.Length == 0)
+            return value;
+
+        var sb = new StringBuilder(value.Length);
+        foreach (var c in value)
+        {
+            if (c == escape || c == '%' || c == '_' || c == '[')
+                sb.Append(escape);
+            sb.Append(c);
+        }
+        return sb.ToString();
     }
 
     /// <summary>
