@@ -145,6 +145,17 @@ public class SqlQuery_JoinTests
     }
 
     [Fact]
+    public void Join_With_Parameterized_Criteria_Is_Idempotent()
+    {
+        var query = new SqlQuery().From("Base").Select("x")
+            .Join(new LeftJoin("Table", "T1", new Criteria("T1") == 5));
+
+        // Duplicate detection compares ToStringIgnoreParams output; deterministic
+        // @pN names make the equivalent join match instead of throwing.
+        Assert.Same(query, query.Join(new LeftJoin("Table", "T1", new Criteria("T1") == 5)));
+    }
+
+    [Fact]
     public void EnsureJoin_And_EnsureJoinsInExpression_Work()
     {
         var query = new SqlQuery().From("Base").Select("x");

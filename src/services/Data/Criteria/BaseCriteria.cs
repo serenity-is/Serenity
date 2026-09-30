@@ -14,7 +14,6 @@ namespace Serenity.Data;
 public abstract class BaseCriteria : ICriteria
 {
     private static readonly NoParamsChecker noParamsChecker = new();
-    private static readonly IgnoreParams ignoreParams = new();
 
     /// <summary>
     /// Gets a value indicating whether this criteria instance is empty.
@@ -1202,7 +1201,11 @@ public abstract class BaseCriteria : ICriteria
     /// <returns>The string representation of the criteria.</returns>
     public string ToStringIgnoreParams()
     {
-        return ToString(ignoreParams);
+        // Fresh instance per render: output is deterministic (same criteria
+        // always renders the same @pN names), which the debugger display and
+        // SqlQuery.Join's duplicate detection rely on. No shared state, so no
+        // atomics are needed despite concurrent renders.
+        return ToString(new IgnoreParams());
     }
 
     /// <summary>
@@ -1278,7 +1281,7 @@ public abstract class BaseCriteria : ICriteria
 
     private class IgnoreParams : IQueryWithParams
     {
-        private static int next;
+        private int next;
 
         public void AddParam(string name, object? value)
         {
