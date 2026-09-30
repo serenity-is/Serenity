@@ -135,6 +135,10 @@ public interface ISqlDialect
     /// <value>
     /// The offset format.
     /// </value>
+    /// <remarks>
+    /// Dialects without OFFSET support (check <see cref="CanUseOffsetFetch"/> first)
+    /// throw <see cref="NotImplementedException"/>.
+    /// </remarks>
     string OffsetFormat { get; }
 
     /// <summary>
@@ -143,6 +147,10 @@ public interface ISqlDialect
     /// <value>
     /// The offset fetch format.
     /// </value>
+    /// <remarks>
+    /// Dialects without OFFSET support (check <see cref="CanUseOffsetFetch"/> first)
+    /// throw <see cref="NotImplementedException"/>.
+    /// </remarks>
     string OffsetFetchFormat { get; }
 
     /// <summary>
@@ -180,6 +188,11 @@ public interface ISqlDialect
     /// <value>
     /// The SCOPE IDENTITY expression.
     /// </value>
+    /// <remarks>
+    /// Dialects that don't use SCOPE IDENTITY (check <see cref="UseScopeIdentity"/>
+    /// first, e.g. dialects using RETURNING) throw
+    /// <see cref="NotImplementedException"/>.
+    /// </remarks>
     string ScopeIdentityExpression { get; }
 
     /// <summary>
@@ -196,6 +209,10 @@ public interface ISqlDialect
     /// <value>
     /// The skip keyword.
     /// </value>
+    /// <remarks>
+    /// Dialects without a SKIP keyword (check <see cref="CanUseSkipKeyword"/> first)
+    /// throw <see cref="NotImplementedException"/>.
+    /// </remarks>
     string SkipKeyword { get; }
 
     /// <summary>
@@ -219,6 +236,10 @@ public interface ISqlDialect
     /// </summary>
     /// <param name="unionType">Type of the union.</param>
     /// <returns>The union keyword.</returns>
+    /// <remarks>
+    /// Throws <see cref="NotImplementedException"/> for union types the dialect
+    /// doesn't support (e.g. INTERSECT / EXCEPT on MySQL and Firebird).
+    /// </remarks>
     string UnionKeyword(SqlUnionType unionType);
 
     /// <summary>
