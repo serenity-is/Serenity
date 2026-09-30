@@ -33,14 +33,16 @@ public class SqlQuery_FullTextSearchTests
     }
 
     [Fact]
-    public void FullTextSearchJoin_Escapes_Quotes_And_Adds_Newline_When_From_Exists()
+    public void FullTextSearchJoin_Uses_Param_And_Adds_Newline_When_From_Exists()
     {
         var query = new SqlQuery()
             .From("Parent")
             .FullTextSearchJoin("Table", "Field1", "o'brien", "T0", "ID", "CT");
 
         var sql = query.ToString();
-        Assert.Contains("o''brien", sql);
+        Assert.DoesNotContain("o'brien", sql, StringComparison.Ordinal);
+        Assert.Contains("@p1", sql, StringComparison.Ordinal);
+        Assert.Equal("o'brien", query.Params!["@p1"]);
         Assert.Contains("Parent", sql);
     }
 }

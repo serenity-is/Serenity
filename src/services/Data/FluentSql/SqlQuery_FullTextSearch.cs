@@ -51,9 +51,15 @@ public partial class SqlQuery
 
         from.Append("INNER JOIN CONTAINSTABLE(");
 
+        // Parameterized: one cached plan per query shape instead of per search text,
+        // and no manual quote escaping.
+        var searchParam = AutoParam();
+        AddParam(searchParam.Name, searchQuery);
+
         from.AppendFormat(
-            "{0}, ({1}), '{2}') AS {5} ON ({5}.[key] = {3}.{4})",
-            searchTable, searchFields, searchQuery.Replace("'", "''"), searchTableAlias, searchTableKey, containsAlias);
+            "{0}, ({1}), {2}) AS {5} ON ({5}.{6} = {3}.{4})",
+            searchTable, searchFields, searchParam.Name, searchTableAlias, searchTableKey, containsAlias,
+            Dialect().QuoteIdentifier("key"));
 
         return this;
     }
