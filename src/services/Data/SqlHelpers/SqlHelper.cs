@@ -132,6 +132,10 @@ public static class SqlHelper
                     param.DbType = DbType.DateTime2;
             }
 
+            // Fixed size on purpose: one plan cache entry per query shape. Using
+            // str.Length here would create a separate cached plan per distinct string
+            // length (cache bloat), and bucketing would diverge from Dapper's own
+            // default of 4000, splitting entries between the two paths.
             if (value is string str && str.Length < 4000)
                 param.Size = 4000;
         }
