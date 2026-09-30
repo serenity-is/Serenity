@@ -80,6 +80,12 @@ public class OracleDialect : ISqlDialect
         if (s.StartsWith("\"") && s.EndsWith("\""))
             return s;
 
+        // Note: identifiers are intentionally upper-cased when quoted. Oracle folds
+        // unquoted identifiers to UPPER, and ORDER BY / WHERE fragments are raw strings
+        // appended verbatim, so OrderBy("AliasA") reaches the server as ALIASA. Quoting
+        // the SELECT alias as "ALIASA" keeps the two consistent. Quoting with preserved
+        // case ("AliasA") would break this (ORA-00904). This also matches objects created
+        // by unquoted DDL, which Oracle stores as UPPER.
         return '"' + s.ToUpperInvariant() + '"';
     }
 
@@ -92,6 +98,8 @@ public class OracleDialect : ISqlDialect
         if (s.StartsWith("\"") && s.EndsWith("\""))
             return s;
 
+        // Note: see QuoteColumnAlias. Quoted identifiers are upper-cased to stay
+        // consistent with Oracle's folding of unquoted identifiers to UPPER.
         if (keywords.Contains(s) || s.IndexOf(' ') >= 0)
             return '"' + s.ToUpperInvariant() + '"';
 
