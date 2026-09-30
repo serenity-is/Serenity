@@ -101,6 +101,59 @@ public class WrappedConnectionTests_More
         Assert.True(raised);
     }
 
+    private class RaisableConnection : MockDbConnection
+    {
+        public void RaiseStateChange(StateChangeEventArgs e) => OnStateChange(e);
+    }
+
+    [Fact]
+    public void Dispose_Unsubscribes_DbConnection_StateChange()
+    {
+        var connection = new RaisableConnection();
+        var wrapped = new WrappedConnection(connection, SqlServer2012Dialect.Instance);
+
+        var raised = 0;
+        wrapped.StateChange += (s, e) => raised++;
+        connection.RaiseStateChange(new StateChangeEventArgs(ConnectionState.Closed, ConnectionState.Open));
+        Assert.Equal(1, raised);
+
+        wrapped.Dispose();
+        connection.RaiseStateChange(new StateChangeEventArgs(ConnectionState.Open, ConnectionState.Closed));
+        Assert.Equal(1, raised);
+    }
+
+    [Fact]
+    public void Dispose_Unsubscribes_NonDbConnection_StateChange()
+    {
+        var connection = new TestIdbConnection();
+        var wrapped = new WrappedConnection(connection, SqlServer2012Dialect.Instance);
+
+        var raised = 0;
+        wrapped.StateChange += (s, e) => raised++;
+        connection.RaiseStateChange(new StateChangeEventArgs(ConnectionState.Closed, ConnectionState.Open));
+        Assert.Equal(1, raised);
+
+        wrapped.Dispose();
+        connection.RaiseStateChange(new StateChangeEventArgs(ConnectionState.Open, ConnectionState.Closed));
+        Assert.Equal(1, raised);
+    }
+
+    [Fact]
+    public async Task DisposeAsync_Unsubscribes_StateChange()
+    {
+        var connection = new TestIdbConnection();
+        var wrapped = new WrappedConnection(connection, SqlServer2012Dialect.Instance);
+
+        var raised = 0;
+        wrapped.StateChange += (s, e) => raised++;
+        connection.RaiseStateChange(new StateChangeEventArgs(ConnectionState.Closed, ConnectionState.Open));
+        Assert.Equal(1, raised);
+
+        await wrapped.DisposeAsync();
+        connection.RaiseStateChange(new StateChangeEventArgs(ConnectionState.Open, ConnectionState.Closed));
+        Assert.Equal(1, raised);
+    }
+
     [Fact]
     public void BeginTransaction_NonDbConnection_RecordsIsolationLevel()
     {

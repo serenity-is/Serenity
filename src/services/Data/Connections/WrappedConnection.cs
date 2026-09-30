@@ -16,6 +16,7 @@ public class WrappedConnection : DbConnection, IDbConnection, IHasActualConnecti
     private readonly ILogger? logger;
     private bool openedOnce;
     private WrappedTransaction? currentTransaction;
+    private StateChangeEventHandler? stateChangeHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="WrappedConnection"/> class.
@@ -29,10 +30,32 @@ public class WrappedConnection : DbConnection, IDbConnection, IHasActualConnecti
         this.dialect = dialect;
         this.logger = logger;
 
+        // Stored (not a throwaway lambda) so it can be unsubscribed on dispose;
+        // otherwise the inner connection would keep this wrapper alive.
+        StateChangeEventHandler handler = (s, e) => OnStateChange(e);
         if (actualConnection is DbConnection dbConnection)
-            dbConnection.StateChange += (s, e) => OnStateChange(e);
+        {
+            dbConnection.StateChange += handler;
+            stateChangeHandler = handler;
+        }
         else if (actualConnection is IHasConnectionStateChange hasStateChange)
-            hasStateChange.StateChange += (s, e) => OnStateChange(e);
+        {
+            hasStateChange.StateChange += handler;
+            stateChangeHandler = handler;
+        }
+    }
+
+    private void UnbindStateChange()
+    {
+        var handler = stateChangeHandler;
+        if (handler is null)
+            return;
+        stateChangeHandler = null;
+
+        if (actualConnection is DbConnection dbConnection)
+            dbConnection.StateChange -= handler;
+        else if (actualConnection is IHasConnectionStateChange hasStateChange)
+            hasStateChange.StateChange -= handler;
     }
 
     /// <summary>
@@ -317,7 +340,10 @@ public class WrappedConnection : DbConnection, IDbConnection, IHasActualConnecti
     protected override void Dispose(bool disposing)
     {
         if (disposing)
+        {
+            UnbindStateChange();
             actualConnection.Dispose();
+        }
         base.Dispose(disposing);
     }
 
@@ -328,6 +354,7 @@ public class WrappedConnection : DbConnection, IDbConnection, IHasActualConnecti
     public override ValueTask DisposeAsync()
     {
         GC.SuppressFinalize(this);
+        UnbindStateChange();
         if (actualConnection is DbConnection dbConnection)
             return dbConnection.DisposeAsync();
         actualConnection.Dispose();
