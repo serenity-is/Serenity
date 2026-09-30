@@ -64,6 +64,50 @@ public class SqlQuery_SkipTake_Tests
     }
 
     [Fact]
+    public void SkipThrowsExceptionIfNoOrderByForSql2005Dialect()
+    {
+        var query = new SqlQuery()
+            .Dialect(SqlServer2005Dialect.Instance)
+            .Select("c")
+            .From("t")
+            .Skip(10);
+
+        var ex = Assert.Throws<InvalidOperationException>(() => query.ToString());
+        Assert.Contains("ordered by unique fields", ex.Message);
+    }
+
+    [Fact]
+    public void SkipThrowsExceptionIfNoOrderByForSql2012Dialect()
+    {
+        var query = new SqlQuery()
+            .Dialect(SqlServer2012Dialect.Instance)
+            .Select("c")
+            .From("t")
+            .Skip(10);
+
+        var ex = Assert.Throws<InvalidOperationException>(() => query.ToString());
+        Assert.Contains("ordered by unique fields", ex.Message);
+    }
+
+    [Fact]
+    public void SkipTakeUsesCorrectSyntaxForSql2012Dialect()
+    {
+        var query = new SqlQuery()
+            .Dialect(SqlServer2012Dialect.Instance)
+            .Select("c")
+            .From("t")
+            .OrderBy("x")
+            .Skip(10)
+            .Take(20);
+
+        Assert.Equal(
+            Normalize.Sql(
+                "SELECT c FROM [t] ORDER BY x OFFSET 10 ROWS FETCH NEXT 20 ROWS ONLY"),
+            Normalize.Sql(
+                query.ToString()));
+    }
+
+    [Fact]
     public void SkipUsesRowNumberForSql2005Dialect()
     {
         var query = new SqlQuery()

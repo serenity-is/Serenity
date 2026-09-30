@@ -72,6 +72,13 @@ public partial class SqlQuery
         bool useRowNumber = skip > 0 && !useSkipKeyword && !useOffset && !useRowNum && dialect.CanUseRowNumber;
         bool useSecondQuery = skip > 0 && !useSkipKeyword && !useRowNum && !useOffset && !useRowNumber;
 
+        // OFFSET / FETCH (2012+) and ROW_NUMBER() (2005/2008) both require ORDER BY
+        // in SQL Server. Fail fast with the same error as the fallback path instead
+        // of generating SQL the server rejects with Msg 102.
+        if ((useOffset || useRowNumber) && orderBy.Length == 0 && dialect is SqlServer2000Dialect)
+            throw new InvalidOperationException("A query must be ordered by unique fields " +
+                "to be able to skip records!");
+
         void appendFromWhereOrderByGroupByHaving(string? extraWhere, bool includeOrderBy)
         {
             if (!string.IsNullOrEmpty(query.From))
