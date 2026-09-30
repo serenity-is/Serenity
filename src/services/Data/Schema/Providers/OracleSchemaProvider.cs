@@ -21,12 +21,12 @@ public class OracleSchemaProvider : ISchemaProvider
             SELECT 
                 c.column_name "FieldName",
                 c.data_type "DataType",
-                COALESCE(NULLIF(c.data_precision, 0), c.char_length) "Size",
-                c.data_scale "Scale",
+                COALESCE(NULLIF(c.data_precision, 0), c.char_length, 0) "Size",
+                COALESCE(c.data_scale, 0) "Scale",
                 CASE WHEN c.nullable = 'N' THEN 0 ELSE 1 END "IsNullable"
             FROM all_tab_columns c
-            WHERE 
-                c.owner = :sma
+            WHERE
+                (:sma IS NULL OR c.owner = :sma)
                 AND c.table_name = :tbl
             ORDER BY c.column_id
 
@@ -53,7 +53,7 @@ public class OracleSchemaProvider : ISchemaProvider
             JOIN all_cons_columns uc ON uc.owner = c_pk.owner AND uc.constraint_name = c_pk.constraint_name
                 AND uc.position = a.position
             WHERE c.constraint_type = 'R'
-                AND a.owner = :sma
+                AND (:sma IS NULL OR a.owner = :sma)
                 AND a.table_name = :tbl
             ORDER BY a.position
             """, new
@@ -78,7 +78,7 @@ public class OracleSchemaProvider : ISchemaProvider
             WHERE cols.table_name = :tbl
             AND cons.constraint_type = 'P'
             AND cons.constraint_name = cols.constraint_name
-            AND cons.owner = :sch
+            AND (:sch IS NULL OR cons.owner = :sch)
             ORDER BY cols.position
             """, new
         {

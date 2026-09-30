@@ -23,11 +23,11 @@ public class SqlServerSchemaProvider : ISchemaProvider
                 CASE WHEN DATA_TYPE = 'timestamp' THEN 'rowversion' ELSE DATA_TYPE END [DataType],
                 CASE WHEN IS_NULLABLE = 'NO' THEN 0 ELSE 1 END [IsNullable],
                 COALESCE(CHARACTER_MAXIMUM_LENGTH, CASE WHEN DATA_TYPE in ('decimal', 'money', 'numeric') THEN NUMERIC_PRECISION ELSE 0 END) [Size],
-                NUMERIC_SCALE [Scale]
+                COALESCE(NUMERIC_SCALE, 0) [Scale]
             FROM
                 INFORMATION_SCHEMA.COLUMNS
             WHERE
-                TABLE_SCHEMA = @sma 
+                (@sma IS NULL OR TABLE_SCHEMA = @sma)
                 AND TABLE_NAME = @tbl
             ORDER BY
                 ORDINAL_POSITION
@@ -53,7 +53,7 @@ public class SqlServerSchemaProvider : ISchemaProvider
                 INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE fk,
                 INFORMATION_SCHEMA.KEY_COLUMN_USAGE pk 
             WHERE
-                fk.TABLE_SCHEMA = @sma
+                (@sma IS NULL OR fk.TABLE_SCHEMA = @sma)
                 AND fk.TABLE_NAME = @tbl
                 AND fk.CONSTRAINT_SCHEMA = c.CONSTRAINT_SCHEMA
                 AND fk.CONSTRAINT_NAME = c.CONSTRAINT_NAME
@@ -72,8 +72,8 @@ public class SqlServerSchemaProvider : ISchemaProvider
         return connection.Query<string>(/*lang=sql*/ """
             SELECT COLUMN_NAME
             FROM INFORMATION_SCHEMA.COLUMNS
-            WHERE TABLE_SCHEMA = @schema AND TABLE_NAME = @table
-            AND COLUMNPROPERTY(object_id(TABLE_SCHEMA + '.' + TABLE_NAME), COLUMN_NAME, 'IsIdentity') = 1
+            WHERE (@schema IS NULL OR TABLE_SCHEMA = @schema) AND TABLE_NAME = @table
+            AND COLUMNPROPERTY(object_id(QUOTENAME(TABLE_SCHEMA) + '.' + QUOTENAME(TABLE_NAME)), COLUMN_NAME, 'IsIdentity') = 1
             """,
             new
             {
@@ -91,7 +91,7 @@ public class SqlServerSchemaProvider : ISchemaProvider
                 "INNER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS ku " +
                 "ON tc.CONSTRAINT_TYPE = 'PRIMARY KEY' " +
                 "AND tc.CONSTRAINT_NAME = ku.CONSTRAINT_NAME " +
-                "AND ku.TABLE_SCHEMA = @schema " +
+                "AND (@schema IS NULL OR ku.TABLE_SCHEMA = @schema) " +
                 "AND ku.TABLE_NAME = @table " +
                 "ORDER BY ku.ORDINAL_POSITION",
             new

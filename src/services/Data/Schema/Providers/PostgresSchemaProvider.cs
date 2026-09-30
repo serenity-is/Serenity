@@ -23,11 +23,11 @@ public class PostgresSchemaProvider : ISchemaProvider
                 data_type "DataType",
                 CASE WHEN is_nullable = 'NO' THEN 0 ELSE 1 END "IsNullable",
                 CASE WHEN column_default LIKE 'nextval(%' THEN 1 ELSE 0 END "IsIdentity",
-                COALESCE(character_maximum_length, CASE WHEN data_type = 'numeric' OR 
-                    data_type = 'decimal' THEN numeric_precision ELSE 0 END) "Size",
-                numeric_scale "Scale"
+                COALESCE(character_maximum_length, CASE WHEN data_type = 'numeric' OR
+                    data_type = 'decimal' THEN numeric_precision ELSE 0 END, 0) "Size",
+                COALESCE(numeric_scale, 0) "Scale"
             FROM information_schema.COLUMNS
-            WHERE table_schema = @sma and table_name = @tbl
+            WHERE (@sma IS NULL OR table_schema = @sma) and table_name = @tbl
             ORDER BY ordinal_position
             """, new
         {
@@ -56,7 +56,7 @@ public class PostgresSchemaProvider : ISchemaProvider
                 JOIN pg_attribute pa ON pa.attrelid = f.oid AND pa.attnum = pk_col.attnum AND pa.attisdropped = false
             WHERE
                 o.contype = 'f' AND m.relkind = 'r'
-                AND (SELECT nspname FROM pg_namespace WHERE oid = m.relnamespace) = @sma
+                AND (@sma IS NULL OR (SELECT nspname FROM pg_namespace WHERE oid = m.relnamespace) = @sma)
                 AND m.relname = @tbl
             ORDER BY fk_col.ord
             """, new
@@ -70,9 +70,9 @@ public class PostgresSchemaProvider : ISchemaProvider
     public IEnumerable<string> GetIdentityFields(IDbConnection connection, string? schema, string table)
     {
         return connection.Query<string>(/*lang=sql*/ """
-            SELECT column_name, column_default 
-            FROM information_schema.COLUMNS 
-            WHERE TABLE_SCHEMA = @sma AND TABLE_NAME = @tbl 
+            SELECT column_name, column_default
+            FROM information_schema.COLUMNS
+            WHERE (@sma IS NULL OR TABLE_SCHEMA = @sma) AND TABLE_NAME = @tbl
             AND column_default like 'nextval(%'
             """, new
         {
@@ -84,18 +84,26 @@ public class PostgresSchemaProvider : ISchemaProvider
     /// <inheritdoc/>
     public IEnumerable<string> GetPrimaryKeyFields(IDbConnection connection, string? schema, string table)
     {
+        // quote_ident builds the name server-side (no string interpolation), and
+        // to_regclass returns NULL instead of throwing for a missing table.
+        // Key order is the indkey array order, not the physical column order.
         return connection.Query<string>(
-            /*lang=sql*/ $$"""
-            SELECT pg_attribute.attname 
-                FROM pg_index, pg_class, pg_attribute, pg_namespace 
-                WHERE pg_class.oid = {{("\"" + schema + "\".\"" + table + "\"").ToSql(PostgresDialect.Instance)}}::regclass 
-                AND indrelid = pg_class.oid 
-                AND nspname = {{("\"" + schema + "\"").ToSql(PostgresDialect.Instance)}}
+            /*lang=sql*/ """
+            SELECT pg_attribute.attname
+                FROM pg_index, pg_class, pg_attribute, pg_namespace
+                WHERE pg_class.oid = to_regclass(quote_ident(@sma) || '.' || quote_ident(@tbl))
+                AND indrelid = pg_class.oid
+                AND nspname = @sma
                 AND pg_class.relnamespace = pg_namespace.oid
                 AND pg_attribute.attrelid = pg_class.oid
                 AND pg_attribute.attnum = any(pg_index.indkey)
                 AND indisprimary
-            """);
+                ORDER BY array_position(pg_index.indkey, pg_attribute.attnum)
+            """, new
+            {
+                sma = schema,
+                tbl = table
+            });
     }
 
     private class TableNameSource

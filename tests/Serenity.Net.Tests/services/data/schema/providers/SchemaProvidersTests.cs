@@ -25,6 +25,41 @@ public class SchemaProvidersTests
     }
 
     [Fact]
+    public void SqlServer_GetFieldInfos_Coalesces_Scale_And_Allows_Null_Schema()
+    {
+        string? sql = null;
+        using var connection = new MockDbConnection()
+            .OnDbCommandExecuteReader(cmd =>
+            {
+                sql = cmd.CommandText;
+                return new MockDbDataReader(
+                    new { FieldName = "ID", DataType = "int", IsNullable = false, Size = 4, Scale = 0 });
+            });
+
+        new SqlServerSchemaProvider().GetFieldInfos(connection, null, "T").ToList();
+
+        Assert.Contains("COALESCE(NUMERIC_SCALE", sql, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("@sma IS NULL", sql, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void SqlServer_GetIdentityFields_Quotes_Object_Name()
+    {
+        string? sql = null;
+        using var connection = new MockDbConnection()
+            .OnDbCommandExecuteReader(cmd =>
+            {
+                sql = cmd.CommandText;
+                return new MockDbDataReader(new { COLUMN_NAME = "ID" });
+            });
+
+        new SqlServerSchemaProvider().GetIdentityFields(connection, "dbo", "T").ToList();
+
+        Assert.Contains("QUOTENAME", sql, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("object_id(TABLE_SCHEMA", sql, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
     public void SqlServer_GetForeignKeys_Maps_ForeignKeys()
     {
         using var connection = new MockDbConnection()
@@ -89,6 +124,43 @@ public class SchemaProvidersTests
         var field = Assert.Single(new PostgresSchemaProvider().GetFieldInfos(connection, "public", "T"));
         Assert.Equal("ID", field.FieldName);
         Assert.True(field.IsIdentity);
+    }
+
+    [Fact]
+    public void Postgres_GetFieldInfos_Coalesces_Scale_And_Allows_Null_Schema()
+    {
+        string? sql = null;
+        using var connection = new MockDbConnection()
+            .OnDbCommandExecuteReader(cmd =>
+            {
+                sql = cmd.CommandText;
+                return new MockDbDataReader(
+                    new { FieldName = "ID", DataType = "integer", IsNullable = false, IsIdentity = false, Size = 0, Scale = 0 });
+            });
+
+        new PostgresSchemaProvider().GetFieldInfos(connection, null, "T").ToList();
+
+        Assert.Contains("COALESCE(numeric_scale", sql, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("@sma IS NULL", sql, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void Postgres_GetPrimaryKeyFields_Uses_ToRegclass_With_Params_And_Order()
+    {
+        string? sql = null;
+        using var connection = new MockDbConnection()
+            .OnDbCommandExecuteReader(cmd =>
+            {
+                sql = cmd.CommandText;
+                return new MockDbDataReader(new { attname = "ID" });
+            });
+
+        Assert.Equal(["ID"], new PostgresSchemaProvider().GetPrimaryKeyFields(connection, "public", "T").ToList());
+
+        Assert.Contains("to_regclass", sql, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("quote_ident(@sma)", sql, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("ORDER BY", sql, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("\"public\"", sql, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -258,6 +330,24 @@ public class SchemaProvidersTests
         var field = Assert.Single(new OracleSchemaProvider().GetFieldInfos(connection, "dbo", "T"));
         Assert.Equal("ID", field.FieldName);
         Assert.Equal("NUMBER", field.DataType);
+    }
+
+    [Fact]
+    public void Oracle_GetFieldInfos_Coalesces_Scale_And_Allows_Null_Schema()
+    {
+        string? sql = null;
+        using var connection = new MockDbConnection()
+            .OnDbCommandExecuteReader(cmd =>
+            {
+                sql = cmd.CommandText;
+                return new MockDbDataReader(
+                    new { FieldName = "ID", DataType = "NUMBER", Size = 4, Scale = 0, IsNullable = false });
+            });
+
+        new OracleSchemaProvider().GetFieldInfos(connection, null, "T").ToList();
+
+        Assert.Contains("COALESCE(c.data_scale", sql, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains(":sma IS NULL", sql, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
