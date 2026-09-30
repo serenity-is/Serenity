@@ -16,11 +16,19 @@ public class DefaultSqlDialectMapperTests
     }
 
     [Fact]
-    public void TryGet_ByDialectTypeName_CreatesInstance()
+    public void TryGet_ByDialectTypeName_ReturnsSingleton()
     {
         var mapper = new DefaultSqlDialectMapper();
 
-        Assert.Equal(SqliteDialect.Instance.OpenQuote, mapper.TryGet("SqliteDialect").OpenQuote);
+        Assert.Same(SqliteDialect.Instance, mapper.TryGet("SqliteDialect"));
+    }
+
+    [Fact]
+    public void TryGet_ByDialectTypeName_CachesInstance()
+    {
+        var mapper = new DefaultSqlDialectMapper();
+
+        Assert.Same(mapper.TryGet("PostgresDialect"), mapper.TryGet("PostgresDialect"));
     }
 
     [Fact]
@@ -28,7 +36,27 @@ public class DefaultSqlDialectMapperTests
     {
         var mapper = new DefaultSqlDialectMapper();
 
-        Assert.Equal(SqlServer2012Dialect.Instance.OpenQuote, mapper.TryGet("SqlServer2012").OpenQuote);
+        Assert.Same(SqlServer2012Dialect.Instance, mapper.TryGet("SqlServer2012"));
+    }
+
+    [Theory]
+    [InlineData("SqlServer", typeof(SqlServer2012Dialect))]
+    [InlineData("PostgreSQL", typeof(PostgresDialect))]
+    public void TryGet_ByAlias_ReturnsDialect(string name, Type dialectType)
+    {
+        var dialect = new DefaultSqlDialectMapper().TryGet(name);
+
+        Assert.IsType(dialectType, dialect);
+    }
+
+    [Theory]
+    [InlineData("sqlitedialect", typeof(SqliteDialect))]
+    [InlineData("SQLSERVER2012", typeof(SqlServer2012Dialect))]
+    public void TryGet_TypeName_IsCaseInsensitive(string name, Type dialectType)
+    {
+        var dialect = new DefaultSqlDialectMapper().TryGet(name);
+
+        Assert.IsType(dialectType, dialect);
     }
 
     [Theory]

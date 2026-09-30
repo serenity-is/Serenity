@@ -1,3 +1,5 @@
+using System.Reflection;
+
 namespace Serenity.Data;
 
 /// <summary>
@@ -6,7 +8,7 @@ namespace Serenity.Data;
 /// </summary>
 public class DefaultSqlDialectMapper : ISqlDialectMapper
 {
-    private static Dictionary<string, ISqlDialect> DialectByProviderName =>
+    private static readonly Dictionary<string, ISqlDialect> DialectByName =
        new(StringComparer.OrdinalIgnoreCase)
        {
             { "System.Data.SqlClient", SqlServer2012Dialect.Instance },
@@ -18,8 +20,16 @@ public class DefaultSqlDialectMapper : ISqlDialectMapper
             { "System.Data.SQLite", SqliteDialect.Instance },
             { "Microsoft.Data.SQLite", SqliteDialect.Instance },
             { "System.Data.OracleClient", OracleDialect.Instance },
-            { "Oracle.ManagedDataAccess.Client", OracleDialect.Instance }
+            { "Oracle.ManagedDataAccess.Client", OracleDialect.Instance },
+            // Short names with no matching type ("SqlServer" has no SqlServerDialect type)
+            { "SqlServer", SqlServer2012Dialect.Instance },
+            { "PostgreSQL", PostgresDialect.Instance }
        };
+
+    // Cache for Type.GetType resolutions. Nulls included (misses shouldn't
+    // pay reflection on every call); Dictionary allows null values.
+    private static readonly Dictionary<string, ISqlDialect?> DialectByTypeName =
+        new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
     /// Returns the dialect for a dialect or provider name, or <c>null</c> if none is found.
@@ -31,16 +41,36 @@ public class DefaultSqlDialectMapper : ISqlDialectMapper
         if (string.IsNullOrEmpty(dialectOrProviderName))
             return null;
 
-        if (DialectByProviderName.TryGetValue(dialectOrProviderName, out ISqlDialect? dialect))
+        if (DialectByName.TryGetValue(dialectOrProviderName, out ISqlDialect? dialect))
             return dialect;
 
-        var dialectType = Type.GetType("Serenity.Data." + dialectOrProviderName + "Dialect") ??
-            Type.GetType("Serenity.Data." + dialectOrProviderName) ??
-            Type.GetType(dialectOrProviderName);
+        lock (DialectByTypeName)
+        {
+            if (DialectByTypeName.TryGetValue(dialectOrProviderName, out dialect))
+                return dialect;
 
-        if (dialectType != null)
-            return Activator.CreateInstance(dialectType) as ISqlDialect;
+            var dialectType = Type.GetType("Serenity.Data." + dialectOrProviderName + "Dialect", false, true) ??
+                Type.GetType("Serenity.Data." + dialectOrProviderName, false, true) ??
+                Type.GetType(dialectOrProviderName, false, true);
 
-        return null;
+            dialect = dialectType is null ? null : CreateDialect(dialectType);
+            DialectByTypeName[dialectOrProviderName] = dialect;
+            return dialect;
+        }
+    }
+
+    private static ISqlDialect? CreateDialect(Type dialectType)
+    {
+        // Prefer the shared singleton when the type itself declares one (all
+        // built-in dialects do, as a static Instance field or property)
+        // instead of allocating per call.
+        var flags = BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly;
+        if (dialectType.GetField("Instance", flags)?.GetValue(null) is ISqlDialect instance)
+            return instance;
+
+        if (dialectType.GetProperty("Instance", flags)?.GetValue(null) is ISqlDialect propertyInstance)
+            return propertyInstance;
+
+        return Activator.CreateInstance(dialectType) as ISqlDialect;
     }
 }
