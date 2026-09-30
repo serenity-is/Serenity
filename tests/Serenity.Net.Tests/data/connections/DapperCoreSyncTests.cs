@@ -20,6 +20,25 @@ public class DapperCoreSyncTests
     }
 
     [Fact]
+    public void Execute_WithAmbientTransaction_EnlistsCommand()
+    {
+        using var actual = new MockDbConnection();
+        using var wrapped = new WrappedConnection(actual, SqlServer2012Dialect.Instance);
+        using var tx = wrapped.BeginTransaction();
+
+        IDbTransaction? captured = null;
+        actual.OnDbCommandExecuteNonQuery(command =>
+        {
+            captured = command.Transaction;
+            return 1;
+        });
+
+        wrapped.Execute("UPDATE [Table] SET [X] = 1");
+
+        Assert.Same(wrapped.GetCurrentActualTransaction(), captured);
+    }
+
+    [Fact]
     public void Execute_Executes_AndReturnsRowsAffected()
     {
         using var connection = new MockDbConnection()

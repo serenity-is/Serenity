@@ -13,6 +13,10 @@ namespace Serenity.Data;
 /// <see cref="ISqlQuery"/> overloads are Serenity specific and have no Dapper equivalent.
 /// Note that unlike <see cref="SqlHelper"/> methods, these extension methods do not go through
 /// <see cref="ISqlOperationInterceptor"/>.
+/// Transaction handling: an explicitly passed <c>transaction</c> takes precedence; when it
+/// is null the connection's ambient transaction applies. That works because the connection
+/// (usually a <see cref="WrappedConnection"/>) enlists the ambient transaction at command
+/// creation, and Dapper only overwrites it with a non-null transaction argument.
 /// </summary>
 public static partial class SqlMapper
 {

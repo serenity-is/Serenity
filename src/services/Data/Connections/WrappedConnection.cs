@@ -261,6 +261,11 @@ public class WrappedConnection : DbConnection, IDbConnection, IHasActualConnecti
         else if (SqlSettings.DefaultCommandTimeout.HasValue)
             command.CommandTimeout = SqlSettings.DefaultCommandTimeout.Value;
 
+        // The ambient transaction is enlisted here, at command creation, so every
+        // command from this connection joins the UnitOfWork by default. Callers must
+        // not overwrite Transaction with null afterwards. Dapper only assigns its own
+        // transaction argument when non-null, which is why the DapperCore wrappers can
+        // pass their optional transaction straight through without breaking enlistment.
         var transaction = currentTransaction?.ActualTransaction;
         if (transaction != null && transaction.Connection == null)
             throw new System.Exception("Active transaction for connection is in invalid state! " +
