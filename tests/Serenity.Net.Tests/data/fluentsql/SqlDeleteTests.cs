@@ -93,4 +93,20 @@ public class SqlDeleteTests
         Assert.Throws<ArgumentNullException>(() => SqlDelete.Format(null!, ""));
         Assert.Throws<ArgumentException>(() => SqlDelete.Format("", ""));
     }
+
+    [Fact]
+    public void Clone_Copies_Where_Params_And_Text()
+    {
+        var delete = new SqlDelete("T").Where(new Criteria("A") == 5);
+
+        var clone = delete.Clone();
+
+        Assert.Equal(delete.ToString(), clone.ToString());
+        Assert.Equal(delete.ParamCount, clone.ParamCount);
+
+        clone.Where(new Criteria("B") == 6);
+
+        Assert.NotEqual(delete.ToString(), clone.ToString());
+        Assert.Equal(delete.ParamCount + 1, clone.ParamCount);
+    }
 }

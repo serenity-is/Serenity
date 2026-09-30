@@ -6,7 +6,7 @@ namespace Serenity.Data;
 ///   Creates a new SqlDelete query.</remarks>
 /// <param name="tableName">
 ///   Table to delete records from (required).</param>
-public sealed class SqlDelete(string tableName) : QueryWithParams, IFilterableQuery
+public class SqlDelete(string tableName) : QueryWithParams, IFilterableQuery
 {
     private readonly string _tableName = tableName ?? throw new ArgumentNullException(nameof(tableName));
     private readonly List<ICriteria> whereCriteria = [];
@@ -40,6 +40,24 @@ public sealed class SqlDelete(string tableName) : QueryWithParams, IFilterableQu
     string IFilterableQuery.GetWhereClause() => SqlUpdate.RemoveT0Reference(whereClause.ToString());
 
     void IFilterableQuery.Where(ICriteria? criteria) => Where(criteria);
+
+    /// <summary>
+    ///   Clones this SqlDelete query.</summary>
+    /// <returns>
+    ///   A new clone.</returns>
+    public SqlDelete Clone()
+    {
+        SqlDelete clone = new(_tableName);
+        clone.whereCriteria.AddRange(whereCriteria);
+        clone.whereClause.Append(whereClause);
+        clone.nextAutoParam = nextAutoParam;
+        clone.dialect = dialect;
+        clone.dialectOverridden = dialectOverridden;
+        CloneParams(clone);
+        CloneAliasExpressionsTo(clone);
+        clone.cachedToString = cachedToString;
+        return clone;
+    }
 
     /// <summary>
     ///   Gets string representation of the query.</summary>

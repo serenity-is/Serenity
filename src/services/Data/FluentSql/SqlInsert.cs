@@ -136,6 +136,7 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
         clone.dialectOverridden = dialectOverridden;
         clone.nextAutoParam = nextAutoParam;
         CloneParams(clone);
+        CloneAliasExpressionsTo(clone);
         clone.cachedToString = cachedToString;
         return clone;
     }

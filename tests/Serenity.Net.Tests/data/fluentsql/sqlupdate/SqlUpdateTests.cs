@@ -272,4 +272,24 @@ public class SqlUpdateTests
         Assert.Throws<ArgumentOutOfRangeException>(() => SqlUpdate.Format("T", "x", ["A", "@a", "B"]));
     }
 #pragma warning restore CS0618
+
+    [Fact]
+    public void Clone_Copies_Alias_Expressions()
+    {
+        var update = new AliasSqlUpdate("T");
+        update.SetAlias("j1", "Table J1");
+
+        var clone = update.Clone();
+
+        Assert.True(clone.HasAlias("j1"));
+
+        update.SetAlias("j2", "Table J2");
+
+        Assert.False(clone.HasAlias("j2"));
+    }
+
+    private sealed class AliasSqlUpdate(string table) : SqlUpdate(table)
+    {
+        public void SetAlias(string alias, string expression) => SetAliasExpression(alias, expression);
+    }
 }

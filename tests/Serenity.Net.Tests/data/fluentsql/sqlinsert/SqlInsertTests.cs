@@ -179,6 +179,26 @@ public class SqlInsertTests
     public void FormatUpsert_Throws_For_Empty_Field_Name()
     {
         Assert.Throws<ArgumentException>(() =>
-            SqlInsert.FormatUpsert("T", [new("", "1")], [""], SqliteDialect.Instance));
+            SqlInsert.FormatUpsert("T", [new("A", "1")], [""], SqliteDialect.Instance));
+    }
+
+    [Fact]
+    public void Clone_Copies_Alias_Expressions()
+    {
+        var insert = new AliasSqlInsert("T");
+        insert.SetAlias("j1", "Table J1");
+
+        var clone = insert.Clone();
+
+        Assert.True(clone.HasAlias("j1"));
+
+        insert.SetAlias("j2", "Table J2");
+
+        Assert.False(clone.HasAlias("j2"));
+    }
+
+    private sealed class AliasSqlInsert(string table) : SqlInsert(table)
+    {
+        public void SetAlias(string alias, string expression) => SetAliasExpression(alias, expression);
     }
 }

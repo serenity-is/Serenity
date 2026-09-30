@@ -249,6 +249,7 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
         clone.dialect = dialect;
         clone.dialectOverridden = dialectOverridden;
         CloneParams(clone);
+        CloneAliasExpressionsTo(clone);
         clone.cachedToString = cachedToString;
         return clone;
     }
