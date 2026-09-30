@@ -26,56 +26,21 @@ public class SqlDebugDumper
         // Token-aware replacement: StringBuilder.Replace would also hit parameter
         // names inside string literals and comments, and the prefix of longer names
         // (e.g. @Id inside @Id2 or inside an inserted replacement value). Scan once
-        // instead, replacing only whole @name tokens outside skip regions. Skip rules
-        // match the Join scanners: ' " ` quotes, -- and /* */ comments, '\n'-only
-        // line comment end. A lone @ (as in @@ROWCOUNT) is copied verbatim.
+        // instead, replacing only whole @name tokens outside skip regions
+        // (see SqlRegionScanner). A lone @ (as in @@ROWCOUNT) is copied verbatim.
         var source = sql ?? "";
         var sb = new StringBuilder(source.Length);
-        char? quoteChar = null;
-        bool inLineComment = false;
-        bool inBlockComment = false;
         for (var i = 0; i < source.Length; i++)
         {
+            var start = i;
+            if (SqlRegionScanner.TrySkipQuotesAndComments(source, ref i))
+            {
+                sb.Append(source, start, i - start + 1);
+                continue;
+            }
+
             var c = source[i];
-            if (inBlockComment)
-            {
-                sb.Append(c);
-                if (c == '*' && i + 1 < source.Length && source[i + 1] == '/')
-                {
-                    sb.Append(source[++i]);
-                    inBlockComment = false;
-                }
-            }
-            else if (inLineComment)
-            {
-                sb.Append(c);
-                if (c == '\n')
-                    inLineComment = false;
-            }
-            else if (quoteChar != null)
-            {
-                sb.Append(c);
-                if (c == quoteChar)
-                    quoteChar = null;
-            }
-            else if (c == '\'' || c == '"' || c == '`')
-            {
-                sb.Append(c);
-                quoteChar = c;
-            }
-            else if (c == '-' && i + 1 < source.Length && source[i + 1] == '-')
-            {
-                sb.Append(c);
-                sb.Append(source[++i]);
-                inLineComment = true;
-            }
-            else if (c == '/' && i + 1 < source.Length && source[i + 1] == '*')
-            {
-                sb.Append(c);
-                sb.Append(source[++i]);
-                inBlockComment = true;
-            }
-            else if (c == '@' && i + 1 < source.Length && IsParamStart(source[i + 1]))
+            if (c == '@' && i + 1 < source.Length && IsParamStart(source[i + 1]))
             {
                 var j = i + 2;
                 while (j < source.Length && IsParamChar(source[j]))

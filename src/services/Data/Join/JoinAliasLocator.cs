@@ -63,55 +63,20 @@ public class JoinAliasLocator
     /// <returns><c>true</c> if the expression was processed successfully.</returns>
     public static bool EnumerateAliases(string expression, Action<string> alias)
     {
-        // Skip regions (quoted strings / identifiers and -- / /* */ comments) use
-        // the same rules as BracketLocator: comment markers only apply outside
-        // quotes, quotes don't span comments, block comments don't nest, and only
-        // '\n' ends a line comment. A '' inside a string is parity-neutral for this
-        // toggle scanner, so it needs no special case.
-        char? quoteChar = null;
-        bool inLineComment = false;
-        bool inBlockComment = false;
+        // Skip regions via SqlRegionScanner. A '' inside a string is
+        // parity-neutral for toggle scanning, so it needs no special case.
         int startIdent = -1;
         for (var i = 0; i < expression.Length; i++)
         {
+            if (SqlRegionScanner.TrySkipQuotesAndComments(expression, ref i))
+            {
+                startIdent = -1;
+                continue;
+            }
+
             var c = expression[i];
 
-            if (inBlockComment)
-            {
-                if (c == '*' && i + 1 < expression.Length && expression[i + 1] == '/')
-                {
-                    i++;
-                    inBlockComment = false;
-                }
-            }
-            else if (inLineComment)
-            {
-                if (c == '\n')
-                    inLineComment = false;
-            }
-            else if (quoteChar != null)
-            {
-                if (c == quoteChar)
-                    quoteChar = null;
-            }
-            else if (c == '\'' || c == '"' || c == '`')
-            {
-                quoteChar = c;
-                startIdent = -1;
-            }
-            else if (c == '-' && i + 1 < expression.Length && expression[i + 1] == '-')
-            {
-                i++;
-                startIdent = -1;
-                inLineComment = true;
-            }
-            else if (c == '/' && i + 1 < expression.Length && expression[i + 1] == '*')
-            {
-                i++;
-                startIdent = -1;
-                inBlockComment = true;
-            }
-            else if (c == '_' || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'))
+            if (c == '_' || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'))
             {
                 if (startIdent < 0)
                     startIdent = i;
@@ -142,53 +107,22 @@ public class JoinAliasLocator
     /// <returns>The expression with aliases replaced.</returns>
     public static string ReplaceAliases(string expression, Func<string, string> replace)
     {
-        // Skip regions use the same rules as EnumerateAliases above.
-        char? quoteChar = null;
-        bool inLineComment = false;
-        bool inBlockComment = false;
         int startIdent = -1;
         var sb = new StringBuilder();
         for (var i = 0; i < expression.Length; i++)
         {
+            var start = i;
+            if (SqlRegionScanner.TrySkipQuotesAndComments(expression, ref i))
+            {
+                sb.Append(expression, start, i - start + 1);
+                startIdent = -1;
+                continue;
+            }
+
             var c = expression[i];
             sb.Append(c);
 
-            if (inBlockComment)
-            {
-                if (c == '*' && i + 1 < expression.Length && expression[i + 1] == '/')
-                {
-                    sb.Append(expression[++i]);
-                    inBlockComment = false;
-                }
-            }
-            else if (inLineComment)
-            {
-                if (c == '\n')
-                    inLineComment = false;
-            }
-            else if (quoteChar != null)
-            {
-                if (c == quoteChar)
-                    quoteChar = null;
-            }
-            else if (c == '\'' || c == '"' || c == '`')
-            {
-                quoteChar = c;
-                startIdent = -1;
-            }
-            else if (c == '-' && i + 1 < expression.Length && expression[i + 1] == '-')
-            {
-                sb.Append(expression[++i]);
-                startIdent = -1;
-                inLineComment = true;
-            }
-            else if (c == '/' && i + 1 < expression.Length && expression[i + 1] == '*')
-            {
-                sb.Append(expression[++i]);
-                startIdent = -1;
-                inBlockComment = true;
-            }
-            else if (c == '_' || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'))
+            if (c == '_' || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'))
             {
                 if (startIdent < 0)
                     startIdent = i;
