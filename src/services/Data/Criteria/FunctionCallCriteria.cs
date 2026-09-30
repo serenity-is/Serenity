@@ -6,12 +6,24 @@ namespace Serenity.Data;
 /// <param name="arguments">The arguments.</param>
 public abstract class FunctionCallCriteria(params BaseCriteria[] arguments) : BaseCriteria
 {
-    private BaseCriteria[] arguments = arguments;
+    private BaseCriteria[] arguments = CheckArguments(arguments);
 
     /// <summary>
-    /// Gets the arguments.
+    /// Gets a copy of the arguments. Mutating the returned array does not
+    /// affect this instance.
     /// </summary>
-    public BaseCriteria[] Arguments => arguments;
+    public BaseCriteria[] Arguments => (BaseCriteria[])arguments.Clone();
+
+    private static BaseCriteria[] CheckArguments(BaseCriteria[]? arguments)
+    {
+        ArgumentNullException.ThrowIfNull(arguments);
+
+        foreach (var argument in arguments)
+            ArgumentNullException.ThrowIfNull(argument, nameof(arguments));
+
+        // Defensive copy: the caller may keep and mutate the passed array.
+        return (BaseCriteria[])arguments.Clone();
+    }
 
     /// <summary>
     /// Creates a copy of this function criteria with the specified arguments.
@@ -21,10 +33,8 @@ public abstract class FunctionCallCriteria(params BaseCriteria[] arguments) : Ba
     /// <exception cref="ArgumentNullException">arguments is null.</exception>
     protected internal virtual FunctionCallCriteria CloneWithArguments(BaseCriteria[] arguments)
     {
-        ArgumentNullException.ThrowIfNull(arguments);
-
         var clone = (FunctionCallCriteria)MemberwiseClone();
-        clone.arguments = arguments;
+        clone.arguments = CheckArguments(arguments);
         return clone;
     }
 

@@ -122,6 +122,39 @@ public class ConstantAndParamCriteriaTests
     }
 
     [Fact]
+    public void FunctionCallCriteria_NullArguments_ThrowsArgumentNullException()
+    {
+        Assert.Throws<ArgumentNullException>(() => new TestFunc((BaseCriteria[])null!));
+    }
+
+    [Fact]
+    public void FunctionCallCriteria_NullElement_ThrowsArgumentNullException()
+    {
+        Assert.Throws<ArgumentNullException>(() => new TestFunc(new Criteria("a"), null!));
+    }
+
+    [Fact]
+    public void FunctionCallCriteria_Copies_Passed_Array()
+    {
+        var source = new BaseCriteria[] { new Criteria("a") };
+        var func = new TestFunc(source);
+        source[0] = new Criteria("mutated");
+
+        Assert.Equal("a", Assert.IsType<Criteria>(func.Arguments[0]).Expression);
+    }
+
+    [Fact]
+    public void FunctionCallCriteria_Arguments_Returns_Copy()
+    {
+        var func = new TestFunc(new Criteria("a"));
+
+        func.Arguments[0] = new Criteria("mutated");
+
+        Assert.Equal("a", Assert.IsType<Criteria>(func.Arguments[0]).Expression);
+        Assert.Equal("MYFUNC(a)", func.ToString());
+    }
+
+    [Fact]
     public void FunctionCallCriteria_AppendHooks_AreCalled()
     {
         var func = new HookedFunc(new Criteria("x"));
