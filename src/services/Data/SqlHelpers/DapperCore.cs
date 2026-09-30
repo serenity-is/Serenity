@@ -45,10 +45,14 @@ public static partial class SqlMapper
     /// <param name="sql">The SQL query.</param>
     /// <param name="param">The parameters.</param>
     /// <param name="transaction">The transaction.</param>
-    /// <param name="buffered">If set to <c>true</c>, results are buffered.</param>
+    /// <param name="buffered">If set to <c>true</c> (the default), results are buffered.</param>
     /// <param name="commandTimeout">The command timeout.</param>
     /// <param name="commandType">Type of the command.</param>
     /// <returns>List of dynamic objects.</returns>
+    /// <remarks>
+    /// With <c>buffered: false</c> execution is deferred: the connection must stay
+    /// open until enumeration completes, otherwise enumeration throws.
+    /// </remarks>
     public static IEnumerable<dynamic> Query(this IDbConnection cnn, string sql, object? param = null, IDbTransaction? transaction = null, bool buffered = true, int? commandTimeout = null, CommandType? commandType = null)
     {
         cnn.EnsureOpen();
@@ -62,10 +66,14 @@ public static partial class SqlMapper
     /// <param name="cnn">The connection.</param>
     /// <param name="sql">The SQL query.</param>
     /// <param name="transaction">The transaction.</param>
-    /// <param name="buffered">If set to <c>true</c>, results are buffered.</param>
+    /// <param name="buffered">If set to <c>true</c> (the default), results are buffered.</param>
     /// <param name="commandTimeout">The command timeout.</param>
     /// <param name="commandType">Type of the command.</param>
     /// <returns>List of dynamic objects.</returns>
+    /// <remarks>
+    /// With <c>buffered: false</c> execution is deferred: the connection must stay
+    /// open until enumeration completes, otherwise enumeration throws.
+    /// </remarks>
     public static IEnumerable<dynamic> Query(this IDbConnection cnn, ISqlQuery sql, IDbTransaction? transaction = null, bool buffered = true, int? commandTimeout = null, CommandType? commandType = null)
     {
         cnn.EnsureOpen();
@@ -80,12 +88,16 @@ public static partial class SqlMapper
     /// <param name="sql">The SQL query.</param>
     /// <param name="param">The parameters.</param>
     /// <param name="transaction">The transaction.</param>
-    /// <param name="buffered">If set to <c>true</c>, results are buffered.</param>
+    /// <param name="buffered">If set to <c>true</c> (the default), results are buffered.</param>
     /// <param name="commandTimeout">The command timeout.</param>
     /// <param name="commandType">Type of the command.</param>
     /// <returns>
     /// List of objects.
     /// </returns>
+    /// <remarks>
+    /// With <c>buffered: false</c> execution is deferred: the connection must stay
+    /// open until enumeration completes, otherwise enumeration throws.
+    /// </remarks>
     public static IEnumerable<T> Query<T>(this IDbConnection cnn, string sql, object? param = null, IDbTransaction? transaction = null, bool buffered = true, int? commandTimeout = null, CommandType? commandType = null)
     {
         cnn.EnsureOpen();
@@ -100,10 +112,14 @@ public static partial class SqlMapper
     /// <param name="cnn">The connection.</param>
     /// <param name="sql">The SQL query.</param>
     /// <param name="transaction">The transaction.</param>
-    /// <param name="buffered">If set to <c>true</c>, results are buffered.</param>
+    /// <param name="buffered">If set to <c>true</c> (the default), results are buffered.</param>
     /// <param name="commandTimeout">The command timeout.</param>
     /// <param name="commandType">Type of the command.</param>
     /// <returns>List of values.</returns>
+    /// <remarks>
+    /// With <c>buffered: false</c> execution is deferred: the connection must stay
+    /// open until enumeration completes, otherwise enumeration throws.
+    /// </remarks>
     public static IEnumerable<T> Query<T>(this IDbConnection cnn, ISqlQuery sql, IDbTransaction? transaction = null, bool buffered = true, int? commandTimeout = null, CommandType? commandType = null)
     {
         cnn.EnsureOpen();
