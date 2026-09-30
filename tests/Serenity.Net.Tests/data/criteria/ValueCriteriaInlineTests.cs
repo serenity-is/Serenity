@@ -67,6 +67,17 @@ public class ValueCriteriaInlineTests
     }
 
     [Fact]
+    public void ToString_LargeUlong_DoesNotOverflow()
+    {
+        var query = new SqlQuery();
+        var values = Enumerable.Repeat(ulong.MaxValue, 11).Cast<object>().ToArray();
+
+        Assert.Equal("(" + string.Join(",", Enumerable.Repeat("18446744073709551615", 11)) + ")",
+            new ValueCriteria(values).ToString(query));
+        Assert.Null(query.Params);
+    }
+
+    [Fact]
     public void ToString_MoreThanTenEnums_InlinesConvertedValues()
     {
         var query = new SqlQuery();
@@ -77,22 +88,24 @@ public class ValueCriteriaInlineTests
     }
 
     [Fact]
-    public void ToString_MoreThanTenStrings_UsesParams()
+    public void ToString_MoreThanTenStrings_InlinesLiterals_On_SqlServer()
     {
+        // Default dialect is SqlServer (2100 params/command): long string lists
+        // become quoted literals to avoid the budget. See ValueCriteriaTests for
+        // dialects that stay parameterized.
         var query = new SqlQuery();
         var values = Enumerable.Range(1, 11).Select(i => "v" + i).Cast<object>().ToArray();
 
         var result = new ValueCriteria(values).ToString(query);
 
-        Assert.StartsWith("(", result);
+        Assert.StartsWith("(N'v1',", result);
         Assert.EndsWith(")", result);
-        Assert.Contains("@p1", result);
-        Assert.Contains("@p11", result);
-        Assert.True(query.Params.Count == 11);
+        Assert.DoesNotContain("@p", result);
+        Assert.Null(query.Params);
     }
 
     [Fact]
-    public void ToString_MoreThanTenMixedWithNull_UsesParamsForNullAndNonInlined()
+    public void ToString_MoreThanTenMixedWithNull_Inlines_Strings_And_Params_Rest()
     {
         var query = new SqlQuery();
         var values = new List<object>();
@@ -108,9 +121,11 @@ public class ValueCriteriaInlineTests
 
         Assert.StartsWith("(", result);
         Assert.EndsWith(")", result);
-        // integers among the 11 items are inlined; null, string, char, datetime and double become params
+        // integers among the 11 items are inlined, as is the string on SqlServer;
+        // null, char, datetime and double become params
+        Assert.Contains("N's1'", result);
         int paramCount = query.Params.Count;
-        Assert.Equal(5, paramCount);
+        Assert.Equal(4, paramCount);
     }
 
     [Fact]
