@@ -19,22 +19,68 @@ public static class ParamPrefixReplacer
         if (expression == null)
             return null;
 
-        bool inQuote = false;
+        // Same quoted-region tracking as BracketLocator: single quotes (strings
+        // everywhere), double quotes (identifiers in Postgres/Oracle, strings
+        // in MySQL/T-SQL) and backticks (MySQL identifiers). Contents are never
+        // translated regardless of interpretation, and only the matching quote
+        // ends a region, so an apostrophe inside "..." (or vice versa) is inert.
+        char? quoteChar = null;
+        bool inLineComment = false;
+        bool inBlockComment = false;
         var sb = new StringBuilder(expression.Length);
         for (var i = 0; i < expression.Length; i++)
         {
             var c = expression[i];
 
-            if (inQuote)
+            if (inBlockComment)
             {
+                // Block comments end only at */ (newlines don't end them);
+                // never translate inside them.
                 sb.Append(c);
-                if (c == '\'')
-                    inQuote = false;
+                if (c == '*' && i + 1 < expression.Length && expression[i + 1] == '/')
+                {
+                    sb.Append(expression[++i]);
+                    inBlockComment = false;
+                }
             }
-            else if (c == '\'')
+            else if (inLineComment)
+            {
+                // Line comments run to the newline; never translate inside them.
+                // Only '\n' ends the comment: a lone '\r' never ends a line on
+                // its own and may appear stray mid-line.
+                sb.Append(c);
+                if (c == '\n')
+                    inLineComment = false;
+            }
+            else if (quoteChar != null)
             {
                 sb.Append(c);
-                inQuote = true;
+                if (c == quoteChar)
+                    quoteChar = null;
+            }
+            else if (c == '\'' || c == '"' || c == '`')
+            {
+                sb.Append(c);
+                quoteChar = c;
+            }
+            else if (c == '-' && i + 1 < expression.Length && expression[i + 1] == '-')
+            {
+                // A "--" outside a quoted string starts a line comment. Quoted
+                // strings are checked first, so 'a--b' is not misdetected, and an
+                // apostrophe inside the comment can no longer corrupt the string
+                // tracking for the rest of the statement.
+                sb.Append(c);
+                sb.Append(expression[++i]);
+                inLineComment = true;
+            }
+            else if (c == '/' && i + 1 < expression.Length && expression[i + 1] == '*')
+            {
+                // A "/*" outside quoted strings and comments starts a block
+                // comment (checked after both, so '/*', "-- /*" and nested "/*"
+                // never trigger it). A lone '/' (division) falls through.
+                sb.Append(c);
+                sb.Append(expression[++i]);
+                inBlockComment = true;
             }
             else if (c == '@')
             {

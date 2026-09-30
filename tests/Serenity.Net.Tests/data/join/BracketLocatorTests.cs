@@ -370,4 +370,90 @@ public class BracketLocatorTests
         Assert.Equal("\"a\" = \"x [b] y",
             BracketLocator.ReplaceBrackets("[a] = \"x [b] y", PostgresDialect.Instance));
     }
+
+    [Fact]
+    public void ReplaceBrackets_Does_Not_Translate_Inside_Line_Comments()
+    {
+        Assert.Equal("SELECT \"A\" FROM T -- [NotCol]",
+            BracketLocator.ReplaceBrackets("SELECT [A] FROM T -- [NotCol]", PostgresDialect.Instance));
+    }
+
+    [Fact]
+    public void ReplaceBrackets_Apostrophe_In_Comment_Does_Not_Poison_Rest()
+    {
+        Assert.Equal("SELECT \"A\" -- don't\nFROM \"T\"",
+            BracketLocator.ReplaceBrackets("SELECT [A] -- don't\nFROM [T]", PostgresDialect.Instance));
+    }
+
+    [Fact]
+    public void ReplaceBrackets_DashDash_Inside_String_Is_Not_A_Comment()
+    {
+        Assert.Equal("SELECT '--' , \"A\"",
+            BracketLocator.ReplaceBrackets("SELECT '--' , [A]", PostgresDialect.Instance));
+    }
+
+    [Fact]
+    public void ReplaceBrackets_Does_Not_Translate_Inside_Block_Comments()
+    {
+        Assert.Equal("SELECT \"A\" /* [x] */ FROM \"T\"",
+            BracketLocator.ReplaceBrackets("SELECT [A] /* [x] */ FROM [T]", PostgresDialect.Instance));
+    }
+
+    [Fact]
+    public void ReplaceBrackets_Quote_And_DashDash_Inside_Block_Comment_Are_Inert()
+    {
+        Assert.Equal("SELECT \"A\" /* it's -- [x] */ FROM \"T\"",
+            BracketLocator.ReplaceBrackets("SELECT [A] /* it's -- [x] */ FROM [T]", PostgresDialect.Instance));
+    }
+
+    [Fact]
+    public void ReplaceBrackets_Lone_Carriage_Return_Does_Not_End_Line_Comment()
+    {
+        Assert.Equal("SELECT \"A\" -- a\rb = [x]",
+            BracketLocator.ReplaceBrackets("SELECT [A] -- a\rb = [x]", PostgresDialect.Instance));
+    }
+
+    [Fact]
+    public void ReplaceBracketContents_Does_Not_Translate_Inside_Block_Comments()
+    {
+        Assert.Equal("[A] /* [b] */ [C]",
+            BracketLocator.ReplaceBracketContents("[a] /* [b] */ [c]", '_', s => s.ToUpperInvariant()));
+    }
+
+    [Fact]
+    public void ReplaceBracketContents_Does_Not_Translate_Inside_Line_Comments()
+    {
+        Assert.Equal("[A] -- [b]",
+            BracketLocator.ReplaceBracketContents("[a] -- [b]", '_', s => s.ToUpperInvariant()));
+    }
+
+    [Fact]
+    public void ReplaceBracketContents_Apostrophe_In_Comment_Does_Not_Poison_Rest()
+    {
+        Assert.Equal("[A] -- don't\n[B]",
+            BracketLocator.ReplaceBracketContents("[a] -- don't\n[b]", '_', s => s.ToUpperInvariant()));
+    }
+
+    [Theory]
+    [InlineData('\'')]
+    [InlineData('"')]
+    [InlineData('`')]
+    public void ReplaceBracketContents_Doubled_Quote_Stays_Inside_Region(char quote)
+    {
+        // Doubled quotes are escaped quotes, not region boundaries.
+        var q = quote.ToString();
+        Assert.Equal($"x = {q}a{q}{q}[b] c{q} [D]",
+            BracketLocator.ReplaceBracketContents($"x = {q}a{q}{q}[b] c{q} [d]", '_', s => s.ToUpperInvariant()));
+    }
+
+    [Theory]
+    [InlineData('\'')]
+    [InlineData('"')]
+    [InlineData('`')]
+    public void ReplaceBrackets_Doubled_Quote_Stays_Inside_Region(char quote)
+    {
+        var q = quote.ToString();
+        Assert.Equal($"\"a\" = {q}x{q}{q}[b] y{q} + \"c\"",
+            BracketLocator.ReplaceBrackets($"[a] = {q}x{q}{q}[b] y{q} + [c]", PostgresDialect.Instance));
+    }
 }
