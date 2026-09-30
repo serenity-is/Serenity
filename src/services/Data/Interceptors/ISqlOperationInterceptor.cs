@@ -1,12 +1,18 @@
 namespace Serenity.Data;
 
 /// <summary>
-/// An interface that makes it possible to intercept basic SQL operations on connections 
+/// An interface that makes it possible to intercept basic SQL operations on connections
 /// (e.g. SqlHelper extensions) mostly for testing purposes. Note that this does not
 /// intercept all SQL operations, only the ones that are done through SqlHelper extensions.
 /// It does not intercept Dapper operations, for example.
 /// This interface should be implemented by the mock connection class used in tests.
 /// </summary>
+/// <remarks>
+/// Interception happens before command creation, so operation arguments carry the
+/// pre-translation SQL text (e.g. [brackets] and @ parameters, not dialect quotes).
+/// This is intentional: it keeps test assertions dialect-independent.
+/// Only the connection itself is checked for this interface; there is no chaining.
+/// </remarks>
 public interface ISqlOperationInterceptor
 {
     /// <summary>
