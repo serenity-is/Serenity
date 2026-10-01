@@ -145,7 +145,7 @@ public class SchemaProvidersTests
     }
 
     [Fact]
-    public void Postgres_GetPrimaryKeyFields_Uses_ToRegclass_With_Params_And_Order()
+    public void Postgres_GetPrimaryKeyFields_Uses_Params_And_Order()
     {
         string? sql = null;
         using var connection = new MockDbConnection()
@@ -157,10 +157,29 @@ public class SchemaProvidersTests
 
         Assert.Equal(["ID"], new PostgresSchemaProvider().GetPrimaryKeyFields(connection, "public", "T").ToList());
 
-        Assert.Contains("to_regclass", sql, StringComparison.OrdinalIgnoreCase);
-        Assert.Contains("quote_ident(@sma)", sql, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("relname = @tbl", sql, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("@sma IS NULL", sql, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("ORDER BY", sql, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("\"public\"", sql, StringComparison.Ordinal);
+        Assert.DoesNotContain("to_regclass", sql, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void Postgres_GetPrimaryKeyFields_Allows_Null_Schema()
+    {
+        string? sql = null;
+        using var connection = new MockDbConnection()
+            .OnDbCommandExecuteReader(cmd =>
+            {
+                sql = cmd.CommandText;
+                return new MockDbDataReader(new { attname = "ID" });
+            });
+
+        // A null schema must not poison the lookup: the @sma IS NULL guard
+        // keeps it working (matching any schema, like GetFieldInfos).
+        Assert.Equal(["ID"], new PostgresSchemaProvider().GetPrimaryKeyFields(connection, null, "T").ToList());
+
+        Assert.Contains("@sma IS NULL", sql, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]

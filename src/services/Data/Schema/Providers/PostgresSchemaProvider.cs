@@ -84,16 +84,18 @@ public class PostgresSchemaProvider : ISchemaProvider
     /// <inheritdoc/>
     public IEnumerable<string> GetPrimaryKeyFields(IDbConnection connection, string? schema, string table)
     {
-        // quote_ident builds the name server-side (no string interpolation), and
-        // to_regclass returns NULL instead of throwing for a missing table.
-        // Key order is the indkey array order, not the physical column order.
+        // Direct catalog comparison (no string interpolation, no to_regclass):
+        // to_regclass(quote_ident(NULL) || ...) returns NULL, so a null schema
+        // would match nothing. The null guard means "any schema", consistent
+        // with the other methods. Key order is the indkey array order, not the
+        // physical column order.
         return connection.Query<string>(
             /*lang=sql*/ """
             SELECT pg_attribute.attname
                 FROM pg_index, pg_class, pg_attribute, pg_namespace
-                WHERE pg_class.oid = to_regclass(quote_ident(@sma) || '.' || quote_ident(@tbl))
+                WHERE pg_class.relname = @tbl
                 AND indrelid = pg_class.oid
-                AND nspname = @sma
+                AND (@sma IS NULL OR nspname = @sma)
                 AND pg_class.relnamespace = pg_namespace.oid
                 AND pg_attribute.attrelid = pg_class.oid
                 AND pg_attribute.attnum = any(pg_index.indkey)
