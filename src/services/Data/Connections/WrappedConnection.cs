@@ -152,6 +152,11 @@ public class WrappedConnection : DbConnection, IDbConnection, IHasActualConnecti
     /// </summary>
     public override void Close()
     {
+        // Forget the current transaction first: the close ends any live
+        // transaction provider-side, so later commands must not enlist in a
+        // dead one — even if the close itself throws. This mirrors how commit,
+        // rollback and dispose detach via Release.
+        currentTransaction = null;
         actualConnection.Close();
     }
 
@@ -161,6 +166,8 @@ public class WrappedConnection : DbConnection, IDbConnection, IHasActualConnecti
     /// <returns>A task that represents the asynchronous operation.</returns>
     public override Task CloseAsync()
     {
+        // See Close: forget upfront, the transaction is over either way.
+        currentTransaction = null;
         if (actualConnection is DbConnection dbConnection)
             return dbConnection.CloseAsync();
         return Task.Run(() => actualConnection.Close());

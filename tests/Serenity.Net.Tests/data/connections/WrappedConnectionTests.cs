@@ -58,6 +58,34 @@ public class WrappedConnectionTests
     }
 
     [Fact]
+    public void Close_ClearsCurrentTransaction()
+    {
+        using var connection = new MockDbConnection();
+        using var wrapped = new WrappedConnection(connection, SqlServer2012Dialect.Instance);
+
+        wrapped.Open();
+        using var transaction = wrapped.BeginTransaction();
+        Assert.NotNull(wrapped.CurrentTransaction);
+
+        wrapped.Close();
+        Assert.Null(wrapped.CurrentTransaction);
+    }
+
+    [Fact]
+    public async Task CloseAsync_ClearsCurrentTransaction()
+    {
+        using var connection = new MockDbConnection();
+        using var wrapped = new WrappedConnection(connection, SqlServer2012Dialect.Instance);
+
+        wrapped.Open();
+        using var transaction = wrapped.BeginTransaction();
+        Assert.NotNull(wrapped.CurrentTransaction);
+
+        await wrapped.CloseAsync();
+        Assert.Null(wrapped.CurrentTransaction);
+    }
+
+    [Fact]
     public void CommandTimeout_Setting_AppliesToCreatedCommands()
     {
         using var connection = new MockDbConnection { Dialect = SqlServer2012Dialect.Instance };
