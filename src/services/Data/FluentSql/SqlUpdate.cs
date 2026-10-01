@@ -313,7 +313,7 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
                 sb.Append(", ");
             sb.Append(SqlSyntax.AutoBracket(pair.Field, dialect));
             sb.Append(" = ");
-            sb.Append(pair.Expression);
+            sb.Append(BracketIncrementFieldReference(pair, dialect));
         }
 
         if (where != null && where.Length > 0)
@@ -323,5 +323,27 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
         }
 
         return sb.ToString();
+    }
+
+    private static string BracketIncrementFieldReference(FieldExpressionPair pair, ISqlDialect? dialect)
+    {
+        var expression = pair.Expression;
+        if (!expression.StartsWith(pair.Field, StringComparison.Ordinal))
+            return expression;
+
+        var remainder = expression[pair.Field.Length..];
+        string increment;
+        if (remainder.StartsWith(" + ", StringComparison.Ordinal))
+            increment = remainder[3..];
+        else if (remainder.Length > 0 && remainder[0] == '-')
+            increment = remainder[1..];
+        else
+            return expression;
+
+        if (!int.TryParse(increment, NumberStyles.AllowLeadingSign,
+                CultureInfo.InvariantCulture, out _))
+            return expression;
+
+        return SqlSyntax.AutoBracket(pair.Field, dialect) + remainder;
     }
 }
