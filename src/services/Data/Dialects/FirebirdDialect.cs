@@ -105,8 +105,8 @@ public class FirebirdDialect : ISqlDialect
         if (s.StartsWith("\"") && s.EndsWith("\""))
             return s;
 
-        if (keywords.Contains(s) || s.IndexOf(' ') >= 0 || s.StartsWith("_"))
-            return '"' + s + '"';
+        if (keywords.Contains(s) || !SqlSyntax.IsValidIdentifier(s) || s[0] == '_')
+            return '"' + s.Replace("\"", "\"\"") + '"';
 
         return s;
     }

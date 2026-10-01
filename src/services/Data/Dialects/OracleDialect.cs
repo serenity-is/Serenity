@@ -100,8 +100,8 @@ public class OracleDialect : ISqlDialect
 
         // Note: see QuoteColumnAlias. Quoted identifiers are upper-cased to stay
         // consistent with Oracle's folding of unquoted identifiers to UPPER.
-        if (keywords.Contains(s) || s.IndexOf(' ') >= 0)
-            return '"' + s.ToUpperInvariant() + '"';
+        if (keywords.Contains(s) || !SqlSyntax.IsValidIdentifier(s) || s[0] == '_')
+            return '"' + s.ToUpperInvariant().Replace("\"", "\"\"") + '"';
 
         return s;
     }

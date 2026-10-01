@@ -25,6 +25,16 @@ public class OracleDialectQuoteTests
         Assert.Equal("MyColumn", OracleDialect.Instance.QuoteIdentifier("MyColumn"));
     }
 
+    [Theory]
+    [InlineData("Order-Detail", "\"ORDER-DETAIL\"")]
+    [InlineData("my.table", "\"MY.TABLE\"")]
+    [InlineData("123col", "\"123COL\"")]
+    [InlineData("_col", "\"_COL\"")]
+    public void QuoteIdentifier_Quotes_Invalid_Unquoted_Identifiers(string identifier, string expected)
+    {
+        Assert.Equal(expected, OracleDialect.Instance.QuoteIdentifier(identifier));
+    }
+
     [Fact]
     public void QuoteColumnAlias_Upper_Cases_Alias()
     {
