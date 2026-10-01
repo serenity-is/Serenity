@@ -191,8 +191,11 @@ public class QueryWithParams : IQueryWithParams
         if (parent != null)
             return parent.AutoParam();
 
-        if (isFrozen)
+        if (IsFrozen)
             throw new InvalidOperationException("Query has been frozen.");
+
+        if (IsParamsFrozen)
+            throw new InvalidOperationException("Query parameters have been frozen.");
 
         return new Parameter((++nextAutoParam).IndexParam());
     }

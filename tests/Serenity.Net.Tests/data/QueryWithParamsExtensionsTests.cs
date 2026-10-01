@@ -65,6 +65,26 @@ public class QueryWithParamsExtensionsTests
     }
 
     [Fact]
+    public void AutoParam_WhenParamsFrozen_Throws_Without_Advancing_Counter()
+    {
+        var query = new SqlQuery();
+        query.FreezeParams();
+
+        Assert.Throws<InvalidOperationException>(() => query.AutoParam());
+        Assert.False(query.HasAutoParams);
+    }
+
+    [Fact]
+    public void AutoParam_WhenQueryFrozen_Throws_Without_Advancing_Counter()
+    {
+        var query = new SqlQuery().Select("c");
+        query.Freeze();
+
+        Assert.Throws<InvalidOperationException>(() => query.AutoParam());
+        Assert.False(query.HasAutoParams);
+    }
+
+    [Fact]
     public void Freeze_Freezes_Query_And_Subquery_Tree()
     {
         var query = new SqlQuery().Select("c").From("t");
