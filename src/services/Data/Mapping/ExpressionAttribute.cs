@@ -25,7 +25,8 @@ public class ExpressionAttribute(string value) : BaseExpressionAttribute
     public ExpressionAttribute(string expression, params ServerType[] serverTypes)
         : this(expression)
     {
-        Dialect = string.Join(",", serverTypes);
+        if (serverTypes is { Length: > 0 })
+            Dialect = string.Join(",", serverTypes);
     }
 
     /// <inheritdoc/>
@@ -56,7 +57,8 @@ public class ExpressionAttribute(string value) : BaseExpressionAttribute
     public bool NegateDialect
     {
         get => Dialect != null && Dialect.StartsWith('!');
-        set => Dialect = value ? (!NegateDialect ? ("!" + Dialect) : Dialect) :
+        set => Dialect = value ?
+            (Dialect != null && !NegateDialect ? "!" + Dialect : Dialect) :
             (NegateDialect ? Dialect![1..] : Dialect);
     }
 }

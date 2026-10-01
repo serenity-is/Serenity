@@ -453,7 +453,7 @@ public class RowFieldsBaseTestsMore
     [Fact]
     public void LeftJoin_Without_ForeignField_Throws()
     {
-        Assert.Throws<InvalidProgramException>(() =>
+        Assert.Throws<ArgumentNullException>(() =>
             new JoinNoForeignFieldRow.RowFields().Initialize(annotations: null, dialect: SqlSettings.DefaultDialect, userEntityOptions: null));
     }
 

@@ -170,6 +170,8 @@ public class MappingAttributesTests
 
         var dialectAttr = new ExpressionAttribute("T0.A", ServerType.MySql);
         Assert.Equal("MySql", dialectAttr.Dialect);
+
+        Assert.Null(new ExpressionAttribute("T0.A", Array.Empty<ServerType>()).Dialect);
     }
 
     [Fact]
@@ -200,6 +202,9 @@ public class MappingAttributesTests
 
         var noDialect = new ExpressionAttribute("T0.A");
         Assert.False(noDialect.NegateDialect);
+        noDialect.NegateDialect = true;
+        Assert.False(noDialect.NegateDialect);
+        Assert.Null(noDialect.Dialect);
         noDialect.NegateDialect = false;
         Assert.Null(noDialect.Dialect);
     }
