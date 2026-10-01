@@ -2,6 +2,11 @@ namespace Serenity.Data;
 
 public class DefaultSqlDialectMapperTests
 {
+    public sealed class DialectWithoutParameterlessConstructor(string value) : SqliteDialect
+    {
+        public string Value { get; } = value;
+    }
+
     [Theory]
     [InlineData("System.Data.SqlClient", "SqlServer2012")]
     [InlineData("Npgsql", "Postgres")]
@@ -21,6 +26,15 @@ public class DefaultSqlDialectMapperTests
         var mapper = new DefaultSqlDialectMapper();
 
         Assert.Same(SqliteDialect.Instance, mapper.TryGet("SqliteDialect"));
+    }
+
+    [Fact]
+    public void SqliteDialect_Instance_Is_ReadOnly()
+    {
+        var field = typeof(SqliteDialect).GetField(nameof(SqliteDialect.Instance));
+
+        Assert.NotNull(field);
+        Assert.True(field.IsInitOnly);
     }
 
     [Fact]
@@ -71,6 +85,14 @@ public class DefaultSqlDialectMapperTests
     public void TryGet_Unknown_ReturnsNull()
     {
         Assert.Null(new DefaultSqlDialectMapper().TryGet("NoSuchDialect"));
+    }
+
+    [Fact]
+    public void TryGet_TypeWithoutParameterlessConstructor_ReturnsNull()
+    {
+        var typeName = typeof(DialectWithoutParameterlessConstructor).AssemblyQualifiedName;
+
+        Assert.Null(new DefaultSqlDialectMapper().TryGet(typeName));
     }
 
     [Fact]

@@ -9,7 +9,7 @@ public class SqliteDialect : ISqlDialect
     /// <summary>
     /// The shared instance of SqliteDialect.
     /// </summary>
-    public static ISqlDialect Instance = new SqliteDialect();
+    public static readonly ISqlDialect Instance = new SqliteDialect();
 
     /// <inheritdoc/>
     public virtual bool CanUseConcat => false;

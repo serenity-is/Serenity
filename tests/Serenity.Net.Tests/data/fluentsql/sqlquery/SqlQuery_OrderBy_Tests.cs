@@ -67,6 +67,20 @@ public partial class SqlQuery_OrderBy_Tests
     }
 
     [Fact]
+    public void OrderBy_DoesNotAppendDuplicateDesc()
+    {
+        var query = new SqlQuery()
+            .Select("T0.C")
+            .From("TestTable T0")
+            .OrderBy("T0.C DESC", desc: true)
+            .OrderByFirst("T0.D DESC", desc: true);
+
+        Assert.Equal(
+            Normalize.Sql("SELECT T0.C FROM TestTable T0 ORDER BY T0.D DESC, T0.C DESC"),
+            Normalize.Sql(query.ToString()));
+    }
+
+    [Fact]
     public void OrderBy_Ensures_Referenced_Joins()
     {
         AssertClauseEnsuresJoin(

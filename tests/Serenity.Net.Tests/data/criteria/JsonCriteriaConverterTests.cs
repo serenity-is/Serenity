@@ -21,7 +21,7 @@ public class JsonCriteriaConverterTests
     [InlineData(typeof(Criteria), true)]
     [InlineData(typeof(ValueCriteria), true)]
     [InlineData(typeof(UnaryCriteria), true)]
-    [InlineData(typeof(BaseCriteria), false)]
+    [InlineData(typeof(BaseCriteria), true)]
     [InlineData(typeof(string), false)]
     [InlineData(typeof(object), false)]
     public void CanConvert_ChecksForBaseCriteriaSubclass(Type type, bool expected)

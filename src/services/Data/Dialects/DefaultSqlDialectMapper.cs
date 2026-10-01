@@ -49,9 +49,10 @@ public class DefaultSqlDialectMapper : ISqlDialectMapper
             if (DialectByTypeName.TryGetValue(dialectOrProviderName, out dialect))
                 return dialect;
 
-            var dialectType = Type.GetType("Serenity.Data." + dialectOrProviderName + "Dialect", false, true) ??
+            var dialectType = Type.GetType(dialectOrProviderName, false, true) ??
+                Type.GetType("Serenity.Data." + dialectOrProviderName + "Dialect", false, true) ??
                 Type.GetType("Serenity.Data." + dialectOrProviderName, false, true) ??
-                Type.GetType(dialectOrProviderName, false, true);
+                null;
 
             dialect = dialectType is null ? null : CreateDialect(dialectType);
             DialectByTypeName[dialectOrProviderName] = dialect;
@@ -71,6 +72,16 @@ public class DefaultSqlDialectMapper : ISqlDialectMapper
         if (dialectType.GetProperty("Instance", flags)?.GetValue(null) is ISqlDialect propertyInstance)
             return propertyInstance;
 
-        return Activator.CreateInstance(dialectType) as ISqlDialect;
+        if (dialectType.GetConstructor(Type.EmptyTypes) is null)
+            return null;
+
+        try
+        {
+            return Activator.CreateInstance(dialectType) as ISqlDialect;
+        }
+        catch (MissingMethodException)
+        {
+            return null;
+        }
     }
 }

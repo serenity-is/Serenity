@@ -298,7 +298,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
         BeforeModify();
 
         if (desc)
-            expression += SqlKeywords.Desc;
+            expression = AppendDescIfMissing(expression);
 
         orderBy ??= [];
 
@@ -347,7 +347,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
         BeforeModify();
 
         if (desc)
-            expression += SqlKeywords.Desc;
+            expression = AppendDescIfMissing(expression);
 
         orderBy ??= [];
 
@@ -369,6 +369,17 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
         EnsureJoinsInExpression(expression!);
 
         return this;
+    }
+
+    private static string AppendDescIfMissing(string expression)
+    {
+        var trimmed = expression.TrimEnd();
+        const string desc = "DESC";
+        if (trimmed.EndsWith(desc, StringComparison.OrdinalIgnoreCase) &&
+            (trimmed.Length == desc.Length || char.IsWhiteSpace(trimmed[trimmed.Length - desc.Length - 1])))
+            return expression;
+
+        return expression + SqlKeywords.Desc;
     }
 
     /// <summary>

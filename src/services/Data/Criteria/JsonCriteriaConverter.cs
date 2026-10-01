@@ -290,7 +290,7 @@ public class JsonCriteriaConverter : JsonConverter
     ///   True if this instance can convert the specified object type; otherwise, false.</returns>
     public override bool CanConvert(Type objectType)
     {
-        return objectType.IsSubclassOf(typeof(BaseCriteria));
+        return typeof(BaseCriteria).IsAssignableFrom(objectType);
     }
 
     /// <summary>
