@@ -5,9 +5,45 @@ namespace Serenity.Data;
 /// </summary>
 public static class SqlSyntax
 {
-    private static string[]? _indexParam;
-    private static string[]? _tableAlias;
-    private static string[]? _tableAliasDot;
+    // One nested class per array: using one cache doesn't initialize the others,
+    // and other SqlSyntax members initialize none. The CLR still guarantees
+    // exactly-once initialization for each.
+    private static class IndexParamCache
+    {
+        internal static readonly string[] Values;
+
+        static IndexParamCache()
+        {
+            Values = new string[1000];
+            for (int index = 0; index < Values.Length; index++)
+                Values[index] = "@p" + index;
+        }
+    }
+
+    private static class TableAliasCache
+    {
+        internal static readonly string[] Values;
+
+        static TableAliasCache()
+        {
+            Values = new string[100];
+            for (int i = 0; i < Values.Length; i++)
+                Values[i] = "T" + i.ToString(CultureInfo.InvariantCulture);
+        }
+    }
+
+    private static class TableAliasDotCache
+    {
+        internal static readonly string[] Values;
+
+        static TableAliasDotCache()
+        {
+            Values = new string[100];
+            for (int i = 0; i < Values.Length; i++)
+                Values[i] = "T" + i.ToString(CultureInfo.InvariantCulture) + ".";
+        }
+    }
+
     private static readonly CultureInfo _invariant = CultureInfo.InvariantCulture;
 
     /// <summary>
@@ -21,16 +57,8 @@ public static class SqlSyntax
     /// </returns>
     public static string IndexParam(this int param)
     {
-        if (_indexParam == null)
-        {
-            var indexParam = new string[1000];
-            for (int index = 0; index < indexParam.Length; index++)
-                indexParam[index] = "@p" + index;
-            _indexParam = indexParam;
-        }
-
-        if (param >= 0 && param < _indexParam.Length)
-            return _indexParam[param];
+        if (param >= 0 && param < IndexParamCache.Values.Length)
+            return IndexParamCache.Values[param];
         else
             return "@p" + param;
     }
@@ -42,16 +70,8 @@ public static class SqlSyntax
     /// <returns>The table alias.</returns>
     public static string TableAlias(this int joinIndex)
     {
-        if (_tableAlias == null)
-        {
-            var tableAlias = new string[100];
-            for (int i = 0; i < tableAlias.Length; i++)
-                tableAlias[i] = "T" + i.ToString(_invariant);
-            _tableAlias = tableAlias;
-        }
-
-        if (joinIndex >= 0 && joinIndex < _tableAlias.Length)
-            return _tableAlias[joinIndex];
+        if (joinIndex >= 0 && joinIndex < TableAliasCache.Values.Length)
+            return TableAliasCache.Values[joinIndex];
         else
             return "T" + joinIndex.ToString(_invariant);
     }
@@ -63,16 +83,8 @@ public static class SqlSyntax
     /// <returns>The table alias dot.</returns>
     public static string TableAliasDot(this int joinIndex)
     {
-        if (_tableAliasDot == null)
-        {
-            var tableAliasDot = new string[100];
-            for (int i = 0; i < tableAliasDot.Length; i++)
-                tableAliasDot[i] = "T" + i.ToString(_invariant) + ".";
-            _tableAliasDot = tableAliasDot;
-        }
-
-        if (joinIndex >= 0 && joinIndex < _tableAliasDot.Length)
-            return _tableAliasDot[joinIndex];
+        if (joinIndex >= 0 && joinIndex < TableAliasDotCache.Values.Length)
+            return TableAliasDotCache.Values[joinIndex];
         else
             return "T" + joinIndex.ToString(_invariant) + ".";
     }

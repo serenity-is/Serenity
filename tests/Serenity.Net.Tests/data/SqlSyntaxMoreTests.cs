@@ -22,6 +22,26 @@ public class SqlSyntaxMoreTests
     }
 
     [Fact]
+    public void Caches_Return_Same_Instance_Under_Concurrency()
+    {
+        const int count = 64;
+        var params1 = new string[count];
+        var aliases = new string[count];
+        var aliasDots = new string[count];
+
+        Parallel.For(0, count, i =>
+        {
+            params1[i] = 5.IndexParam();
+            aliases[i] = 5.TableAlias();
+            aliasDots[i] = 5.TableAliasDot();
+        });
+
+        Assert.All(params1, x => Assert.Same(params1[0], x));
+        Assert.All(aliases, x => Assert.Same(aliases[0], x));
+        Assert.All(aliasDots, x => Assert.Same(aliasDots[0], x));
+    }
+
+    [Fact]
     public void IsReservedKeywordForAny_Checks_All_Dialects()
     {
         Assert.False(SqlSyntax.IsReservedKeywordForAny(null!));
