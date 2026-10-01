@@ -28,7 +28,9 @@ public static class ConnectionExtensions
 
     /// <summary>
     /// Ensures the connection is open. Warning! This method will not reopen a connection that was once opened
-    /// and will raise an error.
+    /// and will raise an error. Reopening onto a fresh session while a (possibly stale,
+    /// post-close) transaction reference remains would enlist later commands in a dead
+    /// transaction, so reuse after close is refused instead of silently allowed.
     /// </summary>
     /// <param name="connection">The connection.</param>
     /// <returns>The connection.</returns>
@@ -52,7 +54,9 @@ public static class ConnectionExtensions
 
     /// <summary>
     /// Ensures the connection is open asynchronously. Warning! This method will not reopen a connection
-    /// that was once opened and will raise an error.
+    /// that was once opened and will raise an error. Reopening onto a fresh session while a (possibly stale,
+    /// post-close) transaction reference remains would enlist later commands in a dead
+    /// transaction, so reuse after close is refused instead of silently allowed.
     /// </summary>
     /// <param name="connection">The connection.</param>
     /// <param name="cancellationToken">The cancellation token.</param>

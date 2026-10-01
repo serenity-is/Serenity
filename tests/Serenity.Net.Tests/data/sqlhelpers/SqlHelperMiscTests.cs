@@ -39,41 +39,41 @@ public class SqlHelperMiscTests
     }
 
     [Fact]
-    public void ExecuteNonQuery_WithConnectionPoolException_ClosesReopensAndRetries()
+    public void ExecuteNonQuery_WithConnectionPoolException_DoesNotRetryUntracked()
     {
         var calls = 0;
         using var connection = new MockDbConnection()
             .OnDbCommandExecuteNonQuery(_ =>
             {
-                if (++calls == 1)
-                    throw new SqlException(10054);
-                return 7;
+                calls++;
+                throw new SqlException(10054);
             });
 
-        var result = SqlHelper.ExecuteNonQuery(connection, "DELETE FROM T");
+        // Connections without open-history tracking never retry: first-use can't
+        // be verified, so re-executing could duplicate real effects.
+        Assert.Throws<SqlException>(() =>
+            SqlHelper.ExecuteNonQuery(connection, "DELETE FROM T"));
 
-        Assert.Equal(7, result);
-        Assert.Equal(2, calls);
-        Assert.Equal(2, connection.OpenCalls);
+        Assert.Equal(1, calls);
+        Assert.Equal(1, connection.OpenCalls);
     }
 
     [Fact]
-    public void ExecuteNonQuery_WithMicrosoftSqlClientPoolException_ClosesReopensAndRetries()
+    public void ExecuteNonQuery_WithMicrosoftSqlClientPoolException_DoesNotRetryUntracked()
     {
         var calls = 0;
         using var connection = new MockDbConnection()
             .OnDbCommandExecuteNonQuery(_ =>
             {
-                if (++calls == 1)
-                    throw new Microsoft.Data.SqlClient.SqlException(10054);
-                return 7;
+                calls++;
+                throw new Microsoft.Data.SqlClient.SqlException(10054);
             });
 
-        var result = SqlHelper.ExecuteNonQuery(connection, "DELETE FROM T");
+        Assert.Throws<Microsoft.Data.SqlClient.SqlException>(() =>
+            SqlHelper.ExecuteNonQuery(connection, "DELETE FROM T"));
 
-        Assert.Equal(7, result);
-        Assert.Equal(2, calls);
-        Assert.Equal(2, connection.OpenCalls);
+        Assert.Equal(1, calls);
+        Assert.Equal(1, connection.OpenCalls);
     }
 
     [Fact]
@@ -94,6 +94,92 @@ public class SqlHelperMiscTests
     }
 
     [Fact]
+    public void ExecuteNonQuery_WithFreshWrappedConnection_RetriesPoolExceptionOnce()
+    {
+        var calls = 0;
+        using var actual = new MockDbConnection()
+            .OnDbCommandExecuteNonQuery(_ =>
+            {
+                if (++calls == 1)
+                    throw new SqlException(10054);
+                return 7;
+            });
+        // Fresh wrapper, first EnsureOpen + first query: nothing ran before,
+        // so the dead-checkout failure may retry once.
+        using var connection = new WrappedConnection(actual, SqlServer2012Dialect.Instance);
+
+        var result = SqlHelper.ExecuteNonQuery(connection, "DELETE FROM T");
+
+        Assert.Equal(7, result);
+        Assert.Equal(2, calls);
+        Assert.Equal(2, actual.OpenCalls);
+    }
+
+    [Fact]
+    public async Task ExecuteNonQueryAsync_WithFreshWrappedConnection_RetriesPoolExceptionOnce()
+    {
+        var calls = 0;
+        using var actual = new MockDbConnection()
+            .OnDbCommandExecuteNonQuery(_ =>
+            {
+                if (++calls == 1)
+                    throw new SqlException(10054);
+                return 7;
+            });
+        using var connection = new WrappedConnection(actual, SqlServer2012Dialect.Instance);
+
+        var result = await SqlHelper.ExecuteNonQueryAsync(connection, "DELETE FROM T",
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.Equal(7, result);
+        Assert.Equal(2, calls);
+        Assert.Equal(2, actual.OpenCalls);
+    }
+
+    [Fact]
+    public void ExecuteReader_WithFreshWrappedConnection_RetriesPoolExceptionOnce()
+    {
+        var calls = 0;
+        using var actual = new MockDbConnection()
+            .OnDbCommandExecuteReader(_ =>
+            {
+                if (++calls == 1)
+                    throw new SqlException(10054);
+                return new MockDbDataReader(new { X = 1 });
+            });
+        using var connection = new WrappedConnection(actual, SqlServer2012Dialect.Instance);
+
+        using var reader = SqlHelper.ExecuteReader(connection, "SELECT X", null);
+
+        Assert.True(reader.Read());
+        Assert.Equal(2, calls);
+        Assert.Equal(2, actual.OpenCalls);
+    }
+
+    [Fact]
+    public void ExecuteNonQuery_WithSecondUseOfWrappedConnection_DoesNotRetryPoolException()
+    {
+        var calls = 0;
+        using var actual = new MockDbConnection()
+            .OnDbCommandExecuteNonQuery(_ =>
+            {
+                calls++;
+                throw new SqlException(10054);
+            });
+        using var connection = new WrappedConnection(actual, SqlServer2012Dialect.Instance);
+
+        // First use opens the wrapper; the failure below is a secondary execution
+        // attempt on tracked history, so it must not retry even though the
+        // connection itself never transacted.
+        connection.Open();
+        Assert.Throws<SqlException>(() =>
+            SqlHelper.ExecuteNonQuery(connection, "DELETE FROM T"));
+
+        Assert.Equal(1, calls);
+        Assert.Equal(1, actual.OpenCalls);
+    }
+
+    [Fact]
     public void ExecuteNonQuery_WithOpenedOnceConnection_DoesNotRetryPoolException()
     {
         using var connection = new OpenedOnceConnection();
@@ -108,82 +194,143 @@ public class SqlHelperMiscTests
     }
 
     [Fact]
-    public async Task ExecuteNonQueryAsync_WithConnectionPoolException_ClosesReopensAndRetries()
+    public void ExecuteNonQuery_WithFreshWrappedConnection_RetriesOnceThenThrows()
+    {
+        var calls = 0;
+        using var actual = new MockDbConnection()
+            .OnDbCommandExecuteNonQuery(_ =>
+            {
+                calls++;
+                throw new SqlException(10054);
+            });
+        using var connection = new WrappedConnection(actual, SqlServer2012Dialect.Instance);
+
+        // Fresh wrapper, first EnsureOpen + first query: the failure retries once,
+        // and the retry failing too propagates (bounded to a single retry, no loop).
+        var ex = Assert.Throws<SqlException>(() =>
+            SqlHelper.ExecuteNonQuery(connection, "DELETE FROM T"));
+
+        Assert.Equal("DELETE FROM T", ex.Data["sql_command_text"]);
+        Assert.Equal(2, calls);
+        Assert.Equal(2, actual.OpenCalls);
+    }
+
+    [Fact]
+    public void ExecuteNonQuery_WithWrappedOverOpenConnection_DoesNotRetryPoolException()
+    {
+        var calls = 0;
+        using var actual = new MockDbConnection()
+            .OnDbCommandExecuteNonQuery(_ =>
+            {
+                calls++;
+                throw new SqlException(10054);
+            });
+        // Opened directly on the actual connection: the wrapper inherits the
+        // open history, so the failure is not verifiably first-use.
+        actual.Open();
+        using var connection = new WrappedConnection(actual, SqlServer2012Dialect.Instance);
+
+        Assert.Throws<SqlException>(() =>
+            SqlHelper.ExecuteNonQuery(connection, "DELETE FROM T"));
+
+        Assert.Equal(1, calls);
+        Assert.Equal(1, actual.OpenCalls);
+    }
+
+    [Fact]
+    public async Task ExecuteNonQueryAsync_WithWrappedOverOpenConnection_DoesNotRetryPoolException()
+    {
+        var calls = 0;
+        using var actual = new MockDbConnection()
+            .OnDbCommandExecuteNonQuery(_ =>
+            {
+                calls++;
+                throw new SqlException(10054);
+            });
+        actual.Open();
+        using var connection = new WrappedConnection(actual, SqlServer2012Dialect.Instance);
+
+        await Assert.ThrowsAsync<SqlException>(() =>
+            SqlHelper.ExecuteNonQueryAsync(connection, "DELETE FROM T",
+                cancellationToken: TestContext.Current.CancellationToken));
+
+        Assert.Equal(1, calls);
+        Assert.Equal(1, actual.OpenCalls);
+    }
+
+    [Fact]
+    public async Task ExecuteNonQueryAsync_WithConnectionPoolException_DoesNotRetryUntracked()
     {
         var calls = 0;
         using var connection = new MockDbConnection()
             .OnDbCommandExecuteNonQuery(_ =>
             {
-                if (++calls == 1)
-                    throw new SqlException(10054);
-                return 3;
+                calls++;
+                throw new SqlException(10054);
             });
 
-        var result = await SqlHelper.ExecuteNonQueryAsync(connection, "DELETE FROM T",
-            cancellationToken: TestContext.Current.CancellationToken);
+        await Assert.ThrowsAsync<SqlException>(() =>
+            SqlHelper.ExecuteNonQueryAsync(connection, "DELETE FROM T",
+                cancellationToken: TestContext.Current.CancellationToken));
 
-        Assert.Equal(3, result);
-        Assert.Equal(2, calls);
-        Assert.Equal(2, connection.OpenCalls);
+        Assert.Equal(1, calls);
+        Assert.Equal(1, connection.OpenCalls);
     }
 
     [Fact]
-    public void ExecuteReader_WithConnectionPoolException_Retries()
+    public void ExecuteReader_WithConnectionPoolException_DoesNotRetryUntracked()
     {
         var calls = 0;
         using var connection = new MockDbConnection()
             .OnDbCommandExecuteReader(_ =>
             {
-                if (++calls == 1)
-                    throw new SqlException(10054);
-                return new MockDbDataReader(new { X = 1 });
+                calls++;
+                throw new SqlException(10054);
             });
 
-        using var reader = SqlHelper.ExecuteReader(connection, "SELECT X", null);
+        Assert.Throws<SqlException>(() =>
+            SqlHelper.ExecuteReader(connection, "SELECT X", null));
 
-        Assert.True(reader.Read());
-        Assert.Equal(2, calls);
-        Assert.Equal(2, connection.OpenCalls);
+        Assert.Equal(1, calls);
+        Assert.Equal(1, connection.OpenCalls);
     }
 
     [Fact]
-    public void ExecuteScalar_WithConnectionPoolException_Retries()
+    public void ExecuteScalar_WithConnectionPoolException_DoesNotRetryUntracked()
     {
         var calls = 0;
         using var connection = new MockDbConnection()
             .OnDbCommandExecuteScalar(_ =>
             {
-                if (++calls == 1)
-                    throw new SqlException(10054);
-                return 42;
+                calls++;
+                throw new SqlException(10054);
             });
 
-        var result = SqlHelper.ExecuteScalar(connection, "SELECT X");
+        Assert.Throws<SqlException>(() =>
+            SqlHelper.ExecuteScalar(connection, "SELECT X"));
 
-        Assert.Equal(42, result);
-        Assert.Equal(2, calls);
-        Assert.Equal(2, connection.OpenCalls);
+        Assert.Equal(1, calls);
+        Assert.Equal(1, connection.OpenCalls);
     }
 
     [Fact]
-    public async Task ExecuteNonQueryAsync_NonDbConnection_WithPoolException_Retries()
+    public async Task ExecuteNonQueryAsync_NonDbConnection_WithPoolException_DoesNotRetry()
     {
         var calls = 0;
         using var inner = new MockDbConnection()
             .OnDbCommandExecuteNonQuery(_ =>
             {
-                if (++calls == 1)
-                    throw new SqlException(10054);
-                return 5;
+                calls++;
+                throw new SqlException(10054);
             });
         using var connection = new PlainDbConnection(inner);
 
-        var result = await SqlHelper.ExecuteNonQueryAsync(connection, "DELETE FROM T",
-            cancellationToken: TestContext.Current.CancellationToken);
+        await Assert.ThrowsAsync<SqlException>(() =>
+            SqlHelper.ExecuteNonQueryAsync(connection, "DELETE FROM T",
+                cancellationToken: TestContext.Current.CancellationToken));
 
-        Assert.Equal(5, result);
-        Assert.Equal(2, calls);
-        Assert.Equal(2, inner.OpenCalls);
+        Assert.Equal(1, calls);
+        Assert.Equal(1, inner.OpenCalls);
     }
 
     [Fact]
@@ -330,43 +477,41 @@ public class SqlHelperMiscTests
     }
 
     [Fact]
-    public async Task ExecuteReaderAsync_WithConnectionPoolException_Retries()
+    public async Task ExecuteReaderAsync_WithConnectionPoolException_DoesNotRetryUntracked()
     {
         var calls = 0;
         using var connection = new MockDbConnection()
             .OnDbCommandExecuteReader(_ =>
             {
-                if (++calls == 1)
-                    throw new SqlException(10054);
-                return new MockDbDataReader(new { X = 1 });
+                calls++;
+                throw new SqlException(10054);
             });
 
-        using var reader = await SqlHelper.ExecuteReaderAsync(connection, "SELECT X",
-            null, cancellationToken: TestContext.Current.CancellationToken);
+        await Assert.ThrowsAsync<SqlException>(() =>
+            SqlHelper.ExecuteReaderAsync(connection, "SELECT X",
+                null, cancellationToken: TestContext.Current.CancellationToken));
 
-        Assert.True(reader.Read());
-        Assert.Equal(2, calls);
-        Assert.Equal(2, connection.OpenCalls);
+        Assert.Equal(1, calls);
+        Assert.Equal(1, connection.OpenCalls);
     }
 
     [Fact]
-    public async Task ExecuteScalarAsync_WithConnectionPoolException_Retries()
+    public async Task ExecuteScalarAsync_WithConnectionPoolException_DoesNotRetryUntracked()
     {
         var calls = 0;
         using var connection = new MockDbConnection()
             .OnDbCommandExecuteScalar(_ =>
             {
-                if (++calls == 1)
-                    throw new SqlException(10054);
-                return 42;
+                calls++;
+                throw new SqlException(10054);
             });
 
-        var result = await SqlHelper.ExecuteScalarAsync(connection, "SELECT X",
-            cancellationToken: TestContext.Current.CancellationToken);
+        await Assert.ThrowsAsync<SqlException>(() =>
+            SqlHelper.ExecuteScalarAsync(connection, "SELECT X",
+                cancellationToken: TestContext.Current.CancellationToken));
 
-        Assert.Equal(42, result);
-        Assert.Equal(2, calls);
-        Assert.Equal(2, connection.OpenCalls);
+        Assert.Equal(1, calls);
+        Assert.Equal(1, connection.OpenCalls);
     }
 
     [Fact]

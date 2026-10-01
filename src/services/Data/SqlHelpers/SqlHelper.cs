@@ -197,40 +197,25 @@ public static class SqlHelper
     /// </summary>
     /// <param name="connection">The connection.</param>
     /// <param name="exception">The exception.</param>
-    /// <returns>True if exception is 10054, e.g. connection pool.</returns>
-    private static bool CheckConnectionPoolException(IDbConnection connection, Exception exception)
-    {
-        if (!CheckConnectionPoolExceptionCore(connection, exception))
-            return false;
-
-        connection.Close();
-        connection.Open();
-        return true;
-    }
-
     /// <summary>
-    /// Checks for the connection pool exception asynchronously.
+    /// Determines whether a transport failure on the given connection is eligible
+    /// for a single close + reopen + retry. This must be evaluated before EnsureOpen:
+    /// only a first EnsureOpen on a verifiably fresh scope qualifies — tracked
+    /// history (IHasOpenedOnce) showing it was never opened, with no live
+    /// transaction. Anything that ran before, including a transaction that has
+    /// since committed and detached (which no live-state check can see),
+    /// disqualifies, as re-executing could duplicate real effects. Callers pass
+    /// the connection the command was created from, so the history consults the
+    /// caller's (possibly wrapping) connection rather than the bare command one.
+    /// Multi-command calls (e.g. upserts) only ever re-execute the failed command,
+    /// so exposure stays bounded to that command's own ambiguity.
     /// </summary>
-    /// <param name="connection">The connection.</param>
-    /// <param name="exception">The exception.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result is true if exception is 10054, e.g. connection pool.</returns>
-    private static async Task<bool> CheckConnectionPoolExceptionAsync(IDbConnection connection, Exception exception, CancellationToken cancellationToken = default)
+    /// <param name="connection">The connection scope to check.</param>
+    /// <returns>True when a pool failure may be retried on this scope.</returns>
+    private static bool AllowPoolRetry(IDbConnection connection)
     {
-        if (!CheckConnectionPoolExceptionCore(connection, exception))
-            return false;
-
-        if (connection is System.Data.Common.DbConnection dbConnection)
-        {
-            await dbConnection.CloseAsync().ConfigureAwait(false);
-            await dbConnection.OpenAsync(cancellationToken).ConfigureAwait(false);
-        }
-        else
-        {
-            connection.Close();
-            connection.Open();
-        }
-        return true;
+        return connection is IHasOpenedOnce { OpenedOnce: false } &&
+            connection is not IHasCurrentTransaction { CurrentTransaction: not null };
     }
 
     /// <summary>
@@ -238,16 +223,11 @@ public static class SqlHelper
     /// exception (e.g. error 10054). The caller should close and reopen the connection
     /// when this returns true.
     /// </summary>
-    /// <param name="connection">The connection.</param>
     /// <param name="exception">The exception.</param>
     /// <returns>True if exception is 10054, e.g. connection pool.</returns>
-    private static bool CheckConnectionPoolExceptionCore(IDbConnection connection, Exception exception)
+    private static bool TryClearConnectionPool(Exception exception)
     {
         var exceptionType = exception.GetType();
-
-        if ((connection is IHasOpenedOnce hoo && hoo.OpenedOnce) ||
-            (connection is IHasCurrentTransaction hct && hct.CurrentTransaction != null))
-            return false;
 
         if ((exceptionType.FullName == "Microsoft.Data.SqlClient.SqlException" ||
             exceptionType.FullName == "System.Data.SqlClient.SqlException") &&
@@ -271,17 +251,22 @@ public static class SqlHelper
     /// <exception cref="ArgumentNullException">
     /// command is null or command.Connection is null.
     /// </exception>
-    private static int InternalExecuteNonQuery(IDbCommand command, ILogger? logger)
+    private static int InternalExecuteNonQuery(IDbCommand command, ILogger? logger, IDbConnection scopeConnection)
     {
         ArgumentNullException.ThrowIfNull(command);
 
         if (command.Connection == null)
             throw new ArgumentNullException("command.Connection");
 
+        ArgumentNullException.ThrowIfNull(scopeConnection);
+
+        // Snapshot before EnsureOpen flips any tracked flag (see AllowPoolRetry).
+        var allowPoolRetry = AllowPoolRetry(scopeConnection);
+
         try
         {
             int result;
-            command.Connection.EnsureOpen();
+            scopeConnection.EnsureOpen();
             var stopwatch = ValueStopwatch.StartNew();
             try
             {
@@ -294,8 +279,12 @@ public static class SqlHelper
             }
             catch (Exception ex)
             {
-                if (CheckConnectionPoolException(command.Connection, ex))
+                if (allowPoolRetry && TryClearConnectionPool(ex))
+                {
+                    scopeConnection.Close();
+                    scopeConnection.Open();
                     return command.ExecuteNonQuery();
+                }
                 else
                     throw;
             }
@@ -328,7 +317,7 @@ public static class SqlHelper
                 ExpectedRows.Ignore, null, false)) is { HasValue: true } intres)
             return (int)intres.Value!;
         using IDbCommand command = NewCommand(connection, commandText, param);
-        return InternalExecuteNonQuery(command, logger);
+        return InternalExecuteNonQuery(command, logger, connection);
     }
 
     private static Task<int> ExecuteNonQueryAsync(IDbCommand command, CancellationToken cancellationToken)
@@ -350,17 +339,22 @@ public static class SqlHelper
     /// <exception cref="ArgumentNullException">
     /// command is null or command.Connection is null.
     /// </exception>
-    private static async Task<int> InternalExecuteNonQueryAsync(IDbCommand command, ILogger? logger, CancellationToken cancellationToken = default)
+    private static async Task<int> InternalExecuteNonQueryAsync(IDbCommand command, ILogger? logger, IDbConnection scopeConnection, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(command);
 
         if (command.Connection == null)
             throw new ArgumentNullException("command.Connection");
 
+        ArgumentNullException.ThrowIfNull(scopeConnection);
+
+        // Snapshot before EnsureOpen flips any tracked flag (see AllowPoolRetry).
+        var allowPoolRetry = AllowPoolRetry(scopeConnection);
+
         try
         {
             int result;
-            await command.Connection.EnsureOpenAsync(cancellationToken).ConfigureAwait(false);
+            await scopeConnection.EnsureOpenAsync(cancellationToken).ConfigureAwait(false);
             var stopwatch = ValueStopwatch.StartNew();
             try
             {
@@ -373,8 +367,20 @@ public static class SqlHelper
             }
             catch (Exception ex)
             {
-                if (await CheckConnectionPoolExceptionAsync(command.Connection, ex, cancellationToken).ConfigureAwait(false))
+                if (allowPoolRetry && TryClearConnectionPool(ex))
+                {
+                    if (scopeConnection is System.Data.Common.DbConnection dbConnection)
+                    {
+                        await dbConnection.CloseAsync().ConfigureAwait(false);
+                        await dbConnection.OpenAsync(cancellationToken).ConfigureAwait(false);
+                    }
+                    else
+                    {
+                        scopeConnection.Close();
+                        scopeConnection.Open();
+                    }
                     return await ExecuteNonQueryAsync(command, cancellationToken).ConfigureAwait(false);
+                }
                 else
                     throw;
             }
@@ -408,7 +414,7 @@ public static class SqlHelper
                 ExpectedRows.Ignore, null, false) { CancellationToken = cancellationToken, IsAsync = true }).ConfigureAwait(false) is { HasValue: true } intres)
             return (int)intres.Value!;
         using IDbCommand command = NewCommand(connection, commandText, param);
-        return await InternalExecuteNonQueryAsync(command, logger, cancellationToken).ConfigureAwait(false);
+        return await InternalExecuteNonQueryAsync(command, logger, connection, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -437,7 +443,7 @@ public static class SqlHelper
         if (dialect.UseReturningIdentity || dialect.UseReturningIntoVar)
         {
             using var command = CreateReturningIdentityCommand(query, connection, queryText, dialect, parameters, out var param);
-            InternalExecuteNonQuery(command, logger);
+            InternalExecuteNonQuery(command, logger, connection);
             return Convert.ToInt64(param.Value);
         }
 
@@ -480,7 +486,7 @@ public static class SqlHelper
         if (dialect.UseReturningIdentity || dialect.UseReturningIntoVar)
         {
             using var command = CreateReturningIdentityCommand(query, connection, queryText, dialect, parameters, out var param);
-            await InternalExecuteNonQueryAsync(command, logger, cancellationToken).ConfigureAwait(false);
+            await InternalExecuteNonQueryAsync(command, logger, connection, cancellationToken).ConfigureAwait(false);
             return Convert.ToInt64(param.Value);
         }
 
@@ -578,7 +584,7 @@ public static class SqlHelper
             return;
 
         using var command = NewCommand(connection, commandText, parameters);
-        InternalExecuteNonQuery(command, logger);
+        InternalExecuteNonQuery(command, logger, connection);
     }
 
     /// <summary>
@@ -602,7 +608,7 @@ public static class SqlHelper
             return;
 
         using var command = NewCommand(connection, commandText, parameters);
-        await InternalExecuteNonQueryAsync(command, logger, cancellationToken).ConfigureAwait(false);
+        await InternalExecuteNonQueryAsync(command, logger, connection, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -649,7 +655,7 @@ public static class SqlHelper
             return (int)intres.Value!;
 
         using var command = NewCommand(connection, commandText, parameters);
-        return CheckExpectedRows(expectedRows, InternalExecuteNonQuery(command, logger));
+        return CheckExpectedRows(expectedRows, InternalExecuteNonQuery(command, logger, connection));
     }
 
     /// <summary>
@@ -699,7 +705,7 @@ public static class SqlHelper
             return (int)intres.Value!;
 
         using var command = NewCommand(connection, commandText, parameters);
-        return CheckExpectedRows(expectedRows, await InternalExecuteNonQueryAsync(command, logger, cancellationToken).ConfigureAwait(false));
+        return CheckExpectedRows(expectedRows, await InternalExecuteNonQueryAsync(command, logger, connection, cancellationToken).ConfigureAwait(false));
     }
 
     /// <summary>
@@ -723,7 +729,7 @@ public static class SqlHelper
             return (int)intres.Value!;
 
         using var command = NewCommand(connection, commandText, parameters);
-        return CheckExpectedRows(expectedRows, InternalExecuteNonQuery(command, logger));
+        return CheckExpectedRows(expectedRows, InternalExecuteNonQuery(command, logger, connection));
     }
 
     /// <summary>
@@ -748,7 +754,7 @@ public static class SqlHelper
             return (int)intres.Value!;
 
         using var command = NewCommand(connection, commandText, parameters);
-        return CheckExpectedRows(expectedRows, await InternalExecuteNonQueryAsync(command, logger, cancellationToken).ConfigureAwait(false));
+        return CheckExpectedRows(expectedRows, await InternalExecuteNonQueryAsync(command, logger, connection, cancellationToken).ConfigureAwait(false));
     }
 
     /// <summary>
@@ -777,7 +783,7 @@ public static class SqlHelper
             return (int)intres.Value!;
 
         using var command = NewCommand(connection, commandText, parameters);
-        return CheckExpectedRows(expectedRows, InternalExecuteNonQuery(command, logger));
+        return CheckExpectedRows(expectedRows, InternalExecuteNonQuery(command, logger, connection));
     }
 
     /// <summary>
@@ -805,12 +811,15 @@ public static class SqlHelper
             return (int)intres.Value!;
 
         using var command = NewCommand(connection, commandText, parameters);
-        return CheckExpectedRows(expectedRows, await InternalExecuteNonQueryAsync(command, logger, cancellationToken).ConfigureAwait(false));
+        return CheckExpectedRows(expectedRows, await InternalExecuteNonQueryAsync(command, logger, connection, cancellationToken).ConfigureAwait(false));
     }
 
     private static CommandOwningDataReader InternalExecuteReader(IDbConnection connection, string commandText, IReadOnlyDictionary<string, object?>? param, ILogger? logger)
     {
         ArgumentNullException.ThrowIfNull(connection);
+
+        // Snapshot before EnsureOpen flips any tracked flag (see AllowPoolRetry).
+        var allowPoolRetry = AllowPoolRetry(connection);
 
         connection.EnsureOpen();
 
@@ -840,8 +849,10 @@ public static class SqlHelper
                 }
                 catch (Exception ex)
                 {
-                    if (CheckConnectionPoolException(connection, ex))
+                    if (allowPoolRetry && TryClearConnectionPool(ex))
                     {
+                        connection.Close();
+                        connection.Open();
                         var retry = new CommandOwningDataReader(command.ExecuteReader(), command);
                         transferred = true;
                         return retry;
@@ -895,6 +906,9 @@ public static class SqlHelper
     {
         ArgumentNullException.ThrowIfNull(connection);
 
+        // Snapshot before EnsureOpen flips any tracked flag (see AllowPoolRetry).
+        var allowPoolRetry = AllowPoolRetry(connection);
+
         await connection.EnsureOpenAsync(cancellationToken).ConfigureAwait(false);
 
         try
@@ -924,8 +938,18 @@ public static class SqlHelper
                 }
                 catch (Exception ex)
                 {
-                    if (await CheckConnectionPoolExceptionAsync(connection, ex, cancellationToken).ConfigureAwait(false))
+                    if (allowPoolRetry && TryClearConnectionPool(ex))
                     {
+                        if (connection is System.Data.Common.DbConnection dbConnection)
+                        {
+                            await dbConnection.CloseAsync().ConfigureAwait(false);
+                            await dbConnection.OpenAsync(cancellationToken).ConfigureAwait(false);
+                        }
+                        else
+                        {
+                            connection.Close();
+                            connection.Open();
+                        }
                         var retry = new CommandOwningDataReader(
                             await ExecuteReaderAsync(command, cancellationToken).ConfigureAwait(false), command);
                         transferred = true;
@@ -1042,6 +1066,9 @@ public static class SqlHelper
     {
         ArgumentNullException.ThrowIfNull(connection);
 
+        // Snapshot before EnsureOpen flips any tracked flag (see AllowPoolRetry).
+        var allowPoolRetry = AllowPoolRetry(connection);
+
         connection.EnsureOpen();
 
         using IDbCommand command = NewCommand(connection, commandText, param);
@@ -1065,8 +1092,12 @@ public static class SqlHelper
             }
             catch (Exception ex)
             {
-                if (CheckConnectionPoolException(connection, ex))
+                if (allowPoolRetry && TryClearConnectionPool(ex))
+                {
+                    connection.Close();
+                    connection.Open();
                     return command.ExecuteScalar();
+                }
                 else
                     throw;
             }
@@ -1109,6 +1140,9 @@ public static class SqlHelper
     {
         ArgumentNullException.ThrowIfNull(connection);
 
+        // Snapshot before EnsureOpen flips any tracked flag (see AllowPoolRetry).
+        var allowPoolRetry = AllowPoolRetry(connection);
+
         await connection.EnsureOpenAsync(cancellationToken).ConfigureAwait(false);
 
         using IDbCommand command = NewCommand(connection, commandText, param);
@@ -1132,8 +1166,20 @@ public static class SqlHelper
             }
             catch (Exception ex)
             {
-                if (await CheckConnectionPoolExceptionAsync(connection, ex, cancellationToken).ConfigureAwait(false))
+                if (allowPoolRetry && TryClearConnectionPool(ex))
+                {
+                    if (connection is System.Data.Common.DbConnection dbConnection)
+                    {
+                        await dbConnection.CloseAsync().ConfigureAwait(false);
+                        await dbConnection.OpenAsync(cancellationToken).ConfigureAwait(false);
+                    }
+                    else
+                    {
+                        connection.Close();
+                        connection.Open();
+                    }
                     return await ExecuteScalarAsync(command, cancellationToken).ConfigureAwait(false);
+                }
                 else
                     throw;
             }

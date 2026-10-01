@@ -30,6 +30,12 @@ public class WrappedConnection : DbConnection, IDbConnection, IHasActualConnecti
         this.dialect = dialect;
         this.logger = logger;
 
+        // Inherit open history: an already-open actual connection may have run
+        // untracked work outside this wrapper, so it must not report itself as
+        // never-opened (which would wrongly qualify for first-use-only recovery).
+        if (connection.State != ConnectionState.Closed)
+            openedOnce = true;
+
         // Stored (not a throwaway lambda) so it can be unsubscribed on dispose;
         // otherwise the inner connection would keep this wrapper alive.
         StateChangeEventHandler handler = (s, e) => OnStateChange(e);
