@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Numerics;
 using System.Text.Json;
 
 namespace Serenity.JsonConverters;
@@ -105,15 +106,10 @@ public class CriteriaJsonConverter : JsonConverter<BaseCriteria>
             // Write emits scalar ValueCriteria as bare scalars (e.g. "test", 5),
             // so accept them back as ValueCriteria for round-trip symmetry.
             var element = JsonSerializer.Deserialize<JsonElement>(ref reader, options);
-            return element.ValueKind switch
-            {
-                JsonValueKind.String => new ValueCriteria(element.GetString()),
-                JsonValueKind.Number => new ValueCriteria(element.GetDouble()),
-                JsonValueKind.True => new ValueCriteria(true),
-                JsonValueKind.False => new ValueCriteria(false),
-                JsonValueKind.Null or JsonValueKind.Undefined => null,
-                _ => throw new JsonException(string.Format("Can't deserialize {0} as Criteria", element.ToString()))
-            };
+            if (element.ValueKind == JsonValueKind.Null || element.ValueKind == JsonValueKind.Undefined)
+                return null;
+
+            return new ValueCriteria(ParseScalarValue(element));
         }
 
         var value = JsonSerializer.Deserialize<JsonElement[]>(ref reader, options);
@@ -122,22 +118,65 @@ public class CriteriaJsonConverter : JsonConverter<BaseCriteria>
 
     private BaseCriteria ParseValue(JsonElement value)
     {
-        if (value.ValueKind == JsonValueKind.String)
-            return new ValueCriteria(value.GetString());
-        else if (value.ValueKind == JsonValueKind.Number)
-            return new ValueCriteria(value.GetDouble());
-        else if (value.ValueKind == JsonValueKind.True)
-            return new ValueCriteria(true);
-        else if (value.ValueKind == JsonValueKind.False)
-            return new ValueCriteria(false);
-        else if (value.ValueKind == JsonValueKind.Null ||
-            value.ValueKind == JsonValueKind.Undefined)
-            return new ValueCriteria(null);
-
         if (value.ValueKind == JsonValueKind.Array)
             return Parse(JsonSerializer.Deserialize<JsonElement[]>(value), allowEmpty: false);
 
+        if (value.ValueKind is JsonValueKind.String or JsonValueKind.Number or
+            JsonValueKind.True or JsonValueKind.False or JsonValueKind.Null or JsonValueKind.Undefined)
+            return new ValueCriteria(ParseScalarValue(value));
+
         throw new JsonException(string.Format("Can't deserialize {0} as Criteria value", value.ToString()));
+    }
+
+    private static object? ParseScalarValue(JsonElement value)
+    {
+        switch (value.ValueKind)
+        {
+            case JsonValueKind.String:
+                var text = value.GetString();
+                if (text is null)
+                    return null;
+
+                // Newtonsoft's default reader interprets ISO 8601 date strings
+                // as DateTime values. Restrict recognition to JSON-style ISO
+                // dates so ordinary strings that DateTime.TryParse accepts are
+                // not silently converted. GUIDs remain strings, as JSON has no
+                // scalar token distinction between a Guid and its string form.
+                if (text.Length >= 10 && text[4] == '-' && text[7] == '-' &&
+                    (text.Length == 10 || text[10] is 'T' or 't') &&
+                    DateTime.TryParse(text, CultureInfo.InvariantCulture,
+                        DateTimeStyles.RoundtripKind, out var dateTime))
+                    return dateTime;
+
+                return text;
+
+            case JsonValueKind.Number:
+                var rawNumber = value.GetRawText();
+                if (rawNumber.IndexOfAny(['.', 'e', 'E']) < 0)
+                {
+                    if (value.TryGetInt64(out var longValue))
+                        return longValue;
+
+                    if (BigInteger.TryParse(rawNumber, NumberStyles.AllowLeadingSign,
+                        CultureInfo.InvariantCulture, out var bigInteger))
+                        return bigInteger;
+                }
+
+                return value.GetDouble();
+
+            case JsonValueKind.True:
+                return true;
+
+            case JsonValueKind.False:
+                return false;
+
+            case JsonValueKind.Null:
+            case JsonValueKind.Undefined:
+                return null;
+
+            default:
+                throw new JsonException(string.Format("Can't deserialize {0} as Criteria value", value.ToString()));
+        }
     }
 
     private BaseCriteria Parse(JsonElement[]? array, bool allowEmpty)
@@ -163,14 +202,9 @@ public class CriteriaJsonConverter : JsonConverter<BaseCriteria>
                         continue;
                     }
 
-                    if (item.ValueKind == JsonValueKind.String)
-                            list.Add(item.GetString()!);
-                    else if (item.ValueKind == JsonValueKind.Number)
-                        list.Add(item.GetDouble());
-                    else if (item.ValueKind == JsonValueKind.True)
-                        list.Add(true);
-                    else if (item.ValueKind == JsonValueKind.False)
-                        list.Add(false);
+                    if (item.ValueKind is JsonValueKind.String or JsonValueKind.Number or
+                        JsonValueKind.True or JsonValueKind.False)
+                        list.Add(ParseScalarValue(item));
                     else
                         throw new JsonException(string.Format("Can't deserialize {0} as Criteria value", item.ToString()));
                 }

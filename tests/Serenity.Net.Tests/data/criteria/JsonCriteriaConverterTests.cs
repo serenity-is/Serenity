@@ -78,6 +78,17 @@ public class JsonCriteriaConverterTests
     }
 
     [Fact]
+    public void Read_GuidJsonString_Remains_String_Without_Type_Metadata()
+    {
+        const string guidText = "12345678-1234-1234-1234-123456789012";
+
+        var result = Newtonsoft.Json.JsonConvert.DeserializeObject<BaseCriteria>(
+            $"\"{guidText}\"", GetSettings());
+
+        Assert.Equal(guidText, Assert.IsType<string>(Assert.IsType<ValueCriteria>(result).Value));
+    }
+
+    [Fact]
     public void Write_ValueCriteriaString_WritesString()
     {
         Assert.Equal("\"test\"", Newtonsoft.Json.JsonConvert.SerializeObject(new ValueCriteria("test"), GetSettings()));
@@ -359,4 +370,3 @@ public class JsonCriteriaConverterTests
         }
     }
 }
-

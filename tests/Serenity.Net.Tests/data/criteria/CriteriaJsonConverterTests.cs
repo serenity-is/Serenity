@@ -1,4 +1,6 @@
 using System.Text.Json;
+using System.Globalization;
+using System.Numerics;
 
 namespace Serenity.JsonConverters;
 
@@ -198,7 +200,81 @@ public class CriteriaJsonConverterTests
 
         Assert.IsType<ValueCriteria>(result);
         var value = Assert.IsType<object[]>(((ValueCriteria)result).Value);
-        Assert.Equal(["a", "b", true, false, 3.0], value);
+        Assert.Equal(["a", "b", true, false, 3L], value);
+    }
+
+    [Fact]
+    public void Read_Integer_Preserves_Int64_Above_Double_Precision()
+    {
+        var result = Assert.IsType<ValueCriteria>(JsonSerializer.Deserialize<BaseCriteria>(
+            "9007199254740993", GetOptions()));
+
+        Assert.Equal(9007199254740993L, Assert.IsType<long>(result.Value));
+    }
+
+    [Fact]
+    public void Read_Binary_IntegerOperand_Preserves_Int64_Above_Double_Precision()
+    {
+        var result = Assert.IsType<BinaryCriteria>(JsonSerializer.Deserialize<BaseCriteria>(
+            "[\"A\",\"=\",9007199254740993]", GetOptions()));
+
+        Assert.Equal(9007199254740993L,
+            Assert.IsType<long>(Assert.IsType<ValueCriteria>(result.RightOperand).Value));
+    }
+
+    [Fact]
+    public void Read_Integer_Larger_Than_Int64_Preserves_BigInteger()
+    {
+        var result = Assert.IsType<ValueCriteria>(JsonSerializer.Deserialize<BaseCriteria>(
+            "18446744073709551616", GetOptions()));
+
+        Assert.Equal(BigInteger.Parse("18446744073709551616", CultureInfo.InvariantCulture),
+            Assert.IsType<BigInteger>(result.Value));
+    }
+
+    [Theory]
+    [InlineData("1.25", 1.25)]
+    [InlineData("1e2", 100.0)]
+    public void Read_Fractional_And_Exponent_Numbers_Are_Double(string json, double expected)
+    {
+        var result = Assert.IsType<ValueCriteria>(JsonSerializer.Deserialize<BaseCriteria>(json, GetOptions()));
+
+        Assert.Equal(expected, Assert.IsType<double>(result.Value));
+    }
+
+    [Fact]
+    public void Read_DateTime_String_Preserves_DateTime_ValueType()
+    {
+        var expected = new DateTime(2023, 1, 15, 10, 30, 0, DateTimeKind.Utc);
+        var json = JsonSerializer.Serialize<BaseCriteria>(new ValueCriteria(expected), GetOptions());
+
+        var result = Assert.IsType<ValueCriteria>(JsonSerializer.Deserialize<BaseCriteria>(json, GetOptions()));
+
+        Assert.Equal(expected, Assert.IsType<DateTime>(result.Value));
+    }
+
+    [Fact]
+    public void Read_Binary_DateTimeOperand_Preserves_DateTime_ValueType()
+    {
+        const string json = "[\"A\",\"=\",\"2023-01-15T10:30:00Z\"]";
+
+        var result = Assert.IsType<BinaryCriteria>(JsonSerializer.Deserialize<BaseCriteria>(json, GetOptions()));
+
+        Assert.IsType<DateTime>(Assert.IsType<ValueCriteria>(result.RightOperand).Value);
+    }
+
+    [Fact]
+    public void Read_Guid_String_Remains_String_Without_Type_Metadata()
+    {
+        var guid = Guid.Parse("12345678-1234-1234-1234-123456789012");
+        var json = JsonSerializer.Serialize<BaseCriteria>(new ValueCriteria(guid), GetOptions());
+
+        var result = Assert.IsType<ValueCriteria>(JsonSerializer.Deserialize<BaseCriteria>(json, GetOptions()));
+
+        // A Guid and a string containing the same text have identical JSON
+        // representations, so the criteria wire format has no type information
+        // with which to distinguish them during deserialization.
+        Assert.Equal(guid.ToString("D"), Assert.IsType<string>(result.Value));
     }
 
     [Fact]
@@ -243,7 +319,7 @@ public class CriteriaJsonConverterTests
 
     [Theory]
     [InlineData("\"string criteria\"", "string criteria")]
-    [InlineData("5", 5.0)]
+    [InlineData("5", 5L)]
     [InlineData("true", true)]
     [InlineData("false", false)]
     public void Read_ScalarRoot_ParsesAsValueCriteria(string json, object expected)
