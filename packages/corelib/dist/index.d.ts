@@ -374,8 +374,13 @@ export declare class CriteriaBuilder extends Array {
 	/**
 	 * Creates a `LIKE '%value%'` (contains) criteria.
 	 *
+	 * The value is treated as literal text: LIKE special characters are
+	 * escaped (see {@link escapeLikeWildcards}) and a 4-element array with
+	 * `ESCAPE '!'` is produced only when escaping was necessary, otherwise
+	 * a plain 3-element array, so older servers keep working.
+	 *
 	 * @param value - Substring to search for. Wrapped with `%` on both sides.
-	 * @returns Criteria `[field, "like", "%value%"]`.
+	 * @returns Criteria `[field, "like", "%value%"]` or `[field, "like", "%value%", "!"]`.
 	 * @example
 	 * Criteria("Name").contains("ser"); // [["Name"], "like", "%ser%"]
 	 */
@@ -383,8 +388,13 @@ export declare class CriteriaBuilder extends Array {
 	/**
 	 * Creates a `LIKE '%value'` (ends-with) criteria.
 	 *
+	 * The value is treated as literal text: LIKE special characters are
+	 * escaped (see {@link escapeLikeWildcards}) and a 4-element array with
+	 * `ESCAPE '!'` is produced only when escaping was necessary, otherwise
+	 * a plain 3-element array, so older servers keep working.
+	 *
 	 * @param value - Suffix to match. Prefixed with `%`.
-	 * @returns Criteria `[field, "like", "%value"]`.
+	 * @returns Criteria `[field, "like", "%value"]` or `[field, "like", "%value", "!"]`.
 	 * @example
 	 * Criteria("Email").endsWith("@example.com");
 	 */
@@ -464,10 +474,31 @@ export declare class CriteriaBuilder extends Array {
 	 */
 	like(value: any): Array<any>;
 	/**
+	 * Creates a `LIKE ... ESCAPE '!'` criteria with a pre-escaped mask.
+	 *
+	 * The mask must already be escaped (see {@link escapeLikeWildcards});
+	 * it is used as is. A 4-element array is produced only when the mask
+	 * contains the escape character, otherwise a plain 3-element array,
+	 * so older servers keep working. For literal values prefer
+	 * {@link CriteriaBuilder.contains}, {@link CriteriaBuilder.startsWith}
+	 * or {@link CriteriaBuilder.endsWith}.
+	 *
+	 * @param mask - LIKE mask, already escaped for `!`.
+	 * @returns Criteria `[field, "like", mask]` or `[field, "like", mask, "!"]`.
+	 * @example
+	 * Criteria("Name").likeEscaped("%a!%b%"); // [["Name"], "like", "%a!%b%", "!"]
+	 */
+	likeEscaped(mask: string): Array<any>;
+	/**
 	 * Creates a `LIKE 'value%'` (starts-with) criteria.
 	 *
+	 * The value is treated as literal text: LIKE special characters are
+	 * escaped (see {@link escapeLikeWildcards}) and a 4-element array with
+	 * `ESCAPE '!'` is produced only when escaping was necessary, otherwise
+	 * a plain 3-element array, so older servers keep working.
+	 *
 	 * @param value - Prefix to match. Suffixed with `%`.
-	 * @returns Criteria `[field, "like", "value%"]`.
+	 * @returns Criteria `[field, "like", "value%"]` or `[field, "like", "value%", "!"]`.
 	 * @example
 	 * Criteria("Name").startsWith("Jo"); // [["Name"], "like", "Jo%"]
 	 */
@@ -486,7 +517,35 @@ export declare class CriteriaBuilder extends Array {
 	 * @returns Criteria `[field, "not like", value]`.
 	 */
 	notLike(value: any): Array<any>;
+	/**
+	 * Creates a `NOT LIKE ... ESCAPE '!'` criteria with a pre-escaped mask.
+	 *
+	 * The mask must already be escaped (see {@link escapeLikeWildcards});
+	 * it is used as is. A 4-element array is produced only when the mask
+	 * contains the escape character, otherwise a plain 3-element array.
+	 *
+	 * @param mask - LIKE mask, already escaped for `!`.
+	 * @returns Criteria `[field, "not like", mask]` or `[field, "not like", mask, "!"]`.
+	 * @example
+	 * Criteria("Name").notLikeEscaped("%a!%b%"); // [["Name"], "not like", "%a!%b%", "!"]
+	 */
+	notLikeEscaped(mask: string): Array<any>;
 }
+/**
+ * Escapes a literal value for use in a LIKE pattern with the `!` escape character.
+ *
+ * The escape character itself is escaped first, then `%`, `_` and `[`.
+ * A `]` outside a `[...]` class is literal on all supported dialects, so it is left as is.
+ * The result must be used with `ESCAPE '!'` declared (see
+ * {@link CriteriaBuilder.likeEscaped}), otherwise the escape character
+ * matches itself instead of escaping.
+ *
+ * @param value - The literal value to escape.
+ * @returns The escaped value, with no `%` affixes added.
+ * @example
+ * escapeLikeWildcards("50%"); // "50!%"
+ */
+export declare function escapeLikeWildcards(value: string): string;
 /**
  * Parses a criteria expression string to Serenity criteria array format.
  *
@@ -636,6 +695,28 @@ export declare namespace Criteria {
 	 * @returns `["()", c]` or `c` if empty.
 	 */
 	function paren(c: any[]): any[];
+	/**
+	 * Creates an `UPPER(value)` function-call criteria.
+	 *
+	 * @param value - Function argument, typically a field criteria.
+	 * @returns Criteria `["function", ["UPPER", value]]`.
+	 * @example
+	 * Criteria.upper(Criteria("Name")); // ["function", ["UPPER", ["Name"]]]
+	 */
+	function upper(value: any[]): any[];
+	/**
+	 * Creates a function-call criteria. Function arguments use the same
+	 * criteria/value shapes as other criteria nodes. The server only accepts
+	 * function names registered with its criteria function factory.
+	 *
+	 * @param functionName - Name of the function.
+	 * @param args - Function arguments.
+	 * @returns Criteria `["function", [functionName, ...args]]`.
+	 * @example
+	 * Criteria.functionCall("COALESCE", Criteria("Name"), "unknown");
+	 * // ["function", ["COALESCE", ["Name"], "unknown"]]
+	 */
+	function functionCall(functionName: string, ...args: any[]): any[];
 	/**
 	 * Alias for {@link parseCriteria} — parses a criteria expression string or tagged template.
 	 *

@@ -92,7 +92,7 @@ export interface NoteRow {
 	EntityType?: string;
 	EntityId?: string;
 	Text?: string;
-	InsertUserId?: number;
+	InsertUserId?: any;
 	InsertDate?: string;
 	InsertUserDisplayName?: string;
 }
@@ -648,7 +648,7 @@ export declare namespace ProductLangService {
 export interface ProductLogRow {
 	ProductLogID?: number;
 	OperationType?: CaptureOperationType;
-	ChangingUserId?: number;
+	ChangingUserId?: any;
 	ValidFrom?: string;
 	ValidUntil?: string;
 	ProductID?: number;

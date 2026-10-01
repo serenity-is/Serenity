@@ -1209,7 +1209,8 @@ export interface GridOptions<TItem = any> {
 	 */
 	formatterFactory?: FormatterFactory;
 	/**
-	 * Defaults to `false`. If `true`, places frozen rows at the bottom edge of the grid.
+	 * Defaults to `false`. If `true`, requests frozen rows at the bottom edge of the grid.
+	 * Layouts without bottom-frozen row support leave `frozenRows` unfrozen.
 	 */
 	frozenBottom?: boolean | number;
 	/**
@@ -1218,8 +1219,9 @@ export interface GridOptions<TItem = any> {
 	 */
 	frozenColumns?: number;
 	/**
-	 * Defaults to `undefined`. If specified, freezes the given number of rows at the top or bottom
-	 * edge (if frozenBottom === true).
+	 * Defaults to `undefined`. If specified, freezes the given number of rows at the top, or at the
+	 * bottom when `frozenBottom` is `true` and the layout supports bottom-frozen rows. Otherwise,
+	 * those rows are left unfrozen when `frozenBottom` is `true`.
 	 */
 	frozenRows?: number;
 	/**
@@ -2567,7 +2569,8 @@ export declare class BasicLayout implements LayoutEngine {
 /**
  * Frozen/pinned layout providing pinned columns and frozen top panes.
  * Renders `start`/`main` bands with `top`/`body` panes and handles
- * `frozenRows`/`frozenBottom` and legacy `frozenColumns` options.
+ * `frozenRows` and legacy `frozenColumns` options.
+ * Bottom-frozen rows are unsupported; when requested, `frozenRows` are left unfrozen.
  */
 export declare class FrozenLayout implements LayoutEngine {
 	/** Host provided during {@link FrozenLayout.init}. */
@@ -2594,7 +2597,8 @@ export declare class FrozenLayout implements LayoutEngine {
 	 */
 	afterSetOptions(arg: GridOptions): void;
 	/**
-	 * Syncs `refs.config.frozenTopRows` from `frozenRows`/`frozenBottom` grid options.
+	 * Syncs `refs.config.frozenTopRows` from `frozenRows`, leaving rows unfrozen
+	 * when bottom-freezing is requested because this layout has no bottom pane.
 	 */
 	adjustFrozenRowsOption(): void;
 	/**
