@@ -2,6 +2,12 @@ namespace Serenity.Data;
 
 public class SqlQuery_GroupBy_Having_Tests
 {
+    private sealed class AliasWithJoins(string table, string name)
+        : Alias(table, name), IHaveJoins
+    {
+        public IDictionary<string, Join> Joins { get; } = new Dictionary<string, Join>();
+    }
+
     [Fact]
     public void GroupByWithExpressionWorks()
     {
@@ -73,5 +79,40 @@ public class SqlQuery_GroupBy_Having_Tests
             Normalize.Sql(
                 query.ToString())
         );
+    }
+
+    [Fact]
+    public void Having_Ensures_Referenced_Joins()
+    {
+        AssertClauseEnsuresJoin(
+            query => query.Having("T1.Value > 0"),
+            "HAVING T1.Value > 0");
+    }
+
+    [Fact]
+    public void GroupBy_Ensures_Referenced_Joins()
+    {
+        AssertClauseEnsuresJoin(
+            query => query.GroupBy("T1.Value"),
+            "GROUP BY T1.Value");
+    }
+
+    [Fact]
+    public void GroupBy_Alias_Overload_Ensures_Referenced_Joins()
+    {
+        AssertClauseEnsuresJoin(
+            query => query.GroupBy(new Alias("T1"), "Value"),
+            "GROUP BY T1.Value");
+    }
+
+    private static void AssertClauseEnsuresJoin(Func<SqlQuery, SqlQuery> addClause, string expectedClause)
+    {
+        var root = new AliasWithJoins("Base", "T0");
+        _ = new LeftJoin(root.Joins, "Related", "T1", null);
+
+        var query = addClause(new SqlQuery().From(root).Select("T0.Id"));
+
+        Assert.Contains("LEFT JOIN [Related] T1", Normalize.Sql(query.ToString()));
+        Assert.Contains(Normalize.Sql(expectedClause), Normalize.Sql(query.ToString()));
     }
 }

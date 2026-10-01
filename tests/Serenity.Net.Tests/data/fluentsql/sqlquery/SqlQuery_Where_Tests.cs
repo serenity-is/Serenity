@@ -2,6 +2,12 @@ namespace Serenity.Data;
 
 public class SqlQuery_Where_Tests
 {
+    private sealed class AliasWithJoins(string table, string name)
+        : Alias(table, name), IHaveJoins
+    {
+        public IDictionary<string, Join> Joins { get; } = new Dictionary<string, Join>();
+    }
+
     [Fact]
     public void WhereDoesAndWhenCalledMoreThanOnce()
     {
@@ -43,6 +49,18 @@ public class SqlQuery_Where_Tests
 
         Assert.Equal("T0.ID = 5", ((IFilterableQuery)query).GetWhereClause());
         Assert.Equal("T0.ID = 5", ((ISqlQuery)query).Where);
+    }
+
+    [Fact]
+    public void Where_Ensures_Referenced_Joins()
+    {
+        var root = new AliasWithJoins("Base", "T0");
+        _ = new LeftJoin(root.Joins, "Related", "T1", null);
+
+        var query = new SqlQuery().From(root)
+            .Where(new Criteria("T1.Value") > 0);
+
+        Assert.Contains("LEFT JOIN [Related] T1", Normalize.Sql(query.ToString()));
     }
 
     [Fact]

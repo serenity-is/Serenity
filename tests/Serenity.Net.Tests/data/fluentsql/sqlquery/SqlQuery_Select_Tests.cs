@@ -2,6 +2,12 @@ namespace Serenity.Data;
 
 public class SqlQuery_Select_Tests
 {
+    private sealed class AliasWithJoins(string table, string name)
+        : Alias(table, name), IHaveJoins
+    {
+        public IDictionary<string, Join> Joins { get; } = new Dictionary<string, Join>();
+    }
+
     [Fact]
     public void SelectWithEmptyOrNullArgumentsThrowsArgumentNull()
     {
@@ -23,5 +29,35 @@ public class SqlQuery_Select_Tests
         Assert.Throws<ArgumentNullException>(() => new SqlQuery().Select((ISqlQuery)null, "x"));
         Assert.Throws<ArgumentNullException>(() => new SqlQuery().Select(new SqlQuery(), null));
         Assert.Throws<ArgumentNullException>(() => new SqlQuery().Select(new SqlQuery(), String.Empty));
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(1)]
+    [InlineData(2)]
+    [InlineData(3)]
+    public void Select_Alias_Overloads_Ensure_Referenced_Joins(int overload)
+    {
+        var root = new AliasWithJoins("Base", "T0");
+        _ = new LeftJoin(root.Joins, "Related", "T1", null);
+        var query = new SqlQuery().From(root);
+
+        switch (overload)
+        {
+            case 0:
+                query.Select("T1.Value");
+                break;
+            case 1:
+                query.Select(new Alias("T1"), "Value");
+                break;
+            case 2:
+                query.Select(new Alias("T1"), "Value", "ValueAlias");
+                break;
+            case 3:
+                query.Select("T1.Value", "ValueAlias");
+                break;
+        }
+
+        Assert.Contains("LEFT JOIN [Related] T1", Normalize.Sql(query.ToString()));
     }
 }

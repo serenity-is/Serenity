@@ -278,6 +278,8 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
         else
             having.Append(SqlKeywords.And).Append(expression);
 
+        EnsureJoinsInExpression(expression);
+
         return this;
     }
 

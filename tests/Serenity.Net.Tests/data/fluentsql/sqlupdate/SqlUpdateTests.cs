@@ -90,6 +90,15 @@ public class SqlUpdateTests
     }
 
     [Fact]
+    public void Dec_Brackets_Keyword_Field_In_Expression()
+    {
+        var update = new SqlUpdate("T").Dec("Order", 1);
+
+        Assert.Equal("Order-1", update.GetFieldExpressions()[0].Expression);
+        Assert.Equal("UPDATE [T] SET [Order] = [Order]-1", update.ToString());
+    }
+
+    [Fact]
     public void Inc_Uses_Dialect_Set_After_Inc_Call_When_Rendering_Expression()
     {
         var update = new SqlUpdate("T").Inc("Order", 1)
@@ -105,6 +114,15 @@ public class SqlUpdateTests
             .Dialect(new MockSqlDialect(autoQuotedIdentifiers: false));
 
         Assert.Equal("UPDATE T SET Counter = Counter + 1", update.ToString());
+    }
+
+    [Fact]
+    public void Dec_Does_Not_Bracket_NonKeyword_Field_When_AutoQuoting_Is_Disabled()
+    {
+        var update = new SqlUpdate("T").Dec("Counter", 1)
+            .Dialect(new MockSqlDialect(autoQuotedIdentifiers: false));
+
+        Assert.Equal("UPDATE T SET Counter = Counter-1", update.ToString());
     }
 
     [Fact]
