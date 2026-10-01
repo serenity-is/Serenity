@@ -144,9 +144,9 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
         AppendFromTable(table);
 
         from.Append(' ');
-        from.Append(alias.Name);
+        from.Append(AliasExtensions.JoinNameWithHints(alias));
 
-        SetAliasExpression(alias.Name, table + " " + alias.Name);
+        SetAliasExpression(alias.Name, table + " " + AliasExtensions.JoinNameWithHints(alias));
 
         if (alias is IHaveJoins haveJoins)
             AliasWithJoins[alias.Name] = haveJoins;

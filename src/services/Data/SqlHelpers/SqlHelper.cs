@@ -193,11 +193,6 @@ public static class SqlHelper
     }
 
     /// <summary>
-    /// Checks for the connection pool exception.
-    /// </summary>
-    /// <param name="connection">The connection.</param>
-    /// <param name="exception">The exception.</param>
-    /// <summary>
     /// Determines whether a transport failure on the given connection is eligible
     /// for a single close + reopen + retry. This must be evaluated before EnsureOpen:
     /// only a first EnsureOpen on a verifiably fresh scope qualifies — tracked
@@ -247,6 +242,8 @@ public static class SqlHelper
     /// </summary>
     /// <param name="command">The command.</param>
     /// <param name="logger">The logger.</param>
+    /// <param name="scopeConnection">The connection the command was created from,
+    /// used for open tracking and pool-retry eligibility.</param>
     /// <returns>The number of affected rows.</returns>
     /// <exception cref="ArgumentNullException">
     /// command is null or command.Connection is null.
@@ -334,6 +331,8 @@ public static class SqlHelper
     /// </summary>
     /// <param name="command">The command.</param>
     /// <param name="logger">The logger.</param>
+    /// <param name="scopeConnection">The connection the command was created from,
+    /// used for open tracking and pool-retry eligibility.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the number of affected rows.</returns>
     /// <exception cref="ArgumentNullException">

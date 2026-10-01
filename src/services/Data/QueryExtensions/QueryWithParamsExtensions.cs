@@ -59,15 +59,6 @@ public static class QueryWithParamsExtensions
         return param;
     }
 
-    /// <summary>
-    /// Throws if a subquery cannot be safely embedded into another query, that is,
-    /// when it is an independent query with auto parameters living in its own
-    /// storage. Call sites must render the subquery first, as auto parameters
-    /// only materialize at render time.
-    /// </summary>
-    /// <param name="subQuery">The subquery to embed.</param>
-    /// <exception cref="InvalidOperationException">Subquery is independent and
-    /// has auto parameters.</exception>
     internal const string UnsharedSubQueryMessage = "Cannot embed a query with auto parameters " +
         "into another query. Create the subquery with the outer query's SubQuery() method " +
         "so that parameters are shared.";
@@ -86,6 +77,15 @@ public static class QueryWithParamsExtensions
         return root;
     }
 
+    /// <summary>
+    /// Throws if a subquery cannot be safely embedded into another query, that is,
+    /// when it is an independent query with auto parameters living in its own
+    /// storage. Call sites must render the subquery first, as auto parameters
+    /// only materialize at render time.
+    /// </summary>
+    /// <param name="subQuery">The subquery to embed.</param>
+    /// <exception cref="InvalidOperationException">Subquery is independent and
+    /// has auto parameters.</exception>
     internal static void ThrowIfUnsharedSubQueryWithAutoParams(this ISqlQuery subQuery)
     {
         if (subQuery.Parent is null && subQuery.HasAutoParams)

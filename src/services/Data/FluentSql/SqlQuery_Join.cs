@@ -14,6 +14,13 @@ public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressio
         {
             sb.Append(' ');
             sb.Append(join.Name);
+
+            if (!string.IsNullOrEmpty(join.TableHint))
+            {
+                sb.Append(" WITH(");
+                sb.Append(join.TableHint);
+                sb.Append(')');
+            }
         }
 
         if (join.OnCriteria is object &&
@@ -107,7 +114,10 @@ public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressio
 
         BeforeModify();
 
-        var join = new LeftJoin(toTable, alias.Name, onCriteria);
+        var join = new LeftJoin(toTable, alias.Name, onCriteria)
+        {
+            TableHint = AliasExtensions.GetTableHint(alias)
+        };
 
         Join(join);
 
@@ -135,7 +145,10 @@ public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressio
 
         BeforeModify();
 
-        var join = new LeftJoin(alias.Table, alias.Name, onCriteria);
+        var join = new LeftJoin(alias.Table, alias.Name, onCriteria)
+        {
+            TableHint = AliasExtensions.GetTableHint(alias)
+        };
 
         Join(join);
 
@@ -166,7 +179,10 @@ public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressio
 
         BeforeModify();
 
-        var join = new RightJoin(toTable, alias.Name, onCriteria);
+        var join = new RightJoin(toTable, alias.Name, onCriteria)
+        {
+            TableHint = AliasExtensions.GetTableHint(alias)
+        };
 
         Join(join);
 
@@ -196,7 +212,10 @@ public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressio
 
         BeforeModify();
 
-        var join = new RightJoin(alias.Table, alias.Name, onCriteria);
+        var join = new RightJoin(alias.Table, alias.Name, onCriteria)
+        {
+            TableHint = AliasExtensions.GetTableHint(alias)
+        };
 
         Join(join);
 
@@ -226,7 +245,10 @@ public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressio
 
         BeforeModify();
 
-        var join = new InnerJoin(alias.Table, alias.Name, onCriteria);
+        var join = new InnerJoin(alias.Table, alias.Name, onCriteria)
+        {
+            TableHint = AliasExtensions.GetTableHint(alias)
+        };
 
         Join(join);
 

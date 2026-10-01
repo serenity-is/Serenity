@@ -68,8 +68,7 @@ public class QueryWithParams : IQueryWithParams
     /// </summary>
     protected void BeforeModify()
     {
-        if (parent != null)
-            parent.BeforeModify();
+        parent?.BeforeModify();
 
         if (isFrozen)
             throw new InvalidOperationException("Query has been frozen.");

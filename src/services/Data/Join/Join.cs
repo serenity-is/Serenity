@@ -66,6 +66,8 @@ public abstract class Join : Alias
     /// </value>
     public ICriteria? OnCriteria => onCriteria;
 
+    internal string? TableHint { get; set; }
+
     /// <summary>
     /// Gets the referenced aliases.
     /// </summary>

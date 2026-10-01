@@ -211,7 +211,7 @@ public class UnitOfWork : IDisposable, IAsyncDisposable, IUnitOfWork
     /// When no underlying transaction exists (e.g. deferStart with a connection
     /// that was never opened) there is nothing to commit, but <see cref="OnCommit"/>
     /// still fires as Commit completed without error. Check
-    /// <see cref="HasTransaction"/> when it matters whether work actually ran
+    /// <see cref="HasStartedTransaction"/> when it matters whether work actually ran
     /// transactionally.
     /// </remarks>
     /// <exception cref="ArgumentNullException">transaction</exception>

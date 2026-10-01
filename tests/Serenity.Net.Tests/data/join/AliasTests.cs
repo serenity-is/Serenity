@@ -154,22 +154,22 @@ public class AliasTests
     }
 
     [Fact]
-    public void WithNoLock_Appends_Hint_To_Name_Without_Table()
+    public void WithNoLock_Keeps_Name_Clean_Without_Table()
     {
         var alias = new Alias("x").WithNoLock();
 
-        Assert.Equal("x WITH(NOLOCK)", alias.Name);
-        Assert.Equal("x WITH(NOLOCK).", alias.NameDot);
+        Assert.Equal("x", alias.Name);
+        Assert.Equal("x.", alias.NameDot);
         Assert.Null(alias.Table);
     }
 
     [Fact]
-    public void WithNoLock_Keeps_Table()
+    public void WithNoLock_Keeps_Table_And_Clean_Name()
     {
         var alias = new Alias("TableName", "x").WithNoLock();
 
-        Assert.Equal("x WITH(NOLOCK)", alias.Name);
-        Assert.Equal("x WITH(NOLOCK).", alias.NameDot);
+        Assert.Equal("x", alias.Name);
+        Assert.Equal("x.", alias.NameDot);
         Assert.Equal("TableName", alias.Table);
     }
 
@@ -180,7 +180,8 @@ public class AliasTests
 
         var alias = join.WithNoLock();
 
-        Assert.Equal("T1 WITH(NOLOCK)", alias.Name);
+        Assert.Equal("T1", alias.Name);
+        Assert.Equal("T1.", alias.NameDot);
         Assert.Equal("Table", alias.Table);
         Assert.IsNotType<LeftJoin>(alias);
     }
