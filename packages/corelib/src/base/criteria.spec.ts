@@ -115,6 +115,16 @@ describe("Criteria function", () => {
         expect(Criteria('a').bw(Criteria('b'), Criteria('c'))).toEqual([[['a'], '>=', ['b']], 'and', [['a'], '<=', ['c']]]);
     });
 
+    it('should create upper and generic function-call criteria', () => {
+        expect(Criteria.upper(Criteria('Name'))).toEqual(
+            ['function', ['UPPER', ['Name']]]);
+
+        expect(Criteria.functionCall('COALESCE', Criteria('Name'), 'unknown', Criteria('Fallback'))).toEqual(
+            ['function', ['COALESCE', ['Name'], 'unknown', ['Fallback']]]);
+
+        expect(() => Criteria.functionCall('  ', Criteria('Name'))).toThrow('Function name is required');
+    });
+
     it('should handle in operators with string values', () => {
         expect(Criteria('a').in(['b', 'c'])).toEqual([['a'], 'in', [['b', 'c']]]);
         expect(Criteria('a').notIn(['b', 'c'])).toEqual([['a'], 'not in', [['b', 'c']]]);
@@ -179,6 +189,41 @@ describe("Criteria.parse", () => {
         expect((Criteria.parse("c=5 or (d=6 and e=3)"))).toEqual(
             [[['c'], '=', 5], 'or', [[['d'], '=', 6], 'and', [['e'], '=', 3]]]
         );
+    });
+
+    it('parses function calls with fields, values, and multiple arguments', () => {
+        expect(Criteria.parse("UPPER(Name) = 'SERENITY'")).toEqual(
+            [['function', ['UPPER', ['Name']]], '=', 'SERENITY']);
+
+        expect(Criteria.parse("COALESCE(Name, 'unknown') = 'serenity'")).toEqual(
+            [['function', ['COALESCE', ['Name'], 'unknown']], '=', 'serenity']);
+    });
+
+    it('parses nested function calls and criteria expressions as arguments', () => {
+        expect(Criteria.parse("OUTER(INNER(Name)) = 'x'")).toEqual(
+            [['function', ['OUTER', ['function', ['INNER', ['Name']]]]], '=', 'x']);
+
+        expect(Criteria.parse("CHECK(A = 5, B > 2)")).toEqual(
+            ['function', ['CHECK', [['A'], '=', 5], [['B'], '>', 2]]]);
+
+        expect(Criteria.parse("CHECK((A = 5), B > 2)")).toEqual(
+            ['function', ['CHECK', [['A'], '=', 5], [['B'], '>', 2]]]);
+    });
+
+    it('parses function calls with parameters and rejects empty arguments', () => {
+        expect(Criteria.parse("UPPER(@field) = @value", { field: 'Name', value: 'x' })).toEqual(
+            [['function', ['UPPER', 'Name']], '=', 'x']);
+
+        expect(Criteria.parse("COALESCE(Name, @fallback)", { fallback: 'unknown' })).toEqual(
+            ['function', ['COALESCE', ['Name'], 'unknown']]);
+
+        expect(() => Criteria.parse("F(, A)")).toThrow('Function call arguments cannot be empty');
+        expect(() => Criteria.parse("F(A,)")).toThrow('Function call arguments cannot be empty');
+    });
+
+    it('preserves function names and supports zero arguments', () => {
+        expect(Criteria.parse("Custom_Function ( )")).toEqual(
+            ['function', ['Custom_Function']]);
     });
 
     it('should parse in query with integers', () => {

@@ -1,9 +1,16 @@
 namespace Serenity.Data;
 
 /// <summary>
-/// Criteria object that identifies a function call
+/// Criteria object that identifies a function call.
 /// </summary>
 /// <param name="arguments">The arguments.</param>
+/// <remarks>
+/// Function-call criteria can be rendered to SQL and represented in criteria
+/// JSON. JSON deserialization resolves calls through
+/// <see cref="FunctionCallCriteriaFactory"/>. The default factory supports
+/// only <c>UPPER</c>; safe request validators can impose stricter
+/// per-function argument rules.
+/// </remarks>
 public abstract class FunctionCallCriteria(params BaseCriteria[] arguments) : BaseCriteria
 {
     private BaseCriteria[] arguments = CheckArguments(arguments);

@@ -122,6 +122,173 @@ public class CriteriaJsonConverterTests
     }
 
     [Fact]
+    public void Write_FunctionCallCriteria_WritesFunctionNode()
+    {
+        var json = JsonSerializer.Serialize<BaseCriteria>(
+            new UpperFunctionCriteria(new Criteria("Name")), GetOptions());
+
+        Assert.Equal("[\"function\",[\"UPPER\",[\"Name\"]]]", json);
+    }
+
+    [Fact]
+    public void Read_FunctionNode_Parses_Whitelisted_Function_And_Arguments()
+    {
+        var result = Assert.IsAssignableFrom<FunctionCallCriteria>(JsonSerializer.Deserialize<BaseCriteria>(
+            "[\"function\",[\"upper\",[\"Name\"]]]", GetOptions()));
+
+        var arguments = result.Arguments;
+        Assert.Single(arguments);
+        Assert.Equal("Name", Assert.IsType<Criteria>(arguments[0]).Expression);
+    }
+
+    [Fact]
+    public void Read_FunctionNode_Rejects_Unregistered_Name()
+    {
+        var ex = Assert.Throws<JsonException>(() => JsonSerializer.Deserialize<BaseCriteria>(
+            "[\"function\",[\"DELETE_ALL\"]]", GetOptions()));
+
+        Assert.Contains("isn't supported in criteria JSON", ex.Message);
+    }
+
+    [Fact]
+    public void FunctionFactory_Can_Be_Extended()
+    {
+        const string functionName = "TEST_MULTI";
+        var source = new Dictionary<string, Func<BaseCriteria[], FunctionCallCriteria?>>
+        {
+            [functionName] = arguments => new TestFunctionCriteria(arguments)
+        };
+        var oldFactories = FunctionCallCriteriaFactory.SetLocalFactories(
+            source);
+        try
+        {
+            source.Clear();
+            var result = JsonSerializer.Deserialize<BaseCriteria>(
+                "[\"function\",[\"TEST_MULTI\",[\"Name\"],[\"A\",\"=\",5]]]", GetOptions());
+
+            var function = Assert.IsType<TestFunctionCriteria>(result);
+            Assert.Equal(2, function.Arguments.Length);
+            Assert.Equal("Name", Assert.IsType<Criteria>(function.Arguments[0]).Expression);
+            Assert.IsType<BinaryCriteria>(function.Arguments[1]);
+        }
+        finally
+        {
+            FunctionCallCriteriaFactory.SetLocalFactories(oldFactories);
+        }
+    }
+
+    [Fact]
+    public void LocalFactory_IsReadOnly_AndCopied()
+    {
+        const string functionName = "TEST_LOCAL";
+        var source = new Dictionary<string, Func<BaseCriteria[], FunctionCallCriteria?>>
+        {
+            [functionName] = arguments => new TestFunctionCriteria(arguments)
+        };
+        var oldFactories = FunctionCallCriteriaFactory.SetLocalFactories(source);
+        try
+        {
+            source.Clear();
+            Assert.IsType<TestFunctionCriteria>(FunctionCallCriteriaFactory.Create(
+                functionName, [new Criteria("Name")]));
+
+            var local = Assert.IsAssignableFrom<IDictionary<string,
+                Func<BaseCriteria[], FunctionCallCriteria?>>>(
+                    FunctionCallCriteriaFactory.SetLocalFactories(null));
+            Assert.Throws<NotSupportedException>(() =>
+                local.Add("OTHER", arguments => new TestFunctionCriteria(arguments)));
+        }
+        finally
+        {
+            FunctionCallCriteriaFactory.SetLocalFactories(oldFactories);
+        }
+    }
+
+    [Fact]
+    public void LocalFactories_AreExclusive_And_Null_Restores_Global_Factories()
+    {
+        const string functionName = "TEST_LOCAL_ONLY";
+        var oldFactories = FunctionCallCriteriaFactory.SetLocalFactories(
+            new Dictionary<string, Func<BaseCriteria[], FunctionCallCriteria?>>
+            {
+                [functionName] = arguments => new TestFunctionCriteria(arguments)
+            }, merge: false);
+        try
+        {
+            Assert.IsType<TestFunctionCriteria>(FunctionCallCriteriaFactory.Create(
+                functionName, [new Criteria("Name")]));
+            Assert.Null(FunctionCallCriteriaFactory.Create("UPPER", [new Criteria("Name")]));
+
+            FunctionCallCriteriaFactory.SetLocalFactories(null, merge: false);
+
+            Assert.IsType<UpperFunctionCriteria>(FunctionCallCriteriaFactory.Create(
+                "UPPER", [new Criteria("Name")]));
+            Assert.Null(FunctionCallCriteriaFactory.Create(functionName, [new Criteria("Name")]));
+        }
+        finally
+        {
+            FunctionCallCriteriaFactory.SetLocalFactories(oldFactories, merge: false);
+        }
+    }
+
+    [Fact]
+    public void SetFactories_Merges_ByDefault_And_Can_Replace_And_Restore_Snapshot()
+    {
+        const string mergedName = "TEST_MERGED";
+        const string replacedName = "TEST_REPLACED";
+        var original = FunctionCallCriteriaFactory.SetFactories(null);
+        var incoming = new Dictionary<string, Func<BaseCriteria[], FunctionCallCriteria?>>
+        {
+            [mergedName] = arguments => new TestFunctionCriteria(arguments)
+        };
+
+        try
+        {
+            var previous = FunctionCallCriteriaFactory.SetFactories(incoming);
+            Assert.Contains("UPPER", previous.Keys);
+            Assert.DoesNotContain(mergedName, previous.Keys);
+            incoming.Clear();
+
+            Assert.IsType<UpperFunctionCriteria>(FunctionCallCriteriaFactory.Create(
+                "UPPER", [new Criteria("Name")]));
+            Assert.IsType<TestFunctionCriteria>(FunctionCallCriteriaFactory.Create(
+                mergedName, [new Criteria("Name")]));
+
+            var replacement = new Dictionary<string, Func<BaseCriteria[], FunctionCallCriteria?>>
+            {
+                ["UPPER"] = args => args.Length == 1 ? new UpperFunctionCriteria(args[0]) : null,
+                [replacedName] = args => new TestFunctionCriteria(args)
+            };
+
+            var mergedSnapshot = FunctionCallCriteriaFactory.SetFactories(replacement, merge: false);
+            Assert.Contains(mergedName, mergedSnapshot.Keys);
+            Assert.Null(FunctionCallCriteriaFactory.Create(mergedName, [new Criteria("Name")]));
+            Assert.IsType<UpperFunctionCriteria>(FunctionCallCriteriaFactory.Create(
+                "upper", [new Criteria("Name")]));
+            Assert.IsType<TestFunctionCriteria>(FunctionCallCriteriaFactory.Create(
+                replacedName, [new Criteria("Name")]));
+
+            var replacedSnapshot = FunctionCallCriteriaFactory.SetFactories(mergedSnapshot, merge: false);
+            Assert.Contains(replacedName, replacedSnapshot.Keys);
+            Assert.Null(FunctionCallCriteriaFactory.Create(replacedName, [new Criteria("Name")]));
+        }
+        finally
+        {
+            FunctionCallCriteriaFactory.SetFactories(original, merge: false);
+        }
+    }
+
+    [Fact]
+    public void Read_BinaryCriteria_With_FunctionStringLeftOperand_IsNotAmbiguous()
+    {
+        var result = Assert.IsType<BinaryCriteria>(JsonSerializer.Deserialize<BaseCriteria>(
+            "[\"function\",\"=\",[\"something\"]]", GetOptions()));
+
+        Assert.Equal(CriteriaOperator.EQ, result.Operator);
+        Assert.Equal("function", Assert.IsType<ValueCriteria>(result.LeftOperand).Value);
+    }
+
+    [Fact]
     public void Write_AllUnaryOperatorKeys_UpperFunctionCriteriaAsNested()
     {
         var options = GetOptions();
@@ -576,5 +743,11 @@ public class CriteriaJsonConverterTests
         {
             throw new NotImplementedException();
         }
+    }
+
+    private sealed class TestFunctionCriteria(params BaseCriteria[] arguments)
+        : FunctionCallCriteria(arguments)
+    {
+        public override string GetFunctionName(ISqlDialect dialect) => "TEST_MULTI";
     }
 }

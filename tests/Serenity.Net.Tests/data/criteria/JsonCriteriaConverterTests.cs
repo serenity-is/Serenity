@@ -146,6 +146,100 @@ public class JsonCriteriaConverterTests
     }
 
     [Fact]
+    public void Write_FunctionCallCriteria_WritesFunctionNode()
+    {
+        var json = Newtonsoft.Json.JsonConvert.SerializeObject(
+            new UpperFunctionCriteria(new Criteria("Name")), GetSettings());
+
+        Assert.Equal("[\"function\",[\"UPPER\",[\"Name\"]]]", json);
+    }
+
+    [Fact]
+    public void Read_FunctionNode_Parses_Whitelisted_Function_And_Arguments()
+    {
+        var result = Assert.IsAssignableFrom<FunctionCallCriteria>(Newtonsoft.Json.JsonConvert.DeserializeObject<BaseCriteria>(
+            "[\"function\",[\"upper\",[\"Name\"]]]", GetSettings()));
+
+        var arguments = result.Arguments;
+        Assert.Single(arguments);
+        Assert.Equal("Name", Assert.IsType<Criteria>(arguments[0]).Expression);
+    }
+
+    [Fact]
+    public void Read_FunctionNode_Rejects_Unregistered_Name()
+    {
+        var ex = Assert.Throws<Newtonsoft.Json.JsonSerializationException>(() =>
+            Newtonsoft.Json.JsonConvert.DeserializeObject<BaseCriteria>(
+                "[\"function\",[\"DELETE_ALL\"]]", GetSettings()));
+
+        Assert.Contains("isn't supported in criteria JSON", ex.Message);
+    }
+
+    [Fact]
+    public void FunctionFactory_Can_Be_Extended()
+    {
+        const string functionName = "TEST_MULTI";
+        var source = new Dictionary<string, Func<BaseCriteria[], FunctionCallCriteria?>>
+        {
+            [functionName] = arguments => new TestFunctionCriteria(arguments)
+        };
+        var oldFactories = FunctionCallCriteriaFactory.SetLocalFactories(
+            source);
+        try
+        {
+            source.Clear();
+            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<BaseCriteria>(
+                "[\"function\",[\"TEST_MULTI\",[\"Name\"],[\"A\",\"=\",5]]]", GetSettings());
+
+            var function = Assert.IsType<TestFunctionCriteria>(result);
+            Assert.Equal(2, function.Arguments.Length);
+            Assert.Equal("Name", Assert.IsType<Criteria>(function.Arguments[0]).Expression);
+            Assert.IsType<BinaryCriteria>(function.Arguments[1]);
+        }
+        finally
+        {
+            FunctionCallCriteriaFactory.SetLocalFactories(oldFactories);
+        }
+    }
+
+    [Fact]
+    public void LocalFactory_IsReadOnly_AndCopied()
+    {
+        const string functionName = "TEST_LOCAL";
+        var source = new Dictionary<string, Func<BaseCriteria[], FunctionCallCriteria?>>
+        {
+            [functionName] = arguments => new TestFunctionCriteria(arguments)
+        };
+        var oldFactories = FunctionCallCriteriaFactory.SetLocalFactories(source);
+        try
+        {
+            source.Clear();
+            Assert.IsType<TestFunctionCriteria>(FunctionCallCriteriaFactory.Create(
+                functionName, [new Criteria("Name")]));
+
+            var local = Assert.IsAssignableFrom<IDictionary<string,
+                Func<BaseCriteria[], FunctionCallCriteria?>>>(
+                    FunctionCallCriteriaFactory.SetLocalFactories(null));
+            Assert.Throws<NotSupportedException>(() =>
+                local.Add("OTHER", arguments => new TestFunctionCriteria(arguments)));
+        }
+        finally
+        {
+            FunctionCallCriteriaFactory.SetLocalFactories(oldFactories);
+        }
+    }
+
+    [Fact]
+    public void Read_BinaryCriteria_With_FunctionStringLeftOperand_IsNotAmbiguous()
+    {
+        var result = Assert.IsType<BinaryCriteria>(Newtonsoft.Json.JsonConvert.DeserializeObject<BaseCriteria>(
+            "[\"function\",\"=\",[\"something\"]]", GetSettings()));
+
+        Assert.Equal(CriteriaOperator.EQ, result.Operator);
+        Assert.Equal("function", Assert.IsType<ValueCriteria>(result.LeftOperand).Value);
+    }
+
+    [Fact]
     public void Write_GenericListValue_SerializedByNestedSerializer()
     {
         var json = Newtonsoft.Json.JsonConvert.SerializeObject(
@@ -368,5 +462,11 @@ public class JsonCriteriaConverterTests
         {
             throw new NotImplementedException();
         }
+    }
+
+    private sealed class TestFunctionCriteria(params BaseCriteria[] arguments)
+        : FunctionCallCriteria(arguments)
+    {
+        public override string GetFunctionName(ISqlDialect dialect) => "TEST_MULTI";
     }
 }

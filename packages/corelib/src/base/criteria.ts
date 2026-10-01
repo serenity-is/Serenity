@@ -274,6 +274,8 @@ const TOKEN_IDENTIFIER = 1;
 const TOKEN_OPERATOR = 2;
 const TOKEN_VALUE = 3;
 const TOKEN_PARAM = 4;
+const TOKEN_FUNCTION = 5;
+const TOKEN_COMMA = 6;
 
 interface Token {
     /** token */
@@ -309,6 +311,7 @@ function tokenize(expression: string): Token[] {
     const l = expression.length;
     const l1 = expression.length - 1;
     let openParens = 0;
+    const functionParenStack: boolean[] = [];
     let index: number;
     let ch: string;
 
@@ -617,8 +620,12 @@ function tokenize(expression: string): Token[] {
                 continue;
             }
             else {
+                let next = end + 1;
+                while (next < l && (expression.charAt(next) === ' ' || expression.charAt(next) === '\t'))
+                    next++;
+
                 tokens.push({
-                    t: TOKEN_IDENTIFIER,
+                    t: next < l && expression.charAt(next) === '(' ? TOKEN_FUNCTION : TOKEN_IDENTIFIER,
                     v: v
                 });
             }
@@ -676,8 +683,20 @@ function tokenize(expression: string): Token[] {
 
         if (ch === '(') {
             openParens++;
+            functionParenStack.push(tokens[tokens.length - 1]?.t === TOKEN_FUNCTION);
             tokens.push({
                 t: TOKEN_OPERATOR,
+                v: ch
+            });
+            continue;
+        }
+
+        if (ch === ',') {
+            if (functionParenStack[functionParenStack.length - 1] !== true)
+                throw new ParseError(expression, 'unknown token', index);
+
+            tokens.push({
+                t: TOKEN_COMMA,
                 v: ch
             });
             continue;
@@ -688,6 +707,7 @@ function tokenize(expression: string): Token[] {
                 throw new ParseError(expression, 'unexpected parenthesis', index);
 
             openParens--;
+            functionParenStack.pop();
             tokens.push({
                 t: TOKEN_OPERATOR,
                 v: ch
@@ -746,7 +766,30 @@ const operatorPrecedence: Record<string, number> = {
 function shuntingYard(tokens: Token[]): Token[] {
     const result: Token[] = [];
     const stack: Token[] = [];
-    for (const token of tokens) {
+    for (let i = 0; i < tokens.length; i++) {
+        const token = tokens[i];
+        if (token.t === TOKEN_FUNCTION) {
+            stack.push(token);
+            continue;
+        }
+
+        if (token.t === TOKEN_COMMA) {
+            while (stack.length &&
+                !(stack[stack.length - 1].t === TOKEN_OPERATOR && stack[stack.length - 1].v === '('))
+                result.push(stack.pop());
+
+            const openingParen = stack[stack.length - 1];
+            if (!openingParen || openingParen.x?.isFunctionCall !== true)
+                throw new Error('Unexpected comma outside a function call!');
+
+            if (tokens[i - 1]?.t === TOKEN_OPERATOR && tokens[i - 1].v === '(' ||
+                tokens[i - 1]?.t === TOKEN_COMMA)
+                throw new Error('Function call arguments cannot be empty!');
+
+            openingParen.x.argumentCount++;
+            continue;
+        }
+
         if (token.t === TOKEN_OPERATOR) {
             const precedence = operatorPrecedence[token.v];
 
@@ -765,7 +808,13 @@ function shuntingYard(tokens: Token[]): Token[] {
                 stack.push(token);
             }
             else if (token.v === '(') {
-                stack.push(token);
+                const functionToken = stack[stack.length - 1]?.t === TOKEN_FUNCTION
+                    ? stack[stack.length - 1]
+                    : null;
+                stack.push({
+                    ...token,
+                    x: functionToken ? { isFunctionCall: true, argumentCount: 0 } : undefined
+                });
             }
             else if (token.v === ')') {
                 while (stack.length &&
@@ -774,7 +823,21 @@ function shuntingYard(tokens: Token[]): Token[] {
                     result.push(stack.pop());
                 }
 
-                stack.pop();
+                const openingParen = stack.pop();
+                if (openingParen?.x?.isFunctionCall) {
+                    if (tokens[i - 1]?.t === TOKEN_COMMA)
+                        throw new Error('Function call arguments cannot be empty!');
+
+                    const functionToken = stack.pop();
+                    if (!functionToken || functionToken.t !== TOKEN_FUNCTION)
+                        throw new Error('Invalid function call!');
+
+                    const isEmpty = tokens[i - 1]?.t === TOKEN_OPERATOR && tokens[i - 1].v === '(';
+                    result.push({
+                        ...functionToken,
+                        x: isEmpty ? 0 : openingParen.x.argumentCount + 1
+                    });
+                }
             }
             else
                 result.push(token);
@@ -819,6 +882,17 @@ function rpnTokensToCriteria(rpnTokens: Token[], getParam?: (name: string) => an
                         throw new Error("getParam must be passed for parameterized expressions!");
                     const prm = getParam(token.v)
                     stack.push(Array.isArray(prm) ? [prm] : prm);
+                    break;
+                }
+
+            case TOKEN_FUNCTION:
+                {
+                    const argumentCount = token.x as number;
+                    if (stack.length < argumentCount)
+                        throw new Error(`Function "${token.v}" requires ${argumentCount} argument(s)!`);
+
+                    const args = argumentCount ? stack.splice(stack.length - argumentCount, argumentCount) : [];
+                    stack.push(["function", [token.v, ...args]]);
                     break;
                 }
 
@@ -1093,6 +1167,37 @@ export namespace Criteria {
      */
     export function paren(c: any[]): any[] {
         return Criteria.isEmpty(c) ? c : ['()', c];
+    }
+
+    /**
+     * Creates an `UPPER(value)` function-call criteria.
+     *
+     * @param value - Function argument, typically a field criteria.
+     * @returns Criteria `["function", ["UPPER", value]]`.
+     * @example
+     * Criteria.upper(Criteria("Name")); // ["function", ["UPPER", ["Name"]]]
+     */
+    export function upper(value: any[]): any[] {
+        return functionCall('UPPER', value);
+    }
+
+    /**
+     * Creates a function-call criteria. Function arguments use the same
+     * criteria/value shapes as other criteria nodes. The server only accepts
+     * function names registered with its criteria function factory.
+     *
+     * @param functionName - Name of the function.
+     * @param args - Function arguments.
+     * @returns Criteria `["function", [functionName, ...args]]`.
+     * @example
+     * Criteria.functionCall("COALESCE", Criteria("Name"), "unknown");
+     * // ["function", ["COALESCE", ["Name"], "unknown"]]
+     */
+    export function functionCall(functionName: string, ...args: any[]): any[] {
+        if (functionName == null || functionName.trim().length === 0)
+            throw new Error("Function name is required!");
+
+        return ["function", [functionName, ...args]];
     }
 
     /**

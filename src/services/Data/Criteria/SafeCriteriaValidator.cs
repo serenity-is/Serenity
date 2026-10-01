@@ -85,14 +85,37 @@ public class SafeCriteriaValidator : BaseCriteriaVisitor
     }
 
     /// <summary>
-    /// Visits the function call criteria.
+    /// Visits an allowed function call criteria.
     /// </summary>
     /// <param name="criteria">The criteria.</param>
     /// <returns>The visited function call criteria.</returns>
-    /// <exception cref="ValidationError">UnsupportedCriteriaType - Function call type criterias is not supported!</exception>
+    /// <exception cref="ValidationError">Only UPPER with one field or string argument is supported.</exception>
     protected override BaseCriteria VisitFunctionCall(FunctionCallCriteria criteria)
     {
-        throw new ValidationError("UnsupportedCriteriaType",
-            "Function call type criterias is not supported!");
+        if (criteria is not UpperFunctionCriteria)
+            throw new ValidationError("UnsupportedCriteriaType",
+                "Only UPPER function criteria is supported!");
+
+        var arguments = criteria.Arguments;
+        if (arguments.Length != 1)
+            throw new ValidationError("UnsupportedCriteriaType",
+                "UPPER function criteria must have exactly one argument!");
+
+        switch (arguments[0])
+        {
+            case Criteria field:
+                Visit(field);
+                break;
+
+            case ValueCriteria { Value: string } value:
+                Visit(value);
+                break;
+
+            default:
+                throw new ValidationError("UnsupportedCriteriaType",
+                    "UPPER function argument must be a field name or string value!");
+        }
+
+        return criteria;
     }
 }

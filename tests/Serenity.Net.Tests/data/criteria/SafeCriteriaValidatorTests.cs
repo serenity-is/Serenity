@@ -118,20 +118,59 @@ public class SafeCriteriaValidatorTests
     }
 
     [Fact]
-    public void Validate_FunctionCallCriteria_ThrowsUnsupportedCriteriaType()
+    public void Validate_UpperFunctionWithFieldArgument_DoesNotThrow()
+    {
+        new SafeCriteriaValidator().Validate(new UpperFunctionCriteria(new Criteria("Name")));
+    }
+
+    [Fact]
+    public void Validate_UpperFunctionWithStringArgument_DoesNotThrow()
+    {
+        new SafeCriteriaValidator().Validate(new UpperFunctionCriteria(new ValueCriteria("name")));
+    }
+
+    [Fact]
+    public void Validate_UpperFunctionWithInvalidField_ThrowsValidationError()
     {
         var exception = Assert.Throws<ValidationError>(
-            () => new SafeCriteriaValidator().Validate(new UpperFunctionCriteria(new Criteria("Name"))));
+            () => new SafeCriteriaValidator().Validate(new UpperFunctionCriteria(new Criteria("bad expr"))));
+
+        Assert.Equal("InvalidCriteriaField", exception.ErrorCode);
+        Assert.Equal("bad expr is not a valid field name!", exception.Message);
+    }
+
+    [Fact]
+    public void Validate_UpperFunctionWithNonStringValue_ThrowsUnsupportedCriteriaType()
+    {
+        var exception = Assert.Throws<ValidationError>(
+            () => new SafeCriteriaValidator().Validate(new UpperFunctionCriteria(new ValueCriteria(5))));
 
         Assert.Equal("UnsupportedCriteriaType", exception.ErrorCode);
     }
 
     [Fact]
-    public void Validate_FunctionCallCriteriaWithInvalidField_DoesNotBypassValidation()
+    public void Validate_UpperFunctionWithCriteriaExpression_ThrowsUnsupportedCriteriaType()
     {
-        // rejected as function call before any nested field could be inspected
         var exception = Assert.Throws<ValidationError>(
-            () => new SafeCriteriaValidator().Validate(new UpperFunctionCriteria(new Criteria("bad expr"))));
+            () => new SafeCriteriaValidator().Validate(new UpperFunctionCriteria(new Criteria("Name") == "x")));
+
+        Assert.Equal("UnsupportedCriteriaType", exception.ErrorCode);
+    }
+
+    [Fact]
+    public void Validate_UpperFunctionWithWrongNumberOfArguments_ThrowsUnsupportedCriteriaType()
+    {
+        var exception = Assert.Throws<ValidationError>(
+            () => new SafeCriteriaValidator().Validate(new TestFunction("UPPER", new Criteria("Name"), new Criteria("Other"))));
+
+        Assert.Equal("UnsupportedCriteriaType", exception.ErrorCode);
+    }
+
+    [Fact]
+    public void Validate_NonUpperFunction_ThrowsUnsupportedCriteriaType()
+    {
+        var exception = Assert.Throws<ValidationError>(
+            () => new SafeCriteriaValidator().Validate(new TestFunction("LOWER", new Criteria("Name"))));
 
         Assert.Equal("UnsupportedCriteriaType", exception.ErrorCode);
     }
@@ -150,5 +189,11 @@ public class SafeCriteriaValidatorTests
         var c = new Criteria("Field3").IsNotNull();
 
         new SafeCriteriaValidator().Validate((a & b) | c);
+    }
+
+    private sealed class TestFunction(string name, params BaseCriteria[] arguments)
+        : FunctionCallCriteria(arguments)
+    {
+        public override string GetFunctionName(ISqlDialect dialect) => name;
     }
 }

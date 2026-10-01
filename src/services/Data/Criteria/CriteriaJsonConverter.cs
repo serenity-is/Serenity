@@ -91,6 +91,20 @@ public class CriteriaJsonConverter : JsonConverter<BaseCriteria>
             return;
         }
 
+        if (criteria is FunctionCallCriteria functionCall)
+        {
+            var functionName = functionCall.GetFunctionName(SqlSettings.DefaultDialect);
+            writer.WriteStartArray();
+            writer.WriteStringValue("function");
+            writer.WriteStartArray();
+            writer.WriteStringValue(functionName);
+            foreach (var argument in functionCall.Arguments)
+                Write(writer, argument, options);
+            writer.WriteEndArray();
+            writer.WriteEndArray();
+            return;
+        }
+
         throw new JsonException(string.Format("Can't serialize criteria of type {0}", criteria.GetType().FullName));
     }
 
@@ -228,6 +242,22 @@ public class CriteriaJsonConverter : JsonConverter<BaseCriteria>
                 throw new JsonException(string.Format("Couldn't deserialize unary criteria: {0}", array.ToString()));
 
             var opStr = array[0].GetString();
+            if (string.Equals(opStr, "function", StringComparison.OrdinalIgnoreCase))
+            {
+                if (array[1].ValueKind != JsonValueKind.Array)
+                    throw new JsonException("Function criteria payload must be an array.");
+
+                var functionParts = array[1].EnumerateArray().ToArray();
+                if (functionParts.Length == 0 || functionParts[0].ValueKind != JsonValueKind.String ||
+                    string.IsNullOrWhiteSpace(functionParts[0].GetString()))
+                    throw new JsonException($"Invalid function criteria name: {array}");
+
+                var functionName = functionParts[0].GetString()!;
+                var arguments = functionParts.Skip(1).Select(ParseValue).ToArray();
+
+                return FunctionCallCriteriaFactory.Create(functionName, arguments) ??
+                    throw new JsonException($"Function '{functionName}' isn't supported in criteria JSON.");
+            }
 
             if (!KeyToOperator.TryGetValue(opStr!, out CriteriaOperator op))
                 throw new JsonException(string.Format("Unknown Criteria operator: {0}", opStr));
