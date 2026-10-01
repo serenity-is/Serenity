@@ -93,6 +93,56 @@ public class UnitOfWorkTests
     }
 
     [Fact]
+    public void Commit_WithoutStartedTransaction_FiresOnCommit_And_HasStartedTransactionIsFalse()
+    {
+        using var connection = new UnitOfWorkTestConnection();
+        using var uow = new UnitOfWork(connection, deferStart: true);
+        var committed = false;
+        uow.OnCommit += () => committed = true;
+
+        Assert.False(uow.HasStartedTransaction);
+        uow.Commit();
+
+        // No transaction was ever started, but OnCommit signals operation success.
+        Assert.True(committed);
+        Assert.False(uow.HasStartedTransaction);
+        Assert.Null(connection.Transaction);
+    }
+
+    [Fact]
+    public void Dispose_WithoutStartedTransaction_FiresOnRollback()
+    {
+        using var connection = new UnitOfWorkTestConnection();
+        var uow = new UnitOfWork(connection, deferStart: true);
+        var rolledBack = false;
+        uow.OnRollback += () => rolledBack = true;
+
+        uow.Dispose();
+
+        Assert.True(rolledBack);
+        Assert.False(uow.HasStartedTransaction);
+    }
+
+    [Fact]
+    public void HasStartedTransaction_IsLatched_And_Visible_From_OnCommit()
+    {
+        using var connection = new UnitOfWorkTestConnection();
+        using var uow = new UnitOfWork(connection);
+
+        Assert.True(uow.HasStartedTransaction);
+
+        var observedInHandler = false;
+        uow.OnCommit += () => observedInHandler = uow.HasStartedTransaction;
+        uow.Commit();
+
+        Assert.True(observedInHandler);
+
+        // Latch is never cleared: still true after commit and dispose.
+        uow.Dispose();
+        Assert.True(uow.HasStartedTransaction);
+    }
+
+    [Fact]
     public void DeferStartCtor_StartsTransaction_IfAlreadyOpen_And_DeferStartTrue()
     {
         using var connection = new UnitOfWorkTestConnection();

@@ -6,6 +6,8 @@ public class NullUnitOfWork(IDbConnection connection = null) : IUnitOfWork
 
     public IDbConnection Connection => connection;
 
+    public bool HasStartedTransaction { get; set; } = true;
+
     public event Action OnCommit
     {
         add { }

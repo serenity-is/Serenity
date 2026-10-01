@@ -18,6 +18,7 @@ public class UnitOfWork : IDisposable, IAsyncDisposable, IUnitOfWork
     private bool initialized;
     private bool commited;
     private bool disposed;
+    private bool transactionStarted;
     private Exception? initializationError;
 
     /// <summary>
@@ -105,6 +106,7 @@ public class UnitOfWork : IDisposable, IAsyncDisposable, IUnitOfWork
             connection.EnsureOpen();
             transaction = isolationLevel == IsolationLevel.Unspecified ? connection.BeginTransaction()
                 : connection.BeginTransaction(isolationLevel);
+            transactionStarted = true;
         }
         catch (Exception ex)
         {
@@ -205,6 +207,13 @@ public class UnitOfWork : IDisposable, IAsyncDisposable, IUnitOfWork
     /// <summary>
     /// Commits this transaction.
     /// </summary>
+    /// <remarks>
+    /// When no underlying transaction exists (e.g. deferStart with a connection
+    /// that was never opened) there is nothing to commit, but <see cref="OnCommit"/>
+    /// still fires as Commit completed without error. Check
+    /// <see cref="HasTransaction"/> when it matters whether work actually ran
+    /// transactionally.
+    /// </remarks>
     /// <exception cref="ArgumentNullException">transaction</exception>
     public void Commit()
     {
@@ -257,7 +266,17 @@ public class UnitOfWork : IDisposable, IAsyncDisposable, IUnitOfWork
     public bool Initialized => initialized;
 
     /// <summary>
-    /// Occurs when transaction is committed.
+    /// Gets whether the unit of work's transaction was actually started.
+    /// Unlike <see cref="Initialized"/>, which is also true when the start was
+    /// attempted but failed, this is only set after BeginTransaction succeeds.
+    /// Once true it stays true, including after commit, rollback and dispose.
+    /// </summary>
+    public bool HasStartedTransaction => transactionStarted;
+
+    /// <summary>
+    /// Occurs when Commit completes without error. This signals operation
+    /// success, not necessarily a database transaction commit: when no
+    /// underlying transaction exists the event still fires.
     /// </summary>
     public event Action OnCommit
     {
@@ -266,7 +285,9 @@ public class UnitOfWork : IDisposable, IAsyncDisposable, IUnitOfWork
     }
 
     /// <summary>
-    /// Occurs when transaction is rolled back.
+    /// Occurs when the unit of work is disposed without a prior Commit.
+    /// This is tied to the operation outcome, not to a database transaction:
+    /// it also fires when no underlying transaction was ever started.
     /// </summary>
     public event Action OnRollback
     {

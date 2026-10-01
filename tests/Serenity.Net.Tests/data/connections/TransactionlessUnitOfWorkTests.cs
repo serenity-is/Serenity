@@ -20,6 +20,14 @@ public class TransactionlessUnitOfWorkTests
     }
 
     [Fact]
+    public void HasStartedTransaction_IsAlwaysFalse()
+    {
+        using var uow = new TransactionlessUnitOfWork(connection);
+
+        Assert.False(uow.HasStartedTransaction);
+    }
+
+    [Fact]
     public void DoubleCommit_ThrowsInvalidOperationException()
     {
         using var uow = new TransactionlessUnitOfWork(connection);

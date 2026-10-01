@@ -87,7 +87,15 @@ public class TransactionlessUnitOfWork(IDbConnection connection) : IDisposable, 
     }
 
     /// <summary>
+    /// Gets whether the unit of work's transaction was actually started.
+    /// This implementation never starts one, so this always returns false.
+    /// </summary>
+    public bool HasStartedTransaction => false;
+
+    /// <summary>
     /// Occurs when Commit is called as there is no underlying transaction.
+    /// Like <see cref="UnitOfWork.OnCommit"/>, this signals operation success,
+    /// not a database transaction commit.
     /// </summary>
     public event Action OnCommit
     {

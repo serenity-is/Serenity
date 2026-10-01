@@ -3,6 +3,7 @@
 public class MockUnitOfWork : IUnitOfWork
 {
     public IDbConnection Connection { get; }
+    public bool HasStartedTransaction { get; set; } = true;
     public event Action OnCommit;
     public event Action OnRollback;
     
