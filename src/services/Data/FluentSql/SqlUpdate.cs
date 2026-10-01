@@ -226,7 +226,7 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
                 return rest;
         }
 
-        if (index >= 0)
+        if (index >= 0 || expression.Contains("[T0].", StringComparison.OrdinalIgnoreCase))
             return T0ReferenceRemover.RemoveT0Aliases(expression);
 
         return expression;

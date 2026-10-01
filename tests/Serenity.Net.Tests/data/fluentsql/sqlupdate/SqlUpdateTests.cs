@@ -200,6 +200,13 @@ public class SqlUpdateTests
     }
 
     [Fact]
+    public void Where_Removes_BracketQuoted_T0_References()
+    {
+        var update = new SqlUpdate("T").Where("[T0].[ID] = 5");
+        Assert.Equal("[ID] = 5", ((IFilterableQuery)update).GetWhereClause());
+    }
+
+    [Fact]
     public void Dialect_Sets_Dialect_And_Validates()
     {
         var update = new SqlUpdate("T").Dialect(new SqlServer2012Dialect());

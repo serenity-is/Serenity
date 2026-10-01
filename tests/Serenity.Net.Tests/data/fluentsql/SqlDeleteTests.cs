@@ -49,6 +49,16 @@ public class SqlDeleteTests
     }
 
     [Fact]
+    public void Where_Removes_BracketQuoted_T0_Reference()
+    {
+        var delete = new SqlDelete("T").Where("[T0].[A] = 1");
+
+        Assert.Equal("[A] = 1", ((IFilterableQuery)delete).GetWhereClause());
+        Assert.Contains("WHERE [A] = 1", delete.ToString());
+        Assert.DoesNotContain("[T0].", delete.ToString());
+    }
+
+    [Fact]
     public void Where_Renders_Parameters_Once()
     {
         var delete = new SqlDelete("T").Where(new Criteria("A") == 5);

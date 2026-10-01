@@ -62,6 +62,20 @@ public class JoinAliasLocatorTests
     }
 
     [Fact]
+    public void Locate_Ignores_Dots_Inside_BracketQuoted_Identifiers()
+    {
+        Assert.Null(JoinAliasLocator.Locate("[My.Table]"));
+    }
+
+    [Fact]
+    public void Locate_Finds_BracketQuoted_Alias_Qualifier()
+    {
+        var aliases = JoinAliasLocator.Locate("[T0].[Col]");
+
+        Assert.Equal("T0", Assert.Single(aliases!));
+    }
+
+    [Fact]
     public void Locate_Ignores_Digit_Only_Identifiers()
     {
         Assert.Null(JoinAliasLocator.Locate("123.x"));
@@ -130,6 +144,20 @@ public class JoinAliasLocatorTests
     {
         Assert.Equal("j.Field",
             JoinAliasLocator.ReplaceAliases("T0.Field", s => s == "T0" ? "j" : s));
+    }
+
+    [Fact]
+    public void ReplaceAliases_Replaces_BracketQuoted_Alias_And_Preserves_Identifier()
+    {
+        Assert.Equal("[j].[Col]",
+            JoinAliasLocator.ReplaceAliases("[T0].[Col]", s => s == "T0" ? "j" : s));
+    }
+
+    [Fact]
+    public void ReplaceAliases_Keeps_Dots_Inside_BracketQuoted_Identifier()
+    {
+        Assert.Equal("[My.Table]",
+            JoinAliasLocator.ReplaceAliases("[My.Table]", _ => "changed"));
     }
 
     [Fact]

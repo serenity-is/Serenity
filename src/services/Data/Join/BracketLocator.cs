@@ -25,7 +25,7 @@ public static class BracketLocator
         for (var i = 0; i < expression.Length; i++)
         {
             var start = i;
-            if (SqlRegionScanner.TrySkipQuotesAndComments(expression, ref i))
+            if (SqlRegionScanner.TrySkipQuotesAndComments(expression, ref i, skipBracketIdentifiers: false))
             {
                 // Brackets and quotes inside skip regions are comment text or
                 // literal text, not SQL. An unclosed bracket before the region
@@ -101,7 +101,7 @@ public static class BracketLocator
         for (var i = 0; i < expression.Length; i++)
         {
             var start = i;
-            if (SqlRegionScanner.TrySkipQuotesAndComments(expression, ref i))
+            if (SqlRegionScanner.TrySkipQuotesAndComments(expression, ref i, skipBracketIdentifiers: false))
             {
                 sb.Append(expression, start, i - start + 1);
                 continue;

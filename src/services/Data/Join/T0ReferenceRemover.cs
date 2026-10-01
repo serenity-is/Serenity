@@ -21,6 +21,26 @@ public static class T0ReferenceRemover
         for (var index = 0; index < expression.Length; index++)
         {
             var start = index;
+            if (expression[index] == '[')
+            {
+                var end = index;
+                if (SqlRegionScanner.TryReadBracketedIdentifier(expression, ref end, out var bracketed))
+                {
+                    if (bracketed != null && end + 1 < expression.Length && expression[end + 1] == '.' &&
+                        string.Equals(bracketed, "T0", StringComparison.OrdinalIgnoreCase))
+                    {
+                        index = end + 1;
+                        startIdent = -1;
+                        continue;
+                    }
+
+                    sb.Append(expression, start, end - start + 1);
+                    index = end;
+                    startIdent = -1;
+                    continue;
+                }
+            }
+
             if (SqlRegionScanner.TrySkipQuotesAndComments(expression, ref index))
             {
                 sb.Append(expression, start, index - start + 1);

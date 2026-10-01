@@ -90,6 +90,31 @@ public class SqlRegionScannerTests
     }
 
     [Fact]
+    public void TrySkip_BracketQuotedIdentifier_ConsumesThroughClosingBracket()
+    {
+        var expression = "[My.Table] + [Column]]Name]";
+        var first = 0;
+
+        Assert.True(SqlRegionScanner.TrySkipQuotesAndComments(expression, ref first));
+        Assert.Equal(9, first);
+
+        var second = expression.IndexOf("[Column", StringComparison.Ordinal);
+        Assert.True(SqlRegionScanner.TrySkipQuotesAndComments(expression, ref second));
+        Assert.Equal(expression.Length - 1, second);
+        Assert.Equal(expression, ConsumeAll(expression));
+    }
+
+    [Fact]
+    public void TrySkip_UnclosedBracketQuotedIdentifier_ConsumesRest()
+    {
+        var expression = "[Column.Name";
+        var index = 0;
+
+        Assert.True(SqlRegionScanner.TrySkipQuotesAndComments(expression, ref index));
+        Assert.Equal(expression.Length - 1, index);
+    }
+
+    [Fact]
     public void TrySkip_LoneSlash_ReturnsFalse()
     {
         var index = 2;

@@ -15,6 +15,19 @@ public class T0ReferenceRemoverTests
     }
 
     [Fact]
+    public void RemoveT0Aliases_Removes_BracketQuoted_T0_Qualifier()
+    {
+        Assert.Equal("[Col]", T0ReferenceRemover.RemoveT0Aliases("[T0].[Col]"));
+        Assert.Equal("[Col].Name", T0ReferenceRemover.RemoveT0Aliases("[T0].[Col].Name"));
+    }
+
+    [Fact]
+    public void RemoveT0Aliases_Keeps_Dots_Inside_BracketQuoted_Identifier()
+    {
+        Assert.Equal("[My.Table]", T0ReferenceRemover.RemoveT0Aliases("[My.Table]"));
+    }
+
+    [Fact]
     public void RemoveT0Aliases_Is_Case_Insensitive_For_T()
     {
         Assert.Equal("field", T0ReferenceRemover.RemoveT0Aliases("t0.field"));

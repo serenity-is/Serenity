@@ -68,6 +68,19 @@ public class JoinAliasLocator
         int startIdent = -1;
         for (var i = 0; i < expression.Length; i++)
         {
+            if (expression[i] == '[')
+            {
+                var end = i;
+                if (SqlRegionScanner.TryReadBracketedIdentifier(expression, ref end, out var bracketed))
+                {
+                    startIdent = -1;
+                    if (bracketed != null && end + 1 < expression.Length && expression[end + 1] == '.')
+                        alias(bracketed);
+                    i = end;
+                    continue;
+                }
+            }
+
             if (SqlRegionScanner.TrySkipQuotesAndComments(expression, ref i))
             {
                 startIdent = -1;
@@ -112,6 +125,28 @@ public class JoinAliasLocator
         for (var i = 0; i < expression.Length; i++)
         {
             var start = i;
+            if (expression[i] == '[')
+            {
+                var end = i;
+                if (SqlRegionScanner.TryReadBracketedIdentifier(expression, ref end, out var bracketed))
+                {
+                    if (bracketed != null && end + 1 < expression.Length && expression[end + 1] == '.')
+                    {
+                        var replaced = replace(bracketed);
+                        if (replaced != bracketed)
+                            sb.Append('[').Append(replaced.Replace("]", "]]", StringComparison.Ordinal)).Append(']');
+                        else
+                            sb.Append(expression, start, end - start + 1);
+                    }
+                    else
+                        sb.Append(expression, start, end - start + 1);
+
+                    startIdent = -1;
+                    i = end;
+                    continue;
+                }
+            }
+
             if (SqlRegionScanner.TrySkipQuotesAndComments(expression, ref i))
             {
                 sb.Append(expression, start, i - start + 1);
