@@ -444,7 +444,9 @@ public static class SqlHelper
         {
             using var command = CreateReturningIdentityCommand(query, connection, queryText, dialect, parameters, out var param);
             InternalExecuteNonQuery(command, logger, connection);
-            return Convert.ToInt64(param.Value);
+            // A null / DBNull output (e.g. zero rows inserted) means no identity
+            // was generated, matching ReadIdentityValue below — never crash here.
+            return param.Value is null or DBNull ? null : Convert.ToInt64(param.Value);
         }
 
         if (dialect.UseScopeIdentity)
@@ -487,7 +489,9 @@ public static class SqlHelper
         {
             using var command = CreateReturningIdentityCommand(query, connection, queryText, dialect, parameters, out var param);
             await InternalExecuteNonQueryAsync(command, logger, connection, cancellationToken).ConfigureAwait(false);
-            return Convert.ToInt64(param.Value);
+            // A null / DBNull output (e.g. zero rows inserted) means no identity
+            // was generated, matching ReadIdentityValue below — never crash here.
+            return param.Value is null or DBNull ? null : Convert.ToInt64(param.Value);
         }
 
         if (dialect.UseScopeIdentity)

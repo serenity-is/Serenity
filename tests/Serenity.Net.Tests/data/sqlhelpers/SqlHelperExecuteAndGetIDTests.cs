@@ -115,6 +115,22 @@ public class SqlHelperExecuteAndGetIDTests
     }
 
     [Fact]
+    public void ExecuteAndGetID_WithReturningIdentityDialect_DbNullValue_ReturnsNull()
+    {
+        using var connection = new MockDbConnection { Dialect = PostgresDialect.Instance }
+            .OnDbCommandExecuteNonQuery(cmd =>
+            {
+                cmd.Parameters["Id"].Value = DBNull.Value;
+                return 0;
+            });
+
+        var query = new SqlInsert("Table").SetTo("X", "1").IdentityColumn("Id");
+        var result = query.ExecuteAndGetID(connection);
+
+        Assert.Null(result);
+    }
+
+    [Fact]
     public void ExecuteAndGetID_WithReturningIdentityDialect_MissingIdentityColumn_Throws()
     {
         using var connection = new MockDbConnection { Dialect = PostgresDialect.Instance }
@@ -228,6 +244,23 @@ public class SqlHelperExecuteAndGetIDTests
 
         Assert.Equal(1, result);
         Assert.Equal(1, connection.DbCommandExecuteNonQueryCallCount);
+    }
+
+    [Fact]
+    public async Task ExecuteAndGetIDAsync_WithReturningIntoVarDialect_DbNullValue_ReturnsNull()
+    {
+        using var connection = new MockDbConnection { Dialect = OracleDialect.Instance }
+            .OnDbCommandExecuteNonQuery(cmd =>
+            {
+                cmd.Parameters["Id"].Value = DBNull.Value;
+                return 0;
+            });
+
+        var query = new SqlInsert("Table").SetTo("X", "1").IdentityColumn("Id");
+        var result = await query.ExecuteAndGetIDAsync(connection,
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.Null(result);
     }
 
     [Fact]
