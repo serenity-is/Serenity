@@ -354,6 +354,8 @@ public class WrappedConnection : DbConnection, IDbConnection, IHasActualConnecti
         if (disposing)
         {
             UnbindStateChange();
+            // Close also forgets the current transaction.
+            Close();
             actualConnection.Dispose();
         }
         base.Dispose(disposing);
@@ -363,13 +365,15 @@ public class WrappedConnection : DbConnection, IDbConnection, IHasActualConnecti
     /// Disposes the actual connection asynchronously.
     /// </summary>
     /// <returns>A value task that represents the asynchronous operation.</returns>
-    public override ValueTask DisposeAsync()
+    public override async ValueTask DisposeAsync()
     {
         GC.SuppressFinalize(this);
         UnbindStateChange();
+        // CloseAsync also forgets the current transaction.
+        await CloseAsync().ConfigureAwait(false);
         if (actualConnection is DbConnection dbConnection)
-            return dbConnection.DisposeAsync();
-        actualConnection.Dispose();
-        return ValueTask.CompletedTask;
+            await dbConnection.DisposeAsync().ConfigureAwait(false);
+        else
+            actualConnection.Dispose();
     }
 }

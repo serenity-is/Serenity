@@ -86,6 +86,20 @@ public class WrappedConnectionTests
     }
 
     [Fact]
+    public void Dispose_ClearsCurrentTransaction()
+    {
+        using var connection = new MockDbConnection();
+        var wrapped = new WrappedConnection(connection, SqlServer2012Dialect.Instance);
+
+        wrapped.Open();
+        using var transaction = wrapped.BeginTransaction();
+        Assert.NotNull(wrapped.CurrentTransaction);
+
+        wrapped.Dispose();
+        Assert.Null(wrapped.CurrentTransaction);
+    }
+
+    [Fact]
     public void CommandTimeout_Setting_AppliesToCreatedCommands()
     {
         using var connection = new MockDbConnection { Dialect = SqlServer2012Dialect.Instance };
