@@ -60,11 +60,6 @@ public interface ISqlQuery : IQueryWithParams
     IReadOnlyList<string> OrderBy { get; }
 
     /// <summary>
-    /// Gets access to parent query if any.
-    /// </summary>
-    IQueryWithParams? Parent { get; }
-
-    /// <summary>
     /// Gets skip number.
     /// </summary>
     int Skip { get; }

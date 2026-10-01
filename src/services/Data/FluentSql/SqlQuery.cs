@@ -178,16 +178,28 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     /// <param name="subQuery">A subquery</param>
     /// <param name="alias">Alias that contains the short name.</param>
     /// <returns>The query itself.</returns>
-    /// <remarks>This overload requires that alias has a table name.</remarks>
+    /// <remarks>This overload requires that alias has a table name.
+    /// The subquery must share the same root query (usually built via this
+    /// query's SubQuery() method). An unrelated query's parameters are not
+    /// available here, so embedding it may produce completely invalid results.
+    /// Independent queries without parameters are safe to embed.</remarks>
+    /// <exception cref="InvalidOperationException">subQuery is an independent
+    /// query with auto parameters.</exception>
     public SqlQuery From(ISqlQuery subQuery, IAlias alias)
     {
         ArgumentNullException.ThrowIfNull(subQuery);
 
         ArgumentNullException.ThrowIfNull(alias);
 
+        // Rendered first: auto parameters only materialize at render time, so a
+        // freshly built subquery reports no autos until this ToString runs.
+        var text = subQuery.ToString()!;
+
+        this.ThrowIfUnsharedSubQueryWithAutoParams(subQuery);
+
         BeforeModify();
 
-        return FromAliasedTable(subQuery.ToString()!, alias);
+        return FromAliasedTable(text, alias);
     }
 
     /// <summary>
@@ -450,9 +462,14 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     /// <summary>
     /// Adds a subquery to the SELECT statement.
     /// </summary>
-    /// <param name="expression">A subquery.</param>
+    /// <param name="expression">A subquery. Must share the same root query
+    /// (usually built via this query's SubQuery() method); an unrelated
+    /// query's parameters are not available here, so embedding it may produce
+    /// completely invalid results.</param>
     /// <param name="columnName">A column name</param>
     /// <returns>The query itself.</returns>
+    /// <exception cref="InvalidOperationException">expression is an independent
+    /// query with auto parameters.</exception>
     public SqlQuery Select(ISqlQuery expression, string columnName)
     {
         ArgumentNullException.ThrowIfNull(expression);
@@ -460,9 +477,15 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
         if (string.IsNullOrEmpty(columnName))
             throw new ArgumentNullException(nameof(columnName));
 
+        // Rendered first: auto parameters only materialize at render time, so a
+        // freshly built subquery reports no autos until this ToString runs.
+        var text = expression.ToString()!;
+
+        this.ThrowIfUnsharedSubQueryWithAutoParams(expression);
+
         BeforeModify();
 
-        Select(expression.ToString()!, columnName);
+        Select(text, columnName);
 
         return this;
     }
@@ -470,15 +493,26 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     /// <summary>
     /// Adds a subquery to the SELECT statement.
     /// </summary>
-    /// <param name="expression">A subquery.</param>
+    /// <param name="expression">A subquery. Must share the same root query
+    /// (usually built via this query's SubQuery() method); an unrelated
+    /// query's parameters are not available here, so embedding it may produce
+    /// completely invalid results.</param>
     /// <returns>The query itself.</returns>
+    /// <exception cref="InvalidOperationException">expression is an independent
+    /// query with auto parameters.</exception>
     public SqlQuery Select(ISqlQuery expression)
     {
         ArgumentNullException.ThrowIfNull(expression);
 
+        // Rendered first: auto parameters only materialize at render time, so a
+        // freshly built subquery reports no autos until this ToString runs.
+        var text = expression.ToString()!;
+
+        this.ThrowIfUnsharedSubQueryWithAutoParams(expression);
+
         BeforeModify();
 
-        Select(expression.ToString()!);
+        Select(text);
 
         return this;
     }

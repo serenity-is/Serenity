@@ -58,4 +58,56 @@ public static class QueryWithParamsExtensions
         self.AddParam(param.Name, value);
         return param;
     }
+
+    /// <summary>
+    /// Throws if a subquery cannot be safely embedded into another query, that is,
+    /// when it is an independent query with auto parameters living in its own
+    /// storage. Call sites must render the subquery first, as auto parameters
+    /// only materialize at render time.
+    /// </summary>
+    /// <param name="subQuery">The subquery to embed.</param>
+    /// <exception cref="InvalidOperationException">Subquery is independent and
+    /// has auto parameters.</exception>
+    internal const string UnsharedSubQueryMessage = "Cannot embed a query with auto parameters " +
+        "into another query. Create the subquery with the outer query's SubQuery() method " +
+        "so that parameters are shared.";
+
+    /// <summary>
+    /// Gets the root query sharing this instance's parameter storage, that is,
+    /// itself when it has no parent, otherwise the topmost ancestor.
+    /// </summary>
+    /// <param name="query">The query.</param>
+    /// <returns>The root query.</returns>
+    internal static IQueryWithParams GetRootQuery(this IQueryWithParams query)
+    {
+        var root = query;
+        while (root.Parent is not null)
+            root = root.Parent;
+        return root;
+    }
+
+    internal static void ThrowIfUnsharedSubQueryWithAutoParams(this ISqlQuery subQuery)
+    {
+        if (subQuery.Parent is null && subQuery.HasAutoParams)
+            throw new InvalidOperationException(UnsharedSubQueryMessage);
+    }
+
+    /// <summary>
+    /// Throws if a subquery cannot be safely embedded into an outer query, that is,
+    /// when it has auto parameters living in a different parameter storage.
+    /// Unlike the criteria composition sites, the outer query is known here, so
+    /// subqueries borrowed from another tree are rejected too, not just
+    /// independent ones. Callers must render the subquery first, as auto
+    /// parameters only materialize at render time.
+    /// </summary>
+    /// <param name="outer">The outer query.</param>
+    /// <param name="subQuery">The subquery to embed.</param>
+    /// <exception cref="InvalidOperationException">Subquery has auto parameters
+    /// outside the outer query's parameter storage.</exception>
+    internal static void ThrowIfUnsharedSubQueryWithAutoParams(this IQueryWithParams outer, IQueryWithParams subQuery)
+    {
+        if (!ReferenceEquals(outer.GetRootQuery(), subQuery.GetRootQuery()) &&
+            subQuery.HasAutoParams)
+            throw new InvalidOperationException(UnsharedSubQueryMessage);
+    }
 }

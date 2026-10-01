@@ -262,18 +262,29 @@ public abstract class BaseCriteria : ICriteria
     /// <param name="statement">The statement query.</param>
     /// <returns>A new binary IN criteria.</returns>
     /// <exception cref="ArgumentNullException">statement is null</exception>
+    /// <exception cref="InvalidOperationException">statement is an independent
+    /// query with auto parameters.</exception>
     /// <remarks>
     /// Subqueries created via <see cref="SqlQuery.SubQuery()"/> already enclose
     /// themselves in parenthesis while rendering, so the statement is only
     /// wrapped in parenthesis when the query would render without them.
+    /// The statement must share the same root query that this criteria will be
+    /// used in (usually built via that query's SubQuery() method). An unrelated
+    /// query's parameters are not available to the outer query, so embedding it
+    /// may produce completely invalid results. Independent queries without
+    /// parameters are safe to embed.
     /// </remarks>
     public BaseCriteria In(ISqlQuery statement)
     {
         ArgumentNullException.ThrowIfNull(statement);
 
+        // Rendered first: auto parameters only materialize at render time, so a
+        // freshly built subquery reports no autos until this ToString runs.
         var text = statement.Parent != null && !statement.OmitParens
             ? statement.ToString()!
             : "(" + statement + ")";
+
+        statement.ThrowIfUnsharedSubQueryWithAutoParams();
 
         return new BinaryCriteria(this, CriteriaOperator.In, new Criteria(text));
     }
@@ -337,18 +348,29 @@ public abstract class BaseCriteria : ICriteria
     /// <param name="statement">The statement query.</param>
     /// <returns>A new binary NOT IN criteria.</returns>
     /// <exception cref="ArgumentNullException">statement is null</exception>
+    /// <exception cref="InvalidOperationException">statement is an independent
+    /// query with auto parameters.</exception>
     /// <remarks>
     /// Subqueries created via <see cref="SqlQuery.SubQuery()"/> already enclose
     /// themselves in parenthesis while rendering, so the statement is only
     /// wrapped in parenthesis when the query would render without them.
+    /// The statement must share the same root query that this criteria will be
+    /// used in (usually built via that query's SubQuery() method). An unrelated
+    /// query's parameters are not available to the outer query, so embedding it
+    /// may produce completely invalid results. Independent queries without
+    /// parameters are safe to embed.
     /// </remarks>
     public BaseCriteria NotIn(ISqlQuery statement)
     {
         ArgumentNullException.ThrowIfNull(statement);
 
+        // Rendered first: auto parameters only materialize at render time, so a
+        // freshly built subquery reports no autos until this ToString runs.
         var text = statement.Parent != null && !statement.OmitParens
             ? statement.ToString()!
             : "(" + statement + ")";
+
+        statement.ThrowIfUnsharedSubQueryWithAutoParams();
 
         return new BinaryCriteria(this, CriteriaOperator.NotIn, new Criteria(text));
     }
@@ -1345,6 +1367,10 @@ public abstract class BaseCriteria : ICriteria
 
     private class NoParamsChecker : IQueryWithParams
     {
+        public bool HasAutoParams => false;
+
+        public IQueryWithParams? Parent => null;
+
         public void AddParam(string name, object? value)
         {
             throw new InvalidOperationException("Criteria should not have parameters!");
@@ -1382,6 +1408,10 @@ public abstract class BaseCriteria : ICriteria
         private int next;
 
         internal int AutoParamCount => next;
+
+        public bool HasAutoParams => next > 0;
+
+        public IQueryWithParams? Parent => null;
 
         public void AddParam(string name, object? value)
         {

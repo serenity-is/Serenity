@@ -218,22 +218,22 @@ public static class EntitySqlQueryProjection
 		return CreateReusableProjection<TResult>(query, projection, takeOwnership: takeOwnership);
 	}
 
-	/// <summary>
-	/// Asynchronously executes the query and buffers the flat projection results.
-	/// </summary>
-	/// <typeparam name="TRow">The row type of the projected source.</typeparam>
-	/// <typeparam name="TResult">The flat projection result type.</typeparam>
-	/// <param name="query">The query to execute.</param>
-	/// <param name="connection">The connection.</param>
-	/// <param name="projection">A flat projection built from direct row field accesses.</param>
-	/// <param name="parameters">Values that override the source query's parameters for this execution.</param>
-	/// <param name="cancellationToken">The cancellation token.</param>
-	/// <param name="takeOwnership">Whether to prepare the source query in place instead of cloning it. The source must not be frozen.</param>
-	/// <returns>A task representing the asynchronous operation. The task result is the projected list.</returns>
-	public static Task<List<TResult>> ListProjectedAsync<TRow, TResult>(this SqlQuery query,
+    /// <summary>
+    /// Asynchronously executes the query and buffers the flat projection results.
+    /// </summary>
+    /// <typeparam name="TRow">The row type of the projected source.</typeparam>
+    /// <typeparam name="TResult">The flat projection result type.</typeparam>
+    /// <param name="query">The query to execute.</param>
+    /// <param name="connection">The connection.</param>
+    /// <param name="projection">A flat projection built from direct row field accesses.</param>
+    /// <param name="parameters">Values that override the source query's parameters for this execution.</param>
+    /// <param name="takeOwnership">Whether to prepare the source query in place instead of cloning it. The source must not be frozen.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task representing the asynchronous operation. The task result is the projected list.</returns>
+    public static Task<List<TResult>> ListProjectedAsync<TRow, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow, TResult>> projection,
-		IReadOnlyDictionary<string, object?>? parameters = null,
-		CancellationToken cancellationToken = default, bool takeOwnership = false)
+		IReadOnlyDictionary<string, object?>? parameters = null, bool takeOwnership = false,
+        CancellationToken cancellationToken = default)
 		where TRow : class, IRow
 	{
 		ArgumentNullException.ThrowIfNull(connection);
@@ -251,13 +251,13 @@ public static class EntitySqlQueryProjection
 	/// <param name="connection">The connection.</param>
 	/// <param name="projection">A flat projection built from direct row field accesses.</param>
 	/// <param name="parameters">Values that override the source query's parameters for this execution.</param>
-	/// <param name="cancellationToken">The cancellation token.</param>
 	/// <param name="takeOwnership">Whether to prepare the source query in place instead of cloning it. The source must not be frozen.</param>
+	/// <param name="cancellationToken">The cancellation token.</param>
 	/// <returns>A task representing the asynchronous operation. The task result is the projected list.</returns>
 	public static Task<List<TResult>> ListProjectedAsync<TRow1, TRow2, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow1, TRow2, TResult>> projection,
-		IReadOnlyDictionary<string, object?>? parameters = null,
-		CancellationToken cancellationToken = default, bool takeOwnership = false)
+		IReadOnlyDictionary<string, object?>? parameters = null, bool takeOwnership = false,
+        CancellationToken cancellationToken = default)
 		where TRow1 : class, IRow
 		where TRow2 : class, IRow
 	{
@@ -277,13 +277,13 @@ public static class EntitySqlQueryProjection
 	/// <param name="connection">The connection.</param>
 	/// <param name="projection">A flat projection built from direct row field accesses.</param>
 	/// <param name="parameters">Values that override the source query's parameters for this execution.</param>
-	/// <param name="cancellationToken">The cancellation token.</param>
 	/// <param name="takeOwnership">Whether to prepare the source query in place instead of cloning it. The source must not be frozen.</param>
+	/// <param name="cancellationToken">The cancellation token.</param>
 	/// <returns>A task representing the asynchronous operation. The task result is the projected list.</returns>
 	public static Task<List<TResult>> ListProjectedAsync<TRow1, TRow2, TRow3, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow1, TRow2, TRow3, TResult>> projection,
-		IReadOnlyDictionary<string, object?>? parameters = null,
-		CancellationToken cancellationToken = default, bool takeOwnership = false)
+		IReadOnlyDictionary<string, object?>? parameters = null, bool takeOwnership = false, 
+        CancellationToken cancellationToken = default)
 		where TRow1 : class, IRow
 		where TRow2 : class, IRow
 		where TRow3 : class, IRow
@@ -303,13 +303,13 @@ public static class EntitySqlQueryProjection
 	/// <param name="connection">The connection.</param>
 	/// <param name="projection">A flat projection built from direct row field accesses.</param>
 	/// <param name="parameters">Values that override the source query's parameters for this execution.</param>
-	/// <param name="cancellationToken">The cancellation token.</param>
 	/// <param name="takeOwnership">Whether to prepare the source query in place instead of cloning it. The source must not be frozen.</param>
+	/// <param name="cancellationToken">The cancellation token.</param>
 	/// <returns>An asynchronous stream of projected results.</returns>
 	public static IAsyncEnumerable<TResult> QueryProjectedAsync<TRow, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow, TResult>> projection,
-		IReadOnlyDictionary<string, object?>? parameters = null,
-		CancellationToken cancellationToken = default, bool takeOwnership = false)
+		IReadOnlyDictionary<string, object?>? parameters = null, bool takeOwnership = false,
+        CancellationToken cancellationToken = default)
 		where TRow : class, IRow
 	{
 		ArgumentNullException.ThrowIfNull(connection);
@@ -328,13 +328,13 @@ public static class EntitySqlQueryProjection
 	/// <param name="connection">The connection.</param>
 	/// <param name="projection">A flat projection built from direct row field accesses.</param>
 	/// <param name="parameters">Values that override the source query's parameters for this execution.</param>
-	/// <param name="cancellationToken">The cancellation token.</param>
 	/// <param name="takeOwnership">Whether to prepare the source query in place instead of cloning it. The source must not be frozen.</param>
+	/// <param name="cancellationToken">The cancellation token.</param>
 	/// <returns>An asynchronous stream of projected results.</returns>
 	public static IAsyncEnumerable<TResult> QueryProjectedAsync<TRow1, TRow2, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow1, TRow2, TResult>> projection,
-		IReadOnlyDictionary<string, object?>? parameters = null,
-		CancellationToken cancellationToken = default, bool takeOwnership = false)
+		IReadOnlyDictionary<string, object?>? parameters = null, bool takeOwnership = false, 
+        CancellationToken cancellationToken = default)
 		where TRow1 : class, IRow
 		where TRow2 : class, IRow
 	{
@@ -355,13 +355,13 @@ public static class EntitySqlQueryProjection
 	/// <param name="connection">The connection.</param>
 	/// <param name="projection">A flat projection built from direct row field accesses.</param>
 	/// <param name="parameters">Values that override the source query's parameters for this execution.</param>
-	/// <param name="cancellationToken">The cancellation token.</param>
 	/// <param name="takeOwnership">Whether to prepare the source query in place instead of cloning it. The source must not be frozen.</param>
+	/// <param name="cancellationToken">The cancellation token.</param>
 	/// <returns>An asynchronous stream of projected results.</returns>
 	public static IAsyncEnumerable<TResult> QueryProjectedAsync<TRow1, TRow2, TRow3, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow1, TRow2, TRow3, TResult>> projection,
-		IReadOnlyDictionary<string, object?>? parameters = null,
-		CancellationToken cancellationToken = default, bool takeOwnership = false)
+		IReadOnlyDictionary<string, object?>? parameters = null, bool takeOwnership = false, 
+        CancellationToken cancellationToken = default)
 		where TRow1 : class, IRow
 		where TRow2 : class, IRow
 		where TRow3 : class, IRow
@@ -450,10 +450,17 @@ public static class EntitySqlQueryProjection
 		where TRow1 : class, IRow where TRow2 : class, IRow where TRow3 : class, IRow => CreateReusableProjection<TResult>(query, projection, sources, takeOwnership);
 
 	/// <summary>Executes and buffers a projection asynchronously using the specified row-fields source aliases.</summary>
+    /// <param name="query">The query to execute.</param>
+    /// <param name="connection">The database connection.</param>
+    /// <param name="projection">A flat projection built from row field accesses or SQL expressions.</param>
+    /// <param name="sources">The row-fields sources for the projection parameters.</param>
+    /// <param name="parameters">The query parameters.</param>
+    /// <param name="takeOwnership">Whether to prepare the source query in place. If false, a clone is prepared; a frozen source cannot be taken over.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
 	public static Task<List<TResult>> ListProjectedAsync<TRow, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow, TResult>> projection,
 		IReadOnlyList<RowFieldsBase> sources, IReadOnlyDictionary<string, object?>? parameters = null,
-		CancellationToken cancellationToken = default, bool takeOwnership = false)
+        bool takeOwnership = false, CancellationToken cancellationToken = default)
 		where TRow : class, IRow
 	{
 		ArgumentNullException.ThrowIfNull(connection);
@@ -461,11 +468,18 @@ public static class EntitySqlQueryProjection
 		return BufferProjectedAsync(prepared.Query, connection, prepared.Materializer, parameters, cancellationToken);
 	}
 
-	/// <summary>Executes and buffers a projection asynchronously using the specified row-fields source aliases.</summary>
-	public static Task<List<TResult>> ListProjectedAsync<TRow1, TRow2, TResult>(this SqlQuery query,
+    /// <summary>Executes and buffers a projection asynchronously using the specified row-fields source aliases.</summary>
+    /// <param name="query">The query to execute.</param>
+    /// <param name="connection">The database connection.</param>
+    /// <param name="projection">A flat projection built from row field accesses or SQL expressions.</param>
+    /// <param name="sources">The row-fields sources for the projection parameters.</param>
+    /// <param name="parameters">The query parameters.</param>
+    /// <param name="takeOwnership">Whether to prepare the source query in place. If false, a clone is prepared; a frozen source cannot be taken over.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    public static Task<List<TResult>> ListProjectedAsync<TRow1, TRow2, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow1, TRow2, TResult>> projection,
 		IReadOnlyList<RowFieldsBase> sources, IReadOnlyDictionary<string, object?>? parameters = null,
-		CancellationToken cancellationToken = default, bool takeOwnership = false)
+		bool takeOwnership = false, CancellationToken cancellationToken = default)
 		where TRow1 : class, IRow where TRow2 : class, IRow
 	{
 		ArgumentNullException.ThrowIfNull(connection);
@@ -474,10 +488,17 @@ public static class EntitySqlQueryProjection
 	}
 
 	/// <summary>Executes and buffers a projection asynchronously using the specified row-fields source aliases.</summary>
+    /// <param name="query">The query to execute.</param>
+    /// <param name="connection">The database connection.</param>
+    /// <param name="projection">A flat projection built from row field accesses or SQL expressions.</param>
+    /// <param name="sources">The row-fields sources for the projection parameters.</param>
+    /// <param name="parameters">The query parameters.</param>
+    /// <param name="takeOwnership">Whether to prepare the source query in place. If false, a clone is prepared; a frozen source cannot be taken over.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
 	public static Task<List<TResult>> ListProjectedAsync<TRow1, TRow2, TRow3, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow1, TRow2, TRow3, TResult>> projection,
 		IReadOnlyList<RowFieldsBase> sources, IReadOnlyDictionary<string, object?>? parameters = null,
-		CancellationToken cancellationToken = default, bool takeOwnership = false)
+		bool takeOwnership = false, CancellationToken cancellationToken = default)
 		where TRow1 : class, IRow where TRow2 : class, IRow where TRow3 : class, IRow
 	{
 		ArgumentNullException.ThrowIfNull(connection);
@@ -485,11 +506,18 @@ public static class EntitySqlQueryProjection
 		return BufferProjectedAsync(prepared.Query, connection, prepared.Materializer, parameters, cancellationToken);
 	}
 
-	/// <summary>Streams a projection asynchronously using the specified row-fields source aliases.</summary>
-	public static IAsyncEnumerable<TResult> QueryProjectedAsync<TRow, TResult>(this SqlQuery query,
+    /// <summary>Streams a projection asynchronously using the specified row-fields source aliases.</summary>
+    /// <param name="query">The query to execute.</param>
+    /// <param name="connection">The database connection.</param>
+    /// <param name="projection">A flat projection built from row field accesses or SQL expressions.</param>
+    /// <param name="sources">The row-fields sources for the projection parameters.</param>
+    /// <param name="parameters">The query parameters.</param>
+    /// <param name="takeOwnership">Whether to prepare the source query in place. If false, a clone is prepared; a frozen source cannot be taken over.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    public static IAsyncEnumerable<TResult> QueryProjectedAsync<TRow, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow, TResult>> projection,
 		IReadOnlyList<RowFieldsBase> sources, IReadOnlyDictionary<string, object?>? parameters = null,
-		CancellationToken cancellationToken = default, bool takeOwnership = false)
+		bool takeOwnership = false, CancellationToken cancellationToken = default)
 		where TRow : class, IRow
 	{
 		ArgumentNullException.ThrowIfNull(connection);
@@ -498,10 +526,17 @@ public static class EntitySqlQueryProjection
 	}
 
 	/// <summary>Streams a projection asynchronously using the specified row-fields source aliases.</summary>
+    /// <param name="query">The query to execute.</param>
+    /// <param name="connection">The database connection.</param>
+    /// <param name="projection">A flat projection built from row field accesses or SQL expressions.</param>
+    /// <param name="sources">The row-fields sources for the projection parameters.</param>
+    /// <param name="parameters">The query parameters.</param>
+    /// <param name="takeOwnership">Whether to prepare the source query in place. If false, a clone is prepared; a frozen source cannot be taken over.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
 	public static IAsyncEnumerable<TResult> QueryProjectedAsync<TRow1, TRow2, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow1, TRow2, TResult>> projection,
 		IReadOnlyList<RowFieldsBase> sources, IReadOnlyDictionary<string, object?>? parameters = null,
-		CancellationToken cancellationToken = default, bool takeOwnership = false)
+		bool takeOwnership = false, CancellationToken cancellationToken = default)
 		where TRow1 : class, IRow where TRow2 : class, IRow
 	{
 		ArgumentNullException.ThrowIfNull(connection);
@@ -510,10 +545,17 @@ public static class EntitySqlQueryProjection
 	}
 
 	/// <summary>Streams a projection asynchronously using the specified row-fields source aliases.</summary>
+    /// <param name="query">The query to execute.</param>
+    /// <param name="connection">The database connection.</param>
+    /// <param name="projection">A flat projection built from row field accesses or SQL expressions.</param>
+    /// <param name="sources">The row-fields sources for the projection parameters.</param>
+    /// <param name="parameters">The query parameters.</param>
+    /// <param name="takeOwnership">Whether to prepare the source query in place. If false, a clone is prepared; a frozen source cannot be taken over.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
 	public static IAsyncEnumerable<TResult> QueryProjectedAsync<TRow1, TRow2, TRow3, TResult>(this SqlQuery query,
 		IDbConnection connection, Expression<Func<TRow1, TRow2, TRow3, TResult>> projection,
 		IReadOnlyList<RowFieldsBase> sources, IReadOnlyDictionary<string, object?>? parameters = null,
-		CancellationToken cancellationToken = default, bool takeOwnership = false)
+		bool takeOwnership = false, CancellationToken cancellationToken = default)
 		where TRow1 : class, IRow where TRow2 : class, IRow where TRow3 : class, IRow
 	{
 		ArgumentNullException.ThrowIfNull(connection);
@@ -661,7 +703,7 @@ public static class EntitySqlQueryProjection
 			: "Projection parameters match multiple query row-fields sources; supply source fields explicitly.");
 	}
 
-	private static IReadOnlyList<RowFieldsBase> GetProjectionSources(SqlQuery query)
+	private static List<RowFieldsBase> GetProjectionSources(SqlQuery query)
 	{
 		var extensible = (ISqlQueryExtensible)query;
 		var sources = new List<RowFieldsBase>();
@@ -711,7 +753,7 @@ public static class EntitySqlQueryProjection
 		if (rowType is null || !parameter.Type.IsAssignableFrom(rowType))
 			throw new ArgumentException(string.Format(
 				"Projection source {0} has row type '{1}', which is not compatible with projection parameter type '{2}'.",
-				index, rowType?.FullName ?? fields.GetType().FullName, parameter.Type.FullName), "sources");
+				index, rowType?.FullName ?? fields.GetType().FullName, parameter.Type.FullName), nameof(parameter));
 	}
 
 	private static ReusableProjectedQuery<TResult> CreateReusableProjection<TResult>(SqlQuery query,

@@ -212,8 +212,10 @@ public class BaseCriteriaOperatorOverloadTests
     [Fact]
     public void In_SqlQueryWithoutParent_WrapsInParentheses()
     {
+        // Note: no parameterized Where here — embedding an independent query
+        // with auto parameters throws (see SqlQuery_SubQueryEmbedTests).
         var query = new SqlQuery().Select("ID");
-        query.From("TestTable").Where(new Criteria("ID") == 1).Dialect(new SqlServer2012Dialect());
+        query.From("TestTable").Dialect(new SqlServer2012Dialect());
 
         var result = Assert.IsType<BinaryCriteria>(new Criteria("ID").In(query));
 
@@ -244,8 +246,10 @@ public class BaseCriteriaOperatorOverloadTests
     [Fact]
     public void NotIn_SqlQuery_WrapsInParentheses()
     {
+        // Note: no parameterized Where here — embedding an independent query
+        // with auto parameters throws (see SqlQuery_SubQueryEmbedTests).
         var query = new SqlQuery().Select("ID");
-        query.From("TestTable").Where(new Criteria("ID") == 1).Dialect(new SqlServer2012Dialect());
+        query.From("TestTable").Dialect(new SqlServer2012Dialect());
 
         var result = Assert.IsType<BinaryCriteria>(new Criteria("ID").NotIn(query));
 

@@ -21,7 +21,6 @@ public partial class SqlQuery
     string? ISqlQuery.Having => having?.ToString();
     bool ISqlQuery.OmitParens => omitParens;
     IReadOnlyList<string> ISqlQuery.OrderBy => orderBy?.AsReadOnly() ?? (IReadOnlyList<string>)[];
-    IQueryWithParams? ISqlQuery.Parent => parent;
     int ISqlQuery.Skip => skip;
     int ISqlQuery.Take => take;
     ISqlQuery? ISqlQuery.UnionQuery => unionQuery;

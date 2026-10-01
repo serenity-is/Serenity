@@ -169,6 +169,21 @@ public class QueryWithParams : IQueryWithParams
     }
 
     /// <summary>
+    /// Gets a value indicating whether any automatically named parameters
+    /// were generated for this query or one of the queries sharing its
+    /// parameter storage. Derived from the auto param counter, so no
+    /// separate tracking state is needed. Note that this may still return
+    /// false before the query is rendered (e.g. via ToString()), as auto
+    /// parameters only materialize at render time.
+    /// </summary>
+    public bool HasAutoParams => parent?.HasAutoParams ?? nextAutoParam > 0;
+
+    /// <summary>
+    /// Gets access to parent query if any.
+    /// </summary>
+    public IQueryWithParams? Parent => parent;
+
+    /// <summary>
     /// Creates an automatically named parameter.
     /// </summary>
     /// <returns>The automatically named parameter.</returns>

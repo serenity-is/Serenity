@@ -123,6 +123,14 @@ public static partial class Sql
     /// <param name="values">The values.</param>
     /// <returns>The COALESCE() expression.</returns>
     /// <exception cref="ArgumentNullException">values is null or empty.</exception>
+    /// <exception cref="InvalidOperationException">A value is a query with auto
+    /// parameters outside <paramref name="query"/>'s parameter storage.</exception>
+    /// <remarks>
+    /// Embedded queries are rendered as text only: their parameters are not
+    /// merged. Pass queries sharing this query's parameter storage (e.g. via
+    /// SubQuery()), instead of standalone queries. Independent queries without
+    /// parameters are safe to embed.
+    /// </remarks>
     public static string Coalesce(this IQueryWithParams query, params object[] values)
     {
         if (values == null || values.Length == 0)
@@ -139,7 +147,12 @@ public static partial class Sql
             if (value is ICriteria crit)
                 crit.ToString(sb, query);
             else if (value is IQueryWithParams qprm)
-                sb.Append(qprm.ToString());
+            {
+                // Rendered first: auto parameters only materialize at render time.
+                var text = qprm.ToString();
+                query.ThrowIfUnsharedSubQueryWithAutoParams(qprm);
+                sb.Append(text);
+            }
             else if (value is IField fld)
                 sb.Append(fld.Expression);
             else
@@ -457,6 +470,8 @@ public static partial class Sql
         /// There should be at least one WHEN/THEN pair.
         /// or
         /// WHEN/THEN pairs don't match.
+        /// or
+        /// A THEN/ELSE query has auto parameters outside the target query's storage.
         /// </exception>
         public string ToString(IQueryWithParams query)
         {
@@ -478,7 +493,12 @@ public static partial class Sql
                 if (value is ICriteria crit)
                     crit.ToString(sb, query);
                 else if (value is IQueryWithParams qprm)
-                    sb.Append(qprm.ToString());
+                {
+                    // Rendered first: auto parameters only materialize at render time.
+                    var text = qprm.ToString();
+                    query.ThrowIfUnsharedSubQueryWithAutoParams(qprm);
+                    sb.Append(text);
+                }
                 else if (value is IField fld)
                     sb.Append(fld.Expression);
                 else
@@ -496,7 +516,12 @@ public static partial class Sql
                 if (elseValue is ICriteria crit)
                     crit.ToString(sb, query);
                 else if (elseValue is IQueryWithParams qprm)
-                    sb.Append(qprm.ToString());
+                {
+                    // Rendered first: auto parameters only materialize at render time.
+                    var text = qprm.ToString();
+                    query.ThrowIfUnsharedSubQueryWithAutoParams(qprm);
+                    sb.Append(text);
+                }
                 else if (elseValue is IField fld)
                     sb.Append(fld.Expression);
                 else

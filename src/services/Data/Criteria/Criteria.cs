@@ -172,9 +172,21 @@ public class Criteria : BaseCriteria
     /// </summary>
     /// <param name="query">The query.</param>
     /// <exception cref="ArgumentNullException">query is null</exception>
+    /// <exception cref="InvalidOperationException">query is an independent
+    /// query with auto parameters.</exception>
+    /// <remarks>
+    /// The query must share the same root query that this criteria will be used
+    /// in (usually built via that query's SubQuery() method). An unrelated
+    /// query's parameters are not available to the outer query, so embedding it
+    /// may produce completely invalid results. Independent queries without
+    /// parameters are safe to embed.
+    /// </remarks>
     public Criteria(ISqlQuery query)
+        // Rendered in the base call: auto parameters only materialize at render
+        // time, so a freshly built subquery reports no autos until ToString runs.
         : this((query ?? throw new ArgumentNullException(nameof(query))).ToString()!)
     {
+        query.ThrowIfUnsharedSubQueryWithAutoParams();
     }
 
 
@@ -196,9 +208,14 @@ public class Criteria : BaseCriteria
     /// Creates a new EXISTS criteria.
     /// </summary>
     /// <param name="query">
-    /// The expression.
+    /// The expression. Must share the same root query that the resulting
+    /// criteria will be used in (usually built via that query's SubQuery()
+    /// method); an unrelated query's parameters are not available to the
+    /// outer query, so embedding it may produce completely invalid results.
     /// </param>
     /// <returns>A new EXISTS criteria.</returns>
+    /// <exception cref="InvalidOperationException">query is an independent
+    /// query with auto parameters.</exception>
     public static BaseCriteria Exists(ISqlQuery query)
     {
         return new UnaryCriteria(CriteriaOperator.Exists, new Criteria(query));
