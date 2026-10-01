@@ -45,11 +45,30 @@ public class SafeCriteriaValidator : BaseCriteriaVisitor
     /// <exception cref="ValidationError">UnsupportedCriteriaType - Criteria values can't contain nested criteria!</exception>
     protected override BaseCriteria VisitValue(ValueCriteria criteria)
     {
-        if (criteria.Value is BaseCriteria)
+        if (ContainsNestedCriteria(criteria.Value))
             throw new ValidationError("UnsupportedCriteriaType",
                 "Criteria values can't contain nested criteria!");
 
         return base.VisitValue(criteria);
+    }
+
+    private static bool ContainsNestedCriteria(object? value)
+    {
+        if (value is BaseCriteria)
+            return true;
+
+        // Values may be collections (e.g. an IN list deserialized from JSON),
+        // so a nested criteria hidden inside an array must be rejected too.
+        if (value is System.Collections.IEnumerable enumerable and not string)
+        {
+            foreach (var item in enumerable)
+            {
+                if (ContainsNestedCriteria(item))
+                    return true;
+            }
+        }
+
+        return false;
     }
 
     /// <summary>

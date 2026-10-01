@@ -35,6 +35,33 @@ public class SafeCriteriaValidatorTests
     }
 
     [Fact]
+    public void Validate_ValueArrayContainingNestedCriteria_ThrowsValidationError()
+    {
+        var exception = Assert.Throws<ValidationError>(
+            () => new SafeCriteriaValidator().Validate(
+                new Criteria("Name") == new ValueCriteria(new object[] { new Criteria("X") })));
+
+        Assert.Equal("UnsupportedCriteriaType", exception.ErrorCode);
+    }
+
+    [Fact]
+    public void Validate_NestedValueArrayContainingNestedCriteria_ThrowsValidationError()
+    {
+        var exception = Assert.Throws<ValidationError>(
+            () => new SafeCriteriaValidator().Validate(
+                new Criteria("Name") == new ValueCriteria(new object[] { new object[] { new Criteria("X") } })));
+
+        Assert.Equal("UnsupportedCriteriaType", exception.ErrorCode);
+    }
+
+    [Fact]
+    public void Validate_ValueArrayWithoutCriteria_DoesNotThrow()
+    {
+        new SafeCriteriaValidator().Validate(
+            new Criteria("Name") == new ValueCriteria(new object[] { 1, "x", null }));
+    }
+
+    [Fact]
     public void Validate_InvalidFieldExpression_ThrowsValidationError()
     {
         var exception = Assert.Throws<ValidationError>(
