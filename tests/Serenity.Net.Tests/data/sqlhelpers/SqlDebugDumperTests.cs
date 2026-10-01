@@ -183,7 +183,7 @@ public class SqlDebugDumperTests
         var old = DatabaseCaretReferences.SetLocalGetDatabaseName(_ => "Db1.dbo");
         try
         {
-            var result = SqlDebugDumper.Dump("SELECT [Db1^Table].[Table].[A]", new Dictionary<string, object?>());
+            var result = SqlDebugDumper.Dump("SELECT [^Db1].[Table].[A]", new Dictionary<string, object?>());
 
             Assert.Contains("[Db1.dbo].[Table]", result, StringComparison.Ordinal);
         }

@@ -281,10 +281,31 @@ public class BracketLocatorTests
     }
 
     [Fact]
-    public void ReplaceBrackets_Keeps_Bracket_Followed_By_Identifier_Char()
+    public void ReplaceBrackets_Quotes_Bracketed_Identifier_Followed_By_Alias()
     {
-        Assert.Equal("[abc]d",
+        Assert.Equal("\"abc\"d",
             BracketLocator.ReplaceBrackets("[abc]d", PostgresDialect.Instance));
+    }
+
+    [Fact]
+    public void ReplaceBrackets_Keeps_Escaped_Closing_Bracket_In_Identifier()
+    {
+        Assert.Equal("\"a]b\"",
+            BracketLocator.ReplaceBrackets("[a]]b]", PostgresDialect.Instance));
+    }
+
+    [Fact]
+    public void ReplaceBrackets_DoesNotPair_Bracket_Across_Comment_And_Still_Translates_Later_Identifier()
+    {
+        Assert.Equal("SELECT [A /* ] */ FROM \"T\"",
+            BracketLocator.ReplaceBrackets("SELECT [A /* ] */ FROM [T]", PostgresDialect.Instance));
+    }
+
+    [Fact]
+    public void ReplaceBrackets_DoesNotPair_Bracket_Across_Quoted_Text()
+    {
+        Assert.Equal("SELECT [A ']' + \"T\"",
+            BracketLocator.ReplaceBrackets("SELECT [A ']' + [T]", PostgresDialect.Instance));
     }
 
     [Fact]

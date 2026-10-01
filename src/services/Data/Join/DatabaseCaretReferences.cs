@@ -18,30 +18,14 @@ public class DatabaseCaretReferences
         if (expression == null || expression.IndexOf('^') < 0)
             return expression;
 
-        return BracketLocator.ReplaceBracketContents(expression, '^', contents =>
+        return BracketLocator.ReplaceBracketContents(expression, '^', '-', contents =>
         {
-            var idx = contents.IndexOf('^');
-            if (idx < 0)
+            if (contents.Length < 2 || contents[0] != '^')
                 return contents;
 
-            string? connectionKey = null;
-
-            if (idx != 0)
-                connectionKey = contents[..idx];
-
-            string? databaseName;
-
-            if (!string.IsNullOrEmpty(connectionKey))
-            {
-                databaseName = GetDatabaseName?.Invoke(connectionKey);
-                if (!string.IsNullOrEmpty(databaseName))
-                    return databaseName;
-            }
-
-            if (idx < contents.Length - 1)
-                return contents[(idx + 1)..];
-
-            return contents;
+            var connectionKey = contents[1..];
+            var databaseName = GetDatabaseName?.Invoke(connectionKey);
+            return string.IsNullOrEmpty(databaseName) ? connectionKey : databaseName;
         });
     }
 

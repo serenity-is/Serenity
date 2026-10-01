@@ -28,7 +28,7 @@ public class DatabaseCaretReferencesTests
         var original = DatabaseCaretReferences.SetLocalGetDatabaseName(null);
         try
         {
-            Assert.Equal("[Table]", DatabaseCaretReferences.Replace("[Db^Table]"));
+            Assert.Equal("[Db]", DatabaseCaretReferences.Replace("[^Db]"));
         }
         finally
         {
@@ -37,12 +37,16 @@ public class DatabaseCaretReferencesTests
     }
 
     [Fact]
-    public void Replace_Drops_Reference_Without_ConnectionKey_Even_With_Resolver()
+    public void Replace_Resolves_ConnectionKey_After_Leading_Caret()
     {
-        var original = DatabaseCaretReferences.SetLocalGetDatabaseName(key => "ActualDb");
+        var original = DatabaseCaretReferences.SetLocalGetDatabaseName(key =>
+        {
+            Assert.Equal("Table", key);
+            return "ActualDb";
+        });
         try
         {
-            Assert.Equal("[Table]", DatabaseCaretReferences.Replace("[^Table]"));
+            Assert.Equal("[ActualDb]", DatabaseCaretReferences.Replace("[^Table]"));
         }
         finally
         {
@@ -60,7 +64,25 @@ public class DatabaseCaretReferencesTests
         });
         try
         {
-            Assert.Equal("[ActualDb]", DatabaseCaretReferences.Replace("[Db^Table]"));
+            Assert.Equal("[ActualDb]", DatabaseCaretReferences.Replace("[^Db]"));
+        }
+        finally
+        {
+            DatabaseCaretReferences.SetLocalGetDatabaseName(original);
+        }
+    }
+
+    [Fact]
+    public void Replace_Uses_Database_Name_For_Hyphenated_Connection_Key()
+    {
+        var original = DatabaseCaretReferences.SetLocalGetDatabaseName(key =>
+        {
+            Assert.Equal("Northwind-Archive", key);
+            return "ArchiveDb";
+        });
+        try
+        {
+            Assert.Equal("[ArchiveDb]", DatabaseCaretReferences.Replace("[^Northwind-Archive]"));
         }
         finally
         {
@@ -74,7 +96,7 @@ public class DatabaseCaretReferencesTests
         var original = DatabaseCaretReferences.SetLocalGetDatabaseName(key => "");
         try
         {
-            Assert.Equal("[Table]", DatabaseCaretReferences.Replace("[Db^Table]"));
+            Assert.Equal("[Db]", DatabaseCaretReferences.Replace("[^Db]"));
         }
         finally
         {
@@ -92,6 +114,18 @@ public class DatabaseCaretReferencesTests
     public void Replace_Keeps_Lone_Caret_In_Brackets()
     {
         Assert.Equal("[^]", DatabaseCaretReferences.Replace("[^]"));
+    }
+
+    [Fact]
+    public void Replace_Leaves_Dotted_Connection_Key_Unchanged()
+    {
+        Assert.Equal("[^Northwind.Archive]", DatabaseCaretReferences.Replace("[^Northwind.Archive]"));
+    }
+
+    [Fact]
+    public void Replace_Leaves_Connection_Key_With_Spaces_Unchanged()
+    {
+        Assert.Equal("[^Northwind Archive]", DatabaseCaretReferences.Replace("[^Northwind Archive]"));
     }
 
     [Fact]

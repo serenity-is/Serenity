@@ -17,6 +17,12 @@ public static class BracketLocator
     [return:NotNullIfNotNull(nameof(expression))]
     public static string? ReplaceBracketContents(string? expression, char validChar1, Func<string, string> replace)
     {
+        return ReplaceBracketContents(expression, validChar1, null, replace);
+    }
+
+    [return:NotNullIfNotNull(nameof(expression))]
+    internal static string? ReplaceBracketContents(string? expression, char validChar1, char? validChar2, Func<string, string> replace)
+    {
         if (expression == null)
             return null;
 
@@ -68,7 +74,8 @@ public static class BracketLocator
                     }
                 }
             }
-            else if (c == '_' || c == validChar1 || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9'))
+            else if (c == '_' || c == validChar1 || c == validChar2 ||
+                (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9'))
             {
             }
             else if (startBracket >= 0)
@@ -120,22 +127,14 @@ public static class BracketLocator
                     continue;
                 }
 
-                var end = expression.IndexOf(']', i + 1);
-                if (end < 0)
+                if (!TryFindBracketIdentifierEnd(expression, i, out var end))
                 {
                     sb.Append(c);
                     continue;
                 }
 
-                if (end < expression.Length - 1 &&
-                    (expression[end + 1] == '_' ||
-                     char.IsLetterOrDigit(expression[end + 1])))
-                {
-                    sb.Append(c);
-                    continue;
-                }
-
-                var sub = expression.SafeSubstring(i + 1, end - i - 1);
+                var sub = expression.SafeSubstring(i + 1, end - i - 1)
+                    .Replace("]]", "]", StringComparison.Ordinal);
                 if (sub.Length == 0 ||
                     sub.IndexOf('\'') >= 0 ||
                     sub.IndexOf('[') >= 0 ||
@@ -156,5 +155,40 @@ public static class BracketLocator
         }
 
         return sb.ToString();
+    }
+
+    private static bool TryFindBracketIdentifierEnd(string expression, int start, out int end)
+    {
+        for (var i = start + 1; i < expression.Length; i++)
+        {
+            // Do not let a bracket opened before a quoted region or comment
+            // pair with a closing bracket inside that region (or after it).
+            if (SqlRegionScanner.TrySkipQuotesAndComments(expression, ref i, skipBracketIdentifiers: false))
+            {
+                end = -1;
+                return false;
+            }
+
+            if (expression[i] == '[')
+            {
+                end = -1;
+                return false;
+            }
+
+            if (expression[i] == ']')
+            {
+                if (i + 1 < expression.Length && expression[i + 1] == ']')
+                {
+                    i++;
+                    continue;
+                }
+
+                end = i;
+                return true;
+            }
+        }
+
+        end = -1;
+        return false;
     }
 }
