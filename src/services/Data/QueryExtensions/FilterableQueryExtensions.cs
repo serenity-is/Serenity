@@ -43,12 +43,21 @@ public static class FilterableQueryExtensions
     /// <param name="value">
     ///   Parameter value.
     /// </param>
+    /// <param name="emitIsNull">
+    ///   When true and <paramref name="value"/> is null, an IS NULL filter is
+    ///   emitted instead of an equality check. This is false by default, in which
+    ///   case null produces a plain equality against NULL that never matches
+    ///   (matching SQL three-valued logic and Criteria equality semantics).
+    /// </param>
     /// <returns>
     ///   The new filter parameter.
     /// </returns>
-    public static T WhereEqual<T>(this T self, IField field, object? value) where T : IFilterableQuery
+    public static T WhereEqual<T>(this T self, IField field, object? value, bool emitIsNull = false) where T : IFilterableQuery
     {
-        self.Where(new Criteria(field) == self.AddParam(value));
+        if (value is null && emitIsNull)
+            self.Where(new Criteria(field).IsNull());
+        else
+            self.Where(new Criteria(field) == self.AddParam(value));
         return self;
     }
 }
