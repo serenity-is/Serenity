@@ -1287,6 +1287,26 @@ public abstract class BaseCriteria : ICriteria
     }
 
     /// <summary>
+    /// Converts the criteria to a string while ignoring its params, if any,
+    /// also reporting how many auto parameters the render generated.
+    /// </summary>
+    /// <param name="autoParamCount">The number of auto parameters generated
+    /// while rendering. When this is greater than zero the rendered text
+    /// contains deterministic @pN placeholders instead of the actual values,
+    /// so two renders cannot be trusted to be equal just because their text
+    /// matches. Manually named parameters (ParamCriteria) don't affect this
+    /// count, as they render literally and compare reliably.</param>
+    /// <returns>The string representation of the criteria.</returns>
+    internal string ToStringIgnoreParams(out int autoParamCount)
+    {
+        var ignoreParams = new IgnoreParams();
+        var sb = new StringBuilder(256);
+        ToString(sb, ignoreParams);
+        autoParamCount = ignoreParams.AutoParamCount;
+        return sb.ToString();
+    }
+
+    /// <summary>
     /// Converts the criteria to string representation while adding params to the target query.
     /// </summary>
     /// <param name="query">The target query to add params to.</param>
@@ -1360,6 +1380,8 @@ public abstract class BaseCriteria : ICriteria
     private class IgnoreParams : IQueryWithParams
     {
         private int next;
+
+        internal int AutoParamCount => next;
 
         public void AddParam(string name, object? value)
         {

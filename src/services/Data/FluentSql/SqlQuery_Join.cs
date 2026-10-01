@@ -2,8 +2,9 @@ namespace Serenity.Data;
 
 public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressionByName
 {
-    private void JoinToString(Join join, StringBuilder sb, bool modifySelf)
+    private void JoinToString(Join join, StringBuilder sb, bool modifySelf, out int autoParamCount)
     {
+        autoParamCount = 0;
         sb.Append(join.GetKeyword());
         sb.Append(' ');
         sb.Append(SqlSyntax.AutoBracketValid(join.Table, dialect));
@@ -24,6 +25,8 @@ public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressio
 
             if (modifySelf)
                 sb.Append(join.OnCriteria.ToString(this));
+            else if (join.OnCriteria is BaseCriteria baseCriteria)
+                sb.Append(baseCriteria.ToStringIgnoreParams(out autoParamCount));
             else
                 sb.Append(join.OnCriteria.ToStringIgnoreParams());
 
@@ -46,23 +49,33 @@ public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressio
         BeforeModify();
 
         var sb = new StringBuilder();
-        JoinToString(join, sb, modifySelf: false);
+        JoinToString(join, sb, modifySelf: false, out int autoParamCount);
         string expression = sb.ToString();
 
         if (!string.IsNullOrEmpty(join.Name) &&
             GetAliasExpression(join.Name) is string existingExpression)
         {
-            if (expression == existingExpression)
+            // The alias is already registered: either an innocent re-join of
+            // the identical join (e.g. explicitly joining and also selecting
+            // a field that auto-ensures it), which is gracefully skipped, or
+            // a conflicting one, which throws. The compared texts are rendered
+            // ignoring params, where every auto value becomes a deterministic
+            // @pN placeholder — so text equality is only trustworthy when no
+            // auto params were generated. Manually named parameters render
+            // literally and stay comparable.
+            if (autoParamCount == 0 && expression == existingExpression)
                 return this;
 
             throw new InvalidOperationException(string.Format("Query already has a join '{0}' with expression '{1}'. " +
-                "Attempted join expression is '{2}'", join.Name, existingExpression, expression));
+                "Attempted join expression is '{2}'" +
+                (autoParamCount > 0 ? ". The attempted join contains parameters, so its equality cannot be verified." : ""),
+                join.Name, existingExpression, expression));
         }
 
         if (from.Length > 0)
             from.Append(" \n");
 
-        JoinToString(join, from, modifySelf: true);
+        JoinToString(join, from, modifySelf: true, out _);
 
         if (!string.IsNullOrEmpty(join.Name))
         {

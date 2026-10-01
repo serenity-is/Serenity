@@ -145,14 +145,18 @@ public class SqlQuery_JoinTests
     }
 
     [Fact]
-    public void Join_With_Parameterized_Criteria_Is_Idempotent()
+    public void Join_Throws_For_Duplicate_Alias_With_Parameterized_Criteria()
     {
         var query = new SqlQuery().From("Base").Select("x")
             .Join(new LeftJoin("Table", "T1", new Criteria("T1") == 5));
 
-        // Duplicate detection compares ToStringIgnoreParams output; deterministic
-        // @pN names make the equivalent join match instead of throwing.
-        Assert.Same(query, query.Join(new LeftJoin("Table", "T1", new Criteria("T1") == 5)));
+        // Duplicate detection compares ToStringIgnoreParams output, where auto
+        // values render as deterministic @pN placeholders, so equality with
+        // the registered join cannot be verified and re-joining throws instead
+        // of risking silently keeping stale values.
+        var exception = Assert.Throws<InvalidOperationException>(() =>
+            query.Join(new LeftJoin("Table", "T1", new Criteria("T1") == 5)));
+        Assert.Contains("already has a join 'T1'", exception.Message);
     }
 
     [Fact]

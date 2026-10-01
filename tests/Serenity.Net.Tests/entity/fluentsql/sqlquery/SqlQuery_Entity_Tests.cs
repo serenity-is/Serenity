@@ -104,4 +104,46 @@ public partial class SqlQuery_Entity_Tests
         Assert.Contains("LEFT JOIN [TheCountryTable] c ON (c.[TheCountryID] = T0.[CountryID])", exception.Message);
         Assert.Contains("Attempted join expression is 'LEFT JOIN [City] c ON (c.[CityID] = T0.[CountryID])", exception.Message);
     }
+
+    [Fact]
+    public void JoinSkipsIdenticalJoinWithSameAlias()
+    {
+        var query = new SqlQuery()
+            .From("T")
+            .LeftJoin(new Alias("Other", "o"), new Criteria("o", "Id") == new Criteria("T", "Oid"));
+
+        // same join again is gracefully skipped, not duplicated
+        query.LeftJoin(new Alias("Other", "o"), new Criteria("o", "Id") == new Criteria("T", "Oid"));
+
+        Assert.Single(System.Text.RegularExpressions.Regex.Matches(query.ToString(), "LEFT JOIN"));
+    }
+
+    [Fact]
+    public void JoinSkipsIdenticalJoinWithSameManualParam()
+    {
+        var query = new SqlQuery()
+            .From("T")
+            .LeftJoin(new Alias("Other", "o"), new Criteria("o", "Id") == new ParamCriteria("@oid"));
+
+        // manually named params render literally, so equality is verifiable
+        query.LeftJoin(new Alias("Other", "o"), new Criteria("o", "Id") == new ParamCriteria("@oid"));
+
+        Assert.Single(System.Text.RegularExpressions.Regex.Matches(query.ToString(), "LEFT JOIN"));
+    }
+
+    [Fact]
+    public void JoinThrowsForSameAliasWhenOnDiffersOnlyInValues()
+    {
+        var query = new SqlQuery()
+            .From("T")
+            .LeftJoin(new Alias("Other", "o"), new Criteria("o", "Id") == 5);
+
+        // both render as "o.[Id] = @p0" when params are ignored, but the
+        // values differ, so this must throw instead of silently keeping 5
+        var exception = Assert.Throws<InvalidOperationException>(() =>
+            query.LeftJoin(new Alias("Other", "o"), new Criteria("o", "Id") == 6));
+
+        Assert.Contains("already has a join 'o'", exception.Message);
+        Assert.Contains("cannot be verified", exception.Message);
+    }
 }
