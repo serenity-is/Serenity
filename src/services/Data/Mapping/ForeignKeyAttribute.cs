@@ -14,8 +14,8 @@ public class ForeignKeyAttribute : Attribute
     /// <param name="field">Matching column in primary key table</param>
     public ForeignKeyAttribute(string table, string field)
     {
-        Field = field ?? throw new ArgumentNullException(nameof(field));
-        Table = table ?? throw new ArgumentNullException(nameof(table));
+        Field = !string.IsNullOrEmpty(field) ? field : throw new ArgumentNullException(nameof(field));
+        Table = !string.IsNullOrEmpty(table) ? table : throw new ArgumentNullException(nameof(table));
     }
 
     /// <summary>

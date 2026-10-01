@@ -32,7 +32,8 @@ public class OuterApplyAttribute(string alias, string innerQuery) : Attribute, I
     /// <value>
     /// The alias.
     /// </value>
-    public string Alias { get; private set; } = alias;
+    public string Alias { get; private set; } =
+        !string.IsNullOrEmpty(alias) ? alias : throw new ArgumentNullException(nameof(alias));
 
     /// <summary>
     /// Gets the inner query.
@@ -40,7 +41,8 @@ public class OuterApplyAttribute(string alias, string innerQuery) : Attribute, I
     /// <value>
     /// The inner query.
     /// </value>
-    public string InnerQuery { get; private set; } = innerQuery;
+    public string InnerQuery { get; private set; } =
+        !string.IsNullOrEmpty(innerQuery) ? innerQuery : throw new ArgumentNullException(nameof(innerQuery));
 
     /// <summary>
     /// Gets the property prefix.

@@ -14,7 +14,7 @@ public class LeftJoinAttribute : Attribute, ISqlJoin
     /// <param name="alias">Foreign join alias</param>
     public LeftJoinAttribute(string alias)
     {
-        Alias = alias;
+        Alias = !string.IsNullOrEmpty(alias) ? alias : throw new ArgumentNullException(nameof(alias));
     }
 
     /// <summary>
@@ -26,9 +26,9 @@ public class LeftJoinAttribute : Attribute, ISqlJoin
     /// this parameter is the ON criteria of the left join statement.</param>
     public LeftJoinAttribute(string alias, string toTable, string onCriteria)
     {
-        Alias = alias;
-        ToTable = toTable;
-        OnCriteria = onCriteria;
+        Alias = !string.IsNullOrEmpty(alias) ? alias : throw new ArgumentNullException(nameof(alias));
+        ToTable = !string.IsNullOrEmpty(toTable) ? toTable : throw new ArgumentNullException(nameof(toTable));
+        OnCriteria = !string.IsNullOrEmpty(onCriteria) ? onCriteria : throw new ArgumentNullException(nameof(onCriteria));
     }
 
     /// <summary>

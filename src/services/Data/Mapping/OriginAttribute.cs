@@ -13,7 +13,7 @@ public class OriginAttribute : Attribute
     /// key via LeftJoin attribute.</param>
     public OriginAttribute(string join)
     {
-        Join = join ?? throw new ArgumentNullException(nameof(join));
+        Join = !string.IsNullOrEmpty(join) ? join : throw new ArgumentNullException(nameof(join));
     }
 
     /// <summary>
@@ -23,8 +23,8 @@ public class OriginAttribute : Attribute
     /// <param name="property">The property.</param>
     public OriginAttribute(string join, string property)
     {
-        Join = join ?? throw new ArgumentNullException(nameof(join));
-        Property = property;
+        Join = !string.IsNullOrEmpty(join) ? join : throw new ArgumentNullException(nameof(join));
+        Property = !string.IsNullOrEmpty(property) ? property : throw new ArgumentNullException(nameof(property));
     }
 
     /// <summary>

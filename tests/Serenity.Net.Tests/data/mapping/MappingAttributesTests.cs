@@ -343,6 +343,22 @@ public class MappingAttributesTests
         var dialectAttr = new InnerJoinAttribute("a", ServerType.MySql);
         Assert.Equal("MySql", dialectAttr.Dialect);
 
+        Assert.Throws<ArgumentNullException>(() => new InnerJoinAttribute(null!));
+        Assert.Throws<ArgumentNullException>(() => new InnerJoinAttribute(""));
+        Assert.Throws<ArgumentNullException>(() => new InnerJoinAttribute("a", null!, "c"));
+        Assert.Throws<ArgumentNullException>(() => new InnerJoinAttribute("a", "", "c"));
+        Assert.Throws<ArgumentNullException>(() => new InnerJoinAttribute("a", "T", null!));
+        Assert.Throws<ArgumentNullException>(() => new InnerJoinAttribute("a", "T", ""));
+
+        var leftJoin = new LeftJoinAttribute("a");
+        Assert.Equal("a", leftJoin.Alias);
+        Assert.Throws<ArgumentNullException>(() => new LeftJoinAttribute(null!));
+        Assert.Throws<ArgumentNullException>(() => new LeftJoinAttribute(""));
+        Assert.Throws<ArgumentNullException>(() => new LeftJoinAttribute("a", null!, "c"));
+        Assert.Throws<ArgumentNullException>(() => new LeftJoinAttribute("a", "", "c"));
+        Assert.Throws<ArgumentNullException>(() => new LeftJoinAttribute("a", "T", null!));
+        Assert.Throws<ArgumentNullException>(() => new LeftJoinAttribute("a", "T", ""));
+
         var fullDialect = new InnerJoinAttribute("a", "T", "c", ServerType.Sqlite);
         Assert.Equal("Sqlite", fullDialect.Dialect);
 
@@ -371,6 +387,11 @@ public class MappingAttributesTests
         var dialectAttr = new OuterApplyAttribute("a", "SELECT 1", ServerType.MySql);
         Assert.Equal("MySql", dialectAttr.Dialect);
 
+        Assert.Throws<ArgumentNullException>(() => new OuterApplyAttribute(null!, "SELECT 1"));
+        Assert.Throws<ArgumentNullException>(() => new OuterApplyAttribute("", "SELECT 1"));
+        Assert.Throws<ArgumentNullException>(() => new OuterApplyAttribute("a", null!));
+        Assert.Throws<ArgumentNullException>(() => new OuterApplyAttribute("a", ""));
+
         attr.PropertyPrefix = "p";
         attr.TitlePrefix = "t";
         attr.RowType = typeof(StringField);
@@ -385,6 +406,20 @@ public class MappingAttributesTests
     }
 
     [Fact]
+    public void OriginAttribute_Validates_Required_Values()
+    {
+        Assert.Throws<ArgumentNullException>(() => new OriginAttribute(null!));
+        Assert.Throws<ArgumentNullException>(() => new OriginAttribute(""));
+        Assert.Throws<ArgumentNullException>(() => new OriginAttribute(null!, "Name"));
+        Assert.Throws<ArgumentNullException>(() => new OriginAttribute("", "Name"));
+        Assert.Throws<ArgumentNullException>(() => new OriginAttribute("join", null!));
+        Assert.Throws<ArgumentNullException>(() => new OriginAttribute("join", ""));
+
+        Assert.Equal("join", new OriginAttribute("join").Join);
+        Assert.Equal("Name", new OriginAttribute("join", "Name").Property);
+    }
+
+    [Fact]
     public void ForeignKeyAttribute_String_Constructor()
     {
         var attr = new ForeignKeyAttribute("T", "F");
@@ -393,7 +428,9 @@ public class MappingAttributesTests
         Assert.Null(attr.RowType);
 
         Assert.Throws<ArgumentNullException>(() => new ForeignKeyAttribute((string)null!, "F"));
+        Assert.Throws<ArgumentNullException>(() => new ForeignKeyAttribute("", "F"));
         Assert.Throws<ArgumentNullException>(() => new ForeignKeyAttribute("T", null!));
+        Assert.Throws<ArgumentNullException>(() => new ForeignKeyAttribute("T", ""));
 
         var dialectAttr = new ForeignKeyAttribute("T", "F", ServerType.MySql);
         Assert.Equal("MySql", dialectAttr.Dialect);
