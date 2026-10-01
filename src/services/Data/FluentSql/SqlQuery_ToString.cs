@@ -45,6 +45,11 @@ public partial class SqlQuery
         var whereClause = query.Where;
         var sb = new StringBuilder();
 
+        // A UNION subquery must enclose the complete set expression, not only
+        // its final SELECT leg.
+        if (query.Parent != null && !query.OmitParens)
+            sb.Append('(');
+
         if (query.UnionQuery != null)
         {
             sb.Append(query.UnionQuery.ToString());
@@ -52,10 +57,6 @@ public partial class SqlQuery
             sb.Append(dialect.UnionKeyword(query.UnionType));
             sb.Append("\n\n");
         }
-
-        // sub queries should be enclosed in parenthesis
-        if (query.Parent != null && !query.OmitParens)
-            sb.Append('(');
 
         var skip = query.Skip;
         var take = query.Take;
@@ -444,6 +445,5 @@ public partial class SqlQuery
 
         return sb.ToString();
     }
-
 
 }
