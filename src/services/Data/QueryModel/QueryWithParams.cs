@@ -60,7 +60,15 @@ public class QueryWithParams : IQueryWithParams
         ArgumentNullException.ThrowIfNull(target);
         target.BeforeModify();
 
-        target.parameters = parameters != null ? new Dictionary<string, object?>(parameters) : null;
+        if (parameters is null)
+            target.parameters = null;
+        else
+        {
+            var cloned = new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase);
+            foreach (var pair in parameters)
+                cloned.Add(pair.Key, pair.Value);
+            target.parameters = cloned;
+        }
     }
 
     /// <summary>
@@ -99,7 +107,11 @@ public class QueryWithParams : IQueryWithParams
         if (IsParamsFrozen)
             throw new InvalidOperationException("Query parameters have been frozen.");
 
-        (parameters ??= new Dictionary<string, object?>()).Add(name, value);
+        parameters ??= new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase);
+        if (parameters.ContainsKey(name))
+            throw new ArgumentException($"A parameter named '{name}' has already been added.", nameof(name));
+
+        parameters.Add(name, value);
     }
 
     /// <summary>
@@ -120,7 +132,7 @@ public class QueryWithParams : IQueryWithParams
         if (IsParamsFrozen)
             throw new InvalidOperationException("Query parameters have been frozen.");
 
-        (parameters ??= new Dictionary<string, object?>())[name] = value;
+        (parameters ??= new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase))[name] = value;
     }
 
     /// <summary>
@@ -237,7 +249,7 @@ public class QueryWithParams : IQueryWithParams
         if (parameters?.IsReadOnly == true)
             return;
 
-        parameters = (parameters ?? new Dictionary<string, object?>()).AsReadOnly();
+        parameters = (parameters ?? new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase)).AsReadOnly();
     }
 
     /// <summary>

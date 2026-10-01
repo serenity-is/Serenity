@@ -13,6 +13,33 @@ public class QueryWithParamsExtensionsTests
     }
 
     [Fact]
+    public void ParameterNames_Are_CaseInsensitive()
+    {
+        var query = new SqlQuery();
+        query.AddParam("@Id", 1);
+
+        var exception = Assert.Throws<ArgumentException>(() => query.AddParam("@ID", 2));
+        Assert.Contains("@ID", exception.Message, StringComparison.Ordinal);
+        Assert.Equal(1, query.Params!["@id"]);
+
+        query.SetParam("@ID", 3);
+        Assert.Equal(3, query.Params["@Id"]);
+        Assert.Equal(1, query.ParamCount);
+    }
+
+    [Fact]
+    public void CloneParams_Preserves_CaseInsensitive_Parameter_Lookup()
+    {
+        var query = new SqlUpdate("T");
+        query.AddParam("@Id", 1);
+
+        var clone = query.Clone();
+
+        Assert.Equal(1, clone.Params!["@ID"]);
+        Assert.Throws<ArgumentException>(() => clone.AddParam("@ID", 2));
+    }
+
+    [Fact]
     public void SetParam_And_AddParam_Reject_Names_Without_At_Prefix()
     {
         var query = new SqlQuery();
