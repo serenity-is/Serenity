@@ -7,7 +7,7 @@ public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressio
         autoParamCount = 0;
         sb.Append(join.GetKeyword());
         sb.Append(' ');
-        sb.Append(SqlSyntax.AutoBracketValid(join.Table, dialect));
+        sb.Append(SqlSyntax.AutoBracketValid(join.Table, Dialect()));
 
         // append if joinAlias is defined
         if (!string.IsNullOrEmpty(join.Name))

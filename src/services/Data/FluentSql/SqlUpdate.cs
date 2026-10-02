@@ -208,10 +208,7 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
     /// <exception cref="ArgumentNullException">dialect is null.</exception>
     public SqlUpdate Dialect(ISqlDialect dialect)
     {
-        ArgumentNullException.ThrowIfNull(dialect);
-        BeforeModify();
-        this.dialect = dialect;
-        dialectOverridden = true;
+        SetDialect(dialect);
         return this;
     }
 
@@ -249,9 +246,6 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
         clone.whereCriteria.AddRange(whereCriteria);
         clone.whereConditions.AddRange(whereConditions);
         clone.whereClause.Append(whereClause);
-        clone.nextAutoParam = nextAutoParam;
-        clone.dialect = dialect;
-        clone.dialectOverridden = dialectOverridden;
         CloneParams(clone);
         CloneAliasExpressionsTo(clone);
         clone.cachedToString = cachedToString;
@@ -264,7 +258,8 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
     ///   String representation.</returns>
     public override string ToString()
     {
-        return cachedToString ??= Format(tableName, ((IFilterableQuery)this).GetWhereClause(), fieldExpressions, dialect);
+        return GetCachedToString(currentDialect =>
+            Format(tableName, ((IFilterableQuery)this).GetWhereClause(), fieldExpressions, currentDialect));
     }
 
     /// <summary>

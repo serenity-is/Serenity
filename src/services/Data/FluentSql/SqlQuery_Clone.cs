@@ -14,8 +14,6 @@ public partial class SqlQuery
     {
         var clone = new SqlQuery
         {
-            dialect = dialect,
-            dialectOverridden = dialectOverridden,
             skip = skip,
             take = take,
             countRecords = countRecords,
@@ -28,8 +26,7 @@ public partial class SqlQuery
             intoIndex = intoIndex,
             forXml = forXml,
             forJson = forJson,
-            unionType = unionType,
-            nextAutoParam = nextAutoParam
+            unionType = unionType
         };
 
         if (unionQuery != null)
@@ -59,11 +56,7 @@ public partial class SqlQuery
         if (having != null)
             clone.having = new StringBuilder(having.ToString());
 
-        if (parent != null)
-            clone.parent = parent;
-        else if (Params != null)
-            foreach (var pair in Params)
-                clone.AddParam(pair.Key, pair.Value);
+        CloneParams(clone);
 
         CloneAliasExpressionsTo(clone);
 

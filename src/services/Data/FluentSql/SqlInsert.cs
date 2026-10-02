@@ -136,9 +136,6 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
         SqlInsert clone = new(tableName);
         clone.fieldExpressions.AddRange(fieldExpressions);
         clone.identityColumn = identityColumn;
-        clone.dialect = dialect;
-        clone.dialectOverridden = dialectOverridden;
-        clone.nextAutoParam = nextAutoParam;
         CloneParams(clone);
         CloneAliasExpressionsTo(clone);
         clone.cachedToString = cachedToString;
@@ -153,10 +150,7 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
     /// <exception cref="ArgumentNullException">dialect is null.</exception>
     public SqlInsert Dialect(ISqlDialect dialect)
     {
-        ArgumentNullException.ThrowIfNull(dialect);
-        BeforeModify();
-        this.dialect = dialect;
-        dialectOverridden = true;
+        SetDialect(dialect);
 
         return this;
     }
@@ -167,7 +161,7 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
     ///   String representation.</returns>
     public override string ToString()
     {
-        return cachedToString ??= Format(tableName, fieldExpressions, dialect);
+        return GetCachedToString(currentDialect => Format(tableName, fieldExpressions, currentDialect));
     }
 
     /// <summary>
@@ -399,6 +393,6 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
     ///   Formatted UPSERT query.</returns>
     public string ToUpsertString(IEnumerable<string> keyFields)
     {
-        return FormatUpsert(tableName, fieldExpressions, keyFields, dialect);
+        return FormatUpsert(tableName, fieldExpressions, keyFields, Dialect());
     }
 }

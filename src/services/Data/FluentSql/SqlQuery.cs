@@ -103,7 +103,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
         if (from.Length > 0)
             from.Append(", ");
 
-        from.Append(SqlSyntax.AutoBracketValid(table, dialect));
+        from.Append(SqlSyntax.AutoBracketValid(table, Dialect()));
     }
 
     /// <summary>
@@ -137,8 +137,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
         {
             var aliasDialect = hasDialect.Dialect;
             ArgumentNullException.ThrowIfNull(aliasDialect);
-            dialect = aliasDialect;
-            dialectOverridden = true;
+            SetDialect(aliasDialect);
         }
 
         AppendFromTable(table);
@@ -569,7 +568,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     }
 
     /// <summary>
-    /// Creates a new query that shares parameter dictionary with this query.
+    /// Creates a new query that shares parameter storage and dialect with this query tree.
     /// </summary>
     /// <returns>
     /// A new query that shares parameters.</returns>
@@ -684,10 +683,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     /// <exception cref="ArgumentNullException">dialect is null.</exception>
     public SqlQuery Dialect(ISqlDialect dialect)
     {
-        ArgumentNullException.ThrowIfNull(dialect);
-        BeforeModify();
-        this.dialect = dialect;
-        dialectOverridden = true;
+        SetDialect(dialect);
 
         return this;
     }

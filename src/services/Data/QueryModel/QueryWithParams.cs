@@ -14,9 +14,9 @@ public class QueryWithParams : IQueryWithParams
     private bool isFrozen;
 
     /// <summary>
-    /// The cached SQL string.
+    /// The cached SQL string and the dialect it was formatted with.
     /// </summary>
-    protected string? cachedToString;
+    protected (string Sql, ISqlDialect Dialect)? cachedToString;
 
     /// <summary>
     /// The dialect.
@@ -60,7 +60,18 @@ public class QueryWithParams : IQueryWithParams
         ArgumentNullException.ThrowIfNull(target);
         target.BeforeModify();
 
-        if (parameters is null)
+        // A subquery clone stays attached to the same parameter root. Root
+        // clones instead receive an independent, mutable copy of the values.
+        target.parent = parent;
+
+        if (parent is null)
+        {
+            target.dialect = dialect;
+            target.dialectOverridden = dialectOverridden;
+            target.nextAutoParam = nextAutoParam;
+        }
+
+        if (parent is not null || parameters is null)
             target.parameters = null;
         else
         {
@@ -82,6 +93,22 @@ public class QueryWithParams : IQueryWithParams
             throw new InvalidOperationException("Query has been frozen.");
 
         cachedToString = null;
+    }
+
+    /// <summary>
+    /// Gets the cached SQL string, regenerating it when this query tree's dialect changes.
+    /// </summary>
+    /// <param name="format">The formatter.</param>
+    /// <returns>The SQL string.</returns>
+    protected string GetCachedToString(Func<ISqlDialect, string> format)
+    {
+        ArgumentNullException.ThrowIfNull(format);
+
+        var currentDialect = Dialect();
+        if (cachedToString is not { } cached || !ReferenceEquals(cached.Dialect, currentDialect))
+            cachedToString = (format(currentDialect), currentDialect);
+
+        return cachedToString.Value.Sql;
     }
 
     private static void CheckParamName(string name)
@@ -213,7 +240,7 @@ public class QueryWithParams : IQueryWithParams
     }
 
     /// <summary>
-    /// Creates a new query that shares parameter dictionary with this query.
+    /// Creates a new query that shares parameter storage and dialect with this query tree.
     /// </summary>
     /// <returns>
     /// A new query that shares parameters.
@@ -225,6 +252,25 @@ public class QueryWithParams : IQueryWithParams
         {
             parent = this
         };
+    }
+
+    /// <summary>
+    /// Sets the dialect for this query tree, propagating the change to its root.
+    /// </summary>
+    /// <param name="value">The dialect.</param>
+    protected void SetDialect(ISqlDialect value)
+    {
+        ArgumentNullException.ThrowIfNull(value);
+        BeforeModify();
+
+        if (parent is not null)
+        {
+            parent.SetDialect(value);
+            return;
+        }
+
+        dialect = value;
+        dialectOverridden = true;
     }
 
     void IQueryWithParams.Freeze()
@@ -339,6 +385,9 @@ public class QueryWithParams : IQueryWithParams
     {
         ArgumentNullException.ThrowIfNull(target);
 
+        // Aliases on child queries resolve through their parent. In particular,
+        // UNION legs share the root registry, so copying the root registry into
+        // a child clone would give it a redundant and potentially stale snapshot.
         if (parent is null && target.parent is null && aliasExpressions is not null)
         {
             target.BeforeModify();
@@ -366,14 +415,14 @@ public class QueryWithParams : IQueryWithParams
         return candidate;
     }
 
-    ISqlDialect IQueryWithParams.Dialect => dialect;
+    ISqlDialect IQueryWithParams.Dialect => Dialect();
 
     /// <summary>
     /// Gets the dialect (SQL server type / version) for query.
     /// </summary>
     public ISqlDialect Dialect()
     {
-        return dialect;
+        return parent?.Dialect() ?? dialect;
     }
 
     /// <summary>
@@ -382,7 +431,7 @@ public class QueryWithParams : IQueryWithParams
     /// <value>
     ///   <c>true</c> if the dialect is overridden; otherwise, <c>false</c>.
     /// </value>
-    public bool IsDialectOverridden => dialectOverridden;
+    public bool IsDialectOverridden => parent?.IsDialectOverridden ?? dialectOverridden;
 
     /// <summary>
     /// Gets the debug text.
@@ -390,5 +439,5 @@ public class QueryWithParams : IQueryWithParams
     /// <value>
     /// The debug text.
     /// </value>
-    public string? DebugText => SqlDebugDumper.Dump(ToString(), Params, dialect);
+    public string? DebugText => SqlDebugDumper.Dump(ToString(), Params, Dialect());
 }

@@ -31,7 +31,7 @@ public class SqlQuery_ToStringTests
 
         public SqlQuery Child { get; }
 
-        public override string ToString() => cachedToString ??= Child.ToString();
+        public override string ToString() => GetCachedToString(_ => Child.ToString());
     }
 
     [Fact]

@@ -29,6 +29,51 @@ public class SqlQuery_SubQuery_Tests
     }
 
     [Fact]
+    public void SubQueryInheritsParentDialect()
+    {
+        var query = new SqlQuery();
+        var sub = query.SubQuery()
+            .Select("SubColumn")
+            .From("SubTable")
+            .Take(1);
+
+        query.Dialect(PostgresDialect.Instance);
+
+        Assert.Same(PostgresDialect.Instance, ((IQueryWithParams)sub).Dialect);
+        Assert.True(sub.IsDialectOverridden);
+        Assert.Contains("LIMIT 1", sub.ToString());
+        Assert.DoesNotContain("TOP 1", sub.ToString());
+    }
+
+    [Fact]
+    public void Setting_Dialect_On_SubQuery_Changes_Root_And_Siblings()
+    {
+        var query = new SqlQuery();
+        var sub = query.SubQuery();
+        var sibling = query.SubQuery();
+
+        sub.Dialect(PostgresDialect.Instance);
+
+        Assert.Same(PostgresDialect.Instance, query.Dialect());
+        Assert.Same(PostgresDialect.Instance, ((IQueryWithParams)sibling).Dialect);
+        Assert.True(query.IsDialectOverridden);
+        Assert.True(sibling.IsDialectOverridden);
+    }
+
+    [Fact]
+    public void Parent_Dialect_Change_Invalidates_SubQuery_Sql_Cache()
+    {
+        var query = new SqlQuery();
+        var sub = query.SubQuery().Select("SubColumn").From("SubTable").Take(1);
+
+        Assert.Contains("TOP 1", sub.ToString());
+        query.Dialect(PostgresDialect.Instance);
+
+        Assert.Contains("LIMIT 1", sub.ToString());
+        Assert.DoesNotContain("TOP 1", sub.ToString());
+    }
+
+    [Fact]
     public void SubQueryCanBeUsedAsCriteriaUsingVar()
     {
         var query = new SqlQuery()

@@ -36,17 +36,55 @@ public class SqlQuery_CloneTests
     }
 
     [Fact]
+    public void CloneParams_Preserves_Dialect_And_AutoParameter_Counter()
+    {
+        var query = new SqlQuery().Dialect(PostgresDialect.Instance);
+        var first = query.AddParam(1);
+
+        var clone = query.Clone();
+        var second = clone.AddParam(2);
+
+        Assert.Equal("@p1", first.Name);
+        Assert.Equal("@p2", second.Name);
+        Assert.Same(PostgresDialect.Instance, clone.Dialect());
+        Assert.True(clone.IsDialectOverridden);
+        Assert.Equal(2, clone.ParamCount);
+        Assert.Equal(1, query.ParamCount);
+    }
+
+    [Fact]
     public void Clone_Copies_SubQuery_With_Parent()
     {
         var query = new SqlQuery().From("Parent");
         var sub = query.SubQuery()
             .Select("A")
             .From("SubTable")
-            .Where("B = 1");
+            .Where(new Criteria("B") == 1);
+
+        _ = sub.ToString();
 
         var clone = sub.Clone();
 
         Assert.Equal(sub.ToString(), clone.ToString());
+
+        var next = clone.AddParam(2);
+        Assert.Equal("@p2", next.Name);
+        Assert.Equal(2, query.ParamCount);
+        Assert.Same(query, clone.Parent);
+    }
+
+    [Fact]
+    public void Clone_Of_SubQuery_Uses_Current_Parent_Dialect()
+    {
+        var query = new SqlQuery();
+        var sub = query.SubQuery().Select("A").From("T");
+        query.Dialect(PostgresDialect.Instance);
+
+        var clone = sub.Clone();
+
+        Assert.Same(query, clone.Parent);
+        Assert.Same(PostgresDialect.Instance, clone.Dialect());
+        Assert.True(clone.IsDialectOverridden);
     }
 
     [Fact]

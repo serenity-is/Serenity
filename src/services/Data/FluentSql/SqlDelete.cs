@@ -50,9 +50,6 @@ public class SqlDelete(string tableName) : QueryWithParams, IFilterableQuery
         SqlDelete clone = new(_tableName);
         clone.whereCriteria.AddRange(whereCriteria);
         clone.whereClause.Append(whereClause);
-        clone.nextAutoParam = nextAutoParam;
-        clone.dialect = dialect;
-        clone.dialectOverridden = dialectOverridden;
         CloneParams(clone);
         CloneAliasExpressionsTo(clone);
         clone.cachedToString = cachedToString;
@@ -65,7 +62,8 @@ public class SqlDelete(string tableName) : QueryWithParams, IFilterableQuery
     ///   String representation of the query.</returns>
     public override string ToString()
     {
-        return cachedToString ??= Format(_tableName, ((IFilterableQuery)this).GetWhereClause(), dialect);
+        return GetCachedToString(currentDialect =>
+            Format(_tableName, ((IFilterableQuery)this).GetWhereClause(), currentDialect));
     }
 
     /// <summary>

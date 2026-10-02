@@ -9,7 +9,7 @@ public partial class SqlQuery
     ///   Formatted SELECT statement.</returns>
     public override string ToString()
     {
-        return cachedToString ??= ToString(this, dialect);
+        return GetCachedToString(currentDialect => ToString(this, currentDialect));
     }
 
     IReadOnlyList<Column> ISqlQuery.Columns => columns.AsReadOnly();
