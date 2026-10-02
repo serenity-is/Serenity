@@ -32,6 +32,18 @@ public class SqlConversionsTests
     }
 
     [Fact]
+    public void ToSql_FloatNull_ReturnsNullConstant()
+    {
+        Assert.Equal("NULL", ((float?)null).ToSql());
+    }
+
+    [Fact]
+    public void ToSql_Float_UsesInvariantFormatting()
+    {
+        Assert.Equal("1.5", ((float?)1.5f).ToSql());
+    }
+
+    [Fact]
     public void ToSql_DecimalNull_ReturnsNullConstant()
     {
         Assert.Equal("NULL", ((decimal?)null).ToSql());
@@ -160,6 +172,54 @@ public class SqlConversionsTests
         var guid = Guid.NewGuid();
 
         Assert.Equal("'" + guid.ToString("D") + "'", ((Guid?)guid).ToSql());
+    }
+
+    [Theory]
+    [InlineData(typeof(SqlServer2012Dialect), "'00112233-4455-6677-8899-aabbccddeeff'")]
+    [InlineData(typeof(PostgresDialect), "'00112233-4455-6677-8899-aabbccddeeff'")]
+    [InlineData(typeof(MySqlDialect), "'00112233-4455-6677-8899-aabbccddeeff'")]
+    [InlineData(typeof(SqliteDialect), "'00112233-4455-6677-8899-aabbccddeeff'")]
+    public void ToSql_Guid_Uses_Canonical_String_For_String_And_Native_Guid_Dialects(Type dialectType, string expected)
+    {
+        var dialect = (ISqlDialect)Activator.CreateInstance(dialectType)!;
+        var guid = Guid.Parse("00112233-4455-6677-8899-aabbccddeeff");
+
+        Assert.Equal(expected, ((Guid?)guid).ToSql(dialect));
+    }
+
+    [Fact]
+    public void ToSql_Guid_Uses_FluentMigrator_Oracle_Raw_Byte_Order()
+    {
+        var guid = Guid.Parse("00112233-4455-6677-8899-aabbccddeeff");
+
+        Assert.Equal("HEXTORAW('33221100554477668899AABBCCDDEEFF')",
+            ((Guid?)guid).ToSql(OracleDialect.Instance));
+    }
+
+    [Fact]
+    public void ToSql_Guid_Uses_Firebird_Uuid_Byte_Order()
+    {
+        var guid = Guid.Parse("00112233-4455-6677-8899-aabbccddeeff");
+
+        Assert.Equal("X'00112233445566778899aabbccddeeff'",
+            ((Guid?)guid).ToSql(FirebirdDialect.Instance));
+    }
+
+    [Fact]
+    public void ToSql_Guid_Uses_Default_Dialect_When_Dialect_Is_Null()
+    {
+        var oldDialect = SqlSettings.SetLocalDialect(OracleDialect.Instance);
+        try
+        {
+            var guid = Guid.Parse("00112233-4455-6677-8899-aabbccddeeff");
+
+            Assert.Equal("HEXTORAW('33221100554477668899AABBCCDDEEFF')",
+                ((Guid?)guid).ToSql(null));
+        }
+        finally
+        {
+            SqlSettings.SetLocalDialect(oldDialect);
+        }
     }
 
     [Fact]

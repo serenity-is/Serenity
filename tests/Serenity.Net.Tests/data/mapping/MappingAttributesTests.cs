@@ -482,11 +482,31 @@ public class MappingAttributesTests
         Assert.Equal("1.5", BaseExpressionAttribute.ToString(1.5d, dialect));
         Assert.Equal("2.5", BaseExpressionAttribute.ToString(2.5m, dialect));
         Assert.Equal("9", BaseExpressionAttribute.ToString(9L, dialect));
+        var guid = Guid.Parse("b9a53eda-e4c8-4d9e-9cc6-c76fbadfdcd9");
+        Assert.Equal("'b9a53eda-e4c8-4d9e-9cc6-c76fbadfdcd9'", BaseExpressionAttribute.ToString(guid, dialect));
+        Assert.Equal("HEXTORAW('DA3EA5B9C8E49E4D9CC6C76FBADFDCD9')",
+            BaseExpressionAttribute.ToString(guid, OracleDialect.Instance));
         Assert.NotNull(BaseExpressionAttribute.ToString(DateTime.Now, dialect));
         Assert.Equal("C", BaseExpressionAttribute.ToString(typeof(ConstantExpressionAttribute), dialect));
         Assert.Equal("T0.A", BaseExpressionAttribute.ToString(
             new object[] { typeof(ExpressionAttribute), "T0.A" }, dialect));
         Assert.Equal("1.5", BaseExpressionAttribute.ToString(1.5f, dialect));
+    }
+
+    [Fact]
+    public void BaseExpressionAttribute_ToString_Enumerates_Lazy_Attribute_Arguments_Once()
+    {
+        var enumerationCount = 0;
+
+        IEnumerable<object> Arguments()
+        {
+            enumerationCount++;
+            yield return typeof(ExpressionAttribute);
+            yield return "T0.A";
+        }
+
+        Assert.Equal("T0.A", BaseExpressionAttribute.ToString(Arguments(), SqlServer2012Dialect.Instance));
+        Assert.Equal(1, enumerationCount);
     }
 
     [Fact]

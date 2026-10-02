@@ -100,7 +100,7 @@ public class ValueCriteria(object? value) : BaseCriteria
                     {
                         // Quoted D-format literal; only where it compares
                         // against GUID-ish columns and the budget matters.
-                        sb.Append(((Guid?)g).ToSql());
+                        sb.Append(((Guid?)g).ToSql(query.Dialect));
                         continue;
                     }
                 }

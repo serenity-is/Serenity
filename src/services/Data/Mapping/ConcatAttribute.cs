@@ -44,6 +44,8 @@ public class ConcatAttribute : BaseExpressionAttribute
     /// <inheritdoc/>
     public override string Translate(ISqlDialect dialect)
     {
+        dialect ??= SqlSettings.DefaultDialect;
+
         string coalesce(string s)
         {
             if (NullAsEmpty && s != "''" && s != "' '")

@@ -27,6 +27,14 @@ public class ConcatAttribute_Tests
         Assert.True(new Concat("TEST", "TEST").NullAsEmpty);
     }
 
+    [Fact]
+    public void Translate_Uses_Default_Dialect_When_Dialect_Is_Null()
+    {
+        var concat = new Concat("Test1", "Test2");
+
+        Assert.Equal(concat.Translate(SqlSettings.DefaultDialect), concat.Translate(null!));
+    }
+
     [InlineData(typeof(SqlServer2012Dialect), false)]
     [InlineData(typeof(SqlServer2012Dialect), true)]
     [InlineData(typeof(PostgresDialect), false)]

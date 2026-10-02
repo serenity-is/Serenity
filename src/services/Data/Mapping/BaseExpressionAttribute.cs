@@ -74,11 +74,17 @@ public abstract class BaseExpressionAttribute : Attribute
         if (expression is double d)
             return SqlConversions.ToSql(d);
 
+        if (expression is float f)
+            return SqlConversions.ToSql((float?)f);
+
         if (expression is decimal m)
             return SqlConversions.ToSql(m);
 
         if (expression is long l)
             return SqlConversions.ToSql(l);
+
+        if (expression is Guid guid)
+            return SqlConversions.ToSql((Guid?)guid, dialect);
 
         if (expression is DateTime dt)
             return SqlConversions.ToSql(dt, dialect);
@@ -91,14 +97,16 @@ public abstract class BaseExpressionAttribute : Attribute
             return instance.ToString(dialect);
         }
 
-        if (expression is IEnumerable<object> enumerable &&
-            enumerable.FirstOrDefault() is Type t2 &&
-            !t2.IsAbstract &&
-            typeof(BaseExpressionAttribute).IsAssignableFrom(t2))
+        if (expression is IEnumerable<object> enumerable)
         {
-            var args = enumerable.Skip(1).ToArray();
-            var instance = (BaseExpressionAttribute)Activator.CreateInstance(t2, args)!;
-            return instance.ToString(dialect);
+            var allArgs = enumerable.ToArray();
+            if (allArgs.Length > 0 && allArgs[0] is Type t2 &&
+                !t2.IsAbstract &&
+                typeof(BaseExpressionAttribute).IsAssignableFrom(t2))
+            {
+                var instance = (BaseExpressionAttribute)Activator.CreateInstance(t2, allArgs.Skip(1).ToArray())!;
+                return instance.ToString(dialect);
+            }
         }
 
         return Convert.ToString(expression, CultureInfo.InvariantCulture)!;

@@ -40,6 +40,18 @@ public static class SqlConversions
     /// </summary>
     /// <param name="value">The value.</param>
     /// <returns>The SQL constant, or NULL if the value has no value.</returns>
+    public static string ToSql(this float? value)
+    {
+        if (!value.HasValue)
+            return Null;
+        return value.Value.ToString(Invariants.NumberFormat);
+    }
+
+    /// <summary>
+    /// Converts the value to SQL.
+    /// </summary>
+    /// <param name="value">The value.</param>
+    /// <returns>The SQL constant, or NULL if the value has no value.</returns>
     public static string ToSql(this decimal? value)
     {
         if (!value.HasValue)
@@ -139,15 +151,33 @@ public static class SqlConversions
     }
 
     /// <summary>
-    /// Converts the value to SQL.
+    /// Converts the GUID to an SQL literal appropriate for the specified dialect.
     /// </summary>
     /// <param name="value">The value.</param>
+    /// <param name="dialect">The target dialect. If null, <see cref="SqlSettings.DefaultDialect"/> is used.</param>
     /// <returns>The SQL constant, or NULL if the value has no value.</returns>
-    public static string ToSql(this Guid? value)
+    /// <remarks>
+    /// FluentMigrator 8.0.1 maps <c>AsGuid()</c> to <c>UNIQUEIDENTIFIER</c> on SQL Server,
+    /// <c>UUID</c> on PostgreSQL, <c>RAW(16)</c> on Oracle,
+    /// <c>CHAR(16) CHARACTER SET OCTETS</c> on Firebird, <c>CHAR(36)</c> on MySQL, and
+    /// <c>UNIQUEIDENTIFIER</c> on SQLite (or <c>TEXT</c> for strict tables). This method
+    /// follows those storage conventions: Oracle uses the .NET Guid byte-array order used
+    /// by FluentMigrator's Oracle quoter, and Firebird uses the canonical UUID byte order
+    /// used by Firebird UUID functions. Other dialects, and a null dialect, use a quoted
+    /// canonical string to remain compatible with string-based GUID columns.
+    /// </remarks>
+    public static string ToSql(this Guid? value, ISqlDialect? dialect = null)
     {
         if (!value.HasValue)
             return Null;
-        return "'" + value.Value.ToString("D") + "'";
+
+        var guid = value.Value;
+        return (dialect ?? SqlSettings.DefaultDialect).ServerType switch
+        {
+            nameof(ServerType.Oracle) => "HEXTORAW('" + BitConverter.ToString(guid.ToByteArray()).Replace("-", string.Empty) + "')",
+            nameof(ServerType.Firebird) => "X'" + guid.ToString("N") + "'",
+            _ => "'" + guid.ToString("D") + "'"
+        };
     }
 
     /// <summary>
