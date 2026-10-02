@@ -23,6 +23,9 @@ public class UnaryCriteria : BaseCriteria
         if (op < CriteriaOperator.Paren || op > CriteriaOperator.Exists)
             throw new ArgumentOutOfRangeException(nameof(op));
 
+        if (op == CriteriaOperator.Exists && operand.IsEmpty)
+            throw new ArgumentException("EXISTS requires a non-empty expression.", nameof(operand));
+
         this.op = op;
         this.operand = operand;
     }
@@ -59,10 +62,11 @@ public class UnaryCriteria : BaseCriteria
                 break;
 
             case CriteriaOperator.Exists:
-                bool hasParens = operand is Criteria c &&
-                    c.Expression != null &&
-                    c.Expression.StartsWith("(", StringComparison.Ordinal) &&
-                    c.Expression.EndsWith(")", StringComparison.Ordinal);
+                if (operand.IsEmpty)
+                    throw new InvalidOperationException("EXISTS requires a non-empty expression.");
+
+                var expression = operand is Criteria c ? c.Expression?.Trim() : null;
+                bool hasParens = expression is { Length: >= 2 } && expression[0] == '(' && expression[^1] == ')';
                 // Sqlite does not like double parentheses in Exist expressions
                 sb.Append(hasParens ? "EXISTS " : "EXISTS (");
                 operand.ToString(sb, query);

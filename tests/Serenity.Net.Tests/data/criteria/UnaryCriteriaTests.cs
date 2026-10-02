@@ -83,6 +83,22 @@ public class UnaryCriteriaTests
     }
 
     [Fact]
+    public void ToString_Exists_WithWhitespaceAroundParenthesizedExpression_DoesNotDoubleParenthesize()
+    {
+        Assert.Equal("EXISTS  (a) ", Criteria.Exists(" (a) ").ToString());
+        Assert.Equal("EXISTS \t(a)\r\n", Criteria.Exists("\t(a)\r\n").ToString());
+    }
+
+    [Fact]
+    public void ToString_Exists_WithEmptyCriteria_Throws()
+    {
+        Assert.Throws<ArgumentException>(() => Criteria.Exists(Criteria.Empty));
+        Assert.Throws<ArgumentException>(() => Criteria.Exists(""));
+        Assert.Throws<ArgumentException>(() =>
+            new UnaryCriteria(CriteriaOperator.Exists, Criteria.Empty));
+    }
+
+    [Fact]
     public void Properties_ReturnOperatorAndOperand()
     {
         var operand = new Criteria("x");

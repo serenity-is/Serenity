@@ -234,6 +234,17 @@ public class Criteria : BaseCriteria
     }
 
     /// <summary>
+    /// Creates a new EXISTS criteria from another criteria expression.
+    /// </summary>
+    /// <param name="expression">The expression.</param>
+    /// <returns>A new EXISTS criteria.</returns>
+    public static BaseCriteria Exists(BaseCriteria expression)
+    {
+        ArgumentNullException.ThrowIfNull(expression);
+        return new UnaryCriteria(CriteriaOperator.Exists, expression);
+    }
+
+    /// <summary>
     /// Escapes a literal value for use in a LIKE pattern with the given escape character.
     /// The escape character itself is escaped first, then %, _ and [.
     /// A ] outside a [...] class is literal on all supported dialects, so it is left as is.
