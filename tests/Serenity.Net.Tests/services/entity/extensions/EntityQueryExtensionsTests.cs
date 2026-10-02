@@ -70,7 +70,9 @@ public class EntityQueryExtensionsTests
         var update = new SqlUpdate("T");
 
         Assert.Same(update, update.Set(row));
-        Assert.Same(update, update.Set(row, SelRow.Fields.Name));
+        var updateExcludingName = new SqlUpdate("T");
+        Assert.Same(updateExcludingName, updateExcludingName.Set(row, SelRow.Fields.Name));
+        Assert.Single(updateExcludingName.GetFieldExpressions());
     }
 
     [Fact]

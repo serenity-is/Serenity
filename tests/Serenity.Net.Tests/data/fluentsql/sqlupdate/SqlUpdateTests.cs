@@ -34,6 +34,26 @@ public class SqlUpdateTests
     }
 
     [Fact]
+    public void SetTo_Rejects_Duplicate_Fields_Regardless_Of_Brackets()
+    {
+        var update = new SqlUpdate("T").SetTo("A", "1");
+
+        Assert.Throws<ArgumentException>(() => update.SetTo("[A]", "2"));
+        Assert.Throws<ArgumentException>(() => update.SetTo("a", "2"));
+        Assert.Throws<ArgumentException>(() => update.SetNull("A"));
+        Assert.Single(update.GetFieldExpressions());
+        Assert.Equal("UPDATE [T] SET [A] = 1", update.ToString());
+    }
+
+    [Fact]
+    public void Format_Rejects_Duplicate_Fields_Regardless_Of_Brackets()
+    {
+        var fields = new[] { new FieldExpressionPair("A", "1"), new FieldExpressionPair("[a]", "2") };
+
+        Assert.Throws<ArgumentException>(() => SqlUpdate.Format("T", null, fields));
+    }
+
+    [Fact]
     public void Explicit_SetTo_Works_And_Validates()
     {
         ISetFieldByStatement update = new SqlUpdate("T");
@@ -45,6 +65,7 @@ public class SqlUpdateTests
         Assert.Throws<ArgumentException>(() => update.SetTo("", "@p"));
         Assert.Throws<ArgumentNullException>(() => update.SetTo("F", null!));
         Assert.Throws<ArgumentException>(() => update.SetTo("F", ""));
+        Assert.Throws<ArgumentException>(() => update.SetTo("[Name]", "@p2"));
     }
 
     [Fact]

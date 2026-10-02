@@ -262,4 +262,19 @@ public static class SqlSyntax
 
         return s[1..^1];
     }
+
+    internal static bool AreSameIdentifier(string left, string right)
+    {
+        return string.Equals(Unquote(left), Unquote(right), StringComparison.OrdinalIgnoreCase);
+    }
+
+    internal static void EnsureUniqueIdentifiers(IEnumerable<string> identifiers, string paramName)
+    {
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var identifier in identifiers)
+        {
+            if (!seen.Add(Unquote(identifier)))
+                throw new ArgumentException($"Field '{identifier}' has already been set.", paramName);
+        }
+    }
 }

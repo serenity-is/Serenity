@@ -68,13 +68,14 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
     ///   Field expression, required.</param>
     /// <returns>
     ///   SqlInsert object itself.</returns>
-    /// <exception cref="ArgumentException">field or expression is null or empty.</exception>
+    /// <exception cref="ArgumentException">field or expression is null or empty, or field was already set.</exception>
     public SqlInsert SetTo(string field, string expression)
     {
         ArgumentException.ThrowIfNullOrEmpty(field);
         ArgumentException.ThrowIfNullOrEmpty(expression);
 
         BeforeModify();
+        EnsureUniqueField(field);
         fieldExpressions.Add(new FieldExpressionPair(field, expression));
         return this;
     }
@@ -89,11 +90,7 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
     ///   SqlInsert object itself.</returns>
     void ISetFieldByStatement.SetTo(string field, string expression)
     {
-        ArgumentException.ThrowIfNullOrEmpty(field);
-        ArgumentException.ThrowIfNullOrEmpty(expression);
-
-        BeforeModify();
-        fieldExpressions.Add(new FieldExpressionPair(field, expression));
+        SetTo(field, expression);
     }
 
     /// <summary>
@@ -116,13 +113,20 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
     ///   Field (required).</param>
     /// <returns>
     ///   SqlInsert object itself.</returns>
-    /// <exception cref="ArgumentException">field is null or empty.</exception>
+    /// <exception cref="ArgumentException">field is null or empty, or was already set.</exception>
     public SqlInsert SetNull(string field)
     {
         ArgumentException.ThrowIfNullOrEmpty(field);
         BeforeModify();
+        EnsureUniqueField(field);
         fieldExpressions.Add(new FieldExpressionPair(field, SqlKeywords.Null));
         return this;
+    }
+
+    private void EnsureUniqueField(string field)
+    {
+        if (fieldExpressions.Any(pair => SqlSyntax.AreSameIdentifier(pair.Field, field)))
+            throw new ArgumentException($"Field '{field}' has already been set.", nameof(field));
     }
 
     /// <summary>Clones the query.</summary>
@@ -209,6 +213,7 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
         ArgumentNullException.ThrowIfNull(fieldExpressions);
 
         var list = fieldExpressions.ToList();
+        SqlSyntax.EnsureUniqueIdentifiers(list.Select(pair => pair.Field), nameof(fieldExpressions));
         StringBuilder sb = new("INSERT INTO ", 64 + list.Count * 16);
         sb.Append(SqlSyntax.AutoBracketValid(tableName, dialect));
         sb.Append(" (");
@@ -263,6 +268,7 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
             throw new ArgumentOutOfRangeException(nameof(keyFields));
 
         var list = fieldExpressions.ToList();
+        SqlSyntax.EnsureUniqueIdentifiers(list.Select(pair => pair.Field), nameof(fieldExpressions));
         int fieldCount = list.Count;
         var fields = new List<string>(fieldCount);
         var values = new List<string>(fieldCount);

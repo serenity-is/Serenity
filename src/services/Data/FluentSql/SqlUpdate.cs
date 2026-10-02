@@ -61,13 +61,14 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
     ///   Field expression, required.</param>
     /// <returns>
     ///   SqlUpdate object itself.</returns>
-    /// <exception cref="ArgumentException">field or expression is null or empty.</exception>
+    /// <exception cref="ArgumentException">field or expression is null or empty, or field was already set.</exception>
     public SqlUpdate SetTo(string field, string expression)
     {
         ArgumentException.ThrowIfNullOrEmpty(field);
         ArgumentException.ThrowIfNullOrEmpty(expression);
 
         BeforeModify();
+        EnsureUniqueField(field);
         fieldExpressions.Add(new FieldExpressionPair(field, expression));
         return this;
     }
@@ -82,11 +83,7 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
     ///   SqlUpdate object itself.</returns>
     void ISetFieldByStatement.SetTo(string field, string expression)
     {
-        ArgumentException.ThrowIfNullOrEmpty(field);
-        ArgumentException.ThrowIfNullOrEmpty(expression);
-
-        BeforeModify();
-        fieldExpressions.Add(new FieldExpressionPair(field, expression));
+        SetTo(field, expression);
     }
 
     /// <summary>
@@ -109,14 +106,21 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
     ///   Field (required).</param>
     /// <returns>
     ///   SqlUpdate object itself.</returns>
-    /// <exception cref="ArgumentException">field is null or empty.</exception>
+    /// <exception cref="ArgumentException">field is null or empty, or was already set.</exception>
     public SqlUpdate SetNull(string field)
     {
         ArgumentException.ThrowIfNullOrEmpty(field);
 
         BeforeModify();
+        EnsureUniqueField(field);
         fieldExpressions.Add(new FieldExpressionPair(field, SqlKeywords.Null));
         return this;
+    }
+
+    private void EnsureUniqueField(string field)
+    {
+        if (fieldExpressions.Any(pair => SqlSyntax.AreSameIdentifier(pair.Field, field)))
+            throw new ArgumentException($"Field '{field}' has already been set.", nameof(field));
     }
 
     /// <summary>
@@ -303,6 +307,7 @@ public class SqlUpdate : QueryWithParams, ISetFieldByStatement, IFilterableQuery
         ArgumentNullException.ThrowIfNull(fieldExpressions);
 
         var list = fieldExpressions.ToList();
+        SqlSyntax.EnsureUniqueIdentifiers(list.Select(pair => pair.Field), nameof(fieldExpressions));
         StringBuilder sb = new("UPDATE ", 64 + (where?.Length ?? 0) + list.Count * 16);
         sb.Append(SqlSyntax.AutoBracketValid(tableName, dialect));
         sb.Append(" SET ");

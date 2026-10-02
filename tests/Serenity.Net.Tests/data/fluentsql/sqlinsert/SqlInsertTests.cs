@@ -35,6 +35,26 @@ public class SqlInsertTests
     }
 
     [Fact]
+    public void SetTo_Rejects_Duplicate_Fields_Regardless_Of_Brackets()
+    {
+        var insert = new SqlInsert("T").SetTo("A", "1");
+
+        Assert.Throws<ArgumentException>(() => insert.SetTo("[A]", "2"));
+        Assert.Throws<ArgumentException>(() => insert.SetTo("a", "2"));
+        Assert.Throws<ArgumentException>(() => insert.SetNull("A"));
+        Assert.Single(insert.GetFieldExpressions());
+        Assert.Equal("INSERT INTO [T] ([A]) VALUES (1)", insert.ToString());
+    }
+
+    [Fact]
+    public void Format_Rejects_Duplicate_Fields_Regardless_Of_Brackets()
+    {
+        var fields = new[] { new FieldExpressionPair("A", "1"), new FieldExpressionPair("[a]", "2") };
+
+        Assert.Throws<ArgumentException>(() => SqlInsert.Format("T", fields));
+    }
+
+    [Fact]
     public void Explicit_SetTo_Validates_And_Adds()
     {
         ISetFieldByStatement insert = new SqlInsert("T");
@@ -46,6 +66,7 @@ public class SqlInsertTests
 
         insert.SetTo("A", "1");
         Assert.Single(((SqlInsert)insert).GetFieldExpressions());
+        Assert.Throws<ArgumentException>(() => insert.SetTo("[A]", "2"));
     }
 
     [Fact]
