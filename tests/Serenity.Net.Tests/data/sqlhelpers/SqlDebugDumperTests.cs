@@ -67,6 +67,31 @@ public class SqlDebugDumperTests
     }
 
     [Fact]
+    public void Dump_MatchesParameterNames_CaseInsensitively()
+    {
+        var result = SqlDebugDumper.Dump("X = @ID", MakePrm("@Id", 1));
+
+        Assert.Equal("X = 1", result);
+    }
+
+    [Fact]
+    public void Dump_ReplacesOracleColonParameters()
+    {
+        var result = SqlDebugDumper.Dump("X = :ID", MakePrm(":Id", 1), OracleDialect.Instance);
+
+        Assert.Equal("X = 1", result);
+    }
+
+    [Fact]
+    public void Dump_DoesNotReplacePostgresCastAsParameter()
+    {
+        var parameters = new Dictionary<string, object?> { [":int"] = 5, [":ID"] = 1 };
+        var result = SqlDebugDumper.Dump("X::int = :ID", parameters, OracleDialect.Instance);
+
+        Assert.Equal("X::int = 1", result);
+    }
+
+    [Fact]
     public void Dump_DoesNotRescan_Inserted_Replacement()
     {
         var prm = new Dictionary<string, object?> { ["@a"] = "@b", ["@b"] = 1 };
@@ -90,7 +115,7 @@ public class SqlDebugDumperTests
         Assert.Equal("X = NULL", SqlDebugDumper.Dump("X = @p1", MakePrm("@p1", null)));
         Assert.Equal("X = NULL", SqlDebugDumper.Dump("X = @p1", MakePrm("@p1", DBNull.Value)));
         Assert.Equal("X = N'a'", SqlDebugDumper.Dump("X = @p1", MakePrm("@p1", 'a')));
-        Assert.Equal("X = N'System.Char[]'", SqlDebugDumper.Dump("X = @p1", MakePrm("@p1", "ab".ToCharArray())));
+        Assert.Equal("X = N'ab'", SqlDebugDumper.Dump("X = @p1", MakePrm("@p1", "ab".ToCharArray())));
         Assert.Equal("X = 1", SqlDebugDumper.Dump("X = @p1", MakePrm("@p1", true)));
         Assert.Equal("X = 0", SqlDebugDumper.Dump("X = @p1", MakePrm("@p1", false)));
     }

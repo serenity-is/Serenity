@@ -19,9 +19,16 @@ public class SqlDebugDumper
         if (parameters == null)
             return sql;
 
-        var lookup = new Dictionary<string, object?>(StringComparer.Ordinal);
+        dialect ??= SqlSettings.DefaultDialect;
+
+        var lookup = new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase);
         foreach (var pair in parameters)
-            lookup[pair.Key.StartsWith("@") ? pair.Key : "@" + pair.Key] = pair.Value;
+        {
+            var name = pair.Key;
+            if (name.Length > 0 && (name[0] == '@' || name[0] == ':'))
+                name = name[1..];
+            lookup["@" + name] = pair.Value;
+        }
 
         // Token-aware replacement: StringBuilder.Replace would also hit parameter
         // names inside string literals and comments, and the prefix of longer names
@@ -40,16 +47,23 @@ public class SqlDebugDumper
             }
 
             var c = source[i];
-            if (c == '@' && i + 1 < source.Length && IsParamStart(source[i + 1]))
+            if (c == '@' && i + 1 < source.Length && source[i + 1] == '@')
+            {
+                sb.Append("@@");
+                i++;
+            }
+            else if ((c == '@' || c == ':') &&
+                i + 1 < source.Length && IsParamStart(source[i + 1]) &&
+                !(c == ':' && i > 0 && source[i - 1] == ':'))
             {
                 var j = i + 2;
                 while (j < source.Length && IsParamChar(source[j]))
                     j++;
-                var token = source[i..j];
+                var token = "@" + source[(i + 1)..j];
                 if (lookup.TryGetValue(token, out var value))
                     sb.Append(DumpParameterValue(value, dialect));
                 else
-                    sb.Append(token);
+                    sb.Append(source, i, j - i);
                 i = j - 1;
             }
             else
@@ -58,7 +72,6 @@ public class SqlDebugDumper
 
         var text = DatabaseCaretReferences.Replace(sb.ToString());
 
-        dialect ??= SqlSettings.DefaultDialect;
         var openBracket = dialect.OpenQuote;
         if (openBracket != '[')
             text = BracketLocator.ReplaceBrackets(text, dialect);
@@ -82,8 +95,11 @@ public class SqlDebugDumper
         if (value is string str)
             return str.ToSql(dialect);
 
-        if (value is char || value is char[])
-            return value.ToString()!.ToSql(dialect);
+        if (value is char character)
+            return character.ToString().ToSql(dialect);
+
+        if (value is char[] characters)
+            return new string(characters).ToSql(dialect);
 
         if (value is bool b)
             return b ? "1" : "0";
