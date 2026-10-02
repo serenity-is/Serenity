@@ -110,6 +110,7 @@ public partial class SqlQuery_Entity_Tests
     {
         var query = new SqlQuery()
             .From("T")
+            .Select("T0.Id")
             .LeftJoin(new Alias("Other", "o"), new Criteria("o", "Id") == new Criteria("T", "Oid"));
 
         // same join again is gracefully skipped, not duplicated
@@ -123,6 +124,7 @@ public partial class SqlQuery_Entity_Tests
     {
         var query = new SqlQuery()
             .From("T")
+            .Select("T0.Id")
             .LeftJoin(new Alias("Other", "o"), new Criteria("o", "Id") == new ParamCriteria("@oid"));
 
         // manually named params render literally, so equality is verifiable

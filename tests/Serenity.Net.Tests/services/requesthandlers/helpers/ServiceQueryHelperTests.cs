@@ -96,7 +96,7 @@ public class ServiceQueryHelperTests
     [Fact]
     public void ApplySort_Uses_Row_Field_Expression()
     {
-        var query = new SqlQuery().From(new SortRow());
+        var query = new SqlQuery().From(new SortRow()).Select("T0.Id");
         query.ApplySort("Name", false);
 
         Assert.Contains("ORDER BY", query.ToString());

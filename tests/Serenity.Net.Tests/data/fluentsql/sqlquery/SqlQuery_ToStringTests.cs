@@ -43,6 +43,15 @@ public class SqlQuery_ToStringTests
     }
 
     [Fact]
+    public void ToString_Without_Selected_Columns_Throws()
+    {
+        Assert.Throws<InvalidOperationException>(() => new SqlQuery().ToString());
+        Assert.Throws<InvalidOperationException>(() => new SqlQuery().From("T").ToString());
+        Assert.Throws<InvalidOperationException>(() => new SqlQuery().From("T").Skip(1).ToString());
+        Assert.Throws<InvalidOperationException>(() => new SqlQuery().Dialect(new QueryToStringDialect()).ToString());
+    }
+
+    [Fact]
     public void ToString_Caches_Except_For_Query_Shape_Changes()
     {
         var dialect = new QueryToStringDialect();
@@ -133,6 +142,8 @@ public class SqlQuery_ToStringTests
 
             Assert.Equal("CUSTOM", query.ToString());
             mutate(query);
+            if (((ISqlQueryExtensible)query).Columns.Count == 0)
+                query.Select("c");
             Assert.Equal("CUSTOM", query.ToString());
             Assert.True(dialect.CallCount == 2, $"{name} did not invalidate the cached SQL.");
         }

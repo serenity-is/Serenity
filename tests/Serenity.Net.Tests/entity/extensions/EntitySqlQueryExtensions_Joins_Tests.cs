@@ -8,7 +8,7 @@ public class EntitySqlQueryExtensions_Joins_Tests
     [Fact]
     public void JoinViaUsesForeignJoinAliasAndPreservesRealiasedSource()
     {
-        var query = new SqlQuery().From("Anchor", new Alias("Anchor", "T0"));
+        var query = new SqlQuery().From("Anchor", new Alias("Anchor", "T0")).Select("T0.Id");
         query.From(new SelfNavigationRow(), out var sourceFields);
 
         query.LeftJoinVia(SelfNavigationRow.Fields, sourceFields.ManagerID, out var managerFields);
@@ -22,7 +22,7 @@ public class EntitySqlQueryExtensions_Joins_Tests
     [Fact]
     public void JoinViaPreservesCustomTargetAlias()
     {
-        var query = new SqlQuery().From(new SelfNavigationRow(), out var sourceFields);
+        var query = new SqlQuery().From(new SelfNavigationRow(), out var sourceFields).Select("T0.Id");
         var targetFields = SelfNavigationRow.Fields.As("manager");
 
         query.LeftJoinVia(targetFields, sourceFields.ManagerID, out var managerFields);
@@ -35,7 +35,7 @@ public class EntitySqlQueryExtensions_Joins_Tests
     [Fact]
     public void JoinViaFallsBackToForeignKeyMetadata()
     {
-        var query = new SqlQuery().From(ForeignKeyOnlyRow.Fields, out var sourceFields);
+        var query = new SqlQuery().From(ForeignKeyOnlyRow.Fields, out var sourceFields).Select("T0.Id");
         query.LeftJoinVia(SelfNavigationRow.Fields, sourceFields.RelatedID, out var leftFields);
         query.RightJoinVia(SelfNavigationRow.Fields, sourceFields.RelatedID, out var rightFields);
         query.InnerJoinVia(SelfNavigationRow.Fields, sourceFields.RelatedID, out var innerFields);
@@ -66,7 +66,7 @@ public class EntitySqlQueryExtensions_Joins_Tests
     [Fact]
     public void JoinWithFieldsDoesNotInvokeCriteriaFactoryForFrozenQuery()
     {
-        var query = new SqlQuery().From(ForeignKeyOnlyRow.Fields, out _);
+        var query = new SqlQuery().From(ForeignKeyOnlyRow.Fields, out _).Select("T0.Id");
         query.Freeze();
         var criteriaFactoryCalled = false;
 

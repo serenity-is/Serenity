@@ -227,7 +227,7 @@ public class BaseCriteriaOperatorOverloadTests
     public void In_SqlQueryWithParent_UsesRawStatement()
     {
         var query = new SqlQuery();
-        var sub = query.SubQuery();
+        var sub = query.SubQuery().Select("ID");
 
         var result = Assert.IsType<BinaryCriteria>(new Criteria("ID").In(sub));
 

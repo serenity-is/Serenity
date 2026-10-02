@@ -84,7 +84,8 @@ public class SqlQuery_From_Tests
     public void FromOnFrozenQueryThrowsBeforeCheckingDuplicateAlias()
     {
         var query = new SqlQuery()
-            .From("TestTable", new Alias("x"));
+            .From("TestTable", new Alias("x"))
+            .Select("x.Id");
         query.Freeze();
 
         Assert.Throws<InvalidOperationException>(() =>

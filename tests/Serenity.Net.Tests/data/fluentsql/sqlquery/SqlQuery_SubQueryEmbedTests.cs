@@ -69,7 +69,7 @@ public class SqlQuery_SubQueryEmbedTests
     [Fact]
     public void Embed_Allows_SubQuery_Of_Same_Tree_With_Params()
     {
-        var query = new SqlQuery().From("T");
+        var query = new SqlQuery().From("T").Select("T.Id");
         var sub = query.SubQuery();
         sub.From("Sub").Select("Id").Where(new Criteria("Sub", "X") == 5);
 
@@ -106,7 +106,7 @@ public class SqlQuery_SubQueryEmbedTests
     [Fact]
     public void From_Allows_SubQuery_Of_Same_Tree_With_Params()
     {
-        var query = new SqlQuery().From("T");
+        var query = new SqlQuery().From("T").Select("T.Id");
         var sub = query.SubQuery();
         sub.From("Sub").Select("Id").Where(new Criteria("Sub", "X") == 5);
 

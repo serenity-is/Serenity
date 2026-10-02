@@ -299,6 +299,7 @@ public class RetrieveRequestHandlerBaseTests
         var handler = Handler(connection: connection, request: new RetrieveRequest { EntityId = 42 });
 
         var query = handler.Build();
+        query.Select("T0.ID");
 
         Assert.Contains("RetrieveBase", query.ToString());
     }

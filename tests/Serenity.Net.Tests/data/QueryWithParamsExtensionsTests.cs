@@ -112,6 +112,15 @@ public class QueryWithParamsExtensionsTests
     }
 
     [Fact]
+    public void Freeze_Without_Selected_Columns_Throws_And_Leaves_Query_Unfrozen()
+    {
+        var query = new SqlQuery().From("T");
+
+        Assert.Throws<InvalidOperationException>(() => query.Freeze());
+        Assert.False(query.IsFrozen);
+    }
+
+    [Fact]
     public void Freeze_Freezes_Query_And_Subquery_Tree()
     {
         var query = new SqlQuery().Select("c").From("t");

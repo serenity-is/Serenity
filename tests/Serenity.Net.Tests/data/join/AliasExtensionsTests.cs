@@ -54,7 +54,7 @@ public class AliasExtensionsTests
     public void WithTableHint_Supports_Multiple_Hints()
     {
         var t = new Alias("Tbl", "t").WithTableHint("READPAST", "UPDLOCK");
-        var query = new SqlQuery().From(t);
+        var query = new SqlQuery().From(t).Select("t.Id");
 
         Assert.Contains("WITH(READPAST, UPDLOCK)", query.ToString());
     }
@@ -66,7 +66,7 @@ public class AliasExtensionsTests
             .WithTableHint("NOLOCK")
             .WithTableHint("READPAST", "UPDLOCK")
             .WithTableHint("nolock", "INDEX(MyIndex)");
-        var query = new SqlQuery().From(t);
+        var query = new SqlQuery().From(t).Select("t.Id");
 
         Assert.Contains("WITH(NOLOCK, READPAST, UPDLOCK, INDEX(MyIndex))", query.ToString());
     }
@@ -88,6 +88,7 @@ public class AliasExtensionsTests
         var on = new Criteria("t2", "X") == new Criteria("T0", "Y");
         var query = new SqlQuery().From("T0")
             .LeftJoin(t, on);
+        query.Select("T0.Id");
 
         Assert.True(query.HasAlias("t2"));
 

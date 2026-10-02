@@ -24,7 +24,7 @@ public class SqlQuery_FullTextSearchTests
     [Fact]
     public void FullTextSearchJoin_Appends_Join()
     {
-        var query = new SqlQuery().FullTextSearchJoin(
+        var query = new SqlQuery().Select("T0.Id").FullTextSearchJoin(
             "Table", "Field1", "word", "T0", "ID", "CT");
 
         var sql = query.ToString();
@@ -37,6 +37,7 @@ public class SqlQuery_FullTextSearchTests
     {
         var query = new SqlQuery()
             .From("Parent")
+            .Select("Parent.Id")
             .FullTextSearchJoin("Table", "Field1", "o'brien", "T0", "ID", "CT");
 
         var sql = query.ToString();

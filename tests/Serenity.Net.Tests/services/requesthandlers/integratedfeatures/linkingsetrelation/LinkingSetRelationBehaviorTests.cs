@@ -576,7 +576,7 @@ public class LinkingSetRelationBehaviorTests
         var row = new LkMainRow { ID = 1 };
         var behavior = CreateBehavior(row, row.GetFields().SelectedItems);
         var handler = new MockListHandler<LkMainRow> { Row = row };
-        var query = new SqlQuery();
+        var query = new SqlQuery().Select("1");
 
         behavior.OnPrepareQuery(handler, query);
 
@@ -593,7 +593,7 @@ public class LinkingSetRelationBehaviorTests
         {
             [nameof(LkNoEqualityMainRow.SelectedItems)] = 5
         };
-        var query = new SqlQuery();
+        var query = new SqlQuery().Select("1");
 
         behavior.OnPrepareQuery(handler, query);
 
@@ -610,7 +610,7 @@ public class LinkingSetRelationBehaviorTests
         {
             [nameof(LkMainRow.SelectedItems)] = ""
         };
-        var query = new SqlQuery();
+        var query = new SqlQuery().Select("1");
 
         behavior.OnPrepareQuery(handler, query);
 
@@ -624,7 +624,7 @@ public class LinkingSetRelationBehaviorTests
         var behavior = CreateBehavior(row, row.GetFields().SelectedItems);
         var handler = new MockListHandler<LkMainRow> { Row = row };
         handler.Request.EqualityFilter = new Dictionary<string, object?> { ["Other"] = 5 };
-        var query = new SqlQuery();
+        var query = new SqlQuery().Select("1");
 
         behavior.OnPrepareQuery(handler, query);
 
@@ -641,7 +641,7 @@ public class LinkingSetRelationBehaviorTests
         {
             [nameof(LkMainRow.SelectedItems)] = 5
         };
-        var query = new SqlQuery();
+        var query = new SqlQuery().Select("1");
 
         behavior.OnPrepareQuery(handler, query);
 
@@ -658,7 +658,7 @@ public class LinkingSetRelationBehaviorTests
         {
             [nameof(LkMainRow.SelectedItems)] = new[] { 5, 6 }
         };
-        var query = new SqlQuery();
+        var query = new SqlQuery().Select("1");
 
         await behavior.OnPrepareQueryAsync(handler, query, TestContext.Current.CancellationToken);
 

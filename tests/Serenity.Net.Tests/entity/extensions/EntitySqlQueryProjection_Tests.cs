@@ -7,7 +7,7 @@ public class EntitySqlQueryProjection_Tests
     [Fact]
     public void FluentJoinOverloadsBuildCriteriaWithAllocatedAliases()
     {
-        var query = new SqlQuery().From(SelfNavigationRow.Fields, out var sourceFields);
+        var query = new SqlQuery().From(SelfNavigationRow.Fields, out var sourceFields).Select("T0.Id");
 
         var leftResult = query.LeftJoin(SelfNavigationRow.Fields,
             fields => sourceFields.ID == fields.ManagerID,
@@ -89,11 +89,11 @@ public class EntitySqlQueryProjection_Tests
         Assert.Equal(17, Assert.Single(result).ID);
         Assert.Single(extensible.Columns);
 
-        var frozenQuery = new SqlQuery().From(new SelfNavigationRow());
+        var frozenQuery = new SqlQuery().From(new SelfNavigationRow()).Select("T0.Id");
         frozenQuery.Freeze();
         Assert.Throws<InvalidOperationException>(() => frozenQuery.QueryProjected(connection,
             (SelfNavigationRow source) => new { ID = source.ID }, takeOwnership: true));
-        Assert.Empty(((ISqlQueryExtensible)frozenQuery).Columns);
+        Assert.Single(((ISqlQueryExtensible)frozenQuery).Columns);
     }
 
     [Fact]
@@ -218,21 +218,18 @@ public class EntitySqlQueryProjection_Tests
         using var connection = new MockDbConnection()
             .OnDbCommandExecuteReader(_ => new MockDbDataReader(new { ID = 17 }));
 
-        var query = new SqlQuery().From(new SelfNavigationRow());
+        var query = new SqlQuery().From(new SelfNavigationRow()).Select("T0.Id");
         query.Freeze();
-        var originalSql = query.ToString();
         var extensible = (ISqlQueryExtensible)query;
 
-        var projected = query.AsReusableProjected(
-            (SelfNavigationRow source) => new { ID = source.ID }, [SelfNavigationRow.Fields]);
-
         Assert.True(query.IsFrozen);
-        Assert.Empty(extensible.Columns);
-        Assert.Equal(originalSql, query.ToString());
-        Assert.Equal(17, Assert.Single(projected.List(connection)).ID);
+        Assert.Single(extensible.Columns);
+        Assert.NotEmpty(query.ToString());
+        Assert.Throws<InvalidOperationException>(() => query.AsReusableProjected(
+            (SelfNavigationRow source) => new { ID = source.ID }, [SelfNavigationRow.Fields]));
         Assert.Throws<InvalidOperationException>(() => query.AsReusableProjected(
             (SelfNavigationRow source) => new { ID = source.ID }, takeOwnership: true));
-        Assert.Empty(extensible.Columns);
+        Assert.Single(extensible.Columns);
     }
 
     [Fact]

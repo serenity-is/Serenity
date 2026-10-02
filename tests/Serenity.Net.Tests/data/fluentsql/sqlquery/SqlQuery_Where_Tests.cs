@@ -57,7 +57,7 @@ public class SqlQuery_Where_Tests
         var root = new AliasWithJoins("Base", "T0");
         _ = new LeftJoin(root.Joins, "Related", "T1", null);
 
-        var query = new SqlQuery().From(root)
+        var query = new SqlQuery().From(root).Select("T0.Id")
             .Where(new Criteria("T1.Value") > 0);
 
         Assert.Contains("LEFT JOIN [Related] T1", Normalize.Sql(query.ToString()));

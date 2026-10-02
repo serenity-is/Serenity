@@ -173,7 +173,7 @@ public class SqlQuery_JoinTests
     public void EnsureJoin_And_Join_Aliases_Throw_When_Query_Is_Frozen()
     {
         var alias = new AliasWithJoins("Table", "T1");
-        var query = new SqlQuery().From("Base").LeftJoin(alias, null);
+        var query = new SqlQuery().From("Base").LeftJoin(alias, null).Select("T0.Id");
         query.Freeze();
 
         Assert.Throws<InvalidOperationException>(() =>

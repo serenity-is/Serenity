@@ -26,7 +26,7 @@ public class SqlQuery_CloneTests
     [Fact]
     public void Clone_Copies_Params_For_Root_Query()
     {
-        var query = new SqlQuery().From("T").Where("A = @p1");
+        var query = new SqlQuery().From("T").Select("T.Id").Where("A = @p1");
         query.AddParam("@p1", 1);
 
         var clone = query.Clone();
