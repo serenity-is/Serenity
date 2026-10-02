@@ -26,7 +26,7 @@ public class SqlHelperExecuteReaderTests
 
         using (IDataReader reader = SqlHelper.ExecuteReader(connection, "SELECT 1", null))
         {
-            Assert.IsAssignableFrom<System.Data.Common.DbDataReader>(reader);
+            Assert.IsType<DbDataReader>(reader, exactMatch: false);
             Assert.True(reader.Read());
             Assert.Equal(1, reader["Id"]);
             Assert.Equal(0, lastCommand()!.DisposeCalls);
@@ -67,9 +67,9 @@ public class SqlHelperExecuteReaderTests
         var (connection, lastCommand) = Create(_ => new MockDbDataReader(
             new { Id = 1 }));
 
-        using (IDataReader reader = await SqlHelper.ExecuteReaderAsync(connection, "SELECT 1", null))
+        using (IDataReader reader = await SqlHelper.ExecuteReaderAsync(connection, "SELECT 1", null, cancellationToken: TestContext.Current.CancellationToken))
         {
-            Assert.IsAssignableFrom<System.Data.Common.DbDataReader>(reader);
+            Assert.IsType<DbDataReader>(reader, exactMatch: false);
             Assert.True(reader.Read());
             Assert.Equal(0, lastCommand()!.DisposeCalls);
         }
@@ -109,7 +109,7 @@ public class SqlHelperExecuteReaderTests
 
         // MockDbDataReader.HasRows throws: the wrapper must pass it through,
         // not mask it with a hardcoded value.
-        var dbReader = Assert.IsAssignableFrom<DbDataReader>(reader);
+        var dbReader = Assert.IsType<DbDataReader>(reader, exactMatch: false);
         Assert.Throws<NotImplementedException>(() => { var ignored = dbReader.HasRows; });
 
         // Mock enumerates raw object[] rows; wrapper must expose the same enumerator.
@@ -180,7 +180,7 @@ public class SqlHelperExecuteReaderTests
         var (connection, lastCommand) = Create(_ => throw new InvalidOperationException("boom"));
 
         var ex = await Assert.ThrowsAsync<InvalidOperationException>(
-            () => SqlHelper.ExecuteReaderAsync(connection, "SELECT 1", null));
+            () => SqlHelper.ExecuteReaderAsync(connection, "SELECT 1", null, cancellationToken: TestContext.Current.CancellationToken));
 
         Assert.Equal("boom", ex.Message);
         Assert.Equal(1, lastCommand()!.DisposeCalls);

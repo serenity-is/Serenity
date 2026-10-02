@@ -140,6 +140,7 @@ public class UnitOfWorkTests
         // Latch is never cleared: still true after commit and dispose.
         uow.Dispose();
         Assert.True(uow.HasStartedTransaction);
+        Assert.Equal(1, connection.Transaction.DisposeCalls);
     }
 
     [Fact]
@@ -498,8 +499,10 @@ public class UnitOfWorkTests
         var uow = new UnitOfWork(connection);
         uow.Commit();
         Assert.Equal(1, connection.Transaction?.CommitCalls);
+        Assert.Equal(1, connection.Transaction?.DisposeCalls);
         Assert.Throws<InvalidOperationException>(uow.Commit);
         Assert.Equal(1, connection.Transaction?.CommitCalls);
+        Assert.Equal(1, connection.Transaction?.DisposeCalls);
     }
 
     private class FailingOpenConnection : UnitOfWorkTestConnection
@@ -602,7 +605,7 @@ public class UnitOfWorkTests
         Assert.Throws<NotImplementedException>(uow.Commit);
         Assert.Equal(0, rollbackCalls);
         Assert.Equal(1, connection.Transaction.CommitCalls);
-        Assert.Equal(0, connection.Transaction.DisposeCalls);
+        Assert.Equal(1, connection.Transaction.DisposeCalls);
         Assert.Equal(0, connection.Transaction.RollbackCalls);
         uow.Dispose();
         Assert.Equal(0, rollbackCalls);
@@ -619,6 +622,10 @@ public class UnitOfWorkTests
         await uow.CommitAsync(TestContext.Current.CancellationToken);
         Assert.Equal(1, connection.Transaction.CommitAsyncCalls);
         Assert.Equal(0, connection.Transaction.CommitCalls);
+        Assert.Equal(1, connection.Transaction.DisposeAsyncCalls);
+        await uow.DisposeAsync();
+        Assert.Equal(1, connection.Transaction.DisposeAsyncCalls);
+        Assert.Equal(0, connection.Transaction.DisposeCalls);
     }
 
     [Fact]
@@ -628,6 +635,7 @@ public class UnitOfWorkTests
         var uow = new UnitOfWork(connection);
         await uow.CommitAsync(TestContext.Current.CancellationToken);
         Assert.Equal(1, connection.Transaction.CommitCalls);
+        Assert.Equal(1, connection.Transaction.DisposeCalls);
     }
 
     [Fact]
@@ -639,6 +647,7 @@ public class UnitOfWorkTests
         await Assert.ThrowsAsync<InvalidOperationException>(
             () => uow.CommitAsync(TestContext.Current.CancellationToken));
         Assert.Equal(1, connection.Transaction.CommitAsyncCalls);
+        Assert.Equal(1, connection.Transaction.DisposeAsyncCalls);
     }
 
     [Fact]

@@ -255,7 +255,7 @@ public class LikeEscapeTests
     [Fact]
     public void Stj_Write_EscapedLike_WritesFourElementArray()
     {
-        var json = JsonSerializer.Serialize<BaseCriteria>(
+        var json = JsonSerializer.Serialize(
             new Criteria("Name").Contains("a%b"), GetStjOptions());
 
         Assert.Equal("[[\"Name\"],\"like\",\"%a!%b%\",\"!\"]", json);
@@ -268,7 +268,7 @@ public class LikeEscapeTests
         var criteria = new Criteria("Name").LikeEscaped(
             "%" + Criteria.EscapeLikeWildcards("a[b", '/') + "%", escape: '/');
 
-        var json = JsonSerializer.Serialize<BaseCriteria>(criteria, options);
+        var json = JsonSerializer.Serialize(criteria, options);
         var result = Assert.IsType<BinaryCriteria>(
             JsonSerializer.Deserialize<BaseCriteria>(json, options));
 

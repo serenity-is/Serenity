@@ -19,7 +19,7 @@ public class RowFieldsBaseTests
             _UserId = null;
         }
 
-        [Serenity.Data.Mapping.UserIdFieldType]
+        [UserIdFieldType]
         public object? UserId { get => fields.UserId.AsObject(this); set => fields.UserId.AsObject(this, value); }
     }
 

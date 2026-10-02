@@ -78,7 +78,7 @@ public class AliasExtensionsTests
         var query = new SqlQuery().From(t).Select(t, "C");
 
         Assert.Single(System.Text.RegularExpressions.Regex.Matches(
-            query.ToString(), "WITH\\(NOLOCK\\)").Cast<System.Text.RegularExpressions.Match>());
+            query.ToString(), "WITH\\(NOLOCK\\)").Cast<Match>());
     }
 
     [Fact]
@@ -96,6 +96,6 @@ public class AliasExtensionsTests
 
         var sql = query.ToString();
         Assert.Single(System.Text.RegularExpressions.Regex.Matches(
-            sql, "WITH\\(NOLOCK\\)").Cast<System.Text.RegularExpressions.Match>());
+            sql, "WITH\\(NOLOCK\\)").Cast<Match>());
     }
 }

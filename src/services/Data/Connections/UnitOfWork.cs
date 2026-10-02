@@ -241,7 +241,7 @@ public class UnitOfWork : IDisposable, IAsyncDisposable, IUnitOfWork
         else
             transaction?.Commit();
 
-        AfterCommit();
+        await AfterCommitAsync().ConfigureAwait(false);
     }
 
     private void AfterCommit()
@@ -249,13 +249,49 @@ public class UnitOfWork : IDisposable, IAsyncDisposable, IUnitOfWork
         commited = true;
 
         onRollback = null;
+        var completedTransaction = transaction;
+        transaction = null;
         try
         {
-            onCommit?.Invoke();
+            completedTransaction?.Dispose();
         }
         finally
         {
-            onCommit = null;
+            try
+            {
+                onCommit?.Invoke();
+            }
+            finally
+            {
+                onCommit = null;
+            }
+        }
+    }
+
+    private async Task AfterCommitAsync()
+    {
+        commited = true;
+
+        onRollback = null;
+        var completedTransaction = transaction;
+        transaction = null;
+        try
+        {
+            if (completedTransaction is IAsyncDisposable asyncDisposable)
+                await asyncDisposable.DisposeAsync().ConfigureAwait(false);
+            else
+                completedTransaction?.Dispose();
+        }
+        finally
+        {
+            try
+            {
+                onCommit?.Invoke();
+            }
+            finally
+            {
+                onCommit = null;
+            }
         }
     }
 
