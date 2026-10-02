@@ -77,7 +77,7 @@ public class OracleDialect : ISqlDialect
         if (string.IsNullOrEmpty(s))
             return s;
 
-        if (s.StartsWith("\"") && s.EndsWith("\""))
+        if (s.Length >= 2 && s[0] == '"' && s[^1] == '"')
             return s;
 
         // Note: identifiers are intentionally upper-cased when quoted. Oracle folds
@@ -86,7 +86,7 @@ public class OracleDialect : ISqlDialect
         // the SELECT alias as "ALIASA" keeps the two consistent. Quoting with preserved
         // case ("AliasA") would break this (ORA-00904). This also matches objects created
         // by unquoted DDL, which Oracle stores as UPPER.
-        return '"' + s.ToUpperInvariant() + '"';
+        return '"' + s.ToUpperInvariant().Replace("\"", "\"\"", StringComparison.Ordinal) + '"';
     }
 
     /// <inheritdoc/>
@@ -95,13 +95,13 @@ public class OracleDialect : ISqlDialect
         if (string.IsNullOrEmpty(s))
             return s;
 
-        if (s.StartsWith("\"") && s.EndsWith("\""))
+        if (s.Length >= 2 && s[0] == '"' && s[^1] == '"')
             return s;
 
         // Note: see QuoteColumnAlias. Quoted identifiers are upper-cased to stay
         // consistent with Oracle's folding of unquoted identifiers to UPPER.
         if (keywords.Contains(s) || !SqlSyntax.IsValidIdentifier(s) || s[0] == '_')
-            return '"' + s.ToUpperInvariant().Replace("\"", "\"\"") + '"';
+            return '"' + s.ToUpperInvariant().Replace("\"", "\"\"", StringComparison.Ordinal) + '"';
 
         return s;
     }

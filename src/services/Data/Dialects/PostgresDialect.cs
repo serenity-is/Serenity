@@ -66,10 +66,10 @@ public class PostgresDialect : ISqlDialect
         if (string.IsNullOrEmpty(s))
             return s;
 
-        if (s.StartsWith("\"") && s.EndsWith("\""))
+        if (s.Length >= 2 && s[0] == '"' && s[^1] == '"')
             return s;
 
-        return '"' + s + '"';
+        return '"' + s.Replace("\"", "\"\"", StringComparison.Ordinal) + '"';
     }
 
     /// <inheritdoc/>

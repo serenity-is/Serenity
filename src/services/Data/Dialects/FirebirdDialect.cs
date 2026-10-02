@@ -102,7 +102,7 @@ public class FirebirdDialect : ISqlDialect
         if (string.IsNullOrEmpty(s))
             return s;
 
-        if (s.StartsWith("\"") && s.EndsWith("\""))
+        if (s.Length >= 2 && s[0] == '"' && s[^1] == '"')
             return s;
 
         if (keywords.Contains(s) || !SqlSyntax.IsValidIdentifier(s) || s[0] == '_')

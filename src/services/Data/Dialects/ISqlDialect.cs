@@ -169,7 +169,7 @@ public interface ISqlDialect
     string QuoteColumnAlias(string s);
 
     /// <summary>
-    /// Quotes the identifier.
+    /// Quotes the identifier, escaping embedded occurrences of the dialect's closing quote character.
     /// </summary>
     /// <param name="s">The identifier.</param>
     /// <returns>The quoted identifier.</returns>

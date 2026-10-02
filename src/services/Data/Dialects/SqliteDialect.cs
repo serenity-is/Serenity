@@ -68,8 +68,13 @@ public class SqliteDialect : ISqlDialect
         if (string.IsNullOrEmpty(s))
             return s;
 
-        if (s.StartsWith("[") && s.EndsWith("]"))
+        if (s.Length >= 2 && s[0] == '[' && s[^1] == ']')
             return s;
+
+        // SQLite's bracket quoting has no escape for a closing bracket, so
+        // use standard double quotes when the identifier contains one.
+        if (s.Contains(']'))
+            return '"' + s.Replace("\"", "\"\"", StringComparison.Ordinal) + '"';
 
         return '[' + s + ']';
     }
