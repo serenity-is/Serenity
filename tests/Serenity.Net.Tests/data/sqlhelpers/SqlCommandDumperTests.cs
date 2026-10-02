@@ -72,6 +72,24 @@ public class SqlCommandDumperTests
     }
 
     [Fact]
+    public void GetCommandText_VariableLengthParameterWithSizeMinusOne_UsesMax()
+    {
+        var command = GetCommand();
+        command.CommandText = "SELECT @p1";
+        command.Parameters.Add(new SqlParameter
+        {
+            ParameterName = "@p1",
+            DbValue = "text",
+            SqlDbType = SqlDbType.NVarChar,
+            Size = -1
+        });
+
+        var result = SqlCommandDumper.GetCommandText(command);
+
+        Assert.Contains("DECLARE @p1 NVARCHAR(MAX) = 'text';", result, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void GetCommandText_StoredProcedure_WithReturnValueAndOutput()
     {
         MockDbCommand command = GetCommand();
@@ -89,6 +107,46 @@ public class SqlCommandDumperTests
         Assert.Contains("@p1 = @p1 OUTPUT, @p2 = @p2 OUTPUT", result, StringComparison.Ordinal);
         Assert.Contains("-- RESULTS", result, StringComparison.Ordinal);
         Assert.Contains("@p1 as [@p1], @p2 as [@p2], @returnValue as ReturnValue", result, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void GetCommandText_TextCommandWithInputOutputParameter_ShowsResults()
+    {
+        var command = GetCommand();
+        command.CommandText = "UPDATE T SET A = @p1";
+        command.Parameters.Add(new SqlParameter
+        {
+            ParameterName = "@p1",
+            DbValue = 1,
+            SqlDbType = SqlDbType.Int,
+            Direction = ParameterDirection.InputOutput
+        });
+
+        var result = SqlCommandDumper.GetCommandText(command);
+
+        Assert.Contains("-- RESULTS", result, StringComparison.Ordinal);
+        Assert.Contains("@p1 as [@p1];", result, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void GetCommandText_DateTime_UsesConnectionDialect()
+    {
+        var connection = new MockDbConnection { Dialect = OracleDialect.Instance };
+        var command = new MockDbCommand(connection)
+        {
+            CommandText = "SELECT @p1"
+        };
+        var date = new DateTime(2023, 5, 1, 12, 30, 0);
+        command.Parameters.Add(new SqlParameter
+        {
+            ParameterName = "@p1",
+            DbValue = date,
+            SqlDbType = SqlDbType.DateTime
+        });
+
+        var result = SqlCommandDumper.GetCommandText(command);
+
+        Assert.Contains("= " + date.ToSql(OracleDialect.Instance) + ";", result, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -207,4 +265,3 @@ public class SqlCommandDumperTests
 
     public override string ToString() => "SqlCommandDumperTestsCustomValue";
 }
-

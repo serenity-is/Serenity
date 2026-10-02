@@ -16,6 +16,7 @@ public class SqlCommandDumper
     public static string GetCommandText(IDbCommand sqc)
     {
         var sbCommandText = new StringBuilder();
+        var dialect = sqc.Connection?.GetDialect() ?? SqlSettings.DefaultDialect;
 
         bool initialized = false;
         PropertyInfo? sqlDbTypeProperty = null;
@@ -35,7 +36,7 @@ public class SqlCommandDumper
                     sizeProperty = parameter.GetType().GetProperty("Size");
                 }
             }
-            LogParameterToSqlBatch(parameter, sbCommandText, sqlDbTypeProperty, sizeProperty);
+            LogParameterToSqlBatch(parameter, sbCommandText, sqlDbTypeProperty, sizeProperty, dialect);
         }
 
         sbCommandText.AppendLine("");
@@ -85,7 +86,7 @@ public class SqlCommandDumper
         bool anyOut = false;
         foreach (IDataParameter p in sqc.Parameters)
             if (p.Direction == ParameterDirection.ReturnValue ||
-                p.Direction == ParameterDirection.Output)
+                p.Direction.HasFlag(ParameterDirection.Output))
             {
                 anyOut = true;
                 break;
@@ -117,7 +118,7 @@ public class SqlCommandDumper
     }
 
     private static void LogParameterToSqlBatch(IDbDataParameter param, StringBuilder sbCommandText,
-        PropertyInfo? sqlDbTypeProperty, PropertyInfo? sizeProperty)
+        PropertyInfo? sqlDbTypeProperty, PropertyInfo? sizeProperty, ISqlDialect dialect)
     {
         sbCommandText.Append("DECLARE ");
         if (param.Direction == ParameterDirection.ReturnValue)
@@ -162,12 +163,12 @@ public class SqlCommandDumper
             }
 
             sbCommandText.Append(" = ");
-            LogQuotedParameterValue(param.Value, sbCommandText);
+            LogQuotedParameterValue(param.Value, sbCommandText, dialect);
             sbCommandText.AppendLine(";");
         }
     }
 
-    private static void LogQuotedParameterValue(object? value, StringBuilder sbCommandText)
+    private static void LogQuotedParameterValue(object? value, StringBuilder sbCommandText, ISqlDialect dialect)
     {
         try
         {
@@ -206,7 +207,7 @@ public class SqlCommandDumper
                 }
                 else if (value is DateTime dt)
                 {
-                    sbCommandText.Append(dt.ToSql(SqlServer2012Dialect.Instance));
+                    sbCommandText.Append(dt.ToSql(dialect));
                 }
                 else if (value is DateTimeOffset dto)
                 {
@@ -273,7 +274,10 @@ public class SqlCommandDumper
                 {
                     sbCommandText.Append(sqlDbType.ToString().ToUpperInvariant());
                     sbCommandText.Append('(');
-                    sbCommandText.Append(size == 0 ? 1 : size);
+                    if (size == -1)
+                        sbCommandText.Append("MAX");
+                    else
+                        sbCommandText.Append(size == 0 ? 1 : size);
                     sbCommandText.Append(')');
                 }
                 break;
