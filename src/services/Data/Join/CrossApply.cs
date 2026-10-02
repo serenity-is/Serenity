@@ -12,7 +12,7 @@ public class CrossApply : Join
     /// <param name="subQuery">Subquery.</param>
     /// <param name="alias">The alias.</param>
     public CrossApply(string subQuery, string alias)
-        : base(null, string.IsNullOrEmpty(subQuery) ? subQuery : "(" + subQuery + ")", alias, null)
+        : base(null, WrapSubQuery(subQuery), alias, null)
     {
     }
 
@@ -23,7 +23,7 @@ public class CrossApply : Join
     /// <param name="subQuery">Subquery.</param>
     /// <param name="alias">The alias.</param>
     public CrossApply(IDictionary<string, Join> joins, string subQuery, string alias)
-        : base(joins, string.IsNullOrEmpty(subQuery) ? subQuery : "(" + subQuery + ")", alias, null)
+        : base(joins, WrapSubQuery(subQuery), alias, null)
     {
     }
 
@@ -34,5 +34,11 @@ public class CrossApply : Join
     public override string GetKeyword()
     {
         return "CROSS APPLY";
+    }
+
+    private static string WrapSubQuery(string subQuery)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(subQuery);
+        return "(" + subQuery + ")";
     }
 }

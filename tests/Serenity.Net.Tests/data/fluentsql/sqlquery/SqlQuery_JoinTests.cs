@@ -29,8 +29,8 @@ public class SqlQuery_JoinTests
 
         Assert.Throws<ArgumentNullException>(() =>
             new SqlQuery().LeftJoin("Table", null!, null!));
-        Assert.Throws<ArgumentNullException>(() =>
-            new SqlQuery().LeftJoin("", alias, null!));
+        Assert.Equal("toTable", Assert.Throws<ArgumentException>(() =>
+            new SqlQuery().LeftJoin("", alias, null!)).ParamName);
 
         var query = new SqlQuery().From("Base").Select("x")
             .LeftJoin("Table", alias, null);
@@ -43,8 +43,8 @@ public class SqlQuery_JoinTests
     {
         Assert.Throws<ArgumentNullException>(() =>
             new SqlQuery().LeftJoin(null!, null!));
-        Assert.Throws<ArgumentNullException>(() =>
-            new SqlQuery().LeftJoin(new Alias("", "T1"), null!));
+        Assert.Equal("alias", Assert.Throws<ArgumentException>(() =>
+            new SqlQuery().LeftJoin(new Alias("", "T1"), null!)).ParamName);
 
         var query = new SqlQuery().From("Base").Select("x")
             .LeftJoin(new Alias("Table", "T1"), null);
@@ -59,8 +59,8 @@ public class SqlQuery_JoinTests
 
         Assert.Throws<ArgumentNullException>(() =>
             new SqlQuery().RightJoin("Table", null!, null!));
-        Assert.Throws<ArgumentNullException>(() =>
-            new SqlQuery().RightJoin("", alias, null!));
+        Assert.Equal("toTable", Assert.Throws<ArgumentException>(() =>
+            new SqlQuery().RightJoin("", alias, null!)).ParamName);
 
         var query = new SqlQuery().From("Base").Select("x")
             .RightJoin("Table", alias, null);
@@ -73,8 +73,8 @@ public class SqlQuery_JoinTests
     {
         Assert.Throws<ArgumentNullException>(() =>
             new SqlQuery().RightJoin(null!, null!));
-        Assert.Throws<ArgumentNullException>(() =>
-            new SqlQuery().RightJoin(new Alias("", "T1"), null!));
+        Assert.Equal("alias", Assert.Throws<ArgumentException>(() =>
+            new SqlQuery().RightJoin(new Alias("", "T1"), null!)).ParamName);
 
         var query = new SqlQuery().From("Base").Select("x")
             .RightJoin(new AliasWithJoins("Table", "T1"), null);
@@ -87,8 +87,8 @@ public class SqlQuery_JoinTests
     {
         Assert.Throws<ArgumentNullException>(() =>
             new SqlQuery().InnerJoin(null!, null!));
-        Assert.Throws<ArgumentNullException>(() =>
-            new SqlQuery().InnerJoin(new Alias("", "T1"), null!));
+        Assert.Equal("alias", Assert.Throws<ArgumentException>(() =>
+            new SqlQuery().InnerJoin(new Alias("", "T1"), null!)).ParamName);
 
         var query = new SqlQuery().From("Base").Select("x")
             .InnerJoin(new AliasWithJoins("Table", "T1"), null);

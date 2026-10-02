@@ -102,15 +102,13 @@ public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressio
     /// <param name="alias">The alias.</param>
     /// <param name="onCriteria">The on criteria.</param>
     /// <returns>The query itself.</returns>
-    /// <exception cref="ArgumentNullException">
-    /// alias is null or alias.table is null or empty
-    /// </exception>
+    /// <exception cref="ArgumentNullException">alias or toTable is null.</exception>
+    /// <exception cref="ArgumentException">toTable is empty.</exception>
     public SqlQuery LeftJoin(string toTable, IAlias alias, ICriteria onCriteria)
     {
         ArgumentNullException.ThrowIfNull(alias);
 
-        if (string.IsNullOrEmpty(toTable))
-            throw new ArgumentNullException("alias.table");
+        ArgumentException.ThrowIfNullOrEmpty(toTable);
 
         BeforeModify();
 
@@ -133,15 +131,14 @@ public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressio
     /// <param name="alias">The alias.</param>
     /// <param name="onCriteria">The on criteria.</param>
     /// <returns>The query itself.</returns>
-    /// <exception cref="ArgumentNullException">
-    /// alias is null or alias.table is null or empty.
-    /// </exception>
+    /// <exception cref="ArgumentNullException">alias is null.</exception>
+    /// <exception cref="ArgumentException">alias has no table name.</exception>
     public SqlQuery LeftJoin(IAlias alias, ICriteria onCriteria)
     {
         ArgumentNullException.ThrowIfNull(alias);
 
         if (string.IsNullOrEmpty(alias.Table))
-            throw new ArgumentNullException("alias.table");
+            throw new ArgumentException("Alias must specify a table name.", nameof(alias));
 
         BeforeModify();
 
@@ -165,17 +162,13 @@ public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressio
     /// <param name="alias">The alias.</param>
     /// <param name="onCriteria">The on criteria.</param>
     /// <returns>SqlQuery itself.</returns>
-    /// <exception cref="ArgumentNullException">
-    /// alias is null
-    /// or
-    /// alias.table is null
-    /// </exception>
+    /// <exception cref="ArgumentNullException">alias or toTable is null.</exception>
+    /// <exception cref="ArgumentException">toTable is empty.</exception>
     public SqlQuery RightJoin(string toTable, IAlias alias, ICriteria onCriteria)
     {
         ArgumentNullException.ThrowIfNull(alias);
 
-        if (string.IsNullOrEmpty(toTable))
-            throw new ArgumentNullException("alias.table");
+        ArgumentException.ThrowIfNullOrEmpty(toTable);
 
         BeforeModify();
 
@@ -198,17 +191,14 @@ public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressio
     /// <param name="alias">The alias with table name/alias name.</param>
     /// <param name="onCriteria">The ON criteria.</param>
     /// <returns>The query itself.</returns>
-    /// <exception cref="ArgumentNullException">
-    /// alias is null
-    /// or
-    /// alias.table is null
-    /// </exception>
+    /// <exception cref="ArgumentNullException">alias is null.</exception>
+    /// <exception cref="ArgumentException">alias has no table name.</exception>
     public SqlQuery RightJoin(IAlias alias, ICriteria onCriteria)
     {
         ArgumentNullException.ThrowIfNull(alias);
 
         if (string.IsNullOrEmpty(alias.Table))
-            throw new ArgumentNullException("alias.table");
+            throw new ArgumentException("Alias must specify a table name.", nameof(alias));
 
         BeforeModify();
 
@@ -231,17 +221,14 @@ public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressio
     /// <param name="alias">The alias.</param>
     /// <param name="onCriteria">The ON criteria.</param>
     /// <returns>The query itself.</returns>
-    /// <exception cref="ArgumentNullException">
-    /// alias is null 
-    /// or
-    /// alias.table is null
-    /// </exception>
+    /// <exception cref="ArgumentNullException">alias is null.</exception>
+    /// <exception cref="ArgumentException">alias has no table name.</exception>
     public SqlQuery InnerJoin(IAlias alias, ICriteria onCriteria)
     {
         ArgumentNullException.ThrowIfNull(alias);
 
         if (string.IsNullOrEmpty(alias.Table))
-            throw new ArgumentNullException("alias.table");
+            throw new ArgumentException("Alias must specify a table name.", nameof(alias));
 
         BeforeModify();
 

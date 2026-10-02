@@ -166,11 +166,9 @@ public class JoinTests
     }
 
     [Fact]
-    public void CrossApply_Empty_SubQuery_Is_Kept_As_Is()
+    public void CrossApply_Rejects_Empty_SubQuery()
     {
-        var join = new CrossApply("", "ca");
-
-        Assert.Equal("", join.Table);
+        Assert.Throws<ArgumentException>(() => new CrossApply("", "ca"));
     }
 
     [Fact]
@@ -184,11 +182,9 @@ public class JoinTests
     }
 
     [Fact]
-    public void OuterApply_Empty_SubQuery_Is_Kept_As_Is()
+    public void OuterApply_Rejects_Empty_SubQuery()
     {
-        var join = new OuterApply("", "oa");
-
-        Assert.Equal("", join.Table);
+        Assert.Throws<ArgumentException>(() => new OuterApply("", "oa"));
     }
 
     [Fact]

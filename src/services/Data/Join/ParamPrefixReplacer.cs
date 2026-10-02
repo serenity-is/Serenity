@@ -24,7 +24,7 @@ public static class ParamPrefixReplacer
         for (var i = 0; i < expression.Length; i++)
         {
             var start = i;
-            if (SqlRegionScanner.TrySkipQuotesAndComments(expression, ref i))
+            if (SqlRegionScanner.TrySkipQuotesAndComments(expression, ref i, skipBracketIdentifiers: true))
             {
                 sb.Append(expression, start, i - start + 1);
                 continue;

@@ -166,6 +166,18 @@ public class ParamPrefixReplacerTests
     }
 
     [Fact]
+    public void Replace_Does_Not_Translate_Inside_Bracketed_Identifiers()
+    {
+        Assert.Equal("[A@B] = :p1", ParamPrefixReplacer.Replace("[A@B] = @p1", ':'));
+    }
+
+    [Fact]
+    public void Replace_Does_Not_Translate_Inside_Escaped_Bracketed_Identifiers()
+    {
+        Assert.Equal("[A]]@B] = :p1", ParamPrefixReplacer.Replace("[A]]@B] = @p1", ':'));
+    }
+
+    [Fact]
     public void Replace_Does_Not_Translate_Inside_Backticks()
     {
         Assert.Equal("x = `a@b` AND y = :p1",

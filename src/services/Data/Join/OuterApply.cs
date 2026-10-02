@@ -12,7 +12,7 @@ public class OuterApply : Join
     /// <param name="innerQuery">The inner query.</param>
     /// <param name="alias">The alias.</param>
     public OuterApply(string innerQuery, string alias)
-        : base(null, string.IsNullOrEmpty(innerQuery) ? innerQuery : "(" + innerQuery + ")", alias, null)
+        : base(null, WrapSubQuery(innerQuery), alias, null)
     {
     }
 
@@ -23,7 +23,7 @@ public class OuterApply : Join
     /// <param name="innerQuery">The inner query.</param>
     /// <param name="alias">The alias.</param>
     public OuterApply(IDictionary<string, Join> joins, string innerQuery, string alias)
-        : base(joins, string.IsNullOrEmpty(innerQuery) ? innerQuery : "(" + innerQuery + ")", alias, null)
+        : base(joins, WrapSubQuery(innerQuery), alias, null)
     {
     }
 
@@ -34,5 +34,11 @@ public class OuterApply : Join
     public override string GetKeyword()
     {
         return "OUTER APPLY";
+    }
+
+    private static string WrapSubQuery(string innerQuery)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(innerQuery);
+        return "(" + innerQuery + ")";
     }
 }

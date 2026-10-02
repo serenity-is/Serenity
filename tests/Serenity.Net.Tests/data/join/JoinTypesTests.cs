@@ -13,10 +13,11 @@ public class JoinTypesTests
     }
 
     [Fact]
-    public void CrossApply_Keeps_Empty_SubQuery_As_Is()
+    public void CrossApply_Rejects_Empty_SubQuery()
     {
-        var join = new CrossApply("", "ca");
-        Assert.Equal("", join.Table);
+        Assert.Throws<ArgumentException>(() => new CrossApply("", "ca"));
+        Assert.Throws<ArgumentNullException>(() => new CrossApply(null!, "ca"));
+        Assert.Throws<ArgumentException>(() => new CrossApply(new Dictionary<string, Join>(), "", "ca"));
     }
 
     [Fact]
@@ -26,6 +27,14 @@ public class JoinTypesTests
         _ = new CrossApply(joins, "SELECT 1", "ca");
 
         Assert.True(joins.ContainsKey("ca"));
+    }
+
+    [Fact]
+    public void OuterApply_Rejects_Empty_SubQuery()
+    {
+        Assert.Throws<ArgumentException>(() => new OuterApply("", "oa"));
+        Assert.Throws<ArgumentNullException>(() => new OuterApply(null!, "oa"));
+        Assert.Throws<ArgumentException>(() => new OuterApply(new Dictionary<string, Join>(), "", "oa"));
     }
 
     [Fact]
