@@ -116,6 +116,29 @@ public class SqlHelperExecuteUpsertTests
     }
 
     [Fact]
+    public void ExecuteUpsert_WithUnsupportedDialect_MergesParameterOverridesCaseInsensitively()
+    {
+        using var connection = new MockDbConnection { Dialect = new UnknownUpsertDialect() }
+            .OnDbCommandExecuteNonQuery(command =>
+            {
+                Assert.Single(command.Parameters);
+                Assert.Equal(2, ((IDbDataParameter)command.Parameters[0]!).Value);
+                return 1;
+            });
+
+        var query = new SqlInsert("Table").SetTo("Id", "1").SetTo("X", "@p1");
+        query.SetParam("@p1", 1);
+        var parameters = new Dictionary<string, object?> { ["@P1"] = 2 };
+
+        var result = query.ExecuteUpsert(connection, ["Id"], parameters: parameters);
+
+        Assert.Equal(1, result);
+        Assert.Equal(1, connection.DbCommandExecuteNonQueryCallCount);
+        Assert.Equal(1, query.Params!["@p1"]);
+        Assert.Single(parameters);
+    }
+
+    [Fact]
     public void ExecuteUpsert_WithUnsupportedDialect_AndNullKeyParameter_UsesIsNullInFallback()
     {
         string? updateSql = null;

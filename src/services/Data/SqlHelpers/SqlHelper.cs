@@ -1100,7 +1100,12 @@ public static class SqlHelper
         if (overrides is null)
             return queryParameters;
 
-        var parameters = queryParameters is null ? [] : new Dictionary<string, object?>(queryParameters);
+        var parameters = new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase);
+        if (queryParameters is not null)
+        {
+            foreach (var (name, value) in queryParameters)
+                parameters[name] = value;
+        }
 
         foreach (var (name, value) in overrides)
             parameters[name] = value;
