@@ -10,8 +10,8 @@ public class DefaultDB_20160515_0726_UserPreferences(IOptions<UserEntityOptions>
         Create.Table("UserPreferences")
             .WithColumn("UserPreferenceId").AsInt32().IdentityKey(this)
             .WithColumn("UserId").AsUserIdType(userEntityOptions).NotNullable()
-            .WithColumn("PreferenceType").AsString(100).NotNullable()
-            .WithColumn("Name").AsString(200).NotNullable()
+            .WithColumn("PreferenceType").AsString(50).NotNullable()
+            .WithColumn("Name").AsString(150).NotNullable()
             .WithColumn("Value").AsString(int.MaxValue).Nullable();
 
         Create.Index("IX_UserPref_UID_PrefType_Name")

@@ -1,5 +1,3 @@
-using Serenity.Reflection;
-
 namespace Serenity.CodeGeneration;
 
 public partial class EsmEntryPointsGeneratorTests

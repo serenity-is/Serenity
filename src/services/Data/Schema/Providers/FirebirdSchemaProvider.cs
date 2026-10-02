@@ -172,7 +172,7 @@ public class FirebirdSchemaProvider : ISchemaProvider
     private class TableNameSource
     {
         public required string NAME { get; set; }
-        public required string ISVIEW { get; set; }
+        public object? ISVIEW { get; set; }
     }
 
     /// <inheritdoc/>

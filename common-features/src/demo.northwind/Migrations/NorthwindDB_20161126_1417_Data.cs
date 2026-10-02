@@ -1,35 +1,110 @@
 using FluentMigrator;
 using FluentMigrator.Builders.Insert;
+using FluentMigrator.Postgres;
 using FluentMigrator.SqlServer;
+using System.Reflection;
 
 namespace Serenity.Demo.Northwind.Migrations;
 
 [NorthwindDB, MigrationKey(20161126_1417)]
 public class NorthwindDB_20161126_1417_Data : Migration
 {
+    private bool isSqlServer;
+    private bool isPostgres;
+
     private void InsertRows<TItem>(string table, IEnumerable<TItem> rows, bool identityInsert)
     {
+        var rowList = rows.ToArray();
+        if (this.IsFirebird() && !identityInsert && rowList.Length > 1)
+        {
+            InsertFirebirdRows(table, rowList);
+            return;
+        }
+
         IInsertDataSyntax insert = Insert.IntoTable(table);
         if (identityInsert)
-            insert = insert.WithIdentityInsert();
-        foreach (var row in rows)
+        {
+            if (isPostgres)
+                insert = insert.WithOverridingSystemValue();
+            else
+                insert = insert.WithIdentityInsert();
+        }
+
+        foreach (var row in rowList)
             insert = insert.Row(row);
+    }
+
+    private void InsertFirebirdRows<TItem>(string table, IReadOnlyList<TItem> rows)
+    {
+        const int maxBlockLength = 32 * 1024;
+        const int maxStatementsPerBlock = 128;
+        var properties = typeof(TItem).GetProperties(BindingFlags.Instance | BindingFlags.Public)
+            .Where(property => property.CanRead && property.GetIndexParameters().Length == 0)
+            .ToArray();
+        var columns = string.Join(", ", properties.Select(property => FirebirdDialect.Instance.QuoteIdentifier(property.Name)));
+        var quotedTable = FirebirdDialect.Instance.QuoteIdentifier(table);
+        var block = new StringBuilder("EXECUTE BLOCK AS BEGIN\n");
+        var statementCount = 0;
+
+        foreach (var row in rows)
+        {
+            var values = string.Join(", ", properties.Select(property => ToFirebirdLiteral(property.GetValue(row))));
+            var statement = $"INSERT INTO {quotedTable} ({columns}) VALUES ({values});\n";
+
+            if ((block.Length + statement.Length + "END".Length > maxBlockLength ||
+                 statementCount >= maxStatementsPerBlock) &&
+                statementCount > 0)
+            {
+                block.Append("END");
+                Execute.Sql(block.ToString());
+                block.Clear().Append("EXECUTE BLOCK AS BEGIN\n");
+                statementCount = 0;
+            }
+
+            block.Append(statement);
+            statementCount++;
+        }
+
+        if (statementCount > 0)
+        {
+            block.Append("END");
+            Execute.Sql(block.ToString());
+        }
+    }
+
+    private static string ToFirebirdLiteral(object? value)
+    {
+        return value switch
+        {
+            null => "NULL",
+            string text => "'" + text.Replace("'", "''") + "'",
+            char character => "'" + (character == '\'' ? "''" : character.ToString()) + "'",
+            bool boolean => boolean ? "1" : "0",
+            DateTime dateTime => "TIMESTAMP '" + dateTime.ToString("yyyy-MM-dd HH:mm:ss.ffff", CultureInfo.InvariantCulture) + "'",
+            decimal number => number.ToString(CultureInfo.InvariantCulture),
+            double number => number.ToString("R", CultureInfo.InvariantCulture),
+            float number => number.ToString("R", CultureInfo.InvariantCulture),
+            IFormattable formattable => formattable.ToString(null, CultureInfo.InvariantCulture),
+            _ => throw new NotSupportedException($"Cannot generate a Firebird SQL literal for {value.GetType()}.")
+        };
     }
 
     public override void Up()
     {
-        bool isSqlServer = this.IsSqlServer();
+        isSqlServer = this.IsSqlServer();
+        isPostgres = this.IsPostgres();
+        bool identityInsert = isSqlServer || isPostgres;
 
-        InsertRows("Region", RegionList, identityInsert: isSqlServer);
+        InsertRows("Region", RegionList, identityInsert: identityInsert);
         InsertRows("Territories", TerritoryList, identityInsert: false);
-        InsertRows("Employees", EmployeeList, identityInsert: isSqlServer);
-        InsertRows("Categories", CategoryList, identityInsert: isSqlServer);
-        InsertRows("Shippers", ShipperList, identityInsert: isSqlServer);
-        InsertRows("Suppliers", SupplierList, identityInsert: isSqlServer);
-        InsertRows("Products", ProductList, identityInsert: isSqlServer);
+        InsertRows("Employees", EmployeeList, identityInsert: identityInsert);
+        InsertRows("Categories", CategoryList, identityInsert: identityInsert);
+        InsertRows("Shippers", ShipperList, identityInsert: identityInsert);
+        InsertRows("Suppliers", SupplierList, identityInsert: identityInsert);
+        InsertRows("Products", ProductList, identityInsert: identityInsert);
         InsertRows("Customers", CustomerList, identityInsert: false);
         InsertRows("EmployeeTerritories", EmployeeTerritoryList, identityInsert: false);
-        InsertRows("Orders", OrderList, identityInsert: isSqlServer);
+        InsertRows("Orders", OrderList, identityInsert: identityInsert);
         InsertRows("OrderDetails", OrderDetailList, identityInsert: false);
 
         IfDatabase("Postgres")

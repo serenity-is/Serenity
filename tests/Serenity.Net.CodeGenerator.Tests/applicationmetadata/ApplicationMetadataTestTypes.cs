@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using Serenity.Data.Mapping;
 
 namespace ApplicationMetadataTest
 {

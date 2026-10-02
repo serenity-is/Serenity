@@ -1,5 +1,4 @@
 using static Serenity.CodeGenerator.CustomerEntityInputs;
-using Serenity.Data.Schema;
 using FieldInfo = Serenity.Data.Schema.FieldInfo;
 
 namespace Serenity.CodeGenerator;

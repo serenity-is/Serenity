@@ -2,9 +2,11 @@
   <PropertyGroup>
     <RunSettingsFilePath>$(MSBuildProjectDirectory)\coverlet.runsettings</RunSettingsFilePath>
   </PropertyGroup>
+  <Import Project="$(MSBuildThisFileDirectory)..\..\..\src\CommonDbProviders.props" Condition="'$(NoDbProviders)' != 'true'" />
   <ItemGroup>
     <ProjectReference Include="..\..\..\tests\Serenity.Net.Tests\Serenity.Net.Tests.csproj" />
     <ProjectReference Include="..\..\src\Serene.Web\Serene.Web.csproj" />
+    <Compile Include="..\..\..\tests\Serenity.Net.CodeGenerator.Tests\sqlintegration\SqlIntegrationConnections.cs" Link="testutils\%(Filename)%(Extension)" />
     <Using Include="Microsoft.AspNetCore.Http" />
     <Using Include="Microsoft.AspNetCore.Mvc" />
     <Using Include="Microsoft.AspNetCore.Mvc.Filters" />

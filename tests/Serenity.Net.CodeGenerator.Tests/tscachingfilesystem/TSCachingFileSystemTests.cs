@@ -1,5 +1,3 @@
-using System.IO;
-
 namespace Serenity.CodeGenerator;
 
 public class TSCachingFileSystemTests

@@ -1,5 +1,3 @@
-using static Serenity.CodeGenerator.CustomerEntityInputs;
-
 namespace Serenity.CodeGenerator;
 
 public partial class EntityModelFactoryTests

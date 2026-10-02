@@ -24,7 +24,7 @@ public sealed class UserPreferenceRow : Row<UserPreferenceRow.RowFields>, IIdRow
     /// <summary>
     /// The preference type.
     /// </summary>
-    [DisplayName("PreferenceType"), Size(100), NotNull]
+    [DisplayName("PreferenceType"), Size(50), NotNull]
     public string? PreferenceType { get => fields.PreferenceType[this]; set => fields.PreferenceType[this] = value; }
 
     /// <summary>

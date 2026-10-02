@@ -30,6 +30,7 @@ public sealed class OrderDetailRow : Row<OrderDetailRow.RowFields>, IIdRow
     public float? Discount { get => fields.Discount[this]; set => fields.Discount[this] = value; }
 
     [DisplayName("Line Total"), Expression("(T0.[UnitPrice] * T0.[Quantity] - T0.[Discount])")]
+    [Expression("(T0.[UnitPrice]::numeric * T0.[Quantity]::numeric - T0.[Discount]::numeric)", Dialect = nameof(ServerType.Postgres))]
     [AlignRight, DisplayFormat("#,##0.00"), MinSelectLevel(SelectLevel.List)]
     public decimal? LineTotal { get => fields.LineTotal[this]; set => fields.LineTotal[this] = value; }
 
