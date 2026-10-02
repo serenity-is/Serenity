@@ -16,10 +16,10 @@ public class SqlInsert_Upsert_Tests
                 INSERT INTO [TestTable] ([KeyField], [DataField])
                 SELECT @p1, @p2 WHERE NOT EXISTS (
                     SELECT 1 FROM [TestTable] WITH (UPDLOCK, SERIALIZABLE)
-                    WHERE [KeyField] = @p1);
+                    WHERE ([KeyField] = @p1 OR ([KeyField] IS NULL AND @p1 IS NULL)));
                 IF @@ROWCOUNT = 0
                 BEGIN
-                   UPDATE [TestTable] SET [DataField] = @p2 WHERE [KeyField] = @p1;
+                   UPDATE [TestTable] SET [DataField] = @p2 WHERE ([KeyField] = @p1 OR ([KeyField] IS NULL AND @p1 IS NULL));
                 END
                 """),
             Normalize.Sql(query.ToUpsertString(["KeyField"])));
@@ -94,7 +94,7 @@ public class SqlInsert_Upsert_Tests
                 """
                 MERGE INTO [TestTable] t
                 USING (SELECT @p1 AS [KeyField], @p2 AS [DataField] FROM dual) s
-                ON (t.[KeyField] = s.[KeyField])
+                ON ((t.[KeyField] = s.[KeyField] OR (t.[KeyField] IS NULL AND s.[KeyField] IS NULL)))
                 WHEN MATCHED THEN
                     UPDATE SET t.[DataField] = s.[DataField]
                 WHEN NOT MATCHED THEN
@@ -178,6 +178,20 @@ public class SqlInsert_Upsert_Tests
     {
         Assert.Throws<NotSupportedException>(() =>
             SqlInsert.FormatUpsert("T", [new ("A", "@p1")], ["A"], new UnknownDialect()));
+    }
+
+    [Fact]
+    public void ToUpsertString_UsesIsNull_ForNullKeyExpression()
+    {
+        var query = new SqlInsert("TestTable")
+            .Dialect(SqlServer2012Dialect.Instance)
+            .SetNull("KeyField")
+            .SetTo("DataField", "@p1");
+
+        var sql = Normalize.Sql(query.ToUpsertString(["KeyField"]));
+
+        Assert.Contains("WHERE [KeyField] IS NULL", sql, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("[KeyField] = NULL", sql, StringComparison.OrdinalIgnoreCase);
     }
 
     private class UnknownDialect : SqlServer2012Dialect

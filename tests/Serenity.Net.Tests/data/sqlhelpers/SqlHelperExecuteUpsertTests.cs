@@ -116,6 +116,30 @@ public class SqlHelperExecuteUpsertTests
     }
 
     [Fact]
+    public void ExecuteUpsert_WithUnsupportedDialect_AndNullKeyParameter_UsesIsNullInFallback()
+    {
+        string? updateSql = null;
+        using var connection = new MockDbConnection { Dialect = new UnknownUpsertDialect() }
+            .OnDbCommandExecuteNonQuery(command =>
+            {
+                updateSql = command.CommandText;
+                return 1;
+            });
+
+        var query = new SqlInsert("Table").SetTo("Id", "@id").SetTo("X", "@x");
+        query.SetParam("@id", 1);
+        query.SetParam("@x", "test");
+        var parameters = new Dictionary<string, object?> { ["@id"] = null };
+
+        var result = query.ExecuteUpsert(connection, ["Id"], parameters: parameters);
+
+        Assert.Equal(1, result);
+        Assert.Contains("Id = @id", updateSql, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("Id IS NULL AND @id IS NULL", updateSql, StringComparison.OrdinalIgnoreCase);
+        Assert.Equal(1, connection.DbCommandExecuteNonQueryCallCount);
+    }
+
+    [Fact]
     public void ExecuteUpsert_NullQuery_ThrowsArgumentNullException()
     {
         using var connection = new MockDbConnection();
@@ -181,6 +205,31 @@ public class SqlHelperExecuteUpsertTests
             cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.Equal(1, result);
+        Assert.Equal(1, connection.DbCommandExecuteNonQueryCallCount);
+    }
+
+    [Fact]
+    public async Task ExecuteUpsertAsync_WithUnsupportedDialect_AndNullKeyParameter_UsesIsNullInFallback()
+    {
+        string? updateSql = null;
+        using var connection = new MockDbConnection { Dialect = new UnknownUpsertDialect() }
+            .OnDbCommandExecuteNonQuery(command =>
+            {
+                updateSql = command.CommandText;
+                return 1;
+            });
+
+        var query = new SqlInsert("Table").SetTo("Id", "@id").SetTo("X", "@x");
+        query.SetParam("@id", 1);
+        query.SetParam("@x", "test");
+        var parameters = new Dictionary<string, object?> { ["@id"] = DBNull.Value };
+
+        var result = await query.ExecuteUpsertAsync(connection, ["Id"], parameters: parameters,
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.Equal(1, result);
+        Assert.Contains("Id = @id", updateSql, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("Id IS NULL AND @id IS NULL", updateSql, StringComparison.OrdinalIgnoreCase);
         Assert.Equal(1, connection.DbCommandExecuteNonQueryCallCount);
     }
 

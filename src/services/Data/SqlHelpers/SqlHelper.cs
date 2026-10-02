@@ -558,7 +558,8 @@ public static class SqlHelper
         return null;
     }
 
-    private static SqlUpdate CreateUpsertFallbackUpdate(SqlInsert query, IEnumerable<string> keyFields)
+    private static SqlUpdate CreateUpsertFallbackUpdate(SqlInsert query, IEnumerable<string> keyFields,
+        IReadOnlyDictionary<string, object?>? parameters)
     {
         var tableName = query.TableName();
         var keySet = new HashSet<string>(keyFields, StringComparer.OrdinalIgnoreCase);
@@ -567,11 +568,16 @@ public static class SqlHelper
         foreach (var pair in query.GetFieldExpressions())
         {
             if (keySet.Contains(pair.Field))
-                update.Where(new Criteria(pair.Field) == new Criteria(pair.Expression));
+            {
+                var fieldCriteria = new Criteria(pair.Field);
+                var valueCriteria = new Criteria(pair.Expression);
+                update.Where((fieldCriteria == valueCriteria) |
+                    (fieldCriteria.IsNull() & valueCriteria.IsNull()));
+            }
             else
                 update.SetTo(pair.Field, pair.Expression);
         }
-        if (query.Params is { } prms)
+        if (parameters is { } prms)
             foreach (var p in prms)
                 update.AddParam(p.Key, p.Value);
 
@@ -634,6 +640,15 @@ public static class SqlHelper
     /// <param name="parameters">Values that override the query's parameters for this execution.</param>
     /// <param name="logger">The logger.</param>
     /// <returns>The number of affected rows.</returns>
+    /// <remarks>
+    /// A native dialect-specific upsert is used when supported. Otherwise this method falls back
+    /// to separate UPDATE and INSERT statements. That compatibility fallback is not atomic, so
+    /// concurrent calls can race; there is no generic way to make this fallback atomic across
+    /// dialects. Prefer a dialect with native upsert support when atomicity is required. The
+    /// fallback reports one affected row for a successful logical upsert, and uses that value
+    /// when checking <paramref name="expectedRows"/>. Key matching is null-safe, so a null key
+    /// value matches another null key value.
+    /// </remarks>
     public static int ExecuteUpsert(this SqlInsert query, IDbConnection connection,
         IEnumerable<string> keyFields, ExpectedRows expectedRows = ExpectedRows.Ignore,
         IReadOnlyDictionary<string, object?>? parameters = null, ILogger? logger = null)
@@ -651,12 +666,17 @@ public static class SqlHelper
         }
         catch (NotSupportedException)
         {
-            // Unknown dialect: fall back to a non-atomic update-then-insert.
-            var update = CreateUpsertFallbackUpdate(query, keyFields);
+            // Compatibility fallback for dialects without generated upsert SQL. This must stay
+            // visibly non-atomic: a generic update-then-insert cannot close the race between
+            // concurrent callers. Native dialect upsert SQL is required when atomicity matters.
+            var effectiveParameters = MergeQueryParameters(query.Params, parameters);
+            var update = CreateUpsertFallbackUpdate(query, keyFields, effectiveParameters);
             if (update.Execute(connection, ExpectedRows.ZeroOrOne,
-                parameters: parameters, logger: logger) != 1)
+                logger: logger) != 1)
                 query.Execute(connection, parameters, logger);
 
+            // The fallback represents a successful update-or-insert operation as one row,
+            // regardless of which of its two statements performed the work.
             return CheckExpectedRows(expectedRows, 1);
         }
 
@@ -682,6 +702,15 @@ public static class SqlHelper
     /// <param name="logger">The logger.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the number of affected rows.</returns>
+    /// <remarks>
+    /// A native dialect-specific upsert is used when supported. Otherwise this method falls back
+    /// to separate UPDATE and INSERT statements. That compatibility fallback is not atomic, so
+    /// concurrent calls can race; there is no generic way to make this fallback atomic across
+    /// dialects. Prefer a dialect with native upsert support when atomicity is required. The
+    /// fallback reports one affected row for a successful logical upsert, and uses that value
+    /// when checking <paramref name="expectedRows"/>. Key matching is null-safe, so a null key
+    /// value matches another null key value.
+    /// </remarks>
     public static async Task<int> ExecuteUpsertAsync(this SqlInsert query, IDbConnection connection,
         IEnumerable<string> keyFields, ExpectedRows expectedRows = ExpectedRows.Ignore,
         IReadOnlyDictionary<string, object?>? parameters = null, ILogger? logger = null,
@@ -700,13 +729,18 @@ public static class SqlHelper
         }
         catch (NotSupportedException)
         {
-            // Unknown dialect: fall back to a non-atomic update-then-insert.
-            var update = CreateUpsertFallbackUpdate(query, keyFields);
+            // Compatibility fallback for dialects without generated upsert SQL. This must stay
+            // visibly non-atomic: a generic update-then-insert cannot close the race between
+            // concurrent callers. Native dialect upsert SQL is required when atomicity matters.
+            var effectiveParameters = MergeQueryParameters(query.Params, parameters);
+            var update = CreateUpsertFallbackUpdate(query, keyFields, effectiveParameters);
             if (await update.ExecuteAsync(connection, ExpectedRows.ZeroOrOne,
-                parameters: parameters, logger: logger, cancellationToken: cancellationToken).ConfigureAwait(false) != 1)
+                logger: logger, cancellationToken: cancellationToken).ConfigureAwait(false) != 1)
                 await query.ExecuteAsync(connection, parameters, logger,
                     cancellationToken).ConfigureAwait(false);
 
+            // The fallback represents a successful update-or-insert operation as one row,
+            // regardless of which of its two statements performed the work.
             return CheckExpectedRows(expectedRows, 1);
         }
 

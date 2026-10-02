@@ -129,6 +129,17 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
             throw new ArgumentException($"Field '{field}' has already been set.", nameof(field));
     }
 
+    private static string NullSafeKeyMatch(string field, string value)
+    {
+        if (string.Equals(value.Trim(), SqlKeywords.Null, StringComparison.OrdinalIgnoreCase))
+            return field + " IS NULL";
+
+        // A key expression can be a parameter whose runtime value is null. Keep
+        // the comparison null-safe because the value is not available here, and
+        // may also be overridden when the generated SQL is executed.
+        return $"({field} = {value} OR ({field} IS NULL AND {value} IS NULL))";
+    }
+
     /// <summary>Clones the query.</summary>
     /// <returns>A clone of this query.</returns>
     public SqlInsert Clone()
@@ -306,7 +317,7 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
         var table = SqlSyntax.AutoBracketValid(tableName, dialect);
         var insertColumns = string.Join(", ", fields);
         var insertValues = string.Join(", ", values);
-        var keyCondition = string.Join(" AND ", keyBracketed.Select((f, i) => f + " = " + keyValues[i]));
+        var keyCondition = string.Join(" AND ", keyBracketed.Select((f, i) => NullSafeKeyMatch(f, keyValues[i])));
         var nonKeyAssignments = string.Join(", ", nonKeyFields.Select((f, i) => f + " = " + nonKeyValues[i]));
 
         switch (dialect.ServerType)
@@ -362,7 +373,7 @@ public class SqlInsert : QueryWithParams, ISetFieldByStatement
                 return $"""
                     MERGE INTO {table} t
                     USING (SELECT {string.Join(", ", fields.Select((f, i) => values[i] + " AS " + f))} FROM dual) s
-                    ON ({string.Join(" AND ", keyBracketed.Select(f => "t." + f + " = s." + f))})
+                    ON ({string.Join(" AND ", keyBracketed.Select(f => NullSafeKeyMatch("t." + f, "s." + f)))})
                     {mergeUpdate}
                     WHEN NOT MATCHED THEN
                         INSERT ({insertColumns}) VALUES ({string.Join(", ", fields.Select(f => "s." + f))})
