@@ -141,6 +141,7 @@ public class SchemaProvidersTests
         new PostgresSchemaProvider().GetFieldInfos(connection, null, "T").ToList();
 
         Assert.Contains("COALESCE(numeric_scale", sql, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("is_identity = 'YES'", sql, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("@sma IS NULL", sql, StringComparison.OrdinalIgnoreCase);
     }
 
@@ -218,11 +219,17 @@ public class SchemaProvidersTests
     [Fact]
     public void Postgres_GetIdentityFields_Maps_Fields()
     {
+        string? sql = null;
         using var connection = new MockDbConnection()
-            .OnDbCommandExecuteReader(cmd => new MockDbDataReader(
-                new { column_name = "ID", column_default = "nextval('T_ID_seq')" }));
+            .OnDbCommandExecuteReader(cmd =>
+            {
+                sql = cmd.CommandText;
+                return new MockDbDataReader(new { column_name = "ID" });
+            });
 
         Assert.Equal(["ID"], new PostgresSchemaProvider().GetIdentityFields(connection, "public", "T").ToList());
+        Assert.Contains("is_identity = 'YES'", sql, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("column_default LIKE 'nextval(%'", sql, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
@@ -399,10 +406,19 @@ public class SchemaProvidersTests
     }
 
     [Fact]
-    public void Oracle_GetIdentityFields_Is_Empty()
+    public void Oracle_GetIdentityFields_Maps_Identity_Columns()
     {
-        using var connection = new MockDbConnection();
-        Assert.Empty(new OracleSchemaProvider().GetIdentityFields(connection, "dbo", "T"));
+        string? sql = null;
+        using var connection = new MockDbConnection()
+            .OnDbCommandExecuteReader(cmd =>
+            {
+                sql = cmd.CommandText;
+                return new MockDbDataReader(new { COLUMN_NAME = "ID" });
+            });
+
+        Assert.Equal(["ID"], new OracleSchemaProvider().GetIdentityFields(connection, "dbo", "T").ToList());
+        Assert.Contains("all_tab_identity_cols", sql, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("owner = :sch", sql, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
@@ -415,14 +431,41 @@ public class SchemaProvidersTests
     }
 
     [Fact]
-    public void Oracle_GetTableNames_Maps_Tables()
+    public void Oracle_GetPrimaryKeyFields_Joins_On_Owner_And_Table()
     {
+        string? sql = null;
         using var connection = new MockDbConnection()
-            .OnDbCommandExecuteReader(cmd => new MockDbDataReader(new { Schema = "dbo", Table = "T" }));
+            .OnDbCommandExecuteReader(cmd =>
+            {
+                sql = cmd.CommandText;
+                return new MockDbDataReader(new { COLUMN_NAME = "ID" });
+            });
 
-        var table = Assert.Single(new OracleSchemaProvider().GetTableNames(connection));
-        Assert.Equal("dbo", table.Schema);
-        Assert.Equal("T", table.Table);
+        Assert.Equal(["ID"], new OracleSchemaProvider().GetPrimaryKeyFields(connection, "dbo", "T").ToList());
+        Assert.Contains("cols.owner = cons.owner", sql, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("cols.table_name = cons.table_name", sql, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void Oracle_GetTableNames_Maps_Tables_And_Views()
+    {
+        string? sql = null;
+        using var connection = new MockDbConnection()
+            .OnDbCommandExecuteReader(cmd =>
+            {
+                sql = cmd.CommandText;
+                return new MockDbDataReader(
+                    new { Schema = "dbo", Table = "T", IsView = 0 },
+                    new { Schema = "dbo", Table = "V", IsView = 1 });
+            });
+
+        var tables = new OracleSchemaProvider().GetTableNames(connection).ToList();
+        Assert.Equal("dbo", tables[0].Schema);
+        Assert.Equal("T", tables[0].Table);
+        Assert.False(tables[0].IsView);
+        Assert.Equal("V", tables[1].Table);
+        Assert.True(tables[1].IsView);
+        Assert.Contains("FROM all_views", sql, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
@@ -436,8 +479,8 @@ public class SchemaProvidersTests
     {
         using var connection = new MockDbConnection()
             .OnDbCommandExecuteReader(cmd => new MockDbDataReader(
-                new { name = "Id", type = "INTEGER", notnull = "1", pk = "1" },
-                new { name = "Name", type = "TEXT", notnull = "0", pk = "0" }));
+                new { name = "Id", type = "INTEGER", notnull = 1, pk = 1 },
+                new { name = "Name", type = "TEXT", notnull = 0, pk = 0 }));
 
         var fields = new SqliteSchemaProvider().GetFieldInfos(connection, null, "T").ToList();
 
@@ -445,8 +488,10 @@ public class SchemaProvidersTests
         Assert.Equal("INTEGER", fields[0].DataType);
         Assert.False(fields[0].IsNullable);
         Assert.True(fields[0].IsPrimaryKey);
+        Assert.True(fields[0].IsIdentity);
         Assert.True(fields[1].IsNullable);
         Assert.False(fields[1].IsPrimaryKey);
+        Assert.False(fields[1].IsIdentity);
     }
 
     [Fact]
@@ -610,35 +655,35 @@ public class SchemaProvidersTests
                 new
                 {
                     FIELD_NAME = "Name",
-                    FIELD_TYPE = "37",
-                    FIELD_SUB_TYPE = "0",
-                    NUMERIC_SCALE = "0",
-                    NUMERIC_PRECISION = "0",
-                    SIZE = "50",
-                    CHARMAXLENGTH = "50",
-                    COLUMN_NULLABLE = (string)null
+                    FIELD_TYPE = 37,
+                    FIELD_SUB_TYPE = 0,
+                    NUMERIC_SCALE = 0,
+                    NUMERIC_PRECISION = 0,
+                    SIZE = 50,
+                    CHARMAXLENGTH = (int?)50,
+                    COLUMN_NULLABLE = (int?)null
                 },
                 new
                 {
                     FIELD_NAME = "Amount",
-                    FIELD_TYPE = "8",
-                    FIELD_SUB_TYPE = "2",
-                    NUMERIC_SCALE = "2",
-                    NUMERIC_PRECISION = "10",
-                    SIZE = "10",
-                    CHARMAXLENGTH = (string)null,
-                    COLUMN_NULLABLE = "1"
+                    FIELD_TYPE = 8,
+                    FIELD_SUB_TYPE = 2,
+                    NUMERIC_SCALE = 2,
+                    NUMERIC_PRECISION = 10,
+                    SIZE = 10,
+                    CHARMAXLENGTH = (int?)null,
+                    COLUMN_NULLABLE = (int?)1
                 },
                 new
                 {
                     FIELD_NAME = "Content",
-                    FIELD_TYPE = "261",
-                    FIELD_SUB_TYPE = "1",
-                    NUMERIC_SCALE = "0",
-                    NUMERIC_PRECISION = "0",
-                    SIZE = "0",
-                    CHARMAXLENGTH = (string)null,
-                    COLUMN_NULLABLE = (string)null
+                    FIELD_TYPE = 261,
+                    FIELD_SUB_TYPE = 1,
+                    NUMERIC_SCALE = 0,
+                    NUMERIC_PRECISION = 0,
+                    SIZE = 0,
+                    CHARMAXLENGTH = (int?)null,
+                    COLUMN_NULLABLE = (int?)null
                 }));
 
         var fields = new FirebirdSchemaProvider().GetFieldInfos(connection, null, "T").ToList();

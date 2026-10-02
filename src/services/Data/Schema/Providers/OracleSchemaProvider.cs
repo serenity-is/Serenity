@@ -66,7 +66,17 @@ public class OracleSchemaProvider : ISchemaProvider
     /// <inheritdoc/>
     public IEnumerable<string> GetIdentityFields(IDbConnection connection, string? schema, string table)
     {
-        return [];
+        return connection.Query<string>(/*lang=sql*/ """
+            SELECT column_name
+            FROM all_tab_identity_cols
+            WHERE (:sch IS NULL OR owner = :sch)
+                AND table_name = :tbl
+            ORDER BY column_name
+            """, new
+        {
+            sch = schema,
+            tbl = table
+        });
     }
 
     /// <inheritdoc/>
@@ -74,10 +84,13 @@ public class OracleSchemaProvider : ISchemaProvider
     {
         return connection.Query<string>("""
             SELECT cols.column_name
-            FROM all_constraints cons, all_cons_columns cols
+            FROM all_constraints cons
+            JOIN all_cons_columns cols
+                ON cols.owner = cons.owner
+                AND cols.constraint_name = cons.constraint_name
+                AND cols.table_name = cons.table_name
             WHERE cols.table_name = :tbl
             AND cons.constraint_type = 'P'
-            AND cons.constraint_name = cols.constraint_name
             AND (:sch IS NULL OR cons.owner = :sch)
             ORDER BY cols.position
             """, new
@@ -90,11 +103,27 @@ public class OracleSchemaProvider : ISchemaProvider
     /// <inheritdoc/>
     public IEnumerable<TableName> GetTableNames(IDbConnection connection)
     {
-        return connection.Query<TableName>(/*lang=sql*/ """
-            SELECT owner "Schema", table_name "Table" 
+        return connection.Query<TableNameSource>(/*lang=sql*/ """
+            SELECT owner "Schema", table_name "Table", 0 "IsView"
             FROM all_tables
-            WHERE owner != 'SYS' 
-            ORDER BY owner, table_name
-            """);
+            WHERE owner != 'SYS'
+            UNION ALL
+            SELECT owner "Schema", view_name "Table", 1 "IsView"
+            FROM all_views
+            WHERE owner != 'SYS'
+            ORDER BY "Schema", "Table"
+            """).Select(x => new TableName
+            {
+                Schema = x.Schema,
+                Table = x.Table,
+                IsView = x.IsView != 0
+            });
+    }
+
+    private sealed class TableNameSource
+    {
+        public string? Schema { get; set; }
+        public required string Table { get; set; }
+        public int IsView { get; set; }
     }
 }

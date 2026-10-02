@@ -22,7 +22,7 @@ public class PostgresSchemaProvider : ISchemaProvider
              column_name "FieldName",
                 data_type "DataType",
                 CASE WHEN is_nullable = 'NO' THEN 0 ELSE 1 END "IsNullable",
-                CASE WHEN column_default LIKE 'nextval(%' THEN 1 ELSE 0 END "IsIdentity",
+                CASE WHEN is_identity = 'YES' OR column_default LIKE 'nextval(%' THEN 1 ELSE 0 END "IsIdentity",
                 COALESCE(character_maximum_length, CASE WHEN data_type = 'numeric' OR
                     data_type = 'decimal' THEN numeric_precision ELSE 0 END, 0) "Size",
                 COALESCE(numeric_scale, 0) "Scale"
@@ -70,10 +70,10 @@ public class PostgresSchemaProvider : ISchemaProvider
     public IEnumerable<string> GetIdentityFields(IDbConnection connection, string? schema, string table)
     {
         return connection.Query<string>(/*lang=sql*/ """
-            SELECT column_name, column_default
+            SELECT column_name
             FROM information_schema.COLUMNS
             WHERE (@sma IS NULL OR TABLE_SCHEMA = @sma) AND TABLE_NAME = @tbl
-            AND column_default like 'nextval(%'
+            AND (is_identity = 'YES' OR column_default LIKE 'nextval(%')
             """, new
         {
             sma = schema,

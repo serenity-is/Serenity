@@ -38,8 +38,8 @@ public class SqliteSchemaProvider : ISchemaProvider
 #pragma warning disable IDE1006 // Naming Styles
         public required string name { get; set; }
         public string? type { get; set; }
-        public string? notnull { get; set; }
-        public string? pk { get; set; }
+        public int notnull { get; set; }
+        public int pk { get; set; }
 #pragma warning restore IDE1006 // Naming Styles
     }
 
@@ -48,20 +48,27 @@ public class SqliteSchemaProvider : ISchemaProvider
     {
         ArgumentNullException.ThrowIfNull(connection);
 
-        return connection.Query<FieldInfoSource>(PragmaTableRef("table_info", schema, table))
-            .Select(x => new FieldInfo
+        var fields = connection.Query<FieldInfoSource>(PragmaTableRef("table_info", schema, table)).ToList();
+        var primaryKeys = fields.Where(x => x.pk > 0).ToList();
+        var identityName = primaryKeys.Count == 1 &&
+            string.Equals(primaryKeys[0].type, "INTEGER", StringComparison.OrdinalIgnoreCase)
+                ? primaryKeys[0].name
+                : null;
+
+        return fields.Select(x => new FieldInfo
             {
                 FieldName = x.name,
                 DataType = x.type,
-                IsNullable = Convert.ToInt32(x.notnull) != 1,
-                IsPrimaryKey = Convert.ToInt32(x.pk) == 1
+                IsNullable = x.notnull != 1,
+                IsPrimaryKey = x.pk > 0,
+                IsIdentity = x.name == identityName
             });
     }
 
     private class ForeignKeySource
     {
 #pragma warning disable IDE1006 // Naming Styles
-        public required string id { get; set; }
+        public int id { get; set; }
         public required string from { get; set; }
         public required string table { get; set; }
         public required string to { get; set; }

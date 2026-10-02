@@ -17,13 +17,13 @@ public class FirebirdSchemaProvider : ISchemaProvider
     private class FieldInfoSource
     {
         public required string FIELD_NAME { get; set; }
-        public required string FIELD_TYPE { get; set; }
-        public required string FIELD_SUB_TYPE { get; set; }
-        public required string NUMERIC_SCALE { get; set; }
-        public required string NUMERIC_PRECISION { get; set; }
-        public required string SIZE { get; set; }
-        public required string CHARMAXLENGTH { get; set; }
-        public required string COLUMN_NULLABLE { get; set; }
+        public int? FIELD_TYPE { get; set; }
+        public int? FIELD_SUB_TYPE { get; set; }
+        public int? NUMERIC_SCALE { get; set; }
+        public int? NUMERIC_PRECISION { get; set; }
+        public int? SIZE { get; set; }
+        public int? CHARMAXLENGTH { get; set; }
+        public int? COLUMN_NULLABLE { get; set; }
     }
 
     /// <inheritdoc/>
@@ -54,16 +54,16 @@ public class FirebirdSchemaProvider : ISchemaProvider
             {
                 FieldName = src.FIELD_NAME.TrimToEmpty()
             };
-            var fieldType = src.FIELD_TYPE == null ? 0 : Convert.ToInt32(src.FIELD_TYPE, CultureInfo.InvariantCulture);
-            var fieldSubType = src.FIELD_SUB_TYPE == null ? 0 : Convert.ToInt32(src.FIELD_SUB_TYPE, CultureInfo.InvariantCulture);
-            var numericScale = src.NUMERIC_SCALE == null ? 0 : Convert.ToInt32(src.NUMERIC_SCALE, CultureInfo.InvariantCulture);
-            var numericPrecision = src.NUMERIC_PRECISION == null ? 0 : Convert.ToInt32(src.NUMERIC_PRECISION, CultureInfo.InvariantCulture);
-            var size = src.SIZE == null ? 0 : Convert.ToInt32(src.SIZE, CultureInfo.InvariantCulture);
+            var fieldType = src.FIELD_TYPE ?? 0;
+            var fieldSubType = src.FIELD_SUB_TYPE ?? 0;
+            var numericScale = src.NUMERIC_SCALE ?? 0;
+            var numericPrecision = src.NUMERIC_PRECISION ?? 0;
+            var size = src.SIZE ?? 0;
             var sqlType = GetSqlTypeFromBlrType(fieldType, fieldSubType, size, numericScale);
             fi.DataType = sqlType;
 
             if (sqlType == "char" || sqlType == "varchar")
-                fi.Size = src.CHARMAXLENGTH == null ? 0 : Convert.ToInt32(src.CHARMAXLENGTH);
+                fi.Size = src.CHARMAXLENGTH ?? 0;
             else if (sqlType == "varbinary" || sqlType == "text")
                 fi.Size = 0;
             else if (sqlType == "decimal" || sqlType == "numeric")
