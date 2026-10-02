@@ -35,8 +35,7 @@ internal static class SqlIntegrationConnections
         if (connectionString is null)
         {
             var password = GetEnvironment(prefix + "_PASSWORD") ?? GetEnvironment("SQLINTEGRATIONTEST_PASSWORD");
-            if (string.IsNullOrEmpty(password))
-                Assert.Skip($"Set {prefix}_CONNECTION or {prefix}_PASSWORD / SQLINTEGRATIONTEST_PASSWORD to run this integration test.");
+            Assert.SkipWhen(string.IsNullOrEmpty(password), $"Set {prefix}_CONNECTION or {prefix}_PASSWORD / SQLINTEGRATIONTEST_PASSWORD to run this integration test.");
 
             var host = GetEnvironment(prefix + "_HOST") ?? GetEnvironment("SQLINTEGRATIONTEST_HOST") ?? "localhost";
             var user = GetEnvironment(prefix + "_USER") ?? GetEnvironment("SQLINTEGRATIONTEST_USER");
