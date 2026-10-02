@@ -260,20 +260,69 @@ public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressio
 
     void EnsureJoin(string joinAlias)
     {
-        if (aliasWithJoins == null)
-            return;
+        if (TryFindJoin(joinAlias, out var owner, out var join))
+            owner.EnsureJoin(join);
+    }
 
-        foreach (var haveJoin in aliasWithJoins)
+    private bool TryFindJoin(string joinAlias, out SqlQuery owner, out Join join)
+    {
+        for (SqlQuery? current = this; current is not null;)
         {
-            if (haveJoin.Value is IAlias alias && haveJoin.Key == alias.Name)
+            if (current.aliasWithJoins is null)
             {
-                if (haveJoin.Value.Joins.TryGetValue(joinAlias, out Join? join))
+                current = GetJoinSourceParent(current);
+                continue;
+            }
+
+            foreach (var haveJoin in current.aliasWithJoins)
+            {
+                if (haveJoin.Value is IAlias alias &&
+                    string.Equals(haveJoin.Key, alias.Name, StringComparison.OrdinalIgnoreCase) &&
+                    TryGetJoin(haveJoin.Value.Joins, joinAlias, out var found) && found is not null)
                 {
-                    EnsureJoin(join);
-                    break;
+                    owner = current;
+                    join = found;
+                    return true;
                 }
             }
+
+            current = GetJoinSourceParent(current);
         }
+
+        owner = null!;
+        join = null!;
+        return false;
+    }
+
+    private static SqlQuery? GetJoinSourceParent(SqlQuery query)
+    {
+        if (query.parent is not SqlQuery parentQuery)
+            return null;
+
+        // UNION legs share the parameter/cache parent, but are separate SQL
+        // scopes. Skip the other leg while still allowing a UNION subquery to
+        // continue searching its actual outer query ancestors.
+        return ReferenceEquals(parentQuery.unionQuery, query)
+            ? parentQuery.parent as SqlQuery
+            : parentQuery;
+    }
+
+    private static bool TryGetJoin(IDictionary<string, Join> joins, string joinAlias, out Join? join)
+    {
+        if (joins.TryGetValue(joinAlias, out join))
+            return true;
+
+        foreach (var pair in joins)
+        {
+            if (string.Equals(pair.Key, joinAlias, StringComparison.OrdinalIgnoreCase))
+            {
+                join = pair.Value;
+                return true;
+            }
+        }
+
+        join = null;
+        return false;
     }
 
     /// <summary>
@@ -317,15 +366,16 @@ public partial class SqlQuery : QueryWithParams, IFilterableQuery, IGetExpressio
         if (GetAliasExpression(joinAlias) is not null)
             return this;
 
-        if (join.Joins != null &&
-            join.ReferencedAliases != null)
+        if (join.ReferencedAliases != null)
             foreach (var alias in join.ReferencedAliases)
             {
                 if (string.Compare(alias, joinAlias, StringComparison.OrdinalIgnoreCase) == 0)
                     continue;
 
-                if (join.Joins.TryGetValue(alias, out Join? other))
+                if (join.Joins is not null && TryGetJoin(join.Joins, alias, out var other) && other is not null)
                     EnsureJoin(other);
+                else
+                    EnsureJoin(alias);
             }
 
         return Join(join);
