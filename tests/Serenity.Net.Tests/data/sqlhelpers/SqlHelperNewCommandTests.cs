@@ -1,7 +1,20 @@
+using System.Data.Common;
+
 namespace Serenity.Data;
 
 public class SqlHelperNewCommandTests
 {
+    private sealed class TrackingConnection : MockDbConnection
+    {
+        public MockDbCommand? LastCommand { get; private set; }
+
+        protected override DbCommand CreateDbCommand()
+        {
+            LastCommand = (MockDbCommand)base.CreateDbCommand();
+            return LastCommand;
+        }
+    }
+
     [Fact]
     public void NewCommand_NullConnection_ThrowsArgumentNullException()
     {
@@ -27,6 +40,26 @@ public class SqlHelperNewCommandTests
         using var command = SqlHelper.NewCommand(connection, "SELECT * FROM [Table] WHERE [X] = 1");
 
         Assert.Equal("SELECT * FROM \"Table\" WHERE \"X\" = 1", command.CommandText);
+    }
+
+    [Fact]
+    public void NewCommand_DisposesCommand_WhenTranslationThrows()
+    {
+        using var connection = new TrackingConnection();
+        var old = DatabaseCaretReferences.SetLocalGetDatabaseName(_ => throw new InvalidOperationException("translation failed"));
+
+        try
+        {
+            var exception = Assert.Throws<InvalidOperationException>(() =>
+                SqlHelper.NewCommand(connection, "SELECT [^Db]"));
+
+            Assert.Equal("translation failed", exception.Message);
+            Assert.Equal(1, connection.LastCommand!.DisposeCalls);
+        }
+        finally
+        {
+            DatabaseCaretReferences.SetLocalGetDatabaseName(old);
+        }
     }
 
     [Fact]

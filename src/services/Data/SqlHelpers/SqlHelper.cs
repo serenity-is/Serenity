@@ -84,8 +84,10 @@ public static class SqlHelper
     /// <param name="value">The value.</param>
     /// <param name="dialect">The dialect.</param>
     /// <returns>The new parameter.</returns>
-    public static IDbDataParameter AddParamWithValue(this IDbCommand command, string name, object? value, ISqlDialect dialect)
+    public static IDbDataParameter AddParamWithValue(this IDbCommand command, string name, object? value, ISqlDialect? dialect)
     {
+        dialect ??= SqlSettings.DefaultDialect;
+
         name = dialect.ParameterPrefix != '@' &&
             name.StartsWith('@') ? dialect.ParameterPrefix + name[1..] :
                 name;
@@ -136,7 +138,7 @@ public static class SqlHelper
             // str.Length here would create a separate cached plan per distinct string
             // length (cache bloat), and bucketing would diverge from Dapper's own
             // default of 4000, splitting entries between the two paths.
-            if (value is string str && str.Length < 4000)
+            if (value is string str && str.Length <= 4000)
                 param.Size = 4000;
         }
 
@@ -186,10 +188,17 @@ public static class SqlHelper
         ArgumentNullException.ThrowIfNull(connection);
 
         IDbCommand command = connection.CreateCommand();
-
-        commandText = SqlConversions.Translate(commandText, connection);
-        command.CommandText = commandText;
-        return command;
+        try
+        {
+            commandText = SqlConversions.Translate(commandText, connection);
+            command.CommandText = commandText;
+            return command;
+        }
+        catch
+        {
+            command.Dispose();
+            throw;
+        }
     }
 
     /// <summary>

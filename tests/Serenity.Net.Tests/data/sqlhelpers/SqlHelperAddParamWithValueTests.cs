@@ -15,6 +15,25 @@ public class SqlHelperAddParamWithValueTests
     }
 
     [Fact]
+    public void AddParamWithValue_NullDialect_UsesDefaultDialect()
+    {
+        var old = SqlSettings.SetLocalDialect(OracleDialect.Instance);
+        try
+        {
+            using var connection = new MockDbConnection();
+            using var command = connection.CreateCommand();
+
+            var param = command.AddParamWithValue("@p1", 5, null);
+
+            Assert.Equal(":p1", param.ParameterName);
+        }
+        finally
+        {
+            SqlSettings.SetLocalDialect(old);
+        }
+    }
+
+    [Fact]
     public void AddParamWithValue_KeepsName_WhenPrefixMatches()
     {
         using var connection = new MockDbConnection();
@@ -103,6 +122,17 @@ public class SqlHelperAddParamWithValueTests
         var param = command.AddParamWithValue("@p1", "test", SqlServer2012Dialect.Instance);
 
         Assert.Equal("test", param.Value);
+        Assert.Equal(4000, param.Size);
+    }
+
+    [Fact]
+    public void AddParamWithValue_String_Exactly4000Chars_SetsSize4000()
+    {
+        using var connection = new MockDbConnection();
+        using var command = connection.CreateCommand();
+
+        var param = command.AddParamWithValue("@p1", new string('x', 4000), SqlServer2012Dialect.Instance);
+
         Assert.Equal(4000, param.Size);
     }
 
