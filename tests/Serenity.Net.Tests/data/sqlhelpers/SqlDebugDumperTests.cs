@@ -121,6 +121,14 @@ public class SqlDebugDumperTests
     }
 
     [Fact]
+    public void Dump_ParameterValueBoolean_UsesDialectLiterals()
+    {
+        Assert.Equal("X = TRUE", SqlDebugDumper.Dump("X = @p1", MakePrm("@p1", true), PostgresDialect.Instance));
+        Assert.Equal("X = FALSE", SqlDebugDumper.Dump("X = @p1", MakePrm("@p1", false), FirebirdDialect.Instance));
+        Assert.Equal("X = 1", SqlDebugDumper.Dump("X = @p1", MakePrm("@p1", true), OracleDialect.Instance));
+    }
+
+    [Fact]
     public void Dump_ParameterValueDateTime_UsesSqlFormats()
     {
         var dialect = SqlServer2012Dialect.Instance;
@@ -145,6 +153,17 @@ public class SqlDebugDumperTests
         var guid = Guid.NewGuid();
 
         Assert.Equal("X = '" + guid + "'", SqlDebugDumper.Dump("X = @p1", MakePrm("@p1", guid)));
+    }
+
+    [Fact]
+    public void Dump_ParameterValueGuid_UsesDialectLiteral()
+    {
+        var guid = Guid.Parse("00112233-4455-6677-8899-aabbccddeeff");
+
+        Assert.Equal("X = HEXTORAW('33221100554477668899AABBCCDDEEFF')",
+            SqlDebugDumper.Dump("X = @p1", MakePrm("@p1", guid), OracleDialect.Instance));
+        Assert.Equal("X = X'00112233445566778899aabbccddeeff'",
+            SqlDebugDumper.Dump("X = @p1", MakePrm("@p1", guid), FirebirdDialect.Instance));
     }
 
     [Fact]

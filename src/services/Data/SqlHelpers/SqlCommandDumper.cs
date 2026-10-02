@@ -183,7 +183,8 @@ public class SqlCommandDumper
                     || value is char[])
                 {
                     sbCommandText.Append('\'');
-                    sbCommandText.Append(value.ToString()!.Replace("'", "''"));
+                    var text = value is char[] characters ? new string(characters) : value.ToString()!;
+                    sbCommandText.Append(text.Replace("'", "''"));
                     sbCommandText.Append('\'');
                 }
                 else if (value is bool)

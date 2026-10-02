@@ -102,7 +102,12 @@ public class SqlDebugDumper
             return new string(characters).ToSql(dialect);
 
         if (value is bool b)
+        {
+            if (dialect?.ServerType is nameof(ServerType.Postgres) or nameof(ServerType.Firebird))
+                return b ? "TRUE" : "FALSE";
+
             return b ? "1" : "0";
+        }
 
         if (value is DateTime date)
         {
@@ -116,7 +121,7 @@ public class SqlDebugDumper
             return "'" + dto.ToString("o") + "'";
 
         if (value is Guid guid)
-            return "'" + guid.ToString() + "'";
+            return ((Guid?)guid).ToSql(dialect);
 
         if (value is MemoryStream ms)
             value = ms.ToArray();

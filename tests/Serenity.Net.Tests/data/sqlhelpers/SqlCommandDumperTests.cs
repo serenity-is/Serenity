@@ -222,6 +222,26 @@ public class SqlCommandDumperTests
     }
 
     [Fact]
+    public void GetCommandText_CharArrayParameter_RendersCharacters()
+    {
+        var command = GetCommand();
+        command.CommandText = "SELECT @p1";
+        command.Parameters.Add(new SqlParameter
+        {
+            ParameterName = "@p1",
+            DbValue = "test'ed".ToCharArray(),
+            SqlDbType = SqlDbType.NVarChar,
+            Size = 10,
+            Direction = ParameterDirection.Input
+        });
+
+        var result = SqlCommandDumper.GetCommandText(command);
+
+        Assert.Contains("DECLARE @p1 NVARCHAR(10) = 'test''ed';", result, StringComparison.Ordinal);
+        Assert.DoesNotContain("System.Char[]", result, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void GetCommandText_ExceptionInParameterValue_WritesExceptionComment()
     {
         MockDbCommand command = GetCommand();
