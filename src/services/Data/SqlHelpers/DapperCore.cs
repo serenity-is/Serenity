@@ -17,6 +17,12 @@ namespace Serenity.Data;
 /// is null the connection's ambient transaction applies. That works because the connection
 /// (usually a <see cref="WrappedConnection"/>) enlists the ambient transaction at command
 /// creation, and Dapper only overwrites it with a non-null transaction argument.
+/// An explicit Dapper <c>commandTimeout</c> takes precedence; when it is omitted,
+/// <see cref="WrappedConnection"/> applies its configured timeout or
+/// <see cref="SqlSettings.DefaultCommandTimeout"/> when creating the command.
+/// Serenity query parameter names retain the <c>@</c> prefix while SQL text is translated
+/// to the connection dialect. Dapper strips parameter prefixes when matching names, so
+/// query parameters such as <c>@Id</c> bind correctly to Oracle SQL using <c>:Id</c>.
 /// </summary>
 public static partial class SqlMapper
 {
