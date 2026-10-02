@@ -605,6 +605,15 @@ public class BaseCriteriaTests
         Assert.Equal("", (~Criteria.Empty).ToString());
     }
 
+    [Fact]
+    public void UnaryOperators_ThrowArgumentNullException_ForNullCriteria()
+    {
+        BaseCriteria criteria = null!;
+
+        Assert.Throws<ArgumentNullException>(() => !criteria);
+        Assert.Throws<ArgumentNullException>(() => ~criteria);
+    }
+
     // Logical operators
 
     [Fact]

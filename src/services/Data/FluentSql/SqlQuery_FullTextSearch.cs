@@ -26,6 +26,11 @@ public partial class SqlQuery
     /// <returns>
     ///   The SqlSelect object itself.
     /// </returns>
+    /// <remarks>
+    /// This join uses SQL Server's <c>CONTAINSTABLE</c> syntax and is SQL Server specific.
+    /// It is emitted as-is for all dialects, similar to table hints; use it only with SQL Server.
+    /// Table and field arguments are SQL fragments and are not automatically quoted or validated.
+    /// </remarks>
     /// <exception cref="ArgumentNullException">Any of the parameters is null or empty.</exception>
     public SqlQuery FullTextSearchJoin(
         string searchTable, string searchFields, string searchQuery,

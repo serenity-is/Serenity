@@ -382,8 +382,12 @@ public abstract class BaseCriteria : ICriteria
     /// <returns>
     /// The result of the operator.
     /// </returns>
+    /// <remarks>
+    /// Builds SQL NOT criteria; it does not evaluate the criteria as a Boolean value.
+    /// </remarks>
     public static BaseCriteria operator !(BaseCriteria criteria)
     {
+        ArgumentNullException.ThrowIfNull(criteria);
         return new UnaryCriteria(CriteriaOperator.Not, criteria);
     }
 
@@ -1246,17 +1250,26 @@ public abstract class BaseCriteria : ICriteria
     /// <returns>
     /// The result of the operator.
     /// </returns>
+    /// <remarks>
+    /// Adds parentheses to a criteria expression; it does not perform Boolean negation.
+    /// </remarks>
     public static BaseCriteria operator ~(BaseCriteria criteria)
     {
+        ArgumentNullException.ThrowIfNull(criteria);
+
         if (!criteria.IsEmpty)
             return new UnaryCriteria(CriteriaOperator.Paren, criteria);
         return criteria;
     }
 
     /// <summary>
-    /// Must return FALSE from this for short circuit OR (||) to return 
-    /// a new binary criteria merging left and right operands in any case
+    /// Returns false so that <c>||</c> evaluates its right operand and combines
+    /// both criteria with <see cref="operator |(BaseCriteria?, BaseCriteria?)"/>.
     /// </summary>
+    /// <remarks>
+    /// Criteria are SQL expression builders, not Boolean values. This operator
+    /// always returns false; do not use a criteria in a Boolean conditional.
+    /// </remarks>
 #pragma warning disable IDE0060 // Remove unused parameter
     public static bool operator false(BaseCriteria statement)
 #pragma warning restore IDE0060 // Remove unused parameter
@@ -1265,10 +1278,13 @@ public abstract class BaseCriteria : ICriteria
     }
 
     /// <summary>
-    /// Must ALSO return FALSE from this for short circuit AND (&amp;&amp;) to return 
-    /// a new binary criteria merging left and right operands in any case
-    /// https://msdn.microsoft.com/en-us/library/aa691312
+    /// Returns false so that <c>&amp;&amp;</c> evaluates its right operand and combines
+    /// both criteria with <see cref="operator &amp;(BaseCriteria?, BaseCriteria?)"/>.
     /// </summary>
+    /// <remarks>
+    /// Criteria are SQL expression builders, not Boolean values. This operator
+    /// always returns false; do not use a criteria in a Boolean conditional.
+    /// </remarks>
 #pragma warning disable IDE0060 // Remove unused parameter
     public static bool operator true(BaseCriteria statement)
 #pragma warning restore IDE0060 // Remove unused parameter
