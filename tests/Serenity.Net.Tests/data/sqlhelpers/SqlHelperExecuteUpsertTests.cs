@@ -93,6 +93,50 @@ public class SqlHelperExecuteUpsertTests
     }
 
     [Fact]
+    public void ExecuteUpsert_WithUnsupportedDialect_AndOnlyKeyFields_UsesNoOpUpdate()
+    {
+        var calls = 0;
+        using var connection = new MockDbConnection { Dialect = new UnknownUpsertDialect() }
+            .OnDbCommandExecuteNonQuery(command =>
+            {
+                if (++calls == 1)
+                {
+                    Assert.Contains("UPDATE [Table] SET [Id] = Id", command.CommandText, StringComparison.Ordinal);
+                    Assert.Contains("WHERE", command.CommandText, StringComparison.Ordinal);
+                    return 0;
+                }
+
+                Assert.Contains("INSERT INTO [Table] ([Id])", command.CommandText, StringComparison.Ordinal);
+                return 1;
+            });
+
+        var query = new SqlInsert("Table").SetTo("Id", "1");
+
+        var result = query.ExecuteUpsert(connection, ["Id"]);
+
+        Assert.Equal(1, result);
+        Assert.Equal(2, connection.DbCommandExecuteNonQueryCallCount);
+    }
+
+    [Fact]
+    public void ExecuteUpsert_WithUnsupportedDialect_AndOnlyKeyFields_DoesNotInsertWhenKeyMatches()
+    {
+        using var connection = new MockDbConnection { Dialect = new UnknownUpsertDialect() }
+            .OnDbCommandExecuteNonQuery(command =>
+            {
+                Assert.Contains("UPDATE [Table] SET [Id] = Id", command.CommandText, StringComparison.Ordinal);
+                return 1;
+            });
+
+        var query = new SqlInsert("Table").SetTo("Id", "1");
+
+        var result = query.ExecuteUpsert(connection, ["Id"]);
+
+        Assert.Equal(1, result);
+        Assert.Equal(1, connection.DbCommandExecuteNonQueryCallCount);
+    }
+
+    [Fact]
     public void ExecuteUpsert_WithUnsupportedDialect_AndUpdateMissed_ExecutesInsert()
     {
         var calls = 0;
@@ -224,6 +268,52 @@ public class SqlHelperExecuteUpsertTests
             .OnDbCommandExecuteNonQuery(_ => 1);
 
         var query = new SqlInsert("Table").SetTo("Id", "1").SetTo("X", "2");
+        var result = await query.ExecuteUpsertAsync(connection, ["Id"],
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.Equal(1, result);
+        Assert.Equal(1, connection.DbCommandExecuteNonQueryCallCount);
+    }
+
+    [Fact]
+    public async Task ExecuteUpsertAsync_WithUnsupportedDialect_AndOnlyKeyFields_UsesNoOpUpdate()
+    {
+        var calls = 0;
+        using var connection = new MockDbConnection { Dialect = new UnknownUpsertDialect() }
+            .OnDbCommandExecuteNonQuery(command =>
+            {
+                if (++calls == 1)
+                {
+                    Assert.Contains("UPDATE [Table] SET [Id] = Id", command.CommandText, StringComparison.Ordinal);
+                    Assert.Contains("WHERE", command.CommandText, StringComparison.Ordinal);
+                    return 0;
+                }
+
+                Assert.Contains("INSERT INTO [Table] ([Id])", command.CommandText, StringComparison.Ordinal);
+                return 1;
+            });
+
+        var query = new SqlInsert("Table").SetTo("Id", "1");
+
+        var result = await query.ExecuteUpsertAsync(connection, ["Id"],
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.Equal(1, result);
+        Assert.Equal(2, connection.DbCommandExecuteNonQueryCallCount);
+    }
+
+    [Fact]
+    public async Task ExecuteUpsertAsync_WithUnsupportedDialect_AndOnlyKeyFields_DoesNotInsertWhenKeyMatches()
+    {
+        using var connection = new MockDbConnection { Dialect = new UnknownUpsertDialect() }
+            .OnDbCommandExecuteNonQuery(command =>
+            {
+                Assert.Contains("UPDATE [Table] SET [Id] = Id", command.CommandText, StringComparison.Ordinal);
+                return 1;
+            });
+
+        var query = new SqlInsert("Table").SetTo("Id", "1");
+
         var result = await query.ExecuteUpsertAsync(connection, ["Id"],
             cancellationToken: TestContext.Current.CancellationToken);
 

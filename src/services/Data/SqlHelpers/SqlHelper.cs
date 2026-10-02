@@ -563,12 +563,21 @@ public static class SqlHelper
     {
         var tableName = query.TableName();
         var keySet = new HashSet<string>(keyFields, StringComparer.OrdinalIgnoreCase);
+        var fieldExpressions = query.GetFieldExpressions().ToList();
+        var hasNonKeyField = fieldExpressions.Any(pair => !keySet.Contains(pair.Field));
 
         var update = new SqlUpdate(tableName).Dialect(query.Dialect());
-        foreach (var pair in query.GetFieldExpressions())
+        var addedNoOpAssignment = false;
+        foreach (var pair in fieldExpressions)
         {
             if (keySet.Contains(pair.Field))
             {
+                if (!hasNonKeyField && !addedNoOpAssignment)
+                {
+                    update.SetTo(pair.Field, pair.Field);
+                    addedNoOpAssignment = true;
+                }
+
                 var fieldCriteria = new Criteria(pair.Field);
                 var valueCriteria = new Criteria(pair.Expression);
                 update.Where((fieldCriteria == valueCriteria) |
