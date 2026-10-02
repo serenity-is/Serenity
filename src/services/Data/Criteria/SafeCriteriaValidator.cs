@@ -3,6 +3,15 @@ namespace Serenity.Data;
 /// <summary>
 /// Validates a criteria for allowed field names, operators and SQL injection safety
 /// </summary>
+/// <remarks>
+/// This validator is intended for criteria supplied by clients, such as criteria
+/// deserialized from a <c>ListRequest</c>. A criteria instance does not indicate
+/// whether it came from JSON or was constructed by application code, so the same
+/// restrictions apply in either case. This is not a validator for every criteria
+/// expression the framework can generate: aliases (e.g. <c>T0.Name</c>), quoted
+/// identifiers, and free-form expressions such as <c>1=1</c> are intentionally
+/// rejected, even when they are otherwise valid framework criteria.
+/// </remarks>
 /// <seealso cref="BaseCriteriaVisitor" />
 public class SafeCriteriaValidator : BaseCriteriaVisitor
 {
@@ -30,6 +39,9 @@ public class SafeCriteriaValidator : BaseCriteriaVisitor
             throw new ValidationError("InvalidCriteriaField",
                 "Empty criteria field name is not allowed!");
 
+        // Client criteria is limited to bare field names. Do not broaden this
+        // to aliases, quoted identifiers, or SQL expressions: the visitor cannot
+        // distinguish a trusted framework-created criteria from client input.
         if (!SqlSyntax.IsValidIdentifier(criteria.Expression))
             throw new ValidationError("InvalidCriteriaField",
                 string.Format("{0} is not a valid field name!", criteria.Expression));
