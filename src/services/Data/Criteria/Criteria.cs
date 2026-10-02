@@ -24,6 +24,8 @@ public class Criteria : BaseCriteria
     public static readonly BaseCriteria True = new Criteria("1=1");
 
     private readonly string expression;
+    private readonly string? aliasDot;
+    private readonly string? fieldName;
     
     /// <summary>
     /// Gets a reference to the <see cref="IField"/> object passed to the constructor.
@@ -46,11 +48,11 @@ public class Criteria : BaseCriteria
     /// Usually used like: <c>new Criteria("fieldname") >= 5</c>.
     /// </remarks>
     /// <param name="expression">
-    /// A field name or criteria condition (can be <c>null</c>).
+    /// A field name or criteria condition (cannot be <c>null</c>).
     /// </param>
     public Criteria(string expression)
     {
-        this.expression = expression;
+        this.expression = expression ?? throw new ArgumentNullException(nameof(expression));
     }
 
     /// <summary>
@@ -82,7 +84,9 @@ public class Criteria : BaseCriteria
         if (string.IsNullOrEmpty(field))
             throw new ArgumentNullException(nameof(field));        
             
-        expression = alias + "." + SqlSyntax.AutoBracketValid(field, dialect: null);
+        aliasDot = alias + ".";
+        expression = aliasDot + SqlSyntax.AutoBracketValid(field, dialect: null);
+        fieldName = field;
     }
 
     /// <summary>
@@ -99,7 +103,9 @@ public class Criteria : BaseCriteria
             throw new ArgumentNullException(nameof(field));
 
         ArgumentOutOfRangeException.ThrowIfNegative(joinNumber);
-        expression = joinNumber.TableAliasDot() + SqlSyntax.AutoBracketValid(field, dialect: null);
+        aliasDot = joinNumber.TableAliasDot();
+        expression = aliasDot + SqlSyntax.AutoBracketValid(field, dialect: null);
+        fieldName = field;
     }
 
     /// <summary>
@@ -290,7 +296,16 @@ public class Criteria : BaseCriteria
     /// <param name="query">The target query to add params into.</param>
     public override void ToString(StringBuilder sb, IQueryWithParams query)
     {
-        sb.Append(expression);
+        ArgumentNullException.ThrowIfNull(sb);
+        ArgumentNullException.ThrowIfNull(query);
+
+        if (fieldName is string field)
+        {
+            sb.Append(aliasDot);
+            sb.Append(SqlSyntax.AutoBracketValid(field, query.Dialect));
+        }
+        else
+            sb.Append(expression);
     }
 
     /// <summary>

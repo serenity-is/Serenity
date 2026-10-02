@@ -46,10 +46,21 @@ public class ConstantAndParamCriteriaTests
     }
 
     [Fact]
-    public void ConstantCriteria_StringValue_WithDialect()
+    public void ConstantCriteria_String_Uses_Rendering_Query_Dialect()
     {
-        Assert.Equal("N'x'", new ConstantCriteria("x", SqlServer2012Dialect.Instance).ToString());
-        Assert.Equal("N'x''y'", new ConstantCriteria("x'y", SqlServer2012Dialect.Instance).ToString());
+        var criteria = new ConstantCriteria("x'y");
+        var query = new SqlQuery().Dialect(PostgresDialect.Instance);
+
+        Assert.Equal("'x''y'", criteria.ToString(query));
+    }
+
+    [Fact]
+    public void ConstantCriteria_StringList_Uses_Rendering_Query_Dialect()
+    {
+        var criteria = new ConstantCriteria(["x", "y"]);
+        var query = new SqlQuery().Dialect(PostgresDialect.Instance);
+
+        Assert.Equal("'x','y'", criteria.ToString(query));
     }
 
     [Fact]

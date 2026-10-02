@@ -67,6 +67,24 @@ public class CriteriaTests
     }
 
     [Fact]
+    public void AliasCriteria_Uses_Rendering_Query_Dialect()
+    {
+        var old = SqlSettings.SetLocalDialect(new MockSqlDialect(autoQuotedIdentifiers: true));
+        try
+        {
+            var criteria = new Criteria("T0", "Name");
+            var query = new SqlQuery().Dialect(new MockSqlDialect(autoQuotedIdentifiers: false));
+
+            Assert.Equal("T0.[Name]", criteria.Expression);
+            Assert.Equal("T0.Name", criteria.ToString(query));
+        }
+        finally
+        {
+            SqlSettings.SetLocalDialect(old);
+        }
+    }
+
+    [Fact]
     public void Constructor_WithJoinNumber_PrefixesTableAlias()
     {
         Assert.Equal("T0.[Name]", new Criteria(0, "Name").ToString());

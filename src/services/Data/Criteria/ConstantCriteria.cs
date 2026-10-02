@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data;
+namespace Serenity.Data;
 
 /// <summary>
 /// A constant criteria object, which only contains a value expression
@@ -8,6 +8,8 @@
 /// <seealso cref="Criteria" />
 public class ConstantCriteria : Criteria
 {
+    private readonly string?[]? stringValues;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="ConstantCriteria"/> class.
     /// </summary>
@@ -48,9 +50,8 @@ public class ConstantCriteria : Criteria
     /// Initializes a new instance of the <see cref="ConstantCriteria"/> class.
     /// </summary>
     /// <param name="value">The value.</param>
-    /// <param name="dialect">The dialect.</param>
-    public ConstantCriteria(string value, ISqlDialect? dialect = null)
-        : base(value.ToSql(dialect))
+    public ConstantCriteria(string value)
+        : this([value])
     {
     }
 
@@ -58,9 +59,32 @@ public class ConstantCriteria : Criteria
     /// Initializes a new instance of the <see cref="ConstantCriteria"/> class.
     /// </summary>
     /// <param name="values">The values.</param>
-    /// <param name="dialect">The dialect.</param>
-    public ConstantCriteria(IEnumerable<string> values, ISqlDialect? dialect = null)
-        : base(string.Join(",", values.Select(x => x.ToSql(dialect))))
+    public ConstantCriteria(IEnumerable<string> values)
+        : this((values ?? throw new ArgumentNullException(nameof(values))).ToArray())
     {
+    }
+
+    private ConstantCriteria(string?[] values)
+        : base(string.Join(",", values.Select(x => x!.ToSql())))
+    {
+        stringValues = values;
+    }
+
+    /// <inheritdoc/>
+    public override void ToString(StringBuilder sb, IQueryWithParams query)
+    {
+        if (stringValues is not null)
+        {
+            for (var i = 0; i < stringValues.Length; i++)
+            {
+                if (i > 0)
+                    sb.Append(',');
+                sb.Append(stringValues[i]!.ToSql(query.Dialect));
+            }
+
+            return;
+        }
+
+        base.ToString(sb, query);
     }
 }
