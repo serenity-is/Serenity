@@ -9,6 +9,9 @@ public class SqlQuery_ToStringTests
         public string ToString(ISqlQuery sqlQuery)
         {
             CallCount++;
+            if (sqlQuery.Columns.Count == 0)
+                throw new InvalidOperationException("A query must select at least one column.");
+
             return "CUSTOM";
         }
     }
@@ -48,7 +51,21 @@ public class SqlQuery_ToStringTests
         Assert.Throws<InvalidOperationException>(() => new SqlQuery().ToString());
         Assert.Throws<InvalidOperationException>(() => new SqlQuery().From("T").ToString());
         Assert.Throws<InvalidOperationException>(() => new SqlQuery().From("T").Skip(1).ToString());
-        Assert.Throws<InvalidOperationException>(() => new SqlQuery().Dialect(new QueryToStringDialect()).ToString());
+
+        var dialect = new QueryToStringDialect();
+        Assert.Throws<InvalidOperationException>(() => new SqlQuery().Dialect(dialect).ToString());
+        Assert.Equal(1, dialect.CallCount);
+    }
+
+    [Fact]
+    public void Freeze_EmptyQuery_IsRejected_By_CustomFormatter()
+    {
+        var dialect = new QueryToStringDialect();
+        var query = new SqlQuery().Dialect(dialect);
+
+        Assert.Throws<InvalidOperationException>(() => query.Freeze());
+        Assert.False(query.IsFrozen);
+        Assert.Equal(1, dialect.CallCount);
     }
 
     [Fact]

@@ -39,11 +39,11 @@ public partial class SqlQuery
     {
         ArgumentNullException.ThrowIfNull(query);
 
-        if (query.Columns.Count == 0)
-            throw new InvalidOperationException("A query must select at least one column.");
-
         if (dialect is ISqlQueryToString sqlQueryToString)
             return sqlQueryToString.ToString(query);
+
+        if (query.Columns.Count == 0)
+            throw new InvalidOperationException("A query must select at least one column.");
 
         var whereClause = query.Where;
         var sb = new StringBuilder();
