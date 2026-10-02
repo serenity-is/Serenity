@@ -215,7 +215,8 @@ public static class SqlSyntax
             return s;
 
         if (!ShouldAutoQuote(dialect) &&
-            !IsKeywordFor(s, dialect))
+            !IsKeywordFor(s, dialect) &&
+            !s.Contains(' '))
             return s;
 
         return '[' + s + ']';
@@ -238,6 +239,14 @@ public static class SqlSyntax
     /// <param name="s">The string.</param>
     /// <param name="dialect">Target dialect; <see cref="SqlSettings.DefaultDialect"/> is used if null.</param>
     /// <returns>The bracketed string.</returns>
+    /// <remarks>
+    /// This method only brackets unquoted, simple identifiers. It deliberately does not try to
+    /// recognize names containing spaces (or other characters that make them invalid simple
+    /// identifiers), because its input may instead be a subquery, function call, or other SQL
+    /// expression. Such table or column names must be bracketed by the caller, for example
+    /// <c>[Some Table]</c> in a <c>TableName</c> definition or <c>.Select("[Some Column]")</c>.
+    /// Handling those ambiguous names is not this method's responsibility.
+    /// </remarks>
     public static string? AutoBracketValid(string? s, ISqlDialect? dialect = null)
     {
         if (!ShouldAutoQuote(dialect) &&

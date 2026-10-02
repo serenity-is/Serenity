@@ -94,6 +94,8 @@ public class SqlSyntaxMoreTests
         {
             Assert.Equal("abc", SqlSyntax.AutoBracket("abc", null));
             Assert.Equal("[select]", SqlSyntax.AutoBracket("select", null));
+            Assert.Equal("[Order Details]", SqlSyntax.AutoBracket("Order Details", null));
+            Assert.Equal("OrderDetails", SqlSyntax.AutoBracket("OrderDetails", null));
         }
         finally
         {
@@ -113,6 +115,8 @@ public class SqlSyntaxMoreTests
             SqlSettings.SetLocalDialect(new MockSqlDialect(autoQuotedIdentifiers: true));
             Assert.Equal("[abc]", SqlSyntax.AutoBracketValid("abc", null));
             Assert.Equal("1abc", SqlSyntax.AutoBracketValid("1abc", null));
+            Assert.Equal("Order Details", SqlSyntax.AutoBracketValid("Order Details", null));
+            Assert.Equal("[Order Details]", SqlSyntax.AutoBracketValid("[Order Details]", null));
         }
         finally
         {
