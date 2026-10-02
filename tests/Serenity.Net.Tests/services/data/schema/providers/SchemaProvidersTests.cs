@@ -146,6 +146,31 @@ public class SchemaProvidersTests
     }
 
     [Fact]
+    public void Postgres_GetFieldInfos_FallsBack_When_IsIdentity_Column_IsUnavailable()
+    {
+        var calls = 0;
+        using var connection = new MockDbConnection()
+            .OnDbCommandExecuteReader(cmd =>
+            {
+                if (++calls == 1)
+                {
+                    Assert.Contains("is_identity", cmd.CommandText, StringComparison.OrdinalIgnoreCase);
+                    throw new SimulatedPostgresException("42703");
+                }
+
+                Assert.DoesNotContain("is_identity", cmd.CommandText, StringComparison.OrdinalIgnoreCase);
+                return new MockDbDataReader(
+                    new { FieldName = "ID", DataType = "integer", IsNullable = false, IsIdentity = true, Size = 0, Scale = 0 });
+            });
+
+        var field = Assert.Single(new PostgresSchemaProvider().GetFieldInfos(connection, "public", "T"));
+
+        Assert.Equal("ID", field.FieldName);
+        Assert.True(field.IsIdentity);
+        Assert.Equal(2, calls);
+    }
+
+    [Fact]
     public void Postgres_GetPrimaryKeyFields_Uses_Params_And_Order()
     {
         string? sql = null;
@@ -230,6 +255,43 @@ public class SchemaProvidersTests
         Assert.Equal(["ID"], new PostgresSchemaProvider().GetIdentityFields(connection, "public", "T").ToList());
         Assert.Contains("is_identity = 'YES'", sql, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("column_default LIKE 'nextval(%'", sql, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void Postgres_GetIdentityFields_FallsBack_When_IsIdentity_Column_IsUnavailable()
+    {
+        var calls = 0;
+        using var connection = new MockDbConnection()
+            .OnDbCommandExecuteReader(cmd =>
+            {
+                if (++calls == 1)
+                {
+                    Assert.Contains("is_identity", cmd.CommandText, StringComparison.OrdinalIgnoreCase);
+                    throw new SimulatedPostgresException("42703");
+                }
+
+                Assert.DoesNotContain("is_identity", cmd.CommandText, StringComparison.OrdinalIgnoreCase);
+                return new MockDbDataReader(new { column_name = "ID" });
+            });
+
+        Assert.Equal(["ID"], new PostgresSchemaProvider().GetIdentityFields(connection, "public", "T").ToList());
+        Assert.Equal(2, calls);
+    }
+
+    [Fact]
+    public void Postgres_GetIdentityFields_DoesNotRetry_ForOtherDatabaseErrors()
+    {
+        var calls = 0;
+        using var connection = new MockDbConnection()
+            .OnDbCommandExecuteReader(_ =>
+            {
+                calls++;
+                throw new SimulatedPostgresException("23505");
+            });
+
+        Assert.Throws<SimulatedPostgresException>(() =>
+            new PostgresSchemaProvider().GetIdentityFields(connection, "public", "T").ToList());
+        Assert.Equal(1, calls);
     }
 
     [Fact]
@@ -422,6 +484,25 @@ public class SchemaProvidersTests
     }
 
     [Fact]
+    public void Oracle_GetIdentityFields_ReturnsEmpty_When_Identity_View_IsUnavailable()
+    {
+        using var connection = new MockDbConnection()
+            .OnDbCommandExecuteReader(_ => throw new SimulatedOracleException(942));
+
+        Assert.Empty(new OracleSchemaProvider().GetIdentityFields(connection, "dbo", "T"));
+    }
+
+    [Fact]
+    public void Oracle_GetIdentityFields_DoesNotHide_OtherDatabaseErrors()
+    {
+        using var connection = new MockDbConnection()
+            .OnDbCommandExecuteReader(_ => throw new SimulatedOracleException(1031));
+
+        Assert.Throws<SimulatedOracleException>(() =>
+            new OracleSchemaProvider().GetIdentityFields(connection, "dbo", "T").ToList());
+    }
+
+    [Fact]
     public void Oracle_GetPrimaryKeyFields_Maps_Fields()
     {
         using var connection = new MockDbConnection()
@@ -495,6 +576,20 @@ public class SchemaProvidersTests
     }
 
     [Fact]
+    public void Sqlite_GetFieldInfos_DoesNotMark_WithoutRowId_IntegerPrimaryKey_AsIdentity()
+    {
+        using var connection = new MockDbConnection()
+            .OnDbCommandExecuteReader(cmd => cmd.CommandText.Contains("sqlite_master", StringComparison.OrdinalIgnoreCase)
+                ? new MockDbDataReader(new { sql = "CREATE TABLE T (Id INTEGER PRIMARY KEY) WITHOUT ROWID" })
+                : new MockDbDataReader(new { name = "Id", type = "INTEGER", notnull = 1, pk = 1 }));
+
+        var field = Assert.Single(new SqliteSchemaProvider().GetFieldInfos(connection, null, "T"));
+
+        Assert.True(field.IsPrimaryKey);
+        Assert.False(field.IsIdentity);
+    }
+
+    [Fact]
     public void Sqlite_GetForeignKeys_Maps_ForeignKeys()
     {
         using var connection = new MockDbConnection()
@@ -525,6 +620,17 @@ public class SchemaProvidersTests
                 new { pk = 1, name = "Id", type = "INTEGER" }));
 
         Assert.Equal(["Id"], new SqliteSchemaProvider().GetIdentityFields(connection, null, "T").ToList());
+    }
+
+    [Fact]
+    public void Sqlite_GetIdentityFields_DoesNotReturn_WithoutRowId_IntegerPrimaryKey()
+    {
+        using var connection = new MockDbConnection()
+            .OnDbCommandExecuteReader(cmd => cmd.CommandText.Contains("sqlite_master", StringComparison.OrdinalIgnoreCase)
+                ? new MockDbDataReader(new { sql = "CREATE TABLE T (Id INTEGER PRIMARY KEY) WITHOUT ROWID" })
+                : new MockDbDataReader(new { pk = 1, name = "Id", type = "INTEGER" }));
+
+        Assert.Empty(new SqliteSchemaProvider().GetIdentityFields(connection, null, "T"));
     }
 
     [Fact]
@@ -569,6 +675,16 @@ public class SchemaProvidersTests
                     new { pk = 2, name = "B", type = "TEXT" }));
 
         Assert.Empty(new SqliteSchemaProvider().GetIdentityFields(connection, null, "C"));
+    }
+
+    private sealed class SimulatedPostgresException(string sqlState) : Exception
+    {
+        public string SqlState => sqlState;
+    }
+
+    private sealed class SimulatedOracleException(int number) : Exception
+    {
+        public int Number => number;
     }
 
     [Fact]

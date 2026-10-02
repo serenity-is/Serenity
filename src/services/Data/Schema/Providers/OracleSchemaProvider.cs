@@ -66,18 +66,31 @@ public class OracleSchemaProvider : ISchemaProvider
     /// <inheritdoc/>
     public IEnumerable<string> GetIdentityFields(IDbConnection connection, string? schema, string table)
     {
-        return connection.Query<string>(/*lang=sql*/ """
-            SELECT column_name
-            FROM all_tab_identity_cols
-            WHERE (:sch IS NULL OR owner = :sch)
-                AND table_name = :tbl
-            ORDER BY column_name
-            """, new
+        try
         {
-            sch = schema,
-            tbl = table
-        });
+            return connection.Query<string>(/*lang=sql*/ """
+                SELECT column_name
+                FROM all_tab_identity_cols
+                WHERE (:sch IS NULL OR owner = :sch)
+                    AND table_name = :tbl
+                ORDER BY column_name
+                """, new
+            {
+                sch = schema,
+                tbl = table
+            }).ToList();
+        }
+        catch (Exception ex) when (IsMissingIdentityView(ex))
+        {
+            // ALL_TAB_IDENTITY_COLS was introduced in Oracle 12c along with identity
+            // columns. Before 12c, returning no identity fields is correct.
+            return [];
+        }
     }
+
+    // ORA-00942 is raised when the 12c identity dictionary view is unavailable.
+    private static bool IsMissingIdentityView(Exception exception) =>
+        exception.GetType().GetProperty("Number")?.GetValue(exception) is int number && number == 942;
 
     /// <inheritdoc/>
     public IEnumerable<string> GetPrimaryKeyFields(IDbConnection connection, string? schema, string table)

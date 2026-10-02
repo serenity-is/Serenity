@@ -17,7 +17,7 @@ public class PostgresSchemaProvider : ISchemaProvider
     /// <inheritdoc/>
     public IEnumerable<FieldInfo> GetFieldInfos(IDbConnection connection, string? schema, string table)
     {
-        return connection.Query<FieldInfo>(/*lang=sql*/ """
+        const string query = /*lang=sql*/ """
             SELECT  
              column_name "FieldName",
                 data_type "DataType",
@@ -29,11 +29,35 @@ public class PostgresSchemaProvider : ISchemaProvider
             FROM information_schema.COLUMNS
             WHERE (@sma IS NULL OR table_schema = @sma) and table_name = @tbl
             ORDER BY ordinal_position
-            """, new
+            """;
+        var parameters = new
         {
             sma = schema,
             tbl = table
-        });
+        };
+
+        try
+        {
+            return connection.Query<FieldInfo>(query, parameters).ToList();
+        }
+        catch (Exception ex) when (IsUndefinedColumn(ex))
+        {
+            // information_schema.columns.is_identity was added in PostgreSQL 10.
+            // Retry without it so PostgreSQL 9.x can still report serial columns.
+            return connection.Query<FieldInfo>(/*lang=sql*/ """
+                SELECT
+                    column_name "FieldName",
+                    data_type "DataType",
+                    CASE WHEN is_nullable = 'NO' THEN 0 ELSE 1 END "IsNullable",
+                    CASE WHEN column_default LIKE 'nextval(%' THEN 1 ELSE 0 END "IsIdentity",
+                    COALESCE(character_maximum_length, CASE WHEN data_type = 'numeric' OR
+                        data_type = 'decimal' THEN numeric_precision ELSE 0 END, 0) "Size",
+                    COALESCE(numeric_scale, 0) "Scale"
+                FROM information_schema.COLUMNS
+                WHERE (@sma IS NULL OR table_schema = @sma) and table_name = @tbl
+                ORDER BY ordinal_position
+                """, parameters).ToList();
+        }
     }
 
     /// <inheritdoc/>
@@ -69,17 +93,41 @@ public class PostgresSchemaProvider : ISchemaProvider
     /// <inheritdoc/>
     public IEnumerable<string> GetIdentityFields(IDbConnection connection, string? schema, string table)
     {
-        return connection.Query<string>(/*lang=sql*/ """
-            SELECT column_name
-            FROM information_schema.COLUMNS
-            WHERE (@sma IS NULL OR TABLE_SCHEMA = @sma) AND TABLE_NAME = @tbl
-            AND (is_identity = 'YES' OR column_default LIKE 'nextval(%')
-            """, new
+        var parameters = new
         {
             sma = schema,
             tbl = table
-        });
+        };
+
+        try
+        {
+            // is_identity is available starting with PostgreSQL 10. Keep the
+            // nextval check as well for legacy serial columns.
+            return connection.Query<string>(/*lang=sql*/ """
+                SELECT column_name
+                FROM information_schema.COLUMNS
+                WHERE (@sma IS NULL OR TABLE_SCHEMA = @sma) AND TABLE_NAME = @tbl
+                AND (is_identity = 'YES' OR column_default LIKE 'nextval(%')
+                """, parameters).ToList();
+        }
+        catch (Exception ex) when (IsUndefinedColumn(ex))
+        {
+            // PostgreSQL 9.x has no is_identity column; it predates identity columns,
+            // but serial columns are still detectable through column_default.
+            return connection.Query<string>(/*lang=sql*/ """
+                SELECT column_name
+                FROM information_schema.COLUMNS
+                WHERE (@sma IS NULL OR TABLE_SCHEMA = @sma) AND TABLE_NAME = @tbl
+                AND column_default LIKE 'nextval(%'
+                """, parameters).ToList();
+        }
     }
+
+    // PostgreSQL SQLSTATE 42703 identifies an undefined column, which is the expected
+    // error when an older server encounters information_schema.columns.is_identity.
+    private static bool IsUndefinedColumn(Exception exception) =>
+        string.Equals(exception.GetType().GetProperty("SqlState")?.GetValue(exception) as string,
+            "42703", StringComparison.Ordinal);
 
     /// <inheritdoc/>
     public IEnumerable<string> GetPrimaryKeyFields(IDbConnection connection, string? schema, string table)

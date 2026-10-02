@@ -50,10 +50,13 @@ public class SqliteSchemaProvider : ISchemaProvider
 
         var fields = connection.Query<FieldInfoSource>(PragmaTableRef("table_info", schema, table)).ToList();
         var primaryKeys = fields.Where(x => x.pk > 0).ToList();
-        var identityName = primaryKeys.Count == 1 &&
-            string.Equals(primaryKeys[0].type, "INTEGER", StringComparison.OrdinalIgnoreCase)
-                ? primaryKeys[0].name
-                : null;
+        var hasIntegerPrimaryKey = primaryKeys.Count == 1 &&
+            string.Equals(primaryKeys[0].type, "INTEGER", StringComparison.OrdinalIgnoreCase);
+        // An INTEGER PRIMARY KEY aliases rowid only for ordinary rowid tables;
+        // WITHOUT ROWID tables require the key value to be supplied on insert.
+        var identityName = hasIntegerPrimaryKey && !IsWithoutRowId(connection, schema, table)
+            ? primaryKeys[0].name
+            : null;
 
         return fields.Select(x => new FieldInfo
             {
@@ -108,25 +111,27 @@ public class SqliteSchemaProvider : ISchemaProvider
             .Where(x => x.pk > 0)
             .ToList();
 
-        // A single INTEGER PRIMARY KEY is a rowid alias (comparison is
-        // case-insensitive as the declared type text keeps its case).
+        // A single INTEGER PRIMARY KEY aliases rowid only on ordinary rowid tables;
+        // WITHOUT ROWID tables require the key value to be supplied on insert.
         if (fields.Count == 1 &&
             string.Equals(fields[0].type, "INTEGER", StringComparison.OrdinalIgnoreCase))
         {
-            return [fields[0].name];
+            return IsWithoutRowId(connection, schema, table) ? [] : [fields[0].name];
         }
 
         // ROWID tables have an implicit rowid, WITHOUT ROWID tables don't.
+        return IsWithoutRowId(connection, schema, table) ? [] : ["ROWID"];
+    }
+
+    private static bool IsWithoutRowId(IDbConnection connection, string? schema, string table)
+    {
         var master = string.IsNullOrEmpty(schema) ? "sqlite_master"
             : "\"" + schema.Replace("\"", "\"\"") + "\".sqlite_master";
         var createSql = connection.Query<string>(
             "SELECT sql FROM " + master + " WHERE type = 'table' AND name = @tbl",
             new { tbl = table }).FirstOrDefault();
-        if (createSql is not null &&
-            createSql.Contains("WITHOUT ROWID", StringComparison.OrdinalIgnoreCase))
-            return [];
-
-        return ["ROWID"];
+        return createSql is not null &&
+            createSql.Contains("WITHOUT ROWID", StringComparison.OrdinalIgnoreCase);
     }
 
     private class PrimaryKeySource
