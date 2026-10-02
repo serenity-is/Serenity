@@ -18,6 +18,8 @@ internal sealed class CommandOwningDataReader(IDataReader reader, IDbCommand com
     private readonly IDataReader reader = reader ?? throw new ArgumentNullException(nameof(reader));
     private readonly IDbCommand command = command ?? throw new ArgumentNullException(nameof(command));
     private bool released;
+    private bool? hasRows;
+    private bool hasPrefetchedRow;
 
     private void Release()
     {
@@ -60,21 +62,28 @@ internal sealed class CommandOwningDataReader(IDataReader reader, IDbCommand com
     /// <inheritdoc/>
     public override async ValueTask DisposeAsync()
     {
-        if (released)
-            return;
-        released = true;
         try
         {
-            if (reader is IAsyncDisposable asyncReader)
-                await asyncReader.DisposeAsync().ConfigureAwait(false);
-            else
-                reader.Dispose();
+            if (!released)
+            {
+                released = true;
+                try
+                {
+                    if (reader is IAsyncDisposable asyncReader)
+                        await asyncReader.DisposeAsync().ConfigureAwait(false);
+                    else
+                        reader.Dispose();
+                }
+                finally
+                {
+                    command.Dispose();
+                }
+            }
         }
         finally
         {
-            command.Dispose();
+            await base.DisposeAsync().ConfigureAwait(false);
         }
-        GC.SuppressFinalize(this);
     }
 
     /// <inheritdoc/>
@@ -84,7 +93,22 @@ internal sealed class CommandOwningDataReader(IDataReader reader, IDbCommand com
     public override int FieldCount => reader.FieldCount;
 
     /// <inheritdoc/>
-    public override bool HasRows => (reader as DbDataReader)?.HasRows == true;
+    public override bool HasRows
+    {
+        get
+        {
+            if (reader is DbDataReader dbReader)
+                return dbReader.HasRows;
+
+            if (!hasRows.HasValue)
+            {
+                hasRows = reader.Read();
+                hasPrefetchedRow = hasRows.Value;
+            }
+
+            return hasRows.Value;
+        }
+    }
 
     /// <inheritdoc/>
     public override bool IsClosed => reader.IsClosed;
@@ -164,15 +188,40 @@ internal sealed class CommandOwningDataReader(IDataReader reader, IDbCommand com
     public override bool IsDBNull(int ordinal) => reader.IsDBNull(ordinal);
 
     /// <inheritdoc/>
-    public override bool NextResult() => reader.NextResult();
+    public override bool NextResult()
+    {
+        var result = reader.NextResult();
+        hasRows = null;
+        hasPrefetchedRow = false;
+        return result;
+    }
 
     /// <inheritdoc/>
-    public override bool Read() => reader.Read();
+    public override bool Read()
+    {
+        if (hasPrefetchedRow)
+        {
+            hasPrefetchedRow = false;
+            return true;
+        }
+
+        if (reader is not DbDataReader && hasRows == false)
+            return false;
+
+        var result = reader.Read();
+        if (result)
+            hasRows = true;
+        else
+            hasRows ??= false;
+
+        return result;
+    }
 
     /// <inheritdoc/>
     public override DataTable? GetSchemaTable() => reader.GetSchemaTable();
 
     /// <inheritdoc/>
     public override IEnumerator GetEnumerator() =>
+        hasPrefetchedRow ? new DbEnumerator(this) :
         (reader as IEnumerable)?.GetEnumerator() ?? new DbEnumerator(this);
 }
