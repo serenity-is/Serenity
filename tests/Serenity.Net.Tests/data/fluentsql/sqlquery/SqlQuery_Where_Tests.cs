@@ -76,4 +76,23 @@ public class SqlQuery_Where_Tests
         Assert.Contains(where, query.ToString());
         Assert.Equal(1, query.ParamCount);
     }
+
+    [Fact]
+    public void Where_Renders_Lazy_In_Values_Only_Once()
+    {
+        var enumerations = 0;
+        IEnumerable<int> Values()
+        {
+            enumerations++;
+            yield return 1;
+            yield return 2;
+        }
+
+        var query = new SqlQuery().From("T").Select("Id")
+            .Where(new Criteria("Id").In<object>(Values()));
+
+        Assert.Equal(1, enumerations);
+        Assert.Equal("SELECT Id FROM [T] WHERE (Id IN (@p1,@p2))", Normalize.Sql(query.ToString()));
+        Assert.Equal(1, enumerations);
+    }
 }

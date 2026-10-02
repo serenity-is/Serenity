@@ -23,6 +23,9 @@ public static class SetFieldByStatementExtensions
     /// </returns>
     public static T Set<T>(this T self, string field, object? value) where T : ISetFieldByStatement
     {
+        ArgumentNullException.ThrowIfNull(self);
+        ArgumentException.ThrowIfNullOrEmpty(field);
+
         var param = self.AddParam(value);
         self.SetTo(field, param.Name);
         return self;

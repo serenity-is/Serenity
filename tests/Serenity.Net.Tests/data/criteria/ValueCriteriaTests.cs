@@ -17,6 +17,64 @@ public class ValueCriteriaTests
     }
 
     [Fact]
+    public void Constructor_EnumerableValue_IsCopiedToArray()
+    {
+        var values = Enumerable.Range(1, 3).Where(_ => true);
+        var criteria = new ValueCriteria(values);
+
+        var snapshot = Assert.IsType<object?[]>(criteria.Value);
+        Assert.Equal(new object?[] { 1, 2, 3 }, snapshot);
+    }
+
+    [Fact]
+    public void Constructor_ArrayValue_PreservesElementTypeAndCopies()
+    {
+        var values = new[] { 1, 2, 3 };
+        var criteria = new ValueCriteria(values);
+
+        values[0] = 99;
+
+        var snapshot = Assert.IsType<int[]>(criteria.Value);
+        Assert.Equal(new[] { 1, 2, 3 }, snapshot);
+        Assert.NotSame(values, snapshot);
+    }
+
+    [Fact]
+    public void Constructor_ListValue_PreservesElementTypeAndCopies()
+    {
+        var values = new List<int> { 1, 2, 3 };
+        var criteria = new ValueCriteria(values);
+
+        values[0] = 99;
+        values.Add(4);
+
+        var snapshot = Assert.IsType<int[]>(criteria.Value);
+        Assert.Equal(new[] { 1, 2, 3 }, snapshot);
+        Assert.NotSame(values, snapshot);
+    }
+
+    [Fact]
+    public void Constructor_LazyEnumerable_IsEnumeratedOnce_AndSnapshotted()
+    {
+        var enumerations = 0;
+        IEnumerable<int> Values()
+        {
+            enumerations++;
+            yield return 1;
+            yield return 2;
+        }
+
+        var criteria = new ValueCriteria(Values());
+
+        Assert.Equal(1, enumerations);
+        Assert.Equal(new object?[] { 1, 2 }, Assert.IsType<object?[]>(criteria.Value));
+
+        var query = new SqlQuery();
+        Assert.Equal("(@p1,@p2)", criteria.ToString(query));
+        Assert.Equal(1, enumerations);
+    }
+
+    [Fact]
     public void ToString_StringValue_AddsParamToQuery()
     {
         var query = new SqlQuery();
@@ -209,8 +267,7 @@ public class ValueCriteriaTests
         var query = new SqlQuery();
         var criteria = new ValueCriteria(Lazy());
 
-        // Previously the enumerable was walked twice (count, then render),
-        // which throws or re-executes single-pass sources.
+        // The lazy source is snapshotted at construction and never re-enumerated.
         Assert.Equal("(@p1,@p2,@p3)", criteria.ToString(query));
         Assert.Equal(1, enumerations);
     }

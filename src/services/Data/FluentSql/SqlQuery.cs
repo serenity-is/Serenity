@@ -659,8 +659,8 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
             return this;
 
         BeforeModify();
-        EnsureJoinsInExpression(criteria.ToStringIgnoreParams());
         var sql = criteria.ToString(this);
+        EnsureJoinsInExpression(sql);
         if (whereCriteria.Count > 0)
             whereClause.Append(SqlKeywords.And);
         whereClause.Append(sql);

@@ -254,7 +254,7 @@ public class BaseCriteriaTests
         var criteria = name.In<object>(values);
 
         var binary = Assert.IsType<BinaryCriteria>(criteria);
-        Assert.Same(values, Assert.IsType<ValueCriteria>(binary.RightOperand).Value);
+        Assert.Equal(values, Assert.IsType<ValueCriteria>(binary.RightOperand).Value);
 
         var query = new SqlQuery();
         Assert.Equal("(Name IN (@p1,@p2,@p3))", criteria.ToString(query));

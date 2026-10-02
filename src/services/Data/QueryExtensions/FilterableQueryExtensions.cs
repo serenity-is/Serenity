@@ -54,6 +54,9 @@ public static class FilterableQueryExtensions
     /// </returns>
     public static T WhereEqual<T>(this T self, IField field, object? value, bool emitIsNull = false) where T : IFilterableQuery
     {
+        ArgumentNullException.ThrowIfNull(self);
+        ArgumentNullException.ThrowIfNull(field);
+
         if (value is null && emitIsNull)
             self.Where(new Criteria(field).IsNull());
         else

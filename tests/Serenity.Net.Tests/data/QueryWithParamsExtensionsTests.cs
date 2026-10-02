@@ -13,6 +13,27 @@ public class QueryWithParamsExtensionsTests
     }
 
     [Fact]
+    public void QueryExtensions_Validate_Required_Arguments()
+    {
+        var field = AllFieldsRow.Fields.AString;
+
+        Assert.Throws<ArgumentNullException>(() =>
+            FilterableQueryExtensions.WhereEqual<SqlQuery>(null!, field, 1));
+        Assert.Throws<ArgumentNullException>(() =>
+            FilterableQueryExtensions.WhereEqual(new SqlQuery(), null!, 1));
+        Assert.Throws<ArgumentNullException>(() =>
+            SetFieldByStatementExtensions.Set<SqlInsert>(null!, "A", 1));
+        Assert.Throws<ArgumentException>(() =>
+            SetFieldByStatementExtensions.Set(new SqlInsert("T"), "", 1));
+        Assert.Throws<ArgumentNullException>(() =>
+            QueryWithParamsExtensions.SetParam<SqlQuery>(null!, new Parameter("@p1"), 1));
+        Assert.Throws<ArgumentNullException>(() =>
+            QueryWithParamsExtensions.AddParam<SqlQuery>(null!, 1));
+        Assert.Throws<ArgumentNullException>(() =>
+            new SqlQuery().SetParam(default, 1));
+    }
+
+    [Fact]
     public void ParameterNames_Are_CaseInsensitive()
     {
         var query = new SqlQuery();

@@ -41,6 +41,9 @@ public static class QueryWithParamsExtensions
     /// <returns>The query itself.</returns>
     public static TQuery SetParam<TQuery>(this TQuery self, Parameter param, object? value) where TQuery : IQueryWithParams
     {
+        ArgumentNullException.ThrowIfNull(self);
+        ArgumentNullException.ThrowIfNull(param.Name);
+
         self.SetParam(param.Name, value);
         return self;
     }
@@ -54,6 +57,8 @@ public static class QueryWithParamsExtensions
     /// <returns>The automatically named parameter that was added.</returns>
     public static Parameter AddParam<TQuery>(this TQuery self, object? value) where TQuery : IQueryWithParams
     {
+        ArgumentNullException.ThrowIfNull(self);
+
         var param = self.AutoParam();
         self.AddParam(param.Name, value);
         return param;

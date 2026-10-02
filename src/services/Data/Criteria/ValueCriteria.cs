@@ -12,7 +12,25 @@ namespace Serenity.Data;
 /// <param name="value">The value.</param>
 public class ValueCriteria(object? value) : BaseCriteria
 {
-    private readonly object? value = value;
+    private readonly object? value = Snapshot(value);
+
+    private static object? Snapshot(object? value)
+    {
+        if (value is Array array)
+            return array.Clone();
+
+        var valueType = value?.GetType();
+        if (value is IList && valueType?.IsGenericType == true &&
+            valueType.GetGenericTypeDefinition() == typeof(List<>))
+        {
+            var toArray = valueType.GetMethod(nameof(List<int>.ToArray), Type.EmptyTypes)!;
+            return toArray.Invoke(value, null);
+        }
+
+        return value is IEnumerable enumerable && value is not string
+            ? enumerable.Cast<object?>().ToArray()
+            : value;
+    }
 
     /// <summary>
     /// Gets the value.
@@ -46,21 +64,9 @@ public class ValueCriteria(object? value) : BaseCriteria
     {
         if (value is IEnumerable enumerable && value is not string)
         {
-            // The size is needed for the server-budget decision. Real
-            // collections report it for free via ICollection.Count — no
-            // enumeration, no boxing. Anything else is buffered once: lazy /
-            // single-pass sources (yield iterator, queryable) would throw or
-            // re-execute on a second pass, so enumerable is reassigned to the
-            // snapshot and the loop below always walks it exactly once.
-            int count;
-            if (enumerable is ICollection collection)
-                count = collection.Count;
-            else
-            {
-                var snapshot = enumerable.Cast<object?>().ToArray();
-                count = snapshot.Length;
-                enumerable = snapshot;
-            }
+            // Constructor snapshots every non-string enumerable into an array,
+            // so both the count check and rendering use stable immutable input.
+            var count = ((ICollection)enumerable).Count;
 
             var inlineValues = ShouldInlineListValues(query, count);
 
