@@ -78,40 +78,37 @@ public class ValueCriteriaTests
     }
 
     [Fact]
-    public void ToString_ManyIntegers_AreInlined()
+    public void ToString_ManyIntegers_StayParameterized_While_Budget_Allows()
     {
         var query = new SqlQuery();
         var criteria = new ValueCriteria(Enumerable.Range(1, 15).ToArray());
 
-        // Collections with more than 10 items inline integer values instead of parameters.
-        Assert.Equal("(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15)", criteria.ToString(query));
-        Assert.Null(query.Params);
+        Assert.Equal("(@p1,@p2,@p3,@p4,@p5,@p6,@p7,@p8,@p9,@p10,@p11,@p12,@p13,@p14,@p15)",
+            criteria.ToString(query));
+        Assert.Equal(15, query.Params.Count);
     }
 
     [Fact]
-    public void ToString_ManyEnums_AreInlined()
+    public void ToString_ManyEnums_StayParameterized_While_Budget_Allows()
     {
         var query = new SqlQuery();
         var values = Enumerable.Range(0, 15).Select(i => (SampleEnum)(i % 3)).ToArray();
         var criteria = new ValueCriteria(values);
 
-        // Enum items are inlined through their Int64 value when count is above 10.
-        Assert.Equal("(0,1,2,0,1,2,0,1,2,0,1,2,0,1,2)", criteria.ToString(query));
-        Assert.Null(query.Params);
+        Assert.Equal("(@p1,@p2,@p3,@p4,@p5,@p6,@p7,@p8,@p9,@p10,@p11,@p12,@p13,@p14,@p15)",
+            criteria.ToString(query));
+        Assert.Equal(15, query.Params.Count);
     }
 
     [Fact]
-    public void ToString_ManyStrings_AreInlined_On_SqlServer()
+    public void ToString_ManyStrings_StayParameterized_While_Budget_Allows()
     {
-        // Default dialect is SqlServer (2100 params/command): long string lists
-        // become quoted literals to avoid the budget.
         var query = new SqlQuery();
         var criteria = new ValueCriteria(Enumerable.Range(1, 15).Select(i => "s" + i).ToArray());
 
-        Assert.Equal("(N's1',N's2',N's3',N's4',N's5',N's6',N's7',N's8',N's9',N's10'," +
-            "N's11',N's12',N's13',N's14',N's15')",
+        Assert.Equal("(@p1,@p2,@p3,@p4,@p5,@p6,@p7,@p8,@p9,@p10,@p11,@p12,@p13,@p14,@p15)",
             criteria.ToString(query));
-        Assert.Null(query.Params);
+        Assert.Equal(15, query.Params.Count);
     }
 
     [Theory]
@@ -135,12 +132,13 @@ public class ValueCriteriaTests
     public void ToString_ManyStrings_WithQuote_AreEscaped_On_SqlServer()
     {
         var query = new SqlQuery();
+        AddNearlyExhaustedSqlServerBudget(query);
         var values = Enumerable.Range(1, 15).Select(i => "o'clock" + i).ToArray();
 
         var sql = new ValueCriteria(values).ToString(query);
 
         Assert.StartsWith("(N'o''clock1',", sql);
-        Assert.Null(query.Params);
+        Assert.Equal(1590, query.Params.Count);
     }
 
     [Theory]
@@ -156,13 +154,20 @@ public class ValueCriteriaTests
             .Select(i => new Guid(i, 0, 0, new byte[8]))
             .ToArray();
         var query = new SqlQuery().Dialect((ISqlDialect)Activator.CreateInstance(dialectType)!);
+        var expectedExistingCount = 0;
+        if (inlined)
+        {
+            expectedExistingCount = dialectType == typeof(SqliteDialect) ? 32252 : 1590;
+            for (int i = 0; i < expectedExistingCount; i++)
+                query.AddParam("@existing" + i, i);
+        }
 
         var sql = new ValueCriteria(guids).ToString(query);
 
         if (inlined)
         {
             Assert.StartsWith("('" + guids[0].ToString("D") + "'", sql);
-            Assert.Null(query.Params);
+            Assert.Equal(expectedExistingCount, query.Params.Count);
         }
         else
         {
@@ -221,11 +226,12 @@ public class ValueCriteriaTests
             CultureInfo.CurrentCulture = culture;
 
             var query = new SqlQuery();
+            AddNearlyExhaustedSqlServerBudget(query);
             var criteria = new ValueCriteria(Enumerable.Range(1, 15).ToArray());
 
             // Inlined values must use invariant digits, or the server can't parse them.
             Assert.Equal("(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15)", criteria.ToString(query));
-            Assert.Null(query.Params);
+            Assert.Equal(1590, query.Params.Count);
         }
         finally
         {
@@ -247,5 +253,11 @@ public class ValueCriteriaTests
     {
         First = 1,
         Second = 2
+    }
+
+    private static void AddNearlyExhaustedSqlServerBudget(SqlQuery query)
+    {
+        for (int i = 0; i < 1590; i++)
+            query.AddParam("@existing" + i, i);
     }
 }

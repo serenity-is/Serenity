@@ -23,21 +23,19 @@ public class ValueCriteria(object? value) : BaseCriteria
     public object? Value => value;
 
     /// <summary>
-    /// Lists longer than this inline values into the SQL instead of creating one
-    /// parameter per item. Small lists always stay parameterized so execution
-    /// plans stay reusable; only long lists are affected, and only with values
-    /// that render safely (integers / enums, strings, GUIDs — see below).
+    /// List values may be inlined into SQL instead of creating one parameter per
+    /// item when the target server's reserved parameter budget would be exceeded.
+    /// Only values with a safe dialect-aware literal representation are inlined.
     /// Other types (DateTime, bool, decimal, ...) stay parameterized and can
     /// still hit the parameter budget for very large lists.
     /// </summary>
     /// <remarks>
-    /// 10 is a deliberately conservative cut-off, not a tuned value: this
-    /// criteria renders in isolation and cannot know how many other parameters
-    /// the rest of the query will add to the same command during
-    /// <c>ToString()</c>, so the threshold stays far below budgets like SQL
-    /// Server's 2100 to leave ample headroom.
+    /// The inlining decision uses the current query parameter count and a
+    /// dialect-specific hard limit, reserving 500 parameters for query parts
+    /// that have not rendered yet. Oracle lists over 1000 values are inlined
+    /// independently of the bind-variable budget.
     /// </remarks>
-    private const int InlineThreshold = 10;
+    private const int ReservedParameterCount = 500;
 
     /// <summary>
     /// Converts the criteria to string.
@@ -48,7 +46,7 @@ public class ValueCriteria(object? value) : BaseCriteria
     {
         if (value is IEnumerable enumerable && value is not string)
         {
-            // The size is needed before rendering (see InlineThreshold). Real
+            // The size is needed for the server-budget decision. Real
             // collections report it for free via ICollection.Count — no
             // enumeration, no boxing. Anything else is buffered once: lazy /
             // single-pass sources (yield iterator, queryable) would throw or
@@ -64,6 +62,8 @@ public class ValueCriteria(object? value) : BaseCriteria
                 enumerable = snapshot;
             }
 
+            var inlineValues = ShouldInlineListValues(query, count);
+
             sb.Append('(');
             var index = 0;
             foreach (var item in enumerable)
@@ -71,23 +71,20 @@ public class ValueCriteria(object? value) : BaseCriteria
                 if (index++ > 0)
                     sb.Append(',');
 
-                if (count > InlineThreshold)
+                if (inlineValues)
                 {
                     if (IsIntegerType(item) || item is Enum)
                     {
                         // Provably numeric, so inlining cannot inject SQL. Render
                         // with the invariant culture: current-culture digits
-                        // would not parse server-side. Enums go through their
-                        // Int64 value (Convert.ToString on an enum would render
-                        // its name). Kept dialect-independent (legacy behavior):
-                        // numeric literals are compact everywhere.
-                        sb.Append(item is Enum
-                            ? Convert.ToInt64(item).ToString(CultureInfo.InvariantCulture)
-                            : Convert.ToString(item, CultureInfo.InvariantCulture));
+                        // would not parse server-side. Enum values are rendered
+                        // using their underlying integral type to preserve ulong
+                        // values above long.MaxValue.
+                        sb.Append(FormatInteger(item!));
                         continue;
                     }
 
-                    if (item is string s && CanInlineLiterals(query.Dialect))
+                    if (item is string s)
                     {
                         // Quoted literal with dialect-aware escaping: cannot
                         // inject, and dodges the parameter budget (see helper).
@@ -95,11 +92,10 @@ public class ValueCriteria(object? value) : BaseCriteria
                         continue;
                     }
 
-                    if (item is Guid g && CanInlineLiterals(query.Dialect) &&
-                        HasStandardGuidLiteral(query.Dialect))
+                    if (item is Guid g)
                     {
-                        // Quoted D-format literal; only where it compares
-                        // against GUID-ish columns and the budget matters.
+                        // Dialect-aware GUID literal; formatting accounts for
+                        // dialect-specific GUID storage conventions.
                         sb.Append(((Guid?)g).ToSql(query.Dialect));
                         continue;
                     }
@@ -121,36 +117,41 @@ public class ValueCriteria(object? value) : BaseCriteria
         return k is byte or sbyte or short or ushort or int or uint or long or ulong;
     }
 
-    private static bool CanInlineLiterals(ISqlDialect dialect)
+    private static string FormatInteger(object value)
     {
-        // Only dialects with a realistically reachable parameter budget inline
-        // long string / GUID lists as literals: SQL Server (2100 params per
-        // command) and SQLite (999 on pre-3.32 builds, 32766 newer) — a header
-        // filter with thousands of selected codes would otherwise crash there.
-        // Postgres (65535) and MySQL (65535 prepared) have budgets no such list
-        // will reach, so they keep reusable parameterized plans. Oracle caps IN
-        // lists at 1000 expressions either way (ORA-01795), which inlining
-        // cannot avoid, so it stays parameterized too.
-        return dialect?.ServerType switch
-        {
-            nameof(ServerType.SqlServer) or nameof(ServerType.Sqlite) => true,
-            _ => false
-        };
+        if (value is Enum enumValue)
+            value = Convert.ChangeType(enumValue, Enum.GetUnderlyingType(enumValue.GetType()), CultureInfo.InvariantCulture);
+
+        return Convert.ToString(value, CultureInfo.InvariantCulture)!;
     }
 
-    private static bool HasStandardGuidLiteral(ISqlDialect dialect)
+    private static bool ShouldInlineListValues(IQueryWithParams query, int listCount)
     {
-        // A quoted D-format GUID literal compares correctly against GUID-ish
-        // columns here (uniqueidentifier coercion on SQL Server, plain text
-        // compare on SQLite). Oracle typically stores GUIDs as RAW(16), where
-        // hyphenated text is not valid hex, and Firebird has several competing
-        // conventions (CHAR(36), CHAR(16) OCTETS) with no single standard, so
-        // GUIDs stay parameterized on those dialects.
-        return dialect?.ServerType switch
+        var serverType = query.Dialect.ServerType;
+
+        // Oracle's requested large-list behavior is based on the 1000-item IN
+        // list boundary, independently of its bind-variable budget.
+        if (serverType == nameof(ServerType.Oracle) && listCount > 1000)
+            return true;
+
+        // Reserve the same fixed headroom for query parts that may render later.
+        var parameterLimit = serverType switch
         {
-            nameof(ServerType.SqlServer) or nameof(ServerType.Sqlite) => true,
-            _ => false
+            nameof(ServerType.SqlServer) => 2100,
+            // Microsoft.Data.Sqlite uses a current SQLite version with a 32766
+            // variable limit by default.
+            nameof(ServerType.Sqlite) => 32766,
+            nameof(ServerType.Postgres) or nameof(ServerType.MySql) or nameof(ServerType.Oracle) => 65535,
+            nameof(ServerType.Firebird) => 32767,
+            _ => 0
         };
+
+        if (parameterLimit == 0)
+            return false;
+
+        var currentParameterCount = query.Params?.Count ?? 0;
+        var inlineAtCount = parameterLimit - ReservedParameterCount;
+        return currentParameterCount + (long)listCount > inlineAtCount;
     }
 
     private static Parameter AddParam(IQueryWithParams query, object? value)
