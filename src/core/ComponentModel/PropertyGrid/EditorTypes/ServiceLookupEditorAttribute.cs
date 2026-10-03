@@ -86,7 +86,7 @@ public class ServiceLookupEditorAttribute : ServiceLookupEditorBaseAttribute
             name = name[0..^6];
 
         return (string.IsNullOrEmpty(module) ? name :
-            module + "/" + name) + "/List";
+            module.Replace('.', '/') + "/" + name) + "/List";
     }
 
     private static string? TryGetEndpointService(Type rowType)

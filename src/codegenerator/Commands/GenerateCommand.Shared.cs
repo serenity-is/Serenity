@@ -123,6 +123,25 @@ public partial class GenerateCommand
         Console.WriteLine();
     }
 
+    private static bool IsValidModuleName(string? module)
+    {
+        return string.IsNullOrEmpty(module) ||
+            module.Split('.').All(segment =>
+                IsValidCSharpIdentifier(segment));
+    }
+
+    private static bool IsValidCSharpIdentifier(string? identifier)
+    {
+        return !string.IsNullOrEmpty(identifier) &&
+            Serenity.CodeGeneration.CSharpSyntaxRules.IsValidIdentifier(identifier, ignoreKeywords: false);
+    }
+
+    private static string InvalidModuleNameMessage =>
+        "Module name must be a dot-separated sequence of valid C# namespace identifiers.";
+
+    private static string InvalidIdentifierMessage =>
+        "Identifier must be a valid C# identifier.";
+
     [GeneratedRegex(@"\<TargetFramework\>\s*netcoreapp\.[^<]<\/TargetFramework\>", RegexOptions.Multiline | RegexOptions.Compiled)]
     private static partial Regex NetCoreAppRegex();
 

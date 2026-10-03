@@ -37,10 +37,10 @@ public partial class GenerateCommand
                 .Validate(module =>
                 {
                     if (string.IsNullOrEmpty(module))
-                        return ValidationResult.Error("[red]Can not be empty[/]");
+                        return ValidationResult.Error("[red]Cannot be empty[/]");
 
                     if (module.IndexOf(' ') > -1)
-                        return ValidationResult.Error("[red]Can not contains space[/]");
+                        return ValidationResult.Error("[red]Cannot contain space[/]");
 
                     return ValidationResult.Success();
                 }));
@@ -54,10 +54,10 @@ public partial class GenerateCommand
                 .Validate(module =>
                 {
                     if (string.IsNullOrEmpty(module))
-                        return ValidationResult.Error("[red]Can not be empty[/]");
+                        return ValidationResult.Error("[red]Cannot be empty[/]");
 
-                    if (module.IndexOf(' ') > -1)
-                        return ValidationResult.Error("[red]Can not contains space[/]");
+                    if (!IsValidCSharpIdentifier(module))
+                        return ValidationResult.Error("[red]" + InvalidIdentifierMessage + "[/]");
 
                     return ValidationResult.Success();
                 })
@@ -73,9 +73,8 @@ public partial class GenerateCommand
                 {
                     if (string.IsNullOrEmpty(module))
                         return ValidationResult.Error("[red]Can not be empty[/]");
-
-                    if (module.IndexOf(' ') > -1)
-                        return ValidationResult.Error("[red]Can not contains space[/]");
+                    if (!IsValidModuleName(module))
+                        return ValidationResult.Error("[red]" + InvalidModuleNameMessage + "[/]");
 
                     return ValidationResult.Success();
                 })

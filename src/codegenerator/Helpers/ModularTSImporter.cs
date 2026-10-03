@@ -11,8 +11,13 @@ public class ModularTSImporter(string? currentModule)
 
     protected string ImportFromTypes(string name)
     {
-        return AddExternalImport(string.IsNullOrEmpty(currentModule) ? 
-            "../ServerTypes/" : ("../../ServerTypes/" + currentModule), name);
+        if (string.IsNullOrEmpty(currentModule))
+            return AddExternalImport("../ServerTypes/", name);
+
+        var modulePath = currentModule.Replace(".", "/");
+        var moduleDepth = modulePath.Count(x => x == '/') + 1;
+        var relativePrefix = string.Concat(Enumerable.Repeat("../", moduleDepth + 1));
+        return AddExternalImport(relativePrefix + "ServerTypes/" + modulePath, name);
     }
 
     protected string ImportFromCorelib(string name)

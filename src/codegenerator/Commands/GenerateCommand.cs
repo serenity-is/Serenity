@@ -32,6 +32,12 @@ public partial class GenerateCommand(IProjectFileInfo project, IGeneratorConsole
 
         Arguments.ThrowIfRemaining();
 
+        if (argsModule != null && !IsValidModuleName(argsModule))
+        {
+            Error(InvalidModuleNameMessage);
+            return ExitCodes.InvalidArguments;
+        }
+
         var templates = new Templates();
 
         if (!string.IsNullOrEmpty(config.CustomTemplates))
@@ -100,12 +106,23 @@ public partial class GenerateCommand(IProjectFileInfo project, IGeneratorConsole
                     EntityModelFactory.IdentifierForTable(connectionKey) : confTable.Module;
 
             module = argsModule ?? SelectModule(tableName, module);
+            if ((argsModule == null && string.IsNullOrEmpty(module)) ||
+                !IsValidModuleName(module))
+            {
+                Error(InvalidModuleNameMessage);
+                return ExitCodes.InvalidArguments;
+            }
 
             var defaultIdentifier = confTable?.Identifier?.IsTrimmedEmpty() != false ?
                 EntityModelFactory.IdentifierForTable(tableEntry.Table) : confTable.Identifier;
 
             var identifier = (selectedTableNames.Count == 1 ? 
                 argsIdentifier : null) ?? SelectIdentifier(tableName, defaultIdentifier);
+            if (!IsValidCSharpIdentifier(identifier))
+            {
+                Error(InvalidIdentifierMessage);
+                return ExitCodes.InvalidArguments;
+            }
 
             permissionKey = argsPermissionKey ?? SelectPermissionKey(tableName, confTable?.PermissionKey?.TrimToNull() ?? permissionKey);
 

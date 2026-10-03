@@ -569,7 +569,7 @@ public class EntityModelFactory : IEntityModelFactory
         else
             module = "";
 
-        return "Services/" + (string.IsNullOrEmpty(module) ? name : module + "/" + name) + "/List";
+        return "Services/" + (string.IsNullOrEmpty(module) ? name : module.Replace('.', '/') + "/" + name) + "/List";
     }
 
     private static string PropertyNameFor(string fieldName)

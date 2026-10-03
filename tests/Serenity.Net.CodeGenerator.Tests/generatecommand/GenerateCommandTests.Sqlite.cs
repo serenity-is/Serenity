@@ -31,7 +31,7 @@ public partial class GenerateCommandTests
         AddConfig(fileSystem, config);
         var console = new MockGeneratorConsole();
         var command = CreateCommand(fileSystem, console,
-            ["--cnk", DefaultConnectionAttribute.Key, "--tbl", "MyTable", "--mod", "Test",
+            ["--cnk", DefaultConnectionAttribute.Key, "--tbl", "MyTable", "--mod", "Some.Module",
              "--cls", "MyTable", "--pms", "Test:Permission", "--wtg", "*"]);
 
         var result = command.Run();
@@ -45,9 +45,131 @@ public partial class GenerateCommandTests
         Assert.Contains(generated, x => x.EndsWith("MyTableRow.cs", StringComparison.OrdinalIgnoreCase));
         Assert.Contains(generated, x => x.EndsWith("MyTableEndpoint.cs", StringComparison.OrdinalIgnoreCase));
         Assert.Contains(generated, x => x.EndsWith("MyTableColumns.cs", StringComparison.OrdinalIgnoreCase));
+        Assert.Contains(generated, x => x.Replace('\\', '/').EndsWith(
+            "/Modules/Some/Module/MyTable/MyTableRow.cs", StringComparison.OrdinalIgnoreCase));
+        var dialog = fileSystem.ReadAllText(projectDir + "/Modules/Some/Module/MyTable/MyTableDialog.tsx");
+        Assert.Contains("../../../ServerTypes/Some/Module", dialog, StringComparison.Ordinal);
 
         var sergen = fileSystem.ReadAllText(projectDir + "/sergen.json");
-        Assert.Contains("MyTable", sergen, StringComparison.Ordinal);
+        Assert.Contains("Some.Module", sergen, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Generate_WithEmptyModule_WritesFilesUnderRootModulesFolder()
+    {
+        using var db = new MemorySqliteDb("MyTable");
+
+        var fileSystem = new MockFileSystem();
+        AddConfig(fileSystem, SqliteConfig(db.ConnectionString, saveGeneratedTables: false));
+        var console = new MockGeneratorConsole();
+        var command = CreateCommand(fileSystem, console,
+            ["--cnk", DefaultConnectionAttribute.Key, "--tbl", "MyTable", "--mod", "",
+             "--cls", "MyTable", "--pms", "Test:Permission", "--wtg", "*"]);
+
+        var result = command.Run();
+
+        Assert.Equal(ExitCodes.Success, result);
+        var rowPath = projectDir + "/Modules/MyTable/MyTableRow.cs";
+        var dialogPath = projectDir + "/Modules/MyTable/MyTableDialog.tsx";
+        Assert.True(fileSystem.FileExists(rowPath));
+        var dialog = fileSystem.ReadAllText(dialogPath);
+        Assert.Contains("from '../ServerTypes/'", dialog, StringComparison.Ordinal);
+    }
+
+    [Theory]
+    [InlineData(".Module")]
+    [InlineData("Module.")]
+    [InlineData("Some..Module")]
+    [InlineData("Some.Module-Name")]
+    [InlineData("2Some.Module")]
+    [InlineData("Some.class")]
+    public void Generate_ReturnsInvalidArguments_ForInvalidModuleName(string module)
+    {
+        using var db = new MemorySqliteDb("MyTable");
+
+        var fileSystem = new MockFileSystem();
+        AddConfig(fileSystem, SqliteConfig(db.ConnectionString));
+        var console = new MockGeneratorConsole();
+        var command = CreateCommand(fileSystem, console,
+            ["--cnk", DefaultConnectionAttribute.Key, "--tbl", "MyTable", "--mod", module]);
+
+        var result = command.Run();
+
+        Assert.Equal(ExitCodes.InvalidArguments, result);
+        Assert.Contains(console.WriteCalls, x =>
+            x.type == MockGeneratorConsole.CallType.Error &&
+            x.message == "Module name must be a dot-separated sequence of valid C# namespace identifiers.");
+    }
+
+    [Theory]
+    [InlineData("2MyTable")]
+    [InlineData("My-Table")]
+    [InlineData("My.Table")]
+    [InlineData("class")]
+    public void Generate_ReturnsInvalidArguments_ForInvalidIdentifier(string identifier)
+    {
+        using var db = new MemorySqliteDb("MyTable");
+
+        var fileSystem = new MockFileSystem();
+        AddConfig(fileSystem, SqliteConfig(db.ConnectionString));
+        var console = new MockGeneratorConsole();
+        var command = CreateCommand(fileSystem, console,
+            ["--cnk", DefaultConnectionAttribute.Key, "--tbl", "MyTable", "--mod", "Test",
+             "--cls", identifier]);
+
+        var result = command.Run();
+
+        Assert.Equal(ExitCodes.InvalidArguments, result);
+        Assert.Contains(console.WriteCalls, x =>
+            x.type == MockGeneratorConsole.CallType.Error &&
+            x.message == "Identifier must be a valid C# identifier.");
+    }
+
+    [Theory]
+    [InlineData("My-Table")]
+    [InlineData("")]
+    public void Generate_Rejects_InvalidInteractiveIdentifier(string identifier)
+    {
+        using var db = new MemorySqliteDb("MyTable");
+
+        var fileSystem = new MockFileSystem();
+        AddConfig(fileSystem, SqliteConfig(db.ConnectionString, saveGeneratedTables: false));
+        var console = new MockGeneratorConsole();
+        console.PromptResults.Enqueue(new List<string> { "MyTable" });
+        console.PromptResults.Enqueue("TestModule");
+        console.PromptResults.Enqueue(identifier);
+
+        var command = CreateCommand(fileSystem, console, ["--cnk", DefaultConnectionAttribute.Key]);
+
+        var result = command.Run();
+
+        Assert.Equal(ExitCodes.InvalidArguments, result);
+        Assert.Contains(console.WriteCalls, x =>
+            x.type == MockGeneratorConsole.CallType.Error &&
+            x.message == "Identifier must be a valid C# identifier.");
+    }
+
+    [Theory]
+    [InlineData("Some..Module")]
+    [InlineData("")]
+    public void Generate_Rejects_InvalidInteractiveModule(string module)
+    {
+        using var db = new MemorySqliteDb("MyTable");
+
+        var fileSystem = new MockFileSystem();
+        AddConfig(fileSystem, SqliteConfig(db.ConnectionString, saveGeneratedTables: false));
+        var console = new MockGeneratorConsole();
+        console.PromptResults.Enqueue(new List<string> { "MyTable" });
+        console.PromptResults.Enqueue(module);
+
+        var command = CreateCommand(fileSystem, console, ["--cnk", DefaultConnectionAttribute.Key]);
+
+        var result = command.Run();
+
+        Assert.Equal(ExitCodes.InvalidArguments, result);
+        Assert.Contains(console.WriteCalls, x =>
+            x.type == MockGeneratorConsole.CallType.Error &&
+            x.message == "Module name must be a dot-separated sequence of valid C# namespace identifiers.");
     }
 
     [Fact]

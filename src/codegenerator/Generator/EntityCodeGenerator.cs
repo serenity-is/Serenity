@@ -25,12 +25,13 @@ public class EntityCodeGenerator
         this.model.CustomSettings = config.CustomSettings;
 
         var modulesFolder = fileSystem.Combine(rootDir, "Modules");
-        var typingFolder = fileSystem.Combine(modulesFolder, "ServerTypes", model.Module ?? "");
+        var modulePath = model.ModulePathPrefix.TrimEnd('/');
+        var typingFolder = fileSystem.Combine(modulesFolder, "ServerTypes", modulePath);
         typingPrefix = fileSystem.Combine(typingFolder, model.ClassName);
 
         var mainFolder = modulesFolder;
         if (!string.IsNullOrEmpty(model.Module))
-            mainFolder = fileSystem.Combine(mainFolder, model.Module);
+            mainFolder = fileSystem.Combine(mainFolder, modulePath);
         
         mainPrefix = fileSystem.Combine(mainFolder, model.ClassName, model.ClassName);
     }
@@ -43,10 +44,11 @@ public class EntityCodeGenerator
             !string.IsNullOrEmpty(model.Module) &&
             config.ServerTypings?.ModuleReExports != false)
         {
-            var moduleIndex = fileSystem.Combine(fileSystem.GetDirectoryName(
-                fileSystem.GetDirectoryName(typingPrefix)), model.Module + ".ts");
+            var moduleFolder = fileSystem.GetDirectoryName(typingPrefix);
+            var moduleName = fileSystem.GetFileName(moduleFolder);
+            var moduleIndex = fileSystem.Combine(fileSystem.GetDirectoryName(moduleFolder), moduleName + ".ts");
 
-            var text = "export * from \"./" + model.Module + "/" +
+            var text = "export * from \"./" + moduleName + "/" +
                 fileSystem.GetFileNameWithoutExtension(targetFile) + "\"\n";
 
             if (fileSystem.FileExists(moduleIndex))
@@ -123,7 +125,7 @@ public class EntityCodeGenerator
     {
         string file = fileSystem.Combine(rootDir, string.IsNullOrEmpty(model.Module) ?
             "Modules/Common/Navigation/NavigationItems.cs" :
-            "Modules/" + model.ModuleSlash + model.Module + "Navigation.cs");
+            "Modules/" + model.ModulePathPrefix + model.Module + "Navigation.cs");
         file = PathHelper.ToPath(file);
 
         string code = templates.Render(fileSystem, "NavigationLink", model);
