@@ -19,6 +19,22 @@ public class ServiceLookupEditorAttributeTests
     {
     }
 
+    private class CustomServiceLookupEditorAttribute : ServiceLookupEditorAttribute
+    {
+        public CustomServiceLookupEditorAttribute()
+        {
+            Service = "Custom/Items/List";
+        }
+    }
+
+    [Fact]
+    public void ProtectedParameterlessCtor_AllowsDerivedEditorAttribute()
+    {
+        var attr = new CustomServiceLookupEditorAttribute();
+
+        Assert.Equal("Custom/Items/List", attr.Service);
+    }
+
     [Fact]
     public void Ctor_WithServiceIdAndTextField_SetsOptions()
     {
@@ -110,6 +126,15 @@ public class ServiceLookupEditorAttributeTests
             typeof(Serenity.Net.Tests.AutoServiceFor.DataSources.LookupOnlyRow));
 
         Assert.Equal("DataSources/LookupOnly/ListLookup", service);
+    }
+
+    [Fact]
+    public void TryGetServiceFromEndpoint_DoesNotAppendListToExplicitActionRoute()
+    {
+        var service = ServiceLookupEditorAttribute.TryGetServiceFromEndpoint(
+            typeof(Serenity.Net.Tests.AutoServiceFor.DataSources.CustomActionEndpoint), "Search");
+
+        Assert.Equal("DataSources/CustomAction/Search", service);
     }
 
     [Fact]

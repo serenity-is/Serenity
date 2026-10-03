@@ -25,7 +25,8 @@ public class ConnectionKeyAttribute : Attribute
     /// <exception cref="ArgumentOutOfRangeException">sourceType has no ConnectionKey attribute.</exception>
     public ConnectionKeyAttribute(Type sourceType)
     {
-        ArgumentNullException.ThrowIfNull(sourceType);
+        if (sourceType is null)
+            throw new ArgumentNullException(nameof(sourceType));
 
         var attr = sourceType.GetCustomAttribute<ConnectionKeyAttribute>(true) ?? throw new ArgumentOutOfRangeException(nameof(sourceType),
                 "ConnectionKeyAttribute is created with source type " + sourceType.Name +

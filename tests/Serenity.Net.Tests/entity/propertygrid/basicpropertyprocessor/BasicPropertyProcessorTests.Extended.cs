@@ -109,6 +109,7 @@ public partial class BasicPropertyProcessorTests
         public string? Plain { get; set; }
     }
 
+    [ConnectionKey("BasicPropertyProcessor")]
     [TableName("BpServiceRows")]
     private class ServiceRow : Row<ServiceRow.RowFields>, IIdRow, INameRow
     {
@@ -125,9 +126,130 @@ public partial class BasicPropertyProcessorTests
         }
     }
 
+    [ConnectionKey("BasicPropertyProcessor")]
+    [TableName("BpServiceRowsWithoutLookupFields")]
+    private class ServiceRowWithoutLookupFields : Row<ServiceRowWithoutLookupFields.RowFields>
+    {
+        public class RowFields : RowFieldsBase;
+    }
+
     private class ServiceLookupForm
     {
         [ServiceLookupEditor(typeof(ServiceRow))]
+        public int? Item { get; set; }
+    }
+
+    private class ServiceLookupWithExplicitFieldsForm
+    {
+        [ServiceLookupEditor(typeof(ServiceRow), IdField = "ID", TextField = "Name")]
+        public int? Item { get; set; }
+    }
+
+    private class ServiceLookupWithoutRowFieldsForm
+    {
+        [ServiceLookupEditor(typeof(ServiceRowWithoutLookupFields))]
+        public int? Item { get; set; }
+    }
+
+    private class ServiceLookupWithLookupColumnSelectionForm
+    {
+        [ServiceLookupEditor(typeof(ServiceRow), IdField = "ID", TextField = "Name",
+            ColumnSelection = ColumnSelection.Lookup)]
+        public int? Item { get; set; }
+    }
+
+    private class ConnectorTypeOption
+    {
+        public string Code { get; set; } = null!;
+        public string DisplayName { get; set; } = null!;
+        public int SortOrder { get; set; }
+    }
+
+    [Route("Services/ProDataSources/ConnectorTypes/[action]")]
+    private class ConnectorTypeEndpoint
+    {
+        public void GetTypes()
+        {
+        }
+    }
+
+    private class ConnectorTypeLookupForm
+    {
+        [ServiceLookupEditor(typeof(ConnectorTypeOption),
+            EndpointType = typeof(ConnectorTypeEndpoint), ActionName = "GetTypes")]
+        public string? ConnectorType { get; set; }
+    }
+
+    private class ConnectorTypeLookupWithNullIdFieldForm
+    {
+        [ServiceLookupEditor(typeof(ConnectorTypeOption), IdField = null)]
+        public string? ConnectorType { get; set; }
+    }
+
+    private class ConnectorTypeLookupWithNullTextFieldForm
+    {
+        [ServiceLookupEditor(typeof(ConnectorTypeOption), TextField = null)]
+        public string? ConnectorType { get; set; }
+    }
+
+    private class SingleTextOption
+    {
+        public string Value { get; set; } = null!;
+    }
+
+    private class SingleTextLookupForm
+    {
+        [ServiceLookupEditor(typeof(SingleTextOption))]
+        public string? Value { get; set; }
+    }
+
+    private class AmbiguousLookupOption
+    {
+        public string Description { get; set; } = null!;
+        public int SortOrder { get; set; }
+    }
+
+    private class AmbiguousLookupForm
+    {
+        [ServiceLookupEditor(typeof(AmbiguousLookupOption))]
+        public int? Value { get; set; }
+    }
+
+    [ConnectionKey(typeof(ServiceRow))]
+    [Route("Services/BasicPropertyProcessor/ServiceRow/[action]")]
+    private class ServiceRowEndpoint
+    {
+        public void List()
+        {
+        }
+    }
+
+    private class EndpointOnlyServiceLookupAttribute : ServiceLookupEditorBaseAttribute
+    {
+        public EndpointOnlyServiceLookupAttribute() : base(ServiceLookupEditorAttribute.Key)
+        {
+            EndpointType = typeof(ServiceRowEndpoint);
+        }
+    }
+
+    private class ClientManagedLookupEditorAttribute : ServiceLookupEditorBaseAttribute
+    {
+        public ClientManagedLookupEditorAttribute() : base("ClientManagedLookup")
+        {
+            Service = "Custom/Items/List";
+            ItemType = typeof(AmbiguousLookupOption);
+        }
+    }
+
+    private class EndpointOnlyServiceLookupForm
+    {
+        [EndpointOnlyServiceLookup]
+        public int? Item { get; set; }
+    }
+
+    private class ClientManagedLookupForm
+    {
+        [ClientManagedLookupEditor]
         public int? Item { get; set; }
     }
 
@@ -549,6 +671,114 @@ public partial class BasicPropertyProcessorTests
         Assert.Equal("ID", item.EditorParams["idField"]);
         Assert.Equal("Name", item.EditorParams["textField"]);
         Assert.Equal("ServiceLookup", item.FilteringType);
+    }
+
+    [Fact]
+    public void ServiceLookupEditor_Determines_IncludeColumns_When_Fields_Are_Explicit()
+    {
+        var item = Process<ServiceLookupWithExplicitFieldsForm>(
+            nameof(ServiceLookupWithExplicitFieldsForm.Item));
+
+        Assert.Equal("ID", item.EditorParams["idField"]);
+        Assert.Equal("Name", item.EditorParams["textField"]);
+        Assert.Equal(new[] { "Name" }, item.EditorParams["includeColumns"]);
+    }
+
+    [Fact]
+    public void ServiceLookupEditor_DoesNotInfer_IncludeColumns_When_ColumnSelection_Is_Explicit()
+    {
+        var item = Process<ServiceLookupWithLookupColumnSelectionForm>(
+            nameof(ServiceLookupWithLookupColumnSelectionForm.Item));
+
+        Assert.Equal(ColumnSelection.Lookup, item.EditorParams["columnSelection"]);
+        Assert.False(item.EditorParams.ContainsKey("includeColumns"));
+    }
+
+    [Fact]
+    public void ServiceLookupEditor_Uses_EndpointType_When_ItemType_Is_Not_Set()
+    {
+        var item = Process<EndpointOnlyServiceLookupForm>(
+            nameof(EndpointOnlyServiceLookupForm.Item));
+
+        Assert.Equal("BasicPropertyProcessor/ServiceRow/List", item.EditorParams["service"]);
+        Assert.Equal("ID", item.EditorParams["idField"]);
+        Assert.Equal("Name", item.EditorParams["textField"]);
+        Assert.Equal(new[] { "Name" }, item.EditorParams["includeColumns"]);
+    }
+
+    [Fact]
+    public void ServiceLookupEditor_Allows_ClientManaged_Fields_Without_ItemType()
+    {
+        var item = Process<ClientManagedLookupForm>(nameof(ClientManagedLookupForm.Item));
+
+        Assert.Equal("ClientManagedLookup", item.EditorType);
+        Assert.Equal("Custom/Items/List", item.EditorParams["service"]);
+        Assert.False(item.EditorParams.ContainsKey("idField"));
+        Assert.False(item.EditorParams.ContainsKey("textField"));
+    }
+
+    [Fact]
+    public void ServiceLookupEditor_InferFields_For_NonRowItemType()
+    {
+        var item = Process<ConnectorTypeLookupForm>(
+            nameof(ConnectorTypeLookupForm.ConnectorType));
+
+        Assert.Equal("ProDataSources/ConnectorTypes/GetTypes", item.EditorParams["service"]);
+        Assert.Equal("Code", item.EditorParams["idField"]);
+        Assert.Equal("DisplayName", item.EditorParams["textField"]);
+    }
+
+    [Fact]
+    public void ServiceLookupEditor_Respects_Null_IdField_And_Infers_TextField()
+    {
+        var item = Process<ConnectorTypeLookupWithNullIdFieldForm>(
+            nameof(ConnectorTypeLookupWithNullIdFieldForm.ConnectorType));
+
+        Assert.True(item.EditorParams.ContainsKey("idField"));
+        Assert.Null(item.EditorParams["idField"]);
+        Assert.Equal("DisplayName", item.EditorParams["textField"]);
+    }
+
+    [Fact]
+    public void ServiceLookupEditor_Respects_Null_TextField_And_Infers_IdField()
+    {
+        var item = Process<ConnectorTypeLookupWithNullTextFieldForm>(
+            nameof(ConnectorTypeLookupWithNullTextFieldForm.ConnectorType));
+
+        Assert.Equal("Code", item.EditorParams["idField"]);
+        Assert.True(item.EditorParams.ContainsKey("textField"));
+        Assert.Null(item.EditorParams["textField"]);
+    }
+
+    [Fact]
+    public void ServiceLookupEditor_Uses_SingleStringProperty_For_Id_And_Text()
+    {
+        var item = Process<SingleTextLookupForm>(nameof(SingleTextLookupForm.Value));
+
+        Assert.Equal("Value", item.EditorParams["idField"]);
+        Assert.Equal("Value", item.EditorParams["textField"]);
+    }
+
+    [Fact]
+    public void ServiceLookupEditor_Throws_When_NonRowFields_Cannot_Be_Inferred()
+    {
+        var error = Assert.Throws<InvalidOperationException>(() =>
+            Process<AmbiguousLookupForm>(nameof(AmbiguousLookupForm.Value)));
+
+        Assert.Contains("IdField and TextField", error.Message, StringComparison.Ordinal);
+        Assert.Contains(nameof(AmbiguousLookupOption), error.Message, StringComparison.Ordinal);
+        Assert.Contains("IdPropertyAttribute and NamePropertyAttribute", error.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ServiceLookupEditor_Throws_When_Row_Has_No_Id_Or_Name_Field()
+    {
+        var error = Assert.Throws<InvalidOperationException>(() =>
+            Process<ServiceLookupWithoutRowFieldsForm>(
+                nameof(ServiceLookupWithoutRowFieldsForm.Item)));
+
+        Assert.Contains("IdField and TextField", error.Message, StringComparison.Ordinal);
+        Assert.Contains(nameof(ServiceRowWithoutLookupFields), error.Message, StringComparison.Ordinal);
     }
 
     [Fact]

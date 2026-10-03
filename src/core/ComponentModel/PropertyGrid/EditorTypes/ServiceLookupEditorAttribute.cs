@@ -1,4 +1,4 @@
-﻿using Serenity.Navigation;
+using Serenity.Navigation;
 
 namespace Serenity.ComponentModel;
 
@@ -14,6 +14,15 @@ public class ServiceLookupEditorAttribute : ServiceLookupEditorBaseAttribute
     public const string Key = "ServiceLookup";
 
     /// <summary>
+    /// Initializes a new instance of the <see cref="ServiceLookupEditorAttribute"/> class
+    /// for use by derived editor attributes.
+    /// </summary>
+    protected ServiceLookupEditorAttribute()
+        : base(Key)
+    {
+    }
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="ServiceLookupEditorAttribute"/> class.
     /// </summary>
     /// <param name="service">The service, e.g. Northwind/Customer/List.</param>
@@ -22,20 +31,27 @@ public class ServiceLookupEditorAttribute : ServiceLookupEditorBaseAttribute
     public ServiceLookupEditorAttribute(string service, string idField, string textField)
         : base(Key)
     {
-        SetOption("service", service);
-        SetOption("idField", idField);
-        SetOption("textField", textField);
+        Service = service ?? throw new ArgumentNullException(nameof(service));
+        IdField = idField ?? throw new ArgumentNullException(nameof(idField));
+        TextField = textField ?? throw new ArgumentNullException(nameof(textField));
     }
 
     /// <summary>
-    /// If you use this constructor, service will tried to be determined by module and
-    /// name of the row class, and idField and textField will be determined by
-    /// rows id and name fields.
+    /// Creates a new instance of the <see cref="ServiceLookupEditorAttribute"/> class
+    /// with an item/row type. Service, ID, and text fields are inferred when possible.
+    /// For non-row types, inference uses <c>[IdProperty]</c> and <c>[NameProperty]</c>,
+    /// then conventional property names
+    /// (Id/Key/Code and Name/DisplayName/Text). A type with a single public string
+    /// property uses that property for both ID and text. Otherwise, set
+    /// <see cref="ServiceLookupEditorBaseAttribute.IdField"/> and
+    /// <see cref="ServiceLookupEditorBaseAttribute.TextField"/> explicitly or annotate
+    /// the corresponding item properties.
     /// </summary>
+    /// <param name="itemType">The item/row type</param>
     public ServiceLookupEditorAttribute(Type itemType)
         : base(Key)
     {
-        ItemType = itemType ?? throw new ArgumentNullException("itemType");
+        ItemType = itemType ?? throw new ArgumentNullException(nameof(itemType));
     }
 
     /// <summary>
@@ -43,21 +59,24 @@ public class ServiceLookupEditorAttribute : ServiceLookupEditorBaseAttribute
     /// from a matching endpoint for row types, then falls back to the module identifier
     /// and type name convention.
     /// </summary>
-    /// <param name="type">Type to generate a service for.</param>
+    /// <param name="itemType">Type to generate a service for.</param>
+    /// <param name="actionName">Optional action name.</param>
     /// <returns>Auto generated service.</returns>
-    public static string AutoServiceFor(Type type)
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="itemType"/> is null.</exception>
+    public static string AutoServiceFor(Type itemType, string? actionName = null)
     {
-        if (type is null)
-            throw new ArgumentNullException(nameof(type));
+        if (itemType is null)
+            throw new ArgumentNullException(nameof(itemType));
 
-        if (IsRowType(type) &&
-            TryGetEndpointService(type) is string endpointService)
-            return endpointService;
+        if (IsRowType(itemType) &&
+            TryGetEndpointForRow(itemType, actionName, out string? service) is not null &&
+                service is string fromRow)
+                return fromRow;
 
-        return AutoServiceByConvention(type);
+        return AutoServiceByConvention(itemType, actionName);
     }
 
-    private static string AutoServiceByConvention(Type type)
+    private static string AutoServiceByConvention(Type type, string? actionName = null)
     {
         string module;
         var moduleAttr = type.GetCustomAttribute<ModuleAttribute>(true);
@@ -73,6 +92,8 @@ public class ServiceLookupEditorAttribute : ServiceLookupEditorBaseAttribute
                 module = module[0..^8];
             else if (module.EndsWith(".Lookups"))
                 module = module[0..^8];
+            else if (module.EndsWith(".Endpoints"))
+                module = module[0..^10];
 
             var idx = module.IndexOf(".");
             if (idx >= 0)
@@ -84,13 +105,18 @@ public class ServiceLookupEditorAttribute : ServiceLookupEditorBaseAttribute
             name = name[0..^3];
         else if (name.EndsWith("Lookup"))
             name = name[0..^6];
+        else if (name.EndsWith("Endpoint"))
+            name = name[0..^8];
+        else if (name.EndsWith("Controller"))
+            name = name[0..^10];
 
         return (string.IsNullOrEmpty(module) ? name :
-            module.Replace('.', '/') + "/" + name) + "/List";
+            module.Replace('.', '/') + "/" + name) + "/" + (actionName ?? "List");
     }
 
-    private static string? TryGetEndpointService(Type rowType)
+    private static Type? TryGetEndpointForRow(Type rowType, string? actionName, out string? service)
     {
+        service = null;
         var rowName = rowType.Name.EndsWith("Row", StringComparison.Ordinal) ?
             rowType.Name[..^3] : rowType.Name;
         var rowNamespace = rowType.Namespace ?? "";
@@ -113,37 +139,54 @@ public class ServiceLookupEditorAttribute : ServiceLookupEditorBaseAttribute
                 !HasConnectionKeyForRow(endpoint, rowType))
                 continue;
 
-            var action = "ListLookup";
-            if (!NavigationItemAttribute.HasRouteForAction(endpoint, action))
-                action = "List";
-
-            if (!NavigationItemAttribute.HasRouteForAction(endpoint, action) ||
-                NavigationItemAttribute.HasComplexRouteTemplate(endpoint, action))
-                continue;
-
-            var serviceUrl = NavigationItemAttribute.GetUrlFromController(
-                endpoint, action, throwIfAbsent: false);
-            if (serviceUrl is null)
-                continue;
-
-            if (!NavigationItemAttribute.HasActionRoute(endpoint, action))
-                serviceUrl = AppendListAction(serviceUrl);
-
-            var servicePath = serviceUrl;
-            if (servicePath.StartsWith("~/", StringComparison.Ordinal))
-                servicePath = servicePath[2..];
-            else if (servicePath.StartsWith("/", StringComparison.Ordinal))
-                servicePath = servicePath[1..];
-
-            if (servicePath.StartsWith("Services/", StringComparison.OrdinalIgnoreCase))
-            {
-                servicePath = servicePath["Services/".Length..];
-                if (servicePath.Length > 0)
-                    return servicePath;
-            }
-            else if (servicePath.Length > 0)
-                return "~/" + servicePath;
+            service = TryGetServiceFromEndpoint(endpoint, actionName);
+            if (service is not null)
+                return endpoint;
         }
+        return null;
+    }
+
+    /// <summary>
+    /// Tries to get the service URL from an endpoint type and action name.
+    /// </summary>
+    /// <param name="endpoint">The endpoint type</param>
+    /// <param name="actionName">The action name</param>
+    /// <returns>The service URL if found; otherwise, null</returns>
+    public static string? TryGetServiceFromEndpoint(Type endpoint, string? actionName)
+    {
+        if (actionName is null)
+        {
+            actionName = "ListLookup";
+            if (!NavigationItemAttribute.HasRouteForAction(endpoint, actionName))
+                actionName = "List";
+        }
+
+        if (!NavigationItemAttribute.HasRouteForAction(endpoint, actionName) ||
+            NavigationItemAttribute.HasComplexRouteTemplate(endpoint, actionName))
+            return null;
+
+        var serviceUrl = NavigationItemAttribute.GetUrlFromController(
+            endpoint, actionName, throwIfAbsent: false);
+        if (serviceUrl is null)
+            return null;
+
+        if (!NavigationItemAttribute.HasActionRoute(endpoint, actionName))
+            serviceUrl = AppendAction(serviceUrl, actionName);
+
+        var servicePath = serviceUrl;
+        if (servicePath.StartsWith("~/", StringComparison.Ordinal))
+            servicePath = servicePath[2..];
+        else if (servicePath.StartsWith("/", StringComparison.Ordinal))
+            servicePath = servicePath[1..];
+
+        if (servicePath.StartsWith("Services/", StringComparison.OrdinalIgnoreCase))
+        {
+            servicePath = servicePath["Services/".Length..];
+            if (servicePath.Length > 0)
+                return servicePath;
+        }
+        else if (servicePath.Length > 0)
+            return "~/" + servicePath;
 
         return null;
     }
@@ -169,13 +212,13 @@ public class ServiceLookupEditorAttribute : ServiceLookupEditorBaseAttribute
         return false;
     }
 
-    private static string AppendListAction(string serviceUrl)
+    private static string AppendAction(string serviceUrl, string actionName)
     {
         serviceUrl = serviceUrl.TrimEnd('/');
-        if (serviceUrl.EndsWith("/List", StringComparison.OrdinalIgnoreCase) ||
-            serviceUrl.EndsWith("/ListLookup", StringComparison.OrdinalIgnoreCase))
+        var actionSuffix = "/" + actionName;
+        if (serviceUrl.EndsWith(actionSuffix, StringComparison.OrdinalIgnoreCase))
             return serviceUrl;
 
-        return serviceUrl + "/List";
+        return serviceUrl + actionSuffix;
     }
 }

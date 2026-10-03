@@ -51,7 +51,9 @@ public class ServiceLookupEditorBaseAttributeTests
     {
         var attr = NewAttribute();
         attr.Sort = "Name";
+#pragma warning disable CA1861 // Avoid constant arrays as arguments
         Assert.Equal(new[] { "Name" }, attr.Sort);
+#pragma warning restore CA1861 // Avoid constant arrays as arguments
     }
 
     [Fact]
@@ -67,7 +69,9 @@ public class ServiceLookupEditorBaseAttributeTests
     {
         var attr = NewAttribute();
         attr.IncludeColumns = ["A", "B"];
+#pragma warning disable CA1861 // Avoid constant arrays as arguments
         Assert.Equal(new[] { "A", "B" }, attr.IncludeColumns);
+#pragma warning restore CA1861 // Avoid constant arrays as arguments
     }
 
     [Fact]
@@ -75,7 +79,9 @@ public class ServiceLookupEditorBaseAttributeTests
     {
         var attr = NewAttribute();
         attr.ExcludeColumns = ["A"];
+#pragma warning disable CA1861 // Avoid constant arrays as arguments
         Assert.Equal(new[] { "A" }, attr.ExcludeColumns);
+#pragma warning restore CA1861 // Avoid constant arrays as arguments
     }
 
     [Fact]
@@ -188,14 +194,6 @@ public class ServiceLookupEditorBaseAttributeTests
         var attr = NewAttribute();
         attr.OpenDialogAsPanel = true;
         Assert.True(attr.OpenDialogAsPanel);
-    }
-
-    [Fact]
-    public void ItemType_GetSet_Works()
-    {
-        var attr = NewAttribute();
-        attr.ItemType = typeof(string);
-        Assert.Equal(typeof(string), attr.ItemType);
     }
 
     [Fact]

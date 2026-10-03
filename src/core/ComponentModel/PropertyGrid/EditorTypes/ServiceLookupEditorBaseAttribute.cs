@@ -221,7 +221,21 @@ public abstract class ServiceLookupEditorBaseAttribute(string editorType) : Cust
     }
 
     /// <summary>
-    /// Gets or sets the row type related to this service lookup editor.
+    /// Gets or sets the item/row type passed to the constructor. 
     /// </summary>
-    public Type? ItemType { get; set; }
+    public Type? ItemType { get; protected set; }
+
+    /// <summary>
+    /// Gets or sets the endpoint type. If this is set, the service URL will be 
+    /// determined from the endpoint's route using <see cref="ActionName"/>
+    /// method, or List or ListLookup actions if ActionName is not set.
+    /// </summary>
+    public Type? EndpointType { get; set; }
+
+    /// <summary>
+    /// Gets / sets the action name, e.g. List / ListLookup etc. to use.
+    /// If this is null, the service will be determined from the endpoint's
+    /// ListLookup or List actions, or defaults to "List" method if no endpoint is available.
+    /// </summary>
+    public string? ActionName { get; set; }
 }

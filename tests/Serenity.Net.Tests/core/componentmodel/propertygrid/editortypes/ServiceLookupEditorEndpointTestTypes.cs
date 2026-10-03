@@ -53,6 +53,15 @@ namespace Serenity.Net.Tests.AutoServiceFor.DataSources
         {
         }
     }
+
+    [ConnectionKey(typeof(RouteOnlyRow))]
+    [Route("Services/DataSources/CustomAction/[action]")]
+    public class CustomActionEndpoint
+    {
+        public void Search()
+        {
+        }
+    }
 }
 
 namespace Serenity.Net.Tests.AutoServiceFor.Reports

@@ -147,51 +147,203 @@ public partial class BasicPropertyProcessor : PropertyProcessor
 
     private static void SetServiceLookupParams(EditorTypeAttribute? editorTypeAttr, Dictionary<string, object?> editorParams)
     {
-        if (editorTypeAttr is not ServiceLookupEditorBaseAttribute sle || sle.ItemType == null)
+        if (editorTypeAttr is not ServiceLookupEditorBaseAttribute sle)
             return;
 
-        if (!editorParams.ContainsKey("service"))
-            editorParams["service"] = ServiceLookupEditorAttribute.AutoServiceFor(sle.ItemType);
+        bool validateInferredFields = editorTypeAttr.GetType() == typeof(ServiceLookupEditorAttribute);
+        var itemType = sle.ItemType ??
+            sle.EndpointType?.GetCustomAttribute<ConnectionKeyAttribute>()?.SourceType;
+        var serviceType = itemType ?? sle.EndpointType;
 
-        if (typeof(IRow).IsAssignableFrom(sle.ItemType) &&
-            !sle.ItemType.IsAbstract &&
-            !sle.ItemType.IsInterface &&
-            (!editorParams.ContainsKey("idField") ||
-                !editorParams.ContainsKey("textField") ||
-                (!editorParams.ContainsKey("includeColumns") &&
-                !editorParams.ContainsKey("columnSelection"))))
+        if (!editorParams.ContainsKey("service"))
+        {
+            if (sle.EndpointType != null &&
+                ServiceLookupEditorAttribute.TryGetServiceFromEndpoint(sle.EndpointType, sle.ActionName) is string fromEndpoint)
+            {
+                editorParams["service"] = fromEndpoint;
+            }
+            else if (serviceType != null)
+            {
+                editorParams["service"] = ServiceLookupEditorAttribute.AutoServiceFor(serviceType, sle.ActionName);
+            }
+        }
+
+        bool idFieldMissing = !editorParams.ContainsKey("idField");
+        bool textFieldMissing = !editorParams.ContainsKey("textField");
+
+        if (itemType == null)
+            return;
+
+        bool isRowType = typeof(IRow).IsAssignableFrom(itemType);
+        // Respect explicit column options; for example, Lookup selection can include lookup columns without an inferred list.
+        bool columnsMissing = isRowType &&
+            !editorParams.ContainsKey("includeColumns") &&
+            !editorParams.ContainsKey("columnSelection");
+
+        if (!idFieldMissing && !textFieldMissing && !columnsMissing)
+            return;
+
+        if (!isRowType)
+        {
+            var properties = itemType.GetProperties()
+                .Where(property => property.GetMethod is { IsPublic: true, IsStatic: false } &&
+                    property.GetIndexParameters().Length == 0)
+                .ToArray();
+
+            if (idFieldMissing)
+            {
+                var idProperty = FindPropertyByAttributeOrName(properties,
+                    property => property.GetCustomAttribute<IdPropertyAttribute>() != null,
+                    "Id", "Key", "Code");
+                if (idProperty != null)
+                    editorParams["idField"] = idProperty.Name;
+            }
+
+            if (textFieldMissing)
+            {
+                var textProperty = FindPropertyByAttributeOrName(properties,
+                    property => property.GetCustomAttribute<NamePropertyAttribute>() != null,
+                    "Name", "DisplayName", "Text");
+                if (textProperty != null)
+                    editorParams["textField"] = textProperty.Name;
+            }
+
+            if (properties.Length == 1 &&
+                properties[0].PropertyType == typeof(string))
+            {
+                if (idFieldMissing && !editorParams.ContainsKey("idField"))
+                    editorParams["idField"] = properties[0].Name;
+                if (textFieldMissing && !editorParams.ContainsKey("textField"))
+                    editorParams["textField"] = properties[0].Name;
+            }
+
+            if (validateInferredFields)
+                ThrowIfLookupFieldsMissing(itemType, editorParams);
+            return;
+        }
+
+        bool success = false;
+        if (!itemType.IsAbstract &&
+            !itemType.IsInterface &&
+            itemType.GetConstructors().Any(x => x.GetParameters().Length == 0))
         {
             try
             {
-                var rowInstance = Activator.CreateInstance(sle.ItemType) as IRow;
-                if (rowInstance is IIdRow idRow &&
-                    !editorParams.ContainsKey("idField"))
+                var rowInstance = Activator.CreateInstance(itemType) as IRow;
+                if (idFieldMissing)
                 {
-                    var idField = idRow.GetIdField();
-                    editorParams["idField"] = idField.PropertyName ?? idField.Name;
+                    var idField = rowInstance?.IdField;
+                    var idFieldName = idField?.PropertyName ?? idField?.Name;
+                    if (idFieldName != null)
+                        editorParams["idField"] = idFieldName;
                 }
 
-                if (!editorParams.ContainsKey("textField"))
+                if (textFieldMissing)
                 {
-                    var nameField = rowInstance!.NameField;
-                    if (nameField is not null)
-                        editorParams["textField"] = nameField.PropertyName ??
-                            nameField.Name;
+                    var nameField = rowInstance?.NameField;
+                    var textFieldName = nameField?.PropertyName ?? nameField?.Name;
+                    if (textFieldName != null)
+                        editorParams["textField"] = textFieldName;
                 }
 
-                if (!editorParams.ContainsKey("includeColumns") &&
-                    !editorParams.ContainsKey("columnSelection"))
+                if (columnsMissing)
                 {
-                    editorParams["includeColumns"] = rowInstance!.Fields
+                    editorParams["includeColumns"] = rowInstance?.Fields
                         .Where(x => x.GetAttribute<LookupIncludeAttribute>() != null)
                         .Select(x => x.PropertyName ?? x.Name)
-                        .ToArray();
+                        .ToArray() ?? [];
                 }
+
+                success = true;
             }
             catch
             {
+                // fallback to reflection-based approach if instantiation fails
             }
         }
+
+        if (!success)
+        {
+            if (idFieldMissing)
+            {
+                var idFieldName = itemType.GetProperties().FirstOrDefault(x =>
+                    x.GetCustomAttribute<IdPropertyAttribute>() != null)?.Name;
+                if (idFieldName != null)
+                    editorParams["idField"] = idFieldName;
+            }
+            if (textFieldMissing)
+            {
+                var textFieldName = itemType.GetProperties().FirstOrDefault(x =>
+                    x.GetCustomAttribute<NamePropertyAttribute>() != null)?.Name;
+                if (textFieldName != null)
+                    editorParams["textField"] = textFieldName;
+            }
+            if (columnsMissing)
+            {
+                // play safe as other service types may not support includeColumns property
+                editorParams["includeColumns"] = itemType.GetProperties().Where(x => x.GetCustomAttribute<LookupIncludeAttribute>() != null).Select(x => x.Name).ToArray();
+            }
+        }
+
+        if (validateInferredFields)
+            ThrowIfLookupFieldsMissing(itemType, editorParams);
+    }
+
+    private static void ThrowIfLookupFieldsMissing(Type? itemType,
+        Dictionary<string, object?> editorParams)
+    {
+        var missing = new List<string>();
+        if (!editorParams.ContainsKey("idField"))
+            missing.Add("IdField");
+        if (!editorParams.ContainsKey("textField"))
+            missing.Add("TextField");
+
+        if (missing.Count == 0)
+            return;
+
+        var typeName = itemType?.FullName ?? "(unknown item type)";
+        throw new InvalidOperationException(
+            $"Could not determine {string.Join(" and ", missing)} for ServiceLookup items of type '{typeName}'. " +
+            "Set the editor fields explicitly or annotate the item properties with IdPropertyAttribute and NamePropertyAttribute.");
+    }
+
+    private static PropertyInfo? FindPropertyByAttributeOrName(PropertyInfo[] properties,
+        Func<PropertyInfo, bool> predicate, params string[] names)
+    {
+        var attributed = properties.Where(predicate).Take(2).ToArray();
+        return attributed.Length switch
+        {
+            1 => attributed[0],
+            > 1 => null,
+            _ => FindPropertyByName(properties, names)
+        };
+    }
+
+    private static PropertyInfo? FindUniqueProperty(PropertyInfo[] properties,
+        Func<PropertyInfo, bool> predicate)
+    {
+        var matches = properties.Where(predicate).Take(2).ToArray();
+        return matches.Length == 1 ? matches[0] : null;
+    }
+
+    private static PropertyInfo? FindPropertyByName(PropertyInfo[] properties,
+        params string[] names)
+    {
+        foreach (var name in names)
+        {
+            var matches = properties.Where(property =>
+                string.Equals(property.Name, name, StringComparison.OrdinalIgnoreCase))
+                .Take(2)
+                .ToArray();
+
+            if (matches.Length == 1)
+                return matches[0];
+
+            if (matches.Length > 1)
+                return null;
+        }
+
+        return null;
     }
 
     private static string AutoDetermineEditorType(Type valueType, Type? enumType, Dictionary<string, object?> editorParams)
