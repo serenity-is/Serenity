@@ -30,7 +30,7 @@ public abstract class LoggingRow<TFields> : Row<TFields>, ILoggingRow
     /// <summary>
     /// Gets or sets the date and time the row was inserted.
     /// </summary>
-    [NotNull, Insertable(false), Updatable(false)]
+    [NotNull, Insertable(false), Updatable(false), DateTimeKind(DateTimeKind.Utc)]
     public DateTime? InsertDate { get => fields.InsertDate[this]; set => fields.InsertDate[this] = value; }
 
     /// <summary>
@@ -42,7 +42,7 @@ public abstract class LoggingRow<TFields> : Row<TFields>, ILoggingRow
     /// <summary>
     /// Gets or sets the date and time the row was last updated.
     /// </summary>
-    [Insertable(false), Updatable(false)]
+    [Insertable(false), Updatable(false), DateTimeKind(DateTimeKind.Utc)]
     public DateTime? UpdateDate { get => fields.UpdateDate[this]; set => fields.UpdateDate[this] = value; }
 
     DateTimeField IInsertDateRow.InsertDateField => fields.InsertDate;
