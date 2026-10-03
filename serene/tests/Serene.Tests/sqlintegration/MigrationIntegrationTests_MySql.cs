@@ -8,6 +8,10 @@ public sealed partial class MigrationIntegrationTests : IDisposable
     [Fact]
     public async Task MySql_Migrations_And_Service_Calls_Succeed()
     {
+        DbProviderFactories.RegisterFactory("MySqlConnector", MySqlConnectorFactory.Instance);
+
+        using var serverConnection = SqlIntegrationConnections.CreateConnection("MySql");
+
         testCleanup += () =>
         {
             MySqlConnection.ClearAllPools();
@@ -19,9 +23,7 @@ public sealed partial class MigrationIntegrationTests : IDisposable
                 $"DROP DATABASE IF EXISTS `{northwindDatabase}`");
         };
 
-        DbProviderFactories.RegisterFactory("MySqlConnector", MySqlConnectorFactory.Instance);
 
-        using var serverConnection = SqlIntegrationConnections.CreateConnection("MySql");
         var defaultConnectionString = WithMySqlDatabase(serverConnection.ConnectionString, defaultDatabase);
         var northwindConnectionString = WithMySqlDatabase(serverConnection.ConnectionString, northwindDatabase);
 

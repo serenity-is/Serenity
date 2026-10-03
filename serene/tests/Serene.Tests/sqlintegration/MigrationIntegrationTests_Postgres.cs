@@ -8,6 +8,10 @@ public sealed partial class MigrationIntegrationTests : IDisposable
     [Fact]
     public async Task Postgres_Migrations_And_Service_Calls_Succeed()
     {
+        DbProviderFactories.RegisterFactory("Npgsql", NpgsqlFactory.Instance);
+
+        using var serverConnection = SqlIntegrationConnections.CreateConnection("Postgres");
+        
         testCleanup += () =>
         {
             using var serverConnection = SqlIntegrationConnections.CreateConnection("Postgres");
@@ -17,10 +21,7 @@ public sealed partial class MigrationIntegrationTests : IDisposable
             SqlIntegrationConnections.ExecuteSql(serverConnection,
                 $"DROP DATABASE IF EXISTS \"{northwindDatabase}\" WITH (FORCE)");
         };
-
-        DbProviderFactories.RegisterFactory("Npgsql", NpgsqlFactory.Instance);
-
-        using var serverConnection = SqlIntegrationConnections.CreateConnection("Postgres");
+        
         var defaultConnectionString = WithPostgresDatabase(serverConnection.ConnectionString, defaultDatabase);
         var northwindConnectionString = WithPostgresDatabase(serverConnection.ConnectionString, northwindDatabase);
 
