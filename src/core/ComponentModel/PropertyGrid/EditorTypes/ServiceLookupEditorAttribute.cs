@@ -1,4 +1,6 @@
-﻿namespace Serenity.ComponentModel;
+﻿using Serenity.Navigation;
+
+namespace Serenity.ComponentModel;
 
 /// <summary>
 /// Indicates that the target property should use a "ServiceLookup" editor.
@@ -37,17 +39,25 @@ public class ServiceLookupEditorAttribute : ServiceLookupEditorBaseAttribute
     }
 
     /// <summary>
-    /// When service is null, this method tries to determine the service by looking
-    /// at the type this attribute is placed on. This is a combination of module identifier and type name.
-    /// If the type has a [Module] attribute, it is used, otherwise the module identifier
-    /// is determined from the namespace, by removing ".Entities", ".Scripts", ".Lookups"
-    /// common suffixes and the root namespace (e.g. the first part of the namespace
-    /// before the first dot). Type name is determined from the class type name, with
-    /// common suffixes like "Row" or "Lookup" removed.
+    /// When service is null, this method first tries to determine the service URL
+    /// from a matching endpoint for row types, then falls back to the module identifier
+    /// and type name convention.
     /// </summary>
     /// <param name="type">Type to generate a service for.</param>
     /// <returns>Auto generated service.</returns>
     public static string AutoServiceFor(Type type)
+    {
+        if (type is null)
+            throw new ArgumentNullException(nameof(type));
+
+        if (IsRowType(type) &&
+            TryGetEndpointService(type) is string endpointService)
+            return endpointService;
+
+        return AutoServiceByConvention(type);
+    }
+
+    private static string AutoServiceByConvention(Type type)
     {
         string module;
         var moduleAttr = type.GetCustomAttribute<ModuleAttribute>(true);
@@ -77,5 +87,95 @@ public class ServiceLookupEditorAttribute : ServiceLookupEditorBaseAttribute
 
         return (string.IsNullOrEmpty(module) ? name :
             module + "/" + name) + "/List";
+    }
+
+    private static string? TryGetEndpointService(Type rowType)
+    {
+        var rowName = rowType.Name.EndsWith("Row", StringComparison.Ordinal) ?
+            rowType.Name[..^3] : rowType.Name;
+        var rowNamespace = rowType.Namespace ?? "";
+
+        if (rowNamespace.EndsWith(".Entities", StringComparison.Ordinal))
+            rowNamespace = rowNamespace[..^9];
+
+        var endpointNames = new[]
+        {
+            string.IsNullOrEmpty(rowNamespace) ?
+                $"Endpoints.{rowName}Endpoint" : $"{rowNamespace}.Endpoints.{rowName}Endpoint",
+            string.IsNullOrEmpty(rowNamespace) ?
+                $"{rowName}Endpoint" : $"{rowNamespace}.{rowName}Endpoint"
+        };
+
+        foreach (var endpointName in endpointNames)
+        {
+            var endpoint = rowType.Assembly.GetType(endpointName, throwOnError: false);
+            if (endpoint is null ||
+                !HasConnectionKeyForRow(endpoint, rowType))
+                continue;
+
+            var action = "ListLookup";
+            if (!NavigationItemAttribute.HasRouteForAction(endpoint, action))
+                action = "List";
+
+            if (!NavigationItemAttribute.HasRouteForAction(endpoint, action) ||
+                NavigationItemAttribute.HasComplexRouteTemplate(endpoint, action))
+                continue;
+
+            var serviceUrl = NavigationItemAttribute.GetUrlFromController(
+                endpoint, action, throwIfAbsent: false);
+            if (serviceUrl is null)
+                continue;
+
+            if (!NavigationItemAttribute.HasActionRoute(endpoint, action))
+                serviceUrl = AppendListAction(serviceUrl);
+
+            var servicePath = serviceUrl;
+            if (servicePath.StartsWith("~/", StringComparison.Ordinal))
+                servicePath = servicePath[2..];
+            else if (servicePath.StartsWith("/", StringComparison.Ordinal))
+                servicePath = servicePath[1..];
+
+            if (servicePath.StartsWith("Services/", StringComparison.OrdinalIgnoreCase))
+            {
+                servicePath = servicePath["Services/".Length..];
+                if (servicePath.Length > 0)
+                    return servicePath;
+            }
+            else if (servicePath.Length > 0)
+                return "~/" + servicePath;
+        }
+
+        return null;
+    }
+
+    private static bool IsRowType(Type type) =>
+        type.FullName == "Serenity.Data.IRow" ||
+        type.GetInterfaces().Any(@interface => @interface.FullName == "Serenity.Data.IRow");
+
+    private static bool HasConnectionKeyForRow(Type endpoint, Type rowType)
+    {
+        for (var currentType = endpoint; currentType is not null; currentType = currentType.BaseType)
+        {
+            if (currentType.GetCustomAttributesData().Any(attribute =>
+                attribute.AttributeType.Name == "ConnectionKeyAttribute" &&
+                attribute.AttributeType.Namespace == "Serenity.Data" &&
+                attribute.ConstructorArguments.Any(argument =>
+                    argument.ArgumentType == typeof(Type) &&
+                    argument.Value is Type sourceType &&
+                    sourceType == rowType)))
+                return true;
+        }
+
+        return false;
+    }
+
+    private static string AppendListAction(string serviceUrl)
+    {
+        serviceUrl = serviceUrl.TrimEnd('/');
+        if (serviceUrl.EndsWith("/List", StringComparison.OrdinalIgnoreCase) ||
+            serviceUrl.EndsWith("/ListLookup", StringComparison.OrdinalIgnoreCase))
+            return serviceUrl;
+
+        return serviceUrl + "/List";
     }
 }

@@ -65,4 +65,77 @@ public class ServiceLookupEditorAttributeTests
         var service = ServiceLookupEditorAttribute.AutoServiceFor(typeof(MyLookup));
         Assert.Equal("ComponentModel/My/List", service);
     }
+
+    [Fact]
+    public void AutoServiceFor_UsesEndpointClassRoute()
+    {
+        var service = ServiceLookupEditorAttribute.AutoServiceFor(
+            typeof(Serenity.Net.Tests.AutoServiceFor.DataSources.RouteOnlyRow));
+
+        Assert.Equal("DataSources/RouteOnly/List", service);
+    }
+
+    [Fact]
+    public void NavigationLink_UsesSharedRouteHelper()
+    {
+        var url = Serenity.Navigation.NavigationLinkAttribute.GetUrlFromController(
+            typeof(Serenity.Net.Tests.AutoServiceFor.DataSources.RouteOnlyEndpoint), "List");
+
+        Assert.Equal("~/Services/DataSources/RouteOnly/List", url);
+    }
+
+    [Fact]
+    public void GetUrlFromController_ReturnsNullForMissingActionWhenThrowIfAbsentIsFalse()
+    {
+        var url = Serenity.Navigation.NavigationItemAttribute.GetUrlFromController(
+            typeof(Serenity.Net.Tests.AutoServiceFor.DataSources.RouteOnlyEndpoint),
+            "Missing", throwIfAbsent: false);
+
+        Assert.Null(url);
+    }
+
+    [Fact]
+    public void AutoServiceFor_PrefersListLookupAndUsesItsRoute()
+    {
+        var service = ServiceLookupEditorAttribute.AutoServiceFor(
+            typeof(Serenity.Net.Tests.AutoServiceFor.DataSources.ConnectionRow));
+
+        Assert.Equal("DataSources/Connection/Lookup", service);
+    }
+
+    [Fact]
+    public void AutoServiceFor_UsesListLookupWhenItIsTheOnlyListMethod()
+    {
+        var service = ServiceLookupEditorAttribute.AutoServiceFor(
+            typeof(Serenity.Net.Tests.AutoServiceFor.DataSources.LookupOnlyRow));
+
+        Assert.Equal("DataSources/LookupOnly/ListLookup", service);
+    }
+
+    [Fact]
+    public void AutoServiceFor_UsesAbsoluteUrlForNonServicesRoute()
+    {
+        var service = ServiceLookupEditorAttribute.AutoServiceFor(
+            typeof(Serenity.Net.Tests.AutoServiceFor.Reports.CustomerRow));
+
+        Assert.Equal("~/Reports/Customer/List", service);
+    }
+
+    [Fact]
+    public void AutoServiceFor_RemovesEntitiesNamespaceBeforeFindingEndpoint()
+    {
+        var service = ServiceLookupEditorAttribute.AutoServiceFor(
+            typeof(Serenity.Net.Tests.AutoServiceFor.Entities.CustomerRow));
+
+        Assert.Equal("Customer/List", service);
+    }
+
+    [Fact]
+    public void AutoServiceFor_FallsBackForComplexEndpointRoute()
+    {
+        var service = ServiceLookupEditorAttribute.AutoServiceFor(
+            typeof(Serenity.Net.Tests.AutoServiceFor.Complex.ComplexRow));
+
+        Assert.Equal("Fallback/Complex/List", service);
+    }
 }

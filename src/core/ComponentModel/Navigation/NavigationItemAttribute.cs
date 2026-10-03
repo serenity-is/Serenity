@@ -6,6 +6,8 @@ namespace Serenity.Navigation;
 [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
 public abstract class NavigationItemAttribute : Attribute
 {
+    private const string RouteAttributeName = "RouteAttribute";
+
     /// <summary>
     /// Creates a new instance of the attribute.
     /// </summary>
@@ -38,6 +40,210 @@ public abstract class NavigationItemAttribute : Attribute
         Permission = permission?.ToString();
         IconClass = icon;
         Url = url;
+    }
+
+    /// <summary>
+    /// Tries to extract the URL from a controller action.
+    /// </summary>
+    /// <param name="controller">The controller.</param>
+    /// <param name="action">The action name.</param>
+    /// <param name="throwIfAbsent">Whether to throw if the action is not found.</param>
+    /// <returns>The resolved URL, or <c>null</c> if the action is not found and <paramref name="throwIfAbsent"/> is <c>false</c>.</returns>
+    /// <exception cref="ArgumentNullException">Controller or action is <c>null</c>.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">The action name is invalid.</exception>
+    /// <exception cref="InvalidOperationException">The route attribute is not found.</exception>
+    public static string? GetUrlFromController(Type controller, string action, bool throwIfAbsent = true)
+    {
+        if (controller is null)
+            throw new ArgumentNullException(nameof(controller));
+
+        if (string.IsNullOrEmpty(action))
+            throw new ArgumentNullException(nameof(action));
+
+        var actionMethod = GetActionMethod(controller, action, throwIfAbsent);
+        if (actionMethod is null)
+            return null;
+
+        var routeController = GetRouteAttribute(controller);
+        var routeAction = GetRouteAttribute(actionMethod);
+
+        if (routeController == null && routeAction == null)
+            throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture,
+                "Route attribute for {0} action of {1} controller is not found!",
+                    action, controller.FullName));
+
+        string url = GetRouteTemplate(routeAction ?? routeController!) ?? "";
+
+        static bool isRooted(string value)
+        {
+            return value.StartsWith("~/", StringComparison.Ordinal) ||
+                value.StartsWith("/", StringComparison.Ordinal);
+        }
+
+        if (routeAction != null &&
+            routeController != null &&
+            !isRooted(url))
+        {
+            var tmp = GetRouteTemplate(routeController) ?? "";
+            if (url.Length > 0 && tmp.Length > 0 && tmp[^1] != '/')
+                tmp += "/";
+
+            url = tmp + url;
+        }
+
+        const string ControllerSuffix = "Controller";
+
+        var controllerName = controller.Name;
+        if (controllerName.EndsWith(ControllerSuffix, StringComparison.Ordinal))
+            controllerName = controllerName[..^ControllerSuffix.Length];
+
+        url = url.Replace("[controller]", controllerName, StringComparison.Ordinal);
+        url = url.Replace("[action]", action, StringComparison.Ordinal);
+
+        if (!url.StartsWith("~/", StringComparison.Ordinal))
+            url = url.StartsWith("/", StringComparison.Ordinal) ?
+                "~" + url : "~/" + url;
+
+        while (true)
+        {
+            var idx1 = url.IndexOf('{', StringComparison.Ordinal);
+            if (idx1 <= 0)
+                break;
+
+            var idx2 = url.IndexOf('}', idx1 + 1);
+            if (idx2 <= 0)
+                break;
+
+            url = url[..idx1] + url[(idx2 + 1)..];
+        }
+
+        return url;
+    }
+
+    internal static bool HasComplexRouteTemplate(Type controller, string action)
+    {
+        if (controller is null)
+            throw new ArgumentNullException(nameof(controller));
+
+        if (string.IsNullOrEmpty(action))
+            throw new ArgumentNullException(nameof(action));
+
+        var actionMethod = GetActionMethod(controller, action)!;
+        var routeController = GetRouteAttribute(controller);
+        var routeAction = GetRouteAttribute(actionMethod);
+
+        if (routeController is null && routeAction is null)
+            return true;
+
+        if (routeAction is not null && IsComplexRouteTemplate(GetRouteTemplate(routeAction)))
+            return true;
+
+        if (routeAction is not null &&
+            IsRootedRoute(GetRouteTemplate(routeAction)))
+            return false;
+
+        return routeController is not null &&
+            IsComplexRouteTemplate(GetRouteTemplate(routeController));
+    }
+
+    internal static bool HasActionRoute(Type controller, string action)
+    {
+        if (controller is null)
+            throw new ArgumentNullException(nameof(controller));
+
+        if (string.IsNullOrEmpty(action))
+            throw new ArgumentNullException(nameof(action));
+
+        return GetRouteAttribute(GetActionMethod(controller, action)!) is not null;
+    }
+
+    internal static bool HasRouteForAction(Type controller, string action)
+    {
+        if (controller is null)
+            throw new ArgumentNullException(nameof(controller));
+
+        if (string.IsNullOrEmpty(action))
+            throw new ArgumentNullException(nameof(action));
+
+        var actionMethod = GetActionMethod(controller, action, throwIfAbsent: false);
+        return actionMethod is not null &&
+            (GetRouteAttribute(actionMethod) is not null || GetRouteAttribute(controller) is not null);
+    }
+
+    private static MethodInfo? GetActionMethod(Type controller, string action, bool throwIfAbsent = true)
+    {
+        var actionMethod = controller.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+            .Where(method => method.Name == action)
+            .FirstOrDefault(method => !HasMvcAttribute(method, "NonActionAttribute"));
+
+        if (actionMethod is not null || !throwIfAbsent)
+            return actionMethod;
+
+        throw new ArgumentOutOfRangeException(nameof(action),
+            string.Format(CultureInfo.CurrentCulture,
+                "Controller {1} doesn't have an action with name {0}!",
+                action, controller.FullName));
+    }
+
+    private static CustomAttributeData? GetRouteAttribute(MemberInfo member)
+    {
+        var routeAttribute = member.GetCustomAttributesData()
+            .FirstOrDefault(attribute => HasMvcAttribute(attribute, RouteAttributeName));
+        if (routeAttribute is not null)
+            return routeAttribute;
+
+        if (member is Type type)
+        {
+            for (var baseType = type.BaseType; baseType is not null; baseType = baseType.BaseType)
+            {
+                routeAttribute = baseType.GetCustomAttributesData()
+                    .FirstOrDefault(attribute => HasMvcAttribute(attribute, RouteAttributeName));
+                if (routeAttribute is not null)
+                    return routeAttribute;
+            }
+        }
+        else if (member is MethodInfo method)
+        {
+            var baseMethod = method.GetBaseDefinition();
+            if (baseMethod != method)
+                return GetRouteAttribute(baseMethod);
+        }
+
+        return null;
+    }
+
+    private static string? GetRouteTemplate(CustomAttributeData? routeAttribute)
+    {
+        if (routeAttribute is null)
+            return null;
+
+        var template = routeAttribute.ConstructorArguments
+            .FirstOrDefault(argument => argument.ArgumentType == typeof(string)).Value as string;
+        template ??= routeAttribute.NamedArguments
+            .FirstOrDefault(argument => argument.MemberName is "Template" or "Url").TypedValue.Value as string;
+
+        return template;
+    }
+
+    private static bool HasMvcAttribute(MemberInfo member, string attributeName) =>
+        member.GetCustomAttributesData().Any(attribute => HasMvcAttribute(attribute, attributeName));
+
+    private static bool HasMvcAttribute(CustomAttributeData attribute, string attributeName) =>
+        attribute.AttributeType.Name == attributeName &&
+        attribute.AttributeType.Namespace is "Microsoft.AspNetCore.Mvc" or "System.Web.Mvc";
+
+    private static bool IsRootedRoute(string? route) =>
+        route is not null &&
+        (route.StartsWith("~/", StringComparison.Ordinal) ||
+            route.StartsWith("/", StringComparison.Ordinal));
+
+    private static bool IsComplexRouteTemplate(string? route)
+    {
+        if (route is null)
+            return false;
+
+        route = route.Replace("[action]", "", StringComparison.Ordinal);
+        return route.IndexOfAny(['{', '}', '?', '#', '*', ':', '[', ']']) >= 0;
     }
 
     /// <summary>

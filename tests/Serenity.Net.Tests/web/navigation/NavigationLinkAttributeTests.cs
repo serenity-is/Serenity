@@ -15,6 +15,11 @@ public class NavigationLinkAttributeTests
         {
         }
 
+        [Route("/appRoot")]
+        public void AppRoot()
+        {
+        }
+
         [NonAction]
         public void Hidden()
         {
@@ -100,6 +105,14 @@ public class NavigationLinkAttributeTests
         var url = NavigationLinkAttribute.GetUrlFromController(typeof(CustomerController), "Absolute");
 
         Assert.Equal("~/absolute", url);
+    }
+
+    [Fact]
+    public void GetUrlFromController_Returns_AppRoot_Relative_Url_For_Leading_Slash()
+    {
+        var url = NavigationLinkAttribute.GetUrlFromController(typeof(CustomerController), "AppRoot");
+
+        Assert.Equal("~/appRoot", url);
     }
 
     [Fact]
