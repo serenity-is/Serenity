@@ -2,6 +2,7 @@
 import { ComboboxSearchQuery, ComboboxSearchResult } from "./combobox";
 import { ComboboxEditor, ComboboxEditorOptions } from "./comboboxeditor";
 import { EditorProps } from "./editorwidget";
+import { createLocalListProcessor } from "./servicelookupeditor-localprocess";
 
 /**
  * Options for the {@link ServiceLookupEditor}.
@@ -27,6 +28,14 @@ export interface ServiceLookupEditorOptions extends ComboboxEditorOptions {
     excludeColumns?: string[];
     /** Whether to include deleted rows. */
     includeDeleted?: boolean;
+    /** Supported ListRequest property names. When omitted, all standard properties are sent. */
+    capabilities?: string[];
+    /**
+     * Additional fields searched by the client-side ContainsText fallback.
+     * The editor's itemText output is always searched unless ContainsField is set.
+     * This fallback cannot reproduce server-side QuickSearch behavior exactly.
+     */
+    quickSearchFields?: string[];
     /** Field used for contains-text search. */
     containsField?: string;
     /** Equality filter applied to the request. */
@@ -252,17 +261,48 @@ export abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptio
             });
         }
 
-        const opt = this.getServiceCallOptions(query);
+        let opt = this.getServiceCallOptions(query);
+        const request = opt.request as ListRequest;
+        const capabilities = this.options.capabilities;
+        const localProcessor = createLocalListProcessor({
+            request,
+            capabilities,
+            query,
+            quickSearchFields: this.options.quickSearchFields,
+            itemText: item => this.itemText(item)
+        });
+
+        if (localProcessor) {
+            opt = {
+                ...opt,
+                request: localProcessor.serverRequest
+            };
+        }
+
         const response = await serviceCall(opt);
-        const itemsPlus1 = response.Entities || [];
+
+        const itemsPlus1 = Array.isArray(response) ? response : response?.Entities;
+        if (!Array.isArray(itemsPlus1))
+            throw new Error("ServiceLookupEditor service response must be an array or contain an Entities array.");
+
         let items = itemsPlus1;
+        const localResult = localProcessor?.process(items);
+        if (localResult) {
+            if (localResult.more != null) {
+                return {
+                    items: localResult.items,
+                    more: localResult.more
+                };
+            }
+            items = localResult.items;
+        }
 
         if (query.take && query.checkMore)
             items = items.slice(0, query.take);
 
         return {
             items: items,
-            more: query.checkMore && query.take && itemsPlus1.length > query.take
+            more: !!query.checkMore && !!query.take && itemsPlus1.length > query.take
         };
     }
 }

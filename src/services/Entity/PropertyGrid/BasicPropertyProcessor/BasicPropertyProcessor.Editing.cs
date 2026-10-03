@@ -168,6 +168,49 @@ public partial class BasicPropertyProcessor : PropertyProcessor
             }
         }
 
+        if ((!editorParams.TryGetValue("capabilities", out var configuredCapabilities) ||
+            configuredCapabilities is null))
+        {
+            var endpointType = sle.EndpointType;
+            if (endpointType is null &&
+                itemType is not null &&
+                typeof(IRow).IsAssignableFrom(itemType))
+            {
+                endpointType = ServiceLookupEditorAttribute.TryGetEndpointForRow(
+                    itemType, sle.ActionName, out _);
+            }
+
+            if (endpointType is not null &&
+                ServiceLookupEditorAttribute.TryGetEndpointActionMethod(endpointType, sle.ActionName) is MethodInfo actionMethod)
+            {
+                var actionCapabilities = actionMethod.GetCustomAttribute<ListRequestCapabilitiesAttribute>(inherit: true);
+                var parameters = actionMethod.GetParameters();
+                var requestParameter = parameters.FirstOrDefault(parameter =>
+                    typeof(ServiceRequest).IsAssignableFrom(parameter.ParameterType)) ??
+                    parameters.FirstOrDefault(parameter =>
+                        parameter.ParameterType != typeof(CancellationToken));
+
+                if (actionCapabilities is not null)
+                {
+                    editorParams["capabilities"] = actionCapabilities.Exclude ?
+                        (requestParameter is null ?
+                            Array.Empty<string>() :
+                            GetListRequestCapabilities(requestParameter.ParameterType)
+                                .Where(capability => !actionCapabilities.Capabilities.Contains(
+                                    capability, StringComparer.OrdinalIgnoreCase))
+                                .ToArray()) :
+                        actionCapabilities.Capabilities;
+                }
+                else
+                {
+                    if (requestParameter is null)
+                        editorParams["capabilities"] = Array.Empty<string>();
+                    else if (requestParameter.ParameterType != typeof(ListRequest))
+                        editorParams["capabilities"] = InferListRequestCapabilities(requestParameter.ParameterType);
+                }
+            }
+        }
+
         bool idFieldMissing = !editorParams.ContainsKey("idField");
         bool textFieldMissing = !editorParams.ContainsKey("textField");
 
@@ -175,6 +218,27 @@ public partial class BasicPropertyProcessor : PropertyProcessor
             return;
 
         bool isRowType = typeof(IRow).IsAssignableFrom(itemType);
+        bool containsTextUnsupported =
+            editorParams.TryGetValue("capabilities", out var capabilityValue) &&
+            capabilityValue is IEnumerable<string> capabilities &&
+            !capabilities.Contains("ContainsText", StringComparer.OrdinalIgnoreCase);
+
+        if (containsTextUnsupported &&
+            !isRowType &&
+            !editorParams.ContainsKey("quickSearchFields"))
+        {
+            var quickSearchFields = itemType.GetProperties()
+                .Where(property => property.GetMethod is { IsPublic: true, IsStatic: false } &&
+                    property.GetIndexParameters().Length == 0)
+                .Where(property => property.GetCustomAttribute<Serenity.Data.Mapping.QuickSearchAttribute>() is
+                    { IsExplicit: false })
+                .Select(property => property.Name)
+                .ToArray();
+
+            if (quickSearchFields.Length > 0)
+                editorParams["quickSearchFields"] = quickSearchFields;
+        }
+
         // Respect explicit column options; for example, Lookup selection can include lookup columns without an inferred list.
         bool columnsMissing = isRowType &&
             !editorParams.ContainsKey("includeColumns") &&
@@ -287,6 +351,26 @@ public partial class BasicPropertyProcessor : PropertyProcessor
 
         if (validateInferredFields)
             ThrowIfLookupFieldsMissing(itemType, editorParams);
+    }
+
+    private static string[] InferListRequestCapabilities(Type requestType)
+    {
+        return GetListRequestCapabilities(requestType);
+    }
+
+    private static string[] GetListRequestCapabilities(Type requestType)
+    {
+        var requestProperties = requestType.GetProperties(BindingFlags.Instance | BindingFlags.Public)
+            .Where(property => property.SetMethod is { IsPublic: true } &&
+                property.GetIndexParameters().Length == 0)
+            .Select(property => property.Name)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        return typeof(ListRequest).GetProperties(BindingFlags.Instance | BindingFlags.Public)
+            .Where(property => property.DeclaringType == typeof(ListRequest) &&
+                requestProperties.Contains(property.Name))
+            .Select(property => property.Name)
+            .ToArray();
     }
 
     private static void ThrowIfLookupFieldsMissing(Type? itemType,

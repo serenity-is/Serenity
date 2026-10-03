@@ -114,9 +114,19 @@ public class ServiceLookupEditorAttribute : ServiceLookupEditorBaseAttribute
             module.Replace('.', '/') + "/" + name) + "/" + (actionName ?? "List");
     }
 
-    private static Type? TryGetEndpointForRow(Type rowType, string? actionName, out string? service)
+    /// <summary>
+    /// Tries to find the endpoint associated with a row type.
+    /// </summary>
+    /// <param name="rowType">The row type.</param>
+    /// <param name="actionName">The optional action name.</param>
+    /// <param name="service">The discovered service URL, if any.</param>
+    /// <returns>The endpoint type if a matching endpoint is found; otherwise, null.</returns>
+    public static Type? TryGetEndpointForRow(Type rowType, string? actionName, out string? service)
     {
         service = null;
+        if (rowType is null)
+            throw new ArgumentNullException(nameof(rowType));
+
         var rowName = rowType.Name.EndsWith("Row", StringComparison.Ordinal) ?
             rowType.Name[..^3] : rowType.Name;
         var rowNamespace = rowType.Namespace ?? "";
@@ -144,6 +154,31 @@ public class ServiceLookupEditorAttribute : ServiceLookupEditorBaseAttribute
                 return endpoint;
         }
         return null;
+    }
+
+    /// <summary>
+    /// Tries to get an endpoint action method using the same action selection rules
+    /// used when resolving a service URL.
+    /// </summary>
+    /// <param name="endpoint">The endpoint type.</param>
+    /// <param name="actionName">The action name, or null to select ListLookup or List.</param>
+    /// <returns>The action method if found; otherwise, null.</returns>
+    public static MethodInfo? TryGetEndpointActionMethod(Type endpoint, string? actionName)
+    {
+        if (endpoint is null)
+            throw new ArgumentNullException(nameof(endpoint));
+
+        if (actionName is null)
+        {
+            actionName = "ListLookup";
+            if (!NavigationItemAttribute.HasRouteForAction(endpoint, actionName))
+                actionName = "List";
+        }
+
+        if (!NavigationItemAttribute.HasRouteForAction(endpoint, actionName))
+            return null;
+
+        return NavigationItemAttribute.GetActionMethod(endpoint, actionName, throwIfAbsent: false);
     }
 
     /// <summary>

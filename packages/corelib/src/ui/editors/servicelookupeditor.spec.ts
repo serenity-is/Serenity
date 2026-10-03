@@ -194,6 +194,112 @@ describe("ServiceLookupEditor", () => {
         editor.destroy();
     });
 
+    it("builds a complete list request regardless of capabilities", () => {
+        const editor = create({ capabilities: ["ContainsText", "Take"] });
+        const request = editor.getListRequest({
+            searchTerm: "abc",
+            skip: 10,
+            take: 5,
+            checkMore: true
+        } as any);
+
+        expect(request.ContainsText).toBe("abc");
+        expect(request.Sort).toEqual(["Name"]);
+        expect(request.Skip).toBe(10);
+        expect(request.Take).toBe(6);
+        expect(request.Criteria).toBeDefined();
+        editor.destroy();
+    });
+
+    it("filters, sorts and pages locally when the endpoint lacks those capabilities", async () => {
+        const entities = [
+            { ID: 1, Name: "Bravo" },
+            { ID: 3, Name: "Alpine" },
+            { ID: 2, Name: "Alpha" },
+            { ID: 4, Name: "Other" }
+        ];
+        serviceCallSpy.mockResolvedValue({ Entities: entities } as any);
+        const editor = create({
+            capabilities: ["ColumnSelection", "IncludeColumns", "ExcludeColumns", "Take",
+                "Skip", "ExcludeTotalCount"]
+        });
+
+        const result = await editor.asyncSearch({
+            searchTerm: "al",
+            skip: 0,
+            take: 1,
+            checkMore: true
+        } as any);
+
+        expect(serviceCallSpy).toHaveBeenCalledWith(expect.objectContaining({
+            request: expect.not.objectContaining({
+                ContainsText: expect.anything(),
+                Sort: expect.anything(),
+                Skip: expect.anything(),
+                Take: expect.anything()
+            })
+        }));
+        expect(result).toEqual({
+            items: [{ ID: 2, Name: "Alpha" }],
+            more: true
+        });
+        editor.destroy();
+    });
+
+    it("uses itemText and quickSearchFields for local contains searches", async () => {
+        serviceCallSpy.mockResolvedValue({
+            Entities: [
+                { ID: 1, Name: "EnumValue", Email: "user@example.com" },
+                { ID: 2, Name: "Other", Email: "other@example.com" }
+            ]
+        } as any);
+        const editor = create({
+            capabilities: ["Skip", "Take", "Sort"],
+            quickSearchFields: ["Email"]
+        });
+        (editor as any).itemText = (item: any) =>
+            item.Name === "EnumValue" ? "Localized enum text" : item.Name;
+
+        const result = await editor.asyncSearch({
+            searchTerm: "localized",
+            take: 5,
+            checkMore: true
+        } as any);
+
+        expect(result.items.map((item: any) => item.ID)).toEqual([1]);
+
+        const quickSearchResult = await editor.asyncSearch({
+            searchTerm: "example.com",
+            take: 5,
+            checkMore: true
+        } as any);
+        expect(quickSearchResult.items.map((item: any) => item.ID)).toEqual([1, 2]);
+        editor.destroy();
+    });
+
+    it("applies unsupported equality and criteria filters locally", async () => {
+        serviceCallSpy.mockResolvedValue({
+            Entities: [
+                { ID: 1, Name: "Alpha", State: "A", Enabled: true },
+                { ID: 2, Name: "Alpine", State: "B", Enabled: true },
+                { ID: 3, Name: "Alps", State: "A", Enabled: false }
+            ]
+        } as any);
+        const editor = create({
+            capabilities: ["Sort", "Skip", "Take", "ContainsText"],
+            criteria: [["State"], "=", "A"],
+            equalityFilter: { Enabled: true }
+        });
+
+        const result = await editor.asyncSearch({ take: 10, checkMore: true } as any);
+
+        expect(result.items.map((item: any) => item.ID)).toEqual([1]);
+        expect(result.more).toBe(false);
+        expect(serviceCallSpy.mock.calls[0][0].request.Criteria).toBeUndefined();
+        expect(serviceCallSpy.mock.calls[0][0].request.EqualityFilter).toBeUndefined();
+        editor.destroy();
+    });
+
     it("builds service call options with the request and signal", () => {
         const editor = create({});
         const signal = new AbortController().signal;
@@ -202,6 +308,18 @@ describe("ServiceLookupEditor", () => {
         expect(options.signal).toBe(signal);
         expect(options.blockUI).toBe(false);
         expect(options.request).toBeDefined();
+        editor.destroy();
+    });
+
+    it("accepts an array response", async () => {
+        const entities = [{ ID: 1, Name: "One" }];
+        serviceCallSpy.mockResolvedValue(entities);
+        const editor = create({});
+
+        await expect(editor.asyncSearch({ take: 10, checkMore: true } as any)).resolves.toEqual({
+            items: entities,
+            more: false
+        });
         editor.destroy();
     });
 
@@ -259,12 +377,12 @@ describe("ServiceLookupEditor", () => {
         editor.destroy();
     });
 
-    it("handles a service response without entities", async () => {
+    it("rejects a service response without entities", async () => {
         const editor = create({});
         serviceCallSpy.mockResolvedValue({} as any);
-        const result = await editor.asyncSearch({ searchTerm: "x", take: 5, checkMore: true } as any);
-        expect(result.items).toEqual([]);
-        expect(result.more).toBe(false);
+
+        await expect(editor.asyncSearch({ searchTerm: "x", take: 5, checkMore: true } as any)).rejects.toThrow(
+            "ServiceLookupEditor service response must be an array or contain an Entities array.");
         editor.destroy();
     });
 });

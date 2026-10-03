@@ -170,7 +170,7 @@ public abstract class NavigationItemAttribute : Attribute
             (GetRouteAttribute(actionMethod) is not null || GetRouteAttribute(controller) is not null);
     }
 
-    private static MethodInfo? GetActionMethod(Type controller, string action, bool throwIfAbsent = true)
+    internal static MethodInfo? GetActionMethod(Type controller, string action, bool throwIfAbsent = true)
     {
         var actionMethod = controller.GetMethods(BindingFlags.Public | BindingFlags.Instance)
             .Where(method => method.Name == action)

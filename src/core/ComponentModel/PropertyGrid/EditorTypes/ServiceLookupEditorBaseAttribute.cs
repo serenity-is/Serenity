@@ -238,4 +238,16 @@ public abstract class ServiceLookupEditorBaseAttribute(string editorType) : Cust
     /// ListLookup or List actions, or defaults to "List" method if no endpoint is available.
     /// </summary>
     public string? ActionName { get; set; }
+
+    /// <summary>
+    /// Gets or sets the supported ListRequest property names. When null, capabilities
+    /// are inferred from the endpoint when possible; otherwise, all request properties
+    /// are sent. An empty array explicitly indicates that no ListRequest properties
+    /// should be sent.
+    /// </summary>
+    public string[]? Capabilities
+    {
+        get { return GetOption<string[]>("capabilities"); }
+        set { SetOption("capabilities", value); }
+    }
 }

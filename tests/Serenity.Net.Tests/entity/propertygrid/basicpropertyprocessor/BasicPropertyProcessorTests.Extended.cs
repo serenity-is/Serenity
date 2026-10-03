@@ -165,6 +165,40 @@ public partial class BasicPropertyProcessorTests
         public int SortOrder { get; set; }
     }
 
+    private class QuickSearchLookupOption
+    {
+        public string Code { get; set; } = null!;
+        public string DisplayName { get; set; } = null!;
+
+        [Serenity.Data.Mapping.QuickSearch]
+        public string Email { get; set; } = null!;
+    }
+
+    [Route("Services/BasicPropertyProcessor/QuickSearchLookup/[action]")]
+    private class QuickSearchLookupEndpoint
+    {
+        [ListRequestCapabilities("ContainsText", Exclude = true)]
+        public ListResponse<QuickSearchLookupOption> List(ListRequest request)
+        {
+            return new();
+        }
+    }
+
+    private class QuickSearchLookupAttribute : ServiceLookupEditorBaseAttribute
+    {
+        public QuickSearchLookupAttribute() : base(ServiceLookupEditorAttribute.Key)
+        {
+            ItemType = typeof(QuickSearchLookupOption);
+            EndpointType = typeof(QuickSearchLookupEndpoint);
+        }
+    }
+
+    private class QuickSearchLookupForm
+    {
+        [QuickSearchLookup]
+        public string? Item { get; set; }
+    }
+
     [Route("Services/ProDataSources/ConnectorTypes/[action]")]
     private class ConnectorTypeEndpoint
     {
@@ -224,11 +258,72 @@ public partial class BasicPropertyProcessorTests
         }
     }
 
+    [Route("Services/BasicPropertyProcessor/RestrictedServiceRow/[action]")]
+    private class RestrictedServiceRowEndpoint
+    {
+        [ListRequestCapabilities("Skip", "Take")]
+        public ListResponse<ServiceRow> List(ListRequest request)
+        {
+            return new();
+        }
+
+        [ListRequestCapabilities("ContainsText", "Criteria", Exclude = true)]
+        public ListResponse<ServiceRow> ListWithoutTextAndCriteria(ListRequest request)
+        {
+            return new();
+        }
+    }
+
+    private class LimitedListRequest : ServiceRequest
+    {
+        public int Skip { get; set; }
+        public string? ContainsText { get; set; }
+        public string? CustomValue { get; set; }
+    }
+
+    [Route("Services/BasicPropertyProcessor/CustomServiceRow/[action]")]
+    private class CustomServiceRowEndpoint
+    {
+        public ListResponse<ServiceRow> Search(LimitedListRequest request)
+        {
+            return new();
+        }
+    }
+
     private class EndpointOnlyServiceLookupAttribute : ServiceLookupEditorBaseAttribute
     {
         public EndpointOnlyServiceLookupAttribute() : base(ServiceLookupEditorAttribute.Key)
         {
             EndpointType = typeof(ServiceRowEndpoint);
+        }
+    }
+
+    private class RestrictedServiceLookupAttribute : ServiceLookupEditorBaseAttribute
+    {
+        public RestrictedServiceLookupAttribute() : base(ServiceLookupEditorAttribute.Key)
+        {
+            ItemType = typeof(ServiceRow);
+            EndpointType = typeof(RestrictedServiceRowEndpoint);
+        }
+    }
+
+    private class ExcludedServiceLookupAttribute : ServiceLookupEditorBaseAttribute
+    {
+        public ExcludedServiceLookupAttribute() : base(ServiceLookupEditorAttribute.Key)
+        {
+            ItemType = typeof(ServiceRow);
+            EndpointType = typeof(RestrictedServiceRowEndpoint);
+            ActionName = "ListWithoutTextAndCriteria";
+        }
+    }
+
+    private class CustomRequestServiceLookupAttribute : ServiceLookupEditorBaseAttribute
+    {
+        public CustomRequestServiceLookupAttribute() : base(ServiceLookupEditorAttribute.Key)
+        {
+            ItemType = typeof(ServiceRow);
+            EndpointType = typeof(CustomServiceRowEndpoint);
+            ActionName = "Search";
         }
     }
 
@@ -244,6 +339,24 @@ public partial class BasicPropertyProcessorTests
     private class EndpointOnlyServiceLookupForm
     {
         [EndpointOnlyServiceLookup]
+        public int? Item { get; set; }
+    }
+
+    private class RestrictedServiceLookupForm
+    {
+        [RestrictedServiceLookup]
+        public int? Item { get; set; }
+    }
+
+    private class ExcludedServiceLookupForm
+    {
+        [ExcludedServiceLookup]
+        public int? Item { get; set; }
+    }
+
+    private class CustomRequestServiceLookupForm
+    {
+        [CustomRequestServiceLookup]
         public int? Item { get; set; }
     }
 
@@ -704,6 +817,39 @@ public partial class BasicPropertyProcessorTests
         Assert.Equal("ID", item.EditorParams["idField"]);
         Assert.Equal("Name", item.EditorParams["textField"]);
         Assert.Equal(new[] { "Name" }, item.EditorParams["includeColumns"]);
+        Assert.Equal(Array.Empty<string>(), item.EditorParams["capabilities"]);
+    }
+
+    [Fact]
+    public void ServiceLookupEditor_Uses_ActionCapabilities_When_Configured()
+    {
+        var item = Process<RestrictedServiceLookupForm>(
+            nameof(RestrictedServiceLookupForm.Item));
+
+        Assert.Equal(new[] { "Skip", "Take" }, item.EditorParams["capabilities"]);
+    }
+
+    [Fact]
+    public void ServiceLookupEditor_Excludes_ActionCapabilities_From_ListRequest_Defaults()
+    {
+        var item = Process<ExcludedServiceLookupForm>(
+            nameof(ExcludedServiceLookupForm.Item));
+        var capabilities = Assert.IsType<string[]>(item.EditorParams["capabilities"]);
+
+        Assert.DoesNotContain("ContainsText", capabilities);
+        Assert.DoesNotContain("Criteria", capabilities);
+        Assert.Contains("Skip", capabilities);
+        Assert.Contains("Take", capabilities);
+        Assert.Contains("IncludeColumns", capabilities);
+    }
+
+    [Fact]
+    public void ServiceLookupEditor_Infers_Capabilities_From_Custom_Request_Properties()
+    {
+        var item = Process<CustomRequestServiceLookupForm>(
+            nameof(CustomRequestServiceLookupForm.Item));
+
+        Assert.Equal(new[] { "Skip", "ContainsText" }, item.EditorParams["capabilities"]);
     }
 
     [Fact]
@@ -726,6 +872,15 @@ public partial class BasicPropertyProcessorTests
         Assert.Equal("ProDataSources/ConnectorTypes/GetTypes", item.EditorParams["service"]);
         Assert.Equal("Code", item.EditorParams["idField"]);
         Assert.Equal("DisplayName", item.EditorParams["textField"]);
+    }
+
+    [Fact]
+    public void ServiceLookupEditor_Infer_QuickSearchFields_When_ContainsText_Is_Unsupported()
+    {
+        var item = Process<QuickSearchLookupForm>(nameof(QuickSearchLookupForm.Item));
+
+        Assert.DoesNotContain("ContainsText", Assert.IsType<string[]>(item.EditorParams["capabilities"]));
+        Assert.Equal(new[] { "Email" }, item.EditorParams["quickSearchFields"]);
     }
 
     [Fact]
