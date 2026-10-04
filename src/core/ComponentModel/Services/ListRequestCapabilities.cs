@@ -40,6 +40,9 @@ public enum ListRequestCapabilities
     Localize = 1 << 13,
     /// <summary>The source honors ExcludeTotalCount.</summary>
     ExcludeTotalCount = 1 << 14,
+    /// <summary>Capabilities supported by the in-memory list request source adapter by default.</summary>
+    SourceAdapter = ContainsText | ContainsField | EqualityFilter | Criteria | Sort |
+        Skip | Take | DistinctFields | ExcludeTotalCount,
     /// <summary>
     /// Fixed set of baseline capabilities. This value will not be expanded with future
     /// capabilities added to <c>ListRequest</c> or <c>ListRequestHandler</c> implementations.

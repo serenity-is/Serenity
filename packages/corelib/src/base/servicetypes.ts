@@ -194,6 +194,9 @@ export enum ListRequestCapabilities {
     Localize = 1 << 13,
     /** The source honors ExcludeTotalCount. */
     ExcludeTotalCount = 1 << 14,
+    /** Capabilities supported by the in-memory list request source adapter by default. */
+    SourceAdapter = ContainsText | ContainsField | EqualityFilter | Criteria | Sort |
+        Skip | Take | DistinctFields | ExcludeTotalCount,
     /**
      * Stable baseline for current ListRequest capabilities. Do not add future capabilities
      * to this value; they require explicit opt-in.
