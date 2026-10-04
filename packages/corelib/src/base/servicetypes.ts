@@ -157,6 +157,53 @@ export interface ListRequest extends ServiceRequest {
 }
 
 /**
+ * Specifies the capabilities of a list request handler.
+ */
+export enum ListRequestCapabilities {
+    /** No ListRequest properties are supported. */
+    None = 0,
+    /** The source applies ContainsText. */
+    ContainsText = 1 << 0,
+    /** The source applies ContainsField together with ContainsText. */
+    ContainsField = 1 << 1,
+    /** The source applies EqualityFilter. */
+    EqualityFilter = 1 << 2,
+    /** The source applies Criteria. */
+    Criteria = 1 << 3,
+    /** The source applies sorting. */
+    Sort = 1 << 4,
+    /** The source applies Skip. */
+    Skip = 1 << 5,
+    /** The source applies Take. */
+    Take = 1 << 6,
+    /** The source applies IncludeDeleted. */
+    IncludeDeleted = 1 << 7,
+    /** The source applies ColumnSelection. */
+    ColumnSelection = 1 << 8,
+    /** The source applies IncludeColumns. */
+    IncludeColumns = 1 << 9,
+    /** The source applies ExcludeColumns. */
+    ExcludeColumns = 1 << 10,
+    /** Combined column-selection, include-column, and exclude-column options. */
+    ColumnOptions = ColumnSelection | IncludeColumns | ExcludeColumns,
+    /** The source applies DistinctFields. */
+    DistinctFields = 1 << 11,
+    /** The source applies ExportColumns. */
+    ExportColumns = 1 << 12,
+    /** The source applies Localize. */
+    Localize = 1 << 13,
+    /** The source honors ExcludeTotalCount. */
+    ExcludeTotalCount = 1 << 14,
+    /**
+     * Stable baseline for current ListRequest capabilities. Do not add future capabilities
+     * to this value; they require explicit opt-in.
+     */
+    Baseline = ContainsText | ContainsField | EqualityFilter | Criteria | Sort | Skip | Take |
+        IncludeDeleted | ColumnSelection | IncludeColumns | ExcludeColumns | DistinctFields |
+        ExportColumns | Localize | ExcludeTotalCount
+}
+
+/**
  * Response DTO for `List` handlers.
  * @typeParam TEntity - Row / entity type of the listed records.
  */

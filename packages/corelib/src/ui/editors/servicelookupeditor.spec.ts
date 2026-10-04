@@ -195,7 +195,8 @@ describe("ServiceLookupEditor", () => {
     });
 
     it("builds a complete list request regardless of capabilities", () => {
-        const editor = create({ capabilities: ["ContainsText", "Take"] });
+        const editor = create({ capabilities: base.ListRequestCapabilities.ContainsText |
+            base.ListRequestCapabilities.Take });
         const request = editor.getListRequest({
             searchTerm: "abc",
             skip: 10,
@@ -220,8 +221,12 @@ describe("ServiceLookupEditor", () => {
         ];
         serviceCallSpy.mockResolvedValue({ Entities: entities } as any);
         const editor = create({
-            capabilities: ["ColumnSelection", "IncludeColumns", "ExcludeColumns", "Take",
-                "Skip", "ExcludeTotalCount"]
+            capabilities: base.ListRequestCapabilities.ColumnSelection |
+                base.ListRequestCapabilities.IncludeColumns |
+                base.ListRequestCapabilities.ExcludeColumns |
+                base.ListRequestCapabilities.Take |
+                base.ListRequestCapabilities.Skip |
+                base.ListRequestCapabilities.ExcludeTotalCount
         });
 
         const result = await editor.asyncSearch({
@@ -254,7 +259,9 @@ describe("ServiceLookupEditor", () => {
             ]
         } as any);
         const editor = create({
-            capabilities: ["Skip", "Take", "Sort"],
+            capabilities: base.ListRequestCapabilities.Skip |
+                base.ListRequestCapabilities.Take |
+                base.ListRequestCapabilities.Sort,
             quickSearchFields: ["Email"]
         });
         (editor as any).itemText = (item: any) =>
@@ -286,7 +293,10 @@ describe("ServiceLookupEditor", () => {
             ]
         } as any);
         const editor = create({
-            capabilities: ["Sort", "Skip", "Take", "ContainsText"],
+            capabilities: base.ListRequestCapabilities.Sort |
+                base.ListRequestCapabilities.Skip |
+                base.ListRequestCapabilities.Take |
+                base.ListRequestCapabilities.ContainsText,
             criteria: [["State"], "=", "A"],
             equalityFilter: { Enabled: true }
         });

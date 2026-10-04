@@ -1,4 +1,4 @@
-﻿import { type ListRequest } from "../../base";
+﻿import { ListRequestCapabilities, type ListRequest } from "../../base";
 import { type ComboboxSearchQuery } from "./combobox";
 import { ComboboxEditor } from "./comboboxeditor";
 
@@ -22,7 +22,7 @@ export function createLocalListProcessor(this: void, {
     request, capabilities, query, quickSearchFields, itemText
 }: {
     request: ListRequest;
-    capabilities: string[] | null | undefined;
+    capabilities: ListRequestCapabilities | null | undefined;
     query: ComboboxSearchQuery;
     quickSearchFields?: string[];
     itemText: (item: any) => string;
@@ -30,24 +30,27 @@ export function createLocalListProcessor(this: void, {
     if (capabilities == null)
         return null;
 
-    const supports = (name: string) =>
-        capabilities.some(capability => capability.toLowerCase() === name.toLowerCase());
+    const supports = (capability: ListRequestCapabilities) =>
+        (capabilities & capability) === capability;
 
     const containsFieldUnsupported = request.ContainsText != null &&
-        request.ContainsField != null && !supports("ContainsField");
+        request.ContainsField != null && !supports(ListRequestCapabilities.ContainsField);
     const localContains = request.ContainsText != null &&
-        (!supports("ContainsText") || containsFieldUnsupported);
-    const localEquality = request.EqualityFilter != null && !supports("EqualityFilter");
-    const localCriteria = request.Criteria != null && !supports("Criteria");
-    const localSort = request.Sort != null && !supports("Sort");
+        (!supports(ListRequestCapabilities.ContainsText) || containsFieldUnsupported);
+    const localEquality = request.EqualityFilter != null &&
+        !supports(ListRequestCapabilities.EqualityFilter);
+    const localCriteria = request.Criteria != null &&
+        !supports(ListRequestCapabilities.Criteria);
+    const localSort = request.Sort != null && !supports(ListRequestCapabilities.Sort);
     const localFilter = localContains || localEquality || localCriteria;
-    const localPage = (request.Skip != null && !supports("Skip")) ||
-        (request.Take != null && !supports("Take")) || localFilter || localSort;
+    const localPage = (request.Skip != null && !supports(ListRequestCapabilities.Skip)) ||
+        (request.Take != null && !supports(ListRequestCapabilities.Take)) || localFilter || localSort;
 
     const serverRequest: ListRequest = { ...request };
 
     for (const key of Object.keys(serverRequest)) {
-        if (!supports(key))
+        const capability = ListRequestCapabilities[key as keyof typeof ListRequestCapabilities];
+        if (typeof capability !== "number" || !supports(capability))
             delete (serverRequest as any)[key];
     }
 

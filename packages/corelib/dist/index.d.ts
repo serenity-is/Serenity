@@ -1646,6 +1646,50 @@ export interface ListRequest extends ServiceRequest {
 	Localize?: string;
 }
 /**
+ * Specifies the capabilities of a list request handler.
+ */
+export declare enum ListRequestCapabilities {
+	/** No ListRequest properties are supported. */
+	None = 0,
+	/** The source applies ContainsText. */
+	ContainsText = 1,
+	/** The source applies ContainsField together with ContainsText. */
+	ContainsField = 2,
+	/** The source applies EqualityFilter. */
+	EqualityFilter = 4,
+	/** The source applies Criteria. */
+	Criteria = 8,
+	/** The source applies sorting. */
+	Sort = 16,
+	/** The source applies Skip. */
+	Skip = 32,
+	/** The source applies Take. */
+	Take = 64,
+	/** The source applies IncludeDeleted. */
+	IncludeDeleted = 128,
+	/** The source applies ColumnSelection. */
+	ColumnSelection = 256,
+	/** The source applies IncludeColumns. */
+	IncludeColumns = 512,
+	/** The source applies ExcludeColumns. */
+	ExcludeColumns = 1024,
+	/** Combined column-selection, include-column, and exclude-column options. */
+	ColumnOptions = 1792,
+	/** The source applies DistinctFields. */
+	DistinctFields = 2048,
+	/** The source applies ExportColumns. */
+	ExportColumns = 4096,
+	/** The source applies Localize. */
+	Localize = 8192,
+	/** The source honors ExcludeTotalCount. */
+	ExcludeTotalCount = 16384,
+	/**
+	 * Stable baseline for current ListRequest capabilities. Do not add future capabilities
+	 * to this value; they require explicit opt-in.
+	 */
+	Baseline = 32767
+}
+/**
  * Response DTO for `List` handlers.
  * @typeParam TEntity - Row / entity type of the listed records.
  */
@@ -13956,6 +14000,14 @@ export interface ServiceLookupEditorOptions extends ComboboxEditorOptions {
 	excludeColumns?: string[];
 	/** Whether to include deleted rows. */
 	includeDeleted?: boolean;
+	/** Supported ListRequest capabilities. When omitted, all standard properties are sent. */
+	capabilities?: ListRequestCapabilities;
+	/**
+	 * Additional fields searched by the client-side ContainsText fallback.
+	 * The editor's itemText output is always searched unless ContainsField is set.
+	 * This fallback cannot reproduce server-side QuickSearch behavior exactly.
+	 */
+	quickSearchFields?: string[];
 	/** Field used for contains-text search. */
 	containsField?: string;
 	/** Equality filter applied to the request. */

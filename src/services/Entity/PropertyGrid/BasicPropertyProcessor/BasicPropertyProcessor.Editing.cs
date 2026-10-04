@@ -168,8 +168,15 @@ public partial class BasicPropertyProcessor : PropertyProcessor
             }
         }
 
-        if ((!editorParams.TryGetValue("capabilities", out var configuredCapabilities) ||
-            configuredCapabilities is null))
+        ListRequestCapabilities? effectiveCapabilities = null;
+        if (editorParams.TryGetValue("capabilities", out var configuredCapabilities) &&
+            configuredCapabilities is ListRequestCapabilities configured)
+        {
+            effectiveCapabilities = configured;
+            editorParams["capabilities"] = configured;
+        }
+
+        if (effectiveCapabilities is null)
         {
             var endpointType = sle.EndpointType;
             if (endpointType is null &&
@@ -192,21 +199,22 @@ public partial class BasicPropertyProcessor : PropertyProcessor
 
                 if (actionCapabilities is not null)
                 {
-                    editorParams["capabilities"] = actionCapabilities.Exclude ?
-                        (requestParameter is null ?
-                            Array.Empty<string>() :
-                            GetListRequestCapabilities(requestParameter.ParameterType)
-                                .Where(capability => !actionCapabilities.Capabilities.Contains(
-                                    capability, StringComparer.OrdinalIgnoreCase))
-                                .ToArray()) :
-                        actionCapabilities.Capabilities;
+                    effectiveCapabilities = actionCapabilities.Capabilities &
+                        ~actionCapabilities.Exclude;
+                    editorParams["capabilities"] = effectiveCapabilities.Value;
                 }
                 else
                 {
                     if (requestParameter is null)
-                        editorParams["capabilities"] = Array.Empty<string>();
+                    {
+                        effectiveCapabilities = ListRequestCapabilities.None;
+                        editorParams["capabilities"] = ListRequestCapabilities.None;
+                    }
                     else if (requestParameter.ParameterType != typeof(ListRequest))
-                        editorParams["capabilities"] = InferListRequestCapabilities(requestParameter.ParameterType);
+                    {
+                        effectiveCapabilities = InferListRequestCapabilities(requestParameter.ParameterType);
+                        editorParams["capabilities"] = effectiveCapabilities.Value;
+                    }
                 }
             }
         }
@@ -238,10 +246,8 @@ public partial class BasicPropertyProcessor : PropertyProcessor
             return;
 
         bool isRowType = typeof(IRow).IsAssignableFrom(itemType);
-        bool containsTextUnsupported =
-            editorParams.TryGetValue("capabilities", out var capabilityValue) &&
-            capabilityValue is IEnumerable<string> capabilities &&
-            !capabilities.Contains("ContainsText", StringComparer.OrdinalIgnoreCase);
+        bool containsTextUnsupported = effectiveCapabilities is { } capabilities &&
+            (capabilities & ListRequestCapabilities.ContainsText) == 0;
 
         if (containsTextUnsupported &&
             !isRowType &&
@@ -373,12 +379,12 @@ public partial class BasicPropertyProcessor : PropertyProcessor
             ThrowIfLookupFieldsMissing(itemType, editorParams);
     }
 
-    private static string[] InferListRequestCapabilities(Type requestType)
+    private static ListRequestCapabilities InferListRequestCapabilities(Type requestType)
     {
         return GetListRequestCapabilities(requestType);
     }
 
-    private static string[] GetListRequestCapabilities(Type requestType)
+    private static ListRequestCapabilities GetListRequestCapabilities(Type requestType)
     {
         var requestProperties = requestType.GetProperties(BindingFlags.Instance | BindingFlags.Public)
             .Where(property => property.SetMethod is { IsPublic: true } &&
@@ -386,11 +392,14 @@ public partial class BasicPropertyProcessor : PropertyProcessor
             .Select(property => property.Name)
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
-        return typeof(ListRequest).GetProperties(BindingFlags.Instance | BindingFlags.Public)
-            .Where(property => property.DeclaringType == typeof(ListRequest) &&
-                requestProperties.Contains(property.Name))
-            .Select(property => property.Name)
-            .ToArray();
+        var capabilities = ListRequestCapabilities.None;
+        foreach (var property in typeof(ListRequest).GetProperties(BindingFlags.Instance | BindingFlags.Public))
+            if (property.DeclaringType == typeof(ListRequest) &&
+                requestProperties.Contains(property.Name) &&
+                Enum.TryParse(property.Name, out ListRequestCapabilities capability))
+                capabilities |= capability;
+
+        return capabilities;
     }
 
     private static Type? TryGetPrimitiveListItemType(Type returnType)

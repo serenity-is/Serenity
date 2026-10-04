@@ -177,7 +177,8 @@ public partial class BasicPropertyProcessorTests
     [Route("Services/BasicPropertyProcessor/QuickSearchLookup/[action]")]
     private class QuickSearchLookupEndpoint
     {
-        [ListRequestCapabilities("ContainsText", Exclude = true)]
+        [ListRequestCapabilities(Serenity.Services.ListRequestCapabilities.Baseline,
+            Exclude = Serenity.Services.ListRequestCapabilities.ContainsText)]
         public ListResponse<QuickSearchLookupOption> List(ListRequest request)
         {
             return new();
@@ -289,13 +290,16 @@ public partial class BasicPropertyProcessorTests
     [Route("Services/BasicPropertyProcessor/RestrictedServiceRow/[action]")]
     private class RestrictedServiceRowEndpoint
     {
-        [ListRequestCapabilities("Skip", "Take")]
+        [ListRequestCapabilities(Serenity.Services.ListRequestCapabilities.Skip |
+            Serenity.Services.ListRequestCapabilities.Take)]
         public ListResponse<ServiceRow> List(ListRequest request)
         {
             return new();
         }
 
-        [ListRequestCapabilities("ContainsText", "Criteria", Exclude = true)]
+        [ListRequestCapabilities(Serenity.Services.ListRequestCapabilities.Baseline,
+            Exclude = Serenity.Services.ListRequestCapabilities.ContainsText |
+                Serenity.Services.ListRequestCapabilities.Criteria)]
         public ListResponse<ServiceRow> ListWithoutTextAndCriteria(ListRequest request)
         {
             return new();
@@ -345,6 +349,16 @@ public partial class BasicPropertyProcessorTests
         }
     }
 
+    private class ExplicitCapabilitiesServiceLookupAttribute : ServiceLookupEditorBaseAttribute
+    {
+        public ExplicitCapabilitiesServiceLookupAttribute() : base(ServiceLookupEditorAttribute.Key)
+        {
+            ItemType = typeof(ServiceRow);
+            Capabilities = Serenity.Services.ListRequestCapabilities.Skip |
+                Serenity.Services.ListRequestCapabilities.Take;
+        }
+    }
+
     private class CustomRequestServiceLookupAttribute : ServiceLookupEditorBaseAttribute
     {
         public CustomRequestServiceLookupAttribute() : base(ServiceLookupEditorAttribute.Key)
@@ -379,6 +393,12 @@ public partial class BasicPropertyProcessorTests
     private class ExcludedServiceLookupForm
     {
         [ExcludedServiceLookup]
+        public int? Item { get; set; }
+    }
+
+    private class ExplicitCapabilitiesServiceLookupForm
+    {
+        [ExplicitCapabilitiesServiceLookup]
         public int? Item { get; set; }
     }
 
@@ -845,7 +865,7 @@ public partial class BasicPropertyProcessorTests
         Assert.Equal("ID", item.EditorParams["idField"]);
         Assert.Equal("Name", item.EditorParams["textField"]);
         Assert.Equal(new[] { "Name" }, item.EditorParams["includeColumns"]);
-        Assert.Equal(Array.Empty<string>(), item.EditorParams["capabilities"]);
+        Assert.Equal(Serenity.Services.ListRequestCapabilities.None, item.EditorParams["capabilities"]);
     }
 
     [Fact]
@@ -854,7 +874,18 @@ public partial class BasicPropertyProcessorTests
         var item = Process<RestrictedServiceLookupForm>(
             nameof(RestrictedServiceLookupForm.Item));
 
-        Assert.Equal(new[] { "Skip", "Take" }, item.EditorParams["capabilities"]);
+        Assert.Equal(Serenity.Services.ListRequestCapabilities.Skip |
+            Serenity.Services.ListRequestCapabilities.Take, item.EditorParams["capabilities"]);
+    }
+
+    [Fact]
+    public void ServiceLookupEditor_Uses_Explicit_Capability_Flags()
+    {
+        var item = Process<ExplicitCapabilitiesServiceLookupForm>(
+            nameof(ExplicitCapabilitiesServiceLookupForm.Item));
+
+        Assert.Equal(Serenity.Services.ListRequestCapabilities.Skip |
+            Serenity.Services.ListRequestCapabilities.Take, item.EditorParams["capabilities"]);
     }
 
     [Fact]
@@ -862,13 +893,19 @@ public partial class BasicPropertyProcessorTests
     {
         var item = Process<ExcludedServiceLookupForm>(
             nameof(ExcludedServiceLookupForm.Item));
-        var capabilities = Assert.IsType<string[]>(item.EditorParams["capabilities"]);
+        var capabilities = Assert.IsType<Serenity.Services.ListRequestCapabilities>(
+            item.EditorParams["capabilities"]);
 
-        Assert.DoesNotContain("ContainsText", capabilities);
-        Assert.DoesNotContain("Criteria", capabilities);
-        Assert.Contains("Skip", capabilities);
-        Assert.Contains("Take", capabilities);
-        Assert.Contains("IncludeColumns", capabilities);
+        Assert.Equal(Serenity.Services.ListRequestCapabilities.None,
+            capabilities & Serenity.Services.ListRequestCapabilities.ContainsText);
+        Assert.Equal(Serenity.Services.ListRequestCapabilities.None,
+            capabilities & Serenity.Services.ListRequestCapabilities.Criteria);
+        Assert.NotEqual(Serenity.Services.ListRequestCapabilities.None,
+            capabilities & Serenity.Services.ListRequestCapabilities.Skip);
+        Assert.NotEqual(Serenity.Services.ListRequestCapabilities.None,
+            capabilities & Serenity.Services.ListRequestCapabilities.Take);
+        Assert.NotEqual(Serenity.Services.ListRequestCapabilities.None,
+            capabilities & Serenity.Services.ListRequestCapabilities.IncludeColumns);
     }
 
     [Fact]
@@ -877,7 +914,8 @@ public partial class BasicPropertyProcessorTests
         var item = Process<CustomRequestServiceLookupForm>(
             nameof(CustomRequestServiceLookupForm.Item));
 
-        Assert.Equal(new[] { "Skip", "ContainsText" }, item.EditorParams["capabilities"]);
+        Assert.Equal(Serenity.Services.ListRequestCapabilities.Skip |
+            Serenity.Services.ListRequestCapabilities.ContainsText, item.EditorParams["capabilities"]);
     }
 
     [Fact]
@@ -907,7 +945,10 @@ public partial class BasicPropertyProcessorTests
     {
         var item = Process<QuickSearchLookupForm>(nameof(QuickSearchLookupForm.Item));
 
-        Assert.DoesNotContain("ContainsText", Assert.IsType<string[]>(item.EditorParams["capabilities"]));
+        var capabilities = Assert.IsType<Serenity.Services.ListRequestCapabilities>(
+            item.EditorParams["capabilities"]);
+        Assert.Equal(Serenity.Services.ListRequestCapabilities.None,
+            capabilities & Serenity.Services.ListRequestCapabilities.ContainsText);
         Assert.Equal(new[] { "Email" }, item.EditorParams["quickSearchFields"]);
     }
 

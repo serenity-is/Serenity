@@ -240,14 +240,12 @@ public abstract class ServiceLookupEditorBaseAttribute(string editorType) : Cust
     public string? ActionName { get; set; }
 
     /// <summary>
-    /// Gets or sets the supported ListRequest property names. When null, capabilities
-    /// are inferred from the endpoint when possible; otherwise, all request properties
-    /// are sent. An empty array explicitly indicates that no ListRequest properties
-    /// should be sent.
+    /// Gets or sets the supported ListRequest capabilities. When not explicitly set,
+    /// capabilities are inferred from the endpoint when possible.
     /// </summary>
-    public string[]? Capabilities
+    public ListRequestCapabilities Capabilities
     {
-        get { return GetOption<string[]>("capabilities"); }
+        get { return GetOption<ListRequestCapabilities>("capabilities"); }
         set { SetOption("capabilities", value); }
     }
 }

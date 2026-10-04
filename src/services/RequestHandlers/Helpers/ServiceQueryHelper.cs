@@ -171,7 +171,7 @@ public static class ServiceQueryHelper
         }
 
         if (row is IDeleteLogRow deleteLogRow)
-            return deleteLogRow.DeleteUserIdField.IsNull();
+            return deleteLogRow.DeleteDateField.IsNull();
 
         return null;
     }

@@ -1,4 +1,4 @@
-﻿import { ColumnSelection, Criteria, ListRequest, ListResponse, ServiceOptions, nsSerenity, resolveServiceUrl, serviceCall } from "../../base";
+﻿import { ColumnSelection, Criteria, ListRequest, ListRequestCapabilities, ListResponse, ServiceOptions, nsSerenity, resolveServiceUrl, serviceCall } from "../../base";
 import { ComboboxSearchQuery, ComboboxSearchResult } from "./combobox";
 import { ComboboxEditor, ComboboxEditorOptions } from "./comboboxeditor";
 import { EditorProps } from "./editorwidget";
@@ -28,8 +28,8 @@ export interface ServiceLookupEditorOptions extends ComboboxEditorOptions {
     excludeColumns?: string[];
     /** Whether to include deleted rows. */
     includeDeleted?: boolean;
-    /** Supported ListRequest property names. When omitted, all standard properties are sent. */
-    capabilities?: string[];
+    /** Supported ListRequest capabilities. When omitted, all standard properties are sent. */
+    capabilities?: ListRequestCapabilities;
     /**
      * Additional fields searched by the client-side ContainsText fallback.
      * The editor's itemText output is always searched unless ContainsField is set.
