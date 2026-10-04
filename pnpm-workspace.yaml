@@ -18,7 +18,7 @@ catalogs:
     "@preact/signals-core": "1.14.4"
     "@vitest/coverage-v8": "5.0.1"
     "chart.js": "4.5.1"
-    "dompurify": "3.4.14"
+    "dompurify": "3.4.16"
     "dts-bundle-generator": "9.5.1"
     "esbuild": "0.28.2"
     "es-module-lexer": "3.0.2"
@@ -34,7 +34,7 @@ catalogs:
 
 overrides:
   dts-bundle-generator>typescript: 6.0.3
-  dompurify@<3.4.14: ^3.4.14
+  dompurify@<3.4.13: ^3.4.16
   undici@<7.29.0: ^7.29.0
   nanoid@<3.3.18: ^3.3.18
   fflate@>=0.8.0 <0.8.3: ^0.8.3
