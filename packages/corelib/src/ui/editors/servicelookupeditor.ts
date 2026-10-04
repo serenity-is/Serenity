@@ -2,7 +2,7 @@
 import { ComboboxSearchQuery, ComboboxSearchResult } from "./combobox";
 import { ComboboxEditor, ComboboxEditorOptions } from "./comboboxeditor";
 import { EditorProps } from "./editorwidget";
-import { createLocalListProcessor } from "./servicelookupeditor-localprocess";
+import { createLocalListProcessor, normalizePrimitiveItems } from "./servicelookupeditor-localprocess";
 
 /**
  * Options for the {@link ServiceLookupEditor}.
@@ -281,9 +281,10 @@ export abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptio
 
         const response = await serviceCall(opt);
 
-        const itemsPlus1 = Array.isArray(response) ? response : response?.Entities;
-        if (!Array.isArray(itemsPlus1))
+        const rawItems = Array.isArray(response) ? response : response?.Entities;
+        if (!Array.isArray(rawItems))
             throw new Error("ServiceLookupEditor service response must be an array or contain an Entities array.");
+        const itemsPlus1 = normalizePrimitiveItems(rawItems);
 
         let items = itemsPlus1;
         const localResult = localProcessor?.process(items);

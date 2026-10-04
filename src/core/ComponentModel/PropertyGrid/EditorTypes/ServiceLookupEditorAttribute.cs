@@ -41,7 +41,7 @@ public class ServiceLookupEditorAttribute : ServiceLookupEditorBaseAttribute
     /// with an item/row type. Service, ID, and text fields are inferred when possible.
     /// For non-row types, inference uses <c>[IdProperty]</c> and <c>[NameProperty]</c>,
     /// then conventional property names
-    /// (Id/Key/Code and Name/DisplayName/Text). A type with a single public string
+    /// (Id/Key/Code/Value and Name/DisplayName/Text). A type with a single public string
     /// property uses that property for both ID and text. Otherwise, set
     /// <see cref="ServiceLookupEditorBaseAttribute.IdField"/> and
     /// <see cref="ServiceLookupEditorBaseAttribute.TextField"/> explicitly or annotate

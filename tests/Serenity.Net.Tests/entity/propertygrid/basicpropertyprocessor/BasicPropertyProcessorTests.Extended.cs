@@ -199,6 +199,34 @@ public partial class BasicPropertyProcessorTests
         public string? Item { get; set; }
     }
 
+    [Route("Services/BasicPropertyProcessor/PrimitiveLookup/[action]")]
+    private class PrimitiveLookupEndpoint
+    {
+        public Task<List<string>> GetNames()
+        {
+            return Task.FromResult(new List<string>());
+        }
+
+        public ListResponse<int> GetNumbers()
+        {
+            return new();
+        }
+    }
+
+    private class PrimitiveListLookupForm
+    {
+        [ServiceLookupEditor(typeof(string), EndpointType = typeof(PrimitiveLookupEndpoint),
+            ActionName = "GetNames")]
+        public string? Item { get; set; }
+    }
+
+    private class PrimitiveListResponseLookupForm
+    {
+        [ServiceLookupEditor(typeof(int), EndpointType = typeof(PrimitiveLookupEndpoint),
+            ActionName = "GetNumbers")]
+        public int? Item { get; set; }
+    }
+
     [Route("Services/ProDataSources/ConnectorTypes/[action]")]
     private class ConnectorTypeEndpoint
     {
@@ -881,6 +909,19 @@ public partial class BasicPropertyProcessorTests
 
         Assert.DoesNotContain("ContainsText", Assert.IsType<string[]>(item.EditorParams["capabilities"]));
         Assert.Equal(new[] { "Email" }, item.EditorParams["quickSearchFields"]);
+    }
+
+    [Fact]
+    public void ServiceLookupEditor_Infer_Value_Fields_For_Primitive_List_Responses()
+    {
+        var listItem = Process<PrimitiveListLookupForm>(nameof(PrimitiveListLookupForm.Item));
+        var responseItem = Process<PrimitiveListResponseLookupForm>(
+            nameof(PrimitiveListResponseLookupForm.Item));
+
+        Assert.Equal("Value", listItem.EditorParams["idField"]);
+        Assert.Equal("Value", listItem.EditorParams["textField"]);
+        Assert.Equal("Value", responseItem.EditorParams["idField"]);
+        Assert.Equal("Value", responseItem.EditorParams["textField"]);
     }
 
     [Fact]

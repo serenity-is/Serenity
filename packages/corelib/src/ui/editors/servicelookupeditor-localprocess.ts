@@ -10,6 +10,14 @@ export type LocalListProcessor = {
     }
 };
 
+export function normalizePrimitiveItems(items: any[]): any[] {
+    if (items.length === 0 || items.some(item =>
+        item !== null && typeof item === "object"))
+        return items;
+
+    return items.map(Value => ({ Value }));
+}
+
 export function createLocalListProcessor(this: void, {
     request, capabilities, query, quickSearchFields, itemText
 }: {

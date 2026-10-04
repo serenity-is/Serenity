@@ -323,6 +323,26 @@ describe("ServiceLookupEditor", () => {
         editor.destroy();
     });
 
+    it("maps primitive list items to Value objects", async () => {
+        serviceCallSpy.mockResolvedValue(["Alpha", "Beta"] as any);
+        const editor = create({ idField: "Value", textField: "Value" });
+
+        const result = await editor.asyncSearch({ take: 10, checkMore: true } as any);
+
+        expect(result.items).toEqual([{ Value: "Alpha" }, { Value: "Beta" }]);
+        editor.destroy();
+    });
+
+    it("maps primitive ListResponse entities to Value objects", async () => {
+        serviceCallSpy.mockResolvedValue({ Entities: [10, 20] } as any);
+        const editor = create({ idField: "Value", textField: "Value" });
+
+        const result = await editor.asyncSearch({ take: 10, checkMore: true } as any);
+
+        expect(result.items).toEqual([{ Value: 10 }, { Value: 20 }]);
+        editor.destroy();
+    });
+
     it("reports an async source", () => {
         const editor = create({});
         expect(editor.hasAsyncSource()).toBe(true);

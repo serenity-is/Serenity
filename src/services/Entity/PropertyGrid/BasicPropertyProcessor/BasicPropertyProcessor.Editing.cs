@@ -214,6 +214,26 @@ public partial class BasicPropertyProcessor : PropertyProcessor
         bool idFieldMissing = !editorParams.ContainsKey("idField");
         bool textFieldMissing = !editorParams.ContainsKey("textField");
 
+        var resultEndpointType = sle.EndpointType;
+        if (resultEndpointType is null &&
+            itemType is not null &&
+            typeof(IRow).IsAssignableFrom(itemType))
+        {
+            resultEndpointType = ServiceLookupEditorAttribute.TryGetEndpointForRow(
+                itemType, sle.ActionName, out _);
+        }
+
+        var resultAction = resultEndpointType is null ? null :
+            ServiceLookupEditorAttribute.TryGetEndpointActionMethod(resultEndpointType, sle.ActionName);
+        if (resultAction is not null &&
+            TryGetPrimitiveListItemType(resultAction.ReturnType) is not null)
+        {
+            if (idFieldMissing)
+                editorParams["idField"] = "Value";
+            if (textFieldMissing)
+                editorParams["textField"] = "Value";
+        }
+
         if (itemType == null)
             return;
 
@@ -258,7 +278,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
             {
                 var idProperty = FindPropertyByAttributeOrName(properties,
                     property => property.GetCustomAttribute<IdPropertyAttribute>() != null,
-                    "Id", "Key", "Code");
+                    "Id", "Key", "Code", "Value");
                 if (idProperty != null)
                     editorParams["idField"] = idProperty.Name;
             }
@@ -371,6 +391,29 @@ public partial class BasicPropertyProcessor : PropertyProcessor
                 requestProperties.Contains(property.Name))
             .Select(property => property.Name)
             .ToArray();
+    }
+
+    private static Type? TryGetPrimitiveListItemType(Type returnType)
+    {
+        if (returnType.IsGenericType &&
+            (returnType.GetGenericTypeDefinition() == typeof(Task<>) ||
+             returnType.GetGenericTypeDefinition() == typeof(ValueTask<>)))
+            returnType = returnType.GetGenericArguments()[0];
+
+        if (!returnType.IsGenericType)
+            return null;
+
+        var genericType = returnType.GetGenericTypeDefinition();
+        if (genericType != typeof(List<>) &&
+            genericType != typeof(ListResponse<>))
+            return null;
+
+        var itemType = returnType.GetGenericArguments()[0];
+        return itemType.IsPrimitive ||
+            itemType == typeof(string) ||
+            itemType == typeof(decimal) ||
+            itemType == typeof(Guid) ||
+            itemType.IsEnum ? itemType : null;
     }
 
     private static void ThrowIfLookupFieldsMissing(Type? itemType,
