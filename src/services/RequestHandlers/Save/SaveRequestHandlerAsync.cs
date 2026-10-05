@@ -143,10 +143,10 @@ public class SaveRequestHandlerAsync<TRow, TSaveRequest, TSaveResponse> :
     {
         if (IsUpdate)
         {
+            var idField = Row.GetIdField();
+
             if (Row.IsAnyFieldAssigned)
             {
-                var idField = Row.GetIdField();
-
                 if (idField.IndexCompare(Old!, Row) != 0)
                 {
                     var update = new SqlUpdate(Row.Table);
@@ -161,9 +161,10 @@ public class SaveRequestHandlerAsync<TRow, TSaveRequest, TSaveResponse> :
                         cancellationToken).ConfigureAwait(false);
                 }
 
-                Response.EntityId = idField.AsObject(Row);
                 InvalidateCacheOnCommit();
             }
+
+            Response.EntityId = idField.AsObject(Row) ?? idField.AsObject(Old!);
         }
         else if (IsCreate)
         {

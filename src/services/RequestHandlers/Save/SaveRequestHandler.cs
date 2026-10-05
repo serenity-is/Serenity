@@ -90,10 +90,10 @@ public class SaveRequestHandler<TRow, TSaveRequest, TSaveResponse> :
     {
         if (IsUpdate)
         {
+            var idField = Row.GetIdField();
+
             if (Row.IsAnyFieldAssigned)
             {
-                var idField = Row.GetIdField();
-
                 if (idField.IndexCompare(Old!, Row) != 0)
                 {
                     var update = new SqlUpdate(Row.Table);
@@ -106,9 +106,10 @@ public class SaveRequestHandler<TRow, TSaveRequest, TSaveResponse> :
                     InvokeSaveAction(() => Connection.UpdateById(Row));
                 }
 
-                Response.EntityId = idField.AsObject(Row);
                 InvalidateCacheOnCommit();
             }
+
+            Response.EntityId = idField.AsObject(Row) ?? idField.AsObject(Old!);
         }
         else if (IsCreate)
         {

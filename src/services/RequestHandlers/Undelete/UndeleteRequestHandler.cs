@@ -120,6 +120,11 @@ public class UndeleteRequestHandler<TRow, TUndeleteRequest, TUndeleteResponse> :
     /// <summary>
     /// Executes the actual SQL undelete/update operation
     /// </summary>
+    /// <remarks>
+    /// Only rows that are currently marked as deleted are restored. For <see cref="IIsActiveDeletedRow"/> the
+    /// active value (<c>1</c>) is restored, because the state the row had before deletion is not stored
+    /// anywhere; a row that was inactive (<c>0</c>) before being deleted ends up active.
+    /// </remarks>
     protected virtual void ExecuteUndelete()
     {
         var idField = Row.GetIdField();
