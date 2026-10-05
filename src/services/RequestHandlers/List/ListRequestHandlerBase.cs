@@ -467,13 +467,36 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(
     }
 
     /// <summary>
-    /// Applies include deleted filter to the query if Request.IncludeDeleted is true
+    /// Applies the not deleted filter to the query unless <see cref="ListRequest.IncludeDeleted"/>
+    /// is true and the current user has the undelete permission for the row. Rows that do not
+    /// use soft delete are always included.
     /// </summary>
     /// <param name="query"></param>
     protected virtual void ApplyIncludeDeletedFilter(SqlQuery query)
     {
-        if (!Request.IncludeDeleted)
-            query.Where(ServiceQueryHelper.GetNotDeletedCriteria(Row));
+        if (!ServiceQueryHelper.UseSoftDelete(Row))
+            return;
+
+        if (Request.IncludeDeleted && Permissions.HasPermission(GetUndeletePermission()))
+            return;
+
+        query.Where(ServiceQueryHelper.GetNotDeletedCriteria(Row));
+    }
+
+    /// <summary>
+    /// Gets the permission required to undelete records of the current row type,
+    /// e.g. <see cref="UndeletePermissionAttribute"/>, falling back to
+    /// <see cref="DeletePermissionAttribute"/>, <see cref="ModifyPermissionAttribute"/>
+    /// and <see cref="ReadPermissionAttribute"/>.
+    /// </summary>
+    protected virtual string GetUndeletePermission()
+    {
+        var attr = typeof(TRow).GetCustomAttribute<UndeletePermissionAttribute>(true) ??
+            typeof(TRow).GetCustomAttribute<DeletePermissionAttribute>(true) ??
+            (PermissionAttributeBase?)typeof(TRow).GetCustomAttribute<ModifyPermissionAttribute>(true) ??
+            typeof(TRow).GetCustomAttribute<ReadPermissionAttribute>(true);
+
+        return attr?.Permission ?? SpecialPermissionKeys.Deny;
     }
 
     /// <summary>

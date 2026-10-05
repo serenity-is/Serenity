@@ -1,4 +1,4 @@
-﻿
+
 import { bindThis } from "@serenity-is/domwise";
 import { Authorization, EntityGridTexts, Fluent, faIcon, getActiveRequests, getInstanceType, getTypeFullName, isPromiseLike, localText, nsSerenity, resolveUrl, stringFormat } from "../../base";
 import { HandleRouteEvent, Router, safeCast } from "../../compat";
@@ -432,6 +432,32 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
     protected hasDeletePermission() {
         const deletePermission = this.getDeletePermission();
         return deletePermission == null || Authorization.hasPermission(deletePermission);
+    }
+
+    /**
+     * Returns the permission key required to undelete a row.
+     * @returns Undelete permission or undefined.
+     */
+    protected getUndeletePermission(): string {
+        return this.getRowDefinition()?.undeletePermission;
+    }
+
+    /**
+     * Checks whether the current user may undelete rows.
+     * @returns True when undeletion is allowed.
+     */
+    protected hasUndeletePermission() {
+        const undeletePermission = this.getUndeletePermission();
+        return undeletePermission == null || Authorization.hasPermission(undeletePermission);
+    }
+
+    /**
+     * Creates the include-deleted toggle button when the row type supports it
+     * and the current user is allowed to undelete rows.
+     */
+    protected override createIncludeDeletedButton(): void {
+        if (this.hasUndeletePermission())
+            super.createIncludeDeletedButton();
     }
 
     /**

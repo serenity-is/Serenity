@@ -6,8 +6,16 @@ public class AuthorizeAttributesTests
     [InsertPermission("Test:Insert")]
     [UpdatePermission("Test:Update")]
     [DeletePermission("Test:Delete")]
+    [UndeletePermission("Test:Undelete")]
     [ServiceLookupPermission("Test:Lookup")]
     private class RowWithPermissions
+    {
+    }
+
+    [ReadPermission("Test:Read")]
+    [ModifyPermission("Test:Modify")]
+    [DeletePermission("Test:Delete")]
+    private class RowWithDeleteNoUndelete
     {
     }
 
@@ -68,6 +76,31 @@ public class AuthorizeAttributesTests
     public void AuthorizeDelete_Falls_Back_To_ReadPermission()
     {
         Assert.Equal("Test:Read", new AuthorizeDeleteAttribute(typeof(RowWithReadOnly)).Permission);
+    }
+
+    [Fact]
+    public void AuthorizeUndelete_Uses_UndeletePermission()
+    {
+        Assert.Equal("Test:Undelete", new AuthorizeUndeleteAttribute(typeof(RowWithPermissions)).Permission);
+    }
+
+    [Fact]
+    public void AuthorizeUndelete_Falls_Back_To_DeletePermission()
+    {
+        Assert.Equal("Test:Delete", new AuthorizeUndeleteAttribute(typeof(RowWithDeleteNoUndelete)).Permission);
+    }
+
+    [Fact]
+    public void AuthorizeUndelete_Falls_Back_To_ModifyPermission()
+    {
+        Assert.Equal("Test:Modify", new AuthorizeUndeleteAttribute(typeof(RowWithModifyAndRead)).Permission);
+        Assert.Equal("Test:Modify", new AuthorizeUndeleteAttribute(typeof(RowWithModifyOnly)).Permission);
+    }
+
+    [Fact]
+    public void AuthorizeUndelete_Falls_Back_To_ReadPermission()
+    {
+        Assert.Equal("Test:Read", new AuthorizeUndeleteAttribute(typeof(RowWithReadOnly)).Permission);
     }
 
     [Fact]

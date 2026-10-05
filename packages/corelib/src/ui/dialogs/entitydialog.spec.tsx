@@ -158,6 +158,14 @@ function getDeletePermission(dialog: EntityDialog<any, any>): string {
     return (dialog as any).getDeletePermission();
 }
 
+function getUndeletePermission(dialog: EntityDialog<any, any>): string {
+    return (dialog as any).getUndeletePermission();
+}
+
+function hasUndeletePermission(dialog: EntityDialog<any, any>): boolean {
+    return (dialog as any).hasUndeletePermission();
+}
+
 function getLoadByIdRequest(dialog: EntityDialog<any, any>, id: any): any {
     return (dialog as any).getLoadByIdRequest(id);
 }
@@ -686,6 +694,53 @@ describe("EntityDialog.permissions", () => {
         vi.spyOn(Authorization, "hasPermission").mockReturnValue(true);
         const dialog = new RowDialog({});
         expect(hasDeletePermission(dialog)).toBe(true);
+        expect(Authorization.hasPermission).toHaveBeenCalledWith("Admin");
+        dialog.destroy();
+        vi.restoreAllMocks();
+    });
+
+    it("getUndeletePermission returns null by default", () => {
+        class DefaultDialog extends EntityDialog<any, any> {
+            getPropertyItemsData() { return mockPropertyItemsData(); }
+        }
+        const dialog = new DefaultDialog({});
+        expect(getUndeletePermission(dialog)).toBeUndefined();
+        dialog.destroy();
+    });
+
+    it("undelete permission from row definition", () => {
+        class TestRow {
+            static readonly undeletePermission = "Undelete";
+        }
+        class RowDialog extends EntityDialog<any, any> {
+            getPropertyItemsData() { return mockPropertyItemsData(); }
+            getRowDefinition() { return TestRow; }
+        }
+        const dialog = new RowDialog({});
+        expect(getUndeletePermission(dialog)).toBe("Undelete");
+        dialog.destroy();
+    });
+
+    it("hasUndeletePermission returns true when permission is null", () => {
+        class DefaultDialog extends EntityDialog<any, any> {
+            getPropertyItemsData() { return mockPropertyItemsData(); }
+        }
+        const dialog = new DefaultDialog({});
+        expect(hasUndeletePermission(dialog)).toBe(true);
+        dialog.destroy();
+    });
+
+    it("hasUndeletePermission checks Authorization", () => {
+        class TestRow {
+            static readonly undeletePermission = "Admin";
+        }
+        class RowDialog extends EntityDialog<any, any> {
+            getPropertyItemsData() { return mockPropertyItemsData(); }
+            getRowDefinition() { return TestRow; }
+        }
+        vi.spyOn(Authorization, "hasPermission").mockReturnValue(true);
+        const dialog = new RowDialog({});
+        expect(hasUndeletePermission(dialog)).toBe(true);
         expect(Authorization.hasPermission).toHaveBeenCalledWith("Admin");
         dialog.destroy();
         vi.restoreAllMocks();

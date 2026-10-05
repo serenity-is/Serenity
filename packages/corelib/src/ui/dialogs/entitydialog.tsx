@@ -915,7 +915,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
                 onClick: () => this.isDeleted() && confirmDialog(EntityDialogTexts.UndeleteConfirmation, () =>
                     this.undelete(() => this.loadById(this.entityId))),
                 visible: () => this.isEditMode() && this.isDeleted() && !this.isViewMode(),
-                disabled: () => !this.hasDeletePermission() || this.readOnly,
+                disabled: () => !this.hasUndeletePermission() || this.readOnly,
                 ref: el => this.undeleteButton = Fluent(el)
             }),
             editToolButton({
@@ -1107,6 +1107,23 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
     protected hasDeletePermission() {
         const deletePermission = this.getDeletePermission();
         return deletePermission == null || Authorization.hasPermission(deletePermission);
+    }
+
+    /**
+     * Returns the permission key required to undelete a row.
+     * @returns Undelete permission or undefined.
+     */
+    protected getUndeletePermission(): string {
+        return this.getRowDefinition()?.undeletePermission;
+    }
+
+    /**
+     * Checks whether the current user may undelete rows.
+     * @returns True when undeletion is allowed.
+     */
+    protected hasUndeletePermission() {
+        const undeletePermission = this.getUndeletePermission();
+        return undeletePermission == null || Authorization.hasPermission(undeletePermission);
     }
 
     /**

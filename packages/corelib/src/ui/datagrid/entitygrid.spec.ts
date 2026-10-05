@@ -392,6 +392,71 @@ describe("EntityGrid permissions", () => {
         spy.mockRestore();
         grid.destroy();
     });
+
+    it("getUndeletePermission returns value from row definition", () => {
+        class TestRow {
+            static readonly undeletePermission = "UD";
+        }
+        class G extends EntityGrid<any, any> {
+            getRowDefinition() { return TestRow; }
+        }
+        const grid = new G({});
+        expect(grid["getUndeletePermission"]()).toBe("UD");
+        grid.destroy();
+    });
+
+    it("hasUndeletePermission is granted when no permission defined", () => {
+        class G extends EntityGrid<any, any> { }
+        const grid = new G({});
+        expect(grid["hasUndeletePermission"]()).toBe(true);
+        grid.destroy();
+    });
+
+    it("hasUndeletePermission checks Authorization", () => {
+        class TestRow {
+            static readonly undeletePermission = "UD";
+        }
+        class G extends EntityGrid<any, any> {
+            getRowDefinition() { return TestRow; }
+        }
+        const grid = new G({});
+        const spy = vi.spyOn(Authorization, "hasPermission").mockReturnValue(false);
+        expect(grid["hasUndeletePermission"]()).toBe(false);
+        expect(Authorization.hasPermission).toHaveBeenCalledWith("UD");
+        spy.mockRestore();
+        grid.destroy();
+    });
+});
+
+describe("EntityGrid include deleted button", () => {
+    it("calls super to add the toggle when user can undelete", () => {
+        class G extends EntityGrid<any, any> { }
+        const grid = new G({});
+        const superSpy = vi.spyOn(DataGrid.prototype, "createIncludeDeletedButton" as any)
+            .mockImplementation(() => { });
+        grid["createIncludeDeletedButton"]();
+        expect(superSpy).toHaveBeenCalled();
+        superSpy.mockRestore();
+        grid.destroy();
+    });
+
+    it("does not add the toggle when user cannot undelete", () => {
+        class TestRow {
+            static readonly undeletePermission = "UD";
+        }
+        class G extends EntityGrid<any, any> {
+            getRowDefinition() { return TestRow; }
+        }
+        const grid = new G({});
+        const authSpy = vi.spyOn(Authorization, "hasPermission").mockReturnValue(false);
+        const superSpy = vi.spyOn(DataGrid.prototype, "createIncludeDeletedButton" as any)
+            .mockImplementation(() => { });
+        grid["createIncludeDeletedButton"]();
+        expect(superSpy).not.toHaveBeenCalled();
+        superSpy.mockRestore();
+        authSpy.mockRestore();
+        grid.destroy();
+    });
 });
 
 describe("EntityGrid buttons", () => {

@@ -78,7 +78,8 @@ public abstract class UndeleteRequestHandlerBase<TRow, TUndeleteRequest, TUndele
     /// </summary>
     protected virtual void ValidatePermissions()
     {
-        var attr = typeof(TRow).GetCustomAttribute<DeletePermissionAttribute>(true) ??
+        var attr = typeof(TRow).GetCustomAttribute<UndeletePermissionAttribute>(true) ??
+            typeof(TRow).GetCustomAttribute<DeletePermissionAttribute>(true) ??
             (PermissionAttributeBase?)typeof(TRow).GetCustomAttribute<ModifyPermissionAttribute>(true) ??
             typeof(TRow).GetCustomAttribute<ReadPermissionAttribute>(true);
 

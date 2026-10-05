@@ -13,7 +13,6 @@ public partial class ClientTypesGenerator : CodeGeneratorBase
             "AutoComplete",
             "CascadeField",
             "CascadeValue",
-            "Capabilities",
             "Delimited",
             "DialogType",
             "FilterField",
@@ -37,11 +36,15 @@ public partial class ClientTypesGenerator : CodeGeneratorBase
         serviceLookupEditorBaseOptions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
             "AutoComplete",
+            "Capabilities",
             "CascadeField",
             "CascadeValue",
             "ColumnSelection",
+            "ContainsField",
+            "Criteria",
             "Delimited",
             "DialogType",
+            "EqualityFilter",
             "ExcludeColumns",
             "FilterField",
             "FilterValue",
@@ -56,6 +59,7 @@ public partial class ClientTypesGenerator : CodeGeneratorBase
             "Multiple",
             "OpenDialogAsPanel",
             "PageSize",
+            "QuickSearchFields",
             "Service",
             "Sort"
         };

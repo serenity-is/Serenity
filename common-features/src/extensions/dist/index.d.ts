@@ -131,10 +131,10 @@ export declare abstract class UserPreferenceRow {
 	static readonly idProperty = "UserPreferenceId";
 	static readonly nameProperty = "Name";
 	static readonly localTextPrefix = "Common.UserPreference";
-	static readonly deletePermission = "";
-	static readonly insertPermission = "";
-	static readonly readPermission = "";
-	static readonly updatePermission = "";
+	static readonly deletePermission = "?";
+	static readonly insertPermission = "?";
+	static readonly readPermission = "?";
+	static readonly updatePermission = "?";
 	static readonly Fields: Readonly<Record<keyof UserPreferenceRow, string>>;
 }
 export interface UserPreferenceUpdateRequest extends ServiceRequest {

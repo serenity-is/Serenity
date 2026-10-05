@@ -422,6 +422,7 @@ public partial class ServerTypingsGenerator
         public string? DeletePermission { get; set; }
         public string? InsertPermission { get; set; }
         public string? UpdatePermission { get; set; }
+        public string? UndeletePermission { get; set; }
     }
 
     protected RowMetadata ExtractRowMetadata(TypeDefinition rowType)
@@ -482,6 +483,14 @@ public partial class ServerTypingsGenerator
         metadata.InsertPermission = DeterminePermission(rowType, "Insert", "Modify", "Read");
         metadata.ReadPermission = DeterminePermission(rowType, "Read") ?? "";
         metadata.UpdatePermission = DeterminePermission(rowType, "Update", "Modify", "Read");
+
+        if (metadata.IsActiveProperty != null ||
+            metadata.IsDeletedProperty != null)
+        {
+            metadata.UndeletePermission = DeterminePermission(rowType,
+                "Undelete", "Delete", "Modify", "Read");
+        }
+
         metadata.LocalTextPrefix = DetermineLocalTextPrefix(rowType);
 
         AddRowTexts(rowType, "Db." + (string.IsNullOrEmpty(metadata.LocalTextPrefix) ? "" :
@@ -533,6 +542,10 @@ public partial class ServerTypingsGenerator
             cw.IndentedLine($"{export}deletePermission = {sq(meta.DeletePermission)};");
             cw.IndentedLine($"{export}insertPermission = {sq(meta.InsertPermission)};");
             cw.IndentedLine($"{export}readPermission = {sq(meta.ReadPermission)};");
+
+            if (meta.UndeletePermission != null)
+                cw.IndentedLine($"{export}undeletePermission = {sq(meta.UndeletePermission)};");
+
             cw.IndentedLine($"{export}updatePermission = {sq(meta.UpdatePermission)};");
             sb.AppendLine();
 

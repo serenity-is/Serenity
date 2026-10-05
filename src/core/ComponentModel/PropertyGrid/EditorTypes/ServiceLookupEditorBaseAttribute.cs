@@ -85,7 +85,8 @@ public abstract class ServiceLookupEditorBaseAttribute(string editorType) : Cust
     }
 
     /// <summary>
-    /// Include deleted, defaults to false.
+    /// Include deleted, defaults to false. Only effective when the current
+    /// user has the undelete permission for the target entity.
     /// </summary>
     public bool IncludeDeleted
     {
@@ -103,6 +104,13 @@ public abstract class ServiceLookupEditorBaseAttribute(string editorType) : Cust
     {
         get { return GetOption<bool>("autoComplete"); }
         set { SetOption("autoComplete", value); }
+    }
+
+    /// <summary>Gets or sets the <c>containsField</c> option.</summary>
+    public string? ContainsField
+    {
+        get { return GetOption<string?>("containsField"); }
+        set { SetOption("containsField", value); }
     }
 
     /// <summary>

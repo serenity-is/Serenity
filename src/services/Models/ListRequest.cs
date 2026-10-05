@@ -53,6 +53,9 @@ public class ListRequest : ServiceRequest, IIncludeExcludeColumns
     /// Include the deleted records. Default is false.
     /// This is only supported by services and entities
     /// that implement soft delete, e.g. IsActive etc.
+    /// The value is ignored unless the current user has the
+    /// undelete permission (<see cref="UndeletePermissionAttribute"/>,
+    /// falling back to delete, modify and read permissions).
     /// </summary>
     [JsonConverter(typeof(JsonConverters.NullAsDefaultJsonConverter))]
     public bool IncludeDeleted { get; set; }

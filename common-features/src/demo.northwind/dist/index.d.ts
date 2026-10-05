@@ -666,10 +666,10 @@ export interface ProductLogRow {
 export declare abstract class ProductLogRow {
 	static readonly idProperty = "ProductLogID";
 	static readonly localTextPrefix = "Northwind.ProductLog";
-	static readonly deletePermission: any;
-	static readonly insertPermission: any;
-	static readonly readPermission = "";
-	static readonly updatePermission: any;
+	static readonly deletePermission = "Northwind:General";
+	static readonly insertPermission = "Northwind:General";
+	static readonly readPermission = "Northwind:General";
+	static readonly updatePermission = "Northwind:General";
 	static readonly Fields: Readonly<Record<keyof ProductLogRow, string>>;
 }
 export declare namespace ProductService {

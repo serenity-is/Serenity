@@ -22,6 +22,11 @@ public class ServiceAuthorizationExtensionsTests
     {
     }
 
+    [UndeletePermission("UndeletePerm")]
+    private class UndeleteRow
+    {
+    }
+
     [ModifyPermission("ModifyPerm")]
     private class ModifyRow
     {
@@ -152,6 +157,37 @@ public class ServiceAuthorizationExtensionsTests
     }
 
     [Fact]
+    public void AuthorizeUndelete_Uses_UndeletePermission()
+    {
+        Assert.Equal("UndeletePerm", CapturePermission((p, l) => { p.AuthorizeUndelete<UndeleteRow>(l); return null; }));
+    }
+
+    [Fact]
+    public void AuthorizeUndelete_Falls_Back_To_DeletePermission()
+    {
+        Assert.Equal("DeletePerm", CapturePermission((p, l) => { p.AuthorizeUndelete<DeleteRow>(l); return null; }));
+    }
+
+    [Fact]
+    public void AuthorizeUndelete_Falls_Back_To_ModifyPermission()
+    {
+        Assert.Equal("ModifyPerm", CapturePermission((p, l) => { p.AuthorizeUndelete<ModifyRow>(l); return null; }));
+    }
+
+    [Fact]
+    public void AuthorizeUndelete_Falls_Back_To_ReadPermission()
+    {
+        Assert.Equal("ReadPerm", CapturePermission((p, l) => { p.AuthorizeUndelete<ReadRow>(l); return null; }));
+    }
+
+    [Fact]
+    public void AuthorizeUndelete_Throws_When_No_Permission_Attribute()
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            new MockPermissions(p => true).AuthorizeUndelete<NoPermissionRow>(NullTextLocalizer.Instance));
+    }
+
+    [Fact]
     public void AuthorizeCreate_On_Context_Uses_InsertPermission()
     {
         string? requested = null;
@@ -176,5 +212,14 @@ public class ServiceAuthorizationExtensionsTests
         var context = CreateContext(new MockPermissions(p => { requested = p; return true; }));
         context.AuthorizeDelete<DeleteRow>();
         Assert.Equal("DeletePerm", requested);
+    }
+
+    [Fact]
+    public void AuthorizeUndelete_On_Context_Uses_UndeletePermission()
+    {
+        string? requested = null;
+        var context = CreateContext(new MockPermissions(p => { requested = p; return true; }));
+        context.AuthorizeUndelete<UndeleteRow>();
+        Assert.Equal("UndeletePerm", requested);
     }
 }

@@ -34,6 +34,7 @@ export abstract class UserRow {
     static readonly deletePermission = 'Administration:Security';
     static readonly insertPermission = 'Administration:Security';
     static readonly readPermission = 'Administration:Security';
+    static readonly undeletePermission = 'Administration:Security';
     static readonly updatePermission = 'Administration:Security';
 
     static readonly Fields = fieldsProxy<UserRow>();

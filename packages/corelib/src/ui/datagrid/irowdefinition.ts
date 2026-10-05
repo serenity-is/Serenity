@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Metadata that describes a row type for grid and dialog integration.
  * Implementations are resolved from the row type registry and used for
  * permissions, identity and display name resolution.
@@ -20,6 +20,8 @@ export interface IRowDefinition {
     readonly nameProperty?: string;
     /** Permission required to read rows. */
     readonly readPermission?: string;
+    /** Permission required to undelete rows. */
+    readonly undeletePermission?: string;
     /** Permission required to update rows. */
     readonly updatePermission?: string;
 }

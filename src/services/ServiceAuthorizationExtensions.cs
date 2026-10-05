@@ -123,4 +123,25 @@ public static class ServiceAuthorizationExtensions
     {
         AuthorizeOperation(context.Permissions, context.Localizer, typeof(TRow), typeof(DeletePermissionAttribute), typeof(ModifyPermissionAttribute), typeof(ReadPermissionAttribute));
     }
+
+    /// <summary>
+    /// Authorizes undelete request access similar to [AuthorizeUndelete] attribute.
+    /// </summary>
+    /// <typeparam name="TRow">Type of row to get Undelete/Delete/Modify/Read permission attribute from</typeparam>
+    /// <param name="permissions">Permission service</param>
+    /// <param name="localizer">Text localizer</param>
+    public static void AuthorizeUndelete<TRow>(this IPermissionService permissions, ITextLocalizer localizer)
+    {
+        AuthorizeOperation(permissions, localizer, typeof(TRow), typeof(UndeletePermissionAttribute), typeof(DeletePermissionAttribute), typeof(ModifyPermissionAttribute), typeof(ReadPermissionAttribute));
+    }
+
+    /// <summary>
+    /// Authorizes undelete request access similar to [AuthorizeUndelete] attribute.
+    /// </summary>
+    /// <typeparam name="TRow">Type of row to get Undelete/Delete/Modify/Read permission attribute from</typeparam>
+    /// <param name="context">Request context</param>
+    public static void AuthorizeUndelete<TRow>(this IRequestContext context)
+    {
+        AuthorizeOperation(context.Permissions, context.Localizer, typeof(TRow), typeof(UndeletePermissionAttribute), typeof(DeletePermissionAttribute), typeof(ModifyPermissionAttribute), typeof(ReadPermissionAttribute));
+    }
 }

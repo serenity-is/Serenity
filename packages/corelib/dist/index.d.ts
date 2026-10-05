@@ -1618,6 +1618,8 @@ export interface ListRequest extends ServiceRequest {
 	Skip?: number;
 	/** Maximum number of records to take (page size). Omit or 0 for server default. */
 	Take?: number;
+	/** When true, request whether more records are available beyond the returned page. */
+	IncludeMore?: boolean;
 	/** Sort expressions, e.g. `["Name ASC", "Age DESC"]`. */
 	Sort?: string[];
 	/** Quick-search text applied across searchable fields (or {@link ContainsField} when specified). */
@@ -1659,6 +1661,8 @@ export declare enum ListRequestCapabilities {
 	EqualityFilter = 4,
 	/** The source applies Criteria. */
 	Criteria = 8,
+	/** Combined text-search, equality-filter, and criteria options. */
+	FilteringOptions = 15,
 	/** The source applies sorting. */
 	Sort = 16,
 	/** The source applies Skip. */
@@ -1683,11 +1687,17 @@ export declare enum ListRequestCapabilities {
 	Localize = 8192,
 	/** The source honors ExcludeTotalCount. */
 	ExcludeTotalCount = 16384,
+	/** The handler supports the IncludeMore request option. */
+	IncludeMore = 32768,
+	/** Combined paging options, including the IncludeMore option. */
+	PagingOptions = 49248,
+	/** Capabilities supported by the in-memory list request source adapter by default. */
+	SourceAdapter = 51327,
 	/**
 	 * Stable baseline for current ListRequest capabilities. Do not add future capabilities
 	 * to this value; they require explicit opt-in.
 	 */
-	Baseline = 32767
+	Baseline = 65535
 }
 /**
  * Response DTO for `List` handlers.
@@ -1704,6 +1714,8 @@ export interface ListResponse<TEntity> extends ServiceResponse {
 	Skip?: number;
 	/** Echo of `Take` from the request. */
 	Take?: number;
+	/** Whether more records are available beyond the returned page, when requested. */
+	More?: boolean | null;
 }
 /**
  * Request DTO for `Retrieve` handlers (single-entity fetch).
@@ -9719,6 +9731,8 @@ export interface IRowDefinition {
 	readonly nameProperty?: string;
 	/** Permission required to read rows. */
 	readonly readPermission?: string;
+	/** Permission required to undelete rows. */
+	readonly undeletePermission?: string;
 	/** Permission required to update rows. */
 	readonly updatePermission?: string;
 }
@@ -11094,6 +11108,21 @@ export declare class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
 	 */
 	protected hasDeletePermission(): boolean;
 	/**
+	 * Returns the permission key required to undelete a row.
+	 * @returns Undelete permission or undefined.
+	 */
+	protected getUndeletePermission(): string;
+	/**
+	 * Checks whether the current user may undelete rows.
+	 * @returns True when undeletion is allowed.
+	 */
+	protected hasUndeletePermission(): boolean;
+	/**
+	 * Creates the include-deleted toggle button when the row type supports it
+	 * and the current user is allowed to undelete rows.
+	 */
+	protected createIncludeDeletedButton(): void;
+	/**
 	 * Checks whether the current user may insert rows.
 	 * @returns True when insertion is allowed.
 	 */
@@ -12186,6 +12215,16 @@ export declare class EntityDialog<TItem, P = {}> extends BaseDialog<P> implement
 	 * @returns True when permitted.
 	 */
 	protected hasDeletePermission(): boolean;
+	/**
+	 * Returns the permission key required to undelete a row.
+	 * @returns Undelete permission or undefined.
+	 */
+	protected getUndeletePermission(): string;
+	/**
+	 * Checks whether the current user may undelete rows.
+	 * @returns True when undeletion is allowed.
+	 */
+	protected hasUndeletePermission(): boolean;
 	/**
 	 * Whether the current user has insert permission.
 	 * @returns True when permitted.

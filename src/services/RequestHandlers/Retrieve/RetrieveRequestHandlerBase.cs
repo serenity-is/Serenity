@@ -190,7 +190,26 @@ public abstract class RetrieveRequestHandlerBase<TRow, TRetrieveRequest, TRetrie
 
         query.WhereEqual(idField, id);
 
+        if (ServiceQueryHelper.UseSoftDelete(Row) && !Permissions.HasPermission(GetUndeletePermission()))
+            query.Where(ServiceQueryHelper.GetNotDeletedCriteria(Row));
+
         return query;
+    }
+
+    /// <summary>
+    /// Gets the permission required to undelete records of the current row type,
+    /// e.g. <see cref="UndeletePermissionAttribute"/>, falling back to
+    /// <see cref="DeletePermissionAttribute"/>, <see cref="ModifyPermissionAttribute"/>
+    /// and <see cref="ReadPermissionAttribute"/>.
+    /// </summary>
+    protected virtual string GetUndeletePermission()
+    {
+        var attr = typeof(TRow).GetCustomAttribute<UndeletePermissionAttribute>(true) ??
+            typeof(TRow).GetCustomAttribute<DeletePermissionAttribute>(true) ??
+            (PermissionAttributeBase?)typeof(TRow).GetCustomAttribute<ModifyPermissionAttribute>(true) ??
+            typeof(TRow).GetCustomAttribute<ReadPermissionAttribute>(true);
+
+        return attr?.Permission ?? SpecialPermissionKeys.Deny;
     }
 
     /// <summary>
