@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.FileProviders;
 using Serenity.Localization;
 using System.IO;
+using System.Text.Json;
 
 namespace Serenity.Extensions.DependencyInjection;
 
@@ -337,9 +338,20 @@ public static class ServiceCollectionExtensions
             string? json = sr.ReadToEnd().TrimToNull();
             if (json is null)
                 continue;
-            var texts = JSON.Parse<Dictionary<string, object?>>(json);
+            Dictionary<string, object>? texts;
+            try
+            {
+                texts = JSON.Parse<Dictionary<string, object>>(json);
+            }
+            catch (JsonException ex)
+            {
+                throw new InvalidOperationException($"Failed to parse JSON text file: {Path.Combine(subpath, entry.Name)}", ex);
+            }
 
-            JsonLocalTextRegistration.AddFromNestedDictionary(texts!, "", langID, registry);
+            if (texts is null)
+                continue;
+
+            JsonLocalTextRegistration.AddFromNestedDictionary(texts, "", langID, registry);
         }
 
         return registry;

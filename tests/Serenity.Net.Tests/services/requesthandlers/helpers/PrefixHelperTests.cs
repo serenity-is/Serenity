@@ -31,4 +31,36 @@ public class PrefixHelperTests
     {
         Assert.Equal(0, PrefixHelper.DeterminePrefixLength(["ABC_Name", "XYZ_Other"], x => x));
     }
+
+    [Fact]
+    public void DeterminePrefixLength_Enumerates_List_Only_Once()
+    {
+        int count = 0;
+
+        IEnumerable<string> Lazy()
+        {
+            foreach (var name in new[] { "ABC_Name", "ABC_Other" })
+            {
+                count++;
+                yield return name;
+            }
+        }
+
+        Assert.Equal(4, PrefixHelper.DeterminePrefixLength(Lazy(), x => x));
+        Assert.Equal(2, count);
+    }
+
+    [Fact]
+    public void DeterminePrefixLength_Throws_For_Null_List()
+    {
+        Assert.Throws<ArgumentNullException>(() =>
+            PrefixHelper.DeterminePrefixLength<string>(null, x => x));
+    }
+
+    [Fact]
+    public void DeterminePrefixLength_Throws_For_Null_GetName()
+    {
+        Assert.Throws<ArgumentNullException>(() =>
+            PrefixHelper.DeterminePrefixLength(["ABC_Name"], null));
+    }
 }

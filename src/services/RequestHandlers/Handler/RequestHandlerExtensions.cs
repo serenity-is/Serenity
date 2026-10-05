@@ -12,7 +12,7 @@ public static class RequestHandlerExtensions
     /// <param name="handler">List handler instance</param>
     public static ListRequest CreateRequest(this IListRequestHandler handler)
     {
-        return (ListRequest)Activator.CreateInstance(handler.GetRequestType()!)!;
+        return InstantiateRequest<ListRequest>(handler);
     }
 
     /// <summary>
@@ -21,7 +21,7 @@ public static class RequestHandlerExtensions
     /// <param name="handler">Retrieve handler instance</param>
     public static RetrieveRequest CreateRequest(this IRetrieveRequestHandler handler)
     {
-        return (RetrieveRequest)Activator.CreateInstance(handler.GetRequestType()!)!;
+        return InstantiateRequest<RetrieveRequest>(handler);
     }
 
     /// <summary>
@@ -30,7 +30,7 @@ public static class RequestHandlerExtensions
     /// <param name="handler">Delete handler instance</param>
     public static DeleteRequest CreateRequest(this IDeleteRequestHandler handler)
     {
-        return (DeleteRequest)Activator.CreateInstance(handler.GetRequestType()!)!;
+        return InstantiateRequest<DeleteRequest>(handler);
     }
 
     /// <summary>
@@ -39,7 +39,7 @@ public static class RequestHandlerExtensions
     /// <param name="handler">Undelete handler instance</param>
     public static UndeleteRequest CreateRequest(this IUndeleteRequestHandler handler)
     {
-        return (UndeleteRequest)Activator.CreateInstance(handler.GetRequestType()!)!;
+        return InstantiateRequest<UndeleteRequest>(handler);
     }
 
     /// <summary>
@@ -48,7 +48,7 @@ public static class RequestHandlerExtensions
     /// <param name="handler">Save handler instance</param>
     public static SaveRequest<TRow> CreateRequest<TRow>(this ISaveRequestHandler handler)
     {
-        return (SaveRequest<TRow>)Activator.CreateInstance(handler.GetRequestType()!)!;
+        return InstantiateRequest<SaveRequest<TRow>>(handler);
     }
 
     /// <summary>
@@ -57,7 +57,21 @@ public static class RequestHandlerExtensions
     /// <param name="handler">Save handler instance</param>
     public static ISaveRequest CreateRequest(this ISaveRequestHandler handler)
     {
-        return (ISaveRequest)Activator.CreateInstance(handler.GetRequestType()!)!;
+        return InstantiateRequest<ISaveRequest>(handler);
+    }
+
+    internal static T InstantiateRequest<T>(IRequestHandler handler)
+    {
+        ArgumentNullException.ThrowIfNull(handler);
+
+        var type = handler.GetRequestType()
+            ?? throw new InvalidOperationException(
+                $"The handler {handler.GetType().Name} does not declare a request type (IRequestType<{typeof(T).Name}>).");
+
+        return Activator.CreateInstance(type) is T request
+            ? request
+            : throw new InvalidOperationException(
+                $"The request type {type.Name} of handler {handler.GetType().Name} cannot be assigned to {typeof(T).Name}.");
     }
 
     /// <summary>

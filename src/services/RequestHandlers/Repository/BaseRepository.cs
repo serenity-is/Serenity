@@ -1,8 +1,9 @@
 namespace Serenity.Services;
 
 /// <summary>
-/// A base class that can be used for repositories (obsolete, <see cref="BaseRequestHandler"/>)
-/// that accept a <see cref="IRequestContext"/> instance.
+/// A base class that can be used for repositories that accept a <see cref="IRequestContext"/> instance.
+/// This repository pattern is not recommended. Prefer defining an individual request handler per service
+/// operation (e.g. save, list, retrieve, delete), such as <see cref="BaseRequestHandler"/>.
 /// </summary>
 /// <remarks>
 /// Initializes a new instance of the class.
