@@ -212,7 +212,7 @@ public class ReportRegistry(ITypeSource typeSource, IPermissionService permissio
 
             attr = type.GetCustomAttributes(typeof(RequiredPermissionAttribute), false);
             if (attr.Length > 0)
-                Permission = ((RequiredPermissionAttribute)attr[0]).Permission ?? "?";
+                Permission = ((RequiredPermissionAttribute)attr[0]).Permission;
         }
     }
 

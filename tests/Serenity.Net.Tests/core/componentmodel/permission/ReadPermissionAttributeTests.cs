@@ -68,9 +68,7 @@ public class ReadPermissionAttributeTests
     [Fact]
     public void Constructor_WithNull()
     {
-        var attribute = new ReadPermissionAttribute(null);
-        Assert.Null(attribute.Permission);
-
+        Assert.Throws<ArgumentException>(() => new ReadPermissionAttribute(null));
     }
 
     [Fact]

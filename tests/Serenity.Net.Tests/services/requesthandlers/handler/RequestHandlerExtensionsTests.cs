@@ -2,6 +2,7 @@ namespace Serenity.Services;
 
 public class RequestHandlerExtensionsTests
 {
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class TestRow : Row<TestRow.RowFields>, IIdRow, INameRow
     {
         [IdProperty, Identity]

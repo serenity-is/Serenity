@@ -175,6 +175,7 @@ public class UpdatableExtensionBehavior_Async_Tests
 
     [TableName("CascadeMains")]
     [UpdatableExtension("d", typeof(DetailRow), ThisKey = "DetailId", CascadeDelete = true)]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     public class CascadeMainRow : Row<CascadeMainRow.RowFields>, IIdRow
     {
         [Identity]

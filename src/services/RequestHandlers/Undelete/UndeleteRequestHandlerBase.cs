@@ -82,8 +82,8 @@ public abstract class UndeleteRequestHandlerBase<TRow, TUndeleteRequest, TUndele
             (PermissionAttributeBase?)typeof(TRow).GetCustomAttribute<ModifyPermissionAttribute>(true) ??
             typeof(TRow).GetCustomAttribute<ReadPermissionAttribute>(true);
 
-        if (attr != null &&
-            !Permissions.HasPermission(attr.Permission ?? "?"))
+        var permission = attr?.Permission ?? SpecialPermissionKeys.Deny;
+        if (!Permissions.HasPermission(permission))
             throw DataValidation.EntityNotFoundError(Row, GetRequestEntityId(), Localizer);
     }
 

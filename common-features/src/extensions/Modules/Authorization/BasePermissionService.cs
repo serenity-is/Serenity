@@ -56,7 +56,7 @@ public abstract class BasePermissionService(
     /// </summary>
     protected virtual bool IsDeny(string permission)
     {
-        return permission == SpecialPermissionKeys.Deny;
+        return string.Equals(permission, SpecialPermissionKeys.Deny, StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>

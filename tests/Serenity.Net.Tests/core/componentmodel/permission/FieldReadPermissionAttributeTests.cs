@@ -68,8 +68,7 @@ public class FieldReadPermissionAttributeTests
     [Fact]
     public void Constructor_WithNull()
     {
-        var attribute = new FieldReadPermissionAttribute(null);
-        Assert.Null(attribute.Permission);
+        Assert.Throws<ArgumentException>(() => new FieldReadPermissionAttribute(null));
     }
 
     [Fact]

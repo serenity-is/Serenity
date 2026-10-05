@@ -87,6 +87,7 @@ public partial class UpdatableExtensionBehavior_ForeignThisKey_Test
 
     [TableName("Mains")]
     [UpdatableExtension("d", typeof(DetailRow), ThisKey = "DetailId")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     public class MainRow : Row<MainRow.RowFields>, IIdRow
     {
         [Identity]
@@ -107,6 +108,7 @@ public partial class UpdatableExtensionBehavior_ForeignThisKey_Test
     }
 
     [TableName("Details")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     public class DetailRow : Row<DetailRow.RowFields>, IIdRow
     {
         [Identity]

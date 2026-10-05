@@ -5,6 +5,7 @@ namespace Serenity.Services;
 public class RetrieveRequestHandlerBehaviorWrappingTests
 {
     [TableName("RetRows")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class RetRow : Row<RetRow.RowFields>, IIdRow
     {
         [Identity]

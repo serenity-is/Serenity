@@ -5,8 +5,8 @@ namespace Serenity.Extensions.Entities;
 /// </summary>
 [DefaultConnection, Module("Common"), TableName("UserPreferences")]
 [DisplayName("User Preferences"), InstanceName("UserPreference")]
-[ReadPermission("")]
-[ModifyPermission("")]
+[ReadPermission(SpecialPermissionKeys.LoggedIn)]
+[ModifyPermission(SpecialPermissionKeys.LoggedIn)]
 public sealed class UserPreferenceRow : Row<UserPreferenceRow.RowFields>, IIdRow, INameRow
 {
     /// <summary>

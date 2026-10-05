@@ -5,6 +5,7 @@ public class SaveRequestHandlerAsyncTests_Coverage
     private static NullRequestContext Context(IBehaviorProvider? behaviors = null) =>
         new NullRequestContext(behaviors).WithPermissions(_ => true);
 
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class CoverRow : Row<CoverRow.RowFields>, IIdRow, INameRow
     {
         [IdProperty]
@@ -20,6 +21,7 @@ public class SaveRequestHandlerAsyncTests_Coverage
         }
     }
 
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class AutoRow : Row<AutoRow.RowFields>, IIdRow, INameRow
     {
         [IdProperty, Identity]
@@ -35,6 +37,7 @@ public class SaveRequestHandlerAsyncTests_Coverage
         }
     }
 
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class OrderRow : Row<OrderRow.RowFields>, IIdRow, IDisplayOrderRow
     {
         [IdProperty]

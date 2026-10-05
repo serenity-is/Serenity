@@ -345,16 +345,15 @@ public abstract class SaveRequestHandlerBase<TRow, TSaveRequest, TSaveResponse>(
         attr ??= (PermissionAttributeBase?)typeof(TRow).GetCustomAttribute<ModifyPermissionAttribute>(true) ??
             typeof(TRow).GetCustomAttribute<ReadPermissionAttribute>(true);
 
-        if (attr == null)
-            return;
+        var permission = attr?.Permission ?? SpecialPermissionKeys.Deny;
 
         if (IsCreate)
         {
-            Permissions.ValidatePermission(attr.Permission ?? "?", Localizer);
+            Permissions.ValidatePermission(permission, Localizer);
             return;
         }
 
-        if (!Permissions.HasPermission(attr.Permission ?? "?"))
+        if (!Permissions.HasPermission(permission))
             throw DataValidation.EntityNotFoundError(Row, GetRequestEntityId(), Localizer);
     }
 

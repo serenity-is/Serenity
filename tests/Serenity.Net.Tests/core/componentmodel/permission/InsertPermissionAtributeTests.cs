@@ -68,8 +68,7 @@ public class InsertPermissionAttributeTests
     [Fact]
     public void Constructor_WithNull()
     {
-        var attribute = new InsertPermissionAttribute(null);
-        Assert.Null(attribute.Permission);
+        Assert.Throws<ArgumentException>(() => new InsertPermissionAttribute(null));
     }
 
     [Fact]

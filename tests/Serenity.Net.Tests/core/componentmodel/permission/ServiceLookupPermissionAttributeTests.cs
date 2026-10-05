@@ -68,8 +68,7 @@ public class ServiceLookupPermissionAttributeTests
     [Fact]
     public void Constructor_WithNull()
     {
-        var attribute = new ServiceLookupPermissionAttribute(null);
-        Assert.Null(attribute.Permission);
+        Assert.Throws<ArgumentException>(() => new ServiceLookupPermissionAttribute(null));
     }
 
     [Fact]

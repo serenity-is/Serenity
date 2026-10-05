@@ -68,8 +68,7 @@ public class FieldModifyPermissionAttributeTests
     [Fact]
     public void Constructor_With_Null()
     {
-        var attribute = new FieldModifyPermissionAttribute(null);
-        Assert.Null(attribute.Permission);
+        Assert.Throws<ArgumentException>(() => new FieldModifyPermissionAttribute(null));
     }
 
     [Fact]

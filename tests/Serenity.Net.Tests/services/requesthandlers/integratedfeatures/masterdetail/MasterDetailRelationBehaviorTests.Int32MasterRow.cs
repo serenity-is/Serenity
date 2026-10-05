@@ -2,6 +2,7 @@ namespace Serenity.Services;
 
 public partial class MasterDetailRelationBehaviorTests
 {
+    [ReadPermission(SpecialPermissionKeys.Public)]
     public class Int32MasterRow : Row<Int32MasterRow.RowFields>, IIdRow
     {
         [Identity, IdProperty]

@@ -3,6 +3,7 @@ namespace Serenity.Services;
 public partial class LocalizationBehaviorTests
 {
     [TableName("PlainRows")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class PlainRow : Row<PlainRow.RowFields>
     {
         [Identity]
@@ -16,6 +17,7 @@ public partial class LocalizationBehaviorTests
 
     [TableName("BadLocMains")]
     [LocalizationRow(typeof(PlainRow))]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class BadLocMainRow : Row<BadLocMainRow.RowFields>, IIdRow
     {
         [Identity, IdProperty]
@@ -29,6 +31,7 @@ public partial class LocalizationBehaviorTests
 
     [TableName("NotIdLocMains")]
     [LocalizationRow(typeof(LocMainLangRow), MappedIdField = "MasterId")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class NotIdLocMainRow : Row<NotIdLocMainRow.RowFields>
     {
         [Identity, IdProperty]
@@ -42,6 +45,7 @@ public partial class LocalizationBehaviorTests
 
     [TableName("MissingFkLocMains")]
     [LocalizationRow(typeof(LocMainLangRow), MappedIdField = "Nope")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class MissingFkLocMainRow : Row<MissingFkLocMainRow.RowFields>, IIdRow
     {
         [Identity, IdProperty]
@@ -54,6 +58,7 @@ public partial class LocalizationBehaviorTests
     }
 
     [TableName("MatchMains")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class MatchMainRow : Row<MatchMainRow.RowFields>, IIdRow
     {
         [Identity, IdProperty]
@@ -75,6 +80,7 @@ public partial class LocalizationBehaviorTests
 
     [TableName("LocSecretMains")]
     [LocalizationRow(typeof(LocSecretLangRow), MappedIdField = "MasterId")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class LocSecretMainRow : Row<LocSecretMainRow.RowFields>, IIdRow
     {
         [Identity, IdProperty]
@@ -90,6 +96,7 @@ public partial class LocalizationBehaviorTests
     }
 
     [TableName("LocSecretLang")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class LocSecretLangRow : Row<LocSecretLangRow.RowFields>, IIdRow, ILocalizationRow
     {
         [Identity]
@@ -110,6 +117,7 @@ public partial class LocalizationBehaviorTests
 
     [TableName("LocSoftMains")]
     [LocalizationRow(typeof(LocMainLangRow), MappedIdField = "MasterId")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class LocSoftMainRow : Row<LocSoftMainRow.RowFields>, IIdRow, IIsDeletedRow
     {
         [Identity, IdProperty]

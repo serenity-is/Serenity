@@ -5,6 +5,7 @@ namespace Serenity.Services;
 public class UndeleteRequestHandlerBehaviorWrappingTests
 {
     [TableName("UndelRows")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class UndelRow : Row<UndelRow.RowFields>, IIdRow, IIsDeletedRow
     {
         [Identity]

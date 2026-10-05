@@ -8,7 +8,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
         if (attr != null)
         {
             if (attr.Permission != SpecialPermissionKeys.Public)
-                item.InsertPermission = attr.Permission ?? SpecialPermissionKeys.LoggedIn;
+                item.InsertPermission = attr.Permission;
 
             return;
         }

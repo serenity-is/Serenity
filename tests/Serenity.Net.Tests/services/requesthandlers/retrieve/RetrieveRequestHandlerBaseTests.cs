@@ -279,10 +279,10 @@ public class RetrieveRequestHandlerBaseTests
     }
 
     [Fact]
-    public void ValidatePermissions_NoAttribute_DoesNotThrow()
+    public void ValidatePermissions_NoAttribute_Denies()
     {
         var handler = Handler();
-        handler.Validate();
+        Assert.Throws<ValidationError>(() => handler.Validate());
     }
 
     [Fact]

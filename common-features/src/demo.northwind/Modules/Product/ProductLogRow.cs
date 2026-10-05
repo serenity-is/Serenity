@@ -1,6 +1,8 @@
 namespace Serenity.Demo.Northwind;
 
 [NorthwindConnection, NorthwindModule, TableName("ProductLog")]
+[ReadPermission(PermissionKeys.General)]
+[ModifyPermission(PermissionKeys.General)]
 public sealed class ProductLogRow : Row<ProductLogRow.RowFields>, ICaptureLogRow
 {
     [Identity, IdProperty]

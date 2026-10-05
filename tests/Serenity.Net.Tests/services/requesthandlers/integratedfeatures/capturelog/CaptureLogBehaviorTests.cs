@@ -6,6 +6,7 @@ public partial class CaptureLogBehaviorTests
 {
     [CaptureLog(typeof(MyLogRow), MappedIdField = "LogId")]
     [TableName("MyRows")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class MyRow : Row<MyRow.RowFields>, IIdRow
     {
         [Identity]
@@ -21,6 +22,7 @@ public partial class CaptureLogBehaviorTests
     }
 
     [TableName("MyLog")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class MyLogRow : Row<MyLogRow.RowFields>, ICaptureLogRow
     {
         [Identity]

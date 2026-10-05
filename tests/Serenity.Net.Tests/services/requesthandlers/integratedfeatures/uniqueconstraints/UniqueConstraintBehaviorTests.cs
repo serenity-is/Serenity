@@ -6,6 +6,7 @@ public class UniqueConstraintBehaviorTests
 {
     [TableName("UniqueRows")]
     [UniqueConstraint("Name")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class UniqueNameRow : Row<UniqueNameRow.RowFields>, IIdRow
     {
         [Identity]

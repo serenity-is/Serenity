@@ -69,8 +69,7 @@ public class NavigationPermissionAttributeTests
     [Fact]
     public void Constructor_WithNull()
     {
-        var attribute = new NavigationPermissionAttribute(null);
-        Assert.Null(attribute.Permission);
+        Assert.Throws<ArgumentException>(() => new NavigationPermissionAttribute(null));
     }
 
     [Fact]

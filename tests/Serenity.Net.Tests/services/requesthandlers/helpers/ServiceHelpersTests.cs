@@ -91,6 +91,7 @@ public class ServiceHelpersTests
     {
         [TwoLevelCached("Key1", "Key2")]
         [TwoLevelCached(typeof(LinkedRow))]
+        [ReadPermission(SpecialPermissionKeys.Public)]
         private class CachedRow : Row<CachedRow.RowFields>, IRow
         {
             public int? ID { get => fields.ID[this]; set => fields.ID[this] = value; }
@@ -101,6 +102,7 @@ public class ServiceHelpersTests
             }
         }
 
+        [ReadPermission(SpecialPermissionKeys.Public)]
         private class LinkedRow : Row<LinkedRow.RowFields>, IRow
         {
             public int? ID { get => fields.ID[this]; set => fields.ID[this] = value; }
@@ -111,6 +113,7 @@ public class ServiceHelpersTests
             }
         }
 
+        [ReadPermission(SpecialPermissionKeys.Public)]
         private class PlainRow : Row<PlainRow.RowFields>, IRow
         {
             public int? ID { get => fields.ID[this]; set => fields.ID[this] = value; }

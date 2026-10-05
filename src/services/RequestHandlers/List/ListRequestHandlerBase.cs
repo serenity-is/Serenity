@@ -610,23 +610,21 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(
     /// </summary>
     protected virtual void ValidatePermissions()
     {
-        var readAttr = typeof(TRow).GetCustomAttribute<ReadPermissionAttribute>(true);
-        if (readAttr != null)
-        {
-            var permission = readAttr.Permission ?? "?";
-            if (!Permissions.HasPermission(permission))
-            {
-                var lookupPermission = typeof(TRow).GetCustomAttribute<ServiceLookupPermissionAttribute>()?.Permission;
-                if (!string.IsNullOrEmpty(lookupPermission) &&
-                    Permissions.HasPermission(lookupPermission))
-                {
-                    lookupAccessMode = true;
-                    return;
-                }
+        var permission = typeof(TRow).GetCustomAttribute<ReadPermissionAttribute>(true)?.Permission
+            ?? SpecialPermissionKeys.Deny;
 
-                Permissions.ValidatePermission(permission, Localizer);
-            }
+        if (Permissions.HasPermission(permission))
+            return;
+
+        var lookupPermission = typeof(TRow).GetCustomAttribute<ServiceLookupPermissionAttribute>()?.Permission;
+        if (!string.IsNullOrEmpty(lookupPermission) &&
+            Permissions.HasPermission(lookupPermission))
+        {
+            lookupAccessMode = true;
+            return;
         }
+
+        Permissions.ValidatePermission(permission, Localizer);
     }
 
     /// <summary>

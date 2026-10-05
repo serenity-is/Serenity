@@ -22,10 +22,10 @@ export interface ProductLogRow {
 export abstract class ProductLogRow {
     static readonly idProperty = 'ProductLogID';
     static readonly localTextPrefix = 'Northwind.ProductLog';
-    static readonly deletePermission = null;
-    static readonly insertPermission = null;
-    static readonly readPermission = '';
-    static readonly updatePermission = null;
+    static readonly deletePermission = 'Northwind:General';
+    static readonly insertPermission = 'Northwind:General';
+    static readonly readPermission = 'Northwind:General';
+    static readonly updatePermission = 'Northwind:General';
 
     static readonly Fields = fieldsProxy<ProductLogRow>();
 }

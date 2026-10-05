@@ -7,6 +7,7 @@ public partial class LocalizationBehaviorTests
 {
     [TableName("LocMains")]
     [LocalizationRow(typeof(LocMainLangRow), MappedIdField = "MasterId")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class LocMainRow : Row<LocMainRow.RowFields>, IIdRow
     {
         [Identity, IdProperty]
@@ -25,6 +26,7 @@ public partial class LocalizationBehaviorTests
     }
 
     [TableName("LocMainLang")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class LocMainLangRow : Row<LocMainLangRow.RowFields>, IIdRow, ILocalizationRow
     {
         [Identity]

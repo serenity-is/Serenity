@@ -1,6 +1,7 @@
 namespace Serenity.TestUtils;
 
 [TableName("ComplexTable")]
+[ReadPermission(SpecialPermissionKeys.Public)]
 public class ComplexRow : Row<ComplexRow.RowFields>
 {
     [DisplayName("Complex ID"), Column("ComplexID"), Identity]

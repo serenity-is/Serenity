@@ -3,6 +3,7 @@ namespace Serenity.Services;
 public partial class MasterDetailRelationBehaviorTests
 {
     [TableName("MdNoChangeMasters")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class NoChangeCheckMasterRow : Row<NoChangeCheckMasterRow.RowFields>, IIdRow
     {
         [Identity, IdProperty]
@@ -20,6 +21,7 @@ public partial class MasterDetailRelationBehaviorTests
     }
 
     [TableName("MdNonUpdatableMasters")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class NonUpdatableMasterRow : Row<NonUpdatableMasterRow.RowFields>, IIdRow
     {
         [Identity, IdProperty]
@@ -37,6 +39,7 @@ public partial class MasterDetailRelationBehaviorTests
     }
 
     [TableName("MdSoftDeleteMasters")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class SoftDeleteMasterRow : Row<SoftDeleteMasterRow.RowFields>, IIdRow, IIsDeletedRow
     {
         [Identity, IdProperty]
@@ -57,6 +60,7 @@ public partial class MasterDetailRelationBehaviorTests
     }
 
     [TableName("MdAltKeyMasters")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class AltKeyMasterRow : Row<AltKeyMasterRow.RowFields>, IIdRow
     {
         [Identity, IdProperty]
@@ -78,6 +82,7 @@ public partial class MasterDetailRelationBehaviorTests
     }
 
     [TableName("MdFilterMasters")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class FilterMasterRow : Row<FilterMasterRow.RowFields>, IIdRow
     {
         [Identity, IdProperty]
@@ -95,6 +100,7 @@ public partial class MasterDetailRelationBehaviorTests
     }
 
     [TableName("MdNullFilterMasters")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class NullFilterMasterRow : Row<NullFilterMasterRow.RowFields>, IIdRow
     {
         [Identity, IdProperty]
@@ -112,6 +118,7 @@ public partial class MasterDetailRelationBehaviorTests
     }
 
     [TableName("MdIncludeMasters")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class IncludeMasterRow : Row<IncludeMasterRow.RowFields>, IIdRow
     {
         [Identity, IdProperty]
@@ -138,6 +145,7 @@ public partial class MasterDetailRelationBehaviorTests
     }
 
     [TableName("MdErrorMasters")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class ErrorMasterRow : Row<ErrorMasterRow.RowFields>, IIdRow
     {
         [Identity, IdProperty]

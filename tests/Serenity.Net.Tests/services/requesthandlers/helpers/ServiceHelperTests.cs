@@ -3,6 +3,7 @@ namespace Serenity.Services;
 public class ServiceHelperTests
 {
     [TableName("ServiceHelperTest")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class TestRow : Row<TestRow.RowFields>, IIdRow
     {
         [IdProperty]

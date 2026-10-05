@@ -3,6 +3,7 @@ namespace Serenity.Services;
 public class UpdatableExtensionBehaviorTests_More
 {
     [TableName("ExtRows")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     public class ExtRow : Row<ExtRow.RowFields>, IIdRow
     {
         [Identity]
@@ -20,6 +21,7 @@ public class UpdatableExtensionBehaviorTests_More
     }
 
     [TableName("NonIdExtRows")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     public class NonIdExtRow : Row<NonIdExtRow.RowFields>
     {
         public string Text { get => fields.Text[this]; set => fields.Text[this] = value; }
@@ -31,6 +33,7 @@ public class UpdatableExtensionBehaviorTests_More
     }
 
     [TableName("FilterExtRows")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     public class FilterExtRow : Row<FilterExtRow.RowFields>, IIdRow
     {
         [Identity]
@@ -49,6 +52,7 @@ public class UpdatableExtensionBehaviorTests_More
     }
 
     [TableName("NoAttrMains")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     public class NoAttrMainRow : Row<NoAttrMainRow.RowFields>, IIdRow
     {
         [Identity]
@@ -62,6 +66,7 @@ public class UpdatableExtensionBehaviorTests_More
 
     [TableName("BadRowTypeMains")]
     [UpdatableExtension("d", typeof(string))]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     public class BadRowTypeMainRow : Row<BadRowTypeMainRow.RowFields>, IIdRow
     {
         [Identity]
@@ -75,6 +80,7 @@ public class UpdatableExtensionBehaviorTests_More
 
     [TableName("NotIdThisKeyMains")]
     [UpdatableExtension("d", typeof(ExtRow))]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     public class NotIdThisKeyMainRow : Row<NotIdThisKeyMainRow.RowFields>
     {
         [Identity]
@@ -91,6 +97,7 @@ public class UpdatableExtensionBehaviorTests_More
 
     [TableName("MissingThisKeyMains")]
     [UpdatableExtension("d", typeof(ExtRow), ThisKey = "Nope")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     public class MissingThisKeyMainRow : Row<MissingThisKeyMainRow.RowFields>, IIdRow
     {
         [Identity]
@@ -107,6 +114,7 @@ public class UpdatableExtensionBehaviorTests_More
 
     [TableName("MissingOtherKeyMains")]
     [UpdatableExtension("d", typeof(NonIdExtRow), ThisKey = "DetailId")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     public class MissingOtherKeyMainRow : Row<MissingOtherKeyMainRow.RowFields>, IIdRow
     {
         [Identity]
@@ -125,6 +133,7 @@ public class UpdatableExtensionBehaviorTests_More
 
     [TableName("MissingFilterMains")]
     [UpdatableExtension("d", typeof(FilterExtRow), ThisKey = "DetailId", FilterField = "Nope")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     public class MissingFilterMainRow : Row<MissingFilterMainRow.RowFields>, IIdRow
     {
         [Identity]
@@ -144,6 +153,7 @@ public class UpdatableExtensionBehaviorTests_More
 
     [TableName("MissingPresenceMains")]
     [UpdatableExtension("d", typeof(FilterExtRow), ThisKey = "DetailId", PresenceField = "Nope")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     public class MissingPresenceMainRow : Row<MissingPresenceMainRow.RowFields>, IIdRow
     {
         [Identity]
@@ -163,6 +173,7 @@ public class UpdatableExtensionBehaviorTests_More
 
     [TableName("NoMatchMains")]
     [UpdatableExtension("d", typeof(ExtRow), ThisKey = "DetailId")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     public class NoMatchMainRow : Row<NoMatchMainRow.RowFields>, IIdRow
     {
         [Identity]
@@ -179,6 +190,7 @@ public class UpdatableExtensionBehaviorTests_More
 
     [TableName("MismatchMains")]
     [UpdatableExtension("d", typeof(ExtRow), ThisKey = "DetailId")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     public class MismatchMainRow : Row<MismatchMainRow.RowFields>, IIdRow
     {
         [Identity]
@@ -198,6 +210,7 @@ public class UpdatableExtensionBehaviorTests_More
 
     [TableName("IdKeyMains")]
     [UpdatableExtension("d", typeof(ExtRow))]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     public class IdKeyMainRow : Row<IdKeyMainRow.RowFields>, IIdRow
     {
         [Identity]
@@ -214,6 +227,7 @@ public class UpdatableExtensionBehaviorTests_More
 
     [TableName("FilterMains")]
     [UpdatableExtension("d", typeof(FilterExtRow), ThisKey = "DetailId", FilterField = "Kind")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     public class FilterMainRow : Row<FilterMainRow.RowFields>, IIdRow
     {
         [Identity]
@@ -233,6 +247,7 @@ public class UpdatableExtensionBehaviorTests_More
 
     [TableName("FilterValueMains")]
     [UpdatableExtension("d", typeof(FilterExtRow), ThisKey = "DetailId", FilterField = "Kind", FilterValue = 1)]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     public class FilterValueMainRow : Row<FilterValueMainRow.RowFields>, IIdRow
     {
         [Identity]
@@ -252,6 +267,7 @@ public class UpdatableExtensionBehaviorTests_More
 
     [TableName("PresenceMains")]
     [UpdatableExtension("d", typeof(FilterExtRow), ThisKey = "DetailId", PresenceField = "Kind", PresenceValue = 1)]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     public class PresenceMainRow : Row<PresenceMainRow.RowFields>, IIdRow
     {
         [Identity]
@@ -273,6 +289,7 @@ public class UpdatableExtensionBehaviorTests_More
 
     [TableName("PresenceBoolMains")]
     [UpdatableExtension("d", typeof(FilterExtRow), ThisKey = "DetailId", PresenceField = "Kind", PresenceValue = true)]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     public class PresenceBoolMainRow : Row<PresenceBoolMainRow.RowFields>, IIdRow
     {
         [Identity]

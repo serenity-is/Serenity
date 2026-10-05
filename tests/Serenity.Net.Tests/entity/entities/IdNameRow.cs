@@ -1,6 +1,7 @@
 namespace Serenity.TestUtils;
 
 [TableName("IdName")]
+[ReadPermission(SpecialPermissionKeys.Public)]
 public class IdNameRow : Row<IdNameRow.RowFields>, IIdRow, INameRow
 {
     [NotNull, Identity, IdProperty]

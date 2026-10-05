@@ -68,8 +68,7 @@ public class DeletePermissionAttributeTests
     [Fact]
     public void Constructor_WithNull()
     {
-        var attribute = new DeletePermissionAttribute(null);
-        Assert.Null(attribute.Permission);
+        Assert.Throws<ArgumentException>(() => new DeletePermissionAttribute(null));
     }
 
     [Fact]

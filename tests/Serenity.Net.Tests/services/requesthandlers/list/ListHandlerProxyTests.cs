@@ -3,6 +3,7 @@ namespace Serenity.Services;
 public class ListHandlerProxyTests
 {
     [TableName("ProxyListRows")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class ProxyRow : Row<ProxyRow.RowFields>, IIdRow
     {
         [IdProperty]

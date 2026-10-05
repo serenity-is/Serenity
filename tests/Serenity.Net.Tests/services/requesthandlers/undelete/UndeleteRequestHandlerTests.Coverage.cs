@@ -7,6 +7,7 @@ public class UndeleteRequestHandlerTests_Coverage
         new NullRequestContext(behaviors).WithPermissions(hasPermission ?? (_ => true));
 
     [TableName("UndelSoft")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class SoftRow : Row<SoftRow.RowFields>, IIdRow, IIsDeletedRow
     {
         [IdProperty]
@@ -22,6 +23,7 @@ public class UndeleteRequestHandlerTests_Coverage
     }
 
     [TableName("UndelActive")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class ActiveRow : Row<ActiveRow.RowFields>, IIdRow, IIsActiveDeletedRow
     {
         [IdProperty]
@@ -37,6 +39,7 @@ public class UndeleteRequestHandlerTests_Coverage
     }
 
     [TableName("UndelLog")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class LogRow : Row<LogRow.RowFields>, IIdRow, IDeleteLogRow
     {
         [IdProperty]
@@ -55,6 +58,7 @@ public class UndeleteRequestHandlerTests_Coverage
     }
 
     [TableName("UndelLogSoft")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class LogSoftRow : Row<LogSoftRow.RowFields>, IIdRow, IIsDeletedRow, IDeleteLogRow
     {
         [IdProperty]
@@ -76,6 +80,7 @@ public class UndeleteRequestHandlerTests_Coverage
     }
 
     [TableName("UndelNone")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class NoMarkerRow : Row<NoMarkerRow.RowFields>, IIdRow
     {
         [IdProperty]
@@ -88,6 +93,7 @@ public class UndeleteRequestHandlerTests_Coverage
     }
 
     [TableName("UndelOrder")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class OrderRow : Row<OrderRow.RowFields>, IIdRow, IIsDeletedRow, IDisplayOrderRow
     {
         [IdProperty]

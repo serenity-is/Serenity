@@ -3,6 +3,7 @@ namespace Serenity.Services;
 public class ServiceQueryHelperTests
 {
     [TableName("SortRow")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class SortRow : Row<SortRow.RowFields>, IRow
     {
         [Size(50)]
@@ -18,6 +19,7 @@ public class ServiceQueryHelperTests
     }
 
     [TableName("ActiveDeleted")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class ActiveDeletedRow : Row<ActiveDeletedRow.RowFields>, IIsActiveDeletedRow
     {
         public short? IsActive { get => fields.IsActive[this]; set => fields.IsActive[this] = value; }
@@ -30,6 +32,7 @@ public class ServiceQueryHelperTests
     }
 
     [TableName("ActiveDeletedNotNull")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class ActiveDeletedNotNullRow : Row<ActiveDeletedNotNullRow.RowFields>, IIsActiveDeletedRow
     {
         [NotNull]
@@ -43,6 +46,7 @@ public class ServiceQueryHelperTests
     }
 
     [TableName("Deleted")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class DeletedRow : Row<DeletedRow.RowFields>, IIsDeletedRow
     {
         public bool? IsDeleted { get => fields.IsDeleted[this]; set => fields.IsDeleted[this] = value; }
@@ -55,6 +59,7 @@ public class ServiceQueryHelperTests
     }
 
     [TableName("DeleteLog")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class DeleteLogRow : Row<DeleteLogRow.RowFields>, IDeleteLogRow
     {
         public int? DeleteUserId { get => fields.DeleteUserId[this]; set => fields.DeleteUserId[this] = value; }

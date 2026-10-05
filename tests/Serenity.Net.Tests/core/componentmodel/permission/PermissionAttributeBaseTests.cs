@@ -76,8 +76,7 @@ public class PermissionAttributeBaseTests
     [Fact]
     public void Constructor_WithNull()
     {
-        var attribute = new TestPermissionAttributeBase(null);
-        Assert.Null(attribute.Permission);
+        Assert.Throws<ArgumentException>(() => new TestPermissionAttributeBase(null));
     }
 
     [Fact]

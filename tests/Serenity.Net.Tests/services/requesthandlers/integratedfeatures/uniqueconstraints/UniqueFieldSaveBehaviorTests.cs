@@ -5,6 +5,7 @@ namespace Serenity.Services;
 public class UniqueFieldSaveBehaviorTests
 {
     [TableName("UniqueFieldRows")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class UniqueFieldRow : Row<UniqueFieldRow.RowFields>, IIdRow
     {
         [Identity]

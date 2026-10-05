@@ -3,6 +3,7 @@ namespace Serenity.Data;
 public class DisplayOrderHelperTests
 {
     [TableName("DisplayOrderTest")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class TestRow : Row<TestRow.RowFields>, IIdRow, IDisplayOrderRow
     {
         [IdProperty]

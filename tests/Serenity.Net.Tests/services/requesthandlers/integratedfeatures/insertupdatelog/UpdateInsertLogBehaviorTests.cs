@@ -6,6 +6,7 @@ namespace Serenity.Services;
 public class UpdateInsertLogBehaviorTests
 {
     [TableName("TestLogRows")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class TestLogRow : Row<TestLogRow.RowFields>, IIdRow,
         IInsertDateRow, IInsertUserIdRow, IUpdateDateRow, IUpdateUserIdRow
     {
@@ -63,6 +64,7 @@ public class UpdateInsertLogBehaviorTests
         Assert.False(behavior.ActivateFor(new IdNameRowStub()));
     }
 
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class IdNameRowStub : Row<IdNameRowStub.RowFields>, IIdRow
     {
         [Identity]

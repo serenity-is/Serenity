@@ -82,7 +82,7 @@ public class RowLookupScript<TRow> : LookupScript
 
         var readPermission = typeof(TRow).GetCustomAttribute<ReadPermissionAttribute>(true);
         if (readPermission != null)
-            Permission = readPermission.Permission ?? "?";
+            Permission = readPermission.Permission;
 
         GroupKey = row.GetFields().GenerationKey;
     }

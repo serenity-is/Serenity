@@ -3,6 +3,7 @@ namespace Serenity.Services;
 public class RetrieveRequestHandlerTests_Coverage
 {
     [TableName("CoverRetRows")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class CoverRow : Row<CoverRow.RowFields>, IIdRow
     {
         [Identity, IdProperty]

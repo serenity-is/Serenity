@@ -5,6 +5,7 @@ namespace Serenity.Services;
 public class ListRequestHandlerBehaviorWrappingTests
 {
     [TableName("ListRows")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class ListRow : Row<ListRow.RowFields>, IIdRow
     {
         [Identity]

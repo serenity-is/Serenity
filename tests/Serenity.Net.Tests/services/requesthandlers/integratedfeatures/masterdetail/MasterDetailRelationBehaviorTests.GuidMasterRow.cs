@@ -2,6 +2,7 @@ namespace Serenity.Services;
 
 public partial class MasterDetailRelationBehaviorTests
 {
+    [ReadPermission(SpecialPermissionKeys.Public)]
     public class GuidMasterRow : Row<GuidMasterRow.RowFields>, IIdRow
     {
         [AutoIncrement, NotNull, PrimaryKey, IdProperty]

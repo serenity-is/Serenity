@@ -14,7 +14,7 @@ public class LogicOperatorPermissionServiceTests
         Assert.False(lops.HasPermission("B:C"));
 
         expected = true;
-        Assert.True(lops.HasPermission(""));
+        Assert.False(lops.HasPermission(""));
         Assert.True(lops.HasPermission("A"));
         Assert.True(lops.HasPermission("B:C"));
     }

@@ -3,6 +3,7 @@ namespace Serenity.Services;
 public partial class DeleteRequestHandlerTests
 {
     [TableName("SoftRows")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class SoftRow : Row<SoftRow.RowFields>, IIdRow, IIsDeletedRow
     {
         [IdProperty]
@@ -20,6 +21,7 @@ public partial class DeleteRequestHandlerTests
     }
 
     [TableName("ActiveRows")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class ActiveRow : Row<ActiveRow.RowFields>, IIdRow, IIsActiveDeletedRow
     {
         [IdProperty]
@@ -37,6 +39,7 @@ public partial class DeleteRequestHandlerTests
     }
 
     [TableName("DeleteLogOnlyRows")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class DeleteLogOnlyRow : Row<DeleteLogOnlyRow.RowFields>, IIdRow, IDeleteLogRow
     {
         [IdProperty]
@@ -57,6 +60,7 @@ public partial class DeleteRequestHandlerTests
     }
 
     [TableName("SoftUpdateRows")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class SoftUpdateLogRow : Row<SoftUpdateLogRow.RowFields>, IIdRow, IIsDeletedRow, IUpdateLogRow
     {
         [IdProperty]
@@ -80,6 +84,7 @@ public partial class DeleteRequestHandlerTests
     }
 
     [TableName("SoftDeleteLogRows")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class SoftDeleteLogRow : Row<SoftDeleteLogRow.RowFields>, IIdRow, IIsDeletedRow, IDeleteLogRow
     {
         [IdProperty]
@@ -103,6 +108,7 @@ public partial class DeleteRequestHandlerTests
     }
 
     [TableName("DisplayOrderDelRows")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class DisplayOrderDelRow : Row<DisplayOrderDelRow.RowFields>, IIdRow, IDisplayOrderRow
     {
         [IdProperty]

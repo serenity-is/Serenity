@@ -10,6 +10,7 @@ public enum SampleEnum
 }
 
 [TableName("AllFields")]
+[ReadPermission(SpecialPermissionKeys.Public)]
 public class AllFieldsRow : Row<AllFieldsRow.RowFields>
 {
     public class RowFields : RowFieldsBase

@@ -11,6 +11,7 @@ public class SaveRequestHandlerTests_Coverage
         public string Validate(IValidationContext context) => "invalid";
     }
 
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class CoverRow : Row<CoverRow.RowFields>, IIdRow, INameRow, IIsActiveRow, IIsDeletedRow
     {
         [IdProperty]

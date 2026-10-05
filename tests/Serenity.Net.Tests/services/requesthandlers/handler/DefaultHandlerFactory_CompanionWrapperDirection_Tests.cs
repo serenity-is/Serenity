@@ -2,6 +2,7 @@ namespace Serenity.Services;
 
 public class DefaultHandlerFactory_CompanionWrapperDirection_Tests
 {
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class TestRow : Row<TestRow.RowFields>, IIdRow
     {
         [IdProperty]

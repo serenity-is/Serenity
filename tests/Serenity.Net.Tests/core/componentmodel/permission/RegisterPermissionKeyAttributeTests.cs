@@ -68,8 +68,7 @@ public class RegisterPermissionKeyAttributeTests
     [Fact]
     public void Constructor_WithNull()
     {
-        var attribute = new RegisterPermissionKeyAttribute(null);
-        Assert.Null(attribute.Permission);
+        Assert.Throws<ArgumentException>(() => new RegisterPermissionKeyAttribute(null));
     }
 
     [Fact]

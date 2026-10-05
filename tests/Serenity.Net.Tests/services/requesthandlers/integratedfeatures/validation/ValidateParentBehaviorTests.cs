@@ -5,6 +5,7 @@ namespace Serenity.Services;
 public class ValidateParentBehaviorTests
 {
     [TableName("Parents")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class ParentRow : Row<ParentRow.RowFields>, IIdRow, IIsActiveRow
     {
         [Identity]
@@ -22,6 +23,7 @@ public class ValidateParentBehaviorTests
     }
 
     [TableName("Children")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class ChildRow : Row<ChildRow.RowFields>, IIdRow, IParentIdRow
     {
         [Identity]

@@ -89,6 +89,7 @@ public partial class ListRequestHandlerTests
         }
     }
 
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class NoQuickSearchRow : Row<NoQuickSearchRow.RowFields>, IIdRow, INameRow
     {
         [IdProperty]

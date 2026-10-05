@@ -67,8 +67,7 @@ public class RequiredPermissionAttributeTests
     [Fact]
     public void Constructor_WithNull()
     {
-        var attribute = new RequiredPermissionAttribute(null);
-        Assert.Null(attribute.Permission);
+        Assert.Throws<ArgumentException>(() => new RequiredPermissionAttribute(null));
     }
 
     [Fact]

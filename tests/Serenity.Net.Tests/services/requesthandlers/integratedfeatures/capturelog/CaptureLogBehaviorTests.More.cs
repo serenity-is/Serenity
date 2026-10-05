@@ -3,6 +3,7 @@ namespace Serenity.Services;
 public partial class CaptureLogBehaviorTests
 {
     [TableName("NoAttrRows")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class NoAttrRow : Row<NoAttrRow.RowFields>, IIdRow
     {
         [Identity]
@@ -14,6 +15,7 @@ public partial class CaptureLogBehaviorTests
         }
     }
 
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class NotIdRow : Row<NotIdRow.RowFields>
     {
         [Identity]
@@ -27,6 +29,7 @@ public partial class CaptureLogBehaviorTests
 
     [CaptureLog(typeof(MyLogRow), MappedIdField = "LogId")]
     [TableName("DeletedAuditRows")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class DeletedAuditRow : Row<DeletedAuditRow.RowFields>, IIdRow, IIsDeletedRow
     {
         [Identity]
@@ -45,6 +48,7 @@ public partial class CaptureLogBehaviorTests
 
     [CaptureLog(typeof(MyLogRow), MappedIdField = "LogId")]
     [TableName("ActiveDeletedAuditRows")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class ActiveDeletedAuditRow : Row<ActiveDeletedAuditRow.RowFields>, IIdRow, IIsActiveDeletedRow
     {
         [Identity]
@@ -61,6 +65,7 @@ public partial class CaptureLogBehaviorTests
 
     [CaptureLog(typeof(MyLogRow), MappedIdField = "LogId")]
     [TableName("DeleteLogAuditRows")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class DeleteLogAuditRow : Row<DeleteLogAuditRow.RowFields>, IIdRow, IDeleteLogRow
     {
         [Identity]
@@ -80,6 +85,7 @@ public partial class CaptureLogBehaviorTests
 
     [CaptureLog(typeof(MyLogRow), MappedIdField = "LogId")]
     [TableName("AuditRows")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class AuditRow : Row<AuditRow.RowFields>, IIdRow,
         IInsertDateRow, IInsertUserIdRow, IUpdateDateRow, IUpdateUserIdRow
     {
@@ -107,6 +113,7 @@ public partial class CaptureLogBehaviorTests
     }
 
     [TableName("PlainLogs")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class NotCaptureLogRow : Row<NotCaptureLogRow.RowFields>
     {
         public int? Id { get => fields.Id[this]; set => fields.Id[this] = value; }
@@ -119,6 +126,7 @@ public partial class CaptureLogBehaviorTests
 
     [CaptureLog(typeof(NotCaptureLogRow))]
     [TableName("BadLogMasters")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class BadLogMasterRow : Row<BadLogMasterRow.RowFields>, IIdRow
     {
         [Identity]
@@ -132,6 +140,7 @@ public partial class CaptureLogBehaviorTests
 
     [CaptureLog(typeof(MyLogRow), MappedIdField = "Nope")]
     [TableName("BadMappedMasters")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class BadMappedMasterRow : Row<BadMappedMasterRow.RowFields>, IIdRow
     {
         [Identity]
@@ -144,6 +153,7 @@ public partial class CaptureLogBehaviorTests
     }
 
     [TableName("MismatchLogs")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class MismatchLogRow : Row<MismatchLogRow.RowFields>, ICaptureLogRow
     {
         [Identity]
@@ -172,6 +182,7 @@ public partial class CaptureLogBehaviorTests
 
     [CaptureLog(typeof(MismatchLogRow), MappedIdField = "LogId")]
     [TableName("MismatchMasters")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class MismatchMasterRow : Row<MismatchMasterRow.RowFields>, IIdRow
     {
         [Identity]

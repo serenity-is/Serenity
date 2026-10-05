@@ -38,6 +38,7 @@ public class BehaviorProviderTests
     }
 
     [AddBehavior(typeof(ClassAttachedBehavior))]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class BehaviorRow : Row<BehaviorRow.RowFields>, IRow
     {
         public int? ID { get => fields.ID[this]; set => fields.ID[this] = value; }
@@ -55,6 +56,7 @@ public class BehaviorProviderTests
         }
     }
 
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class PlainRow : Row<PlainRow.RowFields>, IRow
     {
         public int? ID { get => fields.ID[this]; set => fields.ID[this] = value; }

@@ -60,6 +60,7 @@ public partial class SaveRequestHandler_Update_PropertyValue_Tests
         Assert.Equal(handler.StateBag, ihandler.StateBag);
     }
 
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class TestRow : IdNameRow<TestRow.RowFields>
     {
         public class RowFields : IdNameRowFields { }

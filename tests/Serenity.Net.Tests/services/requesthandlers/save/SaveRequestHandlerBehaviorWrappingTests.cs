@@ -4,6 +4,7 @@ namespace Serenity.Services;
 
 public class SaveRequestHandlerBehaviorWrappingTests
 {
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class TestRow : IdNameRow<TestRow.RowFields>
     {
         public class RowFields : IdNameRowFields { }

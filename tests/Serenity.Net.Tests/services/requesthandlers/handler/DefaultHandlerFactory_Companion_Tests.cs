@@ -4,6 +4,7 @@ namespace Serenity.Services;
 
 public class DefaultHandlerFactory_Companion_Tests
 {
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class TestRow : Row<TestRow.RowFields>, IIdRow
     {
         [IdProperty]

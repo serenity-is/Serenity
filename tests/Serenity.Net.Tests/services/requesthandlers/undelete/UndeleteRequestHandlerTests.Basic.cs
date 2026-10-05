@@ -3,6 +3,7 @@ namespace Serenity.Services;
 public class UndeleteRequestHandlerTests_Basic
 {
     [TableName("UndelRows")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class UndelRow : Row<UndelRow.RowFields>, IIdRow, IIsDeletedRow
     {
         [Identity, IdProperty]

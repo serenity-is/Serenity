@@ -9,6 +9,7 @@ public class DataValidationTests
     }
 
     [TableName("DataValidationTest")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class TestRow : Row<TestRow.RowFields>, IRow
     {
         [IdProperty]

@@ -15,6 +15,10 @@ public class MockPermissions : IPermissionService
 
     bool IPermissionService.HasPermission(string permission)
     {
+        if (string.IsNullOrEmpty(permission) ||
+            string.Equals(permission, SpecialPermissionKeys.Deny, StringComparison.OrdinalIgnoreCase))
+            return false;
+
         return HasPermission == null || HasPermission(permission);
     }
 }

@@ -3,6 +3,7 @@ namespace Serenity.Services;
 public class ListRequestHandlerAsyncTests
 {
     [TableName("AsyncListRows")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class AsyncRow : Row<AsyncRow.RowFields>, IIdRow
     {
         [IdProperty]

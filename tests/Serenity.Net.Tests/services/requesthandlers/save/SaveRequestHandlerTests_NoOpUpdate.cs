@@ -4,6 +4,7 @@ public class SaveRequestHandlerTests_NoOpUpdate
 {
     private static IRequestContext Context() => new NullRequestContext().WithPermissions(_ => true);
 
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class NoOpRow : Row<NoOpRow.RowFields>, IIdRow
     {
         [IdProperty]

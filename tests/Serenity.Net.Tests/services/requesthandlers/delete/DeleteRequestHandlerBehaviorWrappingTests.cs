@@ -5,6 +5,7 @@ namespace Serenity.Services;
 public class DeleteRequestHandlerBehaviorWrappingTests
 {
     [TableName("DelRows")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class DelRow : Row<DelRow.RowFields>, IIdRow
     {
         [Identity]

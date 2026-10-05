@@ -3,6 +3,7 @@ namespace Serenity.Services;
 public class DisplayOrderFilterHelperTests
 {
     [TableName("PlainRow")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class PlainRow : Row<PlainRow.RowFields>, IRow
     {
         [IdProperty]
@@ -14,6 +15,7 @@ public class DisplayOrderFilterHelperTests
     }
 
     [TableName("ParentRow")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class ParentRow : Row<ParentRow.RowFields>, IRow, IParentIdRow
     {
         [IdProperty]
@@ -30,6 +32,7 @@ public class DisplayOrderFilterHelperTests
     }
 
     [TableName("ActiveRow")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class ActiveRow : Row<ActiveRow.RowFields>, IRow, IIsActiveRow
     {
         [IdProperty]
@@ -46,6 +49,7 @@ public class DisplayOrderFilterHelperTests
     }
 
     [TableName("DeletedRow")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class DeletedRow : Row<DeletedRow.RowFields>, IRow, IIsDeletedRow
     {
         [IdProperty]
@@ -62,6 +66,7 @@ public class DisplayOrderFilterHelperTests
     }
 
     [TableName("AllRow")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class AllRow : Row<AllRow.RowFields>, IRow, IParentIdRow, IIsActiveRow, IIsDeletedRow
     {
         [IdProperty]

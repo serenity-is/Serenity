@@ -68,8 +68,7 @@ public class ModifyPermissionAttributeTests
     [Fact]
     public void Constructor_WithNull()
     {
-        var attribute = new ModifyPermissionAttribute(null);
-        Assert.Null(attribute.Permission);
+        Assert.Throws<ArgumentException>(() => new ModifyPermissionAttribute(null));
     }
 
     [Fact]

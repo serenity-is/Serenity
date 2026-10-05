@@ -30,7 +30,7 @@ public class DistinctValuesScript<TRow> : LookupScript
             typeof(TRow).GetCustomAttribute<ReadPermissionAttribute>(true);
 
         if (readPermission != null)
-            Permission = readPermission.Permission ?? "?";
+            Permission = readPermission.Permission;
 
         GroupKey = row.GetFields().GenerationKey;
 

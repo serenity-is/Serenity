@@ -5,6 +5,7 @@ namespace Serenity.Services;
 public class LinkingSetRelationBehaviorTests
 {
     [TableName("LkMains")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class LkMainRow : Row<LkMainRow.RowFields>, IIdRow
     {
         [Identity, IdProperty]
@@ -22,6 +23,7 @@ public class LinkingSetRelationBehaviorTests
     }
 
     [TableName("LkLinks")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class LkLinkRow : Row<LkLinkRow.RowFields>, IIdRow
     {
         [Identity]
@@ -258,6 +260,7 @@ public class LinkingSetRelationBehaviorTests
     }
 
     [TableName("LkFilteredLinks")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class LkFilteredLinkRow : Row<LkFilteredLinkRow.RowFields>, IIdRow
     {
         [Identity]
@@ -276,6 +279,7 @@ public class LinkingSetRelationBehaviorTests
     }
 
     [TableName("LkFilteredMains")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class LkFilteredMainRow : Row<LkFilteredMainRow.RowFields>, IIdRow
     {
         [Identity, IdProperty]
@@ -293,6 +297,7 @@ public class LinkingSetRelationBehaviorTests
     }
 
     [TableName("LkNullFilterMains")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class LkNullFilterMainRow : Row<LkNullFilterMainRow.RowFields>, IIdRow
     {
         [Identity, IdProperty]
@@ -310,6 +315,7 @@ public class LinkingSetRelationBehaviorTests
     }
 
     [TableName("LkOrderMains")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class LkOrderMainRow : Row<LkOrderMainRow.RowFields>, IIdRow
     {
         [Identity, IdProperty]
@@ -327,6 +333,7 @@ public class LinkingSetRelationBehaviorTests
     }
 
     [TableName("LkNoEqualityMains")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class LkNoEqualityMainRow : Row<LkNoEqualityMainRow.RowFields>, IIdRow
     {
         [Identity, IdProperty]
@@ -344,6 +351,7 @@ public class LinkingSetRelationBehaviorTests
     }
 
     [TableName("LkNonUpdatableMains")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class LkNonUpdatableMainRow : Row<LkNonUpdatableMainRow.RowFields>, IIdRow
     {
         [Identity, IdProperty]
@@ -361,6 +369,7 @@ public class LinkingSetRelationBehaviorTests
     }
 
     [TableName("LkSoftDeleteMains")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class LkSoftDeleteMainRow : Row<LkSoftDeleteMainRow.RowFields>, IIdRow, IIsDeletedRow
     {
         [Identity, IdProperty]
@@ -381,6 +390,7 @@ public class LinkingSetRelationBehaviorTests
     }
 
     [TableName("LkNotIdMains")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class LkNotIdMainRow : Row<LkNotIdMainRow.RowFields>
     {
         [Identity, IdProperty]
@@ -398,6 +408,7 @@ public class LinkingSetRelationBehaviorTests
     }
 
     [TableName("LkWrongListMains")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class LkWrongListMainRow : Row<LkWrongListMainRow.RowFields>, IIdRow
     {
         [Identity, IdProperty]
@@ -415,6 +426,7 @@ public class LinkingSetRelationBehaviorTests
     }
 
     [TableName("LkNoIdLinks")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class LkNoIdLinkRow : Row<LkNoIdLinkRow.RowFields>
     {
         public int? MasterID { get => fields.MasterID[this]; set => fields.MasterID[this] = value; }
@@ -428,6 +440,7 @@ public class LinkingSetRelationBehaviorTests
     }
 
     [TableName("LkErrorMains")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class LkErrorMainRow : Row<LkErrorMainRow.RowFields>, IIdRow
     {
         [Identity, IdProperty]

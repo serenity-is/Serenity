@@ -1,5 +1,6 @@
 namespace Serenity.TestUtils;
 
+[ReadPermission(SpecialPermissionKeys.Public)]
 public abstract class IdNameRow<TFields> : Row<TFields>, IIdRow, INameRow
     where TFields : IdNameRowFields
 {

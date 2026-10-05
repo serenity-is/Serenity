@@ -566,17 +566,17 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins, IHas
 
                 if (readPermission != null)
                 {
-                    field.readPermission = readPermission.Permission ?? "?";
+                    field.readPermission = readPermission.Permission;
                 }
 
                 if (insertPermission != null)
                 {
-                    field.insertPermission = insertPermission.Permission ?? "?";
+                    field.insertPermission = insertPermission.Permission;
                 }
 
                 if (updatePermission != null)
                 {
-                    field.updatePermission = updatePermission.Permission ?? "?";
+                    field.updatePermission = updatePermission.Permission;
                 }
 
                 if (property != null)
@@ -1199,7 +1199,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins, IHas
 #pragma warning restore CA2208 // Instantiate argument exceptions correctly
 
         var readPerm = rowType!.GetCustomAttribute<FieldReadPermissionAttribute>();
-        if (readPerm != null && readPerm.Permission != null && !readPerm.ApplyToLookups)
+        if (readPerm != null && !readPerm.ApplyToLookups)
         {
             var permission = readPerm.Permission;
             foreach (var field in this)

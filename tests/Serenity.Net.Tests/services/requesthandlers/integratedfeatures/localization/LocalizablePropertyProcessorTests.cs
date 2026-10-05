@@ -4,6 +4,7 @@ public class LocalizablePropertyProcessorTests
 {
     [TableName("LocMain")]
     [LocalizationRow(typeof(LocMainLangRow), MappedIdField = "MasterId")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class LocMainRow : Row<LocMainRow.RowFields>, IIdRow
     {
         [Identity, IdProperty]
@@ -27,6 +28,7 @@ public class LocalizablePropertyProcessorTests
     }
 
     [TableName("LocMainLang")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class LocMainLangRow : Row<LocMainLangRow.RowFields>, IIdRow, ILocalizationRow
     {
         [Identity]
@@ -49,6 +51,7 @@ public class LocalizablePropertyProcessorTests
     }
 
     [TableName("Plain")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class PlainRow : Row<PlainRow.RowFields>, IIdRow
     {
         [Identity, IdProperty]
@@ -64,6 +67,7 @@ public class LocalizablePropertyProcessorTests
 
     [TableName("BadLoc")]
     [LocalizationRow(typeof(PlainRow))]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class BadLocRow : Row<BadLocRow.RowFields>, IIdRow
     {
         [Identity, IdProperty]

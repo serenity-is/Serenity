@@ -170,9 +170,10 @@ public abstract class RetrieveRequestHandlerBase<TRow, TRetrieveRequest, TRetrie
     /// </summary>
     protected virtual void ValidatePermissions()
     {
-        var readAttr = typeof(TRow).GetCustomAttribute<ReadPermissionAttribute>(true);
-        if (readAttr != null)
-            Permissions.ValidatePermission(readAttr.Permission ?? "?", Localizer);
+        var permission = typeof(TRow).GetCustomAttribute<ReadPermissionAttribute>(true)?.Permission
+            ?? SpecialPermissionKeys.Deny;
+
+        Permissions.ValidatePermission(permission, Localizer);
     }
 
     /// <summary>

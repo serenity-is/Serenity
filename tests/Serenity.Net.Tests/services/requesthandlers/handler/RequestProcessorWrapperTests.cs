@@ -5,6 +5,7 @@ namespace Serenity.Services;
 public class RequestProcessorWrapperTests
 {
     [TableName("WrapTest")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
     private class TestRow : Row<TestRow.RowFields>, IIdRow
     {
         [IdProperty]

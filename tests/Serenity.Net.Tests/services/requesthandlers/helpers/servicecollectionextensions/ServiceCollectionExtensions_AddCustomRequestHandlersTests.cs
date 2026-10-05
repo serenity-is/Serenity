@@ -357,6 +357,7 @@ public class ServiceCollectionExtensions_AddCustomRequestHandlersTests
     {
     }
 
+    [ReadPermission(SpecialPermissionKeys.Public)]
     public class TestRow : Row<TestRow.RowFields>, IIdRow
     {
         [IdProperty]
