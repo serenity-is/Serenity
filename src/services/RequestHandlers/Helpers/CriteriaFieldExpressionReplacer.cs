@@ -163,9 +163,8 @@ public class CriteriaFieldExpressionReplacer(IRow row, IPermissionService permis
         return value != null;
     }
 
-    private bool ShouldHandleLikeCriteria(BinaryCriteria? criteria, [MaybeNullWhen(false)] out Field field)
+    private bool ShouldHandleLikeCriteria(BinaryCriteria? criteria)
     {
-        field = null;
         return Dialect.IsLikeCaseSensitive &&
             criteria is not null &&
             (criteria.Operator == CriteriaOperator.Like ||
@@ -174,19 +173,23 @@ public class CriteriaFieldExpressionReplacer(IRow row, IPermissionService permis
              right.Value is string &&
              criteria.LeftOperand is Criteria left &&
              left.Expression is string expression &&
-             ((field = FindField(expression)) is StringField);
+             FindField(expression) is StringField;
     }
 
     /// <inheritdoc/>
     protected override BaseCriteria VisitBinary(BinaryCriteria criteria)
     {
-        if (ShouldHandleLikeCriteria(criteria, out Field? fieldToUpper))
+        if (ShouldHandleLikeCriteria(criteria))
         {
-            return new BinaryCriteria(new UpperFunctionCriteria(ToCriteria(fieldToUpper)), 
-                criteria.Operator, new UpperFunctionCriteria(criteria.RightOperand));
+            return new BinaryCriteria(new UpperFunctionCriteria(Visit(criteria.LeftOperand)!),
+                criteria.Operator, new UpperFunctionCriteria(Visit(criteria.RightOperand)!));
         }
 
         if (ShouldConvertValues(criteria, out Field? field, out object? value))
+        {
+            var left = Visit(criteria.LeftOperand)!;
+            Visit(criteria.RightOperand);
+
             try
             {
                 var str = value as string;
@@ -196,19 +199,20 @@ public class CriteriaFieldExpressionReplacer(IRow row, IPermissionService permis
                     foreach (var v in enumerable)
                         values.Add(field.ConvertValue(v, CultureInfo.InvariantCulture));
 
-                    return new BinaryCriteria(ToCriteria(field), criteria.Operator, new ValueCriteria(values));
+                    return new BinaryCriteria(left, criteria.Operator, new ValueCriteria(values));
                 }
 
                 if (str == null || str.Length != 0)
                 {
                     value = field.ConvertValue(value, CultureInfo.InvariantCulture);
-                    return new BinaryCriteria(ToCriteria(field), criteria.Operator, new ValueCriteria(value));
+                    return new BinaryCriteria(left, criteria.Operator, new ValueCriteria(value));
                 }
             }
             catch
             {
                 // swallow exceptions for backward compatibility
             }
+        }
 
         return base.VisitBinary(criteria);
     }

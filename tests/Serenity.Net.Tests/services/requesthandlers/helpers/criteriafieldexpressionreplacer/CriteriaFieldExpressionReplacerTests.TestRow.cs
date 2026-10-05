@@ -36,6 +36,14 @@ public partial class CriteriaFieldExpressionReplacerTests
         [MinSelectLevel(SelectLevel.Never)]
         public string MinSelectLevelNeverField { get => fields.MinSelectLevelNeverField[this]; set => fields.MinSelectLevelNeverField[this] = value; }
 
+        public int? NormalIntField { get => fields.NormalIntField[this]; set => fields.NormalIntField[this] = value; }
+
+        [ReadPermission(ExtraReadPermission)]
+        public int? ExtraReadPermissionIntField { get => fields.ExtraReadPermissionIntField[this]; set => fields.ExtraReadPermissionIntField[this] = value; }
+
+        [SetFieldFlags(FieldFlags.DenyFiltering)]
+        public int? DenyFilteringIntField { get => fields.DenyFilteringIntField[this]; set => fields.DenyFilteringIntField[this] = value; }
+
         public class RowFields : RowFieldsBase
         {
             public Int32Field Id = null!;
@@ -47,6 +55,9 @@ public partial class CriteriaFieldExpressionReplacerTests
             public StringField DenyFilteringField = null!;
             public StringField NotMappedField = null!;
             public StringField MinSelectLevelNeverField = null!;
+            public Int32Field NormalIntField = null!;
+            public Int32Field ExtraReadPermissionIntField = null!;
+            public Int32Field DenyFilteringIntField = null!;
         }
     }
 }
