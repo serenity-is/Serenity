@@ -13,6 +13,7 @@ public partial class ClientTypesGenerator : CodeGeneratorBase
             "AutoComplete",
             "CascadeField",
             "CascadeValue",
+            "Capabilities",
             "Delimited",
             "DialogType",
             "FilterField",

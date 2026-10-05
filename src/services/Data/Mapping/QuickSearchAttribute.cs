@@ -1,4 +1,4 @@
-﻿namespace Serenity.Data.Mapping;
+namespace Serenity.Data.Mapping;
 
 /// <summary>
 /// Marks the property so that it should be included in quick text searches.
@@ -10,6 +10,7 @@
 /// <param name="searchType">Type of the search.</param>
 /// <param name="numericOnly">The numeric only.</param>
 /// <param name="isExplicit">if set to <c>true</c> [is explicit].</param>
+[AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
 public class QuickSearchAttribute(SearchType searchType = SearchType.Auto, int numericOnly = -1, bool isExplicit = false) : Attribute
 {
 
