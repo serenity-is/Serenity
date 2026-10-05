@@ -251,7 +251,9 @@ public class ServiceLookupEditorAttribute : ServiceLookupEditorBaseAttribute
     {
         serviceUrl = serviceUrl.TrimEnd('/');
         var actionSuffix = "/" + actionName;
-        if (serviceUrl.EndsWith(actionSuffix, StringComparison.OrdinalIgnoreCase))
+        if (serviceUrl.EndsWith(actionSuffix, StringComparison.OrdinalIgnoreCase) ||
+            (string.Equals(actionName, "ListLookup", StringComparison.OrdinalIgnoreCase) &&
+             serviceUrl.EndsWith("/List", StringComparison.OrdinalIgnoreCase)))
             return serviceUrl;
 
         return serviceUrl + actionSuffix;

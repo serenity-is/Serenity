@@ -129,6 +129,15 @@ public class ServiceLookupEditorAttributeTests
     }
 
     [Fact]
+    public void AutoServiceFor_PreservesFixedListRouteForListLookup()
+    {
+        var service = ServiceLookupEditorAttribute.AutoServiceFor(
+            typeof(Serenity.Net.Tests.AutoServiceFor.DataSources.FixedListRow));
+
+        Assert.Equal("DataSources/FixedList/List", service);
+    }
+
+    [Fact]
     public void TryGetServiceFromEndpoint_DoesNotAppendListToExplicitActionRoute()
     {
         var service = ServiceLookupEditorAttribute.TryGetServiceFromEndpoint(

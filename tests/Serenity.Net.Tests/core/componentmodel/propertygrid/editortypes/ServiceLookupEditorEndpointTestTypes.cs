@@ -22,6 +22,12 @@ namespace Serenity.Net.Tests.AutoServiceFor.DataSources
         public class RowFields : RowFieldsBase;
     }
 
+    [ConnectionKey("DataSources")]
+    public class FixedListRow : Row<FixedListRow.RowFields>
+    {
+        public class RowFields : RowFieldsBase;
+    }
+
     [ConnectionKey(typeof(RouteOnlyRow))]
     [Route("Services/DataSources/RouteOnly/[action]")]
     public class RouteOnlyEndpoint
@@ -48,6 +54,15 @@ namespace Serenity.Net.Tests.AutoServiceFor.DataSources
     [ConnectionKey(typeof(LookupOnlyRow))]
     [Route("Services/DataSources/LookupOnly/[action]")]
     public class LookupOnlyEndpoint
+    {
+        public void ListLookup()
+        {
+        }
+    }
+
+    [ConnectionKey(typeof(FixedListRow))]
+    [Route("Services/DataSources/FixedList/List")]
+    public class FixedListEndpoint
     {
         public void ListLookup()
         {
