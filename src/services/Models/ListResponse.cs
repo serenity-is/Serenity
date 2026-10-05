@@ -30,4 +30,9 @@ public class ListResponse<T> : ServiceResponse, IListResponse
 
     /// <inheritdoc/>
     public int Take { get; set; }
+    
+    /// <summary>
+    /// Whether more records are available beyond the returned page, when requested.
+    /// </summary>
+    public bool? More { get; set; }
 }

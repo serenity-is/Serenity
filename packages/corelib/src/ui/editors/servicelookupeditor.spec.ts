@@ -183,7 +183,8 @@ describe("ServiceLookupEditor", () => {
         expect(request.IncludeDeleted).toBe(true);
         expect(request.ExcludeTotalCount).toBe(true);
         expect(request.Skip).toBe(10);
-        expect(request.Take).toBe(6);
+        expect(request.Take).toBe(5);
+        expect(request.IncludeMore).toBe(true);
         editor.destroy();
     });
 
@@ -208,6 +209,7 @@ describe("ServiceLookupEditor", () => {
         expect(request.Sort).toEqual(["Name"]);
         expect(request.Skip).toBe(10);
         expect(request.Take).toBe(6);
+        expect(request.IncludeMore).toBeUndefined();
         expect(request.Criteria).toBeDefined();
         editor.destroy();
     });
@@ -398,6 +400,45 @@ describe("ServiceLookupEditor", () => {
         expect(result.items).toHaveLength(1);
         expect(result.items[0].ID).toBe(1);
         expect(result.more).toBe(true);
+        editor.destroy();
+    });
+
+    it("uses the service More response when the capability is supported", async () => {
+        const editor = create({
+            capabilities: base.ListRequestCapabilities.Skip |
+                base.ListRequestCapabilities.Take |
+                base.ListRequestCapabilities.Sort |
+                base.ListRequestCapabilities.IncludeMore
+        });
+        serviceCallSpy.mockResolvedValue({
+            Entities: [{ ID: 1, Name: "A" }],
+            More: true
+        } as any);
+
+        const result = await editor.asyncSearch({ take: 1, checkMore: true } as any);
+
+        expect(serviceCallSpy.mock.calls[0][0].request.Take).toBe(1);
+        expect(serviceCallSpy.mock.calls[0][0].request.IncludeMore).toBe(true);
+        expect(result).toEqual({ items: [{ ID: 1, Name: "A" }], more: true });
+        editor.destroy();
+    });
+
+    it("uses client lookahead when IncludeMore is not supported", async () => {
+        const editor = create({
+            capabilities: base.ListRequestCapabilities.Skip |
+                base.ListRequestCapabilities.Take |
+                base.ListRequestCapabilities.Sort
+        });
+        serviceCallSpy.mockResolvedValue({
+            Entities: [{ ID: 1, Name: "A" }, { ID: 2, Name: "B" }],
+            More: false
+        } as any);
+
+        const result = await editor.asyncSearch({ take: 1, checkMore: true } as any);
+
+        expect(serviceCallSpy.mock.calls[0][0].request.Take).toBe(2);
+        expect(serviceCallSpy.mock.calls[0][0].request.IncludeMore).toBeUndefined();
+        expect(result).toEqual({ items: [{ ID: 1, Name: "A" }], more: true });
         editor.destroy();
     });
 

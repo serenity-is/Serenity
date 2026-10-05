@@ -59,6 +59,58 @@ public static class ServiceHelper
     }
 
     /// <summary>
+    /// Sets paging metadata using the state returned by <see cref="ServiceQueryHelper.ApplySkipTakeAndCount(SqlQuery, int, int, bool, bool, out ListRequestPagingState)"/>.
+    /// </summary>
+    /// <typeparam name="T">Type of the response entities</typeparam>
+    /// <param name="response">Response object</param>
+    /// <param name="query">Query after execution</param>
+    /// <param name="pagingState">Paging strategy selected before query execution</param>
+    /// <param name="distinctFieldCount">Number of fields in each flattened distinct value tuple, or null for entities.</param>
+    public static void SetSkipTakeTotal<T>(this ListResponse<T> response, SqlQuery query,
+        ListRequestPagingState pagingState, int? distinctFieldCount = null)
+    {
+        var queryTake = query.Take();
+        var hasSentinel = pagingState.UsesSentinel && queryTake == pagingState.AppliedTake;
+        response.Skip = query.Skip();
+        response.Take = hasSentinel ? pagingState.RequestedTake : queryTake;
+
+        int? resultCount;
+        if (distinctFieldCount is int fieldCount)
+        {
+            resultCount = fieldCount > 0 && response.Values is not null ?
+                response.Values.Count / fieldCount : null;
+        }
+        else
+            resultCount = response.Entities.Count;
+
+        if (hasSentinel && resultCount is int sentinelResultCount &&
+            sentinelResultCount > pagingState.RequestedTake)
+        {
+            var extraCount = sentinelResultCount - pagingState.RequestedTake;
+            if (distinctFieldCount is int tupleWidth)
+                response.Values!.RemoveRange(pagingState.RequestedTake * tupleWidth,
+                    extraCount * tupleWidth);
+            else
+                response.Entities.RemoveRange(pagingState.RequestedTake, extraCount);
+        }
+
+        if (pagingState.IncludeMore)
+        {
+            if (queryTake == 0)
+                response.More = resultCount is not null ? false : null;
+            else if (query.CountRecords)
+                response.More = response.TotalCount > (long)response.Skip + response.Take;
+            else if (hasSentinel && resultCount is int count)
+                response.More = count > pagingState.RequestedTake;
+            else
+                response.More = null;
+        }
+
+        if (response.Take == 0 && resultCount is int totalCount)
+            response.TotalCount = totalCount + response.Skip;
+    }
+
+    /// <summary>
     /// Checks if an exception seems to be an unique index exception
     /// </summary>
     /// <param name="connection">Connection</param>

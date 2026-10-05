@@ -128,6 +128,8 @@ export interface ListRequest extends ServiceRequest {
     Skip?: number;
     /** Maximum number of records to take (page size). Omit or 0 for server default. */
     Take?: number;
+    /** When true, request whether more records are available beyond the returned page. */
+    IncludeMore?: boolean;
     /** Sort expressions, e.g. `["Name ASC", "Age DESC"]`. */
     Sort?: string[];
     /** Quick-search text applied across searchable fields (or {@link ContainsField} when specified). */
@@ -170,6 +172,8 @@ export enum ListRequestCapabilities {
     EqualityFilter = 1 << 2,
     /** The source applies Criteria. */
     Criteria = 1 << 3,
+    /** Combined text-search, equality-filter, and criteria options. */
+    FilteringOptions = ContainsText | ContainsField | EqualityFilter | Criteria,
     /** The source applies sorting. */
     Sort = 1 << 4,
     /** The source applies Skip. */
@@ -194,16 +198,19 @@ export enum ListRequestCapabilities {
     Localize = 1 << 13,
     /** The source honors ExcludeTotalCount. */
     ExcludeTotalCount = 1 << 14,
+    /** The handler supports the IncludeMore request option. */
+    IncludeMore = 1 << 15,
+    /** Combined paging options, including the IncludeMore option. */
+    PagingOptions = Skip | Take | ExcludeTotalCount | IncludeMore,
     /** Capabilities supported by the in-memory list request source adapter by default. */
-    SourceAdapter = ContainsText | ContainsField | EqualityFilter | Criteria | Sort |
-        Skip | Take | DistinctFields | ExcludeTotalCount,
+    SourceAdapter = FilteringOptions | Sort | PagingOptions | DistinctFields,
     /**
      * Stable baseline for current ListRequest capabilities. Do not add future capabilities
      * to this value; they require explicit opt-in.
      */
     Baseline = ContainsText | ContainsField | EqualityFilter | Criteria | Sort | Skip | Take |
         IncludeDeleted | ColumnSelection | IncludeColumns | ExcludeColumns | DistinctFields |
-        ExportColumns | Localize | ExcludeTotalCount
+        ExportColumns | Localize | ExcludeTotalCount | IncludeMore
 }
 
 /**
@@ -221,6 +228,8 @@ export interface ListResponse<TEntity> extends ServiceResponse {
     Skip?: number;
     /** Echo of `Take` from the request. */
     Take?: number;
+    /** Whether more records are available beyond the returned page, when requested. */
+    More?: boolean | null;
 }
 
 /**

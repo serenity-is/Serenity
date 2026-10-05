@@ -30,4 +30,9 @@ public interface IListResponse
     /// Number of records taken, passed from the ListRequest
     /// </summary>
     int Take { get; }
+
+    /// <summary>
+    /// Whether more records are available beyond the returned page, when requested.
+    /// </summary>
+    bool? More { get; }
 }

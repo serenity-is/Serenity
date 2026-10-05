@@ -103,6 +103,32 @@ public static class ServiceQueryHelper
     }
 
     /// <summary>
+    /// Applies paging and count parameters, optionally requesting one additional row to detect
+    /// whether more results are available.
+    /// </summary>
+    /// <param name="query">Query</param>
+    /// <param name="skip">Skip parameter</param>
+    /// <param name="take">Take parameter</param>
+    /// <param name="excludeTotalCount">ExcludeTotalCount flag</param>
+    /// <param name="includeMore">Whether the response should include a More indicator.</param>
+    /// <param name="pagingState">Receives the selected paging strategy.</param>
+    /// <returns>The query.</returns>
+    public static SqlQuery ApplySkipTakeAndCount(this SqlQuery query, int skip, int take,
+        bool excludeTotalCount, bool includeMore, out ListRequestPagingState pagingState)
+    {
+        var countAvailable = query.CountRecords || (!excludeTotalCount && take > 0);
+        var usesSentinel = includeMore && !countAvailable && take > 0 && take < int.MaxValue;
+        var queryTake = usesSentinel ? take + 1 : take;
+
+        query.Skip(skip).Take(queryTake);
+        if (!excludeTotalCount && query.Take() > 0)
+            query.CountRecords = true;
+
+        pagingState = new ListRequestPagingState(take, query.Take(), includeMore, usesSentinel);
+        return query;
+    }
+
+    /// <summary>
     /// Applies contains text criteria to the query
     /// </summary>
     /// <param name="query">Query</param>

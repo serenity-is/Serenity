@@ -150,6 +150,29 @@ public class ServiceQueryHelperTests
     }
 
     [Fact]
+    public void ApplySkipTakeAndCount_IncludesExtraRecordWhenRequested()
+    {
+        var query = new SqlQuery().Select("Name", "Name");
+        query.ApplySkipTakeAndCount(5, 10, true, true, out var pagingState);
+
+        Assert.Equal(5, query.Skip());
+        Assert.Equal(11, query.Take());
+        Assert.False(query.CountRecords);
+        Assert.True(pagingState.UsesSentinel);
+    }
+
+    [Fact]
+    public void ApplySkipTakeAndCount_UsesCountInsteadOfSentinelWhenAvailable()
+    {
+        var query = new SqlQuery().Select("Name", "Name");
+        query.ApplySkipTakeAndCount(5, 10, false, true, out var pagingState);
+
+        Assert.Equal(10, query.Take());
+        Assert.True(query.CountRecords);
+        Assert.False(pagingState.UsesSentinel);
+    }
+
+    [Fact]
     public void ApplySkipTakeAndCount_Does_Not_Count_When_Take_Zero()
     {
         var query = new SqlQuery().Select("Name", "Name");

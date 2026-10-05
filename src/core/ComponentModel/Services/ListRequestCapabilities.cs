@@ -16,6 +16,8 @@ public enum ListRequestCapabilities
     EqualityFilter = 1 << 2,
     /// <summary>The source applies Criteria.</summary>
     Criteria = 1 << 3,
+    /// <summary>Combined text-search, equality-filter, and criteria options.</summary>
+    FilteringOptions = ContainsText | ContainsField | EqualityFilter | Criteria,
     /// <summary>The source applies sorting.</summary>
     Sort = 1 << 4,
     /// <summary>The source applies Skip.</summary>
@@ -40,16 +42,19 @@ public enum ListRequestCapabilities
     Localize = 1 << 13,
     /// <summary>The source honors ExcludeTotalCount.</summary>
     ExcludeTotalCount = 1 << 14,
+    /// <summary>The handler supports the IncludeMore request option.</summary>
+    IncludeMore = 1 << 15,
+    /// <summary>Combined paging options, including the IncludeMore option.</summary>
+    PagingOptions = Skip | Take | ExcludeTotalCount | IncludeMore,
     /// <summary>Capabilities supported by the in-memory list request source adapter by default.</summary>
-    SourceAdapter = ContainsText | ContainsField | EqualityFilter | Criteria | Sort |
-        Skip | Take | DistinctFields | ExcludeTotalCount,
+    SourceAdapter = FilteringOptions | Sort | PagingOptions | DistinctFields,
     /// <summary>
     /// Fixed set of baseline capabilities. This value will not be expanded with future
     /// capabilities added to <c>ListRequest</c> or <c>ListRequestHandler</c> implementations.
     /// </summary>
     Baseline = ContainsText | ContainsField | EqualityFilter | Criteria | Sort | Skip | Take |
         IncludeDeleted | ColumnSelection | IncludeColumns | ExcludeColumns | DistinctFields |
-        ExportColumns | Localize | ExcludeTotalCount,
+        ExportColumns | Localize | ExcludeTotalCount | IncludeMore,
     /// <summary>
     /// Currently equivalent to <see cref="Baseline"/>. May include capabilities
     /// added to <c>ListRequest</c> and <c>ListRequestHandler</c> implementations in the future.

@@ -45,6 +45,97 @@ public class ServiceHelperTests
     }
 
     [Fact]
+    public void SetSkipTakeTotal_SetsMoreAndTrimsSentinelEntity()
+    {
+        var response = new ListResponse<TestRow>
+        {
+            Entities = { new(), new(), new() }
+        };
+        var query = new SqlQuery();
+        query.ApplySkipTakeAndCount(2, 2, true, true, out var pagingState);
+
+        response.SetSkipTakeTotal(query, pagingState);
+
+        Assert.Equal(2, response.Skip);
+        Assert.Equal(2, response.Take);
+        Assert.True(response.More);
+        Assert.Equal(2, response.Entities.Count);
+    }
+
+    [Fact]
+    public void SetSkipTakeTotal_SetsMoreAndTrimsSentinelDistinctTuple()
+    {
+        var response = new ListResponse<TestRow>
+        {
+            Values = new() { "a", 1, "b", 2, "c", 3 }
+        };
+        var query = new SqlQuery();
+        query.ApplySkipTakeAndCount(1, 2, true, true, out var pagingState);
+
+        response.SetSkipTakeTotal(query, pagingState, distinctFieldCount: 2);
+
+        Assert.Equal(1, response.Skip);
+        Assert.Equal(2, response.Take);
+        Assert.True(response.More);
+        Assert.Equal(new object?[] { "a", 1, "b", 2 }, response.Values);
+        Assert.Equal(0, response.TotalCount);
+    }
+
+    [Fact]
+    public void SetSkipTakeTotal_CountsUnpagedDistinctTuples()
+    {
+        var response = new ListResponse<TestRow>
+        {
+            Values = new() { "a", 1, "b", 2 }
+        };
+        var query = new SqlQuery();
+        query.ApplySkipTakeAndCount(2, 0, true, true, out var pagingState);
+
+        response.SetSkipTakeTotal(query, pagingState, distinctFieldCount: 2);
+
+        Assert.Equal(0, response.Take);
+        Assert.False(response.More);
+        Assert.Equal(4, response.TotalCount);
+    }
+
+    [Fact]
+    public void SetSkipTakeTotal_UsesCountWithoutSentinelWhenAvailable()
+    {
+        var response = new ListResponse<TestRow>
+        {
+            TotalCount = 6,
+            Entities = { new(), new(), new() }
+        };
+        var query = new SqlQuery();
+        query.ApplySkipTakeAndCount(2, 3, false, true, out var pagingState);
+
+        response.SetSkipTakeTotal(query, pagingState);
+
+        Assert.Equal(3, response.Take);
+        Assert.True(response.More);
+        Assert.Equal(3, response.Entities.Count);
+    }
+
+    [Fact]
+    public void SetSkipTakeTotal_UsesFinalQueryValuesWhenPagingWasModified()
+    {
+        var response = new ListResponse<TestRow>
+        {
+            Entities = { new(), new(), new() }
+        };
+        var query = new SqlQuery();
+        query.ApplySkipTakeAndCount(1, 2, true, true, out var pagingState);
+        query.Skip(4).Take(5);
+
+        response.SetSkipTakeTotal(query, pagingState);
+
+        Assert.Equal(4, response.Skip);
+        Assert.Equal(5, response.Take);
+        Assert.Null(response.More);
+        Assert.Equal(3, response.Entities.Count);
+    }
+
+    [Fact]
     public void CheckParentNotDeleted_Throws_When_Record_Exists()
     {
         using var connection = new MockDbConnection()

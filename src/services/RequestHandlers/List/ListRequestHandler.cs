@@ -178,7 +178,8 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> :
             ApplyKeyOrder(query);
 
         query.ApplySkipTakeAndCount(request.Skip, request.Take,
-            request.ExcludeTotalCount || DistinctFields != null);
+            request.ExcludeTotalCount || DistinctFields != null, request.IncludeMore,
+            out var pagingState);
 
         ApplyContainsText(query, request.ContainsText);
 
@@ -199,7 +200,7 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> :
             Response.Values = null;
         }
 
-        Response.SetSkipTakeTotal(query);
+        Response.SetSkipTakeTotal(query, pagingState, DistinctFields?.Length);
 
         OnAfterExecuteQuery();
 

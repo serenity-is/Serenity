@@ -16,6 +16,12 @@ public class ListRequest : ServiceRequest, IIncludeExcludeColumns
     /// </summary>
     [JsonConverter(typeof(JsonConverters.NullAsDefaultJsonConverter))]
     public int Take { get; set; }
+    
+    /// <summary>
+    /// Include whether more records are available beyond the requested page in the response.
+    /// </summary>
+    [JsonConverter(typeof(JsonConverters.NullAsDefaultJsonConverter))]
+    public bool IncludeMore { get; set; }
 
     /// <summary>
     /// Columns to sort returned records by

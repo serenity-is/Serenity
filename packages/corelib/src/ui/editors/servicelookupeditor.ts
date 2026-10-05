@@ -204,7 +204,13 @@ export abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptio
         request.EqualityFilter = this.options.equalityFilter;
         request.Criteria = this.getCriteria(query);
         request.Skip = query.skip || 0;
-        request.Take = query.take ? (query.checkMore ? query.take + 1 : query.take) : 0;
+        const capabilities = this.options.capabilities;
+        const supportsIncludeMore = capabilities == null ||
+            (capabilities & ListRequestCapabilities.IncludeMore) !== 0;
+        request.Take = query.take ?
+            (query.checkMore && !supportsIncludeMore ? query.take + 1 : query.take) : 0;
+        if (query.checkMore && supportsIncludeMore)
+            request.IncludeMore = true;
         request.IncludeDeleted = this.options.includeDeleted;
         request.ExcludeTotalCount = true;
 
@@ -264,6 +270,8 @@ export abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptio
         let opt = this.getServiceCallOptions(query);
         const request = opt.request as ListRequest;
         const capabilities = this.options.capabilities;
+        const supportsIncludeMore = capabilities == null ||
+            (capabilities & ListRequestCapabilities.IncludeMore) !== 0;
         const localProcessor = createLocalListProcessor({
             request,
             capabilities,
@@ -285,6 +293,7 @@ export abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptio
         if (!Array.isArray(rawItems))
             throw new Error("ServiceLookupEditor service response must be an array or contain an Entities array.");
         const itemsPlus1 = normalizePrimitiveItems(rawItems);
+        const responseMore = Array.isArray(response) ? undefined : response?.More;
 
         let items = itemsPlus1;
         const localResult = localProcessor?.process(items);
@@ -303,7 +312,10 @@ export abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptio
 
         return {
             items: items,
-            more: !!query.checkMore && !!query.take && itemsPlus1.length > query.take
+            more: !!query.checkMore && !!query.take &&
+                (supportsIncludeMore ?
+                    responseMore ?? itemsPlus1.length > query.take :
+                    itemsPlus1.length > query.take)
         };
     }
 }
