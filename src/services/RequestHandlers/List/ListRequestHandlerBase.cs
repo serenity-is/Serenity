@@ -271,16 +271,13 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(
                 var attr = x.CustomAttributes.OfType<QuickSearchAttribute>()
                     .FirstOrDefault();
 
-                if (attr == null || attr.IsExplicit)
-                    return false;
-
-                return true;
+                return attr != null && !attr.IsExplicit && AllowFilterField(x);
             });
 
             if (!fields.Any())
             {
                 var nameField = Row.NameField;
-                if (nameField is not null)
+                if (nameField is not null && AllowFilterField(nameField))
                     return [nameField];
             }
 
@@ -289,13 +286,22 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(
 
         var field = Row.FindField(containsField) ?? Row.FindFieldByPropertyName(containsField);
         if (field is null ||
-            ((field.MinSelectLevel == SelectLevel.Never) &&
-                (!field.CustomAttributes.OfType<QuickSearchAttribute>().Any())))
+            !IsQuickSearchableField(field) ||
+            !AllowFilterField(field))
         {
             throw new ArgumentOutOfRangeException(nameof(containsField));
         }
 
         return [field];
+    }
+
+    private bool IsQuickSearchableField(Field field)
+    {
+        if (field.CustomAttributes.OfType<QuickSearchAttribute>().Any())
+            return true;
+
+        return ReferenceEquals(Row.NameField, field) &&
+            !Row.GetFields().Any(x => x.CustomAttributes.OfType<QuickSearchAttribute>().Any());
     }
 
     /// <summary>
@@ -311,10 +317,17 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(
     /// The result should be returned via this argument.</param>
     /// <param name="orFalse">Should return true from this parameter if this contains criteria
     /// should cause search to return no records</param>
-    /// <exception cref="ArgumentOutOfRangeException"><paramref name="searchType"/> is not a supported <see cref="SearchType"/>.</exception>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="searchType"/> is not a supported <see cref="SearchType"/>,
+    /// or <paramref name="field"/> is not mapped.</exception>
     protected virtual void AddFieldContainsCriteria(Field field, string containsText, long? id,
         SearchType searchType, bool numericOnly, ref BaseCriteria criteria, ref bool orFalse)
     {
+        if (field.Flags.HasFlag(FieldFlags.NotMapped))
+        {
+            throw new ArgumentOutOfRangeException(field.PropertyName ?? field.Name,
+                $"Can't apply contains text on field {field.PropertyName ?? field.Name}");
+        }
+
         if (numericOnly == true && (id == null))
         {
             orFalse = true;

@@ -29,6 +29,9 @@ public partial class ListRequestHandlerTests
         [QuickSearch(SearchType.FullTextContains)]
         public string? FullTextQ { get => fields.FullTextQ[this]; set => fields.FullTextQ[this] = value; }
 
+        [QuickSearch, ReadPermission(ExtraSpecialFieldPermission)]
+        public string? ProtectedQ { get => fields.ProtectedQ[this]; set => fields.ProtectedQ[this] = value; }
+
         [SortOrder(2)]
         public string? Sorted { get => fields.Sorted[this]; set => fields.Sorted[this] = value; }
 
@@ -71,6 +74,7 @@ public partial class ListRequestHandlerTests
             public Int64Field LongQ = null!;
             public StringField StartsQ = null!;
             public StringField FullTextQ = null!;
+            public StringField ProtectedQ = null!;
             public StringField Sorted = null!;
             public StringField Unsortable = null!;
             public StringField NotMappedF = null!;
@@ -165,6 +169,22 @@ public partial class ListRequestHandlerTests
     private sealed class AllowAllFilterListHandler(IRequestContext context) : CovListHandler(context)
     {
         protected override bool AllowFilterField(Field field) => true;
+    }
+
+    private sealed class NotMappedAwareListHandler(IRequestContext context) : CovListHandler(context)
+    {
+        protected override void AddFieldContainsCriteria(Field field, string containsText, long? id,
+            SearchType searchType, bool numericOnly, ref BaseCriteria criteria, ref bool orFalse)
+        {
+            if (field.Flags.HasFlag(FieldFlags.NotMapped))
+            {
+                criteria |= Criteria.True;
+                return;
+            }
+
+            base.AddFieldContainsCriteria(field, containsText, id, searchType, numericOnly,
+                ref criteria, ref orFalse);
+        }
     }
 
     private sealed class DenyAllSortListHandler(IRequestContext context) : CovListHandler(context)
@@ -381,14 +401,89 @@ public partial class ListRequestHandlerTests
     }
 
     [Fact]
-    public void GetQuickSearchFields_Uses_ContainsField()
+    public void GetQuickSearchFields_Uses_ContainsField_For_Explicit_QuickSearch_Field()
     {
         using var conn = CovConnection();
         var handler = new CovListHandler(CovContext());
         handler.Setup(conn);
 
-        var fields = handler.CallGetQuickSearchFields(CovRow.Fields.NormalF.Name).ToList();
-        Assert.Equal(CovRow.Fields.NormalF.Name, Assert.Single(fields).Name);
+        var fields = handler.CallGetQuickSearchFields(CovRow.Fields.ExplicitQ.Name).ToList();
+        Assert.Equal(CovRow.Fields.ExplicitQ.Name, Assert.Single(fields).Name);
+    }
+
+    [Fact]
+    public void GetQuickSearchFields_Throws_For_Field_Without_QuickSearch()
+    {
+        using var conn = CovConnection();
+        var handler = new CovListHandler(CovContext());
+        handler.Setup(conn);
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => handler.CallGetQuickSearchFields(CovRow.Fields.NormalF.Name));
+    }
+
+    [Fact]
+    public void GetQuickSearchFields_Throws_For_DenyFiltering_ContainsField()
+    {
+        using var conn = CovConnection();
+        var handler = new DenyAllFilterListHandler(CovContext());
+        handler.Setup(conn);
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => handler.CallGetQuickSearchFields(CovRow.Fields.Name.Name));
+    }
+
+    [Fact]
+    public void GetQuickSearchFields_Throws_For_Protected_QuickSearch_Field()
+    {
+        using var conn = CovConnection();
+        var handler = new CovListHandler(new NullRequestContext().WithPermissions(x => x is ReadPermission));
+        handler.Setup(conn);
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => handler.CallGetQuickSearchFields(CovRow.Fields.ProtectedQ.Name));
+    }
+
+    [Fact]
+    public void GetQuickSearchFields_Allows_Protected_QuickSearch_Field_When_Permission_Granted()
+    {
+        using var conn = CovConnection();
+        var handler = new CovListHandler(new NullRequestContext()
+            .WithPermissions(x => x is ReadPermission or ExtraSpecialFieldPermission));
+        handler.Setup(conn);
+
+        var fields = handler.CallGetQuickSearchFields(CovRow.Fields.ProtectedQ.Name).ToList();
+        Assert.Equal(CovRow.Fields.ProtectedQ.Name, Assert.Single(fields).Name);
+    }
+
+    [Fact]
+    public void GetQuickSearchFields_Throws_For_LookupInaccessible_ContainsField()
+    {
+        using var conn = CovConnection();
+        var handler = new CovListHandler(CovContext());
+        handler.Setup(conn);
+        handler.SetLookupAccessMode(true);
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => handler.CallGetQuickSearchFields(CovRow.Fields.StartsQ.Name));
+    }
+
+    [Fact]
+    public void GetQuickSearchFields_Default_Excludes_Unauthorized_QuickSearch_Field()
+    {
+        using var conn = CovConnection();
+        var handler = new CovListHandler(new NullRequestContext().WithPermissions(x => x is ReadPermission));
+        handler.Setup(conn);
+
+        var fields = handler.CallGetQuickSearchFields(null).ToList();
+        Assert.Contains(fields, x => x.Name == CovRow.Fields.Name.Name);
+        Assert.DoesNotContain(fields, x => x.Name == CovRow.Fields.ProtectedQ.Name);
+    }
+
+    [Fact]
+    public void GetQuickSearchFields_Default_NameField_Fallback_Respects_Permissions()
+    {
+        using var conn = CovConnection();
+        var handler = new DenyAllFilterListHandler(CovContext());
+        handler.Setup(conn);
+
+        Assert.Empty(handler.CallGetQuickSearchFields(null));
     }
 
     [Fact]
@@ -503,6 +598,31 @@ public partial class ListRequestHandlerTests
 
         Assert.Throws<ArgumentOutOfRangeException>(() => handler.CallAddFieldContains(
             CovRow.Fields.Name, "x", null, (SearchType)999, false, out _));
+    }
+
+    [Fact]
+    public void AddFieldContains_Throws_For_NotMapped_Field()
+    {
+        using var conn = CovConnection();
+        var handler = new CovListHandler(CovContext());
+        handler.Setup(conn);
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => handler.CallAddFieldContains(
+            CovRow.Fields.NotMappedF, "x", null, SearchType.Contains, false, out _));
+    }
+
+    [Fact]
+    public void AddFieldContains_Allows_Subclass_To_Handle_NotMapped_Field()
+    {
+        using var conn = CovConnection();
+        var handler = new NotMappedAwareListHandler(CovContext());
+        handler.Setup(conn);
+
+        var criteria = handler.CallAddFieldContains(
+            CovRow.Fields.NotMappedF, "x", null, SearchType.Contains, false, out var orFalse);
+
+        Assert.False(orFalse);
+        Assert.False(criteria.IsEmpty);
     }
 
     [Fact]
