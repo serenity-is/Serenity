@@ -81,7 +81,7 @@ public class DeleteRequestHandler<TRow, TDeleteRequest, TDeleteResponse> :
     protected virtual void LoadEntity()
     {
         var idField = Row.GetIdField();
-        var id = idField.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture);
+        var id = GetRequestEntityId();
 
         var query = new SqlQuery()
             .Dialect(Connection.GetDialect())
@@ -91,7 +91,7 @@ public class DeleteRequestHandler<TRow, TDeleteRequest, TDeleteResponse> :
         PrepareQuery(query);
 
         if (!query.GetFirst(Connection))
-            throw DataValidation.EntityNotFoundError(Row, Request.EntityId, Localizer);
+            throw DataValidation.EntityNotFoundError(Row, id, Localizer);
     }
 
     /// <summary>

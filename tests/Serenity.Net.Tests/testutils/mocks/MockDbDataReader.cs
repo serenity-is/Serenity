@@ -77,8 +77,17 @@ public class MockDbDataReader : DbDataReader
     private static (string[] Props, object[][] Values) MapAnonymousRows(
         string[]? columnNames, object[] anonymousItems)
     {
-        if (anonymousItems == null || anonymousItems.Length == 0)
-            throw new ArgumentNullException(nameof(anonymousItems));
+        ArgumentNullException.ThrowIfNull(anonymousItems);
+
+        if (anonymousItems.Length == 0)
+        {
+            if (columnNames == null)
+                throw new ArgumentException(
+                    "Reader shape can't be inferred from an empty item list. Pass at least one item, or specify the column names explicitly.",
+                    nameof(anonymousItems));
+
+            return (columnNames, Array.Empty<object[]>());
+        }
 
         var sample = anonymousItems.First();
         if (anonymousItems.Any(x => x == null || x.GetType() != sample.GetType()))

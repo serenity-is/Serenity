@@ -83,7 +83,7 @@ public class DeleteRequestHandlerAsync<TRow, TDeleteRequest, TDeleteResponse> :
     protected virtual async Task LoadEntityAsync(CancellationToken cancellationToken = default)
     {
         var idField = Row.GetIdField();
-        var id = idField.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture);
+        var id = GetRequestEntityId();
 
         var query = new SqlQuery()
             .Dialect(Connection.GetDialect())
@@ -93,7 +93,7 @@ public class DeleteRequestHandlerAsync<TRow, TDeleteRequest, TDeleteResponse> :
         await PrepareQueryAsync(query, cancellationToken).ConfigureAwait(false);
 
         if (!await query.GetFirstAsync(Connection, cancellationToken: cancellationToken).ConfigureAwait(false))
-            throw DataValidation.EntityNotFoundError(Row, Request.EntityId, Localizer);
+            throw DataValidation.EntityNotFoundError(Row, id, Localizer);
     }
 
     /// <summary>

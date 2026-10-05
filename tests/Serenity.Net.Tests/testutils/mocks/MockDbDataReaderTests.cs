@@ -27,6 +27,26 @@ public class MockDbDataReaderTests
     }
 
     [Fact]
+    public void Empty_Anonymous_Items_With_Columns_Yield_Empty_Reader()
+    {
+        var reader = new MockDbDataReader(["ID", "Name"], Array.Empty<object>());
+
+        Assert.Equal(2, reader.FieldCount);
+        Assert.Equal("ID", reader.GetName(0));
+        Assert.Equal("Name", reader.GetName(1));
+        Assert.False(reader.Read());
+    }
+
+    [Fact]
+    public void Empty_Anonymous_Items_Without_Columns_Throw()
+    {
+        var ex = Assert.Throws<ArgumentException>(() =>
+            new MockDbDataReader(Array.Empty<object>()));
+
+        Assert.Equal("anonymousItems", ex.ParamName);
+    }
+
+    [Fact]
     public void Maps_Dictionary_Items_By_Key_Ignoring_Order()
     {
         var items = new List<IDictionary<string, object?>>

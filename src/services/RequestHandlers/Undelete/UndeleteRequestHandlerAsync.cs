@@ -84,7 +84,7 @@ public class UndeleteRequestHandlerAsync<TRow, TUndeleteRequest, TUndeleteRespon
     protected virtual async Task LoadEntityAsync(CancellationToken cancellationToken = default)
     {
         var idField = Row.GetIdField();
-        var id = idField.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture);
+        var id = GetRequestEntityId();
 
         var query = new SqlQuery()
             .Dialect(Connection.GetDialect())

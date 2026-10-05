@@ -233,14 +233,7 @@ public class SaveRequestHandlerAsync<TRow, TSaveRequest, TSaveResponse> :
     protected virtual async Task LoadOldEntityAsync(CancellationToken cancellationToken = default)
     {
         if (!await (await PrepareQueryAsync(cancellationToken).ConfigureAwait(false)).GetFirstAsync(Connection, cancellationToken: cancellationToken).ConfigureAwait(false))
-        {
-            var idField = Row.GetIdField();
-            var id = Request.EntityId != null ?
-                idField.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture)
-                : idField.AsObject(Row);
-
-            throw DataValidation.EntityNotFoundError(Row, id, Localizer);
-        }
+            throw DataValidation.EntityNotFoundError(Row, GetRequestEntityId(), Localizer);
     }
 
     /// <summary>

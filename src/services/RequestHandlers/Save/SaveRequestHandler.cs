@@ -180,14 +180,7 @@ public class SaveRequestHandler<TRow, TSaveRequest, TSaveResponse> :
     protected virtual void LoadOldEntity()
     {
         if (!PrepareQuery().GetFirst(Connection))
-        {
-            var idField = Row.GetIdField();
-            var id = Request.EntityId != null ?
-                idField.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture)
-                : idField.AsObject(Row);
-
-            throw DataValidation.EntityNotFoundError(Row, id, Localizer);
-        }
+            throw DataValidation.EntityNotFoundError(Row, GetRequestEntityId(), Localizer);
     }
 
     /// <summary>

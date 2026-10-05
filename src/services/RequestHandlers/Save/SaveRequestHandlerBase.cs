@@ -305,6 +305,26 @@ public abstract class SaveRequestHandlerBase<TRow, TSaveRequest, TSaveResponse>(
     }
 
     /// <summary>
+    /// Gets the id of the entity targeted by the current request, converted to the
+    /// value type of the row's id field. Falls back to the row's own id when the
+    /// request does not carry one. Used both for loading the previous entity and for
+    /// building the error returned when it cannot be loaded, so that a caller cannot
+    /// distinguish a missing record from one they are not allowed to touch.
+    /// </summary>
+    protected virtual object? GetRequestEntityId()
+    {
+        var idField = Row.GetIdField();
+        if (Request.EntityId != null)
+            return idField.ConvertValue(Request.EntityId, System.Globalization.CultureInfo.InvariantCulture);
+
+        var rowId = idField.AsObject(Row);
+        if (rowId == null && (idField.Flags & FieldFlags.NotNull) == FieldFlags.NotNull)
+            ArgumentNullException.ThrowIfNull(Request.EntityId);
+
+        return rowId;
+    }
+
+    /// <summary>
     /// Validates user permissions by checking <see cref="InsertPermissionAttribute"/>
     /// and <see cref="UpdatePermissionAttribute"/>, and <see cref="ModifyPermissionAttribute"/>
     /// or <see cref="ReadPermissionAttribute" /> if others are not found.
@@ -325,8 +345,17 @@ public abstract class SaveRequestHandlerBase<TRow, TSaveRequest, TSaveResponse>(
         attr ??= (PermissionAttributeBase?)typeof(TRow).GetCustomAttribute<ModifyPermissionAttribute>(true) ??
             typeof(TRow).GetCustomAttribute<ReadPermissionAttribute>(true);
 
-        if (attr != null)
+        if (attr == null)
+            return;
+
+        if (IsCreate)
+        {
             Permissions.ValidatePermission(attr.Permission ?? "?", Localizer);
+            return;
+        }
+
+        if (!Permissions.HasPermission(attr.Permission ?? "?"))
+            throw DataValidation.EntityNotFoundError(Row, GetRequestEntityId(), Localizer);
     }
 
     /// <summary>

@@ -54,6 +54,21 @@ public abstract class DeleteRequestHandlerBase<TRow, TDeleteRequest, TDeleteResp
     }
 
     /// <summary>
+    /// Gets the id of the entity targeted by the current request, converted to the
+    /// value type of the row's id field. Used both for loading the entity and for
+    /// building the error returned when it cannot be loaded, so that a caller cannot
+    /// distinguish a missing record from one they are not allowed to touch.
+    /// </summary>
+    protected virtual object? GetRequestEntityId()
+    {
+        var idField = Row.GetIdField();
+        if ((idField.Flags & FieldFlags.NotNull) == FieldFlags.NotNull)
+            ArgumentNullException.ThrowIfNull(Request.EntityId);
+
+        return idField.ConvertValue(Request.EntityId, System.Globalization.CultureInfo.InvariantCulture);
+    }
+
+    /// <summary>
     /// Validates the user permissions for delete operation
     /// </summary>
     protected virtual void ValidatePermissions()
@@ -62,8 +77,9 @@ public abstract class DeleteRequestHandlerBase<TRow, TDeleteRequest, TDeleteResp
             (PermissionAttributeBase?)typeof(TRow).GetCustomAttribute<ModifyPermissionAttribute>(true) ??
             typeof(TRow).GetCustomAttribute<ReadPermissionAttribute>(true);
 
-        if (attr != null)
-            Permissions.ValidatePermission(attr.Permission ?? "?", Localizer);
+        if (attr != null &&
+            !Permissions.HasPermission(attr.Permission ?? "?"))
+            throw DataValidation.EntityNotFoundError(Row, GetRequestEntityId(), Localizer);
     }
 
     /// <summary>
