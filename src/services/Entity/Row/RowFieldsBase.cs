@@ -433,7 +433,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins, IHas
                 {
                     readPermission = fieldsReadPerm;
                     insertPermission = fieldsInsertPerm ?? fieldsModifyPerm ?? fieldsReadPerm;
-                    updatePermission = fieldsUpdatePerm ?? fieldsUpdatePerm ?? fieldsReadPerm;
+                    updatePermission = fieldsUpdatePerm ?? fieldsModifyPerm ?? fieldsReadPerm;
                 }
 
                 if (fieldType.GetCustomAttribute<NotMappedAttribute>() != null)

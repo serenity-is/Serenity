@@ -16,7 +16,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
         if (source.BasedOnField is not null)
         {
             if (source.BasedOnField.UpdatePermission != null &&
-                source.BasedOnField.UpdatePermission != SpecialPermissionKeys.LoggedIn)
+                source.BasedOnField.UpdatePermission != SpecialPermissionKeys.Public)
                 item.UpdatePermission = source.BasedOnField.UpdatePermission;
         }
     }
