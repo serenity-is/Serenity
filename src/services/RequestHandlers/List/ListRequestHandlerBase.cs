@@ -102,6 +102,27 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(
     }
 
     /// <summary>
+    /// Returns true if the field can be used in a filter, based on its flags,
+    /// minimum select level, read permission, and lookup access mode.
+    /// </summary>
+    /// <param name="field">The field</param>
+    protected virtual bool AllowFilterField(Field field) =>
+        CriteriaFieldExpressionReplacer.IsFieldFilterAllowed(field, Permissions, lookupAccessMode);
+
+    /// <summary>
+    /// Returns true if the field should be allowed to affect sort order.
+    /// </summary>
+    /// <param name="field">The field</param>
+    protected virtual bool AllowSortField(Field field)
+    {
+        var sortable = field.GetAttribute<SortableAttribute>();
+        if (sortable is not null && !sortable.Value)
+            return false;
+
+        return AllowSelectField(field);
+    }
+
+    /// <summary>
     /// Returns true if the field should be selected, based on
     /// current <see cref="ColumnSelection"/>, field <see cref="MinSelectLevelAttribute"/>,
     /// the field being a not mapped (<see cref="NotMappedAttribute"/>) field, table field,
@@ -454,7 +475,8 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(
             permissions: Permissions,
             lookupAccessMode: lookupAccessMode,
             dialect: Connection.GetDialect(),
-            toCriteria: ToCriteria)
+            toCriteria: ToCriteria,
+            allowFilterField: AllowFilterField)
                 .Process(criteria);
     }
 
@@ -480,8 +502,8 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(
     /// <summary>
     /// Applies a field equality filter, e.g. one that is passed via Request.EqualityFilter
     /// to the query. It validates field flags like <see cref="FieldFlags.DenyFiltering"/> and
-    /// <see cref="FieldFlags.NotMapped"/> and <see cref="SelectLevel.Never"/> to check 
-    /// if the field is allowed to be filtered.
+    /// <see cref="FieldFlags.NotMapped"/>, <see cref="SelectLevel.Never"/>, and field read
+    /// permissions to check if the field is allowed to be filtered.
     /// </summary>
     /// <param name="query">Query</param>
     /// <param name="field">Field</param>
@@ -489,9 +511,7 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(
     /// <exception cref="ArgumentOutOfRangeException">The field is not allowed to be filtered.</exception>
     protected virtual void ApplyFieldEqualityFilter(SqlQuery query, Field field, object? value)
     {
-        if (field.MinSelectLevel == SelectLevel.Never ||
-            field.Flags.HasFlag(FieldFlags.DenyFiltering) ||
-            field.Flags.HasFlag(FieldFlags.NotMapped))
+        if (field.Flags.HasFlag(FieldFlags.NotMapped) || !AllowFilterField(field))
         {
             throw new ArgumentOutOfRangeException(field.PropertyName ?? field.Name,
                 $"Can't apply equality filter on field {field.PropertyName ?? field.Name}");
@@ -608,6 +628,7 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(
 
     /// <summary>
     /// Applies a sort order to the query
+    /// Fields with read permissions the user does not have are ignored.
     /// </summary>
     /// <param name="query">Query</param>
     /// <param name="sortBy">Sort order</param>
@@ -621,8 +642,7 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(
             if (field.Flags.HasFlag(FieldFlags.NotMapped))
                 return;
 
-            var sortable = field.GetAttribute<SortableAttribute>();
-            if (sortable != null && !sortable.Value)
+            if (!AllowSortField(field))
                 return;
         }
 
@@ -659,9 +679,6 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(
     {
         if (!Request.DistinctFields.IsEmptyOrNull())
         {
-            Query.Distinct(true);
-            Query.ApplySort(Request.DistinctFields!);
-
             var result = Request.DistinctFields!.Select(x =>
             {
                 if (x == null || string.IsNullOrEmpty(x.Field))
@@ -681,6 +698,10 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(
             // if any of fields are invalid, return an empty array to avoid errors
             if (result.Any(x => x is null))
                 return [];
+
+            Query.Distinct(true);
+            for (var i = Request.DistinctFields!.Length - 1; i >= 0; i--)
+                ApplySortBy(Query, Request.DistinctFields[i]);
 
             return result!;
         }

@@ -17,12 +17,16 @@ namespace Serenity.Data;
 /// used in the filter. Default is false.</param>
 /// <param name="dialect">Optional dialect</param>
 /// <param name="toCriteria">Optional field to criteria converter</param>
+/// <param name="allowFilterField">Optional field filter validator. If provided, it will be used to determine if a field can be filtered
+/// instead of the default logic using see <see cref="permissions"/> argument.</param>
 /// <exception cref="ArgumentNullException"><paramref name="row"/> or <paramref name="permissions"/> is <c>null</c>.</exception>
 public class CriteriaFieldExpressionReplacer(IRow row, IPermissionService permissions,
-    bool lookupAccessMode = false, ISqlDialect? dialect = null, Func<IField, BaseCriteria>? toCriteria = null) : SafeCriteriaValidator
+    bool lookupAccessMode = false, ISqlDialect? dialect = null, Func<IField, BaseCriteria>? toCriteria = null,
+    Func<Field, bool>? allowFilterField = null) : SafeCriteriaValidator
 {
     private readonly IPermissionService permissions = permissions ?? throw new ArgumentNullException(nameof(permissions));
     private readonly bool lookupAccessMode = lookupAccessMode;
+    private readonly Func<Field, bool>? allowFilterField = allowFilterField;
 
     /// <summary>
     /// Gets the row instance.
@@ -52,8 +56,26 @@ public class CriteriaFieldExpressionReplacer(IRow row, IPermissionService permis
     /// <param name="field">Field instance</param>
     protected virtual bool CanFilterField(Field field)
     {
-        if (field.Flags.HasFlag(FieldFlags.DenyFiltering) ||
-            field.Flags.HasFlag(FieldFlags.NotMapped))
+        if (field.Flags.HasFlag(FieldFlags.NotMapped))
+            return false;
+
+        if (allowFilterField is not null)
+            return allowFilterField(field);
+
+        return IsFieldFilterAllowed(field, permissions, lookupAccessMode);
+    }
+
+    /// <summary>
+    /// Returns whether filtering a field is allowed by its flags and permissions.
+    /// </summary>
+    /// <param name="field">The field to check.</param>
+    /// <param name="permissions">The permission service.</param>
+    /// <param name="lookupAccessMode">Whether lookup access mode is enabled.</param>
+    /// <returns>True if filtering the field is allowed.</returns>
+    public static bool IsFieldFilterAllowed(Field field, IPermissionService permissions,
+        bool lookupAccessMode = false)
+    {
+        if (field.Flags.HasFlag(FieldFlags.DenyFiltering))
             return false;
 
         if (field.MinSelectLevel == SelectLevel.Never)

@@ -41,6 +41,9 @@ public partial class ListRequestHandlerTests
         [SetFieldFlags(FieldFlags.DenyFiltering)]
         public string? DenyFilterF { get => fields.DenyFilterF[this]; set => fields.DenyFilterF[this] = value; }
 
+        [ReadPermission(ExtraSpecialFieldPermission)]
+        public string? ProtectedF { get => fields.ProtectedF[this]; set => fields.ProtectedF[this] = value; }
+
         [MinSelectLevel(SelectLevel.Never)]
         public string? NeverF { get => fields.NeverF[this]; set => fields.NeverF[this] = value; }
 
@@ -72,6 +75,7 @@ public partial class ListRequestHandlerTests
             public StringField Unsortable = null!;
             public StringField NotMappedF = null!;
             public StringField DenyFilterF = null!;
+            public StringField ProtectedF = null!;
             public StringField NeverF = null!;
             public StringField AlwaysF = null!;
             public StringField ExplicitF = null!;
@@ -105,6 +109,8 @@ public partial class ListRequestHandlerTests
             Query = new SqlQuery().Dialect(connection.GetDialect());
             Request = request ?? new ListRequest();
         }
+
+        public void IncludeRowInQuery() => Query.From(Row);
 
         public void SetLookupAccessMode(bool value) => lookupAccessMode = value;
 
@@ -146,6 +152,35 @@ public partial class ListRequestHandlerTests
         public void CallApplySortBy(SqlQuery query, SortBy sortBy) => ApplySortBy(query, sortBy);
 
         public void CallApplyEquality(SqlQuery query) => ApplyEqualityFilter(query);
+
+        public BaseCriteria CallReplaceFieldExpressions(BaseCriteria criteria) =>
+            ReplaceFieldExpressions(criteria);
+    }
+
+    private sealed class DenyAllFilterListHandler(IRequestContext context) : CovListHandler(context)
+    {
+        protected override bool AllowFilterField(Field field) => false;
+    }
+
+    private sealed class AllowAllFilterListHandler(IRequestContext context) : CovListHandler(context)
+    {
+        protected override bool AllowFilterField(Field field) => true;
+    }
+
+    private sealed class DenyAllSortListHandler(IRequestContext context) : CovListHandler(context)
+    {
+        protected override bool AllowSortField(Field field) => false;
+    }
+
+    private sealed class TrackingSelectListHandler(IRequestContext context) : CovListHandler(context)
+    {
+        public int AllowSelectFieldCalls { get; private set; }
+
+        protected override bool AllowSelectField(Field field)
+        {
+            AllowSelectFieldCalls++;
+            return base.AllowSelectField(field);
+        }
     }
 
     private class SkippingListHandler(IRequestContext context) : ListRequestHandler<NoQuickSearchRow>(context)
@@ -533,6 +568,72 @@ public partial class ListRequestHandlerTests
     }
 
     [Fact]
+    public void ApplyEqualityFilter_Throws_For_FieldReadPermission()
+    {
+        using var conn = CovConnection();
+        var handler = new CovListHandler(new NullRequestContext()
+            .WithPermissions(permission => permission == ReadPermission));
+        handler.Setup(conn, new ListRequest
+        {
+            EqualityFilter = new Dictionary<string, object?>
+            {
+                [CovRow.Fields.ProtectedF.Name] = "x"
+            }
+        });
+
+        var query = new SqlQuery().Dialect(conn.GetDialect()).From(new CovRow());
+        Assert.Throws<ArgumentOutOfRangeException>(() => handler.CallApplyEquality(query));
+    }
+
+    [Fact]
+    public void EqualityFilter_And_Criteria_Use_The_Same_FieldFilterPolicy()
+    {
+        using var conn = CovConnection();
+        var handler = new DenyAllFilterListHandler(CovContext());
+        handler.Setup(conn);
+
+        Assert.Throws<ValidationError>(() => handler.CallReplaceFieldExpressions(
+            new Criteria(CovRow.Fields.NormalF.PropertyName)));
+
+        var query = new SqlQuery().Dialect(conn.GetDialect()).From(new CovRow());
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            handler.CallApplyFieldEquality(query, CovRow.Fields.NormalF, "x"));
+    }
+
+    [Fact]
+    public void NotMapped_IsRejected_IndependentlyOfFilterPolicy()
+    {
+        using var conn = CovConnection();
+        var handler = new AllowAllFilterListHandler(CovContext());
+        handler.Setup(conn);
+
+        Assert.Throws<ValidationError>(() => handler.CallReplaceFieldExpressions(
+            new Criteria(CovRow.Fields.NotMappedF.PropertyName)));
+
+        var query = new SqlQuery().Dialect(conn.GetDialect()).From(new CovRow());
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            handler.CallApplyFieldEquality(query, CovRow.Fields.NotMappedF, "x"));
+    }
+
+    [Fact]
+    public void ApplyEqualityFilter_Skips_Empty_Value_Before_FieldReadPermission()
+    {
+        using var conn = CovConnection();
+        var handler = new CovListHandler(new NullRequestContext()
+            .WithPermissions(permission => permission == ReadPermission));
+        handler.Setup(conn, new ListRequest
+        {
+            EqualityFilter = new Dictionary<string, object?>
+            {
+                [CovRow.Fields.ProtectedF.Name] = ""
+            }
+        });
+
+        var query = new SqlQuery().Dialect(conn.GetDialect()).From(new CovRow());
+        handler.CallApplyEquality(query);
+    }
+
+    [Fact]
     public void ApplyFieldEquality_Throws_For_DenyFiltering_And_NotMapped()
     {
         using var conn = CovConnection();
@@ -574,6 +675,69 @@ public partial class ListRequestHandlerTests
     }
 
     [Fact]
+    public void ApplySortBy_Skips_FieldWithoutReadPermission()
+    {
+        using var conn = CovConnection();
+        var handler = new CovListHandler(new NullRequestContext()
+            .WithPermissions(permission => permission == ReadPermission));
+        handler.Setup(conn);
+
+        var query = new SqlQuery().Dialect(conn.GetDialect()).From(new CovRow())
+            .Select(CovRow.Fields.NormalF);
+        handler.CallApplySortBy(query, new SortBy(CovRow.Fields.ProtectedF.Name, false));
+
+        Assert.False(query.ToString().Contains("ORDER BY", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public void ApplySortBy_Uses_AllowSortFieldOverride()
+    {
+        using var conn = CovConnection();
+        var handler = new DenyAllSortListHandler(CovContext());
+        handler.Setup(conn);
+
+        var query = new SqlQuery().Dialect(conn.GetDialect()).From(new CovRow())
+            .Select(CovRow.Fields.NormalF);
+        handler.CallApplySortBy(query, new SortBy(CovRow.Fields.NormalF.Name, false));
+
+        Assert.False(query.ToString().Contains("ORDER BY", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public void AllowSortField_ChecksSortableAttributeBeforeSelectPermission()
+    {
+        using var conn = CovConnection();
+        var handler = new TrackingSelectListHandler(CovContext());
+        handler.Setup(conn);
+
+        var query = new SqlQuery().Dialect(conn.GetDialect()).From(new CovRow())
+            .Select(CovRow.Fields.NormalF);
+        handler.CallApplySortBy(query, new SortBy(CovRow.Fields.Unsortable.Name, false));
+
+        Assert.Equal(0, handler.AllowSelectFieldCalls);
+        Assert.False(query.ToString().Contains("ORDER BY", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public void ApplySortBy_DefaultPolicy_UsesAllowSelectFieldRules()
+    {
+        using var conn = CovConnection();
+        var handler = new CovListHandler(CovContext());
+        handler.Setup(conn);
+
+        var neverFieldQuery = new SqlQuery().Dialect(conn.GetDialect()).From(new CovRow())
+            .Select(CovRow.Fields.NormalF);
+        handler.CallApplySortBy(neverFieldQuery, new SortBy(CovRow.Fields.NeverF.Name, false));
+        Assert.False(neverFieldQuery.ToString().Contains("ORDER BY", StringComparison.OrdinalIgnoreCase));
+
+        handler.SetLookupAccessMode(true);
+        var nonLookupFieldQuery = new SqlQuery().Dialect(conn.GetDialect()).From(new CovRow())
+            .Select(CovRow.Fields.NormalF);
+        handler.CallApplySortBy(nonLookupFieldQuery, new SortBy(CovRow.Fields.NormalF.Name, false));
+        Assert.False(nonLookupFieldQuery.ToString().Contains("ORDER BY", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
     public void GetDistinctFields_Returns_Valid_Fields()
     {
         using var conn = CovConnection();
@@ -582,10 +746,30 @@ public partial class ListRequestHandlerTests
         {
             DistinctFields = [new SortBy(CovRow.Fields.NormalF.Name, false)]
         });
+        handler.IncludeRowInQuery();
 
         var fields = handler.CallGetDistinctFields();
         Assert.NotNull(fields);
         Assert.Equal(CovRow.Fields.NormalF.Name, Assert.Single(fields).Name);
+        Assert.Single(((ISqlQuery)handler.Query).OrderBy);
+    }
+
+    [Fact]
+    public void GetDistinctFields_SkipsOrdering_WhenFieldIsUnsortable()
+    {
+        using var conn = CovConnection();
+        var handler = new CovListHandler(CovContext());
+        handler.Setup(conn, new ListRequest
+        {
+            DistinctFields = [new SortBy(CovRow.Fields.Unsortable.Name, false)]
+        });
+        handler.IncludeRowInQuery();
+
+        var fields = handler.CallGetDistinctFields();
+
+        Assert.Equal(CovRow.Fields.Unsortable.Name, Assert.Single(fields!).Name);
+        Assert.True(((ISqlQuery)handler.Query).Distinct);
+        Assert.Empty(((ISqlQuery)handler.Query).OrderBy);
     }
 
     [Fact]
@@ -600,6 +784,25 @@ public partial class ListRequestHandlerTests
 
         var fields = handler.CallGetDistinctFields();
         Assert.Empty(fields!);
+    }
+
+    [Fact]
+    public void GetDistinctFields_DoesNotMutateQuery_ForUnauthorizedField()
+    {
+        using var conn = CovConnection();
+        var handler = new CovListHandler(new NullRequestContext()
+            .WithPermissions(permission => permission == ReadPermission));
+        handler.Setup(conn, new ListRequest
+        {
+            DistinctFields = [new SortBy(CovRow.Fields.ProtectedF.Name, false)]
+        });
+        handler.IncludeRowInQuery();
+
+        var fields = handler.CallGetDistinctFields();
+
+        Assert.Empty(fields!);
+        Assert.False(((ISqlQuery)handler.Query).Distinct);
+        Assert.Empty(((ISqlQuery)handler.Query).OrderBy);
     }
 
     [Fact]

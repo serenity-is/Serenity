@@ -11,7 +11,8 @@ public static class ServiceQueryHelper
     /// <param name="query">Query</param>
     /// <param name="sort">Sort field, ignored if null, empty or
     /// not a usable field (e.g. a field that is selected in the query
-    /// or available in the row)</param>
+    /// or available in the row). Note that this does not do any permission checks,
+    /// so they must be pre-handled separately by the caller.</param>
     /// <param name="descending">Descending flag</param>
     /// <exception cref="ArgumentNullException">query is null</exception>
     public static SqlQuery ApplySort(this SqlQuery query, string? sort, bool descending)
