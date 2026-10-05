@@ -223,7 +223,7 @@ public abstract class ServiceLookupEditorBaseAttribute(string editorType) : Cust
     /// <summary>
     /// Gets or sets the item/row type passed to the constructor. 
     /// </summary>
-    public Type? ItemType { get; protected set; }
+    public Type? ItemType { get; set; }
 
     /// <summary>
     /// Gets or sets the endpoint type. If this is set, the service URL will be 
