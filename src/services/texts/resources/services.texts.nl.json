@@ -34,6 +34,8 @@
   "Enums.ImageCheckResult.WidthTooLow": "De afbeeldingsbreedte moet hoger zijn dan {0} pixels, maar het is {1} pixels!",
   "Validation.ArgumentIsNull": "Argument {0} is null!",
   "Validation.ArgumentOutOfRange": "Argument {0} is buiten bereik!",
+  "Validation.DeleteForeignKeyError": "Kan record niet verwijderen. Tabel '{0}' heeft records die afhankelijk zijn van deze!",
+  "Validation.DeleteForeignKeyErrorGeneric": "Kan het record niet verwijderen. Er zijn gerelateerde records die afhankelijk zijn van dit record!",
   "Validation.EntityForeignKeyViolation": "U moet eerst de bijbehorende {0}-records verwijderen voordat u deze verwijdert!",
   "Validation.EntityHasDeletedParent": "Voordat u aan deze gegevens werkt, moet de ouder worden hersteld!",
   "Validation.EntityIsNotActive": "Kan niet opereren op een verwijderd {0}-record!",
@@ -46,5 +48,9 @@
   "Validation.FieldIsRequired": "Veld {0} is verplicht!",
   "Validation.Recaptcha": "Gelieve te bevestigen dat u geen robot bent!",
   "Validation.RequestIsNull": "Verzoek is leeg!",
+  "Validation.SaveForeignKeyError": "Kan het record niet opslaan. Het record '{0}' waarnaar wordt verwezen, bestaat niet!",
+  "Validation.SaveForeignKeyErrorGeneric": "Kan het record niet opslaan. Een record waarnaar wordt verwezen, bestaat niet!",
+  "Validation.SavePrimaryKeyError": "Kan het record niet opslaan. Er is een ander record met dezelfde {1} waarde!",
+  "Validation.SavePrimaryKeyErrorGeneric": "Kan het record niet opslaan. Er is een ander record met dezelfde waarde of waarden!",
   "Validation.UnexpectedError": "Er is een onverwachte fout opgetreden!"
 }

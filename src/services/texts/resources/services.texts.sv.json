@@ -34,6 +34,8 @@
   "Enums.ImageCheckResult.WidthTooLow": "Bildbredd måste vara högre än {0} pixlar, men det är {1} pixlar!",
   "Validation.ArgumentIsNull": "Argumentet {0} är null!",
   "Validation.ArgumentOutOfRange": "Argumentet {0} ligger utanför intervallet!",
+  "Validation.DeleteForeignKeyError": "Kan inte ta bort posten. '{0}'-tabellen har poster som är beroende av denna!",
+  "Validation.DeleteForeignKeyErrorGeneric": "Det går inte att ta bort posten. Det finns relaterade poster som är beroende av den här posten!",
   "Validation.EntityForeignKeyViolation": "Du måste först ta bort relaterade {0}-poster innan du tar bort den här!",
   "Validation.EntityHasDeletedParent": "Innan du arbetar med den här posten måste dess förälder återställas!",
   "Validation.EntityIsNotActive": "Kan inte utföra operationer på en borttagen {0}-post!",
@@ -46,5 +48,9 @@
   "Validation.FieldIsRequired": "Fältet {0} krävs!",
   "Validation.Recaptcha": "Var god bekräfta att du inte är en robot!",
   "Validation.RequestIsNull": "Begäran är tom!",
+  "Validation.SaveForeignKeyError": "Det går inte att spara posten. Den refererade posten '{0}' finns inte!",
+  "Validation.SaveForeignKeyErrorGeneric": "Det går inte att spara posten. En refererad post finns inte!",
+  "Validation.SavePrimaryKeyError": "Det går inte att spara posten. Det finns en annan post med samma {1} värde!",
+  "Validation.SavePrimaryKeyErrorGeneric": "Det går inte att spara posten. Det finns en annan post med samma värde eller värden!",
   "Validation.UnexpectedError": "Ett oväntat fel har uppstått!"
 }

@@ -132,12 +132,10 @@
   "Site.ValidationError.Title": "HATA",
   "Validation.AuthenticationError": "Geçersiz kullanıcı adı veya şifre!",
   "Validation.CurrentPasswordMismatch": "Mevcut şifreniz doğru değil!",
-  "Validation.DeleteForeignKeyError": "Kayıt silinemiyor. '{0}' tablosunda buna bağlı kayıtlar var!",
   "Validation.EmailConfirm": "Girilen e-postalar eşleşmiyor!",
   "Validation.EmailInUse": "Bu e-postaya sahip başka bir kullanıcı var!",
   "Validation.InvalidActivateToken": "Hesabınızı etkinleştirmek için kullandığınız belirteciniz geçersiz veya süresi dolmuş!",
   "Validation.InvalidResetToken": "Parolanızı sıfırlamak için kullandığınız belirteciniz geçersiz veya süresi dolmuş!",
   "Validation.MinRequiredPasswordLength": "Girilen parolada yeterli uzunlukta değil (en az {0})!",
-  "Validation.PasswordConfirmMismatch": "Girilen parolalar eşleşmiyor!",
-  "Validation.SavePrimaryKeyError": "Kayıt yapılamıyor. Aynı {1} değerine sahip başka bir kayıt var!"
+  "Validation.PasswordConfirmMismatch": "Girilen parolalar eşleşmiyor!"
 }

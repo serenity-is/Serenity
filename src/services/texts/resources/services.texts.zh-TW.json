@@ -34,6 +34,8 @@
   "Enums.ImageCheckResult.WidthTooLow": "圖片寬度必須大於{0}像素，但它是{1}像素！",
   "Validation.ArgumentIsNull": "參數{0}為空！",
   "Validation.ArgumentOutOfRange": "參數{0}超出範圍！",
+  "Validation.DeleteForeignKeyError": "無法刪除記錄。 '{0}'表中有依賴於此記錄的記錄！",
+  "Validation.DeleteForeignKeyErrorGeneric": "無法刪除記錄。有相關記錄依賴於此記錄！",
   "Validation.EntityForeignKeyViolation": "您必須先刪除相關的{0}記錄，然後才能刪除此記錄！",
   "Validation.EntityHasDeletedParent": "在操作此記錄之前，其父級必須恢復！",
   "Validation.EntityIsNotActive": "無法在已刪除的{0}記錄上操作！",
@@ -46,5 +48,9 @@
   "Validation.FieldIsRequired": "{0} 欄位是必填！",
   "Validation.Recaptcha": "請確認您不是機器人！",
   "Validation.RequestIsNull": "請求為空！",
+  "Validation.SaveForeignKeyError": "無法儲存記錄。參照的「{0}」記錄不存在！",
+  "Validation.SaveForeignKeyErrorGeneric": "無法儲存記錄。參照的記錄不存在！",
+  "Validation.SavePrimaryKeyError": "無法儲存記錄。 有另一條記錄具有相同的{1}值！",
+  "Validation.SavePrimaryKeyErrorGeneric": "無法儲存記錄。存在具有相同值的其他記錄！",
   "Validation.UnexpectedError": "發生了意外錯誤！"
 }

@@ -34,6 +34,8 @@
   "Enums.ImageCheckResult.WidthTooLow": "Ширина изображения должна быть больше чем {0} пикселей, но это {1} пикселей!",
   "Validation.ArgumentIsNull": "Аргумент {0} нулевой!",
   "Validation.ArgumentOutOfRange": "Аргумент {0} вне диапазона!",
+  "Validation.DeleteForeignKeyError": "Невозможно удалить запись. В таблице '{0}' есть записи, которые зависят от этой!",
+  "Validation.DeleteForeignKeyErrorGeneric": "Невозможно удалить запись. Есть связанные записи, которые зависят от этой записи!",
   "Validation.EntityForeignKeyViolation": "Вы должны сначала удалить связанные записи {0}, прежде чем удалить эту!",
   "Validation.EntityHasDeletedParent": "Прежде чем приступить к работе с этой записью, ее родитель должен быть восстановлен!",
   "Validation.EntityIsNotActive": "Невозможно выполнить операцию над удаленной записью {0}!",
@@ -46,5 +48,9 @@
   "Validation.FieldIsRequired": "Поле {0} обязательно для заполнения!",
   "Validation.Recaptcha": "Пожалуйста, подтвердите, что вы не робот!",
   "Validation.RequestIsNull": "Запрос пуст!",
+  "Validation.SaveForeignKeyError": "Невозможно сохранить запись. Запись '{0}', на которую ссылаются, не существует!",
+  "Validation.SaveForeignKeyErrorGeneric": "Невозможно сохранить запись. Связанная запись не существует!",
+  "Validation.SavePrimaryKeyError": "Не удается сохранить запись. Есть другая запись с тем же значением {1}!",
+  "Validation.SavePrimaryKeyErrorGeneric": "Невозможно сохранить запись. Существует другая запись с таким же значением или значениями!",
   "Validation.UnexpectedError": "Произошла непредвиденная ошибка!"
 }

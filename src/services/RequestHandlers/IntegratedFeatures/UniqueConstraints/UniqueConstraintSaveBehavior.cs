@@ -1,13 +1,17 @@
 namespace Serenity.Services;
 
 /// <summary>
-/// Behavior that handles <see cref="UniqueConstraintAttribute"/>.
+/// Behavior that handles <see cref="UniqueConstraintAttribute"/> on a row. It checks each
+/// unique constraint before save (unless <see cref="UniqueConstraintAttribute.CheckBeforeSave"/>
+/// is disabled) by running an existence query. Override <see cref="BaseUniqueConstraintSaveBehavior.BuildUniqueConstraintQuery"/>
+/// in a derived behavior, or add your own behavior and set <see cref="UniqueConstraintAttribute.DisableDefaultBehavior"/>,
+/// to customize or replace the pre-check.
 /// </summary>
 /// <remarks>
 /// Initializes a new instance of the class.
 /// </remarks>
 /// <param name="localizer">Text localizer</param>
-public class UniqueConstraintSaveBehavior(ITextLocalizer localizer) : BaseSaveBehaviorAsync, ISaveBehaviorSync, IImplicitBehavior
+public class UniqueConstraintSaveBehavior(ITextLocalizer localizer) : BaseUniqueConstraintSaveBehavior, IImplicitBehavior
 {
     private UniqueConstraintAttribute[]? attrList;
     private IEnumerable<Field>[]? attrFields;
@@ -17,7 +21,7 @@ public class UniqueConstraintSaveBehavior(ITextLocalizer localizer) : BaseSaveBe
     public bool ActivateFor(IRow row)
     {
         var attr = row.GetType().GetCustomAttributes<UniqueConstraintAttribute>()
-            .Where(x => x.CheckBeforeSave);
+            .Where(x => x.CheckBeforeSave && !x.DisableDefaultBehavior);
 
         if (!attr.Any())
             return false;
@@ -39,7 +43,7 @@ public class UniqueConstraintSaveBehavior(ITextLocalizer localizer) : BaseSaveBe
             var attr = attrList[i];
             var fields = attrFields![i];
 
-            UniqueFieldSaveBehavior.ValidateUniqueConstraint(handler, fields, localizer, attr.ErrorMessage,
+            ValidateUniqueConstraint(handler, fields, localizer, attr.ErrorMessage,
                 attrList[i].IgnoreDeleted ? ServiceQueryHelper.GetNotDeletedCriteria(handler.Row) : Criteria.Empty);
         }
     }
@@ -57,7 +61,7 @@ public class UniqueConstraintSaveBehavior(ITextLocalizer localizer) : BaseSaveBe
             var attr = attrList![i];
             var fields = attrFields![i];
 
-            await UniqueFieldSaveBehavior.ValidateUniqueConstraintAsync(handler, fields, localizer, attr.ErrorMessage,
+            await ValidateUniqueConstraintAsync(handler, fields, localizer, attr.ErrorMessage,
                 attrList[i].IgnoreDeleted ? ServiceQueryHelper.GetNotDeletedCriteria(handler.Row) : Criteria.Empty,
                 cancellationToken).ConfigureAwait(false);
         }

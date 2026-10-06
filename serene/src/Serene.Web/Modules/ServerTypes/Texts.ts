@@ -166,14 +166,12 @@ namespace texts {
         export function asTry(): typeof Validation;
         export const AuthenticationError: string;
         export const CurrentPasswordMismatch: string;
-        export const DeleteForeignKeyError: string;
         export const EmailConfirm: string;
         export const EmailInUse: string;
         export const InvalidActivateToken: string;
         export const InvalidResetToken: string;
         export const MinRequiredPasswordLength: string;
         export const PasswordConfirmMismatch: string;
-        export const SavePrimaryKeyError: string;
     }
 
 }
@@ -213,7 +211,6 @@ export const RolePermissionDialogTexts = Texts.Site.RolePermissionDialog;
 export const SignUpFormTexts = Texts.Forms.Membership.SignUp;
 export const SiteFormTexts = Texts.Forms;
 export const SiteLayoutTexts = Texts.Site.Layout;
-export const SqlExceptionHelperTexts = Texts.Validation;
 export const UserDialogTexts = Texts.Site.UserDialog;
 export const UserPermissionDialogTexts = Texts.Site.UserPermissionDialog;
 export const ValidationErrorViewTexts = Texts.Site.ValidationError;

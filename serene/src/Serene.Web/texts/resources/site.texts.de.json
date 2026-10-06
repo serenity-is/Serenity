@@ -132,12 +132,10 @@
   "Site.ValidationError.Title": "FEHLER",
   "Validation.AuthenticationError": "Validierungsfehler: Ungültiger Benutzername oder Passwort!",
   "Validation.CurrentPasswordMismatch": "Ihr aktuelles Passwort ist nicht gültig!",
-  "Validation.DeleteForeignKeyError": null,
   "Validation.EmailConfirm": "Die eingegebenen E-Mails stimmen nicht überein!",
   "Validation.EmailInUse": "Es existiert bereits ein Benutzer mit dieser E-Mail-Adresse!",
   "Validation.InvalidActivateToken": "Ihr Token zur Aktivierung Ihres Kontos ist ungültig oder abgelaufen!",
   "Validation.InvalidResetToken": "Ihr Token zum Zurücksetzen Ihres Passworts ist ungültig oder abgelaufen!",
   "Validation.MinRequiredPasswordLength": "Das eingegebene Passwort hat nicht genügend Zeichen (min {0})!",
-  "Validation.PasswordConfirmMismatch": "Die eingegebenen Passwörter stimmen nicht überein!",
-  "Validation.SavePrimaryKeyError": null
+  "Validation.PasswordConfirmMismatch": "Die eingegebenen Passwörter stimmen nicht überein!"
 }

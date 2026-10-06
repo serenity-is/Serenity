@@ -132,12 +132,10 @@
   "Site.ValidationError.Title": "错误",
   "Validation.AuthenticationError": "验证错误：无效的用户名或密码！",
   "Validation.CurrentPasswordMismatch": "您当前的密码无效！",
-  "Validation.DeleteForeignKeyError": "无法删除记录。 '{0}'表中有依赖于此记录的记录！",
   "Validation.EmailConfirm": "输入的电子邮件不匹配！",
   "Validation.EmailInUse": "另一位使用此电子邮件的用户已存在！",
   "Validation.InvalidActivateToken": "您用于激活帐户的令牌无效或已过期！",
   "Validation.InvalidResetToken": "您重置密码的令牌无效或已过期！",
   "Validation.MinRequiredPasswordLength": "输入的密码字符不足（最小{0}）！",
-  "Validation.PasswordConfirmMismatch": "输入的密码不匹配！",
-  "Validation.SavePrimaryKeyError": "无法保存记录。 有另一条记录具有相同的{1}值！"
+  "Validation.PasswordConfirmMismatch": "输入的密码不匹配！"
 }

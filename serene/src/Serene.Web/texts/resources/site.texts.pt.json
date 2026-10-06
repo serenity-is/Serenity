@@ -132,12 +132,10 @@
   "Site.ValidationError.Title": "ERRO",
   "Validation.AuthenticationError": "Erro de validação: Nome de utilizador ou palavra-passe inválidos!",
   "Validation.CurrentPasswordMismatch": "A sua palavra-passe atual não é válida!",
-  "Validation.DeleteForeignKeyError": null,
   "Validation.EmailConfirm": "Os emails inseridos não coincidem!",
   "Validation.EmailInUse": "Já existe outro utilizador com este email!",
   "Validation.InvalidActivateToken": "O seu token para ativar a sua conta é inválido ou expirou!",
   "Validation.InvalidResetToken": "O seu token para redefinir a sua palavra-passe é inválido ou expirou!",
   "Validation.MinRequiredPasswordLength": "A palavra-passe introduzida não tem caracteres suficientes (mín {0})!",
-  "Validation.PasswordConfirmMismatch": "As palavras-passe inseridas não coincidem!",
-  "Validation.SavePrimaryKeyError": null
+  "Validation.PasswordConfirmMismatch": "As palavras-passe inseridas não coincidem!"
 }

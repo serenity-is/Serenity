@@ -35,6 +35,8 @@
   "Enums.ImageCheckResult.WidthTooLow": "Image width must be higher than {0} pixels, but it is {1} pixels!",
   "Validation.ArgumentIsNull": "Argument {0} is null!",
   "Validation.ArgumentOutOfRange": "Argument {0} is out of range!",
+  "Validation.DeleteForeignKeyError": "Can't delete record. '{0}' table has records that depends on this one!",
+  "Validation.DeleteForeignKeyErrorGeneric": "Can't delete record. There are related records that depend on this one!",
   "Validation.EntityForeignKeyViolation": "You must first delete related {0} records before deleting this one!",
   "Validation.EntityHasDeletedParent": "Before operating on this record, its parent must be undeleted!",
   "Validation.EntityIsNotActive": "Can't operate on a deleted {0} record!",
@@ -47,5 +49,9 @@
   "Validation.FieldIsRequired": "{0} field is required!",
   "Validation.Recaptcha": "Please validate that you are not a robot!",
   "Validation.RequestIsNull": "Request is null!",
+  "Validation.SaveForeignKeyError": "Can't save record. Referenced '{0}' record does not exist!",
+  "Validation.SaveForeignKeyErrorGeneric": "Can't save record. A referenced record does not exist!",
+  "Validation.SavePrimaryKeyError": "Can't save record. There is another record with the same {1} value!",
+  "Validation.SavePrimaryKeyErrorGeneric": "Can't save record. There is another record with the same value(s)!",
   "Validation.UnexpectedError": "An unexpected error has occurred!"
 }

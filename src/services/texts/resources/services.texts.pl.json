@@ -34,6 +34,8 @@
   "Enums.ImageCheckResult.WidthTooLow": "Szerokość obrazu musi być większa niż {0} pikseli, ale jest {1} pikseli!",
   "Validation.ArgumentIsNull": "Argument {0} jest pusty!",
   "Validation.ArgumentOutOfRange": "Argument {0} jest poza zakresem!",
+  "Validation.DeleteForeignKeyError": "Nie można usunąć rekordu. Tabela '{0}' ma rekordy, od których ten zależy!",
+  "Validation.DeleteForeignKeyErrorGeneric": "Nie można usunąć rekordu. Istnieją powiązane rekordy zależne od tego rekordu!",
   "Validation.EntityForeignKeyViolation": "Najpierw musisz usunąć powiązane rekordy {0}, zanim usuniesz ten!",
   "Validation.EntityHasDeletedParent": "Przed pracą nad tym rekordem jego rodzic musi zostać przywrócony!",
   "Validation.EntityIsNotActive": "Nie można wykonać operacji na usuniętym rekordzie {0}!",
@@ -46,5 +48,9 @@
   "Validation.FieldIsRequired": "Pole {0} jest wymagane!",
   "Validation.Recaptcha": "Proszę potwierdzić, że nie jesteś robotem!",
   "Validation.RequestIsNull": "Żądanie jest puste!",
+  "Validation.SaveForeignKeyError": "Nie można zapisać rekordu. Wskazany rekord '{0}' nie istnieje!",
+  "Validation.SaveForeignKeyErrorGeneric": "Nie można zapisać rekordu. Wskazany rekord nie istnieje!",
+  "Validation.SavePrimaryKeyError": "Nie można zapisać rekordu. Istnieje inny rekord o tej samej wartości {1}!",
+  "Validation.SavePrimaryKeyErrorGeneric": "Nie można zapisać rekordu. Istnieje inny rekord z taką samą wartością lub takimi samymi wartościami!",
   "Validation.UnexpectedError": "Wystąpił nieoczekiwany błąd!"
 }

@@ -132,12 +132,10 @@
   "Site.ValidationError.Title": "ERRORE",
   "Validation.AuthenticationError": "Errore di convalida: Nome utente o password non validi!",
   "Validation.CurrentPasswordMismatch": "La tua password attuale non è valida!",
-  "Validation.DeleteForeignKeyError": null,
   "Validation.EmailConfirm": "Gli indirizzi email inseriti non corrispondono!",
   "Validation.EmailInUse": "Un altro utente con questa email esiste già!",
   "Validation.InvalidActivateToken": "Il token per attivare il tuo account non è valido o è scaduto!",
   "Validation.InvalidResetToken": "Il tuo token per reimpostare la tua password non è valido o è scaduto!",
   "Validation.MinRequiredPasswordLength": "La password inserita non contiene abbastanza caratteri (min {0})!",
-  "Validation.PasswordConfirmMismatch": "Le password inserite non corrispondono!",
-  "Validation.SavePrimaryKeyError": null
+  "Validation.PasswordConfirmMismatch": "Le password inserite non corrispondono!"
 }

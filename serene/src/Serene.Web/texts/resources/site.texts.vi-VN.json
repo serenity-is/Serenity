@@ -133,12 +133,10 @@
   "Site.ValidationError.Title": "LỖI",
   "Validation.AuthenticationError": "Lỗi xác thực: Tên người dùng hoặc mật khẩu không hợp lệ!",
   "Validation.CurrentPasswordMismatch": "Mật khẩu hiện tại của bạn không hợp lệ!",
-  "Validation.DeleteForeignKeyError": null,
   "Validation.EmailConfirm": "Các email được nhập không khớp nhau!",
   "Validation.EmailInUse": "Đã có một người dùng khác với email này!",
   "Validation.InvalidActivateToken": "Mã thông báo của bạn để kích hoạt tài khoản của bạn không hợp lệ hoặc đã hết hạn!",
   "Validation.InvalidResetToken": "Mã thông báo của bạn để đặt lại mật khẩu của bạn không hợp lệ hoặc đã hết hạn!",
   "Validation.MinRequiredPasswordLength": "Mật khẩu đã nhập không có đủ ký tự (tối thiểu {0})!",
-  "Validation.PasswordConfirmMismatch": "Mật khẩu đã nhập không khớp!",
-  "Validation.SavePrimaryKeyError": null
+  "Validation.PasswordConfirmMismatch": "Mật khẩu đã nhập không khớp!"
 }

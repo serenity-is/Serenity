@@ -132,12 +132,10 @@
   "Site.ValidationError.Title": "ERRO",
   "Validation.AuthenticationError": "Erro de validação: Nome de usuário ou senha inválidos!",
   "Validation.CurrentPasswordMismatch": "Sua senha atual não é válida!",
-  "Validation.DeleteForeignKeyError": null,
   "Validation.EmailConfirm": "Os e-mails inseridos não coincidem!",
   "Validation.EmailInUse": "Já existe outro usuário com este e-mail!",
   "Validation.InvalidActivateToken": "Seu token para ativar sua conta é inválido ou expirou!",
   "Validation.InvalidResetToken": "Seu token para redefinir sua senha é inválido ou expirou!",
   "Validation.MinRequiredPasswordLength": "A senha digitada não possui caracteres suficientes (mín {0})!",
-  "Validation.PasswordConfirmMismatch": "As senhas digitadas não correspondem!",
-  "Validation.SavePrimaryKeyError": null
+  "Validation.PasswordConfirmMismatch": "As senhas digitadas não correspondem!"
 }

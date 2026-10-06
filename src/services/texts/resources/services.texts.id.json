@@ -34,6 +34,8 @@
   "Enums.ImageCheckResult.WidthTooLow": "Lebar gambar harus lebih tinggi dari {0} piksel, tetapi itu {1} piksel!",
   "Validation.ArgumentIsNull": "Argumen {0} kosong!",
   "Validation.ArgumentOutOfRange": "Argumen {0} di luar jangkauan!",
+  "Validation.DeleteForeignKeyError": "Tidak dapat menghapus catatan. Tabel '{0}' memiliki catatan yang bergantung pada catatan ini!",
+  "Validation.DeleteForeignKeyErrorGeneric": "Catatan tidak dapat dihapus. Ada catatan terkait yang bergantung pada catatan ini!",
   "Validation.EntityForeignKeyViolation": "Anda harus menghapus catatan {0} yang terkait sebelum menghapus ini!",
   "Validation.EntityHasDeletedParent": "Sebelum melakukan operasi pada catatan ini, orang tuanya harus dikembalikan!",
   "Validation.EntityIsNotActive": "Tidak dapat melakukan operasi pada catatan {0} yang dihapus!",
@@ -46,5 +48,9 @@
   "Validation.FieldIsRequired": "Bidang {0} diperlukan!",
   "Validation.Recaptcha": "Tolong validasikan bahwa Anda bukan robot!",
   "Validation.RequestIsNull": "Permintaan kosong!",
+  "Validation.SaveForeignKeyError": "Catatan tidak dapat disimpan. Catatan '{0}' yang dirujuk tidak ada!",
+  "Validation.SaveForeignKeyErrorGeneric": "Catatan tidak dapat disimpan. Catatan yang dirujuk tidak ada!",
+  "Validation.SavePrimaryKeyError": "Tidak dapat menyimpan catatan. Ada catatan lain dengan nilai yang sama {1}!",
+  "Validation.SavePrimaryKeyErrorGeneric": "Catatan tidak dapat disimpan. Ada catatan lain dengan nilai yang sama!",
   "Validation.UnexpectedError": "Terjadi kesalahan yang tidak terduga!"
 }

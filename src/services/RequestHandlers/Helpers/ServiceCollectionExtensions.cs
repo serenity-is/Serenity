@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.FileProviders;
 using Serenity.Localization;
+using Serenity.Services.SqlErrors;
 using System.IO;
 using System.Text.Json;
 
@@ -221,6 +222,7 @@ public static class ServiceCollectionExtensions
         collection.AddCustomRequestHandlers(customHandlerTypeSource, customHandlerPredicate);
         collection.AddProxyRequestHandlers();
 
+        collection.TryAddSingleton<ISqlErrorExtractor, DefaultSqlErrorExtractor>();
         collection.TryAddSingleton<IRequestContext, DefaultRequestContext>();
         return collection;
     }

@@ -34,6 +34,8 @@
   "Enums.ImageCheckResult.WidthTooLow": "¡El ancho de la imagen debe ser mayor que {0} píxeles, pero es {1} píxeles!",
   "Validation.ArgumentIsNull": "Argumento {0} es nulo!",
   "Validation.ArgumentOutOfRange": "¡El argumento {0} está fuera del rango!",
+  "Validation.DeleteForeignKeyError": "No se puede eliminar el registro. La tabla '{0}' tiene registros que dependen de este.",
+  "Validation.DeleteForeignKeyErrorGeneric": "No se puede eliminar el registro. Hay registros relacionados que dependen de este registro!",
   "Validation.EntityForeignKeyViolation": "¡Primero debe eliminar los registros relacionados {0} antes de eliminar este!",
   "Validation.EntityHasDeletedParent": "¡Antes de operar en este registro, su padre debe ser restaurado!",
   "Validation.EntityIsNotActive": "¡No se puede operar en un registro {0} eliminado!",
@@ -46,5 +48,9 @@
   "Validation.FieldIsRequired": "¡El campo {0} es obligatorio!",
   "Validation.Recaptcha": "¡Por favor, valide que no es un robot!",
   "Validation.RequestIsNull": "¡La solicitud es nula!",
+  "Validation.SaveForeignKeyError": "No se puede guardar el registro. El registro referenciado '{0}' no existe!",
+  "Validation.SaveForeignKeyErrorGeneric": "No se puede guardar el registro. Un registro referenciado no existe!",
+  "Validation.SavePrimaryKeyError": "No se puede guardar el registro. ¡Hay otro registro con el mismo valor de {1}!",
+  "Validation.SavePrimaryKeyErrorGeneric": "No se puede guardar el registro. Hay otro registro con el mismo valor o los mismos valores!",
   "Validation.UnexpectedError": "¡Se ha producido un error inesperado!"
 }

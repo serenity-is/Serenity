@@ -133,12 +133,10 @@
   "Site.ValidationError.Title": "ОШИБКА",
   "Validation.AuthenticationError": "Ошибка проверки: Неверное имя пользователя или пароль!",
   "Validation.CurrentPasswordMismatch": "Ваш текущий пароль недействителен!",
-  "Validation.DeleteForeignKeyError": null,
   "Validation.EmailConfirm": "Введенные адреса электронной почты не совпадают!",
   "Validation.EmailInUse": "Другой пользователь с таким электронным адресом уже существует!",
   "Validation.InvalidActivateToken": "Ваш токен для активации вашей учетной записи недействителен или истек!",
   "Validation.InvalidResetToken": "Ваш токен для сброса пароля недействителен или истек!",
   "Validation.MinRequiredPasswordLength": "Введенный пароль не содержит достаточное количество символов (мин {0})!",
-  "Validation.PasswordConfirmMismatch": "Введенные пароли не совпадают!",
-  "Validation.SavePrimaryKeyError": null
+  "Validation.PasswordConfirmMismatch": "Введенные пароли не совпадают!"
 }

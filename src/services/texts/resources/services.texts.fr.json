@@ -34,6 +34,8 @@
   "Enums.ImageCheckResult.WidthTooLow": "La largeur de l'image doit être supérieure à {0} pixels, mais elle est de {1} pixels!",
   "Validation.ArgumentIsNull": "L'argument {0} est nul !",
   "Validation.ArgumentOutOfRange": "L'argument {0} est hors de portée !",
+  "Validation.DeleteForeignKeyError": "Impossible de supprimer l'enregistrement. La table '{0}' a des enregistrements qui dépendent de celui-ci!",
+  "Validation.DeleteForeignKeyErrorGeneric": "Impossible de supprimer l'enregistrement. Des enregistrements associés dépendent de celui-ci !",
   "Validation.EntityForeignKeyViolation": "Vous devez d'abord supprimer les enregistrements {0} associés avant de supprimer celui-ci!",
   "Validation.EntityHasDeletedParent": "Avant d'opérer sur ce dossier, son parent doit être restauré!",
   "Validation.EntityIsNotActive": "Impossible d'effectuer une opération sur un enregistrement {0} supprimé !",
@@ -46,5 +48,9 @@
   "Validation.FieldIsRequired": "Le champ {0} est requis !",
   "Validation.Recaptcha": "Veuillez valider que vous n'êtes pas un robot !",
   "Validation.RequestIsNull": "La demande est nulle !",
+  "Validation.SaveForeignKeyError": "Enregistrement impossible. L'enregistrement référencé '{0}' n'existe pas !",
+  "Validation.SaveForeignKeyErrorGeneric": "Enregistrement impossible. Un enregistrement référencé n'existe pas !",
+  "Validation.SavePrimaryKeyError": "Impossible d'enregistrer l'enregistrement. Il existe un autre enregistrement avec la même valeur de {1}!",
+  "Validation.SavePrimaryKeyErrorGeneric": "Enregistrement impossible. Un autre enregistrement possède la ou les mêmes valeurs !",
   "Validation.UnexpectedError": "Une erreur inattendue s'est produite!"
 }

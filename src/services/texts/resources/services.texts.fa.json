@@ -34,6 +34,8 @@
   "Enums.ImageCheckResult.WidthTooLow": "عرض تصویر باید بیشتر از {0} پیکسل باشد، اما {1} پیکسل است!",
   "Validation.ArgumentIsNull": "پارامتر {0} خالی است!",
   "Validation.ArgumentOutOfRange": "پارامتر {0} خارج از محدوده است!",
+  "Validation.DeleteForeignKeyError": "رکورد قابل حذف نیست. جدول '{0}' دارای رکوردهایی است که به این رکورد وابسته هستند!",
+  "Validation.DeleteForeignKeyErrorGeneric": "رکورد قابل حذف نیست. رکوردهای مرتبطی وجود دارند که به این رکورد وابسته‌اند!",
   "Validation.EntityForeignKeyViolation": "شما باید ابتدا رکوردهای مرتبط {0} را پیش از حذف این کار پاک کنید!",
   "Validation.EntityHasDeletedParent": "قبل از اقدام به این رکورد، والدش باید حذف نشود!",
   "Validation.EntityIsNotActive": "نمی‌توان از رکورد {0} حذف شده استفاده کرد!",
@@ -46,5 +48,9 @@
   "Validation.FieldIsRequired": "فیلد {0} اجباری است!",
   "Validation.Recaptcha": "لطفاً اعتبار برسانید که شما یک ربات نیستید!",
   "Validation.RequestIsNull": "درخواست خالی است!",
+  "Validation.SaveForeignKeyError": "رکورد قابل ذخیره نیست. رکورد ارجاع‌شده '{0}' وجود ندارد!",
+  "Validation.SaveForeignKeyErrorGeneric": "رکورد قابل ذخیره نیست. یکی از رکوردهای ارجاع‌شده وجود ندارد!",
+  "Validation.SavePrimaryKeyError": "امکان ذخیره سجل وجود ندارد. یک سجل دیگر با همان مقدار {1} وجود دارد!",
+  "Validation.SavePrimaryKeyErrorGeneric": "امکان ذخیره رکورد وجود ندارد. رکورد دیگری با همان مقدار یا مقادیر وجود دارد!",
   "Validation.UnexpectedError": "خطای دور از کنجکاوی رخ داده است!"
 }

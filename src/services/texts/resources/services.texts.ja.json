@@ -34,6 +34,8 @@
   "Enums.ImageCheckResult.WidthTooLow": "画像の幅は{0}ピクセルより大きくなければなりませんが、{1}ピクセルです！",
   "Validation.ArgumentIsNull": "引数{0}はnullです！",
   "Validation.ArgumentOutOfRange": "引数{0}は範囲外です！",
+  "Validation.DeleteForeignKeyError": "レコードを削除できません。 '{0}'テーブルには、これに依存するレコードがあります！",
+  "Validation.DeleteForeignKeyErrorGeneric": "レコードを削除できません。このレコードに依存する関連レコードがあります！",
   "Validation.EntityForeignKeyViolation": "これを削除する前に関連する{0}レコードを最初に削除する必要があります！",
   "Validation.EntityHasDeletedParent": "このレコードを操作する前に、その親を復元する必要があります！",
   "Validation.EntityIsNotActive": "削除された{0}レコード上で操作を行うことはできません！",
@@ -46,5 +48,9 @@
   "Validation.FieldIsRequired": "{0} フィールドが必要です！",
   "Validation.Recaptcha": "ロボットではないことを確認してください！",
   "Validation.RequestIsNull": "リクエストが空です！",
+  "Validation.SaveForeignKeyError": "レコードを保存できません。参照先の'{0}'レコードが存在しません！",
+  "Validation.SaveForeignKeyErrorGeneric": "レコードを保存できません。参照先のレコードが存在しません！",
+  "Validation.SavePrimaryKeyError": "レコードを保存できません。 同じ{1}値を持つ別のレコードがあります！",
+  "Validation.SavePrimaryKeyErrorGeneric": "レコードを保存できません。同じ値の別のレコードがあります！",
   "Validation.UnexpectedError": "予期しないエラーが発生しました！"
 }

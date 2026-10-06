@@ -34,6 +34,8 @@
   "Enums.ImageCheckResult.WidthTooLow": "Lățimea imaginii trebuie să fie mai mare decât {0} pixeli, dar este {1} pixeli!",
   "Validation.ArgumentIsNull": "Argumentul {0} este nul!",
   "Validation.ArgumentOutOfRange": "Argumentul {0} este în afara intervalului!",
+  "Validation.DeleteForeignKeyError": "Nu se poate șterge înregistrarea. Tabelul '{0}' are înregistrări care depind de aceasta!",
+  "Validation.DeleteForeignKeyErrorGeneric": "Nu se poate șterge înregistrarea. Există înregistrări asociate care depind de aceasta!",
   "Validation.EntityForeignKeyViolation": "Trebuie să ștergeți în prealabil înregistrările {0} corelate înainte de a șterge aceasta!",
   "Validation.EntityHasDeletedParent": "Înainte de a opera pe acest înregistrare, părintele său trebuie să fie restaurat!",
   "Validation.EntityIsNotActive": "Nu se poate opera pe un înregistrare {0} ștearsă!",
@@ -46,5 +48,9 @@
   "Validation.FieldIsRequired": "Câmpul {0} este obligatoriu!",
   "Validation.Recaptcha": "Vă rugăm să confirmați că nu sunteți un robot!",
   "Validation.RequestIsNull": "Cererea este nulă!",
+  "Validation.SaveForeignKeyError": "Nu se poate salva înregistrarea. Înregistrarea referită '{0}' nu există!",
+  "Validation.SaveForeignKeyErrorGeneric": "Nu se poate salva înregistrarea. O înregistrare referită nu există!",
+  "Validation.SavePrimaryKeyError": "Nu se poate salva înregistrarea. Există o altă înregistrare cu aceeași valoare de {1}!",
+  "Validation.SavePrimaryKeyErrorGeneric": "Nu se poate salva înregistrarea. Există o altă înregistrare cu aceeași valoare sau aceleași valori!",
   "Validation.UnexpectedError": "A avut loc o eroare neașteptată!"
 }

@@ -34,6 +34,8 @@
   "Enums.ImageCheckResult.WidthTooLow": "Görüntü genişliği {0} pikselden daha yüksek olmalı, ancak {1} piksel!",
   "Validation.ArgumentIsNull": "{0} argümanı boş girilmiş!",
   "Validation.ArgumentOutOfRange": "Argüman {0} izin verilen aralıkta değil!",
+  "Validation.DeleteForeignKeyError": "Kayıt silinemiyor. '{0}' tablosunda buna bağlı kayıtlar var!",
+  "Validation.DeleteForeignKeyErrorGeneric": "Kayıt silinemiyor. Bu kayda bağlı ilişkili kayıtlar var!",
   "Validation.EntityForeignKeyViolation": "Bunu silmeden önce ilgili {0} kaydını silmelisiniz!",
   "Validation.EntityHasDeletedParent": "Bu kayıt üzerinde işlem yapmadan önce, kendisinin bağlı olduğu {0} kaydı geri alınmalıdır!",
   "Validation.EntityIsNotActive": "Silinmiş bir {0} kaydı üzerinde işlem yapılamaz!",
@@ -46,5 +48,9 @@
   "Validation.FieldIsRequired": "{0} alanı için değer girilmeli!",
   "Validation.Recaptcha": "Lütfen robot olmadığınızı doğrulayın!",
   "Validation.RequestIsNull": "İstek içeriği boş!",
+  "Validation.SaveForeignKeyError": "Kayıt işlemi başarısız. Başvurulan '{0}' kaydı mevcut değil!",
+  "Validation.SaveForeignKeyErrorGeneric": "Kayıt işlemi başarısız. Başvurulan bir kayıt mevcut değil!",
+  "Validation.SavePrimaryKeyError": "Kayıt yapılamıyor. Aynı {1} değerine sahip başka bir kayıt var!",
+  "Validation.SavePrimaryKeyErrorGeneric": "Kayıt işlemi başarısız. Aynı değere veya değerlere sahip başka bir kayıt var!",
   "Validation.UnexpectedError": "Beklenmedik bir hata oluştu!"
 }

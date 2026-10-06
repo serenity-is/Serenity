@@ -34,6 +34,8 @@
   "Enums.ImageCheckResult.WidthTooLow": "Obrázek šířka musí být vyšší než {0} pixelů, ale je to {1} pixelů!",
   "Validation.ArgumentIsNull": "Argument {0} je prázdný!",
   "Validation.ArgumentOutOfRange": "Argument {0} je mimo rozsah!",
+  "Validation.DeleteForeignKeyError": "Záznam nelze smazat. Tabulka '{0}' obsahuje záznamy, které závisí na tomto záznamu!",
+  "Validation.DeleteForeignKeyErrorGeneric": "Záznam nelze odstranit. Existují související záznamy, které na tomto záznamu závisejí!",
   "Validation.EntityForeignKeyViolation": "Nejprve musíte smazat související záznamy {0} před smazáním tohoto!",
   "Validation.EntityHasDeletedParent": "Před zpracováním tohoto záznamu musí být jeho rodič obnoven!",
   "Validation.EntityIsNotActive": "Nelze provádět operace nad smazaným záznamem {0}!",
@@ -46,5 +48,9 @@
   "Validation.FieldIsRequired": "Pole {0} je povinné!",
   "Validation.Recaptcha": "Prosím, ověřte, že nejste robot!",
   "Validation.RequestIsNull": "Žádost je prázdná!",
+  "Validation.SaveForeignKeyError": "Záznam nelze uložit. Odkazovaný záznam '{0}' neexistuje!",
+  "Validation.SaveForeignKeyErrorGeneric": "Záznam nelze uložit. Odkazovaný záznam neexistuje!",
+  "Validation.SavePrimaryKeyError": "Záznam nelze uložit. Existuje jiný záznam se stejnou hodnotou {1}!",
+  "Validation.SavePrimaryKeyErrorGeneric": "Záznam nelze uložit. Existuje jiný záznam se stejnou hodnotou nebo hodnotami!",
   "Validation.UnexpectedError": "Došlo k neočekávané chybě!"
 }

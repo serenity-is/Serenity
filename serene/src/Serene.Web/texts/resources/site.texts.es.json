@@ -132,12 +132,10 @@
   "Site.ValidationError.Title": "ERROR",
   "Validation.AuthenticationError": "Error de validación: ¡Nombre de usuario o contraseña inválidos!",
   "Validation.CurrentPasswordMismatch": "¡Tu contraseña actual no es válida!",
-  "Validation.DeleteForeignKeyError": null,
   "Validation.EmailConfirm": "¡Los correos electrónicos ingresados no coinciden!",
   "Validation.EmailInUse": "¡Otro usuario con este correo electrónico ya existe!",
   "Validation.InvalidActivateToken": "¡Su token para activar su cuenta es inválido o ha caducado!",
   "Validation.InvalidResetToken": "¡Tu token para restablecer tu contraseña es inválido o ha expirado!",
   "Validation.MinRequiredPasswordLength": "¡La contraseña ingresada no tiene suficientes caracteres (mín {0})!",
-  "Validation.PasswordConfirmMismatch": "¡Las contraseñas ingresadas no coinciden!",
-  "Validation.SavePrimaryKeyError": null
+  "Validation.PasswordConfirmMismatch": "¡Las contraseñas ingresadas no coinciden!"
 }

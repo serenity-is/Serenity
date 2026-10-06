@@ -1,13 +1,17 @@
 namespace Serenity.Services;
 
 /// <summary>
-/// Interface that handles <see cref="UniqueConstraintAttribute"/> on fields.
+/// Behavior that handles <see cref="UniqueAttribute"/> on a single field. It checks the
+/// unique constraint before save (unless <see cref="UniqueAttribute.CheckBeforeSave"/> is
+/// disabled) by running an existence query. Override <see cref="BaseUniqueConstraintSaveBehavior.BuildUniqueConstraintQuery"/>
+/// in a derived behavior, or add your own behavior and set <see cref="UniqueAttribute.DisableDefaultBehavior"/>
+/// on the field, to customize or replace the pre-check.
 /// </summary>
 /// <remarks>
 /// Initializes a new instance of the class.
 /// </remarks>
 /// <param name="localizer">Text localizer</param>
-public class UniqueFieldSaveBehavior(ITextLocalizer localizer) : BaseSaveBehaviorAsync, ISaveBehaviorSync, IImplicitBehavior, IFieldBehavior
+public class UniqueFieldSaveBehavior(ITextLocalizer localizer) : BaseUniqueConstraintSaveBehavior, IImplicitBehavior, IFieldBehavior
 {
     /// <inheritdoc/>
     public Field? Target { get; set; }
@@ -26,7 +30,7 @@ public class UniqueFieldSaveBehavior(ITextLocalizer localizer) : BaseSaveBehavio
             return false;
 
         var attr = Target.GetAttribute<UniqueAttribute>();
-        if (attr != null && !attr.CheckBeforeSave)
+        if (attr != null && (!attr.CheckBeforeSave || attr.DisableDefaultBehavior))
             return false;
 
         this.attr = attr;
@@ -56,69 +60,5 @@ public class UniqueFieldSaveBehavior(ITextLocalizer localizer) : BaseSaveBehavio
             attr?.ErrorMessage,
             attr != null && attr.IgnoreDeleted ? ServiceQueryHelper.GetNotDeletedCriteria(handler.Row) : Criteria.Empty,
             cancellationToken).ConfigureAwait(false);
-    }
-
-    internal static void ValidateUniqueConstraint(ISaveRequestHandler handler, IEnumerable<Field> fields, 
-        ITextLocalizer localizer, string? errorMessage = null, BaseCriteria? groupCriteria = null)
-    {
-        if (handler.IsUpdate && !fields.Any(x => x.IndexCompare(handler.Old!, handler.Row) != 0))
-            return;
-
-        var query = BuildUniqueConstraintQuery(handler, fields, groupCriteria);
-
-        if (query.Exists(handler.UnitOfWork.Connection))
-        {
-            throw UniqueViolation(fields, localizer, errorMessage);
-        }
-    }
-
-    internal static async Task ValidateUniqueConstraintAsync(ISaveRequestHandler handler, IEnumerable<Field> fields,
-        ITextLocalizer localizer, string? errorMessage = null, BaseCriteria? groupCriteria = null,
-        CancellationToken cancellationToken = default)
-    {
-        if (handler.IsUpdate && !fields.Any(x => x.IndexCompare(handler.Old!, handler.Row) != 0))
-            return;
-
-        var query = BuildUniqueConstraintQuery(handler, fields, groupCriteria);
-
-        if (await query.ExistsAsync(handler.UnitOfWork.Connection, cancellationToken: cancellationToken).ConfigureAwait(false))
-        {
-            throw UniqueViolation(fields, localizer, errorMessage);
-        }
-    }
-
-    private static SqlQuery BuildUniqueConstraintQuery(ISaveRequestHandler handler,
-        IEnumerable<Field> fields, BaseCriteria? groupCriteria)
-    {
-        var criteria = groupCriteria ?? Criteria.Empty;
-
-        foreach (var field in fields)
-            if (field.IsNull(handler.Row))
-                criteria &= field.IsNull();
-            else
-                criteria &= field == new ValueCriteria(field.AsSqlValue(handler.Row));
-
-        var idField = handler.Row.GetIdField();
-
-        if (handler.IsUpdate)
-            criteria &= idField != new ValueCriteria(idField.AsSqlValue(handler.Old!));
-
-        var row = handler.Row.CreateNew();
-        return new SqlQuery()
-            .Dialect(handler.Connection.GetDialect())
-            .From(row)
-            .Select("1")
-            .Where(criteria);
-    }
-
-    private static ValidationError UniqueViolation(IEnumerable<Field> fields,
-        ITextLocalizer localizer, string? errorMessage)
-    {
-        return new ValidationError("UniqueViolation",
-            string.Join(", ", fields.Select(x => x.PropertyName ?? x.Name)),
-            string.Format(!string.IsNullOrEmpty(errorMessage) ?
-                (localizer.TryGet(errorMessage) ?? errorMessage) :
-                    localizer.Get("Validation.UniqueConstraint"),
-                string.Join(", ", fields.Select(x => x.GetTitle(localizer)))));
     }
 }

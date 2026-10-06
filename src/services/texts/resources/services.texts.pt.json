@@ -34,6 +34,8 @@
   "Enums.ImageCheckResult.WidthTooLow": "A largura da imagem deve ser superior a {0} píxeis, mas é {1} píxeis!",
   "Validation.ArgumentIsNull": "Argumento {0} é nulo!",
   "Validation.ArgumentOutOfRange": "O argumento {0} está fora do intervalo!",
+  "Validation.DeleteForeignKeyError": "Não é possível excluir o registro. A tabela '{0}' tem registros que dependem deste!",
+  "Validation.DeleteForeignKeyErrorGeneric": "Não é possível eliminar o registo. Existem registos relacionados que dependem deste!",
   "Validation.EntityForeignKeyViolation": "Primeiro você deve excluir os registros relacionados {0} antes de excluir este!",
   "Validation.EntityHasDeletedParent": "Antes de operar neste registo, o seu pai deve ser restaurado!",
   "Validation.EntityIsNotActive": "Não é possível operar em um registro {0} excluído!",
@@ -46,5 +48,9 @@
   "Validation.FieldIsRequired": "O campo {0} é obrigatório!",
   "Validation.Recaptcha": "Por favor, valide que não é um robô!",
   "Validation.RequestIsNull": "A solicitação é nula!",
+  "Validation.SaveForeignKeyError": "Não é possível guardar o registo. O registo referenciado '{0}' não existe!",
+  "Validation.SaveForeignKeyErrorGeneric": "Não é possível guardar o registo. Um registo referenciado não existe!",
+  "Validation.SavePrimaryKeyError": "Não é possível salvar o registro. Há outro registro com o mesmo valor de {1}!",
+  "Validation.SavePrimaryKeyErrorGeneric": "Não é possível guardar o registo. Existe outro registo com o mesmo valor ou com os mesmos valores!",
   "Validation.UnexpectedError": "Ocorreu um erro inesperado!"
 }

@@ -17,11 +17,15 @@ public class UniqueFieldSaveBehaviorTests
         [Unique(IgnoreNulls = true)]
         public string NullableCode { get => fields.NullableCode[this]; set => fields.NullableCode[this] = value; }
 
+        [Unique(DisableDefaultBehavior = true)]
+        public string DisabledCode { get => fields.DisabledCode[this]; set => fields.DisabledCode[this] = value; }
+
         public class RowFields : RowFieldsBase
         {
             public Int32Field Id = null!;
             public StringField Code = null!;
             public StringField NullableCode = null!;
+            public StringField DisabledCode = null!;
         }
     }
 
@@ -166,5 +170,46 @@ public class UniqueFieldSaveBehaviorTests
         await behavior.OnBeforeSaveAsync(handler, CancellationToken.None);
 
         Assert.Empty(connection.ExecuteReaderCalls);
+    }
+
+    private sealed class OverridingBehavior(ITextLocalizer localizer) : UniqueFieldSaveBehavior(localizer)
+    {
+        public bool BuildCalled { get; private set; }
+
+        protected override SqlQuery BuildUniqueConstraintQuery(ISaveRequestHandler handler,
+            IEnumerable<Field> fields, BaseCriteria? groupCriteria)
+        {
+            BuildCalled = true;
+            return base.BuildUniqueConstraintQuery(handler, fields, groupCriteria);
+        }
+    }
+
+    [Fact]
+    public void ActivateFor_Returns_False_When_DisableDefaultBehavior()
+    {
+        var behavior = new UniqueFieldSaveBehavior(NullTextLocalizer.Instance)
+        {
+            Target = UniqueFieldRow.Fields.DisabledCode
+        };
+
+        Assert.False(behavior.ActivateFor(new UniqueFieldRow()));
+    }
+
+    [Fact]
+    public void OnBeforeSave_Uses_BuildUniqueConstraintQuery_Override()
+    {
+        var behavior = new OverridingBehavior(NullTextLocalizer.Instance)
+        {
+            Target = UniqueFieldRow.Fields.Code
+        };
+        Assert.True(behavior.ActivateFor(new UniqueFieldRow()));
+
+        using var connection = new MockDbConnection()
+            .InterceptExecuteReader(args => new MockDbDataReader());
+        var handler = CreateHandler(true, new UniqueFieldRow { Code = "X" }, connection);
+
+        behavior.OnBeforeSave(handler);
+
+        Assert.True(behavior.BuildCalled);
     }
 }

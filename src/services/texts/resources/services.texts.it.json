@@ -34,6 +34,8 @@
   "Enums.ImageCheckResult.WidthTooLow": "La larghezza dell'immagine deve essere superiore a {0} pixel, ma è {1} pixel!",
   "Validation.ArgumentIsNull": "L'argomento {0} è nullo!",
   "Validation.ArgumentOutOfRange": "L'argomento {0} è fuori dal range!",
+  "Validation.DeleteForeignKeyError": "Impossibile eliminare il record. La tabella '{0}' ha record che dipendono da questo!",
+  "Validation.DeleteForeignKeyErrorGeneric": "Impossibile eliminare il record. Esistono record correlati che dipendono da questo!",
   "Validation.EntityForeignKeyViolation": "Devi prima eliminare i record {0} correlati prima di eliminare questo!",
   "Validation.EntityHasDeletedParent": "Prima di operare su questo record, il suo genitore deve essere ripristinato!",
   "Validation.EntityIsNotActive": "Impossibile eseguire operazioni su un record {0} eliminato!",
@@ -46,5 +48,9 @@
   "Validation.FieldIsRequired": "Il campo {0} è obbligatorio!",
   "Validation.Recaptcha": "Si prega di convalidare che non si è un robot!",
   "Validation.RequestIsNull": "La richiesta è nulla!",
+  "Validation.SaveForeignKeyError": "Impossibile salvare il record. Il record '{0}' a cui si fa riferimento non esiste!",
+  "Validation.SaveForeignKeyErrorGeneric": "Impossibile salvare il record. Un record referenziato non esiste!",
+  "Validation.SavePrimaryKeyError": "Impossibile salvare il record. C'è un altro record con lo stesso valore {1}!",
+  "Validation.SavePrimaryKeyErrorGeneric": "Impossibile salvare il record. Esiste un altro record con lo stesso valore o gli stessi valori!",
   "Validation.UnexpectedError": "Si è verificato un errore imprevisto!"
 }

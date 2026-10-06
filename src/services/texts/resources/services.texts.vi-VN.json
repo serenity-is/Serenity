@@ -34,6 +34,8 @@
   "Enums.ImageCheckResult.WidthTooLow": "Chiều rộng hình ảnh phải lớn hơn {0} pixel, nhưng là {1} pixel!",
   "Validation.ArgumentIsNull": "Tham số {0} là null!",
   "Validation.ArgumentOutOfRange": "Tham số {0} nằm ngoài phạm vi!",
+  "Validation.DeleteForeignKeyError": "Không thể xóa bản ghi. Bảng '{0}' có các bản ghi phụ thuộc vào bản ghi này!",
+  "Validation.DeleteForeignKeyErrorGeneric": "Không thể xóa bản ghi. Có các bản ghi liên quan phụ thuộc vào bản ghi này!",
   "Validation.EntityForeignKeyViolation": "Bạn phải xóa các bản ghi liên quan {0} trước khi xóa bản ghi này!",
   "Validation.EntityHasDeletedParent": "Trước khi thao tác trên bản ghi này, cha mẹ của nó phải được khôi phục lại!",
   "Validation.EntityIsNotActive": "Không thể thực hiện thao tác trên một bản ghi {0} đã bị xóa!",
@@ -46,5 +48,9 @@
   "Validation.FieldIsRequired": "Trường {0} là bắt buộc!",
   "Validation.Recaptcha": "Vui lòng xác nhận rằng bạn không phải là robot!",
   "Validation.RequestIsNull": "Yêu cầu là rỗng!",
+  "Validation.SaveForeignKeyError": "Không thể lưu bản ghi. Bản ghi '{0}' được tham chiếu không tồn tại!",
+  "Validation.SaveForeignKeyErrorGeneric": "Không thể lưu bản ghi. Bản ghi được tham chiếu không tồn tại!",
+  "Validation.SavePrimaryKeyError": "Không thể lưu bản ghi. Có một bản ghi khác với cùng giá trị {1}!",
+  "Validation.SavePrimaryKeyErrorGeneric": "Không thể lưu bản ghi. Có một bản ghi khác có cùng giá trị hoặc các giá trị!",
   "Validation.UnexpectedError": "Đã xảy ra lỗi không mong muốn!"
 }

@@ -34,6 +34,8 @@
   "Enums.ImageCheckResult.WidthTooLow": "الصورة العرض يجب أن يكون أعلى من {0} بكسل، ولكنها {1} بكسل!",
   "Validation.ArgumentIsNull": "المعامل {0} فارغ!",
   "Validation.ArgumentOutOfRange": "المعطي {0} خارج النطاق!",
+  "Validation.DeleteForeignKeyError": "لا يمكن حذف السجل. يحتوي جدول '{0}' على سجلات تعتمد على هذا السجل!",
+  "Validation.DeleteForeignKeyErrorGeneric": "لا يمكن حذف السجل. توجد سجلات مرتبطة تعتمد على هذا السجل!",
   "Validation.EntityForeignKeyViolation": "يجب أن تحذف أولاً سجلات {0} ذات صلة قبل حذف هذا واحد!",
   "Validation.EntityHasDeletedParent": "قبل التشغيل على هذا السجل، يجب إلغاء حذف والده!",
   "Validation.EntityIsNotActive": "لا يمكن العمل على سجل {0} المحذوف!",
@@ -46,5 +48,9 @@
   "Validation.FieldIsRequired": "الحقل {0} مطلوب!",
   "Validation.Recaptcha": "الرجاء التحقق من أنك لست روبوتا!",
   "Validation.RequestIsNull": "الطلب فارغ!",
+  "Validation.SaveForeignKeyError": "لا يمكن حفظ السجل. السجل المشار إليه '{0}' غير موجود!",
+  "Validation.SaveForeignKeyErrorGeneric": "لا يمكن حفظ السجل. أحد السجلات المشار إليها غير موجود!",
+  "Validation.SavePrimaryKeyError": "لا يمكن حفظ السجل. يوجد سجل آخر بنفس القيمة {1}!",
+  "Validation.SavePrimaryKeyErrorGeneric": "لا يمكن حفظ السجل. يوجد سجل آخر بالقيمة نفسها أو القيم نفسها!",
   "Validation.UnexpectedError": "حدث خطأ غير متوقع!"
 }

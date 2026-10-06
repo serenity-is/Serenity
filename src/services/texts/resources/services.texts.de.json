@@ -34,6 +34,8 @@
   "Enums.ImageCheckResult.WidthTooLow": "Bildbreite muss höher als {0} Pixel sein, aber es ist {1} Pixel!",
   "Validation.ArgumentIsNull": "Argument {0} ist null!",
   "Validation.ArgumentOutOfRange": "Argument {0} liegt außerhalb des Bereichs!",
+  "Validation.DeleteForeignKeyError": "Datensatz kann nicht gelöscht werden. Die Tabelle '{0}' hat Datensätze, die von diesem abhängig sind!",
+  "Validation.DeleteForeignKeyErrorGeneric": "Datensatz kann nicht gelöscht werden. Es gibt zugehörige Datensätze, die von diesem Datensatz abhängen!",
   "Validation.EntityForeignKeyViolation": "Sie müssen zuerst die zugehörigen {0}-Datensätze löschen, bevor Sie diesen löschen!",
   "Validation.EntityHasDeletedParent": "Bevor Sie an diesem Datensatz arbeiten, muss sein Elternteil wiederhergestellt werden!",
   "Validation.EntityIsNotActive": "Kann nicht auf einen gelöschten {0}-Datensatz operieren!",
@@ -46,5 +48,9 @@
   "Validation.FieldIsRequired": "{0} Feld ist erforderlich!",
   "Validation.Recaptcha": "Bitte bestätigen Sie, dass Sie kein Roboter sind!",
   "Validation.RequestIsNull": "Anfrage ist leer!",
+  "Validation.SaveForeignKeyError": "Datensatz kann nicht gespeichert werden. Der referenzierte Datensatz '{0}' existiert nicht!",
+  "Validation.SaveForeignKeyErrorGeneric": "Datensatz kann nicht gespeichert werden. Ein referenzierter Datensatz existiert nicht!",
+  "Validation.SavePrimaryKeyError": "Datensatz kann nicht gespeichert werden. Es gibt einen anderen Datensatz mit demselben {1} Wert!",
+  "Validation.SavePrimaryKeyErrorGeneric": "Datensatz kann nicht gespeichert werden. Es gibt einen anderen Datensatz mit denselben Werten!",
   "Validation.UnexpectedError": "Es ist ein unerwarteter Fehler aufgetreten!"
 }

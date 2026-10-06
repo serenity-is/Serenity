@@ -1,5 +1,6 @@
 namespace Serenity.Data.Schema;
 
+[Collection(SqlIntegrationCollections.Firebird)]
 [Trait("tag", "sqldb")]
 public partial class SchemaProviderIntegrationTests_Firebird
 {

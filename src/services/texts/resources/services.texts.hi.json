@@ -34,6 +34,8 @@
   "Enums.ImageCheckResult.WidthTooLow": "छवि की चौड़ाई {0} पिक्सेल से ऊपर होनी चाहिए, लेकिन यह {1} पिक्सेल है!",
   "Validation.ArgumentIsNull": "तर्क {0} शून्य है!",
   "Validation.ArgumentOutOfRange": "तर्क {0} रेंज से बाहर है!",
+  "Validation.DeleteForeignKeyError": "रिकॉर्ड हटा नहीं सकते। '{0}' टेबल में इससे निर्भर रिकॉर्ड हैं!",
+  "Validation.DeleteForeignKeyErrorGeneric": "रिकॉर्ड हटाया नहीं जा सकता। इससे संबंधित ऐसे रिकॉर्ड हैं जो इस पर निर्भर हैं!",
   "Validation.EntityForeignKeyViolation": "आपको इसे हटाने से पहले संबंधित {0} रिकॉर्ड्स को पहले हटाना होगा!",
   "Validation.EntityHasDeletedParent": "इस रिकॉर्ड पर कार्रवाई करने से पहले, इसके माता-पिता को पुनर्स्थापित किया जाना चाहिए!",
   "Validation.EntityIsNotActive": "डिलीट किया गया {0} रिकॉर्ड पर कार्रवाई नहीं की जा सकती!",
@@ -46,5 +48,9 @@
   "Validation.FieldIsRequired": "{0} फील्ड आवश्यक है!",
   "Validation.Recaptcha": "कृपया सुनिश्चित करें कि आप एक रोबोट नहीं हैं!",
   "Validation.RequestIsNull": "अनुरोध शून्य है!",
+  "Validation.SaveForeignKeyError": "रिकॉर्ड सहेजा नहीं जा सकता। संदर्भित '{0}' रिकॉर्ड मौजूद नहीं है!",
+  "Validation.SaveForeignKeyErrorGeneric": "रिकॉर्ड सहेजा नहीं जा सकता। संदर्भित रिकॉर्ड मौजूद नहीं है!",
+  "Validation.SavePrimaryKeyError": "रिकॉर्ड सहेजने में असमर्थ। एक ही {1} मान के अन्य रिकॉर्ड है!",
+  "Validation.SavePrimaryKeyErrorGeneric": "रिकॉर्ड सहेजा नहीं जा सकता। समान मान वाला कोई अन्य रिकॉर्ड मौजूद है!",
   "Validation.UnexpectedError": "अप्रत्याशित त्रुटि हुई है!"
 }

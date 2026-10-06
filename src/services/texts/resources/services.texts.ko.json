@@ -34,6 +34,8 @@
   "Enums.ImageCheckResult.WidthTooLow": "이미지 너비는 {0} 픽셀보다 높아야하지만 {1} 픽셀입니다!",
   "Validation.ArgumentIsNull": "인수 {0}이(가) null입니다!",
   "Validation.ArgumentOutOfRange": "인수 {0}이 범위를 벗어났습니다!",
+  "Validation.DeleteForeignKeyError": "레코드를 삭제할 수 없습니다. '{0}' 테이블에는 이 레코드에 종속된 레코드가 있습니다!",
+  "Validation.DeleteForeignKeyErrorGeneric": "레코드를 삭제할 수 없습니다. 이 레코드에 종속된 관련 레코드가 있습니다!",
   "Validation.EntityForeignKeyViolation": "이것을 삭제하기 전에 관련된 {0} 레코드를 먼저 삭제해야합니다!",
   "Validation.EntityHasDeletedParent": "이 기록에 작업하기 전에 부모를 복원해야합니다!",
   "Validation.EntityIsNotActive": "삭제된 {0} 레코드에서 작업을 수행할 수 없습니다!",
@@ -46,5 +48,9 @@
   "Validation.FieldIsRequired": "{0} 필드가 필요합니다!",
   "Validation.Recaptcha": "로봇이 아닌 것을 확인하십시오!",
   "Validation.RequestIsNull": "요청이 비어 있습니다!",
+  "Validation.SaveForeignKeyError": "레코드를 저장할 수 없습니다. 참조된 '{0}' 레코드가 존재하지 않습니다!",
+  "Validation.SaveForeignKeyErrorGeneric": "레코드를 저장할 수 없습니다. 참조된 레코드가 존재하지 않습니다!",
+  "Validation.SavePrimaryKeyError": "레코드를 저장할 수 없습니다. 동일한 {1} 값으로 다른 레코드가 있습니다!",
+  "Validation.SavePrimaryKeyErrorGeneric": "레코드를 저장할 수 없습니다. 동일한 값을 가진 다른 레코드가 있습니다!",
   "Validation.UnexpectedError": "예상치 못한 오류가 발생했습니다!"
 }
