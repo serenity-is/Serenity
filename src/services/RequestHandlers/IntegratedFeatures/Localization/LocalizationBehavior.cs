@@ -254,7 +254,7 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
         var localIdField = handler.Row.GetIdField();
 
         var listHandler = handlerFactory.CreateHandler<IListRequestProcessor>(localRowType);
-        var listRequest = listHandler.CreateRequest();
+        var listRequest = listHandler.CreateRequest().SuppressPagingLimits();
         PopulateListRequest(listRequest, localIdField, handler);
 
         var response = listHandler.Process(handler.Connection, listRequest);
@@ -277,7 +277,7 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
         var localIdField = handler.Row.GetIdField();
 
         var listHandler = handlerFactory.CreateHandler<IListRequestProcessorAsync>(localRowType);
-        var listRequest = listHandler.CreateRequest();
+        var listRequest = listHandler.CreateRequest().SuppressPagingLimits();
         PopulateListRequest(listRequest, localIdField, handler);
 
         var response = await listHandler.ProcessAsync(handler.Connection, listRequest, cancellationToken).ConfigureAwait(false);

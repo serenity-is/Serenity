@@ -241,7 +241,7 @@ public class UpdatableExtensionBehavior(IDefaultHandlerFactory handlerFactory) :
         object thisKey)
     {
         var listHandler = handlerFactory.CreateHandler<IListRequestProcessor>(info.Attr!.RowType);
-        var listRequest = listHandler.CreateRequest();
+        var listRequest = listHandler.CreateRequest().SuppressPagingLimits();
         ApplyFilter(listRequest, info, thisKey);
 
         var existing = listHandler.Process(connection, listRequest).Entities!;
@@ -252,7 +252,7 @@ public class UpdatableExtensionBehavior(IDefaultHandlerFactory handlerFactory) :
         object thisKey, CancellationToken cancellationToken)
     {
         var listHandler = handlerFactory.CreateHandler<IListRequestProcessorAsync>(info.Attr!.RowType);
-        var listRequest = listHandler.CreateRequest();
+        var listRequest = listHandler.CreateRequest().SuppressPagingLimits();
         ApplyFilter(listRequest, info, thisKey);
 
         var existing = (await listHandler.ProcessAsync(connection, listRequest, cancellationToken).ConfigureAwait(false)).Entities!;

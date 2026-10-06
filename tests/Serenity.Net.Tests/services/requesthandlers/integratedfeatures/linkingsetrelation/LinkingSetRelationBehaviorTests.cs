@@ -908,4 +908,104 @@ public class LinkingSetRelationBehaviorTests
 
         Assert.False(invoked);
     }
+
+    [Fact]
+    public void OnReturn_Retrieve_SuppressesPagingLimits()
+    {
+        var handlerFactory = new MockHandlerFactory((rowType, intf) =>
+        {
+            Assert.Equal(typeof(LkLinkRow), rowType);
+            Assert.Equal(typeof(IListRequestProcessor), intf);
+            return new MockListHandler<LkLinkRow>(x =>
+            {
+                Assert.True(x.Request.IsPagingLimitsSuppressed());
+                x.Response.Entities.Add(new LkLinkRow { ItemID = 11 });
+            });
+        });
+
+        var retrieve = new MockRetrieveHandler<LkMainRow>();
+        retrieve.Row.ID = 5;
+        var behavior = new LinkingSetRelationBehavior(handlerFactory)
+        {
+            Target = retrieve.Row.GetFields().SelectedItems
+        };
+        Assert.True(behavior.ActivateFor(retrieve.Row));
+        behavior.OnReturn(retrieve);
+    }
+
+    [Fact]
+    public async Task OnReturnAsync_Retrieve_SuppressesPagingLimits()
+    {
+        var handlerFactory = new MockHandlerFactory((rowType, intf) =>
+        {
+            Assert.Equal(typeof(LkLinkRow), rowType);
+            Assert.Equal(typeof(IListRequestProcessorAsync), intf);
+            return new MockListHandlerAsync<LkLinkRow>(x =>
+            {
+                Assert.True(x.Request.IsPagingLimitsSuppressed());
+                x.Response.Entities.Add(new LkLinkRow { ItemID = 11 });
+            });
+        });
+
+        var retrieve = new MockRetrieveHandler<LkMainRow>();
+        retrieve.Row.ID = 5;
+        var behavior = new LinkingSetRelationBehavior(handlerFactory)
+        {
+            Target = retrieve.Row.GetFields().SelectedItems
+        };
+        Assert.True(behavior.ActivateFor(retrieve.Row));
+        await behavior.OnReturnAsync(retrieve, CancellationToken.None);
+    }
+
+    [Fact]
+    public void OnReturn_List_SuppressesPagingLimits()
+    {
+        var handlerFactory = new MockHandlerFactory((rowType, intf) =>
+        {
+            Assert.Equal(typeof(LkLinkRow), rowType);
+            Assert.Equal(typeof(IListRequestProcessor), intf);
+            return new MockListHandler<LkLinkRow>(x =>
+            {
+                Assert.True(x.Request.IsPagingLimitsSuppressed());
+                x.Response.Entities.Add(new LkLinkRow { MasterID = 5, ItemID = 11 });
+            });
+        });
+
+        var master = new LkMainRow { ID = 5 };
+        var behavior = new LinkingSetRelationBehavior(handlerFactory)
+        {
+            Target = master.GetFields().SelectedItems
+        };
+        Assert.True(behavior.ActivateFor(master));
+
+        var listHandler = new MockListHandler<LkMainRow>();
+        listHandler.Response.Entities.Add(master);
+        behavior.OnReturn((IListRequestHandler)listHandler);
+    }
+
+    [Fact]
+    public async Task OnReturnAsync_List_SuppressesPagingLimits()
+    {
+        var handlerFactory = new MockHandlerFactory((rowType, intf) =>
+        {
+            Assert.Equal(typeof(LkLinkRow), rowType);
+            Assert.Equal(typeof(IListRequestProcessorAsync), intf);
+            return new MockListHandlerAsync<LkLinkRow>(x =>
+            {
+                Assert.True(x.Request.IsPagingLimitsSuppressed());
+                x.Response.Entities.Add(new LkLinkRow { MasterID = 5, ItemID = 11 });
+            });
+        });
+
+        var master = new LkMainRow { ID = 5 };
+        var behavior = new LinkingSetRelationBehavior(handlerFactory)
+        {
+            Target = master.GetFields().SelectedItems
+        };
+        Assert.True(behavior.ActivateFor(master));
+
+        var listHandler = new MockListHandler<LkMainRow>();
+        listHandler.Response.Entities.Add(master);
+        await behavior.OnReturnAsync((IListRequestHandler)listHandler, CancellationToken.None);
+    }
 }

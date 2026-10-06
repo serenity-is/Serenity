@@ -180,7 +180,7 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
             return;
 
         var listHandler = handlerFactory.CreateHandler<IListRequestProcessor>(rowType);
-        var listRequest = BuildRetrieveListRequest(listHandler.CreateRequest(), handler);
+        var listRequest = BuildRetrieveListRequest(listHandler.CreateRequest().SuppressPagingLimits(), handler);
         var response = listHandler.Process(handler.Connection, listRequest);
         FillRetrieveList(handler, response);
     }
@@ -199,7 +199,7 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
     private async Task OnReturnAsyncCore(IRetrieveRequestHandler handler, CancellationToken cancellationToken)
     {
         var listHandler = handlerFactory.CreateHandler<IListRequestProcessorAsync>(rowType);
-        var listRequest = BuildRetrieveListRequest(listHandler.CreateRequest(), handler);
+        var listRequest = BuildRetrieveListRequest(listHandler.CreateRequest().SuppressPagingLimits(), handler);
         var response = await listHandler.ProcessAsync(handler.Connection, listRequest, cancellationToken).ConfigureAwait(false);
         FillRetrieveList(handler, response);
     }
@@ -234,7 +234,7 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
         var idField = handler.Row.GetIdField();
 
         var listHandler = handlerFactory.CreateHandler<IListRequestProcessor>(rowType);
-        var listRequest = listHandler.CreateRequest();
+        var listRequest = listHandler.CreateRequest().SuppressPagingLimits();
         listRequest.ColumnSelection = ColumnSelection.KeyOnly;
         listRequest.IncludeColumns =
         [
@@ -278,7 +278,7 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
         var idField = handler.Row.GetIdField();
 
         var listHandler = handlerFactory.CreateHandler<IListRequestProcessorAsync>(rowType);
-        var listRequest = listHandler.CreateRequest();
+        var listRequest = listHandler.CreateRequest().SuppressPagingLimits();
         listRequest.ColumnSelection = ColumnSelection.KeyOnly;
         listRequest.IncludeColumns =
         [

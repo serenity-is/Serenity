@@ -141,7 +141,7 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
             return;
 
         var listHandler = handlerFactory.CreateHandler<IListRequestProcessor>(rowType);
-        var listRequest = BuildRetrieveListRequest(listHandler.CreateRequest(), handler);
+        var listRequest = BuildRetrieveListRequest(listHandler.CreateRequest().SuppressPagingLimits(), handler);
         var response = listHandler.Process(handler.Connection, listRequest);
         FillRetrieveList(handler, response);
     }
@@ -160,7 +160,7 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
     private async Task OnReturnAsyncCore(IRetrieveRequestHandler handler, CancellationToken cancellationToken)
     {
         var listHandler = handlerFactory.CreateHandler<IListRequestProcessorAsync>(rowType);
-        var listRequest = BuildRetrieveListRequest(listHandler.CreateRequest(), handler);
+        var listRequest = BuildRetrieveListRequest(listHandler.CreateRequest().SuppressPagingLimits(), handler);
         var response = await listHandler.ProcessAsync(handler.Connection, listRequest, cancellationToken).ConfigureAwait(false);
         FillRetrieveList(handler, response);
     }
@@ -192,7 +192,7 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
             return;
 
         var listHandler = handlerFactory.CreateHandler<IListRequestProcessor>(rowType);
-        var listRequest = listHandler.CreateRequest();
+        var listRequest = listHandler.CreateRequest().SuppressPagingLimits();
         listRequest.ColumnSelection = attr.ColumnSelection;
         listRequest.IncludeColumns = includeColumns;
 
@@ -228,7 +228,7 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
     private async Task OnReturnAsyncCore(IListRequestHandler handler, CancellationToken cancellationToken)
     {
         var listHandler = handlerFactory.CreateHandler<IListRequestProcessorAsync>(rowType);
-        var listRequest = listHandler.CreateRequest();
+        var listRequest = listHandler.CreateRequest().SuppressPagingLimits();
         listRequest.ColumnSelection = attr.ColumnSelection;
         listRequest.IncludeColumns = includeColumns;
 
@@ -515,7 +515,7 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
         else
         {
             var listHandler = handlerFactory.CreateHandler<IListRequestProcessor>(rowType);
-            var listRequest = listHandler.CreateRequest();
+            var listRequest = listHandler.CreateRequest().SuppressPagingLimits();
             listRequest.ColumnSelection = ColumnSelection.List;
             listRequest.Criteria = foreignKeyCriteria == new ValueCriteria(masterKeyField.AsObject(handler.Row)) & filterCriteria;
 
@@ -548,7 +548,7 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
         else
         {
             var listHandler = handlerFactory.CreateHandler<IListRequestProcessorAsync>(rowType);
-            var listRequest = listHandler.CreateRequest();
+            var listRequest = listHandler.CreateRequest().SuppressPagingLimits();
             listRequest.ColumnSelection = ColumnSelection.List;
             listRequest.Criteria = foreignKeyCriteria == new ValueCriteria(masterKeyField.AsObject(handler.Row)) & filterCriteria;
 
