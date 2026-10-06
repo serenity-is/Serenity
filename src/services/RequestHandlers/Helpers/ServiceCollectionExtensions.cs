@@ -224,6 +224,9 @@ public static class ServiceCollectionExtensions
 
         collection.TryAddSingleton<ISqlErrorExtractor, DefaultSqlErrorExtractor>();
         collection.TryAddSingleton<IRequestContext, DefaultRequestContext>();
+
+        collection.AddOptions();
+
         return collection;
     }
 

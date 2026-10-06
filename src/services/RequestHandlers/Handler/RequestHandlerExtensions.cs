@@ -16,8 +16,8 @@ public static class RequestHandlerExtensions
     }
 
     /// <summary>
-    /// Sets whether paging limits (<see cref="ListHandlerSettings.DefaultPageSize"/> /
-    /// <see cref="ListHandlerSettings.MaxPageSize"/>) should be ignored for the list request.
+    /// Sets whether paging limits (<see cref="RequestHandlerSettings.DefaultPageSize"/> /
+    /// <see cref="RequestHandlerSettings.MaxPageSize"/>) should be ignored for the list request.
     /// Server side code that needs all rows (e.g. exports, reports, background jobs, nested
     /// relation loads) should call this; otherwise enabling the limits may silently truncate
     /// the results. Has no effect on JSON bound client requests.
@@ -35,8 +35,8 @@ public static class RequestHandlerExtensions
     }
 
     /// <summary>
-    /// Gets whether paging limits (<see cref="ListHandlerSettings.DefaultPageSize"/> /
-    /// <see cref="ListHandlerSettings.MaxPageSize"/>) are suppressed for the list request,
+    /// Gets whether paging limits (<see cref="RequestHandlerSettings.DefaultPageSize"/> /
+    /// <see cref="RequestHandlerSettings.MaxPageSize"/>) are suppressed for the list request,
     /// e.g. set via <see cref="SuppressPagingLimits{TRequest}"/>.
     /// </summary>
     /// <typeparam name="TRequest">List request type.</typeparam>

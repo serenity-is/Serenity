@@ -651,28 +651,29 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(
     }
 
     /// <summary>
-    /// Gets the list settings (default / maximum page size). The default implementation
-    /// reads them from an <see cref="IHasHandlerSettings"/> capable request context, falling
-    /// back to <see cref="ListHandlerSettings.Default"/> (no limits). Override to return different
-    /// settings per request / entity, e.g. a limited page size for public access and unlimited
-    /// for administrators.
+    /// Gets the request handler settings (default / maximum page size). The default
+    /// implementation reads them from an <see cref="IHasHandlerSettings"/> capable request
+    /// context, falling back to <see cref="RequestHandlerSettings.Default"/> (no limits).
+    /// Override to return different settings per request / entity, e.g. a limited page size
+    /// for public access and unlimited for administrators (see
+    /// <see cref="RequestHandlerSettings.With"/>).
     /// </summary>
-    /// <returns>List settings.</returns>
-    protected virtual ListHandlerSettings GetListSettings()
+    /// <returns>Request handler settings.</returns>
+    protected virtual RequestHandlerSettings GetHandlerSettings()
     {
-        return (Context as IHasHandlerSettings)?.HandlerSettings?.List ?? ListHandlerSettings.Default;
+        return (Context as IHasHandlerSettings)?.HandlerSettings ?? RequestHandlerSettings.Default;
     }
 
     /// <summary>
-    /// Gets the list settings (default / maximum page size), as returned by
-    /// <see cref="GetListSettings"/>.
+    /// Gets the request handler settings (default / maximum page size), as returned by
+    /// <see cref="GetHandlerSettings"/>.
     /// </summary>
-    public ListHandlerSettings ListSettings => GetListSettings();
+    public RequestHandlerSettings HandlerSettings => GetHandlerSettings();
 
     /// <summary>
-    /// Validates the requested skip / take and applies <see cref="ListHandlerSettings"/>
+    /// Validates the requested skip / take and applies <see cref="RequestHandlerSettings"/>
     /// (default and maximum page size). Negative values are rejected as a validation error,
-    /// while larger values are clamped to <see cref="ListHandlerSettings.MaxPageSize"/> so that
+    /// while larger values are clamped to <see cref="RequestHandlerSettings.MaxPageSize"/> so that
     /// the response can report the applied take. Paging limits are skipped when
     /// <paramref name="suppressPagingLimits"/> is true (see <see cref="RequestHandlerExtensions.SuppressPagingLimits{TRequest}"/>).
     /// </summary>
@@ -689,18 +690,7 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(
         if (take < 0)
             throw DataValidation.ArgumentOutOfRange(nameof(ListRequest.Take), Localizer);
 
-        if (suppressPagingLimits)
-            return (skip, take);
-
-        var settings = ListSettings;
-
-        if (take == 0)
-            take = settings.DefaultPageSize;
-
-        if (settings.MaxPageSize > 0 && (take == 0 || take > settings.MaxPageSize))
-            take = settings.MaxPageSize;
-
-        return (skip, take);
+        return HandlerSettings.GetEffectiveSkipTake(skip, take, suppressPagingLimits);
     }
 
     /// <summary>

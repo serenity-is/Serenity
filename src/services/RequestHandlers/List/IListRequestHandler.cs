@@ -57,10 +57,10 @@ public interface IListRequestHandler : IRequestHandler
     void IgnoreEqualityFilter(string field);
 
     /// <summary>
-    /// Gets the list settings, e.g. the default / maximum page size. The default
+    /// Gets the request handler settings, e.g. the default / maximum page size. The default
     /// implementation reads them from an <see cref="IHasHandlerSettings"/> capable request
-    /// context, falling back to <see cref="ListHandlerSettings.Default"/> (no limits).
+    /// context, falling back to <see cref="RequestHandlerSettings.Default"/> (no limits).
     /// </summary>
-    /// <returns>List settings.</returns>
-    ListHandlerSettings ListSettings => (Context as IHasHandlerSettings)?.HandlerSettings?.List ?? ListHandlerSettings.Default;
+    /// <returns>Request handler settings.</returns>
+    RequestHandlerSettings HandlerSettings => (Context as IHasHandlerSettings)?.HandlerSettings ?? RequestHandlerSettings.Default;
 }

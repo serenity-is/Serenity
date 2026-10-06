@@ -7,7 +7,7 @@ using System.Text.Json;
 
 namespace Serenity.Services;
 
-public class ListHandlerSettingsTests
+public class RequestHandlerSettingsTests
 {
     [ReadPermission(SpecialPermissionKeys.Public)]
     private class ListRow : Row<ListRow.RowFields>, IIdRow
@@ -21,7 +21,7 @@ public class ListHandlerSettingsTests
         }
     }
 
-    private static IRequestContext Context(RequestHandlerSettings? options = null)
+    private static IRequestContext Context(RequestHandlerSettings? settings = null)
     {
         return new DefaultRequestContext(
             new NullBehaviorProvider(),
@@ -29,7 +29,7 @@ public class ListHandlerSettingsTests
             NullTextLocalizer.Instance,
             new MockPermissions(_ => true),
             new NullUserAccessor(),
-            options);
+            settings);
     }
 
     private static MockDbConnection Connection() =>
@@ -41,9 +41,9 @@ public class ListHandlerSettingsTests
     {
         var settings = new RequestHandlerSettings();
         if (maxPageSize != null)
-            settings.List.MaxPageSize = maxPageSize.Value;
+            settings.MaxPageSize = maxPageSize.Value;
         if (defaultPageSize != null)
-            settings.List.DefaultPageSize = defaultPageSize.Value;
+            settings.DefaultPageSize = defaultPageSize.Value;
         return settings;
     }
 
@@ -75,9 +75,9 @@ public class ListHandlerSettingsTests
     public void MaxPageSize_Clamps_Take_And_Response_Reports_Applied()
     {
         using var conn = Connection();
-        var options = Settings(maxPageSize: 5);
+        var settings = Settings(maxPageSize: 5);
 
-        var response = new ListRequestHandler<ListRow>(Context(options)).List(conn,
+        var response = new ListRequestHandler<ListRow>(Context(settings)).List(conn,
             new ListRequest { Take = 100, ExcludeTotalCount = true });
 
         Assert.Equal(5, response.Take);
@@ -87,9 +87,9 @@ public class ListHandlerSettingsTests
     public void MaxPageSize_Limits_Unspecified_Take()
     {
         using var conn = Connection();
-        var options = Settings(maxPageSize: 5);
+        var settings = Settings(maxPageSize: 5);
 
-        var response = new ListRequestHandler<ListRow>(Context(options)).List(conn,
+        var response = new ListRequestHandler<ListRow>(Context(settings)).List(conn,
             new ListRequest { ExcludeTotalCount = true });
 
         Assert.Equal(5, response.Take);
@@ -99,9 +99,9 @@ public class ListHandlerSettingsTests
     public void DefaultPageSize_Applies_When_Take_Unspecified()
     {
         using var conn = Connection();
-        var options = Settings(defaultPageSize: 7);
+        var settings = Settings(defaultPageSize: 7);
 
-        var response = new ListRequestHandler<ListRow>(Context(options)).List(conn,
+        var response = new ListRequestHandler<ListRow>(Context(settings)).List(conn,
             new ListRequest { ExcludeTotalCount = true });
 
         Assert.Equal(7, response.Take);
@@ -119,42 +119,56 @@ public class ListHandlerSettingsTests
     }
 
     [Fact]
-    public void ListSettings_Returns_Default_When_Context_Does_Not_Provide_Settings()
+    public void HandlerSettings_Returns_Default_When_Context_Does_Not_Provide_Settings()
     {
         var handler = new ListRequestHandler<ListRow>(new NullRequestContext().WithPermissions(_ => true));
 
-        Assert.Same(ListHandlerSettings.Default, handler.ListSettings);
+        Assert.Same(RequestHandlerSettings.Default, handler.HandlerSettings);
     }
 
     [Fact]
-    public void ListSettings_Returns_Settings_From_Context()
+    public void HandlerSettings_Returns_Settings_From_Context()
     {
         var settings = Settings(maxPageSize: 5);
         var handler = new ListRequestHandler<ListRow>(Context(settings));
 
-        Assert.Same(settings.List, handler.ListSettings);
+        Assert.Same(settings, handler.HandlerSettings);
     }
 
-    private class CustomSettingsHandler(IRequestContext context, ListHandlerSettings settings)
+    private class CustomSettingsHandler(IRequestContext context, RequestHandlerSettings settings)
         : ListRequestHandler<ListRow>(context)
     {
-        protected override ListHandlerSettings GetListSettings() => settings;
+        protected override RequestHandlerSettings GetHandlerSettings() => settings;
     }
 
     [Fact]
-    public void ListSettings_Can_Be_Overridden_Per_Handler()
+    public void HandlerSettings_Can_Be_Overridden_Per_Handler()
     {
-        var settings = new ListHandlerSettings { MaxPageSize = 3 };
+        var settings = new RequestHandlerSettings { MaxPageSize = 3 };
         var handler = new CustomSettingsHandler(new NullRequestContext().WithPermissions(_ => true), settings);
 
-        Assert.Same(settings, handler.ListSettings);
+        Assert.Same(settings, handler.HandlerSettings);
     }
 
     [Fact]
-    public void Binds_Nested_List_Settings_From_Configuration()
+    public void With_Creates_Modified_Copy_Without_Changing_Original()
+    {
+        var settings = Settings(maxPageSize: 5, defaultPageSize: 10);
+
+        var copy = settings.With(x => x.MaxPageSize = 0);
+
+        Assert.Equal(0, copy.MaxPageSize);
+        Assert.Equal(10, copy.DefaultPageSize);
+        Assert.Equal(5, settings.MaxPageSize);
+        Assert.Equal(10, settings.DefaultPageSize);
+        Assert.NotSame(settings, copy);
+    }
+
+    [Fact]
+    public void Binds_Settings_From_Configuration()
     {
         var config = new ConfigurationBuilder()
-            .AddInMemoryCollection([new KeyValuePair<string, string?>("RequestHandlers:List:MaxPageSize", "10")])
+            .AddInMemoryCollection([new KeyValuePair<string, string?>("RequestHandlerSettings:MaxPageSize", "10")])
             .Build();
 
         var services = new ServiceCollection();
@@ -162,7 +176,7 @@ public class ListHandlerSettingsTests
         var settings = services.BuildServiceProvider()
             .GetRequiredService<IOptions<RequestHandlerSettings>>().Value;
 
-        Assert.Equal(10, settings.List.MaxPageSize);
+        Assert.Equal(10, settings.MaxPageSize);
     }
 
     [Fact]
