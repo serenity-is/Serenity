@@ -22,7 +22,13 @@ public class ListHandlerSettings
     /// <see cref="RequestHandlerExtensions.SuppressPagingLimits{TRequest}"/> to ignore the
     /// limits. Do not enable this without auditing existing List usages. Also, grids that do
     /// not render a pager (e.g. <c>usePager() =&gt; false</c>) will be truncated with no way to
-    /// reach the remaining rows, so avoid low values.
+    /// reach the remaining rows, so avoid low values. Enabling this (or <see cref="MaxPageSize"/>)
+    /// also makes the effective take non-zero for every request, which — with the default
+    /// <see cref="ListRequest.ExcludeTotalCount"/> of false — adds a COUNT(*) to every list
+    /// request, including internal ones. Callers that don't need the total should set
+    /// <see cref="ListRequest.ExcludeTotalCount"/> to true, or call
+    /// <see cref="RequestHandlerExtensions.SuppressPagingLimits{TRequest}"/> (which also
+    /// restores take to zero).
     /// </remarks>
     public int DefaultPageSize { get; set; }
 
@@ -32,10 +38,9 @@ public class ListHandlerSettings
     /// also limited to this value. The response returns the applied take. Zero means no limit.
     /// </summary>
     /// <remarks>
-    /// WARNING: This has the same risks as <see cref="DefaultPageSize"/>. Even without a
-    /// default, it truncates requests that do not specify a take and any server side
-    /// enumeration through the List service, and truncates grids without a pager. Server side
-    /// callers that need all rows must call
+    /// WARNING: This has the same risks as <see cref="DefaultPageSize"/> (truncation of server
+    /// side enumerations and grids without a pager, and an added COUNT(*) on every list
+    /// request). Server side callers that need all rows must call
     /// <see cref="RequestHandlerExtensions.SuppressPagingLimits{TRequest}"/>. Do not enable
     /// this without auditing existing List usages, and avoid low values.
     /// </remarks>
