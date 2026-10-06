@@ -1,4 +1,4 @@
-﻿namespace Serenity.Services;
+namespace Serenity.Services;
 
 /// <summary>
 /// Represents a ListRequestHandler. Is used with ListBehavior objects.
@@ -55,4 +55,12 @@ public interface IListRequestHandler : IRequestHandler
     /// </summary>
     /// <param name="field">Field name or property name</param>
     void IgnoreEqualityFilter(string field);
+
+    /// <summary>
+    /// Gets the list settings, e.g. the default / maximum page size. The default
+    /// implementation reads them from an <see cref="IHasHandlerSettings"/> capable request
+    /// context, falling back to <see cref="ListHandlerSettings.Default"/> (no limits).
+    /// </summary>
+    /// <returns>List settings.</returns>
+    ListHandlerSettings ListSettings => (Context as IHasHandlerSettings)?.HandlerSettings?.List ?? ListHandlerSettings.Default;
 }

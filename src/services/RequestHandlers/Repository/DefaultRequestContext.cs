@@ -1,4 +1,6 @@
-﻿namespace Serenity.Services;
+using Microsoft.Extensions.Options;
+
+namespace Serenity.Services;
 
 /// <summary>
 /// Default implementation for a <see cref="IRequestContext"/>.
@@ -11,9 +13,11 @@
 /// <param name="localizer">Text localizer</param>
 /// <param name="permissions">Permissions</param>
 /// <param name="userAccessor">User access</param>
+/// <param name="handlerSettings">Request handler settings</param>
 /// <exception cref="ArgumentNullException">Any of the arguments is <c>null</c>.</exception>
 public class DefaultRequestContext(IBehaviorProvider behaviors, ITwoLevelCache cache, ITextLocalizer localizer,
-    IPermissionService permissions, IUserAccessor userAccessor) : IRequestContext
+    IPermissionService permissions, IUserAccessor userAccessor,
+    IOptions<RequestHandlerSettings>? handlerSettings = null) : IRequestContext, IHasHandlerSettings
 {
     private readonly IUserAccessor userAccessor = userAccessor ?? throw new ArgumentNullException(nameof(userAccessor));
 
@@ -21,6 +25,8 @@ public class DefaultRequestContext(IBehaviorProvider behaviors, ITwoLevelCache c
     public IBehaviorProvider Behaviors { get; private set; } = behaviors ?? throw new ArgumentNullException(nameof(behaviors));
     /// <inheritdoc/>
     public ITwoLevelCache Cache { get; private set; } = cache ?? throw new ArgumentNullException(nameof(cache));
+    /// <inheritdoc/>
+    public RequestHandlerSettings HandlerSettings => handlerSettings?.Value ?? RequestHandlerSettings.Default;
     /// <inheritdoc/>
     public ITextLocalizer Localizer { get; private set; } = localizer ?? throw new ArgumentNullException(nameof(localizer));
     /// <inheritdoc/>

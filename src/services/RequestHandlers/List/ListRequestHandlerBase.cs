@@ -651,6 +651,59 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(
     }
 
     /// <summary>
+    /// Gets the list settings (default / maximum page size). The default implementation
+    /// reads them from an <see cref="IHasHandlerSettings"/> capable request context, falling
+    /// back to <see cref="ListHandlerSettings.Default"/> (no limits). Override to return different
+    /// settings per request / entity, e.g. a limited page size for public access and unlimited
+    /// for administrators.
+    /// </summary>
+    /// <returns>List settings.</returns>
+    protected virtual ListHandlerSettings GetListSettings()
+    {
+        return (Context as IHasHandlerSettings)?.HandlerSettings?.List ?? ListHandlerSettings.Default;
+    }
+
+    /// <summary>
+    /// Gets the list settings (default / maximum page size), as returned by
+    /// <see cref="GetListSettings"/>.
+    /// </summary>
+    public ListHandlerSettings ListSettings => GetListSettings();
+
+    /// <summary>
+    /// Validates the requested skip / take and applies <see cref="ListHandlerSettings"/>
+    /// (default and maximum page size). Negative values are rejected as a validation error,
+    /// while larger values are clamped to <see cref="ListHandlerSettings.MaxPageSize"/> so that
+    /// the response can report the applied take. Paging limits are skipped when
+    /// <paramref name="suppressPagingLimits"/> is true (see <see cref="RequestHandlerExtensions.SuppressPagingLimits{TRequest}"/>).
+    /// </summary>
+    /// <param name="skip">Requested skip value.</param>
+    /// <param name="take">Requested take value.</param>
+    /// <param name="suppressPagingLimits">True to ignore paging limits.</param>
+    /// <returns>The effective skip / take values.</returns>
+    /// <exception cref="ValidationError">Skip or take is negative.</exception>
+    protected virtual (int Skip, int Take) GetEffectiveSkipTake(int skip, int take, bool suppressPagingLimits = false)
+    {
+        if (skip < 0)
+            throw DataValidation.ArgumentOutOfRange(nameof(ListRequest.Skip), Localizer);
+
+        if (take < 0)
+            throw DataValidation.ArgumentOutOfRange(nameof(ListRequest.Take), Localizer);
+
+        if (suppressPagingLimits)
+            return (skip, take);
+
+        var settings = ListSettings;
+
+        if (take == 0)
+            take = settings.DefaultPageSize;
+
+        if (settings.MaxPageSize > 0 && (take == 0 || take > settings.MaxPageSize))
+            take = settings.MaxPageSize;
+
+        return (skip, take);
+    }
+
+    /// <summary>
     /// Creates a query instance with the dialect for current connection.
     /// </summary>
     protected virtual SqlQuery CreateQuery()

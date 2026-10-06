@@ -1551,6 +1551,37 @@ describe("RemoteView", () => {
             expect(view.getPagingInfo().page).toBe(1);
         });
 
+        it("tracks returned Take as actualRowsPerPage while keeping requested rowsPerPage", () => {
+            const clampedView = new RemoteView<any>({
+                idField: "id",
+                rowsPerPage: 100,
+                url: "/api/test"
+            });
+
+            clampedView.addData({
+                Entities: [{ id: 1 }, { id: 2 }],
+                TotalCount: 91,
+                Skip: 0,
+                Take: 10
+            });
+
+            const info = clampedView.getPagingInfo();
+            expect(info.rowsPerPage).toBe(100);
+            expect(info.actualRowsPerPage).toBe(10);
+            expect(info.page).toBe(1);
+            expect(info.totalCount).toBe(91);
+        });
+
+        it("falls back to rowsPerPage for actualRowsPerPage before a response", () => {
+            const freshView = new RemoteView<any>({
+                idField: "id",
+                rowsPerPage: 25,
+                url: "/api/test"
+            });
+
+            expect(freshView.getPagingInfo().actualRowsPerPage).toBe(25);
+        });
+
         it("sets page to 1 when rowsPerPage is 0 and no Take", () => {
             const viewNoPaging = new RemoteView<any>({
                 idField: "id",

@@ -16,6 +16,40 @@ public static class RequestHandlerExtensions
     }
 
     /// <summary>
+    /// Sets whether paging limits (<see cref="ListHandlerSettings.DefaultPageSize"/> /
+    /// <see cref="ListHandlerSettings.MaxPageSize"/>) should be ignored for the list request.
+    /// Server side code that needs all rows (e.g. exports, reports, background jobs, nested
+    /// relation loads) should call this; otherwise enabling the limits may silently truncate
+    /// the results. Has no effect on JSON bound client requests.
+    /// </summary>
+    /// <typeparam name="TRequest">List request type.</typeparam>
+    /// <param name="request">The list request.</param>
+    /// <param name="suppress">True to ignore paging limits, false to apply them.</param>
+    /// <returns>The same request, for chaining.</returns>
+    public static TRequest SuppressPagingLimits<TRequest>(this TRequest request, bool suppress = true)
+        where TRequest : ListRequest
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        request.pagingLimitsSuppressed = suppress;
+        return request;
+    }
+
+    /// <summary>
+    /// Gets whether paging limits (<see cref="ListHandlerSettings.DefaultPageSize"/> /
+    /// <see cref="ListHandlerSettings.MaxPageSize"/>) are suppressed for the list request,
+    /// e.g. set via <see cref="SuppressPagingLimits{TRequest}"/>.
+    /// </summary>
+    /// <typeparam name="TRequest">List request type.</typeparam>
+    /// <param name="request">The list request.</param>
+    /// <returns>True if paging limits should be ignored.</returns>
+    public static bool IsPagingLimitsSuppressed<TRequest>(this TRequest request)
+        where TRequest : ListRequest
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        return request.pagingLimitsSuppressed;
+    }
+
+    /// <summary>
     /// Creates a request object for the retrieve handler instance
     /// </summary>
     /// <param name="handler">Retrieve handler instance</param>

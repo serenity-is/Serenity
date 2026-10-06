@@ -89,7 +89,8 @@ export class SlickPager<P extends PagerOptions = PagerOptions> extends Widget<P>
             return true;
 
         const info = view.getPagingInfo();
-        const pages = (!info.rowsPerPage || !info.totalCount) ? 1 : Math.ceil(info.totalCount / info.rowsPerPage);
+        const rowsPerPage = info.actualRowsPerPage || info.rowsPerPage;
+        const pages = (!rowsPerPage || !info.totalCount) ? 1 : Math.ceil(info.totalCount / rowsPerPage);
 
         let newp: number;
 
@@ -130,13 +131,14 @@ export class SlickPager<P extends PagerOptions = PagerOptions> extends Widget<P>
 
         const view = this.options.view;
         const info = view.getPagingInfo();
-        const pages = (!info.rowsPerPage || !info.totalCount) ? 1 : Math.ceil(info.totalCount / info.rowsPerPage);
+        const rowsPerPage = info.actualRowsPerPage || info.rowsPerPage;
+        const pages = (!rowsPerPage || !info.totalCount) ? 1 : Math.ceil(info.totalCount / rowsPerPage);
 
         this.currentPage.value = info.page?.toString();
         this.totalPages.textContent = "" + pages;
 
-        const r1 = (info.page - 1) * info.rowsPerPage + 1;
-        let r2 = r1 + info.rowsPerPage - 1;
+        const r1 = (info.page - 1) * rowsPerPage + 1;
+        let r2 = r1 + rowsPerPage - 1;
 
         if (info.totalCount < r2)
             r2 = info.totalCount;

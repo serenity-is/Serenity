@@ -295,8 +295,11 @@ export interface PagingInfo {
     loading: boolean;
     /** Current page number (1-based) */
     page: number;
-    /** Number of rows displayed per page */
+    /** Number of rows requested per page */
     rowsPerPage: number;
+    /** Number of rows actually used by the server for the current page. May differ from
+     * {@link rowsPerPage} when the server applies a maximum or default page size. */
+    actualRowsPerPage: number;
     /** Total number of items available */
     totalCount: number;
 }

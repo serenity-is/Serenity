@@ -6,6 +6,14 @@ namespace Serenity.Services;
 public class ListRequest : ServiceRequest, IIncludeExcludeColumns
 {
     /// <summary>
+    /// When true, paging limits (<see cref="ListHandlerSettings.DefaultPageSize"/> /
+    /// <see cref="ListHandlerSettings.MaxPageSize"/>) are ignored for this request. Set via
+    /// the <c>SuppressPagingLimits()</c> extension from server side code. Not bound from JSON,
+    /// so clients cannot set it.
+    /// </summary>
+    internal bool pagingLimitsSuppressed;
+
+    /// <summary>
     /// Number of records to skip
     /// </summary>
     [JsonConverter(typeof(JsonConverters.NullAsDefaultJsonConverter))]

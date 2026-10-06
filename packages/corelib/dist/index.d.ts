@@ -6913,6 +6913,7 @@ export declare class RemoteView<TItem = any> implements IRemoteView<TItem> {
 	private rows;
 	private rowsById;
 	private rowsPerPage;
+	private actualRowsPerPage;
 	private sortAsc;
 	private sortComparer;
 	private suspend;
@@ -7597,8 +7598,11 @@ export interface PagingInfo {
 	loading: boolean;
 	/** Current page number (1-based) */
 	page: number;
-	/** Number of rows displayed per page */
+	/** Number of rows requested per page */
 	rowsPerPage: number;
+	/** Number of rows actually used by the server for the current page. May differ from
+	 * {@link rowsPerPage} when the server applies a maximum or default page size. */
+	actualRowsPerPage: number;
 	/** Total number of items available */
 	totalCount: number;
 }
@@ -11611,6 +11615,13 @@ export interface EntityLocalizerOptions {
 	idPrefix: string;
 	/** Whether the entity is new (no id). */
 	isNew: () => boolean;
+	/**
+	 * Maps a source property item to the item used in the localization grid. The default
+	 * returns the item as is. Return an item with `localizable: false` to skip it, or a copy
+	 * with modified permissions / insertable / updatable flags to customize editability
+	 * (e.g. require a translation specific permission).
+	 */
+	mapSourceItem?: (item: PropertyItem) => PropertyItem;
 	/** Returns the localization toggle button. */
 	getButton: () => Fluent;
 	/** Returns the current entity. */
@@ -11658,6 +11669,22 @@ export declare class EntityLocalizer {
 	 * @returns True when enabled.
 	 */
 	isEnabled(): boolean;
+	/**
+	 * Maps a source property item to the item used in the localization grid, using the
+	 * dialog supplied {@link EntityLocalizerOptions.mapSourceItem} callback. The callback
+	 * may return a modified item (e.g. with different permissions / insertable / updatable
+	 * flags, or `localizable: false` to skip it), or null/undefined to use the item as is.
+	 * @param item - Source property item.
+	 * @returns The item to use.
+	 */
+	protected mapSourceItem(item: PropertyItem): PropertyItem;
+	/**
+	 * Applies the insert/update mode to the localization grid, so that insertable /
+	 * updatable flags and field level permissions are evaluated for the current operation.
+	 * The dialog calls this whenever the main property grid mode changes.
+	 * @param mode - The property grid mode.
+	 */
+	setMode(mode: PropertyGridMode): void;
 	/**
 	 * Whether the dialog is currently in localization mode.
 	 * @returns True when in localization mode.
@@ -12042,6 +12069,15 @@ export declare class EntityDialog<TItem, P = {}> extends BaseDialog<P> implement
 	 * @returns The language list.
 	 */
 	protected getLanguages(): LanguageList;
+	/**
+	 * Maps a property item to the item used in the localization grid. The default returns
+	 * the item as is (return null for the same effect). Override to clear or modify
+	 * permissions / insertable / updatable flags, or to exclude items by returning an item
+	 * with `localizable: false`.
+	 * @param item - Property item.
+	 * @returns The item to use, or null to use the item as is.
+	 */
+	protected mapSourceItem(item: PropertyItem): PropertyItem;
 	/**
 	 * Initializes the property grid from the PropertyGrid element.
 	 */

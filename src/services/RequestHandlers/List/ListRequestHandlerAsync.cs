@@ -179,7 +179,8 @@ public class ListRequestHandlerAsync<TRow, TListRequest, TListResponse> :
         if (DistinctFields == null)
             ApplyKeyOrder(query);
 
-        query.ApplySkipTakeAndCount(request.Skip, request.Take,
+        var (skip, take) = GetEffectiveSkipTake(request.Skip, request.Take, request.IsPagingLimitsSuppressed());
+        query.ApplySkipTakeAndCount(skip, take,
             request.ExcludeTotalCount || DistinctFields != null, request.IncludeMore,
             out var pagingState);
 

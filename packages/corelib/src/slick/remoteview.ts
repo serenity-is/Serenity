@@ -107,6 +107,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
     private rows: (TItem | Group | GroupTotals)[] = [];
     private rowsById: Record<any, number> = null;
     private rowsPerPage: number;
+    private actualRowsPerPage: number = null;
     private sortAsc = true;
     private sortComparer: any;
     private suspend = 0;
@@ -297,17 +298,19 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         if (args.rowsPerPage != undefined &&
             this.rowsPerPage != args.rowsPerPage) {
             this.rowsPerPage = args.rowsPerPage;
+            this.actualRowsPerPage = null;
             anyChange = true;
         }
 
         if (args.page != undefined) {
             let newPage: number;
-            if (!this.rowsPerPage)
+            const rowsPerPage = this.actualRowsPerPage || this.rowsPerPage;
+            if (!rowsPerPage)
                 newPage = 1;
             else if (this.totalCount == null)
                 newPage = args.page;
             else
-                newPage = Math.min(args.page, Math.ceil(this.totalCount / this.rowsPerPage) + 1);
+                newPage = Math.min(args.page, Math.ceil(this.totalCount / rowsPerPage) + 1);
 
             if (newPage < 1)
                 newPage = 1;
@@ -329,6 +332,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
     public getPagingInfo(): PagingInfo {
         return {
             rowsPerPage: this.rowsPerPage,
+            actualRowsPerPage: this.actualRowsPerPage ?? this.rowsPerPage,
             page: this.page,
             totalCount: this.totalCount,
             loading: this.loading != null && this.loading != false,
@@ -1338,6 +1342,11 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         data.TotalCount = data.TotalCount || 0;
         data.Entities = data.Entities || [];
 
+        // the server may apply a different page size than requested (e.g. a maximum
+        // page size limit or a default page size), so track it separately and use it
+        // for paging calculations and the pager UI, while keeping rowsPerPage as requested
+        this.actualRowsPerPage = data.Take != null ? data.Take : this.rowsPerPage;
+
         if (!data.Skip || (!this.rowsPerPage && !data.Take))
             data.Page = 1;
         else
@@ -1383,7 +1392,8 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
 
         let request: ListRequest = {};
 
-        const skip = (this.seekToPage - 1) * this.rowsPerPage;
+        const rowsPerPage = this.actualRowsPerPage > 0 ? this.actualRowsPerPage : this.rowsPerPage;
+        const skip = (this.seekToPage - 1) * rowsPerPage;
         if (skip)
             request.Skip = skip;
         if (this.rowsPerPage)
