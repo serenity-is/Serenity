@@ -353,4 +353,77 @@ public class StreamFieldTests
         field[row] = stream;
         Assert.Same(stream, field.AsSqlValue(row));
     }
+
+    private static StreamField SizedField(int size)
+    {
+        var fields = new AllFieldsRow.RowFields();
+        fields.AStream.Size = size;
+        return fields.AStream;
+    }
+
+    [Fact]
+    public void ValueFromJson_Newtonsoft_Base64ExceedingSize_Throws()
+    {
+        var field = SizedField(2);
+        var row = NewRow();
+        var base64 = Convert.ToBase64String(new byte[10]);
+        using var reader = new Newtonsoft.Json.JsonTextReader(new System.IO.StringReader("\"" + base64 + "\""));
+        reader.Read();
+        Assert.Throws<Newtonsoft.Json.JsonSerializationException>(() =>
+            field.ValueFromJson(reader, row, Newtonsoft.Json.JsonSerializer.CreateDefault()));
+        Assert.Null(field[row]);
+    }
+
+    [Fact]
+    public void ValueFromJson_Stj_Base64ExceedingSize_Throws()
+    {
+        var field = SizedField(2);
+        var row = NewRow();
+        var base64 = Convert.ToBase64String(new byte[10]);
+        var bytes = Encoding.UTF8.GetBytes("\"" + base64 + "\"");
+        var ex = Record.Exception(() =>
+        {
+            var reader = new Utf8JsonReader(bytes);
+            reader.Read();
+            field.ValueFromJson(ref reader, row, new JsonSerializerOptions());
+        });
+        Assert.IsType<JsonException>(ex);
+        Assert.Null(field[row]);
+    }
+
+    [Fact]
+    public void ValueFromJson_Newtonsoft_Base64WithWhitespaceWithinSize_Parses()
+    {
+        var field = SizedField(2);
+        var row = NewRow();
+        using var reader = new Newtonsoft.Json.JsonTextReader(new System.IO.StringReader("\"AQ I=\""));
+        reader.Read();
+        field.ValueFromJson(reader, row, Newtonsoft.Json.JsonSerializer.CreateDefault());
+        Assert.Equal(new byte[] { 1, 2 }, ((System.IO.MemoryStream)field[row]).ToArray());
+    }
+
+    [Fact]
+    public void ValueFromJson_Stj_Base64WithWhitespaceWithinSize_Parses()
+    {
+        var field = SizedField(2);
+        var row = NewRow();
+        var bytes = Encoding.UTF8.GetBytes("\"AQ I=\"");
+        var reader = new Utf8JsonReader(bytes);
+        reader.Read();
+        field.ValueFromJson(ref reader, row, new JsonSerializerOptions());
+        Assert.Equal(new byte[] { 1, 2 }, ((System.IO.MemoryStream)field[row]).ToArray());
+    }
+
+    [Fact]
+    public void ValueFromJson_UnboundedSize_LargeBase64_Parses()
+    {
+        var row = NewRow();
+        var field = AllFieldsRow.Fields.AStream;
+        var value = new byte[1000];
+        var base64 = Convert.ToBase64String(value);
+        using var reader = new Newtonsoft.Json.JsonTextReader(new System.IO.StringReader("\"" + base64 + "\""));
+        reader.Read();
+        field.ValueFromJson(reader, row, Newtonsoft.Json.JsonSerializer.CreateDefault());
+        Assert.Equal(value, ((System.IO.MemoryStream)field[row]).ToArray());
+    }
 }

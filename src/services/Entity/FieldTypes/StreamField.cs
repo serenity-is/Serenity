@@ -147,11 +147,24 @@ public class StreamField(ICollection<Field> collection, string name, LocalText? 
                 _setValue(row, null);
                 break;
             case Newtonsoft.Json.JsonToken.String:
-                _setValue(row, new MemoryStream(Convert.FromBase64String((string)reader.Value!)));
+            {
+                var s = (string)reader.Value!;
+                var maxBase64Length = Base64Helper.GetMaxLength(Size);
+                if (s.Length > maxBase64Length && Base64Helper.CountCharacters(s.AsSpan()) > maxBase64Length)
+                    throw new Newtonsoft.Json.JsonSerializationException(Base64Helper.GetTooLongMessage(this));
+
+                _setValue(row, new MemoryStream(Convert.FromBase64String(s)));
                 break;
+            }
             case Newtonsoft.Json.JsonToken.Bytes:
-                _setValue(row, new MemoryStream((byte[])reader.Value!));
+            {
+                var bytes = (byte[])reader.Value!;
+                if (Size > 0 && bytes.Length > Size)
+                    throw new Newtonsoft.Json.JsonSerializationException(Base64Helper.GetTooLongMessage(this));
+
+                _setValue(row, new MemoryStream(bytes));
                 break;
+            }
             default:
                 throw JsonUnexpectedToken(reader);
         }
@@ -168,7 +181,10 @@ public class StreamField(ICollection<Field> collection, string name, LocalText? 
                 _setValue(row, null);
                 break;
             case JsonTokenType.String:
-                if (string.IsNullOrEmpty(reader.GetString()))
+                if (Base64Helper.GetLength(ref reader) > Base64Helper.GetMaxLength(Size))
+                    throw new JsonException(Base64Helper.GetTooLongMessage(this));
+
+                if (reader.HasValueSequence ? reader.ValueSequence.IsEmpty : reader.ValueSpan.IsEmpty)
                     _setValue(row, null);
                 else
                     _setValue(row, new MemoryStream(reader.GetBytesFromBase64()));
