@@ -186,13 +186,61 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
         return null;
     }
 
-    private SqlQuery BuildOldLocalizationRowQuery(IRow row, object recordId, string cultureId)
+    private SqlQuery BuildOldLocalizationRowQuery(IRow row, object recordId, string cultureId, bool selectAll = false)
     {
-        return new SqlQuery()
+        var query = new SqlQuery()
             .From(row)
-            .Select(localRowIdField)
             .WhereEqual(foreignKeyField, recordId)
             .WhereEqual(cultureIdField, cultureId);
+
+        return selectAll ? query.SelectTableFields() : query.Select(localRowIdField);
+    }
+
+    private IRow? LoadOldLocalizationRow(IDbConnection connection, object? recordId, string? cultureId, object? oldId)
+    {
+        if (oldId is null || recordId is null || cultureId is null)
+            return null;
+
+        var row = localRowInstance.CreateNew();
+        return BuildOldLocalizationRowQuery(row, recordId, cultureId, selectAll: true).GetFirst(connection)
+            ? row : null;
+    }
+
+    private async Task<IRow?> LoadOldLocalizationRowAsync(IDbConnection connection, object? recordId, string? cultureId,
+        object? oldId, CancellationToken cancellationToken = default)
+    {
+        if (oldId is null || recordId is null || cultureId is null)
+            return null;
+
+        var row = localRowInstance.CreateNew();
+        return await BuildOldLocalizationRowQuery(row, recordId, cultureId, selectAll: true)
+            .GetFirstAsync(connection, cancellationToken: cancellationToken).ConfigureAwait(false)
+            ? row : null;
+    }
+
+    /// <summary>
+    /// Determines whether the master field may be edited by the current user for the current
+    /// operation, mirroring the save handler's editable field logic. Localization values are
+    /// only copied for fields that pass this check; otherwise a <see cref="ValidationError"/>
+    /// is thrown, so field level permissions cannot be bypassed by sending values under
+    /// <c>SaveRequest.Localizations</c>.
+    /// </summary>
+    /// <param name="handler">Save request handler.</param>
+    /// <param name="field">Master row field.</param>
+    /// <returns>True if the field is editable.</returns>
+    private static bool IsFieldEditable(ISaveRequestHandler handler, Field field)
+    {
+        var flag = handler.IsCreate ? FieldFlags.Insertable : FieldFlags.Updatable;
+        if ((field.Flags & flag) != flag)
+            return false;
+
+        var permission = handler.IsCreate ? field.InsertPermission : field.UpdatePermission;
+        return permission is null || handler.Context.Permissions.HasPermission(permission);
+    }
+
+    private static bool IsNonEmptyValue(object? value)
+    {
+        return value != null && (value is not string str || !string.IsNullOrWhiteSpace(str));
     }
 
     /// <inheritdoc/>
@@ -348,6 +396,7 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
             var row = pair.Value as IRow;
 
             bool anyNonEmpty = false;
+            IRow? oldLocalRow = null;
 
             foreach (var field in row!.GetFields())
             {
@@ -360,13 +409,23 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
                 var match = GetLocalizationMatch(field) ?? throw new ValidationError("CantLocalize", field.Name, string.Format("{0} field is not localizable!",
                         field.PropertyName ?? field.Name));
                 var value = field.AsObject(row);
+
+                if (!IsFieldEditable(handler, field))
+                {
+                    oldLocalRow ??= LoadOldLocalizationRow(handler.UnitOfWork.Connection, masterId, cultureId, oldId);
+                    if (oldLocalRow is not null && Equals(match.AsObject(oldLocalRow), value))
+                    {
+                        anyNonEmpty |= IsNonEmptyValue(value);
+                        continue;
+                    }
+
+                    throw DataValidation.ReadOnlyError(field, handler.Context.Localizer);
+                }
+
                 match.AsObject(localRow, value);
 
-                if (value != null &&
-                    (value is not string || !string.IsNullOrWhiteSpace(value as string)))
-                {
+                if (IsNonEmptyValue(value))
                     anyNonEmpty = true;
-                }
             }
 
             if (anyNonEmpty)
@@ -398,6 +457,7 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
             var row = pair.Value as IRow;
 
             bool anyNonEmpty = false;
+            IRow? oldLocalRow = null;
 
             foreach (var field in row!.GetFields())
             {
@@ -410,13 +470,24 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
                 var match = GetLocalizationMatch(field) ?? throw new ValidationError("CantLocalize", field.Name, string.Format("{0} field is not localizable!",
                         field.PropertyName ?? field.Name));
                 var value = field.AsObject(row);
+
+                if (!IsFieldEditable(handler, field))
+                {
+                    oldLocalRow ??= await LoadOldLocalizationRowAsync(handler.UnitOfWork.Connection, masterId, cultureId,
+                        oldId, cancellationToken).ConfigureAwait(false);
+                    if (oldLocalRow is not null && Equals(match.AsObject(oldLocalRow), value))
+                    {
+                        anyNonEmpty |= IsNonEmptyValue(value);
+                        continue;
+                    }
+
+                    throw DataValidation.ReadOnlyError(field, handler.Context.Localizer);
+                }
+
                 match.AsObject(localRow, value);
 
-                if (value != null &&
-                    (value is not string || !string.IsNullOrWhiteSpace(value as string)))
-                {
+                if (IsNonEmptyValue(value))
                     anyNonEmpty = true;
-                }
             }
 
             if (anyNonEmpty)

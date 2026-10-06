@@ -1,5 +1,5 @@
 import { cssEscape, EntityDialogTexts, faIcon, Fluent, LanguageList, localText, PropertyItem, SaveRequest, TranslationConfig } from "../../base";
-import { PropertyGrid, PropertyGridOptions } from "../widgets/propertygrid";
+import { PropertyGrid, PropertyGridMode, PropertyGridOptions } from "../widgets/propertygrid";
 
 /**
  * Options for the {@link EntityLocalizer}.
@@ -11,6 +11,13 @@ export interface EntityLocalizerOptions {
     idPrefix: string,
     /** Whether the entity is new (no id). */
     isNew: () => boolean,
+    /**
+     * Maps a source property item to the item used in the localization grid. The default
+     * returns the item as is. Return an item with `localizable: false` to skip it, or a copy
+     * with modified permissions / insertable / updatable flags to customize editability
+     * (e.g. require a translation specific permission).
+     */
+    mapSourceItem?: (item: PropertyItem) => PropertyItem,
     /** Returns the localization toggle button. */
     getButton: () => Fluent;
     /** Returns the current entity. */
@@ -52,7 +59,7 @@ export class EntityLocalizer {
         const pgDiv = this.options.getPropertyGrid();
 
         if (!pgDiv?.getNode() ||
-            !pgOptions.items.some(x => x.localizable === true))
+            !pgOptions.items.some(x => this.mapSourceItem(x)?.localizable === true))
             return;
 
         const localGridDiv = <div id={idPrefix + 'LocalizationGrid'} hidden /> as HTMLDivElement;
@@ -75,27 +82,27 @@ export class EntityLocalizer {
         const items: PropertyItem[] = [];
         for (const item of pgOptions.items) {
 
-            if (item.localizable === true) {
-                items.push(Object.assign({} as PropertyItem, item, {
-                    skipOnSave: true,
-                    readOnly: true,
+            const sourceItem = this.mapSourceItem(item);
+            if (sourceItem?.localizable !== true)
+                continue;
+
+            items.push(Object.assign({} as PropertyItem, sourceItem, {
+                skipOnSave: true,
+                readOnly: true,
+                required: false,
+                defaultValue: null
+            }));
+
+            for (const lang of langs) {
+                items.push(Object.assign({} as PropertyItem, sourceItem, {
+                    name: lang.id + '$' + sourceItem.name,
+                    title: lang.text,
+                    cssClass: Fluent.toClassName([sourceItem.cssClass, 'translation', 'language-' + lang.id]),
+                    skipOnSave: false,
                     required: false,
+                    localizable: false,
                     defaultValue: null
                 }));
-
-                for (const lang of langs) {
-                    items.push(Object.assign({} as PropertyItem, item, {
-                        name: lang.id + '$' + item.name,
-                        title: lang.text,
-                        cssClass: Fluent.toClassName([item.cssClass, 'translation', 'language-' + lang.id]),
-                        insertable: true,
-                        updatable: true,
-                        skipOnSave: false,
-                        required: false,
-                        localizable: false,
-                        defaultValue: null
-                    }));
-                }
             }
         }
 
@@ -166,6 +173,28 @@ export class EntityLocalizer {
      */
     public isEnabled(): boolean {
         return !!this.grid;
+    }
+
+    /**
+     * Maps a source property item to the item used in the localization grid, using the
+     * dialog supplied {@link EntityLocalizerOptions.mapSourceItem} callback. The callback
+     * may return a modified item (e.g. with different permissions / insertable / updatable
+     * flags, or `localizable: false` to skip it), or null/undefined to use the item as is.
+     * @param item - Source property item.
+     * @returns The item to use.
+     */
+    protected mapSourceItem(item: PropertyItem): PropertyItem {
+        return this.options.mapSourceItem?.(item) ?? item;
+    }
+
+    /**
+     * Applies the insert/update mode to the localization grid, so that insertable /
+     * updatable flags and field level permissions are evaluated for the current operation.
+     * The dialog calls this whenever the main property grid mode changes.
+     * @param mode - The property grid mode.
+     */
+    public setMode(mode: PropertyGridMode): void {
+        this.grid?.set_mode?.(mode);
     }
 
     /**

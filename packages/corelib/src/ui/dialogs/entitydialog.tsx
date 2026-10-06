@@ -502,7 +502,9 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
             this.entityId = ((entity as any)[idField]);
 
         this.entity = entity;
-        this.propertyGrid?.set_mode((this.isEditMode() ? PropertyGridMode.update : PropertyGridMode.insert));
+        const mode = this.isEditMode() ? PropertyGridMode.update : PropertyGridMode.insert;
+        this.propertyGrid?.set_mode(mode);
+        this.localizer?.setMode(mode);
         this.propertyGrid?.load(entity);
     }
 
@@ -653,6 +655,7 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
             getPropertyGrid: () => this.byId("PropertyGrid"),
             getToolButtons: () => this.toolbar.element.findAll(".tool-button"),
             isNew: () => this.isNew(),
+            mapSourceItem: item => this.mapSourceItem(item),
             pgOptions: this.getPropertyGridOptions(),
             retrieveLocalizations: () => this.retrieveLocalizations(),
             validateForm: () => this.validateForm()
@@ -673,6 +676,18 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
      */
     protected getLanguages(): LanguageList {
         return TranslationConfig.getLanguageList?.() || [];
+    }
+
+    /**
+     * Maps a property item to the item used in the localization grid. The default returns
+     * the item as is (return null for the same effect). Override to clear or modify
+     * permissions / insertable / updatable flags, or to exclude items by returning an item
+     * with `localizable: false`.
+     * @param item - Property item.
+     * @returns The item to use, or null to use the item as is.
+     */
+    protected mapSourceItem(item: PropertyItem): PropertyItem {
+        return item;
     }
 
     /**

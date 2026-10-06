@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Fluent, PropertyItem, TranslationConfig } from "../../base";
+import { PropertyGridMode } from "../widgets/propertygrid";
 import { EntityLocalizer, EntityLocalizerOptions } from "./entitylocalizer";
 // Import StringEditor to register it in the editor registry, needed by PropertyGrid
 import "../editors/stringeditor";
@@ -119,6 +120,82 @@ describe("EntityLocalizer", () => {
 
             const localizer = new EntityLocalizer(opt);
             expect(localizer.isEnabled()).toBe(true);
+        });
+    });
+
+    describe("mapSourceItem", () => {
+        it("skips items mapped to localizable false", () => {
+            const pgDiv = document.createElement("div");
+            const items: PropertyItem[] = [
+                { name: "Name", title: "Name", localizable: true }
+            ];
+            const opt = createMockOptions({
+                getPropertyGrid: vi.fn(() => Fluent(pgDiv)),
+                getLanguages: vi.fn(() => [{ id: "en", text: "English" }]),
+                mapSourceItem: vi.fn(item => ({ ...item, localizable: false })),
+                pgOptions: { idPrefix: "Test_", items, mode: 0 as any, localTextPrefix: "Forms.Test." }
+            });
+            const localizer = new EntityLocalizer(opt);
+            expect(localizer.isEnabled()).toBe(false);
+        });
+
+        it("uses the mapped item, without forcing insertable/updatable", () => {
+            const pgDiv = document.createElement("div");
+            const items: PropertyItem[] = [
+                { name: "Name", title: "Name", localizable: true, updatable: true }
+            ];
+            const opt = createMockOptions({
+                getPropertyGrid: vi.fn(() => Fluent(pgDiv)),
+                getLanguages: vi.fn(() => [{ id: "en", text: "English" }]),
+                mapSourceItem: item => ({ ...item, updatable: false, updatePermission: "Translation" }),
+                pgOptions: { idPrefix: "Test_", items, mode: 0 as any, localTextPrefix: "Forms.Test." }
+            });
+            const localizer = new EntityLocalizer(opt);
+            expect(localizer.isEnabled()).toBe(true);
+            const langItem = opt.pgOptions.items.find(x => x.name === "en$Name");
+            expect(langItem).toBeDefined();
+            expect(langItem!.updatable).toBe(false);
+            expect(langItem!.updatePermission).toBe("Translation");
+        });
+
+        it("defaults to the item as is", () => {
+            const pgDiv = document.createElement("div");
+            const items: PropertyItem[] = [{ name: "Name", title: "Name", localizable: true }];
+            const opt = createMockOptions({
+                getPropertyGrid: vi.fn(() => Fluent(pgDiv)),
+                getLanguages: vi.fn(() => [{ id: "en", text: "English" }]),
+                pgOptions: { idPrefix: "Test_", items, mode: 0 as any, localTextPrefix: "Forms.Test." }
+            });
+            const localizer = new EntityLocalizer(opt);
+            const item = { name: "X", localizable: true } as PropertyItem;
+            expect((localizer as any).mapSourceItem(item)).toBe(item);
+        });
+    });
+
+    describe("setMode", () => {
+        function createEnabledLocalizer() {
+            const pgDiv = document.createElement("div");
+            const items: PropertyItem[] = [{ name: "Name", title: "Name", localizable: true }];
+            const opt = createMockOptions({
+                getPropertyGrid: vi.fn(() => Fluent(pgDiv)),
+                getLanguages: vi.fn(() => [{ id: "en", text: "English" }]),
+                pgOptions: { idPrefix: "Test_", items, mode: 0 as any, localTextPrefix: "Forms.Test." }
+            });
+            return new EntityLocalizer(opt);
+        }
+
+        it("applies the given mode to the localization grid", () => {
+            const localizer = createEnabledLocalizer();
+            const setModeSpy = vi.fn();
+            localizer["grid"] = { set_mode: setModeSpy, save: vi.fn(), load: vi.fn(), enumerateItems: vi.fn(), destroy: vi.fn() } as any;
+            localizer.setMode(PropertyGridMode.update);
+            expect(setModeSpy).toHaveBeenCalledWith(PropertyGridMode.update);
+        });
+
+        it("does nothing when there is no grid", () => {
+            const opt = createMockOptions();
+            const localizer = new EntityLocalizer(opt);
+            expect(() => localizer.setMode(PropertyGridMode.insert)).not.toThrow();
         });
     });
 
