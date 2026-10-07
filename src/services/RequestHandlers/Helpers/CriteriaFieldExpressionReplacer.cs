@@ -188,8 +188,11 @@ public class CriteriaFieldExpressionReplacer(IRow row, IPermissionService permis
     {
         if (ShouldHandleLikeCriteria(criteria))
         {
-            return new BinaryCriteria(new UpperFunctionCriteria(Visit(criteria.LeftOperand)!),
-                criteria.Operator, new UpperFunctionCriteria(Visit(criteria.RightOperand)!));
+            var left = new UpperFunctionCriteria(Visit(criteria.LeftOperand)!);
+            var right = new UpperFunctionCriteria(Visit(criteria.RightOperand)!);
+            return criteria.LikeEscapeChar is char escapeChar
+                ? new BinaryCriteria(left, criteria.Operator, right, escapeChar)
+                : new BinaryCriteria(left, criteria.Operator, right);
         }
 
         if (ShouldConvertValues(criteria, out Field? field, out object? value))

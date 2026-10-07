@@ -60,4 +60,31 @@ public class SqlQuery_Select_Tests
 
         Assert.Contains("LEFT JOIN [Related] T1", Normalize.Sql(query.ToString()));
     }
+
+    private class TestRow : Row<TestRow.RowFields>
+    {
+        public int? Id { get => fields.Id[this]; set => fields.Id[this] = value; }
+        public string? Name { get => fields.Name[this]; set => fields.Name[this] = value; }
+
+        public class RowFields : RowFieldsBase
+        {
+            public Int32Field Id;
+            public StringField Name;
+            public RowFields() : base("TestTable")
+            {
+                Id = new Int32Field(this, "Id");
+                Name = new StringField(this, "Name");
+            }
+        }
+    }
+
+    [Fact]
+    public void Select_Alias_Field_UsesFieldNameOnce()
+    {
+        var row = new TestRow();
+        var query = new SqlQuery().From(row).Select(TestRow.Fields, TestRow.Fields.Name);
+        var sql = query.ToString();
+        Assert.Contains("T0.[Name]", sql, StringComparison.Ordinal);
+        Assert.DoesNotContain("T0.T0.", sql, StringComparison.Ordinal);
+    }
 }

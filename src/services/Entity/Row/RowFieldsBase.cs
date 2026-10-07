@@ -39,6 +39,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins, IHas
     internal string? schema;
     internal string? tableOnly;
     internal string? tableName;
+    private readonly string? explicitTableName;
     internal string alias;
     internal string aliasDot;
     internal bool aliasLocked;
@@ -109,6 +110,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins, IHas
     protected RowFieldsBase(string? tableName = null, string fieldPrefix = "")
     {
         this.tableName = tableName;
+        this.explicitTableName = tableName;
         alias = "T0";
         aliasDot = "T0.";
         this.fieldPrefix = fieldPrefix;
@@ -160,12 +162,13 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins, IHas
         var attr = expressionSelector.GetBestMatch(rowType!.GetCustomAttributes<TableNameAttribute>(),
             x => x.Dialect);
 
-        if (tableName != null)
+        if (explicitTableName != null)
         {
-            if (attr != null && string.Compare(tableName, attr.Name, StringComparison.OrdinalIgnoreCase) != 0)
+            if (attr != null && string.Compare(explicitTableName, attr.Name, StringComparison.OrdinalIgnoreCase) != 0)
                 throw new InvalidProgramException(string.Format(
                     "Tablename in row type {0} can't be overridden by attribute!",
                         rowType!.Name));
+            tableName = explicitTableName;
         }
         else if (attr != null)
         {
@@ -1049,7 +1052,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins, IHas
             {
                 foreach (var join in joins.Values)
                 {
-                    if (string.Compare(field.ForeignTable, join.Table) == 0 &&
+                    if (string.Compare(field.ForeignTable, join.Table, StringComparison.OrdinalIgnoreCase) == 0 &&
                         (join is LeftJoin || join is InnerJoin) &&
                         join.OnCriteria is object &&
                         join.OnCriteria.ToStringIgnoreParams().Contains(field.Expression, StringComparison.OrdinalIgnoreCase))

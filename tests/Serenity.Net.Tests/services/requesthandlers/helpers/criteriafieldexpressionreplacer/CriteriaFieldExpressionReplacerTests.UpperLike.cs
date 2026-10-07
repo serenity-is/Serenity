@@ -13,4 +13,14 @@ public partial class CriteriaFieldExpressionReplacerTests
         // ToStringIgnoreParams numbering restarts at @p0 on every render.
         Assert.Equal("(UPPER(T0.[Name]) LIKE UPPER(@p0))", result.ToStringIgnoreParams());
     }
+
+    [Fact]
+    public void UpperLike_Preserves_EscapeChar()
+    {
+        // The UPPER() rewrite must keep the ESCAPE clause of the original Like criteria.
+        var replacer = new CriteriaFieldExpressionReplacer(new TestRow(), new NullPermissions(), dialect: PostgresDialect.Instance);
+        var criteria = new Criteria(nameof(TestRow.Name)).LikeEscaped("a!%b");
+        var result = replacer.Process(criteria);
+        Assert.Equal("(UPPER(T0.[Name]) LIKE UPPER(@p0) ESCAPE '!')", result.ToStringIgnoreParams());
+    }
 }

@@ -629,7 +629,7 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(
     /// <param name="field"></param>
     public void IgnoreEqualityFilter(string field)
     {
-        ignoredEqualityFilters ??= [];
+        ignoredEqualityFilters ??= new(StringComparer.OrdinalIgnoreCase);
         ignoredEqualityFilters.Add(field);
     }
 

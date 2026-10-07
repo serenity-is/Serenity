@@ -311,7 +311,7 @@ public abstract partial class Field : IFieldWithJoinInfo
                 }
                 else
                 {
-                    expression = "T0." + name;
+                    expression = "T0." + SqlSyntax.AutoBracket(name, fields?.dialect);
 
                     if (flags.HasFlag(FieldFlags.Calculated))
                         flags -= FieldFlags.Calculated;

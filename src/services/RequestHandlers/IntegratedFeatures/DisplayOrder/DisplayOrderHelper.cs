@@ -367,10 +367,10 @@ public static class DisplayOrderHelper
             return str.ToSql(dialect);
 
         if (id is Guid guid)
-            return ((Guid?)guid).ToSql();
+            return ((Guid?)guid).ToSql(dialect);
 
         if (long.TryParse(id.ToString(), out long l))
-            return l.ToString();
+            return l.ToString(CultureInfo.InvariantCulture);
 
         throw new ArgumentOutOfRangeException("displayOrderIDType");
     }

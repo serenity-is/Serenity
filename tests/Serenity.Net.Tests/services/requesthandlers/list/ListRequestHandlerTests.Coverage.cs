@@ -675,6 +675,26 @@ public partial class ListRequestHandlerTests
     }
 
     [Fact]
+    public void ApplyEqualityFilter_IgnoreEqualityFilter_Is_CaseInsensitive()
+    {
+        using var conn = CovConnection();
+        var handler = new CovListHandler(CovContext());
+        handler.Setup(conn, new ListRequest
+        {
+            EqualityFilter = new Dictionary<string, object?>
+            {
+                [CovRow.Fields.Name.Name.ToUpperInvariant()] = "x"
+            }
+        });
+        handler.CallIgnoreEqualityFilter(CovRow.Fields.Name.Name);
+
+        var query = new SqlQuery().Dialect(conn.GetDialect()).From(new CovRow()).Select("T0.Id");
+        handler.CallApplyEquality(query);
+
+        Assert.DoesNotContain("WHERE", query.ToString(), StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
     public void ApplyEqualityFilter_Throws_For_Missing_Field()
     {
         using var conn = CovConnection();

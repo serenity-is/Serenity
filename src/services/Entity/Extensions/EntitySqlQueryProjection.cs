@@ -722,8 +722,8 @@ public static class EntitySqlQueryProjection
 				if (!query.HasAlias(join.Name) || join.RowType is not Type rowType)
 					continue;
 
-				var fieldsType = rowType.GetNestedType("RowFields",
-					BindingFlags.Public | BindingFlags.NonPublic);
+				var fieldsType = rowType.GetNestedTypes(BindingFlags.Public | BindingFlags.NonPublic)
+					.FirstOrDefault(t => typeof(RowFieldsBase).IsAssignableFrom(t) && !t.IsAbstract);
 				if (fieldsType is null)
 					continue;
 

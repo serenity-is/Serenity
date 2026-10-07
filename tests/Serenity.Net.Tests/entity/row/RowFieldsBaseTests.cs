@@ -184,6 +184,41 @@ public class RowFieldsBaseTests
         public string? Country { get => fields.Country[this]; set => fields.Country[this] = value; }
     }
 
+    [TableName("FirebirdTable", ServerType.Firebird)]
+    public class FirebirdOnlyTableRow : Row<FirebirdOnlyTableRow.RowFields>
+    {
+        public class RowFields : RowFieldsBase
+        {
+            public Int32Field Id;
+            public RowFields() : base()
+            {
+                Id = new Int32Field(this, "Id");
+            }
+        }
+
+        public int? Id { get => fields.Id[this]; set => fields.Id[this] = value; }
+    }
+
+    public class CaseInsensitiveTextualJoinRow : Row<CaseInsensitiveTextualJoinRow.RowFields>
+    {
+        public class RowFields : RowFieldsBase
+        {
+            public Int32Field CountryID;
+            public StringField Country;
+            public RowFields() : base()
+            {
+                CountryID = new Int32Field(this, "CountryID");
+                Country = new StringField(this, "Country");
+            }
+        }
+
+        [ForeignKey("Country", "ID"), LeftJoin("c", "COUNTRY", "ID")]
+        public int? CountryID { get => fields.CountryID[this]; set => fields.CountryID[this] = value; }
+
+        [Expression("c.Name")]
+        public string? Country { get => fields.Country[this]; set => fields.Country[this] = value; }
+    }
+
     #endregion
 
     [Fact]
@@ -282,6 +317,25 @@ public class RowFieldsBaseTests
     public void TableName_AttributeOnExplicitName_Throws()
     {
         Assert.Throws<InvalidProgramException>(() => new WrongTableNameAttrRow.RowFields());
+    }
+
+    [Fact]
+    public void TableName_DialectSpecificAttribute_NotMatchingDefaultDialect_ResolvesOnInitialize()
+    {
+        var f = new FirebirdOnlyTableRow.RowFields();
+        Assert.Equal("FirebirdOnlyTable", f.TableName);
+
+        f.Initialize(annotations: null, dialect: FirebirdDialect.Instance, userEntityOptions: null);
+        Assert.Equal("FirebirdTable", f.TableName);
+    }
+
+    [Fact]
+    public void InferTextualFields_MatchesJoinTable_CaseInsensitively()
+    {
+        var f = new CaseInsensitiveTextualJoinRow.RowFields();
+        f.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect, userEntityOptions: null);
+
+        Assert.Equal("Country", f.CountryID.TextualField);
     }
 
     [Fact]

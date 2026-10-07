@@ -335,7 +335,7 @@ public static partial class EntitySqlQueryExtensions
 
         ArgumentNullException.ThrowIfNull(field);
 
-        return query.Select(alias.NameDot + field);
+        return query.Select(alias.NameDot + SqlSyntax.AutoBracket(field.Name, query.Dialect()));
     }
 
 

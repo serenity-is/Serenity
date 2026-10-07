@@ -189,6 +189,27 @@ public class DisplayOrderHelperTests
     }
 
     [Fact]
+    public void UpdateOrders_With_Guid_Ids_Uses_Dialect()
+    {
+        var guid = Guid.NewGuid();
+        var commands = new List<string>();
+        using var connection = new MockDbConnection { Dialect = FirebirdDialect.Instance }
+            .OnDbCommandExecuteNonQuery(command =>
+            {
+                commands.Add(command.CommandText);
+                return 1;
+            });
+
+        var records = new List<DisplayOrderHelper.OrderRecord>
+        {
+            new() { recordID = guid, oldOrder = 5, newOrder = 1 }
+        };
+
+        Assert.True(DisplayOrderHelper.UpdateOrders(connection, records, "T", Fields.ID, Fields.Order));
+        Assert.Contains(commands, c => c.Contains("X'", StringComparison.Ordinal));
+    }
+
+    [Fact]
     public void ReorderValues_With_Unique_Constraint()
     {
         using var connection = ConnectionWith(

@@ -87,6 +87,19 @@ public class FieldPropertiesTests
     }
 
     [Fact]
+    public void ExpressionSetter_Reset_UsesAutoBracket()
+    {
+        var f = new ComplexRow.RowFields();
+        f.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect, userEntityOptions: null);
+        var field = f.BasicExpression;
+
+        field.Expression = "Complex(x + y)";
+        field.Expression = null;
+
+        Assert.Equal("T0.[" + field.Name + "]", field.Expression);
+    }
+
+    [Fact]
     public void ExpressionSetter_T0CalculatedExpression_IsNotForeign()
     {
         var fields = new ComplexRow.RowFields();
