@@ -47,7 +47,8 @@ public class DeleteRequestHandler<TRow, TDeleteRequest, TDeleteResponse> :
         if (Row is IDisplayOrderRow displayOrderRow)
         {
             var filter = GetDisplayOrderFilter();
-            DisplayOrderHelper.ReorderValues(Connection, displayOrderRow, filter, -1, 1, false);
+            DisplayOrderHelper.ReorderValues(Connection, displayOrderRow, filter, -1, 1,
+                displayOrderRow.DisplayOrderField.Flags.HasFlag(FieldFlags.Unique));
         }
 
         foreach (var behavior in behaviors.Value)

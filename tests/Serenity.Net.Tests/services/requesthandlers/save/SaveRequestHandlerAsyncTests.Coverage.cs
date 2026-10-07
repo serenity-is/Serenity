@@ -374,4 +374,51 @@ public class SaveRequestHandlerAsyncTests_Coverage
 
         Assert.Equal(3, handler.CurrentRow.Order);
     }
+
+    [TableName("UniqueOrders")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
+    private class UniqueOrderRow : Row<UniqueOrderRow.RowFields>, IIdRow, IDisplayOrderRow
+    {
+        [IdProperty]
+        public int? Id { get => fields.Id[this]; set => fields.Id[this] = value; }
+
+        [Unique(CheckBeforeSave = false)]
+        public int? Order { get => fields.Order[this]; set => fields.Order[this] = value; }
+
+        public Int32Field DisplayOrderField => fields.Order;
+
+        public class RowFields : RowFieldsBase
+        {
+            public Int32Field Id = null!;
+            public Int32Field Order = null!;
+        }
+    }
+
+    [Fact]
+    public async Task DisplayOrder_Update_With_Unique_Order_Uses_Unique_Strategy()
+    {
+        // A [Unique] display order field must be passed as hasUniqueConstraint: true, which
+        // reorders with per-record updates instead of the batched IN(...) form.
+        var commands = new List<string>();
+        using var connection = new MockDbConnection()
+            .InterceptExecuteReader(args => args.ToMockReader(
+                new { Id = 1, Order = 1 },
+                new { Id = 2, Order = 2 },
+                new { Id = 3, Order = 3 }))
+            .InterceptExecuteNonQuery(args =>
+            {
+                commands.Add(args.CommandText);
+                return 1;
+            })
+            .InterceptManipulateRow(_ => 1);
+        var handler = new TestAsyncHandler<UniqueOrderRow>(Context());
+
+        await handler.UpdateAsync(new MockUnitOfWork(connection), new SaveRequest<UniqueOrderRow>
+        {
+            Entity = new UniqueOrderRow { Id = 1, Order = 3 }
+        }, TestContext.Current.CancellationToken);
+
+        Assert.NotEmpty(commands);
+        Assert.DoesNotContain(commands, c => c.Contains("IN (", StringComparison.OrdinalIgnoreCase));
+    }
 }

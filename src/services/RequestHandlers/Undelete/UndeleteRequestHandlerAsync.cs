@@ -49,7 +49,8 @@ public class UndeleteRequestHandlerAsync<TRow, TUndeleteRequest, TUndeleteRespon
             var filter = GetDisplayOrderFilter();
             await DisplayOrderHelper.ReorderValuesAsync(Connection!, displayOrderRow, filter,
                 Row.GetIdField().AsObject(Row), displayOrderRow.DisplayOrderField[Row]!.Value,
-                hasUniqueConstraint: false, cancellationToken: cancellationToken).ConfigureAwait(false);
+                hasUniqueConstraint: displayOrderRow.DisplayOrderField.Flags.HasFlag(FieldFlags.Unique),
+                cancellationToken: cancellationToken).ConfigureAwait(false);
         }
 
         foreach (var behavior in behaviors.Value)

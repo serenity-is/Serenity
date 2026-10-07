@@ -48,7 +48,8 @@ public class DeleteRequestHandlerAsync<TRow, TDeleteRequest, TDeleteResponse> :
         {
             var filter = GetDisplayOrderFilter();
             await DisplayOrderHelper.ReorderValuesAsync(Connection, displayOrderRow, filter, -1, 1,
-                hasUniqueConstraint: false, cancellationToken: cancellationToken).ConfigureAwait(false);
+                hasUniqueConstraint: displayOrderRow.DisplayOrderField.Flags.HasFlag(FieldFlags.Unique),
+                cancellationToken: cancellationToken).ConfigureAwait(false);
         }
 
         foreach (var behavior in behaviors.Value)

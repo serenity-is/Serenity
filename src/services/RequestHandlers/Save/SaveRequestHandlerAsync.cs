@@ -225,7 +225,7 @@ public class SaveRequestHandlerAsync<TRow, TSaveRequest, TSaveResponse> :
                 filter: GetDisplayOrderFilter(),
                 recordID: Row.GetIdField().AsObject(Row),
                 newDisplayOrder: displayOrderRow.DisplayOrderField[Row]!.Value,
-                hasUniqueConstraint: false,
+                hasUniqueConstraint: displayOrderRow.DisplayOrderField.Flags.HasFlag(FieldFlags.Unique),
                 cancellationToken: cancellationToken).ConfigureAwait(false);
         }
     }

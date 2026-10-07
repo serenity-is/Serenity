@@ -10,6 +10,16 @@ namespace Serenity.Data;
 /// sanitized against SQL injection, so callers must never pass user supplied strings as
 /// table or column names (the same way they could not pass such values to
 /// <see cref="SqlQuery.From(string)"/> or a field <c>Expression</c>).
+/// <para>
+/// These helpers do NOT handle race conditions. In particular, <c>GetNextValue</c> reads
+/// MAX(display order) + 1 and the caller inserts that value later in the same transaction, so
+/// under the default (read committed) isolation two concurrent inserts in the same group can
+/// compute the same next value. A unique index on the display order column (grouped with the
+/// same keys used by the display order filter) is therefore recommended so the database rejects
+/// the duplicate. When such an index exists, pass <c>hasUniqueConstraint: true</c> to the reorder
+/// methods so they avoid transient collisions. Automatic retry of conflicting inserts is not
+/// implemented.
+/// </para>
 /// </remarks>
 public static class DisplayOrderHelper
 {
@@ -26,6 +36,11 @@ public static class DisplayOrderHelper
     /// <returns>
     ///   One more of maximum display order values of records in the group. 
     ///   If none, 1.</returns>
+    /// <remarks>
+    /// Not race safe: the value is computed here but inserted later, so concurrent inserts in
+    /// the same group may compute the same value. A unique index on the display order column is
+    /// recommended so the database rejects duplicates. See the class remarks.
+    /// </remarks>
     public static int GetNextValue(IDbConnection connection, string tableName,
         Field orderField, ICriteria? filter)
     {
@@ -59,6 +74,11 @@ public static class DisplayOrderHelper
     /// <returns>
     ///   One more of maximum display order values of records in the group. 
     ///   If none, 1.</returns>
+    /// <remarks>
+    /// Not race safe: the value is computed here but inserted later, so concurrent inserts in
+    /// the same group may compute the same value. A unique index on the display order column is
+    /// recommended so the database rejects duplicates. See the class remarks.
+    /// </remarks>
     public static int GetNextValue(IDbConnection connection, IDisplayOrderRow row, ICriteria? filter = null)
     {
         return GetNextValue(connection, row.Table, row.DisplayOrderField, filter);
