@@ -212,8 +212,8 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
         ArgumentNullException.ThrowIfNull(columnName);
 
         Column? fieldInfo = columns.Find(
-            column => (column.ColumnName != null && column.ColumnName == columnName) ||
-                 (string.IsNullOrEmpty(column.ColumnName) && column.Expression == columnName));
+            column => (column.ColumnName != null && string.Equals(column.ColumnName, columnName, StringComparison.OrdinalIgnoreCase)) ||
+                 (string.IsNullOrEmpty(column.ColumnName) && string.Equals(column.Expression, columnName, StringComparison.OrdinalIgnoreCase)));
 
         if (fieldInfo == null)
             return null;

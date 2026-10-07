@@ -108,4 +108,24 @@ public class SqlQuery_GetExpression_Tests
 
         Assert.Equal("SomeColumn", ((IGetExpressionByName)query).GetExpression("SomeColumn"));
     }
+
+    [Fact]
+    public void GetExpressionIsCaseInsensitiveForAliasedColumns()
+    {
+        var query = new SqlQuery()
+            .Select("SomeColumn", "x")
+            .From("SomeTable");
+
+        Assert.Equal("SomeColumn", ((IGetExpressionByName)query).GetExpression("X"));
+    }
+
+    [Fact]
+    public void GetExpressionIsCaseInsensitiveForNonAliasedColumns()
+    {
+        var query = new SqlQuery()
+            .Select("SomeColumn")
+            .From("SomeTable");
+
+        Assert.Equal("SomeColumn", ((IGetExpressionByName)query).GetExpression("somecolumn"));
+    }
 }

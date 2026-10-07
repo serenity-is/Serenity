@@ -41,6 +41,10 @@ public static partial class EntitySqlQueryExtensions
 				throw new InvalidOperationException($"{fieldDescription}'s ForeignJoinAlias must specify ON criteria.");
 			string ReplaceJoinAlias(string joinAlias) =>
 				string.Equals(joinAlias, foreignJoin.Name, StringComparison.OrdinalIgnoreCase) ? alias : joinAlias;
+			// ON criteria in metadata is effectively always a BaseCriteria (the only ICriteria
+			// implementation that is a walkable criteria tree), so aliases are replaced in place.
+			// The fallback below only covers a hypothetical bare ICriteria, which is not a walkable
+			// tree: aliases can only be replaced textually and any params cannot be carried over.
 			onCriteria = declaredOnCriteria is BaseCriteria criteriaTree
 				? JoinAliasLocator.ReplaceAliases(criteriaTree, ReplaceJoinAlias)
 				: new Criteria(JoinAliasLocator.ReplaceAliases(declaredOnCriteria.ToStringIgnoreParams(), ReplaceJoinAlias));

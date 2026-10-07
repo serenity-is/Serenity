@@ -1476,6 +1476,9 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins, IHas
         joins.Clear();
         foreach (var join in oldJoins)
         {
+            // Metadata join ON criteria is effectively always a BaseCriteria and is expected to be
+            // param-free (ToString throws for param-bearing criteria), so rebuilding it textually
+            // is safe here. A bare ICriteria is not a walkable tree, hence only its ToString maps.
             BaseCriteria? onCriteria;
             if (join.Value.OnCriteria is BinaryCriteria bc)
                 onCriteria = new BinaryCriteria(

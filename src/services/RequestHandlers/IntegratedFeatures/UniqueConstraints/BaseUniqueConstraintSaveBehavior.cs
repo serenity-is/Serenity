@@ -58,6 +58,12 @@ public abstract class BaseUniqueConstraintSaveBehavior : BaseSaveBehaviorAsync, 
     /// the pre-check, for example to add row-level scoping (tenant/owner filters) so that the
     /// check matches the actual database unique constraint, or to skip the pre-check entirely.
     /// </summary>
+    /// <remarks>
+    /// Equality is evaluated by the database, which is the single source of truth for comparison
+    /// semantics, so case sensitivity follows the actual column collation and the pre-check matches
+    /// the real unique index. The configured field, dialect or <see cref="SqlSettings.DefaultComparer"/>
+    /// comparer only approximates that for in-memory change detection and does not affect this query.
+    /// </remarks>
     /// <param name="handler">Save request handler.</param>
     /// <param name="fields">Fields that make up the unique constraint.</param>
     /// <param name="groupCriteria">Optional additional criteria to scope the check.</param>
@@ -67,6 +73,7 @@ public abstract class BaseUniqueConstraintSaveBehavior : BaseSaveBehaviorAsync, 
     {
         var criteria = groupCriteria ?? Criteria.Empty;
 
+        // Delegate equality to the database (see remarks); do not apply an in-memory comparer here.
         foreach (var field in fields)
         {
             if (field.IsNull(handler.Row))
