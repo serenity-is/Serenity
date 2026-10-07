@@ -3,6 +3,15 @@ namespace Serenity.Data;
 /// <summary>
 /// An abstract base attribute that all permission-related attributes derive from.
 /// </summary>
+/// <remarks>
+/// Permissions defined by these attributes are checked per row <b>type</b>, not per record.
+/// Having a permission grants access to every record of that type that can be targeted by its
+/// id, so they should not be used to restrict access to individual records (e.g. records owned
+/// by the current user or a specific tenant). For record level authorization, implement a
+/// request handler behavior that adds the required filter to the query (e.g. via its
+/// <c>OnPrepareQuery</c> method), or override the relevant handler method. See the multitenancy
+/// tutorial in Serenity docs for a sample.
+/// </remarks>
 /// <seealso cref="Attribute" />
 public abstract class PermissionAttributeBase : Attribute
 {

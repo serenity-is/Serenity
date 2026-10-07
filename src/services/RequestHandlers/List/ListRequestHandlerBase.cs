@@ -637,6 +637,12 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(
     /// Validates if the user is allowed to query this entity type by checking <see cref="ReadPermissionAttribute"/>
     /// and <see cref="ServiceLookupPermissionAttribute"/> if the request is in lookup access mode.
     /// </summary>
+    /// <remarks>
+    /// This check is per row type, not per record, so it does not prevent listing records that
+    /// belong to other users or tenants. For record level authorization, implement a behavior
+    /// that applies the required filter in <see cref="IListBehaviorSync.OnPrepareQuery"/>,
+    /// or override this method. See the multitenancy tutorial in Serenity docs.
+    /// </remarks>
     protected virtual void ValidatePermissions()
     {
         var permission = typeof(TRow).GetCustomAttribute<ReadPermissionAttribute>(true)?.Permission

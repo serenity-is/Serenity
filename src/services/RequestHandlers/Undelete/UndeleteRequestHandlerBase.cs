@@ -76,6 +76,12 @@ public abstract class UndeleteRequestHandlerBase<TRow, TUndeleteRequest, TUndele
     /// <summary>
     /// Validates the user permissions for undelete operation
     /// </summary>
+    /// <remarks>
+    /// This check is per row type, not per record, so it does not prevent undeleting records that
+    /// belong to other users or tenants by their id. For record level authorization, implement a
+    /// behavior that applies the required filter in <see cref="IUndeleteBehaviorSync.OnPrepareQuery"/>,
+    /// or override this method. See the multitenancy tutorial in Serenity docs.
+    /// </remarks>
     protected virtual void ValidatePermissions()
     {
         var attr = typeof(TRow).GetCustomAttribute<UndeletePermissionAttribute>(true) ??

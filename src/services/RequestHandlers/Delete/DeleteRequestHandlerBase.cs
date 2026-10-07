@@ -71,6 +71,12 @@ public abstract class DeleteRequestHandlerBase<TRow, TDeleteRequest, TDeleteResp
     /// <summary>
     /// Validates the user permissions for delete operation
     /// </summary>
+    /// <remarks>
+    /// This check is per row type, not per record, so it does not prevent deleting records that
+    /// belong to other users or tenants by their id. For record level authorization, implement a
+    /// behavior that applies the required filter in <see cref="IDeleteBehaviorSync.OnPrepareQuery"/>,
+    /// or override this method. See the multitenancy tutorial in Serenity docs.
+    /// </remarks>
     protected virtual void ValidatePermissions()
     {
         var attr = typeof(TRow).GetCustomAttribute<DeletePermissionAttribute>(true) ??

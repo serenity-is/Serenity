@@ -335,6 +335,12 @@ public abstract class SaveRequestHandlerBase<TRow, TSaveRequest, TSaveResponse>(
     /// and <see cref="UpdatePermissionAttribute"/>, and <see cref="ModifyPermissionAttribute"/>
     /// or <see cref="ReadPermissionAttribute" /> if others are not found.
     /// </summary>
+    /// <remarks>
+    /// This check is per row type, not per record, so it does not prevent modifying records that
+    /// belong to other users or tenants by their id. For record level authorization, implement a
+    /// behavior that applies the required filter in <see cref="ISaveBehaviorSync.OnPrepareQuery"/>,
+    /// or override this method. See the multitenancy tutorial in Serenity docs.
+    /// </remarks>
     protected virtual void ValidatePermissions()
     {
         PermissionAttributeBase? attr = null;
