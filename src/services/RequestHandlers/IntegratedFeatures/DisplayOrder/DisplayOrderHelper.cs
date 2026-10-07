@@ -3,6 +3,14 @@ namespace Serenity.Data;
 /// <summary>
 ///   A static class with helper functions to update display orders of all records or
 ///   groups of records in a table.</summary>
+/// <remarks>
+/// Table and column names passed to these methods are assumed to be trusted row metadata
+/// (e.g. <see cref="IEntity.Table"/> and <see cref="IDisplayOrderRow"/> fields), not external
+/// user input. They are auto bracketed for correct quoting, but are NOT validated or
+/// sanitized against SQL injection, so callers must never pass user supplied strings as
+/// table or column names (the same way they could not pass such values to
+/// <see cref="SqlQuery.From(string)"/> or a field <c>Expression</c>).
+/// </remarks>
 public static class DisplayOrderHelper
 {
     /// <summary>
@@ -28,7 +36,7 @@ public static class DisplayOrderHelper
 
         using IDataReader reader = new SqlQuery()
             .Select(
-                Sql.Max(orderField.Name))
+                Sql.Max(SqlSyntax.AutoBracket(orderField.Name, connection.GetDialect())))
             .From(
                 tableName, Alias.T0)
             .Where(
@@ -107,7 +115,7 @@ public static class DisplayOrderHelper
 
         // determine display order for records with same display order values 
         // based on ID ordering set
-        query.OrderBy(keyField.Name, desc: descendingKeyOrder);
+        query.OrderBy(SqlSyntax.AutoBracket(keyField.Name, connection.GetDialect()), desc: descendingKeyOrder);
 
         var orderRecords = new List<OrderRecord>();
         OrderRecord? changing = null;
@@ -165,7 +173,7 @@ public static class DisplayOrderHelper
 
         using IDataReader reader = await new SqlQuery()
             .Select(
-                Sql.Max(orderField.Name))
+                Sql.Max(SqlSyntax.AutoBracket(orderField.Name, connection.GetDialect())))
             .From(
                 tableName, Alias.T0)
             .Where(
@@ -278,7 +286,7 @@ public static class DisplayOrderHelper
 
         // determine display order for records with same display order values 
         // based on ID ordering set
-        query.OrderBy(keyField.Name, desc: descendingKeyOrder);
+        query.OrderBy(SqlSyntax.AutoBracket(keyField.Name, connection.GetDialect()), desc: descendingKeyOrder);
 
         var orderRecords = new List<OrderRecord>();
         OrderRecord? changing = null;
@@ -435,10 +443,14 @@ public static class DisplayOrderHelper
     private static string BuildUpdateQueries(IDbConnection connection, List<OrderRecord> orderRecords,
         string tableName, Field keyField, Field orderField, bool hasUniqueConstraint)
     {
+        // Table and column names are assumed to come from trusted row metadata (see class remarks),
+        // never from external users. They are auto bracketed for correct quoting only.
+        var dialect = connection.GetDialect();
+
         // StringBuilder that will contain query(s)
         StringBuilder queries = new();
 
-        if (connection.GetDialect().NeedsExecuteBlockStatement)
+        if (dialect.NeedsExecuteBlockStatement)
         {
             queries.AppendLine("EXECUTE BLOCK AS");
             queries.AppendLine("BEGIN");
@@ -449,8 +461,12 @@ public static class DisplayOrderHelper
         void appendSingleUpdate(object id, long newOrder)
         {
             queries.AppendLine(string.Format(
-                "UPDATE {0} SET {1} = {2} WHERE {3} = {4};", tableName,
-                orderField.Name, newOrder, keyField.Name, IdToSql(id, connection.GetDialect())));
+                "UPDATE {0} SET {1} = {2} WHERE {3} = {4};",
+                SqlSyntax.AutoBracket(tableName, dialect),
+                SqlSyntax.AutoBracket(orderField.Name, dialect),
+                newOrder,
+                SqlSyntax.AutoBracket(keyField.Name, dialect),
+                IdToSql(id, dialect)));
             updateCount++;
         }
 
@@ -511,7 +527,7 @@ public static class DisplayOrderHelper
                 sb.Length = 0;
 
                 // add this records ID to the IN (...) part
-                sb.Append(IdToSql(rs.recordID, connection.GetDialect()));
+                sb.Append(IdToSql(rs.recordID, dialect));
 
                 // now we'll find all following records whose display orders are changed same amount 
                 // (difference between old and new is same), so we will update them with just one query
@@ -534,7 +550,7 @@ public static class DisplayOrderHelper
                         break;
 
                     sb.Append(',');
-                    sb.Append(IdToSql(rf.recordID, connection.GetDialect()));
+                    sb.Append(IdToSql(rf.recordID, dialect));
 
                     finish++;
                 }
@@ -543,9 +559,12 @@ public static class DisplayOrderHelper
                 if (start == finish)
                 {
                     queries.AppendLine(string.Format(
-                        "UPDATE {0} SET {1} = {2} WHERE {3} = {4};", tableName,
-                        orderField.Name, rs.newOrder, keyField.Name, 
-                        IdToSql(rs.recordID, connection.GetDialect())));
+                        "UPDATE {0} SET {1} = {2} WHERE {3} = {4};",
+                        SqlSyntax.AutoBracket(tableName, dialect),
+                        SqlSyntax.AutoBracket(orderField.Name, dialect),
+                        rs.newOrder,
+                        SqlSyntax.AutoBracket(keyField.Name, dialect),
+                        IdToSql(rs.recordID, dialect)));
                     updateCount++;
                 }
                 else
@@ -555,10 +574,10 @@ public static class DisplayOrderHelper
 
                     queries.AppendLine(string.Format(
                         "UPDATE {0} SET {1} = {1} - ({2}) WHERE ({3} IN ({4}));",
-                        tableName,
-                        orderField.Name,
+                        SqlSyntax.AutoBracket(tableName, dialect),
+                        SqlSyntax.AutoBracket(orderField.Name, dialect),
                         rs.oldOrder - rs.newOrder,
-                        keyField.Name,
+                        SqlSyntax.AutoBracket(keyField.Name, dialect),
                         sb.ToString()));
                     updateCount++;
                 }
@@ -567,7 +586,7 @@ public static class DisplayOrderHelper
             }
         }
 
-        if (connection.GetDialect().NeedsExecuteBlockStatement && updateCount > 0)
+        if (dialect.NeedsExecuteBlockStatement && updateCount > 0)
             queries.AppendLine("END;");
 
         return updateCount > 0 ? queries.ToString() : string.Empty;
