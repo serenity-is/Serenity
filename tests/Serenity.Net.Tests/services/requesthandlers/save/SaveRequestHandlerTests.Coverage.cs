@@ -321,6 +321,24 @@ public class SaveRequestHandlerTests_Coverage
     }
 
     [Fact]
+    public void Process_Auto_With_EntityId_And_Null_Entity_Id_Detects_Update()
+    {
+        using var connection = new MockDbConnection()
+            .InterceptManipulateRow(_ => 1)
+            .InterceptExecuteReader(args => args.ToMockReader(new { ID = 5, Name = "Old" }))
+            .OnDbCommandExecuteNonQuery(_ => 1);
+        var handler = new CoverHandler(Context());
+
+        var response = handler.Process(new MockUnitOfWork(connection), new SaveRequest<CoverRow>
+        {
+            EntityId = 5,
+            Entity = new CoverRow { Name = "New" }
+        });
+
+        Assert.Equal(5, response.EntityId);
+    }
+
+    [Fact]
     public void Explicit_ISaveRequestProcessor_Process_Works()
     {
         using var connection = new MockDbConnection().InterceptManipulateRow(_ => 1);

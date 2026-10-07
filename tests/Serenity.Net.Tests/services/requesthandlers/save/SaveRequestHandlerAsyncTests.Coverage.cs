@@ -116,6 +116,24 @@ public class SaveRequestHandlerAsyncTests_Coverage
     }
 
     [Fact]
+    public async Task ProcessAsync_Auto_With_EntityId_And_Null_Entity_Id_Detects_Update()
+    {
+        using var connection = new MockDbConnection()
+            .InterceptManipulateRow(_ => 1)
+            .InterceptExecuteReader(args => args.ToMockReader(new { Id = 5, Name = "Old" }))
+            .OnDbCommandExecuteNonQuery(_ => 1);
+        var handler = new TestAsyncHandler<CoverRow>(Context());
+
+        var response = await handler.ProcessAsync(new MockUnitOfWork(connection), new SaveRequest<CoverRow>
+        {
+            EntityId = 5,
+            Entity = new CoverRow { Name = "New" }
+        }, SaveRequestType.Auto, TestContext.Current.CancellationToken);
+
+        Assert.Equal(5, response.EntityId);
+    }
+
+    [Fact]
     public async Task CreateAsync_AutoIncrement_Uses_InsertAndGetId()
     {
         using var connection = new MockDbConnection()
