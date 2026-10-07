@@ -19,6 +19,21 @@ public class DeleteRequestHandlerTests_Basic
     }
 
     [Fact]
+    public void Delete_When_No_Rows_Affected_Throws_EntityNotFound()
+    {
+        // Race: the row is found by the initial load, but the delete affects zero
+        // rows (another request removed it in between). This must surface as a
+        // friendly EntityNotFoundError, not a generic expected-rows exception.
+        using var connection = new MockDbConnection()
+            .InterceptExecuteReader(args => args.ToMockReader(new { ID = 5, Name = "A" }))
+            .InterceptExecuteNonQuery(_ => 0);
+        var handler = new DeleteRequestHandler<IdNameRow>(Context());
+
+        Assert.Throws<ValidationError>(() =>
+            handler.Delete(new MockUnitOfWork(connection), new DeleteRequest { EntityId = 5 }));
+    }
+
+    [Fact]
     public void Delete_UninitializedProperties_Throw()
     {
         var handler = new DeleteRequestHandler<IdNameRow>(Context());

@@ -156,7 +156,7 @@ public class UndeleteRequestHandlerAsync<TRow, TUndeleteRequest, TUndeleteRespon
 
         await InvokeUndeleteActionAsync(async () =>
         {
-            if (await update.ExecuteAsync(Connection, ExpectedRows.One, cancellationToken: cancellationToken).ConfigureAwait(false) != 1)
+            if (await update.ExecuteAsync(Connection, ExpectedRows.ZeroOrOne, cancellationToken: cancellationToken).ConfigureAwait(false) != 1)
                 throw DataValidation.EntityNotFoundError(Row, id, Localizer);
         }, cancellationToken).ConfigureAwait(false);
 

@@ -47,6 +47,19 @@ public partial class DeleteRequestHandlerTests
     }
 
     [Fact]
+    public async Task DeleteAsync_When_No_Rows_Affected_Throws_EntityNotFound()
+    {
+        using var connection = new MockDbConnection()
+            .InterceptExecuteReader(args => args.ToMockReader(new { ID = 5, Name = "A" }))
+            .InterceptExecuteNonQuery(_ => 0);
+        var handler = new DeleteRequestHandlerAsync<IdNameRow>(CovDeleteContext());
+
+        await Assert.ThrowsAsync<ValidationError>(() =>
+            handler.DeleteAsync(new MockUnitOfWork(connection), new DeleteRequest { EntityId = 5 },
+                TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
     public async Task DeleteAsync_SoftDeleteLog()
     {
         using var connection = new MockDbConnection()

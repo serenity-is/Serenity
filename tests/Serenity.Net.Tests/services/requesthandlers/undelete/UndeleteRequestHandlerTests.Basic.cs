@@ -37,6 +37,18 @@ public class UndeleteRequestHandlerTests_Basic
     }
 
     [Fact]
+    public void Undelete_When_No_Rows_Affected_Throws_EntityNotFound()
+    {
+        using var connection = new MockDbConnection()
+            .InterceptExecuteReader(args => args.ToMockReader(new { ID = 5, Name = "A", IsDeleted = true }))
+            .InterceptExecuteNonQuery(_ => 0);
+        var handler = new UndeleteRequestHandler<UndelRow>(Context());
+
+        Assert.Throws<ValidationError>(() =>
+            handler.Undelete(new MockUnitOfWork(connection), new UndeleteRequest { EntityId = 5 }));
+    }
+
+    [Fact]
     public void Undelete_UninitializedProperties_Throw()
     {
         var handler = new UndeleteRequestHandler<UndelRow>(Context());

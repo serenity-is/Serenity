@@ -137,7 +137,7 @@ public class DeleteRequestHandlerAsync<TRow, TDeleteRequest, TDeleteResponse> :
 
             await InvokeDeleteActionAsync(async () =>
             {
-                if (await delete.ExecuteAsync(Connection, cancellationToken: cancellationToken).ConfigureAwait(false) != 1)
+                if (await delete.ExecuteAsync(Connection, ExpectedRows.ZeroOrOne, cancellationToken: cancellationToken).ConfigureAwait(false) != 1)
                     throw DataValidation.EntityNotFoundError(Row, id, Localizer);
             }, cancellationToken).ConfigureAwait(false);
         }
@@ -176,7 +176,7 @@ public class DeleteRequestHandlerAsync<TRow, TDeleteRequest, TDeleteResponse> :
 
                 await InvokeDeleteActionAsync(async () =>
                 {
-                    if (await update.ExecuteAsync(Connection, ExpectedRows.One, cancellationToken: cancellationToken).ConfigureAwait(false) != 1)
+                    if (await update.ExecuteAsync(Connection, ExpectedRows.ZeroOrOne, cancellationToken: cancellationToken).ConfigureAwait(false) != 1)
                         throw DataValidation.EntityNotFoundError(Row, id, Localizer);
                 }, cancellationToken).ConfigureAwait(false);
             }
@@ -191,7 +191,7 @@ public class DeleteRequestHandlerAsync<TRow, TDeleteRequest, TDeleteResponse> :
 
                 await InvokeDeleteActionAsync(async () =>
                 {
-                    if (await update.ExecuteAsync(Connection, ExpectedRows.One, cancellationToken: cancellationToken).ConfigureAwait(false) != 1)
+                    if (await update.ExecuteAsync(Connection, ExpectedRows.ZeroOrOne, cancellationToken: cancellationToken).ConfigureAwait(false) != 1)
                         throw DataValidation.EntityNotFoundError(Row, id, Localizer);
                 }, cancellationToken).ConfigureAwait(false);
             }

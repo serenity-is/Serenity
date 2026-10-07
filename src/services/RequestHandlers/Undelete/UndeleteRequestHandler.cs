@@ -158,7 +158,7 @@ public class UndeleteRequestHandler<TRow, TUndeleteRequest, TUndeleteResponse> :
 
         InvokeUndeleteAction(() =>
         {
-            if (update.Execute(Connection) != 1)
+            if (update.Execute(Connection, ExpectedRows.ZeroOrOne) != 1)
                 throw DataValidation.EntityNotFoundError(Row, id, Localizer);
         });
 

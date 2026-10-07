@@ -134,7 +134,7 @@ public class DeleteRequestHandler<TRow, TDeleteRequest, TDeleteResponse> :
 
             InvokeDeleteAction(() =>
             {
-                if (delete.Execute(Connection) != 1)
+                if (delete.Execute(Connection, ExpectedRows.ZeroOrOne) != 1)
                     throw DataValidation.EntityNotFoundError(Row, id, Localizer);
             });
         }
@@ -173,7 +173,7 @@ public class DeleteRequestHandler<TRow, TDeleteRequest, TDeleteResponse> :
 
                 InvokeDeleteAction(() =>
                 {
-                    if (update.Execute(Connection) != 1)
+                    if (update.Execute(Connection, ExpectedRows.ZeroOrOne) != 1)
                         throw DataValidation.EntityNotFoundError(Row, id, Localizer);
                 });
             }
@@ -188,7 +188,7 @@ public class DeleteRequestHandler<TRow, TDeleteRequest, TDeleteResponse> :
 
                 InvokeDeleteAction(() =>
                 {
-                    if (update.Execute(Connection) != 1)
+                    if (update.Execute(Connection, ExpectedRows.ZeroOrOne) != 1)
                         throw DataValidation.EntityNotFoundError(Row, id, Localizer);
                 });
             }
