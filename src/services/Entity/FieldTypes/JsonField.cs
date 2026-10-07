@@ -90,6 +90,7 @@ public class JsonField<TValue>(ICollection<Field> collection, string name, Local
     /// <returns>A value indicating the relative order of the two values.</returns>
     protected override int CompareValues(TValue value1, TValue value2, IComparer? comparer)
     {
+        comparer ??= Comparer;
         var jsonComparer = comparer as IComparer<string> ?? StringComparer.CurrentCulture;
         return jsonComparer.Compare(
             JSON.Stringify(value1, writeNulls: false),

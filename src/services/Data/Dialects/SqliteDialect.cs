@@ -12,6 +12,17 @@ public class SqliteDialect : ISqlDialect
     public static readonly ISqlDialect Instance = new SqliteDialect();
 
     /// <inheritdoc/>
+    public System.Collections.IComparer? Comparer { get; private set; }
+
+    /// <inheritdoc/>
+    public ISqlDialect WithComparer(System.Collections.IComparer? comparer)
+    {
+        var clone = (SqliteDialect)MemberwiseClone();
+        clone.Comparer = comparer;
+        return clone;
+    }
+
+    /// <inheritdoc/>
     public virtual bool CanUseConcat => false;
 
     /// <inheritdoc/>

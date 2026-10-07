@@ -140,10 +140,12 @@ public abstract class GenericValueField<TValue> : Field, IEnumTypeField where TV
     /// </summary>
     /// <param name="value1">The first value.</param>
     /// <param name="value2">The second value.</param>
-    /// <param name="comparer">The comparer, or null to use the default comparer for the value type.</param>
+    /// <param name="comparer">The comparer, or null to use <see cref="Field.Comparer"/>.</param>
     /// <returns>A value indicating the relative order of the two values.</returns>
     protected virtual int CompareValues(TValue value1, TValue value2, IComparer? comparer)
     {
+        comparer ??= Comparer;
+
         if (comparer is IComparer<TValue> typed)
             return typed.Compare(value1, value2);
 
@@ -168,7 +170,7 @@ public abstract class GenericValueField<TValue> : Field, IEnumTypeField where TV
         if (value2 is null)
             return 1;
 
-        return CompareValues(value1.Value, value2.Value, comparer ?? Comparer);
+        return CompareValues(value1.Value, value2.Value, comparer);
     }
 
     /// <summary>

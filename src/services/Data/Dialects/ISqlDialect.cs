@@ -13,6 +13,22 @@ public interface ISqlDialect
     public bool? AutoQuotedIdentifiers => null;
 
     /// <summary>
+    /// Gets the comparer used to compare string field values for this connection,
+    /// or null to fall back to <see cref="SqlSettings.DefaultComparer"/>. Dialects that
+    /// support a per-connection comparer override this and <see cref="WithComparer"/>.
+    /// </summary>
+    public System.Collections.IComparer? Comparer => null;
+
+    /// <summary>
+    /// Returns a copy of this dialect with the specified comparer set. Dialects that
+    /// support a per-connection comparer override this method; the default throws.
+    /// </summary>
+    /// <param name="comparer">The comparer.</param>
+    /// <returns>The dialect with the comparer applied.</returns>
+    public ISqlDialect WithComparer(System.Collections.IComparer? comparer) =>
+        throw new NotSupportedException($"{GetType().Name} does not support a custom comparer.");
+
+    /// <summary>
     /// Gets a value indicating whether the server supports the CONCAT() function
     /// (used by <c>ConcatAttribute</c> to decide between <c>CONCAT(...)</c>
     /// and an infix operator). This does not imply <see cref="ConcatOperator"/>

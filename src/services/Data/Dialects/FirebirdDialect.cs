@@ -11,6 +11,17 @@ public class FirebirdDialect : ISqlDialect
     /// </summary>
     public static readonly FirebirdDialect Instance = new();
 
+    /// <inheritdoc/>
+    public System.Collections.IComparer? Comparer { get; private set; }
+
+    /// <inheritdoc/>
+    public ISqlDialect WithComparer(System.Collections.IComparer? comparer)
+    {
+        var clone = (FirebirdDialect)MemberwiseClone();
+        clone.Comparer = comparer;
+        return clone;
+    }
+
     private static readonly HashSet<string> keywords = new(StringComparer.OrdinalIgnoreCase)
     {
         "!<", "^<", "^=", "^>", ",", ":=", "!=", "!>", "(", ")", "<", "<=", "<>", "=", ">", ">=", "||", "~<", "~=", "~>",

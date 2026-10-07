@@ -81,6 +81,7 @@ public class ByteArrayField(ICollection<Field> collection, string name, LocalTex
     /// <returns>A value indicating the relative order of the two values.</returns>
     protected override int CompareValues(byte[] value1, byte[] value2, IComparer? comparer)
     {
+        comparer ??= Comparer;
         var byteComparer = comparer as IComparer<byte> ?? Comparer<byte>.Default;
         var length = Math.Min(value1.Length, value2.Length);
         for (var i = 0; i < length; i++)

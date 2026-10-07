@@ -30,6 +30,17 @@ public class OracleDialect : ISqlDialect
     public static readonly ISqlDialect Instance = new OracleDialect();
 
     /// <inheritdoc/>
+    public System.Collections.IComparer? Comparer { get; private set; }
+
+    /// <inheritdoc/>
+    public ISqlDialect WithComparer(System.Collections.IComparer? comparer)
+    {
+        var clone = (OracleDialect)MemberwiseClone();
+        clone.Comparer = comparer;
+        return clone;
+    }
+
+    /// <inheritdoc/>
     public virtual bool CanUseOffsetFetch => false;
 
     /// <inheritdoc/>

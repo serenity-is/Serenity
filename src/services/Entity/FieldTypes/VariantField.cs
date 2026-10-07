@@ -65,6 +65,8 @@ public class VariantField(ICollection<Field> collection, string name, LocalText?
     /// <returns>A value indicating the relative order of the two values.</returns>
     protected override int CompareValues(object value1, object value2, IComparer? comparer)
     {
+        comparer ??= Comparer;
+
         if (value1 is string string1 && value2 is string string2 && comparer is IComparer<string> stringComparer)
             return stringComparer.Compare(string1, string2);
 

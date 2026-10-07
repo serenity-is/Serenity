@@ -12,6 +12,17 @@ public class SqlServer2000Dialect : ISqlDialect
     public static readonly ISqlDialect Instance = new SqlServer2000Dialect();
 
     /// <inheritdoc/>
+    public System.Collections.IComparer? Comparer { get; private set; }
+
+    /// <inheritdoc/>
+    public ISqlDialect WithComparer(System.Collections.IComparer? comparer)
+    {
+        var clone = (SqlServer2000Dialect)MemberwiseClone();
+        clone.Comparer = comparer;
+        return clone;
+    }
+
+    /// <inheritdoc/>
     public virtual bool CanUseConcat => false;
 
     /// <inheritdoc/>

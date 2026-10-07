@@ -39,16 +39,21 @@ public class DefaultConnectionStrings(IOptions<ConnectionStringOptions> options,
     {
         ArgumentNullException.ThrowIfNull(entry);
 
+        ISqlDialect dialect;
         if (entry.DialectInstance != null)
-            return entry.DialectInstance;
-        
-        if (string.IsNullOrEmpty(entry.Dialect))
-            return sqlDialectMapper.TryGet(entry.ProviderName) ?? SqlSettings.DefaultDialect;
-        
-        return sqlDialectMapper.TryGet(entry.Dialect) ?? 
-            throw new ArgumentException($"Dialect type {entry.Dialect} specified for connection {connectionKey} is not found!");
-    }
+            dialect = entry.DialectInstance;
+        else if (string.IsNullOrEmpty(entry.Dialect))
+            dialect = sqlDialectMapper.TryGet(entry.ProviderName) ?? SqlSettings.DefaultDialect;
+        else
+            dialect = sqlDialectMapper.TryGet(entry.Dialect) ?? 
+                throw new ArgumentException($"Dialect type {entry.Dialect} specified for connection {connectionKey} is not found!");
 
+        var comparer = ComparerResolver.Parse(entry.Comparer);
+        if (comparer is not null)
+            dialect = dialect.WithComparer(comparer);
+
+        return dialect;
+    }
     /// <summary>
     /// Gets a connection string by its key, resolving any connection key fallbacks.
     /// If the specified key is not configured but has a fallback, the fallback connection

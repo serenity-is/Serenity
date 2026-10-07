@@ -12,6 +12,17 @@ public class PostgresDialect : ISqlDialect
     public static readonly ISqlDialect Instance = new PostgresDialect();
 
     /// <inheritdoc/>
+    public System.Collections.IComparer? Comparer { get; private set; }
+
+    /// <inheritdoc/>
+    public ISqlDialect WithComparer(System.Collections.IComparer? comparer)
+    {
+        var clone = (PostgresDialect)MemberwiseClone();
+        clone.Comparer = comparer;
+        return clone;
+    }
+
+    /// <inheritdoc/>
     public virtual bool CanUseOffsetFetch => true;
 
     /// <inheritdoc/>

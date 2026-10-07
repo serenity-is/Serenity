@@ -12,6 +12,17 @@ public class MySqlDialect : ISqlDialect
     public static readonly ISqlDialect Instance = new MySqlDialect();
 
     /// <inheritdoc/>
+    public System.Collections.IComparer? Comparer { get; private set; }
+
+    /// <inheritdoc/>
+    public ISqlDialect WithComparer(System.Collections.IComparer? comparer)
+    {
+        var clone = (MySqlDialect)MemberwiseClone();
+        clone.Comparer = comparer;
+        return clone;
+    }
+
+    /// <inheritdoc/>
     public virtual bool CanUseOffsetFetch => true;
 
     /// <inheritdoc/>

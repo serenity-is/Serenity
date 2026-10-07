@@ -30,6 +30,7 @@ public class ListField<TItem>(ICollection<Field> collection, string name, LocalT
     /// <returns>A value indicating the relative order of the two values.</returns>
     protected override int CompareValues(List<TItem> value1, List<TItem> value2, IComparer? comparer)
     {
+        comparer ??= Comparer;
         var itemComparer = comparer as IComparer<TItem> ?? Comparer<TItem>.Default;
         var length = Math.Min(value1.Count, value2.Count);
         for (var i = 0; i < length; i++)

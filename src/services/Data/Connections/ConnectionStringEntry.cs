@@ -24,6 +24,14 @@ public class ConnectionStringEntry
     public ISqlDialect? DialectInstance { get; set; }
 
     /// <summary>
+    /// Gets or sets the comparer specification used to compare string field values for
+    /// this connection, e.g. "Ordinal", "OrdinalIgnoreCase", "CurrentCultureIgnoreCase",
+    /// "tr-TR" or "tr-TR:IgnoreCase". Defaults to null, meaning
+    /// <see cref="SqlSettings.DefaultComparer"/> is used.
+    /// </summary>
+    public string? Comparer { get; set; }
+
+    /// <summary>
     /// Gets or sets a semicolon-separated list of connection keys that fall back to this
     /// connection when they are not configured. For example, "ProFeatures;ProWorkLog".
     /// </summary>

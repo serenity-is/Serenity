@@ -14,6 +14,37 @@ public static class SqlSettings
         localDialect = new AsyncLocal<ISqlDialect?>();
     }
 
+    private static System.Collections.IComparer defaultComparer = StringComparer.CurrentCulture;
+    private static readonly AsyncLocal<System.Collections.IComparer?> localComparer = new();
+
+    /// <summary>
+    /// Gets or sets the default comparer used to compare string field values (e.g. for
+    /// change detection or dirty tracking) when a field, row or connection does not specify
+    /// one. Returns the local comparer if any is set through <see cref="SetLocalComparer"/>,
+    /// otherwise the default comparer. Defaults to <see cref="StringComparer.CurrentCulture"/>.
+    /// This should only be set on application start. The local comparer should be used for
+    /// unit tests.
+    /// </summary>
+    public static System.Collections.IComparer DefaultComparer
+    {
+        get => localComparer.Value ?? defaultComparer;
+        set => defaultComparer = value ?? throw new ArgumentNullException(nameof(value));
+    }
+
+    /// <summary>
+    /// Sets the local comparer for the current thread and async context.
+    /// Useful for background tasks, async methods, and testing to set the comparer locally
+    /// and for auto spawned threads.
+    /// </summary>
+    /// <param name="comparer">The comparer. Can be null.</param>
+    /// <returns>The old local comparer, if any.</returns>
+    public static System.Collections.IComparer? SetLocalComparer(System.Collections.IComparer? comparer)
+    {
+        var old = localComparer.Value;
+        localComparer.Value = comparer;
+        return old;
+    }
+
     /// <summary>
     /// Gets or sets a value indicating whether to automatically quote identifiers.
     /// This is used as a fallback if the dialect and <see cref="SqlSettings.DefaultDialect"/> do

@@ -363,6 +363,8 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins, IHas
 
             var rowCustomAttributes = rowType!.GetCustomAttributes().ToList();
 
+            var rowComparer = rowType!.GetCustomAttribute<ComparerAttribute>()?.ToStringComparer();
+
             DetermineTableName(expressionSelector);
 
             var fieldsReadPerm = rowType!.GetCustomAttribute<FieldReadPermissionAttribute>();
@@ -649,6 +651,11 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins, IHas
                             "Field name '{0}' in type {1} can't be overridden by Column name attribute!",
                                 fieldInfo.Name, rowType!.FullName));
                 }
+
+                field.comparer = property?.GetAttribute<ComparerAttribute>()?.ToStringComparer()
+                    ?? rowComparer
+                    ?? dialect.Comparer
+                    ?? SqlSettings.DefaultComparer;
 
                 if (scale != null)
                 {
