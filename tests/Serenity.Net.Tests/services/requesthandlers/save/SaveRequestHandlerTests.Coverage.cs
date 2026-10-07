@@ -311,31 +311,34 @@ public class SaveRequestHandlerTests_Coverage
         {
             Entity = new CoverRow { Name = "A" }
         });
-        Assert.NotNull(createResponse);
+        Assert.Null(createResponse.EntityId);
 
         var updateResponse = handler.Process(uow, new SaveRequest<CoverRow>
         {
-            Entity = new CoverRow { Id = 5, Name = "New" }
+            EntityId = 5,
+            Entity = new CoverRow { Name = "New" }
         });
-        Assert.NotNull(updateResponse);
+        Assert.Equal(5, updateResponse.EntityId);
     }
 
     [Fact]
-    public void Process_Auto_With_EntityId_And_Null_Entity_Id_Detects_Update()
+    public void Process_Auto_NonAutoIncrement_Id_Without_EntityId_Creates()
     {
+        // CoverRow.Id is a client-assigned (non AutoIncrement) id, so a supplied
+        // Entity.Id alone must not be interpreted as an update target.
         using var connection = new MockDbConnection()
             .InterceptManipulateRow(_ => 1)
             .InterceptExecuteReader(args => args.ToMockReader(new { ID = 5, Name = "Old" }))
             .OnDbCommandExecuteNonQuery(_ => 1);
         var handler = new CoverHandler(Context());
 
-        var response = handler.Process(new MockUnitOfWork(connection), new SaveRequest<CoverRow>
+        handler.Process(new MockUnitOfWork(connection), new SaveRequest<CoverRow>
         {
-            EntityId = 5,
-            Entity = new CoverRow { Name = "New" }
+            Entity = new CoverRow { Id = 5, Name = "New" }
         });
 
-        Assert.Equal(5, response.EntityId);
+        Assert.Single(connection.ManipulateRowCalls);
+        Assert.Empty(connection.ExecuteReaderCalls);
     }
 
     [Fact]

@@ -237,7 +237,9 @@ public class SaveRequestHandler<TRow, TSaveRequest, TSaveResponse> :
 
         if (requestType == SaveRequestType.Auto)
         {
-            if (Request.EntityId != null || !Row.GetIdField().IsNullNoCheck(Row))
+            var idField = Row.GetIdField();
+            if (Request.EntityId != null ||
+                (idField.Flags.HasFlag(FieldFlags.AutoIncrement) && !idField.IsNullNoCheck(Row)))
                 requestType = SaveRequestType.Update;
             else
                 requestType = SaveRequestType.Create;

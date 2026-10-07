@@ -106,31 +106,34 @@ public class SaveRequestHandlerAsyncTests_Coverage
         {
             Entity = new CoverRow { Name = "A" }
         }, SaveRequestType.Auto, token);
-        Assert.NotNull(createResponse);
+        Assert.Null(createResponse.EntityId);
 
         var updateResponse = await handler.ProcessAsync(uow, new SaveRequest<CoverRow>
         {
-            Entity = new CoverRow { Id = 5, Name = "New" }
+            EntityId = 5,
+            Entity = new CoverRow { Name = "New" }
         }, SaveRequestType.Auto, token);
-        Assert.NotNull(updateResponse);
+        Assert.Equal(5, updateResponse.EntityId);
     }
 
     [Fact]
-    public async Task ProcessAsync_Auto_With_EntityId_And_Null_Entity_Id_Detects_Update()
+    public async Task ProcessAsync_Auto_AutoIncrement_Id_Without_EntityId_Updates()
     {
+        // AutoRow.Id is an identity (AutoIncrement) id, so a supplied Entity.Id
+        // can only target an existing row.
         using var connection = new MockDbConnection()
             .InterceptManipulateRow(_ => 1)
             .InterceptExecuteReader(args => args.ToMockReader(new { Id = 5, Name = "Old" }))
             .OnDbCommandExecuteNonQuery(_ => 1);
-        var handler = new TestAsyncHandler<CoverRow>(Context());
+        var handler = new TestAsyncHandler<AutoRow>(Context());
 
-        var response = await handler.ProcessAsync(new MockUnitOfWork(connection), new SaveRequest<CoverRow>
+        var response = await handler.ProcessAsync(new MockUnitOfWork(connection), new SaveRequest<AutoRow>
         {
-            EntityId = 5,
-            Entity = new CoverRow { Name = "New" }
+            Entity = new AutoRow { Id = 5, Name = "New" }
         }, SaveRequestType.Auto, TestContext.Current.CancellationToken);
 
         Assert.Equal(5, response.EntityId);
+        Assert.NotEmpty(connection.ExecuteReaderCalls);
     }
 
     [Fact]
@@ -237,7 +240,8 @@ public class SaveRequestHandlerAsyncTests_Coverage
 
         await handler.ProcessAsync(new MockUnitOfWork(connection), new SaveRequest<CoverRow>
         {
-            Entity = new CoverRow { Id = 5, Name = "New" }
+            EntityId = 5,
+            Entity = new CoverRow { Name = "New" }
         }, SaveRequestType.Auto, TestContext.Current.CancellationToken);
         Assert.True(behavior.Prepare);
     }
