@@ -50,7 +50,7 @@ public sealed class Int16Field(ICollection<Field> collection, string name, Local
         if (reader.IsDBNull(index))
             _setValue(row, null);
         else
-            _setValue(row, Convert.ToInt16(reader.GetValue(index)));
+            _setValue(row, Convert.ToInt16(reader.GetValue(index), CultureInfo.InvariantCulture));
 
         row.OnFieldSet(this);
     }

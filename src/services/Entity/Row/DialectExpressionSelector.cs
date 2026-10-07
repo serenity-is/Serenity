@@ -16,6 +16,9 @@ public class DialectExpressionSelector(ISqlDialect dialect)
 
     private bool IsMatch(string dialect)
     {
+        if (string.IsNullOrEmpty(dialect))
+            return false;
+
         if (dialect[0] == '!')
         {
             dialect = dialect[1..];

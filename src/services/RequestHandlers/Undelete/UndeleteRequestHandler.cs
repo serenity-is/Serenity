@@ -193,7 +193,7 @@ public class UndeleteRequestHandler<TRow, TUndeleteRequest, TUndeleteResponse> :
     {
         StateBag.Clear();
         UnitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
-        Request = request;
+        Request = request ?? throw new ArgumentNullException(nameof(request));
         Response = new TUndeleteResponse();
 
         if (request.EntityId == null)

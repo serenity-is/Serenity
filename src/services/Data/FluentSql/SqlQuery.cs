@@ -131,7 +131,7 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
             throw new ArgumentNullException(nameof(table));
 
         if (GetAliasExpression(alias.Name) is not null)
-            throw new ArgumentOutOfRangeException(string.Format("{0} alias is used more than once in the query!", alias.Name));
+            throw new ArgumentOutOfRangeException(nameof(alias), string.Format("{0} alias is used more than once in the query!", alias.Name));
 
         if (alias is IHasDialect hasDialect && !IsDialectOverridden)
         {

@@ -138,6 +138,23 @@ public class ListRowAndRowListFieldTests
     }
 
     [Fact]
+    public void RowListField_Clone_HandlesNullItems()
+    {
+        var row1 = NewRow();
+        var row2 = NewRow();
+        var field = AllFieldsRow.Fields.ARowList;
+        field[row1] = [null, MakeIdName(1, "a")];
+
+        field.Copy(row1, row2);
+
+        var cloned = field[row2];
+        Assert.NotNull(cloned);
+        Assert.Equal(2, cloned.Count);
+        Assert.Null(cloned[0]);
+        Assert.Equal(1, cloned[1].ID);
+    }
+
+    [Fact]
     public void RowListField_IndexCompare_RowWiseComparison()
     {
         var field = AllFieldsRow.Fields.ARowList;

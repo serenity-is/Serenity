@@ -193,7 +193,7 @@ public static class EntitySqlHelper
         IReadOnlyDictionary<string, object?>? parameters = null) where TRow : class, IRow
     {
         var list = new List<TRow>();
-        loaderRow ??= ((query as ISqlQueryExtensible)?.FirstIntoRow as TRow) ?? throw new ArgumentNullException(nameof(loaderRow));
+        loaderRow ??= ((query as ISqlQueryExtensible)?.FirstIntoRow as TRow) ?? throw new InvalidOperationException("The query has no INTO row of the requested type, and no loader row was specified.");
         ForEach(query, connection, delegate ()
         {
             list.Add(loaderRow.Clone());
@@ -216,7 +216,7 @@ public static class EntitySqlHelper
         IReadOnlyDictionary<string, object?>? parameters = null, CancellationToken cancellationToken = default) where TRow : class, IRow
     {
         var list = new List<TRow>();
-        loaderRow ??= ((query as ISqlQueryExtensible)?.FirstIntoRow as TRow) ?? throw new ArgumentNullException(nameof(loaderRow));
+        loaderRow ??= ((query as ISqlQueryExtensible)?.FirstIntoRow as TRow) ?? throw new InvalidOperationException("The query has no INTO row of the requested type, and no loader row was specified.");
         await ForEachAsync(query, connection, delegate ()
         {
             list.Add(loaderRow.Clone());

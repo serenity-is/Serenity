@@ -46,5 +46,13 @@ public class UndeleteRequestHandlerTests_Basic
         Assert.Throws<InvalidOperationException>(() => handler.Connection);
         Assert.Throws<InvalidOperationException>(() => handler.UnitOfWork);
     }
+
+    [Fact]
+    public void Undelete_NullRequest_Throws()
+    {
+        using var connection = new MockDbConnection();
+        var handler = new UndeleteRequestHandler<UndelRow>(Context());
+        Assert.Throws<ArgumentNullException>(() => handler.Undelete(new MockUnitOfWork(connection), null!));
+    }
 }
 

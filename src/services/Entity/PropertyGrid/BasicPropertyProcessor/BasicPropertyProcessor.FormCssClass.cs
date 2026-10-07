@@ -14,7 +14,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
             if (!string.IsNullOrEmpty(cssClass.Value))
             {
                 if (!string.IsNullOrEmpty(item.FormCssClass))
-                    item.FormCssClass = " " + cssClass.Value;
+                    item.FormCssClass += " " + cssClass.Value;
                 else
                     item.FormCssClass = cssClass.Value;
             }

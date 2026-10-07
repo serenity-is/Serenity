@@ -68,7 +68,7 @@ public static partial class EntitySqlQueryExtensions
         ArgumentException.ThrowIfNullOrEmpty(alias.Table);
 
         if (query.HasAlias(alias.Name))
-            throw new ArgumentOutOfRangeException(string.Format("{0} alias is used more than once in the query!", alias.Name));
+            throw new ArgumentOutOfRangeException(nameof(alias), string.Format("{0} alias is used more than once in the query!", alias.Name));
 
         if (!query.IsDialectOverridden)
             query.Dialect(fields.Dialect);

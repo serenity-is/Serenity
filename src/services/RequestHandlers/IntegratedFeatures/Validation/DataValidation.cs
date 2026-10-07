@@ -178,7 +178,7 @@ public static class DataValidation
     {
         return new ValidationError("InvalidId", field.Name,
             DataValidationTexts.FieldInvalidValue.ToString(localizer),
-            field.GetTitle(localizer), field.AsObject(row));
+            field.AsObject(row), field.GetTitle(localizer));
     }
 
     /// <summary>
@@ -192,7 +192,7 @@ public static class DataValidation
     {
         return new ValidationError("InvalidId", field.Name,
             DataValidationTexts.FieldInvalidValue.ToString(localizer),
-            field.GetTitle(localizer), value);
+            value, field.GetTitle(localizer));
     }
 
     /// <summary>

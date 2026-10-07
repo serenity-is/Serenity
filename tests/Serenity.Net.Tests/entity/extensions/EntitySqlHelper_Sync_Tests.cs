@@ -155,7 +155,8 @@ public class EntitySqlHelper_Sync_Tests
     public void List_Throws_When_No_LoaderRow()
     {
         using var connection = new MockDbConnection();
-        Assert.Throws<ArgumentNullException>(() => EntitySqlHelper.List<CityRow>(new SqlQuery(), connection));
+        var ex = Assert.Throws<InvalidOperationException>(() => EntitySqlHelper.List<CityRow>(new SqlQuery(), connection));
+        Assert.Contains("INTO row", ex.Message);
     }
 
     [Fact]

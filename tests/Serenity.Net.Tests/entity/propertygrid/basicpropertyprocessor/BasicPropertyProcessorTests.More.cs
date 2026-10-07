@@ -321,4 +321,22 @@ public partial class BasicPropertyProcessorTests
         Assert.Equal("fd", a.FormCssClass);
         Assert.Null(b.FormCssClass);
     }
+
+    private class FormCssClassAppendForm
+    {
+        [FormCssClass("new")]
+        public string? A { get; set; }
+    }
+
+    [Fact]
+    public void FormCssClass_Appends_To_Existing_Class()
+    {
+        var prop = typeof(FormCssClassAppendForm).GetProperty(nameof(FormCssClassAppendForm.A))!;
+        var source = new PropertyInfoSource(prop, null);
+        var item = new PropertyItem { Name = "A", FormCssClass = "existing" };
+
+        new BasicPropertyProcessor().Process(source, item);
+
+        Assert.Equal("existing new", item.FormCssClass);
+    }
 }

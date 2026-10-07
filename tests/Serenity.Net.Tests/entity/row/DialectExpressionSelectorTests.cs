@@ -208,4 +208,13 @@ public class DialectExpressionSelectorTests
 
         Assert.Same(sqlite, result);
     }
+
+    [Fact]
+    public void GetBestMatch_CommaSeparatedList_WithEmptyTrimmedToken_DoesNotThrow()
+    {
+        var selector = new DialectExpressionSelector(SqlServer2012Dialect.Instance);
+        var attr = Attr("SqlServer, ");
+
+        Assert.Same(attr, selector.GetBestMatch([attr], x => x.Dialect));
+    }
 }

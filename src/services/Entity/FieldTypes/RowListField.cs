@@ -65,7 +65,7 @@ public class RowListField<TForeign>(ICollection<Field> collection, string name, 
             return null;
         var clone = new List<TForeign>();
         foreach (var row in value)
-            clone.Add(row.Clone());
+            clone.Add(row is null ? null! : row.Clone());
         return clone;
     }
 }

@@ -75,7 +75,7 @@ public class Int32Field(ICollection<Field> collection, string name, LocalText? c
     {
         if (enumType.IsEnum)
         {
-            var val = Enum.Parse(enumType, v.ToString());
+            var val = Enum.Parse(enumType, v.ToString(CultureInfo.InvariantCulture));
             if (!Enum.IsDefined(enumType, val))
                 throw new InvalidCastException(string.Format("{0} is not a valid {1} enum value!", v, enumType.Name));
 

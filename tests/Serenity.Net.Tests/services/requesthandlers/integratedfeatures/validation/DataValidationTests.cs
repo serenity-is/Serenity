@@ -260,4 +260,15 @@ public class DataValidationTests
         var localizer = new MockTextLocalizer(_ => "Entity");
         Assert.Equal("Entity", DataValidation.GetEntitySingular("T", localizer));
     }
+
+    [Fact]
+    public void InvalidIdError_Formats_Value_Before_Field()
+    {
+        var row = NewRow();
+        row.Name = "n";
+        var field = row.GetFields().Name;
+
+        Assert.Equal("Invalid value n for field Name!", DataValidation.InvalidIdError(row, field, null).Message);
+        Assert.Equal("Invalid value 1 for field Name!", DataValidation.InvalidIdError(field, 1, null).Message);
+    }
 }
