@@ -117,6 +117,19 @@ public class EntitySqlQueryProjection_Tests
     }
 
     [Fact]
+    public void ListProjected_DBNull_IntoNonNullableMember_UsesDefault()
+    {
+        using var connection = new MockDbConnection()
+            .OnDbCommandExecuteReader(_ => new MockDbDataReader(new { SomeProp = (int?)null }));
+
+        var query = new SqlQuery().From(new SelfNavigationRow());
+        var result = query.ListProjected(connection,
+            (SelfNavigationRow source) => new { SomeProp = Sql.Expr<int>("CAST(NULL AS INT)") }).Single();
+
+        Assert.Equal(0, result.SomeProp);
+    }
+
+    [Fact]
     public void ReusableProjectedQueryReusesPreparedQueryAndOverridesParams()
     {
         var parameterValues = new List<object?>();

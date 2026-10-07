@@ -963,10 +963,19 @@ public static class EntitySqlQueryProjection
 	private static readonly MethodInfo ReadProjectedValueMethod = typeof(EntitySqlQueryProjection)
 		.GetMethod(nameof(ReadProjectedValue), BindingFlags.NonPublic | BindingFlags.Static)!;
 
-	private static object? ReadProjectedValue(IDataReader reader, int index, Field? field)
+	private static object? ReadProjectedValue(IDataReader reader, int index, Field? field, Type targetType)
 	{
 		var value = reader.IsDBNull(index) ? null : reader.GetValue(index);
-		return field is null ? value : field.ConvertValue(value, CultureInfo.InvariantCulture);
+		if (value is not null && field is not null)
+			value = field.ConvertValue(value, CultureInfo.InvariantCulture);
+
+		// Like Dapper and EF Core, materialize default(T) when the column is DBNull and the
+		// target member is a non-nullable value type. Unboxing null into such a member would
+		// otherwise throw a NullReferenceException. Nullable and reference members still get null.
+		if (value is null && targetType.IsValueType && Nullable.GetUnderlyingType(targetType) is null)
+			return Activator.CreateInstance(targetType);
+
+		return value;
 	}
 
 	private sealed class ProjectionReaderVisitor(ParameterExpression reader,
@@ -981,7 +990,8 @@ public static class EntitySqlQueryProjection
 			{
 				var column = matches.Dequeue();
 				return Expression.Convert(Expression.Call(ReadProjectedValueMethod,
-					reader, Expression.Constant(column.Index), Expression.Constant(column.Field, typeof(Field))), node.Type);
+					reader, Expression.Constant(column.Index), Expression.Constant(column.Field, typeof(Field)),
+					Expression.Constant(node.Type, typeof(Type))), node.Type);
 			}
 
 			return base.Visit(node);

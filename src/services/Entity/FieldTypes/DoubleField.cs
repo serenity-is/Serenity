@@ -145,6 +145,8 @@ public sealed class DoubleField(ICollection<Field> collection, string name, Loca
         if (value == null)
             writer.WriteNullValue();
         else
+            // System.Text.Json throws for NaN/Infinity by default (Utf8JsonWriter.WriteNumberValue).
+            // We intentionally follow that behavior instead of substituting a string or null.
             writer.WriteNumberValue(value.Value);
     }
 
