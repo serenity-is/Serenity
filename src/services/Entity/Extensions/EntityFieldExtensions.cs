@@ -23,6 +23,24 @@ public static class EntityFieldExtensions
     }
 
     /// <summary>
+    /// Returns true if the field is a sensitive field based on the row implementing interfaces
+    /// like <see cref="IPasswordRow"/> (e.g. its password hash / salt), regardless of its name.
+    /// This complements the name based detection in <see cref="RowFieldsBase"/>. The caller is
+    /// responsible for checking any explicit attributes (e.g. <see cref="MinSelectLevelAttribute"/>)
+    /// that may opt the field out of the default protection.
+    /// </summary>
+    /// <param name="field">The field.</param>
+    /// <param name="row">The row instance, used to detect the sensitive interface fields.</param>
+    /// <returns>True if the field is a sensitive field based on the row interfaces.</returns>
+    public static bool IsSensitiveFieldBasedOnInterfaces(Field field, IRow? row)
+    {
+        return field is not null &&
+            row is IPasswordRow passwordRow &&
+            (ReferenceEquals(field, passwordRow.PasswordHashField) ||
+             ReferenceEquals(field, passwordRow.PasswordSaltField));
+    }
+
+    /// <summary>
     ///   Gets a dictionary of table fields (e.g. not a foreign or calculated field) in a row.
     /// </summary>
     /// <param name="row">

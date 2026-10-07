@@ -62,7 +62,7 @@ public class CriteriaFieldExpressionReplacer(IRow row, IPermissionService permis
         if (allowFilterField is not null)
             return allowFilterField(field);
 
-        return IsFieldFilterAllowed(field, permissions, lookupAccessMode);
+        return IsFieldFilterAllowed(field, permissions, lookupAccessMode, Row);
     }
 
     /// <summary>
@@ -71,9 +71,10 @@ public class CriteriaFieldExpressionReplacer(IRow row, IPermissionService permis
     /// <param name="field">The field to check.</param>
     /// <param name="permissions">The permission service.</param>
     /// <param name="lookupAccessMode">Whether lookup access mode is enabled.</param>
+    /// <param name="row">Optional row instance, used to detect IPasswordRow sensitive fields.</param>
     /// <returns>True if filtering the field is allowed.</returns>
     public static bool IsFieldFilterAllowed(Field field, IPermissionService permissions,
-        bool lookupAccessMode = false)
+        bool lookupAccessMode = false, IRow? row = null)
     {
         if (field.Flags.HasFlag(FieldFlags.DenyFiltering))
             return false;
@@ -88,6 +89,12 @@ public class CriteriaFieldExpressionReplacer(IRow row, IPermissionService permis
         if (field.ReadPermission == null &&
             lookupAccessMode &&
             !field.IsLookup)
+            return false;
+
+        // RowFieldsBase protects potentially sensitive fields by name, but IPasswordRow
+        // fields may have arbitrary names, so deny them here too unless explicitly annotated.
+        if (EntityFieldExtensions.IsSensitiveFieldBasedOnInterfaces(field, row) &&
+            field.GetAttribute<MinSelectLevelAttribute>() == null)
             return false;
 
         return true;

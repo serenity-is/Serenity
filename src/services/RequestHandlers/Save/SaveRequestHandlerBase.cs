@@ -67,6 +67,12 @@ public abstract class SaveRequestHandlerBase<TRow, TSaveRequest, TSaveResponse>(
         foreach (var field in Row.GetFields())
             if (field.Flags.HasFlag(flag))
             {
+                // RowFieldsBase protects potentially sensitive fields by name, but IPasswordRow
+                // fields may have arbitrary names, so don't allow editing them unless annotated.
+                if (EntityFieldExtensions.IsSensitiveFieldBasedOnInterfaces(field, Row) &&
+                    field.GetAttribute<MinSelectLevelAttribute>() == null)
+                    continue;
+
                 if ((IsCreate && (field.InsertPermission == null ||
                         Permissions.HasPermission(field.InsertPermission))) ||
                     (IsUpdate && (field.UpdatePermission == null ||

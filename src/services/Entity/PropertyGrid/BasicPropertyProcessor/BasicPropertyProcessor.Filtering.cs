@@ -5,12 +5,12 @@ public partial class BasicPropertyProcessor : PropertyProcessor
     private static void SetFiltering(IPropertySource source, PropertyItem item)
     {
         var filterOnlyAttr = source.GetAttribute<FilterOnlyAttribute>();
-        var notFilterableAttr = source.GetAttribute<NotFilterableAttribute>();
+        var filterableAttribute = source.GetAttribute<FilterableAttribute>();
 
         if (filterOnlyAttr != null && filterOnlyAttr.Value)
             item.FilterOnly = true;
 
-        if (notFilterableAttr != null && notFilterableAttr.Value)
+        if (filterableAttribute != null && !filterableAttribute.Value)
             item.NotFilterable = true;
 
         if (item.NotFilterable == true)
@@ -29,7 +29,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
 
         var basedOnField = source.BasedOnField;
         if (basedOnField is not null &&
-            notFilterableAttr == null)
+            filterableAttribute == null)
         {
             if (basedOnField.Flags.HasFlag(FieldFlags.DenyFiltering) ||
                 basedOnField.Flags.HasFlag(FieldFlags.NotMapped))

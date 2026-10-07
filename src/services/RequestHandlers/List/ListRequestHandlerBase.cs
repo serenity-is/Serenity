@@ -98,6 +98,12 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(
             !field.IsLookup)
             return false;
 
+        // RowFieldsBase protects potentially sensitive fields by name, but IPasswordRow
+        // fields may have arbitrary names, so deny them here too unless explicitly annotated.
+        if (EntityFieldExtensions.IsSensitiveFieldBasedOnInterfaces(field, Row) &&
+            field.GetAttribute<MinSelectLevelAttribute>() == null)
+            return false;
+
         return true;
     }
 
@@ -107,7 +113,7 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(
     /// </summary>
     /// <param name="field">The field</param>
     protected virtual bool AllowFilterField(Field field) =>
-        CriteriaFieldExpressionReplacer.IsFieldFilterAllowed(field, Permissions, lookupAccessMode);
+        CriteriaFieldExpressionReplacer.IsFieldFilterAllowed(field, Permissions, lookupAccessMode, Row);
 
     /// <summary>
     /// Returns true if the field should be allowed to affect sort order.

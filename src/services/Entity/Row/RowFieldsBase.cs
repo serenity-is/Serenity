@@ -46,6 +46,62 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins, IHas
     private static readonly ConcurrentDictionary<Type, Type> fieldValueTypeCache = new();
 
     /// <summary>
+    /// Field names that are potentially sensitive (e.g. password hash, secret, API key,
+    /// 2FA data), and thus should not be selected, filtered, sorted, inserted or updated
+    /// by default unless the developer explicitly allows it via the corresponding attributes.
+    /// This is a name based heuristic: rows implementing interfaces like
+    /// <see cref="IPasswordRow"/> are additionally protected in request handlers, as their
+    /// sensitive fields may have arbitrary names.
+    /// </summary>
+    internal static readonly HashSet<string> PotentiallySensitiveFieldNames = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "Password",
+        "PasswordHash",
+        "PasswordSalt",
+        "OldPassword",
+        "NewPassword",
+        "Pass",
+        "Secret",
+        "SecretKey",
+        "ClientSecret",
+        "ApiKey",
+        "PrivateKey",
+        "AccessToken",
+        "RefreshToken",
+        "Token",
+        "SecurityStamp",
+        "AuthenticatorKey",
+        "TwoFactorSecret",
+        "TwoFactorData",
+        "TwoFactorUserData",
+        "2FASecret",
+        "2FAData",
+        "2FAUserData",
+        "RecoveryCode",
+        "ConnectionString",
+        "password_hash",
+        "password_salt",
+        "old_password",
+        "new_password",
+        "secret_key",
+        "client_secret",
+        "api_key",
+        "private_key",
+        "access_token",
+        "refresh_token",
+        "security_stamp",
+        "authenticator_key",
+        "two_factor_secret",
+        "two_factor_data",
+        "two_factor_user_data",
+        "2fa_secret",
+        "2fa_data",
+        "2fa_user_data",
+        "recovery_code",
+        "connection_string"
+    };
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="RowFieldsBase"/> class.
     /// </summary>
     /// <param name="tableName">Name of the table.</param>
@@ -204,6 +260,34 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins, IHas
         localTextPrefix = RowIdentifier;
     }
 
+    /// <summary>
+    /// Returns true if the property name or column name is one of the
+    /// <see cref="PotentiallySensitiveFieldNames"/> (optionally bracketed).
+    /// </summary>
+    private static bool IsPotentiallySensitiveField(string? propertyName, string? columnName)
+    {
+        return IsPotentiallySensitiveFieldName(propertyName) ||
+            IsPotentiallySensitiveFieldName(columnName);
+    }
+
+    private static bool IsPotentiallySensitiveFieldName(string? name)
+    {
+        if (string.IsNullOrEmpty(name))
+            return false;
+
+        if (PotentiallySensitiveFieldNames.Contains(name))
+            return true;
+
+        if (name[0] != '[' && !char.IsWhiteSpace(name[0]))
+            return false;
+
+        var unbracketed = name.Trim();
+        if (unbracketed.Length >= 2 && unbracketed[0] == '[' && unbracketed[^1] == ']')
+            unbracketed = unbracketed[1..^1];
+
+        return PotentiallySensitiveFieldNames.Contains(unbracketed);
+    }
+
     private void GetRowFieldsAndProperties(
         out Dictionary<string, FieldInfo> rowFields,
         out Dictionary<string, IPropertyInfo> rowProperties)
@@ -322,6 +406,10 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins, IHas
                 DefaultValueAttribute? defaultValue = null;
                 TextualFieldAttribute? textualField = null;
                 DateTimeKindAttribute? dateTimeKind = null;
+                SortableAttribute? sortable = null;
+                FilterableAttribute? filterableAttr = null;
+                NotMappedAttribute? notMappedAttr = null;
+                List<Attribute>? extraAttrs = null;
 
                 PermissionAttributeBase? readPermission;
                 PermissionAttributeBase? insertPermission;
@@ -381,6 +469,8 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins, IHas
                     defaultValue = property.GetAttribute<DefaultValueAttribute>();
                     textualField = property.GetAttribute<TextualFieldAttribute>();
                     dateTimeKind = property.GetAttribute<DateTimeKindAttribute>();
+                    sortable = property.GetAttribute<SortableAttribute>();
+                    filterableAttr = property.GetAttribute<FilterableAttribute>();
                     readPermission = property.GetAttribute<ReadPermissionAttribute>() ?? (PermissionAttributeBase?)fieldsReadPerm;
                     insertPermission = property.GetAttribute<InsertPermissionAttribute>() ?? fieldsInsertPerm ??
                         property.GetAttribute<ModifyPermissionAttribute>() ?? fieldsModifyPerm ?? readPermission ?? fieldsReadPerm;
@@ -416,6 +506,71 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins, IHas
 
                     var insertable = property.GetAttribute<InsertableAttribute>();
                     var updatable = property.GetAttribute<UpdatableAttribute>();
+
+                    notMappedAttr = property.GetAttribute<NotMappedAttribute>() ??
+                        fieldType.GetCustomAttribute<NotMappedAttribute>();
+
+                    // Fields whose names look like they may hold sensitive data (e.g. password hash,
+                    // secret, API key, 2FA data) should not be selected, filtered, sorted, inserted
+                    // or updated by default. Otherwise, forgetting a [MinSelectLevel(Never)],
+                    // [Insertable(false)] or [Updatable(false)] annotation would leak such data in
+                    // retrieve/list responses, or allow clients to mass assign them.
+                    // We synthesize the equivalent attributes (only when the developer did not
+                    // specify one explicitly) and add them to extraAttrs so that they also end up
+                    // in the field's CustomAttributes, keeping the field metadata self describing.
+                    var isSensitive = IsPotentiallySensitiveField(property.Name, column?.Name);
+                    if (isSensitive)
+                    {
+                        if (selectLevel == null)
+                        {
+                            // never select sensitive fields (not even in Details mode)
+                            selectLevel = new MinSelectLevelAttribute(SelectLevel.Never);
+                            (extraAttrs ??= []).Add(selectLevel);
+                        }
+
+                        if (sortable == null)
+                        {
+                            // don't allow sorting by sensitive fields, as it could reveal their values
+                            sortable = new SortableAttribute(false);
+                            (extraAttrs ??= []).Add(sortable);
+                        }
+
+                        if (filterableAttr == null)
+                        {
+                            // don't allow filtering by sensitive fields, as it could reveal their values
+                            filterableAttr = new FilterableAttribute(false);
+                            (extraAttrs ??= []).Add(filterableAttr);
+                        }
+
+                        if (notMappedAttr == null)
+                        {
+                            // only mapped columns should be made non insertable/updatable. NotMapped
+                            // fields (e.g. password / password confirm inputs) are client side only
+                            // and must stay settable, or such input flows would break.
+                            if (insertable == null)
+                            {
+                                insertable = new InsertableAttribute(false);
+                                (extraAttrs ??= []).Add(insertable);
+                            }
+
+                            if (updatable == null)
+                            {
+                                updatable = new UpdatableAttribute(false);
+                                (extraAttrs ??= []).Add(updatable);
+                            }
+                        }
+                    }
+
+                    // A [Filterable(false)] / [NotFilterable] field is also marked with the
+                    // DenyFiltering flag so it cannot be filtered server side, whether or not it
+                    // matched the sensitive field name heuristic above. [Filterable(true)] clears it.
+                    if (filterableAttr != null)
+                    {
+                        if (filterableAttr.Value)
+                            addFlags &= ~FieldFlags.DenyFiltering;
+                        else
+                            addFlags |= FieldFlags.DenyFiltering;
+                    }
 
                     if (insertable != null && !insertable.Value)
                         removeFlags |= FieldFlags.Insertable;
@@ -636,7 +791,10 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins, IHas
                     field.PropertyName = property.Name;
                     byPropertyName[field.PropertyName] = field;
 
-                    field.customAttributes = [.. property.GetAttributes<Attribute>()];
+                    if (extraAttrs == null)
+                        field.customAttributes = [.. property.GetAttributes<Attribute>()];
+                    else
+                        field.customAttributes = [.. property.GetAttributes<Attribute>(), .. extraAttrs];
                 }
 
                 var idFieldAttribute = field.GetAttribute<IdPropertyAttribute>();

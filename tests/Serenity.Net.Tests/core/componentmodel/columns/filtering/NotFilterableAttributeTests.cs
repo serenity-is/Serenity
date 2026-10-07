@@ -3,16 +3,14 @@ namespace Serenity.ComponentModel;
 public class NotFilterableAttributeTests
 {
     [Fact]
-    public void Value_IsTrue_ByDefault()
+    public void Value_IsFalse()
     {
-        var attribute = new NotFilterableAttribute();
-        Assert.True(attribute.Value);
+        Assert.False(new NotFilterableAttribute().Value);
     }
 
     [Fact]
-    public void Value_CanBeSet_ToFalse()
+    public void DerivesFromFilterableAttribute()
     {
-        var attribute = new NotFilterableAttribute(false);
-        Assert.False(attribute.Value);
+        Assert.IsAssignableFrom<FilterableAttribute>(new NotFilterableAttribute());
     }
 }

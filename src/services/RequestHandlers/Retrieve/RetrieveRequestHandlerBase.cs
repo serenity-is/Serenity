@@ -44,6 +44,12 @@ public abstract class RetrieveRequestHandlerBase<TRow, TRetrieveRequest, TRetrie
             !Permissions.HasPermission(field.ReadPermission))
             return false;
 
+        // RowFieldsBase protects potentially sensitive fields by name, but IPasswordRow
+        // fields may have arbitrary names, so deny them here too unless explicitly annotated.
+        if (EntityFieldExtensions.IsSensitiveFieldBasedOnInterfaces(field, Row) &&
+            field.GetAttribute<MinSelectLevelAttribute>() == null)
+            return false;
+
         return true;
     }
 
