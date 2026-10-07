@@ -5,6 +5,12 @@
 /// that occur during delete. It could be useful to preview the exception and
 /// raise another exception for FK / PK database errors etc.
 /// </summary>
+/// <remarks>
+/// All behaviors implementing this interface are called in order when an undelete fails. A behavior
+/// may translate the original exception by throwing a new one; dispatch then stops and that new
+/// exception is what propagates, so the first behavior that throws wins and later behaviors never
+/// see the original exception. If no behavior throws, the original exception is rethrown unchanged.
+/// </remarks>
 public interface IUndeleteExceptionBehavior
 {
     /// <summary>Called when an exception occurs during undelete</summary>
