@@ -303,7 +303,8 @@ public class UpdatableExtensionBehavior(IDefaultHandlerFactory handlerFactory) :
             {
                 var newRow = row.CreateNew();
                 info.PresenceField.AsInvariant(newRow, info.PresenceValue);
-                if (info.PresenceField.IndexCompare(row, newRow) != 0)
+                // use field's own comparer so that presence value might match case-insensitively or with some other custom comparison
+                if (info.PresenceField.IndexCompare(row, newRow, comparer: null) != 0)
                     return false;
             }
         }

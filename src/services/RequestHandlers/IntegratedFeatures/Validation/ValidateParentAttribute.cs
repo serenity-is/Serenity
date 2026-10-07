@@ -55,7 +55,7 @@ public class ValidateParentBehavior(IRowTypeRegistry rowTypeRegistry, ITextLocal
         if (parentId == null)
             return false;
 
-        if (isUpdate && parentIdField.IndexCompare(old!, row) == 0)
+        if (isUpdate && parentIdField.IndexCompare(old!, row, StringComparer.Ordinal) == 0)
             return false;
 
         if (string.IsNullOrEmpty(parentIdField.ForeignTable))

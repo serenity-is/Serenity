@@ -1,3 +1,5 @@
+using System.Collections;
+
 namespace Serenity.Data;
 
 /// <summary>
@@ -134,21 +136,39 @@ public abstract class GenericValueField<TValue> : Field, IEnumTypeField where TV
     }
 
     /// <summary>
-    /// Compares the field values for two rows for an ascending index sort.
+    /// Compares two values of this field using the specified comparer.
+    /// </summary>
+    /// <param name="value1">The first value.</param>
+    /// <param name="value2">The second value.</param>
+    /// <param name="comparer">The comparer, or null to use the default comparer for the value type.</param>
+    /// <returns>A value indicating the relative order of the two values.</returns>
+    protected virtual int CompareValues(TValue value1, TValue value2, IComparer? comparer)
+    {
+        if (comparer is IComparer<TValue> typed)
+            return typed.Compare(value1, value2);
+
+        return Comparer<TValue>.Default.Compare(value1, value2);
+    }
+
+    /// <summary>
+    /// Compares the field values for two rows for an ascending index sort using the specified
+    /// comparer, falling back to <see cref="Field.Comparer"/> when it is null.
     /// </summary>
     /// <param name="row1">The row1.</param>
     /// <param name="row2">The row2.</param>
+    /// <param name="comparer">The comparer, or null to use the field comparer.</param>
     /// <returns>A value indicating the relative order of the two rows.</returns>
-    public override int IndexCompare(IRow row1, IRow row2)
+    public override int IndexCompare(IRow row1, IRow row2, IComparer? comparer = null)
     {
-        var val1 = _getValue(row1);
-        if (val1.HasValue)
-        {
-            var val2 = _getValue(row2);
-            return val2.HasValue ? val1.Value.CompareTo(val2.Value) : 1;
-        }
-        else
-            return _getValue(row2).HasValue ? -1 : 0;
+        var value1 = _getValue(row1);
+        if (value1 is null)
+            return _getValue(row2) is null ? 0 : -1;
+
+        var value2 = _getValue(row2);
+        if (value2 is null)
+            return 1;
+
+        return CompareValues(value1.Value, value2.Value, comparer ?? Comparer);
     }
 
     /// <summary>

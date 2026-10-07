@@ -1,3 +1,5 @@
+using System.Collections;
+
 namespace Serenity.Data;
 
 /// <summary>
@@ -74,6 +76,43 @@ public abstract class GenericClassField<TValue> : Field where TValue : class
 
             return Convert.ChangeType(source, typeof(TValue), provider);
         }
+    }
+
+    /// <summary>
+    /// Compares two values of this field using the specified comparer.
+    /// </summary>
+    /// <param name="value1">The first value.</param>
+    /// <param name="value2">The second value.</param>
+    /// <param name="comparer">The comparer, or null to use the default comparer for the value type.</param>
+    /// <returns>A value indicating the relative order of the two values.</returns>
+    protected virtual int CompareValues(TValue value1, TValue value2, IComparer? comparer)
+    {
+        if (comparer is IComparer<TValue> typed)
+            return typed.Compare(value1, value2);
+
+        return Comparer<TValue>.Default.Compare(value1, value2);
+    }
+
+    /// <summary>
+    /// Compares the field values for two rows for an ascending index sort using the specified
+    /// comparer, falling back to <see cref="Field.Comparer"/> when it is null.
+    /// </summary>
+    /// <param name="row1">The row1.</param>
+    /// <param name="row2">The row2.</param>
+    /// <param name="comparer">The comparer, or null to use the field comparer.</param>
+    /// <returns>A value indicating the relative order of the two rows.</returns>
+    public override int IndexCompare(IRow row1, IRow row2, IComparer? comparer = null)
+    {
+        var value1 = _getValue(row1);
+        var value2 = _getValue(row2);
+
+        if (value1 is null)
+            return value2 is null ? 0 : -1;
+
+        if (value2 is null)
+            return 1;
+
+        return CompareValues(value1, value2, comparer ?? Comparer);
     }
 
     /// <inheritdoc />

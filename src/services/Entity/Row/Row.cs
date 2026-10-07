@@ -214,7 +214,7 @@ public abstract partial class Row<TFields> : IRow, IRow<TFields>
 
         if (propertyChanged != null &&
             previousValues != null &&
-            field.IndexCompare(previousValues, this) != 0)
+            field.IndexCompare(previousValues, this, StringComparer.Ordinal) != 0)
         {
             RaisePropertyChanged(field);
             field.Copy(this, previousValues);

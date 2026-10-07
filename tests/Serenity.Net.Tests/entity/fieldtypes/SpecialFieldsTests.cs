@@ -8,7 +8,7 @@ public class SpecialFieldsTests
         {
         }
 
-        public int Compare(IdNameRow? a, IdNameRow? b) => CompareValues(a!, b!);
+        public int Compare(IdNameRow? a, IdNameRow? b) => CompareValues(a!, b!, null);
 
         public IdNameRow? CloneValue(IdNameRow? value) => Clone(value);
     }
@@ -19,7 +19,7 @@ public class SpecialFieldsTests
         {
         }
 
-        public int Compare(List<IdNameRow> a, List<IdNameRow> b) => CompareValues(a, b);
+        public int Compare(List<IdNameRow> a, List<IdNameRow> b) => CompareValues(a, b, null);
 
         public List<IdNameRow>? CloneValue(List<IdNameRow>? value) => Clone(value);
     }

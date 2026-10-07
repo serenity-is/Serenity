@@ -172,6 +172,34 @@ public class UniqueFieldSaveBehaviorTests
         Assert.Empty(connection.ExecuteReaderCalls);
     }
 
+    [Fact]
+    public void OnBeforeSave_Sync_Update_CultureEquivalentChange_DoesNotSkipQuery()
+    {
+        var behavior = CreateBehavior(UniqueFieldRow.Fields.Code, new UniqueFieldRow());
+        using var connection = new MockDbConnection()
+            .InterceptExecuteReader(args => new MockDbDataReader());
+        var handler = CreateHandler(false, new UniqueFieldRow { Code = "ab" }, connection,
+            old: new UniqueFieldRow { Code = "a\u00ADb" });
+
+        behavior.OnBeforeSave(handler);
+
+        Assert.Single(connection.ExecuteReaderCalls);
+    }
+
+    [Fact]
+    public async Task OnBeforeSaveAsync_Async_Update_CultureEquivalentChange_DoesNotSkipQuery()
+    {
+        var behavior = CreateBehavior(UniqueFieldRow.Fields.Code, new UniqueFieldRow());
+        using var connection = new MockDbConnection()
+            .InterceptExecuteReader(args => new MockDbDataReader());
+        var handler = CreateHandler(false, new UniqueFieldRow { Code = "ab" }, connection,
+            old: new UniqueFieldRow { Code = "a\u00ADb" });
+
+        await behavior.OnBeforeSaveAsync(handler, CancellationToken.None);
+
+        Assert.Single(connection.ExecuteReaderCalls);
+    }
+
     private sealed class OverridingBehavior(ITextLocalizer localizer) : UniqueFieldSaveBehavior(localizer)
     {
         public bool BuildCalled { get; private set; }

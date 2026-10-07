@@ -147,7 +147,7 @@ public class SaveRequestHandlerAsync<TRow, TSaveRequest, TSaveResponse> :
 
             if (Row.IsAnyFieldAssigned)
             {
-                if (idField.IndexCompare(Old!, Row) != 0)
+                if (idField.IndexCompare(Old!, Row, StringComparer.Ordinal) != 0)
                 {
                     var update = new SqlUpdate(Row.Table);
                     update.Set(Row);

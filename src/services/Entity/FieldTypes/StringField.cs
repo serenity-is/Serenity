@@ -56,35 +56,6 @@ public class StringField(ICollection<Field> collection, string name, LocalText? 
     }
 
     /// <summary>
-    /// Compares the field values for two rows for an ascending index sort.
-    /// </summary>
-    /// <param name="row1">The row1.</param>
-    /// <param name="row2">The row2.</param>
-    /// <returns>A value indicating the relative order of the two rows.</returns>
-    public override int IndexCompare(IRow row1, IRow row2)
-    {
-        var value1 = _getValue(row1);
-        var value2 = _getValue(row2);
-
-        bool null1 = value1 == null;
-        bool null2 = value2 == null;
-        if (null1 || null2)
-        {
-            if (null1 && null2)
-                return 0;
-            else if (null1)
-                return -1;
-            else
-                return 1;
-        }
-        else
-            // TODO: IndexCompare should support an optional IComparer / culture / ignore-case
-            // option on the base Field type so string ordering is configurable. Keeping the
-            // current CurrentCulture behavior (String.CompareTo) for now.
-            return value1!.CompareTo(value2);
-    }
-
-    /// <summary>
     /// Serializes this field's value to JSON.
     /// </summary>
     /// <param name="writer">The writer.</param>

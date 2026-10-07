@@ -41,7 +41,7 @@ public abstract partial class Row<TFields> : IEditableRow
     bool IEditableRow.IsFieldChanged(Field field)
     {
         return originalValues != null &&
-                field.IndexCompare(originalValues, this) != 0;
+                field.IndexCompare(originalValues, this, StringComparer.Ordinal) != 0;
     }
 
     event PropertyChangedEventHandler? INotifyPropertyChanged.PropertyChanged
@@ -138,7 +138,7 @@ public abstract partial class Row<TFields> : IEditableRow
                 return false;
 
             for (var i = 0; i < fields.Count; i++)
-                if (fields[i].IndexCompare(originalValues, this) != 0)
+                if (fields[i].IndexCompare(originalValues, this, StringComparer.Ordinal) != 0)
                     return true;
 
             return false;

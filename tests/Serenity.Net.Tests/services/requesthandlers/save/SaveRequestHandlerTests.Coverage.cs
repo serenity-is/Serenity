@@ -156,6 +156,18 @@ public class SaveRequestHandlerTests_Coverage
     }
 
     [Fact]
+    public void HandleNonEditable_Update_CultureEquivalentChange_IsTreatedAsChanged()
+    {
+        var handler = NewHandler();
+        var row = new CoverRow { Name = "ab" };
+        var old = new CoverRow { Name = "a\u00ADb" };
+        handler.SetRow(row);
+        handler.SetOld(old);
+
+        Assert.Throws<ValidationError>(() => handler.DoHandleNonEditable(row.GetFields().Name));
+    }
+
+    [Fact]
     public void HandleNonEditable_Update_NonTable_Clears()
     {
         var handler = NewHandler();

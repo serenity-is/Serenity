@@ -140,7 +140,7 @@ public static class ServiceHelper
         {
             bool anyDifferent = false;
             foreach (var field in indexFields)
-                if (field.IndexCompare(oldRow, newRow) != 0)
+                if (field.IndexCompare(oldRow, newRow, StringComparer.Ordinal) != 0)
                 {
                     anyDifferent = true;
                     break;
@@ -162,6 +162,6 @@ public static class ServiceHelper
         if (!query.GetFirst(connection))
             return false;
 
-        return idField.IndexCompare(row, newRow) != 0;
+        return idField.IndexCompare(row, newRow, StringComparer.Ordinal) != 0;
     }
 }

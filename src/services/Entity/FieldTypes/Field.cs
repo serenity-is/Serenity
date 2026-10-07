@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Text.Json;
 
 namespace Serenity.Data;
@@ -31,6 +32,10 @@ public abstract partial class Field : IFieldWithJoinInfo
     internal string? readPermission;
     internal string? insertPermission;
     internal string? updatePermission;
+    /// <summary>
+    /// The comparer used by <see cref="IndexCompare(IRow, IRow, IComparer?)"/> by default.
+    /// </summary>
+    protected internal IComparer? comparer;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Field"/> class.
@@ -580,12 +585,30 @@ public abstract partial class Field : IFieldWithJoinInfo
     }
 
     /// <summary>
-    /// Compares the field values for two rows for an ascending index sort.
+    /// Compares the field values for two rows for an ascending index sort using the specified
+    /// comparer, falling back to <see cref="Comparer"/> when it is null.
     /// </summary>
+    /// <remarks>
+    /// The comparer is only used when it implements <see cref="IComparer{T}"/> for the field's
+    /// value type (e.g. <see cref="StringComparer"/> for string fields, <see cref="Comparer{T}"/>
+    /// for other types). Non-generic comparers are intentionally ignored to avoid boxing value
+    /// types.
+    /// </remarks>
     /// <param name="row1">The row1.</param>
     /// <param name="row2">The row2.</param>
+    /// <param name="comparer">The comparer to use, or null to use <see cref="Comparer"/>.</param>
     /// <returns>A value indicating the relative order of the two rows.</returns>
-    public abstract int IndexCompare(IRow row1, IRow row2);
+    public abstract int IndexCompare(IRow row1, IRow row2, IComparer? comparer = null);
+
+    /// <summary>
+    /// Gets the comparer used by <see cref="IndexCompare(IRow, IRow, IComparer)"/> when no
+    /// comparer is passed explicitly. Set the protected <c>comparer</c> field during field
+    /// initialization to configure it.
+    /// </summary>
+    /// <value>
+    /// The comparer.
+    /// </value>
+    public IComparer? Comparer => comparer;
 
     /// <summary>
     /// Gets the value of this row as an object.

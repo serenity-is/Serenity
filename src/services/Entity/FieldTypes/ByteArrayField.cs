@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Text.Json;
 
 namespace Serenity.Data;
@@ -76,13 +77,15 @@ public class ByteArrayField(ICollection<Field> collection, string name, LocalTex
     /// </summary>
     /// <param name="value1">The value1.</param>
     /// <param name="value2">The value2.</param>
+    /// <param name="comparer">The comparer.</param>
     /// <returns>A value indicating the relative order of the two values.</returns>
-    protected override int CompareValues(byte[] value1, byte[] value2)
+    protected override int CompareValues(byte[] value1, byte[] value2, IComparer? comparer)
     {
+        var byteComparer = comparer as IComparer<byte> ?? Comparer<byte>.Default;
         var length = Math.Min(value1.Length, value2.Length);
         for (var i = 0; i < length; i++)
         {
-            var c = value1[i].CompareTo(value2[i]);
+            var c = byteComparer.Compare(value1[i], value2[i]);
             if (c != 0)
                 return c;
         }

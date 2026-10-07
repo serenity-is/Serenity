@@ -9,11 +9,13 @@ public class ServiceHelperTests
         [IdProperty]
         public int? ID { get => fields.ID[this]; set => fields.ID[this] = value; }
         public int? Number { get => fields.Number[this]; set => fields.Number[this] = value; }
+        public string? Name { get => fields.Name[this]; set => fields.Name[this] = value; }
 
         public class RowFields : RowFieldsBase
         {
             public Int32Field ID = null!;
             public Int32Field Number = null!;
+            public StringField Name = null!;
         }
     }
 
@@ -259,6 +261,21 @@ public class ServiceHelperTests
 
         var result = ServiceHelper.IsUniqueIndexException(connection, new Exception("UQ_Test"),
             "UQ_Test", oldRow, newRow, Fields.Number);
+
+        Assert.True(result);
+    }
+
+    [Fact]
+    public void IsUniqueIndexException_Old_Row_CultureEquivalentChange_Counts_As_Different()
+    {
+        using var connection = new MockDbConnection()
+            .OnDbCommandExecuteReader(_ => new MockDbDataReader(new { ID = 99 }));
+
+        var oldRow = new TestRow { ID = 5, Name = "a\u00ADb" };
+        var newRow = new TestRow { ID = 5, Name = "ab" };
+
+        var result = ServiceHelper.IsUniqueIndexException(connection, new Exception("UQ_Test"),
+            "UQ_Test", oldRow, newRow, Fields.Name);
 
         Assert.True(result);
     }

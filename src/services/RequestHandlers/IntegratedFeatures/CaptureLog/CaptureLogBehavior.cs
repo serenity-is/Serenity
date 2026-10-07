@@ -155,7 +155,7 @@ public class CaptureLogBehavior : BaseSaveDeleteBehaviorAsync, ISaveBehaviorSync
             if (handler.Row is IUpdateUserIdRow updateUserIdRow && ReferenceEquals(updateUserIdRow.UpdateUserIdField, field))
                 continue;
 
-            if (field.IndexCompare(handler.Old!, handler.Row) != 0)
+            if (field.IndexCompare(handler.Old!, handler.Row, StringComparer.Ordinal) != 0)
                 return true;
         }
 

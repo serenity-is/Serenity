@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Text.Json;
 
 namespace Serenity.Data;
@@ -56,28 +57,18 @@ public class VariantField(ICollection<Field> collection, string name, LocalText?
     }
 
     /// <summary>
-    /// Compares the field values for two rows for an ascending index sort.
+    /// Compares two values of this field using the specified comparer.
     /// </summary>
-    /// <param name="row1">The row1.</param>
-    /// <param name="row2">The row2.</param>
-    /// <returns>A value indicating the relative order of the two rows.</returns>
-    public override int IndexCompare(IRow row1, IRow row2)
+    /// <param name="value1">The first value.</param>
+    /// <param name="value2">The second value.</param>
+    /// <param name="comparer">The comparer, or null to use the default comparer for the value type.</param>
+    /// <returns>A value indicating the relative order of the two values.</returns>
+    protected override int CompareValues(object value1, object value2, IComparer? comparer)
     {
-        var value1 = _getValue(row1);
-        var value2 = _getValue(row2);
+        if (value1 is string string1 && value2 is string string2 && comparer is IComparer<string> stringComparer)
+            return stringComparer.Compare(string1, string2);
 
-        bool null1 = value1 is null;
-        bool null2 = value2 is null;
-        if (null1 || null2)
-        {
-            if (null1 && null2)
-                return 0;
-            else if (null1)
-                return -1;
-            else
-                return 1;
-        }
-        else if (value1!.GetType() == value2!.GetType() && value1 is IComparable comparable)
+        if (value1.GetType() == value2.GetType() && value1 is IComparable comparable)
             return comparable.CompareTo(value2);
 
         return string.Compare(

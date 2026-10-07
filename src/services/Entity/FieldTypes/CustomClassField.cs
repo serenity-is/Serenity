@@ -54,43 +54,6 @@ public class CustomClassField<TValue>(ICollection<Field> collection, string name
     }
 
     /// <summary>
-    /// Compares the values.
-    /// </summary>
-    /// <param name="value1">The value1.</param>
-    /// <param name="value2">The value2.</param>
-    /// <returns>A value indicating the relative order of the two values.</returns>
-    protected virtual int CompareValues(TValue value1, TValue value2)
-    {
-        return Comparer<TValue>.Default.Compare(value1, value2);
-    }
-
-    /// <summary>
-    /// Compares the field values for two rows for an ascending index sort.
-    /// </summary>
-    /// <param name="row1">The row1.</param>
-    /// <param name="row2">The row2.</param>
-    /// <returns>A value indicating the relative order of the two rows.</returns>
-    public override int IndexCompare(IRow row1, IRow row2)
-    {
-        var value1 = _getValue(row1);
-        var value2 = _getValue(row2);
-
-        bool null1 = value1 == null;
-        bool null2 = value2 == null;
-        if (null1 || null2)
-        {
-            if (null1 && null2)
-                return 0;
-            else if (null1)
-                return -1;
-            else
-                return 1;
-        }
-        else
-            return CompareValues(value1!, value2!);
-    }
-
-    /// <summary>
     /// Serializes this field's value to JSON.
     /// </summary>
     /// <param name="writer">The writer.</param>

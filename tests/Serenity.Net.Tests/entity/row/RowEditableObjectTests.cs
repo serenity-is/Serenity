@@ -139,6 +139,20 @@ public class RowEditableObjectTests
     }
 
     [Fact]
+    public void IsFieldChanged_CultureEquivalentChange_IsChanged()
+    {
+        var row = new IdNameRow { Name = "a\u00ADb" };
+        var editable = (IEditableRow)row;
+        var fields = row.GetFields();
+
+        ((IEditableObject)row).BeginEdit();
+        row.Name = "ab";
+
+        Assert.True(editable.IsFieldChanged(fields.Name));
+        Assert.True(editable.IsAnyFieldChanged);
+    }
+
+    [Fact]
     public void PostHandler_HasPostHandler_FalseByDefault_SetGetWorks()
     {
         var row = new IdNameRow();
@@ -305,6 +319,21 @@ public class RowEditableObjectTests
         row.Name = "Test2";
 
         Assert.Single(received);
+    }
+
+    [Fact]
+    public void PropertyChanged_CultureEquivalentChange_RaisesEvent()
+    {
+        var row = new IdNameRow();
+        var notify = (INotifyPropertyChanged)row;
+        var received = new List<PropertyChangedEventArgs>();
+        void handler(object? s, PropertyChangedEventArgs e) => received.Add(e);
+
+        notify.PropertyChanged += handler;
+        row.Name = "a\u00ADb";
+        row.Name = "ab";
+
+        Assert.Equal(2, received.Count);
     }
 
     [Fact]

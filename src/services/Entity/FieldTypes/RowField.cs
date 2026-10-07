@@ -1,3 +1,5 @@
+using System.Collections;
+
 namespace Serenity.Data;
 
 /// <summary>
@@ -25,8 +27,9 @@ public class RowField<TForeign>(ICollection<Field> collection, string name, Loca
     /// </summary>
     /// <param name="value1">The value1.</param>
     /// <param name="value2">The value2.</param>
+    /// <param name="comparer">The comparer.</param>
     /// <returns>A value indicating the relative order of the two values.</returns>
-    protected override int CompareValues(TForeign value1, TForeign value2)
+    protected override int CompareValues(TForeign value1, TForeign value2, IComparer? comparer)
     {
         if (value1 == null && value2 == null)
             return 0;
@@ -39,7 +42,7 @@ public class RowField<TForeign>(ICollection<Field> collection, string name, Loca
 
         foreach (var f in value1.Fields)
         {
-            var c = f.IndexCompare(value1, value2);
+            var c = f.IndexCompare(value1, value2, comparer);
             if (c != 0)
                 return c;
         }

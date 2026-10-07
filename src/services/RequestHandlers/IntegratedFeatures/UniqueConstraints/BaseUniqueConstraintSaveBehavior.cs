@@ -21,7 +21,7 @@ public abstract class BaseUniqueConstraintSaveBehavior : BaseSaveBehaviorAsync, 
     protected virtual void ValidateUniqueConstraint(ISaveRequestHandler handler, IEnumerable<Field> fields,
         ITextLocalizer localizer, string? errorMessage = null, BaseCriteria? groupCriteria = null)
     {
-        if (handler.IsUpdate && !fields.Any(x => x.IndexCompare(handler.Old!, handler.Row) != 0))
+        if (handler.IsUpdate && !fields.Any(x => x.IndexCompare(handler.Old!, handler.Row, StringComparer.Ordinal) != 0))
             return;
 
         var query = BuildUniqueConstraintQuery(handler, fields, groupCriteria);
@@ -44,7 +44,7 @@ public abstract class BaseUniqueConstraintSaveBehavior : BaseSaveBehaviorAsync, 
         ITextLocalizer localizer, string? errorMessage = null, BaseCriteria? groupCriteria = null,
         CancellationToken cancellationToken = default)
     {
-        if (handler.IsUpdate && !fields.Any(x => x.IndexCompare(handler.Old!, handler.Row) != 0))
+        if (handler.IsUpdate && !fields.Any(x => x.IndexCompare(handler.Old!, handler.Row, StringComparer.Ordinal) != 0))
             return;
 
         var query = BuildUniqueConstraintQuery(handler, fields, groupCriteria);

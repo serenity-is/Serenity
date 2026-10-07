@@ -1,3 +1,4 @@
+using System.Collections;
 using System.IO;
 using System.Text.Json;
 
@@ -73,13 +74,14 @@ public class StreamField(ICollection<Field> collection, string name, LocalText? 
     }
 
     /// <summary>
-    /// Compares the field values for two rows for an ascending index sort.
+    /// Compares two values of this field using the specified comparer.
     /// </summary>
-    /// <param name="row1">The row1.</param>
-    /// <param name="row2">The row2.</param>
-    /// <returns>A value indicating the relative order of the two rows.</returns>
+    /// <param name="value1">The first value.</param>
+    /// <param name="value2">The second value.</param>
+    /// <param name="comparer">The comparer, or null to use the default comparer for the value type.</param>
+    /// <returns>A value indicating the relative order of the two values.</returns>
     /// <exception cref="NotImplementedException">This method is not implemented.</exception>
-    public override int IndexCompare(IRow row1, IRow row2)
+    protected override int CompareValues(Stream value1, Stream value2, IComparer? comparer)
     {
         throw new NotImplementedException();
     }

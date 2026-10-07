@@ -416,7 +416,7 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
                 {
                     if (item.IsAssigned(field) &&
                         (field.Flags & FieldFlags.Updatable) == FieldFlags.Updatable &&
-                        field.IndexCompare(old, item) != 0)
+                        field.IndexCompare(old, item, StringComparer.Ordinal) != 0)
                     {
                         anyChanges = true;
                         break;

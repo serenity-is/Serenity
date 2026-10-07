@@ -372,4 +372,56 @@ public class StringFieldTests
         Assert.Contains("ConvertValue", ex.Message);
         Assert.Contains("AString", ex.Message);
     }
+
+    [TableName("ComparerTest")]
+    private class ComparerRow : Row<ComparerRow.RowFields>, IRow
+    {
+        public string? Name { get => fields.Name[this]; set => fields.Name[this] = value; }
+
+        public ComparerRow()
+        {
+        }
+
+        public ComparerRow(RowFields fields) : base(fields)
+        {
+        }
+
+        public class RowFields : RowFieldsBase
+        {
+            public StringField Name = null!;
+        }
+    }
+
+    private static ComparerRow NewComparerRow()
+    {
+        var fields = new ComparerRow.RowFields();
+        fields.Initialize(annotations: null, dialect: SqlSettings.DefaultDialect, userEntityOptions: null);
+        return new ComparerRow(fields);
+    }
+
+    [Fact]
+    public void IndexCompare_WithComparer_UsesComparer()
+    {
+        var row1 = NewComparerRow();
+        var row2 = NewComparerRow();
+        var field = row1.GetFields().Name;
+        row1.Name = "a";
+        row2.Name = "B";
+
+        Assert.True(field.IndexCompare(row1, row2, StringComparer.Ordinal) > 0);
+        Assert.True(field.IndexCompare(row1, row2, StringComparer.OrdinalIgnoreCase) < 0);
+    }
+
+    [Fact]
+    public void IndexCompare_UsesFieldComparer_WhenNoComparerPassed()
+    {
+        var row1 = NewComparerRow();
+        var row2 = NewComparerRow();
+        var field = row1.GetFields().Name;
+        field.comparer = StringComparer.OrdinalIgnoreCase;
+        row1.Name = "a";
+        row2.Name = "B";
+
+        Assert.True(field.IndexCompare(row1, row2) < 0);
+    }
 }

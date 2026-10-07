@@ -108,7 +108,7 @@ public abstract class SaveRequestHandlerBase<TRow, TSaveRequest, TSaveResponse>(
     /// <param name="field">The field to handle.</param>
     protected virtual void HandleNonEditable(Field field)
     {
-        if (IsUpdate && field.IndexCompare(Row, Old!) == 0)
+        if (IsUpdate && field.IndexCompare(Row, Old!, StringComparer.Ordinal) == 0)
         {
             field.CopyNoAssignment(Old!, Row);
             Row.ClearAssignment(field);
