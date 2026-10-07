@@ -1,5 +1,12 @@
 namespace Serenity.Services;
 
+/// <summary>
+/// Generic handler proxy that resolves the undelete handler for <typeparamref name="TRow"/> through
+/// <see cref="IDefaultHandlerFactory"/> and forwards calls to it.
+/// </summary>
+/// <remarks>
+/// See <see cref="Serenity.Extensions.DependencyInjection.ServiceCollectionExtensions.AddProxyRequestHandlers"/> for why these exist.
+/// </remarks>
 internal class UndeleteHandlerProxy<TRow, TUndeleteRequest, TUndeleteResponse>
     : IUndeleteHandler<TRow, TUndeleteRequest, TUndeleteResponse>
     where TRow : class, IRow, IIdRow, new()
@@ -12,7 +19,7 @@ internal class UndeleteHandlerProxy<TRow, TUndeleteRequest, TUndeleteResponse>
     {
         ArgumentNullException.ThrowIfNull(factory);
 
-        handler = (IUndeleteHandler<TRow, TUndeleteRequest, TUndeleteResponse>) factory.CreateHandler<IUndeleteRequestProcessor>(typeof(TRow));
+        handler = factory.CreateHandlerForProxy<IUndeleteRequestProcessor, IUndeleteHandler<TRow, TUndeleteRequest, TUndeleteResponse>>(typeof(TRow));
     }
 
     public TUndeleteResponse Undelete(IUnitOfWork uow, TUndeleteRequest request)

@@ -1,5 +1,12 @@
 namespace Serenity.Services;
 
+/// <summary>
+/// Generic handler proxy that resolves the retrieve handler for <typeparamref name="TRow"/> through
+/// <see cref="IDefaultHandlerFactory"/> and forwards calls to it.
+/// </summary>
+/// <remarks>
+/// See <see cref="Serenity.Extensions.DependencyInjection.ServiceCollectionExtensions.AddProxyRequestHandlers"/> for why these exist.
+/// </remarks>
 internal class RetrieveHandlerProxyAsync<TRow, TRetrieveRequest, TRetrieveResponse>
     : IRetrieveHandlerAsync<TRow, TRetrieveRequest, TRetrieveResponse>
     where TRow : class, IRow, IIdRow, new()
@@ -12,7 +19,7 @@ internal class RetrieveHandlerProxyAsync<TRow, TRetrieveRequest, TRetrieveRespon
     {
         ArgumentNullException.ThrowIfNull(factory);
 
-        handler = (IRetrieveHandlerAsync<TRow, TRetrieveRequest, TRetrieveResponse>) factory.CreateHandler<IRetrieveRequestProcessorAsync>(typeof(TRow));
+        handler = factory.CreateHandlerForProxy<IRetrieveRequestProcessorAsync, IRetrieveHandlerAsync<TRow, TRetrieveRequest, TRetrieveResponse>>(typeof(TRow));
     }
 
     public Task<TRetrieveResponse> RetrieveAsync(IDbConnection connection, TRetrieveRequest request, CancellationToken cancellationToken = default)

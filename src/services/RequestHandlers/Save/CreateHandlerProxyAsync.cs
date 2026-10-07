@@ -1,5 +1,12 @@
 namespace Serenity.Services;
 
+/// <summary>
+/// Generic handler proxy that resolves the create handler for <typeparamref name="TRow"/> through
+/// <see cref="IDefaultHandlerFactory"/> and forwards calls to it.
+/// </summary>
+/// <remarks>
+/// See <see cref="Serenity.Extensions.DependencyInjection.ServiceCollectionExtensions.AddProxyRequestHandlers"/> for why these exist.
+/// </remarks>
 internal class CreateHandlerProxyAsync<TRow, TSaveRequest, TSaveResponse>
     : ICreateHandlerAsync<TRow, TSaveRequest, TSaveResponse>
     where TRow : class, IRow, IIdRow, new()
@@ -12,7 +19,7 @@ internal class CreateHandlerProxyAsync<TRow, TSaveRequest, TSaveResponse>
     {
         ArgumentNullException.ThrowIfNull(factory);
 
-        handler = (ICreateHandlerAsync<TRow, TSaveRequest, TSaveResponse>) factory.CreateHandler<ISaveRequestProcessorAsync>(typeof(TRow));
+        handler = factory.CreateHandlerForProxy<ISaveRequestProcessorAsync, ICreateHandlerAsync<TRow, TSaveRequest, TSaveResponse>>(typeof(TRow));
     }
 
     public Task<TSaveResponse> CreateAsync(IUnitOfWork uow, TSaveRequest request, CancellationToken cancellationToken = default)

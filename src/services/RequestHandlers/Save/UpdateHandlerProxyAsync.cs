@@ -1,5 +1,12 @@
 namespace Serenity.Services;
 
+/// <summary>
+/// Generic handler proxy that resolves the update handler for <typeparamref name="TRow"/> through
+/// <see cref="IDefaultHandlerFactory"/> and forwards calls to it.
+/// </summary>
+/// <remarks>
+/// See <see cref="Serenity.Extensions.DependencyInjection.ServiceCollectionExtensions.AddProxyRequestHandlers"/> for why these exist.
+/// </remarks>
 internal class UpdateHandlerProxyAsync<TRow, TSaveRequest, TSaveResponse>
     : IUpdateHandlerAsync<TRow, TSaveRequest, TSaveResponse>
     where TRow : class, IRow, IIdRow, new()
@@ -12,7 +19,7 @@ internal class UpdateHandlerProxyAsync<TRow, TSaveRequest, TSaveResponse>
     {
         ArgumentNullException.ThrowIfNull(factory);
 
-        handler = (IUpdateHandlerAsync<TRow, TSaveRequest, TSaveResponse>) factory.CreateHandler<ISaveRequestProcessorAsync>(typeof(TRow));
+        handler = factory.CreateHandlerForProxy<ISaveRequestProcessorAsync, IUpdateHandlerAsync<TRow, TSaveRequest, TSaveResponse>>(typeof(TRow));
     }
 
     public Task<TSaveResponse> UpdateAsync(IUnitOfWork uow, TSaveRequest request, CancellationToken cancellationToken = default)

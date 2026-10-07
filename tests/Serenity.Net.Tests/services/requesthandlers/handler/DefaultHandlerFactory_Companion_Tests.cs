@@ -157,4 +157,16 @@ public class DefaultHandlerFactory_Companion_Tests
 
         Assert.IsType<ICreateHandler<TestRow>>(proxy, exactMatch: false);
     }
+
+    [Fact]
+    public void CreateHandler_With_Mismatched_Expected_Interface_Throws_Descriptive_Error()
+    {
+        var factory = CreateFactory();
+
+        var ex = Assert.Throws<InvalidProgramException>(() =>
+            factory.CreateHandler<ISaveRequestProcessor, IListHandler<TestRow>>(typeof(TestRow)));
+
+        Assert.Contains(typeof(TestRow).FullName!, ex.Message);
+        Assert.Contains(typeof(IListHandler<TestRow>).FullName!, ex.Message);
+    }
 }

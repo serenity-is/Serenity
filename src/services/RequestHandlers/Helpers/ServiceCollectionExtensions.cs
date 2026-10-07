@@ -43,6 +43,16 @@ public static class ServiceCollectionExtensions
     /// Registers proxy activators for the DI container to resolve generic request handler instances
     /// like <see cref="ICreateHandler{TRow}" />, <see cref="IListHandler{TRow}" /> etc.
     /// </summary>
+    /// <remarks>
+    /// These open-generic proxies let the container resolve a handler by its generic request-handler
+    /// interface (e.g. <see cref="ICreateHandler{TRow}"/>, <see cref="IListHandler{TRow}"/>) without
+    /// requiring a per-entity handler interface. They were introduced while migrating from the
+    /// repository to the handler pattern, to ease that transition. The code generator now emits a
+    /// per-entity handler interface and class (e.g. <c>IOrderSaveHandler</c>/<c>OrderSaveHandler</c>),
+    /// which is the recommended approach; these proxies remain as a compatibility/fallback path.
+    /// They are registered after custom handlers, so a concrete handler (which also implements the
+    /// generic interface) takes precedence.
+    /// </remarks>
     /// <param name="collection">Service collection</param>
     public static IServiceCollection AddProxyRequestHandlers(this IServiceCollection collection)
     {

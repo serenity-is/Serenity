@@ -1,5 +1,12 @@
 namespace Serenity.Services;
 
+/// <summary>
+/// Generic handler proxy that resolves the delete handler for <typeparamref name="TRow"/> through
+/// <see cref="IDefaultHandlerFactory"/> and forwards calls to it.
+/// </summary>
+/// <remarks>
+/// See <see cref="ServiceCollectionExtensions.AddProxyRequestHandlers"/> for why these exist.
+/// </remarks>
 internal class DeleteHandlerProxy<TRow, TDeleteRequest, TDeleteResponse>
     : IDeleteHandler<TRow, TDeleteRequest, TDeleteResponse>
     where TRow : class, IRow, IIdRow, new()
@@ -12,7 +19,7 @@ internal class DeleteHandlerProxy<TRow, TDeleteRequest, TDeleteResponse>
     {
         ArgumentNullException.ThrowIfNull(factory);
 
-        handler = (IDeleteHandler<TRow, TDeleteRequest, TDeleteResponse>) factory.CreateHandler<IDeleteRequestProcessor>(typeof(TRow));
+        handler = factory.CreateHandlerForProxy<IDeleteRequestProcessor, IDeleteHandler<TRow, TDeleteRequest, TDeleteResponse>>(typeof(TRow));
     }
 
     public TDeleteResponse Delete(IUnitOfWork uow, TDeleteRequest request)

@@ -1,5 +1,12 @@
 namespace Serenity.Services;
 
+/// <summary>
+/// Generic handler proxy that resolves the list handler for <typeparamref name="TRow"/> through
+/// <see cref="IDefaultHandlerFactory"/> and forwards calls to it.
+/// </summary>
+/// <remarks>
+/// See <see cref="Serenity.Extensions.DependencyInjection.ServiceCollectionExtensions.AddProxyRequestHandlers"/> for why these exist.
+/// </remarks>
 internal class ListHandlerProxyAsync<TRow, TListRequest, TListResponse>
     : IListHandlerAsync<TRow, TListRequest, TListResponse>
     where TRow : class, IRow, IIdRow, new()
@@ -12,7 +19,7 @@ internal class ListHandlerProxyAsync<TRow, TListRequest, TListResponse>
     {
         ArgumentNullException.ThrowIfNull(factory);
 
-        handler = (IListHandlerAsync<TRow, TListRequest, TListResponse>) factory.CreateHandler<IListRequestProcessorAsync>(typeof(TRow));
+        handler = factory.CreateHandlerForProxy<IListRequestProcessorAsync, IListHandlerAsync<TRow, TListRequest, TListResponse>>(typeof(TRow));
     }
 
     public Task<TListResponse> ListAsync(IDbConnection connection, TListRequest request, CancellationToken cancellationToken = default)
