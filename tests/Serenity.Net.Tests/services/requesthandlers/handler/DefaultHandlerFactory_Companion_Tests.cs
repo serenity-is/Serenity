@@ -164,7 +164,7 @@ public class DefaultHandlerFactory_Companion_Tests
         var factory = CreateFactory();
 
         var ex = Assert.Throws<InvalidProgramException>(() =>
-            factory.CreateHandler<ISaveRequestProcessor, IListHandler<TestRow>>(typeof(TestRow)));
+            factory.CreateHandlerForProxy<ISaveRequestProcessor, IListHandler<TestRow>>(typeof(TestRow)));
 
         Assert.Contains(typeof(TestRow).FullName!, ex.Message);
         Assert.Contains(typeof(IListHandler<TestRow>).FullName!, ex.Message);

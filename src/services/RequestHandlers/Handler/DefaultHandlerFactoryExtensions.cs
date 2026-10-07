@@ -1,4 +1,4 @@
-﻿namespace Serenity.Services;
+namespace Serenity.Services;
 
 /// <summary>
 /// Extension methods for <see cref="IDefaultHandlerFactory"/>
@@ -25,7 +25,7 @@ public static class DefaultHandlerFactoryExtensions
     /// </summary>
     /// <remarks>
     /// Used by the generic request handler proxies (see
-    /// <see cref="ServiceCollectionExtensions.AddProxyRequestHandlers"/>) to adapt the processor
+    /// <see cref="Serenity.Extensions.DependencyInjection.ServiceCollectionExtensions.AddProxyRequestHandlers"/>) to adapt the processor
     /// interface they resolve from <see cref="IDefaultHandlerFactory"/> to the generic handler
     /// interface the proxy exposes.
     /// </remarks>
