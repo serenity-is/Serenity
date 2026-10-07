@@ -155,6 +155,20 @@ public class ListRowAndRowListFieldTests
     }
 
     [Fact]
+    public void Row_Clone_DoesNotShare_RowListValues()
+    {
+        var row = NewRow();
+        row.ARowList = [MakeIdName(1, "a")];
+
+        var clone = (AllFieldsRow)((IRow)row).CloneRow();
+
+        Assert.NotNull(clone.ARowList);
+        Assert.NotSame(row.ARowList, clone.ARowList);
+        Assert.NotSame(row.ARowList[0], clone.ARowList[0]);
+        Assert.Equal(1, clone.ARowList[0].ID);
+    }
+
+    [Fact]
     public void RowListField_IndexCompare_RowWiseComparison()
     {
         var field = AllFieldsRow.Fields.ARowList;

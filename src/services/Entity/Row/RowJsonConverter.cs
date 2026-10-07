@@ -172,7 +172,7 @@ public class RowJsonConverter : JsonConverter<IRow>
                                 JsonTokenType.False => false,
                                 JsonTokenType.True => true,
                                 JsonTokenType.String => reader.GetString(),
-                                JsonTokenType.Number => reader.GetDouble(),
+                                JsonTokenType.Number => reader.TryGetInt64(out var l) ? (object)l : reader.GetDouble(),
                                 JsonTokenType.StartArray => JsonSerializer.Deserialize<object[]>(ref reader, options),
                                 JsonTokenType.StartObject => JsonSerializer.Deserialize<Dictionary<string, object?>>(ref reader, options),
                                 _ => throw new JsonException("Unexpected error while deserializing field extension value!"),

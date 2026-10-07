@@ -224,6 +224,27 @@ public class NewtonsoftJsonRowConverterTests
     }
 
     [Fact]
+    public void Deserialize_WithShouldDeserializeExtension_ObjectAndArray_ConsumesNestedValues()
+    {
+        var old = JsonRowConverter.SetLocalShouldDeserializeExtension((_, key) => key is "Extra" or "Arr");
+        try
+        {
+            var row = Newtonsoft.Json.JsonConvert.DeserializeObject<IdNameRow>(
+                """{"ID":1,"Extra":{"a":1},"Arr":[1,2],"Name":"x"}""");
+
+            Assert.NotNull(row);
+            Assert.Equal(1, row.ID);
+            Assert.Equal("x", row.Name);
+            Assert.IsType<Dictionary<string, object?>>(((IRow)row).GetDictionaryData("Extra"));
+            Assert.IsType<object[]>(((IRow)row).GetDictionaryData("Arr"));
+        }
+        finally
+        {
+            JsonRowConverter.SetLocalShouldDeserializeExtension(old);
+        }
+    }
+
+    [Fact]
     public void RoundTrip_IdNameRow_PreservesValues()
     {
         var row = new IdNameRow { ID = 42, Name = "Test" };

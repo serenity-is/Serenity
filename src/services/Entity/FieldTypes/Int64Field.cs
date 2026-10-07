@@ -163,7 +163,10 @@ public sealed class Int64Field(ICollection<Field> collection, string name, Local
         var value = _getValue(row);
         if (value == null)
             writer.WriteNullValue();
+        else if (value.Value > 9007199254740992L ||
+            value.Value < -9007199254740992L)
+            writer.WriteStringValue(value.Value.ToString(CultureInfo.InvariantCulture));
         else
-            JsonSerializer.Serialize(writer, value.Value, options);
+            writer.WriteNumberValue(value.Value);
     }
 }

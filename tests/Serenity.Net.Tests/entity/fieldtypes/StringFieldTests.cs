@@ -350,4 +350,26 @@ public class StringFieldTests
         field.Caption = "Db.AllFields.AString";
         Assert.Equal("Db.AllFields.AString", field.GetTitle(null).ToString());
     }
+
+    [Fact]
+    public void ValueFromJson_Stj_LargeNumber_PreservesPrecision()
+    {
+        var row = NewRow();
+        var field = AllFieldsRow.Fields.AString;
+        var bytes = Encoding.UTF8.GetBytes("9007199254740993");
+        var reader = new Utf8JsonReader(bytes);
+        reader.Read();
+        field.ValueFromJson(ref reader, row, new JsonSerializerOptions());
+        Assert.Equal("9007199254740993", field[row]);
+    }
+
+    [Fact]
+    public void AsObject_WrongType_ThrowsWithContext()
+    {
+        var row = NewRow();
+        var field = AllFieldsRow.Fields.AString;
+        var ex = Assert.Throws<InvalidCastException>(() => field.AsObject(row, 5));
+        Assert.Contains("ConvertValue", ex.Message);
+        Assert.Contains("AString", ex.Message);
+    }
 }

@@ -115,15 +115,6 @@ public abstract partial class Row<TFields> : IRow, IRow<TFields>
         else
             clone.dictionaryData = null;
 
-        if (indexedData != null)
-        {
-            clone.indexedData = new object[indexedData.Length];
-            for (var i = 0; i < indexedData.Length; i++)
-                clone.indexedData[i] = indexedData[i];
-        }
-        else
-            clone.indexedData = null;
-
         if (previousValues != null)
             clone.previousValues = previousValues.CloneRow();
         else

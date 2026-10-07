@@ -161,7 +161,20 @@ public class JsonRowConverter : JsonConverter
                     if (field is null)
                     {
                         if (deserializeAsExtension)
-                            row.SetDictionaryData(fieldName, reader.Value);
+                        {
+                            object? v = reader.TokenType switch
+                            {
+                                Newtonsoft.Json.JsonToken.Null => null,
+                                Newtonsoft.Json.JsonToken.Boolean => (bool)reader.Value!,
+                                Newtonsoft.Json.JsonToken.String => (string?)reader.Value,
+                                Newtonsoft.Json.JsonToken.Integer => Convert.ToInt64(reader.Value, CultureInfo.InvariantCulture),
+                                Newtonsoft.Json.JsonToken.Float => Convert.ToDouble(reader.Value, CultureInfo.InvariantCulture),
+                                Newtonsoft.Json.JsonToken.StartArray => serializer.Deserialize<object[]>(reader),
+                                Newtonsoft.Json.JsonToken.StartObject => serializer.Deserialize<Dictionary<string, object?>>(reader),
+                                _ => throw new JsonSerializationException("Unexpected error while deserializing field extension value!"),
+                            };
+                            row.SetDictionaryData(fieldName, v);
+                        }
                         else
                             reader.Skip();
                     }

@@ -213,6 +213,23 @@ public class RowJsonConverterTests
     }
 
     [Fact]
+    public void ShouldDeserializeExtension_LargeNumber_StoresInt64()
+    {
+        var old = RowJsonConverter.SetLocalShouldDeserializeExtension((_, key) => key == "Extra");
+        try
+        {
+            var row = JsonSerializer.Deserialize<IdNameRow>("""{"ID":1,"Extra":9007199254740993}""", NewOptions());
+
+            Assert.NotNull(row);
+            Assert.Equal(9007199254740993L, ((IRow)row).GetDictionaryData("Extra"));
+        }
+        finally
+        {
+            RowJsonConverter.SetLocalShouldDeserializeExtension(old);
+        }
+    }
+
+    [Fact]
     public void RoundTrip_IdNameRow_PreservesValues()
     {
         var row = new IdNameRow { ID = 42, Name = "Test" };

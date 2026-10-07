@@ -279,6 +279,32 @@ public class StreamFieldTests
     }
 
     [Fact]
+    public void ValueToJson_Stj_DoesNotConsumeStream()
+    {
+        var row = NewRow();
+        var field = AllFieldsRow.Fields.AStream;
+        var stream = new System.IO.MemoryStream([1, 2]);
+        stream.Position = 0;
+        field[row] = stream;
+
+        using var ms1 = new System.IO.MemoryStream();
+        using (var writer1 = new Utf8JsonWriter(ms1))
+        {
+            field.ValueToJson(writer1, row, new JsonSerializerOptions());
+        }
+
+        Assert.Equal(0, stream.Position);
+
+        using var ms2 = new System.IO.MemoryStream();
+        using (var writer2 = new Utf8JsonWriter(ms2))
+        {
+            field.ValueToJson(writer2, row, new JsonSerializerOptions());
+        }
+
+        Assert.Equal(Encoding.UTF8.GetString(ms1.ToArray()), Encoding.UTF8.GetString(ms2.ToArray()));
+    }
+
+    [Fact]
     public void Copy_CopiesValue()
     {
         var source = NewRow();

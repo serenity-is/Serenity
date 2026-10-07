@@ -347,7 +347,9 @@ public class DateOnlyFieldTests
     {
         var row = NewRow();
         var field = AllFieldsRow.Fields.ADateOnly;
-        Assert.Throws<InvalidCastException>(() => field.AsObject(row, new DateTime(2024, 1, 15)));
+        var ex = Assert.Throws<InvalidCastException>(() => field.AsObject(row, new DateTime(2024, 1, 15)));
+        Assert.Contains("ConvertValue", ex.Message);
+        Assert.Contains("ADateOnly", ex.Message);
     }
 
     [Fact]
@@ -391,10 +393,10 @@ public class DateOnlyFieldTests
     }
 
     [Fact]
-    public void ConvertValue_String_ThrowsInvalidCast()
+    public void ConvertValue_String_Parses()
     {
         var field = AllFieldsRow.Fields.ADateOnly;
-        Assert.Throws<InvalidCastException>(() => field.ConvertValue("2024-01-15", CultureInfo.InvariantCulture));
+        Assert.Equal(new DateOnly(2024, 1, 15), field.ConvertValue("2024-01-15", CultureInfo.InvariantCulture));
     }
 
     [Fact]

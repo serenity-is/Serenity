@@ -46,6 +46,9 @@ public abstract class GenericValueField<TValue> : Field, IEnumTypeField where TV
         if (source is TValue val)
             return val;
 
+        if (typeof(TValue) == typeof(TimeSpan))
+            return TimeSpan.Parse(Convert.ToString(source, provider)!, provider);
+
         return Convert.ChangeType(source, typeof(TValue), provider);
     }
 
@@ -115,7 +118,9 @@ public abstract class GenericValueField<TValue> : Field, IEnumTypeField where TV
             }
             catch (InvalidCastException ex)
             {
-                throw new InvalidCastException($"Invalid cast exception while trying to set the value of {Name} field on {row.GetType().Name} as object.", ex);
+                throw new InvalidCastException(
+                    $"Invalid cast exception while trying to set the value of {Name} field on {row.GetType().Name} as object. " +
+                    $"Source type is {value.GetType().Name}. Use ConvertValue to convert the value to {typeof(TValue).Name} first.", ex);
             }
         }
 

@@ -390,6 +390,16 @@ public class DateTimeFieldTests
     }
 
     [Fact]
+    public void AsObject_WrongType_ThrowsWithContext()
+    {
+        var row = NewRow();
+        var field = AllFieldsRow.Fields.ADateTime;
+        var ex = Assert.Throws<InvalidCastException>(() => field.AsObject(row, "2024-01-15"));
+        Assert.Contains("ConvertValue", ex.Message);
+        Assert.Contains("ADateTime", ex.Message);
+    }
+
+    [Fact]
     public void IsNull_Works()
     {
         var row = NewRow();

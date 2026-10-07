@@ -50,11 +50,11 @@ public sealed class DateTimeOffsetField(ICollection<Field> collection, string na
         if (source == null)
             return null;
 
-        if (source is DateTime dt)
-            return dt;
-
         if (source is DateTimeOffset dto)
-            return dto.DateTime;
+            return dto;
+
+        if (source is DateTime dt)
+            return new DateTimeOffset(dt);
 
         if (source is string s)
         {
@@ -62,13 +62,13 @@ public sealed class DateTimeOffsetField(ICollection<Field> collection, string na
                 return dtOffset;
 
             if (s.TryParseISO8601DateTime(out var dateTime))
-                return dateTime;
+                return new DateTimeOffset(dateTime);
 
             if (DateTime.TryParse(s, provider, DateTimeStyles.None, out dateTime))
-                return dateTime;
+                return new DateTimeOffset(dateTime);
         }
 
-        return Convert.ChangeType(source, typeof(DateTime), provider);
+        return new DateTimeOffset(Convert.ToDateTime(source, provider));
     }
 
     /// <summary>

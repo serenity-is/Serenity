@@ -89,7 +89,15 @@ public abstract class GenericClassField<TValue> : Field where TValue : class
     /// <param name="value">The value.</param>
     public override void AsObject(IRow row, object? value)
     {
-        _setValue(row, (TValue?)value);
+        if (value == null)
+            _setValue(row, null);
+        else if (value is TValue typedValue)
+            _setValue(row, typedValue);
+        else
+            throw new InvalidCastException(
+                $"Invalid cast exception while trying to set the value of {Name} field on {row.GetType().Name} as object. " +
+                $"Source type is {value.GetType().Name}. Use ConvertValue to convert the value to {typeof(TValue).Name} first.");
+
         row.OnFieldSet(this);
     }
 

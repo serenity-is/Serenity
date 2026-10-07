@@ -357,10 +357,10 @@ public class TimeSpanFieldTests
     }
 
     [Fact]
-    public void ConvertValue_String_ThrowsInvalidCast()
+    public void ConvertValue_String_Parses()
     {
         var field = AllFieldsRow.Fields.ATimeSpan;
-        Assert.Throws<InvalidCastException>(() => field.ConvertValue("10:30:00", CultureInfo.InvariantCulture));
+        Assert.Equal(new TimeSpan(10, 30, 0), field.ConvertValue("10:30:00", CultureInfo.InvariantCulture));
     }
 
     [Fact]

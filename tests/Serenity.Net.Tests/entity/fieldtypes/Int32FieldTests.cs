@@ -301,4 +301,26 @@ public class Int32FieldTests
         field.EnumType = null;
         Assert.Null(field.EnumType);
     }
+
+    [Flags]
+    private enum FlagEnum
+    {
+        None = 0,
+        A = 1,
+        B = 2,
+        C = 4
+    }
+
+    [Fact]
+    public void ConvertEnumFromInt_Flags_AcceptsDefinedCombinations()
+    {
+        Assert.Equal(3L, Int32Field.ConvertEnumFromInt(typeof(FlagEnum), 3));
+        Assert.Equal(7L, Int32Field.ConvertEnumFromInt(typeof(FlagEnum), 7));
+    }
+
+    [Fact]
+    public void ConvertEnumFromInt_Flags_RejectsUndefinedBits()
+    {
+        Assert.Throws<InvalidCastException>(() => Int32Field.ConvertEnumFromInt(typeof(FlagEnum), 8));
+    }
 }

@@ -303,4 +303,30 @@ public class Int64FieldTests
         field.EnumType = null;
         Assert.Null(field.EnumType);
     }
+
+    [Fact]
+    public void ValueToJson_Stj_LargeValue_WritesString()
+    {
+        var row = NewRow();
+        var field = AllFieldsRow.Fields.AInt64;
+        field[row] = 9007199254740993L;
+        using var ms = new System.IO.MemoryStream();
+        using var writer = new Utf8JsonWriter(ms);
+        field.ValueToJson(writer, row, new JsonSerializerOptions());
+        writer.Flush();
+        Assert.Equal("\"9007199254740993\"", Encoding.UTF8.GetString(ms.ToArray()));
+    }
+
+    [Fact]
+    public void ValueToJson_Stj_SmallValue_WritesNumber()
+    {
+        var row = NewRow();
+        var field = AllFieldsRow.Fields.AInt64;
+        field[row] = 5L;
+        using var ms = new System.IO.MemoryStream();
+        using var writer = new Utf8JsonWriter(ms);
+        field.ValueToJson(writer, row, new JsonSerializerOptions());
+        writer.Flush();
+        Assert.Equal("5", Encoding.UTF8.GetString(ms.ToArray()));
+    }
 }

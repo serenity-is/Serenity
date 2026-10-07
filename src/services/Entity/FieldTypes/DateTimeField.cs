@@ -64,6 +64,11 @@ public sealed class DateTimeField(ICollection<Field> collection, string name, Lo
     /// <summary>
     /// Gets field value from a data reader.
     /// </summary>
+    /// <remarks>
+    /// The value returned by the data reader is assumed to already be stored in the field's
+    /// <see cref="DateTimeKind"/>; the kind is only labeled via <see cref="DateTime.SpecifyKind(DateTime, DateTimeKind)"/>,
+    /// not converted.
+    /// </remarks>
     /// <param name="reader">The reader.</param>
     /// <param name="index">The index.</param>
     /// <param name="row">The row.</param>
@@ -205,8 +210,12 @@ public sealed class DateTimeField(ICollection<Field> collection, string name, Lo
     {
         if (value == null)
             _setValue(row, null);
+        else if (value is DateTime dateTime)
+            _setValue(row, ToDateTimeKind(dateTime));
         else
-            _setValue(row, ToDateTimeKind((DateTime)value));
+            throw new InvalidCastException(
+                $"Invalid cast exception while trying to set the value of {Name} field on {row.GetType().Name} as object. " +
+                $"Source type is {value.GetType().Name}. Use ConvertValue to convert the value to DateTime first.");
 
         row.OnFieldSet(this);
     }

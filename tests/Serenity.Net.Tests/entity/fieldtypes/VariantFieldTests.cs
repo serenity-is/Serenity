@@ -118,6 +118,20 @@ public class VariantFieldTests
     }
 
     [Fact]
+    public void IndexCompare_Strings_OrdersOrdinally()
+    {
+        var row1 = NewRow();
+        var row2 = NewRow();
+        var field = AllFieldsRow.Fields.AVariant;
+        field[row1] = "a";
+        field[row2] = "b";
+        Assert.True(field.IndexCompare(row1, row2) < 0);
+        Assert.True(field.IndexCompare(row2, row1) > 0);
+        field[row2] = "a";
+        Assert.Equal(0, field.IndexCompare(row1, row2));
+    }
+
+    [Fact]
     public void ValueToJson_Newtonsoft_WritesValue()
     {
         var row = NewRow();
@@ -160,6 +174,8 @@ public class VariantFieldTests
     [InlineData("\"Test\"", "Test")]
     [InlineData("123", 123L)]
     [InlineData("12.5", 12.5)]
+    [InlineData("true", true)]
+    [InlineData("false", false)]
     public void ValueFromJson_Newtonsoft_ParsesTokens(string json, object? expected)
     {
         var row = NewRow();

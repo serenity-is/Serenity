@@ -60,7 +60,7 @@ public sealed class DateOnlyField(ICollection<Field> collection, string name, Lo
             if (source is DateTimeOffset dto)
                 return DateOnly.FromDateTime(dto.Date);
 
-            return Convert.ChangeType(source, typeof(DateOnly), provider);
+            return DateOnly.FromDateTime(Convert.ToDateTime(source, provider));
         }
     }
 
@@ -99,8 +99,12 @@ public sealed class DateOnlyField(ICollection<Field> collection, string name, Lo
     {
         if (value == null)
             _setValue(row, null);
+        else if (value is DateOnly dateOnly)
+            _setValue(row, dateOnly);
         else
-            _setValue(row, (DateOnly)value);
+            throw new InvalidCastException(
+                $"Invalid cast exception while trying to set the value of {Name} field on {row.GetType().Name} as object. " +
+                $"Source type is {value.GetType().Name}. Use ConvertValue to convert the value to DateOnly first.");
 
         row.OnFieldSet(this);
     }

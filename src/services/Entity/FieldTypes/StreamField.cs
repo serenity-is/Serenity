@@ -123,9 +123,18 @@ public class StreamField(ICollection<Field> collection, string name, LocalText? 
             writer.WriteNull();
         else
         {
-            var ms = new MemoryStream((int)value.Length);
-            CopyStream(value, ms);
-            writer.WriteValue(ms.ToArray());
+            var position = value.CanSeek ? value.Position : (long?)null;
+            try
+            {
+                var ms = new MemoryStream((int)value.Length);
+                CopyStream(value, ms);
+                writer.WriteValue(ms.ToArray());
+            }
+            finally
+            {
+                if (position.HasValue)
+                    value.Position = position.Value;
+            }
         }
     }
 
@@ -204,9 +213,18 @@ public class StreamField(ICollection<Field> collection, string name, LocalText? 
             writer.WriteNullValue();
         else
         {
-            var ms = new MemoryStream((int)value.Length);
-            CopyStream(value, ms);
-            writer.WriteBase64StringValue(ms.ToArray());
+            var position = value.CanSeek ? value.Position : (long?)null;
+            try
+            {
+                var ms = new MemoryStream((int)value.Length);
+                CopyStream(value, ms);
+                writer.WriteBase64StringValue(ms.ToArray());
+            }
+            finally
+            {
+                if (position.HasValue)
+                    value.Position = position.Value;
+            }
         }
     }
 

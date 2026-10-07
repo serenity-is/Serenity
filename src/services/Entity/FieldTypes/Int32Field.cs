@@ -73,35 +73,42 @@ public class Int32Field(ICollection<Field> collection, string name, LocalText? c
 
     internal static long ConvertEnumFromInt(Type enumType, long v)
     {
-        if (enumType.IsEnum)
-        {
-            var val = Enum.Parse(enumType, v.ToString(CultureInfo.InvariantCulture));
-            if (!Enum.IsDefined(enumType, val))
-                throw new InvalidCastException(string.Format("{0} is not a valid {1} enum value!", v, enumType.Name));
-
-            return v;
-        }
-        else
+        if (!enumType.IsEnum)
             throw new InvalidProgramException(string.Format("{0} is not a valid enum type!", enumType.Name));
+
+        ValidateEnumValue(enumType, v);
+        return v;
     }
 
     internal static long ConvertEnumFromString(Type enumType, string s)
     {
-        if (enumType.IsEnum)
-        {
-            if (long.TryParse(s, out long v))
-            {
-                var val = Enum.Parse(enumType, s);
-                if (!Enum.IsDefined(enumType, val))
-                    throw new InvalidCastException(string.Format("{0} is not a valid {1} enum value!", v, enumType.Name));
-
-                return v;
-            }
-            else
-                return Convert.ToInt64(Enum.Parse(enumType, s), CultureInfo.InvariantCulture);
-        }
-        else
+        if (!enumType.IsEnum)
             throw new InvalidProgramException(string.Format("{0} is not a valid enum type!", enumType.Name));
+
+        if (long.TryParse(s, NumberStyles.Integer, CultureInfo.InvariantCulture, out long v))
+        {
+            ValidateEnumValue(enumType, v);
+            return v;
+        }
+
+        var parsed = Convert.ToInt64(Enum.Parse(enumType, s), CultureInfo.InvariantCulture);
+        ValidateEnumValue(enumType, parsed);
+        return parsed;
+    }
+
+    private static void ValidateEnumValue(Type enumType, long v)
+    {
+        if (enumType.IsDefined(typeof(FlagsAttribute), false))
+        {
+            long defined = 0;
+            foreach (var value in Enum.GetValues(enumType))
+                defined |= Convert.ToInt64(value, CultureInfo.InvariantCulture);
+
+            if ((v & ~defined) != 0)
+                throw new InvalidCastException(string.Format("{0} is not a valid {1} enum value!", v, enumType.Name));
+        }
+        else if (!Enum.IsDefined(enumType, Enum.ToObject(enumType, v)))
+            throw new InvalidCastException(string.Format("{0} is not a valid {1} enum value!", v, enumType.Name));
     }
 
     /// <summary>

@@ -347,19 +347,19 @@ public class DateTimeOffsetFieldTests
     }
 
     [Fact]
-    public void ConvertValue_DateTime_PassesThrough()
+    public void ConvertValue_DateTime_ReturnsDateTimeOffset()
     {
         var field = AllFieldsRow.Fields.ADateTimeOffset;
         var dt = new DateTime(2024, 1, 15, 10, 30, 0);
-        Assert.Equal(dt, field.ConvertValue(dt, CultureInfo.InvariantCulture));
+        Assert.Equal(new DateTimeOffset(dt), field.ConvertValue(dt, CultureInfo.InvariantCulture));
     }
 
     [Fact]
-    public void ConvertValue_DateTimeOffset_ConvertsToDateTime()
+    public void ConvertValue_DateTimeOffset_PassesThrough()
     {
         var field = AllFieldsRow.Fields.ADateTimeOffset;
         var dto = new DateTimeOffset(2024, 1, 15, 10, 30, 0, TimeSpan.FromHours(2));
-        Assert.Equal(new DateTime(2024, 1, 15, 10, 30, 0), field.ConvertValue(dto, CultureInfo.InvariantCulture));
+        Assert.Equal(dto, field.ConvertValue(dto, CultureInfo.InvariantCulture));
     }
 
     [Fact]
@@ -374,7 +374,7 @@ public class DateTimeOffsetFieldTests
     public void ConvertValue_JValue_Unwraps()
     {
         var field = AllFieldsRow.Fields.ADateTimeOffset;
-        Assert.Equal(new DateTime(2024, 1, 15, 10, 30, 0),
-            field.ConvertValue(new Newtonsoft.Json.Linq.JValue(new DateTimeOffset(2024, 1, 15, 10, 30, 0, TimeSpan.FromHours(2))), CultureInfo.InvariantCulture));
+        var dto = new DateTimeOffset(2024, 1, 15, 10, 30, 0, TimeSpan.FromHours(2));
+        Assert.Equal(dto, field.ConvertValue(new Newtonsoft.Json.Linq.JValue(dto), CultureInfo.InvariantCulture));
     }
 }

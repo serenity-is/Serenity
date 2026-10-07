@@ -77,8 +77,13 @@ public class VariantField(ICollection<Field> collection, string name, LocalText?
             else
                 return 1;
         }
-        else
-            return value1!.GetHashCode().CompareTo(value2!.GetHashCode());
+        else if (value1!.GetType() == value2!.GetType() && value1 is IComparable comparable)
+            return comparable.CompareTo(value2);
+
+        return string.Compare(
+            Convert.ToString(value1, CultureInfo.InvariantCulture),
+            Convert.ToString(value2, CultureInfo.InvariantCulture),
+            StringComparison.Ordinal);
     }
 
     /// <summary>
@@ -113,6 +118,7 @@ public class VariantField(ICollection<Field> collection, string name, LocalText?
             case Newtonsoft.Json.JsonToken.Integer:
             case Newtonsoft.Json.JsonToken.Float:
             case Newtonsoft.Json.JsonToken.Bytes:
+            case Newtonsoft.Json.JsonToken.Boolean:
                 _setValue(row, reader.Value);
                 break;
             default:

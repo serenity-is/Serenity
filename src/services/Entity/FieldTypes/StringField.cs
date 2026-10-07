@@ -78,6 +78,9 @@ public class StringField(ICollection<Field> collection, string name, LocalText? 
                 return 1;
         }
         else
+            // TODO: IndexCompare should support an optional IComparer / culture / ignore-case
+            // option on the base Field type so string ordering is configurable. Keeping the
+            // current CurrentCulture behavior (String.CompareTo) for now.
             return value1!.CompareTo(value2);
     }
 
@@ -152,7 +155,12 @@ public class StringField(ICollection<Field> collection, string name, LocalText? 
             case JsonTokenType.False:
             case JsonTokenType.Number:
                 if (reader.TokenType == JsonTokenType.Number)
-                    v = Convert.ToString(reader.GetDouble(), CultureInfo.InvariantCulture);
+                {
+                    if (reader.TryGetInt64(out var l))
+                        v = l.ToString(CultureInfo.InvariantCulture);
+                    else
+                        v = Convert.ToString(reader.GetDouble(), CultureInfo.InvariantCulture);
+                }
                 else
                     v = Convert.ToString(reader.TokenType == JsonTokenType.True, CultureInfo.InvariantCulture);
                 _setValue(row, v);
