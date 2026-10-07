@@ -137,6 +137,36 @@ public class SaveRequestHandlerAsyncTests_Coverage
     }
 
     [Fact]
+    public async Task ProcessAsync_Update_AutoIncrement_Mismatched_Id_Throws()
+    {
+        // AutoRow.Id is not updatable, so an Entity.Id that differs from the
+        // targeted EntityId cannot be applied and must be rejected.
+        using var connection = new MockDbConnection();
+        var handler = new TestAsyncHandler<AutoRow>(Context());
+
+        await Assert.ThrowsAsync<ValidationError>(() => handler.ProcessAsync(
+            new MockUnitOfWork(connection),
+            new SaveRequest<AutoRow> { EntityId = 5, Entity = new AutoRow { Id = 6, Name = "New" } },
+            SaveRequestType.Update, TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
+    public async Task ProcessAsync_Update_AutoIncrement_Null_Id_Uses_EntityId()
+    {
+        using var connection = new MockDbConnection()
+            .InterceptManipulateRow(_ => 1)
+            .InterceptExecuteReader(args => args.ToMockReader(new { Id = 5, Name = "Old" }))
+            .OnDbCommandExecuteNonQuery(_ => 1);
+        var handler = new TestAsyncHandler<AutoRow>(Context());
+
+        var response = await handler.ProcessAsync(new MockUnitOfWork(connection),
+            new SaveRequest<AutoRow> { EntityId = 5, Entity = new AutoRow { Name = "New" } },
+            SaveRequestType.Update, TestContext.Current.CancellationToken);
+
+        Assert.Equal(5, response.EntityId);
+    }
+
+    [Fact]
     public async Task CreateAsync_AutoIncrement_Uses_InsertAndGetId()
     {
         using var connection = new MockDbConnection()

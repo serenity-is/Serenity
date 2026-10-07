@@ -307,7 +307,27 @@ public abstract class SaveRequestHandlerBase<TRow, TSaveRequest, TSaveResponse>(
             Row.ValidateRequired(idField, Localizer);
 
         if ((idField.Flags & FieldFlags.Updatable) != FieldFlags.Updatable)
+        {
+            // The id field is not updatable, so a client-supplied id cannot be applied. Only an
+            // unassigned/null id, or the same value as the target record, is acceptable. The old
+            // id is the one the request targets (Old is loaded by this same id), i.e. Request.EntityId
+            // when present, otherwise the row's own id. A different non-null value would otherwise be
+            // silently ignored (or re-key the row), so reject it instead.
+            var newId = idField.AsObjectNoCheck(Row);
+            var oldId = Request.EntityId != null
+                ? idField.ConvertValue(Request.EntityId, System.Globalization.CultureInfo.InvariantCulture)
+                : newId;
+
+            if (newId != null && !Equals(newId, oldId))
+                throw DataValidation.InvalidIdError(Row, idField, Localizer);
+
+            // Keep the row id equal to the target record id so the update and response use it
+            // consistently, then mark it unassigned so it is not included in the update SET.
+            if (oldId != null)
+                idField.AsObject(Row, oldId);
+
             Row.ClearAssignment(idField);
+        }
     }
 
     /// <summary>
