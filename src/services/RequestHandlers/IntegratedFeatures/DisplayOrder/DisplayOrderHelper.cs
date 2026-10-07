@@ -17,8 +17,15 @@ namespace Serenity.Data;
 /// compute the same next value. A unique index on the display order column (grouped with the
 /// same keys used by the display order filter) is therefore recommended so the database rejects
 /// the duplicate. When such an index exists, pass <c>hasUniqueConstraint: true</c> to the reorder
-/// methods so they avoid transient collisions. Automatic retry of conflicting inserts is not
-/// implemented.
+/// methods so they avoid transient collisions.
+/// </para>
+/// <para>
+/// Automatic retry of conflicting inserts is not implemented. It is feasible (a unique violation
+/// can be detected via <c>ISqlErrorExtractor</c> and the value recomputed), but a failed insert
+/// aborts the surrounding transaction, so retrying requires re-running the whole save in a fresh
+/// transaction and reliably attributing the violation to the display-order constraint (providers
+/// do not always report the offending column). Until that is warranted, handling the conflict
+/// (e.g. retrying the request or surfacing the error) is left to the application.
 /// </para>
 /// </remarks>
 public static class DisplayOrderHelper
