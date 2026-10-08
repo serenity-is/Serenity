@@ -8,6 +8,14 @@ namespace Serenity.Services;
 /// <remarks>
 /// Initializes a new instance of the class.
 /// </remarks>
+/// <remarks>
+/// Saving or deleting a master invokes the nested save/delete handler once per detail row
+/// (an N+1 pattern). This is intentional, so the full handler pipeline (behaviors, audit,
+/// concurrency version checks, unique constraints, cascades and cache invalidation) applies
+/// to every detail row. Batching these into a single statement would bypass that pipeline and
+/// change the semantics, so it is not done. Callers with very large detail sets should be
+/// aware of the resulting number of round trips.
+/// </remarks>
 /// <param name="handlerFactory">Default handler factory</param>
 /// <exception cref="ArgumentNullException"><paramref name="handlerFactory"/> is <c>null</c>.</exception>
 public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory) : BaseSaveDeleteBehaviorAsync,
@@ -30,6 +38,8 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
     private BaseCriteria filterCriteria = null!;
     private BaseCriteria queryCriteria = null!;
     private HashSet<string> includeColumns = null!;
+
+    private const int BatchSize = 1000;
 
     /// <inheritdoc/>
     public bool ActivateFor(IRow row)
@@ -196,14 +206,10 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
         listRequest.ColumnSelection = attr.ColumnSelection;
         listRequest.IncludeColumns = includeColumns;
 
-        var enumerator = handler.Response.Entities.Cast<IRow>();
-        while (true)
+        var entities = handler.Response.Entities.Cast<IRow>().ToList();
+        for (var start = 0; start < entities.Count; start += BatchSize)
         {
-            var part = enumerator.Take(1000);
-            if (!part.Any())
-                break;
-
-            enumerator = enumerator.Skip(1000);
+            var part = entities.GetRange(start, Math.Min(BatchSize, entities.Count - start));
 
             listRequest.Criteria = foreignKeyCriteria.In(
                 part.Select(x => masterKeyField.AsObject(x))) & filterCriteria;
@@ -232,14 +238,10 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
         listRequest.ColumnSelection = attr.ColumnSelection;
         listRequest.IncludeColumns = includeColumns;
 
-        var enumerator = handler.Response.Entities.Cast<IRow>();
-        while (true)
+        var entities = handler.Response.Entities.Cast<IRow>().ToList();
+        for (var start = 0; start < entities.Count; start += BatchSize)
         {
-            var part = enumerator.Take(1000);
-            if (!part.Any())
-                break;
-
-            enumerator = enumerator.Skip(1000);
+            var part = entities.GetRange(start, Math.Min(BatchSize, entities.Count - start));
 
             listRequest.Criteria = foreignKeyCriteria.In(
                 part.Select(x => masterKeyField.AsObject(x))) & filterCriteria;

@@ -8,6 +8,14 @@ namespace Serenity.Services;
 /// <remarks>
 /// Initializes a new instance of the class.
 /// </remarks>
+/// <remarks>
+/// Saving or deleting the linking set invokes the nested save/delete handler once per item
+/// (an N+1 pattern). This is intentional, so the full handler pipeline (behaviors, audit,
+/// concurrency version checks, unique constraints, cascades and cache invalidation) applies
+/// to every link row. Batching these into a single statement would bypass that pipeline and
+/// change the semantics, so it is not done. Callers with very large item sets should be
+/// aware of the resulting number of round trips.
+/// </remarks>
 /// <param name="handlerFactory">Default handler factory</param>
 /// <exception cref="ArgumentNullException"><paramref name="handlerFactory"/> is <c>null</c>.</exception>
 public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) : BaseSaveDeleteBehaviorAsync,
@@ -29,6 +37,8 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
     private BaseCriteria queryCriteria = null!;
     private Func<IRow> rowFactory = null!;
     private Func<IList> listFactory = null!;
+
+    private const int BatchSize = 1000;
 
     /// <inheritdoc/>
     public bool ActivateFor(IRow row)
@@ -242,14 +252,10 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
             thisKeyField.PropertyName ?? thisKeyField.Name
         ];
 
-        var enumerator = handler.Response.Entities.Cast<IRow>();
-        while (true)
+        var entities = handler.Response.Entities.Cast<IRow>().ToList();
+        for (var start = 0; start < entities.Count; start += BatchSize)
         {
-            var part = enumerator.Take(1000);
-            if (!part.Any())
-                break;
-
-            enumerator = enumerator.Skip(1000);
+            var part = entities.GetRange(start, Math.Min(BatchSize, entities.Count - start));
 
             listRequest.Criteria = thisKeyCriteria.In(
                 part.Select(idField.AsObject)) & filterCriteria;
@@ -286,14 +292,10 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
             thisKeyField.PropertyName ?? thisKeyField.Name
         ];
 
-        var enumerator = handler.Response.Entities.Cast<IRow>();
-        while (true)
+        var entities = handler.Response.Entities.Cast<IRow>().ToList();
+        for (var start = 0; start < entities.Count; start += BatchSize)
         {
-            var part = enumerator.Take(1000);
-            if (!part.Any())
-                break;
-
-            enumerator = enumerator.Skip(1000);
+            var part = entities.GetRange(start, Math.Min(BatchSize, entities.Count - start));
 
             listRequest.Criteria = thisKeyCriteria.In(
                 part.Select(idField.AsObject)) & filterCriteria;

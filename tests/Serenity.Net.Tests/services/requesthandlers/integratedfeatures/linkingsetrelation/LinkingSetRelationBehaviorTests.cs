@@ -1043,4 +1043,37 @@ public class LinkingSetRelationBehaviorTests
         listHandler.Response.Entities.Add(master);
         await behavior.OnReturnAsync((IListRequestHandler)listHandler, CancellationToken.None);
     }
+
+    [Fact]
+    public void OnReturn_List_Fills_Masters_Across_Multiple_Batches()
+    {
+        const int count = 2500;
+
+        var handlerFactory = new MockHandlerFactory((rowType, intf) =>
+        {
+            Assert.Equal(typeof(LkLinkRow), rowType);
+            Assert.Equal(typeof(IListRequestProcessor), intf);
+            return new MockListHandler<LkLinkRow>(x =>
+            {
+                x.Response.Entities.Clear();
+                for (var i = 1; i <= count; i++)
+                    x.Response.Entities.Add(new LkLinkRow { MasterID = i, ItemID = i * 10 });
+            });
+        });
+
+        var handler = new MockListHandler<LkMainRow>();
+        handler.Row.ID = 1;
+        for (var i = 1; i <= count; i++)
+            handler.Response.Entities.Add(new LkMainRow { ID = i });
+
+        var behavior = CreateBehavior(handler.Row, handler.Row.GetFields().SelectedItems, handlerFactory);
+        behavior.OnReturn(handler);
+
+        Assert.Equal(count, handler.Response.Entities.Count);
+        foreach (var entity in handler.Response.Entities)
+        {
+            var item = Assert.Single(entity.SelectedItems!);
+            Assert.Equal(entity.ID * 10, item);
+        }
+    }
 }

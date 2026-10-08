@@ -153,4 +153,74 @@ public partial class MasterDetailRelationBehaviorTests
         await behavior.OnAfterSaveAsync(CreateMasterSaveHandlerAsync(connection, false, master),
             CancellationToken.None);
     }
+
+    [Fact]
+    public void List_OnReturn_Fills_Masters_Across_Multiple_Batches()
+    {
+        const int count = 2500;
+
+        var detailListHandler = new MockListHandler<Int32DetailRow>(handler =>
+        {
+            handler.Response.Entities.Clear();
+            for (var i = 1; i <= count; i++)
+                handler.Response.Entities.Add(new Int32DetailRow { DetailID = i, MasterID = i });
+        });
+
+        var handlerFactory = new MockHandlerFactory((_, _) => detailListHandler);
+
+        var master = new Int32MasterRow { ID = 1 };
+        var behavior = new MasterDetailRelationBehavior(handlerFactory)
+        {
+            Target = master.GetFields().DetailList
+        };
+        Assert.True(behavior.ActivateFor(master));
+
+        var listHandler = new MockListHandler<Int32MasterRow>();
+        for (var i = 1; i <= count; i++)
+            listHandler.Response.Entities.Add(new Int32MasterRow { ID = i });
+
+        behavior.OnReturn((IListRequestHandler)listHandler);
+
+        Assert.Equal(count, listHandler.Response.Entities.Count);
+        foreach (var entity in listHandler.Response.Entities)
+        {
+            var detail = Assert.Single(entity.DetailList!);
+            Assert.Equal(entity.ID, detail.MasterID);
+        }
+    }
+
+    [Fact]
+    public async Task List_OnReturnAsync_Fills_Masters_Across_Multiple_Batches()
+    {
+        const int count = 2500;
+
+        var detailListHandler = new MockListHandlerAsync<Int32DetailRow>(handler =>
+        {
+            handler.Response.Entities.Clear();
+            for (var i = 1; i <= count; i++)
+                handler.Response.Entities.Add(new Int32DetailRow { DetailID = i, MasterID = i });
+        });
+
+        var handlerFactory = new MockHandlerFactory((_, _) => detailListHandler);
+
+        var master = new Int32MasterRow { ID = 1 };
+        var behavior = new MasterDetailRelationBehavior(handlerFactory)
+        {
+            Target = master.GetFields().DetailList
+        };
+        Assert.True(behavior.ActivateFor(master));
+
+        var listHandler = new MockListHandlerAsync<Int32MasterRow>();
+        for (var i = 1; i <= count; i++)
+            listHandler.Response.Entities.Add(new Int32MasterRow { ID = i });
+
+        await behavior.OnReturnAsync((IListRequestHandler)listHandler, CancellationToken.None);
+
+        Assert.Equal(count, listHandler.Response.Entities.Count);
+        foreach (var entity in listHandler.Response.Entities)
+        {
+            var detail = Assert.Single(entity.DetailList!);
+            Assert.Equal(entity.ID, detail.MasterID);
+        }
+    }
 }
