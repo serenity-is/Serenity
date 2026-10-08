@@ -143,4 +143,16 @@ public class RowFieldsPermissionTests
         Assert.Equal(ReadPerm, f.QueryOnly.InsertPermission);
         Assert.Equal(ReadPerm, f.QueryOnly.ReadPermission);
     }
+
+    [Fact]
+    public async Task RowCreated_Applies_Permissions_Under_Concurrent_Row_Construction()
+    {
+        var fields = (RowFieldsBaseTestsMore.PermissionRow.RowFields)RowFieldsProvider.Current
+            .Resolve(typeof(RowFieldsBaseTestsMore.PermissionRow.RowFields));
+
+        await Task.WhenAll(Enumerable.Range(0, 64)
+            .Select(_ => Task.Run(() => new RowFieldsBaseTestsMore.PermissionRow())));
+
+        Assert.Equal("Perm", fields.Extra.ReadPermission);
+    }
 }

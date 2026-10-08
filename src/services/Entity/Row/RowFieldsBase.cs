@@ -22,7 +22,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins, IHas
     internal Field[]? primaryKeys;
     internal Field? nameField;
     internal Tuple<Field, bool>[]? sortOrders;
-    internal bool isInitialized;
+    internal volatile bool isInitialized;
     internal string fieldPrefix;
     internal Dictionary<string, Join> joins;
     internal string? localTextPrefix;
@@ -1360,42 +1360,50 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins, IHas
             return null;
     }
 
-    private bool calledRowCreated;
+    private volatile bool calledRowCreated;
 
     internal void RowCreated(IRow row)
     {
         if (calledRowCreated)
             return;
 
-#pragma warning disable CA2208 // Instantiate argument exceptions correctly
-        if (row is IIdRow && idField is null)
-            throw new ArgumentOutOfRangeException(nameof(IdField),
-                $"Row type {GetType().FullName} has IIdRow interface but does not have a field with [IdProperty] attribute!");
+        // rows sharing the same fields instance can be constructed concurrently, so this
+        // must only apply the row level permissions once
+        lock (initializeLock)
+        {
+            if (calledRowCreated)
+                return;
 
-        if (row is INameRow && nameField is null)
-            throw new ArgumentOutOfRangeException(nameof(IdField),
-                $"Row type {GetType().FullName} has INameRow interface but does not have a field with [NameProperty] attribute!");
+#pragma warning disable CA2208 // Instantiate argument exceptions correctly
+            if (row is IIdRow && idField is null)
+                throw new ArgumentOutOfRangeException(nameof(IdField),
+                    $"Row type {GetType().FullName} has IIdRow interface but does not have a field with [IdProperty] attribute!");
+
+            if (row is INameRow && nameField is null)
+                throw new ArgumentOutOfRangeException(nameof(IdField),
+                    $"Row type {GetType().FullName} has INameRow interface but does not have a field with [NameProperty] attribute!");
 #pragma warning restore CA2208 // Instantiate argument exceptions correctly
 
-        var readPerm = rowType!.GetCustomAttribute<FieldReadPermissionAttribute>();
-        if (readPerm != null && !readPerm.ApplyToLookups)
-        {
-            var permission = readPerm.Permission;
-            foreach (var field in this)
+            var readPerm = rowType!.GetCustomAttribute<FieldReadPermissionAttribute>();
+            if (readPerm != null && !readPerm.ApplyToLookups)
             {
-                if (field.ReadPermission == null &&
-                    !ReferenceEquals(idField, field) &&
-                    !ReferenceEquals(nameField, field) &&
-                    field.GetAttribute<LookupIncludeAttribute>() == null)
+                var permission = readPerm.Permission;
+                foreach (var field in this)
                 {
-                    field.ReadPermission = permission;
-                    field.InsertPermission ??= permission;
-                    field.UpdatePermission ??= permission;
+                    if (field.ReadPermission == null &&
+                        !ReferenceEquals(idField, field) &&
+                        !ReferenceEquals(nameField, field) &&
+                        field.GetAttribute<LookupIncludeAttribute>() == null)
+                    {
+                        field.ReadPermission = permission;
+                        field.InsertPermission ??= permission;
+                        field.UpdatePermission ??= permission;
+                    }
                 }
             }
-        }
 
-        calledRowCreated = true;
+            calledRowCreated = true;
+        }
     }
 
     /// <summary>
