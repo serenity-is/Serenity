@@ -646,6 +646,9 @@ public abstract partial class Field : IFieldWithJoinInfo
     /// </summary>
     /// <param name="row">The row.</param>
     /// <returns>The value of the field in the row as an SQL value.</returns>
+    /// <remarks>This simply calls AsObject, it is only provided for subclasses
+    /// like ByteArrayField to convert it to a suitable param value,
+    /// for example null => System.Data.SqlTypes.SqlBinary.Null</remarks>
     public virtual object? AsSqlValue(IRow row)
     {
         return AsObject(row);

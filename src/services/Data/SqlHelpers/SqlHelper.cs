@@ -276,7 +276,7 @@ public static class SqlHelper
             var stopwatch = ValueStopwatch.StartNew();
             try
             {
-                logger ??= command.Connection.GetLogger();
+                logger ??= scopeConnection.GetLogger() ?? command.Connection.GetLogger();
 
                 if (logger?.IsEnabled(LogLevel.Debug) == true)
                     LogCommand("ExecuteNonQuery", command, logger);
@@ -366,7 +366,7 @@ public static class SqlHelper
             var stopwatch = ValueStopwatch.StartNew();
             try
             {
-                logger ??= command.Connection.GetLogger();
+                logger ??= scopeConnection.GetLogger() ?? command.Connection.GetLogger();
 
                 if (logger?.IsEnabled(LogLevel.Debug) == true)
                     LogCommand("ExecuteNonQuery", command, logger);
