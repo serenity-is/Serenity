@@ -6,6 +6,12 @@ namespace Serenity.Services;
 /// <see cref="DefaultHandlerFactory"/> when a synchronous undelete handler is requested for a row
 /// that only has an asynchronous custom undelete handler.
 /// </summary>
+/// <remarks>This is a bridging adapter that blocks on the wrapped asynchronous
+/// handler (sync-over-async). The synchronous interface exposes no
+/// <see cref="System.Threading.CancellationToken"/>, so a cancellation token from
+/// an asynchronous call site cannot be observed by the wrapped handler. Prefer
+/// invoking the asynchronous handler directly whenever a cancellation token is
+/// available.</remarks>
 /// <typeparam name="TRow">Row type</typeparam>
 internal class AsyncToSyncUndeleteRequestProcessorWrapper<TRow>(IUndeleteRequestProcessorAsync handler) : IUndeleteRequestProcessor,
     IUndeleteHandler<TRow>

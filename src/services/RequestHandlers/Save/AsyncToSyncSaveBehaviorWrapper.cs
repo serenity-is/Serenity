@@ -11,6 +11,12 @@ namespace Serenity.Services;
 /// is thread-safe. If you need to pass some state between events, 
 /// use handler's StateBag.
 /// </remarks>
+/// <remarks>This is a bridging adapter that blocks on the wrapped asynchronous
+/// behavior (sync-over-async). The synchronous interface exposes no
+/// <see cref="System.Threading.CancellationToken"/>, so a cancellation token from
+/// an asynchronous call site cannot be observed by the wrapped behavior. Prefer
+/// invoking the asynchronous behavior directly whenever a cancellation token is
+/// available.</remarks>
 /// <remarks>
 /// Initializes a new instance of the class.
 /// </remarks>
