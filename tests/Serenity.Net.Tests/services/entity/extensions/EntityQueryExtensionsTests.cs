@@ -132,6 +132,20 @@ public class EntityQueryExtensionsTests
     }
 
     [Fact]
+    public void SelectTableFields_Throws_When_No_Into_Row()
+    {
+        var ex = Assert.Throws<InvalidOperationException>(() => new SqlQuery().SelectTableFields());
+        Assert.Contains("no INTO row", ex.Message);
+    }
+
+    [Fact]
+    public void SelectNonTableFields_Throws_When_No_Into_Row()
+    {
+        var ex = Assert.Throws<InvalidOperationException>(() => new SqlQuery().SelectNonTableFields());
+        Assert.Contains("no INTO row", ex.Message);
+    }
+
+    [Fact]
     public void SelectNonTableFields_Selects_Foreign_Fields()
     {
         var row = new SelRow();

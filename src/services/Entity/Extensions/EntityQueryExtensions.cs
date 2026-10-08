@@ -146,8 +146,10 @@ public static class EntityQueryExtensions
         ArgumentNullException.ThrowIfNull(query);
 
         var ext = (ISqlQueryExtensible)query;
+        var row = ext.FirstIntoRow as IRow ?? throw new InvalidOperationException(
+            "The query has no INTO row. Use the Into() method to specify a row before selecting its fields.");
 
-        foreach (var field in ((IRow)ext.FirstIntoRow!).Fields)
+        foreach (var field in row.Fields)
         {
             if (!EntityFieldExtensions.IsTableField(field) &&
                 (field.Flags & FieldFlags.NotMapped) != FieldFlags.NotMapped)
@@ -173,8 +175,10 @@ public static class EntityQueryExtensions
         ArgumentNullException.ThrowIfNull(query);
 
         var ext = (ISqlQueryExtensible)query;
+        var row = ext.FirstIntoRow as IRow ?? throw new InvalidOperationException(
+            "The query has no INTO row. Use the Into() method to specify a row before selecting its fields.");
 
-        return SelectTableFields(query, (IRow)ext.FirstIntoRow!, exclude);
+        return SelectTableFields(query, row, exclude);
     }
 
     /// <summary>
