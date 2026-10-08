@@ -59,6 +59,9 @@ public partial class DefaultPropertyItemProvider : IPropertyItemProvider, IDispo
 
         var list = new List<PropertyItem>();
 
+        // Intentionally not cached: callers such as DynamicScriptManager already cache the
+        // generated property items per type, so this method is not a hot path, and caching
+        // the reflected property list here would not be worth the extra state.
         var basedOnRow = GetBasedOnRow(type, out bool checkNames);
         var processors = processorFactories.Select(x => (IPropertyProcessor)x(provider, []))
             .OrderBy(x => x.Priority).ToList();

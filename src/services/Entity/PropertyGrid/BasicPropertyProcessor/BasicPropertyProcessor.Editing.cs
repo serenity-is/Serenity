@@ -317,6 +317,8 @@ public partial class BasicPropertyProcessor : PropertyProcessor
             !itemType.IsInterface &&
             itemType.GetConstructors().Any(x => x.GetParameters().Length == 0))
         {
+            // Intentionally not cached: row metadata/data can vary per call
+            // (e.g. multitenancy, per-request fields), so the instance is created on demand.
             try
             {
                 var rowInstance = Activator.CreateInstance(itemType) as IRow;

@@ -1,6 +1,7 @@
 using Serenity.Reflection;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq.Expressions;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 
@@ -151,10 +152,20 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins, IHas
         var constructor = rowType.GetConstructors().FirstOrDefault(x => x.GetParameters().Length == 1 &&
             typeof(RowFieldsBase).IsAssignableFrom(x.GetParameters()[0].ParameterType));
 
+        // Compile the row constructor once instead of calling Activator.CreateInstance
+        // for every materialized row.
         if (constructor != null)
-            rowFactory = () => (IRow)Activator.CreateInstance(rowType, this)!;
+        {
+            var fieldsParameter = Expression.Parameter(typeof(RowFieldsBase), "fields");
+            var newRow = Expression.New(constructor,
+                Expression.Convert(fieldsParameter, constructor.GetParameters()[0].ParameterType));
+            var factory = Expression.Lambda<Func<RowFieldsBase, IRow>>(newRow, fieldsParameter).Compile();
+            rowFactory = () => factory(this);
+        }
         else
-            rowFactory = () => (IRow)Activator.CreateInstance(rowType)!;
+        {
+            rowFactory = Expression.Lambda<Func<IRow>>(Expression.New(rowType)).Compile();
+        }
     }
 
     private void DetermineTableName(DialectExpressionSelector expressionSelector)
