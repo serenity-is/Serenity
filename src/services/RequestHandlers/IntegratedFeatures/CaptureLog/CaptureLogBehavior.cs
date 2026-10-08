@@ -94,7 +94,7 @@ public class CaptureLogBehavior : BaseSaveDeleteBehaviorAsync, ISaveBehaviorSync
         }
         else if (newRow is IIsDeletedRow isDeletedRow)
         {
-            isDeletedRow.IsDeletedField[newRow] = true;
+            isDeletedRow.IsDeletedField[newRow] = false;
         }
         else if (newRow is IDeleteLogRow deleteLogRow)
         {

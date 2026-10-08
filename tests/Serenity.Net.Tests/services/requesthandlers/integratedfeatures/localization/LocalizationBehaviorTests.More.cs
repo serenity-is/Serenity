@@ -194,7 +194,7 @@ public partial class LocalizationBehaviorTests
             {
                 x.Response.Entities.Add(new LocMainLangRow
                 {
-                    LanguageId = "en", Name = "Hello", Description = "Desc"
+                    MasterId = 7, LanguageId = "en", Name = "Hello", Description = "Desc"
                 });
             });
         });
@@ -213,6 +213,7 @@ public partial class LocalizationBehaviorTests
 
         Assert.NotNull(handler.Response.Localizations);
         var localized = Assert.IsType<LocMainRow>(handler.Response.Localizations!["en"]);
+        Assert.Equal(7, localized.Id);
         Assert.Equal("Hello", localized.Name);
         Assert.Equal("Desc", localized.Description);
     }

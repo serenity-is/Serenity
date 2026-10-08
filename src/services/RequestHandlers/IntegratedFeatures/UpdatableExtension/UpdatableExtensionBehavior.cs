@@ -91,7 +91,7 @@ public class UpdatableExtensionBehavior(IDefaultHandlerFactory handlerFactory) :
                 info.OtherKeyField = ext.FindField(info.ThisKeyField!.Name);
 
                 if (info.OtherKeyField is null && ext is IIdRow)
-                    info.OtherKeyField = row.GetIdField();
+                    info.OtherKeyField = ext.GetIdField();
 
                 if (info.OtherKeyField is null)
                     throw new ArgumentException(string.Format(

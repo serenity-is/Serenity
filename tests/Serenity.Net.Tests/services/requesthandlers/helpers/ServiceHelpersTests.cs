@@ -55,6 +55,40 @@ public class ServiceHelpersTests
 
             Assert.Equal([1, 2, 1], result);
         }
+
+        [Fact]
+        public void Sort_Keeps_Items_In_A_Cycle()
+        {
+            var result = SortIds([
+                new Node(1, 2),
+                new Node(2, 1)
+            ]);
+
+            Assert.Equal([1, 2], result.OrderBy(x => x).ToList());
+        }
+
+        [Fact]
+        public void Sort_Keeps_Self_Parented_Items()
+        {
+            var result = SortIds([new Node(1, 1)]);
+
+            Assert.Equal([1], result);
+        }
+
+        [Fact]
+        public void Sort_Handles_Deep_Chains_Without_Overflow()
+        {
+            const int count = 50000;
+            var nodes = new List<Node>(count);
+            for (var i = 0; i < count; i++)
+                nodes.Add(new Node(i, i == 0 ? (int?)null : i - 1));
+
+            var result = SortIds(nodes);
+
+            Assert.Equal(count, result.Count);
+            Assert.Equal(0, result[0]);
+            Assert.Equal(count - 1, result[^1]);
+        }
     }
 
     public class ServiceHelperTests

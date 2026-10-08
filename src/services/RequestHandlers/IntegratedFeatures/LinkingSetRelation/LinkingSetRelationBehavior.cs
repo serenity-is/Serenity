@@ -375,15 +375,15 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
     {
         ArgumentNullException.ThrowIfNull(masterId);
 
+        var newKeys = newItemKeys.Where(x => x != null).Distinct().ToList();
+
         if (oldRows.Count == 0)
         {
-            foreach (object itemKey in newItemKeys)
+            foreach (object itemKey in newKeys)
                 InsertDetail(uow, masterId, itemKey);
 
             return;
         }
-
-        var newKeys = newItemKeys.Where(x => x != null).Distinct().ToList();
 
         if (newKeys.Count == 0)
         {
@@ -406,15 +406,15 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
     private async Task DetailListSaveAsync(IUnitOfWork uow, object masterId, List<IRow> oldRows,
         IList<object> newItemKeys, CancellationToken cancellationToken = default)
     {
+        var newKeys = newItemKeys.Where(x => x != null).Distinct().ToList();
+
         if (oldRows.Count == 0)
         {
-            foreach (object itemKey in newItemKeys)
+            foreach (object itemKey in newKeys)
                 await InsertDetailAsync(uow, masterId, itemKey, cancellationToken).ConfigureAwait(false);
 
             return;
         }
-
-        var newKeys = newItemKeys.Where(x => x != null).Distinct().ToList();
 
         if (newKeys.Count == 0)
         {

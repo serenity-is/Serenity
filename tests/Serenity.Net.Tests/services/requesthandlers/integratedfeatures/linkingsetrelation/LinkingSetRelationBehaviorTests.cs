@@ -808,6 +808,41 @@ public class LinkingSetRelationBehaviorTests
     }
 
     [Fact]
+    public void OnAfterSave_Update_WithNoOldRows_IgnoresDuplicateKeys()
+    {
+        var saved = new List<int?>();
+        var deleted = new List<object?>();
+        var factory = SaveDeleteFactory(saved, deleted);
+        using var connection = new MockDbConnection()
+            .InterceptExecuteReader(_ => new MockDbDataReader());
+        var master = new LkMainRow { ID = 5, SelectedItems = [11, 11, 22] };
+        var behavior = CreateBehavior(master, master.GetFields().SelectedItems, factory);
+
+        behavior.OnAfterSave(CreateSaveHandler(connection, false, master));
+
+        Assert.Equal([11, 22], saved);
+        Assert.Empty(deleted);
+    }
+
+    [Fact]
+    public async Task OnAfterSaveAsync_Update_WithNoOldRows_IgnoresDuplicateKeys()
+    {
+        var saved = new List<int?>();
+        var deleted = new List<object?>();
+        var factory = SaveDeleteFactory(saved, deleted);
+        using var connection = new MockDbConnection()
+            .InterceptExecuteReader(_ => new MockDbDataReader());
+        var master = new LkMainRow { ID = 5, SelectedItems = [11, 11, 22] };
+        var behavior = CreateBehavior(master, master.GetFields().SelectedItems, factory);
+
+        await behavior.OnAfterSaveAsync(CreateSaveHandlerAsync(connection, false, master),
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal([11, 22], saved);
+        Assert.Empty(deleted);
+    }
+
+    [Fact]
     public void OnAfterSave_Update_WithEmptyNewList_DeletesOldRows()
     {
         var saved = new List<int?>();

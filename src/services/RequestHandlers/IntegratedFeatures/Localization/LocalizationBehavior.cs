@@ -310,7 +310,7 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
         {
             row = rowFactory();
             row.TrackAssignments = true;
-            rowIdField.AsObject(row, rowIdField.AsObject(row));
+            rowIdField.AsObject(row, foreignKeyField.AsObject(localRow));
 
             for (var i = 0; i < fields.Count; i++)
             {

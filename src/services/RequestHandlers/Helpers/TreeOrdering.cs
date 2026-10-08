@@ -20,37 +20,58 @@ public static class TreeOrdering
         Func<TItem, TIdentity> getId, Func<TItem, TIdentity?> getParentId)
         where TIdentity : struct
     {
-        var result = new List<TItem>();
+        ArgumentNullException.ThrowIfNull(items);
+        ArgumentNullException.ThrowIfNull(getId);
+        ArgumentNullException.ThrowIfNull(getParentId);
 
-        var itemById = items.ToLookup(getId);
-        var byParentId = items.ToLookup(getParentId);
+        var itemList = items as IReadOnlyList<TItem> ?? items.ToList();
+        var result = new List<TItem>(itemList.Count);
 
-        var visited = new HashSet<TIdentity>();
+        if (itemList.Count == 0)
+            return result;
 
-        void takeChildren(TIdentity theParentId)
+        var itemById = itemList.ToLookup(getId);
+        var byParentId = itemList.ToLookup(getParentId);
+
+        var emitted = new HashSet<TItem>();
+        var expanded = new HashSet<TIdentity>();
+        var stack = new Stack<TItem>();
+
+        void processStack()
         {
-            if (visited.Contains(theParentId))
-                return;
-
-            visited.Add(theParentId);
-
-            foreach (var item in byParentId[theParentId])
+            while (stack.Count > 0)
             {
+                var item = stack.Pop();
+                if (!emitted.Add(item))
+                    continue;
+
                 result.Add(item);
-                takeChildren(getId(item));
+
+                var id = getId(item);
+                if (!expanded.Add(id))
+                    continue;
+
+                var children = byParentId[id].ToList();
+                for (var i = children.Count - 1; i >= 0; i--)
+                    stack.Push(children[i]);
             }
         }
 
-        foreach (var item in items)
+        for (var i = itemList.Count - 1; i >= 0; i--)
         {
+            var item = itemList[i];
             var parentId = getParentId(item);
-            if (parentId == null ||
-                !itemById[parentId.Value].Any())
-            {
-                result.Add(item);
-                takeChildren(getId(item));
-            }
+            if (parentId == null || !itemById[parentId.Value].Any())
+                stack.Push(item);
         }
+
+        processStack();
+
+        for (var i = itemList.Count - 1; i >= 0; i--)
+            if (!emitted.Contains(itemList[i]))
+                stack.Push(itemList[i]);
+
+        processStack();
 
         return result;
     }
