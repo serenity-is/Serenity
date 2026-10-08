@@ -49,7 +49,8 @@ public class MultipleOutputHelper
         string[]? designTimeCoreFiles = null,
         bool allowDeletion = true,
         IEnumerable<string>? preservedFiles = null,
-        bool collectSkippedDeletes = false)
+        bool collectSkippedDeletes = false,
+        bool preserveAllExisting = false)
     {
         ArgumentNullException.ThrowIfNull(fileSystem);
 
@@ -64,9 +65,18 @@ public class MultipleOutputHelper
         var extraPatterns = deleteExtraPattern ?? [];
         var outRoot = PathHelper.ToUrl(outDir).TrimEnd('/') + '/';
 
+        var skippedUpdateSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        void addSkippedUpdate(string path)
+        {
+            if (skippedUpdateSet.Add(path))
+                result.SkippedUpdates.Add(path);
+        }
+
         // Files kept as-is even though the generated content differs (e.g. design-time
         // snapshots that would collapse a populated core file to an empty baseline).
         // They are treated as generated (so they are not deleted) and never overwritten.
+        // When preserveAllExisting is set (a collapsed/invalid snapshot), every existing
+        // output is kept so a partial compilation cannot corrupt previously generated files.
         var preservedSet = new HashSet<string>(
             (preservedFiles ?? []).Where(x => !string.IsNullOrEmpty(x))
                 .Select(x => PathHelper.ToUrl(x)!), StringComparer.OrdinalIgnoreCase);
@@ -74,15 +84,18 @@ public class MultipleOutputHelper
         {
             generated.Add(preserved);
             if (fileSystem.FileExists(fileSystem.Combine(outDir, preserved)))
-                result.SkippedUpdates.Add(preserved);
+                addSkippedUpdate(preserved);
         }
 
         foreach (var (path, txt) in outputFiles)
         {
             var outFile = fileSystem.Combine(outDir, path);
             bool exists = fileSystem.FileExists(outFile);
-            if (exists && preservedSet.Contains(PathHelper.ToUrl(path)!))
+            if (exists && (preserveAllExisting || preservedSet.Contains(PathHelper.ToUrl(path)!)))
+            {
+                addSkippedUpdate(PathHelper.ToUrl(path)!);
                 continue;
+            }
 
             if (exists)
             {
