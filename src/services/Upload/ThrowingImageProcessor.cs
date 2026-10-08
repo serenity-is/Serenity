@@ -7,7 +7,11 @@ namespace Serenity.Web;
 /// </summary>
 public class ThrowingImageProcessor : IImageProcessor
 {
-    const string NotImplementedMessage = "Please add your own IImageProcessor implementation in Startup.cs.";
+    const string NotImplementedMessage =
+        "No IImageProcessor implementation is registered. Image upload operations that check or resize images " +
+        "require one. Register your own in Startup.cs before calling services.AddUploadStorage(), " +
+        "e.g. services.AddSingleton<IImageProcessor, YourImageProcessor>(); " +
+        "See SkiaSharpImageProcessor.cs in latest Serene and StartSharp for a sample implementation.";
 
     /// <inheritdoc/>
     public (int width, int height) GetImageSize(object image)

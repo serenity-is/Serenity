@@ -36,6 +36,10 @@
     <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" VersionOverride="3.0.5" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="7.0.2" />
     <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="6.0.3" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers" />
+    <PackageReference Include="SkiaSharp" Version="3.119.4" />
+    <!-- Uncomment if you will host on Linux/Ubuntu (large native package, not needed on Windows/macOS):
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="3.119.4" />
+    -->
   </ItemGroup>
   <ItemGroup Condition="'$(UseProjectRefs)' == 'false'">
     <PackageReference Include="Serenity.Assets" Version="10.5.2" />

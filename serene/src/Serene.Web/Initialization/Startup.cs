@@ -91,6 +91,7 @@ public partial class Startup
         services.AddUserProvider<AppServices.UserAccessor, AppServices.UserRetrieveService>();
 
         services.AddClamAVUploadScanner()
+            .AddSingleton<IImageProcessor, SkiaSharpImageProcessor>()
             .AddUploadStorage();
         services.AddDynamicScripts()
             .AddCssAndScriptBundling();

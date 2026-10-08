@@ -43,7 +43,8 @@ public interface IImageProcessor
     ///   source aspect ratio is different than thumbnail (see <see cref="ImageScaleMode"/>).</param>
     /// <param name="backgroundColor">
     ///   Specifies fill color for PreserveRatioWithFill mode.</param>
-    /// <param name="inplace">True if the original image should be modified inplace</param>
+    /// <param name="inplace">True if the original image should be modified inplace.
+    /// If this is not supported, the processor may throw an exception.</param>
     /// <returns>
     ///   Generated thumbnail image. Should be disposed by caller.</returns>
     object Scale(object image, int width, int height,
