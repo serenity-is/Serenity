@@ -132,7 +132,9 @@ internal class OriginPropertyDictionary
         }
         else if (!d.TryGetValue(propertyName, out pi))
         {
-            d = new Dictionary<string, Tuple<PropertyInfo, Type>>
+            // Copy-on-write: keep the entries already resolved for other properties,
+            // otherwise each new property would evict all previously cached ones.
+            d = new Dictionary<string, Tuple<PropertyInfo, Type>>(d)
             {
                 [propertyName] = pi = new Tuple<PropertyInfo, Type>(
                     GetOriginProperty(propertyByName[propertyName],

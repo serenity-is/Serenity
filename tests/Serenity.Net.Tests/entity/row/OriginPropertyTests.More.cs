@@ -213,4 +213,22 @@ public class OriginPropertyTestsMore
         Assert.Contains("eo_ij", fields.CountryName.Expression);
         Assert.Contains("eo_oa", fields.CountryName.Expression);
     }
+
+    [Fact]
+    public void Origin_Property_Cache_Keeps_Entries_For_Multiple_Properties()
+    {
+        // Regression: the copy-on-write cache previously replaced the whole dictionary
+        // on a miss, so resolving each new property evicted all previously cached ones.
+        var dictionary = new OriginPropertyDictionary(
+            typeof(OriginPropertyTests.OriginAttributePropagationRow), userEntityOptions: null);
+        var selector = new DialectExpressionSelector(SqlServer2012Dialect.Instance);
+
+        Assert.NotNull(dictionary.OriginAttribute<SizeAttribute>("CountryCode", selector));
+        Assert.NotNull(dictionary.OriginAttribute<ScaleAttribute>("CountryRate", selector));
+
+        Assert.NotNull(dictionary.originPropertyByName);
+        Assert.Equal(2, dictionary.originPropertyByName!.Count);
+        Assert.True(dictionary.originPropertyByName.ContainsKey("CountryCode"));
+        Assert.True(dictionary.originPropertyByName.ContainsKey("CountryRate"));
+    }
 }
