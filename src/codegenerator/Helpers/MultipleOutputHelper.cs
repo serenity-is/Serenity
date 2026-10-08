@@ -1,10 +1,44 @@
 namespace Serenity.CodeGenerator;
 
+/// <summary>
+/// Summarizes the file changes performed by <see cref="MultipleOutputHelper.WriteFiles"/>.
+/// All paths are relative to the output directory (URL style, e.g. <c>Administration/UserRow.ts</c>).
+/// </summary>
+public class WriteFilesResult
+{
+    /// <summary>New files that were written.</summary>
+    public List<string> Added { get; } = [];
+
+    /// <summary>Existing files whose content was overwritten.</summary>
+    public List<string> Modified { get; } = [];
+
+    /// <summary>Stale files that were deleted.</summary>
+    public List<string> Deleted { get; } = [];
+
+    /// <summary>Stale files that would have been deleted, but were kept by safety checks.</summary>
+    public List<string> SkippedDeletes { get; } = [];
+
+    /// <summary>Files that would have been overwritten, but whose existing content was kept by safety checks.</summary>
+    public List<string> SkippedUpdates { get; } = [];
+
+    /// <summary>Number of files written (added + modified).</summary>
+    public int WrittenCount => Added.Count + Modified.Count;
+
+    /// <summary>Number of files deleted.</summary>
+    public int DeletedCount => Deleted.Count;
+
+    /// <summary>True if any file was added, modified or deleted.</summary>
+    public bool HasChanges => Added.Count > 0 || Modified.Count > 0 || Deleted.Count > 0;
+
+    /// <summary>True if any change was suppressed by safety checks.</summary>
+    public bool HasSkippedChanges => SkippedDeletes.Count > 0 || SkippedUpdates.Count > 0;
+}
+
 public class MultipleOutputHelper
 {
     private static readonly Encoding utf8 = new UTF8Encoding(true);
 
-    public static void WriteFiles(IFileSystem fileSystem,
+    public static WriteFilesResult WriteFiles(IFileSystem fileSystem,
 #if !ISSOURCEGENERATOR
         IGeneratorConsole console,
 #endif
@@ -13,9 +47,13 @@ public class MultipleOutputHelper
         string? endOfLine,
         bool designTimeBuild = false,
         string[]? designTimeCoreFiles = null,
-        bool allowDesignTimeDeletion = true)
+        bool allowDeletion = true,
+        IEnumerable<string>? preservedFiles = null,
+        bool collectSkippedDeletes = false)
     {
         ArgumentNullException.ThrowIfNull(fileSystem);
+
+        var result = new WriteFilesResult();
 
         outDir = fileSystem.GetFullPath(outDir);
         fileSystem.CreateDirectory(outDir);
@@ -26,10 +64,26 @@ public class MultipleOutputHelper
         var extraPatterns = deleteExtraPattern ?? [];
         var outRoot = PathHelper.ToUrl(outDir).TrimEnd('/') + '/';
 
+        // Files kept as-is even though the generated content differs (e.g. design-time
+        // snapshots that would collapse a populated core file to an empty baseline).
+        // They are treated as generated (so they are not deleted) and never overwritten.
+        var preservedSet = new HashSet<string>(
+            (preservedFiles ?? []).Where(x => !string.IsNullOrEmpty(x))
+                .Select(x => PathHelper.ToUrl(x)!), StringComparer.OrdinalIgnoreCase);
+        foreach (var preserved in preservedSet)
+        {
+            generated.Add(preserved);
+            if (fileSystem.FileExists(fileSystem.Combine(outDir, preserved)))
+                result.SkippedUpdates.Add(preserved);
+        }
+
         foreach (var (path, txt) in outputFiles)
         {
             var outFile = fileSystem.Combine(outDir, path);
             bool exists = fileSystem.FileExists(outFile);
+            if (exists && preservedSet.Contains(PathHelper.ToUrl(path)!))
+                continue;
+
             if (exists)
             {
                 var content = fileSystem.ReadAllText(outFile, utf8);
@@ -53,29 +107,50 @@ public class MultipleOutputHelper
                 text = text.Replace("\r", "").Replace("\n", "\r\n");
 
             fileSystem.WriteAllText(outFile, text, utf8);
+
+            if (exists)
+                result.Modified.Add(PathHelper.ToUrl(path));
+            else
+                result.Added.Add(PathHelper.ToUrl(path));
         }
 
         if (extraPatterns.Length == 0)
-            return;
+            return result;
 
-        // Keep stale outputs while compiler errors can temporarily hide generated types.
-        if (designTimeBuild && !allowDesignTimeDeletion)
-            return;
+        string relativeOf(string file) => PathHelper.ToUrl(file)[outRoot.Length..];
 
-        var filesToDelete = extraPatterns.SelectMany(x => fileSystem.GetFiles(outDir, x, recursive: true))
-            .Distinct()
-            .Where(file =>
-            {
-                var filePath = PathHelper.ToUrl(file);
-                return filePath.StartsWith(outRoot, StringComparison.Ordinal) &&
-                    !generated.Contains(filePath[outRoot.Length..]);
-            })
-            .ToArray();
+        string[] computeStaleFiles()
+        {
+            return extraPatterns.SelectMany(x => fileSystem.GetFiles(outDir, x, recursive: true))
+                .Distinct()
+                .Where(file =>
+                {
+                    var filePath = PathHelper.ToUrl(file);
+                    return filePath.StartsWith(outRoot, StringComparison.Ordinal) &&
+                        !generated.Contains(filePath[outRoot.Length..]);
+                })
+                .ToArray();
+        }
+
+        // Keep stale outputs whenever deletion is not authorized (compiler errors or a
+        // collapsed/incomplete compilation). This applies in every context, not only
+        // design-time builds, because VS also runs real builds with partial compilations
+        // (e.g. BuildingProject=true with a nearly empty syntax tree set while loading).
+        // Only enumerate the stale candidates when they are actually going to be reported,
+        // to avoid an extra directory scan when tracing/diagnostics are disabled.
+        if (!allowDeletion)
+        {
+            if (collectSkippedDeletes)
+                result.SkippedDeletes.AddRange(computeStaleFiles().Select(relativeOf));
+            return result;
+        }
+
+        var filesToDelete = computeStaleFiles();
 
         if (designTimeBuild)
         {
             var coreFiles = new HashSet<string>((designTimeCoreFiles ?? [])
-                .Select(PathHelper.ToUrl).OfType<string>(), StringComparer.OrdinalIgnoreCase);
+                .Select(x => PathHelper.ToUrl(x)!), StringComparer.OrdinalIgnoreCase);
             var nonCoreFilesToDelete = filesToDelete.Where(file =>
             {
                 var filePath = PathHelper.ToUrl(file);
@@ -87,8 +162,16 @@ public class MultipleOutputHelper
             // removals and renames are reflected during design-time builds. Multiple stale files or no generated
             // non-core types may indicate incomplete discovery, so preserve existing outputs in those cases.
             if (nonCoreFilesToDelete.Length != 1 || generatedNonCoreFileCount == 0)
-                return;
+            {
+                result.SkippedDeletes.AddRange(filesToDelete.Select(relativeOf));
+                return result;
+            }
 
+            var nonCoreSet = new HashSet<string>(nonCoreFilesToDelete
+                .Select(x => PathHelper.ToUrl(x)!), StringComparer.OrdinalIgnoreCase);
+            result.SkippedDeletes.AddRange(filesToDelete
+                .Where(file => !nonCoreSet.Contains(PathHelper.ToUrl(file)))
+                .Select(relativeOf));
             filesToDelete = nonCoreFilesToDelete;
         }
 
@@ -99,6 +182,9 @@ public class MultipleOutputHelper
             console.WriteLine(fileSystem.GetFileName(file));
 #endif
             fileSystem.DeleteFile(file);
+            result.Deleted.Add(relativeOf(file));
         }
+
+        return result;
     }
 }
