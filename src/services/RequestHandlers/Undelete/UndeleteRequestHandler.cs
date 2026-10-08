@@ -129,7 +129,7 @@ public class UndeleteRequestHandler<TRow, TUndeleteRequest, TUndeleteResponse> :
     protected virtual void ExecuteUndelete()
     {
         var idField = Row.GetIdField();
-        var id = idField.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture);
+        var id = EntityIdHelper.Convert(idField, Request.EntityId, Localizer);
 
         var isActiveDeletedRow = Row as IIsActiveDeletedRow;
         var isDeletedRow = Row as IIsDeletedRow;

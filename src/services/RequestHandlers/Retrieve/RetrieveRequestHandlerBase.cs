@@ -198,7 +198,7 @@ public abstract class RetrieveRequestHandlerBase<TRow, TRetrieveRequest, TRetrie
             .From(Row);
 
         var idField = Row.GetIdField();
-        var id = idField.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture);
+        var id = EntityIdHelper.Convert(idField, Request.EntityId, Localizer);
 
         query.WhereEqual(idField, id);
 

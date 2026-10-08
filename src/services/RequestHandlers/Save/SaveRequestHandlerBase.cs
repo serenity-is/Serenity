@@ -350,7 +350,7 @@ public abstract class SaveRequestHandlerBase<TRow, TSaveRequest, TSaveResponse>(
             // silently ignored (or re-key the row), so reject it instead.
             var newId = idField.AsObjectNoCheck(Row);
             var oldId = Request.EntityId != null
-                ? idField.ConvertValue(Request.EntityId, System.Globalization.CultureInfo.InvariantCulture)
+                ? EntityIdHelper.Convert(idField, Request.EntityId, Localizer)
                 : newId;
 
             if (newId != null && !Equals(newId, oldId))
@@ -376,7 +376,7 @@ public abstract class SaveRequestHandlerBase<TRow, TSaveRequest, TSaveResponse>(
     {
         var idField = Row.GetIdField();
         if (Request.EntityId != null)
-            return idField.ConvertValue(Request.EntityId, System.Globalization.CultureInfo.InvariantCulture);
+            return EntityIdHelper.Convert(idField, Request.EntityId, Localizer);
 
         var rowId = idField.AsObject(Row);
         if (rowId == null && (idField.Flags & FieldFlags.NotNull) == FieldFlags.NotNull)

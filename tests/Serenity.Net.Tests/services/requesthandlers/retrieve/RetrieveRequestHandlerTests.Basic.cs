@@ -19,6 +19,17 @@ public class RetrieveRequestHandlerTests_Basic
     }
 
     [Fact]
+    public void Retrieve_MalformedEntityId_Throws_InvalidId()
+    {
+        using var connection = new MockDbConnection();
+        var handler = new RetrieveRequestHandler<IdNameRow>(Context());
+
+        var ex = Assert.Throws<ValidationError>(() =>
+            handler.Retrieve(connection, new RetrieveRequest { EntityId = "abc" }));
+        Assert.Equal("InvalidId", ex.ErrorCode);
+    }
+
+    [Fact]
     public void Retrieve_UninitializedProperties_Throw()
     {
         var handler = new RetrieveRequestHandler<IdNameRow>(Context());

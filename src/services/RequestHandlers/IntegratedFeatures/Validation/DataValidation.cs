@@ -182,13 +182,15 @@ public static class DataValidation
     }
 
     /// <summary>
-    /// Returns an invalid ID error.
+    /// Returns an invalid ID error. The value is usually the raw value as received in
+    /// the request, so it can be a string that could not be converted to the id
+    /// field's type.
     /// </summary>
     /// <param name="field">Field</param>
     /// <param name="value">Value</param>
     /// <param name="localizer">Text localizer</param>
     /// <returns>The invalid ID error.</returns>
-    public static ValidationError InvalidIdError(Field field, long value, ITextLocalizer? localizer)
+    public static ValidationError InvalidIdError(Field field, object? value, ITextLocalizer? localizer)
     {
         return new ValidationError("InvalidId", field.Name,
             DataValidationTexts.FieldInvalidValue.ToString(localizer),

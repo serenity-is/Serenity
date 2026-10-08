@@ -34,6 +34,17 @@ public class DeleteRequestHandlerTests_Basic
     }
 
     [Fact]
+    public void Delete_MalformedEntityId_Throws_InvalidId()
+    {
+        using var connection = new MockDbConnection();
+        var handler = new DeleteRequestHandler<IdNameRow>(Context());
+
+        var ex = Assert.Throws<ValidationError>(() =>
+            handler.Delete(new MockUnitOfWork(connection), new DeleteRequest { EntityId = "abc" }));
+        Assert.Equal("InvalidId", ex.ErrorCode);
+    }
+
+    [Fact]
     public void Delete_UninitializedProperties_Throw()
     {
         var handler = new DeleteRequestHandler<IdNameRow>(Context());

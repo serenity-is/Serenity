@@ -70,7 +70,7 @@ public abstract class UndeleteRequestHandlerBase<TRow, TUndeleteRequest, TUndele
         if ((idField.Flags & FieldFlags.NotNull) == FieldFlags.NotNull)
             ArgumentNullException.ThrowIfNull(Request.EntityId);
 
-        return idField.ConvertValue(Request.EntityId, System.Globalization.CultureInfo.InvariantCulture);
+        return EntityIdHelper.Convert(idField, Request.EntityId, Localizer);
     }
 
     /// <summary>

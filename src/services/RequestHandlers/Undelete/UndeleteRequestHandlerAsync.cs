@@ -127,7 +127,7 @@ public class UndeleteRequestHandlerAsync<TRow, TUndeleteRequest, TUndeleteRespon
     protected virtual async Task ExecuteUndeleteAsync(CancellationToken cancellationToken = default)
     {
         var idField = Row.GetIdField();
-        var id = idField.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture);
+        var id = EntityIdHelper.Convert(idField, Request.EntityId, Localizer);
 
         var isActiveDeletedRow = Row as IIsActiveDeletedRow;
         var isDeletedRow = Row as IIsDeletedRow;

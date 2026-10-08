@@ -49,6 +49,17 @@ public class UndeleteRequestHandlerTests_Basic
     }
 
     [Fact]
+    public void Undelete_MalformedEntityId_Throws_InvalidId()
+    {
+        using var connection = new MockDbConnection();
+        var handler = new UndeleteRequestHandler<UndelRow>(Context());
+
+        var ex = Assert.Throws<ValidationError>(() =>
+            handler.Undelete(new MockUnitOfWork(connection), new UndeleteRequest { EntityId = "abc" }));
+        Assert.Equal("InvalidId", ex.ErrorCode);
+    }
+
+    [Fact]
     public void Undelete_UninitializedProperties_Throw()
     {
         var handler = new UndeleteRequestHandler<UndelRow>(Context());

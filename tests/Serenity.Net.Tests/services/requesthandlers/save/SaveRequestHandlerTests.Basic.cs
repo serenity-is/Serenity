@@ -67,6 +67,20 @@ public class SaveRequestHandlerTests_Basic
     }
 
     [Fact]
+    public void Update_MalformedEntityId_Throws_InvalidId()
+    {
+        using var connection = new MockDbConnection();
+        var handler = new SaveRequestHandler<IdNameRow>(Context());
+
+        var ex = Assert.Throws<ValidationError>(() => handler.Update(new MockUnitOfWork(connection), new SaveRequest<IdNameRow>
+        {
+            EntityId = "abc",
+            Entity = new IdNameRow { ID = 5, Name = "New" }
+        }));
+        Assert.Equal("InvalidId", ex.ErrorCode);
+    }
+
+    [Fact]
     public void UninitializedProperties_Throw()
     {
         var handler = new SaveRequestHandler<IdNameRow>(Context());

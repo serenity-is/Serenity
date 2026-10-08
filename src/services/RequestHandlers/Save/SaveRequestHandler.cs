@@ -215,14 +215,14 @@ public class SaveRequestHandler<TRow, TSaveRequest, TSaveResponse> :
     {
         var idField = Row.IdField;
         var id = Request.EntityId != null ?
-            idField!.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture)
+            EntityIdHelper.Convert(idField!, Request.EntityId, Localizer)
             : idField!.AsSqlValue(Row);
 
         var query = new SqlQuery()
             .Dialect(Connection.GetDialect())
             .From(Old!)
             .SelectTableFields()
-            .WhereEqual(idField, id);
+            .WhereEqual(idField!, id);
 
         foreach (var behavior in behaviors.Value)
             behavior.OnPrepareQuery(this, query);

@@ -271,7 +271,7 @@ public class SaveRequestHandlerAsync<TRow, TSaveRequest, TSaveResponse> :
     {
         var idField = Row.GetIdField();
         var id = Request.EntityId != null ?
-            idField.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture)
+            EntityIdHelper.Convert(idField, Request.EntityId, Localizer)
             : idField.AsSqlValue(Row);
 
         var query = new SqlQuery()

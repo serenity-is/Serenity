@@ -270,5 +270,6 @@ public class DataValidationTests
 
         Assert.Equal("Invalid value n for field Name!", DataValidation.InvalidIdError(row, field, null).Message);
         Assert.Equal("Invalid value 1 for field Name!", DataValidation.InvalidIdError(field, 1, null).Message);
+        Assert.Equal("Invalid value x for field Name!", DataValidation.InvalidIdError(field, "x", null).Message);
     }
 }

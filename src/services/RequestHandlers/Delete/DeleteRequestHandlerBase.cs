@@ -65,7 +65,7 @@ public abstract class DeleteRequestHandlerBase<TRow, TDeleteRequest, TDeleteResp
         if ((idField.Flags & FieldFlags.NotNull) == FieldFlags.NotNull)
             ArgumentNullException.ThrowIfNull(Request.EntityId);
 
-        return idField.ConvertValue(Request.EntityId, System.Globalization.CultureInfo.InvariantCulture);
+        return EntityIdHelper.Convert(idField, Request.EntityId, Localizer);
     }
 
     /// <summary>

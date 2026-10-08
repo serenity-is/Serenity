@@ -129,7 +129,7 @@ public class DeleteRequestHandlerAsync<TRow, TDeleteRequest, TDeleteResponse> :
         var isDeletedRow = Row as IIsDeletedRow;
         var deleteLogRow = Row as IDeleteLogRow;
         var idField = Row.GetIdField();
-        var id = idField.ConvertValue(Request.EntityId, CultureInfo.InvariantCulture);
+        var id = EntityIdHelper.Convert(idField, Request.EntityId, Localizer);
 
         if (isActiveDeletedRow == null && isDeletedRow == null && deleteLogRow == null)
         {
