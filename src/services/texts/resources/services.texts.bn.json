@@ -34,6 +34,7 @@
   "Enums.ImageCheckResult.WidthTooLow": "ছবির প্রস্থ অবশ্যই {0} পিক্সেল থেকে উচ্চতা থাকতে হবে, কিন্তু এটি {1} পিক্সেল!",
   "Validation.ArgumentIsNull": "আর্গুমেন্ট {0} খালি আছে!",
   "Validation.ArgumentOutOfRange": "আর্গুমেন্ট {0} রেঞ্জ থেকে বাহির!",
+  "Validation.ConcurrencyConflict": "আপনি এটি লোড করার পর থেকে অন্য একজন ব্যবহারকারী এই রেকর্ডটি পরিবর্তন করেছেন। অনুগ্রহ করে আবার লোড করে চেষ্টা করুন!",
   "Validation.DeleteForeignKeyError": "রেকর্ড মুছে দেওয়া যাবে না। '{0}' টেবিলে এই একটির উপর নির্ভরশীল রেকর্ড আছে!",
   "Validation.DeleteForeignKeyErrorGeneric": "রেকর্ড মুছে ফেলা যাচ্ছে না। এই রেকর্ডের ওপর নির্ভরশীল সম্পর্কিত রেকর্ড রয়েছে!",
   "Validation.EntityForeignKeyViolation": "আপনাকে প্রথমে এই একটি মুছে দিতে হলে সম্পর্কিত {0} রেকর্ড মুছে দিতে হবে!",

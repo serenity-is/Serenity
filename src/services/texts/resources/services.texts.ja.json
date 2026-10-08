@@ -34,6 +34,7 @@
   "Enums.ImageCheckResult.WidthTooLow": "画像の幅は{0}ピクセルより大きくなければなりませんが、{1}ピクセルです！",
   "Validation.ArgumentIsNull": "引数{0}はnullです！",
   "Validation.ArgumentOutOfRange": "引数{0}は範囲外です！",
+  "Validation.ConcurrencyConflict": "読み込み後に別のユーザーがこのレコードを変更しました。再読み込みしてもう一度お試しください！",
   "Validation.DeleteForeignKeyError": "レコードを削除できません。 '{0}'テーブルには、これに依存するレコードがあります！",
   "Validation.DeleteForeignKeyErrorGeneric": "レコードを削除できません。このレコードに依存する関連レコードがあります！",
   "Validation.EntityForeignKeyViolation": "これを削除する前に関連する{0}レコードを最初に削除する必要があります！",

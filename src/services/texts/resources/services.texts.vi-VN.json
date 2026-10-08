@@ -34,6 +34,7 @@
   "Enums.ImageCheckResult.WidthTooLow": "Chiều rộng hình ảnh phải lớn hơn {0} pixel, nhưng là {1} pixel!",
   "Validation.ArgumentIsNull": "Tham số {0} là null!",
   "Validation.ArgumentOutOfRange": "Tham số {0} nằm ngoài phạm vi!",
+  "Validation.ConcurrencyConflict": "Bản ghi này đã được người dùng khác chỉnh sửa kể từ khi bạn tải. Vui lòng tải lại và thử lại!",
   "Validation.DeleteForeignKeyError": "Không thể xóa bản ghi. Bảng '{0}' có các bản ghi phụ thuộc vào bản ghi này!",
   "Validation.DeleteForeignKeyErrorGeneric": "Không thể xóa bản ghi. Có các bản ghi liên quan phụ thuộc vào bản ghi này!",
   "Validation.EntityForeignKeyViolation": "Bạn phải xóa các bản ghi liên quan {0} trước khi xóa bản ghi này!",

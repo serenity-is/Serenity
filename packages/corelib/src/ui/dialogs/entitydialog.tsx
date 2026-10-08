@@ -407,6 +407,14 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
         return this.getRowDefinition()?.isDeletedProperty;
     }
 
+    /**
+     * Returns the concurrency version property for the entity, if any.
+     * @returns The concurrency version property name.
+     */
+    protected getConcurrencyVersionProperty(): string {
+        return this.getRowDefinition()?.concurrencyVersionProperty;
+    }
+
     declare private _service: string;
 
     protected getService() {
@@ -821,6 +829,16 @@ export class EntityDialog<TItem, P = {}> extends BaseDialog<P> implements IEditD
             const idField = this.getIdProperty();
             if (idField != null && (entity as any)[idField] == null)
                 (entity as any)[idField] = this.entityId;
+        }
+
+        // the concurrency version field is read only so it has no form field,
+        // send it back from the loaded entity for optimistic concurrency checks
+        const concurrencyVersionProperty = this.getConcurrencyVersionProperty();
+        if (concurrencyVersionProperty != null &&
+            (entity as any)[concurrencyVersionProperty] == null &&
+            this.entity != null &&
+            (this.entity as any)[concurrencyVersionProperty] != null) {
+            (entity as any)[concurrencyVersionProperty] = (this.entity as any)[concurrencyVersionProperty];
         }
 
         return entity;

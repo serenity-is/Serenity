@@ -34,6 +34,7 @@
   "Enums.ImageCheckResult.WidthTooLow": "Lățimea imaginii trebuie să fie mai mare decât {0} pixeli, dar este {1} pixeli!",
   "Validation.ArgumentIsNull": "Argumentul {0} este nul!",
   "Validation.ArgumentOutOfRange": "Argumentul {0} este în afara intervalului!",
+  "Validation.ConcurrencyConflict": "Această înregistrare a fost modificată de alt utilizator de când ați încărcat-o. Reîncărcați-o și încercați din nou!",
   "Validation.DeleteForeignKeyError": "Nu se poate șterge înregistrarea. Tabelul '{0}' are înregistrări care depind de aceasta!",
   "Validation.DeleteForeignKeyErrorGeneric": "Nu se poate șterge înregistrarea. Există înregistrări asociate care depind de aceasta!",
   "Validation.EntityForeignKeyViolation": "Trebuie să ștergeți în prealabil înregistrările {0} corelate înainte de a șterge aceasta!",

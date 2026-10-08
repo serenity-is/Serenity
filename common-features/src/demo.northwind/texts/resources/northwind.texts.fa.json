@@ -151,6 +151,7 @@
   "Db.Northwind.Product.ProductName": "نام محصول",
   "Db.Northwind.Product.QuantityPerUnit": "مقدار برای هر واحد",
   "Db.Northwind.Product.ReorderLevel": "سطح سفارش مجدد",
+  "Db.Northwind.Product.RowVersion": "نسخه رکورد",
   "Db.Northwind.Product.SupplierCompanyName": "تامین کننده",
   "Db.Northwind.Product.SupplierCountry": "کشور تامین کننده",
   "Db.Northwind.Product.SupplierID": "تامین کننده",

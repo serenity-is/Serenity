@@ -220,6 +220,18 @@ public static class DataValidation
     }
 
     /// <summary>
+    /// Returns a concurrency conflict error, e.g. the record was modified by another user
+    /// since the version value the client sent.
+    /// </summary>
+    /// <param name="localizer">Text localizer</param>
+    /// <returns>The concurrency conflict error.</returns>
+    public static ValidationError ConcurrencyConflictError(ITextLocalizer? localizer)
+    {
+        return new ValidationError("ConcurrencyConflict", null,
+            DataValidationTexts.ConcurrencyConflict.ToString(localizer));
+    }
+
+    /// <summary>
     /// Returns an invalid value error.
     /// </summary>
     /// <param name="field">Field</param>

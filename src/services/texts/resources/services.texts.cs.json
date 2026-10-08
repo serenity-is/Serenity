@@ -34,6 +34,7 @@
   "Enums.ImageCheckResult.WidthTooLow": "Obrázek šířka musí být vyšší než {0} pixelů, ale je to {1} pixelů!",
   "Validation.ArgumentIsNull": "Argument {0} je prázdný!",
   "Validation.ArgumentOutOfRange": "Argument {0} je mimo rozsah!",
+  "Validation.ConcurrencyConflict": "Tento záznam byl od načtení změněn jiným uživatelem. Znovu jej načtěte a zkuste to znovu!",
   "Validation.DeleteForeignKeyError": "Záznam nelze smazat. Tabulka '{0}' obsahuje záznamy, které závisí na tomto záznamu!",
   "Validation.DeleteForeignKeyErrorGeneric": "Záznam nelze odstranit. Existují související záznamy, které na tomto záznamu závisejí!",
   "Validation.EntityForeignKeyViolation": "Nejprve musíte smazat související záznamy {0} před smazáním tohoto!",

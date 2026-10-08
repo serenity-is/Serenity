@@ -34,6 +34,7 @@
   "Enums.ImageCheckResult.WidthTooLow": "圖片寬度必須大於{0}像素，但它是{1}像素！",
   "Validation.ArgumentIsNull": "參數{0}為空！",
   "Validation.ArgumentOutOfRange": "參數{0}超出範圍！",
+  "Validation.ConcurrencyConflict": "此記錄自您載入後已被其他使用者修改。請重新載入並再試一次！",
   "Validation.DeleteForeignKeyError": "無法刪除記錄。 '{0}'表中有依賴於此記錄的記錄！",
   "Validation.DeleteForeignKeyErrorGeneric": "無法刪除記錄。有相關記錄依賴於此記錄！",
   "Validation.EntityForeignKeyViolation": "您必須先刪除相關的{0}記錄，然後才能刪除此記錄！",

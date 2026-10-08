@@ -94,7 +94,21 @@ public class SaveRequestHandler<TRow, TSaveRequest, TSaveResponse> :
 
             if (Row.IsAnyFieldAssigned)
             {
-                if (idField.IndexCompare(Old!, Row, StringComparer.Ordinal) != 0)
+                var concurrencyVersionField = (Row as IConcurrencyVersionRow)?.ConcurrencyVersionField;
+
+                if (concurrencyVersionField is not null && concurrencyVersion is not null)
+                {
+                    var update = new SqlUpdate(Row.Table);
+                    update.Set(Row);
+                    update.Where(idField == new ValueCriteria(idField.AsSqlValue(Old!)) &
+                        concurrencyVersionField == new ValueCriteria(concurrencyVersion));
+                    InvokeSaveAction(() =>
+                    {
+                        if (update.Execute(Connection!, ExpectedRows.ZeroOrOne) != 1)
+                            throw DataValidation.ConcurrencyConflictError(Localizer);
+                    });
+                }
+                else if (idField.IndexCompare(Old!, Row, StringComparer.Ordinal) != 0)
                 {
                     var update = new SqlUpdate(Row.Table);
                     update.Set(Row);

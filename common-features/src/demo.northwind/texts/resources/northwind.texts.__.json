@@ -152,6 +152,7 @@
   "Db.Northwind.Product.ProductName": "Product Name",
   "Db.Northwind.Product.QuantityPerUnit": "Quantity Per Unit",
   "Db.Northwind.Product.ReorderLevel": "Reorder Level",
+  "Db.Northwind.Product.RowVersion": "Row Version",
   "Db.Northwind.Product.SupplierCompanyName": "Supplier",
   "Db.Northwind.Product.SupplierCountry": "Supplier Country",
   "Db.Northwind.Product.SupplierID": "Supplier",

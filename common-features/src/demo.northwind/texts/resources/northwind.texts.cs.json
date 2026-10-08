@@ -151,6 +151,7 @@
   "Db.Northwind.Product.ProductName": "Název produktu",
   "Db.Northwind.Product.QuantityPerUnit": "Množství na jednotku",
   "Db.Northwind.Product.ReorderLevel": "Reorder Level",
+  "Db.Northwind.Product.RowVersion": "Verze záznamu",
   "Db.Northwind.Product.SupplierCompanyName": "Dodavatel",
   "Db.Northwind.Product.SupplierCountry": "Země dodavatele",
   "Db.Northwind.Product.SupplierID": "Dodavatel",

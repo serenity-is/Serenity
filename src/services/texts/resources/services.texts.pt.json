@@ -34,6 +34,7 @@
   "Enums.ImageCheckResult.WidthTooLow": "A largura da imagem deve ser superior a {0} píxeis, mas é {1} píxeis!",
   "Validation.ArgumentIsNull": "Argumento {0} é nulo!",
   "Validation.ArgumentOutOfRange": "O argumento {0} está fora do intervalo!",
+  "Validation.ConcurrencyConflict": "Este registo foi alterado por outro utilizador desde que o carregou. Volte a carregá-lo e tente novamente!",
   "Validation.DeleteForeignKeyError": "Não é possível excluir o registro. A tabela '{0}' tem registros que dependem deste!",
   "Validation.DeleteForeignKeyErrorGeneric": "Não é possível eliminar o registo. Existem registos relacionados que dependem deste!",
   "Validation.EntityForeignKeyViolation": "Primeiro você deve excluir os registros relacionados {0} antes de excluir este!",

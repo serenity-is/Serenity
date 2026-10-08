@@ -265,24 +265,27 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
         }
     }
 
-    private void SaveDetail(IUnitOfWork uow, IRow detail, object masterId, object? detailId)
+    private void SaveDetail(IUnitOfWork uow, IRow detail, object masterId, object? detailId,
+        bool ignoreConcurrencyVersion)
     {
         detail = PrepareDetail(detail, masterId, detailId);
 
         var saveHandler = handlerFactory.CreateHandler<ISaveRequestProcessor>(rowType);
         var saveRequest = saveHandler.CreateRequest();
         saveRequest.Entity = detail;
+        saveRequest.IgnoreConcurrencyVersion = ignoreConcurrencyVersion;
         saveHandler.Process(uow, saveRequest, detailId == null ? SaveRequestType.Create : SaveRequestType.Update);
     }
 
     private async Task SaveDetailAsync(IUnitOfWork uow, IRow detail, object masterId, object? detailId,
-        CancellationToken cancellationToken = default)
+        bool ignoreConcurrencyVersion, CancellationToken cancellationToken = default)
     {
         detail = PrepareDetail(detail, masterId, detailId);
 
         var saveHandler = handlerFactory.CreateHandler<ISaveRequestProcessorAsync>(rowType);
         var saveRequest = saveHandler.CreateRequest();
         saveRequest.Entity = detail;
+        saveRequest.IgnoreConcurrencyVersion = ignoreConcurrencyVersion;
         await saveHandler.ProcessAsync(uow, saveRequest,
             detailId == null ? SaveRequestType.Create : SaveRequestType.Update, cancellationToken).ConfigureAwait(false);
     }
@@ -322,37 +325,38 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
         return obj.ToString();
     }
 
-    private void DetailListSave(IUnitOfWork uow, object masterId, IList oldList, IList newList)
+    private void DetailListSave(IUnitOfWork uow, object masterId, IList oldList, IList newList,
+        bool ignoreConcurrencyVersion)
     {
         var changes = ComputeDetailChanges(oldList, newList);
         if (changes == null)
             return;
 
         foreach (var row in changes.RowsToUpdate)
-            SaveDetail(uow, row.Row!, masterId, row.Id);
+            SaveDetail(uow, row.Row!, masterId, row.Id, ignoreConcurrencyVersion);
 
         foreach (var row in changes.RowsToDelete)
             DeleteDetail(uow, row.Id);
 
         foreach (var row in changes.RowsToInsert)
-            SaveDetail(uow, row.Row!, masterId, null);
+            SaveDetail(uow, row.Row!, masterId, null, ignoreConcurrencyVersion);
     }
 
     private async Task DetailListSaveAsync(IUnitOfWork uow, object masterId, IList oldList, IList newList,
-        CancellationToken cancellationToken = default)
+        bool ignoreConcurrencyVersion, CancellationToken cancellationToken = default)
     {
         var changes = ComputeDetailChanges(oldList, newList);
         if (changes == null)
             return;
 
         foreach (var row in changes.RowsToUpdate)
-            await SaveDetailAsync(uow, row.Row!, masterId, row.Id!, cancellationToken).ConfigureAwait(false);
+            await SaveDetailAsync(uow, row.Row!, masterId, row.Id!, ignoreConcurrencyVersion, cancellationToken).ConfigureAwait(false);
 
         foreach (var row in changes.RowsToDelete)
             await DeleteDetailAsync(uow, row.Id!, cancellationToken).ConfigureAwait(false);
 
         foreach (var row in changes.RowsToInsert)
-            await SaveDetailAsync(uow, row.Row!, masterId, null, cancellationToken).ConfigureAwait(false);
+            await SaveDetailAsync(uow, row.Row!, masterId, null, ignoreConcurrencyVersion, cancellationToken).ConfigureAwait(false);
     }
 
     private DetailChanges? ComputeDetailChanges(IList oldList, IList newList)
@@ -465,13 +469,13 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
         if (handler.IsCreate)
         {
             foreach (IRow entity in newList)
-                SaveDetail(handler.UnitOfWork, entity, masterId, null);
+                SaveDetail(handler.UnitOfWork, entity, masterId, null, handler.Request.IgnoreConcurrencyVersion);
 
             return;
         }
 
         var oldList = GetOldList(handler);
-        DetailListSave(handler.UnitOfWork, masterId, oldList, newList);
+        DetailListSave(handler.UnitOfWork, masterId, oldList, newList, handler.Request.IgnoreConcurrencyVersion);
     }
 
     /// <inheritdoc/>
@@ -485,13 +489,15 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
         if (handler.IsCreate)
         {
             foreach (IRow entity in newList)
-                await SaveDetailAsync(handler.UnitOfWork, entity, masterId, null, cancellationToken).ConfigureAwait(false);
+                await SaveDetailAsync(handler.UnitOfWork, entity, masterId, null,
+                    handler.Request.IgnoreConcurrencyVersion, cancellationToken).ConfigureAwait(false);
 
             return;
         }
 
         var oldList = await GetOldListAsync(handler, cancellationToken).ConfigureAwait(false);
-        await DetailListSaveAsync(handler.UnitOfWork, masterId, oldList, newList, cancellationToken).ConfigureAwait(false);
+        await DetailListSaveAsync(handler.UnitOfWork, masterId, oldList, newList,
+            handler.Request.IgnoreConcurrencyVersion, cancellationToken).ConfigureAwait(false);
     }
 
     private List<IRow> GetOldList(ISaveRequestHandler handler)

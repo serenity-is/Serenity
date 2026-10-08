@@ -151,6 +151,7 @@
   "Db.Northwind.Product.ProductName": "Nama Produk",
   "Db.Northwind.Product.QuantityPerUnit": "Kuantitas per unit",
   "Db.Northwind.Product.ReorderLevel": "Tingkat Pesanan Ulang",
+  "Db.Northwind.Product.RowVersion": "Versi baris",
   "Db.Northwind.Product.SupplierCompanyName": "Pemasok",
   "Db.Northwind.Product.SupplierCountry": "Negara pemasok",
   "Db.Northwind.Product.SupplierID": "Pemasok",

@@ -27,6 +27,7 @@ public partial class ServerTypingsGenerator
         "Serenity.Data.IIsActiveRow", "Serenity.Data.IIsActiveDeletedRow"
     ];
     private static readonly string[] isDeletedRowInterfaces = ["Serenity.Data.IIsDeletedRow", "Serenity.Data.IIsDeletedRow"];
+    private static readonly string[] concurrencyVersionRowInterface = ["Serenity.Data.IConcurrencyVersionRow"];
 
     private void GenerateRowMembers(TypeDefinition rowType, string? codeNamespace)
     {
@@ -416,6 +417,7 @@ public partial class ServerTypingsGenerator
         public string? NameProperty { get; set; }
         public string? IsActiveProperty { get; set; }
         public string? IsDeletedProperty { get; set; }
+        public string? ConcurrencyVersionProperty { get; set; }
         public string? LocalTextPrefix { get; set; }
         public string? LookupKey { get; set; }
         public string? ReadPermission { get; set; }
@@ -477,6 +479,11 @@ public partial class ServerTypingsGenerator
             "Serenity.Data.BooleanField", "IsDeletedField",
             "Serenity.Data.BooleanField Serenity.Data.IIsDeletedRow::get_IsDeletedField()");
 
+        metadata.ConcurrencyVersionProperty = ExtractInterfacePropertyFromRow(rowType,
+            concurrencyVersionRowInterface,
+            "Serenity.Data.Field", "ConcurrencyVersionField",
+            "Serenity.Data.Field Serenity.Data.IConcurrencyVersionRow::get_ConcurrencyVersionField()");
+
         metadata.LookupKey = DetermineLookupKey(rowType);
 
         metadata.DeletePermission = DeterminePermission(rowType, "Delete", "Modify", "Read");
@@ -511,6 +518,9 @@ public partial class ServerTypingsGenerator
 
         cw.InBrace(delegate
         {
+            if (meta.ConcurrencyVersionProperty != null)
+                cw.IndentedLine($"{export}concurrencyVersionProperty = {sq(meta.ConcurrencyVersionProperty)};");
+
             if (meta.IdProperty != null)
                 cw.IndentedLine($"{export}idProperty = {sq(meta.IdProperty)};");
 

@@ -34,6 +34,7 @@
   "Enums.ImageCheckResult.WidthTooLow": "Lebar gambar harus lebih tinggi dari {0} piksel, tetapi itu {1} piksel!",
   "Validation.ArgumentIsNull": "Argumen {0} kosong!",
   "Validation.ArgumentOutOfRange": "Argumen {0} di luar jangkauan!",
+  "Validation.ConcurrencyConflict": "Catatan ini telah diubah oleh pengguna lain sejak Anda memuatnya. Muat ulang dan coba lagi!",
   "Validation.DeleteForeignKeyError": "Tidak dapat menghapus catatan. Tabel '{0}' memiliki catatan yang bergantung pada catatan ini!",
   "Validation.DeleteForeignKeyErrorGeneric": "Catatan tidak dapat dihapus. Ada catatan terkait yang bergantung pada catatan ini!",
   "Validation.EntityForeignKeyViolation": "Anda harus menghapus catatan {0} yang terkait sebelum menghapus ini!",

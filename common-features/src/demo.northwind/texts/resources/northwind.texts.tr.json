@@ -151,6 +151,7 @@
   "Db.Northwind.Product.ProductName": "Ürün Adı",
   "Db.Northwind.Product.QuantityPerUnit": "Birim Başına Miktar",
   "Db.Northwind.Product.ReorderLevel": "Azami Sipariş Seviyesi",
+  "Db.Northwind.Product.RowVersion": "Satır sürümü",
   "Db.Northwind.Product.SupplierCompanyName": "Tedarikçi",
   "Db.Northwind.Product.SupplierCountry": "Tedarikçi Ülke",
   "Db.Northwind.Product.SupplierID": "Tedarikçi",

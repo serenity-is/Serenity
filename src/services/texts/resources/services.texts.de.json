@@ -34,6 +34,7 @@
   "Enums.ImageCheckResult.WidthTooLow": "Bildbreite muss höher als {0} Pixel sein, aber es ist {1} Pixel!",
   "Validation.ArgumentIsNull": "Argument {0} ist null!",
   "Validation.ArgumentOutOfRange": "Argument {0} liegt außerhalb des Bereichs!",
+  "Validation.ConcurrencyConflict": "Dieser Datensatz wurde von einem anderen Benutzer geändert, seit Sie ihn geladen haben. Bitte laden Sie ihn neu und versuchen Sie es erneut!",
   "Validation.DeleteForeignKeyError": "Datensatz kann nicht gelöscht werden. Die Tabelle '{0}' hat Datensätze, die von diesem abhängig sind!",
   "Validation.DeleteForeignKeyErrorGeneric": "Datensatz kann nicht gelöscht werden. Es gibt zugehörige Datensätze, die von diesem Datensatz abhängen!",
   "Validation.EntityForeignKeyViolation": "Sie müssen zuerst die zugehörigen {0}-Datensätze löschen, bevor Sie diesen löschen!",

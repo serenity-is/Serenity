@@ -26,6 +26,15 @@ public class SaveRequest<TEntity> : ServiceRequest, ISaveRequest
     /// </summary>
     public Dictionary<string, TEntity>? Localizations { get; set; }
 
+    /// <summary>
+    /// Gets or sets a value indicating whether the concurrency version check should be skipped
+    /// for this save request. This is a server side only option and is ignored in client JSON,
+    /// intended for internal services that need to update a row regardless of its version.
+    /// </summary>
+    [Newtonsoft.Json.JsonIgnore]
+    [JsonIgnore]
+    public bool IgnoreConcurrencyVersion { get; set; }
+
     object? ISaveRequest.Entity
     {
         get { return Entity; }

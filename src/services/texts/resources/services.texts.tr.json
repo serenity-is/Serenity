@@ -34,6 +34,7 @@
   "Enums.ImageCheckResult.WidthTooLow": "Görüntü genişliği {0} pikselden daha yüksek olmalı, ancak {1} piksel!",
   "Validation.ArgumentIsNull": "{0} argümanı boş girilmiş!",
   "Validation.ArgumentOutOfRange": "Argüman {0} izin verilen aralıkta değil!",
+  "Validation.ConcurrencyConflict": "Bu kayıt, yüklediğinizden beri başka bir kullanıcı tarafından değiştirildi. Lütfen yeniden yükleyip tekrar deneyin!",
   "Validation.DeleteForeignKeyError": "Kayıt silinemiyor. '{0}' tablosunda buna bağlı kayıtlar var!",
   "Validation.DeleteForeignKeyErrorGeneric": "Kayıt silinemiyor. Bu kayda bağlı ilişkili kayıtlar var!",
   "Validation.EntityForeignKeyViolation": "Bunu silmeden önce ilgili {0} kaydını silmelisiniz!",

@@ -34,6 +34,7 @@
   "Enums.ImageCheckResult.WidthTooLow": "De afbeeldingsbreedte moet hoger zijn dan {0} pixels, maar het is {1} pixels!",
   "Validation.ArgumentIsNull": "Argument {0} is null!",
   "Validation.ArgumentOutOfRange": "Argument {0} is buiten bereik!",
+  "Validation.ConcurrencyConflict": "Dit record is gewijzigd door een andere gebruiker sinds u het hebt geladen. Laad het opnieuw en probeer het nogmaals!",
   "Validation.DeleteForeignKeyError": "Kan record niet verwijderen. Tabel '{0}' heeft records die afhankelijk zijn van deze!",
   "Validation.DeleteForeignKeyErrorGeneric": "Kan het record niet verwijderen. Er zijn gerelateerde records die afhankelijk zijn van dit record!",
   "Validation.EntityForeignKeyViolation": "U moet eerst de bijbehorende {0}-records verwijderen voordat u deze verwijdert!",

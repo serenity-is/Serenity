@@ -35,6 +35,7 @@
   "Enums.ImageCheckResult.WidthTooLow": "Image width must be higher than {0} pixels, but it is {1} pixels!",
   "Validation.ArgumentIsNull": "Argument {0} is null!",
   "Validation.ArgumentOutOfRange": "Argument {0} is out of range!",
+  "Validation.ConcurrencyConflict": "This record was modified by another user since you loaded it. Please reload and try again!",
   "Validation.DeleteForeignKeyError": "Can't delete record. '{0}' table has records that depends on this one!",
   "Validation.DeleteForeignKeyErrorGeneric": "Can't delete record. There are related records that depend on this one!",
   "Validation.EntityForeignKeyViolation": "You must first delete related {0} records before deleting this one!",

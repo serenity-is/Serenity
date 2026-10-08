@@ -151,6 +151,7 @@
   "Db.Northwind.Product.ProductName": "제품명",
   "Db.Northwind.Product.QuantityPerUnit": "단위 당 수량",
   "Db.Northwind.Product.ReorderLevel": "재주문 레벨",
+  "Db.Northwind.Product.RowVersion": "행 버전",
   "Db.Northwind.Product.SupplierCompanyName": "공급자",
   "Db.Northwind.Product.SupplierCountry": "공급자 국가",
   "Db.Northwind.Product.SupplierID": "공급자",

@@ -1,5 +1,6 @@
 using FluentMigrator;
 using FluentMigrator.Builders;
+using FluentMigrator.Builders.Alter.Table;
 using FluentMigrator.Builders.Create.Table;
 using System.IO;
 
@@ -435,5 +436,248 @@ public static class MigrationUtils
         where TNextFk : FluentMigrator.Infrastructure.IFluentSyntax
     {
         return syntax.ForeignKey(foreignKeyName, userEntityOptions?.Value?.TableName ?? "Users", userEntityOptions?.Value?.IdColumnName ?? "UserId");
+    }
+
+    /// <summary>
+    /// Adds a database trigger that increments this column on every update, providing optimistic
+    /// concurrency support for rows implementing <c>Serenity.Data.IConcurrencyVersionRow</c>.
+    /// </summary>
+    /// <remarks>
+    /// <para>Call on the column builder after <c>AsInt32()</c> / <c>AsInt64()</c>, e.g.
+    /// <c>.WithColumn("RowVersion").AsInt32().AddConcurrencyVersionTrigger(this, idField: "ID")</c>.
+    /// The column name, table name and column type (int32/int64) are read from the builder, so only
+    /// the id (primary key) column is passed explicitly.</para>
+    /// <para>If you only target SQL Server, prefer a native <c>rowversion</c> column (mapped as a
+    /// byte[] field) which the server maintains automatically, instead of this trigger based numeric
+    /// column. This trigger approach is recommended when you need to support multiple database types
+    /// with the same numeric version column.</para>
+    /// </remarks>
+    /// <param name="syntax">Column option syntax (after AsInt32/AsInt64).</param>
+    /// <param name="migration">The migration reference.</param>
+    /// <param name="idField">Name of the id (primary key) column, required for the trigger.</param>
+    /// <param name="schema">Optional schema name. Defaults to the table's schema.</param>
+    public static ICreateTableColumnOptionOrWithColumnSyntax AddConcurrencyVersionTrigger(
+        this ICreateTableColumnOptionOrWithColumnSyntax syntax,
+        MigrationBase migration, string idField, string? schema = null)
+    {
+        var builder = (IColumnExpressionBuilder)syntax;
+        AddConcurrencyVersionTriggerCore(migration, builder.TableName, builder.Column.Name,
+            builder.Column.Type, idField, schema ?? builder.SchemaName);
+        return syntax;
+    }
+
+    /// <summary>
+    /// Adds a database trigger that increments this column on every update, providing optimistic
+    /// concurrency support for rows implementing <c>Serenity.Data.IConcurrencyVersionRow</c>.
+    /// </summary>
+    /// <remarks>
+    /// See the <see cref="AddConcurrencyVersionTrigger(ICreateTableColumnOptionOrWithColumnSyntax, MigrationBase, string, string?)"/>
+    /// overload for details. This overload is for <c>Alter.Table(...).AddColumn(...)</c>.
+    /// </remarks>
+    /// <param name="syntax">Column option syntax (after AsInt32/AsInt64).</param>
+    /// <param name="migration">The migration reference.</param>
+    /// <param name="idField">Name of the id (primary key) column, required for the trigger.</param>
+    /// <param name="schema">Optional schema name. Defaults to the table's schema.</param>
+    public static IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax AddConcurrencyVersionTrigger(
+        this IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax syntax,
+        MigrationBase migration, string idField, string? schema = null)
+    {
+        var builder = (IColumnExpressionBuilder)syntax;
+        AddConcurrencyVersionTriggerCore(migration, builder.TableName, builder.Column.Name,
+            builder.Column.Type, idField, schema ?? builder.SchemaName);
+        return syntax;
+    }
+
+    /// <summary>
+    /// Drops the concurrency version trigger created by
+    /// <see cref="AddConcurrencyVersionTrigger(ICreateTableColumnOptionOrWithColumnSyntax, MigrationBase, string, string?)"/>.
+    /// </summary>
+    /// <param name="migration">The migration reference.</param>
+    /// <param name="table">Table name.</param>
+    /// <param name="column">Concurrency version column name.</param>
+    /// <param name="schema">Optional schema name.</param>
+    public static void DropConcurrencyVersionTrigger(this MigrationBase migration,
+        string table, string column, string? schema = null)
+    {
+        ArgumentNullException.ThrowIfNull(migration);
+        ArgumentException.ThrowIfNullOrEmpty(table);
+        ArgumentException.ThrowIfNullOrEmpty(column);
+
+        var name = MakeConcurrencyVersionTriggerName(table, column);
+
+        if (migration.IsSqlServer())
+            migration.IfDatabase("SqlServer").Execute.Sql($"DROP TRIGGER [{name}];");
+        else if (migration.IsPostgres())
+            migration.IfDatabase("Postgres").Execute.Sql($"DROP TRIGGER \"{name}\" ON {Quote(table, schema, '"', '"')}; DROP FUNCTION IF EXISTS {name}_FN();");
+        else if (migration.IsMySql())
+            migration.IfDatabase("MySql").Execute.Sql($"DROP TRIGGER IF EXISTS `{name}`;");
+        else if (migration.IsOracle())
+            migration.IfDatabase("Oracle").Execute.Sql($"DROP TRIGGER \"{name}\";");
+        else if (migration.IsFirebird())
+            migration.IfDatabase("Firebird").Execute.Sql($"DROP TRIGGER \"{name}\";");
+        else if (migration.IsSqlite())
+            migration.IfDatabase("Sqlite").Execute.Sql($"DROP TRIGGER IF EXISTS \"{name}\";");
+    }
+
+    private static string MakeConcurrencyVersionTriggerName(string table, string column)
+    {
+        var name = (table + "_" + column + "_CV_TRG")
+            .Replace(" ", "_", StringComparison.Ordinal)
+            .Replace("\"", "", StringComparison.Ordinal)
+            .Replace("[", "", StringComparison.Ordinal)
+            .Replace("]", "", StringComparison.Ordinal)
+            .Replace("`", "", StringComparison.Ordinal);
+        return name.Length > 30 ? name[..30] : name;
+    }
+
+    private static string Quote(string name, string? schema, char open, char close)
+    {
+        string q(string x) => open + x + close;
+        return string.IsNullOrEmpty(schema) ? q(name) : q(schema) + "." + q(name);
+    }
+
+    private static void AddConcurrencyVersionTriggerCore(MigrationBase migration,
+        string table, string column, System.Data.DbType? columnType, string idField, string? schema)
+    {
+        ArgumentNullException.ThrowIfNull(migration);
+        ArgumentException.ThrowIfNullOrEmpty(table);
+        ArgumentException.ThrowIfNullOrEmpty(column);
+        ArgumentException.ThrowIfNullOrEmpty(idField);
+
+        if (columnType is not (System.Data.DbType.Int32 or System.Data.DbType.Int64))
+            throw new ArgumentOutOfRangeException(nameof(columnType),
+                "Concurrency version column must be Int32 or Int64.");
+
+        var serverType =
+            migration.IsSqlServer() ? "SqlServer" :
+            migration.IsPostgres() ? "Postgres" :
+            migration.IsMySql() ? "MySql" :
+            migration.IsOracle() ? "Oracle" :
+            migration.IsFirebird() ? "Firebird" :
+            migration.IsSqlite() ? "Sqlite" : null;
+
+        if (serverType is null)
+            throw new InvalidOperationException("Unsupported database type for a concurrency version trigger.");
+
+        migration.IfDatabase(serverType).Execute.Sql(GetConcurrencyVersionTriggerSql(serverType,
+            table, column, columnType == System.Data.DbType.Int64, idField, schema));
+    }
+
+    /// <summary>
+    /// Generates the SQL statements that create the concurrency version trigger for the given
+    /// database type.
+    /// </summary>
+    /// <param name="serverType">Database server type, e.g. "SqlServer", "Postgres", "MySql",
+    /// "Oracle", "Firebird" or "Sqlite".</param>
+    /// <param name="table">Table name.</param>
+    /// <param name="column">Concurrency version column name.</param>
+    /// <param name="isLong">True for a 64-bit (long) column, false for a 32-bit (int) column.</param>
+    /// <param name="idField">Id (primary key) column name, required for SQL Server.</param>
+    /// <param name="schema">Optional schema name.</param>
+    /// <returns>The trigger creation SQL.</returns>
+    public static string GetConcurrencyVersionTriggerSql(string serverType, string table, string column,
+        bool isLong, string idField, string? schema = null)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(serverType);
+        ArgumentException.ThrowIfNullOrEmpty(table);
+        ArgumentException.ThrowIfNullOrEmpty(column);
+        ArgumentException.ThrowIfNullOrEmpty(idField);
+
+        var name = MakeConcurrencyVersionTriggerName(table, column);
+
+        // int columns wrap around (like the common SQL Server audit triggers), long simply increments
+        string Increment(string x) => isLong
+            ? x + " + 1"
+            : $"CASE WHEN {x} = 2147483647 THEN -2147483648 ELSE {x} + 1 END";
+
+        if (serverType.StartsWith("SqlServer", StringComparison.OrdinalIgnoreCase))
+        {
+            var t = Quote(table, schema, '[', ']');
+            var c = $"[{column}]";
+            var id = $"[{idField}]";
+            return $"""
+                CREATE TRIGGER [{name}] ON {t} AFTER UPDATE AS
+                BEGIN
+                    SET NOCOUNT ON;
+
+                    IF NOT UPDATE({c})
+                    BEGIN
+                        UPDATE t SET t.{c} = {Increment("t." + c)}
+                        FROM {t} t
+                        INNER JOIN inserted i ON t.{id} = i.{id};
+                    END
+                END
+                """;
+        }
+
+        if (serverType.StartsWith("Postgres", StringComparison.OrdinalIgnoreCase))
+        {
+            var t = Quote(table, schema, '"', '"');
+            var c = $"\"{column}\"";
+            var fn = name + "_FN";
+            return $"""
+                CREATE OR REPLACE FUNCTION {fn}() RETURNS trigger AS $$
+                BEGIN
+                    NEW.{c} := {Increment("OLD." + c)};
+                    RETURN NEW;
+                END;
+                $$ LANGUAGE plpgsql;
+                CREATE TRIGGER "{name}" BEFORE UPDATE ON {t} FOR EACH ROW EXECUTE FUNCTION {fn}();
+                """;
+        }
+
+        if (serverType.StartsWith("MySql", StringComparison.OrdinalIgnoreCase))
+        {
+            var t = Quote(table, schema, '`', '`');
+            var c = $"`{column}`";
+            return $"""
+                CREATE TRIGGER `{name}` BEFORE UPDATE ON {t}
+                FOR EACH ROW SET NEW.{c} = {Increment("OLD." + c)};
+                """;
+        }
+
+        if (serverType.StartsWith("Oracle", StringComparison.OrdinalIgnoreCase))
+        {
+            var t = Quote(table, schema, '"', '"');
+            var c = $"\"{column}\"";
+            return $"""
+                CREATE OR REPLACE TRIGGER "{name}"
+                BEFORE UPDATE ON {t}
+                FOR EACH ROW
+                BEGIN
+                    :NEW.{c} := {Increment(":OLD." + c)};
+                END;
+                """;
+        }
+
+        if (serverType.StartsWith("Firebird", StringComparison.OrdinalIgnoreCase))
+        {
+            var t = Quote(table, schema, '"', '"');
+            var c = $"\"{column}\"";
+            return $"""
+                CREATE TRIGGER "{name}" FOR {t} ACTIVE BEFORE UPDATE POSITION 0
+                AS
+                BEGIN
+                    NEW.{c} = {Increment("OLD." + c)};
+                END
+                """;
+        }
+
+        if (serverType.StartsWith("Sqlite", StringComparison.OrdinalIgnoreCase))
+        {
+            var t = Quote(table, schema, '"', '"');
+            var c = $"\"{column}\"";
+            var id = $"\"{idField}\"";
+            return $"""
+                CREATE TRIGGER "{name}" AFTER UPDATE ON {t}
+                WHEN NEW.{c} = OLD.{c}
+                BEGIN
+                    UPDATE {t} SET {c} = {Increment(c)} WHERE {id} = NEW.{id};
+                END
+                """;
+        }
+
+        throw new ArgumentOutOfRangeException(nameof(serverType), serverType,
+            "Unsupported database type for a concurrency version trigger.");
     }
 }

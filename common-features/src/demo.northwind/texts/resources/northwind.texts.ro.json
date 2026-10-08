@@ -151,6 +151,7 @@
   "Db.Northwind.Product.ProductName": "Numele produsului",
   "Db.Northwind.Product.QuantityPerUnit": "Cantitate pe unitate",
   "Db.Northwind.Product.ReorderLevel": "Nivel de Reordonare",
+  "Db.Northwind.Product.RowVersion": "Versiunea rândului",
   "Db.Northwind.Product.SupplierCompanyName": "Furnizor",
   "Db.Northwind.Product.SupplierCountry": "Țara furnizorului",
   "Db.Northwind.Product.SupplierID": "Furnizor",

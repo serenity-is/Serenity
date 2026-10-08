@@ -215,6 +215,7 @@ namespace texts {
                 export const ProductName: string;
                 export const QuantityPerUnit: string;
                 export const ReorderLevel: string;
+                export const RowVersion: string;
                 export const SupplierCompanyName: string;
                 export const SupplierCountry: string;
                 export const SupplierID: string;

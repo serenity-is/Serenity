@@ -34,6 +34,7 @@
   "Enums.ImageCheckResult.WidthTooLow": "La larghezza dell'immagine deve essere superiore a {0} pixel, ma è {1} pixel!",
   "Validation.ArgumentIsNull": "L'argomento {0} è nullo!",
   "Validation.ArgumentOutOfRange": "L'argomento {0} è fuori dal range!",
+  "Validation.ConcurrencyConflict": "Questo record è stato modificato da un altro utente da quando lo hai caricato. Ricaricalo e riprova!",
   "Validation.DeleteForeignKeyError": "Impossibile eliminare il record. La tabella '{0}' ha record che dipendono da questo!",
   "Validation.DeleteForeignKeyErrorGeneric": "Impossibile eliminare il record. Esistono record correlati che dipendono da questo!",
   "Validation.EntityForeignKeyViolation": "Devi prima eliminare i record {0} correlati prima di eliminare questo!",

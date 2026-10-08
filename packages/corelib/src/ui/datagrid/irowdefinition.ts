@@ -4,6 +4,8 @@
  * permissions, identity and display name resolution.
  */
 export interface IRowDefinition {
+    /** Name of the property that holds the optimistic concurrency version, if any. */
+    readonly concurrencyVersionProperty?: string;
     /** Permission required to delete rows. */
     readonly deletePermission?: string;
     /** Name of the identity / primary key property. */

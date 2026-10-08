@@ -151,6 +151,7 @@
   "Db.Northwind.Product.ProductName": "اسم المنتج",
   "Db.Northwind.Product.QuantityPerUnit": "الكمية لكل وحدة",
   "Db.Northwind.Product.ReorderLevel": "مستوى الإعادة ترتيب",
+  "Db.Northwind.Product.RowVersion": "إصدار الصف",
   "Db.Northwind.Product.SupplierCompanyName": "المورد",
   "Db.Northwind.Product.SupplierCountry": "بلد المورد",
   "Db.Northwind.Product.SupplierID": "المورد",

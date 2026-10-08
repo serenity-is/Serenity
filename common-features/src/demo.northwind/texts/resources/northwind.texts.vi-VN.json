@@ -151,6 +151,7 @@
   "Db.Northwind.Product.ProductName": "Tên sản phẩm",
   "Db.Northwind.Product.QuantityPerUnit": "Số lượng mỗi đơn vị",
   "Db.Northwind.Product.ReorderLevel": "Mức Đặt Lại",
+  "Db.Northwind.Product.RowVersion": "Phiên bản bản ghi",
   "Db.Northwind.Product.SupplierCompanyName": "Nhà cung cấp",
   "Db.Northwind.Product.SupplierCountry": "Quốc gia nhà cung cấp",
   "Db.Northwind.Product.SupplierID": "Nhà cung cấp",

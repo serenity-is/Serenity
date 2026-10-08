@@ -34,6 +34,7 @@
   "Enums.ImageCheckResult.WidthTooLow": "Ширина изображения должна быть больше чем {0} пикселей, но это {1} пикселей!",
   "Validation.ArgumentIsNull": "Аргумент {0} нулевой!",
   "Validation.ArgumentOutOfRange": "Аргумент {0} вне диапазона!",
+  "Validation.ConcurrencyConflict": "Эта запись была изменена другим пользователем после загрузки. Перезагрузите её и попробуйте снова!",
   "Validation.DeleteForeignKeyError": "Невозможно удалить запись. В таблице '{0}' есть записи, которые зависят от этой!",
   "Validation.DeleteForeignKeyErrorGeneric": "Невозможно удалить запись. Есть связанные записи, которые зависят от этой записи!",
   "Validation.EntityForeignKeyViolation": "Вы должны сначала удалить связанные записи {0}, прежде чем удалить эту!",

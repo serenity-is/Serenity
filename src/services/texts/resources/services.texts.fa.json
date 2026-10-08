@@ -34,6 +34,7 @@
   "Enums.ImageCheckResult.WidthTooLow": "عرض تصویر باید بیشتر از {0} پیکسل باشد، اما {1} پیکسل است!",
   "Validation.ArgumentIsNull": "پارامتر {0} خالی است!",
   "Validation.ArgumentOutOfRange": "پارامتر {0} خارج از محدوده است!",
+  "Validation.ConcurrencyConflict": "این رکورد از زمان بارگذاری توسط شما، توسط کاربر دیگری تغییر کرده است. لطفاً آن را دوباره بارگذاری کرده و دوباره تلاش کنید!",
   "Validation.DeleteForeignKeyError": "رکورد قابل حذف نیست. جدول '{0}' دارای رکوردهایی است که به این رکورد وابسته هستند!",
   "Validation.DeleteForeignKeyErrorGeneric": "رکورد قابل حذف نیست. رکوردهای مرتبطی وجود دارند که به این رکورد وابسته‌اند!",
   "Validation.EntityForeignKeyViolation": "شما باید ابتدا رکوردهای مرتبط {0} را پیش از حذف این کار پاک کنید!",

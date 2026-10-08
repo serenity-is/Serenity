@@ -12,12 +12,14 @@ export interface ProductRow {
     UnitsInStock?: number;
     UnitsOnOrder?: number;
     ReorderLevel?: number;
+    RowVersion?: number;
     SupplierCompanyName?: string;
     SupplierCountry?: string;
     CategoryName?: string;
 }
 
 export abstract class ProductRow {
+    static readonly concurrencyVersionProperty = 'RowVersion';
     static readonly idProperty = 'ProductID';
     static readonly nameProperty = 'ProductName';
     static readonly localTextPrefix = 'Northwind.Product';

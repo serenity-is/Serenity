@@ -34,6 +34,7 @@
   "Enums.ImageCheckResult.WidthTooLow": "الصورة العرض يجب أن يكون أعلى من {0} بكسل، ولكنها {1} بكسل!",
   "Validation.ArgumentIsNull": "المعامل {0} فارغ!",
   "Validation.ArgumentOutOfRange": "المعطي {0} خارج النطاق!",
+  "Validation.ConcurrencyConflict": "تم تعديل هذا السجل بواسطة مستخدم آخر منذ تحميله. يرجى إعادة تحميله والمحاولة مرة أخرى!",
   "Validation.DeleteForeignKeyError": "لا يمكن حذف السجل. يحتوي جدول '{0}' على سجلات تعتمد على هذا السجل!",
   "Validation.DeleteForeignKeyErrorGeneric": "لا يمكن حذف السجل. توجد سجلات مرتبطة تعتمد على هذا السجل!",
   "Validation.EntityForeignKeyViolation": "يجب أن تحذف أولاً سجلات {0} ذات صلة قبل حذف هذا واحد!",

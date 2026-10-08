@@ -354,6 +354,7 @@ public class UpdatableExtensionBehavior(IDefaultHandlerFactory handlerFactory) :
         var request = saveHandler.CreateRequest();
         request.Entity = extension;
         request.EntityId = oldID;
+        request.IgnoreConcurrencyVersion = handler.Request.IgnoreConcurrencyVersion;
 
         foreach (var mapping in mappings)
             mapping.Item2.AsInvariant(extension, mapping.Item1.AsObject(handler.Row));
@@ -407,6 +408,7 @@ public class UpdatableExtensionBehavior(IDefaultHandlerFactory handlerFactory) :
         var request = saveHandler.CreateRequest();
         request.Entity = extension;
         request.EntityId = oldID;
+        request.IgnoreConcurrencyVersion = handler.Request.IgnoreConcurrencyVersion;
 
         foreach (var mapping in mappings)
             mapping.Item2.AsInvariant(extension, mapping.Item1.AsObject(handler.Row));

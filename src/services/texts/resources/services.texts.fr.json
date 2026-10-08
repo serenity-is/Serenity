@@ -34,6 +34,7 @@
   "Enums.ImageCheckResult.WidthTooLow": "La largeur de l'image doit être supérieure à {0} pixels, mais elle est de {1} pixels!",
   "Validation.ArgumentIsNull": "L'argument {0} est nul !",
   "Validation.ArgumentOutOfRange": "L'argument {0} est hors de portée !",
+  "Validation.ConcurrencyConflict": "Cet enregistrement a été modifié par un autre utilisateur depuis son chargement. Veuillez le recharger et réessayer !",
   "Validation.DeleteForeignKeyError": "Impossible de supprimer l'enregistrement. La table '{0}' a des enregistrements qui dépendent de celui-ci!",
   "Validation.DeleteForeignKeyErrorGeneric": "Impossible de supprimer l'enregistrement. Des enregistrements associés dépendent de celui-ci !",
   "Validation.EntityForeignKeyViolation": "Vous devez d'abord supprimer les enregistrements {0} associés avant de supprimer celui-ci!",

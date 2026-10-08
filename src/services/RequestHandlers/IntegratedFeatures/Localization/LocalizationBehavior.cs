@@ -330,7 +330,8 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
         handler.Response.Localizations = dictionary;
     }
 
-    private void SaveLocalRow(IUnitOfWork uow, ILocalizationRow localRow, object masterId, object? localRowId)
+    private void SaveLocalRow(IUnitOfWork uow, ILocalizationRow localRow, object masterId, object? localRowId,
+        bool ignoreConcurrencyVersion)
     {
         localRow = localRow.Clone();
 
@@ -340,11 +341,12 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
         var saveHandler = handlerFactory.CreateHandler<ISaveRequestProcessor>(localRowType);
         var saveRequest = saveHandler.CreateRequest();
         saveRequest.Entity = localRow;
+        saveRequest.IgnoreConcurrencyVersion = ignoreConcurrencyVersion;
         saveHandler.Process(uow, saveRequest, localRowId == null ? SaveRequestType.Create : SaveRequestType.Update);
     }
 
     private async Task SaveLocalRowAsync(IUnitOfWork uow, ILocalizationRow localRow, object masterId, object? localRowId,
-        CancellationToken cancellationToken = default)
+        bool ignoreConcurrencyVersion, CancellationToken cancellationToken = default)
     {
         localRow = localRow.Clone();
 
@@ -354,6 +356,7 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
         var saveHandler = handlerFactory.CreateHandler<ISaveRequestProcessorAsync>(localRowType);
         var saveRequest = saveHandler.CreateRequest();
         saveRequest.Entity = localRow;
+        saveRequest.IgnoreConcurrencyVersion = ignoreConcurrencyVersion;
         await saveHandler.ProcessAsync(uow, saveRequest,
             localRowId == null ? SaveRequestType.Create : SaveRequestType.Update, cancellationToken).ConfigureAwait(false);
     }
@@ -429,7 +432,8 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
             }
 
             if (anyNonEmpty)
-                SaveLocalRow(handler.UnitOfWork, localRow, masterId!, oldId);
+                SaveLocalRow(handler.UnitOfWork, localRow, masterId!, oldId,
+                    handler.Request.IgnoreConcurrencyVersion);
             else if (oldId != null)
                 DeleteLocalRow(handler.UnitOfWork, oldId);
         }
@@ -491,7 +495,8 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
             }
 
             if (anyNonEmpty)
-                await SaveLocalRowAsync(handler.UnitOfWork, localRow, masterId!, oldId, cancellationToken).ConfigureAwait(false);
+                await SaveLocalRowAsync(handler.UnitOfWork, localRow, masterId!, oldId,
+                    handler.Request.IgnoreConcurrencyVersion, cancellationToken).ConfigureAwait(false);
             else if (oldId != null)
                 await DeleteLocalRowAsync(handler.UnitOfWork, oldId, cancellationToken).ConfigureAwait(false);
         }

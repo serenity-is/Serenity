@@ -7,7 +7,7 @@ namespace Serenity.Demo.Northwind;
 [LookupScript]
 [CaptureLog(typeof(ProductLogRow))]
 [LocalizationRow(typeof(ProductLangRow), LocalizeListByDefault = true)]
-public sealed class ProductRow : Row<ProductRow.RowFields>, IIdRow, INameRow
+public sealed class ProductRow : Row<ProductRow.RowFields>, IIdRow, INameRow, IConcurrencyVersionRow
 {
     [DisplayName("Product Id"), Identity, LookupInclude, IdProperty]
     public int? ProductID { get => fields.ProductID[this]; set => fields.ProductID[this] = value; }
@@ -29,7 +29,7 @@ public sealed class ProductRow : Row<ProductRow.RowFields>, IIdRow, INameRow
     [DisplayName("Category"), NotNull, ForeignKey(typeof(CategoryRow)), LeftJoin("cat"), LookupInclude]
     [ServiceLookupEditor(typeof(CategoryRow), InplaceAdd = true, DialogType = "Demo.Northwind.CategoryDialog")]
     public int? CategoryID { get => fields.CategoryID[this]; set => fields.CategoryID[this] = value; }
-    
+
     [DisplayName("Quantity Per Unit"), Size(20)]
     public string? QuantityPerUnit { get => fields.QuantityPerUnit[this]; set => fields.QuantityPerUnit[this] = value; }
 
@@ -54,6 +54,11 @@ public sealed class ProductRow : Row<ProductRow.RowFields>, IIdRow, INameRow
     [Origin("cat"), DisplayName("Category")]
     public string? CategoryName { get => fields.CategoryName[this]; set => fields.CategoryName[this] = value; }
 
+    [DisplayName("Row Version"), Insertable(false), Updatable(false)]
+    public int? RowVersion { get => fields.RowVersion[this]; set => fields.RowVersion[this] = value; }
+
+    Field IConcurrencyVersionRow.ConcurrencyVersionField => fields.RowVersion;
+
     public class RowFields : RowFieldsBase
     {
         public Int32Field ProductID = null!;
@@ -67,6 +72,7 @@ public sealed class ProductRow : Row<ProductRow.RowFields>, IIdRow, INameRow
         public Int16Field UnitsInStock = null!;
         public Int16Field UnitsOnOrder = null!;
         public Int16Field ReorderLevel = null!;
+        public Int32Field RowVersion = null!;
 
         public StringField SupplierCompanyName = null!;
         public StringField SupplierCountry = null!;

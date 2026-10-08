@@ -151,6 +151,7 @@
   "Db.Northwind.Product.ProductName": "Produktnamn",
   "Db.Northwind.Product.QuantityPerUnit": "Antal per enhet",
   "Db.Northwind.Product.ReorderLevel": "Reorder Level",
+  "Db.Northwind.Product.RowVersion": "Radversion",
   "Db.Northwind.Product.SupplierCompanyName": "Leverantör",
   "Db.Northwind.Product.SupplierCountry": "Leverantörsland",
   "Db.Northwind.Product.SupplierID": "Leverantör",

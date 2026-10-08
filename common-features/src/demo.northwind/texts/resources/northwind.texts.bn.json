@@ -151,6 +151,7 @@
   "Db.Northwind.Product.ProductName": "পণ্যের নাম",
   "Db.Northwind.Product.QuantityPerUnit": "প্রতি একক পরিমাণ",
   "Db.Northwind.Product.ReorderLevel": "রিআর্ডার স্তর",
+  "Db.Northwind.Product.RowVersion": "রেকর্ডের সংস্করণ",
   "Db.Northwind.Product.SupplierCompanyName": "সরবরাহকারী",
   "Db.Northwind.Product.SupplierCountry": "সরবরাহকারীর দেশ",
   "Db.Northwind.Product.SupplierID": "সরবরাহকারী",

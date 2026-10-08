@@ -151,6 +151,7 @@
   "Db.Northwind.Product.ProductName": "उत्पाद का नाम",
   "Db.Northwind.Product.QuantityPerUnit": "एकक प्रति मात्रा",
   "Db.Northwind.Product.ReorderLevel": "पुनर्निर्माण स्तर",
+  "Db.Northwind.Product.RowVersion": "पंक्ति का संस्करण",
   "Db.Northwind.Product.SupplierCompanyName": "आपूर्तिकर्ता",
   "Db.Northwind.Product.SupplierCountry": "आपूर्तिकर्ता देश",
   "Db.Northwind.Product.SupplierID": "आपूर्तिकर्ता",

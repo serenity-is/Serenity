@@ -151,6 +151,7 @@
   "Db.Northwind.Product.ProductName": "Nazwa produktu",
   "Db.Northwind.Product.QuantityPerUnit": "Ilość na jednostkę",
   "Db.Northwind.Product.ReorderLevel": "Poziom zamówienia",
+  "Db.Northwind.Product.RowVersion": "Wersja wiersza",
   "Db.Northwind.Product.SupplierCompanyName": "Dostawca",
   "Db.Northwind.Product.SupplierCountry": "Kraj dostawcy",
   "Db.Northwind.Product.SupplierID": "Dostawca",

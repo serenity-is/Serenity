@@ -75,6 +75,44 @@ public sealed partial class MigrationIntegrationTests : IDisposable
                 }, cancellationToken)).Entities;
 
                 Assert.Equal(2155, orderDetails.Count);
+
+                // optimistic concurrency: the concurrency version trigger increments RowVersion
+                // on update, and a stale RowVersion in the request causes a concurrency conflict
+                var productRetrieve = services.GetRequiredService<Serenity.Demo.Northwind.IProductRetrieveHandler>();
+                var product = (await productRetrieve.RetrieveAsync(northwindConnection, new()
+                {
+                    EntityId = 1
+                }, cancellationToken)).Entity!;
+                var initialVersion = product.RowVersion;
+                Assert.NotNull(initialVersion);
+
+                var productSave = services.GetRequiredService<Serenity.Demo.Northwind.IProductSaveHandler>();
+                product.UnitsInStock = 0;
+                using (var uow = new UnitOfWork(northwindConnection))
+                {
+                    await productSave.UpdateAsync(uow, new()
+                    {
+                        EntityId = 1,
+                        Entity = product
+                    }, cancellationToken);
+                    await uow.CommitAsync(cancellationToken);
+                }
+
+                var reloaded = (await productRetrieve.RetrieveAsync(northwindConnection, new()
+                {
+                    EntityId = 1
+                }, cancellationToken)).Entity!;
+                Assert.Equal(initialVersion + 1, reloaded.RowVersion);
+
+                // product still carries the old RowVersion, so this update must be rejected
+                product.UnitsInStock = 1;
+                using var staleUow = new UnitOfWork(northwindConnection);
+                var ex = await Assert.ThrowsAsync<ValidationError>(() => productSave.UpdateAsync(staleUow, new()
+                {
+                    EntityId = 1,
+                    Entity = product
+                }, cancellationToken));
+                Assert.Equal("ConcurrencyConflict", ex.ErrorCode);
             }
             finally
             {

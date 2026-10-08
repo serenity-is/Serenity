@@ -34,6 +34,7 @@
   "Enums.ImageCheckResult.WidthTooLow": "Bildbredd måste vara högre än {0} pixlar, men det är {1} pixlar!",
   "Validation.ArgumentIsNull": "Argumentet {0} är null!",
   "Validation.ArgumentOutOfRange": "Argumentet {0} ligger utanför intervallet!",
+  "Validation.ConcurrencyConflict": "Den här posten har ändrats av en annan användare sedan du hämtade den. Läs in den igen och försök igen!",
   "Validation.DeleteForeignKeyError": "Kan inte ta bort posten. '{0}'-tabellen har poster som är beroende av denna!",
   "Validation.DeleteForeignKeyErrorGeneric": "Det går inte att ta bort posten. Det finns relaterade poster som är beroende av den här posten!",
   "Validation.EntityForeignKeyViolation": "Du måste först ta bort relaterade {0}-poster innan du tar bort den här!",

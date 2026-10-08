@@ -219,11 +219,46 @@ public abstract class SaveRequestHandlerBase<TRow, TSaveRequest, TSaveResponse>(
     }
 
     /// <summary>
+    /// Captures the concurrency version used for the update, if the row implements
+    /// <see cref="IConcurrencyVersionRow"/>, before editable field validation clears non
+    /// editable assignments. The value sent by the client is used when present, otherwise
+    /// the value loaded from the database. The captured value is later used to append the
+    /// version to the update's WHERE clause.
+    /// </summary>
+    protected virtual void CaptureConcurrencyVersion()
+    {
+        concurrencyVersion = null;
+
+        if (!IsUpdate || Row is not IConcurrencyVersionRow versionRow)
+            return;
+
+        var versionField = versionRow.ConcurrencyVersionField;
+        if (versionField is null)
+            return;
+
+        // server side only opt out for internal services (client JSON cannot set it)
+        if (!Request.IgnoreConcurrencyVersion)
+        {
+            // use the value sent by the client when present (full stale read detection),
+            // otherwise fall back to the value loaded from the database (Old), so that a
+            // concurrent write in the load -> update window is still detected. this mirrors
+            // the server-tracked concurrency token behavior of EF Core / NHibernate.
+            concurrencyVersion = Row.IsAssigned(versionField)
+                ? versionField.AsObject(Row)
+                : versionField.AsObject(Old!);
+        }
+
+        Row.ClearAssignment(versionField);
+    }
+
+    /// <summary>
     /// Validates editable fields.
     /// </summary>
     /// <returns>The set of editable fields.</returns>
     protected virtual HashSet<Field> ValidateEditable()
     {
+        CaptureConcurrencyVersion();
+
         var editableFields = new HashSet<Field>();
         GetEditableFields(editableFields);
         ValidateEditableFields(editableFields);
@@ -447,6 +482,13 @@ public abstract class SaveRequestHandlerBase<TRow, TSaveRequest, TSaveResponse>(
     /// Gets the old entity for update.
     /// </summary>
     public TRow? Old { get; protected set; }
+
+    /// <summary>
+    /// Gets the concurrency version used for the update operation, when the row implements
+    /// <see cref="IConcurrencyVersionRow"/>. It is the value sent by the client when present,
+    /// otherwise the value loaded from the database.
+    /// </summary>
+    protected object? concurrencyVersion;
 
     /// <summary>
     /// Gets the inserted entity for Create and the new entity for Update.

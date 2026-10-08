@@ -151,6 +151,7 @@
   "Db.Northwind.Product.ProductName": "Наименование продукта",
   "Db.Northwind.Product.QuantityPerUnit": "Количество на единицу",
   "Db.Northwind.Product.ReorderLevel": "Уровень повторного заказа",
+  "Db.Northwind.Product.RowVersion": "Версия строки",
   "Db.Northwind.Product.SupplierCompanyName": "Поставщик",
   "Db.Northwind.Product.SupplierCountry": "Страна поставщика",
   "Db.Northwind.Product.SupplierID": "Поставщик",

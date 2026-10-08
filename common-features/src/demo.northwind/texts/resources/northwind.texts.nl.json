@@ -151,6 +151,7 @@
   "Db.Northwind.Product.ProductName": "Productnaam",
   "Db.Northwind.Product.QuantityPerUnit": "Aantal per eenheid",
   "Db.Northwind.Product.ReorderLevel": "Reorder Level",
+  "Db.Northwind.Product.RowVersion": "Rijversie",
   "Db.Northwind.Product.SupplierCompanyName": "Leverancier",
   "Db.Northwind.Product.SupplierCountry": "Leveranciersland",
   "Db.Northwind.Product.SupplierID": "Leverancier",

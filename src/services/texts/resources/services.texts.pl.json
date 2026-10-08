@@ -34,6 +34,7 @@
   "Enums.ImageCheckResult.WidthTooLow": "Szerokość obrazu musi być większa niż {0} pikseli, ale jest {1} pikseli!",
   "Validation.ArgumentIsNull": "Argument {0} jest pusty!",
   "Validation.ArgumentOutOfRange": "Argument {0} jest poza zakresem!",
+  "Validation.ConcurrencyConflict": "Ten rekord został zmieniony przez innego użytkownika od momentu jego wczytania. Wczytaj go ponownie i spróbuj jeszcze raz!",
   "Validation.DeleteForeignKeyError": "Nie można usunąć rekordu. Tabela '{0}' ma rekordy, od których ten zależy!",
   "Validation.DeleteForeignKeyErrorGeneric": "Nie można usunąć rekordu. Istnieją powiązane rekordy zależne od tego rekordu!",
   "Validation.EntityForeignKeyViolation": "Najpierw musisz usunąć powiązane rekordy {0}, zanim usuniesz ten!",

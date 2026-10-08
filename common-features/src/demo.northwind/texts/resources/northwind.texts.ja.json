@@ -151,6 +151,7 @@
   "Db.Northwind.Product.ProductName": "製品名",
   "Db.Northwind.Product.QuantityPerUnit": "単位あたりの数量",
   "Db.Northwind.Product.ReorderLevel": "再発注レベル",
+  "Db.Northwind.Product.RowVersion": "行バージョン",
   "Db.Northwind.Product.SupplierCompanyName": "仕入先",
   "Db.Northwind.Product.SupplierCountry": "仕入先の国",
   "Db.Northwind.Product.SupplierID": "仕入先",

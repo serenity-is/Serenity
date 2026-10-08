@@ -151,6 +151,7 @@
   "Db.Northwind.Product.ProductName": "产品名称",
   "Db.Northwind.Product.QuantityPerUnit": "单位数量",
   "Db.Northwind.Product.ReorderLevel": "重新订购级别",
+  "Db.Northwind.Product.RowVersion": "行版本",
   "Db.Northwind.Product.SupplierCompanyName": "供应商",
   "Db.Northwind.Product.SupplierCountry": "供应商国家",
   "Db.Northwind.Product.SupplierID": "供应商",

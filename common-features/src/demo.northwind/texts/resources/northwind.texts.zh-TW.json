@@ -151,6 +151,7 @@
   "Db.Northwind.Product.ProductName": "產品名稱",
   "Db.Northwind.Product.QuantityPerUnit": "單位數量",
   "Db.Northwind.Product.ReorderLevel": "重新訂購級別",
+  "Db.Northwind.Product.RowVersion": "資料列版本",
   "Db.Northwind.Product.SupplierCompanyName": "供應商",
   "Db.Northwind.Product.SupplierCountry": "供應商國家",
   "Db.Northwind.Product.SupplierID": "供應商",

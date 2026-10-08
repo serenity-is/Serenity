@@ -202,6 +202,10 @@ function getIsDeletedProperty(dialog: EntityDialog<any, any>): string {
     return (dialog as any).getIsDeletedProperty();
 }
 
+function getConcurrencyVersionProperty(dialog: EntityDialog<any, any>): string {
+    return (dialog as any).getConcurrencyVersionProperty();
+}
+
 function loadById(dialog: EntityDialog<any, any>, id: any, callback?: any, fail?: any): void {
     (dialog as any).loadById(id, callback, fail);
 }
@@ -527,6 +531,30 @@ describe("EntityDialog.getIsDeletedProperty", () => {
         }
         const dialog = new RowDialog({});
         expect(getIsDeletedProperty(dialog)).toBe("IsDeleted");
+        dialog.destroy();
+    });
+});
+
+describe("EntityDialog.getConcurrencyVersionProperty", () => {
+    it("returns undefined when no row definition", () => {
+        class DefaultDialog extends EntityDialog<any, any> {
+            getPropertyItemsData() { return mockPropertyItemsData(); }
+        }
+        const dialog = new DefaultDialog({});
+        expect(getConcurrencyVersionProperty(dialog)).toBeUndefined();
+        dialog.destroy();
+    });
+
+    it("returns value from row definition", () => {
+        class TestRow {
+            static readonly concurrencyVersionProperty = "Version";
+        }
+        class RowDialog extends EntityDialog<any, any> {
+            getPropertyItemsData() { return mockPropertyItemsData(); }
+            getRowDefinition() { return TestRow; }
+        }
+        const dialog = new RowDialog({});
+        expect(getConcurrencyVersionProperty(dialog)).toBe("Version");
         dialog.destroy();
     });
 });
@@ -926,6 +954,57 @@ describe("EntityDialog.getSaveEntity", () => {
         dialog["propertyGrid"] = { save: vi.fn(), destroy: vi.fn() } as any;
         const entity = getSaveEntity(dialog);
         expect(entity).toBeDefined();
+        dialog.destroy();
+    });
+
+    it("copies concurrency version from loaded entity when not in form", () => {
+        class TestRow {
+            static readonly concurrencyVersionProperty = "Version";
+        }
+        class RowDialog extends EntityDialog<any, any> {
+            getPropertyItemsData() { return mockPropertyItemsData(); }
+            getRowDefinition() { return TestRow; }
+        }
+        const dialog = new RowDialog({});
+        (dialog as any).entity = { Version: 7 };
+        dialog["propertyGrid"] = { save: vi.fn(), destroy: vi.fn() } as any;
+        const entity = getSaveEntity(dialog);
+        expect((entity as any).Version).toBe(7);
+        dialog.destroy();
+    });
+
+    it("does not override concurrency version already in form entity", () => {
+        class TestRow {
+            static readonly concurrencyVersionProperty = "Version";
+        }
+        class RowDialog extends EntityDialog<any, any> {
+            getPropertyItemsData() { return mockPropertyItemsData(); }
+            getRowDefinition() { return TestRow; }
+        }
+        const dialog = new RowDialog({});
+        (dialog as any).entity = { Version: 7 };
+        dialog["propertyGrid"] = {
+            save: (entity: any) => { entity.Version = 9; },
+            destroy: vi.fn()
+        } as any;
+        const entity = getSaveEntity(dialog);
+        expect((entity as any).Version).toBe(9);
+        dialog.destroy();
+    });
+
+    it("does not set concurrency version when loaded entity has none", () => {
+        class TestRow {
+            static readonly concurrencyVersionProperty = "Version";
+        }
+        class RowDialog extends EntityDialog<any, any> {
+            getPropertyItemsData() { return mockPropertyItemsData(); }
+            getRowDefinition() { return TestRow; }
+        }
+        const dialog = new RowDialog({});
+        (dialog as any).entity = { ID: 1 };
+        dialog["propertyGrid"] = { save: vi.fn(), destroy: vi.fn() } as any;
+        const entity = getSaveEntity(dialog);
+        expect((entity as any).Version).toBeUndefined();
         dialog.destroy();
     });
 });
