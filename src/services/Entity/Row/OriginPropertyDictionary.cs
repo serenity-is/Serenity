@@ -216,7 +216,7 @@ internal class OriginPropertyDictionary
         DialectExpressionSelector expressionSelector, string aliasPrefix, List<Attribute> extraJoins)
     {
         if (aliasPrefix.Length >= 1000)
-            throw new DivideByZeroException("Infinite origin recursion detected!");
+            throw new OriginRecursionException();
 
         var org = GetOriginProperty(propertyName, expressionSelector);
         var originProperty = org.Item1;
@@ -261,7 +261,7 @@ internal class OriginPropertyDictionary
         where TAttr : Attribute
     {
         if (recursion++ > 1000)
-            throw new DivideByZeroException("Infinite origin recursion detected!");
+            throw new OriginRecursionException();
 
         var org = GetOriginProperty(propertyName, expressionSelector);
         var originProperty = org.Item1;
@@ -284,7 +284,7 @@ internal class OriginPropertyDictionary
         DialectExpressionSelector expressionSelector, int recursion = 0)
     {
         if (recursion++ > 1000)
-            throw new DivideByZeroException("Infinite origin recursion detected!");
+            throw new OriginRecursionException();
 
         DisplayNameAttribute? attr;
         string prefix = "";

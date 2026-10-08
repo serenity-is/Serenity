@@ -511,7 +511,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins, IHas
                             scale ??= propertyDictionary.OriginAttribute<ScaleAttribute>(
                                     property.Name, expressionSelector);
                         }
-                        catch (DivideByZeroException)
+                        catch (OriginRecursionException)
                         {
                             throw new InvalidProgramException(string.Format(
                                 "Infinite recursion detected while determining origins " +

@@ -388,6 +388,48 @@ public class OriginPropertyTests
         }
     }
 
+    public class RecCycleARow : Row<RecCycleARow.RowFields>
+    {
+        [ForeignKey("RecCycleB", "BID"), LeftJoin("jb", RowType = typeof(RecCycleBRow))]
+        public int? BID { get => fields.BID[this]; set => fields.BID[this] = value; }
+
+        [Origin("jb", nameof(RecCycleBRow.AName))]
+        public string? AName { get => fields.AName[this]; set => fields.AName[this] = value; }
+
+        public class RowFields : RowFieldsBase
+        {
+            public Int32Field BID;
+            public StringField AName;
+
+            public RowFields()
+            {
+                BID = new Int32Field(this, "BID");
+                AName = new StringField(this, "AName");
+            }
+        }
+    }
+
+    public class RecCycleBRow : Row<RecCycleBRow.RowFields>
+    {
+        [ForeignKey("RecCycleA", "AID"), LeftJoin("ja", RowType = typeof(RecCycleARow))]
+        public int? AID { get => fields.AID[this]; set => fields.AID[this] = value; }
+
+        [Origin("ja", nameof(RecCycleARow.AName))]
+        public string? AName { get => fields.AName[this]; set => fields.AName[this] = value; }
+
+        public class RowFields : RowFieldsBase
+        {
+            public Int32Field AID;
+            public StringField AName;
+
+            public RowFields()
+            {
+                AID = new Int32Field(this, "AID");
+                AName = new StringField(this, "AName");
+            }
+        }
+    }
+
     #endregion
 
     [Fact]
@@ -566,5 +608,16 @@ public class OriginPropertyTests
         fields.Initialize(annotations: null, dialect: SqlServer2012Dialect.Instance, userEntityOptions: null);
 
         Assert.Equal("p9c.[Name]", fields.PfxName.Expression);
+    }
+
+    [Fact]
+    public void Raises_InvalidProgramException_For_Cyclic_Origins()
+    {
+        var ex = Assert.Throws<InvalidProgramException>(() =>
+            new RecCycleARow.RowFields().Initialize(annotations: null,
+                dialect: SqlServer2012Dialect.Instance, userEntityOptions: null));
+
+        Assert.Contains("Infinite recursion", ex.Message);
+        Assert.Contains(nameof(RecCycleARow.AName), ex.Message);
     }
 }
