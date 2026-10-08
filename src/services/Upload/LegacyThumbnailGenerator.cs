@@ -1,11 +1,12 @@
-﻿using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
+/*
+//using SixLabors.ImageSharp;
+//using SixLabors.ImageSharp.PixelFormats;
 
 namespace Serenity.Web;
 
 /// <summary>
-///   Static class that contains thumbnail generator methods</summary>
-public static class ThumbnailGenerator
+///   Legacy class that contains thumbnail generator methods</summary>
+public static class LegacyThumbnailGenerator
 {
     /// <summary>
     ///   Generates a thumbnail of the source image based on parameters.</summary>
@@ -51,3 +52,4 @@ public static class ThumbnailGenerator
         return new Image<Rgb24>(width, height, color);
     }
 }
+*/

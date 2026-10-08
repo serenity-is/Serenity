@@ -24,7 +24,7 @@ public static class UploadServiceCollectionExtensions
         collection.TryAddSingleton<IFilenameFormatSanitizer, DefaultFilenameFormatSanitizer>();
         collection.TryAddSingleton<IUploadStorage, DefaultUploadStorage>();
         collection.TryAddSingleton<IUploadValidator, DefaultUploadValidator>();
-        collection.TryAddSingleton<IImageProcessor, DefaultImageProcessor>();
+        collection.TryAddSingleton<IImageProcessor, ThrowingImageProcessor>();
         collection.TryAddSingleton<IUploadProcessor, DefaultUploadProcessor>();
         collection.TryAddSingleton<IUploadFileResponder, DefaultUploadFileResponder>();
         return collection;

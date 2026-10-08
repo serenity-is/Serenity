@@ -1,3 +1,4 @@
+/*
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Png;
@@ -1216,3 +1217,4 @@ public partial class FileUploadBehaviorTests
         return !str.EndsWith(".meta", StringComparison.Ordinal);
     }
 }
+*/

@@ -185,7 +185,7 @@ public class ImageChecker
         var format = localizer.Get("Enums." + 
             (typeof(ImageCheckResult).GetCustomAttribute<EnumKeyAttribute>(inherit: false)?.Value ??
              typeof(ImageCheckResult).FullName) + "." +
-            Enum.GetName(typeof(ImageCheckResult), result));
+            Enum.GetName(result));
 
         return result switch
         {

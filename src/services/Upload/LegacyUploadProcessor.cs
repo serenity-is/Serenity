@@ -1,3 +1,4 @@
+/*
 using System.IO;
 
 namespace Serenity.Web;
@@ -13,7 +14,7 @@ namespace Serenity.Web;
 /// <exception cref="ArgumentNullException"><paramref name="storage"/> is <c>null</c>.</exception>
 [Obsolete("Please inject and use IUploadProcessor interface")]
 #pragma warning disable CS9113 // Parameter is unread.
-public class UploadProcessor(IUploadStorage storage, IExceptionLogger? _ = null) : ProcessedUploadInfo
+public class LegacyUploadProcessor(IUploadStorage storage, IExceptionLogger? _ = null) : ProcessedUploadInfo
 #pragma warning restore CS9113 // Parameter is unread.
 {
     private readonly IUploadStorage storage = storage ?? throw new ArgumentNullException(nameof(storage));
@@ -79,3 +80,4 @@ public class UploadProcessor(IUploadStorage storage, IExceptionLogger? _ = null)
         return true;
     }
 }
+*/

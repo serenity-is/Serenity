@@ -1,3 +1,4 @@
+/*
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Gif;
@@ -11,9 +12,9 @@ using System.IO;
 namespace Serenity.Web;
 
 /// <summary>
-/// Default implementation for the <see cref="IImageProcessor"/>
+/// Legacy SixLabors.ImageSharp v2 implementation for the <see cref="IImageProcessor"/>
 /// </summary>
-public class DefaultImageProcessor : IImageProcessor
+public class LegacyImageProcessor : IImageProcessor
 {
     /// <inheritdoc/>
     public (int width, int height) GetImageSize(object imageObj)
@@ -137,3 +138,4 @@ public class DefaultImageProcessor : IImageProcessor
         return new Image<Rgb24>(width, height, color);
     }
 }
+*/

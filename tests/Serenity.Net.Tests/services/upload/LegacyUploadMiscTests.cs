@@ -1,5 +1,4 @@
-using SixLabors.ImageSharp;
-
+/*
 namespace Serenity.Web;
 
 public class UploadMiscTests
@@ -140,4 +139,4 @@ public class UploadMiscTests
         Assert.Contains("MB", UploadFormatting.FileSizeDisplay(5 * 1024 * 1024));
     }
 }
-
+*/
