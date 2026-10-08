@@ -88,10 +88,52 @@ public class DisplayOrderFilterHelperTests
         }
     }
 
+    [TableName("GuidParentRow")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
+    private class GuidParentRow : Row<GuidParentRow.RowFields>, IRow, IParentIdRow
+    {
+        [IdProperty]
+        public Guid? Id { get => fields.Id[this]; set => fields.Id[this] = value; }
+        public Guid? ParentId { get => fields.ParentId[this]; set => fields.ParentId[this] = value; }
+
+        public Field ParentIdField => fields.ParentId;
+
+        public class RowFields : RowFieldsBase
+        {
+            public GuidField Id = null!;
+            public GuidField ParentId = null!;
+        }
+    }
+
     [Fact]
     public void Returns_Empty_For_Plain_Row()
     {
         Assert.NotNull(DisplayOrderFilterHelper.GetDisplayOrderFilterFor(new PlainRow()));
+    }
+
+    [Fact]
+    public void Null_ParentId_Maps_To_Is_Null()
+    {
+        var criteria = DisplayOrderFilterHelper.GetDisplayOrderFilterFor(new ParentRow());
+        var sql = criteria.ToString(new SqlQuery());
+        Assert.Contains("IS NULL", sql);
+    }
+
+    [Fact]
+    public void NonNull_ParentId_Uses_Value_Criteria()
+    {
+        var criteria = DisplayOrderFilterHelper.GetDisplayOrderFilterFor(new ParentRow { ParentId = 5 });
+        var sql = criteria.ToString(new SqlQuery());
+        Assert.Contains("= @p", sql);
+    }
+
+    [Fact]
+    public void Guid_ParentId_Is_Supported()
+    {
+        var parentId = Guid.NewGuid();
+        var criteria = DisplayOrderFilterHelper.GetDisplayOrderFilterFor(new GuidParentRow { ParentId = parentId });
+        var sql = criteria.ToString(new SqlQuery());
+        Assert.Contains("= @p", sql);
     }
 
     [Fact]

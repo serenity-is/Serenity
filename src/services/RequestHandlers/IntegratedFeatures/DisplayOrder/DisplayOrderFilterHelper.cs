@@ -13,7 +13,14 @@ public class DisplayOrderFilterHelper
     {
         BaseCriteria flt = Criteria.Empty;
         if (row is IParentIdRow parentRow)
-            flt &= parentRow.ParentIdField == Convert.ToInt64(parentRow.ParentIdField.AsObject(row));
+        {
+            // Use the parent id's own field type instead of forcing it to long, so Guid/string
+            // keys work, and map a null parent id to IS NULL instead of coercing it to 0.
+            var parentId = parentRow.ParentIdField.AsObject(row);
+            flt &= parentId is null
+                ? parentRow.ParentIdField.IsNull()
+                : parentRow.ParentIdField == new ValueCriteria(parentId);
+        }
 
         if (row is IIsActiveRow activeRow)
             flt &= activeRow.IsActiveField >= 0;
