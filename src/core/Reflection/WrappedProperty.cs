@@ -12,8 +12,8 @@ public class WrappedProperty(PropertyInfo property) : IPropertyInfo
     private static readonly ConcurrentDictionary<Type, PropertyInfo?> providerAttributesPropertyByType = new();
 
     private readonly PropertyInfo property = property;
-    private Attribute[]? cachedAttributesExplicit;
-    private Attribute[]? cachedAttributesInherit;
+    // cache slots indexed by (inherit ? 2 : 0) | (intrinsic ? 1 : 0)
+    private readonly Attribute[]?[] cachedAttributesByOrigin = new Attribute[]?[4];
 
     /// <summary>
     /// Gets the name.
@@ -67,35 +67,39 @@ public class WrappedProperty(PropertyInfo property) : IPropertyInfo
 
     private Attribute[] GetCachedAttributes(AttributeOrigin origin)
     {
-        bool inherit = origin.HasFlag(AttributeOrigin.Inherit);
-        var cachedAttributes = inherit ? 
-            cachedAttributesInherit : cachedAttributesExplicit;
+        var index = (origin.HasFlag(AttributeOrigin.Inherit) ? 2 : 0) |
+            (origin.HasFlag(AttributeOrigin.Intrinsic) ? 1 : 0);
+
+        var cachedAttributes = cachedAttributesByOrigin[index];
         if (cachedAttributes is not null)
             return cachedAttributes;
-         
+
+        bool inherit = (index & 2) != 0;
+        bool intrinsic = (index & 1) != 0;
+
         var directAttributes = property.GetCustomAttributes<Attribute>(inherit);
         var allAttributes = new List<Attribute>(directAttributes);
 
-        foreach (var customAttr in directAttributes)
+        // intrinsic provider attributes are only included when the Intrinsic origin
+        // bit is requested, so e.g. AttributeOrigin.Explicit does not leak them.
+        if (intrinsic)
         {
-            if (customAttr is not IIntrinsicPropertyAttributeProvider)
-                continue;
+            foreach (var customAttr in directAttributes)
+            {
+                if (customAttr is not IIntrinsicPropertyAttributeProvider)
+                    continue;
 
-            var providerAttributesProperty = providerAttributesPropertyByType.GetOrAdd(customAttr.GetType(), static t =>
-                t.GetProperty(nameof(IIntrinsicPropertyAttributeProvider.PropertyAttributes),
-                    BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic));
+                var providerAttributesProperty = providerAttributesPropertyByType.GetOrAdd(customAttr.GetType(), static t =>
+                    t.GetProperty(nameof(IIntrinsicPropertyAttributeProvider.PropertyAttributes),
+                        BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic));
 
-            if (providerAttributesProperty == null)
-                continue;
+                if (providerAttributesProperty == null)
+                    continue;
 
-            allAttributes.AddRange(providerAttributesProperty.GetCustomAttributes<Attribute>(inherit: false));
+                allAttributes.AddRange(providerAttributesProperty.GetCustomAttributes<Attribute>(inherit: false));
+            }
         }
 
-        cachedAttributes = [.. allAttributes];
-
-        if (inherit)
-            cachedAttributesInherit = cachedAttributes;
-
-        return cachedAttributesExplicit = cachedAttributes;
+        return cachedAttributesByOrigin[index] = [.. allAttributes];
     }
 }

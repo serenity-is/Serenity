@@ -33,6 +33,17 @@ public class WrappedPropertyTests
         public int NoAttributes { get; set; }
     }
 
+    private class BaseTargetClass
+    {
+        [Display("Base")]
+        public virtual string Inherited { get; set; }
+    }
+
+    private class DerivedTargetClass : BaseTargetClass
+    {
+        public override string Inherited { get; set; }
+    }
+
     private static WrappedProperty GetProperty(string name)
     {
         return new WrappedProperty(typeof(TargetClass).GetProperty(name));
@@ -93,12 +104,24 @@ public class WrappedPropertyTests
     }
 
     [Fact]
-    public void GetAttribute_ReturnsIntrinsicAttribute_EvenWithExplicitOrigin()
+    public void GetAttribute_DoesNotReturnIntrinsicAttribute_WithExplicitOrigin()
     {
-        // WrappedProperty always includes intrinsic attributes in its cached list,
-        // regardless of the requested origin.
-        var attr = GetProperty("Intrinsic").GetAttribute<DisplayAttribute>(AttributeOrigin.Explicit);
-        Assert.NotNull(attr);
-        Assert.Equal("Intrinsic", attr.Name);
+        // intrinsic provider attributes are only included when the Intrinsic bit is requested.
+        Assert.Null(GetProperty("Intrinsic").GetAttribute<DisplayAttribute>(AttributeOrigin.Explicit));
+    }
+
+    [Fact]
+    public void Inherit_Origin_Does_Not_Poison_Explicit_Cache()
+    {
+        var wrapped = new WrappedProperty(typeof(DerivedTargetClass)
+            .GetProperty(nameof(DerivedTargetClass.Inherited)));
+
+        var inherited = wrapped.GetAttribute<DisplayAttribute>(AttributeOrigin.Inherit);
+        Assert.NotNull(inherited);
+        Assert.Equal("Base", inherited.Name);
+
+        // populating the inherit cache must not leak inherited attributes
+        // into the explicit-only origin
+        Assert.Null(wrapped.GetAttribute<DisplayAttribute>(AttributeOrigin.Explicit));
     }
 }
