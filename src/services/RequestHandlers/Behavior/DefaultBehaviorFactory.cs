@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Collections.Concurrent;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Serenity.Services;
 
@@ -14,10 +15,13 @@ namespace Serenity.Services;
 public class DefaultBehaviorFactory(IServiceProviderAccessor serviceProviderAccessor) : IBehaviorFactory
 {
     private readonly IServiceProviderAccessor serviceProviderAccessor = serviceProviderAccessor ?? throw new ArgumentNullException(nameof(serviceProviderAccessor));
+    private readonly ConcurrentDictionary<Type, ObjectFactory> factories = new();
 
     /// <inheritdoc/>
     public object CreateInstance(Type behaviorType)
     {
-        return ActivatorUtilities.CreateInstance(serviceProviderAccessor.ServiceProvider, behaviorType);
+        var factory = factories.GetOrAdd(behaviorType,
+            static type => ActivatorUtilities.CreateFactory(type, Type.EmptyTypes));
+        return factory(serviceProviderAccessor.ServiceProvider, []);
     }
 }

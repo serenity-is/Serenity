@@ -1,4 +1,6 @@
 using System.Collections;
+using System.Collections.Concurrent;
+using System.Runtime.CompilerServices;
 
 namespace Serenity.Services;
 
@@ -18,6 +20,14 @@ public class DefaultBehaviorProvider(IImplicitBehaviorRegistry implicitBehaviors
             throw new ArgumentNullException(nameof(implicitBehaviors));
     private readonly IBehaviorFactory behaviorFactory = behaviorFactory ??
             throw new ArgumentNullException(nameof(behaviorFactory));
+    private readonly ConditionalWeakTable<Type[], ConcurrentDictionary<Type, Type[]>> assignableCache = new();
+
+    private Type[] GetAssignableTypes(Type behaviorType, Type[] sourceTypes)
+    {
+        var cache = assignableCache.GetValue(sourceTypes,
+            _ => new ConcurrentDictionary<Type, Type[]>());
+        return cache.GetOrAdd(behaviorType, bt => sourceTypes.Where(bt.IsAssignableFrom).ToArray());
+    }
 
     /// <inheritdoc/>
     public IEnumerable Resolve(Type handlerType, Type rowType, Type behaviorType)
@@ -26,11 +36,11 @@ public class DefaultBehaviorProvider(IImplicitBehaviorRegistry implicitBehaviors
 
         var row = (IRow)Activator.CreateInstance(rowType)!;
 
-        foreach (var type in implicitBehaviors.GetTypes())
-        {
-            if (!behaviorType.IsAssignableFrom(type))
-                continue;
+        var source = implicitBehaviors.GetTypes();
+        var sourceTypes = source as Type[] ?? [.. source];
 
+        foreach (var type in GetAssignableTypes(behaviorType, sourceTypes))
+        {
             var behavior = behaviorFactory.CreateInstance(type);
             if (behavior == null)
                 continue;
