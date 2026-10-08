@@ -8,15 +8,15 @@ namespace Serenity.Services;
 /// <remarks>
 /// Initializes a new instance of the class.
 /// </remarks>
-/// <param name="provider">Service provider</param>
-/// <exception cref="ArgumentNullException"><paramref name="provider"/> is <c>null</c>.</exception>
-public class DefaultHandlerActivator(IServiceProvider provider) : IHandlerActivator
+/// <param name="serviceProviderAccessor">Accessor for the service provider used to resolve the services handler classes require</param>
+/// <exception cref="ArgumentNullException"><paramref name="serviceProviderAccessor"/> is <c>null</c>.</exception>
+public class DefaultHandlerActivator(IServiceProviderAccessor serviceProviderAccessor) : IHandlerActivator
 {
-    private readonly IServiceProvider provider = provider ?? throw new ArgumentNullException(nameof(provider));
+    private readonly IServiceProviderAccessor serviceProviderAccessor = serviceProviderAccessor ?? throw new ArgumentNullException(nameof(serviceProviderAccessor));
 
     /// <inheritdoc/>
     public object CreateInstance(Type handlerType)
     {
-        return ActivatorUtilities.CreateInstance(provider, handlerType);
+        return ActivatorUtilities.CreateInstance(serviceProviderAccessor.ServiceProvider, handlerType);
     }
 }

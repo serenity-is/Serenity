@@ -53,7 +53,7 @@ public class DefaultHandlerFactory_CompanionWrapperDirection_Tests
         var provider = services.BuildServiceProvider();
         return new DefaultHandlerFactory(
             new DefaultHandlerRegistry(new MockTypeSource(types)),
-            new DefaultHandlerActivator(provider));
+            new DefaultHandlerActivator(new DefaultServiceProviderAccessor(provider)));
     }
 
     public static TheoryData<Type> ProcessorInterfaces =>

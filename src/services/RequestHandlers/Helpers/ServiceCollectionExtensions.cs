@@ -20,6 +20,7 @@ public static class ServiceCollectionExtensions
     /// <param name="collection">Service collection</param>
     public static IServiceCollection AddServiceBehaviors(this IServiceCollection collection)
     {
+        collection.AddServiceResolver();
         collection.TryAddSingleton<IBehaviorFactory, DefaultBehaviorFactory>();
         collection.TryAddSingleton<IImplicitBehaviorRegistry, DefaultImplicitBehaviorRegistry>();
         collection.TryAddSingleton<IBehaviorProvider, DefaultBehaviorProvider>();
@@ -33,6 +34,7 @@ public static class ServiceCollectionExtensions
     /// <param name="collection">Service collection</param>
     public static IServiceCollection AddServiceHandlerFactory(this IServiceCollection collection)
     {
+        collection.AddServiceResolver();
         collection.TryAddSingleton<IHandlerActivator, DefaultHandlerActivator>();
         collection.TryAddSingleton<IDefaultHandlerRegistry, DefaultHandlerRegistry>();
         collection.TryAddSingleton<IDefaultHandlerFactory, DefaultHandlerFactory>();

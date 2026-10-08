@@ -23,7 +23,7 @@ public class ServiceResolverTests
         services.AddSingleton<ITestService, TestService>();
         var provider = services.BuildServiceProvider();
 
-        var resolver = new ServiceResolver<ITestService>(provider);
+        var resolver = new ServiceResolver<ITestService>(new DefaultServiceProviderAccessor(provider));
         var resolved = resolver.Resolve();
 
         Assert.IsType<TestService>(resolved);
@@ -33,7 +33,7 @@ public class ServiceResolverTests
     public void Resolve_Throws_WhenServiceNotRegistered()
     {
         var provider = new ServiceCollection().BuildServiceProvider();
-        var resolver = new ServiceResolver<ITestService>(provider);
+        var resolver = new ServiceResolver<ITestService>(new DefaultServiceProviderAccessor(provider));
 
         Assert.Throws<InvalidOperationException>(() => resolver.Resolve());
     }

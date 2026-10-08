@@ -43,14 +43,14 @@ public class DefaultHandlerFactoryTests
         var provider = services.BuildServiceProvider();
         return new DefaultHandlerFactory(
             new DefaultHandlerRegistry(new MockTypeSource(types)),
-            new DefaultHandlerActivator(provider));
+            new DefaultHandlerActivator(new DefaultServiceProviderAccessor(provider)));
     }
 
     [Fact]
     public void Constructor_Throws_For_Nulls()
     {
         Assert.Throws<ArgumentNullException>(() =>
-            new DefaultHandlerFactory(null, new DefaultHandlerActivator(new ServiceCollection().BuildServiceProvider())));
+            new DefaultHandlerFactory(null, new DefaultHandlerActivator(new DefaultServiceProviderAccessor(new ServiceCollection().BuildServiceProvider()))));
         Assert.Throws<ArgumentNullException>(() =>
             new DefaultHandlerFactory(new DefaultHandlerRegistry(new MockTypeSource()), null));
     }

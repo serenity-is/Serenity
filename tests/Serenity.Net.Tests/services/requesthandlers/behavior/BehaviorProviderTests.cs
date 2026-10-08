@@ -119,7 +119,7 @@ public class BehaviorProviderTests
         [Fact]
         public void CreateInstance_Creates_Behavior()
         {
-            var factory = new DefaultBehaviorFactory(new ServiceCollection().BuildServiceProvider());
+            var factory = new DefaultBehaviorFactory(new DefaultServiceProviderAccessor(new ServiceCollection().BuildServiceProvider()));
             Assert.IsType<NonFieldBehavior>(factory.CreateInstance(typeof(NonFieldBehavior)));
         }
     }

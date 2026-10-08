@@ -41,7 +41,7 @@ public class DefaultHandlerFactory_Companion_Tests
         var provider = services.BuildServiceProvider();
         return new DefaultHandlerFactory(
             new DefaultHandlerRegistry(new MockTypeSource(types)),
-            new DefaultHandlerActivator(provider));
+            new DefaultHandlerActivator(new DefaultServiceProviderAccessor(provider)));
     }
 
     [Fact]
@@ -131,6 +131,7 @@ public class DefaultHandlerFactory_Companion_Tests
         var services = new ServiceCollection();
         services.AddSingleton<IRequestContext>(new NullRequestContext());
         services.AddSingleton<ITypeSource>(new MockTypeSource(types));
+        services.AddSingleton<IServiceProviderAccessor, DefaultServiceProviderAccessor>();
         services.AddSingleton<IDefaultHandlerRegistry, DefaultHandlerRegistry>();
         services.AddSingleton<IHandlerActivator, DefaultHandlerActivator>();
         services.AddSingleton<IDefaultHandlerFactory, DefaultHandlerFactory>();

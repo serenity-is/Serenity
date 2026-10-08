@@ -75,6 +75,7 @@ public static class CoreServiceCollectionExtensions
         if (services is null)
             throw new ArgumentNullException(nameof(services));
 
+        services.TryAddSingleton<IServiceProviderAccessor, DefaultServiceProviderAccessor>();
         services.TryAddSingleton(typeof(IServiceResolver<>), typeof(ServiceResolver<>));
     }
 

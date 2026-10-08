@@ -9,12 +9,12 @@ namespace Serenity.Extensions.DependencyInjection;
 /// <remarks>
 /// Initializes a new instance.
 /// </remarks>
-/// <param name="serviceProvider">The service provider.</param>
-/// <exception cref="ArgumentNullException">Throws when the service provider is null.</exception>
-public class ServiceResolver<TService>(IServiceProvider serviceProvider) : IServiceResolver<TService> 
+/// <param name="serviceProviderAccessor">Accessor for the service provider to resolve the service on demand.</param>
+/// <exception cref="ArgumentNullException">Throws when the service provider accessor is null.</exception>
+public class ServiceResolver<TService>(IServiceProviderAccessor serviceProviderAccessor) : IServiceResolver<TService> 
     where TService : notnull
 {
-    private readonly IServiceProvider serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+    private readonly IServiceProviderAccessor serviceProviderAccessor = serviceProviderAccessor ?? throw new ArgumentNullException(nameof(serviceProviderAccessor));
 
     /// <summary>
     /// Resolves TService using the service provider. If the service was registered as transient, this method acts like a factory.
@@ -22,6 +22,6 @@ public class ServiceResolver<TService>(IServiceProvider serviceProvider) : IServ
     /// <returns>TService instance.</returns>
     public TService Resolve()
     {
-        return serviceProvider.GetRequiredService<TService>();
+        return serviceProviderAccessor.ServiceProvider.GetRequiredService<TService>();
     }
 }

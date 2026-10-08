@@ -8,16 +8,16 @@ namespace Serenity.Services;
 /// <remarks>
 /// Initializes a new instance of the class.
 /// </remarks>
-/// <param name="provider">Service provider which will be
+/// <param name="serviceProviderAccessor">Accessor for the service provider which will be
 /// used to resolve the services that behavior classes might require</param>
-/// <exception cref="ArgumentNullException"><paramref name="provider"/> is <c>null</c>.</exception>
-public class DefaultBehaviorFactory(IServiceProvider provider) : IBehaviorFactory
+/// <exception cref="ArgumentNullException"><paramref name="serviceProviderAccessor"/> is <c>null</c>.</exception>
+public class DefaultBehaviorFactory(IServiceProviderAccessor serviceProviderAccessor) : IBehaviorFactory
 {
-    private readonly IServiceProvider provider = provider ?? throw new ArgumentNullException(nameof(provider));
+    private readonly IServiceProviderAccessor serviceProviderAccessor = serviceProviderAccessor ?? throw new ArgumentNullException(nameof(serviceProviderAccessor));
 
     /// <inheritdoc/>
     public object CreateInstance(Type behaviorType)
     {
-        return ActivatorUtilities.CreateInstance(provider, behaviorType);
+        return ActivatorUtilities.CreateInstance(serviceProviderAccessor.ServiceProvider, behaviorType);
     }
 }

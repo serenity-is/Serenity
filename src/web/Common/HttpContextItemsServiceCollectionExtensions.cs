@@ -20,6 +20,16 @@ public static class HttpContextServiceCollectionExtensions
     {
         collection.AddHttpContextAccessor();
         collection.TryAddSingleton<IHttpContextItemsAccessor, HttpContextItemsAccessor>();
+
+        var accessors = collection.Where(x => x.ServiceType == typeof(IServiceProviderAccessor)).ToList();
+        if (accessors.All(x => x.ImplementationType == typeof(DefaultServiceProviderAccessor)))
+        {
+            foreach (var accessor in accessors)
+                collection.Remove(accessor);
+
+            collection.AddSingleton<IServiceProviderAccessor, HttpContextServiceProviderAccessor>();
+        }
+
         return collection;
     }
 
