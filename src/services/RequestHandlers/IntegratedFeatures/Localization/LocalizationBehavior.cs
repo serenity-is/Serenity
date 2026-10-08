@@ -390,23 +390,28 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
         foreach (DictionaryEntry pair in localizations)
         {
             var cultureId = cultureIdField.ConvertValue(pair.Key, CultureInfo.InvariantCulture)?.ToString();
+            if (string.IsNullOrEmpty(cultureId))
+                throw DataValidation.RequiredError(cultureIdField, handler.Context.Localizer);
+
+            if (pair.Value is not IRow row)
+                throw new ValidationError("InvalidLocalization", null, string.Format(
+                    "Localization value for culture '{0}' is not valid!", cultureId));
+
             var oldId = handler.IsCreate ? null : GetOldLocalizationRowId(handler.UnitOfWork.Connection, masterId, cultureId);
             var localRow = localRowFactory();
             localRow.TrackAssignments = true;
             if (oldId == null)
                 cultureIdField[localRow] = cultureId;
 
-            var row = pair.Value as IRow;
-
             bool anyNonEmpty = false;
             IRow? oldLocalRow = null;
 
-            foreach (var field in row!.GetFields())
+            foreach (var field in row.GetFields())
             {
                 if (ReferenceEquals(field, idField))
                     continue;
 
-                if (!row!.IsAssigned(field))
+                if (!row.IsAssigned(field))
                     continue;
 
                 var match = GetLocalizationMatch(field) ?? throw new ValidationError("CantLocalize", field.Name, string.Format("{0} field is not localizable!",
@@ -452,23 +457,28 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
         foreach (DictionaryEntry pair in localizations)
         {
             var cultureId = cultureIdField.ConvertValue(pair.Key, CultureInfo.InvariantCulture)?.ToString();
+            if (string.IsNullOrEmpty(cultureId))
+                throw DataValidation.RequiredError(cultureIdField, handler.Context.Localizer);
+
+            if (pair.Value is not IRow row)
+                throw new ValidationError("InvalidLocalization", null, string.Format(
+                    "Localization value for culture '{0}' is not valid!", cultureId));
+
             var oldId = handler.IsCreate ? null : await GetOldLocalizationRowIdAsync(handler.UnitOfWork.Connection, masterId, cultureId, cancellationToken).ConfigureAwait(false);
             var localRow = localRowFactory();
             localRow.TrackAssignments = true;
             if (oldId == null)
                 cultureIdField[localRow] = cultureId;
 
-            var row = pair.Value as IRow;
-
             bool anyNonEmpty = false;
             IRow? oldLocalRow = null;
 
-            foreach (var field in row!.GetFields())
+            foreach (var field in row.GetFields())
             {
                 if (ReferenceEquals(field, idField))
                     continue;
 
-                if (!row!.IsAssigned(field))
+                if (!row.IsAssigned(field))
                     continue;
 
                 var match = GetLocalizationMatch(field) ?? throw new ValidationError("CantLocalize", field.Name, string.Format("{0} field is not localizable!",

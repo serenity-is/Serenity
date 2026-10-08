@@ -1,3 +1,5 @@
+using System.Threading;
+
 namespace Serenity.Services;
 
 public partial class LocalizationBehaviorTests
@@ -349,6 +351,85 @@ public partial class LocalizationBehaviorTests
             Connection = new MockDbConnection(),
             UnitOfWork = new MockUnitOfWork(new MockDbConnection())
         });
+    }
+
+    [Fact]
+    public void OnAfterSave_Throws_WhenLocalizationValueNotRow()
+    {
+        var behavior = new LocalizationBehavior(new MockHandlerFactory((_, _) =>
+            throw new InvalidOperationException("should not create")));
+        var row = new LocMainRow { Id = 7 };
+        Assert.True(behavior.ActivateFor(row));
+
+        var handler = new MockSaveHandler<LocMainRow>
+        {
+            Row = row,
+            IsCreate = true,
+            Context = new NullRequestContext(),
+            Connection = new MockDbConnection(),
+            UnitOfWork = new MockUnitOfWork(new MockDbConnection()),
+            Request = new SaveRequest<LocMainRow>
+            {
+                Entity = row,
+                Localizations = new Dictionary<string, LocMainRow> { ["en"] = null! }
+            }
+        };
+
+        var ex = Assert.Throws<ValidationError>(() => behavior.OnAfterSave(handler));
+        Assert.Equal("InvalidLocalization", ex.ErrorCode);
+    }
+
+    [Fact]
+    public void OnAfterSave_Throws_WhenLocalizationCultureEmpty()
+    {
+        var behavior = new LocalizationBehavior(new MockHandlerFactory((_, _) =>
+            throw new InvalidOperationException("should not create")));
+        var row = new LocMainRow { Id = 7 };
+        Assert.True(behavior.ActivateFor(row));
+
+        var handler = new MockSaveHandler<LocMainRow>
+        {
+            Row = row,
+            IsCreate = true,
+            Context = new NullRequestContext(),
+            Connection = new MockDbConnection(),
+            UnitOfWork = new MockUnitOfWork(new MockDbConnection()),
+            Request = new SaveRequest<LocMainRow>
+            {
+                Entity = row,
+                Localizations = new Dictionary<string, LocMainRow> { [""] = new LocMainRow { Description = "x" } }
+            }
+        };
+
+        var ex = Assert.Throws<ValidationError>(() => behavior.OnAfterSave(handler));
+        Assert.Equal("Required", ex.ErrorCode);
+    }
+
+    [Fact]
+    public async Task OnAfterSaveAsync_Throws_WhenLocalizationValueNotRow()
+    {
+        var behavior = new LocalizationBehavior(new MockHandlerFactory((_, _) =>
+            throw new InvalidOperationException("should not create")));
+        var row = new LocMainRow { Id = 7 };
+        Assert.True(behavior.ActivateFor(row));
+
+        var handler = new MockSaveHandlerAsync<LocMainRow>
+        {
+            Row = row,
+            IsCreate = true,
+            Context = new NullRequestContext(),
+            Connection = new MockDbConnection(),
+            UnitOfWork = new MockUnitOfWork(new MockDbConnection()),
+            Request = new SaveRequest<LocMainRow>
+            {
+                Entity = row,
+                Localizations = new Dictionary<string, LocMainRow> { ["en"] = null! }
+            }
+        };
+
+        var ex = await Assert.ThrowsAsync<ValidationError>(() =>
+            behavior.OnAfterSaveAsync(handler, CancellationToken.None));
+        Assert.Equal("InvalidLocalization", ex.ErrorCode);
     }
 }
 
