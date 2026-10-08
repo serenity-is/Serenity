@@ -81,6 +81,9 @@ public partial class BasicPropertyProcessorTests
         [FixedWidth(100)]
         public string? FixedW { get; set; }
 
+        [NotFixedWidth]
+        public string? NonFixedW { get; set; }
+
         [FormWidth("fw", JustThis = true)]
         public string? FormWidthJustThis { get; set; }
 
@@ -676,6 +679,22 @@ public partial class BasicPropertyProcessorTests
     {
         var item = Process<DecoratedForm>(nameof(DecoratedForm.FixedW));
         Assert.False(item.Resizable);
+    }
+
+    private class NotFixedWidthAttribute : FixedWidthAttribute
+    {
+        public NotFixedWidthAttribute() : base(100)
+        {
+            Min = 50;
+            Max = 150;
+        }
+    }
+
+    [Fact]
+    public void Does_Not_Force_Resizable_False_When_FixedWidth_Bounds_Differ()
+    {
+        var item = Process<DecoratedForm>(nameof(DecoratedForm.NonFixedW));
+        Assert.Null(item.Resizable);
     }
 
     [Fact]

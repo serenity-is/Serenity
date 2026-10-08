@@ -10,9 +10,9 @@ public partial class BasicPropertyProcessor : PropertyProcessor
         else
         {
             var fixedWidth = source.GetAttribute<FixedWidthAttribute>();
-            if (fixedWidth != null && 
-                fixedWidth.Min == fixedWidth.Max && 
-                fixedWidth.Value == fixedWidth.Value)
+            if (fixedWidth != null &&
+                fixedWidth.Value == fixedWidth.Min &&
+                fixedWidth.Min == fixedWidth.Max)
                 item.Resizable = false;
         }
     }
