@@ -12,6 +12,8 @@ public class FallbackRowFieldsProvider : IRowFieldsProvider
     /// </summary>
     public static FallbackRowFieldsProvider Instance = new();
     private readonly ConcurrentDictionary<Type, RowFieldsBase> byType;
+    // Not expected to grow much: one entry per fields type/alias actually used, and aliases
+    // come from join declarations, so no eviction/bound is implemented.
     private readonly ConcurrentDictionary<(Type type, string alias),
         RowFieldsBase> byTypeAndAlias;
 

@@ -150,6 +150,20 @@ public class DefaultRowFieldsProviderTests
     }
 
     [Fact]
+    public void ResolveWithAlias_Is_Case_Sensitive()
+    {
+        // the alias case is emitted literally into SQL, so distinct cases are distinct aliases
+        var provider = CreateProvider();
+
+        var lower = provider.ResolveWithAlias(typeof(IdNameRow.RowFields), "x");
+        var upper = provider.ResolveWithAlias(typeof(IdNameRow.RowFields), "X");
+
+        Assert.NotSame(lower, upper);
+        Assert.Equal("x", lower.AliasName);
+        Assert.Equal("X", upper.AliasName);
+    }
+
+    [Fact]
     public void ResolveWithAlias_ReplacesFieldExpressions()
     {
         var provider = CreateProvider();
