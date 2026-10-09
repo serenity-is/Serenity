@@ -67,6 +67,20 @@ public class ValidationError : Exception, IIsSensitiveMessage
     /// <summary>
     /// Initializes a new instance of the <see cref="ValidationError"/> class.
     /// </summary>
+    /// <param name="errorCode">The error code.</param>
+    /// <param name="arguments">The arguments.</param>
+    /// <param name="errorMessage">The error message.</param>
+    /// <param name="innerException">The exception that is the cause of the current exception.</param>
+    public ValidationError(string errorCode, string? arguments, string errorMessage, Exception innerException)
+        : base(errorMessage, innerException)
+    {
+        ErrorCode = errorCode;
+        Arguments = arguments;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ValidationError"/> class.
+    /// </summary>
     /// <param name="localizer">Text localizer</param>
     /// <param name="errorCode">The error code.</param>
     /// <param name="arguments">The arguments.</param>

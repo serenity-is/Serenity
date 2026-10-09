@@ -97,6 +97,33 @@ public class HumanizeSqlExceptionBehaviorTests
     }
 
     [Fact]
+    public void Save_Unique_Violation_Without_Parsed_Column_Does_Not_Use_Id_Title()
+    {
+        var handler = CreateSaveHandler(isCreate: true);
+
+        var error = Assert.Throws<ValidationError>(() => CreateBehavior().OnException(handler,
+            new MockDbException(
+                "Cannot insert duplicate key row in object 'dbo.IT_Humanize_Row' with unique index 'IX_Code'. " +
+                "The duplicate key value is (X).", number: 2601)));
+
+        Assert.Equal("UniqueViolation", error.ErrorCode);
+        Assert.Contains("same value", error.Message);
+    }
+
+    [Fact]
+    public void Humanized_Error_Chains_Original_Exception()
+    {
+        var handler = CreateSaveHandler(isCreate: true);
+        var dbException = new MockDbException(
+            "Violation of PRIMARY KEY constraint 'PK_X'. Cannot insert duplicate key in object " +
+            "'dbo.IT_Humanize_Row'. The duplicate key value is (1).", number: 2627);
+
+        var error = Assert.Throws<ValidationError>(() => CreateBehavior().OnException(handler, dbException));
+
+        Assert.Same(dbException, error.InnerException);
+    }
+
+    [Fact]
     public void Save_NotNull_Without_Parsed_Column_Does_Not_Use_Id_Title()
     {
         var handler = CreateSaveHandler(isCreate: true);

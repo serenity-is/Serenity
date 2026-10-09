@@ -60,7 +60,7 @@ public class HumanizeSqlExceptionBehavior(ISqlErrorExtractor extractor) : IImpli
 
         localizer ??= NullTextLocalizer.Instance;
 
-        var fieldTitle = info.Type is SqlErrorConstraintType.PrimaryKey or SqlErrorConstraintType.Unique
+        var fieldTitle = info.Type is SqlErrorConstraintType.PrimaryKey
             ? (row as IIdRow)?.GetIdField()?.GetTitle(localizer)
             : null;
 
@@ -71,7 +71,7 @@ public class HumanizeSqlExceptionBehavior(ISqlErrorExtractor extractor) : IImpli
             FieldName = info.ColumnName is null ? fieldTitle : null
         });
 
-        throw new ValidationError(GetErrorCode(info, operation), info.ColumnName, message);
+        throw new ValidationError(GetErrorCode(info, operation), info.ColumnName, message, exception);
     }
 
     private static string GetErrorCode(SqlErrorInfo info, SqlErrorOperation operation) => info.Type switch
