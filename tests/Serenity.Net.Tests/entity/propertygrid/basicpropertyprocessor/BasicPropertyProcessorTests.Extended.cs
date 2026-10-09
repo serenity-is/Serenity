@@ -733,7 +733,7 @@ public partial class BasicPropertyProcessorTests
     [Theory]
     [InlineData(nameof(DecoratedForm.IntProp), "Integer")]
     [InlineData(nameof(DecoratedForm.ShortProp), "Integer")]
-    [InlineData(nameof(DecoratedForm.LongProp), "String")]
+    [InlineData(nameof(DecoratedForm.LongProp), "Int64")]
     [InlineData(nameof(DecoratedForm.BoolProp), "Boolean")]
     [InlineData(nameof(DecoratedForm.DecimalProp), "Decimal")]
     [InlineData(nameof(DecoratedForm.DoubleProp), "Decimal")]
@@ -761,6 +761,7 @@ public partial class BasicPropertyProcessorTests
     [InlineData(nameof(DecoratedForm.BoolProp), "Checkbox")]
     [InlineData(nameof(DecoratedForm.DecimalProp), "Number")]
     [InlineData(nameof(DecoratedForm.IntProp), "Number")]
+    [InlineData(nameof(DecoratedForm.LongProp), "BigInt")]
     public void AutoDetermines_FormatterType(string propName, string expected)
     {
         var item = Process<DecoratedForm>(propName);
@@ -773,7 +774,7 @@ public partial class BasicPropertyProcessorTests
     [InlineData(nameof(DecoratedForm.BoolProp), "Boolean")]
     [InlineData(nameof(DecoratedForm.DecimalProp), "Decimal")]
     [InlineData(nameof(DecoratedForm.IntProp), "Integer")]
-    [InlineData(nameof(DecoratedForm.LongProp), "Integer")]
+    [InlineData(nameof(DecoratedForm.LongProp), "Int64")]
     [InlineData(nameof(DecoratedForm.Plain), "String")]
     public void AutoDetermines_FilteringType(string propName, string expected)
     {

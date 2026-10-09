@@ -16,7 +16,8 @@ public partial class BasicPropertyProcessor : PropertyProcessor
                 item.FormatterType = "Enum";
                 item.FormatterParams["enumKey"] = EnumMapper.GetEnumTypeKey(enumType);
             }
-            else if (valueType == typeof(DateTime) || valueType == typeof(DateTime?))
+            else if (valueType == typeof(DateTime) || valueType == typeof(DateTime?) ||
+                valueType == typeof(DateOnly) || valueType == typeof(DateOnly?))
             {
                 if (basedOnField is not null &&
                     basedOnField is DateTimeField dtf &&
@@ -27,10 +28,13 @@ public partial class BasicPropertyProcessor : PropertyProcessor
             }
             else if (valueType == typeof(bool))
                 item.FormatterType = "Checkbox";
+            else if (valueType == typeof(long))
+                item.FormatterType = "BigInt";
             else if (valueType == typeof(decimal) ||
                 valueType == typeof(double) ||
                 valueType == typeof(float) ||
-                valueType == typeof(int))
+                valueType == typeof(int) ||
+                valueType == typeof(short))
             {
                 item.FormatterType = "Number";
             }

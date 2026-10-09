@@ -326,6 +326,63 @@ describe("Validator.methods", () => {
         }
     });
 
+    it("validates int64 range (int64)", () => {
+        const el = document.createElement("input");
+        const method = Validator.methods.int64;
+
+        el.value = "";
+        expect(method("", el)).toBe("dependency-mismatch");
+
+        el.value = "0";
+        expect(method("0", el)).toBe(true);
+        el.value = "-1";
+        expect(method("-1", el)).toBe(true);
+
+        // exact boundaries must be accepted
+        el.value = "9223372036854775807";
+        expect(method("9223372036854775807", el)).toBe(true);
+        el.value = "-9223372036854775808";
+        expect(method("-9223372036854775808", el)).toBe(true);
+
+        // just outside the boundaries must be rejected
+        el.value = "9223372036854775808";
+        expect(method("9223372036854775808", el)).toBe(false);
+        el.value = "-9223372036854775809";
+        expect(method("-9223372036854775809", el)).toBe(false);
+
+        el.value = "1.5";
+        expect(method("1.5", el)).toBe(false);
+        el.value = "abc";
+        expect(method("abc", el)).toBe(false);
+    });
+
+    it("compares min/max bounds exactly for bigint params", () => {
+        const el = document.createElement("input");
+        const min = Validator.methods.min;
+        const max = Validator.methods.max;
+        const bound = 9223372036854775807n;
+
+        el.value = "9223372036854775807";
+        expect(max("9223372036854775807", el, bound)).toBe(true);
+        expect(min("9223372036854775807", el, bound)).toBe(true);
+
+        el.value = "9223372036854775808";
+        expect(max("9223372036854775808", el, bound)).toBe(false);
+        expect(min("9223372036854775808", el, bound)).toBe(true);
+
+        el.value = "9223372036854775806";
+        expect(max("9223372036854775806", el, bound)).toBe(true);
+        expect(min("9223372036854775806", el, bound)).toBe(false);
+    });
+
+    it("compareBound is exact for bigint bounds", () => {
+        expect(Validator.compareBound("9223372036854775807", 9223372036854775807n)).toBe(0);
+        expect(Validator.compareBound("9223372036854775808", 9223372036854775807n)).toBe(1);
+        expect(Validator.compareBound("9223372036854775806", 9223372036854775807n)).toBe(-1);
+        expect(Validator.compareBound(5, 3)).toBe(1);
+        expect(Validator.compareBound("abc", 3)).toBeNaN();
+    });
+
     it("validates custom rules (customValidate)", () => {
         const el = document.createElement("input");
         const method = Validator.methods.customValidate;

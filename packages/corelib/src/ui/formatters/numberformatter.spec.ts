@@ -29,4 +29,10 @@ describe("NumberFormatter", () => {
         formatter.displayFormat = "0.###"
         expect(formatter.format(ctx({ value: "123456.789" }))).toBe("123456.789");
     });
+
+    it("formats numbers whose toString uses exponent notation", () => {
+        const formatter = new NumberFormatter();
+        formatter.displayFormat = "0.########";
+        expect(formatter.format(ctx({ value: 1e-7 }))).toBe("0.0000001");
+    });
 })

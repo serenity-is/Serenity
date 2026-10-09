@@ -4967,7 +4967,7 @@ export declare class Validator {
 	 * @param method - Rule method name.
 	 * @param value - Raw attribute value.
 	 */
-	static normalizeAttributeRule(rules: ValidationRules, type: string, method: string, value: ValidationValue): void;
+	static normalizeAttributeRule(rules: ValidationRules, type: string, method: string, value: ValidationValue | bigint): void;
 	/**
 	 * Gets rules derived from HTML attributes (e.g. `required`, `minlength`, `type`).
 	 * @param element - Target element.
@@ -9719,6 +9719,8 @@ export interface DataGridPersistenceEvent extends DataGridEvent {
  * permissions, identity and display name resolution.
  */
 export interface IRowDefinition {
+	/** Name of the property that holds the optimistic concurrency version, if any. */
+	readonly concurrencyVersionProperty?: string;
 	/** Permission required to delete rows. */
 	readonly deletePermission?: string;
 	/** Name of the identity / primary key property. */
@@ -11958,6 +11960,11 @@ export declare class EntityDialog<TItem, P = {}> extends BaseDialog<P> implement
 	 */
 	protected getIsActiveProperty(): string;
 	protected getIsDeletedProperty(): string;
+	/**
+	 * Returns the concurrency version property for the entity, if any.
+	 * @returns The concurrency version property name.
+	 */
+	protected getConcurrencyVersionProperty(): string;
 	private _service;
 	protected getService(): string;
 	/**
@@ -13419,6 +13426,58 @@ export declare class HtmlReportContentEditor<P extends HtmlContentEditorOptions 
 	protected getCKEditorConfig(): CKEditorConfig;
 	protected getTiptapToolbarHidden(editor: any): TiptapToolbarHiddenOption;
 	protected configureTiptapExtension(extension: any): any;
+}
+/**
+ * Options for the {@link Int64Editor}.
+ */
+export interface Int64EditorOptions {
+	/** Minimum allowed value. */
+	minValue?: number | bigint | string;
+	/** Maximum allowed value. */
+	maxValue?: number | bigint | string;
+	/** Whether negative values are allowed. */
+	allowNegatives?: boolean;
+}
+/**
+ * An editor that renders a Int64/long input.
+ * @typeParam P - Widget props type.
+ */
+export declare class Int64Editor<P extends Int64EditorOptions = Int64EditorOptions> extends EditorWidget<P> implements IGetEditValue {
+	static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
+	/** Creates the default text input element.
+	 * @returns The text input element. */
+	static createDefaultElement(): HTMLInputElement;
+	readonly domNode: HTMLInputElement;
+	/**
+	 * Creates a Int64/long editor.
+	 * @param props - Widget props.
+	 */
+	constructor(props: EditorProps<P>);
+	static convertToInt64(value: boolean | string | number | bigint | null | undefined, argumentName?: string): bigint | null;
+	getEditValue(property: PropertyItem, target: any): void;
+	/**
+	* Returns the current Int64/long value.
+	* @returns The value, or null when empty.
+	*/
+	get_value(): bigint | null;
+	/**
+	 * Returns the current Int64/long value.
+	 * @returns The value, or null when empty.
+	 */
+	get value(): bigint | null;
+	/**
+	 * Sets the Int64/long value.
+	 * @param value - The value to set.
+	 */
+	set_value(value: bigint | string | number | null): void;
+	/** Sets the Int64/long value.
+	 * @param v - The Int64/long value to set. */
+	set value(v: bigint | string | number | null);
+	/**
+	 * Whether the current value is valid.
+	 * @returns True when valid.
+	 */
+	get_isValid(): boolean;
 }
 /**
  * Options for the {@link IntegerEditor}.
@@ -15601,6 +15660,63 @@ export declare class StringFiltering extends BaseFiltering {
 	validateEditorValue(value: string): string;
 }
 /**
+ * Formats big integer values, including values outside the JavaScript safe integer range
+ * (2^53) that arrive as strings, without losing precision.
+ * @remarks Values that fit in the safe integer range (including numeric strings and small
+ * bigints) are delegated to {@link NumberFormatter}. Only integers outside that range are
+ * formatted from their `bigint` representation, so no digits are lost.
+ */
+export declare class BigIntFormatter implements Formatter {
+	readonly props: {
+		displayFormat?: string;
+	};
+	static [Symbol.typeInfo]: FormatterTypeInfo<"Serenity.">;
+	/**
+	 * Creates a BigIntFormatter.
+	 * @param props - Formatter options.
+	 * @param props.displayFormat - Number format string (default `"0"`).
+	 */
+	constructor(props?: {
+		displayFormat?: string;
+	});
+	/**
+	 * Formats the cell value as an integer string.
+	 * @param ctx - Formatter context containing the cell value.
+	 * @returns Formatted integer string.
+	 */
+	format(ctx: FormatterContext): string;
+	/**
+	 * Static helper to format any big integer value (number, numeric string or bigint).
+	 * This does not HTML encode the return value.
+	 * @param value - Number, numeric string or bigint.
+	 * @param format - Format string (default `"0"`).
+	 * @returns Formatted string.
+	 */
+	static formatValue(value: any, format?: string): string;
+	/**
+	 * Returns the value as a bigint only when it is an integer outside the safe JavaScript
+	 * integer range (where a number would lose precision); otherwise `null`, so the caller
+	 * can delegate to the number formatter.
+	 * @param value - Number, numeric string or bigint.
+	 * @returns The value as a bigint, or `null`.
+	 */
+	static getAsBigIntIfUnsafe(value: any): bigint | null;
+	/**
+	 * Formats a bigint using .NET-style integer format strings and {@link Culture} settings.
+	 * @param value - Value to format.
+	 * @param format - Format specifier: `"g"`, `"d"`, `"n"`, `"x"`, or a custom pattern (`"#,##0"`, `"000"`, etc.). Defaults to `"0"`.
+	 * @returns The formatted integer string.
+	 */
+	static formatBigInt(value: bigint, format?: string): string;
+	/** Gets the number display format. @returns The display format string. */
+	get displayFormat(): string;
+	/**
+	 * Sets the number display format.
+	 * @param value - The display format string.
+	 */
+	set displayFormat(value: string);
+}
+/**
  * Renders a boolean value as localized text and/or an icon.
  * Falls back to `DialogTexts.YesButton` / `NoButton` when no explicit texts are provided.
  */
@@ -15931,12 +16047,20 @@ export declare class NumberFormatter implements Formatter {
 	 */
 	format(ctx: FormatterContext): string;
 	/**
-	 * Static helper to format any numeric-like value.
+	 * Static compat helper to format any numeric-like value with HTML encoding.
 	 * @param value - Number or numeric string.
 	 * @param format - Format string (default `"0.##"`).
 	 * @returns Formatted string.
 	 */
 	static format(value: any, format?: string): string;
+	/**
+	 * Static helper to format any numeric-like value.
+	 * This does not HTML encode returned value.
+	 * @param value - Number or numeric string.
+	 * @param format - Format string (default `"0.##"`).
+	 * @returns Formatted string.
+	 */
+	static formatValue(value: any, format?: string): string;
 	/** Gets the number display format. @returns The display format string. */
 	get displayFormat(): string;
 	/**

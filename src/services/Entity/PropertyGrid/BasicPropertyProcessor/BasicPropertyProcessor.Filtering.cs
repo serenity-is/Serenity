@@ -139,9 +139,12 @@ public partial class BasicPropertyProcessor : PropertyProcessor
             {
                 item.FilteringType = "Decimal";
             }
+            else if (valueType == typeof(long))
+            {
+                item.FilteringType = "Int64";
+            }
             else if (valueType == typeof(int) ||
-                valueType == typeof(short) ||
-                valueType == typeof(long))
+                valueType == typeof(short))
             {
                 item.FilteringType = "Integer";
             }

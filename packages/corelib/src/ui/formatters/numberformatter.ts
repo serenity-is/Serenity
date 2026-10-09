@@ -21,16 +21,27 @@ export class NumberFormatter implements Formatter {
      * @returns Formatted number string.
      */
     format(ctx: FormatterContext): string {
-        return NumberFormatter.format(ctx.value, this.displayFormat);
+        return NumberFormatter.formatValue(ctx.value, this.displayFormat);
     }
 
     /**
-     * Static helper to format any numeric-like value.
+     * Static compat helper to format any numeric-like value with HTML encoding.
      * @param value - Number or numeric string.
      * @param format - Format string (default `"0.##"`).
      * @returns Formatted string.
      */
     static format(value: any, format?: string): string {
+        return htmlEncode(this.formatValue(value, format));
+    }
+
+    /**
+     * Static helper to format any numeric-like value.
+     * This does not HTML encode returned value.
+     * @param value - Number or numeric string.
+     * @param format - Format string (default `"0.##"`).
+     * @returns Formatted string.
+     */
+    static formatValue(value: any, format?: string): string {
         format = (format ?? '0.##');
         if (value == null)
             return '';
@@ -39,14 +50,14 @@ export class NumberFormatter implements Formatter {
             if (isNaN(value))
                 return '';
 
-            return htmlEncode(formatNumber(value, format));
+            return formatNumber(value, format);
         }
 
         const dbl = parseDecimal(value.toString());
         if (dbl == null || isNaN(dbl))
             return value?.toString() ?? '';
 
-        return htmlEncode(formatNumber(dbl, format));
+        return formatNumber(dbl, format);
     }
 
     /** Gets the number display format. @returns The display format string. */

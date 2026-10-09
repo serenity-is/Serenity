@@ -318,6 +318,33 @@ export class Validator {
         return !Validator.methods.required(value, element) && "dependency-mismatch";
     }
 
+    /**
+     * Compares a form value against a min/max/range bound. When the bound is a `bigint`
+     * (used for 64-bit integer bounds beyond the safe integer range), the value is compared
+     * exactly as a bigint instead of losing precision through `Number` coercion.
+     * @param value - The value to compare.
+     * @param param - The bound (number, string or bigint).
+     * @returns Negative if value &lt; bound, positive if value &gt; bound, `0` if equal, or `NaN` when not comparable.
+     */
+    static compareBound(value: any, param: any): number {
+        if (typeof param === "bigint") {
+            try {
+                const big = BigInt(String(value).trim());
+                return big < param ? -1 : (big > param ? 1 : 0);
+            }
+            catch {
+                // not a plain integer, fall back to numeric comparison below
+            }
+        }
+
+        const num = Number(value);
+        const bound = Number(param);
+        if (isNaN(num) || isNaN(bound))
+            return NaN;
+
+        return num < bound ? -1 : (num > bound ? 1 : 0);
+    }
+
     /** When `true` automatically combines `min`+`max` into `range` and `minlength`+`maxlength` into `rangelength` during rule normalization. */
     static autoCreateRanges: boolean = false;
 
@@ -423,6 +450,7 @@ export class Validator {
         decimalQ: "Validation.Decimal",
         dateISO: "Please enter a valid date (ISO).",
         integerQ: "Validation.Integer",
+        int64: "Validation.Int64",
         number: "Please enter a valid number.",
         digits: "Validation.Digits",
         equalTo: "Please enter the same value again.",
@@ -522,7 +550,19 @@ export class Validator {
         integerQ: function (value: string, element: any) {
             return Validator.optional(element, value) || !isNaN(parseInteger(value));
         },
+        int64: function (value: string, element: any) {
+            const optional = Validator.optional(element, value);
+            if (optional)
+                return optional;
 
+            try {
+                const val = BigInt(value);
+                return val <= 9223372036854775807n && val >= -9223372036854775808n;
+            }
+            catch {
+                return false;
+            }
+        },
         /**
          * Validates whether the input value is an email in accordance to RFC822 specification, with a top level domain.
          */
@@ -578,15 +618,17 @@ export class Validator {
         },
 
         min: function (value, element, param) {
-            return Validator.optional(element, value) || value >= param;
+            return Validator.optional(element, value) || Validator.compareBound(value, param) >= 0;
         },
 
         max: function (value, element, param) {
-            return Validator.optional(element, value) || value <= param;
+            return Validator.optional(element, value) || Validator.compareBound(value, param) <= 0;
         },
 
         range: function (value, element, param) {
-            return Validator.optional(element, value) || (value >= param[0] && value <= param[1]);
+            return Validator.optional(element, value) ||
+                (Validator.compareBound(value, param[0]) >= 0 &&
+                 Validator.compareBound(value, param[1]) <= 0);
         },
 
         url: function (value, element) {
@@ -1801,16 +1843,30 @@ export class Validator {
      * @param method - Rule method name.
      * @param value - Raw attribute value.
      */
-    static normalizeAttributeRule(rules: ValidationRules, type: string, method: string, value: ValidationValue) {
+    static normalizeAttributeRule(rules: ValidationRules, type: string, method: string, value: ValidationValue | bigint) {
 
         // Convert the value to a number for number inputs, and for text for backwards compability
         // allows type="date" and others to be compared as strings
         if (/min|max|step/.test(method) && (type === null || /number|range|text/.test(type))) {
-            value = Number(value);
+            try {
+                // try to convert the value to BigInt if it exceeds the safe integer range
+                if ((/min|max|step/.test(method) && (type === null || /text/.test(type)) &&
+                    typeof value == "string" && /^-?\d+$/.test(value) &&
+                    (BigInt(value) > BigInt(Number.MAX_SAFE_INTEGER) || 
+                     BigInt(value) < BigInt(Number.MIN_SAFE_INTEGER)))) {
+                    value = BigInt(value);
+                }
+            }
+            catch {
+            }
 
-            // Support Opera Mini, which returns NaN for undefined minlength
-            if (isNaN(value)) {
-                value = undefined;
+            if (typeof value !== "bigint") {
+                value = Number(value);
+
+                // Support Opera Mini, which returns NaN for undefined minlength
+                if (isNaN(value)) {
+                    value = undefined;
+                }
             }
         }
 

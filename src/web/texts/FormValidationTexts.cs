@@ -14,6 +14,7 @@ public static class FormValidationTexts
     public static readonly LocalText HourAndMin = "Please enter a valid time (e.g. 15:30)";
     public static readonly LocalText IncorrectPassword = "Incorrect password. Please check.";
     public static readonly LocalText Integer = "Please enter a valid integer value.";
+    public static readonly LocalText Int64 = "Please enter a valid 64-bit integer value.";
     public static readonly LocalText MaxLength = "Please enter no more than {0} characters.";
     public static readonly LocalText MinLength = "Please enter no less than {0} characters.";
     public static readonly LocalText PasswordConfirm = "Passwords entered don't match.";

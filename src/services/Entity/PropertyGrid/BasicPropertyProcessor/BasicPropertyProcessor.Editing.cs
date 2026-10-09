@@ -490,6 +490,8 @@ public partial class BasicPropertyProcessor : PropertyProcessor
             return "Enum";
         else if (valueType == typeof(string))
             return "String";
+        else if (valueType == typeof(long))
+            return "Int64";
         else if (valueType == typeof(int) ||
             valueType == typeof(short))
         {
@@ -501,7 +503,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
 
             return "Integer";
         }
-        else if (valueType == typeof(DateTime))
+        else if (valueType == typeof(DateTime) || valueType == typeof(DateOnly))
             return "Date";
         else if (valueType == typeof(TimeSpan))
             return "TimeSpan";
