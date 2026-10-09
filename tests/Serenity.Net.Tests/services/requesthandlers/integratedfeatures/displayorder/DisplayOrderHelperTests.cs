@@ -147,6 +147,80 @@ public class DisplayOrderHelperTests
         Assert.True(changed);
     }
 
+    private static MockDbConnection ConnectionCapturing(object[] rows, List<string> commands)
+    {
+        return new MockDbConnection()
+            .OnDbCommandExecuteReader(_ => new MockDbDataReader(rows))
+            .OnDbCommandExecuteNonQuery(command =>
+            {
+                commands.Add(command.CommandText);
+                return 1;
+            });
+    }
+
+    [Fact]
+    public void ReorderValues_Only_Updates_Records_In_Moved_Range()
+    {
+        var commands = new List<string>();
+        using var connection = ConnectionCapturing(new object[]
+        {
+            new { ID = "a", Order = 10 },
+            new { ID = "b", Order = 20 },
+            new { ID = "c", Order = 30 },
+            new { ID = "d", Order = 40 }
+        }, commands);
+
+        var changed = DisplayOrderHelper.ReorderValues(connection, "T", Fields.ID, Fields.Order,
+            recordID: "b", newDisplayOrder: 1);
+
+        Assert.True(changed);
+        var sql = string.Join("\n", commands);
+        Assert.Contains("'a'", sql, StringComparison.Ordinal);
+        Assert.Contains("'b'", sql, StringComparison.Ordinal);
+        Assert.DoesNotContain("'c'", sql, StringComparison.Ordinal);
+        Assert.DoesNotContain("'d'", sql, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ReorderValues_Renumbers_When_Orders_Are_Not_Distinct()
+    {
+        var commands = new List<string>();
+        using var connection = ConnectionCapturing(new object[]
+        {
+            new { ID = 1, Order = 0 },
+            new { ID = 2, Order = 0 },
+            new { ID = 3, Order = 0 }
+        }, commands);
+
+        var changed = DisplayOrderHelper.ReorderValues(connection, "T", Fields.ID, Fields.Order,
+            recordID: 3, newDisplayOrder: 1);
+
+        Assert.True(changed);
+    }
+
+    [Fact]
+    public async Task ReorderValuesAsync_Only_Updates_Records_In_Moved_Range()
+    {
+        var commands = new List<string>();
+        using var connection = ConnectionCapturing(new object[]
+        {
+            new { ID = "a", Order = 10 },
+            new { ID = "b", Order = 20 },
+            new { ID = "c", Order = 30 },
+            new { ID = "d", Order = 40 }
+        }, commands);
+
+        var changed = await DisplayOrderHelper.ReorderValuesAsync(connection, "T", Fields.ID, Fields.Order,
+            recordID: "d", newDisplayOrder: 2, cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.True(changed);
+        var sql = string.Join("\n", commands);
+        Assert.Contains("'b'", sql, StringComparison.Ordinal);
+        Assert.Contains("'c'", sql, StringComparison.Ordinal);
+        Assert.Contains("'d'", sql, StringComparison.Ordinal);
+        Assert.DoesNotContain("'a'", sql, StringComparison.Ordinal);
+    }
+
     [Fact]
     public void ReorderValues_Clamps_NonPositive_Order()
     {

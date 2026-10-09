@@ -153,16 +153,14 @@ public static class DisplayOrderHelper
             var recordIDStr = recordID == null ? null :
                 IdToSql(recordID, connection.GetDialect());
 
-            int order = 0;
             while (reader.Read())
             {
-                order++;
                 OrderRecord r = new()
                 {
                     recordID = reader.GetValue(0),
-                    oldOrder = Convert.ToInt32(reader.GetValue(1)),
-                    newOrder = order
+                    oldOrder = Convert.ToInt32(reader.GetValue(1))
                 };
+                r.newOrder = r.oldOrder;
                 orderRecords.Add(r);
 
                 if (recordID != null && recordIDStr ==
@@ -324,16 +322,14 @@ public static class DisplayOrderHelper
             var recordIDStr = recordID == null ? null :
                 IdToSql(recordID, connection.GetDialect());
 
-            int order = 0;
             while (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
             {
-                order++;
                 OrderRecord r = new()
                 {
                     recordID = reader.GetValue(0),
-                    oldOrder = Convert.ToInt32(reader.GetValue(1)),
-                    newOrder = order
+                    oldOrder = Convert.ToInt32(reader.GetValue(1))
                 };
+                r.newOrder = r.oldOrder;
                 orderRecords.Add(r);
 
                 if (recordID != null && recordIDStr ==
@@ -350,7 +346,6 @@ public static class DisplayOrderHelper
 
     private static int ComputeNewOrders(List<OrderRecord> orderRecords, OrderRecord? changing, int newDisplayOrder)
     {
-        // last assigned display order value is the count of records read
         int order = orderRecords.Count;
 
         // ensure that the new display order is within limits
@@ -360,26 +355,64 @@ public static class DisplayOrderHelper
         else if (newDisplayOrder > order)
             newDisplayOrder = order;
 
-        // if the record whose display order is to be changed can be found, and its display order value is different
-        // than the one in database
-        if (changing != null && changing.newOrder != newDisplayOrder)
+        var changingIndex = changing is null ? -1 : orderRecords.IndexOf(changing);
+
+        // nothing to reorder if the record can't be found, or it is already at the target position
+        if (changingIndex < 0 || changingIndex == newDisplayOrder - 1)
+            return newDisplayOrder;
+
+        int from = changingIndex;
+        int to = newDisplayOrder - 1;
+
+        // only the records between the old and the new positions need to change. When the current
+        // display order values are all distinct we shift only those records and keep the values of
+        // the rest (including any gaps) as they are, so a single move does not rewrite the whole
+        // group. Otherwise (e.g. several records still have the default 0 value) the group has to
+        // be renumbered so the record can be placed at the requested position.
+        bool distinct = true;
+        for (int i = 1; i < order; i++)
         {
-            // let's say record had a display order value of 6and now it will become 10, the records with actual
-            // display orders of 7, 8, 9, 10 will become 6, 7, 8, 9 orders.
-            //
-            // WARNING: notice that array is 0 based, so record with actual display order of 7 is in the
-            // 6th index in the array)
-            for (int i = changing.newOrder; i < newDisplayOrder; i++)
-                orderRecords[i].newOrder = i;
+            if (orderRecords[i].oldOrder <= orderRecords[i - 1].oldOrder)
+            {
+                distinct = false;
+                break;
+            }
+        }
 
-            // if the records display order is to be changed from 9 to 5, the records with actual orders of 5, 6, 7, 8 
-            // is going to be 6, 7, 8, 9 ordered.
-            for (int i = newDisplayOrder - 1; i < changing.newOrder - 1; i++)
-                orderRecords[i].newOrder = i + 2;
+        if (distinct)
+        {
+            if (from < to)
+            {
+                // record moves down: records after it up to the target shift up
+                for (int i = from + 1; i <= to; i++)
+                    orderRecords[i].newOrder = orderRecords[i - 1].oldOrder;
+                orderRecords[from].newOrder = orderRecords[to].oldOrder;
+            }
+            else
+            {
+                // record moves up: records before it down to the target shift down
+                for (int i = to; i <= from - 1; i++)
+                    orderRecords[i].newOrder = orderRecords[i + 1].oldOrder;
+                orderRecords[from].newOrder = orderRecords[to].oldOrder;
+            }
+        }
+        else
+        {
+            for (int i = 0; i < order; i++)
+                orderRecords[i].newOrder = i + 1;
 
-            // as the records that will be changing are assigned new orders, we may assign new display order
-            // directly.
-            changing.newOrder = newDisplayOrder;
+            if (from < to)
+            {
+                for (int i = from + 1; i <= to; i++)
+                    orderRecords[i].newOrder = i;
+                orderRecords[from].newOrder = newDisplayOrder;
+            }
+            else
+            {
+                for (int i = to; i <= from - 1; i++)
+                    orderRecords[i].newOrder = i + 2;
+                orderRecords[from].newOrder = newDisplayOrder;
+            }
         }
 
         return newDisplayOrder;
