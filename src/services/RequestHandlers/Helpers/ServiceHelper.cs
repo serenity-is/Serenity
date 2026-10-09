@@ -66,8 +66,11 @@ public static class ServiceHelper
     /// <param name="query">Query after execution</param>
     /// <param name="pagingState">Paging strategy selected before query execution</param>
     /// <param name="distinctFieldCount">Number of fields in each flattened distinct value tuple, or null for entities.</param>
+    /// <param name="rowsRead">Number of rows returned by the query before post-processing (e.g.
+    /// <c>ProcessEntity</c> dropping rows). When provided, the <see cref="ListResponse{T}.More"/> sentinel
+    /// check uses it, so a dropped row does not hide the existence of further results.</param>
     public static void SetSkipTakeTotal<T>(this ListResponse<T> response, SqlQuery query,
-        ListRequestPagingState pagingState, int? distinctFieldCount = null)
+        ListRequestPagingState pagingState, int? distinctFieldCount = null, int? rowsRead = null)
     {
         var requestedTake = pagingState.Params.Take;
         var includeMore = pagingState.Params.IncludeMore;
@@ -102,7 +105,7 @@ public static class ServiceHelper
                 response.More = resultCount is not null ? false : null;
             else if (query.CountRecords)
                 response.More = response.TotalCount > (long)response.Skip + response.Take;
-            else if (hasSentinel && resultCount is int count)
+            else if (hasSentinel && (rowsRead ?? resultCount) is int count)
                 response.More = count > requestedTake;
             else
                 response.More = null;

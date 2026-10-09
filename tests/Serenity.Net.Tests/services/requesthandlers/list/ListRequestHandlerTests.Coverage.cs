@@ -667,6 +667,25 @@ public partial class ListRequestHandlerTests
     }
 
     [Fact]
+    public void IncludeMore_More_Is_True_When_Extra_Row_Is_Dropped_By_ProcessEntity()
+    {
+        using var conn = new MockDbConnection()
+            .InterceptExecuteReader(args => args.ToMockReader(
+                new { Id = 1 }, new { Id = 2 }, new { Id = 3 }));
+        var handler = new SkippingListHandler(CovContext());
+
+        var response = handler.List(conn, new ListRequest
+        {
+            Take = 2,
+            IncludeMore = true,
+            ExcludeTotalCount = true
+        });
+
+        Assert.True(response.More);
+        Assert.Empty(response.Entities);
+    }
+
+    [Fact]
     public void ApplyFieldContains_Auto_Detects_Int_As_Equals()
     {
         using var conn = CovConnection();

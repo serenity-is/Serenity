@@ -72,6 +72,29 @@ public class ServiceHelperTests
     }
 
     [Fact]
+    public void SetSkipTakeTotal_More_Uses_Executed_Row_Count_When_Rows_Dropped()
+    {
+        var response = new ListResponse<TestRow>
+        {
+            Entities = { new(), new() }
+        };
+        var query = new SqlQuery();
+        query.ApplyPagingParams(new()
+        {
+            Skip = 0,
+            Take = 2,
+            ExcludeTotalCount = true,
+            IncludeMore = true
+        }, out var pagingState);
+
+        response.SetSkipTakeTotal(query, pagingState, rowsRead: 3);
+
+        Assert.Equal(2, response.Take);
+        Assert.True(response.More);
+        Assert.Equal(2, response.Entities.Count);
+    }
+
+    [Fact]
     public void SetSkipTakeTotal_SetsMoreAndTrimsSentinelDistinctTuple()
     {
         var response = new ListResponse<TestRow>

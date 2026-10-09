@@ -33,6 +33,14 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(
     protected bool lookupAccessMode;
 
     /// <summary>
+    /// Number of rows returned by the executed query before any post-processing
+    /// (e.g. <see cref="ProcessEntity"/> dropping rows). Used to compute the
+    /// <see cref="ListResponse{T}.More"/> indicator based on the sentinel row rather
+    /// than the filtered entity count.
+    /// </summary>
+    protected int? rowsRead;
+
+    /// <summary>
     /// Gets the list of list behaviors.
     /// </summary>
     protected virtual IEnumerable<IListBehavior> GetBehaviors()

@@ -116,8 +116,10 @@ public class ListRequestHandlerAsync<TRow, TListRequest, TListResponse> :
     {
         try
         {
+            int count = 0;
             Response.TotalCount = await Query.ForEachAsync(Connection, delegate ()
             {
+                count++;
                 var clone = ProcessEntity(Row.Clone());
                 if (clone == null)
                     return;
@@ -130,6 +132,7 @@ public class ListRequestHandlerAsync<TRow, TListRequest, TListResponse> :
                 else
                     Response.Entities.Add(clone);
             }, cancellationToken: cancellationToken).ConfigureAwait(false);
+            rowsRead = count;
         }
         catch (Exception exception)
         {
@@ -156,6 +159,7 @@ public class ListRequestHandlerAsync<TRow, TListRequest, TListResponse> :
         StateBag.Clear();
         lookupAccessMode = false;
         ignoredEqualityFilters = null;
+        rowsRead = null;
         Connection = connection ?? throw new ArgumentNullException(nameof(connection));
         Request = request ?? throw new ArgumentNullException(nameof(request));
         await ValidateRequestAsync(cancellationToken).ConfigureAwait(false);
@@ -200,7 +204,7 @@ public class ListRequestHandlerAsync<TRow, TListRequest, TListResponse> :
             Response.Values = null;
         }
 
-        Response.SetSkipTakeTotal(query, pagingState, DistinctFields?.Length);
+        Response.SetSkipTakeTotal(query, pagingState, DistinctFields?.Length, rowsRead);
 
         await OnAfterExecuteQueryAsync(cancellationToken).ConfigureAwait(false);
 

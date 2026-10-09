@@ -116,8 +116,10 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> :
     {
         try
         {
+            int count = 0;
             Response.TotalCount = Query.ForEach(Connection, delegate ()
             {
+                count++;
                 var clone = ProcessEntity(Row.Clone());
                 if (clone == null)
                     return;
@@ -130,6 +132,7 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> :
                 else
                     Response.Entities.Add(clone);
             });
+            rowsRead = count;
         }
         catch (Exception exception)
         {
@@ -154,6 +157,7 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> :
         StateBag.Clear();
         lookupAccessMode = false;
         ignoredEqualityFilters = null;
+        rowsRead = null;
         Connection = connection ?? throw new ArgumentNullException(nameof(connection));
         Request = request ?? throw new ArgumentNullException(nameof(request));
         ValidateRequest();
@@ -198,7 +202,7 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> :
             Response.Values = null;
         }
 
-        Response.SetSkipTakeTotal(query, pagingState, DistinctFields?.Length);
+        Response.SetSkipTakeTotal(query, pagingState, DistinctFields?.Length, rowsRead);
 
         OnAfterExecuteQuery();
 
