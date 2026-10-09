@@ -14,8 +14,10 @@ public sealed class ProductLogRow : Row<ProductLogRow.RowFields>, ICaptureLogRow
     [UserIdFieldType]
     public object? ChangingUserId { get => fields.ChangingUserId.AsObject(this); set => fields.ChangingUserId.AsObject(this, value); }
 
+    [DateTimeKind(DateTimeKind.Utc)]
     public DateTime? ValidFrom { get => fields.ValidFrom[this]; set => fields.ValidFrom[this] = value; }
 
+    [DateTimeKind(DateTimeKind.Utc)]
     public DateTime? ValidUntil { get => fields.ValidUntil[this]; set => fields.ValidUntil[this] = value; }
 
     [NotNull]

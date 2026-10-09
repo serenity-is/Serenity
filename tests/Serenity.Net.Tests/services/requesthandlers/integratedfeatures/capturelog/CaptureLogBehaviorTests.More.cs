@@ -196,6 +196,52 @@ public partial class CaptureLogBehaviorTests
         }
     }
 
+    [TableName("LocalLogs")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
+    private class LocalLogRow : Row<LocalLogRow.RowFields>, ICaptureLogRow
+    {
+        [Identity]
+        public long? LogId { get => fields.LogId[this]; set => fields.LogId[this] = value; }
+        public CaptureOperationType? OperationType { get => fields.OperationType[this]; set => fields.OperationType[this] = value; }
+        public int? ChangingUserId { get => fields.ChangingUserId[this]; set => fields.ChangingUserId[this] = value; }
+
+        [DateTimeKind(DateTimeKind.Local)]
+        public DateTime? ValidFrom { get => fields.ValidFrom[this]; set => fields.ValidFrom[this] = value; }
+
+        [DateTimeKind(DateTimeKind.Local)]
+        public DateTime? ValidUntil { get => fields.ValidUntil[this]; set => fields.ValidUntil[this] = value; }
+
+        EnumField<CaptureOperationType> ICaptureLogRow.OperationTypeField => fields.OperationType;
+        Field ICaptureLogRow.ChangingUserIdField => fields.ChangingUserId;
+        DateTimeField ICaptureLogRow.ValidFromField => fields.ValidFrom;
+        DateTimeField ICaptureLogRow.ValidUntilField => fields.ValidUntil;
+
+        public class RowFields : RowFieldsBase
+        {
+            public Int64Field LogId = null!;
+            public EnumField<CaptureOperationType> OperationType = null;
+            public Int32Field ChangingUserId = null!;
+            public DateTimeField ValidFrom = null!;
+            public DateTimeField ValidUntil = null!;
+        }
+    }
+
+    [CaptureLog(typeof(LocalLogRow), MappedIdField = "LogId")]
+    [TableName("LocalMasters")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
+    private class LocalMasterRow : Row<LocalMasterRow.RowFields>, IIdRow
+    {
+        [Identity]
+        public int? Id { get => fields.Id[this]; set => fields.Id[this] = value; }
+        public string Name { get => fields.Name[this]; set => fields.Name[this] = value; }
+
+        public class RowFields : RowFieldsBase
+        {
+            public Int32Field Id = null!;
+            public StringField Name = null!;
+        }
+    }
+
     private class FakeUndeleteHandler<TRow> : IUndeleteRequestHandler where TRow : IRow, new()
     {
         public IRow Row { get; set; } = new TRow();
@@ -444,6 +490,35 @@ public partial class CaptureLogBehaviorTests
         var handler = CreateSaveHandlerFor(connection, true, new MismatchMasterRow { Id = 1, Name = "X" });
 
         Assert.Throws<InvalidOperationException>(() => behavior.OnAudit(handler));
+    }
+
+    [Fact]
+    public void Log_StoresValidFromAsUtc_ByDefault()
+    {
+        var behavior = CreateBehaviorFor(new MyRow { Id = 1, Name = "X" });
+        using var connection = CreateConnection();
+
+        behavior.OnAudit(CreateSaveHandlerFor(connection, true, new MyRow { Id = 1, Name = "X" }));
+
+        var logRow = (MyLogRow)connection.ManipulateRowCalls[0].Row!;
+        Assert.Equal(DateTimeKind.Utc, logRow.ValidFrom!.Value.Kind);
+        Assert.True((DateTime.UtcNow - logRow.ValidFrom!.Value).Duration() < TimeSpan.FromMinutes(1));
+        Assert.Equal(new DateTime(9999, 1, 1), logRow.ValidUntil!.Value);
+    }
+
+    [Fact]
+    public void Log_StoresValidFromAsLocal_WhenFieldIsLocalKind()
+    {
+        var behavior = CreateBehaviorFor(new LocalMasterRow { Id = 1, Name = "X" });
+        using var connection = CreateConnection();
+
+        behavior.OnAudit(CreateSaveHandlerFor(connection, true, new LocalMasterRow { Id = 1, Name = "X" }));
+
+        var logRow = (LocalLogRow)connection.ManipulateRowCalls[0].Row!;
+        Assert.Equal(DateTimeKind.Local, logRow.ValidFrom!.Value.Kind);
+        Assert.True((DateTime.Now - logRow.ValidFrom!.Value).Duration() < TimeSpan.FromMinutes(1));
+        // the active-until sentinel keeps the same clock (no timezone shift)
+        Assert.Equal(new DateTime(9999, 1, 1), logRow.ValidUntil!.Value);
     }
 }
 

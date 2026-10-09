@@ -3,6 +3,14 @@ namespace Serenity.Services;
 /// <summary>
 /// Capture log behavior
 /// </summary>
+/// <remarks>
+/// Writes a new capture log row for each audited change and closes the previous active row,
+/// similar to SQL Server temporal tables. The captured columns are exactly the table fields
+/// declared on the capture log row type, so a field is excluded by simply not declaring it on
+/// that row type. ValidFrom/ValidUntil values are stored as UTC unless those fields are
+/// explicitly annotated with <see cref="DateTimeKind.Local"/>. Capture log tables grow with
+/// every change and are not pruned automatically, so a periodic cleanup is recommended.
+/// </remarks>
 public class CaptureLogBehavior : BaseSaveDeleteBehaviorAsync, ISaveBehaviorSync, IDeleteBehaviorSync,
     IUndeleteBehaviorAsync, IUndeleteBehaviorSync, IImplicitBehavior
 {
@@ -165,6 +173,11 @@ public class CaptureLogBehavior : BaseSaveDeleteBehaviorAsync, ISaveBehaviorSync
     /// <summary>
     /// Logs a capture log operation
     /// </summary>
+    /// <remarks>
+    /// The currently active log row is closed before inserting the new one. As this is not
+    /// atomic across concurrent transactions for the same ID, a unique index on the mapped ID
+    /// and ValidUntil columns is recommended to enforce a single active row.
+    /// </remarks>
     /// <param name="uow">Unit of work</param>
     /// <param name="old">Old entity</param>
     /// <param name="row">New entity</param>
@@ -191,6 +204,11 @@ public class CaptureLogBehavior : BaseSaveDeleteBehaviorAsync, ISaveBehaviorSync
     /// <summary>
     /// Asynchronously logs a capture log operation
     /// </summary>
+    /// <remarks>
+    /// The currently active log row is closed before inserting the new one. As this is not
+    /// atomic across concurrent transactions for the same ID, a unique index on the mapped ID
+    /// and ValidUntil columns is recommended to enforce a single active row.
+    /// </remarks>
     /// <param name="uow">Unit of work</param>
     /// <param name="old">Old entity</param>
     /// <param name="row">New entity</param>
@@ -222,7 +240,7 @@ public class CaptureLogBehavior : BaseSaveDeleteBehaviorAsync, ISaveBehaviorSync
         return new SqlUpdate(context.LogRow.Table)
             .Set(context.LogRow.ValidUntilField, context.Now)
             .WhereEqual(context.MappedIdField, context.MappedIdField.AsSqlValue(context.LogRow))
-            .WhereEqual(context.LogRow.ValidUntilField, CaptureLogConsts.UntilMax);
+            .WhereEqual(context.LogRow.ValidUntilField, context.UntilMax);
     }
 
     private static ICaptureLogRow BuildBeforeInsertRow(LogContext context)
@@ -232,7 +250,7 @@ public class CaptureLogBehavior : BaseSaveDeleteBehaviorAsync, ISaveBehaviorSync
         updateLogRow.ChangingUserIdField.AsInvariant(updateLogRow, context.UserId);
         updateLogRow.OperationTypeField[updateLogRow] = CaptureOperationType.Update;
         updateLogRow.ValidFromField[updateLogRow] = context.Now;
-        updateLogRow.ValidUntilField[updateLogRow] = CaptureLogConsts.UntilMax;
+        updateLogRow.ValidUntilField[updateLogRow] = context.UntilMax;
         context.CopyCapturedFields(context.Row, updateLogRow);
         return updateLogRow;
     }
@@ -242,12 +260,19 @@ public class CaptureLogBehavior : BaseSaveDeleteBehaviorAsync, ISaveBehaviorSync
         if (old == null && row == null)
             throw new ArgumentNullException(nameof(old));
 
-        var now = DateTime.Now;
         var rowInstance = (row ?? old)!;
         var rowType = rowInstance!.GetType();
         var logRow = (Activator.CreateInstance(captureLogAttr!.LogRow) as ICaptureLogRow) ??
             throw new InvalidOperationException($"Capture log table {captureLogAttr.LogRow.FullName} " +
                 $"for {rowType.FullName} doesn't implement ICaptureLogRow interface!");
+
+        // store UTC unless the log row's ValidFrom/ValidUntil fields are explicitly Local
+        var now = logRow.ValidFromField.DateTimeKind == DateTimeKind.Local ||
+            logRow.ValidUntilField.DateTimeKind == DateTimeKind.Local ? DateTime.Now : DateTime.UtcNow;
+
+        // the active-until sentinel must keep the same clock in the stored row and the
+        // close-active comparison, so relabel its kind to the field's (SpecifyKind doesn't shift)
+        var untilMax = DateTime.SpecifyKind(CaptureLogConsts.UntilMax, logRow.ValidUntilField.DateTimeKind);
 
         var rowFieldPrefixLength = PrefixHelper.DeterminePrefixLength(rowInstance.EnumerateTableFields(), x => x.Name);
         var logFieldPrefixLength = PrefixHelper.DeterminePrefixLength(logRow.EnumerateTableFields(), x => x.Name);
@@ -300,7 +325,7 @@ public class CaptureLogBehavior : BaseSaveDeleteBehaviorAsync, ISaveBehaviorSync
 
         if (operationType == CaptureOperationType.Insert)
         {
-            logRow.ValidUntilField[logRow] = CaptureLogConsts.UntilMax;
+            logRow.ValidUntilField[logRow] = untilMax;
             copyCapturedFields(row!, logRow);
         }
         else
@@ -309,16 +334,17 @@ public class CaptureLogBehavior : BaseSaveDeleteBehaviorAsync, ISaveBehaviorSync
             copyCapturedFields(old!, logRow);
         }
 
-        return new LogContext(logRow, rowInstance, operationType, now, userId, copyCapturedFields, mappedIdField);
+        return new LogContext(logRow, rowInstance, operationType, now, untilMax, userId, copyCapturedFields, mappedIdField);
     }
 
     private sealed class LogContext(ICaptureLogRow logRow, IRow row, CaptureOperationType operationType,
-        DateTime now, object? userId, Action<IRow, IRow> copyCapturedFields, Field mappedIdField)
+        DateTime now, DateTime untilMax, object? userId, Action<IRow, IRow> copyCapturedFields, Field mappedIdField)
     {
         public ICaptureLogRow LogRow { get; } = logRow;
         public IRow Row { get; } = row;
         public CaptureOperationType OperationType { get; } = operationType;
         public DateTime Now { get; } = now;
+        public DateTime UntilMax { get; } = untilMax;
         public object? UserId { get; } = userId;
         public Action<IRow, IRow> CopyCapturedFields { get; } = copyCapturedFields;
         public Field MappedIdField { get; } = mappedIdField;
