@@ -180,6 +180,34 @@ public class StringFieldTests
     }
 
     [Fact]
+    public void ValueFromJson_Newtonsoft_DateOnly_Clips_At_Quoted_T()
+    {
+        var row = NewRow();
+        var field = AllFieldsRow.Fields.AString;
+        var serializer = Newtonsoft.Json.JsonSerializer.CreateDefault();
+        serializer.DateFormatString = "yyyy-MM-dd'T'HH:mm:ss";
+        using var reader = new Newtonsoft.Json.JsonTextReader(new System.IO.StringReader("\"2024-01-15T00:00:00\""));
+        reader.DateParseHandling = Newtonsoft.Json.DateParseHandling.DateTime;
+        reader.Read();
+        field.ValueFromJson(reader, row, serializer);
+        Assert.Equal("2024-01-15", field[row]);
+    }
+
+    [Fact]
+    public void ValueFromJson_Newtonsoft_DateOnly_Keeps_Custom_Literals()
+    {
+        var row = NewRow();
+        var field = AllFieldsRow.Fields.AString;
+        var serializer = Newtonsoft.Json.JsonSerializer.CreateDefault();
+        serializer.DateFormatString = "yyyy-MM-dd 'at' HH:mm:ss";
+        using var reader = new Newtonsoft.Json.JsonTextReader(new System.IO.StringReader("\"2024-01-15T00:00:00\""));
+        reader.DateParseHandling = Newtonsoft.Json.DateParseHandling.DateTime;
+        reader.Read();
+        field.ValueFromJson(reader, row, serializer);
+        Assert.Equal("2024-01-15 at 00:00:00", field[row]);
+    }
+
+    [Fact]
     public void ValueFromJson_Newtonsoft_UnexpectedToken_Throws()
     {
         var row = NewRow();

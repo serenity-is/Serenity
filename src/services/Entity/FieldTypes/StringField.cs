@@ -94,12 +94,14 @@ public class StringField(ICollection<Field> collection, string name, LocalText? 
             case Newtonsoft.Json.JsonToken.Date:
                 var val = reader.Value is DateTimeOffset dto ? dto.DateTime : (DateTime)reader.Value!;
 
-                // use a configured DateFormatString verbatim; only fall back to a date-only
-                // or round-trip format when none is set. (Do not split on 'T' or strip quotes,
-                // as that corrupts custom formats where quotes escape literal text.)
                 var style = serializer.DateFormatString;
                 if (string.IsNullOrEmpty(style))
                     style = val.TimeOfDay == TimeSpan.Zero ? "yyyy-MM-dd" : "o";
+                else if (val.TimeOfDay == TimeSpan.Zero && style.Contains("'T'"))
+                    // date-only value: drop the time part after the quoted 'T' literal of a
+                    // custom format, without touching quotes elsewhere (stripping them would
+                    // turn literals like 'at' into format specifiers)
+                    style = style.Split("'T'")[0];
 
                 _setValue(row, val.ToString(style, CultureInfo.InvariantCulture));
                 break;
