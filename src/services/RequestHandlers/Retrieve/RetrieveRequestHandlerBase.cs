@@ -172,7 +172,6 @@ public abstract class RetrieveRequestHandlerBase<TRow, TRetrieveRequest, TRetrie
 
     /// <summary>
     /// Validates if the user is allowed to query this entity type by checking <see cref="ReadPermissionAttribute"/>
-    /// and <see cref="ServiceLookupPermissionAttribute"/> if the request is in lookup access mode.
     /// </summary>
     /// <remarks>
     /// This check is per row type, not per record, so it does not prevent accessing records that
