@@ -136,6 +136,65 @@ public class DefaultSqlErrorExtractorTests
     }
 
     [Fact]
+    public void Extract_Parses_Postgres_Delete_ForeignKey()
+    {
+        const string message = "update or delete on table \"Customers\" violates foreign key " +
+            "constraint \"Orders_Customer_FK\" on table \"Orders\"\n" +
+            "DETAIL: Key (Id)=(5) is still referenced from table \"Orders\".";
+
+        var info = new DefaultSqlErrorExtractor().Extract(new MockDbException(message, sqlState: "23503"));
+
+        Assert.NotNull(info);
+        Assert.Equal(SqlErrorConstraintType.ForeignKey, info!.Type);
+        Assert.Equal("Orders", info.TableName);
+        Assert.Equal("Customers", info.ReferencedTableName);
+        Assert.Equal("Orders_Customer_FK", info.ConstraintName);
+    }
+
+    [Fact]
+    public void Extract_Parses_Postgres_Insert_ForeignKey()
+    {
+        const string message = "insert or update on table \"Orders\" violates foreign key " +
+            "constraint \"Orders_Customer_FK\"\n" +
+            "DETAIL: Key (CustomerId)=(5) is not present in table \"Customers\".";
+
+        var info = new DefaultSqlErrorExtractor().Extract(new MockDbException(message, sqlState: "23503"));
+
+        Assert.NotNull(info);
+        Assert.Equal(SqlErrorConstraintType.ForeignKey, info!.Type);
+        Assert.Equal("Orders", info.TableName);
+        Assert.Equal("Customers", info.ReferencedTableName);
+    }
+
+    [Fact]
+    public void Extract_Does_Not_Classify_Sqlite_Check_As_Unique()
+    {
+        var info = new ServerTypedExtractor(ServerType.Sqlite).Extract(
+            new MockDbException("SQLite Error 19: 'CHECK constraint failed: Quantity'.", number: 19));
+
+        Assert.Null(info);
+    }
+
+    [Fact]
+    public void Extract_Does_Not_Classify_Sqlite_Check_Extended_Code_As_Unique()
+    {
+        var info = new ServerTypedExtractor(ServerType.Sqlite).Extract(
+            new MockDbException("SQLite Error 19: 'CHECK constraint failed: Quantity'.", number: 275));
+
+        Assert.Null(info);
+    }
+
+    [Fact]
+    public void Extract_Parses_Sqlite_PrimaryKey_Extended_Code()
+    {
+        var info = new ServerTypedExtractor(ServerType.Sqlite).Extract(
+            new MockDbException("SQLite Error 19: 'UNIQUE constraint failed: t.Id'.", number: 1555));
+
+        Assert.NotNull(info);
+        Assert.Equal(SqlErrorConstraintType.PrimaryKey, info!.Type);
+    }
+
+    [Fact]
     public void Extract_Parses_Localized_SqlServer_NotNull_German()
     {
         var info = new ServerTypedExtractor(ServerType.SqlServer).Extract(new MockDbException(

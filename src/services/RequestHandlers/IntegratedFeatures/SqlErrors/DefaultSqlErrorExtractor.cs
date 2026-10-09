@@ -57,6 +57,12 @@ public partial class DefaultSqlErrorExtractor : ISqlErrorExtractor
         RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
     protected static partial Regex PostgresReferencedTableRegex();
 
+    /// <summary>Regex that matches the dependent table named after a PostgreSQL foreign key
+    /// constraint (the delete/update-delete message form).</summary>
+    [GeneratedRegex("foreign key constraint \"[^\"]+\" on table \"(?<table>[^\"]+)\"",
+        RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
+    protected static partial Regex PostgresForeignKeyOnTableRegex();
+
     /// <summary>Regex that matches MySQL key names in messages.</summary>
     [GeneratedRegex("for key '(?<name>[^']+)'",
         RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
@@ -204,6 +210,9 @@ public partial class DefaultSqlErrorExtractor : ISqlErrorExtractor
         if (TryGetInt(exception, "Number", out var exceptionNumber))
             return exceptionNumber;
 
+        if (TryGetInt(exception, "SqliteExtendedErrorCode", out var sqliteExtendedCode))
+            return sqliteExtendedCode;
+
         if (TryGetInt(exception, "SqliteErrorCode", out var sqliteCode))
             return sqliteCode;
 
@@ -279,11 +288,16 @@ public partial class DefaultSqlErrorExtractor : ISqlErrorExtractor
                 case ServerType.Sqlite:
                     switch (number)
                     {
-                        case 1555:
+                        case 1555: // SQLITE_CONSTRAINT_PRIMARYKEY
+                        case 2579: // SQLITE_CONSTRAINT_ROWID
+                            return SqlErrorConstraintType.PrimaryKey;
                         case 2067: return SqlErrorConstraintType.Unique;
                         case 787: return SqlErrorConstraintType.ForeignKey;
                         case 1299: return SqlErrorConstraintType.NotNull;
-                        case 19: return ClassifyFromMessage(message) ?? SqlErrorConstraintType.Unique;
+                        // generic SQLITE_CONSTRAINT (19): messages are not localized, so
+                        // classify from the message. Other extended codes such as CHECK (275)
+                        // or TRIGGER (1811) are left unclassified rather than reported as unique.
+                        case 19: return ClassifyFromMessage(message);
                     }
                     break;
             }
@@ -386,8 +400,23 @@ public partial class DefaultSqlErrorExtractor : ISqlErrorExtractor
             info.ColumnNames ??= SplitColumns(postgresColumns.Groups["cols"].Value);
 
         var postgresTable = PostgresTableRegex().Match(message);
-        if (postgresTable.Success)
+        var postgresForeignKeyOnTable = PostgresForeignKeyOnTableRegex().Match(message);
+
+        if (postgresForeignKeyOnTable.Success)
+        {
+            // delete/update-delete form: 'update or delete on table "parent" ... foreign key
+            // constraint "fk" on table "child"'. The dependent (referencing) table follows the
+            // constraint, while the first 'on table' part names the referenced (parent) table.
+            info.TableName ??= postgresForeignKeyOnTable.Groups["table"].Value;
+            if (postgresTable.Success)
+                info.ReferencedTableName ??= postgresTable.Groups["table"].Value;
+        }
+        else if (postgresTable.Success)
+        {
+            // insert/update form names the dependent table first:
+            // 'insert or update on table "child" violates foreign key constraint "fk"'.
             info.TableName ??= postgresTable.Groups["table"].Value;
+        }
 
         var postgresReferenced = PostgresReferencedTableRegex().Match(message);
         if (postgresReferenced.Success)
