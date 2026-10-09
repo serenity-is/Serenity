@@ -225,6 +225,20 @@ public class DataValidationTests
     }
 
     [Fact]
+    public void InvalidDateRangeError_Message_Matches_The_Check()
+    {
+        var row = NewRow();
+        row.Start = new DateTime(2020, 2, 1);
+        row.Finish = new DateTime(2020, 1, 1);
+
+        var error = Assert.Throws<ValidationError>(() =>
+            DataValidation.ValidateDateRange(row, row.GetFields().Start, row.GetFields().Finish, null));
+
+        Assert.Contains("after", error.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("before", error.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
     public void Error_Factories_Return_ValidationErrors()
     {
         var row = NewRow();

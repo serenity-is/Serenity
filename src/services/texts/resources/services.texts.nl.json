@@ -43,7 +43,7 @@
   "Validation.EntityNotFound": "Record niet gevonden",
   "Validation.EntityReadAccessViolation": "U heeft geen vereiste machtigingen om het record {0} met de sleutel: {1} te bekijken",
   "Validation.EntityWriteAccessViolation": "U hebt geen vereiste machtigingen om de record {0} met sleutel: {1} te updaten",
-  "Validation.FieldInvalidDateRange": "De waarde van het veld {0} mag niet voor de datum {1} zijn!",
+  "Validation.FieldInvalidDateRange": "De waarde van het veld {0} mag niet na de datum {1} liggen!",
   "Validation.FieldInvalidValue": "Ongeldige waarde {0} voor veld {1}!",
   "Validation.FieldIsReadOnly": "Het veld {0} is alleen-lezen!",
   "Validation.FieldIsRequired": "Veld {0} is verplicht!",

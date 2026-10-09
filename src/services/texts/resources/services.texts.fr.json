@@ -43,7 +43,7 @@
   "Validation.EntityNotFound": "Enregistrement introuvable",
   "Validation.EntityReadAccessViolation": "Vous n'avez pas les autorisations requises pour afficher l'enregistrement {0} avec la clé: {1}",
   "Validation.EntityWriteAccessViolation": "Vous n'avez pas les autorisations requises pour mettre à jour l'enregistrement {0} avec la clé: {1}",
-  "Validation.FieldInvalidDateRange": "La valeur du champ {0} ne peut pas être antérieure à la date {1} !",
+  "Validation.FieldInvalidDateRange": "La valeur du champ {0} ne peut pas être postérieure à la date {1} !",
   "Validation.FieldInvalidValue": "Valeur non valide {0} pour le champ {1}!",
   "Validation.FieldIsReadOnly": "Le champ {0} est en lecture seule !",
   "Validation.FieldIsRequired": "Le champ {0} est requis !",

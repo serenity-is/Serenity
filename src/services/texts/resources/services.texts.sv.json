@@ -43,7 +43,7 @@
   "Validation.EntityNotFound": "Posten hittades inte",
   "Validation.EntityReadAccessViolation": "Du har inte de behörigheter som krävs för att visa posten {0} med nyckeln: {1}",
   "Validation.EntityWriteAccessViolation": "Du har inte de nödvändiga behörigheterna för att uppdatera posten {0} med nyckeln: {1}",
-  "Validation.FieldInvalidDateRange": "Värdet av fältet {0} kan inte vara före datum {1}!",
+  "Validation.FieldInvalidDateRange": "Värdet i fältet {0} får inte vara efter datumet {1}!",
   "Validation.FieldInvalidValue": "Ogiltigt värde {0} för fält {1}!",
   "Validation.FieldIsReadOnly": "Fältet {0} är endast läsbart!",
   "Validation.FieldIsRequired": "Fältet {0} krävs!",

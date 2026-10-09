@@ -43,7 +43,7 @@
   "Validation.EntityNotFound": "기록을 찾을 수 없습니다",
   "Validation.EntityReadAccessViolation": "필요한 권한이 없어서 키 : {1}의 {0} 레코드를 볼 수 없습니다",
   "Validation.EntityWriteAccessViolation": "필요한 권한이 없습니다 {0} 레코드를 키 : {1} 로 업데이트하는",
-  "Validation.FieldInvalidDateRange": "필드 {0}의 값은 날짜 {1} 이전일 수 없습니다!",
+  "Validation.FieldInvalidDateRange": "필드 {0}의 값은 날짜 {1}보다 늦을 수 없습니다!",
   "Validation.FieldInvalidValue": "필드 {1}에 대한 {0} 잘못된 값!",
   "Validation.FieldIsReadOnly": "필드 {0}는 읽기 전용입니다!",
   "Validation.FieldIsRequired": "{0} 필드가 필요합니다!",

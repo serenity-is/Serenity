@@ -43,7 +43,7 @@
   "Validation.EntityNotFound": "رکورد یافت نشد",
   "Validation.EntityReadAccessViolation": "شما اجازه مشاهده رکورد {0} با کلید {1} را ندارید",
   "Validation.EntityWriteAccessViolation": "شما اجازه لازم برای به‌روزرسانی رکورد {0} با کلید: {1} را ندارید",
-  "Validation.FieldInvalidDateRange": "مقدار فیلد {0} نمی‌تواند قبل از تاریخ {1} باشد!",
+  "Validation.FieldInvalidDateRange": "مقدار فیلد {0} نمی‌تواند بعد از تاریخ {1} باشد!",
   "Validation.FieldInvalidValue": "مقدار نامعتبر {0} برای فیلد {1}!",
   "Validation.FieldIsReadOnly": "فیلد {0} فقط خواندنی است!",
   "Validation.FieldIsRequired": "فیلد {0} اجباری است!",

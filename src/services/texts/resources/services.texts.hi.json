@@ -43,7 +43,7 @@
   "Validation.EntityNotFound": "रिकॉर्ड नहीं मिला। यह हटा दिया गया हो सकता है या आपको आवश्यक अनुमतियां नहीं हैं!",
   "Validation.EntityReadAccessViolation": "आपको {0} रिकॉर्ड के लिए आवश्यक अनुमतियाँ नहीं हैं: {1}",
   "Validation.EntityWriteAccessViolation": "आपको {0} रिकॉर्ड के साथ कुंजी: {1} को अपडेट करने के लिए आवश्यक अनुमतियां नहीं हैं",
-  "Validation.FieldInvalidDateRange": "फील्ड {0} के मान तारीख {1} से पहले नहीं हो सकता!",
+  "Validation.FieldInvalidDateRange": "फ़ील्ड {0} का मान तारीख {1} के बाद नहीं हो सकता!",
   "Validation.FieldInvalidValue": "क्षेत्र {1} के लिए अमान्य {0} मान!",
   "Validation.FieldIsReadOnly": "फ़ील्ड {0} केवल पढ़ने के लिए है!",
   "Validation.FieldIsRequired": "{0} फील्ड आवश्यक है!",

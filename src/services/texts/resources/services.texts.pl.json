@@ -43,7 +43,7 @@
   "Validation.EntityNotFound": "Rekord nie został znaleziony",
   "Validation.EntityReadAccessViolation": "Nie masz wymaganych uprawnień do wyświetlenia rekordu {0} z kluczem: {1}",
   "Validation.EntityWriteAccessViolation": "Nie masz wymaganych uprawnień do aktualizacji rekordu {0} z kluczem: {1}",
-  "Validation.FieldInvalidDateRange": "Wartość pola {0} nie może być przed datą {1}!",
+  "Validation.FieldInvalidDateRange": "Wartość pola {0} nie może być po dacie {1}!",
   "Validation.FieldInvalidValue": "Nieprawidłowa wartość {0} dla pola {1}!",
   "Validation.FieldIsReadOnly": "Pole {0} jest tylko do odczytu!",
   "Validation.FieldIsRequired": "Pole {0} jest wymagane!",

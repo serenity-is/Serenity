@@ -43,7 +43,7 @@
   "Validation.EntityNotFound": "Rekaman tidak ditemukan",
   "Validation.EntityReadAccessViolation": "Anda tidak memiliki izin yang diperlukan untuk melihat catatan {0} dengan kunci: {1}",
   "Validation.EntityWriteAccessViolation": "Anda tidak memiliki izin yang diperlukan untuk memperbarui catatan {0} dengan kunci: {1}",
-  "Validation.FieldInvalidDateRange": "Nilai bidang {0} tidak bisa sebelum tanggal {1}!",
+  "Validation.FieldInvalidDateRange": "Nilai bidang {0} tidak boleh setelah tanggal {1}!",
   "Validation.FieldInvalidValue": "Nilai tidak valid {0} untuk bidang {1}!",
   "Validation.FieldIsReadOnly": "Bidang {0} hanya bisa dibaca!",
   "Validation.FieldIsRequired": "Bidang {0} diperlukan!",

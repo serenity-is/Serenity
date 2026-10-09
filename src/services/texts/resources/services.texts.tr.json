@@ -43,7 +43,7 @@
   "Validation.EntityNotFound": "Kayıt bulunamadı. Silinmiş olabilir veya gerekli izinlere sahip değilsiniz!",
   "Validation.EntityReadAccessViolation": "{0} numaralı {1} kaydını görmeye hakkınız yok!",
   "Validation.EntityWriteAccessViolation": "{0} numaralı {1} kaydını güncellemeye hakkınız yok!",
-  "Validation.FieldInvalidDateRange": "{0} için girilen tarih {1}'den önce olamaz!",
+  "Validation.FieldInvalidDateRange": "{0} alanının değeri {1} tarihinden sonra olamaz!",
   "Validation.FieldInvalidValue": "{0}, {1} alanı için geçerli bir değer değil!",
   "Validation.FieldIsReadOnly": "{0} alanı salt okunur!",
   "Validation.FieldIsRequired": "{0} alanı için değer girilmeli!",

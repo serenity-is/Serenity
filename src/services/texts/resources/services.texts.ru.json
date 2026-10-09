@@ -43,7 +43,7 @@
   "Validation.EntityNotFound": "Запись не найдена",
   "Validation.EntityReadAccessViolation": "У вас нет необходимых разрешений для просмотра записи {0} с ключом: {1}",
   "Validation.EntityWriteAccessViolation": "У вас нет необходимых разрешений для обновления записи {0} с ключом: {1}",
-  "Validation.FieldInvalidDateRange": "Значение поля {0} не может быть раньше даты {1}!",
+  "Validation.FieldInvalidDateRange": "Значение поля {0} не может быть позже даты {1}!",
   "Validation.FieldInvalidValue": "Недопустимое значение {0} для поля {1}!",
   "Validation.FieldIsReadOnly": "Поле {0} только для чтения!",
   "Validation.FieldIsRequired": "Поле {0} обязательно для заполнения!",

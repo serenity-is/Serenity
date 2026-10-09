@@ -43,7 +43,7 @@
   "Validation.EntityNotFound": "Înregistrarea nu a fost găsită",
   "Validation.EntityReadAccessViolation": "Nu aveți permisiunile necesare pentru a vizualiza înregistrarea {0} cu cheia: {1}",
   "Validation.EntityWriteAccessViolation": "Nu aveți permisiunile necesare pentru a actualiza înregistrarea {0} cu cheia: {1}",
-  "Validation.FieldInvalidDateRange": "Valoarea câmpului {0} nu poate fi înainte de data {1}!",
+  "Validation.FieldInvalidDateRange": "Valoarea câmpului {0} nu poate fi ulterioară datei {1}!",
   "Validation.FieldInvalidValue": "Valoare nevalidă {0} pentru câmpul {1}!",
   "Validation.FieldIsReadOnly": "Câmpul {0} este doar pentru citire!",
   "Validation.FieldIsRequired": "Câmpul {0} este obligatoriu!",

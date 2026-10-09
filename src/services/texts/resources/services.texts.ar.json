@@ -43,7 +43,7 @@
   "Validation.EntityNotFound": "السجل غير موجود",
   "Validation.EntityReadAccessViolation": "ليس لديك الأذونات المطلوبة لعرض سجل {0} مع مفتاح: {1}",
   "Validation.EntityWriteAccessViolation": "ليس لديك الأذونات المطلوبة لتحديث سجل {0} مع مفتاح: {1}",
-  "Validation.FieldInvalidDateRange": "الحقل {0} قيمته لا يمكن أن تكون قبل التاريخ {1}!",
+  "Validation.FieldInvalidDateRange": "قيمة الحقل {0} لا يمكن أن تكون بعد التاريخ {1}!",
   "Validation.FieldInvalidValue": "قيمة غير صالحة {0} للحقل {1}!",
   "Validation.FieldIsReadOnly": "الحقل {0} قراءة فقط!",
   "Validation.FieldIsRequired": "الحقل {0} مطلوب!",

@@ -44,7 +44,7 @@
   "Validation.EntityNotFound": "Record not found. It might be deleted or you don't have required permissions!",
   "Validation.EntityReadAccessViolation": "You don't have required permissions to view {0} record with key: {1}",
   "Validation.EntityWriteAccessViolation": "You don't have required permissions to update {0} record with key: {1}",
-  "Validation.FieldInvalidDateRange": "{0} field value can't be before date {1}!",
+  "Validation.FieldInvalidDateRange": "{0} field value can't be after date {1}!",
   "Validation.FieldInvalidValue": "Invalid value {0} for field {1}!",
   "Validation.FieldIsReadOnly": "{0} field is read only!",
   "Validation.FieldIsRequired": "{0} field is required!",

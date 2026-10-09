@@ -16,7 +16,7 @@ public static partial class DataValidationTexts
     public static readonly LocalText FieldIsReadOnly = "{0} field is read only!";
     public static readonly LocalText FieldIsRequired = "{0} field is required!";
     public static readonly LocalText FieldInvalidValue = "Invalid value {0} for field {1}!";
-    public static readonly LocalText FieldInvalidDateRange = "{0} field value can't be before date {1}!";
+    public static readonly LocalText FieldInvalidDateRange = "{0} field value can't be after date {1}!";
     public static readonly LocalText RequestIsNull = "Request is null!";
     public static readonly LocalText UnexpectedError = "An unexpected error has occurred!";
 }

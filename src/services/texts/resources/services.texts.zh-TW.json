@@ -43,7 +43,7 @@
   "Validation.EntityNotFound": "找不到記錄。 它可能已被刪除或您沒有所需的權限！",
   "Validation.EntityReadAccessViolation": "您沒有查看具有鍵{1}的{0}記錄所需的權限",
   "Validation.EntityWriteAccessViolation": "您沒有更新 {0} 記錄的所需權限，其鍵為：{1}",
-  "Validation.FieldInvalidDateRange": "欄位{0}的值不能早於日期{1}！",
+  "Validation.FieldInvalidDateRange": "欄位{0}的值不能晚於日期{1}！",
   "Validation.FieldInvalidValue": "欄位{1}的{0}無效值！",
   "Validation.FieldIsReadOnly": "欄位{0}僅供讀取！",
   "Validation.FieldIsRequired": "{0} 欄位是必填！",

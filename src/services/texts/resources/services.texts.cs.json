@@ -43,7 +43,7 @@
   "Validation.EntityNotFound": "Záznam nenalezen",
   "Validation.EntityReadAccessViolation": "Nemáte požadovaná oprávnění pro zobrazení záznamu {0} s klíčem: {1}",
   "Validation.EntityWriteAccessViolation": "Nemáte požadovaná oprávnění k aktualizaci záznamu {0} s klíčem: {1}",
-  "Validation.FieldInvalidDateRange": "Hodnota pole {0} nemůže být před datem {1}!",
+  "Validation.FieldInvalidDateRange": "Hodnota pole {0} nemůže být po datu {1}!",
   "Validation.FieldInvalidValue": "Neplatná hodnota {0} pro pole {1}!",
   "Validation.FieldIsReadOnly": "Pole {0} je pouze pro čtení!",
   "Validation.FieldIsRequired": "Pole {0} je povinné!",

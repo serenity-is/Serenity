@@ -43,7 +43,7 @@
   "Validation.EntityNotFound": "Không tìm thấy bản ghi",
   "Validation.EntityReadAccessViolation": "Bạn không có quyền cần thiết để xem bản ghi {0} với khóa: {1}",
   "Validation.EntityWriteAccessViolation": "Bạn không có quyền cần thiết để cập nhật bản ghi {0} với khóa: {1}",
-  "Validation.FieldInvalidDateRange": "Trường {0} không thể có giá trị trước ngày {1}!",
+  "Validation.FieldInvalidDateRange": "Giá trị của trường {0} không được sau ngày {1}!",
   "Validation.FieldInvalidValue": "Giá trị không hợp lệ {0} cho trường {1}!",
   "Validation.FieldIsReadOnly": "Trường {0} chỉ đọc!",
   "Validation.FieldIsRequired": "Trường {0} là bắt buộc!",

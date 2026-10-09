@@ -43,7 +43,7 @@
   "Validation.EntityNotFound": "Registro não encontrado",
   "Validation.EntityReadAccessViolation": "Você não tem as permissões necessárias para ver o registro {0} com a chave: {1}",
   "Validation.EntityWriteAccessViolation": "Você não tem as permissões necessárias para atualizar o registro {0} com a chave: {1}",
-  "Validation.FieldInvalidDateRange": "O valor do campo {0} não pode ser anterior à data {1}!",
+  "Validation.FieldInvalidDateRange": "O valor do campo {0} não pode ser posterior à data {1}!",
   "Validation.FieldInvalidValue": "Valor inválido {0} para o campo {1}!",
   "Validation.FieldIsReadOnly": "O campo {0} é somente de leitura!",
   "Validation.FieldIsRequired": "O campo {0} é obrigatório!",

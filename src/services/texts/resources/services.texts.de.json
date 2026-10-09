@@ -43,7 +43,7 @@
   "Validation.EntityNotFound": "Datensatz nicht gefunden",
   "Validation.EntityReadAccessViolation": "Sie haben nicht die erforderlichen Berechtigungen, um den Datensatz {0} mit dem Schlüssel: {1} anzuzeigen",
   "Validation.EntityWriteAccessViolation": "Sie haben nicht die erforderlichen Berechtigungen, um den Datensatz {0} mit dem Schlüssel: {1} zu aktualisieren",
-  "Validation.FieldInvalidDateRange": "Der Wert des Feldes {0} darf nicht vor dem Datum {1} liegen!",
+  "Validation.FieldInvalidDateRange": "Der Wert des Feldes {0} darf nicht nach dem Datum {1} liegen!",
   "Validation.FieldInvalidValue": "Ungültiger Wert {0} für Feld {1}!",
   "Validation.FieldIsReadOnly": "Das Feld {0} ist nur zum Lesen!",
   "Validation.FieldIsRequired": "{0} Feld ist erforderlich!",
