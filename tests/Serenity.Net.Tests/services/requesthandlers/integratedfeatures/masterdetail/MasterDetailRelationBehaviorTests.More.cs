@@ -504,6 +504,75 @@ public partial class MasterDetailRelationBehaviorTests
     }
 
     [Fact]
+    public void OnAfterSave_Update_DeletesRemovedBeforeUpdatingChanged()
+    {
+        var calls = new List<string>();
+        var factory = new MockHandlerFactory((rowType, intf) =>
+        {
+            Assert.Equal(typeof(Int32DetailRow), rowType);
+            if (intf == typeof(IListRequestProcessor))
+                return new MockListHandler<Int32DetailRow>(x =>
+                {
+                    x.Response.Entities.Add(new Int32DetailRow { DetailID = 100, MasterID = 7, ProductID = 1, Quantity = 1m });
+                    x.Response.Entities.Add(new Int32DetailRow { DetailID = 200, MasterID = 7, ProductID = 2, Quantity = 2m });
+                });
+            if (intf == typeof(IDeleteRequestProcessor))
+                return new MockDeleteHandler<Int32DetailRow>(x =>
+                    calls.Add("delete " + x.Request?.EntityId));
+            Assert.Equal(typeof(ISaveRequestProcessor), intf);
+            return new MockSaveHandler<Int32DetailRow>(x =>
+                calls.Add("update " + ((x.Request?.Entity as Int32DetailRow)?.DetailID)));
+        });
+
+        using var connection = new MockDbConnection();
+        var master = new Int32MasterRow { ID = 7, Name = "M" };
+        var behavior = Activate(master, master.GetFields().DetailList, factory);
+        master.DetailList =
+        [
+            new Int32DetailRow { DetailID = 200, MasterID = 7, ProductID = 2, Quantity = 9m }
+        ];
+
+        behavior.OnAfterSave(CreateMasterSaveHandler(connection, false, master));
+
+        Assert.Equal(["delete 100", "update 200"], calls);
+    }
+
+    [Fact]
+    public async Task OnAfterSaveAsync_Update_DeletesRemovedBeforeUpdatingChanged()
+    {
+        var calls = new List<string>();
+        var factory = new MockHandlerFactory((rowType, intf) =>
+        {
+            Assert.Equal(typeof(Int32DetailRow), rowType);
+            if (intf == typeof(IListRequestProcessorAsync))
+                return new MockListHandlerAsync<Int32DetailRow>(x =>
+                {
+                    x.Response.Entities.Add(new Int32DetailRow { DetailID = 100, MasterID = 7, ProductID = 1, Quantity = 1m });
+                    x.Response.Entities.Add(new Int32DetailRow { DetailID = 200, MasterID = 7, ProductID = 2, Quantity = 2m });
+                });
+            if (intf == typeof(IDeleteRequestProcessorAsync))
+                return new MockDeleteHandlerAsync<Int32DetailRow>(x =>
+                    calls.Add("delete " + x.Request?.EntityId));
+            Assert.Equal(typeof(ISaveRequestProcessorAsync), intf);
+            return new MockSaveHandlerAsync<Int32DetailRow>(x =>
+                calls.Add("update " + ((x.Request?.Entity as Int32DetailRow)?.DetailID)));
+        });
+
+        using var connection = new MockDbConnection();
+        var master = new Int32MasterRow { ID = 7, Name = "M" };
+        var behavior = Activate(master, master.GetFields().DetailList, factory);
+        master.DetailList =
+        [
+            new Int32DetailRow { DetailID = 200, MasterID = 7, ProductID = 2, Quantity = 9m }
+        ];
+
+        await behavior.OnAfterSaveAsync(CreateMasterSaveHandlerAsync(connection, false, master),
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(["delete 100", "update 200"], calls);
+    }
+
+    [Fact]
     public void OnAfterSave_Update_NoChangeCheck_UpdatesMatchedRows()
     {
         var calls = new List<(SaveRequestType type, int? id)>();

@@ -334,11 +334,13 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
         if (changes == null)
             return;
 
-        foreach (var row in changes.RowsToUpdate)
-            SaveDetail(uow, row.Row!, masterId, row.Id, ignoreConcurrencyVersion);
-
+        // deletes run before updates/inserts so a value freed by a removed detail row
+        // (e.g. a unique column) is available to the rows that take it.
         foreach (var row in changes.RowsToDelete)
             DeleteDetail(uow, row.Id);
+
+        foreach (var row in changes.RowsToUpdate)
+            SaveDetail(uow, row.Row!, masterId, row.Id, ignoreConcurrencyVersion);
 
         foreach (var row in changes.RowsToInsert)
             SaveDetail(uow, row.Row!, masterId, null, ignoreConcurrencyVersion);
@@ -351,11 +353,13 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
         if (changes == null)
             return;
 
-        foreach (var row in changes.RowsToUpdate)
-            await SaveDetailAsync(uow, row.Row!, masterId, row.Id!, ignoreConcurrencyVersion, cancellationToken).ConfigureAwait(false);
-
+        // deletes run before updates/inserts so a value freed by a removed detail row
+        // (e.g. a unique column) is available to the rows that take it.
         foreach (var row in changes.RowsToDelete)
             await DeleteDetailAsync(uow, row.Id!, cancellationToken).ConfigureAwait(false);
+
+        foreach (var row in changes.RowsToUpdate)
+            await SaveDetailAsync(uow, row.Row!, masterId, row.Id!, ignoreConcurrencyVersion, cancellationToken).ConfigureAwait(false);
 
         foreach (var row in changes.RowsToInsert)
             await SaveDetailAsync(uow, row.Row!, masterId, null, ignoreConcurrencyVersion, cancellationToken).ConfigureAwait(false);
