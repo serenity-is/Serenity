@@ -49,26 +49,9 @@ public class StreamField(ICollection<Field> collection, string name, LocalText? 
     {
         ArgumentNullException.ThrowIfNull(reader);
 
-        if (reader.IsDBNull(index))
-            _setValue(row, null);
-        else
-        {
-            byte[] a;
+        var bytes = reader.AsBytes(index);
 
-            if (reader.GetType().Name == "SqliteDataReader")
-            {
-                a = (byte[])reader.GetValue(index);
-            }
-            else
-            {
-                long available = reader.GetBytes(index, 0, null, 0, 0);
-                a = new byte[available];
-                if (a.Length > 0)
-                    reader.GetBytes(index, 0, a, 0, a.Length);
-            }
-
-            _setValue(row, new MemoryStream(a));
-        }
+        _setValue(row, bytes == null ? null : new MemoryStream(bytes));
 
         row.OnFieldSet(this);
     }

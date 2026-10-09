@@ -73,6 +73,17 @@ public class ByteArrayFieldTests
     }
 
     [Fact]
+    public void GetFromReader_GetBytesOnlyReader_HonorsPartialReads()
+    {
+        var row = NewRow();
+        var field = AllFieldsRow.Fields.AByteArray;
+        using var reader = new GetBytesOnlyDataReader([1, 2, 3, 4, 5], 2);
+        reader.Read();
+        field.GetFromReader(reader, 0, row);
+        Assert.Equal(new byte[] { 1, 2, 3, 4, 5 }, field[row]);
+    }
+
+    [Fact]
     public void GetFromReader_NullReader_Throws()
     {
         var row = NewRow();

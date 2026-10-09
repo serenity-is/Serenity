@@ -176,6 +176,51 @@ public static class DataReaderExtensions
     }
 
     /// <summary>
+    /// Reads the value at the field index as a byte array. Returns <c>null</c> if the value
+    /// is <see cref="DBNull"/>. When the provider does not return a byte array (or
+    /// <see cref="System.Data.SqlTypes.SqlBinary"/>) directly, the value is read using
+    /// the <c>GetBytes</c> method, honoring the number of bytes actually returned by each
+    /// call so that partial reads are not lost.
+    /// </summary>
+    /// <param name="reader">The reader (required).</param>
+    /// <param name="index">The field index.</param>
+    /// <returns>The field value as a byte array, or <c>null</c> if the value is <see cref="DBNull"/>.</returns>
+    public static byte[]? AsBytes(this IDataReader reader, int index)
+    {
+        ArgumentNullException.ThrowIfNull(reader);
+
+        if (reader.IsDBNull(index))
+            return null;
+
+        var value = reader.GetValue(index);
+        if (value is byte[] bytes)
+            return bytes;
+
+        if (value is System.Data.SqlTypes.SqlBinary binary)
+            return binary.IsNull ? null : binary.Value;
+
+        var length = reader.GetBytes(index, 0, null, 0, 0);
+        if (length <= 0)
+            return [];
+
+        var result = new byte[length];
+        var offset = 0L;
+        while (offset < length)
+        {
+            var read = reader.GetBytes(index, offset, result, (int)offset, (int)(length - offset));
+            if (read <= 0)
+                break;
+
+            offset += read;
+        }
+
+        if (offset < length)
+            Array.Resize(ref result, (int)offset);
+
+        return result;
+    }
+
+    /// <summary>
     /// Asynchronously advances the data reader to the next record, using the native
     /// <see cref="DbDataReader.ReadAsync(CancellationToken)"/> when available, and falling
     /// back to a synchronous <see cref="IDataReader.Read"/> for readers that do not

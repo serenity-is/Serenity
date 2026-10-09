@@ -85,6 +85,50 @@ public class DataReaderExtensionsTests
     [Fact]
     public void ToString_Value_Converts() => Assert.Equal("v", Reader("F", "v").ToString(0));
 
+    // AsBytes
+
+    [Fact]
+    public void AsBytes_DbNull_ReturnsNull() => Assert.Null(Reader("F", DBNull.Value).AsBytes(0));
+
+    [Fact]
+    public void AsBytes_ByteArrayValue_ReturnsValue() => Assert.Equal([1, 2], Reader("F", new byte[] { 1, 2 }).AsBytes(0));
+
+    [Fact]
+    public void AsBytes_SqlBinaryValue_ReturnsValue() =>
+        Assert.Equal([1, 2], Reader("F", new System.Data.SqlTypes.SqlBinary([1, 2])).AsBytes(0));
+
+    [Fact]
+    public void AsBytes_SqlBinaryNull_ReturnsNull() =>
+        Assert.Null(Reader("F", System.Data.SqlTypes.SqlBinary.Null).AsBytes(0));
+
+    [Fact]
+    public void AsBytes_GetBytesOnlyReader_ReadsAllBytes()
+    {
+        using var reader = new GetBytesOnlyDataReader([1, 2, 3, 4, 5], 2);
+        reader.Read();
+        Assert.Equal(new byte[] { 1, 2, 3, 4, 5 }, reader.AsBytes(0));
+    }
+
+    [Fact]
+    public void AsBytes_GetBytesOnlyReader_SingleRead_ReturnsAllBytes()
+    {
+        using var reader = new GetBytesOnlyDataReader([1, 2, 3], 100);
+        reader.Read();
+        Assert.Equal(new byte[] { 1, 2, 3 }, reader.AsBytes(0));
+    }
+
+    [Fact]
+    public void AsBytes_GetBytesOnlyReader_Empty_ReturnsEmpty()
+    {
+        using var reader = new GetBytesOnlyDataReader([], 4);
+        reader.Read();
+        Assert.Empty(reader.AsBytes(0));
+    }
+
+    [Fact]
+    public void AsBytes_NullReader_Throws() =>
+        Assert.Throws<ArgumentNullException>(() => ((IDataReader)null).AsBytes(0));
+
     // Async extensions
 
     [Fact]

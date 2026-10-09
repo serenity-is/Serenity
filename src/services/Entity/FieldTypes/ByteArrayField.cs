@@ -48,26 +48,7 @@ public class ByteArrayField(ICollection<Field> collection, string name, LocalTex
     {
         ArgumentNullException.ThrowIfNull(reader);
 
-        if (reader.IsDBNull(index))
-            _setValue(row, null);
-        else
-        {
-            byte[] a;
-
-            if (reader.GetType().Name == "SqliteDataReader")
-            {
-                a = (byte[])reader.GetValue(index);
-            }
-            else
-            {
-                long available = reader.GetBytes(index, 0, null, 0, 0);
-                a = new byte[available];
-                if (a.Length > 0)
-                    reader.GetBytes(index, 0, a, 0, a.Length);
-            }
-
-            _setValue(row, a);
-        }
+        _setValue(row, reader.AsBytes(index));
 
         row.OnFieldSet(this);
     }
