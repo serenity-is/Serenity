@@ -295,7 +295,8 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(
             !IsQuickSearchableField(field) ||
             !AllowFilterField(field))
         {
-            throw new ArgumentOutOfRangeException(nameof(containsField));
+            throw new ArgumentOutOfRangeException(nameof(containsField), containsField,
+                $"'{containsField}' is not a valid quick search field for {Row.GetType().Name}!");
         }
 
         return [field];
@@ -556,7 +557,7 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(
         if (field.Flags.HasFlag(FieldFlags.NotMapped) || !AllowFilterField(field))
         {
             throw new ArgumentOutOfRangeException(field.PropertyName ?? field.Name,
-                $"Can't apply equality filter on field {field.PropertyName ?? field.Name}");
+                $"Can't apply equality filter on field '{field.PropertyName ?? field.Name}' for {Row.GetType().Name}!");
         }
 
         if (value is not string && value is IEnumerable enumerable)
@@ -617,7 +618,7 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(
                 continue;
 
             var field = (Row.FindFieldByPropertyName(pair.Key) ?? Row.FindField(pair.Key)) ?? throw new ArgumentOutOfRangeException(pair.Key,
-                    string.Format("Can't find field {0} in row for equality filter.", pair.Key));
+                    string.Format("Can't find field '{0}' in {1} for equality filter.", pair.Key, Row.GetType().Name));
             ApplyFieldEqualityFilter(query, field, pair.Value);
         }
     }

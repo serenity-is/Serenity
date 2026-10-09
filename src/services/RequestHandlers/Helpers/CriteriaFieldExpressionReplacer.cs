@@ -123,18 +123,18 @@ public class CriteriaFieldExpressionReplacer(IRow row, IPermissionService permis
     {
         if (string.IsNullOrEmpty(criteria.Expression))
             throw new ValidationError("InvalidCriteriaField", null,
-                "Empty criteria field name is not allowed!");
+                $"Empty criteria field name is not allowed in {Row.GetType().Name}!");
 
         var result = base.VisitCriteria(criteria);
 
         if (result is Criteria critResult)
         {
             var field = FindField(critResult.Expression) ?? throw new ValidationError("InvalidCriteriaField", critResult.Expression,
-                    string.Format("'{0}' criteria field is not found!", critResult.Expression));
+                    string.Format("'{0}' criteria field is not found in {1}!", critResult.Expression, Row.GetType().Name));
             if (!CanFilterField(field))
             {
                 throw new ValidationError("CantFilterField", critResult.Expression,
-                    string.Format("Can't filter on field '{0}'!", critResult.Expression));
+                    string.Format("Can't filter on field '{0}' in {1}!", critResult.Expression, Row.GetType().Name));
             }
 
             return ToCriteria(field);

@@ -423,6 +423,18 @@ public partial class ListRequestHandlerTests
     }
 
     [Fact]
+    public void GetQuickSearchFields_Error_Identifies_Entity()
+    {
+        using var conn = CovConnection();
+        var handler = new CovListHandler(CovContext());
+        handler.Setup(conn);
+
+        var ex = Assert.Throws<ArgumentOutOfRangeException>(() =>
+            handler.CallGetQuickSearchFields("NoSuchField"));
+        Assert.Contains(nameof(CovRow), ex.Message);
+    }
+
+    [Fact]
     public void GetQuickSearchFields_Throws_For_DenyFiltering_ContainsField()
     {
         using var conn = CovConnection();
@@ -706,6 +718,50 @@ public partial class ListRequestHandlerTests
 
         var query = new SqlQuery().Dialect(conn.GetDialect()).From(new CovRow());
         Assert.Throws<ArgumentOutOfRangeException>(() => handler.CallApplyEquality(query));
+    }
+
+    [Fact]
+    public void ApplyEqualityFilter_Error_Identifies_Entity()
+    {
+        using var conn = CovConnection();
+        var handler = new CovListHandler(CovContext());
+        handler.Setup(conn, new ListRequest
+        {
+            EqualityFilter = new Dictionary<string, object?> { ["NoSuchField"] = "x" }
+        });
+
+        var query = new SqlQuery().Dialect(conn.GetDialect()).From(new CovRow());
+        var ex = Assert.Throws<ArgumentOutOfRangeException>(() => handler.CallApplyEquality(query));
+        Assert.Contains(nameof(CovRow), ex.Message);
+    }
+
+    [Fact]
+    public void ApplyFieldEqualityFilter_Error_Identifies_Entity()
+    {
+        using var conn = CovConnection();
+        var handler = new DenyAllFilterListHandler(CovContext());
+        handler.Setup(conn);
+
+        var query = new SqlQuery().Dialect(conn.GetDialect()).From(new CovRow());
+        var ex = Assert.Throws<ArgumentOutOfRangeException>(() =>
+            handler.CallApplyFieldEquality(query, CovRow.Fields.NormalF, "x"));
+        Assert.Contains(nameof(CovRow), ex.Message);
+    }
+
+    [Fact]
+    public void ReplaceFieldExpressions_Error_Identifies_Entity()
+    {
+        using var conn = CovConnection();
+        var handler = new CovListHandler(CovContext());
+        handler.Setup(conn);
+
+        var missing = Assert.Throws<ValidationError>(() =>
+            handler.CallReplaceFieldExpressions(new Criteria("NoSuchField")));
+        Assert.Contains(nameof(CovRow), missing.Message);
+
+        var notAllowed = Assert.Throws<ValidationError>(() =>
+            handler.CallReplaceFieldExpressions(new Criteria(CovRow.Fields.NotMappedF.PropertyName)));
+        Assert.Contains(nameof(CovRow), notAllowed.Message);
     }
 
     [Fact]
