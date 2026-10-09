@@ -38,9 +38,13 @@ public class RequestHandlerSettings : IOptions<RequestHandlerSettings>
     /// <see cref="ListRequest.ExcludeTotalCount"/> to true, request
     /// <see cref="ListRequest.IncludeMore"/> (which returns a More indicator instead), or call
     /// <see cref="RequestHandlerExtensions.SuppressPagingLimits{TRequest}"/> (which also
-    /// restores take to zero).
+    /// restores take to zero). Negative values are ignored (treated as zero).
     /// </remarks>
-    public int DefaultPageSize { get; set; }
+    public int DefaultPageSize
+    {
+        get => field;
+        set => field = value > 0 ? value : 0;
+    }
 
     /// <summary>
     /// Gets or sets the maximum page size (take) allowed for List requests. When greater than
@@ -54,9 +58,14 @@ public class RequestHandlerSettings : IOptions<RequestHandlerSettings>
     /// becomes non-zero, even when <see cref="ExcludeTotalCountByDefault"/> is enabled). Server
     /// side callers that need all rows must call
     /// <see cref="RequestHandlerExtensions.SuppressPagingLimits{TRequest}"/>. Do not enable
-    /// this without auditing existing List usages, and avoid low values.
+    /// this without auditing existing List usages, and avoid low values. Negative values are
+    /// ignored (treated as zero, i.e. no limit).
     /// </remarks>
-    public int MaxPageSize { get; set; }
+    public int MaxPageSize
+    {
+        get => field;
+        set => field = value > 0 ? value : 0;
+    }
 
     /// <summary>
     /// Gets or sets whether the total record count is excluded by default for list requests

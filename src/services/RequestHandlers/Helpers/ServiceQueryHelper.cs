@@ -157,7 +157,7 @@ public static class ServiceQueryHelper
 
         var originalTake = paging.Take;
 
-        if (paging.Take == 0)
+        if (paging.Take == 0 && settings.DefaultPageSize > 0)
             paging.Take = settings.DefaultPageSize;
 
         if (settings.MaxPageSize > 0 &&

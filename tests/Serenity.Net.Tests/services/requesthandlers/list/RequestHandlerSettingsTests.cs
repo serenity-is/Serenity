@@ -107,6 +107,34 @@ public class RequestHandlerSettingsTests
         Assert.Equal(7, response.Take);
     }
 
+    [Fact]
+    public void Negative_DefaultPageSize_Is_Ignored()
+    {
+        using var conn = Connection();
+        var settings = new RequestHandlerSettings { DefaultPageSize = -5 };
+
+        Assert.Equal(0, settings.DefaultPageSize);
+
+        var response = new ListRequestHandler<ListRow>(Context(settings)).List(conn,
+            new ListRequest { ExcludeTotalCount = true });
+
+        Assert.Equal(0, response.Take);
+    }
+
+    [Fact]
+    public void Negative_MaxPageSize_Is_Ignored()
+    {
+        using var conn = Connection();
+        var settings = new RequestHandlerSettings { MaxPageSize = -5 };
+
+        Assert.Equal(0, settings.MaxPageSize);
+
+        var response = new ListRequestHandler<ListRow>(Context(settings)).List(conn,
+            new ListRequest { Take = 100, ExcludeTotalCount = true });
+
+        Assert.Equal(100, response.Take);
+    }
+
     [Theory]
     [InlineData(0, 0, false, false)]
     [InlineData(0, 0, true, false)]
@@ -220,6 +248,25 @@ public class RequestHandlerSettingsTests
             .GetRequiredService<IOptions<RequestHandlerSettings>>().Value;
 
         Assert.Equal(10, settings.MaxPageSize);
+    }
+
+    [Fact]
+    public void Binds_Negative_Page_Size_As_Zero()
+    {
+        var config = new ConfigurationBuilder()
+            .AddInMemoryCollection([
+                new KeyValuePair<string, string?>("RequestHandlerSettings:MaxPageSize", "-5"),
+                new KeyValuePair<string, string?>("RequestHandlerSettings:DefaultPageSize", "-3")
+            ])
+            .Build();
+
+        var services = new ServiceCollection();
+        services.ConfigureSection<RequestHandlerSettings>(config);
+        var settings = services.BuildServiceProvider()
+            .GetRequiredService<IOptions<RequestHandlerSettings>>().Value;
+
+        Assert.Equal(0, settings.MaxPageSize);
+        Assert.Equal(0, settings.DefaultPageSize);
     }
 
     [Fact]
