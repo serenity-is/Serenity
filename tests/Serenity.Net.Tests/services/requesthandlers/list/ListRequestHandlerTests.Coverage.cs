@@ -188,6 +188,17 @@ public partial class ListRequestHandlerTests
         }
     }
 
+    private sealed class MapNotMappedFieldBehavior : BaseListBehavior, IListMapFieldExpressionBehavior
+    {
+        public string? MapFieldExpression(IListRequestHandler handler, SqlQuery query, IField field)
+            => field.Name == CovRow.Fields.NotMappedF.Name ? "T0.[NotMappedF_Mapped]" : null;
+    }
+
+    private sealed class MappingBehaviorListHandler(IRequestContext context) : CovListHandler(context)
+    {
+        protected override IEnumerable<IListBehavior> GetBehaviors() => [new MapNotMappedFieldBehavior()];
+    }
+
     private sealed class DenyAllSortListHandler(IRequestContext context) : CovListHandler(context)
     {
         protected override bool AllowSortField(Field field) => false;
@@ -636,6 +647,23 @@ public partial class ListRequestHandlerTests
 
         Assert.False(orFalse);
         Assert.False(criteria.IsEmpty);
+    }
+
+    [Fact]
+    public void AddFieldContains_Allows_NotMapped_Field_Mapped_By_Behavior()
+    {
+        using var conn = CovConnection();
+        var handler = new MappingBehaviorListHandler(CovContext());
+        handler.Setup(conn);
+
+        var criteria = handler.CallAddFieldContains(
+            CovRow.Fields.NotMappedF, "x", null, SearchType.Contains, false, out var orFalse);
+
+        Assert.False(orFalse);
+        Assert.False(criteria.IsEmpty);
+
+        var sqlQuery = new SqlQuery().Dialect(conn.GetDialect());
+        Assert.Contains("NotMappedF_Mapped", criteria.ToString(sqlQuery), StringComparison.Ordinal);
     }
 
     [Fact]

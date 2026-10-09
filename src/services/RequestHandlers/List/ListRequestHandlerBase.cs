@@ -329,7 +329,8 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(
     protected virtual void AddFieldContainsCriteria(Field field, string containsText, long? id,
         SearchType searchType, bool numericOnly, ref BaseCriteria criteria, ref bool orFalse)
     {
-        if (field.Flags.HasFlag(FieldFlags.NotMapped))
+        if (field.Flags.HasFlag(FieldFlags.NotMapped) &&
+            MapFieldExpression(field, Query) is not string)
         {
             throw new ArgumentOutOfRangeException(field.PropertyName ?? field.Name,
                 $"Can't apply contains text on field {field.PropertyName ?? field.Name}");
