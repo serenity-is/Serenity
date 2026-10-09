@@ -49,7 +49,8 @@ public class TransientGrantingPermissionService(IPermissionService? permissionSe
     /// <returns><c>true</c> if the permission is granted; otherwise <c>false</c>.</returns>
     public bool HasPermission(string permission)
     {
-        if (string.IsNullOrEmpty(permission))
+        if (string.IsNullOrEmpty(permission) ||
+            string.Equals(permission, SpecialPermissionKeys.Deny, StringComparison.OrdinalIgnoreCase))
             return false;
 
         sync.EnterReadLock();

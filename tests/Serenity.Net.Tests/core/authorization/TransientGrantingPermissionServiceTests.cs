@@ -34,6 +34,31 @@ public class TransientGrantingPermissionServiceTests
     }
 
     [Fact]
+    public void HasPermission_ReturnsFalse_For_Deny_Even_WhenGrantAllIsActive()
+    {
+        var service = new TransientGrantingPermissionService(Allowed());
+        service.GrantAll();
+        Assert.True(service.HasPermission("Whatever"));
+        Assert.False(service.HasPermission(SpecialPermissionKeys.Deny));
+        Assert.False(service.HasPermission("deny"));
+    }
+
+    [Fact]
+    public void HasPermission_ReturnsFalse_For_Deny_WhenExplicitlyGranted()
+    {
+        var service = new TransientGrantingPermissionService(Allowed());
+        service.Grant(SpecialPermissionKeys.Deny);
+        Assert.False(service.HasPermission(SpecialPermissionKeys.Deny));
+    }
+
+    [Fact]
+    public void HasPermission_ReturnsFalse_For_Deny_WhenUnderlyingAllowsEverything()
+    {
+        var service = new TransientGrantingPermissionService(new MockPermissions(_ => true));
+        Assert.False(service.HasPermission(SpecialPermissionKeys.Deny));
+    }
+
+    [Fact]
     public void Grant_PermitsGrantedPermissions_UntilUndone()
     {
         var service = new TransientGrantingPermissionService(Allowed("A"));
