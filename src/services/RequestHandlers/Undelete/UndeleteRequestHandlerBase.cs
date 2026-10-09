@@ -55,7 +55,7 @@ public abstract class UndeleteRequestHandlerBase<TRow, TUndeleteRequest, TUndele
 
         return !((isDeletedRow != null && isDeletedRow.IsDeletedField[Row] != true) ||
                  (isActiveDeletedRow != null && isActiveDeletedRow.IsActiveField[Row] >= 0) ||
-                 (deleteLogRow != null && deleteLogRow.DeleteUserIdField.IsNull(Row)));
+                 (deleteLogRow != null && deleteLogRow.DeleteDateField.IsNull(Row)));
     }
 
     /// <summary>

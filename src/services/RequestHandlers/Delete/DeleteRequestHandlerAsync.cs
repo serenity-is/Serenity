@@ -188,7 +188,7 @@ public class DeleteRequestHandlerAsync<TRow, TDeleteRequest, TDeleteResponse> :
                         deleteLogRow.DeleteDateField.DateTimeKind))
                     .Set(deleteLogRow.DeleteUserIdField, User?.GetIdentifier().TryParseID())
                     .WhereEqual(idField, id)
-                    .Where(deleteLogRow.DeleteUserIdField.IsNull());
+                    .Where(deleteLogRow.DeleteDateField.IsNull());
 
                 await InvokeDeleteActionAsync(async () =>
                 {

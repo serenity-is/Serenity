@@ -215,6 +215,49 @@ public partial class DeleteRequestHandlerTests
     }
 
     [Fact]
+    public void DeleteLogOnly_NotDeleted_Where_Uses_DeleteDate()
+    {
+        var commands = new List<string>();
+        using var connection = new MockDbConnection()
+            .InterceptExecuteReader(_ => new MockDbDataReader(new
+            {
+                Id = 5,
+                DeleteDate = (DateTime?)null,
+                DeleteUserId = (long?)null
+            }))
+            .InterceptExecuteNonQuery(args =>
+            {
+                commands.Add(args.CommandText);
+                return 1;
+            });
+        var handler = new DeleteRequestHandler<DeleteLogOnlyRow>(CovDeleteContext());
+
+        handler.Delete(new MockUnitOfWork(connection), new DeleteRequest { EntityId = 5 });
+
+        var sql = string.Join("\n", commands);
+        Assert.Contains("[DeleteDate] IS NULL", sql, StringComparison.Ordinal);
+        Assert.DoesNotContain("[DeleteUserId] IS NULL", sql, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void DeleteLogOnly_AlreadyDeleted_With_Null_DeleteUser_Is_WasAlreadyDeleted()
+    {
+        using var connection = new MockDbConnection()
+            .InterceptExecuteReader(_ => new MockDbDataReader(new
+            {
+                Id = 5,
+                DeleteDate = (DateTime?)DateTime.Now,
+                DeleteUserId = (long?)null
+            }))
+            .InterceptExecuteNonQuery(_ => 1);
+        var handler = new DeleteRequestHandler<DeleteLogOnlyRow>(CovDeleteContext());
+
+        var response = handler.Delete(new MockUnitOfWork(connection), new DeleteRequest { EntityId = 5 });
+
+        Assert.True(response.WasAlreadyDeleted);
+    }
+
+    [Fact]
     public void Delete_AlreadyDeleted_Returns_WasAlreadyDeleted()
     {
         using var connection = new MockDbConnection()

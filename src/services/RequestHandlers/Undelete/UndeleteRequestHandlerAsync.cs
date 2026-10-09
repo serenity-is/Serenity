@@ -152,7 +152,7 @@ public class UndeleteRequestHandlerAsync<TRow, TUndeleteRequest, TUndeleteRespon
                 .Set(deleteLogRow.DeleteDateField, null);
 
             if (isActiveDeletedRow == null && isDeletedRow == null)
-                update.Where(deleteLogRow.DeleteUserIdField.IsNotNull());
+                update.Where(deleteLogRow.DeleteDateField.IsNotNull());
         }
 
         await InvokeUndeleteActionAsync(async () =>

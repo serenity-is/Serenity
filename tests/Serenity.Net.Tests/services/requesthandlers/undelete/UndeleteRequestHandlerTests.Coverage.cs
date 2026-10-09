@@ -311,6 +311,53 @@ public class UndeleteRequestHandlerTests_Coverage
     }
 
     [Fact]
+    public void Undelete_DeleteLog_Null_DeleteUserId_Restores_And_Keys_On_DeleteDate()
+    {
+        var commands = new List<string>();
+        using var connection = new MockDbConnection()
+            .InterceptExecuteReader(args => args.ToMockReader(new
+            {
+                Id = 5,
+                DeleteUserId = (long?)null,
+                DeleteDate = (DateTime?)DateTime.Now
+            }))
+            .InterceptExecuteNonQuery(args =>
+            {
+                commands.Add(args.CommandText);
+                return 1;
+            })
+            .InterceptManipulateRow(_ => 1);
+        var handler = new SyncHandler<LogRow>(Context());
+
+        var response = handler.Undelete(new MockUnitOfWork(connection), new UndeleteRequest { EntityId = 5 });
+
+        Assert.False(response.WasNotDeleted);
+        var sql = string.Join("\n", commands);
+        Assert.Contains("[DeleteDate] IS NOT NULL", sql, StringComparison.Ordinal);
+        Assert.DoesNotContain("[DeleteUserId] IS NOT NULL", sql, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task UndeleteAsync_DeleteLog_Null_DeleteUserId_Restores()
+    {
+        using var connection = new MockDbConnection()
+            .InterceptExecuteReader(args => args.ToMockReader(new
+            {
+                Id = 5,
+                DeleteUserId = (long?)null,
+                DeleteDate = (DateTime?)DateTime.Now
+            }))
+            .InterceptExecuteNonQuery(_ => 1)
+            .InterceptManipulateRow(_ => 1);
+        var handler = new AsyncHandler<LogRow>(Context());
+
+        var response = await handler.UndeleteAsync(new MockUnitOfWork(connection),
+            new UndeleteRequest { EntityId = 5 }, TestContext.Current.CancellationToken);
+
+        Assert.False(response.WasNotDeleted);
+    }
+
+    [Fact]
     public void Undelete_LogAndSoft_Uses_SoftBranch()
     {
         using var connection = Connection(new
