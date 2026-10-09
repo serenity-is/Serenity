@@ -116,11 +116,15 @@ public static class DisplayOrderHelper
     ///   order value assigned (or 0) be shown at start or at the end.</param>
     /// <param name="hasUniqueConstraint">True if the entity has a unique constraint on display order
     /// column.</param>
+    /// <param name="preserveGaps">When false (default) all display order values in the group are
+    /// normalized to consecutive values starting from 1, closing any gaps. When true, only the
+    /// records between the old and the new position are renumbered and the existing display order
+    /// values (including any gaps) are preserved where possible, so fewer rows are updated.</param>
     /// <returns>
     ///   If any of the display order values is changed true.</returns>
     public static bool ReorderValues(IDbConnection connection, string tableName, Field keyField, Field orderField,
         ICriteria? filter = null, object? recordID = null, int newDisplayOrder = 1,
-        bool descendingKeyOrder = false, bool hasUniqueConstraint = false)
+        bool descendingKeyOrder = false, bool hasUniqueConstraint = false, bool preserveGaps = false)
     {
         ArgumentNullException.ThrowIfNull(connection);
         if (tableName == null || tableName.Length == 0)
@@ -169,7 +173,7 @@ public static class DisplayOrderHelper
             }
         }
 
-        _ = ComputeNewOrders(orderRecords, changing, newDisplayOrder);
+        _ = ComputeNewOrders(orderRecords, changing, newDisplayOrder, preserveGaps);
 
         return UpdateOrders(connection, orderRecords, tableName, keyField, orderField, hasUniqueConstraint);
     }
@@ -249,15 +253,20 @@ public static class DisplayOrderHelper
     ///   Will records with same display order values be sorted in ascending or descending ID order?</param>
     /// <param name="hasUniqueConstraint">True if the entity has a unique constraint on display order
     /// column.</param>
+    /// <param name="preserveGaps">When false (default) all display order values in the group are
+    /// normalized to consecutive values starting from 1, closing any gaps. When true, only the
+    /// records between the old and the new position are renumbered and the existing display order
+    /// values (including any gaps) are preserved where possible, so fewer rows are updated.</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>
     ///   A task whose result is true if any of the display order values is changed.</returns>
     public static Task<bool> ReorderValuesAsync(IDbConnection connection, string tableName, Field keyField, Field orderField,
         ICriteria? filter = null, object? recordID = null, int newDisplayOrder = 1,
-        bool descendingKeyOrder = false, bool hasUniqueConstraint = false, CancellationToken cancellationToken = default)
+        bool descendingKeyOrder = false, bool hasUniqueConstraint = false, bool preserveGaps = false,
+        CancellationToken cancellationToken = default)
     {
         return ReorderValuesCoreAsync(connection, tableName, keyField, orderField, filter, recordID,
-            newDisplayOrder, descendingKeyOrder, hasUniqueConstraint, cancellationToken);
+            newDisplayOrder, descendingKeyOrder, hasUniqueConstraint, preserveGaps, cancellationToken);
     }
 
     /// <summary>
@@ -276,20 +285,24 @@ public static class DisplayOrderHelper
     /// <param name="descendingKeyOrder">
     ///   Will records with same display order values be sorted in ascending or descending ID order?</param>
     /// <param name="hasUniqueConstraint">True if the display order field has a unique index</param>
+    /// <param name="preserveGaps">When false (default) all display order values in the group are
+    /// normalized to consecutive values starting from 1, closing any gaps. When true, only the
+    /// records between the old and the new position are renumbered and the existing display order
+    /// values (including any gaps) are preserved where possible, so fewer rows are updated.</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>
     ///   A task whose result is true if any of the display order values is changed.</returns>
     public static Task<bool> ReorderValuesAsync(IDbConnection connection, IDisplayOrderRow row, ICriteria? filter = null,
         object? recordID = null, int newDisplayOrder = 1, bool descendingKeyOrder = false,
-        bool hasUniqueConstraint = false, CancellationToken cancellationToken = default)
+        bool hasUniqueConstraint = false, bool preserveGaps = false, CancellationToken cancellationToken = default)
     {
         return ReorderValuesCoreAsync(connection, row.Table, row.GetIdField(), row.DisplayOrderField, filter, recordID,
-            newDisplayOrder, descendingKeyOrder, hasUniqueConstraint, cancellationToken);
+            newDisplayOrder, descendingKeyOrder, hasUniqueConstraint, preserveGaps, cancellationToken);
     }
 
     private static async Task<bool> ReorderValuesCoreAsync(IDbConnection connection, string tableName, Field keyField, Field orderField,
         ICriteria? filter, object? recordID, int newDisplayOrder, bool descendingKeyOrder, bool hasUniqueConstraint,
-        CancellationToken cancellationToken)
+        bool preserveGaps, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(connection);
         if (tableName == null || tableName.Length == 0)
@@ -338,13 +351,14 @@ public static class DisplayOrderHelper
             }
         }
 
-        _ = ComputeNewOrders(orderRecords, changing, newDisplayOrder);
+        _ = ComputeNewOrders(orderRecords, changing, newDisplayOrder, preserveGaps);
 
         return await UpdateOrdersAsync(connection, orderRecords, tableName, keyField, orderField,
             hasUniqueConstraint, cancellationToken).ConfigureAwait(false);
     }
 
-    private static int ComputeNewOrders(List<OrderRecord> orderRecords, OrderRecord? changing, int newDisplayOrder)
+    private static int ComputeNewOrders(List<OrderRecord> orderRecords, OrderRecord? changing, int newDisplayOrder,
+        bool preserveGaps)
     {
         int order = orderRecords.Count;
 
@@ -357,29 +371,43 @@ public static class DisplayOrderHelper
 
         var changingIndex = changing is null ? -1 : orderRecords.IndexOf(changing);
 
-        // nothing to reorder if the record can't be found, or it is already at the target position
-        if (changingIndex < 0 || changingIndex == newDisplayOrder - 1)
+        // when there is no specific record to move (e.g. renumbering the group after a delete
+        // passes a sentinel id that never matches), assign consecutive display order values to
+        // every record so any gaps left by the removed record are closed.
+        if (changingIndex < 0)
+        {
+            for (int i = 0; i < order; i++)
+                orderRecords[i].newOrder = i + 1;
             return newDisplayOrder;
+        }
 
         int from = changingIndex;
         int to = newDisplayOrder - 1;
 
-        // only the records between the old and the new positions need to change. When the current
-        // display order values are all distinct we shift only those records and keep the values of
-        // the rest (including any gaps) as they are, so a single move does not rewrite the whole
-        // group. Otherwise (e.g. several records still have the default 0 value) the group has to
-        // be renumbered so the record can be placed at the requested position.
-        bool distinct = true;
-        for (int i = 1; i < order; i++)
+        // by default the whole group is renumbered to consecutive values starting from 1. When the
+        // caller opts in (preserveGaps) and the current display order values are all distinct, only
+        // the records between the old and new positions are shifted and the existing values
+        // (including any gaps) are reused, so fewer rows have to be updated.
+        bool minimal = preserveGaps;
+        if (minimal)
         {
-            if (orderRecords[i].oldOrder <= orderRecords[i - 1].oldOrder)
+            for (int i = 1; i < order; i++)
             {
-                distinct = false;
-                break;
+                if (orderRecords[i].oldOrder <= orderRecords[i - 1].oldOrder)
+                {
+                    minimal = false;
+                    break;
+                }
             }
+
+            // nothing to reorder if the record is already at the target position and the existing
+            // values are distinct. When they are duplicated the group is still renumbered
+            // (normalized) even though the record does not move.
+            if (minimal && changingIndex == newDisplayOrder - 1)
+                return newDisplayOrder;
         }
 
-        if (distinct)
+        if (minimal)
         {
             if (from < to)
             {
@@ -672,13 +700,18 @@ public static class DisplayOrderHelper
     ///   become 3, 2, 1. This parameter controls if records that are added recently and has no display
     ///   order value assigned (or 0) be shown at start or at the end.</param>
     /// <param name="hasUniqueConstraint">True if the display order field has a unique index</param>
+    /// <param name="preserveGaps">When false (default) all display order values in the group are
+    /// normalized to consecutive values starting from 1, closing any gaps. When true, only the
+    /// records between the old and the new position are renumbered and the existing display order
+    /// values (including any gaps) are preserved where possible, so fewer rows are updated.</param>
     /// <returns>
     ///   If any of the display order values is changed true.</returns>
     public static bool ReorderValues(IDbConnection connection, IDisplayOrderRow row, ICriteria? filter = null,
-        object? recordID = null, int newDisplayOrder = 1, bool descendingKeyOrder = false, bool hasUniqueConstraint = false)
+        object? recordID = null, int newDisplayOrder = 1, bool descendingKeyOrder = false, bool hasUniqueConstraint = false,
+        bool preserveGaps = false)
     {
         return ReorderValues(connection, row.Table, row.GetIdField(), row.DisplayOrderField, filter, recordID,
-            newDisplayOrder, descendingKeyOrder, hasUniqueConstraint);
+            newDisplayOrder, descendingKeyOrder, hasUniqueConstraint, preserveGaps);
     }
 
     /// <summary>

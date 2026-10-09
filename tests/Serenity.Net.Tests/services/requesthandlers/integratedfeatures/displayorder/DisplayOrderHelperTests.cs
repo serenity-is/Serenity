@@ -171,7 +171,7 @@ public class DisplayOrderHelperTests
         }, commands);
 
         var changed = DisplayOrderHelper.ReorderValues(connection, "T", Fields.ID, Fields.Order,
-            recordID: "b", newDisplayOrder: 1);
+            recordID: "b", newDisplayOrder: 1, preserveGaps: true);
 
         Assert.True(changed);
         var sql = string.Join("\n", commands);
@@ -179,6 +179,27 @@ public class DisplayOrderHelperTests
         Assert.Contains("'b'", sql, StringComparison.Ordinal);
         Assert.DoesNotContain("'c'", sql, StringComparison.Ordinal);
         Assert.DoesNotContain("'d'", sql, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ReorderValues_Normalizes_Existing_Values_By_Default()
+    {
+        var commands = new List<string>();
+        using var connection = ConnectionCapturing(new object[]
+        {
+            new { ID = "a", Order = 10 },
+            new { ID = "b", Order = 20 },
+            new { ID = "c", Order = 30 }
+        }, commands);
+
+        var changed = DisplayOrderHelper.ReorderValues(connection, "T", Fields.ID, Fields.Order,
+            recordID: "b", newDisplayOrder: 1);
+
+        Assert.True(changed);
+        var sql = string.Join("\n", commands);
+        Assert.Contains("[Order] = 1", sql, StringComparison.Ordinal);
+        Assert.Contains("[Order] = 2", sql, StringComparison.Ordinal);
+        Assert.Contains("[Order] = 3", sql, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -199,6 +220,48 @@ public class DisplayOrderHelperTests
     }
 
     [Fact]
+    public void ReorderValues_Normalizes_Duplicates_When_Already_At_Target()
+    {
+        var commands = new List<string>();
+        using var connection = ConnectionCapturing(new object[]
+        {
+            new { ID = "a", Order = 0 },
+            new { ID = "b", Order = 0 },
+            new { ID = "c", Order = 0 }
+        }, commands);
+
+        var changed = DisplayOrderHelper.ReorderValues(connection, "T", Fields.ID, Fields.Order,
+            recordID: "b", newDisplayOrder: 2, preserveGaps: true);
+
+        Assert.True(changed);
+        var sql = string.Join("\n", commands);
+        Assert.Contains("'a'", sql, StringComparison.Ordinal);
+        Assert.Contains("'b'", sql, StringComparison.Ordinal);
+        Assert.Contains("'c'", sql, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ReorderValues_Without_Matching_Record_Renumbers_To_Close_Gaps()
+    {
+        var commands = new List<string>();
+        using var connection = ConnectionCapturing(new object[]
+        {
+            new { ID = "a", Order = 1 },
+            new { ID = "b", Order = 3 },
+            new { ID = "c", Order = 4 }
+        }, commands);
+
+        var changed = DisplayOrderHelper.ReorderValues(connection, "T", Fields.ID, Fields.Order,
+            recordID: -1, newDisplayOrder: 1);
+
+        Assert.True(changed);
+        var sql = string.Join("\n", commands);
+        Assert.Contains("'b'", sql, StringComparison.Ordinal);
+        Assert.Contains("'c'", sql, StringComparison.Ordinal);
+        Assert.DoesNotContain("'a'", sql, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public async Task ReorderValuesAsync_Only_Updates_Records_In_Moved_Range()
     {
         var commands = new List<string>();
@@ -211,7 +274,8 @@ public class DisplayOrderHelperTests
         }, commands);
 
         var changed = await DisplayOrderHelper.ReorderValuesAsync(connection, "T", Fields.ID, Fields.Order,
-            recordID: "d", newDisplayOrder: 2, cancellationToken: TestContext.Current.CancellationToken);
+            recordID: "d", newDisplayOrder: 2, preserveGaps: true,
+            cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.True(changed);
         var sql = string.Join("\n", commands);

@@ -49,7 +49,7 @@ public class UndeleteRequestHandler<TRow, TUndeleteRequest, TUndeleteResponse> :
             var filter = GetDisplayOrderFilter();
             DisplayOrderHelper.ReorderValues(Connection!, displayOrderRow, filter,
                 Row.GetIdField().AsObject(Row), displayOrderRow.DisplayOrderField[Row]!.Value,
-                displayOrderRow.DisplayOrderField.Flags.HasFlag(FieldFlags.Unique));
+                hasUniqueConstraint: displayOrderRow.DisplayOrderField.Flags.HasFlag(FieldFlags.Unique));
         }
 
         foreach (var behavior in behaviors.Value)

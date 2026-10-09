@@ -48,7 +48,7 @@ public class DeleteRequestHandler<TRow, TDeleteRequest, TDeleteResponse> :
         {
             var filter = GetDisplayOrderFilter();
             DisplayOrderHelper.ReorderValues(Connection, displayOrderRow, filter, -1, 1,
-                displayOrderRow.DisplayOrderField.Flags.HasFlag(FieldFlags.Unique));
+                hasUniqueConstraint: displayOrderRow.DisplayOrderField.Flags.HasFlag(FieldFlags.Unique));
         }
 
         foreach (var behavior in behaviors.Value)

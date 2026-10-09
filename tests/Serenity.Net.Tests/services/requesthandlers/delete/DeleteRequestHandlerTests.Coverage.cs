@@ -125,6 +125,25 @@ public partial class DeleteRequestHandlerTests
         }
     }
 
+    [TableName("UniqueDisplayOrderDelRows")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
+    private class UniqueDisplayOrderDelRow : Row<UniqueDisplayOrderDelRow.RowFields>, IIdRow, IDisplayOrderRow
+    {
+        [IdProperty]
+        public int? Id { get => fields.Id[this]; set => fields.Id[this] = value; }
+
+        [Unique(CheckBeforeSave = false)]
+        public int? Order { get => fields.Order[this]; set => fields.Order[this] = value; }
+
+        public Int32Field DisplayOrderField => fields.Order;
+
+        public class RowFields : RowFieldsBase
+        {
+            public Int32Field Id = null!;
+            public Int32Field Order = null!;
+        }
+    }
+
     private sealed class DeleteExceptionBehavior : IDeleteBehaviorSync, IDeleteExceptionBehavior
     {
         public bool ExceptionCalled;
@@ -329,6 +348,28 @@ public partial class DeleteRequestHandlerTests
         var response = handler.Delete(new MockUnitOfWork(connection), new DeleteRequest { EntityId = 5 });
 
         Assert.NotNull(response);
+    }
+
+    [Fact]
+    public void Delete_DisplayOrder_With_Unique_Order_Uses_Unique_Strategy()
+    {
+        var commands = new List<string>();
+        using var connection = new MockDbConnection()
+            .InterceptExecuteReader(args => args.ToMockReader(
+                new { Id = 1, Order = 1 },
+                new { Id = 2, Order = 3 },
+                new { Id = 3, Order = 4 }))
+            .InterceptExecuteNonQuery(args =>
+            {
+                commands.Add(args.CommandText);
+                return 1;
+            });
+        var handler = new DeleteRequestHandler<UniqueDisplayOrderDelRow>(CovDeleteContext());
+
+        handler.Delete(new MockUnitOfWork(connection), new DeleteRequest { EntityId = 1 });
+
+        Assert.NotEmpty(commands);
+        Assert.DoesNotContain(commands, c => c.Contains("IN (", StringComparison.OrdinalIgnoreCase));
     }
 
     [Fact]

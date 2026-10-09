@@ -111,6 +111,26 @@ public class UndeleteRequestHandlerTests_Coverage
         }
     }
 
+    [TableName("UndelUniqueOrder")]
+    [ReadPermission(SpecialPermissionKeys.Public)]
+    private class UniqueOrderRow : Row<UniqueOrderRow.RowFields>, IIdRow, IIsDeletedRow, IDisplayOrderRow
+    {
+        [IdProperty]
+        public int? Id { get => fields.Id[this]; set => fields.Id[this] = value; }
+        public bool? IsDeleted { get => fields.IsDeleted[this]; set => fields.IsDeleted[this] = value; }
+        [Unique(CheckBeforeSave = false)]
+        public int? Order { get => fields.Order[this]; set => fields.Order[this] = value; }
+        public BooleanField IsDeletedField => fields.IsDeleted;
+        public Int32Field DisplayOrderField => fields.Order;
+
+        public class RowFields : RowFieldsBase
+        {
+            public Int32Field Id = null!;
+            public BooleanField IsDeleted = null!;
+            public Int32Field Order = null!;
+        }
+    }
+
     [DeletePermission("Test.UD")]
     private class DeletePermRow : Row<DeletePermRow.RowFields>, IIdRow, IIsDeletedRow
     {
@@ -433,6 +453,31 @@ public class UndeleteRequestHandlerTests_Coverage
         var response = handler.Undelete(new MockUnitOfWork(connection), new UndeleteRequest { EntityId = 5 });
 
         Assert.False(response.WasNotDeleted);
+    }
+
+    [Fact]
+    public void Undelete_DisplayOrder_With_Unique_Order_Uses_Unique_Strategy()
+    {
+        var commands = new List<string>();
+        using var connection = new MockDbConnection()
+            .InterceptExecuteReader(args => args.ToMockReader(
+                new { Id = 2, IsDeleted = true, Order = 2 },
+                new { Id = 1, IsDeleted = false, Order = 1 },
+                new { Id = 3, IsDeleted = false, Order = 1 },
+                new { Id = 4, IsDeleted = false, Order = 2 }))
+            .InterceptExecuteNonQuery(args =>
+            {
+                commands.Add(args.CommandText);
+                return 1;
+            })
+            .InterceptManipulateRow(_ => 1);
+        var handler = new SyncHandler<UniqueOrderRow>(Context());
+
+        var response = handler.Undelete(new MockUnitOfWork(connection), new UndeleteRequest { EntityId = 2 });
+
+        Assert.False(response.WasNotDeleted);
+        Assert.NotEmpty(commands);
+        Assert.DoesNotContain(commands, c => c.Contains("IN (", StringComparison.OrdinalIgnoreCase));
     }
 
     [Fact]
