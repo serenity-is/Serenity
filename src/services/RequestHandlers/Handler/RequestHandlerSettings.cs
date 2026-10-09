@@ -31,11 +31,12 @@ public class RequestHandlerSettings : IOptions<RequestHandlerSettings>
     /// <see cref="RequestHandlerExtensions.SuppressPagingLimits{TRequest}"/> to ignore the
     /// limits. Do not enable this without auditing existing List usages. Also, grids that do
     /// not render a pager (e.g. <c>usePager() =&gt; false</c>) will be truncated with no way to
-    /// reach the remaining rows, so avoid low values. Enabling this (or <see cref="MaxPageSize"/>)
-    /// also makes the effective take non-zero for every request, which — with the default
-    /// <see cref="ListRequest.ExcludeTotalCount"/> of false — adds a COUNT(*) to every list
-    /// request, including internal ones. Callers that don't need the total should set
-    /// <see cref="ListRequest.ExcludeTotalCount"/> to true, or call
+    /// reach the remaining rows, so avoid low values. A take of zero that this setting (or
+    /// <see cref="MaxPageSize"/>) turns into an actual page size still returns the total
+    /// (a <c>COUNT(*)</c>) even when <see cref="ExcludeTotalCountByDefault"/> is enabled,
+    /// because the caller did not ask to page. Callers that don't need the total should set
+    /// <see cref="ListRequest.ExcludeTotalCount"/> to true, request
+    /// <see cref="ListRequest.IncludeMore"/> (which returns a More indicator instead), or call
     /// <see cref="RequestHandlerExtensions.SuppressPagingLimits{TRequest}"/> (which also
     /// restores take to zero).
     /// </remarks>
@@ -49,12 +50,34 @@ public class RequestHandlerSettings : IOptions<RequestHandlerSettings>
     /// </summary>
     /// <remarks>
     /// WARNING: This has the same risks as <see cref="DefaultPageSize"/> (truncation of server
-    /// side enumerations and grids without a pager, and an added COUNT(*) on every list
-    /// request). Server side callers that need all rows must call
+    /// side enumerations and grids without a pager, and an added total count whenever the take
+    /// becomes non-zero, even when <see cref="ExcludeTotalCountByDefault"/> is enabled). Server
+    /// side callers that need all rows must call
     /// <see cref="RequestHandlerExtensions.SuppressPagingLimits{TRequest}"/>. Do not enable
     /// this without auditing existing List usages, and avoid low values.
     /// </remarks>
     public int MaxPageSize { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether the total record count is excluded by default for list requests
+    /// that do not explicitly specify <see cref="ListRequest.ExcludeTotalCount"/> (i.e. it is
+    /// <c>null</c> / not sent). Default is false, which preserves the historical behavior of
+    /// calculating the total (and issuing a <c>COUNT(*)</c>) for paged requests. When a request
+    /// has a zero take that <see cref="DefaultPageSize"/> / <see cref="MaxPageSize"/> turns into
+    /// an actual page size, the total is still returned as if <see cref="ListRequest.ExcludeTotalCount"/>
+    /// was false, unless <see cref="ListRequest.IncludeMore"/> was requested (a More indicator
+    /// is returned instead).
+    /// </summary>
+    /// <remarks>
+    /// WARNING: Enabling this changes the default behavior of every List request that does not
+    /// explicitly send <see cref="ListRequest.ExcludeTotalCount"/>, including grid requests that
+    /// rely on <see cref="ListResponse{T}.TotalCount"/> for their pager. Such grids will report
+    /// a zero total until they explicitly send <c>ExcludeTotalCount = false</c>. Audit existing
+    /// usages before enabling. Requests that explicitly send <c>ExcludeTotalCount = false</c> are
+    /// unaffected, which is why the request property is nullable. Also note that requests with
+    /// <see cref="ListRequest.IncludeMore"/> already skip the count.
+    /// </remarks>
+    public bool ExcludeTotalCountByDefault { get; set; }
 
     /// <summary>
     /// Gets this instance.
@@ -75,31 +98,5 @@ public class RequestHandlerSettings : IOptions<RequestHandlerSettings>
         var clone = (RequestHandlerSettings)MemberwiseClone();
         configure(clone);
         return clone;
-    }
-
-    /// <summary>
-    /// Applies these settings to a requested skip / take pair. A zero take is replaced by
-    /// <see cref="DefaultPageSize"/>, then clamped to <see cref="MaxPageSize"/> when set.
-    /// Paging limits are bypassed when <paramref name="suppressPagingLimits"/> is true.
-    /// This method does not validate negative values; callers should validate them according
-    /// to their own request contract before calling it.
-    /// </summary>
-    /// <param name="skip">Requested number of records to skip.</param>
-    /// <param name="take">Requested number of records to take.</param>
-    /// <param name="suppressPagingLimits">True to bypass configured paging limits.</param>
-    /// <returns>The effective skip / take values.</returns>
-    public (int Skip, int Take) GetEffectiveSkipTake(
-        int skip, int take, bool suppressPagingLimits = false)
-    {
-        if (suppressPagingLimits)
-            return (skip, take);
-
-        if (take == 0)
-            take = DefaultPageSize;
-
-        if (MaxPageSize > 0 && (take == 0 || take > MaxPageSize))
-            take = MaxPageSize;
-
-        return (skip, take);
     }
 }

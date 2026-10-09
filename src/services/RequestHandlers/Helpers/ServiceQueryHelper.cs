@@ -105,28 +105,73 @@ public static class ServiceQueryHelper
 
     /// <summary>
     /// Applies paging and count parameters, optionally requesting one additional row to detect
-    /// whether more results are available.
+    /// whether more results are available. Whether the total count is calculated is resolved
+    /// from <see cref="ListRequestPagingParams"/> (see
+    /// <see cref="ListRequestPagingParams.ShouldExcludeTotalCount"/>).
     /// </summary>
     /// <param name="query">Query</param>
-    /// <param name="skip">Skip parameter</param>
-    /// <param name="take">Take parameter</param>
-    /// <param name="excludeTotalCount">ExcludeTotalCount flag</param>
-    /// <param name="includeMore">Whether the response should include a More indicator.</param>
+    /// <param name="paging">Paging parameters.</param>
     /// <param name="pagingState">Receives the selected paging strategy.</param>
     /// <returns>The query.</returns>
-    public static SqlQuery ApplySkipTakeAndCount(this SqlQuery query, int skip, int take,
-        bool excludeTotalCount, bool includeMore, out ListRequestPagingState pagingState)
+    /// <exception cref="ArgumentNullException"><paramref name="query"/> or <paramref name="paging"/> is null.</exception>
+    public static SqlQuery ApplyPagingParams(this SqlQuery query, ListRequestPagingParams paging,
+        out ListRequestPagingState pagingState)
     {
+        ArgumentNullException.ThrowIfNull(query);
+        ArgumentNullException.ThrowIfNull(paging);
+
+        var excludeTotalCount = paging.ShouldExcludeTotalCount;
+        var take = paging.Take;
+
         var countAvailable = query.CountRecords || (!excludeTotalCount && take > 0);
-        var usesSentinel = includeMore && !countAvailable && take > 0 && take < int.MaxValue;
+        var usesSentinel = paging.IncludeMore && !countAvailable && take > 0 && take < int.MaxValue;
         var queryTake = usesSentinel ? take + 1 : take;
 
-        query.Skip(skip).Take(queryTake);
+        query.Skip(paging.Skip).Take(queryTake);
         if (!excludeTotalCount && query.Take() > 0)
             query.CountRecords = true;
 
-        pagingState = new ListRequestPagingState(take, query.Take(), includeMore, usesSentinel);
+        pagingState = new ListRequestPagingState(paging, query.Take(), usesSentinel);
         return query;
+    }
+
+    /// <summary>
+    /// Applies the configured paging limits (<see cref="RequestHandlerSettings.DefaultPageSize"/>
+    /// and <see cref="RequestHandlerSettings.MaxPageSize"/>) to
+    /// <see cref="ListRequestPagingParams.Take"/>, changing it in place. A zero take is replaced
+    /// by the default page size, then clamped to the maximum page size when set.
+    /// </summary>
+    /// <param name="paging">Paging parameters (required).</param>
+    /// <param name="settings">Handler settings that provide the limits (required).</param>
+    /// <param name="suppressed">True to bypass the configured limits.</param>
+    /// <returns>The same paging parameters, for chaining.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="paging"/> or <paramref name="settings"/> is null.</exception>
+    public static ListRequestPagingParams ApplyPagingLimits(this ListRequestPagingParams paging,
+        RequestHandlerSettings settings, bool suppressed = false)
+    {
+        ArgumentNullException.ThrowIfNull(paging);
+        ArgumentNullException.ThrowIfNull(settings);
+
+        if (suppressed)
+            return paging;
+
+        var originalTake = paging.Take;
+
+        if (paging.Take == 0)
+            paging.Take = settings.DefaultPageSize;
+
+        if (settings.MaxPageSize > 0 &&
+            (paging.Take == 0 || paging.Take > settings.MaxPageSize))
+            paging.Take = settings.MaxPageSize;
+
+        // a take of zero (unpaged) that the limits turned into an actual page size should
+        // still return the total, so assume ExcludeTotalCount = false when it was unspecified,
+        // unless a More indicator was requested (the caller then expects More, not the total)
+        if (originalTake == 0 && paging.Take > 0 &&
+            paging.ExcludeTotalCount is null && !paging.IncludeMore)
+            paging.ExcludeTotalCount = false;
+
+        return paging;
     }
 
     /// <summary>

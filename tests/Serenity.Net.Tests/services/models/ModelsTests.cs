@@ -85,7 +85,7 @@ public class ModelsTests
         Assert.Equal("field", request.ContainsField);
         Assert.NotNull(request.Criteria);
         Assert.True(request.IncludeDeleted);
-        Assert.True(request.ExcludeTotalCount);
+        Assert.True(request.ExcludeTotalCount == true);
         Assert.Equal(1, request.EqualityFilter["a"]);
         Assert.Equal(ColumnSelection.Details, request.ColumnSelection);
         Assert.Contains("A", request.IncludeColumns);
@@ -93,6 +93,21 @@ public class ModelsTests
         Assert.Single(request.DistinctFields);
         Assert.Contains("C", request.ExportColumns);
         Assert.Equal("en", request.Localize);
+    }
+
+    [Fact]
+    public void ListRequest_ExcludeTotalCount_Binding_IsNullable()
+    {
+        Assert.Null(new ListRequest().ExcludeTotalCount);
+
+        Assert.Null(System.Text.Json.JsonSerializer.Deserialize<ListRequest>("{}")!.ExcludeTotalCount);
+        Assert.Null(System.Text.Json.JsonSerializer.Deserialize<ListRequest>("{\"ExcludeTotalCount\":null}")!.ExcludeTotalCount);
+        Assert.False(System.Text.Json.JsonSerializer.Deserialize<ListRequest>("{\"ExcludeTotalCount\":false}")!.ExcludeTotalCount);
+        Assert.True(System.Text.Json.JsonSerializer.Deserialize<ListRequest>("{\"ExcludeTotalCount\":true}")!.ExcludeTotalCount);
+
+        Assert.Null(Newtonsoft.Json.JsonConvert.DeserializeObject<ListRequest>("{}")!.ExcludeTotalCount);
+        Assert.False(Newtonsoft.Json.JsonConvert.DeserializeObject<ListRequest>("{\"ExcludeTotalCount\":false}")!.ExcludeTotalCount);
+        Assert.True(Newtonsoft.Json.JsonConvert.DeserializeObject<ListRequest>("{\"ExcludeTotalCount\":true}")!.ExcludeTotalCount);
     }
 
     [Fact]

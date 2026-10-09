@@ -1702,6 +1702,62 @@ describe("RemoteView", () => {
             const callOptions = mockServiceCall.mock.calls[0][0];
             expect(callOptions.request.additionalFilter).toBe("test");
         });
+
+        it("sets ExcludeTotalCount to false for paged requests", () => {
+            const paged = new RemoteView<any>({
+                idField: "id",
+                url: "/api/test",
+                rowsPerPage: 10
+            });
+
+            const mockServiceCall = vi.fn();
+            vi.mocked(serviceCall).mockImplementation(mockServiceCall);
+
+            paged.populate();
+            const callOptions = mockServiceCall.mock.calls[0][0];
+            expect(callOptions.request.ExcludeTotalCount).toBe(false);
+        });
+
+        it("does not set ExcludeTotalCount when not paged", () => {
+            const mockServiceCall = vi.fn();
+            vi.mocked(serviceCall).mockImplementation(mockServiceCall);
+
+            view.populate();
+            const callOptions = mockServiceCall.mock.calls[0][0];
+            expect(callOptions.request.ExcludeTotalCount).toBeUndefined();
+        });
+
+        it("does not override ExcludeTotalCount from params", () => {
+            const paged = new RemoteView<any>({
+                idField: "id",
+                url: "/api/test",
+                rowsPerPage: 10
+            });
+            paged.params = { ExcludeTotalCount: true };
+
+            const mockServiceCall = vi.fn();
+            vi.mocked(serviceCall).mockImplementation(mockServiceCall);
+
+            paged.populate();
+            const callOptions = mockServiceCall.mock.calls[0][0];
+            expect(callOptions.request.ExcludeTotalCount).toBe(true);
+        });
+
+        it("does not set ExcludeTotalCount when IncludeMore is requested", () => {
+            const paged = new RemoteView<any>({
+                idField: "id",
+                url: "/api/test",
+                rowsPerPage: 10
+            });
+            paged.params = { IncludeMore: true };
+
+            const mockServiceCall = vi.fn();
+            vi.mocked(serviceCall).mockImplementation(mockServiceCall);
+
+            paged.populate();
+            const callOptions = mockServiceCall.mock.calls[0][0];
+            expect(callOptions.request.ExcludeTotalCount).toBeUndefined();
+        });
     });
 
     describe("syncGridCellCssStyles coverage", () => {

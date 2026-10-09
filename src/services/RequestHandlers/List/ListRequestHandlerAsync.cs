@@ -179,10 +179,7 @@ public class ListRequestHandlerAsync<TRow, TListRequest, TListResponse> :
         if (DistinctFields == null)
             ApplyKeyOrder(query);
 
-        var (skip, take) = GetEffectiveSkipTake(request.Skip, request.Take, request.IsPagingLimitsSuppressed());
-        query.ApplySkipTakeAndCount(skip, take,
-            request.ExcludeTotalCount || DistinctFields != null, request.IncludeMore,
-            out var pagingState);
+        query.ApplyPagingParams(GetPagingParams(), out var pagingState);
 
         ApplyContainsText(query, request.ContainsText);
 

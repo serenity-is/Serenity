@@ -59,7 +59,7 @@ public static class ServiceHelper
     }
 
     /// <summary>
-    /// Sets paging metadata using the state returned by <see cref="ServiceQueryHelper.ApplySkipTakeAndCount(SqlQuery, int, int, bool, bool, out ListRequestPagingState)"/>.
+    /// Sets paging metadata using the state returned by <see cref="ServiceQueryHelper.ApplyPagingParams(SqlQuery, ListRequestPagingParams, out ListRequestPagingState)"/>.
     /// </summary>
     /// <typeparam name="T">Type of the response entities</typeparam>
     /// <param name="response">Response object</param>
@@ -69,10 +69,12 @@ public static class ServiceHelper
     public static void SetSkipTakeTotal<T>(this ListResponse<T> response, SqlQuery query,
         ListRequestPagingState pagingState, int? distinctFieldCount = null)
     {
+        var requestedTake = pagingState.Params.Take;
+        var includeMore = pagingState.Params.IncludeMore;
         var queryTake = query.Take();
         var hasSentinel = pagingState.UsesSentinel && queryTake == pagingState.AppliedTake;
         response.Skip = query.Skip();
-        response.Take = hasSentinel ? pagingState.RequestedTake : queryTake;
+        response.Take = hasSentinel ? requestedTake : queryTake;
 
         int? resultCount;
         if (distinctFieldCount is int fieldCount)
@@ -84,24 +86,24 @@ public static class ServiceHelper
             resultCount = response.Entities.Count;
 
         if (hasSentinel && resultCount is int sentinelResultCount &&
-            sentinelResultCount > pagingState.RequestedTake)
+            sentinelResultCount > requestedTake)
         {
-            var extraCount = sentinelResultCount - pagingState.RequestedTake;
+            var extraCount = sentinelResultCount - requestedTake;
             if (distinctFieldCount is int tupleWidth)
-                response.Values!.RemoveRange(pagingState.RequestedTake * tupleWidth,
+                response.Values!.RemoveRange(requestedTake * tupleWidth,
                     extraCount * tupleWidth);
             else
-                response.Entities.RemoveRange(pagingState.RequestedTake, extraCount);
+                response.Entities.RemoveRange(requestedTake, extraCount);
         }
 
-        if (pagingState.IncludeMore)
+        if (includeMore)
         {
             if (queryTake == 0)
                 response.More = resultCount is not null ? false : null;
             else if (query.CountRecords)
                 response.More = response.TotalCount > (long)response.Skip + response.Take;
             else if (hasSentinel && resultCount is int count)
-                response.More = count > pagingState.RequestedTake;
+                response.More = count > requestedTake;
             else
                 response.More = null;
         }

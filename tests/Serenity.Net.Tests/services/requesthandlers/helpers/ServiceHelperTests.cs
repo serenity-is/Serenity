@@ -55,7 +55,13 @@ public class ServiceHelperTests
             Entities = { new(), new(), new() }
         };
         var query = new SqlQuery();
-        query.ApplySkipTakeAndCount(2, 2, true, true, out var pagingState);
+        query.ApplyPagingParams(new()
+        {
+            Skip = 2,
+            Take = 2,
+            ExcludeTotalCount = true,
+            IncludeMore = true
+        }, out var pagingState);
 
         response.SetSkipTakeTotal(query, pagingState);
 
@@ -73,7 +79,13 @@ public class ServiceHelperTests
             Values = new() { "a", 1, "b", 2, "c", 3 }
         };
         var query = new SqlQuery();
-        query.ApplySkipTakeAndCount(1, 2, true, true, out var pagingState);
+        query.ApplyPagingParams(new()
+        {
+            Skip = 1,
+            Take = 2,
+            ExcludeTotalCount = true,
+            IncludeMore = true
+        }, out var pagingState);
 
         response.SetSkipTakeTotal(query, pagingState, distinctFieldCount: 2);
 
@@ -92,7 +104,13 @@ public class ServiceHelperTests
             Values = new() { "a", 1, "b", 2 }
         };
         var query = new SqlQuery();
-        query.ApplySkipTakeAndCount(2, 0, true, true, out var pagingState);
+        query.ApplyPagingParams(new()
+        {
+            Skip = 2,
+            Take = 0,
+            ExcludeTotalCount = true,
+            IncludeMore = true
+        }, out var pagingState);
 
         response.SetSkipTakeTotal(query, pagingState, distinctFieldCount: 2);
 
@@ -110,7 +128,13 @@ public class ServiceHelperTests
             Entities = { new(), new(), new() }
         };
         var query = new SqlQuery();
-        query.ApplySkipTakeAndCount(2, 3, false, true, out var pagingState);
+        query.ApplyPagingParams(new()
+        {
+            Skip = 2,
+            Take = 3,
+            ExcludeTotalCount = false,
+            IncludeMore = true
+        }, out var pagingState);
 
         response.SetSkipTakeTotal(query, pagingState);
 
@@ -127,7 +151,13 @@ public class ServiceHelperTests
             Entities = { new(), new(), new() }
         };
         var query = new SqlQuery();
-        query.ApplySkipTakeAndCount(1, 2, true, true, out var pagingState);
+        query.ApplyPagingParams(new()
+        {
+            Skip = 1,
+            Take = 2,
+            ExcludeTotalCount = true,
+            IncludeMore = true
+        }, out var pagingState);
         query.Skip(4).Take(5);
 
         response.SetSkipTakeTotal(query, pagingState);

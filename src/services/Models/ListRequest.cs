@@ -69,13 +69,16 @@ public class ListRequest : ServiceRequest, IIncludeExcludeColumns
     public bool IncludeDeleted { get; set; }
 
     /// <summary>
-    /// Exclude the total count from the result. Set this to true
-    /// if you don't need the total number of records when Skip / Take
-    /// parameters are passed. Otherwise, a second query will be
-    /// required to get number of total records.
+    /// Exclude the total count from the result. When <c>true</c>, the total number of records
+    /// is not calculated (no extra <c>COUNT(*)</c>) and <see cref="ListResponse{T}.TotalCount"/>
+    /// is left as zero. When <c>false</c>, the total is calculated for paged requests (when
+    /// <see cref="Take"/> is greater than zero). When <c>null</c> (the default, i.e. not sent),
+    /// the total is calculated for paged requests unless <see cref="IncludeMore"/> is true or
+    /// the handler's <c>RequestHandlerSettings.ExcludeTotalCountByDefault</c> is enabled. A
+    /// zero <see cref="Take"/> that paging limits turn into an actual page size still returns
+    /// the total, regardless of that setting, unless <see cref="IncludeMore"/> is requested.
     /// </summary>
-    [JsonConverter(typeof(JsonConverters.NullAsDefaultJsonConverter))]
-    public bool ExcludeTotalCount { get; set; }
+    public bool? ExcludeTotalCount { get; set; }
 
     /// <summary>
     /// A dictionary of field name / value pairs used to 

@@ -155,10 +155,16 @@ public class ServiceQueryHelperTests
     }
 
     [Fact]
-    public void ApplySkipTakeAndCount_IncludesExtraRecordWhenRequested()
+    public void ApplyPagingParams_IncludesExtraRecordWhenRequested()
     {
         var query = new SqlQuery().Select("Name", "Name");
-        query.ApplySkipTakeAndCount(5, 10, true, true, out var pagingState);
+        query.ApplyPagingParams(new()
+        {
+            Skip = 5,
+            Take = 10,
+            ExcludeTotalCount = true,
+            IncludeMore = true
+        }, out var pagingState);
 
         Assert.Equal(5, query.Skip());
         Assert.Equal(11, query.Take());
@@ -167,14 +173,63 @@ public class ServiceQueryHelperTests
     }
 
     [Fact]
-    public void ApplySkipTakeAndCount_UsesCountInsteadOfSentinelWhenAvailable()
+    public void ApplyPagingParams_UsesCountInsteadOfSentinelWhenAvailable()
     {
         var query = new SqlQuery().Select("Name", "Name");
-        query.ApplySkipTakeAndCount(5, 10, false, true, out var pagingState);
+        query.ApplyPagingParams(new()
+        {
+            Skip = 5,
+            Take = 10,
+            ExcludeTotalCount = false,
+            IncludeMore = true
+        }, out var pagingState);
 
         Assert.Equal(10, query.Take());
         Assert.True(query.CountRecords);
         Assert.False(pagingState.UsesSentinel);
+    }
+
+    [Fact]
+    public void ApplyPagingParams_IncludeMore_Without_Explicit_Count_Uses_Sentinel()
+    {
+        var query = new SqlQuery().Select("Name", "Name");
+        query.ApplyPagingParams(new()
+        {
+            Skip = 5,
+            Take = 10,
+            ExcludeTotalCount = null,
+            IncludeMore = true
+        }, out var pagingState);
+
+        Assert.Equal(11, query.Take());
+        Assert.False(query.CountRecords);
+        Assert.True(pagingState.UsesSentinel);
+    }
+
+    [Fact]
+    public void ApplyPagingParams_Excludes_By_Default_When_Unspecified()
+    {
+        var query = new SqlQuery().Select("Name", "Name");
+        query.ApplyPagingParams(new()
+        {
+            Skip = 5,
+            Take = 10,
+            ExcludeTotalCountByDefault = true
+        }, out _);
+
+        Assert.Equal(10, query.Take());
+        Assert.False(query.CountRecords);
+    }
+
+    [Fact]
+    public void ApplyPagingParams_Throws_For_Null_Arguments()
+    {
+        SqlQuery? query = null;
+        Assert.Throws<ArgumentNullException>(() =>
+            query.ApplyPagingParams(new() { Skip = 0, Take = 10 }, out _));
+
+        Assert.Throws<ArgumentNullException>(() =>
+            new SqlQuery().ApplyPagingParams(null, out _));
     }
 
     [Fact]
@@ -193,6 +248,30 @@ public class ServiceQueryHelperTests
         query.ApplySkipTakeAndCount(0, 10, true);
 
         Assert.False(query.CountRecords);
+    }
+
+    [Theory]
+    [InlineData(true, false, false, true)]
+    [InlineData(true, true, false, true)]
+    [InlineData(false, false, false, false)]
+    [InlineData(false, true, false, false)]
+    [InlineData(null, false, false, false)]
+    [InlineData(null, true, false, true)]
+    [InlineData(null, false, true, true)]
+    [InlineData(null, true, true, true)]
+    public void ListRequestPagingParams_Resolves_Precedence(bool? excludeTotalCount,
+        bool includeMore, bool excludeByDefault, bool expected)
+    {
+        var paging = new ListRequestPagingParams
+        {
+            Skip = 0,
+            Take = 10,
+            ExcludeTotalCount = excludeTotalCount,
+            IncludeMore = includeMore,
+            ExcludeTotalCountByDefault = excludeByDefault
+        };
+
+        Assert.Equal(expected, paging.ShouldExcludeTotalCount);
     }
 
     [Fact]

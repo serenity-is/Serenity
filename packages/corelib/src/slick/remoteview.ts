@@ -1411,6 +1411,11 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
             request = Object.assign(request, this.params);
         }
 
+        // paged requests need the total count, so declare it explicitly instead of
+        // relying on the server default (RequestHandlerSettings.ExcludeTotalCountByDefault)
+        if (!("ExcludeTotalCount" in request) && request.Take && !request.IncludeMore)
+            request.ExcludeTotalCount = false;
+
         const controller = new AbortController();
 
         const self = this;

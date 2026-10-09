@@ -683,26 +683,37 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(
     public RequestHandlerSettings HandlerSettings => GetHandlerSettings();
 
     /// <summary>
-    /// Validates the requested skip / take and applies <see cref="RequestHandlerSettings"/>
-    /// (default and maximum page size). Negative values are rejected as a validation error,
-    /// while larger values are clamped to <see cref="RequestHandlerSettings.MaxPageSize"/> so that
-    /// the response can report the applied take. Paging limits are skipped when
-    /// <paramref name="suppressPagingLimits"/> is true (see <see cref="RequestHandlerExtensions.SuppressPagingLimits{TRequest}"/>).
+    /// Validates the request paging values and builds the effective
+    /// <see cref="ListRequestPagingParams"/> for the current request. Negative skip / take
+    /// values are rejected as a validation error, while larger values are clamped to
+    /// <see cref="RequestHandlerSettings.MaxPageSize"/> so that the response can report the
+    /// applied take. Paging limits are skipped when the request suppresses them (see
+    /// <see cref="RequestHandlerExtensions.SuppressPagingLimits{TRequest}"/>). The returned
+    /// params also carry <see cref="ListRequest.ExcludeTotalCount"/>, <see cref="ListRequest.IncludeMore"/>
+    /// and <see cref="RequestHandlerSettings.ExcludeTotalCountByDefault"/>, forcing
+    /// <see cref="ListRequest.ExcludeTotalCount"/> when the query has distinct fields.
     /// </summary>
-    /// <param name="skip">Requested skip value.</param>
-    /// <param name="take">Requested take value.</param>
-    /// <param name="suppressPagingLimits">True to ignore paging limits.</param>
-    /// <returns>The effective skip / take values.</returns>
+    /// <returns>The effective paging parameters.</returns>
     /// <exception cref="ValidationError">Skip or take is negative.</exception>
-    protected virtual (int Skip, int Take) GetEffectiveSkipTake(int skip, int take, bool suppressPagingLimits = false)
+    protected virtual ListRequestPagingParams GetPagingParams()
     {
+        var skip = Request.Skip;
+        var take = Request.Take;
+
         if (skip < 0)
             throw DataValidation.ArgumentOutOfRange(nameof(ListRequest.Skip), Localizer);
 
         if (take < 0)
             throw DataValidation.ArgumentOutOfRange(nameof(ListRequest.Take), Localizer);
 
-        return HandlerSettings.GetEffectiveSkipTake(skip, take, suppressPagingLimits);
+        return new ListRequestPagingParams
+        {
+            Skip = skip,
+            Take = take,
+            ExcludeTotalCount = DistinctFields != null ? true : Request.ExcludeTotalCount,
+            IncludeMore = Request.IncludeMore,
+            ExcludeTotalCountByDefault = HandlerSettings.ExcludeTotalCountByDefault
+        }.ApplyPagingLimits(HandlerSettings, Request.IsPagingLimitsSuppressed());
     }
 
     /// <summary>

@@ -107,6 +107,49 @@ public class RequestHandlerSettingsTests
         Assert.Equal(7, response.Take);
     }
 
+    [Theory]
+    [InlineData(0, 0, false, false)]
+    [InlineData(0, 0, true, false)]
+    [InlineData(0, 20, false, true)]
+    [InlineData(0, 20, true, true)]
+    [InlineData(25, 0, false, true)]
+    [InlineData(25, 0, true, false)]
+    [InlineData(25, 20, true, false)]
+    public void ExcludeTotalCountByDefault_And_PagingLimits_Interaction(
+        int take, int defaultPageSize, bool excludeByDefault, bool expectCount)
+    {
+        using var conn = Connection();
+        var settings = new RequestHandlerSettings
+        {
+            DefaultPageSize = defaultPageSize,
+            ExcludeTotalCountByDefault = excludeByDefault
+        };
+
+        var response = new ListRequestHandler<ListRow>(Context(settings)).List(conn,
+            new ListRequest { Take = take });
+
+        Assert.Equal(take == 0 ? defaultPageSize : take, response.Take);
+
+        var commandText = conn.ExecuteReaderCalls.Single().CommandText;
+        Assert.Equal(expectCount, commandText.Contains("count(*)", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public void IncludeMore_Is_Not_Overridden_When_PagingLimits_Apply_Take()
+    {
+        using var conn = Connection();
+        var settings = new RequestHandlerSettings { DefaultPageSize = 20 };
+
+        var response = new ListRequestHandler<ListRow>(Context(settings)).List(conn,
+            new ListRequest { IncludeMore = true });
+
+        Assert.Equal(20, response.Take);
+        Assert.False(response.More);
+
+        var commandText = conn.ExecuteReaderCalls.Single().CommandText;
+        Assert.DoesNotContain("count(*)", commandText, StringComparison.OrdinalIgnoreCase);
+    }
+
     [Fact]
     public void Defaults_Are_Unlimited()
     {
@@ -177,6 +220,28 @@ public class RequestHandlerSettingsTests
             .GetRequiredService<IOptions<RequestHandlerSettings>>().Value;
 
         Assert.Equal(10, settings.MaxPageSize);
+    }
+
+    [Fact]
+    public void ExcludeTotalCountByDefault_Defaults_To_False()
+    {
+        Assert.False(RequestHandlerSettings.Default.ExcludeTotalCountByDefault);
+        Assert.False(new RequestHandlerSettings().ExcludeTotalCountByDefault);
+    }
+
+    [Fact]
+    public void Binds_ExcludeTotalCountByDefault_From_Configuration()
+    {
+        var config = new ConfigurationBuilder()
+            .AddInMemoryCollection([new KeyValuePair<string, string?>("RequestHandlerSettings:ExcludeTotalCountByDefault", "true")])
+            .Build();
+
+        var services = new ServiceCollection();
+        services.ConfigureSection<RequestHandlerSettings>(config);
+        var settings = services.BuildServiceProvider()
+            .GetRequiredService<IOptions<RequestHandlerSettings>>().Value;
+
+        Assert.True(settings.ExcludeTotalCountByDefault);
     }
 
     [Fact]
