@@ -93,7 +93,7 @@ Assert-ExitCode
 
 # build_vsix_package
 Write-Host '*** BUILDING VSIX PACKAGE ***'
-& $msbuild (Join-Path $root 'vsix\Serene.VSIX.slnx') -verbosity:m
+& $msbuild (Join-Path $root 'vsix\Serene.VSIX.slnx') -verbosity:m /p:EnableProjectDataOnBuild=false
 Assert-ExitCode
 
 # install_template
