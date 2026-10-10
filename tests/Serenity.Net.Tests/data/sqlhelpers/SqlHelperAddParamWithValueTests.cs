@@ -197,13 +197,13 @@ public class SqlHelperAddParamWithValueTests
     [Fact]
     public void AddParamWithValue_DateOnly_FreshParameter_UsesDapperObjectMapping()
     {
-        // Dapper maps DateOnly to DbType.Object, so a fresh parameter gets Object
         using var connection = new MockDbConnection();
         using var command = connection.CreateCommand();
 
         var param = command.AddParamWithValue("@p1", new DateOnly(2024, 1, 15), SqlServer2012Dialect.Instance);
 
-        Assert.Equal(DbType.Object, param.DbType);
+        // Dapper maps DateOnly to DbType.Object, so a fresh parameter gets AnsiString, before 2.1.86 it was DbType.Object
+        Assert.Equal(DbType.AnsiString, param.DbType);
     }
 
     [Fact]

@@ -7,6 +7,9 @@ public partial class SchemaProviderIntegrationTests_MySql
     [Fact]
     public void MySqlSchemaProvider_Reads_Columns_Keys_ForeignKeys_And_Views()
     {
+        if (SqlIntegrationConnections.ShouldSkip("MySql"))
+            return;
+
         var database = "serenity_schema_it_" + Guid.NewGuid().ToString("N");
         var parentTable = "parent_" + Guid.NewGuid().ToString("N");
         var childTable = "child_" + Guid.NewGuid().ToString("N");

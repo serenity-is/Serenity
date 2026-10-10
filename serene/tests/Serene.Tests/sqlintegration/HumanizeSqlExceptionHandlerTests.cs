@@ -46,6 +46,9 @@ public class HumanizeSqlExceptionHandlerTests
     [Fact]
     public void Save_Duplicate_Code_Humanizes_Db_Unique_Violation()
     {
+        if (SqlIntegrationConnections.ShouldSkip("Sqlite"))
+            return;
+
         using var actual = OpenSqlite();
         using var connection = new WrappedConnection(actual, SqliteDialect.Instance);
         var context = CreateContext();

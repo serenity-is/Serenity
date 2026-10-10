@@ -6,6 +6,9 @@ public partial class SchemaProviderIntegrationTests_SqlServer
     [Fact]
     public void SqlServerSchemaProvider_Reads_Tables_Keys_ForeignKeys_And_Views()
     {
+        if (SqlIntegrationConnections.ShouldSkip("SqlServer"))
+            return;
+
         var database = "SerenitySchemaIT_" + Guid.NewGuid().ToString("N");
         var quotedDatabase = "[" + database + "]";
         var parentTable = "Parent_" + Guid.NewGuid().ToString("N");

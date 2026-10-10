@@ -7,6 +7,9 @@ public partial class SchemaProviderIntegrationTests_Oracle
     [Fact]
     public void OracleSchemaProvider_Reads_Columns_Identity_Keys_ForeignKeys_And_Views()
     {
+        if (SqlIntegrationConnections.ShouldSkip("Oracle"))
+            return;
+
         var suffix = Guid.NewGuid().ToString("N")[..8].ToUpperInvariant();
         var parentTable = "SIT_P_" + suffix;
         var childTable = "SIT_C_" + suffix;

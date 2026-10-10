@@ -142,4 +142,25 @@ internal static class SqlIntegrationConnections
 
     private static string? GetEnvironment(string name)
         => Environment.GetEnvironmentVariable(name)?.Trim() is { Length: > 0 } value ? value : null;
+
+    public static bool ShouldSkip(string provider)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(provider);
+        if (provider == "Sqlite")
+            return false;
+
+        var prefix = "SQLINTEGRATIONTEST_" + provider.ToUpperInvariant();
+        var connectionString = GetEnvironment(prefix + "_CONNECTION");
+        if (connectionString is null)
+        {
+            var password = GetEnvironment(prefix + "_PASSWORD") ?? GetEnvironment("SQLINTEGRATIONTEST_PASSWORD");
+            if (string.IsNullOrEmpty(password))
+            {
+                Console.WriteLine($"Skipping {provider} integration test because {prefix}_CONNECTION / {prefix}_PASSWORD / SQLINTEGRATIONTEST_PASSWORD is not set.");
+                return true;
+            }
+        }
+
+        return false;
+    }        
 }

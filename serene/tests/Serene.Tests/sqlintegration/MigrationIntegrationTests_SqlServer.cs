@@ -8,6 +8,9 @@ public sealed partial class MigrationIntegrationTests : IDisposable
     [Fact]
     public async Task SqlServer_Migrations_And_Service_Calls_Succeed()
     {
+        if (SqlIntegrationConnections.ShouldSkip("SqlServer"))
+            return;
+
         DbProviderFactories.RegisterFactory("Microsoft.Data.SqlClient", SqlClientFactory.Instance);
         using var serverConnection = SqlIntegrationConnections.CreateConnection("SqlServer");
 
@@ -21,7 +24,7 @@ public sealed partial class MigrationIntegrationTests : IDisposable
             SqlIntegrationConnections.ExecuteSql(serverConnection,
                 $"IF DB_ID(N'{northwindDatabase}') IS NOT NULL BEGIN ALTER DATABASE [{northwindDatabase}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE; DROP DATABASE [{northwindDatabase}]; END;");
         };
-        
+
         var defaultConnectionString = WithSqlServerDatabase(serverConnection.ConnectionString, defaultDatabase);
         var northwindConnectionString = WithSqlServerDatabase(serverConnection.ConnectionString, northwindDatabase);
 

@@ -8,6 +8,9 @@ public sealed partial class MigrationIntegrationTests : IDisposable
     [Fact]
     public async Task MySql_Migrations_And_Service_Calls_Succeed()
     {
+        if (SqlIntegrationConnections.ShouldSkip("MySql"))
+            return;
+
         DbProviderFactories.RegisterFactory("MySqlConnector", MySqlConnectorFactory.Instance);
 
         using var serverConnection = SqlIntegrationConnections.CreateConnection("MySql");

@@ -103,6 +103,9 @@ public abstract class SqlErrorIntegrationTests_Base
     [Fact]
     public void UniqueConstraint_Is_Recognized()
     {
+        if (SqlIntegrationConnections.ShouldSkip(Provider))
+            return;
+
         var info = RunScenario(
             connection => Execute(connection, InsertParent(1, "CODE_A", "value")),
             InsertParent(2, "CODE_A", "value"));
@@ -116,6 +119,9 @@ public abstract class SqlErrorIntegrationTests_Base
     [Fact]
     public void PrimaryKeyConstraint_Is_Recognized()
     {
+        if (SqlIntegrationConnections.ShouldSkip(Provider))
+            return;
+
         var info = RunScenario(
             connection => Execute(connection, InsertParent(1, "CODE_A", "value")),
             InsertParent(1, "CODE_B", "value"));
@@ -129,6 +135,9 @@ public abstract class SqlErrorIntegrationTests_Base
     [Fact]
     public void InsertForeignKeyConstraint_Is_Recognized()
     {
+        if (SqlIntegrationConnections.ShouldSkip(Provider))
+            return;
+
         var info = RunScenario(
             connection => { },
             InsertChild(1, 987654));
@@ -142,6 +151,9 @@ public abstract class SqlErrorIntegrationTests_Base
     [Fact]
     public void DeleteForeignKeyConstraint_Is_Recognized()
     {
+        if (SqlIntegrationConnections.ShouldSkip(Provider))
+            return;
+
         var info = RunScenario(
             connection =>
             {
@@ -159,6 +171,9 @@ public abstract class SqlErrorIntegrationTests_Base
     [Fact]
     public void NotNullConstraint_Is_Recognized()
     {
+        if (SqlIntegrationConnections.ShouldSkip(Provider))
+            return;
+
         var info = RunScenario(
             connection => { },
             InsertParent(1, "CODE_A", null));

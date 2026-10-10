@@ -5,6 +5,9 @@ public partial class SchemaProviderIntegrationTests_Sqlite
     [Fact]
     public void SqliteSchemaProvider_Reads_Columns_Keys_ForeignKeys_RowId_And_Views()
     {
+        if (SqlIntegrationConnections.ShouldSkip("Sqlite"))
+            return;
+
         var suffix = Guid.NewGuid().ToString("N");
         var parentTable = "SerenitySchemaIT_Parent_" + suffix;
         var childTable = "SerenitySchemaIT_Child_" + suffix;

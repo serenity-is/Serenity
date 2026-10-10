@@ -8,6 +8,9 @@ public sealed partial class MigrationIntegrationTests : IDisposable
     [Fact]
     public async Task Firebird_Migrations_And_Service_Calls_Succeed()
     {
+        if (SqlIntegrationConnections.ShouldSkip("Firebird"))
+            return;
+
         var serverConnection = SqlIntegrationConnections.CreateConnection("Firebird");
         var defaultConnectionString = WithFirebirdDatabase(serverConnection.ConnectionString, defaultDatabase);
         var northwindConnectionString = WithFirebirdDatabase(serverConnection.ConnectionString, northwindDatabase);

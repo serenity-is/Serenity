@@ -8,6 +8,9 @@ public sealed partial class MigrationIntegrationTests : IDisposable
     [Fact]
     public async Task Sqlite_Migrations_And_Service_Calls_Succeed()
     {
+        if (SqlIntegrationConnections.ShouldSkip("Sqlite"))
+            return;
+
         DbProviderFactories.RegisterFactory("Microsoft.Data.Sqlite", SqliteFactory.Instance);
 
         var defaultConnectionString = $"Data Source={defaultDatabase};Mode=Memory;Cache=Shared";

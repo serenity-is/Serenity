@@ -8,6 +8,9 @@ public sealed partial class MigrationIntegrationTests : IDisposable
     [Fact]
     public async Task Oracle_Migrations_And_Service_Calls_Succeed()
     {
+        if (SqlIntegrationConnections.ShouldSkip("Oracle"))
+            return;
+
         var suffix = Guid.NewGuid().ToString("N")[..16].ToUpperInvariant();
         var defaultUser = "SDEF" + suffix;
         var northwindUser = "SNW" + suffix;

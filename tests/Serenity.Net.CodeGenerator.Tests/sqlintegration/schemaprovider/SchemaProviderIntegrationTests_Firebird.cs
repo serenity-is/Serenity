@@ -7,6 +7,9 @@ public partial class SchemaProviderIntegrationTests_Firebird
     [Fact]
     public void FirebirdSchemaProvider_Reads_Columns_Keys_ForeignKeys_And_Views()
     {
+        if (SqlIntegrationConnections.ShouldSkip("Firebird"))
+            return;
+
         var suffix = Guid.NewGuid().ToString("N")[..12].ToUpperInvariant();
         var parentTable = "SIT_PARENT_" + suffix;
         var childTable = "SIT_CHILD_" + suffix;

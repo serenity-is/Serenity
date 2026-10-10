@@ -6,6 +6,9 @@ public partial class SchemaProviderIntegrationTests_Postgres
     [Fact]
     public void PostgresSchemaProvider_Reads_Columns_Identity_Keys_ForeignKeys_And_Views()
     {
+        if (SqlIntegrationConnections.ShouldSkip("Postgres"))
+            return;
+
         var schema = "serenity_schema_it_" + Guid.NewGuid().ToString("N");
         var parentTable = "parent_" + Guid.NewGuid().ToString("N");
         var childTable = "child_" + Guid.NewGuid().ToString("N");

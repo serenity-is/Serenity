@@ -23,6 +23,9 @@ public partial class SchemaProviderIntegrationTests_BasicConnectivity
     [InlineData("Sqlite")]
     public void ProviderConnection_Opens_And_Closes(string provider)
     {
+        if (SqlIntegrationConnections.ShouldSkip(provider))
+            return;
+
         using var connection = SqlIntegrationConnections.CreateConnection(provider);
 
         connection.Open();
