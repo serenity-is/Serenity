@@ -24,7 +24,8 @@ public static partial class Shared
             if (StartProcess("dotnet", $"build -v minimal -c Release \"{SolutionFile}\"", Path.GetDirectoryName(SolutionFile)) != 0)
                 ExitWithError("Error while building solution!");
 
-            var projectPackages = ParsePackages(ProjectFile);
+            var packageVersions = GetPackageVersions();
+            var projectPackages = ParsePackages(ProjectFile, packageVersions);
 
             CleanDirectory(TemporaryFilesRoot, ensure: true);
 
@@ -42,7 +43,7 @@ public static partial class Shared
             {
                 CleanDirectory(TemplateZipFolder, ensure: true);
                 CleanDirectory(TemplateZipWebFolder, ensure: true);
-                PatchVsTemplateAndCopyFiles();
+                PatchVsTemplateAndCopyFiles(packageVersions);
 
                 File.Copy(Path.Combine(VSIXTemplateFolder, "SerenityLogo.ico"),
                     Path.Combine(TemplateZipFolder, "SerenityLogo.ico"));

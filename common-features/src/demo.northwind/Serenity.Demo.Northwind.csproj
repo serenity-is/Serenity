@@ -7,7 +7,7 @@
     <EmbeddedResource Include="Migrations\*.sql" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Serenity.Extensions" Version="$(Version)" Condition="!Exists('..\extensions\Serenity.Extensions.csproj')" />
+    <PackageReference Include="Serenity.Extensions" VersionOverride="$(Version)" Condition="!Exists('..\extensions\Serenity.Extensions.csproj')" />
     <ProjectReference Include="..\extensions\Serenity.Extensions.csproj" Condition="Exists('..\extensions\Serenity.Extensions.csproj')" />
   </ItemGroup>
 </Project>

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Numerics;
+using System.Xml.Linq;
 using YamlDotNet.Serialization;
 
 namespace Build;
@@ -109,15 +110,31 @@ public static partial class Shared
             content = root.ToString().Replace("\r", "");
             File.WriteAllText(PackageJsonCopy, content);
 
+            var projectXml = XElement.Parse(File.ReadAllText(ProjectFile));
+            NormalizePackageReferences(projectXml, GetPackageVersions());
+            File.WriteAllText(PackageProjectCopy,
+                projectXml.ToString(SaveOptions.OmitDuplicateNamespaces));
+
             if (File.Exists(PackageJsonCopyLock))
                 File.Delete(PackageJsonCopyLock);
 
             var dotnetDir = Path.Combine(PackagePatchFolder, "node_modules", ".dotnet");
+            var dotnetTarget = Path.Combine(Path.GetDirectoryName(PackageJsonFile), "node_modules", ".dotnet");
             if (!Directory.Exists(dotnetDir))
             {
                 if (!Directory.Exists(Path.GetDirectoryName(dotnetDir)))
                     Directory.CreateDirectory(Path.GetDirectoryName(dotnetDir));
-                Directory.CreateSymbolicLink(dotnetDir, Path.Combine(Path.GetDirectoryName(PackageJsonFile), "node_modules", ".dotnet"));
+
+                if (OperatingSystem.IsWindows())
+                {
+                    if (StartProcess("cmd.exe", $"/c mklink /J \"{dotnetDir}\" \"{dotnetTarget}\"", PackagePatchFolder) != 0)
+                    {
+                        ExitWithError($"Could not create directory junction at {dotnetDir}.");
+                        return;
+                    }
+                }
+                else
+                    Directory.CreateSymbolicLink(dotnetDir, dotnetTarget);
             }
 
             if (StartProcess("cmd", "/c npm i --ignore-scripts", PackagePatchFolder) != 0)

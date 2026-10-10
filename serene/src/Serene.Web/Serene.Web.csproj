@@ -26,30 +26,30 @@
     <Using Include="Serene.MVC.ESM" Alias="ESM" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="FluentMigrator.Runner.Firebird" Version="8.0.1" />
-    <PackageReference Include="FluentMigrator.Runner.MySql" Version="8.0.1" />
-    <PackageReference Include="FluentMigrator.Runner.Oracle" Version="8.0.1" />
-    <PackageReference Include="FluentMigrator.Runner.Postgres" Version="8.0.1" />
-    <PackageReference Include="FluentMigrator.Runner.SQLite" Version="8.0.1" />
-    <PackageReference Include="FluentMigrator.Runner.SqlServer" Version="8.0.1" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.12" />
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="7.1.1" />
-    <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="6.0.3" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers" />
-    <PackageReference Include="SkiaSharp" Version="4.153.1" />
+    <PackageReference Include="FluentMigrator.Runner.Firebird" />
+    <PackageReference Include="FluentMigrator.Runner.MySql" />
+    <PackageReference Include="FluentMigrator.Runner.Oracle" />
+    <PackageReference Include="FluentMigrator.Runner.Postgres" />
+    <PackageReference Include="FluentMigrator.Runner.SQLite" />
+    <PackageReference Include="FluentMigrator.Runner.SqlServer" />
+    <PackageReference Include="Microsoft.Data.Sqlite" />
+    <PackageReference Include="Microsoft.Data.SqlClient" />
+    <PackageReference Include="Microsoft.TypeScript.MSBuild" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers" />
+    <PackageReference Include="SkiaSharp" />
     <!-- Uncomment if you will host on Linux/Ubuntu (large native package, not needed on Windows/macOS):
-    <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="4.153.1" />
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" />
     -->
   </ItemGroup>
   <ItemGroup Condition="'$(UseProjectRefs)' == 'false'">
-    <PackageReference Include="Serenity.Assets" Version="10.5.2" />
-    <PackageReference Include="Serenity.Corelib" Version="10.5.2" />
-    <PackageReference Include="Serenity.Net.Web" Version="10.5.2" />
-    <PackageReference Include="Serenity.Extensions" Version="10.5.2" />
+    <PackageReference Include="Serenity.Assets" VersionOverride="10.5.2" />
+    <PackageReference Include="Serenity.Corelib" VersionOverride="10.5.2" />
+    <PackageReference Include="Serenity.Net.Web" VersionOverride="10.5.2" />
+    <PackageReference Include="Serenity.Extensions" VersionOverride="10.5.2" />
     <!--#if (Northwind)-->
-    <PackageReference Include="Serenity.Demo.Northwind" Version="10.5.2" />
+    <PackageReference Include="Serenity.Demo.Northwind" VersionOverride="10.5.2" />
     <!--#endif-->
     <!--#if (BasicSamples)-->
-    <PackageReference Include="Serenity.Demo.BasicSamples" Version="10.5.2" />
+    <PackageReference Include="Serenity.Demo.BasicSamples" VersionOverride="10.5.2" />
     <!--#endif-->
   </ItemGroup>
   <ItemGroup Condition="'$(UseProjectRefs)' != 'false'">

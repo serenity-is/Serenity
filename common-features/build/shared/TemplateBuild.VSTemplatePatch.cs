@@ -86,7 +86,7 @@ public static partial class Shared
         }
     }
 
-    public static void PatchVsTemplateAndCopyFiles()
+    public static void PatchVsTemplateAndCopyFiles(IReadOnlyDictionary<string, string> packageVersions)
     {
         List<string> fileList;
         var csprojXml = XElement.Parse(File.ReadAllText(ProjectFile));
@@ -193,6 +193,8 @@ public static partial class Shared
             else if (string.Equals(value, "'$(UseProjectRefs)'!='false'", StringComparison.OrdinalIgnoreCase))
                 z.Remove();
         }
+
+        NormalizePackageReferences(csprojXml, packageVersions);
 
         var targetProj = Path.Combine(TemplateZipWebFolder, Path.GetFileName(ProjectFile));
         File.WriteAllText(targetProj,

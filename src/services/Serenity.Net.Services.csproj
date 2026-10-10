@@ -7,8 +7,8 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\core\Serenity.Net.Core.csproj" />
-    <PackageReference Include="Dapper" Version="2.1.89" />
-    <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" Version="10.0.12" />
+    <PackageReference Include="Dapper" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" />
   </ItemGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="Serenity.Net.Tests" />

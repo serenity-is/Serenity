@@ -4,7 +4,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\web\Serenity.Net.Web.csproj" />
-    <PackageReference Include="TSQL.Parser" Version="2.6.0" />
+    <PackageReference Include="TSQL.Parser" />
     <Using Include="Microsoft.AspNetCore.Hosting" />
     <Using Include="Microsoft.AspNetCore.Http" />
     <Using Include="Microsoft.AspNetCore.Mvc" />

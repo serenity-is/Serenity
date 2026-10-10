@@ -1,12 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk.Razor">
   <ItemGroup>
-    <PackageReference Include="ClosedXML" Version="0.105.1" />
-    <PackageReference Include="FastMember" Version="1.5.0" />
-    <PackageReference Include="FluentMigrator" Version="8.0.1" />
-    <PackageReference Include="FluentMigrator.Extensions.SqlServer" Version="8.0.1" />
-    <PackageReference Include="FluentMigrator.Extensions.Postgres" Version="8.0.1" />
-    <PackageReference Include="MailKit" Version="4.18.1" />
-    <PackageReference Include="nClam" Version="9.0.0" />
+    <PackageReference Include="ClosedXML" />
+    <PackageReference Include="FastMember" />
+    <PackageReference Include="FluentMigrator" />
+    <PackageReference Include="FluentMigrator.Extensions.SqlServer" />
+    <PackageReference Include="FluentMigrator.Extensions.Postgres" />
+    <PackageReference Include="MailKit" />
+    <PackageReference Include="nClam" />
     <ProjectReference Include="$(SerenitySrc)..\packages\corelib\Serenity.Corelib.csproj" Condition="Exists('$(SerenitySrc)..\packages\corelib\Serenity.Corelib.csproj') and '$(AddAutoRefs)' == 'true'"
       Private="false" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" UndefineProperties="TargetFramework" 
       ExcludeAssets="all" PrivateAssets="all" DisableTransitiveProjectReferences="true" DisableTransitiveFrameworkReferences="true" />

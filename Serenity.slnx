@@ -16,6 +16,7 @@
   </Folder>
   <Folder Name="/serenity/">
     <File Path="build/Package.Build.props" />
+    <File Path="Directory.Packages.props" />
     <File Path="src/Directory.Build.props" />
     <File Path="src/Directory.Build.targets" />
     <File Path="src/RestoreNpmPackages.targets" />

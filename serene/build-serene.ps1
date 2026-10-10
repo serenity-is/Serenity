@@ -71,6 +71,9 @@ if (-not (Test-Path -LiteralPath $dotnet)) {
 $vsInstallDir = $env:VS2026INSTALLDIR
 if ([string]::IsNullOrEmpty($vsInstallDir)) {
     $vsInstallDir = Join-Path $env:ProgramFiles 'Microsoft Visual Studio\2026\Community'
+    if (-not (Test-Path -LiteralPath $vsInstallDir)) {
+        $vsInstallDir = Join-Path $env:ProgramFiles 'Microsoft Visual Studio\18\Community'
+    }
 }
 
 $msbuild = Join-Path $vsInstallDir 'MSBuild\Current\Bin\msbuild.exe'
@@ -106,6 +109,10 @@ $projectName = "SereneTest_$ldt"
 
 $vsDir = Join-Path $root '.vs'
 New-Item -ItemType Directory -Force -Path $vsDir | Out-Null
+$directoryPackagesProps = Join-Path $vsDir 'Directory.Packages.props'
+if (-not (Test-Path -LiteralPath $directoryPackagesProps)) {
+    Set-Content -LiteralPath $directoryPackagesProps -Value '<Project></Project>' -NoNewline -Encoding UTF8
+}
 Set-Location -LiteralPath $vsDir
 
 & $dotnet new serene -n $projectName

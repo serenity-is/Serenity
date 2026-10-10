@@ -25,6 +25,7 @@ public static partial class Shared
     public static string PackagePatchFolder => Path.Combine(Root, ".vs", "package-json-patch");
     public static string PackageJsonCopy => Path.Combine(PackagePatchFolder, "package.json");
     public static string PackageJsonCopyLock => Path.Combine(PackagePatchFolder, "package-lock.json");
+    public static string PackageProjectCopy => Path.Combine(PackagePatchFolder, Path.GetFileName(ProjectFile));
     public static string TemplateVersion { get; set; }
     public static string TemplateZipFolder => Path.Combine(TemporaryFilesRoot, ProjectId);
     public static string TemplateZipWebFolder => Path.Combine(TemporaryFilesRoot, ProjectId, ProjectName);

@@ -19,7 +19,7 @@
     <RunTSBuild Condition="'$(RunTSBuild)' == '' And '$(SkipTSBuild)' != 'true'">true</RunTSBuild>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Serenity.Net.Web" Version="$(SerenityVersion)" Condition="!Exists('$(SerenitySrc)web\Serenity.Net.Web.csproj') and '$(AddAutoRefs)' == 'true'" />
+    <PackageReference Include="Serenity.Net.Web" VersionOverride="$(SerenityVersion)" Condition="!Exists('$(SerenitySrc)web\Serenity.Net.Web.csproj') and '$(AddAutoRefs)' == 'true'" />
     <ProjectReference Include="$(SerenitySrc)web\Serenity.Net.Web.csproj" Condition="Exists('$(SerenitySrc)web\Serenity.Net.Web.csproj') and '$(AddAutoRefs)' == 'true'" />
   </ItemGroup>
 </Project>
