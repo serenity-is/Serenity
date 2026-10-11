@@ -4647,6 +4647,15 @@ export declare class Validator {
 	 * @returns Truthy optional marker or falsy when required / non-empty; `"dependency-mismatch"` when the required rule is absent and value is empty.
 	 */
 	static optional(element: ValidatableElement, value?: ValidationValue): "" | "dependency-mismatch";
+	/**
+	 * Compares a form value against a min/max/range bound. When the bound is a `bigint`
+	 * (used for 64-bit integer bounds beyond the safe integer range), the value is compared
+	 * exactly as a bigint instead of losing precision through `Number` coercion.
+	 * @param value - The value to compare.
+	 * @param param - The bound (number, string or bigint).
+	 * @returns Negative if value &lt; bound, positive if value &gt; bound, `0` if equal, or `NaN` when not comparable.
+	 */
+	static compareBound(value: any, param: any): number;
 	/** When `true` automatically combines `min`+`max` into `range` and `minlength`+`maxlength` into `rangelength` during rule normalization. */
 	static autoCreateRanges: boolean;
 	/** Default options applied to every new validator instance. */
@@ -15567,6 +15576,21 @@ declare class FilteringTypeRegistryImpl extends BaseTypeRegistry<Function> {
  * Registry for filtering handler types, resolved by filtering type key.
  */
 export declare const FilteringTypeRegistry: FilteringTypeRegistryImpl;
+/**
+ * Filtering handler for Int64 (64-bit integer) fields using an Int64 editor.
+ */
+export declare class Int64Filtering extends BaseEditorFiltering<Int64Editor> {
+	static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
+	/**
+	 * Creates an Int64 filtering handler.
+	 */
+	constructor();
+	/**
+	 * Returns the operators supported by this filtering handler.
+	 * @returns The operators.
+	 */
+	getOperators(): FilterOperator[];
+}
 /**
  * Filtering handler for integer fields using an integer editor.
  */
