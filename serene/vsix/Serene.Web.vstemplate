@@ -51,6 +51,7 @@
         <ProjectItem ReplaceParameters="true" TargetFileName="_ViewImports.cshtml">_ViewImports.cshtml</ProjectItem>
         <ProjectItem ReplaceParameters="true" TargetFileName="_ViewStart.cshtml">_ViewStart.cshtml</ProjectItem>
         <Folder Name="Administration" TargetFolderName="Administration">
+          <ProjectItem ReplaceParameters="true" TargetFileName="AdministrationModuleAttribute.cs">AdministrationModuleAttribute.cs</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="AdministrationNavigation.cs">AdministrationNavigation.cs</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="AdministrationPermissionKeys.cs">AdministrationPermissionKeys.cs</ProjectItem>
           <Folder Name="Language" TargetFolderName="Language">
@@ -110,7 +111,6 @@
             <Folder Name="Authentication" TargetFolderName="Authentication">
               <ProjectItem ReplaceParameters="true" TargetFileName="Authorization.ts">Authorization.ts</ProjectItem>
             </Folder>
-            <ProjectItem ReplaceParameters="true" TargetFileName="LoggingRow.cs">LoggingRow.cs</ProjectItem>
             <Folder Name="RequestHandlers" TargetFolderName="RequestHandlers">
               <ProjectItem ReplaceParameters="true" TargetFileName="UserDeleteHandler.cs">UserDeleteHandler.cs</ProjectItem>
               <ProjectItem ReplaceParameters="true" TargetFileName="UserListHandler.cs">UserListHandler.cs</ProjectItem>
@@ -168,6 +168,7 @@
             <ProjectItem ReplaceParameters="true" TargetFileName="PermissionKeyLister.cs">PermissionKeyLister.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="PermissionService.cs">PermissionService.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="RolePermissionService.cs">RolePermissionService.cs</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="SkiaSharpImageProcessor.cs">SkiaSharpImageProcessor.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="UserAccessor.cs">UserAccessor.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="UserCultureProvider.cs">UserCultureProvider.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="UserPasswordValidator.cs">UserPasswordValidator.cs</ProjectItem>
@@ -182,10 +183,7 @@
             <ProjectItem ReplaceParameters="true" TargetFileName="FilePage.cs">FilePage.cs</ProjectItem>
           </Folder>
           <Folder Name="Helpers" TargetFolderName="Helpers">
-            <ProjectItem ReplaceParameters="true" TargetFileName="HumanizeSqlExceptionBehavior.cs">HumanizeSqlExceptionBehavior.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="LanguageList.ts">LanguageList.ts</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="SqlExceptionHelper.cs">SqlExceptionHelper.cs</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="SqlExceptionHelperTexts.cs">SqlExceptionHelperTexts.cs</ProjectItem>
           </Folder>
           <Folder Name="Navigation" TargetFolderName="Navigation">
             <ProjectItem ReplaceParameters="true" TargetFileName="NavigationItems.cs">NavigationItems.cs</ProjectItem>
@@ -319,12 +317,12 @@
         </Folder>
         <Folder Name="esm" TargetFolderName="esm">
           <Folder Name="_chunks" TargetFolderName="_chunks">
-            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-2IN7J5FW.js">chunk-2IN7J5FW.js</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-5RO7G4JC.js">chunk-5RO7G4JC.js</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-JEFYSR23.js">chunk-JEFYSR23.js</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-JP6DECJA.js">chunk-JP6DECJA.js</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-N4JCLJZY.js">chunk-N4JCLJZY.js</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-XTGGXHA6.js">chunk-XTGGXHA6.js</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-4RRITRPO.js">chunk-4RRITRPO.js</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-6WBDC6IK.js">chunk-6WBDC6IK.js</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-BGXO3CPC.js">chunk-BGXO3CPC.js</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-C2YFWUCF.js">chunk-C2YFWUCF.js</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-EYHTJNN2.js">chunk-EYHTJNN2.js</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-TJGMM5KO.js">chunk-TJGMM5KO.js</ProjectItem>
           </Folder>
           <Folder Name="Modules" TargetFolderName="Modules">
             <Folder Name="Administration" TargetFolderName="Administration">
