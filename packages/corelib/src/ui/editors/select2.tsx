@@ -23,9 +23,9 @@ export interface Select2QueryOptions {
     /** Additional context. */
     context?: any;
     /** Callback invoked with the results. */
-    callback?: (p1: Select2Result) => void;
+    callback?: (data: Select2Result) => void;
     /** Custom matcher function. */
-    matcher?: (p1: any, p2: any, p3?: any) => boolean;
+    matcher?: (term: string, text: string, data?: any) => boolean;
 }
 
 /**
@@ -38,6 +38,8 @@ export interface Select2Item {
     text?: string;
     /** The source item. */
     source?: any;
+    /** CSS class(es) of the item. */
+    css?: string;
     /** Child items. */
     children?: Select2Item[];
     /** Whether the item is disabled. */
@@ -73,9 +75,9 @@ export interface Select2AjaxOptions extends RequestInit {
     /** Delay in milliseconds before the ajax request. */
     quietMillis?: number;
     /** Callback that builds the request data. */
-    data?: (p1: string, p2: number, p3: any) => any;
+    data?: (term: string, page: number, context: any) => any;
     /** Callback that processes the response. */
-    results?: (p1: any, p2: number, p3: any) => any;
+    results?: (response: any, page: number, query: Select2QueryOptions) => Select2Result;
     /** Additional request parameters. */
     params?: (() => any) | any;
     /** Callback invoked when the ajax request fails.
@@ -94,7 +96,7 @@ export interface Select2Options {
     /** The element to attach Select2 to. */
     element?: Select2Element;
     /** Width of the widget. */
-    width?: any;
+    width?: string | (() => string);
     /** Minimum input length before searching. */
     minimumInputLength?: number;
     /** Maximum input length. */
@@ -102,11 +104,11 @@ export interface Select2Options {
     /** Minimum results required to show the search box. */
     minimumResultsForSearch?: number;
     /** Maximum number of selectable items. */
-    maximumSelectionSize?: any;
+    maximumSelectionSize?: number | (() => number);
     /** Placeholder text. */
     placeholder?: string;
     /** Placeholder option. */
-    placeholderOption?: any;
+    placeholderOption?: "first" | ((select: HTMLSelectElement) => HTMLOptionElement);
     /** Separator for multiple values. */
     separator?: string;
     /** Whether the selection can be cleared. */
@@ -118,21 +120,21 @@ export interface Select2Options {
     /** Whether to open the dropdown on enter. */
     openOnEnter?: boolean;
     /** Callback that returns the id of an item. */
-    id?: (p1: any) => string;
+    id?: (item: any) => string;
     /** Custom matcher function. */
-    matcher?: (p1: string, p2: string, p3: HTMLElement) => boolean;
+    matcher?: (term: string, text: string, data?: any) => boolean;
     /** Callback that sorts results. */
-    sortResults?: (p1: any, p2: HTMLElement, p3: any) => any;
+    sortResults?: (results: Select2Item[], container: HTMLElement, query: Select2QueryOptions) => Select2Item[];
     /** Formatter for ajax errors. */
-    formatAjaxError?: (p1: any, p2: any) => Select2FormatResult;
+    formatAjaxError?: (data: Select2Result, info?: any) => Select2FormatResult;
     /** Formatter for the matches count. */
     formatMatches?: (matches: number) => Select2FormatResult;
     /** Formatter for selected items. */
-    formatSelection?: (p1: any, p2: HTMLElement, p3: (p1: string) => string) => Select2FormatResult;
+    formatSelection?: (data: Select2Item, container: HTMLElement, escapeMarkup: (markup: string) => string) => Select2FormatResult;
     /** Formatter for result items. */
-    formatResult?: (p1: any, p2: HTMLElement, p3: any, p4: (p1: string) => string) => Select2FormatResult;
+    formatResult?: (result: Select2Item, container: HTMLElement, query: Select2QueryOptions, escapeMarkup: (markup: string) => string) => Select2FormatResult;
     /** Formatter for result CSS classes. */
-    formatResultCssClass?: (p1: any) => string;
+    formatResultCssClass?: (data: Select2Item) => string;
     /** Formatter for selection CSS classes. */
     formatSelectionCssClass?: (item: Select2Item, container: HTMLElement) => string;
     /** Formatter for no-matches text. */
@@ -146,19 +148,19 @@ export interface Select2Options {
     /** Formatter for input-too-short text. */
     formatInputTooShort?: (input: string, min: number) => Select2FormatResult;
     /** Formatter for selection-too-big text. */
-    formatSelectionTooBig?: (p1: number) => Select2FormatResult;
+    formatSelectionTooBig?: (limit: number) => Select2FormatResult;
     /** Callback that creates a search choice. */
-    createSearchChoice?: (p1: string) => Select2Item;
+    createSearchChoice?: (term: string) => Select2Item;
     /** Position of the create-search-choice item. */
     createSearchChoicePosition?: string | ((list: Select2Item[], item: Select2Item) => void);
     /** Callback that initializes the selection. */
-    initSelection?: (p1: HTMLElement, p2: (p1: any) => void) => void;
+    initSelection?: (element: HTMLElement, callback: (data: any) => void) => void;
     /** Tokenizer function. */
-    tokenizer?: (p1: string, p2: any, p3: (p1: any) => any, p4: any) => string;
+    tokenizer?: (input: string, selection: Select2Item[], selectCallback: (data: Select2Item) => void, opts: Select2Options) => string;
     /** Token separators. */
-    tokenSeparators?: any;
+    tokenSeparators?: string[];
     /** Query callback. */
-    query?: (p1: Select2QueryOptions) => void;
+    query?: (query: Select2QueryOptions) => void;
     /** Ajax options. */
     ajax?: Select2AjaxOptions;
     /** Static data. */
@@ -166,23 +168,23 @@ export interface Select2Options {
     /** Tags for tag mode. */
     tags?: ((string | Select2Item)[]) | (() => (string | Select2Item)[]);
     /** Container CSS. */
-    containerCss?: any;
+    containerCss?: Record<string, string> | (() => Record<string, string>);
     /** Container CSS class. */
-    containerCssClass?: any;
+    containerCssClass?: string | (() => string);
     /** Dropdown CSS. */
-    dropdownCss?: any;
+    dropdownCss?: Record<string, string> | (() => Record<string, string>);
     /** Dropdown CSS class. */
-    dropdownCssClass?: any;
+    dropdownCssClass?: string | (() => string);
     /** Whether the dropdown auto-widths. */
     dropdownAutoWidth?: boolean;
     /** Callback that returns the dropdown parent. */
     dropdownParent?: (input: HTMLElement) => HTMLElement;
     /** Callback that adapts the container CSS class. */
-    adaptContainerCssClass?: (p1: string) => string;
+    adaptContainerCssClass?: (cls: string) => string;
     /** Callback that adapts the dropdown CSS class. */
-    adaptDropdownCssClass?: (p1: string) => string;
+    adaptDropdownCssClass?: (cls: string) => string;
     /** Callback that escapes markup. */
-    escapeMarkup?: (p1: string) => string;
+    escapeMarkup?: (markup: string) => string;
     /** Placeholder for the search input. */
     searchInputPlaceholder?: string;
     /** Whether to select on blur. */
@@ -192,11 +194,11 @@ export interface Select2Options {
     /** Padding for load-more. */
     loadMorePadding?: number;
     /** Callback that returns the next search term. */
-    nextSearchTerm?: (p1: any, p2: string) => string;
+    nextSearchTerm?: (selectedObject: Select2Item, currentSearchTerm: string) => string;
     /** Callback that populates results. */
     populateResults?: (container: HTMLElement, results: Select2Item[], query: Select2QueryOptions) => void
     /** Callback that determines whether to focus the input. */
-    shouldFocusInput?: (p1: AbstractSelect2) => boolean;
+    shouldFocusInput?: (instance: AbstractSelect2) => boolean;
 }
 
 const lastMousePosition = { x: 0, y: 0 };
@@ -814,7 +816,7 @@ export class Select2 {
             }
 
             // Never focus the input if search is disabled
-            if (instance.opts.minimumResultsForSearch < 0) {
+            if (instance["opts"]?.minimumResultsForSearch < 0) {
                 return false;
             }
 
@@ -1006,9 +1008,9 @@ function tags(data: any) {
         const t = query.term, filtered = { results: [] as any[] };
         const result = isFunc ? data(query) : data;
         if (Array.isArray(result)) {
-            result.forEach(function (item: Select2Item) {
-                const isObject = item.text !== undefined,
-                    text = isObject ? item.text : item;
+            result.forEach(function (item: string | Select2Item) {
+                const isObject = typeof item !== "string";
+                const text = isObject ? item.text : item;
                 if (t === "" || query.matcher(t, text)) {
                     filtered.results.push(isObject ? item : { id: item, text: item });
                 }
@@ -1072,7 +1074,7 @@ function countResults(results: any[]) {
  * @param opts select2's opts
  * @return undefined/null to leave the current input unchanged, or a string to change the input to the returned value
  */
-function defaultTokenizer(input: string, selection: string | any[], selectCallback: (arg0: any) => void, opts: { createSearchChoice: { call: (arg0: any, arg1: any, arg2: any) => any; }; tokenSeparators: string | any[]; id: (arg0: any) => null; }) {
+function defaultTokenizer(input: string, selection: Select2Item[], selectCallback: (data: Select2Item) => void, opts: Select2Options) {
     let original = input, // store the original so we can compare and know if we need to tell the search to update its text
         dupe = false, // check for whether a token we extracted represents a duplicate selected choice
         token, // token
