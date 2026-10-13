@@ -7,9 +7,9 @@ public class ServiceAuthorizeAttributeTests
     private static readonly string[] testPermissionArray = ["Test:Permission"];
 
     [Fact]
-    public void Passes_If_Permission_Is_Null_And_Context_Is_Logged_In()
+    public void Passes_If_Permission_Is_LoggedIn_And_Context_Is_Logged_In()
     {
-        var sutResult = TestResourceFilters([new ServiceAuthorizeAttribute((string)null)],
+        var sutResult = TestResourceFilters([new ServiceAuthorizeAttribute(SpecialPermissionKeys.LoggedIn)],
             isLoggedIn: true);
 
         Assert.Null(sutResult);
@@ -85,18 +85,9 @@ public class ServiceAuthorizeAttributeTests
     }
 
     [Fact]
-    public void Fails_If_Permission_Is_Null_And_User_Is_Not_Logged_In_And_Have_No_Permissions()
+    public void Passes_If_Permission_Is_LoggedIn_And_User_Is_Logged_In_And_Have_No_Permissions()
     {
-        var sutResult = TestResourceFilters([new ServiceAuthorizeAttribute((string)null)],
-            isLoggedIn: false);
-
-        Assert.Equal(NotLoggedInErrorCode, sutResult.Error.Code);
-    }
-
-    [Fact]
-    public void Passes_If_Permission_Is_Null_And_User_Is_Logged_In_And_Have_No_Permissions()
-    {
-        var sutResult = TestResourceFilters([new ServiceAuthorizeAttribute((string)null)],
+        var sutResult = TestResourceFilters([new ServiceAuthorizeAttribute(SpecialPermissionKeys.LoggedIn)],
             isLoggedIn: true);
 
         Assert.Null(sutResult);
