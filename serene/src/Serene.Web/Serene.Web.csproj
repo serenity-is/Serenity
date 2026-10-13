@@ -36,9 +36,10 @@
     <PackageReference Include="Microsoft.Data.SqlClient" />
     <PackageReference Include="Microsoft.TypeScript.MSBuild" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers" />
     <PackageReference Include="SkiaSharp" />
-    <!-- Uncomment if you will host on Linux/Ubuntu (large native package, not needed on Windows/macOS):
+  </ItemGroup>
+  <ItemGroup Condition="$([MSBuild]::IsOSPlatform('Linux'))">
+    <!-- Remove "Condition" above if you will publish on Windows/macOS but host on Linux/Ubuntu (large native package, not needed on Windows/macOS) -->
     <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" />
-    -->
   </ItemGroup>
   <ItemGroup Condition="'$(UseProjectRefs)' == 'false'">
     <PackageReference Include="Serenity.Assets" VersionOverride="10.6.0" />
