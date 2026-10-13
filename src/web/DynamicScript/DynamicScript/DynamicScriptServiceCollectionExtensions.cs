@@ -211,7 +211,10 @@ public static class DynamicScriptServiceCollectionExtensions
             [
                 () => PropertyItemsScript.Compact((columnScripts as IEnumerable<PropertyItemsScript>).Concat(formScripts)
                     .Select(x => (x.ScriptName, (PropertyItemsData)x.GetScriptData())))
-            ]));
+            ])
+            {
+                Permission = SpecialPermissionKeys.Public
+            });
 
         return serviceProvider;
     }

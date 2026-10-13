@@ -38,9 +38,9 @@ public class PageAuthorizeAttributeTests
     }
 
     [Fact]
-    public void Default_Constructor_Has_No_Permission()
+    public void Default_Constructor_Has_LoggedIn_Permission()
     {
-        Assert.Null(new PageAuthorizeAttribute().Permission);
+        Assert.Equal(SpecialPermissionKeys.LoggedIn, new PageAuthorizeAttribute().Permission);
     }
 
     [Fact]
@@ -50,9 +50,9 @@ public class PageAuthorizeAttributeTests
     }
 
     [Fact]
-    public void Constructor_With_Null_Permission_Sets_Null()
+    public void Constructor_With_Null_Permission_Throws()
     {
-        Assert.Null(new PageAuthorizeAttribute((object?)null).Permission);
+        Assert.Throws<ArgumentNullException>(() => new PageAuthorizeAttribute((object?)null));
     }
 
     [Fact]

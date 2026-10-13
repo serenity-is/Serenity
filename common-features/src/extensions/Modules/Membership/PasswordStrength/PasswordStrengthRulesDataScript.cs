@@ -3,7 +3,7 @@ namespace Serenity.Extensions;
 /// <summary>
 /// This declares a dynamic script with key 'PasswordStrengthRules' that will be available from client side.
 /// </summary>
-[DataScript("PasswordStrengthRules", CacheDuration = -1, Permission = "*")]
+[DataScript("PasswordStrengthRules", CacheDuration = -1, Permission = SpecialPermissionKeys.Public)]
 public class PasswordStrengthRulesDataScript(IOptions<MembershipSettings>? membershipSettings = null) 
     : DataScript<PasswordStrengthRules>
 {

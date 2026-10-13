@@ -38,7 +38,10 @@ public class ColumnsScriptRegistration
         scriptManager.Register("ColumnsBundle", new ConcatenatedScript(
         [
             () => PropertyItemsScript.Compact(scripts.Select(x => (x.ScriptName, (PropertyItemsData)x.GetScriptData())))
-        ]));
+        ])
+        {
+            Permission = SpecialPermissionKeys.Public
+        });
 
         return scripts;
     }

@@ -76,10 +76,11 @@ public class DynamicScriptTests
     }
 
     [Fact]
-    public void DynamicScript_CheckRights_DoesNothing_WithoutPermission()
+    public void DynamicScript_CheckRights_Denies_WithoutPermission()
     {
         var script = new TestDynamicScript();
-        script.CheckRights(new MockPermissions(_ => false), NullTextLocalizer.Instance);
+        Assert.Throws<ValidationError>(() =>
+            script.CheckRights(new MockPermissions(_ => false), NullTextLocalizer.Instance));
     }
 
     [Fact]
@@ -102,7 +103,7 @@ public class DynamicScriptTests
     public void ConcatenatedScript_CheckRights_InvokesCallback()
     {
         var invoked = false;
-        var script = new ConcatenatedScript([() => "x"], checkRights: (_, _) => invoked = true);
+        var script = new ConcatenatedScript([() => "x"], checkRights: (_, _) => invoked = true) { Permission = SpecialPermissionKeys.Public };
         script.CheckRights(new MockPermissions(_ => true), NullTextLocalizer.Instance);
         Assert.True(invoked);
     }

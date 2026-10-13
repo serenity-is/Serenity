@@ -221,7 +221,7 @@ public class DynamicScriptManagerTests
     public void ReadScriptContent_Returns_Content()
     {
         var manager = Create();
-        manager.Register("Test", new TestScript());
+        manager.Register("Test", new TestScript() { Permission = SpecialPermissionKeys.Public });
 
         var content = manager.ReadScriptContent("Test", false);
 

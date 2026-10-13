@@ -29,7 +29,10 @@ public class BaseDynamicDataGeneratorTests
             if (RegisterColumns)
             {
                 scriptManager.Register("Columns.Test", new DataScript("Columns.Test",
-                    () => new PropertyItemsData { Items = [], AdditionalItems = [] }));
+                    () => new PropertyItemsData { Items = [], AdditionalItems = [] })
+                { 
+                    Permission = SpecialPermissionKeys.Public
+                });
             }
         }
     }

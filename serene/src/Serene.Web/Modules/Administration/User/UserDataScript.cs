@@ -3,7 +3,7 @@ namespace Serene.Administration;
 /// <summary>
 /// This declares a dynamic script with key 'UserData' that will be available from client side.
 /// </summary>
-[DataScript("UserData", CacheDuration = -1, Permission = "*")]
+[DataScript("UserData", CacheDuration = -1, Permission = SpecialPermissionKeys.Public)]
 public class UserDataScript(ITwoLevelCache cache, IPermissionService permissions,
     IPermissionKeyLister permissionKeyLister, IUserProvider userProvider) : DataScript<ScriptUserDefinition>
 {

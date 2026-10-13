@@ -4,7 +4,7 @@ namespace Serene.Administration;
 [DisplayName("Languages"), InstanceName("Language")]
 [ReadPermission(PermissionKeys.Translation)]
 [ModifyPermission(PermissionKeys.Translation)]
-[LookupScript(Permission = "*")]
+[LookupScript(Permission = SpecialPermissionKeys.Public)]
 public sealed class LanguageRow : Row<LanguageRow.RowFields>, IIdRow, INameRow
 {
     [DisplayName("Language Code"), Size(10), NotNull, IdProperty, Unique]

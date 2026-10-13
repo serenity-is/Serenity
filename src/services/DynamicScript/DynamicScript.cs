@@ -18,8 +18,8 @@ public abstract class DynamicScript : IDynamicScript
     /// <inheritdoc/>
     public virtual void CheckRights(IPermissionService permissions, ITextLocalizer localizer)
     {
-        if (Permission != null)
-            permissions.ValidatePermission(Permission, localizer);
+        var permission = string.IsNullOrEmpty(Permission) ? SpecialPermissionKeys.Deny : Permission;
+        permissions.ValidatePermission(permission, localizer);
     }
 
     /// <inheritdoc/>

@@ -276,7 +276,10 @@ public class ScriptBundleManager : IScriptBundleManager
                             recursionCheck.Remove(scriptName);
                         }
                     }
-                });
+                })
+                {
+                    Permission = SpecialPermissionKeys.Public
+                };
 
                 scriptManager.Register(bundleName, bundle);
                 bundleKeys.Add(bundleKey);

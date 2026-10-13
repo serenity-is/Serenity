@@ -18,6 +18,7 @@ public class PageAuthorizeAttribute : TypeFilterAttribute
         : base(typeof(PageAuthorizeFilter))
     {
         Arguments = [this];
+        Permission = SpecialPermissionKeys.LoggedIn;
     }
 
     private class PageAuthorizeFilter(PageAuthorizeAttribute attr) : IResourceFilter
@@ -30,10 +31,14 @@ public class PageAuthorizeAttribute : TypeFilterAttribute
 
         public void OnResourceExecuting(ResourceExecutingContext context)
         {
-            if ((string.IsNullOrEmpty(attr.Permission) &&
+            var permission = attr.Permission;
+            if (string.IsNullOrEmpty(permission))
+                permission = SpecialPermissionKeys.Deny;
+
+            if ((permission == SpecialPermissionKeys.LoggedIn &&
                  !context.HttpContext.User.IsLoggedIn()) ||
-                (!string.IsNullOrEmpty(attr.Permission) &&
-                 !context.HttpContext.RequestServices.GetRequiredService<IPermissionService>().HasPermission(attr.Permission)))
+                (permission != SpecialPermissionKeys.LoggedIn &&
+                 !context.HttpContext.RequestServices.GetRequiredService<IPermissionService>().HasPermission(permission)))
             {
                 if (context.HttpContext.User.IsLoggedIn())
                     context.Result = new ForbidResult();
@@ -79,7 +84,7 @@ public class PageAuthorizeAttribute : TypeFilterAttribute
                 string.Join(" OR ", attributeTypes.Select(x => x.Name)) + " attribute(s)");
         }
 
-        Permission = attr.Permission;
+        Permission = string.IsNullOrEmpty(attr.Permission) ? SpecialPermissionKeys.Deny : attr.Permission;
     }
 
     /// <summary>
@@ -99,7 +104,10 @@ public class PageAuthorizeAttribute : TypeFilterAttribute
     public PageAuthorizeAttribute(object permission)
         : this()
     {
-        Permission = permission?.ToString();
+        var perm = permission?.ToString();
+        if (string.IsNullOrEmpty(perm))
+            throw new ArgumentNullException(nameof(permission));
+        Permission = perm;
     }
     /// <summary>
     /// Initializes an instance of the <see cref="PageAuthorizeAttribute"/> class with a permission key
@@ -127,7 +135,7 @@ public class PageAuthorizeAttribute : TypeFilterAttribute
     /// <summary>
     /// Gets the permission key.
     /// </summary>
-    public string? Permission { get; private set; }
+    public string Permission { get; private set; }
 
     /// <inheritdoc/>
     public override bool Equals(object? obj)

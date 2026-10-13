@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Serenity.Services;
@@ -19,12 +19,16 @@ public class ServiceAuthorizeAttribute : Attribute, IResourceFilter
     /// <inheritdoc/>
     public void OnResourceExecuting(ResourceExecutingContext context)
     {
-        if (string.IsNullOrEmpty(Permission))
+        var permission = Permission;
+        if (string.IsNullOrEmpty(permission))
+            permission = SpecialPermissionKeys.Deny;
+
+        if (permission == SpecialPermissionKeys.LoggedIn)
         {
             if (context.HttpContext.User.IsLoggedIn())
                 return;
         }
-        else if (context.HttpContext.RequestServices.GetRequiredService<IPermissionService>().HasPermission(Permission))
+        else if (context.HttpContext.RequestServices.GetRequiredService<IPermissionService>().HasPermission(permission))
             return;
 
         if (!string.IsNullOrEmpty(OrPermission) &&
@@ -69,6 +73,7 @@ public class ServiceAuthorizeAttribute : Attribute, IResourceFilter
     /// </summary>
     public ServiceAuthorizeAttribute()
     {
+        Permission = SpecialPermissionKeys.LoggedIn;
     }
 
     /// <summary>
@@ -107,7 +112,7 @@ public class ServiceAuthorizeAttribute : Attribute, IResourceFilter
                 string.Join(" OR ", attributeTypes.Select(x => x.Name)) + " attribute(s)");
         }
 
-        Permission = attr.Permission;
+        Permission = string.IsNullOrEmpty(attr.Permission) ? SpecialPermissionKeys.Deny : attr.Permission;
     }
 
     /// <summary>
@@ -127,7 +132,10 @@ public class ServiceAuthorizeAttribute : Attribute, IResourceFilter
     public ServiceAuthorizeAttribute(object permission)
         : this()
     {
-        Permission = permission?.ToString();
+        var perm = permission?.ToString();
+        if (string.IsNullOrEmpty(perm))
+            throw new ArgumentNullException(nameof(permission));
+        Permission = perm;
     }
 
     /// <summary>
@@ -156,7 +164,7 @@ public class ServiceAuthorizeAttribute : Attribute, IResourceFilter
     /// <summary>
     /// Gets the permission key.
     /// </summary>
-    public string? Permission { get; private set; }
+    public string Permission { get; private set; }
 
     /// <summary>
     /// Gets or sets an optional secondary permission to check by OR,
