@@ -196,7 +196,7 @@ export interface Select2Options {
     /** Callback that populates results. */
     populateResults?: (container: HTMLElement, results: Select2Item[], query: Select2QueryOptions) => void
     /** Callback that determines whether to focus the input. */
-    shouldFocusInput?: (p1: any) => boolean;
+    shouldFocusInput?: (p1: AbstractSelect2) => boolean;
 }
 
 const lastMousePosition = { x: 0, y: 0 };
@@ -1125,7 +1125,7 @@ function cleanupElements() {
 
 const resultsSelector = ".select2-results";
 
-abstract class AbstractSelect2 {
+export abstract class AbstractSelect2 {
 
     declare private _enabled: boolean;
     declare private _readonly: boolean;
@@ -2454,7 +2454,7 @@ abstract class AbstractSelect2 {
     }
 }
 
-class SingleSelect2 extends AbstractSelect2 {
+export class SingleSelect2 extends AbstractSelect2 {
 
     declare protected focusser: HTMLInputElement;
 
@@ -3048,7 +3048,7 @@ class SingleSelect2 extends AbstractSelect2 {
     }
 }
 
-class MultiSelect2 extends AbstractSelect2 {
+export class MultiSelect2 extends AbstractSelect2 {
 
     protected createContainer(): HTMLElement {
         return (
