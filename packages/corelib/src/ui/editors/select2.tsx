@@ -197,7 +197,9 @@ export interface Select2Options {
     nextSearchTerm?: (selectedObject: Select2Item, currentSearchTerm: string) => string;
     /** Callback that populates results. */
     populateResults?: (container: HTMLElement, results: Select2Item[], query: Select2QueryOptions) => void
-    /** Callback that determines whether to focus the input. */
+    /** Callback that determines whether to focus the input. Defaults to not focusing the input
+     * on touch devices, so that the virtual keyboard does not cover the dropdown. Hardware
+     * keyboard input is still routed to the widget. */
     shouldFocusInput?: (instance: AbstractSelect2) => boolean;
 }
 
@@ -350,6 +352,15 @@ function measureScrollbar() {
     $template.remove();
 
     return dim;
+}
+
+/**
+ * Determines if the device is likely a touch device (e.g. a phone or tablet),
+ * based on its primary pointer type when supported.
+ */
+function isTouchDevice() {
+    return window.matchMedia?.("(pointer: coarse)")?.matches ??
+        (('ontouchstart' in window) || (navigator.maxTouchPoints > 0));
 }
 
 /**
@@ -805,22 +816,11 @@ export class Select2 {
         nextSearchTerm: function (selectedObject, currentSearchTerm) { return undefined; },
         searchInputPlaceholder: '',
         createSearchChoicePosition: 'top',
-        shouldFocusInput: function (instance) {
-            // Attempt to detect touch devices
-            const supportsTouchEvents = (('ontouchstart' in window) ||
-                ('msMaxTouchPoints' in navigator));
-
-            // Only devices which support touch events should be special cased
-            if (!supportsTouchEvents) {
-                return true;
-            }
-
-            // Never focus the input if search is disabled
-            if (instance["opts"]?.minimumResultsForSearch < 0) {
-                return false;
-            }
-
-            return true;
+        shouldFocusInput: function () {
+            // On touch devices, do not focus the search input automatically,
+            // otherwise the virtual keyboard would cover the dropdown. The user
+            // can still focus it by tapping the search field.
+            return !isTouchDevice();
         }
     };
 
@@ -1736,6 +1736,10 @@ export abstract class AbstractSelect2 {
 
         //if we are changing direction we need to get positions when dropdown is hidden;
         if (changeDirection) {
+            // hiding the dropdown below would blur the search input if it is focused,
+            // so remember its state and only refocus it when it had focus (otherwise
+            // focusing it on a touch device would pop up the virtual keyboard)
+            const hadSearchFocus = document.activeElement === this.search;
             Fluent.toggleClass(dropdown, "select2-display-none", true);
             offset = getOffset(this.container);
             height = this.container.offsetHeight;
@@ -1747,8 +1751,10 @@ export abstract class AbstractSelect2 {
             enoughRoomOnRight = dropLeft + dropWidth <= viewPortRight;
             Fluent.toggleClass(dropdown, "select2-display-none", false);
 
-            // fix so the cursor does not move to the left within the search-textbox in IE
-            this.focusSearch();
+            if (hadSearchFocus) {
+                // fix so the cursor does not move to the left within the search-textbox in IE
+                this.focusSearch();
+            }
         }
 
         if (this.opts.dropdownAutoWidth) {
@@ -1834,6 +1840,10 @@ export abstract class AbstractSelect2 {
             lastMousePosition.x = e.pageX;
             lastMousePosition.y = e.pageY;
         });
+
+        // Focus the search input when the user types with a hardware keyboard, even
+        // when it was not focused automatically (e.g. on touch devices)
+        Fluent.on(document, "keydown.select2External", bindThis(this).handleExternalKeydown);
 
         return true;
     }
@@ -1954,6 +1964,7 @@ export abstract class AbstractSelect2 {
 
         // Now that the dropdown is closed, unbind the global document mousemove event
         Fluent.off(document, "mousemove.select2Event");
+        Fluent.off(document, "keydown.select2External", this.handleExternalKeydown);
 
         this.clearSearch();
         this.search.classList.remove("select2-active");
@@ -2170,6 +2181,60 @@ export abstract class AbstractSelect2 {
 
     protected handleSearchBlur() {
         this.search?.classList.remove("select2-focused");
+    }
+
+    private handleExternalKeydown(e: KeyboardEvent) {
+        if (!this.opened() || !this.isInterfaceEnabled() ||
+            e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey)
+            return;
+
+        if (!e.key || e.isComposing)
+            return;
+
+        const target = e.target as HTMLElement;
+
+        // ignore events targeted at editable elements, including our own search input
+        if (target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable))
+            return;
+
+        // only handle keys when nothing else is focused, or when the target is the widget
+        // itself, so that we don't steal keys meant for other controls on the page
+        if (target && target !== document.body && target !== document.documentElement &&
+            !this.container?.contains(target) && !this.dropdown?.contains(target))
+            return;
+
+        switch (e.key) {
+            case "Escape":
+                // the search input would normally handle this key
+                this.cancel(e);
+                killEvent(e);
+                return;
+
+            case "Enter":
+                // select the highlighted item, as the search input would normally do;
+                // no need to focus the search input for this key
+                this.selectHighlighted();
+                killEvent(e);
+                return;
+
+            case "ArrowUp":
+            case "ArrowDown":
+                // move the highlight; focus the search input only if the widget is
+                // allowed to do so, as focusing could show the virtual keyboard
+                this.moveHighlight((e.key === "ArrowUp") ? -1 : 1);
+                if (this.opts.shouldFocusInput(this))
+                    this.search.focus();
+                killEvent(e);
+                return;
+        }
+
+        if (e.key.length !== 1)
+            return;
+
+        // The user is typing with a hardware keyboard (virtual keyboards only exist
+        // while an input is focused, so this can't be a virtual keyboard). Focus the
+        // search input, the typed character will be inserted into it by the browser.
+        this.search.focus();
     }
 
     /**
@@ -2652,7 +2717,7 @@ export class SingleSelect2 extends AbstractSelect2 {
         Fluent.on(this.search, "blur", e => {
             // a workaround for chrome to keep the search field focussed when the scroll bar is used to scroll the dropdown.
             // without this the search field loses focus which is annoying
-            if (document.activeElement === document.body) {
+            if (document.activeElement === document.body && this.opts.shouldFocusInput(this)) {
                 window.setTimeout(() => {
                     if (this.opened()) {
                         this.search.focus();
@@ -3167,7 +3232,8 @@ export class MultiSelect2 extends AbstractSelect2 {
         const _this = this;
         Fluent.on(this.selection, "click", ".select2-search-choice:not(.select2-locked)", (e: Event) => {
             //killEvent(e);
-            _this.search.focus();
+            if (_this.opts.shouldFocusInput(_this))
+                _this.search.focus();
             _this.selectChoice((e.target as HTMLElement).closest('.select2-search-choice') as HTMLElement);
         });
 
@@ -3311,7 +3377,8 @@ export class MultiSelect2 extends AbstractSelect2 {
                 Fluent.trigger(this.opts.element, "select2-focus");
             }
             this.open();
-            this.focusSearch();
+            if (this.opts.shouldFocusInput(this))
+                this.focusSearch();
             e.preventDefault();
         });
 
@@ -3391,7 +3458,8 @@ export class MultiSelect2 extends AbstractSelect2 {
 
         super.opening();
 
-        this.focusSearch();
+        if (this.opts.shouldFocusInput(this))
+            this.focusSearch();
 
         // initializes search's value with nextSearchTerm (if defined by user)
         // ignore nextSearchTerm if the dropdown is opened by the user pressing a letter
@@ -3501,13 +3569,14 @@ export class MultiSelect2 extends AbstractSelect2 {
         // added we do not need to check if this is a new element before firing change
         this.triggerChange({ added: data });
 
-        if (!options || !options.noFocus)
+        if ((!options || !options.noFocus) && this.opts.shouldFocusInput(this))
             this.focusSearch();
     }
 
     protected override cancel(e?: Event) {
         this.close();
-        this.focusSearch();
+        if (this.opts.shouldFocusInput(this))
+            this.focusSearch();
     }
 
     protected addSelectedChoice(data: Select2Item) {
@@ -3553,7 +3622,8 @@ export class MultiSelect2 extends AbstractSelect2 {
                 this.selection.querySelector(".select2-search-choice-focus")?.classList.remove("select2-search-choice-focus");
                 killEvent(e);
                 this.close();
-                this.focusSearch();
+                if (this.opts.shouldFocusInput(this))
+                    this.focusSearch();
             }));
 
             Fluent.on(close, "focus", () => {

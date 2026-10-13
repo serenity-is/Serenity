@@ -939,19 +939,464 @@ describe("Select2 wrapper", () => {
     });
 
     it("detects touch devices when deciding whether to focus", () => {
-        (window as any).ontouchstart = null;
+        const matchMedia = window.matchMedia;
+        try {
+            delete (window as any).matchMedia;
+            (window as any).ontouchstart = null;
+            const input = document.createElement("input");
+            document.body.appendChild(input);
+            new Select2({
+                element: input,
+                initSelection: (_e, callback) => callback(null),
+                query: query => query.callback({ results: [], more: false })
+            } as any);
+            const internal: any = (input as any).select2;
+            expect(internal.opts.shouldFocusInput(internal)).toBe(false);
+            internal.destroy();
+        }
+        finally {
+            delete (window as any).ontouchstart;
+            window.matchMedia = matchMedia;
+        }
+    });
+
+    it("does not focus the search input when opening on a touch device", () => {
+        const matchMedia = window.matchMedia;
+        try {
+            delete (window as any).matchMedia;
+            (window as any).ontouchstart = null;
+            const input = document.createElement("input");
+            document.body.appendChild(input);
+            new Select2({
+                element: input,
+                initSelection: (_e, callback) => callback(null),
+                query: query => query.callback({ results: [], more: false })
+            } as any);
+            const internal: any = (input as any).select2;
+            internal.open();
+            expect(document.activeElement).not.toBe(internal.search);
+            internal.destroy();
+        }
+        finally {
+            delete (window as any).ontouchstart;
+            window.matchMedia = matchMedia;
+        }
+    });
+
+    it("does not focus the search input when the pointer is coarse", () => {
+        const matchMedia = window.matchMedia;
+        try {
+            window.matchMedia = ((query: string) => ({ matches: query === "(pointer: coarse)" })) as any;
+            const input = document.createElement("input");
+            document.body.appendChild(input);
+            new Select2({
+                element: input,
+                initSelection: (_e, callback) => callback(null),
+                query: query => query.callback({ results: [], more: false })
+            } as any);
+            const internal: any = (input as any).select2;
+            internal.open();
+            expect(document.activeElement).not.toBe(internal.search);
+            internal.destroy();
+        }
+        finally {
+            window.matchMedia = matchMedia;
+        }
+    });
+
+    it("focuses the search input when opening on a non-touch device", () => {
+        const matchMedia = window.matchMedia;
+        try {
+            window.matchMedia = (() => ({ matches: false })) as any;
+            const input = document.createElement("input");
+            document.body.appendChild(input);
+            new Select2({
+                element: input,
+                initSelection: (_e, callback) => callback(null),
+                query: query => query.callback({ results: [], more: false })
+            } as any);
+            const internal: any = (input as any).select2;
+            internal.open();
+            expect(document.activeElement).toBe(internal.search);
+            internal.destroy();
+        }
+        finally {
+            window.matchMedia = matchMedia;
+        }
+    });
+
+    it("does not focus the multi search input when opening on a touch device", () => {
+        const matchMedia = window.matchMedia;
+        try {
+            window.matchMedia = ((query: string) => ({ matches: query === "(pointer: coarse)" })) as any;
+            const input = document.createElement("input");
+            document.body.appendChild(input);
+            new Select2({
+                element: input,
+                multiple: true,
+                initSelection: (_e, callback) => callback([]),
+                query: query => query.callback({ results: [], more: false })
+            } as any);
+            const internal: any = (input as any).select2;
+            internal.container.querySelector(".select2-choices").dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
+            expect(internal.opened()).toBe(true);
+            expect(document.activeElement).not.toBe(internal.search);
+            internal.destroy();
+        }
+        finally {
+            window.matchMedia = matchMedia;
+        }
+    });
+
+    it("only refocuses the search input on dropdown reposition when it was focused", () => {
         const input = document.createElement("input");
         document.body.appendChild(input);
         new Select2({
             element: input,
-            minimumResultsForSearch: -1,
             initSelection: (_e, callback) => callback(null),
             query: query => query.callback({ results: [], more: false })
         } as any);
         const internal: any = (input as any).select2;
-        expect(internal.opts.shouldFocusInput(internal)).toBe(false);
+        (internal.container as HTMLElement).getBoundingClientRect = () =>
+            ({ top: 5000, left: 0, bottom: 5010, right: 100, width: 100, height: 10, x: 0, y: 5000, toJSON: () => ({}) }) as DOMRect;
+        const focusSearch = vi.spyOn(internal, "focusSearch").mockImplementation(() => { });
+        internal.positionDropdown();
+        expect(focusSearch).not.toHaveBeenCalled();
+        internal.search.focus();
+        internal.clearDropdownAlignmentPreference();
+        internal.positionDropdown();
+        expect(focusSearch).toHaveBeenCalledTimes(1);
+        focusSearch.mockRestore();
         internal.destroy();
-        delete (window as any).ontouchstart;
+    });
+
+    it("focuses the search input when typing with a hardware keyboard on a touch device", () => {
+        const matchMedia = window.matchMedia;
+        try {
+            window.matchMedia = ((query: string) => ({ matches: query === "(pointer: coarse)" })) as any;
+            const input = document.createElement("input");
+            document.body.appendChild(input);
+            new Select2({
+                element: input,
+                initSelection: (_e, callback) => callback(null),
+                query: query => query.callback({ results: [], more: false })
+            } as any);
+            const internal: any = (input as any).select2;
+            internal.open();
+            expect(document.activeElement).not.toBe(internal.search);
+            document.body.dispatchEvent(new KeyboardEvent("keydown", { key: "a", bubbles: true }));
+            expect(document.activeElement).toBe(internal.search);
+            internal.destroy();
+        }
+        finally {
+            window.matchMedia = matchMedia;
+        }
+    });
+
+    it("does not focus the search input on keydown targeted at another input", () => {
+        const matchMedia = window.matchMedia;
+        try {
+            window.matchMedia = ((query: string) => ({ matches: query === "(pointer: coarse)" })) as any;
+            const other = document.createElement("input");
+            document.body.appendChild(other);
+            const input = document.createElement("input");
+            document.body.appendChild(input);
+            new Select2({
+                element: input,
+                initSelection: (_e, callback) => callback(null),
+                query: query => query.callback({ results: [], more: false })
+            } as any);
+            const internal: any = (input as any).select2;
+            internal.open();
+            other.focus();
+            other.dispatchEvent(new KeyboardEvent("keydown", { key: "a", bubbles: true }));
+            expect(document.activeElement).toBe(other);
+            internal.destroy();
+        }
+        finally {
+            window.matchMedia = matchMedia;
+        }
+    });
+
+    it("does not focus the search input on keydown after the dropdown is closed", () => {
+        const matchMedia = window.matchMedia;
+        try {
+            window.matchMedia = ((query: string) => ({ matches: query === "(pointer: coarse)" })) as any;
+            const input = document.createElement("input");
+            document.body.appendChild(input);
+            new Select2({
+                element: input,
+                initSelection: (_e, callback) => callback(null),
+                query: query => query.callback({ results: [], more: false })
+            } as any);
+            const internal: any = (input as any).select2;
+            internal.open();
+            internal.close();
+            document.body.dispatchEvent(new KeyboardEvent("keydown", { key: "a", bubbles: true }));
+            expect(document.activeElement).not.toBe(internal.search);
+            internal.destroy();
+        }
+        finally {
+            window.matchMedia = matchMedia;
+        }
+    });
+
+    it("moves the highlight on navigation keys without focusing the search input on a touch device", () => {
+        const matchMedia = window.matchMedia;
+        try {
+            window.matchMedia = ((query: string) => ({ matches: query === "(pointer: coarse)" })) as any;
+            const input = document.createElement("input");
+            document.body.appendChild(input);
+            new Select2({
+                element: input,
+                initSelection: (_e, callback) => callback(null),
+                query: query => query.callback({
+                    results: [
+                        { id: "1", text: "One" },
+                        { id: "2", text: "Two" }
+                    ], more: false
+                })
+            } as any);
+            const internal: any = (input as any).select2;
+            internal.open();
+            expect(document.activeElement).not.toBe(internal.search);
+            const down = new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true, cancelable: true });
+            document.body.dispatchEvent(down);
+            expect(down.defaultPrevented).toBe(true);
+            expect(document.activeElement).not.toBe(internal.search);
+            expect(internal.highlight()).toBe(1);
+            const up = new KeyboardEvent("keydown", { key: "ArrowUp", bubbles: true, cancelable: true });
+            document.body.dispatchEvent(up);
+            expect(up.defaultPrevented).toBe(true);
+            expect(document.activeElement).not.toBe(internal.search);
+            expect(internal.highlight()).toBe(0);
+            internal.destroy();
+        }
+        finally {
+            window.matchMedia = matchMedia;
+        }
+    });
+
+    it("closes the dropdown on Escape with a hardware keyboard on a touch device", () => {
+        const matchMedia = window.matchMedia;
+        try {
+            window.matchMedia = ((query: string) => ({ matches: query === "(pointer: coarse)" })) as any;
+            const input = document.createElement("input");
+            document.body.appendChild(input);
+            new Select2({
+                element: input,
+                initSelection: (_e, callback) => callback(null),
+                query: query => query.callback({ results: [], more: false })
+            } as any);
+            const internal: any = (input as any).select2;
+            internal.open();
+            expect(internal.opened()).toBe(true);
+            document.body.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true }));
+            expect(internal.opened()).toBe(false);
+            internal.destroy();
+        }
+        finally {
+            window.matchMedia = matchMedia;
+        }
+    });
+
+    it("selects the highlighted item on Enter without focusing the search input on a touch device", () => {
+        const matchMedia = window.matchMedia;
+        try {
+            window.matchMedia = ((query: string) => ({ matches: query === "(pointer: coarse)" })) as any;
+            const input = document.createElement("input");
+            document.body.appendChild(input);
+            new Select2({
+                element: input,
+                initSelection: (_e, callback) => callback(null),
+                query: query => query.callback({
+                    results: [
+                        { id: "1", text: "One" },
+                        { id: "2", text: "Two" }
+                    ], more: false
+                })
+            } as any);
+            const internal: any = (input as any).select2;
+            internal.open();
+            expect(document.activeElement).not.toBe(internal.search);
+            const event = new KeyboardEvent("keydown", { key: "Enter", bubbles: true, cancelable: true });
+            document.body.dispatchEvent(event);
+            expect(event.defaultPrevented).toBe(true);
+            expect(document.activeElement).not.toBe(internal.search);
+            expect(input.value).toBe("1");
+            expect(internal.opened()).toBe(false);
+            internal.destroy();
+        }
+        finally {
+            window.matchMedia = matchMedia;
+        }
+    });
+
+    it("highlights on arrow down and selects on enter without focusing the search input on a touch device", () => {
+        const matchMedia = window.matchMedia;
+        try {
+            window.matchMedia = ((query: string) => ({ matches: query === "(pointer: coarse)" })) as any;
+            const input = document.createElement("input");
+            document.body.appendChild(input);
+            new Select2({
+                element: input,
+                initSelection: (_e, callback) => callback(null),
+                query: query => query.callback({
+                    results: [
+                        { id: "1", text: "One" },
+                        { id: "2", text: "Two" }
+                    ], more: false
+                })
+            } as any);
+            const internal: any = (input as any).select2;
+            internal.open();
+            expect(document.activeElement).not.toBe(internal.search);
+            const down = new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true, cancelable: true });
+            document.body.dispatchEvent(down);
+            expect(down.defaultPrevented).toBe(true);
+            expect(document.activeElement).not.toBe(internal.search);
+            expect(internal.highlight()).toBe(1);
+            const enter = new KeyboardEvent("keydown", { key: "Enter", bubbles: true, cancelable: true });
+            document.body.dispatchEvent(enter);
+            expect(enter.defaultPrevented).toBe(true);
+            expect(document.activeElement).not.toBe(internal.search);
+            expect(input.value).toBe("2");
+            expect(internal.opened()).toBe(false);
+            internal.destroy();
+        }
+        finally {
+            window.matchMedia = matchMedia;
+        }
+    });
+
+    it("skips unselectable and disabled items when selecting with enter", () => {
+        const matchMedia = window.matchMedia;
+        try {
+            window.matchMedia = ((query: string) => ({ matches: query === "(pointer: coarse)" })) as any;
+            const input = document.createElement("input");
+            document.body.appendChild(input);
+            new Select2({
+                element: input,
+                initSelection: (_e, callback) => callback(null),
+                query: query => query.callback({
+                    results: [
+                        { text: "Unselectable" },
+                        { id: "1", text: "One", disabled: true },
+                        { id: "2", text: "Two" }
+                    ], more: false
+                })
+            } as any);
+            const internal: any = (input as any).select2;
+            internal.open();
+            expect(internal.highlight()).toBe(0);
+            document.body.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true, cancelable: true }));
+            expect(input.value).toBe("2");
+            internal.destroy();
+        }
+        finally {
+            window.matchMedia = matchMedia;
+        }
+    });
+
+    it("ignores hardware keyboard input when the widget is readonly", () => {
+        const matchMedia = window.matchMedia;
+        try {
+            window.matchMedia = ((query: string) => ({ matches: query === "(pointer: coarse)" })) as any;
+            const input = document.createElement("input");
+            document.body.appendChild(input);
+            new Select2({
+                element: input,
+                initSelection: (_e, callback) => callback(null),
+                query: query => query.callback({
+                    results: [
+                        { id: "1", text: "One" },
+                        { id: "2", text: "Two" }
+                    ], more: false
+                })
+            } as any);
+            const internal: any = (input as any).select2;
+            internal.open();
+            internal.readonly(true);
+            expect(internal.opened()).toBe(false);
+            expect(internal.open()).toBe(false);
+            document.body.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true, cancelable: true }));
+            expect(input.value).toBe("");
+            document.body.dispatchEvent(new KeyboardEvent("keydown", { key: "a", bubbles: true }));
+            expect(document.activeElement).not.toBe(internal.search);
+            internal.destroy();
+        }
+        finally {
+            window.matchMedia = matchMedia;
+        }
+    });
+
+    it("does not double-handle keys when the search input is focused", () => {
+        const matchMedia = window.matchMedia;
+        try {
+            window.matchMedia = (() => ({ matches: false })) as any;
+            const input = document.createElement("input");
+            document.body.appendChild(input);
+            new Select2({
+                element: input,
+                initSelection: (_e, callback) => callback(null),
+                query: query => query.callback({
+                    results: [
+                        { id: "1", text: "One" },
+                        { id: "2", text: "Two" },
+                        { id: "3", text: "Three" }
+                    ], more: false
+                })
+            } as any);
+            const internal: any = (input as any).select2;
+            internal.open();
+            expect(document.activeElement).toBe(internal.search);
+            const down = new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true, cancelable: true });
+            internal.search.dispatchEvent(down);
+            expect(down.defaultPrevented).toBe(true);
+            expect(internal.highlight()).toBe(1);
+            const enter = new KeyboardEvent("keydown", { key: "Enter", bubbles: true, cancelable: true });
+            internal.search.dispatchEvent(enter);
+            expect(enter.defaultPrevented).toBe(true);
+            expect(input.value).toBe("2");
+            expect(internal.opened()).toBe(false);
+            internal.destroy();
+        }
+        finally {
+            window.matchMedia = matchMedia;
+        }
+    });
+
+    it("does not route keys targeted at other elements to the widget", () => {
+        const matchMedia = window.matchMedia;
+        try {
+            window.matchMedia = ((query: string) => ({ matches: query === "(pointer: coarse)" })) as any;
+            const button = document.createElement("button");
+            document.body.appendChild(button);
+            const input = document.createElement("input");
+            document.body.appendChild(input);
+            new Select2({
+                element: input,
+                initSelection: (_e, callback) => callback(null),
+                query: query => query.callback({
+                    results: [
+                        { id: "1", text: "One" },
+                        { id: "2", text: "Two" }
+                    ], more: false
+                })
+            } as any);
+            const internal: any = (input as any).select2;
+            internal.open();
+            button.focus();
+            button.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
+            expect(document.activeElement).toBe(button);
+            expect(internal.highlight()).toBe(0);
+            button.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+            expect(internal.opened()).toBe(true);
+            internal.destroy();
+        }
+        finally {
+            window.matchMedia = matchMedia;
+        }
     });
 
     it("adapts css classes from the source element", () => {

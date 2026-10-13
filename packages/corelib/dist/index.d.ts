@@ -14002,7 +14002,9 @@ export interface Select2Options {
 	nextSearchTerm?: (selectedObject: Select2Item, currentSearchTerm: string) => string;
 	/** Callback that populates results. */
 	populateResults?: (container: HTMLElement, results: Select2Item[], query: Select2QueryOptions) => void;
-	/** Callback that determines whether to focus the input. */
+	/** Callback that determines whether to focus the input. Defaults to not focusing the input
+	 * on touch devices, so that the virtual keyboard does not cover the dropdown. Typing with a
+	 * hardware keyboard still focuses the search input. */
 	shouldFocusInput?: (instance: AbstractSelect2) => boolean;
 }
 /**
@@ -14221,6 +14223,7 @@ export declare abstract class AbstractSelect2 {
 	protected handleSearchInput(): void;
 	protected handleSearchFocus(): void;
 	protected handleSearchBlur(): void;
+	private handleExternalKeydown;
 	/**
 	 * @param initial whether or not this is the call to this method right after the dropdown has been opened
 	 */
