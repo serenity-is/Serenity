@@ -1,0 +1,4 @@
+/wwwroot/bootstrap/**/*.css
+/wwwroot/glightbox/**/*.css
+/wwwroot/nprogress/**/*.css
+/wwwroot/tabler-icons/**/*.css

@@ -1,5 +1,24 @@
 @import "./slick.base.css";
 
+/* SVG icon masks (generated): replaces s-icon-font glyphs */
+button.ui-datepicker-trigger::before,
+.slick-editor-percentcomplete-picker::before {
+    content: "";
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    vertical-align: -0.125em;
+    background-color: currentColor;
+    -webkit-mask-image: var(--s-ico);
+    mask-image: var(--s-ico);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+}
+
 /*
 IMPORTANT:
 In order to preserve the uniform grid appearance, all cell styles need to have padding, margin and border sizes.
@@ -191,15 +210,15 @@ classes should alter those!
 }
 
 .slick-editor-percentcomplete-picker::before {
-  font-family: 'Font Awesome 5 Free', FontAwesome;
-  font-weight: 900;
-  content: '\f304';
+    font-family: 'Font Awesome 5 Free', FontAwesome;
+    font-weight: 900;
+    --s-ico: var(--s-icon-slick-editor-percentcomplete-picker, var(--s-icon-pen));
 }
 
 button.ui-datepicker-trigger::before {
-  font-family: 'Font Awesome 5 Free', FontAwesome;
-  font-weight: 900;
-  content: '\f304';
+    font-family: 'Font Awesome 5 Free', FontAwesome;
+    font-weight: 900;
+    --s-ico: var(--s-icon-button-ui-datepicker-trigger, var(--s-icon-pen));
 }
 
 .slick-editor-percentcomplete-helper {

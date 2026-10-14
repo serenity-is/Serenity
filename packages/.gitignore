@@ -4,8 +4,5 @@ coverage/
 out/
 /*/dist/**/*.js
 /*/dist/**/*.map
-/assets/wwwroot/bootstrap/**/*.css
-/assets/wwwroot/glightbox/**/*.css
-/assets/wwwroot/nprogress/**/*.css
 /*/wwwroot/**/*.js
 /*/wwwroot/**/*.map

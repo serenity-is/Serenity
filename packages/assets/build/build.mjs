@@ -1,6 +1,10 @@
 import { copyFileSync, constants, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 import esbuild from 'esbuild';
+// import { buildTablerFaSubset, buildTablerSerenityIcons } from './tabler-icons.mjs'; // disabled, see below
+// import { buildTablerFaShim } from './tabler-icons.mjs'; // experimental, see below
+// import { buildTablerIconsSvg } from './tabler-icons.mjs'; // experimental, see below
+// import { buildLineAwesomeSerenityIcons } from './line-awesome-icons.mjs'; // disabled, see below
 
 function copyFileIfChanged(srcFile, dstfile, opt) {
 
@@ -35,6 +39,14 @@ function copyFileIfChanged(srcFile, dstfile, opt) {
 
     copyFileSync(srcFile, dstfile, constants.COPYFILE_FICLONE);
     console.log(`Copied: ${srcFile} to ${dstfile}.`);
+}
+
+function writeFileIfChanged(file, content, encoding = 'utf-8') {
+    if (existsSync(file) && readFileSync(file, encoding) === content)
+        return;
+    mkdirSync(dirname(file), { recursive: true });
+    writeFileSync(file, content, encoding);
+    console.log(`Generated: ${file}.`);
 }
 
 function removeSourceMappingURL(content, srcFile) {
@@ -209,6 +221,61 @@ function writeIfChanged() {
         }
     };
 }
+
+// All icon CSS generation is disabled: the generated files are checked in as-is.
+// The generator modules (build/tabler-icons.mjs, build/line-awesome-icons.mjs) are
+// block-commented and each require devDependencies to run again; see their headers.
+// The commented calls below show what each one produced.
+//
+// const tablerFaSubset = buildTablerFaSubset();
+// writeFileIfChanged('wwwroot/tabler-icons/tabler-fa-subset.css', tablerFaSubset);
+
+// Experimental font based shim (kept for reference, currently disabled):
+// buildTablerFaShim maps the same fa-* class names onto the Tabler webfont
+// (content codepoints + the fa utility classes), reading codepoints/family from
+// webfontVariant in tabler-icons.mjs. It declares no fonts; load the matching
+// @tabler/icons-webfont CSS alongside it. The family is overridable via
+// --tabler-icons-font. Note: names mapped to the Line Awesome fallback ("" in
+// tabler-fa-map.json, e.g. th-list/toolbox) and names without a codepoint get no
+// glyph here (the SVG subset inlines the LA path instead). Uncomment to
+// regenerate wwwroot/tabler-icons/tabler-fa-shim.css.
+//
+// const tablerFaShim = buildTablerFaShim();
+// writeFileIfChanged('wwwroot/tabler-icons/tabler-fa-shim.css', tablerFaShim);
+
+// Experimental comparison artifact (kept for reference, currently disabled):
+// generates the full Tabler .ti-* set as SVG masks so it can be benchmarked
+// against @tabler/icons-webfont. Not referenced by any bundle; uncomment to
+// regenerate wwwroot/tabler-icons/tabler-icons-svg.css.
+//
+// Results (webfont 3.49.0, @iconify-json/tabler 1.2.42):
+//   - Coverage: all 5247 webfont .ti-* classes are present; the SVG file has
+//     1233 extra *-filled variants (6480 total), since the webfont dist ships
+//     the outline set only, so it is a strict superset.
+//   - Sharing: one rule per unique SVG -> 6480 .ti-* names + 1062 fa mappings
+//     collapse to 6270 rules (aliases and fa mappings reuse the .ti-* def).
+//   - Size: SVG 2.81 MB raw / 355 KB gzip / 266 KB brotli, vs webfont
+//     255 KB css (38 KB gzip) + 507 KB woff2 = ~544 KB gzip transfer.
+//     => SVG masks are ~half the transfer size, but are per-icon payload
+//        rather than one shared cacheable font.
+//
+// const tablerIconsSvg = buildTablerIconsSvg();
+// writeFileIfChanged('wwwroot/tabler-icons/tabler-icons-svg.css', tablerIconsSvg);
+
+// const tablerSerenityIcons = buildTablerSerenityIcons();
+// if (tablerSerenityIcons)
+//     writeFileIfChanged('wwwroot/tabler-icons/tabler-serenity-icons.css', tablerSerenityIcons);
+
+// Disabled: wwwroot/line-awesome/css/line-awesome-serenity-icons.css is checked
+// in, so the build no longer regenerates it. To regenerate:
+//   1. add devDependencies `@iconify-json/la` and `@iconify/utils` (the tabler
+//      generators additionally need `@iconify-json/tabler` and `@tabler/icons-webfont`)
+//   2. uncomment the import at the top and un-comment build/line-awesome-icons.mjs
+//   3. uncomment the two lines below, then run `pnpm build`.
+//
+// const laSerenityIcons = buildLineAwesomeSerenityIcons();
+// if (laSerenityIcons)
+//     writeFileIfChanged('wwwroot/line-awesome/css/line-awesome-serenity-icons.css', laSerenityIcons);
 
 await esbuild.build({
     entryPoints: ['./src/**/*.mjs'],

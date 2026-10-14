@@ -38,7 +38,7 @@ export class NotesEditor<P = {}> extends EditorWidget<P>
                 <a href="#" class="note-date" data-index={index} onClick={boundThis.editClick}>
                     {item.InsertUserDisplayName + ' - ' + formatDate(item.InsertDate, 'g')}
                 </a>
-                <a href="#" class="note-delete" data-index={index} title="delete note" onClick={boundThis.deleteClick} />
+                <a href="#" class="note-delete" data-index={index} title="delete note" onClick={boundThis.deleteClick}><i class="fa fa-trash" /></a>
             </li>
         )}</>);
     }

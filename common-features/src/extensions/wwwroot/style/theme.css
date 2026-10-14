@@ -1,5 +1,229 @@
 @import "../../../../../packages/sleekgrid/css/slick.base.css";
 
+/*
+ * Generic SVG icon helper classes.
+ *
+ * Mask - monotone icon that follows text color:
+ *
+ *   .svg-icon-dashboard { --svg: url("data:image/svg+xml,..."); }
+ *   <i class="svg-icon-dashboard"></i>
+ *
+ *   .my-icon { --svg: url("/icons/my-icon.svg"); }
+ *   <i class="svg-icon my-icon"></i>
+ *   <i class="svg-icon-mask my-icon"></i>       same as .svg-icon
+ *
+ * Background - keeps the SVG's own colors (palette icons, two color icons):
+ *
+ *   .svg-bg-icon-logo { --svg: url("..."); }
+ *   <i class="svg-bg-icon-logo"></i>
+ *   <i class="svg-bg-icon my-icon"></i>
+ *
+ * Content - keeps colors, renders at the SVG's intrinsic width/height:
+ *
+ *   .svg-content-icon-logo { --svg: url("..."); }
+ *   <i class="svg-content-icon-logo"></i>
+ *   <i class="svg-content-icon my-icon"></i>
+ *
+ * Accent - two stacked layers, main layer follows text color while the accent
+ * layer uses its own color (e.g. a badge/dot that stays red on hover):
+ *
+ *   .svg-accent-icon-bell {
+ *       --svg: url("...bell shape...");
+ *       --svg-accent: url("...dot shape...");
+ *       --svg-accent-color: #e5484d;
+ *   }
+ *   <i class="svg-accent-icon-bell"></i>
+ *   <i class="svg-accent-icon my-accent"></i>
+ *
+ * Theme-specific variants are up to you, e.g.:
+ *
+ *   :root.dark .svg-icon-dashboard { --svg: url("..."); }
+ *
+ * Notes:
+ * - Only mask mode follows `color`/`currentColor`. Background, content and the
+ *   accent layer use their own colors.
+ * - Content mode renders the image at the size stated in its width/height
+ *   attributes, it cannot be resized through CSS.
+ * - Use only one mode per element. The svg-icon-, svg-bg-icon-,
+ *   svg-accent-icon- and svg-content-icon- class prefixes are reserved.
+ */
+
+.svg-icon,
+.svg-bg-icon,
+.svg-content-icon,
+[class^="svg-icon-"], [class*=" svg-icon-"],
+[class^="svg-bg-icon-"], [class*=" svg-bg-icon-"],
+[class^="svg-content-icon-"], [class*=" svg-content-icon-"] {
+    display: inline-block;
+    font-style: normal;
+    line-height: 1;
+}
+
+.svg-icon::before,
+.svg-icon-mask::before,
+[class^="svg-icon-"]::before,
+[class*=" svg-icon-"]::before {
+    content: "";
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    vertical-align: -0.125em;
+    background-color: currentColor;
+    -webkit-mask-image: var(--svg, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3Cpath fill='none' d='M0 0h1v1H0z'/%3E%3C/svg%3E"));
+    mask-image: var(--svg, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3Cpath fill='none' d='M0 0h1v1H0z'/%3E%3C/svg%3E"));
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+}
+
+.svg-bg-icon::before,
+[class^="svg-bg-icon-"]::before,
+[class*=" svg-bg-icon-"]::before {
+    content: "";
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    vertical-align: -0.125em;
+    background-color: transparent;
+    background-image: var(--svg, none);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    -webkit-mask-image: none;
+    mask-image: none;
+}
+
+.svg-content-icon::before,
+[class^="svg-content-icon-"]::before,
+[class*=" svg-content-icon-"]::before {
+    content: var(--svg, "");
+    display: inline-block;
+    vertical-align: -0.125em;
+    background-color: transparent;
+    background-image: none;
+    -webkit-mask-image: none;
+    mask-image: none;
+}
+
+.svg-accent-icon,
+[class^="svg-accent-icon-"],
+[class*=" svg-accent-icon-"] {
+    display: inline-grid;
+    font-style: normal;
+    line-height: 1;
+    vertical-align: -0.125em;
+}
+
+.svg-accent-icon::before,
+[class^="svg-accent-icon-"]::before,
+[class*=" svg-accent-icon-"]::before,
+.svg-accent-icon::after,
+[class^="svg-accent-icon-"]::after,
+[class*=" svg-accent-icon-"]::after {
+    grid-area: 1 / 1;
+    content: "";
+    width: 1em;
+    height: 1em;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+}
+
+.svg-accent-icon::before,
+[class^="svg-accent-icon-"]::before,
+[class*=" svg-accent-icon-"]::before {
+    background-color: currentColor;
+    -webkit-mask-image: var(--svg, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3Cpath fill='none' d='M0 0h1v1H0z'/%3E%3C/svg%3E"));
+    mask-image: var(--svg, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3Cpath fill='none' d='M0 0h1v1H0z'/%3E%3C/svg%3E"));
+}
+
+.svg-accent-icon::after,
+[class^="svg-accent-icon-"]::after,
+[class*=" svg-accent-icon-"]::after {
+    background-color: var(--svg-accent-color, currentColor);
+    -webkit-mask-image: var(--svg-accent, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3Cpath fill='none' d='M0 0h1v1H0z'/%3E%3C/svg%3E"));
+    mask-image: var(--svg-accent, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3Cpath fill='none' d='M0 0h1v1H0z'/%3E%3C/svg%3E"));
+}
+
+/* SVG icon masks (generated): replaces s-icon-font glyphs */
+.s-IncludeDeletedToggle>a::before,
+.add-file-button:not(.icon-tool-button) .button-inner:before,
+.delete-button:not(.icon-tool-button) .button-inner:before,
+.localization-button:not(.icon-tool-button) .button-inner:before,
+.export-xlsx-button:not(.icon-tool-button) .button-inner:before,
+.export-pdf-button:not(.icon-tool-button) .button-inner:before,
+.export-docx-button:not(.icon-tool-button) .button-inner:before,
+.export-csv-button:not(.icon-tool-button) .button-inner:before,
+.apply-changes-button:not(.icon-tool-button) .button-inner:before,
+.slick-group-expand-all::before,
+.slick-group-collapse-all::before,
+.s-TreeExpand::before, .slick-group-toggle.collapsed::before,
+.s-TreeCollapse::before, .slick-group-toggle.expanded::before,
+.slick-pg-reload>span:before,
+.slick-pg-last>span:before,
+.slick-pg-next>span:before,
+.slick-pg-prev>span:before,
+.slick-pg-first>span:before,
+.slick-sort-indicator-desc::before,
+.slick-sort-indicator-asc::before,
+.select2-search.select2-active::after, .select2-search-field.select2-active::after, .select2-more-results.select2-active::after,
+.select2-search::after,
+.select2-dropdown-open .select2-arrow::after,
+.select2-arrow::after,
+.select2-search-choice-close::after,
+.quick-search-field::after,
+.quick-search-icon>i::before,
+button.panel-titlebar-close::after,
+.ui-datepicker .ui-datepicker-next::after,
+.ui-datepicker .ui-datepicker-prev::after,
+button.ui-datepicker-trigger::before,
+.ui-icon-closethick::before,
+.vx label.error::before, .s-FilterPanel div.v span.error::before,
+.inplace-now b::before,
+.inplace-calc b::before,
+.inplace-create.edit b::before,
+.inplace-create b::before,
+.effective-permission.deny::before,
+.effective-permission.partial::before,
+.effective-permission.allow::before,
+.s-MultipleImageUploadEditor li .delete:before,
+.file-item.file-binary .thumb::before,
+.file-item .download a::before,
+.s-SuccessDialog .ui-dialog-content::before, .s-SuccessDialog .modal-body::before,
+.s-InformationDialog .ui-dialog-content::before, .s-InformationDialog .modal-body::before,
+.s-ConfirmDialog .ui-dialog-content::before, .s-ConfirmDialog .modal-body::before,
+.s-WarningDialog .ui-dialog-content::before, .s-WarningDialog .modal-body::before,
+.s-AlertDialog .ui-dialog-content::before, .s-AlertDialog .modal-body::before,
+.effective-permission.deny::before,
+.effective-permission.partial::before,
+.effective-permission.allow::before,
+.s-FilterDisplayBar .reset::before,
+.s-FilterDisplayBar .edit::before,
+.s-FilterPanel a.delete::before,
+.drag-helper.reject::before,
+.drag-helper::before {
+    content: "";
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    vertical-align: -0.125em;
+    background-color: currentColor;
+    -webkit-mask-image: var(--s-ico);
+    mask-image: var(--s-ico);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+}
+
 :root {
   --s-col-gap: 0.7rem;
   --s-icon-font: "Font Awesome 5 Free";
@@ -180,18 +404,16 @@ body.disable-css-transitions *:before {
 }
 
 .drag-helper::before {
-  font-size: 2em;
-  vertical-align: -25%;
-  font-family: var(--s-icon-font);
-  font-weight: var(--s-icon-solid);
-  content: "\f058";
-  color: green;
-  margin-right: 4px;
+    font-size: 2em;
+    vertical-align: -25%;
+    color: green;
+    margin-right: 4px;
+    --s-ico: var(--s-icon-drag-helper, var(--s-icon-check-circle));
 }
 
 .drag-helper.reject::before {
-  content: "\f05e";
-  color: red;
+    color: red;
+    --s-ico: var(--s-icon-drag-helper-reject, var(--s-icon-ban));
 }
 
 .card {
@@ -463,9 +685,7 @@ section.content-header>h1 {
 }
 
 .s-FilterPanel a.delete::before {
-  content: "\f056";
-  font-family: var(--s-icon-font);
-  font-weight: var(--s-icon-solid);
+    --s-ico: var(--s-icon-filter-panel-delete, var(--s-icon-minus-circle));
 }
 
 .s-FilterPanel a.delete:hover {
@@ -597,11 +817,9 @@ section.content-header>h1 {
 }
 
 .s-FilterDisplayBar .edit::before {
-  font-size: 1.35rem;
-  content: "\f0b0";
-  font-family: var(--s-icon-font);
-  font-style: normal;
-  font-weight: var(--s-icon-solid);
+    font-size: 1.35rem;
+    font-style: normal;
+    --s-ico: var(--s-icon-filter-display-bar-edit, var(--s-icon-filter));
 }
 
 .s-FilterDisplayBar .reset {
@@ -612,10 +830,8 @@ section.content-header>h1 {
 }
 
 .s-FilterDisplayBar .reset::before {
-  content: "\f00d";
-  font-family: var(--s-icon-font);
-  font-style: normal;
-  font-weight: var(--s-icon-solid);
+    font-style: normal;
+    --s-ico: var(--s-icon-filter-display-bar-reset, var(--s-icon-times));
 }
 
 .effective-permission {
@@ -623,8 +839,6 @@ section.content-header>h1 {
 }
 
 .effective-permission::before {
-  font-family: var(--s-icon-font);
-  font-weight: var(--s-icon-solid);
   font-size: 19px;
   vertical-align: -2px;
 }
@@ -635,18 +849,18 @@ section.content-header>h1 {
 }
 
 .effective-permission.allow::before {
-  content: "\f058";
-  color: var(--bs-success);
+    color: var(--bs-success);
+    --s-ico: var(--s-icon-effective-permission-allow, var(--s-icon-check-circle));
 }
 
 .effective-permission.partial::before {
-  content: "\f056";
-  color: var(--bs-primary);
+    color: var(--bs-primary);
+    --s-ico: var(--s-icon-effective-permission-partial, var(--s-icon-minus-circle));
 }
 
 .effective-permission.deny::before {
-  content: "\f05e";
-  color: var(--bs-danger);
+    color: var(--bs-danger);
+    --s-ico: var(--s-icon-effective-permission-deny, var(--s-icon-ban));
 }
 
 .s-ColumnPickerDialog > .size {
@@ -732,8 +946,6 @@ section.content-header>h1 {
 
 .s-MessageDialog .ui-dialog-content::before,
 .s-MessageDialog .modal-body::before {
-  font-family: var(--s-icon-font);
-  font-weight: var(--s-icon-solid);
   font-size: 60px;
   line-height: 60px;
   position: absolute;
@@ -743,32 +955,32 @@ section.content-header>h1 {
 
 .s-AlertDialog .ui-dialog-content::before,
 .s-AlertDialog .modal-body::before {
-  content: "\f06a";
-  color: var(--bs-danger);
+    color: var(--bs-danger);
+    --s-ico: var(--s-icon-alert-dialog-ui-content, var(--s-icon-exclamation-circle));
 }
 
 .s-WarningDialog .ui-dialog-content::before,
 .s-WarningDialog .modal-body::before {
-  content: "\f071";
-  color: var(--bs-warning);
+    color: var(--bs-warning);
+    --s-ico: var(--s-icon-warning-dialog-ui-content, var(--s-icon-exclamation-triangle));
 }
 
 .s-ConfirmDialog .ui-dialog-content::before,
 .s-ConfirmDialog .modal-body::before {
-  content: "\f059";
-  color: var(--bs-primary);
+    color: var(--bs-primary);
+    --s-ico: var(--s-icon-confirm-dialog-ui-content, var(--s-icon-question-circle));
 }
 
 .s-InformationDialog .ui-dialog-content::before,
 .s-InformationDialog .modal-body::before {
-  content: "\f05a";
-  color: var(--bs-info);
+    color: var(--bs-info);
+    --s-ico: var(--s-icon-information-dialog-ui-content, var(--s-icon-info-circle));
 }
 
 .s-SuccessDialog .ui-dialog-content::before,
 .s-SuccessDialog .modal-body::before {
-  content: "\f058";
-  color: var(--bs-success);
+    color: var(--bs-success);
+    --s-ico: var(--s-icon-success-dialog-ui-content, var(--s-icon-check-circle));
 }
 
 .fileinput-button {
@@ -812,9 +1024,7 @@ section.content-header>h1 {
 }
 
 .file-item .download a::before {
-  font-family: var(--s-icon-font);
-  font-weight: var(--s-icon-solid);
-  content: "\f019";
+    --s-ico: var(--s-icon-file-item-download, var(--s-icon-download));
 }
 
 .file-item .filename {
@@ -837,9 +1047,7 @@ section.content-header>h1 {
 }
 
 .file-item.file-binary .thumb::before {
-  font-family: var(--s-icon-font);
-  font-weight: var(--s-icon-solid);
-  content: "\f15b";
+    --s-ico: var(--s-icon-file-item-binary-thumb, var(--s-icon-file));
 }
 
 .upload-progress {
@@ -902,10 +1110,8 @@ section.content-header>h1 {
 }
 
 .s-MultipleImageUploadEditor li .delete:before {
-  font-family: var(--s-icon-font);
-  font-weight: var(--s-icon-solid);
-  content: "\f00d";
-  color: var(--bs-danger);
+    color: var(--bs-danger);
+    --s-ico: var(--s-icon-multiple-image-upload-editor-li-delete, var(--s-icon-times));
 }
 
 .s-MultipleImageUploadEditor li .delete:hover {
@@ -1046,8 +1252,6 @@ input[type=checkbox]:indeterminate,
 }
 
 .effective-permission::before {
-  font-family: var(--s-icon-font);
-  font-weight: var(--s-icon-solid);
   font-size: 19px;
   vertical-align: -2px;
 }
@@ -1058,18 +1262,18 @@ input[type=checkbox]:indeterminate,
 }
 
 .effective-permission.allow::before {
-  content: "\f058";
-  color: var(--bs-success);
+    color: var(--bs-success);
+    --s-ico: var(--s-icon-effective-permission-allow, var(--s-icon-check-circle));
 }
 
 .effective-permission.partial::before {
-  content: "\f056";
-  color: var(--bs-primary);
+    color: var(--bs-primary);
+    --s-ico: var(--s-icon-effective-permission-partial, var(--s-icon-minus-circle));
 }
 
 .effective-permission.deny::before {
-  content: "\f05e";
-  color: var(--bs-danger);
+    color: var(--bs-danger);
+    --s-ico: var(--s-icon-effective-permission-deny, var(--s-icon-ban));
 }
 
 input[type=checkbox]:disabled {
@@ -1100,25 +1304,23 @@ input[type=checkbox]:disabled {
 }
 
 .inplace-button b::before {
-  font-family: var(--s-icon-font);
-  font-weight: var(--s-icon-solid);
   line-height: inherit;
 }
 
 .inplace-create b::before {
-  content: "\f069";
+    --s-ico: var(--s-icon-inplace-create, var(--s-icon-asterisk));
 }
 
 .inplace-create.edit b::before {
-  content: "\f044";
+    --s-ico: var(--s-icon-inplace-create-edit, var(--s-icon-edit));
 }
 
 .inplace-calc b::before {
-  content: "\f1ec";
+    --s-ico: var(--s-icon-inplace-calc, var(--s-icon-calculator));
 }
 
 .inplace-now b::before {
-  content: "\f017";
+    --s-ico: var(--s-icon-inplace-now, var(--s-icon-clock));
 }
 
 .mx-field {
@@ -1370,13 +1572,11 @@ textarea.error,
 
 .vx label.error::before,
 .s-FilterPanel div.v span.error::before {
-  font-family: var(--s-icon-font);
-  font-weight: var(--s-icon-solid);
-  line-height: 1;
-  content: "\f06a";
-  font-size: 1.5em;
-  width: 1.5rem;
-  color: var(--bs-form-invalid-border-color);
+    line-height: 1;
+    font-size: 1.5em;
+    width: 1.5rem;
+    color: var(--bs-form-invalid-border-color);
+    --s-ico: var(--s-icon-vx-label-error, var(--s-icon-exclamation-circle));
 }
 
 .vx label.checked {
@@ -1874,9 +2074,7 @@ input.ui-button::-moz-focus-inner {
 }
 
 .ui-icon-closethick::before {
-  font-family: var(--s-icon-font);
-  font-weight: var(--s-icon-solid);
-  content: "\f00d";
+    --s-ico: var(--s-icon-ui-icon-closethick, var(--s-icon-times));
 }
 
 .ui-dialog-content {
@@ -2011,9 +2209,7 @@ input.ui-button::-moz-focus-inner {
 }
 
 button.ui-datepicker-trigger::before {
-  font-family: var(--s-icon-font, "FontAwesome");
-  font-weight: var(--s-icon-solid);
-  content: "\f133";
+    --s-ico: var(--s-icon-button-ui-datepicker-trigger, var(--s-icon-calendar));
 }
 
 .ui-datepicker {
@@ -2061,17 +2257,15 @@ button.ui-datepicker-trigger::before {
 
 .ui-datepicker .ui-datepicker-prev::after,
 .ui-datepicker .ui-datepicker-next::after {
-  font-family: var(--s-icon-font);
-  font-weight: var(--s-icon-solid);
   font-size: 21px;
 }
 
 .ui-datepicker .ui-datepicker-prev::after {
-  content: "\f104";
+    --s-ico: var(--s-icon-ui-datepicker-prev, var(--s-icon-angle-left));
 }
 
 .ui-datepicker .ui-datepicker-next::after {
-  content: "\f105";
+    --s-ico: var(--s-icon-ui-datepicker-next, var(--s-icon-angle-right));
 }
 
 .ui-datepicker .ui-datepicker-title {
@@ -2469,9 +2663,7 @@ button.ui-state-hover .ui-button-text {
 }
 
 button.panel-titlebar-close::after {
-  content: "\f00d";
-  font-family: var(--s-icon-font);
-  font-weight: var(--s-icon-solid);
+    --s-ico: var(--s-icon-button-panel-titlebar-close, var(--s-icon-times));
 }
 
 .panel-footer {
@@ -2575,10 +2767,9 @@ button.panel-titlebar-close::after {
 }
 
 .quick-search-icon>i::before {
-  font-family: var(--s-icon-font);
-  content: "\f002";
-  font-weight: 900;
-  font-style: normal;
+    font-weight: 900;
+    font-style: normal;
+    --s-ico: var(--s-icon-quick-search-icon, var(--s-icon-search));
 }
 
 .quick-search-field {
@@ -2609,11 +2800,10 @@ button.panel-titlebar-close::after {
 }
 
 .quick-search-field::after {
-  font-family: var(--s-icon-font);
-  content: "\f107";
-  font-weight: 900;
-  font-style: normal;
-  margin-left: 2px;
+    font-weight: 900;
+    font-style: normal;
+    margin-left: 2px;
+    --s-ico: var(--s-icon-quick-search-field, var(--s-icon-angle-down));
 }
 
 .s-shake-effect {
@@ -2781,10 +2971,8 @@ button.panel-titlebar-close::after {
 }
 
 .select2-search-choice-close::after {
-  font-family: var(--s-icon-font);
-  font-weight: var(--s-icon-solid);
-  content: "\f00d";
-  line-height: 1;
+    line-height: 1;
+    --s-ico: var(--s-icon-select2-search-choice-close, var(--s-icon-times));
 }
 
 .select2-container-disabled .select2-search-choice-close {
@@ -2862,13 +3050,11 @@ button.panel-titlebar-close::after {
 }
 
 .select2-arrow::after {
-  font-family: var(--s-icon-font);
-  font-weight: var(--s-icon-solid);
-  content: "\f107";
+    --s-ico: var(--s-icon-select2-arrow, var(--s-icon-angle-down));
 }
 
 .select2-dropdown-open .select2-arrow::after {
-  content: "\f106";
+    --s-ico: var(--s-icon-select2-dropdown-open-arrow, var(--s-icon-angle-up));
 }
 
 .select2-search {
@@ -2896,13 +3082,12 @@ button.panel-titlebar-close::after {
 }
 
 .select2-search::after {
-  content: "\f002";
+    --s-ico: var(--s-icon-select2-search, var(--s-icon-search));
 }
 
 .select2-search::after,
 .select2-search-field.select2-active::after,
 .select2-more-results.select2-active::after {
-  font-family: var(--s-icon-font);
   font-weight: 900;
   font-style: normal;
   color: var(--s-input-text);
@@ -2914,8 +3099,8 @@ button.panel-titlebar-close::after {
 .select2-search.select2-active::after,
 .select2-search-field.select2-active::after,
 .select2-more-results.select2-active::after {
-  content: "\f110";
-  animation: spinner-border .75s linear infinite;
+    animation: spinner-border .75s linear infinite;
+    --s-ico: var(--s-icon-select2-search-active, var(--s-icon-spinner));
 }
 
 .select2-drop.select2-drop-above .select2-search input {
@@ -3174,7 +3359,6 @@ button.panel-titlebar-close::after {
 }
 
 .slick-sort-indicator::before {
-  font-family: var(--s-icon-font);
   font-weight: 900;
   line-height: 1;
 }
@@ -3185,11 +3369,11 @@ button.panel-titlebar-close::after {
 }
 
 .slick-sort-indicator-asc::before {
-  content: "\f885";
+    --s-ico: var(--s-icon-slick-sort-indicator-asc, var(--s-icon-sort-amount-up-alt));
 }
 
 .slick-sort-indicator-desc::before {
-  content: "\f160";
+    --s-ico: var(--s-icon-slick-sort-indicator-desc, var(--s-icon-sort-amount-down));
 }
 
 .slick-resizable-handle {
@@ -3437,19 +3621,19 @@ button.panel-titlebar-close::after {
 }
 
 .slick-pg-first>span:before {
-  content: "\f100";
+    --s-ico: var(--s-icon-slick-pg-first-span, var(--s-icon-angle-double-left));
 }
 
 .slick-pg-prev>span:before {
-  content: "\f104";
+    --s-ico: var(--s-icon-slick-pg-prev-span, var(--s-icon-angle-left));
 }
 
 .slick-pg-next>span:before {
-  content: "\f105";
+    --s-ico: var(--s-icon-slick-pg-next-span, var(--s-icon-angle-right));
 }
 
 .slick-pg-last>span:before {
-  content: "\f101";
+    --s-ico: var(--s-icon-slick-pg-last-span, var(--s-icon-angle-double-right));
 }
 
 .slick-pg-reload {
@@ -3458,7 +3642,7 @@ button.panel-titlebar-close::after {
 }
 
 .slick-pg-reload>span:before {
-  content: "\f021";
+    --s-ico: var(--s-icon-slick-pg-reload-span, var(--s-icon-sync));
 }
 
 .s-TreeToggle,
@@ -3476,27 +3660,25 @@ button.panel-titlebar-close::after {
 .slick-group-expand-all::before,
 .slick-group-collapse-all::before {
   content: "";
-  font-family: var(--s-icon-font);
-  font-weight: var(--s-icon-solid);
   color: rgba(var(--s-bright-rgb), 1);
 }
 
 .s-TreeCollapse::before,
 .slick-group-toggle.expanded::before {
-  content: "\f107";
+    --s-ico: var(--s-icon-tree-collapse, var(--s-icon-angle-down));
 }
 
 .s-TreeExpand::before,
 .slick-group-toggle.collapsed::before {
-  content: "\f105";
+    --s-ico: var(--s-icon-tree-expand, var(--s-icon-angle-right));
 }
 
 .slick-group-collapse-all::before {
-  content: "\f146";
+    --s-ico: var(--s-icon-slick-group-collapse-all, var(--s-icon-minus-square));
 }
 
 .slick-group-expand-all::before {
-  content: "\f0fe";
+    --s-ico: var(--s-icon-slick-group-expand-all, var(--s-icon-plus-square));
 }
 
 .s-TreeIndent {
@@ -3870,9 +4052,7 @@ button.toast-close-button {
 :not(.icon-tool-button) .button-inner:not(:empty):before {
   display: inline-block;
   color: var(--s-tool-icon);
-  font-family: var(--s-icon-font);
   font-style: normal;
-  font-weight: var(--s-icon-solid);
 }
 
 .button-inner:empty:before {
@@ -3884,38 +4064,38 @@ button.toast-close-button {
 }
 
 .apply-changes-button:not(.icon-tool-button) .button-inner:before {
-  content: "\f0c7";
+    --s-ico: var(--s-icon-apply-changes-button-inner, var(--s-icon-save));
 }
 
 .export-csv-button:not(.icon-tool-button) .button-inner:before {
-  content: "\f6dd";
+    --s-ico: var(--s-icon-export-csv-button-inner, var(--s-icon-file-csv));
 }
 
 .export-docx-button:not(.icon-tool-button) .button-inner:before {
-  content: "\f1c2";
+    --s-ico: var(--s-icon-export-docx-button-inner, var(--s-icon-file-word));
 }
 
 .export-pdf-button:not(.icon-tool-button) .button-inner:before {
-  content: "\f1c1";
-  color: #d81b60;
+    color: #d81b60;
+    --s-ico: var(--s-icon-export-pdf-button-inner, var(--s-icon-file-pdf));
 }
 
 .export-xlsx-button:not(.icon-tool-button) .button-inner:before {
-  content: "\f1c3";
-  color: #3d9970;
+    color: #3d9970;
+    --s-ico: var(--s-icon-export-xlsx-button-inner, var(--s-icon-file-excel));
 }
 
 .localization-button:not(.icon-tool-button) .button-inner:before {
-  content: "\f1ab";
+    --s-ico: var(--s-icon-localization-button-inner, var(--s-icon-language));
 }
 
 .delete-button:not(.icon-tool-button) .button-inner:before {
-  content: "\f2ed";
-  color: var(--bs-red);
+    color: var(--bs-red);
+    --s-ico: var(--s-icon-delete-button-inner, var(--s-icon-trash-alt));
 }
 
 .add-file-button:not(.icon-tool-button) .button-inner:before {
-  content: "\f093";
+    --s-ico: var(--s-icon-add-file-button-inner, var(--s-icon-upload));
 }
 
 .s-IncludeDeletedToggle {
@@ -3939,10 +4119,8 @@ button.toast-close-button {
 }
 
 .s-IncludeDeletedToggle>a::before {
-  font-family: var(--s-icon-font);
-  font-weight: var(--s-icon-solid);
-  font-size: 19px;
-  content: "\f829";
+    font-size: 19px;
+    --s-ico: var(--s-icon-include-deleted-toggle, var(--s-icon-trash-restore));
 }
 
 :root {
