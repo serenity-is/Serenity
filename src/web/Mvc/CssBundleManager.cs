@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Text;
 
 namespace Serenity.Web;
 
@@ -117,6 +118,8 @@ public partial class CssBundleManager : ICssBundleManager
             bundleKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
             bool minimize = settings.Minimize == true;
+            bool processImports = settings.ProcessImports != false;
+            bool dedupImports = settings.DedupImports == true;
             var noMinimize = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             if (settings.NoMinimize != null)
                 noMinimize.AddRange(settings.NoMinimize);
@@ -133,6 +136,8 @@ public partial class CssBundleManager : ICssBundleManager
                 var bundleRewriteRoot = string.Concat(Enumerable.Repeat("../",
                     Math.Max(bundleKey.Split('/', StringSplitOptions.RemoveEmptyEntries).Length, 1)));
                 var bundleParts = new List<Func<string>>();
+                var parts = new List<Func<string>>();
+                var dedupHolder = new HashSet<string>?[1];
                 var scriptNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
                 void registerInBundle(string appRelativeUrl)
@@ -161,7 +166,7 @@ public partial class CssBundleManager : ICssBundleManager
 
                         var scriptName = sourceFile[10..];
                         scriptNames.Add(scriptName);
-                        bundleParts.Add(() =>
+                        parts.Add(() =>
                         {
                             if (recursionCheck != null)
                             {
@@ -218,62 +223,49 @@ public partial class CssBundleManager : ICssBundleManager
                     registerInBundle(sourceUrl);
                     var sourcePath = sourceUrl[2..];
 
+                    parts.Add(() =>
+                    {
+                        var minimizeFile = minimize &&
+                            !noMinimize.Contains(sourceFile) &&
+                            !sourceFile.EndsWith(".min.css", StringComparison.OrdinalIgnoreCase);
+
+                        var stack = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { sourceUrl };
+                        var (code, usedMin) = LoadCssFile(sourcePath, sourceUrl,
+                            minimizeFile, settings.UseMinCSS == true, bundleRewriteRoot,
+                            processImports, dedupHolder[0], stack);
+
+                        if (minimizeFile && !usedMin)
+                            code = MinifyCss(code, sourceUrl);
+
+                        return code;
+                    });
+                }
+
+                if (parts.Count > 0)
+                {
                     bundleParts.Add(() =>
                     {
-                        var sourceInfo = hostEnvironment.WebRootFileProvider.GetFileInfo(sourcePath);
-                        if (!sourceInfo.Exists)
-                            return string.Format(CultureInfo.CurrentCulture, errorLines,
-                                string.Format(CultureInfo.CurrentCulture, "File {0} is not found!", sourcePath));
+                        dedupHolder[0] = dedupImports
+                            ? new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+                            : null;
 
-                        string? code = null;
-
-                        if (minimize &&
-                            !noMinimize.Contains(sourceFile) &&
-                            !sourceFile.EndsWith(".min.css", StringComparison.OrdinalIgnoreCase))
+                        try
                         {
-                            if (settings.UseMinCSS == true)
+                            var sb = new StringBuilder();
+                            foreach (var part in parts)
                             {
-                                var minPath = System.IO.Path.ChangeExtension(sourcePath, ".min.css");
-                                var minInfo = hostEnvironment.WebRootFileProvider.GetFileInfo(minPath);
-                                if (minInfo.Exists)
-                                {
-                                    sourcePath = minPath;
-                                    using var sr = new System.IO.StreamReader(minInfo.CreateReadStream());
-                                    code = sr.ReadToEnd();
-                                }
+                                if (sb.Length > 0)
+                                    sb.Append("\n\n");
+
+                                sb.Append(part());
                             }
 
-                            if (code == null)
-                            {
-                                using (var sr = new System.IO.StreamReader(sourceInfo.CreateReadStream()))
-                                    code = sr.ReadToEnd();
-
-                                try
-                                {
-                                    var result = cssMinifier.MinifyCss(code, new()
-                                    {
-                                        LineBreakThreshold = 1000
-                                    });
-                                    if (!result.HasErrors)
-                                        code = result.Code;
-                                }
-                                catch (Exception ex)
-                                {
-                                    logger?.LogError(ex, "Error minifying CSS: {sourceFile}", sourceFile);
-                                }
-                            }
+                            return sb.ToString();
                         }
-                        else
+                        finally
                         {
-                            using var sr = new System.IO.StreamReader(sourceInfo.CreateReadStream());
-                            code = sr.ReadToEnd();
+                            dedupHolder[0] = null;
                         }
-
-                        code = SourceMappingRegex()
-                            .Replace(code, "");
-
-                        code = RewriteUrls(sourceUrl, code, bundleRewriteRoot);
-                        return code;
                     });
                 }
 
@@ -410,6 +402,182 @@ public partial class CssBundleManager : ICssBundleManager
             match.Groups["suffix"].Value + ")");
     }
 
+    private (string Code, bool UsedMin) LoadCssFile(string sourcePath, string sourceUrl,
+        bool minimize, bool useMinCSS, string rootPrefix, bool processImports,
+        HashSet<string>? dedup, HashSet<string> stack)
+    {
+        var info = hostEnvironment.WebRootFileProvider.GetFileInfo(sourcePath);
+        if (!info.Exists)
+            return (string.Format(CultureInfo.CurrentCulture, errorLines,
+                string.Format(CultureInfo.CurrentCulture, "File {0} is not found!", sourcePath)), false);
+
+        string code;
+        var usedMin = false;
+
+        if (minimize && useMinCSS)
+        {
+            var minPath = System.IO.Path.ChangeExtension(sourcePath, ".min.css");
+            var minInfo = hostEnvironment.WebRootFileProvider.GetFileInfo(minPath);
+            if (minInfo.Exists)
+            {
+                using var sr = new System.IO.StreamReader(minInfo.CreateReadStream());
+                code = sr.ReadToEnd();
+                usedMin = true;
+            }
+            else
+            {
+                using var sr = new System.IO.StreamReader(info.CreateReadStream());
+                code = sr.ReadToEnd();
+            }
+        }
+        else
+        {
+            using var sr = new System.IO.StreamReader(info.CreateReadStream());
+            code = sr.ReadToEnd();
+        }
+
+        code = SourceMappingRegex().Replace(code, "");
+
+        if (!processImports)
+            return (RewriteUrls(sourceUrl, code, rootPrefix), usedMin);
+
+        code = ExpandImports(code, sourcePath, sourceUrl, minimize, useMinCSS,
+            rootPrefix, dedup, stack);
+
+        return (code, usedMin);
+    }
+
+    private string MinifyCss(string code, string sourceUrl)
+    {
+        try
+        {
+            var result = cssMinifier.MinifyCss(code, new()
+            {
+                LineBreakThreshold = 1000
+            });
+
+            if (!result.HasErrors)
+                return result.Code;
+        }
+        catch (Exception ex)
+        {
+            logger?.LogError(ex, "Error minifying CSS: {sourceFile}", sourceUrl);
+        }
+
+        return code;
+    }
+
+    private string ExpandImports(string code, string sourcePath, string sourceUrl,
+        bool minimize, bool useMinCSS, string rootPrefix,
+        HashSet<string>? dedup, HashSet<string> stack)
+    {
+        var pos = 0;
+        var imports = new List<(string Raw, string Url, string Media)>();
+        var match = ImportRegex().Match(code);
+        while (match.Success && match.Index == pos)
+        {
+            imports.Add((match.Value, ExtractImportUrl(match.Groups["st"].Value),
+                match.Groups["media"].Value.Trim()));
+            pos = match.Index + match.Length;
+            match = ImportRegex().Match(code, pos);
+        }
+
+        if (imports.Count == 0)
+            return RewriteUrls(sourceUrl, code, rootPrefix);
+
+        var sb = new StringBuilder();
+
+        foreach (var import in imports)
+        {
+            if (import.Media.Length > 0 || !IsRelativeImportUrl(import.Url))
+            {
+                sb.Append(import.Raw);
+                continue;
+            }
+
+            var resolvedPath = ResolveRelativePath(sourcePath, import.Url);
+            if (string.IsNullOrEmpty(resolvedPath))
+            {
+                sb.Append(import.Raw);
+                continue;
+            }
+
+            var resolvedUrl = "~/" + resolvedPath;
+
+            if (dedup != null && !dedup.Add(resolvedUrl))
+                continue;
+
+            if (!stack.Add(resolvedUrl))
+                continue;
+
+            try
+            {
+                var (importedCode, _) = LoadCssFile(resolvedPath, resolvedUrl,
+                    minimize, useMinCSS, rootPrefix, true, dedup, stack);
+                sb.Append(importedCode);
+            }
+            finally
+            {
+                stack.Remove(resolvedUrl);
+            }
+
+            sb.Append('\n');
+        }
+
+        sb.Append(RewriteUrls(sourceUrl, code[pos..], rootPrefix));
+        return sb.ToString();
+    }
+
+    private static string ExtractImportUrl(string statement)
+    {
+        statement = statement.Trim();
+        if (statement.StartsWith("url(", StringComparison.OrdinalIgnoreCase))
+            statement = statement[4..^1].Trim();
+
+        if (statement.Length >= 2 &&
+            ((statement[0] == '"' && statement[^1] == '"') ||
+             (statement[0] == '\'' && statement[^1] == '\'')))
+            statement = statement[1..^1];
+
+        return statement.Trim();
+    }
+
+    private static bool IsRelativeImportUrl(string url)
+    {
+        if (string.IsNullOrWhiteSpace(url))
+            return false;
+
+        return !url.StartsWith("data:", StringComparison.OrdinalIgnoreCase) &&
+            !url.StartsWith("//", StringComparison.Ordinal) &&
+            !url.StartsWith('/') &&
+            !url.Contains("://", StringComparison.Ordinal);
+    }
+
+    private static string ResolveRelativePath(string sourcePath, string relativePath)
+    {
+        var slash = sourcePath.LastIndexOf('/');
+        var baseDir = slash >= 0 ? sourcePath[..slash] : "";
+        var combined = (baseDir.Length > 0 ? baseDir + "/" : "") + relativePath;
+
+        var segments = new List<string>();
+        foreach (var part in combined.Replace('\\', '/').Split('/'))
+        {
+            if (part.Length == 0 || part == ".")
+                continue;
+
+            if (part == "..")
+            {
+                if (segments.Count > 0)
+                    segments.RemoveAt(segments.Count - 1);
+                continue;
+            }
+
+            segments.Add(part);
+        }
+
+        return string.Join("/", segments);
+    }
+
     /// <inheritdoc/>
     public string GetCssBundle(string cssUrl)
     {
@@ -455,6 +623,8 @@ public partial class CssBundleManager : ICssBundleManager
 
     [GeneratedRegex(@"^\s*\/\*\s*[#@]\s?(source(?:Mapping)?URL)=\s*(\S+)\s*\*\/\s*$", RegexOptions.Multiline)]
     private static partial Regex SourceMappingRegex();
+    [GeneratedRegex(@"\G(?:/\*.*?\*/|\s)*@import\s+(?<st>url\([^)]*\)|""[^""]*""|'[^']*')\s*(?<media>[^;]*);", RegexOptions.Singleline | RegexOptions.IgnoreCase)]
+    private static partial Regex ImportRegex();
     [GeneratedRegex("url\\((?<prefix>['\"]?)(?<url>[^)]+?)(?<suffix>['\"]?)\\)")]
     private static partial Regex CssUrlRegex();
 }

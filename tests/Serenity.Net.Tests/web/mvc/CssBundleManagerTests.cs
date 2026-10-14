@@ -391,4 +391,184 @@ public class CssBundleManagerTests
 
         Assert.Contains("DEV", scripts.Registered["CssBundle.App"].GetScript());
     }
+
+    private static int CountOccurrences(string content, string value)
+    {
+        var count = 0;
+        var index = 0;
+        while ((index = content.IndexOf(value, index, StringComparison.Ordinal)) >= 0)
+        {
+            count++;
+            index += value.Length;
+        }
+        return count;
+    }
+
+    [Fact]
+    public void Plain_Import_Is_Inlined()
+    {
+        var (manager, scripts, env, _, _) = Create(options =>
+        {
+            options.Enabled = true;
+            options.Minimize = false;
+            options.Bundles["App"] = ["~/Styles/a.css"];
+        });
+        env.AddWebFile("Styles/a.css", "@import \"b.css\";\nA_MARK{}");
+        env.AddWebFile("Styles/b.css", "B_MARK{}");
+        manager.Reset();
+
+        var content = scripts.Registered["CssBundle.App"].GetScript();
+
+        Assert.Contains("B_MARK", content);
+        Assert.Contains("A_MARK", content);
+        Assert.DoesNotContain("@import", content);
+    }
+
+    [Fact]
+    public void Nested_Imports_Are_Inlined()
+    {
+        var (manager, scripts, env, _, _) = Create(options =>
+        {
+            options.Enabled = true;
+            options.Minimize = false;
+            options.Bundles["App"] = ["~/Styles/a.css"];
+        });
+        env.AddWebFile("Styles/a.css", "@import \"b.css\";");
+        env.AddWebFile("Styles/b.css", "@import \"c.css\";");
+        env.AddWebFile("Styles/c.css", "C_MARK{}");
+        manager.Reset();
+
+        var content = scripts.Registered["CssBundle.App"].GetScript();
+
+        Assert.Contains("C_MARK", content);
+        Assert.DoesNotContain("@import", content);
+    }
+
+    [Fact]
+    public void Media_External_And_Absolute_Imports_Are_Left_As_Is()
+    {
+        var (manager, scripts, env, _, _) = Create(options =>
+        {
+            options.Enabled = true;
+            options.Minimize = false;
+            options.Bundles["App"] = ["~/Styles/a.css"];
+        });
+        env.AddWebFile("Styles/a.css",
+            "@import \"http://cdn/x.css\";\n" +
+            "@import \"/abs.css\";\n" +
+            "@import \"cond.css\" screen;\n" +
+            "@import \"b.css\";\n" +
+            "A_MARK{}");
+        env.AddWebFile("Styles/b.css", "B_MARK{}");
+        env.AddWebFile("Styles/cond.css", "C_MARK{}");
+        manager.Reset();
+
+        var content = scripts.Registered["CssBundle.App"].GetScript();
+
+        Assert.Equal(3, CountOccurrences(content, "@import"));
+        Assert.Contains("B_MARK", content);
+        Assert.DoesNotContain("C_MARK", content);
+    }
+
+    [Fact]
+    public void Imported_File_Urls_Are_Rewritten()
+    {
+        var (manager, scripts, env, _, _) = Create(options =>
+        {
+            options.Enabled = true;
+            options.Minimize = false;
+            options.Bundles["App"] = ["~/a.css"];
+        });
+        env.AddWebFile("a.css", "@import \"b.css\";");
+        env.AddWebFile("b.css", ".b { background: url(rel.png); }");
+        manager.Reset();
+
+        var content = scripts.Registered["CssBundle.App"].GetScript();
+
+        Assert.Contains("../rel.png", content);
+        Assert.DoesNotContain("@import", content);
+    }
+
+    [Fact]
+    public void ProcessImports_False_Leaves_Import_Statements()
+    {
+        var (manager, scripts, env, _, _) = Create(options =>
+        {
+            options.Enabled = true;
+            options.Minimize = false;
+            options.ProcessImports = false;
+            options.Bundles["App"] = ["~/Styles/a.css"];
+        });
+        env.AddWebFile("Styles/a.css", "@import \"b.css\";\nA_MARK{}");
+        env.AddWebFile("Styles/b.css", "B_MARK{}");
+        manager.Reset();
+
+        var content = scripts.Registered["CssBundle.App"].GetScript();
+
+        Assert.Contains("@import", content);
+        Assert.DoesNotContain("B_MARK", content);
+        Assert.Contains("A_MARK", content);
+    }
+
+    [Fact]
+    public void DedupImports_True_Embeds_Shared_Import_Once()
+    {
+        var (manager, scripts, env, _, _) = Create(options =>
+        {
+            options.Enabled = true;
+            options.Minimize = false;
+            options.DedupImports = true;
+            options.Bundles["App"] = ["~/Styles/a.css", "~/Styles/b.css"];
+        });
+        env.AddWebFile("Styles/a.css", "@import \"shared.css\";\nA_MARK{}");
+        env.AddWebFile("Styles/b.css", "@import \"shared.css\";\nB_MARK{}");
+        env.AddWebFile("Styles/shared.css", "SHARED_MARK{}");
+        manager.Reset();
+
+        var content = scripts.Registered["CssBundle.App"].GetScript();
+
+        Assert.Equal(1, CountOccurrences(content, "SHARED_MARK"));
+        Assert.Contains("A_MARK", content);
+        Assert.Contains("B_MARK", content);
+    }
+
+    [Fact]
+    public void DedupImports_False_Embeds_Shared_Import_At_Each_Position()
+    {
+        var (manager, scripts, env, _, _) = Create(options =>
+        {
+            options.Enabled = true;
+            options.Minimize = false;
+            options.DedupImports = false;
+            options.Bundles["App"] = ["~/Styles/a.css", "~/Styles/b.css"];
+        });
+        env.AddWebFile("Styles/a.css", "@import \"shared.css\";\nA_MARK{}");
+        env.AddWebFile("Styles/b.css", "@import \"shared.css\";\nB_MARK{}");
+        env.AddWebFile("Styles/shared.css", "SHARED_MARK{}");
+        manager.Reset();
+
+        var content = scripts.Registered["CssBundle.App"].GetScript();
+
+        Assert.Equal(2, CountOccurrences(content, "SHARED_MARK"));
+    }
+
+    [Fact]
+    public void Circular_Imports_Do_Not_Loop()
+    {
+        var (manager, scripts, env, _, _) = Create(options =>
+        {
+            options.Enabled = true;
+            options.Minimize = false;
+            options.Bundles["App"] = ["~/Styles/a.css"];
+        });
+        env.AddWebFile("Styles/a.css", "@import \"b.css\";\nA_MARK{}");
+        env.AddWebFile("Styles/b.css", "@import \"a.css\";\nB_MARK{}");
+        manager.Reset();
+
+        var content = scripts.Registered["CssBundle.App"].GetScript();
+
+        Assert.Contains("A_MARK", content);
+        Assert.Contains("B_MARK", content);
+        Assert.DoesNotContain("@import", content);
+    }
 }

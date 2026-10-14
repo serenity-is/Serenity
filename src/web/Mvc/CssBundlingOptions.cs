@@ -22,6 +22,8 @@ public class CssBundlingOptions : IOptions<CssBundlingOptions>
         Enabled = false;
         Minimize = true;
         UseMinCSS = true;
+        ProcessImports = true;
+        DedupImports = false;
         Replacements = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
     }
 
@@ -41,6 +43,23 @@ public class CssBundlingOptions : IOptions<CssBundlingOptions>
     /// should be used if available, instead of minifying the file in memory.
     /// </summary>
     public bool? UseMinCSS { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether CSS <c>@import</c> statements in bundle source files
+    /// should be processed and their contents embedded into the bundle. Only plain
+    /// (non media qualified), relative imports at the start of a file are processed;
+    /// external, absolute and conditional imports are left as is. Defaults to <c>true</c>.
+    /// Set to <c>false</c> to disable import processing entirely.
+    /// </summary>
+    public bool? ProcessImports { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether a CSS file that is imported multiple times within a bundle
+    /// should only be embedded once. When <c>false</c> (the default, and matching browser
+    /// behavior), the file is embedded at each import position. When <c>true</c>, the
+    /// first occurrence is embedded and later ones are skipped.
+    /// </summary>
+    public bool? DedupImports { get; set; }
 
     /// <summary>
     /// Gets or sets a list of relative paths to not minify.
