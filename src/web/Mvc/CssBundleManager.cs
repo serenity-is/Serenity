@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System.Text;
 
 namespace Serenity.Web;
 
@@ -225,19 +224,10 @@ public partial class CssBundleManager : ICssBundleManager
 
                     parts.Add(() =>
                     {
-                        var minimizeFile = minimize &&
-                            !noMinimize.Contains(sourceFile) &&
-                            !sourceFile.EndsWith(".min.css", StringComparison.OrdinalIgnoreCase);
-
                         var stack = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { sourceUrl };
-                        var (code, usedMin) = LoadCssFile(sourcePath, sourceUrl,
-                            minimizeFile, settings.UseMinCSS == true, bundleRewriteRoot,
-                            processImports, dedupHolder[0], stack);
-
-                        if (minimizeFile && !usedMin)
-                            code = MinifyCss(code, sourceUrl);
-
-                        return code;
+                        return LoadCssFile(sourcePath, sourceUrl, minimize,
+                            settings.UseMinCSS == true, bundleRewriteRoot,
+                            processImports, noMinimize, dedupHolder[0], stack);
                     });
                 }
 
@@ -402,19 +392,23 @@ public partial class CssBundleManager : ICssBundleManager
             match.Groups["suffix"].Value + ")");
     }
 
-    private (string Code, bool UsedMin) LoadCssFile(string sourcePath, string sourceUrl,
+    private string LoadCssFile(string sourcePath, string sourceUrl,
         bool minimize, bool useMinCSS, string rootPrefix, bool processImports,
-        HashSet<string>? dedup, HashSet<string> stack)
+        HashSet<string> noMinimize, HashSet<string>? dedup, HashSet<string> stack)
     {
         var info = hostEnvironment.WebRootFileProvider.GetFileInfo(sourcePath);
         if (!info.Exists)
-            return (string.Format(CultureInfo.CurrentCulture, errorLines,
-                string.Format(CultureInfo.CurrentCulture, "File {0} is not found!", sourcePath)), false);
+            return string.Format(CultureInfo.CurrentCulture, errorLines,
+                string.Format(CultureInfo.CurrentCulture, "File {0} is not found!", sourcePath));
+
+        var minifyThis = minimize &&
+            !noMinimize.Contains(sourceUrl) &&
+            !sourcePath.EndsWith(".min.css", StringComparison.OrdinalIgnoreCase);
 
         string code;
         var usedMin = false;
 
-        if (minimize && useMinCSS)
+        if (minifyThis && useMinCSS)
         {
             var minPath = System.IO.Path.ChangeExtension(sourcePath, ".min.css");
             var minInfo = hostEnvironment.WebRootFileProvider.GetFileInfo(minPath);
@@ -439,38 +433,13 @@ public partial class CssBundleManager : ICssBundleManager
         code = SourceMappingRegex().Replace(code, "");
 
         if (!processImports)
-            return (RewriteUrls(sourceUrl, code, rootPrefix), usedMin);
-
-        code = ExpandImports(code, sourcePath, sourceUrl, minimize, useMinCSS,
-            rootPrefix, dedup, stack);
-
-        return (code, usedMin);
-    }
-
-    private string MinifyCss(string code, string sourceUrl)
-    {
-        try
         {
-            var result = cssMinifier.MinifyCss(code, new()
-            {
-                LineBreakThreshold = 1000
-            });
+            if (minifyThis && !usedMin)
+                code = MinifyCss(code, sourceUrl);
 
-            if (!result.HasErrors)
-                return result.Code;
-        }
-        catch (Exception ex)
-        {
-            logger?.LogError(ex, "Error minifying CSS: {sourceFile}", sourceUrl);
+            return RewriteUrls(sourceUrl, code, rootPrefix);
         }
 
-        return code;
-    }
-
-    private string ExpandImports(string code, string sourcePath, string sourceUrl,
-        bool minimize, bool useMinCSS, string rootPrefix,
-        HashSet<string>? dedup, HashSet<string> stack)
-    {
         var pos = 0;
         var imports = new List<(string Raw, string Url, string Media)>();
         var match = ImportRegex().Match(code);
@@ -482,8 +451,15 @@ public partial class CssBundleManager : ICssBundleManager
             match = ImportRegex().Match(code, pos);
         }
 
+        // only the file's own content (excluding the leading @import lines) is
+        // minified here; imported files are minified independently on their own
+        var rest = RewriteUrls(sourceUrl, code[pos..], rootPrefix);
+
+        if (minifyThis && !usedMin)
+            rest = MinifyCss(rest, sourceUrl);
+
         if (imports.Count == 0)
-            return RewriteUrls(sourceUrl, code, rootPrefix);
+            return rest;
 
         var sb = new StringBuilder();
 
@@ -512,9 +488,8 @@ public partial class CssBundleManager : ICssBundleManager
 
             try
             {
-                var (importedCode, _) = LoadCssFile(resolvedPath, resolvedUrl,
-                    minimize, useMinCSS, rootPrefix, true, dedup, stack);
-                sb.Append(importedCode);
+                sb.Append(LoadCssFile(resolvedPath, resolvedUrl, minimize, useMinCSS,
+                    rootPrefix, true, noMinimize, dedup, stack));
             }
             finally
             {
@@ -524,8 +499,28 @@ public partial class CssBundleManager : ICssBundleManager
             sb.Append('\n');
         }
 
-        sb.Append(RewriteUrls(sourceUrl, code[pos..], rootPrefix));
+        sb.Append(rest);
         return sb.ToString();
+    }
+
+    private string MinifyCss(string code, string sourceUrl)
+    {
+        try
+        {
+            var result = cssMinifier.MinifyCss(code, new()
+            {
+                LineBreakThreshold = 1000
+            });
+
+            if (!result.HasErrors)
+                return result.Code;
+        }
+        catch (Exception ex)
+        {
+            logger?.LogError(ex, "Error minifying CSS: {sourceFile}", sourceUrl);
+        }
+
+        return code;
     }
 
     private static string ExtractImportUrl(string statement)

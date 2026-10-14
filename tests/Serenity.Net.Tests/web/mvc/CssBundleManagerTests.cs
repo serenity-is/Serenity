@@ -571,4 +571,48 @@ public class CssBundleManagerTests
         Assert.Contains("B_MARK", content);
         Assert.DoesNotContain("@import", content);
     }
+
+    [Fact]
+    public void Imported_Files_Are_Minified_Even_When_Entry_Is_Min_Css()
+    {
+        var (manager, scripts, env, _, minifier) = Create(options =>
+        {
+            options.Enabled = true;
+            options.Minimize = true;
+            options.UseMinCSS = true;
+            options.Bundles["App"] = ["~/Styles/a.min.css"];
+        });
+        env.AddWebFile("Styles/a.min.css", "@import \"b.css\";\nA{}");
+        env.AddWebFile("Styles/b.css", "B_ORIGINAL{}");
+        minifier.MinifyCallback = (content, _) =>
+            new CssMinifyResult { Code = content.Replace("B_ORIGINAL", "B_MINIFIED") };
+        manager.Reset();
+
+        var content = scripts.Registered["CssBundle.App"].GetScript();
+
+        Assert.Contains("B_MINIFIED", content);
+        Assert.DoesNotContain("B_ORIGINAL", content);
+    }
+
+    [Fact]
+    public void Imported_Files_Are_Minified_With_InMemory_Minifier()
+    {
+        var (manager, scripts, env, _, minifier) = Create(options =>
+        {
+            options.Enabled = true;
+            options.Minimize = true;
+            options.UseMinCSS = false;
+            options.Bundles["App"] = ["~/Styles/a.css"];
+        });
+        env.AddWebFile("Styles/a.css", "@import \"b.css\";\nA{}");
+        env.AddWebFile("Styles/b.css", "B_ORIGINAL{}");
+        minifier.MinifyCallback = (content, _) =>
+            new CssMinifyResult { Code = content.Replace("B_ORIGINAL", "B_MINIFIED") };
+        manager.Reset();
+
+        var content = scripts.Registered["CssBundle.App"].GetScript();
+
+        Assert.Contains("B_MINIFIED", content);
+        Assert.DoesNotContain("B_ORIGINAL", content);
+    }
 }
