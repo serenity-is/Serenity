@@ -15,7 +15,7 @@ public partial class ColumnsTemplateTests : BaseTemplateTest
             [BasedOnRow(typeof(CustomerRow), CheckNames = true)]
             public class CustomerColumns
             {
-                [EditLink, DisplayName("Db.Shared.RecordId"), AlignRight]
+                [EditLink, DisplayText(TextKey = "Db.Shared.RecordId"), AlignRight]
                 public int? CustomerId { get; set; }
                 [EditLink]
                 public string CustomerName { get; set; }
@@ -43,7 +43,7 @@ public partial class ColumnsTemplateTests : BaseTemplateTest
             [BasedOnRow(typeof(CustomerRow), CheckNames = true)]
             public class CustomerColumns
             {
-                [EditLink, DisplayName("Db.Shared.RecordId"), AlignRight]
+                [EditLink, DisplayText(TextKey = "Db.Shared.RecordId"), AlignRight]
                 public int? CustomerId { get; set; }
                 [EditLink]
                 public string? CustomerName { get; set; }
