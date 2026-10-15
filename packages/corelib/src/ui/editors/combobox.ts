@@ -85,6 +85,14 @@ export interface ComboboxOptions<TSource = any> {
     typeDelay?: number;
 }
 
+type SelectionLoad = {
+    controller: AbortController;
+    waiters: Array<{
+        resolve: () => void;
+        reject: (error: any) => void;
+    }>;
+}
+
 /**
  * A combobox widget that provides searchable selection over a set of items.
  * @typeParam TItem - The item type.
@@ -119,6 +127,44 @@ export class Combobox<TItem = any> {
 
         opt = Object.assign({}, Combobox.defaults, opt);
         this.createSelect2(opt);
+    }
+
+    private _selectionLoad?: SelectionLoad;
+    private _selectionLoadError?: { reason: unknown };
+
+    /**
+     * Waits for the initial selection to load, if necessary.
+     * @returns A promise while loading or after a load failure; otherwise, undefined.
+        * The promise rejects if loading fails or is aborted.
+     */
+    ensureSelectionLoaded(): PromiseLike<void> | void {
+        const load = this._selectionLoad;
+        if (load) {
+            return new Promise<void>((resolve, reject) => {
+                load.waiters.push({ resolve, reject });
+            });
+        }
+
+        if (this._selectionLoadError)
+            return Promise.reject(this._selectionLoadError.reason);
+    }
+
+    private resolveSelectionLoad(load: SelectionLoad) {
+        if (this._selectionLoad === load) {
+            this._selectionLoad = undefined;
+            this._selectionLoadError = undefined;
+        }
+
+        load.waiters.splice(0).forEach(waiter => waiter.resolve());
+    }
+
+    private rejectSelectionLoad(load: SelectionLoad, error: any) {
+        if (this._selectionLoad === load) {
+            this._selectionLoad = undefined;
+            this._selectionLoadError = { reason: error };
+        }
+
+        load.waiters.splice(0).forEach(waiter => waiter.reject(error));
     }
 
     private createSelect2(opt: ComboboxOptions) {
@@ -188,8 +234,11 @@ export class Combobox<TItem = any> {
 
         select2Opt.initSelection = (element: ArrayLike<HTMLElement> | HTMLElement, callback: any) => {
             const el = isArrayLike(element) ? element[0] : element;
+            this.abortInitSelection();
+
             const val = (el as any).value;
             if (val == null || val == '') {
+                this._selectionLoadError = undefined;
                 callback(null);
                 return;
             }
@@ -201,45 +250,62 @@ export class Combobox<TItem = any> {
                 initSelection: true
             };
 
+            const load: SelectionLoad = {
+                controller: new AbortController(),
+                waiters: []
+            };
+            this._selectionLoad = load;
+            this._selectionLoadError = undefined;
+            searchQuery.signal = load.controller.signal;
+
             const then = (result: ComboboxSearchResult<ComboboxItem<TItem>>) => {
-                cleanup();
-                if (isMultiple) {
-                    callback(result.items);
-                }
-                else if (!result.items || !result.items.length) {
-                    if (opt.arbitraryValues) {
-                        callback({
-                            id: val,
-                            text: val
-                        });
+                if (this._selectionLoad !== load)
+                    return;
+
+                try {
+                    if (isMultiple) {
+                        callback(result.items);
                     }
-                    else
-                        callback(null);
+                    else if (!result.items || !result.items.length) {
+                        if (opt.arbitraryValues) {
+                            callback({
+                                id: val,
+                                text: val
+                            });
+                        }
+                        else
+                            callback(null);
+                    }
+                    else {
+                        const item = result.items[0];
+                        callback(item);
+                    }
                 }
-                else {
-                    const item = result.items[0];
-                    callback(item);
+                catch (error) {
+                    this.rejectSelectionLoad(load, error);
+                    throw error;
                 }
+
+                this.resolveSelectionLoad(load);
             }
 
-            const cleanup = () => { delete (el as any).initSelectionLoading; }
+            const fail = (error: any) => {
+                if (this._selectionLoad === load)
+                    this.rejectSelectionLoad(load, error);
+            }
 
-            (el as any).initSelectionLoading && (el as any).initSelectionLoading?.abort?.();
-            searchQuery.signal = ((el as any).initSelectionLoading = new AbortController()).signal;
             try {
                 const searchResult = opt.search(searchQuery);
                 if (isPromiseLike(searchResult)) {
-                    searchResult.then(then, cleanup);
+                    searchResult.then(then, fail);
                 }
                 else {
-                    cleanup();
-                    if (searchResult)
-                        then(searchResult);
+                    then(searchResult || { items: [], more: false });
                 }
             }
-            catch (e) {
-                cleanup();
-                throw e;
+            catch (error) {
+                fail(error);
+                throw error;
             }
         }
 
@@ -287,11 +353,14 @@ export class Combobox<TItem = any> {
      * Aborts any pending initial selection query.
      */
     abortInitSelection() {
-        if (!this.el)
+        const load = this._selectionLoad;
+        if (!load)
             return;
 
-        (this.el as any).initSelectionLoading && (this.el as any).initSelectionLoading?.abort?.();
-        delete (this.el as any).initSelectionLoading;
+        const error = new Error("Initial selection loading was aborted.");
+        error.name = "AbortError";
+        this.rejectSelectionLoad(load, error);
+        load.controller.abort();
     }
 
     /**

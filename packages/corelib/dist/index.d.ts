@@ -8904,6 +8904,16 @@ export declare class Combobox<TItem = any> {
 	 * @param opt - Combobox options.
 	 */
 	constructor(opt: ComboboxOptions);
+	private _selectionLoad?;
+	private _selectionLoadError?;
+	/**
+	 * Waits for the initial selection to load, if necessary.
+	 * @returns A promise while loading or after a load failure; otherwise, undefined.
+		* The promise rejects if loading fails or is aborted.
+	 */
+	ensureSelectionLoaded(): PromiseLike<void> | void;
+	private resolveSelectionLoad;
+	private rejectSelectionLoad;
 	private createSelect2;
 	/**
 	 * Aborts any pending search query.
@@ -9109,6 +9119,12 @@ export declare class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
 	 * @returns A promise resolving to the search result.
 	 */
 	protected asyncSearch(query: ComboboxSearchQuery): PromiseLike<ComboboxSearchResult<TItem>>;
+	/**
+		* Waits for the current initial selection load, if necessary.
+		* @returns A promise while loading or after a load failure; otherwise, undefined.
+		* The promise rejects if loading fails or is aborted.
+	 */
+	ensureSelectionLoaded(): void | PromiseLike<void>;
 	/**
 	 * Returns the type delay for searching.
 	 * @returns The delay in milliseconds.
@@ -14003,8 +14019,8 @@ export interface Select2Options {
 	/** Callback that populates results. */
 	populateResults?: (container: HTMLElement, results: Select2Item[], query: Select2QueryOptions) => void;
 	/** Callback that determines whether to focus the input. Defaults to not focusing the input
-	 * on touch devices, so that the virtual keyboard does not cover the dropdown. Typing with a
-	 * hardware keyboard still focuses the search input. */
+	 * on touch devices, so that the virtual keyboard does not cover the dropdown. Hardware
+	 * keyboard input is still routed to the widget. */
 	shouldFocusInput?: (instance: AbstractSelect2) => boolean;
 }
 /**

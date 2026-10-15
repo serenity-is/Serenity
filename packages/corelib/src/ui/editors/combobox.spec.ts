@@ -10,6 +10,16 @@ describe("Combobox", () => {
         return { combobox: new (Combobox as any)({ element }, false) as Combobox, element };
     }
 
+    function createDeferred<T>() {
+        let resolve!: (value: T) => void;
+        let reject!: (error?: any) => void;
+        const promise = new Promise<T>((resolvePromise, rejectPromise) => {
+            resolve = resolvePromise;
+            reject = rejectPromise;
+        });
+        return { promise, resolve, reject };
+    }
+
     it("reads and writes a scalar value without Select2", () => {
         const { combobox, element } = createCombobox();
         element.value = "one";
@@ -122,6 +132,129 @@ describe("Combobox", () => {
         select2.destroy();
     });
 
+    it("waits for the pending initial selection", async () => {
+        const element = document.createElement("input");
+        document.body.appendChild(element);
+        const deferred = createDeferred<any>();
+        const combobox = new Combobox({ element, search: () => deferred.promise });
+        const select2 = (element as any).select2;
+        const item = { id: "1", text: "One", source: { Key: "one" } };
+        element.value = "1";
+
+        const callback = vi.fn(value => select2.data(value));
+        select2.opts.initSelection(element, callback);
+        const firstWaiter = combobox.ensureSelectionLoaded() as PromiseLike<void>;
+        const secondWaiter = combobox.ensureSelectionLoaded() as PromiseLike<void>;
+
+        deferred.resolve({ items: [item], more: false });
+        await Promise.all([firstWaiter, secondWaiter]);
+
+        expect(callback).toHaveBeenCalledWith(item);
+        expect(combobox.getSelectedItem()).toMatchObject(item);
+        combobox.dispose();
+    });
+
+    it("returns immediately when no initial selection load is pending", () => {
+        const element = document.createElement("input");
+        document.body.appendChild(element);
+        const combobox = new Combobox({ element, search: () => ({ items: [], more: false }) });
+
+        expect(combobox.ensureSelectionLoaded()).toBeUndefined();
+        combobox.dispose();
+    });
+
+    it("rejects waiters and remembers a failed initial selection load", async () => {
+        const element = document.createElement("input");
+        document.body.appendChild(element);
+        const deferred = createDeferred<any>();
+        const combobox = new Combobox({ element, search: () => deferred.promise });
+        const select2 = (element as any).select2;
+        element.value = "1";
+        select2.opts.initSelection(element, vi.fn());
+
+        const firstWaiter = combobox.ensureSelectionLoaded() as PromiseLike<void>;
+        const secondWaiter = combobox.ensureSelectionLoaded() as PromiseLike<void>;
+        const error = new Error("Lookup failed");
+        deferred.reject(error);
+
+        await expect(firstWaiter).rejects.toBe(error);
+        await expect(secondWaiter).rejects.toBe(error);
+        await expect(combobox.ensureSelectionLoaded()).rejects.toBe(error);
+        combobox.dispose();
+    });
+
+    it("preserves falsy initial selection rejection reasons", async () => {
+        const element = document.createElement("input");
+        document.body.appendChild(element);
+        const deferred = createDeferred<any>();
+        const combobox = new Combobox({ element, search: () => deferred.promise });
+        const select2 = (element as any).select2;
+        element.value = "1";
+        select2.opts.initSelection(element, vi.fn());
+
+        const waiter = combobox.ensureSelectionLoaded() as PromiseLike<void>;
+        deferred.reject(undefined);
+
+        await expect(waiter).rejects.toBeUndefined();
+        await expect(combobox.ensureSelectionLoaded()).rejects.toBeUndefined();
+        combobox.dispose();
+    });
+
+    it("rejects waiters on abort and ignores a late result", async () => {
+        const element = document.createElement("input");
+        document.body.appendChild(element);
+        const deferred = createDeferred<any>();
+        const combobox = new Combobox({ element, search: () => deferred.promise });
+        const select2 = (element as any).select2;
+        element.value = "1";
+        const callback = vi.fn();
+        select2.opts.initSelection(element, callback);
+
+        const waiter = combobox.ensureSelectionLoaded() as PromiseLike<void>;
+        combobox.abortInitSelection();
+
+        await expect(waiter).rejects.toMatchObject({ name: "AbortError" });
+        await expect(combobox.ensureSelectionLoaded()).rejects.toMatchObject({ name: "AbortError" });
+        deferred.resolve({ items: [{ id: "1", text: "One" }], more: false });
+        await Promise.resolve();
+
+        expect(callback).not.toHaveBeenCalled();
+        combobox.dispose();
+    });
+
+    it("isolates waiters from superseded initial selection requests", async () => {
+        const element = document.createElement("input");
+        document.body.appendChild(element);
+        const firstResult = createDeferred<any>();
+        const secondResult = createDeferred<any>();
+        const search = vi.fn()
+            .mockReturnValueOnce(firstResult.promise)
+            .mockReturnValueOnce(secondResult.promise);
+        const combobox = new Combobox({ element, search });
+        const select2 = (element as any).select2;
+        const firstCallback = vi.fn();
+        const secondCallback = vi.fn(value => select2.data(value));
+
+        element.value = "1";
+        select2.opts.initSelection(element, firstCallback);
+        const firstWaiter = combobox.ensureSelectionLoaded() as PromiseLike<void>;
+
+        element.value = "2";
+        select2.opts.initSelection(element, secondCallback);
+        const secondWaiter = combobox.ensureSelectionLoaded() as PromiseLike<void>;
+
+        await expect(firstWaiter).rejects.toMatchObject({ name: "AbortError" });
+        secondResult.resolve({ items: [{ id: "2", text: "Two" }], more: false });
+        await secondWaiter;
+        firstResult.resolve({ items: [{ id: "1", text: "One" }], more: false });
+        await Promise.resolve();
+
+        expect(firstCallback).not.toHaveBeenCalled();
+        expect(secondCallback).toHaveBeenCalledWith({ id: "2", text: "Two" });
+        expect(combobox.getSelectedItem()).toMatchObject({ id: "2", text: "Two" });
+        combobox.dispose();
+    });
+
     it("supports provider options and formatting callbacks", () => {
         const element = document.createElement("input");
         document.body.appendChild(element);
@@ -203,15 +336,12 @@ describe("Combobox", () => {
         const combobox = new Combobox({ element, search: () => ({ items: [], more: false }) });
         const select2 = (element as any).select2;
         const abortQuery = vi.fn();
-        const abortSelection = vi.fn();
         (element as any).queryLoading = { abort: abortQuery };
-        (element as any).initSelectionLoading = { abort: abortSelection };
         (element as any).typeTimeout = 1;
         (element as any).typeTimeoutFn = vi.fn();
         combobox.abortPendingQuery();
         combobox.abortInitSelection();
         expect(abortQuery).toHaveBeenCalled();
-        expect(abortSelection).toHaveBeenCalled();
         expect(combobox.container).toBeTruthy();
         combobox.dispose();
     });

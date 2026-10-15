@@ -143,6 +143,15 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
     }
 
     /**
+        * Waits for the current initial selection load, if necessary.
+        * @returns A promise while loading or after a load failure; otherwise, undefined.
+        * The promise rejects if loading fails or is aborted.
+     */
+    ensureSelectionLoaded(): void | PromiseLike<void> {
+        return this.combobox?.ensureSelectionLoaded();
+    }
+
+    /**
      * Returns the type delay for searching.
      * @returns The delay in milliseconds.
      */
