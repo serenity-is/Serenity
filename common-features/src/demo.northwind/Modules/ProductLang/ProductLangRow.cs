@@ -1,21 +1,21 @@
 namespace Serenity.Demo.Northwind;
 
 [NorthwindConnection, NorthwindModule, TableName("ProductLang")]
-[DisplayName("ProductLang"), InstanceName("ProductLang")]
+[DisplayText("ProductLang"), InstanceName("ProductLang")]
 [ReadPermission("Northwind:General")]
 [ModifyPermission("Northwind:General")]
 public sealed class ProductLangRow : Row<ProductLangRow.RowFields>, IIdRow, INameRow, ILocalizationRow
 {
-    [DisplayName("Id"), Column("ID"), Identity, IdProperty]
+    [DisplayText("Id"), Column("ID"), Identity, IdProperty]
     public int? Id { get => fields.Id[this]; set => fields.Id[this] = value; }
 
-    [DisplayName("Product Id"), Column("ProductID"), NotNull]
+    [DisplayText("Product Id"), Column("ProductID"), NotNull]
     public int? ProductId { get => fields.ProductId[this]; set => fields.ProductId[this] = value; }
 
-    [DisplayName("Language Id"), Column("LanguageID"), NotNull]
+    [DisplayText("Language Id"), Column("LanguageID"), NotNull]
     public string? LanguageId { get => fields.LanguageId[this]; set => fields.LanguageId[this] = value; }
 
-    [DisplayName("Product Name"), Size(40), QuickSearch, NameProperty]
+    [DisplayText("Product Name"), Size(40), QuickSearch, NameProperty]
     public string? ProductName { get => fields.ProductName[this]; set => fields.ProductName[this] = value; }
 
     public StringField CultureIdField  => fields.LanguageId;

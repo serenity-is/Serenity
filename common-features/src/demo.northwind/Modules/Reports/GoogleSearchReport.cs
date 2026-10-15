@@ -7,10 +7,10 @@ namespace Serenity.Demo.Northwind.Reports;
 /// You could open any other page, internal or external, e.g. an SSRS report web page
 /// </summary>
 [Report]
-[Category("Northwind/Orders"), DisplayName("Google Search - External Report Sample")]
+[CategoryName("Northwind/Orders"), DisplayText("Google Search - External Report Sample")]
 public class GoogleSearchReport : IReport, IExternalReport
 {
-    [DisplayName("Search Query"), Required(true)]
+    [DisplayText("Search Query"), Required(true)]
     public string? Query { get; set; }
 
     public object GetData()

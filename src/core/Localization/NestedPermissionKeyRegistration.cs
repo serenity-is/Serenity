@@ -53,15 +53,11 @@ public static class NestedPermissionKeyRegistration
                 key.IndexOfAny(splitChar) >= 0) // skip permissions with logical operators
                 continue;
 
-            DescriptionAttribute descr;
-
             if (key.EndsWith(":"))
             {
                 if (registry != null)
-                {
-                    descr = member.GetCustomAttribute<DescriptionAttribute>();
-                    registry.Add(languageID, "Permission." + key, descr != null ? descr.Description : member.Name);
-                }
+                    AddDescriptionText(registry, languageID, key, member.Name,
+                        member.GetCustomAttribute<DescriptionAttribute>());
 
                 continue;
             }
@@ -71,10 +67,8 @@ public static class NestedPermissionKeyRegistration
             permissions?.Add(key);
 
             if (registry != null)
-            {
-                descr = member.GetCustomAttribute<DescriptionAttribute>();
-                registry.Add(languageID, "Permission." + key, descr != null ? descr.Description : member.Name);
-            }
+                AddDescriptionText(registry, languageID, key, member.Name,
+                    member.GetCustomAttribute<DescriptionAttribute>());
         }
 
         if (registry != null && thisKeys.Count > 0)
@@ -87,11 +81,29 @@ public static class NestedPermissionKeyRegistration
                 lastColonIndex < thisKeys[0].Length - 1 &&
                 thisKeys.TrueForAll(x => x.LastIndexOf(":") == lastColonIndex))
             {
-                registry.Add(languageID, "Permission." + thisKeys[0][..(lastColonIndex + 1)], displayName.DisplayName);
+                var defaultKey = "Permission." + thisKeys[0][..(lastColonIndex + 1)];
+                var resolved = LocalText.ResolveFromAttribute(displayName, displayName.DisplayName, defaultKey);
+                if (resolved.Key is string key)
+                    registry.Add(languageID, key, resolved.Text);
             }
         }
 
         foreach (var nested in type.GetNestedTypes(BindingFlags.Public | BindingFlags.DeclaredOnly))
             AddKeysFrom(permissions!, registry, nested, languageID);
+    }
+
+    private static void AddDescriptionText(ILocalTextRegistry registry, string languageID,
+        string permissionKey, string memberName, DescriptionAttribute? attribute)
+    {
+        var defaultKey = "Permission." + permissionKey;
+        if (attribute is null)
+        {
+            registry.Add(languageID, defaultKey, memberName);
+            return;
+        }
+
+        var resolved = LocalText.ResolveFromAttribute(attribute, attribute.Description, defaultKey);
+        if (resolved.Key is string key)
+            registry.Add(languageID, key, resolved.Text);
     }
 }

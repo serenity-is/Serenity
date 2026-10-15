@@ -13,10 +13,12 @@ namespace Serenity.Reporting;
 /// <param name="htmlReportPdfRenderer">The HTML report PDF renderer.</param>
 /// <param name="serviceProvider">The service provider.</param>
 /// <param name="httpContextAccessor">The HTTP context accessor.</param>
+/// <param name="localizer">The text localizer.</param>
 public class DefaultReportRenderer(IDataReportExcelRenderer excelRenderer,
     IHtmlReportPdfRenderer htmlReportPdfRenderer,
     IServiceProvider serviceProvider,
-    IHttpContextAccessor? httpContextAccessor = null) : IReportRenderer
+    IHttpContextAccessor? httpContextAccessor = null,
+    ITextLocalizer? localizer = null) : IReportRenderer
 {
     /// <summary>
     /// The Excel renderer.
@@ -50,7 +52,7 @@ public class DefaultReportRenderer(IDataReportExcelRenderer excelRenderer,
         return new ReportRenderResult
         {
             ContentBytes = excelRenderer.Render(report),
-            FileName = GetFileNameFor(report),
+            FileName = GetFileNameFor(report, localizer),
             FileExtension = ".xlsx",
             MimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         };
@@ -86,7 +88,7 @@ public class DefaultReportRenderer(IDataReportExcelRenderer excelRenderer,
     {
         var result = new ReportRenderResult()
         {
-            FileName = GetFileNameFor(report),
+            FileName = GetFileNameFor(report, localizer),
             FileExtension = ".html",
             MimeType = "text/html"
         };
@@ -166,7 +168,7 @@ public class DefaultReportRenderer(IDataReportExcelRenderer excelRenderer,
         {
             ContentBytes = htmlReportPdfRenderer.Render(report, renderOptions),
             FileExtension = ".pdf",
-            FileName = GetFileNameFor(report),
+            FileName = GetFileNameFor(report, localizer),
             MimeType = "application/pdf",
         };
     }
@@ -198,13 +200,22 @@ public class DefaultReportRenderer(IDataReportExcelRenderer excelRenderer,
         return RenderHtmlReport(report, renderOptions);
     }
     
-    private static string GetFileNameFor(IReport report)
+    private static string GetFileNameFor(IReport report, ITextLocalizer? localizer)
     {
         if (report is ICustomFileName customFileName)
             return customFileName.GetFileName();
 
-        var filePrefix = report.GetType().GetCustomAttribute<DisplayNameAttribute>(inherit: false)?.DisplayName ??
-            report.GetType().GetCustomAttribute<ReportAttribute>(inherit: false)?.ReportKey ??
+        var displayName = report.GetType().GetCustomAttribute<DisplayNameAttribute>(inherit: false);
+        var filePrefix = displayName?.DisplayName;
+        if (displayName is not null)
+        {
+            var resolved = LocalText.ResolveFromAttribute(displayName,
+                displayName.DisplayName, defaultKey: null);
+            filePrefix = resolved.Key is string key ?
+                localizer?.TryGet(key) ?? resolved.Text ?? key : resolved.Text;
+        }
+
+        filePrefix ??= report.GetType().GetCustomAttribute<ReportAttribute>(inherit: false)?.ReportKey ??
             report.GetType().Name;
 
         return filePrefix + "_" +

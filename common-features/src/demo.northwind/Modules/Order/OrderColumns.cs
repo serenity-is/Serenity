@@ -7,7 +7,7 @@ public class OrderColumns
     [EditLink, AlignRight, SortOrder(1, descending: true), Width(70), PinToStart]
     public string? OrderID { get; set; }
 
-    [DisplayName(""), AlignCenter, Unbound, FixedWidth(15), PinToStart]
+    [DisplayText(""), AlignCenter, Unbound, FixedWidth(15), PinToStart]
     public string? PrintInvoice { get; set; }
 
     [EditLink, Width(200), QuickFilter, PinToStart]

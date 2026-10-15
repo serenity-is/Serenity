@@ -4,15 +4,15 @@ namespace Serenity.Demo.Northwind.Forms;
 [BasedOnRow(typeof(CustomerRow), CheckNames = true)]
 public class CustomerForm
 {
-    [Category("General")]
+    [CategoryName("General")]
     public string? CustomerID { get; set; }
     public string? CompanyName { get; set; }
-    [Category("Contact")]
+    [CategoryName("Contact")]
     public string? ContactName { get; set; }
     public string? ContactTitle { get; set; }
     public List<int>? Representatives { get; set; }
 
-    [Category("Address")]
+    [CategoryName("Address")]
     public string? Address { get; set; }
     [HalfWidth]
     public string? Country { get; set; }
@@ -29,7 +29,7 @@ public class CustomerForm
     public List<object>? NoteList { get; set; }
 
     // note: these fields are stored in an extension table (CustomerDetails)
-    [Category("Details")]
+    [CategoryName("Details")]
     [HalfWidth]
     public DateTime? LastContactDate { get; set; }
     [HalfWidth]

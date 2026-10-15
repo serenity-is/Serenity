@@ -280,7 +280,7 @@ internal class OriginPropertyDictionary
         return null;
     }
 
-    public string OriginDisplayName(string propertyName, OriginAttribute origin, 
+    public DisplayNameAttribute OriginDisplayName(string propertyName, OriginAttribute origin,
         DialectExpressionSelector expressionSelector, int recursion = 0)
     {
         if (recursion++ > 1000)
@@ -297,7 +297,8 @@ internal class OriginPropertyDictionary
             else
             {
                 attr = propertyByName[propJoin.propertyName].GetCustomAttribute<DisplayNameAttribute>();
-                if (attr != null)
+                if (attr is not null && (attr is DisplayTextAttribute ||
+                    !LocalText.IsLocalTextKeyCandidate(attr.DisplayName, uiKeyOnly: true)))
                     prefix = attr.DisplayName;
                 else
                     prefix = propJoin.propertyName;
@@ -321,17 +322,40 @@ internal class OriginPropertyDictionary
         var originProperty = org.Item1;
 
         attr = originProperty.GetCustomAttribute<DisplayNameAttribute>();
+        if (attr is DisplayTextAttribute displayText)
+        {
+            var name = addPrefix(displayText.DisplayName);
+            return name == displayText.DisplayName &&
+                !string.IsNullOrEmpty(displayText.TextKey) ? displayText :
+                new DisplayTextAttribute(name);
+        }
+
         if (attr != null)
-            return addPrefix(attr.DisplayName);
+        {
+            var name = attr.DisplayName;
+            if (LocalText.IsLocalTextKeyCandidate(name, uiKeyOnly: true))
+                return new DisplayTextAttribute(addPrefix(originProperty.Name));
+
+            var prefixedName = addPrefix(name);
+            return prefixedName == name ? new DisplayNameAttribute(name) :
+                new DisplayTextAttribute(prefixedName);
+        }
 
         var originOrigin = originProperty.GetCustomAttribute<OriginAttribute>();
         if (originOrigin != null)
         {
             var originDictionary = GetPropertyDictionary(org.Item2, userEntityOptions);
-            return addPrefix(originDictionary.OriginDisplayName(originProperty.Name, originOrigin, expressionSelector));
+            var nestedDisplay = originDictionary.OriginDisplayName(originProperty.Name,
+                originOrigin, expressionSelector);
+            var name = nestedDisplay.DisplayName;
+            var prefixedName = addPrefix(name);
+            if (prefixedName == name)
+                return nestedDisplay;
+
+            return new DisplayTextAttribute(prefixedName);
         }
 
-        return addPrefix(originProperty.Name);
+        return new DisplayTextAttribute(addPrefix(originProperty.Name));
     }
 
     internal string? PrefixAliases(string expression, string alias,

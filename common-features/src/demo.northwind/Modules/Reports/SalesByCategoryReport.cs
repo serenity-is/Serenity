@@ -3,7 +3,7 @@ using Serenity.Reporting;
 namespace Serenity.Demo.Northwind;
 
 [Report, RequiredPermission(PermissionKeys.General)]
-[Category("Northwind/Orders"), DisplayName("Sales By Category")]
+[CategoryName("Northwind/Orders"), DisplayText("Sales By Category")]
 public class SalesByDetailReport(ISqlConnections sqlConnections, ITextLocalizer localizer, IServiceProvider serviceProvider) : IReport, IDataOnlyReport
 {
     protected ISqlConnections SqlConnections { get; } = sqlConnections ?? throw new ArgumentNullException(nameof(sqlConnections));

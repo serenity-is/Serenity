@@ -167,7 +167,11 @@ public static class EnumMapper
                     var attribute = memInfo[0].GetCustomAttribute<DescriptionAttribute>(inherit: false);
                     if (attribute != null)
                     {
-                        text = attribute.Description;
+                        var resolved = LocalText.ResolveFromAttribute(attribute,
+                            attribute.Description, defaultKey: null);
+                        text = resolved.Key is string descriptionKey ?
+                            localizer?.TryGet(descriptionKey) ?? resolved.Text ?? descriptionKey :
+                            resolved.Text;
                     }
                 }
             }

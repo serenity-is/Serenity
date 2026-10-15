@@ -502,8 +502,8 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins, IHas
                                 expression = new ExpressionAttribute(propertyDictionary.OriginExpression(
                                     property.Name, origin, expressionSelector, "", rowCustomAttributes));
 
-                            display ??= new DisplayNameAttribute(propertyDictionary.OriginDisplayName(
-                                    property.Name, origin, expressionSelector));
+                            display ??= propertyDictionary.OriginDisplayName(
+                                    property.Name, origin, expressionSelector);
 
                             size ??= propertyDictionary.OriginAttribute<SizeAttribute>(
                                     property.Name, expressionSelector);
@@ -619,11 +619,15 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins, IHas
                                 fieldInfo.Name, rowType!.Name));
                     }
 
+                    var caption = display is IHasTextKey hasTextKey &&
+                        !string.IsNullOrEmpty(hasTextKey.TextKey) ?
+                        hasTextKey.TextKey : display?.DisplayName;
+
                     object?[] prm =
                     [
                         this, // owner
                         column == null ? property.Name : (column.Name.TrimToNull() ?? property.Name),
-                        display != null ? new LocalText(display.DisplayName) : null,
+                        display != null ? new LocalText(caption) : null,
                         size != null ? size.Value : 0,
                         (FieldFlags.Default ^ removeFlags) | addFlags,
                         null,
@@ -655,7 +659,9 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins, IHas
                         field.Size = size.Value;
 
                     if (display != null)
-                        field.Caption = new LocalText(display.DisplayName);
+                        field.Caption = new LocalText(display is IHasTextKey hasTextKey &&
+                            !string.IsNullOrEmpty(hasTextKey.TextKey) ?
+                            hasTextKey.TextKey : display.DisplayName);
 
                     if (addFlags != 0 || removeFlags != 0)
                         field.Flags = (field.Flags ^ removeFlags) | addFlags;

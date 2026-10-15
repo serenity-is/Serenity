@@ -5,24 +5,42 @@ public partial class PropertyItemsLocalTextRegistrationTests
     [FormScript]
     private class TabWithTextKeys
     {
-        [Tab("Db.SomeEntity.SomeField")]
+        [Tab(TextKey = "Db.SomeEntity.SomeField")]
         public string Db { get; set; }
 
-        [Tab("Columns.SomeColumns.SomeField")]
+        [Tab(TextKey = "Columns.SomeColumns.SomeField")]
         public string Cols { get; set; }
 
-        [Tab("Forms.SomeForm.SomeKey")]
+        [Tab(TextKey = "Forms.SomeForm.SomeKey")]
         public string Forms { get; set; }
 
-        [Tab("Site.AKey")]
+        [Tab(TextKey = "Site.AKey")]
         public string Site { get; set; }
 
-        [Tab("Site.ExistingKey")]
+        [Tab(TextKey = "Site.ExistingKey")]
         public string Existing { get; set; }
     }
 
+    [FormScript]
+    private class TabWithExplicitTextKey
+    {
+        [Tab("Regular tab", TextKey = "Site.ExplicitTab")]
+        public string Name { get; set; }
+    }
+
     [Fact]
-    public void Tab_With_Regular_Keys_Are_Registered_As_Null()
+    public void Tab_With_Explicit_TextKey_Uses_Explicit_Key()
+    {
+        var registry = new LocalTextRegistry();
+        PropertyItemsLocalTextRegistration.AddPropertyItemsTexts(registry,
+            new MockTypeSource(typeof(TabWithExplicitTextKey)));
+
+        Assert.Contains(registry.GetAllTexts(false),
+            x => x.Key.Key == "Site.ExplicitTab" && x.Value == "Regular tab");
+    }
+
+    [Fact]
+    public void Tab_With_Explicit_Keys_Are_Registered_As_Null()
     {
         var registry = new LocalTextRegistry();
         registry.Add(LocalText.InvariantLanguageID, "Site.ExistingKey", "ExistingValue");
@@ -79,7 +97,7 @@ public partial class PropertyItemsLocalTextRegistrationTests
     }
 
     [Fact]
-    public void Tab_With_NonSupported_KeyLike_Are_Registered_As_Their_Values()
+    public void Tab_With_KeyLike_Text_Are_Registered_As_Their_Values()
     {
         var registry = new LocalTextRegistry();
         registry.Add(LocalText.InvariantLanguageID,
@@ -108,6 +126,47 @@ public partial class PropertyItemsLocalTextRegistrationTests
                 Assert.Equal(LocalText.InvariantLanguageID, x.Key.LanguageId);
                 Assert.Equal("S.No", x.Value);
             });
+    }
+
+    [ColumnsScript("TestColsKeyLikeText")]
+    private class TabWithKeyLikeText
+    {
+        [Tab("Site.LegacyTabKey")]
+        public string Name { get; set; }
+    }
+
+    [Fact]
+    public void Tab_With_KeyLike_Text_Without_TextKey_Uses_Generated_Key()
+    {
+        var registry = new LocalTextRegistry();
+        PropertyItemsLocalTextRegistration.AddPropertyItemsTexts(registry,
+            new MockTypeSource(typeof(TabWithKeyLikeText)));
+
+        Assert.Contains(registry.GetAllTexts(false),
+            x => x.Key.Key == "Columns.TestColsKeyLikeText.Tabs.Site.LegacyTabKey" &&
+                x.Value == "Site.LegacyTabKey");
+        Assert.DoesNotContain(registry.GetAllTexts(false),
+            x => x.Key.Key == "Site.LegacyTabKey");
+    }
+
+    [ColumnsScript("TestColsExplicit")]
+    private class TabWithExplicitTextKeyLike
+    {
+        [Tab(TextKey = "Site.LegacyTabKey")]
+        public string Name { get; set; }
+    }
+
+    [Fact]
+    public void Tab_With_TextKey_Registers_Key_Instead_Of_KeyLike_Value()
+    {
+        var registry = new LocalTextRegistry();
+        PropertyItemsLocalTextRegistration.AddPropertyItemsTexts(registry,
+            new MockTypeSource(typeof(TabWithExplicitTextKeyLike)));
+
+        Assert.Contains(registry.GetAllTexts(false),
+            x => x.Key.Key == "Site.LegacyTabKey" && x.Value is null);
+        Assert.DoesNotContain(registry.GetAllTexts(false),
+            x => x.Key.Key == "Columns.TestColsExplicit.Tabs.Site.LegacyTabKey");
     }
 
     [FormScript("MyForm")]

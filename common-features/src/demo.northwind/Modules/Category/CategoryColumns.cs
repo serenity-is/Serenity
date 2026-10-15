@@ -4,7 +4,7 @@
 [BasedOnRow(typeof(CategoryRow), CheckNames = true)]
 public class CategoryColumns
 {
-    [EditLink, DisplayName("Db.Shared.RecordId"), AlignRight]
+    [EditLink, DisplayText(TextKey = "Db.Shared.RecordId"), AlignRight]
     public int CategoryID { get; set; }
     [EditLink, Width(250)]
     public string? CategoryName { get; set; }

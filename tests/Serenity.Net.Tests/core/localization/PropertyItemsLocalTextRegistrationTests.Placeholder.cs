@@ -5,24 +5,63 @@ public partial class PropertyItemsLocalTextRegistrationTests
     [FormScript]
     private class PlaceholderWithTextKeys
     {
-        [Placeholder("Db.SomeEntity.SomeField")]
+        [Placeholder(TextKey = "Db.SomeEntity.SomeField")]
         public string Db { get; set; }
 
-        [Placeholder("Columns.SomeColumns.SomeField")]
+        [Placeholder(TextKey = "Columns.SomeColumns.SomeField")]
         public string Cols { get; set; }
 
-        [Placeholder("Forms.SomeForm.SomeKey")]
+        [Placeholder(TextKey = "Forms.SomeForm.SomeKey")]
         public string Forms { get; set; }
 
-        [Placeholder("Site.AKey")]
+        [Placeholder(TextKey = "Site.AKey")]
         public string Site { get; set; }
 
-        [Placeholder("Site.ExistingKey")]
+        [Placeholder(TextKey = "Site.ExistingKey")]
         public string Existing { get; set; }
     }
 
+    [FormScript]
+    private class PlaceholderWithExplicitTextKey
+    {
+        [Placeholder("Regular placeholder", TextKey = "Site.ExplicitPlaceholder")]
+        public string Name { get; set; }
+    }
+
     [Fact]
-    public void Placeholder_With_Regular_Keys_Are_Registered_As_Null()
+    public void Placeholder_With_Explicit_TextKey_Uses_Explicit_Key()
+    {
+        var registry = new LocalTextRegistry();
+        PropertyItemsLocalTextRegistration.AddPropertyItemsTexts(registry,
+            new MockTypeSource(typeof(PlaceholderWithExplicitTextKey)));
+
+        Assert.Contains(registry.GetAllTexts(false),
+            x => x.Key.Key == "Site.ExplicitPlaceholder" && x.Value == "Regular placeholder");
+    }
+
+    [FormScript("PlaceholderKeyLikeLiteral")]
+    private class PlaceholderWithKeyLikeLiteral
+    {
+        [Placeholder("Site.LegacyPlaceholderKey")]
+        public string Name { get; set; }
+    }
+
+    [Fact]
+    public void Placeholder_With_KeyLike_Literal_Uses_Generated_Key()
+    {
+        var registry = new LocalTextRegistry();
+        PropertyItemsLocalTextRegistration.AddPropertyItemsTexts(registry,
+            new MockTypeSource(typeof(PlaceholderWithKeyLikeLiteral)));
+
+        Assert.Contains(registry.GetAllTexts(false),
+            x => x.Key.Key == "Forms.PlaceholderKeyLikeLiteral.Name_Placeholder" &&
+                x.Value == "Site.LegacyPlaceholderKey");
+        Assert.DoesNotContain(registry.GetAllTexts(false),
+            x => x.Key.Key == "Site.LegacyPlaceholderKey");
+    }
+
+    [Fact]
+    public void Placeholder_With_Explicit_Keys_Are_Registered_As_Null()
     {
         var registry = new LocalTextRegistry();
         registry.Add(LocalText.InvariantLanguageID, "Site.ExistingKey", "ExistingValue");

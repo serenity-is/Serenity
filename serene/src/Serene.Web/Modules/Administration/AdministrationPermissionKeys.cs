@@ -1,12 +1,12 @@
 ﻿namespace Serene.Administration;
 
 [NestedPermissionKeys]
-[DisplayName("Administration")]
+[DisplayText("Administration")]
 public class PermissionKeys
 {
-    [Description("User, Role Management and Permissions")]
+    [DescriptionText("User, Role Management and Permissions")]
     public const string Security = "Administration:Security";
 
-    [Description("Languages and Translations")]
+    [DescriptionText("Languages and Translations")]
     public const string Translation = "Administration:Translation";
 }

@@ -4,17 +4,17 @@ namespace Serenity.Demo.BasicSamples.Forms;
 [BasedOnRow(typeof(Northwind.ProductRow), CheckNames = true)]
 public class LookupFilterByMultipleForm
 {
-    [Category("General")]
+    [CategoryName("General")]
     public string? ProductName { get; set; }
     public string? ProductImage { get; set; }
     public bool Discontinued { get; set; }
     public int SupplierID { get; set; }
     [ProduceSeafoodCategoryEditor]
     public int CategoryID { get; set; }
-    [Category("Pricing")]
+    [CategoryName("Pricing")]
     public string? QuantityPerUnit { get; set; }
     public decimal UnitPrice { get; set; }
-    [Category("Status")]
+    [CategoryName("Status")]
     public short UnitsInStock { get; set; }
     public short UnitsOnOrder { get; set; }
     public short ReorderLevel { get; set; }

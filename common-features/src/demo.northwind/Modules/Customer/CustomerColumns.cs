@@ -6,7 +6,7 @@ namespace Serenity.Demo.Northwind.Columns;
 [BasedOnRow(typeof(CustomerRow), CheckNames = true)]
 public class CustomerColumns
 {
-    [EditLink, DisplayName("Db.Shared.RecordId"), Width(100)]
+    [EditLink, DisplayText(TextKey = "Db.Shared.RecordId"), Width(100)]
     public string? CustomerID { get; set; }
     [EditLink, Width(250)]
     public string? CompanyName { get; set; }

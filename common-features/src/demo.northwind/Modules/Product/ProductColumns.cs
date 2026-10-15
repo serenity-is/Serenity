@@ -4,7 +4,7 @@
 [BasedOnRow(typeof(ProductRow), CheckNames = true)]
 public class ProductColumns
 {
-    [EditLink, DisplayName("Db.Shared.RecordId"), AlignRight]
+    [EditLink, DisplayText(TextKey = "Db.Shared.RecordId"), AlignRight]
     public string? ProductID { get; set; }
     [EditLink, Width(250)]
     public string? ProductName { get; set; }

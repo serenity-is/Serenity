@@ -1,7 +1,7 @@
 namespace Serenity.Demo.Northwind;
 
 [NorthwindConnection, NorthwindModule, TableName("Orders")]
-[DisplayName("Orders"), InstanceName("Order")]
+[DisplayText("Orders"), InstanceName("Order")]
 [ReadPermission(PermissionKeys.General)]
 [ModifyPermission(PermissionKeys.General)]
 [DataAuditLog]
@@ -11,61 +11,61 @@ public sealed class OrderRow : Row<OrderRow.RowFields>, IIdRow, INameRow
     const string jEmployee = nameof(jEmployee);
     const string jShipVia = nameof(jShipVia);
 
-    [DisplayName("Order ID"), NotNull, Identity, QuickSearch, IdProperty]
+    [DisplayText("Order ID"), NotNull, Identity, QuickSearch, IdProperty]
     public int? OrderID { get => fields.OrderID[this]; set => fields.OrderID[this] = value; }
 
-    [DisplayName("Customer"), Size(5), NotNull, NameProperty]
+    [DisplayText("Customer"), Size(5), NotNull, NameProperty]
     [ForeignKey(typeof(CustomerRow), nameof(CustomerRow.CustomerID)), LeftJoin(jCustomer)]
     public string? CustomerID { get => fields.CustomerID[this]; set => fields.CustomerID[this] = value; }
 
-    [Origin(jCustomer, nameof(CustomerRow.CompanyName)), DisplayName("Customer"), QuickSearch]
+    [Origin(jCustomer, nameof(CustomerRow.CompanyName)), DisplayText("Customer"), QuickSearch]
     public string? CustomerCompanyName { get => fields.CustomerCompanyName[this]; set => fields.CustomerCompanyName[this] = value; }
 
-    [DisplayName("Employee"), ForeignKey(typeof(EmployeeRow)), LeftJoin(jEmployee)]
+    [DisplayText("Employee"), ForeignKey(typeof(EmployeeRow)), LeftJoin(jEmployee)]
     [TextualField(nameof(EmployeeFullName))]
     public int? EmployeeID { get => fields.EmployeeID[this]; set => fields.EmployeeID[this] = value; }
 
-    [Origin(jEmployee, nameof(EmployeeRow.FullName)), DisplayName("Employee")]
+    [Origin(jEmployee, nameof(EmployeeRow.FullName)), DisplayText("Employee")]
     public string? EmployeeFullName { get => fields.EmployeeFullName[this]; set => fields.EmployeeFullName[this] = value; }
 
     [Origin(jEmployee, nameof(EmployeeRow.Gender))]
     public Gender? EmployeeGender { get => fields.EmployeeGender[this]; set => fields.EmployeeGender[this] = value; }
 
-    [DisplayName("Order Date"), NotNull]
+    [DisplayText("Order Date"), NotNull]
     public DateTime? OrderDate { get => fields.OrderDate[this]; set => fields.OrderDate[this] = value; }
 
-    [DisplayName("Required Date")]
+    [DisplayText("Required Date")]
     public DateTime? RequiredDate { get => fields.RequiredDate[this]; set => fields.RequiredDate[this] = value; }
 
-    [DisplayName("Shipped Date")]
+    [DisplayText("Shipped Date")]
     public DateTime? ShippedDate { get => fields.ShippedDate[this]; set => fields.ShippedDate[this] = value; }
 
-    [DisplayName("Shipping State"), Case($"T0.[{nameof(ShippedDate)}] IS NULL",
+    [DisplayText("Shipping State"), Case($"T0.[{nameof(ShippedDate)}] IS NULL",
         (int)OrderShippingState.NotShipped, (int)OrderShippingState.Shipped)]
     public OrderShippingState? ShippingState { get => fields.ShippingState[this]; set => fields.ShippingState[this] = value; }
 
-    [DisplayName("Ship Via"), ForeignKey(typeof(ShipperRow)), LeftJoin(jShipVia)]
+    [DisplayText("Ship Via"), ForeignKey(typeof(ShipperRow)), LeftJoin(jShipVia)]
     public int? ShipVia { get => fields.ShipVia[this]; set => fields.ShipVia[this] = value; }
 
-    [DisplayName("Freight"), Scale(4), DisplayFormat("#,##0.####"), AlignRight]
+    [DisplayText("Freight"), Scale(4), DisplayFormat("#,##0.####"), AlignRight]
     public decimal? Freight { get => fields.Freight[this]; set => fields.Freight[this] = value; }
 
-    [DisplayName("Ship Name"), Size(40)]
+    [DisplayText("Ship Name"), Size(40)]
     public string? ShipName { get => fields.ShipName[this]; set => fields.ShipName[this] = value; }
 
-    [DisplayName("Ship Address"), Size(60)]
+    [DisplayText("Ship Address"), Size(60)]
     public string? ShipAddress { get => fields.ShipAddress[this]; set => fields.ShipAddress[this] = value; }
 
-    [DisplayName("Ship City"), Size(15)]
+    [DisplayText("Ship City"), Size(15)]
     public string? ShipCity { get => fields.ShipCity[this]; set => fields.ShipCity[this] = value; }
 
-    [DisplayName("Ship Region"), Size(15)]
+    [DisplayText("Ship Region"), Size(15)]
     public string? ShipRegion { get => fields.ShipRegion[this]; set => fields.ShipRegion[this] = value; }
 
-    [DisplayName("Ship Postal Code"), Size(10)]
+    [DisplayText("Ship Postal Code"), Size(10)]
     public string? ShipPostalCode { get => fields.ShipPostalCode[this]; set => fields.ShipPostalCode[this] = value; }
 
-    [DisplayName("Ship Country"), Size(15)]
+    [DisplayText("Ship Country"), Size(15)]
     public string? ShipCountry { get => fields.ShipCountry[this]; set => fields.ShipCountry[this] = value; }
 
     [Origin(jCustomer, nameof(CustomerRow.ContactName))]
@@ -89,10 +89,10 @@ public sealed class OrderRow : Row<OrderRow.RowFields>, IIdRow, INameRow
     [Origin(jCustomer, nameof(CustomerRow.Fax))]
     public string? CustomerFax { get => fields.CustomerFax[this]; set => fields.CustomerFax[this] = value; }
 
-    [Origin(jShipVia, nameof(ShipperRow.CompanyName)), DisplayName("Ship Via")]
+    [Origin(jShipVia, nameof(ShipperRow.CompanyName)), DisplayText("Ship Via")]
     public string? ShipViaCompanyName { get => fields.ShipViaCompanyName[this]; set => fields.ShipViaCompanyName[this] = value; }
 
-    [DisplayName("Details"), MasterDetailRelation(foreignKey: nameof(OrderDetailRow.OrderID)), NotMapped]
+    [DisplayText("Details"), MasterDetailRelation(foreignKey: nameof(OrderDetailRow.OrderID)), NotMapped]
     [MinSelectLevel(SelectLevel.Explicit)] // set SelectLevel to explict to use connected mode for details while editing an order
     public List<OrderDetailRow>? DetailList { get => fields.DetailList[this]; set => fields.DetailList[this] = value; }
 

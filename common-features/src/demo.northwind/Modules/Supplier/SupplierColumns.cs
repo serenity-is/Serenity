@@ -4,7 +4,7 @@ namespace Serenity.Demo.Northwind.Forms;
 [BasedOnRow(typeof(SupplierRow), CheckNames = true)]
 public class SupplierColumns
 {
-    [EditLink, DisplayName("Db.Shared.RecordId"), AlignRight]
+    [EditLink, DisplayText(TextKey = "Db.Shared.RecordId"), AlignRight]
     public int SupplierID { get; set; }
     [EditLink, Width(250)]
     public string? CompanyName { get; set; }

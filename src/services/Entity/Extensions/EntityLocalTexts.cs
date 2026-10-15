@@ -23,18 +23,20 @@ public static class EntityLocalTexts
 
         ArgumentNullException.ThrowIfNull(rowInstances);
 
-        void addText(string text, string key)
+        void addAttributeText(Attribute attribute, string? text, string defaultKey)
         {
-            if (string.IsNullOrEmpty(text))
-                return;
-
-            if (PropertyItemsLocalTextRegistration.IsLocalTextKeyCandidate(text))
+            var resolved = LocalText.ResolveFromAttribute(attribute, text, defaultKey);
+            if (resolved.Key is not string key)
             {
-                if (registry.TryGet(languageID, text, false) is null)
-                    registry.Add(languageID, text, null);
+                if (!string.IsNullOrEmpty(resolved.Text))
+                    provider.Add(languageID, defaultKey, resolved.Text);
+                return;
             }
-            else if (key is not null)
-                registry.Add(languageID, key, text);
+
+            if (!string.IsNullOrEmpty(resolved.Text))
+                provider.Add(languageID, key, resolved.Text);
+            else if (resolved.IsKey && provider.TryGet(languageID, key, false) is null)
+                provider.Add(languageID, key, null);
         }
 
         foreach (var row in rowInstances)
@@ -44,17 +46,19 @@ public static class EntityLocalTexts
 
             foreach (var field in fields)
             {
-                if (field.GetAttribute<CategoryAttribute>()?.Category is string category)
-                    addText(category, dbPrefix + "Categories." + category);
+                if (field.GetAttribute<CategoryAttribute>() is CategoryAttribute categoryAttr)
+                    addAttributeText(categoryAttr, categoryAttr.Category,
+                        dbPrefix + "Categories." + categoryAttr.Category);
 
-                if (field.GetAttribute<TabAttribute>()?.Value is string tab)
-                    addText(tab, dbPrefix + "Tabs." + tab);
+                if (field.GetAttribute<TabAttribute>() is TabAttribute tabAttr)
+                    addAttributeText(tabAttr, tabAttr.Value, dbPrefix + "Tabs." + tabAttr.Value);
 
-                if (field.GetAttribute<HintAttribute>()?.Hint is string hint)
-                    addText(hint, field.AutoTextKey + "_Hint");
+                if (field.GetAttribute<HintAttribute>() is HintAttribute hintAttr)
+                    addAttributeText(hintAttr, hintAttr.Hint, field.AutoTextKey + "_Hint");
 
-                if (field.GetAttribute<PlaceholderAttribute>()?.Value is string placeholder)
-                    addText(placeholder, field.AutoTextKey + "_Placeholder");
+                if (field.GetAttribute<PlaceholderAttribute>() is PlaceholderAttribute placeholderAttr)
+                    addAttributeText(placeholderAttr, placeholderAttr.Value,
+                        field.AutoTextKey + "_Placeholder");
 
                 if (field.Caption is not ILocalText lt)
                 {
@@ -69,7 +73,7 @@ public static class EntityLocalTexts
 
                 if (lt.OriginalKey is null)
                 {
-                    if (PropertyItemsLocalTextRegistration.IsLocalTextKeyCandidate(lt.Key))
+                    if (LocalText.IsLocalTextKeyCandidate(lt.Key, uiKeyOnly: true))
                     {
                         if (registry.TryGet(languageID, lt.Key, false) is null)
                             registry.Add(languageID, lt.Key, null);
@@ -85,13 +89,11 @@ public static class EntityLocalTexts
 
             var displayName = row.GetType().GetCustomAttribute<DisplayNameAttribute>();
             if (displayName != null)
-                provider.Add(languageID, dbPrefix + "EntityPlural", 
-                    displayName.DisplayName);
+                addAttributeText(displayName, displayName.DisplayName, dbPrefix + "EntityPlural");
 
             var instanceName = row.GetType().GetCustomAttribute<InstanceNameAttribute>();
             if (instanceName != null)
-                provider.Add(languageID, dbPrefix + "EntitySingular",
-                    instanceName.InstanceName);
+                addAttributeText(instanceName, instanceName.InstanceName, dbPrefix + "EntitySingular");
         }
     }
 }

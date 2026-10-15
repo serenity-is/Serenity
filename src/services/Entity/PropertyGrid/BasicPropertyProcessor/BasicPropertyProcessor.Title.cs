@@ -7,10 +7,10 @@ public partial class BasicPropertyProcessor : PropertyProcessor
     private string? propertyItemsTextPrefix;
 
     private string? GetLocalizableTextValue<TAttribute>(IPropertySource source, string? text,
-        Func<string> getSuffix, bool ignoreField = false)
+        Func<string> getSuffix, bool ignoreField = false, bool inferTextKey = true)
         where TAttribute : Attribute
     {
-        if (PropertyItemsLocalTextRegistration.IsLocalTextKeyCandidate(text))
+        if (inferTextKey && PropertyItemsLocalTextRegistration.IsLocalTextKeyCandidate(text))
             return text;
 
         if (string.IsNullOrEmpty(text))
@@ -47,8 +47,14 @@ public partial class BasicPropertyProcessor : PropertyProcessor
         var attr = source.GetAttribute<DisplayNameAttribute>(AttributeOrigin.ExcludeBasedOnField);
         if (attr != null)
         {
+            if (attr is IHasTextKey hasTextKey && !string.IsNullOrEmpty(hasTextKey.TextKey))
+            {
+                item.Title = hasTextKey.TextKey;
+                return;
+            }
+
             item.Title = GetLocalizableTextValue<DisplayNameAttribute>(source, attr.DisplayName,
-                () => source.Name, ignoreField: true);
+                () => source.Name, ignoreField: true, inferTextKey: attr is not IHasTextKey);
             return;
         }
 

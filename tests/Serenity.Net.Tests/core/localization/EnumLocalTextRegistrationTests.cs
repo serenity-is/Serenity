@@ -17,6 +17,17 @@ public class EnumLocalTextRegistrationTests
         NoDescriptionNoKey,
     }
 
+    [EnumKey("My.TextKeyEnum")]
+    public enum EnumWithTextKeyDescriptions
+    {
+        [DescriptionText("Invariant description", TextKey = "Site.EnumDescription")]
+        ExplicitTextKey,
+        [DescriptionText("Site.LiteralDescription")]
+        KeyShapedLiteral,
+        [Description("Site.LegacyDescription")]
+        LegacyKeyCandidate
+    }
+
     [Fact]
     public void AddEnumTexts_ThrowsArgumentNull_If_Registry_IsNull()
     {
@@ -53,6 +64,21 @@ public class EnumLocalTextRegistrationTests
 
         Assert.Equal((LocalText.InvariantLanguageID, expectedKey, "Description for WithDescriptionKey"),
             Assert.Single(registry.AddedList));
+    }
+
+    [Fact]
+    public void AddEnumTexts_Uses_Explicit_DescriptionText_Key()
+    {
+        var registry = new MockLocalTextRegistry();
+        EnumLocalTextRegistration.AddEnumTexts(registry,
+            new MockTypeSource(typeof(EnumWithTextKeyDescriptions)));
+
+        Assert.Collection(registry.AddedList,
+            item => Assert.Equal((LocalText.InvariantLanguageID, "Site.EnumDescription", "Invariant description"), item),
+            item => Assert.Equal((LocalText.InvariantLanguageID,
+                "Enums.My.TextKeyEnum.KeyShapedLiteral", "Site.LiteralDescription"), item),
+            item => Assert.Equal((LocalText.InvariantLanguageID,
+                "Site.LegacyDescription", null), item));
     }
 
     [Fact]

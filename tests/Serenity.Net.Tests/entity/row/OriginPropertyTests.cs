@@ -214,6 +214,68 @@ public class OriginPropertyTests
         }
     }
 
+    public class OriginTextKeySourceRow : Row<OriginTextKeySourceRow.RowFields>
+    {
+        public class RowFields : RowFieldsBase
+        {
+            public StringField Name;
+            public StringField KeyLikeName;
+
+            public RowFields()
+            {
+                Name = new StringField(this, "Name");
+                KeyLikeName = new StringField(this, "KeyLikeName");
+            }
+        }
+
+        [DisplayText("Origin display", TextKey = "Site.OriginDisplay")]
+        public string Name { get => fields.Name[this]; set => fields.Name[this] = value; }
+
+        [DisplayName("Site.LegacyOriginKey")]
+        public string KeyLikeName { get => fields.KeyLikeName[this]; set => fields.KeyLikeName[this] = value; }
+    }
+
+    public class OriginTextKeyRow : Row<OriginTextKeyRow.RowFields>
+    {
+        public class RowFields : RowFieldsBase
+        {
+            public Int32Field SourceID;
+            public Int32Field PrefixSourceID;
+            public StringField Name;
+            public StringField PrefixedName;
+            public StringField KeyLikeName;
+            public StringField PrefixedKeyLikeName;
+
+            public RowFields()
+            {
+                SourceID = new Int32Field(this, "SourceID");
+                PrefixSourceID = new Int32Field(this, "PrefixSourceID");
+                Name = new StringField(this, "Name");
+                PrefixedName = new StringField(this, "PrefixedName");
+                KeyLikeName = new StringField(this, "KeyLikeName");
+                PrefixedKeyLikeName = new StringField(this, "PrefixedKeyLikeName");
+            }
+        }
+
+        [ForeignKey("SourceTable", "Id"), LeftJoin("src", RowType = typeof(OriginTextKeySourceRow), TitlePrefix = "")]
+        public int? SourceID { get => fields.SourceID[this]; set => fields.SourceID[this] = value; }
+
+        [ForeignKey("SourceTable", "Id"), LeftJoin("pref", RowType = typeof(OriginTextKeySourceRow), TitlePrefix = "Prefix")]
+        public int? PrefixSourceID { get => fields.PrefixSourceID[this]; set => fields.PrefixSourceID[this] = value; }
+
+        [Origin("src", nameof(OriginTextKeySourceRow.Name))]
+        public string Name { get => fields.Name[this]; set => fields.Name[this] = value; }
+
+        [Origin("pref", nameof(OriginTextKeySourceRow.Name))]
+        public string PrefixedName { get => fields.PrefixedName[this]; set => fields.PrefixedName[this] = value; }
+
+        [Origin("src", nameof(OriginTextKeySourceRow.KeyLikeName))]
+        public string KeyLikeName { get => fields.KeyLikeName[this]; set => fields.KeyLikeName[this] = value; }
+
+        [Origin("pref", nameof(OriginTextKeySourceRow.KeyLikeName))]
+        public string PrefixedKeyLikeName { get => fields.PrefixedKeyLikeName[this]; set => fields.PrefixedKeyLikeName[this] = value; }
+    }
+
     public class OriginNestedRow : Row<OriginNestedRow.RowFields>
     {
         [ForeignKey("TheCountryTable", "CountryID"), LeftJoin("j1", RowType = typeof(CountryRow))]
@@ -509,6 +571,18 @@ public class OriginPropertyTests
 
         // TitlePrefix on a row level join declaration
         Assert.Equal("Row Title Country Name", fields.CountryRowTitle.Caption?.Key);
+    }
+
+    [Fact]
+    public void Origin_DisplayText_Preserves_TextKey_Only_Without_Prefix()
+    {
+        var fields = new OriginTextKeyRow.RowFields();
+        fields.Initialize(annotations: null, dialect: SqlServer2012Dialect.Instance, userEntityOptions: null);
+
+        Assert.Equal("Site.OriginDisplay", fields.Name.Caption?.Key);
+        Assert.Equal("Prefix Origin display", fields.PrefixedName.Caption?.Key);
+        Assert.Equal("KeyLikeName", fields.KeyLikeName.Caption?.Key);
+        Assert.Equal("Prefix KeyLikeName", fields.PrefixedKeyLikeName.Caption?.Key);
     }
 
     [Fact]

@@ -4,7 +4,7 @@ namespace Serenity.Demo.Northwind.Forms;
 [BasedOnRow(typeof(TerritoryRow), CheckNames = true)]
 public class TerritoryColumns
 {
-    [EditLink, DisplayName("Db.Shared.RecordId"), Width(100)]
+    [EditLink, DisplayText(TextKey = "Db.Shared.RecordId"), Width(100)]
     public int TerritoryID { get; set; }
     [EditLink, Width(200)]
     public string? TerritoryDescription { get; set; }

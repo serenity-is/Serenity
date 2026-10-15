@@ -1,7 +1,7 @@
 namespace Serenity.Demo.Northwind;
 
 [NorthwindConnection, NorthwindModule, TableName("[OrderDetails]")]
-[DisplayName("Order Details"), InstanceName("Order Detail")]
+[DisplayText("Order Details"), InstanceName("Order Detail")]
 [ReadPermission(PermissionKeys.General)]
 [ModifyPermission(PermissionKeys.General)]
 [DataAuditLog]
@@ -10,26 +10,26 @@ public sealed class OrderDetailRow : Row<OrderDetailRow.RowFields>, IIdRow
     const string jOrder = nameof(jOrder);
     const string jProduct = nameof(jProduct);
 
-    [DisplayName("ID"), Identity, IdProperty]
+    [DisplayText("ID"), Identity, IdProperty]
     public int? DetailID { get => fields.DetailID[this]; set => fields.DetailID[this] = value; }
 
-    [DisplayName("Order Id"), PrimaryKey, ForeignKey(typeof(OrderRow)), LeftJoin(jOrder), Updatable(false)]
+    [DisplayText("Order Id"), PrimaryKey, ForeignKey(typeof(OrderRow)), LeftJoin(jOrder), Updatable(false)]
     public int? OrderID { get => fields.OrderID[this]; set => fields.OrderID[this] = value; }
 
-    [DisplayName("Product"), PrimaryKey, NotNull, ForeignKey(typeof(ProductRow)), LeftJoin(jProduct)]
+    [DisplayText("Product"), PrimaryKey, NotNull, ForeignKey(typeof(ProductRow)), LeftJoin(jProduct)]
     [ServiceLookupEditor(typeof(ProductRow))]
     public int? ProductID { get => fields.ProductID[this]; set => fields.ProductID[this] = value; }
 
-    [DisplayName("Unit Price"), Scale(4), NotNull, AlignRight, DisplayFormat("#,##0.00")]
+    [DisplayText("Unit Price"), Scale(4), NotNull, AlignRight, DisplayFormat("#,##0.00")]
     public decimal? UnitPrice { get => fields.UnitPrice[this]; set => fields.UnitPrice[this] = value; }
 
-    [DisplayName("Quantity"), NotNull, DefaultValue(1), AlignRight]
+    [DisplayText("Quantity"), NotNull, DefaultValue(1), AlignRight]
     public short? Quantity { get => fields.Quantity[this]; set => fields.Quantity[this] = value; }
 
-    [DisplayName("Discount"), NotNull, DefaultValue(0), AlignRight, DisplayFormat("#,##0.00")]
+    [DisplayText("Discount"), NotNull, DefaultValue(0), AlignRight, DisplayFormat("#,##0.00")]
     public float? Discount { get => fields.Discount[this]; set => fields.Discount[this] = value; }
 
-    [DisplayName("Line Total"), Expression("(T0.[UnitPrice] * T0.[Quantity] - T0.[Discount])")]
+    [DisplayText("Line Total"), Expression("(T0.[UnitPrice] * T0.[Quantity] - T0.[Discount])")]
     [Expression("(T0.[UnitPrice]::numeric * T0.[Quantity]::numeric - T0.[Discount]::numeric)", Dialect = nameof(ServerType.Postgres))]
     [AlignRight, DisplayFormat("#,##0.00"), MinSelectLevel(SelectLevel.List)]
     public decimal? LineTotal { get => fields.LineTotal[this]; set => fields.LineTotal[this] = value; }

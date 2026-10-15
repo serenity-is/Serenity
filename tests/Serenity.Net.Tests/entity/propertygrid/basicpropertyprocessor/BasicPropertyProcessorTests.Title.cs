@@ -37,6 +37,35 @@ public partial class BasicPropertyProcessorTests
         Assert.Equal(expectedKey, item.Title);
     }
 
+    private class DisplayWithExplicitTextKey
+    {
+        [DisplayText("Site.LiteralLookingText")]
+        public string Literal { get; set; }
+
+        [DisplayText(TextKey = "Site.ExplicitKey")]
+        public string KeyOnly { get; set; }
+
+        [DisplayText("Regular display text", TextKey = "Site.KeyWithText")]
+        public string KeyAndText { get; set; }
+    }
+
+    [Theory]
+    [InlineData(nameof(DisplayWithExplicitTextKey.Literal), "Site.LiteralLookingText")]
+    [InlineData(nameof(DisplayWithExplicitTextKey.KeyOnly), "Site.ExplicitKey")]
+    [InlineData(nameof(DisplayWithExplicitTextKey.KeyAndText), "Site.KeyWithText")]
+    public void Title_Should_Use_Explicit_DisplayText_Key_Or_Literal(string propertyName,
+        string expected)
+    {
+        var processor = new BasicPropertyProcessor();
+        var item = new PropertyItem();
+        var source = new PropertyInfoSource(typeof(DisplayWithExplicitTextKey)
+            .GetProperty(propertyName), null);
+
+        processor.Process(source, item);
+
+        Assert.Equal(expected, item.Title);
+    }
+
     [ColumnsScript]
     private class DisplayWithNonSupportedKeyLike
     {

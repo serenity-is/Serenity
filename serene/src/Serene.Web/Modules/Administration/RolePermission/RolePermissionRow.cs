@@ -1,21 +1,21 @@
 namespace Serene.Administration;
 
 [DefaultConnection, AdministrationModule, TableName("RolePermissions")]
-[DisplayName("Role Permissions"), InstanceName("Role Permission")]
+[DisplayText("Role Permissions"), InstanceName("Role Permission")]
 [ReadPermission(PermissionKeys.Security)]
 [ModifyPermission(PermissionKeys.Security)]
 public sealed class RolePermissionRow : Row<RolePermissionRow.RowFields>, IIdRow, INameRow, IRolePermissionRow
 {
-    [DisplayName("Role Permission Id"), Identity, IdProperty]
+    [DisplayText("Role Permission Id"), Identity, IdProperty]
     public long? RolePermissionId { get => fields.RolePermissionId[this]; set => fields.RolePermissionId[this] = value; }
 
-    [DisplayName("Role Id"), NotNull, ForeignKey("Roles", "RoleId"), LeftJoin("jRole")]
+    [DisplayText("Role Id"), NotNull, ForeignKey("Roles", "RoleId"), LeftJoin("jRole")]
     public int? RoleId { get => fields.RoleId[this]; set => fields.RoleId[this] = value; }
 
-    [DisplayName("Permission Key"), Size(100), NotNull, QuickSearch, NameProperty]
+    [DisplayText("Permission Key"), Size(100), NotNull, QuickSearch, NameProperty]
     public string? PermissionKey { get => fields.PermissionKey[this]; set => fields.PermissionKey[this] = value; }
 
-    [DisplayName("Role Role Name"), Expression("jRole.[RoleName]")]
+    [DisplayText("Role Role Name"), Expression("jRole.[RoleName]")]
     public string? RoleName { get => fields.RoleName[this]; set => fields.RoleName[this] = value; }
 
     public StringField RoleKeyOrNameField => fields.RoleName;

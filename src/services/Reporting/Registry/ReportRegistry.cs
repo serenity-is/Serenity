@@ -33,13 +33,27 @@ public class ReportRegistry(ITypeSource typeSource, IPermissionService permissio
         return attr.ReportKey;
     }
 
-    private static string GetReportCategory(Type type)
+    private static Category GetReportCategory(Type type, ITextLocalizer localizer)
     {
-        var attr = type.GetCustomAttributes(typeof(CategoryAttribute), false);
-        if (attr.Length == 1)
-            return ((CategoryAttribute)attr[0]).Category;
+        var attrs = type.GetCustomAttributes(typeof(CategoryAttribute), false);
+        if (attrs.Length == 1)
+        {
+            var attr = (CategoryAttribute)attrs[0];
+            var key = attr.Category ?? string.Empty;
 
-        return string.Empty;
+            if (attr is IHasTextKey)
+            {
+                var resolved = LocalText.ResolveFromAttribute(attr, attr.Category,
+                    defaultKey: null);
+                var title = resolved.Key is string textKey ?
+                    localizer.TryGet(textKey) ?? resolved.Text ?? textKey : resolved.Text ?? string.Empty;
+                return new Category(key, title);
+            }
+
+            return new Category(key, GetReportCategoryTitle(key, localizer));
+        }
+
+        return new Category(string.Empty, string.Empty);
     }
 
     /// <summary>
@@ -205,10 +219,15 @@ public class ReportRegistry(ITypeSource typeSource, IPermissionService permissio
 
             var attr = type.GetCustomAttributes(typeof(DisplayNameAttribute), false);
             if (attr.Length == 1)
-                Title = ((DisplayNameAttribute)attr[0]).DisplayName;
+            {
+                var displayName = (DisplayNameAttribute)attr[0];
+                var resolved = LocalText.ResolveFromAttribute(displayName,
+                    displayName.DisplayName, defaultKey: null);
+                Title = resolved.Key is string key ?
+                    localizer.TryGet(key) ?? resolved.Text ?? key : resolved.Text;
+            }
 
-            var category = GetReportCategory(type);
-            Category = new Category(category, GetReportCategoryTitle(category, localizer));
+            Category = GetReportCategory(type, localizer);
 
             attr = type.GetCustomAttributes(typeof(RequiredPermissionAttribute), false);
             if (attr.Length > 0)

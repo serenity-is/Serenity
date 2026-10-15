@@ -1,9 +1,17 @@
 using Serenity.Localization;
 
+using Serenity.ComponentModel;
+using System.Reflection;
+
 namespace Serenity;
 
 public class LocalTextTests
 {
+    [DisplayText("Literal display", TextKey = "")]
+    private class AttributeWithEmptyTextKey
+    {
+    }
+
     [Fact]
     public void InvariantLanguageID_IsEmptyString()
     {
@@ -29,6 +37,42 @@ public class LocalTextTests
     {
         _ = new LocalText(null);
         _ = new LocalText(string.Empty);
+    }
+
+    [Fact]
+    public void ResolveFromAttribute_Treats_EmptyTextKey_As_Unspecified()
+    {
+        var attribute = typeof(AttributeWithEmptyTextKey).GetCustomAttribute<DisplayTextAttribute>();
+
+        var result = LocalText.ResolveFromAttribute(attribute!, "Literal display", "Forms.Test.Field");
+
+        Assert.Equal("Forms.Test.Field", result.Key);
+        Assert.Equal("Literal display", result.Text);
+        Assert.False(result.IsKey);
+    }
+
+    [Fact]
+    public void ResolveFromAttribute_ReturnsNoKey_When_DefaultKey_IsEmpty()
+    {
+        var attribute = new DisplayTextAttribute("Literal display");
+
+        var result = LocalText.ResolveFromAttribute(attribute, "Literal display", "");
+
+        Assert.Null(result.Key);
+        Assert.Equal("Literal display", result.Text);
+        Assert.False(result.IsKey);
+    }
+
+    [Fact]
+    public void ResolveFromAttribute_ReturnsNoKey_When_DefaultKey_IsNull()
+    {
+        var attribute = new DisplayTextAttribute("Literal display");
+
+        var result = LocalText.ResolveFromAttribute(attribute, "Literal display", null);
+
+        Assert.Null(result.Key);
+        Assert.Equal("Literal display", result.Text);
+        Assert.False(result.IsKey);
     }
 
     [Fact]

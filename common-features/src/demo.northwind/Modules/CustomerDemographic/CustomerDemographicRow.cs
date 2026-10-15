@@ -1,18 +1,18 @@
 ﻿namespace Serenity.Demo.Northwind;
 
 [NorthwindConnection, NorthwindModule, TableName("CustomerDemographics")]
-[DisplayName("CustomerDemographics"), InstanceName("CustomerDemographics")]
+[DisplayText("CustomerDemographics"), InstanceName("CustomerDemographics")]
 [ReadPermission(PermissionKeys.General)]
 [ModifyPermission(PermissionKeys.General)]
 public sealed class CustomerDemographicRow : Row<CustomerDemographicRow.RowFields>, IIdRow, INameRow
 {
-    [DisplayName("Id"), Identity, IdProperty]
+    [DisplayText("Id"), Identity, IdProperty]
     public int? ID { get => fields.ID[this]; set => fields.ID[this] = value; }
 
-    [DisplayName("Customer Type Id"), Size(10), PrimaryKey, QuickSearch, NameProperty]
+    [DisplayText("Customer Type Id"), Size(10), PrimaryKey, QuickSearch, NameProperty]
     public string? CustomerTypeID { get => fields.CustomerTypeID[this]; set => fields.CustomerTypeID[this] = value; }
 
-    [DisplayName("Customer Desc")]
+    [DisplayText("Customer Desc")]
     public string? CustomerDesc { get => fields.CustomerDesc[this]; set => fields.CustomerDesc[this] = value; }
 
     public class RowFields : RowFieldsBase

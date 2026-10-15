@@ -20,10 +20,10 @@ public class FilteredLookupInDetailForm
     /// and as we didn't have such a field in OrderRow,
     /// it would raise an error on deserialization.
     /// </summary>
-    [DisplayName("Category"), LookupEditor(typeof(CategoryRow)), SkipOnSave, SkipNameCheck]
+    [DisplayText("Category"), LookupEditor(typeof(CategoryRow)), SkipOnSave, SkipNameCheck]
     public int? CategoryID { get; set; }
 
-    [Category("Order Details")]
+    [CategoryName("Order Details")]
     [FilteredLookupDetailEditor]
     public List<OrderDetailRow>? DetailList { get; set; }
 }

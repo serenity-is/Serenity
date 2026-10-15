@@ -9,10 +9,10 @@ namespace Serenity.Demo.BasicSamples.Forms;
 [BasedOnRow(typeof(OrderRow), CheckNames = true)]
 public class PopulateLinkedDataForm
 {
-    [Category("Order")]
+    [CategoryName("Order")]
     public string? CustomerID { get; set; }
 
-    [Category("Customer Details")]
+    [CategoryName("Customer Details")]
     [ReadOnly(true)]
     public string? CustomerContactName { get; set; }
     [ReadOnly(true)]
@@ -28,7 +28,7 @@ public class PopulateLinkedDataForm
     [ReadOnly(true)]
     public string? CustomerFax { get; set; }
 
-    [Category("Order Details")]
+    [CategoryName("Order Details")]
     [DefaultValue("now")]
     public DateTime OrderDate { get; set; }
     public DateTime RequiredDate { get; set; }

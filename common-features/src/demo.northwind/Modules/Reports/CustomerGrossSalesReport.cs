@@ -3,13 +3,13 @@ using Serenity.Reporting;
 namespace Serenity.Demo.Northwind;
 
 [Report, RequiredPermission(PermissionKeys.General)]
-[Category("Northwind/Orders"), DisplayName("Customer Gross Sales")]
+[CategoryName("Northwind/Orders"), DisplayText("Customer Gross Sales")]
 public class CustomerGrossSalesReport(ISqlConnections sqlConnections, ITextLocalizer localizer, IServiceProvider serviceProvider) : IReport, IDataOnlyReport
 {
-    [DisplayName("Start Date")]
+    [DisplayText("Start Date")]
     public DateTime? StartDate { get; set; }
 
-    [DisplayName("End Date")]
+    [DisplayText("End Date")]
     public DateTime? EndDate { get; set; }
 
     protected ISqlConnections SqlConnections { get; } = sqlConnections ?? throw new ArgumentNullException(nameof(sqlConnections));

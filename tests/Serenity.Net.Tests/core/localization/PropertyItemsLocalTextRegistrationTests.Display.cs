@@ -5,19 +5,19 @@ public partial class PropertyItemsLocalTextRegistrationTests
     [FormScript]
     private class DisplayWithTextKeys
     {
-        [DisplayName("Db.SomeEntity.SomeField")]
+        [DisplayText(TextKey = "Db.SomeEntity.SomeField")]
         public string Db { get; set; }
 
-        [DisplayName("Columns.SomeColumns.SomeField")]
+        [DisplayText(TextKey = "Columns.SomeColumns.SomeField")]
         public string Cols { get; set; }
 
-        [DisplayName("Forms.SomeForm.SomeKey")]
+        [DisplayText(TextKey = "Forms.SomeForm.SomeKey")]
         public string Forms { get; set; }
 
-        [DisplayName("Site.AKey")]
+        [DisplayText(TextKey = "Site.AKey")]
         public string Site { get; set; }
 
-        [DisplayName("Site.ExistingKey")]
+        [DisplayText(TextKey = "Site.ExistingKey")]
         public string Existing { get; set; }
     }
 

@@ -39,7 +39,13 @@ public static class EnumLocalTextRegistration
 
                     var descAttr = member[0].GetCustomAttribute<DescriptionAttribute>();
                     if (descAttr != null)
-                        registry.Add(languageID, "Enums." + enumKey + "." + name, descAttr.Description);
+                    {
+                        var defaultKey = "Enums." + enumKey + "." + name;
+                        var resolved = LocalText.ResolveFromAttribute(descAttr,
+                            descAttr.Description, defaultKey);
+                        if (resolved.Key is string key)
+                            registry.Add(languageID, key, resolved.Text);
+                    }
                 }
             }
         }

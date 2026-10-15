@@ -24,6 +24,45 @@ public class ReportRegistryTests
     }
 
     [Report("Report.Four")]
+    [Category("Cat2")]
+    [DisplayText("Report title fallback", TextKey = "Site.ReportTitle")]
+    private class ReportWithTextKey
+    {
+    }
+
+    [Report("Report.Five")]
+    [Category("Cat2")]
+    [DisplayText("Site.LiteralReportTitle")]
+    private class ReportWithKeyLikeLiteralTitle
+    {
+    }
+
+    [Report("Report.Six")]
+    [Category("Cat2")]
+    [DisplayName("Site.LegacyReportTitle")]
+    private class ReportWithLegacyKeyLikeTitle
+    {
+    }
+
+    [Report("Report.Eight")]
+    [CategoryName("Invariant category", TextKey = "Site.ReportCategory")]
+    private class ReportWithCategoryTextKey
+    {
+    }
+
+    [Report("Report.Nine")]
+    [CategoryName("Site.LiteralReportCategory")]
+    private class ReportWithKeyLikeLiteralCategory
+    {
+    }
+
+    [Report("Report.Ten")]
+    [Category("Site.LegacyReportCategory")]
+    private class ReportWithLegacyKeyLikeCategory
+    {
+    }
+
+    [Report("Report.Seven")]
     private class NoCategoryReport
     {
     }
@@ -111,6 +150,35 @@ public class ReportRegistryTests
     }
 
     [Fact]
+    public void Report_Title_Uses_DisplayText_Key_And_Falls_Back_To_Invariant_Text()
+    {
+        var report = new ReportRegistry.Report(typeof(ReportWithTextKey),
+            new MockTextLocalizer(key => key == "Site.ReportTitle" ? "Localized report title" : null));
+        var fallbackReport = GetReportMeta<ReportWithTextKey>();
+
+        Assert.Equal("Localized report title", report.Title);
+        Assert.Equal("Report title fallback", fallbackReport.Title);
+    }
+
+    [Fact]
+    public void Report_Title_Does_Not_Infer_DisplayText_Key_Looking_Value()
+    {
+        var report = GetReportMeta<ReportWithKeyLikeLiteralTitle>();
+
+        Assert.Equal("Site.LiteralReportTitle", report.Title);
+    }
+
+    [Fact]
+    public void Report_Title_Localizes_Key_Looking_DisplayName()
+    {
+        var report = new ReportRegistry.Report(typeof(ReportWithLegacyKeyLikeTitle),
+            new MockTextLocalizer(key => key == "Site.LegacyReportTitle" ?
+                "Localized legacy report title" : null));
+
+        Assert.Equal("Localized legacy report title", report.Title);
+    }
+
+    [Fact]
     public void Report_Without_DisplayName_Or_Permission_Has_Nulls()
     {
         var report = GetReportMeta<ReportThree>();
@@ -126,6 +194,37 @@ public class ReportRegistryTests
         var report = GetReportMeta<NoCategoryReport>();
         Assert.Equal(string.Empty, report.Category.Key);
         Assert.Equal(string.Empty, report.Category.Title);
+    }
+
+    [Fact]
+    public void Report_Category_Uses_Explicit_TextKey()
+    {
+        var report = new ReportRegistry.Report(typeof(ReportWithCategoryTextKey),
+            new MockTextLocalizer(key => key == "Site.ReportCategory" ? "Localized category" : null));
+
+        Assert.Equal("Invariant category", report.Category.Key);
+        Assert.Equal("Localized category", report.Category.Title);
+    }
+
+    [Fact]
+    public void Report_Category_Does_Not_Infer_Key_Looking_CategoryName_Value()
+    {
+        var report = new ReportRegistry.Report(typeof(ReportWithKeyLikeLiteralCategory),
+            new MockTextLocalizer(key => key == "Site.LiteralReportCategory" ? "Should not localize" : null));
+
+        Assert.Equal("Site.LiteralReportCategory", report.Category.Key);
+        Assert.Equal("Site.LiteralReportCategory", report.Category.Title);
+    }
+
+    [Fact]
+    public void Report_Category_Continues_To_Infer_Legacy_Category_Key()
+    {
+        var report = new ReportRegistry.Report(typeof(ReportWithLegacyKeyLikeCategory),
+            new MockTextLocalizer(key => key == "Report.Category.Site.LegacyReportCategory" ?
+                "Localized legacy category" : null));
+
+        Assert.Equal("Site.LegacyReportCategory", report.Category.Key);
+        Assert.Equal("Localized legacy category", report.Category.Title);
     }
 
     [Fact]

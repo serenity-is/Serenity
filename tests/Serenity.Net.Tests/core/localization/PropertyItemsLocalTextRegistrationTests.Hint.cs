@@ -5,24 +5,63 @@ public partial class PropertyItemsLocalTextRegistrationTests
     [FormScript]
     private class HintWithTextKeys
     {
-        [Hint("Db.SomeEntity.SomeField")]
+        [Hint(TextKey = "Db.SomeEntity.SomeField")]
         public string Db { get; set; }
 
-        [Hint("Columns.SomeColumns.SomeField")]
+        [Hint(TextKey = "Columns.SomeColumns.SomeField")]
         public string Cols { get; set; }
 
-        [Hint("Forms.SomeForm.SomeKey")]
+        [Hint(TextKey = "Forms.SomeForm.SomeKey")]
         public string Forms { get; set; }
 
-        [Hint("Site.AKey")]
+        [Hint(TextKey = "Site.AKey")]
         public string Site { get; set; }
 
-        [Hint("Site.ExistingKey")]
+        [Hint(TextKey = "Site.ExistingKey")]
         public string Existing { get; set; }
     }
 
+    [FormScript]
+    private class HintWithExplicitTextKey
+    {
+        [Hint("Regular hint", TextKey = "Site.ExplicitHint")]
+        public string Name { get; set; }
+    }
+
     [Fact]
-    public void Hint_With_Regular_Keys_Are_Registered_As_Null()
+    public void Hint_With_Explicit_TextKey_Uses_Explicit_Key()
+    {
+        var registry = new LocalTextRegistry();
+        PropertyItemsLocalTextRegistration.AddPropertyItemsTexts(registry,
+            new MockTypeSource(typeof(HintWithExplicitTextKey)));
+
+        Assert.Contains(registry.GetAllTexts(false),
+            x => x.Key.Key == "Site.ExplicitHint" && x.Value == "Regular hint");
+    }
+
+    [FormScript("HintKeyLikeLiteral")]
+    private class HintWithKeyLikeLiteral
+    {
+        [Hint("Site.LegacyHintKey")]
+        public string Name { get; set; }
+    }
+
+    [Fact]
+    public void Hint_With_KeyLike_Literal_Uses_Generated_Key()
+    {
+        var registry = new LocalTextRegistry();
+        PropertyItemsLocalTextRegistration.AddPropertyItemsTexts(registry,
+            new MockTypeSource(typeof(HintWithKeyLikeLiteral)));
+
+        Assert.Contains(registry.GetAllTexts(false),
+            x => x.Key.Key == "Forms.HintKeyLikeLiteral.Name_Hint" &&
+                x.Value == "Site.LegacyHintKey");
+        Assert.DoesNotContain(registry.GetAllTexts(false),
+            x => x.Key.Key == "Site.LegacyHintKey");
+    }
+
+    [Fact]
+    public void Hint_With_Explicit_Keys_Are_Registered_As_Null()
     {
         var registry = new LocalTextRegistry();
         registry.Add(LocalText.InvariantLanguageID, "Site.ExistingKey", "ExistingValue");

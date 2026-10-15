@@ -3,7 +3,7 @@ namespace Serenity.Demo.BasicSamples.Forms;
 [FormScript("BasicSamples.HarcodedValues")]
 public class HardcodedValuesForm
 {
-    [DisplayName("Some Value")]
+    [DisplayText("Some Value")]
     [HardcodedValuesEditor]
     public string? SomeValue { get; set; }
 }

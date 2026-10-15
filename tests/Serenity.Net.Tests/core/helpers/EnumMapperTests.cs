@@ -11,6 +11,17 @@ public class EnumMapperTests
         Third = 3
     }
 
+    [EnumKey("TextKeyEnum")]
+    private enum TextKeyEnum
+    {
+        [DescriptionText("Invariant description", TextKey = "Site.EnumDescription")]
+        ExplicitTextKey,
+        [DescriptionText("Site.LiteralDescription")]
+        KeyShapedLiteral,
+        [Description("Site.LegacyDescription")]
+        LegacyKeyCandidate
+    }
+
     [Fact]
     public void TryParse_ReturnsTrue_ForValidName()
     {
@@ -120,6 +131,36 @@ public class EnumMapperTests
     {
         var text = NullTextLocalizer.Instance.FormatEnum(typeof(TestEnum), TestEnum.Second);
         Assert.Equal("Second", text);
+    }
+
+    [Fact]
+    public void FormatEnum_Uses_DescriptionText_TextKey()
+    {
+        var localizer = new MockTextLocalizer(key =>
+            key == "Site.EnumDescription" ? "Localized description" : null);
+
+        Assert.Equal("Localized description", localizer.FormatEnum(typeof(TextKeyEnum),
+            TextKeyEnum.ExplicitTextKey));
+    }
+
+    [Fact]
+    public void FormatEnum_Does_Not_Infer_Key_Shaped_DescriptionText()
+    {
+        var localizer = new MockTextLocalizer(key =>
+            key == "Site.LiteralDescription" ? "Should not localize" : null);
+
+        Assert.Equal("Site.LiteralDescription", localizer.FormatEnum(typeof(TextKeyEnum),
+            TextKeyEnum.KeyShapedLiteral));
+    }
+
+    [Fact]
+    public void FormatEnum_Continues_To_Infer_Legacy_Description_Key()
+    {
+        var localizer = new MockTextLocalizer(key =>
+            key == "Site.LegacyDescription" ? "Localized legacy description" : null);
+
+        Assert.Equal("Localized legacy description", localizer.FormatEnum(typeof(TextKeyEnum),
+            TextKeyEnum.LegacyKeyCandidate));
     }
 
     [Fact]

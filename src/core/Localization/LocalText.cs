@@ -78,6 +78,57 @@ public class LocalText(string? key) : ILocalText
         originalKey = Key;
         Key = newKey;
     }
+
+    private static readonly Regex LocalTextKeyLike = new(@"^([A-Z][A-za-z0-9_]*\.)+[A-Z][A-za-z0-9_]*$", RegexOptions.Compiled);
+
+    private static readonly Regex UIKeyCandidates = new(@"^(Columns|Controls|Db|Dialogs|Enums|Forms|Permission|Site|Validation)\.", RegexOptions.Compiled);
+
+
+    /// <summary>
+    /// Determines whether the specified text is a candidate for a local text key, optionally restricting to UI key prefixes.
+    /// </summary>
+    /// <param name="text">The text to evaluate as a potential local text key.</param>
+    /// <param name="uiKeyOnly">If set to <c>true</c>, only considers keys with UI-related prefixes.</param>
+    /// <returns><c>true</c> if the text is a candidate for a local text key; otherwise, <c>false</c>.</returns>
+    public static bool IsLocalTextKeyCandidate(string? text, bool uiKeyOnly = true)
+    {
+        return !string.IsNullOrEmpty(text) &&
+            LocalTextKeyLike.IsMatch(text) &&
+            (!uiKeyOnly || UIKeyCandidates.IsMatch(text));
+    }
+
+    /// <summary>
+    /// Resolves the local text key and invariant text for an attribute value.
+    /// </summary>
+    /// <param name="attribute">The attribute that defines the text.</param>
+    /// <param name="text">The attribute's invariant text.</param>
+    /// <param name="defaultKey">The fallback key, or <c>null</c> or empty when no fallback key is available.</param>
+    /// <returns>The resolved local text key, invariant text, and fallback behavior.</returns>
+    public static ResolveLocalTextResult ResolveFromAttribute(
+        Attribute attribute, string? text, string? defaultKey)
+    {
+        if (attribute == null)
+            throw new ArgumentNullException(nameof(attribute));
+
+        if (string.IsNullOrEmpty(defaultKey))
+            defaultKey = null;
+
+        if (attribute is IHasTextKey hasTextKey)
+        {
+            var textKey = hasTextKey.TextKey;
+            if (!string.IsNullOrEmpty(textKey))
+                return new(textKey, text, true);
+
+            return new(defaultKey, text, false);
+        }
+
+        // Older attributes without explicit key support may use a key-looking string as the key.
+        if (IsLocalTextKeyCandidate(text, uiKeyOnly: true))
+            return new(text!, null, true);
+
+        return new(defaultKey, text, false);
+    }
+
 }
 
     

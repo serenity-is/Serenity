@@ -9,8 +9,15 @@
 /// Initializes a new instance of the <see cref="PlaceholderAttribute"/> class.
 /// </remarks>
 /// <param name="value">The value.</param>
-public class PlaceholderAttribute(string? value) : Attribute
+public class PlaceholderAttribute(string? value) : Attribute, IHasTextKey
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PlaceholderAttribute"/> class with no placeholder text.
+    /// Maybe used to specify a TextKey instead.
+    /// </summary>
+    public PlaceholderAttribute() : this(null)
+    {
+    }
 
     /// <summary>
     /// Gets the value.
@@ -19,4 +26,9 @@ public class PlaceholderAttribute(string? value) : Attribute
     /// The value.
     /// </value>
     public string? Value { get; private set; } = value;
+
+    /// <summary>
+    /// Gets or sets the local text key for the placeholder text.
+    /// </summary>
+    public string? TextKey { get; set => field = value ?? throw new ArgumentNullException(nameof(value)); }    
 }

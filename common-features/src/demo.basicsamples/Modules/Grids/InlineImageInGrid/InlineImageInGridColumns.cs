@@ -4,7 +4,7 @@ namespace Serenity.Demo.BasicSamples.Columns;
 [BasedOnRow(typeof(Northwind.ProductRow), CheckNames = true)]
 public class InlineImageInGridColumns
 {
-    [EditLink, DisplayName("Db.Shared.RecordId"), AlignRight]
+    [EditLink, DisplayText(TextKey = "Db.Shared.RecordId"), AlignRight]
     public string? ProductID { get; set; }
     [EditLink, Width(250)]
     public string? ProductName { get; set; }

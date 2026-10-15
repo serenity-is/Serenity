@@ -112,12 +112,23 @@ public partial class TranslationRepository(IRequestContext context, IWebHostEnvi
 
         foreach (var type in TypeSource.GetTypesWithAttribute(typeof(FormScriptAttribute)))
         {
-            var attr = type.GetCustomAttribute<FormScriptAttribute>(inherit: false);
+            var textPrefix = PropertyItemsLocalTextRegistration.GetPropertyItemsTextPrefix(type);
+            if (textPrefix is null)
+                continue;
+
             foreach (var member in type.GetMembers(BindingFlags.Instance | BindingFlags.Public))
             {
-                var category = member.GetCustomAttribute<CategoryAttribute>();
-                if (category != null && !category.Category.IsEmptyOrNull())
-                    result.Add("Forms." + attr!.Key + ".Categories." + category.Category);
+                if (member.GetCustomAttribute<CategoryAttribute>() is not CategoryAttribute category)
+                    continue;
+
+                if (category.Category.IsEmptyOrNull() &&
+                    category is not IHasTextKey { TextKey: not null })
+                    continue;
+
+                var defaultKey = textPrefix + "Categories." + category.Category;
+                var resolved = LocalText.ResolveFromAttribute(category, category.Category, defaultKey);
+                if (resolved.Key is string key)
+                    result.Add(key);
             }
         }
 

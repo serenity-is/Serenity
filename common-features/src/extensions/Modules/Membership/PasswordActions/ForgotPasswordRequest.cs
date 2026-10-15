@@ -9,6 +9,6 @@ public class ForgotPasswordRequest : ServiceRequest
     /// <summary>
     /// The email address of the account to reset the password for.
     /// </summary>
-    [Required(true), EmailAddressEditor, DisplayName("Email Address"), Placeholder("email")]
+    [Required(true), EmailAddressEditor, DisplayText("Email Address"), Placeholder("email")]
     public string? Email { get; set; }
 }

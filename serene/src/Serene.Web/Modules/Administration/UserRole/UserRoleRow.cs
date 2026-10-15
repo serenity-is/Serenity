@@ -1,7 +1,7 @@
 namespace Serene.Administration;
 
 [DefaultConnection, AdministrationModule, TableName("UserRoles")]
-[DisplayName("UserRoles"), InstanceName("UserRoles")]
+[DisplayText("UserRoles"), InstanceName("UserRoles")]
 [ReadPermission(PermissionKeys.Security)]
 [ModifyPermission(PermissionKeys.Security)]
 [TwoLevelCached(typeof(UserPermissionRow))]
@@ -10,22 +10,22 @@ public sealed class UserRoleRow : Row<UserRoleRow.RowFields>, IIdRow, IUserRoleR
     const string jRole = nameof(jRole);
     const string jUser = nameof(jUser);
 
-    [DisplayName("User Role Id"), Identity, IdProperty]
+    [DisplayText("User Role Id"), Identity, IdProperty]
     public long? UserRoleId { get => fields.UserRoleId[this]; set => fields.UserRoleId[this] = value; }
 
-    [DisplayName("User Id"), NotNull, ForeignKey(typeof(UserRow)), LeftJoin(jUser)]
+    [DisplayText("User Id"), NotNull, ForeignKey(typeof(UserRow)), LeftJoin(jUser)]
     public int? UserId { get => fields.UserId[this]; set => fields.UserId[this] = value; }
 
-    [DisplayName("Role Id"), NotNull, ForeignKey(typeof(RoleRow)), LeftJoin(jRole)]
+    [DisplayText("Role Id"), NotNull, ForeignKey(typeof(RoleRow)), LeftJoin(jRole)]
     public int? RoleId { get => fields.RoleId[this]; set => fields.RoleId[this] = value; }
 
-    [DisplayName("Username"), Expression($"{jUser}.[Username]")]
+    [DisplayText("Username"), Expression($"{jUser}.[Username]")]
     public string? Username { get => fields.Username[this]; set => fields.Username[this] = value; }
 
-    [DisplayName("User Display Name"), Expression($"{jUser}.[DisplayName]")]
+    [DisplayText("User Display Name"), Expression($"{jUser}.[DisplayName]")]
     public string? User { get => fields.User[this]; set => fields.User[this] = value; }
 
-    [DisplayName("Role"), Expression($"{jRole}.[RoleName]")]
+    [DisplayText("Role"), Expression($"{jRole}.[RoleName]")]
     public string? RoleName { get => fields.RoleName[this]; set => fields.RoleName[this] = value; }
 
     public Field UserIdField => fields.UserId;

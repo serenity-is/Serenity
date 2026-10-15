@@ -1,16 +1,16 @@
 namespace Serene.Administration;
 
 [DefaultConnection, AdministrationModule, TableName("Languages")]
-[DisplayName("Languages"), InstanceName("Language")]
+[DisplayText("Languages"), InstanceName("Language")]
 [ReadPermission(PermissionKeys.Translation)]
 [ModifyPermission(PermissionKeys.Translation)]
 [LookupScript(Permission = SpecialPermissionKeys.Public)]
 public sealed class LanguageRow : Row<LanguageRow.RowFields>, IIdRow, INameRow
 {
-    [DisplayName("Language Code"), Size(10), NotNull, IdProperty, Unique]
+    [DisplayText("Language Code"), Size(10), NotNull, IdProperty, Unique]
     public string? LanguageId { get => fields.LanguageId[this]; set => fields.LanguageId[this] = value; }
 
-    [DisplayName("Language Name"), Size(50), NotNull, QuickSearch, NameProperty]
+    [DisplayText("Language Name"), Size(50), NotNull, QuickSearch, NameProperty]
     public string? LanguageName { get => fields.LanguageName[this]; set => fields.LanguageName[this] = value; }
 
     public class RowFields : RowFieldsBase

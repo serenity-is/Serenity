@@ -28,6 +28,38 @@ public class DefaultPropertyItemProviderTests
         public string Name { get; set; }
     }
 
+    [FormScript("CategoryKeyForm")]
+    private class CategoryKeyDecorated
+    {
+        [CategoryName("Invariant category", TextKey = "Site.CategoryKey")]
+        public string ExplicitKey { get; set; }
+
+        [CategoryName("Site.LiteralCategory")]
+        public string KeyShapedLiteral { get; set; }
+    }
+
+    [FormScript("TabKeyForm")]
+    private class TabKeyDecorated
+    {
+        [Tab("Invariant tab", TextKey = "Site.TabKey")]
+        public string ExplicitKey { get; set; }
+
+        [Tab("Site.LiteralTab")]
+        public string KeyShapedLiteral { get; set; }
+    }
+
+    [FormScript("HintPlaceholderKeyForm")]
+    private class HintPlaceholderKeyDecorated
+    {
+        [Hint("Invariant hint", TextKey = "Site.HintKey")]
+        [Placeholder("Invariant placeholder", TextKey = "Site.PlaceholderKey")]
+        public string ExplicitKey { get; set; }
+
+        [Hint("Site.LiteralHint")]
+        [Placeholder("Site.LiteralPlaceholder")]
+        public string KeyShapedLiteral { get; set; }
+    }
+
     [TableName("PGRows")]
     private class PGRow : Row<PGRow.RowFields>, IIdRow
     {
@@ -120,6 +152,45 @@ public class DefaultPropertyItemProviderTests
         Assert.Equal("P", item.Placeholder);
         Assert.Equal("C", item.Category);
         Assert.Equal("T", item.Tab);
+    }
+
+    [Fact]
+    public void Processes_CategoryName_TextKey_And_Does_Not_Infer_Key_Shaped_Text()
+    {
+        using var provider = CreateProvider(typeof(BasicPropertyProcessor));
+        var items = provider.GetPropertyItemsFor(typeof(CategoryKeyDecorated), null)
+            .ToDictionary(x => x.Name);
+
+        Assert.Equal("Site.CategoryKey", items[nameof(CategoryKeyDecorated.ExplicitKey)].Category);
+        Assert.Equal("Forms.CategoryKeyForm.Categories.Site.LiteralCategory",
+            items[nameof(CategoryKeyDecorated.KeyShapedLiteral)].Category);
+    }
+
+    [Fact]
+    public void Processes_Tab_TextKey_And_Does_Not_Infer_Key_Shaped_Text()
+    {
+        using var provider = CreateProvider(typeof(BasicPropertyProcessor));
+        var items = provider.GetPropertyItemsFor(typeof(TabKeyDecorated), null)
+            .ToDictionary(x => x.Name);
+
+        Assert.Equal("Site.TabKey", items[nameof(TabKeyDecorated.ExplicitKey)].Tab);
+        Assert.Equal("Forms.TabKeyForm.Tabs.Site.LiteralTab",
+            items[nameof(TabKeyDecorated.KeyShapedLiteral)].Tab);
+    }
+
+    [Fact]
+    public void Processes_Hint_And_Placeholder_TextKeys_Without_Inferring_Key_Shaped_Text()
+    {
+        using var provider = CreateProvider(typeof(BasicPropertyProcessor));
+        var items = provider.GetPropertyItemsFor(typeof(HintPlaceholderKeyDecorated), null)
+            .ToDictionary(x => x.Name);
+
+        Assert.Equal("Site.HintKey", items[nameof(HintPlaceholderKeyDecorated.ExplicitKey)].Hint);
+        Assert.Equal("Site.PlaceholderKey", items[nameof(HintPlaceholderKeyDecorated.ExplicitKey)].Placeholder);
+        Assert.Equal("Forms.HintPlaceholderKeyForm.KeyShapedLiteral_Hint",
+            items[nameof(HintPlaceholderKeyDecorated.KeyShapedLiteral)].Hint);
+        Assert.Equal("Forms.HintPlaceholderKeyForm.KeyShapedLiteral_Placeholder",
+            items[nameof(HintPlaceholderKeyDecorated.KeyShapedLiteral)].Placeholder);
     }
 
     [Fact]

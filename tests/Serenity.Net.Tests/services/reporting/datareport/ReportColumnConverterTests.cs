@@ -49,6 +49,12 @@ public class ReportColumnConverterTests
         [DisplayName("Display Title")]
         public string? WithDisplay { get; set; }
 
+        [DisplayText("Display fallback", TextKey = "Site.ReportColumnTitle")]
+        public string? WithDisplayTextKey { get; set; }
+
+        [DisplayText("Site.LiteralDisplayText")]
+        public string? WithKeyShapedLiteralDisplayText { get; set; }
+
         public string? ExtraField = null;
     }
 
@@ -192,6 +198,26 @@ public class ReportColumnConverterTests
 
         var withDisplay = columns.Single(c => c.Name == "WithDisplay");
         Assert.Equal("Display Title", withDisplay.Title);
+    }
+
+    [Fact]
+    public void FromPropertyInfo_Uses_Localized_DisplayText_Key_With_Invariant_Fallback()
+    {
+        var property = typeof(TestColumns).GetProperty(nameof(TestColumns.WithDisplayTextKey));
+        var column = ReportColumnConverter.FromPropertyInfo(property,
+            new MockTextLocalizer(key => key == "Site.ReportColumnTitle" ?
+                "Localized report title" : null));
+
+        Assert.Equal("Localized report title", column.Title);
+    }
+
+    [Fact]
+    public void FromPropertyInfo_Uses_DisplayText_Without_Key_Inference()
+    {
+        var property = typeof(TestColumns).GetProperty(nameof(TestColumns.WithKeyShapedLiteralDisplayText));
+        var column = ReportColumnConverter.FromPropertyInfo(property, NullTextLocalizer.Instance);
+
+        Assert.Equal("Site.LiteralDisplayText", column.Title);
     }
 
     [Fact]

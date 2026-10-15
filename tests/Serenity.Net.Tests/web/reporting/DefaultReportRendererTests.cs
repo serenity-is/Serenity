@@ -38,6 +38,27 @@ public class DefaultReportRendererTests
         public string GetFileName() => "custom_file";
     }
 
+    [DisplayText("Report fallback", TextKey = "Site.RendererFileName")]
+    private class LocalizedFileNameReport : IDataOnlyReport
+    {
+        public object GetData() => "d";
+        public List<ReportColumn> GetColumnList() => [];
+    }
+
+    [DisplayText("Site.LiteralRendererFileName")]
+    private class LiteralFileNameReport : IDataOnlyReport
+    {
+        public object GetData() => "d";
+        public List<ReportColumn> GetColumnList() => [];
+    }
+
+    [DisplayName("Site.LegacyRendererFileName")]
+    private class LegacyKeyFileNameReport : IDataOnlyReport
+    {
+        public object GetData() => "d";
+        public List<ReportColumn> GetColumnList() => [];
+    }
+
     private class FakeExcelRenderer : IDataReportExcelRenderer
     {
         public byte[] Render(IDataOnlyReport report) => [1, 2];
@@ -48,10 +69,10 @@ public class DefaultReportRendererTests
         public byte[] Render(IReport report, ReportRenderOptions renderOptions) => [3, 4];
     }
 
-    private static DefaultReportRenderer Create()
+    private static DefaultReportRenderer Create(ITextLocalizer? localizer = null)
     {
         return new DefaultReportRenderer(new FakeExcelRenderer(), new FakePdfRenderer(),
-            new ServiceCollection().BuildServiceProvider());
+            new ServiceCollection().BuildServiceProvider(), localizer: localizer);
     }
 
     [Fact]
@@ -137,5 +158,43 @@ public class DefaultReportRendererTests
         var result = Create().Render(new CustomFileNameReport(), new ReportRenderOptions());
 
         Assert.Equal("custom_file", result.FileName);
+    }
+
+    [Fact]
+    public void Render_Localizes_DisplayText_File_Name_When_Localizer_Is_Available()
+    {
+        var renderer = Create(new MockTextLocalizer(key => key == "Site.RendererFileName" ?
+            "Localized report" : null));
+
+        var result = renderer.Render(new LocalizedFileNameReport(), new ReportRenderOptions());
+
+        Assert.StartsWith("Localized report_", result.FileName);
+    }
+
+    [Fact]
+    public void Render_Uses_DisplayText_Fallback_When_Localizer_Is_Null()
+    {
+        var result = Create().Render(new LocalizedFileNameReport(), new ReportRenderOptions());
+
+        Assert.StartsWith("Report fallback_", result.FileName);
+    }
+
+    [Fact]
+    public void Render_Does_Not_Infer_Key_Looking_DisplayText_File_Name()
+    {
+        var result = Create().Render(new LiteralFileNameReport(), new ReportRenderOptions());
+
+        Assert.StartsWith("Site.LiteralRendererFileName_", result.FileName);
+    }
+
+    [Fact]
+    public void Render_Localizes_Key_Looking_DisplayName_File_Name()
+    {
+        var renderer = Create(new MockTextLocalizer(key => key == "Site.LegacyRendererFileName" ?
+            "Localized legacy report" : null));
+
+        var result = renderer.Render(new LegacyKeyFileNameReport(), new ReportRenderOptions());
+
+        Assert.StartsWith("Localized legacy report_", result.FileName);
     }
 }

@@ -1,30 +1,30 @@
 namespace Serenity.Demo.Northwind;
 
 [NorthwindConnection, NorthwindModule, TableName("Notes")]
-[DisplayName("Notes"), InstanceName("Note")]
+[DisplayText("Notes"), InstanceName("Note")]
 [ReadPermission(PermissionKeys.General)]
 [ModifyPermission(PermissionKeys.General)]
 public sealed class NoteRow : Row<NoteRow.RowFields>, IIdRow, INameRow, IInsertLogRow
 {
-    [DisplayName("Note Id"), Identity, Column("NoteID"), IdProperty]
+    [DisplayText("Note Id"), Identity, Column("NoteID"), IdProperty]
     public long? NoteId { get => fields.NoteId[this]; set => fields.NoteId[this] = value; }
 
-    [DisplayName("Entity Type"), Size(100), NotNull, Updatable(false), NameProperty]
+    [DisplayText("Entity Type"), Size(100), NotNull, Updatable(false), NameProperty]
     public string? EntityType { get => fields.EntityType[this]; set => fields.EntityType[this] = value; }
 
-    [DisplayName("Entity Id"), Column("EntityID"), Size(100), NotNull, Updatable(false)]
+    [DisplayText("Entity Id"), Column("EntityID"), Size(100), NotNull, Updatable(false)]
     public string? EntityId { get => fields.EntityId[this]; set => fields.EntityId[this] = value; }
 
-    [DisplayName("Text"), NotNull, QuickSearch]
+    [DisplayText("Text"), NotNull, QuickSearch]
     public string? Text { get => fields.Text[this]; set => fields.Text[this] = value; }
 
-    [DisplayName("Insert User Id"), UserIdFieldType, NotNull, Insertable(false), Updatable(false)]
+    [DisplayText("Insert User Id"), UserIdFieldType, NotNull, Insertable(false), Updatable(false)]
     public object? InsertUserId { get => fields.InsertUserId.AsObject(this); set => fields.InsertUserId.AsObject(this, value); }
 
-    [DisplayName("Insert User"), NotMapped]
+    [DisplayText("Insert User"), NotMapped]
     public string? InsertUserDisplayName { get => fields.InsertUserDisplayName[this]; set => fields.InsertUserDisplayName[this] = value; }
 
-    [DisplayName("Insert Date"), NotNull, Insertable(false), Updatable(false)]
+    [DisplayText("Insert Date"), NotNull, Insertable(false), Updatable(false)]
     public DateTime? InsertDate { get => fields.InsertDate[this]; set => fields.InsertDate[this] = value; }
 
     Field IInsertUserIdRow.InsertUserIdField => Fields.InsertUserId;

@@ -3,8 +3,8 @@
 [EnumKey("Northwind.OrderShippingState")]
 public enum OrderShippingState
 {
-    [Description("Not Shipped")]
+    [DescriptionText("Not Shipped")]
     NotShipped = 0,
-    [Description("Shipped")]
+    [DescriptionText("Shipped")]
     Shipped = 1
 }

@@ -7,8 +7,14 @@ public partial class BasicPropertyProcessor : PropertyProcessor
         var attr = source.GetAttribute<CategoryAttribute>();
         if (attr != null)
         {
+            if (attr is IHasTextKey hasTextKey && !string.IsNullOrEmpty(hasTextKey.TextKey))
+            {
+                item.Category = hasTextKey.TextKey;
+                return;
+            }
+
             item.Category = GetLocalizableTextValue<CategoryAttribute>(source, attr.Category,
-                () => "Categories." + attr.Category);
+                () => "Categories." + attr.Category, inferTextKey: attr is not IHasTextKey);
         }
         else if (source.GetAttribute<TabAttribute>() is null && Items?.Count > 0)
         {

@@ -14,11 +14,11 @@ public class ResetPasswordRequest : ServiceRequest
     /// <summary>
     /// The new password.
     /// </summary>
-    [PasswordEditor, Required(true), DisplayName("New Password"), Placeholder("password")]
+    [PasswordEditor, Required(true), DisplayText("New Password"), Placeholder("password")]
     public string? NewPassword { get; set; }
     /// <summary>
     /// The confirmation of the new password.
     /// </summary>
-    [PasswordEditor, Required(true), DisplayName("Confirm Password"), Placeholder("confirm password")]
+    [PasswordEditor, Required(true), DisplayText("Confirm Password"), Placeholder("confirm password")]
     public string? ConfirmPassword { get; set; }
 }

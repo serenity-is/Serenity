@@ -4,7 +4,7 @@
 [BasedOnRow(typeof(ShipperRow), CheckNames = true)]
 public class ShipperColumns
 {
-    [EditLink, DisplayName("Db.Shared.RecordId"), AlignRight]
+    [EditLink, DisplayText(TextKey = "Db.Shared.RecordId"), AlignRight]
     public int ShipperID { get; set; }
     [EditLink, Width(300)]
     public string? CompanyName { get; set; }

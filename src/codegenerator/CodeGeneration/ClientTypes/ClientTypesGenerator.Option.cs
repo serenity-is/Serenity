@@ -131,6 +131,7 @@ public partial class ClientTypesGenerator
                 (member.Attributes == null ||
                  !member.Attributes.Any(x =>
                     x.Type == "System.ComponentModel.DisplayNameAttribute" ||
+                    x.Type == "Serenity.ComponentModel.DisplayTextAttribute" ||
                     x.Type == "Serenity.OptionAttribute" ||
                     x.Type == "Serenity.Decorators.option" ||
                     x.Type == "Decorators.option" ||

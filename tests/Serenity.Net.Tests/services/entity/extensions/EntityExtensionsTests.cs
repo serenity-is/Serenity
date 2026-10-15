@@ -50,6 +50,23 @@ public class EntityExtensionsTests
         }
     }
 
+    [LocalTextPrefix("TextKeyLocal")]
+    [DisplayText("Plural text", TextKey = "Site.TextKeyPlural")]
+    [InstanceName("Singular text", TextKey = "Site.TextKeySingular")]
+    private class TextKeyRow : Row<TextKeyRow.RowFields>
+    {
+        [CategoryName("Category text", TextKey = "Site.TextKeyCategory"),
+            Tab("Tab text", TextKey = "Site.TextKeyTab"),
+            Hint("Hint text", TextKey = "Site.TextKeyHint"),
+            Placeholder("Placeholder text", TextKey = "Site.TextKeyPlaceholder")]
+        public string? Name { get => fields.Name[this]; set => fields.Name[this] = value; }
+
+        public class RowFields : RowFieldsBase
+        {
+            public StringField Name = null!;
+        }
+    }
+
     [Fact]
     public void IsTableField_Throws_For_Null()
     {
@@ -191,6 +208,44 @@ public class EntityExtensionsTests
             "Db.ExtLocal.Categories.Cat", false));
         Assert.NotNull(registry.TryGet(LocalText.InvariantLanguageID,
             "Db.ExtLocal.Tabs.Tab1", false));
+    }
+
+    [Fact]
+    public void AddRowTexts_Registers_Explicit_Attribute_Text_Keys()
+    {
+        var registry = new LocalTextRegistry();
+        registry.AddRowTexts([new TextKeyRow()], LocalText.InvariantLanguageID);
+
+        Assert.Equal("Plural text", registry.TryGet(LocalText.InvariantLanguageID, "Site.TextKeyPlural", false));
+        Assert.Equal("Singular text", registry.TryGet(LocalText.InvariantLanguageID, "Site.TextKeySingular", false));
+        Assert.Equal("Category text", registry.TryGet(LocalText.InvariantLanguageID, "Site.TextKeyCategory", false));
+        Assert.Equal("Tab text", registry.TryGet(LocalText.InvariantLanguageID, "Site.TextKeyTab", false));
+        Assert.Equal("Hint text", registry.TryGet(LocalText.InvariantLanguageID, "Site.TextKeyHint", false));
+        Assert.Equal("Placeholder text", registry.TryGet(LocalText.InvariantLanguageID, "Site.TextKeyPlaceholder", false));
+    }
+
+    [TableName("InstanceNameKeyLikeRows")]
+    [LocalTextPrefix("InstanceNameKeyLike")]
+    [InstanceName("Site.LegacyInstanceKey")]
+    private class InstanceNameKeyLikeRow : Row<InstanceNameKeyLikeRow.RowFields>
+    {
+        public string? Name { get => fields.Name[this]; set => fields.Name[this] = value; }
+
+        public class RowFields : RowFieldsBase
+        {
+            public StringField Name = null!;
+        }
+    }
+
+    [Fact]
+    public void AddRowTexts_Registers_KeyLike_InstanceName_As_Literal_Text()
+    {
+        var registry = new LocalTextRegistry();
+        registry.AddRowTexts([new InstanceNameKeyLikeRow()], LocalText.InvariantLanguageID);
+
+        Assert.Equal("Site.LegacyInstanceKey", registry.TryGet(LocalText.InvariantLanguageID,
+            "Db.InstanceNameKeyLike.EntitySingular", false));
+        Assert.Null(registry.TryGet(LocalText.InvariantLanguageID, "Site.LegacyInstanceKey", false));
     }
 
     [Fact]

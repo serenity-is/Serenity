@@ -5,24 +5,24 @@ namespace Serenity.Demo.Northwind.Forms;
 public class OrderForm
 {
     [Tab("General")]
-    [Category("Order")]
+    [CategoryName("Order")]
     public string? CustomerID { get; set; }
     [DefaultValue("now")]
     public DateTime OrderDate { get; set; }
     public DateTime RequiredDate { get; set; }
     public int? EmployeeID { get; set; }
 
-    [Category("Order Details")]
+    [CategoryName("Order Details")]
     [OrderDetailsEditor]
     public List<OrderDetailRow>? DetailList { get; set; }
 
     [Tab("Shipping")]
-    [Category("Info")]
+    [CategoryName("Info")]
     public DateTime ShippedDate { get; set; }
     public int ShipVia { get; set; }
     public decimal Freight { get; set; }
 
-    [Category("Ship To")]
+    [CategoryName("Ship To")]
     public string? ShipName { get; set; }
     public string? ShipAddress { get; set; }
     public string? ShipCity { get; set; }

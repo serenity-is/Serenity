@@ -1,7 +1,7 @@
 namespace Serenity.Demo.Northwind;
 
 [NorthwindConnection, NorthwindModule, TableName("Customers")]
-[DisplayName("Customers"), InstanceName("Customer")]
+[DisplayText("Customers"), InstanceName("Customer")]
 [ReadPermission(PermissionKeys.Customer.View)]
 [ModifyPermission(PermissionKeys.Customer.Modify)]
 [DeletePermission(PermissionKeys.Customer.Delete)]
@@ -10,37 +10,37 @@ namespace Serenity.Demo.Northwind;
 [LookupScript(typeof(Lookups.CustomerLookup))]
 public sealed class CustomerRow : Row<CustomerRow.RowFields>, IIdRow, INameRow
 {
-    [DisplayName("Customer Id"), Size(5), PrimaryKey, IdProperty, NotNull, QuickSearch, Updatable(false), LookupInclude]
+    [DisplayText("Customer Id"), Size(5), PrimaryKey, IdProperty, NotNull, QuickSearch, Updatable(false), LookupInclude]
     public string? CustomerID { get => fields.CustomerID[this]; set => fields.CustomerID[this] = value; }
 
-    [DisplayName("Company Name"), Size(40), NotNull, QuickSearch, LookupInclude, NameProperty]
+    [DisplayText("Company Name"), Size(40), NotNull, QuickSearch, LookupInclude, NameProperty]
     public string? CompanyName { get => fields.CompanyName[this]; set => fields.CompanyName[this] = value; }
 
-    [DisplayName("Contact Name"), Size(30), QuickSearch]
+    [DisplayText("Contact Name"), Size(30), QuickSearch]
     public string? ContactName { get => fields.ContactName[this]; set => fields.ContactName[this] = value; }
 
-    [DisplayName("Contact Title"), Size(30)]
+    [DisplayText("Contact Title"), Size(30)]
     public string? ContactTitle { get => fields.ContactTitle[this]; set => fields.ContactTitle[this] = value; }
 
-    [DisplayName("Address"), Size(60)]
+    [DisplayText("Address"), Size(60)]
     public string? Address { get => fields.Address[this]; set => fields.Address[this] = value; }
 
-    [DisplayName("City"), Size(15), AsyncLookupEditor(typeof(Lookups.CustomerCityLookup), CascadeFrom = "Country", AutoComplete = true)]
+    [DisplayText("City"), Size(15), AsyncLookupEditor(typeof(Lookups.CustomerCityLookup), CascadeFrom = "Country", AutoComplete = true)]
     public string? City { get => fields.City[this]; set => fields.City[this] = value; }
 
-    [DisplayName("Region"), Size(15)]
+    [DisplayText("Region"), Size(15)]
     public string? Region { get => fields.Region[this]; set => fields.Region[this] = value; }
 
-    [DisplayName("Postal Code"), Size(10)]
+    [DisplayText("Postal Code"), Size(10)]
     public string? PostalCode { get => fields.PostalCode[this]; set => fields.PostalCode[this] = value; }
 
-    [DisplayName("Country"), Size(15), AsyncLookupEditor(typeof(Lookups.CustomerCountryLookup), AutoComplete = true)]
+    [DisplayText("Country"), Size(15), AsyncLookupEditor(typeof(Lookups.CustomerCountryLookup), AutoComplete = true)]
     public string? Country { get => fields.Country[this]; set => fields.Country[this] = value; }
 
-    [DisplayName("Phone"), Size(24)]
+    [DisplayText("Phone"), Size(24)]
     public string? Phone { get => fields.Phone[this]; set => fields.Phone[this] = value; }
 
-    [DisplayName("Fax"), Size(24)]
+    [DisplayText("Fax"), Size(24)]
     public string? Fax { get => fields.Fax[this]; set => fields.Fax[this] = value; }
 
     [Origin("cd")]
@@ -58,7 +58,7 @@ public sealed class CustomerRow : Row<CustomerRow.RowFields>, IIdRow, INameRow
     [NotesEditor, NotMapped]
     public List<NoteRow>? NoteList { get => fields.NoteList[this]; set => fields.NoteList[this] = value; }
     
-    [DisplayName("Representatives"), AsyncLookupEditor(typeof(EmployeeRow), Multiple = true), NotMapped]
+    [DisplayText("Representatives"), AsyncLookupEditor(typeof(EmployeeRow), Multiple = true), NotMapped]
     [LinkingSetRelation(typeof(CustomerRepresentativesRow), "CustomerId", "EmployeeId")]
     [MinSelectLevel(SelectLevel.Details), QuickFilter(CssClass = "hidden-xs")]
     public List<int>? Representatives { get => fields.Representatives[this]; set => fields.Representatives[this] = value; }

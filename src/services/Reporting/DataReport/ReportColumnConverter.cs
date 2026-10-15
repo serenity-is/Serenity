@@ -18,7 +18,12 @@ public static class ReportColumnConverter
         };
         var displayAttr = member.GetCustomAttribute<DisplayNameAttribute>();
         if (displayAttr != null)
-            result.Title = displayAttr.DisplayName;
+        {
+            var resolved = LocalText.ResolveFromAttribute(displayAttr,
+                displayAttr.DisplayName, defaultKey: null);
+            result.Title = resolved.Key is string key ?
+                localizer.TryGet(key) ?? resolved.Text ?? key : resolved.Text;
+        }
 
         var sizeAttr = member.GetCustomAttribute<SizeAttribute>();
         if (sizeAttr != null && sizeAttr.Value != 0)

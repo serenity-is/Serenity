@@ -9,8 +9,6 @@ namespace Serenity.Localization;
 /// </summary>
 public static class PropertyItemsLocalTextRegistration
 {
-    private static readonly Regex LocalTextKeyLike = new(@"^([A-Z][A-za-z0-9_]*\.)+[A-Z][A-za-z0-9_]*$", RegexOptions.Compiled);
-
     /// <summary>
     /// Adds local text translations defined implicitly by <see cref="DisplayNameAttribute"/>,
     /// <see cref="TabAttribute"/>, <see cref="PlaceholderAttribute"/>, <see cref="HintAttribute"/>,
@@ -47,24 +45,41 @@ public static class PropertyItemsLocalTextRegistration
                     registry.Add(languageID, textPrefix + suffix, text);
             }
 
+            void addAttributeText(Attribute attribute, string? text, string suffix)
+            {
+                var resolved = LocalText.ResolveFromAttribute(attribute, text, textPrefix + suffix);
+                if (resolved.Key is not string key)
+                {
+                    if (!string.IsNullOrEmpty(resolved.Text))
+                        registry.Add(languageID, textPrefix + suffix, resolved.Text);
+                    return;
+                }
+
+                if (!string.IsNullOrEmpty(resolved.Text))
+                    registry.Add(languageID, key, resolved.Text);
+                else if (resolved.IsKey && registry.TryGet(languageID, key, false) is null)
+                    registry.Add(languageID, key, null);
+            }
+
             var addonParams = new Dictionary<string, object?>(StringComparer.Ordinal);
 
             foreach (var member in type.GetMembers(BindingFlags.Instance | BindingFlags.Public))
             {
-                if (member.GetCustomAttribute<CategoryAttribute>()?.Category is string category)
-                    addText(category, "Categories." + category);
+                if (member.GetCustomAttribute<CategoryAttribute>() is CategoryAttribute categoryAttr)
+                    addAttributeText(categoryAttr, categoryAttr.Category,
+                        "Categories." + categoryAttr.Category);
 
-                if (member.GetCustomAttribute<TabAttribute>()?.Value is string tab)
-                    addText(tab, "Tabs." + tab);
+                if (member.GetCustomAttribute<TabAttribute>() is TabAttribute tabAttr)
+                    addAttributeText(tabAttr, tabAttr.Value, "Tabs." + tabAttr.Value);
 
-                if (member.GetCustomAttribute<DisplayNameAttribute>()?.DisplayName is string displayName)
-                    addText(displayName, member.Name);
+                if (member.GetCustomAttribute<DisplayNameAttribute>() is DisplayNameAttribute displayAttr)
+                    addAttributeText(displayAttr, displayAttr.DisplayName, member.Name);
 
-                if (member.GetCustomAttribute<HintAttribute>()?.Hint is string hint)
-                    addText(hint, member.Name + "_Hint");
+                if (member.GetCustomAttribute<HintAttribute>() is HintAttribute hintAttr)
+                    addAttributeText(hintAttr, hintAttr.Hint, member.Name + "_Hint");
 
-                if (member.GetCustomAttribute<PlaceholderAttribute>()?.Value is string placeholder)
-                    addText(placeholder, member.Name + "_Placeholder");
+                if (member.GetCustomAttribute<PlaceholderAttribute>() is PlaceholderAttribute placeholderAttr)
+                    addAttributeText(placeholderAttr, placeholderAttr.Value, member.Name + "_Placeholder");
 
                 foreach (var addonAttr in member.GetCustomAttributes<EditorAddonAttribute>())
                 {
@@ -119,11 +134,10 @@ public static class PropertyItemsLocalTextRegistration
     /// that could be passed to the client side.
     /// </summary>
     /// <param name="text">The key or text.</param>
+    /// <param name="uiKeyOnly">If set to <c>true</c>, only considers keys with UI-related prefixes.</param>
     /// <returns><c>true</c> if the text looks like a local text key; otherwise, <c>false</c>.</returns>
-    public static bool IsLocalTextKeyCandidate(string? text)
+    public static bool IsLocalTextKeyCandidate(string? text, bool uiKeyOnly = true)
     {
-        return !string.IsNullOrEmpty(text) &&
-            LocalTextKeyLike.IsMatch(text) &&
-            LocalTextPackages.DefaultSitePackageIncludes.IsMatch(text);
+        return LocalText.IsLocalTextKeyCandidate(text, uiKeyOnly);
     }
 }

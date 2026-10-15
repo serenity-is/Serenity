@@ -7,7 +7,7 @@
 
 {{NAMESPACE ModuleNamespace}}{{capture block~}}
 [ConnectionKey("{{ConnectionKey}}"){{if Module}}, Module("{{Module}}"){{end}}, TableName("{{SchemaAndTable}}")]
-[DisplayName("{{Title}}"), InstanceName("{{Title}}"){{if EnableGenerateFields}}, GenerateFields{{end}}]
+[DisplayText("{{Title}}"), InstanceName("{{Title}}"){{if EnableGenerateFields}}, GenerateFields{{end}}]
 [ReadPermission("{{Permission}}")]
 [ModifyPermission("{{Permission}}")]
 {{~if ServiceLookupPermission~}}
