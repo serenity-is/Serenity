@@ -85,7 +85,7 @@ public partial class EntityModelFactoryTests
                 Assert.Collection(customerId.AttributeList,
                     displayName =>
                     {
-                        Assert.Equal(AttrName<DisplayNameAttribute>(), displayName.TypeName);
+                        Assert.Equal(AttrName<DisplayTextAttribute>(), displayName.TypeName);
                         Assert.Equal("Customer Id", Assert.Single(displayName.Arguments));
                     },
                     identity =>
@@ -107,8 +107,10 @@ public partial class EntityModelFactoryTests
                     },
                     displayName =>
                     {
-                        Assert.Equal(AttrName<DisplayNameAttribute>(), displayName.TypeName);
-                        Assert.Equal("Db.Shared.RecordId", Assert.Single(displayName.Arguments));
+                        Assert.Equal(AttrName<DisplayTextAttribute>(), displayName.TypeName);
+                        var arg = Assert.IsType<NamedArg>(Assert.Single(displayName.Arguments));
+                        Assert.Equal("TextKey", arg.PropertyName);
+                        Assert.Equal("Db.Shared.RecordId", arg.Value);
                     },
                     alignRight =>
                     {
@@ -136,7 +138,7 @@ public partial class EntityModelFactoryTests
                 Assert.Collection(customerName.AttributeList,
                     displayName =>
                     {
-                        Assert.Equal(AttrName<DisplayNameAttribute>(), displayName.TypeName);
+                        Assert.Equal(AttrName<DisplayTextAttribute>(), displayName.TypeName);
                         Assert.Equal("Customer Name", Assert.Single(displayName.Arguments));
                     },
                     size =>

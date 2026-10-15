@@ -7,9 +7,11 @@ public partial class EntityModelFactoryTests
     [Fact]
     public void Service_Lookup_Permission_Is_Set_For_Single_PK_Table()
     {
-        var inputs = new CustomerEntityInputs();
-        inputs.Table = "Account";
-        inputs.Identifier = "Account";
+        var inputs = new CustomerEntityInputs
+        {
+            Table = "Account",
+            Identifier = "Account"
+        };
         var schema = (CustomerDataSchema)inputs.DataSchema;
         AddField(schema, "Account", F("AccountId", "int", pk: true, identity: true, nullable: false));
         AddField(schema, "Account", F("AccountName", "nvarchar", nullable: false, size: 50));
@@ -22,9 +24,11 @@ public partial class EntityModelFactoryTests
     [Fact]
     public void Service_Lookup_Permission_Is_Skipped_For_Multiple_PK_Table()
     {
-        var inputs = new CustomerEntityInputs();
-        inputs.Table = "Account";
-        inputs.Identifier = "Account";
+        var inputs = new CustomerEntityInputs
+        {
+            Table = "Account",
+            Identifier = "Account"
+        };
         var schema = (CustomerDataSchema)inputs.DataSchema;
         AddField(schema, "Account", F("AccountId", "int", pk: true, identity: true, nullable: false));
         AddField(schema, "Account", F("AccountId2", "int", pk: true, nullable: false));
@@ -71,7 +75,7 @@ public partial class EntityModelFactoryTests
         Assert.Equal("TitleCol", titleField.Name);
         Assert.Equal("City Title Col", titleField.Title);
         Assert.Contains(titleField.AttributeList, a =>
-            a.TypeName == "System.ComponentModel.DisplayName" &&
+            a.TypeName == "Serenity.ComponentModel.DisplayText" &&
             "City Title Col".Equals(a.Arguments[0]));
         var origin = Assert.Single(titleField.AttributeList, a => a.TypeName == "Serenity.Data.Mapping.Origin");
         Assert.Equal(2, origin.Arguments.Length);
@@ -97,9 +101,12 @@ public partial class EntityModelFactoryTests
         app.Rows["Country"] = cityRow;
         app.Rows["[test].[Country]"] = cityRow;
 
-        var inputs = new CustomerEntityInputs { Application = app };
-        inputs.Table = "City";
-        inputs.Identifier = "City";
+        var inputs = new CustomerEntityInputs
+        {
+            Application = app,
+            Table = "City",
+            Identifier = "City"
+        };
         var schema = (CustomerDataSchema)inputs.DataSchema;
         schema.ForeignKeys.Add((TestSchema, City, new()
         {
@@ -138,9 +145,12 @@ public partial class EntityModelFactoryTests
         app.Rows["Num"] = numRow;
         app.Rows["[test].[Num]"] = numRow;
 
-        var inputs = new CustomerEntityInputs { Application = app };
-        inputs.Table = "City";
-        inputs.Identifier = "City";
+        var inputs = new CustomerEntityInputs
+        {
+            Application = app,
+            Table = "City",
+            Identifier = "City"
+        };
         var schema = (CustomerDataSchema)inputs.DataSchema;
         AddField(schema, "Num", F("NumId", "int", pk: true, nullable: false));
         AddField(schema, "Num", F("NumValue", "int"));

@@ -138,7 +138,7 @@ public partial class BasicPropertyProcessorTests
         [Hint("R")]
         public string RowOnly { get; set; }
 
-        [Hint("Site.CustomRowOnlyTextKey")]
+        [Hint(TextKey = "Site.CustomRowOnlyTextKey")]
         public string RowOnlyTextKey { get; set; }
 
         public class RowFields : RowFieldsBase
@@ -161,13 +161,13 @@ public partial class BasicPropertyProcessorTests
         [Hint("B")]
         public string FormOnly { get; set; }
 
-        [Hint("Site.FormOnlyTextKey")]
+        [Hint(TextKey = "Site.FormOnlyTextKey")]
         public string FormOnlyTextKey { get; set; }
 
         [Hint("C")]
         public string FormOverride { get; set; }
 
-        [Hint("Site.FormCustomTextKeyOverride")]
+        [Hint(TextKey = "Site.FormCustomTextKeyOverride")]
         public string FormOverrideTextKey { get; set; }
 
         public string RowOnly { get; set; }

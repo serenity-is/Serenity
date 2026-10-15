@@ -327,6 +327,22 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins, IHas
         }
     }
 
+    private static LocalText? CreateDisplayCaption(DisplayNameAttribute? display, string autoTextKey)
+    {
+        if (display is null)
+            return null;
+
+        var text = display.DisplayName;
+        var resolved = LocalText.ResolveFromAttribute(display, text, autoTextKey);
+        if (display is IHasTextKey hasTextKey)
+            return new LocalText(string.IsNullOrEmpty(hasTextKey.TextKey) ? text : hasTextKey.TextKey);
+
+        if (resolved.IsKey)
+            return new LocalText(resolved.Key ?? resolved.Text);
+
+        return new LocalText(text);
+    }
+
     /// <summary>
     /// Afters the initialize.
     /// </summary>
@@ -619,15 +635,11 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins, IHas
                                 fieldInfo.Name, rowType!.Name));
                     }
 
-                    var caption = display is IHasTextKey hasTextKey &&
-                        !string.IsNullOrEmpty(hasTextKey.TextKey) ?
-                        hasTextKey.TextKey : display?.DisplayName;
-
                     object?[] prm =
                     [
                         this, // owner
                         column == null ? property.Name : (column.Name.TrimToNull() ?? property.Name),
-                        display != null ? new LocalText(caption) : null,
+                        display != null ? new LocalText(display.DisplayName) : null,
                         size != null ? size.Value : 0,
                         (FieldFlags.Default ^ removeFlags) | addFlags,
                         null,
@@ -652,6 +664,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins, IHas
 
                     field = (Field)Activator.CreateInstance(fieldType, prm)!;
                     fieldInfo.SetValue(this, field);
+                    field.Caption = CreateDisplayCaption(display, field.AutoTextKey);
                 }
                 else
                 {
@@ -659,9 +672,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins, IHas
                         field.Size = size.Value;
 
                     if (display != null)
-                        field.Caption = new LocalText(display is IHasTextKey hasTextKey &&
-                            !string.IsNullOrEmpty(hasTextKey.TextKey) ?
-                            hasTextKey.TextKey : display.DisplayName);
+                        field.Caption = CreateDisplayCaption(display, field.AutoTextKey);
 
                     if (addFlags != 0 || removeFlags != 0)
                         field.Flags = (field.Flags ^ removeFlags) | addFlags;

@@ -64,7 +64,7 @@ public partial class EntityModelFactoryTests
         var cityCountryId = Assert.Single(cityJoin.Fields, x => x.PropertyName == CityCountryId);
         Assert.Equal("City Country Id", cityCountryId.Title);
         Assert.Contains(cityCountryId.AttributeList, a =>
-            a.TypeName == "System.ComponentModel.DisplayName" &&
+            a.TypeName == "Serenity.ComponentModel.DisplayText" &&
             "City Country Id".Equals(a.Arguments[0]));
         Assert.Contains(cityCountryId.AttributeList, a =>
             a.TypeName == "Serenity.Data.Mapping.Expression" &&
@@ -74,9 +74,11 @@ public partial class EntityModelFactoryTests
     [Fact]
     public void Omit_Default_Schema_Normalizes_Foreign_Key_Schema_Too()
     {
-        var inputs = new CustomerEntityInputs();
-        inputs.Table = "User";
-        inputs.Schema = "dbo";
+        var inputs = new CustomerEntityInputs
+        {
+            Table = "User",
+            Schema = "dbo"
+        };
         inputs.Config.OmitDefaultSchema = true;
         var schema = (CustomerDataSchema)inputs.DataSchema;
         schema.FieldInfos.Add(("dbo", "User", F("UserId", "int", pk: true, identity: true, nullable: false)));

@@ -7,8 +7,10 @@ public partial class EntityModelFactoryTests
     [Fact]
     public void Config_Options_Are_Mapped_To_Model()
     {
-        var inputs = new CustomerEntityInputs();
-        inputs.Table = "Customer";
+        var inputs = new CustomerEntityInputs
+        {
+            Table = "Customer"
+        };
         inputs.Config.DeclareJoinConstants = true;
         inputs.Config.EnableGenerateFields = true;
         inputs.Config.EnableRowTemplates = true;
@@ -33,9 +35,11 @@ public partial class EntityModelFactoryTests
     [Fact]
     public void Omit_Default_Schema_Removes_Schema_When_Equal_To_Data_Schema_Default()
     {
-        var inputs = new CustomerEntityInputs();
-        inputs.Table = "Customer";
-        inputs.Schema = "dbo";
+        var inputs = new CustomerEntityInputs
+        {
+            Table = "Customer",
+            Schema = "dbo"
+        };
         inputs.Config.OmitDefaultSchema = true;
 
         var model = new EntityModelFactory().Create(inputs);
@@ -49,9 +53,11 @@ public partial class EntityModelFactoryTests
     [Fact]
     public void Schema_Is_Database_Always_Omits_Schema()
     {
-        var inputs = new CustomerEntityInputs();
-        inputs.Table = "Customer";
-        inputs.SchemaIsDatabase = true;
+        var inputs = new CustomerEntityInputs
+        {
+            Table = "Customer",
+            SchemaIsDatabase = true
+        };
 
         var model = new EntityModelFactory().Create(inputs);
         Assert.Null(model.Schema);
@@ -60,9 +66,11 @@ public partial class EntityModelFactoryTests
     [Fact]
     public void Auto_Identifier_Is_Derived_When_Identifier_Is_Deleted()
     {
-        var inputs = new CustomerEntityInputs();
-        inputs.Table = "tb_Customer";
-        inputs.Identifier = null;
+        var inputs = new CustomerEntityInputs
+        {
+            Table = "tb_Customer",
+            Identifier = null
+        };
 
         var model = new EntityModelFactory().Create(inputs);
 

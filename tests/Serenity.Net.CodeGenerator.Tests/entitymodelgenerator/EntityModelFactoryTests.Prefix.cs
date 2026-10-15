@@ -32,8 +32,11 @@ public partial class EntityModelFactoryTests
     [Fact]
     public void Field_Prefix_Is_Detected_From_Common_Underscore_Prefix()
     {
-        var inputs = new CustomerEntityInputs { Identifier = "Profile" };
-        inputs.Table = "Profile";
+        var inputs = new CustomerEntityInputs
+        {
+            Identifier = "Profile",
+            Table = "Profile"
+        };
         var schema = (CustomerDataSchema)inputs.DataSchema;
         AddField(schema, "Profile", F("Profile_Id", "int", pk: true, identity: true, nullable: false));
         AddField(schema, "Profile", F("Profile_Name", "nvarchar", nullable: false, size: 100));
@@ -56,8 +59,11 @@ public partial class EntityModelFactoryTests
     [Fact]
     public void Field_Prefix_Is_Ignored_If_Not_Shared_By_All_Fields()
     {
-        var inputs = new CustomerEntityInputs { Identifier = "Mixed" };
-        inputs.Table = "Mixed";
+        var inputs = new CustomerEntityInputs
+        {
+            Identifier = "Mixed",
+            Table = "Mixed"
+        };
         var schema = (CustomerDataSchema)inputs.DataSchema;
         AddField(schema, "Mixed", F("Mixed_Id", "int", pk: true, nullable: false));
         AddField(schema, "Mixed", F("OtherName", "nvarchar", size: 30));
@@ -71,8 +77,11 @@ public partial class EntityModelFactoryTests
     [Fact]
     public void PropertyNames_Are_Made_Unique_When_Case_Insensitive_Duplicates()
     {
-        var inputs = new CustomerEntityInputs { Identifier = "Dup" };
-        inputs.Table = "Dup";
+        var inputs = new CustomerEntityInputs
+        {
+            Identifier = "Dup",
+            Table = "Dup"
+        };
         var schema = (CustomerDataSchema)inputs.DataSchema;
         AddField(schema, "Dup", F("DupId", "int", pk: true, nullable: false));
         AddField(schema, "Dup", F("dup_name", "nvarchar", size: 50));

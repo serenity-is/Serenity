@@ -276,7 +276,7 @@ public class EntityModelFactory : IEntityModelFactory
             if (tableField.PropertyName == model.IdField)
             {
                 tableField.ColAttributeList.Add(new("Serenity.ComponentModel.EditLink"));
-                tableField.ColAttributeList.Add(new("System.ComponentModel.DisplayName", "Db.Shared.RecordId"));
+                tableField.ColAttributeList.Add(new("Serenity.ComponentModel.DisplayText", new NamedArg("TextKey", "Db.Shared.RecordId")));
                 tableField.ColAttributeList.Add(new("Serenity.ComponentModel.AlignRight"));
                 tableField.OmitInForm = true;
             }
@@ -359,7 +359,7 @@ public class EntityModelFactory : IEntityModelFactory
                         nameViewField.Title = Inflector.Inflector.Titleize(JoinUnderscore(entityJoin.Name!,
                             nameViewField.Name))?.Trim();
 
-                        nameViewField.AttributeList.Add(new("System.ComponentModel.DisplayName",
+                        nameViewField.AttributeList.Add(new("Serenity.ComponentModel.DisplayText",
                             nameViewField.Title));
 
                         object joinExpr = model.DeclareJoinConstants ?
@@ -413,7 +413,7 @@ public class EntityModelFactory : IEntityModelFactory
                 viewField.Title = Inflector.Inflector.Titleize(JoinUnderscore(entityJoin.Name!,
                     foreignField.FieldName[foreignPrefixLength..]))?.Trim();
 
-                viewField.AttributeList.Add(new("System.ComponentModel.DisplayName",
+                viewField.AttributeList.Add(new("Serenity.ComponentModel.DisplayText",
                     viewField.Title));
 
                 viewField.Expression = entityJoin.Alias + ".[" + viewField.Name + "]";
@@ -446,7 +446,7 @@ public class EntityModelFactory : IEntityModelFactory
         {
             var attrs = tableField.AttributeList;
 
-            attrs.Add(new("System.ComponentModel.DisplayName", tableField.Title));
+            attrs.Add(new("Serenity.ComponentModel.DisplayText", tableField.Title));
 
             if (tableField.PropertyName != tableField.Name)
                 attrs.Add(new("Serenity.Data.Mapping.Column", tableField.Name));

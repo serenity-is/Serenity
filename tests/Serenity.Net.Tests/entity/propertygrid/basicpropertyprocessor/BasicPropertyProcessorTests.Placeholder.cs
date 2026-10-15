@@ -132,13 +132,13 @@ public partial class BasicPropertyProcessorTests
         [Placeholder("O")]
         public string FormOverride { get; set; }
 
-        [Placeholder("Site.CustomRowTextKey")]
+        [Placeholder(TextKey = "Site.CustomRowTextKey")]
         public string FormOverrideTextKey { get; set; }
 
         [Placeholder("R")]
         public string RowOnly { get; set; }
 
-        [Placeholder("Site.CustomRowOnlyTextKey")]
+        [Placeholder(TextKey = "Site.CustomRowOnlyTextKey")]
         public string RowOnlyTextKey { get; set; }
 
         public class RowFields : RowFieldsBase
@@ -161,13 +161,13 @@ public partial class BasicPropertyProcessorTests
         [Placeholder("B")]
         public string FormOnly { get; set; }
 
-        [Placeholder("Site.FormOnlyTextKey")]
+        [Placeholder(TextKey = "Site.FormOnlyTextKey")]
         public string FormOnlyTextKey { get; set; }
 
         [Placeholder("C")]
         public string FormOverride { get; set; }
 
-        [Placeholder("Site.FormCustomTextKeyOverride")]
+        [Placeholder(TextKey = "Site.FormCustomTextKeyOverride")]
         public string FormOverrideTextKey { get; set; }
 
         public string RowOnly { get; set; }

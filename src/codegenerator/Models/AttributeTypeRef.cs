@@ -18,20 +18,27 @@ public class AttributeTypeRef(string typeName, params object?[] arguments)
             if (i > 0)
                 s += ", ";
 
-            if (value is TypeOfRef tr)
-                s += tr.ToString(cw);
-            else if (value is NameOfRef nr)
-                s += nr.ToString(cw);
-            else if (value is string str)
-                s += StringHelper.ToDoubleQuoted(str);
-            else if (value is bool b)
-                s += b ? "true" : "false";
-            else if (value is IFormattable fmt)
-                s += fmt.ToString(null, CultureInfo.InvariantCulture);
-            else
-                s += value?.ToString() ?? "null";
+            s += FormatArgument(value, cw);
         }
 
         return s + ")";
+    }
+
+    private static string FormatArgument(object? value, CodeWriter cw)
+    {
+        if (value is TypeOfRef tr)
+            return tr.ToString(cw);
+        else if (value is NameOfRef nr)
+            return nr.ToString(cw);
+        else if (value is NamedArg na)
+            return na.PropertyName + " = " + FormatArgument(na.Value, cw);
+        else if (value is string str)
+            return StringHelper.ToDoubleQuoted(str);
+        else if (value is bool b)
+            return b ? "true" : "false";
+        else if (value is IFormattable fmt)
+            return fmt.ToString(null, CultureInfo.InvariantCulture);
+        else
+            return value?.ToString() ?? "null";
     }
 }

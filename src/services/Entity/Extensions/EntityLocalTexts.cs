@@ -60,6 +60,7 @@ public static class EntityLocalTexts
                     addAttributeText(placeholderAttr, placeholderAttr.Value,
                         field.AutoTextKey + "_Placeholder");
 
+                var displayAttr = field.GetAttribute<DisplayNameAttribute>();
                 if (field.Caption is not ILocalText lt)
                 {
                     if (languageID != LocalText.InvariantLanguageID)
@@ -68,12 +69,20 @@ public static class EntityLocalTexts
                     lt = field.Caption = new LocalText(field.PropertyName ?? field.Name);
                 }
 
+                if (displayAttr is IHasTextKey hasTextKey &&
+                    !string.IsNullOrEmpty(hasTextKey.TextKey))
+                {
+                    addAttributeText(displayAttr, displayAttr.DisplayName, field.AutoTextKey);
+                    continue;
+                }
+
                 if (string.IsNullOrEmpty(lt.Key))
                     continue;
 
                 if (lt.OriginalKey is null)
                 {
-                    if (LocalText.IsLocalTextKeyCandidate(lt.Key, uiKeyOnly: true))
+                    if (displayAttr is not IHasTextKey &&
+                        LocalText.IsLocalTextKeyCandidate(lt.Key, uiKeyOnly: true))
                     {
                         if (registry.TryGet(languageID, lt.Key, false) is null)
                             registry.Add(languageID, lt.Key, null);

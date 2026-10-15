@@ -7,8 +7,10 @@ public partial class EntityModelFactoryTests
     [Fact]
     public void Largest_Matching_Base_Row_Class_Is_Used_And_Fields_Are_Moved_To_Base()
     {
-        var inputs = new CustomerEntityInputs();
-        inputs.Table = "Customer";
+        var inputs = new CustomerEntityInputs
+        {
+            Table = "Customer"
+        };
         inputs.Config.BaseRowClasses =
         [
             new() { ClassName = "NoFieldsBase", Fields = null },
@@ -32,8 +34,10 @@ public partial class EntityModelFactoryTests
     [Fact]
     public void Base_Row_Class_Is_Skipped_When_Field_Names_Do_Not_Match_Exact_Case()
     {
-        var inputs = new CustomerEntityInputs();
-        inputs.Table = "Customer";
+        var inputs = new CustomerEntityInputs
+        {
+            Table = "Customer"
+        };
         inputs.Config.BaseRowClasses =
         [
             new() { ClassName = "CasedBase", Fields = ["customerid"] }
@@ -51,8 +55,10 @@ public partial class EntityModelFactoryTests
     [Fact]
     public void Serializable_Encoding_For_Base_Row_Classes_Trimmed_Whitespace_Is_Checked()
     {
-        var inputs = new CustomerEntityInputs();
-        inputs.Table = "Customer";
+        var inputs = new CustomerEntityInputs
+        {
+            Table = "Customer"
+        };
         inputs.Config.BaseRowClasses =
         [
             new() { ClassName = "SpacedFieldsBase", Fields = [" ", " "] }

@@ -13,7 +13,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
                 return;
             }
 
-            item.Hint = GetLocalizableTextValue<HintAttribute>(source, attr.Hint, 
+            item.Hint = GetLocalizableTextValue<HintAttribute>(source, attr.Hint,
                 () => source.Name + "_Hint", inferTextKey: attr is not IHasTextKey);
         }
     }

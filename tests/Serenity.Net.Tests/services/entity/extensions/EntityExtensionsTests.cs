@@ -61,9 +61,33 @@ public class EntityExtensionsTests
             Placeholder("Placeholder text", TextKey = "Site.TextKeyPlaceholder")]
         public string? Name { get => fields.Name[this]; set => fields.Name[this] = value; }
 
+        [DisplayText("Site.LiteralDisplay")]
+        public string? LiteralDisplay { get => fields.LiteralDisplay[this]; set => fields.LiteralDisplay[this] = value; }
+
+        [DisplayText("Invariant display", TextKey = "Site.InvariantDisplay")]
+        public string? InvariantDisplay { get => fields.InvariantDisplay[this]; set => fields.InvariantDisplay[this] = value; }
+
+        [DisplayName("Some Test")]
+        public string? LegacyDisplay { get => fields.LegacyDisplay[this]; set => fields.LegacyDisplay[this] = value; }
+
+        [DisplayName("Site.Key.Like")]
+        public string? LegacyKeyLikeDisplay { get => fields.LegacyKeyLikeDisplay[this]; set => fields.LegacyKeyLikeDisplay[this] = value; }
+
+        [DisplayText("Some Text")]
+        public string? LiteralDisplayText { get => fields.LiteralDisplayText[this]; set => fields.LiteralDisplayText[this] = value; }
+
+        [DisplayText(TextKey = "Site.KeyOnlyDisplay")]
+        public string? KeyOnlyDisplay { get => fields.KeyOnlyDisplay[this]; set => fields.KeyOnlyDisplay[this] = value; }
+
         public class RowFields : RowFieldsBase
         {
             public StringField Name = null!;
+            public StringField LiteralDisplay = null!;
+            public StringField InvariantDisplay = null!;
+            public StringField LegacyDisplay = null!;
+            public StringField LegacyKeyLikeDisplay = null!;
+            public StringField LiteralDisplayText = null!;
+            public StringField KeyOnlyDisplay = null!;
         }
     }
 
@@ -214,7 +238,14 @@ public class EntityExtensionsTests
     public void AddRowTexts_Registers_Explicit_Attribute_Text_Keys()
     {
         var registry = new LocalTextRegistry();
-        registry.AddRowTexts([new TextKeyRow()], LocalText.InvariantLanguageID);
+        var row = new TextKeyRow();
+
+        Assert.Equal("Site.InvariantDisplay", TextKeyRow.Fields.InvariantDisplay.Caption.Key);
+        Assert.Equal("Some Test", TextKeyRow.Fields.LegacyDisplay.Caption.Key);
+        Assert.Equal("Site.Key.Like", TextKeyRow.Fields.LegacyKeyLikeDisplay.Caption.Key);
+        Assert.Equal("Some Text", TextKeyRow.Fields.LiteralDisplayText.Caption.Key);
+
+        registry.AddRowTexts([row], LocalText.InvariantLanguageID);
 
         Assert.Equal("Plural text", registry.TryGet(LocalText.InvariantLanguageID, "Site.TextKeyPlural", false));
         Assert.Equal("Singular text", registry.TryGet(LocalText.InvariantLanguageID, "Site.TextKeySingular", false));
@@ -222,6 +253,28 @@ public class EntityExtensionsTests
         Assert.Equal("Tab text", registry.TryGet(LocalText.InvariantLanguageID, "Site.TextKeyTab", false));
         Assert.Equal("Hint text", registry.TryGet(LocalText.InvariantLanguageID, "Site.TextKeyHint", false));
         Assert.Equal("Placeholder text", registry.TryGet(LocalText.InvariantLanguageID, "Site.TextKeyPlaceholder", false));
+        Assert.Equal("Site.LiteralDisplay", registry.TryGet(LocalText.InvariantLanguageID,
+            "Db.TextKeyLocal.LiteralDisplay", false));
+        Assert.Equal("Some Test", registry.TryGet(LocalText.InvariantLanguageID,
+            "Db.TextKeyLocal.LegacyDisplay", false));
+        Assert.Null(registry.TryGet(LocalText.InvariantLanguageID,
+            "Site.Key.Like", false));
+        Assert.Null(registry.TryGet(LocalText.InvariantLanguageID,
+            "Db.TextKeyLocal.LegacyKeyLikeDisplay", false));
+        Assert.Equal("Some Text", registry.TryGet(LocalText.InvariantLanguageID,
+            "Db.TextKeyLocal.LiteralDisplayText", false));
+        Assert.Equal("Invariant display", registry.TryGet(LocalText.InvariantLanguageID,
+            "Site.InvariantDisplay", false));
+        Assert.Equal("Db.TextKeyLocal.LegacyDisplay", TextKeyRow.Fields.LegacyDisplay.Caption.Key);
+        Assert.Equal("Site.Key.Like", TextKeyRow.Fields.LegacyKeyLikeDisplay.Caption.Key);
+        Assert.Equal("Db.TextKeyLocal.LiteralDisplayText", TextKeyRow.Fields.LiteralDisplayText.Caption.Key);
+        Assert.Null(registry.TryGet(LocalText.InvariantLanguageID, "Site.LiteralDisplay", false));
+        Assert.Null(registry.TryGet(LocalText.InvariantLanguageID, "Site.KeyOnlyDisplay", false));
+        Assert.Null(registry.TryGet(LocalText.InvariantLanguageID,
+            "Db.TextKeyLocal.KeyOnlyDisplay", false));
+        Assert.Equal("Site.KeyOnlyDisplay", TextKeyRow.Fields.KeyOnlyDisplay.Caption.Key);
+        Assert.Equal("Db.TextKeyLocal.LiteralDisplay", TextKeyRow.Fields.LiteralDisplay.Caption.Key);
+        Assert.Equal("Site.InvariantDisplay", TextKeyRow.Fields.InvariantDisplay.Caption.Key);
     }
 
     [TableName("InstanceNameKeyLikeRows")]

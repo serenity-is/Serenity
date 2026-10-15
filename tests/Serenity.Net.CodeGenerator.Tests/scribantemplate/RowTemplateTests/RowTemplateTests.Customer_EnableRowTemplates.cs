@@ -12,26 +12,26 @@ public partial class RowTemplateTests
         namespace TestNamespace.TestModule
         {
             [ConnectionKey("TestConnection"), Module("TestModule"), TableName("[test].[Customer]")]
-            [DisplayName("Customer"), InstanceName("Customer")]
+            [DisplayText("Customer"), InstanceName("Customer")]
             [ReadPermission("TestPermission")]
             [ModifyPermission("TestPermission")]
             public sealed partial class CustomerRow : Row<CustomerRow.RowFields>, IIdRow, INameRow
             {
                 class RowTemplate
                 {
-                    [DisplayName("Customer Id"), Identity, IdProperty]
+                    [DisplayText("Customer Id"), Identity, IdProperty]
                     public int? CustomerId { get; set; }
 
-                    [DisplayName("Customer Name"), Size(50), NotNull, QuickSearch, NameProperty]
+                    [DisplayText("Customer Name"), Size(50), NotNull, QuickSearch, NameProperty]
                     public string CustomerName { get; set; }
 
-                    [DisplayName("City"), ForeignKey("[test].[City]", "CityId"), LeftJoin("jCity"), TextualField(nameof(CityName))]
+                    [DisplayText("City"), ForeignKey("[test].[City]", "CityId"), LeftJoin("jCity"), TextualField(nameof(CityName))]
                     public int? CityId { get; set; }
 
-                    [DisplayName("City Name"), Expression("jCity.[CityName]")]
+                    [DisplayText("City Name"), Expression("jCity.[CityName]")]
                     public string CityName { get; set; }
 
-                    [DisplayName("City Country Id"), Expression("jCity.[CountryId]")]
+                    [DisplayText("City Country Id"), Expression("jCity.[CountryId]")]
                     public int? CityCountryId { get; set; }
                 }
             }

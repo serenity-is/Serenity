@@ -132,13 +132,13 @@ public partial class BasicPropertyProcessorTests
         [Tab("O")]
         public string FormOverride { get; set; }
 
-        [Tab("Site.CustomRowTextKey")]
+        [Tab(TextKey = "Site.CustomRowTextKey")]
         public string FormOverrideTextKey { get; set; }
 
         [Tab("R")]
         public string RowOnly { get; set; }
 
-        [Tab("Site.CustomRowOnlyTextKey")]
+        [Tab(TextKey = "Site.CustomRowOnlyTextKey")]
         public string RowOnlyTextKey { get; set; }
 
         public string EmptyString { get; set; }
@@ -171,13 +171,13 @@ public partial class BasicPropertyProcessorTests
         [Tab("B")]
         public string FormOnly { get; set; }
 
-        [Tab("Site.FormOnlyTextKey")]
+        [Tab(TextKey = "Site.FormOnlyTextKey")]
         public string FormOnlyTextKey { get; set; }
 
         [Tab("C")]
         public string FormOverride { get; set; }
 
-        [Tab("Site.FormCustomTextKeyOverride")]
+        [Tab(TextKey = "Site.FormCustomTextKeyOverride")]
         public string FormOverrideTextKey { get; set; }
 
         public string RowOnly { get; set; }

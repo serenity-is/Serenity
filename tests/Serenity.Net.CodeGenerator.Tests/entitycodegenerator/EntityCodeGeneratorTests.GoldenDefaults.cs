@@ -15,7 +15,7 @@ public partial class EntityCodeGeneratorTests
             namespace TestNamespace.TestModule;
             
             [ConnectionKey("TestConnection"), Module("TestModule"), TableName("[test].[Customer]")]
-            [DisplayName("Customer"), InstanceName("Customer")]
+            [DisplayText("Customer"), InstanceName("Customer")]
             [ReadPermission("TestPermission")]
             [ModifyPermission("TestPermission")]
             [ServiceLookupPermission("TestPermission")]
@@ -23,16 +23,16 @@ public partial class EntityCodeGeneratorTests
             {
                 const string jCity = nameof(jCity);
             
-                [DisplayName("Customer Id"), Identity, IdProperty]
+                [DisplayText("Customer Id"), Identity, IdProperty]
                 public int? CustomerId { get => fields.CustomerId[this]; set => fields.CustomerId[this] = value; }
             
-                [DisplayName("Customer Name"), Size(50), NotNull, QuickSearch, NameProperty]
+                [DisplayText("Customer Name"), Size(50), NotNull, QuickSearch, NameProperty]
                 public string CustomerName { get => fields.CustomerName[this]; set => fields.CustomerName[this] = value; }
             
-                [DisplayName("City"), ForeignKey("[test].[City]", "CityId"), LeftJoin(jCity), TextualField(nameof(CityName))]
+                [DisplayText("City"), ForeignKey("[test].[City]", "CityId"), LeftJoin(jCity), TextualField(nameof(CityName))]
                 public int? CityId { get => fields.CityId[this]; set => fields.CityId[this] = value; }
             
-                [DisplayName("City City Name"), Expression($"{jCity}.[CityName]")]
+                [DisplayText("City City Name"), Expression($"{jCity}.[CityName]")]
                 public string CityName { get => fields.CityName[this]; set => fields.CityName[this] = value; }
             
                 public class RowFields : RowFieldsBase
@@ -52,7 +52,7 @@ public partial class EntityCodeGeneratorTests
             [BasedOnRow(typeof(CustomerRow), CheckNames = true)]
             public class CustomerColumns
             {
-                [EditLink, DisplayName("Db.Shared.RecordId"), AlignRight]
+                [EditLink, DisplayText(TextKey = "Db.Shared.RecordId"), AlignRight]
                 public int? CustomerId { get; set; }
                 [EditLink]
                 public string CustomerName { get; set; }
@@ -344,7 +344,7 @@ public partial class EntityCodeGeneratorTests
             [BasedOnRow(typeof(CustomerRow), CheckNames = true)]
             public class CustomerColumns
             {
-                [EditLink, DisplayName("Db.Shared.RecordId"), AlignRight]
+                [EditLink, DisplayText(TextKey = "Db.Shared.RecordId"), AlignRight]
                 public int? CustomerId { get; set; }
                 [EditLink]
                 public string? CustomerName { get; set; }
@@ -366,7 +366,7 @@ public partial class EntityCodeGeneratorTests
             namespace TestNamespace.TestModule;
 
             [ConnectionKey("TestConnection"), Module("TestModule"), TableName("[test].[Customer]")]
-            [DisplayName("Customer"), InstanceName("Customer")]
+            [DisplayText("Customer"), InstanceName("Customer")]
             [ReadPermission("TestPermission")]
             [ModifyPermission("TestPermission")]
             [ServiceLookupPermission("TestPermission")]
@@ -374,16 +374,16 @@ public partial class EntityCodeGeneratorTests
             {
                 const string jCity = nameof(jCity);
 
-                [DisplayName("Customer Id"), Identity, IdProperty]
+                [DisplayText("Customer Id"), Identity, IdProperty]
                 public int? CustomerId { get => fields.CustomerId[this]; set => fields.CustomerId[this] = value; }
 
-                [DisplayName("Customer Name"), Size(50), NotNull, QuickSearch, NameProperty]
+                [DisplayText("Customer Name"), Size(50), NotNull, QuickSearch, NameProperty]
                 public string? CustomerName { get => fields.CustomerName[this]; set => fields.CustomerName[this] = value; }
 
-                [DisplayName("City"), ForeignKey("[test].[City]", "CityId"), LeftJoin(jCity), TextualField(nameof(CityName))]
+                [DisplayText("City"), ForeignKey("[test].[City]", "CityId"), LeftJoin(jCity), TextualField(nameof(CityName))]
                 public int? CityId { get => fields.CityId[this]; set => fields.CityId[this] = value; }
 
-                [DisplayName("City City Name"), Expression($"{jCity}.[CityName]")]
+                [DisplayText("City City Name"), Expression($"{jCity}.[CityName]")]
                 public string? CityName { get => fields.CityName[this]; set => fields.CityName[this] = value; }
 
                 public class RowFields : RowFieldsBase

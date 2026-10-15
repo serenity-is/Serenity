@@ -5,8 +5,11 @@ public partial class EntityModelFactoryTests
     [Fact]
     public void Primary_Key_Flag_And_NotNull_Are_Added_For_Non_Identity_PK_With_Markers()
     {
-        var inputs = new CustomerEntityInputs { Identifier = "Flag" };
-        inputs.Table = "Flag";
+        var inputs = new CustomerEntityInputs
+        {
+            Identifier = "Flag",
+            Table = "Flag"
+        };
         var schema = (CustomerDataSchema)inputs.DataSchema;
         AddField(schema, "Flag", F("FlagId", "int", pk: true, nullable: false));
         AddField(schema, "Flag", F("FlagStamp", "timestamp", nullable: false));
@@ -41,8 +44,11 @@ public partial class EntityModelFactoryTests
     [Fact]
     public void Markers_Are_Looked_Up_From_Schema_When_Missing_On_Fields()
     {
-        var inputs = new CustomerEntityInputs { Identifier = "Lookup" };
-        inputs.Table = "Lookup";
+        var inputs = new CustomerEntityInputs
+        {
+            Identifier = "Lookup",
+            Table = "Lookup"
+        };
         var schema = (CustomerDataSchema)inputs.DataSchema;
         AddField(schema, "Lookup", F("LookupId", "int", nullable: false));
         schema.OnGetPrimaryKeyFields = (_, _) => ["LookupId"];
@@ -59,8 +65,11 @@ public partial class EntityModelFactoryTests
     [Fact]
     public void First_Field_Is_Used_As_Id_Field_When_No_PK_Or_Identity()
     {
-        var inputs = new CustomerEntityInputs { Identifier = "Num" };
-        inputs.Table = "Num";
+        var inputs = new CustomerEntityInputs
+        {
+            Identifier = "Num",
+            Table = "Num"
+        };
         var schema = (CustomerDataSchema)inputs.DataSchema;
         AddField(schema, "Num", F("NumValue", "decimal"));
 
@@ -72,8 +81,11 @@ public partial class EntityModelFactoryTests
     [Fact]
     public void Sql_Types_Are_Mapped_To_Field_Types_And_Kind_Types()
     {
-        var inputs = new CustomerEntityInputs { Identifier = "T" };
-        inputs.Table = "T";
+        var inputs = new CustomerEntityInputs
+        {
+            Identifier = "T",
+            Table = "T"
+        };
         var schema = (CustomerDataSchema)inputs.DataSchema;
         AddField(schema, "T", F("TBit", "bit"));
         AddField(schema, "T", F("TDate", "date"));
@@ -105,8 +117,11 @@ public partial class EntityModelFactoryTests
     [Fact]
     public void Non_String_Only_Table_Has_No_Name_Field()
     {
-        var inputs = new CustomerEntityInputs { Identifier = "Num2" };
-        inputs.Table = "Num2";
+        var inputs = new CustomerEntityInputs
+        {
+            Identifier = "Num2",
+            Table = "Num2"
+        };
         var schema = (CustomerDataSchema)inputs.DataSchema;
         AddField(schema, "Num2", F("Num2Id", "int", pk: true, nullable: false));
         AddField(schema, "Num2", F("Num2Count", "int"));

@@ -19,8 +19,10 @@ public partial class ProjectFileInfoTests
 
         var info = new ProjectFileInfo(fileSystem, projectFile,
             getProperty is null ? null : name => getProperty(name),
-            onError);
-        info.ExecuteMSBuild = executeMSBuild;
+            onError)
+        {
+            ExecuteMSBuild = executeMSBuild
+        };
         return info;
     }
 
