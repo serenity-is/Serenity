@@ -1,3 +1,5 @@
+using Serenity.Localization;
+
 namespace Serene.Administration.Repositories;
 
 public class TranslationRepositoryTests
