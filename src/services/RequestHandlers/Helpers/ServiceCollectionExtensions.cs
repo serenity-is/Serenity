@@ -284,10 +284,11 @@ public static class ServiceCollectionExtensions
     {
         ArgumentNullException.ThrowIfNull(textRegistry);
 
-        textRegistry.AddNavigationTexts(typeSource);
+        textRegistry.AddImplicitTexts(typeSource);
         textRegistry.AddPropertyItemsTexts(typeSource);
-        textRegistry.AddNestedTexts(typeSource);
+        textRegistry.AddNavigationTexts(typeSource);
         textRegistry.AddEnumTexts(typeSource);
+        textRegistry.AddNestedTexts(typeSource);
         textRegistry.AddNestedPermissions(typeSource);
 
         rowTypeRegistry ??= new DefaultRowTypeRegistry(typeSource);
