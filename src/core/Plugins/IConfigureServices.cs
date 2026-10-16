@@ -6,6 +6,11 @@ namespace Serenity.Plugins;
 /// <summary>
 /// Interface for plugins that require configuring their own services or options.
 /// </summary>
+/// <remarks>
+/// This type is part of a legacy plugin system design and is no longer used by
+/// the framework. Register services through dependency injection instead, e.g.
+/// using <c>AddAutoRegisteredServices</c> and <c>IConfigureOptions</c>.
+/// </remarks>
 public interface IConfigureServices
 {
     /// <summary>
