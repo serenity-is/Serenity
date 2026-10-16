@@ -8,7 +8,7 @@ namespace Serenity.Web;
 /// <summary>
 /// Contains import map related extension methods for HTML helpers and HTTP contexts.
 /// </summary>
-public static partial class HtmlImportMapExtensions
+public static class HtmlImportMapExtensions
 {
     const string importMapKey = "HtmlScriptExtensions:ImportMap";
 

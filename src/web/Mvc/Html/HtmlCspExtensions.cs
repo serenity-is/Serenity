@@ -11,7 +11,7 @@ namespace Serenity.Web;
 /// <summary>
 /// Contains CSP related extension methods for HTML helpers and HTTP contexts.
 /// </summary>
-public static partial class HtmlCspExtensions
+public static class HtmlCspExtensions
 {
     const string NonceKey = "HtmlCspExtensions:Nonce";
 

@@ -46,7 +46,7 @@ public class LayoutCssFilesTests
     public void LayoutCssFiles_Throws_For_Null_Helper()
     {
         Assert.Throws<ArgumentNullException>(() =>
-            HtmlScriptExtensions.LayoutCssFiles(null!));
+            HtmlLayoutCssFilesExtensions.LayoutCssFiles(null!));
     }
 
     [Fact]
