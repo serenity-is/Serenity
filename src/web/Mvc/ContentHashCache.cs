@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.FileProviders;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Serenity.IO;
@@ -23,6 +22,7 @@ public class ContentHashCache : IContentHashCache, IDisposable
     private readonly IWebHostEnvironment hostEnvironment;
     private readonly IHttpContextAccessor? httpContextAccessor;
     private readonly IMemoryCache memoryCache;
+    private readonly IWebRootFileWatcher? fileWatcher;
     private readonly IDisposable? ownedMemoryCache;
     private CancellationTokenSource tokenSource = new();
 
@@ -64,15 +64,18 @@ public class ContentHashCache : IContentHashCache, IDisposable
     /// <param name="memoryCache">The memory cache.</param>
     /// <param name="hostEnvironment">The host environment.</param>
     /// <param name="httpContextAccessor">The HTTP context accessor.</param>
+    /// <param name="fileWatcher">The web root file watcher, used to invalidate hashes in development.</param>
     /// <exception cref="ArgumentNullException"><paramref name="hostEnvironment"/> is <c>null</c>.</exception>
     public ContentHashCache(IOptions<CDNSettings> cdnSettings,
         IMemoryCache memoryCache,
         IWebHostEnvironment hostEnvironment,
-        IHttpContextAccessor? httpContextAccessor = null)
+        IHttpContextAccessor? httpContextAccessor = null,
+        IWebRootFileWatcher? fileWatcher = null)
     {
         this.memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
         this.hostEnvironment = hostEnvironment ?? throw new ArgumentNullException(nameof(hostEnvironment));
         this.httpContextAccessor = httpContextAccessor;
+        this.fileWatcher = fileWatcher;
 
         var cdn = cdnSettings.Value;
         cdnEnabled = cdn.Enabled == true && !string.IsNullOrEmpty(cdn.Url);
@@ -91,9 +94,12 @@ public class ContentHashCache : IContentHashCache, IDisposable
     /// <param name="cdnSettings">The CDN settings.</param>
     /// <param name="hostEnvironment">The host environment.</param>
     /// <param name="httpContextAccessor">The HTTP context accessor.</param>
+    /// <param name="fileWatcher">The web root file watcher, used to invalidate hashes in development.</param>
     public ContentHashCache(IOptions<CDNSettings> cdnSettings,
-        IWebHostEnvironment hostEnvironment, IHttpContextAccessor? httpContextAccessor = null)
-        : this(cdnSettings, new MemoryCache(new MemoryCacheOptions()), hostEnvironment, httpContextAccessor)
+        IWebHostEnvironment hostEnvironment, IHttpContextAccessor? httpContextAccessor = null,
+        IWebRootFileWatcher? fileWatcher = null)
+        : this(cdnSettings, new MemoryCache(new MemoryCacheOptions()), hostEnvironment,
+            httpContextAccessor, fileWatcher)
     {
         ownedMemoryCache = memoryCache;
     }
@@ -107,67 +113,8 @@ public class ContentHashCache : IContentHashCache, IDisposable
     }
 
     private readonly Lock @lock = new();
-    private readonly Dictionary<string, IFileProvider> watchFileProviders = new(
-        OperatingSystem.IsWindows() ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal);
 
-    private static bool IsSameOrChildDirectory(string root, string path)
-    {
-        var relative = System.IO.Path.GetRelativePath(root, path);
-        return !System.IO.Path.IsPathRooted(relative) &&
-            relative != ".." &&
-            !relative.StartsWith(".." + System.IO.Path.DirectorySeparatorChar, StringComparison.Ordinal);
-    }
-
-    private IChangeToken? WatchPhysicalFile(string physicalPath)
-    {
-        var directory = PathHelper.ToUrl(System.IO.Path.GetDirectoryName(physicalPath));
-        if (string.IsNullOrEmpty(directory))
-            return null;
-
-        var wwwroot = directory.IndexOf("/wwwroot/", StringComparison.Ordinal);
-        if (wwwroot >= 0)
-            directory = directory[0..(wwwroot + 8)];
-        else
-        {
-            var staticwebassets = directory.IndexOf("/staticwebassets/", StringComparison.Ordinal);
-            if (staticwebassets >= 0)
-                directory = directory[0..(staticwebassets + 16)];
-        }
-
-        var watchRoot = System.IO.Path.GetFullPath(PathHelper.ToPath(directory)!);
-        physicalPath = System.IO.Path.GetFullPath(physicalPath);
-        IFileProvider? provider = null;
-        string? providerRoot = null;
-        lock (@lock)
-        {
-            if (watchFileProviders.TryGetValue(watchRoot, out provider))
-                providerRoot = watchRoot;
-            else
-            {
-                foreach (var pair in watchFileProviders)
-                {
-                    if (IsSameOrChildDirectory(pair.Key, watchRoot) &&
-                        (providerRoot == null || pair.Key.Length > providerRoot.Length))
-                    {
-                        provider = pair.Value;
-                        providerRoot = pair.Key;
-                    }
-                }
-
-                if (provider == null)
-                {
-                    provider = new PhysicalFileProvider(watchRoot);
-                    providerRoot = watchRoot;
-                    watchFileProviders[watchRoot] = provider;
-                }
-            }
-        }
-
-        var filter = PathHelper.ToUrl(System.IO.Path.GetRelativePath(providerRoot!, physicalPath));
-        return provider.Watch(filter!);
-    }
-
-    private string GetFileSHA1(IFileInfo file, out IChangeToken? changeToken)
+    private string GetFileSHA1(string webRelativePath, IFileInfo file, out IChangeToken? changeToken)
     {
         byte[] hash;
         changeToken = null;
@@ -177,14 +124,7 @@ public class ContentHashCache : IContentHashCache, IDisposable
             var physicalPath = file.PhysicalPath;
             if (physicalPath != null && System.IO.File.Exists(physicalPath))
             {
-                try
-                {
-                    if (hostEnvironment.IsDevelopment())
-                        changeToken = WatchPhysicalFile(physicalPath);
-                }
-                catch
-                {
-                }
+                changeToken = fileWatcher?.GetChangeToken(webRelativePath);
 
                 try
                 {
@@ -287,7 +227,7 @@ public class ContentHashCache : IContentHashCache, IDisposable
                 var fileInfo = hostEnvironment.WebRootFileProvider.GetFileInfo(path);
                 if (fileInfo.Exists)
                 {
-                    hash = GetFileSHA1(fileInfo, out var changeToken);
+                    hash = GetFileSHA1(path, fileInfo, out var changeToken);
                     var cacheOpt = new MemoryCacheEntryOptions();
                     cacheOpt.AddExpirationToken(new CancellationChangeToken(scriptsChangedToken));
                     if (changeToken != null)
@@ -326,15 +266,6 @@ public class ContentHashCache : IContentHashCache, IDisposable
     /// <inheritdoc/>
     public void Dispose()
     {
-        lock (@lock)
-        {
-            foreach (var provider in watchFileProviders.Values)
-            {
-                if (provider is IDisposable disposable)
-                    disposable.Dispose();
-            }
-            watchFileProviders.Clear();
-        }
         ownedMemoryCache?.Dispose();
         GC.SuppressFinalize(this);
     }

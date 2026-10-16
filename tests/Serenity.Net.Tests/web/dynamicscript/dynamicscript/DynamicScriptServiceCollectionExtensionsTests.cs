@@ -216,6 +216,46 @@ public class DynamicScriptServiceCollectionExtensionsTests
         Assert.True(scriptManager.IsRegistered("FormBundle"));
     }
 
+    private sealed class StubLayoutCssFileProvider : ILayoutCssFileProvider
+    {
+        public IReadOnlyList<string> GetFiles() => [];
+    }
+
+    [Fact]
+    public void UseDynamicScriptTypes_Registers_LayoutCss_Bundle_When_Available()
+    {
+        var scriptManager = new MockDynamicScriptManager();
+        var env = new MockHostEnvironment();
+        var builder = new CssBundleBuilder(Options.Create(new CssBundlingOptions()),
+            scriptManager, new MockCssMinifier(), env);
+        var services = new ServiceCollection()
+            .AddSingleton<IDynamicScriptManager>(scriptManager)
+            .AddSingleton<IPropertyItemProvider>(new MockPropertyItemProvider())
+            .AddSingleton<ITypeSource>(new MockTypeSource())
+            .AddSingleton<ILayoutCssFileProvider>(new StubLayoutCssFileProvider())
+            .AddSingleton<ICssBundleBuilder>(builder)
+            .BuildServiceProvider();
+
+        services.UseDynamicScriptTypes();
+
+        Assert.True(scriptManager.IsRegistered(LayoutCssBundleScript.ScriptName));
+    }
+
+    [Fact]
+    public void UseDynamicScriptTypes_Does_Not_Register_LayoutCss_Bundle_Without_Services()
+    {
+        var scriptManager = new MockDynamicScriptManager();
+        var services = new ServiceCollection()
+            .AddSingleton<IDynamicScriptManager>(scriptManager)
+            .AddSingleton<IPropertyItemProvider>(new MockPropertyItemProvider())
+            .AddSingleton<ITypeSource>(new MockTypeSource())
+            .BuildServiceProvider();
+
+        services.UseDynamicScriptTypes();
+
+        Assert.False(scriptManager.IsRegistered(LayoutCssBundleScript.ScriptName));
+    }
+
     [Fact]
     public void UseCssWatching_Default_Path_Watches_Content()
     {

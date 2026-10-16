@@ -21,7 +21,8 @@ public class CssBundleManagerTests
         var scripts = new MockDynamicScriptManager();
         var minifier = new MockCssMinifier();
         var manager = new CssBundleManager(Microsoft.Extensions.Options.Options.Create(options),
-            scripts, minifier, env, accessor);
+            scripts, new CssBundleBuilder(Microsoft.Extensions.Options.Options.Create(options),
+                scripts, minifier, env), env, accessor);
         return (manager, scripts, env, options, minifier);
     }
 
@@ -32,15 +33,16 @@ public class CssBundleManagerTests
         var options = Microsoft.Extensions.Options.Options.Create(new CssBundlingOptions());
         var scripts = new MockDynamicScriptManager();
         var minifier = new MockCssMinifier();
+        var builder = new CssBundleBuilder(options, scripts, minifier, env);
 
         Assert.Throws<ArgumentNullException>(() =>
-            new CssBundleManager(null!, scripts, minifier, env));
+            new CssBundleManager(null!, scripts, builder, env));
         Assert.Throws<ArgumentNullException>(() =>
-            new CssBundleManager(options, null!, minifier, env));
+            new CssBundleManager(options, null!, builder, env));
         Assert.Throws<ArgumentNullException>(() =>
             new CssBundleManager(options, scripts, null!, env));
         Assert.Throws<ArgumentNullException>(() =>
-            new CssBundleManager(options, scripts, minifier, null!));
+            new CssBundleManager(options, scripts, builder, null!));
     }
 
     [Fact]

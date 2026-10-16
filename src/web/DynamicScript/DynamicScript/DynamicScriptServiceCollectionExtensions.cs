@@ -68,6 +68,7 @@ public static class DynamicScriptServiceCollectionExtensions
         AddFileWatcherFactory(collection);
         collection.AddMemoryCache();
         collection.AddOptions();
+        collection.TryAddSingleton<IWebRootFileWatcher, WebRootFileWatcher>();
         collection.TryAddSingleton<IContentHashCache, ContentHashCache>();
         return collection;
     }
@@ -86,6 +87,9 @@ public static class DynamicScriptServiceCollectionExtensions
         collection.AddDynamicScriptManager();
         collection.AddContentHashCache();
         collection.AddEsBuildCssMinifier();
+        collection.TryAddSingleton<ICssBundleBuilder, CssBundleBuilder>();
+        collection.TryAddSingleton<ILayoutCssFileProvider, LayoutCssFileProvider>();
+        collection.TryAddSingleton<ILayoutCssFileWatcher, LayoutCssFileWatcher>();
         collection.TryAddSingleton<ICssBundleManager, CssBundleManager>();
         return collection;
     }
@@ -217,7 +221,33 @@ public static class DynamicScriptServiceCollectionExtensions
                 Permission = SpecialPermissionKeys.Public
             });
 
+        RegisterLayoutCssBundle(serviceProvider, scriptManager);
+
         return serviceProvider;
+    }
+
+    /// <summary>
+    /// Registers the predefined <see cref="LayoutCssBundleScript"/> when CSS bundling
+    /// (and thus the layout CSS file provider and bundle builder) is available.
+    /// </summary>
+    /// <param name="serviceProvider">The service provider.</param>
+    /// <param name="scriptManager">The dynamic script manager.</param>
+    private static void RegisterLayoutCssBundle(IServiceProvider serviceProvider,
+        IDynamicScriptManager scriptManager)
+    {
+        var fileProvider = serviceProvider.GetService<ILayoutCssFileProvider>();
+        var bundleBuilder = serviceProvider.GetService<ICssBundleBuilder>();
+        if (fileProvider == null || bundleBuilder == null)
+            return;
+
+        scriptManager.Register(LayoutCssBundleScript.ScriptName,
+            new LayoutCssBundleScript(fileProvider, bundleBuilder)
+            {
+                Permission = SpecialPermissionKeys.Public
+            });
+
+        serviceProvider.GetService<ILayoutCssFileWatcher>()?.Watch(
+            LayoutCssBundleScript.ScriptName, fileProvider.GetFiles());
     }
 
     /// <summary>
