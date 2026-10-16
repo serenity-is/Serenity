@@ -1,23 +1,26 @@
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Primitives;
 
 namespace Serenity.Web;
 
 public class LayoutCssFilesTests
 {
-    private sealed class RecordingLayoutCssFileWatcher : ILayoutCssFileWatcher
+    private sealed class RecordingWebRootFileWatcher : IWebRootFileWatcher
     {
-        public List<(string ScriptName, IReadOnlyList<string> Files)> Calls { get; } = [];
+        public List<(string Key, IReadOnlyList<string> Files)> Calls { get; } = [];
 
-        public void Watch(string scriptName, IReadOnlyList<string> appRelativeUrls)
+        public IChangeToken? GetChangeToken(string webRelativePath) => null;
+
+        public void RegisterCallback(string key, IEnumerable<string> appRelativePaths, Action callback)
         {
-            Calls.Add((scriptName, appRelativeUrls));
+            Calls.Add((key, appRelativePaths.ToList()));
         }
     }
 
     private static ServiceProvider CreateServices(Attribute[] attributes,
         MockDynamicScriptManager scripts, MockHostEnvironment env,
         LayoutCssFileOptions? options = null, bool bundlingEnabled = true,
-        IFeatureToggles? featureToggles = null, ILayoutCssFileWatcher? layoutWatcher = null)
+        IFeatureToggles? featureToggles = null, IWebRootFileWatcher? layoutWatcher = null)
     {
         var services = new ServiceCollection();
         services.AddSingleton<IDynamicScriptManager>(scripts);
@@ -46,7 +49,7 @@ public class LayoutCssFilesTests
     public void LayoutCssFiles_Throws_For_Null_Helper()
     {
         Assert.Throws<ArgumentNullException>(() =>
-            HtmlLayoutCssFilesExtensions.LayoutCssFiles(null!));
+            HtmlLayoutFilesExtensions.LayoutCssFiles(null!));
     }
 
     [Fact]
@@ -163,7 +166,7 @@ public class LayoutCssFilesTests
         var env = new MockHostEnvironment();
         env.AddWebFile("a.css", "A_MARK{}");
         var scripts = new MockDynamicScriptManager();
-        var layoutWatcher = new RecordingLayoutCssFileWatcher();
+        var layoutWatcher = new RecordingWebRootFileWatcher();
         var html = MockHtmlHelper.Create(CreateServices([
             new LayoutCssFileAttribute("~/a.css"),
         ], scripts, env, layoutWatcher: layoutWatcher));
@@ -173,7 +176,7 @@ public class LayoutCssFilesTests
         var call = Assert.Single(layoutWatcher.Calls);
         Assert.Equal(["~/a.css"], call.Files);
 
-        var disabledWatcher = new RecordingLayoutCssFileWatcher();
+        var disabledWatcher = new RecordingWebRootFileWatcher();
         var disabledScripts = new MockDynamicScriptManager();
         var disabledHtml = MockHtmlHelper.Create(CreateServices([
             new LayoutCssFileAttribute("~/a.css"),

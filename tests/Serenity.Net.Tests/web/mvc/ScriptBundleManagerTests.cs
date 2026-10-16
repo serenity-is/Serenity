@@ -21,7 +21,8 @@ public class ScriptBundleManagerTests
         var scripts = new MockDynamicScriptManager();
         var minifier = new MockScriptMinifier();
         var manager = new ScriptBundleManager(Options.Create(options),
-            minifier, scripts, env, accessor);
+            new ScriptBundleBuilder(Options.Create(options), minifier, scripts, env, accessor),
+            scripts, env, accessor);
         return (manager, scripts, env, options, minifier);
     }
 
@@ -32,15 +33,16 @@ public class ScriptBundleManagerTests
         var options = Options.Create(new ScriptBundlingOptions());
         var scripts = new MockDynamicScriptManager();
         var minifier = new MockScriptMinifier();
+        var builder = new ScriptBundleBuilder(options, minifier, scripts, env);
 
         Assert.Throws<ArgumentNullException>(() =>
-            new ScriptBundleManager(null!, minifier, scripts, env));
+            new ScriptBundleManager(null!, builder, scripts, env));
         Assert.Throws<ArgumentNullException>(() =>
             new ScriptBundleManager(options, null!, scripts, env));
         Assert.Throws<ArgumentNullException>(() =>
-            new ScriptBundleManager(options, minifier, null!, env));
+            new ScriptBundleManager(options, builder, null!, env));
         Assert.Throws<ArgumentNullException>(() =>
-            new ScriptBundleManager(options, minifier, scripts, null!));
+            new ScriptBundleManager(options, builder, scripts, null!));
     }
 
     [Fact]

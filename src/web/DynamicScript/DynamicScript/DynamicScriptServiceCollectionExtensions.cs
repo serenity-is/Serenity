@@ -89,7 +89,6 @@ public static class DynamicScriptServiceCollectionExtensions
         collection.AddEsBuildCssMinifier();
         collection.TryAddSingleton<ICssBundleBuilder, CssBundleBuilder>();
         collection.TryAddSingleton<ILayoutCssFileProvider, LayoutCssFileProvider>();
-        collection.TryAddSingleton<ILayoutCssFileWatcher, LayoutCssFileWatcher>();
         collection.TryAddSingleton<ICssBundleManager, CssBundleManager>();
         return collection;
     }
@@ -137,6 +136,8 @@ public static class DynamicScriptServiceCollectionExtensions
         collection.AddDynamicScriptManager();
         collection.AddContentHashCache();
         collection.AddEsBuildScriptMinifier();
+        collection.TryAddSingleton<IScriptBundleBuilder, ScriptBundleBuilder>();
+        collection.TryAddSingleton<ILayoutScriptFileProvider, LayoutScriptFileProvider>();
         collection.TryAddSingleton<IScriptBundleManager, ScriptBundleManager>();
         return collection;
     }
@@ -222,6 +223,7 @@ public static class DynamicScriptServiceCollectionExtensions
             });
 
         RegisterLayoutCssBundle(serviceProvider, scriptManager);
+        RegisterLayoutScriptBundle(serviceProvider, scriptManager);
 
         return serviceProvider;
     }
@@ -246,8 +248,34 @@ public static class DynamicScriptServiceCollectionExtensions
                 Permission = SpecialPermissionKeys.Public
             });
 
-        serviceProvider.GetService<ILayoutCssFileWatcher>()?.Watch(
-            LayoutCssBundleScript.ScriptName, fileProvider.GetFiles());
+        serviceProvider.GetService<IWebRootFileWatcher>()?.RegisterCallback(
+            LayoutCssBundleScript.ScriptName, fileProvider.GetFiles(),
+            () => scriptManager.Changed(LayoutCssBundleScript.ScriptName));
+    }
+
+    /// <summary>
+    /// Registers the predefined <see cref="LayoutScriptBundleScript"/> when script bundling
+    /// (and thus the layout script file provider and bundle builder) is available.
+    /// </summary>
+    /// <param name="serviceProvider">The service provider.</param>
+    /// <param name="scriptManager">The dynamic script manager.</param>
+    private static void RegisterLayoutScriptBundle(IServiceProvider serviceProvider,
+        IDynamicScriptManager scriptManager)
+    {
+        var fileProvider = serviceProvider.GetService<ILayoutScriptFileProvider>();
+        var bundleBuilder = serviceProvider.GetService<IScriptBundleBuilder>();
+        if (fileProvider == null || bundleBuilder == null)
+            return;
+
+        scriptManager.Register(LayoutScriptBundleScript.ScriptName,
+            new LayoutScriptBundleScript(fileProvider, bundleBuilder)
+            {
+                Permission = SpecialPermissionKeys.Public
+            });
+
+        serviceProvider.GetService<IWebRootFileWatcher>()?.RegisterCallback(
+            LayoutScriptBundleScript.ScriptName, fileProvider.GetFiles(),
+            () => scriptManager.Changed(LayoutScriptBundleScript.ScriptName));
     }
 
     /// <summary>

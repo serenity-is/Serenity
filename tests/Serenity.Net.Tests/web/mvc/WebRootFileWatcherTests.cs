@@ -74,4 +74,53 @@ public class WebRootFileWatcherTests : IDisposable
 
         Assert.Null(watcher.GetChangeToken(path!));
     }
+
+    [Fact]
+    public void RegisterCallback_Registers_Once_Per_Key_In_Development()
+    {
+        using var watcher = new WebRootFileWatcher(CreateEnv("Development"));
+
+        watcher.RegisterCallback("k", ["~/a.css"], () => { });
+        Assert.Equal(1, watcher.SubscriptionCount);
+        Assert.Equal(1, watcher.RegisteredCallbackKeyCount);
+
+        watcher.RegisterCallback("k", ["~/a.css"], () => { });
+        Assert.Equal(1, watcher.SubscriptionCount);
+        Assert.Equal(1, watcher.RegisteredCallbackKeyCount);
+    }
+
+    [Fact]
+    public void RegisterCallback_Does_Nothing_In_Production()
+    {
+        using var watcher = new WebRootFileWatcher(CreateEnv("Production"));
+
+        watcher.RegisterCallback("k", ["~/a.css"], () => { });
+
+        Assert.Equal(0, watcher.SubscriptionCount);
+        Assert.Equal(0, watcher.RegisteredCallbackKeyCount);
+    }
+
+    [Fact]
+    public void RegisterCallback_Keeps_Key_When_No_Token_Available()
+    {
+        using var watcher = new WebRootFileWatcher(CreateEnv("Development"));
+
+        watcher.RegisterCallback("k", ["~/missing.css"], () => { });
+
+        Assert.Equal(0, watcher.SubscriptionCount);
+        Assert.Equal(0, watcher.RegisteredCallbackKeyCount);
+    }
+
+    [Fact]
+    public void RegisterCallback_Ignores_Empty_Arguments()
+    {
+        using var watcher = new WebRootFileWatcher(CreateEnv("Development"));
+
+        watcher.RegisterCallback("", ["~/a.css"], () => { });
+        watcher.RegisterCallback("k", [], () => { });
+        watcher.RegisterCallback("k", ["~/a.css"], null!);
+
+        Assert.Equal(0, watcher.SubscriptionCount);
+        Assert.Equal(0, watcher.RegisteredCallbackKeyCount);
+    }
 }

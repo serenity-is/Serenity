@@ -21,8 +21,11 @@ public class WebRootFileWatcher(IWebHostEnvironment hostEnvironment) : IWebRootF
     private readonly IWebHostEnvironment hostEnvironment = hostEnvironment
         ?? throw new ArgumentNullException(nameof(hostEnvironment));
     private readonly Lock @lock = new();
+    private static readonly IChangeToken neverChangeToken = new CancellationChangeToken(CancellationToken.None);
     private readonly Dictionary<string, IFileProvider> watchFileProviders = new(
         OperatingSystem.IsWindows() ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal);
+    private readonly HashSet<string> registeredCallbackKeys = new(StringComparer.OrdinalIgnoreCase);
+    private readonly List<IDisposable> subscriptions = [];
 
     private static bool IsSameOrChildDirectory(string root, string path)
     {
@@ -31,6 +34,10 @@ public class WebRootFileWatcher(IWebHostEnvironment hostEnvironment) : IWebRootF
             relative != ".." &&
             !relative.StartsWith(".." + System.IO.Path.DirectorySeparatorChar, StringComparison.Ordinal);
     }
+
+    internal int SubscriptionCount => subscriptions.Count;
+
+    internal int RegisteredCallbackKeyCount => registeredCallbackKeys.Count;
 
     /// <inheritdoc/>
     public IChangeToken? GetChangeToken(string webRelativePath)
@@ -54,6 +61,42 @@ public class WebRootFileWatcher(IWebHostEnvironment hostEnvironment) : IWebRootF
         catch
         {
             return null;
+        }
+    }
+
+    /// <inheritdoc/>
+    public void RegisterCallback(string key, IEnumerable<string> appRelativePaths, Action callback)
+    {
+        if (string.IsNullOrEmpty(key) ||
+            appRelativePaths == null ||
+            callback == null ||
+            !hostEnvironment.IsDevelopment())
+            return;
+
+        lock (@lock)
+        {
+            if (!registeredCallbackKeys.Add(key))
+                return;
+
+            var any = false;
+            foreach (var path in appRelativePaths)
+            {
+                if (string.IsNullOrEmpty(path))
+                    continue;
+
+                var webPath = path.StartsWith("~/", StringComparison.Ordinal) ? path[2..] : path;
+                if (GetChangeToken(webPath) == null)
+                    continue;
+
+                subscriptions.Add(ChangeToken.OnChange(
+                    () => GetChangeToken(webPath) ?? neverChangeToken,
+                    callback));
+
+                any = true;
+            }
+
+            if (!any)
+                registeredCallbackKeys.Remove(key);
         }
     }
 
@@ -109,6 +152,11 @@ public class WebRootFileWatcher(IWebHostEnvironment hostEnvironment) : IWebRootF
     {
         lock (@lock)
         {
+            foreach (var subscription in subscriptions)
+                subscription.Dispose();
+            subscriptions.Clear();
+            registeredCallbackKeys.Clear();
+
             foreach (var provider in watchFileProviders.Values)
             {
                 if (provider is IDisposable disposable)
