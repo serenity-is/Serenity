@@ -225,6 +225,31 @@ public class ContentHashCacheTests
     }
 
     [Fact]
+    public void ResolveWithHash_Uses_Cached_Hash_When_Cdn_Enabled()
+    {
+        var readCount = 0;
+        using var cache = CreateWithFileInfo(new TestFileInfo
+        {
+            CreateReadStreamCallback = () =>
+            {
+                readCount++;
+                return new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes("content"));
+            }
+        }, new ContentHashCache.CDNSettings
+        {
+            Enabled = true,
+            Url = "https://cdn.example.com/",
+            Include = ["Scripts/*"]
+        });
+
+        var first = cache.ResolveWithHash(PathString.Empty, "~/Scripts/site.js");
+        var second = cache.ResolveWithHash(PathString.Empty, "~/Scripts/site.js");
+
+        Assert.Equal(first, second);
+        Assert.Equal(1, readCount);
+    }
+
+    [Fact]
     public void ResolveWithHash_Applies_Cdn_With_Include_Filter()
     {
         var (cache, _) = Create(new ContentHashCache.CDNSettings
@@ -303,6 +328,25 @@ public class ContentHashCacheTests
         var third = cache.ResolveWithHash(PathString.Empty, "~/Scripts/site.js");
 
         Assert.NotEqual(first, third);
+    }
+
+    [Fact]
+    public void ResolveWithHash_Uses_Case_Sensitive_Cache_Keys()
+    {
+        var readCount = 0;
+        using var cache = CreateWithFileInfo(new TestFileInfo
+        {
+            CreateReadStreamCallback = () =>
+            {
+                readCount++;
+                return new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes("content"));
+            }
+        });
+
+        cache.ResolveWithHash(PathString.Empty, "~/Scripts/site.js");
+        cache.ResolveWithHash(PathString.Empty, "~/scripts/SITE.js");
+
+        Assert.Equal(2, readCount);
     }
 
     [Fact]

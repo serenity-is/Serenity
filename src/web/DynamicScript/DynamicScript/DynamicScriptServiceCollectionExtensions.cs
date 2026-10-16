@@ -66,6 +66,7 @@ public static class DynamicScriptServiceCollectionExtensions
         ArgumentNullException.ThrowIfNull(collection);
 
         AddFileWatcherFactory(collection);
+        collection.AddMemoryCache();
         collection.AddOptions();
         collection.TryAddSingleton<IContentHashCache, ContentHashCache>();
         return collection;
