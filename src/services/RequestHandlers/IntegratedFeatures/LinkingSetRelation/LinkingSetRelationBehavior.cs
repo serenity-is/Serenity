@@ -91,7 +91,7 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
 
         var detailRow = rowFactory();
 
-        thisKeyField = (detailRow.FindFieldByPropertyOrFieldName(attr.ThisKey) ??
+        thisKeyField = detailRow.FindFieldByPropertyOrFieldName(attr.ThisKey) ??
             throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
                 "This field is specified for a linking set relation in field '{2}' of row type '{3}'.",
                 attr.ThisKey, detailRow.GetType().FullName,

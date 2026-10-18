@@ -76,7 +76,7 @@ public class UpdatableExtensionBehavior(IDefaultHandlerFactory handlerFactory) :
             }
             else
             {
-                info.ThisKeyField = (row.FindFieldByPropertyOrFieldName(attr.ThisKey!) ??
+                info.ThisKeyField = row.FindFieldByPropertyOrFieldName(attr.ThisKey!) ??
                     throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
                         "This field is specified for an ExtensionRelation attribute",
                         attr.ThisKey,
