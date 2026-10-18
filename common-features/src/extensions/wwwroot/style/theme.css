@@ -10,7 +10,6 @@
  *
  *   .my-icon { --sv: url("/icons/my-icon.svg"); }
  *   <i class="sv my-icon"></i>
- *   <i class="svmask my-icon"></i> same as .sv
  *
  * Background - keeps the SVG's own colors (palette icons, two color icons):
  *
@@ -60,7 +59,6 @@
 }
 
 .sv::before,
-.svmask::before,
 [class^="sv-"]::before,
 [class*=" sv-"]::before {
     content: "";
