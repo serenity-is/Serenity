@@ -184,6 +184,11 @@ public abstract partial class Field : IFieldWithJoinInfo
         set { propertyName = value; }
     }
 
+    /// <summary>
+    /// Gets the public name which is property name or name of the field.
+    /// </summary>
+    public string PublicName => propertyName ?? name;
+
     internal object[] customAttributes;
 
     /// <summary>

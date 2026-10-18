@@ -383,7 +383,7 @@ public static class EntitySqlHelper
                 catch (Exception ex)
                 {
                     throw new InvalidOperationException(string.Format(FieldReadValueError,
-                        field.PropertyName ?? field.Name, row.GetType().FullName, ex.Message), ex);
+                        field.PublicName, row.GetType().FullName, ex.Message), ex);
                 }
                 continue;
             }
@@ -399,7 +399,7 @@ public static class EntitySqlHelper
                 catch (Exception ex)
                 {
                     throw new InvalidOperationException(string.Format(FieldReadValueError,
-                        intoField.PropertyName ?? intoField.Name, row.GetType().FullName, ex.Message), ex);
+                        intoField.PublicName, row.GetType().FullName, ex.Message), ex);
                 }
                 continue;
             }

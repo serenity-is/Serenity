@@ -66,7 +66,7 @@ public static class EntityLocalTexts
                     if (languageID != LocalText.InvariantLanguageID)
                         continue;
 
-                    lt = field.Caption = new LocalText(field.PropertyName ?? field.Name);
+                    lt = field.Caption = new LocalText(field.PublicName);
                 }
 
                 if (displayAttr is IHasTextKey hasTextKey &&

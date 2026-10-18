@@ -79,7 +79,7 @@ public class JsonRowConverter : JsonConverter
                         var f = fields[i];
                         if (!f.IsNull(row) || serializer.NullValueHandling == Newtonsoft.Json.NullValueHandling.Include)
                         {
-                            writer.WritePropertyName(f.PropertyName ?? f.Name);
+                            writer.WritePropertyName(f.PublicName);
                             f.ValueToJson(writer, row, serializer);
                         }
                     }
@@ -91,7 +91,7 @@ public class JsonRowConverter : JsonConverter
             foreach (var f in fields)
                 if (!f.IsNull(row) || serializer.NullValueHandling == Newtonsoft.Json.NullValueHandling.Include)
                 {
-                    writer.WritePropertyName(f.PropertyName ?? f.Name);
+                    writer.WritePropertyName(f.PublicName);
                     f.ValueToJson(writer, row, serializer);
                 }
         }

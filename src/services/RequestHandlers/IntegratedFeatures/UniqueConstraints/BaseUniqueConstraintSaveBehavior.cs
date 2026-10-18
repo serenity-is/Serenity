@@ -105,7 +105,7 @@ public abstract class BaseUniqueConstraintSaveBehavior : BaseSaveBehaviorAsync, 
         ITextLocalizer localizer, string? errorMessage)
     {
         return new ValidationError("UniqueViolation",
-            string.Join(", ", fields.Select(x => x.PropertyName ?? x.Name)),
+            string.Join(", ", fields.Select(x => x.PublicName)),
             string.Format(!string.IsNullOrEmpty(errorMessage) ?
                 (localizer.TryGet(errorMessage) ?? errorMessage) :
                     localizer.Get("Validation.UniqueConstraint"),

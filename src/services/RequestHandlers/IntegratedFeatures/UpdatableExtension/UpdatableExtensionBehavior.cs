@@ -184,8 +184,8 @@ public class UpdatableExtensionBehavior(IDefaultHandlerFactory handlerFactory) :
                         "Their '{2}' and '{3}' fields are matched but they have different types ({4} and {5})!",
                             row.GetType().FullName,
                             ext.GetType().FullName,
-                            field.PropertyName ?? field.Name,
-                            match.PropertyName ?? match.Name,
+                            field.PublicName,
+                            match.PublicName,
                             field.GetType().Name,
                             match.GetType().Name));
 
@@ -261,12 +261,12 @@ public class UpdatableExtensionBehavior(IDefaultHandlerFactory handlerFactory) :
 
     private static void ApplyFilter(ListRequest listRequest, RelationInfo info, object? thisKey)
     {
-        var criteria = new Criteria(info.OtherKeyField!.PropertyName ?? info.OtherKeyField.Name) ==
+        var criteria = new Criteria(info.OtherKeyField!.PublicName) ==
             new ValueCriteria(thisKey);
 
         if (info.FilterField is not null)
         {
-            var flt = new Criteria(info.FilterField.PropertyName ?? info.FilterField.Name);
+            var flt = new Criteria(info.FilterField.PublicName);
             if (info.FilterValue == null)
                 criteria &= flt.IsNull();
             else

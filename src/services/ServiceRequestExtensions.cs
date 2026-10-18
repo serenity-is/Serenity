@@ -13,8 +13,8 @@ public static class ServiceRequestExtensions
     public static TRequest IncludeField<TRequest>(this TRequest request, Field field)
         where TRequest : ServiceRequest, IIncludeExcludeColumns
     {
-        request.IncludeColumns ??= new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        request.IncludeColumns.Add(field.PropertyName ?? field.Name);
+        request.IncludeColumns ??= new(StringComparer.OrdinalIgnoreCase);
+        request.IncludeColumns.Add(field.PublicName);
         return request;
     }
 }

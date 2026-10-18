@@ -55,7 +55,7 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
         {
             throw new ArgumentException(string.Format("Field '{0}' in row type '{1}' has a [LinkingSetRelation] attribute " +
                 "but it doesn't implement IIdRow!",
-                Target.PropertyName ?? Target.Name, row.GetType().FullName));
+                Target.PublicName, row.GetType().FullName));
         }
 
         var listType = Target.ValueType;
@@ -64,7 +64,7 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
         {
             throw new ArgumentException(string.Format("Field '{0}' in row type '{1}' has a [LinkingSetRelation] attribute " +
                 "but its property type is not a generic List (e.g. List<int>)!",
-                Target.PropertyName ?? Target.Name, row.GetType().FullName));
+                Target.PublicName, row.GetType().FullName));
         }
 
         rowType = attr.RowType;
@@ -75,7 +75,7 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
             throw new ArgumentException(string.Format(
                 "Field '{0}' in row type '{1}' has a LinkingSetRelationBehavior " +
                 "but specified row type is not valid row class!",
-                    Target.PropertyName ?? Target.Name, row.GetType().FullName));
+                    Target.PublicName, row.GetType().FullName));
         }
 
         if (!typeof(IIdRow).IsAssignableFrom(rowType))
@@ -83,7 +83,7 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
             throw new ArgumentException(string.Format(
                 "Field '{0}' in row type '{1}' has a LinkingSetRelationBehavior " +
                 "but specified row type doesn't implement IIdRow!",
-                    Target.PropertyName ?? Target.Name, row.GetType().FullName));
+                    Target.PublicName, row.GetType().FullName));
         }
 
         listFactory = () => (IList)Activator.CreateInstance(listType)!;
@@ -95,22 +95,22 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
             throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
                 "This field is specified for a linking set relation in field '{2}' of row type '{3}'.",
                 attr.ThisKey, detailRow.GetType().FullName,
-                Target.PropertyName ?? Target.Name, row.GetType().FullName));
-        thisKeyCriteria = new Criteria(thisKeyField.PropertyName ?? thisKeyField.Name);
+                Target.PublicName, row.GetType().FullName));
+        thisKeyCriteria = new Criteria(thisKeyField.PublicName);
 
         itemKeyField = detailRow.FindFieldByPropertyOrFieldName(attr.ItemKey) ?? 
             throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
                 "This field is specified for a linking set relation in field '{2}' of row type '{3}'.",
                 attr.ItemKey, detailRow.GetType().FullName,
-                Target.PropertyName ?? Target.Name, row.GetType().FullName));
+                Target.PublicName, row.GetType().FullName));
         if (!string.IsNullOrEmpty(attr.FilterField))
         {
             filterField = detailRow.FindFieldByPropertyOrFieldName(attr.FilterField) ?? 
                 throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
                     "This field is specified for a linking set relation as FilterField in field '{2}' of row type '{3}'.",
                     attr.FilterField, detailRow.GetType().FullName,
-                    Target.PropertyName ?? Target.Name, row.GetType().FullName));
-            filterCriteria = new Criteria(filterField.PropertyName ?? filterField.Name);
+                    Target.PublicName, row.GetType().FullName));
+            filterCriteria = new Criteria(filterField.PublicName);
             filterValue = filterField.ConvertValue(attr.FilterValue, CultureInfo.InvariantCulture);
             if (filterValue == null)
             {
@@ -219,7 +219,7 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
     {
         var idField = handler.Row.GetIdField();
         listRequest.ColumnSelection = ColumnSelection.KeyOnly;
-        listRequest.IncludeColumns = [itemKeyField.PropertyName ?? itemKeyField.Name];
+        listRequest.IncludeColumns = [itemKeyField.PublicName];
         listRequest.Criteria = thisKeyCriteria == new ValueCriteria(idField.AsObject(handler.Row)) & filterCriteria;
         return listRequest;
     }
@@ -249,8 +249,8 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
         listRequest.ColumnSelection = ColumnSelection.KeyOnly;
         listRequest.IncludeColumns =
         [
-            itemKeyField.PropertyName ?? itemKeyField.Name,
-            thisKeyField.PropertyName ?? thisKeyField.Name
+            itemKeyField.PublicName,
+            thisKeyField.PublicName
         ];
 
         var entities = handler.Response.Entities.Cast<IRow>().ToList();
@@ -289,8 +289,8 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
         listRequest.ColumnSelection = ColumnSelection.KeyOnly;
         listRequest.IncludeColumns =
         [
-            itemKeyField.PropertyName ?? itemKeyField.Name,
-            thisKeyField.PropertyName ?? thisKeyField.Name
+            itemKeyField.PublicName,
+            thisKeyField.PublicName
         ];
 
         var entities = handler.Response.Entities.Cast<IRow>().ToList();

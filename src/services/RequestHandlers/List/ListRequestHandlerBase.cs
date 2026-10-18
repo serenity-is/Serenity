@@ -65,11 +65,11 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(
     {
         var sortOrders = Row.GetFields().SortOrders;
         if (!sortOrders.IsEmptyOrNull())
-            return [.. sortOrders.Select(x => new SortBy(x.Item1.PropertyName ?? x.Item1.Name, x.Item2))];
+            return [.. sortOrders.Select(x => new SortBy(x.Item1.PublicName, x.Item2))];
 
         var nameField = Row.NameField;
         if (nameField is not null)
-            return [new SortBy(nameField.Name, false)];
+            return [new SortBy(nameField.PublicName, false)];
 
         return null;
     }
@@ -340,8 +340,8 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(
         if (field.Flags.HasFlag(FieldFlags.NotMapped) &&
             MapFieldExpression(field, Query) is not string)
         {
-            throw new ArgumentOutOfRangeException(field.PropertyName ?? field.Name,
-                $"Can't apply contains text on field {field.PropertyName ?? field.Name}");
+            throw new ArgumentOutOfRangeException(field.PublicName,
+                $"Can't apply contains text on field {field.PublicName}");
         }
 
         if (numericOnly == true && (id == null))
@@ -565,8 +565,8 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(
     {
         if (field.Flags.HasFlag(FieldFlags.NotMapped) || !AllowFilterField(field))
         {
-            throw new ArgumentOutOfRangeException(field.PropertyName ?? field.Name,
-                $"Can't apply equality filter on field '{field.PropertyName ?? field.Name}' for {Row.GetType().Name}!");
+            throw new ArgumentOutOfRangeException(field.PublicName,
+                $"Can't apply equality filter on field '{field.PublicName}' for {Row.GetType().Name}!");
         }
 
         if (value is not string && value is IEnumerable enumerable)

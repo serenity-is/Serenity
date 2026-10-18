@@ -80,7 +80,7 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
         var dictionaryType = typeof(Dictionary<,>).MakeGenericType(typeof(string), row.GetType());
         dictionaryFactory = () => (IDictionary)Activator.CreateInstance(dictionaryType)!;
 
-        foreignKeyCriteria = new Criteria(foreignKeyField.PropertyName ?? foreignKeyField.Name);
+        foreignKeyCriteria = new Criteria(foreignKeyField.PublicName);
         return true;
     }
 
@@ -415,7 +415,7 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
                     continue;
 
                 var match = GetLocalizationMatch(field) ?? throw new ValidationError("CantLocalize", field.Name, string.Format("{0} field is not localizable!",
-                        field.PropertyName ?? field.Name));
+                        field.PublicName));
                 var value = field.AsObject(row);
 
                 if (!IsFieldEditable(handler, field))
@@ -482,7 +482,7 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
                     continue;
 
                 var match = GetLocalizationMatch(field) ?? throw new ValidationError("CantLocalize", field.Name, string.Format("{0} field is not localizable!",
-                        field.PropertyName ?? field.Name));
+                        field.PublicName));
                 var value = field.AsObject(row);
 
                 if (!IsFieldEditable(handler, field))

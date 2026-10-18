@@ -58,7 +58,7 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
         {
             throw new ArgumentException(string.Format("Field '{0}' in row type '{1}' has a MasterDetailRelationAttribute " +
                 "but its property type is not a generic List (e.g. List<IRow>)!",
-                Target.PropertyName ?? Target.Name, row.GetType().FullName));
+                Target.PublicName, row.GetType().FullName));
         }
 
         rowType = rowListType.GetGenericArguments()[0];
@@ -69,7 +69,7 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
             throw new ArgumentException(string.Format(
                 "Field '{0}' in row type '{1}' has a MasterDetailRelationAttribute " +
                 "but its property type is not a generic list of rows (e.g. List<IRow>)!",
-                    Target.PropertyName ?? Target.Name, row.GetType().FullName));
+                    Target.PublicName, row.GetType().FullName));
         }
 
         rowListFactory = () => (IList)Activator.CreateInstance(rowListType)!;
@@ -82,7 +82,7 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
                 throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
                     "This field is specified for a master detail relation in field '{2}'.",
                     attr.MasterKeyField, row.GetType().FullName,
-                    Target.PropertyName ?? Target.Name));
+                    Target.PublicName));
         }
         else
         {
@@ -95,8 +95,8 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
             throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
                 "This field is specified for a master detail relation in field '{2}' of row type '{3}'.",
                 attr.ForeignKey, detailRow.GetType().FullName,
-                Target.PropertyName ?? Target.Name, row.GetType().FullName));
-        foreignKeyCriteria = new Criteria(foreignKeyField.PropertyName ?? foreignKeyField.Name);
+                Target.PublicName, row.GetType().FullName));
+        foreignKeyCriteria = new Criteria(foreignKeyField.PublicName);
 
         if (!string.IsNullOrEmpty(attr.FilterField))
         {
@@ -104,8 +104,8 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
                 throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
                     "This field is specified for a master detail relation as FilterField in field '{2}' of row type '{3}'.",
                     attr.FilterField, detailRow.GetType().FullName,
-                    Target.PropertyName ?? Target.Name, row.GetType().FullName));
-            filterCriteria = new Criteria(filterField.PropertyName ?? filterField.Name);
+                    Target.PublicName, row.GetType().FullName));
+            filterCriteria = new Criteria(filterField.PublicName);
             filterValue = filterField.ConvertValue(attr.FilterValue, CultureInfo.InvariantCulture);
             if (filterValue == null)
             {

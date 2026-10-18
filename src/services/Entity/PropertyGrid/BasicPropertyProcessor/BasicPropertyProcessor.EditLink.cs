@@ -50,6 +50,6 @@ public partial class BasicPropertyProcessor : PropertyProcessor
                 x.ForeignJoinAlias.Name == joinName);
         }
 
-        return idField is null ? null : (idField.PropertyName ?? idField.Name);
+        return idField is null ? null : idField.PublicName;
     }
 }

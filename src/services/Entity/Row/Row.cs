@@ -210,7 +210,7 @@ public abstract partial class Row<TFields> : IRow, IRow<TFields>
         }
 
         if (validationErrors != null)
-            ((IEditableRow)this).RemoveValidationError(field.PropertyName ?? field.Name);
+            ((IEditableRow)this).RemoveValidationError(field.PublicName);
 
         if (propertyChanged != null &&
             previousValues != null &&

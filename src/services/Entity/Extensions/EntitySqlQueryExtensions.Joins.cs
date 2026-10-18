@@ -11,7 +11,7 @@ public static partial class EntitySqlQueryExtensions
 		ArgumentNullException.ThrowIfNull(foreignKeyField);
 		CheckNotFrozen(query);
 
-		var fieldName = foreignKeyField.PropertyName ?? foreignKeyField.Name;
+		var fieldName = foreignKeyField.PublicName;
 		var sourceFieldsType = foreignKeyField.Fields.GetType();
 		var fieldDescription = $"Field '{fieldName}' in row fields type '{sourceFieldsType.FullName ?? sourceFieldsType.Name}'";
 		var foreignJoin = foreignKeyField.ForeignJoinAlias;

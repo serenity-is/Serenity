@@ -67,17 +67,17 @@ public class RowLookupScript<TRow> : LookupScript
 
         if (row.IdField is Field idField)
         {
-            IdField = idField.PropertyName ?? idField.Name;
+            IdField = idField.PublicName;
         }
 
         if (row.NameField is Field nameField)
         {
-            TextField = nameField.PropertyName ?? nameField.Name;
+            TextField = nameField.PublicName;
         }
 
         if (row is IParentIdRow treeRow)
         {
-            ParentIdField = treeRow.ParentIdField.PropertyName ?? treeRow.ParentIdField.Name;
+            ParentIdField = treeRow.ParentIdField.PublicName;
         }
 
         var readPermission = typeof(TRow).GetCustomAttribute<ReadPermissionAttribute>(true);

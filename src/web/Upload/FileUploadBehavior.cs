@@ -50,7 +50,7 @@ public class FileUploadBehavior(IUploadStorage? storage, IUploadProcessor? uploa
 
         this.editorAttr = editorAttr;
         entityField = Target.Name;
-        entityProperty = Target.PropertyName ?? entityField;
+        entityProperty = Target.PublicName;
 
         if (Target is not StringField)
             throw new ArgumentException(string.Format(CultureInfo.InvariantCulture,
@@ -75,7 +75,7 @@ public class FileUploadBehavior(IUploadStorage? storage, IUploadProcessor? uploa
                 originalNameField = (StringField?)nameField ?? throw new ArgumentException(string.Format(CultureInfo.InvariantCulture,
                     "Field '{0}' on row type '{1}' has a UploadEditor attribute but " +
                     "a field with OriginalNameProperty '{2}' is not found!",
-                    Target.PropertyName ?? Target.Name,
+                    Target.PublicName,
                     row.GetType().FullName,
                     originalNameProperty));
             }
@@ -127,7 +127,7 @@ public class FileUploadBehavior(IUploadStorage? storage, IUploadProcessor? uploa
                 throw new ArgumentException(string.Format(CultureInfo.CurrentCulture,
                     "Field '{0}' on row type '{1}' has a UploadEditor attribute " +
                     "with invalid format string '{2}'!",
-                        target.PropertyName ?? target.Name,
+                        target.PublicName,
                         row.GetType().FullName,
                         fileNameFormat));
 
@@ -141,7 +141,7 @@ public class FileUploadBehavior(IUploadStorage? storage, IUploadProcessor? uploa
                 throw new ArgumentException(string.Format(CultureInfo.CurrentCulture,
                     "Field '{0}' on row type '{1}' has a UploadEditor attribute that " +
                     "references field '{2}', but no such field is found!'",
-                        target.PropertyName ?? target.Name,
+                        target.PublicName,
                         row.GetType().FullName,
                         actualName));
             replaceFields['|' + fieldName + '|'] = replaceField;

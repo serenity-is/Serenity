@@ -88,7 +88,7 @@ public class RowJsonConverter : JsonConverter<IRow>
                         if (!f.IsNull(row) || 
                             options.DefaultIgnoreCondition != JsonIgnoreCondition.WhenWritingNull)
                         {
-                            writer.WritePropertyName(f.PropertyName ?? f.Name);
+                            writer.WritePropertyName(f.PublicName);
                             f.ValueToJson(writer, row, options);
                         }
                     }
@@ -101,7 +101,7 @@ public class RowJsonConverter : JsonConverter<IRow>
                 if (!f.IsNull(row) ||
                     options.DefaultIgnoreCondition != JsonIgnoreCondition.WhenWritingNull)
                 {
-                    writer.WritePropertyName(f.PropertyName ?? f.Name);
+                    writer.WritePropertyName(f.PublicName);
                     f.ValueToJson(writer, row, options);
                 }
         }

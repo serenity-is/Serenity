@@ -301,7 +301,7 @@ public abstract class SaveRequestHandlerBase<TRow, TSaveRequest, TSaveResponse>(
                 var error = CustomValidate(context, field, validator);
 
                 if (error != null)
-                    throw new ValidationError("CustomValidationError", field.PropertyName ?? field.Name, error);
+                    throw new ValidationError("CustomValidationError", field.PublicName, error);
             }
         }
     }
