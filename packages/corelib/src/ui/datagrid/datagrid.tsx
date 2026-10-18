@@ -1,6 +1,6 @@
 import { bindThis } from "@serenity-is/domwise";
 import { AutoTooltips, Column, ColumnSort, FormatterContext, SleekGrid, type CellMouseEvent, type GridOptions, type GridSortEvent, type ISleekGrid } from "@serenity-is/sleekgrid";
-import { Authorization, Criteria, DataGridTexts, Fluent, ListResponse, cssEscape, debounce, getInstanceType, getTypeFullName, getjQuery, nsSerenity, tryGetText, type PropertyItem, type PropertyItemsData } from "../../base";
+import { Authorization, Criteria, DataGridTexts, Fluent, ListResponse, RenderableContent, cssEscape, debounce, getInstanceType, getTypeFullName, getjQuery, nsSerenity, tryGetText, type PropertyItem, type PropertyItemsData } from "../../base";
 import { PubSub } from "../../base/pubsub";
 import { LayoutTimer, canLoadScriptData, getColumnsData, getColumnsDataAsync } from "../../compat";
 import { IReadOnly } from "../../interfaces";
@@ -264,7 +264,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
      * Returns the initial title shown above the grid.
      * @returns The title text, or null for no title.
      */
-    protected getInitialTitle(): string {
+    protected getInitialTitle(): RenderableContent {
         return null;
     }
 
@@ -1061,7 +1061,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
      * Sets the grid title text, creating or removing the title element as needed.
      * @param value - The title text, or null to remove the title.
      */
-    setTitle(value: string) {
+    setTitle(value: RenderableContent) {
         if (value !== this.getTitle()) {
             if (value == null) {
                 if (this.titleDiv) {
@@ -1074,7 +1074,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
                     this.titleDiv = Fluent(<div class="grid-title"><div class="title-text" /></div>)
                         .prependTo(this.domNode);
                 }
-                this.titleDiv.findFirst('.title-text').text(value);
+                this.titleDiv.findFirst('.title-text').empty().append(value);
             }
 
             this.layout();

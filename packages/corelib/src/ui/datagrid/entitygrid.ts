@@ -1,6 +1,6 @@
 
 import { bindThis } from "@serenity-is/domwise";
-import { Authorization, EntityGridTexts, Fluent, faIcon, getActiveRequests, getInstanceType, getTypeFullName, isPromiseLike, localText, nsSerenity, resolveUrl, stringFormat } from "../../base";
+import { Authorization, EntityGridTexts, Fluent, RenderableContent, faIcon, getActiveRequests, getInstanceType, getTypeFullName, isPromiseLike, localText, nsSerenity, resolveUrl, stringFormat } from "../../base";
 import { HandleRouteEvent, Router, safeCast } from "../../compat";
 import { IEditDialog } from "../../interfaces";
 import { RemoteViewOptions } from "../../slick";
@@ -115,7 +115,7 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
      * Returns the initial title for the grid panel.
      * @returns Localized plural display name.
      */
-    protected override getInitialTitle(): string {
+    protected override getInitialTitle(): RenderableContent {
         return this.getDisplayName();
     }
 
