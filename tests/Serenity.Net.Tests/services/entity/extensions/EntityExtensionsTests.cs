@@ -190,6 +190,20 @@ public class EntityExtensionsTests
     }
 
     [Fact]
+    public void FindFieldByPropertyOrFieldName_FallsBackToColumnName()
+    {
+        var row = new OriginPropertyTests.CountryRow();
+        var field = OriginPropertyTests.CountryRow.Fields.Renamed;
+
+        Assert.Same(field, row.GetFields().FindFieldByPropertyOrFieldName(nameof(OriginPropertyTests.CountryRow.Renamed)));
+        Assert.Same(field, row.GetFields().FindFieldByPropertyOrFieldName("CustomCol"));
+        Assert.Same(field, row.FindFieldByPropertyOrFieldName("CustomCol"));
+        Assert.Null(row.FindFieldByPublicName("CustomCol"));
+        Assert.Null(row.FindFieldByPropertyOrFieldName(null));
+        Assert.Null(row.FindFieldByPropertyOrFieldName("Unknown"));
+    }
+
+    [Fact]
     public void As_Returns_Same_For_Same_Alias()
     {
         var fields = IdNameRow.Fields;

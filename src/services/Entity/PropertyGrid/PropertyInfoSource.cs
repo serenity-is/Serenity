@@ -23,18 +23,7 @@ public class PropertyInfoSource : IPropertySource
         BasedOnRow = basedOnRow;
 
         if (basedOnRow != null)
-        {
-            BasedOnField = basedOnRow.Fields.FindFieldByPropertyName(property.Name);
-
-            if (BasedOnField is null)
-            {
-                // only use field found by field name if it has no property
-                var byFieldName = basedOnRow.Fields.FindField(property.Name);
-                if (byFieldName is not null &&
-                    string.IsNullOrEmpty(byFieldName.PropertyName))
-                    BasedOnField = byFieldName;
-            }
-        }
+            BasedOnField = basedOnRow.Fields.FindFieldByPublicName(property.Name);
 
         var nullableType = Nullable.GetUnderlyingType(property.PropertyType);
         ValueType = nullableType ?? property.PropertyType;

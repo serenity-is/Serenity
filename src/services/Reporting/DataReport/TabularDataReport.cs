@@ -182,8 +182,7 @@ public class TabularDataReport : IDataOnlyReport
             if (!propertyItemByName!.TryGetValue(columnName, out PropertyItem? item))
                 continue;
 
-            var basedOnField = basedOnRow == null ? null :
-                (basedOnRow.FindField(columnName) ?? basedOnRow.FindFieldByPropertyName(columnName));
+            var basedOnField = basedOnRow?.FindFieldByPropertyOrFieldName(columnName);
 
             if (propertyInfos == null || !propertyInfos.TryGetValue(columnName, out PropertyInfo? p))
                 p = null;

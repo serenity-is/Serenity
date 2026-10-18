@@ -147,7 +147,7 @@ public static class ExcelReportGenerator
                     for (var i = 0; i < columns.Count; i++)
                     {
                         var n = columns[i].Name;
-                        fields[i] = row.FindFieldByPropertyName(n) ?? row.FindField(n);
+                        fields[i] = row.FindFieldByPropertyOrFieldName(n);
                     }
                 }
             }

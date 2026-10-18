@@ -116,7 +116,7 @@ public static class ReportColumnConverter
             if (basedOnRow != null)
             {
                 var name = ((MemberInfo?)fieldInfo ?? propertyInfo)!.Name;
-                baseField = basedOnRow.FindFieldByPropertyName(name) ?? basedOnRow.FindField(name);
+                baseField = basedOnRow.FindFieldByPropertyOrFieldName(name);
             }
             else
             {

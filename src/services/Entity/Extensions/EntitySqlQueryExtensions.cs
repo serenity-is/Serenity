@@ -453,8 +453,7 @@ public static partial class EntitySqlQueryExtensions
         if (foreignRowField.GetAttribute<ForeignRowAttribute>()?.ForeignKeyProperty is not string fkPropertyName)
             throw new InvalidOperationException("The foreign row field must have a ForeignRowAttribute with a valid foreign key property.");
 
-        if ((row.Fields.FindFieldByPropertyName(fkPropertyName) ??
-             row.Fields.FindField(fkPropertyName)) is not Field fkField)
+        if (row.Fields.FindFieldByPropertyOrFieldName(fkPropertyName) is not Field fkField)
             throw new InvalidOperationException("The ForeignRowAttribute does not match a property or field on the current into row.");
 
         var foreignJoin = fkField.ForeignJoinAlias ??

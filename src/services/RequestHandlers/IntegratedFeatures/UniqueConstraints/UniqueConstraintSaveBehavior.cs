@@ -76,7 +76,7 @@ public class UniqueConstraintSaveBehavior(ITextLocalizer localizer) : BaseUnique
         {
             return attr.Fields.Select(x =>
             {
-                var field = handler.Row.FindFieldByPropertyName(x) ?? handler.Row.FindField(x);
+                var field = handler.Row.FindFieldByPropertyOrFieldName(x);
                 return field is null
                     ? throw new InvalidOperationException(string.Format(
                         "Can't find field '{0}' of unique constraint in row type '{1}'",

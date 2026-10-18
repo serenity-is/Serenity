@@ -76,8 +76,8 @@ public class UpdatableExtensionBehavior(IDefaultHandlerFactory handlerFactory) :
             }
             else
             {
-                info.ThisKeyField = (row.FindFieldByPropertyName(attr.ThisKey!) ??
-                    row.FindField(attr.ThisKey!)) ?? throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
+                info.ThisKeyField = (row.FindFieldByPropertyOrFieldName(attr.ThisKey!) ??
+                    throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
                         "This field is specified for an ExtensionRelation attribute",
                         attr.ThisKey,
                         row.GetType().FullName));
@@ -101,7 +101,7 @@ public class UpdatableExtensionBehavior(IDefaultHandlerFactory handlerFactory) :
             }
             else
             {
-                info.OtherKeyField = (ext.FindFieldByPropertyName(attr.OtherKey!) ?? ext.FindField(attr.OtherKey!)) ?? throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
+                info.OtherKeyField = ext.FindFieldByPropertyOrFieldName(attr.OtherKey!) ?? throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
                         "This field is specified for an ExtensionRelation attribute on '{2}'",
                         attr.OtherKey,
                         ext.GetType().FullName,
@@ -109,16 +109,16 @@ public class UpdatableExtensionBehavior(IDefaultHandlerFactory handlerFactory) :
 
             if (!string.IsNullOrEmpty(attr.FilterField))
             {
-                info.FilterField = (ext.FindFieldByPropertyName(attr.FilterField) ?? ext.FindField(attr.FilterField)) ?? throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
+                info.FilterField = ext.FindFieldByPropertyOrFieldName(attr.FilterField) ?? throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
                         "This field is specified as FilterField for an ExtensionRelation attribute on '{2}'",
-                        attr.OtherKey,
+                        attr.FilterField,
                         ext.GetType().FullName,
                         row.GetType().FullName)); info.FilterValue = info.FilterField.ConvertValue(attr.FilterValue, CultureInfo.InvariantCulture);
             }
 
             if (!string.IsNullOrEmpty(attr.PresenceField))
             {
-                info.PresenceField = (row.FindFieldByPropertyName(attr.PresenceField) ?? row.FindField(attr.PresenceField)) ?? throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
+                info.PresenceField = row.FindFieldByPropertyOrFieldName(attr.PresenceField) ?? throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
                         "This field is specified as PresenceField as an ExtensionRelation attribute.",
                         attr.PresenceField,
                         row.GetType().FullName)); info.PresenceValue = attr.PresenceValue;

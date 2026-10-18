@@ -70,8 +70,7 @@ public class FileUploadBehavior(IUploadStorage? storage, IUploadProcessor? uploa
             var originalNameProperty = (editorAttr as IUploadFileOptions)?.OriginalNameProperty;
             if (!string.IsNullOrEmpty(originalNameProperty))
             {
-                var nameField = row.FindFieldByPropertyName(originalNameProperty) ??
-                    row.FindField(originalNameProperty);
+                var nameField = row.FindFieldByPropertyOrFieldName(originalNameProperty);
 
                 originalNameField = (StringField?)nameField ?? throw new ArgumentException(string.Format(CultureInfo.InvariantCulture,
                     "Field '{0}' on row type '{1}' has a UploadEditor attribute but " +
@@ -138,8 +137,8 @@ public class FileUploadBehavior(IUploadStorage? storage, IUploadProcessor? uploa
             if (colon >= 0)
                 actualName = fieldName[..colon];
 
-            var replaceField = (row.FindFieldByPropertyName(actualName) ??
-                row.FindField(actualName)) ?? throw new ArgumentException(string.Format(CultureInfo.CurrentCulture,
+            var replaceField = row.FindFieldByPropertyOrFieldName(actualName) ?? 
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture,
                     "Field '{0}' on row type '{1}' has a UploadEditor attribute that " +
                     "references field '{2}', but no such field is found!'",
                         target.PropertyName ?? target.Name,

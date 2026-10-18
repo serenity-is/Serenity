@@ -44,25 +44,68 @@ public static class RowExtensions
     }
 
     /// <summary>
-    /// Finds the field by its name.
+    /// Finds a field by its column or field name.
     /// </summary>
     /// <param name="row">The row.</param>
-    /// <param name="name">The name.</param>
-    /// <returns>The field with the specified name.</returns>
+    /// <param name="name">The column or field name.</param>
+    /// <returns>The matching field, or <see langword="null"/> if no field has that name.</returns>
+    /// <remarks>
+    /// This lookup does not search by C# property name. Use <see cref="FindFieldByPropertyName"/> for a
+    /// property-name lookup, or <see cref="FindFieldByPropertyOrFieldName"/> when the name may be a property
+    /// name or any column or field name.
+    /// </remarks>
     public static Field? FindField(this IRow row, string? name)
     {
         return name == null ? null : row.Fields.FindField(name);
     }
 
     /// <summary>
-    /// Finds the field by its property name.
+    /// Finds a field by its C# property name.
     /// </summary>
     /// <param name="row">The row.</param>
-    /// <param name="name">The name.</param>
-    /// <returns>The field with the specified property name.</returns>
+    /// <param name="name">The C# property name.</param>
+    /// <returns>The matching field, or <see langword="null"/> if no field has that property.</returns>
+    /// <remarks>
+    /// This lookup does not fall back to a column or field name. Use
+    /// <see cref="FindFieldByPropertyOrFieldName"/> to try the property name first and then fall back to any
+    /// column or field name, or <see cref="FindFieldByPublicName"/> to restrict that fallback to fields without
+    /// a corresponding property.
+    /// </remarks>
     public static Field? FindFieldByPropertyName(this IRow row, string? name)
     {
         return row.Fields.FindFieldByPropertyName(name);
+    }
+
+    /// <summary>
+    /// Finds a field by its public name: its C# property name, or its field name when it has no corresponding property.
+    /// </summary>
+    /// <param name="row">The row.</param>
+    /// <param name="name">A C# property name, or the field name of a field without a corresponding property.</param>
+    /// <returns>The matching field, or <see langword="null"/> if no eligible field matches.</returns>
+    /// <remarks>
+    /// Property-name matches take precedence. A column or field name is accepted only if the matching field has no
+    /// corresponding C# property name. Use <see cref="FindFieldByPropertyOrFieldName"/> to also allow column or
+    /// field names for property-backed fields.
+    /// </remarks>
+    public static Field? FindFieldByPublicName(this IRow row, string? name)
+    {
+        return row.Fields.FindFieldByPublicName(name);
+    }
+
+    /// <summary>
+    /// Finds a field by its C# property name, falling back to its column or field name.
+    /// </summary>
+    /// <param name="row">The row.</param>
+    /// <param name="name">The C# property name or the column or field name.</param>
+    /// <returns>The matching field, or <see langword="null"/> if no field matches.</returns>
+    /// <remarks>
+    /// A property-name match takes precedence. If no property matches, this lookup accepts a column or field name
+    /// even when the matching field has a corresponding C# property. Use <see cref="FindFieldByPublicName"/> to
+    /// restrict that fallback to fields without a corresponding property.
+    /// </remarks>
+    public static Field? FindFieldByPropertyOrFieldName(this IRow row, string? name)
+    {
+        return row.Fields.FindFieldByPropertyOrFieldName(name);
     }
 
     /// <summary>

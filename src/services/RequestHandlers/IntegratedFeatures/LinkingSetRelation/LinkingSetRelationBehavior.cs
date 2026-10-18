@@ -91,21 +91,22 @@ public class LinkingSetRelationBehavior(IDefaultHandlerFactory handlerFactory) :
 
         var detailRow = rowFactory();
 
-        thisKeyField = (detailRow.FindFieldByPropertyName(attr.ThisKey) ??
-            detailRow.FindField(attr.ThisKey)) ?? throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
+        thisKeyField = (detailRow.FindFieldByPropertyOrFieldName(attr.ThisKey) ??
+            throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
                 "This field is specified for a linking set relation in field '{2}' of row type '{3}'.",
                 attr.ThisKey, detailRow.GetType().FullName,
                 Target.PropertyName ?? Target.Name, row.GetType().FullName));
         thisKeyCriteria = new Criteria(thisKeyField.PropertyName ?? thisKeyField.Name);
 
-        itemKeyField = (detailRow.FindFieldByPropertyName(attr.ItemKey) ??
-            detailRow.FindField(attr.ItemKey)) ?? throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
+        itemKeyField = detailRow.FindFieldByPropertyOrFieldName(attr.ItemKey) ?? 
+            throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
                 "This field is specified for a linking set relation in field '{2}' of row type '{3}'.",
                 attr.ItemKey, detailRow.GetType().FullName,
                 Target.PropertyName ?? Target.Name, row.GetType().FullName));
         if (!string.IsNullOrEmpty(attr.FilterField))
         {
-            filterField = (detailRow.FindFieldByPropertyName(attr.FilterField) ?? detailRow.FindField(attr.FilterField)) ?? throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
+            filterField = detailRow.FindFieldByPropertyOrFieldName(attr.FilterField) ?? 
+                throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
                     "This field is specified for a linking set relation as FilterField in field '{2}' of row type '{3}'.",
                     attr.FilterField, detailRow.GetType().FullName,
                     Target.PropertyName ?? Target.Name, row.GetType().FullName));

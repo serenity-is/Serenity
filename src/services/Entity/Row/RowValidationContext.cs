@@ -21,7 +21,7 @@ public class RowValidationContext(IDbConnection connection, IRow row, ITextLocal
     /// <returns>The value of the field, or <c>null</c> if the field is not found.</returns>
     public object? GetFieldValue(string fieldName)
     {
-        var field = row.Fields.FindFieldByPropertyName(fieldName) ?? row.Fields.FindField(fieldName);
+        var field = row.FindFieldByPropertyOrFieldName(fieldName);
         if (field is null)
             return null;
 

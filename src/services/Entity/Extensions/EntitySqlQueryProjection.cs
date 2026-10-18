@@ -920,7 +920,7 @@ public static class EntitySqlQueryProjection
 		var fields = sourceFields;
 		for (var index = 0; index < memberNames.Length; index++)
 		{
-            var field = (fields.FindFieldByPropertyName(memberNames[index]) ?? fields.FindField(memberNames[index])) ?? throw new ArgumentException(string.Format(
+            var field = fields.FindFieldByPropertyOrFieldName(memberNames[index]) ?? throw new ArgumentException(string.Format(
                     "Property '{0}' does not map to a field on row type '{1}'.",
                     memberNames[index], fields.GetType().DeclaringType?.FullName ?? fields.GetType().FullName));
             if (index == memberNames.Length - 1)
@@ -932,7 +932,7 @@ public static class EntitySqlQueryProjection
 					"Property path '{0}' contains a member that is not a configured foreign row.",
 					string.Join('.', memberNames)));
 
-			var foreignKeyField = fields.FindFieldByPropertyName(foreignKeyProperty) ?? fields.FindField(foreignKeyProperty);
+			var foreignKeyField = fields.FindFieldByPropertyOrFieldName(foreignKeyProperty);
 			var foreignJoin = foreignKeyField?.ForeignJoinAlias ?? throw new InvalidOperationException(
 				"The foreign row's foreign key field must have a ForeignJoinAlias.");
 

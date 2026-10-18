@@ -106,7 +106,7 @@ public class CriteriaFieldExpressionReplacer(IRow row, IPermissionService permis
     /// <param name="expression">The property name or field name</param>
     protected virtual Field? FindField(string expression)
     {
-        return Row.FindFieldByPropertyName(expression) ?? Row.FindField(expression);
+        return Row.FindFieldByPublicName(expression);
     }
 
     /// <summary>

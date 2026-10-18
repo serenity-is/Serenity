@@ -78,8 +78,8 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
         if (attr.MasterKeyField != null)
         {
             // Use field from AltIdField
-            masterKeyField = (row.FindFieldByPropertyName(attr.MasterKeyField) ??
-                row.FindField(attr.MasterKeyField)) ?? throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
+            masterKeyField = row.FindFieldByPropertyOrFieldName(attr.MasterKeyField) ?? 
+                throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
                     "This field is specified for a master detail relation in field '{2}'.",
                     attr.MasterKeyField, row.GetType().FullName,
                     Target.PropertyName ?? Target.Name));
@@ -91,8 +91,8 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
         }
 
         var detailRow = rowFactory();
-        foreignKeyField = (detailRow.FindFieldByPropertyName(attr.ForeignKey) ??
-            detailRow.FindField(attr.ForeignKey)) ?? throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
+        foreignKeyField = detailRow.FindFieldByPropertyOrFieldName(attr.ForeignKey) ?? 
+            throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
                 "This field is specified for a master detail relation in field '{2}' of row type '{3}'.",
                 attr.ForeignKey, detailRow.GetType().FullName,
                 Target.PropertyName ?? Target.Name, row.GetType().FullName));
@@ -100,7 +100,8 @@ public class MasterDetailRelationBehavior(IDefaultHandlerFactory handlerFactory)
 
         if (!string.IsNullOrEmpty(attr.FilterField))
         {
-            filterField = (detailRow.FindFieldByPropertyName(attr.FilterField) ?? detailRow.FindField(attr.FilterField)) ?? throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
+            filterField = detailRow.FindFieldByPropertyOrFieldName(attr.FilterField) ??
+                throw new ArgumentException(string.Format("Field '{0}' doesn't exist in row of type '{1}'." +
                     "This field is specified for a master detail relation as FilterField in field '{2}' of row type '{3}'.",
                     attr.FilterField, detailRow.GetType().FullName,
                     Target.PropertyName ?? Target.Name, row.GetType().FullName));

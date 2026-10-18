@@ -146,8 +146,7 @@ public class RowJsonConverter : JsonConverter<IRow>
                     if (!reader.Read())
                         throw new JsonException("Unexpected end when deserializing object.");
 
-                    var field = row.Fields.FindField(fieldName);
-                    field ??= row.Fields.FindFieldByPropertyName(fieldName);
+                    var field = row.Fields.FindFieldByPublicName(fieldName);
 
                     bool deserializeAsExtension = field is null &&
                         ShouldDeserializeExtension is not null && ShouldDeserializeExtension(row, fieldName);

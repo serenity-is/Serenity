@@ -72,8 +72,8 @@ public class LocalizationBehavior(IDefaultHandlerFactory handlerFactory) : BaseS
         cultureIdField = localRow.CultureIdField;
 
         var foreignKeyFieldName = attr.MappedIdField ?? row.GetIdField().PropertyName;
-        foreignKeyField = localRow.FindFieldByPropertyName(foreignKeyFieldName) ??
-            localRow.FindField(foreignKeyFieldName) ?? throw new ArgumentException(string.Format(
+        foreignKeyField = localRow.FindFieldByPropertyOrFieldName(foreignKeyFieldName) ??
+            throw new ArgumentException(string.Format(
                 "Row type '{0}' has a LocalizationRowAttribute, " +
                 "but its localization row type ('{1}') doesn't have a field with name '{2}'!",
                     row.GetType().FullName, localRowType.FullName, foreignKeyFieldName));

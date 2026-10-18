@@ -298,7 +298,7 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(
             return fields;
         }
 
-        var field = Row.FindField(containsField) ?? Row.FindFieldByPropertyName(containsField);
+        var field = Row.FindFieldByPublicName(containsField);
         if (field is null ||
             !IsQuickSearchableField(field) ||
             !AllowFilterField(field))
@@ -626,7 +626,7 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(
             if (IsEmptyEqualityFilterValue(pair.Value))
                 continue;
 
-            var field = (Row.FindFieldByPropertyName(pair.Key) ?? Row.FindField(pair.Key)) ?? throw new ArgumentOutOfRangeException(pair.Key,
+            var field = Row.FindFieldByPublicName(pair.Key) ?? throw new ArgumentOutOfRangeException(pair.Key,
                     string.Format("Can't find field '{0}' in {1} for equality filter.", pair.Key, Row.GetType().Name));
             ApplyFieldEqualityFilter(query, field, pair.Value);
         }
@@ -744,8 +744,7 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(
     /// <param name="sortBy">Sort order</param>
     protected virtual void ApplySortBy(SqlQuery query, SortBy sortBy)
     {
-        var field = Row.FindField(sortBy.Field) ??
-            Row.FindFieldByPropertyName(sortBy.Field);
+        var field = Row.FindFieldByPublicName(sortBy.Field);
 
         if (field is not null)
         {
@@ -794,8 +793,7 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(
                 if (x == null || string.IsNullOrEmpty(x.Field))
                     return null;
 
-                var field = Row.FindFieldByPropertyName(x.Field) ??
-                    Row.FindField(x.Field);
+                var field = Row.FindFieldByPublicName(x.Field);
 
                 if (field is null ||
                     (field.Flags & FieldFlags.NotMapped) == FieldFlags.NotMapped ||

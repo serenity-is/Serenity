@@ -44,7 +44,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
         if (filteringIdField != null)
         {
             idFieldName = filteringIdField.Value;
-            idField = basedOnField?.Fields.FindFieldByPropertyName(idFieldName) ?? basedOnField?.Fields.FindField(idFieldName);
+            idField = basedOnField?.Fields.FindFieldByPropertyOrFieldName(idFieldName);
         }
         else
         {
@@ -53,7 +53,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
             idField = null;
             if (idFieldName != null)
             {
-                idField = basedOnField!.Fields.FindFieldByPropertyName(idFieldName) ?? basedOnField!.Fields.FindField(idFieldName);
+                idField = basedOnField!.Fields.FindFieldByPropertyOrFieldName(idFieldName);
                 if (idField is null ||
                     (idField.TextualField != basedOnField!.PropertyName &&
                      idField.TextualField != basedOnField.Name))
