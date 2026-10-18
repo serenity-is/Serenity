@@ -121,6 +121,24 @@ public abstract class LookupScript : DynamicScript, INamedDynamicScript, IGetScr
     }
 
     /// <summary>
+    /// Gets or sets the lookup icon field.
+    /// </summary>
+    public string? IconField
+    {
+        get
+        {
+            if (lookupParams.TryGetValue("iconField", out object? value) && value != null)
+                return value.ToString();
+
+            return null;
+        }
+        set
+        {
+            lookupParams["iconField"] = value;
+        }
+    }    
+
+    /// <summary>
     /// Gets or sets the lookup key.
     /// </summary>
     public string? LookupKey { get; set; }

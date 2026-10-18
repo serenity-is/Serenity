@@ -1,4 +1,4 @@
-import { Fluent, isArrayLike, isPromiseLike } from "../../base";
+import { Fluent, IconClassName, isArrayLike, isPromiseLike } from "../../base";
 import { Select2, Select2Options } from "./select2";
 
 /** The combobox provider type. */
@@ -15,6 +15,8 @@ export interface ComboboxItem<TSource = any> {
     id?: string;
     /** Display text. */
     text?: string;
+    /** Icon class for the item. */
+    icon?: IconClassName;
     /** The source item. */
     source?: TSource;
     /** Whether the item is disabled. */

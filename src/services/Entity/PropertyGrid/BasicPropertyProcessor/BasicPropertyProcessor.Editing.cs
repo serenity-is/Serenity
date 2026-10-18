@@ -51,9 +51,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
                     if (prefix != null)
                     {
                         var propertyName = string.IsNullOrEmpty(distinct.PropertyName) ?
-                                (source.BasedOnField is not null ?
-                                    (source.BasedOnField.PropertyName ?? source.BasedOnField.Name) :
-                                item.Name) : distinct.PropertyName;
+                                (source.BasedOnField?.PublicName ?? item.Name) : distinct.PropertyName;
 
                         if (!string.IsNullOrEmpty(propertyName))
                             item.EditorParams["lookupKey"] = "Distinct." + prefix + "." + propertyName;
@@ -221,6 +219,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
 
         bool idFieldMissing = !editorParams.ContainsKey("idField");
         bool textFieldMissing = !editorParams.ContainsKey("textField");
+        bool iconFieldMissing = !editorParams.ContainsKey("iconField");
 
         var resultEndpointType = sle.EndpointType;
         if (resultEndpointType is null &&
@@ -270,7 +269,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
             !editorParams.ContainsKey("includeColumns") &&
             !editorParams.ContainsKey("columnSelection");
 
-        if (!idFieldMissing && !textFieldMissing && !columnsMissing)
+        if (!idFieldMissing && !textFieldMissing && !columnsMissing && !iconFieldMissing)
             return;
 
         if (!isRowType)
@@ -307,8 +306,17 @@ public partial class BasicPropertyProcessor : PropertyProcessor
                     editorParams["textField"] = properties[0].Name;
             }
 
+            if (iconFieldMissing)
+            {
+                var iconProperty = FindPropertyByName(properties,
+                    "IconClass", "Icon");
+                if (iconProperty != null)
+                    editorParams["iconField"] = iconProperty.Name;
+            }
+
             if (validateInferredFields)
                 ThrowIfLookupFieldsMissing(itemType, editorParams);
+
             return;
         }
 
@@ -325,7 +333,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
                 if (idFieldMissing)
                 {
                     var idField = rowInstance?.IdField;
-                    var idFieldName = idField?.PropertyName ?? idField?.Name;
+                    var idFieldName = idField?.PublicName;
                     if (idFieldName != null)
                         editorParams["idField"] = idFieldName;
                 }
@@ -333,16 +341,22 @@ public partial class BasicPropertyProcessor : PropertyProcessor
                 if (textFieldMissing)
                 {
                     var nameField = rowInstance?.NameField;
-                    var textFieldName = nameField?.PropertyName ?? nameField?.Name;
+                    var textFieldName = nameField?.PublicName;
                     if (textFieldName != null)
                         editorParams["textField"] = textFieldName;
+                }
+
+                if (iconFieldMissing)
+                {
+                    if (rowInstance?.FindFieldByPublicName("IconClass") is StringField iconField)
+                        editorParams["iconField"] = iconField.PublicName;
                 }
 
                 if (columnsMissing)
                 {
                     editorParams["includeColumns"] = rowInstance?.Fields
                         .Where(x => x.GetAttribute<LookupIncludeAttribute>() != null)
-                        .Select(x => x.PropertyName ?? x.Name)
+                        .Select(x => x.PublicName)
                         .ToArray() ?? [];
                 }
 

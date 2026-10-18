@@ -1,5 +1,5 @@
 import { bindThis } from "@serenity-is/domwise";
-import { getInstanceType, getLookupAsync, getTypeFullName, nsSerenity, type Lookup } from "../../base";
+import { getInstanceType, getLookupAsync, getTypeFullName, IconClassName, nsSerenity, type Lookup } from "../../base";
 import { ScriptData, getLookup, reloadLookup } from "../../compat";
 import { ComboboxItem, ComboboxSearchQuery, ComboboxSearchResult } from "./combobox";
 import { ComboboxEditor, ComboboxEditorOptions } from "./comboboxeditor";
@@ -131,6 +131,14 @@ export abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> ext
         return textValue == null ? '' : textValue.toString();
     }
 
+    protected getItemIcon(item: TItem, lookup: Lookup<TItem>): IconClassName {
+        if (lookup?.iconField == null)
+            return super.itemIcon(item);
+
+        const iconValue = (item as any)[lookup.iconField];
+        return iconValue == null ? null : iconValue.toString() as IconClassName;
+    }
+
     /**
      * Maps an item to a combobox item.
      * @param item - The item.
@@ -141,6 +149,7 @@ export abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> ext
             id: this.itemId(item),
             text: this.getItemText(item, this.lookup),
             disabled: this.getItemDisabled(item, this.lookup),
+            icon: this.getItemIcon(item, this.lookup),
             source: item
         };
     }

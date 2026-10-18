@@ -29,7 +29,7 @@ public class NotesBehavior(IUserRetrieveService userRetriever,
             throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, 
                 "Field '{0}' in row type '{1}' has a NotesEditorAttribute " +
                 "but its property type is not a List<NoteRow>!",
-                Target.PropertyName ?? Target.Name, row.GetType().FullName));
+                Target.PublicName, row.GetType().FullName));
         }
 
         return true;

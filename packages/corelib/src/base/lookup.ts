@@ -9,6 +9,8 @@ export interface LookupOptions<TItem> {
     parentIdField?: string;
     /** Name of the field that holds the human-readable display text for an item. */
     textField?: string;
+    /** Name of the field that holds the icon for an item. */
+    iconField?: string;
 }
 
 /**
@@ -27,6 +29,8 @@ export interface Lookup<TItem> {
     parentIdField: string;
     /** Name of the display-text field (copied from {@link LookupOptions.textField}). */
     textField: string;
+    /** Name of the icon field (copied from {@link LookupOptions.iconField}). */
+    iconField: string;
 }
 
 /**
@@ -50,6 +54,8 @@ export class Lookup<TItem> {
     declare public parentIdField: string;
     /** Name of the display-text field (from constructor options). */
     declare public textField: string;
+    /** Name of the field that holds the icon for an item (from constructor options). */
+    declare public iconField: string;
 
     /**
      * Creates a new lookup instance.
@@ -63,6 +69,7 @@ export class Lookup<TItem> {
         this.idField = options.idField;
         this.parentIdField = options.parentIdField;
         this.textField = options.textField;
+        this.iconField = options.iconField;
 
         if (items != null)
             this.update(items);

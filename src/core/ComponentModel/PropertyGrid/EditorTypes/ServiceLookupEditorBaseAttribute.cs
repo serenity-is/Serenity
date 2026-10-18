@@ -40,6 +40,16 @@ public abstract class ServiceLookupEditorBaseAttribute(string editorType) : Cust
     }
 
     /// <summary>
+    /// Name of the icon field.
+    /// </summary>
+    public string? IconField
+    {
+        get { return GetOption<string>("iconField"); }
+        set { SetOption("iconField", value); }
+    }
+
+
+    /// <summary>
     /// Page size used while loading records, default 100.
     /// </summary>
     public int? PageSize

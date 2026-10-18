@@ -3,7 +3,7 @@
  */
 
 import { bindThis } from "@serenity-is/domwise";
-import { debounce, Fluent, SelectEditorTexts, serviceCall, stringFormat } from "../../base";
+import { debounce, Fluent, iconClassName, IconClassName, SelectEditorTexts, serviceCall, stringFormat } from "../../base";
 
 /** Element type that can host a Select2. */
 export type Select2Element = HTMLInputElement | HTMLSelectElement;
@@ -38,6 +38,8 @@ export interface Select2Item {
     text?: string;
     /** The source item. */
     source?: any;
+    /** Icon class for the item. */
+    icon?: IconClassName;
     /** CSS class(es) of the item. */
     css?: string;
     /** Child items. */
@@ -791,11 +793,21 @@ export class Select2 {
         formatMatches: (matches: number) => matches === 1 ? SelectEditorTexts.SingleMatch : stringFormat(SelectEditorTexts.MultipleMatches, matches),
         formatNoMatches: () => SelectEditorTexts.NoMatches,
         formatResult: function (result, _, query) {
-            return Select2.highlightMatch(result?.text, query?.term);
+            const content = Select2.highlightMatch(result?.text, query?.term);
+            if (result?.icon)
+                return <><i class={iconClassName(result.icon)}></i> {content}</>;
+            return content;
         },
         formatResultCssClass: function (data) { return data.css; },
         formatSearching: () => SelectEditorTexts.Searching,
-        formatSelection: (data) => data ? data.text : undefined,
+        formatSelection: (data) => {
+            if (!data)
+                return undefined;
+
+            if (data.icon)
+                return <><i class={iconClassName(data.icon)}></i> {data.text}</>;
+            return data.text;
+        },
         formatSelectionCssClass: function () { return undefined; },
         formatSelectionTooBig: (limit: number) => stringFormat(SelectEditorTexts.SelectionTooBig, limit),
         sortResults: results => results,

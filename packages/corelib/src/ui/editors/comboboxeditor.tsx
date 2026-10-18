@@ -1,5 +1,5 @@
 import { bindThis } from "@serenity-is/domwise";
-import { Authorization, Fluent, PropertyItem, SelectEditorTexts, isPromiseLike, nsSerenity, setElementReadOnly } from "../../base";
+import { Authorization, Fluent, IconClassName, PropertyItem, SelectEditorTexts, isPromiseLike, nsSerenity, setElementReadOnly } from "../../base";
 import { ValidationHelper } from "../../compat";
 import { IEditDialog, IGetEditValue, IReadOnly, ISetEditValue, IStringValue } from "../../interfaces";
 import { DialogType } from "../../types/dialogtype";
@@ -226,6 +226,25 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
     }
 
     /**
+     * Gets the name of the icon field.
+     * @returns The name of the icon field.
+     */
+    protected getIconField() {
+        return (this.options as any)['iconField'];
+    }
+
+    /**
+     * Returns the icon of an item.
+     * @param item - The item.
+     * @returns The item icon.
+     */
+    protected itemIcon(item: TItem): IconClassName {
+        const value = (item as any)[this.getIconField()];
+        if (value != null)
+            return value.toString() as IconClassName;
+    }
+
+    /**
      * Maps an item to a combobox item.
      * @param item - The item.
      * @returns The combobox item.
@@ -235,6 +254,7 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
             id: this.itemId(item),
             text: this.itemText(item),
             disabled: this.itemDisabled(item),
+            icon: this.itemIcon(item),
             source: item
         };
     }
