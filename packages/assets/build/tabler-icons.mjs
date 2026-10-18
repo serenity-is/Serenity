@@ -143,8 +143,8 @@ const maskBase = `
     height: 1em;
     vertical-align: -0.125em;
     background-color: currentColor;
-    -webkit-mask-image: var(--svg, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3Cpath fill='none' d='M0 0h1v1H0z'/%3E%3C/svg%3E"));
-    mask-image: var(--svg, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3Cpath fill='none' d='M0 0h1v1H0z'/%3E%3C/svg%3E"));
+    -webkit-mask-image: var(--sv, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3Cpath fill='none' d='M0 0h1v1H0z'/%3E%3C/svg%3E"));
+    mask-image: var(--sv, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3Cpath fill='none' d='M0 0h1v1H0z'/%3E%3C/svg%3E"));
     -webkit-mask-repeat: no-repeat;
     mask-repeat: no-repeat;
     -webkit-mask-position: center;
@@ -168,8 +168,8 @@ const iconsMaskBase = `
     height: 1em;
     vertical-align: -0.125em;
     background-color: currentColor;
-    -webkit-mask-image: var(--svg, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3Cpath fill='none' d='M0 0h1v1H0z'/%3E%3C/svg%3E"));
-    mask-image: var(--svg, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3Cpath fill='none' d='M0 0h1v1H0z'/%3E%3C/svg%3E"));
+    -webkit-mask-image: var(--sv, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3Cpath fill='none' d='M0 0h1v1H0z'/%3E%3C/svg%3E"));
+    mask-image: var(--sv, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3Cpath fill='none' d='M0 0h1v1H0z'/%3E%3C/svg%3E"));
     -webkit-mask-repeat: no-repeat;
     mask-repeat: no-repeat;
     -webkit-mask-position: center;
@@ -190,10 +190,10 @@ function extractUtilities(oldCss) {
 function faRules(groups, laGroups, uriFor, laUriFor) {
     let rules = '';
     for (const [target, groupNames] of groups) {
-        rules += groupNames.map(n => '.fa-' + n).join(', ') + ' { --svg: url("' + uriFor(target) + '"); }\n';
+        rules += groupNames.map(n => '.fa-' + n).join(', ') + ' { --sv: url("' + uriFor(target) + '"); }\n';
     }
     for (const [target, groupNames] of laGroups) {
-        rules += groupNames.map(n => '.fa-' + n).join(', ') + ' { --svg: url("' + laUriFor(target) + '"); }\n';
+        rules += groupNames.map(n => '.fa-' + n).join(', ') + ' { --sv: url("' + laUriFor(target) + '"); }\n';
     }
     return rules;
 }
@@ -311,7 +311,7 @@ export function buildTablerIconsSvg() {
 
     let rules = '';
     for (const [uri, selectors] of byUri)
-        rules += selectors.join(', ') + ' { --svg: url("' + uri + '"); }\n';
+        rules += selectors.join(', ') + ' { --sv: url("' + uri + '"); }\n';
 
     const faCount = [...groups.values()].reduce((a, g) => a + g.length, 0);
     const laCount = [...laGroups.values()].reduce((a, g) => a + g.length, 0);

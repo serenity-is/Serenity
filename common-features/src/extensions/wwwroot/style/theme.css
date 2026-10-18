@@ -5,72 +5,72 @@
  *
  * Mask - monotone icon that follows text color:
  *
- *   .svg-icon-dashboard { --svg: url("data:image/svg+xml,..."); }
- *   <i class="svg-icon-dashboard"></i>
+ *   .sv-dashboard { --sv: url("data:image/svg+xml,..."); }
+ *   <i class="sv-dashboard"></i>
  *
- *   .my-icon { --svg: url("/icons/my-icon.svg"); }
- *   <i class="svg-icon my-icon"></i>
- *   <i class="svg-icon-mask my-icon"></i>       same as .svg-icon
+ *   .my-icon { --sv: url("/icons/my-icon.svg"); }
+ *   <i class="sv my-icon"></i>
+ *   <i class="svmask my-icon"></i> same as .sv
  *
  * Background - keeps the SVG's own colors (palette icons, two color icons):
  *
- *   .svg-bg-icon-logo { --svg: url("..."); }
- *   <i class="svg-bg-icon-logo"></i>
- *   <i class="svg-bg-icon my-icon"></i>
+ *   .svbg-logo { --sv: url("..."); }
+ *   <i class="svbg-logo"></i>
+ *   <i class="svbg my-icon"></i>
  *
  * Content - keeps colors, renders at the SVG's intrinsic width/height:
  *
- *   .svg-content-icon-logo { --svg: url("..."); }
- *   <i class="svg-content-icon-logo"></i>
- *   <i class="svg-content-icon my-icon"></i>
+ *   .svcontent-logo { --sv: url("..."); }
+ *   <i class="svcontent-logo"></i>
+ *   <i class="svcontent my-icon"></i>
  *
  * Accent - two stacked layers, main layer follows text color while the accent
  * layer uses its own color (e.g. a badge/dot that stays red on hover):
  *
- *   .svg-accent-icon-bell {
- *       --svg: url("...bell shape...");
- *       --svg-accent: url("...dot shape...");
- *       --svg-accent-color: #e5484d;
+ *   .svaccent-bell {
+ *       --sv: url("...bell shape...");
+ *       --svaccent: url("...dot shape...");
+ *       --svaccent-color: #e5484d;
  *   }
- *   <i class="svg-accent-icon-bell"></i>
- *   <i class="svg-accent-icon my-accent"></i>
+ *   <i class="svaccent-bell"></i>
+ *   <i class="svaccent my-accent"></i>
  *
  * Theme-specific variants are up to you, e.g.:
  *
- *   :root.dark .svg-icon-dashboard { --svg: url("..."); }
+ *   :root.dark .sv-dashboard { --sv: url("..."); }
  *
  * Notes:
  * - Only mask mode follows `color`/`currentColor`. Background, content and the
  *   accent layer use their own colors.
  * - Content mode renders the image at the size stated in its width/height
  *   attributes, it cannot be resized through CSS.
- * - Use only one mode per element. The svg-icon-, svg-bg-icon-,
- *   svg-accent-icon- and svg-content-icon- class prefixes are reserved.
+ * - Use only one mode per element. The sv-, svbg-,
+ *   svaccent- and svcontent- class prefixes are reserved.
  */
 
-.svg-icon,
-.svg-bg-icon,
-.svg-content-icon,
-[class^="svg-icon-"], [class*=" svg-icon-"],
-[class^="svg-bg-icon-"], [class*=" svg-bg-icon-"],
-[class^="svg-content-icon-"], [class*=" svg-content-icon-"] {
+.sv,
+.svbg,
+.svcontent,
+[class^="sv-"], [class*=" sv-"],
+[class^="svbg-"], [class*=" svbg-"],
+[class^="svcontent-"], [class*=" svcontent-"] {
     display: inline-block;
     font-style: normal;
     line-height: 1;
 }
 
-.svg-icon::before,
-.svg-icon-mask::before,
-[class^="svg-icon-"]::before,
-[class*=" svg-icon-"]::before {
+.sv::before,
+.svmask::before,
+[class^="sv-"]::before,
+[class*=" sv-"]::before {
     content: "";
     display: inline-block;
     width: 1em;
     height: 1em;
     vertical-align: -0.125em;
     background-color: currentColor;
-    -webkit-mask-image: var(--svg, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3Cpath fill='none' d='M0 0h1v1H0z'/%3E%3C/svg%3E"));
-    mask-image: var(--svg, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3Cpath fill='none' d='M0 0h1v1H0z'/%3E%3C/svg%3E"));
+    -webkit-mask-image: var(--sv, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3Cpath fill='none' d='M0 0h1v1H0z'/%3E%3C/svg%3E"));
+    mask-image: var(--sv, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3Cpath fill='none' d='M0 0h1v1H0z'/%3E%3C/svg%3E"));
     -webkit-mask-repeat: no-repeat;
     mask-repeat: no-repeat;
     -webkit-mask-position: center;
@@ -79,16 +79,16 @@
     mask-size: contain;
 }
 
-.svg-bg-icon::before,
-[class^="svg-bg-icon-"]::before,
-[class*=" svg-bg-icon-"]::before {
+.svbg::before,
+[class^="svbg-"]::before,
+[class*=" svbg-"]::before {
     content: "";
     display: inline-block;
     width: 1em;
     height: 1em;
     vertical-align: -0.125em;
     background-color: transparent;
-    background-image: var(--svg, none);
+    background-image: var(--sv, none);
     background-repeat: no-repeat;
     background-position: center;
     background-size: contain;
@@ -96,10 +96,10 @@
     mask-image: none;
 }
 
-.svg-content-icon::before,
-[class^="svg-content-icon-"]::before,
-[class*=" svg-content-icon-"]::before {
-    content: var(--svg, "");
+.svcontent::before,
+[class^="svcontent-"]::before,
+[class*=" svcontent-"]::before {
+    content: var(--sv, "");
     display: inline-block;
     vertical-align: -0.125em;
     background-color: transparent;
@@ -108,21 +108,21 @@
     mask-image: none;
 }
 
-.svg-accent-icon,
-[class^="svg-accent-icon-"],
-[class*=" svg-accent-icon-"] {
+.svaccent,
+[class^="svaccent-"],
+[class*=" svaccent-"] {
     display: inline-grid;
     font-style: normal;
     line-height: 1;
     vertical-align: -0.125em;
 }
 
-.svg-accent-icon::before,
-[class^="svg-accent-icon-"]::before,
-[class*=" svg-accent-icon-"]::before,
-.svg-accent-icon::after,
-[class^="svg-accent-icon-"]::after,
-[class*=" svg-accent-icon-"]::after {
+.svaccent::before,
+[class^="svaccent-"]::before,
+[class*=" svaccent-"]::before,
+.svaccent::after,
+[class^="svaccent-"]::after,
+[class*=" svaccent-"]::after {
     grid-area: 1 / 1;
     content: "";
     width: 1em;
@@ -135,20 +135,20 @@
     mask-size: contain;
 }
 
-.svg-accent-icon::before,
-[class^="svg-accent-icon-"]::before,
-[class*=" svg-accent-icon-"]::before {
+.svaccent::before,
+[class^="svaccent-"]::before,
+[class*=" svaccent-"]::before {
     background-color: currentColor;
-    -webkit-mask-image: var(--svg, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3Cpath fill='none' d='M0 0h1v1H0z'/%3E%3C/svg%3E"));
-    mask-image: var(--svg, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3Cpath fill='none' d='M0 0h1v1H0z'/%3E%3C/svg%3E"));
+    -webkit-mask-image: var(--sv, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3Cpath fill='none' d='M0 0h1v1H0z'/%3E%3C/svg%3E"));
+    mask-image: var(--sv, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3Cpath fill='none' d='M0 0h1v1H0z'/%3E%3C/svg%3E"));
 }
 
-.svg-accent-icon::after,
-[class^="svg-accent-icon-"]::after,
-[class*=" svg-accent-icon-"]::after {
-    background-color: var(--svg-accent-color, currentColor);
-    -webkit-mask-image: var(--svg-accent, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3Cpath fill='none' d='M0 0h1v1H0z'/%3E%3C/svg%3E"));
-    mask-image: var(--svg-accent, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3Cpath fill='none' d='M0 0h1v1H0z'/%3E%3C/svg%3E"));
+.svaccent::after,
+[class^="svaccent-"]::after,
+[class*=" svaccent-"]::after {
+    background-color: var(--svaccent-color, currentColor);
+    -webkit-mask-image: var(--svaccent, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3Cpath fill='none' d='M0 0h1v1H0z'/%3E%3C/svg%3E"));
+    mask-image: var(--svaccent, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3Cpath fill='none' d='M0 0h1v1H0z'/%3E%3C/svg%3E"));
 }
 
 /* SVG icon masks (generated): replaces s-icon-font glyphs */
