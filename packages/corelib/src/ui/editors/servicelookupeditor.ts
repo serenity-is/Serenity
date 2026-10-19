@@ -263,7 +263,9 @@ export abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptio
      * @returns A promise resolving to the search result.
      */
     protected override async asyncSearch(query: ComboboxSearchQuery): Promise<ComboboxSearchResult<TItem>> {
-        if (!this.canSearch(query.idList != null)) {
+        
+        if (query.idList?.length === 0 || // avoid service calls when idList is empty
+            !this.canSearch(query.idList != null)) {
             return Promise.resolve({
                 items: [],
                 more: false
