@@ -229,6 +229,54 @@ describe("Combobox", () => {
         combobox.dispose();
     });
 
+    it("discards pending initial selection when the user changes the value", async () => {
+        for (const eventName of ["select2-selected", "selected", "select2-removed"]) {
+            const element = document.createElement("input");
+            document.body.appendChild(element);
+            const deferred = createDeferred<any>();
+            const combobox = new Combobox({ element, search: () => deferred.promise });
+            const select2 = (element as any).select2;
+            const callback = vi.fn();
+            element.value = "1";
+            select2.opts.initSelection(element, callback);
+
+            const waiter = combobox.ensureSelectionLoaded();
+            element.dispatchEvent(new Event(eventName));
+
+            await expect(waiter).rejects.toMatchObject({ name: "AbortError" });
+            expect(combobox.selectionLoadState).toBe("idle");
+            await expect(combobox.ensureSelectionLoaded()).resolves.toBeUndefined();
+
+            deferred.resolve({ items: [{ id: "1", text: "One" }], more: false });
+            await Promise.resolve();
+
+            expect(callback).not.toHaveBeenCalled();
+            combobox.dispose();
+        }
+    });
+
+    it("clears a previous initial selection error when the user changes the value", async () => {
+        const element = document.createElement("input");
+        document.body.appendChild(element);
+        const deferred = createDeferred<any>();
+        const combobox = new Combobox({ element, search: () => deferred.promise });
+        const select2 = (element as any).select2;
+        element.value = "1";
+        select2.opts.initSelection(element, vi.fn());
+
+        const waiter = combobox.ensureSelectionLoaded();
+        const error = new Error("Lookup failed");
+        deferred.reject(error);
+        await expect(waiter).rejects.toBe(error);
+        expect(combobox.selectionLoadState).toBe("error");
+
+        element.dispatchEvent(new Event("select2-selected"));
+
+        expect(combobox.selectionLoadState).toBe("idle");
+        await expect(combobox.ensureSelectionLoaded()).resolves.toBeUndefined();
+        combobox.dispose();
+    });
+
     it("isolates waiters from superseded initial selection requests", async () => {
         const element = document.createElement("input");
         document.body.appendChild(element);

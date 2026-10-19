@@ -1,3 +1,4 @@
+import { bindThis } from "@serenity-is/domwise";
 import { Fluent, IconClassName, isArrayLike, isPromiseLike } from "../../base";
 import { Select2, Select2Options } from "./select2";
 
@@ -343,6 +344,10 @@ export class Combobox<TItem = any> {
 
         new Select2(select2Opt);
 
+        const boundThis = bindThis(this);
+        ["select2-selected", "selected", "select2-removed"].forEach(type =>
+            Fluent.on(this.el, type + ".combobox", boundThis.discardInitSelection));
+
         Fluent.on(this.el, "execute-search", () => {
             if (!this.el || !(this.el as any).typeTimeout || !(this.el as any).typeTimeoutFn) {
                 return;
@@ -369,6 +374,16 @@ export class Combobox<TItem = any> {
         }
     }
 
+    private cancelSelectionLoad(load: SelectionLoad, error: any, rememberError: boolean) {
+        if (this._selectionLoad === load) {
+            this._selectionLoad = undefined;
+            this._selectionLoadError = rememberError ? { reason: error } : undefined;
+        }
+
+        load.waiters.splice(0).forEach(waiter => waiter.reject(error));
+        load.controller.abort();
+    }
+
     /**
      * Aborts any pending initial selection query.
      */
@@ -379,8 +394,19 @@ export class Combobox<TItem = any> {
 
         const error = new Error("Initial selection loading was aborted.");
         error.name = "AbortError";
-        this.rejectSelectionLoad(load, error);
-        load.controller.abort();
+        this.cancelSelectionLoad(load, error, true);
+    }
+
+    private discardInitSelection() {
+        this._selectionLoadError = undefined;
+
+        const load = this._selectionLoad;
+        if (!load)
+            return;
+
+        const error = new Error("Initial selection loading was superseded.");
+        error.name = "AbortError";
+        this.cancelSelectionLoad(load, error, false);
     }
 
     /**
@@ -392,6 +418,7 @@ export class Combobox<TItem = any> {
         this.abortInitSelection();
         this.abortPendingQuery();
         Select2.getInstance(this.el)?.destroy();
+        Fluent.off(this.el, ".combobox");
         Fluent.off(this.el, "execute-search");
     }
 

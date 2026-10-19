@@ -8934,10 +8934,12 @@ export declare class Combobox<TItem = any> {
 	 * Aborts any pending search query.
 	 */
 	abortPendingQuery(): void;
+	private cancelSelectionLoad;
 	/**
 	 * Aborts any pending initial selection query.
 	 */
 	abortInitSelection(): void;
+	private discardInitSelection;
 	/**
 	 * Disposes the combobox and cleans up its resources.
 	 */
@@ -9147,6 +9149,16 @@ export declare class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
 	 * pending load.
 	 */
 	ensureSelectionLoaded(): Promise<void>;
+	/**
+	 * Waits for the current initial selection load and returns the selected item.
+	 * @returns The selected item, or null when nothing is selected.
+	 */
+	getSelectedItemAsync(): Promise<TItem>;
+	/**
+	 * Waits for the current initial selection load and returns the selected items.
+	 * @returns The selected items.
+	 */
+	getSelectedItemsAsync(): Promise<TItem[]>;
 	/**
 	 * Returns the type delay for searching.
 	 * @returns The delay in milliseconds.

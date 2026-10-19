@@ -62,6 +62,31 @@ describe("ComboboxEditor async behavior", () => {
             vi.useRealTimers();
         }
     });
+
+    it("returns the selected item after the initial selection load", async () => {
+        const combo = new ReverseAsyncCombo({});
+        combo.values = ["1"];
+        await expect(combo.getSelectedItemAsync()).resolves.toMatchObject({ ID: "1" });
+    });
+
+    it("returns null when no item is selected", async () => {
+        const combo = new ReverseAsyncCombo({});
+        await expect(combo.getSelectedItemAsync()).resolves.toBeNull();
+    });
+
+    it("returns selected items after the initial selection load", async () => {
+        const combo = new ReverseAsyncCombo({});
+        combo.values = ["1", "2"];
+        await expect(combo.getSelectedItemsAsync()).resolves.toMatchObject([
+            { ID: "1" },
+            { ID: "2" }
+        ]);
+    });
+
+    it("returns an empty array when no items are selected", async () => {
+        const combo = new ReverseAsyncCombo({});
+        await expect(combo.getSelectedItemsAsync()).resolves.toEqual([]);
+    });
 });
 
 describe("ComboboxEditor helpers", () => {
