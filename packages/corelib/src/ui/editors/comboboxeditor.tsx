@@ -143,12 +143,22 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
     }
 
     /**
-        * Waits for the current initial selection load, if necessary.
-        * @returns A promise while loading or after a load failure; otherwise, undefined.
-        * The promise rejects if loading fails or is aborted.
+     * Returns the current state of the initial selection load.
+     * "idle" means there is no pending or failed load. It does not guarantee
+     * that an item is currently selected.
      */
-    ensureSelectionLoaded(): void | PromiseLike<void> {
-        return this.combobox?.ensureSelectionLoaded();
+    get selectionLoadState(): "idle" | "loading" | "error" {
+        return this.combobox?.selectionLoadState ?? "idle";
+    }
+
+    /**
+     * Waits for the current initial selection load, if necessary.
+     * @returns A promise that resolves when the selection is loaded or rejects
+     * if loading fails or is aborted. It resolves immediately when there is no
+     * pending load.
+     */
+    ensureSelectionLoaded(): Promise<void> {
+        return this.combobox?.ensureSelectionLoaded() ?? Promise.resolve();
     }
 
     /**

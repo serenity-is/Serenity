@@ -135,11 +135,27 @@ export class Combobox<TItem = any> {
     private _selectionLoadError?: { reason: unknown };
 
     /**
-     * Waits for the initial selection to load, if necessary.
-     * @returns A promise while loading or after a load failure; otherwise, undefined.
-        * The promise rejects if loading fails or is aborted.
+     * Returns the current state of the initial selection load.
+     * "idle" means there is no pending or failed load. It does not guarantee
+     * that an item is currently selected.
      */
-    ensureSelectionLoaded(): PromiseLike<void> | void {
+    get selectionLoadState(): "idle" | "loading" | "error" {
+        if (this._selectionLoad)
+            return "loading";
+
+        if (this._selectionLoadError)
+            return "error";
+
+        return "idle";
+    }
+
+    /**
+     * Waits for the initial selection to load, if necessary.
+     * @returns A promise that resolves when the selection is loaded or rejects
+     * if loading fails or is aborted. It resolves immediately when there is no
+     * pending load.
+     */
+    ensureSelectionLoaded(): Promise<void> {
         const load = this._selectionLoad;
         if (load) {
             return new Promise<void>((resolve, reject) => {
@@ -149,6 +165,8 @@ export class Combobox<TItem = any> {
 
         if (this._selectionLoadError)
             return Promise.reject(this._selectionLoadError.reason);
+
+        return Promise.resolve();
     }
 
     private resolveSelectionLoad(load: SelectionLoad) {
@@ -523,8 +541,14 @@ export class Combobox<TItem = any> {
                 this.el.value = val;
             }
 
-            if (triggerChange)
-                Fluent.trigger(this.el, "change");
+            if (triggerChange) {
+                this.el.dataset.select2ChangeTriggered = "true";
+                try {
+                    Fluent.trigger(this.el, "change");
+                } finally {
+                    delete this.el.dataset.select2ChangeTriggered;
+                }
+            }
 
         } finally {
             delete this.el.dataset.comboboxsettingvalue;

@@ -2827,6 +2827,8 @@ export interface LookupOptions<TItem> {
 	parentIdField?: string;
 	/** Name of the field that holds the human-readable display text for an item. */
 	textField?: string;
+	/** Name of the field that holds the icon for an item. */
+	iconField?: string;
 }
 /**
  * Client-side lookup data structure that holds a flat list of items and a fast key-based index.
@@ -2846,6 +2848,8 @@ export interface Lookup<TItem> {
 	parentIdField: string;
 	/** Name of the display-text field (copied from {@link LookupOptions.textField}). */
 	textField: string;
+	/** Name of the icon field (copied from {@link LookupOptions.iconField}). */
+	iconField: string;
 }
 /**
  * Concrete implementation of the {@link Lookup} interface for client-side use.
@@ -2870,6 +2874,8 @@ export declare class Lookup<TItem> {
 	parentIdField: string;
 	/** Name of the display-text field (from constructor options). */
 	textField: string;
+	/** Name of the field that holds the icon for an item (from constructor options). */
+	iconField: string;
 	/**
 	 * Creates a new lookup instance.
 	 * @param options - Field mapping for id/parent/text. Pass `null`/`undefined` for an empty configuration (fields remain `undefined`).
@@ -8825,6 +8831,8 @@ export interface ComboboxItem<TSource = any> {
 	id?: string;
 	/** Display text. */
 	text?: string;
+	/** Icon class for the item. */
+	icon?: IconClassName;
 	/** The source item. */
 	source?: TSource;
 	/** Whether the item is disabled. */
@@ -8907,11 +8915,18 @@ export declare class Combobox<TItem = any> {
 	private _selectionLoad?;
 	private _selectionLoadError?;
 	/**
-	 * Waits for the initial selection to load, if necessary.
-	 * @returns A promise while loading or after a load failure; otherwise, undefined.
-		* The promise rejects if loading fails or is aborted.
+	 * Returns the current state of the initial selection load.
+	 * "idle" means there is no pending or failed load. It does not guarantee
+	 * that an item is currently selected.
 	 */
-	ensureSelectionLoaded(): PromiseLike<void> | void;
+	get selectionLoadState(): "idle" | "loading" | "error";
+	/**
+	 * Waits for the initial selection to load, if necessary.
+	 * @returns A promise that resolves when the selection is loaded or rejects
+	 * if loading fails or is aborted. It resolves immediately when there is no
+	 * pending load.
+	 */
+	ensureSelectionLoaded(): Promise<void>;
 	private resolveSelectionLoad;
 	private rejectSelectionLoad;
 	private createSelect2;
@@ -9120,11 +9135,18 @@ export declare class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
 	 */
 	protected asyncSearch(query: ComboboxSearchQuery): PromiseLike<ComboboxSearchResult<TItem>>;
 	/**
-		* Waits for the current initial selection load, if necessary.
-		* @returns A promise while loading or after a load failure; otherwise, undefined.
-		* The promise rejects if loading fails or is aborted.
+	 * Returns the current state of the initial selection load.
+	 * "idle" means there is no pending or failed load. It does not guarantee
+	 * that an item is currently selected.
 	 */
-	ensureSelectionLoaded(): void | PromiseLike<void>;
+	get selectionLoadState(): "idle" | "loading" | "error";
+	/**
+	 * Waits for the current initial selection load, if necessary.
+	 * @returns A promise that resolves when the selection is loaded or rejects
+	 * if loading fails or is aborted. It resolves immediately when there is no
+	 * pending load.
+	 */
+	ensureSelectionLoaded(): Promise<void>;
 	/**
 	 * Returns the type delay for searching.
 	 * @returns The delay in milliseconds.
@@ -9168,6 +9190,17 @@ export declare class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
 	 * @returns True when disabled.
 	 */
 	protected itemDisabled(item: TItem): boolean;
+	/**
+	 * Gets the name of the icon field.
+	 * @returns The name of the icon field.
+	 */
+	protected getIconField(): any;
+	/**
+	 * Returns the icon of an item.
+	 * @param item - The item.
+	 * @returns The item icon.
+	 */
+	protected itemIcon(item: TItem): IconClassName;
 	/**
 	 * Maps an item to a combobox item.
 	 * @param item - The item.
@@ -10251,7 +10284,7 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
 	 * Returns the initial title shown above the grid.
 	 * @returns The title text, or null for no title.
 	 */
-	protected getInitialTitle(): string;
+	protected getInitialTitle(): RenderableContent;
 	/**
 	 * Hook for subclasses to add extra toolbar buttons or controls.
 	 */
@@ -10594,7 +10627,7 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
 	 * Sets the grid title text, creating or removing the title element as needed.
 	 * @param value - The title text, or null to remove the title.
 	 */
-	setTitle(value: string): void;
+	setTitle(value: RenderableContent): void;
 	/**
 	 * Returns the item type key for this grid.
 	 * @returns The item type key.
@@ -11019,7 +11052,7 @@ export declare class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
 	 * Returns the initial title for the grid panel.
 	 * @returns Localized plural display name.
 	 */
-	protected getInitialTitle(): string;
+	protected getInitialTitle(): RenderableContent;
 	/**
 	 * Resolves the local text prefix for this grid; falls back to the entity type.
 	 * @returns Local text prefix key.
@@ -13633,6 +13666,7 @@ export declare abstract class LookupEditorBase<P extends LookupEditorOptions, TI
 	 * @returns The item text.
 	 */
 	protected getItemText(item: TItem, lookup: Lookup<TItem>): any;
+	protected getItemIcon(item: TItem, lookup: Lookup<TItem>): IconClassName;
 	/**
 	 * Maps an item to a combobox item.
 	 * @param item - The item.
@@ -13828,9 +13862,6 @@ export declare class Recaptcha<P extends RecaptchaOptions = RecaptchaOptions> ex
 	 */
 	set_value(value: string): void;
 }
-/**
- * Adapted from 3.5.x version of Select2 (https://github.com/select2/select2), removing jQuery dependency
- */
 /** Element type that can host a Select2. */
 export type Select2Element = HTMLInputElement | HTMLSelectElement;
 /** Result of a Select2 formatter. */
@@ -13862,6 +13893,8 @@ export interface Select2Item {
 	text?: string;
 	/** The source item. */
 	source?: any;
+	/** Icon class for the item. */
+	icon?: IconClassName;
 	/** CSS class(es) of the item. */
 	css?: string;
 	/** Child items. */
