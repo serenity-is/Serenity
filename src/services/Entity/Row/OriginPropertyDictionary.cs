@@ -297,7 +297,8 @@ internal class OriginPropertyDictionary
             else
             {
                 attr = propertyByName[propJoin.propertyName].GetCustomAttribute<DisplayNameAttribute>();
-                if (attr is not null && (attr is DisplayTextAttribute ||
+                if (attr is not null && !string.IsNullOrEmpty(attr.DisplayName) &&
+                    (attr is DisplayTextAttribute ||
                     !LocalText.IsLocalTextKeyCandidate(attr.DisplayName, uiKeyOnly: true)))
                     prefix = attr.DisplayName;
                 else
@@ -310,8 +311,11 @@ internal class OriginPropertyDictionary
             prefix = join.TitlePrefix;
         }
 
-        string addPrefix(string s)
+        string addPrefix(string? s)
         {
+            if (string.IsNullOrEmpty(s))
+                return "";
+
             if (string.IsNullOrEmpty(prefix) || s == prefix || s.StartsWith(prefix + " "))
                 return s;
 
@@ -324,6 +328,14 @@ internal class OriginPropertyDictionary
         attr = originProperty.GetCustomAttribute<DisplayNameAttribute>();
         if (attr is DisplayTextAttribute displayText)
         {
+            if (string.IsNullOrEmpty(displayText.DisplayName))
+            {
+                if (string.IsNullOrEmpty(prefix) && !string.IsNullOrEmpty(displayText.TextKey))
+                    return displayText;
+
+                return new DisplayTextAttribute(addPrefix(originProperty.Name));
+            }
+
             var name = addPrefix(displayText.DisplayName);
             return name == displayText.DisplayName &&
                 !string.IsNullOrEmpty(displayText.TextKey) ? displayText :
@@ -348,6 +360,16 @@ internal class OriginPropertyDictionary
             var nestedDisplay = originDictionary.OriginDisplayName(originProperty.Name,
                 originOrigin, expressionSelector);
             var name = nestedDisplay.DisplayName;
+            if (string.IsNullOrEmpty(name))
+            {
+                if (string.IsNullOrEmpty(prefix) &&
+                    nestedDisplay is DisplayTextAttribute nestedText &&
+                    !string.IsNullOrEmpty(nestedText.TextKey))
+                    return nestedDisplay;
+
+                return new DisplayTextAttribute(addPrefix(originProperty.Name));
+            }
+
             var prefixedName = addPrefix(name);
             if (prefixedName == name)
                 return nestedDisplay;

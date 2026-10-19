@@ -91,6 +91,37 @@ public class EntityExtensionsTests
         }
     }
 
+    [LocalTextPrefix("AutoTextKeyLocal")]
+    private class AutoTextKeyRow : Row<AutoTextKeyRow.RowFields>
+    {
+        [Column("UID"), DisplayText("Uid Caption")]
+        public string? Uid { get => fields.Uid[this]; set => fields.Uid[this] = value; }
+
+        public class RowFields : RowFieldsBase
+        {
+            public StringField Uid = null!;
+            public StringField NoProperty = null!;
+
+            public RowFields()
+            {
+                Uid = new StringField(this, "UID");
+                NoProperty = new StringField(this, "COLUMN_NO_PROP");
+            }
+        }
+    }
+
+    [Fact]
+    public void AutoTextKey_Uses_Property_Name_When_Field_Has_Column_Only_For_Unbound_Fields()
+    {
+        var fields = new AutoTextKeyRow().GetFields();
+
+        Assert.Equal("Uid", fields.Uid.PropertyName);
+        Assert.Equal("Db.AutoTextKeyLocal.Uid", fields.Uid.AutoTextKey);
+
+        Assert.Null(fields.NoProperty.PropertyName);
+        Assert.Equal("Db.AutoTextKeyLocal.COLUMN_NO_PROP", fields.NoProperty.AutoTextKey);
+    }
+
     [Fact]
     public void IsTableField_Throws_For_Null()
     {

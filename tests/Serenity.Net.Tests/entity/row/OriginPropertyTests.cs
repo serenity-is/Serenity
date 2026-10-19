@@ -220,11 +220,13 @@ public class OriginPropertyTests
         {
             public StringField Name;
             public StringField KeyLikeName;
+            public StringField KeyOnlyName;
 
             public RowFields()
             {
                 Name = new StringField(this, "Name");
                 KeyLikeName = new StringField(this, "KeyLikeName");
+                KeyOnlyName = new StringField(this, "KeyOnlyName");
             }
         }
 
@@ -233,6 +235,9 @@ public class OriginPropertyTests
 
         [DisplayName("Site.LegacyOriginKey")]
         public string KeyLikeName { get => fields.KeyLikeName[this]; set => fields.KeyLikeName[this] = value; }
+
+        [DisplayText(TextKey = "Site.OriginKeyOnly")]
+        public string KeyOnlyName { get => fields.KeyOnlyName[this]; set => fields.KeyOnlyName[this] = value; }
     }
 
     public class OriginTextKeyRow : Row<OriginTextKeyRow.RowFields>
@@ -241,19 +246,27 @@ public class OriginPropertyTests
         {
             public Int32Field SourceID;
             public Int32Field PrefixSourceID;
+            public Int32Field KeyOnlySourceID;
             public StringField Name;
             public StringField PrefixedName;
             public StringField KeyLikeName;
             public StringField PrefixedKeyLikeName;
+            public StringField KeyOnlyName;
+            public StringField PrefixedKeyOnlyName;
+            public StringField KeyOnlySourceName;
 
             public RowFields()
             {
                 SourceID = new Int32Field(this, "SourceID");
                 PrefixSourceID = new Int32Field(this, "PrefixSourceID");
+                KeyOnlySourceID = new Int32Field(this, "KeyOnlySourceID");
                 Name = new StringField(this, "Name");
                 PrefixedName = new StringField(this, "PrefixedName");
                 KeyLikeName = new StringField(this, "KeyLikeName");
                 PrefixedKeyLikeName = new StringField(this, "PrefixedKeyLikeName");
+                KeyOnlyName = new StringField(this, "KeyOnlyName");
+                PrefixedKeyOnlyName = new StringField(this, "PrefixedKeyOnlyName");
+                KeyOnlySourceName = new StringField(this, "KeyOnlySourceName");
             }
         }
 
@@ -262,6 +275,10 @@ public class OriginPropertyTests
 
         [ForeignKey("SourceTable", "Id"), LeftJoin("pref", RowType = typeof(OriginTextKeySourceRow), TitlePrefix = "Prefix")]
         public int? PrefixSourceID { get => fields.PrefixSourceID[this]; set => fields.PrefixSourceID[this] = value; }
+
+        [DisplayText(TextKey = "Site.SourceKeyOnly")]
+        [ForeignKey("SourceTable", "Id"), LeftJoin("ksrc", RowType = typeof(OriginTextKeySourceRow))]
+        public int? KeyOnlySourceID { get => fields.KeyOnlySourceID[this]; set => fields.KeyOnlySourceID[this] = value; }
 
         [Origin("src", nameof(OriginTextKeySourceRow.Name))]
         public string Name { get => fields.Name[this]; set => fields.Name[this] = value; }
@@ -274,6 +291,15 @@ public class OriginPropertyTests
 
         [Origin("pref", nameof(OriginTextKeySourceRow.KeyLikeName))]
         public string PrefixedKeyLikeName { get => fields.PrefixedKeyLikeName[this]; set => fields.PrefixedKeyLikeName[this] = value; }
+
+        [Origin("src", nameof(OriginTextKeySourceRow.KeyOnlyName))]
+        public string KeyOnlyName { get => fields.KeyOnlyName[this]; set => fields.KeyOnlyName[this] = value; }
+
+        [Origin("pref", nameof(OriginTextKeySourceRow.KeyOnlyName))]
+        public string PrefixedKeyOnlyName { get => fields.PrefixedKeyOnlyName[this]; set => fields.PrefixedKeyOnlyName[this] = value; }
+
+        [Origin("ksrc", nameof(OriginTextKeySourceRow.Name))]
+        public string KeyOnlySourceName { get => fields.KeyOnlySourceName[this]; set => fields.KeyOnlySourceName[this] = value; }
     }
 
     public class OriginNestedRow : Row<OriginNestedRow.RowFields>
@@ -583,6 +609,9 @@ public class OriginPropertyTests
         Assert.Equal("Prefix Origin display", fields.PrefixedName.Caption?.Key);
         Assert.Equal("KeyLikeName", fields.KeyLikeName.Caption?.Key);
         Assert.Equal("Prefix KeyLikeName", fields.PrefixedKeyLikeName.Caption?.Key);
+        Assert.Equal("Site.OriginKeyOnly", fields.KeyOnlyName.Caption?.Key);
+        Assert.Equal("Prefix KeyOnlyName", fields.PrefixedKeyOnlyName.Caption?.Key);
+        Assert.Equal("KeyOnlySourceID Origin display", fields.KeyOnlySourceName.Caption?.Key);
     }
 
     [Fact]
