@@ -22,7 +22,7 @@
   "Enums.ImageCheckResult.DataSizeTooHigh": "Bestandsgrootte moet lager zijn dan {0}, maar het is {1}!",
   "Enums.ImageCheckResult.HeightMismatch": "De afbeelding moet precies {0} pixels hebben, maar het heeft {1} pixels!",
   "Enums.ImageCheckResult.HeightTooHigh": "De afbeelding moet lager zijn dan {0} pixels, maar het is {1} pixels!",
-  "Enums.ImageCheckResult.HeightTooLow": "De breedte van de afbeelding moet hoger zijn dan {0} pixels, maar het is {1} pixels!",
+  "Enums.ImageCheckResult.HeightTooLow": "De hoogte van de afbeelding moet hoger zijn dan {0} pixels, maar het is {1} pixels!",
   "Enums.ImageCheckResult.ImageIsEmpty": "De afbeelding is leeg, de hoogte of breedte is nul!",
   "Enums.ImageCheckResult.InvalidImage": "Bestand is geen geldige afbeelding!",
   "Enums.ImageCheckResult.SizeMismatch": "De afbeeldingsgrootte moet precies {0}x{1} pixels zijn, maar het is {2}x{3} pixels!",

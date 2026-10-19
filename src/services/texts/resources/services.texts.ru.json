@@ -22,7 +22,7 @@
   "Enums.ImageCheckResult.DataSizeTooHigh": "Размер файла должен быть меньше {0}, но это {1}!",
   "Enums.ImageCheckResult.HeightMismatch": "Изображение должно иметь ровно {0} пикселей, но у него {1} пикселей!",
   "Enums.ImageCheckResult.HeightTooHigh": "Высота изображения должна быть ниже {0} пикселей, но это {1} пикселей!",
-  "Enums.ImageCheckResult.HeightTooLow": "Ширина изображения должна быть больше, чем {0} пикселей, но это {1} пикселей!",
+  "Enums.ImageCheckResult.HeightTooLow": "Высота изображения должна быть больше, чем {0} пикселей, но это {1} пикселей!",
   "Enums.ImageCheckResult.ImageIsEmpty": "Изображение пустое, его высота или ширина равна нулю!",
   "Enums.ImageCheckResult.InvalidImage": "Файл не является допустимым изображением!",
   "Enums.ImageCheckResult.SizeMismatch": "Размер изображения должен быть ровно {0}x{1} пикселей, но это {2}x{3} пикселей!",

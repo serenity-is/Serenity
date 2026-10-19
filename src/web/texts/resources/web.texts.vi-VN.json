@@ -169,6 +169,7 @@
   "Validation.EmailMultiple": "Vui lòng nhập một địa chỉ email hợp lệ (nếu có nhiều hơn một, sử dụng ';' làm phân tách)",
   "Validation.HourAndMin": "Vui lòng nhập thời gian hợp lệ (ví dụ: 15:30)",
   "Validation.IncorrectPassword": "Mật khẩu không chính xác",
+  "Validation.Int64": "Vui lòng nhập một giá trị số nguyên 64 bit hợp lệ.",
   "Validation.Integer": "Vui lòng nhập một giá trị số nguyên hợp lệ",
   "Validation.InvalidFormMessage": "Vui lòng xác nhận các đầu vào trống hoặc không hợp lệ (đánh dấu bằng màu đỏ) trước khi gửi biểu mẫu",
   "Validation.MaxDate": "Vui lòng nhập một ngày trước '{0}'",

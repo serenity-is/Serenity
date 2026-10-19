@@ -22,7 +22,7 @@
   "Enums.ImageCheckResult.DataSizeTooHigh": "फ़ाइल का आकार {0} से कम होना चाहिए, लेकिन यह {1} है!",
   "Enums.ImageCheckResult.HeightMismatch": "छवि को ठीक से {0} पिक्सेल होना चाहिए, लेकिन यह {1} पिक्सेल है!",
   "Enums.ImageCheckResult.HeightTooHigh": "छवि की ऊंचाई {0} पिक्सेल से कम होनी चाहिए, लेकिन यह {1} पिक्सेल है!",
-  "Enums.ImageCheckResult.HeightTooLow": "छवि की चौड़ाई {0} पिक्सेल से अधिक होनी चाहिए, लेकिन यह {1} पिक्सेल है!",
+  "Enums.ImageCheckResult.HeightTooLow": "छवि की ऊँचाई {0} पिक्सेल से अधिक होनी चाहिए, लेकिन यह {1} पिक्सेल है!",
   "Enums.ImageCheckResult.ImageIsEmpty": "छवि खाली है, इसकी ऊंचाई या चौड़ाई शून्य है!",
   "Enums.ImageCheckResult.InvalidImage": "फ़ाइल एक वैध छवि नहीं है!",
   "Enums.ImageCheckResult.SizeMismatch": "छवि का आकार बराबर {0}x{1} पिक्सेल होना चाहिए, लेकिन यह {2}x{3} पिक्सेल है!",

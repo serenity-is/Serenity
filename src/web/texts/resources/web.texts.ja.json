@@ -169,6 +169,7 @@
   "Validation.EmailMultiple": "有効なメールアドレスを入力してください（複数の場合は、セパレータとして「;」を使用してください）",
   "Validation.HourAndMin": "有効な時間を入力してください（例：15:30）",
   "Validation.IncorrectPassword": "パスワードが間違っています。確認してください。",
+  "Validation.Int64": "有効な64ビット整数値を入力してください。",
   "Validation.Integer": "有効な整数値を入力してください。",
   "Validation.InvalidFormMessage": "フォームを送信する前に、赤色でマークされた空または無効な入力を検証してください。",
   "Validation.MaxDate": "「{0}」より前の日付を入力してください。",

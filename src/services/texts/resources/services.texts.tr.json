@@ -22,7 +22,7 @@
   "Enums.ImageCheckResult.DataSizeTooHigh": "Dosya boyutu {0}'dan küçük olmalı, ancak {1}!",
   "Enums.ImageCheckResult.HeightMismatch": "Resim yüksekliği tam olarak {0} piksel olmalı, ancak {1} piksel!",
   "Enums.ImageCheckResult.HeightTooHigh": "Resim yüksekliği {0} pikselden daha düşük olmalı, ancak {1} piksel!",
-  "Enums.ImageCheckResult.HeightTooLow": "Resim genişliği {0} pikselden daha yüksek olmalı, ancak {1} piksel!",
+  "Enums.ImageCheckResult.HeightTooLow": "Resim yüksekliği {0} pikselden daha yüksek olmalı, ancak {1} piksel!",
   "Enums.ImageCheckResult.ImageIsEmpty": "Resim boş, yüksekliği veya genişliği sıfır!",
   "Enums.ImageCheckResult.InvalidImage": "Dosya geçerli bir resim değil!",
   "Enums.ImageCheckResult.SizeMismatch": "Resim boyutu tam olarak {0}x{1} piksel olmalı ancak {2}x{3} piksel!",

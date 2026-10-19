@@ -169,6 +169,7 @@
   "Validation.EmailMultiple": "Silakan masukkan alamat email yang valid (jika lebih dari satu, gunakan ';' sebagai pemisah)",
   "Validation.HourAndMin": "Silakan masukkan waktu yang valid (contoh: 15:30)",
   "Validation.IncorrectPassword": "Kata sandi salah",
+  "Validation.Int64": "Silakan masukkan nilai bilangan bulat 64-bit yang valid.",
   "Validation.Integer": "Silakan masukkan nilai bilangan bulat yang valid",
   "Validation.InvalidFormMessage": "Silakan validasi masukan kosong atau tidak valid (ditandai dengan warna merah) sebelum mengirimkan formulir",
   "Validation.MaxDate": "Silakan masukkan tanggal sebelum '{0}'",

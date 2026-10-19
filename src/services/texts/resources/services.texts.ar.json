@@ -22,7 +22,7 @@
   "Enums.ImageCheckResult.DataSizeTooHigh": "الحجم يجب أن يكون أقل من {0}، ولكنه {1}!",
   "Enums.ImageCheckResult.HeightMismatch": "الصورة يجب أن تكون بالضبط {0} بكسل، ولكنها {1} بكسل!",
   "Enums.ImageCheckResult.HeightTooHigh": "الصورة يجب أن تكون أقل من {0} بكسل، لكنها {1} بكسل!",
-  "Enums.ImageCheckResult.HeightTooLow": "الصورة العرض يجب أن يكون أعلى من {0} بكسل، ولكنه {1} بكسل!",
+  "Enums.ImageCheckResult.HeightTooLow": "يجب أن يكون ارتفاع الصورة أعلى من {0} بكسل، ولكنه {1} بكسل!",
   "Enums.ImageCheckResult.ImageIsEmpty": "الصورة فارغة، إرتفاعها أو عرضها يساوي صفر!",
   "Enums.ImageCheckResult.InvalidImage": "الملف ليس صورة صالحة!",
   "Enums.ImageCheckResult.SizeMismatch": "الحجم يجب أن يكون بالضبط {0}x{1} بكسل ولكنه {2}x{3} بكسل!",

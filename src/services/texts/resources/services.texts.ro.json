@@ -22,7 +22,7 @@
   "Enums.ImageCheckResult.DataSizeTooHigh": "Mărimea fișierului trebuie să fie mai mică decât {0}, dar este {1}!",
   "Enums.ImageCheckResult.HeightMismatch": "Imaginea trebuie să aibă exact {0} pixeli, dar are {1} pixeli!",
   "Enums.ImageCheckResult.HeightTooHigh": "Imaginea trebuie să fie mai mică decât {0} pixeli, dar este {1} pixeli!",
-  "Enums.ImageCheckResult.HeightTooLow": "Lățimea imaginii trebuie să fie mai mare decât {0} pixeli, dar este {1} pixeli!",
+  "Enums.ImageCheckResult.HeightTooLow": "Înălțimea imaginii trebuie să fie mai mare decât {0} pixeli, dar este {1} pixeli!",
   "Enums.ImageCheckResult.ImageIsEmpty": "Imaginea este goală, înălțimea sau lățimea este zero!",
   "Enums.ImageCheckResult.InvalidImage": "Fișierul nu este o imagine validă!",
   "Enums.ImageCheckResult.SizeMismatch": "Mărimea imaginii trebuie să fie exact {0}x{1} pixeli, dar este {2}x{3} pixeli!",

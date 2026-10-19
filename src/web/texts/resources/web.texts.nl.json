@@ -169,6 +169,7 @@
   "Validation.EmailMultiple": "Voer een geldig emailadres in (als er meer dan één is, gebruik dan ';' als scheidingsteken)",
   "Validation.HourAndMin": "Voer een geldige tijd in (bijv",
   "Validation.IncorrectPassword": "Onjuist wachtwoord",
+  "Validation.Int64": "Voer een geldige 64-bits integerwaarde in.",
   "Validation.Integer": "Voer een geldige gehele waarde in",
   "Validation.InvalidFormMessage": "Controleer alstublieft lege of ongeldige invoer (gemarkeerd met rood) voordat u het formulier verzendt",
   "Validation.MaxDate": "Voer alstublieft een datum in voor '{0}'",

@@ -22,7 +22,7 @@
   "Enums.ImageCheckResult.DataSizeTooHigh": "Velikost souboru musí být nižší než {0}, ale je {1}!",
   "Enums.ImageCheckResult.HeightMismatch": "Obrázek musí mít přesně {0} pixelů, ale má {1} pixelů!",
   "Enums.ImageCheckResult.HeightTooHigh": "Obrázek musí být nižší než {0} pixelů, ale je to {1} pixelů!",
-  "Enums.ImageCheckResult.HeightTooLow": "Obrázek šířka musí být vyšší než {0} pixelů, ale je to {1} pixelů!",
+  "Enums.ImageCheckResult.HeightTooLow": "Výška obrázku musí být vyšší než {0} pixelů, ale je to {1} pixelů!",
   "Enums.ImageCheckResult.ImageIsEmpty": "Obrázek je prázdný, jeho výška nebo šířka je nula!",
   "Enums.ImageCheckResult.InvalidImage": "Soubor není platný obrázek!",
   "Enums.ImageCheckResult.SizeMismatch": "Velikost obrázku musí být přesně {0}x{1} pixelů, ale je {2}x{3} pixelů!",

@@ -22,7 +22,7 @@
   "Enums.ImageCheckResult.DataSizeTooHigh": "Filstorleken måste vara lägre än {0}, men det är {1}!",
   "Enums.ImageCheckResult.HeightMismatch": "Bilden måste ha exakt {0} pixlar, men den har {1} pixlar!",
   "Enums.ImageCheckResult.HeightTooHigh": "Bilden måste vara lägre än {0} pixlar, men det är {1} pixlar!",
-  "Enums.ImageCheckResult.HeightTooLow": "Bildens bredd måste vara högre än {0} pixlar, men det är {1} pixlar!",
+  "Enums.ImageCheckResult.HeightTooLow": "Bildens höjd måste vara högre än {0} pixlar, men det är {1} pixlar!",
   "Enums.ImageCheckResult.ImageIsEmpty": "Bilden är tom, dess höjd eller bredd är noll!",
   "Enums.ImageCheckResult.InvalidImage": "Filen är inte en giltig bild!",
   "Enums.ImageCheckResult.SizeMismatch": "Bildstorleken måste vara exakt {0}x{1} pixlar, men det är {2}x{3} pixlar!",

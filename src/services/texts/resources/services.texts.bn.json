@@ -22,7 +22,7 @@
   "Enums.ImageCheckResult.DataSizeTooHigh": "ফাইলের আকার অবশ্যই {0} এর চেয়ে কম হতে হবে, তবে এটি {1}!",
   "Enums.ImageCheckResult.HeightMismatch": "ছবির উচ্চতার আকার ঠিকঠাক {0} পিক্সেল হতে হবে, তবে এটি {1} পিক্সেল!",
   "Enums.ImageCheckResult.HeightTooHigh": "ছবির উচ্চতা {0} পিক্সেলের চেয়ে কম হতে হবে, কিন্তু এটি {1} পিক্সেল!",
-  "Enums.ImageCheckResult.HeightTooLow": "ছবির প্রস্থ অবশ্যই {0} পিক্সেলের উপরে হতে হবে, কিন্তু এটি {1} পিক্সেল!",
+  "Enums.ImageCheckResult.HeightTooLow": "ছবির উচ্চতা অবশ্যই {0} পিক্সেলের উপরে হতে হবে, কিন্তু এটি {1} পিক্সেল!",
   "Enums.ImageCheckResult.ImageIsEmpty": "ছবিটি খালি, তার উচ্চতা অথবা প্রস্থ শূন্য!",
   "Enums.ImageCheckResult.InvalidImage": "ফাইল একটি বৈধ ছবি নয়!",
   "Enums.ImageCheckResult.SizeMismatch": "ইমেজ আকার ঠিক করে {0}x{1} পিক্সেল হতে হবে, কিন্তু এটি {2}x{3} পিক্সেল!",

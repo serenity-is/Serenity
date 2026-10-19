@@ -169,6 +169,7 @@
   "Validation.EmailMultiple": "الرجاء إدخال عنوان بريد إلكتروني صالح (إذا كانت أكثر من واحد، استخدم ';' كفاصل)",
   "Validation.HourAndMin": "الرجاء إدخال وقت صالح (مثال: 15:30)",
   "Validation.IncorrectPassword": "خطأ كلمة المرور",
+  "Validation.Int64": "يرجى إدخال قيمة صحيحة لعدد صحيح من 64 بت.",
   "Validation.Integer": "يرجى إدخال قيمة عدد صحيحة صالحة",
   "Validation.InvalidFormMessage": "الرجاء التحقق من الإدخالات الفارغة أو غير صالحة (المؤشر باللون الأحمر) قبل تقديم النموذج",
   "Validation.MaxDate": "الرجاء إدخال تاريخ قبل '{0}'",

@@ -169,6 +169,7 @@
   "Validation.EmailMultiple": "유효한 이메일 주소를 입력하십시오 (1개 이상인 경우 ';'를 구분자로 사용하십시오)",
   "Validation.HourAndMin": "유효한 시간을 입력하십시오 (예: 15:30)",
   "Validation.IncorrectPassword": "비밀번호가 잘못되었습니다",
+  "Validation.Int64": "유효한 64비트 정수 값을 입력하세요.",
   "Validation.Integer": "유효한 정수 값을 입력하십시오",
   "Validation.InvalidFormMessage": "양식을 제출하기 전에 빨간색으로 표시된 빈 또는 잘못된 입력을 확인하십시오",
   "Validation.MaxDate": "'{0}' 이전 날짜를 입력하십시오",

@@ -169,6 +169,7 @@
   "Validation.EmailMultiple": "Zadejte prosím platnou emailovou adresu (pokud jich bude více, oddělte je znakem ';')",
   "Validation.HourAndMin": "Zadejte prosím platný čas (např",
   "Validation.IncorrectPassword": "Nesprávné heslo",
+  "Validation.Int64": "Zadejte platnou 64bitovou celočíselnou hodnotu.",
   "Validation.Integer": "Zadejte prosím platnou celočíselnou hodnotu",
   "Validation.InvalidFormMessage": "Prosím, ověřte prázdné nebo neplatné vstupy (označené červeně) před odesláním formuláře",
   "Validation.MaxDate": "Prosím, zadejte datum před '{0}'",

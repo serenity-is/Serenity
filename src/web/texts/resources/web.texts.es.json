@@ -169,6 +169,7 @@
   "Validation.EmailMultiple": "Por favor, introduzca una dirección de correo electrónico válida (si hay más de una, use ';' como separador)",
   "Validation.HourAndMin": "Por favor, introduzca una hora válida (por ejemplo, 15:30)",
   "Validation.IncorrectPassword": "Contraseña incorrecta",
+  "Validation.Int64": "Introduzca un valor entero de 64 bits válido.",
   "Validation.Integer": "Por favor, introduzca un valor entero válido",
   "Validation.InvalidFormMessage": "Por favor, valide los campos vacíos o inválidos (marcados en rojo) antes de enviar el formulario",
   "Validation.MaxDate": "Por favor, ingrese una fecha antes de '{0}'",

@@ -22,7 +22,7 @@
   "Enums.ImageCheckResult.DataSizeTooHigh": "文件大小必须小于{0}，但它是{1}！",
   "Enums.ImageCheckResult.HeightMismatch": "图像必须正好有{0}个像素，但它有{1}个像素！",
   "Enums.ImageCheckResult.HeightTooHigh": "图像的高度必须低于{0}像素，但它是{1}像素！",
-  "Enums.ImageCheckResult.HeightTooLow": "图像的宽度必须大于{0}像素，但它是{1}像素！",
+  "Enums.ImageCheckResult.HeightTooLow": "图像的高度必须大于{0}像素，但它是{1}像素！",
   "Enums.ImageCheckResult.ImageIsEmpty": "图片为空，其高度或宽度为零！",
   "Enums.ImageCheckResult.InvalidImage": "文件不是有效的图像！",
   "Enums.ImageCheckResult.SizeMismatch": "图像的大小必须正好是{0}x{1}像素，但它是{2}x{3}像素！",

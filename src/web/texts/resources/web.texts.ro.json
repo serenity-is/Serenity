@@ -169,6 +169,7 @@
   "Validation.EmailMultiple": "Vă rugăm să introduceți o adresă de email validă (dacă sunt mai multe, utilizați ';' ca separator)",
   "Validation.HourAndMin": "Vă rugăm să introduceți o oră validă (de exemplu, 15:30)",
   "Validation.IncorrectPassword": "Parolă incorectă",
+  "Validation.Int64": "Introduceți o valoare întreagă validă pe 64 de biți.",
   "Validation.Integer": "Introduceți o valoare întreagă validă",
   "Validation.InvalidFormMessage": "Vă rugăm să validați intrările goale sau nevalide (marcate cu roșu) înainte de a trimite formularul",
   "Validation.MaxDate": "Vă rugăm să introduceți o dată înainte de '{0}'",

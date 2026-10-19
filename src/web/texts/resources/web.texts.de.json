@@ -169,6 +169,7 @@
   "Validation.EmailMultiple": "Bitte geben Sie eine gültige Email-Adresse ein (wenn mehr als eine, verwenden Sie ';' als Trennzeichen)",
   "Validation.HourAndMin": "Bitte geben Sie eine gültige Uhrzeit ein (z",
   "Validation.IncorrectPassword": "Falsches Passwort",
+  "Validation.Int64": "Bitte geben Sie einen gültigen 64-Bit-Ganzzahlwert ein.",
   "Validation.Integer": "Bitte geben Sie einen gültigen Ganzzahlwert ein",
   "Validation.InvalidFormMessage": "Bitte überprüfen Sie leere oder ungültige Eingaben (rot markiert) vor dem Absenden des Formulars",
   "Validation.MaxDate": "Bitte geben Sie ein Datum vor '{0}' ein",

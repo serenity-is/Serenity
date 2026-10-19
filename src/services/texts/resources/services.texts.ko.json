@@ -22,7 +22,7 @@
   "Enums.ImageCheckResult.DataSizeTooHigh": "파일 크기는 {0}보다 작아야하지만 {1}입니다!",
   "Enums.ImageCheckResult.HeightMismatch": "그림은 정확히 {0} 픽셀이어야하지만 {1} 픽셀입니다!",
   "Enums.ImageCheckResult.HeightTooHigh": "이미지 높이는 {0} 픽셀보다 낮아야하지만 {1} 픽셀입니다!",
-  "Enums.ImageCheckResult.HeightTooLow": "이미지 너비는 {0} 픽셀보다 높아야하지만 {1} 픽셀입니다!",
+  "Enums.ImageCheckResult.HeightTooLow": "이미지 높이는 {0} 픽셀보다 높아야하지만 {1} 픽셀입니다!",
   "Enums.ImageCheckResult.ImageIsEmpty": "그림이 비어 있고, 높이 또는 너비가 0입니다!",
   "Enums.ImageCheckResult.InvalidImage": "파일은 유효한 이미지가 아닙니다!",
   "Enums.ImageCheckResult.SizeMismatch": "이미지 크기는 정확히 {0}x{1} 픽셀이어야 하지만 {2}x{3} 픽셀입니다!",

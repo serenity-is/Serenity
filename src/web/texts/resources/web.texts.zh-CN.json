@@ -169,6 +169,7 @@
   "Validation.EmailMultiple": "请输入有效的电子邮件地址（如果有多个，请使用“;”作为分隔符）",
   "Validation.HourAndMin": "请输入有效时间（例如15:30）",
   "Validation.IncorrectPassword": "密码不正确。请检查。",
+  "Validation.Int64": "请输入有效的 64 位整数值。",
   "Validation.Integer": "请输入有效的整数值。",
   "Validation.InvalidFormMessage": "请在提交表单前验证空或无效输入（标有红色）。",
   "Validation.MaxDate": "请输入'{0}'之前的日期。",

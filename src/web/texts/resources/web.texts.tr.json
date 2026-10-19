@@ -169,6 +169,7 @@
   "Validation.EmailMultiple": "Lütfen geçerli bir e-posta adresi giriniz (birden fazlaysa ';' ile ayırınız)",
   "Validation.HourAndMin": "Lütfen geçerli bir zaman giriniz (15:30 gibi)",
   "Validation.IncorrectPassword": "Girilen şifre hatalı. Kontrol ediniz.",
+  "Validation.Int64": "Lütfen geçerli bir 64 bit tam sayı değeri girin.",
   "Validation.Integer": "Lütfen geçerli bir tamsayı değeri giriniz.",
   "Validation.InvalidFormMessage": "Lütfen formda kırmızı renkle işaretlenmiş olan eksik ya da hatalı alanları düzeltiniz.",
   "Validation.MaxDate": "Lütfen '{0}' öncesi bir tarih giriniz",

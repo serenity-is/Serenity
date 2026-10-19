@@ -170,6 +170,7 @@
   "Validation.EmailMultiple": "Please enter a valid email address (if more than one, use ';' as separator)",
   "Validation.HourAndMin": "Please enter a valid time (e.g. 15:30)",
   "Validation.IncorrectPassword": "Incorrect password. Please check.",
+  "Validation.Int64": "Please enter a valid 64-bit integer value.",
   "Validation.Integer": "Please enter a valid integer value.",
   "Validation.InvalidFormMessage": "Please validate empty or invalid inputs (marked with red) before submitting the form.",
   "Validation.MaxDate": "Please enter a date before '{0}'.",

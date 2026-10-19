@@ -169,6 +169,7 @@
   "Validation.EmailMultiple": "Ange en giltig e-postadress (om det är fler än en, använd ';' som avgränsare)",
   "Validation.HourAndMin": "Ange en giltig tid (t",
   "Validation.IncorrectPassword": "Fel lösenord",
+  "Validation.Int64": "Ange ett giltigt 64-bitars heltalsvärde.",
   "Validation.Integer": "Ange ett giltigt heltal",
   "Validation.InvalidFormMessage": "Var god verifiera tomma eller ogiltiga indata (markerade med rött) innan du skickar formuläret",
   "Validation.MaxDate": "Vänligen ange ett datum före '{0}'",

@@ -22,7 +22,7 @@
   "Enums.ImageCheckResult.DataSizeTooHigh": "Kích thước tập tin phải nhỏ hơn {0}, nhưng là {1}!",
   "Enums.ImageCheckResult.HeightMismatch": "Hình ảnh phải có chính xác {0} pixel, nhưng nó là {1} pixel!",
   "Enums.ImageCheckResult.HeightTooHigh": "Chiều cao hình ảnh phải thấp hơn {0} pixel, nhưng nó là {1} pixel!",
-  "Enums.ImageCheckResult.HeightTooLow": "Chiều rộng của hình ảnh phải lớn hơn {0} pixel, nhưng nó là {1} pixel!",
+  "Enums.ImageCheckResult.HeightTooLow": "Chiều cao của hình ảnh phải lớn hơn {0} pixel, nhưng nó là {1} pixel!",
   "Enums.ImageCheckResult.ImageIsEmpty": "Hình ảnh trống, chiều cao hoặc chiều rộng là không!",
   "Enums.ImageCheckResult.InvalidImage": "Tệp không phải là hình ảnh hợp lệ!",
   "Enums.ImageCheckResult.SizeMismatch": "Kích thước hình ảnh phải chính xác là {0}x{1} pixel, nhưng là {2}x{3} pixel!",

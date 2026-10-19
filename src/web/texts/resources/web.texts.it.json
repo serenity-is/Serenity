@@ -169,6 +169,7 @@
   "Validation.EmailMultiple": "Inserisci un indirizzo email valido (se più di uno, usa ';' come separatore)",
   "Validation.HourAndMin": "Inserisci un orario valido (ad es",
   "Validation.IncorrectPassword": "Password errata",
+  "Validation.Int64": "Inserisci un valore intero a 64 bit valido.",
   "Validation.Integer": "Inserisci un valore intero valido",
   "Validation.InvalidFormMessage": "Si prega di convalidare gli input vuoti o non validi (contrassegnati in rosso) prima di inviare il modulo",
   "Validation.MaxDate": "Inserisci una data prima di '{0}'",

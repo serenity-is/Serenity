@@ -22,7 +22,7 @@
   "Enums.ImageCheckResult.DataSizeTooHigh": "Ukuran file harus lebih kecil dari {0}, tapi ini {1}!",
   "Enums.ImageCheckResult.HeightMismatch": "Gambar harus tepat {0} piksel, tapi itu {1} piksel!",
   "Enums.ImageCheckResult.HeightTooHigh": "Gambar harus lebih rendah dari {0} piksel, tetapi itu {1} piksel!",
-  "Enums.ImageCheckResult.HeightTooLow": "Lebar gambar harus lebih tinggi dari {0} piksel, tetapi itu {1} piksel!",
+  "Enums.ImageCheckResult.HeightTooLow": "Tinggi gambar harus lebih tinggi dari {0} piksel, tetapi itu {1} piksel!",
   "Enums.ImageCheckResult.ImageIsEmpty": "Gambar kosong, tinggi atau lebarnya adalah nol!",
   "Enums.ImageCheckResult.InvalidImage": "File bukan gambar yang valid!",
   "Enums.ImageCheckResult.SizeMismatch": "Ukuran gambar harus tepat {0}x{1} piksel, tetapi itu {2}x{3} piksel!",
