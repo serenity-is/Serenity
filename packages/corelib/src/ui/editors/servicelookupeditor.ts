@@ -170,6 +170,9 @@ export abstract class ServiceLookupEditorBase<P extends ServiceLookupEditorOptio
         if (idField == null)
             throw new Error("ServiceLookupEditor requires 'idField' option to be configured!");
 
+        if (idList.length === 1)
+            return Criteria(idField).eq(idList[0]);
+        
         return Criteria(idField).in(idList);
     }
 
