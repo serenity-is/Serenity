@@ -663,11 +663,14 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins, IHas
                     }
 
                     field = (Field)Activator.CreateInstance(fieldType, prm)!;
+                    field.propertyName = property.Name;
                     fieldInfo.SetValue(this, field);
                     field.Caption = CreateDisplayCaption(display, field.AutoTextKey);
                 }
                 else
                 {
+                    field.propertyName = property?.Name;
+
                     if (size != null && size.Value != field.Size)
                         field.Size = size.Value;
 
@@ -826,8 +829,8 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins, IHas
                         }
                     }
 
-                    field.PropertyName = property.Name;
-                    byPropertyName[field.PropertyName] = field;
+                    field.propertyName = property.Name;
+                    byPropertyName[field.propertyName] = field;
 
                     if (extraAttrs == null)
                         field.customAttributes = [.. property.GetAttributes<Attribute>()];
