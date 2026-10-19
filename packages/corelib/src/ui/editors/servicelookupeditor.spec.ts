@@ -132,6 +132,12 @@ describe("ServiceLookupEditor", () => {
         editor.destroy();
     });
 
+    it("builds an equality criterion for a single id", () => {
+        const editor = create({});
+        expect(JSON.stringify(editor.getIdListCriteria(["5"]))).toBe('[["ID"],"=","5"]');
+        editor.destroy();
+    });
+
     it("builds an id list criterion for values", () => {
         const editor = create({});
         const criterion = editor.getIdListCriteria(["1", "2"]);
