@@ -12,6 +12,35 @@ public partial class ServerTypingsGenerator(Compilation compilation, Cancellatio
     private readonly CancellationToken cancellationToken = cancellationToken;
 
     public Compilation Compilation { get; } = compilation ?? throw new ArgumentNullException(nameof(compilation));
+
+    /// <summary>
+    /// Set when the generator encounters an unresolved attribute that is normally available
+    /// through Serenity's global usings, e.g. <c>Column</c>, <c>BasedOnRow</c> or
+    /// <c>InstanceName</c>. This is a cheap safety signal for partial/loading compilations.
+    /// </summary>
+    public bool HasUnexpectedErrorSymbols { get; private set; }
+
+    /// <summary>
+    /// Predicate supplied by the Pro.Coder source generator to identify Serenity attribute
+    /// names that are normally resolved through global usings.
+    /// </summary>
+    public Func<string, bool>? IsSerenityAttributeName { get; set; }
+
+    private void TrackUnresolvedAttribute(CustomAttribute? attribute)
+    {
+        var type = attribute?.AttributeType();
+        if (type is null || type.TypeKind != TypeKind.Error)
+            return;
+
+        if (IsSerenityAttributeName?.Invoke(type.Name) == true)
+            HasUnexpectedErrorSymbols = true;
+    }
+
+    private void TrackUnresolvedAttributes(IEnumerable<CustomAttribute> attributes)
+    {
+        foreach (var attribute in attributes)
+            TrackUnresolvedAttribute(attribute);
+    }
 #else
 public partial class ServerTypingsGenerator : CodeGeneratorBase
 {

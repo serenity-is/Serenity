@@ -158,6 +158,9 @@ public partial class ServerTypingsGenerator
     {
         foreach (var fromType in types)
         {
+#if ISSOURCEGENERATOR
+            TrackUnresolvedAttributes(fromType.GetAttributes());
+#endif
             PreVisitType(fromType);
             ScanAnnotationTypeAttributes(fromType);
 
@@ -198,11 +201,19 @@ public partial class ServerTypingsGenerator
     protected virtual void EnqueueTypeMembers(TypeDefinition type)
     {
         foreach (var field in type.FieldsOf())
+        {
+#if ISSOURCEGENERATOR
+            TrackUnresolvedAttributes(field.GetAttributes());
+#endif
             if (!field.IsStatic && field.IsPublic())
                 EnqueueMemberType(field.FieldType());
+        }
 
         foreach (var property in type.PropertiesOf())
         {
+#if ISSOURCEGENERATOR
+            TrackUnresolvedAttributes(property.GetAttributes());
+#endif
             if (!TypingsUtils.IsPublicInstanceProperty(property))
                 continue;
 

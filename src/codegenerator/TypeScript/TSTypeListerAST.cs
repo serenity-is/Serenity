@@ -313,12 +313,12 @@ public class TSTypeListerAST
             {
                 var module = ctx.GetModuleAt(i);
                 if (module.Body is ModuleBlock mb &&
-                    TryGetLiteralValueInScope(module, mb.Statements, identifierName, isTypeInfo, out var moduleValue))
+                    TryGetLiteralValueInScope(module, mb.Statements, identifierName!, isTypeInfo, out var moduleValue))
                     return moduleValue;
             }
 
             if (ctx.SourceFile.Statements != null &&
-                TryGetLiteralValueInScope(ctx.SourceFile, ctx.SourceFile.Statements, identifierName, isTypeInfo, out var sourceValue))
+                TryGetLiteralValueInScope(ctx.SourceFile, ctx.SourceFile.Statements, identifierName!, isTypeInfo, out var sourceValue))
                 return sourceValue;
         }
 
