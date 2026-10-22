@@ -189,8 +189,18 @@ public class TSTypeListerAST
         {
             if (args.Count == 1)
                 return text + "<" + GetText(args[0]) + ">";
-            else
-                return text + "<" + string.Join(",", args.Select(GetText) + ">");
+
+            var sb = new System.Text.StringBuilder();
+            sb.Append(text);
+            sb.Append('<');
+            for (var i = 0; i < args.Count; i++)
+            {
+                if (i > 0)
+                    sb.Append(',');
+                sb.Append(GetText(args[i]));
+            }
+            sb.Append('>');
+            return sb.ToString();
         }
 
         return text;
@@ -351,8 +361,10 @@ public class TSTypeListerAST
         if (parent is SourceFile sourceFile &&
             sourceFile.ExternalModuleIndicator is not null)
         {
-            foreach (var import in children.OfType<ImportDeclaration>())
+            foreach (var child in children)
             {
+                if (child is not ImportDeclaration import)
+                    continue;
                 if (import.ModuleSpecifier is not StringLiteral id)
                     continue;
 
@@ -381,9 +393,9 @@ public class TSTypeListerAST
 
                         var statements = subFile.Statements;
 
-                        foreach (var child in statements)
+                        foreach (var subStatement in statements)
                         {
-                            if (child is VariableStatement vs &&
+                            if (subStatement is VariableStatement vs &&
                                 vs.HasModifier(SyntaxKind.ExportKeyword) &&
                                 vs.DeclarationList?.Declarations is { } declarations)
                             {
@@ -442,10 +454,21 @@ public class TSTypeListerAST
             if (intersectionType.Types != null &&
                 intersectionType.Types.Count > 0)
             {
-                return '[' + string.Join(",", intersectionType.Types.Select(x =>
-                    GetTypeReferenceExpression(x, isDecorator: false))
-                        .Where(x => x != null)
-                        .Select(x => x.ToDoubleQuoted())) + ']';
+                var sb = new System.Text.StringBuilder();
+                sb.Append('[');
+                var first = true;
+                foreach (var type in intersectionType.Types)
+                {
+                    var name = GetTypeReferenceExpression(type, isDecorator: false);
+                    if (name == null)
+                        continue;
+                    if (!first)
+                        sb.Append(',');
+                    first = false;
+                    sb.Append(name.ToDoubleQuoted());
+                }
+                sb.Append(']');
+                return sb.ToString();
             }
 
             return null;
@@ -457,8 +480,18 @@ public class TSTypeListerAST
                 typeLiteral.Members.Count > 0)
             {
                 var members = GetInterfaceOrLiteralTypeMembers(typeLiteral.Members);
-                return "{" + string.Join(",", members.Select(x => x.Name.ToDoubleQuoted()
-                    + ":" + x.Type.ToDoubleQuoted())) + "}";
+                var sb = new System.Text.StringBuilder();
+                sb.Append('{');
+                for (var i = 0; i < members.Count; i++)
+                {
+                    if (i > 0)
+                        sb.Append(',');
+                    sb.Append(members[i].Name.ToDoubleQuoted());
+                    sb.Append(':');
+                    sb.Append(members[i].Type.ToDoubleQuoted());
+                }
+                sb.Append('}');
+                return sb.ToString();
             }
 
             return null;
@@ -540,8 +573,10 @@ public class TSTypeListerAST
         if (parent is SourceFile sourceFile &&
             sourceFile.ExternalModuleIndicator is not null)
         {
-            foreach (var import in children.OfType<ImportDeclaration>())
+            foreach (var child in children)
             {
+                if (child is not ImportDeclaration import)
+                    continue;
                 if (import.ModuleSpecifier is not StringLiteral id)
                     continue;
 
@@ -700,12 +735,17 @@ public class TSTypeListerAST
         if (p == null || p.Count == 0)
             return null;
 
-        return [.. p.Select(k => new ExternalGenericParameter
+        var result = new List<ExternalGenericParameter>(p.Count);
+        foreach (var k in p)
         {
-            Name = GetText(k.Name),
-            Default = GetTypeReferenceExpression(k.Default) ?? GetText(k.Default),
-            Extends = k.Constraint is TypeReferenceNode trn ? (GetTypeReferenceExpression(trn.TypeName) ?? GetText(trn.TypeName)) : null
-        })];
+            result.Add(new ExternalGenericParameter
+            {
+                Name = GetText(k.Name),
+                Default = GetTypeReferenceExpression(k.Default) ?? GetText(k.Default),
+                Extends = k.Constraint is TypeReferenceNode trn ? (GetTypeReferenceExpression(trn.TypeName) ?? GetText(trn.TypeName)) : null
+            });
+        }
+        return result;
     }
 
     bool IsUnderAmbientNamespace(INode? node)
@@ -749,6 +789,17 @@ public class TSTypeListerAST
             result.Type = GetTypeReferenceExpression(pae);
         }
 
+        return result;
+    }
+
+    List<ExternalAttribute>? DecoratorsToExternalAttributes(List<Decorator>? decorators)
+    {
+        if (decorators == null)
+            return null;
+
+        var result = new List<ExternalAttribute>(decorators.Count);
+        foreach (var decorator in decorators)
+            result.Add(DecoratorToExternalAttribute(decorator)!);
         return result;
     }
 
@@ -875,8 +926,7 @@ public class TSTypeListerAST
             if (member.HasModifier(SyntaxKind.StaticKeyword))
                 externalMember.IsStatic = true;
             var decorators = member.GetDecorators();
-            if (decorators != null)
-                externalMember.Attributes = [.. decorators.Select(x => DecoratorToExternalAttribute(x)!)];
+            externalMember.Attributes = DecoratorsToExternalAttributes(decorators);
 
             result.Add(externalMember);
         }
@@ -942,8 +992,7 @@ public class TSTypeListerAST
 
             externalMember.Name = name;
             var decorators = member.GetDecorators();
-            if (decorators != null)
-                externalMember.Attributes = [.. decorators.Select(x => DecoratorToExternalAttribute(x)!)];
+            externalMember.Attributes = DecoratorsToExternalAttributes(decorators);
 
             result.Add(externalMember);
         }
@@ -963,29 +1012,39 @@ public class TSTypeListerAST
         return result;
     }
 
+    static void SplitMembers(List<ExternalMember>? members, ExternalType target)
+    {
+        target.Fields = null;
+        target.Methods = null;
+        if (members == null)
+            return;
+
+        foreach (var member in members)
+        {
+            if (member is ExternalMethod method)
+                (target.Methods ??= []).Add(method);
+            else
+                (target.Fields ??= []).Add(member);
+        }
+    }
+
     ExternalType ClassToExternalType(ClassDeclaration klass)
     {
         var result = new ExternalType
         {
             BaseType = GetBaseType(klass),
             GenericParameters = TypeParametersToExternal(klass.TypeParameters),
-            IsAbstract = klass.Modifiers != null && klass.Modifiers.Any(x => x.Kind == SyntaxKind.AbstractKeyword) == true ? true : null,
+            IsAbstract = klass.HasModifier(SyntaxKind.AbstractKeyword) ? true : null,
             Namespace = GetNamespace(klass),
             Name = GetText(klass.Name),
             IsDeclaration = IsUnderAmbientNamespace(klass) ? true : null
         };
 
         var members = GetClassMembers(klass);
-        result.Fields = members?.Where(x => x is not ExternalMethod).ToList();
-        if (result.Fields != null && result.Fields.Count == 0)
-            result.Fields = null;
-        result.Methods = [.. members!.OfType<ExternalMethod>()];
-        if (result.Methods != null && result.Methods.Count == 0)
-            result.Methods = null;
+        SplitMembers(members, result);
         result.Interfaces = GetInterfaces(klass);
         var decorators = klass.GetDecorators();
-        if (decorators != null)
-            result.Attributes = [.. decorators.Select(x => DecoratorToExternalAttribute(x)!)];
+        result.Attributes = DecoratorsToExternalAttributes(decorators);
 
         return result;
     }
@@ -1002,17 +1061,11 @@ public class TSTypeListerAST
         };
 
         var members = GetInterfaceMembers(intf);
-        result.Fields = members?.Where(x => x is not ExternalMethod).ToList();
-        if (result.Fields != null && result.Fields.Count == 0)
-            result.Fields = null;
-        result.Methods = members?.OfType<ExternalMethod>().ToList();
-        if (result.Methods != null && result.Methods.Count == 0)
-            result.Methods = null;
+        SplitMembers(members, result);
         result.Interfaces = GetBaseInterfaces(intf);
         result.TransformIncludeTypeName = GetTransformIncludeTypeName(intf);
         var decorators = intf.GetDecorators();
-        if (decorators != null)
-            result.Attributes = [.. decorators.Select(x => DecoratorToExternalAttribute(x)!)];
+        result.Attributes = DecoratorsToExternalAttributes(decorators);
 
         return result;
     }
@@ -1034,17 +1087,19 @@ public class TSTypeListerAST
                 return null;
 
             result.IsIntersectionType = true;
-            result.Interfaces = [.. intersectionType.Types.Select(x => GetTypeReferenceExpression(x)!).Where(x => x != null)];
+            var interfaces = new List<string>(intersectionType.Types.Count);
+            foreach (var type in intersectionType.Types)
+            {
+                var name = GetTypeReferenceExpression(type);
+                if (name != null)
+                    interfaces.Add(name);
+            }
+            result.Interfaces = interfaces;
         }
         else if (typeAlias.Type is TypeLiteralNode typeLiteral)
         {
             var members = GetInterfaceOrLiteralTypeMembers(typeLiteral.Members);
-            result.Fields = members?.Where(x => x is not ExternalMethod).ToList();
-            if (result.Fields != null && result.Fields.Count == 0)
-                result.Fields = null;
-            result.Methods = members?.OfType<ExternalMethod>().ToList();
-            if (result.Methods != null && result.Methods.Count == 0)
-                result.Methods = null;
+            SplitMembers(members, result);
         }
         else
             return null;
@@ -1112,8 +1167,7 @@ public class TSTypeListerAST
             externalMember.Name = name;
             externalMember.IsStatic = true;
             var decorators = member.GetDecorators();
-            if (decorators != null)
-                externalMember.Attributes = [.. decorators.Select(x => DecoratorToExternalAttribute(x)!)];
+            externalMember.Attributes = DecoratorsToExternalAttributes(decorators);
 
             result.Add(externalMember);
         }
@@ -1132,12 +1186,7 @@ public class TSTypeListerAST
         };
 
         var members = GetModuleMembers(module);
-        result.Fields = members?.Where(x => x is not ExternalMethod).ToList();
-        if (result.Fields != null && result.Fields.Count == 0)
-            result.Fields = null;
-        result.Methods = members?.OfType<ExternalMethod>().ToList();
-        if (result.Methods != null && result.Methods.Count == 0)
-            result.Methods = null;
+        SplitMembers(members, result);
 
         return result;
     }
@@ -1160,9 +1209,11 @@ public class TSTypeListerAST
 
         if (sourceFile.ExternalModuleIndicator is not null)
         {
-            foreach (var exportDeclaration in sourceFile
-                .Statements.OfType<ExportDeclaration>())
+            foreach (var statement in sourceFile.Statements)
             {
+                if (statement is not ExportDeclaration exportDeclaration)
+                    continue;
+
                 string? identifier;
                 if (exportDeclaration.ModuleSpecifier is not Identifier ms)
                 {
@@ -1219,22 +1270,24 @@ public class TSTypeListerAST
 
                 if (exportDeclaration.ExportClause is not NamedExports namedExports)
                 {
-                    foreach (var type in subTypes.Where(x => string.IsNullOrEmpty(x.Namespace)))
+                    foreach (var type in subTypes)
                     {
-                        addSubType(type);
+                        if (string.IsNullOrEmpty(type.Namespace))
+                            addSubType(type);
                     }
                 }
                 else if (namedExports.Elements is not null)
                 {
                     foreach (var element in namedExports.Elements)
                     {
-                        if (element.Name is Identifier nameIdentifier)
+                        if (element.Name is not Identifier nameIdentifier)
+                            continue;
+
+                        var name = element.PropertyName?.Text ?? nameIdentifier.Text;
+                        foreach (var type in subTypes)
                         {
-                            foreach (var type in subTypes.Where(x => string.IsNullOrEmpty(x.Namespace) &&
-                                x.Name == (element.PropertyName?.Text ?? nameIdentifier.Text)))
-                            {
+                            if (string.IsNullOrEmpty(type.Namespace) && type.Name == name)
                                 addSubType(type);
-                            }
                         }
                     }
                 }
