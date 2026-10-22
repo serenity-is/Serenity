@@ -4,9 +4,11 @@ public class Identifier : PrimaryExpressionBase, IDeclaration, IJsxTagNameExpres
     IEntityName, IPropertyName, IBindingName, IJsxAttributeName, IHasLiteralText, IModuleName, IModuleExportName
 {
     public Identifier(string? text, SyntaxKind? originalKeywordKind = null, bool? hasExtendedUnicodeEscape = null,
-        SyntaxKind kind = SyntaxKind.Identifier)
+        SyntaxKind kind = SyntaxKind.Identifier, string? sourceText = null)
         : base(kind)
     {
+        this.sourceText = sourceText;
+
         if (originalKeywordKind == null && !string.IsNullOrEmpty(text))
             originalKeywordKind = Scanner.StringToToken(text!);
 
@@ -17,11 +19,20 @@ public class Identifier : PrimaryExpressionBase, IDeclaration, IJsxTagNameExpres
         OriginalKeywordKind = originalKeywordKind;
         HasExtendedUnicodeEscape = hasExtendedUnicodeEscape ?? false;
 
-        if (HasExtendedUnicodeEscape)
-            Flags |= NodeFlags.IdentifierHasExtendedUnicodeEscape;
+        // if (HasExtendedUnicodeEscape)
+        //    Flags |= NodeFlags.IdentifierHasExtendedUnicodeEscape;
     }
 
-    public string? Text { get; set; }
+    private string? text;
+    private string? sourceText;
+
+    public string? Text
+    {
+        // Identifiers parsed without escapes usually don't need their text materialized.
+        // Pos/End and the source text can reconstruct it on demand, and the result is cached.
+        get => text ??= this.GetText(sourceText);
+        set => text = value;
+    }
     public SyntaxKind? OriginalKeywordKind { get; set; }
     public bool IsInJsDocNamespace { get; set; }
     public bool HasExtendedUnicodeEscape { get; set; }

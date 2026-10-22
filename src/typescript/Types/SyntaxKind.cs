@@ -2,7 +2,7 @@ namespace Serenity.TypeScript;
 
 // Keep the underlying type small: SyntaxKind fields and nullable SyntaxKind? values are
 // stored on hot AST nodes (e.g. Identifier). Values are far below short.MaxValue.
-// Note: NodeFlags cannot use short, as it needs bit 30 (Unreachable).
+// NodeFlags is separately compacted into 15 bits and also uses a short.
 public enum SyntaxKind : short
 {
     Unknown,

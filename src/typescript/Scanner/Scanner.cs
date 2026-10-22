@@ -25,7 +25,7 @@ public partial class Scanner
     private bool tokenValueIsSpan;
     private TokenFlags tokenFlags;
 
-    private string tokenValue
+    private string TokenValueAsString
     {
         get
         {
@@ -78,7 +78,7 @@ public partial class Scanner
     public int GetTokenStart() => tokenStart;
     public int GetTokenEnd() => pos;
     public string GetTokenText() => text[tokenStart..pos];
-    public string GetTokenValue() => tokenValue;
+    public string GetTokenValue() => TokenValueAsString;
     public bool HasUnicodeEscape() => (tokenFlags & TokenFlags.UnicodeEscape) != 0;
     public bool HasExtendedUnicodeEscape() => (tokenFlags & TokenFlags.ExtendedUnicodeEscape) != 0;
     public bool HasPrecedingLineBreak() => (tokenFlags & TokenFlags.PrecedingLineBreak) != 0;
@@ -194,9 +194,9 @@ public partial class Scanner
                 // NonOctalDecimalIntegerLiteral, emit error later
                 // Separators in decimal and exponent parts are still allowed according to the spec
                 tokenFlags |= TokenFlags.ContainsLeadingZero;
-                mainFragment = "" + (long.TryParse(tokenValue, out var v) ? v.ToString(CultureInfo.InvariantCulture) : tokenValue);
+                mainFragment = "" + (long.TryParse(TokenValueAsString, out var v) ? v.ToString(CultureInfo.InvariantCulture) : TokenValueAsString);
             }
-            else if (string.IsNullOrEmpty(tokenValue))
+            else if (string.IsNullOrEmpty(TokenValueAsString))
             {
                 // a single zero
                 mainFragment = "0";
@@ -204,8 +204,8 @@ public partial class Scanner
             else
             {
                 // LegacyOctalIntegerLiteral
-                var value = Convert.ToInt64(tokenValue, 8);
-                tokenValue = "" + value.ToString(CultureInfo.InvariantCulture);
+                var value = Convert.ToInt64(TokenValueAsString, 8);
+                TokenValueAsString = "" + value.ToString(CultureInfo.InvariantCulture);
                 tokenFlags |= TokenFlags.Octal;
                 var withMinus = token == SyntaxKind.MinusToken;
                 var literal = (withMinus ? "-" : "") + "0o" + Convert.ToString(value, 8);
@@ -267,7 +267,7 @@ public partial class Scanner
         {
             Error(Diagnostics.Decimals_with_leading_zeros_are_not_allowed, start, endPos - start);
             // if a literal has a leading zero, it must not be bigint
-            tokenValue = "" + result;
+            TokenValueAsString = "" + result;
             return SyntaxKind.NumericLiteral;
         }
 
@@ -275,12 +275,12 @@ public partial class Scanner
         {
             CheckForIdentifierStartAfterNumericLiteral(start, decimalFragment == null && (tokenFlags & TokenFlags.Scientific) != 0);
             // if value is not an integer, it can be safely coerced to a number
-            tokenValue = double.Parse(result, CultureInfo.InvariantCulture).ToString().ToLowerInvariant();
+            TokenValueAsString = double.Parse(result, CultureInfo.InvariantCulture).ToString().ToLowerInvariant();
             return SyntaxKind.NumericLiteral;
         }
         else
         {
-            tokenValue = result;
+            TokenValueAsString = result;
             var type = CheckBigIntSuffix(); // if value is an integer, check whether it is a bigint
             CheckForIdentifierStartAfterNumericLiteral(start);
             return type;
@@ -327,7 +327,7 @@ public partial class Scanner
             }
             pos++;
         }
-        tokenValue = text[start..pos];
+        TokenValueAsString = text[start..pos];
         return isOctal;
     }
 
@@ -523,7 +523,7 @@ public partial class Scanner
 
         Debug.Assert(resultingToken != SyntaxKind.Unknown);
 
-        tokenValue = contents.ToString();
+        TokenValueAsString = contents.ToString();
         return resultingToken;
     }
 
@@ -968,11 +968,11 @@ public partial class Scanner
     {
         if (pos < end && text[pos] == CharacterCodes.n)
         {
-            tokenValue += "n";
+            TokenValueAsString += "n";
             // Use base 10 instead of base 2 or base 8 for shorter literals
             if ((tokenFlags & TokenFlags.BinaryOrOctalSpecifier) != 0)
             {
-                tokenValue = ParsePseudoBigInt(tokenValue) + "n";
+                TokenValueAsString = ParsePseudoBigInt(TokenValueAsString) + "n";
             }
             pos++;
             return SyntaxKind.BigIntLiteral;
@@ -982,13 +982,13 @@ public partial class Scanner
             // not a bigint, so can convert to number in simplified form
             // Number() may not support 0b or 0o, so use parseInt() instead
             var numericValue = (tokenFlags & TokenFlags.BinarySpecifier) != 0
-                ? Convert.ToInt64(tokenValue[2..], 2) // skip "0b"
+                ? Convert.ToInt64(TokenValueAsString[2..], 2) // skip "0b"
                 : (tokenFlags & TokenFlags.OctalSpecifier) != 0
-                ? Convert.ToInt64(tokenValue[2..], 8) // skip "0o"
-                : (tokenValue.Length > 1 && tokenValue[1] == 'x')
-                ? Convert.ToInt64(tokenValue[2..], 16)
-                : double.Parse(tokenValue);
-            tokenValue = "" + numericValue.ToString(CultureInfo.InvariantCulture);
+                ? Convert.ToInt64(TokenValueAsString[2..], 8) // skip "0o"
+                : (TokenValueAsString.Length > 1 && TokenValueAsString[1] == 'x')
+                ? Convert.ToInt64(TokenValueAsString[2..], 16)
+                : double.Parse(TokenValueAsString);
+            TokenValueAsString = "" + numericValue.ToString(CultureInfo.InvariantCulture);
             return SyntaxKind.NumericLiteral;
         }
     }
@@ -1099,7 +1099,7 @@ public partial class Scanner
 
                 case CharacterCodes.DoubleQuote:
                 case CharacterCodes.SingleQuote:
-                    tokenValue = ScanString();
+                    TokenValueAsString = ScanString();
                     return token = SyntaxKind.StringLiteral;
 
                 case CharacterCodes.Backtick:
@@ -1315,39 +1315,39 @@ public partial class Scanner
                     if (pos + 2 < end && (text[pos + 1] == CharacterCodes.X || text[pos + 1] == CharacterCodes.x))
                     {
                         pos += 2;
-                        tokenValue = ScanMinimumNumberOfHexDigits(1, canHaveSeparators: true);
-                        if (string.IsNullOrEmpty(tokenValue))
+                        TokenValueAsString = ScanMinimumNumberOfHexDigits(1, canHaveSeparators: true);
+                        if (string.IsNullOrEmpty(TokenValueAsString))
                         {
                             Error(Diagnostics.Hexadecimal_digit_expected);
-                            tokenValue = "0";
+                            TokenValueAsString = "0";
                         }
-                        tokenValue = "0x" + tokenValue;
+                        TokenValueAsString = "0x" + TokenValueAsString;
                         tokenFlags |= TokenFlags.HexSpecifier;
                         return token = CheckBigIntSuffix();
                     }
                     else if (pos + 2 < end && (text[pos + 1] == CharacterCodes.B || text[pos + 1] == CharacterCodes.b))
                     {
                         pos += 2;
-                        tokenValue = ScanBinaryOrOctalDigits(@base: 2);
-                        if (string.IsNullOrEmpty(tokenValue))
+                        TokenValueAsString = ScanBinaryOrOctalDigits(@base: 2);
+                        if (string.IsNullOrEmpty(TokenValueAsString))
                         {
                             Error(Diagnostics.Binary_digit_expected);
-                            tokenValue = "0";
+                            TokenValueAsString = "0";
                         }
-                        tokenValue = "0b" + tokenValue;
+                        TokenValueAsString = "0b" + TokenValueAsString;
                         tokenFlags |= TokenFlags.BinarySpecifier;
                         return token = CheckBigIntSuffix();
                     }
                     else if (pos + 2 < end && (text[pos + 1] == CharacterCodes.O || text[pos + 1] == CharacterCodes.o))
                     {
                         pos += 2;
-                        tokenValue = ScanBinaryOrOctalDigits(@base: 8);
-                        if (string.IsNullOrEmpty(tokenValue))
+                        TokenValueAsString = ScanBinaryOrOctalDigits(@base: 8);
+                        if (string.IsNullOrEmpty(TokenValueAsString))
                         {
                             Error(Diagnostics.Octal_digit_expected);
-                            tokenValue = "0";
+                            TokenValueAsString = "0";
                         }
-                        tokenValue = "0o" + tokenValue;
+                        TokenValueAsString = "0o" + TokenValueAsString;
                         tokenFlags |= TokenFlags.OctalSpecifier;
                         return token = CheckBigIntSuffix();
                     }
@@ -1554,7 +1554,7 @@ public partial class Scanner
                     var extendedCookedChar = PeekExtendedUnicodeEscape();
                     if (extendedCookedChar >= 0 && IsIdentifierStart(extendedCookedChar, languageVersion))
                     {
-                        tokenValue = ScanExtendedUnicodeEscape(shouldEmitInvalidEscapeError: true) + ScanIdentifierParts();
+                        TokenValueAsString = ScanExtendedUnicodeEscape(shouldEmitInvalidEscapeError: true) + ScanIdentifierParts();
                         return token = GetIdentifierToken();
                     }
 
@@ -1563,7 +1563,7 @@ public partial class Scanner
                     {
                         pos += 6;
                         tokenFlags |= TokenFlags.UnicodeEscape;
-                        tokenValue = (char)cookedChar + ScanIdentifierParts();
+                        TokenValueAsString = (char)cookedChar + ScanIdentifierParts();
                         return token = GetIdentifierToken();
                     }
 
@@ -1586,7 +1586,7 @@ public partial class Scanner
                         extendedCookedChar = PeekExtendedUnicodeEscape();
                         if (extendedCookedChar >= 0 && IsIdentifierStart((char)extendedCookedChar, languageVersion))
                         {
-                            tokenValue = "#" + ScanExtendedUnicodeEscape(shouldEmitInvalidEscapeError: true) + ScanIdentifierParts();
+                            TokenValueAsString = "#" + ScanExtendedUnicodeEscape(shouldEmitInvalidEscapeError: true) + ScanIdentifierParts();
                             return token = SyntaxKind.PrivateIdentifier;
                         }
 
@@ -1595,7 +1595,7 @@ public partial class Scanner
                         {
                             pos += 6;
                             tokenFlags |= TokenFlags.UnicodeEscape;
-                            tokenValue = "#" + (char)cookedChar + ScanIdentifierParts();
+                            TokenValueAsString = "#" + (char)cookedChar + ScanIdentifierParts();
                             return token = SyntaxKind.PrivateIdentifier;
                         }
                         pos--;
@@ -1613,7 +1613,7 @@ public partial class Scanner
                     }
                     else
                     {
-                        tokenValue = "#";
+                        TokenValueAsString = "#";
                         Error(Diagnostics.Invalid_character, pos++, CharSize(ch));
                     }
                     return token = SyntaxKind.PrivateIdentifier;
@@ -1699,7 +1699,7 @@ public partial class Scanner
             SetTokenValueSpan(tokenStart, pos);
             if (ch == CharacterCodes.Backslash)
             {
-                tokenValue += ScanIdentifierParts();
+                TokenValueAsString += ScanIdentifierParts();
             }
             return GetIdentifierToken();
         }
@@ -1965,7 +1965,7 @@ public partial class Scanner
                     });
                 }
             }
-            tokenValue = text[tokenStart..pos];
+            TokenValueAsString = text[tokenStart..pos];
             token = SyntaxKind.RegularExpressionLiteral;
         }
         return token;
@@ -2139,7 +2139,7 @@ public partial class Scanner
                         pos++;
                         var digitsStart = pos;
                         ScanDigits();
-                        var min = tokenValue;
+                        var min = TokenValueAsString;
                         if (!anyUnicodeModeOrNonAnnexB && string.IsNullOrEmpty(min))
                         {
                             isPreviousTermQuantifiable = true;
@@ -2149,7 +2149,7 @@ public partial class Scanner
                         {
                             pos++;
                             ScanDigits();
-                            var max = tokenValue;
+                            var max = TokenValueAsString;
                             if (string.IsNullOrEmpty(min))
                             {
                                 if (!string.IsNullOrEmpty(max) || CharCodeChecked(pos) == CharacterCodes.CloseBrace)
@@ -2337,7 +2337,7 @@ public partial class Scanner
             {
                 var start = pos;
                 ScanDigits();
-                (decimalEscapes ??= []).Append(new() { Pos = start, End = pos, Value = decimal.Parse(tokenValue, CultureInfo.InvariantCulture) });
+                (decimalEscapes ??= []).Append(new() { Pos = start, End = pos, Value = decimal.Parse(TokenValueAsString, CultureInfo.InvariantCulture) });
                 return true;
             }
             return false;
@@ -2423,17 +2423,17 @@ public partial class Scanner
             }
             else if (isReference)
             {
-                (groupNameReferences ??= []).Add(new() { Pos = tokenStart, End = pos, Name = tokenValue });
+                (groupNameReferences ??= []).Add(new() { Pos = tokenStart, End = pos, Name = TokenValueAsString });
             }
-            else if (topNamedCapturingGroupsScope?.Contains(tokenValue) == true ||
-                namedCapturingGroupsScopeStack.Any(group => group?.Contains(tokenValue) == true))
+            else if (topNamedCapturingGroupsScope?.Contains(TokenValueAsString) == true ||
+                namedCapturingGroupsScopeStack.Any(group => group?.Contains(TokenValueAsString) == true))
             {
                 Error(Diagnostics.Named_capturing_groups_with_the_same_name_must_be_mutually_exclusive_to_each_other, tokenStart, pos - tokenStart);
             }
             else
             {
-                (topNamedCapturingGroupsScope ??= []).Add(tokenValue);
-                (groupSpecifiers ??= []).Add(tokenValue);
+                (topNamedCapturingGroupsScope ??= []).Add(TokenValueAsString);
+                (groupSpecifiers ??= []).Add(TokenValueAsString);
             }
         }
 
@@ -3277,7 +3277,7 @@ public partial class Scanner
             pos++;
         }
 
-        tokenValue = text[fullStartPos..pos];
+        TokenValueAsString = text[fullStartPos..pos];
 
         return firstNonWhitespace == -1 ? SyntaxKind.JsxTextAllWhiteSpaces : SyntaxKind.JsxText;
     }
@@ -3297,12 +3297,12 @@ public partial class Scanner
                 var ch = text[pos];
                 if (ch == CharacterCodes.Minus)
                 {
-                    tokenValue += "-";
+                    TokenValueAsString += "-";
                     pos++;
                     continue;
                 }
                 var oldPos = pos;
-                tokenValue += ScanIdentifierParts(); // reuse `scanIdentifierParts` so unicode escapes are handled
+                TokenValueAsString += ScanIdentifierParts(); // reuse `scanIdentifierParts` so unicode escapes are handled
                 if (pos == oldPos)
                 {
                     break;
@@ -3321,7 +3321,7 @@ public partial class Scanner
         {
             case CharacterCodes.DoubleQuote:
             case CharacterCodes.SingleQuote:
-                tokenValue = ScanString(/*jsxAttributeString*/ true);
+                TokenValueAsString = ScanString(/*jsxAttributeString*/ true);
                 return token = SyntaxKind.StringLiteral;
             default:
                 // If this Scans anything other than `{`, it's a parse error.
@@ -3366,7 +3366,7 @@ public partial class Scanner
         {
             return ScanJsDocToken();
         }
-        tokenValue = text[tokenStart..pos];
+        TokenValueAsString = text[tokenStart..pos];
         return token = SyntaxKind.JSDocCommentTextToken;
     }
 
@@ -3453,7 +3453,7 @@ public partial class Scanner
                 var extendedCookedChar = PeekExtendedUnicodeEscape();
                 if (extendedCookedChar >= 0 && IsIdentifierStart(extendedCookedChar, languageVersion))
                 {
-                    tokenValue = ScanExtendedUnicodeEscape(shouldEmitInvalidEscapeError: true) + ScanIdentifierParts();
+                    TokenValueAsString = ScanExtendedUnicodeEscape(shouldEmitInvalidEscapeError: true) + ScanIdentifierParts();
                     return token = GetIdentifierToken();
                 }
 
@@ -3462,7 +3462,7 @@ public partial class Scanner
                 {
                     pos += 6;
                     tokenFlags |= TokenFlags.UnicodeEscape;
-                    tokenValue = (char)cookedChar + ScanIdentifierParts();
+                    TokenValueAsString = (char)cookedChar + ScanIdentifierParts();
                     return token = GetIdentifierToken();
                 }
                 pos++;
@@ -3477,7 +3477,7 @@ public partial class Scanner
             SetTokenValueSpan(tokenStart, pos);
             if (ch2 == CharacterCodes.Backslash)
             {
-                tokenValue += ScanIdentifierParts();
+                TokenValueAsString += ScanIdentifierParts();
             }
             return token = GetIdentifierToken();
         }
@@ -3611,7 +3611,7 @@ public partial class Scanner
         fullStartPos = position;
         tokenStart = position;
         token = SyntaxKind.Unknown;
-        tokenValue = null!;
+        TokenValueAsString = null!;
         tokenFlags = TokenFlags.None;
     }
 

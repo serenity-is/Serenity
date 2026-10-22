@@ -219,7 +219,8 @@ public class Parser
         contextFlags = scriptKind switch
         {
             ScriptKind.JS or ScriptKind.JSX => NodeFlags.JavaScriptFile,
-            ScriptKind.JSON => NodeFlags.JavaScriptFile | NodeFlags.JsonFile,
+            // ScriptKind.JSON => NodeFlags.JavaScriptFile | NodeFlags.JsonFile,
+            ScriptKind.JSON => NodeFlags.JavaScriptFile,
             _ => NodeFlags.None,
         };
         parseErrorBeforeNextFinishedNode = false;
@@ -757,7 +758,7 @@ public class Parser
         }
 
         // Otherwise, if this isn't a well-known keyword-like identifier, give the generic fallback message.
-        var expressionText = node is Identifier id ? IdText(id) : null;
+        var expressionText = node is Identifier id ? IdText(id, sourceText) : null;
         if (string.IsNullOrEmpty(expressionText) || !IsIdentifierText(expressionText!, languageVersion))
         {
             ParseErrorAtCurrentToken(Diagnostics._0_expected, TokenToString(SyntaxKind.SemicolonToken));
@@ -1020,10 +1021,16 @@ public class Parser
             var pos = scanner.HasPrecedingJSDocLeadingAsterisks() ? scanner.GetTokenStart() : GetNodePos();
             // Store original token kind if it is not just an Identifier so we can report appropriate error later in type checker
             var originalKeywordKind = Token();
-            var text = scanner.GetTokenValue();
+            // Identifier.Text can be materialized lazily from the source text using Pos/End,
+            // avoiding a substring allocation for identifiers that are never read by consumers
+            // such as TSTypeListerAST. Escaped identifiers must use the cooked scanner value.
+            var hasUnicodeEscape = scanner.HasUnicodeEscape() || scanner.HasExtendedUnicodeEscape();
+            var text = hasUnicodeEscape ? scanner.GetTokenValue() : null;
             var hasExtendedUnicodeEscape = scanner.HasExtendedUnicodeEscape();
+            var identifierSourceText = text == null ? scanner.GetText() : null;
             NextTokenWithoutCheck();
-            return FinishNode(new Identifier(text, originalKeywordKind, hasExtendedUnicodeEscape), pos);
+            return FinishNode(new Identifier(text, originalKeywordKind, hasExtendedUnicodeEscape,
+                sourceText: identifierSourceText), pos);
         }
 
         if (Token() == SyntaxKind.PrivateIdentifier)
@@ -3016,7 +3023,7 @@ public class Parser
 
     ImportTypeNode ParseImportType()
     {
-        sourceFlags |= NodeFlags.PossiblyContainsDynamicImport;
+        // sourceFlags |= NodeFlags.PossiblyContainsDynamicImport;
         var pos = GetNodePos();
         var isTypeOf = ParseOptional(SyntaxKind.TypeOfKeyword);
         ParseExpected(SyntaxKind.ImportKeyword);
@@ -4532,7 +4539,7 @@ public class Parser
                 //      var foo3 = require("subfolder
                 //      import * as foo1 from "module-from-node
                 // We want this import to be a statement rather than import call expression
-                sourceFlags |= NodeFlags.PossiblyContainsDynamicImport;
+                // sourceFlags |= NodeFlags.PossiblyContainsDynamicImport;
                 expression = ParseTokenNode<ImportExpression>();
             }
             else if (LookAhead(nextTokenIsDotFn))
@@ -4547,7 +4554,7 @@ public class Parser
                 {
                     if (Token() == SyntaxKind.OpenParenToken || Token() == SyntaxKind.LessThanToken)
                     {
-                        sourceFlags |= NodeFlags.PossiblyContainsDynamicImport;
+                        // sourceFlags |= NodeFlags.PossiblyContainsDynamicImport;
                     }
                 }
                 else
@@ -6537,20 +6544,20 @@ public class Parser
             case SyntaxKind.VarKeyword:
                 break;
             case SyntaxKind.LetKeyword:
-                flags |= NodeFlags.Let;
+                // flags |= NodeFlags.Let;
                 break;
             case SyntaxKind.ConstKeyword:
-                flags |= NodeFlags.Const;
+                // flags |= NodeFlags.Const;
                 break;
             case SyntaxKind.UsingKeyword:
-                flags |= NodeFlags.Using;
+                // flags |= NodeFlags.Using;
                 break;
             case SyntaxKind.AwaitKeyword:
                 if (!IsAwaitUsingDeclaration())
                 {
                     break;
                 }
-                flags |= NodeFlags.AwaitUsing;
+                //flags |= NodeFlags.AwaitUsing;
                 NextToken();
                 break;
             default:
@@ -7290,7 +7297,7 @@ public class Parser
         {
             // parse 'global' as name of global scope augmentation
             name = ParseIdentifier();
-            flags |= NodeFlags.GlobalAugmentation;
+            // flags |= NodeFlags.GlobalAugmentation;
         }
         else
         {

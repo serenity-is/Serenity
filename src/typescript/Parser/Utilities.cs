@@ -368,10 +368,9 @@ public class Utilities
 #endif
     }
 
-    internal static string? IdText(Identifier identifier)
+    internal static string? IdText(Identifier identifier, string? sourceText = null)
     {
-        return identifier.Text;
-        // return unescapeLeadingUnderscores(identifierOrPrivateName.escapedText);
+        return identifier.Text ?? identifier.GetText(sourceText);
     }
 
     internal static bool CanHaveModifiers(INode node)
