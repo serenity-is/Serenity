@@ -42,6 +42,7 @@ public class Utilities
         return scriptKind == ScriptKind.TSX || scriptKind == ScriptKind.JSX || scriptKind == ScriptKind.JS ? LanguageVariant.JSX : LanguageVariant.Standard;
     }
 
+    #if false // Incremental parsing is not implemented.
     internal static INode? ContainsParseError(INode node)
     {
         AggregateChildData(node);
@@ -62,6 +63,7 @@ public class Utilities
             node.Flags |= NodeFlags.HasAggregatedChildData;
         }
     }
+    #endif
 
     internal static bool NodeIsMissing([NotNullWhen(false)] INode? node)
     {

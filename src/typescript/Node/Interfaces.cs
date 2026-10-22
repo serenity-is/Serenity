@@ -16,10 +16,11 @@ public interface INode : ITextRange
     string ToString(bool withPos);
 }
 
-public interface ISyntaxCursor
-{
-    public INode? CurrentNode(int pos);
-}
+// Incremental parsing is not implemented by this parser port.
+// public interface ISyntaxCursor
+// {
+//     public INode? CurrentNode(int pos);
+// }
 
 public interface IModifierLike : INode
 {
@@ -221,10 +222,11 @@ public interface IVariableDeclarationList : INode, IForInitializer
     NodeArray<VariableDeclaration>? Declarations { get; }
 }
 
-public interface IIntersectsIncrementalChange : INode
-{
-    bool IntersectsIncrementalChange { get; }
-}
+// Incremental parsing is not implemented by this parser port.
+// public interface IIntersectsIncrementalChange : INode
+// {
+//     bool IntersectsIncrementalChange { get; }
+// }
 
 
 public interface IJsxAttributeName : IDeclarationName

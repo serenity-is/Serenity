@@ -1,9 +1,9 @@
 namespace Serenity.TypeScript;
 
 // The upstream TypeScript compiler uses a 32-bit NodeFlags enum, but most of those
-// flags are only needed by the binder/checker. This parser port only uses 15 bits,
-// so the flags are compacted into bits 0..14 and the enum fits in a short (2 bytes).
-// Bit 15 is intentionally unused; if a 16th flag is ever needed, switch to ushort.
+// flags are only needed by the binder/checker/incremental parser. This parser port
+// only uses 12 bits, so the flags are compacted into bits 0..11 and the enum fits
+// in a short (2 bytes). Bits 12..15 are currently unused.
 [Flags]
 public enum NodeFlags : short
 {
@@ -17,19 +17,13 @@ public enum NodeFlags : short
     DecoratorContext = 1 << 5, // If node was parsed as part of a decorator
     AwaitContext = 1 << 6, // If node was parsed in the 'await' context created when parsing an async function
     DisallowConditionalTypesContext = 1 << 7, // If node was parsed in a context where conditional types are not allowed
-    ThisNodeHasError = 1 << 8, // If the parser encountered an error when parsing the code that created this node
-    JavaScriptFile = 1 << 9, // If node was parsed in a JavaScript
-    ThisNodeOrAnySubNodesHasError = 1 << 10, // If this node or any of its children had an error
-    HasAggregatedChildData = 1 << 11, // If we've computed data from children and cached it in this node
+    JavaScriptFile = 1 << 8, // If node was parsed in a JavaScript
     // @internal
-    PossiblyContainsImportMeta = 1 << 12,
+    PossiblyContainsImportMeta = 1 << 9,
     // @internal
-    Ambient = 1 << 13, // If node was inside an ambient context -- a declaration file, or inside something with the `declare` modifier.
+    Ambient = 1 << 10, // If node was inside an ambient context -- a declaration file, or inside something with the `declare` modifier.
     // @internal
-    InWithStatement = 1 << 14, // If any ancestor of node was the `statement` of a WithStatement (not the `expression`)
-
-    // Parsing context flags
-    ContextFlags = DisallowInContext | DisallowConditionalTypesContext | YieldContext | DecoratorContext | AwaitContext | JavaScriptFile | InWithStatement | Ambient,
+    InWithStatement = 1 << 11, // If any ancestor of node was the `statement` of a WithStatement (not the `expression`)
 
     // Exclude these flags when parsing a Type
     TypeExcludesFlags = YieldContext | AwaitContext,
@@ -51,6 +45,9 @@ public enum NodeFlags : short
     // HasExplicitReturn = 1 << 10,  // If function has explicit reachable return on one of codepaths (initialized by binding)
     // GlobalAugmentation = 1 << 11,  // Set if module declaration is an augmentation for the global scope
     // HasAsyncFunctions = 1 << 12, // If the file has async functions (initialized by binding)
+    // ThisNodeHasError = 1 << 18, // Incremental parsing only
+    // ThisNodeOrAnySubNodesHasError = 1 << 20, // Incremental parsing only
+    // HasAggregatedChildData = 1 << 21, // Incremental parsing only
     // PossiblyContainsDynamicImport = 1 << 22, // Only assigned in upstream; never checked by this port
     // JSDoc = 1 << 24, // If node was parsed inside jsdoc
     // JsonFile = 1 << 27, // If node was parsed in a Json
@@ -63,6 +60,9 @@ public enum NodeFlags : short
     // ReachabilityCheckFlags = HasImplicitReturn | HasExplicitReturn,
     // ReachabilityAndEmitFlags = ReachabilityCheckFlags | HasAsyncFunctions,
     // PermanentlySetIncrementalFlags = PossiblyContainsDynamicImport | PossiblyContainsImportMeta,
+
+    // Parsing context flags (used by incremental parsing only)
+    // ContextFlags = DisallowInContext | DisallowConditionalTypesContext | YieldContext | DecoratorContext | AwaitContext | JavaScriptFile | InWithStatement | Ambient,
 
     // The following flags repurpose other NodeFlags as different meanings for Identifier nodes
     // IdentifierHasExtendedUnicodeEscape = ContainsThis, // Indicates whether the identifier contains an extended unicode escape sequence

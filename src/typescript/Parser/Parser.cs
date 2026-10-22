@@ -16,7 +16,7 @@ public class Parser
     private ScriptTarget languageVersion;
     private LanguageVariant languageVariant;
     public List<Diagnostic> parseDiagnostics = null!;
-    private ISyntaxCursor? syntaxCursor;
+    // private ISyntaxCursor? syntaxCursor; // Incremental parsing is not implemented.
 
     private SyntaxKind currentToken;
     private int nodeCount;
@@ -116,6 +116,8 @@ public class Parser
     // Indicates whether we are currently parsing top-level statements.
     private bool topLevel = true;
 
+    // Incremental parsing is not implemented; kept for reference.
+    //
     // Whether or not we've had a parse error since creating the last AST node.  If we have
     // encountered an error, it will be stored on the next AST node we create.  Parse errors
     // can be broken down into three categories:
@@ -143,7 +145,7 @@ public class Parser
     //
     // Note: any errors at the end of the file that do not precede a regular node, should get
     // attached to the EOF token.
-    private bool parseErrorBeforeNextFinishedNode = false;
+    // private bool parseErrorBeforeNextFinishedNode = false;
 
     public Parser()
     {
@@ -181,7 +183,8 @@ public class Parser
     }
 
     public SourceFile ParseSourceFile(string fileName, string sourceText, ScriptTarget languageVersion = ScriptTarget.Latest,
-        ISyntaxCursor? syntaxCursor = null, bool setParentNodes = true, ScriptKind scriptKind = ScriptKind.Unknown,
+        // ISyntaxCursor? syntaxCursor = null, // Incremental parsing is not implemented.
+        bool setParentNodes = true, ScriptKind scriptKind = ScriptKind.Unknown,
         Action<SourceFile>? setExternalModuleIndicatorOverride = null,
         JSDocParsingMode jsDocParsingMode = JSDocParsingMode.ParseNone)
     {
@@ -190,7 +193,8 @@ public class Parser
         if (scriptKind == ScriptKind.JSON)
             throw new ArgumentOutOfRangeException(nameof(scriptKind));
 
-        InitializeState(fileName, sourceText, languageVersion, syntaxCursor, scriptKind, jsDocParsingMode);
+        // InitializeState(fileName, sourceText, languageVersion, syntaxCursor, scriptKind, jsDocParsingMode);
+        InitializeState(fileName, sourceText, languageVersion, scriptKind, jsDocParsingMode);
 
         var result = ParseSourceFileWorker(fileName, setParentNodes, scriptKind,
             setExternalModuleIndicatorOverride ?? SetExternalModuleIndicator, jsDocParsingMode);
@@ -200,13 +204,14 @@ public class Parser
         return result;
     }
 
-    private void InitializeState(string fileName, string sourceText, ScriptTarget languageVersion, ISyntaxCursor? syntaxCursor,
+    private void InitializeState(string fileName, string sourceText, ScriptTarget languageVersion,
+        // ISyntaxCursor? syntaxCursor, // Incremental parsing is not implemented.
         ScriptKind scriptKind, JSDocParsingMode jsDocParsingMode)
     {
         this.fileName = NormalizePath(fileName);
         this.sourceText = sourceText;
         this.languageVersion = languageVersion;
-        this.syntaxCursor = syntaxCursor;
+        // this.syntaxCursor = syntaxCursor;
         languageVariant = GetLanguageVariant(scriptKind);
 
         parseDiagnostics = [];
@@ -223,7 +228,7 @@ public class Parser
             ScriptKind.JSON => NodeFlags.JavaScriptFile,
             _ => NodeFlags.None,
         };
-        parseErrorBeforeNextFinishedNode = false;
+        // parseErrorBeforeNextFinishedNode = false;
 
         // Initialize and prime the scanner before parsing the source elements.
         scanner.SetText(sourceText);
@@ -246,7 +251,7 @@ public class Parser
         // Clear any data.  We don't want to accidentally hold onto it for too long.
         sourceText = null;
         languageVersion = ScriptTarget.Latest;
-        syntaxCursor = null;
+        // syntaxCursor = null;
         languageVariant = LanguageVariant.Standard;
         sourceFlags = 0;
         parseDiagnostics = null!;
@@ -516,7 +521,7 @@ public class Parser
 
         // Mark that we've encountered an error.  We'll set an appropriate bit on the next
         // node we finish so that it can't be reused incrementally.
-        parseErrorBeforeNextFinishedNode = true;
+        // parseErrorBeforeNextFinishedNode = true;
         return result;
     }
 
@@ -629,7 +634,7 @@ public class Parser
         // caller asked us to always reset our state).
         var saveToken = currentToken;
         var saveParseDiagnosticsLength = parseDiagnostics.Count;
-        var saveParseErrorBeforeNextFinishedNode = parseErrorBeforeNextFinishedNode;
+        // var saveParseErrorBeforeNextFinishedNode = parseErrorBeforeNextFinishedNode;
 
         // Note: it is not actually necessary to save/restore the context flags here.  That's
         // because the saving/restoring of these flags happens naturally through the recursive
@@ -656,7 +661,7 @@ public class Parser
                 while (parseDiagnostics.Count > saveParseDiagnosticsLength)
                     parseDiagnostics.RemoveAt(parseDiagnostics.Count - 1);
             }
-            parseErrorBeforeNextFinishedNode = saveParseErrorBeforeNextFinishedNode;
+            // parseErrorBeforeNextFinishedNode = saveParseErrorBeforeNextFinishedNode;
         }
 
         return result;
@@ -978,14 +983,15 @@ public class Parser
             node.Flags |= contextFlags;
         }
 
+        // Incremental parsing is not implemented; kept for reference.
         // Keep track on the node if we encountered an error while parsing it.  If we did, then
         // we cannot reuse the node incrementally.  Once we've marked this node, clear out the
         // flag so that we don't mark any subsequent nodes.
-        if (parseErrorBeforeNextFinishedNode)
-        {
-            parseErrorBeforeNextFinishedNode = false;
-            node.Flags |= NodeFlags.ThisNodeHasError;
-        }
+        // if (parseErrorBeforeNextFinishedNode)
+        // {
+        //     parseErrorBeforeNextFinishedNode = false;
+        //     node.Flags |= NodeFlags.ThisNodeHasError;
+        // }
 
         return node;
     }
@@ -1246,11 +1252,12 @@ public class Parser
     // True if positioned at the start of a list element
     bool IsListElement(ParsingContext parsingContext, bool inErrorRecovery)
     {
-        var node = CurrentNode(parsingContext);
-        if (node != null)
-        {
-            return true;
-        }
+        // Incremental parsing is not implemented; kept for reference.
+        // var node = CurrentNode(parsingContext);
+        // if (node != null)
+        // {
+        //     return true;
+        // }
 
         switch (parsingContext)
         {
@@ -1530,15 +1537,17 @@ public class Parser
 
     T ParseListElement<T>(ParsingContext parsingContext, Func<T> parseElement) where T : INode
     {
-        var node = CurrentNode(parsingContext);
-        if (node != null)
-        {
-            return (T)ConsumeNode(node);
-        }
+        // Incremental parsing is not implemented; kept for reference.
+        // var node = CurrentNode(parsingContext);
+        // if (node != null)
+        // {
+        //     return (T)ConsumeNode(node);
+        // }
 
         return parseElement();
     }
 
+    #if false // Incremental parsing is not implemented.
     INode? CurrentNode(ParsingContext parsingContext, int? pos = null)
     {
         // If we don't have a cursor or the parsing context isn't reusable, there's nothing to reuse.
@@ -1777,6 +1786,8 @@ public class Parser
         var parameter = node as ParameterDeclaration;
         return parameter?.Initializer == null;
     }
+
+    #endif
 
     // Returns true if we should abort parsing.
     bool AbortParsingListOrMoveToNextToken(ParsingContext kind)
@@ -6309,11 +6320,12 @@ public class Parser
         var isAmbient = HasModifierKind(modifiers, SyntaxKind.DeclareKeyword);
         if (isAmbient)
         {
-            var node = TryReuseAmbientDeclaration(pos);
-            if (node != null)
-            {
-                return node;
-            }
+            // Incremental parsing is not implemented; kept for reference.
+            // var node = TryReuseAmbientDeclaration(pos);
+            // if (node != null)
+            // {
+            //     return node;
+            // }
 
             foreach (var m in modifiers!)
             {
@@ -6327,6 +6339,7 @@ public class Parser
         }
     }
 
+    #if false // Incremental parsing is not implemented.
     Statement TryReuseAmbientDeclaration(int pos)
     {
         return DoInsideOfContext(NodeFlags.Ambient, () =>
@@ -6341,6 +6354,7 @@ public class Parser
             return null!;
         });
     }
+    #endif
 
     IStatement ParseDeclarationWorker(int pos, bool hasJSDoc, NodeArray<IModifierLike> modifiersIn)
     {
