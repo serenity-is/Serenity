@@ -19,8 +19,37 @@ public partial class Scanner
     private int tokenStart;
 
     private SyntaxKind token;
-    private string tokenValue = null!;
+    private string? tokenValueString;
+    private int tokenValueStart;
+    private int tokenValueEnd;
+    private bool tokenValueIsSpan;
     private TokenFlags tokenFlags;
+
+    private string tokenValue
+    {
+        get
+        {
+            if (tokenValueIsSpan)
+            {
+                tokenValueString = text[tokenValueStart..tokenValueEnd];
+                tokenValueIsSpan = false;
+            }
+            return tokenValueString!;
+        }
+        set
+        {
+            tokenValueString = value;
+            tokenValueIsSpan = false;
+        }
+    }
+
+    private void SetTokenValueSpan(int start, int end)
+    {
+        tokenValueString = null;
+        tokenValueStart = start;
+        tokenValueEnd = end;
+        tokenValueIsSpan = true;
+    }
 
     private List<CommentDirective>? commentDirectives;
     private int skipJsDocLeadingAsterisks;
@@ -868,15 +897,20 @@ public partial class Scanner
 
     private SyntaxKind GetIdentifierToken()
     {
-        var len = tokenValue.Length;
-        if (len >= 2 && len <= 11)
+        var length = tokenValueIsSpan ? tokenValueEnd - tokenValueStart : tokenValueString!.Length;
+        if (length >= 2 && length <= 11)
         {
-            var ch = tokenValue[0];
-            if (ch >= CharacterCodes.a && ch <= CharacterCodes.z)
+            var start = tokenValueIsSpan ? tokenValueStart : 0;
+            var value = tokenValueIsSpan ? text : tokenValueString!;
+            if (value[start] >= CharacterCodes.a && value[start] <= CharacterCodes.z &&
+                KeywordIndex.TryGetValue((length << 8) | value[start], out var candidates))
             {
-                if (textToToken.TryGetValue(tokenValue, out SyntaxKind keyword))
+                foreach (var candidate in candidates)
                 {
-                    return token = keyword;
+                    if (string.CompareOrdinal(value, start, candidate.Text, 0, length) == 0)
+                    {
+                        return token = candidate.Kind;
+                    }
                 }
             }
         }
@@ -1662,7 +1696,7 @@ public partial class Scanner
         {
             pos += CharSize(ch);
             while (pos < end && IsIdentifierPart(ch = CodePointUnchecked(pos), languageVersion)) pos += CharSize(ch);
-            tokenValue = text[tokenStart..pos];
+            SetTokenValueSpan(tokenStart, pos);
             if (ch == CharacterCodes.Backslash)
             {
                 tokenValue += ScanIdentifierParts();
@@ -3440,7 +3474,7 @@ public partial class Scanner
             var ch2 = ch;
             while (pos < end && IsIdentifierPart(ch2 = text[pos], languageVersion) || text[pos] == CharacterCodes.Minus)
                 pos += CharSize(ch2);
-            tokenValue = text[tokenStart..pos];
+            SetTokenValueSpan(tokenStart, pos);
             if (ch2 == CharacterCodes.Backslash)
             {
                 tokenValue += ScanIdentifierParts();
@@ -3465,7 +3499,10 @@ public partial class Scanner
         var saveStartPos = fullStartPos;
         var saveTokenPos = tokenStart;
         var saveToken = token;
-        var saveTokenValue = tokenValue;
+        var saveTokenValueString = tokenValueString;
+        var saveTokenValueStart = tokenValueStart;
+        var saveTokenValueEnd = tokenValueEnd;
+        var saveTokenValueIsSpan = tokenValueIsSpan;
         var saveTokenFlags = tokenFlags;
         var result = callback();
 
@@ -3477,7 +3514,10 @@ public partial class Scanner
             fullStartPos = saveStartPos;
             tokenStart = saveTokenPos;
             token = saveToken;
-            tokenValue = saveTokenValue;
+            tokenValueString = saveTokenValueString;
+            tokenValueStart = saveTokenValueStart;
+            tokenValueEnd = saveTokenValueEnd;
+            tokenValueIsSpan = saveTokenValueIsSpan;
             tokenFlags = saveTokenFlags;
         }
         return result;
@@ -3495,7 +3535,10 @@ public partial class Scanner
         var saveStartPos = fullStartPos;
         var saveTokenPos = tokenStart;
         var saveToken = token;
-        var saveTokenValue = tokenValue;
+        var saveTokenValueString = tokenValueString;
+        var saveTokenValueStart = tokenValueStart;
+        var saveTokenValueEnd = tokenValueEnd;
+        var saveTokenValueIsSpan = tokenValueIsSpan;
         var saveTokenFlags = tokenFlags;
         var saveErrorExpectations = commentDirectives;
 
@@ -3507,7 +3550,10 @@ public partial class Scanner
         fullStartPos = saveStartPos;
         tokenStart = saveTokenPos;
         token = saveToken;
-        tokenValue = saveTokenValue;
+        tokenValueString = saveTokenValueString;
+        tokenValueStart = saveTokenValueStart;
+        tokenValueEnd = saveTokenValueEnd;
+        tokenValueIsSpan = saveTokenValueIsSpan;
         tokenFlags = saveTokenFlags;
         commentDirectives = saveErrorExpectations;
 

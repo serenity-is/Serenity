@@ -11,18 +11,34 @@ public static class NodeExtensions
 
     public static bool HasModifier(this INode node, SyntaxKind kind)
     {
-        return node is IHasModifierLike hasModifiersLike &&
-            hasModifiersLike.Modifiers != null &&
-            hasModifiersLike.Modifiers.Any(x => x.Kind == kind);
+        if (node is not IHasModifierLike hasModifiersLike || hasModifiersLike.Modifiers == null)
+            return false;
+
+        var modifiers = hasModifiersLike.Modifiers;
+        for (var i = 0; i < modifiers.Count; i++)
+        {
+            if (modifiers[i]?.Kind == kind)
+                return true;
+        }
+        return false;
     }
 
-    public static IEnumerable<Decorator> GetDecorators(this INode node)
+    public static List<Decorator>? GetDecorators(this INode node)
     {
         if (node is not IHasModifierLike hasModifiersLike ||
             hasModifiersLike.Modifiers == null)
-            return [];
+            return null;
 
-        return hasModifiersLike.Modifiers.OfType<Decorator>();
+        List<Decorator>? result = null;
+        var modifiers = hasModifiersLike.Modifiers;
+        for (var i = 0; i < modifiers.Count; i++)
+        {
+            if (modifiers[i] is Decorator decorator)
+            {
+                (result ??= []).Add(decorator);
+            }
+        }
+        return result;
     }
 
     public static string? GetText(this INode node, string? sourceText = null)

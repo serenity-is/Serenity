@@ -380,8 +380,16 @@ public class Utilities
 
     internal static bool HasModifierOfKind(INode node, SyntaxKind kind)
     {
-        return node is IHasModifierLike hasModifiers && hasModifiers.Modifiers != null &&
-            hasModifiers.Modifiers.Any(m => m.Kind == kind);
+        if (node is not IHasModifierLike hasModifiers || hasModifiers.Modifiers == null)
+            return false;
+
+        var modifiers = hasModifiers.Modifiers;
+        for (var i = 0; i < modifiers.Count; i++)
+        {
+            if (modifiers[i]?.Kind == kind)
+                return true;
+        }
+        return false;
     }
 
     static bool IsAnExternalModuleIndicatorNode(INode node)

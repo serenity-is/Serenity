@@ -20,7 +20,6 @@ public class Parser
 
     private SyntaxKind currentToken;
     private int nodeCount;
-    private HashSet<string> identifiers = null!;
     private int identifierCount;
 
     // TODO(jakebailey): This type is a lie; this value actually contains the result
@@ -144,7 +143,6 @@ public class Parser
 
         parseDiagnostics = [];
         parsingContext = 0;
-        identifiers = [];
         identifierCount = 0;
         nodeCount = 0;
         sourceFlags = 0;
@@ -185,7 +183,6 @@ public class Parser
         parseDiagnostics = null!;
         //jsDocDiagnostics = null;
         parsingContext = 0;
-        identifiers = null!;
         notParenthesizedArrow = null!;
         topLevel = true;
     }
@@ -233,7 +230,6 @@ public class Parser
         sourceFile.CommentDirectives = scanner.GetCommentDirectives();
         sourceFile.NodeCount = nodeCount;
         sourceFile.IdentifierCount = identifierCount;
-        sourceFile.Identifiers = identifiers;
         //sourceFile.ParseDiagnostics = AttachFileToDiagnostics(parseDiagnostics, sourceFile);
         sourceFile.ParseDiagnostics = parseDiagnostics;
         sourceFile.JsDocParsingMode = jsDocParsingMode;
@@ -886,19 +882,23 @@ public class Parser
         return TryParseSemicolon() || ParseExpected(SyntaxKind.SemicolonToken);
     }
 
+    NodeArray<T> FinishNodeArray<T>(NodeArray<T> list, int pos, int? end = null, bool hasTrailingComma = false)
+        where T : INode
+    {
+        list.HasTrailingComma = hasTrailingComma;
+        SetTextRangePosEnd(list, pos, end ?? scanner.GetTokenFullStart());
+        return list;
+    }
+
     NodeArray<T> CreateNodeArray<T>(IEnumerable<T> elements, int pos, int? end = null, bool hasTrailingComma = false)
         where T : INode
     {
-        var array = new NodeArray<T>(elements)
-        {
-            HasTrailingComma = hasTrailingComma
-        };
-        SetTextRangePosEnd(array, pos, end ?? scanner.GetTokenFullStart());
-        return array;
+        return FinishNodeArray(new NodeArray<T>(elements), pos, end, hasTrailingComma);
     }
 
     T FinishNode<T>(T node, int pos, int? end = null) where T : INode
     {
+        nodeCount++;
         SetTextRangePosEnd(node, pos, end ?? scanner.GetTokenFullStart());
         if (contextFlags != 0)
         {
@@ -940,16 +940,6 @@ public class Parser
         return FinishNode((T)result!, pos);
     }
 
-    string InternIdentifier(string text)
-    {
-        if (identifiers.Contains(text))
-            identifiers.Add(text);
-        return text;
-    }
-
-    // An identifier that starts with two underscores has an extra underscore character prepended to it to avoid issues
-    // with magic property names like '__proto__'. The 'identifiers' object is used to share a single string instance for
-    // each identifier in order to reduce memory consumption.
     Identifier CreateIdentifier(bool isIdentifier, DiagnosticMessage? diagnosticMessage = null, DiagnosticMessage? privateIdentifierDiagnosticMessage = null)
     {
         if (isIdentifier)
@@ -958,7 +948,7 @@ public class Parser
             var pos = scanner.HasPrecedingJSDocLeadingAsterisks() ? scanner.GetTokenStart() : GetNodePos();
             // Store original token kind if it is not just an Identifier so we can report appropriate error later in type checker
             var originalKeywordKind = Token();
-            var text = InternIdentifier(scanner.GetTokenValue());
+            var text = scanner.GetTokenValue();
             var hasExtendedUnicodeEscape = scanner.HasExtendedUnicodeEscape();
             NextTokenWithoutCheck();
             return FinishNode(new Identifier(text, originalKeywordKind, hasExtendedUnicodeEscape), pos);
@@ -1031,7 +1021,6 @@ public class Parser
         if (Token() == SyntaxKind.StringLiteral || Token() == SyntaxKind.NumericLiteral || Token() == SyntaxKind.BigIntLiteral)
         {
             var node = ParseLiteralNode<ILiteralExpression>();
-            node.Text = InternIdentifier(node.Text!);
             return (IPropertyName)node;
         }
         if (allowComputedPropertyNames && Token() == SyntaxKind.OpenBracketToken)
@@ -1068,7 +1057,7 @@ public class Parser
     PrivateIdentifier ParsePrivateIdentifier()
     {
         var pos = GetNodePos();
-        var node = new PrivateIdentifier(InternIdentifier(scanner.GetTokenValue()));
+        var node = new PrivateIdentifier(scanner.GetTokenValue());
         NextToken();
         return FinishNode(node, pos);
     }
@@ -1438,7 +1427,7 @@ public class Parser
     {
         var saveParsingContext = parsingContext;
         parsingContext |= (ParsingContext)(1 << (int)kind);
-        var list = new List<T>();
+        var list = new NodeArray<T>();
         var listPos = GetNodePos();
 
         while (!IsListTerminator(kind))
@@ -1457,7 +1446,7 @@ public class Parser
         }
 
         parsingContext = saveParsingContext;
-        return CreateNodeArray(list, listPos);
+        return FinishNodeArray(list, listPos);
     }
 
     T ParseListElement<T>(ParsingContext parsingContext, Func<T> parseElement) where T : INode
@@ -1799,7 +1788,7 @@ public class Parser
     {
         var saveParsingContext = parsingContext;
         parsingContext |= (ParsingContext)(1 << (int)kind);
-        var list = new List<T>();
+        var list = new NodeArray<T>();
         var listPos = GetNodePos();
 
         var commaStart = -1; // Meaning the previous token was not a comma
@@ -1871,7 +1860,7 @@ public class Parser
         // was a trailing comma.
         // Check if the last token was a comma.
         // Always preserve a trailing comma by marking it on the NodeArray
-        return CreateNodeArray(list, listPos, hasTrailingComma: commaStart >= 0);
+        return FinishNodeArray(list, listPos, hasTrailingComma: commaStart >= 0);
     }
 
     static DiagnosticMessage? GetExpectedCommaDiagnostic(ParsingContext kind)
@@ -1978,7 +1967,7 @@ public class Parser
     NodeArray<TemplateSpan> ParseTemplateSpans(bool isTaggedTemplate)
     {
         var pos = GetNodePos();
-        var list = new List<TemplateSpan>();
+        var list = new NodeArray<TemplateSpan>();
         TemplateSpan node;
         do
         {
@@ -1986,7 +1975,7 @@ public class Parser
             list.Add(node);
         }
         while (node.Literal.Kind == SyntaxKind.TemplateMiddle);
-        return CreateNodeArray(list, pos);
+        return FinishNodeArray(list, pos);
     }
 
     TemplateExpression ParseTemplateExpression(bool isTaggedTemplate)
@@ -2007,7 +1996,7 @@ public class Parser
     NodeArray<TemplateLiteralTypeSpan> ParseTemplateTypeSpans()
     {
         var pos = GetNodePos();
-        var list = new List<TemplateLiteralTypeSpan>();
+        var list = new NodeArray<TemplateLiteralTypeSpan>();
         TemplateLiteralTypeSpan node;
         do
         {
@@ -2015,7 +2004,7 @@ public class Parser
             list.Add(node);
         }
         while (node.Literal.Kind == SyntaxKind.TemplateMiddle);
-        return CreateNodeArray(list, pos);
+        return FinishNodeArray(list, pos);
     }
 
     TemplateLiteralTypeSpan ParseTemplateTypeSpan()
@@ -3908,7 +3897,7 @@ public class Parser
         var pos = GetNodePos();
         var hasJSDoc = HasPrecedingJSDocComment();
         var modifiers = ParseModifiersForArrowFunction();
-        var isAsync = modifiers?.Any(x => x.Kind == SyntaxKind.AsyncKeyword) == true ? SignatureFlags.Await : SignatureFlags.None;
+        var isAsync = HasModifierKind(modifiers, SyntaxKind.AsyncKeyword) ? SignatureFlags.Await : SignatureFlags.None;
         // Arrow functions are never generators.
         //
         // If we're speculatively parsing a signature for a parenthesized arrow function, then
@@ -3984,7 +3973,7 @@ public class Parser
         var lastToken = Token();
         var equalsGreaterThanToken = ParseExpectedToken<EqualsGreaterThanToken>(SyntaxKind.EqualsGreaterThanToken);
         var body = (lastToken == SyntaxKind.EqualsGreaterThanToken || lastToken == SyntaxKind.OpenBraceToken)
-            ? ParseArrowFunctionExpressionBody(modifiers?.Any(x => x.Kind == SyntaxKind.AsyncKeyword) == true, 
+            ? ParseArrowFunctionExpressionBody(HasModifierKind(modifiers, SyntaxKind.AsyncKeyword), 
                 allowReturnTypeInArrowFunction)
             : ParseIdentifier();
 
@@ -4735,7 +4724,7 @@ public class Parser
 
     NodeArray<IJsxChild> ParseJsxChildren(IJsxOpeningLikeElementOrOpeningFragment openingTag)
     {
-        List<IJsxChild> list = [];
+        NodeArray<IJsxChild> list = [];
         var listPos = GetNodePos();
         var saveParsingContext = parsingContext;
         parsingContext |= (ParsingContext)(1 << (int)ParsingContext.JsxChildren);
@@ -4757,7 +4746,7 @@ public class Parser
         }
 
         parsingContext = saveParsingContext;
-        return CreateNodeArray(list, listPos);
+        return FinishNodeArray(list, listPos);
     }
 
     JsxAttributes ParseJsxAttributes()
@@ -5068,11 +5057,6 @@ public class Parser
         else
         {
             var argument = AllowInAnd(ParseExpression);
-            if (argument is IStringLiteralLike or NumericLiteral &&
-                argument is IHasLiteralText hasLiteralText)
-            {
-                hasLiteralText.Text = InternIdentifier(hasLiteralText.Text!);
-            }
             argumentExpression = argument;
         }
 
@@ -5469,7 +5453,7 @@ public class Parser
         ParseExpected(SyntaxKind.FunctionKeyword);
         var asteriskToken = ParseOptionalToken<AsteriskToken>(SyntaxKind.AsteriskToken);
         var isGenerator = asteriskToken != null ? SignatureFlags.Yield : SignatureFlags.None;
-        var isAsync = modifiers?.Any(x => x.Kind == SyntaxKind.AsyncKeyword) == true ? SignatureFlags.Await : SignatureFlags.None;
+        var isAsync = HasModifierKind(modifiers, SyntaxKind.AsyncKeyword) ? SignatureFlags.Await : SignatureFlags.None;
         var name = isGenerator != 0 && isAsync != 0 ? DoInYieldAndAwaitContext(ParseOptionalBindingIdentifier) :
             isGenerator != 0 ? DoInYieldContext(ParseOptionalBindingIdentifier) :
             isAsync != 0 ? DoInAwaitContext(ParseOptionalBindingIdentifier) :
@@ -6222,6 +6206,19 @@ public class Parser
         return modifier.Kind == SyntaxKind.DeclareKeyword;
     }
 
+    static bool HasModifierKind(NodeArray<IModifierLike>? modifiers, SyntaxKind kind)
+    {
+        if (modifiers == null)
+            return false;
+
+        for (var i = 0; i < modifiers.Count; i++)
+        {
+            if (modifiers[i]?.Kind == kind)
+                return true;
+        }
+        return false;
+    }
+
     IStatement ParseDeclaration()
     {
         // `parseListElement` attempted to get the reused node at this position,
@@ -6230,7 +6227,7 @@ public class Parser
         var pos = GetNodePos();
         var hasJSDoc = HasPrecedingJSDocComment();
         var modifiers = ParseModifiers(allowDecorators: true);
-        var isAmbient = modifiers?.Any(IsDeclareModifier) == true;
+        var isAmbient = HasModifierKind(modifiers, SyntaxKind.DeclareKeyword);
         if (isAmbient)
         {
             var node = TryReuseAmbientDeclaration(pos);
@@ -6600,7 +6597,7 @@ public class Parser
         DiagnosticMessage? diagnosticMessage = null)
     {
         var isGenerator = asteriskToken != null ? SignatureFlags.Yield : SignatureFlags.None;
-        var isAsync = modifiers?.Any(x => x.Kind == SyntaxKind.AsyncKeyword) == true ? SignatureFlags.Await : SignatureFlags.None;
+        var isAsync = HasModifierKind(modifiers, SyntaxKind.AsyncKeyword) ? SignatureFlags.Await : SignatureFlags.None;
         var typeParameters = ParseTypeParameters();
         var parameters = ParseParameters(isGenerator | isAsync);
         var type = ParseReturnType(SyntaxKind.ColonToken, isType: false);
@@ -6845,7 +6842,7 @@ public class Parser
     NodeArray<IModifierLike> ParseModifiers(bool allowDecorators, bool permitConstAsModifier = false, bool stopOnStartOfClassStaticBlock = false)
     {
         var pos = GetNodePos();
-        List<IModifierLike>? list = null;
+        NodeArray<IModifierLike>? list = null;
         Decorator decorator;
         IModifier modifier;
         var hasSeenStaticModifier = false;
@@ -6901,7 +6898,7 @@ public class Parser
             }
         }
 
-        return list != null ? CreateNodeArray(list, pos) : null!;
+        return list != null ? FinishNodeArray(list, pos) : null!;
     }
 
     NodeArray<IModifierLike> ParseModifiersForArrowFunction()
@@ -6970,7 +6967,7 @@ public class Parser
             Token() == SyntaxKind.OpenBracketToken
         )
         {
-            var isAmbient = modifiers?.Any(x => x != null && IsDeclareModifier(x)) == true;
+            var isAmbient = HasModifierKind(modifiers, SyntaxKind.DeclareKeyword);
             if (isAmbient)
             {
                 foreach (var m in modifiers!)
@@ -7034,7 +7031,7 @@ public class Parser
         // We don't parse the name here in await context, instead we will report a grammar error in the checker.
         var name = ParseNameOfClassDeclarationOrExpression();
         var typeParameters = ParseTypeParameters();
-        if (modifiers?.Any(x => x.Kind == SyntaxKind.ExportKeyword) == true)
+        if (HasModifierKind(modifiers, SyntaxKind.ExportKeyword))
             SetAwaitContext(val: true);
         var heritageClauses = ParseHeritageClauses();
 
@@ -7226,7 +7223,6 @@ public class Parser
         else
         {
             name = ParseLiteralNode<StringLiteral>();
-            ((StringLiteral)name).Text = InternIdentifier(((StringLiteral)name).Text!);
         }
         ModuleBlock? body = null;
         if (Token() == SyntaxKind.OpenBraceToken)
@@ -7479,7 +7475,6 @@ public class Parser
         if (Token() == SyntaxKind.StringLiteral)
         {
             var result = ParseLiteralNode<StringLiteral>();
-            result.Text = InternIdentifier(result.Text!);
             return result;
         }
         else

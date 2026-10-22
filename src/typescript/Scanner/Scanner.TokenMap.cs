@@ -154,4 +154,30 @@ partial class Scanner
         ["#"] = SyntaxKind.HashToken,
         ["`"] = SyntaxKind.BacktickToken
     };
+
+    // Groups keywords by length and first character so the scanner can detect
+    // keywords from source text without allocating a substring.
+    internal static readonly Dictionary<int, (string Text, SyntaxKind Kind)[]> KeywordIndex = BuildKeywordIndex();
+
+    private static Dictionary<int, (string Text, SyntaxKind Kind)[]> BuildKeywordIndex()
+    {
+        var groups = new Dictionary<int, List<(string Text, SyntaxKind Kind)>>();
+        foreach (var pair in textToKeyword)
+        {
+            var text = pair.Key;
+            var length = text.Length;
+            if (length < 2 || length > 11 || text[0] < 'a' || text[0] > 'z')
+                continue;
+
+            var key = (length << 8) | text[0];
+            if (!groups.TryGetValue(key, out var list))
+                groups[key] = list = [];
+            list.Add((text, pair.Value));
+        }
+
+        var result = new Dictionary<int, (string Text, SyntaxKind Kind)[]>(groups.Count);
+        foreach (var pair in groups)
+            result[pair.Key] = [.. pair.Value];
+        return result;
+    }
 }

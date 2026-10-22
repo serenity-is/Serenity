@@ -756,7 +756,7 @@ public class TSTypeListerAST
             if (member.HasModifier(SyntaxKind.StaticKeyword))
                 externalMember.IsStatic = true;
             var decorators = member.GetDecorators();
-            if (decorators.Any())
+            if (decorators != null)
                 externalMember.Attributes = [.. decorators.Select(x => DecoratorToExternalAttribute(x)!)];
 
             result.Add(externalMember);
@@ -823,7 +823,7 @@ public class TSTypeListerAST
 
             externalMember.Name = name;
             var decorators = member.GetDecorators();
-            if (decorators.Any())
+            if (decorators != null)
                 externalMember.Attributes = [.. decorators.Select(x => DecoratorToExternalAttribute(x)!)];
 
             result.Add(externalMember);
@@ -865,7 +865,7 @@ public class TSTypeListerAST
             result.Methods = null;
         result.Interfaces = GetInterfaces(klass);
         var decorators = klass.GetDecorators();
-        if (decorators.Any())
+        if (decorators != null)
             result.Attributes = [.. decorators.Select(x => DecoratorToExternalAttribute(x)!)];
 
         return result;
@@ -892,7 +892,7 @@ public class TSTypeListerAST
         result.Interfaces = GetBaseInterfaces(intf);
         result.TransformIncludeTypeName = GetTransformIncludeTypeName(intf);
         var decorators = intf.GetDecorators();
-        if (decorators.Any())
+        if (decorators != null)
             result.Attributes = [.. decorators.Select(x => DecoratorToExternalAttribute(x)!)];
 
         return result;
@@ -993,7 +993,7 @@ public class TSTypeListerAST
             externalMember.Name = name;
             externalMember.IsStatic = true;
             var decorators = member.GetDecorators();
-            if (decorators.Any())
+            if (decorators != null)
                 externalMember.Attributes = [.. decorators.Select(x => DecoratorToExternalAttribute(x)!)];
 
             result.Add(externalMember);
