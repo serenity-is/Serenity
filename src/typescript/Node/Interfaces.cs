@@ -2,8 +2,8 @@ namespace Serenity.TypeScript;
 
 public interface ITextRange
 {
-    int? Pos { get; set; }
-    int? End { get; set; }
+    int Pos { get; set; }
+    int End { get; set; }
 }
 
 public interface INode : ITextRange
@@ -43,8 +43,8 @@ public class NodeArray<T> : List<T>, ITextRange
     }
 
     public bool HasTrailingComma { get; set; }
-    public int? Pos { get; set; }
-    public int? End { get; set; }
+    public int Pos { get; set; } = Utilities.UnsetTextRange;
+    public int End { get; set; } = Utilities.UnsetTextRange;
     public bool IsMissingList { get; set; }
 }
 

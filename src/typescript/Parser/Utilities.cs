@@ -5,9 +5,35 @@ namespace Serenity.TypeScript;
 
 public class Utilities
 {
+    internal const int UnsetTextRange = -1;
+
+    internal static int PosOrZero(ITextRange? range)
+    {
+        return range != null && range.Pos >= 0 ? range.Pos : 0;
+    }
+
+    internal static int EndOrZero(ITextRange? range)
+    {
+        return range != null && range.End >= 0 ? range.End : 0;
+    }
+
+    internal static int EndOrPosOrZero(ITextRange? range)
+    {
+        if (range == null)
+            return 0;
+        if (range.End >= 0)
+            return range.End;
+        return PosOrZero(range);
+    }
+
+    internal static bool HasTextRange(ITextRange? range)
+    {
+        return range != null && range.Pos >= 0 && range.End >= 0;
+    }
+
     internal static int GetFullWidth(INode node)
     {
-        return (node.End ?? 0) - (node.Pos ?? 0);
+        return Math.Max(0, node.End - node.Pos);
     }
 
     internal static LanguageVariant GetLanguageVariant(ScriptKind scriptKind)
@@ -61,12 +87,12 @@ public class Utilities
         if (NodeIsMissing(node))
             return "";
 
-        var start = SkipTrivia(sourceText, node.Pos ?? 0) ?? 0;
+        var start = SkipTrivia(sourceText, node.Pos) ?? 0;
 
-        if (node.End == null)
+        if (node.End < 0)
             return sourceText[start..];
 
-        return sourceText[start..node.End.Value];
+        return sourceText[start..node.End];
     }
 
     internal static bool IsModifierKind(SyntaxKind token)
@@ -445,7 +471,7 @@ public class Utilities
 
     internal static ITextRange SetTextRange(ITextRange range, ITextRange location)
     {
-        return location != null ? SetTextRangePosEnd(range, location.Pos ?? 0, location.End ?? location.Pos ?? 0) : range;
+        return location != null ? SetTextRangePosEnd(range, PosOrZero(location), EndOrZero(location)) : range;
     }
 
     internal static ITextRange SetTextRangePos(ITextRange range, int pos)

@@ -3113,7 +3113,7 @@ public partial class Scanner
         {
             if (!groupSpecifiers?.Contains(reference.Name!) != true)
             {
-                Error(Diagnostics.There_is_no_capturing_group_named_0_in_this_regular_expression, reference.Pos, (reference.End ?? 0) - (reference.Pos ?? 0), reference.Name);
+                Error(Diagnostics.There_is_no_capturing_group_named_0_in_this_regular_expression, reference.Pos, Math.Max(0, reference.End - reference.Pos), reference.Name);
                 if (groupSpecifiers != null)
                 {
                     //const suggestion = getSpellingSuggestion(reference.name, groupSpecifiers, identity);
@@ -3134,11 +3134,11 @@ public partial class Scanner
             {
                 if (numberOfCapturingGroups != 0)
                 {
-                    Error(Diagnostics.This_backreference_refers_to_a_group_that_does_not_exist_There_are_only_0_capturing_groups_in_this_regular_expression, escape.Pos, (escape.End ?? 0) - (escape.Pos ?? 0), numberOfCapturingGroups);
+                    Error(Diagnostics.This_backreference_refers_to_a_group_that_does_not_exist_There_are_only_0_capturing_groups_in_this_regular_expression, escape.Pos, Math.Max(0, escape.End - escape.Pos), numberOfCapturingGroups);
                 }
                 else
                 {
-                    Error(Diagnostics.This_backreference_refers_to_a_group_that_does_not_exist_There_are_no_capturing_groups_in_this_regular_expression, escape.Pos, (escape.End ?? 0) - (escape.Pos ?? 0));
+                    Error(Diagnostics.This_backreference_refers_to_a_group_that_does_not_exist_There_are_no_capturing_groups_in_this_regular_expression, escape.Pos, Math.Max(0, escape.End - escape.Pos));
                 }
             }
         });

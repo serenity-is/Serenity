@@ -46,14 +46,14 @@ public static class NodeExtensions
         if ((sourceText ??= node.GetSourceFile()?.Text) == null)
             return null;
 
-        if (node.Pos == null || node.End == null)
+        if (node.Pos < 0 || node.End < 0)
             return null;
 
-        var pos = Scanner.SkipTrivia(sourceText!, node.Pos) ?? node.Pos ?? 0;
+        var pos = Scanner.SkipTrivia(sourceText!, node.Pos) ?? node.Pos;
         if (node.End < pos)
             return null;
 
-        return sourceText![pos..node.End.Value];
+        return sourceText![pos..node.End];
     }
 
     public static string? GetTextWithTrivia(this INode node, string? sourceText = null)
@@ -61,10 +61,10 @@ public static class NodeExtensions
         if ((sourceText ??= node.GetSourceFile()?.Text) == null)
             return null;
 
-        if (node.Pos == null || node.End == null || node.End < node.Pos)
+        if (node.Pos < 0 || node.End < 0 || node.End < node.Pos)
             return null;
 
-        return sourceText![(int)node.Pos..(int)node.End];
+        return sourceText![node.Pos..node.End];
     }
 
     public static INode? ForEachChild(this INode node, Func<INode, INode?> visitor, bool recursively = false)
