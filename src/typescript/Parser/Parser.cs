@@ -1,5 +1,5 @@
 // Initially converted from https://github.com/microsoft/TypeScript/commit/fbcdb8cf4fbbbea0111a9adeb9d0d2983c088b7c on 2023-12-21 
-// Last updated from commit 9757109cafcb771a35ad9fe09855373cdd82005a on 2024-07-29
+// Last updated from commit 050880ce59e30b356b686bd3144efe24f875ebc8 on 2026-10-22 (6.0.3, e.g. last js version before go)
 
 using static Serenity.TypeScript.Scanner;
 using static Serenity.TypeScript.Utilities;
@@ -1109,10 +1109,12 @@ public class Parser
             case SyntaxKind.DefaultKeyword:
                 return NextTokenCanFollowDefaultKeyword();
             case SyntaxKind.StaticKeyword:
+                NextToken();
+                return CanFollowModifier();
             case SyntaxKind.GetKeyword:
             case SyntaxKind.SetKeyword:
                 NextToken();
-                return CanFollowModifier();
+                return CanFollowGetOrSetKeyword();
             default:
                 return NextTokenIsOnSameLineAndCanFollowModifier();
         }
@@ -1153,6 +1155,12 @@ public class Parser
             || Token() == SyntaxKind.OpenBraceToken
             || Token() == SyntaxKind.AsteriskToken
             || Token() == SyntaxKind.DotDotDotToken
+            || IsLiteralPropertyName();
+    }
+
+    bool CanFollowGetOrSetKeyword()
+    {
+        return Token() == SyntaxKind.OpenBracketToken
             || IsLiteralPropertyName();
     }
 
@@ -2969,6 +2977,7 @@ public class Parser
             }
             ParseExpected(SyntaxKind.ColonToken);
             attributes = ParseImportAttributes(currentToken, skipKeyword: true);
+            ParseOptional(SyntaxKind.CommaToken);
             ParseExpected(SyntaxKind.CloseBraceToken);
         }
         ParseExpected(SyntaxKind.CloseParenToken);
@@ -4043,12 +4052,15 @@ public class Parser
             return ParseFunctionBlock(SignatureFlags.IgnoreMissingOpenBrace | (isAsync ? SignatureFlags.Await : SignatureFlags.None));
         }
 
+        var savedYieldContext = InYieldContext();
+        SetYieldContext(false);
         var savedTopLevel = topLevel;
         topLevel = false;
         var node = isAsync
             ? DoInAwaitContext(() => ParseAssignmentExpressionOrHigher(allowReturnTypeInArrowFunction))
             : DoOutsideOfAwaitContext(() => ParseAssignmentExpressionOrHigher(allowReturnTypeInArrowFunction));
         topLevel = savedTopLevel;
+        SetYieldContext(savedYieldContext);
         return node;
     }
 
@@ -4467,8 +4479,20 @@ public class Parser
                 // This is an 'import.*' metaproperty (i.e. 'import.meta')
                 NextToken(); // advance past the 'import'
                 NextToken(); // advance past the dot
-                expression = FinishNode(new MetaProperty(SyntaxKind.ImportKeyword, ParseIdentifierName()), pos);
-                sourceFlags |= NodeFlags.PossiblyContainsImportMeta;
+                var name = ParseIdentifierName();
+                expression = FinishNode(new MetaProperty(SyntaxKind.ImportKeyword, name), pos);
+
+                if (name.EscapedText == "defer")
+                {
+                    if (Token() == SyntaxKind.OpenParenToken || Token() == SyntaxKind.LessThanToken)
+                    {
+                        sourceFlags |= NodeFlags.PossiblyContainsDynamicImport;
+                    }
+                }
+                else
+                {
+                    sourceFlags |= NodeFlags.PossiblyContainsImportMeta;
+                }
             }
             else
             {
@@ -5939,6 +5963,7 @@ public class Parser
                 // could be legal, it would add complexity for very little gain.
                 case SyntaxKind.InterfaceKeyword:
                 case SyntaxKind.TypeKeyword:
+                case SyntaxKind.DeferKeyword:
                     return NextTokenIsIdentifierOnSameLine();
                 case SyntaxKind.ModuleKeyword:
                 case SyntaxKind.NamespaceKeyword:
@@ -5972,7 +5997,7 @@ public class Parser
 
                 case SyntaxKind.ImportKeyword:
                     NextToken();
-                    return Token() == SyntaxKind.StringLiteral || Token() == SyntaxKind.AsteriskToken ||
+                    return Token() == SyntaxKind.DeferKeyword || Token() == SyntaxKind.StringLiteral || Token() == SyntaxKind.AsteriskToken ||
                         Token() == SyntaxKind.OpenBraceToken || TokenIsIdentifierOrKeyword(Token());
                 case SyntaxKind.ExportKeyword:
                     var currentToken = NextToken();
@@ -6023,7 +6048,7 @@ public class Parser
             SyntaxKind.ConstKeyword or SyntaxKind.ExportKeyword => IsStartOfDeclaration(),
             SyntaxKind.AsyncKeyword or SyntaxKind.DeclareKeyword or SyntaxKind.InterfaceKeyword
                 or SyntaxKind.ModuleKeyword or SyntaxKind.NamespaceKeyword or SyntaxKind.TypeKeyword
-                or SyntaxKind.GlobalKeyword => true,
+                or SyntaxKind.GlobalKeyword or SyntaxKind.DeferKeyword => true,
             // When these don't start a declaration, they may be the start of a class member if an identifier
             SyntaxKind.AccessorKeyword or SyntaxKind.PublicKeyword
                 or SyntaxKind.PrivateKeyword or SyntaxKind.ProtectedKeyword
@@ -6057,10 +6082,19 @@ public class Parser
         return NextTokenIsBindingIdentifierOrStartOfDestructuringOnSameLine(disallowOf: false);
     }
 
+    bool NextTokenIsEqualsOrSemicolonOrColonToken()
+    {
+        NextToken();
+        return Token() == SyntaxKind.EqualsToken || Token() == SyntaxKind.SemicolonToken || Token() == SyntaxKind.ColonToken;
+    }
+
     bool NextTokenIsBindingIdentifierOrStartOfDestructuringOnSameLine(bool disallowOf)
     {
         NextToken();
-        if (disallowOf && Token() == SyntaxKind.OfKeyword) return false;
+        if (disallowOf && Token() == SyntaxKind.OfKeyword)
+        {
+            return LookAhead(NextTokenIsEqualsOrSemicolonOrColonToken);
+        }
         return (IsBindingIdentifier() || Token() == SyntaxKind.OpenBraceToken) && !scanner.HasPrecedingLineBreak();
     }
 
@@ -6240,7 +6274,12 @@ public class Parser
             case SyntaxKind.LetKeyword:
             case SyntaxKind.ConstKeyword:
             case SyntaxKind.UsingKeyword:
+                return ParseVariableStatement(pos, hasJSDoc, modifiersIn);
             case SyntaxKind.AwaitKeyword:
+                if (!IsAwaitUsingDeclaration())
+                {
+                    break;
+                }
                 return ParseVariableStatement(pos, hasJSDoc, modifiersIn);
             case SyntaxKind.FunctionKeyword:
                 return ParseFunctionDeclaration(pos, hasJSDoc, modifiersIn);
@@ -6266,18 +6305,18 @@ public class Parser
                     SyntaxKind.AsKeyword => ParseNamespaceExportDeclaration(pos, hasJSDoc, modifiersIn),
                     _ => ParseExportDeclaration(pos, hasJSDoc, modifiersIn),
                 };
-            default:
-                if (modifiersIn != null)
-                {
-                    // We reached this point because we encountered decorators and/or modifiers and assumed a declaration
-                    // would follow. For recovery and error reporting purposes, return an incomplete declaration.
-                    var missing = CreateMissingNode<MissingDeclaration>(SyntaxKind.MissingDeclaration, reportAtCurrentPosition: true, Diagnostics.Declaration_expected);
-                    SetTextRangePos(missing, pos);
-                    missing.Modifiers = modifiersIn;
-                    return missing;
-                }
-                return null!; // TODO: GH#18217
         }
+
+        if (modifiersIn != null)
+        {
+            // We reached this point because we encountered decorators and/or modifiers and assumed a declaration
+            // would follow. For recovery and error reporting purposes, return an incomplete declaration.
+            var missing = CreateMissingNode<MissingDeclaration>(SyntaxKind.MissingDeclaration, reportAtCurrentPosition: true, Diagnostics.Declaration_expected);
+            SetTextRangePos(missing, pos);
+            missing.Modifiers = modifiersIn;
+            return missing;
+        }
+        return null!; // TODO: GH#18217
     }
 
     bool NextTokenIsStringLiteral()
@@ -6438,7 +6477,10 @@ public class Parser
                 flags |= NodeFlags.Using;
                 break;
             case SyntaxKind.AwaitKeyword:
-                Debug.Assert(IsAwaitUsingDeclaration());
+                if (!IsAwaitUsingDeclaration())
+                {
+                    break;
+                }
                 flags |= NodeFlags.AwaitUsing;
                 NextToken();
                 break;
@@ -7269,23 +7311,31 @@ public class Parser
             identifier = ParseIdentifier();
         }
 
-        var isTypeOnly = false;
+        SyntaxKind? phaseModifier = null;
         if (
             identifier?.EscapedText == "type" &&
             (Token() != SyntaxKind.FromKeyword || IsIdentifier() && LookAhead(NextTokenIsFromKeywordOrEqualsToken)) &&
             (IsIdentifier() || TokenAfterImportDefinitelyProducesImportDeclaration())
         )
         {
-            isTypeOnly = true;
+            phaseModifier = SyntaxKind.TypeKeyword;
+            identifier = IsIdentifier() ? ParseIdentifier() : null;
+        }
+        else if (
+            identifier?.EscapedText == "defer" &&
+            (Token() == SyntaxKind.FromKeyword ? !LookAhead(NextTokenIsStringLiteral) : Token() != SyntaxKind.CommaToken && Token() != SyntaxKind.EqualsToken)
+        )
+        {
+            phaseModifier = SyntaxKind.DeferKeyword;
             identifier = IsIdentifier() ? ParseIdentifier() : null;
         }
 
-        if (identifier != null && !TokenAfterImportedIdentifierDefinitelyProducesImportDeclaration())
+        if (identifier != null && !TokenAfterImportedIdentifierDefinitelyProducesImportDeclaration() && phaseModifier != SyntaxKind.DeferKeyword)
         {
-            return ParseImportEqualsDeclaration(pos, hasJSDoc, modifiers, identifier, isTypeOnly);
+            return ParseImportEqualsDeclaration(pos, hasJSDoc, modifiers, identifier, phaseModifier == SyntaxKind.TypeKeyword);
         }
 
-        var importClause = TryParseImportClause(identifier!, afterImportPos, isTypeOnly);
+        var importClause = TryParseImportClause(identifier!, afterImportPos, phaseModifier);
         var moduleSpecifier = ParseModuleSpecifier();
         var attributes = TryParseImportAttributes();
 
@@ -7294,7 +7344,7 @@ public class Parser
         return WithJSDoc(FinishNode(node, pos), hasJSDoc);
     }
 
-    ImportClause TryParseImportClause(Identifier identifier, int pos, bool isTypeOnly, bool skipJsDocLeadingAsterisks = false)
+    ImportClause TryParseImportClause(Identifier identifier, int pos, SyntaxKind? phaseModifier, bool skipJsDocLeadingAsterisks = false)
     {
         // ImportDeclaration:
         //  import ImportClause from ModuleSpecifier ;
@@ -7305,7 +7355,7 @@ public class Parser
             Token() == SyntaxKind.OpenBraceToken // import {
         )
         {
-            importClause = ParseImportClause(identifier!, pos, isTypeOnly, skipJsDocLeadingAsterisks);
+            importClause = ParseImportClause(identifier!, pos, phaseModifier, skipJsDocLeadingAsterisks);
             ParseExpected(SyntaxKind.FromKeyword);
         }
         return importClause!;
@@ -7314,8 +7364,7 @@ public class Parser
     ImportAttributes TryParseImportAttributes()
     { 
         var currentToken = Token();
-        if ((currentToken == SyntaxKind.WithKeyword || currentToken == SyntaxKind.AssertKeyword)
-            && !scanner.HasPrecedingLineBreak())
+        if (currentToken == SyntaxKind.WithKeyword || (currentToken == SyntaxKind.AssertKeyword && !scanner.HasPrecedingLineBreak()))
         {
             return ParseImportAttributes(currentToken);
         }
@@ -7378,7 +7427,7 @@ public class Parser
         return finished;
     }
 
-    ImportClause ParseImportClause(Identifier identifier, int pos, bool isTypeOnly, bool skipJsDocLeadingAsterisks = false)
+    ImportClause ParseImportClause(Identifier identifier, int pos, SyntaxKind? phaseModifier, bool skipJsDocLeadingAsterisks = false)
     {
         // ImportClause:
         //  ImportedDefaultBinding
@@ -7394,12 +7443,18 @@ public class Parser
             ParseOptional(SyntaxKind.CommaToken))
         {
             if (skipJsDocLeadingAsterisks) scanner.SetSkipJsDocLeadingAsterisks(true);
-            namedBindings = Token() == SyntaxKind.AsteriskToken ? ParseNamespaceImport()
-                : (INamedImportBindings)ParseNamedImportsOrExports(SyntaxKind.NamedImports);
+            if (Token() == SyntaxKind.AsteriskToken)
+            {
+                namedBindings = ParseNamespaceImport();
+            }
+            else
+            {
+                namedBindings = (INamedImportBindings)ParseNamedImportsOrExports(SyntaxKind.NamedImports);
+            }
             if (skipJsDocLeadingAsterisks) scanner.SetSkipJsDocLeadingAsterisks(false);
         }
 
-        return FinishNode(new ImportClause(isTypeOnly, identifier, namedBindings), pos);
+        return FinishNode(new ImportClause(phaseModifier, identifier, namedBindings), pos);
     }
 
     IModuleReference ParseModuleReference()

@@ -186,7 +186,8 @@ public enum SyntaxKind
     GlobalKeyword,
     BigIntKeyword,
     OverrideKeyword,
-    OfKeyword, // LastKeyword and LastToken and LastContextualKeyword
+    OfKeyword,
+    DeferKeyword, // LastKeyword and LastToken and LastContextualKeyword
 
     // Parse tree nodes
 
@@ -427,6 +428,7 @@ public enum SyntaxKind
 
     // Transformation nodes
     NotEmittedStatement,
+    NotEmittedTypeElement,
     PartiallyEmittedExpression,
     CommaListExpression,
     SyntheticReferenceExpression,

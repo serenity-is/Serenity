@@ -52,6 +52,8 @@ public enum NodeFlags
     TypeCached = 1 << 28, // If a type was cached for node at any point
     // @internal
     Deprecated = 1 << 29, // If has '@deprecated' JSDoc tag
+    // @internal
+    Unreachable = 1 << 30, // If node is unreachable according to the binder
 
     BlockScoped = Let | Const | Using,
     Constant = Const | Using,

@@ -10,7 +10,7 @@ public static class SyntaxKindMarker
     public const SyntaxKind FirstReservedWord = SyntaxKind.BreakKeyword;
     public const SyntaxKind LastReservedWord = SyntaxKind.WithKeyword;
     public const SyntaxKind FirstKeyword = SyntaxKind.BreakKeyword;
-    public const SyntaxKind LastKeyword = SyntaxKind.OfKeyword;
+    public const SyntaxKind LastKeyword = SyntaxKind.DeferKeyword;
     public const SyntaxKind FirstFutureReservedWord = SyntaxKind.ImplementsKeyword;
     public const SyntaxKind LastFutureReservedWord = SyntaxKind.YieldKeyword;
     public const SyntaxKind FirstTypeNode = SyntaxKind.TypePredicate;
@@ -36,5 +36,5 @@ public static class SyntaxKindMarker
     public const SyntaxKind LastJSDocTagNode = SyntaxKind.JSDocSatisfiesTag;
 
     internal const SyntaxKind FirstContextualKeyword = SyntaxKind.AbstractKeyword;
-    internal const SyntaxKind LastContextualKeyword = SyntaxKind.OfKeyword;
+    internal const SyntaxKind LastContextualKeyword = LastKeyword;
 }

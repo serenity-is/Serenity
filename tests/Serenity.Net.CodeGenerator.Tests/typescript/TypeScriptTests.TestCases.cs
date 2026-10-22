@@ -13,16 +13,14 @@ public partial class TypeScriptTests
     const string TypeScriptCasesFolder = "/misc/TypeScript/tests/cases/compiler/";
     const string DummyCaseFile = "__dummyFile__";
 
-    // For these tests to work, clone TypeScript repo, npm i, npm run build and
-    // create a testcases.cjs at root with the following content:
-    // 
+    // For these tests to work, clone TypeScript 6 repo, add glob to package.json,
+    // npm i, npm run build and create a testcases.cjs at root with the following content:
+    //
     // var glob = require("glob");
-    // var ts = require("./built/local/typescript");
-    // const { createScanner, createProgram, ScriptTarget } = require("typescript");
-    // 
+    // var ts = require("./built/local/typescript.js");
     // var fs = require("fs");
     // var path = require("path");
-    // var scanner = createScanner(ts.ScriptTarget.Latest, true);
+    // var scanner = ts.createScanner(ts.ScriptTarget.Latest, true);
     // var host = ts.createCompilerHost({});
     // for (var file of glob.sync("./tests/cases/compiler/**/*.{ts,tsx}")) {
     //     try {
@@ -50,8 +48,8 @@ public partial class TypeScriptTests
     //             });
     //         }
     //         
-    //         let program = createProgram([file], {
-    //             target: ScriptTarget.Latest,
+    //         let program = ts.createProgram([file], {
+    //             target: ts.ScriptTarget.Latest,
     //         }, host);
     //         var sourceFile = program.getSourceFile(file);
     //         var nodes = [];
@@ -126,6 +124,10 @@ public partial class TypeScriptTests
         "parseBigInt", // bigint parse issues
         "parseInvalidNonNullableTypes",  // jsdoc type parsing
         "parseInvalidNullableTypes",  // jsdoc type parsing
+        // TS 6.0.3's recovery from the invalid `asyncIterable!:` parameter re-parses the
+        // rest of the file as a broken object literal; our parser recovers with a valid
+        // function body. The upstream case only asserts that the checker does not crash.
+        "reachabilityChecksNoCrash1",
     ];
 
     internal class TestCase
@@ -266,7 +268,7 @@ public partial class TypeScriptTests
 
         var path = Path.Combine(TypeScriptCasesFolder, file) + TestCaseExtension;
         var testCase = JSON.Parse<TestCase>(File.ReadAllText(path));
-        var sourceFile = new Parser().ParseSourceFile(Path.ChangeExtension(file, 
+        var sourceFile = new Parser().ParseSourceFile(Path.ChangeExtension(file,
             testCase.Extension), testCase.Content);
         var expectedNodes = testCase.Nodes;
         var actualNodes = new List<TestCase.NodeData>();
