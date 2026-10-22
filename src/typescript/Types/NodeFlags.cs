@@ -1,5 +1,7 @@
 namespace Serenity.TypeScript;
 
+// Keep the underlying type at least 32-bit: Unreachable uses 1 << 30.
+// Changing this to short/ushort would drop flags.
 [Flags]
 public enum NodeFlags
 {
