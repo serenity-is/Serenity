@@ -16,8 +16,9 @@ public class Identifier : PrimaryExpressionBase, IDeclaration, IJsxTagNameExpres
             originalKeywordKind = null;
 
         Text = text;
-        OriginalKeywordKind = originalKeywordKind;
-        HasExtendedUnicodeEscape = hasExtendedUnicodeEscape ?? false;
+        // Unused by this parser port; kept commented for comparison.
+        // OriginalKeywordKind = originalKeywordKind;
+        // HasExtendedUnicodeEscape = hasExtendedUnicodeEscape ?? false;
 
         // if (HasExtendedUnicodeEscape)
         //    Flags |= NodeFlags.IdentifierHasExtendedUnicodeEscape;
@@ -33,9 +34,10 @@ public class Identifier : PrimaryExpressionBase, IDeclaration, IJsxTagNameExpres
         get => text ??= this.GetText(sourceText);
         set => text = value;
     }
-    public SyntaxKind? OriginalKeywordKind { get; set; }
-    public bool IsInJsDocNamespace { get; set; }
-    public bool HasExtendedUnicodeEscape { get; set; }
+    // Unused by this parser port; kept commented for comparison.
+    // public SyntaxKind? OriginalKeywordKind { get; set; }
+    // public bool IsInJsDocNamespace { get; set; }
+    // public bool HasExtendedUnicodeEscape { get; set; }
 
     string? escapedText;
 

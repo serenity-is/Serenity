@@ -58,6 +58,8 @@ public class Parser
     private readonly Func<ITypeNode> parseKeywordAndNoDotFn;
     private readonly Func<Identifier> parseTypePredicatePrefixFn;
     private readonly Func<ITypeNode> tryParseConstraintOfInferTypeFn;
+    private readonly Func<ITypeNode> parseTypeOperatorOrHigherFn;
+    private readonly Func<ITypeNode> parseIntersectionTypeOrHigherFn;
 
     // TODO(jakebailey): This type is a lie; this value actually contains the result
     // of ORing a bunch of `1 << ParsingContext.XYZ`.
@@ -180,6 +182,8 @@ public class Parser
         parseKeywordAndNoDotFn = ParseKeywordAndNoDot;
         parseTypePredicatePrefixFn = ParseTypePredicatePrefix;
         tryParseConstraintOfInferTypeFn = TryParseConstraintOfInferType;
+        parseTypeOperatorOrHigherFn = ParseTypeOperatorOrHigher;
+        parseIntersectionTypeOrHigherFn = ParseIntersectionTypeOrHigher;
     }
 
     public SourceFile ParseSourceFile(string fileName, string sourceText, ScriptTarget languageVersion = ScriptTarget.Latest,
@@ -3320,13 +3324,13 @@ public class Parser
 
     ITypeNode ParseIntersectionTypeOrHigher()
     {
-        return ParseUnionOrIntersectionType(SyntaxKind.AmpersandToken, ParseTypeOperatorOrHigher,
+        return ParseUnionOrIntersectionType(SyntaxKind.AmpersandToken, parseTypeOperatorOrHigherFn,
             types => new IntersectionTypeNode(types));
     }
 
     ITypeNode ParseUnionTypeOrHigher()
     {
-        return ParseUnionOrIntersectionType(SyntaxKind.BarToken, ParseIntersectionTypeOrHigher,
+        return ParseUnionOrIntersectionType(SyntaxKind.BarToken, parseIntersectionTypeOrHigherFn,
             types => new UnionTypeNode(types));
     }
 
