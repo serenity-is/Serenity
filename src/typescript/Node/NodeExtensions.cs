@@ -2,12 +2,13 @@ namespace Serenity.TypeScript;
 
 public static class NodeExtensions
 {
-    public static SourceFile? GetSourceFile(this INode? node)
-    {
-        while (node != null && node is not SourceFile)
-            node = node.Parent;
-        return node as SourceFile;
-    }
+    // Parent pointers are no longer stored; callers must pass source text explicitly.
+    // public static SourceFile? GetSourceFile(this INode? node)
+    // {
+    //     while (node != null && node is not SourceFile)
+    //         node = node.Parent;
+    //     return node as SourceFile;
+    // }
 
     public static bool HasModifier(this INode node, SyntaxKind kind)
     {
@@ -43,7 +44,8 @@ public static class NodeExtensions
 
     public static string? GetText(this INode node, string? sourceText = null)
     {
-        if ((sourceText ??= node.GetSourceFile()?.Text) == null)
+        // Parent pointers are no longer stored; the caller must supply the source text.
+        if (sourceText == null)
             return null;
 
         if (node.Pos < 0 || node.End < 0)
@@ -58,7 +60,8 @@ public static class NodeExtensions
 
     public static string? GetTextWithTrivia(this INode node, string? sourceText = null)
     {
-        if ((sourceText ??= node.GetSourceFile()?.Text) == null)
+        // Parent pointers are no longer stored; the caller must supply the source text.
+        if (sourceText == null)
             return null;
 
         if (node.Pos < 0 || node.End < 0 || node.End < node.Pos)

@@ -312,12 +312,14 @@ public class Parser
         //    sourceFile.JsDocDiagnostics = AttachFileToDiagnostics(jsDocDiagnostics, sourceFile);
         //}
 
-        if (setParentNodes)
-            SetParentRecursive(sourceFile);
+        // Parent pointers are no longer stored; this block is kept for reference.
+        // if (setParentNodes)
+        //     SetParentRecursive(sourceFile);
 
         return sourceFile;
     }
 
+    #if false // Parent pointers are no longer stored.
     private static void SetParentRecursive(INode rootNode)
     {
         rootNode.ForEachChild((child) =>
@@ -327,6 +329,7 @@ public class Parser
             return null;
         }, recursively: false);
     }
+    #endif
 
     void SetContextFlag(bool val, NodeFlags flag)
     {

@@ -16,6 +16,7 @@ public class TSTypeListerAST
     private readonly ConcurrentDictionary<string, object>? astCache;
     private readonly TSModuleResolver moduleResolver;
     private readonly CancellationToken cancellationToken;
+    private readonly SourceFileContext? context;
 
     internal TSTypeListerAST(IFileSystem fileSystem, string tsConfigDir,
         TSConfig tsConfig, ConcurrentDictionary<string, object>? astCache = null,
@@ -28,6 +29,71 @@ public class TSTypeListerAST
 
         moduleResolver = new TSModuleResolver(fileSystem, tsConfigDir, tsConfig);
         this.cancellationToken = cancellationToken;
+    }
+
+    private TSTypeListerAST(TSTypeListerAST other, SourceFile sourceFile)
+    {
+        fileNames = other.fileNames;
+        exportedTypeNames = other.exportedTypeNames;
+        fileSystem = other.fileSystem;
+        astCache = other.astCache;
+        moduleResolver = other.moduleResolver;
+        cancellationToken = other.cancellationToken;
+        processFileQueue = other.processFileQueue;
+        processByFullPath = other.processByFullPath;
+        resolvedExternals = other.resolvedExternals;
+        parsedFiles = other.parsedFiles;
+        sourceFileInfos = other.sourceFileInfos;
+        context = new SourceFileContext(sourceFile);
+    }
+
+    private sealed class SourceFileContext(SourceFile sourceFile)
+    {
+        public SourceFile SourceFile { get; } = sourceFile;
+        public string? SourceText { get; } = sourceFile.Text;
+        public bool IsDeclarationFile { get; } = sourceFile.IsDeclarationFile;
+
+        // Parent stack for the current module nesting. Entries are never truncated;
+        // Level is moved up/down instead, so traversal does not allocate per node.
+        private readonly struct ModuleLevel(ModuleDeclaration module, string ns, bool ambient)
+        {
+            public ModuleDeclaration Module { get; } = module;
+            public string Namespace { get; } = ns;
+            public bool Ambient { get; } = ambient;
+        }
+
+        private readonly List<ModuleLevel> levels = [];
+        public int Level { get; private set; }
+
+        public ModuleDeclaration GetModuleAt(int level) => levels[level].Module;
+        public string GetNamespaceAt(int level) => level < 0 ? "" : levels[level].Namespace;
+        public string CurrentNamespace => Level == 0 ? "" : levels[Level - 1].Namespace;
+        public bool CurrentAmbient => IsDeclarationFile || (Level != 0 && levels[Level - 1].Ambient);
+        public string ParentNamespace => Level <= 1 ? "" : levels[Level - 2].Namespace;
+        public bool ParentAmbient => IsDeclarationFile || (Level > 1 && levels[Level - 2].Ambient);
+
+        public void PushModule(ModuleDeclaration module)
+        {
+            var parentNamespace = Level == 0 ? "" : levels[Level - 1].Namespace;
+            var name = module.Name?.GetText(SourceText) ?? "";
+            var ns = string.IsNullOrEmpty(parentNamespace) ? name : parentNamespace + "." + name;
+            var isAmbient = IsDeclarationFile ||
+                (Level != 0 && levels[Level - 1].Ambient) ||
+                (module.Flags & NodeFlags.Ambient) != 0 ||
+                module.HasModifier(SyntaxKind.DeclareKeyword);
+
+            var level = new ModuleLevel(module, ns, isAmbient);
+            if (Level == levels.Count)
+                levels.Add(level);
+            else
+                levels[Level] = level;
+            Level++;
+        }
+
+        public void PopModule()
+        {
+            Level--;
+        }
     }
 
     public void AddInputFile(string path)
@@ -45,61 +111,78 @@ public class TSTypeListerAST
         return node != null && node.HasModifier(SyntaxKind.DeclareKeyword);
     }
 
-    static IEnumerable<INode> EnumerateParents(INode? node)
-    {
-        if (node == null)
-            yield break;
-
-        while ((node = node.Parent) != null)
-            yield return node;
-    }
-
-    static IEnumerable<INode> EnumerateTypesAndModules(IEnumerable<INode> nodes)
+    IEnumerable<INode> EnumerateTypesAndModules(IEnumerable<INode> nodes)
     {
         foreach (var node in nodes)
         {
-            if (node.Kind == SyntaxKind.ModuleDeclaration)
+            if (node is ModuleDeclaration module)
             {
-                yield return node;
-
-                var md = (node as ModuleDeclaration)!;
-                while (md.Body is ModuleDeclaration smd)
-                {
-                    yield return smd;
-                    md = smd;
-                }
-
-                if (md.Body is IBlockLike blockLike &&
-                    blockLike.Statements != null)
-                {
-                    foreach (var x in EnumerateTypesAndModules(blockLike.Statements))
-                        yield return x;
-                }
+                foreach (var x in EnumerateModule(module))
+                    yield return x;
             }
             else if (node.Kind == SyntaxKind.ClassDeclaration ||
                 node.Kind == SyntaxKind.InterfaceDeclaration ||
                 node.Kind == SyntaxKind.TypeAliasDeclaration ||
                 node.Kind == SyntaxKind.EnumDeclaration)
+            {
                 yield return node;
+            }
         }
     }
 
-    static string GetNamespace(INode? node)
+    IEnumerable<INode> EnumerateModule(ModuleDeclaration module)
     {
-        return string.Join(".", Enumerable.Reverse(EnumerateParents(node)
-            .Where(x => x.Kind == SyntaxKind.ModuleDeclaration)
-            .Select(x => GetText((x as ModuleDeclaration)!.Name))));
+        context!.PushModule(module);
+        try
+        {
+            yield return module;
+            if (module.Body is ModuleDeclaration nestedModule)
+            {
+                foreach (var x in EnumerateModule(nestedModule))
+                    yield return x;
+            }
+            else if (module.Body is IBlockLike blockLike &&
+                blockLike.Statements != null)
+            {
+                foreach (var x in EnumerateTypesAndModules(blockLike.Statements))
+                    yield return x;
+            }
+        }
+        finally
+        {
+            context.PopModule();
+        }
     }
 
-    static string? PrependNamespace(string? s, INode? node)
+    string GetNamespace(INode? node)
     {
-        var ns = GetNamespace(node);
+        return context?.CurrentNamespace ?? "";
+    }
+
+    string GetParentNamespace()
+    {
+        return context?.ParentNamespace ?? "";
+    }
+
+    bool IsParentUnderAmbientNamespace()
+    {
+        return context?.ParentAmbient ?? false;
+    }
+
+    string? PrependNamespace(string? s, INode? node)
+    {
+        return PrependNamespaceAt(s, context?.Level - 1 ?? -1);
+    }
+
+    string? PrependNamespaceAt(string? s, int level)
+    {
+        var ns = context?.GetNamespaceAt(level) ?? "";
         if (!string.IsNullOrEmpty(ns))
             return ns + "." + s;
         return s;
     }
 
-    static string? AddTypeArgs(string? text, NodeArray<ITypeNode>? args)
+    string? AddTypeArgs(string? text, NodeArray<ITypeNode>? args)
     {
         if (args != null &&
             args.Count > 0)
@@ -113,7 +196,7 @@ public class TSTypeListerAST
         return text;
     }
 
-    static string? GetText(INode? node)
+    string? GetText(INode? node)
     {
         if (node is PropertyAccessExpression pac)
         {
@@ -158,10 +241,40 @@ public class TSTypeListerAST
             return GetText(de.Name);
         else if (node is TypeLiteralNode tln)
         {
-            var text = tln.GetText(sourceText: null);
+            var text = tln.GetText(context?.SourceText);
             return string.IsNullOrEmpty(text) ? "{}" : text;
         }
-        return node?.GetText();
+        return node?.GetText(context?.SourceText);
+    }
+
+    static bool GetBasicLiteralValue(IExpression? node, out object? value)
+    {
+        if (node is StringLiteral sl)
+        {
+            value = sl.Text;
+            return true;
+        }
+
+        if (node is NumericLiteral nl)
+        {
+            value = double.Parse(nl.Text!, CultureInfo.InvariantCulture.NumberFormat);
+            return true;
+        }
+
+        if (node is BooleanLiteral bl)
+        {
+            value = bl.Kind == SyntaxKind.TrueKeyword;
+            return true;
+        }
+
+        if (node is NullLiteral)
+        {
+            value = null;
+            return true;
+        }
+
+        value = null;
+        return false;
     }
 
     object? GetLiteralValue(IExpression? node, bool isTypeInfo = false)
@@ -169,37 +282,7 @@ public class TSTypeListerAST
         if (node == null)
             return null;
 
-        static bool getBasicLiteralValue(IExpression? node, out object? value)
-        {
-            if (node is StringLiteral sl)
-            {
-                value = sl.Text;
-                return true;
-            }
-
-            if (node is NumericLiteral nl)
-            {
-                value = double.Parse(nl.Text!, CultureInfo.InvariantCulture.NumberFormat);
-                return true;
-            }
-
-            if (node is BooleanLiteral bl)
-            {
-                value = bl.Kind == SyntaxKind.TrueKeyword;
-                return true;
-            }
-
-            if (node is NullLiteral)
-            {
-                value = null;
-                return true;
-            }
-
-            value = null;
-            return false;
-        }
-
-        if (getBasicLiteralValue(node, out var value))
+        if (GetBasicLiteralValue(node, out var value))
             return value;
 
         string? identifierName = null;
@@ -213,99 +296,133 @@ public class TSTypeListerAST
         if (isTypeInfo && identifierName == "nsSerenity")
             return "Serenity.";
 
-        var parents = EnumerateParents(node).ToArray();
-
-        foreach (var parent in parents)
+        var ctx = context;
+        if (ctx != null)
         {
-            IEnumerable<INode>? children = null;
-            if (parent is ModuleDeclaration md && md.Body is ModuleBlock mb)
-                children = mb.Statements;
-            else if (parent is SourceFile sf)
-                children = sf.Statements;
-
-            foreach (var child in children ?? [])
+            for (var i = ctx.Level - 1; i >= 0; i--)
             {
-                if (child is VariableStatement vs &&
-                    vs.DeclarationList?.Declarations is { } declarations)
-                {
-                    foreach (var dec in declarations)
-                    {
-                        if (GetText(dec.Name) == identifierName)
-                        {
-                            if (getBasicLiteralValue(dec.Initializer, out var v))
-                                return v;
-
-                            if (isTypeInfo &&
-                                dec.Type is LiteralTypeNode declt &&
-                                declt.Literal is StringLiteral decltsl)
-                                return decltsl.Text;
-
-                            return null;
-                        }
-                    }
-                }
+                var module = ctx.GetModuleAt(i);
+                if (module.Body is ModuleBlock mb &&
+                    TryGetLiteralValueInScope(module, mb.Statements, identifierName, isTypeInfo, out var moduleValue))
+                    return moduleValue;
             }
 
-            if (parent is SourceFile sourceFile &&
-                sourceFile.ExternalModuleIndicator is not null)
+            if (ctx.SourceFile.Statements != null &&
+                TryGetLiteralValueInScope(ctx.SourceFile, ctx.SourceFile.Statements, identifierName, isTypeInfo, out var sourceValue))
+                return sourceValue;
+        }
+
+        return null;
+    }
+
+    bool TryGetLiteralValueInScope(INode parent, IEnumerable<INode> children,
+        string identifierName, bool isTypeInfo, out object? value)
+    {
+        foreach (var child in children)
+        {
+            if (child is VariableStatement vs &&
+                vs.DeclarationList?.Declarations is { } declarations)
             {
-                foreach (var import in (children ?? []).OfType<ImportDeclaration>())
+                foreach (var dec in declarations)
                 {
-                    if (import.ModuleSpecifier is not StringLiteral id)
-                        continue;
-
-                    var elements = (import.ImportClause?.NamedBindings as NamedImports)?.Elements;
-                    if (elements is null)
-                        continue;
-
-                    foreach (var element in elements)
+                    if (GetText(dec.Name) == identifierName)
                     {
-                        if (element.Name is Identifier nameIdentifier &&
-                            nameIdentifier.Text == identifierName)
+                        if (GetBasicLiteralValue(dec.Initializer, out var v))
                         {
-                            var resolveResult = ResolveModule(id.Text, sourceFile.FileName, false);
-                            if (resolveResult?.FullPath is null)
-                                return null;
-
-                            var subFile = ParseFile(resolveResult.ActualPath ?? resolveResult.FullPath, null, extractExportsOnly: true);
-                            if (subFile is null || subFile.Statements is null || subFile.ExternalModuleIndicator is null)
-                                return null;
-
-                            var statements = subFile.Statements;
-
-                            foreach (var child in statements)
-                            {
-                                if (child is VariableStatement vs &&
-                                    vs.HasModifier(SyntaxKind.ExportKeyword) &&
-                                    vs.DeclarationList?.Declarations is { } declarations)
-                                {
-                                    foreach (var dec in declarations)
-                                    {
-                                        if (GetText(dec.Name) == identifierName)
-                                        {
-                                            if (getBasicLiteralValue(dec.Initializer, out var v))
-                                                return v;
-
-                                            if (isTypeInfo &&
-                                                dec.Type is LiteralTypeNode declt &&
-                                                declt.Literal is StringLiteral decltsl)
-                                                return decltsl.Text;
-
-                                            return null;
-                                        }
-                                    }
-                                }
-                            }
-
-                            return null;
+                            value = v;
+                            return true;
                         }
+
+                        if (isTypeInfo &&
+                            dec.Type is LiteralTypeNode declt &&
+                            declt.Literal is StringLiteral decltsl)
+                        {
+                            value = decltsl.Text;
+                            return true;
+                        }
+
+                        value = null;
+                        return true;
                     }
                 }
             }
         }
 
-        return null;
+        if (parent is SourceFile sourceFile &&
+            sourceFile.ExternalModuleIndicator is not null)
+        {
+            foreach (var import in children.OfType<ImportDeclaration>())
+            {
+                if (import.ModuleSpecifier is not StringLiteral id)
+                    continue;
+
+                var elements = (import.ImportClause?.NamedBindings as NamedImports)?.Elements;
+                if (elements is null)
+                    continue;
+
+                foreach (var element in elements)
+                {
+                    if (element.Name is Identifier nameIdentifier &&
+                        nameIdentifier.Text == identifierName)
+                    {
+                        var resolveResult = ResolveModule(id.Text, sourceFile.FileName, false);
+                        if (resolveResult?.FullPath is null)
+                        {
+                            value = null;
+                            return true;
+                        }
+
+                        var subFile = ParseFile(resolveResult.ActualPath ?? resolveResult.FullPath, null, extractExportsOnly: true);
+                        if (subFile is null || subFile.Statements is null || subFile.ExternalModuleIndicator is null)
+                        {
+                            value = null;
+                            return true;
+                        }
+
+                        var statements = subFile.Statements;
+
+                        foreach (var child in statements)
+                        {
+                            if (child is VariableStatement vs &&
+                                vs.HasModifier(SyntaxKind.ExportKeyword) &&
+                                vs.DeclarationList?.Declarations is { } declarations)
+                            {
+                                foreach (var dec in declarations)
+                                {
+                                    if (GetText(dec.Name) == identifierName)
+                                    {
+                                        if (GetBasicLiteralValue(dec.Initializer, out var v))
+                                        {
+                                            value = v;
+                                            return true;
+                                        }
+
+                                        if (isTypeInfo &&
+                                            dec.Type is LiteralTypeNode declt &&
+                                            declt.Literal is StringLiteral decltsl)
+                                        {
+                                            value = decltsl.Text;
+                                            return true;
+                                        }
+
+                                        value = null;
+                                        return true;
+                                    }
+                                }
+                            }
+                        }
+
+                        value = null;
+                        return true;
+                    }
+                }
+            }
+        }
+
+        value = null;
+        return false;
     }
+
 
     string? GetTypeReferenceExpression(INode? node, bool isDecorator = false)
     {
@@ -382,85 +499,23 @@ public class TSTypeListerAST
         var beforeDot = dotIndex >= 0 ? noGeneric[..dotIndex] : null;
         var afterDot = dotIndex >= 0 ? noGeneric[dotIndex..] : null;
 
-        var parents = EnumerateParents(node).ToArray();
-
-        foreach (var parent in parents)
+        var ctx = context;
+        if (ctx != null)
         {
-            if (parent.Kind == SyntaxKind.ModuleDeclaration ||
-                parent.Kind == SyntaxKind.SourceFile)
+            for (var i = ctx.Level - 1; i >= 0; i--)
             {
-                IEnumerable<INode>? children;
-                if (parent is ModuleDeclaration md)
-                    children = (md.Body as ModuleBlock)?.Statements;
-                else
-                    children = ((SourceFile)parent).Statements;
-
-                if (children == null)
-                    continue;
-
-                if (parent is SourceFile sourceFile &&
-                    sourceFile.ExternalModuleIndicator is not null)
-                {
-                    foreach (var import in (children ?? []).OfType<ImportDeclaration>())
-                    {
-                        if (import.ModuleSpecifier is not StringLiteral id)
-                            continue;
-
-                        if (import.ImportClause?.Name is Identifier name &&
-                            name.Text == noGeneric)
-                            return id.Text + ":" + name.Text + functionSuffix;
-
-                        var elements = (import.ImportClause?.NamedBindings as NamedImports)?.Elements;
-                        if (elements is null)
-                            continue;
-
-                        foreach (var element in elements)
-                        {
-                            if (element.Name is Identifier nameIdentifier &&
-                                nameIdentifier.Text == noGeneric)
-                            {
-                                var module = id.Text!;
-                                if (module.StartsWith(".", StringComparison.OrdinalIgnoreCase))
-                                    module = ResolveModule(id.Text, sourceFile.FileName, false)?.ModuleName ?? module;
-
-                                return module + ":" + nameIdentifier.Text + functionSuffix;
-                            }
-                        }
-                    }
-                }
-
-                if (dotIndex < 0)
-                {
-                    foreach (var child in children!)
-                    {
-                        if ((child.Kind == SyntaxKind.ClassDeclaration &&
-                             GetText((child as ClassDeclaration)!.Name) == noGeneric) ||
-                            (child.Kind == SyntaxKind.InterfaceDeclaration &&
-                             GetText((child as InterfaceDeclaration)!.Name) == noGeneric) ||
-                            (child.Kind == SyntaxKind.EnumDeclaration &&
-                             GetText((child as EnumDeclaration)!.Name) == noGeneric))
-                            return PrependNamespace(noGeneric.ToString(), child) + functionSuffix;
-                    }
-                }
-                else
-                {
-                    foreach (var child in children!)
-                    {
-                        if (child.Kind == SyntaxKind.ImportEqualsDeclaration)
-                        {
-                            if (GetText((child as ImportEqualsDeclaration)!.Name) == beforeDot)
-                            {
-                                var fullName = GetText((child as ImportEqualsDeclaration)!.ModuleReference) +
-                                    afterDot!.ToString();
-                                if (exportedTypeNames.Contains(fullName))
-                                    return fullName + functionSuffix;
-                            }
-                        }
-                    }
-                }
+                var module = ctx.GetModuleAt(i);
+                if (module.Body is ModuleBlock mb &&
+                    ResolveTypeReferenceInScope(module, mb.Statements, noGeneric, dotIndex,
+                        beforeDot, afterDot, functionSuffix, i) is { } moduleResult)
+                    return moduleResult;
             }
-        }
 
+            if (ctx.SourceFile.Statements != null &&
+                ResolveTypeReferenceInScope(ctx.SourceFile, ctx.SourceFile.Statements, noGeneric, dotIndex,
+                    beforeDot, afterDot, functionSuffix, -1) is { } sourceResult)
+                return sourceResult;
+        }
         var ns = GetNamespace(node);
         while (!string.IsNullOrEmpty(ns))
         {
@@ -476,6 +531,74 @@ public class TSTypeListerAST
         }
 
         return noGeneric.ToString() + functionSuffix;
+    }
+
+    string? ResolveTypeReferenceInScope(INode parent, IEnumerable<INode> children,
+        string noGeneric, int dotIndex, string? beforeDot, string? afterDot,
+        string functionSuffix, int namespaceLevel)
+    {
+        if (parent is SourceFile sourceFile &&
+            sourceFile.ExternalModuleIndicator is not null)
+        {
+            foreach (var import in children.OfType<ImportDeclaration>())
+            {
+                if (import.ModuleSpecifier is not StringLiteral id)
+                    continue;
+
+                if (import.ImportClause?.Name is Identifier name &&
+                    name.Text == noGeneric)
+                    return id.Text + ":" + name.Text + functionSuffix;
+
+                var elements = (import.ImportClause?.NamedBindings as NamedImports)?.Elements;
+                if (elements is null)
+                    continue;
+
+                foreach (var element in elements)
+                {
+                    if (element.Name is Identifier nameIdentifier &&
+                        nameIdentifier.Text == noGeneric)
+                    {
+                        var module = id.Text!;
+                        if (module.StartsWith(".", StringComparison.OrdinalIgnoreCase))
+                            module = ResolveModule(id.Text, sourceFile.FileName, false)?.ModuleName ?? module;
+
+                        return module + ":" + nameIdentifier.Text + functionSuffix;
+                    }
+                }
+            }
+        }
+
+        if (dotIndex < 0)
+        {
+            foreach (var child in children)
+            {
+                if ((child.Kind == SyntaxKind.ClassDeclaration &&
+                     GetText((child as ClassDeclaration)!.Name) == noGeneric) ||
+                    (child.Kind == SyntaxKind.InterfaceDeclaration &&
+                     GetText((child as InterfaceDeclaration)!.Name) == noGeneric) ||
+                    (child.Kind == SyntaxKind.EnumDeclaration &&
+                     GetText((child as EnumDeclaration)!.Name) == noGeneric))
+                    return PrependNamespaceAt(noGeneric, namespaceLevel) + functionSuffix;
+            }
+        }
+        else
+        {
+            foreach (var child in children)
+            {
+                if (child.Kind == SyntaxKind.ImportEqualsDeclaration)
+                {
+                    if (GetText((child as ImportEqualsDeclaration)!.Name) == beforeDot)
+                    {
+                        var fullName = GetText((child as ImportEqualsDeclaration)!.ModuleReference) +
+                            afterDot!.ToString();
+                        if (exportedTypeNames.Contains(fullName))
+                            return fullName + functionSuffix;
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 
     string? GetBaseType(ClassDeclaration node)
@@ -585,13 +708,9 @@ public class TSTypeListerAST
         })];
     }
 
-    static bool IsUnderAmbientNamespace(INode? node)
+    bool IsUnderAmbientNamespace(INode? node)
     {
-        return EnumerateParents(node).Any(x =>
-            (x.Kind == SyntaxKind.ModuleDeclaration &&
-             x.HasModifier(SyntaxKind.DeclareKeyword)) ||
-            (x.Kind == SyntaxKind.SourceFile &&
-             (x as SourceFile)!.IsDeclarationFile));
+        return context?.CurrentAmbient ?? false;
     }
 
     ExternalAttribute? DecoratorToExternalAttribute(Decorator decorator)
@@ -831,7 +950,7 @@ public class TSTypeListerAST
         return result;
     }
 
-    static ExternalType EnumToExternalType(EnumDeclaration enumDec)
+    ExternalType EnumToExternalType(EnumDeclaration enumDec)
     {
         var result = new ExternalType
         {
@@ -1006,10 +1125,10 @@ public class TSTypeListerAST
     {
         var result = new ExternalType
         {
-            Namespace = GetNamespace(module),
+            Namespace = GetParentNamespace(),
             Name = GetText(module.Name),
             IsInterface = true,
-            IsDeclaration = IsUnderAmbientNamespace(module) ? true : null
+            IsDeclaration = IsParentUnderAmbientNamespace() ? true : null
         };
 
         var members = GetModuleMembers(module);
@@ -1024,6 +1143,12 @@ public class TSTypeListerAST
     }
 
     List<ExternalType> ExtractTypes(SourceFile sourceFile, HashSet<string> visited)
+    {
+        var worker = new TSTypeListerAST(this, sourceFile);
+        return worker.ExtractTypesCore(sourceFile, visited);
+    }
+
+    List<ExternalType> ExtractTypesCore(SourceFile sourceFile, HashSet<string> visited)
     {
         var result = new List<ExternalType>();
 
@@ -1168,7 +1293,7 @@ public class TSTypeListerAST
                     var modul = node as ModuleDeclaration;
 
                     if (sourceFile.IsDeclarationFile || HasExportModifier(modul) ||
-                        (!IsUnderAmbientNamespace(modul) && !HasDeclareModifier(modul)))
+                        (!IsParentUnderAmbientNamespace() && !HasDeclareModifier(modul)))
                     {
                         var exportedType = ModuleToExternalType(modul!);
                         result.Add(exportedType);
@@ -1180,7 +1305,13 @@ public class TSTypeListerAST
         return result;
     }
 
-    private static void ExtractExportedTypeNames(SourceFile sourceFile, HashSet<string> target)
+    private void ExtractExportedTypeNames(SourceFile sourceFile, HashSet<string> target)
+    {
+        var worker = new TSTypeListerAST(this, sourceFile);
+        worker.ExtractExportedTypeNamesCore(sourceFile, target);
+    }
+
+    private void ExtractExportedTypeNamesCore(SourceFile sourceFile, HashSet<string> target)
     {
         if (sourceFile!.Statements == null ||
             sourceFile?.ExternalModuleIndicator is not null)
@@ -1219,8 +1350,8 @@ public class TSTypeListerAST
                     {
                         var modul = node as ModuleDeclaration;
                         if (sourceFile.IsDeclarationFile || HasExportModifier(modul) ||
-                            (!IsUnderAmbientNamespace(modul) && !HasDeclareModifier(modul)))
-                            target.Add(PrependNamespace(GetText(modul!.Name), modul)!);
+                            (!IsParentUnderAmbientNamespace() && !HasDeclareModifier(modul)))
+                            target.Add(PrependNamespaceAt(GetText(modul!.Name), (context?.Level ?? 1) - 2)!);
                     }
                     break;
             }

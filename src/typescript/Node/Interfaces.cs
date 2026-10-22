@@ -11,7 +11,8 @@ public interface INode : ITextRange
     SyntaxKind Kind { get; set; }
     NodeFlags Flags { get; set; }
 
-    INode? Parent { get; set; }
+    // Parent pointers are no longer stored; use explicit source/parent context.
+    // INode? Parent { get; set; }
 
     string ToString(bool withPos);
 }
