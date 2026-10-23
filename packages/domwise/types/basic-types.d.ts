@@ -17,32 +17,32 @@ export interface BasicClassList extends PropHook<Element> {
     /** Returns the underlying `DOMTokenList` (detached before binding, live after). */
     (): DOMTokenList;
     /** Number of tokens in the list. */
-    readonly size: number
+    readonly size: number;
     /** Space-separated string of all tokens (mirrors `DOMTokenList.value`). */
-    readonly value: string
+    readonly value: string;
     /**
      * Adds one or more tokens to the list. Duplicate tokens are ignored.
      * @param tokens - Class names to add.
      */
-    add(...tokens: string[]): void
+    add(...tokens: string[]): void;
     /**
      * Removes one or more tokens from the list.
      * @param tokens - Class names to remove.
      */
-    remove(...tokens: string[]): void
+    remove(...tokens: string[]): void;
     /**
      * Toggles a token, optionally forcing the presence or absence.
      * @param token - Class name to toggle.
      * @param force - When provided, forces add (`true`) or remove (`false`).
      * @returns `true` if the token is now present, otherwise `false`.
      */
-    toggle(token: string, force?: boolean): boolean
+    toggle(token: string, force?: boolean): boolean;
     /**
      * Checks whether the list contains the given token.
      * @param token - Class name to test.
      * @returns `true` if the token is present.
      */
-    contains(token: string): boolean
+    contains(token: string): boolean;
 }
 
 type ClassName = string | { [key: string]: boolean | SignalLike<boolean | string | null | undefined> } | false | null | undefined | SignalLike<string | boolean | null | undefined> | ClassName[]

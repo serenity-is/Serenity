@@ -1,1172 +1,1172 @@
-import { BaseDialog, BooleanEditor, CaptureOperationType, ColumnsBase, DateEditor, DecimalEditor, DeleteRequest, DeleteResponse, DialogButton, EditorProps, EditorWidget, EmailAddressEditor, EntityDialog, EntityGrid, EnumEditor, Formatter, IGetEditValue, ISetEditValue, ImageUploadEditor, IntegerEditor, ListRequest, ListResponse, LookupEditor, LookupEditorBase, LookupEditorOptions, PrefixedContext, PropertyItem, RetrieveRequest, RetrieveResponse, SaveInitiator, SaveRequest, SaveResponse, ServiceLookupEditor, ServiceOptions, StringEditor, ToolButton, Widget, WidgetProps } from '@serenity-is/corelib';
+import { BaseDialog, BooleanEditor, CaptureOperationType, ClassTypeInfo, ColumnsBase, DateEditor, DecimalEditor, DeleteRequest, DeleteResponse, DialogButton, EditorProps, EditorTypeInfo, EditorWidget, EmailAddressEditor, EntityDialog, EntityGrid, EnumEditor, Formatter, FormatterTypeInfo, IGetEditValue, ImageUploadEditor, IntegerEditor, ISetEditValue, ListRequest, ListResponse, Lookup, LookupEditor, LookupEditorBase, LookupEditorOptions, PrefixedContext, PropertyItem, QuickFilter, RetrieveRequest, RetrieveResponse, SaveInitiator, SaveRequest, SaveResponse, ServiceLookupEditor, ServiceOptions, StringEditor, ToolButton, Widget, WidgetProps } from '@serenity-is/corelib';
 import { GetNextNumberRequest, GetNextNumberResponse, GridEditorBase, GridEditorDialog } from '@serenity-is/extensions';
 import { Column, FormatterContext, FormatterResult } from '@serenity-is/sleekgrid';
 
 export interface CategoryRow {
-	CategoryID?: number;
-	CategoryName?: string;
-	Description?: string;
-	PicturePath?: string;
+    CategoryID?: number;
+    CategoryName?: string;
+    Description?: string;
+    PicturePath?: string;
 }
 export declare abstract class CategoryRow {
-	static readonly idProperty = "CategoryID";
-	static readonly nameProperty = "CategoryName";
-	static readonly localTextPrefix = "Northwind.Category";
-	static readonly lookupKey = "Northwind.Category";
-	/** [DEPRECATED] use getLookupAsync instead */
-	static getLookup(): import("@serenity-is/corelib").Lookup<CategoryRow>;
-	static getLookupAsync(): Promise<import("@serenity-is/corelib").Lookup<CategoryRow>>;
-	static readonly deletePermission = "Northwind:General";
-	static readonly insertPermission = "Northwind:General";
-	static readonly readPermission = "Northwind:General";
-	static readonly updatePermission = "Northwind:General";
-	static readonly Fields: Readonly<Record<keyof CategoryRow, string>>;
+    static readonly idProperty = "CategoryID";
+    static readonly nameProperty = "CategoryName";
+    static readonly localTextPrefix = "Northwind.Category";
+    static readonly lookupKey = "Northwind.Category";
+    /** [DEPRECATED] use getLookupAsync instead */
+    static getLookup(): Lookup<CategoryRow>;
+    static getLookupAsync(): Promise<Lookup<CategoryRow>>;
+    static readonly deletePermission = "Northwind:General";
+    static readonly insertPermission = "Northwind:General";
+    static readonly readPermission = "Northwind:General";
+    static readonly updatePermission = "Northwind:General";
+    static readonly Fields: Readonly<Record<keyof CategoryRow, string>>;
 }
 export interface CategoryColumns {
-	CategoryID: Column<CategoryRow>;
-	CategoryName: Column<CategoryRow>;
-	Description: Column<CategoryRow>;
+    CategoryID: Column<CategoryRow>;
+    CategoryName: Column<CategoryRow>;
+    Description: Column<CategoryRow>;
 }
 export declare class CategoryColumns extends ColumnsBase<CategoryRow> {
-	static readonly columnsKey = "Northwind.Category";
-	static readonly Fields: Readonly<Record<keyof CategoryColumns, string>>;
+    static readonly columnsKey = "Northwind.Category";
+    static readonly Fields: Readonly<Record<keyof CategoryColumns, string>>;
 }
 export interface CategoryForm {
-	CategoryName: StringEditor;
-	Description: StringEditor;
+    CategoryName: StringEditor;
+    Description: StringEditor;
 }
 export declare class CategoryForm extends PrefixedContext {
-	static readonly formKey = "Northwind.Category";
-	private static init;
-	constructor(...args: ConstructorParameters<typeof PrefixedContext>);
+    static readonly formKey = "Northwind.Category";
+    private static init;
+    constructor(...args: ConstructorParameters<typeof PrefixedContext>);
 }
 export interface CategoryLangRow {
-	Id?: number;
-	CategoryId?: number;
-	LanguageId?: string;
-	CategoryName?: string;
-	Description?: string;
+    Id?: number;
+    CategoryId?: number;
+    LanguageId?: string;
+    CategoryName?: string;
+    Description?: string;
 }
 export declare abstract class CategoryLangRow {
-	static readonly idProperty = "Id";
-	static readonly nameProperty = "CategoryName";
-	static readonly localTextPrefix = "Northwind.CategoryLang";
-	static readonly deletePermission = "Northwind:General";
-	static readonly insertPermission = "Northwind:General";
-	static readonly readPermission = "Northwind:General";
-	static readonly updatePermission = "Northwind:General";
-	static readonly Fields: Readonly<Record<keyof CategoryLangRow, string>>;
+    static readonly idProperty = "Id";
+    static readonly nameProperty = "CategoryName";
+    static readonly localTextPrefix = "Northwind.CategoryLang";
+    static readonly deletePermission = "Northwind:General";
+    static readonly insertPermission = "Northwind:General";
+    static readonly readPermission = "Northwind:General";
+    static readonly updatePermission = "Northwind:General";
+    static readonly Fields: Readonly<Record<keyof CategoryLangRow, string>>;
 }
 export declare namespace CategoryLangService {
-	const baseUrl = "Northwind/CategoryLang";
-	function Create(request: SaveRequest<CategoryLangRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
-	function Update(request: SaveRequest<CategoryLangRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
-	function Delete(request: DeleteRequest, onSuccess?: (response: DeleteResponse) => void, opt?: ServiceOptions<any>): PromiseLike<DeleteResponse>;
-	function Retrieve(request: RetrieveRequest, onSuccess?: (response: RetrieveResponse<CategoryLangRow>) => void, opt?: ServiceOptions<any>): PromiseLike<RetrieveResponse<CategoryLangRow>>;
-	function List(request: ListRequest, onSuccess?: (response: ListResponse<CategoryLangRow>) => void, opt?: ServiceOptions<any>): PromiseLike<ListResponse<CategoryLangRow>>;
-	const Methods: {
-		readonly Create: "Northwind/CategoryLang/Create";
-		readonly Update: "Northwind/CategoryLang/Update";
-		readonly Delete: "Northwind/CategoryLang/Delete";
-		readonly Retrieve: "Northwind/CategoryLang/Retrieve";
-		readonly List: "Northwind/CategoryLang/List";
-	};
+    const baseUrl = "Northwind/CategoryLang";
+    function Create(request: SaveRequest<CategoryLangRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
+    function Update(request: SaveRequest<CategoryLangRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
+    function Delete(request: DeleteRequest, onSuccess?: (response: DeleteResponse) => void, opt?: ServiceOptions<any>): PromiseLike<DeleteResponse>;
+    function Retrieve(request: RetrieveRequest, onSuccess?: (response: RetrieveResponse<CategoryLangRow>) => void, opt?: ServiceOptions<any>): PromiseLike<RetrieveResponse<CategoryLangRow>>;
+    function List(request: ListRequest, onSuccess?: (response: ListResponse<CategoryLangRow>) => void, opt?: ServiceOptions<any>): PromiseLike<ListResponse<CategoryLangRow>>;
+    const Methods: {
+        readonly Create: "Northwind/CategoryLang/Create";
+        readonly Update: "Northwind/CategoryLang/Update";
+        readonly Delete: "Northwind/CategoryLang/Delete";
+        readonly Retrieve: "Northwind/CategoryLang/Retrieve";
+        readonly List: "Northwind/CategoryLang/List";
+    };
 }
 export declare namespace CategoryService {
-	const baseUrl = "Northwind/Category";
-	function Create(request: SaveRequest<CategoryRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
-	function Update(request: SaveRequest<CategoryRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
-	function Delete(request: DeleteRequest, onSuccess?: (response: DeleteResponse) => void, opt?: ServiceOptions<any>): PromiseLike<DeleteResponse>;
-	function Retrieve(request: RetrieveRequest, onSuccess?: (response: RetrieveResponse<CategoryRow>) => void, opt?: ServiceOptions<any>): PromiseLike<RetrieveResponse<CategoryRow>>;
-	function List(request: ListRequest, onSuccess?: (response: ListResponse<CategoryRow>) => void, opt?: ServiceOptions<any>): PromiseLike<ListResponse<CategoryRow>>;
-	const Methods: {
-		readonly Create: "Northwind/Category/Create";
-		readonly Update: "Northwind/Category/Update";
-		readonly Delete: "Northwind/Category/Delete";
-		readonly Retrieve: "Northwind/Category/Retrieve";
-		readonly List: "Northwind/Category/List";
-	};
+    const baseUrl = "Northwind/Category";
+    function Create(request: SaveRequest<CategoryRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
+    function Update(request: SaveRequest<CategoryRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
+    function Delete(request: DeleteRequest, onSuccess?: (response: DeleteResponse) => void, opt?: ServiceOptions<any>): PromiseLike<DeleteResponse>;
+    function Retrieve(request: RetrieveRequest, onSuccess?: (response: RetrieveResponse<CategoryRow>) => void, opt?: ServiceOptions<any>): PromiseLike<RetrieveResponse<CategoryRow>>;
+    function List(request: ListRequest, onSuccess?: (response: ListResponse<CategoryRow>) => void, opt?: ServiceOptions<any>): PromiseLike<ListResponse<CategoryRow>>;
+    const Methods: {
+        readonly Create: "Northwind/Category/Create";
+        readonly Update: "Northwind/Category/Update";
+        readonly Delete: "Northwind/Category/Delete";
+        readonly Retrieve: "Northwind/Category/Retrieve";
+        readonly List: "Northwind/Category/List";
+    };
 }
 export interface NoteRow {
-	NoteId?: number;
-	EntityType?: string;
-	EntityId?: string;
-	Text?: string;
-	InsertUserId?: any;
-	InsertDate?: string;
-	InsertUserDisplayName?: string;
+    NoteId?: number;
+    EntityType?: string;
+    EntityId?: string;
+    Text?: string;
+    InsertUserId?: any;
+    InsertDate?: string;
+    InsertUserDisplayName?: string;
 }
 export declare abstract class NoteRow {
-	static readonly idProperty = "NoteId";
-	static readonly nameProperty = "EntityType";
-	static readonly localTextPrefix = "Northwind.Note";
-	static readonly deletePermission = "Northwind:General";
-	static readonly insertPermission = "Northwind:General";
-	static readonly readPermission = "Northwind:General";
-	static readonly updatePermission = "Northwind:General";
-	static readonly Fields: Readonly<Record<keyof NoteRow, string>>;
+    static readonly idProperty = "NoteId";
+    static readonly nameProperty = "EntityType";
+    static readonly localTextPrefix = "Northwind.Note";
+    static readonly deletePermission = "Northwind:General";
+    static readonly insertPermission = "Northwind:General";
+    static readonly readPermission = "Northwind:General";
+    static readonly updatePermission = "Northwind:General";
+    static readonly Fields: Readonly<Record<keyof NoteRow, string>>;
 }
 export interface CustomerRow {
-	CustomerID?: string;
-	CompanyName?: string;
-	ContactName?: string;
-	ContactTitle?: string;
-	Address?: string;
-	City?: string;
-	Region?: string;
-	PostalCode?: string;
-	Country?: string;
-	Phone?: string;
-	Fax?: string;
-	NoteList?: NoteRow[];
-	Representatives?: number[];
-	LastContactDate?: string;
-	LastContactedBy?: number;
-	Email?: string;
-	SendBulletin?: boolean;
+    CustomerID?: string;
+    CompanyName?: string;
+    ContactName?: string;
+    ContactTitle?: string;
+    Address?: string;
+    City?: string;
+    Region?: string;
+    PostalCode?: string;
+    Country?: string;
+    Phone?: string;
+    Fax?: string;
+    NoteList?: NoteRow[];
+    Representatives?: number[];
+    LastContactDate?: string;
+    LastContactedBy?: number;
+    Email?: string;
+    SendBulletin?: boolean;
 }
 export declare abstract class CustomerRow {
-	static readonly idProperty = "CustomerID";
-	static readonly nameProperty = "CompanyName";
-	static readonly localTextPrefix = "Northwind.Customer";
-	static readonly lookupKey = "Northwind.Customer";
-	/** [DEPRECATED] use getLookupAsync instead */
-	static getLookup(): import("@serenity-is/corelib").Lookup<CustomerRow>;
-	static getLookupAsync(): Promise<import("@serenity-is/corelib").Lookup<CustomerRow>>;
-	static readonly deletePermission = "Northwind:Customer:Delete";
-	static readonly insertPermission = "Northwind:Customer:Modify";
-	static readonly readPermission = "Northwind:Customer:View";
-	static readonly updatePermission = "Northwind:Customer:Modify";
-	static readonly Fields: Readonly<Record<keyof CustomerRow, string>>;
+    static readonly idProperty = "CustomerID";
+    static readonly nameProperty = "CompanyName";
+    static readonly localTextPrefix = "Northwind.Customer";
+    static readonly lookupKey = "Northwind.Customer";
+    /** [DEPRECATED] use getLookupAsync instead */
+    static getLookup(): Lookup<CustomerRow>;
+    static getLookupAsync(): Promise<Lookup<CustomerRow>>;
+    static readonly deletePermission = "Northwind:Customer:Delete";
+    static readonly insertPermission = "Northwind:Customer:Modify";
+    static readonly readPermission = "Northwind:Customer:View";
+    static readonly updatePermission = "Northwind:Customer:Modify";
+    static readonly Fields: Readonly<Record<keyof CustomerRow, string>>;
 }
 export interface CustomerColumns {
-	CustomerID: Column<CustomerRow>;
-	CompanyName: Column<CustomerRow>;
-	ContactName: Column<CustomerRow>;
-	ContactTitle: Column<CustomerRow>;
-	Region: Column<CustomerRow>;
-	PostalCode: Column<CustomerRow>;
-	Country: Column<CustomerRow>;
-	City: Column<CustomerRow>;
-	Phone: Column<CustomerRow>;
-	Fax: Column<CustomerRow>;
-	Representatives: Column<CustomerRow>;
+    CustomerID: Column<CustomerRow>;
+    CompanyName: Column<CustomerRow>;
+    ContactName: Column<CustomerRow>;
+    ContactTitle: Column<CustomerRow>;
+    Region: Column<CustomerRow>;
+    PostalCode: Column<CustomerRow>;
+    Country: Column<CustomerRow>;
+    City: Column<CustomerRow>;
+    Phone: Column<CustomerRow>;
+    Fax: Column<CustomerRow>;
+    Representatives: Column<CustomerRow>;
 }
 export declare class CustomerColumns extends ColumnsBase<CustomerRow> {
-	static readonly columnsKey = "Northwind.Customer";
-	static readonly Fields: Readonly<Record<keyof CustomerColumns, string>>;
+    static readonly columnsKey = "Northwind.Customer";
+    static readonly Fields: Readonly<Record<keyof CustomerColumns, string>>;
 }
 export interface CustomerCustomerDemoRow {
-	ID?: number;
-	CustomerID?: string;
-	CustomerTypeID?: string;
-	CustomerCompanyName?: string;
+    ID?: number;
+    CustomerID?: string;
+    CustomerTypeID?: string;
+    CustomerCompanyName?: string;
 }
 export declare abstract class CustomerCustomerDemoRow {
-	static readonly idProperty = "ID";
-	static readonly nameProperty = "CustomerID";
-	static readonly localTextPrefix = "Northwind.CustomerCustomerDemo";
-	static readonly deletePermission = "Northwind:General";
-	static readonly insertPermission = "Northwind:General";
-	static readonly readPermission = "Northwind:General";
-	static readonly updatePermission = "Northwind:General";
-	static readonly Fields: Readonly<Record<keyof CustomerCustomerDemoRow, string>>;
+    static readonly idProperty = "ID";
+    static readonly nameProperty = "CustomerID";
+    static readonly localTextPrefix = "Northwind.CustomerCustomerDemo";
+    static readonly deletePermission = "Northwind:General";
+    static readonly insertPermission = "Northwind:General";
+    static readonly readPermission = "Northwind:General";
+    static readonly updatePermission = "Northwind:General";
+    static readonly Fields: Readonly<Record<keyof CustomerCustomerDemoRow, string>>;
 }
 export interface CustomerDemographicRow {
-	ID?: number;
-	CustomerTypeID?: string;
-	CustomerDesc?: string;
+    ID?: number;
+    CustomerTypeID?: string;
+    CustomerDesc?: string;
 }
 export declare abstract class CustomerDemographicRow {
-	static readonly idProperty = "ID";
-	static readonly nameProperty = "CustomerTypeID";
-	static readonly localTextPrefix = "Northwind.CustomerDemographic";
-	static readonly deletePermission = "Northwind:General";
-	static readonly insertPermission = "Northwind:General";
-	static readonly readPermission = "Northwind:General";
-	static readonly updatePermission = "Northwind:General";
-	static readonly Fields: Readonly<Record<keyof CustomerDemographicRow, string>>;
+    static readonly idProperty = "ID";
+    static readonly nameProperty = "CustomerTypeID";
+    static readonly localTextPrefix = "Northwind.CustomerDemographic";
+    static readonly deletePermission = "Northwind:General";
+    static readonly insertPermission = "Northwind:General";
+    static readonly readPermission = "Northwind:General";
+    static readonly updatePermission = "Northwind:General";
+    static readonly Fields: Readonly<Record<keyof CustomerDemographicRow, string>>;
 }
 export interface CustomerDetailsRow {
-	CustomerID?: string;
-	LastContactDate?: string;
-	LastContactedBy?: number;
-	Email?: string;
-	SendBulletin?: boolean;
-	LastContactedByFullName?: string;
+    CustomerID?: string;
+    LastContactDate?: string;
+    LastContactedBy?: number;
+    Email?: string;
+    SendBulletin?: boolean;
+    LastContactedByFullName?: string;
 }
 export declare abstract class CustomerDetailsRow {
-	static readonly idProperty = "CustomerID";
-	static readonly nameProperty = "Email";
-	static readonly localTextPrefix = "Northwind.CustomerDetails";
-	static readonly deletePermission = "Northwind:General";
-	static readonly insertPermission = "Northwind:General";
-	static readonly readPermission = "Northwind:General";
-	static readonly updatePermission = "Northwind:General";
-	static readonly Fields: Readonly<Record<keyof CustomerDetailsRow, string>>;
+    static readonly idProperty = "CustomerID";
+    static readonly nameProperty = "Email";
+    static readonly localTextPrefix = "Northwind.CustomerDetails";
+    static readonly deletePermission = "Northwind:General";
+    static readonly insertPermission = "Northwind:General";
+    static readonly readPermission = "Northwind:General";
+    static readonly updatePermission = "Northwind:General";
+    static readonly Fields: Readonly<Record<keyof CustomerDetailsRow, string>>;
 }
 export declare class NotesEditor<P = {}> extends EditorWidget<P> implements IGetEditValue, ISetEditValue {
-	static [Symbol.typeInfo]: import("@serenity-is/corelib").EditorTypeInfo<"Serenity.Demo.Northwind.">;
-	static createDefaultElement(): HTMLElement;
-	private isDirty;
-	private items;
-	private noteList;
-	protected renderContents(): any;
-	protected updateContent(): void;
-	protected addClick(): void;
-	protected editClick(e: any): void;
-	deleteClick(e: any): void;
-	get value(): NoteRow[];
-	set value(value: NoteRow[]);
-	getEditValue(prop: PropertyItem, target: any): void;
-	setEditValue(source: any, prop: PropertyItem): void;
-	get_isDirty(): boolean;
-	set_isDirty(value: any): void;
-	onChange: () => void;
+    static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.Demo.Northwind.">;
+    static createDefaultElement(): HTMLElement;
+    private isDirty;
+    private items;
+    private noteList;
+    protected renderContents(): any;
+    protected updateContent(): void;
+    protected addClick(): void;
+    protected editClick(e: any): void;
+    deleteClick(e: any): void;
+    get value(): NoteRow[];
+    set value(value: NoteRow[]);
+    getEditValue(prop: PropertyItem, target: any): void;
+    setEditValue(source: any, prop: PropertyItem): void;
+    get_isDirty(): boolean;
+    set_isDirty(value: any): void;
+    onChange: () => void;
 }
 export interface CustomerForm {
-	CustomerID: StringEditor;
-	CompanyName: StringEditor;
-	ContactName: StringEditor;
-	ContactTitle: StringEditor;
-	Representatives: LookupEditor;
-	Address: StringEditor;
-	Country: LookupEditor;
-	City: LookupEditor;
-	Region: StringEditor;
-	PostalCode: StringEditor;
-	Phone: StringEditor;
-	Fax: StringEditor;
-	NoteList: NotesEditor;
-	LastContactDate: DateEditor;
-	LastContactedBy: LookupEditor;
-	Email: EmailAddressEditor;
-	SendBulletin: BooleanEditor;
+    CustomerID: StringEditor;
+    CompanyName: StringEditor;
+    ContactName: StringEditor;
+    ContactTitle: StringEditor;
+    Representatives: LookupEditor;
+    Address: StringEditor;
+    Country: LookupEditor;
+    City: LookupEditor;
+    Region: StringEditor;
+    PostalCode: StringEditor;
+    Phone: StringEditor;
+    Fax: StringEditor;
+    NoteList: NotesEditor;
+    LastContactDate: DateEditor;
+    LastContactedBy: LookupEditor;
+    Email: EmailAddressEditor;
+    SendBulletin: BooleanEditor;
 }
 export declare class CustomerForm extends PrefixedContext {
-	static readonly formKey = "Northwind.Customer";
-	private static init;
-	constructor(...args: ConstructorParameters<typeof PrefixedContext>);
+    static readonly formKey = "Northwind.Customer";
+    private static init;
+    constructor(...args: ConstructorParameters<typeof PrefixedContext>);
 }
 export interface CustomerGrossSalesRow {
-	CustomerId?: string;
-	ContactName?: string;
-	ProductId?: number;
-	ProductName?: string;
-	GrossAmount?: number;
+    CustomerId?: string;
+    ContactName?: string;
+    ProductId?: number;
+    ProductName?: string;
+    GrossAmount?: number;
 }
 export declare abstract class CustomerGrossSalesRow {
-	static readonly nameProperty = "ContactName";
-	static readonly localTextPrefix = "Northwind.CustomerGrossSales";
-	static readonly deletePermission = "Northwind:General";
-	static readonly insertPermission = "Northwind:General";
-	static readonly readPermission = "Northwind:General";
-	static readonly updatePermission = "Northwind:General";
-	static readonly Fields: Readonly<Record<keyof CustomerGrossSalesRow, string>>;
+    static readonly nameProperty = "ContactName";
+    static readonly localTextPrefix = "Northwind.CustomerGrossSales";
+    static readonly deletePermission = "Northwind:General";
+    static readonly insertPermission = "Northwind:General";
+    static readonly readPermission = "Northwind:General";
+    static readonly updatePermission = "Northwind:General";
+    static readonly Fields: Readonly<Record<keyof CustomerGrossSalesRow, string>>;
 }
 export interface CustomerRepresentativesRow {
-	RepresentativeId?: number;
-	CustomerId?: string;
-	EmployeeId?: number;
+    RepresentativeId?: number;
+    CustomerId?: string;
+    EmployeeId?: number;
 }
 export declare abstract class CustomerRepresentativesRow {
-	static readonly idProperty = "RepresentativeId";
-	static readonly localTextPrefix = "Northwind.CustomerRepresentatives";
-	static readonly deletePermission = "Northwind:Customer:View";
-	static readonly insertPermission = "Northwind:Customer:View";
-	static readonly readPermission = "Northwind:Customer:View";
-	static readonly updatePermission = "Northwind:Customer:View";
-	static readonly Fields: Readonly<Record<keyof CustomerRepresentativesRow, string>>;
+    static readonly idProperty = "RepresentativeId";
+    static readonly localTextPrefix = "Northwind.CustomerRepresentatives";
+    static readonly deletePermission = "Northwind:Customer:View";
+    static readonly insertPermission = "Northwind:Customer:View";
+    static readonly readPermission = "Northwind:Customer:View";
+    static readonly updatePermission = "Northwind:Customer:View";
+    static readonly Fields: Readonly<Record<keyof CustomerRepresentativesRow, string>>;
 }
 export declare namespace CustomerService {
-	const baseUrl = "Northwind/Customer";
-	function Create(request: SaveRequest<CustomerRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
-	function Update(request: SaveRequest<CustomerRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
-	function Delete(request: DeleteRequest, onSuccess?: (response: DeleteResponse) => void, opt?: ServiceOptions<any>): PromiseLike<DeleteResponse>;
-	function GetNextNumber(request: GetNextNumberRequest, onSuccess?: (response: GetNextNumberResponse) => void, opt?: ServiceOptions<any>): PromiseLike<GetNextNumberResponse>;
-	function Retrieve(request: RetrieveRequest, onSuccess?: (response: RetrieveResponse<CustomerRow>) => void, opt?: ServiceOptions<any>): PromiseLike<RetrieveResponse<CustomerRow>>;
-	function List(request: ListRequest, onSuccess?: (response: ListResponse<CustomerRow>) => void, opt?: ServiceOptions<any>): PromiseLike<ListResponse<CustomerRow>>;
-	const Methods: {
-		readonly Create: "Northwind/Customer/Create";
-		readonly Update: "Northwind/Customer/Update";
-		readonly Delete: "Northwind/Customer/Delete";
-		readonly GetNextNumber: "Northwind/Customer/GetNextNumber";
-		readonly Retrieve: "Northwind/Customer/Retrieve";
-		readonly List: "Northwind/Customer/List";
-	};
+    const baseUrl = "Northwind/Customer";
+    function Create(request: SaveRequest<CustomerRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
+    function Update(request: SaveRequest<CustomerRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
+    function Delete(request: DeleteRequest, onSuccess?: (response: DeleteResponse) => void, opt?: ServiceOptions<any>): PromiseLike<DeleteResponse>;
+    function GetNextNumber(request: GetNextNumberRequest, onSuccess?: (response: GetNextNumberResponse) => void, opt?: ServiceOptions<any>): PromiseLike<GetNextNumberResponse>;
+    function Retrieve(request: RetrieveRequest, onSuccess?: (response: RetrieveResponse<CustomerRow>) => void, opt?: ServiceOptions<any>): PromiseLike<RetrieveResponse<CustomerRow>>;
+    function List(request: ListRequest, onSuccess?: (response: ListResponse<CustomerRow>) => void, opt?: ServiceOptions<any>): PromiseLike<ListResponse<CustomerRow>>;
+    const Methods: {
+        readonly Create: "Northwind/Customer/Create";
+        readonly Update: "Northwind/Customer/Update";
+        readonly Delete: "Northwind/Customer/Delete";
+        readonly GetNextNumber: "Northwind/Customer/GetNextNumber";
+        readonly Retrieve: "Northwind/Customer/Retrieve";
+        readonly List: "Northwind/Customer/List";
+    };
 }
 export declare enum Gender {
-	Male = 1,
-	Female = 2
+    Male = 1,
+    Female = 2
 }
 export interface EmployeeRow {
-	EmployeeID?: number;
-	LastName?: string;
-	FirstName?: string;
-	FullName?: string;
-	Title?: string;
-	TitleOfCourtesy?: string;
-	BirthDate?: string;
-	HireDate?: string;
-	Address?: string;
-	City?: string;
-	Region?: string;
-	PostalCode?: string;
-	Country?: string;
-	HomePhone?: string;
-	Extension?: string;
-	Photo?: number[];
-	Notes?: string;
-	ReportsTo?: number;
-	PhotoPath?: string;
-	ReportsToFullName?: string;
-	Gender?: Gender;
+    EmployeeID?: number;
+    LastName?: string;
+    FirstName?: string;
+    FullName?: string;
+    Title?: string;
+    TitleOfCourtesy?: string;
+    BirthDate?: string;
+    HireDate?: string;
+    Address?: string;
+    City?: string;
+    Region?: string;
+    PostalCode?: string;
+    Country?: string;
+    HomePhone?: string;
+    Extension?: string;
+    Photo?: number[];
+    Notes?: string;
+    ReportsTo?: number;
+    PhotoPath?: string;
+    ReportsToFullName?: string;
+    Gender?: Gender;
 }
 export declare abstract class EmployeeRow {
-	static readonly idProperty = "EmployeeID";
-	static readonly nameProperty = "FullName";
-	static readonly localTextPrefix = "Northwind.Employee";
-	static readonly lookupKey = "Northwind.Employee";
-	/** [DEPRECATED] use getLookupAsync instead */
-	static getLookup(): import("@serenity-is/corelib").Lookup<EmployeeRow>;
-	static getLookupAsync(): Promise<import("@serenity-is/corelib").Lookup<EmployeeRow>>;
-	static readonly deletePermission = "Northwind:General";
-	static readonly insertPermission = "Northwind:General";
-	static readonly readPermission = "Northwind:General";
-	static readonly updatePermission = "Northwind:General";
-	static readonly Fields: Readonly<Record<keyof EmployeeRow, string>>;
+    static readonly idProperty = "EmployeeID";
+    static readonly nameProperty = "FullName";
+    static readonly localTextPrefix = "Northwind.Employee";
+    static readonly lookupKey = "Northwind.Employee";
+    /** [DEPRECATED] use getLookupAsync instead */
+    static getLookup(): Lookup<EmployeeRow>;
+    static getLookupAsync(): Promise<Lookup<EmployeeRow>>;
+    static readonly deletePermission = "Northwind:General";
+    static readonly insertPermission = "Northwind:General";
+    static readonly readPermission = "Northwind:General";
+    static readonly updatePermission = "Northwind:General";
+    static readonly Fields: Readonly<Record<keyof EmployeeRow, string>>;
 }
 export interface EmployeeTerritoryRow {
-	EmployeeID?: number;
-	TerritoryID?: string;
-	EmployeeFullName?: string;
-	TerritoryDescription?: string;
+    EmployeeID?: number;
+    TerritoryID?: string;
+    EmployeeFullName?: string;
+    TerritoryDescription?: string;
 }
 export declare abstract class EmployeeTerritoryRow {
-	static readonly idProperty = "EmployeeID";
-	static readonly nameProperty = "TerritoryID";
-	static readonly localTextPrefix = "Northwind.EmployeeTerritory";
-	static readonly deletePermission = "Northwind:General";
-	static readonly insertPermission = "Northwind:General";
-	static readonly readPermission = "Northwind:General";
-	static readonly updatePermission = "Northwind:General";
-	static readonly Fields: Readonly<Record<keyof EmployeeTerritoryRow, string>>;
+    static readonly idProperty = "EmployeeID";
+    static readonly nameProperty = "TerritoryID";
+    static readonly localTextPrefix = "Northwind.EmployeeTerritory";
+    static readonly deletePermission = "Northwind:General";
+    static readonly insertPermission = "Northwind:General";
+    static readonly readPermission = "Northwind:General";
+    static readonly updatePermission = "Northwind:General";
+    static readonly Fields: Readonly<Record<keyof EmployeeTerritoryRow, string>>;
 }
 export interface OrderDetailRow {
-	DetailID?: number;
-	OrderID?: number;
-	ProductID?: number;
-	UnitPrice?: number;
-	Quantity?: number;
-	Discount?: number;
-	OrderCustomerID?: string;
-	OrderEmployeeID?: number;
-	OrderDate?: string;
-	ProductName?: string;
-	LineTotal?: number;
+    DetailID?: number;
+    OrderID?: number;
+    ProductID?: number;
+    UnitPrice?: number;
+    Quantity?: number;
+    Discount?: number;
+    OrderCustomerID?: string;
+    OrderEmployeeID?: number;
+    OrderDate?: string;
+    ProductName?: string;
+    LineTotal?: number;
 }
 export declare abstract class OrderDetailRow {
-	static readonly idProperty = "DetailID";
-	static readonly localTextPrefix = "Northwind.OrderDetail";
-	static readonly deletePermission = "Northwind:General";
-	static readonly insertPermission = "Northwind:General";
-	static readonly readPermission = "Northwind:General";
-	static readonly updatePermission = "Northwind:General";
-	static readonly Fields: Readonly<Record<keyof OrderDetailRow, string>>;
+    static readonly idProperty = "DetailID";
+    static readonly localTextPrefix = "Northwind.OrderDetail";
+    static readonly deletePermission = "Northwind:General";
+    static readonly insertPermission = "Northwind:General";
+    static readonly readPermission = "Northwind:General";
+    static readonly updatePermission = "Northwind:General";
+    static readonly Fields: Readonly<Record<keyof OrderDetailRow, string>>;
 }
 export declare enum OrderShippingState {
-	NotShipped = 0,
-	Shipped = 1
+    NotShipped = 0,
+    Shipped = 1
 }
 export interface OrderRow {
-	OrderID?: number;
-	CustomerID?: string;
-	EmployeeID?: number;
-	OrderDate?: string;
-	RequiredDate?: string;
-	ShippedDate?: string;
-	ShipVia?: number;
-	Freight?: number;
-	ShipName?: string;
-	ShipAddress?: string;
-	ShipCity?: string;
-	ShipRegion?: string;
-	ShipPostalCode?: string;
-	ShipCountry?: string;
-	CustomerCompanyName?: string;
-	CustomerContactName?: string;
-	CustomerContactTitle?: string;
-	CustomerCity?: string;
-	CustomerRegion?: string;
-	CustomerCountry?: string;
-	CustomerPhone?: string;
-	CustomerFax?: string;
-	EmployeeFullName?: string;
-	EmployeeGender?: Gender;
-	ShipViaCompanyName?: string;
-	ShippingState?: OrderShippingState;
-	DetailList?: OrderDetailRow[];
+    OrderID?: number;
+    CustomerID?: string;
+    EmployeeID?: number;
+    OrderDate?: string;
+    RequiredDate?: string;
+    ShippedDate?: string;
+    ShipVia?: number;
+    Freight?: number;
+    ShipName?: string;
+    ShipAddress?: string;
+    ShipCity?: string;
+    ShipRegion?: string;
+    ShipPostalCode?: string;
+    ShipCountry?: string;
+    CustomerCompanyName?: string;
+    CustomerContactName?: string;
+    CustomerContactTitle?: string;
+    CustomerCity?: string;
+    CustomerRegion?: string;
+    CustomerCountry?: string;
+    CustomerPhone?: string;
+    CustomerFax?: string;
+    EmployeeFullName?: string;
+    EmployeeGender?: Gender;
+    ShipViaCompanyName?: string;
+    ShippingState?: OrderShippingState;
+    DetailList?: OrderDetailRow[];
 }
 export declare abstract class OrderRow {
-	static readonly idProperty = "OrderID";
-	static readonly nameProperty = "CustomerID";
-	static readonly localTextPrefix = "Northwind.Order";
-	static readonly deletePermission = "Northwind:General";
-	static readonly insertPermission = "Northwind:General";
-	static readonly readPermission = "Northwind:General";
-	static readonly updatePermission = "Northwind:General";
-	static readonly Fields: Readonly<Record<keyof OrderRow, string>>;
+    static readonly idProperty = "OrderID";
+    static readonly nameProperty = "CustomerID";
+    static readonly localTextPrefix = "Northwind.Order";
+    static readonly deletePermission = "Northwind:General";
+    static readonly insertPermission = "Northwind:General";
+    static readonly readPermission = "Northwind:General";
+    static readonly updatePermission = "Northwind:General";
+    static readonly Fields: Readonly<Record<keyof OrderRow, string>>;
 }
 export interface OrderColumns {
-	OrderID: Column<OrderRow>;
-	PrintInvoice: Column<OrderRow>;
-	CustomerCompanyName: Column<OrderRow>;
-	OrderDate: Column<OrderRow>;
-	EmployeeFullName: Column<OrderRow>;
-	RequiredDate: Column<OrderRow>;
-	ShippingState: Column<OrderRow>;
-	ShippedDate: Column<OrderRow>;
-	ShipViaCompanyName: Column<OrderRow>;
-	ShipCountry: Column<OrderRow>;
-	ShipCity: Column<OrderRow>;
-	Freight: Column<OrderRow>;
+    OrderID: Column<OrderRow>;
+    PrintInvoice: Column<OrderRow>;
+    CustomerCompanyName: Column<OrderRow>;
+    OrderDate: Column<OrderRow>;
+    EmployeeFullName: Column<OrderRow>;
+    RequiredDate: Column<OrderRow>;
+    ShippingState: Column<OrderRow>;
+    ShippedDate: Column<OrderRow>;
+    ShipViaCompanyName: Column<OrderRow>;
+    ShipCountry: Column<OrderRow>;
+    ShipCity: Column<OrderRow>;
+    Freight: Column<OrderRow>;
 }
 export declare class OrderColumns extends ColumnsBase<OrderRow> {
-	static readonly columnsKey = "Northwind.Order";
-	static readonly Fields: Readonly<Record<keyof OrderColumns, string>>;
+    static readonly columnsKey = "Northwind.Order";
+    static readonly Fields: Readonly<Record<keyof OrderColumns, string>>;
 }
 export interface OrderDetailColumns {
-	RowEditActions: Column<OrderDetailRow>;
-	ProductName: Column<OrderDetailRow>;
-	UnitPrice: Column<OrderDetailRow>;
-	Quantity: Column<OrderDetailRow>;
-	Discount: Column<OrderDetailRow>;
-	LineTotal: Column<OrderDetailRow>;
+    RowEditActions: Column<OrderDetailRow>;
+    ProductName: Column<OrderDetailRow>;
+    UnitPrice: Column<OrderDetailRow>;
+    Quantity: Column<OrderDetailRow>;
+    Discount: Column<OrderDetailRow>;
+    LineTotal: Column<OrderDetailRow>;
 }
 export declare class OrderDetailColumns extends ColumnsBase<OrderDetailRow> {
-	static readonly columnsKey = "Northwind.OrderDetail";
-	static readonly Fields: Readonly<Record<keyof OrderDetailColumns, string>>;
+    static readonly columnsKey = "Northwind.OrderDetail";
+    static readonly Fields: Readonly<Record<keyof OrderDetailColumns, string>>;
 }
 export interface OrderDetailForm {
-	OrderID: IntegerEditor;
-	ProductID: ServiceLookupEditor;
-	UnitPrice: DecimalEditor;
-	Quantity: IntegerEditor;
-	Discount: DecimalEditor;
+    OrderID: IntegerEditor;
+    ProductID: ServiceLookupEditor;
+    UnitPrice: DecimalEditor;
+    Quantity: IntegerEditor;
+    Discount: DecimalEditor;
 }
 export declare class OrderDetailForm extends PrefixedContext {
-	static readonly formKey = "Northwind.OrderDetail";
-	private static init;
-	constructor(...args: ConstructorParameters<typeof PrefixedContext>);
+    static readonly formKey = "Northwind.OrderDetail";
+    private static init;
+    constructor(...args: ConstructorParameters<typeof PrefixedContext>);
 }
 export declare namespace OrderDetailService {
-	const baseUrl = "Northwind/OrderDetail";
-	function Create(request: SaveRequest<OrderDetailRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
-	function Update(request: SaveRequest<OrderDetailRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
-	function Delete(request: DeleteRequest, onSuccess?: (response: DeleteResponse) => void, opt?: ServiceOptions<any>): PromiseLike<DeleteResponse>;
-	function Retrieve(request: RetrieveRequest, onSuccess?: (response: RetrieveResponse<OrderDetailRow>) => void, opt?: ServiceOptions<any>): PromiseLike<RetrieveResponse<OrderDetailRow>>;
-	function List(request: ListRequest, onSuccess?: (response: ListResponse<OrderDetailRow>) => void, opt?: ServiceOptions<any>): PromiseLike<ListResponse<OrderDetailRow>>;
-	const Methods: {
-		readonly Create: "Northwind/OrderDetail/Create";
-		readonly Update: "Northwind/OrderDetail/Update";
-		readonly Delete: "Northwind/OrderDetail/Delete";
-		readonly Retrieve: "Northwind/OrderDetail/Retrieve";
-		readonly List: "Northwind/OrderDetail/List";
-	};
+    const baseUrl = "Northwind/OrderDetail";
+    function Create(request: SaveRequest<OrderDetailRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
+    function Update(request: SaveRequest<OrderDetailRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
+    function Delete(request: DeleteRequest, onSuccess?: (response: DeleteResponse) => void, opt?: ServiceOptions<any>): PromiseLike<DeleteResponse>;
+    function Retrieve(request: RetrieveRequest, onSuccess?: (response: RetrieveResponse<OrderDetailRow>) => void, opt?: ServiceOptions<any>): PromiseLike<RetrieveResponse<OrderDetailRow>>;
+    function List(request: ListRequest, onSuccess?: (response: ListResponse<OrderDetailRow>) => void, opt?: ServiceOptions<any>): PromiseLike<ListResponse<OrderDetailRow>>;
+    const Methods: {
+        readonly Create: "Northwind/OrderDetail/Create";
+        readonly Update: "Northwind/OrderDetail/Update";
+        readonly Delete: "Northwind/OrderDetail/Delete";
+        readonly Retrieve: "Northwind/OrderDetail/Retrieve";
+        readonly List: "Northwind/OrderDetail/List";
+    };
 }
 export declare class CustomerEditor<P extends LookupEditorOptions = LookupEditorOptions> extends LookupEditorBase<P, CustomerRow> {
-	static [Symbol.typeInfo]: import("@serenity-is/corelib").EditorTypeInfo<"Serenity.Demo.Northwind.">;
-	constructor(props: EditorProps<P>);
-	protected getLookupKey(): string;
-	protected getItemText(item: any, lookup: any): string;
+    static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.Demo.Northwind.">;
+    constructor(props: EditorProps<P>);
+    protected getLookupKey(): string;
+    protected getItemText(item: any, lookup: any): string;
 }
 export declare class OrderDetailDialog extends GridEditorDialog<OrderDetailRow> {
-	static [Symbol.typeInfo]: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Demo.Northwind.">;
-	protected getFormKey(): string;
-	protected getRowDefinition(): typeof OrderDetailRow;
-	protected getService(): string;
-	protected form: OrderDetailForm;
-	constructor(props: WidgetProps<any>);
+    static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.Demo.Northwind.">;
+    protected getFormKey(): string;
+    protected getRowDefinition(): typeof OrderDetailRow;
+    protected getService(): string;
+    protected form: OrderDetailForm;
+    constructor(props: WidgetProps<any>);
 }
 export declare class OrderDetailsEditor<P = {}> extends GridEditorBase<OrderDetailRow, P> {
-	static [Symbol.typeInfo]: import("@serenity-is/corelib").EditorTypeInfo<"Serenity.Demo.Northwind.">;
-	protected getColumnsKey(): string;
-	protected getDialogType(): typeof OrderDetailDialog;
-	protected getRowDefinition(): typeof OrderDetailRow;
-	protected getService(): string;
-	protected validateEntity(row: OrderDetailRow, id: any): Promise<boolean>;
-	protected getGridCanLoad(): boolean;
-	protected getNewEntity(): {
-		OrderID: number;
-	};
-	private _orderId;
-	get orderId(): number;
-	set orderId(value: number);
-	protected onClick(e: Event, row: number, cell: number): void;
+    static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.Demo.Northwind.">;
+    protected getColumnsKey(): string;
+    protected getDialogType(): typeof OrderDetailDialog;
+    protected getRowDefinition(): typeof OrderDetailRow;
+    protected getService(): string;
+    protected validateEntity(row: OrderDetailRow, id: any): Promise<boolean>;
+    protected getGridCanLoad(): boolean;
+    protected getNewEntity(): {
+        OrderID: number;
+    };
+    private _orderId;
+    get orderId(): number;
+    set orderId(value: number);
+    protected onClick(e: Event, row: number, cell: number): void;
 }
 export interface OrderForm {
-	CustomerID: CustomerEditor;
-	OrderDate: DateEditor;
-	RequiredDate: DateEditor;
-	EmployeeID: LookupEditor;
-	DetailList: OrderDetailsEditor;
-	ShippedDate: DateEditor;
-	ShipVia: LookupEditor;
-	Freight: DecimalEditor;
-	ShipName: StringEditor;
-	ShipAddress: StringEditor;
-	ShipCity: StringEditor;
-	ShipRegion: StringEditor;
-	ShipPostalCode: StringEditor;
-	ShipCountry: StringEditor;
+    CustomerID: CustomerEditor;
+    OrderDate: DateEditor;
+    RequiredDate: DateEditor;
+    EmployeeID: LookupEditor;
+    DetailList: OrderDetailsEditor;
+    ShippedDate: DateEditor;
+    ShipVia: LookupEditor;
+    Freight: DecimalEditor;
+    ShipName: StringEditor;
+    ShipAddress: StringEditor;
+    ShipCity: StringEditor;
+    ShipRegion: StringEditor;
+    ShipPostalCode: StringEditor;
+    ShipCountry: StringEditor;
 }
 export declare class OrderForm extends PrefixedContext {
-	static readonly formKey = "Northwind.Order";
-	private static init;
-	constructor(...args: ConstructorParameters<typeof PrefixedContext>);
+    static readonly formKey = "Northwind.Order";
+    private static init;
+    constructor(...args: ConstructorParameters<typeof PrefixedContext>);
 }
 export interface OrderListRequest extends ListRequest {
-	ProductID?: number;
+    ProductID?: number;
 }
 export declare namespace OrderService {
-	const baseUrl = "Northwind/Order";
-	function Create(request: SaveRequest<OrderRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
-	function Update(request: SaveRequest<OrderRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
-	function Delete(request: DeleteRequest, onSuccess?: (response: DeleteResponse) => void, opt?: ServiceOptions<any>): PromiseLike<DeleteResponse>;
-	function Retrieve(request: RetrieveRequest, onSuccess?: (response: RetrieveResponse<OrderRow>) => void, opt?: ServiceOptions<any>): PromiseLike<RetrieveResponse<OrderRow>>;
-	function List(request: OrderListRequest, onSuccess?: (response: ListResponse<OrderRow>) => void, opt?: ServiceOptions<any>): PromiseLike<ListResponse<OrderRow>>;
-	const Methods: {
-		readonly Create: "Northwind/Order/Create";
-		readonly Update: "Northwind/Order/Update";
-		readonly Delete: "Northwind/Order/Delete";
-		readonly Retrieve: "Northwind/Order/Retrieve";
-		readonly List: "Northwind/Order/List";
-	};
+    const baseUrl = "Northwind/Order";
+    function Create(request: SaveRequest<OrderRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
+    function Update(request: SaveRequest<OrderRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
+    function Delete(request: DeleteRequest, onSuccess?: (response: DeleteResponse) => void, opt?: ServiceOptions<any>): PromiseLike<DeleteResponse>;
+    function Retrieve(request: RetrieveRequest, onSuccess?: (response: RetrieveResponse<OrderRow>) => void, opt?: ServiceOptions<any>): PromiseLike<RetrieveResponse<OrderRow>>;
+    function List(request: OrderListRequest, onSuccess?: (response: ListResponse<OrderRow>) => void, opt?: ServiceOptions<any>): PromiseLike<ListResponse<OrderRow>>;
+    const Methods: {
+        readonly Create: "Northwind/Order/Create";
+        readonly Update: "Northwind/Order/Update";
+        readonly Delete: "Northwind/Order/Delete";
+        readonly Retrieve: "Northwind/Order/Retrieve";
+        readonly List: "Northwind/Order/List";
+    };
 }
 export declare namespace PermissionKeys {
-	const General = "Northwind:General";
-	namespace Customer {
-		const Delete = "Northwind:Customer:Delete";
-		const Modify = "Northwind:Customer:Modify";
-		const View = "Northwind:Customer:View";
-	}
+    const General = "Northwind:General";
+    namespace Customer {
+        const Delete = "Northwind:Customer:Delete";
+        const Modify = "Northwind:Customer:Modify";
+        const View = "Northwind:Customer:View";
+    }
 }
 export interface ProductRow {
-	ProductID?: number;
-	ProductName?: string;
-	ProductImage?: string;
-	Discontinued?: boolean;
-	SupplierID?: number;
-	CategoryID?: number;
-	QuantityPerUnit?: string;
-	UnitPrice?: number;
-	UnitsInStock?: number;
-	UnitsOnOrder?: number;
-	ReorderLevel?: number;
-	RowVersion?: number;
-	SupplierCompanyName?: string;
-	SupplierCountry?: string;
-	CategoryName?: string;
+    ProductID?: number;
+    ProductName?: string;
+    ProductImage?: string;
+    Discontinued?: boolean;
+    SupplierID?: number;
+    CategoryID?: number;
+    QuantityPerUnit?: string;
+    UnitPrice?: number;
+    UnitsInStock?: number;
+    UnitsOnOrder?: number;
+    ReorderLevel?: number;
+    RowVersion?: number;
+    SupplierCompanyName?: string;
+    SupplierCountry?: string;
+    CategoryName?: string;
 }
 export declare abstract class ProductRow {
-	static readonly concurrencyVersionProperty = "RowVersion";
-	static readonly idProperty = "ProductID";
-	static readonly nameProperty = "ProductName";
-	static readonly localTextPrefix = "Northwind.Product";
-	static readonly lookupKey = "Northwind.Product";
-	/** [DEPRECATED] use getLookupAsync instead */
-	static getLookup(): import("@serenity-is/corelib").Lookup<ProductRow>;
-	static getLookupAsync(): Promise<import("@serenity-is/corelib").Lookup<ProductRow>>;
-	static readonly deletePermission = "Northwind:General";
-	static readonly insertPermission = "Northwind:General";
-	static readonly readPermission = "Northwind:General";
-	static readonly updatePermission = "Northwind:General";
-	static readonly Fields: Readonly<Record<keyof ProductRow, string>>;
+    static readonly concurrencyVersionProperty = "RowVersion";
+    static readonly idProperty = "ProductID";
+    static readonly nameProperty = "ProductName";
+    static readonly localTextPrefix = "Northwind.Product";
+    static readonly lookupKey = "Northwind.Product";
+    /** [DEPRECATED] use getLookupAsync instead */
+    static getLookup(): Lookup<ProductRow>;
+    static getLookupAsync(): Promise<Lookup<ProductRow>>;
+    static readonly deletePermission = "Northwind:General";
+    static readonly insertPermission = "Northwind:General";
+    static readonly readPermission = "Northwind:General";
+    static readonly updatePermission = "Northwind:General";
+    static readonly Fields: Readonly<Record<keyof ProductRow, string>>;
 }
 export interface ProductColumns {
-	ProductID: Column<ProductRow>;
-	ProductName: Column<ProductRow>;
-	Discontinued: Column<ProductRow>;
-	SupplierCompanyName: Column<ProductRow>;
-	CategoryName: Column<ProductRow>;
-	QuantityPerUnit: Column<ProductRow>;
-	UnitPrice: Column<ProductRow>;
-	UnitsInStock: Column<ProductRow>;
-	UnitsOnOrder: Column<ProductRow>;
-	ReorderLevel: Column<ProductRow>;
+    ProductID: Column<ProductRow>;
+    ProductName: Column<ProductRow>;
+    Discontinued: Column<ProductRow>;
+    SupplierCompanyName: Column<ProductRow>;
+    CategoryName: Column<ProductRow>;
+    QuantityPerUnit: Column<ProductRow>;
+    UnitPrice: Column<ProductRow>;
+    UnitsInStock: Column<ProductRow>;
+    UnitsOnOrder: Column<ProductRow>;
+    ReorderLevel: Column<ProductRow>;
 }
 export declare class ProductColumns extends ColumnsBase<ProductRow> {
-	static readonly columnsKey = "Northwind.Product";
-	static readonly Fields: Readonly<Record<keyof ProductColumns, string>>;
+    static readonly columnsKey = "Northwind.Product";
+    static readonly Fields: Readonly<Record<keyof ProductColumns, string>>;
 }
 export interface ProductForm {
-	ProductName: StringEditor;
-	ProductImage: ImageUploadEditor;
-	Discontinued: BooleanEditor;
-	SupplierID: LookupEditor;
-	CategoryID: ServiceLookupEditor;
-	QuantityPerUnit: StringEditor;
-	UnitPrice: DecimalEditor;
-	UnitsInStock: IntegerEditor;
-	UnitsOnOrder: IntegerEditor;
-	ReorderLevel: IntegerEditor;
+    ProductName: StringEditor;
+    ProductImage: ImageUploadEditor;
+    Discontinued: BooleanEditor;
+    SupplierID: LookupEditor;
+    CategoryID: ServiceLookupEditor;
+    QuantityPerUnit: StringEditor;
+    UnitPrice: DecimalEditor;
+    UnitsInStock: IntegerEditor;
+    UnitsOnOrder: IntegerEditor;
+    ReorderLevel: IntegerEditor;
 }
 export declare class ProductForm extends PrefixedContext {
-	static readonly formKey = "Northwind.Product";
-	private static init;
-	constructor(...args: ConstructorParameters<typeof PrefixedContext>);
+    static readonly formKey = "Northwind.Product";
+    private static init;
+    constructor(...args: ConstructorParameters<typeof PrefixedContext>);
 }
 export interface ProductLangRow {
-	Id?: number;
-	ProductId?: number;
-	LanguageId?: string;
-	ProductName?: string;
+    Id?: number;
+    ProductId?: number;
+    LanguageId?: string;
+    ProductName?: string;
 }
 export declare abstract class ProductLangRow {
-	static readonly idProperty = "Id";
-	static readonly nameProperty = "ProductName";
-	static readonly localTextPrefix = "Northwind.ProductLang";
-	static readonly deletePermission = "Northwind:General";
-	static readonly insertPermission = "Northwind:General";
-	static readonly readPermission = "Northwind:General";
-	static readonly updatePermission = "Northwind:General";
-	static readonly Fields: Readonly<Record<keyof ProductLangRow, string>>;
+    static readonly idProperty = "Id";
+    static readonly nameProperty = "ProductName";
+    static readonly localTextPrefix = "Northwind.ProductLang";
+    static readonly deletePermission = "Northwind:General";
+    static readonly insertPermission = "Northwind:General";
+    static readonly readPermission = "Northwind:General";
+    static readonly updatePermission = "Northwind:General";
+    static readonly Fields: Readonly<Record<keyof ProductLangRow, string>>;
 }
 export declare namespace ProductLangService {
-	const baseUrl = "Northwind/ProductLang";
-	function Create(request: SaveRequest<ProductLangRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
-	function Update(request: SaveRequest<ProductLangRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
-	function Delete(request: DeleteRequest, onSuccess?: (response: DeleteResponse) => void, opt?: ServiceOptions<any>): PromiseLike<DeleteResponse>;
-	function Retrieve(request: RetrieveRequest, onSuccess?: (response: RetrieveResponse<ProductLangRow>) => void, opt?: ServiceOptions<any>): PromiseLike<RetrieveResponse<ProductLangRow>>;
-	function List(request: ListRequest, onSuccess?: (response: ListResponse<ProductLangRow>) => void, opt?: ServiceOptions<any>): PromiseLike<ListResponse<ProductLangRow>>;
-	const Methods: {
-		readonly Create: "Northwind/ProductLang/Create";
-		readonly Update: "Northwind/ProductLang/Update";
-		readonly Delete: "Northwind/ProductLang/Delete";
-		readonly Retrieve: "Northwind/ProductLang/Retrieve";
-		readonly List: "Northwind/ProductLang/List";
-	};
+    const baseUrl = "Northwind/ProductLang";
+    function Create(request: SaveRequest<ProductLangRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
+    function Update(request: SaveRequest<ProductLangRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
+    function Delete(request: DeleteRequest, onSuccess?: (response: DeleteResponse) => void, opt?: ServiceOptions<any>): PromiseLike<DeleteResponse>;
+    function Retrieve(request: RetrieveRequest, onSuccess?: (response: RetrieveResponse<ProductLangRow>) => void, opt?: ServiceOptions<any>): PromiseLike<RetrieveResponse<ProductLangRow>>;
+    function List(request: ListRequest, onSuccess?: (response: ListResponse<ProductLangRow>) => void, opt?: ServiceOptions<any>): PromiseLike<ListResponse<ProductLangRow>>;
+    const Methods: {
+        readonly Create: "Northwind/ProductLang/Create";
+        readonly Update: "Northwind/ProductLang/Update";
+        readonly Delete: "Northwind/ProductLang/Delete";
+        readonly Retrieve: "Northwind/ProductLang/Retrieve";
+        readonly List: "Northwind/ProductLang/List";
+    };
 }
 export interface ProductLogRow {
-	ProductLogID?: number;
-	OperationType?: CaptureOperationType;
-	ChangingUserId?: any;
-	ValidFrom?: string;
-	ValidUntil?: string;
-	ProductID?: number;
-	ProductName?: string;
-	ProductImage?: string;
-	Discontinued?: boolean;
-	SupplierID?: number;
-	CategoryID?: number;
-	QuantityPerUnit?: string;
-	UnitPrice?: number;
-	UnitsInStock?: number;
-	UnitsOnOrder?: number;
-	ReorderLevel?: number;
+    ProductLogID?: number;
+    OperationType?: CaptureOperationType;
+    ChangingUserId?: any;
+    ValidFrom?: string;
+    ValidUntil?: string;
+    ProductID?: number;
+    ProductName?: string;
+    ProductImage?: string;
+    Discontinued?: boolean;
+    SupplierID?: number;
+    CategoryID?: number;
+    QuantityPerUnit?: string;
+    UnitPrice?: number;
+    UnitsInStock?: number;
+    UnitsOnOrder?: number;
+    ReorderLevel?: number;
 }
 export declare abstract class ProductLogRow {
-	static readonly idProperty = "ProductLogID";
-	static readonly localTextPrefix = "Northwind.ProductLog";
-	static readonly deletePermission = "Northwind:General";
-	static readonly insertPermission = "Northwind:General";
-	static readonly readPermission = "Northwind:General";
-	static readonly updatePermission = "Northwind:General";
-	static readonly Fields: Readonly<Record<keyof ProductLogRow, string>>;
+    static readonly idProperty = "ProductLogID";
+    static readonly localTextPrefix = "Northwind.ProductLog";
+    static readonly deletePermission = "Northwind:General";
+    static readonly insertPermission = "Northwind:General";
+    static readonly readPermission = "Northwind:General";
+    static readonly updatePermission = "Northwind:General";
+    static readonly Fields: Readonly<Record<keyof ProductLogRow, string>>;
 }
 export declare namespace ProductService {
-	const baseUrl = "Northwind/Product";
-	function Create(request: SaveRequest<ProductRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
-	function Update(request: SaveRequest<ProductRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
-	function Delete(request: DeleteRequest, onSuccess?: (response: DeleteResponse) => void, opt?: ServiceOptions<any>): PromiseLike<DeleteResponse>;
-	function Retrieve(request: RetrieveRequest, onSuccess?: (response: RetrieveResponse<ProductRow>) => void, opt?: ServiceOptions<any>): PromiseLike<RetrieveResponse<ProductRow>>;
-	function List(request: ListRequest, onSuccess?: (response: ListResponse<ProductRow>) => void, opt?: ServiceOptions<any>): PromiseLike<ListResponse<ProductRow>>;
-	const Methods: {
-		readonly Create: "Northwind/Product/Create";
-		readonly Update: "Northwind/Product/Update";
-		readonly Delete: "Northwind/Product/Delete";
-		readonly Retrieve: "Northwind/Product/Retrieve";
-		readonly List: "Northwind/Product/List";
-	};
+    const baseUrl = "Northwind/Product";
+    function Create(request: SaveRequest<ProductRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
+    function Update(request: SaveRequest<ProductRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
+    function Delete(request: DeleteRequest, onSuccess?: (response: DeleteResponse) => void, opt?: ServiceOptions<any>): PromiseLike<DeleteResponse>;
+    function Retrieve(request: RetrieveRequest, onSuccess?: (response: RetrieveResponse<ProductRow>) => void, opt?: ServiceOptions<any>): PromiseLike<RetrieveResponse<ProductRow>>;
+    function List(request: ListRequest, onSuccess?: (response: ListResponse<ProductRow>) => void, opt?: ServiceOptions<any>): PromiseLike<ListResponse<ProductRow>>;
+    const Methods: {
+        readonly Create: "Northwind/Product/Create";
+        readonly Update: "Northwind/Product/Update";
+        readonly Delete: "Northwind/Product/Delete";
+        readonly Retrieve: "Northwind/Product/Retrieve";
+        readonly List: "Northwind/Product/List";
+    };
 }
 export interface RegionRow {
-	RegionID?: number;
-	RegionDescription?: string;
+    RegionID?: number;
+    RegionDescription?: string;
 }
 export declare abstract class RegionRow {
-	static readonly idProperty = "RegionID";
-	static readonly nameProperty = "RegionDescription";
-	static readonly localTextPrefix = "Northwind.Region";
-	static readonly lookupKey = "Northwind.Region";
-	/** [DEPRECATED] use getLookupAsync instead */
-	static getLookup(): import("@serenity-is/corelib").Lookup<RegionRow>;
-	static getLookupAsync(): Promise<import("@serenity-is/corelib").Lookup<RegionRow>>;
-	static readonly deletePermission = "Northwind:General";
-	static readonly insertPermission = "Northwind:General";
-	static readonly readPermission = "Northwind:General";
-	static readonly updatePermission = "Northwind:General";
-	static readonly Fields: Readonly<Record<keyof RegionRow, string>>;
+    static readonly idProperty = "RegionID";
+    static readonly nameProperty = "RegionDescription";
+    static readonly localTextPrefix = "Northwind.Region";
+    static readonly lookupKey = "Northwind.Region";
+    /** [DEPRECATED] use getLookupAsync instead */
+    static getLookup(): Lookup<RegionRow>;
+    static getLookupAsync(): Promise<Lookup<RegionRow>>;
+    static readonly deletePermission = "Northwind:General";
+    static readonly insertPermission = "Northwind:General";
+    static readonly readPermission = "Northwind:General";
+    static readonly updatePermission = "Northwind:General";
+    static readonly Fields: Readonly<Record<keyof RegionRow, string>>;
 }
 export interface RegionColumns {
-	RegionID: Column<RegionRow>;
-	RegionDescription: Column<RegionRow>;
+    RegionID: Column<RegionRow>;
+    RegionDescription: Column<RegionRow>;
 }
 export declare class RegionColumns extends ColumnsBase<RegionRow> {
-	static readonly columnsKey = "Northwind.Region";
-	static readonly Fields: Readonly<Record<keyof RegionColumns, string>>;
+    static readonly columnsKey = "Northwind.Region";
+    static readonly Fields: Readonly<Record<keyof RegionColumns, string>>;
 }
 export interface RegionForm {
-	RegionID: IntegerEditor;
-	RegionDescription: StringEditor;
+    RegionID: IntegerEditor;
+    RegionDescription: StringEditor;
 }
 export declare class RegionForm extends PrefixedContext {
-	static readonly formKey = "Northwind.Region";
-	private static init;
-	constructor(...args: ConstructorParameters<typeof PrefixedContext>);
+    static readonly formKey = "Northwind.Region";
+    private static init;
+    constructor(...args: ConstructorParameters<typeof PrefixedContext>);
 }
 export declare namespace RegionService {
-	const baseUrl = "Northwind/Region";
-	function Create(request: SaveRequest<RegionRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
-	function Update(request: SaveRequest<RegionRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
-	function Delete(request: DeleteRequest, onSuccess?: (response: DeleteResponse) => void, opt?: ServiceOptions<any>): PromiseLike<DeleteResponse>;
-	function Retrieve(request: RetrieveRequest, onSuccess?: (response: RetrieveResponse<RegionRow>) => void, opt?: ServiceOptions<any>): PromiseLike<RetrieveResponse<RegionRow>>;
-	function List(request: ListRequest, onSuccess?: (response: ListResponse<RegionRow>) => void, opt?: ServiceOptions<any>): PromiseLike<ListResponse<RegionRow>>;
-	const Methods: {
-		readonly Create: "Northwind/Region/Create";
-		readonly Update: "Northwind/Region/Update";
-		readonly Delete: "Northwind/Region/Delete";
-		readonly Retrieve: "Northwind/Region/Retrieve";
-		readonly List: "Northwind/Region/List";
-	};
+    const baseUrl = "Northwind/Region";
+    function Create(request: SaveRequest<RegionRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
+    function Update(request: SaveRequest<RegionRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
+    function Delete(request: DeleteRequest, onSuccess?: (response: DeleteResponse) => void, opt?: ServiceOptions<any>): PromiseLike<DeleteResponse>;
+    function Retrieve(request: RetrieveRequest, onSuccess?: (response: RetrieveResponse<RegionRow>) => void, opt?: ServiceOptions<any>): PromiseLike<RetrieveResponse<RegionRow>>;
+    function List(request: ListRequest, onSuccess?: (response: ListResponse<RegionRow>) => void, opt?: ServiceOptions<any>): PromiseLike<ListResponse<RegionRow>>;
+    const Methods: {
+        readonly Create: "Northwind/Region/Create";
+        readonly Update: "Northwind/Region/Update";
+        readonly Delete: "Northwind/Region/Delete";
+        readonly Retrieve: "Northwind/Region/Retrieve";
+        readonly List: "Northwind/Region/List";
+    };
 }
 export interface SalesByCategoryRow {
-	CategoryId?: number;
-	CategoryName?: string;
-	ProductName?: string;
-	ProductSales?: number;
+    CategoryId?: number;
+    CategoryName?: string;
+    ProductName?: string;
+    ProductSales?: number;
 }
 export declare abstract class SalesByCategoryRow {
-	static readonly nameProperty = "CategoryName";
-	static readonly localTextPrefix = "Northwind.SalesByCategory";
-	static readonly deletePermission = "Northwind:General";
-	static readonly insertPermission = "Northwind:General";
-	static readonly readPermission = "Northwind:General";
-	static readonly updatePermission = "Northwind:General";
-	static readonly Fields: Readonly<Record<keyof SalesByCategoryRow, string>>;
+    static readonly nameProperty = "CategoryName";
+    static readonly localTextPrefix = "Northwind.SalesByCategory";
+    static readonly deletePermission = "Northwind:General";
+    static readonly insertPermission = "Northwind:General";
+    static readonly readPermission = "Northwind:General";
+    static readonly updatePermission = "Northwind:General";
+    static readonly Fields: Readonly<Record<keyof SalesByCategoryRow, string>>;
 }
 export interface SalesByCategoryColumns {
-	CategoryName: Column<SalesByCategoryRow>;
-	ProductName: Column<SalesByCategoryRow>;
-	ProductSales: Column<SalesByCategoryRow>;
+    CategoryName: Column<SalesByCategoryRow>;
+    ProductName: Column<SalesByCategoryRow>;
+    ProductSales: Column<SalesByCategoryRow>;
 }
 export declare class SalesByCategoryColumns extends ColumnsBase<SalesByCategoryRow> {
-	static readonly columnsKey = "Northwind.SalesByCategory";
-	static readonly Fields: Readonly<Record<keyof SalesByCategoryColumns, string>>;
+    static readonly columnsKey = "Northwind.SalesByCategory";
+    static readonly Fields: Readonly<Record<keyof SalesByCategoryColumns, string>>;
 }
 export declare namespace SalesByCategoryService {
-	const baseUrl = "Northwind/SalesByCategory";
-	function List(request: ListRequest, onSuccess?: (response: ListResponse<SalesByCategoryRow>) => void, opt?: ServiceOptions<any>): PromiseLike<ListResponse<SalesByCategoryRow>>;
-	const Methods: {
-		readonly List: "Northwind/SalesByCategory/List";
-	};
+    const baseUrl = "Northwind/SalesByCategory";
+    function List(request: ListRequest, onSuccess?: (response: ListResponse<SalesByCategoryRow>) => void, opt?: ServiceOptions<any>): PromiseLike<ListResponse<SalesByCategoryRow>>;
+    const Methods: {
+        readonly List: "Northwind/SalesByCategory/List";
+    };
 }
 export interface ShipperRow {
-	ShipperID?: number;
-	CompanyName?: string;
-	Phone?: string;
+    ShipperID?: number;
+    CompanyName?: string;
+    Phone?: string;
 }
 export declare abstract class ShipperRow {
-	static readonly idProperty = "ShipperID";
-	static readonly nameProperty = "CompanyName";
-	static readonly localTextPrefix = "Northwind.Shipper";
-	static readonly lookupKey = "Northwind.Shipper";
-	/** [DEPRECATED] use getLookupAsync instead */
-	static getLookup(): import("@serenity-is/corelib").Lookup<ShipperRow>;
-	static getLookupAsync(): Promise<import("@serenity-is/corelib").Lookup<ShipperRow>>;
-	static readonly deletePermission = "Northwind:General";
-	static readonly insertPermission = "Northwind:General";
-	static readonly readPermission = "Northwind:General";
-	static readonly updatePermission = "Northwind:General";
-	static readonly Fields: Readonly<Record<keyof ShipperRow, string>>;
+    static readonly idProperty = "ShipperID";
+    static readonly nameProperty = "CompanyName";
+    static readonly localTextPrefix = "Northwind.Shipper";
+    static readonly lookupKey = "Northwind.Shipper";
+    /** [DEPRECATED] use getLookupAsync instead */
+    static getLookup(): Lookup<ShipperRow>;
+    static getLookupAsync(): Promise<Lookup<ShipperRow>>;
+    static readonly deletePermission = "Northwind:General";
+    static readonly insertPermission = "Northwind:General";
+    static readonly readPermission = "Northwind:General";
+    static readonly updatePermission = "Northwind:General";
+    static readonly Fields: Readonly<Record<keyof ShipperRow, string>>;
 }
 export interface ShipperColumns {
-	ShipperID: Column<ShipperRow>;
-	CompanyName: Column<ShipperRow>;
-	Phone: Column<ShipperRow>;
+    ShipperID: Column<ShipperRow>;
+    CompanyName: Column<ShipperRow>;
+    Phone: Column<ShipperRow>;
 }
 export declare class ShipperColumns extends ColumnsBase<ShipperRow> {
-	static readonly columnsKey = "Northwind.Shipper";
-	static readonly Fields: Readonly<Record<keyof ShipperColumns, string>>;
+    static readonly columnsKey = "Northwind.Shipper";
+    static readonly Fields: Readonly<Record<keyof ShipperColumns, string>>;
 }
 export interface PhoneEditorOptions {
-	multiple?: boolean;
+    multiple?: boolean;
 }
 export declare class PhoneEditor<P extends PhoneEditorOptions = PhoneEditorOptions> extends StringEditor<P> {
-	static [Symbol.typeInfo]: import("@serenity-is/corelib").EditorTypeInfo<"Serenity.Demo.Northwind.">;
-	constructor(props: WidgetProps<P>);
-	protected formatValue(): void;
-	protected getFormattedValue(): string;
-	get_value(): string;
-	set_value(value: string): void;
-	static validate(phone: string, isMultiple: boolean): string;
-	static isValidPhone(phone: string): boolean;
-	static formatPhone(phone: string): string;
-	static formatMulti(phone: string, format: (s: string) => string): string;
-	static isValidMulti(phone: string, check: (s: string) => boolean): boolean;
+    static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.Demo.Northwind.">;
+    constructor(props: WidgetProps<P>);
+    protected formatValue(): void;
+    protected getFormattedValue(): string;
+    get_value(): string;
+    set_value(value: string): void;
+    static validate(phone: string, isMultiple: boolean): string;
+    static isValidPhone(phone: string): boolean;
+    static formatPhone(phone: string): string;
+    static formatMulti(phone: string, format: (s: string) => string): string;
+    static isValidMulti(phone: string, check: (s: string) => boolean): boolean;
 }
 export interface ShipperForm {
-	CompanyName: StringEditor;
-	Phone: PhoneEditor;
+    CompanyName: StringEditor;
+    Phone: PhoneEditor;
 }
 export declare class ShipperForm extends PrefixedContext {
-	static readonly formKey = "Northwind.Shipper";
-	private static init;
-	constructor(...args: ConstructorParameters<typeof PrefixedContext>);
+    static readonly formKey = "Northwind.Shipper";
+    private static init;
+    constructor(...args: ConstructorParameters<typeof PrefixedContext>);
 }
 export declare namespace ShipperService {
-	const baseUrl = "Northwind/Shipper";
-	function Create(request: SaveRequest<ShipperRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
-	function Update(request: SaveRequest<ShipperRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
-	function Delete(request: DeleteRequest, onSuccess?: (response: DeleteResponse) => void, opt?: ServiceOptions<any>): PromiseLike<DeleteResponse>;
-	function Retrieve(request: RetrieveRequest, onSuccess?: (response: RetrieveResponse<ShipperRow>) => void, opt?: ServiceOptions<any>): PromiseLike<RetrieveResponse<ShipperRow>>;
-	function List(request: ListRequest, onSuccess?: (response: ListResponse<ShipperRow>) => void, opt?: ServiceOptions<any>): PromiseLike<ListResponse<ShipperRow>>;
-	const Methods: {
-		readonly Create: "Northwind/Shipper/Create";
-		readonly Update: "Northwind/Shipper/Update";
-		readonly Delete: "Northwind/Shipper/Delete";
-		readonly Retrieve: "Northwind/Shipper/Retrieve";
-		readonly List: "Northwind/Shipper/List";
-	};
+    const baseUrl = "Northwind/Shipper";
+    function Create(request: SaveRequest<ShipperRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
+    function Update(request: SaveRequest<ShipperRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
+    function Delete(request: DeleteRequest, onSuccess?: (response: DeleteResponse) => void, opt?: ServiceOptions<any>): PromiseLike<DeleteResponse>;
+    function Retrieve(request: RetrieveRequest, onSuccess?: (response: RetrieveResponse<ShipperRow>) => void, opt?: ServiceOptions<any>): PromiseLike<RetrieveResponse<ShipperRow>>;
+    function List(request: ListRequest, onSuccess?: (response: ListResponse<ShipperRow>) => void, opt?: ServiceOptions<any>): PromiseLike<ListResponse<ShipperRow>>;
+    const Methods: {
+        readonly Create: "Northwind/Shipper/Create";
+        readonly Update: "Northwind/Shipper/Update";
+        readonly Delete: "Northwind/Shipper/Delete";
+        readonly Retrieve: "Northwind/Shipper/Retrieve";
+        readonly List: "Northwind/Shipper/List";
+    };
 }
 export interface SupplierRow {
-	SupplierID?: number;
-	CompanyName?: string;
-	ContactName?: string;
-	ContactTitle?: string;
-	Address?: string;
-	City?: string;
-	Region?: string;
-	PostalCode?: string;
-	Country?: string;
-	Phone?: string;
-	Fax?: string;
-	HomePage?: string;
+    SupplierID?: number;
+    CompanyName?: string;
+    ContactName?: string;
+    ContactTitle?: string;
+    Address?: string;
+    City?: string;
+    Region?: string;
+    PostalCode?: string;
+    Country?: string;
+    Phone?: string;
+    Fax?: string;
+    HomePage?: string;
 }
 export declare abstract class SupplierRow {
-	static readonly idProperty = "SupplierID";
-	static readonly nameProperty = "CompanyName";
-	static readonly localTextPrefix = "Northwind.Supplier";
-	static readonly lookupKey = "Northwind.Supplier";
-	/** [DEPRECATED] use getLookupAsync instead */
-	static getLookup(): import("@serenity-is/corelib").Lookup<SupplierRow>;
-	static getLookupAsync(): Promise<import("@serenity-is/corelib").Lookup<SupplierRow>>;
-	static readonly deletePermission = "Northwind:General";
-	static readonly insertPermission = "Northwind:General";
-	static readonly readPermission = "Northwind:General";
-	static readonly updatePermission = "Northwind:General";
-	static readonly Fields: Readonly<Record<keyof SupplierRow, string>>;
+    static readonly idProperty = "SupplierID";
+    static readonly nameProperty = "CompanyName";
+    static readonly localTextPrefix = "Northwind.Supplier";
+    static readonly lookupKey = "Northwind.Supplier";
+    /** [DEPRECATED] use getLookupAsync instead */
+    static getLookup(): Lookup<SupplierRow>;
+    static getLookupAsync(): Promise<Lookup<SupplierRow>>;
+    static readonly deletePermission = "Northwind:General";
+    static readonly insertPermission = "Northwind:General";
+    static readonly readPermission = "Northwind:General";
+    static readonly updatePermission = "Northwind:General";
+    static readonly Fields: Readonly<Record<keyof SupplierRow, string>>;
 }
 export interface SupplierColumns {
-	SupplierID: Column<SupplierRow>;
-	CompanyName: Column<SupplierRow>;
-	ContactName: Column<SupplierRow>;
-	ContactTitle: Column<SupplierRow>;
-	Phone: Column<SupplierRow>;
-	Region: Column<SupplierRow>;
-	Country: Column<SupplierRow>;
-	City: Column<SupplierRow>;
+    SupplierID: Column<SupplierRow>;
+    CompanyName: Column<SupplierRow>;
+    ContactName: Column<SupplierRow>;
+    ContactTitle: Column<SupplierRow>;
+    Phone: Column<SupplierRow>;
+    Region: Column<SupplierRow>;
+    Country: Column<SupplierRow>;
+    City: Column<SupplierRow>;
 }
 export declare class SupplierColumns extends ColumnsBase<SupplierRow> {
-	static readonly columnsKey = "Northwind.Supplier";
-	static readonly Fields: Readonly<Record<keyof SupplierColumns, string>>;
+    static readonly columnsKey = "Northwind.Supplier";
+    static readonly Fields: Readonly<Record<keyof SupplierColumns, string>>;
 }
 export interface SupplierForm {
-	CompanyName: StringEditor;
-	ContactName: StringEditor;
-	ContactTitle: StringEditor;
-	Address: StringEditor;
-	Region: StringEditor;
-	PostalCode: StringEditor;
-	Country: StringEditor;
-	City: StringEditor;
-	Phone: StringEditor;
-	Fax: StringEditor;
-	HomePage: StringEditor;
+    CompanyName: StringEditor;
+    ContactName: StringEditor;
+    ContactTitle: StringEditor;
+    Address: StringEditor;
+    Region: StringEditor;
+    PostalCode: StringEditor;
+    Country: StringEditor;
+    City: StringEditor;
+    Phone: StringEditor;
+    Fax: StringEditor;
+    HomePage: StringEditor;
 }
 export declare class SupplierForm extends PrefixedContext {
-	static readonly formKey = "Northwind.Supplier";
-	private static init;
-	constructor(...args: ConstructorParameters<typeof PrefixedContext>);
+    static readonly formKey = "Northwind.Supplier";
+    private static init;
+    constructor(...args: ConstructorParameters<typeof PrefixedContext>);
 }
 export declare namespace SupplierService {
-	const baseUrl = "Northwind/Supplier";
-	function Create(request: SaveRequest<SupplierRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
-	function Update(request: SaveRequest<SupplierRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
-	function Delete(request: DeleteRequest, onSuccess?: (response: DeleteResponse) => void, opt?: ServiceOptions<any>): PromiseLike<DeleteResponse>;
-	function Retrieve(request: RetrieveRequest, onSuccess?: (response: RetrieveResponse<SupplierRow>) => void, opt?: ServiceOptions<any>): PromiseLike<RetrieveResponse<SupplierRow>>;
-	function List(request: ListRequest, onSuccess?: (response: ListResponse<SupplierRow>) => void, opt?: ServiceOptions<any>): PromiseLike<ListResponse<SupplierRow>>;
-	const Methods: {
-		readonly Create: "Northwind/Supplier/Create";
-		readonly Update: "Northwind/Supplier/Update";
-		readonly Delete: "Northwind/Supplier/Delete";
-		readonly Retrieve: "Northwind/Supplier/Retrieve";
-		readonly List: "Northwind/Supplier/List";
-	};
+    const baseUrl = "Northwind/Supplier";
+    function Create(request: SaveRequest<SupplierRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
+    function Update(request: SaveRequest<SupplierRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
+    function Delete(request: DeleteRequest, onSuccess?: (response: DeleteResponse) => void, opt?: ServiceOptions<any>): PromiseLike<DeleteResponse>;
+    function Retrieve(request: RetrieveRequest, onSuccess?: (response: RetrieveResponse<SupplierRow>) => void, opt?: ServiceOptions<any>): PromiseLike<RetrieveResponse<SupplierRow>>;
+    function List(request: ListRequest, onSuccess?: (response: ListResponse<SupplierRow>) => void, opt?: ServiceOptions<any>): PromiseLike<ListResponse<SupplierRow>>;
+    const Methods: {
+        readonly Create: "Northwind/Supplier/Create";
+        readonly Update: "Northwind/Supplier/Update";
+        readonly Delete: "Northwind/Supplier/Delete";
+        readonly Retrieve: "Northwind/Supplier/Retrieve";
+        readonly List: "Northwind/Supplier/List";
+    };
 }
 export interface TerritoryRow {
-	TerritoryID?: string;
-	TerritoryDescription?: string;
-	RegionID?: number;
-	RegionDescription?: string;
+    TerritoryID?: string;
+    TerritoryDescription?: string;
+    RegionID?: number;
+    RegionDescription?: string;
 }
 export declare abstract class TerritoryRow {
-	static readonly idProperty = "TerritoryID";
-	static readonly nameProperty = "TerritoryID";
-	static readonly localTextPrefix = "Northwind.Territory";
-	static readonly lookupKey = "Northwind.Territory";
-	/** [DEPRECATED] use getLookupAsync instead */
-	static getLookup(): import("@serenity-is/corelib").Lookup<TerritoryRow>;
-	static getLookupAsync(): Promise<import("@serenity-is/corelib").Lookup<TerritoryRow>>;
-	static readonly deletePermission = "Northwind:General";
-	static readonly insertPermission = "Northwind:General";
-	static readonly readPermission = "Northwind:General";
-	static readonly updatePermission = "Northwind:General";
-	static readonly Fields: Readonly<Record<keyof TerritoryRow, string>>;
+    static readonly idProperty = "TerritoryID";
+    static readonly nameProperty = "TerritoryID";
+    static readonly localTextPrefix = "Northwind.Territory";
+    static readonly lookupKey = "Northwind.Territory";
+    /** [DEPRECATED] use getLookupAsync instead */
+    static getLookup(): Lookup<TerritoryRow>;
+    static getLookupAsync(): Promise<Lookup<TerritoryRow>>;
+    static readonly deletePermission = "Northwind:General";
+    static readonly insertPermission = "Northwind:General";
+    static readonly readPermission = "Northwind:General";
+    static readonly updatePermission = "Northwind:General";
+    static readonly Fields: Readonly<Record<keyof TerritoryRow, string>>;
 }
 export interface TerritoryColumns {
-	TerritoryID: Column<TerritoryRow>;
-	TerritoryDescription: Column<TerritoryRow>;
-	RegionDescription: Column<TerritoryRow>;
+    TerritoryID: Column<TerritoryRow>;
+    TerritoryDescription: Column<TerritoryRow>;
+    RegionDescription: Column<TerritoryRow>;
 }
 export declare class TerritoryColumns extends ColumnsBase<TerritoryRow> {
-	static readonly columnsKey = "Northwind.Territory";
-	static readonly Fields: Readonly<Record<keyof TerritoryColumns, string>>;
+    static readonly columnsKey = "Northwind.Territory";
+    static readonly Fields: Readonly<Record<keyof TerritoryColumns, string>>;
 }
 export interface TerritoryForm {
-	TerritoryID: StringEditor;
-	TerritoryDescription: StringEditor;
-	RegionID: LookupEditor;
+    TerritoryID: StringEditor;
+    TerritoryDescription: StringEditor;
+    RegionID: LookupEditor;
 }
 export declare class TerritoryForm extends PrefixedContext {
-	static readonly formKey = "Northwind.Territory";
-	private static init;
-	constructor(...args: ConstructorParameters<typeof PrefixedContext>);
+    static readonly formKey = "Northwind.Territory";
+    private static init;
+    constructor(...args: ConstructorParameters<typeof PrefixedContext>);
 }
 export declare namespace TerritoryService {
-	const baseUrl = "Northwind/Territory";
-	function Create(request: SaveRequest<TerritoryRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
-	function Update(request: SaveRequest<TerritoryRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
-	function Delete(request: DeleteRequest, onSuccess?: (response: DeleteResponse) => void, opt?: ServiceOptions<any>): PromiseLike<DeleteResponse>;
-	function Retrieve(request: RetrieveRequest, onSuccess?: (response: RetrieveResponse<TerritoryRow>) => void, opt?: ServiceOptions<any>): PromiseLike<RetrieveResponse<TerritoryRow>>;
-	function List(request: ListRequest, onSuccess?: (response: ListResponse<TerritoryRow>) => void, opt?: ServiceOptions<any>): PromiseLike<ListResponse<TerritoryRow>>;
-	const Methods: {
-		readonly Create: "Northwind/Territory/Create";
-		readonly Update: "Northwind/Territory/Update";
-		readonly Delete: "Northwind/Territory/Delete";
-		readonly Retrieve: "Northwind/Territory/Retrieve";
-		readonly List: "Northwind/Territory/List";
-	};
+    const baseUrl = "Northwind/Territory";
+    function Create(request: SaveRequest<TerritoryRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
+    function Update(request: SaveRequest<TerritoryRow>, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
+    function Delete(request: DeleteRequest, onSuccess?: (response: DeleteResponse) => void, opt?: ServiceOptions<any>): PromiseLike<DeleteResponse>;
+    function Retrieve(request: RetrieveRequest, onSuccess?: (response: RetrieveResponse<TerritoryRow>) => void, opt?: ServiceOptions<any>): PromiseLike<RetrieveResponse<TerritoryRow>>;
+    function List(request: ListRequest, onSuccess?: (response: ListResponse<TerritoryRow>) => void, opt?: ServiceOptions<any>): PromiseLike<ListResponse<TerritoryRow>>;
+    const Methods: {
+        readonly Create: "Northwind/Territory/Create";
+        readonly Update: "Northwind/Territory/Update";
+        readonly Delete: "Northwind/Territory/Delete";
+        readonly Retrieve: "Northwind/Territory/Retrieve";
+        readonly List: "Northwind/Territory/List";
+    };
 }
 export declare class CategoryDialog<P = {}> extends EntityDialog<CategoryRow, P> {
-	static [Symbol.typeInfo]: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Demo.Northwind.">;
-	protected getFormKey(): string;
-	protected getRowDefinition(): typeof CategoryRow;
-	protected getService(): string;
-	protected form: CategoryForm;
+    static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.Demo.Northwind.">;
+    protected getFormKey(): string;
+    protected getRowDefinition(): typeof CategoryRow;
+    protected getService(): string;
+    protected form: CategoryForm;
 }
 export declare class CategoryGrid<P = {}> extends EntityGrid<CategoryRow, P> {
-	static [Symbol.typeInfo]: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Demo.Northwind.">;
-	protected getColumnsKey(): string;
-	protected getDialogType(): any;
-	protected getRowDefinition(): typeof CategoryRow;
-	protected getService(): string;
+    static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.Demo.Northwind.">;
+    protected getColumnsKey(): string;
+    protected getDialogType(): any;
+    protected getRowDefinition(): typeof CategoryRow;
+    protected getService(): string;
 }
 export declare class CustomerDialog<P = {}> extends EntityDialog<CustomerRow, P> {
-	static [Symbol.typeInfo]: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Demo.Northwind.">;
-	protected getFormKey(): string;
-	protected getRowDefinition(): typeof CustomerRow;
-	protected getService(): string;
-	protected form: CustomerForm;
-	private ordersGrid;
-	private loadedState;
-	constructor(props: WidgetProps<P>);
-	initDialog(): void;
-	getSaveState(): string;
-	protected loadResponse(data: any): void;
-	protected loadEntity(entity: CustomerRow): void;
-	protected onSaveSuccess(response: SaveResponse, initiator: SaveInitiator): void;
-	protected renderContents(): any;
+    static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.Demo.Northwind.">;
+    protected getFormKey(): string;
+    protected getRowDefinition(): typeof CustomerRow;
+    protected getService(): string;
+    protected form: CustomerForm;
+    private ordersGrid;
+    private loadedState;
+    constructor(props: WidgetProps<P>);
+    initDialog(): void;
+    getSaveState(): string;
+    protected loadResponse(data: any): void;
+    protected loadEntity(entity: CustomerRow): void;
+    protected onSaveSuccess(response: SaveResponse, initiator: SaveInitiator): void;
+    protected renderContents(): any;
 }
 export declare class CustomerGrid<P = {}> extends EntityGrid<CustomerRow, P> {
-	static [Symbol.typeInfo]: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Demo.Northwind.">;
-	protected getColumnsKey(): string;
-	protected getDialogType(): any;
-	protected getRowDefinition(): typeof CustomerRow;
-	protected getService(): string;
+    static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.Demo.Northwind.">;
+    protected getColumnsKey(): string;
+    protected getDialogType(): any;
+    protected getRowDefinition(): typeof CustomerRow;
+    protected getService(): string;
 }
 export declare class OrderDialog<P = {}> extends EntityDialog<OrderRow, P> {
-	static [Symbol.typeInfo]: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Demo.Northwind.">;
-	protected getFormKey(): string;
-	protected getRowDefinition(): typeof OrderRow;
-	protected getService(): string;
-	protected form: OrderForm;
-	protected getToolbarButtons(): import("@serenity-is/corelib").ToolButton[];
-	protected updateInterface(): void;
-	protected afterLoadEntity(): void;
+    static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.Demo.Northwind.">;
+    protected getFormKey(): string;
+    protected getRowDefinition(): typeof OrderRow;
+    protected getService(): string;
+    protected form: OrderForm;
+    protected getToolbarButtons(): ToolButton[];
+    protected updateInterface(): void;
+    protected afterLoadEntity(): void;
 }
 export declare class CustomerOrderDialog extends OrderDialog {
-	static [Symbol.typeInfo]: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Demo.Northwind.">;
-	protected updateInterface(): void;
+    static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.Demo.Northwind.">;
+    protected updateInterface(): void;
 }
 export declare class OrderGrid<P = {}> extends EntityGrid<OrderRow, P> {
-	static [Symbol.typeInfo]: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Demo.Northwind.">;
-	protected getColumnsKey(): string;
-	protected getDialogType(): any;
-	protected getRowDefinition(): typeof OrderRow;
-	protected getService(): string;
-	protected shippingStateFilter: EnumEditor;
-	protected getQuickFilters(): import("@serenity-is/corelib").QuickFilter<import("@serenity-is/corelib").Widget<any>, any>[];
-	protected createQuickFilters(): void;
-	protected getButtons(): ToolButton[];
-	protected createColumns(): import("@serenity-is/sleekgrid").Column<OrderRow>[];
-	protected onClick(e: Event, row: number, cell: number): void;
-	set_shippingState(value: number): void;
-	protected addButtonClick(): void;
+    static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.Demo.Northwind.">;
+    protected getColumnsKey(): string;
+    protected getDialogType(): any;
+    protected getRowDefinition(): typeof OrderRow;
+    protected getService(): string;
+    protected shippingStateFilter: EnumEditor;
+    protected getQuickFilters(): QuickFilter<Widget<any>, any>[];
+    protected createQuickFilters(): void;
+    protected getButtons(): ToolButton[];
+    protected createColumns(): Column<OrderRow>[];
+    protected onClick(e: Event, row: number, cell: number): void;
+    set_shippingState(value: number): void;
+    protected addButtonClick(): void;
 }
 export declare class CustomerOrdersGrid<P = {}> extends OrderGrid<P> {
-	static [Symbol.typeInfo]: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Demo.Northwind.">;
-	protected getDialogType(): typeof CustomerOrderDialog;
-	protected createColumns(): Column[];
-	protected initEntityDialog(itemType: string, dialog: Widget<any>): void;
-	protected getButtons(): import("@serenity-is/corelib").ToolButton[];
-	protected addButtonClick(): void;
-	protected getInitialTitle(): any;
-	protected getGridCanLoad(): boolean;
-	private _customerID;
-	get customerID(): string;
-	set customerID(value: string);
+    static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.Demo.Northwind.">;
+    protected getDialogType(): typeof CustomerOrderDialog;
+    protected createColumns(): Column[];
+    protected initEntityDialog(itemType: string, dialog: Widget<any>): void;
+    protected getButtons(): ToolButton[];
+    protected addButtonClick(): void;
+    protected getInitialTitle(): any;
+    protected getGridCanLoad(): boolean;
+    private _customerID;
+    get customerID(): string;
+    set customerID(value: string);
 }
 export declare class EmployeeListFormatter implements Formatter {
-	static [Symbol.typeInfo]: import("@serenity-is/corelib").FormatterTypeInfo<"Serenity.Demo.Northwind.">;
-	format(ctx: FormatterContext): FormatterResult;
+    static [Symbol.typeInfo]: FormatterTypeInfo<"Serenity.Demo.Northwind.">;
+    format(ctx: FormatterContext): FormatterResult;
 }
 export declare class EmployeeFormatter implements Formatter {
-	readonly props: {
-		genderProperty?: string;
-	};
-	static [Symbol.typeInfo]: import("@serenity-is/corelib").FormatterTypeInfo<"Serenity.Demo.Northwind.">;
-	constructor(props?: {
-		genderProperty?: string;
-	});
-	format(ctx: FormatterContext): FormatterResult;
-	initializeColumn(column: Column): void;
+    readonly props: {
+        genderProperty?: string;
+    };
+    static [Symbol.typeInfo]: FormatterTypeInfo<"Serenity.Demo.Northwind.">;
+    constructor(props?: {
+        genderProperty?: string;
+    });
+    format(ctx: FormatterContext): FormatterResult;
+    initializeColumn(column: Column): void;
 }
 export declare class NoteDialog<P = {}> extends BaseDialog<P> {
-	static [Symbol.typeInfo]: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Demo.Northwind.">;
-	private textEditor;
-	protected renderContents(): any;
-	protected getDialogButtons(): DialogButton[];
-	get text(): string;
-	set text(value: string);
-	okClick: () => void;
+    static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.Demo.Northwind.">;
+    private textEditor;
+    protected renderContents(): any;
+    protected getDialogButtons(): DialogButton[];
+    get text(): string;
+    set text(value: string);
+    okClick: () => void;
 }
 export declare class FreightFormatter implements Formatter {
-	static [Symbol.typeInfo]: import("@serenity-is/corelib").FormatterTypeInfo<"Serenity.Demo.Northwind.">;
-	format(ctx: FormatterContext): FormatterResult;
+    static [Symbol.typeInfo]: FormatterTypeInfo<"Serenity.Demo.Northwind.">;
+    format(ctx: FormatterContext): FormatterResult;
 }
 export declare class ProductDialog<P = {}> extends EntityDialog<ProductRow, P> {
-	static [Symbol.typeInfo]: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Demo.Northwind.">;
-	protected getFormKey(): string;
-	protected getRowDefinition(): typeof ProductRow;
-	protected getService(): string;
-	protected form: ProductForm;
+    static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.Demo.Northwind.">;
+    protected getFormKey(): string;
+    protected getRowDefinition(): typeof ProductRow;
+    protected getService(): string;
+    protected form: ProductForm;
 }
 export declare class ProductGrid<P = {}> extends EntityGrid<ProductRow, P> {
-	static [Symbol.typeInfo]: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Demo.Northwind.">;
-	protected getColumnsKey(): string;
-	protected getDialogType(): any;
-	protected getRowDefinition(): typeof ProductRow;
-	protected getService(): string;
-	private pendingChanges;
-	constructor(props: WidgetProps<P>);
-	protected getButtons(): import("@serenity-is/corelib").ToolButton[];
-	protected onViewProcessData(response: any): import("@serenity-is/corelib").ListResponse<ProductRow>;
-	private numericInputFormatter;
-	private stringInputFormatter;
-	private selectFormatter;
-	private getEffectiveValue;
-	protected createColumns(): Column[];
-	private inputsChange;
-	private setSaveButtonState;
-	private saveClick;
-	protected getQuickFilters(): import("@serenity-is/corelib").QuickFilter<import("@serenity-is/corelib").Widget<any>, any>[];
+    static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.Demo.Northwind.">;
+    protected getColumnsKey(): string;
+    protected getDialogType(): any;
+    protected getRowDefinition(): typeof ProductRow;
+    protected getService(): string;
+    private pendingChanges;
+    constructor(props: WidgetProps<P>);
+    protected getButtons(): ToolButton[];
+    protected onViewProcessData(response: any): ListResponse<ProductRow>;
+    private numericInputFormatter;
+    private stringInputFormatter;
+    private selectFormatter;
+    private getEffectiveValue;
+    protected createColumns(): Column[];
+    private inputsChange;
+    private setSaveButtonState;
+    private saveClick;
+    protected getQuickFilters(): QuickFilter<Widget<any>, any>[];
 }
 export declare class RegionDialog<P = {}> extends EntityDialog<RegionRow, P> {
-	static [Symbol.typeInfo]: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Demo.Northwind.">;
-	protected getFormKey(): string;
-	protected getRowDefinition(): typeof RegionRow;
-	protected getService(): string;
-	protected form: RegionForm;
+    static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.Demo.Northwind.">;
+    protected getFormKey(): string;
+    protected getRowDefinition(): typeof RegionRow;
+    protected getService(): string;
+    protected form: RegionForm;
 }
 export declare class RegionGrid<P = {}> extends EntityGrid<RegionRow, P> {
-	static [Symbol.typeInfo]: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Demo.Northwind.">;
-	protected getColumnsKey(): string;
-	protected getDialogType(): any;
-	protected getRowDefinition(): typeof RegionRow;
-	protected getService(): string;
+    static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.Demo.Northwind.">;
+    protected getColumnsKey(): string;
+    protected getDialogType(): any;
+    protected getRowDefinition(): typeof RegionRow;
+    protected getService(): string;
 }
 export declare class CountryWithFlagFormatter implements Formatter {
-	static [Symbol.typeInfo]: import("@serenity-is/corelib").FormatterTypeInfo<"Serenity.Demo.Northwind.">;
-	format(ctx: FormatterContext): FormatterResult;
+    static [Symbol.typeInfo]: FormatterTypeInfo<"Serenity.Demo.Northwind.">;
+    format(ctx: FormatterContext): FormatterResult;
 }
 export declare const iso2CodesByCountryName: Record<string, string>;
 export declare const validIso2CountryCodes: Set<string>;
 export declare function getCountryFlagEmoji(codeOrName: string): string;
 export declare class ShipperDialog<P = {}> extends EntityDialog<ShipperRow, P> {
-	static [Symbol.typeInfo]: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Demo.Northwind.">;
-	protected getFormKey(): string;
-	protected getRowDefinition(): typeof ShipperRow;
-	protected getService(): string;
-	protected form: ShipperForm;
+    static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.Demo.Northwind.">;
+    protected getFormKey(): string;
+    protected getRowDefinition(): typeof ShipperRow;
+    protected getService(): string;
+    protected form: ShipperForm;
 }
 export declare class ShipperFormatter implements Formatter {
-	static [Symbol.typeInfo]: import("@serenity-is/corelib").FormatterTypeInfo<"Serenity.Demo.Northwind.">;
-	format(ctx: FormatterContext): FormatterResult;
+    static [Symbol.typeInfo]: FormatterTypeInfo<"Serenity.Demo.Northwind.">;
+    format(ctx: FormatterContext): FormatterResult;
 }
 export declare class ShipperGrid<P = {}> extends EntityGrid<ShipperRow, P> {
-	static [Symbol.typeInfo]: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Demo.Northwind.">;
-	protected getColumnsKey(): string;
-	protected getDialogType(): any;
-	protected getRowDefinition(): typeof ShipperRow;
-	protected getService(): string;
+    static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.Demo.Northwind.">;
+    protected getColumnsKey(): string;
+    protected getDialogType(): any;
+    protected getRowDefinition(): typeof ShipperRow;
+    protected getService(): string;
 }
 export declare class SupplierDialog<P = {}> extends EntityDialog<SupplierRow, P> {
-	static [Symbol.typeInfo]: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Demo.Northwind.">;
-	protected getFormKey(): string;
-	protected getRowDefinition(): typeof SupplierRow;
-	protected getService(): string;
-	protected form: SupplierForm;
+    static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.Demo.Northwind.">;
+    protected getFormKey(): string;
+    protected getRowDefinition(): typeof SupplierRow;
+    protected getService(): string;
+    protected form: SupplierForm;
 }
 export declare class SupplierGrid<P = {}> extends EntityGrid<SupplierRow, P> {
-	static [Symbol.typeInfo]: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Demo.Northwind.">;
-	protected getColumnsKey(): string;
-	protected getDialogType(): any;
-	protected getRowDefinition(): typeof SupplierRow;
-	protected getService(): string;
+    static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.Demo.Northwind.">;
+    protected getColumnsKey(): string;
+    protected getDialogType(): any;
+    protected getRowDefinition(): typeof SupplierRow;
+    protected getService(): string;
 }
 export declare class TerritoryDialog<P = {}> extends EntityDialog<TerritoryRow, P> {
-	static [Symbol.typeInfo]: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Demo.Northwind.">;
-	protected getFormKey(): string;
-	protected getRowDefinition(): typeof TerritoryRow;
-	protected getService(): string;
-	protected form: TerritoryForm;
+    static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.Demo.Northwind.">;
+    protected getFormKey(): string;
+    protected getRowDefinition(): typeof TerritoryRow;
+    protected getService(): string;
+    protected form: TerritoryForm;
 }
 export declare class TerritoryGrid<P = {}> extends EntityGrid<TerritoryRow, P> {
-	static [Symbol.typeInfo]: import("@serenity-is/corelib").ClassTypeInfo<"Serenity.Demo.Northwind.">;
-	protected getColumnsKey(): string;
-	protected getDialogType(): any;
-	protected getRowDefinition(): typeof TerritoryRow;
-	protected getService(): string;
+    static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.Demo.Northwind.">;
+    protected getColumnsKey(): string;
+    protected getDialogType(): any;
+    protected getRowDefinition(): typeof TerritoryRow;
+    protected getService(): string;
 }
 
 export {};

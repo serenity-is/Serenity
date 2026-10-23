@@ -1,0 +1,53 @@
+{
+  "name": "@serenity-is/dtsbundler",
+  "version": "0.1.0",
+  "description": "Bundle TypeScript declaration files into a single .d.ts using the TypeScript 7 native API",
+  "type": "module",
+  "types": "dist/index.d.ts",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "bin": {
+    "dtsbundler": "./dist/cli.js"
+  },
+  "sideEffects": false,
+  "dependencies": {
+    "typescript": "catalog:serenity"
+  },
+  "devDependencies": {
+    "@types/node": "^26.0.0"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "main": "./dist/index.js",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist/**/*.d.ts",
+    "dist/**/*.js",
+    "dist/**/*.map",
+    "LICENSE.md",
+    "NOTICE.md"
+  ],
+  "scripts": {
+    "build": "node build/build",
+    "dts": "node --run build && node dist/cli.js",
+    "prepublishOnly": "node --run test -- --coverage && node --run dts",
+    "test": "node --run build && vitest run",
+    "tsc": "tsc"
+  },
+  "keywords": [
+    "typescript",
+    "declaration",
+    "d.ts",
+    "bundle",
+    "dts",
+    "serenity"
+  ],
+  "author": "Serenity (https://serenity.is)",
+  "repository": "https://github.com/serenity-is/serenity/packages/dtsbundler",
+  "license": "MIT",
+  "bugs": "https://github.com/serenity-is/serenity/issues",
+  "homepage": "https://github.com/serenity-is/serenity/#readme"
+}

@@ -19,7 +19,6 @@ catalogs:
     "@vitest/coverage-v8": "5.0.5"
     "chart.js": "4.5.1"
     "dompurify": "3.4.17"
-    "dts-bundle-generator": "9.5.1"
     "esbuild": "0.28.2"
     "es-module-lexer": "3.0.4"
     "flatpickr": "4.6.13"
@@ -28,12 +27,11 @@ catalogs:
     "moment": "2.31.0"
     "preact": "11.0.1"
     "tinyglobby": "0.2.17"
-    "typescript": "7.0.2"
+    "typescript": "7.1.0-beta"
     "vite": "8.3.4"
     "vitest": "5.0.5"
 
 overrides:
-  dts-bundle-generator>typescript: 6.0.3
   dompurify@<3.4.13: ^3.4.16
   undici@<7.29.0: ^7.29.0
   nanoid@<3.3.18: ^3.3.18

@@ -435,9 +435,7 @@ interface EventHandlersElement<T> {
     onCompositionEnd?: EventHandlerUnion<T, CompositionEvent> | undefined;
     onCompositionStart?: EventHandlerUnion<T, CompositionEvent> | undefined;
     onCompositionUpdate?: EventHandlerUnion<T, CompositionEvent> | undefined;
-    onContentVisibilityAutoStateChange?:
-    | EventHandlerUnion<T, ContentVisibilityAutoStateChangeEvent>
-    | undefined;
+    onContentVisibilityAutoStateChange?: EventHandlerUnion<T, ContentVisibilityAutoStateChangeEvent> | undefined;
     onContextLost?: EventHandlerUnion<T, Event> | undefined;
     onContextMenu?: EventHandlerUnion<T, PointerEvent> | undefined;
     onContextRestored?: EventHandlerUnion<T, Event> | undefined;

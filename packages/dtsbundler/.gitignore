@@ -1,0 +1,15 @@
+.vs/
+obj/
+bin/
+/artifacts
+/coverage
+# dist/*.d.ts is committed (it is the published type entry point), the bundles are not
+/dist/**/*.js
+/dist/**/*.map
+node_modules/
+*.bak
+*.orig
+*.log
+*.tgz
+
+*.tsbuildinfo

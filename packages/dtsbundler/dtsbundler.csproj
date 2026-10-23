@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>NuGet version of @serenity-is/dtsbundler NPM package</Description>
+  </PropertyGroup>
+</Project>

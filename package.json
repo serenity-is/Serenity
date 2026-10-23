@@ -3,8 +3,8 @@
   "devDependencies": {
     "@preact/signals-core": "catalog:serenity",
     "@serenity-is/domwise": "workspace:*",
+    "@serenity-is/dtsbundler": "workspace:*",
     "@vitest/coverage-v8": "catalog:serenity",
-    "dts-bundle-generator": "catalog:serenity",
     "esbuild": "catalog:serenity",
     "jsdom": "catalog:serenity",
     "typescript": "catalog:serenity",

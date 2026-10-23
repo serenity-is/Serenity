@@ -35,6 +35,7 @@
     <Project Path="packages/assets/Serenity.Assets.csproj" />
     <Project Path="packages/corelib/Serenity.Corelib.csproj" />
     <Project Path="packages/domwise/Serenity.DomWise.csproj" />
+    <Project Path="packages/dtsbundler/dtsbundler.csproj" />
     <Project Path="packages/sleekgrid/Serenity.SleekGrid.csproj" />
     <Project Path="packages/test-utils/test-utils.csproj" />
     <Project Path="packages/tsbuild/tsbuild.csproj" />

@@ -1,0 +1,19 @@
+﻿{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "declaration": false,
+    "isolatedDeclarations": false,
+    "rootDir": "..",
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "types": [
+      "node"
+    ]
+  },
+  "include": [
+    "."
+  ],
+  "exclude": [
+    "fixtures"
+  ]
+}
