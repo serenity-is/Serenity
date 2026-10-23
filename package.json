@@ -12,7 +12,8 @@
     "vitest": "catalog:serenity"
   },
   "scripts": {
-    "all": "pnpm i && pnpm -r build && pnpm -r tsc && pnpm -r test"
+    "all": "pnpm i && pnpm -r build && pnpm -r tsc && pnpm -r test",
+    "cleanup": "node build/cleanup.mjs"
   },
   "private": true,
   "license": "MIT",
