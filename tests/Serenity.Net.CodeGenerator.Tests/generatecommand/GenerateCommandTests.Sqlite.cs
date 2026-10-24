@@ -73,7 +73,7 @@ public partial class GenerateCommandTests
         var dialogPath = projectDir + "/Modules/MyTable/MyTableDialog.tsx";
         Assert.True(fileSystem.FileExists(rowPath));
         var dialog = fileSystem.ReadAllText(dialogPath);
-        Assert.Contains("from '../ServerTypes/'", dialog, StringComparison.Ordinal);
+        Assert.Contains("from \"../ServerTypes/\"", dialog, StringComparison.Ordinal);
     }
 
     [Theory]

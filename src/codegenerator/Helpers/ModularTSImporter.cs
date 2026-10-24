@@ -64,7 +64,7 @@ public class ModularTSImporter(string? currentModule)
         return string.Join(Environment.NewLine, moduleImports
             .OrderBy(x => FromOrderKey(x.From), StringComparer.OrdinalIgnoreCase)
             .GroupBy(x => x.From, StringComparer.Ordinal)
-            .Select(x => "import { " + string.Join(", ", x.Select(y => y.Name)) + " } from '" + x.Key + "';")) + Environment.NewLine + Environment.NewLine;
+            .Select(x => "import { " + string.Join(", ", x.Select(y => y.Name)) + " } from " + x.Key.ToDoubleQuoted() + ";")) + Environment.NewLine + Environment.NewLine;
     }
 
     private static string? FromOrderKey(string? from)

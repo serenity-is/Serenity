@@ -84,8 +84,8 @@ public partial class EntityCodeGeneratorTests
             }
             """,
         ["Modules/TestModule/Customer/CustomerDialog.tsx"] = /*lang=typescript*/ """
-            import { EntityDialog } from '@serenity-is/corelib';
-            import { CustomerForm, CustomerRow, CustomerService } from '../../ServerTypes/TestModule';
+            import { EntityDialog } from "@serenity-is/corelib";
+            import { CustomerForm, CustomerRow, CustomerService } from "../../ServerTypes/TestModule";
             
             export class CustomerDialog extends EntityDialog<CustomerRow, any> {
                 static override [Symbol.typeInfo] = this.registerClass("TestNamespace.TestModule.");
@@ -98,9 +98,9 @@ public partial class EntityCodeGeneratorTests
             }
             """,
         ["Modules/TestModule/Customer/CustomerGrid.tsx"] = /*lang=typescript*/ """
-            import { EntityGrid } from '@serenity-is/corelib';
-            import { CustomerColumns, CustomerRow, CustomerService } from '../../ServerTypes/TestModule';
-            import { CustomerDialog } from './CustomerDialog';
+            import { EntityGrid } from "@serenity-is/corelib";
+            import { CustomerColumns, CustomerRow, CustomerService } from "../../ServerTypes/TestModule";
+            import { CustomerDialog } from "./CustomerDialog";
             
             export class CustomerGrid extends EntityGrid<CustomerRow> {
                 static override [Symbol.typeInfo] = this.registerClass("TestNamespace.TestModule.");
@@ -112,8 +112,8 @@ public partial class EntityCodeGeneratorTests
             }
             """,
         ["Modules/TestModule/Customer/CustomerPage.tsx"] = /*lang=typescript*/ """
-            import { gridPageInit } from '@serenity-is/corelib';
-            import { CustomerGrid } from './CustomerGrid';
+            import { gridPageInit } from "@serenity-is/corelib";
+            import { CustomerGrid } from "./CustomerGrid";
             
             export default () => gridPageInit(CustomerGrid);
             """,
@@ -235,7 +235,7 @@ public partial class EntityCodeGeneratorTests
             export * from "./TestModule/CustomerColumns"
             """,
         ["Modules/ServerTypes/TestModule/CustomerRow.ts"] = """
-            import { fieldsProxy } from '@serenity-is/corelib';
+            import { fieldsProxy } from "@serenity-is/corelib";
             
             export interface CustomerRow {
                 CustomerId?: number;
@@ -258,9 +258,9 @@ public partial class EntityCodeGeneratorTests
             }
             """,
         ["Modules/ServerTypes/TestModule/CustomerColumns.ts"] = /*lang=typescript*/ """
-            import { ColumnsBase, fieldsProxy } from '@serenity-is/corelib';
-            import { Column } from '@serenity-is/sleekgrid';
-            import { CustomerRow } from './CustomerRow';
+            import { ColumnsBase, fieldsProxy } from "@serenity-is/corelib";
+            import { Column } from "@serenity-is/sleekgrid";
+            import { CustomerRow } from "./CustomerRow";
             
             export interface CustomerColumns {
                 CustomerId: Column<CustomerRow>;
@@ -274,7 +274,7 @@ public partial class EntityCodeGeneratorTests
             }
             """,
         ["Modules/ServerTypes/TestModule/CustomerForm.ts"] = /*lang=typescript*/ """
-            import { PrefixedContext, initFormType, StringEditor, IntegerEditor } from '@serenity-is/corelib';
+            import { PrefixedContext, initFormType, StringEditor, IntegerEditor } from "@serenity-is/corelib";
             
             export interface CustomerForm {
                 CustomerName: StringEditor;
@@ -300,8 +300,8 @@ public partial class EntityCodeGeneratorTests
             }
             """,
         ["Modules/ServerTypes/TestModule/CustomerService.ts"] = /*lang=typescript*/ """
-            import { SaveRequest, SaveResponse, ServiceOptions, DeleteRequest, DeleteResponse, RetrieveRequest, RetrieveResponse, ListRequest, ListResponse, serviceRequest } from '@serenity-is/corelib';
-            import { CustomerRow } from './CustomerRow';
+            import { SaveRequest, SaveResponse, ServiceOptions, DeleteRequest, DeleteResponse, RetrieveRequest, RetrieveResponse, ListRequest, ListResponse, serviceRequest } from "@serenity-is/corelib";
+            import { CustomerRow } from "./CustomerRow";
             
             export namespace CustomerService {
                 export const baseUrl = 'TestModule/Customer';

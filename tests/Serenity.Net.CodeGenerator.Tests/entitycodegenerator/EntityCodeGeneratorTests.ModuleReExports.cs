@@ -30,7 +30,7 @@ public partial class EntityCodeGeneratorTests
 
         Assert.Contains(writer.Files, x => x.EndsWith("/Modules/Some/Module/Customer/CustomerDialog.tsx"));
         var dialog = fileSystem.ReadAllText("/app/Modules/Some/Module/Customer/CustomerDialog.tsx");
-        Assert.Contains("from '../../../ServerTypes/Some/Module'", dialog, StringComparison.Ordinal);
+        Assert.Contains("from \"../../../ServerTypes/Some/Module\"", dialog, StringComparison.Ordinal);
         Assert.Contains(writer.Files, x => x.EndsWith("/Modules/ServerTypes/Some/Module/CustomerRow.ts"));
 
         var moduleIndex = fileSystem.ReadAllText("/app/Modules/ServerTypes/Some/Module.ts");
