@@ -9,6 +9,52 @@ public partial class ArgumentReaderTests
     }
 
     [Fact]
+    public void GetOptionalString_ReturnsNull_IfArgument_IsOmitted()
+    {
+        var reader = new ArgumentReader(["--other"]);
+        Assert.Null(reader.GetOptionalString(["overwrite", "ovr"]));
+        Assert.Equal(1, reader.Remaining);
+    }
+
+    [Theory]
+    [InlineData("--overwrite")]
+    [InlineData("--overwrite=")]
+    [InlineData("/overwrite")]
+    public void GetOptionalString_ReturnsEmptyString_ForBareSwitch(string argument)
+    {
+        var reader = new ArgumentReader([argument]);
+        Assert.Equal("", reader.GetOptionalString(["overwrite", "ovr"]));
+        Assert.Equal(0, reader.Remaining);
+    }
+
+    [Theory]
+    [InlineData("--overwrite:yes")]
+    [InlineData("--overwrite=yes")]
+    [InlineData("-ovr:yes")]
+    public void GetOptionalString_ReturnsValue_WhenAssigned(string argument)
+    {
+        var reader = new ArgumentReader([argument]);
+        Assert.Equal("yes", reader.GetOptionalString(["overwrite", "ovr"]));
+        Assert.Equal(0, reader.Remaining);
+    }
+
+    [Fact]
+    public void GetOptionalString_ConsumesFollowingNonSwitch_AsValue()
+    {
+        var reader = new ArgumentReader(["--overwrite", "force", "--other"]);
+        Assert.Equal("force", reader.GetOptionalString(["overwrite", "ovr"]));
+        Assert.Equal(1, reader.Remaining);
+    }
+
+    [Fact]
+    public void GetOptionalString_DoesNotConsumeFollowingSwitch_AsValue()
+    {
+        var reader = new ArgumentReader(["--overwrite", "--other"]);
+        Assert.Equal("", reader.GetOptionalString(["overwrite", "ovr"]));
+        Assert.Equal(1, reader.Remaining);
+    }
+
+    [Fact]
     public void GetString_ThrowsArgumentNullException_IfNames_IsNullOrEmpty()
     {
         Assert.Throws<ArgumentNullException>(() =>

@@ -6,6 +6,9 @@ public partial class GenerateCommand
 {
     private List<string> SelectWhatToGenerate()
     {
+        if (NonInteractive)
+            return ["Row", "Services", "User Interface", "Custom"];
+
         var whatToGenerate = new List<string>
         {
             "Row",
@@ -31,6 +34,9 @@ public partial class GenerateCommand
 
     private string SelectPermissionKey(string table, string defaultPermissionKey)
     {
+        if (NonInteractive)
+            return defaultPermissionKey;
+
         return Console.Prompt(
             new TextPrompt<string>($"Enter a Permission Key for table [springgreen3_1]{table}[/]")
                 .DefaultValue(defaultPermissionKey)
@@ -48,6 +54,9 @@ public partial class GenerateCommand
 
     private string SelectIdentifier(string table, string defaultIdentifier)
     {
+        if (NonInteractive)
+            return defaultIdentifier;
+
         Console.WriteLine();
         return Console.Prompt(
             new TextPrompt<string>($"Enter a class Identifier for table [springgreen3_1]{table}[/]")
@@ -66,6 +75,9 @@ public partial class GenerateCommand
 
     private string SelectModule(string table, string defaultModule)
     {
+        if (NonInteractive)
+            return defaultModule;
+
         Console.WriteLine();
         return Console.Prompt(
             new TextPrompt<string>($"Enter a Module name for table [springgreen3_1]{table}[/]")
@@ -83,6 +95,9 @@ public partial class GenerateCommand
 
     private List<string> SelectTables(IEnumerable<string> tables)
     {
+        if (NonInteractive)
+            return [];
+
         return Console.Prompt(
             new MultiSelectionPrompt<string>()
                 .Title("[steelblue1]Select tables for code generation (single/multiple)[/]")
@@ -94,9 +109,14 @@ public partial class GenerateCommand
                 .AddChoices(tables));
     }
 
-    private string SelectConnection(ConnectionStringOptions options)
+    private string? SelectConnection(ConnectionStringOptions options)
     {
         var connectionKeys = options.Keys.OrderBy(x => x).ToArray();
+
+        // in non-interactive mode "the only connection" is an answer, but "several"
+        // is not, so the caller reports the missing switch instead of asking
+        if (NonInteractive)
+            return connectionKeys.Length == 1 ? connectionKeys[0] : null;
 
         RegisterSqlProviders();
         Console.WriteLine();

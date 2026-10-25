@@ -15,12 +15,6 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console, IProcessExec
     {
         ArgumentNullException.ThrowIfNull(arguments);
 
-        if (arguments.HasHelpSwitch())
-        {
-            WriteHelp(Console);
-            return ExitCodes.Help;
-        }
-
         var projectFile = arguments.GetString(["p", "project"]);
         var globalUsings = arguments.GetString(["globalusings", "global-usings"], requiresValue: false);
         var projectRefs = arguments.GetStrings(["projectrefs", "project-refs"], requiresValue: false);
@@ -28,6 +22,13 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console, IProcessExec
             separators: [',', ';'], requiresValue: false);
 
         var command = arguments.GetCommand();
+
+        if (arguments.HasHelpSwitch())
+        {
+            WriteHelp(Console, command);
+            return ExitCodes.Help;
+        }
+
         if (string.IsNullOrEmpty(command))
         {
             WriteHelp(Console);
@@ -171,9 +172,13 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console, IProcessExec
         return current is null || current == ExitCodes.Success ? result : current.Value;
     }
 
-    public static void WriteHelp(IGeneratorConsole console)
+    public static void WriteHelp(IGeneratorConsole console, string? command = null)
     {
-        console.ShowHelp(Texts.Help);
+        console.ShowHelp(command != null &&
+            (string.Equals(command, CommandKeys.Generate, StringComparison.OrdinalIgnoreCase) ||
+             string.Equals(command, CommandAliases.Generate, StringComparison.OrdinalIgnoreCase))
+                ? Texts.GenerateHelp
+                : Texts.Help);
     }
 
     public static class CommandKeys

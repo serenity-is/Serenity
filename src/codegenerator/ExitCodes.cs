@@ -16,5 +16,6 @@ public enum ExitCodes
     InvalidConnectionKey = 9,
     NoTablesSelected = 10,
     InvalidTable = 11,
-    CantDetermineOutputAssemblies = 12
+    CantDetermineOutputAssemblies = 12,
+    OverwriteRefused = 13
 }

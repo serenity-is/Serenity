@@ -117,6 +117,45 @@ public partial class GenerateCommand
         }
     }
 
+    /// <summary>
+    /// Parses the value of "--overwrite": yes/no/force, with the usual aliases.
+    /// </summary>
+    private static bool TryParseOverwriteMode(string value, out OverwriteMode mode)
+    {
+        switch ((value ?? "").Trim().ToLowerInvariant())
+        {
+            // "--overwrite" on its own means "yes": replace, keeping a backup
+            case "":
+            case "y":
+            case "yes":
+            case "true":
+            case "backup":
+                mode = OverwriteMode.Backup;
+                return true;
+
+            case "n":
+            case "no":
+            case "false":
+                mode = OverwriteMode.Fail;
+                return true;
+
+            case "s":
+            case "skip":
+                mode = OverwriteMode.Skip;
+                return true;
+
+            case "f":
+            case "force":
+            case "overwrite":
+                mode = OverwriteMode.Force;
+                return true;
+
+            default:
+                mode = OverwriteMode.Ask;
+                return false;
+        }
+    }
+
     private void Error(string error)
     {
         Console.Error(error);

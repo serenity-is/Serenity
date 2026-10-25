@@ -377,4 +377,226 @@ public partial class GenerateCommandTests
 
         Assert.Equal(ExitCodes.Success, result);
     }
+private static string[] NonInteractiveArgs(string table = "MyTable", string? extra = null)
+    {
+        var args = new List<string>
+        {
+            "--cnk", DefaultConnectionAttribute.Key,
+            "--tbl", table,
+            "--mod", "Some.Module",
+            "--cls", table,
+            "--pms", "Test:Permission",
+            "--wtg", "*",
+            "--no-interactive"
+        };
+        if (extra != null)
+            args.Add(extra);
+        return [.. args];
+    }
+
+    [Fact]
+    public void Generate_NonInteractive_Does_Not_Prompt()
+    {
+        using var db = new MemorySqliteDb("MyTable");
+
+        var fileSystem = new MockFileSystem();
+        AddConfig(fileSystem, SqliteConfig(db.ConnectionString, saveGeneratedTables: false));
+        var console = new MockGeneratorConsole();
+        var command = CreateCommand(fileSystem, console, NonInteractiveArgs());
+
+        var result = command.Run();
+
+        Assert.Equal(ExitCodes.Success, result);
+        Assert.DoesNotContain(console.WriteCalls, x => x.type == MockGeneratorConsole.CallType.Prompt);
+        Assert.Empty(console.PromptResults);
+        Assert.Contains(fileSystem.GetFiles(projectDir, "*.cs", recursive: true),
+            x => x.EndsWith("MyTableRow.cs", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public void Generate_NonInteractive_DefaultsWhatToGenerate_WhenNotSpecified()
+    {
+        using var db = new MemorySqliteDb("MyTable");
+
+        var fileSystem = new MockFileSystem();
+        AddConfig(fileSystem, SqliteConfig(db.ConnectionString, saveGeneratedTables: false));
+        var console = new MockGeneratorConsole();
+        var args = NonInteractiveArgs().Where(x => x != "--wtg" && x != "*").ToArray();
+        var command = CreateCommand(fileSystem, console, args);
+
+        var result = command.Run();
+
+        Assert.Equal(ExitCodes.Success, result);
+        Assert.DoesNotContain(console.WriteCalls, x => x.type == MockGeneratorConsole.CallType.Prompt);
+
+        // the interactive default is everything
+        var generated = fileSystem.GetFiles(projectDir, "*.cs", recursive: true);
+        Assert.Contains(generated, x => x.EndsWith("MyTableRow.cs", StringComparison.OrdinalIgnoreCase));
+        Assert.Contains(generated, x => x.EndsWith("MyTableColumns.cs", StringComparison.OrdinalIgnoreCase));
+        Assert.Contains(generated, x => x.EndsWith("MyTableEndpoint.cs", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public void Generate_NonInteractive_WithoutTable_Fails_Instead_Of_Asking()
+    {
+        using var db = new MemorySqliteDb("MyTable");
+
+        var fileSystem = new MockFileSystem();
+        AddConfig(fileSystem, SqliteConfig(db.ConnectionString, saveGeneratedTables: false));
+        var console = new MockGeneratorConsole();
+        var command = CreateCommand(fileSystem, console,
+            ["--cnk", DefaultConnectionAttribute.Key, "--no-interactive"]);
+
+        var result = command.Run();
+
+        Assert.Equal(ExitCodes.NoTablesSelected, result);
+        Assert.DoesNotContain(console.WriteCalls, x => x.type == MockGeneratorConsole.CallType.Prompt);
+        Assert.Contains(console.WriteCalls, x =>
+            x.type == MockGeneratorConsole.CallType.Error &&
+            x.message.Contains("--table", StringComparison.Ordinal));
+    }
+
+private static string EditGeneratedFile(MockFileSystem fileSystem)
+    {
+        var rowFile = fileSystem.GetFiles(projectDir, "*.cs", recursive: true)
+            .First(x => x.EndsWith("MyTableRow.cs", StringComparison.OrdinalIgnoreCase));
+        fileSystem.WriteAllText(rowFile, fileSystem.ReadAllText(rowFile) + "// edited by hand");
+        return rowFile;
+    }
+
+    [Fact]
+    public void Generate_NonInteractive_WithoutOverwrite_Fails_When_File_Would_Change()
+    {
+        using var db = new MemorySqliteDb("MyTable");
+
+        var fileSystem = new MockFileSystem();
+        AddConfig(fileSystem, SqliteConfig(db.ConnectionString, saveGeneratedTables: false));
+        var console = new MockGeneratorConsole();
+
+        Assert.Equal(ExitCodes.Success, CreateCommand(fileSystem, console, NonInteractiveArgs()).Run());
+
+        var rowFile = EditGeneratedFile(fileSystem);
+        console.WriteCalls.Clear();
+
+        // nobody can be asked, and --overwrite was not specified: refuse, and
+        // say which switch would have allowed it
+        Assert.Equal(ExitCodes.OverwriteRefused,
+            CreateCommand(fileSystem, console, NonInteractiveArgs()).Run());
+
+        Assert.DoesNotContain(console.WriteCalls, x => x.type == MockGeneratorConsole.CallType.Prompt);
+        Assert.Contains(console.WriteCalls, x =>
+            x.type == MockGeneratorConsole.CallType.Error &&
+            x.message.Contains("--overwrite", StringComparison.Ordinal));
+        Assert.Empty(fileSystem.GetFiles(projectDir, "*.bak", recursive: true));
+        Assert.Contains("// edited by hand", fileSystem.ReadAllText(rowFile), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Generate_NonInteractive_WithForce_Replaces_Without_Backup()
+    {
+        using var db = new MemorySqliteDb("MyTable");
+
+        var fileSystem = new MockFileSystem();
+        AddConfig(fileSystem, SqliteConfig(db.ConnectionString, saveGeneratedTables: false));
+        var console = new MockGeneratorConsole();
+
+        var args = NonInteractiveArgs().Append("--overwrite:force").ToArray();
+        Assert.Equal(ExitCodes.Success, CreateCommand(fileSystem, console, args).Run());
+
+        var rowFile = EditGeneratedFile(fileSystem);
+
+        Assert.Equal(ExitCodes.Success, CreateCommand(fileSystem, console, args).Run());
+
+        Assert.DoesNotContain(console.WriteCalls, x => x.type == MockGeneratorConsole.CallType.Prompt);
+        Assert.DoesNotContain("// edited by hand", fileSystem.ReadAllText(rowFile), StringComparison.Ordinal);
+        Assert.Empty(fileSystem.GetFiles(projectDir, "*.bak", recursive: true));
+    }
+
+    [Fact]
+    public void Generate_NonInteractive_WithBareOverwrite_Behaves_Like_Yes()
+    {
+        using var db = new MemorySqliteDb("MyTable");
+
+        var fileSystem = new MockFileSystem();
+        AddConfig(fileSystem, SqliteConfig(db.ConnectionString, saveGeneratedTables: false));
+        var console = new MockGeneratorConsole();
+
+        var args = NonInteractiveArgs().Append("--overwrite").ToArray();
+        Assert.Equal(ExitCodes.Success, CreateCommand(fileSystem, console, args).Run());
+
+        var rowFile = EditGeneratedFile(fileSystem);
+
+        Assert.Equal(ExitCodes.Success, CreateCommand(fileSystem, console, args).Run());
+
+        // "yes": replaced, with the hand edit kept in a backup
+        Assert.DoesNotContain("// edited by hand", fileSystem.ReadAllText(rowFile), StringComparison.Ordinal);
+        Assert.Contains(fileSystem.GetFiles(projectDir, "*.bak", recursive: true),
+            x => fileSystem.ReadAllText(x).Contains("// edited by hand", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void Generate_NonInteractive_WithSkip_Keeps_Existing_Files_And_Succeeds()
+    {
+        using var db = new MemorySqliteDb("MyTable");
+
+        var fileSystem = new MockFileSystem();
+        AddConfig(fileSystem, SqliteConfig(db.ConnectionString, saveGeneratedTables: false));
+        var console = new MockGeneratorConsole();
+
+        var args = NonInteractiveArgs().Append("--overwrite:skip").ToArray();
+        Assert.Equal(ExitCodes.Success, CreateCommand(fileSystem, console, args).Run());
+
+        var rowFile = EditGeneratedFile(fileSystem);
+
+        // skipping is not an error: CI can run it over a partially hand-edited module
+        Assert.Equal(ExitCodes.Success, CreateCommand(fileSystem, console, args).Run());
+
+        Assert.DoesNotContain(console.WriteCalls, x => x.type == MockGeneratorConsole.CallType.Prompt);
+        Assert.Contains("// edited by hand", fileSystem.ReadAllText(rowFile), StringComparison.Ordinal);
+        Assert.Empty(fileSystem.GetFiles(projectDir, "*.bak", recursive: true));
+    }
+
+    [Fact]
+    public void Generate_Rejects_Invalid_Overwrite_Value()
+    {
+        using var db = new MemorySqliteDb("MyTable");
+
+        var fileSystem = new MockFileSystem();
+        AddConfig(fileSystem, SqliteConfig(db.ConnectionString, saveGeneratedTables: false));
+        var console = new MockGeneratorConsole();
+        var command = CreateCommand(fileSystem, console,
+            NonInteractiveArgs().Append("--overwrite:maybe").ToArray());
+
+        Assert.Equal(ExitCodes.InvalidArguments, command.Run());
+        Assert.Contains(console.WriteCalls, x =>
+            x.type == MockGeneratorConsole.CallType.Error &&
+            x.message.Contains("--overwrite", StringComparison.Ordinal) &&
+            x.message.Contains("maybe", StringComparison.Ordinal) &&
+            x.message.Contains("skip", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void Generate_NonInteractive_WithOverwrite_BacksUp_Instead_Of_Asking()
+    {
+        using var db = new MemorySqliteDb("MyTable");
+
+        var fileSystem = new MockFileSystem();
+        AddConfig(fileSystem, SqliteConfig(db.ConnectionString, saveGeneratedTables: false));
+        var console = new MockGeneratorConsole();
+
+        var args = NonInteractiveArgs().Append("--overwrite:yes").ToArray();
+        Assert.Equal(ExitCodes.Success, CreateCommand(fileSystem, console, args).Run());
+
+        var rowFile = EditGeneratedFile(fileSystem);
+
+        Assert.Equal(ExitCodes.Success, CreateCommand(fileSystem, console, args).Run());
+
+        // nobody was asked, and the hand edit was kept in a backup next to the file
+        Assert.DoesNotContain(console.WriteCalls, x => x.type == MockGeneratorConsole.CallType.Prompt);
+        var backups = fileSystem.GetFiles(projectDir, "*.bak", recursive: true);
+        Assert.Contains(backups, x => x.Contains("MyTableRow.cs", StringComparison.OrdinalIgnoreCase) &&
+            fileSystem.ReadAllText(x).Contains("// edited by hand", StringComparison.Ordinal));
+        Assert.DoesNotContain("// edited by hand", fileSystem.ReadAllText(rowFile), StringComparison.Ordinal);
+    }
 }
+

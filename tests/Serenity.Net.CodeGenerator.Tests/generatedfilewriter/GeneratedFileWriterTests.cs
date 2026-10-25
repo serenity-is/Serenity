@@ -82,7 +82,7 @@ public class GeneratedFileWriterTests
         var console = new MockGeneratorConsole();
         var writer = new GeneratedFileWriter(fileSystem, console)
         {
-            Interactive = false
+            Overwrite = OverwriteMode.Backup
         };
 
         writer.WriteAllText("/root/a.txt", "new");
@@ -92,6 +92,84 @@ public class GeneratedFileWriterTests
         Assert.Single(backups);
         Assert.Equal("old", fileSystem.ReadAllText(backups[0]));
         Assert.Empty(console.WriteCalls);
+    }
+
+    [Fact]
+    public void WriteAllText_Throws_WhenNotInteractiveAndOverwriteNotAllowed()
+    {
+        var fileSystem = new MockFileSystem();
+        AddFile(fileSystem, "/root/a.txt", "old");
+        var console = new MockGeneratorConsole();
+        var writer = new GeneratedFileWriter(fileSystem, console)
+        {
+            Overwrite = OverwriteMode.Fail
+        };
+
+        var ex = Assert.Throws<GeneratedFileExistsException>(() =>
+            writer.WriteAllText("/root/a.txt", "new"));
+
+        Assert.Equal("/root/a.txt", ex.FileName);
+        Assert.Contains("--overwrite", ex.Message, StringComparison.Ordinal);
+        Assert.Equal("old", fileSystem.ReadAllText("/root/a.txt"));
+        Assert.Empty(fileSystem.GetFiles("/root", "*.bak"));
+        Assert.Empty(console.WriteCalls);
+    }
+
+    [Fact]
+    public void WriteAllText_LeavesExistingFile_WhenSkipIsSelected()
+    {
+        var fileSystem = new MockFileSystem();
+        AddFile(fileSystem, "/root/a.txt", "old");
+        AddFile(fileSystem, "/root/b.txt", "old-b");
+        var console = new MockGeneratorConsole();
+        var writer = new GeneratedFileWriter(fileSystem, console)
+        {
+            Overwrite = OverwriteMode.Skip
+        };
+
+        // no exception, unlike Fail: the run continues with the remaining files
+        writer.WriteAllText("/root/a.txt", "new");
+        writer.WriteAllText("/root/b.txt", "new-b");
+        writer.WriteAllText("/root/c.txt", "new-c");
+
+        Assert.Equal("old", fileSystem.ReadAllText("/root/a.txt"));
+        Assert.Equal("old-b", fileSystem.ReadAllText("/root/b.txt"));
+        Assert.Equal("new-c", fileSystem.ReadAllText("/root/c.txt"));
+        Assert.Empty(fileSystem.GetFiles("/root", "*.bak"));
+        Assert.Empty(console.WriteCalls);
+    }
+
+    [Fact]
+    public void WriteAllText_ReplacesWithoutBackup_WhenBackupIsOff()
+    {
+        var fileSystem = new MockFileSystem();
+        AddFile(fileSystem, "/root/a.txt", "old");
+        var writer = new GeneratedFileWriter(fileSystem, new MockGeneratorConsole())
+        {
+            Overwrite = OverwriteMode.Force
+        };
+
+        writer.WriteAllText("/root/a.txt", "new");
+
+        Assert.Equal("new", fileSystem.ReadAllText("/root/a.txt"));
+        Assert.Empty(fileSystem.GetFiles("/root", "*.bak"));
+    }
+
+    [Fact]
+    public void WriteAllText_DoesNothing_WhenNotInteractiveButContentIsIdentical()
+    {
+        var fileSystem = new MockFileSystem();
+        AddFile(fileSystem, "/root/a.txt", "same");
+        var writer = new GeneratedFileWriter(fileSystem, new MockGeneratorConsole())
+        {
+            Overwrite = OverwriteMode.Fail
+        };
+
+        // identical content is not a conflict, so it must not throw
+        writer.WriteAllText("/root/a.txt", "same");
+
+        Assert.Equal("same", fileSystem.ReadAllText("/root/a.txt"));
+        Assert.Empty(fileSystem.GetFiles("/root", "*.bak"));
     }
 
     [Fact]
@@ -188,7 +266,7 @@ public class GeneratedFileWriterTests
             var console = new MockGeneratorConsole();
             var writer = new GeneratedFileWriter(fileSystem, console)
             {
-                Interactive = false
+                Overwrite = OverwriteMode.Backup
             };
 
             var target = Path.Combine(tempDir, "sub", "a.ts");

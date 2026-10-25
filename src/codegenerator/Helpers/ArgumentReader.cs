@@ -112,6 +112,68 @@ public partial class ArgumentReader(IEnumerable<string> arguments) : IArgumentRe
     }
 
     /// <inheritdoc/>
+    public string? GetOptionalString(string[] names)
+    {
+        ArgumentNullException.ThrowIfNull(names);
+        if (names.Length == 0)
+            throw new ArgumentNullException(nameof(names));
+
+        string? result = null;
+        bool found = false;
+        for (int i = 0; i < arguments.Count; i++)
+        {
+            var name = ParseSwitch(arguments[i], out string? value);
+            if (name == null || !names.Contains(name, StringComparer.Ordinal))
+                continue;
+
+            arguments.RemoveAt(i--);
+
+            // "--overwrite value" is allowed as well as "--overwrite:value"
+            if (value is null && i + 1 < arguments.Count && !IsSwitch(arguments[i + 1]))
+            {
+                value = arguments[i + 1];
+                arguments.RemoveAt(i + 1);
+            }
+
+            // an omitted value leaves an empty string, which the caller reads as
+            // "the switch is present, use its default behaviour"
+            value ??= "";
+
+            if (found && value != result)
+                throw new ArgumentException($"The switch '{name}' can only be specified once!", name);
+
+            found = true;
+            result = value;
+        }
+
+        return result;
+    }
+
+    /// <inheritdoc/>
+    public bool HasSwitch(string[] names)
+    {
+        ArgumentNullException.ThrowIfNull(names);
+        if (names.Length == 0)
+            throw new ArgumentNullException(nameof(names));
+
+        bool found = false;
+        for (int i = 0; i < arguments.Count; i++)
+        {
+            var name = ParseSwitch(arguments[i], out string? value);
+            if (name == null || !names.Contains(name, StringComparer.Ordinal))
+                continue;
+
+            if (value != null)
+                throw new ArgumentException($"The switch '{name}' does not take a value!", name);
+
+            arguments.RemoveAt(i--);
+            found = true;
+        }
+
+        return found;
+    }
+
+    /// <inheritdoc/>
     public bool HasHelpSwitch()
     {
         return arguments.Any(x => ParseSwitch(x, out _) is string s &&

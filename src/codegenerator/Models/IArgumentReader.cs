@@ -43,6 +43,24 @@ namespace Serenity.CodeGenerator
         string[] GetStrings(string[] names, bool requiresValue = true);
 
         /// <summary>
+        /// Gets the value of a switch that may be used without one, such as
+        /// "--overwrite" or "--overwrite:yes". The switch is removed if present.
+        /// </summary>
+        /// <param name="names">Allowed switch names</param>
+        /// <returns>null when the switch is omitted; an empty string when it is used
+        /// without a value; the value otherwise.</returns>
+        string? GetOptionalString(string[] names);
+
+        /// <summary>
+        /// Removes and returns true when any of the specified switches is present.
+        /// Switches of this kind take no value, e.g. "--no-interactive".
+        /// </summary>
+        /// <param name="names">Allowed switch names</param>
+        /// <returns>True if one of the switches was specified</returns>
+        /// <exception cref="ArgumentException">A switch is given a value</exception>
+        bool HasSwitch(string[] names);
+
+        /// <summary>
         /// Returns true if any of switches are -?, --help, or -h
         /// </summary>
         bool HasHelpSwitch();

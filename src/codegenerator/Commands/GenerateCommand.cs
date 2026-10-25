@@ -7,6 +7,20 @@ public partial class GenerateCommand(IProjectFileInfo project, IGeneratorConsole
 {
     public IArgumentReader Arguments { get; set; } = null!;
 
+    /// <summary>
+    /// Never prompts: missing values fall back to their defaults, and values
+    /// without a default (table, connection key when there are several) make
+    /// the command fail instead of asking. Existing files are backed up instead
+    /// of asking for confirmation.
+    /// </summary>
+    public bool NonInteractive { get; set; }
+
+    /// <summary>
+    /// What to do with existing files that would change: <see cref="OverwriteMode.Ask"/>
+    /// when the switch is omitted, otherwise the requested mode. Set from "--overwrite".
+    /// </summary>
+    public OverwriteMode? Overwrite { get; set; }
+
     public override ExitCodes Run()
     {
         ArgumentNullException.ThrowIfNull(Arguments);
@@ -30,6 +44,23 @@ public partial class GenerateCommand(IProjectFileInfo project, IGeneratorConsole
         var argsTable = Arguments.GetString(["tbl", "table"]);
         var argsWhat = Arguments.GetString(["wtg", "what", "whattogenerate"]);
 
+        NonInteractive = Arguments.HasSwitch(
+            ["nointeractive", "no-interactive", "noninteractive", "ni"]);
+
+        var argsOverwrite = Arguments.GetOptionalString(["ovr", "overwrite"]);
+        if (argsOverwrite != null)
+        {
+            if (!TryParseOverwriteMode(argsOverwrite, out var overwriteMode))
+            {
+                Error($"Invalid --overwrite value: {argsOverwrite}. " +
+                    "Use yes (replace, keep a backup), no (fail), skip (leave as is) " +
+                    "or force (replace, no backup).");
+                return ExitCodes.InvalidArguments;
+            }
+
+            Overwrite = overwriteMode;
+        }
+
         Arguments.ThrowIfRemaining();
 
         if (argsModule != null && !IsValidModuleName(argsModule))
@@ -50,7 +81,10 @@ public partial class GenerateCommand(IProjectFileInfo project, IGeneratorConsole
 
         if (string.IsNullOrEmpty(connectionKey))
         {
-            Error("No connection selected!");
+            Error(NonInteractive
+                ? $"Multiple connections found, specify one with --connection-key: " +
+                    string.Join(", ", connectionStrings.Keys.OrderBy(x => x, StringComparer.OrdinalIgnoreCase))
+                : "No connection selected!");
             return ExitCodes.NoConnectionString;
         }
 
@@ -78,7 +112,9 @@ public partial class GenerateCommand(IProjectFileInfo project, IGeneratorConsole
         List<string> selectedTableNames = !string.IsNullOrEmpty(argsTable) ? [argsTable] : SelectTables(allTableNames);
         if (selectedTableNames.Count == 0)
         {
-            Error("No tables selected!");
+            Error(NonInteractive
+                ? "No table selected! Specify one with --table, e.g. --table dbo.Movie"
+                : "No tables selected!");
             return ExitCodes.NoTablesSelected;
         }
 
@@ -220,14 +256,28 @@ public partial class GenerateCommand(IProjectFileInfo project, IGeneratorConsole
         }
         catch { }
 
-        var writer = new GeneratedFileWriter(Project.FileSystem, Console);
-        foreach (var inputs in inputsList)
+        // --no-interactive can't ask, so it refuses to replace anything unless
+        // --overwrite said otherwise
+        var writer = new GeneratedFileWriter(Project.FileSystem, Console)
         {
-            UpdateConfigTableFor(inputs, confConnection);
-            inputs.Application = application!;
-            var model = createModel(inputs);
-            var generator = new EntityCodeGenerator(Project, model, inputs.Config, templates, writer);
-            generator.Run();
+            Overwrite = Overwrite ?? (NonInteractive ? OverwriteMode.Fail : OverwriteMode.Ask)
+        };
+
+        try
+        {
+            foreach (var inputs in inputsList)
+            {
+                UpdateConfigTableFor(inputs, confConnection);
+                inputs.Application = application!;
+                var model = createModel(inputs);
+                var generator = new EntityCodeGenerator(Project, model, inputs.Config, templates, writer);
+                generator.Run();
+            }
+        }
+        catch (GeneratedFileExistsException ex)
+        {
+            Error(ex.Message);
+            return ExitCodes.OverwriteRefused;
         }
 
         if (config.SaveGeneratedTables != false)

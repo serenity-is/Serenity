@@ -6,7 +6,11 @@ public class GeneratedFileWriter(IFileSystem fileSystem, IGeneratorConsole conso
     private readonly IFileSystem fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
     private readonly IGeneratorConsole console = console ?? throw new ArgumentNullException(nameof(console));
 
-    public bool Interactive { get; set; } = true;
+    /// <summary>
+    /// What to do when a target file exists with different content. Defaults to
+    /// <see cref="OverwriteMode.Ask"/>, i.e. prompt the user.
+    /// </summary>
+    public OverwriteMode Overwrite { get; set; } = OverwriteMode.Ask;
 
     private bool? overwriteAll;
 
@@ -25,17 +29,31 @@ public class GeneratedFileWriter(IFileSystem fileSystem, IGeneratorConsole conso
                 contents.Trim().Replace("\r", "", StringComparison.Ordinal))
                 return;
 
-            if (!Interactive)
+            switch (Overwrite)
             {
-                var backupFile = string.Format(CultureInfo.InvariantCulture,
-                    "{0}.{1}.bak", targetFile, DateTime.Now.ToString(
-                    "yyyyMMdd_HHmmss", CultureInfo.InvariantCulture));
+                case OverwriteMode.Skip:
+                    return;
 
-                fileSystem.WriteAllBytes(backupFile, 
-                    fileSystem.ReadAllBytes(targetFile));
+                case OverwriteMode.Fail:
+                    throw new GeneratedFileExistsException(targetFile);
+
+                case OverwriteMode.Backup:
+                    var backupFile = string.Format(CultureInfo.InvariantCulture,
+                        "{0}.{1}.bak", targetFile, DateTime.Now.ToString(
+                        "yyyyMMdd_HHmmss", CultureInfo.InvariantCulture));
+
+                    fileSystem.WriteAllBytes(backupFile,
+                        fileSystem.ReadAllBytes(targetFile));
+                    break;
+
+                case OverwriteMode.Force:
+                    break;
+
+                default:
+                    if (!ConfirmOverwrite(targetFile))
+                        return;
+                    break;
             }
-            else if (!ConfirmOverwrite(targetFile))
-                return;
         }
         else
             fileSystem.CreateDirectory(fileSystem.GetDirectoryName(targetFile));

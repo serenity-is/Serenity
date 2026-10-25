@@ -31,6 +31,40 @@ public static class Texts
             
         """"";
 
+    public static string GenerateHelp => $"""
+        Serenity Code Generator {Assembly.GetEntryAssembly()?.GetName().Version}
+        Usage: sergen g [switches]
+
+        Launches the table code generator.
+
+        Switches:
+            --cnk, --connection-key <key>  Connection key to use. Required when the project
+                                          has several connections and prompts are disabled.
+            --tbl, --table <table>         Table to generate code for, e.g. dbo.Movie
+                                          (SQLite needs no schema). Required when prompts
+                                          are disabled.
+            --mod, --module <module>       Module (namespace) for the generated code.
+            --cls, --identifier <class>    Class name for the entity.
+            --pms, --permission <key>      Permission key, e.g. Administration:General.
+            --wtg, --what <R|S|U|C|*>      What to generate: Row, Services, User Interface,
+                                          Custom, or * for all of them.
+
+            --no-interactive               Never prompt. Values with a default fall back to
+                                          it, --table (and --connection-key with several
+                                          connections) become required, and existing files
+                                          that would change make the command fail with
+                                          exit code 13.
+            --overwrite[:mode]             What to do with existing files whose content
+                                          changed. Without a value it means "yes":
+                                            yes    replace, keeping a *.bak copy
+                                            no     fail with exit code 13
+                                            skip   leave the file as it is
+                                            force  replace, without a backup
+                                          Omit it to be asked, or to fail when
+                                          --no-interactive is used.
+
+        """;
+
     public const string CantFindProject = "Can't find a project file at: {0}";
 
     public const string NoProjectFiles = "Multiple project files found in current directory!\n" +
