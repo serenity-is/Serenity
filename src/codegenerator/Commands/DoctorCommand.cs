@@ -21,7 +21,8 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
         (new(10, 1, 6), new(10, 2, 1)),
         (new(10, 2, 3), new(10, 2, 4)),
         (new(10, 3, 7), new(10, 3, 7)),
-        (new(10, 4, 0), new(10, 4, 0))
+        (new(10, 4, 0), new(10, 4, 0)),
+        (new(10, 6, 1), new(10, 6, 1))
     ];
 
     public IArgumentReader Arguments { get; set; } = null!;

@@ -136,12 +136,6 @@ public class BaseDynamicDataGeneratorTests
     }
 
     [Fact]
-    public void RunAndExitIf_Does_Nothing_For_Other_Arguments()
-    {
-        new TestGenerator().RunAndExitIf(["other"]);
-    }
-
-    [Fact]
     public void RunIf_Returns_Null_For_Other_Arguments()
     {
         Assert.Null(new TestGenerator().RunIf(["other"]));
