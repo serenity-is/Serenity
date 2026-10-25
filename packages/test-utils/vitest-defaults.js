@@ -7,6 +7,24 @@ import { defineConfig } from "vitest/config";
 const testUtils = resolve(join(fileURLToPath(new URL('.', import.meta.url)), './'));
 const serenityRoot = resolve(join(testUtils, "../../"));
 
+/**
+ * Options every project shares, exported separately so packages that build their
+ * config inline (corelib, domwise, sleekgrid, tsbuild, dtsbundler) do not have to
+ * repeat them. Keyed by folder name, which is unique within a workspace.
+ */
+export function serenityTestOptions(projectRoot) {
+    projectRoot = resolve(projectRoot ?? "./");
+    return {
+        // one transform cache folder per project: a single shared cache is wiped
+        // when the lockfile changes, and parallel "pnpm -r" runs then race on it
+        fsModuleCachePath: join(serenityRoot, "artifacts", ".vitest-cache", basename(projectRoot)),
+        // the first run after a lockfile change is cold for every project, and
+        // "pnpm -r" runs them concurrently, so the 5s default is too tight
+        testTimeout: 20_000,
+        hookTimeout: 20_000
+    };
+}
+
 export default (opt) => {
 
     const projectRoot = resolve(opt?.projectRoot ?? "./");
@@ -42,6 +60,7 @@ export default (opt) => {
         test: {
             name: opt?.name,
             environment: "jsdom",
+            ...serenityTestOptions(projectRoot),
             execArgv: [
                 Number(process.versions.node.split('.')[0]) >= 25 ? '--no-webstorage' : null
             ].filter(x => x != null),

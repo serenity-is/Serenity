@@ -11,5 +11,5 @@ node_modules/
 *.orig
 *.log
 *.tgz
-
+test/fixtures/**/tmp*/
 *.tsbuildinfo

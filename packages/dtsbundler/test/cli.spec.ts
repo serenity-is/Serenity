@@ -12,7 +12,9 @@ const fixtureRoot = path.join(here, 'fixtures', 'basic');
 
 // the fixture's `ext-lib` resolves through `fixtures/basic/node_modules`, so outputs
 // written below that folder also type-check (the CLI validates the output by default)
-const outRoot = path.join(fixtureRoot, 'tmp-cli-tests');
+// a per-process folder so a concurrent run (e.g. the root workspace config and a
+// package run at the same time) cannot delete outputs the other one is writing
+const outRoot = path.join(fixtureRoot, `tmp-cli-tests-${process.pid}`);
 const entryPath = path.join(outRoot, 'src', 'entry.ts');
 
 function run(args: readonly string[], cwd: string = here) {
@@ -29,6 +31,10 @@ const toPosix = (text: string) => text.replaceAll('\\', '/');
 
 describe('cli', () => {
 	beforeAll(() => {
+		// a run that timed out never reaches afterAll, so clear leftovers first:
+		// an identical existing bundle would be reported as "Unchanged", not "Writing"
+		rmSync(outRoot, { recursive: true, force: true });
+
 		// work on copies so the convention tests cannot leave a stale .d.ts next to
 		// the real fixture sources (it would shadow entry.ts on module resolution)
 		mkdirSync(outRoot, { recursive: true });

@@ -48,7 +48,7 @@ Important conventions and patterns (repo-specific)
 - .NET ↔ TypeScript integration: MSBuild targets call TypeScript build steps via `RunTSBuild` and related targets in `src/Directory.Build.targets` and `build/Package.Build.props`. Changing package outputs often requires updating the corresponding `.csproj` or MSBuild props.
 - Packaging: Some packages are consumed via NuGet wrappers that place JS under `node_modules/.dotnet/<package>`; check `packages/*/README.md` which documents the hybrid NuGet/NPM usage.
 - Data binding patterns: Use lookup system for dropdowns/editors (`LookupEditor` in `packages/corelib/src/ui/editors/lookupeditor.ts`). Script data system handles dynamic content loading via `~/DynamicData/` endpoints.
-- Testing: Vitest workspace configured in `vitest.workspace.json` runs tests across packages. Use `pnpm -r test` from root.
+- Testing: Vitest is configured per package. `pnpm -r test` from root runs every package except `packages/dtsbundler`, which has no `test` script (use `pnpm --filter @serenity-is/dtsbundler test:dist` or `pnpm test` at the root, which runs both).
 
 Examples to copy patterns from
 - Adding a new editor widget: model after `packages/corelib/src/ui/editors/lookupeditor.ts` and `src/ui/editors/*.tsx` — the pattern uses `ScriptData` binding and global registration.
@@ -105,7 +105,7 @@ Critical developer workflows (explicit commands)
     ```powershell
     pnpm -r build
     pnpm -r tsc
-    pnpm -r test
+    node --run test   # pnpm -r test, plus dtsbundler
     ```
 
     Note that `build` does not do type checking; use `tsc` for that. `pnpm -r dts` uses typescript to generate bundled declaration files so running it is recommended when changing public APIs and it also covers type checking. `test` also runs `build` first.

@@ -292,7 +292,11 @@ the public API and no internals.
 ```sh
 pnpm install        # installs the TypeScript 7 beta inside the package
 pnpm tsc            # typecheck (root config)
-pnpm test           # vitest (bundle + CLI specs, runs against dist)
+pnpm test:dist      # vitest (bundle + CLI specs, runs against dist)
 pnpm build          # esbuild bundle -> dist/index.js, dist/cli.js
 pnpm dts            # builds, then bundles the package's own types -> dist/index.d.ts
 ```
+
+The script is called `test:dist` so this package is excluded from `pnpm -r test`,
+which skips packages without a `test` script. Run `pnpm test` from the repository
+root to run every script test suite, including this one.

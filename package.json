@@ -12,7 +12,8 @@
     "vitest": "catalog:serenity"
   },
   "scripts": {
-    "all": "pnpm i && pnpm -r build && pnpm -r tsc && pnpm -r test",
+    "all": "pnpm i && pnpm -r build && pnpm -r tsc && node --run test",
+    "test": "pnpm -r test && pnpm --filter @serenity-is/dtsbundler test:dist",
     "cleanup": "node build/cleanup.mjs"
   },
   "private": true,

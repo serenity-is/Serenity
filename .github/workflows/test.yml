@@ -45,7 +45,11 @@ jobs:
       run: pnpm -r build
 
     - name: script tests
-      run: pnpm -r test -- --coverage
+      run: pnpm -r test --coverage
+
+    # excluded from the recursive run (recursive runs skip packages without a "test" script)
+    - name: dtsbundler tests
+      run: pnpm --filter @serenity-is/dtsbundler test:dist --coverage
 
     - name: dotnet build Serenity.slnx
       run: dotnet build /p:SkipTSBuild=true

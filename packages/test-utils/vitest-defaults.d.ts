@@ -4,6 +4,12 @@ declare global {
     }
 }
 
+export function serenityTestOptions(projectRoot?: string): {
+    fsModuleCachePath: string,
+    testTimeout: number,
+    hookTimeout: number,
+};
+
 export default function vitestDefaults(opt?: {
     name?: string,
     projectRoot?: string,
