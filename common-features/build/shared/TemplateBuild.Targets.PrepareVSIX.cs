@@ -12,9 +12,6 @@ public static partial class Shared
         {
             Clean();
 
-            UpdateSerenityPackages();
-            UpdateCommonAndProPackages();
-
             if (!File.Exists(SolutionFile))
                 ExitWithError("Solution file not found: " + SolutionFile);
 
@@ -25,7 +22,7 @@ public static partial class Shared
                 ExitWithError("Error while building solution!");
 
             var packageVersions = GetPackageVersions();
-            var projectPackages = ParsePackages(ProjectFile, packageVersions);
+            var projectPackages = ParsePackages(ProjectFile, packageVersions, GetTemplateProperties());
 
             CleanDirectory(TemporaryFilesRoot, ensure: true);
 

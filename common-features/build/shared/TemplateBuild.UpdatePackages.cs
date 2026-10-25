@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Text.Json;
 using System.Xml.Linq;
 
@@ -12,20 +11,87 @@ namespace Build;
 
 public static partial class Shared
 {
-    private static bool PatchPackageVersion(string packageId, string version)
-    {
-        var projectContent = File.ReadAllText(ProjectFile);
-        var pattern = $"(PackageReference\\s*Include=\"{Regex.Escape(packageId)}\"\\s*(?:VersionOverride|Version)\\s*=\\s*\")([^\"]*)(\")";
-        var replacedContent = Regex.Replace(projectContent, pattern,
-            match => match.Groups[1].Value + version + match.Groups[3].Value);
+    private static IReadOnlyDictionary<string, string> templateProperties;
 
-        if (replacedContent != projectContent)
+    /// <summary>
+    /// Evaluated MSBuild properties from Template.Version.props (imported by the
+    /// template csproj inside its IsNotTemplate block). The template build must
+    /// never rewrite the csproj; it only resolves these values into the generated
+    /// project and the VSIX manifest.
+    /// </summary>
+    static IReadOnlyDictionary<string, string> GetTemplateProperties()
+    {
+        if (templateProperties is not null)
+            return templateProperties;
+
+        var names = new[]
         {
-            File.WriteAllText(ProjectFile, replacedContent);
-            return true;
+            "SerenityVersion",
+            "CFPackageVersion",
+            "ProPackageVersion",
+            "BusinessPackageVersion",
+            "EnterprisePackageVersion"
+        };
+
+        var properties = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        var startInfo = new ProcessStartInfo("dotnet")
+        {
+            WorkingDirectory = ProjectFolder,
+            RedirectStandardOutput = true,
+            UseShellExecute = false
+        };
+        startInfo.ArgumentList.Add("msbuild");
+        startInfo.ArgumentList.Add(ProjectFile);
+        foreach (var name in names)
+            startInfo.ArgumentList.Add("-getProperty:" + name);
+
+        using var process = Process.Start(startInfo);
+        if (process == null)
+        {
+            ExitWithError("Could not start MSBuild to read Template.Version.props.");
+            return properties;
         }
 
-        return false;
+        var output = process.StandardOutput.ReadToEnd();
+        process.WaitForExit();
+        if (process.ExitCode != 0)
+        {
+            ExitWithError("Error while reading Template.Version.props from " + ProjectFile);
+            return properties;
+        }
+
+        using var json = JsonDocument.Parse(output);
+        if (!json.RootElement.TryGetProperty("Properties", out var props))
+            return properties;
+
+        foreach (var name in names)
+        {
+            if (props.TryGetProperty(name, out var element))
+            {
+                var value = element.GetString();
+                if (!string.IsNullOrEmpty(value))
+                    properties[name] = value;
+            }
+        }
+
+        templateProperties = properties;
+        return properties;
+    }
+
+    static string ResolveVersion(string value, IReadOnlyDictionary<string, string> properties)
+    {
+        if (string.IsNullOrEmpty(value) || properties is null)
+            return value;
+
+        foreach (var pair in properties)
+            value = value.Replace("$(" + pair.Key + ")", pair.Value, StringComparison.OrdinalIgnoreCase);
+
+        if (value.Contains("$("))
+        {
+            ExitWithError("Couldn't resolve package version expression '" + value + "' in " + ProjectFile + ".");
+        }
+
+        return value;
     }
 
     static Dictionary<string, string> GetPackageVersions()
@@ -76,128 +142,9 @@ public static partial class Shared
         return packageVersions;
     }
 
-    static IEnumerable<string> SerenityPackagesWithSameVersion
-    {
-        get
-        {
-            yield return "Serenity.Net.Web";
-            yield return "Serenity.Corelib";
-            yield return "Serenity.Assets";
-            yield return "Serenity.DomWise";
-            yield return "Serenity.SleekGrid";
-        }
-    }
-
-    static IEnumerable<string> SerenityPackagesWithUniqueVersion
-    {
-        get
-        {
-            yield break;
-        }
-    }
-
-    static void UpdateSerenityPackages()
-    {
-        string serenityVersion;
-        if (IsPatch)
-        {
-            var xes = XElement.Parse(File.ReadAllText(SerenityPackageVersionProps));
-            serenityVersion = xes.Descendants("Version").FirstOrDefault()?.Value?.ToString();
-        }
-        else
-            serenityVersion = GetLatestVersionOf("Serenity.Net.Web")?.ToString();
-
-        if (!string.IsNullOrEmpty(serenityVersion))
-        {
-            foreach (var package in SerenityPackagesWithSameVersion)
-                PatchPackageVersion(package, serenityVersion);
-        }
-
-        foreach (var package in SerenityPackagesWithUniqueVersion)
-        {
-            var pkgVer = IsPatch ? serenityVersion : GetLatestVersionOf(package)?.ToString();
-            if (pkgVer != null)
-                PatchPackageVersion(package, pkgVer);
-        }
-    }
-
-    static bool IsCommonPackage(string packageId)
-    {
-        return packageId.StartsWith("Serenity.", StringComparison.OrdinalIgnoreCase) &&
-            !IsProPackage(packageId) &&
-            (string.Equals(packageId, "Serenity.Extensions", StringComparison.OrdinalIgnoreCase) ||
-             packageId.StartsWith("Serenity.Common", StringComparison.OrdinalIgnoreCase) ||
-             packageId.StartsWith("Serenity.Demo", StringComparison.OrdinalIgnoreCase));
-    }
-
-    static void UpdateCommonAndProPackages()
-    {
-        string cfPackageVersion = null;
-        string proPackageVersion = null;
-        string bizPackageVersion = null;
-        string entPackageVersion = null;
-
-        if (IsPatch)
-        {
-            var propsFile = Path.Combine(Root, "Serenity", "common-features", "build", "Package.Build.props");
-            var propsRoot = XElement.Parse(File.ReadAllText(propsFile));
-            cfPackageVersion = propsRoot.Descendants("Version").FirstOrDefault()?.Value;
-
-            propsFile = Path.Combine(Root, "pro-features", "build", "Package.Build.props");
-            if (File.Exists(propsFile))
-            {
-                propsRoot = XElement.Parse(File.ReadAllText(propsFile));
-                proPackageVersion = propsRoot.Descendants("Version").FirstOrDefault()?.Value;
-            }
-
-            propsFile = Path.Combine(Root, "business-features", "build", "Package.Build.props");
-            if (File.Exists(propsFile))
-            {
-                propsRoot = XElement.Parse(File.ReadAllText(propsFile));
-                bizPackageVersion = propsRoot.Descendants("Version").FirstOrDefault()?.Value;
-            }
-
-            propsFile = Path.Combine(Root, "enterprise-features", "build", "Package.Build.props");
-            if (File.Exists(propsFile))
-            {
-                propsRoot = XElement.Parse(File.ReadAllText(propsFile));
-                entPackageVersion = propsRoot.Descendants("Version").FirstOrDefault()?.Value;
-            }
-        }
-
-        string getPackageVersion(string package)
-        {
-            if (!IsPatch)
-                return GetLatestVersionOf(package)?.ToString();
-
-            if (IsCommonPackage(package))
-                return cfPackageVersion;
-
-            if (File.Exists(Path.Combine(Root, "business-features", "src", package, package + ".csproj")))
-                return bizPackageVersion;
-
-            if (File.Exists(Path.Combine(Root, "enterprise-features", "src", package, package + ".csproj")))
-                return entPackageVersion;
-
-            return proPackageVersion;
-        }
-
-        var packages = ParsePackages(ProjectFile);
-        foreach (var package in packages)
-        {
-            string packageId = package.Item1;
-            if (!IsCommonPackage(packageId) &&
-                !IsProPackage(packageId))
-                continue;
-
-            string version = getPackageVersion(packageId);
-            if (!string.IsNullOrEmpty(version))
-                PatchPackageVersion(packageId, version);
-        }
-    }
-
     static List<Tuple<string, string>> ParsePackages(string path,
-        IReadOnlyDictionary<string, string> packageVersions = null)
+        IReadOnlyDictionary<string, string> packageVersions = null,
+        IReadOnlyDictionary<string, string> templateProperties = null)
     {
         var xml = XElement.Parse(File.ReadAllText(path));
         var pkg = new List<Tuple<string, string>>();
@@ -207,9 +154,9 @@ public static partial class Shared
             if (string.IsNullOrEmpty(packageId))
                 continue;
 
-            var version = x.Attribute("VersionOverride")?.Value;
+            var version = ResolveVersion(x.Attribute("VersionOverride")?.Value, templateProperties);
             if (string.IsNullOrEmpty(version))
-                version = x.Attribute("Version")?.Value;
+                version = ResolveVersion(x.Attribute("Version")?.Value, templateProperties);
             if (string.IsNullOrEmpty(version) && packageVersions != null)
                 packageVersions.TryGetValue(packageId, out version);
 
@@ -220,7 +167,8 @@ public static partial class Shared
     }
 
     static void NormalizePackageReferences(XElement projectXml,
-        IReadOnlyDictionary<string, string> packageVersions)
+        IReadOnlyDictionary<string, string> packageVersions,
+        IReadOnlyDictionary<string, string> templateProperties = null)
     {
         foreach (var packageReference in projectXml.Descendants("PackageReference"))
         {
@@ -228,9 +176,9 @@ public static partial class Shared
             if (string.IsNullOrEmpty(packageId))
                 continue;
 
-            var version = packageReference.Attribute("VersionOverride")?.Value;
+            var version = ResolveVersion(packageReference.Attribute("VersionOverride")?.Value, templateProperties);
             if (string.IsNullOrEmpty(version))
-                version = packageReference.Attribute("Version")?.Value;
+                version = ResolveVersion(packageReference.Attribute("Version")?.Value, templateProperties);
             if (string.IsNullOrEmpty(version))
                 packageVersions.TryGetValue(packageId, out version);
 

@@ -194,7 +194,7 @@ public static partial class Shared
                 z.Remove();
         }
 
-        NormalizePackageReferences(csprojXml, packageVersions);
+        NormalizePackageReferences(csprojXml, packageVersions, GetTemplateProperties());
 
         var targetProj = Path.Combine(TemplateZipWebFolder, Path.GetFileName(ProjectFile));
         File.WriteAllText(targetProj,

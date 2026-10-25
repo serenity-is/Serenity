@@ -127,7 +127,7 @@ public static partial class Shared
             File.WriteAllText(PackageJsonCopy, content);
 
             var projectXml = XElement.Parse(File.ReadAllText(ProjectFile));
-            NormalizePackageReferences(projectXml, GetPackageVersions());
+            NormalizePackageReferences(projectXml, GetPackageVersions(), GetTemplateProperties());
             File.WriteAllText(PackageProjectCopy,
                 projectXml.ToString(SaveOptions.OmitDuplicateNamespaces));
 
