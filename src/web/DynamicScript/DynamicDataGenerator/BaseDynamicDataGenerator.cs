@@ -151,17 +151,52 @@ public abstract class BaseDynamicDataGenerator
     }
 
     /// <summary>
+    /// Runs the generator when the first argument is <c>dynamic-data</c>.
+    /// </summary>
+    /// <param name="args">The command line arguments.</param>
+    /// <returns><c>null</c> when <paramref name="args"/> is not the dynamic data command,
+    /// so the application should start normally; otherwise the exit code the caller should
+    /// return: 0 on success, 1 when the generator throws, 2 for extra arguments.</returns>
+    /// <remarks>
+    /// Terminating the process is the caller's job, so this can be used from tests. Extra
+    /// arguments are rejected instead of starting the web host, which would otherwise look
+    /// like a hang to a script. Mirrors <c>MigrationUtils.RunMigrationsIf</c>.
+    /// </remarks>
+    public virtual int? RunIf(string[] args)
+    {
+        if (args is not ["dynamic-data", ..])
+            return null;
+
+        if (args.Length > 1)
+        {
+            Console.Error.WriteLine("usage: <app> dynamic-data");
+            return 2;
+        }
+
+        try
+        {
+            Run();
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine("Dynamic data generation failed: " + ex.Message);
+            return 1;
+        }
+
+        Console.WriteLine("Dynamic data generated successfully.");
+        return 0;
+    }
+
+    /// <summary>
     /// Checks the arguments; if they contain <c>dynamic-data</c>, runs the
     /// generator and exits the process.
     /// </summary>
     /// <param name="args">The command line arguments.</param>
+    [Obsolete("Use RunIf and exit from the caller instead, e.g. if (generator.RunIf(args) is int code) return code;")]
     public virtual void RunAndExitIf(string[] args)
     {
-        if (args?.Length == 1 && args[0] == "dynamic-data")
-        {
-            Run();
-            Environment.Exit(0);
-        }
+        if (RunIf(args) is int code)
+            Environment.Exit(code);
     }
 }
 

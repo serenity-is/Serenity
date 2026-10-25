@@ -6,11 +6,18 @@ namespace Serene;
 
 public class Program
 {
-    public static void Main(string[] args)
+    public static int Main(string[] args)
     {
-        new AppServices.DynamicDataGenerator().RunAndExitIf(args);
+        if (new AppServices.DynamicDataGenerator().RunIf(args) is int dynamicDataExit)
+            return dynamicDataExit;
 
-        CreateHostBuilder(args).Build().Run();
+        using var host = CreateHostBuilder(args).Build();
+
+        if (host.RunMigrationsIf(args) is int migrateExit)
+            return migrateExit;
+
+        host.Run();
+        return 0;
     }
 
     public static IHostBuilder CreateHostBuilder(string[] args)

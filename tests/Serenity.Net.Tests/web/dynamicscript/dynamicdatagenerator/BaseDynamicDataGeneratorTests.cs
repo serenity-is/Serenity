@@ -142,6 +142,22 @@ public class BaseDynamicDataGeneratorTests
     }
 
     [Fact]
+    public void RunIf_Returns_Null_For_Other_Arguments()
+    {
+        Assert.Null(new TestGenerator().RunIf(["other"]));
+        Assert.Null(new TestGenerator().RunIf([]));
+        Assert.Null(new TestGenerator().RunIf(["--dynamic-data"]));
+        Assert.Null(new TestGenerator().RunIf(["server", "dynamic-data"]));
+    }
+
+    [Fact]
+    public void RunIf_Returns_Two_For_Extra_Arguments_Without_Running()
+    {
+        // starting the web host here would look like a hang to a script
+        Assert.Equal(2, new TestGenerator().RunIf(["dynamic-data", "--force"]));
+    }
+
+    [Fact]
     public void NullPermissionService_Grants_All()
     {
         Assert.True(new NullPermissionService().HasPermission("anything"));

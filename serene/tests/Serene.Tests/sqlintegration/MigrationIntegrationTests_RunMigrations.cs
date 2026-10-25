@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
+using Serenity.Extensions;
 
 namespace Serene.Migrations;
 
