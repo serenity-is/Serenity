@@ -155,7 +155,6 @@
         <Folder Name="Common" TargetFolderName="Common">
           <Folder Name="AppServices" TargetFolderName="AppServices">
             <Folder Name="Abstractions" TargetFolderName="Abstractions">
-              <ProjectItem ReplaceParameters="true" TargetFileName="IDataMigrations.cs">IDataMigrations.cs</ProjectItem>
               <ProjectItem ReplaceParameters="true" TargetFileName="IDirectoryService.cs">IDirectoryService.cs</ProjectItem>
             </Folder>
             <ProjectItem ReplaceParameters="true" TargetFileName="DataMigrations.cs">DataMigrations.cs</ProjectItem>

@@ -93,7 +93,7 @@ Assert-ExitCode
 
 # build_vsix_package
 Write-Host '*** BUILDING VSIX PACKAGE ***'
-& $msbuild (Join-Path $root 'vsix\Serene.VSIX.slnx') /restore -verbosity:m /p:EnableProjectDataOnBuild=false
+& $msbuild (Join-Path $root 'vsix\Serene.VSIX.slnx') /restore -verbosity:m /p:EnableProjectDataOnBuild=false /p:RestorePackagesConfig=true
 Assert-ExitCode
 
 # install_template

@@ -42,15 +42,15 @@
     <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" />
   </ItemGroup>
   <ItemGroup Condition="'$(UseProjectRefs)' == 'false'">
-    <PackageReference Include="Serenity.Assets" VersionOverride="10.6.0" />
-    <PackageReference Include="Serenity.Corelib" VersionOverride="10.6.0" />
-    <PackageReference Include="Serenity.Net.Web" VersionOverride="10.6.0" />
-    <PackageReference Include="Serenity.Extensions" VersionOverride="10.6.0" />
+    <PackageReference Include="Serenity.Assets" VersionOverride="10.6.2" />
+    <PackageReference Include="Serenity.Corelib" VersionOverride="10.6.2" />
+    <PackageReference Include="Serenity.Net.Web" VersionOverride="10.6.2" />
+    <PackageReference Include="Serenity.Extensions" VersionOverride="10.6.2" />
     <!--#if (Northwind)-->
-    <PackageReference Include="Serenity.Demo.Northwind" VersionOverride="10.6.0" />
+    <PackageReference Include="Serenity.Demo.Northwind" VersionOverride="10.6.2" />
     <!--#endif-->
     <!--#if (BasicSamples)-->
-    <PackageReference Include="Serenity.Demo.BasicSamples" VersionOverride="10.6.0" />
+    <PackageReference Include="Serenity.Demo.BasicSamples" VersionOverride="10.6.2" />
     <!--#endif-->
   </ItemGroup>
   <ItemGroup Condition="'$(UseProjectRefs)' != 'false'">
