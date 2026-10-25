@@ -1,4 +1,4 @@
-import { PropertyPanel, WidgetProps, informationDialog, resolveUrl, serviceCall } from "@serenity-is/corelib";
+import { getWindowLocation, informationDialog, PropertyPanel, resolveUrl, serviceCall, WidgetProps } from "@serenity-is/corelib";
 import { ChangePasswordForm } from "../../ServerTypes/Extensions/ChangePasswordForm";
 import { ChangePasswordRequest } from "../../ServerTypes/Extensions/ChangePasswordRequest";
 import { ChangePasswordFormTexts, ChangePasswordValidationTexts } from "../../ServerTypes/Texts";
@@ -36,7 +36,7 @@ class ChangePasswordPanel<P = {}> extends PropertyPanel<ChangePasswordRequest, P
             request: request,
             onSuccess: () => {
                 informationDialog(ChangePasswordFormTexts.Success, () => {
-                    window.location.href = resolveUrl('~/');
+                    getWindowLocation().href = resolveUrl('~/');
                 })
             }
         })

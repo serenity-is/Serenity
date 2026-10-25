@@ -322,7 +322,7 @@ export declare const Config: {
      * prompt the user, redirect to login, or refresh a token. When `null` (default),
      * the framework falls back to its built-in handling.
      * @example
-     * Config.notLoggedInHandler = () => window.location.href = "/Account/Login";
+     * Config.notLoggedInHandler = () => { getWindowLocation().href = "/Account/Login"; };
      */
     notLoggedInHandler: Function;
 };
@@ -3436,6 +3436,18 @@ export declare function setScriptData(name: string, value: any): void;
  * @returns The resolved absolute / root-relative URL.
  */
 export declare function resolveUrl(url: string): string;
+/**
+ * Returns the window location object.
+ * Applications should read or assign the location through this function instead of
+ * referencing `window.location` directly, so tests can replace it with a stub, as
+ * jsdom does not implement navigation.
+ * @param opt - pass `{ top: true }` to get the top window's location, e.g. to
+ * break out of an iframe.
+ * @returns The requested {@link Location}.
+ */
+export declare function getWindowLocation(opt?: {
+    top?: boolean;
+}): Location;
 /**
  * Resolves a Serenity service endpoint to a full URL.
  * Bare service keys like `"Administration/User/List"` are prefixed with `~/Services/`;

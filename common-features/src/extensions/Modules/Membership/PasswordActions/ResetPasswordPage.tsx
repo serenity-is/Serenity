@@ -1,4 +1,4 @@
-import { PropertyPanel, TransformInclude, WidgetProps, informationDialog, resolveUrl, serviceCall } from "@serenity-is/corelib";
+import { getWindowLocation, informationDialog, PropertyPanel, resolveUrl, serviceCall, TransformInclude, WidgetProps } from "@serenity-is/corelib";
 import { ResetPasswordForm } from "../../ServerTypes/Extensions/ResetPasswordForm";
 import { ResetPasswordRequest } from "../../ServerTypes/Extensions/ResetPasswordRequest";
 import { ResetPasswordResponse } from "../../ServerTypes/Extensions/ResetPasswordResponse";
@@ -45,10 +45,10 @@ export class ResetPasswordPanel extends PropertyPanel<ResetPasswordRequest, Rese
             request: request,
             onSuccess: (response: ResetPasswordResponse) => {
                 if (response.RedirectHome)
-                    window.location.href = resolveUrl('~/')
+                    getWindowLocation().href = resolveUrl('~/')
                 else
                     informationDialog(ResetPasswordFormTexts.Success, () => {
-                        window.location.href = resolveUrl('~/Account/Login');
+                        getWindowLocation().href = resolveUrl('~/Account/Login');
                     });
             }
         });

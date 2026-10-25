@@ -5,6 +5,7 @@ import pageInit from "../../../../Modules/Membership/Account/Login/LoginPage";
 import { LoginForm } from "../../../../Modules/ServerTypes/Membership";
 
 let calls: any[];
+let location: { href: string };
 
 beforeAll(() => {
     mockDynamicData();
@@ -13,6 +14,9 @@ beforeAll(() => {
 beforeEach(() => {
     document.body.innerHTML = '<div id="LoginPanel"></div>';
     calls = [];
+    // jsdom cannot navigate; capture the redirect target instead
+    location = { href: "" };
+    vi.spyOn(corelib, "getWindowLocation").mockReturnValue(location as any);
     vi.spyOn(corelib, "serviceCall").mockImplementation(((options: any) => {
         calls.push(options);
         return { then: () => void 0 } as any;
@@ -55,6 +59,7 @@ describe("LoginPage", () => {
         expect(calls.length).toBe(1);
         expect(calls[0].url).toContain("Account/Login");
         expect(() => calls[0].onSuccess?.()).not.toThrow();
+        expect(location.href).not.toBe("");
     });
 
     it("handles RedirectUserTo errors", () => {
@@ -64,6 +69,7 @@ describe("LoginPage", () => {
         typeText(form.Password, "secret");
         loginButton().click();
         expect(() => calls[0].onError?.({ Error: { Code: "RedirectUserTo", Arguments: "/somewhere" } })).not.toThrow();
+        expect(location.href).toBe("/somewhere");
     });
 
     it("notifies on message errors", () => {

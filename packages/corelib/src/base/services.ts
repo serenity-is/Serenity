@@ -17,6 +17,19 @@ export function resolveUrl(url: string) {
 }
 
 /**
+ * Returns the window location object.
+ * Applications should read or assign the location through this function instead of
+ * referencing `window.location` directly, so tests can replace it with a stub, as
+ * jsdom does not implement navigation.
+ * @param opt - pass `{ top: true }` to get the top window's location, e.g. to
+ * break out of an iframe.
+ * @returns The requested {@link Location}.
+ */
+export function getWindowLocation(opt?: { top?: boolean }) {
+    return opt?.top ? window.top.location : window.location;
+}
+
+/**
  * Resolves a Serenity service endpoint to a full URL.
  * Bare service keys like `"Administration/User/List"` are prefixed with `~/Services/`;
  * already rooted (`~/`, `/`) or absolute (`://`) URLs are resolved via {@link resolveUrl} unchanged.
@@ -351,7 +364,7 @@ function handleRedirect(getHeader: (key: string) => string): boolean {
         l = null;
     }
     if (l) {
-        window.top.location.href = l;
+        getWindowLocation({ top: true }).href = l;
         return true;
     }
 }

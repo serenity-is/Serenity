@@ -1,4 +1,4 @@
-import { BasePanel, informationDialog, parseQueryString, resolveUrl, serviceCall } from "@serenity-is/corelib";
+import { BasePanel, getWindowLocation, informationDialog, parseQueryString, resolveUrl, serviceCall } from "@serenity-is/corelib";
 import { SendResetPasswordResponse } from "../../ServerTypes/Extensions/SendResetPasswordResponse";
 import { SetPasswordFormTexts } from "../../ServerTypes/Texts";
 
@@ -18,12 +18,12 @@ class SetPasswordPage extends BasePanel {
                 if (response.DemoLink) {
                     informationDialog("If this wasn't a demo we would send you a reset password email. " +
                         "Since this is a demo we will just redirect you to set your password.", () => {
-                            window.location.href = resolveUrl(response.DemoLink);
+                            getWindowLocation().href = resolveUrl(response.DemoLink);
                         });
                 }
                 else {
                     informationDialog(SetPasswordFormTexts.EmailSentMessage, () => {
-                        window.location.href = resolveUrl('~/');
+                        getWindowLocation().href = resolveUrl('~/');
                     });
                 }
             }

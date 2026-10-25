@@ -1,4 +1,4 @@
-import { informationDialog, PropertyPanel, resolveUrl, serviceCall } from "@serenity-is/corelib";
+import { getWindowLocation, informationDialog, PropertyPanel, resolveUrl, serviceCall } from "@serenity-is/corelib";
 import { SignUpForm, SignUpRequest, SignUpResponse } from "../../../ServerTypes/Membership";
 import { MembershipValidationTexts, SignUpFormTexts } from "../../../ServerTypes/Texts";
 import { AccountPanelTitle } from "../AccountPanelTitle";
@@ -48,7 +48,7 @@ class SignUpPanel extends PropertyPanel<SignUpRequest, any> {
             request: request,
             onSuccess: (response: SignUpResponse) => {
                 informationDialog(SignUpFormTexts.Success, () => {
-                    window.location.href = resolveUrl('~/');
+                    getWindowLocation().href = resolveUrl('~/');
                 });
             }
         });

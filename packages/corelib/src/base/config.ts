@@ -93,7 +93,7 @@ const Config = {
      * prompt the user, redirect to login, or refresh a token. When `null` (default),
      * the framework falls back to its built-in handling.
      * @example
-     * Config.notLoggedInHandler = () => window.location.href = "/Account/Login";
+     * Config.notLoggedInHandler = () => { getWindowLocation().href = "/Account/Login"; };
      */
     notLoggedInHandler: <Function>null
 }
