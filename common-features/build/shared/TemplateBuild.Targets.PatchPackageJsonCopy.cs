@@ -50,7 +50,9 @@ public static partial class Shared
             devDependencies.Remove("test-utils");
 
             PnpmWorkspaceYaml workspaceYaml = null;
+            PnpmWorkspaceYaml workspaceYamlSerenity = null;
             string workspaceFile = IsStartSharp ? Path.Combine(Root, "pnpm-workspace.yaml") : Path.Combine(Root, "..", "pnpm-workspace.yaml");
+            string workspaceFileSerenity = IsStartSharp ? Path.Combine(Root, "Serenity", "pnpm-workspace.yaml") : workspaceFile;
 
             foreach (var deps in new JObject[] { dependencies, devDependencies })
             {
@@ -81,6 +83,14 @@ public static partial class Shared
                                 .IgnoreUnmatchedProperties()
                                 .Build();
                             workspaceYaml = deserializer.Deserialize<PnpmWorkspaceYaml>(yaml);
+
+                            if (workspaceFileSerenity == workspaceFile)
+                                workspaceYamlSerenity = workspaceYaml;
+                            else 
+                            {
+                                yaml = File.ReadAllText(workspaceFileSerenity);
+                                workspaceYamlSerenity = deserializer.Deserialize<PnpmWorkspaceYaml>(yaml);
+                            }
                         }
 
                         var catalogName = version["catalog:".Length..];
@@ -89,9 +99,15 @@ public static partial class Shared
                              catalog?.TryGetValue(property.Name, out var catalogVersion) != true) &&
                              workspaceYaml.catalog?.TryGetValue(property.Name, out catalogVersion) != true)
                         {
-                            Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(workspaceYaml.catalogs, Newtonsoft.Json.Formatting.Indented));
-                            ExitWithError($"Catalog package version not found: {property.Name} for catalog {catalogName} in {workspaceFile}!");
-                            return;
+                            if (workspaceYamlSerenity is null || 
+                                workspaceYamlSerenity == workspaceYaml ||
+                                workspaceYamlSerenity.catalogs?.TryGetValue(catalogName, out var catalogSerenity) != true ||
+                                catalogSerenity?.TryGetValue(property.Name, out catalogVersion) != true)
+                            {
+                                Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(workspaceYaml.catalogs, Newtonsoft.Json.Formatting.Indented));
+                                ExitWithError($"Catalog package version not found: {property.Name} for catalog {catalogName} in {workspaceFile}!");
+                                return;
+                            }
                         }
 
                         deps[property.Name] = catalogVersion;
