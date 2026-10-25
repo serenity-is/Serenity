@@ -7,7 +7,9 @@
     <GenerateComputedBuildStaticWebAssetsDependsOn>RunTSBuild;$(GenerateComputedBuildStaticWebAssetsDependsOn)</GenerateComputedBuildStaticWebAssetsDependsOn>
     <CompressionExcludePatterns>$(CompressionExcludePatterns);**\*.map;**\*.txt</CompressionExcludePatterns>
     <Nullable>annotations</Nullable>
-    <!--#if (IsNotTemplate)-->
+  </PropertyGroup>
+  <!--#if (IsNotTemplate)-->
+  <PropertyGroup>
     <CommonSrc>..\..\..\common-features\src\</CommonSrc>
     <EnableDefaultCompressedItems>false</EnableDefaultCompressedItems>
     <SerenitySrc>..\..\..\src\</SerenitySrc>
@@ -15,8 +17,10 @@
     <Nullable>enable</Nullable>
     <UseProjectRefs Condition="!Exists('$(SerenitySrc)..\Serenity.slnx')">false</UseProjectRefs>
     <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
-    <!--#endif-->
   </PropertyGroup>
+  <Import Project="$(MSBuildThisFileDirectory)..\..\..\build\Template.Version.props"
+          Condition="Exists('$(MSBuildThisFileDirectory)..\..\..\build\Template.Version.props')" />
+  <!--#endif-->
   <Import Project="$(SerenitySrc)web\Serenity.Net.Web.targets" Condition="'$(UseProjectRefs)' != 'false'" />
   <ItemGroup>
     <TypeScriptCompile Remove="node_modules\**" />
