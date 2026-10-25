@@ -1,11 +1,88 @@
 import { execFileSync } from "child_process";
-import { existsSync, readdirSync, readFileSync } from "fs";
-import { basename, join, resolve } from "path";
+import { createHash } from "crypto";
+import { existsSync, readdirSync, readFileSync, readlinkSync } from "fs";
+import { basename, dirname, join, resolve, sep } from "path";
 import { fileURLToPath } from 'url';
 import { defineConfig } from "vitest/config";
 
 const testUtils = resolve(join(fileURLToPath(new URL('.', import.meta.url)), './'));
 const serenityRoot = resolve(join(testUtils, "../../"));
+
+/**
+ * Collects the pnpm links in a node_modules folder as "path|name|target" lines.
+ * Workspace links (to source folders) are skipped, only links into a pnpm store matter.
+ */
+function collectLinks(nodeModules, lines) {
+    let entries;
+    try {
+        entries = readdirSync(nodeModules);
+    }
+    catch {
+        return;
+    }
+
+    const add = (full, name) => {
+        try {
+            const target = readlinkSync(full);
+            if (target.includes(sep + ".pnpm" + sep) || target.includes("/.pnpm/"))
+                lines.push(nodeModules + "|" + name + "|" + target);
+        }
+        catch {
+            // not a link, ignore
+        }
+    };
+
+    for (const name of entries) {
+        if (name.startsWith("."))
+            continue;
+
+        const full = join(nodeModules, name);
+        if (name.startsWith("@")) {
+            let scoped;
+            try {
+                scoped = readdirSync(full);
+            }
+            catch {
+                continue;
+            }
+            for (const sub of scoped)
+                add(join(full, sub), name + "/" + sub);
+        }
+        else
+            add(full, name);
+    }
+}
+
+/**
+ * Fingerprints the pnpm links the project resolves its dependencies through,
+ * walking up to the workspace root. Cached transforms embed absolute module paths,
+ * so a cache filled before "pnpm i" from the other workspace rewrote these links
+ * would not match the mocked module ids anymore. Keying the cache by the link state
+ * makes such a switch use a separate cache folder instead of stale transforms.
+ */
+function linkFingerprint(projectRoot) {
+    const lines = [];
+    let dir = resolve(projectRoot);
+    while (true) {
+        collectLinks(join(dir, "node_modules"), lines);
+        if (existsSync(join(dir, "pnpm-workspace.yaml")))
+            break;
+
+        const parent = dirname(dir);
+        if (parent === dir)
+            break;
+
+        dir = parent;
+    }
+
+    if (lines.length === 0)
+        return "";
+
+    return createHash("sha1")
+        .update(lines.sort().join("\n"))
+        .digest("hex")
+        .substring(0, 8);
+}
 
 /**
  * Options every project shares, exported separately so packages that build their
@@ -14,10 +91,12 @@ const serenityRoot = resolve(join(testUtils, "../../"));
  */
 export function serenityTestOptions(projectRoot) {
     projectRoot = resolve(projectRoot ?? "./");
+    const store = linkFingerprint(projectRoot);
     return {
-        // one transform cache folder per project: a single shared cache is wiped
-        // when the lockfile changes, and parallel "pnpm -r" runs then race on it
-        fsModuleCachePath: join(serenityRoot, "artifacts", ".vitest-cache", basename(projectRoot)),
+        // one transform cache folder per project and per pnpm store: a shared cache
+        // is wiped when the lockfile changes, and parallel "pnpm -r" runs race on it
+        fsModuleCachePath: join(serenityRoot, "artifacts", ".vitest-cache",
+            basename(projectRoot) + (store ? "-" + store : "")),
         // the first run after a lockfile change is cold for every project, and
         // "pnpm -r" runs them concurrently, so the 5s default is too tight
         testTimeout: 20_000,

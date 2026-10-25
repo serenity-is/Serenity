@@ -1,3 +1,8 @@
+## 10.6.2 (2026-10-25)
+
+### Bugfixes
+- Fix a version mismatch in common-features packages.
+
 ## 10.6.1 (2026-10-25)
 
 ### Features
