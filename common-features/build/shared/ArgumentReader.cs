@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 
 namespace Build;
 
-public partial class ArgumentReader(IEnumerable<string> arguments)
+public partial class ArgumentReader(IEnumerable<string> arguments, bool strictBooleans = true)
 {
     private static readonly char[] assignmentChars = [':', '='];
     private static readonly string[] helpSwitches = ["?", "h", "help"];
@@ -63,7 +63,11 @@ public partial class ArgumentReader(IEnumerable<string> arguments)
 
                 if (value is null)
                 {
-                    if (i < arguments.Count &&
+                    if (isBoolean && strictBooleans)
+                    {
+                        value = "true";
+                    }
+                    else if (i < arguments.Count &&
                         !IsSwitch(arguments[i]))
                     {
                         if (!isBoolean || isTrue(arguments[i]) || isFalse(arguments[i]))
