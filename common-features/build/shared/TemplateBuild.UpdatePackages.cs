@@ -14,7 +14,7 @@ public static partial class Shared
     private static IReadOnlyDictionary<string, string> templateProperties;
 
     /// <summary>
-    /// Evaluated MSBuild properties from Template.Version.props (imported by the
+    /// Evaluated MSBuild properties from Package.Version.props (imported by the
     /// template csproj inside its IsNotTemplate block). The template build must
     /// never rewrite the csproj; it only resolves these values into the generated
     /// project and the VSIX manifest.
@@ -30,7 +30,9 @@ public static partial class Shared
             "CFPackageVersion",
             "ProPackageVersion",
             "BusinessPackageVersion",
-            "EnterprisePackageVersion"
+            "EnterprisePackageVersion",
+            "SereneTemplateVersion",
+            "StartSharpTemplateVersion"
         };
 
         var properties = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -48,7 +50,7 @@ public static partial class Shared
         using var process = Process.Start(startInfo);
         if (process == null)
         {
-            ExitWithError("Could not start MSBuild to read Template.Version.props.");
+            ExitWithError("Could not start MSBuild to read Package.Version.props.");
             return properties;
         }
 
@@ -56,7 +58,7 @@ public static partial class Shared
         process.WaitForExit();
         if (process.ExitCode != 0)
         {
-            ExitWithError("Error while reading Template.Version.props from " + ProjectFile);
+            ExitWithError("Error while reading Package.Version.props from " + ProjectFile);
             return properties;
         }
 

@@ -1,6 +1,7 @@
 <Project>
   <Import Project="$(MSBuildThisFileDirectory)Package.Version.props" />
   <PropertyGroup>
+    <Version>$(SerenityVersion)</Version>
     <Authors>Volkan Ceylan</Authors>
     <Company>Serenity</Company>
     <Copyright>Copyright © Serenity Software, Volkan Ceylan</Copyright>

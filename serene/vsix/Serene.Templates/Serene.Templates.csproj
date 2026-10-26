@@ -1,7 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="$(MSBuildThisFileDirectory)..\..\..\build\Package.Version.props" />
   <PropertyGroup>
     <PackageType>Template</PackageType>
-    <PackageVersion>10.6.2.0</PackageVersion>
+    <PackageVersion>$(SereneTemplateVersion)</PackageVersion>
     <PackageId>Serene.Templates</PackageId>
     <PackageOutputPath>..\.nupkg</PackageOutputPath>
     <Title>Serene Project Templates</Title>

@@ -18,8 +18,8 @@
     <UseProjectRefs Condition="!Exists('$(SerenitySrc)..\Serenity.slnx')">false</UseProjectRefs>
     <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
   </PropertyGroup>
-  <Import Project="$(MSBuildThisFileDirectory)..\..\..\build\Template.Version.props"
-          Condition="Exists('$(MSBuildThisFileDirectory)..\..\..\build\Template.Version.props')" />
+  <Import Project="$(MSBuildThisFileDirectory)..\..\..\build\Package.Version.props"
+          Condition="Exists('$(MSBuildThisFileDirectory)..\..\..\build\Package.Version.props')" />
   <!--#endif-->
   <Import Project="$(SerenitySrc)web\Serenity.Net.Web.targets" Condition="'$(UseProjectRefs)' != 'false'" />
   <ItemGroup>

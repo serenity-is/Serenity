@@ -1,6 +1,0 @@
-<Project>
-  <PropertyGroup>
-    <SerenityVersion>10.6.2</SerenityVersion>
-    <CFPackageVersion>10.6.2</CFPackageVersion>
-  </PropertyGroup>
-</Project>

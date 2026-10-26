@@ -1,5 +1,7 @@
 <Project>
   <PropertyGroup>
-    <Version>10.6.2</Version>
+    <SerenityVersion>10.6.2</SerenityVersion>
+    <CFPackageVersion>10.6.2</CFPackageVersion>
+    <SereneTemplateVersion>10.6.2.0</SereneTemplateVersion>
   </PropertyGroup>
 </Project>

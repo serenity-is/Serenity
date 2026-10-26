@@ -62,7 +62,8 @@ public static partial class Shared
                 string.Equals(SerenityVersion, "workspace", StringComparison.OrdinalIgnoreCase))
             {
                 var xes = XElement.Parse(File.ReadAllText(SerenityPackageVersionProps));
-                SerenityVersion = xes.Descendants("Version").FirstOrDefault()?.Value?.ToString();
+                SerenityVersion = xes.Descendants("SerenityVersion").FirstOrDefault()?.Value?.ToString()
+                    ?? xes.Descendants("Version").FirstOrDefault()?.Value?.ToString();
                 System.Console.WriteLine("Determined workspace Serenity version: " + SerenityVersion);
             }
 
@@ -85,7 +86,7 @@ public static partial class Shared
                 return;
             }
 
-            if (StartProcess("git", "restore " + PackageBuildProps, Root) != 0)
+            if (StartProcess("git", "restore --source=HEAD -- " + PackageBuildProps, Root) != 0)
                 ExitWithError("Error while restoring " + PackageBuildProps);
 
             var xe = XElement.Parse(File.ReadAllText(PackageBuildProps));
@@ -102,7 +103,11 @@ public static partial class Shared
             if (xeVersion != null)
             {
                 var value = (xeVersion.Value ?? "").Trim();
-                if (value != (PackageVersion ?? SerenityVersion))
+                if (value.Contains("$("))
+                {
+                    // Version comes from Package.Version.props; keep the expression.
+                }
+                else if (value != (PackageVersion ?? SerenityVersion))
                 {
                     changed = true;
                     if (PackageVersion != null)

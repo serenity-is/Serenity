@@ -28,7 +28,6 @@ public static partial class Shared
 
             var initialVersion = PatchVSIXManifest(projectPackages, out string serenityVersion);
             SetInitialVersionInSergenJson(initialVersion);
-            SetTemplatesPackageVersion(initialVersion);
 
             if (StartProcess("dotnet", "restore " + Path.GetFileName(ProjectFile), ProjectFolder) != 0)
                 ExitWithError("Error while restoring " + ProjectFile);
