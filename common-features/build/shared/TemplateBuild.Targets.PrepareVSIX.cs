@@ -32,7 +32,8 @@ public static partial class Shared
             if (StartProcess("dotnet", "restore " + Path.GetFileName(ProjectFile), ProjectFolder) != 0)
                 ExitWithError("Error while restoring " + ProjectFile);
 
-            UpdateSergen(ProjectFolder, serenityVersion);
+            if (System.Environment.GetEnvironmentVariable("SERENITY_BUILD_ONLY") != "1")
+                UpdateSergen(ProjectFolder, serenityVersion);
             PatchPackageJsonCopy();
 
             if (!IsStartSharp)
