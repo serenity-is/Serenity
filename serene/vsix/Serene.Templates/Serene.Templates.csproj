@@ -42,6 +42,7 @@
       <NuGetFilesToDelete Include="..\.nupkg\Serene.Templates*.nupkg" />
     </ItemGroup>
     <Delete Files="@(NuGetFilesToDelete)" />
-    <Exec Command="dotnet run --project build-serene.csproj --no-dependencies --no-launch-profile -- patchpackagejson" Condition="'$(SkipPatchPackageJson)' != 'true'" WorkingDirectory="..\..\build" />
+    <Error Condition="!Exists('..\..\.vs\package-json-patch\package.json')"
+           Text="package.json patch is missing. Run build-serene.ps1 or the release tool (serene:build) before packing." />
   </Target>
 </Project>
