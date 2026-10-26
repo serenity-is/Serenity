@@ -20,7 +20,7 @@ public static partial class Shared
         allPackages.AddRange(hash);
         allPackages.Sort((x, y) => x.Item1.CompareTo(y.Item1));
 
-        if (StartProcess("git", "restore " + VSIXManifestFile, Root) != 0)
+        if (StartProcess("git", "restore --source=HEAD -- " + VSIXManifestFile, Root) != 0)
             ExitWithError("Error while restoring " + VSIXManifestFile);
 
         var xm = XElement.Parse(File.ReadAllText(VSIXManifestFile));
