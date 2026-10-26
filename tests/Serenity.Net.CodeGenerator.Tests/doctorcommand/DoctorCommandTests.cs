@@ -39,6 +39,34 @@ public partial class DoctorCommandTests
             x.message.Contains("Project filename should start with a capital letter"));
     }
 
+    [InlineData("10.4.0", null, "10.4.0")]
+    [InlineData("10.6.2", null, "10.6.1")]
+    [InlineData("10.6.3", null, "10.6.1")]
+    [InlineData("10.6.3.1", null, "10.6.1")]
+    [InlineData("10.7.0", null, "10.6.1")]
+    [Theory]
+    public void GetMinimumTSBuildVersion_Does_Not_Require_A_Release_For_Every_Patch(
+        string serenity, string? latest, string expected)
+    {
+        Assert.Equal(Version.Parse(expected),
+            DoctorCommand.GetRecommendedTSBuildVersion(Version.Parse(serenity),
+                latest is null ? null : Version.Parse(latest)));
+    }
+
+    [InlineData("10.6.3", "10.6.4", "10.6.1")]
+    [InlineData("10.6.4", "10.6.4", "10.6.4")]
+    [InlineData("10.6.5", "10.6.4", "10.6.4")]
+    [InlineData("10.7.0", "10.6.4", "10.6.4")]
+    [InlineData("10.7.0", "10.8.0", "10.6.1")]
+    [Theory]
+    public void GetRecommendedTSBuildVersion_Uses_Newer_Npm_Version_For_Newer_Serenity(
+        string serenity, string latest, string expected)
+    {
+        Assert.Equal(Version.Parse(expected),
+            DoctorCommand.GetRecommendedTSBuildVersion(Version.Parse(serenity),
+                Version.Parse(latest)));
+    }
+
     private class MockEnv
     {
         public static readonly string SergenVersion = typeof(DoctorCommand).Assembly.GetName().Version.ToString();
@@ -79,7 +107,8 @@ public partial class DoctorCommandTests
 
         public Dictionary<string, string> NpmDevDependencies { get; set; } = new()
         {
-            ["@serenity-is/tsbuild"] = DoctorCommand.RecommendedTSBuildVersion.Last().Item2.ToString()
+            ["@serenity-is/tsbuild"] = DoctorCommand.GetMinimumTSBuildVersion(
+                Version.Parse(SergenVersion)).ToString()
         };
 
         public string SergenExtends { get; set; } = "defaults@9.0.0";
@@ -198,7 +227,11 @@ public partial class DoctorCommandTests
         environment.WritePackageJson();
         environment.WriteTsConfigJson();
 
-        return (new DoctorCommand(environment.Project, environment.Console, environment.Executor), environment);
+        var command = new DoctorCommand(environment.Project, environment.Console, environment.Executor)
+        {
+            LatestTSBuildVersionResolver = () => null
+        };
+        return (command, environment);
     }
 
 }

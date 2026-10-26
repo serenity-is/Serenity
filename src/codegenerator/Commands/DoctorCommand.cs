@@ -1,3 +1,4 @@
+using System.Net.Http;
 using Serenity.CodeGeneration;
 using System.Diagnostics;
 using System.Text.Json.Nodes;
@@ -11,7 +12,12 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
     static readonly Version RecommendedNodeVersion = new(24, 10, 0);
     static readonly Version RecommendedNpmVersion = new(11, 6, 2);
 
-    public static readonly (Version, Version)[] RecommendedTSBuildVersion = [
+    /// <summary>
+    /// Minimum supported tsbuild version for a Serenity version range.
+    /// tsbuild is not published for every Serenity patch, so this is a floor,
+    /// not an exact version.
+    /// </summary>
+    public static readonly (Version, Version)[] MinimumTSBuildVersion = [
         (new(0, 0, 0), new(8, 6, 0)),
         (new(8, 7, 1), new(8, 7, 4)),
         (new(8, 8, 4), new(8, 8, 4)),
@@ -27,6 +33,12 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
 
     public IArgumentReader Arguments { get; set; } = null!;
     public List<ExternalType>? TsTypes { get; set; }
+
+    /// <summary>
+    /// Optional resolver used by tests. When null, the latest published
+    /// @serenity-is/tsbuild version is read from the npm registry.
+    /// </summary>
+    public Func<Version?>? LatestTSBuildVersionResolver { get; set; }
 
     private bool hasErrors;
 
@@ -375,6 +387,64 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
         CheckTSBuildVersion(packageJson, serenityVersion);
     }
 
+    /// <summary>
+    /// Returns the minimum tsbuild version supported by a Serenity version.
+    /// </summary>
+    public static Version GetMinimumTSBuildVersion(Version serenityVersion)
+    {
+        return MinimumTSBuildVersion.LastOrDefault(x =>
+            serenityVersion >= x.Item1).Item2;
+    }
+
+    /// <summary>
+    /// Returns the recommended tsbuild version. The npm latest version wins
+    /// once it is newer than the last minimum-table entry, but only for
+    /// Serenity versions at least as new as that tsbuild version. This keeps
+    /// newer Serenity patches from requiring a tsbuild release.
+    /// </summary>
+    public static Version GetRecommendedTSBuildVersion(Version serenityVersion,
+        Version? latestTSBuildVersion)
+    {
+        var tableMinimum = GetMinimumTSBuildVersion(serenityVersion);
+        var lastTableVersion = MinimumTSBuildVersion[^1].Item2;
+
+        if (latestTSBuildVersion is not null &&
+            latestTSBuildVersion > lastTableVersion &&
+            serenityVersion >= latestTSBuildVersion)
+        {
+            return latestTSBuildVersion;
+        }
+
+        return tableMinimum;
+    }
+
+    static Version? FetchLatestTSBuildVersion()
+    {
+        try
+        {
+            using var client = new HttpClient
+            {
+                Timeout = TimeSpan.FromSeconds(3)
+            };
+            var json = client.GetStringAsync(
+                "https://registry.npmjs.org/@serenity-is%2ftsbuild")
+                .GetAwaiter().GetResult();
+            using var document = System.Text.Json.JsonDocument.Parse(json);
+            if (document.RootElement.TryGetProperty("dist-tags", out var tags) &&
+                tags.TryGetProperty("latest", out var latest) &&
+                Version.TryParse(latest.GetString(), out var version))
+            {
+                return version;
+            }
+        }
+        catch
+        {
+            // offline / registry unavailable; fall back to the table
+        }
+
+        return null;
+    }
+
     void CheckTSBuildVersion(PackageJson? packageJson, Version serenityVersion)
     { 
         if (packageJson?.devDependencies?.TryGetValue("@serenity-is/tsbuild", out var versionStr) != true &&
@@ -396,23 +466,27 @@ public partial class DoctorCommand(IProjectFileInfo project, IGeneratorConsole c
             return;
         }
 
-        var recommendedVersion = RecommendedTSBuildVersion.LastOrDefault(x =>
-            serenityVersion >= x.Item1).Item2;
+        var latestVersion = LatestTSBuildVersionResolver is not null
+            ? LatestTSBuildVersionResolver()
+            : FetchLatestTSBuildVersion();
+        var recommendedVersion = GetRecommendedTSBuildVersion(serenityVersion, latestVersion);
+        var tsbuildMinor = new Version(version!.Major, version.Minor, 0);
+        var serenityMinor = new Version(serenityVersion.Major, serenityVersion.Minor, 0);
 
-        if (version != null && version < recommendedVersion)
+        if (version < recommendedVersion)
         {
             Error($"@serenity-is/tsbuild version in package.json is {version}, " +
-                $"please update to {recommendedVersion} for better support.");
+                $"please update to at least {recommendedVersion} for better support.");
         }
-        else if (version != null && version > recommendedVersion)
+        else if (tsbuildMinor > serenityMinor)
         {
             Warning($"@serenity-is/tsbuild version in package.json is {version}, " +
-                $"which is newer than the recommended version {recommendedVersion} for " +
-                $"Serenity {serenityVersion}. Please check docs as it may include breaking changes.");
+                $"which is newer than Serenity {serenityVersion}. " +
+                $"Please check docs as it may include breaking changes.");
         }
         else
         {
-            Info("@serenity-is/tsbuild Version", version!.ToString());
+            Info("@serenity-is/tsbuild Version", version.ToString());
         }
     }
 
