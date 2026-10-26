@@ -33,7 +33,8 @@
   "scripts": {
     "build": "node build/build",
     "dts": "node --run build && node dist/cli.js",
-    "prepublishOnly": "node --run test:dist -- --coverage && node --run dts",
+    "prepack": "node --run dts",
+    "prepublishOnly": "node --run test:dist -- --coverage",
     "test:dist": "node --run build && vitest run",
     "tsc": "tsc"
   },

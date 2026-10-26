@@ -33,7 +33,8 @@
     "build": "node build/build",
     "doc": "typedoc --plugin typedoc-plugin-markdown --exclude **/lib/**/* --excludePrivate --readme none --githubPages false --hidePageHeader --name @serenity-is/domwise --sourceLinkTemplate https://github.com/serenity-is/serenity/blob/master/{path}#L{line} --out /serenity-is/web/Docs/api/js/domwise --json ./out/typedoc.json src",
     "dts": "dtsbundler --external-inlines=@preact/signals-core",
-    "prepublishOnly": "node --run build && node --run test -- --coverage && node --run dts",
+    "prepack": "node --run build && node --run dts",
+    "prepublishOnly": "node --run test -- --coverage",
     "test": "node --run build && vitest run",
     "tsc": "tsc"
   },

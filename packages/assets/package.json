@@ -1,5 +1,6 @@
 {
   "name": "@serenity-is/assets",
+  "version": "10.6.1",
   "exports": {
     "./*": "./wwwroot/*"
   },
@@ -23,6 +24,6 @@
   },
   "scripts": {
     "build": "node build/build.mjs",
-    "prepublishOnly": "node build/build.mjs"
+    "prepack": "node build/build.mjs"
   }
 }
