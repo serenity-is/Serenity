@@ -1,6 +1,6 @@
 {
   "name": "@serenity-is/dtsbundler",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Bundle TypeScript declaration files into a single .d.ts using the TypeScript 7 native API",
   "type": "module",
   "types": "dist/index.d.ts",
