@@ -11,7 +11,8 @@
     "test-utils": "workspace:*"
   },
   "scripts": {
-    "all": "pnpm --filter ./** i && pnpm --filter ./** build && pnpm --filter ./** tsc && pnpm --filter ./** dts && pnpm --filter ./** test"
+    "all": "node --run all:notests && pnpm --filter ./** test",
+    "all:notests": "pnpm --filter ./** i && pnpm --filter ./** build && pnpm --filter ./** tsc && pnpm --filter ./** dts"
   },
   "type": "module"
 }
