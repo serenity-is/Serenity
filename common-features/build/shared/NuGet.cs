@@ -1,4 +1,4 @@
-#if IsFeatureBuild || IsTemplateBuild
+#if IsTemplateBuild
 using NuGet.Common;
 using NuGet.Configuration;
 using NuGet.Protocol;
@@ -77,37 +77,6 @@ public static partial class Shared
         }
     }
 
-#if IsFeatureBuild
-    private static void PushToLocalNugetFeed(PackageSource localFeed, string nupkg)
-    {
-        Directory.CreateDirectory(localFeed.Source);
-        var filename = Path.ChangeExtension(Path.GetFileName(nupkg).ToLowerInvariant(), null);
-        var match = System.Text.RegularExpressions.Regex.Match(filename, @"(.+?)((\.[0-9]+)+)");
-        if (match != null && match.Groups.Count >= 2)
-        {
-            var id = match.Groups[1].Value;
-            var version = match.Groups[2].Value.Substring(1);
-            var dir = Path.Combine(localFeed.Source, id, version);
-            if (Directory.Exists(dir))
-                Directory.Delete(dir, true);
-
-            var metadata = Path.Combine(dir, ".nupkg.metadata");
-
-            if (StartProcess("dotnet", $"nuget push \"{nupkg}\"" +
-                " --source " + localFeed.Name, Path.GetDirectoryName(nupkg)) != 0)
-                Console.Error.WriteLine("Error while pushing " + Path.GetFileName(nupkg) +
-                    " to local feed");
-            else if (!File.Exists(metadata))
-            {
-                string nuget = "nuget";
-                if (StartProcess(nuget, "init . .", localFeed.Source) != 0)
-                    Console.Error.WriteLine("Error while initializing " + localFeed.Source);
-                else if (File.Exists(metadata))
-                    File.Delete(Path.Combine(localFeed.Source, Path.GetFileName(nupkg)));
-            }
-        }
-    }
-#endif
 
     public static bool IsProPackage(string packageId)
     {

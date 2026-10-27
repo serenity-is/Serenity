@@ -41,7 +41,7 @@ public static partial class Shared
 
     public static void CleanDirectory(string path, bool ensure = false)
     {
-#if IsFeatureBuild || IsTemplateBuild
+#if IsTemplateBuild
         path = Path.Combine(Root, path);
 #endif
         if (!Directory.Exists(path))
