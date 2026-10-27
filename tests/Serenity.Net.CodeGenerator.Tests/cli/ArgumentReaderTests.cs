@@ -9,6 +9,65 @@ public partial class ArgumentReaderTests
     }
 
     [Fact]
+    public void GetBoolean_ReturnsNull_WhenSwitchIsOmitted()
+    {
+        var reader = new ArgumentReader(["--other"]);
+        Assert.Null(reader.GetBoolean(["test"]));
+        Assert.Equal(1, reader.Remaining);
+    }
+
+    [Theory]
+    [InlineData("--test", true)]
+    [InlineData("--test:true", true)]
+    [InlineData("--test=false", false)]
+    [InlineData("/test:false", false)]
+    public void GetBoolean_Strict_ReadsBareOrAssignedValue(string argument, bool expected)
+    {
+        var reader = new ArgumentReader([argument]);
+        Assert.Equal(expected, reader.GetBoolean(["test"]));
+        Assert.Equal(0, reader.Remaining);
+    }
+
+    [Fact]
+    public void GetBoolean_Strict_DoesNotConsumeFollowingNonSwitch()
+    {
+        var reader = new ArgumentReader(["--test", "false", "--other"]);
+        Assert.True(reader.GetBoolean(["test"]));
+        Assert.Equal(2, reader.Remaining);
+    }
+
+    [Fact]
+    public void GetBoolean_Strict_ThrowsForInvalidAssignedValue()
+    {
+        var reader = new ArgumentReader(["--test:yes"]);
+        Assert.Throws<ArgumentException>(() => reader.GetBoolean(["test"]));
+    }
+
+    [Theory]
+    [InlineData("true", true)]
+    [InlineData("false", false)]
+    public void GetBoolean_NonStrict_ConsumesFollowingBoolean(string value, bool expected)
+    {
+        var reader = new ArgumentReader(["--test", value, "--other"], strictBooleans: false);
+        Assert.Equal(expected, reader.GetBoolean(["test"]));
+        Assert.Equal(1, reader.Remaining);
+    }
+
+    [Fact]
+    public void GetBoolean_NonStrict_ThrowsForNonBooleanValue()
+    {
+        var reader = new ArgumentReader(["--test", "value"], strictBooleans: false);
+        Assert.Throws<ArgumentException>(() => reader.GetBoolean(["test"]));
+    }
+
+    [Fact]
+    public void GetBoolean_ThrowsIfSpecifiedTwiceWithDifferentValues()
+    {
+        var reader = new ArgumentReader(["--test:true", "--test:false"]);
+        Assert.Throws<ArgumentException>(() => reader.GetBoolean(["test"]));
+    }
+
+    [Fact]
     public void GetOptionalString_ReturnsNull_IfArgument_IsOmitted()
     {
         var reader = new ArgumentReader(["--other"]);

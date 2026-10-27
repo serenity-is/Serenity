@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+#nullable enable
 
 namespace Serenity.CodeGenerator
 {
@@ -21,6 +23,11 @@ namespace Serenity.CodeGenerator
         /// </summary>
         /// <returns>Command, or null if not found</returns>
         string? GetCommand();
+
+        /// <summary>
+        /// Gets the value of a true/false switch.
+        /// </summary>
+        bool? GetBoolean(string[] names);
 
         /// <summary>
         /// Gets the value for a switch that can only be specified once.

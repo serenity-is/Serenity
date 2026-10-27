@@ -1,5 +1,6 @@
 #if IsTemplateBuild
 using System.IO;
+using Serenity.CodeGenerator;
 
 namespace Build;
 

@@ -20,5 +20,7 @@
     <Compile Include="$(SharedSrc)\**\*.cs">
       <Link>shared\%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Compile>
+    <Compile Include="..\..\src\codegenerator\Helpers\ArgumentReader.cs" Link="shared\ArgumentReader.cs" />
+    <Compile Include="..\..\src\codegenerator\Models\IArgumentReader.cs" Link="shared\IArgumentReader.cs" />
   </ItemGroup>
 </Project>
