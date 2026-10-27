@@ -4,13 +4,13 @@
 Key points (quick):
 - Root build is driven by MSBuild/Visual Studio (`Serenity.slnx`) for .NET projects and `pnpm`/`node` for TypeScript packages under `packages/` and `src/typescript`.
 - Many packages (e.g., `packages/corelib`, `packages/sleekgrid`) contain their own `README.md` and a `.github/copilot-instructions.md` with package-specific details — check those for specialized rules.
-- Use project scripts (`pnpm -r build`, `pnpm -r tsc`, `pnpm -r test`) from the repository root where appropriate; .NET builds are via `build\build.csproj` or opening `Serenity.slnx` in Visual Studio.
+- Use project scripts (`pnpm -r build`, `pnpm -r tsc`, `pnpm -r test`) from the repository root where appropriate; .NET builds are via `Serenity.slnx` using `dotnet build` or Visual Studio.
 
 Repository architecture (concise):
 - .NET backend: projects live under `src/` (e.g., `src/core/Serenity.Net.Core.csproj`, `src/web/Serenity.Net.Web.csproj`) and are composed into `Serenity.slnx`. These projects provide services, code-generation hooks, and MSBuild targets that integrate TypeScript builds.
 - TypeScript frontend and libraries: under `packages/` and `serene/` (app template). Notable package: `packages/corelib` — core TypeScript utilities, event system, UI widgets, and runtime registration conventions.
 - Common-features: reusable .NET features and demo projects in `common-features/`.
-- Build/release orchestration: top-level `build/` contains MSBuild helpers; `build.cmd` invokes `dotnet run --project build\build.csproj`.
+- Build/release orchestration: local .NET builds use `Serenity.slnx`; release orchestration lives in the StartSharp repo's `build/release` tool.
 
 Critical developer workflows (explicit commands)
 - Full repo (Windows/pwsh):
@@ -21,12 +21,13 @@ Critical developer workflows (explicit commands)
   - Build TypeScript packages and .NET projects (recommended):
     ```powershell
     # from repo root
-    dotnet run --project .\build\build.csproj --
-    # or use the simpler wrapper (Windows)
-    .\build.cmd
+    dotnet build Serenity.slnx
+
+    # or the local wrapper (build + tests, same as CI)
+    .\build\build.cmd
     ```
 
-    Note that `build` does not do type checking; use `tsc` for that. `pnpm -r dts` uses typescript to generate bundled declaration files so running it is recommended when changing public APIs and it also covers type checking. `test` also runs `build` first.
+    Note that `dotnet build Serenity.slnx` and `pnpm -r build` do not do type checking; use `tsc` for that. `pnpm -r dts` uses typescript to generate bundled declaration files so running it is recommended when changing public APIs and it also covers type checking. `test` also runs `build` first.
 
   - Run an individual .NET project (example web):
     ```powershell
@@ -58,7 +59,7 @@ Examples to copy patterns from
 
 Where to look first (high-signal files)
 - `Serenity.slnx` — overall project composition and which projects are built together.
-- `build/build.csproj` and `build.cmd` — orchestrates higher-level build steps for the repo.
+- `Serenity.slnx` — overall project composition and local .NET build entry point.
 - `packages/corelib/.github/copilot-instructions.md` and `packages/corelib/README.md` — package-specific agent guidance and examples.
 - `package.json` (repo root) and `pnpm-workspace.yaml` — workspace and scripts for TypeScript tooling.
 - `vitest.workspace.json` — test configuration across packages.
@@ -66,7 +67,7 @@ Where to look first (high-signal files)
 
 Editing guidance (do's and don'ts for AI agents)
 - Do: follow existing registration/factory patterns in `packages/corelib` when introducing new runtime behavior (events, lookups, formatters).
-- Do: run `pnpm -r build` and `pnpm -r tsc` after TS changes; run `dotnet build` or the `build` target for .NET changes that impact packaging.
+- Do: run `pnpm -r build` and `pnpm -r tsc` after TS changes; run `dotnet build Serenity.slnx` for .NET changes that impact packaging.
 - Do: use `registerEnum()` and `registerClass()` for runtime metadata instead of ad-hoc global assignments.
 - Do: prefer `LookupEditor` subclasses for data-bound dropdowns with automatic script data loading.
 - Don't: modify MSBuild props or solution structure without confirming where the change is required — these files affect packaging and CI.
@@ -86,7 +87,7 @@ Repository architecture (concise):
 - .NET backend: projects live under `src/` (e.g., `src/core/Serenity.Net.Core.csproj`, `src/web/Serenity.Net.Web.csproj`) and are composed into `Serenity.slnx`. These projects provide services, code-generation hooks, and MSBuild targets that integrate TypeScript builds.
 - TypeScript frontend and libraries: under `packages/` and `serene/` (app template). Notable package: `packages/corelib` — core TypeScript utilities, event system, UI widgets, and runtime registration conventions.
 - Common-features: reusable .NET features and demo projects in `common-features/`.
-- Build orchestration: top-level `build/` contains MSBuild helpers; `build.cmd` invokes `dotnet run --project build\build.csproj`.
+- Build orchestration: local .NET builds use `Serenity.slnx`; release orchestration lives in the StartSharp repo's `build/release` tool.
 
 Critical developer workflows (explicit commands)
 - Full repo (Windows/pwsh):
@@ -97,9 +98,10 @@ Critical developer workflows (explicit commands)
   - Build TypeScript packages and .NET projects (recommended):
     ```powershell
     # from repo root
-    dotnet run --project .\build\build.csproj --
-    # or use the simpler wrapper (Windows)
-    .\build.cmd
+    dotnet build Serenity.slnx
+
+    # or the local wrapper (build + tests, same as CI)
+    .\build\build.cmd
     ```
   - Quick TypeScript-only work:
     ```powershell
@@ -108,7 +110,7 @@ Critical developer workflows (explicit commands)
     node --run test   # pnpm -r test, plus dtsbundler
     ```
 
-    Note that `build` does not do type checking; use `tsc` for that. `pnpm -r dts` uses typescript to generate bundled declaration files so running it is recommended when changing public APIs and it also covers type checking. `test` also runs `build` first.
+    Note that `dotnet build Serenity.slnx` and `pnpm -r build` do not do type checking; use `tsc` for that. `pnpm -r dts` uses typescript to generate bundled declaration files so running it is recommended when changing public APIs and it also covers type checking. `test` also runs `build` first.
 
   - Run an individual .NET project (example web):
     ```powershell
@@ -152,13 +154,13 @@ Examples to copy patterns from
 
 Where to look first (high-signal files)
 - `Serenity.slnx` — overall project composition and which projects are built together.
-- `build/build.csproj` and `build.cmd` — orchestrates higher-level build steps for the repo.
+- `Serenity.slnx` — overall project composition and local .NET build entry point.
 - `packages/corelib/.github/copilot-instructions.md` and `packages/corelib/README.md` — package-specific agent guidance and examples.
 - `package.json` (repo root) and `pnpm-workspace.yaml` — workspace and scripts for TypeScript tooling.
 
 Editing guidance (do's and don'ts for AI agents)
 - Do: follow existing registration/factory patterns in `packages/corelib` when introducing new runtime behavior (events, lookups, formatters).
-- Do: run `pnpm -r build` and `pnpm -r tsc` after TS changes; run `dotnet build` or the `build` target for .NET changes that impact packaging.
+- Do: run `pnpm -r build` and `pnpm -r tsc` after TS changes; run `dotnet build Serenity.slnx` for .NET changes that impact packaging.
 - Don't: modify MSBuild props or solution structure without confirming where the change is required — these files affect packaging and CI.
 - Don't: assume NPM-only packaging — some packages are wired to NuGet and MSBuild; check `packages/*/README.md`.
 
