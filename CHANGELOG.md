@@ -1,3 +1,12 @@
+## 10.6.3 (2026-10-27)
+
+### Features
+- Pin `Microsoft.TypeScript.MSBuild` to 7.0.1 instead of the floating `[6.0.3,7.0.0)` range, so projects created from the Serene and StartSharp templates are built with the TypeScript 7 compiler. Existing projects keep restoring the 6.x compiler from their own reference until they update it to 7.0.1.
+- Bump template and shared NuGet package versions: `Microsoft.Data.Sqlite`, `Microsoft.Extensions.*`, `System.Text.Json`, `System.Security.Cryptography.Pkcs` and `Microsoft.AspNetCore.DataProtection` to 10.0.14, MailKit 4.18.2, Markdig 1.5.0, NUglify 1.23.5, Scriban 7.5.3, PuppeteerSharp 25.15.0 and Microsoft.Playwright.Xunit.v3 1.64.1.
+
+### Bugfixes
+- Fix `sergen doctor` reporting a false `@serenity-is/tsbuild` version error or warning. The Serenity-to-tsbuild version table is now treated as a minimum required version instead of an exact one, so Serenity patches that don't have a matching tsbuild release no longer fail the check, and a newer tsbuild version only produces a warning when its minor version is ahead of the project's Serenity version. The recommended version comes from the npm registry `latest` tag when it is newer than the last table entry and the project's Serenity version is at least as new, falling back to the table when the registry is unreachable.
+
 ## 10.6.2 (2026-10-25)
 
 ### Bugfixes
