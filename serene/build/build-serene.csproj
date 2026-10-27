@@ -22,5 +22,6 @@
     </Compile>
     <Compile Include="..\..\src\codegenerator\Helpers\ArgumentReader.cs" Link="shared\ArgumentReader.cs" />
     <Compile Include="..\..\src\codegenerator\Models\IArgumentReader.cs" Link="shared\IArgumentReader.cs" />
+    <Compile Include="..\..\src\core\IO\GlobFilter.cs" Link="shared\GlobFilter.cs" />
   </ItemGroup>
 </Project>
