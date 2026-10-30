@@ -3,6 +3,5 @@
     <SerenityVersion Condition="'$(SerenityVersion)' == ''">10.6.3</SerenityVersion>
     <CFPackageVersion Condition="'$(CFPackageVersion)' == ''">10.6.3.0</CFPackageVersion>
     <SereneTemplateVersion Condition="'$(SereneTemplateVersion)' == ''">10.6.3.0</SereneTemplateVersion>
-    <SerenityTestingVersion Condition="'$(SerenityTestingVersion)' == ''">10.0.0</SerenityTestingVersion>
   </PropertyGroup>
 </Project>

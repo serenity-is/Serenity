@@ -12,6 +12,8 @@
       "src\\core\\Serenity.Net.Core.csproj",
       "src\\services\\Serenity.Net.Services.csproj",
       "src\\web\\Serenity.Net.Web.csproj",
+      "src\\testing\\Serenity.Testing.csproj",
+      "src\\testing-playwright\\Serenity.Testing.Playwright.csproj",
       "tests\\Serenity.Net.CodeGenerator.Tests\\Serenity.Net.CodeGenerator.Tests.csproj",
       "tests\\Serenity.Net.Tests\\Serenity.Net.Tests.csproj"
     ]
