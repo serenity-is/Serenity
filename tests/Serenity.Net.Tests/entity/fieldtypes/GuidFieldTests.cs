@@ -22,7 +22,7 @@ public class GuidFieldTests
         Assert.Equal("T0.[Test]", field.Expression);
         Assert.Same(fields, field.Fields);
         Assert.Equal(21, field.Index);
-        Assert.Equal("Db.TestUtils.AllFields.Test", field.AutoTextKey);
+        Assert.Equal("Db.Testing.AllFields.Test", field.AutoTextKey);
     }
 
     [Fact]
