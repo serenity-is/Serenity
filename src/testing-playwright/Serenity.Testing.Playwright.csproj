@@ -3,7 +3,7 @@
     <AssemblyName>Serenity.Testing.Playwright</AssemblyName>
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>annotations</Nullable>
-    <Version>0.0.1</Version>
+    <Version>$(SerenityTestingVersion)</Version>
     <Title>Serenity Platform - Playwright Testing Library</Title>
     <Description>Playwright page objects (dialogs, grids, inputs) and browser test helpers for Serenity based applications.</Description>
     <NoWarn>$(NoWarn);CS1591</NoWarn>

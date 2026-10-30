@@ -3,7 +3,7 @@
     <AssemblyName>Serenity.Testing</AssemblyName>
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>annotations</Nullable>
-    <Version>0.0.1</Version>
+    <Version>$(SerenityTestingVersion)</Version>
     <Title>Serenity Platform - Testing Library</Title>
     <Description>Mocks, in-memory (SQLite) SQL connections, service collection and configuration helpers shared by Serenity based test projects.</Description>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
