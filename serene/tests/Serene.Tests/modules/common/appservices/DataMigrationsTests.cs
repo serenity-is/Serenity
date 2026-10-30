@@ -1,5 +1,3 @@
-using System.Data;
-
 namespace Serene.Tests;
 
 public class DataMigrationsTests

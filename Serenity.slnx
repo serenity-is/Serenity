@@ -1,4 +1,4 @@
-<Solution>
+﻿<Solution>
   <Folder Name="/common-features/">
     <Project Path="common-features/src/demo.basicsamples/Serenity.Demo.BasicSamples.csproj" />
     <Project Path="common-features/src/demo.northwind/Serenity.Demo.Northwind.csproj" />
@@ -25,6 +25,8 @@
     <Project Path="src/codegenerator/Serenity.Net.CodeGenerator.csproj" />
     <Project Path="src/core/Serenity.Net.Core.csproj" />
     <Project Path="src/services/Serenity.Net.Services.csproj" />
+    <Project Path="src/testing/Serenity.Testing.csproj" />
+    <Project Path="src/testing-playwright/Serenity.Testing.Playwright.csproj" />
     <Project Path="src/web/Serenity.Net.Web.csproj" />
     <Project Path="tests/Serenity.Net.CodeGenerator.Tests/Serenity.Net.CodeGenerator.Tests.csproj" />
     <Project Path="tests/Serenity.Net.Tests/Serenity.Net.Tests.csproj" />

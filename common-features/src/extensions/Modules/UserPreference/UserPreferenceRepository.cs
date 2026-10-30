@@ -1,4 +1,3 @@
-using System.Data;
 using MyRow = Serenity.Extensions.Entities.UserPreferenceRow;
 
 namespace Serenity.Extensions.Repositories;

@@ -1,5 +1,3 @@
-using static Dapper.SqlMapper;
-
 namespace Serenity.Data;
 
 /// <summary>

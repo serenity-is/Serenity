@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc.Abstractions;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace Serenity.Web;
 

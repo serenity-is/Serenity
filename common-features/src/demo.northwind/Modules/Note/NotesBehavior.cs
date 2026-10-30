@@ -1,5 +1,3 @@
-using System.Threading;
-
 namespace Serenity.Demo.Northwind;
 
 public class NotesBehavior(IUserRetrieveService userRetriever,

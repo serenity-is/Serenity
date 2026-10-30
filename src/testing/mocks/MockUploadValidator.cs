@@ -1,0 +1,16 @@
+﻿using System.IO;
+
+namespace Serenity.Testing;
+
+public class MockUploadValidator : IUploadValidator
+{
+    public void ValidateFile(IUploadFileConstraints constraints, Stream stream, string filename, out bool isImageExtension)
+    {
+        isImageExtension = false;
+    }
+
+    public void ValidateImage(IUploadImageConstraints constraints, Stream stream, string filename, out object image)
+    {
+        image = new object();
+    }
+}

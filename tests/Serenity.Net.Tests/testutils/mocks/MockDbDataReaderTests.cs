@@ -1,4 +1,4 @@
-namespace Serenity.TestUtils;
+﻿namespace Serenity.Testing;
 
 public class MockDbDataReaderTests
 {

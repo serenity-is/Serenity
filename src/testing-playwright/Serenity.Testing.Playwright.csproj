@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>Serenity.Testing.Playwright</AssemblyName>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>annotations</Nullable>
+    <Version>0.0.1</Version>
+    <Title>Serenity Platform - Playwright Testing Library</Title>
+    <Description>Playwright page objects (dialogs, grids, inputs) and browser test helpers for Serenity based applications.</Description>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\testing\Serenity.Testing.csproj" />
+    <ProjectReference Include="..\web\Serenity.Net.Web.csproj" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.Playwright.Xunit.v3" />
+    <PackageReference Include="xunit.v3.assert" />
+  </ItemGroup>
+  <ItemGroup>
+    <Using Include="Microsoft.Extensions.DependencyInjection" />
+    <Using Include="Microsoft.Playwright" />
+    <Using Include="Microsoft.Playwright.Xunit.v3" />
+    <Using Include="Serenity.Testing" />
+    <Using Include="Serenity.Web" />
+    <Using Include="Xunit" />
+  </ItemGroup>
+</Project>

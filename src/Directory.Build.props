@@ -18,6 +18,8 @@
   </PropertyGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="Serenity.Net.Tests" />
+    <InternalsVisibleTo Include="Serenity.Testing" />
+    <InternalsVisibleTo Include="Serenity.Testing.Playwright" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="$(MSBuildProjectDirectory)\*.json" />

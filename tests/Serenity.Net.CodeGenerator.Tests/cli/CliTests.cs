@@ -1,6 +1,6 @@
 using Xunit.Sdk;
 using Xunit.v3;
-using CallType = Serenity.TestUtils.MockGeneratorConsole.CallType;
+using CallType = Serenity.Testing.MockGeneratorConsole.CallType;
 
 namespace Serenity.CodeGenerator;
 

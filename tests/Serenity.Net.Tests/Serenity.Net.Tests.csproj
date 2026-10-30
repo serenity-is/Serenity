@@ -4,6 +4,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\web\Serenity.Net.Web.csproj" />
+    <ProjectReference Include="..\..\src\testing\Serenity.Testing.csproj" />
     <PackageReference Include="TSQL.Parser" />
     <Using Include="Microsoft.AspNetCore.Hosting" />
     <Using Include="Microsoft.AspNetCore.Http" />
@@ -14,6 +15,6 @@
     <Using Include="Microsoft.AspNetCore.Routing" />
     <Using Include="Microsoft.Extensions.FileProviders" />
     <Using Include="Microsoft.Extensions.Primitives" />
-    <Using Include="Serenity.TestUtils" />
+    <Using Include="Serenity.Testing" />
   </ItemGroup>
 </Project>

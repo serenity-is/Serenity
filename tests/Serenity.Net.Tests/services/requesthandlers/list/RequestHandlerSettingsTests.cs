@@ -1,8 +1,5 @@
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Serenity.Extensions.DependencyInjection;
-using Serenity.TestUtils;
 using System.Text.Json;
 
 namespace Serenity.Services;
@@ -21,7 +18,7 @@ public class RequestHandlerSettingsTests
         }
     }
 
-    private static IRequestContext Context(RequestHandlerSettings? settings = null)
+    private static DefaultRequestContext Context(RequestHandlerSettings? settings = null)
     {
         return new DefaultRequestContext(
             new NullBehaviorProvider(),

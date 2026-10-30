@@ -1,5 +1,3 @@
-using Serenity.ComponentModel;
-
 namespace Serenity.Extensions;
 
 public class BasePermissionServiceTMoreTests

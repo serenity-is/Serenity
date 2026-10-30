@@ -1,5 +1,3 @@
-using Microsoft.Extensions.FileProviders;
-
 namespace Serenity.Web;
 
 public class ContentHashCacheTests

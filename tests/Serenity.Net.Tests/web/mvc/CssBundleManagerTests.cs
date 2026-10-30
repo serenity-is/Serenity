@@ -1,5 +1,3 @@
-using Microsoft.Extensions.Options;
-
 namespace Serenity.Web;
 
 public class CssBundleManagerTests

@@ -1,5 +1,4 @@
 using System.Data.Common;
-using Serenity.Data;
 
 namespace Serenity.Services.SqlErrors;
 

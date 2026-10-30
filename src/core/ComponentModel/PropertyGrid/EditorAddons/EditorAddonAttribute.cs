@@ -1,5 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
-
 namespace Serenity.ComponentModel;
 
 /// <summary>

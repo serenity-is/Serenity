@@ -6,7 +6,7 @@ using MySqlConnector;
 using Npgsql;
 using Oracle.ManagedDataAccess.Client;
 
-namespace Serenity.TestUtils;
+namespace Serenity.Testing;
 
 /// <summary>
 /// Shared database connection and SQL command helpers for SQL integration tests.

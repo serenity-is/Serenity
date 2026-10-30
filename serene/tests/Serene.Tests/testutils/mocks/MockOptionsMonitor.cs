@@ -1,6 +1,4 @@
-using Microsoft.Extensions.Options;
-
-namespace Serenity.TestUtils;
+namespace Serenity.Testing;
 
 public class MockOptionsMonitor<T>(T value) : IOptionsMonitor<T>
 {

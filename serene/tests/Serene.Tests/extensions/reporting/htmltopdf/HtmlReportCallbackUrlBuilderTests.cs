@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.DataProtection;
-using System.Net;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace Serenity.Reporting;

@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Options;
 using Serenity.Localization;
 
 namespace Serenity.Web;

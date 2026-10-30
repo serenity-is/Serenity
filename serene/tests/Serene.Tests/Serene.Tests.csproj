@@ -16,6 +16,6 @@
     <Using Include="Microsoft.Extensions.Logging" />
     <Using Include="Microsoft.Extensions.Options" />
     <Using Include="System.Security.Principal" />
-    <Using Include="Serenity.TestUtils" />
+    <Using Include="Serenity.Testing" />
   </ItemGroup>
 </Project>

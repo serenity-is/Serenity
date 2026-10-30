@@ -1,4 +1,4 @@
-namespace Serenity.TestUtils;
+namespace Serenity.Testing;
 
 [DefaultConnection]
 public class MockUserRow : Row<MockUserRow.RowFields>, IIdRow, IEmailRow, IPasswordRow,

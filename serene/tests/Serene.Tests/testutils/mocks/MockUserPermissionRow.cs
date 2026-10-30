@@ -1,4 +1,4 @@
-namespace Serenity.TestUtils;
+namespace Serenity.Testing;
 
 [DefaultConnection]
 public sealed class MockUserPermissionRow : Row<MockUserPermissionRow.RowFields>, IUserPermissionRow

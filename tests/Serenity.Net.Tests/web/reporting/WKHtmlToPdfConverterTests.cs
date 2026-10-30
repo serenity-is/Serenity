@@ -1,5 +1,3 @@
-using Microsoft.Extensions.Options;
-
 namespace Serenity.Reporting;
 
 public class WKHtmlToPdfConverterTests

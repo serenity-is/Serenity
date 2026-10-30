@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>Serenity.Testing</AssemblyName>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>annotations</Nullable>
+    <Version>0.0.1</Version>
+    <Title>Serenity Platform - Testing Library</Title>
+    <Description>Mocks, in-memory (SQLite) SQL connections, service collection and configuration helpers shared by Serenity based test projects.</Description>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\core\Serenity.Net.Core.csproj" />
+    <ProjectReference Include="..\services\Serenity.Net.Services.csproj" />
+    <ProjectReference Include="..\web\Serenity.Net.Web.csproj" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.Data.Sqlite" />
+    <PackageReference Include="System.IO.Abstractions.TestingHelpers" />
+    <PackageReference Include="TSQL.Parser" />
+    <PackageReference Include="xunit.v3.assert" />
+  </ItemGroup>
+  <ItemGroup>
+    <Using Include="Microsoft.AspNetCore.Hosting" />
+    <Using Include="Microsoft.AspNetCore.Http" />
+    <Using Include="Microsoft.AspNetCore.Mvc" />
+    <Using Include="Microsoft.AspNetCore.Mvc.Abstractions" />
+    <Using Include="Microsoft.AspNetCore.Mvc.Filters" />
+    <Using Include="Microsoft.AspNetCore.Mvc.ModelBinding" />
+    <Using Include="Microsoft.AspNetCore.Mvc.Routing" />
+    <Using Include="Microsoft.AspNetCore.Routing" />
+    <Using Include="Microsoft.Extensions.Caching.Memory" />
+    <Using Include="Microsoft.Extensions.DependencyInjection" />
+    <Using Include="Microsoft.Extensions.FileProviders" />
+    <Using Include="Microsoft.Extensions.Logging" />
+    <Using Include="Microsoft.Extensions.Options" />
+    <Using Include="Microsoft.Extensions.Primitives" />
+    <Using Include="Serenity.Extensions.DependencyInjection" />
+    <Using Include="Serenity.IO" />
+    <Using Include="Serenity.Web" />
+    <Using Include="Xunit" />
+  </ItemGroup>
+</Project>

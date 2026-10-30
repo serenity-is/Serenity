@@ -1,6 +1,3 @@
-using System.Collections;
-using ClosedXML.Excel;
-
 namespace Serenity.Reporting;
 
 public class DataReportExcelRendererTests

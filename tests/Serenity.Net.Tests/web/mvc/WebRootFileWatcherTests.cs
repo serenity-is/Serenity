@@ -1,4 +1,3 @@
-using Microsoft.Extensions.FileProviders;
 using System.IO;
 
 namespace Serenity.Web;

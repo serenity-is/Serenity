@@ -1,7 +1,3 @@
-using Microsoft.AspNetCore.Mvc;
-using Serenity.ComponentModel;
-using Serenity.Data;
-
 namespace Serenity.Net.Tests.AutoServiceFor.DataSources
 {
     [ConnectionKey("DataSources")]

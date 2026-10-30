@@ -1,4 +1,4 @@
-namespace Serenity.TestUtils;
+namespace Serenity.Testing;
 
 [TableName("IdName")]
 [ReadPermission(SpecialPermissionKeys.Public)]

@@ -1,7 +1,7 @@
 using Serenity.CodeGenerator;
 using System.Diagnostics;
 
-namespace Serenity.TestUtils;
+namespace Serenity.Testing;
 
 public class MockProcessExecutor : IProcessExecutor
 {

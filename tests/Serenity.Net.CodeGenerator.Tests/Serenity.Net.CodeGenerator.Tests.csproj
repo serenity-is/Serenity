@@ -7,7 +7,7 @@
     <ProjectReference Include="..\..\src\web\Serenity.Net.Web.csproj" />
     <PackageReference Include="CSharpMinifier" />
     <Compile Include="..\..\src\web\RestoreNodeTypesTask.cs" Link="restorenodetypes\RestoreNodeTypesTask.cs" />
-    <Compile Include="..\Serenity.Net.Tests\testutils\mocks\MockFileSystem.cs" Link="testutils/mocks/%(RecursiveDir)%(Filename)%(Extension)" />
-    <Using Include="Serenity.TestUtils" />
+    <Compile Include="..\..\src\testing\mocks\MockFileSystem.cs" Link="testutils/mocks/%(RecursiveDir)%(Filename)%(Extension)" />
+    <Using Include="Serenity.Testing" />
   </ItemGroup>
 </Project>

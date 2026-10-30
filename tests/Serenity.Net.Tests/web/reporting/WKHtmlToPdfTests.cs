@@ -1,5 +1,3 @@
-using Serenity.Web;
-
 namespace Serenity.Reporting;
 
 public class WKHtmlToPdfTests

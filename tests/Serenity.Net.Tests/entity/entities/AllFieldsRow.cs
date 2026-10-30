@@ -1,6 +1,6 @@
 using System.IO;
 
-namespace Serenity.TestUtils;
+namespace Serenity.Testing;
 
 public enum SampleEnum
 {

@@ -1,4 +1,4 @@
-namespace Serenity.TestUtils;
+namespace Serenity.Testing;
 
 [TableName("ComplexTable")]
 [ReadPermission(SpecialPermissionKeys.Public)]

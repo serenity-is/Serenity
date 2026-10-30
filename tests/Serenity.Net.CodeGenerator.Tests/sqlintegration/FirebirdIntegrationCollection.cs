@@ -1,4 +1,4 @@
-namespace Serenity.TestUtils;
+namespace Serenity.Testing;
 
 /// <summary>
 /// Names of xUnit test collections used by SQL integration tests.

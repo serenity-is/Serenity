@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 #nullable enable
 
 namespace Serenity.CodeGenerator

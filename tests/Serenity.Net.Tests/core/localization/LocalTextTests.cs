@@ -1,8 +1,5 @@
 using Serenity.Localization;
 
-using Serenity.ComponentModel;
-using System.Reflection;
-
 namespace Serenity;
 
 public class LocalTextTests

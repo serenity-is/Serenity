@@ -1,4 +1,3 @@
-using Serenity.Extensions.DependencyInjection;
 using Serenity.PropertyGrid;
 
 namespace Serenity.Web;

@@ -1,6 +1,5 @@
 using Microsoft.Extensions.FileSystemGlobbing;
 using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
-using System.Security.Permissions;
 
 namespace Serenity.CodeGeneration;
 
