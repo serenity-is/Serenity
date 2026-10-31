@@ -1,5 +1,6 @@
 <Project>
   <Import Project="$(MSBuildThisFileDirectory)Serenity.Net.Web.TSBuild.targets" />
+  <Import Project="$(MSBuildThisFileDirectory)Serenity.Net.Web.StaticAssets.targets" />
   <PropertyGroup>
     <DotNetSergen Condition="'$(DotNetSergen)' == '' And Exists('$(MSBuildThisFileDirectory)..\codegenerator\Serenity.Net.CodeGenerator.csproj')">dotnet $(MSBuildThisFileDirectory)..\..\artifacts\bin\Serenity.Net.CodeGenerator\sergen.dll</DotNetSergen>
     <DotNetSergen Condition="'$(DotNetSergen)' == ''">dotnet sergen</DotNetSergen>

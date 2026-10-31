@@ -139,8 +139,6 @@ public partial class Startup
         app.UseAuthentication();
         app.UseAuthorization();
 
-        ConfigureTestPipeline?.Invoke(app);
-
         app.UseDynamicScripts();
 
         app.UseEndpoints(endpoints => {
@@ -149,8 +147,6 @@ public partial class Startup
 
         app.ApplicationServices.GetRequiredService<IDataMigrations>().Initialize();
     }
-
-    public static Action<IApplicationBuilder>? ConfigureTestPipeline { get; set; }
 
     public static void RegisterDataProviders()
     {

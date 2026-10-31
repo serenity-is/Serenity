@@ -6,25 +6,22 @@
     <Content Update="$(MSBuildProjectDirectory)\package.json" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" Pack="true" PackagePath="" />
     <None Update="$(MSBuildProjectDirectory)\coverage\**\*;$(MSBuildProjectDirectory)\out\**\*;$(MSBuildProjectDirectory)\jest*.js;$(MSBuildProjectDirectory)\tsbuild*.js;$(MSBuildProjectDirectory)\test\**\*" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" Pack="false" />
     <None Include="$(MSBuildProjectDirectory)\dist\**" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" Pack="true" PackagePath="dist\" />
+    <!--
+      served / published / packed by Serenity static assets instead, see Serenity.Net.Web.StaticAssets.targets.
+      not using Content Update with Pack=false, as NuGet would then exclude these files from the package entirely
+    -->
+    <Content Remove="$(MSBuildProjectDirectory)\wwwroot\**" />
+    <None Include="$(MSBuildProjectDirectory)\wwwroot\**" Exclude="@(None)" />
   </ItemGroup>
   <Import Project="$(SerenitySrc)web\Serenity.Net.Web.targets" Condition="'$(AddAutoRefs)' != 'false'" />
   <Import Project="$(SerenitySrc)web\Serenity.Net.Web.TSBuild.targets" Condition="'$(AddAutoRefs)' == 'false'" />
   <Import Project="$(SerenitySrc)RestoreNpmPackages.targets" />
-  <Target Name="CompileProjectTSConfig" DependsOnTargets="NpmInstall;RestoreNodeTypes;CollectTSBuildInputs" BeforeTargets="ResolveProjectStaticWebAssets" AfterTargets="ResolveProjectReferences"
+  <Target Name="CompileProjectTSConfig" DependsOnTargets="NpmInstall;RestoreNodeTypes;CollectTSBuildInputs" AfterTargets="ResolveProjectReferences"
           Inputs="@(TSBuildInput);$(TSBuildInputsFile)" Outputs="$(TSBuildStampFile)"
           Condition="Exists('tsconfig.json') And '$(RunTSBuild)' == 'true'">
-    <ItemGroup>
-      <_ContentBeforeTSBuild Include="wwwroot\**\*" />
-    </ItemGroup>
     <Message Text="Executing TypeScript compiler for $(ProjectName)..." Importance="high"></Message>
     <Exec Command="node &quot;$(TSJavaScriptFile.Replace('build\\..\tools\', 'tools\'))&quot; -p ./tsconfig.json" Condition="!Exists('tsbuild.js')" ContinueOnError="true" />
     <Exec Command="node --run build" Condition="Exists('tsbuild.js')" ContinueOnError="true" />
     <Touch Files="$(TSBuildStampFile)" AlwaysCreate="true" Condition="'$(MSBuildLastTaskResult)' == 'true'" />
-    <ItemGroup>
-      <_ContentAfterTSBuild Include="wwwroot\**\*" Exclude="@(_ContentBeforeTSBuild)" />
-      <Content Include="@(_ContentAfterTSBuild)" Exclude="@(Content)" CopyToOutputDirectory="Never" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
-      <_ContentBeforeTSBuild Remove="wwwroot\**\*" />
-      <Content Remove="@(_ContentBeforeTSBuild)" />
-    </ItemGroup>
   </Target>
 </Project>

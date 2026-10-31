@@ -12,6 +12,8 @@
     <RestoreNodeTypes>false</RestoreNodeTypes>
     <SerenitySrc Condition="'$(SerenitySrc)' == ''">$(MSBuildThisFileDirectory)..\..\src\</SerenitySrc>
     <StaticWebAssetBasePath>/$(MSBuildProjectName)</StaticWebAssetBasePath>
+    <!-- wwwroot is served / published / packed by Serenity static assets instead, see Serenity.Net.Web.StaticAssets.targets -->
+    <StaticWebAssetsEnabled>false</StaticWebAssetsEnabled>
     <TargetFramework>net10.0</TargetFramework>
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
     <UseArtifactsOutput>true</UseArtifactsOutput>

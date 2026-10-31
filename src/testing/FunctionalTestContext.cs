@@ -25,8 +25,9 @@ public abstract class FunctionalTestContext<TStartup> : IDisposable, ISerenityTe
     private static readonly MethodInfo configureServicesMethod = GetStartupMethod("ConfigureServices", typeof(IServiceCollection))
         ?? throw new InvalidOperationException($"{typeof(TStartup).Name} has no ConfigureServices(IServiceCollection) method");
 
-    private static readonly MethodInfo configureMethod = GetStartupMethod("Configure", typeof(IApplicationBuilder), typeof(IWebHostEnvironment))
-        ?? throw new InvalidOperationException($"{typeof(TStartup).Name} has no Configure(IApplicationBuilder, IWebHostEnvironment) method");
+    // looked up with WebApplication argument type, so it matches both Configure(IApplicationBuilder, ...) and Configure(WebApplication, ...)
+    private static readonly MethodInfo configureMethod = GetStartupMethod("Configure", typeof(WebApplication), typeof(IWebHostEnvironment))
+        ?? throw new InvalidOperationException($"{typeof(TStartup).Name} has no Configure(IApplicationBuilder or WebApplication, IWebHostEnvironment) method");
 
     private bool disposed;
     private IServer server;
@@ -89,16 +90,22 @@ public abstract class FunctionalTestContext<TStartup> : IDisposable, ISerenityTe
     /// </summary>
     public virtual void ConfigureTestPipeline(IApplicationBuilder app)
     {
-        app.Map("/test-session-login", branch =>
+        // not using app.Map here, as it moves "/test-session-login" to Request.PathBase, and as this runs
+        // before UseAuthentication, the cookie handler would issue the cookie for that path only
+        app.Use(async (httpContext, next) =>
         {
-            branch.Run(async httpContext =>
+            if (!httpContext.Request.Path.StartsWithSegments("/test-session-login", out var remaining) ||
+                !remaining.HasValue)
             {
-                var username = httpContext.Request.Path.ToString()[1..];
-                var principal = httpContext.RequestServices.GetRequiredService<IUserClaimCreator>()
-                    .CreatePrincipal(username, authType: "Test");
-                await httpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
-                await httpContext.Response.WriteAsync(httpContext.Request.Path);
-            });
+                await next();
+                return;
+            }
+
+            var username = remaining.ToString()[1..];
+            var principal = httpContext.RequestServices.GetRequiredService<IUserClaimCreator>()
+                .CreatePrincipal(username, authType: "Test");
+            await httpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+            await httpContext.Response.WriteAsync(remaining);
         });
 
         app.Map("/test/callback", branch =>
@@ -291,6 +298,7 @@ public abstract class FunctionalTestContext<TStartup> : IDisposable, ISerenityTe
         });
 
         builder.WebHost.UseStaticWebAssets();
+        builder.WebHost.UseSerenityStaticAssets();
         ConfigureAppConfiguration(builder.Configuration);
 
         DbProviderFactories.RegisterFactory("Microsoft.Data.Sqlite", Microsoft.Data.Sqlite.SqliteFactory.Instance);

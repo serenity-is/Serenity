@@ -25,7 +25,7 @@ public class Program
         return Host.CreateDefaultBuilder(args)
             .ConfigureWebHostDefaults(webBuilder =>
             {
-                webBuilder.UseStaticWebAssets();
+                webBuilder.UseSerenityStaticAssets();
                 webBuilder.UseStartup<Startup>();
             })
             .ConfigureAppConfiguration((builderContext, config) =>

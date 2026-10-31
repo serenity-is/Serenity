@@ -1,5 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <!-- built by its own tooling, not as part of the dotnet build -->
+    <RunTSBuild>false</RunTSBuild>
     <DefaultItemExcludes>$(DefaultItemExcludes);out\**</DefaultItemExcludes>
   </PropertyGroup>
 </Project>

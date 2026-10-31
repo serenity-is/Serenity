@@ -1,30 +1,22 @@
 <Project>
   <Import Project="..\src\RestoreNpmPackages.targets" />
   <Import Project="..\src\web\Serenity.Net.Web.TSBuild.targets" />
+  <Import Project="..\src\web\Serenity.Net.Web.StaticAssets.targets" />
   <PropertyGroup>
-    <StaticWebAssetBasePath Condition="$('StaticWebAssetBasePath') == ''">/$(AssemblyName)</StaticWebAssetBasePath>
-    <ESMAssetBasePath Condition="$('ESMAssetBasePath') == ''">$(StaticWebAssetBasePath)/esm</ESMAssetBasePath>
+    <!-- pinned so URLs stay the same if a package switches back to static web assets (its default is _content/[PackageId]) -->
+    <StaticWebAssetBasePath Condition="'$(StaticWebAssetBasePath)' == ''">/$(AssemblyName)</StaticWebAssetBasePath>
   </PropertyGroup>
   <ItemGroup>
     <TypeScriptCompile Remove="node_modules\**;obj\**;out\**;dist\**"></TypeScriptCompile>
     <ProjectCapability Include="TypeScriptNuGet" />
     <Content Update="$(MSBuildProjectDirectory)\build\**\*;$(MSBuildProjectDirectory)\coverage\**\*;$(MSBuildProjectDirectory)\out\**\*;$(MSBuildProjectDirectory)\package*.json;$(MSBuildProjectDirectory)\sergen*.json;$(MSBuildProjectDirectory)\ts*.json;$(MSBuildProjectDirectory)\src\**\*;$(MSBuildProjectDirectory)\test\**\*" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" Pack="false" />
     <None Update="$(MSBuildProjectDirectory)\coverage\**\*;$(MSBuildProjectDirectory)\out\**\*;$(MSBuildProjectDirectory)\jest*.js;$(MSBuildProjectDirectory)\vitest*.*;$(MSBuildProjectDirectory)\tsbuild*.js;$(MSBuildProjectDirectory)\test\**\*" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" Pack="false" />
-    <Content Update="$(MSBuildProjectDirectory)\package.json" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" Pack="true" PackagePath="" />
+    <None Update="$(MSBuildProjectDirectory)\package.json" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" Pack="true" PackagePath="" />
     <None Include="$(MSBuildProjectDirectory)\dist\**" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" Pack="true" PackagePath="dist\" />
   </ItemGroup>
-  <Target Name="CompileProjectTSConfig" BeforeTargets="ResolveProjectStaticWebAssets" DependsOnTargets="NpmInstall;CollectTSBuildInputs" Condition="'$(RunTSBuild)' == 'true'"
+  <Target Name="CompileProjectTSConfig" AfterTargets="ResolveProjectReferences" DependsOnTargets="NpmInstall;CollectTSBuildInputs" Condition="'$(RunTSBuild)' == 'true'"
           Inputs="@(TSBuildInput);$(TSBuildInputsFile)" Outputs="$(TSBuildStampFile)">
-    <ItemGroup>
-      <_ContentBeforeTSBuild Include="wwwroot\**\*" />
-    </ItemGroup>
     <Exec Command="node --run build" />
     <Touch Files="$(TSBuildStampFile)" AlwaysCreate="true" />
-    <ItemGroup>
-      <_ContentAfterTSBuild Include="wwwroot\**\*" Exclude="@(_ContentBeforeTSBuild)" />
-      <Content Include="@(_ContentAfterTSBuild)" Exclude="@(Content)" CopyToOutputDirectory="Never" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
-      <_ContentBeforeTSBuild Remove="wwwroot\**\*" />
-      <Content Remove="@(_ContentBeforeTSBuild)" />
-    </ItemGroup>
-  </Target>  
+  </Target>
 </Project>

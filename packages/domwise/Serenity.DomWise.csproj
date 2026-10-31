@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Razor">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Description>NuGet version of @serenity-is/domwise NPM package</Description>
   </PropertyGroup>

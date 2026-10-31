@@ -1,0 +1,126 @@
+<Project>
+  <!--
+    Static assets of projects / packages that don't use the static web assets SDK (e.g. Serenity.Corelib).
+
+    Library side:
+    - SerenityStaticAssetsEnabled defaults to true for libraries that don't use static web assets
+      (StaticWebAssetsEnabled is not true). Set it to false to opt out.
+    - The files are SerenityStaticAssetIncludes (defaults to wwwroot\**, can be set to a whitelist of
+      patterns under wwwroot) minus SerenityStaticAssetDefaultExcludes (temp / dot files) and
+      SerenityStaticAssetExcludes (project relative patterns, for library specific exclusions).
+      Their paths are relative to wwwroot. While running from the build output, the whole wwwroot is served.
+    - They are served / published by referencing web apps under StaticWebAssetBasePath (the same property
+      the static web assets SDK uses, so switching between the two keeps the URLs; leading / optional),
+      or the assembly name if it is not set.
+    - Packing puts the files under staticwebassets\ and adds a buildTransitive\[PackageId].props that
+      declares the folder as a SerenityStaticAssetRoot item for consuming apps.
+
+    Application side (OutputType Exe):
+    - build: writes [AssemblyName].serenitystaticassets.json listing the folders of referenced projects
+      and packages, copied to the output directory but not published, which Serenity.Web.SerenityStaticAssets
+      uses to serve the files under their base paths while running from the build output
+      (see UseSerenityStaticAssets)
+    - publish: copies the files to wwwroot\[BasePath]\
+  -->
+  <Target Name="_InitSerenityStaticAssets">
+    <PropertyGroup>
+      <SerenityStaticAssetsEnabled Condition="'$(SerenityStaticAssetsEnabled)' == '' And '$(StaticWebAssetsEnabled)' != 'true'">true</SerenityStaticAssetsEnabled>
+      <_SerenityStaticAssetBasePath>$(StaticWebAssetBasePath.Trim('/'))</_SerenityStaticAssetBasePath>
+      <_SerenityStaticAssetBasePath Condition="'$(_SerenityStaticAssetBasePath)' == ''">$(AssemblyName)</_SerenityStaticAssetBasePath>
+      <SerenityStaticAssetIncludes Condition="'$(SerenityStaticAssetIncludes)' == ''">wwwroot\**</SerenityStaticAssetIncludes>
+      <SerenityStaticAssetDefaultExcludes Condition="'$(SerenityStaticAssetDefaultExcludes)' == ''">wwwroot\**\.*;wwwroot\**\.*\**;wwwroot\**\*.tmp;wwwroot\**\*~;wwwroot\**\Thumbs.db;wwwroot\**\desktop.ini</SerenityStaticAssetDefaultExcludes>
+    </PropertyGroup>
+  </Target>
+
+  <!-- called by referencing web apps on each referenced project, for serving while running from the build output -->
+  <Target Name="GetSerenityStaticAssetRoots" DependsOnTargets="_InitSerenityStaticAssets" Returns="@(_SerenityStaticAssetRoot)">
+    <ItemGroup Condition="'$(SerenityStaticAssetsEnabled)' == 'true'">
+      <_SerenityStaticAssetRoot Include="$(MSBuildProjectDirectory)\wwwroot\" BasePath="$(_SerenityStaticAssetBasePath)"
+        Condition="Exists('$(MSBuildProjectDirectory)\wwwroot')" />
+    </ItemGroup>
+  </Target>
+
+  <!-- the files to publish / pack, with BasePath and AssetPath (path relative to the base path) metadata -->
+  <Target Name="GetSerenityStaticAssetFiles" DependsOnTargets="_InitSerenityStaticAssets" Returns="@(_SerenityStaticAssetFile)">
+    <ItemGroup Condition="'$(SerenityStaticAssetsEnabled)' == 'true'">
+      <_SerenityStaticAssetFileCandidate Include="$(SerenityStaticAssetIncludes)" Exclude="$(SerenityStaticAssetDefaultExcludes);$(SerenityStaticAssetExcludes)" />
+      <_SerenityStaticAssetFile Include="@(_SerenityStaticAssetFileCandidate->'%(FullPath)')" BasePath="$(_SerenityStaticAssetBasePath)"
+        Condition="'@(_SerenityStaticAssetFileCandidate)' != ''"
+        AssetPath="$([MSBuild]::MakeRelative('$(MSBuildProjectDirectory)\wwwroot\', '%(_SerenityStaticAssetFileCandidate.FullPath)'))" />
+      <_SerenityStaticAssetFileCandidate Remove="@(_SerenityStaticAssetFileCandidate)" />
+    </ItemGroup>
+  </Target>
+
+  <!-- added through NuGet's extension point, so wwwroot item settings (e.g. Content with Pack=false) don't matter -->
+  <PropertyGroup>
+    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_PackSerenityStaticAssets</TargetsForTfmSpecificContentInPackage>
+  </PropertyGroup>
+
+  <Target Name="_PackSerenityStaticAssets" DependsOnTargets="GetSerenityStaticAssetFiles"
+          Condition="'$(OutputType)' != 'Exe'">
+    <PropertyGroup>
+      <_SerenityStaticAssetsPackProps>$(IntermediateOutputPath)serenitystaticassets\$(PackageId).props</_SerenityStaticAssetsPackProps>
+    </PropertyGroup>
+    <WriteLinesToFile File="$(_SerenityStaticAssetsPackProps)" Overwrite="true" WriteOnlyWhenDifferent="true"
+      Condition="'@(_SerenityStaticAssetFile)' != ''"
+      Lines="&lt;Project&gt;;  &lt;ItemGroup&gt;;    &lt;SerenityStaticAssetRoot Include=&quot;%24(MSBuildThisFileDirectory)..\staticwebassets\&quot; BasePath=&quot;$(_SerenityStaticAssetBasePath)&quot; /&gt;;  &lt;/ItemGroup&gt;;&lt;/Project&gt;" />
+    <ItemGroup Condition="'@(_SerenityStaticAssetFile)' != ''">
+      <TfmSpecificPackageFile Include="@(_SerenityStaticAssetFile)"
+        PackagePath="$([System.IO.Path]::Combine('staticwebassets', $([System.IO.Path]::GetDirectoryName('%(_SerenityStaticAssetFile.AssetPath)'))))\" />
+      <TfmSpecificPackageFile Include="$(_SerenityStaticAssetsPackProps)" PackagePath="buildTransitive\" />
+      <FileWrites Include="$(_SerenityStaticAssetsPackProps)" />
+    </ItemGroup>
+  </Target>
+
+  <!--
+    SerenityStaticAssetRoot items of packages come from their buildTransitive props,
+    the ones of referenced projects are added here
+  -->
+  <Target Name="ResolveSerenityStaticAssetRoots" AfterTargets="ResolveProjectReferences" Condition="'$(OutputType)' == 'Exe'">
+    <MSBuild Projects="@(_MSBuildProjectReferenceExistent)" Targets="GetSerenityStaticAssetRoots"
+             Properties="%(_MSBuildProjectReferenceExistent.SetConfiguration);%(_MSBuildProjectReferenceExistent.SetPlatform);%(_MSBuildProjectReferenceExistent.SetTargetFramework)"
+             RemoveProperties="%(_MSBuildProjectReferenceExistent.GlobalPropertiesToRemove)"
+             SkipNonexistentTargets="true" BuildInParallel="$(BuildInParallel)"
+             Condition="'@(_MSBuildProjectReferenceExistent)' != ''">
+      <Output TaskParameter="TargetOutputs" ItemName="SerenityStaticAssetRoot" />
+    </MSBuild>
+    <PropertyGroup>
+      <_SerenityStaticAssetsManifestFile>$(IntermediateOutputPath)$(AssemblyName).serenitystaticassets.json</_SerenityStaticAssetsManifestFile>
+    </PropertyGroup>
+    <ItemGroup>
+      <_SerenityStaticAssetsManifestLine Include="  { &quot;BasePath&quot;: &quot;%(SerenityStaticAssetRoot.BasePath)&quot;, &quot;Root&quot;: &quot;$([System.String]::Copy('%(SerenityStaticAssetRoot.FullPath)').Replace('\', '\\'))&quot; }" />
+    </ItemGroup>
+    <WriteLinesToFile File="$(_SerenityStaticAssetsManifestFile)" Lines="[;@(_SerenityStaticAssetsManifestLine, ',%0D%0A');]"
+                      Overwrite="true" WriteOnlyWhenDifferent="true" Condition="'@(SerenityStaticAssetRoot)' != ''" />
+    <ItemGroup Condition="'@(SerenityStaticAssetRoot)' != ''">
+      <None Include="$(_SerenityStaticAssetsManifestFile)" Link="$(AssemblyName).serenitystaticassets.json"
+            CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Never" />
+      <FileWrites Include="$(_SerenityStaticAssetsManifestFile)" />
+    </ItemGroup>
+  </Target>
+
+  <!--
+    referenced projects return their (filtered) file lists, package folders were already
+    filtered while packing, so all their files are published
+  -->
+  <Target Name="_PublishSerenityStaticAssets" AfterTargets="ComputeResolvedFilesToPublishList" DependsOnTargets="ResolveSerenityStaticAssetRoots"
+          Condition="'$(OutputType)' == 'Exe'">
+    <MSBuild Projects="@(_MSBuildProjectReferenceExistent)" Targets="GetSerenityStaticAssetFiles"
+             Properties="%(_MSBuildProjectReferenceExistent.SetConfiguration);%(_MSBuildProjectReferenceExistent.SetPlatform);%(_MSBuildProjectReferenceExistent.SetTargetFramework)"
+             RemoveProperties="%(_MSBuildProjectReferenceExistent.GlobalPropertiesToRemove)"
+             SkipNonexistentTargets="true" BuildInParallel="$(BuildInParallel)"
+             Condition="'@(_MSBuildProjectReferenceExistent)' != ''">
+      <Output TaskParameter="TargetOutputs" ItemName="_SerenityStaticAssetPublishFile" />
+    </MSBuild>
+    <ItemGroup>
+      <_SerenityPackageStaticAssetFile Include="%(SerenityStaticAssetRoot.FullPath)**\*"
+        Condition="'%(SerenityStaticAssetRoot.MSBuildSourceProjectFile)' == ''"
+        BasePath="%(SerenityStaticAssetRoot.BasePath)" AssetRoot="%(SerenityStaticAssetRoot.FullPath)" />
+      <_SerenityStaticAssetPublishFile Include="@(_SerenityPackageStaticAssetFile)" Condition="'@(_SerenityPackageStaticAssetFile)' != ''"
+        AssetPath="$([MSBuild]::MakeRelative('%(_SerenityPackageStaticAssetFile.AssetRoot)', '%(_SerenityPackageStaticAssetFile.FullPath)'))" />
+      <ResolvedFileToPublish Include="@(_SerenityStaticAssetPublishFile)"
+        RelativePath="wwwroot\%(_SerenityStaticAssetPublishFile.BasePath)\%(_SerenityStaticAssetPublishFile.AssetPath)"
+        CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
+    </ItemGroup>
+  </Target>
+</Project>
