@@ -7,6 +7,8 @@
     <ProjectReference Include="..\..\src\web\Serenity.Net.Web.csproj" />
     <PackageReference Include="CSharpMinifier" />
     <Compile Include="..\..\src\web\RestoreNodeTypesTask.cs" Link="restorenodetypes\RestoreNodeTypesTask.cs" />
+    <Compile Include="..\..\src\web\CompressStaticAssetsTask.cs" Link="staticassets\CompressStaticAssetsTask.cs" />
+    <Compile Include="..\..\src\web\WriteStaticAssetsManifestTask.cs" Link="staticassets\WriteStaticAssetsManifestTask.cs" />
     <Compile Include="..\..\src\testing\mocks\MockFileSystem.cs" Link="testutils/mocks/%(RecursiveDir)%(Filename)%(Extension)" />
     <Using Include="Serenity.Testing" />
   </ItemGroup>

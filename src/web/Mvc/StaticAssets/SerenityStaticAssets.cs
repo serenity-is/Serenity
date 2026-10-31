@@ -36,6 +36,47 @@ public static class SerenityStaticAssets
         /// Gets or sets the physical path of the folder.
         /// </summary>
         public string? Root { get; set; }
+
+        /// <summary>
+        /// Gets or sets the include patterns (; separated, project relative), the same ones used to select
+        /// the files to publish / pack. Empty for package folders, which only contain the selected files.
+        /// </summary>
+        public string? Includes { get; set; }
+
+        /// <summary>
+        /// Gets or sets the exclude patterns (; separated, project relative).
+        /// </summary>
+        public string? Excludes { get; set; }
+
+        /// <summary>
+        /// Gets or sets if the .well-known folder is included regardless of <see cref="Excludes"/>,
+        /// in which case <see cref="WellKnownExcludes"/> apply to it instead.
+        /// </summary>
+        public bool WellKnown { get; set; }
+
+        /// <summary>
+        /// Gets or sets the exclude patterns for the .well-known folder.
+        /// </summary>
+        public string? WellKnownExcludes { get; set; }
+    }
+
+    /// <summary>
+    /// Creates the file provider for a manifest entry, which serves the files of the folder that match its
+    /// patterns under its base path.
+    /// </summary>
+    /// <param name="entry">Manifest entry</param>
+    public static IFileProvider CreateFileProvider(ManifestEntry entry)
+    {
+        ArgumentNullException.ThrowIfNull(entry);
+
+        IFileProvider provider = new PhysicalFileProvider(entry.Root!);
+        if (!string.IsNullOrEmpty(entry.Includes) || !string.IsNullOrEmpty(entry.Excludes))
+        {
+            var filter = new StaticAssetPatternFilter(entry.Includes, entry.Excludes, entry.WellKnown, entry.WellKnownExcludes);
+            provider = new FilteredFileProvider(provider, filter.IsMatch);
+        }
+
+        return new PrefixedFileProvider(entry.BasePath!, provider);
     }
 
     /// <summary>
@@ -89,7 +130,7 @@ public static class SerenityStaticAssets
                 !Directory.Exists(entry.Root))
                 continue;
 
-            providers.Add(new PrefixedFileProvider(entry.BasePath, new PhysicalFileProvider(entry.Root)));
+            providers.Add(CreateFileProvider(entry));
         }
 
         environment.WebRootFileProvider = new CompositeFileProvider(providers);

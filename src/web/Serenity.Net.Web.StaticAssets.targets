@@ -51,7 +51,10 @@
   -->
   <Target Name="GetSerenityStaticAssetRoots" DependsOnTargets="_InitSerenityStaticAssets" Returns="@(_SerenityStaticAssetRoot)">
     <ItemGroup Condition="Exists('$(MSBuildProjectDirectory)\wwwroot')">
+      <!-- the same patterns as GetSerenityStaticAssetFiles, so that files that are not published are not served either -->
       <_SerenityStaticAssetRoot Include="$(MSBuildProjectDirectory)\wwwroot\" BasePath="$(_SerenityStaticAssetBasePath)"
+        Includes="$(SerenityStaticAssetIncludes)" Excludes="$(SerenityStaticAssetDefaultExcludes);$(SerenityStaticAssetExcludes)"
+        WellKnown="$(_SerenityStaticAssetDefaultIncludes)" WellKnownExcludes="$(DefaultItemExcludes);$(SerenityStaticAssetExcludes)"
         Condition="'$(SerenityStaticAssetsEnabled)' == 'true'" />
       <_SerenityStaticAssetRoot Include="$(MSBuildProjectFullPath)" UsesStaticWebAssets="true" ProjectName="$(MSBuildProjectName)"
         Condition="'$(StaticWebAssetsEnabled)' == 'true'" />
@@ -114,11 +117,9 @@
     <PropertyGroup>
       <_SerenityStaticAssetsManifestFile>$(IntermediateOutputPath)$(AssemblyName).serenitystaticassets.json</_SerenityStaticAssetsManifestFile>
     </PropertyGroup>
-    <ItemGroup>
-      <_SerenityStaticAssetsManifestLine Include="  { &quot;BasePath&quot;: &quot;%(SerenityStaticAssetRoot.BasePath)&quot;, &quot;Root&quot;: &quot;$([System.String]::Copy('%(SerenityStaticAssetRoot.FullPath)').Replace('\', '\\'))&quot; }" />
-    </ItemGroup>
-    <WriteLinesToFile File="$(_SerenityStaticAssetsManifestFile)" Lines="[;@(_SerenityStaticAssetsManifestLine, ',%0D%0A');]"
-                      Overwrite="true" WriteOnlyWhenDifferent="true" Condition="'@(SerenityStaticAssetRoot)' != ''" />
+    <!-- written by a task, as patterns contain characters (* ;) that MSBuild item / line handling would interpret -->
+    <WriteStaticAssetsManifestTask Roots="@(SerenityStaticAssetRoot)" File="$(_SerenityStaticAssetsManifestFile)"
+      Condition="'@(SerenityStaticAssetRoot)' != ''" />
     <ItemGroup Condition="'@(SerenityStaticAssetRoot)' != ''">
       <None Include="$(_SerenityStaticAssetsManifestFile)" Link="$(AssemblyName).serenitystaticassets.json"
             CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Never" />
@@ -180,6 +181,19 @@
     <SerenityBuildTasksAssembly Condition="'$(SerenityBuildTasksAssembly)' == '' And Exists('$(SerenityBuildTasksPointer)')">$([System.IO.File]::ReadAllText('$(SerenityBuildTasksPointer)').Trim())</SerenityBuildTasksAssembly>
     <_CompressStaticAssetsFromBuildTasks Condition="'$(SerenityBuildTasksAssembly)' != '' And Exists('$(SerenityBuildTasksAssembly)') And $([System.IO.File]::GetLastWriteTime('$(SerenityBuildTasksPointer)').Ticks) &gt; $([System.IO.File]::GetLastWriteTime('$(MSBuildThisFileDirectory)CompressStaticAssetsTask.cs').Ticks)">true</_CompressStaticAssetsFromBuildTasks>
   </PropertyGroup>
+  <PropertyGroup>
+    <_WriteStaticAssetsManifestFromBuildTasks Condition="'$(SerenityBuildTasksAssembly)' != '' And Exists('$(SerenityBuildTasksAssembly)') And $([System.IO.File]::GetLastWriteTime('$(SerenityBuildTasksPointer)').Ticks) &gt; $([System.IO.File]::GetLastWriteTime('$(MSBuildThisFileDirectory)WriteStaticAssetsManifestTask.cs').Ticks)">true</_WriteStaticAssetsManifestFromBuildTasks>
+  </PropertyGroup>
+  <UsingTask TaskName="WriteStaticAssetsManifestTask" AssemblyFile="$(SerenityBuildTasksAssembly)" Condition="'$(_WriteStaticAssetsManifestFromBuildTasks)' == 'true'" />
+  <UsingTask TaskName="WriteStaticAssetsManifestTask" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll" Condition="'$(_WriteStaticAssetsManifestFromBuildTasks)' != 'true'">
+    <ParameterGroup>
+      <Roots ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+      <File ParameterType="System.String" Required="true" />
+    </ParameterGroup>
+    <Task>
+      <Code Type="Class" Language="cs" Source="$(MSBuildThisFileDirectory)WriteStaticAssetsManifestTask.cs" />
+    </Task>
+  </UsingTask>
   <UsingTask TaskName="CompressStaticAssetsTask" AssemblyFile="$(SerenityBuildTasksAssembly)" Condition="'$(_CompressStaticAssetsFromBuildTasks)' == 'true'" />
   <UsingTask TaskName="CompressStaticAssetsTask" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll" Condition="'$(_CompressStaticAssetsFromBuildTasks)' != 'true'">
     <ParameterGroup>

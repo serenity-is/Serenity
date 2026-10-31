@@ -22,10 +22,10 @@ public class CompressStaticAssetsTask : Microsoft.Build.Utilities.Task
 {
     /// <summary>Files with a RelativePath (publish relative) metadata, optionally with a
     /// CompressionExcludePatterns metadata (patterns relative to AssetPath metadata) from their library</summary>
-    [Required]
+    [Microsoft.Build.Framework.Required]
     public ITaskItem[] Files { get; set; }
 
-    [Required]
+    [Microsoft.Build.Framework.Required]
     public string IntermediateDirectory { get; set; }
 
     /// <summary>Prefix of RelativePath to strip before matching patterns, e.g. "wwwroot"</summary>
@@ -38,7 +38,7 @@ public class CompressStaticAssetsTask : Microsoft.Build.Utilities.Task
     /// <summary>gzip, brotli or both</summary>
     public string Formats { get; set; }
 
-    [Output]
+    [Microsoft.Build.Framework.Output]
     public ITaskItem[] CompressedFiles { get; set; }
 
     public override bool Execute()
