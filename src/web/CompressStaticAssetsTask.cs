@@ -47,7 +47,9 @@ public class CompressStaticAssetsTask : Microsoft.Build.Utilities.Task
         var brotliType = formats.Contains("brotli") ?
             Type.GetType("System.IO.Compression.BrotliStream, System.IO.Compression.Brotli", throwOnError: false) : null;
         if (formats.Contains("brotli") && brotliType == null)
-            Log.LogMessage(MessageImportance.Normal, "Brotli is not available in this MSBuild runtime, only gzip files will be created.");
+            Log.LogMessage(MessageImportance.High, "Brotli is not available when building with .NET Framework MSBuild " +
+                "(e.g. publishing from Visual Studio), so only gzip (.gz) files are created. Use dotnet publish from " +
+                "the command line instead, if you also need brotli (.br) files.");
 
         // SmallestSize is only defined on .NET
         var level = Enum.IsDefined(typeof(CompressionLevel), 3) ? (CompressionLevel)3 : CompressionLevel.Optimal;
