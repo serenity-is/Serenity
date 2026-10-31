@@ -47,9 +47,13 @@
       <SerenityStaticAssetIncludes Condition="'$(SerenityStaticAssetIncludes)' == ''">wwwroot\**</SerenityStaticAssetIncludes>
       <!--
         same as the SDK's default Content items (output folders, *.user, project files, dot folders...) plus dot / temp files.
-        node_modules etc. are added explicitly, as only the web / razor SDK adds them to DefaultItemExcludes
+        node_modules etc. are added explicitly, as only the web / razor SDK adds them to DefaultItemExcludes, so that
+        the defaults are the same for all project types (and share one pattern set in the manifest, see WriteStaticAssetsManifestTask)
       -->
-      <SerenityStaticAssetDefaultExcludes Condition="'$(SerenityStaticAssetDefaultExcludes)' == ''">$(DefaultItemExcludes);$(DefaultExcludesInProjectFolder);**\node_modules\**;**\jspm_packages\**;**\bower_components\**;wwwroot\**\.*;wwwroot\**\*.tmp;wwwroot\**\*~;wwwroot\**\Thumbs.db;wwwroot\**\desktop.ini</SerenityStaticAssetDefaultExcludes>
+      <_SerenityStaticAssetSdkExcludes>$(DefaultItemExcludes);**\node_modules\**;**\jspm_packages\**;**\bower_components\**;**\packages.lock.json</_SerenityStaticAssetSdkExcludes>
+      <SerenityStaticAssetDefaultExcludes Condition="'$(SerenityStaticAssetDefaultExcludes)' == ''">$(_SerenityStaticAssetSdkExcludes);$(DefaultExcludesInProjectFolder);wwwroot\**\.*;wwwroot\**\*.tmp;wwwroot\**\*~;wwwroot\**\Thumbs.db;wwwroot\**\desktop.ini</SerenityStaticAssetDefaultExcludes>
+      <!-- like the SDK, wwwroot\.well-known (RFC 8615) is kept although dot folders are excluded, unless includes are customized -->
+      <_SerenityStaticAssetWellKnownExcludes>$(_SerenityStaticAssetSdkExcludes);$(SerenityStaticAssetExcludes)</_SerenityStaticAssetWellKnownExcludes>
     </PropertyGroup>
   </Target>
 
@@ -63,7 +67,7 @@
       <!-- the same patterns as GetSerenityStaticAssetFiles, so that files that are not published are not served either -->
       <_SerenityStaticAssetRoot Include="$(MSBuildProjectDirectory)\wwwroot\" BasePath="$(_SerenityStaticAssetBasePath)"
         Includes="$(SerenityStaticAssetIncludes)" Excludes="$(SerenityStaticAssetDefaultExcludes);$(SerenityStaticAssetExcludes)"
-        WellKnown="$(_SerenityStaticAssetDefaultIncludes)" WellKnownExcludes="$(DefaultItemExcludes);$(SerenityStaticAssetExcludes)"
+        WellKnown="$(_SerenityStaticAssetDefaultIncludes)" WellKnownExcludes="$(_SerenityStaticAssetWellKnownExcludes)"
         Condition="'$(SerenityStaticAssetsEnabled)' == 'true'" />
       <_SerenityStaticAssetRoot Include="$(MSBuildProjectFullPath)" UsesStaticWebAssets="true" ProjectName="$(MSBuildProjectName)"
         Condition="'$(StaticWebAssetsEnabled)' == 'true'" />
@@ -74,8 +78,7 @@
   <Target Name="GetSerenityStaticAssetFiles" DependsOnTargets="_InitSerenityStaticAssets" Returns="@(_SerenityStaticAssetFile)">
     <ItemGroup Condition="'$(SerenityStaticAssetsEnabled)' == 'true'">
       <_SerenityStaticAssetFileCandidate Include="$(SerenityStaticAssetIncludes)" Exclude="$(SerenityStaticAssetDefaultExcludes);$(SerenityStaticAssetExcludes)" />
-      <!-- like the SDK, keep wwwroot\.well-known (RFC 8615) although dot folders are excluded, unless includes are customized -->
-      <_SerenityStaticAssetFileCandidate Include="wwwroot\.well-known\**" Exclude="$(DefaultItemExcludes);$(SerenityStaticAssetExcludes)"
+      <_SerenityStaticAssetFileCandidate Include="wwwroot\.well-known\**" Exclude="$(_SerenityStaticAssetWellKnownExcludes)"
         Condition="'$(_SerenityStaticAssetDefaultIncludes)' == 'true'" />
       <_SerenityStaticAssetFile Include="@(_SerenityStaticAssetFileCandidate->'%(FullPath)')" BasePath="$(_SerenityStaticAssetBasePath)"
         Condition="'@(_SerenityStaticAssetFileCandidate)' != ''" CompressionExcludePatterns="$(CompressionExcludePatterns)"

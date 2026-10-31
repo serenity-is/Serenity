@@ -30,8 +30,9 @@ public class SerenityStaticAssetsProviderTests : IDisposable
         }
     }
 
-    private SerenityStaticAssets.ManifestEntry Entry(string? includes = @"wwwroot\**", string? excludes =
-        @"**/.*/**;**\node_modules\**;wwwroot\**\.*;wwwroot\**\*.tmp", bool wellKnown = true)
+    // patterns relative to the folder, as in the manifest
+    private SerenityStaticAssets.ManifestEntry Entry(string? includes = "**", string? excludes =
+        "**/.*/**;**/node_modules/**;**/.*;**/*.tmp", bool wellKnown = true)
     {
         return new SerenityStaticAssets.ManifestEntry
         {
@@ -61,12 +62,32 @@ public class SerenityStaticAssetsProviderTests : IDisposable
     }
 
     [Fact]
-    public void Serves_All_Files_When_There_Are_No_Patterns()
+    public void Serves_All_Files_When_Filter_Is_False()
     {
         // e.g. package folders, which only contain the files selected while packing
-        var provider = SerenityStaticAssets.CreateFileProvider(Entry(includes: null, excludes: null, wellKnown: false));
+        var entry = Entry();
+        entry.Filter = false;
+        var provider = SerenityStaticAssets.CreateFileProvider(entry);
         Assert.True(provider.GetFileInfo("/My.Lib/file.tmp").Exists);
         Assert.True(provider.GetFileInfo("/My.Lib/node_modules/pkg/x.js").Exists);
+        Assert.True(provider.GetFileInfo("/My.Lib/.hidden/x.js").Exists);
+    }
+
+    [Theory]
+    [InlineData("/My.Lib/index.js")]
+    [InlineData("/My.Lib/.well-known/security.txt")]
+    [InlineData("/My.Lib/file.tmp")]
+    [InlineData("/My.Lib/node_modules/pkg/x.js")]
+    [InlineData("/My.Lib/.hidden/x.js")]
+    public void Excludes_Nothing_When_There_Are_No_Patterns(string path)
+    {
+        // no implicit default patterns, the manifest always lists them
+        var provider = SerenityStaticAssets.CreateFileProvider(new SerenityStaticAssets.ManifestEntry
+        {
+            BasePath = "My.Lib",
+            Root = root
+        });
+        Assert.True(provider.GetFileInfo(path).Exists);
     }
 
     [Fact]
@@ -104,19 +125,35 @@ public class SerenityStaticAssetsProviderTests : IDisposable
     {
         var manifest = Path.Combine(root, "test.serenitystaticassets.json");
         File.WriteAllText(manifest, """
-            [
-              { "BasePath": "My.Lib", "Root": "C:\\x\\wwwroot\\", "Includes": "wwwroot\\**", "Excludes": "**/.*/**;wwwroot\\**\\*.tmp", "WellKnown": true, "WellKnownExcludes": "**/*.user" },
-              { "BasePath": "Pkg", "Root": "C:\\pkg\\staticwebassets\\" }
-            ]
+            {
+              "PatternSets": [
+                ["esm/**"],
+                ["**/.*/**", "**/*.tmp"],
+                ["**/*.user"]
+              ],
+              "Folders": [
+                { "BasePath": "My.Lib", "Root": "C:/x/wwwroot/", "Includes": 0, "Excludes": 1, "WellKnown": false, "WellKnownExcludes": 2 },
+                { "BasePath": "Pkg", "Root": "C:/pkg/staticwebassets/", "Filter": false },
+                { "BasePath": "Defaults", "Root": "C:/x/wwwroot/", "Excludes": 99 }
+              ]
+            }
             """);
 
         var entries = SerenityStaticAssets.ReadManifest(manifest);
-        Assert.Equal(2, entries.Length);
-        Assert.Equal(@"wwwroot\**", entries[0].Includes);
-        Assert.Equal(@"**/.*/**;wwwroot\**\*.tmp", entries[0].Excludes);
-        Assert.True(entries[0].WellKnown);
+        Assert.Equal(3, entries.Length);
+        Assert.True(entries[0].Filter);
+        Assert.Equal("esm/**", entries[0].Includes);
+        Assert.Equal("**/.*/**;**/*.tmp", entries[0].Excludes);
+        Assert.False(entries[0].WellKnown);
         Assert.Equal("**/*.user", entries[0].WellKnownExcludes);
-        Assert.Null(entries[1].Includes);
-        Assert.False(entries[1].WellKnown);
+
+        Assert.False(entries[1].Filter);
+
+        // omitted keys mean no patterns, an invalid index is ignored, flags default to true
+        Assert.True(entries[2].Filter);
+        Assert.Null(entries[2].Includes);
+        Assert.Null(entries[2].Excludes);
+        Assert.True(entries[2].WellKnown);
+        Assert.Null(entries[2].WellKnownExcludes);
     }
 }

@@ -6,10 +6,11 @@ namespace Serenity.Web;
 /// Decides which files of a static asset folder (e.g. a project's wwwroot) are served, using the same
 /// include / exclude patterns that are used to select the files to publish / pack, so that a file that
 /// would not be published is not served while running from the build output either.
-/// Patterns are MSBuild style and relative to the project folder (e.g. wwwroot\**, wwwroot\**\*.tmp,
-/// **\node_modules\**). They are converted to be relative to the asset folder: patterns that start with
-/// the folder (wwwroot\) lose that prefix, patterns that start with **\ are kept, others can't match files
-/// under the folder and are ignored.
+/// Patterns are relative to the asset folder (e.g. **/*.tmp), as in the manifest. When a folder is passed,
+/// patterns are MSBuild style and relative to the project folder instead (e.g. wwwroot\**, wwwroot\**\*.tmp,
+/// **\node_modules\**), and converted to be relative to the asset folder: patterns that start with the folder
+/// (wwwroot\) lose that prefix, patterns that start with **\ are kept, others can't match files under the
+/// folder and are ignored.
 /// </summary>
 public sealed class StaticAssetPatternFilter
 {
@@ -28,11 +29,12 @@ public sealed class StaticAssetPatternFilter
     /// <param name="wellKnown">True to include files under .well-known even if excludes match them, like
     /// the static web assets SDK does (it excludes dot folders but keeps .well-known)</param>
     /// <param name="wellKnownExcludes">Exclude patterns separated with ; for the .well-known folder</param>
-    /// <param name="folder">Asset folder, relative to the project, that the patterns are rooted at</param>
+    /// <param name="folder">Asset folder, relative to the project, that project relative patterns are rooted at,
+    /// e.g. "wwwroot". Null if the patterns are already relative to the asset folder.</param>
     public StaticAssetPatternFilter(string? includes, string? excludes, bool wellKnown = false,
-        string? wellKnownExcludes = null, string folder = "wwwroot")
+        string? wellKnownExcludes = null, string? folder = null)
     {
-        var prefix = Normalize(folder).Trim('/') + "/";
+        var prefix = folder == null ? null : Normalize(folder).Trim('/') + "/";
         this.includes = CreateMatcher(includes, prefix);
         this.excludes = CreateMatcher(excludes, prefix);
         this.wellKnownExcludes = CreateMatcher(wellKnownExcludes, prefix);
@@ -66,7 +68,7 @@ public sealed class StaticAssetPatternFilter
         return matcher != null && matcher.Match(path).HasMatches;
     }
 
-    private static Matcher? CreateMatcher(string? patterns, string prefix)
+    private static Matcher? CreateMatcher(string? patterns, string? prefix)
     {
         Matcher? matcher = null;
         foreach (var pattern in (patterns ?? "").Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
@@ -82,9 +84,12 @@ public sealed class StaticAssetPatternFilter
         return matcher;
     }
 
-    private static string? ConvertPattern(string pattern, string prefix)
+    private static string? ConvertPattern(string pattern, string? prefix)
     {
         pattern = Normalize(pattern);
+        if (prefix == null)
+            return pattern.TrimStart('/');
+
         if (pattern.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
             return pattern[prefix.Length..];
 

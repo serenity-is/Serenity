@@ -23,7 +23,9 @@ public static class SerenityStaticAssets
     public const string ManifestFileSuffix = ".serenitystaticassets.json";
 
     /// <summary>
-    /// An asset folder entry in the manifest.
+    /// An asset folder in the manifest, with its patterns resolved from the manifest's pattern sets.
+    /// Patterns are ; separated, relative to <see cref="Root"/>, and the same ones used to select the
+    /// files to publish / pack.
     /// </summary>
     public class ManifestEntry
     {
@@ -38,26 +40,49 @@ public static class SerenityStaticAssets
         public string? Root { get; set; }
 
         /// <summary>
-        /// Gets or sets the include patterns (; separated, project relative), the same ones used to select
-        /// the files to publish / pack. Empty for package folders, which only contain the selected files.
+        /// Gets or sets if files are filtered by the patterns (default true). False for package folders,
+        /// which only contain the files selected while packing.
+        /// </summary>
+        public bool Filter { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets the include patterns, all files if null or empty.
         /// </summary>
         public string? Includes { get; set; }
 
         /// <summary>
-        /// Gets or sets the exclude patterns (; separated, project relative).
+        /// Gets or sets the exclude patterns, none if null or empty.
         /// </summary>
         public string? Excludes { get; set; }
 
         /// <summary>
         /// Gets or sets if the .well-known folder is included regardless of <see cref="Excludes"/>,
-        /// in which case <see cref="WellKnownExcludes"/> apply to it instead.
+        /// in which case <see cref="WellKnownExcludes"/> apply to it instead (default true).
         /// </summary>
-        public bool WellKnown { get; set; }
+        public bool WellKnown { get; set; } = true;
 
         /// <summary>
-        /// Gets or sets the exclude patterns for the .well-known folder.
+        /// Gets or sets the exclude patterns for the .well-known folder, none if null or empty.
         /// </summary>
         public string? WellKnownExcludes { get; set; }
+    }
+
+    // the manifest's JSON format: pattern lists are written once in PatternSets, and referenced by index
+    private sealed class ManifestJson
+    {
+        public string[][]? PatternSets { get; set; }
+        public FolderJson[]? Folders { get; set; }
+    }
+
+    private sealed class FolderJson
+    {
+        public string? BasePath { get; set; }
+        public string? Root { get; set; }
+        public bool Filter { get; set; } = true;
+        public int? Includes { get; set; }
+        public int? Excludes { get; set; }
+        public bool WellKnown { get; set; } = true;
+        public int? WellKnownExcludes { get; set; }
     }
 
     /// <summary>
@@ -70,7 +95,7 @@ public static class SerenityStaticAssets
         ArgumentNullException.ThrowIfNull(entry);
 
         IFileProvider provider = new PhysicalFileProvider(entry.Root!);
-        if (!string.IsNullOrEmpty(entry.Includes) || !string.IsNullOrEmpty(entry.Excludes))
+        if (entry.Filter)
         {
             var filter = new StaticAssetPatternFilter(entry.Includes, entry.Excludes, entry.WellKnown, entry.WellKnownExcludes);
             provider = new FilteredFileProvider(provider, filter.IsMatch);
@@ -95,8 +120,22 @@ public static class SerenityStaticAssets
     /// <param name="manifestPath">Manifest file path</param>
     public static ManifestEntry[] ReadManifest(string manifestPath)
     {
-        return JsonSerializer.Deserialize<ManifestEntry[]>(File.ReadAllText(manifestPath),
-            new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? [];
+        var manifest = JsonSerializer.Deserialize<ManifestJson>(File.ReadAllText(manifestPath),
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+        var sets = manifest?.PatternSets ?? [];
+        string? Patterns(int? index) => index is int i && i >= 0 && i < sets.Length ? string.Join(";", sets[i] ?? []) : null;
+
+        return (manifest?.Folders ?? []).Select(x => new ManifestEntry
+        {
+            BasePath = x.BasePath,
+            Root = x.Root,
+            Filter = x.Filter,
+            Includes = Patterns(x.Includes),
+            Excludes = Patterns(x.Excludes),
+            WellKnown = x.WellKnown,
+            WellKnownExcludes = Patterns(x.WellKnownExcludes)
+        }).ToArray();
     }
 
     /// <summary>

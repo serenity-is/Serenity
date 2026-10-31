@@ -7,6 +7,39 @@ public class StaticAssetPatternFilterTests
     private const string DefaultExcludes = @"bin\**;obj\**;P:\artifacts/**;**/*.user;**/*.*proj;**/.DS_Store;**/.*/**;" +
         @"**\node_modules\**;wwwroot\**\.*;wwwroot\**\*.tmp;wwwroot\**\*~;wwwroot\**\Thumbs.db;wwwroot\**\desktop.ini";
 
+    // project relative patterns, like the ones in MSBuild properties
+    private static StaticAssetPatternFilter Project(string? includes, string? excludes, bool wellKnown = false,
+        string? wellKnownExcludes = null)
+    {
+        return new StaticAssetPatternFilter(includes, excludes, wellKnown, wellKnownExcludes, folder: "wwwroot");
+    }
+
+    [Theory]
+    [InlineData("index.js", true)]
+    [InlineData("esm/page.js", true)]
+    [InlineData("index.js.map", false)]
+    [InlineData("sub/file.tmp", false)]
+    [InlineData("node_modules/pkg/x.js", false)]
+    [InlineData(".hidden/x.js", false)]
+    [InlineData(".well-known/security.txt", true)]
+    [InlineData(".well-known/my.user", false)]
+    public void Uses_Folder_Relative_Patterns_As_Is_By_Default(string path, bool expected)
+    {
+        // as written in the manifest
+        var filter = new StaticAssetPatternFilter(null, "**/.*/**;**/node_modules/**;**/*.tmp;**/*.map",
+            wellKnown: true, wellKnownExcludes: "**/*.user");
+        Assert.Equal(expected, filter.IsMatch(path));
+    }
+
+    [Fact]
+    public void Folder_Relative_Includes_Are_Not_Prefixed()
+    {
+        var filter = new StaticAssetPatternFilter("esm/**;*.css", null);
+        Assert.True(filter.IsMatch("esm/page.js"));
+        Assert.True(filter.IsMatch("site.css"));
+        Assert.False(filter.IsMatch("index.js"));
+    }
+
     [Theory]
     [InlineData("index.js", true)]
     [InlineData("css/site.css", true)]
@@ -23,7 +56,7 @@ public class StaticAssetPatternFilterTests
     [InlineData("backup.js~", false)]
     public void Applies_Default_Patterns(string path, bool expected)
     {
-        var filter = new StaticAssetPatternFilter(@"wwwroot\**", DefaultExcludes);
+        var filter = Project(@"wwwroot\**", DefaultExcludes);
         Assert.Equal(expected, filter.IsMatch(path));
     }
 
@@ -31,7 +64,7 @@ public class StaticAssetPatternFilterTests
     public void Ignores_Patterns_Outside_The_Folder()
     {
         // bin\**, obj\**, absolute paths and root level patterns can't match files under wwwroot
-        var filter = new StaticAssetPatternFilter(@"wwwroot\**", @"bin\**;obj\**;P:\artifacts/**;*.js");
+        var filter = Project(@"wwwroot\**", @"bin\**;obj\**;P:\artifacts/**;*.js");
         Assert.True(filter.IsMatch("bin/file.js"));
         Assert.True(filter.IsMatch("obj/file.js"));
         Assert.True(filter.IsMatch("file.js"));
@@ -43,7 +76,7 @@ public class StaticAssetPatternFilterTests
     [InlineData("CSS/SITE.CSS", true)]
     public void Normalizes_Separators_Slashes_And_Case(string path, bool expected)
     {
-        var filter = new StaticAssetPatternFilter(@"wwwroot\css\**", null);
+        var filter = Project(@"wwwroot\css\**", null);
         Assert.Equal(expected, filter.IsMatch(path));
     }
 
@@ -55,14 +88,14 @@ public class StaticAssetPatternFilterTests
     [InlineData("other/style.css", false)]
     public void Uses_Whitelist_Includes(string path, bool expected)
     {
-        var filter = new StaticAssetPatternFilter(@"wwwroot\esm\**;wwwroot\*.css", DefaultExcludes);
+        var filter = Project(@"wwwroot\esm\**;wwwroot\*.css", DefaultExcludes);
         Assert.Equal(expected, filter.IsMatch(path));
     }
 
     [Fact]
     public void Includes_All_Files_When_There_Are_No_Includes()
     {
-        var filter = new StaticAssetPatternFilter(null, @"wwwroot\**\*.map");
+        var filter = Project(null, @"wwwroot\**\*.map");
         Assert.True(filter.IsMatch("index.js"));
         Assert.False(filter.IsMatch("index.js.map"));
     }
@@ -70,7 +103,7 @@ public class StaticAssetPatternFilterTests
     [Fact]
     public void Applies_Custom_Excludes()
     {
-        var filter = new StaticAssetPatternFilter(@"wwwroot\**", DefaultExcludes + @";wwwroot\**\*.map;wwwroot\docs\**");
+        var filter = Project(@"wwwroot\**", DefaultExcludes + @";wwwroot\**\*.map;wwwroot\docs\**");
         Assert.True(filter.IsMatch("index.js"));
         Assert.False(filter.IsMatch("index.js.map"));
         Assert.False(filter.IsMatch("docs/readme.html"));
@@ -79,7 +112,7 @@ public class StaticAssetPatternFilterTests
     [Fact]
     public void Keeps_WellKnown_Folder_When_Enabled()
     {
-        var filter = new StaticAssetPatternFilter(@"wwwroot\**", DefaultExcludes, wellKnown: true,
+        var filter = Project(@"wwwroot\**", DefaultExcludes, wellKnown: true,
             wellKnownExcludes: @"bin\**;**/*.user;wwwroot\**\secret.txt");
         Assert.True(filter.IsMatch(".well-known/security.txt"));
         Assert.False(filter.IsMatch(".well-known/my.user"));
@@ -91,7 +124,7 @@ public class StaticAssetPatternFilterTests
     [Fact]
     public void Excludes_WellKnown_Folder_When_Not_Enabled()
     {
-        var filter = new StaticAssetPatternFilter(@"wwwroot\**", DefaultExcludes);
+        var filter = Project(@"wwwroot\**", DefaultExcludes);
         Assert.False(filter.IsMatch(".well-known/security.txt"));
     }
 
@@ -101,7 +134,7 @@ public class StaticAssetPatternFilterTests
     [InlineData("/")]
     public void Does_Not_Match_Empty_Paths(string? path)
     {
-        var filter = new StaticAssetPatternFilter(null, null);
+        var filter = Project(null, null);
         Assert.False(filter.IsMatch(path!));
     }
 
