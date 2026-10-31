@@ -1,9 +1,17 @@
 <Project>
+  <Import Project="$(MSBuildThisFileDirectory)Serenity.Net.Web.TSBuild.targets" />
   <PropertyGroup>
     <DotNetSergen Condition="'$(DotNetSergen)' == '' And Exists('$(MSBuildThisFileDirectory)..\codegenerator\Serenity.Net.CodeGenerator.csproj')">dotnet $(MSBuildThisFileDirectory)..\..\artifacts\bin\Serenity.Net.CodeGenerator\sergen.dll</DotNetSergen>
     <DotNetSergen Condition="'$(DotNetSergen)' == ''">dotnet sergen</DotNetSergen>
   </PropertyGroup>
-  <UsingTask TaskName="RestoreNodeTypesTask" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll" >
+  <PropertyGroup>
+    <!-- in the source tree, prefer the precompiled Serenity.BuildTasks.dll (see build/tasks) over compiling tasks with RoslynCodeTaskFactory -->
+    <SerenityBuildTasksPointer Condition="'$(SerenityBuildTasksPointer)' == ''">$(MSBuildThisFileDirectory)..\..\artifacts\buildtasks\current.txt</SerenityBuildTasksPointer>
+    <SerenityBuildTasksAssembly Condition="'$(SerenityBuildTasksAssembly)' == '' And Exists('$(SerenityBuildTasksPointer)')">$([System.IO.File]::ReadAllText('$(SerenityBuildTasksPointer)').Trim())</SerenityBuildTasksAssembly>
+    <_RestoreNodeTypesFromBuildTasks Condition="'$(SerenityBuildTasksAssembly)' != '' And Exists('$(SerenityBuildTasksAssembly)') And $([System.IO.File]::GetLastWriteTime('$(SerenityBuildTasksPointer)').Ticks) &gt; $([System.IO.File]::GetLastWriteTime('$(MSBuildThisFileDirectory)RestoreNodeTypesTask.cs').Ticks)">true</_RestoreNodeTypesFromBuildTasks>
+  </PropertyGroup>
+  <UsingTask TaskName="RestoreNodeTypesTask" AssemblyFile="$(SerenityBuildTasksAssembly)" Condition="'$(_RestoreNodeTypesFromBuildTasks)' == 'true'" />
+  <UsingTask TaskName="RestoreNodeTypesTask" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll" Condition="'$(_RestoreNodeTypesFromBuildTasks)' != 'true'">
     <ParameterGroup>
       <FolderNames ParameterType="System.String" />
       <PatchDependencies ParameterType="System.String" />

@@ -1,8 +1,29 @@
 <Project>
   <Import Project="$(MSBuildThisFileDirectory)..\build\Feature.Build.targets" />
   <PropertyGroup>
-      <TransformDependsOn>SetSergenTransformArgs;TransformToolRestore</TransformDependsOn>
+      <TransformDependsOn>SetSergenTransformArgs;TransformToolRestore;_CollectSergenTransformInputs</TransformDependsOn>
   </PropertyGroup>
+  <!-- inputs for incremental sergen transforms, written to a list file so that added / deleted files also trigger a transform -->
+  <Target Name="_CollectSergenTransformInputs" DependsOnTargets="_ComputeReferencedNpmOutputs">
+    <PropertyGroup>
+      <_SergenInputsFile>$(IntermediateOutputPath)sergen.inputs.txt</_SergenInputsFile>
+      <_SergenExecutable Condition="$(DotNetSergen.StartsWith('dotnet ')) And '$(DotNetSergen)' != 'dotnet sergen'">$(DotNetSergen.Substring(7).Trim('&quot;'))</_SergenExecutable>
+    </PropertyGroup>
+    <ItemGroup>
+      <_SergenTSInput Include="**\*.ts;**\*.tsx" Exclude="bin\**;obj\**;out\**;dist\**;wwwroot\**;coverage\**;test\**;node_modules\**;**\ServerTypes\**" />
+      <_SergenTSInput Include="@(_ReferencedNpmOutput)" Condition="'%(Filename)%(Extension)' == 'package.json' Or $([System.String]::Copy('%(Filename)%(Extension)').EndsWith('.d.ts'))" />
+      <_SergenConfigCandidate Include="$(MSBuildProjectFullPath);$(_SergenExecutable);$(DotnetToolManifestFile);sergen.json;tsconfig.json;package.json;appsettings.json" />
+      <_SergenConfigInput Include="@(_SergenConfigCandidate)" Condition="Exists('%(Identity)')" />
+      <_SergenCshtmlInput Include="@(Content)" Condition="'%(Extension)' == '.cshtml'" />
+      <!-- lower cased, as path casing of referenced projects may differ between builds (e.g. p:\ vs P:\) -->
+      <_SergenInputLine Include="$([System.String]::Copy('%(_SergenTSInput.FullPath)').ToLowerInvariant())" KeepDuplicates="false" />
+      <_SergenInputLine Include="$([System.String]::Copy('%(_SergenCshtmlInput.FullPath)').ToLowerInvariant())" KeepDuplicates="false" />
+    </ItemGroup>
+    <WriteLinesToFile File="$(_SergenInputsFile)" Lines="@(_SergenInputLine)" Overwrite="true" WriteOnlyWhenDifferent="true" />
+    <ItemGroup>
+      <FileWrites Include="$(_SergenInputsFile);$(IntermediateOutputPath)sergen-mvct.stamp;$(IntermediateOutputPath)sergen-servertypings.stamp" />
+    </ItemGroup>
+  </Target>
   <Target Name="TransformToolRestore" BeforeTargets="BeforeBuild" DependsOnTargets="SetSergenTransformArgs"
           Inputs="$(DotnetToolManifestFile)" Outputs="$(DotnetToolRestoreStamp)"
           Condition="Exists('$(DotnetToolManifestFile)') And '$(DotNetSergen)' == 'dotnet sergen' And '$(SergenTransform)' != 'none' And ('$(SergenTransform)' != '' OR Exists('tsconfig.json'))">
@@ -15,13 +36,17 @@
     <Exec Command="$(DotNetSergen) mvc $(SergenTransformArgs)" ContinueOnError="true" Condition="'$(DotNetSergen)' == 'dotnet sergen'" />
   </Target>
   <Target Name="TransformMvct" AfterTargets="ResolveProjectReferences" DependsOnTargets="$(TransformDependsOn)"
+          Inputs="@(_SergenTSInput);@(_SergenConfigInput);@(_SergenCshtmlInput);$(_SergenInputsFile)" Outputs="$(IntermediateOutputPath)sergen-mvct.stamp"
           Condition="'$(SergenTransform)' == 'mvct' OR '$(SergenTransform)' == 'all'">
     <MutexExec Command="$(DotNetSergen) mvct $(SergenTransformArgs)" MutexName="Global\SergenTransformWithDotnetRun" ContinueOnError="true" Condition="'$(DotNetSergen)' != 'dotnet sergen'" WorkingDirectory="$(MSBuildProjectDirectory)" />
     <Exec Command="$(DotNetSergen) mvct $(SergenTransformArgs)" ContinueOnError="true" Condition="'$(DotNetSergen)' == 'dotnet sergen'" />
+    <Touch Files="$(IntermediateOutputPath)sergen-mvct.stamp" AlwaysCreate="true" Condition="'$(MSBuildLastTaskResult)' == 'true'" />
   </Target>
   <Target Name="TransformServerTypings" AfterTargets="AfterBuild" DependsOnTargets="$(TransformDependsOn)"
+          Inputs="@(IntermediateAssembly);@(ReferencePath);@(_SergenTSInput);@(_SergenConfigInput);$(_SergenInputsFile)" Outputs="$(IntermediateOutputPath)sergen-servertypings.stamp"
           Condition="'$(SergenTransform)' == 'servertypings' OR '$(SergenTransform)' == 'all'">
     <MutexExec Command="$(DotNetSergen) servertypings $(SergenTransformArgs)" MutexName="Global\SergenTransformWithDotnetRun" ContinueOnError="true" Condition="'$(DotNetSergen)' != 'dotnet sergen'" WorkingDirectory="$(MSBuildProjectDirectory)" />
     <Exec Command="$(DotNetSergen) servertypings $(SergenTransformArgs)" ContinueOnError="true" Condition="'$(DotNetSergen)' == 'dotnet sergen'" />
+    <Touch Files="$(IntermediateOutputPath)sergen-servertypings.stamp" AlwaysCreate="true" Condition="'$(MSBuildLastTaskResult)' == 'true'" />
   </Target>
 </Project>

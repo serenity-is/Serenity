@@ -1,0 +1,47 @@
+<Project>
+  <!--
+    Inputs for incremental TS builds (tsbuild.js or the npm build script), shared by web, feature and npm package projects.
+    A TS build target uses it like:
+      <Target Name="RunTSBuild" DependsOnTargets="...;CollectTSBuildInputs" Inputs="@(TSBuildInput);$(TSBuildInputsFile)" Outputs="$(TSBuildStampFile)">
+        ...
+        <Touch Files="$(TSBuildStampFile)" AlwaysCreate="true" Condition="'$(MSBuildLastTaskResult)' == 'true'" />
+      </Target>
+  -->
+
+  <!--
+    outputs (dist, wwwroot) of referenced npm projects that TS builds and sergen transforms of this project consume,
+    both from (transitive) project references and from linked @serenity-is workspace packages (two levels deep,
+    as e.g. corelib is only reachable through extensions for most features)
+  -->
+  <Target Name="_ComputeReferencedNpmOutputs" DependsOnTargets="IncludeTransitiveProjectReferences">
+    <ItemGroup>
+      <_ReferencedNpmOutput Include="%(ProjectReference.RootDir)%(Directory)package.json;%(ProjectReference.RootDir)%(Directory)dist\**\*;%(ProjectReference.RootDir)%(Directory)wwwroot\**\*"
+        Exclude="%(ProjectReference.RootDir)%(Directory)wwwroot\esm\**"
+        Condition="Exists('%(ProjectReference.RootDir)%(Directory)package.json')" />
+      <_ReferencedNpmOutput Include="node_modules\@serenity-is\*\package.json;node_modules\@serenity-is\*\dist\**\*;node_modules\@serenity-is\*\wwwroot\**\*;node_modules\@serenity-is\*\node_modules\@serenity-is\*\package.json;node_modules\@serenity-is\*\node_modules\@serenity-is\*\dist\**\*"
+        Exclude="node_modules\@serenity-is\*\wwwroot\esm\**" />
+    </ItemGroup>
+  </Target>
+
+  <!-- the input list is also written to a file so that added / deleted files trigger a build as well -->
+  <Target Name="CollectTSBuildInputs" DependsOnTargets="$(CollectTSBuildInputsDependsOn);_ComputeReferencedNpmOutputs">
+    <PropertyGroup>
+      <TSBuildStampFile>$(IntermediateOutputPath)tsbuild.stamp</TSBuildStampFile>
+      <TSBuildInputsFile>$(IntermediateOutputPath)tsbuild.inputs.txt</TSBuildInputsFile>
+    </PropertyGroup>
+    <ItemGroup>
+      <TSBuildInput Include="**\*.ts;**\*.tsx;**\*.mts;**\*.cts;**\*.js;**\*.jsx;**\*.mjs;**\*.cjs;**\*.css;**\*.json;**\*.svg;**\*.png;**\*.jpg;**\*.jpeg;**\*.gif;**\*.webp;**\*.woff;**\*.woff2;**\*.ttf;**\*.eot"
+        Exclude="bin\**;obj\**;out\**;dist\**;wwwroot\**;coverage\**;test\**;texts\**;node_modules\**;Properties\**;App_Data\**" />
+      <!-- installed packages, including the ones RestoreNodeTypes copies to node_modules\.dotnet -->
+      <TSBuildInput Include="$(MSBuildProjectFullPath);pnpm-lock.yaml;node_modules\.package-lock.json;node_modules\.modules.yaml;node_modules\.dotnet\**\*;@(NpmPackageFile);@(_ReferencedNpmOutput)" />
+      <TSBuildInput Include="%(NpmPackageFile.StampFile)" Condition="'%(NpmPackageFile.StampFile)' != ''" />
+      <TSBuildInput Remove="@(TSBuildInput)" Condition="!Exists('%(Identity)')" />
+      <!-- lower cased, as path casing of referenced projects may differ between builds (e.g. p:\ vs P:\) -->
+      <_TSBuildInputLine Include="$([System.String]::Copy('%(TSBuildInput.FullPath)').ToLowerInvariant())" KeepDuplicates="false" />
+    </ItemGroup>
+    <WriteLinesToFile File="$(TSBuildInputsFile)" Lines="@(_TSBuildInputLine)" Overwrite="true" WriteOnlyWhenDifferent="true" />
+    <ItemGroup>
+      <FileWrites Include="$(TSBuildInputsFile);$(TSBuildStampFile)" />
+    </ItemGroup>
+  </Target>
+</Project>

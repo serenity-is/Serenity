@@ -1,8 +1,15 @@
 <Project>
   <PropertyGroup>
     <NpmInstallMutex Condition="'$(NpmInstallMutex)' == ''">Global\SerenityNpmInstallMutex</NpmInstallMutex>
+    <!-- makes CollectTSBuildInputs (Serenity.Net.Web.TSBuild.targets) also watch the npm install stamp -->
+    <CollectTSBuildInputsDependsOn>ComputeNpmPackageMetadata;$(CollectTSBuildInputsDependsOn)</CollectTSBuildInputsDependsOn>
+    <!-- in the source tree, prefer the precompiled Serenity.BuildTasks.dll (see build/tasks) over compiling tasks with RoslynCodeTaskFactory -->
+    <SerenityBuildTasksPointer Condition="'$(SerenityBuildTasksPointer)' == ''">$(MSBuildThisFileDirectory)..\artifacts\buildtasks\current.txt</SerenityBuildTasksPointer>
+    <SerenityBuildTasksAssembly Condition="'$(SerenityBuildTasksAssembly)' == '' And Exists('$(SerenityBuildTasksPointer)')">$([System.IO.File]::ReadAllText('$(SerenityBuildTasksPointer)').Trim())</SerenityBuildTasksAssembly>
+    <_MutexExecFromBuildTasks Condition="'$(SerenityBuildTasksAssembly)' != '' And Exists('$(SerenityBuildTasksAssembly)') And $([System.IO.File]::GetLastWriteTime('$(SerenityBuildTasksPointer)').Ticks) &gt; $([System.IO.File]::GetLastWriteTime('$(MSBuildThisFileDirectory)web\MutexExecTask.cs').Ticks)">true</_MutexExecFromBuildTasks>
   </PropertyGroup>
-  <UsingTask TaskName="MutexExec" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll" >
+  <UsingTask TaskName="MutexExec" AssemblyFile="$(SerenityBuildTasksAssembly)" Condition="'$(_MutexExecFromBuildTasks)' == 'true'" />
+  <UsingTask TaskName="MutexExec" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll" Condition="'$(_MutexExecFromBuildTasks)' != 'true'">
     <ParameterGroup>
       <MutexName ParameterType="System.String" />
       <MutexTimeout ParameterType="System.Int32" />
@@ -17,7 +24,7 @@
       <Reference Include="Microsoft.Build.Tasks.Core.dll" />
       <Code Type="Class" Language="cs" Source="$(MSBuildThisFileDirectory)web/MutexExecTask.cs" />
     </Task>
-  </UsingTask>  
+  </UsingTask>
   <Target Name="ComputeNpmPackageMetadata">
     <ItemGroup>
       <NpmPackageFile>

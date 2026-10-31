@@ -8,8 +8,10 @@
     <None Include="$(MSBuildProjectDirectory)\dist\**" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" Pack="true" PackagePath="dist\" />
   </ItemGroup>
   <Import Project="$(SerenitySrc)web\Serenity.Net.Web.targets" Condition="'$(AddAutoRefs)' != 'false'" />
+  <Import Project="$(SerenitySrc)web\Serenity.Net.Web.TSBuild.targets" Condition="'$(AddAutoRefs)' == 'false'" />
   <Import Project="$(SerenitySrc)RestoreNpmPackages.targets" />
-  <Target Name="CompileProjectTSConfig" DependsOnTargets="NpmInstall;RestoreNodeTypes" BeforeTargets="ResolveProjectStaticWebAssets" AfterTargets="ResolveProjectReferences"
+  <Target Name="CompileProjectTSConfig" DependsOnTargets="NpmInstall;RestoreNodeTypes;CollectTSBuildInputs" BeforeTargets="ResolveProjectStaticWebAssets" AfterTargets="ResolveProjectReferences"
+          Inputs="@(TSBuildInput);$(TSBuildInputsFile)" Outputs="$(TSBuildStampFile)"
           Condition="Exists('tsconfig.json') And '$(RunTSBuild)' == 'true'">
     <ItemGroup>
       <_ContentBeforeTSBuild Include="wwwroot\**\*" />
@@ -17,6 +19,7 @@
     <Message Text="Executing TypeScript compiler for $(ProjectName)..." Importance="high"></Message>
     <Exec Command="node &quot;$(TSJavaScriptFile.Replace('build\\..\tools\', 'tools\'))&quot; -p ./tsconfig.json" Condition="!Exists('tsbuild.js')" ContinueOnError="true" />
     <Exec Command="node --run build" Condition="Exists('tsbuild.js')" ContinueOnError="true" />
+    <Touch Files="$(TSBuildStampFile)" AlwaysCreate="true" Condition="'$(MSBuildLastTaskResult)' == 'true'" />
     <ItemGroup>
       <_ContentAfterTSBuild Include="wwwroot\**\*" Exclude="@(_ContentBeforeTSBuild)" />
       <Content Include="@(_ContentAfterTSBuild)" Exclude="@(Content)" CopyToOutputDirectory="Never" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" />

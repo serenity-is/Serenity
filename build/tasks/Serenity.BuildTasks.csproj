@@ -34,6 +34,24 @@
     </ItemGroup>
   </Target>
 
+  <!--
+    Copies the task assembly to a content addressed folder and points artifacts/buildtasks/current.txt to it,
+    so that source tree builds can use it instead of RoslynCodeTaskFactory. As MSBuild nodes keep loaded task
+    assemblies locked, the copy that is in use is never overwritten.
+  -->
+  <Target Name="PublishBuildTasksForSourceTree" AfterTargets="CopyFilesToOutputDirectory"
+          Inputs="@(IntermediateAssembly)" Outputs="$(ArtifactsPath)\buildtasks\current.txt">
+    <GetFileHash Files="@(IntermediateAssembly)">
+      <Output TaskParameter="Hash" PropertyName="_BuildTasksHash" />
+    </GetFileHash>
+    <!-- condition: when the target is skipped as up to date, output inference still evaluates this group -->
+    <PropertyGroup Condition="'$(_BuildTasksHash)' != ''">
+      <_BuildTasksSourceTreeFile>$([MSBuild]::NormalizePath('$(ArtifactsPath)', 'buildtasks', '$(_BuildTasksHash.Substring(0, 16))', '$(TargetFileName)'))</_BuildTasksSourceTreeFile>
+    </PropertyGroup>
+    <Copy SourceFiles="@(IntermediateAssembly)" DestinationFiles="$(_BuildTasksSourceTreeFile)" Condition="!Exists('$(_BuildTasksSourceTreeFile)')" />
+    <WriteLinesToFile File="$(ArtifactsPath)\buildtasks\current.txt" Lines="$(_BuildTasksSourceTreeFile)" Overwrite="true" />
+  </Target>
+
   <Target Name="AddBuildDependencyFileToBuiltProjectOutputGroupOutput" BeforeTargets="BuiltProjectOutputGroup" Condition=" '$(GenerateDependencyFile)' == 'true'">
     <ItemGroup>
       <BuiltProjectOutputGroupOutput Include="$(ProjectDepsFilePath)" TargetPath="$(ProjectDepsFileName)" FinalOutputPath="$(ProjectDepsFilePath)" />

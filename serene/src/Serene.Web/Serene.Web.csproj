@@ -78,12 +78,14 @@
     <Exec Command="npm install" Condition="!Exists('..\..\..\pnpm-workspace.yaml')" />
     <Exec Command="pnpm install" Condition="Exists('..\..\..\pnpm-workspace.yaml')" />
   </Target>
-  <Target Name="RunTSBuild" DependsOnTargets="RestoreNodeTypes;NpmInstall" BeforeTargets="ResolveProjectStaticWebAssets" AfterTargets="ResolveProjectReferences" Condition="'$(SkipTSBuild)' != 'true'">
+  <Target Name="RunTSBuild" DependsOnTargets="RestoreNodeTypes;NpmInstall;CollectTSBuildInputs" BeforeTargets="ResolveProjectStaticWebAssets" AfterTargets="ResolveProjectReferences" Condition="'$(SkipTSBuild)' != 'true'"
+          Inputs="@(TSBuildInput);$(TSBuildInputsFile)" Outputs="$(TSBuildStampFile)">
     <Message Text="Executing TypeScript compiler for $(ProjectName)..." Importance="high" />
     <ItemGroup>
       <CleanedEsmFiles Include="wwwroot\esm\**" />
     </ItemGroup>
     <Exec Command="node ./tsbuild.js" ContinueOnError="true" />
+    <Touch Files="$(TSBuildStampFile)" AlwaysCreate="true" Condition="'$(MSBuildLastTaskResult)' == 'true'" />
     <ItemGroup>
       <CleanedEsmFiles Remove="wwwroot\esm\**" />
       <Content Remove="@(CleanedEsmFiles)" />
@@ -106,9 +108,11 @@
   <Target Name="TransformServerTypings" AfterTargets="AfterBuild" DependsOnTargets="SetSergenTransformArgs">
     <Exec Command="$(DotNetSergen) servertypings $(SergenTransformArgs)" ContinueOnError="true" />
   </Target>
-  <Target Name="TransformRunTSBuild" AfterTargets="AfterBuild" DependsOnTargets="RestoreNodeTypes;NpmInstall;TransformServerTypings" Condition="'$(SkipTSBuild)' != 'true'">
+  <Target Name="TransformRunTSBuild" AfterTargets="AfterBuild" DependsOnTargets="RestoreNodeTypes;NpmInstall;TransformServerTypings;CollectTSBuildInputs" Condition="'$(SkipTSBuild)' != 'true'"
+          Inputs="@(TSBuildInput);$(TSBuildInputsFile)" Outputs="$(TSBuildStampFile)">
     <Message Text="Executing TypeScript compiler for $(ProjectName)..." Importance="high" />
     <Exec Command="node ./tsbuild.js" ContinueOnError="true" />
+    <Touch Files="$(TSBuildStampFile)" AlwaysCreate="true" Condition="'$(MSBuildLastTaskResult)' == 'true'" />
   </Target>
   <ProjectExtensions><VisualStudio><UserProperties NpmRestoreOnProjectOpen="True" /></VisualStudio></ProjectExtensions>
 </Project>
