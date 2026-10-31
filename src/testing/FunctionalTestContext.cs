@@ -281,9 +281,11 @@ public abstract class FunctionalTestContext<TStartup> : IDisposable, ISerenityTe
         if (!File.Exists(depsFile))
             throw new InvalidOperationException($"Missing Deps File: {depsFile}");
 
+        // apps with static web assets disabled only have the Serenity static assets manifest
         var staticAssetsFile = baseName + ".staticwebassets.runtime.json";
-        if (!File.Exists(staticAssetsFile))
-            throw new InvalidOperationException($"Missing Static Assets File: {staticAssetsFile}");
+        var serenityStaticAssetsFile = baseName + SerenityStaticAssets.ManifestFileSuffix;
+        if (!File.Exists(staticAssetsFile) && !File.Exists(serenityStaticAssetsFile))
+            throw new InvalidOperationException($"Missing Static Assets File: {serenityStaticAssetsFile} or {staticAssetsFile}");
     }
 
     /// <summary>Creates the web application builder for the test application.</summary>

@@ -7,6 +7,8 @@
     <GenerateComputedBuildStaticWebAssetsDependsOn>RunTSBuild;$(GenerateComputedBuildStaticWebAssetsDependsOn)</GenerateComputedBuildStaticWebAssetsDependsOn>
     <CompressionExcludePatterns>$(CompressionExcludePatterns);**\*.map;**\*.txt</CompressionExcludePatterns>
     <Nullable>annotations</Nullable>
+    <!-- Serenity packages / features use Serenity static assets, set to true if another package needs static web assets -->
+    <StaticWebAssetsEnabled>false</StaticWebAssetsEnabled>
   </PropertyGroup>
   <!--#if (IsNotTemplate)-->
   <PropertyGroup>

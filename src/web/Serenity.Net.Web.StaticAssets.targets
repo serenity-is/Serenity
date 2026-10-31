@@ -6,8 +6,10 @@
     - SerenityStaticAssetsEnabled defaults to true for libraries that don't use static web assets
       (StaticWebAssetsEnabled is not true). Set it to false to opt out.
     - The files are SerenityStaticAssetIncludes (defaults to wwwroot\**, can be set to a whitelist of
-      patterns under wwwroot) minus SerenityStaticAssetDefaultExcludes (temp / dot files) and
-      SerenityStaticAssetExcludes (project relative patterns, for library specific exclusions).
+      patterns under wwwroot) minus SerenityStaticAssetDefaultExcludes (the SDK's DefaultItemExcludes and
+      DefaultExcludesInProjectFolder like for default Content items, plus dot / temp files; wwwroot\.well-known
+      is kept like the SDK does, when includes are not customized) and SerenityStaticAssetExcludes
+      (project relative patterns, for library specific exclusions).
       Their paths are relative to wwwroot. While running from the build output, the whole wwwroot is served.
     - They are served / published by referencing web apps under StaticWebAssetBasePath (the same property
       the static web assets SDK uses, so switching between the two keeps the URLs; leading / optional),
@@ -21,22 +23,36 @@
       uses to serve the files under their base paths while running from the build output
       (see UseSerenityStaticAssets)
     - publish: copies the files to wwwroot\[BasePath]\
+    - when StaticWebAssetsEnabled is false for the app, warns about packages (SERSA001) and referenced
+      projects (SERSA002) that still use static web assets, unless SerenityStaticWebAssetsCheck is false.
+      referenced projects are only detected if they import these targets (e.g. via Serenity.Net.Web).
   -->
   <Target Name="_InitSerenityStaticAssets">
     <PropertyGroup>
       <SerenityStaticAssetsEnabled Condition="'$(SerenityStaticAssetsEnabled)' == '' And '$(StaticWebAssetsEnabled)' != 'true'">true</SerenityStaticAssetsEnabled>
       <_SerenityStaticAssetBasePath>$(StaticWebAssetBasePath.Trim('/'))</_SerenityStaticAssetBasePath>
       <_SerenityStaticAssetBasePath Condition="'$(_SerenityStaticAssetBasePath)' == ''">$(AssemblyName)</_SerenityStaticAssetBasePath>
+      <_SerenityStaticAssetDefaultIncludes Condition="'$(SerenityStaticAssetIncludes)' == ''">true</_SerenityStaticAssetDefaultIncludes>
       <SerenityStaticAssetIncludes Condition="'$(SerenityStaticAssetIncludes)' == ''">wwwroot\**</SerenityStaticAssetIncludes>
-      <SerenityStaticAssetDefaultExcludes Condition="'$(SerenityStaticAssetDefaultExcludes)' == ''">wwwroot\**\.*;wwwroot\**\.*\**;wwwroot\**\*.tmp;wwwroot\**\*~;wwwroot\**\Thumbs.db;wwwroot\**\desktop.ini</SerenityStaticAssetDefaultExcludes>
+      <!--
+        same as the SDK's default Content items (output folders, *.user, project files, dot folders...) plus dot / temp files.
+        node_modules etc. are added explicitly, as only the web / razor SDK adds them to DefaultItemExcludes
+      -->
+      <SerenityStaticAssetDefaultExcludes Condition="'$(SerenityStaticAssetDefaultExcludes)' == ''">$(DefaultItemExcludes);$(DefaultExcludesInProjectFolder);**\node_modules\**;**\jspm_packages\**;**\bower_components\**;wwwroot\**\.*;wwwroot\**\*.tmp;wwwroot\**\*~;wwwroot\**\Thumbs.db;wwwroot\**\desktop.ini</SerenityStaticAssetDefaultExcludes>
     </PropertyGroup>
   </Target>
 
-  <!-- called by referencing web apps on each referenced project, for serving while running from the build output -->
+  <!--
+    called by referencing web apps on each referenced project, for serving while running from the build output.
+    a project that uses static web assets instead returns an item with UsesStaticWebAssets=true, so that an app
+    that has static web assets disabled can warn about it
+  -->
   <Target Name="GetSerenityStaticAssetRoots" DependsOnTargets="_InitSerenityStaticAssets" Returns="@(_SerenityStaticAssetRoot)">
-    <ItemGroup Condition="'$(SerenityStaticAssetsEnabled)' == 'true'">
+    <ItemGroup Condition="Exists('$(MSBuildProjectDirectory)\wwwroot')">
       <_SerenityStaticAssetRoot Include="$(MSBuildProjectDirectory)\wwwroot\" BasePath="$(_SerenityStaticAssetBasePath)"
-        Condition="Exists('$(MSBuildProjectDirectory)\wwwroot')" />
+        Condition="'$(SerenityStaticAssetsEnabled)' == 'true'" />
+      <_SerenityStaticAssetRoot Include="$(MSBuildProjectFullPath)" UsesStaticWebAssets="true" ProjectName="$(MSBuildProjectName)"
+        Condition="'$(StaticWebAssetsEnabled)' == 'true'" />
     </ItemGroup>
   </Target>
 
@@ -44,6 +60,9 @@
   <Target Name="GetSerenityStaticAssetFiles" DependsOnTargets="_InitSerenityStaticAssets" Returns="@(_SerenityStaticAssetFile)">
     <ItemGroup Condition="'$(SerenityStaticAssetsEnabled)' == 'true'">
       <_SerenityStaticAssetFileCandidate Include="$(SerenityStaticAssetIncludes)" Exclude="$(SerenityStaticAssetDefaultExcludes);$(SerenityStaticAssetExcludes)" />
+      <!-- like the SDK, keep wwwroot\.well-known (RFC 8615) although dot folders are excluded, unless includes are customized -->
+      <_SerenityStaticAssetFileCandidate Include="wwwroot\.well-known\**" Exclude="$(DefaultItemExcludes);$(SerenityStaticAssetExcludes)"
+        Condition="'$(_SerenityStaticAssetDefaultIncludes)' == 'true'" />
       <_SerenityStaticAssetFile Include="@(_SerenityStaticAssetFileCandidate->'%(FullPath)')" BasePath="$(_SerenityStaticAssetBasePath)"
         Condition="'@(_SerenityStaticAssetFileCandidate)' != ''"
         AssetPath="$([MSBuild]::MakeRelative('$(MSBuildProjectDirectory)\wwwroot\', '%(_SerenityStaticAssetFileCandidate.FullPath)'))" />
@@ -82,8 +101,12 @@
              RemoveProperties="%(_MSBuildProjectReferenceExistent.GlobalPropertiesToRemove)"
              SkipNonexistentTargets="true" BuildInParallel="$(BuildInParallel)"
              Condition="'@(_MSBuildProjectReferenceExistent)' != ''">
-      <Output TaskParameter="TargetOutputs" ItemName="SerenityStaticAssetRoot" />
+      <Output TaskParameter="TargetOutputs" ItemName="_SerenityReferencedStaticAssetRoot" />
     </MSBuild>
+    <ItemGroup>
+      <SerenityStaticAssetRoot Include="@(_SerenityReferencedStaticAssetRoot)" Condition="'%(_SerenityReferencedStaticAssetRoot.UsesStaticWebAssets)' != 'true'" />
+      <_SerenityStaticWebAssetsProject Include="@(_SerenityReferencedStaticAssetRoot)" Condition="'%(_SerenityReferencedStaticAssetRoot.UsesStaticWebAssets)' == 'true'" />
+    </ItemGroup>
     <PropertyGroup>
       <_SerenityStaticAssetsManifestFile>$(IntermediateOutputPath)$(AssemblyName).serenitystaticassets.json</_SerenityStaticAssetsManifestFile>
     </PropertyGroup>
@@ -97,6 +120,22 @@
             CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Never" />
       <FileWrites Include="$(_SerenityStaticAssetsManifestFile)" />
     </ItemGroup>
+  </Target>
+
+  <!--
+    when the app has static web assets disabled, files of packages / referenced projects that still use them
+    are neither served nor published, so warn about them. packages declare their StaticWebAsset items in
+    their props regardless of the app's setting. set SerenityStaticWebAssetsCheck to false to skip the check.
+  -->
+  <Target Name="_CheckSerenityStaticWebAssetsDisabled" AfterTargets="ResolveSerenityStaticAssetRoots"
+          Condition="'$(OutputType)' == 'Exe' And '$(StaticWebAssetsEnabled)' != 'true' And '$(SerenityStaticWebAssetsCheck)' != 'false'">
+    <ItemGroup>
+      <_SerenityStaticWebAssetsPackage Include="%(StaticWebAsset.SourceId)" Condition="'%(StaticWebAsset.SourceType)' == 'Package'" />
+    </ItemGroup>
+    <Warning Code="SERSA001" Condition="'@(_SerenityStaticWebAssetsPackage)' != ''"
+      Text="Package %(_SerenityStaticWebAssetsPackage.Identity) contains static web assets, but StaticWebAssetsEnabled is false for $(MSBuildProjectName), so its files are not served or published. Set StaticWebAssetsEnabled to true in $(MSBuildProjectFile) if you need them, or SerenityStaticWebAssetsCheck to false to hide this warning." />
+    <Warning Code="SERSA002" Condition="'@(_SerenityStaticWebAssetsProject)' != ''"
+      Text="Referenced project %(_SerenityStaticWebAssetsProject.ProjectName) uses static web assets, but StaticWebAssetsEnabled is false for $(MSBuildProjectName), so its wwwroot files are not served or published. Set StaticWebAssetsEnabled to false in %(_SerenityStaticWebAssetsProject.ProjectName) to serve them with Serenity static assets, or to true in $(MSBuildProjectFile)." />
   </Target>
 
   <!--
