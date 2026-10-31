@@ -23,6 +23,8 @@
       uses to serve the files under their base paths while running from the build output
       (see UseSerenityStaticAssets)
     - publish: copies the files to wwwroot\[BasePath]\
+    - publish: creates .br / .gz files for wwwroot files to publish, using the static web assets SDK's compression
+      properties (see _CompressSerenityPublishFiles)
     - when StaticWebAssetsEnabled is false for the app, warns about packages (SERSA001) and referenced
       projects (SERSA002) that still use static web assets, unless SerenityStaticWebAssetsCheck is false.
       referenced projects are only detected if they import these targets (e.g. via Serenity.Net.Web).
@@ -64,7 +66,7 @@
       <_SerenityStaticAssetFileCandidate Include="wwwroot\.well-known\**" Exclude="$(DefaultItemExcludes);$(SerenityStaticAssetExcludes)"
         Condition="'$(_SerenityStaticAssetDefaultIncludes)' == 'true'" />
       <_SerenityStaticAssetFile Include="@(_SerenityStaticAssetFileCandidate->'%(FullPath)')" BasePath="$(_SerenityStaticAssetBasePath)"
-        Condition="'@(_SerenityStaticAssetFileCandidate)' != ''"
+        Condition="'@(_SerenityStaticAssetFileCandidate)' != ''" CompressionExcludePatterns="$(CompressionExcludePatterns)"
         AssetPath="$([MSBuild]::MakeRelative('$(MSBuildProjectDirectory)\wwwroot\', '%(_SerenityStaticAssetFileCandidate.FullPath)'))" />
       <_SerenityStaticAssetFileCandidate Remove="@(_SerenityStaticAssetFileCandidate)" />
     </ItemGroup>
@@ -79,10 +81,12 @@
           Condition="'$(OutputType)' != 'Exe'">
     <PropertyGroup>
       <_SerenityStaticAssetsPackProps>$(IntermediateOutputPath)serenitystaticassets\$(PackageId).props</_SerenityStaticAssetsPackProps>
+      <!-- escaped, as WriteLinesToFile would otherwise split the patterns into separate lines at ; -->
+      <_SerenityStaticAssetsPackExcludes>$([MSBuild]::Escape('$(CompressionExcludePatterns)').Trim('%3B'))</_SerenityStaticAssetsPackExcludes>
     </PropertyGroup>
     <WriteLinesToFile File="$(_SerenityStaticAssetsPackProps)" Overwrite="true" WriteOnlyWhenDifferent="true"
       Condition="'@(_SerenityStaticAssetFile)' != ''"
-      Lines="&lt;Project&gt;;  &lt;ItemGroup&gt;;    &lt;SerenityStaticAssetRoot Include=&quot;%24(MSBuildThisFileDirectory)..\staticwebassets\&quot; BasePath=&quot;$(_SerenityStaticAssetBasePath)&quot; /&gt;;  &lt;/ItemGroup&gt;;&lt;/Project&gt;" />
+      Lines="&lt;Project&gt;;  &lt;ItemGroup&gt;;    &lt;SerenityStaticAssetRoot Include=&quot;%24(MSBuildThisFileDirectory)..\staticwebassets\&quot; BasePath=&quot;$(_SerenityStaticAssetBasePath)&quot; CompressionExcludePatterns=&quot;$(_SerenityStaticAssetsPackExcludes)&quot; /&gt;;  &lt;/ItemGroup&gt;;&lt;/Project&gt;" />
     <ItemGroup Condition="'@(_SerenityStaticAssetFile)' != ''">
       <TfmSpecificPackageFile Include="@(_SerenityStaticAssetFile)"
         PackagePath="$([System.IO.Path]::Combine('staticwebassets', $([System.IO.Path]::GetDirectoryName('%(_SerenityStaticAssetFile.AssetPath)'))))\" />
@@ -154,12 +158,68 @@
     <ItemGroup>
       <_SerenityPackageStaticAssetFile Include="%(SerenityStaticAssetRoot.FullPath)**\*"
         Condition="'%(SerenityStaticAssetRoot.MSBuildSourceProjectFile)' == ''"
-        BasePath="%(SerenityStaticAssetRoot.BasePath)" AssetRoot="%(SerenityStaticAssetRoot.FullPath)" />
+        BasePath="%(SerenityStaticAssetRoot.BasePath)" AssetRoot="%(SerenityStaticAssetRoot.FullPath)"
+        CompressionExcludePatterns="%(SerenityStaticAssetRoot.CompressionExcludePatterns)" />
       <_SerenityStaticAssetPublishFile Include="@(_SerenityPackageStaticAssetFile)" Condition="'@(_SerenityPackageStaticAssetFile)' != ''"
         AssetPath="$([MSBuild]::MakeRelative('%(_SerenityPackageStaticAssetFile.AssetRoot)', '%(_SerenityPackageStaticAssetFile.FullPath)'))" />
       <ResolvedFileToPublish Include="@(_SerenityStaticAssetPublishFile)"
         RelativePath="wwwroot\%(_SerenityStaticAssetPublishFile.BasePath)\%(_SerenityStaticAssetPublishFile.AssetPath)"
         CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
+    </ItemGroup>
+  </Target>
+
+  <!--
+    publish only compression of wwwroot files (the app's own and Serenity static assets), like the static web assets
+    SDK does on publish. uses the same properties: PublishCompressionFormats (gzip;brotli by default, empty to disable),
+    CompressionIncludePatterns / CompressionExcludePatterns (SDK defaults appended unless EnableDefaultCompressedItems
+    is false). CompressionExcludePatterns of libraries also apply to their own files. existing .br / .gz files to
+    publish (e.g. produced by the SDK when static web assets are enabled) are kept as is.
+  -->
+  <PropertyGroup>
+    <SerenityBuildTasksPointer Condition="'$(SerenityBuildTasksPointer)' == ''">$(MSBuildThisFileDirectory)..\..\artifacts\buildtasks\current.txt</SerenityBuildTasksPointer>
+    <SerenityBuildTasksAssembly Condition="'$(SerenityBuildTasksAssembly)' == '' And Exists('$(SerenityBuildTasksPointer)')">$([System.IO.File]::ReadAllText('$(SerenityBuildTasksPointer)').Trim())</SerenityBuildTasksAssembly>
+    <_CompressStaticAssetsFromBuildTasks Condition="'$(SerenityBuildTasksAssembly)' != '' And Exists('$(SerenityBuildTasksAssembly)') And $([System.IO.File]::GetLastWriteTime('$(SerenityBuildTasksPointer)').Ticks) &gt; $([System.IO.File]::GetLastWriteTime('$(MSBuildThisFileDirectory)CompressStaticAssetsTask.cs').Ticks)">true</_CompressStaticAssetsFromBuildTasks>
+  </PropertyGroup>
+  <UsingTask TaskName="CompressStaticAssetsTask" AssemblyFile="$(SerenityBuildTasksAssembly)" Condition="'$(_CompressStaticAssetsFromBuildTasks)' == 'true'" />
+  <UsingTask TaskName="CompressStaticAssetsTask" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll" Condition="'$(_CompressStaticAssetsFromBuildTasks)' != 'true'">
+    <ParameterGroup>
+      <Files ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+      <IntermediateDirectory ParameterType="System.String" Required="true" />
+      <PatternRoot ParameterType="System.String" />
+      <IncludePatterns ParameterType="System.String" />
+      <ExcludePatterns ParameterType="System.String" />
+      <Formats ParameterType="System.String" />
+      <CompressedFiles ParameterType="Microsoft.Build.Framework.ITaskItem[]" Output="true" />
+    </ParameterGroup>
+    <Task>
+      <Code Type="Class" Language="cs" Source="$(MSBuildThisFileDirectory)CompressStaticAssetsTask.cs" />
+    </Task>
+  </UsingTask>
+
+  <Target Name="_CompressSerenityPublishFiles" AfterTargets="ComputeResolvedFilesToPublishList" DependsOnTargets="_PublishSerenityStaticAssets"
+          Condition="'$(OutputType)' == 'Exe'">
+    <!-- same defaults as Microsoft.NET.Sdk.StaticWebAssets.Compression.targets, which is not imported when static web assets are disabled -->
+    <PropertyGroup>
+      <EnableDefaultCompressionFormats Condition="'$(EnableDefaultCompressionFormats)' == ''">true</EnableDefaultCompressionFormats>
+      <PublishCompressionFormats Condition="'$(EnableDefaultCompressionFormats)' == 'true'">$(PublishCompressionFormats);gzip;brotli</PublishCompressionFormats>
+      <CompressionIncludePatterns Condition="'$(EnableDefaultCompressedItems)' != 'false'">$(CompressionIncludePatterns);**/*.js;**/*.css;**/*.html;**/*.json;**/*.mjs;**/*.xml;**/*.htm;**/*.wasm;**/*.txt;**/*.dll;**/*.pdb;**/*.dat;**/*.jsx;**/*.markdown;**/*.md;**/*.webmanifest;**/*.bmp;**/*.svg;**/*.otf;**/*.art;**/*.cmx;**/*.cod;**/*.dib;**/*.ico;**/*.ief;**/*.pbm;**/*.pgm;**/*.pnm;**/*.ppm;**/*.ras;**/*.rf;**/*.rgb;**/*.tif;**/*.tiff;**/*.wbmp;**/*.xbm;**/*.xpm;**/*.xwd;**/*.aif;**/*.aifc;**/*.au;**/*.m3u;**/*.mid;**/*.midi;**/*.ra;**/*.ram;**/*.smd;**/*.smx;**/*.smz;**/*.wav;**/*.323;**/*.appcache;**/*.asm;**/*.bas;**/*.c;**/*.cnf;**/*.cpp;**/*.csv;**/*.disco;**/*.dlm;**/*.dtd;**/*.etx;**/*.h;**/*.hdml;**/*.htc;**/*.htt;**/*.hxt;**/*.ical;**/*.icalendar;**/*.ics;**/*.ifb;**/*.map;**/*.mno;**/*.odc;**/*.rtx;**/*.sct;**/*.sgml;**/*.tsv;**/*.uls;**/*.vbs;**/*.vcf;**/*.vcs;**/*.vml;**/*.wml;**/*.wmls;**/*.wsdl;**/*.xdr;**/*.xsd;**/*.xsf;**/*.xsl;**/*.xslt</CompressionIncludePatterns>
+      <!-- conditions can't contain ; so computed here -->
+      <_SerenityPublishCompressionFormatsCheck>$(PublishCompressionFormats.Replace(';', '').Trim())</_SerenityPublishCompressionFormatsCheck>
+      <CompressionExcludePatterns Condition="'$(EnableDefaultCompressedItems)' != 'false'">$(CompressionExcludePatterns);**/*.gz;**/*.br;**/*.jpeg;**/*.jpg;**/*.png;**/*.gif;**/*.webp;**/*.woff;**/*.woff2;**/*.m4v;**/*.mov;**/*.movie;**/*.mp2;**/*.mp4;**/*.mp4v;**/*.mpa;**/*.mpe;**/*.mpeg;**/*.mpg;**/*.mpv2;**/*.ogg;**/*.ogv;**/*.webm;**/*.jfif;**/*.svgz;**/*.jpe;**/*.pnz;**/*.aac;**/*.adt;**/*.adts;**/*.m4a;**/*.mp3;**/*.oga;**/*.wax;**/*.wma</CompressionExcludePatterns>
+    </PropertyGroup>
+    <ItemGroup>
+      <_SerenityCompressCandidate Include="@(ResolvedFileToPublish)"
+        Condition="$([System.String]::Copy('%(ResolvedFileToPublish.RelativePath)').Replace('/', '\').ToLowerInvariant().StartsWith('wwwroot\'))" />
+    </ItemGroup>
+    <CompressStaticAssetsTask Files="@(_SerenityCompressCandidate)" IntermediateDirectory="$(IntermediateOutputPath)serenitycompressed\"
+      PatternRoot="wwwroot" IncludePatterns="$(CompressionIncludePatterns)" ExcludePatterns="$(CompressionExcludePatterns)" Formats="$(PublishCompressionFormats)"
+      Condition="'@(_SerenityCompressCandidate)' != '' And '$(_SerenityPublishCompressionFormatsCheck)' != ''">
+      <Output TaskParameter="CompressedFiles" ItemName="_SerenityCompressedFile" />
+    </CompressStaticAssetsTask>
+    <ItemGroup>
+      <ResolvedFileToPublish Include="@(_SerenityCompressedFile)" />
+      <FileWrites Include="@(_SerenityCompressedFile)" />
+      <_SerenityCompressCandidate Remove="@(_SerenityCompressCandidate)" />
     </ItemGroup>
   </Target>
 </Project>

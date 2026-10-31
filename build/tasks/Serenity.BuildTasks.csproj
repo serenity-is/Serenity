@@ -26,6 +26,7 @@
   <ItemGroup>
     <Compile Include="..\..\src\web\MutexExecTask.cs" Link="MutexExecTask.cs" />
     <Compile Include="..\..\src\web\RestoreNodeTypesTask.cs" Link="RestoreNodeTypesTask.cs" />
+    <Compile Include="..\..\src\web\CompressStaticAssetsTask.cs" Link="CompressStaticAssetsTask.cs" />
   </ItemGroup>
 
   <Target Name="CopyProjectReferencesToPackage" DependsOnTargets="ResolveReferences">
