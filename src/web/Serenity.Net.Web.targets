@@ -9,7 +9,7 @@
     <!-- in the source tree, prefer the precompiled Serenity.BuildTasks.dll (see build/tasks) over compiling tasks with RoslynCodeTaskFactory -->
     <SerenityBuildTasksPointer Condition="'$(SerenityBuildTasksPointer)' == ''">$(MSBuildThisFileDirectory)..\..\artifacts\buildtasks\current.txt</SerenityBuildTasksPointer>
     <SerenityBuildTasksAssembly Condition="'$(SerenityBuildTasksAssembly)' == '' And Exists('$(SerenityBuildTasksPointer)')">$([System.IO.File]::ReadAllText('$(SerenityBuildTasksPointer)').Trim())</SerenityBuildTasksAssembly>
-    <_RestoreNodeTypesFromBuildTasks Condition="'$(SerenityBuildTasksAssembly)' != '' And Exists('$(SerenityBuildTasksAssembly)') And $([System.IO.File]::GetLastWriteTime('$(SerenityBuildTasksPointer)').Ticks) &gt; $([System.IO.File]::GetLastWriteTime('$(MSBuildThisFileDirectory)RestoreNodeTypesTask.cs').Ticks)">true</_RestoreNodeTypesFromBuildTasks>
+    <_RestoreNodeTypesFromBuildTasks Condition="'$(_SerenityBuildTasksPackaged)' == 'true' Or ('$(SerenityBuildTasksAssembly)' != '' And Exists('$(SerenityBuildTasksAssembly)') And $([System.IO.File]::GetLastWriteTime('$(SerenityBuildTasksPointer)').Ticks) &gt; $([System.IO.File]::GetLastWriteTime('$(MSBuildThisFileDirectory)RestoreNodeTypesTask.cs').Ticks))">true</_RestoreNodeTypesFromBuildTasks>
   </PropertyGroup>
   <UsingTask TaskName="RestoreNodeTypesTask" AssemblyFile="$(SerenityBuildTasksAssembly)" Condition="'$(_RestoreNodeTypesFromBuildTasks)' == 'true'" />
   <UsingTask TaskName="RestoreNodeTypesTask" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll" Condition="'$(_RestoreNodeTypesFromBuildTasks)' != 'true'">

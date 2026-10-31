@@ -5,11 +5,26 @@
     <Title>Serenity Platform - Asp.Net Core Web Library</Title>
     <Description>Contains Web application related types...</Description>
     <DefaultItemExcludes>$(DefaultItemExcludes);*Task.cs;Serenity.Net.Web*.targets</DefaultItemExcludes>
+    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_PackSerenityBuildTasks</TargetsForTfmSpecificContentInPackage>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\services\Serenity.Net.Services.csproj" />
+    <!-- only to build the tasks assembly first for packing, it is not referenced or a package dependency -->
+    <ProjectReference Include="..\..\build\tasks\Serenity.BuildTasks.csproj" ReferenceOutputAssembly="false" Private="false"
+      PrivateAssets="all" SkipGetTargetFrameworkProperties="true" UndefineProperties="TargetFramework" />
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="NUglify" />
+    <!-- task sources are a fallback for RoslynCodeTaskFactory when Serenity.BuildTasks.dll is not available -->
     <None Include=".\*Task.cs;.\Serenity.Net.Web*.targets" Pack="true" PackagePath="build" />
   </ItemGroup>
+  <!-- the compiled tasks go next to the targets, which use it instead of compiling the task sources -->
+  <Target Name="_PackSerenityBuildTasks">
+    <MSBuild Projects="..\..\build\tasks\Serenity.BuildTasks.csproj" Targets="GetTargetPath" Properties="Configuration=$(Configuration)">
+      <Output TaskParameter="TargetOutputs" ItemName="_SerenityBuildTasksAssembly" />
+    </MSBuild>
+    <Error Text="Serenity.BuildTasks.dll not found at @(_SerenityBuildTasksAssembly)" Condition="!Exists('@(_SerenityBuildTasksAssembly)')" />
+    <ItemGroup>
+      <TfmSpecificPackageFile Include="@(_SerenityBuildTasksAssembly)" PackagePath="build\" />
+    </ItemGroup>
+  </Target>
 </Project>

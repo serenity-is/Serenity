@@ -29,6 +29,15 @@
       projects (SERSA002) that still use static web assets, unless SerenityStaticWebAssetsCheck is false.
       referenced projects are only detected if they import these targets (e.g. via Serenity.Net.Web).
   -->
+  <!--
+    the Serenity.Net.Web package ships the compiled tasks next to its targets, which is preferred over the source tree
+    copy (see build/tasks) and compiling the task sources with RoslynCodeTaskFactory
+  -->
+  <PropertyGroup>
+    <SerenityBuildTasksAssembly Condition="'$(SerenityBuildTasksAssembly)' == '' And Exists('$(MSBuildThisFileDirectory)Serenity.BuildTasks.dll')">$(MSBuildThisFileDirectory)Serenity.BuildTasks.dll</SerenityBuildTasksAssembly>
+    <_SerenityBuildTasksPackaged Condition="'$(SerenityBuildTasksAssembly)' == '$(MSBuildThisFileDirectory)Serenity.BuildTasks.dll'">true</_SerenityBuildTasksPackaged>
+  </PropertyGroup>
+
   <Target Name="_InitSerenityStaticAssets">
     <PropertyGroup>
       <SerenityStaticAssetsEnabled Condition="'$(SerenityStaticAssetsEnabled)' == '' And '$(StaticWebAssetsEnabled)' != 'true'">true</SerenityStaticAssetsEnabled>
@@ -179,10 +188,10 @@
   <PropertyGroup>
     <SerenityBuildTasksPointer Condition="'$(SerenityBuildTasksPointer)' == ''">$(MSBuildThisFileDirectory)..\..\artifacts\buildtasks\current.txt</SerenityBuildTasksPointer>
     <SerenityBuildTasksAssembly Condition="'$(SerenityBuildTasksAssembly)' == '' And Exists('$(SerenityBuildTasksPointer)')">$([System.IO.File]::ReadAllText('$(SerenityBuildTasksPointer)').Trim())</SerenityBuildTasksAssembly>
-    <_CompressStaticAssetsFromBuildTasks Condition="'$(SerenityBuildTasksAssembly)' != '' And Exists('$(SerenityBuildTasksAssembly)') And $([System.IO.File]::GetLastWriteTime('$(SerenityBuildTasksPointer)').Ticks) &gt; $([System.IO.File]::GetLastWriteTime('$(MSBuildThisFileDirectory)CompressStaticAssetsTask.cs').Ticks)">true</_CompressStaticAssetsFromBuildTasks>
+    <_CompressStaticAssetsFromBuildTasks Condition="'$(_SerenityBuildTasksPackaged)' == 'true' Or ('$(SerenityBuildTasksAssembly)' != '' And Exists('$(SerenityBuildTasksAssembly)') And $([System.IO.File]::GetLastWriteTime('$(SerenityBuildTasksPointer)').Ticks) &gt; $([System.IO.File]::GetLastWriteTime('$(MSBuildThisFileDirectory)CompressStaticAssetsTask.cs').Ticks))">true</_CompressStaticAssetsFromBuildTasks>
   </PropertyGroup>
   <PropertyGroup>
-    <_WriteStaticAssetsManifestFromBuildTasks Condition="'$(SerenityBuildTasksAssembly)' != '' And Exists('$(SerenityBuildTasksAssembly)') And $([System.IO.File]::GetLastWriteTime('$(SerenityBuildTasksPointer)').Ticks) &gt; $([System.IO.File]::GetLastWriteTime('$(MSBuildThisFileDirectory)WriteStaticAssetsManifestTask.cs').Ticks)">true</_WriteStaticAssetsManifestFromBuildTasks>
+    <_WriteStaticAssetsManifestFromBuildTasks Condition="'$(_SerenityBuildTasksPackaged)' == 'true' Or ('$(SerenityBuildTasksAssembly)' != '' And Exists('$(SerenityBuildTasksAssembly)') And $([System.IO.File]::GetLastWriteTime('$(SerenityBuildTasksPointer)').Ticks) &gt; $([System.IO.File]::GetLastWriteTime('$(MSBuildThisFileDirectory)WriteStaticAssetsManifestTask.cs').Ticks))">true</_WriteStaticAssetsManifestFromBuildTasks>
   </PropertyGroup>
   <UsingTask TaskName="WriteStaticAssetsManifestTask" AssemblyFile="$(SerenityBuildTasksAssembly)" Condition="'$(_WriteStaticAssetsManifestFromBuildTasks)' == 'true'" />
   <UsingTask TaskName="WriteStaticAssetsManifestTask" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll" Condition="'$(_WriteStaticAssetsManifestFromBuildTasks)' != 'true'">
