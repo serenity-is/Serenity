@@ -23,6 +23,8 @@ export interface ComboboxCommonOptions {
     minimumResultsForSearch?: any;
     /** Whether multiple items can be selected. */
     multiple?: boolean;
+    /** Name of the item field containing the icon class. */
+    iconField?: string;
 }
 
 /**
@@ -53,6 +55,8 @@ export interface ComboboxInplaceAddOptions {
     dialogType?: string | DialogType | PromiseLike<DialogType>;
     /** Whether arbitrary values are allowed. */
     autoComplete?: boolean;
+    /** Whether the in-place add dialog opens as a panel. */
+    openDialogAsPanel?: boolean;
 }
 
 /**

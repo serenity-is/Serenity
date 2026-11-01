@@ -240,6 +240,14 @@ public partial class ServerTypingsGenerator : CodeGeneratorBase
             return;
         }
 
+        var editorTemplateAttr = GetEditorTemplateAttribute(type, out var editorTemplateFamily);
+        if (editorTemplateAttr != null)
+        {
+            var defaultsIdentifier = GetEditorDefaultsIdentifier(type);
+            add((t) => GenerateEditorDefaults(t, editorTemplateAttr, editorTemplateFamily, defaultsIdentifier), defaultsIdentifier);
+            return;
+        }
+
         if (IsRowType(baseTypes))
         {
             var metadata = ExtractRowMetadata(type);

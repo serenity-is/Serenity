@@ -114,9 +114,15 @@ public partial class BasicPropertyProcessor : PropertyProcessor
                         leba.Async == true)
                         item.FilteringParams["async"] = true;
 
-                    // a custom service lookup editor with a template gets its service options, like a service lookup
-                    if (editorAttr is ServiceLookupEditorBaseAttribute && GetEditorTemplate(editorAttr) is not null)
-                        copyParamsFromEditor(serviceLookupCopyToFilterParams);
+                    // a custom lookup or service lookup editor with a template gets its lookup or service options,
+                    // like a lookup or service lookup
+                    if (GetEditorTemplate(editorAttr) is not null)
+                    {
+                        if (editorAttr is ServiceLookupEditorBaseAttribute)
+                            copyParamsFromEditor(serviceLookupCopyToFilterParams);
+                        else if (editorAttr is LookupEditorBaseAttribute)
+                            copyParamsFromEditor(lookupCopyToFilterParams);
+                    }
                 }
             }
             else if (source.EnumType != null)

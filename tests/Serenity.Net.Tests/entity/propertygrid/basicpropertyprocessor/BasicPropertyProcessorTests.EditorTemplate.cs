@@ -140,4 +140,85 @@ public partial class BasicPropertyProcessorTests
         Assert.Equal(Serenity.Services.ListRequestCapabilities.Skip |
             Serenity.Services.ListRequestCapabilities.Take, item.FilteringParams["capabilities"]);
     }
+
+    // like an attribute generated for a client side lookup editor, with a template on its partial class
+    [LookupEditor("Test.Items", InplaceAdd = true, Async = true)]
+    private class TemplatedClientLookupEditorAttribute : LookupEditorBaseAttribute
+    {
+        public TemplatedClientLookupEditorAttribute()
+            : base("Test.TemplatedClientLookupEditor")
+        {
+        }
+    }
+
+    private class SizedEditorAttribute : CustomEditorAttribute
+    {
+        public SizedEditorAttribute()
+            : base("Test.SizedEditor")
+        {
+        }
+
+        public int Size
+        {
+            get { return GetOption<int>("size"); }
+            set { SetOption("size", value); }
+        }
+    }
+
+    // editors of families other than lookup and service lookup don't support templates
+    [SizedEditor(Size = 3)]
+    private class DerivedSizedEditorAttribute : SizedEditorAttribute
+    {
+    }
+
+    private class OtherTemplateFamiliesForm
+    {
+        [TemplatedClientLookupEditor]
+        public string? Lookup { get; set; }
+
+        [TemplatedClientLookupEditor(InplaceAdd = false)]
+        public string? LookupOverridden { get; set; }
+
+        [DerivedSizedEditor]
+        public string? Sized { get; set; }
+    }
+
+    [Fact]
+    public void EditorTemplate_Provides_Lookup_Options()
+    {
+        var item = Process<OtherTemplateFamiliesForm>(nameof(OtherTemplateFamiliesForm.Lookup));
+
+        Assert.Equal("Test.TemplatedClientLookupEditor", item.EditorType);
+        Assert.Equal("Test.Items", item.EditorParams["lookupKey"]);
+        Assert.Equal(true, item.EditorParams["inplaceAdd"]);
+        Assert.Equal(true, item.EditorParams["async"]);
+    }
+
+    [Fact]
+    public void EditorTemplate_Lookup_Options_Are_Overridden_By_The_Attribute()
+    {
+        var item = Process<OtherTemplateFamiliesForm>(nameof(OtherTemplateFamiliesForm.LookupOverridden));
+
+        Assert.Equal("Test.Items", item.EditorParams["lookupKey"]);
+        Assert.Equal(false, item.EditorParams["inplaceAdd"]);
+    }
+
+    [Fact]
+    public void EditorTemplate_Provides_Lookup_Options_To_Editor_Filtering()
+    {
+        var item = Process<OtherTemplateFamiliesForm>(nameof(OtherTemplateFamiliesForm.Lookup));
+
+        Assert.Equal("Editor", item.FilteringType);
+        Assert.Equal("Test.Items", item.FilteringParams["lookupKey"]);
+        Assert.Equal(true, item.FilteringParams["async"]);
+    }
+
+    [Fact]
+    public void EditorTemplate_Is_Not_Supported_For_Other_Editor_Families()
+    {
+        var item = Process<OtherTemplateFamiliesForm>(nameof(OtherTemplateFamiliesForm.Sized));
+
+        Assert.Equal("Test.SizedEditor", item.EditorType);
+        Assert.False(item.EditorParams.ContainsKey("size"));
+    }
 }

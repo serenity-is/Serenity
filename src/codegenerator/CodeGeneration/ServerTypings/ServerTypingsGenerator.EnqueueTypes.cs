@@ -151,6 +151,7 @@ public partial class ServerTypingsGenerator
             GetColumnsScriptAttribute(type) != null ||
             GetFormScriptAttribute(type) != null ||
             GetNestedPermissionKeysAttribute(type) != null ||
+            GetEditorTemplateAttribute(type, out _) != null ||
             TypingsUtils.GetAttr(type, "Serenity.ComponentModel", "ScriptIncludeAttribute", emptyTypes) != null;
     }
 

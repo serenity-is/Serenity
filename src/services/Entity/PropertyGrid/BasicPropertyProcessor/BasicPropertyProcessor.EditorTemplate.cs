@@ -35,20 +35,24 @@ public partial class BasicPropertyProcessor : PropertyProcessor
     }
 
     /// <summary>
-    /// Checks whether two editor attribute types share a base class more specific than
-    /// <see cref="CustomEditorAttribute"/>, like <see cref="ServiceLookupEditorBaseAttribute"/>,
-    /// so that the options of one are meaningful for the other.
+    /// Checks whether two editor attribute types are of the same editor family supporting templates, which are
+    /// currently <see cref="ServiceLookupEditorBaseAttribute"/> and <see cref="LookupEditorBaseAttribute"/>.
+    /// The server typings generator supports the same families for the client side editor defaults.
     /// </summary>
     private static bool IsSameEditorFamily(Type templateType, Type editorType)
     {
-        for (var type = templateType;
-            type is not null && type != typeof(CustomEditorAttribute) && type != typeof(EditorTypeAttribute);
-            type = type.BaseType)
-        {
-            if (type.IsAssignableFrom(editorType))
-                return true;
-        }
+        return GetEditorTemplateFamily(templateType) is Type family &&
+            family.IsAssignableFrom(editorType);
+    }
 
-        return false;
+    private static Type? GetEditorTemplateFamily(Type type)
+    {
+        if (typeof(ServiceLookupEditorBaseAttribute).IsAssignableFrom(type))
+            return typeof(ServiceLookupEditorBaseAttribute);
+
+        if (typeof(LookupEditorBaseAttribute).IsAssignableFrom(type))
+            return typeof(LookupEditorBaseAttribute);
+
+        return null;
     }
 }
