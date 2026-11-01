@@ -1,6 +1,6 @@
 import { bindThis } from "@serenity-is/domwise";
 import { Fluent, IconClassName, isArrayLike, isPromiseLike } from "../../base";
-import { Select2, Select2Options } from "./select2";
+import { Select2, Select2Options, Select2QueryOptions } from "./select2";
 
 /** The combobox provider type. */
 export type ComboboxType = "select2";
@@ -69,9 +69,9 @@ export interface ComboboxOptions<TSource = any> {
     /** Allow arbitrary values for items. */
     arbitraryValues?: boolean;
     /** Formatter for the selected item. */
-    formatSelection?: (p1: ComboboxItem<TSource>) => ComboboxFormatResult;
+    formatSelection?: (item: ComboboxItem<TSource>) => ComboboxFormatResult;
     /** Formatter for result items. */
-    formatResult?: (p1: ComboboxItem<TSource>) => ComboboxFormatResult;
+    formatResult?: (result: ComboboxItem<TSource>, container: HTMLElement, query: Select2QueryOptions) => ComboboxFormatResult;
     /** Minimum results required to show the search box. */
     minimumResultsForSearch?: number;
     /** Whether multiple items can be selected. */

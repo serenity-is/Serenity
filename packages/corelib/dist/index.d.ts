@@ -8836,6 +8836,500 @@ export declare class DateEditor<P extends DateEditorOptions = DateEditorOptions>
      * @param el - The input element or array-like collection. */
     static uiPickerZIndexWorkaround(el: HTMLElement | ArrayLike<HTMLElement>): void;
 }
+/** Element type that can host a Select2. */
+export type Select2Element = HTMLInputElement | HTMLSelectElement;
+/** Result of a Select2 formatter. */
+export type Select2FormatResult = string | Element | DocumentFragment;
+/**
+ * Options passed to a Select2 query callback.
+ */
+export interface Select2QueryOptions {
+    /** The element the query is for. */
+    element?: Select2Element;
+    /** The search term. */
+    term?: string;
+    /** The page number. */
+    page?: number;
+    /** Additional context. */
+    context?: any;
+    /** Callback invoked with the results. */
+    callback?: (data: Select2Result) => void;
+    /** Custom matcher function. */
+    matcher?: (term: string, text: string, data?: any) => boolean;
+}
+/**
+ * A single Select2 item.
+ */
+export interface Select2Item {
+    /** Unique identifier of the select item. */
+    id?: string;
+    /** Display text. */
+    text?: string;
+    /** The source item. */
+    source?: any;
+    /** Icon class for the item. */
+    icon?: IconClassName;
+    /** CSS class(es) of the item. */
+    css?: string;
+    /** Child items. */
+    children?: Select2Item[];
+    /** Whether the item is disabled. */
+    disabled?: boolean;
+    /** Whether the item is locked. */
+    locked?: boolean;
+}
+/**
+ * Result of a Select2 query.
+ */
+export interface Select2Result {
+    /** Whether the query failed. */
+    hasError?: boolean;
+    /** Error information. */
+    errorInfo?: any;
+    /** The result items. */
+    results: Select2Item[];
+    /** Whether there are more results. */
+    more?: boolean;
+    /** Additional context. */
+    context?: any;
+}
+/**
+ * Options for ajax-based Select2 queries.
+ */
+export interface Select2AjaxOptions extends RequestInit {
+    /** Request headers. */
+    headers?: Record<string, string>;
+    /** The URL or a function returning it. */
+    url?: string | ((term: string, page: number, context: any) => string);
+    /** Delay in milliseconds before the ajax request. */
+    quietMillis?: number;
+    /** Callback that builds the request data. */
+    data?: (term: string, page: number, context: any) => any;
+    /** Callback that processes the response. */
+    results?: (response: any, page: number, query: Select2QueryOptions) => Select2Result;
+    /** Additional request parameters. */
+    params?: (() => any) | any;
+    /** Callback invoked when the ajax request fails.
+     * @param response - The error response payload.
+     * @param info - Additional error info. */
+    onError?(response: any, info?: any): void | boolean;
+    /** Callback invoked when the ajax request succeeds.
+     * @param response - The success response payload. */
+    onSuccess?(response: any): void;
+}
+/**
+ * Options for the {@link Select2} widget.
+ */
+export interface Select2Options {
+    /** The element to attach Select2 to. */
+    element?: Select2Element;
+    /** Width of the widget. */
+    width?: string | (() => string);
+    /** Minimum input length before searching. */
+    minimumInputLength?: number;
+    /** Maximum input length. */
+    maximumInputLength?: number;
+    /** Minimum results required to show the search box. */
+    minimumResultsForSearch?: number;
+    /** Maximum number of selectable items. */
+    maximumSelectionSize?: number | (() => number);
+    /** Placeholder text. */
+    placeholder?: string;
+    /** Placeholder option. */
+    placeholderOption?: "first" | ((select: HTMLSelectElement) => HTMLOptionElement);
+    /** Separator for multiple values. */
+    separator?: string;
+    /** Whether the selection can be cleared. */
+    allowClear?: boolean;
+    /** Whether multiple items can be selected. */
+    multiple?: boolean;
+    /** Whether to close the dropdown on select. */
+    closeOnSelect?: boolean;
+    /** Whether to open the dropdown on enter. */
+    openOnEnter?: boolean;
+    /** Callback that returns the id of an item. */
+    id?: (item: any) => string;
+    /** Custom matcher function. */
+    matcher?: (term: string, text: string, data?: any) => boolean;
+    /** Callback that sorts results. */
+    sortResults?: (results: Select2Item[], container: HTMLElement, query: Select2QueryOptions) => Select2Item[];
+    /** Formatter for ajax errors. */
+    formatAjaxError?: (data: Select2Result, info?: any) => Select2FormatResult;
+    /** Formatter for the matches count. */
+    formatMatches?: (matches: number) => Select2FormatResult;
+    /** Formatter for selected items. */
+    formatSelection?: (data: Select2Item, container: HTMLElement, escapeMarkup: (markup: string) => string) => Select2FormatResult;
+    /** Formatter for result items. */
+    formatResult?: (result: Select2Item, container: HTMLElement, query: Select2QueryOptions, escapeMarkup: (markup: string) => string) => Select2FormatResult;
+    /** Formatter for result CSS classes. */
+    formatResultCssClass?: (data: Select2Item) => string;
+    /** Formatter for selection CSS classes. */
+    formatSelectionCssClass?: (item: Select2Item, container: HTMLElement) => string;
+    /** Formatter for no-matches text. */
+    formatNoMatches?: (input: string) => Select2FormatResult;
+    /** Formatter for load-more text. */
+    formatLoadMore?: (pageNumber: number) => Select2FormatResult;
+    /** Formatter for searching text. */
+    formatSearching?: () => Select2FormatResult;
+    /** Formatter for input-too-long text. */
+    formatInputTooLong?: (input: string, max: number) => Select2FormatResult;
+    /** Formatter for input-too-short text. */
+    formatInputTooShort?: (input: string, min: number) => Select2FormatResult;
+    /** Formatter for selection-too-big text. */
+    formatSelectionTooBig?: (limit: number) => Select2FormatResult;
+    /** Callback that creates a search choice. */
+    createSearchChoice?: (term: string) => Select2Item;
+    /** Position of the create-search-choice item. */
+    createSearchChoicePosition?: string | ((list: Select2Item[], item: Select2Item) => void);
+    /** Callback that initializes the selection. */
+    initSelection?: (element: HTMLElement, callback: (data: any) => void) => void;
+    /** Tokenizer function. */
+    tokenizer?: (input: string, selection: Select2Item[], selectCallback: (data: Select2Item) => void, opts: Select2Options) => string;
+    /** Token separators. */
+    tokenSeparators?: string[];
+    /** Query callback. */
+    query?: (query: Select2QueryOptions) => void;
+    /** Ajax options. */
+    ajax?: Select2AjaxOptions;
+    /** Static data. */
+    data?: any;
+    /** Tags for tag mode. */
+    tags?: ((string | Select2Item)[]) | (() => (string | Select2Item)[]);
+    /** Container CSS. */
+    containerCss?: Record<string, string> | (() => Record<string, string>);
+    /** Container CSS class. */
+    containerCssClass?: string | (() => string);
+    /** Dropdown CSS. */
+    dropdownCss?: Record<string, string> | (() => Record<string, string>);
+    /** Dropdown CSS class. */
+    dropdownCssClass?: string | (() => string);
+    /** Whether the dropdown auto-widths. */
+    dropdownAutoWidth?: boolean;
+    /** Callback that returns the dropdown parent. */
+    dropdownParent?: (input: HTMLElement) => HTMLElement;
+    /** Callback that adapts the container CSS class. */
+    adaptContainerCssClass?: (cls: string) => string;
+    /** Callback that adapts the dropdown CSS class. */
+    adaptDropdownCssClass?: (cls: string) => string;
+    /** Callback that escapes markup. */
+    escapeMarkup?: (markup: string) => string;
+    /** Placeholder for the search input. */
+    searchInputPlaceholder?: string;
+    /** Whether to select on blur. */
+    selectOnBlur?: boolean;
+    /** Whether to blur on change. */
+    blurOnChange?: boolean;
+    /** Padding for load-more. */
+    loadMorePadding?: number;
+    /** Callback that returns the next search term. */
+    nextSearchTerm?: (selectedObject: Select2Item, currentSearchTerm: string) => string;
+    /** Callback that populates results. */
+    populateResults?: (container: HTMLElement, results: Select2Item[], query: Select2QueryOptions) => void;
+    /** Callback that determines whether to focus the input. Defaults to not focusing the input
+     * on touch devices, so that the virtual keyboard does not cover the dropdown. Hardware
+     * keyboard input is still routed to the widget. */
+    shouldFocusInput?: (instance: AbstractSelect2) => boolean;
+}
+/**
+ * A searchable select widget ported from Select2.
+ */
+export declare class Select2 {
+    private el;
+    /**
+     * Creates a Select2 widget.
+     * @param opts - Select2 options.
+     */
+    constructor(opts?: Select2Options);
+    private get instance();
+    /**
+     * Closes the dropdown.
+     */
+    close(): void;
+    /**
+     * Returns the container element.
+     * @returns The container element.
+     */
+    get container(): HTMLElement;
+    /**
+     * Returns the dropdown element.
+     * @returns The dropdown element.
+     */
+    get dropdown(): HTMLElement;
+    /**
+     * Destroys the Select2 instance.
+     */
+    destroy(): void;
+    /**
+     * Returns the current data.
+     * @returns The selected item(s).
+     */
+    get data(): (Select2Item | Select2Item[]);
+    /** Sets the current data.
+     * @param value - The data to set. */
+    set data(value: Select2Item | Select2Item[]);
+    /**
+     * Disables the Select2 widget.
+     */
+    disable(): void;
+    /**
+     * Enables or disables the Select2 widget.
+     * @param enabled - Whether to enable.
+     */
+    enable(enabled?: boolean): void;
+    /**
+     * Focuses the search input.
+     */
+    focus(): void;
+    /**
+     * Whether the widget is focused.
+     * @returns True when focused.
+     */
+    get isFocused(): boolean;
+    /**
+     * Whether the widget allows multiple selection.
+     * @returns True when multiple.
+     */
+    get isMultiple(): boolean;
+    /**
+     * Whether the dropdown is open.
+     * @returns True when open.
+     */
+    get opened(): boolean;
+    /**
+     * Opens the dropdown.
+     * @returns True when opened.
+     */
+    open(): boolean;
+    /**
+     * Repositions the dropdown.
+     */
+    positionDropdown(): void;
+    /**
+     * Sets the read-only state.
+     * @param value - Whether to enable read-only mode.
+     */
+    readonly(value?: boolean): void;
+    /**
+     * Returns the search input element.
+     * @returns The search input.
+     */
+    get search(): HTMLInputElement;
+    /**
+     * Returns the current value.
+     * @returns The value.
+     */
+    get val(): (string | string[]);
+    /** Sets the current value.
+     * @param value - The value to set. */
+    set val(value: string | string[]);
+    /**
+     * Returns the Select2 instance attached to an element, or null.
+     * @param el - The element.
+     * @returns The Select2 instance, or null.
+     */
+    static getInstance(el: Select2Element): Select2;
+    /** Default ajax options. */
+    static readonly ajaxDefaults: Select2AjaxOptions;
+    /** Default options for the Select2 widget. */
+    static readonly defaults: Select2Options;
+    /**
+     * Highlights the matching portion of text for a search term.
+     * @param text - The text to highlight.
+     * @param term - The search term.
+     * @returns The highlighted result.
+     */
+    static highlightMatch(text: string, term: string): Select2FormatResult;
+    /**
+     * Strips diacritics from a string for accent-insensitive matching.
+     * @param str - The string to process.
+     * @returns The string with diacritics removed.
+     */
+    static stripDiacritics(str: string): string;
+}
+export declare abstract class AbstractSelect2 {
+    private _enabled;
+    private _readonly;
+    private _touchEvent;
+    private _touchMoved;
+    protected autofocus: boolean;
+    container: HTMLElement;
+    protected containerId: string;
+    protected containerEventName: string;
+    protected context: any;
+    dropdown: HTMLElement;
+    protected elementTabIndex: string;
+    protected enabledInterface: boolean;
+    protected id: (item: any) => string;
+    protected nextSearchTerm: string;
+    protected opts: Select2Options;
+    protected propertyObserver: MutationObserver;
+    protected queryCount: number;
+    protected results: HTMLElement;
+    protected resultsPage: number;
+    search: HTMLInputElement;
+    protected selection: HTMLElement;
+    protected showSearchInput: boolean;
+    protected abstract createContainer(): HTMLElement;
+    abstract data(value?: Select2Item | Select2Item[], triggerChange?: boolean): Select2Item | Select2Item[] | void;
+    abstract focus(): void;
+    abstract isFocused(): boolean;
+    protected abstract initContainer(): void;
+    protected abstract initSelection(): void;
+    protected abstract onSelect(item: Select2Item, options?: {
+        noFocus: boolean;
+    }): void;
+    protected abstract postprocessResults(data: Select2Result, initial: boolean, noHighlightUpdate?: boolean): void;
+    abstract val(value?: string | string[]): string | string[];
+    init(opts: Select2Options): void;
+    destroy(): void;
+    optionToData(element: HTMLOptionElement | HTMLOptGroupElement): Select2Item;
+    protected select: HTMLSelectElement;
+    private handleDropdownMouseUp;
+    private handleDropdownTouchStartMoveEnd;
+    private handleDropdownTouchMove;
+    private handleDropdownTouchStartEnd;
+    private handleDropdownClick;
+    protected prepareOpts(opts: Select2Options): Select2Options;
+    private handleMonitorFocus;
+    private handleMonitorChange;
+    private handleMonitorSync;
+    /**
+     * Monitor the original element for changes and update select2 accordingly
+     */
+    protected monitorSource(): void;
+    protected triggerSelect(data: Select2Item): boolean;
+    /**
+     * Triggers the change event on the source element
+     */
+    protected triggerChange(details?: any): void;
+    protected isInterfaceEnabled(): boolean;
+    protected enableInterface(): boolean;
+    enable(enabled?: boolean): void;
+    disable(): void;
+    readonly(enabled?: boolean): void;
+    opened(): boolean;
+    positionDropdown(): void;
+    protected shouldOpen(): boolean;
+    protected clearDropdownAlignmentPreference(): void;
+    /**
+     * Opens the dropdown
+     *
+     * @return {Boolean} whether or not dropdown was opened. This method will return false if, for example,
+     * the dropdown is already open, or if the 'open' event listener on the element called preventDefault().
+     */
+    open(): boolean;
+    /**
+     * Performs the opening of the dropdown
+     */
+    protected opening(): void;
+    close(): void;
+    /**
+     * Opens control, sets input value, and updates results.
+     */
+    protected externalSearch(term: string): void;
+    protected clearSearch(): void;
+    protected getMaximumSelectionSize(): any;
+    protected ensureHighlightVisible(): void;
+    protected findHighlightableChoices(): Element[];
+    protected moveHighlight(delta: number): void;
+    protected highlight(index?: number): number;
+    protected removeHighlight(): void;
+    protected touchMoved(): void;
+    protected clearTouchMoved(): void;
+    protected countSelectableResults(): number;
+    protected highlightUnderEvent(event: Event): void;
+    protected loadMoreIfNeeded(): void;
+    /**
+     * Default tokenizer function which does nothing
+     */
+    protected tokenize(): string;
+    protected handleSearchInput(): void;
+    protected handleSearchFocus(): void;
+    protected handleSearchBlur(): void;
+    private handleExternalKeydown;
+    /**
+     * @param initial whether or not this is the call to this method right after the dropdown has been opened
+     */
+    protected updateResults(initial?: boolean): void;
+    protected cancel(e?: Event): void;
+    protected blur(): void;
+    protected focusSearch(): void;
+    protected selectHighlighted(options?: any): void;
+    protected getPlaceholder(): string;
+    protected getPlaceholderOption(): HTMLOptionElement;
+    /**
+     * Get the desired width for the container element.  This is
+     * derived first from option `width` passed to select2, then
+     * the inline 'style' on the original element, and finally
+     * falls back to the jQuery calculated element width.
+     */
+    protected initContainerWidth(): void;
+}
+export declare class SingleSelect2 extends AbstractSelect2 {
+    protected focusser: HTMLInputElement;
+    createContainer(): HTMLElement;
+    protected enableInterface(): boolean;
+    protected opening(): void;
+    close(): void;
+    focus(): void;
+    isFocused(): boolean;
+    protected cancel(e?: Event): void;
+    destroy(): void;
+    initContainer(): void;
+    protected clear(triggerChange?: boolean): void;
+    /**
+     * Sets selection based on source element's value
+     */
+    protected initSelection(): void;
+    protected isPlaceholderOptionSelected(): boolean;
+    protected prepareOpts(opts: Select2Options): Select2Options;
+    protected getPlaceholder(): string;
+    protected setPlaceholder(): void;
+    protected postprocessResults(data: Select2Result, initial: boolean, noHighlightUpdate?: boolean): void;
+    protected showSearch(showSearchInput: boolean): void;
+    protected onSelect(data: Select2Item, options: any): void;
+    protected updateSelection(data: Select2Item): void;
+    val(val?: string, triggerChange?: boolean): string;
+    protected clearSearch(): void;
+    data(value?: Select2Item): (void | Select2Item);
+}
+export declare class MultiSelect2 extends AbstractSelect2 {
+    protected createContainer(): HTMLElement;
+    protected prepareOpts(opts: Select2Options): Select2Options;
+    protected selectChoice(choice: HTMLElement): void;
+    destroy(): void;
+    private searchContainer;
+    private keydowns;
+    protected initContainer(): void;
+    protected enableInterface(): boolean;
+    protected initSelection(): void;
+    protected clearSearch(): void;
+    protected clearPlaceholder(): void;
+    protected opening(): void;
+    close(): void;
+    focus(): void;
+    isFocused(): boolean;
+    protected updateSelection(data: Select2Item[]): void;
+    protected tokenize(): string;
+    protected onSelect(data: Select2Item, options: any): void;
+    protected cancel(e?: Event): void;
+    protected addSelectedChoice(data: Select2Item): void;
+    protected unselect(selected: HTMLElement): boolean;
+    protected postprocessResults(data?: Select2Result, initial?: boolean, noHighlightUpdate?: boolean): void;
+    protected getMaxSearchWidth(): number;
+    protected resizeSearch(): void;
+    protected getVal(): string[];
+    protected setVal(val: string[]): void;
+    protected buildChangeDetails(old: Select2Item[], current: Select2Item[]): {
+        added: Select2Item[];
+        removed: Select2Item[];
+    };
+    val(val?: string[], triggerChange?: boolean): string[];
+    protected onSortStart(): void;
+    protected onSortEnd(): void;
+    data(): Select2Item[];
+    data(values: Select2Item[], triggerChange?: boolean): void;
+}
 /** The combobox provider type. */
 export type ComboboxType = "select2";
 /** Result of a combobox formatter. */
@@ -8899,9 +9393,9 @@ export interface ComboboxOptions<TSource = any> {
     /** Allow arbitrary values for items. */
     arbitraryValues?: boolean;
     /** Formatter for the selected item. */
-    formatSelection?: (p1: ComboboxItem<TSource>) => ComboboxFormatResult;
+    formatSelection?: (item: ComboboxItem<TSource>) => ComboboxFormatResult;
     /** Formatter for result items. */
-    formatResult?: (p1: ComboboxItem<TSource>) => ComboboxFormatResult;
+    formatResult?: (result: ComboboxItem<TSource>, container: HTMLElement, query: Select2QueryOptions) => ComboboxFormatResult;
     /** Minimum results required to show the search box. */
     minimumResultsForSearch?: number;
     /** Whether multiple items can be selected. */
@@ -13895,500 +14389,6 @@ export declare class Recaptcha<P extends RecaptchaOptions = RecaptchaOptions> ex
      * @param value - The value to set.
      */
     set_value(value: string): void;
-}
-/** Element type that can host a Select2. */
-export type Select2Element = HTMLInputElement | HTMLSelectElement;
-/** Result of a Select2 formatter. */
-export type Select2FormatResult = string | Element | DocumentFragment;
-/**
- * Options passed to a Select2 query callback.
- */
-export interface Select2QueryOptions {
-    /** The element the query is for. */
-    element?: Select2Element;
-    /** The search term. */
-    term?: string;
-    /** The page number. */
-    page?: number;
-    /** Additional context. */
-    context?: any;
-    /** Callback invoked with the results. */
-    callback?: (data: Select2Result) => void;
-    /** Custom matcher function. */
-    matcher?: (term: string, text: string, data?: any) => boolean;
-}
-/**
- * A single Select2 item.
- */
-export interface Select2Item {
-    /** Unique identifier of the select item. */
-    id?: string;
-    /** Display text. */
-    text?: string;
-    /** The source item. */
-    source?: any;
-    /** Icon class for the item. */
-    icon?: IconClassName;
-    /** CSS class(es) of the item. */
-    css?: string;
-    /** Child items. */
-    children?: Select2Item[];
-    /** Whether the item is disabled. */
-    disabled?: boolean;
-    /** Whether the item is locked. */
-    locked?: boolean;
-}
-/**
- * Result of a Select2 query.
- */
-export interface Select2Result {
-    /** Whether the query failed. */
-    hasError?: boolean;
-    /** Error information. */
-    errorInfo?: any;
-    /** The result items. */
-    results: Select2Item[];
-    /** Whether there are more results. */
-    more?: boolean;
-    /** Additional context. */
-    context?: any;
-}
-/**
- * Options for ajax-based Select2 queries.
- */
-export interface Select2AjaxOptions extends RequestInit {
-    /** Request headers. */
-    headers?: Record<string, string>;
-    /** The URL or a function returning it. */
-    url?: string | ((term: string, page: number, context: any) => string);
-    /** Delay in milliseconds before the ajax request. */
-    quietMillis?: number;
-    /** Callback that builds the request data. */
-    data?: (term: string, page: number, context: any) => any;
-    /** Callback that processes the response. */
-    results?: (response: any, page: number, query: Select2QueryOptions) => Select2Result;
-    /** Additional request parameters. */
-    params?: (() => any) | any;
-    /** Callback invoked when the ajax request fails.
-     * @param response - The error response payload.
-     * @param info - Additional error info. */
-    onError?(response: any, info?: any): void | boolean;
-    /** Callback invoked when the ajax request succeeds.
-     * @param response - The success response payload. */
-    onSuccess?(response: any): void;
-}
-/**
- * Options for the {@link Select2} widget.
- */
-export interface Select2Options {
-    /** The element to attach Select2 to. */
-    element?: Select2Element;
-    /** Width of the widget. */
-    width?: string | (() => string);
-    /** Minimum input length before searching. */
-    minimumInputLength?: number;
-    /** Maximum input length. */
-    maximumInputLength?: number;
-    /** Minimum results required to show the search box. */
-    minimumResultsForSearch?: number;
-    /** Maximum number of selectable items. */
-    maximumSelectionSize?: number | (() => number);
-    /** Placeholder text. */
-    placeholder?: string;
-    /** Placeholder option. */
-    placeholderOption?: "first" | ((select: HTMLSelectElement) => HTMLOptionElement);
-    /** Separator for multiple values. */
-    separator?: string;
-    /** Whether the selection can be cleared. */
-    allowClear?: boolean;
-    /** Whether multiple items can be selected. */
-    multiple?: boolean;
-    /** Whether to close the dropdown on select. */
-    closeOnSelect?: boolean;
-    /** Whether to open the dropdown on enter. */
-    openOnEnter?: boolean;
-    /** Callback that returns the id of an item. */
-    id?: (item: any) => string;
-    /** Custom matcher function. */
-    matcher?: (term: string, text: string, data?: any) => boolean;
-    /** Callback that sorts results. */
-    sortResults?: (results: Select2Item[], container: HTMLElement, query: Select2QueryOptions) => Select2Item[];
-    /** Formatter for ajax errors. */
-    formatAjaxError?: (data: Select2Result, info?: any) => Select2FormatResult;
-    /** Formatter for the matches count. */
-    formatMatches?: (matches: number) => Select2FormatResult;
-    /** Formatter for selected items. */
-    formatSelection?: (data: Select2Item, container: HTMLElement, escapeMarkup: (markup: string) => string) => Select2FormatResult;
-    /** Formatter for result items. */
-    formatResult?: (result: Select2Item, container: HTMLElement, query: Select2QueryOptions, escapeMarkup: (markup: string) => string) => Select2FormatResult;
-    /** Formatter for result CSS classes. */
-    formatResultCssClass?: (data: Select2Item) => string;
-    /** Formatter for selection CSS classes. */
-    formatSelectionCssClass?: (item: Select2Item, container: HTMLElement) => string;
-    /** Formatter for no-matches text. */
-    formatNoMatches?: (input: string) => Select2FormatResult;
-    /** Formatter for load-more text. */
-    formatLoadMore?: (pageNumber: number) => Select2FormatResult;
-    /** Formatter for searching text. */
-    formatSearching?: () => Select2FormatResult;
-    /** Formatter for input-too-long text. */
-    formatInputTooLong?: (input: string, max: number) => Select2FormatResult;
-    /** Formatter for input-too-short text. */
-    formatInputTooShort?: (input: string, min: number) => Select2FormatResult;
-    /** Formatter for selection-too-big text. */
-    formatSelectionTooBig?: (limit: number) => Select2FormatResult;
-    /** Callback that creates a search choice. */
-    createSearchChoice?: (term: string) => Select2Item;
-    /** Position of the create-search-choice item. */
-    createSearchChoicePosition?: string | ((list: Select2Item[], item: Select2Item) => void);
-    /** Callback that initializes the selection. */
-    initSelection?: (element: HTMLElement, callback: (data: any) => void) => void;
-    /** Tokenizer function. */
-    tokenizer?: (input: string, selection: Select2Item[], selectCallback: (data: Select2Item) => void, opts: Select2Options) => string;
-    /** Token separators. */
-    tokenSeparators?: string[];
-    /** Query callback. */
-    query?: (query: Select2QueryOptions) => void;
-    /** Ajax options. */
-    ajax?: Select2AjaxOptions;
-    /** Static data. */
-    data?: any;
-    /** Tags for tag mode. */
-    tags?: ((string | Select2Item)[]) | (() => (string | Select2Item)[]);
-    /** Container CSS. */
-    containerCss?: Record<string, string> | (() => Record<string, string>);
-    /** Container CSS class. */
-    containerCssClass?: string | (() => string);
-    /** Dropdown CSS. */
-    dropdownCss?: Record<string, string> | (() => Record<string, string>);
-    /** Dropdown CSS class. */
-    dropdownCssClass?: string | (() => string);
-    /** Whether the dropdown auto-widths. */
-    dropdownAutoWidth?: boolean;
-    /** Callback that returns the dropdown parent. */
-    dropdownParent?: (input: HTMLElement) => HTMLElement;
-    /** Callback that adapts the container CSS class. */
-    adaptContainerCssClass?: (cls: string) => string;
-    /** Callback that adapts the dropdown CSS class. */
-    adaptDropdownCssClass?: (cls: string) => string;
-    /** Callback that escapes markup. */
-    escapeMarkup?: (markup: string) => string;
-    /** Placeholder for the search input. */
-    searchInputPlaceholder?: string;
-    /** Whether to select on blur. */
-    selectOnBlur?: boolean;
-    /** Whether to blur on change. */
-    blurOnChange?: boolean;
-    /** Padding for load-more. */
-    loadMorePadding?: number;
-    /** Callback that returns the next search term. */
-    nextSearchTerm?: (selectedObject: Select2Item, currentSearchTerm: string) => string;
-    /** Callback that populates results. */
-    populateResults?: (container: HTMLElement, results: Select2Item[], query: Select2QueryOptions) => void;
-    /** Callback that determines whether to focus the input. Defaults to not focusing the input
-     * on touch devices, so that the virtual keyboard does not cover the dropdown. Hardware
-     * keyboard input is still routed to the widget. */
-    shouldFocusInput?: (instance: AbstractSelect2) => boolean;
-}
-/**
- * A searchable select widget ported from Select2.
- */
-export declare class Select2 {
-    private el;
-    /**
-     * Creates a Select2 widget.
-     * @param opts - Select2 options.
-     */
-    constructor(opts?: Select2Options);
-    private get instance();
-    /**
-     * Closes the dropdown.
-     */
-    close(): void;
-    /**
-     * Returns the container element.
-     * @returns The container element.
-     */
-    get container(): HTMLElement;
-    /**
-     * Returns the dropdown element.
-     * @returns The dropdown element.
-     */
-    get dropdown(): HTMLElement;
-    /**
-     * Destroys the Select2 instance.
-     */
-    destroy(): void;
-    /**
-     * Returns the current data.
-     * @returns The selected item(s).
-     */
-    get data(): (Select2Item | Select2Item[]);
-    /** Sets the current data.
-     * @param value - The data to set. */
-    set data(value: Select2Item | Select2Item[]);
-    /**
-     * Disables the Select2 widget.
-     */
-    disable(): void;
-    /**
-     * Enables or disables the Select2 widget.
-     * @param enabled - Whether to enable.
-     */
-    enable(enabled?: boolean): void;
-    /**
-     * Focuses the search input.
-     */
-    focus(): void;
-    /**
-     * Whether the widget is focused.
-     * @returns True when focused.
-     */
-    get isFocused(): boolean;
-    /**
-     * Whether the widget allows multiple selection.
-     * @returns True when multiple.
-     */
-    get isMultiple(): boolean;
-    /**
-     * Whether the dropdown is open.
-     * @returns True when open.
-     */
-    get opened(): boolean;
-    /**
-     * Opens the dropdown.
-     * @returns True when opened.
-     */
-    open(): boolean;
-    /**
-     * Repositions the dropdown.
-     */
-    positionDropdown(): void;
-    /**
-     * Sets the read-only state.
-     * @param value - Whether to enable read-only mode.
-     */
-    readonly(value?: boolean): void;
-    /**
-     * Returns the search input element.
-     * @returns The search input.
-     */
-    get search(): HTMLInputElement;
-    /**
-     * Returns the current value.
-     * @returns The value.
-     */
-    get val(): (string | string[]);
-    /** Sets the current value.
-     * @param value - The value to set. */
-    set val(value: string | string[]);
-    /**
-     * Returns the Select2 instance attached to an element, or null.
-     * @param el - The element.
-     * @returns The Select2 instance, or null.
-     */
-    static getInstance(el: Select2Element): Select2;
-    /** Default ajax options. */
-    static readonly ajaxDefaults: Select2AjaxOptions;
-    /** Default options for the Select2 widget. */
-    static readonly defaults: Select2Options;
-    /**
-     * Highlights the matching portion of text for a search term.
-     * @param text - The text to highlight.
-     * @param term - The search term.
-     * @returns The highlighted result.
-     */
-    static highlightMatch(text: string, term: string): Select2FormatResult;
-    /**
-     * Strips diacritics from a string for accent-insensitive matching.
-     * @param str - The string to process.
-     * @returns The string with diacritics removed.
-     */
-    static stripDiacritics(str: string): string;
-}
-export declare abstract class AbstractSelect2 {
-    private _enabled;
-    private _readonly;
-    private _touchEvent;
-    private _touchMoved;
-    protected autofocus: boolean;
-    container: HTMLElement;
-    protected containerId: string;
-    protected containerEventName: string;
-    protected context: any;
-    dropdown: HTMLElement;
-    protected elementTabIndex: string;
-    protected enabledInterface: boolean;
-    protected id: (item: any) => string;
-    protected nextSearchTerm: string;
-    protected opts: Select2Options;
-    protected propertyObserver: MutationObserver;
-    protected queryCount: number;
-    protected results: HTMLElement;
-    protected resultsPage: number;
-    search: HTMLInputElement;
-    protected selection: HTMLElement;
-    protected showSearchInput: boolean;
-    protected abstract createContainer(): HTMLElement;
-    abstract data(value?: Select2Item | Select2Item[], triggerChange?: boolean): Select2Item | Select2Item[] | void;
-    abstract focus(): void;
-    abstract isFocused(): boolean;
-    protected abstract initContainer(): void;
-    protected abstract initSelection(): void;
-    protected abstract onSelect(item: Select2Item, options?: {
-        noFocus: boolean;
-    }): void;
-    protected abstract postprocessResults(data: Select2Result, initial: boolean, noHighlightUpdate?: boolean): void;
-    abstract val(value?: string | string[]): string | string[];
-    init(opts: Select2Options): void;
-    destroy(): void;
-    optionToData(element: HTMLOptionElement | HTMLOptGroupElement): Select2Item;
-    protected select: HTMLSelectElement;
-    private handleDropdownMouseUp;
-    private handleDropdownTouchStartMoveEnd;
-    private handleDropdownTouchMove;
-    private handleDropdownTouchStartEnd;
-    private handleDropdownClick;
-    protected prepareOpts(opts: Select2Options): Select2Options;
-    private handleMonitorFocus;
-    private handleMonitorChange;
-    private handleMonitorSync;
-    /**
-     * Monitor the original element for changes and update select2 accordingly
-     */
-    protected monitorSource(): void;
-    protected triggerSelect(data: Select2Item): boolean;
-    /**
-     * Triggers the change event on the source element
-     */
-    protected triggerChange(details?: any): void;
-    protected isInterfaceEnabled(): boolean;
-    protected enableInterface(): boolean;
-    enable(enabled?: boolean): void;
-    disable(): void;
-    readonly(enabled?: boolean): void;
-    opened(): boolean;
-    positionDropdown(): void;
-    protected shouldOpen(): boolean;
-    protected clearDropdownAlignmentPreference(): void;
-    /**
-     * Opens the dropdown
-     *
-     * @return {Boolean} whether or not dropdown was opened. This method will return false if, for example,
-     * the dropdown is already open, or if the 'open' event listener on the element called preventDefault().
-     */
-    open(): boolean;
-    /**
-     * Performs the opening of the dropdown
-     */
-    protected opening(): void;
-    close(): void;
-    /**
-     * Opens control, sets input value, and updates results.
-     */
-    protected externalSearch(term: string): void;
-    protected clearSearch(): void;
-    protected getMaximumSelectionSize(): any;
-    protected ensureHighlightVisible(): void;
-    protected findHighlightableChoices(): Element[];
-    protected moveHighlight(delta: number): void;
-    protected highlight(index?: number): number;
-    protected removeHighlight(): void;
-    protected touchMoved(): void;
-    protected clearTouchMoved(): void;
-    protected countSelectableResults(): number;
-    protected highlightUnderEvent(event: Event): void;
-    protected loadMoreIfNeeded(): void;
-    /**
-     * Default tokenizer function which does nothing
-     */
-    protected tokenize(): string;
-    protected handleSearchInput(): void;
-    protected handleSearchFocus(): void;
-    protected handleSearchBlur(): void;
-    private handleExternalKeydown;
-    /**
-     * @param initial whether or not this is the call to this method right after the dropdown has been opened
-     */
-    protected updateResults(initial?: boolean): void;
-    protected cancel(e?: Event): void;
-    protected blur(): void;
-    protected focusSearch(): void;
-    protected selectHighlighted(options?: any): void;
-    protected getPlaceholder(): string;
-    protected getPlaceholderOption(): HTMLOptionElement;
-    /**
-     * Get the desired width for the container element.  This is
-     * derived first from option `width` passed to select2, then
-     * the inline 'style' on the original element, and finally
-     * falls back to the jQuery calculated element width.
-     */
-    protected initContainerWidth(): void;
-}
-export declare class SingleSelect2 extends AbstractSelect2 {
-    protected focusser: HTMLInputElement;
-    createContainer(): HTMLElement;
-    protected enableInterface(): boolean;
-    protected opening(): void;
-    close(): void;
-    focus(): void;
-    isFocused(): boolean;
-    protected cancel(e?: Event): void;
-    destroy(): void;
-    initContainer(): void;
-    protected clear(triggerChange?: boolean): void;
-    /**
-     * Sets selection based on source element's value
-     */
-    protected initSelection(): void;
-    protected isPlaceholderOptionSelected(): boolean;
-    protected prepareOpts(opts: Select2Options): Select2Options;
-    protected getPlaceholder(): string;
-    protected setPlaceholder(): void;
-    protected postprocessResults(data: Select2Result, initial: boolean, noHighlightUpdate?: boolean): void;
-    protected showSearch(showSearchInput: boolean): void;
-    protected onSelect(data: Select2Item, options: any): void;
-    protected updateSelection(data: Select2Item): void;
-    val(val?: string, triggerChange?: boolean): string;
-    protected clearSearch(): void;
-    data(value?: Select2Item): (void | Select2Item);
-}
-export declare class MultiSelect2 extends AbstractSelect2 {
-    protected createContainer(): HTMLElement;
-    protected prepareOpts(opts: Select2Options): Select2Options;
-    protected selectChoice(choice: HTMLElement): void;
-    destroy(): void;
-    private searchContainer;
-    private keydowns;
-    protected initContainer(): void;
-    protected enableInterface(): boolean;
-    protected initSelection(): void;
-    protected clearSearch(): void;
-    protected clearPlaceholder(): void;
-    protected opening(): void;
-    close(): void;
-    focus(): void;
-    isFocused(): boolean;
-    protected updateSelection(data: Select2Item[]): void;
-    protected tokenize(): string;
-    protected onSelect(data: Select2Item, options: any): void;
-    protected cancel(e?: Event): void;
-    protected addSelectedChoice(data: Select2Item): void;
-    protected unselect(selected: HTMLElement): boolean;
-    protected postprocessResults(data?: Select2Result, initial?: boolean, noHighlightUpdate?: boolean): void;
-    protected getMaxSearchWidth(): number;
-    protected resizeSearch(): void;
-    protected getVal(): string[];
-    protected setVal(val: string[]): void;
-    protected buildChangeDetails(old: Select2Item[], current: Select2Item[]): {
-        added: Select2Item[];
-        removed: Select2Item[];
-    };
-    val(val?: string[], triggerChange?: boolean): string[];
-    protected onSortStart(): void;
-    protected onSortEnd(): void;
-    data(): Select2Item[];
-    data(values: Select2Item[], triggerChange?: boolean): void;
 }
 /**
  * Options for the {@link ServiceLookupEditor}.
