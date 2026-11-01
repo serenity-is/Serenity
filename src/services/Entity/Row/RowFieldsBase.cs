@@ -55,7 +55,7 @@ public partial class RowFieldsBase : Collection<Field>, IAlias, IHaveJoins, IHas
     /// <see cref="IPasswordRow"/> are additionally protected in request handlers, as their
     /// sensitive fields may have arbitrary names.
     /// </summary>
-    internal static readonly HashSet<string> PotentiallySensitiveFieldNames = new(StringComparer.OrdinalIgnoreCase)
+    public static readonly IReadOnlySet<string> PotentiallySensitiveFieldNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
     {
         "Password",
         "PasswordHash",
