@@ -13,7 +13,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
         else
         {
             item.EditorType = editorTypeAttr.EditorType;
-            editorTypeAttr.SetParams(item.EditorParams);
+            SetEditorParams(editorTypeAttr, item.EditorParams);
             if (item.EditorType == "Lookup" &&
                 !item.EditorParams.ContainsKey("lookupKey"))
             {
@@ -148,21 +148,24 @@ public partial class BasicPropertyProcessor : PropertyProcessor
         if (editorTypeAttr is not ServiceLookupEditorBaseAttribute sle)
             return;
 
-        bool validateInferredFields = editorTypeAttr.GetType() == typeof(ServiceLookupEditorAttribute);
-        var itemType = sle.ItemType ??
-            sle.EndpointType?.GetCustomAttribute<ConnectionKeyAttribute>()?.SourceType;
-        var serviceType = itemType ?? sle.EndpointType;
+        // the endpoint is read from the template of the editor attribute when the attribute specifies none
+        var endpointSource = sle.ItemType is null && sle.EndpointType is null &&
+            GetEditorTemplate(sle) is ServiceLookupEditorBaseAttribute template ? template : sle;
+        bool validateInferredFields = endpointSource.GetType() == typeof(ServiceLookupEditorAttribute);
+        var itemType = endpointSource.ItemType ??
+            endpointSource.EndpointType?.GetCustomAttribute<ConnectionKeyAttribute>()?.SourceType;
+        var serviceType = itemType ?? endpointSource.EndpointType;
 
         if (!editorParams.ContainsKey("service"))
         {
-            if (sle.EndpointType != null &&
-                ServiceLookupEditorAttribute.TryGetServiceFromEndpoint(sle.EndpointType, sle.ActionName) is string fromEndpoint)
+            if (endpointSource.EndpointType != null &&
+                ServiceLookupEditorAttribute.TryGetServiceFromEndpoint(endpointSource.EndpointType, endpointSource.ActionName) is string fromEndpoint)
             {
                 editorParams["service"] = fromEndpoint;
             }
             else if (serviceType != null)
             {
-                editorParams["service"] = ServiceLookupEditorAttribute.AutoServiceFor(serviceType, sle.ActionName);
+                editorParams["service"] = ServiceLookupEditorAttribute.AutoServiceFor(serviceType, endpointSource.ActionName);
             }
         }
 
@@ -176,17 +179,17 @@ public partial class BasicPropertyProcessor : PropertyProcessor
 
         if (effectiveCapabilities is null)
         {
-            var endpointType = sle.EndpointType;
+            var endpointType = endpointSource.EndpointType;
             if (endpointType is null &&
                 itemType is not null &&
                 typeof(IRow).IsAssignableFrom(itemType))
             {
                 endpointType = ServiceLookupEditorAttribute.TryGetEndpointForRow(
-                    itemType, sle.ActionName, out _);
+                    itemType, endpointSource.ActionName, out _);
             }
 
             if (endpointType is not null &&
-                ServiceLookupEditorAttribute.TryGetEndpointActionMethod(endpointType, sle.ActionName) is MethodInfo actionMethod)
+                ServiceLookupEditorAttribute.TryGetEndpointActionMethod(endpointType, endpointSource.ActionName) is MethodInfo actionMethod)
             {
                 var actionCapabilities = actionMethod.GetCustomAttribute<ListRequestCapabilitiesAttribute>(inherit: true);
                 var parameters = actionMethod.GetParameters();
@@ -221,17 +224,17 @@ public partial class BasicPropertyProcessor : PropertyProcessor
         bool textFieldMissing = !editorParams.ContainsKey("textField");
         bool iconFieldMissing = !editorParams.ContainsKey("iconField");
 
-        var resultEndpointType = sle.EndpointType;
+        var resultEndpointType = endpointSource.EndpointType;
         if (resultEndpointType is null &&
             itemType is not null &&
             typeof(IRow).IsAssignableFrom(itemType))
         {
             resultEndpointType = ServiceLookupEditorAttribute.TryGetEndpointForRow(
-                itemType, sle.ActionName, out _);
+                itemType, endpointSource.ActionName, out _);
         }
 
         var resultAction = resultEndpointType is null ? null :
-            ServiceLookupEditorAttribute.TryGetEndpointActionMethod(resultEndpointType, sle.ActionName);
+            ServiceLookupEditorAttribute.TryGetEndpointActionMethod(resultEndpointType, endpointSource.ActionName);
         if (resultAction is not null &&
             TryGetPrimitiveListItemType(resultAction.ReturnType) is not null)
         {

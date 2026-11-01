@@ -78,7 +78,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
             void copyParamsFromEditor(string[] keys)
             {
                 var prm = new Dictionary<string, object?>();
-                editorAttr.SetParams(prm);
+                SetEditorParams(editorAttr, prm);
                 SetServiceLookupParams(editorAttr, prm);
                 foreach (var key in keys)
                 {
@@ -113,6 +113,10 @@ public partial class BasicPropertyProcessor : PropertyProcessor
                     if (editorAttr is LookupEditorBaseAttribute leba &&
                         leba.Async == true)
                         item.FilteringParams["async"] = true;
+
+                    // a custom service lookup editor with a template gets its service options, like a service lookup
+                    if (editorAttr is ServiceLookupEditorBaseAttribute && GetEditorTemplate(editorAttr) is not null)
+                        copyParamsFromEditor(serviceLookupCopyToFilterParams);
                 }
             }
             else if (source.EnumType != null)
@@ -228,7 +232,9 @@ public partial class BasicPropertyProcessor : PropertyProcessor
         "columnSelection",
         "includeColumns",
         "excludeColumns",
-        "includeDeleted"
+        "includeDeleted",
+        "capabilities",
+        "quickSearchFields"
     ];
 
     private static readonly HashSet<string> standardFilteringEditors = new(StringComparer.OrdinalIgnoreCase)
