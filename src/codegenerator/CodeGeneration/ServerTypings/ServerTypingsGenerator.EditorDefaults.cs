@@ -190,6 +190,11 @@ public partial class ServerTypingsGenerator
                     actionName = value as string;
                     break;
 
+                case "Capabilities":
+                    options.RemoveAll(x => x.key == "capabilities");
+                    options.Add(("capabilities", ToCapabilitiesValue(NamedArgumentTypeOf(property), value)));
+                    break;
+
                 default:
                     if (value is TypeReference || string.IsNullOrEmpty(name))
                         break;
@@ -209,7 +214,7 @@ public partial class ServerTypingsGenerator
                 if (!has("service"))
                     options.Add(("service", GetServiceUrlFromRoute(endpoint) + "/" + action.Name));
 
-                if (!has("capabilities") && GetListRequestCapabilities(action) is int capabilities)
+                if (!has("capabilities") && GetListRequestCapabilities(action) is { } capabilities)
                     options.Add(("capabilities", capabilities));
             }
         }
@@ -306,7 +311,7 @@ public partial class ServerTypingsGenerator
         return actionName is not null ? find(actionName) : find("ListLookup") ?? find("List");
     }
 
-    private static int? GetListRequestCapabilities(MethodDefinition action)
+    private static object? GetListRequestCapabilities(MethodDefinition action)
     {
         var attr = TypingsUtils.FindAttr(action.GetAttributes(), "Serenity.Services", "ListRequestCapabilitiesAttribute");
         if (attr is null)
@@ -322,7 +327,66 @@ public partial class ServerTypingsGenerator
                 capabilities &= ~exclude;
         }
 
-        return capabilities;
+        return ToCapabilitiesValue(ArgumentTypeOf(args[0]), capabilities);
+    }
+
+    /// <summary>
+    /// A flags enum value, written as a combination of its named members, e.g.
+    /// ListRequestCapabilities.FilteringOptions | ListRequestCapabilities.Sort.
+    /// </summary>
+    private sealed class EnumFlagsValue(string enumName, IReadOnlyList<string> members, long remainder)
+    {
+        public string EnumName { get; } = enumName;
+        public IReadOnlyList<string> Members { get; } = members;
+        public long Remainder { get; } = remainder;
+    }
+
+    /// <summary>
+    /// Converts a ListRequestCapabilities value to the combination of its named members, preferring the
+    /// members covering the most flags, like SourceAdapter, in their declaration order. The members are read
+    /// from the enum itself. Other values are returned as they are.
+    /// </summary>
+    private static object? ToCapabilitiesValue(TypeReference? enumType, object? value)
+    {
+        if (value is not int and not long ||
+            enumType?.FullNameOf() != "Serenity.Services.ListRequestCapabilities" ||
+            enumType.Resolve() is not TypeDefinition enumDefinition)
+            return value;
+
+        var number = Convert.ToInt64(value, CultureInfo.InvariantCulture);
+        var members = enumDefinition.FieldsOf()
+            .Where(x => x.HasConstant())
+            .Select((x, index) => (x.Name, Value: Convert.ToInt64(x.Constant(), CultureInfo.InvariantCulture), Index: index))
+            .ToArray();
+
+        if (number == 0)
+        {
+            var none = members.FirstOrDefault(x => x.Value == 0).Name;
+            return none is null ? value : new EnumFlagsValue(enumType.Name, [none], 0);
+        }
+
+        static int bitCount(long value)
+        {
+            var count = 0;
+            for (; value != 0; value &= value - 1)
+                count++;
+            return count;
+        }
+
+        var remaining = number;
+        var chosen = new List<(string Name, long Value, int Index)>();
+        foreach (var member in members.Where(x => x.Value != 0)
+            .OrderByDescending(x => bitCount(x.Value)).ThenBy(x => x.Index))
+        {
+            // only members without flags outside the remaining value, so that they don't overlap
+            if ((member.Value & remaining) == member.Value)
+            {
+                chosen.Add(member);
+                remaining &= ~member.Value;
+            }
+        }
+
+        return new EnumFlagsValue(enumType.Name, [.. chosen.OrderBy(x => x.Index).Select(x => x.Name)], remaining);
     }
 
     private static string? FindPropertyByAttributeOrName(PropertyDefinition[] properties, string attributeName,
@@ -354,8 +418,12 @@ public partial class ServerTypingsGenerator
 
 #if ISSOURCEGENERATOR
     private static object? ArgumentValueOf(TypedConstant argument) => argument.Value();
+    private static TypeReference? ArgumentTypeOf(TypedConstant argument) => argument.Type;
+    private static TypeReference? NamedArgumentTypeOf(KeyValuePair<string, TypedConstant> argument) => argument.Value.Type;
 #else
     private static object? ArgumentValueOf(Mono.Cecil.CustomAttributeArgument argument) => argument.Value;
+    private static TypeReference? ArgumentTypeOf(Mono.Cecil.CustomAttributeArgument argument) => argument.Type;
+    private static TypeReference? NamedArgumentTypeOf(Mono.Cecil.CustomAttributeNamedArgument argument) => argument.Argument.Type;
 #endif
 
     private static object? NormalizeAttributeValue(object? value)
@@ -398,6 +466,14 @@ public partial class ServerTypingsGenerator
                     AppendEditorOptionValue(array[i]);
                 }
                 sb.Append(']');
+                break;
+
+            case EnumFlagsValue flags:
+                var enumName = ImportFromCorelib(flags.EnumName);
+                var parts = flags.Members.Select(x => enumName + "." + x).ToList();
+                if (flags.Remainder != 0)
+                    parts.Add(flags.Remainder.ToString(System.Globalization.CultureInfo.InvariantCulture));
+                sb.Append(string.Join(" | ", parts));
                 break;
 
             case IFormattable formattable:

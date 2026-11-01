@@ -16,10 +16,10 @@ namespace Serenity.CodeGeneration
         {
             var code = GenerateEditorDefaults(typeof(TemplatedEditorAttribute), "TemplatedEditorDefaults");
 
-            Assert.Contains("import { ServiceLookupEditorOptions } from \"@serenity-is/corelib\";", code);
+            Assert.Contains("import { ListRequestCapabilities, ServiceLookupEditorOptions } from \"@serenity-is/corelib\";", code);
             Assert.Contains("export const TemplatedEditorDefaults: ServiceLookupEditorOptions = {", code);
             Assert.Contains("service: \"Test/LookupItems/ListItems\"", code);
-            Assert.Contains("capabilities: " + (int)(ListRequestCapabilities.SourceAdapter & ~ListRequestCapabilities.DistinctFields), code);
+            Assert.Contains("capabilities: ListRequestCapabilities.FilteringOptions | ListRequestCapabilities.Sort | ListRequestCapabilities.PagingOptions", code);
             Assert.Contains("idField: \"Key\"", code);
             Assert.Contains("textField: \"Key\"", code);
             Assert.Contains("iconField: \"IconClass\"", code);
@@ -45,7 +45,7 @@ namespace Serenity.CodeGeneration
             var code = GenerateEditorDefaults(typeof(ListLookupEditorAttribute), "ListLookupEditorDefaults");
 
             Assert.Contains("service: \"Test/LookupWithListLookup/ListLookup\"", code);
-            Assert.Contains("capabilities: " + (int)ListRequestCapabilities.Baseline, code);
+            Assert.Contains("capabilities: ListRequestCapabilities.Baseline", code);
         }
 
         [Fact]
@@ -142,6 +142,7 @@ namespace Serenity.CodeGeneration
         [InlineData(nameof(EditorDefaultsForm.ClientLookup), typeof(ClientLookupEditorAttribute))]
         [InlineData(nameof(EditorDefaultsForm.ExplicitLookupType), typeof(ExplicitLookupTypeEditorAttribute))]
         [InlineData(nameof(EditorDefaultsForm.AutoLookupType), typeof(AutoLookupTypeEditorAttribute))]
+        [InlineData(nameof(EditorDefaultsForm.ExplicitCapabilities), typeof(ExplicitCapabilitiesEditorAttribute))]
         public void EditorDefaults_Match_The_Options_Determined_At_Runtime(string propertyName, Type attributeType)
         {
             var identifier = attributeType.Name[..^"Attribute".Length] + "Defaults";
@@ -156,7 +157,7 @@ namespace Serenity.CodeGeneration
             {
                 Assert.True(item.EditorParams.TryGetValue(key, out var runtimeValue),
                     $"'{key}' is generated but not determined at runtime.");
-                Assert.Equal(literal, ToLiteral(runtimeValue));
+                Assert.Equal(ToLiteral(runtimeValue), EvaluateEnumFlags(literal));
             }
         }
 
@@ -166,6 +167,30 @@ namespace Serenity.CodeGeneration
                 .Select(line => System.Text.RegularExpressions.Regex.Match(line, @"^\s+(\w+): (.*?),?\s*$"))
                 .Where(match => match.Success)
                 .ToDictionary(match => match.Groups[1].Value, match => match.Groups[2].Value);
+        }
+
+        /// <summary>
+        /// Evaluates a generated ListRequestCapabilities member combination to its numeric value,
+        /// returning other literals as they are.
+        /// </summary>
+        private static string EvaluateEnumFlags(string literal)
+        {
+            if (!literal.StartsWith(nameof(ListRequestCapabilities) + ".", StringComparison.Ordinal))
+                return literal;
+
+            return literal.Split(" | ").Aggregate(0L, (value, part) => value |
+                (part.StartsWith(nameof(ListRequestCapabilities) + ".", StringComparison.Ordinal) ?
+                    (long)Enum.Parse<ListRequestCapabilities>(part[(nameof(ListRequestCapabilities).Length + 1)..]) :
+                    long.Parse(part, System.Globalization.CultureInfo.InvariantCulture)))
+                .ToString(System.Globalization.CultureInfo.InvariantCulture);
+        }
+
+        [Fact]
+        public void EditorDefaults_Write_Explicit_Capabilities_As_Enum_Members()
+        {
+            var code = GenerateEditorDefaults(typeof(ExplicitCapabilitiesEditorAttribute), "ExplicitCapabilitiesEditorDefaults");
+
+            Assert.Contains("capabilities: ListRequestCapabilities.Skip | ListRequestCapabilities.Take", code);
         }
 
         private static string ToLiteral(object value) => value switch
@@ -296,6 +321,12 @@ namespace ServerTypingsTest.EditorDefaults
     public partial class ClientServiceEditorAttribute
     {
     }
+
+    [ServiceLookupEditor(typeof(LookupItem), EndpointType = typeof(LookupItemEndpoint),
+        Capabilities = ListRequestCapabilities.Skip | ListRequestCapabilities.Take)]
+    public partial class ExplicitCapabilitiesEditorAttribute() : ServiceLookupEditorBaseAttribute("Test.ExplicitCapabilitiesEditor")
+    {
+    }
 }
 
 namespace ServerTypingsTest.EditorDefaults
@@ -325,5 +356,8 @@ namespace ServerTypingsTest.EditorDefaults
 
         [AutoLookupTypeEditor]
         public string AutoLookupType { get; set; }
+
+        [ExplicitCapabilitiesEditor]
+        public string ExplicitCapabilities { get; set; }
     }
 }
