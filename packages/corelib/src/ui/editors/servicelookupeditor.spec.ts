@@ -259,6 +259,23 @@ describe("ServiceLookupEditor", () => {
         editor.destroy();
     });
 
+    it("keeps custom request properties while removing unsupported list request options", async () => {
+        serviceCallSpy.mockResolvedValue({ Entities: [{ ID: 1, Name: "One" }] } as any);
+        const editor = create({ capabilities: base.ListRequestCapabilities.SourceAdapter });
+        const getListRequest = editor.getListRequest.bind(editor);
+        editor.getListRequest = (query: any) => ({ ...getListRequest(query), ConnectionId: 5, Kinds: 3 });
+
+        await editor.asyncSearch({ searchTerm: "on", skip: 0, take: 10, checkMore: true } as any);
+
+        const request = serviceCallSpy.mock.calls[0][0].request;
+        expect(request.ConnectionId).toBe(5);
+        expect(request.Kinds).toBe(3);
+        expect(request.ContainsText).toBe("on");
+        expect(request).not.toHaveProperty("ColumnSelection");
+        expect(request).not.toHaveProperty("IncludeColumns");
+        editor.destroy();
+    });
+
     it("uses itemText and quickSearchFields for local contains searches", async () => {
         serviceCallSpy.mockResolvedValue({
             Entities: [

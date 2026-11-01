@@ -10,6 +10,26 @@ export type LocalListProcessor = {
     }
 };
 
+/** The capability required for each list request option, keyed by the request property name. */
+const capabilityByRequestKey: Record<string, ListRequestCapabilities> = {
+    ContainsText: ListRequestCapabilities.ContainsText,
+    ContainsField: ListRequestCapabilities.ContainsField,
+    EqualityFilter: ListRequestCapabilities.EqualityFilter,
+    Criteria: ListRequestCapabilities.Criteria,
+    Sort: ListRequestCapabilities.Sort,
+    Skip: ListRequestCapabilities.Skip,
+    Take: ListRequestCapabilities.Take,
+    IncludeDeleted: ListRequestCapabilities.IncludeDeleted,
+    ColumnSelection: ListRequestCapabilities.ColumnSelection,
+    IncludeColumns: ListRequestCapabilities.IncludeColumns,
+    ExcludeColumns: ListRequestCapabilities.ExcludeColumns,
+    DistinctFields: ListRequestCapabilities.DistinctFields,
+    ExportColumns: ListRequestCapabilities.ExportColumns,
+    Localize: ListRequestCapabilities.Localize,
+    ExcludeTotalCount: ListRequestCapabilities.ExcludeTotalCount,
+    IncludeMore: ListRequestCapabilities.IncludeMore
+};
+
 export function normalizePrimitiveItems(items: any[]): any[] {
     if (items.length === 0 || items.some(item =>
         item !== null && typeof item === "object"))
@@ -48,9 +68,11 @@ export function createLocalListProcessor(this: void, {
 
     const serverRequest: ListRequest = { ...request };
 
+    // only list request options with a matching capability are removed, so the properties of a custom
+    // request type, which the endpoint handles itself, are passed through
     for (const key of Object.keys(serverRequest)) {
-        const capability = ListRequestCapabilities[key as keyof typeof ListRequestCapabilities];
-        if (typeof capability !== "number" || !supports(capability))
+        const capability = capabilityByRequestKey[key];
+        if (capability !== undefined && !supports(capability))
             delete (serverRequest as any)[key];
     }
 
