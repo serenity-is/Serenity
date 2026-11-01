@@ -114,11 +114,15 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
     }
 
     /**
-     * Disposes the combobox and delegates to the base destroy.
+     * Disposes the combobox, unbinds the cascade link and delegates to the base destroy.
      */
     override destroy() {
         this.combobox?.dispose();
         this.combobox = null;
+        // the link otherwise relies on a disposing listener of this element, which the base destroy
+        // removes along with the other namespaced handlers, leaving a change handler on the parent
+        this.cascadeLink?.set_parentID(null);
+        this.cascadeLink = null;
         super.destroy();
     }
 

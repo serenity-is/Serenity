@@ -3,6 +3,10 @@ import { DialogTypeRegistry } from "../../types/dialogtyperegistry";
 import { SubDialogHelper } from "../helpers/subdialoghelper";
 import { Combobox, ComboboxSearchQuery, ComboboxSearchResult } from "./combobox";
 import { ComboboxEditor } from "./comboboxeditor";
+import { SelectEditor } from "./selecteditor";
+import { StringEditor } from "./stringeditor";
+import { PropertyGrid } from "../widgets/propertygrid";
+import { Fluent } from "../../base";
 
 describe("ComboboxEditor async behavior", () => {
 
@@ -544,5 +548,57 @@ describe("ComboboxEditor helpers", () => {
         (combo as any).abortPendingQuery();
         expect(abortPendingQuery).toHaveBeenCalled();
         combo.destroy();
+    });
+});
+describe("ComboboxEditor cascade link cleanup", () => {
+
+    function createParent(id: string) {
+        const parent = new StringEditor({ id });
+        document.body.appendChild(parent.domNode);
+        return parent;
+    }
+
+    function cascadeCalls(editor: ComboboxEditor<any, any>) {
+        return vi.spyOn(editor as any, "set_cascadeValue");
+    }
+
+    it("stops receiving parent changes after destroy", () => {
+        const parent = createParent("Cleanup1_Parent");
+        const child = new SelectEditor({ id: "Cleanup1_Child", cascadeFrom: "Parent" } as any);
+        document.body.appendChild(child.domNode);
+        const spy = cascadeCalls(child);
+
+        Fluent.trigger(parent.domNode, "change");
+        expect(spy).toHaveBeenCalledTimes(1);
+
+        child.destroy();
+        spy.mockClear();
+        Fluent.trigger(parent.domNode, "change");
+        expect(spy).not.toHaveBeenCalled();
+
+        parent.destroy();
+        document.body.innerHTML = "";
+    });
+
+    it("stops receiving parent changes after its property grid is destroyed", () => {
+        const parent = createParent("Cleanup2_Parent");
+        const grid = new PropertyGrid({
+            element: el => document.body.appendChild(el),
+            idPrefix: "Cleanup2_Sub_",
+            items: [{ name: "Child", editorType: "Select", editorParams: { cascadeFrom: "Parent" } }]
+        });
+        const child = grid.get_editors()[0] as SelectEditor;
+        const spy = cascadeCalls(child);
+
+        Fluent.trigger(parent.domNode, "change");
+        expect(spy).toHaveBeenCalledTimes(1);
+
+        grid.destroy();
+        spy.mockClear();
+        expect(() => Fluent.trigger(parent.domNode, "change")).not.toThrow();
+        expect(spy).not.toHaveBeenCalled();
+
+        parent.destroy();
+        document.body.innerHTML = "";
     });
 });

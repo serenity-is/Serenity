@@ -658,13 +658,18 @@ export class CheckLookupEditor<TItem extends CheckTreeItem<TItem> = any, P exten
     }
 
     /**
-     * Cleans up lookup change handlers and delegates to the base destroy.
+     * Cleans up lookup change handlers, unbinds the cascade link and delegates to the base destroy.
      */
     public override destroy(): void {
         if (this.lookupChangeOff) {
             this.lookupChangeOff();
             this.lookupChangeOff = null;
         }
+
+        // the link otherwise relies on a disposing listener of this element, which the base destroy
+        // removes along with the other namespaced handlers, leaving a change handler on the parent
+        this.cascadeLink?.set_parentID(null);
+        this.cascadeLink = null;
 
         super.destroy();
     }

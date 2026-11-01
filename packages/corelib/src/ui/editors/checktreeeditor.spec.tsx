@@ -3,10 +3,11 @@ import { Lookup, setScriptData } from "../../base";
 import { CheckLookupEditor, CheckTreeEditor, CheckTreeItem } from "./checktreeeditor";
 
 const quickSearch = vi.hoisted(() => ({ search: null as any }));
+const cascadeLink = vi.hoisted(() => ({ parentIDs: [] as string[] }));
 
 vi.mock("./cascadedwidgetlink", () => ({
     CascadedWidgetLink: class {
-        set_parentID() { }
+        set_parentID(value: string) { cascadeLink.parentIDs.push(value); }
         set_parentValue() { }
     }
 }));
@@ -258,5 +259,16 @@ describe("CheckLookupEditor", () => {
         editor.filterValue = "X";
         expect(editor.filterValue).toBe("X");
         editor.destroy();
+    });
+
+    it("unbinds the cascade link on destroy", () => {
+        setScriptData("Lookup.Test.Lookup", makeLookup([{ Id: 1, Name: "One" }]));
+        const editor = new CheckLookupEditor({ element: el => document.body.appendChild(el), lookupKey: "Test.Lookup", cascadeFrom: "Parent" } as any);
+        cascadeLink.parentIDs.length = 0;
+
+        editor.destroy();
+
+        expect(cascadeLink.parentIDs).toEqual([null]);
+        expect(editor["cascadeLink"]).toBeNull();
     });
 });
