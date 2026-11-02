@@ -27,12 +27,14 @@ public class CategoryLangEndpoint : ServiceEndpoint
         return handler.DeleteAsync(uow, request, cancellationToken);
     }
 
+    [HttpPost, AuthorizeRetrieve(typeof(MyRow))]
     public Task<RetrieveResponse<MyRow>> Retrieve(IDbConnection connection, RetrieveRequest request,
         [FromServices] ICategoryLangRetrieveHandler handler, CancellationToken cancellationToken = default)
     {
         return handler.RetrieveAsync(connection, request, cancellationToken);
     }
 
+    [HttpPost, AuthorizeList(typeof(MyRow))]
     public Task<ListResponse<MyRow>> List(IDbConnection connection, ListRequest request,
         [FromServices] ICategoryLangListHandler handler, CancellationToken cancellationToken = default)
     {

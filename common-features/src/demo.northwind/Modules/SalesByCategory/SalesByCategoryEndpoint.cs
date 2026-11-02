@@ -6,6 +6,7 @@ namespace Serenity.Demo.Northwind.Endpoints;
 [ConnectionKey(typeof(MyRow)), ServiceAuthorize(typeof(MyRow))]
 public class SalesByCategoryEndpoint : ServiceEndpoint
 {
+    [HttpPost, AuthorizeList(typeof(MyRow))]
     public Task<ListResponse<MyRow>> List(IDbConnection connection, ListRequest request,
         [FromServices] ISalesByCategoryListHandler handler, CancellationToken cancellationToken = default)
     {

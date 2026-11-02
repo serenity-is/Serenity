@@ -28,6 +28,7 @@ public class UserPreferenceEndpoint : ServiceEndpoint
     /// <param name="connection">The database connection.</param>
     /// <param name="request">The retrieve request.</param>
     /// <returns>The retrieve response.</returns>
+    [HttpPost, AuthorizeRetrieve(typeof(MyRow))]
     public UserPreferenceRetrieveResponse Retrieve(IDbConnection connection, UserPreferenceRetrieveRequest request)
     {
         return new MyRepository(Context).Retrieve(connection, request);

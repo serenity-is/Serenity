@@ -17,6 +17,7 @@ public class TranslationEndpoint(IWebHostEnvironment hostEnvironment,
         return new MyRepository(Context, HostEnvironment, LocalTextRegistry, TypeSource);
     }
 
+    [HttpPost]
     public ListResponse<TranslationItem> List(TranslationListRequest request)
     {
         return NewRepository().List(request);

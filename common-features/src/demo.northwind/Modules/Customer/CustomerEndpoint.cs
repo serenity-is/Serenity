@@ -34,18 +34,21 @@ public class CustomerEndpoint : ServiceEndpoint
         return handler.GetNextNumber(connection, request);
     }
 
+    [HttpPost, AuthorizeRetrieve(typeof(MyRow))]
     public Task<RetrieveResponse<MyRow>> Retrieve(IDbConnection connection, RetrieveRequest request,
         [FromServices] ICustomerRetrieveHandler handler, CancellationToken cancellationToken = default)
     {
         return handler.RetrieveAsync(connection, request, cancellationToken);
     }
 
+    [HttpPost, AuthorizeList(typeof(MyRow))]
     public Task<ListResponse<MyRow>> List(IDbConnection connection, ListRequest request,
         [FromServices] ICustomerListHandler handler, CancellationToken cancellationToken = default)
     {
         return handler.ListAsync(connection, request, cancellationToken);
     }
 
+    [HttpPost, AuthorizeList(typeof(MyRow))]
     public async Task<FileContentResult> ListExcel(IDbConnection connection, ListRequest request,
         [FromServices] ICustomerListHandler handler,
         [FromServices] IExcelExporter exporter, CancellationToken cancellationToken = default)

@@ -13,6 +13,7 @@ public class UserRoleEndpoint : ServiceEndpoint
         return new MyRepository(Context).Update(uow, request);
     }
 
+    [HttpPost, AuthorizeList(typeof(MyRow))]
     public UserRoleListResponse List(IDbConnection connection, UserRoleListRequest request)
     {
         return new MyRepository(Context).List(connection, request);

@@ -28,18 +28,21 @@ public class OrderEndpoint : ServiceEndpoint
         return handler.DeleteAsync(uow, request, cancellationToken);
     }
 
+    [HttpPost, AuthorizeRetrieve(typeof(MyRow))]
     public Task<RetrieveResponse<MyRow>> Retrieve(IDbConnection connection, RetrieveRequest request,
         [FromServices] IOrderRetrieveHandler handler, CancellationToken cancellationToken = default)
     {
         return handler.RetrieveAsync(connection, request, cancellationToken);
     }
 
+    [HttpPost, AuthorizeList(typeof(MyRow))]
     public Task<ListResponse<MyRow>> List(IDbConnection connection, OrderListRequest request,
         [FromServices] IOrderListHandler handler, CancellationToken cancellationToken = default)
     {
         return handler.ListAsync(connection, request, cancellationToken);
     }
 
+    [HttpPost, AuthorizeList(typeof(MyRow))]
     public async Task<FileContentResult> ListExcel(IDbConnection connection, OrderListRequest request,
         [FromServices] IExcelExporter exporter,
         [FromServices] IOrderListHandler handler, CancellationToken cancellationToken = default)

@@ -13,6 +13,7 @@ public class RolePermissionEndpoint : ServiceEndpoint
         return new MyRepository(Context).Update(uow, request);
     }
 
+    [HttpPost, AuthorizeList(typeof(MyRow))]
     public RolePermissionListResponse List(IDbConnection connection, RolePermissionListRequest request)
     {
         return new MyRepository(Context).List(connection, request);

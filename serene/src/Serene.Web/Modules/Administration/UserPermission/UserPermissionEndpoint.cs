@@ -13,6 +13,7 @@ public class UserPermissionEndpoint : ServiceEndpoint
         return new MyRepository(Context).Update(uow, request);
     }
 
+    [HttpPost, AuthorizeList(typeof(MyRow))]
     public ListResponse<MyRow> List(IDbConnection connection, UserPermissionListRequest request)
     {
         return new MyRepository(Context).List(connection, request);
