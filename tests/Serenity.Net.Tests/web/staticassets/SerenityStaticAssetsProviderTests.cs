@@ -112,6 +112,48 @@ public class SerenityStaticAssetsProviderTests : IDisposable
         Assert.Equal(["esm/page.js", "esm/page.js"], seen);
     }
 
+    private sealed class RecordingFileProvider : IFileProvider
+    {
+        public List<string> Requested { get; } = [];
+
+        public IDirectoryContents GetDirectoryContents(string subpath)
+        {
+            Requested.Add(subpath);
+            return NotFoundDirectoryContents.Singleton;
+        }
+
+        public IFileInfo GetFileInfo(string subpath)
+        {
+            Requested.Add(subpath);
+            return new NotFoundFileInfo(subpath);
+        }
+
+        public Microsoft.Extensions.Primitives.IChangeToken Watch(string filter) => null!;
+    }
+
+    [Theory]
+    [InlineData(@"esm\page.js", "esm/page.js")]
+    [InlineData("/esm/page.js", "esm/page.js")]
+    [InlineData(@"\esm\sub\page.js", "esm/sub/page.js")]
+    public void FilteredFileProvider_Passes_The_Path_The_Filter_Accepted_To_The_Inner_Provider(string subpath, string expected)
+    {
+        var inner = new RecordingFileProvider();
+        new FilteredFileProvider(inner, _ => true).GetFileInfo(subpath);
+        Assert.Equal([expected], inner.Requested);
+    }
+
+    [Theory]
+    [InlineData(@"esm\sub", "esm/sub")]
+    [InlineData("/esm/sub/", "esm/sub")]
+    [InlineData("/", "")]
+    [InlineData(null, "")]
+    public void FilteredFileProvider_Passes_The_Normalized_Directory_To_The_Inner_Provider(string? subpath, string expected)
+    {
+        var inner = new RecordingFileProvider();
+        new FilteredFileProvider(inner, _ => true).GetDirectoryContents(subpath!);
+        Assert.Equal([expected], inner.Requested);
+    }
+
     [Fact]
     public void FilteredFileProvider_Returns_Not_Found_For_Excluded_Or_Empty_Paths()
     {

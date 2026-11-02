@@ -19,11 +19,11 @@ public sealed class FilteredFileProvider(IFileProvider inner, Func<string, bool>
     /// <inheritdoc/>
     public IDirectoryContents GetDirectoryContents(string subpath)
     {
-        var contents = inner.GetDirectoryContents(subpath);
+        var directory = (subpath ?? "").Replace('\\', '/').Trim('/');
+        var contents = inner.GetDirectoryContents(directory);
         if (!contents.Exists)
             return contents;
 
-        var directory = (subpath ?? "").Replace('\\', '/').Trim('/');
         return new FilteredDirectoryContents(contents, file =>
             file.IsDirectory || isMatch(directory.Length == 0 ? file.Name : directory + "/" + file.Name));
     }
@@ -35,7 +35,8 @@ public sealed class FilteredFileProvider(IFileProvider inner, Func<string, bool>
         if (path.Length == 0 || !isMatch(path))
             return new NotFoundFileInfo(subpath ?? "");
 
-        return inner.GetFileInfo(subpath!);
+        // the path the filter accepted, as a physical provider doesn't treat a backslash as a separator on all platforms
+        return inner.GetFileInfo(path);
     }
 
     /// <inheritdoc/>
