@@ -194,12 +194,14 @@ export function autosizeColumns(cols: Column[], availWidth: number, absoluteColM
         for (i = 0; i < cols.length && total < availWidth; i++) {
             c = cols[i];
             const currentWidth = widths[i];
+            // like the other checks of maxWidth, an empty one, which may be null as well, means no limit
+            const maxWidth = c.maxWidth || Infinity;
             let growSize;
 
-            if (!c.resizable || c.maxWidth <= currentWidth) {
+            if (!c.resizable || maxWidth <= currentWidth) {
                 growSize = 0;
             } else {
-                growSize = Math.min(Math.floor(growProportion * currentWidth) - currentWidth, (c.maxWidth - currentWidth) || 1000000) || 1;
+                growSize = Math.min(Math.floor(growProportion * currentWidth) - currentWidth, maxWidth - currentWidth) || 1;
             }
             total += growSize;
             widths[i] += (total <= availWidth ? growSize : 0);

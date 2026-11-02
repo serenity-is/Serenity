@@ -260,6 +260,13 @@ describe('autosizeColumns', () => {
         expect(cols[1].width).toBe(280);
     });
 
+    it.each([null, undefined, 0])('grows columns with %s maxWidth as they have no limit', maxWidth => {
+        const cols = [{ id: "a", width: 100, resizable: true, maxWidth }, { id: "b", width: 100, resizable: true, maxWidth }];
+        autosizeColumns(cols, 400, 30);
+        expect(cols[0].width).toBe(200);
+        expect(cols[1].width).toBe(200);
+    });
+
     it('does not shrink non-resizable columns', () => {
         const cols = [{ id: "a", width: 100, resizable: false }, { id: "b", width: 100, resizable: true, minWidth: 80 }];
         autosizeColumns(cols, 100, 30);
