@@ -94,17 +94,47 @@ public static class HtmlLayoutFilesExtensions
     {
         ArgumentNullException.ThrowIfNull(helper);
 
-        var context = helper.ViewContext.HttpContext;
-        var files = context.RequestServices.GetService<ILayoutScriptFileProvider>()?.GetFiles();
-        if (files == null || files.Count == 0)
+        var provider = helper.ViewContext.HttpContext.RequestServices.GetService<ILayoutScriptFileProvider>();
+        if (provider == null)
             return HtmlString.Empty;
 
+        var files = provider.GetFiles();
+        var moduleFiles = provider.GetModuleFiles();
         if (filter != null)
         {
             files = [.. files.Where(filter)];
-            if (files.Count == 0)
-                return HtmlString.Empty;
+            moduleFiles = [.. moduleFiles.Where(filter)];
         }
+
+        var modules = RenderLayoutModules(helper, moduleFiles);
+        return new HtmlString(RenderLayoutScripts(helper, files) + modules);
+    }
+
+    private static string RenderLayoutModules(IHtmlHelper helper, IReadOnlyList<string> files)
+    {
+        var context = helper.ViewContext.HttpContext;
+        var tags = new StringBuilder();
+        foreach (var file in files)
+        {
+            var url = VirtualPathUtility.ToAbsolute(context, file);
+            if (HtmlScriptExtensions.IsAlreadyIncluded(context.Items, url))
+                continue;
+
+            tags.Append(string.Format(CultureInfo.InvariantCulture,
+                "    <script type=\"module\" src=\"{0}\" nonce=\"{1}\"></script>\n",
+                WebUtility.HtmlEncode(context.RequestServices.GetRequiredService<IContentHashCache>()
+                    .ResolveWithHash(context.Request.PathBase, url)), helper.CspNonce()));
+        }
+
+        return tags.ToString();
+    }
+
+    private static string RenderLayoutScripts(IHtmlHelper helper, IReadOnlyList<string> files)
+    {
+        if (files.Count == 0)
+            return "";
+
+        var context = helper.ViewContext.HttpContext;
 
         // when bundling is disabled (e.g. development), render one tag per file; each
         // tag is content hashed, so file changes are picked up without any watcher
@@ -114,7 +144,7 @@ public static class HtmlLayoutFilesExtensions
             foreach (var file in files)
                 tags.Append(helper.Script(file).Value);
 
-            return new HtmlString(tags.ToString());
+            return tags.ToString();
         }
 
         var scriptManager = context.RequestServices.GetRequiredService<IDynamicScriptManager>();
@@ -130,12 +160,12 @@ public static class HtmlLayoutFilesExtensions
         var scriptUrl = VirtualPathUtility.ToAbsolute(context, "~/DynJS.axd/" + include);
 
         if (HtmlScriptExtensions.IsAlreadyIncluded(context.Items, scriptUrl))
-            return HtmlString.Empty;
+            return "";
 
-        return new HtmlString(string.Format(CultureInfo.InvariantCulture,
+        return string.Format(CultureInfo.InvariantCulture,
             "    <script src=\"{0}\" type=\"text/javascript\"></script>\n",
             WebUtility.HtmlEncode(context.RequestServices.GetRequiredService<IContentHashCache>()
-                .ResolveWithHash(context.Request.PathBase, scriptUrl))));
+                .ResolveWithHash(context.Request.PathBase, scriptUrl)));
     }
 
     private static string GetLayoutCssScriptName(IReadOnlyList<string> files)

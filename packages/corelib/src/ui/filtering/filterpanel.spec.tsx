@@ -1,10 +1,99 @@
-import { describe, expect, it, vi } from "vitest";
-import { FilterPanelTexts, Fluent } from "../../base";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { Config, FilterPanelTexts, Fluent } from "../../base";
+import { StringEditor } from "../editors/stringeditor";
 import { getWidgetFrom } from "../widgets/widget";
+import { EditorFiltering } from "./editorfiltering";
 import { FilteringTypeRegistry } from "./filteringtyperegistry";
 import { FilterOperator } from "./filteroperator";
 import { FilterFieldSelect, FilterOperatorSelect, FilterPanel } from "./filterpanel";
+import { FilterStore } from "./filterstore";
 import { StringFiltering } from "./stringfiltering";
+
+[EditorFiltering];
+
+describe("FilterPanel with an editor type that has to be loaded", () => {
+    const orgLoader = Config.lazyTypeLoader;
+    let keyId = 0;
+
+    afterEach(() => {
+        Config.lazyTypeLoader = orgLoader;
+        document.body.innerHTML = "";
+    });
+
+    class LazyEditor extends StringEditor {
+    }
+
+    function setup(items: any[]) {
+        // types stay registered after they are loaded, so each test needs its own key
+        const key = "Test.LazyPanelEditor" + (++keyId);
+        let resolve: () => void;
+        const promise = new Promise(r => resolve = () => r(LazyEditor));
+        Config.lazyTypeLoader = k => k === key ? promise : null;
+
+        const panel = new FilterPanel({});
+        document.body.append(panel.domNode);
+        const store = new FilterStore([{
+            name: "Field1", title: "Field 1", filteringType: "Editor", filteringParams: { editorType: key }
+        }]);
+        panel.set_store(store);
+        store.get_items().push(...items);
+        panel.updateRowsFromStore();
+
+        const row = panel.domNode.querySelector<HTMLElement>("div.filter-line");
+        return {
+            panel, store, row,
+            input: () => row.isConnected ? row.querySelector<HTMLInputElement>("div.v input") : panel.domNode.querySelector<HTMLInputElement>("div.filter-line div.v input"),
+            load: async () => { resolve(); await new Promise(r => setTimeout(r)); }
+        };
+    }
+
+    const savedLine = { field: "Field1", operator: "eq", state: "saved", displayText: "Field 1 = saved" };
+
+    it("restores a saved filter when the editor is created", async () => {
+        const { panel, input, load } = setup([savedLine]);
+        expect(input()).toBeNull();
+
+        await load();
+
+        expect(input().value).toBe("saved");
+        panel.destroy();
+    });
+
+    it("keeps the saved filter when searching before the editor is created", async () => {
+        const { panel, store, input, load } = setup([savedLine]);
+
+        panel.search();
+
+        expect(panel.domNode.querySelector("span.error")).toBeNull();
+        const line = store.get_items()[0];
+        expect(line.state).toBe("saved");
+        expect(line.criteria).toEqual([["Field1"], "=", "saved"]);
+
+        await load();
+
+        expect(input().value).toBe("saved");
+        panel.destroy();
+    });
+
+    it("reports a missing value when searching before the editor is created", () => {
+        const { panel, row } = setup([{ field: "Field1", operator: "eq" }]);
+
+        panel.search();
+
+        expect(row.querySelector("div.v span.error")).toBeTruthy();
+        panel.destroy();
+    });
+
+    it("creates a single editor when the operator changes before it is created", async () => {
+        const { panel, row, load } = setup([savedLine]);
+
+        (panel as any).rowOperatorChange(row);
+        await load();
+
+        expect(row.querySelectorAll("div.v input").length).toBe(1);
+        panel.destroy();
+    });
+});
 
 describe("FilterPanel", () => {
     it("is registered with typeInfo", () => {

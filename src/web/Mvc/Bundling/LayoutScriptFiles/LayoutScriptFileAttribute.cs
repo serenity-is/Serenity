@@ -29,6 +29,20 @@ public class LayoutScriptFileAttribute : Attribute
     /// </summary>
     public string Path { get; }
 
+    private bool? module;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the file is an ES module, which is rendered with its own
+    /// <c>type="module"</c> script tag and never concatenated to a bundle, as its imports are relative to
+    /// its own URL. Defaults to <c>true</c> for files under an <c>esm</c> folder and <c>.mjs</c> files.
+    /// </summary>
+    public bool Module
+    {
+        get => module ?? (Path.Contains("/esm/", StringComparison.OrdinalIgnoreCase) ||
+            Path.EndsWith(".mjs", StringComparison.OrdinalIgnoreCase));
+        set => module = value;
+    }
+
     /// <summary>
     /// Gets or sets the order among the included files. Files with a lower
     /// order are included first. Defaults to <c>0</c>.

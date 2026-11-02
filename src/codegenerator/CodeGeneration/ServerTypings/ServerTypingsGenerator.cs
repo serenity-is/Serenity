@@ -134,8 +134,7 @@ public partial class ServerTypingsGenerator : CodeGeneratorBase
         if (LocalTexts)
             GenerateTexts();
 
-        // Disable lazy type loader until excessive chunking is resolved
-        // GenerateLazyTypeLoader();
+        GenerateLazyTypeLoader();
         GenerateScriptDataKeys();
 
         if (ModuleReExports)

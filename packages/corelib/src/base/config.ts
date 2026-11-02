@@ -57,20 +57,21 @@ const Config = {
     emailAllowOnlyAscii: true,
 
     /**
-     * Optional callback to lazily resolve a type that is not yet in the type registry.
+     * Callback to lazily resolve a type that is not yet in the type registry.
      *
      * @remarks
      * Useful with code-splitting / lazy chunk loading. Called with the requested type key
      * and a `kind` hint (`"dialog"`, `"editor"`, `"enum"`, `"formatter"`, `"filtering"`, …).
      * May return the type synchronously or a `Promise` resolving to it; returning `null`/`undefined`
-     * signals "not found".
+     * signals "not found". By default, it loads the types implementing `LazyLoadInclude` that are listed
+     * in the JSON block rendered by `Html.LazyTypes()`, so wrap the existing value when overriding it.
      * @param typeKey - Full type name being requested, e.g. `"MyApp.MyEditor"`.
      * @param kind - Category of the type, used to narrow search/loading.
      * @returns The resolved type, a promise for it, or `null` if unavailable.
      * @example
      * Config.lazyTypeLoader = async (typeKey) => await import(`./editors/${typeKey}`);
      */
-    lazyTypeLoader: <(typeKey: string, kind: "dialog" | "editor" | "enum" | "formatter" | "filtering" | string) => any | Promise<any>>null,
+    lazyTypeLoader: <(typeKey: string, kind: "dialog" | "editor" | "enum" | "formatter" | "filtering" | string) => any | Promise<any>>defaultLazyTypeLoader,
 
     /**
      * Root namespaces probed when resolving short type names.
@@ -133,6 +134,47 @@ export function resetCspNonce() {
             document.querySelector<HTMLScriptElement>('script[nonce]')?.nonce ??
             document.querySelector<HTMLStyleElement>('style[nonce]')?.nonce;
     }
+}
+
+let lazyTypeModules: Map<string, string>;
+
+/**
+ * Makes the types that can be lazily loaded read again from the DOM when a type is next requested.
+ *
+ * @remarks
+ * These are in the `<script id="LazyTypes">` JSON block rendered by `Html.LazyTypes()`, which maps
+ * the urls of the modules that load the types implementing `LazyLoadInclude` to the keys of the types.
+ */
+export function resetLazyTypes() {
+    lazyTypeModules = null;
+}
+
+function getLazyTypeModules() {
+    if (lazyTypeModules)
+        return lazyTypeModules;
+
+    lazyTypeModules = new Map();
+    if (typeof document !== 'undefined') {
+        const json = document.querySelector('script#LazyTypes')?.textContent?.trim();
+        if (json) {
+            for (const [url, keys] of Object.entries<string[]>(JSON.parse(json))) {
+                for (const key of keys)
+                    lazyTypeModules.set(key, url);
+            }
+        }
+    }
+
+    return lazyTypeModules;
+}
+
+// finds the module synchronously, as the registries only try the other forms of a key when this returns nothing
+function defaultLazyTypeLoader(typeKey: string): Promise<any> {
+    const url = getLazyTypeModules().get(typeKey);
+    if (!url)
+        return null;
+
+    return import(/* @vite-ignore */ url)
+        .then(module => module.loaderByKey[typeKey]?.());
 }
 
 resetApplicationPath();

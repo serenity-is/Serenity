@@ -42,6 +42,8 @@ public partial class ClientTypesGeneratorTests
         }
         export interface TransformInclude<TypeName = ""> {
         }
+        export interface LazyLoadInclude {
+        }
         export interface Formatter {
         }
         export interface EditorTypeInfo<TypeName = any> {

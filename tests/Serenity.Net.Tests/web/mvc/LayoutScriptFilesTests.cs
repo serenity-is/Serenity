@@ -162,6 +162,95 @@ public class LayoutScriptFilesTests
         Assert.Empty(disabledWatcher.Calls);
     }
 
+    [Theory]
+    [InlineData("~/esm/a.js", true)]
+    [InlineData("~/Serenity.Pro.Dashboards/esm/Modules/a.js", true)]
+    [InlineData("~/ESM/a.js", true)]
+    [InlineData("~/a.mjs", true)]
+    [InlineData("~/lib/a.MJS", true)]
+    [InlineData("~/a.js", false)]
+    [InlineData("~/besm/a.js", false)]
+    [InlineData("~/esm.js", false)]
+    [InlineData("~/a.mjs.js", false)]
+    public void Module_Defaults_To_True_For_Files_Under_An_Esm_Folder_And_Mjs_Files(string path, bool expected)
+    {
+        Assert.Equal(expected, new LayoutScriptFileAttribute(path).Module);
+    }
+
+    [Fact]
+    public void Module_Can_Be_Set_Explicitly()
+    {
+        Assert.False(new LayoutScriptFileAttribute("~/esm/a.js") { Module = false }.Module);
+        Assert.False(new LayoutScriptFileAttribute("~/a.mjs") { Module = false }.Module);
+        Assert.True(new LayoutScriptFileAttribute("~/a.js") { Module = true }.Module);
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void LayoutScriptFiles_Renders_Module_Tags_After_Scripts_And_Never_Bundles_Them(bool bundlingEnabled)
+    {
+        var env = new MockHostEnvironment();
+        env.AddWebFile("a.js", "A_MARK");
+        env.AddWebFile("esm/m.js", "M_MARK");
+        var scripts = new MockDynamicScriptManager();
+        var html = MockHtmlHelper.Create(CreateServices([
+            new LayoutScriptFileAttribute("~/esm/m.js") { Order = 1 },
+            new LayoutScriptFileAttribute("~/a.js") { Order = 2 },
+        ], scripts, env, bundlingEnabled: bundlingEnabled));
+
+        var result = html.LayoutScriptFiles().Value;
+
+        var module = result!.IndexOf("<script type=\"module\" src=\"", StringComparison.Ordinal);
+        Assert.True(module >= 0);
+        Assert.Contains("esm/m.js", result[module..]);
+        Assert.Equal(2, result.Split("<script").Length - 1);
+        Assert.True(result.IndexOf("<script", StringComparison.Ordinal) < module);
+        Assert.DoesNotContain(scripts.Registered.Values, x => x.GetScript().Contains("M_MARK"));
+    }
+
+    [Fact]
+    public void LayoutScriptFiles_Renders_Only_Modules_When_There_Are_No_Scripts()
+    {
+        var scripts = new MockDynamicScriptManager();
+        var html = MockHtmlHelper.Create(CreateServices([
+            new LayoutScriptFileAttribute("~/esm/m.js"),
+        ], scripts, new MockHostEnvironment()));
+
+        Assert.Contains("type=\"module\"", html.LayoutScriptFiles().Value);
+        Assert.Empty(scripts.Registered);
+    }
+
+    [Fact]
+    public void LayoutScriptFiles_Renders_A_Module_Only_Once_And_Applies_The_Filter()
+    {
+        var html = MockHtmlHelper.Create(CreateServices([
+            new LayoutScriptFileAttribute("~/esm/m.js"),
+        ], new MockDynamicScriptManager(), new MockHostEnvironment()));
+
+        Assert.Equal("", html.LayoutScriptFiles(_ => false).Value);
+        Assert.Contains("type=\"module\"", html.LayoutScriptFiles().Value);
+        Assert.Equal("", html.LayoutScriptFiles().Value);
+    }
+
+    [Fact]
+    public void Predefined_Bundle_Does_Not_Include_Modules()
+    {
+        var env = new MockHostEnvironment();
+        env.AddWebFile("a.js", "A_MARK");
+        env.AddWebFile("esm/m.js", "M_MARK");
+        var services = CreateServices([
+            new LayoutScriptFileAttribute("~/a.js"),
+            new LayoutScriptFileAttribute("~/esm/m.js"),
+        ], new MockDynamicScriptManager(), env);
+
+        var script = new LayoutScriptBundleScript(services.GetRequiredService<ILayoutScriptFileProvider>(),
+            services.GetRequiredService<IScriptBundleBuilder>()).GetScript();
+
+        Assert.Contains("A_MARK", script);
+        Assert.DoesNotContain("M_MARK", script);
+    }
+
     [Fact]
     public void LayoutScriptFiles_Filter_Excludes_Files()
     {

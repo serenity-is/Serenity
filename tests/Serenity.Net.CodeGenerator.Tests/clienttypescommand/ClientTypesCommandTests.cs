@@ -67,6 +67,23 @@ public partial class ClientTypesCommandTests
     }
 
     [Fact]
+    public void Run_Deletes_Only_A_Stale_LazyLoadTypes_File()
+    {
+        var (command, fileSystem, _) = Create(new GeneratorConfig() { RootNamespace = "MyProject" });
+        var outDir = fileSystem.Combine(projectDir, "Imports/ClientTypes");
+        fileSystem.CreateDirectory(outDir);
+        var lazyLoadTypes = fileSystem.Combine(outDir, "LazyLoadTypes.cs");
+        var editorAttribute = fileSystem.Combine(outDir, "OldEditorAttribute.cs");
+        fileSystem.AddFile(lazyLoadTypes, "// stale");
+        fileSystem.AddFile(editorAttribute, "// stale");
+
+        Assert.Equal(ExitCodes.Success, command.Run());
+
+        Assert.False(fileSystem.FileExists(lazyLoadTypes));
+        Assert.True(fileSystem.FileExists(editorAttribute));
+    }
+
+    [Fact]
     public void Run_With_ParseGlobalUsings_False_Generates_File_Scoped_Namespace()
     {
         var config = new GeneratorConfig()

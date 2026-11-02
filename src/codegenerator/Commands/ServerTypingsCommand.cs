@@ -55,7 +55,7 @@ public class ServerTypingsCommand(IProjectFileInfo project, IGeneratorConsole co
 
         MultipleOutputHelper.WriteFiles(FileSystem, Console, outDir,
             generatedSources.Select(x => (x.Filename, x.Text)),
-            deleteExtraPattern: ["*.ts"],
+            deleteExtraPattern: ["*.ts", "*.mts"],
             endOfLine: config.EndOfLine);
 
         return ExitCodes.Success;

@@ -14,7 +14,7 @@ public partial class ServerTypingsGeneratorTests
     {
         return [.. files.Where(x => x.Filename != "Texts.ts" &&
             x.Filename != "Namespaces.ts" &&
-            x.Filename != "LazyTypeLoader.ts")];
+            x.Filename != "LazyTypeLoader.mts")];
     }
 
     private static ServerTypingsGenerator CreateGenerator(params Type[] types)
@@ -60,4 +60,69 @@ public partial class ServerTypingsGeneratorTests
         Assert.Equal(code.Trim().Length, generator.GetRootNamespacesOnlyOutputLength());
     }
 
+    private static ExternalType LazyEditor(string name, string? marker)
+    {
+        return new ExternalType
+        {
+            Name = name,
+            Module = "/Modules/Editors/" + name,
+            Interfaces = marker is null ? null : [marker],
+            Fields =
+            [
+                new ExternalMember
+                {
+                    Name = "[Symbol.typeInfo]",
+                    IsStatic = true,
+                    Type = "EditorTypeInfo",
+                    Value = "ServerTypingsTest." + name
+                }
+            ]
+        };
+    }
+
+    [Fact]
+    public void Generates_LazyTypeLoader_With_Literal_Imports_Only_For_Marked_Types()
+    {
+        var generator = CreateGenerator();
+        generator.TypeFilter = _ => false;
+        generator.AddTSType(LazyEditor("MarkedEditor", "@serenity-is/corelib:LazyLoadInclude"));
+        generator.AddTSType(LazyEditor("ShortMarkedEditor", "LazyLoadInclude"));
+        generator.AddTSType(LazyEditor("PlainEditor", null));
+        generator.AddTSType(LazyEditor("OtherEditor", "IStringValue"));
+
+        var code = Assert.Single(generator.Run(), x => x.Filename == "LazyTypeLoader.mts").Text;
+
+        Assert.Contains("export const loaderByKey", code);
+        Assert.Contains("\"ServerTypingsTest.MarkedEditor\": async () => (await import(\"", code);
+        Assert.Contains("Editors/MarkedEditor\")).MarkedEditor", code);
+        Assert.Contains("\"ServerTypingsTest.ShortMarkedEditor\"", code);
+        Assert.DoesNotContain("PlainEditor", code);
+        Assert.DoesNotContain("OtherEditor", code);
+        Assert.DoesNotContain("Config", code);
+    }
+
+    [Fact]
+    public void Does_Not_Generate_LazyTypeLoader_Without_A_Marked_Type()
+    {
+        var generator = CreateGenerator();
+        generator.TypeFilter = _ => false;
+        generator.AddTSType(LazyEditor("PlainEditor", null));
+
+        Assert.DoesNotContain(generator.Run(), x => x.Filename == "LazyTypeLoader.mts");
+    }
+
+    [Fact]
+    public void LazyTypeLoader_Is_Not_Added_To_The_Module_ReExports()
+    {
+        var generator = CreateGenerator();
+        generator.TypeFilter = _ => false;
+        generator.ModuleReExports = true;
+        generator.AddTSType(LazyEditor("MarkedEditor", "LazyLoadInclude"));
+
+        var files = generator.Run();
+
+        Assert.Contains(files, x => x.Filename == "LazyTypeLoader.mts");
+        Assert.DoesNotContain(files, x => x.Text.Contains("export * from", StringComparison.Ordinal) &&
+            x.Text.Contains("LazyTypeLoader", StringComparison.Ordinal));
+    }
 }

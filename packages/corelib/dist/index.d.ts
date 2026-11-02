@@ -288,13 +288,14 @@ export declare const Config: {
      */
     emailAllowOnlyAscii: boolean;
     /**
-     * Optional callback to lazily resolve a type that is not yet in the type registry.
+     * Callback to lazily resolve a type that is not yet in the type registry.
      *
      * @remarks
      * Useful with code-splitting / lazy chunk loading. Called with the requested type key
      * and a `kind` hint (`"dialog"`, `"editor"`, `"enum"`, `"formatter"`, `"filtering"`, …).
      * May return the type synchronously or a `Promise` resolving to it; returning `null`/`undefined`
-     * signals "not found".
+     * signals "not found". By default, it loads the types implementing `LazyLoadInclude` that are listed
+     * in the JSON block rendered by `Html.LazyTypes()`, so wrap the existing value when overriding it.
      * @param typeKey - Full type name being requested, e.g. `"MyApp.MyEditor"`.
      * @param kind - Category of the type, used to narrow search/loading.
      * @returns The resolved type, a promise for it, or `null` if unavailable.
@@ -346,6 +347,14 @@ export declare function resetApplicationPath(): void;
  * Sets `null` if none found or when `document` is unavailable. Called once on module load.
  */
 export declare function resetCspNonce(): void;
+/**
+ * Makes the types that can be lazily loaded read again from the DOM when a type is next requested.
+ *
+ * @remarks
+ * These are in the `<script id="LazyTypes">` JSON block rendered by `Html.LazyTypes()`, which maps
+ * the urls of the modules that load the types implementing `LazyLoadInclude` to the keys of the types.
+ */
+export declare function resetLazyTypes(): void;
 /**
  * Fluent builder for Serenity criteria expressions with completion support.
  *
@@ -3884,6 +3893,15 @@ declare const transformIncludeTypeNameSymbol: unique symbol;
  */
 export interface TransformInclude<TypeName = ""> {
     readonly [transformIncludeTypeNameSymbol]?: TypeName;
+}
+/**
+ * Marker interface used to include a registered class in the lazy type loader during code generation
+ * (sergen servertypings / clienttypes), so that it is loaded when it is first requested by its key from a type
+ * registry, without a side-effect import. Useful for types that are only referenced by their keys, like the
+ * editors of dynamically generated property items. Only the classes directly implementing it are included.
+ * This empty interface exists for typing only.
+ */
+export interface LazyLoadInclude {
 }
 declare namespace servicesTexts {
     namespace Controls {
@@ -10356,11 +10374,19 @@ export interface QuickFilterArgs<TWidget> {
 export interface QuickFilter<TWidget extends Widget<P>, P> {
     /** Field name associated with the quick filter. */
     field?: string;
-    /** Widget constructor used to create the filter editor. */
+    /**
+     * Widget constructor used to create the filter editor, or a promise for it when the type has to be loaded.
+     * In that case a placeholder widget that only holds a value is used until the type is loaded, so
+     * {@link handler}, {@link loadState}, {@link saveState} and {@link displayText} may be called with it,
+     * while {@link element} and {@link init} are only called for the actual widget.
+     */
     type?: {
         new (options?: P): TWidget;
         prototype: TWidget;
-    };
+    } | PromiseLike<{
+        new (options?: P): TWidget;
+        prototype: TWidget;
+    }>;
     /** Callback invoked when the list request is prepared; may mutate the request. */
     handler?: (h: QuickFilterArgs<TWidget>) => void;
     /** Title / label shown for the filter. */
@@ -10600,7 +10626,7 @@ export declare class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilte
     /**
      * Adds a quick filter widget to the bar and wires its submit handler.
      * @param opt - Quick filter definition.
-     * @returns The created widget instance.
+     * @returns The created widget instance, or a placeholder if the type of the widget has to be loaded.
      */
     add<TWidget extends Widget<any>, TOptions>(opt: QuickFilter<TWidget, TOptions>): TWidget;
     /**
@@ -15557,10 +15583,42 @@ export declare class EditorFiltering extends BaseEditorFiltering<Widget<any>> {
      * @returns True when an editor is used.
      */
     protected useEditor(): boolean;
+    /** Marks the place of the editor while its type is loading. It is gone if the container is emptied meanwhile. */
+    private loadingPoint;
+    /** The state loaded while the editor type is loading, which is applied once the editor is created. */
+    private pendingState;
     /**
-     * Creates the editor for the current operator.
+     * Whether the type of the editor for the current operator is still loading.
+     * @returns True when it is loading.
+     */
+    private isEditorLoading;
+    /**
+     * Creates the editor for the current operator. If its type has to be loaded, it is created when the
+     * type is loaded, and until then the state methods work with the state that will be applied to it.
      */
     createEditor(): void;
+    private newEditor;
+    private editorTypeLoaded;
+    /**
+     * Loads persisted state into the editor, or keeps it until the editor is created.
+     * @param state - The persisted state.
+     */
+    loadState(state: any): void;
+    /**
+     * Saves the editor state for persistence.
+     * @returns The saved state.
+     */
+    saveState(): any;
+    /**
+     * Returns the current editor value.
+     * @returns The editor value.
+     */
+    getEditorValue(): any;
+    /**
+     * Returns the display text of the current editor value, which is the state while the editor is loading.
+     * @returns The editor text.
+     */
+    getEditorText(): string;
     /**
      * Whether to use the id field for the criteria.
      * @returns True when an editor is used.

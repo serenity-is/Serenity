@@ -1,9 +1,72 @@
-﻿import { afterEach, describe, expect, it } from "vitest";
-import { Config, resetApplicationPath } from "./config";
+﻿import { afterEach, describe, expect, it, vi } from "vitest";
+import { Config, resetApplicationPath, resetLazyTypes } from "./config";
 
 afterEach(() => {
-    document.head.childNodes.forEach(el => el.remove());
+    document.head.querySelectorAll("*").forEach(el => el.remove());
     resetApplicationPath();
+    resetLazyTypes();
+});
+
+describe("Config.lazyTypeLoader", () => {
+    function addLazyTypes(modules: Record<string, string[]>) {
+        const script = document.createElement("script");
+        script.type = "application/json";
+        script.id = "LazyTypes";
+        script.textContent = JSON.stringify(modules);
+        document.head.appendChild(script);
+        resetLazyTypes();
+    }
+
+    it("returns nothing without the block, so that registries report the type as not found", () => {
+        expect(Config.lazyTypeLoader("App.MyEditor", "editor")).toBeNull();
+    });
+
+    it("returns nothing for keys that are not lazy types, without trying to import them", () => {
+        addLazyTypes({ "/other.js": ["App.Other"] });
+
+        expect(Config.lazyTypeLoader("App.MyEditor", "editor")).toBeNull();
+    });
+
+    it("reads the block when a type is first requested, so its place in the page doesn't matter", async () => {
+        class LateEditor {
+        }
+
+        vi.doMock("lazy-types-spec-late", () => ({
+            loaderByKey: { "App.Late": async () => LateEditor }
+        }));
+
+        resetLazyTypes();
+        const script = document.createElement("script");
+        script.type = "application/json";
+        script.id = "LazyTypes";
+        script.textContent = JSON.stringify({ "lazy-types-spec-late": ["App.Late"] });
+        document.head.appendChild(script);
+
+        await expect(Config.lazyTypeLoader("App.Late", "editor")).resolves.toBe(LateEditor);
+        vi.doUnmock("lazy-types-spec-late");
+    });
+
+    it("loads each type through the module listing it", async () => {
+        class MyEditor {
+        }
+
+        class OtherEditor {
+        }
+
+        vi.doMock("lazy-types-spec-a", () => ({
+            loaderByKey: { "App.MyEditor": async () => MyEditor }
+        }));
+        vi.doMock("lazy-types-spec-b", () => ({
+            loaderByKey: { "App.OtherEditor": async () => OtherEditor }
+        }));
+
+        addLazyTypes({ "lazy-types-spec-a": ["App.MyEditor"], "lazy-types-spec-b": ["App.OtherEditor"] });
+
+        await expect(Config.lazyTypeLoader("App.MyEditor", "editor")).resolves.toBe(MyEditor);
+        await expect(Config.lazyTypeLoader("App.OtherEditor", "editor")).resolves.toBe(OtherEditor);
+        vi.doUnmock("lazy-types-spec-a");
+        vi.doUnmock("lazy-types-spec-b");
+    });
 });
 
 describe("Config", () => {

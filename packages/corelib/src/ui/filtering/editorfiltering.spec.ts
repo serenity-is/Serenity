@@ -1,6 +1,147 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
+import { Config } from "../../base";
+import { StringEditor } from "../editors/stringeditor";
 import { Widget } from "../widgets/widget";
 import { EditorFiltering } from "./editorfiltering";
+
+describe("EditorFiltering with an editor type that has to be loaded", () => {
+    const orgLoader = Config.lazyTypeLoader;
+    let keyId = 0;
+
+    afterEach(() => {
+        Config.lazyTypeLoader = orgLoader;
+    });
+
+    class LazyEditor extends StringEditor {
+    }
+
+    function setup(operator = "eq") {
+        // types stay registered after they are loaded, so each test needs its own key
+        const key = "Test.LazyFilteringEditor" + (++keyId);
+        let resolve: () => void;
+        const promise = new Promise(r => resolve = () => r(LazyEditor));
+        Config.lazyTypeLoader = k => k === key ? promise : null;
+
+        const filtering = new EditorFiltering({ editorType: key, useLike: true });
+        const container = document.createElement("div");
+        filtering.set_field({ name: "Test", title: "Test" });
+        filtering.set_container(container);
+        filtering.set_operator({ key: operator });
+
+        return { filtering, container, key, load: async () => { resolve(); await new Promise(r => setTimeout(r)); } };
+    }
+
+    it("creates the editor when the type is loaded, where it was requested", async () => {
+        const { filtering, container, load } = setup();
+        container.append(document.createElement("hr"));
+        filtering.createEditor();
+        container.append(document.createElement("br"));
+
+        expect((filtering as any).editor).toBeNull();
+        expect(container.querySelector("input")).toBeNull();
+
+        await load();
+
+        expect((filtering as any).editor).toBeInstanceOf(LazyEditor);
+        expect([...container.children].map(x => x.tagName)).toEqual(["HR", "INPUT", "BR"]);
+        expect(container.childNodes.length).toBe(3);
+    });
+
+    it("applies the state loaded meanwhile to the editor", async () => {
+        const { filtering, container, load } = setup();
+        filtering.createEditor();
+        filtering.loadState("saved");
+
+        await load();
+
+        expect(container.querySelector("input").value).toBe("saved");
+        expect(filtering.saveState()).toBe("saved");
+    });
+
+    it("works with the state loaded meanwhile, so a search doesn't lose it", () => {
+        const { filtering } = setup();
+        filtering.createEditor();
+        filtering.loadState("saved");
+
+        expect(filtering.saveState()).toBe("saved");
+        expect(filtering.getEditorValue()).toBe("saved");
+        expect(filtering.getEditorText()).toBe("saved");
+        expect(filtering.getCriteria().criteria).toEqual([["Test"], "=", "saved"]);
+    });
+
+    it.each([undefined, null, "", "  "])("reports a missing value while loading with state %j", state => {
+        const { filtering } = setup();
+        filtering.createEditor();
+        filtering.loadState(state);
+
+        expect(() => filtering.getEditorValue()).toThrow();
+        expect(filtering.getEditorText()).toBe(state ?? "");
+    });
+
+    it("doesn't create the editor if the container is emptied meanwhile", async () => {
+        const { filtering, container, load } = setup();
+        filtering.createEditor();
+        filtering.loadState("saved");
+        container.innerHTML = "";
+
+        await load();
+
+        expect(container.childNodes.length).toBe(0);
+        expect((filtering as any).editor).toBeNull();
+    });
+
+    it("creates one editor when called again meanwhile, without the state of the previous one", async () => {
+        const { filtering, container, load } = setup();
+        filtering.createEditor();
+        filtering.loadState("old");
+        filtering.createEditor();
+
+        await load();
+
+        expect(container.querySelectorAll("input").length).toBe(1);
+        expect(container.querySelector("input").value).toBe("");
+    });
+
+    it("doesn't create the editor if the operator no longer uses one", async () => {
+        const { filtering, container, load } = setup();
+        filtering.createEditor();
+        filtering.set_operator({ key: "isnull" });
+        filtering.createEditor();
+
+        await load();
+
+        expect(container.childNodes.length).toBe(0);
+        expect((filtering as any).editor).toBeNull();
+    });
+
+    it("uses the regular behavior for an operator not using the editor", () => {
+        const { filtering, container } = setup("contains");
+        filtering.createEditor();
+
+        const input = container.querySelector("input");
+        expect(input).toBeTruthy();
+        filtering.loadState("text");
+        expect(input.value).toBe("text");
+        expect(filtering.saveState()).toBe("text");
+    });
+
+    it("creates the editor right away once the type is loaded", async () => {
+        const { filtering, container, key, load } = setup();
+        filtering.createEditor();
+        await load();
+
+        const other = new EditorFiltering({ editorType: key });
+        const otherContainer = document.createElement("div");
+        other.set_field({ name: "Test" });
+        other.set_container(otherContainer);
+        other.set_operator({ key: "eq" });
+        other.createEditor();
+
+        expect((other as any).editor).toBeInstanceOf(LazyEditor);
+        expect(otherContainer.querySelector("input")).toBeTruthy();
+        expect(container.querySelector("input")).toBeTruthy();
+    });
+});
 
 describe("EditorFiltering", () => {
     it("is registered with typeInfo", () => {

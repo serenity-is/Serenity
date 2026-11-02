@@ -2,60 +2,29 @@ namespace Serenity.CodeGeneration;
 
 public partial class ServerTypingsGenerator
 {
+    /// <summary>
+    /// Generates the module that loads the types implementing <c>LazyLoadInclude</c>. As an .mts file it is
+    /// an entry point with a stable URL, while the literal dynamic imports make esbuild split each
+    /// type into its own chunk. It is only generated for a project that has such types.
+    /// </summary>
     protected void GenerateLazyTypeLoader()
     {
-        var config = ImportFromCorelib("Config");
-        sb.Append("const loaderByKey =");
-        cw.InBrace(() => 
+        var lazyTypes = GetLazyLoadTypes();
+        if (lazyTypes.Count == 0)
+            return;
+
+        sb.Append("export const loaderByKey: Record<string, () => Promise<any>> =");
+        cw.InBrace(() =>
         {
-            bool first = true;
-
-            foreach (var types in modularDialogTypeByKey
-               .Concat(modularEditorTypeByKey)
-               .Concat(modularFormatterTypeByKey)
-               .Select(x => (x.Key, Type: x.FirstOrDefault()))
-               .Where(x => x.Type != null)
-               .OrderBy(x => x.Key))
+            for (var i = 0; i < lazyTypes.Count; i++)
             {
-                if (string.IsNullOrEmpty(types.Key))
-                    continue;
-
-                var type = types.Type;
-                if (type == null)
-                    continue;
-
-                if (type.Module is null or "")
-                    continue;
-
-                // these are currently loaded via appsettings.bundles.json
-                if (type.Module == "@serenity-is/corelib" ||
-                    type.Module == "@serenity-is/extensions" ||
-                    type.Module == "@serenity-is/pro.extensions" ||
-                    type.Module == "@serenity-is/sleekgrid")
-                    continue;
-
-                // don't generate dynamic imports for types that are not in current project
-                if (!type.Module.StartsWith('/'))
-                    continue;
-
-                var module = RelativeModulePath("LazyTypeLoader.ts", type.Module);
-
-                if (first)
-                    first = false;
-                else
-                    cw.AppendLine(",");
-                cw.Indented($"{Newtonsoft.Json.JsonConvert.SerializeObject(types.Key)}: async () => (await import({Newtonsoft.Json.JsonConvert.SerializeObject(module)})).{type.Name}");
+                var (key, type) = lazyTypes[i];
+                var module = RelativeModulePath("LazyTypeLoader.mts", type.Module);
+                cw.Indented($"{Newtonsoft.Json.JsonConvert.SerializeObject(key)}: async () => (await import({Newtonsoft.Json.JsonConvert.SerializeObject(module)})).{type.Name}");
+                cw.AppendLine(i < lazyTypes.Count - 1 ? "," : "");
             }
-            if (!first)
-                cw.AppendLine();
         });
 
-        cw.AppendLine();
-        cw.AppendLine("""
-            Config.lazyTypeLoader = (function(org: any) {
-                return (key: string, type: any) => loaderByKey[key]?.() || org?.(key, type);
-            })(Config.lazyTypeLoader);
-            """);
-        AddFile("LazyTypeLoader.ts");
+        AddFile("LazyTypeLoader.mts");
     }
 }

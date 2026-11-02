@@ -25,6 +25,8 @@ static [Symbol.typeInfo] = this.registerEditor("MyProject.MyModule.MyEditor");
 Also, side-effect import this editor class from the current page.ts, grid.ts, or dialog.ts file. For example:
 import "./path/to/MyEditor.ts";
 
+If it is only referenced by its key, e.g. by dynamically generated property items, make the class implement LazyLoadInclude instead, so that it is loaded on demand, and ensure that the layout head includes @Html.LazyTypes().
+
 After applying the fixes, build the project by running "npm run build" from the project folder.`;
 
         notifyError(message, '', { preWrap: true, timeOut: 5000 });

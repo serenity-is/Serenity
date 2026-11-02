@@ -24,6 +24,8 @@ static [Symbol.typeInfo] = this.registerClass("MyProject.MyModule.MyDialog");
 Also, side-effect import this dialog class from the current page.ts, grid.ts, or dialog.ts file. For example:
 import "./path/to/MyDialog.ts";
 
+If it is only referenced by its key, make the class implement LazyLoadInclude instead, so that it is loaded on demand, and ensure that the layout head includes @Html.LazyTypes().
+
 If you encounter this error from an editor with the InplaceAdd option, verify that the lookup key and dialog type name match case-sensitively, excluding the "Dialog" suffix. Specify the DialogType property in the LookupEditor attribute if it does not match.
 
 After applying the fixes, build the project by running "npm run build" from the project folder.`;

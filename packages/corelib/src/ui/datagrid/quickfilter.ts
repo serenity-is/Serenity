@@ -30,8 +30,13 @@ export interface QuickFilterArgs<TWidget> {
 export interface QuickFilter<TWidget extends Widget<P>, P> {
     /** Field name associated with the quick filter. */
     field?: string;
-    /** Widget constructor used to create the filter editor. */
-    type?: { new(options?: P): TWidget, prototype: TWidget };
+    /**
+     * Widget constructor used to create the filter editor, or a promise for it when the type has to be loaded.
+     * In that case a placeholder widget that only holds a value is used until the type is loaded, so
+     * {@link handler}, {@link loadState}, {@link saveState} and {@link displayText} may be called with it,
+     * while {@link element} and {@link init} are only called for the actual widget.
+     */
+    type?: { new(options?: P): TWidget, prototype: TWidget } | PromiseLike<{ new(options?: P): TWidget, prototype: TWidget }>;
     /** Callback invoked when the list request is prepared; may mutate the request. */
     handler?: (h: QuickFilterArgs<TWidget>) => void;
     /** Title / label shown for the filter. */

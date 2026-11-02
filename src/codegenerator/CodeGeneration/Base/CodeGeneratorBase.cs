@@ -87,6 +87,42 @@ public abstract class CodeGeneratorBase
         tsTypes[type.FullName] = type;
     }
 
+    /// <summary>
+    /// Gets the classes of the current project that directly implement the <c>LazyLoadInclude</c>
+    /// marker of corelib, with the keys they are registered with, ordered by key.
+    /// </summary>
+    protected List<(string Key, ExternalType Type)> GetLazyLoadTypes()
+    {
+        return [.. TSTypes.Values
+            .Where(type => type.IsAbstract != true &&
+                type.IsInterface != true &&
+                type.IsEnum != true &&
+                type.Module?.StartsWith('/') == true &&
+                type.Interfaces?.Any(x => x == "LazyLoadInclude" ||
+                    x?.EndsWith(":LazyLoadInclude", StringComparison.Ordinal) == true) == true)
+            .Select(type => (Key: GetRegistrationKey(type)!, Type: type))
+            .Where(x => !string.IsNullOrEmpty(x.Key))
+            .GroupBy(x => x.Key)
+            .Select(x => x.First())
+            .OrderBy(x => x.Key, StringComparer.Ordinal)];
+    }
+
+    private static string? GetRegistrationKey(ExternalType type)
+    {
+        var key = type.Fields?.FirstOrDefault(x =>
+                x.IsStatic == true &&
+                x.Value is string &&
+                x.Name == "[Symbol.typeInfo]" &&
+                x.Type?.EndsWith("TypeInfo", StringComparison.Ordinal) == true)?.Value as string ??
+            type.Attributes?.FirstOrDefault(x =>
+                x.Arguments?.Count > 0 &&
+                x.Type is not null &&
+                x.Type.Split('.').Last() is "registerClass" or "registerEditor" or "registerFormatter")?
+                .Arguments![0]?.Value as string;
+
+        return key is { Length: > 0 } && key[^1] == '.' ? key + type.Name : key;
+    }
+
     public void AddBuiltinTSTypes()
     {
         foreach (var type in BuiltinTSTypes.All)

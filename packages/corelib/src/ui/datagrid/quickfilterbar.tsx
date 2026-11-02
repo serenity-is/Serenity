@@ -1,5 +1,5 @@
 ﻿import { addDisposingListener } from "@serenity-is/domwise";
-import { Criteria, FilterPanelTexts, Fluent, FormValidationTexts, ListRequest, formatDate, notifyWarning, nsSerenity, parseDate, toId, tryGetText } from "../../base";
+import { Criteria, FilterPanelTexts, Fluent, FormValidationTexts, ListRequest, formatDate, isPromiseLike, notifyWarning, nsSerenity, parseDate, toId, tryGetText } from "../../base";
 import { DateEditor } from "../editors/dateeditor";
 import { DateTimeEditor, DateTimeEditorOptions } from "../editors/datetimeeditor";
 import { EditorUtils } from "../editors/editorutils";
@@ -7,6 +7,7 @@ import { SelectEditor, SelectEditorOptions } from "../editors/selecteditor";
 import { Widget, WidgetProps } from "../widgets/widget";
 import { getWidgetFrom, tryGetWidget } from "../widgets/widgetutils";
 import { QuickFilter } from "./quickfilter";
+import { QuickFilterPlaceholder } from "./quickfilterplaceholder";
 
 /**
  * Options for the {@link QuickFilterBar} widget.
@@ -81,7 +82,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
     /**
      * Adds a quick filter widget to the bar and wires its submit handler.
      * @param opt - Quick filter definition.
-     * @returns The created widget instance.
+     * @returns The created widget instance, or a placeholder if the type of the widget has to be loaded.
      */
     public add<TWidget extends Widget<any>, TOptions>(opt: QuickFilter<TWidget, TOptions>): TWidget {
 
@@ -126,14 +127,14 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
             Fluent.addClass(qfElement, opt.cssClass);
         }
 
-        const widget = Widget.create({
-            type: opt.type,
+        const createWidget = (type: { new(options?: TOptions): TWidget, prototype: TWidget }, place: (el: HTMLElement) => void) => Widget.create({
+            type,
             options: {
                 element: el => {
                     if (opt.field)
                         el.setAttribute('id', this.options.idPrefix + opt.field);
                     el.setAttribute('placeholder', ' ');
-                    qfElement.append(el);
+                    place(el);
                     if (opt.element != null) {
                         opt.element(Fluent(el));
                     }
@@ -141,7 +142,23 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
                 ...opt.options
             }
         });
-        opt.init?.(widget);
+
+        let widget: TWidget;
+
+        const removeHandlerOnDisposing = (w: Widget<any>) => addDisposingListener(w.domNode, () => {
+            // a placeholder is disposed when it is replaced, but the handler continues with the actual widget
+            if (w === (widget as Widget<any>))
+                this.submitHandlers = this.submitHandlers?.filter(h => h !== submitHandler);
+        });
+
+        const activate = (w: TWidget) => {
+            opt.init?.(w);
+            w.changeSelect2(e1 => {
+                // use timeout give cascaded dropdowns a chance to update / clear themselves
+                window.setTimeout(() => this.onChange && this.onChange(e1), 0);
+            });
+            removeHandlerOnDisposing(w);
+        };
 
         const submitHandler = (request: ListRequest) => {
 
@@ -174,13 +191,38 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
             }
         };
 
-        widget.changeSelect2(e1 => {
-            // use timeout give cascaded dropdowns a chance to update / clear themselves
-            window.setTimeout(() => this.onChange && this.onChange(e1), 0);
-        });
-
         this.submitHandlers.push(submitHandler);
-        addDisposingListener(widget.domNode, () => this.submitHandlers = this.submitHandlers?.filter(h => h !== submitHandler));
+
+        if (isPromiseLike(opt.type)) {
+            const placeholder = new QuickFilterPlaceholder({
+                element: el => {
+                    if (opt.field)
+                        el.setAttribute('id', this.options.idPrefix + opt.field);
+                    qfElement.append(el);
+                }
+            });
+            widget = placeholder as Widget<any> as TWidget;
+            removeHandlerOnDisposing(placeholder);
+
+            opt.type.then(type => {
+                // the bar or the quick filter is destroyed meanwhile
+                if (!this.domNode || placeholder.domNode?.parentNode !== qfElement)
+                    return;
+
+                const loaded = createWidget(type, el => placeholder.domNode.replaceWith(el));
+                widget = loaded;
+                const value = placeholder.value;
+                placeholder.destroy();
+                // before listening to the changes, as this is not a change of the value of the quick filter
+                if (value != null)
+                    EditorUtils.setValue(loaded, value);
+                activate(loaded);
+            });
+        }
+        else {
+            widget = createWidget(opt.type, el => qfElement.append(el));
+            activate(widget);
+        }
 
         return widget;
     }

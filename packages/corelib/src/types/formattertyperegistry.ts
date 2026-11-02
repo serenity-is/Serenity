@@ -26,6 +26,8 @@ Alternatively, use a legacy decorator such as:
 Make sure to side-effect import this formatter class from the current page.ts, grid.ts, or dialog.ts file. For example:
 import "./path/to/MyFormatter.ts";
 
+If it is only referenced by its key, make the class implement LazyLoadInclude instead, so that it is loaded on demand, and ensure that the layout head includes @Html.LazyTypes().
+
 After applying the fixes, build the project by running "npm run build" from the project folder.`;
 
         notifyError(message, '', { preWrap: true, timeOut: 5000 });

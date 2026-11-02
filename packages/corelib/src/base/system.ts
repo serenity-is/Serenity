@@ -706,3 +706,13 @@ declare const transformIncludeTypeNameSymbol: unique symbol;
 export interface TransformInclude<TypeName = ""> {
     readonly [transformIncludeTypeNameSymbol]?: TypeName;
 }
+
+/**
+ * Marker interface used to include a registered class in the lazy type loader during code generation
+ * (sergen servertypings / clienttypes), so that it is loaded when it is first requested by its key from a type
+ * registry, without a side-effect import. Useful for types that are only referenced by their keys, like the
+ * editors of dynamically generated property items. Only the classes directly implementing it are included.
+ * This empty interface exists for typing only.
+ */
+export interface LazyLoadInclude {
+}

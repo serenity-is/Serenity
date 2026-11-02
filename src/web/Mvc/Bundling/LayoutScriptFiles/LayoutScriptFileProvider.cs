@@ -12,9 +12,17 @@ public interface ILayoutScriptFileProvider
     /// <summary>
     /// Gets the list of app relative (<c>~/</c>) JS file urls to include in the
     /// layout, in the order they should be included, with duplicates removed.
+    /// These don't include the ES modules, see <see cref="GetModuleFiles"/>.
     /// </summary>
     /// <returns>The list of JS file urls.</returns>
     IReadOnlyList<string> GetFiles();
+
+    /// <summary>
+    /// Gets the list of app relative (<c>~/</c>) urls of the ES modules to include in the
+    /// layout, in the order they should be included, with duplicates removed.
+    /// </summary>
+    /// <returns>The list of ES module urls.</returns>
+    IReadOnlyList<string> GetModuleFiles() => [];
 }
 
 /// <summary>
@@ -40,13 +48,21 @@ public class LayoutScriptFileProvider(ITypeSource typeSource,
     private readonly LayoutScriptFileOptions options = (options ?? throw new ArgumentNullException(nameof(options))).Value;
 
     /// <inheritdoc/>
-    public IReadOnlyList<string> GetFiles()
+    public IReadOnlyList<string> GetFiles() => GetFiles(module: false);
+
+    /// <inheritdoc/>
+    public IReadOnlyList<string> GetModuleFiles() => GetFiles(module: true);
+
+    private List<string> GetFiles(bool module)
     {
         var featureToggles = serviceProvider.GetService<IFeatureToggles>();
         var result = new List<(decimal Order, string Path)>();
 
         foreach (var attr in typeSource.GetAssemblyAttributes<LayoutScriptFileAttribute>())
         {
+            if (attr.Module != module)
+                continue;
+
             if (attr.RequireFeatures?.Length > 0 &&
                 featureToggles != null &&
                 !featureToggles.IsEnabled(attr.RequireFeatures, attr.RequireAnyFeature))

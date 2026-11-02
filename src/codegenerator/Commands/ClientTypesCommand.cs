@@ -42,6 +42,10 @@ public class ClientTypesCommand(IProjectFileInfo project, IGeneratorConsole cons
         if (config.IncludeGlobalUsings != null)
             generator.GlobalUsings.AddRange(config.IncludeGlobalUsings);
 
+        var esmAssetBasePath = Project.GetEsmAssetBasePath();
+        if (!string.IsNullOrEmpty(esmAssetBasePath))
+            generator.EsmAssetBasePath = esmAssetBasePath;
+
         generator.NullableProp = Project.GetNullable();
         generator.RootNamespaces.Add(config.RootNamespace);
 
@@ -55,7 +59,9 @@ public class ClientTypesCommand(IProjectFileInfo project, IGeneratorConsole cons
         var generatedSources = generator.Run();
         MultipleOutputHelper.WriteFiles(FileSystem, Console, outDir,
             generatedSources.Select(x => (x.Filename, x.Text)), 
-            deleteExtraPattern: null,
+            // editor attributes are kept, as code may use them while they can't be generated due to
+            // an error, but nothing references this one, which would point to a removed module
+            deleteExtraPattern: ["LazyLoadTypes.cs"],
             endOfLine: config.EndOfLine);
 
         return ExitCodes.Success;
