@@ -17,6 +17,17 @@ describe("Config.lazyTypeLoader", () => {
         resetLazyTypes();
     }
 
+    it("tells whether a type is in the block for an availability check, without importing its module", () => {
+        addLazyTypes({ "/does-not-exist.js": ["App.MyFormatter"] });
+
+        expect(Config.lazyTypeLoader("App.MyFormatter", "formatter", true)).toBe(true);
+        expect(Config.lazyTypeLoader("App.Other", "formatter", true)).toBe(false);
+    });
+
+    it("says nothing is available for an availability check without the block", () => {
+        expect(Config.lazyTypeLoader("App.MyFormatter", "formatter", true)).toBe(false);
+    });
+
     it("returns nothing without the block, so that registries report the type as not found", () => {
         expect(Config.lazyTypeLoader("App.MyEditor", "editor")).toBeNull();
     });

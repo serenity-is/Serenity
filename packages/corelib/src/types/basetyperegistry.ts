@@ -191,6 +191,34 @@ export abstract class BaseTypeRegistry<TType> {
     }
 
     /**
+     * Gets the forms of a key a lazy type can be registered with, in the order they are tried.
+     * @param key The key to look up
+     */
+    private getLazyKeys(key: string): string[] {
+        const keys = this.defaultSuffix ? [key, key + this.defaultSuffix] : [key];
+        for (const ns of Config.rootNamespaces) {
+            keys.push(ns + "." + key);
+            if (this.defaultSuffix)
+                keys.push(ns + "." + key + this.defaultSuffix);
+        }
+        return keys;
+    }
+
+    /**
+     * Checks whether a type seems to be available, either as it is already registered or as `Config.lazyTypeLoader`
+     * says it can load it, without loading it. A lazy type may still turn out to be of another kind once it is loaded.
+     * @param key The key to look up
+     * @returns True if the type seems to be available
+     */
+    isAvailable(key: string): boolean {
+        if (this.tryGet(key))
+            return true;
+
+        return !!key && !!Config.lazyTypeLoader &&
+            this.getLazyKeys(key).some(lazyKey => !!Config.lazyTypeLoader(lazyKey, this.loadKind as any, true));
+    }
+
+    /**
      * Attempts to get a type by key, with lazy loading support.
      * @param key The key to look up
      * @returns The found type, a promise that resolves to it, or null if not found
@@ -201,20 +229,10 @@ export abstract class BaseTypeRegistry<TType> {
             return type;
 
         if (key && Config.lazyTypeLoader) {
-            let promise = Config.lazyTypeLoader(key, this.loadKind as any);
-
-            if (!promise && this.defaultSuffix) {
-                promise = Config.lazyTypeLoader(key + this.defaultSuffix, this.loadKind as any);
-            }
-
-            if (!promise) {
-                for (const ns of Config.rootNamespaces) {
-                    const k = ns + "." + key;
-                    if (promise = Config.lazyTypeLoader(k, this.loadKind as any))
-                        break;
-                    if (this.defaultSuffix && (promise = Config.lazyTypeLoader(k + this.defaultSuffix, this.loadKind as any)))
-                        break;
-                }
+            let promise: any;
+            for (const lazyKey of this.getLazyKeys(key)) {
+                if (promise = Config.lazyTypeLoader(lazyKey, this.loadKind as any))
+                    break;
             }
 
             if (isPromiseLike(promise)) {

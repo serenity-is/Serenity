@@ -298,11 +298,15 @@ export declare const Config: {
      * in the JSON block rendered by `Html.LazyTypes()`, so wrap the existing value when overriding it.
      * @param typeKey - Full type name being requested, e.g. `"MyApp.MyEditor"`.
      * @param kind - Category of the type, used to narrow search/loading.
-     * @returns The resolved type, a promise for it, or `null` if unavailable.
+     * @param availabilityCheck - When true, only checks whether the type can be loaded, without loading it, and
+     * should synchronously return a boolean. As the result is only checked for being truthy, a loader that doesn't
+     * support this is considered to have a type whenever it returns something for it, which also loads it.
+     * @returns The resolved type, a promise for it, or `null` if unavailable. With `availabilityCheck`, whether
+     * the type can be loaded.
      * @example
      * Config.lazyTypeLoader = async (typeKey) => await import(`./editors/${typeKey}`);
      */
-    lazyTypeLoader: (typeKey: string, kind: "dialog" | "editor" | "enum" | "formatter" | "filtering" | string) => any | Promise<any>;
+    lazyTypeLoader: (typeKey: string, kind: "dialog" | "editor" | "enum" | "formatter" | "filtering" | string, availabilityCheck?: boolean) => any | Promise<any>;
     /**
      * Root namespaces probed when resolving short type names.
      *
@@ -8002,6 +8006,18 @@ declare abstract class BaseTypeRegistry<TType> {
      * @returns The found type, or null if not found
      */
     tryGet(key: string): TType;
+    /**
+     * Gets the forms of a key a lazy type can be registered with, in the order they are tried.
+     * @param key The key to look up
+     */
+    private getLazyKeys;
+    /**
+     * Checks whether a type seems to be available, either as it is already registered or as `Config.lazyTypeLoader`
+     * says it can load it, without loading it. A lazy type may still turn out to be of another kind once it is loaded.
+     * @param key The key to look up
+     * @returns True if the type seems to be available
+     */
+    isAvailable(key: string): boolean;
     /**
      * Attempts to get a type by key, with lazy loading support.
      * @param key The key to look up

@@ -107,6 +107,54 @@ describe("FormatterTypeRegistry", () => {
         expect(type2).toBe(TestFormatter1);
     });
 
+    describe("isAvailable", () => {
+        it("is true for a registered type, without asking the loader", function () {
+            const loader = vi.fn();
+            (Config as any).lazyTypeLoader = loader;
+            (isAssignableFrom as any).mockImplementation((iface: any, type: any) => type === TestFormatter1);
+            registerClass(TestFormatter1, 'Test.Available1');
+            FormatterTypeRegistry.reset();
+
+            expect(FormatterTypeRegistry.isAvailable("Test.Available1")).toBe(true);
+            expect(loader).not.toHaveBeenCalled();
+        });
+
+        it("asks the loader for each form of the key, only as an availability check with its kind", function () {
+            Config.rootNamespaces.push("Root");
+            const loader = vi.fn((key: string) => key === "Root.My.ThingFormatter");
+            (Config as any).lazyTypeLoader = loader;
+
+            expect(FormatterTypeRegistry.isAvailable("My.Thing")).toBe(true);
+            expect(loader.mock.calls).toEqual([
+                ["My.Thing", "formatter", true],
+                ["My.ThingFormatter", "formatter", true],
+                ["Root.My.Thing", "formatter", true],
+                ["Root.My.ThingFormatter", "formatter", true]
+            ]);
+        });
+
+        it("considers a type available for a loader that doesn't know the check and returns something", function () {
+            (Config as any).lazyTypeLoader = (key: string) => key === "My.Thing" ? Promise.resolve(TestFormatter1) : null;
+
+            expect(FormatterTypeRegistry.isAvailable("My.Thing")).toBe(true);
+            expect(FormatterTypeRegistry.isAvailable("My.Other")).toBe(false);
+        });
+
+        it("is false for anything else, without a notification", function () {
+            (Config as any).lazyTypeLoader = () => false;
+
+            expect(FormatterTypeRegistry.isAvailable("My.Thing")).toBe(false);
+            expect(FormatterTypeRegistry.isAvailable("")).toBe(false);
+            expect(notifyError).not.toHaveBeenCalled();
+        });
+
+        it("is false without a loader", function () {
+            (Config as any).lazyTypeLoader = null;
+
+            expect(FormatterTypeRegistry.isAvailable("My.Thing")).toBe(false);
+        });
+    });
+
     it('tryGetOrLoad returns formatter synchronously when found', function () {
         registerClass(TestFormatter1, 'Test.Formatter1');
 

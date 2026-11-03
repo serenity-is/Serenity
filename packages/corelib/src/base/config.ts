@@ -67,11 +67,15 @@ const Config = {
      * in the JSON block rendered by `Html.LazyTypes()`, so wrap the existing value when overriding it.
      * @param typeKey - Full type name being requested, e.g. `"MyApp.MyEditor"`.
      * @param kind - Category of the type, used to narrow search/loading.
-     * @returns The resolved type, a promise for it, or `null` if unavailable.
+     * @param availabilityCheck - When true, only checks whether the type can be loaded, without loading it, and
+     * should synchronously return a boolean. As the result is only checked for being truthy, a loader that doesn't
+     * support this is considered to have a type whenever it returns something for it, which also loads it.
+     * @returns The resolved type, a promise for it, or `null` if unavailable. With `availabilityCheck`, whether
+     * the type can be loaded.
      * @example
      * Config.lazyTypeLoader = async (typeKey) => await import(`./editors/${typeKey}`);
      */
-    lazyTypeLoader: <(typeKey: string, kind: "dialog" | "editor" | "enum" | "formatter" | "filtering" | string) => any | Promise<any>>defaultLazyTypeLoader,
+    lazyTypeLoader: <(typeKey: string, kind: "dialog" | "editor" | "enum" | "formatter" | "filtering" | string, availabilityCheck?: boolean) => any | Promise<any>>defaultLazyTypeLoader,
 
     /**
      * Root namespaces probed when resolving short type names.
@@ -168,8 +172,11 @@ function getLazyTypeModules() {
 }
 
 // finds the module synchronously, as the registries only try the other forms of a key when this returns nothing
-function defaultLazyTypeLoader(typeKey: string): Promise<any> {
+function defaultLazyTypeLoader(typeKey: string, _kind?: string, availabilityCheck?: boolean): any {
     const url = getLazyTypeModules().get(typeKey);
+    if (availabilityCheck)
+        return !!url;
+
     if (!url)
         return null;
 
