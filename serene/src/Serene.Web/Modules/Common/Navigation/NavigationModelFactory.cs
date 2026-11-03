@@ -47,7 +47,7 @@ public class NavigationModelFactory(
             Items = cache.GetLocalStoreOnly("LeftNavigationModel:NavigationItems:" +
                 (userAccessor.User?.GetIdentifier() ?? "-1"),
                 TimeSpan.Zero,
-                UserPermissionRow.Fields.GenerationKey,
+                [UserPermissionRow.Fields.GenerationKey, NavigationCaching.ItemsGroupKey],
                 () => NavigationHelper.GetNavigationItems(permissions, typeSource, serviceProvider,
                     url => ToAbsolute(url)!))!
         };

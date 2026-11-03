@@ -75,7 +75,7 @@ public static class TwoLevelCacheExtensions
         where TItem : class
     {
         return GetInternal(cache, cacheKey, localExpiration, remoteExpiration,
-            groupKey, loader, localOnly: false, forceReload: false);
+            [groupKey], loader, localOnly: false, forceReload: false);
     }
 
     /// <summary>
@@ -103,7 +103,7 @@ public static class TwoLevelCacheExtensions
         where TItem : class
     {
         return GetInternal(cache, cacheKey, expiration, expiration,
-            groupKey, loader, localOnly: false, forceReload: false);
+            [groupKey], loader, localOnly: false, forceReload: false);
     }
 
     /// <summary>
@@ -133,14 +133,105 @@ public static class TwoLevelCacheExtensions
         where TItem : class
     {
         return GetInternal(cache, cacheKey, localExpiration, TimeSpan.FromSeconds(0),
-            groupKey, loader, localOnly: true, forceReload: false);
+            [groupKey], loader, localOnly: true, forceReload: false);
+    }
+
+    /// <summary>
+    /// Tries to read a value from local cache. If it is not found there, tries the distributed cache.
+    /// If neither contains the specified key, or any of the groups it depends on is expired, produces value
+    /// by calling a loader function and adds the value to local and distributed cache for a given expiration time.
+    /// An item can also expire about 5 seconds later on other servers, as the generations are cached locally for
+    /// that long.
+    /// </summary>
+    /// <typeparam name="TItem">Data type</typeparam>
+    /// <param name="cache">Two level cache</param>
+    /// <param name="cacheKey">The item key for local and distributed cache</param>
+    /// <param name="localExpiration">Local expiration</param>
+    /// <param name="remoteExpiration">Distributed cache expiration (is usually same with local expiration)</param>
+    /// <param name="groupKeys">Group keys that hold the generations. Expiring any of them expires the item.</param>
+    /// <param name="loader">The delegate that will be called to generate value, if not found in local cache,
+    /// or distributed cache, or all found items are expired.</param>
+    /// <exception cref="ArgumentException"><paramref name="groupKeys"/> is empty.</exception>
+    public static TItem? Get<TItem>(this ITwoLevelCache cache, string cacheKey, TimeSpan localExpiration, TimeSpan remoteExpiration,
+        IReadOnlyList<string> groupKeys, Func<TItem?> loader)
+        where TItem : class
+    {
+        return GetInternal(cache, cacheKey, localExpiration, remoteExpiration,
+            groupKeys, loader, localOnly: false, forceReload: false);
+    }
+
+    /// <summary>
+    /// Tries to read a value from local cache, and if it is not found there, or any of the groups it depends on
+    /// is expired, produces the value by calling a loader function and adds it to local cache. The distributed
+    /// cache is only used for the generations of the groups. An item can also expire about 5 seconds later on
+    /// other servers, as the generations are cached locally for that long.
+    /// </summary>
+    /// <typeparam name="TItem">Data type</typeparam>
+    /// <param name="cache">Two level cache</param>
+    /// <param name="cacheKey">The item key for local cache</param>
+    /// <param name="localExpiration">Local expiration</param>
+    /// <param name="groupKeys">Group keys that hold the generations. Expiring any of them expires the item.</param>
+    /// <param name="loader">The delegate that will be called to generate value, if not found in local cache
+    /// or the found item is expired.</param>
+    /// <exception cref="ArgumentException"><paramref name="groupKeys"/> is empty.</exception>
+    public static TItem? GetLocalStoreOnly<TItem>(this ITwoLevelCache cache, string cacheKey, TimeSpan localExpiration,
+        IReadOnlyList<string> groupKeys, Func<TItem?>? loader)
+        where TItem : class
+    {
+        return GetInternal(cache, cacheKey, localExpiration, TimeSpan.FromSeconds(0),
+            groupKeys, loader, localOnly: true, forceReload: false);
+    }
+
+    /// <summary>
+    /// Reads the generation of a group from distributed cache, creating one when there is none,
+    /// and adds it to local cache for about 5 seconds.
+    /// </summary>
+    private static ulong ReadGroupGeneration(ITwoLevelCache cache, string groupKey)
+    {
+        var bytes = cache.Distributed.Get(groupKey);
+        ulong? generation = (bytes == null || bytes.Length != 8) ? null : BitConverter.ToUInt64(bytes);
+        if (generation == null || generation == 0)
+        {
+            generation = RandomGeneration();
+            cache.Distributed.Set(groupKey, BitConverter.GetBytes(generation.Value));
+        }
+
+        // add to local cache, use 5 seconds from there
+        cache.Memory.Add(groupKey, generation, TwoLevelCache.GenerationCacheExpiration);
+
+        return generation.Value;
+    }
+
+    /// <summary>
+    /// Gets the generation an item of the groups is stored with. For a single group, it is the generation of the
+    /// group. For several groups, it is a hash of their generations, which is always different when the generation
+    /// of only one of them changes, as both steps of the hash are reversible for a given value of the other groups.
+    /// </summary>
+    private static ulong CombineGenerations(IReadOnlyList<string> groupKeys, Func<string, ulong> getGeneration)
+    {
+        if (groupKeys.Count == 1)
+            return getGeneration(groupKeys[0]);
+
+        unchecked
+        {
+            var hash = 14695981039346656037UL;
+            foreach (var groupKey in groupKeys)
+                hash = (hash ^ getGeneration(groupKey)) * 1099511628211UL;
+            return hash;
+        }
     }
 
     private static TItem? GetInternal<TItem>(ITwoLevelCache cache, string cacheKey,
         TimeSpan localExpiration, TimeSpan remoteExpiration,
-        string groupKey, Func<TItem?>? loader, bool localOnly, bool forceReload)
+        IReadOnlyList<string> groupKeys, Func<TItem?>? loader, bool localOnly, bool forceReload)
         where TItem : class
     {
+        if (groupKeys == null)
+            throw new ArgumentNullException(nameof(groupKeys));
+
+        if (groupKeys.Count == 0)
+            throw new ArgumentException("At least one group key is required.", nameof(groupKeys));
+
         ulong? groupGeneration = null;
         ulong? groupGenerationCache = null;
 
@@ -155,17 +246,8 @@ public static class TwoLevelCacheExtensions
             if (groupGeneration != null)
                 return groupGeneration.Value;
 
-            var bytes = distributedCache.Get(groupKey);
-            groupGeneration = (bytes == null || bytes.Length != 8) ? null : BitConverter.ToUInt64(bytes);
-            if (groupGeneration == null || groupGeneration == 0)
-            {
-                groupGeneration = RandomGeneration();
-                distributedCache.Set(groupKey, BitConverter.GetBytes(groupGeneration.Value));
-            }
-
+            groupGeneration = CombineGenerations(groupKeys, groupKey => ReadGroupGeneration(cache, groupKey));
             groupGenerationCache = groupGeneration.Value;
-            // add to local cache, use 5 seconds from there
-            localCache.Add(groupKey, groupGenerationCache, TwoLevelCache.GenerationCacheExpiration);
 
             return groupGeneration.Value;
         }
@@ -176,15 +258,12 @@ public static class TwoLevelCacheExtensions
             if (groupGenerationCache != null)
                 return groupGenerationCache.Value;
 
-            // check cached local value of group key 
-            // it expires in 5 seconds and read from server again
-            groupGenerationCache = localCache.Get<object>(groupKey) as ulong?;
+            // check cached local values of group keys
+            // they expire in 5 seconds and read from server again
+            groupGenerationCache = CombineGenerations(groupKeys, groupKey =>
+                localCache.Get<object>(groupKey) as ulong? ?? ReadGroupGeneration(cache, groupKey));
 
-            // if its in local cache, return it
-            if (groupGenerationCache != null)
-                return groupGenerationCache.Value;
-
-            return getGroupGenerationValue();
+            return groupGenerationCache.Value;
         }
 
         if (!forceReload)
@@ -239,12 +318,15 @@ public static class TwoLevelCacheExtensions
         if (loader == null)
             return null;
 
+        // read before calling the loader, so an item loaded while a group expires doesn't count as current
+        var generation = getGroupGenerationValue();
+
         // couldn't find valid item in local or distributed cache, produce value by calling loader
         var item = loader();
 
         // add item and its version to cache
         localCache.Add(cacheKey, (object?)item ?? DBNull.Value, localExpiration);
-        localCache.Add(itemGenerationKey, getGroupGenerationValue(), localExpiration);
+        localCache.Add(itemGenerationKey, generation, localExpiration);
 
         if (!localOnly)
         {
@@ -252,7 +334,7 @@ public static class TwoLevelCacheExtensions
             if (remoteExpiration == TimeSpan.Zero)
             {
                 distributedCache.SetAutoJson(cacheKey, item);
-                distributedCache.Set(itemGenerationKey, BitConverter.GetBytes(getGroupGenerationValue()));
+                distributedCache.Set(itemGenerationKey, BitConverter.GetBytes(generation));
             }
             else if (remoteExpiration < TimeSpan.Zero)
             {
@@ -262,7 +344,7 @@ public static class TwoLevelCacheExtensions
             else
             {
                 distributedCache.SetAutoJson(cacheKey, item, remoteExpiration);
-                distributedCache.Set(itemGenerationKey, BitConverter.GetBytes(getGroupGenerationValue()), new DistributedCacheEntryOptions
+                distributedCache.Set(itemGenerationKey, BitConverter.GetBytes(generation), new DistributedCacheEntryOptions
                 {
                     AbsoluteExpirationRelativeToNow = remoteExpiration
                 });
@@ -313,7 +395,7 @@ public static class TwoLevelCacheExtensions
         where TItem : class
     {
         return GetInternal(cache, cacheKey, localExpiration, remoteExpiration,
-            groupKey, () => value, localOnly: false, forceReload: true);
+            [groupKey], () => value, localOnly: false, forceReload: true);
     }
 
     /// <summary>
@@ -331,7 +413,7 @@ public static class TwoLevelCacheExtensions
         where TItem : class
     {
         return GetInternal(cache, cacheKey, expiration, expiration,
-            groupKey, () => value, localOnly: false, forceReload: true);
+            [groupKey], () => value, localOnly: false, forceReload: true);
     }
 
     /// <summary>
@@ -350,6 +432,6 @@ public static class TwoLevelCacheExtensions
         where TItem : class
     {
         return GetInternal(cache, cacheKey, localExpiration, TimeSpan.FromSeconds(0),
-            groupKey, () => value, localOnly: true, forceReload: true);
+            [groupKey], () => value, localOnly: true, forceReload: true);
     }
 }
