@@ -50,7 +50,9 @@ export interface TSBuildOptions extends Partial<import("esbuild").BuildOptions> 
     /** Should source maps be generated. Default is true. */
     sourcemap?: boolean;
     target?: string;
-    /** True to watch, default is calculated from process args and true if it contains --watch */
+    /** True to watch, default is calculated from process args and true if it contains --watch.
+     * If the SERENITY_EXIT_ON_STDIN_CLOSE environment variable is "1", which NodeScriptRunner sets except on Windows,
+     * the process exits when its standard input closes, so it does not outlive the application. */
     watch?: boolean;
     /** Write output files only if contents have changed. Default is true. */
     writeIfChanged?: boolean;

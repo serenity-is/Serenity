@@ -4,7 +4,7 @@ import { createReadStream, createWriteStream, existsSync, mkdirSync, readFileSyn
 import { globSync } from "tinyglobby";
 import pipe from "node:stream/promises";
 import { constants, createBrotliCompress, createGzip } from "node:zlib";
-import { dirname, isAbsolute, join, resolve, sep } from "path";
+import { dirname, isAbsolute, join, relative, resolve, sep } from "path";
 
 export const defaultEntryPointGlobs = [
     "Modules/**/*Page.ts",
@@ -205,6 +205,21 @@ export const tsbuildGlobalBundleDefaults = {
     watch: false
 };
 
+let exitOnStdinCloseEnabled = false;
+
+// NodeScriptRunner sets the variable, and holds the other end of the stdin pipe, so that watchers
+// don't outlive the application even if it is terminated abruptly. It is opt-in, as otherwise
+// watching with an empty or closed stdin, e.g. a background job, would exit immediately.
+function exitOnStdinClose() {
+    if (exitOnStdinCloseEnabled || process.env.SERENITY_EXIT_ON_STDIN_CLOSE !== "1")
+        return;
+    exitOnStdinCloseEnabled = true;
+    const exit = () => process.exit(0);
+    process.stdin.on("end", exit);
+    process.stdin.on("error", exit);
+    process.stdin.resume();
+}
+
 export const build = async (opt) => {
     if (opt.buildGlobalBundles) {
         const buildGlobalBundles = {
@@ -241,6 +256,7 @@ export const build = async (opt) => {
     delete opt?.npmCopy;
     const esopt = esbuildOptions(opt);
     if (esopt.watch) {
+        exitOnStdinClose();
         setInterval(() => {
             process.stdout.write("");
         }, 5e3);
@@ -396,25 +412,30 @@ export const cleanPluginDefaults = {
     ],
     logDeletedFiles: true
 };
-function cleanPlugin(opt) {
+export function cleanPlugin(opt) {
     opt = Object.assign({}, cleanPluginDefaults, opt ?? {});
     return {
         name: "clean",
         setup(build2) {
             build2.onEnd((result) => {
                 try {
-                    const outdir = build2.initialOptions.outdir;
+                    // this runs on every rebuild while watching, when the current directory
+                    // might not be the one the build started from, so don't depend on it
+                    const workDir = build2.initialOptions.absWorkingDir ?? process.cwd();
+                    const outdir = resolve(workDir, build2.initialOptions.outdir);
                     const { outputs } = result.metafile ?? {};
                     if (!outputs || !existsSync(outdir))
                         return;
-                    const outputFiles = new Set(Object.keys(outputs).map((x) => x.replace(/\\/g, "/")));
+                    const normalize = (x) => x.replace(/\\/g, "/");
+                    // metafile output paths are relative to the working directory
+                    const outputFiles = new Set(Object.keys(outputs).map((x) => normalize(resolve(workDir, x))));
                     const existingFiles = safeGlobSync(opt.globs || [], {
-                        cwd: outdir
-                    }).map((x) => join(outdir, x).replace(/\\/g, "/"));
+                        root: outdir
+                    }).map((x) => normalize(join(outdir, x)));
                     existingFiles.forEach((file) => {
                         if (!outputFiles.has(file)) {
                             if (opt.logDeletedFiles ?? true)
-                                console.log(`esbuild clean: \x1B[33mdeleting extra file ${file}\x1B[0m`);
+                                console.log(`esbuild clean: \x1B[33mdeleting extra file ${normalize(relative(workDir, file))}\x1B[0m`);
                             rmSync(file);
                             if (existsSync(file + ".gz")) {
                                 rmSync(file + ".gz");

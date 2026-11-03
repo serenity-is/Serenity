@@ -198,13 +198,30 @@ buildList.push(
     sleekGlobal
 )
 
+const watch = process.argv.includes('--watch');
+
+// NodeScriptRunner sets the variable and holds the other end of the stdin pipe, so that the
+// watcher doesn't outlive the application even if it is terminated abruptly
+if (watch && process.env.SERENITY_EXIT_ON_STDIN_CLOSE === "1") {
+    process.stdin.on("end", () => process.exit(0));
+    process.stdin.on("error", () => process.exit(0));
+    process.stdin.resume();
+}
+
+async function run(options) {
+    if (watch)
+        await (await esbuild.context(options)).watch();
+    else
+        await esbuild.build(options);
+}
+
 for (var esmOpt of buildList) {
-    await esbuild.build({
+    await run({
         ...esmOpt,
     }).catch(() => process.exit());
 
     if (!esmOpt.minify) {
-        await esbuild.build({
+        await run({
             ...esmOpt,
             minify: true,
             outfile: esmOpt.outfile.replace(/\.js/, '.min.js')
@@ -213,7 +230,8 @@ for (var esmOpt of buildList) {
 }
 
 const root = resolve(join(fileURLToPath(new URL('.', import.meta.url)), '../'));
-if (existsSync(join(root, "docs/_config.yml"))) {
+// when watching, the first builds are still in progress at this point
+if (!watch && existsSync(join(root, "docs/_config.yml"))) {
     const target = join(root, 'docs/assets/local');
     !existsSync(target) && mkdirSync(target);
     existsSync(join(root, 'css')) && cpSync(join(root, 'css'), join(target, 'css'), { force: true, recursive: true });

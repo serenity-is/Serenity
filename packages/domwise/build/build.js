@@ -65,8 +65,25 @@ buildList.push(
     esmJsxRuntime
 )
 
+const watch = process.argv.includes('--watch');
+
+// NodeScriptRunner sets the variable and holds the other end of the stdin pipe, so that the
+// watcher doesn't outlive the application even if it is terminated abruptly
+if (watch && process.env.SERENITY_EXIT_ON_STDIN_CLOSE === "1") {
+    process.stdin.on("end", () => process.exit(0));
+    process.stdin.on("error", () => process.exit(0));
+    process.stdin.resume();
+}
+
+async function run(options) {
+    if (watch)
+        await (await esbuild.context(options)).watch();
+    else
+        await esbuild.build(options);
+}
+
 for (const buildItem of buildList) {
-    await esbuild.build({
+    await run({
         ...buildItem,
     }).catch(() => process.exit());
 }

@@ -97,6 +97,35 @@ public class NodeScriptRunnerTests
     }
 
     [Fact]
+    public void Constructor_Enables_Exit_On_Stdin_Close_Except_On_Windows()
+    {
+        ProcessStartInfo? captured = null;
+        _ = new NodeScriptRunner("myscript", null, "workdir", processFactory: startInfo =>
+        {
+            captured = startInfo;
+            return new FakeStartedProcess();
+        });
+
+        captured!.Environment.TryGetValue("SERENITY_EXIT_ON_STDIN_CLOSE", out var value);
+        Assert.Equal(OperatingSystem.IsWindows() ? null : "1", value);
+    }
+
+    [Fact]
+    public void Constructor_Allows_Overriding_Exit_On_Stdin_Close()
+    {
+        ProcessStartInfo? captured = null;
+        _ = new NodeScriptRunner("myscript", null, "workdir",
+            new Dictionary<string, string> { ["SERENITY_EXIT_ON_STDIN_CLOSE"] = "0" },
+            processFactory: startInfo =>
+            {
+                captured = startInfo;
+                return new FakeStartedProcess();
+            });
+
+        Assert.Equal("0", captured!.Environment["SERENITY_EXIT_ON_STDIN_CLOSE"]);
+    }
+
+    [Fact]
     public void Constructor_Wraps_Process_Factory_Exceptions()
     {
         var exception = Assert.Throws<InvalidOperationException>(() =>

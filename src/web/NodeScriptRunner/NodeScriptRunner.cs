@@ -21,6 +21,16 @@ public sealed class NodeScriptRunner : IDisposable
     private static readonly Regex AnsiColorRegex = new("\x001b\\[[0-9;]*m", RegexOptions.None, TimeSpan.FromSeconds(1));
 
     /// <summary>
+    /// Set for started scripts, so watchers exit when the standard input pipe held by this
+    /// process closes, which also happens when this process is terminated abruptly.
+    /// It is opt-in as an empty or closed standard input is normal outside of this runner.
+    /// It is not set on Windows, where <see cref="ChildProcessJob"/> covers this instead, as
+    /// watchers inherit the same synchronous pipe there, and a pending read in one of them
+    /// blocks the others when they access the handle, so they stall while starting esbuild.
+    /// </summary>
+    internal const string ExitOnStdinCloseEnvVar = "SERENITY_EXIT_ON_STDIN_CLOSE";
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="NodeScriptRunner"/> class.
     /// </summary>
     /// <param name="scriptName">The name of the script to run.</param>
@@ -76,6 +86,9 @@ public sealed class NodeScriptRunner : IDisposable
             WorkingDirectory = workingDirectory
         };
 
+        if (!OperatingSystem.IsWindows())
+            processStartInfo.Environment[ExitOnStdinCloseEnvVar] = "1";
+
         if (envVars != null)
         {
             foreach (var keyValuePair in envVars)
@@ -86,9 +99,7 @@ public sealed class NodeScriptRunner : IDisposable
 
         try
         {
-            npmProcess = processFactory?.Invoke(processStartInfo) ??
-                new StartedProcess(Process.Start(processStartInfo) ??
-                    throw new InvalidOperationException("Could not start NPM process!"));
+            npmProcess = processFactory?.Invoke(processStartInfo) ?? StartProcess(processStartInfo);
             npmProcess.EnableRaisingEvents = true;
         }
         catch (Exception ex)
@@ -122,6 +133,17 @@ public sealed class NodeScriptRunner : IDisposable
             Justification = "The values being passed into Write have the commonly used properties being preserved with DynamicDependency.")]
         static void WriteDiagnosticEvent<TValue>(DiagnosticSource diagnosticSource, string name, TValue value)
             => diagnosticSource.Write(name, value);
+    }
+
+    private static StartedProcess StartProcess(ProcessStartInfo startInfo)
+    {
+        var process = Process.Start(startInfo) ??
+            throw new InvalidOperationException("Could not start NPM process!");
+
+        // best effort: the process is still stopped on a graceful shutdown if this fails
+        ChildProcessJob.Shared?.TryAssign(process);
+
+        return new StartedProcess(process);
     }
 
     /// <summary>

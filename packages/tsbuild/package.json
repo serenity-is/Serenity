@@ -31,6 +31,9 @@
   ],
   "license": "MIT",
   "repository": "https://github.com/serenity-is/serenity/packages/tsbuild",
+  "scripts": {
+    "test": "vitest run"
+  },
   "type": "module",
   "types": "dist/index.d.ts"
 }
