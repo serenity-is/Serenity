@@ -3297,6 +3297,11 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
             return false;
         }
 
+        // a press in the open editor is for placing the caret or selecting text, which a drag plugin would prevent
+        if (this._currentEditor && this._activeCellNode?.contains(e.target as Node)) {
+            return false;
+        }
+
         const sge = this._trigger(this.onDragInit as any, dd, e);
         if (sge.isImmediatePropagationStopped()) {
             e.preventDefault();

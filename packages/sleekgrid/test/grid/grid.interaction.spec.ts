@@ -322,6 +322,38 @@ describe("SleekGrid interaction behavior", () => {
         key("A");
     });
 
+    it("leaves a press in the open editor to the editor, so a drag plugin doesn't prevent selecting its text", () => {
+        const { grid } = makeGrid([{ first: "a", second: "b" }], { editable: true, enableCellNavigation: true }, [
+            { ...baseColumns[0], editor: editorClass },
+            { ...baseColumns[1] }
+        ]);
+        grids.push(grid);
+        const dragInit = vi.fn((e: any) => e.stopImmediatePropagation());
+        grid.onDragInit.subscribe(dragInit);
+        const press = (target: Element) => {
+            const event = new MouseEvent("mousedown", { bubbles: true, cancelable: true });
+            target.dispatchEvent(event);
+            return event;
+        };
+
+        grid.setActiveCell(0, 0);
+        grid.editActiveCell();
+
+        const inEditor = press((grid.getCellEditor() as unknown as TestEditor).input);
+        expect(inEditor.defaultPrevented).toBe(false);
+        expect(dragInit).not.toHaveBeenCalled();
+
+        // anywhere else, the plugin still gets it
+        const elsewhere = press(grid.getCellNode(0, 1));
+        expect(elsewhere.defaultPrevented).toBe(true);
+        expect(dragInit).toHaveBeenCalledOnce();
+
+        // and in the same cell when it is no longer being edited
+        grid.cancelCurrentEdit();
+        press(grid.getCellNode(0, 0));
+        expect(dragInit).toHaveBeenCalledTimes(2);
+    });
+
     it("keeps Escape to itself when it cancels an edit, so a dialog containing the grid stays open", () => {
         const { container, grid } = makeGrid([{ first: "a", second: "b" }], { editable: true, enableCellNavigation: true }, [
             { ...baseColumns[0], editor: editorClass },
