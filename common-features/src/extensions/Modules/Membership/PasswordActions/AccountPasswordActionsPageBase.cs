@@ -77,7 +77,7 @@ public abstract class AccountPasswordActionsPageBase<TUserRow> : MembershipPageB
 #if (IsPublicDemo)
         return this.UseConnection(GetConnectionKey(), connection =>
         {
-            var user = connection.TryFirst<TUserRow>(new TUserRow().Fields.IdField! == Convert.ToInt32(userDefinition.Id));
+            var user = connection.TryFirst<TUserRow>(new TUserRow().GetIdField() == Convert.ToInt32(userDefinition.Id));
             if (user is null)
                 throw new ValidationError("Couldn't find user.");
 
