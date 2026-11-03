@@ -3376,6 +3376,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
                         return; // no editing mode to cancel, allow bubbling and default processing (exit without cancelling the event)
                     }
                     this.cancelEditAndSetFocus();
+                    handled = true; // only the edit is cancelled, not e.g. a dialog containing the grid
                 } else if (e.key === "PageDown") {
                     this.navigatePageDown();
                     handled = true;

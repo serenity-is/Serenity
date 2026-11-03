@@ -322,6 +322,30 @@ describe("SleekGrid interaction behavior", () => {
         key("A");
     });
 
+    it("keeps Escape to itself when it cancels an edit, so a dialog containing the grid stays open", () => {
+        const { container, grid } = makeGrid([{ first: "a", second: "b" }], { editable: true, enableCellNavigation: true }, [
+            { ...baseColumns[0], editor: editorClass },
+            { ...baseColumns[1] }
+        ]);
+        grids.push(grid);
+        const outside = vi.fn();
+        container.addEventListener("keydown", outside);
+        const escape = () => new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true });
+
+        grid.setActiveCell(0, 0);
+        grid.editActiveCell();
+        const editing = escape();
+        (grid.getCellEditor() as unknown as TestEditor).input.dispatchEvent(editing);
+
+        expect(grid.getCellEditor()).toBeFalsy();
+        expect(editing.defaultPrevented).toBe(true);
+        expect(outside).not.toHaveBeenCalled();
+
+        // with nothing to cancel, it is not the grid's to handle
+        grid.getCanvasNode().dispatchEvent(escape());
+        expect(outside).toHaveBeenCalledOnce();
+    });
+
     it("covers commitCurrentEdit validation error", () => {
         const { grid } = makeGrid([{ first: "a", second: "b" }], { editable: true }, [
             { ...baseColumns[0], editor: editorClass },
