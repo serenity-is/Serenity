@@ -43,6 +43,8 @@
       <SerenityStaticAssetsEnabled Condition="'$(SerenityStaticAssetsEnabled)' == '' And '$(StaticWebAssetsEnabled)' != 'true'">true</SerenityStaticAssetsEnabled>
       <_SerenityStaticAssetBasePath>$(StaticWebAssetBasePath.Trim('/'))</_SerenityStaticAssetBasePath>
       <_SerenityStaticAssetBasePath Condition="'$(_SerenityStaticAssetBasePath)' == ''">$(AssemblyName)</_SerenityStaticAssetBasePath>
+      <!-- MSBuild only normalizes separators in item specs / paths it knows of, a \ in a plain string is part of a file name on Linux -->
+      <_SerenityStaticAssetFolder>$([MSBuild]::NormalizeDirectory('$(MSBuildProjectDirectory)', 'wwwroot'))</_SerenityStaticAssetFolder>
       <_SerenityStaticAssetDefaultIncludes Condition="'$(SerenityStaticAssetIncludes)' == ''">true</_SerenityStaticAssetDefaultIncludes>
       <SerenityStaticAssetIncludes Condition="'$(SerenityStaticAssetIncludes)' == ''">wwwroot\**</SerenityStaticAssetIncludes>
       <!--
@@ -82,7 +84,7 @@
         Condition="'$(_SerenityStaticAssetDefaultIncludes)' == 'true'" />
       <_SerenityStaticAssetFile Include="@(_SerenityStaticAssetFileCandidate->'%(FullPath)')" BasePath="$(_SerenityStaticAssetBasePath)"
         Condition="'@(_SerenityStaticAssetFileCandidate)' != ''" CompressionExcludePatterns="$(CompressionExcludePatterns)"
-        AssetPath="$([MSBuild]::MakeRelative('$(MSBuildProjectDirectory)\wwwroot\', '%(_SerenityStaticAssetFileCandidate.FullPath)'))" />
+        AssetPath="$([MSBuild]::MakeRelative('$(_SerenityStaticAssetFolder)', '%(_SerenityStaticAssetFileCandidate.FullPath)'))" />
       <_SerenityStaticAssetFileCandidate Remove="@(_SerenityStaticAssetFileCandidate)" />
     </ItemGroup>
   </Target>
@@ -95,7 +97,7 @@
   <Target Name="_PackSerenityStaticAssets" DependsOnTargets="GetSerenityStaticAssetFiles"
           Condition="'$(OutputType)' != 'Exe'">
     <PropertyGroup>
-      <_SerenityStaticAssetsPackProps>$(IntermediateOutputPath)serenitystaticassets\$(PackageId).props</_SerenityStaticAssetsPackProps>
+      <_SerenityStaticAssetsPackProps>$(IntermediateOutputPath)serenitystaticassets/$(PackageId).props</_SerenityStaticAssetsPackProps>
       <!-- escaped, as WriteLinesToFile would otherwise split the patterns into separate lines at ; -->
       <_SerenityStaticAssetsPackExcludes>$([MSBuild]::Escape('$(CompressionExcludePatterns)').Trim('%3B'))</_SerenityStaticAssetsPackExcludes>
     </PropertyGroup>
@@ -104,8 +106,8 @@
       Lines="&lt;Project&gt;;  &lt;ItemGroup&gt;;    &lt;SerenityStaticAssetRoot Include=&quot;%24(MSBuildThisFileDirectory)..\staticwebassets\&quot; BasePath=&quot;$(_SerenityStaticAssetBasePath)&quot; CompressionExcludePatterns=&quot;$(_SerenityStaticAssetsPackExcludes)&quot; /&gt;;  &lt;/ItemGroup&gt;;&lt;/Project&gt;" />
     <ItemGroup Condition="'@(_SerenityStaticAssetFile)' != ''">
       <TfmSpecificPackageFile Include="@(_SerenityStaticAssetFile)"
-        PackagePath="$([System.IO.Path]::Combine('staticwebassets', $([System.IO.Path]::GetDirectoryName('%(_SerenityStaticAssetFile.AssetPath)'))))\" />
-      <TfmSpecificPackageFile Include="$(_SerenityStaticAssetsPackProps)" PackagePath="buildTransitive\" />
+        PackagePath="$([System.IO.Path]::Combine('staticwebassets', $([System.IO.Path]::GetDirectoryName('%(_SerenityStaticAssetFile.AssetPath)'))))/" />
+      <TfmSpecificPackageFile Include="$(_SerenityStaticAssetsPackProps)" PackagePath="buildTransitive/" />
       <FileWrites Include="$(_SerenityStaticAssetsPackProps)" />
     </ItemGroup>
   </Target>
@@ -175,8 +177,8 @@
         CompressionExcludePatterns="%(SerenityStaticAssetRoot.CompressionExcludePatterns)" />
       <_SerenityStaticAssetPublishFile Include="@(_SerenityPackageStaticAssetFile)" Condition="'@(_SerenityPackageStaticAssetFile)' != ''"
         AssetPath="$([MSBuild]::MakeRelative('%(_SerenityPackageStaticAssetFile.AssetRoot)', '%(_SerenityPackageStaticAssetFile.FullPath)'))" />
-      <ResolvedFileToPublish Include="@(_SerenityStaticAssetPublishFile)"
-        RelativePath="wwwroot\%(_SerenityStaticAssetPublishFile.BasePath)\%(_SerenityStaticAssetPublishFile.AssetPath)"
+      <ResolvedFileToPublish Include="@(_SerenityStaticAssetPublishFile)" Condition="'@(_SerenityStaticAssetPublishFile)' != ''"
+        RelativePath="$([System.IO.Path]::Combine('wwwroot', '%(_SerenityStaticAssetPublishFile.BasePath)', '%(_SerenityStaticAssetPublishFile.AssetPath)'))"
         CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
     </ItemGroup>
   </Target>
@@ -189,7 +191,7 @@
     publish (e.g. produced by the SDK when static web assets are enabled) are kept as is.
   -->
   <PropertyGroup>
-    <SerenityBuildTasksPointer Condition="'$(SerenityBuildTasksPointer)' == ''">$(MSBuildThisFileDirectory)..\..\artifacts\buildtasks\current.txt</SerenityBuildTasksPointer>
+    <SerenityBuildTasksPointer Condition="'$(SerenityBuildTasksPointer)' == ''">$(MSBuildThisFileDirectory)../../artifacts/buildtasks/current.txt</SerenityBuildTasksPointer>
     <SerenityBuildTasksAssembly Condition="'$(SerenityBuildTasksAssembly)' == '' And Exists('$(SerenityBuildTasksPointer)')">$([System.IO.File]::ReadAllText('$(SerenityBuildTasksPointer)').Trim())</SerenityBuildTasksAssembly>
     <_CompressStaticAssetsFromBuildTasks Condition="'$(_SerenityBuildTasksPackaged)' == 'true' Or ('$(SerenityBuildTasksAssembly)' != '' And Exists('$(SerenityBuildTasksAssembly)') And $([System.IO.File]::GetLastWriteTime('$(SerenityBuildTasksPointer)').Ticks) &gt; $([System.IO.File]::GetLastWriteTime('$(MSBuildThisFileDirectory)CompressStaticAssetsTask.cs').Ticks))">true</_CompressStaticAssetsFromBuildTasks>
   </PropertyGroup>
@@ -237,7 +239,7 @@
       <_SerenityCompressCandidate Include="@(ResolvedFileToPublish)"
         Condition="$([System.String]::Copy('%(ResolvedFileToPublish.RelativePath)').Replace('/', '\').ToLowerInvariant().StartsWith('wwwroot\'))" />
     </ItemGroup>
-    <CompressStaticAssetsTask Files="@(_SerenityCompressCandidate)" IntermediateDirectory="$(IntermediateOutputPath)serenitycompressed\"
+    <CompressStaticAssetsTask Files="@(_SerenityCompressCandidate)" IntermediateDirectory="$(IntermediateOutputPath)serenitycompressed/"
       PatternRoot="wwwroot" IncludePatterns="$(CompressionIncludePatterns)" ExcludePatterns="$(CompressionExcludePatterns)" Formats="$(PublishCompressionFormats)"
       Condition="'@(_SerenityCompressCandidate)' != '' And '$(_SerenityPublishCompressionFormatsCheck)' != ''">
       <Output TaskParameter="CompressedFiles" ItemName="_SerenityCompressedFile" />
