@@ -9,6 +9,8 @@ public static partial class ESM
     public const string CategoryPage = "~/Serenity.Demo.Northwind/esm/Modules/Category/CategoryPage.js";
     /// <summary>The module path for the <c>CustomerPage</c> entry point.</summary>
     public const string CustomerPage = "~/Serenity.Demo.Northwind/esm/Modules/Customer/CustomerPage.js";
+    /// <summary>The module path for the <c>LazyTypeLoader</c> entry point.</summary>
+    public const string LazyTypeLoader = "~/Serenity.Demo.Northwind/esm/Modules/ServerTypes/LazyTypeLoader.js";
     /// <summary>The module path for the <c>OrderPage</c> entry point.</summary>
     public const string OrderPage = "~/Serenity.Demo.Northwind/esm/Modules/Order/OrderPage.js";
     /// <summary>The module path for the <c>ProductPage</c> entry point.</summary>
@@ -58,6 +60,13 @@ public static partial class ESM
         {
             /// <summary>The module path for the <c>RegionPage</c> entry point.</summary>
             public const string RegionPage = "~/Serenity.Demo.Northwind/esm/Modules/Region/RegionPage.js";
+        }
+
+        /// <summary>Provides module entry points in the <c>Modules/ServerTypes</c> folder.</summary>
+        public static partial class ServerTypes
+        {
+            /// <summary>The module path for the <c>LazyTypeLoader</c> entry point.</summary>
+            public const string LazyTypeLoader = "~/Serenity.Demo.Northwind/esm/Modules/ServerTypes/LazyTypeLoader.js";
         }
 
         /// <summary>Provides module entry points in the <c>Modules/Shipper</c> folder.</summary>

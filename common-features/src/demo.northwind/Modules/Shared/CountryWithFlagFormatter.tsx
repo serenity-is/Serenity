@@ -1,9 +1,9 @@
-import { Formatter, formatterTypeInfo, registerType } from "@serenity-is/corelib";
+import { Formatter, formatterTypeInfo, LazyLoadInclude, registerType } from "@serenity-is/corelib";
 import { FormatterContext, FormatterResult } from "@serenity-is/sleekgrid";
 import { nsDemoNorthwind } from "../ServerTypes/Namespaces";
 import "./unicode-emoji.css";
 
-export class CountryWithFlagFormatter implements Formatter {
+export class CountryWithFlagFormatter implements Formatter, LazyLoadInclude {
     static [Symbol.typeInfo] = formatterTypeInfo(nsDemoNorthwind); static { registerType(this); }
 
     format(ctx: FormatterContext): FormatterResult {

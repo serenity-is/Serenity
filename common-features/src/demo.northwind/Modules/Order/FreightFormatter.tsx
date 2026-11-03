@@ -1,8 +1,8 @@
-import { Formatter, faIcon, formatterTypeInfo, registerType } from "@serenity-is/corelib";
+import { Formatter, LazyLoadInclude, faIcon, formatterTypeInfo, registerType } from "@serenity-is/corelib";
 import { FormatterContext, FormatterResult } from "@serenity-is/sleekgrid";
 import { nsDemoNorthwind } from "../ServerTypes/Namespaces";
 
-export class FreightFormatter implements Formatter {
+export class FreightFormatter implements Formatter, LazyLoadInclude {
     static [Symbol.typeInfo] = formatterTypeInfo(nsDemoNorthwind); static { registerType(this); }
 
     format(ctx: FormatterContext): FormatterResult {

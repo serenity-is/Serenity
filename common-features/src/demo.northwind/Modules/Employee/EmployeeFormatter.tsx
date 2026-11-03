@@ -1,9 +1,9 @@
-import { Formatter, IInitializeColumn, faIcon, formatterTypeInfo, registerType } from "@serenity-is/corelib";
+import { Formatter, IInitializeColumn, LazyLoadInclude, faIcon, formatterTypeInfo, registerType } from "@serenity-is/corelib";
 import { Column, FormatterContext, FormatterResult } from "@serenity-is/sleekgrid";
 import { Gender } from "../ServerTypes/Demo";
 import { nsDemoNorthwind } from "../ServerTypes/Namespaces";
 
-export class EmployeeFormatter implements Formatter {
+export class EmployeeFormatter implements Formatter, LazyLoadInclude {
     static [Symbol.typeInfo] = formatterTypeInfo(nsDemoNorthwind, [IInitializeColumn]); static { registerType(this); }
 
     constructor(public readonly props: { genderProperty?: string } = {}) {
