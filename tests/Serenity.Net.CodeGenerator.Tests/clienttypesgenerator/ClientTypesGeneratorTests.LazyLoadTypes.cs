@@ -30,6 +30,19 @@ public partial class ClientTypesGeneratorTests
     }
 
     [Fact]
+    public void Declares_The_Types_Of_A_Lazy_Group()
+    {
+        var code = Read(Generate(null, true, ("Modules/GroupedEditor.ts", /*lang=typescript*/ """
+            import { Widget, LazyLoadInclude } from "@serenity-is/corelib";
+            export class GroupedEditor extends Widget<any> implements LazyLoadInclude<"Viewer"> {
+                static [Symbol.typeInfo] = this.registerEditor("MyProject.GroupedEditor");
+            }
+            """)), "LazyLoadTypes.cs");
+
+        Assert.Contains("\"MyProject.GroupedEditor\"", code);
+    }
+
+    [Fact]
     public void Does_Not_Generate_LazyLoadTypes_Without_A_Marked_Type()
     {
         var files = Generate(null, true, ("Modules/PlainEditor.ts", /*lang=typescript*/ """

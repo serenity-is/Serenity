@@ -318,7 +318,7 @@ public class BuiltinTSTypes
         new() { Name = "ToolButtonProps", IsInterface = true, Fields = [ new() { Name = "action", Type = "string" }, new() { Name = "title" }, new() { Name = "hint", Type = "string" }, new() { Name = "cssClass", Type = "string" }, new() { Name = "icon", Type = "IconClassName" }, new() { Name = "onClick" }, new() { Name = "ref" }, new() { Name = "visible" }, new() { Name = "disabled" } ] },
         new() { Name = "Tooltip", Fields = [ new() { Name = "el" }, new() { Name = "defaults", Type = "TooltipOptions", IsStatic = true }, new() { Name = "existingInstance", IsStatic = true } ] },
         new() { Name = "TooltipOptions", IsInterface = true, Fields = [ new() { Name = "title", Type = "string" }, new() { Name = "trigger", Type = "string" } ] },
-        new() { Name = "LazyLoadInclude", IsInterface = true },
+        new() { Name = "LazyLoadInclude", IsInterface = true, GenericParameters = [ new() { Name = "TGroup", Default = "\"\"" } ] },
         new() { Name = "TransformInclude", IsInterface = true, GenericParameters = [ new() { Name = "TypeName", Default = "\"\"" } ] },
         new() { Name = "TranslateTextsOptions", IsInterface = true, Fields = [ new() { Name = "SourceLanguageID", Type = "string" }, new() { Name = "Inputs" } ] },
         new() { Name = "TranslateTextsResult", IsInterface = true, Fields = [ new() { Name = "Translations" } ] },

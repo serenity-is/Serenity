@@ -718,6 +718,32 @@ public class TSTypeListerAST
         return null;
     }
 
+    string? GetLazyLoadGroup(ClassDeclaration node)
+    {
+        if (node.HeritageClauses == null)
+            return null;
+
+        foreach (var heritage in node.HeritageClauses)
+        {
+            if (heritage.Token != SyntaxKind.ImplementsKeyword ||
+                heritage.Types == null)
+                continue;
+
+            foreach (var type in heritage.Types)
+            {
+                var name = GetTypeReferenceExpression(type);
+                if (name != "LazyLoadInclude" &&
+                    name?.EndsWith(":LazyLoadInclude", StringComparison.Ordinal) != true)
+                    continue;
+
+                if (type.TypeArguments is { Count: 1 })
+                    return GetInterfaceGenericArgumentValue(type.TypeArguments[0]);
+            }
+        }
+
+        return null;
+    }
+
     string? GetInterfaceGenericArgumentValue(ITypeNode arg)
     {
         if (arg is TypeQueryNode typeQuery &&
@@ -1043,6 +1069,7 @@ public class TSTypeListerAST
         var members = GetClassMembers(klass);
         SplitMembers(members, result);
         result.Interfaces = GetInterfaces(klass);
+        result.LazyLoadGroup = GetLazyLoadGroup(klass);
         var decorators = klass.GetDecorators();
         result.Attributes = DecoratorsToExternalAttributes(decorators);
 

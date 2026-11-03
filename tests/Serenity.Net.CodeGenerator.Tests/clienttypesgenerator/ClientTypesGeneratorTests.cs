@@ -42,7 +42,7 @@ public partial class ClientTypesGeneratorTests
         }
         export interface TransformInclude<TypeName = ""> {
         }
-        export interface LazyLoadInclude {
+        export interface LazyLoadInclude<TGroup extends string = ""> {
         }
         export interface Formatter {
         }

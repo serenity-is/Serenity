@@ -9,6 +9,7 @@ public class ExternalType
     public string? BaseType { get; set; }
     public List<string>? Interfaces { get; set; }
     public string? TransformIncludeTypeName { get; set; }
+    public string? LazyLoadGroup { get; set; }
     public List<ExternalAttribute>? Attributes { get; set; }
     public List<ExternalMember>? Fields { get; set; }
     public List<ExternalMethod>? Methods { get; set; }
