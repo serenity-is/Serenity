@@ -7,13 +7,16 @@ namespace Serene.Administration;
 [ReadPermission(PermissionKeys.Security)]
 [ModifyPermission(PermissionKeys.Security)]
 [LookupScript(Permission = PermissionKeys.Security)]
-public sealed class UserRow : LoggingRow<UserRow.RowFields>, IIdRow, INameRow, IIsActiveRow, IDisplayNameRow, IEmailRow, IPasswordRow
+public sealed class UserRow : LoggingRow<UserRow.RowFields>, IIdRow, INameRow, INormalizedUsernameRow, IIsActiveRow, IDisplayNameRow, IEmailRow, IPasswordRow
 {
     [DisplayText("User Id"), Identity, IdProperty]
     public int? UserId { get => fields.UserId[this]; set => fields.UserId[this] = value; }
 
     [DisplayText("Username"), Size(100), NotNull, QuickSearch, LookupInclude, NameProperty]
     public string? Username { get => fields.Username[this]; set => fields.Username[this] = value; }
+
+    [DisplayText("Normalized Username"), Size(100), NotNull, Insertable(false), Updatable(false), MinSelectLevel(SelectLevel.Never)]
+    public string? NormalizedUsername { get => fields.NormalizedUsername[this]; set => fields.NormalizedUsername[this] = value; }
 
     [DisplayText("Source"), Size(4), NotNull, Insertable(false), Updatable(false), DefaultValue("site")]
     public string? Source { get => fields.Source[this]; set => fields.Source[this] = value; }
@@ -50,6 +53,7 @@ public sealed class UserRow : LoggingRow<UserRow.RowFields>, IIdRow, INameRow, I
     [AsyncLookupEditor(typeof(RoleRow), Multiple = true)]
     public List<int>? Roles { get => fields.Roles[this]; set => fields.Roles[this] = value; }
 
+    StringField INormalizedUsernameRow.NormalizedUsernameField => fields.NormalizedUsername;
     StringField IDisplayNameRow.DisplayNameField => fields.DisplayName;
     StringField IEmailRow.EmailField => fields.Email;
     Int16Field IIsActiveRow.IsActiveField => fields.IsActive;
@@ -60,6 +64,7 @@ public sealed class UserRow : LoggingRow<UserRow.RowFields>, IIdRow, INameRow, I
     {
         public Int32Field UserId = null!;
         public StringField Username = null!;
+        public StringField NormalizedUsername = null!;
         public StringField Source = null!;
         public StringField PasswordHash = null!;
         public StringField PasswordSalt = null!;

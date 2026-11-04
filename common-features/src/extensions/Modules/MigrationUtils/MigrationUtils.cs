@@ -280,6 +280,36 @@ public static class MigrationUtils
     }
 
     /// <summary>
+    /// Gets the SQL dialect for the database the migration is running against. It can be used to
+    /// quote identifiers and strings in the statements passed to <c>Execute.Sql</c>.
+    /// </summary>
+    /// <param name="migration">The migration reference.</param>
+    /// <returns>The SQL dialect.</returns>
+    /// <exception cref="NotSupportedException">There is no dialect for the database type.</exception>
+    public static ISqlDialect GetDialect(this MigrationBase migration)
+    {
+        if (migration.IsSqlServer())
+            return SqlServer2000Dialect.Instance;
+
+        if (migration.IsFirebird())
+            return FirebirdDialect.Instance;
+
+        if (migration.IsSqlite())
+            return SqliteDialect.Instance;
+
+        if (migration.IsPostgres())
+            return PostgresDialect.Instance;
+
+        if (migration.IsMySql())
+            return MySqlDialect.Instance;
+
+        if (migration.IsOracle())
+            return OracleDialect.Instance;
+
+        throw new NotSupportedException("There is no SQL dialect for the database type of this migration!");
+    }
+
+    /// <summary>
     /// Ensures the database for the specified connection key exists, creating it if necessary.
     /// </summary>
     /// <param name="databaseKey">The connection key.</param>

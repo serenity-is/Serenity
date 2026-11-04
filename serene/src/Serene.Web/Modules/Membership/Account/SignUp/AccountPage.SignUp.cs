@@ -29,7 +29,7 @@ public partial class AccountPage : Controller
             ArgumentException.ThrowIfNullOrWhiteSpace(request.DisplayName);
 
             if (connection.Exists<UserRow>(
-                    UserRow.Fields.Username == request.Email |
+                    UserRow.Fields.NormalizedUsername == BaseUserRetrieveService.NormalizeUsername(request.Email) |
                     UserRow.Fields.Email == request.Email))
             {
                 throw new ValidationError("EmailInUse", MembershipValidationTexts.EmailInUse.ToString(Localizer));
@@ -46,6 +46,7 @@ public partial class AccountPage : Controller
             var userId = (int)connection.InsertAndGetID(new UserRow
             {
                 Username = username,
+                NormalizedUsername = BaseUserRetrieveService.NormalizeUsername(username),
                 Source = "sign",
                 DisplayName = displayName,
                 Email = email,

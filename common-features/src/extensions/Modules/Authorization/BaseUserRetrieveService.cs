@@ -8,6 +8,29 @@ public abstract class BaseUserRetrieveService(ITwoLevelCache cache) : IUserRetri
 {
     private readonly ITwoLevelCache cache = cache ?? throw new ArgumentNullException(nameof(cache));
 
+    /// <summary>
+    /// Gets the normalized form of the specified username, which allows looking it up and comparing
+    /// it case insensitively, without depending on the collation of the database. This is the value
+    /// to store in the field provided by <see cref="INormalizedUsernameRow"/>.
+    /// </summary>
+    /// <remarks>
+    /// ToUpperInvariant leaves the Turkish dotless ı and dotted İ as they are, so they are
+    /// folded to I first. A migration that fills in the normalized values of existing users
+    /// with SQL should apply the same rule.
+    /// </remarks>
+    /// <param name="username">The username.</param>
+    /// <returns>The normalized username.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="username"/> is null.</exception>
+    public static string NormalizeUsername(string username)
+    {
+        ArgumentNullException.ThrowIfNull(username);
+
+        return username.Normalize()
+            .Replace('ı', 'I')
+            .Replace('İ', 'I')
+            .ToUpperInvariant();
+    }
+
     /// <inheritdoc/>
     public virtual IUserDefinition? ById(string id)
     {

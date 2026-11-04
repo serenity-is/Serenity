@@ -62,6 +62,25 @@ public class BaseUserRetrieveServiceTTests
         }
     }
 
+    [DefaultConnection]
+    private class NormalizedUserRow : Row<NormalizedUserRow.RowFields>, IIdRow, INameRow, INormalizedUsernameRow
+    {
+        [IdProperty]
+        public int? Id { get => fields.Id[this]; set => fields.Id[this] = value; }
+        [NameProperty]
+        public string? Name { get => fields.Name[this]; set => fields.Name[this] = value; }
+        public string? NormalizedName { get => fields.NormalizedName[this]; set => fields.NormalizedName[this] = value; }
+
+        StringField INormalizedUsernameRow.NormalizedUsernameField => fields.NormalizedName;
+
+        public class RowFields : RowFieldsBase
+        {
+            public Int32Field Id = null!;
+            public StringField Name = null!;
+            public StringField NormalizedName = null!;
+        }
+    }
+
     private class TestService<TRow>(
         ITwoLevelCache cache,
         ISqlConnections sqlConnections,
@@ -75,6 +94,7 @@ public class BaseUserRetrieveServiceTTests
         public IUserDefinition? LoadByCriteriaExposed(IDbConnection connection, BaseCriteria criteria) =>
             LoadByCriteria(connection, criteria);
         public string CacheGroupKeyExposed() => GetCacheGroupKey();
+        public string UsernameCacheKeyExposed(string username) => GetUsernameCacheKey(username);
 
         protected override IUserDefinition? ToUserDefinition(TRow row) => toDefinition(row);
     }
@@ -173,6 +193,60 @@ public class BaseUserRetrieveServiceTTests
         var result = service.LoadByUsernameExposed("user5");
         Assert.NotNull(result);
         Assert.Equal("user5", result.Username);
+    }
+
+    [Fact]
+    public void LoadByUsername_Uses_Normalized_Field_When_Row_Implements_Interface()
+    {
+        var row = new NormalizedUserRow { Id = 5, Name = "user5" };
+        using var connection = new MockDbConnection()
+            .InterceptFindRow(_ => new OptionalValue<IRow>(row));
+
+        var service = new TestService<NormalizedUserRow>(new TestTwoLevelCache(),
+            new MockSqlConnections { OnNewByKey = _ => connection },
+            r => new MockUserDefinition(r.Id!.Value.ToString(), r.Name!));
+
+        Assert.Equal("user5", service.LoadByUsernameExposed("User5")?.Username);
+
+        var query = Assert.Single(connection.FindRowCalls).Query;
+        Assert.Contains("NormalizedName", query.ToString());
+        Assert.Contains("USER5", query.Params!.Values.Select(x => x as string));
+    }
+
+    [Fact]
+    public void LoadByUsername_Does_Not_Normalize_When_Row_Does_Not_Implement_Interface()
+    {
+        var row = new IntUserRow { Id = 5, Name = "user5" };
+        using var connection = new MockDbConnection()
+            .InterceptFindRow(_ => new OptionalValue<IRow>(row));
+
+        var service = new TestService<IntUserRow>(new TestTwoLevelCache(),
+            new MockSqlConnections { OnNewByKey = _ => connection },
+            r => new MockUserDefinition(r.Id!.Value.ToString(), r.Name!));
+
+        service.LoadByUsernameExposed("User5");
+
+        var query = Assert.Single(connection.FindRowCalls).Query;
+        Assert.Contains("User5", query.Params!.Values.Select(x => x as string));
+    }
+
+    [Fact]
+    public void UsernameCacheKey_Is_Normalized_When_Row_Implements_Interface()
+    {
+        var service = new TestService<NormalizedUserRow>(new TestTwoLevelCache(),
+            new NullSqlConnections(), _ => null);
+
+        Assert.Equal(service.UsernameCacheKeyExposed("isik"), service.UsernameCacheKeyExposed("ISIK"));
+        Assert.Equal(service.UsernameCacheKeyExposed("isik"), service.UsernameCacheKeyExposed("ısık"));
+    }
+
+    [Fact]
+    public void UsernameCacheKey_Keeps_Dotless_I_Separate_When_Row_Does_Not_Implement_Interface()
+    {
+        var service = new TestService<IntUserRow>(new TestTwoLevelCache(),
+            new NullSqlConnections(), _ => null);
+
+        Assert.NotEqual(service.UsernameCacheKeyExposed("isik"), service.UsernameCacheKeyExposed("ısık"));
     }
 
     [Fact]

@@ -38,7 +38,7 @@ public class UserPasswordValidator(ITwoLevelCache cache, ISqlConnections sqlConn
         }
 
         // prevent more than 50 invalid login attempts in 30 minutes
-        var throttler = new Throttler(cache.Memory, "ValidateUser:" + username!.ToLowerInvariant(), TimeSpan.FromMinutes(30), 50);
+        var throttler = new Throttler(cache.Memory, "ValidateUser:" + BaseUserRetrieveService.NormalizeUsername(username!), TimeSpan.FromMinutes(30), 50);
         if (!throttler.Check())
             return PasswordValidationResult.Throttle;
 
@@ -134,7 +134,7 @@ public class UserPasswordValidator(ITwoLevelCache cache, ISqlConnections sqlConn
 
     private PasswordValidationResult ValidateFirstTimeUser(ref string? username, string password)
     {
-        var throttler = new Throttler(cache.Memory, "ValidateUser:" + username!.ToLowerInvariant(), TimeSpan.FromMinutes(30), 50);
+        var throttler = new Throttler(cache.Memory, "ValidateUser:" + BaseUserRetrieveService.NormalizeUsername(username!), TimeSpan.FromMinutes(30), 50);
         if (!throttler.Check())
             return PasswordValidationResult.Throttle;
 
@@ -169,6 +169,7 @@ public class UserPasswordValidator(ITwoLevelCache cache, ISqlConnections sqlConn
             var userId = (int)connection.InsertAndGetID(new UserRow
             {
                 Username = username,
+                NormalizedUsername = BaseUserRetrieveService.NormalizeUsername(username!),
                 Source = "ldap",
                 DisplayName = displayName,
                 Email = email,

@@ -10,6 +10,8 @@ public abstract class BaseUserRetrieveService<TRow>(ITwoLevelCache cache, ISqlCo
     : BaseUserRetrieveService(cache)
     where TRow : class, IRow, IIdRow, INameRow, new()
 {
+    private static readonly bool hasNormalizedUsername = typeof(INormalizedUsernameRow).IsAssignableFrom(typeof(TRow));
+
     private readonly ISqlConnections sqlConnections = sqlConnections ?? throw new ArgumentNullException(nameof(sqlConnections));
 
     /// <summary>
@@ -80,13 +82,31 @@ public abstract class BaseUserRetrieveService<TRow>(ITwoLevelCache cache, ISqlCo
     }
 
     /// <summary>
-    /// Loads the user by the specified username from database.
+    /// Gets the cache key for the specified username. If the row implements
+    /// <see cref="INormalizedUsernameRow"/>, it is based on the normalized username.
+    /// </summary>
+    /// <param name="username">Username</param>
+    protected override string GetUsernameCacheKey(string username)
+    {
+        return hasNormalizedUsername
+            ? "UserByName_" + NormalizeUsername(username)
+            : base.GetUsernameCacheKey(username);
+    }
+
+    /// <summary>
+    /// Loads the user by the specified username from database. If the row implements
+    /// <see cref="INormalizedUsernameRow"/>, the normalized username field is used.
     /// </summary>
     /// <param name="username">Username</param>
     protected override IUserDefinition? LoadByUsername(string username)
     {
-        nameField ??= new TRow().NameField!;
         using var connection = sqlConnections.NewFor<TRow>();
+
+        if (new TRow() is INormalizedUsernameRow normalizedRow)
+            return LoadByCriteria(connection, normalizedRow.NormalizedUsernameField ==
+                NormalizeUsername(username));
+
+        nameField ??= new TRow().NameField!;
 
         return LoadByCriteria(connection, nameField == 
             new ValueCriteria(nameField.ConvertValue(username, CultureInfo.InvariantCulture)));

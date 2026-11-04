@@ -3,6 +3,7 @@
 export interface UserRow {
     UserId?: number;
     Username?: string;
+    NormalizedUsername?: string;
     Source?: string;
     PasswordHash?: string;
     PasswordSalt?: string;

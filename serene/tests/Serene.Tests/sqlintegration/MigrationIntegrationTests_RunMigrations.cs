@@ -67,6 +67,11 @@ public sealed partial class MigrationIntegrationTests : IDisposable
                 var adminUser = Assert.Single(users);
                 Assert.Equal(adminUsername, adminUser.Username);
 
+                // the migration filled in the normalized username, so the casing doesn't matter
+                var userRetriever = services.GetRequiredService<IUserRetrieveService>();
+                Assert.Equal(adminUsername, userRetriever.ByUsername("ADMIN")?.Username);
+                Assert.Equal(adminUsername, userRetriever.ByUsername("Admin")?.Username);
+
                 using var northwindConnection = sqlConnections.NewFor<Serenity.Demo.Northwind.OrderDetailRow>();
 
                 var orderDetailListHandler = services.GetRequiredService<Serenity.Demo.Northwind.IOrderDetailListHandler>();

@@ -33,8 +33,7 @@ public class UserSaveHandler(IRequestContext context, IOptions<EnvironmentSettin
                 "Usernames should start with letters, only contain letters and numbers!");
 
         var existing = await UserHelper.GetUserAsync(connection,
-            fld.Username == username |
-            fld.Username == username.Replace('I', 'İ'),
+            fld.NormalizedUsername == BaseUserRetrieveService.NormalizeUsername(username),
             cancellationToken).ConfigureAwait(false);
 
         if (existing != null && existingUserId != existing.UserId)
@@ -88,6 +87,9 @@ public class UserSaveHandler(IRequestContext context, IOptions<EnvironmentSettin
             Row.Source = "site";
             Row.IsActive = Row.IsActive ?? 1;
         }
+
+        if (IsCreate || Row.Username != Old!.Username)
+            Row.NormalizedUsername = BaseUserRetrieveService.NormalizeUsername(Row.Username!);
 
         if (IsCreate || !Row.Password.IsEmptyOrNull())
         {
