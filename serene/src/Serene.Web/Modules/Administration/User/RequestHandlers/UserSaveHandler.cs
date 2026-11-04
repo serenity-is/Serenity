@@ -91,6 +91,9 @@ public class UserSaveHandler(IRequestContext context, IOptions<EnvironmentSettin
         if (IsCreate || Row.Username != Old!.Username)
             Row.NormalizedUsername = BaseUserRetrieveService.NormalizeUsername(Row.Username!);
 
+            if (IsCreate || Row.Email != Old!.Email)
+                Row.NormalizedEmail = BaseUserRetrieveService.NormalizeEmail(Row.Email);
+
         if (IsCreate || !Row.Password.IsEmptyOrNull())
         {
             string? salt = null;

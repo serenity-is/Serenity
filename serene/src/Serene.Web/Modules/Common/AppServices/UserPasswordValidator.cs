@@ -115,6 +115,7 @@ public class UserPasswordValidator(ITwoLevelCache cache, ISqlConnections sqlConn
                 .Set(fld.PasswordHash, hash)
                 .Set(fld.PasswordSalt, salt)
                 .Set(fld.Email, email)
+                .Set(fld.NormalizedEmail, BaseUserRetrieveService.NormalizeEmail(email))
                 .Set(fld.LastDirectoryUpdate, DateTime.Now)
                 .WhereEqual(fld.UserId, user.UserId)
                 .Execute(connection, ExpectedRows.One);
@@ -173,6 +174,7 @@ public class UserPasswordValidator(ITwoLevelCache cache, ISqlConnections sqlConn
                 Source = "ldap",
                 DisplayName = displayName,
                 Email = email,
+                NormalizedEmail = BaseUserRetrieveService.NormalizeEmail(email),
                 PasswordHash = hash,
                 PasswordSalt = salt,
                 IsActive = 1,

@@ -7,7 +7,7 @@ namespace Serene.Administration;
 [ReadPermission(PermissionKeys.Security)]
 [ModifyPermission(PermissionKeys.Security)]
 [LookupScript(Permission = PermissionKeys.Security)]
-public sealed class UserRow : LoggingRow<UserRow.RowFields>, IIdRow, INameRow, INormalizedUsernameRow, IIsActiveRow, IDisplayNameRow, IEmailRow, IPasswordRow
+public sealed class UserRow : LoggingRow<UserRow.RowFields>, IIdRow, INameRow, INormalizedUsernameRow, INormalizedEmailRow, IIsActiveRow, IDisplayNameRow, IEmailRow, IPasswordRow
 {
     [DisplayText("User Id"), Identity, IdProperty]
     public int? UserId { get => fields.UserId[this]; set => fields.UserId[this] = value; }
@@ -33,6 +33,9 @@ public sealed class UserRow : LoggingRow<UserRow.RowFields>, IIdRow, INameRow, I
     [DisplayText("Email"), Size(100)]
     public string? Email { get => fields.Email[this]; set => fields.Email[this] = value; }
 
+    [DisplayText("Normalized Email"), Size(100), Insertable(false), Updatable(false), MinSelectLevel(SelectLevel.Never)]
+    public string? NormalizedEmail { get => fields.NormalizedEmail[this]; set => fields.NormalizedEmail[this] = value; }
+
     [DisplayText("User Image"), Size(100)]
     [ImageUploadEditor(FilenameFormat = "UserImage/~", CopyToHistory = true)]
     public string? UserImage { get => fields.UserImage[this]; set => fields.UserImage[this] = value; }
@@ -54,6 +57,7 @@ public sealed class UserRow : LoggingRow<UserRow.RowFields>, IIdRow, INameRow, I
     public List<int>? Roles { get => fields.Roles[this]; set => fields.Roles[this] = value; }
 
     StringField INormalizedUsernameRow.NormalizedUsernameField => fields.NormalizedUsername;
+    StringField INormalizedEmailRow.NormalizedEmailField => fields.NormalizedEmail;
     StringField IDisplayNameRow.DisplayNameField => fields.DisplayName;
     StringField IEmailRow.EmailField => fields.Email;
     Int16Field IIsActiveRow.IsActiveField => fields.IsActive;
@@ -70,6 +74,7 @@ public sealed class UserRow : LoggingRow<UserRow.RowFields>, IIdRow, INameRow, I
         public StringField PasswordSalt = null!;
         public StringField DisplayName = null!;
         public StringField Email = null!;
+        public StringField NormalizedEmail = null!;
         public StringField UserImage = null!;
         public DateTimeField LastDirectoryUpdate = null!;
         public Int16Field IsActive = null!;

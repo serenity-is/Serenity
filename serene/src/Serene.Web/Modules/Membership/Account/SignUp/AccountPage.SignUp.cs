@@ -30,7 +30,7 @@ public partial class AccountPage : Controller
 
             if (connection.Exists<UserRow>(
                     UserRow.Fields.NormalizedUsername == BaseUserRetrieveService.NormalizeUsername(request.Email) |
-                    UserRow.Fields.Email == request.Email))
+                    UserRow.Fields.NormalizedEmail == BaseUserRetrieveService.NormalizeEmail(request.Email)))
             {
                 throw new ValidationError("EmailInUse", MembershipValidationTexts.EmailInUse.ToString(Localizer));
             }
@@ -50,6 +50,7 @@ public partial class AccountPage : Controller
                 Source = "sign",
                 DisplayName = displayName,
                 Email = email,
+                NormalizedEmail = BaseUserRetrieveService.NormalizeEmail(email),
                 PasswordHash = hash,
                 PasswordSalt = salt,
                 IsActive = 0,

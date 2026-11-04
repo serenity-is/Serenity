@@ -44,6 +44,7 @@ namespace texts {
                 export const InsertUserId: string;
                 export const IsActive: string;
                 export const LastDirectoryUpdate: string;
+                export const NormalizedEmail: string;
                 export const NormalizedUsername: string;
                 export const Password: string;
                 export const PasswordConfirm: string;

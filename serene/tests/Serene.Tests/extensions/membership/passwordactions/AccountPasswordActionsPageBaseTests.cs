@@ -54,6 +54,10 @@ public class AccountPasswordActionsPageBaseTests
         public string GenerateResetPasswordTokenExposed(MockUserRow user) => GenerateResetPasswordToken(user);
     }
 
+    private class NormalizedEmailTestPage : AccountPasswordActionsPageBase<MockNormalizedEmailUserRow>
+    {
+    }
+
     private class FakeView : IView
     {
         public string Path => "/Test/View.cshtml";
@@ -248,6 +252,35 @@ public class AccountPasswordActionsPageBaseTests
         Assert.Null(result.Data.Error);
         var message = ctx.EmailSender.Message.AssertNotNull();
         Assert.Equal("user@example.com", Assert.Single(message.To.Mailboxes).Address);
+    }
+
+    [Fact]
+    public void ForgotPassword_Compares_Email_When_Row_Has_No_Normalized_Field()
+    {
+        var ctx = CreateContext();
+        ctx.Page.ForgotPassword(new ForgotPasswordRequest { Email = "User@example.com" },
+            ctx.EmailSender, ctx.SiteUrl, ctx.Cache, NullTextLocalizer.Instance);
+
+        var query = Assert.Single(ctx.Connection.FindRowCalls).Query;
+        Assert.Contains("User@example.com", query.Params!.Values.Select(x => x as string));
+    }
+
+    [Fact]
+    public void ForgotPassword_Uses_Normalized_Field_When_Row_Implements_Interface()
+    {
+        var ctx = CreateContext();
+        var page = new NormalizedEmailTestPage
+        {
+            ControllerContext = ctx.Page.ControllerContext,
+            TempData = ctx.Page.TempData
+        };
+
+        page.ForgotPassword(new ForgotPasswordRequest { Email = "User@example.com" },
+            ctx.EmailSender, ctx.SiteUrl, ctx.Cache, NullTextLocalizer.Instance);
+
+        var query = Assert.Single(ctx.Connection.FindRowCalls).Query;
+        Assert.Contains("NormalizedEmail", query.ToString());
+        Assert.Contains("USER@EXAMPLE.COM", query.Params!.Values.Select(x => x as string));
     }
 
     [Fact]

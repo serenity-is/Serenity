@@ -31,6 +31,19 @@ public abstract class BaseUserRetrieveService(ITwoLevelCache cache) : IUserRetri
             .ToUpperInvariant();
     }
 
+    /// <summary>
+    /// Gets the normalized form of the specified email, using the same rule as
+    /// <see cref="NormalizeUsername"/>. This is the value to store in the field
+    /// provided by <see cref="INormalizedEmailRow"/>.
+    /// </summary>
+    /// <param name="email">The email.</param>
+    /// <returns>The normalized email, or null if <paramref name="email"/> is null.</returns>
+    [return: System.Diagnostics.CodeAnalysis.NotNullIfNotNull(nameof(email))]
+    public static string? NormalizeEmail(string? email)
+    {
+        return email is null ? null : NormalizeUsername(email);
+    }
+
     /// <inheritdoc/>
     public virtual IUserDefinition? ById(string id)
     {

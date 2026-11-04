@@ -210,7 +210,9 @@ public abstract class AccountPasswordActionsPageBase<TUserRow> : MembershipPageB
 
             var fieldsRow = new TUserRow();
 
-            var user = uow.Connection.TryFirst<TUserRow>(fieldsRow.EmailField == request.Email);
+            var user = uow.Connection.TryFirst<TUserRow>(fieldsRow is INormalizedEmailRow normalizedEmailRow
+                ? normalizedEmailRow.NormalizedEmailField == BaseUserRetrieveService.NormalizeEmail(request.Email)
+                : fieldsRow.EmailField == request.Email);
             if (user == null)
                 return new ServiceResponse();
 

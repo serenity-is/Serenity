@@ -9,6 +9,7 @@ export interface UserRow {
     PasswordSalt?: string;
     DisplayName?: string;
     Email?: string;
+    NormalizedEmail?: string;
     UserImage?: string;
     LastDirectoryUpdate?: string;
     IsActive?: number;

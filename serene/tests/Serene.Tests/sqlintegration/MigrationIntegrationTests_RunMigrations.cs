@@ -72,6 +72,11 @@ public sealed partial class MigrationIntegrationTests : IDisposable
                 Assert.Equal(adminUsername, userRetriever.ByUsername("ADMIN")?.Username);
                 Assert.Equal(adminUsername, userRetriever.ByUsername("Admin")?.Username);
 
+                // the migration filled in the normalized email too
+                Assert.True(defaultConnection.Exists<Administration.UserRow>(
+                    Administration.UserRow.Fields.NormalizedEmail ==
+                    BaseUserRetrieveService.NormalizeEmail(adminUser.Email)!));
+
                 using var northwindConnection = sqlConnections.NewFor<Serenity.Demo.Northwind.OrderDetailRow>();
 
                 var orderDetailListHandler = services.GetRequiredService<Serenity.Demo.Northwind.IOrderDetailListHandler>();
