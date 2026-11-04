@@ -54,6 +54,9 @@ public sealed class DateTimeField(ICollection<Field> collection, string name, Lo
             if (source is DateTime dt)
                 return dt;
 
+            if (source is DateOnly dateOnly)
+                return dateOnly.ToDateTime(TimeOnly.MinValue);
+
             if (source is DateTimeOffset dto)
                 return dto.DateTime;
 
@@ -83,7 +86,8 @@ public sealed class DateTimeField(ICollection<Field> collection, string name, Lo
         {
             var value = reader.GetValue(index);
             DateTime datetime = value is DateTimeOffset dto ?
-                dto.DateTime : (value is DateTime dt ? dt : Convert.ToDateTime(value));
+                dto.DateTime : (value is DateTime dt ? dt : (value is DateOnly dateOnly ?
+                dateOnly.ToDateTime(TimeOnly.MinValue) : Convert.ToDateTime(value)));
             if (DateTimeKind != System.DateTimeKind.Unspecified)
                 datetime = DateTime.SpecifyKind(datetime, DateTimeKind);
             _setValue(row, datetime);
