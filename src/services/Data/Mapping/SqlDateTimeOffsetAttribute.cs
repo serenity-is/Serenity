@@ -11,8 +11,8 @@ public class SqlDateTimeOffsetAttribute : BaseExpressionAttribute
         return dialect.ServerType switch
         {
             nameof(ServerType.Oracle) => "SYSTIMESTAMP",
-            nameof(ServerType.Postgres) => "now",
-            nameof(ServerType.SqlServer) => "SYSDATETIMEOFFSET",
+            nameof(ServerType.Postgres) => "CURRENT_TIMESTAMP",
+            nameof(ServerType.SqlServer) => "SYSDATETIMEOFFSET()",
             _ => "CURRENT_TIMESTAMP"
         };
     }

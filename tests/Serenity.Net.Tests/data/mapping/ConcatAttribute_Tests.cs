@@ -188,4 +188,13 @@ public class ConcatAttribute_Tests
         Assert.Equal("(COALESCE(Test1, '') || COALESCE(Test2, '') || COALESCE(Test3, '') || COALESCE(Test4, ''))", new Concat("Test1", "Test2", "Test3", "Test4") { NullAsEmpty = true }
             .ToString(dialect));
     }
+
+    [Fact]
+    public void Casts_Parameters_For_Firebird_Which_Would_Type_Them_As_The_Empty_String()
+    {
+        Assert.Equal("(COALESCE(CAST(@p1 AS VARCHAR(8191)), '') || COALESCE(Test2, ''))",
+            new Concat("@p1", "Test2").ToString(FirebirdDialect.Instance));
+        Assert.Equal("(COALESCE(@p1, '') || COALESCE(Test2, ''))",
+            new Concat("@p1", "Test2").ToString(SqliteDialect.Instance));
+    }
 }

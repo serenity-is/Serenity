@@ -269,6 +269,8 @@ public class WrappedConnection : DbConnection, IDbConnection, IHasActualConnecti
 
     private void SetupCommand(IDbCommand command)
     {
+        CommandParameterBinding.BindByName(command);
+
         if (CommandTimeout.HasValue)
             command.CommandTimeout = CommandTimeout.Value;
         else if (SqlSettings.DefaultCommandTimeout.HasValue)

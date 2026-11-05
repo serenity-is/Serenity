@@ -190,6 +190,7 @@ public static class SqlHelper
         IDbCommand command = connection.CreateCommand();
         try
         {
+            CommandParameterBinding.BindByName(command);
             commandText = SqlConversions.Translate(commandText, connection);
             command.CommandText = commandText;
             return command;

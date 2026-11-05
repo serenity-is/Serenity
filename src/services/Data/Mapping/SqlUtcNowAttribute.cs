@@ -10,7 +10,8 @@ public class SqlUtcNowAttribute : BaseExpressionAttribute
     {
         return dialect.ServerType switch
         {
-            nameof(ServerType.Firebird) => "DATEDIFF(second, timestamp '1/1/1970 00:00:00', current_timestamp)",
+            // requires Firebird 4 or later, as earlier versions have no time zone support
+            nameof(ServerType.Firebird) => "CAST(CURRENT_TIMESTAMP AT TIME ZONE 'UTC' AS TIMESTAMP)",
             nameof(ServerType.MySql) => "UTC_TIMESTAMP",
             nameof(ServerType.Oracle) => "SYS_EXTRACT_UTC(SYSTIMESTAMP)",
             nameof(ServerType.Postgres) => "TIMEZONE('utc', now())",

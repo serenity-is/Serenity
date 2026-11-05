@@ -111,4 +111,16 @@ public abstract class BaseExpressionAttribute : Attribute
 
         return Convert.ToString(expression, CultureInfo.InvariantCulture)!;
     }
+
+    /// <summary>
+    /// Returns true if the expression is a single parameter, like @p1, which some databases, like Firebird, can't
+    /// determine the type of from where it is used, so it needs a CAST.
+    /// </summary>
+    /// <param name="expression">The expression.</param>
+    /// <returns>True if the expression is a single parameter.</returns>
+    internal static bool IsParameter(string expression)
+    {
+        return expression.Length > 1 && expression[0] == '@' &&
+            expression.Skip(1).All(c => c == '_' || char.IsLetterOrDigit(c));
+    }
 }

@@ -30,6 +30,11 @@ public class DatePartAttribute(DateParts part, object expression) : BaseExpressi
     {
         string datePart = Enum.GetName<DateParts>(Part)!.ToUpperInvariant();
         string expression = ToString(Expression, dialect);
+
+        // Firebird can't determine the type of a parameter from EXTRACT
+        if (dialect.ServerType == nameof(ServerType.Firebird) && IsParameter(expression))
+            expression = "CAST(" + expression + " AS TIMESTAMP)";
+
         return dialect.ServerType switch
         {
             nameof(ServerType.MySql) or

@@ -44,4 +44,11 @@ public class DatePartAttribute_Tests
         Assert.Equal("CAST(STRFTIME('%S', TEST) AS INTEGER)", new DatePart(DateParts.Second, "TEST").ToString(dialect));
     }
 
+    [Fact]
+    public void Casts_A_Parameter_For_Firebird_Which_Cant_Determine_Its_Type()
+    {
+        Assert.Equal("EXTRACT(YEAR FROM CAST(@p1 AS TIMESTAMP))", new DatePart(DateParts.Year, "@p1").ToString(FirebirdDialect.Instance));
+        Assert.Equal("EXTRACT(YEAR FROM @p1)", new DatePart(DateParts.Year, "@p1").ToString(PostgresDialect.Instance));
+        Assert.Equal("EXTRACT(YEAR FROM @p1 + 1)", new DatePart(DateParts.Year, "@p1 + 1").ToString(FirebirdDialect.Instance));
+    }
 }

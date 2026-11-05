@@ -2,6 +2,7 @@ namespace Serenity.Data.Mapping;
 
 using DateDiff = DateDiffAttribute;
 
+// The results of these expressions are checked against real databases by ExpressionAttributeIntegrationTests
 public class DateDiffAttribute_Tests
 {
     [Fact]
@@ -15,23 +16,27 @@ public class DateDiffAttribute_Tests
     [Fact]
     public void Sqlite_Syntax()
     {
-        Assert.Equal("(CAST(STRFTIME('%Y', D2) AS INTEGER) - CAST(STRFTIME('%Y', D1) AS INTEGER))", 
+        Assert.Equal("(CAST(STRFTIME('%Y', D2) AS INTEGER) - CAST(STRFTIME('%Y', D1) AS INTEGER))",
             new DateDiff(DateParts.Year, "D1", "D2").ToString(SqliteDialect.Instance));
 
-        Assert.Equal("((CAST(STRFTIME('%Y', D2) AS INTEGER) - CAST(STRFTIME('%Y', D1) AS INTEGER)) * 12 + " + 
+        Assert.Equal("((CAST(STRFTIME('%Y', D2) AS INTEGER) - CAST(STRFTIME('%Y', D1) AS INTEGER)) * 12 + " +
             "CAST(STRFTIME('%m', D2) AS INTEGER) - CAST(STRFTIME('%m', D1) AS INTEGER))",
             new DateDiff(DateParts.Month, "D1", "D2").ToString(SqliteDialect.Instance));
 
-        Assert.Equal("ROUND((JULIANDAY(D2) - JULIANDAY(D1)))",
+        Assert.Equal("((CAST(STRFTIME('%s', STRFTIME('%Y-%m-%d', D2)) AS INTEGER) - " +
+            "CAST(STRFTIME('%s', STRFTIME('%Y-%m-%d', D1)) AS INTEGER)) / 86400)",
             new DateDiff(DateParts.Day, "D1", "D2").ToString(SqliteDialect.Instance));
 
-        Assert.Equal("ROUND((JULIANDAY(D2) - JULIANDAY(D1)) * 24)",
+        Assert.Equal("((CAST(STRFTIME('%s', STRFTIME('%Y-%m-%d %H:00:00', D2)) AS INTEGER) - " +
+            "CAST(STRFTIME('%s', STRFTIME('%Y-%m-%d %H:00:00', D1)) AS INTEGER)) / 3600)",
             new DateDiff(DateParts.Hour, "D1", "D2").ToString(SqliteDialect.Instance));
 
-        Assert.Equal("ROUND((JULIANDAY(D2) - JULIANDAY(D1)) * 1440)",
+        Assert.Equal("((CAST(STRFTIME('%s', STRFTIME('%Y-%m-%d %H:%M:00', D2)) AS INTEGER) - " +
+            "CAST(STRFTIME('%s', STRFTIME('%Y-%m-%d %H:%M:00', D1)) AS INTEGER)) / 60)",
             new DateDiff(DateParts.Minute, "D1", "D2").ToString(SqliteDialect.Instance));
 
-        Assert.Equal("ROUND((JULIANDAY(D2) - JULIANDAY(D1)) * 86400)",
+        Assert.Equal("((CAST(STRFTIME('%s', STRFTIME('%Y-%m-%d %H:%M:%S', D2)) AS INTEGER) - " +
+            "CAST(STRFTIME('%s', STRFTIME('%Y-%m-%d %H:%M:%S', D1)) AS INTEGER)) / 1)",
             new DateDiff(DateParts.Second, "D1", "D2").ToString(SqliteDialect.Instance));
     }
 
@@ -45,16 +50,16 @@ public class DateDiffAttribute_Tests
             "EXTRACT(MONTH FROM D2) - EXTRACT(MONTH FROM D1))",
             new DateDiff(DateParts.Month, "D1", "D2").ToString(PostgresDialect.Instance));
 
-        Assert.Equal("ROUND(EXTRACT(EPOCH FROM (D2::timestamp - D1::timestamp)) / 86400)",
+        Assert.Equal("ROUND(EXTRACT(EPOCH FROM (DATE_TRUNC('day', D2::timestamp) - DATE_TRUNC('day', D1::timestamp))) / 86400)",
             new DateDiff(DateParts.Day, "D1", "D2").ToString(PostgresDialect.Instance));
 
-        Assert.Equal("ROUND(EXTRACT(EPOCH FROM (D2::timestamp - D1::timestamp)) / 3600)",
+        Assert.Equal("ROUND(EXTRACT(EPOCH FROM (DATE_TRUNC('hour', D2::timestamp) - DATE_TRUNC('hour', D1::timestamp))) / 3600)",
             new DateDiff(DateParts.Hour, "D1", "D2").ToString(PostgresDialect.Instance));
 
-        Assert.Equal("ROUND(EXTRACT(EPOCH FROM (D2::timestamp - D1::timestamp)) / 60)",
+        Assert.Equal("ROUND(EXTRACT(EPOCH FROM (DATE_TRUNC('minute', D2::timestamp) - DATE_TRUNC('minute', D1::timestamp))) / 60)",
             new DateDiff(DateParts.Minute, "D1", "D2").ToString(PostgresDialect.Instance));
 
-        Assert.Equal("ROUND(EXTRACT(EPOCH FROM (D2::timestamp - D1::timestamp)))",
+        Assert.Equal("ROUND(EXTRACT(EPOCH FROM (DATE_TRUNC('second', D2::timestamp) - DATE_TRUNC('second', D1::timestamp))) / 1)",
             new DateDiff(DateParts.Second, "D1", "D2").ToString(PostgresDialect.Instance));
     }
 
@@ -68,38 +73,39 @@ public class DateDiffAttribute_Tests
             "EXTRACT(MONTH FROM D2) - EXTRACT(MONTH FROM D1))",
             new DateDiff(DateParts.Month, "D1", "D2").ToString(OracleDialect.Instance));
 
-        Assert.Equal("ROUND((CAST (D2 as DATE) - CAST (D1 as DATE)))",
+        Assert.Equal("(TRUNC(CAST(D2 AS DATE)) - TRUNC(CAST(D1 AS DATE)))",
             new DateDiff(DateParts.Day, "D1", "D2").ToString(OracleDialect.Instance));
 
-        Assert.Equal("ROUND((CAST (D2 as DATE) - CAST (D1 as DATE)) * 24)",
+        Assert.Equal("ROUND((TRUNC(CAST(D2 AS DATE), 'HH') - TRUNC(CAST(D1 AS DATE), 'HH')) * 24)",
             new DateDiff(DateParts.Hour, "D1", "D2").ToString(OracleDialect.Instance));
 
-        Assert.Equal("ROUND((CAST (D2 as DATE) - CAST (D1 as DATE)) * 1440)",
+        Assert.Equal("ROUND((TRUNC(CAST(D2 AS DATE), 'MI') - TRUNC(CAST(D1 AS DATE), 'MI')) * 1440)",
             new DateDiff(DateParts.Minute, "D1", "D2").ToString(OracleDialect.Instance));
 
-        Assert.Equal("ROUND((CAST (D2 as DATE) - CAST (D1 as DATE)) * 86400)",
+        Assert.Equal("ROUND((CAST(D2 AS DATE) - CAST(D1 AS DATE)) * 86400)",
             new DateDiff(DateParts.Second, "D1", "D2").ToString(OracleDialect.Instance));
     }
 
     [Fact]
     public void MySql_Syntax()
     {
-        Assert.Equal("TIMESTAMPDIFF(YEAR, D1, D2)",
+        Assert.Equal("(EXTRACT(YEAR FROM D2) - EXTRACT(YEAR FROM D1))",
             new DateDiff(DateParts.Year, "D1", "D2").ToString(MySqlDialect.Instance));
 
-        Assert.Equal("TIMESTAMPDIFF(MONTH, D1, D2)",
+        Assert.Equal("((EXTRACT(YEAR FROM D2) - EXTRACT(YEAR FROM D1)) * 12 + " +
+            "EXTRACT(MONTH FROM D2) - EXTRACT(MONTH FROM D1))",
             new DateDiff(DateParts.Month, "D1", "D2").ToString(MySqlDialect.Instance));
 
-        Assert.Equal("TIMESTAMPDIFF(DAY, D1, D2)",
+        Assert.Equal("DATEDIFF(D2, D1)",
             new DateDiff(DateParts.Day, "D1", "D2").ToString(MySqlDialect.Instance));
 
-        Assert.Equal("TIMESTAMPDIFF(HOUR, D1, D2)",
+        Assert.Equal("TIMESTAMPDIFF(HOUR, DATE_FORMAT(D1, '%Y-%m-%d %H:00:00'), DATE_FORMAT(D2, '%Y-%m-%d %H:00:00'))",
             new DateDiff(DateParts.Hour, "D1", "D2").ToString(MySqlDialect.Instance));
 
-        Assert.Equal("TIMESTAMPDIFF(MINUTE, D1, D2)",
+        Assert.Equal("TIMESTAMPDIFF(MINUTE, DATE_FORMAT(D1, '%Y-%m-%d %H:%i:00'), DATE_FORMAT(D2, '%Y-%m-%d %H:%i:00'))",
             new DateDiff(DateParts.Minute, "D1", "D2").ToString(MySqlDialect.Instance));
 
-        Assert.Equal("TIMESTAMPDIFF(SECOND, D1, D2)",
+        Assert.Equal("TIMESTAMPDIFF(SECOND, DATE_FORMAT(D1, '%Y-%m-%d %H:%i:%s'), DATE_FORMAT(D2, '%Y-%m-%d %H:%i:%s'))",
             new DateDiff(DateParts.Second, "D1", "D2").ToString(MySqlDialect.Instance));
     }
 

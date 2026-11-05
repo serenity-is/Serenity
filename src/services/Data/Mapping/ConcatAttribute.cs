@@ -56,6 +56,10 @@ public class ConcatAttribute : BaseExpressionAttribute
 
         var expressions = Expressions.Select(x => ToString(x, dialect)).ToArray();
 
+        // Firebird determines the type of a parameter from the other operand, which is CHAR(0) for COALESCE(@p, '')
+        if (dialect.ServerType == nameof(ServerType.Firebird))
+            expressions = [.. expressions.Select(x => IsParameter(x) ? "CAST(" + x + " AS VARCHAR(8191))" : x)];
+
         if (dialect.CanUseConcat)
         {
             switch (dialect?.ServerType)

@@ -210,9 +210,9 @@ public class MappingAttributesTests
     }
 
     [Theory]
-    [InlineData(typeof(SqlServer2012Dialect), "SYSDATETIMEOFFSET")]
+    [InlineData(typeof(SqlServer2012Dialect), "SYSDATETIMEOFFSET()")]
     [InlineData(typeof(OracleDialect), "SYSTIMESTAMP")]
-    [InlineData(typeof(PostgresDialect), "now")]
+    [InlineData(typeof(PostgresDialect), "CURRENT_TIMESTAMP")]
     [InlineData(typeof(MySqlDialect), "CURRENT_TIMESTAMP")]
     public void SqlDateTimeOffsetAttribute_Translates(Type dialectType, string expected)
     {
@@ -232,7 +232,7 @@ public class MappingAttributesTests
     }
 
     [Theory]
-    [InlineData(typeof(FirebirdDialect), "DATEDIFF(second, timestamp '1/1/1970 00:00:00', current_timestamp)")]
+    [InlineData(typeof(FirebirdDialect), "CAST(CURRENT_TIMESTAMP AT TIME ZONE 'UTC' AS TIMESTAMP)")]
     [InlineData(typeof(MySqlDialect), "UTC_TIMESTAMP")]
     [InlineData(typeof(OracleDialect), "SYS_EXTRACT_UTC(SYSTIMESTAMP)")]
     [InlineData(typeof(PostgresDialect), "TIMEZONE('utc', now())")]
