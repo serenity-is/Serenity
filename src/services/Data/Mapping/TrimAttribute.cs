@@ -42,10 +42,10 @@ public class TrimAttribute(object expression) : BaseExpressionAttribute
     /// <summary>
     /// Whether to remove the spaces at the start, true by default.
     /// </summary>
-    public bool Leading { get; set; } = true;
+    public bool Leading { get; init; } = true;
 
     /// <summary>
     /// Whether to remove the spaces at the end, true by default.
     /// </summary>
-    public bool Trailing { get; set; } = true;
+    public bool Trailing { get; init; } = true;
 }
