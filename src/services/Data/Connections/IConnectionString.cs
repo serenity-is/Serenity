@@ -36,4 +36,10 @@ public interface IConnectionString
     /// The name of the provider.
     /// </value>
     string ProviderName { get; }
+
+    /// <summary>
+    /// Gets the default collation to use if the database for this connection
+    /// is created by the application, or null to use the default of the server.
+    /// </summary>
+    string? Collation => null;
 }

@@ -80,7 +80,10 @@ public class DefaultConnectionStrings(IOptions<ConnectionStringOptions> options,
             return null;
 
         info = new ConnectionStringInfo(resolvedKey, entry.ConnectionString, entry.ProviderName,
-            DetermineDialect(resolvedKey, entry));
+            DetermineDialect(resolvedKey, entry))
+        {
+            Collation = entry.Collation
+        };
 
         return byKey.GetOrAdd(resolvedKey, info);
     }

@@ -207,8 +207,9 @@ public class MigrationUtilsTests
     }
 
     private class FakeConnectionString(ISqlDialect dialect, string connectionString = "Data Source=:memory:",
-        string providerName = "Microsoft.Data.Sqlite") : IConnectionString
+        string providerName = "Microsoft.Data.Sqlite", string? collation = null) : IConnectionString
     {
+        public string? Collation { get; } = collation;
         public ISqlDialect Dialect { get; } = dialect;
         public string ConnectionKey => DefaultConnectionAttribute.Key;
         public string ConnectionString { get; } = connectionString;
@@ -327,6 +328,54 @@ public class MigrationUtilsTests
     {
         Assert.Equal("CREATE DATABASE [mydb] COLLATE Turkish_100_CI_AS",
             CreateSqlServerDatabaseCommand("Turkish_100_CI_AS"));
+    }
+
+    private static string CreateDatabaseCommandWithConnectionCollation(string? collationArgument)
+    {
+        EnsureSqlServerProviderRegistered();
+        string? command = null;
+        using var connection = new MockDbConnection()
+            .OnDbCommandExecuteReader(_ => new MockDbDataReader())
+            .OnDbCommandExecuteNonQuery(cmd =>
+            {
+                command = cmd.CommandText;
+                return 1;
+            });
+
+        MigrationUtils.EnsureDatabase(DefaultConnectionAttribute.Key, null!, new FakeSqlConnections(
+            new FakeConnectionString(SqlServer2012Dialect.Instance, "Server=.;Database=mydb;Trusted_Connection=True;",
+                "Microsoft.Data.SqlClient", collation: "Turkish_100_CI_AS"), connection), collationArgument);
+
+        return command.AssertNotNull();
+    }
+
+    [Fact]
+    public void EnsureDatabase_Uses_Collation_Of_Connection_By_Default()
+    {
+        Assert.Equal("CREATE DATABASE [mydb] COLLATE Turkish_100_CI_AS",
+            CreateDatabaseCommandWithConnectionCollation(null));
+    }
+
+    [Fact]
+    public void EnsureDatabase_Collation_Argument_Overrides_Connection()
+    {
+        Assert.Equal("CREATE DATABASE [mydb] COLLATE Latin1_General_100_CI_AS",
+            CreateDatabaseCommandWithConnectionCollation("Latin1_General_100_CI_AS"));
+    }
+
+    [Fact]
+    public void EnsureDatabase_Empty_Collation_Argument_Ignores_Connection()
+    {
+        Assert.Equal("CREATE DATABASE [mydb]", CreateDatabaseCommandWithConnectionCollation(""));
+    }
+
+    [Fact]
+    public void EnsureDatabase_Throws_For_Connection_Collation_On_Sqlite()
+    {
+        var connections = new FakeSqlConnections(new FakeConnectionString(SqliteDialect.Instance, collation: "NOCASE"));
+
+        Assert.Throws<NotSupportedException>(() =>
+            MigrationUtils.EnsureDatabase(DefaultConnectionAttribute.Key, null!, connections));
     }
 
     [Fact]

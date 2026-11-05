@@ -41,4 +41,10 @@ public class ConnectionStringInfo(string connectionKey, string? connectionString
     /// The name of the provider.
     /// </value>
     public string ProviderName { get; private set; } = providerName ?? throw new ArgumentNullException(nameof(providerName));
+
+    /// <summary>
+    /// Gets the default collation to use if the database for this connection
+    /// is created by the application, or null to use the default of the server.
+    /// </summary>
+    public string? Collation { get; init; }
 }

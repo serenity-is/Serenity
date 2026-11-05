@@ -319,7 +319,9 @@ public static class MigrationUtils
     /// <param name="collation">The default collation to create the database with, in the format of the
     /// database engine, e.g. Turkish_100_CI_AS for SQL Server, utf8mb4_turkish_ci for MySQL or UNICODE_CI
     /// for Firebird. For Postgres, it is a locale like tr_TR.UTF-8, or an ICU collation like tr-TR-x-icu.
-    /// It only applies when the database is created here: an existing database is not changed.</param>
+    /// It only applies when the database is created here: an existing database is not changed.
+    /// Defaults to the <see cref="IConnectionString.Collation"/> of the connection, and
+    /// an empty value can be passed to ignore that.</param>
     /// <exception cref="NotSupportedException">A collation is specified for a database type that
     /// can't be created with one, e.g. Sqlite or Oracle.</exception>
     /// <exception cref="ArgumentException">The collation has invalid characters.</exception>
@@ -335,7 +337,7 @@ public static class MigrationUtils
         bool isSqlite = serverType.StartsWith("Sqlite", StringComparison.OrdinalIgnoreCase);
         bool isFirebird = serverType.StartsWith("Firebird", StringComparison.OrdinalIgnoreCase);
 
-        collation = collation.TrimToNull();
+        collation = (collation ?? cs.Collation).TrimToNull();
         if (collation is not null)
         {
             if (!isSql && !isPostgres && !isMySql && !isFirebird)

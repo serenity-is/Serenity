@@ -136,7 +136,7 @@ public class NorthwindDB_20161126_1417_Data : Migration
                 """);
 
         var o = OrderRow.Fields;
-        var dateAdd = "dateadd(day, datediff(day, (select max(orderdate) from Orders), getdate()), ";
+        var dateAdd = "dateadd(day, datediff(day, (select max(OrderDate) from Orders), getdate()), ";
 
         IfDatabase("SqlServer")
             .Execute.Sql(

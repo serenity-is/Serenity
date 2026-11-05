@@ -7,7 +7,7 @@ namespace Serene.Migrations;
 public sealed partial class MigrationIntegrationTests : IDisposable
 {
     private async Task RunMigrationsAndServiceCall(string connectionString,
-        string northwindConnectionString, string providerName)
+        string northwindConnectionString, string providerName, string collation = null)
     {
         var configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string>()
@@ -16,6 +16,8 @@ public sealed partial class MigrationIntegrationTests : IDisposable
                 ["Data:Default:ProviderName"] = providerName,
                 ["Data:Northwind:ConnectionString"] = northwindConnectionString,
                 ["Data:Northwind:ProviderName"] = providerName,
+                ["Data:Default:Collation"] = collation,
+                ["Data:Northwind:Collation"] = collation,
             })
             .Build();
 
@@ -58,6 +60,10 @@ public sealed partial class MigrationIntegrationTests : IDisposable
                 var sqlConnections = services.GetRequiredService<ISqlConnections>();
 
                 using var defaultConnection = sqlConnections.NewFor<Administration.UserRow>();
+
+                if (!string.IsNullOrEmpty(collation))
+                    Assert.Equal(collation, defaultConnection.Query<string>(
+                        "SELECT CONVERT(nvarchar(128), DATABASEPROPERTYEX(DB_NAME(), 'Collation'))").Single());
 
                 var userListHandler = services.GetRequiredService<Administration.IUserListHandler>();
                 var users = (await userListHandler.ListAsync(defaultConnection, new()

@@ -28,8 +28,19 @@ public sealed partial class MigrationIntegrationTests : IDisposable
         var defaultConnectionString = WithSqlServerDatabase(serverConnection.ConnectionString, defaultDatabase);
         var northwindConnectionString = WithSqlServerDatabase(serverConnection.ConnectionString, northwindDatabase);
 
+        if (Environment.GetEnvironmentVariable("SQLINTEGRATIONTEST_SQLSERVER_CONTAINED") == "1")
+        {
+            var databaseCollation = Environment.GetEnvironmentVariable("SQLINTEGRATIONTEST_SQLSERVER_COLLATION");
+            serverConnection.Open();
+            foreach (var database in new[] { defaultDatabase, northwindDatabase })
+                SqlIntegrationConnections.ExecuteSql(serverConnection,
+                    $"CREATE DATABASE [{database}] CONTAINMENT = PARTIAL COLLATE {databaseCollation}");
+            serverConnection.Close();
+        }
+
         await RunMigrationsAndServiceCall(defaultConnectionString, northwindConnectionString,
-            "Microsoft.Data.SqlClient");
+            "Microsoft.Data.SqlClient",
+            Environment.GetEnvironmentVariable("SQLINTEGRATIONTEST_SQLSERVER_COLLATION"));
     }
 
     private static string WithSqlServerDatabase(string connectionString, string database)

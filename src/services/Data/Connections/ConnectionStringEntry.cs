@@ -32,6 +32,14 @@ public class ConnectionStringEntry
     public string? Comparer { get; set; }
 
     /// <summary>
+    /// Gets or sets the default collation to use if the database for this connection is created
+    /// by the application, in the format of the database engine, e.g. "Turkish_100_CI_AS" for
+    /// SQL Server. It has no effect on a database that already exists. Defaults to null,
+    /// meaning the database is created with the default collation of the server.
+    /// </summary>
+    public string? Collation { get; set; }
+
+    /// <summary>
     /// Gets or sets a semicolon-separated list of connection keys that fall back to this
     /// connection when they are not configured. For example, "ProFeatures;ProWorkLog".
     /// </summary>

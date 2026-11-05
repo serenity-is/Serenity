@@ -30,6 +30,30 @@ public class DefaultConnectionStringsTests
     }
 
     [Fact]
+    public void TryGetConnectionString_Returns_Collation_Of_Entry()
+    {
+        var entry = Entry();
+        entry.Collation = "Turkish_100_CI_AS";
+        var settings = Create(new()
+        {
+            [DefaultConnectionAttribute.Key] = entry
+        });
+
+        Assert.Equal("Turkish_100_CI_AS", settings.TryGetConnectionString(DefaultConnectionAttribute.Key)?.Collation);
+    }
+
+    [Fact]
+    public void TryGetConnectionString_Collation_Is_Null_By_Default()
+    {
+        var settings = Create(new()
+        {
+            [DefaultConnectionAttribute.Key] = Entry()
+        });
+
+        Assert.Null(settings.TryGetConnectionString(DefaultConnectionAttribute.Key)?.Collation);
+    }
+
+    [Fact]
     public void TryGetConnectionString_ReturnsInfoAndCaches()
     {
         var settings = Create(new()
