@@ -1,3 +1,4 @@
+using System.Data;
 using System.Globalization;
 
 namespace Serenity.Data.Mapping;
@@ -46,6 +47,7 @@ public abstract class ExpressionAttributeIntegrationTests_Base
     {
         DateTime dateTime => dateTime,
         DateTimeOffset offset => offset.UtcDateTime,
+        DateOnly date => date.ToDateTime(TimeOnly.MinValue),
         string text => DateTime.Parse(text, CultureInfo.InvariantCulture),
         _ => throw new InvalidOperationException($"Unexpected {value?.GetType().Name ?? "null"} for a date.")
     };
@@ -170,6 +172,96 @@ public abstract class ExpressionAttributeIntegrationTests_Base
         var value = Scalar(new ConcatAttribute("@a", "NULL", "@b"), ("@a", "x"), ("@b", "y"));
 
         Assert.Equal("xy", value);
+    }
+
+    [Fact]
+    public void Substring_ReturnsThePart()
+    {
+        if (SqlIntegrationConnections.ShouldSkip(Provider))
+            return;
+
+        var value = Scalar(new SubstringAttribute("@s", "@a", "@b"), ("@s", "Serenity"), ("@a", 3), ("@b", 4));
+
+        Assert.Equal("reni", value);
+    }
+
+    [Fact]
+    public void Replace_ReplacesAllOccurrences()
+    {
+        if (SqlIntegrationConnections.ShouldSkip(Provider))
+            return;
+
+        var value = Scalar(new ReplaceAttribute("@s", "@f", "@r"), ("@s", "a-b-c"), ("@f", "-"), ("@r", "+"));
+
+        Assert.Equal("a+b+c", value);
+    }
+
+    [Theory]
+    [InlineData(true, true, "ab")]
+    [InlineData(true, false, "ab  ")]
+    [InlineData(false, true, "  ab")]
+    public void Trim_RemovesTheSpaces(bool leading, bool trailing, string expected)
+    {
+        if (SqlIntegrationConnections.ShouldSkip(Provider))
+            return;
+
+        var value = Scalar(new TrimAttribute("@s") { Leading = leading, Trailing = trailing }, ("@s", "  ab  "));
+
+        Assert.Equal(expected, value);
+    }
+
+    [Fact]
+    public void TrimLeft_And_TrimRight_RemoveTheSpacesOnTheirSide()
+    {
+        if (SqlIntegrationConnections.ShouldSkip(Provider))
+            return;
+
+        Assert.Equal("ab  ", Scalar(new TrimLeftAttribute("@s"), ("@s", "  ab  ")));
+        Assert.Equal("  ab", Scalar(new TrimRightAttribute("@s"), ("@s", "  ab  ")));
+    }
+
+    [Fact]
+    public void Cast_ConvertsToIntegers()
+    {
+        if (SqlIntegrationConnections.ShouldSkip(Provider))
+            return;
+
+        Assert.Equal(42, Convert.ToInt64(Scalar(new CastAttribute("@s", DbType.Int32), ("@s", "42")), CultureInfo.InvariantCulture));
+        Assert.Equal(9876543210, Convert.ToInt64(Scalar(new CastAttribute("@s", DbType.Int64), ("@s", "9876543210")), CultureInfo.InvariantCulture));
+    }
+
+    [Fact]
+    public void Cast_ToDecimal_AvoidsIntegerDivision()
+    {
+        if (SqlIntegrationConnections.ShouldSkip(Provider))
+            return;
+
+        var expression = new ExpressionAttribute(new CastAttribute("@n", DbType.Decimal) { Precision = 10, Scale = 2 }
+            .ToString(Dialect) + " / 4");
+
+        Assert.Equal(1.75m, Math.Round(Convert.ToDecimal(Scalar(expression, ("@n", 7)), CultureInfo.InvariantCulture), 2));
+    }
+
+    [Fact]
+    public void Cast_ConvertsToString()
+    {
+        if (SqlIntegrationConnections.ShouldSkip(Provider))
+            return;
+
+        var value = Scalar(new CastAttribute("@n", DbType.String) { Size = 10 }, ("@n", 42));
+
+        Assert.Equal("42", value);
+    }
+
+    [Fact]
+    public void Cast_ToDate_DropsTheTime()
+    {
+        if (SqlIntegrationConnections.ShouldSkip(Provider))
+            return;
+
+        var value = Scalar(new CastAttribute("@d", DbType.Date), ("@d", Date("2026-03-15 10:30:45")));
+
+        Assert.Equal(Date("2026-03-15 00:00:00"), ToDateTime(value));
     }
 
     [Fact]

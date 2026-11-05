@@ -123,4 +123,15 @@ public abstract class BaseExpressionAttribute : Attribute
         return expression.Length > 1 && expression[0] == '@' &&
             expression.Skip(1).All(c => c == '_' || char.IsLetterOrDigit(c));
     }
+
+    /// <summary>
+    /// Casts the expression to a string type when it is a single parameter, as Firebird can't determine its type in
+    /// string functions.
+    /// </summary>
+    /// <param name="expression">The expression.</param>
+    /// <returns>The expression, with a CAST if it is a parameter.</returns>
+    internal static string CastParameterForFirebird(string expression)
+    {
+        return IsParameter(expression) ? "CAST(" + expression + " AS VARCHAR(8191))" : expression;
+    }
 }
