@@ -7,7 +7,9 @@ namespace Serene.Migrations;
 public sealed partial class MigrationIntegrationTests : IDisposable
 {
     private async Task RunMigrationsAndServiceCall(string connectionString,
-        string northwindConnectionString, string providerName, string collation = null)
+        string northwindConnectionString, string providerName, string collation = null, string comparer = null,
+        bool partialContainment = false, string expectedCollation = null,
+        Action<System.Data.IDbConnection> verifyDatabase = null, bool checkDefaultOnly = false)
     {
         var configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string>()
@@ -17,6 +19,10 @@ public sealed partial class MigrationIntegrationTests : IDisposable
                 ["Data:Northwind:ConnectionString"] = northwindConnectionString,
                 ["Data:Northwind:ProviderName"] = providerName,
                 ["Data:Default:Collation"] = collation,
+                ["Data:Default:Comparer"] = comparer,
+                ["Data:Default:PartialContainment"] = partialContainment ? "true" : null,
+                ["Data:Northwind:Comparer"] = comparer,
+                ["Data:Northwind:PartialContainment"] = partialContainment ? "true" : null,
                 ["Data:Northwind:Collation"] = collation,
             })
             .Build();
@@ -49,7 +55,24 @@ public sealed partial class MigrationIntegrationTests : IDisposable
         try
         {
             var dataMigrations = services.GetRequiredService<IDataMigrations>();
-            dataMigrations.Initialize();
+            try
+            {
+                dataMigrations.Initialize();
+            }
+            catch (InvalidOperationException) when (checkDefaultOnly)
+            {
+                // only the Default database is checked, which is migrated first
+            }
+
+            if (checkDefaultOnly)
+            {
+                using var connection = services.GetRequiredService<ISqlConnections>().NewFor<Administration.UserRow>();
+                var retriever = services.GetRequiredService<IUserRetrieveService>();
+                Assert.Equal("admin", retriever.ByUsername("ADMIN")?.Username);
+                VerifyBackfillMatchesCode(connection);
+                VerifyColumnCollations(connection);
+                return;
+            }
 
             var cancellationToken = TestContext.Current.CancellationToken;
             var userProvider = services.GetRequiredService<IUserProvider>();
@@ -61,8 +84,10 @@ public sealed partial class MigrationIntegrationTests : IDisposable
 
                 using var defaultConnection = sqlConnections.NewFor<Administration.UserRow>();
 
-                if (!string.IsNullOrEmpty(collation))
-                    Assert.Equal(collation, defaultConnection.Query<string>(
+                verifyDatabase?.Invoke(defaultConnection);
+
+                if (providerName == "Microsoft.Data.SqlClient" && !string.IsNullOrEmpty(expectedCollation ?? collation))
+                    Assert.Equal(expectedCollation ?? collation, defaultConnection.Query<string>(
                         "SELECT CONVERT(nvarchar(128), DATABASEPROPERTYEX(DB_NAME(), 'Collation'))").Single());
 
                 var userListHandler = services.GetRequiredService<Administration.IUserListHandler>();
@@ -77,6 +102,9 @@ public sealed partial class MigrationIntegrationTests : IDisposable
                 var userRetriever = services.GetRequiredService<IUserRetrieveService>();
                 Assert.Equal(adminUsername, userRetriever.ByUsername("ADMIN")?.Username);
                 Assert.Equal(adminUsername, userRetriever.ByUsername("Admin")?.Username);
+
+                VerifyBackfillMatchesCode(defaultConnection);
+                VerifyColumnCollations(defaultConnection);
 
                 // the migration filled in the normalized email too
                 Assert.True(defaultConnection.Exists<Administration.UserRow>(

@@ -207,9 +207,12 @@ public class MigrationUtilsTests
     }
 
     private class FakeConnectionString(ISqlDialect dialect, string connectionString = "Data Source=:memory:",
-        string providerName = "Microsoft.Data.Sqlite", string? collation = null) : IConnectionString
+        string providerName = "Microsoft.Data.Sqlite", string? collation = null, string? comparer = null,
+        bool partialContainment = false) : IConnectionString
     {
         public string? Collation { get; } = collation;
+        public string? Comparer { get; } = comparer;
+        public bool PartialContainment { get; } = partialContainment;
         public ISqlDialect Dialect { get; } = dialect;
         public string ConnectionKey => DefaultConnectionAttribute.Key;
         public string ConnectionString { get; } = connectionString;
@@ -367,6 +370,143 @@ public class MigrationUtilsTests
     public void EnsureDatabase_Empty_Collation_Argument_Ignores_Connection()
     {
         Assert.Equal("CREATE DATABASE [mydb]", CreateDatabaseCommandWithConnectionCollation(""));
+    }
+
+    private static string? AutoMapCommand(string keyword, string? comparer, params string[] serverCollations)
+    {
+        EnsureSqlServerProviderRegistered();
+        string? command = null;
+        using var connection = new MockDbConnection()
+            .OnDbCommandExecuteReader(cmd => cmd.CommandText.Contains("fn_helpcollations", StringComparison.Ordinal)
+                && serverCollations.Length > 0
+                ? new MockDbDataReader([.. serverCollations.Select(name => new { name })])
+                : new MockDbDataReader())
+            .OnDbCommandExecuteNonQuery(cmd =>
+            {
+                command = cmd.CommandText;
+                return 1;
+            });
+
+        MigrationUtils.EnsureDatabase(DefaultConnectionAttribute.Key, null!, new FakeSqlConnections(
+            new FakeConnectionString(SqlServer2012Dialect.Instance, "Server=.;Database=mydb;Trusted_Connection=True;",
+                "Microsoft.Data.SqlClient", keyword, comparer), connection));
+
+        return command;
+    }
+
+    [Fact]
+    public void EnsureDatabase_AutoMap_Uses_Comparer_Of_Connection()
+    {
+        Assert.Equal("CREATE DATABASE [mydb] COLLATE Turkish_100_CI_AS",
+            AutoMapCommand("automap", "tr-TR:IgnoreCase", "Turkish_100_CI_AS"));
+    }
+
+    [Fact]
+    public void EnsureDatabase_AutoMap_Throws_When_Collation_Is_Not_On_Server()
+    {
+        Assert.Throws<NotSupportedException>(() => AutoMapCommand("automap", "tr-TR:IgnoreCase", "Latin1_General_100_CI_AS"));
+    }
+
+    [Fact]
+    public void EnsureDatabase_TryAutoMap_Creates_Without_Collation_When_Not_On_Server()
+    {
+        Assert.Equal("CREATE DATABASE [mydb]", AutoMapCommand("tryautomap", "tr-TR:IgnoreCase", "Latin1_General_100_CI_AS"));
+    }
+
+    [Fact]
+    public void EnsureDatabase_AutoMap_Throws_Without_Fixed_Comparer()
+    {
+        Assert.Throws<NotSupportedException>(() => AutoMapCommand("automap", null));
+        Assert.Equal("CREATE DATABASE [mydb]", AutoMapCommand("tryautomap", null));
+    }
+
+    [Fact]
+    public void EnsureDatabase_AutoMap_Does_Not_Fail_When_Database_Exists()
+    {
+        EnsureSqlServerProviderRegistered();
+        using var connection = new MockDbConnection()
+            .OnDbCommandExecuteReader(_ => new MockDbDataReader(new { name = "mydb" }));
+
+        MigrationUtils.EnsureDatabase(DefaultConnectionAttribute.Key, null!, new FakeSqlConnections(
+            new FakeConnectionString(SqlServer2012Dialect.Instance, "Server=.;Database=mydb;Trusted_Connection=True;",
+                "Microsoft.Data.SqlClient", "automap"), connection));
+    }
+
+    [Fact]
+    public void EnsureDatabase_TryAutoMap_Does_Nothing_On_Sqlite()
+    {
+        var connections = new FakeSqlConnections(new FakeConnectionString(SqliteDialect.Instance,
+            collation: "tryautomap", comparer: "OrdinalIgnoreCase"));
+
+        MigrationUtils.EnsureDatabase(DefaultConnectionAttribute.Key, null!, connections);
+    }
+
+    [Fact]
+    public void EnsureDatabase_AutoMap_Throws_On_Sqlite()
+    {
+        var connections = new FakeSqlConnections(new FakeConnectionString(SqliteDialect.Instance,
+            collation: "automap", comparer: "OrdinalIgnoreCase"));
+
+        Assert.Throws<NotSupportedException>(() =>
+            MigrationUtils.EnsureDatabase(DefaultConnectionAttribute.Key, null!, connections));
+    }
+
+    private static string PartialContainmentCommand(bool? argument, bool connectionSetting, string? collation = null)
+    {
+        EnsureSqlServerProviderRegistered();
+        string? command = null;
+        using var connection = new MockDbConnection()
+            .OnDbCommandExecuteReader(_ => new MockDbDataReader())
+            .OnDbCommandExecuteNonQuery(cmd =>
+            {
+                command = cmd.CommandText;
+                return 1;
+            });
+
+        MigrationUtils.EnsureDatabase(DefaultConnectionAttribute.Key, null!, new FakeSqlConnections(
+            new FakeConnectionString(SqlServer2012Dialect.Instance, "Server=.;Database=mydb;Trusted_Connection=True;",
+                "Microsoft.Data.SqlClient", partialContainment: connectionSetting), connection),
+            collation, argument);
+
+        return command.AssertNotNull();
+    }
+
+    [Fact]
+    public void EnsureDatabase_PartialContainment_Is_Off_By_Default()
+    {
+        Assert.Equal("CREATE DATABASE [mydb]", PartialContainmentCommand(null, false));
+    }
+
+    [Fact]
+    public void EnsureDatabase_Uses_PartialContainment_Of_Connection()
+    {
+        Assert.Equal("CREATE DATABASE [mydb] CONTAINMENT = PARTIAL", PartialContainmentCommand(null, true));
+    }
+
+    [Fact]
+    public void EnsureDatabase_PartialContainment_Argument_Overrides_Connection()
+    {
+        Assert.Equal("CREATE DATABASE [mydb]", PartialContainmentCommand(false, true));
+        Assert.Equal("CREATE DATABASE [mydb] CONTAINMENT = PARTIAL", PartialContainmentCommand(true, false));
+    }
+
+    [Fact]
+    public void EnsureDatabase_PartialContainment_Comes_Before_Collate()
+    {
+        Assert.Equal("CREATE DATABASE [mydb] CONTAINMENT = PARTIAL COLLATE Latin1_General_100_BIN2",
+            PartialContainmentCommand(true, false, "Latin1_General_100_BIN2"));
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void EnsureDatabase_PartialContainment_Throws_For_Others_Than_SqlServer(bool fromConnection)
+    {
+        var connections = new FakeSqlConnections(new FakeConnectionString(PostgresDialect.Instance,
+            partialContainment: fromConnection));
+
+        Assert.Throws<NotSupportedException>(() => MigrationUtils.EnsureDatabase(DefaultConnectionAttribute.Key,
+            null!, connections, partialContainment: fromConnection ? null : true));
     }
 
     [Fact]

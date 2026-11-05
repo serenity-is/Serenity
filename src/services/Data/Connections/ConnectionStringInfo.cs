@@ -47,4 +47,15 @@ public class ConnectionStringInfo(string connectionKey, string? connectionString
     /// is created by the application, or null to use the default of the server.
     /// </summary>
     public string? Collation { get; init; }
+
+    /// <summary>
+    /// Gets the comparer specification of this connection, if any.
+    /// </summary>
+    public string? Comparer { get; init; }
+
+    /// <summary>
+    /// Gets a value indicating whether a SQL Server database for this connection
+    /// is created as a partially contained database, if it is created by the application.
+    /// </summary>
+    public bool PartialContainment { get; init; }
 }

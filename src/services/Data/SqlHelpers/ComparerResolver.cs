@@ -2,7 +2,8 @@ namespace Serenity.Data;
 
 /// <summary>
 /// Parses comparer specifications like "Ordinal", "OrdinalIgnoreCase", "CurrentCulture",
-/// "CurrentCultureIgnoreCase", "tr-TR" or "tr-TR:IgnoreCase" into a <see cref="StringComparer"/>.
+/// "CurrentCultureIgnoreCase", "tr-TR", "tr-TR:IgnoreCase" or "tr-TR:IgnoreCase:IgnoreAccents"
+/// into a <see cref="StringComparer"/>.
 /// </summary>
 public static class ComparerResolver
 {
@@ -23,23 +24,25 @@ public static class ComparerResolver
             Enum.IsDefined(comparison))
             return StringComparer.FromComparison(comparison);
 
-        var parts = value.Split(':', 2);
-        var cultureName = parts[0].Trim();
-        var ignoreCase = false;
+        var parts = value.Split(':', StringSplitOptions.TrimEntries);
+        var cultureName = parts[0];
+        var options = CompareOptions.None;
 
-        if (parts.Length > 1)
+        foreach (var option in parts.Skip(1))
         {
-            if (!parts[1].Trim().Equals("IgnoreCase", StringComparison.OrdinalIgnoreCase))
+            if (option.Equals("IgnoreCase", StringComparison.OrdinalIgnoreCase))
+                options |= CompareOptions.IgnoreCase;
+            else if (option.Equals("IgnoreAccents", StringComparison.OrdinalIgnoreCase))
+                options |= CompareOptions.IgnoreNonSpace;
+            else
                 throw new ArgumentException(
                     $"Invalid comparer specification '{value}'. Expected a StringComparison name " +
-                    "or 'culture' / 'culture:IgnoreCase'.", nameof(value));
-
-            ignoreCase = true;
+                    "or 'culture' / 'culture:IgnoreCase' / 'culture:IgnoreCase:IgnoreAccents'.", nameof(value));
         }
 
         try
         {
-            return StringComparer.Create(CultureInfo.GetCultureInfo(cultureName), ignoreCase);
+            return StringComparer.Create(CultureInfo.GetCultureInfo(cultureName), options);
         }
         catch (CultureNotFoundException)
         {

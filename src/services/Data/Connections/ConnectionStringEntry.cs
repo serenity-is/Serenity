@@ -37,7 +37,24 @@ public class ConnectionStringEntry
     /// SQL Server. It has no effect on a database that already exists. Defaults to null,
     /// meaning the database is created with the default collation of the server.
     /// </summary>
+    /// <remarks>
+    /// It can also be one of the <see cref="SqlCollationMapper"/> keywords, to map <see cref="Comparer"/>
+    /// to a collation of the database engine. "automap" throws and "tryautomap" uses no collation if there
+    /// is no match. Their "automaptolerant" and "tryautomaptolerant" versions also accept
+    /// a collation that only differs in case or accent sensitivity.
+    /// </remarks>
     public string? Collation { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether a SQL Server database for this connection is created as a
+    /// partially contained database, if it is created by the application. Table and column names of such
+    /// a database are compared by a fixed case insensitive collation, whatever <see cref="Collation"/> is.
+    /// </summary>
+    /// <remarks>
+    /// The "contained database authentication" setting of the server must already be enabled, and
+    /// such a database can't use replication, change data capture or change tracking.
+    /// </remarks>
+    public bool PartialContainment { get; set; }
 
     /// <summary>
     /// Gets or sets a semicolon-separated list of connection keys that fall back to this

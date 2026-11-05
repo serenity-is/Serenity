@@ -42,4 +42,15 @@ public interface IConnectionString
     /// is created by the application, or null to use the default of the server.
     /// </summary>
     string? Collation => null;
+
+    /// <summary>
+    /// Gets the comparer specification of this connection, if any.
+    /// </summary>
+    string? Comparer => null;
+
+    /// <summary>
+    /// Gets a value indicating whether a SQL Server database for this connection
+    /// is created as a partially contained database, if it is created by the application.
+    /// </summary>
+    bool PartialContainment => false;
 }

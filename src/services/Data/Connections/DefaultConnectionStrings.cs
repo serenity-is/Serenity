@@ -82,7 +82,9 @@ public class DefaultConnectionStrings(IOptions<ConnectionStringOptions> options,
         info = new ConnectionStringInfo(resolvedKey, entry.ConnectionString, entry.ProviderName,
             DetermineDialect(resolvedKey, entry))
         {
-            Collation = entry.Collation
+            Collation = entry.Collation,
+            Comparer = entry.Comparer,
+            PartialContainment = entry.PartialContainment
         };
 
         return byKey.GetOrAdd(resolvedKey, info);

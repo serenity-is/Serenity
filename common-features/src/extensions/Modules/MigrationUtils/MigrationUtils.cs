@@ -311,6 +311,64 @@ public static class MigrationUtils
     }
 
     /// <summary>
+    /// Gets the column collation for the specified comparison on the database the migration is running
+    /// against, in the form to pass to <c>AsString</c>.
+    /// </summary>
+    /// <param name="migration">The migration reference.</param>
+    /// <param name="comparer">The comparer specification, e.g. "OrdinalIgnoreCase" or "tr-TR:IgnoreCase".</param>
+    /// <param name="tolerant">True to allow a collation that only differs in case or accent sensitivity.</param>
+    /// <param name="exists">Optional check for whether a collation exists, e.g. the Contains method of a set of
+    /// names read from the server. It is called with unquoted names, and the first candidate it accepts is used.
+    /// If not specified, the first candidate is used without checking the server.</param>
+    /// <returns>The collation.</returns>
+    /// <exception cref="NotSupportedException">There is no such collation.</exception>
+    /// <exception cref="ArgumentException">The comparer can't be mapped to a collation.</exception>
+    public static string MapCollation(this MigrationBase migration, string comparer, bool tolerant = false,
+        Func<string, bool>? exists = null)
+    {
+        var dialect = migration.GetDialect();
+        return QuoteCollation(dialect, SqlCollationMapper.Map(dialect.ServerType,
+            ParseCollationSpec(comparer), SqlCollationTarget.Column, tolerant, exists));
+    }
+
+    /// <summary>
+    /// Tries to get the column collation for the specified comparison on the database the migration is running
+    /// against, in the form to pass to <c>AsString</c>.
+    /// </summary>
+    /// <param name="migration">The migration reference.</param>
+    /// <param name="comparer">The comparer specification, e.g. "OrdinalIgnoreCase" or "tr-TR:IgnoreCase".</param>
+    /// <param name="tolerant">True to allow a collation that only differs in case or accent sensitivity.</param>
+    /// <param name="exists">Optional check for whether a collation exists, e.g. the Contains method of a set of
+    /// names read from the server. It is called with unquoted names, and the first candidate it accepts is used.
+    /// If not specified, the first candidate is used without checking the server.</param>
+    /// <returns>The collation, or null if there is no such collation, which uses the default of the database.</returns>
+    /// <exception cref="ArgumentException">The comparer can't be mapped to a collation.</exception>
+    public static string? TryMapCollation(this MigrationBase migration, string comparer, bool tolerant = false,
+        Func<string, bool>? exists = null)
+    {
+        var dialect = migration.GetDialect();
+        var collation = SqlCollationMapper.TryMap(dialect.ServerType,
+            ParseCollationSpec(comparer), SqlCollationTarget.Column, tolerant, exists);
+        return collation is null ? null : QuoteCollation(dialect, collation);
+    }
+
+    private static SqlCollationSpec ParseCollationSpec(string comparer)
+    {
+        return SqlCollationSpec.TryParse(comparer, out var spec) ? spec : throw new ArgumentException(
+            $"Comparer '{comparer}' can't be mapped to a collation. Expected Ordinal, Invariant or a specific culture.",
+            nameof(comparer));
+    }
+
+    /// <summary>
+    /// FluentMigrator writes the collation as is, and the names on Postgres require quoting.
+    /// </summary>
+    private static string QuoteCollation(ISqlDialect dialect, string collation)
+    {
+        return dialect.ServerType.StartsWith("Postgres", StringComparison.OrdinalIgnoreCase)
+            ? dialect.QuoteIdentifier(collation) : collation;
+    }
+
+    /// <summary>
     /// Ensures the database for the specified connection key exists, creating it if necessary.
     /// </summary>
     /// <param name="databaseKey">The connection key.</param>
@@ -321,12 +379,17 @@ public static class MigrationUtils
     /// for Firebird. For Postgres, it is a locale like tr_TR.UTF-8, or an ICU collation like tr-TR-x-icu.
     /// It only applies when the database is created here: an existing database is not changed.
     /// Defaults to the <see cref="IConnectionString.Collation"/> of the connection, and
-    /// an empty value can be passed to ignore that.</param>
+    /// an empty value can be passed to ignore that. It can also be one of the
+    /// <see cref="SqlCollationMapper"/> keywords, which map the comparer of the connection.</param>
+    /// <param name="partialContainment">True to create a SQL Server database as partially contained. This
+    /// requires the "contained database authentication" setting of the server to be already enabled.
+    /// Defaults to the <see cref="IConnectionString.PartialContainment"/> of the connection.</param>
     /// <exception cref="NotSupportedException">A collation is specified for a database type that
-    /// can't be created with one, e.g. Sqlite or Oracle.</exception>
+    /// can't be created with one, e.g. Sqlite or Oracle, an automap keyword can't map the comparer,
+    /// or partial containment is requested for a database type other than SQL Server.</exception>
     /// <exception cref="ArgumentException">The collation has invalid characters.</exception>
     public static void EnsureDatabase(string databaseKey, string contentRoot, ISqlConnections sqlConnections,
-        string? collation = null)
+        string? collation = null, bool? partialContainment = null)
     {
         var cs = sqlConnections.TryGetConnectionString(databaseKey)
             ?? throw new ArgumentNullException(nameof(databaseKey));
@@ -337,8 +400,23 @@ public static class MigrationUtils
         bool isSqlite = serverType.StartsWith("Sqlite", StringComparison.OrdinalIgnoreCase);
         bool isFirebird = serverType.StartsWith("Firebird", StringComparison.OrdinalIgnoreCase);
 
+        var containment = "";
+        if (partialContainment ?? cs.PartialContainment)
+        {
+            if (!isSql)
+                throw new NotSupportedException($"Partial containment is not supported for {serverType}!");
+
+            containment = " CONTAINMENT = PARTIAL";
+        }
+
         collation = (collation ?? cs.Collation).TrimToNull();
-        if (collation is not null)
+
+        // collations are only checked against the server for these, where one is connected to
+        var autoMap = SqlCollationMapper.IsAutoMap(collation) && (isSql || isPostgres || isMySql);
+        if (!autoMap && SqlCollationMapper.IsAutoMap(collation))
+            collation = SqlCollationMapper.ResolveAutoMap(collation!, cs.Comparer, serverType, SqlCollationTarget.Database);
+
+        if (collation is not null && !autoMap)
         {
             if (!isSql && !isPostgres && !isMySql && !isFirebird)
                 throw new NotSupportedException($"Creating a database with a collation is not supported for {serverType}!");
@@ -412,21 +490,31 @@ public static class MigrationUtils
         serverConnection.Open();
 
         string databasesQuery = "SELECT * FROM sys.databases WHERE NAME = @name";
-        string createDatabaseQuery = @"CREATE DATABASE [{0}]";
+        string collationsQuery = "SELECT name FROM sys.fn_helpcollations()";
+        string createDatabaseQuery = @"CREATE DATABASE [{0}]" + containment;
 
         if (isPostgres)
         {
             databasesQuery = "select datname from postgres.pg_catalog.pg_database where datname = @name";
+            collationsQuery = "SELECT collname FROM pg_catalog.pg_collation";
             createDatabaseQuery = "CREATE DATABASE \"{0}\"";
         }
         else if (isMySql)
         {
             databasesQuery = "SELECT * FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = @name";
+            collationsQuery = "SELECT COLLATION_NAME FROM INFORMATION_SCHEMA.COLLATIONS";
             createDatabaseQuery = "CREATE DATABASE `{0}`";
         }
 
         if (serverConnection.Query(databasesQuery, new { name = catalog }).Any())
             return;
+
+        if (autoMap)
+        {
+            var collations = serverConnection.Query<string>(collationsQuery).ToHashSet(StringComparer.OrdinalIgnoreCase);
+            collation = SqlCollationMapper.ResolveAutoMap(collation!, cs.Comparer, serverType,
+                SqlCollationTarget.Database, collations.Contains);
+        }
 
         var isLocalDb = isSql && serverConnection.ConnectionString.Contains(@"(localdb)\", StringComparison.OrdinalIgnoreCase);
 
@@ -438,11 +526,11 @@ public static class MigrationUtils
                 var filename = Path.Combine(Path.Combine(contentRoot, "App_Data"), catalog!);
                 Directory.CreateDirectory(Path.GetDirectoryName(filename)!);
 
-                command = string.Format(CultureInfo.InvariantCulture, @"CREATE DATABASE [{0}] ON PRIMARY (Name = N'{0}', FILENAME = '{1}.mdf') " +
+                // an attached database keeps its options, COLLATE and CONTAINMENT can't be used with FOR ATTACH
+                command = string.Format(CultureInfo.InvariantCulture, @"CREATE DATABASE [{0}]{2} ON PRIMARY (Name = N'{0}', FILENAME = '{1}.mdf') " +
                     "LOG ON (NAME = N'{0}_log', FILENAME = '{1}.ldf')",
-                    catalog, filename);
+                    catalog, filename, File.Exists(filename + ".mdf") ? "" : containment);
 
-                // an attached database keeps its collation, COLLATE can't be used with FOR ATTACH
                 if (File.Exists(filename + ".mdf"))
                     command += " FOR ATTACH";
                 else if (collation is not null)
