@@ -3,6 +3,7 @@ using FluentMigrator.Builders;
 using FluentMigrator.Builders.Alter.Table;
 using FluentMigrator.Builders.Create.Table;
 using System.IO;
+using System.Reflection;
 
 namespace Serenity.Extensions;
 
@@ -315,7 +316,15 @@ public static class MigrationUtils
     /// <param name="databaseKey">The connection key.</param>
     /// <param name="contentRoot">The content root path, used for local databases and Sqlite files.</param>
     /// <param name="sqlConnections">The SQL connections.</param>
-    public static void EnsureDatabase(string databaseKey, string contentRoot, ISqlConnections sqlConnections)
+    /// <param name="collation">The default collation to create the database with, in the format of the
+    /// database engine, e.g. Turkish_100_CI_AS for SQL Server, utf8mb4_turkish_ci for MySQL or UNICODE_CI
+    /// for Firebird. For Postgres, it is a locale like tr_TR.UTF-8, or an ICU collation like tr-TR-x-icu.
+    /// It only applies when the database is created here: an existing database is not changed.</param>
+    /// <exception cref="NotSupportedException">A collation is specified for a database type that
+    /// can't be created with one, e.g. Sqlite or Oracle.</exception>
+    /// <exception cref="ArgumentException">The collation has invalid characters.</exception>
+    public static void EnsureDatabase(string databaseKey, string contentRoot, ISqlConnections sqlConnections,
+        string? collation = null)
     {
         var cs = sqlConnections.TryGetConnectionString(databaseKey)
             ?? throw new ArgumentNullException(nameof(databaseKey));
@@ -325,6 +334,16 @@ public static class MigrationUtils
         bool isMySql = serverType.StartsWith("MySql", StringComparison.OrdinalIgnoreCase);
         bool isSqlite = serverType.StartsWith("Sqlite", StringComparison.OrdinalIgnoreCase);
         bool isFirebird = serverType.StartsWith("Firebird", StringComparison.OrdinalIgnoreCase);
+
+        collation = collation.TrimToNull();
+        if (collation is not null)
+        {
+            if (!isSql && !isPostgres && !isMySql && !isFirebird)
+                throw new NotSupportedException($"Creating a database with a collation is not supported for {serverType}!");
+
+            if (!isPostgres && !collation.All(c => char.IsAsciiLetterOrDigit(c) || c == '_'))
+                throw new ArgumentException($"Collation name '{collation}' has invalid characters!", nameof(collation));
+        }
 
         if (isSqlite)
         {
@@ -359,6 +378,14 @@ public static class MigrationUtils
                 .GetMethod("CreateDatabase", [typeof(string), typeof(int), typeof(bool), typeof(bool)]);
 
             method?.Invoke(null, [fbConnection.ConnectionString, 4096, true, false]);
+
+            if (collation is not null && method is not null)
+            {
+                // the client API has no collation option for creating a database,
+                // so the default collation of the database character set is changed instead
+                var charset = cb.TryGetValue("Charset", out var charsetValue) ? charsetValue as string : null;
+                fbConnection.Execute($"ALTER CHARACTER SET {charset.TrimToNull() ?? "UTF8"} SET DEFAULT COLLATION {collation}");
+            }
 
             return;
         }
@@ -413,8 +440,11 @@ public static class MigrationUtils
                     "LOG ON (NAME = N'{0}_log', FILENAME = '{1}.ldf')",
                     catalog, filename);
 
+                // an attached database keeps its collation, COLLATE can't be used with FOR ATTACH
                 if (File.Exists(filename + ".mdf"))
                     command += " FOR ATTACH";
+                else if (collation is not null)
+                    command += " COLLATE " + collation;
 
                 serverConnection.Execute(command);
                 return;
@@ -426,7 +456,46 @@ public static class MigrationUtils
         }
 
         command = string.Format(CultureInfo.InvariantCulture, createDatabaseQuery, catalog);
+        if (collation is not null)
+            command += isPostgres ? " " + GetPostgresLocaleOptions(collation, cs.Dialect) : " COLLATE " + collation;
+
         serverConnection.Execute(command);
+    }
+
+    /// <summary>
+    /// Gets the options for creating a Postgres database with the specified collation. template0 is
+    /// required, as a locale that differs from the one of the template database is not allowed otherwise.
+    /// </summary>
+    private static string GetPostgresLocaleOptions(string collation, ISqlDialect dialect)
+    {
+        const string icuSuffix = "-x-icu";
+
+        return collation.EndsWith(icuSuffix, StringComparison.OrdinalIgnoreCase)
+            ? "TEMPLATE template0 LOCALE_PROVIDER icu ICU_LOCALE " + dialect.QuoteUnicodeString(collation[..^icuSuffix.Length])
+            : "TEMPLATE template0 LOCALE " + dialect.QuoteUnicodeString(collation);
+    }
+
+    /// <summary>
+    /// Clears the connection pools of the database provider for the specified connection key, so that
+    /// connections opened before the database was created are not reused. Does nothing if the
+    /// provider is not registered, or its connection type has no static ClearAllPools method.
+    /// </summary>
+    /// <param name="databaseKey">The connection key.</param>
+    /// <param name="sqlConnections">The SQL connections.</param>
+    public static void ClearAllPools(string databaseKey, ISqlConnections sqlConnections)
+    {
+        ArgumentNullException.ThrowIfNull(sqlConnections);
+
+        var cs = sqlConnections.TryGetConnectionString(databaseKey)
+            ?? throw new ArgumentNullException(nameof(databaseKey));
+
+        if (string.IsNullOrEmpty(cs.ProviderName) ||
+            !DbProviderFactories.TryGetFactory(cs.ProviderName, out var factory))
+            return;
+
+        using var connection = factory.CreateConnection();
+        connection?.GetType().GetMethod("ClearAllPools", BindingFlags.Public | BindingFlags.Static, Type.EmptyTypes)
+            ?.Invoke(null, null);
     }
 
     /// <summary>

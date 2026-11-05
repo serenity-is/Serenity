@@ -255,6 +255,202 @@ public class MigrationUtilsTests
         }
     }
 
+    private class CountingConnection : MockDbConnection
+    {
+        public static int ClearCount;
+
+        public static void ClearAllPools() => ClearCount++;
+    }
+
+    private class CountingFactory : System.Data.Common.DbProviderFactory
+    {
+        public static readonly CountingFactory Instance = new();
+
+        public override System.Data.Common.DbConnection CreateConnection() => new CountingConnection();
+    }
+
+    private class NoClearFactory : System.Data.Common.DbProviderFactory
+    {
+        public static readonly NoClearFactory Instance = new();
+
+        public override System.Data.Common.DbConnection CreateConnection() => new MockDbConnection();
+    }
+
+    private static void EnsureProviderRegistered(string providerName, System.Data.Common.DbProviderFactory factory)
+    {
+        System.Data.Common.DbProviderFactories.RegisterFactory(providerName, factory);
+    }
+
+    private static string CreateDatabaseCommand(ISqlDialect dialect, string connectionString, string providerName,
+        string? collation)
+    {
+        string? command = null;
+        using var connection = new MockDbConnection()
+            .OnDbCommandExecuteReader(_ => new MockDbDataReader())
+            .OnDbCommandExecuteNonQuery(cmd =>
+            {
+                command = cmd.CommandText;
+                return 1;
+            });
+
+        MigrationUtils.EnsureDatabase(DefaultConnectionAttribute.Key, null!, new FakeSqlConnections(
+            new FakeConnectionString(dialect, connectionString, providerName), connection), collation);
+
+        return command.AssertNotNull();
+    }
+
+    private static string CreateSqlServerDatabaseCommand(string? collation)
+    {
+        EnsureSqlServerProviderRegistered();
+        return CreateDatabaseCommand(SqlServer2012Dialect.Instance,
+            "Server=.;Database=mydb;Trusted_Connection=True;", "Microsoft.Data.SqlClient", collation);
+    }
+
+    private static string CreatePostgresDatabaseCommand(string? collation)
+    {
+        EnsureProviderRegistered("Npgsql", Npgsql.NpgsqlFactory.Instance);
+        return CreateDatabaseCommand(PostgresDialect.Instance,
+            "Host=localhost;Database=mydb;Username=x", "Npgsql", collation);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("  ")]
+    public void EnsureDatabase_Uses_No_Collation_When_Empty(string? collation)
+    {
+        Assert.Equal("CREATE DATABASE [mydb]", CreateSqlServerDatabaseCommand(collation));
+    }
+
+    [Fact]
+    public void EnsureDatabase_Creates_SqlServer_Database_With_Collation()
+    {
+        Assert.Equal("CREATE DATABASE [mydb] COLLATE Turkish_100_CI_AS",
+            CreateSqlServerDatabaseCommand("Turkish_100_CI_AS"));
+    }
+
+    [Fact]
+    public void EnsureDatabase_Creates_MySql_Database_With_Collation()
+    {
+        EnsureProviderRegistered("MySqlConnector", MySqlConnector.MySqlConnectorFactory.Instance);
+        Assert.Equal("CREATE DATABASE `mydb` COLLATE utf8mb4_turkish_ci",
+            CreateDatabaseCommand(MySqlDialect.Instance, "Server=localhost;Database=mydb", "MySqlConnector", "utf8mb4_turkish_ci"));
+    }
+
+    [Fact]
+    public void EnsureDatabase_Creates_Postgres_Database_With_Locale()
+    {
+        Assert.Equal("CREATE DATABASE \"mydb\" TEMPLATE template0 LOCALE 'tr_TR.UTF-8'",
+            CreatePostgresDatabaseCommand("tr_TR.UTF-8"));
+    }
+
+    [Fact]
+    public void EnsureDatabase_Creates_Postgres_Database_With_Icu_Collation()
+    {
+        Assert.Equal("CREATE DATABASE \"mydb\" TEMPLATE template0 LOCALE_PROVIDER icu ICU_LOCALE 'tr-TR'",
+            CreatePostgresDatabaseCommand("tr-TR-x-icu"));
+    }
+
+    [Fact]
+    public void EnsureDatabase_Escapes_Postgres_Locale()
+    {
+        Assert.Equal("CREATE DATABASE \"mydb\" TEMPLATE template0 LOCALE 'a''b'",
+            CreatePostgresDatabaseCommand("a'b"));
+    }
+
+    [Theory]
+    [InlineData("Turkish_100_CI_AS; DROP DATABASE x")]
+    [InlineData("a b")]
+    [InlineData("a-b")]
+    public void EnsureDatabase_Throws_For_Invalid_Collation_Name(string collation)
+    {
+        Assert.Throws<ArgumentException>(() => CreateSqlServerDatabaseCommand(collation));
+    }
+
+    [Fact]
+    public void EnsureDatabase_Throws_For_Collation_On_Sqlite_Without_Side_Effects()
+    {
+        var root = System.IO.Path.Combine(System.IO.Path.GetTempPath(),
+            "serenity_db_" + Guid.NewGuid().ToString("N"));
+        var connections = new FakeSqlConnections(new FakeConnectionString(SqliteDialect.Instance));
+
+        Assert.Throws<NotSupportedException>(() =>
+            MigrationUtils.EnsureDatabase(DefaultConnectionAttribute.Key, root, connections, "NOCASE"));
+
+        Assert.False(System.IO.Directory.Exists(root));
+    }
+
+    [Fact]
+    public void EnsureDatabase_Throws_For_Collation_On_Oracle()
+    {
+        var connections = new FakeSqlConnections(new FakeConnectionString(OracleDialect.Instance));
+
+        Assert.Throws<NotSupportedException>(() =>
+            MigrationUtils.EnsureDatabase(DefaultConnectionAttribute.Key, null!, connections, "BINARY_CI"));
+    }
+
+    [Fact]
+    public void EnsureDatabase_Ignores_Collation_When_Database_Exists()
+    {
+        EnsureSqlServerProviderRegistered();
+        var executed = false;
+        using var connection = new MockDbConnection()
+            .OnDbCommandExecuteReader(_ => new MockDbDataReader(new { name = "mydb" }))
+            .OnDbCommandExecuteNonQuery(_ =>
+            {
+                executed = true;
+                return 1;
+            });
+
+        MigrationUtils.EnsureDatabase(DefaultConnectionAttribute.Key, null!, new FakeSqlConnections(
+            new FakeConnectionString(SqlServer2012Dialect.Instance,
+                "Server=.;Database=mydb;Trusted_Connection=True;", "Microsoft.Data.SqlClient"),
+            connection), "Turkish_100_CI_AS");
+
+        Assert.False(executed);
+    }
+
+    [Fact]
+    public void ClearAllPools_Calls_Static_Method_Of_Provider_Connection()
+    {
+        EnsureProviderRegistered("CountingProvider", CountingFactory.Instance);
+        var before = CountingConnection.ClearCount;
+
+        MigrationUtils.ClearAllPools(DefaultConnectionAttribute.Key, new FakeSqlConnections(
+            new FakeConnectionString(SqlServer2012Dialect.Instance, "x", "CountingProvider")));
+
+        Assert.Equal(before + 1, CountingConnection.ClearCount);
+    }
+
+    [Fact]
+    public void ClearAllPools_Does_Nothing_When_Provider_Has_No_Method()
+    {
+        EnsureProviderRegistered("NoClearProvider", NoClearFactory.Instance);
+
+        MigrationUtils.ClearAllPools(DefaultConnectionAttribute.Key, new FakeSqlConnections(
+            new FakeConnectionString(SqlServer2012Dialect.Instance, "x", "NoClearProvider")));
+    }
+
+    [Fact]
+    public void ClearAllPools_Does_Nothing_When_Provider_Is_Not_Registered()
+    {
+        MigrationUtils.ClearAllPools(DefaultConnectionAttribute.Key, new FakeSqlConnections(
+            new FakeConnectionString(SqlServer2012Dialect.Instance, "x", "NotRegisteredProvider")));
+    }
+
+    [Theory]
+    [InlineData(typeof(Microsoft.Data.SqlClient.SqlConnection))]
+    [InlineData(typeof(Microsoft.Data.Sqlite.SqliteConnection))]
+    [InlineData(typeof(MySqlConnector.MySqlConnection))]
+    [InlineData(typeof(Npgsql.NpgsqlConnection))]
+    [InlineData(typeof(Oracle.ManagedDataAccess.Client.OracleConnection))]
+    [InlineData(typeof(FirebirdSql.Data.FirebirdClient.FbConnection))]
+    public void ClearAllPools_Exists_On_All_Supported_Providers(Type connectionType)
+    {
+        Assert.NotNull(connectionType.GetMethod("ClearAllPools",
+            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static, Type.EmptyTypes));
+    }
+
     [Fact]
     public void EnsureDatabase_Returns_When_SqlServer_Database_Exists()
     {

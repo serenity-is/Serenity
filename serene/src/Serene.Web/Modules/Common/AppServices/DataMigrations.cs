@@ -41,7 +41,7 @@ public class DataMigrations(ITypeSource typeSource,
     {
         MigrationUtils.EnsureDatabase(databaseKey,
             hostEnvironment.ContentRootPath, sqlConnections);
-        Microsoft.Data.SqlClient.SqlConnection.ClearAllPools();
+        MigrationUtils.ClearAllPools(databaseKey, sqlConnections);
     }
 
     /// <summary>
