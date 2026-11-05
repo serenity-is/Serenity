@@ -3,12 +3,12 @@ using FluentMigrator;
 namespace Serenity.Demo.Northwind.Migrations;
 
 [NorthwindDB, MigrationKey(20160908_1801)]
-public class NorthwindDB_20160908_1801_CustomerGrossSales : AutoReversingMigration
+public class NorthwindDB_20160908_1801_CustomerGrossSales : Migration
 {
     public override void Up()
     {
-        IfDatabase("SqlServer", "SqlServer2000", "SqlServerCe")
-            .Execute.Sql(/*lang=sql*/ """
+        if (this.IsSqlServer())
+            Execute.Sql(/*lang=sql*/ """
                 CREATE PROCEDURE [dbo].[CustomerGrossSales]
                     @startDate DATE,
                     @endDate DATE
@@ -35,6 +35,9 @@ public class NorthwindDB_20160908_1801_CustomerGrossSales : AutoReversingMigrati
                     ORDER BY c.ContactName, Sum(d.UnitPrice* d.Quantity) DESC
                 END
                 """);
+    }
 
+    public override void Down()
+    {
     }
 }

@@ -126,69 +126,6 @@ public sealed partial class MigrationIntegrationTests
         }
     }
 
-    /// <summary>
-    /// The migrations of the Northwind database can fail on an engine because of an unrelated issue, which
-    /// should not stop checking the Default database, as it is migrated first and has its own transactions.
-    /// </summary>
-    [Fact]
-    public async Task Oracle_Default_Database_Passes_Collation_Checks()
-    {
-        if (SqlIntegrationConnections.ShouldSkip("Oracle"))
-            return;
-
-        var suffix = Guid.NewGuid().ToString("N")[..16].ToUpperInvariant();
-        var defaultUser = "SDEF" + suffix;
-        var northwindUser = "SNW" + suffix;
-        var password = "S" + Guid.NewGuid().ToString("N")[..12] + "Aa1";
-
-        DbProviderFactories.RegisterFactory("Oracle.ManagedDataAccess.Client", Oracle.ManagedDataAccess.Client.OracleClientFactory.Instance);
-        using var serverConnection = SqlIntegrationConnections.CreateConnection("Oracle");
-        serverConnection.Open();
-
-        testCleanup += () =>
-        {
-            Oracle.ManagedDataAccess.Client.OracleConnection.ClearAllPools();
-            using var cleanupConnection = SqlIntegrationConnections.CreateConnection("Oracle");
-            cleanupConnection.Open();
-            TryDropOracleUser(cleanupConnection, defaultUser);
-            TryDropOracleUser(cleanupConnection, northwindUser);
-        };
-
-        CreateOracleUser(serverConnection, defaultUser, password);
-        CreateOracleUser(serverConnection, northwindUser, password);
-
-        await RunMigrationsAndServiceCall(WithOracleUser(serverConnection.ConnectionString, defaultUser, password),
-            WithOracleUser(serverConnection.ConnectionString, northwindUser, password),
-            "Oracle.ManagedDataAccess.Client", checkDefaultOnly: true);
-    }
-
-    /// <inheritdoc cref="Oracle_Default_Database_Passes_Collation_Checks"/>
-    [Fact]
-    public async Task Firebird_Default_Database_Passes_Collation_Checks()
-    {
-        if (SqlIntegrationConnections.ShouldSkip("Firebird"))
-            return;
-
-        var serverConnection = SqlIntegrationConnections.CreateConnection("Firebird");
-        var defaultConnectionString = WithFirebirdDatabase(serverConnection.ConnectionString, defaultDatabase);
-        var northwindConnectionString = WithFirebirdDatabase(serverConnection.ConnectionString, northwindDatabase);
-        serverConnection.Dispose();
-
-        testCleanup += () =>
-        {
-            FbConnection.ClearAllPools();
-            TryDropDatabase(defaultConnectionString);
-            TryDropDatabase(northwindConnectionString);
-        };
-
-        DbProviderFactories.RegisterFactory("FirebirdSql.Data.FirebirdClient", FirebirdClientFactory.Instance);
-        FbConnection.CreateDatabase(defaultConnectionString, 8192, true, false);
-        FbConnection.CreateDatabase(northwindConnectionString, 8192, true, false);
-
-        await RunMigrationsAndServiceCall(defaultConnectionString, northwindConnectionString,
-            "FirebirdSql.Data.FirebirdClient", checkDefaultOnly: true);
-    }
-
     [Fact]
     public async Task Postgres_AutoMapTolerant_Creates_Icu_Database()
     {

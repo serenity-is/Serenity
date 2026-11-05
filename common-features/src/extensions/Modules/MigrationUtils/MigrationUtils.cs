@@ -2,6 +2,7 @@ using FluentMigrator;
 using FluentMigrator.Builders;
 using FluentMigrator.Builders.Alter.Table;
 using FluentMigrator.Builders.Create.Table;
+using FluentMigrator.Builders.IfDatabase;
 using System.IO;
 using System.Reflection;
 
@@ -126,7 +127,7 @@ public static class MigrationUtils
             var type = builder.Column.Type is System.Data.DbType.Int64 or System.Data.DbType.UInt64 ?
                 "BIGINT" : "INT";
 
-            migration.IfDatabase("MySql").Execute.Sql(
+            IfDatabaseType(migration, "MySql").Execute.Sql(
                 $"ALTER TABLE `{(string.IsNullOrEmpty(builder.SchemaName) ? "" :
                 (builder.SchemaName + "."))}{builder.TableName}` MODIFY COLUMN `{builder.Column.Name}` {type} NOT NULL UNIQUE AUTO_INCREMENT;");
 
@@ -155,10 +156,10 @@ public static class MigrationUtils
         seq = seq[..Math.Min(20, seq.Length)];
         seq += "_SEQ";
 
-        migration.IfDatabase("Oracle")
+        IfDatabaseType(migration, "Oracle")
             .Execute.Sql("CREATE SEQUENCE " + seq);
 
-        migration.IfDatabase("Oracle")
+        IfDatabaseType(migration, "Oracle")
             .Execute.Sql(string.Format(CultureInfo.InvariantCulture, /*lang=sql*/ """
                 CREATE OR REPLACE TRIGGER {2}_TRG
                 BEFORE INSERT ON {0}
@@ -170,7 +171,7 @@ public static class MigrationUtils
                 END;
                 """, table, id, seq));
 
-        migration.IfDatabase("Oracle")
+        IfDatabaseType(migration, "Oracle")
             .Execute.Sql(@"ALTER TRIGGER " + seq + "_TRG ENABLE");
     }
     
@@ -219,6 +220,15 @@ public static class MigrationUtils
 
         migration.IfDatabase(myPredicate);
         return isMatch;
+    }
+
+    /// <summary>
+    /// Matches the database type by prefix, as the exact type can be a versioned one like Postgres15_0,
+    /// which IfDatabase with a string does not match.
+    /// </summary>
+    private static IIfDatabaseExpressionRoot IfDatabaseType(MigrationBase migration, string type)
+    {
+        return migration.IfDatabase(x => x.StartsWith(type, StringComparison.OrdinalIgnoreCase));
     }
 
     /// <summary>
@@ -695,17 +705,17 @@ public static class MigrationUtils
         var name = MakeConcurrencyVersionTriggerName(table, column);
 
         if (migration.IsSqlServer())
-            migration.IfDatabase("SqlServer").Execute.Sql($"DROP TRIGGER [{name}];");
+            IfDatabaseType(migration, "SqlServer").Execute.Sql($"DROP TRIGGER [{name}];");
         else if (migration.IsPostgres())
-            migration.IfDatabase("Postgres").Execute.Sql($"DROP TRIGGER \"{name}\" ON {Quote(table, schema, '"', '"')}; DROP FUNCTION IF EXISTS {name}_FN();");
+            IfDatabaseType(migration, "Postgres").Execute.Sql($"DROP TRIGGER \"{name}\" ON {Quote(table, schema, '"', '"')}; DROP FUNCTION IF EXISTS {name}_FN();");
         else if (migration.IsMySql())
-            migration.IfDatabase("MySql").Execute.Sql($"DROP TRIGGER IF EXISTS `{name}`;");
+            IfDatabaseType(migration, "MySql").Execute.Sql($"DROP TRIGGER IF EXISTS `{name}`;");
         else if (migration.IsOracle())
-            migration.IfDatabase("Oracle").Execute.Sql($"DROP TRIGGER \"{name}\";");
+            IfDatabaseType(migration, "Oracle").Execute.Sql($"DROP TRIGGER \"{name}\";");
         else if (migration.IsFirebird())
-            migration.IfDatabase("Firebird").Execute.Sql($"DROP TRIGGER \"{name}\";");
+            IfDatabaseType(migration, "Firebird").Execute.Sql($"DROP TRIGGER \"{name}\";");
         else if (migration.IsSqlite())
-            migration.IfDatabase("Sqlite").Execute.Sql($"DROP TRIGGER IF EXISTS \"{name}\";");
+            IfDatabaseType(migration, "Sqlite").Execute.Sql($"DROP TRIGGER IF EXISTS \"{name}\";");
     }
 
     private static string MakeConcurrencyVersionTriggerName(string table, string column)
@@ -723,6 +733,16 @@ public static class MigrationUtils
     {
         string q(string x) => open + x + close;
         return string.IsNullOrEmpty(schema) ? q(name) : q(schema) + "." + q(name);
+    }
+
+    /// <summary>
+    /// FluentMigrator does not quote names on Oracle and Firebird, which folds them to upper case, so
+    /// a name that is always quoted would not find them. The dialect only quotes when it is required.
+    /// </summary>
+    private static string QuoteByDialect(ISqlDialect dialect, string name, string? schema)
+    {
+        return string.IsNullOrEmpty(schema) ? dialect.QuoteIdentifier(name) :
+            dialect.QuoteIdentifier(schema) + "." + dialect.QuoteIdentifier(name);
     }
 
     private static void AddConcurrencyVersionTriggerCore(MigrationBase migration,
@@ -748,8 +768,23 @@ public static class MigrationUtils
         if (serverType is null)
             throw new InvalidOperationException("Unsupported database type for a concurrency version trigger.");
 
-        migration.IfDatabase(serverType).Execute.Sql(GetConcurrencyVersionTriggerSql(serverType,
-            table, column, columnType == System.Data.DbType.Int64, idField, schema));
+        var sql = GetConcurrencyVersionTriggerSql(serverType,
+            table, column, columnType == System.Data.DbType.Int64, idField, schema);
+
+        if (serverType != "Oracle")
+        {
+            IfDatabaseType(migration, serverType).Execute.Sql(sql);
+            return;
+        }
+
+        // the SQL splitter of FluentMigrator would cut the PL/SQL block of the trigger at its semicolons
+        IfDatabaseType(migration, serverType).Execute.WithConnection((connection, transaction) =>
+        {
+            using var command = connection.CreateCommand();
+            command.Transaction = transaction;
+            command.CommandText = sql.Replace("\r\n", "\n", StringComparison.Ordinal);
+            command.ExecuteNonQuery();
+        });
     }
 
     /// <summary>
@@ -827,8 +862,9 @@ public static class MigrationUtils
 
         if (serverType.StartsWith("Oracle", StringComparison.OrdinalIgnoreCase))
         {
-            var t = Quote(table, schema, '"', '"');
-            var c = $"\"{column}\"";
+            var t = QuoteByDialect(OracleDialect.Instance, table, schema);
+            var c = OracleDialect.Instance.QuoteIdentifier(column);
+
             return $"""
                 CREATE OR REPLACE TRIGGER "{name}"
                 BEFORE UPDATE ON {t}
@@ -841,8 +877,8 @@ public static class MigrationUtils
 
         if (serverType.StartsWith("Firebird", StringComparison.OrdinalIgnoreCase))
         {
-            var t = Quote(table, schema, '"', '"');
-            var c = $"\"{column}\"";
+            var t = QuoteByDialect(FirebirdDialect.Instance, table, schema);
+            var c = FirebirdDialect.Instance.QuoteIdentifier(column);
             return $"""
                 CREATE TRIGGER "{name}" FOR {t} ACTIVE BEFORE UPDATE POSITION 0
                 AS

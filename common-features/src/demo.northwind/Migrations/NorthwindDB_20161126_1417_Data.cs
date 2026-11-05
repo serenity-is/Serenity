@@ -107,8 +107,8 @@ public class NorthwindDB_20161126_1417_Data : Migration
         InsertRows("Orders", OrderList, identityInsert: identityInsert);
         InsertRows("OrderDetails", OrderDetailList, identityInsert: false);
 
-        IfDatabase("Postgres")
-            .Execute.Sql(/*lang=sql*/ """
+        if (this.IsPostgres())
+            Execute.Sql(/*lang=sql*/ """
                 SELECT setval('"Region_RegionID_seq"', max("RegionID")) FROM "Region";
                 SELECT setval('"Categories_CategoryID_seq"', max("CategoryID")) FROM "Categories";
                 SELECT setval('"Employees_EmployeeID_seq"', max("EmployeeID")) FROM "Employees";
@@ -118,8 +118,8 @@ public class NorthwindDB_20161126_1417_Data : Migration
                 SELECT setval('"Suppliers_SupplierID_seq"', max("SupplierID")) FROM "Suppliers";
                 """);
 
-        IfDatabase("Oracle")
-            .Execute.Sql(/*lang=sql*/ """
+        if (this.IsOracle())
+            Execute.Sql(/*lang=sql*/ """
                 alter sequence Region_seq restart start with 5
                 ;
                 alter sequence Categories_seq restart start with 9
@@ -135,11 +135,23 @@ public class NorthwindDB_20161126_1417_Data : Migration
                 alter sequence Suppliers_seq restart start with 30
                 """);
 
+        if (this.IsFirebird())
+        {
+            // the identity columns continue from the rows inserted with explicit ids above
+            Execute.Sql("SET GENERATOR GEN_REGION_REGIONID TO 4");
+            Execute.Sql("SET GENERATOR GEN_CATEGORIES_CATEGORYID TO 8");
+            Execute.Sql("SET GENERATOR GEN_EMPLOYEES_EMPLOYEEID TO 9");
+            Execute.Sql("SET GENERATOR GEN_ORDERS_ORDERID TO 11073");
+            Execute.Sql("SET GENERATOR GEN_PRODUCTS_PRODUCTID TO 77");
+            Execute.Sql("SET GENERATOR GEN_SHIPPERS_SHIPPERID TO 3");
+            Execute.Sql("SET GENERATOR GEN_SUPPLIERS_SUPPLIERID TO 29");
+        }
+
         var o = OrderRow.Fields;
         var dateAdd = "dateadd(day, datediff(day, (select max(OrderDate) from Orders), getdate()), ";
 
-        IfDatabase("SqlServer")
-            .Execute.Sql(
+        if (this.IsSqlServer())
+            Execute.Sql(
                 new SqlUpdate(o.TableName)
                     .SetTo(o.OrderDate, dateAdd + o.OrderDate.Name + ")")
                     .SetTo(o.RequiredDate, dateAdd + o.RequiredDate.Name + ")")

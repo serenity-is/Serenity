@@ -197,8 +197,8 @@ public class NorthwindDB_20141123_1551_Initial(IOptions<UserEntityOptions>? user
             .WithColumn("ParentId").AsInt32().Nullable()
             .WithColumn("Title").AsString(100).NotNullable();
 
-        IfDatabase("SqlServer")
-            .Execute.Sql("""
+        if (this.IsSqlServer())
+            Execute.Sql("""
             create view [dbo].[OrderDetailsExtended] AS
             SELECT OrderDetails.OrderID, OrderDetails.ProductID, Products.ProductName, 
                 OrderDetails.UnitPrice, OrderDetails.Quantity, OrderDetails.Discount, 
@@ -217,8 +217,8 @@ public class NorthwindDB_20141123_1551_Initial(IOptions<UserEntityOptions>? user
             
             """);
 
-        IfDatabase("Sqlite")
-            .Execute.Sql("""
+        if (this.IsSqlite())
+            Execute.Sql("""
             DROP VIEW IF EXISTS [OrderDetailsExtended];
             CREATE VIEW [OrderDetailsExtended] AS
             SELECT [OrderDetails].OrderID,

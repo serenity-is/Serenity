@@ -9,7 +9,7 @@ public sealed partial class MigrationIntegrationTests : IDisposable
     private async Task RunMigrationsAndServiceCall(string connectionString,
         string northwindConnectionString, string providerName, string collation = null, string comparer = null,
         bool partialContainment = false, string expectedCollation = null,
-        Action<System.Data.IDbConnection> verifyDatabase = null, bool checkDefaultOnly = false)
+        Action<System.Data.IDbConnection> verifyDatabase = null)
     {
         var configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string>()
@@ -55,24 +55,7 @@ public sealed partial class MigrationIntegrationTests : IDisposable
         try
         {
             var dataMigrations = services.GetRequiredService<IDataMigrations>();
-            try
-            {
-                dataMigrations.Initialize();
-            }
-            catch (InvalidOperationException) when (checkDefaultOnly)
-            {
-                // only the Default database is checked, which is migrated first
-            }
-
-            if (checkDefaultOnly)
-            {
-                using var connection = services.GetRequiredService<ISqlConnections>().NewFor<Administration.UserRow>();
-                var retriever = services.GetRequiredService<IUserRetrieveService>();
-                Assert.Equal("admin", retriever.ByUsername("ADMIN")?.Username);
-                VerifyBackfillMatchesCode(connection);
-                VerifyColumnCollations(connection);
-                return;
-            }
+            dataMigrations.Initialize();
 
             var cancellationToken = TestContext.Current.CancellationToken;
             var userProvider = services.GetRequiredService<IUserProvider>();
@@ -120,6 +103,14 @@ public sealed partial class MigrationIntegrationTests : IDisposable
                 }, cancellationToken)).Entities;
 
                 Assert.Equal(2155, orderDetails.Count);
+
+                // the identity sequences should continue after the rows inserted with explicit ids
+                var categoryId = Convert.ToInt32(northwindConnection.InsertAndGetID(new Serenity.Demo.Northwind.CategoryRow
+                {
+                    CategoryName = "Test"
+                }));
+                Assert.True(categoryId > 8, $"Category id {categoryId} should be after the existing ones.");
+                northwindConnection.DeleteById<Serenity.Demo.Northwind.CategoryRow>(categoryId);
 
                 // optimistic concurrency: the concurrency version trigger increments RowVersion
                 // on update, and a stale RowVersion in the request causes a concurrency conflict
