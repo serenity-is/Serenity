@@ -206,6 +206,46 @@ public class MigrationUtilsTests
         });
     }
 
+    [Fact]
+    public void GetSystemUserId_DefaultsToOneWithoutOptions()
+    {
+        Assert.Equal(1, ((IOptions<UserEntityOptions>?)null).GetSystemUserId());
+        Assert.Equal(1, Options.Create(new UserEntityOptions()).GetSystemUserId());
+        Assert.Equal(1L, Options.Create(new UserEntityOptions { IdFieldType = typeof(Int64Field) }).GetSystemUserId());
+    }
+
+    [Fact]
+    public void GetSystemUserId_ReturnsTheConfiguredValue()
+    {
+        var id = Guid.NewGuid();
+        var options = Options.Create(new UserEntityOptions { IdFieldType = typeof(GuidField), SystemUserId = id });
+
+        Assert.Equal(id, options.GetSystemUserId());
+    }
+
+    [Theory]
+    [InlineData(typeof(GuidField))]
+    [InlineData(typeof(StringField))]
+    public void GetSystemUserId_ThrowsWhenNotSetForIdTypesWithoutDefault(Type idFieldType)
+    {
+        var options = Options.Create(new UserEntityOptions { IdFieldType = idFieldType });
+
+        var exception = Assert.Throws<InvalidOperationException>(() => options.GetSystemUserId());
+        Assert.Contains(nameof(UserEntityOptions.SystemUserId), exception.Message);
+    }
+
+    [Theory]
+    [InlineData(null, true)]
+    [InlineData(typeof(Int32Field), true)]
+    [InlineData(typeof(Int64Field), true)]
+    [InlineData(typeof(GuidField), false)]
+    [InlineData(typeof(StringField), false)]
+    public void HasIdentityUserId_IsTrueForIntegerIds(Type? idFieldType, bool expected)
+    {
+        Assert.True(((IOptions<UserEntityOptions>?)null).HasIdentityUserId());
+        Assert.Equal(expected, Options.Create(new UserEntityOptions { IdFieldType = idFieldType }).HasIdentityUserId());
+    }
+
     private class FakeConnectionString(ISqlDialect dialect, string connectionString = "Data Source=:memory:",
         string providerName = "Microsoft.Data.Sqlite", string? collation = null, string? comparer = null,
         bool partialContainment = false) : IConnectionString

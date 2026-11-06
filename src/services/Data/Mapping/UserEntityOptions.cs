@@ -94,6 +94,26 @@ public class UserEntityOptions : IOptions<UserEntityOptions>
     /// </summary>
     public Type? IdFieldType { get; set; } = typeof(Int32Field);
 
+    private object? systemUserId;
+
+    /// <summary>
+    /// Gets or sets the ID of the user that rows created by the system, e.g. by migrations or sample data,
+    /// are attributed to, like their <c>InsertUserId</c>. It should be the ID of an existing user, e.g. the
+    /// admin user created by the initial migration.
+    /// </summary>
+    /// <remarks>
+    /// When not explicitly set, it defaults to <c>1</c> for <see cref="Int32Field"/> and <see cref="Int64Field"/>
+    /// IDs, which is the ID of the first user in an identity column. There is no such default for
+    /// <see cref="GuidField"/> and <see cref="StringField"/> IDs, so it has to be set for them before running
+    /// migrations that insert such rows, and its value should be of the ID type, e.g. a <see cref="Guid"/>.
+    /// </remarks>
+    public object? SystemUserId
+    {
+        get => systemUserId ?? (IdFieldType is null || IdFieldType == typeof(Int32Field) ? 1 :
+            IdFieldType == typeof(Int64Field) ? 1L : null);
+        set => systemUserId = value;
+    }
+
     /// <inheritdoc />
     public UserEntityOptions Value => this;
 
@@ -110,5 +130,7 @@ public class UserEntityOptions : IOptions<UserEntityOptions>
         IdColumnSize = other.IdColumnSize;
         IdFieldType = other.IdFieldType;
         TableName = other.TableName;
+        // the explicit value only, so the default still follows the ID type
+        systemUserId = other.systemUserId;
     }
 }

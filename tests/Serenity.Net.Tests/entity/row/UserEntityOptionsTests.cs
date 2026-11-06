@@ -150,4 +150,55 @@ public class UserEntityOptionsTests
         Assert.Equal(source.IdColumnSize, target.IdColumnSize);
         Assert.Equal(source.IdFieldType, target.IdFieldType);
     }
+
+    [Theory]
+    [InlineData(typeof(IntUserRow), 1)]
+    [InlineData(typeof(LongUserRow), 1L)]
+    [InlineData(typeof(GuidUserRow), null)]
+    [InlineData(typeof(OriginPropertyTests.ConfiguredUserRow), null)]
+    public void SystemUserId_DefaultsByIdFieldType(Type rowType, object? expected)
+    {
+        var options = new UserEntityOptions { RowType = rowType };
+
+        Assert.Equal(expected, options.SystemUserId);
+    }
+
+    [Fact]
+    public void SystemUserId_DefaultsToOneWithoutRowType()
+    {
+        Assert.Equal(1, new UserEntityOptions().SystemUserId);
+    }
+
+    [Fact]
+    public void SystemUserId_KeepsTheExplicitValue()
+    {
+        var id = Guid.NewGuid();
+        var options = new UserEntityOptions { RowType = typeof(GuidUserRow), SystemUserId = id };
+
+        Assert.Equal(id, options.SystemUserId);
+    }
+
+    [Fact]
+    public void AssignFrom_CopiesTheExplicitSystemUserId()
+    {
+        var id = Guid.NewGuid();
+        var target = new UserEntityOptions();
+
+        target.AssignFrom(new UserEntityOptions { RowType = typeof(GuidUserRow), SystemUserId = id });
+
+        Assert.Equal(id, target.SystemUserId);
+    }
+
+    [Fact]
+    public void AssignFrom_KeepsTheSystemUserIdDefaultFollowingTheIdType()
+    {
+        // the default of the source (1 for int IDs) is not copied as an explicit value, so it
+        // still follows the ID type when that is changed later
+        var target = new UserEntityOptions();
+        target.AssignFrom(new UserEntityOptions());
+
+        target.RowType = typeof(GuidUserRow);
+
+        Assert.Null(target.SystemUserId);
+    }
 }
