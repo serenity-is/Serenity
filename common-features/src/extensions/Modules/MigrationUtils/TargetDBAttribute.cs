@@ -13,8 +13,15 @@ namespace Serenity.Extensions;
 /// runners that do not group tags by dimension.
 /// </remarks>
 public class TargetDBAttribute(string db)
-    : TagsAttribute(TagBehavior.RequireAny, db + LegacyTagSuffix, TagPrefix + db)
+    : TagsAttribute(TagBehavior.RequireAny, db + LegacyTagSuffix, GetTag(db))
 {
+    /// <summary>
+    /// Returns the tag for the specified database key.
+    /// </summary>
+    /// <param name="db">The database key.</param>
+    /// <returns>The tag corresponding to the specified database key.</returns>
+    public static string GetTag(string db) => TagPrefix + db;
+
     /// <summary>
     /// The prefix used for database tags, e.g. <c>db:Default</c> for the <c>Default</c> connection.
     /// </summary>

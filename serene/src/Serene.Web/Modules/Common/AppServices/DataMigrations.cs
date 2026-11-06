@@ -70,8 +70,7 @@ public class DataMigrations(ITypeSource typeSource,
             {
                 options.Tags = ((sqlConnections as IConnectionKeyFallbacks)?
                     .GetConnectionKeysResolvingTo(databaseKey)?
-                    .Select(x => TargetDBAttribute.TagPrefix + x).ToArray()) ??
-                        [TargetDBAttribute.TagPrefix + databaseKey];
+                    .Select(TargetDBAttribute.GetTag).ToArray()) ?? [TargetDBAttribute.GetTag(databaseKey)];
                 options.IncludeUntaggedMigrations = databaseKey == DefaultConnectionAttribute.Key;
             })
             .ConfigureRunner(builder =>

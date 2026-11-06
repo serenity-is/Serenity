@@ -196,7 +196,7 @@ public static class MigrationTagUtils
 
         if (tag.Length > TargetDBAttribute.LegacyTagSuffix.Length &&
             tag.EndsWith(TargetDBAttribute.LegacyTagSuffix, StringComparison.Ordinal))
-            return TargetDBAttribute.TagPrefix + tag[..^TargetDBAttribute.LegacyTagSuffix.Length];
+            return TargetDBAttribute.GetTag(tag[..^TargetDBAttribute.LegacyTagSuffix.Length]);
 
         return tag;
     }

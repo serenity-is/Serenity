@@ -44,7 +44,7 @@ public class DataMigrationsTests
         using var serviceProvider = CreateServiceProvider(new TestSqlConnections(new TestConnectionString()));
         var options = serviceProvider.GetRequiredService<IOptions<RunnerOptions>>().Value;
 
-        Assert.Equal(new[] { TargetDBAttribute.TagPrefix + DefaultConnectionAttribute.Key }, options.Tags);
+        Assert.Equal(new[] { TargetDBAttribute.GetTag(DefaultConnectionAttribute.Key) }, options.Tags);
         Assert.True(options.IncludeUntaggedMigrations);
     }
 
@@ -58,9 +58,9 @@ public class DataMigrationsTests
         var options = serviceProvider.GetRequiredService<IOptions<RunnerOptions>>().Value;
 
         Assert.Equal(new[] {
-            TargetDBAttribute.TagPrefix + DefaultConnectionAttribute.Key,
-            TargetDBAttribute.TagPrefix + "ProFeatures",
-            TargetDBAttribute.TagPrefix + "ProDataSources"
+            TargetDBAttribute.GetTag(DefaultConnectionAttribute.Key),
+            TargetDBAttribute.GetTag("ProFeatures"),
+            TargetDBAttribute.GetTag("ProDataSources")
         }, options.Tags);
     }
 
