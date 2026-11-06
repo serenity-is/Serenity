@@ -1,5 +1,6 @@
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Conventions;
+using FluentMigrator.Runner.Infrastructure;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 using Microsoft.AspNetCore.Hosting;
@@ -67,9 +68,10 @@ public class DataMigrations(ITypeSource typeSource,
             })
             .Configure<RunnerOptions>(options =>
             {
-                options.Tags = (sqlConnections as IConnectionKeyFallbacks)?
+                options.Tags = ((sqlConnections as IConnectionKeyFallbacks)?
                     .GetConnectionKeysResolvingTo(databaseKey)?
-                    .Select(x => x + "DB").ToArray() ?? [databaseKey + "DB"];
+                    .Select(x => TargetDBAttribute.TagPrefix + x).ToArray()) ??
+                        [TargetDBAttribute.TagPrefix + databaseKey];
                 options.IncludeUntaggedMigrations = databaseKey == DefaultConnectionAttribute.Key;
             })
             .ConfigureRunner(builder =>
@@ -89,6 +91,12 @@ public class DataMigrations(ITypeSource typeSource,
 
                 builder.WithGlobalConnectionString(cs.ConnectionString);
                 builder.ScanIn([.. ((IGetAssemblies)typeSource).GetAssemblies()]).For.Migrations();
+
+                // match migrations by dimensioned tags, e.g. db:Default, instead of the flat tag set
+                builder.WithRunnerConventions(new MigrationRunnerConventions()
+                {
+                    TypeHasMatchingTags = MigrationTagUtils.CreateMatcher()
+                });
             })
             .Configure<UserEntityOptions>(options => options.AssignFrom(userEntityOptions));
     }

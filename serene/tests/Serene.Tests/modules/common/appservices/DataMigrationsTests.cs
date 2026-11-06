@@ -1,3 +1,8 @@
+using FluentMigrator;
+using FluentMigrator.Runner;
+using FluentMigrator.Runner.Initialization;
+using Serenity.Extensions;
+
 namespace Serene.Tests;
 
 public class DataMigrationsTests
@@ -32,6 +37,95 @@ public class DataMigrationsTests
         Assert.Equal(configured.IdColumnSize, options.IdColumnSize);
     }
 
+    [Fact]
+    public void AddMigratorServices_AssignsTagsForTheDatabase()
+    {
+        // no IConnectionKeyFallbacks, so only the database itself is requested
+        using var serviceProvider = CreateServiceProvider(new TestSqlConnections(new TestConnectionString()));
+        var options = serviceProvider.GetRequiredService<IOptions<RunnerOptions>>().Value;
+
+        Assert.Equal(new[] { TargetDBAttribute.TagPrefix + DefaultConnectionAttribute.Key }, options.Tags);
+        Assert.True(options.IncludeUntaggedMigrations);
+    }
+
+    [Fact]
+    public void AddMigratorServices_AssignsTagsOfConnectionKeysResolvingToTheDatabase()
+    {
+        // the tags are the union of all connection keys that resolve to the database being
+        // migrated, e.g. the pro features that fall back to the default connection
+        using var serviceProvider = CreateServiceProvider(new TestSqlConnectionsWithFallbacks(
+            new TestConnectionString(), [DefaultConnectionAttribute.Key, "ProFeatures", "ProDataSources"]));
+        var options = serviceProvider.GetRequiredService<IOptions<RunnerOptions>>().Value;
+
+        Assert.Equal(new[] {
+            TargetDBAttribute.TagPrefix + DefaultConnectionAttribute.Key,
+            TargetDBAttribute.TagPrefix + "ProFeatures",
+            TargetDBAttribute.TagPrefix + "ProDataSources"
+        }, options.Tags);
+    }
+
+    [Fact]
+    public void AddMigratorServices_LoadsTheMigrationsOfTheDatabase()
+    {
+        // verifies the whole wiring, i.e. the requested db: tags select the migrations that
+        // declare a matching target database via TargetDBAttribute
+        using var serviceProvider = CreateServiceProvider(new TestSqlConnections(new TestConnectionString()));
+        var migrations = serviceProvider.GetRequiredService<IMigrationInformationLoader>().LoadMigrations();
+
+        Assert.NotEmpty(migrations);
+    }
+
+    [Fact]
+    public void AddMigratorServices_UsesDimensionedTagMatching()
+    {
+        using var serviceProvider = CreateServiceProvider(new TestSqlConnections(new TestConnectionString()));
+        var conventions = serviceProvider.GetRequiredService<IMigrationRunnerConventionsAccessor>()
+            .MigrationRunnerConventions;
+
+        Assert.True(conventions.TypeHasMatchingTags(typeof(TaggedWithDefaultDB), ["db:Default"]));
+        Assert.True(conventions.TypeHasMatchingTags(typeof(TaggedWithDefaultDB), ["db:Default", "env:Staging"]));
+
+        // the legacy tag form is normalized to the db: form, so old style tags still match
+        Assert.True(conventions.TypeHasMatchingTags(typeof(TaggedWithDefaultDB), ["DefaultDB"]));
+        Assert.False(conventions.TypeHasMatchingTags(typeof(TaggedWithDefaultDB), ["db:Northwind"]));
+
+        // the other conventions are still delegated to FluentMigrator
+        Assert.True(conventions.TypeIsMigration(typeof(TestMigration)));
+        Assert.False(conventions.TypeIsMigration(typeof(TaggedWithDefaultDB)));
+    }
+
+    private static ServiceProvider CreateServiceProvider(ISqlConnections sqlConnections)
+    {
+        var connectionString = sqlConnections.TryGetConnectionString(DefaultConnectionAttribute.Key);
+        using var typeSource = new DefaultTypeSource([typeof(Serene.AppServices.DataMigrations).Assembly]);
+        var migrations = new Serene.AppServices.DataMigrations(
+            typeSource,
+            sqlConnections,
+            new MockWebHostEnvironment(),
+            Options.Create(new UserEntityOptions()));
+
+        return migrations.AddMigratorServices(
+            new ServiceCollection(), DefaultConnectionAttribute.Key, connectionString!)
+            .BuildServiceProvider();
+    }
+
+    [DefaultDB]
+    private class TaggedWithDefaultDB
+    {
+    }
+
+    [Migration(20990101_0000)]
+    private class TestMigration : Migration
+    {
+        public override void Up()
+        {
+        }
+
+        public override void Down()
+        {
+        }
+    }
+
     private sealed class TestConnectionString : IConnectionString
     {
         public ISqlDialect Dialect => SqliteDialect.Instance;
@@ -40,7 +134,7 @@ public class DataMigrationsTests
         public string ProviderName => "Microsoft.Data.Sqlite";
     }
 
-    private sealed class TestSqlConnections(IConnectionString connectionString) : ISqlConnections
+    private class TestSqlConnections(IConnectionString connectionString) : ISqlConnections
     {
         public IEnumerable<IConnectionString> ListConnectionStrings() => [connectionString];
 
@@ -50,5 +144,15 @@ public class DataMigrationsTests
         public IDbConnection NewByKey(string connectionKey) => throw new NotSupportedException();
 
         public IConnectionString? TryGetConnectionString(string connectionKey) => connectionString;
+    }
+
+    private sealed class TestSqlConnectionsWithFallbacks(IConnectionString connectionString, string[] resolvingKeys)
+        : TestSqlConnections(connectionString), IConnectionKeyFallbacks
+    {
+        public IEnumerable<string> GetConnectionKeyFallbacks(string connectionKey) => [connectionKey];
+
+        public string? ResolveConnectionKey(string connectionKey) => connectionKey;
+
+        public IEnumerable<string> GetConnectionKeysResolvingTo(string connectionKey) => resolvingKeys;
     }
 }
