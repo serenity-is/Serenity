@@ -7,7 +7,7 @@ namespace Serenity.Services;
 /// <typeparam name="TListRequest">List request type</typeparam>
 /// <typeparam name="TListResponse">List response type</typeparam>
 public class ListRequestHandler<TRow, TListRequest, TListResponse> :
-    ListRequestHandlerBase<TRow, TListRequest, TListResponse>, IListRequestProcessor,
+    ListRequestHandlerBase<TRow, TListRequest, TListResponse>, IListRequestProcessor, IListQueryCapture,
     IListHandler<TRow, TListRequest, TListResponse>
     where TRow : class, IRow, new()
     where TListRequest : ListRequest
@@ -255,7 +255,7 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> :
         }
     }
 
-    SqlQuery IListRequestProcessor.CaptureQuery(IDbConnection connection, ListRequest request)
+    SqlQuery IListQueryCapture.CaptureQuery(IDbConnection connection, ListRequest request)
     {
         return CaptureQuery(connection, (TListRequest)request);
     }

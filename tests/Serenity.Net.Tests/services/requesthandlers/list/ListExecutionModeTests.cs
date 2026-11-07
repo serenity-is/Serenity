@@ -158,32 +158,53 @@ public class ListExecutionModeTests
     }
 
     [Fact]
-    public async Task Wrappers_CaptureTheQueryOfTheWrappedHandler()
+    public void GetQueryCapture_ReturnsTheAsyncHandlerItself()
+    {
+        var handler = new TestListHandlerAsync(Context(), new CaptureAwareBehavior());
+
+        Assert.Same(handler, handler.GetQueryCapture());
+    }
+
+    [Fact]
+    public async Task GetQueryCapture_FindsTheWrappedHandler_ThroughTheWrappers()
     {
         var recording = new RecordingConnection();
         using var connection = recording.Create();
+        var cancellationToken = TestContext.Current.CancellationToken;
 
-        IListRequestProcessorAsync syncToAsync = new SyncToAsyncListRequestProcessorWrapper<ListRow>(
+        var asyncHandler = new TestListHandlerAsync(Context(), new CaptureAwareBehavior());
+        var syncToAsync = new SyncToAsyncListRequestProcessorWrapper<ListRow>(
             new TestListHandler(Context(), new CaptureAwareBehavior()));
-        IListRequestProcessor asyncToSync = new AsyncToSyncListRequestProcessorWrapper<ListRow>(
-            new TestListHandlerAsync(Context(), new CaptureAwareBehavior()));
+        var asyncToSync = new AsyncToSyncListRequestProcessorWrapper<ListRow>(asyncHandler);
 
+        var syncCapture = syncToAsync.GetQueryCapture();
+        Assert.NotNull(syncCapture);
         Assert.Contains("T0.Id > @p",
-            (await syncToAsync.CaptureQueryAsync(connection, new ListRequest(), TestContext.Current.CancellationToken)).ToString());
-        Assert.Contains("T0.Id > @p", asyncToSync.CaptureQuery(connection, new ListRequest()).ToString());
+            (await syncCapture.CaptureQueryAsync(connection, new ListRequest(), cancellationToken)).ToString());
+        // an async handler is used directly, without blocking on it
+        Assert.Same(asyncHandler, asyncToSync.GetQueryCapture());
         Assert.Empty(recording.Readers);
     }
 
     [Fact]
-    public async Task CaptureQuery_IsNotSupported_ByHandlersThatDoNotImplementIt()
+    public async Task GetQueryCapture_AdaptsASyncHandler_AndObservesCancellation()
     {
-        using var connection = new MockDbConnection();
+        var capture = new TestListHandler(Context(), new CaptureAwareBehavior()).GetQueryCapture();
+        using var connection = new RecordingConnection().Create();
 
-        Assert.Throws<NotSupportedException>(() =>
-            ((IListRequestProcessor)new MockListHandler<ListRow>()).CaptureQuery(connection, new ListRequest()));
-        await Assert.ThrowsAsync<NotSupportedException>(() =>
-            ((IListRequestProcessorAsync)new MockListHandlerAsync<ListRow>()).CaptureQueryAsync(connection, new ListRequest(),
-                TestContext.Current.CancellationToken));
+        Assert.NotNull(capture);
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() =>
+            capture.CaptureQueryAsync(connection, new ListRequest(), new System.Threading.CancellationToken(canceled: true)));
+    }
+
+    [Fact]
+    public void GetQueryCapture_ReturnsNull_ForHandlersThatCantCapture()
+    {
+        Assert.Null(new MockListHandler<ListRow>().GetQueryCapture());
+        Assert.Null(new MockListHandlerAsync<ListRow>().GetQueryCapture());
+        Assert.Null(new SyncToAsyncListRequestProcessorWrapper<ListRow>(new MockListHandler<ListRow>()).GetQueryCapture());
+        Assert.Null(new AsyncToSyncListRequestProcessorWrapper<ListRow>(new MockListHandlerAsync<ListRow>()).GetQueryCapture());
+        Assert.Throws<ArgumentNullException>(() => ListQueryCaptureExtensions.GetQueryCapture(null!));
     }
 
     [Fact]

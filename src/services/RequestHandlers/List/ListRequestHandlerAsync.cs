@@ -7,7 +7,7 @@ namespace Serenity.Services;
 /// <typeparam name="TListRequest">List request type</typeparam>
 /// <typeparam name="TListResponse">List response type</typeparam>
 public class ListRequestHandlerAsync<TRow, TListRequest, TListResponse> :
-    ListRequestHandlerBase<TRow, TListRequest, TListResponse>, IListRequestProcessorAsync,
+    ListRequestHandlerBase<TRow, TListRequest, TListResponse>, IListRequestProcessorAsync, IListQueryCaptureAsync,
     IListHandlerAsync<TRow, TListRequest, TListResponse>
     where TRow : class, IRow, new()
     where TListRequest : ListRequest
@@ -262,7 +262,7 @@ public class ListRequestHandlerAsync<TRow, TListRequest, TListResponse> :
         }
     }
 
-    Task<SqlQuery> IListRequestProcessorAsync.CaptureQueryAsync(IDbConnection connection, ListRequest request,
+    Task<SqlQuery> IListQueryCaptureAsync.CaptureQueryAsync(IDbConnection connection, ListRequest request,
         CancellationToken cancellationToken)
     {
         return CaptureQueryAsync(connection, (TListRequest)request, cancellationToken);

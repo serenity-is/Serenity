@@ -7,7 +7,7 @@ namespace Serenity.Services;
 /// that only has a synchronous custom list handler.
 /// </summary>
 /// <typeparam name="TRow">Row type</typeparam>
-internal class SyncToAsyncListRequestProcessorWrapper<TRow>(IListRequestProcessor handler) : IListRequestProcessorAsync,
+internal class SyncToAsyncListRequestProcessorWrapper<TRow>(IListRequestProcessor handler) : IListRequestProcessorAsync, IListRequestProcessorWrapper,
     IListHandlerAsync<TRow>
     where TRow : class, IRow, IIdRow, new()
 {
@@ -31,11 +31,7 @@ internal class SyncToAsyncListRequestProcessorWrapper<TRow>(IListRequestProcesso
         return Task.FromResult((ListResponse<TRow>)handler.Process(connection, request));
     }
 
-    public Task<SqlQuery> CaptureQueryAsync(IDbConnection connection, ListRequest request, CancellationToken cancellationToken = default)
-    {
-        return Task.FromResult(handler.CaptureQuery(connection, request));
-    }
-
+    IListRequestHandler IListRequestProcessorWrapper.WrappedHandler => handler;
     IRow IListRequestHandler.Row => handler.Row;
     ListRequest IListRequestHandler.Request => handler.Request;
     IListResponse IListRequestHandler.Response => handler.Response;

@@ -13,7 +13,7 @@ namespace Serenity.Services;
 /// invoking the asynchronous handler directly whenever a cancellation token is
 /// available.</remarks>
 /// <typeparam name="TRow">Row type</typeparam>
-internal class AsyncToSyncListRequestProcessorWrapper<TRow>(IListRequestProcessorAsync handler) : IListRequestProcessor,
+internal class AsyncToSyncListRequestProcessorWrapper<TRow>(IListRequestProcessorAsync handler) : IListRequestProcessor, IListRequestProcessorWrapper,
     IListHandler<TRow>
     where TRow : class, IRow, IIdRow, new()
 {
@@ -37,12 +37,7 @@ internal class AsyncToSyncListRequestProcessorWrapper<TRow>(IListRequestProcesso
         return (ListResponse<TRow>)Process(connection, request);
     }
 
-    /// <inheritdoc/>
-    public SqlQuery CaptureQuery(IDbConnection connection, ListRequest request)
-    {
-        return handler.CaptureQueryAsync(connection, request).GetAwaiter().GetResult();
-    }
-
+    IListRequestHandler IListRequestProcessorWrapper.WrappedHandler => handler;
     IRow IListRequestHandler.Row => handler.Row;
     ListRequest IListRequestHandler.Request => handler.Request;
     IListResponse IListRequestHandler.Response => handler.Response;
