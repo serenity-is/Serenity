@@ -109,12 +109,17 @@ public static class RequestHandlerExtensions
     }
 
     /// <summary>
-    /// Gets the request type for the handler instance
+    /// Gets the request type for the handler instance. For a sync / async list handler wrapper returned by
+    /// the handler factory, it is the request type of the wrapped handler, which may be a subclass of
+    /// <see cref="ListRequest"/> the wrapped handler casts the request to.
     /// </summary>
     /// <param name="handler">Handler instance</param>
     public static Type? GetRequestType(this IRequestHandler handler)
     {
         ArgumentNullException.ThrowIfNull(handler);
+
+        while (handler is IListRequestProcessorWrapper wrapper)
+            handler = wrapper.WrappedHandler;
 
         return handler.GetType().GetInterfaces()
             .FirstOrDefault(x => x.IsGenericType &&
