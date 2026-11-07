@@ -883,6 +883,12 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(
     /// </summary>
     public IDictionary<string, object?> StateBag { get; } = new Dictionary<string, object?>();
 
+    /// <summary>
+    /// Gets why the handler is being executed, e.g. <see cref="ListExecutionMode.QueryCapture"/>
+    /// while it is only building its query for a CaptureQuery call.
+    /// </summary>
+    public ListExecutionMode ExecutionMode { get; protected set; }
+
     IRow IListRequestHandler.Row => Row;
     ListRequest IListRequestHandler.Request => Request;
     IListResponse IListRequestHandler.Response => Response;

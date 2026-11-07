@@ -180,6 +180,14 @@ public class ListRequestHandlerAsync<TRow, TListRequest, TListResponse> :
 
         await PrepareQueryAsync(query, cancellationToken).ConfigureAwait(false);
 
+        if (ExecutionMode == ListExecutionMode.QueryCapture)
+        {
+            ApplyContainsText(query, request.ContainsText);
+            await ApplyFiltersAsync(query, cancellationToken).ConfigureAwait(false);
+            await OnBeforeExecuteQueryAsync(cancellationToken).ConfigureAwait(false);
+            return Response;
+        }
+
         if (DistinctFields == null)
             ApplyKeyOrder(query);
 
@@ -223,5 +231,40 @@ public class ListRequestHandlerAsync<TRow, TListRequest, TListResponse> :
     public Task<TListResponse> ListAsync(IDbConnection connection, TListRequest request, CancellationToken cancellationToken = default)
     {
         return ProcessAsync(connection, request, cancellationToken);
+    }
+
+    /// <summary>
+    /// Builds the query this handler would execute for the request, without executing it.
+    /// The request is validated, and the query is prepared and filtered by the handler and
+    /// its behaviors as usual, with <see cref="ListRequestHandlerBase{TRow, TListRequest, TListResponse}.ExecutionMode"/>
+    /// set to <see cref="ListExecutionMode.QueryCapture"/>. The query has no key order,
+    /// sort, paging or total count, as it is meant to be used as a source of another query.
+    /// Anything the handler or its behaviors would do after the query is executed, e.g.
+    /// in ProcessEntity, OnAfterExecuteQuery or OnReturn, does not happen.
+    /// </summary>
+    /// <param name="connection">Connection, which the handler and its behaviors may use
+    /// to run their own queries while building the query</param>
+    /// <param name="request">Request</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>The query</returns>
+    public async Task<SqlQuery> CaptureQueryAsync(IDbConnection connection, TListRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        ExecutionMode = ListExecutionMode.QueryCapture;
+        try
+        {
+            await ProcessAsync(connection, request, cancellationToken).ConfigureAwait(false);
+            return Query;
+        }
+        finally
+        {
+            ExecutionMode = ListExecutionMode.Normal;
+        }
+    }
+
+    Task<SqlQuery> IListRequestProcessorAsync.CaptureQueryAsync(IDbConnection connection, ListRequest request,
+        CancellationToken cancellationToken)
+    {
+        return CaptureQueryAsync(connection, (TListRequest)request, cancellationToken);
     }
 }

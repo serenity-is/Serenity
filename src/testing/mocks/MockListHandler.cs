@@ -26,6 +26,8 @@ public class MockListHandler<TRow>(Action<MockListHandler<TRow>> onProcess)
 
     public IRequestContext Context { get; set; }
 
+    public ListExecutionMode ExecutionMode { get; set; }
+
     IListResponse IListRequestHandler.Response => Response;
     IRow IListRequestHandler.Row => Row;
 

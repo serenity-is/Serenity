@@ -176,6 +176,14 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> :
 
         PrepareQuery(query);
 
+        if (ExecutionMode == ListExecutionMode.QueryCapture)
+        {
+            ApplyContainsText(query, request.ContainsText);
+            ApplyFilters(query);
+            OnBeforeExecuteQuery();
+            return Response;
+        }
+
         if (DistinctFields == null)
             ApplyKeyOrder(query);
 
@@ -218,5 +226,37 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> :
     public TListResponse List(IDbConnection connection, TListRequest request)
     {
         return Process(connection, request);
+    }
+
+    /// <summary>
+    /// Builds the query this handler would execute for the request, without executing it.
+    /// The request is validated, and the query is prepared and filtered by the handler and
+    /// its behaviors as usual, with <see cref="ListRequestHandlerBase{TRow, TListRequest, TListResponse}.ExecutionMode"/>
+    /// set to <see cref="ListExecutionMode.QueryCapture"/>. The query has no key order,
+    /// sort, paging or total count, as it is meant to be used as a source of another query.
+    /// Anything the handler or its behaviors would do after the query is executed, e.g.
+    /// in ProcessEntity, OnAfterExecuteQuery or OnReturn, does not happen.
+    /// </summary>
+    /// <param name="connection">Connection, which the handler and its behaviors may use
+    /// to run their own queries while building the query</param>
+    /// <param name="request">Request</param>
+    /// <returns>The query</returns>
+    public SqlQuery CaptureQuery(IDbConnection connection, TListRequest request)
+    {
+        ExecutionMode = ListExecutionMode.QueryCapture;
+        try
+        {
+            Process(connection, request);
+            return Query;
+        }
+        finally
+        {
+            ExecutionMode = ListExecutionMode.Normal;
+        }
+    }
+
+    SqlQuery IListRequestProcessor.CaptureQuery(IDbConnection connection, ListRequest request)
+    {
+        return CaptureQuery(connection, (TListRequest)request);
     }
 }

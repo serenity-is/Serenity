@@ -63,4 +63,11 @@ public interface IListRequestHandler : IRequestHandler
     /// </summary>
     /// <returns>Request handler settings.</returns>
     RequestHandlerSettings HandlerSettings => (Context as IHasHandlerSettings)?.HandlerSettings ?? RequestHandlerSettings.Default;
+
+    /// <summary>
+    /// Gets why the handler is being executed. Handlers and behaviors may check it
+    /// to act differently, e.g. when the handler is only executed to build its query.
+    /// The default implementation returns <see cref="ListExecutionMode.Normal"/>.
+    /// </summary>
+    ListExecutionMode ExecutionMode => ListExecutionMode.Normal;
 }

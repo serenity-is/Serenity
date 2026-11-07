@@ -25,6 +25,8 @@ public class MockListHandlerAsync<TRow>(Action<MockListHandlerAsync<TRow>> onPro
     public IDbConnection Connection { get; set; }
     public IRequestContext Context { get; set; }
 
+    public ListExecutionMode ExecutionMode { get; set; }
+
     IListResponse IListRequestHandler.Response => Response;
     IRow IListRequestHandler.Row => Row;
 

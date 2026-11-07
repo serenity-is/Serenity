@@ -37,6 +37,12 @@ internal class AsyncToSyncListRequestProcessorWrapper<TRow>(IListRequestProcesso
         return (ListResponse<TRow>)Process(connection, request);
     }
 
+    /// <inheritdoc/>
+    public SqlQuery CaptureQuery(IDbConnection connection, ListRequest request)
+    {
+        return handler.CaptureQueryAsync(connection, request).GetAwaiter().GetResult();
+    }
+
     IRow IListRequestHandler.Row => handler.Row;
     ListRequest IListRequestHandler.Request => handler.Request;
     IListResponse IListRequestHandler.Response => handler.Response;
@@ -46,4 +52,5 @@ internal class AsyncToSyncListRequestProcessorWrapper<TRow>(IListRequestProcesso
     bool IListRequestHandler.AllowSelectField(Field field) => handler.AllowSelectField(field);
     bool IListRequestHandler.ShouldSelectField(Field field) => handler.ShouldSelectField(field);
     void IListRequestHandler.IgnoreEqualityFilter(string field) => handler.IgnoreEqualityFilter(field);
+    ListExecutionMode IListRequestHandler.ExecutionMode => handler.ExecutionMode;
 }
