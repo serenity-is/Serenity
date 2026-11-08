@@ -96,10 +96,22 @@ public static class CoreServiceCollectionExtensions
     /// <param name="dependencyMap">Feature dependency map. Features are dictionary
     /// keys and the list of features that they depend on (e.g. all must be enabled)
     /// for that feature to be enabled.</param>
+    /// <param name="knownFeatures">Known feature keys, e.g. those declared by the enums annotated
+    /// with <c>FeatureKeySetAttribute</c>. When this is passed, features that are not declared
+    /// anywhere are treated as unknown, reported through <paramref name="onUnknownFeature"/>,
+    /// and disabled if <paramref name="disableUnknown"/> is <c>true</c>.
+    /// Pass <c>null</c> (the default) when the known features cannot be determined.</param>
+    /// <param name="disableUnknown">Whether to disable unknown features. Defaults to <c>false</c>,
+    /// and only has an effect when <paramref name="knownFeatures"/> is not <c>null</c>.</param>
+    /// <param name="onUnknownFeature">Callback that is invoked once for each feature key that is
+    /// queried but not declared anywhere, e.g. to log it.</param>
     public static IServiceCollection AddFeatureToggles(this IServiceCollection services, 
         IConfiguration? configuration = null, 
         object[]? disableByDefault = null,
-        Dictionary<string, List<RequiresFeatureAttribute>>? dependencyMap = null)
+        Dictionary<string, List<RequiresFeatureAttribute>>? dependencyMap = null,
+        IEnumerable<string>? knownFeatures = null,
+        bool disableUnknown = false,
+        Action<string>? onUnknownFeature = null)
     {
         if (services is null)
             throw new ArgumentNullException(nameof(services));
@@ -107,11 +119,14 @@ public static class CoreServiceCollectionExtensions
         configuration ??= GetServiceFromCollection<IConfiguration>(services);
         if (configuration != null)
         {
-            services.TryAddSingleton<IFeatureToggles>(new ConfigurationFeatureToggles(configuration, disableByDefault, dependencyMap));
+            services.TryAddSingleton<IFeatureToggles>(new ConfigurationFeatureToggles(configuration,
+                disableByDefault, dependencyMap, knownFeatures, disableUnknown, onUnknownFeature));
         }
         else
         {
-            services.TryAddSingleton<IFeatureToggles>(s => new ConfigurationFeatureToggles(s.GetRequiredService<IConfiguration>(), disableByDefault, dependencyMap));
+            services.TryAddSingleton<IFeatureToggles>(s => new ConfigurationFeatureToggles(
+                s.GetRequiredService<IConfiguration>(), disableByDefault, dependencyMap, knownFeatures,
+                disableUnknown, onUnknownFeature));
         }
 
         return services;

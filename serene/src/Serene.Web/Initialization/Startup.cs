@@ -26,7 +26,7 @@ public partial class Startup
 
     public void ConfigureServices(IServiceCollection services)
     {
-        services.AddApplicationPartsFeatureToggles(Configuration);
+        services.AddApplicationPartsFeatureToggles(Configuration, disableUnknown: true);
         services.AddApplicationPartsTypeSource();
         services.ConfigureSections(Configuration);
 
