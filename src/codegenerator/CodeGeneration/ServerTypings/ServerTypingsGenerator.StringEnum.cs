@@ -7,7 +7,7 @@ public partial class ServerTypingsGenerator
     /// </summary>
     internal static bool IsStringEnumType(TypeReference? type)
     {
-        return type != null && TypingsUtils.IsSubclassOf(type, "Serenity", nameof(StringEnum));
+        return type != null && TypingsUtils.IsSubclassOf(type, "Serenity", "StringEnum");
     }
 
     /// <summary>

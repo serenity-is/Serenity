@@ -44,7 +44,7 @@ public class StringEnumField<TStringEnum> : StringField, IEnumTypeField
 
     /// <summary>
     /// Gets or sets the type of the string enumeration. It is <typeparamref name="TStringEnum"/> by default, and
-    /// no validation is performed when it is set to null, like <see cref="Int32Field.EnumType"/>.
+    /// no validation is performed when it is set to null, like Int32Field.EnumType.
     /// </summary>
     public Type? EnumType { get; set; }
 
