@@ -53,7 +53,7 @@ export class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions> extends
      * @returns The icon class name representing the enum value, or undefined if none.
      */
     protected mapIcon(value: number, opt: { enumKey: string, enumType: any }): IconClassName | undefined {
-        return undefined;
+        return Enum.getIconClass(opt.enumType, value);
     }
 
     /**

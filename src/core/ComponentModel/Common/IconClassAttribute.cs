@@ -8,6 +8,7 @@ namespace Serenity.ComponentModel;
 /// Initializes a new instance of the <see cref="IconClassAttribute"/> class.
 /// </remarks>
 /// <param name="value">The icon class.</param>
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface | AttributeTargets.Enum | AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false)]
 public class IconClassAttribute(string value) : Attribute
 {
 

@@ -3541,6 +3541,8 @@ export type TypeInfo<TypeName> = {
     customAttributes?: CustomAttribute[];
     /** Enum flags */
     enumFlags?: boolean;
+    /** Enum icon classes mapping enum values to icon class names */
+    enumIcons?: Record<number, string>;
     /** Registered flag */
     registered?: boolean;
 };
@@ -3674,9 +3676,14 @@ export declare class EnumKeyAttribute extends CustomAttribute {
  * Register an enum with the type system.
  * @param enumType Enum type to register
  * @param name Name to register the enum under
- * @param enumKey Optional key to use for the enum
+ * @param optOrEnumKey Alternative enum key or options for the enum registration, including alternative key and icon classes.
  */
-export declare function registerEnum(enumType: any, name: string, enumKey?: string): void;
+export declare function registerEnum(enumType: any, name: string, optOrEnumKey?: string | {
+    /** Enum key */
+    enumKey?: string;
+    /** Icon classes for enum values */
+    enumIcons?: Record<number, string>;
+}): void;
 /**
  * Register an interface with the type system. There is no runtime representation of interfaces
  * in JavaScript, so Serenity uses classes decorated with some special symbols to emulate
@@ -3697,6 +3704,13 @@ export declare const Enum: {
      * @param value Enum value
      */
     toString: (enumType: any, value: number) => string;
+    /**
+     * Get the icon class for a specific enum value.
+     * @param enumType Enum type
+     * @param value Enum value
+     * @returns Icon class name or undefined if not found
+     */
+    getIconClass: (enumType: any, value: number) => string | undefined;
     /**
      * Returns all numeric values of an enum as an array.
      * @param enumType - Enum object to enumerate.
@@ -7842,7 +7856,10 @@ export declare namespace Decorators {
     /** Registers an editor class. @param nameOrIntf - Full type name or interface list. @param intf2 - Additional interfaces. @returns Class decorator. */
     function registerEditor(nameOrIntf?: string | InterfaceType[], intf2?: InterfaceType[]): (target: Function, _context?: any) => void;
     /** Registers an enum with optional keys. @param target - Enum object. @param enumKey - Legacy lookup key. @param name - Full type name. */
-    function registerEnum(target: any, enumKey?: string, name?: string): void;
+    function registerEnum(target: any, optOrEnumKey?: string | {
+        enumKey?: string;
+        enumIcons?: Record<number, string>;
+    }, name?: string): void;
     /**
      * Legacy wrapper for {@link registerEnum} kept for backward compatibility.
      * @deprecated Use {@link registerEnum} instead. Prefer direct `static [Symbol.typeInfo]` pattern for new code.
@@ -13859,10 +13876,22 @@ export declare class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions>
      * @param props - Widget props.
      */
     constructor(props: EditorProps<P>);
+    /**
+     * Maps an enum value to a combobox item.
+     * @param value The enum value.
+     * @param opt The enum key and type.
+     * @returns The combobox item representing the enum value.
+     */
     protected mapEnum(value: number, opt: {
         enumKey: string;
         enumType: any;
     }): ComboboxItem<any>;
+    /**
+     * Maps an enum value to an icon class name.
+     * @param value The enum value.
+     * @param opt The enum key and type.
+     * @returns The icon class name representing the enum value, or undefined if none.
+     */
     protected mapIcon(value: number, opt: {
         enumKey: string;
         enumType: any;

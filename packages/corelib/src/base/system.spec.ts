@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { implementedInterfacesSymbol, isAssignableFromSymbol, isInstanceOfTypeSymbol } from "./symbols";
-import { CustomAttribute, EditorAttribute, Enum, ISlickFormatter, addCustomAttribute, classTypeInfo, editorTypeInfo, fieldsProxy, formatterTypeInfo, getBaseType, getCustomAttribute, getCustomAttributes, getInstanceType, getType, getTypeFullName, getTypeNameProp, getTypeShortName, hasCustomAttribute, initFormType, interfaceTypeInfo, isAssignableFrom, isEnum, isInstanceOfType, registerClass, registerEditor, registerEnum, registerFormatter, registerInterface, registerType, type InterfaceType, type InterfaceTypeInfo } from "./system";
+import { CustomAttribute, EditorAttribute, Enum, EnumKeyAttribute, ISlickFormatter, addCustomAttribute, classTypeInfo, editorTypeInfo, fieldsProxy, formatterTypeInfo, getBaseType, getCustomAttribute, getCustomAttributes, getInstanceType, getType, getTypeFullName, getTypeNameProp, getTypeShortName, hasCustomAttribute, initFormType, interfaceTypeInfo, isAssignableFrom, isEnum, isInstanceOfType, registerClass, registerEditor, registerEnum, registerFormatter, registerInterface, registerType, type InterfaceType, type InterfaceTypeInfo } from "./system";
 import { ensureTypeInfo, getGlobalTypeRegistry, peekTypeInfo } from "./system-internal";
 
 afterEach(() => {
@@ -30,6 +30,34 @@ describe("Enum.getValues", () => {
         registerEnum(Test, 'EnumGetValuesRegisteredEnums.Test')
 
         expect(Enum.getValues(Test)).toStrictEqual([1, 5, -1]);
+    });
+});
+
+describe("Enum.getIconClass", () => {
+    it('returns the registered icon class of the value', function () {
+
+        enum Test {
+            A = 1,
+            B = 2
+        }
+
+        registerEnum(Test, 'Enum_GetIconClass_Test', { enumIcons: { [Test.A]: 'sv-a' } });
+
+        expect(Enum.getIconClass(Test, Test.A)).toBe('sv-a');
+        expect(Enum.getIconClass(Test, Test.B)).toBeUndefined();
+    });
+
+    it('returns undefined for an enum without icons or an unknown type', function () {
+
+        enum Test {
+            A = 1
+        }
+
+        registerEnum(Test, 'Enum_GetIconClass_Without_Icons_Test');
+
+        expect(Enum.getIconClass(Test, Test.A)).toBeUndefined();
+        expect(Enum.getIconClass(undefined, Test.A)).toBeUndefined();
+        expect(Enum.getIconClass({}, Test.A)).toBeUndefined();
     });
 });
 
@@ -472,6 +500,51 @@ describe("registerEnum", () => {
         registerEnum(Test, name, key);
         expect(getType(name)).toBe(Test);
         expect(getType(key)).toBe(Test);
+    });
+
+    it('works with enum key and icons', function () {
+
+        enum Test {
+            A = 1,
+            B = 2
+        }
+
+        const name = 'Test_Enum_With_Icons_Name';
+        const key = 'Test_Enum_With_Icons_Key';
+        registerEnum(Test, name, { enumKey: key, enumIcons: { [Test.A]: 'sv-a' } });
+
+        expect(getType(name)).toBe(Test);
+        expect(getType(key)).toBe(Test);
+        expect(getCustomAttribute(Test, EnumKeyAttribute, false)?.value).toBe(key);
+        expect(peekTypeInfo(Test)?.enumIcons).toStrictEqual({ [Test.A]: 'sv-a' });
+    });
+
+    it('works with icons but no enum key', function () {
+
+        enum Test {
+            A = 1
+        }
+
+        const name = 'Test_Enum_Icons_Without_Key';
+        registerEnum(Test, name, { enumIcons: { [Test.A]: 'sv-a' } });
+
+        expect(getType(name)).toBe(Test);
+        expect(hasCustomAttribute(Test, EnumKeyAttribute, false)).toBe(false);
+        expect(peekTypeInfo(Test)?.enumIcons).toStrictEqual({ [Test.A]: 'sv-a' });
+    });
+
+    it('merges the icons of later registrations', function () {
+
+        enum Test {
+            A = 1,
+            B = 2
+        }
+
+        const name = 'Test_Enum_Merged_Icons';
+        registerEnum(Test, name, { enumIcons: { [Test.A]: 'sv-a' } });
+        registerEnum(Test, name, { enumIcons: { [Test.B]: 'sv-b', [Test.A]: 'sv-a2' } });
+
+        expect(peekTypeInfo(Test)?.enumIcons).toStrictEqual({ [Test.A]: 'sv-a2', [Test.B]: 'sv-b' });
     });
 
     it('throws if enumType is not object or null', function () {

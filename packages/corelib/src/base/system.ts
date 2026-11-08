@@ -273,9 +273,14 @@ export class EnumKeyAttribute extends CustomAttribute {
  * Register an enum with the type system.
  * @param enumType Enum type to register
  * @param name Name to register the enum under
- * @param enumKey Optional key to use for the enum
+ * @param optOrEnumKey Alternative enum key or options for the enum registration, including alternative key and icon classes.
  */
-export function registerEnum(enumType: any, name: string, enumKey?: string) {
+export function registerEnum(enumType: any, name: string, optOrEnumKey?: string | {
+    /** Enum key */
+    enumKey?: string,
+    /** Icon classes for enum values */
+    enumIcons?: Record<number, string>
+}) {
     if (typeof enumType !== "object" || enumType == null)
         throw new Error("Enum type is required in registerEnum!");
 
@@ -283,12 +288,18 @@ export function registerEnum(enumType: any, name: string, enumKey?: string) {
         throw new Error("Enum name cannot end with a dot in registerEnum!");
 
     internalRegisterType(enumType, name, undefined, "enum");
+    const enumKey = typeof optOrEnumKey === "string" ? optOrEnumKey : optOrEnumKey?.enumKey;
+    const iconClasses = optOrEnumKey != null && typeof optOrEnumKey === "object" ? optOrEnumKey?.enumIcons : undefined;
     if (enumKey && enumKey != name) {
         if (!hasCustomAttribute(enumType, EnumKeyAttribute, false))
             addCustomAttribute(enumType, new EnumKeyAttribute(enumKey));
         const typeStore = getGlobalTypeRegistry();
         if (!typeStore[enumKey])
             typeStore[enumKey] = enumType;
+    }
+    if (iconClasses) {
+        const typeInfo = ensureTypeInfo(enumType);
+        typeInfo.enumIcons = Object.assign(typeInfo.enumIcons ?? {}, iconClasses);
     }
 }
 
@@ -349,6 +360,17 @@ export const Enum = {
     },
 
     /**
+     * Get the icon class for a specific enum value.
+     * @param enumType Enum type
+     * @param value Enum value
+     * @returns Icon class name or undefined if not found
+     */
+    getIconClass: (enumType: any, value: number): string | undefined => {
+        const typeInfo = peekTypeInfo(enumType);
+        return typeInfo?.enumIcons?.[value];
+    },
+
+    /**
      * Returns all numeric values of an enum as an array.
      * @param enumType - Enum object to enumerate.
      * @returns Array of numeric enum values.
@@ -362,7 +384,7 @@ export const Enum = {
                 parts.push(values[i]);
         }
         return parts;
-    }
+    },
 }
 
 /**

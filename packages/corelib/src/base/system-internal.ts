@@ -37,6 +37,8 @@ export type TypeInfo<TypeName> = {
     customAttributes?: CustomAttribute[];
     /** Enum flags */
     enumFlags?: boolean;
+    /** Enum icon classes mapping enum values to icon class names */
+    enumIcons?: Record<number, string>;
     /** Registered flag */
     registered?: boolean;
 }

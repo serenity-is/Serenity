@@ -51,10 +51,10 @@ export namespace Decorators {
     }
 
     /** Registers an enum with optional keys. @param target - Enum object. @param enumKey - Legacy lookup key. @param name - Full type name. */
-    export function registerEnum(target: any, enumKey?: string, name?: string) {
-        regEnum(target, name, enumKey);
-        if (enumKey)
-            addCustomAttribute(target, new EnumKeyAttribute(enumKey));
+    export function registerEnum(target: any, optOrEnumKey?: string | { enumKey?: string, enumIcons?: Record<number, string> }, name?: string) {
+        regEnum(target, name, optOrEnumKey);
+        if (typeof optOrEnumKey === "string")
+            addCustomAttribute(target, new EnumKeyAttribute(optOrEnumKey));
     }
 
     /**
