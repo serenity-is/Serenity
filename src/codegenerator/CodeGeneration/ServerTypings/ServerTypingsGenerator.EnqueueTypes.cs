@@ -196,7 +196,57 @@ public partial class ServerTypingsGenerator
 
         var enumType = TypingsUtils.GetEnumTypeFrom(memberType);
         if (enumType != null)
+        {
             EnqueueType(enumType);
+            return;
+        }
+
+        EnqueueStringEnumType(memberType);
+
+        if (memberType is GenericInstanceType genericType &&
+            genericType.GenericArguments() is { } genericArguments)
+        {
+            foreach (var argument in genericArguments)
+                EnqueueStringEnumType(argument);
+        }
+    }
+
+    /// <summary>
+    /// Enqueues the type when it is a <see cref="StringEnum"/> type, so its TypeScript is generated even when it is
+    /// only used as the argument of a field type like <c>StringEnumField&lt;T&gt;</c>.
+    /// </summary>
+    private void EnqueueStringEnumType(TypeReference? type)
+    {
+        if (!IsStringEnumType(type) || type?.Resolve() is not { } resolved)
+            return;
+
+        EnqueueType(resolved);
+    }
+
+    /// <summary>
+    /// Enqueues the string enumerations named by the arguments of the <see cref="EnumEditorAttribute"/> attributes
+    /// of a member, e.g. <c>[EnumEditor(typeof(WidgetCategory))]</c> on a string property.
+    /// </summary>
+    private void EnqueueStringEnumAttributes(IEnumerable<CustomAttribute>? attributes)
+    {
+        if (attributes == null)
+            return;
+
+        foreach (var attribute in attributes)
+        {
+            var attributeType = attribute.AttributeType();
+            if (attributeType == null ||
+                attributeType.NamespaceOf() != "Serenity.ComponentModel" ||
+                attributeType.Name != "EnumEditorAttribute")
+                continue;
+
+            foreach (var argument in attribute.ConstructorArguments() ?? [])
+            {
+                if (argument.Type?.FullNameOf() == "System.Type" &&
+                    argument.Value is TypeReference typeReference)
+                    EnqueueStringEnumType(typeReference);
+            }
+        }
     }
 
     protected virtual void EnqueueTypeMembers(TypeDefinition type)
@@ -207,7 +257,10 @@ public partial class ServerTypingsGenerator
             TrackUnresolvedAttributes(field.GetAttributes());
 #endif
             if (!field.IsStatic && field.IsPublic())
+            {
                 EnqueueMemberType(field.FieldType());
+                EnqueueStringEnumAttributes(field.GetAttributes());
+            }
         }
 
         foreach (var property in type.PropertiesOf())
@@ -219,6 +272,7 @@ public partial class ServerTypingsGenerator
                 continue;
 
             EnqueueMemberType(property.PropertyType());
+            EnqueueStringEnumAttributes(property.GetAttributes());
         }
     }
 

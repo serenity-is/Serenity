@@ -198,6 +198,12 @@ public partial class ServerTypingsGenerator : CodeGeneratorBase
             return;
         }
 
+        if (IsStringEnumType(type))
+        {
+            add(GenerateStringEnum);
+            return;
+        }
+
         var baseTypes = type.EnumerateBaseClasses().ToArray();
 
         if (IsServiceEndpoint(baseTypes, type))

@@ -20,6 +20,53 @@ public partial class EnumEditorAttribute : CustomEditorAttribute
     }
 
     /// <summary>
+    /// Initializes a new instance of the <see cref="EnumEditorAttribute"/> class for a numeric enum or a
+    /// <see cref="StringEnum"/> type, which is needed for a property that is not typed with it, e.g. a string
+    /// property that holds the values of a <see cref="StringEnum"/>.
+    /// </summary>
+    /// <param name="enumType">The enum or string enumeration type.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="enumType"/> is null.</exception>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="enumType"/> is neither an enum nor a string enumeration.</exception>
+    public EnumEditorAttribute(Type enumType)
+        : base(Key)
+    {
+        if (enumType == null)
+            throw new ArgumentNullException(nameof(enumType));
+
+        if (!enumType.IsEnum && !StringEnum.IsStringEnum(enumType))
+            throw new ArgumentOutOfRangeException(nameof(enumType),
+                $"{enumType.FullName} is neither an enum nor a {nameof(StringEnum)} type!");
+
+        EnumKey = EnumMapper.GetEnumTypeKey(enumType);
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="EnumEditorAttribute"/> class for an enum or a
+    /// <see cref="StringEnum"/> type by its key, which is needed for a property that is not typed with it, e.g.
+    /// a string property that holds the values of a <see cref="StringEnum"/>.
+    /// </summary>
+    /// <param name="enumKey">The key of the enum or string enumeration.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="enumKey"/> is null or empty.</exception>
+    public EnumEditorAttribute(string enumKey)
+        : base(Key)
+    {
+        if (string.IsNullOrEmpty(enumKey))
+            throw new ArgumentNullException(nameof(enumKey));
+
+        EnumKey = enumKey;
+    }
+
+    /// <summary>
+    /// Gets or sets the key of the enum or string enumeration, which is determined from the type of the property
+    /// when it is typed with one.
+    /// </summary>
+    public string? EnumKey
+    {
+        get { return GetOption<string>("enumKey"); }
+        set { SetOption("enumKey", value); }
+    }
+
+    /// <summary>
     /// Gets or sets a value indicating whether to allow clearing.
     /// </summary>
     /// <value>

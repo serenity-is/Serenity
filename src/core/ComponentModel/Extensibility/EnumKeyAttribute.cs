@@ -1,14 +1,15 @@
 ﻿namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Sets the enumeration key of an enum.
+/// Sets the enumeration key of an enum, or of a <see cref="StringEnum"/>, which is used as the
+/// <c>Enums.&lt;EnumKey&gt;.&lt;Name&gt;</c> prefix of its member texts.
 /// </summary>
 /// <seealso cref="Attribute" />
 /// <remarks>
 /// Initializes a new instance of the <see cref="EnumKeyAttribute"/> class.
 /// </remarks>
 /// <param name="value">The value.</param>
-[AttributeUsage(AttributeTargets.Enum, AllowMultiple = false)]
+[AttributeUsage(AttributeTargets.Enum | AttributeTargets.Class, AllowMultiple = false)]
 public class EnumKeyAttribute(string value) : Attribute
 {
 

@@ -1,8 +1,7 @@
 namespace Serenity.Localization;
 
 public class EnumLocalTextRegistrationTests
-{
-    [EnumKey("My.CoolEnumKey")]
+{    [EnumKey("My.CoolEnumKey")]
     public enum EnumWithKey
     {
         NoDescriptionKey,
@@ -114,5 +113,67 @@ public class EnumLocalTextRegistrationTests
         EnumLocalTextRegistration.AddEnumTexts(registry, new MockTypeSource(typeof(EnumWithKey)), languageID: "es");
         Assert.NotEmpty(registry.AddedList);
         Assert.All(registry.AddedList, x => Assert.Equal("es", x.languageID));
+    }
+
+    [Fact]
+    public void AddEnumTexts_Adds_StringEnum_Members_With_Enums_Key()
+    {
+        var registry = new MockLocalTextRegistry();
+        EnumLocalTextRegistration.AddEnumTexts(registry, new MockTypeSource(typeof(WidgetCategory)));
+
+        Assert.Collection(registry.AddedList,
+            item => Assert.Equal((LocalText.InvariantLanguageID,
+                "Enums.My.WidgetCategory.Charts", "Charts"), item),
+            item => Assert.Equal((LocalText.InvariantLanguageID,
+                "Site.Outlines", "Outlines"), item));
+    }
+
+    [Fact]
+    public void AddEnumTexts_Uses_FullName_For_StringEnum_Without_EnumKey()
+    {
+        var registry = new MockLocalTextRegistry();
+        EnumLocalTextRegistration.AddEnumTexts(registry, new MockTypeSource(typeof(EnumKeyLessStringEnum)));
+
+        Assert.Equal((LocalText.InvariantLanguageID,
+            "Enums." + typeof(EnumKeyLessStringEnum).FullName + ".FirstMember", "First"),
+            Assert.Single(registry.AddedList));
+    }
+
+    [Fact]
+    public void AddEnumTexts_Skips_StringEnum_Members_Without_Text()
+    {
+        var registry = new MockLocalTextRegistry();
+        EnumLocalTextRegistration.AddEnumTexts(registry, new MockTypeSource(typeof(WidgetCategory)));
+
+        Assert.DoesNotContain(registry.AddedList, x => x.key.EndsWith(".Tables", StringComparison.Ordinal));
+        Assert.DoesNotContain(registry.AddedList, x => x.key.EndsWith(".Internal", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void AddEnumTexts_Throws_For_Key_Collision_Between_Enum_And_StringEnum()
+    {
+        var registry = new MockLocalTextRegistry();
+
+        var ex = Assert.Throws<InvalidOperationException>(() => EnumLocalTextRegistration.AddEnumTexts(registry,
+            new MockTypeSource(typeof(WidgetCategory), typeof(CollidingWidgetCategory))));
+
+        Assert.Contains(typeof(CollidingWidgetCategory).FullName!, ex.Message);
+        Assert.Contains(typeof(WidgetCategory).FullName!, ex.Message);
+    }
+
+    [EnumKey("My.WidgetCategory")]
+    public enum CollidingWidgetCategory
+    {
+        [Description("Colliding charts")]
+        Charts,
+        [Description("Unrelated")]
+        Other
+    }
+
+    public abstract class EnumKeyLessStringEnum : StringEnum
+    {
+        [Description("First")]
+        public const string FirstMember = "first";
+        public const string SecondMember = "second";
     }
 }

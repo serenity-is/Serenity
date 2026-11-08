@@ -37,7 +37,7 @@ export class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions> extends
      * @param opt The enum key and type.
      * @returns The combobox item representing the enum value.
      */
-    protected mapEnum(value: number, opt: { enumKey: string, enumType: any }): ComboboxItem<any> {
+    protected mapEnum(value: number | string, opt: { enumKey: string, enumType: any }): ComboboxItem<any> {
         const name = Enum.toString(opt.enumType, value);
         return {
             id: String(value),
@@ -52,7 +52,7 @@ export class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions> extends
      * @param opt The enum key and type.
      * @returns The icon class name representing the enum value, or undefined if none.
      */
-    protected mapIcon(value: number, opt: { enumKey: string, enumType: any }): IconClassName | undefined {
+    protected mapIcon(value: number | string, opt: { enumKey: string, enumType: any }): IconClassName | undefined {
         return Enum.getIconClass(opt.enumType, value);
     }
 

@@ -67,6 +67,15 @@ public class StringField(ICollection<Field> collection, string name, LocalText? 
     }
 
     /// <summary>
+    /// Converts or validates a non-null string value read from JSON before it is set on the row. It is
+    /// not called for a JSON null. Derived fields can override it to reject a value by throwing, in which case
+    /// the row is left unassigned for this field.
+    /// </summary>
+    /// <param name="value">The value read from JSON.</param>
+    /// <returns>The value to set, which is the value itself by default.</returns>
+    protected virtual string? ConvertJsonValue(string? value) => value;
+
+    /// <summary>
     /// Deserializes this field's value from JSON.
     /// </summary>
     /// <param name="reader">The reader.</param>
@@ -84,12 +93,12 @@ public class StringField(ICollection<Field> collection, string name, LocalText? 
                 _setValue(row, null);
                 break;
             case Newtonsoft.Json.JsonToken.String:
-                _setValue(row, (string?)reader.Value);
+                _setValue(row, ConvertJsonValue((string?)reader.Value));
                 break;
             case Newtonsoft.Json.JsonToken.Integer:
             case Newtonsoft.Json.JsonToken.Float:
             case Newtonsoft.Json.JsonToken.Boolean:
-                _setValue(row, Convert.ToString(reader.Value, CultureInfo.InvariantCulture));
+                _setValue(row, ConvertJsonValue(Convert.ToString(reader.Value, CultureInfo.InvariantCulture)));
                 break;
             case Newtonsoft.Json.JsonToken.Date:
                 var val = reader.Value is DateTimeOffset dto ? dto.DateTime : (DateTime)reader.Value!;
@@ -103,7 +112,7 @@ public class StringField(ICollection<Field> collection, string name, LocalText? 
                     // turn literals like 'at' into format specifiers)
                     style = style.Split("'T'")[0];
 
-                _setValue(row, val.ToString(style, CultureInfo.InvariantCulture));
+                _setValue(row, ConvertJsonValue(val.ToString(style, CultureInfo.InvariantCulture)));
                 break;
 
             default:
@@ -135,11 +144,11 @@ public class StringField(ICollection<Field> collection, string name, LocalText? 
                 }
                 else
                     v = Convert.ToString(reader.TokenType == JsonTokenType.True, CultureInfo.InvariantCulture);
-                _setValue(row, v);
+                _setValue(row, ConvertJsonValue(v));
                 break;
             case JsonTokenType.String:
                 v = reader.GetString()!;
-                _setValue(row, v);
+                _setValue(row, ConvertJsonValue(v));
                 break;
             default:
                 throw UnexpectedJsonToken(ref reader);

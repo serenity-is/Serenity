@@ -78,4 +78,51 @@ public class EnumEditorAttributeTests
         };
         Assert.False(attribute.Multiple);
     }
+
+    [Fact]
+    public void EnumKey_IsDetermined_FromTheTypeConstructor()
+    {
+        // for a property not typed with the enum, e.g. a string property holding StringEnum values
+        var attribute = new EnumEditorAttribute(typeof(WidgetCategory));
+
+        Assert.Equal("My.WidgetCategory", attribute.EnumKey);
+    }
+
+    [Fact]
+    public void EnumKey_IsDetermined_FromTheFullName_WhenNoEnumKeyAttribute()
+    {
+        var attribute = new EnumEditorAttribute(typeof(WidgetCategoryExtended));
+
+        Assert.Equal(typeof(WidgetCategoryExtended).FullName, attribute.EnumKey);
+    }
+
+    [Fact]
+    public void TypeConstructor_Throws_ForNonEnumType()
+    {
+        Assert.Throws<ArgumentNullException>(() => new EnumEditorAttribute((Type)null!));
+        Assert.Throws<ArgumentOutOfRangeException>(() => new EnumEditorAttribute(typeof(string)));
+    }
+
+    [Fact]
+    public void StringConstructor_SetsEnumKey()
+    {
+        var attribute = new EnumEditorAttribute("My.WidgetCategory");
+
+        Assert.Equal("My.WidgetCategory", attribute.EnumKey);
+    }
+
+    [Fact]
+    public void StringConstructor_Throws_ForNullOrEmptyKey()
+    {
+        Assert.Throws<ArgumentNullException>(() => new EnumEditorAttribute((string)null!));
+        Assert.Throws<ArgumentNullException>(() => new EnumEditorAttribute(""));
+    }
+
+    [Fact]
+    public void EnumKey_CanBeSet_AsAnOption()
+    {
+        var attribute = new EnumEditorAttribute { EnumKey = "My.WidgetCategory" };
+
+        Assert.Equal("My.WidgetCategory", attribute.EnumKey);
+    }
 }

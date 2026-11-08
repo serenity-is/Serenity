@@ -37,8 +37,10 @@ export type TypeInfo<TypeName> = {
     customAttributes?: CustomAttribute[];
     /** Enum flags */
     enumFlags?: boolean;
-    /** Enum icon classes mapping enum values to icon class names */
-    enumIcons?: Record<number, string>;
+    /** Whether the enum has string members (a StringEnum), which is determined when it is registered */
+    enumKind?: "numeric" | "string";
+    /** Icon classes mapping enum values (numeric or string) to icon class names */
+    enumIcons?: Record<string | number, string>;
     /** Registered flag */
     registered?: boolean;
 }

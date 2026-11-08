@@ -16,6 +16,18 @@ enum IconTestEnum {
 
 registerEnum(IconTestEnum, "Serenity.Tests.IconTestEnum", { enumIcons: { [IconTestEnum.Option2]: "sv-ph-chart-bar-duotone" } });
 
+const WidgetCategory = {
+    Charts: 'charts',
+    Tables: 'tables'
+} as const;
+
+type WidgetCategory = typeof WidgetCategory[keyof typeof WidgetCategory];
+
+registerEnum(WidgetCategory, "Serenity.Tests.WidgetCategory", {
+    enumKey: 'My.WidgetCategory',
+    enumIcons: { 'charts': 'sv-ph-chart-bar-duotone' }
+});
+
 describe("EnumEditor", () => {
     it("builds options from enumType", () => {
         const editor = new EnumEditor({ enumType: TestEnum } as any);
@@ -54,5 +66,26 @@ describe("EnumEditor", () => {
         finally {
             getOrLoad.mockRestore();
         }
+    });
+
+    it("builds options from a string enum", () => {
+        const editor = new EnumEditor({ enumType: WidgetCategory } as any);
+        const items = editor["_items"];
+        expect(items.map((x: any) => x.id)).toEqual(["charts", "tables"]);
+        editor.destroy();
+    });
+
+    it("uses the icon classes of a string enum", () => {
+        const editor = new EnumEditor({ enumType: WidgetCategory } as any);
+        const items = editor["_items"];
+        expect(items.map((x: any) => x.icon)).toEqual(["sv-ph-chart-bar-duotone", undefined]);
+        editor.destroy();
+    });
+
+    it("loads a string enum by its key", () => {
+        const editor = new EnumEditor({ enumKey: 'My.WidgetCategory' } as any);
+        const items = editor["_items"];
+        expect(items.map((x: any) => x.id)).toEqual(["charts", "tables"]);
+        editor.destroy();
     });
 });

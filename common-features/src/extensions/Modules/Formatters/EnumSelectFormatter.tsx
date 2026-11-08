@@ -1,4 +1,4 @@
-import { EnumTypeRegistry, Formatter, formatterTypeInfo, htmlEncode, localText, registerType, SelectEditorTexts } from "@serenity-is/corelib";
+import { Enum, EnumTypeRegistry, Formatter, formatterTypeInfo, htmlEncode, localText, registerType, SelectEditorTexts } from "@serenity-is/corelib";
 import { FormatterContext, FormatterResult } from "@serenity-is/sleekgrid";
 import { nsExtensions } from "../ServerTypes/Namespaces";
 
@@ -18,11 +18,15 @@ export class EnumSelectFormatter implements Formatter {
                 {this.props.allowClear && <option value="">
                     {htmlEncode(this.props.emptyItemText ?? SelectEditorTexts.EmptyItemText)}
                 </option>}
-                {Object.keys(enumType).filter(v => !isNaN(parseInt(v, 10))).map(x => (
-                    <option value={x} selected={x == ctx.value}>
-                        {localText("Enums." + this.props.enumKey + "." + enumType[x], enumType[x])}
-                    </option>
-                ))}
+                {Enum.getValues(enumType).map(x => {
+                    const value = String(x);
+                    const name = Enum.toString(enumType, x);
+                    return (
+                        <option value={value} selected={value == ctx.value}>
+                            {localText("Enums." + this.props.enumKey + "." + name, name)}
+                        </option>
+                    );
+                })}
             </select>
         );
     }

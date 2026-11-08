@@ -47,6 +47,9 @@ public partial class ServerTypingsGenerator
             AppendMappedType(memberType, codeNamespace);
             sb.Append(';');
             sb.AppendLine();
+
+            // a member typed string that names its set with [EnumEditor(typeof(X))] still depends on it
+            EnqueueStringEnumAttributes(a);
         }
 
         var current = type;

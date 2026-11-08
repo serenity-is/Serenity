@@ -31,7 +31,7 @@ public partial class ServerTypingsGenerator
 
     private void GenerateRowMembers(TypeDefinition rowType, string? codeNamespace)
     {
-        foreach (var property in EnumerateFieldProperties(rowType))
+        foreach (var (property, field) in EnumerateFieldPropertiesWithFields(rowType))
         {
             cw.Indented(property.Name);
             sb.Append("?: ");
@@ -40,6 +40,12 @@ public partial class ServerTypingsGenerator
             if (enumType != null)
             {
                 AppendMappedType(enumType, codeNamespace);
+            }
+            else if (GetStringEnumTypeOfField(field) is { } stringEnumType)
+            {
+                // a row property of a StringEnumField is a string on the wire, but is typed with the
+                // union of its values on the client, so it is checked against them
+                AppendMappedType(stringEnumType, codeNamespace);
             }
             else
             {
@@ -50,7 +56,27 @@ public partial class ServerTypingsGenerator
         }
     }
 
+    /// <summary>
+    /// Gets the string enumeration type of a row field when the field is a StringEnumField, so its property can be
+    /// typed with the union of its values.
+    /// </summary>
+    private static TypeReference? GetStringEnumTypeOfField(FieldDefinition field)
+    {
+        var fieldType = field.FieldType();
+        if (fieldType is not GenericInstanceType genericType ||
+            genericType.GenericArguments() is not { Count: > 0 } genericArguments ||
+            !IsStringEnumType(genericArguments[0]))
+            return null;
+
+        return genericArguments[0];
+    }
+
     private static IEnumerable<PropertyDefinition> EnumerateFieldProperties(TypeDefinition rowType)
+    {
+        return EnumerateFieldPropertiesWithFields(rowType).Select(x => x.Property);
+    }
+
+    private static IEnumerable<(PropertyDefinition Property, FieldDefinition Field)> EnumerateFieldPropertiesWithFields(TypeDefinition rowType)
     {
         do
         {
@@ -87,21 +113,20 @@ public partial class ServerTypingsGenerator
 
             if (fieldsType != null)
             {
-                foreach (var fieldName in fieldsType.FieldsOf()
+                foreach (var field in fieldsType.FieldsOf()
                     .Where(x => x.IsPublic())
 #if ISSOURCEGENERATOR
                     .OrderBy(p => p.DeclaringSyntaxReferences.FirstOrDefault()?.SyntaxTree?.FilePath)
 #endif
-
-                    .Select(x => x.Name))
+                    )
                 {
-                    var property = propertyByName[fieldName].FirstOrDefault();
+                    var property = propertyByName[field.Name].FirstOrDefault();
                     if (property != null)
                     {
                         var attrs = property.GetAttributesWithIntrinsic();
                         if (TypingsUtils.FindAttr(attrs, "Serenity.ComponentModel", "IgnoreUIFieldAttribute") is null &&
                             TypingsUtils.FindAttr(attrs, "Serenity.ComponentModel", "TransformIgnoreAttribute") is null)
-                            yield return property;
+                            yield return (property, field);
                     }
                 }
             }

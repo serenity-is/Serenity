@@ -174,4 +174,38 @@ public class EnumMapperTests
     {
         Assert.Equal("42", NullTextLocalizer.Instance.FormatEnum(typeof(int), 42));
     }
+
+    [Fact]
+    public void ToString_ReturnsMemberName_ForStringEnumValue()
+    {
+        Assert.Equal(nameof(WidgetCategory.Charts), EnumMapper.ToString(typeof(WidgetCategory), "charts"));
+    }
+
+    [Fact]
+    public void ToString_ReturnsValue_ForUnknownStringEnumValue()
+    {
+        Assert.Equal("missing", EnumMapper.ToString(typeof(WidgetCategory), "missing"));
+    }
+
+    [Fact]
+    public void FormatEnum_ReturnsMemberText_ForStringEnumValue()
+    {
+        Assert.Equal("Charts", NullTextLocalizer.Instance.FormatEnum(typeof(WidgetCategory), "charts"));
+        Assert.Equal("Outlines", NullTextLocalizer.Instance.FormatEnum(typeof(WidgetCategory), "outlines"));
+        Assert.Equal("Tables", NullTextLocalizer.Instance.FormatEnum(typeof(WidgetCategory), "tables"));
+    }
+
+    [Fact]
+    public void FormatEnum_UsesLocalText_ForStringEnumValue()
+    {
+        var localizer = new MockTextLocalizer(key => key == "Enums.My.WidgetCategory.Tables" ? "Tabular" : null);
+
+        Assert.Equal("Tabular", localizer.FormatEnum(typeof(WidgetCategory), "tables"));
+    }
+
+    [Fact]
+    public void FormatEnum_ReturnsValue_ForUnknownStringEnumValue()
+    {
+        Assert.Equal("missing", NullTextLocalizer.Instance.FormatEnum(typeof(WidgetCategory), "missing"));
+    }
 }

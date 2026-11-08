@@ -7,9 +7,12 @@ enum TestEnum {
     Value2 = 2
 }
 
+const TestStringEnum = { Charts: "charts", Tables: "tables" } as const;
+
 describe("EnumSelectFormatter", () => {
     beforeEach(() => {
         registerEnum(TestEnum, "My.TestEnum", "TestEnum");
+        registerEnum(TestStringEnum, "My.TestStringEnum", "TestStringEnum");
     });
 
     it("has allowClear true by default", () => {
@@ -27,6 +30,14 @@ describe("EnumSelectFormatter", () => {
         expect(options[1].value).toBe("1");
         expect(options[2].value).toBe("2");
         expect(options[2].selected).toBe(true);
+    });
+
+    it("renders an option for each string enum value in declaration order and marks selected", () => {
+        const select = new EnumSelectFormatter({ enumKey: "TestStringEnum" }).format({ value: "tables" } as any) as HTMLElement;
+        const options = Array.from(select.querySelectorAll("option"));
+        expect(options.map(x => x.value)).toStrictEqual(["", "charts", "tables"]);
+        expect(options.map(x => x.textContent)).toStrictEqual([options[0].textContent, "Charts", "Tables"]);
+        expect(options.map(x => x.selected)).toStrictEqual([false, false, true]);
     });
 
     it("omits clear option when allowClear is false", () => {

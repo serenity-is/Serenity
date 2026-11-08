@@ -1,4 +1,6 @@
-﻿namespace Serenity.Localization;
+﻿using System.ComponentModel;
+
+namespace Serenity.Localization;
 
 /// <summary>
 /// Contains initialization methods for adding local text translations defined by
@@ -12,6 +14,10 @@ public static class EnumLocalTextRegistration
     /// local text. By default, enums are registered in the format
     /// "Enums.{EnumerationTypeFullName}.{EnumValueName}", where EnumerationTypeFullName is the
     /// full name of the enumeration type. This can be overridden by attaching an <see cref="EnumKeyAttribute"/>.
+    /// <para>
+    /// The members of <see cref="StringEnum"/> types are registered with the same keys, so a string enumeration
+    /// can't share a member name with an enum that has the same key.
+    /// </para>
     /// </summary>
     /// <param name="registry">The registry to add texts to.</param>
     /// <param name="typeSource">The type source to search for enumeration classes in.</param>
@@ -24,6 +30,8 @@ public static class EnumLocalTextRegistration
 
         if (registry is null)
             throw new ArgumentNullException(nameof(registry));
+
+        var owners = new Dictionary<string, Type>(StringComparer.Ordinal);
 
         foreach (var type in typeSource.GetTypes())
         {
@@ -38,16 +46,42 @@ public static class EnumLocalTextRegistration
                         continue;
 
                     var descAttr = member[0].GetCustomAttribute<DescriptionAttribute>();
-                    if (descAttr != null)
-                    {
-                        var defaultKey = "Enums." + enumKey + "." + name;
-                        var resolved = LocalText.ResolveFromAttribute(descAttr,
-                            descAttr.Description, defaultKey);
-                        if (resolved.Key is string key)
-                            registry.Add(languageID, key, resolved.Text);
-                    }
+                    if (descAttr == null)
+                        continue;
+
+                    var defaultKey = "Enums." + enumKey + "." + name;
+                    var resolved = LocalText.ResolveFromAttribute(descAttr, descAttr.Description, defaultKey);
+                    if (resolved.Key is string key)
+                        AddText(registry, owners, type, key, resolved.Text, languageID);
+                }
+            }
+            else if (StringEnum.IsStringEnum(type))
+            {
+                var info = StringEnum.GetInfo(type);
+
+                foreach (var member in info.Members)
+                {
+                    if (member.TextKey is null && member.Text is null)
+                        continue;
+
+                    var key = member.TextKey ?? "Enums." + info.EnumKey + "." + member.Name;
+                    AddText(registry, owners, type, key, member.Text, languageID);
                 }
             }
         }
+    }
+
+    private static void AddText(ILocalTextRegistry registry, Dictionary<string, Type> owners,
+        Type type, string key, string? text, string languageID)
+    {
+        if (owners.TryGetValue(key, out var ownerType) && ownerType != type)
+            throw new InvalidOperationException(string.Format(
+                "The local text key '{0}' of {1} is already used by {2}. " +
+                "Please change the EnumKey of one of them, or the name of its members!",
+                key, type.FullName, ownerType.FullName));
+
+        owners[key] = type;
+
+        registry.Add(languageID, key, text);
     }
 }

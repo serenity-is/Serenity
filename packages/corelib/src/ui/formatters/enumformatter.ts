@@ -45,7 +45,7 @@ export class EnumFormatter implements Formatter {
     /**
      * Formats an enum value given an enum type.
      * @param enumType - Registered enum object.
-     * @param value - Enum numeric value.
+     * @param value - Enum value, numeric or string.
      * @returns Localized display text.
      */
     static format(enumType: any, value: any) {

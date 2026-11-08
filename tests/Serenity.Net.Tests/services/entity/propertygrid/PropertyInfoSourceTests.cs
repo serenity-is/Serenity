@@ -92,6 +92,27 @@ public class PropertyInfoSourceTests
     }
 
     [Fact]
+    public void EnumType_ComesFromStringEnumField()
+    {
+        // the property stays a string, while the editor, filtering and formatting are inferred from the set
+        var source = new PropertyInfoSource(typeof(WidgetRow).GetProperty(nameof(WidgetRow.Category)),
+            new WidgetRow());
+
+        Assert.Equal(typeof(string), source.ValueType);
+        Assert.Equal(typeof(WidgetCategory), source.EnumType);
+        Assert.Same(WidgetRow.Fields.Category, source.BasedOnField);
+    }
+
+    [Fact]
+    public void EnumType_IsNull_ForStringPropertyWithoutStringEnumField()
+    {
+        var source = new PropertyInfoSource(typeof(WidgetRow).GetProperty(nameof(WidgetRow.Name)),
+            new WidgetRow());
+
+        Assert.Null(source.EnumType);
+    }
+
+    [Fact]
     public void NameAndReflectedType_AreExposed()
     {
         var property = typeof(SourceForm).GetProperty(nameof(SourceForm.EnumMapped));

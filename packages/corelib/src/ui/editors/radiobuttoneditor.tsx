@@ -82,14 +82,8 @@ export class RadioButtonEditor<P extends RadioButtonEditorOptions = RadioButtonE
      * @returns The enum values.
      */
     protected getEnumValues(enumType: any): any[] {
-        const values = Enum.getValues(enumType);
-        if (values.length || enumType == null)
-            return values;
-
-        // Enum.getValues only returns numeric values, so for string enums collect the string members directly.
-        return Object.keys(enumType)
-            .filter(k => typeof enumType[k] === "string")
-            .map(k => enumType[k]);
+        // string enums of a StringEnum have string members, which Enum.getValues returns as they are
+        return Enum.getValues(enumType);
     }
 
     /**

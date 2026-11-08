@@ -9,7 +9,7 @@ public partial class ServerTypingsGenerator
         if (enumKeyAttr != null &&
             enumKeyAttr.ConstructorArguments().Count >= 1 &&
             enumKeyAttr.ConstructorArguments()[0].Type?.FullNameOf() == "System.String")
-            enumKey = enumKeyAttr.ConstructorArguments[0].Value as string;
+            enumKey = enumKeyAttr.ConstructorArguments()[0].Value as string;
         return enumKey;
     }
 
@@ -23,6 +23,67 @@ public partial class ServerTypingsGenerator
             return iconAttr.ConstructorArguments()[0].Value as string;
 
         return null;
+    }
+
+    /// <summary>
+    /// Writes the registerEnum call for an enum or a string enumeration. The keys of the icons are the object
+    /// literal keys, e.g. a quoted numeric value for an enum or a quoted string for a string enumeration.
+    /// </summary>
+    private void WriteEnumRegistration(string identifier, string fullName, string? enumKey,
+        IReadOnlyList<(string Key, string Icon)> icons)
+    {
+        var registerEnum = ImportFromCorelib("registerEnum");
+        cw.Indented($"{registerEnum}(");
+
+        sb.Append(identifier);
+        sb.Append(", '");
+        sb.Append(fullName);
+        sb.Append('\'');
+
+        // the icon classes are only included when a member has one, so the others keep the simpler calls
+        if (icons.Count == 0)
+        {
+            if (enumKey != fullName)
+            {
+                sb.Append(", '");
+                sb.Append(enumKey);
+                sb.AppendLine("');");
+            }
+            else
+                sb.AppendLine(");");
+
+            return;
+        }
+
+        sb.AppendLine(", {");
+        cw.Block(delegate
+        {
+            if (enumKey != fullName)
+            {
+                cw.Indented("enumKey: '");
+                sb.Append(enumKey);
+                sb.AppendLine("',");
+            }
+
+            cw.IndentedLine("enumIcons: {");
+            cw.Block(delegate
+            {
+                for (var i = 0; i < icons.Count; i++)
+                {
+                    if (i > 0)
+                        sb.AppendLine(",");
+
+                    cw.Indented(icons[i].Key);
+                    sb.Append(": ");
+                    sb.Append(icons[i].Icon.ToSingleQuoted());
+                }
+
+                sb.AppendLine();
+            });
+            cw.Indented("}");
+            sb.AppendLine();
+        });
+        cw.IndentedLine("});");
     }
 
     private void GenerateEnum(TypeDefinition enumType)
@@ -61,65 +122,13 @@ public partial class ServerTypingsGenerator
             sb.AppendLine();
         });
 
-        var registerEnum = ImportFromCorelib("registerEnum");
-        cw.Indented($"{registerEnum}(");
-
-        sb.Append(enumType.Name);
-        sb.Append(", '");
-        sb.Append(fullName);
-        sb.Append('\'');
-
-        // the icon classes are only included when a member has one, so the others keep the simpler calls.
-        // C# allows aliases with the same value, in which case the icon of the first one is used
+        // C# allows aliases with the same value, in which case the icon of the first one is used. The keys are
+        // quoted as a negative number is not valid as an object key
         var icons = fields.Where(x => !string.IsNullOrEmpty(x.Icon))
             .GroupBy(x => x.Value)
-            .Select(group => (Value: group.Key, Icon: group.First().Icon!))
-            .OrderBy(x => x.Value)
+            .Select(group => (Key: $"'{group.Key}'", Icon: group.First().Icon!))
             .ToList();
-        if (icons.Count == 0)
-        {
-            if (enumKey != fullName)
-            {
-                sb.Append(", '");
-                sb.Append(enumKey);
-                sb.AppendLine("');");
-            }
-            else
-                sb.AppendLine(");");
 
-            return;
-        }
-
-        sb.AppendLine(", {");
-        cw.Block(delegate
-        {
-            if (enumKey != fullName)
-            {
-                cw.Indented("enumKey: '");
-                sb.Append(enumKey);
-                sb.AppendLine("',");
-            }
-
-            cw.IndentedLine("enumIcons: {");
-            cw.Block(delegate
-            {
-                var inserted = 0;
-                foreach (var icon in icons)
-                {
-                    if (inserted > 0)
-                        sb.AppendLine(",");
-
-                    cw.Indented($"'{icon.Value}': ");
-                    // a negative number is not valid as an object key, so the values are quoted
-                    sb.Append(icon.Icon.ToSingleQuoted());
-                    inserted++;
-                }
-
-                sb.AppendLine();
-            });
-            cw.Indented("}");
-            sb.AppendLine();
-        });
-        cw.IndentedLine("});");
+        WriteEnumRegistration(identifier, fullName, enumKey, icons);
     }
 }

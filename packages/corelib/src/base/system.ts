@@ -278,8 +278,8 @@ export class EnumKeyAttribute extends CustomAttribute {
 export function registerEnum(enumType: any, name: string, optOrEnumKey?: string | {
     /** Enum key */
     enumKey?: string,
-    /** Icon classes for enum values */
-    enumIcons?: Record<number, string>
+    /** Icon classes for enum values, numeric or string */
+    enumIcons?: Record<string | number, string>
 }) {
     if (typeof enumType !== "object" || enumType == null)
         throw new Error("Enum type is required in registerEnum!");
@@ -297,10 +297,37 @@ export function registerEnum(enumType: any, name: string, optOrEnumKey?: string 
         if (!typeStore[enumKey])
             typeStore[enumKey] = enumType;
     }
-    if (iconClasses) {
-        const typeInfo = ensureTypeInfo(enumType);
+
+    const typeInfo = ensureTypeInfo(enumType);
+    if (typeInfo.enumKind == null)
+        typeInfo.enumKind = hasStringMembers(enumType) ? "string" : "numeric";
+
+    if (iconClasses)
         typeInfo.enumIcons = Object.assign(typeInfo.enumIcons ?? {}, iconClasses);
+}
+
+/**
+ * Checks whether an enum object has string members, i.e. whether it is generated from a StringEnum. A numeric TS
+ * enum reverse-maps names to numbers, so an entry only counts when its value is a string and the entry for that
+ * value is not a number.
+ */
+function hasStringMembers(enumType: any): boolean {
+    if (enumType == null || typeof enumType !== "object")
+        return false;
+
+    for (const i in enumType) {
+        if (isStringMember(enumType, i))
+            return true;
     }
+
+    return false;
+}
+
+/** Checks whether the entry is an own string member, not the reverse mapping of a numeric member */
+function isStringMember(enumType: any, key: string): boolean {
+    return Object.prototype.hasOwnProperty.call(enumType, key) &&
+        typeof enumType[key] === "string" &&
+        typeof enumType[enumType[key]] !== "number";
 }
 
 /**
@@ -322,16 +349,40 @@ export function registerInterface(type: any, name: string, intf?: InterfaceType[
  */
 export const Enum = {
     /**
+     * Checks whether an enum has string members, i.e. whether it is generated from a StringEnum. The kind is
+     * recorded when the enum is registered; before that, the members are inspected.
+     * @param enumType Enum type
+     * @returns True when the members of the enum are strings
+     */
+    isStringEnum: (enumType: any): boolean => {
+        const kind = peekTypeInfo(enumType)?.enumKind;
+        if (kind != null)
+            return kind === "string";
+
+        return hasStringMembers(enumType);
+    },
+
+    /**
      * Convert an enum value to a string containing enum names.
      * @param enumType Enum type
      * @param value Enum value
      */
-    toString: (enumType: any, value: number): string => {
+    toString: (enumType: any, value: number | string): string => {
         if (value == null)
             return "";
 
-        if (typeof value !== "number")
+        if (typeof value !== "number") {
+            // for a string enum the value is stored as it is, so the name of its member is returned. Numeric enums
+            // keep returning the value itself, as their editor values are strings of the numeric values
+            if (typeof value === "string" && Enum.isStringEnum(enumType)) {
+                const members = enumType;
+                for (const i in members) {
+                    if (isStringMember(members, i) && members[i] === value)
+                        return i;
+                }
+            }
             return "" + value;
+        }
 
         const values = enumType;
         if (value === 0 || !peekTypeInfo(enumType)?.enumFlags) {
@@ -362,22 +413,35 @@ export const Enum = {
     /**
      * Get the icon class for a specific enum value.
      * @param enumType Enum type
-     * @param value Enum value
+     * @param value Enum value, numeric or string
      * @returns Icon class name or undefined if not found
      */
-    getIconClass: (enumType: any, value: number): string | undefined => {
+    getIconClass: (enumType: any, value: string | number): string | undefined => {
         const typeInfo = peekTypeInfo(enumType);
         return typeInfo?.enumIcons?.[value];
     },
 
     /**
-     * Returns all numeric values of an enum as an array.
+     * Returns all values of an enum as an array, in their declaration order. A numeric enum returns its numeric
+     * values, a string enum returns the string values of its members.
      * @param enumType - Enum object to enumerate.
-     * @returns Array of numeric enum values.
+     * @returns Array of enum values. It is typed as `any[]` by default, and can be narrowed with a type
+     * argument, e.g. `Enum.getValues<WidgetCategory>(WidgetCategory)`.
      */
-    getValues: (enumType: any) => {
-        const parts = [];
+    getValues: <T = any>(enumType: any): T[] => {
+        const parts: any[] = [];
         const values = enumType;
+        if (values == null)
+            return parts;
+
+        if (Enum.isStringEnum(values)) {
+            for (const i in values) {
+                if (isStringMember(values, i))
+                    parts.push(values[i]);
+            }
+            return parts;
+        }
+
         for (const i in values) {
             if (Object.prototype.hasOwnProperty.call(values, i) &&
                 typeof values[i] === "number")

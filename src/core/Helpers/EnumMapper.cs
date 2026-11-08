@@ -93,6 +93,9 @@ public static class EnumMapper
     /// </returns>
     public static string ToString(Type enumType, object value)
     {
+        if (StringEnum.IsStringEnum(enumType))
+            return StringEnum.GetName(enumType, value as string) ?? value?.ToString() ?? "";
+
         var item = Get(enumType);
         var intValue = Convert.ToInt32(value);
         if (item.valueToString.TryGetValue(intValue, out string key))
@@ -135,8 +138,10 @@ public static class EnumMapper
     /// <returns>Enum type key</returns>
     public static string GetEnumTypeKey(Type enumType)
     {
-        var enumKeyAttr = enumType.GetCustomAttribute<EnumKeyAttribute>();
-        return enumKeyAttr != null ? enumKeyAttr.Value : enumType.FullName;
+        // declared only, so a type deriving from a string enumeration gets its own key, like the server typings
+        // generator, which does not read the attributes of base types
+        var enumKeyAttr = enumType.GetCustomAttribute<EnumKeyAttribute>(inherit: false);
+        return enumKeyAttr != null ? enumKeyAttr.Value : enumType.FullName!;
     }
 
     /// <summary>
@@ -150,6 +155,9 @@ public static class EnumMapper
     {
         if (value == null)
             return string.Empty;
+
+        if (enumType != null && StringEnum.IsStringEnum(enumType))
+            return StringEnum.GetText(enumType, value as string, localizer);
 
         if (enumType != null &&
             enumType.IsEnum &&

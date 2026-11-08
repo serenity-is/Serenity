@@ -33,7 +33,7 @@ public class PropertyInfoSource : IPropertySource
         else if (BasedOnField is IEnumTypeField enumTypeField)
         {
             EnumType = enumTypeField.EnumType;
-            if (EnumType != null && !EnumType.IsEnum)
+            if (EnumType != null && !EnumType.IsEnum && !StringEnum.IsStringEnum(EnumType))
                 EnumType = null;
         }
     }

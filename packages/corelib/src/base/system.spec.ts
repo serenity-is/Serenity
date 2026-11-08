@@ -102,6 +102,82 @@ describe("Enum.toString", () => {
     });
 });
 
+describe("StringEnum support", () => {
+    const WidgetCategory = {
+        Charts: 'charts',
+        Tables: 'tables',
+        ChartsAlias: 'charts'
+    } as const;
+
+    type WidgetCategory = typeof WidgetCategory[keyof typeof WidgetCategory];
+
+    registerEnum(WidgetCategory, 'Test_WidgetCategory', {
+        enumKey: 'My.WidgetCategory',
+        enumIcons: { 'charts': 'sv-ph-chart-bar-duotone' }
+    });
+
+    it('detects a string enum by its members', function () {
+        expect(Enum.isStringEnum(WidgetCategory)).toBe(true);
+        expect(Enum.isStringEnum({ A: 'a' })).toBe(true);
+    });
+
+    it('does not detect a numeric enum as a string enum', function () {
+        enum Test {
+            A = 1,
+            B = 2
+        }
+
+        expect(Enum.isStringEnum(Test)).toBe(false);
+        expect(Enum.isStringEnum(null)).toBe(false);
+        expect(Enum.isStringEnum(undefined)).toBe(false);
+    });
+
+    it('records the kind when the enum is registered', function () {
+        expect(peekTypeInfo(WidgetCategory)?.enumKind).toBe('string');
+
+        enum Test {
+            A = 1
+        }
+
+        registerEnum(Test, 'Test_EnumKind_Numeric');
+        expect(peekTypeInfo(Test)?.enumKind).toBe('numeric');
+    });
+
+    it('returns the string values in their declaration order', function () {
+        expect(Enum.getValues(WidgetCategory)).toStrictEqual(['charts', 'tables', 'charts']);
+    });
+
+    it('returns the member name of a string value', function () {
+        expect(Enum.toString(WidgetCategory, 'charts')).toBe('Charts');
+        expect(Enum.toString(WidgetCategory, 'tables')).toBe('Tables');
+    });
+
+    it('returns an unknown string value as it is', function () {
+        expect(Enum.toString(WidgetCategory, 'missing')).toBe('missing');
+    });
+
+    it('returns the icon class of a string value', function () {
+        expect(Enum.getIconClass(WidgetCategory, 'charts')).toBe('sv-ph-chart-bar-duotone');
+        expect(Enum.getIconClass(WidgetCategory, 'tables')).toBeUndefined();
+        const value: WidgetCategory = 'charts';
+        expect(Enum.getIconClass(WidgetCategory, value)).toBe('sv-ph-chart-bar-duotone');
+    });
+
+    it('keeps numeric enums unchanged', function () {
+        enum Test {
+            A = 1,
+            B = 2
+        }
+
+        registerEnum(Test, 'Test_EnumUnchanged_StringSupport');
+
+        expect(Enum.getValues(Test)).toStrictEqual([1, 2]);
+        expect(Enum.toString(Test, 1)).toBe('A');
+        // numeric enums keep returning the value itself for a string input
+        expect(Enum.toString(Test, '1' as any)).toBe('1');
+    });
+});
+
 namespace Module1 {
     export class ISome {
         declare static [Symbol.typeInfo]: InterfaceTypeInfo<"ISome">;

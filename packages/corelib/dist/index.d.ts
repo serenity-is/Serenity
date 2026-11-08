@@ -3541,8 +3541,10 @@ export type TypeInfo<TypeName> = {
     customAttributes?: CustomAttribute[];
     /** Enum flags */
     enumFlags?: boolean;
-    /** Enum icon classes mapping enum values to icon class names */
-    enumIcons?: Record<number, string>;
+    /** Whether the enum has string members (a StringEnum), which is determined when it is registered */
+    enumKind?: "numeric" | "string";
+    /** Icon classes mapping enum values (numeric or string) to icon class names */
+    enumIcons?: Record<string | number, string>;
     /** Registered flag */
     registered?: boolean;
 };
@@ -3681,8 +3683,8 @@ export declare class EnumKeyAttribute extends CustomAttribute {
 export declare function registerEnum(enumType: any, name: string, optOrEnumKey?: string | {
     /** Enum key */
     enumKey?: string;
-    /** Icon classes for enum values */
-    enumIcons?: Record<number, string>;
+    /** Icon classes for enum values, numeric or string */
+    enumIcons?: Record<string | number, string>;
 }): void;
 /**
  * Register an interface with the type system. There is no runtime representation of interfaces
@@ -3699,24 +3701,33 @@ export declare function registerInterface(type: any, name: string, intf?: Interf
  */
 export declare const Enum: {
     /**
+     * Checks whether an enum has string members, i.e. whether it is generated from a StringEnum. The kind is
+     * recorded when the enum is registered; before that, the members are inspected.
+     * @param enumType Enum type
+     * @returns True when the members of the enum are strings
+     */
+    isStringEnum: (enumType: any) => boolean;
+    /**
      * Convert an enum value to a string containing enum names.
      * @param enumType Enum type
      * @param value Enum value
      */
-    toString: (enumType: any, value: number) => string;
+    toString: (enumType: any, value: number | string) => string;
     /**
      * Get the icon class for a specific enum value.
      * @param enumType Enum type
-     * @param value Enum value
+     * @param value Enum value, numeric or string
      * @returns Icon class name or undefined if not found
      */
-    getIconClass: (enumType: any, value: number) => string | undefined;
+    getIconClass: (enumType: any, value: string | number) => string | undefined;
     /**
-     * Returns all numeric values of an enum as an array.
+     * Returns all values of an enum as an array, in their declaration order. A numeric enum returns its numeric
+     * values, a string enum returns the string values of its members.
      * @param enumType - Enum object to enumerate.
-     * @returns Array of numeric enum values.
+     * @returns Array of enum values. It is typed as `any[]` by default, and can be narrowed with a type
+     * argument, e.g. `Enum.getValues<WidgetCategory>(WidgetCategory)`.
      */
-    getValues: (enumType: any) => number[];
+    getValues: <T = any>(enumType: any) => T[];
 };
 /**
  * Check if a type is an enum. A type is considered an enum if it is not a function
@@ -13882,7 +13893,7 @@ export declare class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions>
      * @param opt The enum key and type.
      * @returns The combobox item representing the enum value.
      */
-    protected mapEnum(value: number, opt: {
+    protected mapEnum(value: number | string, opt: {
         enumKey: string;
         enumType: any;
     }): ComboboxItem<any>;
@@ -13892,7 +13903,7 @@ export declare class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions>
      * @param opt The enum key and type.
      * @returns The icon class name representing the enum value, or undefined if none.
      */
-    protected mapIcon(value: number, opt: {
+    protected mapIcon(value: number | string, opt: {
         enumKey: string;
         enumType: any;
     }): IconClassName | undefined;
@@ -16308,7 +16319,7 @@ export declare class EnumFormatter implements Formatter {
     /**
      * Formats an enum value given an enum type.
      * @param enumType - Registered enum object.
-     * @param value - Enum numeric value.
+     * @param value - Enum value, numeric or string.
      * @returns Localized display text.
      */
     static format(enumType: any, value: any): string;
