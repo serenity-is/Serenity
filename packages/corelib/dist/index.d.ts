@@ -13859,6 +13859,14 @@ export declare class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions>
      * @param props - Widget props.
      */
     constructor(props: EditorProps<P>);
+    protected mapEnum(value: number, opt: {
+        enumKey: string;
+        enumType: any;
+    }): ComboboxItem<any>;
+    protected mapIcon(value: number, opt: {
+        enumKey: string;
+        enumType: any;
+    }): IconClassName | undefined;
     /**
      * Loads the enum values into the editor.
      * @returns Void or a promise that resolves when items are loaded.

@@ -1,4 +1,4 @@
-import { BaseDialog, BooleanEditor, CaptureOperationType, ClassTypeInfo, ColumnsBase, DateEditor, DecimalEditor, DeleteRequest, DeleteResponse, DialogButton, EditorProps, EditorTypeInfo, EditorWidget, EmailAddressEditor, EntityDialog, EntityGrid, EnumEditor, Formatter, FormatterTypeInfo, IGetEditValue, ImageUploadEditor, IntegerEditor, ISetEditValue, ListRequest, ListResponse, Lookup, LookupEditor, LookupEditorBase, LookupEditorOptions, PrefixedContext, PropertyItem, QuickFilter, RetrieveRequest, RetrieveResponse, SaveInitiator, SaveRequest, SaveResponse, ServiceLookupEditor, ServiceOptions, StringEditor, ToolButton, Widget, WidgetProps } from '@serenity-is/corelib';
+import { BaseDialog, BooleanEditor, CaptureOperationType, ClassTypeInfo, ColumnsBase, DateEditor, DecimalEditor, DeleteRequest, DeleteResponse, DialogButton, EditorProps, EditorTypeInfo, EditorWidget, EmailAddressEditor, EntityDialog, EntityGrid, EnumEditor, Formatter, FormatterTypeInfo, IGetEditValue, ImageUploadEditor, IntegerEditor, ISetEditValue, LazyLoadInclude, ListRequest, ListResponse, Lookup, LookupEditor, LookupEditorBase, LookupEditorOptions, PrefixedContext, PropertyItem, QuickFilter, RetrieveRequest, RetrieveResponse, SaveInitiator, SaveRequest, SaveResponse, ServiceLookupEditor, ServiceOptions, StringEditor, ToolButton, Widget, WidgetProps } from '@serenity-is/corelib';
 import { GetNextNumberRequest, GetNextNumberResponse, GridEditorBase, GridEditorDialog } from '@serenity-is/extensions';
 import { Column, FormatterContext, FormatterResult } from '@serenity-is/sleekgrid';
 
@@ -1050,7 +1050,7 @@ export declare class EmployeeListFormatter implements Formatter {
     static [Symbol.typeInfo]: FormatterTypeInfo<"Serenity.Demo.Northwind.">;
     format(ctx: FormatterContext): FormatterResult;
 }
-export declare class EmployeeFormatter implements Formatter {
+export declare class EmployeeFormatter implements Formatter, LazyLoadInclude {
     readonly props: {
         genderProperty?: string;
     };
@@ -1070,7 +1070,7 @@ export declare class NoteDialog<P = {}> extends BaseDialog<P> {
     set text(value: string);
     okClick: () => void;
 }
-export declare class FreightFormatter implements Formatter {
+export declare class FreightFormatter implements Formatter, LazyLoadInclude {
     static [Symbol.typeInfo]: FormatterTypeInfo<"Serenity.Demo.Northwind.">;
     format(ctx: FormatterContext): FormatterResult;
 }
@@ -1115,7 +1115,7 @@ export declare class RegionGrid<P = {}> extends EntityGrid<RegionRow, P> {
     protected getRowDefinition(): typeof RegionRow;
     protected getService(): string;
 }
-export declare class CountryWithFlagFormatter implements Formatter {
+export declare class CountryWithFlagFormatter implements Formatter, LazyLoadInclude {
     static [Symbol.typeInfo]: FormatterTypeInfo<"Serenity.Demo.Northwind.">;
     format(ctx: FormatterContext): FormatterResult;
 }
@@ -1129,7 +1129,7 @@ export declare class ShipperDialog<P = {}> extends EntityDialog<ShipperRow, P> {
     protected getService(): string;
     protected form: ShipperForm;
 }
-export declare class ShipperFormatter implements Formatter {
+export declare class ShipperFormatter implements Formatter, LazyLoadInclude {
     static [Symbol.typeInfo]: FormatterTypeInfo<"Serenity.Demo.Northwind.">;
     format(ctx: FormatterContext): FormatterResult;
 }

@@ -1,4 +1,4 @@
-import { Enum, EnumKeyAttribute, getCustomAttribute, getTypeFullName, isPromiseLike, localText, nsSerenity } from "../../base";
+import { Enum, EnumKeyAttribute, getCustomAttribute, getTypeFullName, IconClassName, isPromiseLike, localText, nsSerenity } from "../../base";
 import { EnumTypeRegistry } from "../../types/enumtyperegistry";
 import { ComboboxItem } from "./combobox";
 import { ComboboxCommonOptions, ComboboxEditor } from "./comboboxeditor";
@@ -32,6 +32,31 @@ export class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions> extends
     }
 
     /**
+     * Maps an enum value to a combobox item.
+     * @param value The enum value.
+     * @param opt The enum key and type.
+     * @returns The combobox item representing the enum value.
+     */
+    protected mapEnum(value: number, opt: { enumKey: string, enumType: any }): ComboboxItem<any> {
+        const name = Enum.toString(opt.enumType, value);
+        return {
+            id: String(value),
+            text: localText("Enums." + opt.enumKey + "." + name, name),
+            icon: this.mapIcon(value, opt)
+        }
+    }
+
+    /**
+     * Maps an enum value to an icon class name.
+     * @param value The enum value.
+     * @param opt The enum key and type.
+     * @returns The icon class name representing the enum value, or undefined if none.
+     */
+    protected mapIcon(value: number, opt: { enumKey: string, enumType: any }): IconClassName | undefined {
+        return undefined;
+    }
+
+    /**
      * Loads the enum values into the editor.
      * @returns Void or a promise that resolves when items are loaded.
      */
@@ -52,10 +77,9 @@ export class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions> extends
             }
 
             const values = Enum.getValues(enumType);
-            for (const x of values) {
-                const name = Enum.toString(enumType, x);
-                this.addOption(String(x),
-                    localText("Enums." + enumKey + "." + name, name), null, false);
+            for (const value of values) {
+                const item = this.mapEnum(value, { enumKey, enumType });
+                this.addItem(item);
             }
         }
 
