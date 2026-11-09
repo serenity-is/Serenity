@@ -1,3 +1,5 @@
+import { registerEnum } from "./system";
+
 /**
  * Error payload returned by Serenity service endpoints inside a {@link ServiceResponse}.
  * The server populates at least `Code` or `Message`; other fields are optional and
@@ -100,6 +102,9 @@ export enum ColumnSelection {
     Lookup = 5
 }
 
+// registered by the full name of the server-side enum, e.g. for the column selection option of a service lookup editor
+registerEnum(ColumnSelection, "Serenity.Services.ColumnSelection");
+
 /**
  * Column-selection variant used by `Retrieve` handlers.
  * Lowercase naming is kept for backward compatibility with legacy endpoints.
@@ -118,6 +123,8 @@ export enum RetrieveColumnSelection {
     /** Lookup columns. */
     lookup = 5
 }
+
+registerEnum(RetrieveColumnSelection, "Serenity.Services.RetrieveColumnSelection");
 
 /**
  * Request DTO for `List` handlers (grid data source).
