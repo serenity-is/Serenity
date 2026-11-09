@@ -143,7 +143,16 @@ public partial class BasicPropertyProcessor : PropertyProcessor
         SetServiceLookupParams(editorTypeAttr, item.EditorParams);
     }
 
-    private static void SetServiceLookupParams(EditorTypeAttribute? editorTypeAttr, Dictionary<string, object?> editorParams)
+    /// <summary>
+    /// Sets the options of a service lookup editor that its attribute doesn't give, like the service, the id, text and icon fields,
+    /// the capabilities, and the columns to include, as they are for a property with the attribute. It does nothing for other
+    /// attributes. Options that are already in the dictionary are left as they are.
+    /// </summary>
+    /// <param name="editorTypeAttr">The editor attribute, e.g. a <see cref="ServiceLookupEditorAttribute"/> with an item type.</param>
+    /// <param name="editorParams">The options of the editor to add to.</param>
+    /// <exception cref="InvalidOperationException">The attribute is a plain service lookup editor attribute, and the id or text field
+    /// can't be determined.</exception>
+    public static void SetServiceLookupParams(EditorTypeAttribute? editorTypeAttr, Dictionary<string, object?> editorParams)
     {
         if (editorTypeAttr is not ServiceLookupEditorBaseAttribute sle)
             return;

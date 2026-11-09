@@ -97,6 +97,16 @@ public abstract class ServiceLookupEditorBaseAttribute(string editorType) : Cust
     }
 
     /// <summary>
+    /// Quick search fields list.
+    /// </summary>
+    [EditorType("SelectEditor"), EditorOption("multiple", true), EditorOption("allowClear", true), EditorOption("delimited", false), EditorOption("autoComplete", true)]
+    public string[]? QuickSearchFields
+    {
+        get { return GetOption<string[]>("quickSearchFields"); }
+        set { SetOption("quickSearchFields", value); }
+    }
+
+    /// <summary>
     /// Include deleted, defaults to false. Only effective when the current
     /// user has the undelete permission for the target entity.
     /// </summary>
