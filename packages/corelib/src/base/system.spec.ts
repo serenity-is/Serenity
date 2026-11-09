@@ -100,6 +100,28 @@ describe("Enum.toString", () => {
         expect(Enum.toString(Test2, Test2.Some + Test2.Another)).toBe("Some | Another");
         expect(Enum.toString(Test2, Test2.Some + Test2.Another + 16)).toBe("Some | Another | 16");
     });
+
+    it('gives the name of a member combining others, and else the fewest members that make the value', () => {
+        enum Access {
+            // a combined member declared before its bits is not taken for a value it is only partly in
+            All = 7,
+            Read = 1,
+            Write = 2,
+            ReadWrite = 3,
+            Delete = 4,
+            Archive = 8
+        }
+
+        ensureTypeInfo(Access as any).enumFlags = true;
+        expect(Enum.toString(Access, Access.ReadWrite)).toBe("ReadWrite");
+        expect(Enum.toString(Access, Access.All)).toBe("All");
+        // the members are listed in their order
+        expect(Enum.toString(Access, Access.ReadWrite | Access.Archive)).toBe("ReadWrite | Archive");
+        expect(Enum.toString(Access, Access.All | Access.Archive)).toBe("All | Archive");
+        expect(Enum.toString(Access, Access.Read | Access.Delete)).toBe("Read | Delete");
+        expect(Enum.toString(Access, Access.Write | 32)).toBe("Write | 32");
+        expect(Enum.toString(Access, 0)).toBe("0");
+    });
 });
 
 describe("StringEnum support", () => {

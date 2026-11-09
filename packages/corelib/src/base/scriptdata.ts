@@ -45,6 +45,19 @@ export function getScriptDataHash(name: string, reload?: boolean): string {
 }
 
 /**
+ * Gets the names of the dynamic scripts known to be registered server-side, e.g. Lookup.Northwind.Customer, which are the keys
+ * of the RegisteredScripts script element, along with the ones registered by {@link setRegisteredScripts}.
+ * @param prefix Only the names starting with it are returned, e.g. "Lookup." for the lookups.
+ * @returns The names, in the order they were registered.
+ */
+export function getRegisteredScriptNames(prefix?: string): string[] {
+    // reads the RegisteredScripts element, when the hashes are not loaded yet
+    getScriptDataHash("");
+    return Object.keys(getGlobalObject()[scriptDataHashSymbol] ?? {})
+        .filter(name => !prefix || name.startsWith(prefix));
+}
+
+/**
  * Global hooks for script-data loading.
  * Allows tests or custom bootstrapping to intercept `fetchScriptData` / `ensureScriptDataSync`.
  * When the hook returns `undefined` the default `fetch` / XHR implementation is used.

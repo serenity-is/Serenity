@@ -220,6 +220,8 @@ export enum ListRequestCapabilities {
         ExportColumns | Localize | ExcludeTotalCount | IncludeMore
 }
 
+registerEnum(ListRequestCapabilities, "Serenity.Services.ListRequestCapabilities", { enumFlags: true });
+
 /**
  * Response DTO for `List` handlers.
  * @typeParam TEntity - Row / entity type of the listed records.

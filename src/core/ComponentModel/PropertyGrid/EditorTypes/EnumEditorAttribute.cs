@@ -87,6 +87,15 @@ public partial class EnumEditorAttribute : CustomEditorAttribute
         set { SetOption("delimited", value); }
     }
 
+   /// <summary>
+    /// Indicates whether the enum should be treated as a flags enum, allowing multiple selections.
+    /// </summary>
+    public bool Flags
+    {
+        get { return GetOption<bool>("flags"); }
+        set { SetOption("flags", value); }
+    }
+
     /// <summary>
     /// The minimum number of results that must be initially (after opening the dropdown for the first time) populated in order to keep the search field. 
     /// This is useful for cases where local data is used with just a few results, in which case the search box is not very useful and wastes screen space.

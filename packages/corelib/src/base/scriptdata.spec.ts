@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { Lookup } from "./lookup";
 import { notifyError } from "./notify";
-import { ensureScriptDataSync, fetchScriptData, getColumnsScript, getFormScript, getLookupAsync, getRemoteDataAsync, getScriptData, getScriptDataHash, handleScriptDataError, peekScriptData, scriptDataHooks, setRegisteredScripts, setScriptData } from "./scriptdata";
+import { ensureScriptDataSync, fetchScriptData, getColumnsScript, getFormScript, getLookupAsync, getRegisteredScriptNames, getRemoteDataAsync, getScriptData, getScriptDataHash, handleScriptDataError, peekScriptData, scriptDataHooks, setRegisteredScripts, setScriptData } from "./scriptdata";
 import { scriptDataHashSymbol, scriptDataSymbol } from "./symbols";
 import { getGlobalObject } from "./system";
 
@@ -547,6 +547,34 @@ describe("peekScriptData", () => {
         }
         finally {
             window["fetch"] = orgFetch;
+        }
+    });
+});
+
+describe("getRegisteredScriptNames", () => {
+    it("gives no names when nothing is registered", () => {
+        expect(getRegisteredScriptNames()).toEqual([]);
+        expect(getRegisteredScriptNames("Lookup.")).toEqual([]);
+    });
+
+    it("gives the names of the registered scripts, only the ones with the prefix when it is given", () => {
+        setRegisteredScripts({ "Lookup.Northwind.Customer": "1", "Form.Northwind.Customer": "2", "Lookup.Administration.Role": "3" });
+
+        expect(getRegisteredScriptNames()).toEqual(["Lookup.Northwind.Customer", "Form.Northwind.Customer", "Lookup.Administration.Role"]);
+        expect(getRegisteredScriptNames("Lookup.")).toEqual(["Lookup.Northwind.Customer", "Lookup.Administration.Role"]);
+    });
+
+    it("reads the RegisteredScripts element of the page", () => {
+        const element = document.createElement("script");
+        element.id = "RegisteredScripts";
+        element.type = "application/json";
+        element.innerHTML = '{"Lookup.Northwind.Region":"a","Columns.Northwind.Region":"b"}';
+        document.head.append(element);
+        try {
+            expect(getRegisteredScriptNames("Lookup.")).toEqual(["Lookup.Northwind.Region"]);
+        }
+        finally {
+            element.remove();
         }
     });
 });

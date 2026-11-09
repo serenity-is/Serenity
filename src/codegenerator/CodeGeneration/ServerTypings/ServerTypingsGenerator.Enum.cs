@@ -27,10 +27,12 @@ public partial class ServerTypingsGenerator
 
     /// <summary>
     /// Writes the registerEnum call for an enum or a string enumeration. The keys of the icons are the object
-    /// literal keys, e.g. a quoted numeric value for an enum or a quoted string for a string enumeration.
+    /// literal keys, e.g. a quoted numeric value for an enum or a quoted string for a string enumeration. A [Flags]
+    /// enum is registered with enumFlags, so its values are formatted as flags, and an enum editor with the multiple
+    /// option gives the members selected as one number.
     /// </summary>
     private void WriteEnumRegistration(string identifier, string fullName, string? enumKey,
-        IReadOnlyList<(string Key, string Icon)> icons)
+        IReadOnlyList<(string Key, string Icon)> icons, bool flags = false)
     {
         var registerEnum = ImportFromCorelib("registerEnum");
         cw.Indented($"{registerEnum}(");
@@ -40,8 +42,9 @@ public partial class ServerTypingsGenerator
         sb.Append(fullName);
         sb.Append('\'');
 
-        // the icon classes are only included when a member has one, so the others keep the simpler calls
-        if (icons.Count == 0)
+        // the options are only written when a member has an icon or the enum is a set of flags, so the others keep the
+        // simpler calls
+        if (icons.Count == 0 && !flags)
         {
             if (enumKey != fullName)
             {
@@ -62,8 +65,15 @@ public partial class ServerTypingsGenerator
             {
                 cw.Indented("enumKey: '");
                 sb.Append(enumKey);
-                sb.AppendLine("',");
+                sb.Append('\'');
+                sb.AppendLine(flags || icons.Count > 0 ? "," : "");
             }
+
+            if (flags)
+                cw.IndentedLine(icons.Count > 0 ? "enumFlags: true," : "enumFlags: true");
+
+            if (icons.Count == 0)
+                return;
 
             cw.IndentedLine("enumIcons: {");
             cw.Block(delegate
@@ -129,6 +139,8 @@ public partial class ServerTypingsGenerator
             .Select(group => (Key: $"'{group.Key}'", Icon: group.First().Icon!))
             .ToList();
 
-        WriteEnumRegistration(identifier, fullName, enumKey, icons);
+        var flags = TypingsUtils.FindAttr(enumType.GetAttributes(), "System", "FlagsAttribute") != null;
+
+        WriteEnumRegistration(identifier, fullName, enumKey, icons, flags);
     }
 }

@@ -79,6 +79,7 @@ public abstract class ServiceLookupEditorBaseAttribute(string editorType) : Cust
     /// <summary>
     /// Include columns list, defaults to ID, text, and [LookupInclude] columns.
     /// </summary>
+    [EditorType("SelectEditor"), EditorOption("multiple", true), EditorOption("allowClear", true), EditorOption("delimited", false), EditorOption("autoComplete", true)]
     public string[]? IncludeColumns
     {
         get { return GetOption<string[]>("includeColumns"); }
@@ -88,6 +89,7 @@ public abstract class ServiceLookupEditorBaseAttribute(string editorType) : Cust
     /// <summary>
     /// Exclude columns list.
     /// </summary>
+    [EditorType("SelectEditor"), EditorOption("multiple", true), EditorOption("allowClear", true), EditorOption("delimited", false), EditorOption("autoComplete", true)]
     public string[]? ExcludeColumns
     {
         get { return GetOption<string[]>("excludeColumns"); }
@@ -261,6 +263,7 @@ public abstract class ServiceLookupEditorBaseAttribute(string editorType) : Cust
     /// Gets or sets the supported ListRequest capabilities. When not explicitly set,
     /// capabilities are inferred from the endpoint when possible.
     /// </summary>
+    [EnumEditor(Multiple = true, Flags = true)]
     public ListRequestCapabilities Capabilities
     {
         get { return GetOption<ListRequestCapabilities>("capabilities"); }

@@ -3332,6 +3332,13 @@ export type UIFieldSet = PropertyItemsData;
  */
 export declare function getScriptDataHash(name: string, reload?: boolean): string;
 /**
+ * Gets the names of the dynamic scripts known to be registered server-side, e.g. Lookup.Northwind.Customer, which are the keys
+ * of the RegisteredScripts script element, along with the ones registered by {@link setRegisteredScripts}.
+ * @param prefix Only the names starting with it are returned, e.g. "Lookup." for the lookups.
+ * @returns The names, in the order they were registered.
+ */
+export declare function getRegisteredScriptNames(prefix?: string): string[];
+/**
  * Global hooks for script-data loading.
  * Allows tests or custom bootstrapping to intercept `fetchScriptData` / `ensureScriptDataSync`.
  * When the hook returns `undefined` the default `fetch` / XHR implementation is used.
@@ -3685,6 +3692,8 @@ export declare function registerEnum(enumType: any, name: string, optOrEnumKey?:
     enumKey?: string;
     /** Icon classes for enum values, numeric or string */
     enumIcons?: Record<string | number, string>;
+    /** Whether the enum is a set of flags, like a [Flags] enum on the server side, whose values are OR-ed together */
+    enumFlags?: boolean;
 }): void;
 /**
  * Register an interface with the type system. There is no runtime representation of interfaces
@@ -13875,6 +13884,13 @@ export interface EnumEditorOptions extends ComboboxCommonOptions {
     enumKey?: string;
     /** The enum type to load items from. */
     enumType?: any;
+    /**
+     * Whether the enum is a set of flags, like a [Flags] enum on the server side. Along with the multiple option, the value is a
+     * number, the members selected OR-ed together, or null for none, and the members combining others, like SourceAdapter of the
+     * list request capabilities, are offered too, while none (zero) is not. Without multiple, a single member is selected as usual.
+     * When it is not set, it is what the enum is registered with, see the enumFlags option of registerEnum.
+     */
+    flags?: boolean;
 }
 /**
  * An editor that renders a select of enum values.
@@ -13887,6 +13903,17 @@ export declare class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions>
      * @param props - Widget props.
      */
     constructor(props: EditorProps<P>);
+    /**
+     * Whether the enum is a set of flags, by the flags option, or else by the registration of the enum, when it is already
+     * loaded.
+     * @returns True for a set of flags.
+     */
+    protected isFlags(): boolean;
+    /**
+     * Whether several members of a set of flags are selected, whose value is the number they make together.
+     * @returns True for a set of flags with the multiple option.
+     */
+    protected isMultipleFlags(): boolean;
     /**
      * Maps an enum value to a combobox item.
      * @param value The enum value.
@@ -13912,6 +13939,25 @@ export declare class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions>
      * @returns Void or a promise that resolves when items are loaded.
      */
     protected updateItems(): void | PromiseLike<void>;
+    /**
+     * Gets or sets the value of a set of flags with the multiple option, which is the members selected OR-ed together, or null when
+     * none is selected. Setting it selects the fewest members that make it: the ones combining others first, the larger first, as
+     * long as all their bits are in the value and some are not covered yet, and then the single bits left.
+     */
+    get flagsValue(): number | null;
+    set flagsValue(value: number | string | null);
+    /**
+     * Sets the edit value from a source object, which is a number for several members of a set of flags.
+     * @param source - The source object.
+     * @param property - The property item.
+     */
+    setEditValue(source: any, property: PropertyItem): void;
+    /**
+     * Gets the edit value into a target object, which is a number for several members of a set of flags.
+     * @param property - The property item.
+     * @param target - The target object.
+     */
+    getEditValue(property: PropertyItem, target: any): void;
     /**
      * Whether the editor allows clearing the selection.
      * @returns True when clear is allowed.

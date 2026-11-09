@@ -66,6 +66,44 @@ namespace Serenity.CodeGeneration
             Assert.Contains("        '2': 'sv-two'", code);
             Assert.DoesNotContain("enumKey:", code);
         }
+
+        [Fact]
+        public void Flags_Enum_Is_Registered_With_EnumFlags()
+        {
+            var generator = CreateGenerator(typeof(EnumContainer));
+            var result = generator.Run();
+            var code = Assert.Single(result, x => x.Filename == "Enums/AccessFlags.ts").Text;
+
+            Assert.Contains("ReadWrite = 3", code);
+            Assert.Contains("registerEnum(AccessFlags, 'ServerTypingsTest.Enums.AccessFlags', {\n    enumFlags: true\n});",
+                code.Replace("\r\n", "\n"));
+        }
+
+        [Fact]
+        public void Flags_Enum_With_EnumKey_And_Icons_Has_All_Options()
+        {
+            var generator = CreateGenerator(typeof(EnumContainer));
+            var result = generator.Run();
+            var code = Assert.Single(result, x => x.Filename == "Enums/AccessFlagsWithIcons.ts").Text.Replace("\r\n", "\n");
+
+            Assert.Contains("registerEnum(AccessFlagsWithIcons, 'ServerTypingsTest.Enums.AccessFlagsWithIcons', {\n" +
+                "    enumKey: 'Test.Access',\n" +
+                "    enumFlags: true,\n" +
+                "    enumIcons: {\n" +
+                "        '1': 'sv-read'\n" +
+                "    }\n" +
+                "});", code);
+        }
+
+        [Fact]
+        public void Enum_Without_Flags_Has_No_EnumFlags()
+        {
+            var generator = CreateGenerator(typeof(EnumContainer));
+            var result = generator.Run();
+
+            Assert.All(result.Where(x => x.Filename is "Enums/StatusWithKey.ts" or "Enums/StatusWithIcons.ts"),
+                x => Assert.DoesNotContain("enumFlags", x.Text));
+        }
     }
 }
 
@@ -78,6 +116,8 @@ namespace ServerTypingsTest.Enums
         public StatusWithoutKey? Other { get; set; }
         public StatusWithIcons? WithIcons { get; set; }
         public StatusWithIconsWithoutKey? WithIconsWithoutKey { get; set; }
+        public AccessFlags? Access { get; set; }
+        public AccessFlagsWithIcons? AccessWithIcons { get; set; }
     }
 
     [EnumKey("Test.Status")]
@@ -117,5 +157,22 @@ namespace ServerTypingsTest.Enums
     {
         [IconClass("sv-two")]
         Two = 2
+    }
+
+    [Flags]
+    public enum AccessFlags
+    {
+        None = 0,
+        Read = 1,
+        Write = 2,
+        ReadWrite = 3
+    }
+
+    [Flags, EnumKey("Test.Access")]
+    public enum AccessFlagsWithIcons
+    {
+        [IconClass("sv-read")]
+        Read = 1,
+        Write = 2
     }
 }

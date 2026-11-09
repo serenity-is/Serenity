@@ -279,7 +279,9 @@ export function registerEnum(enumType: any, name: string, optOrEnumKey?: string 
     /** Enum key */
     enumKey?: string,
     /** Icon classes for enum values, numeric or string */
-    enumIcons?: Record<string | number, string>
+    enumIcons?: Record<string | number, string>,
+    /** Whether the enum is a set of flags, like a [Flags] enum on the server side, whose values are OR-ed together */
+    enumFlags?: boolean
 }) {
     if (typeof enumType !== "object" || enumType == null)
         throw new Error("Enum type is required in registerEnum!");
@@ -304,6 +306,9 @@ export function registerEnum(enumType: any, name: string, optOrEnumKey?: string 
 
     if (iconClasses)
         typeInfo.enumIcons = Object.assign(typeInfo.enumIcons ?? {}, iconClasses);
+
+    if (optOrEnumKey != null && typeof optOrEnumKey === "object" && optOrEnumKey.enumFlags != null)
+        typeInfo.enumFlags = !!optOrEnumKey.enumFlags;
 }
 
 /**
@@ -328,6 +333,14 @@ function isStringMember(enumType: any, key: string): boolean {
     return Object.prototype.hasOwnProperty.call(enumType, key) &&
         typeof enumType[key] === "string" &&
         typeof enumType[enumType[key]] !== "number";
+}
+
+/** The number of bits in a value of a set of flags, which is more than one for a member combining others */
+function bitCount(value: number): number {
+    let count = 0;
+    for (; value; value &= value - 1)
+        count++;
+    return count;
 }
 
 /**
@@ -384,30 +397,35 @@ export const Enum = {
             return "" + value;
         }
 
+        // a value that is a member, also one of a set of flags combining others like SourceAdapter, is its name, as in .NET
         const values = enumType;
-        if (value === 0 || !peekTypeInfo(enumType)?.enumFlags) {
-            for (const i in values) {
-                if (values[i] === value) {
-                    return i;
-                }
+        for (const i in values) {
+            if (values[i] === value) {
+                return i;
             }
-            return value == null ? "" : value.toString();
         }
-        else {
-            const parts: string[] = [];
-            for (const i in values) {
-                if (typeof values[i] !== "number")
-                    continue;
 
-                if (values[i] & value) {
-                    parts.push(i);
-                    value -= values[i];
-                }
+        if (value === 0 || !peekTypeInfo(enumType)?.enumFlags)
+            return value.toString();
+
+        // otherwise it is the fewest members that make it, the ones combining others first, as long as all their bits are in the
+        // value and some are not covered yet, listed in their order, and the bits that no member has as a number
+        const names = Object.keys(values).filter(name => typeof values[name] === "number" && values[name] > 0 &&
+            (values[name] & value) === values[name]);
+        let covered = 0;
+        const picked = new Set<string>();
+        for (const name of [...names].sort((a, b) => bitCount(values[b]) - bitCount(values[a]))) {
+            if ((values[name] & ~covered) !== 0) {
+                picked.add(name);
+                covered |= values[name];
             }
-            if (value != 0)
-                parts.push(value.toString());
-            return parts.join(' | ');
         }
+
+        const parts = names.filter(name => picked.has(name));
+        const rest = value & ~covered;
+        if (rest !== 0)
+            parts.push(rest.toString());
+        return parts.join(' | ');
     },
 
     /**
