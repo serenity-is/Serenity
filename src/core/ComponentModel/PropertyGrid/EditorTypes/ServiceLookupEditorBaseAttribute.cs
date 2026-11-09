@@ -61,10 +61,11 @@ public abstract class ServiceLookupEditorBaseAttribute(string editorType) : Cust
     /// <summary>
     /// Sort order for records, defaults to the text field.
     /// </summary>
-    public object? Sort
+    [EditorType("SelectEditor"), EditorOption("multiple", true), EditorOption("allowClear", true), EditorOption("delimited", false), EditorOption("autoComplete", true)]
+    public string[]? Sort
     {
         get { return GetOption<string[]>("sort"); }
-        set { SetOption("sort", value is string s ? new string[] { s } : value); }
+        set { SetOption("sort", value); }
     }
 
     /// <summary>

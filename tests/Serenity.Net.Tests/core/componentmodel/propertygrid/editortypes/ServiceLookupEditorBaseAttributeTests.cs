@@ -50,8 +50,8 @@ public class ServiceLookupEditorBaseAttributeTests
     public void Sort_GetSet_Works()
     {
         var attr = NewAttribute();
-        attr.Sort = "Name";
 #pragma warning disable CA1861 // Avoid constant arrays as arguments
+        attr.Sort = ["Name"];
         Assert.Equal(new[] { "Name" }, attr.Sort);
 #pragma warning restore CA1861 // Avoid constant arrays as arguments
     }
