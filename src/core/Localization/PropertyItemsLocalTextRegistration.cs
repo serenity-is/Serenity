@@ -104,10 +104,11 @@ public static class PropertyItemsLocalTextRegistration
     public static string? GetPropertyItemsTextPrefix(Type type)
     {
         var formAttr = type.GetCustomAttribute<FormScriptAttribute>(inherit: false);
+        ColumnsScriptAttribute? columnsAttr = null;
         string? itemsKey;
         if (formAttr is null)
         {
-            var columnsAttr = type.GetCustomAttribute<ColumnsScriptAttribute>(inherit: false);
+            columnsAttr = type.GetCustomAttribute<ColumnsScriptAttribute>(inherit: false);
             if (columnsAttr is null)
                 return null;
 
@@ -122,7 +123,9 @@ public static class PropertyItemsLocalTextRegistration
             itemsKey = formAttr.Key;
 
         if (string.IsNullOrEmpty(itemsKey))
-            itemsKey = type.FullName;
+            itemsKey = formAttr is not null && formAttr.InferKey ? FormScriptAttribute.AutoFormKeyFor(type) : 
+                columnsAttr is not null && columnsAttr.InferKey ? ColumnsScriptAttribute.AutoColumnsKeyFor(type) :
+                type.FullName;
 
         return (formAttr is null ? "Columns." : "Forms.") + itemsKey + ".";
     }

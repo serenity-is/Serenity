@@ -10,7 +10,7 @@ public partial class FormTemplateTests : BaseTemplateTest
 
         namespace TestNamespace.TestModule.Forms
         {
-            [FormScript("TestModule.Customer")]
+            [FormScript(InferKey = true)]
             [BasedOnRow(typeof(CustomerRow), CheckNames = true)]
             public class CustomerForm
             {
@@ -34,7 +34,7 @@ public partial class FormTemplateTests : BaseTemplateTest
 
         namespace TestNamespace.TestModule.Forms
         {
-            [FormScript("TestModule.Customer")]
+            [FormScript(InferKey = true)]
             [BasedOnRow(typeof(CustomerRow), CheckNames = true)]
             public class CustomerForm
             {

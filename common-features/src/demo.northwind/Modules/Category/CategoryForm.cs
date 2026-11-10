@@ -1,6 +1,6 @@
 ﻿namespace Serenity.Demo.Northwind.Forms;
 
-[FormScript("Northwind.Category")]
+[FormScript(InferKey = true)]
 [BasedOnRow(typeof(CategoryRow), CheckNames = true)]
 public class CategoryForm
 {

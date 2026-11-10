@@ -1,6 +1,6 @@
 ﻿namespace Serenity.Demo.Northwind.Forms;
 
-[FormScript("Northwind.Supplier")]
+[FormScript(InferKey = true)]
 [BasedOnRow(typeof(SupplierRow), CheckNames = true)]
 public class SupplierForm
 {

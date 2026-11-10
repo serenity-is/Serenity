@@ -11,7 +11,7 @@ public partial class ColumnsTemplateTests : BaseTemplateTest
 
         namespace TestNamespace.TestModule.Columns
         {
-            [ColumnsScript("TestModule.Customer")]
+            [ColumnsScript(InferKey = true)]
             [BasedOnRow(typeof(CustomerRow), CheckNames = true)]
             public class CustomerColumns
             {
@@ -39,7 +39,7 @@ public partial class ColumnsTemplateTests : BaseTemplateTest
 
         namespace TestNamespace.TestModule.Columns
         {
-            [ColumnsScript("TestModule.Customer")]
+            [ColumnsScript(InferKey = true)]
             [BasedOnRow(typeof(CustomerRow), CheckNames = true)]
             public class CustomerColumns
             {

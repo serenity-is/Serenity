@@ -60,8 +60,23 @@ public partial class ServerTypingsGenerator
         cw.InBrace(delegate
         {
             cw.Indented("static readonly columnsKey = '");
+
             var key = columnsAttribute.ConstructorArguments() != null &&
-                columnsAttribute.ConstructorArguments().Count > 0 ? columnsAttribute.ConstructorArguments()[0].Value as string : null;
+                           columnsAttribute.ConstructorArguments().Count > 0 ? columnsAttribute.ConstructorArguments()[0].Value as string : null;
+
+            if (key is null && columnsAttribute.NamedArguments().FirstOrDefault(x => string.Equals(x.Name(), "Value")) is { } namedArg)
+            {
+                key = namedArg.ArgumentValue() as string;
+            }
+
+            if (key == null && columnsAttribute.NamedArguments() != null &&
+                columnsAttribute.NamedArguments()
+                    .FirstOrDefault(x => string.Equals(x.Name(), "InferKey")) is { } inferArg &&
+                    inferArg.ArgumentValue() is true)
+            {
+                key = AutoFormOrColumnsKeyFor(type);
+            }
+
             key ??= type.FullNameOf();
 
             sb.Append(key);

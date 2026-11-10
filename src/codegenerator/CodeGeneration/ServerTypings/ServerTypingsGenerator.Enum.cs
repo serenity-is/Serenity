@@ -2,16 +2,45 @@ namespace Serenity.CodeGeneration;
 
 public partial class ServerTypingsGenerator
 {
-    private static string? GetEnumKeyFor(TypeDefinition enumType)
+    private string? GetEnumKeyFor(TypeDefinition enumType)
     {
-        string? enumKey = enumType.FullNameOf();
         var enumKeyAttr = TypingsUtils.FindAttr(enumType.GetAttributes(), "Serenity.ComponentModel", "EnumKeyAttribute");
-        if (enumKeyAttr != null &&
-            enumKeyAttr.ConstructorArguments().Count >= 1 &&
-            enumKeyAttr.ConstructorArguments()[0].Type?.FullNameOf() == "System.String")
-            enumKey = enumKeyAttr.ConstructorArguments()[0].Value as string;
-        return enumKey;
+        if (enumKeyAttr != null)
+        {
+            var args = enumKeyAttr.ConstructorArguments();
+            if (args.Count >= 1 &&
+                args[0].Type?.FullNameOf() == "System.String")
+                return args[0].Value as string;
+
+            if (args.Count == 0)
+            {
+                return AutoEnumKeyFor(enumType);
+            }
+        }
+
+        return enumType.FullNameOf();
     }
+
+    private string AutoEnumKeyFor(TypeDefinition type)
+    {
+        string? module = GetModuleKeyForType(type);
+        if (module is null)
+        {
+            module = type.NamespaceOf() ?? "";
+
+            if (module.EndsWith(".Entities", StringComparison.Ordinal))
+                module = module[0..^9];
+            else if (module.EndsWith(".Enums", StringComparison.Ordinal))
+                module = module[0..^8];
+
+            var idx = module.IndexOf('.');
+            if (idx >= 0)
+                module = module[(idx + 1)..];
+        }
+
+        var name = type.Name;
+        return string.IsNullOrEmpty(module) ? name : module + "." + name;
+    }    
 
     private static string? GetEnumIconFor(FieldDefinition field)
     {

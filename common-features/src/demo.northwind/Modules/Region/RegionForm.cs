@@ -1,6 +1,6 @@
 ﻿namespace Serenity.Demo.Northwind.Forms;
 
-[FormScript("Northwind.Region")]
+[FormScript(InferKey = true)]
 [BasedOnRow(typeof(RegionRow), CheckNames = true)]
 public class RegionForm
 {

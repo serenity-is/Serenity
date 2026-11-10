@@ -1,7 +1,7 @@
 {{USING "Serenity.ComponentModel"}}
 
 {{NAMESPACE ColumnsNamespace}}{{capture block~}}
-[ColumnsScript("{{ColumnsKey}}")]
+[ColumnsScript(InferKey = true)]
 [BasedOnRow(typeof({{RowClassName}}), CheckNames = true)]
 public class {{ColumnsClassName}}
 {

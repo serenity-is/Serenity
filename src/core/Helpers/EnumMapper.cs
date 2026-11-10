@@ -141,7 +141,7 @@ public static class EnumMapper
         // declared only, so a type deriving from a string enumeration gets its own key, like the server typings
         // generator, which does not read the attributes of base types
         var enumKeyAttr = enumType.GetCustomAttribute<EnumKeyAttribute>(inherit: false);
-        return enumKeyAttr != null ? enumKeyAttr.Value : enumType.FullName!;
+        return enumKeyAttr != null ? (enumKeyAttr.Value ?? EnumKeyAttribute.AutoEnumKeyFor(enumType)) : enumType.FullName!;
     }
 
     /// <summary>

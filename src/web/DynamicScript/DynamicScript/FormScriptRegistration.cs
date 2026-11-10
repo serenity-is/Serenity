@@ -29,7 +29,7 @@ public class FormScriptRegistration
             var attr = type.GetCustomAttribute<FormScriptAttribute>();
             if (attr == null)
                 continue;
-            var key = attr.Key ?? type.FullName!;
+            var key = attr.Key ?? (attr.InferKey ? FormScriptAttribute.AutoFormKeyFor(type) : type.FullName!);
             var script = new FormScript(key, type, propertyProvider, serviceProvider);
             scriptManager.Register(script);
             scripts.Add(script);

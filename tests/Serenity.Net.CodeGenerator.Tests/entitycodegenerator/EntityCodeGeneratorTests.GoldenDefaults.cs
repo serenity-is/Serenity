@@ -48,7 +48,7 @@ public partial class EntityCodeGeneratorTests
         ["Modules/TestModule/Customer/CustomerColumns.cs"] = /*lang=c#*/ """
             namespace TestNamespace.TestModule.Columns;
             
-            [ColumnsScript("TestModule.Customer")]
+            [ColumnsScript(InferKey = true)]
             [BasedOnRow(typeof(CustomerRow), CheckNames = true)]
             public class CustomerColumns
             {
@@ -62,7 +62,7 @@ public partial class EntityCodeGeneratorTests
         ["Modules/TestModule/Customer/CustomerForm.cs"] = /*lang=c#*/ """
             namespace TestNamespace.TestModule.Forms;
             
-            [FormScript("TestModule.Customer")]
+            [FormScript(InferKey = true)]
             [BasedOnRow(typeof(CustomerRow), CheckNames = true)]
             public class CustomerForm
             {
@@ -340,7 +340,7 @@ public partial class EntityCodeGeneratorTests
         ["Modules/TestModule/Customer/CustomerColumns.cs"] = """
             namespace TestNamespace.TestModule.Columns;
 
-            [ColumnsScript("TestModule.Customer")]
+            [ColumnsScript(InferKey = true)]
             [BasedOnRow(typeof(CustomerRow), CheckNames = true)]
             public class CustomerColumns
             {
@@ -354,7 +354,7 @@ public partial class EntityCodeGeneratorTests
         ["Modules/TestModule/Customer/CustomerForm.cs"] = """
             namespace TestNamespace.TestModule.Forms;
 
-            [FormScript("TestModule.Customer")]
+            [FormScript(InferKey = true)]
             [BasedOnRow(typeof(CustomerRow), CheckNames = true)]
             public class CustomerForm
             {

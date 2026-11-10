@@ -29,7 +29,7 @@ public partial class RadioButtonEditorAttribute : CustomEditorAttribute
             if (ek == null)
                 EnumKey = enumOrLookupType.FullName;
             else
-                EnumKey = ek.Value;
+                EnumKey = ek.Value ?? EnumKeyAttribute.AutoEnumKeyFor(enumOrLookupType);
 
             return;
         }

@@ -1,6 +1,6 @@
 namespace Serenity.Demo.Northwind.Forms;
 
-[FormScript("Northwind.Order")]
+[FormScript(InferKey = true)]
 [BasedOnRow(typeof(OrderRow), CheckNames = true)]
 public class OrderForm
 {

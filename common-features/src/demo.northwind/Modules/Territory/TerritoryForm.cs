@@ -1,6 +1,6 @@
 ﻿namespace Serenity.Demo.Northwind.Forms;
 
-[FormScript("Northwind.Territory")]
+[FormScript(InferKey = true)]
 [BasedOnRow(typeof(TerritoryRow), CheckNames = true)]
 public class TerritoryForm
 {

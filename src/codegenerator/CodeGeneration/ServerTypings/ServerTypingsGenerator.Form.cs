@@ -165,19 +165,14 @@ public partial class ServerTypingsGenerator
         out ILookup<string, PropertyDefinition>? basedOnByName,
         out List<AnnotationTypeInfo>? rowAnnotations)
     {
-        TypeDefinition? basedOnRow = null;
-        var basedOnRowAttr = TypingsUtils.GetAttr(type, "Serenity.ComponentModel", "BasedOnRowAttribute");
-        if (basedOnRowAttr != null &&
-            basedOnRowAttr.ConstructorArguments().Count > 0 &&
-            basedOnRowAttr.ConstructorArguments()[0].Type?.FullNameOf() == "System.Type")
-            basedOnRow = (basedOnRowAttr.ConstructorArguments[0].Value as TypeReference)!.Resolve();
+        TypeDefinition? basedOnRow = GetBasedOnRowType(type);
 
         rowAnnotations = basedOnRow != null ? GetAnnotationTypesFor(basedOnRow) : null;
 
         basedOnByName = null;
-        if (basedOnRowAttr != null)
+        if (basedOnRow != null)
         {
-            basedOnByName = EnumerateProperties(basedOnRow!).Where(TypingsUtils.IsPublicInstanceProperty)
+            basedOnByName = EnumerateProperties(basedOnRow).Where(TypingsUtils.IsPublicInstanceProperty)
                 .ToLookup(x => x.Name);
         }
 
@@ -337,7 +332,21 @@ public partial class ServerTypingsGenerator
         {
             cw.Indented("static readonly formKey = '");
             var key = formScriptAttribute.ConstructorArguments() != null &&
-                formScriptAttribute.ConstructorArguments().Count > 0 ? formScriptAttribute.ConstructorArguments[0].Value as string : null;
+                formScriptAttribute.ConstructorArguments().Count > 0 ? formScriptAttribute.ConstructorArguments()[0].Value as string : null;
+
+            if (key is null && formScriptAttribute.NamedArguments().FirstOrDefault(x => string.Equals(x.Name(), "Value")) is { } namedArg)
+            {
+                key = namedArg.ArgumentValue() as string;
+            }
+
+            if (key == null && formScriptAttribute.NamedArguments() != null && 
+                formScriptAttribute.NamedArguments()
+                    .FirstOrDefault(x => string.Equals(x.Name(), "InferKey")) is { } inferArg && 
+                    inferArg.ArgumentValue() is true)
+            {
+                key = AutoFormOrColumnsKeyFor(type);
+            }
+
             key ??= type.FullNameOf();
 
             sb.Append(key);
@@ -402,5 +411,48 @@ public partial class ServerTypingsGenerator
         }
 
         RegisterGeneratedType(codeNamespace, identifier, typeOnly: false);
+    }
+
+    private static TypeDefinition? GetBasedOnRowType(TypeDefinition type)
+    {
+        var basedOnRowAttr = TypingsUtils.GetAttr(type, "Serenity.ComponentModel", "BasedOnRowAttribute");
+        if (basedOnRowAttr != null &&
+            basedOnRowAttr.ConstructorArguments().Count > 0 &&
+            basedOnRowAttr.ConstructorArguments()[0].Type?.FullNameOf() == "System.Type")
+            return (basedOnRowAttr.ConstructorArguments[0].Value as TypeReference)!.Resolve();
+        return null;
+    }
+
+    private string AutoFormOrColumnsKeyFor(TypeDefinition type)
+    {
+        string? module = GetModuleKeyForType(type) ??
+            (GetBasedOnRowType(type) is { } basedOnRow ? GetModuleKeyForType(basedOnRow) : null);
+
+        if (module is null)
+        {
+            module = type.NamespaceOf() ?? "";
+
+            if (module.EndsWith(".Forms", StringComparison.Ordinal))
+                module = module[0..^6];
+            else if (module.EndsWith(".Columns", StringComparison.Ordinal))
+                module = module[0..^8];
+            else if (module.EndsWith(".Lookups", StringComparison.Ordinal))
+                module = module[0..^8];
+
+            var idx = module.IndexOf('.');
+            if (idx >= 0)
+                module = module[(idx + 1)..];
+        }
+
+        var name = type.Name;
+        if (name.EndsWith("Form", StringComparison.Ordinal))
+            name = name[0..^4];
+        else if (name.EndsWith("Columns", StringComparison.Ordinal))
+            name = name[0..^7];
+        else if (name.EndsWith("Request", StringComparison.Ordinal))
+            name = name[0..^7];
+
+
+        return string.IsNullOrEmpty(module) ? name : module + "." + name;
     }
 }

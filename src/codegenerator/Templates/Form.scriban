@@ -1,7 +1,7 @@
 {{USING "Serenity.ComponentModel"}}
 
 {{NAMESPACE FormNamespace}}{{capture block~}}
-[FormScript("{{FormKey}}")]
+[FormScript(InferKey = true)]
 [BasedOnRow(typeof({{RowClassName}}), CheckNames = true)]
 public class {{FormClassName}}
 {
