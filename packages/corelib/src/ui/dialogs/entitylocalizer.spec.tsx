@@ -663,6 +663,60 @@ describe("EntityLocalizer.updateInterface", () => {
         localizer.destroy();
     });
 
+    it("keeps the tool buttons that were hidden before localization mode hidden after it", () => {
+        const pgDiv = document.createElement("div");
+        const button = document.createElement("button");
+        button.classList.add("pressed");
+        const visibleBtn = document.createElement("button");
+        const hiddenBtn = document.createElement("button");
+        hiddenBtn.hidden = true;
+        const items: PropertyItem[] = [{ name: "Name", title: "Name", localizable: true }];
+        const opt = createMockOptions({
+            getPropertyGrid: () => Fluent(pgDiv),
+            getButton: () => Fluent(button),
+            getToolButtons: () => [button, visibleBtn, hiddenBtn],
+            getLanguages: () => [{ id: "en", text: "English" }],
+            pgOptions: { idPrefix: "Test_", items, mode: 0 as any, localTextPrefix: "Forms.Test." }
+        });
+        const localizer = new EntityLocalizer(opt);
+
+        localizer.updateInterface();
+        expect(visibleBtn.hidden).toBe(true);
+        expect(hiddenBtn.classList.contains("localization-hidden")).toBe(false);
+
+        // back to the form
+        button.classList.remove("pressed");
+        localizer.updateInterface();
+        expect(visibleBtn.hidden).toBe(false);
+        expect(visibleBtn.classList.contains("localization-hidden")).toBe(false);
+        expect(hiddenBtn.hidden).toBe(true);
+        localizer.destroy();
+    });
+
+    it("hides a tool button the dialog showed again while in localization mode", () => {
+        const pgDiv = document.createElement("div");
+        const button = document.createElement("button");
+        button.classList.add("pressed");
+        const otherBtn = document.createElement("button");
+        const items: PropertyItem[] = [{ name: "Name", title: "Name", localizable: true }];
+        const opt = createMockOptions({
+            getPropertyGrid: () => Fluent(pgDiv),
+            getButton: () => Fluent(button),
+            getToolButtons: () => [button, otherBtn],
+            getLanguages: () => [{ id: "en", text: "English" }],
+            pgOptions: { idPrefix: "Test_", items, mode: 0 as any, localTextPrefix: "Forms.Test." }
+        });
+        const localizer = new EntityLocalizer(opt);
+
+        localizer.updateInterface();
+        // e.g. the toolbar updating its buttons after a change
+        otherBtn.hidden = false;
+        localizer.updateInterface();
+
+        expect(otherBtn.hidden).toBe(true);
+        localizer.destroy();
+    });
+
     it("updateInterface restores tool buttons outside localization mode", () => {
         const pgDiv = document.createElement("div");
         const button = document.createElement("button");

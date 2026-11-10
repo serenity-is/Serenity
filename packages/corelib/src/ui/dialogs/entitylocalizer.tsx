@@ -368,7 +368,9 @@ export class EntityLocalizer {
 
         const buttons = this.options.getToolButtons().filter(x => x !== button);
         if (locMode) {
-            buttons?.filter(x => !x.classList.contains("localization-hidden")).forEach(el => {
+            // only the visible ones are marked, so the ones that were already hidden, e.g. undelete of
+            // an entity that is not deleted, are not shown when leaving localization mode
+            buttons?.filter(x => !x.hidden).forEach(el => {
                 el.classList.add('localization-hidden');
                 el.hidden = true;
             });
