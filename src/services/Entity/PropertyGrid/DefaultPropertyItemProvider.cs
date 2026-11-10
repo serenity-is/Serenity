@@ -48,6 +48,32 @@ public partial class DefaultPropertyItemProvider : IPropertyItemProvider, IDispo
         changeSubscription = null;
     }
 
+    /// <summary>
+    /// Gets the public instance properties of a type in the order they are declared in their assembly, or when the type has
+    /// the <see cref="BasePropertyOrderAttribute"/>, the ones of its base types before or after its own as it says.
+    /// </summary>
+    private static IEnumerable<PropertyInfo> GetOrderedProperties(Type type)
+    {
+        var all = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+        if (type.GetCustomAttribute<BasePropertyOrderAttribute>(inherit: false) is null)
+            return all.OrderBy(x => x.MetadataToken);
+
+        return ComposeProperties(type, all);
+    }
+
+    private static IEnumerable<PropertyInfo> ComposeProperties(Type? type, PropertyInfo[] all)
+    {
+        if (type is null || type == typeof(object))
+            return [];
+
+        var own = all.Where(x => x.DeclaringType == type).OrderBy(x => x.MetadataToken);
+        var bases = ComposeProperties(type.BaseType, all);
+
+        // a base type without the attribute has its base types first, which is the natural order
+        return type.GetCustomAttribute<BasePropertyOrderAttribute>(inherit: false)?.Position == BasePropertyPosition.After ?
+            own.Concat(bases) : bases.Concat(own);
+    }
+
     /// <inheritdoc/>
     /// <param name="type">The type.</param>
     /// <param name="predicate"><inheritdoc/></param>
@@ -74,8 +100,7 @@ public partial class DefaultPropertyItemProvider : IPropertyItemProvider, IDispo
             processor.Initialize();
         }
 
-        foreach (var property in type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
-            .OrderBy(x => x.MetadataToken))
+        foreach (var property in GetOrderedProperties(type))
         {
 
             if (property.GetCustomAttribute<IgnoreUIFieldAttribute>(inherit: false) != null ||

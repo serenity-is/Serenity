@@ -223,6 +223,84 @@ public class DefaultPropertyItemProviderTests
         var provider = CreateProvider();
         provider.Dispose();
     }
+
+    // the derived types are declared before the ones they inherit, so the order of declaration is not the one of inheritance
+    private class UnorderedLeaf : UnorderedBase
+    {
+        public string LeafA { get; set; }
+        public string LeafB { get; set; }
+    }
+
+    private class UnorderedBase
+    {
+        public string BaseA { get; set; }
+        public string BaseB { get; set; }
+    }
+
+    [BasePropertyOrder]
+    private class BaseFirstLeaf : OrderedBase
+    {
+        public string LeafA { get; set; }
+        public string LeafB { get; set; }
+    }
+
+    [BasePropertyOrder(BasePropertyPosition.After)]
+    private class BaseLastLeaf : OrderedBase
+    {
+        public string LeafA { get; set; }
+        public string LeafB { get; set; }
+    }
+
+    private class OrderedBase
+    {
+        public string BaseA { get; set; }
+        public string BaseB { get; set; }
+    }
+
+    [BasePropertyOrder]
+    private class ThreeLevelLeaf : ThreeLevelMiddle
+    {
+        public string LeafA { get; set; }
+    }
+
+    [BasePropertyOrder(BasePropertyPosition.After)]
+    private class ThreeLevelMiddle : ThreeLevelRoot
+    {
+        public string MiddleA { get; set; }
+        public string MiddleB { get; set; }
+    }
+
+    private class ThreeLevelRoot
+    {
+        public string RootA { get; set; }
+    }
+
+    private static string[] Names(Type type) =>
+        [.. CreateProvider().GetPropertyItemsFor(type, null).Select(x => x.Name)];
+
+    [Fact]
+    public void GetPropertyItemsFor_KeepsTheOrderOfDeclaration_WithoutBasePropertyOrder()
+    {
+        // what is declared first in the assembly comes first, whichever of the types inherits the other
+        Assert.Equal(["LeafA", "LeafB", "BaseA", "BaseB"], Names(typeof(UnorderedLeaf)));
+    }
+
+    [Fact]
+    public void GetPropertyItemsFor_PutsThePropertiesOfTheBaseTypesFirst_WithBasePropertyOrder()
+    {
+        Assert.Equal(["BaseA", "BaseB", "LeafA", "LeafB"], Names(typeof(BaseFirstLeaf)));
+    }
+
+    [Fact]
+    public void GetPropertyItemsFor_PutsThePropertiesOfTheBaseTypesLast_WithBasePropertyOrderAfter()
+    {
+        Assert.Equal(["LeafA", "LeafB", "BaseA", "BaseB"], Names(typeof(BaseLastLeaf)));
+    }
+
+    [Fact]
+    public void GetPropertyItemsFor_AppliesBasePropertyOrderToEachTypeOfTheHierarchyThatHasIt()
+    {
+        // the middle type places its base after its own, and the leaf places both before its own
+        Assert.Equal(["MiddleA", "MiddleB", "RootA", "LeafA"], Names(typeof(ThreeLevelLeaf)));
+    }
 }
-
-
