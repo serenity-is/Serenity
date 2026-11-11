@@ -3,7 +3,7 @@
   height: 4em;
 }
 
-.s-Demo-BasicSamples-WrappedHeadersGrid .slick-header-column.ui-state-default {
+.s-Demo-BasicSamples-WrappedHeadersGrid .slick-header-columns .slick-header-column {
   height: 100%;
   line-height: 1.3em;
 }
