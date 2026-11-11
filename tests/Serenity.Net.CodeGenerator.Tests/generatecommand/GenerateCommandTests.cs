@@ -24,6 +24,7 @@ public partial class GenerateCommandTests
         public string? GetRootNamespace() => "My";
         public string? GetTargetFramework() => "net8.0";
         public string? GetDotNetSergen() => null;
+        public Version? GetSerenityWebVersion() => null;
         public bool UsesSourceGenerators() => false;
     }
 

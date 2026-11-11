@@ -16,6 +16,11 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console, IProcessExec
     /// </summary>
     public string? SergenLocation { get; set; } = typeof(Cli).Assembly.Location;
 
+    /// <summary>
+    /// Gets or sets the version of the sergen that is running, to compare with the Serenity.Net.Web of the project.
+    /// </summary>
+    public Version? SergenVersion { get; set; } = typeof(Cli).Assembly.GetName().Version;
+
     public ExitCodes Run(IArgumentReader arguments)
     {
         ArgumentNullException.ThrowIfNull(arguments);
@@ -78,6 +83,7 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console, IProcessExec
 
         if (isCommand(CommandKeys.Generate, CommandAliases.Generate))
         {
+            WarnIfNotTheSergenOfTheProject(project);
             return RunCommand(new GenerateCommand(project, Console)
             {
                 Arguments = arguments
@@ -142,7 +148,7 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console, IProcessExec
         var force = arguments.GetBoolean(["force"]) == true;
         arguments.ThrowIfRemaining();
 
-        WarnIfProjectUsesAnotherSergen(project);
+        WarnIfNotTheSergenOfTheProject(project);
 
         // the generators of Pro.Coder write these on build, and the files written here would be duplicates of them
         if ((mvc || clientTypes) && !force && project.UsesSourceGenerators())
@@ -180,27 +186,54 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console, IProcessExec
         return exitCode ?? ExitCodes.InvalidCommand;
     }
 
+    private void WarnIfNotTheSergenOfTheProject(IProjectFileInfo project)
+    {
+        if (!WarnIfProjectUsesAnotherSergen(project))
+            WarnIfVersionDiffersFromSerenityWeb(project);
+    }
+
+    /// <summary>
+    /// Warns when sergen does not have the version of the Serenity.Net.Web package of the project, as when the dotnet tool
+    /// of the project is not restored or updated, which the doctor command tells about too. It is for the projects that
+    /// run the tool, as the ones running sergen from a path are compared with it, and the ones referencing Serenity as a
+    /// project have no version to compare.
+    /// </summary>
+    private void WarnIfVersionDiffersFromSerenityWeb(IProjectFileInfo project)
+    {
+        if (SergenVersion is null || project.GetSerenityWebVersion() is not { } serenityVersion)
+            return;
+
+        if (serenityVersion.Major != SergenVersion.Major ||
+            serenityVersion.Minor != SergenVersion.Minor ||
+            serenityVersion.Build != SergenVersion.Build)
+            Console.WriteLine(string.Format(CultureInfo.CurrentCulture, Texts.DifferentSergenVersion,
+                SergenVersion, serenityVersion), ConsoleColor.Yellow);
+    }
+
     /// <summary>
     /// Warns when the project runs sergen from a path, e.g. one built from the source of Serenity, and this is not it,
     /// as it may be a released version that has not got the changes of that one.
     /// </summary>
-    private void WarnIfProjectUsesAnotherSergen(IProjectFileInfo project)
+    /// <returns>True when the project runs sergen from a path, whether or not it is this one.</returns>
+    private bool WarnIfProjectUsesAnotherSergen(IProjectFileInfo project)
     {
         var command = project.GetDotNetSergen()?.Trim();
         if (string.IsNullOrEmpty(command) || string.IsNullOrEmpty(SergenLocation) ||
             !command.StartsWith("dotnet ", StringComparison.OrdinalIgnoreCase))
-            return;
+            return false;
 
         var expected = command[7..].Trim().Trim('"').Trim();
         // 'dotnet sergen' is the tool, which does not have a path to compare
         if (string.IsNullOrEmpty(expected) || string.Equals(expected, "sergen", StringComparison.OrdinalIgnoreCase))
-            return;
+            return false;
 
         string withoutExtension(string path) => FileSystem.ChangeExtension(FileSystem.GetFullPath(path), null) ?? path;
 
         if (!string.Equals(withoutExtension(expected), withoutExtension(SergenLocation), StringComparison.OrdinalIgnoreCase))
             Console.WriteLine(string.Format(CultureInfo.CurrentCulture, Texts.DifferentSergen, expected, SergenLocation),
                 ConsoleColor.Yellow);
+
+        return true;
     }
 
     private ExitCodes RunCommand(BaseGeneratorCommand command, ExitCodes? current = null)

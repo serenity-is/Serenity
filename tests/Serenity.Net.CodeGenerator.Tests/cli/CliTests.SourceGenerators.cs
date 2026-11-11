@@ -4,7 +4,8 @@ namespace Serenity.CodeGenerator;
 
 public partial class CliTests
 {
-    private static string MSBuildJson(string sourceGeneratorTransform = null, bool visibleProperty = true, string dotNetSergen = null)
+    private static string MSBuildJson(string sourceGeneratorTransform = null, bool visibleProperty = true, string dotNetSergen = null,
+        string serenityWebVersion = null)
     {
         var properties = new List<string>();
         if (sourceGeneratorTransform != null)
@@ -14,14 +15,17 @@ public partial class CliTests
 
         // only the targets of Pro.Coder add this one, so a project without them does not have it
         var items = visibleProperty ? "{ \"Identity\": \"SourceGeneratorTransform\" }" : "";
+        var packages = serenityWebVersion == null ? "" :
+            "{ \"Identity\": \"Serenity.Net.Web\", \"Version\": \"" + serenityWebVersion + "\" }";
         return "{ \"Properties\": { " + string.Join(", ", properties) + " }, " +
-            "\"Items\": { \"CompilerVisibleProperty\": [ " + items + " ] } }";
+            "\"Items\": { \"CompilerVisibleProperty\": [ " + items + " ], \"PackageReference\": [ " + packages + " ] } }";
     }
 
     private ExitCodes RunWithMSBuild(string msbuildJson, params string[] arguments)
     {
         var cli = NewCli();
         cli.SergenLocation = "/tools/sergen/sergen.dll";
+        cli.SergenVersion = new Version(10, 6, 3, 0);
         cli.ProjectFactory = (project, getProperty) => new ProjectFileInfo(fileSystem, project, getProperty)
         {
             ExecuteMSBuild = _ => msbuildJson
@@ -85,20 +89,6 @@ public partial class CliTests
     }
 
     [Fact]
-    public void DoesNotAskMSBuildForTheGenerateCommand()
-    {
-        var asked = false;
-        var cli = NewCli();
-        cli.ProjectFactory = (project, getProperty) => new ProjectFileInfo(fileSystem, project, getProperty)
-        {
-            ExecuteMSBuild = _ => { asked = true; return MSBuildJson(); }
-        };
-
-        Assert.Equal(ExitCodes.Success, cli.Run(new ArgumentReader([Cli.CommandKeys.Generate])));
-        Assert.False(asked);
-    }
-
-    [Fact]
     public void WarnsWhenTheProjectRunsAnotherSergen()
     {
         var exitCode = RunWithMSBuild(MSBuildJson(sourceGeneratorTransform: "false", dotNetSergen: "dotnet /repo/artifacts/sergen.dll"),
@@ -123,5 +113,50 @@ public partial class CliTests
         RunWithMSBuild(MSBuildJson(sourceGeneratorTransform: "false", dotNetSergen: dotNetSergen), Cli.CommandKeys.Mvc);
 
         Assert.Empty(console.WriteCalls);
+    }
+
+    [Fact]
+    public void WarnsWhenTheToolDoesNotHaveTheVersionOfSerenityWeb()
+    {
+        var exitCode = RunWithMSBuild(MSBuildJson(sourceGeneratorTransform: "false", dotNetSergen: "dotnet sergen",
+            serenityWebVersion: "10.7.0"), Cli.CommandKeys.Mvc);
+
+        Assert.Equal(ExitCodes.Success, exitCode);
+        Assert.Single(runCalls);
+        var (type, message, _) = Assert.Single(console.WriteCalls);
+        Assert.Equal(CallType.WriteLine, type);
+        Assert.Contains("10.6.3.0", message);
+        Assert.Contains("10.7.0", message);
+    }
+
+    [Fact]
+    public void WarnsForTheGenerateCommandToo()
+    {
+        RunWithMSBuild(MSBuildJson(serenityWebVersion: "10.5.0"), Cli.CommandKeys.Generate);
+
+        Assert.Contains("10.5.0", Assert.Single(console.WriteCalls).message);
+    }
+
+    [InlineData("10.6.3")]
+    [InlineData("10.6.3.0")]
+    [InlineData("10.6.3.17")]
+    [InlineData("10.6.3-beta")]
+    [InlineData("not a version")]
+    [InlineData(null)]
+    [Theory]
+    public void DoesNotWarnAboutTheVersion_WhenItMatchesOrIsUnknown(string serenityWebVersion)
+    {
+        RunWithMSBuild(MSBuildJson(sourceGeneratorTransform: "false", serenityWebVersion: serenityWebVersion), Cli.CommandKeys.Mvc);
+
+        Assert.Empty(console.WriteCalls);
+    }
+
+    [Fact]
+    public void ComparesOnlyThePathWhenTheProjectRunsSergenFromOne()
+    {
+        RunWithMSBuild(MSBuildJson(sourceGeneratorTransform: "false", dotNetSergen: "dotnet /repo/artifacts/sergen.dll",
+            serenityWebVersion: "10.7.0"), Cli.CommandKeys.Mvc);
+
+        Assert.DoesNotContain("10.7.0", Assert.Single(console.WriteCalls).message);
     }
 }

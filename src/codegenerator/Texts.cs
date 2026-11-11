@@ -75,6 +75,11 @@ public static class Texts
     public const string DifferentSergen = "This project runs sergen as '{0}' but this one is '{1}', " +
         "which may be a different version and not include its latest changes.";
 
+    public const string DifferentSergenVersion = "This is Sergen {0}, but the project uses Serenity.Net.Web {1}. " +
+        "Their versions should match, so the generated code is not from a different version. " +
+        "Update the sergen version in .config/dotnet-tools.json and run 'dotnet tool restore', " +
+        "or run 'sergen doctor' for more information.";
+
     public const string CantFindProject = "Can't find a project file at: {0}";
 
     public const string NoProjectFiles = "Multiple project files found in current directory!\n" +

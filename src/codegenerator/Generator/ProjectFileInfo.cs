@@ -82,6 +82,18 @@ public class ProjectFileInfo(IFileSystem fileSystem, string projectFile,
             string.Equals(x.Identity, "SourceGeneratorTransform", StringComparison.OrdinalIgnoreCase)) == true;
     }
 
+    /// <summary>
+    /// Gets the version of the Serenity.Net.Web package the project references.
+    /// </summary>
+    /// <returns>The version, or null when the project references it as a project, or its version can't be read.</returns>
+    public Version? GetSerenityWebVersion()
+    {
+        var item = GetProjectMSBuildInfo().Items?.PackageReference?.FirstOrDefault(x =>
+            string.Equals(x.Identity, "Serenity.Net.Web", StringComparison.OrdinalIgnoreCase));
+
+        return item?.Version != null && Version.TryParse(item.Version, out var version) ? version : null;
+    }
+
     public string? GetEsmAssetBasePath()
     {
         if (esmAssetBasePath is null)
@@ -301,6 +313,7 @@ public class ProjectFileInfo(IFileSystem fileSystem, string projectFile,
             Arguments = $"msbuild \"{projectFile}\" {configArg}" +
                 "-getItem:Using " +
                 "-getItem:CompilerVisibleProperty " +
+                "-getItem:PackageReference " +
                 "-getProperty:AssemblyName " +
                 "-getProperty:DotNetSergen " +
                 "-getProperty:SourceGeneratorTransform " +

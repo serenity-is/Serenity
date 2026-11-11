@@ -13,6 +13,7 @@ namespace Serenity.CodeGenerator
         string? GetNullable();
         string? GetOutDir();
         string? GetRootNamespace();
+        Version? GetSerenityWebVersion();
         string? GetTargetFramework();
         bool UsesSourceGenerators();
     }
