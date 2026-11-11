@@ -11,6 +11,34 @@ public class EnumJsonConverterTests
         Two = 2
     }
 
+    [Flags]
+    public enum TestFlags
+    {
+        None = 0,
+        Table = 1,
+        View = 2,
+        Entity = 4
+    }
+
+    // a flags enum whose values are not all single bits, like a named combination
+    [Flags]
+    private enum TestGroupedFlags
+    {
+        None = 0,
+        Read = 1,
+        Write = 2,
+        ReadWrite = Read | Write,
+        Admin = 8
+    }
+
+    [Flags]
+    private enum TestUnsignedFlags : ulong
+    {
+        None = 0,
+        Low = 1,
+        High = 1UL << 63
+    }
+
     private static readonly JsonSerializerOptions options = new()
     {
         Converters = { EnumJsonConverter.Instance }
@@ -78,5 +106,65 @@ public class EnumJsonConverterTests
     {
         Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize<TestEnum>("{}", options));
+    }
+
+    [Theory]
+    [InlineData("0", TestFlags.None)]
+    [InlineData("1", TestFlags.Table)]
+    [InlineData("3", TestFlags.Table | TestFlags.View)]
+    [InlineData("5", TestFlags.Table | TestFlags.Entity)]
+    [InlineData("7", TestFlags.Table | TestFlags.View | TestFlags.Entity)]
+    [InlineData("\"3\"", TestFlags.Table | TestFlags.View)]
+    [InlineData("\"Table, View\"", TestFlags.Table | TestFlags.View)]
+    public void Deserializes_ACombinationOfTheValuesOfAFlagsEnum(string json, TestFlags expected)
+    {
+        // the combination is not defined itself, but it is made of the defined ones
+        Assert.Equal(expected, JsonSerializer.Deserialize<TestFlags>(json, options));
+    }
+
+    [Theory]
+    [InlineData("8")]
+    [InlineData("11")]
+    [InlineData("-1")]
+    [InlineData("\"8\"")]
+    public void Deserializes_AValueWithABitThatIsNotDefined_ForAFlagsEnum_Throws(string json)
+    {
+        Assert.Throws<InvalidCastException>(() => JsonSerializer.Deserialize<TestFlags>(json, options));
+    }
+
+    [Fact]
+    public void Serializes_ACombinationOfTheValuesOfAFlagsEnum_AsNumber()
+    {
+        Assert.Equal("3", JsonSerializer.Serialize(TestFlags.Table | TestFlags.View, options));
+    }
+
+    [Theory]
+    [InlineData("3")]
+    [InlineData("9")]
+    [InlineData("11")]
+    [InlineData("10")]
+    public void Deserializes_ACombinationOfTheBitsOfTheNamedValues_OfAFlagsEnum(string json)
+    {
+        Assert.Equal((TestGroupedFlags)int.Parse(json), JsonSerializer.Deserialize<TestGroupedFlags>(json, options));
+    }
+
+    [Fact]
+    public void Deserializes_AValueWithABitThatIsNotInTheNamedValues_OfAFlagsEnum_Throws()
+    {
+        Assert.Throws<InvalidCastException>(() => JsonSerializer.Deserialize<TestGroupedFlags>("4", options));
+    }
+
+    [Fact]
+    public void Deserializes_AnEnumThatIsNotFlags_OnlyAsADefinedValue()
+    {
+        // a sum of the values of an enum that is not flags is not a value of it
+        Assert.Throws<InvalidCastException>(() => JsonSerializer.Deserialize<TestEnum>("3", options));
+    }
+
+    [Fact]
+    public void Deserializes_ACombinationOfTheValuesOfAFlagsEnum_OfAnUnsignedType()
+    {
+        Assert.Equal(TestUnsignedFlags.Low, JsonSerializer.Deserialize<TestUnsignedFlags>("1", options));
+        Assert.Throws<InvalidCastException>(() => JsonSerializer.Deserialize<TestUnsignedFlags>("2", options));
     }
 }
