@@ -168,6 +168,38 @@ public static class CoreServiceCollectionExtensions
     }
 
     /// <summary>
+    /// Adds the given <see cref="IRoleListService"/> implementation, which lists the roles for the services that need to
+    /// pick them, e.g. the editors. It is optional, so the ones that use it work without when it is not added.
+    /// </summary>
+    /// <typeparam name="TRoleListService">The type of the role list service.</typeparam>
+    /// <param name="services">The service collection.</param>
+    public static IServiceCollection AddRoleListService<TRoleListService>(this IServiceCollection services)
+        where TRoleListService : class, IRoleListService
+    {
+        if (services is null)
+            throw new ArgumentNullException(nameof(services));
+
+        services.AddSingleton<IRoleListService, TRoleListService>();
+        return services;
+    }
+
+    /// <summary>
+    /// Adds the given <see cref="IUserListService"/> implementation, which lists the users for the services that need to
+    /// pick them, e.g. the editors. It is optional, so the ones that use it work without when it is not added.
+    /// </summary>
+    /// <typeparam name="TUserListService">The type of the user list service.</typeparam>
+    /// <param name="services">The service collection.</param>
+    public static IServiceCollection AddUserListService<TUserListService>(this IServiceCollection services)
+        where TUserListService : class, IUserListService
+    {
+        if (services is null)
+            throw new ArgumentNullException(nameof(services));
+
+        services.AddSingleton<IUserListService, TUserListService>();
+        return services;
+    }
+
+    /// <summary>
     /// Adds the <see cref="DefaultUserProvider"/> as <see cref="IUserProvider"/> implementation to the service collection.
     /// Also registers the given IUserAccessor, IUserRetrieveService and IUserClaimCreator implementations.
     /// </summary>
