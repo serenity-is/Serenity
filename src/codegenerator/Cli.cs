@@ -11,6 +11,11 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console, IProcessExec
     public Func<string, Func<string, string?>, IProjectFileInfo>? ProjectFactory { get; set; }
     public Func<BaseGeneratorCommand, ExitCodes>? RunCommandCallback { get; set; }
 
+    /// <summary>
+    /// Gets or sets the location of the sergen that is running, to find out whether the project uses another one.
+    /// </summary>
+    public string? SergenLocation { get; set; } = typeof(Cli).Assembly.Location;
+
     public ExitCodes Run(IArgumentReader arguments)
     {
         ArgumentNullException.ThrowIfNull(arguments);
@@ -134,8 +139,17 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console, IProcessExec
             return ExitCodes.InvalidCommand;
         }
 
+        var force = arguments.GetBoolean(["force"]) == true;
         arguments.ThrowIfRemaining();
 
+        WarnIfProjectUsesAnotherSergen(project);
+
+        // the generators of Pro.Coder write these on build, and the files written here would be duplicates of them
+        if ((mvc || clientTypes) && !force && project.UsesSourceGenerators())
+        {
+            Console.Error(Texts.GeneratedOnBuild);
+            return ExitCodes.GeneratedOnBuild;
+        }
 
         ExitCodes? exitCode = null;
         if (mvc)
@@ -164,6 +178,29 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console, IProcessExec
         }
 
         return exitCode ?? ExitCodes.InvalidCommand;
+    }
+
+    /// <summary>
+    /// Warns when the project runs sergen from a path, e.g. one built from the source of Serenity, and this is not it,
+    /// as it may be a released version that has not got the changes of that one.
+    /// </summary>
+    private void WarnIfProjectUsesAnotherSergen(IProjectFileInfo project)
+    {
+        var command = project.GetDotNetSergen()?.Trim();
+        if (string.IsNullOrEmpty(command) || string.IsNullOrEmpty(SergenLocation) ||
+            !command.StartsWith("dotnet ", StringComparison.OrdinalIgnoreCase))
+            return;
+
+        var expected = command[7..].Trim().Trim('"').Trim();
+        // 'dotnet sergen' is the tool, which does not have a path to compare
+        if (string.IsNullOrEmpty(expected) || string.Equals(expected, "sergen", StringComparison.OrdinalIgnoreCase))
+            return;
+
+        string withoutExtension(string path) => FileSystem.ChangeExtension(FileSystem.GetFullPath(path), null) ?? path;
+
+        if (!string.Equals(withoutExtension(expected), withoutExtension(SergenLocation), StringComparison.OrdinalIgnoreCase))
+            Console.WriteLine(string.Format(CultureInfo.CurrentCulture, Texts.DifferentSergen, expected, SergenLocation),
+                ConsoleColor.Yellow);
     }
 
     private ExitCodes RunCommand(BaseGeneratorCommand command, ExitCodes? current = null)

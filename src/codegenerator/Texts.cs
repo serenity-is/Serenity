@@ -16,6 +16,8 @@ public static class Texts
             t[ransform]       Executes clienttypes, mvc, and servertypings commands simultaneously.
 
         Switches:
+            --force           Runs mvc, clienttypes, mvct and transform even if the Pro.Coder
+                            source generators of the project generate their output on build.
             -p <ProjectFile>  Specifies the project file. Useful when multiple projects exist 
                             in the current directory.
             -prop:<n>=<v>     Provides hints to sergen for project-level properties, 
@@ -64,6 +66,14 @@ public static class Texts
                                           --no-interactive is used.
 
         """;
+
+    public const string GeneratedOnBuild = "The source generators of Pro.Coder generate the client types and view paths of this " +
+        "project while it builds, so running this command could write duplicates of them.\n" +
+        "Use 'dotnet build' to generate them. The servertypings command can still be run. " +
+        "To run this one anyway, add the --force switch.";
+
+    public const string DifferentSergen = "This project runs sergen as '{0}' but this one is '{1}', " +
+        "which may be a different version and not include its latest changes.";
 
     public const string CantFindProject = "Can't find a project file at: {0}";
 

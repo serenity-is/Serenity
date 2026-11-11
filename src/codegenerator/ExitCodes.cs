@@ -17,5 +17,6 @@ public enum ExitCodes
     NoTablesSelected = 10,
     InvalidTable = 11,
     CantDetermineOutputAssemblies = 12,
-    OverwriteRefused = 13
+    OverwriteRefused = 13,
+    GeneratedOnBuild = 14
 }

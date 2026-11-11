@@ -15,6 +15,8 @@ public partial class EntityCodeGeneratorTests
         public string? GetOutDir() => throw new NotSupportedException();
         public string? GetRootNamespace() => throw new NotSupportedException();
         public string? GetTargetFramework() => throw new NotSupportedException();
+        public string? GetDotNetSergen() => throw new NotSupportedException();
+        public bool UsesSourceGenerators() => throw new NotSupportedException();
     }
 
     private class MockGeneratedFileWriter : IGeneratedFileWriter

@@ -10,6 +10,7 @@ public class ProjectFileInfo(IFileSystem fileSystem, string projectFile,
     private readonly IFileSystem fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
     private readonly string projectFile = projectFile ?? throw new ArgumentNullException(nameof(projectFile));
     private string? assemblyName;
+    private string? dotNetSergen;
     private string? esmAssetBasePath;
     private Dictionary<string, string?>? globalUsings;
     private string? nullable;
@@ -46,6 +47,39 @@ public class ProjectFileInfo(IFileSystem fileSystem, string projectFile,
         }
 
         return string.IsNullOrEmpty(assemblyName) ? null : assemblyName;
+    }
+
+    /// <summary>
+    /// Gets the command the project uses to run sergen, from its DotNetSergen property, e.g. <c>dotnet sergen</c>
+    /// for the dotnet tool, or <c>dotnet path/to/sergen.dll</c> when the project builds sergen from source.
+    /// </summary>
+    public string? GetDotNetSergen()
+    {
+        if (dotNetSergen is null)
+        {
+            if (getPropertyArgument?.Invoke("DotNetSergen") is string s)
+                dotNetSergen = s;
+            else
+                dotNetSergen = GetProjectProperties().DotNetSergen ?? "";
+        }
+
+        return string.IsNullOrEmpty(dotNetSergen) ? null : dotNetSergen;
+    }
+
+    /// <summary>
+    /// Gets whether the Pro.Coder source generators of the project generate the server types, client types and
+    /// view paths while it builds, which is when its targets are imported, and SourceGeneratorTransform is not false.
+    /// </summary>
+    public bool UsesSourceGenerators()
+    {
+        var props = GetProjectProperties();
+        var transform = getPropertyArgument?.Invoke("SourceGeneratorTransform") ?? props.SourceGeneratorTransform;
+        if (string.Equals(transform?.Trim(), "false", StringComparison.OrdinalIgnoreCase))
+            return false;
+
+        // only the targets of Pro.Coder make the property visible to the compiler
+        return GetProjectMSBuildInfo().Items?.CompilerVisibleProperty?.Any(x =>
+            string.Equals(x.Identity, "SourceGeneratorTransform", StringComparison.OrdinalIgnoreCase)) == true;
     }
 
     public string? GetEsmAssetBasePath()
@@ -204,6 +238,12 @@ public class ProjectFileInfo(IFileSystem fileSystem, string projectFile,
         public PackageReferenceItem[]? PackageReference { get; set; }
         public ProjectReferenceItem[]? ProjectReference { get; set; }
         public UsingItem[]? Using { get; set; }
+        public CompilerVisiblePropertyItem[]? CompilerVisibleProperty { get; set; }
+    }
+
+    private class CompilerVisiblePropertyItem
+    {
+        public string? Identity { get; set; }
     }
 
     private class PackageReferenceItem
@@ -227,6 +267,8 @@ public class ProjectFileInfo(IFileSystem fileSystem, string projectFile,
     public class ProjectProperties
     {
         public string? AssemblyName { get; set; }
+        public string? DotNetSergen { get; set; }
+        public string? SourceGeneratorTransform { get; set; }
         public string? EsmAssetBasePath { get; set; }
         public string? Nullable { get; set; }
         public string? OutDir { get; set; }
@@ -258,7 +300,10 @@ public class ProjectFileInfo(IFileSystem fileSystem, string projectFile,
             FileName = "dotnet",
             Arguments = $"msbuild \"{projectFile}\" {configArg}" +
                 "-getItem:Using " +
+                "-getItem:CompilerVisibleProperty " +
                 "-getProperty:AssemblyName " +
+                "-getProperty:DotNetSergen " +
+                "-getProperty:SourceGeneratorTransform " +
                 "-getProperty:ESMAssetBasePath " +
                 "-getProperty:Nullable " +
                 "-getProperty:OutDir " +
