@@ -49,30 +49,53 @@ public partial class DefaultPropertyItemProvider : IPropertyItemProvider, IDispo
     }
 
     /// <summary>
-    /// Gets the public instance properties of a type in the order they are declared in their assembly, or when the type has
-    /// the <see cref="BasePropertyOrderAttribute"/>, the ones of its base types before or after its own as it says.
+    /// Gets the public instance properties of a type in the order they are declared in their assembly, or when a type of its
+    /// hierarchy has the <see cref="BasePropertyOrderAttribute"/>, the ones of its types in the order the attributes say.
     /// </summary>
     private static IEnumerable<PropertyInfo> GetOrderedProperties(Type type)
     {
         var all = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
-        if (type.GetCustomAttribute<BasePropertyOrderAttribute>(inherit: false) is null)
+        var order = ComposeTypes(type, out var anyAttribute);
+        if (!anyAttribute)
             return all.OrderBy(x => x.MetadataToken);
 
-        return ComposeProperties(type, all);
+        var byType = all.ToLookup(x => x.DeclaringType);
+        return order.SelectMany(x => byType[x].OrderBy(y => y.MetadataToken));
     }
 
-    private static IEnumerable<PropertyInfo> ComposeProperties(Type? type, PropertyInfo[] all)
+    private static List<Type> ComposeTypes(Type? type, out bool anyAttribute)
     {
+        anyAttribute = false;
         if (type is null || type == typeof(object))
             return [];
 
-        var own = all.Where(x => x.DeclaringType == type).OrderBy(x => x.MetadataToken);
-        var bases = ComposeProperties(type.BaseType, all);
+        var bases = ComposeTypes(type.BaseType, out anyAttribute);
+        var attr = type.GetCustomAttribute<BasePropertyOrderAttribute>(inherit: false);
+        anyAttribute |= attr is not null;
 
-        // a base type without the attribute has its base types first, which is the natural order
-        return type.GetCustomAttribute<BasePropertyOrderAttribute>(inherit: false)?.Position == BasePropertyPosition.After ?
-            own.Concat(bases) : bases.Concat(own);
+        var listedBefore = (attr?.TypesBefore ?? []).Where(bases.Contains).Distinct().ToList();
+        var listedAfter = (attr?.TypesAfter ?? []).Where(x => bases.Contains(x) && !listedBefore.Contains(x)).Distinct().ToList();
+        var rest = bases.Where(x => !listedBefore.Contains(x) && !listedAfter.Contains(x)).ToList();
+
+        // the base types that ask to be first or last, wherever the type puts the others
+        var first = rest.Where(x => WhenInherited(x) == BasePropertyPosition.Before).ToList();
+        var last = rest.Where(x => WhenInherited(x) == BasePropertyPosition.After).ToList();
+        var others = rest.Except(first).Except(last).ToList();
+        var othersAfter = attr?.Position == BasePropertyPosition.After;
+
+        List<Type> result = [.. first, .. listedBefore];
+        if (!othersAfter)
+            result.AddRange(others);
+        result.Add(type);
+        if (othersAfter)
+            result.AddRange(others);
+        result.AddRange(listedAfter);
+        result.AddRange(last);
+        return result;
     }
+
+    private static BasePropertyPosition WhenInherited(Type type) =>
+        type.GetCustomAttribute<BasePropertyOrderAttribute>(inherit: false)?.WhenInherited ?? BasePropertyPosition.Default;
 
     /// <inheritdoc/>
     /// <param name="type">The type.</param>

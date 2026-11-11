@@ -1,18 +1,24 @@
 namespace Serenity.ComponentModel;
 
 /// <summary>
-/// Where the properties declared in the base types of a type are placed, relative to the properties it declares itself.
+/// Where properties declared in a type are placed, relative to the properties of another type.
 /// </summary>
 /// <seealso cref="BasePropertyOrderAttribute"/>
 public enum BasePropertyPosition
 {
     /// <summary>
-    /// The properties of the base types come before the ones of the type.
+    /// No preference, which is before for the properties of the base types of a type, and the position the type that
+    /// inherits a type gives it for the properties of the type itself.
     /// </summary>
-    Before = 0,
+    Default = 0,
 
     /// <summary>
-    /// The properties of the base types come after the ones of the type.
+    /// Before the other properties.
     /// </summary>
-    After = 1
+    Before = 1,
+
+    /// <summary>
+    /// After the other properties.
+    /// </summary>
+    After = 2
 }

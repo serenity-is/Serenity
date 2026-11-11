@@ -303,4 +303,89 @@ public class DefaultPropertyItemProviderTests
         // the middle type places its base after its own, and the leaf places both before its own
         Assert.Equal(["MiddleA", "MiddleB", "RootA", "LeafA"], Names(typeof(ThreeLevelLeaf)));
     }
+
+    // the audit base says it is always last, and the type in the middle has no attribute, so only the hierarchy tells
+    private class AuditLeaf : AuditMiddle
+    {
+        public string LeafA { get; set; }
+    }
+
+    [BasePropertyOrder(TypesBefore = [typeof(AuditBase)])]
+    private class AuditBeforeLeaf : AuditMiddle
+    {
+        public string LeafA { get; set; }
+    }
+
+    [BasePropertyOrder(TypesAfter = [typeof(AuditMiddle)])]
+    private class AuditMiddleAfterLeaf : AuditMiddle
+    {
+        public string LeafA { get; set; }
+    }
+
+    [BasePropertyOrder(Position = BasePropertyPosition.After)]
+    private class AuditBasesAfterLeaf : AuditMiddle
+    {
+        public string LeafA { get; set; }
+    }
+
+    private class AuditMiddle : AuditBase
+    {
+        public string MiddleA { get; set; }
+    }
+
+    [BasePropertyOrder(WhenInherited = BasePropertyPosition.After)]
+    private class AuditBase
+    {
+        public string CreatedBy { get; set; }
+    }
+
+    private class FirstLeaf : FirstBase
+    {
+        public string LeafA { get; set; }
+    }
+
+    [BasePropertyOrder(WhenInherited = BasePropertyPosition.Before)]
+    private class FirstBase
+    {
+        public string KeyA { get; set; }
+    }
+
+    [BasePropertyOrder(TypesBefore = [typeof(ThreeLevelRoot), typeof(string)])]
+    private class ListedLeaf : ThreeLevelMiddle
+    {
+        public string LeafA { get; set; }
+    }
+
+    [Fact]
+    public void GetPropertyItemsFor_PlacesTheBaseTypeThatAsksToBeLast_AfterTheOthers_EvenWhenOnlyItHasTheAttribute()
+    {
+        Assert.Equal(["MiddleA", "LeafA", "CreatedBy"], Names(typeof(AuditLeaf)));
+    }
+
+    [Fact]
+    public void GetPropertyItemsFor_PlacesTheBaseTypeThatAsksToBeFirst_BeforeTheOthers()
+    {
+        Assert.Equal(["KeyA", "LeafA"], Names(typeof(FirstLeaf)));
+    }
+
+    [Fact]
+    public void GetPropertyItemsFor_LetsTheListsOfATypeOverrideWhatABaseTypeAsksFor()
+    {
+        // the audit base asks to be last, but the type lists it before its own
+        Assert.Equal(["CreatedBy", "MiddleA", "LeafA"], Names(typeof(AuditBeforeLeaf)));
+        Assert.Equal(["LeafA", "MiddleA", "CreatedBy"], Names(typeof(AuditMiddleAfterLeaf)));
+    }
+
+    [Fact]
+    public void GetPropertyItemsFor_KeepsWhatABaseTypeAsksFor_WhateverPositionTheTypeGivesTheOthers()
+    {
+        Assert.Equal(["LeafA", "MiddleA", "CreatedBy"], Names(typeof(AuditBasesAfterLeaf)));
+    }
+
+    [Fact]
+    public void GetPropertyItemsFor_PlacesTheListedTypesInTheOrderOfTheList_AndIgnoresTheOnesThatAreNotBaseTypes()
+    {
+        // the middle type places the root after its own, but the leaf lists it before
+        Assert.Equal(["RootA", "MiddleA", "MiddleB", "LeafA"], Names(typeof(ListedLeaf)));
+    }
 }
