@@ -86,8 +86,10 @@ public partial class Startup
         services.AddSingleton<INavigationModelFactory, AppServices.NavigationModelFactory>();
         services.AddSingleton<IPermissionService, AppServices.PermissionService>();
         services.AddSingleton<IPermissionKeyLister, AppServices.PermissionKeyLister>();
+        services.AddRoleListService<AppServices.RoleListService>();
         services.AddSingleton<IRolePermissionService, AppServices.RolePermissionService>();
         services.AddSingleton<IUserPasswordValidator, AppServices.UserPasswordValidator>();
+        services.AddUserListService<AppServices.UserListService>();
         services.AddUserProvider<AppServices.UserAccessor, AppServices.UserRetrieveService>();
 
         services.AddClamAVUploadScanner()
