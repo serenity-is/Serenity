@@ -1,19 +1,37 @@
 .alert.s-sample-info {
   font-size: 13px;
-  --bs-alert-padding-y: 0.5rem;
+  line-height: 20px;
+  padding-right: 40px;
+  --bs-alert-padding-x: 16px;
+  --bs-alert-padding-y: 12px;
+  --bs-alert-margin-bottom: 16px;
 }
 
 .alert.s-sample-info.alert-dismissible .btn-close {
-  padding: 0.5rem 0.75rem;
+  top: 4px;
+  right: 4px;
+  padding: 8px;
 }
 
 .alert.s-sample-info p {
-  margin-bottom: 5px;
+  margin: 0 0 4px;
+}
+
+.alert.s-sample-info ul {
+  margin: 4px 0 0;
+  padding-left: 20px;
 }
 
 .alert.s-sample-info .s-sample-sources {
-  text-align: right;
-  margin-bottom: 0;
+  margin: 8px 0 0;
+  padding-top: 8px;
+  border-top: 1px solid var(--bs-alert-border-color);
+  text-align: start;
+}
+
+.alert.s-sample-info .s-sample-sources b,
+a.s-sample-source-link {
+  font-weight: 500;
 }
 
 :root.pro .alert-dismissible button.close.btn-close {
