@@ -147,17 +147,9 @@ public class NorthwindDB_20161126_1417_Data : Migration
             Execute.Sql("SET GENERATOR GEN_SUPPLIERS_SUPPLIERID TO 29");
         }
 
-        var o = OrderRow.Fields;
-        var dateAdd = "dateadd(day, datediff(day, (select max(OrderDate) from Orders), getdate()), ";
-
-        if (this.IsSqlServer())
-            Execute.Sql(
-                new SqlUpdate(o.TableName)
-                    .SetTo(o.OrderDate, dateAdd + o.OrderDate.Name + ")")
-                    .SetTo(o.RequiredDate, dateAdd + o.RequiredDate.Name + ")")
-                    .SetTo(o.ShippedDate, dateAdd + o.ShippedDate.Name + ")")
-                    .Where(o.OrderDate <= new DateTime(1999, 7, 1))
-                    .DebugText);
+        // the orders are moved to the present, so the sample data looks recent, with the functions of the dialect
+        var dialect = this.GetDialect();
+        Execute.WithConnection((connection, transaction) => NorthwindSampleDates.Shift(connection, transaction, dialect));
     }
 
     public override void Down()
