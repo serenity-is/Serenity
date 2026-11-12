@@ -11,6 +11,12 @@ namespace Serenity.Demo.Northwind;
 public static class NorthwindSampleDates
 {
     /// <summary>
+    /// The highest id of the orders inserted by the Northwind migration. The orders after it are entered by the users, so their
+    /// dates are not moved, and don't count when finding how far the others are from today.
+    /// </summary>
+    public const int LastSampleOrderId = 11077;
+
+    /// <summary>
     /// Moves the dates of the orders, and the last contact dates of the customer details, forward by the number of days
     /// between the latest order and today. It does nothing when the latest order is already today or later, so it can
     /// be run any number of times.
@@ -24,6 +30,9 @@ public static class NorthwindSampleDates
     {
         ArgumentNullException.ThrowIfNull(connection);
         ArgumentNullException.ThrowIfNull(dialect);
+
+        // the commands are run directly, which don't open a connection that is not open yet, like the helpers of Serenity do
+        connection.EnsureOpen();
 
         string q(string name) => dialect.QuoteIdentifier(name);
 
@@ -39,7 +48,7 @@ public static class NorthwindSampleDates
         using (var command = connection.CreateCommand())
         {
             command.Transaction = transaction;
-            command.CommandText = $"SELECT MAX({q("OrderDate")}) FROM {q("Orders")}";
+            command.CommandText = $"SELECT MAX({q("OrderDate")}) FROM {q("Orders")} WHERE {q("OrderID")} <= {LastSampleOrderId}";
             latest = command.ExecuteScalar();
         }
 
@@ -54,7 +63,8 @@ public static class NorthwindSampleDates
 
         // a date that is null stays null
         execute($"UPDATE {q("Orders")} SET {q("OrderDate")} = {add("OrderDate")}, " +
-            $"{q("RequiredDate")} = {add("RequiredDate")}, {q("ShippedDate")} = {add("ShippedDate")}");
+            $"{q("RequiredDate")} = {add("RequiredDate")}, {q("ShippedDate")} = {add("ShippedDate")} " +
+            $"WHERE {q("OrderID")} <= {LastSampleOrderId}");
 
         execute($"UPDATE {q("CustomerDetails")} SET {q("LastContactDate")} = {add("LastContactDate")} " +
             $"WHERE {q("LastContactDate")} IS NOT NULL");
