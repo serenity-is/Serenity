@@ -150,7 +150,7 @@
   "Db.Northwind.Product.ProductImage": "Produktbild",
   "Db.Northwind.Product.ProductName": "Produktname",
   "Db.Northwind.Product.QuantityPerUnit": "Menge pro Einheit",
-  "Db.Northwind.Product.ReorderLevel": "Reorder Level",
+  "Db.Northwind.Product.ReorderLevel": "Meldebestand",
   "Db.Northwind.Product.RowVersion": "Zeilenversion",
   "Db.Northwind.Product.SupplierCompanyName": "Lieferant",
   "Db.Northwind.Product.SupplierCountry": "Lieferland",
@@ -246,6 +246,6 @@
   "Permission.Northwind:Customer:Modify": "Erstellen / Aktualisieren",
   "Permission.Northwind:Customer:View": "Anzeigen",
   "Permission.Northwind:General": "Berechtigun",
-  "Validation.NorthwindPhone": "Telefonnummern sollten in der Form '(503) 555-9831' eingegeben werde",
-  "Validation.NorthwindPhoneMultiple": "Telefonnummern müssen im Format '(503) 555-9831' eingegeben werde"
+  "Validation.NorthwindPhone": "Telefonnummern sollten im Format '(503) 555-9831' eingegeben werden.",
+  "Validation.NorthwindPhoneMultiple": "Telefonnummern sollten im Format '(503) 555-9831' eingegeben werden. Mehrere Nummern können durch Komma getrennt werden."
 }

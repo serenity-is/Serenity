@@ -246,6 +246,6 @@
   "Permission.Northwind:Customer:Modify": "انشاء / تحديث",
   "Permission.Northwind:Customer:View": "عرض",
   "Permission.Northwind:General": "الإذ",
-  "Validation.NorthwindPhone": "الأرقام الهاتفية يجب إدخالها بالصيغة '(503) 555-9831",
-  "Validation.NorthwindPhoneMultiple": "الرقم الهاتفي يجب إدخاله بالشكل '(503) 555-983"
+  "Validation.NorthwindPhone": "الأرقام الهاتفية يجب إدخالها بالصيغة '(503) 555-9831'.",
+  "Validation.NorthwindPhoneMultiple": "الأرقام الهاتفية يجب إدخالها بالصيغة '(503) 555-9831. يمكن فصل الأرقام المتعددة بفاصلة."
 }

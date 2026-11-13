@@ -150,7 +150,7 @@
   "Db.Northwind.Product.ProductImage": "Productafbeelding",
   "Db.Northwind.Product.ProductName": "Productnaam",
   "Db.Northwind.Product.QuantityPerUnit": "Aantal per eenheid",
-  "Db.Northwind.Product.ReorderLevel": "Reorder Level",
+  "Db.Northwind.Product.ReorderLevel": "Bestelniveau",
   "Db.Northwind.Product.RowVersion": "Rijversie",
   "Db.Northwind.Product.SupplierCompanyName": "Leverancier",
   "Db.Northwind.Product.SupplierCountry": "Leveranciersland",
@@ -246,6 +246,6 @@
   "Permission.Northwind:Customer:Modify": "Maken / Bijwerken",
   "Permission.Northwind:Customer:View": "Bekijken",
   "Permission.Northwind:General": "Toestemmin",
-  "Validation.NorthwindPhone": "Telefoonnummers moeten worden ingevoerd in het formaat '(503) 555-9831",
-  "Validation.NorthwindPhoneMultiple": "Telefoonnummers moeten worden ingevoerd in het formaat '(503) 555-9831"
+  "Validation.NorthwindPhone": "Telefoonnummers moeten worden ingevoerd in de notatie '(503) 555-9831'.",
+  "Validation.NorthwindPhoneMultiple": "Telefoonnummers moeten worden ingevoerd in de notatie '(503) 555-9831. Meerdere nummers kunnen met een komma worden gescheiden."
 }

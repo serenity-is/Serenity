@@ -246,6 +246,6 @@
   "Permission.Northwind:Customer:Modify": "Criar / Atualizar",
   "Permission.Northwind:Customer:View": "Ver",
   "Permission.Northwind:General": "Permissã",
-  "Validation.NorthwindPhone": "Os números de telefone devem ser inseridos no formato '(503) 555-9831",
-  "Validation.NorthwindPhoneMultiple": "Os números de telefone devem ser inseridos no formato '(503) 555-9831"
+  "Validation.NorthwindPhone": "Os números de telefone devem ser introduzidos no formato '(503) 555-9831'.",
+  "Validation.NorthwindPhoneMultiple": "Os números de telefone devem ser introduzidos no formato '(503) 555-9831. Vários números podem ser separados por vírgula."
 }

@@ -246,6 +246,6 @@
   "Permission.Northwind:Customer:Modify": "Buat / Perbarui",
   "Permission.Northwind:Customer:View": "Lihat",
   "Permission.Northwind:General": "Izi",
-  "Validation.NorthwindPhone": "Nomor telepon harus dimasukkan dalam format '(503) 555-9831",
-  "Validation.NorthwindPhoneMultiple": "Nomor telepon harus dimasukkan dalam format '(503) 555-9831"
+  "Validation.NorthwindPhone": "Nomor telepon harus dimasukkan dalam format '(503) 555-9831'.",
+  "Validation.NorthwindPhoneMultiple": "Nomor telepon harus dimasukkan dalam format '(503) 555-9831. Beberapa nomor dapat dipisahkan dengan koma."
 }

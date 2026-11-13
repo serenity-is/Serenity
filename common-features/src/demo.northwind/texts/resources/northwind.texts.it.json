@@ -42,7 +42,7 @@
   "Db.Northwind.CustomerDemographic.EntityPlural": "Demografie dei clienti",
   "Db.Northwind.CustomerDemographic.EntitySingular": "Demografia dei clienti",
   "Db.Northwind.CustomerDemographic.ID": "ID",
-  "Db.Northwind.CustomerDetails.CustomerID": null,
+  "Db.Northwind.CustomerDetails.CustomerID": "Cliente",
   "Db.Northwind.CustomerDetails.Email": "Email",
   "Db.Northwind.CustomerDetails.EntityPlural": "Dettagli cliente",
   "Db.Northwind.CustomerDetails.EntitySingular": "Dettagli del cliente",
@@ -246,6 +246,6 @@
   "Permission.Northwind:Customer:Modify": "Creare / Aggiornare",
   "Permission.Northwind:Customer:View": "Vedere",
   "Permission.Northwind:General": "Permess",
-  "Validation.NorthwindPhone": "I numeri di telefono devono essere inseriti nel formato '(503) 555-9831",
-  "Validation.NorthwindPhoneMultiple": "I numeri di telefono devono essere inseriti nel formato '(503) 555-9831"
+  "Validation.NorthwindPhone": "I numeri di telefono devono essere inseriti nel formato '(503) 555-9831'.",
+  "Validation.NorthwindPhoneMultiple": "I numeri di telefono devono essere inseriti nel formato '(503) 555-9831. Più numeri possono essere separati da una virgola."
 }

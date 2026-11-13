@@ -246,6 +246,6 @@
   "Permission.Northwind:Customer:Modify": "Creați / Actualizați",
   "Permission.Northwind:Customer:View": "Vezi",
   "Permission.Northwind:General": "Permisiun",
-  "Validation.NorthwindPhone": "Numerele de telefon trebuie introduse în formatul '(503) 555-9831",
-  "Validation.NorthwindPhoneMultiple": "Numerele de telefon trebuie introduse în formatul '(503) 555-9831"
+  "Validation.NorthwindPhone": "Numerele de telefon trebuie introduse în formatul '(503) 555-9831'.",
+  "Validation.NorthwindPhoneMultiple": "Numerele de telefon trebuie introduse în formatul '(503) 555-9831. Mai multe numere pot fi separate prin virgulă."
 }

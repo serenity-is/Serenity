@@ -150,7 +150,7 @@
   "Db.Northwind.Product.ProductImage": "Produktový obrázek",
   "Db.Northwind.Product.ProductName": "Název produktu",
   "Db.Northwind.Product.QuantityPerUnit": "Množství na jednotku",
-  "Db.Northwind.Product.ReorderLevel": "Reorder Level",
+  "Db.Northwind.Product.ReorderLevel": "Úroveň doplnění",
   "Db.Northwind.Product.RowVersion": "Verze záznamu",
   "Db.Northwind.Product.SupplierCompanyName": "Dodavatel",
   "Db.Northwind.Product.SupplierCountry": "Země dodavatele",
@@ -246,6 +246,6 @@
   "Permission.Northwind:Customer:Modify": "Vytvořit / Aktualizovat",
   "Permission.Northwind:Customer:View": "Zobrazit",
   "Permission.Northwind:General": "Povolen",
-  "Validation.NorthwindPhone": "Telefonní čísla by měla být zadána ve formátu '(503) 555-9831",
-  "Validation.NorthwindPhoneMultiple": "Telefonní čísla by měla být zadána ve formátu '(503) 555-9831"
+  "Validation.NorthwindPhone": "Telefonní čísla by měla být zadána ve formátu '(503) 555-9831'.",
+  "Validation.NorthwindPhoneMultiple": "Telefonní čísla by měla být zadána ve formátu '(503) 555-9831. Více čísel lze oddělit čárkou."
 }

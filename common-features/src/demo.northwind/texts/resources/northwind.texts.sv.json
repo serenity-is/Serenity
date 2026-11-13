@@ -150,7 +150,7 @@
   "Db.Northwind.Product.ProductImage": "Produktbild",
   "Db.Northwind.Product.ProductName": "Produktnamn",
   "Db.Northwind.Product.QuantityPerUnit": "Antal per enhet",
-  "Db.Northwind.Product.ReorderLevel": "Reorder Level",
+  "Db.Northwind.Product.ReorderLevel": "Beställningsnivå",
   "Db.Northwind.Product.RowVersion": "Radversion",
   "Db.Northwind.Product.SupplierCompanyName": "Leverantör",
   "Db.Northwind.Product.SupplierCountry": "Leverantörsland",
@@ -246,6 +246,6 @@
   "Permission.Northwind:Customer:Modify": "Skapa / Uppdatera",
   "Permission.Northwind:Customer:View": "Visa",
   "Permission.Northwind:General": "Behörighe",
-  "Validation.NorthwindPhone": "Telefonnummer ska anges i formatet '(503) 555-9831",
-  "Validation.NorthwindPhoneMultiple": "Telefonnumren ska anges i formatet '(503) 555-9831"
+  "Validation.NorthwindPhone": "Telefonnummer ska anges i formatet '(503) 555-9831'.",
+  "Validation.NorthwindPhoneMultiple": "Telefonnummer ska anges i formatet '(503) 555-9831. Flera nummer kan separeras med kommatecken."
 }

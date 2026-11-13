@@ -246,6 +246,6 @@
   "Permission.Northwind:Customer:Modify": "Создать / Обновить",
   "Permission.Northwind:Customer:View": "Просмотр",
   "Permission.Northwind:General": "Разрешени",
-  "Validation.NorthwindPhone": "Номера телефонов должны быть введены в формате '(503) 555-9831",
-  "Validation.NorthwindPhoneMultiple": "Номера телефонов должны быть введены в формате '(503) 555-9831"
+  "Validation.NorthwindPhone": "Номера телефонов должны быть введены в формате '(503) 555-9831'.",
+  "Validation.NorthwindPhoneMultiple": "Номера телефонов должны быть введены в формате '(503) 555-9831. Несколько номеров можно разделить запятой."
 }

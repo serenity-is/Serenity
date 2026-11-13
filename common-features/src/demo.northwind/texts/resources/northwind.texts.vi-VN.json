@@ -246,6 +246,6 @@
   "Permission.Northwind:Customer:Modify": "Tạo / Cập nhật",
   "Permission.Northwind:Customer:View": "Xem",
   "Permission.Northwind:General": "Quyề",
-  "Validation.NorthwindPhone": "Số điện thoại phải được nhập theo định dạng '(503) 555-9831",
-  "Validation.NorthwindPhoneMultiple": "Số điện thoại phải được nhập theo định dạng '(503) 555-9831"
+  "Validation.NorthwindPhone": "Số điện thoại phải được nhập theo định dạng '(503) 555-9831'.",
+  "Validation.NorthwindPhoneMultiple": "Số điện thoại phải được nhập theo định dạng '(503) 555-9831. Nhiều số có thể được phân tách bằng dấu phẩy."
 }

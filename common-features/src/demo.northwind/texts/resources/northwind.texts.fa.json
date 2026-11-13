@@ -246,6 +246,6 @@
   "Permission.Northwind:Customer:Modify": "ایجاد / به‌روزرسانی",
   "Permission.Northwind:Customer:View": "نمایش",
   "Permission.Northwind:General": "اجاز",
-  "Validation.NorthwindPhone": "شماره های تلفن باید به فرمت '(503) 555-9831' وارد شون",
-  "Validation.NorthwindPhoneMultiple": "شماره‌های تلفن باید به فرمت '(503) 555-9831' وارد شون"
+  "Validation.NorthwindPhone": "شماره‌های تلفن باید به قالب '(503) 555-9831' وارد شوند.",
+  "Validation.NorthwindPhoneMultiple": "شماره‌های تلفن باید به قالب '(503) 555-9831' وارد شوند. چند شماره را می‌توان با کاما از هم جدا کرد."
 }
