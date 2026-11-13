@@ -3698,6 +3698,48 @@ button.panel-titlebar-close::after {
   background-color: rgb(0, 114, 255, 0.2);
 }
 
+.slick-row.selected {
+  background-color: rgba(var(--bs-primary-rgb), 0.12);
+}
+
+.slick-row.selected:hover,
+.slick-row.selected.active {
+  background-color: rgba(var(--bs-primary-rgb), 0.22);
+}
+
+.slick-row.selected > .slick-cell.l0 {
+  box-shadow: inset 2px 0 var(--bs-primary);
+}
+
+.selection-bar {
+  display: flex;
+  align-items: center;
+  align-self: center;
+  gap: 0.75rem;
+  margin-inline-start: auto;
+  padding-inline-start: 0.75rem;
+  border-inline-start: 2px solid var(--bs-primary);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.selection-bar[hidden] {
+  display: flex;
+  visibility: hidden;
+}
+
+.selection-bar .selection-count {
+  font-weight: 600;
+}
+
+.selection-bar .selection-page {
+  color: var(--bs-secondary-color);
+}
+
+.selection-bar .selection-clear {
+  padding: 0;
+}
+
 .slick-cell.editable {
   background-color: var(--s-card-bg);
   border: 1px solid rgba(var(--s-bright-rgb), 0.3);
