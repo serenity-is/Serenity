@@ -27,7 +27,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Remove="texts\resources\**\*.json" />
-    <EmbeddedResource Include="texts\resources\**\*.json" WithCulture="false" Culture="" />
+    <EmbeddedResource Include="texts\resources\**\*.json" Exclude="texts\resources\**\*.__.stale.json" WithCulture="false" Culture="" />
     <AssemblyAttribute Include="Serenity.ComponentModel.TypeSourceAssemblyAttribute" />
   </ItemGroup>
   <Target Name="RestoreNodeTypes" DependsOnTargets="ResolvePackageAssets;IncludeTransitiveProjectReferences" BeforeTargets="BeforeBuild" Condition="'$(RestoreNodeTypes)' != 'false'">
