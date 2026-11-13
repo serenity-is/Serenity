@@ -208,6 +208,13 @@ public class ListRequestHandler<TRow, TListRequest, TListResponse> :
             Response.Values = null;
         }
 
+        // only the total count and what is calculated from the rows are wanted, so one row is read
+        if (Request.ExcludeEntities)
+        {
+            Response.Entities.Clear();
+            Response.Values?.Clear();
+        }
+
         Response.SetSkipTakeTotal(query, pagingState, DistinctFields?.Length, rowsRead);
 
         OnAfterExecuteQuery();

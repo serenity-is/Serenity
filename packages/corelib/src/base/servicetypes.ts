@@ -163,6 +163,72 @@ export interface ListRequest extends ServiceRequest {
     DistinctFields?: string[];
     /** Language ID for localized field selection (e.g. `"en"`, `"tr"`). */
     Localize?: string;
+    /**
+     * Values to calculate from all the rows the request matches, and not only from the returned page, e.g. the sum of a field.
+     * They are returned in {@link ListResponse.Aggregates}. A handler that doesn't support aggregates ignores this.
+     */
+    Aggregates?: AggregateBy[];
+    /** Fields to group the rows by for the aggregates, the outermost first, so they are also calculated for each group. */
+    GroupBy?: GroupBy[];
+    /** When true no entities are returned, only what is calculated from them, like the total count and the aggregates. */
+    ExcludeEntities?: boolean;
+}
+
+/**
+ * The kind of a value that is calculated from the rows of a list request. The values of the ones that are
+ * also in `SummaryType` are the same.
+ */
+export enum AggregateType {
+    /** The number of the rows, or of the rows whose field is not null when a field is given. */
+    Count = 0,
+    /** The sum of the values of the field. */
+    Sum = 1,
+    /** The average of the values of the field, without the null ones. */
+    Avg = 2,
+    /** The smallest value of the field. */
+    Min = 3,
+    /** The largest value of the field. */
+    Max = 4,
+    /** The number of the different values of the field, without null. */
+    DistinctCount = 5
+}
+
+registerEnum(AggregateType, "Serenity.Services.AggregateType");
+
+/** A value to calculate from all the rows a list request matches, and from the rows of each of its groups. */
+export interface AggregateBy {
+    /** The field name, which is only optional for `Count`. */
+    Field?: string;
+    /** The type of the aggregate. */
+    Type?: AggregateType;
+}
+
+/** A field the rows a list request matches are grouped by, for the aggregates of each group. */
+export interface GroupBy {
+    /** The field name. */
+    Field?: string;
+    /** Whether the groups are in descending order of the field. */
+    Descending?: boolean;
+}
+
+/**
+ * The aggregates of a list request for a set of rows: all the rows the request matches at the root, and
+ * the rows of a group under it, one level for each `GroupBy` of the request.
+ */
+export interface AggregateGroup {
+    /** The value of the group field for the rows of the group, as it is in the entities. Null at the root. */
+    Key?: any;
+    /** The number of the rows. */
+    Count?: number;
+    /**
+     * The values of the aggregates by the key of their type (`count`, `sum`, `avg`, `min`, `max`, `distinct`), then by
+     * the name of their field, e.g. `Values.sum.Freight`, as the totals of a grid are.
+     */
+    Values?: { [type: string]: { [field: string]: any } };
+    /** The groups of the next level, in their order. Not set when the rows are not grouped further. */
+    Groups?: AggregateGroup[];
+    /** True when there are more groups than the ones in `Groups`, as their number is limited. */
+    More?: boolean;
 }
 
 /**
@@ -209,6 +275,14 @@ export enum ListRequestCapabilities {
     IncludeMore = 1 << 15,
     /** Combined paging options, including the IncludeMore option. */
     PagingOptions = Skip | Take | ExcludeTotalCount | IncludeMore,
+    /** The handler calculates Aggregates from all the rows the request matches. */
+    Aggregates = 1 << 16,
+    /** The handler calculates the aggregates of the groups of GroupBy. */
+    GroupBy = 1 << 17,
+    /** The handler honors ExcludeEntities. */
+    ExcludeEntities = 1 << 18,
+    /** Combined aggregate, group, and entity exclusion options, which are not in the baseline. */
+    AggregateOptions = Aggregates | GroupBy | ExcludeEntities,
     /** Capabilities supported by the in-memory list request source adapter by default. */
     SourceAdapter = FilteringOptions | Sort | PagingOptions | DistinctFields,
     /**
@@ -239,6 +313,11 @@ export interface ListResponse<TEntity> extends ServiceResponse {
     Take?: number;
     /** Whether more records are available beyond the returned page, when requested. */
     More?: boolean | null;
+    /**
+     * The aggregates of all the rows the request matches, and of their groups, when requested. Not set when the handler
+     * doesn't support aggregates, in which case they can only be calculated from the returned entities.
+     */
+    Aggregates?: AggregateGroup;
 }
 
 /**

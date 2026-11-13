@@ -35,4 +35,12 @@ public class ListResponse<T> : ServiceResponse, IListResponse
     /// Whether more records are available beyond the returned page, when requested.
     /// </summary>
     public bool? More { get; set; }
+
+    /// <summary>
+    /// The aggregates of all the rows the request matches, and of their groups, when
+    /// <see cref="ListRequest.Aggregates"/> or <see cref="ListRequest.GroupBy"/> is requested.
+    /// It is null when the handler doesn't support aggregates, in which case they can only be
+    /// calculated from the entities that are returned.
+    /// </summary>
+    public AggregateGroup? Aggregates { get; set; }
 }

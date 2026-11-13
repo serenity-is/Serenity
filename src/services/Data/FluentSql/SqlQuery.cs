@@ -546,6 +546,31 @@ public partial class SqlQuery : QueryWithParams, ISqlQuery, IFilterableQuery, IG
     }
 
     /// <summary>
+    /// Removes the selected columns, e.g. to select others from the same sources, filters and joins.
+    /// </summary>
+    /// <returns>The query itself.</returns>
+    public SqlQuery ClearSelect()
+    {
+        BeforeModify();
+        columns = [];
+        into = [];
+        intoIndex = -1;
+        distinct = false;
+        return this;
+    }
+
+    /// <summary>
+    /// Removes the ORDER BY expressions.
+    /// </summary>
+    /// <returns>The query itself.</returns>
+    public SqlQuery ClearOrderBy()
+    {
+        BeforeModify();
+        orderBy = null;
+        return this;
+    }
+
+    /// <summary>
     /// Gets current SKIP value.
     /// </summary>
     /// <returns>SKIP value.</returns>

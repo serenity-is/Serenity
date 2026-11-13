@@ -707,8 +707,9 @@ public abstract class ListRequestHandlerBase<TRow, TListRequest, TListResponse>(
     /// <exception cref="ValidationError">Skip or take is negative.</exception>
     protected virtual ListRequestPagingParams GetPagingParams()
     {
-        var skip = Request.Skip;
-        var take = Request.Take;
+        // with no entities wanted, one row is enough to get the total count
+        var skip = Request.ExcludeEntities ? 0 : Request.Skip;
+        var take = Request.ExcludeEntities ? 1 : Request.Take;
 
         if (skip < 0)
             throw DataValidation.ArgumentOutOfRange(nameof(ListRequest.Skip), Localizer);

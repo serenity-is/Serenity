@@ -35,4 +35,9 @@ public interface IListResponse
     /// Whether more records are available beyond the returned page, when requested.
     /// </summary>
     bool? More { get; }
+
+    /// <summary>
+    /// The aggregates of all the rows the request matches, set by a behavior that supports them.
+    /// </summary>
+    AggregateGroup? Aggregates { get => null; set { } }
 }

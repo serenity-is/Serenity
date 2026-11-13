@@ -120,6 +120,27 @@ public class ListRequest : ServiceRequest, IIncludeExcludeColumns
     public List<string>? ExportColumns { get; set; }
 
     /// <summary>
+    /// The values to calculate from all the rows the request matches, and not only from the page
+    /// that is returned, e.g. the sum of a field, which are returned in
+    /// <see cref="ListResponse{T}.Aggregates"/>. A handler that doesn't support aggregates ignores
+    /// this, and returns none.
+    /// </summary>
+    public List<AggregateBy>? Aggregates { get; set; }
+
+    /// <summary>
+    /// The fields to group the rows by for the aggregates, the outermost first, so they are also
+    /// calculated for each group, see <see cref="AggregateGroup.Groups"/>. The groups are counted
+    /// even when there are no <see cref="Aggregates"/>.
+    /// </summary>
+    public List<GroupBy>? GroupBy { get; set; }
+
+    /// <summary>
+    /// Set to true to get no entities, only what is calculated from them, like the total count
+    /// and the aggregates.
+    /// </summary>
+    public bool ExcludeEntities { get; set; }
+
+    /// <summary>
     /// Set to "true" to localize fields with the Localize attribute.
     /// Note that this will also affect filtering and sorting as the field's
     /// expression will be changed to a COALESCE one. To get a localized

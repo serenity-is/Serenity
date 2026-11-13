@@ -46,6 +46,14 @@ public enum ListRequestCapabilities
     IncludeMore = 1 << 15,
     /// <summary>Combined paging options, including the IncludeMore option.</summary>
     PagingOptions = Skip | Take | ExcludeTotalCount | IncludeMore,
+    /// <summary>The handler calculates Aggregates from all the rows the request matches.</summary>
+    Aggregates = 1 << 16,
+    /// <summary>The handler calculates the aggregates of the groups of GroupBy.</summary>
+    GroupBy = 1 << 17,
+    /// <summary>The handler honors ExcludeEntities.</summary>
+    ExcludeEntities = 1 << 18,
+    /// <summary>Combined aggregate, group, and entity exclusion options, which are not in the baseline.</summary>
+    AggregateOptions = Aggregates | GroupBy | ExcludeEntities,
     /// <summary>Capabilities supported by the in-memory list request source adapter by default.</summary>
     SourceAdapter = FilteringOptions | Sort | PagingOptions | DistinctFields,
     /// <summary>
