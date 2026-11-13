@@ -1,5 +1,5 @@
 import { convertCompatFormatter, EventEmitter, Group, GroupItemMetadataProvider, GroupTotals, IGroupTotals, ISleekGrid, ItemMetadata, type FormatterContext, type NonDataRow } from "@serenity-is/sleekgrid";
-import { ListRequest, ListResponse, PagerTexts, serviceCall, ServiceOptions, ServiceResponse } from "../base";
+import { AggregateBy, AggregateGroup, AggregateType, GroupBy, ListRequest, ListResponse, PagerTexts, serviceCall, ServiceOptions, ServiceResponse } from "../base";
 import { AggregateFormatting } from "./aggregateformatting";
 import { IAggregator } from "./aggregators";
 import { CancellableViewCallback, IRemoteView, PagingInfo, RemoteViewAjaxCallback, RemoteViewFilter, RemoteViewProcessCallback } from "./iremoteview";
@@ -89,6 +89,15 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
     private filteredItems: TItem[] = [];
     private grandAggregators: IAggregator[];
     private grandTotals: IGroupTotals;
+    /**
+     * The aggregates that were asked from the server with the last request, which the server totals are for. It is null when the
+     * view hasn't asked, e.g. before the first request, or when it is not asking.
+     */
+    private sent: { aggregates: AggregateBy[], groupBy: GroupBy[] } | null = null;
+    /** The sort of the last request, which is null before the first one. */
+    private sentSort: string | null = null;
+    /** The aggregates the server calculated from all the rows of the last response, if it did. */
+    private serverTotals: AggregateGroup = null;
     private groupingInfos: GroupInfo<TItem>[] = [];
     private groupItemMetadataProvider: GroupItemMetadataProvider;
     private groups: Group<TItem>[] = [];
@@ -118,6 +127,13 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
 
     /** Additional parameters to send with service requests. */
     public params: Record<string, any>;
+    /**
+     * Whether to ask the server to calculate the aggregates of the summary options, e.g. the totals of the grid footer, from all
+     * the rows the request matches, instead of calculating them from the rows of the current page. A server that doesn't
+     * support it doesn't return them, in which case the view calculates them from its rows as usual. The
+     * aggregators that the server can't calculate, like the weighted average, are also calculated from the rows.
+     */
+    public serverAggregates: boolean;
     /** The page number to seek to when loading data. */
     public seekToPage: number;
     /** Sort expressions for the data (e.g. "Name" or "Name desc"). */
@@ -161,6 +177,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         AggregateFormatting.initGridDefaults();
         this.groupItemMetadataProvider = options.groupItemMetadataProvider;
         this.localSort = options.localSort ?? false;
+        this.serverAggregates = options.serverAggregates ?? false;
 
         this.idProperty = options.idField ?? 'id';
         this.contentType = options.contentType ?? "application/json";
@@ -461,7 +478,31 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
     public setSummaryOptions(summary: SummaryOptions): void {
         this.grandAggregators = summary?.aggregators || [];
         this.grandTotals = {};
+
         this.setGrouping(this.groupingInfos || []);
+    }
+
+    /**
+     * The totals of the server are for the aggregates and the groups that were asked for, so they are still good for the same ones,
+     * e.g. when the summary options are set again for a request that is already sent. When they change, they are forgotten and
+     * the server is asked again, as the rows it calculated them from are not on the page.
+     */
+    private syncServerAggregates(): void {
+        // nothing was asked yet
+        if (this.sentSort === null)
+            return;
+
+        const aggregatesChanged = this.sent !== null && JSON.stringify(this.getServerRequest()) !== JSON.stringify(this.sent);
+        // the groups are of the rows of the page, so with paging they have to be the rows that follow in the order of the groups
+        const sortChanged = this.rowsPerPage > 0 && JSON.stringify(this.getRequestSort()) !== this.sentSort;
+
+        if (aggregatesChanged) {
+            this.serverTotals = null;
+            this.grandTotals = {};
+        }
+
+        if (((aggregatesChanged && this.serverAggregates) || sortChanged) && this.url)
+            this.populate();
     }
 
     /**
@@ -475,8 +516,16 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
             this.grandAggregators ??= [];
             let agg: IAggregator, idx = this.grandAggregators.length;
 
+            const server = this.getServerTotals();
+            if (server)
+                Object.assign(this.grandTotals, server);
+
             while (idx--) {
                 agg = this.grandAggregators[idx];
+                // what the server calculated is of all the rows, and not only of the ones of this page
+                if (server && this.hasServerTotal(server, agg))
+                    continue;
+
                 agg.init();
                 for (const item of this.items)
                     agg.accumulate(item);
@@ -486,6 +535,135 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         }
 
         return this.grandTotals;
+    }
+
+    /**
+     * Gets the totals the server calculated by the aggregate key, then the field, as the aggregators store them, or null when
+     * the server totals can't be used. They can't when the filter of the view hides some of the rows, as the totals are of all of them.
+     * A filter that hides none, like the one a grid always sets, doesn't matter.
+     */
+    private getServerTotals(): Record<string, Record<string, any>> {
+        return this.canUseServerTotals() ? this.copyServerValues(this.serverTotals) : null;
+    }
+
+    private canUseServerTotals(): boolean {
+        return this.serverAggregates && !!this.serverTotals &&
+            !(this.filter && this.filteredItems.length !== this.items.length);
+    }
+
+    private copyServerValues(node: AggregateGroup): Record<string, Record<string, any>> {
+        if (!node?.Values)
+            return null;
+
+        const totals: Record<string, Record<string, any>> = {};
+        for (const [key, byField] of Object.entries(node.Values))
+            totals[key] = { ...byField };
+
+        return totals;
+    }
+
+    /** Makes the value of a group the same as the key of its group of the server, which are null and undefined for a missing one. */
+    private static groupKeyText(value: any): string {
+        return value == null || value === "undefined" || value === "null" ? "\u0002" : String(value);
+    }
+
+    /**
+     * Gets the totals the server calculated for a group, which are of all of its rows, and not only the ones on the page, or
+     * null when it has none. The group is found by its values from the outermost group, as the server returns the
+     * groups by the fields of the groupings in the same order.
+     */
+    private getServerGroupTotals(group: Group<TItem>): Record<string, Record<string, any>> {
+        return this.copyServerValues(this.getServerGroup(group));
+    }
+
+    /** Gets the group of the server for a group of the view, which is of all of its rows, or null when it has none. */
+    private getServerGroup(group: Group<TItem>): AggregateGroup | null {
+        if (!this.canUseServerTotals() || !this.sent?.groupBy.length)
+            return null;
+
+        let node = this.serverTotals;
+        for (const part of String(group.groupingKey).split(groupingDelimiter)) {
+            const key = RemoteView.groupKeyText(part);
+            node = node.Groups?.find(x => RemoteView.groupKeyText(x.Key) === key);
+            if (!node)
+                return null;
+        }
+
+        return node;
+    }
+
+    private hasServerTotal(server: Record<string, Record<string, any>>, agg: IAggregator): boolean {
+        const key = (agg.constructor as any).aggregateKey as string;
+        const field = (agg as any).field as string;
+        return !!key && !!field && !!server[key] && field in server[key];
+    }
+
+    /**
+     * Gets what to ask the server to calculate for the aggregators of the summary options, which are the ones it can calculate.
+     */
+    /**
+     * Gets the sort of a request, which has the fields the rows are grouped by first, as the groups are made from the rows of the
+     * page, so the rows of a group follow each other, and so are on the same page unless there are more of them than a page. A field
+     * that is also sorted keeps its direction. It only counts for the groupings that are by a field, from the outermost,
+     * and when the view doesn't sort the rows itself.
+     */
+    private getRequestSort(): string[] {
+        const sort = !this.sortBy ? [] : typeof this.sortBy === "string" ? [this.sortBy] : [...this.sortBy];
+        if (this.localSort)
+            return sort;
+
+        const fields: string[] = [];
+        for (const gi of this.groupingInfos) {
+            if (gi.getterIsAFn || typeof gi.getter !== "string" || !gi.getter)
+                break;
+
+            fields.push(gi.getter);
+        }
+
+        const prefix: string[] = [];
+        for (const field of fields) {
+            const lower = field.toLowerCase();
+            const index = sort.findIndex(x => x != null && (x.toLowerCase() === lower || x.toLowerCase() === lower + " desc"));
+            if (index < 0)
+                prefix.push(field);
+            else
+                prefix.push(sort.splice(index, 1)[0]);
+        }
+
+        return [...prefix, ...sort];
+    }
+
+    private getServerRequest(): { aggregates: AggregateBy[], groupBy: GroupBy[] } {
+        const aggregates = this.getAggregatesToRequest();
+        // the groups are only of use for what is calculated for them, and can only be by the fields
+        const fields = this.groupingInfos.map(x => x.getterIsAFn ? null : x.getter as string);
+        const groupBy = aggregates.length && fields.length && fields.every(x => !!x) ?
+            fields.map(field => ({ Field: field }) as GroupBy) : [];
+        return { aggregates, groupBy };
+    }
+
+    private getAggregatesToRequest(): AggregateBy[] {
+        const types: Record<string, AggregateType> = {
+            sum: AggregateType.Sum,
+            avg: AggregateType.Avg,
+            min: AggregateType.Min,
+            max: AggregateType.Max
+        };
+
+        const aggregates: AggregateBy[] = [];
+        // the aggregators of the groups can be other than the ones of the totals
+        const all = [...(this.grandAggregators ?? []), ...this.groupingInfos.flatMap(x => x.aggregators ?? [])];
+        for (const agg of all) {
+            const type = types[(agg.constructor as any).aggregateKey as string];
+            const field = (agg as any).field as string;
+            if (type === undefined || !field ||
+                aggregates.some(x => x.Field === field && x.Type === type))
+                continue;
+
+            aggregates.push({ Field: field, Type: type });
+        }
+
+        return aggregates;
     }
 
     /**
@@ -509,6 +687,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         }
 
         this.refresh();
+        this.syncServerAggregates();
     }
 
     /**
@@ -956,8 +1135,18 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
             }
         }
 
+        // what the server calculated is of all the rows of the group, and not only of the ones on this page
+        const server = this.getServerGroupTotals(group);
+        if (server) {
+            for (const [key, byField] of Object.entries(server))
+                (totals as any)[key] = { ...((totals as any)[key] ?? {}), ...byField };
+        }
+
         while (idx--) {
             agg = aggregators[idx];
+            if (server && this.hasServerTotal(server, agg))
+                continue;
+
             agg.init();
             const items = !isLeafLevel && gi.aggregateChildGroups ? group.groups : group.rows;
             for (const item of items) {
@@ -987,6 +1176,11 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         let idx = groups.length, g: Group<TItem>;
         while (idx--) {
             g = groups[idx];
+
+            // the number of the rows of the group, and not only of the ones on this page, which even a collapsed group shows
+            const serverGroup = this.getServerGroup(g);
+            if (serverGroup?.Count != null)
+                g.count = serverGroup.Count;
 
             if (g.collapsed && !gi?.aggregateCollapsed) {
                 continue;
@@ -1354,6 +1548,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
 
         this.page = data.Page;
         this.totalCount = data.TotalCount;
+        this.serverTotals = this.sent?.aggregates.length ? (data.Aggregates ?? null) : null;
 
         this.setItems(data.Entities);
 
@@ -1399,16 +1594,23 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         if (this.rowsPerPage)
             request.Take = this.rowsPerPage;
 
-        if (this.sortBy && this.sortBy.length) {
-            if (typeof this.sortBy !== "string")
-                request.Sort = this.sortBy;
-            else {
-                request.Sort = [this.sortBy];
-            }
-        }
+        const sort = this.getRequestSort();
+        this.sentSort = JSON.stringify(sort);
+        if (sort.length)
+            request.Sort = sort;
 
         if (this.params) {
             request = Object.assign(request, this.params);
+        }
+
+        this.sent = null;
+        if (this.serverAggregates && !request.Aggregates) {
+            this.sent = this.getServerRequest();
+            if (this.sent.aggregates.length)
+                request.Aggregates = this.sent.aggregates;
+
+            if (this.sent.groupBy.length && !request.GroupBy)
+                request.GroupBy = this.sent.groupBy;
         }
 
         // paged requests need the total count, so declare it explicitly instead of
@@ -1572,6 +1774,11 @@ export interface RemoteViewOptions<TItem = any> {
     params?: Record<string, object>;
     /** Number of rows to display per page (0 for no paging) */
     rowsPerPage?: number;
+    /**
+     * Whether to ask the server for the aggregates of the summary options, calculated from all the rows the request
+     * matches and not only from the current page, which only a server that supports them returns. Default is false.
+     */
+    serverAggregates?: boolean;
     /** Initial page number to seek to on first load */
     seekToPage?: number;
     /** Initial sort criteria for the data */

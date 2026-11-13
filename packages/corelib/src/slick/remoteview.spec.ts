@@ -819,6 +819,364 @@ describe("RemoteView", () => {
         });
     });
 
+    describe("server aggregates", () => {
+        /** Populates the view, answering the request with the response, and gives the request that was sent. */
+        function populate(view: RemoteView<any>, response: any) {
+            const mockServiceCall = vi.fn((options: any) => options.onSuccess(response));
+            vi.mocked(serviceCall).mockImplementation(mockServiceCall);
+            view.populate();
+            return mockServiceCall.mock.calls[0][0].request;
+        }
+
+        const page = [{ id: 1, value: 10, rate: 1, weight: 1 }, { id: 2, value: 20, rate: 5, weight: 3 }];
+
+        function create(options: any = { serverAggregates: true }) {
+            const view = new RemoteView<any>({ idField: "id", url: "/api/test", rowsPerPage: 2, ...options });
+            view.setSummaryOptions({
+                aggregators: [new Aggregators.Sum("value"), new Aggregators.Avg("value"), new Aggregators.WeightedAvg("rate", "weight")]
+            });
+            return view;
+        }
+
+        it("asks for the aggregators the server can calculate, and not the others", () => {
+            const request = populate(create(), { Entities: page, TotalCount: 100 });
+
+            expect(request.Aggregates).toEqual([{ Field: "value", Type: 1 }, { Field: "value", Type: 2 }]);
+        });
+
+        it("doesn't ask when the option is not set, or there are no aggregators", () => {
+            expect(populate(create({}), { Entities: page, TotalCount: 100 }).Aggregates).toBeUndefined();
+
+            const view = new RemoteView<any>({ idField: "id", url: "/api/test", serverAggregates: true });
+            expect(populate(view, { Entities: page, TotalCount: 100 }).Aggregates).toBeUndefined();
+        });
+
+        it("keeps the aggregates a request already has", () => {
+            const view = create({ serverAggregates: true, params: { Aggregates: [{ Field: "other", Type: 3 }] } });
+
+            expect(populate(view, { Entities: page, TotalCount: 100 }).Aggregates).toEqual([{ Field: "other", Type: 3 }]);
+        });
+
+        it("uses the totals of the server, which are of all the rows, and the rows for the others", () => {
+            const view = create();
+            populate(view, {
+                Entities: page,
+                TotalCount: 100,
+                Aggregates: { Count: 100, Values: { sum: { value: 5000 }, avg: { value: 50 } } }
+            });
+
+            const totals = view.getGrandTotals();
+
+            expect(totals.sum.value).toBe(5000);
+            expect(totals.avg.value).toBe(50);
+            // calculated from the page, as the server can't calculate it
+            expect(totals.avg.rate).toBe((1 * 1 + 5 * 3) / 4);
+        });
+
+        it("calculates a total from the rows when the server didn't return it", () => {
+            const view = create();
+            populate(view, { Entities: page, TotalCount: 100, Aggregates: { Count: 100, Values: { sum: { value: 5000 } } } });
+
+            const totals = view.getGrandTotals();
+
+            expect(totals.sum.value).toBe(5000);
+            expect(totals.avg.value).toBe(15);
+        });
+
+        it("uses a null total of the server, e.g. of a column without values", () => {
+            const view = create();
+            populate(view, { Entities: page, TotalCount: 100, Aggregates: { Count: 100, Values: { sum: { value: null }, avg: { value: null } } } });
+
+            expect(view.getGrandTotals().sum.value).toBeNull();
+        });
+
+        it("calculates from the rows when the server returns no aggregates", () => {
+            const view = create();
+            populate(view, { Entities: page, TotalCount: 100 });
+
+            expect(view.getGrandTotals().sum.value).toBe(30);
+        });
+
+        it("calculates from the rows when the option is not set, even if the server returns them", () => {
+            const view = create({});
+            populate(view, { Entities: page, TotalCount: 100, Aggregates: { Count: 100, Values: { sum: { value: 5000 } } } });
+
+            expect(view.getGrandTotals().sum.value).toBe(30);
+        });
+
+        it("calculates from the rows when the view has a filter, as the server totals are of rows it hides", () => {
+            const view = create();
+            populate(view, { Entities: page, TotalCount: 100, Aggregates: { Count: 100, Values: { sum: { value: 5000 } } } });
+            view.setFilter(item => item.id === 1);
+
+            // as it does without the server, from the rows the view has
+            expect(view.getGrandTotals().sum.value).toBe(30);
+        });
+
+        it("uses the totals of the server when the filter of the view hides no row, like the one of a grid", () => {
+            const view = create();
+            view.setFilter(() => true);
+            populate(view, { Entities: page, TotalCount: 100, Aggregates: { Count: 100, Values: { sum: { value: 5000 } } } });
+
+            expect(view.getGrandTotals().sum.value).toBe(5000);
+        });
+
+        it("keeps the totals of the server when the same aggregators are set again, even as new instances", () => {
+            const view = create();
+            // the response comes after the summary options are set again, e.g. by a mixin that restores them
+            let respond: () => void;
+            vi.mocked(serviceCall).mockImplementation(((options: any) => {
+                respond = () => options.onSuccess({ Entities: page, TotalCount: 100, Aggregates: { Count: 100, Values: { sum: { value: 5000 }, avg: { value: 50 } } } });
+            }) as any);
+            view.populate();
+            view.setSummaryOptions({ aggregators: [new Aggregators.Sum("value"), new Aggregators.Avg("value")] });
+            respond();
+
+            expect(vi.mocked(serviceCall)).toHaveBeenCalledTimes(1);
+            expect(view.getGrandTotals().sum.value).toBe(5000);
+            expect(view.getGrandTotals().avg.value).toBe(50);
+        });
+
+        it("asks the server again with the new aggregates when the summary options change after a request", () => {
+            const view = create();
+            const requests: any[] = [];
+            vi.mocked(serviceCall).mockImplementation(((options: any) => {
+                requests.push(options.request);
+                options.onSuccess({ Entities: page, TotalCount: 100, Aggregates: { Count: 100, Values: requests.length === 1 ?
+                    { sum: { value: 5000 }, avg: { value: 50 } } : { min: { value: 7 } } } });
+            }) as any);
+            view.populate();
+            view.setSummaryOptions({ aggregators: [new Aggregators.Min("value")] });
+
+            expect(requests).toHaveLength(2);
+            expect(requests[1].Aggregates).toEqual([{ Field: "value", Type: 3 }]);
+            expect(view.getGrandTotals().min.value).toBe(7);
+        });
+
+        it("doesn't ask again when the summary options change but the server is not asked for them", () => {
+            const view = create({});
+            const mockServiceCall = vi.fn();
+            vi.mocked(serviceCall).mockImplementation(mockServiceCall);
+            view.populate();
+            view.setSummaryOptions({ aggregators: [new Aggregators.Min("value")] });
+
+            expect(mockServiceCall).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe("server aggregates of groups", () => {
+        const rows = [{ id: 1, cat: "A", sub: "x", value: 10 }, { id: 2, cat: "A", sub: "y", value: 20 }, { id: 3, cat: "B", sub: "x", value: 5 }];
+
+        const tree = {
+            Count: 100,
+            Values: { sum: { value: 5000 } },
+            Groups: [
+                { Key: "A", Count: 60, Values: { sum: { value: 3000 } }, Groups: [
+                    { Key: "x", Count: 10, Values: { sum: { value: 700 } } }, { Key: "y", Count: 50, Values: { sum: { value: 2300 } } }] },
+                { Key: "B", Count: 40, Values: { sum: { value: 2000 } }, Groups: [{ Key: "x", Count: 40, Values: { sum: { value: 1999 } } }] }
+            ]
+        };
+
+        function create(grouping: any[] = [{ getter: "cat" }], options: any = { serverAggregates: true }) {
+            const view = new RemoteView<any>({ idField: "id", url: "/api/test", rowsPerPage: 3, ...options });
+            view.setSummaryOptions({ aggregators: [new Aggregators.Sum("value")] });
+            view.setGrouping(grouping);
+            return view;
+        }
+
+        function populate(view: RemoteView<any>, aggregates: any = tree) {
+            const requests: any[] = [];
+            vi.mocked(serviceCall).mockImplementation(((options: any) => {
+                requests.push(options.request);
+                options.onSuccess({ Entities: rows, TotalCount: 100, Aggregates: aggregates });
+            }) as any);
+            view.populate();
+            return requests;
+        }
+
+        it("asks for the groups by the fields of the groupings, in their order", () => {
+            const requests = populate(create([{ getter: "cat" }, { getter: "sub" }]));
+
+            expect(requests[0].GroupBy).toEqual([{ Field: "cat" }, { Field: "sub" }]);
+            expect(requests[0].Aggregates).toEqual([{ Field: "value", Type: 1 }]);
+        });
+
+        it("doesn't ask for groups when a grouping is not by a field, or nothing is calculated for them", () => {
+            expect(populate(create([{ getter: (item: any) => item.cat }]))[0].GroupBy).toBeUndefined();
+
+            const view = new RemoteView<any>({ idField: "id", url: "/api/test", serverAggregates: true });
+            view.setGrouping([{ getter: "cat" }]);
+            expect(populate(view)[0].GroupBy).toBeUndefined();
+        });
+
+        it("asks for the aggregators of the groupings, which can be others than the ones of the totals", () => {
+            const view = create([{ getter: "cat", aggregators: [new Aggregators.Max("value")] }]);
+
+            expect(populate(view)[0].Aggregates).toEqual([{ Field: "value", Type: 1 }, { Field: "value", Type: 4 }]);
+        });
+
+        it("uses the totals of the server for a group, which are of all its rows, and not only of the ones on the page", () => {
+            const view = create();
+            populate(view);
+
+            const groups = view.getGroups();
+            expect(groups.map(x => x.value)).toEqual(["A", "B"]);
+            expect(groups[0].totals.sum.value).toBe(3000);
+            expect(groups[1].totals.sum.value).toBe(2000);
+            expect(view.getGrandTotals().sum.value).toBe(5000);
+        });
+
+        it("finds the groups of the next levels by the values of their parents", () => {
+            const view = create([{ getter: "cat" }, { getter: "sub" }]);
+            populate(view);
+
+            const [a, b] = view.getGroups();
+            expect(a.totals.sum.value).toBe(3000);
+            expect(a.groups.map(x => x.totals.sum.value)).toEqual([700, 2300]);
+            // the same sub value of another parent is not mixed with it
+            expect(b.groups[0].totals.sum.value).toBe(1999);
+        });
+
+        it("calculates a group from its rows when the server returned no group for it", () => {
+            const view = create();
+            populate(view, { Count: 100, Values: { sum: { value: 5000 } }, Groups: [tree.Groups[0]] });
+
+            const [a, b] = view.getGroups();
+            expect(a.totals.sum.value).toBe(3000);
+            expect(b.totals.sum.value).toBe(5);
+        });
+
+        it("calculates the groups from the rows when the server returned no groups, e.g. as there were too many", () => {
+            const view = create();
+            populate(view, { Count: 100, Values: { sum: { value: 5000 } }, More: true });
+
+            expect(view.getGroups().map(x => x.totals.sum.value)).toEqual([30, 5]);
+            // while the totals of all the rows are still the ones of the server
+            expect(view.getGrandTotals().sum.value).toBe(5000);
+        });
+
+        it("shows the number of the rows of a group that the server counted, also for a collapsed one", () => {
+            const view = create([{ getter: "cat", collapsed: true }]);
+            populate(view);
+
+            // the rows on the page are 2 and 1
+            expect(view.getGroups().map(x => x.count)).toEqual([60, 40]);
+        });
+
+        it("keeps the number of the rows on the page for a group the server has none for", () => {
+            const view = create();
+            populate(view, { Count: 100, Values: { sum: { value: 5000 } }, Groups: [tree.Groups[0]] });
+
+            expect(view.getGroups().map(x => x.count)).toEqual([60, 1]);
+        });
+
+        it("calculates the groups from the rows when the option is not set", () => {
+            const view = create([{ getter: "cat" }], {});
+            populate(view);
+
+            expect(view.getGroups().map(x => x.totals.sum.value)).toEqual([30, 5]);
+        });
+
+        it("asks the server again when the groupings change after a request, and forgets the groups of the old ones", () => {
+            const view = create();
+            const requests = populate(view);
+            expect(requests).toHaveLength(1);
+
+            requests.length = 0;
+            vi.mocked(serviceCall).mockImplementation(((options: any) => { requests.push(options.request); }) as any);
+            view.setGrouping([{ getter: "sub" }]);
+
+            expect(requests).toHaveLength(1);
+            expect(requests[0].GroupBy).toEqual([{ Field: "sub" }]);
+            // until the new ones are loaded, they are calculated from the rows
+            expect(view.getGroups().map(x => x.totals.sum.value)).toEqual([15, 20, 5].slice(0, view.getGroups().length));
+        });
+
+        it("doesn't ask again when the same groupings are set again", () => {
+            const view = create();
+            const requests = populate(view);
+
+            view.setGrouping([{ getter: "cat" }]);
+            view.setSummaryOptions({ aggregators: [new Aggregators.Sum("value")] });
+
+            expect(requests).toHaveLength(1);
+            expect(view.getGroups()[0].totals.sum.value).toBe(3000);
+        });
+    });
+
+    describe("sorting by groups", () => {
+        function populate(view: RemoteView<any>) {
+            const requests: any[] = [];
+            vi.mocked(serviceCall).mockImplementation(((options: any) => {
+                requests.push(options.request);
+                options.onSuccess({ Entities: [], TotalCount: 0 });
+            }) as any);
+            view.populate();
+            return requests;
+        }
+
+        function create(grouping: any[], options: any = {}) {
+            const view = new RemoteView<any>({ idField: "id", url: "/api/test", rowsPerPage: 10, ...options });
+            view.setGrouping(grouping);
+            return view;
+        }
+
+        it("sorts by the fields of the groupings first, so the rows of a group follow each other", () => {
+            const requests = populate(create([{ getter: "cat" }, { getter: "sub" }], { sortBy: ["Name desc"] }));
+
+            expect(requests[0].Sort).toEqual(["cat", "sub", "Name desc"]);
+        });
+
+        it("keeps the direction of a field of a grouping that is sorted, moving it to its place", () => {
+            const requests = populate(create([{ getter: "cat" }, { getter: "sub" }], { sortBy: ["Name", "sub desc", "Cat desc"] }));
+
+            expect(requests[0].Sort).toEqual(["Cat desc", "sub desc", "Name"]);
+        });
+
+        it("only counts the groupings that are by a field, until one is not", () => {
+            const requests = populate(create([{ getter: "cat" }, { getter: (item: any) => item.sub }, { getter: "other" }], { sortBy: ["Name"] }));
+
+            expect(requests[0].Sort).toEqual(["cat", "Name"]);
+        });
+
+        it("doesn't change the sort without groupings, or when the view sorts the rows itself", () => {
+            expect(populate(create([], { sortBy: ["Name"] }))[0].Sort).toEqual(["Name"]);
+            expect(populate(create([], {}))[0].Sort).toBeUndefined();
+            expect(populate(create([{ getter: "cat" }], { sortBy: ["Name"], localSort: true }))[0].Sort).toEqual(["Name"]);
+        });
+
+        it("loads again when the groupings change with paging, as the rows of the page follow the order of the groups", () => {
+            const view = create([{ getter: "cat" }], { sortBy: ["Name"] });
+            const requests = populate(view);
+
+            view.setGrouping([{ getter: "sub" }]);
+
+            expect(requests).toHaveLength(2);
+            expect(requests[1].Sort).toEqual(["sub", "Name"]);
+        });
+
+        it("doesn't load again when the same groupings are set again, or without paging, where all the rows are loaded", () => {
+            const paged = create([{ getter: "cat" }]);
+            const requests = populate(paged);
+            paged.setGrouping([{ getter: "cat" }]);
+            expect(requests).toHaveLength(1);
+
+            const all = create([{ getter: "cat" }], { rowsPerPage: 0 });
+            const allRequests = populate(all);
+            all.setGrouping([{ getter: "sub" }]);
+            expect(allRequests).toHaveLength(1);
+        });
+
+        it("doesn't load before the first request, as there are no rows to order yet", () => {
+            const mockServiceCall = vi.fn();
+            vi.mocked(serviceCall).mockImplementation(mockServiceCall);
+            const view = create([{ getter: "cat" }]);
+            view.setGrouping([{ getter: "sub" }]);
+
+            expect(mockServiceCall).not.toHaveBeenCalled();
+        });
+    });
+
     describe("data loading operations", () => {
         let view: RemoteView<any>;
 

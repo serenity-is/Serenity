@@ -1659,6 +1659,70 @@ export interface ListRequest extends ServiceRequest {
     DistinctFields?: string[];
     /** Language ID for localized field selection (e.g. `"en"`, `"tr"`). */
     Localize?: string;
+    /**
+     * Values to calculate from all the rows the request matches, and not only from the returned page, e.g. the sum of a field.
+     * They are returned in {@link ListResponse.Aggregates}. A handler that doesn't support aggregates ignores this.
+     */
+    Aggregates?: AggregateBy[];
+    /** Fields to group the rows by for the aggregates, the outermost first, so they are also calculated for each group. */
+    GroupBy?: GroupBy[];
+    /** When true no entities are returned, only what is calculated from them, like the total count and the aggregates. */
+    ExcludeEntities?: boolean;
+}
+/**
+ * The kind of a value that is calculated from the rows of a list request. The values of the ones that are
+ * also in `SummaryType` are the same.
+ */
+export declare enum AggregateType {
+    /** The number of the rows, or of the rows whose field is not null when a field is given. */
+    Count = 0,
+    /** The sum of the values of the field. */
+    Sum = 1,
+    /** The average of the values of the field, without the null ones. */
+    Avg = 2,
+    /** The smallest value of the field. */
+    Min = 3,
+    /** The largest value of the field. */
+    Max = 4,
+    /** The number of the different values of the field, without null. */
+    DistinctCount = 5
+}
+/** A value to calculate from all the rows a list request matches, and from the rows of each of its groups. */
+export interface AggregateBy {
+    /** The field name, which is only optional for `Count`. */
+    Field?: string;
+    /** The type of the aggregate. */
+    Type?: AggregateType;
+}
+/** A field the rows a list request matches are grouped by, for the aggregates of each group. */
+export interface GroupBy {
+    /** The field name. */
+    Field?: string;
+    /** Whether the groups are in descending order of the field. */
+    Descending?: boolean;
+}
+/**
+ * The aggregates of a list request for a set of rows: all the rows the request matches at the root, and
+ * the rows of a group under it, one level for each `GroupBy` of the request.
+ */
+export interface AggregateGroup {
+    /** The value of the group field for the rows of the group, as it is in the entities. Null at the root. */
+    Key?: any;
+    /** The number of the rows. */
+    Count?: number;
+    /**
+     * The values of the aggregates by the key of their type (`count`, `sum`, `avg`, `min`, `max`, `distinct`), then by
+     * the name of their field, e.g. `Values.sum.Freight`, as the totals of a grid are.
+     */
+    Values?: {
+        [type: string]: {
+            [field: string]: any;
+        };
+    };
+    /** The groups of the next level, in their order. Not set when the rows are not grouped further. */
+    Groups?: AggregateGroup[];
+    /** True when there are more groups than the ones in `Groups`, as their number is limited. */
+    More?: boolean;
 }
 /**
  * Specifies the capabilities of a list request handler.
@@ -1704,6 +1768,14 @@ export declare enum ListRequestCapabilities {
     IncludeMore = 32768,
     /** Combined paging options, including the IncludeMore option. */
     PagingOptions = 49248,
+    /** The handler calculates Aggregates from all the rows the request matches. */
+    Aggregates = 65536,
+    /** The handler calculates the aggregates of the groups of GroupBy. */
+    GroupBy = 131072,
+    /** The handler honors ExcludeEntities. */
+    ExcludeEntities = 262144,
+    /** Combined aggregate, group, and entity exclusion options, which are not in the baseline. */
+    AggregateOptions = 458752,
     /** Capabilities supported by the in-memory list request source adapter by default. */
     SourceAdapter = 51327,
     /**
@@ -1729,6 +1801,11 @@ export interface ListResponse<TEntity> extends ServiceResponse {
     Take?: number;
     /** Whether more records are available beyond the returned page, when requested. */
     More?: boolean | null;
+    /**
+     * The aggregates of all the rows the request matches, and of their groups, when requested. Not set when the handler
+     * doesn't support aggregates, in which case they can only be calculated from the returned entities.
+     */
+    Aggregates?: AggregateGroup;
 }
 /**
  * Request DTO for `Retrieve` handlers (single-entity fetch).
@@ -6978,6 +7055,15 @@ export declare class RemoteView<TItem = any> implements IRemoteView<TItem> {
     private filteredItems;
     private grandAggregators;
     private grandTotals;
+    /**
+     * The aggregates that were asked from the server with the last request, which the server totals are for. It is null when the
+     * view hasn't asked, e.g. before the first request, or when it is not asking.
+     */
+    private sent;
+    /** The sort of the last request, which is null before the first one. */
+    private sentSort;
+    /** The aggregates the server calculated from all the rows of the last response, if it did. */
+    private serverTotals;
     private groupingInfos;
     private groupItemMetadataProvider;
     private groups;
@@ -7006,6 +7092,13 @@ export declare class RemoteView<TItem = any> implements IRemoteView<TItem> {
     private updated;
     /** Additional parameters to send with service requests. */
     params: Record<string, any>;
+    /**
+     * Whether to ask the server to calculate the aggregates of the summary options, e.g. the totals of the grid footer, from all
+     * the rows the request matches, instead of calculating them from the rows of the current page. A server that doesn't
+     * support it doesn't return them, in which case the view calculates them from its rows as usual. The
+     * aggregators that the server can't calculate, like the weighted average, are also calculated from the rows.
+     */
+    serverAggregates: boolean;
     /** The page number to seek to when loading data. */
     seekToPage: number;
     /** Sort expressions for the data (e.g. "Name" or "Name desc"). */
@@ -7127,10 +7220,47 @@ export declare class RemoteView<TItem = any> implements IRemoteView<TItem> {
      */
     setSummaryOptions(summary: SummaryOptions): void;
     /**
+     * The totals of the server are for the aggregates and the groups that were asked for, so they are still good for the same ones,
+     * e.g. when the summary options are set again for a request that is already sent. When they change, they are forgotten and
+     * the server is asked again, as the rows it calculated them from are not on the page.
+     */
+    private syncServerAggregates;
+    /**
      * Gets the grand totals for the view.
      * @returns The grand totals object.
      */
     getGrandTotals(): IGroupTotals;
+    /**
+     * Gets the totals the server calculated by the aggregate key, then the field, as the aggregators store them, or null when
+     * the server totals can't be used. They can't when the filter of the view hides some of the rows, as the totals are of all of them.
+     * A filter that hides none, like the one a grid always sets, doesn't matter.
+     */
+    private getServerTotals;
+    private canUseServerTotals;
+    private copyServerValues;
+    /** Makes the value of a group the same as the key of its group of the server, which are null and undefined for a missing one. */
+    private static groupKeyText;
+    /**
+     * Gets the totals the server calculated for a group, which are of all of its rows, and not only the ones on the page, or
+     * null when it has none. The group is found by its values from the outermost group, as the server returns the
+     * groups by the fields of the groupings in the same order.
+     */
+    private getServerGroupTotals;
+    /** Gets the group of the server for a group of the view, which is of all of its rows, or null when it has none. */
+    private getServerGroup;
+    private hasServerTotal;
+    /**
+     * Gets what to ask the server to calculate for the aggregators of the summary options, which are the ones it can calculate.
+     */
+    /**
+     * Gets the sort of a request, which has the fields the rows are grouped by first, as the groups are made from the rows of the
+     * page, so the rows of a group follow each other, and so are on the same page unless there are more of them than a page. A field
+     * that is also sorted keeps its direction. It only counts for the groupings that are by a field, from the outermost,
+     * and when the view doesn't sort the rows itself.
+     */
+    private getRequestSort;
+    private getServerRequest;
+    private getAggregatesToRequest;
     /**
      * Sets the grouping configuration for the view.
      * @param groupingInfo - Grouping information or array of grouping information.
@@ -7385,6 +7515,11 @@ export interface RemoteViewOptions<TItem = any> {
     params?: Record<string, object>;
     /** Number of rows to display per page (0 for no paging) */
     rowsPerPage?: number;
+    /**
+     * Whether to ask the server for the aggregates of the summary options, calculated from all the rows the request
+     * matches and not only from the current page, which only a server that supports them returns. Default is false.
+     */
+    serverAggregates?: boolean;
     /** Initial page number to seek to on first load */
     seekToPage?: number;
     /** Initial sort criteria for the data */
@@ -10800,6 +10935,7 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
         columnWidthScale: number;
         enableAdvancedFiltering: (boolean | ((grid: DataGrid<any>) => boolean));
         openDialogsAsPanel: boolean;
+        serverAggregates: boolean;
         rowHeight: number;
         persistenceFlags: GridPersistenceFlags;
         persistenceStorage: SettingStorage;

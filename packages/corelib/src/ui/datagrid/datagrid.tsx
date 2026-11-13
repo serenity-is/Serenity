@@ -1015,6 +1015,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         const opt: RemoteViewOptions = {};
         opt.idField = this.getIdProperty();
         opt.sortBy = this.getDefaultSortBy();
+        opt.serverAggregates = dataGridDefaults.serverAggregates ?? false;
 
         if (!this.usePager()) {
             opt.rowsPerPage = 0;

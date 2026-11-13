@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { Fluent } from "../../base";
 import { ScriptData } from "../../compat";
 import { DataGrid, omitAllGridPersistenceFlags } from "./datagrid";
+import { dataGridDefaults } from "./datagrid-defaults";
 
 function createGrid(): DataGrid<any, any> {
     class DefaultGrid extends DataGrid<any, any> { }
@@ -874,6 +875,30 @@ describe("DataGrid advanced filtering and pager", () => {
         const grid = new PagerGrid({});
         expect(() => grid["createPager"]()).not.toThrow();
         grid.destroy();
+    });
+
+    it("getViewOptions has serverAggregates off by default, and from dataGridDefaults, which a grid can override", () => {
+        class DefaultGrid extends DataGrid<any, any> { }
+        class OverridingGrid extends DataGrid<any, any> {
+            protected override getViewOptions() {
+                return { ...super.getViewOptions(), serverAggregates: false };
+            }
+        }
+
+        const grid = new DefaultGrid({});
+        const overriding = new OverridingGrid({});
+        try {
+            expect(grid["getViewOptions"]().serverAggregates).toBe(false);
+
+            dataGridDefaults.serverAggregates = true;
+            expect(grid["getViewOptions"]().serverAggregates).toBe(true);
+            expect(overriding["getViewOptions"]().serverAggregates).toBe(false);
+        }
+        finally {
+            dataGridDefaults.serverAggregates = null;
+            grid.destroy();
+            overriding.destroy();
+        }
     });
 
     it("getViewOptions uses responsive height rows per page", () => {

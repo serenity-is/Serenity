@@ -10,6 +10,8 @@ export const dataGridDefaults = {
     enableAdvancedFiltering: null as (boolean | ((grid: DataGrid<any>) => boolean)),
     /** Controls whether to open dialogs as panels. Default is null. */
     openDialogsAsPanel: null as boolean,
+    /** Controls whether the views of the grids ask the server for the aggregates of the summary options, e.g. the totals in the footer, from all the rows and not only the page. Grids can override it in getViewOptions. Default is null, which is false. */
+    serverAggregates: null as boolean,
     /** Default row height. Default is null. */
     rowHeight: null as number,
     /** Default persistence flags. Defaults are true except quickSearch and quickFilterText */
