@@ -1,6 +1,6 @@
 {
-  "Authorization.AccessDenied": "इस अनुरोध के लिए अनुमोदन अस्वीकृत किया गया है!",
-  "Authorization.NotLoggedIn": "इस अनुरोध के लिए अधिकृति आवश्यक है!",
+  "Authorization.AccessDenied": "इस अनुरोध के लिए प्राधिकरण अस्वीकृत कर दिया गया है!",
+  "Authorization.NotLoggedIn": "इस अनुरोध के लिए प्राधिकरण आवश्यक है!",
   "Db.Shared.RecordId": "आईडी",
   "Services.GenericErrorMessage": "आपके अनुरोध का प्रक्रिया करते समय त्रुटि हुई।",
   "Services.HttpError": "HTTP त्रुटि {0}.",

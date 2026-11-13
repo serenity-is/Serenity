@@ -2,7 +2,7 @@
   "Authorization.AccessDenied": "Yêu cầu này đã bị từ chối!",
   "Authorization.NotLoggedIn": "Yêu cầu này cần phải được cấp phép!",
   "Db.Shared.RecordId": "ID",
-  "Services.GenericErrorMessage": "Khi xử lý yêu cầu của bạn, xảy ra lỗi",
+  "Services.GenericErrorMessage": "Đã xảy ra lỗi khi xử lý yêu cầu của bạn.",
   "Services.HttpError": "Lỗi HTTP {0}.",
   "Services.InternalServerError": "Lỗi máy chủ nội bộ (500).",
   "Services.SeeBrowserConsole": "Xem bảng điều khiển trình duyệt (F12) để biết thêm thông tin.",
