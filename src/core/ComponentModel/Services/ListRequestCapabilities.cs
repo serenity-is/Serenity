@@ -52,10 +52,13 @@ public enum ListRequestCapabilities
     GroupBy = 1 << 17,
     /// <summary>The handler honors ExcludeEntities.</summary>
     ExcludeEntities = 1 << 18,
-    /// <summary>Combined aggregate, group, and entity exclusion options, which are not in the baseline.</summary>
+    /// <summary>
+    /// Combined aggregate, group, and entity exclusion options, which are not in <see cref="Baseline"/>, but
+    /// in <see cref="ProBaseline"/>.
+    /// </summary>
     AggregateOptions = Aggregates | GroupBy | ExcludeEntities,
     /// <summary>Capabilities supported by the in-memory list request source adapter by default.</summary>
-    SourceAdapter = FilteringOptions | Sort | PagingOptions | DistinctFields,
+    SourceAdapter = FilteringOptions | Sort | PagingOptions | DistinctFields | AggregateOptions,
     /// <summary>
     /// Fixed set of baseline capabilities. This value will not be expanded with future
     /// capabilities added to <c>ListRequest</c> or <c>ListRequestHandler</c> implementations.
@@ -64,8 +67,14 @@ public enum ListRequestCapabilities
         IncludeDeleted | ColumnSelection | IncludeColumns | ExcludeColumns | DistinctFields |
         ExportColumns | Localize | ExcludeTotalCount | IncludeMore,
     /// <summary>
-    /// Currently equivalent to <see cref="Baseline"/>. May include capabilities
+    /// Fixed set of the capabilities of a list request handler with the behaviors of Serenity.Pro.Extensions, which
+    /// are the ones of <see cref="Baseline"/> and <see cref="AggregateOptions"/>. This value will not be expanded with
+    /// future capabilities.
+    /// </summary>
+    ProBaseline = Baseline | AggregateOptions,
+    /// <summary>
+    /// Currently equivalent to <see cref="ProBaseline"/>. May include capabilities
     /// added to <c>ListRequest</c> and <c>ListRequestHandler</c> implementations in the future.
     /// </summary>
-    All = Baseline
+    All = ProBaseline
 }
