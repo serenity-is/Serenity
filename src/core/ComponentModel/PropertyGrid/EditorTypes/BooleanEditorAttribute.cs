@@ -18,4 +18,15 @@ public partial class BooleanEditorAttribute : CustomEditorAttribute
         : base(Key)
     {
     }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the checkbox is placed first
+    /// and the field caption is shown after it, on the end side (right in LTR), instead of the default
+    /// caption-left layout. Useful for fitting several checkboxes in one row.
+    /// </summary>
+    public bool LabelOnEnd
+    {
+        get { return GetOption<bool>("labelOnEnd"); }
+        set { SetOption("labelOnEnd", value); }
+    }
 }

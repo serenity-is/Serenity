@@ -1384,6 +1384,20 @@ input[type=checkbox].editor,
   margin-left: calc(50% - 0.75em);
 }
 
+/* BooleanEditor with labelOnEnd: checkbox first, caption on its right */
+.field:has(> input[type=checkbox].editor.label-on-end) > input.label-on-end {
+  order: -1;
+  flex: 0 0 auto;
+}
+
+.field:has(> input[type=checkbox].editor.label-on-end) > .caption {
+  width: auto;
+  flex: 0 1 auto;
+  text-align: start;
+  margin-right: 0;
+  margin-inline: var(--s-col-gap) 0;
+}
+
 .slick-cell .check-box,
 .slick-header-column .select-all-items,
 .slick-cell input[type=checkbox] {

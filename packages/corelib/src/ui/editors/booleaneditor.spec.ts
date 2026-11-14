@@ -17,6 +17,15 @@ describe("BooleanEditor", () => {
         editor.destroy();
     })
 
+    it("adds label-on-end class only when labelOnEnd option is set", () => {
+        const normal = new BooleanEditor({});
+        expect(normal.domNode.classList.contains("label-on-end")).toBe(false);
+        normal.destroy();
+        const right = new BooleanEditor({ labelOnEnd: true });
+        expect(right.domNode.classList.contains("label-on-end")).toBe(true);
+        right.destroy();
+    })
+
     it("get_value returns checked state", () => {
         const editor = new BooleanEditor({});
         editor.domNode.checked = true;
