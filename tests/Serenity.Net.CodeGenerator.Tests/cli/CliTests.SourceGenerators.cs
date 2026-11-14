@@ -144,7 +144,7 @@ public partial class CliTests
     [InlineData("not a version")]
     [InlineData(null)]
     [Theory]
-    public void DoesNotWarnAboutTheVersion_WhenItMatchesOrIsUnknown(string serenityWebVersion)
+    public void DoesNotWarnAboutTheVersion_WhenItMatchesOrIsUnknown(string? serenityWebVersion)
     {
         RunWithMSBuild(MSBuildJson(sourceGeneratorTransform: "false", serenityWebVersion: serenityWebVersion), Cli.CommandKeys.Mvc);
 

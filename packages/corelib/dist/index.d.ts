@@ -1694,12 +1694,35 @@ export interface AggregateBy {
     /** The type of the aggregate. */
     Type?: AggregateType;
 }
+/**
+ * The interval the values of a date field are grouped by. The rows of an interval are one group, whose key
+ * is the start of the interval, e.g. the first day of the month.
+ */
+export declare enum DateGroupInterval {
+    /** The year, which starts on the first of January. */
+    Year = 1,
+    /** The quarter of the year, which starts on the first of January, April, July or October. */
+    Quarter = 2,
+    /** The month, which starts on its first day. */
+    Month = 3,
+    /** The week, which starts on Monday. */
+    Week = 4,
+    /** The day, which starts at midnight. */
+    Day = 5,
+    /** The hour. */
+    Hour = 6
+}
 /** A field the rows a list request matches are grouped by, for the aggregates of each group. */
 export interface GroupBy {
     /** The field name. */
     Field?: string;
     /** Whether the groups are in descending order of the field. */
     Descending?: boolean;
+    /**
+     * The interval the values of a date field are grouped by, e.g. the months. The key of a group is then the start
+     * of its interval. It can only be used with a date field, and the rows are not grouped at all otherwise.
+     */
+    Interval?: DateGroupInterval;
 }
 /**
  * The aggregates of a list request for a set of rows: all the rows the request matches at the root, and
