@@ -637,8 +637,12 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         const aggregates = this.getAggregatesToRequest();
         // the groups are only of use for what is calculated for them, and can only be by the fields
         const fields = this.groupingInfos.map(x => x.getterIsAFn ? null : x.getter as string);
+        // in the order the rows are sorted by, so the groups the server leaves out, when there are too many, are the last ones
+        const sort = (!this.sortBy ? [] : typeof this.sortBy === "string" ? [this.sortBy] : this.sortBy)
+            .map(x => x?.toLowerCase());
         const groupBy = aggregates.length && fields.length && fields.every(x => !!x) ?
-            fields.map(field => ({ Field: field }) as GroupBy) : [];
+            fields.map(field => sort.includes(field.toLowerCase() + " desc") ?
+                { Field: field, Descending: true } as GroupBy : { Field: field } as GroupBy) : [];
         return { aggregates, groupBy };
     }
 

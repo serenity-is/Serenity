@@ -844,6 +844,15 @@ describe("RemoteView", () => {
             expect(request.Aggregates).toEqual([{ Field: "value", Type: 1 }, { Field: "value", Type: 2 }]);
         });
 
+        it("asks for the groups in the order the rows of the view are sorted by", () => {
+            const view = create();
+            view.sortBy = ["cat DESC", "name"];
+            view.setGrouping([{ getter: "cat" }, { getter: "name" }]);
+            const request = populate(view, { Entities: page, TotalCount: 100 });
+
+            expect(request.GroupBy).toEqual([{ Field: "cat", Descending: true }, { Field: "name" }]);
+        });
+
         it("doesn't ask when the option is not set, or there are no aggregators", () => {
             expect(populate(create({}), { Entities: page, TotalCount: 100 }).Aggregates).toBeUndefined();
 
