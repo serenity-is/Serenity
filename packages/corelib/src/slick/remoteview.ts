@@ -1517,12 +1517,14 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
      */
     public addData(data: any) {
 
-        if (this.onProcessData && data)
-            data = this.onProcessData(data, this) || data;
-
         this.errorMessage = null;
         this.loading && typeof this.loading !== "boolean" && this.loading.abort();
         this.loading = false;
+
+        // after the request that is loading is done with, as processing may ask for another one, e.g. when the columns
+        // of a grid are known from this data, so they have summaries to ask the server for, which must not be aborted
+        if (this.onProcessData && data)
+            data = this.onProcessData(data, this) || data;
 
         if (!data) {
             this.errorMessage = this.errormsg ?? PagerTexts.DefaultLoadError;
@@ -1637,7 +1639,9 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
                 self.addData(response);
             },
             onCleanup: function (this: void) {
-                self.loading = false;
+                // not the one of a request that was made while this one was processed
+                if (self.loading === controller || self.loading === true)
+                    self.loading = false;
                 self.onPagingInfoChanged.notify({ pagingInfo: self.getPagingInfo(), dataView: self });
                 self.onDataLoaded.notify({ dataView: self });
             }

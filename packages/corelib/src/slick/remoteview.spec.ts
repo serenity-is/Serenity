@@ -1215,6 +1215,27 @@ describe("RemoteView", () => {
             expect(view['errorMessage']).toBeDefined();
         });
 
+        it("doesn't abort the request that processing the data asks for", () => {
+            const mockServiceCall = vi.mocked(serviceCall);
+            mockServiceCall.mockClear();
+            const v = new RemoteView<any>({ idField: "id", url: "/api/test", rowsPerPage: 2, serverAggregates: true });
+            v.populate();
+            const first = mockServiceCall.mock.calls[0][0];
+
+            // like a grid that knows its summaries from the first response, and asks for them
+            v.onProcessData = () => {
+                v.setSummaryOptions({ aggregators: [new Aggregators.Sum("value")] });
+                return undefined;
+            };
+
+            v.addData({ Entities: [{ id: 1, value: 1 }], TotalCount: 10 });
+            first.onCleanup?.();
+
+            expect(mockServiceCall.mock.calls).toHaveLength(2);
+            expect(mockServiceCall.mock.calls[1][0].signal.aborted).toBe(false);
+            expect((v as any).loading).not.toBe(false);
+        });
+
         it("processes data with onProcessData callback", () => {
             const originalData = {
                 Entities: [{ id: 1, name: "Item 1" }],
