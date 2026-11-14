@@ -1668,6 +1668,12 @@ export interface ListRequest extends ServiceRequest {
     GroupBy?: GroupBy[];
     /** When true no entities are returned, only what is calculated from them, like the total count and the aggregates. */
     ExcludeEntities?: boolean;
+    /**
+     * The time zone of the user, an IANA one like `Europe/Istanbul`, as `Intl.DateTimeFormat().resolvedOptions().timeZone`
+     * gives. It tells where the days start for the intervals of `GroupBy`, so the dates and times of the fields that are UTC
+     * are grouped by the days the user sees. It doesn't change the filters, or the dates that are returned.
+     */
+    TimeZone?: string;
 }
 /**
  * The kind of a value that is calculated from the rows of a list request. The values of the ones that are
@@ -1797,20 +1803,30 @@ export declare enum ListRequestCapabilities {
     GroupBy = 131072,
     /** The handler honors ExcludeEntities. */
     ExcludeEntities = 262144,
-    /** Combined aggregate, group, and entity exclusion options, which are not in Baseline, but in ProBaseline. */
-    AggregateOptions = 458752,
+    /** The handler groups the dates by the days of the TimeZone of the request. */
+    TimeZone = 524288,
+    /**
+     * Combined aggregate, group, entity exclusion and time zone options. Only the entity exclusion is in ListHandler,
+     * and all of them are in ProListHandler.
+     */
+    AggregateOptions = 983040,
     /** Capabilities supported by the in-memory list request source adapter by default. */
-    SourceAdapter = 510079,
+    SourceAdapter = 1034367,
     /**
      * Stable baseline for current ListRequest capabilities. Do not add future capabilities
      * to this value; they require explicit opt-in.
      */
-    Baseline = 65535,
+    Baseline = 327679,
     /**
-     * Stable set of the capabilities of a list request handler with the behaviors of Serenity.Pro.Extensions, which
-     * are the ones of Baseline and AggregateOptions. Do not add future capabilities to this value.
+     * The capabilities of ListRequestHandler itself, without the behaviors of Serenity.Pro.Extensions. Currently
+     * equivalent to Baseline. May include capabilities added to it in the future.
      */
-    ProBaseline = 524287
+    ListHandler = 327679,
+    /**
+     * The capabilities of ListRequestHandler with the behaviors of Serenity.Pro.Extensions, which are the ones of
+     * ListHandler and AggregateOptions. May include capabilities added to them in the future.
+     */
+    ProListHandler = 1048575
 }
 /**
  * Response DTO for `List` handlers.

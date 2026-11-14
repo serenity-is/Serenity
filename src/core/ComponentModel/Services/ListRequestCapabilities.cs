@@ -52,11 +52,13 @@ public enum ListRequestCapabilities
     GroupBy = 1 << 17,
     /// <summary>The handler honors ExcludeEntities.</summary>
     ExcludeEntities = 1 << 18,
+    /// <summary>The handler groups the dates by the days of the TimeZone of the request.</summary>
+    TimeZone = 1 << 19,
     /// <summary>
-    /// Combined aggregate, group, and entity exclusion options, which are not in <see cref="Baseline"/>, but
-    /// in <see cref="ProBaseline"/>.
+    /// Combined aggregate, group, entity exclusion and time zone options. Only the entity exclusion is in
+    /// <see cref="ListHandler"/>, and all of them are in <see cref="ProListHandler"/>.
     /// </summary>
-    AggregateOptions = Aggregates | GroupBy | ExcludeEntities,
+    AggregateOptions = Aggregates | GroupBy | ExcludeEntities | TimeZone,
     /// <summary>Capabilities supported by the in-memory list request source adapter by default.</summary>
     SourceAdapter = FilteringOptions | Sort | PagingOptions | DistinctFields | AggregateOptions,
     /// <summary>
@@ -65,16 +67,20 @@ public enum ListRequestCapabilities
     /// </summary>
     Baseline = ContainsText | ContainsField | EqualityFilter | Criteria | Sort | Skip | Take |
         IncludeDeleted | ColumnSelection | IncludeColumns | ExcludeColumns | DistinctFields |
-        ExportColumns | Localize | ExcludeTotalCount | IncludeMore,
+        ExportColumns | Localize | ExcludeTotalCount | IncludeMore | ExcludeEntities,
     /// <summary>
-    /// Fixed set of the capabilities of a list request handler with the behaviors of Serenity.Pro.Extensions, which
-    /// are the ones of <see cref="Baseline"/> and <see cref="AggregateOptions"/>. This value will not be expanded with
-    /// future capabilities.
+    /// The capabilities of <c>ListRequestHandler</c> itself, without the behaviors of Serenity.Pro.Extensions.
+    /// Currently equivalent to <see cref="Baseline"/>. May include capabilities added to it in the future.
     /// </summary>
-    ProBaseline = Baseline | AggregateOptions,
+    ListHandler = Baseline,
     /// <summary>
-    /// Currently equivalent to <see cref="ProBaseline"/>. May include capabilities
+    /// The capabilities of <c>ListRequestHandler</c> with the behaviors of Serenity.Pro.Extensions, which are the ones
+    /// of <see cref="ListHandler"/> and <see cref="AggregateOptions"/>. May include capabilities added to them in the future.
+    /// </summary>
+    ProListHandler = ListHandler | AggregateOptions,
+    /// <summary>
+    /// All the capabilities, which are currently the ones of <see cref="ProListHandler"/>. May include capabilities
     /// added to <c>ListRequest</c> and <c>ListRequestHandler</c> implementations in the future.
     /// </summary>
-    All = ProBaseline
+    All = ProListHandler
 }

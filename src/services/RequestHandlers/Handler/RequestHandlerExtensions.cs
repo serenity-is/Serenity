@@ -50,6 +50,24 @@ public static class RequestHandlerExtensions
     }
 
     /// <summary>
+    /// Finds the time zone of a list request, see <see cref="ListRequest.TimeZone"/>.
+    /// </summary>
+    /// <param name="request">The list request.</param>
+    /// <returns>The time zone, or null when the request has none.</returns>
+    /// <exception cref="ValidationError">There is no time zone with the ID of the request.</exception>
+    public static TimeZoneInfo? GetTimeZoneInfo(this ListRequest request)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+
+        if (string.IsNullOrWhiteSpace(request.TimeZone))
+            return null;
+
+        return TimeZoneInfo.TryFindSystemTimeZoneById(request.TimeZone.Trim(), out var zone) ? zone :
+            throw new ValidationError("InvalidTimeZone", nameof(ListRequest.TimeZone),
+                $"'{request.TimeZone}' is not a known time zone.");
+    }
+
+    /// <summary>
     /// Creates a request object for the retrieve handler instance
     /// </summary>
     /// <param name="handler">Retrieve handler instance</param>

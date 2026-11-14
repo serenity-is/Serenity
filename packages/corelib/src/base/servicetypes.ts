@@ -172,6 +172,12 @@ export interface ListRequest extends ServiceRequest {
     GroupBy?: GroupBy[];
     /** When true no entities are returned, only what is calculated from them, like the total count and the aggregates. */
     ExcludeEntities?: boolean;
+    /**
+     * The time zone of the user, an IANA one like `Europe/Istanbul`, as `Intl.DateTimeFormat().resolvedOptions().timeZone`
+     * gives. It tells where the days start for the intervals of `GroupBy`, so the dates and times of the fields that are UTC
+     * are grouped by the days the user sees. It doesn't change the filters, or the dates that are returned.
+     */
+    TimeZone?: string;
 }
 
 /**
@@ -307,8 +313,13 @@ export enum ListRequestCapabilities {
     GroupBy = 1 << 17,
     /** The handler honors ExcludeEntities. */
     ExcludeEntities = 1 << 18,
-    /** Combined aggregate, group, and entity exclusion options, which are not in Baseline, but in ProBaseline. */
-    AggregateOptions = Aggregates | GroupBy | ExcludeEntities,
+    /** The handler groups the dates by the days of the TimeZone of the request. */
+    TimeZone = 1 << 19,
+    /**
+     * Combined aggregate, group, entity exclusion and time zone options. Only the entity exclusion is in ListHandler,
+     * and all of them are in ProListHandler.
+     */
+    AggregateOptions = Aggregates | GroupBy | ExcludeEntities | TimeZone,
     /** Capabilities supported by the in-memory list request source adapter by default. */
     SourceAdapter = FilteringOptions | Sort | PagingOptions | DistinctFields | AggregateOptions,
     /**
@@ -317,12 +328,17 @@ export enum ListRequestCapabilities {
      */
     Baseline = ContainsText | ContainsField | EqualityFilter | Criteria | Sort | Skip | Take |
         IncludeDeleted | ColumnSelection | IncludeColumns | ExcludeColumns | DistinctFields |
-        ExportColumns | Localize | ExcludeTotalCount | IncludeMore,
+        ExportColumns | Localize | ExcludeTotalCount | IncludeMore | ExcludeEntities,
     /**
-     * Stable set of the capabilities of a list request handler with the behaviors of Serenity.Pro.Extensions, which
-     * are the ones of Baseline and AggregateOptions. Do not add future capabilities to this value.
+     * The capabilities of ListRequestHandler itself, without the behaviors of Serenity.Pro.Extensions. Currently
+     * equivalent to Baseline. May include capabilities added to it in the future.
      */
-    ProBaseline = Baseline | AggregateOptions
+    ListHandler = Baseline,
+    /**
+     * The capabilities of ListRequestHandler with the behaviors of Serenity.Pro.Extensions, which are the ones of
+     * ListHandler and AggregateOptions. May include capabilities added to them in the future.
+     */
+    ProListHandler = ListHandler | AggregateOptions
 }
 
 registerEnum(ListRequestCapabilities, "Serenity.Services.ListRequestCapabilities", { enumFlags: true });

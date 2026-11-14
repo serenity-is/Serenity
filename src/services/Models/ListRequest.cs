@@ -147,4 +147,13 @@ public class ListRequest : ServiceRequest, IIncludeExcludeColumns
     /// version in a specific language, pass the language code as the value.
     /// </summary>
     public string? Localize { get; set; }
+
+    /// <summary>
+    /// The time zone of the user, an IANA one like <c>Europe/Istanbul</c>, which is what a browser gives, or a Windows one.
+    /// It tells where the days start for the intervals of <see cref="GroupBy"/>, see <see cref="Services.GroupBy.Interval"/>,
+    /// so the dates and times of the fields that are UTC are grouped by the days the user sees. It doesn't change the filters,
+    /// or the dates that are returned. A service can use it for other things it tells of. When it is not given, the dates
+    /// are grouped as they are stored.
+    /// </summary>
+    public string? TimeZone { get; set; }
 }
