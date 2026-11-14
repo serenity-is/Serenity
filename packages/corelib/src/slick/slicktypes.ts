@@ -68,6 +68,11 @@ export interface PagerOptions {
     rowsPerPage?: number;
     /** Choices for rows-per-page selector. */
     rowsPerPageOptions?: number[],
+    /**
+     * Whether to page without the total number of the rows: no last page button, no total of the pages, and a next page button
+     * that is only enabled while there are more rows. Default is the setting of the view, see {@link RemoteViewOptions.indeterminatePaging}.
+     */
+    indeterminatePaging?: boolean;
     /** Callback when page changes. @param newPage - New page index (1-based). */
     onChangePage?: (newPage: number) => void;
     /** Callback when rows-per-page changes. @param n - New rows-per-page value. */

@@ -819,6 +819,65 @@ describe("RemoteView", () => {
         });
     });
 
+    describe("indeterminate paging", () => {
+        function populate(view: RemoteView<any>, response: any | ((request: any) => any)) {
+            const requests: any[] = [];
+            vi.mocked(serviceCall).mockImplementation(((options: any) => {
+                requests.push(options.request);
+                options.onSuccess(typeof response === "function" ? response(options.request) : response);
+            }) as any);
+            view.populate();
+            return requests;
+        }
+
+        const rows = (n: number) => Array.from({ length: n }, (_, i) => ({ id: i + 1 }));
+
+        it("asks whether there are more rows, instead of the total count", () => {
+            const view = new RemoteView<any>({ idField: "id", url: "/api/test", rowsPerPage: 2, indeterminatePaging: true });
+            const [request] = populate(view, { Entities: rows(2), More: true });
+
+            expect(request.IncludeMore).toBe(true);
+            expect(request.ExcludeTotalCount).toBe(true);
+            expect(view.getPagingInfo()).toMatchObject({ indeterminate: true, hasMore: true, totalCount: 3 });
+        });
+
+        it("has no more rows after the last page, and knows the rows so far", () => {
+            const view = new RemoteView<any>({ idField: "id", url: "/api/test", rowsPerPage: 2, indeterminatePaging: true });
+            view.seekToPage = 3;
+            populate(view, { Entities: rows(1), More: false, Skip: 4, Take: 2 });
+
+            expect(view.getPagingInfo()).toMatchObject({ hasMore: false, totalCount: 5, page: 3 });
+        });
+
+        it("takes a full page to have more rows when the server doesn't tell", () => {
+            const view = new RemoteView<any>({ idField: "id", url: "/api/test", rowsPerPage: 2, indeterminatePaging: true });
+            populate(view, { Entities: rows(2) });
+            expect(view.getPagingInfo().hasMore).toBe(true);
+
+            populate(view, { Entities: rows(1) });
+            expect(view.getPagingInfo().hasMore).toBe(false);
+        });
+
+        it("goes back to the last page that has rows, when the page asked for is after the last one", () => {
+            const view = new RemoteView<any>({ idField: "id", url: "/api/test", rowsPerPage: 2, indeterminatePaging: true });
+            view.seekToPage = 3;
+            const requests = populate(view, (request: any) => request.Skip === 4 ?
+                { Entities: [], More: false, Skip: 4, Take: 2 } : { Entities: rows(2), More: false, Skip: 2, Take: 2 });
+
+            expect(requests.map(x => x.Skip)).toEqual([4, 2]);
+            expect(view.getPagingInfo()).toMatchObject({ page: 2, hasMore: false });
+        });
+
+        it("doesn't change the requests when it is not set", () => {
+            const view = new RemoteView<any>({ idField: "id", url: "/api/test", rowsPerPage: 2 });
+            const [request] = populate(view, { Entities: rows(2), TotalCount: 10 });
+
+            expect(request.IncludeMore).toBeUndefined();
+            expect(request.ExcludeTotalCount).toBe(false);
+            expect(view.getPagingInfo().indeterminate).toBeUndefined();
+        });
+    });
+
     describe("server aggregates", () => {
         /** Populates the view, answering the request with the response, and gives the request that was sent. */
         function populate(view: RemoteView<any>, response: any) {

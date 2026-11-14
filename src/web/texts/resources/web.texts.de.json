@@ -129,6 +129,7 @@
   "Controls.Pager.NoRowStatus": "Keine Datensätze",
   "Controls.Pager.Page": "Seite",
   "Controls.Pager.PageStatus": "Zeige {from} bis {to} von insgesamt {total} Datensätzen",
+  "Controls.Pager.RangeStatus": "Zeige {from} bis {to} Datensätze",
   "Controls.PropertyGrid.RequiredHint": "Dieses Feld ist erforderlich",
   "Controls.QuickSearch.FieldSelection": "Wählen Sie das Feld aus, nach dem gesucht werden soll",
   "Controls.QuickSearch.Hint": "Geben Sie den Text zur Suche ein",

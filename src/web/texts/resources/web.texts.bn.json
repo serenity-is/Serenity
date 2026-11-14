@@ -129,6 +129,7 @@
   "Controls.Pager.NoRowStatus": "কোন রেকর্ড নেই",
   "Controls.Pager.Page": "পৃষ্ঠা",
   "Controls.Pager.PageStatus": "মোট {total} টি রেকর্ড থেকে {from} থেকে {to} পর্যন্ত প্রদর্শন করা হচ্ছে",
+  "Controls.Pager.RangeStatus": "{from} থেকে {to} পর্যন্ত রেকর্ড দেখানো হচ্ছে",
   "Controls.PropertyGrid.RequiredHint": "এই ক্ষেত্রটি আবশ্যক",
   "Controls.QuickSearch.FieldSelection": "অনুসন্ধানের জন্য ক্ষেত্র নির্বাচন করুন",
   "Controls.QuickSearch.Hint": "অনুসন্ধানের জন্য লেখা প্রবেশ করুন",

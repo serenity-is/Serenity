@@ -4307,6 +4307,7 @@ declare namespace webTexts {
             const NoRowStatus: string;
             const Page: string;
             const PageStatus: string;
+            const RangeStatus: string;
         }
         namespace PropertyGrid {
             function asKey(): typeof PropertyGrid;
@@ -7005,6 +7006,11 @@ export interface PagerOptions {
     rowsPerPage?: number;
     /** Choices for rows-per-page selector. */
     rowsPerPageOptions?: number[];
+    /**
+     * Whether to page without the total number of the rows: no last page button, no total of the pages, and a next page button
+     * that is only enabled while there are more rows. Default is the setting of the view, see {@link RemoteViewOptions.indeterminatePaging}.
+     */
+    indeterminatePaging?: boolean;
     /** Callback when page changes. @param newPage - New page index (1-based). */
     onChangePage?: (newPage: number) => void;
     /** Callback when rows-per-page changes. @param n - New rows-per-page value. */
@@ -7143,6 +7149,14 @@ export declare class RemoteView<TItem = any> implements IRemoteView<TItem> {
      * aggregators that the server can't calculate, like the weighted average, are also calculated from the rows.
      */
     serverAggregates: boolean;
+    /**
+     * Whether the view pages without knowing the total number of the rows, which is slow to count for large tables. It asks the
+     * server whether there are more rows after the page, instead of their count, so the pager can only go to the next page
+     * while there are more. The total count of its paging info is then only the number of the rows known so far, see
+     * {@link PagingInfo.indeterminate}.
+     */
+    indeterminatePaging: boolean;
+    private more;
     /** The page number to seek to when loading data. */
     seekToPage: number;
     /** Sort expressions for the data (e.g. "Name" or "Name desc"). */
@@ -7564,6 +7578,11 @@ export interface RemoteViewOptions<TItem = any> {
      * matches and not only from the current page, which only a server that supports them returns. Default is false.
      */
     serverAggregates?: boolean;
+    /**
+     * Whether to page without the total number of the rows, by asking the server whether there are more rows after the page,
+     * which is faster for large tables. Default is false.
+     */
+    indeterminatePaging?: boolean;
     /** Initial page number to seek to on first load */
     seekToPage?: number;
     /** Initial sort criteria for the data */
@@ -7865,8 +7884,15 @@ export interface PagingInfo {
     /** Number of rows actually used by the server for the current page. May differ from
      * {@link rowsPerPage} when the server applies a maximum or default page size. */
     actualRowsPerPage: number;
-    /** Total number of items available */
+    /**
+     * Total number of items available, or the number of the rows known so far when the view is {@link indeterminate}, which
+     * is more than the rows up to the current page only when there are more.
+     */
     totalCount: number;
+    /** Whether the view pages without knowing the total number of the rows, so only whether there are more after the page. */
+    indeterminate?: boolean;
+    /** Whether there are more rows after the current page, for a view that is {@link indeterminate}. */
+    hasMore?: boolean;
 }
 /**
  * Callback function that can cancel a view operation
@@ -12043,6 +12069,8 @@ export declare class SlickPager<P extends PagerOptions = PagerOptions> extends W
     private totalPages;
     private pageSize;
     private stat;
+    private nextButton;
+    private indeterminate;
     /**
      * Creates a pager for the view specified in the options.
      * @param props - Widget props including the view to page.

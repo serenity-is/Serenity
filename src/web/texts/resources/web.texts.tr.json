@@ -129,6 +129,7 @@
   "Controls.Pager.NoRowStatus": "Kayıt yok",
   "Controls.Pager.Page": "Sayfa",
   "Controls.Pager.PageStatus": "Toplam {total} kayıttan {from} ile {to} arasındakiler gösteriliyor",
+  "Controls.Pager.RangeStatus": "{from} ile {to} arasındaki kayıtlar gösteriliyor",
   "Controls.PropertyGrid.RequiredHint": "Bu alan zorunludur",
   "Controls.QuickSearch.FieldSelection": "arama yapılacak alanı seç",
   "Controls.QuickSearch.Hint": "aranacak kelimeyi giriniz",

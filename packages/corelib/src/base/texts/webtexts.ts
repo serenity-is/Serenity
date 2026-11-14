@@ -177,6 +177,7 @@ namespace webTexts {
             export const NoRowStatus: string;
             export const Page: string;
             export const PageStatus: string;
+            export const RangeStatus: string;
         }
         namespace PropertyGrid {
             export function asKey(): typeof PropertyGrid;

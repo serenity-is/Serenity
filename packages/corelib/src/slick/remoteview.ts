@@ -134,6 +134,14 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
      * aggregators that the server can't calculate, like the weighted average, are also calculated from the rows.
      */
     public serverAggregates: boolean;
+    /**
+     * Whether the view pages without knowing the total number of the rows, which is slow to count for large tables. It asks the
+     * server whether there are more rows after the page, instead of their count, so the pager can only go to the next page
+     * while there are more. The total count of its paging info is then only the number of the rows known so far, see
+     * {@link PagingInfo.indeterminate}.
+     */
+    public indeterminatePaging: boolean;
+    private more: boolean = false;
     /** The page number to seek to when loading data. */
     public seekToPage: number;
     /** Sort expressions for the data (e.g. "Name" or "Name desc"). */
@@ -178,6 +186,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         this.groupItemMetadataProvider = options.groupItemMetadataProvider;
         this.localSort = options.localSort ?? false;
         this.serverAggregates = options.serverAggregates ?? false;
+        this.indeterminatePaging = options.indeterminatePaging ?? false;
 
         this.idProperty = options.idField ?? 'id';
         this.contentType = options.contentType ?? "application/json";
@@ -352,6 +361,8 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
             actualRowsPerPage: this.actualRowsPerPage ?? this.rowsPerPage,
             page: this.page,
             totalCount: this.totalCount,
+            indeterminate: this.indeterminatePaging || undefined,
+            hasMore: this.indeterminatePaging ? this.more : undefined,
             loading: this.loading != null && this.loading != false,
             error: this.errorMessage,
             dataView: this
@@ -1554,6 +1565,23 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
 
         this.page = data.Page;
         this.totalCount = data.TotalCount;
+
+        if (this.indeterminatePaging) {
+            const take = data.Take || this.rowsPerPage;
+            // a server that doesn't support it doesn't tell, so a full page is taken to have more after it
+            this.more = data.More ?? (take > 0 && data.Entities.length >= take);
+
+            // a page after the last one, e.g. when the rows were deleted, so the last one that has rows is shown
+            if (!data.Entities.length && data.Page > 1 && !this.more) {
+                this.seekToPage = data.Page - 1;
+                this.populate();
+                return false;
+            }
+
+            // what is known of the count, to tell that there are more pages
+            this.totalCount = (data.Skip ?? 0) + data.Entities.length + (this.more ? 1 : 0);
+        }
+
         this.serverTotals = this.sent?.aggregates.length ? (data.Aggregates ?? null) : null;
 
         this.setItems(data.Entities);
@@ -1617,6 +1645,11 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
 
             if (this.sent.groupBy.length && !request.GroupBy)
                 request.GroupBy = this.sent.groupBy;
+        }
+
+        if (this.indeterminatePaging && request.Take) {
+            request.IncludeMore ??= true;
+            request.ExcludeTotalCount ??= true;
         }
 
         // paged requests need the total count, so declare it explicitly instead of
@@ -1787,6 +1820,11 @@ export interface RemoteViewOptions<TItem = any> {
      * matches and not only from the current page, which only a server that supports them returns. Default is false.
      */
     serverAggregates?: boolean;
+    /**
+     * Whether to page without the total number of the rows, by asking the server whether there are more rows after the page,
+     * which is faster for large tables. Default is false.
+     */
+    indeterminatePaging?: boolean;
     /** Initial page number to seek to on first load */
     seekToPage?: number;
     /** Initial sort criteria for the data */

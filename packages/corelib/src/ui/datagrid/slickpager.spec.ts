@@ -211,6 +211,49 @@ describe("SlickPager", () => {
         });
     });
 
+    describe("indeterminate paging", () => {
+        function createIndeterminate(info: any) {
+            const view = createMockView();
+            view.pagingInfo = { page: 1, rowsPerPage: 20, totalCount: 21, loading: false, error: null, indeterminate: true, hasMore: true, ...info };
+            return { view, pager: createPager(view, { indeterminatePaging: true }) };
+        }
+
+        it("has no last page button or total of the pages", () => {
+            const { pager } = createIndeterminate({});
+            expect(document.body.querySelector(".slick-pg-last")).toBeNull();
+            expect(document.body.querySelector(".slick-pg-total")).toBeNull();
+            pager.destroy();
+        });
+
+        it("shows the range, and only goes to the next page while there are more rows", () => {
+            const { view, pager } = createIndeterminate({ page: 5, totalCount: 101 });
+            pager._updatePager();
+            expect(pager["stat"].textContent).toBe(PagerTexts.RangeStatus.replace(/{from}/, "81").replace(/{to}/, "100"));
+            expect(pager["nextButton"].classList.contains("slick-pg-disabled")).toBe(false);
+
+            pager._changePage("next");
+            expect(view.setPagingOptions).toHaveBeenCalledWith({ page: 6 });
+
+            view.setPagingOptions.mockClear();
+            view.pagingInfo = { ...view.pagingInfo, page: 6, totalCount: 105, hasMore: false };
+            pager._updatePager();
+            expect(pager["stat"].textContent).toBe(PagerTexts.RangeStatus.replace(/{from}/, "101").replace(/{to}/, "105"));
+            expect(pager["nextButton"].classList.contains("slick-pg-disabled")).toBe(true);
+
+            pager._changePage("next");
+            expect(view.setPagingOptions).not.toHaveBeenCalled();
+            pager.destroy();
+        });
+
+        it("takes any page number, as the last page is not known", () => {
+            const { view, pager } = createIndeterminate({});
+            pager["currentPage"].value = "50";
+            pager._changePage("input");
+            expect(view.setPagingOptions).toHaveBeenCalledWith({ page: 50 });
+            pager.destroy();
+        });
+    });
+
     describe("_updatePager", () => {
         it("updates status with normal paging info", () => {
             const view = createMockView();

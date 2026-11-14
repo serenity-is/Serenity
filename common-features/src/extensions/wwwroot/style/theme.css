@@ -3618,6 +3618,11 @@ button.panel-titlebar-close::after {
   cursor: pointer;
 }
 
+.slick-pg-btn.slick-pg-disabled {
+  opacity: 0.35;
+  pointer-events: none;
+}
+
 .slick-pg-first>span:before {
     --s-ico: var(--s-icon-slick-pg-first-span, var(--s-icon-angle-double-left));
 }

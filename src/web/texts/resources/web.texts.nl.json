@@ -129,6 +129,7 @@
   "Controls.Pager.NoRowStatus": "Geen records",
   "Controls.Pager.Page": "Pagina",
   "Controls.Pager.PageStatus": "Van {from} tot {to} van in totaal {total} records worden weergegeven",
+  "Controls.Pager.RangeStatus": "Van {from} tot {to} records worden weergegeven",
   "Controls.PropertyGrid.RequiredHint": "Dit veld is verplicht",
   "Controls.QuickSearch.FieldSelection": "Selecteer het veld om op te zoeken",
   "Controls.QuickSearch.Hint": "Voer de tekst in om te zoeken",

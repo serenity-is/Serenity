@@ -300,8 +300,15 @@ export interface PagingInfo {
     /** Number of rows actually used by the server for the current page. May differ from
      * {@link rowsPerPage} when the server applies a maximum or default page size. */
     actualRowsPerPage: number;
-    /** Total number of items available */
+    /**
+     * Total number of items available, or the number of the rows known so far when the view is {@link indeterminate}, which
+     * is more than the rows up to the current page only when there are more.
+     */
     totalCount: number;
+    /** Whether the view pages without knowing the total number of the rows, so only whether there are more after the page. */
+    indeterminate?: boolean;
+    /** Whether there are more rows after the current page, for a view that is {@link indeterminate}. */
+    hasMore?: boolean;
 }
 
 /**

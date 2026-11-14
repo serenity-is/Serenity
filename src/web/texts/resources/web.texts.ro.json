@@ -129,6 +129,7 @@
   "Controls.Pager.NoRowStatus": "Niciun record",
   "Controls.Pager.Page": "Pagină",
   "Controls.Pager.PageStatus": "Afișare de la {from} la {to} din {total} înregistrări totale",
+  "Controls.Pager.RangeStatus": "Afișare de la {from} la {to} înregistrări",
   "Controls.PropertyGrid.RequiredHint": "Acest câmp este obligatoriu",
   "Controls.QuickSearch.FieldSelection": "Selectați câmpul pentru căutare",
   "Controls.QuickSearch.Hint": "Introduceți textul pentru căutare",
