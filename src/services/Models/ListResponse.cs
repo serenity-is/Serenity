@@ -6,7 +6,7 @@ namespace Serenity.Services;
 /// The response model for a list service.
 /// </summary>
 /// <typeparam name="T">Type of the returned entities.</typeparam>
-public class ListResponse<T> : ServiceResponse, IListResponse
+public class ListResponse<T> : ServiceResponse, IListResponse, IListResponseTotalCount
 {
     IList IListResponse.Entities => Entities;
 
@@ -43,4 +43,10 @@ public class ListResponse<T> : ServiceResponse, IListResponse
     /// calculated from the entities that are returned.
     /// </summary>
     public AggregateGroup? Aggregates { get; set; }
+
+    void IListResponseTotalCount.SetTotalCount(int totalCount, bool? more)
+    {
+        TotalCount = totalCount;
+        More = more;
+    }
 }
