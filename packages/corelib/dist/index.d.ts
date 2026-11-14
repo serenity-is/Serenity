@@ -7124,7 +7124,8 @@ export declare class RemoteView<TItem = any> implements IRemoteView<TItem> {
     private loading;
     private localSort;
     private method;
-    private page;
+    /** The page of the rows of the view, which a view that doesn't page by them, e.g. one appending the rows, keeps as 1. */
+    protected page: number;
     private populateCalls;
     private populateLocks;
     private prevRefreshHints;
@@ -7137,7 +7138,8 @@ export declare class RemoteView<TItem = any> implements IRemoteView<TItem> {
     private sortComparer;
     private suspend;
     private toggledGroupsByLevel;
-    private totalCount;
+    /** The total number of the rows, or the number of the ones known so far when paging is indeterminate. */
+    protected totalCount: number;
     private totalRows;
     private updated;
     /** Additional parameters to send with service requests. */
@@ -7156,7 +7158,10 @@ export declare class RemoteView<TItem = any> implements IRemoteView<TItem> {
      * {@link PagingInfo.indeterminate}.
      */
     indeterminatePaging: boolean;
-    private more;
+    /** Whether there are more rows after the ones of the view, which is only known when paging is indeterminate. */
+    protected more: boolean;
+    /** Whether the server totals of the previous request are kept for the one that is loading, see {@link keepServerTotals}. */
+    private totalsKept;
     /** The page number to seek to when loading data. */
     seekToPage: number;
     /** Sort expressions for the data (e.g. "Name" or "Name desc"). */
@@ -7503,6 +7508,25 @@ export declare class RemoteView<TItem = any> implements IRemoteView<TItem> {
      * @returns False if the data could not be added.
      */
     addData(data: any): boolean;
+    /**
+     * Sets the paging state and the items of the view from a response, which replace the ones it has. A view that loads its
+     * rows in another way, e.g. by appending them, can override it.
+     * @param data - The response, whose TotalCount and Entities are never null.
+     * @returns False if the rows of the response are not used, e.g. when another request is made instead.
+     */
+    protected applyResponse(data: ListResponse<TItem>): boolean | void;
+    /**
+     * Sets the rows to skip and take of a request, which are the ones of the page to seek to. It is called after
+     * onSubmit, so the params are the ones of the request. A view that loads its rows in another way can override it.
+     * @param request - The request to set the Skip and Take of.
+     */
+    protected setRequestPaging(request: ListRequest): void;
+    /**
+     * Whether the request that is being made keeps the server totals of the previous one instead of asking for them again,
+     * which is for a view whose request matches the same rows, e.g. one that loads the rows after the ones it has. It is
+     * called after {@link setRequestPaging}, and only when the previous request asked for them.
+     */
+    protected keepServerTotals(): boolean;
     /**
      * Loads data from the server using the configured URL and parameters.
      * @returns False if the operation was cancelled or no URL is configured.
@@ -13483,16 +13507,33 @@ export declare class AutoNumeric {
     static readonly allowedSettingKeys: Set<string>;
 }
 /**
+ * Options for the {@link BooleanEditor}.
+ */
+export interface BooleanEditorOptions {
+    /**
+     * When true, and the editor is rendered in a form field, the checkbox is
+     * placed first and the field caption is shown after it, on the end side (right in LTR) instead of the
+     * default caption-left layout. This saves horizontal space and lets
+     * several checkboxes share a row.
+     */
+    labelOnEnd?: boolean;
+}
+/**
  * An editor that renders a checkbox for boolean values.
  * @typeParam P - Widget props type.
  */
-export declare class BooleanEditor<P = {}> extends EditorWidget<P> {
+export declare class BooleanEditor<P extends BooleanEditorOptions = BooleanEditorOptions> extends EditorWidget<P> {
     static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
     /** Creates the default checkbox input element.
      * @returns The checkbox input element. */
     static createDefaultElement(): HTMLInputElement;
     /** The checkbox input element that backs the editor. */
     readonly domNode: HTMLInputElement;
+    /**
+     * Creates a boolean editor.
+     * @param props - Widget props.
+     */
+    constructor(props: EditorProps<P>);
     /**
      * Returns the current boolean value.
      * @returns True when the checkbox is checked.

@@ -108,7 +108,8 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
     private loading: AbortController | boolean = false;
     private localSort: boolean;
     private method: string;
-    private page = 1;
+    /** The page of the rows of the view, which a view that doesn't page by them, e.g. one appending the rows, keeps as 1. */
+    protected page = 1;
     private populateCalls = 0;
     private populateLocks = 0;
     private prevRefreshHints: any = {};
@@ -121,7 +122,8 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
     private sortComparer: any;
     private suspend = 0;
     private toggledGroupsByLevel: any[] = [];
-    private totalCount: number = null;
+    /** The total number of the rows, or the number of the ones known so far when paging is indeterminate. */
+    protected totalCount: number = null;
     private totalRows = 0;
     private updated: Record<string, boolean> = null;
 
@@ -141,7 +143,10 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
      * {@link PagingInfo.indeterminate}.
      */
     public indeterminatePaging: boolean;
-    private more: boolean = false;
+    /** Whether there are more rows after the ones of the view, which is only known when paging is indeterminate. */
+    protected more: boolean = false;
+    /** Whether the server totals of the previous request are kept for the one that is loading, see {@link keepServerTotals}. */
+    private totalsKept = false;
     /** The page number to seek to when loading data. */
     public seekToPage: number;
     /** Sort expressions for the data (e.g. "Name" or "Name desc"). */
@@ -1553,6 +1558,22 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         data.TotalCount = data.TotalCount || 0;
         data.Entities = data.Entities || [];
 
+        if (!this.totalsKept)
+            this.serverTotals = this.sent?.aggregates.length ? (data.Aggregates ?? null) : null;
+
+        if (this.applyResponse(data) === false)
+            return false;
+
+        this.onPagingInfoChanged.notify({ pagingInfo: this.getPagingInfo(), dataView: this });
+    }
+
+    /**
+     * Sets the paging state and the items of the view from a response, which replace the ones it has. A view that loads its
+     * rows in another way, e.g. by appending them, can override it.
+     * @param data - The response, whose TotalCount and Entities are never null.
+     * @returns False if the rows of the response are not used, e.g. when another request is made instead.
+     */
+    protected applyResponse(data: ListResponse<TItem>): boolean | void {
         // the server may apply a different page size than requested (e.g. a maximum
         // page size limit or a default page size), so track it separately and use it
         // for paging calculations and the pager UI, while keeping rowsPerPage as requested
@@ -1582,11 +1603,30 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
             this.totalCount = (data.Skip ?? 0) + data.Entities.length + (this.more ? 1 : 0);
         }
 
-        this.serverTotals = this.sent?.aggregates.length ? (data.Aggregates ?? null) : null;
-
         this.setItems(data.Entities);
+    }
 
-        this.onPagingInfoChanged.notify({ pagingInfo: this.getPagingInfo(), dataView: this });
+    /**
+     * Sets the rows to skip and take of a request, which are the ones of the page to seek to. It is called after
+     * onSubmit, so the params are the ones of the request. A view that loads its rows in another way can override it.
+     * @param request - The request to set the Skip and Take of.
+     */
+    protected setRequestPaging(request: ListRequest): void {
+        const rowsPerPage = this.actualRowsPerPage > 0 ? this.actualRowsPerPage : this.rowsPerPage;
+        const skip = (this.seekToPage - 1) * rowsPerPage;
+        if (skip)
+            request.Skip = skip;
+        if (this.rowsPerPage)
+            request.Take = this.rowsPerPage;
+    }
+
+    /**
+     * Whether the request that is being made keeps the server totals of the previous one instead of asking for them again,
+     * which is for a view whose request matches the same rows, e.g. one that loads the rows after the ones it has. It is
+     * called after {@link setRequestPaging}, and only when the previous request asked for them.
+     */
+    protected keepServerTotals(): boolean {
+        return false;
     }
 
     /**
@@ -1621,12 +1661,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
 
         let request: ListRequest = {};
 
-        const rowsPerPage = this.actualRowsPerPage > 0 ? this.actualRowsPerPage : this.rowsPerPage;
-        const skip = (this.seekToPage - 1) * rowsPerPage;
-        if (skip)
-            request.Skip = skip;
-        if (this.rowsPerPage)
-            request.Take = this.rowsPerPage;
+        this.setRequestPaging(request);
 
         const sort = this.getRequestSort();
         this.sentSort = JSON.stringify(sort);
@@ -1637,8 +1672,11 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
             request = Object.assign(request, this.params);
         }
 
-        this.sent = null;
-        if (this.serverAggregates && !request.Aggregates) {
+        this.totalsKept = this.serverAggregates && this.sent !== null && !request.Aggregates && this.keepServerTotals();
+        if (!this.totalsKept)
+            this.sent = null;
+
+        if (!this.totalsKept && this.serverAggregates && !request.Aggregates) {
             this.sent = this.getServerRequest();
             if (this.sent.aggregates.length)
                 request.Aggregates = this.sent.aggregates;
