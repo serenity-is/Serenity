@@ -1774,15 +1774,20 @@ export declare enum ListRequestCapabilities {
     GroupBy = 131072,
     /** The handler honors ExcludeEntities. */
     ExcludeEntities = 262144,
-    /** Combined aggregate, group, and entity exclusion options, which are not in the baseline. */
+    /** Combined aggregate, group, and entity exclusion options, which are not in Baseline, but in ProBaseline. */
     AggregateOptions = 458752,
     /** Capabilities supported by the in-memory list request source adapter by default. */
-    SourceAdapter = 51327,
+    SourceAdapter = 510079,
     /**
      * Stable baseline for current ListRequest capabilities. Do not add future capabilities
      * to this value; they require explicit opt-in.
      */
-    Baseline = 65535
+    Baseline = 65535,
+    /**
+     * Stable set of the capabilities of a list request handler with the behaviors of Serenity.Pro.Extensions, which
+     * are the ones of Baseline and AggregateOptions. Do not add future capabilities to this value.
+     */
+    ProBaseline = 524287
 }
 /**
  * Response DTO for `List` handlers.

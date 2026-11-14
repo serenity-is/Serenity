@@ -4,11 +4,22 @@ namespace Serenity.CodeGenerator;
 
 public partial class TSTypeListerASTTests
 {
-    protected void BuiltinTSTypesGenerator()
+    /// <summary>
+    /// Writes BuiltinTSTypes.gen.cs of the code generator from the type declarations of the corelib and sleekgrid packages,
+    /// which have to be built first. It is not a test, so it only runs when it is asked for, as the builtin-ts-types script
+    /// does: <c>-explicit only -method Serenity.CodeGenerator.TSTypeListerASTTests.BuiltinTSTypesGenerator</c>
+    /// </summary>
+    [Fact(Explicit = true)]
+    public void BuiltinTSTypesGenerator()
     {
-        var path = Environment.CurrentDirectory.Replace('\\', '/');
-        Assert.Contains("/Serenity/", path);
-        var serenityRoot = path[0..(path.IndexOf("/Serenity/", StringComparison.Ordinal) + 10)];
+        // the folder of the repository, which the tests run somewhere under
+        var serenityRoot = AppContext.BaseDirectory;
+        while (serenityRoot is not null && !(
+            System.IO.File.Exists(System.IO.Path.Combine(serenityRoot, "packages", "corelib", "package.json")) &&
+            System.IO.Directory.Exists(System.IO.Path.Combine(serenityRoot, "src", "codegenerator"))))
+            serenityRoot = System.IO.Path.GetDirectoryName(serenityRoot);
+
+        Assert.NotNull(serenityRoot);
         var packages = System.IO.Path.Combine(serenityRoot, "packages");
 
         var fileSystem = new MockFileSystem();
