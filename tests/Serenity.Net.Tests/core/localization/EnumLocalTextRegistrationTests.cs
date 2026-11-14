@@ -129,8 +129,7 @@ public class EnumLocalTextRegistrationTests
     }
 
     [Fact]
-    public void AddEnumTexts_Uses_FullName_For_StringEnum_Without_EnumKey()
-    {
+    public void AddEnumTexts_Uses_FullName_For_StringEnum_Without_EnumKey()    {
         var registry = new MockLocalTextRegistry();
         EnumLocalTextRegistration.AddEnumTexts(registry, new MockTypeSource(typeof(EnumKeyLessStringEnum)));
 
@@ -159,6 +158,22 @@ public class EnumLocalTextRegistrationTests
 
         Assert.Contains(typeof(CollidingWidgetCategory).FullName!, ex.Message);
         Assert.Contains(typeof(WidgetCategory).FullName!, ex.Message);
+    }
+
+    [Fact]
+    public void AddEnumTexts_RegistersTheAggregates_OfTheGridsAndTheListRequests()
+    {
+        var registry = new MockLocalTextRegistry();
+        EnumLocalTextRegistration.AddEnumTexts(registry, new MockTypeSource(typeof(SummaryType), typeof(AggregateType)));
+
+        // both use the full name as the key, as neither has an EnumKey, which the enums of the server typings use as well
+        var summary = "Enums." + typeof(SummaryType).FullName + ".";
+        var aggregate = "Enums." + typeof(AggregateType).FullName + ".";
+        Assert.Contains(registry.AddedList, x => x.key == summary + "Sum" && x.text == "Sum");
+        Assert.Contains(registry.AddedList, x => x.key == summary + "Avg" && x.text == "Avg");
+        Assert.Contains(registry.AddedList, x => x.key == aggregate + "Count" && x.text == "Count");
+        Assert.Contains(registry.AddedList, x => x.key == aggregate + "Sum" && x.text == "Sum");
+        Assert.Contains(registry.AddedList, x => x.key == aggregate + "DistinctCount" && x.text == "Distinct Count");
     }
 
     [EnumKey("My.WidgetCategory")]
