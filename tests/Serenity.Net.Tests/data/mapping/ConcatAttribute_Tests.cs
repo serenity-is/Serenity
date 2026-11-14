@@ -55,15 +55,15 @@ public class ConcatAttribute_Tests
     }
 
     [Fact]
-    public void Uses_TwoParam_Concat_For_Oracle()
+    public void Uses_TwoParam_Concat_For_Oracle_Without_Coalesce_As_Empty_String_Is_Null()
     {
-        Assert.Equal("COALESCE(CONCAT(Test1, Test2), '')", new Concat("Test1", "Test2")
+        Assert.Equal("CONCAT(Test1, Test2)", new Concat("Test1", "Test2")
             .ToString(OracleDialect.Instance));
 
-        Assert.Equal("CONCAT(COALESCE(CONCAT(Test1, Test2), ''), Test3)", new Concat("Test1", "Test2", "Test3")
+        Assert.Equal("CONCAT(CONCAT(Test1, Test2), Test3)", new Concat("Test1", "Test2", "Test3")
             .ToString(OracleDialect.Instance));
 
-        Assert.Equal("CONCAT(CONCAT(COALESCE(CONCAT(Test1, Test2), ''), Test3), Test4)", 
+        Assert.Equal("CONCAT(CONCAT(CONCAT(Test1, Test2), Test3), Test4)", 
             new Concat("Test1", "Test2", "Test3", "Test4")
             .ToString(OracleDialect.Instance));
     }

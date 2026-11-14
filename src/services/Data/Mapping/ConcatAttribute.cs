@@ -71,9 +71,10 @@ public class ConcatAttribute : BaseExpressionAttribute
 
                 case nameof(ServerType.Oracle):
                     // Oracle accepts only two arguments in CONCAT function 
-                    // and it only returns null when both arguments are null
-                    var result = coalesce("CONCAT(" + expressions[0] + ", "
-                        + expressions[1] + ")");
+                    // and it only returns null when both arguments are null. An empty
+                    // string is null in Oracle, so it is not coalesced to one, which would
+                    // also fail with a character set mismatch for NVARCHAR2 arguments.
+                    var result = "CONCAT(" + expressions[0] + ", " + expressions[1] + ")";
 
                     for (var i = 2; i < expressions.Length; i++)
                         result = "CONCAT(" + result + ", " + expressions[i] + ")";
