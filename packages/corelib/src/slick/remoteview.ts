@@ -75,6 +75,8 @@ export interface ArgsRecalcRows extends ArgsRemoteView {
     newRows: any[];
 }
 
+const groupingDelimiter = ':|:';
+
 /**
  * A data view that supports remote data loading, sorting, filtering, grouping, and paging.
  * Extends the functionality of SleekGrid's DataView with server-side data operations.
@@ -568,6 +570,18 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
     }
 
     private copyServerValues(node: AggregateGroup): Record<string, Record<string, any>> {
+        return RemoteView.copyServerValues(node);
+    }
+
+    /** The text that separates the values of the groups in the grouping key of a group, from the outermost one. */
+    static readonly groupingDelimiter: string = groupingDelimiter;
+
+    /**
+     * Copies the values of a group of the server by the aggregate key, then the field, as the aggregators store them in the totals.
+     * @param node - The group of the server, or its root for the totals of all the rows.
+     * @returns The totals, or null when the group has no values.
+     */
+    static copyServerValues(node: AggregateGroup): Record<string, Record<string, any>> {
         if (!node?.Values)
             return null;
 
@@ -579,7 +593,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
     }
 
     /** Makes the value of a group the same as the key of its group of the server, which are null and undefined for a missing one. */
-    private static groupKeyText(value: any): string {
+    static groupKeyText(value: any): string {
         return value == null || value === "undefined" || value === "null" ? "\u0002" : String(value);
     }
 
@@ -597,10 +611,21 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         if (!this.canUseServerTotals() || !this.sent?.groupBy.length)
             return null;
 
-        let node = this.serverTotals;
-        for (const part of String(group.groupingKey).split(groupingDelimiter)) {
+        return RemoteView.findServerGroup(this.serverTotals, group.groupingKey);
+    }
+
+    /**
+     * Finds the group of the server for the grouping key of a group of a view, by its values from the outermost group, as
+     * the server returns the groups by the fields of the groupings in the same order.
+     * @param root - The aggregates of a response.
+     * @param groupingKey - The grouping key of the group.
+     * @returns The group of the server, or null when it has none.
+     */
+    static findServerGroup(root: AggregateGroup, groupingKey: string): AggregateGroup | null {
+        let node = root;
+        for (const part of String(groupingKey).split(groupingDelimiter)) {
             const key = RemoteView.groupKeyText(part);
-            node = node.Groups?.find(x => RemoteView.groupKeyText(x.Key) === key);
+            node = node?.Groups?.find(x => RemoteView.groupKeyText(x.Key) === key);
             if (!node)
                 return null;
         }
@@ -624,13 +649,24 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
      * and when the view doesn't sort the rows itself.
      */
     private getRequestSort(): string[] {
-        const sort = !this.sortBy ? [] : typeof this.sortBy === "string" ? [this.sortBy] : [...this.sortBy];
-        if (this.localSort)
+        return RemoteView.getRequestSort(this.sortBy, this.groupingInfos, this.localSort);
+    }
+
+    /**
+     * Gets the sort of a request, which has the fields the rows are grouped by first, so the rows of a group follow each other.
+     * A field that is also sorted keeps its direction. It only counts for the groupings that are by a field, from the outermost.
+     * @param sortBy - The sort expressions of the view.
+     * @param groupingInfos - The groupings of the view.
+     * @param localSort - Whether the view sorts the rows itself, so the sort is not changed.
+     */
+    static getRequestSort(sortBy: string | string[], groupingInfos: GroupInfo<any>[], localSort?: boolean): string[] {
+        const sort = !sortBy ? [] : typeof sortBy === "string" ? [sortBy] : [...sortBy];
+        if (localSort)
             return sort;
 
         const fields: string[] = [];
-        for (const gi of this.groupingInfos) {
-            if (gi.getterIsAFn || typeof gi.getter !== "string" || !gi.getter)
+        for (const gi of groupingInfos ?? []) {
+            if (!gi || gi.getterIsAFn || typeof gi.getter !== "string" || !gi.getter)
                 break;
 
             fields.push(gi.getter);
@@ -651,18 +687,38 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
 
     private getServerRequest(): { aggregates: AggregateBy[], groupBy: GroupBy[] } {
         const aggregates = this.getAggregatesToRequest();
-        // the groups are only of use for what is calculated for them, and can only be by the fields
-        const fields = this.groupingInfos.map(x => x.getterIsAFn ? null : x.getter as string);
-        // in the order the rows are sorted by, so the groups the server leaves out, when there are too many, are the last ones
-        const sort = (!this.sortBy ? [] : typeof this.sortBy === "string" ? [this.sortBy] : this.sortBy)
-            .map(x => x?.toLowerCase());
-        const groupBy = aggregates.length && fields.length && fields.every(x => !!x) ?
-            fields.map(field => sort.includes(field.toLowerCase() + " desc") ?
-                { Field: field, Descending: true } as GroupBy : { Field: field } as GroupBy) : [];
+        // the groups are only of use for what is calculated for them
+        const groupBy = aggregates.length ? RemoteView.getGroupByToRequest(this.groupingInfos, this.sortBy) : [];
         return { aggregates, groupBy };
     }
 
+    /**
+     * Gets the groups to ask the server for the groupings of a view, which can only be by the fields, so there are none when
+     * one of the groupings is by a function.
+     * @param groupingInfos - The groupings of the view.
+     * @param sortBy - The sort expressions of the view, which the groups of a field that is sorted descending are in the order of.
+     */
+    static getGroupByToRequest(groupingInfos: GroupInfo<any>[], sortBy: string | string[]): GroupBy[] {
+        const fields = (groupingInfos ?? []).map(x => x.getterIsAFn || typeof x.getter !== "string" ? null : x.getter);
+        // in the order the rows are sorted by, so the groups the server leaves out, when there are too many, are the last ones
+        const sort = (!sortBy ? [] : typeof sortBy === "string" ? [sortBy] : sortBy)
+            .map(x => x?.toLowerCase());
+        return fields.length && fields.every(x => !!x) ?
+            fields.map(field => sort.includes(field.toLowerCase() + " desc") ?
+                { Field: field, Descending: true } as GroupBy : { Field: field } as GroupBy) : [];
+    }
+
     private getAggregatesToRequest(): AggregateBy[] {
+        // the aggregators of the groups can be other than the ones of the totals
+        return RemoteView.getAggregatesToRequest(
+            [...(this.grandAggregators ?? []), ...this.groupingInfos.flatMap(x => x.aggregators ?? [])]);
+    }
+
+    /**
+     * Gets what to ask the server to calculate for some aggregators, which are the ones it can calculate.
+     * @param aggregators - The aggregators of the totals and the groups.
+     */
+    static getAggregatesToRequest(aggregators: IAggregator[]): AggregateBy[] {
         const types: Record<string, AggregateType> = {
             sum: AggregateType.Sum,
             avg: AggregateType.Avg,
@@ -671,9 +727,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         };
 
         const aggregates: AggregateBy[] = [];
-        // the aggregators of the groups can be other than the ones of the totals
-        const all = [...(this.grandAggregators ?? []), ...this.groupingInfos.flatMap(x => x.aggregators ?? [])];
-        for (const agg of all) {
+        for (const agg of aggregators ?? []) {
             const type = types[(agg.constructor as any).aggregateKey as string];
             const field = (agg as any).field as string;
             if (type === undefined || !field ||
@@ -697,17 +751,28 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
 
         this.groups = [];
         this.toggledGroupsByLevel = [];
-        groupingInfo = groupingInfo || [];
-        this.groupingInfos = (groupingInfo instanceof Array) ? groupingInfo : [groupingInfo];
+        this.groupingInfos = RemoteView.normalizeGroupingInfos(groupingInfo);
 
-        for (let i = 0; i < this.groupingInfos.length; i++) {
-            const gi = this.groupingInfos[i] = Object.assign({}, RemoteView.groupingInfoDefaults, this.groupingInfos[i]);
-            gi.getterIsAFn ??= typeof gi.getter == "function";
+        for (let i = 0; i < this.groupingInfos.length; i++)
             this.toggledGroupsByLevel[i] = {};
-        }
 
         this.refresh();
         this.syncServerAggregates();
+    }
+
+    /**
+     * Gets the groupings of a view from what it is given, with the defaults of a grouping. The groupings in an array
+     * are replaced with their copies that have the defaults, and the array itself is returned.
+     * @param groupingInfo - Grouping information or array of grouping information.
+     */
+    static normalizeGroupingInfos<TItem = any>(groupingInfo: GroupInfo<TItem> | GroupInfo<TItem>[]): GroupInfo<TItem>[] {
+        groupingInfo = groupingInfo || [];
+        const infos = (groupingInfo instanceof Array) ? groupingInfo : [groupingInfo];
+        for (let i = 0; i < infos.length; i++) {
+            const gi = infos[i] = Object.assign({}, RemoteView.groupingInfoDefaults, infos[i]);
+            gi.getterIsAFn ??= typeof gi.getter == "function";
+        }
+        return infos;
     }
 
     /**
@@ -1040,6 +1105,15 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
     }
 
     private resolveLevelAndGroupingKey(args: any) {
+        return RemoteView.resolveLevelAndGroupingKey(args);
+    }
+
+    /**
+     * Gets the level and the grouping key of a group from the arguments of collapseGroup and expandGroup, which are either
+     * its grouping key, or the values of the groups from the outermost one.
+     * @param args - The arguments.
+     */
+    static resolveLevelAndGroupingKey(args: any[]): { level: number, groupingKey: string } {
         const arg0 = args[0];
         if (args.length === 1 && arg0.indexOf(groupingDelimiter) !== -1) {
             return { level: arg0.split(groupingDelimiter).length - 1, groupingKey: arg0 };
@@ -1579,12 +1653,14 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         // for paging calculations and the pager UI, while keeping rowsPerPage as requested
         this.actualRowsPerPage = data.Take != null ? data.Take : this.rowsPerPage;
 
+        // the page is also set on the response, as it was before
+        const paged = data as ListResponse<TItem> & { Page?: number };
         if (!data.Skip || (!this.rowsPerPage && !data.Take))
-            data.Page = 1;
+            paged.Page = 1;
         else
-            data.Page = Math.ceil(data.Skip / (data.Take || this.rowsPerPage)) + 1;
+            paged.Page = Math.ceil(data.Skip / (data.Take || this.rowsPerPage)) + 1;
 
-        this.page = data.Page;
+        this.page = paged.Page;
         this.totalCount = data.TotalCount;
 
         if (this.indeterminatePaging) {
@@ -1593,8 +1669,8 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
             this.more = data.More ?? (take > 0 && data.Entities.length >= take);
 
             // a page after the last one, e.g. when the rows were deleted, so the last one that has rows is shown
-            if (!data.Entities.length && data.Page > 1 && !this.more) {
-                this.seekToPage = data.Page - 1;
+            if (!data.Entities.length && paged.Page > 1 && !this.more) {
+                this.seekToPage = paged.Page - 1;
                 this.populate();
                 return false;
             }
@@ -1797,11 +1873,20 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         // so the ctx.item is always a Group and value of the group is in item.value, not ctx.value
         // as ctx.value is set by the grid to ctx.item["__groupdisplaycolumnfield__"],
         // so never use or rely on ctx.value here!        
+        return RemoteView.formatGroupValue(this.groupingInfos, ctx);
+    }
+
+    /**
+     * Formats the value of a group for its row, by the format of its grouping when it has one.
+     * @param groupingInfos - The groupings of the view.
+     * @param ctx - The formatter context, whose item is the group.
+     */
+    static formatGroupValue<TItem = any>(groupingInfos: GroupInfo<TItem>[], ctx: FormatterContext<Group<TItem>>) {
         if (!ctx.item || ctx.item.level == null) {
             return ctx.escape(ctx.item?.value);
         }
 
-        const gi = this.groupingInfos[ctx.item.level];
+        const gi = groupingInfos[ctx.item.level];
         if (!gi) {
             return ctx.escape(ctx.item?.value);
         }
@@ -1870,5 +1955,3 @@ export interface RemoteViewOptions<TItem = any> {
     /** URL of the service endpoint for data requests */
     url?: string;
 }
-
-const groupingDelimiter = ':|:';

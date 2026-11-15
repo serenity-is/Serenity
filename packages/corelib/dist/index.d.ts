@@ -7301,8 +7301,16 @@ export declare class RemoteView<TItem = any> implements IRemoteView<TItem> {
     private getServerTotals;
     private canUseServerTotals;
     private copyServerValues;
+    /** The text that separates the values of the groups in the grouping key of a group, from the outermost one. */
+    static readonly groupingDelimiter: string;
+    /**
+     * Copies the values of a group of the server by the aggregate key, then the field, as the aggregators store them in the totals.
+     * @param node - The group of the server, or its root for the totals of all the rows.
+     * @returns The totals, or null when the group has no values.
+     */
+    static copyServerValues(node: AggregateGroup): Record<string, Record<string, any>>;
     /** Makes the value of a group the same as the key of its group of the server, which are null and undefined for a missing one. */
-    private static groupKeyText;
+    static groupKeyText(value: any): string;
     /**
      * Gets the totals the server calculated for a group, which are of all of its rows, and not only the ones on the page, or
      * null when it has none. The group is found by its values from the outermost group, as the server returns the
@@ -7311,6 +7319,14 @@ export declare class RemoteView<TItem = any> implements IRemoteView<TItem> {
     private getServerGroupTotals;
     /** Gets the group of the server for a group of the view, which is of all of its rows, or null when it has none. */
     private getServerGroup;
+    /**
+     * Finds the group of the server for the grouping key of a group of a view, by its values from the outermost group, as
+     * the server returns the groups by the fields of the groupings in the same order.
+     * @param root - The aggregates of a response.
+     * @param groupingKey - The grouping key of the group.
+     * @returns The group of the server, or null when it has none.
+     */
+    static findServerGroup(root: AggregateGroup, groupingKey: string): AggregateGroup | null;
     private hasServerTotal;
     /**
      * Gets what to ask the server to calculate for the aggregators of the summary options, which are the ones it can calculate.
@@ -7322,13 +7338,39 @@ export declare class RemoteView<TItem = any> implements IRemoteView<TItem> {
      * and when the view doesn't sort the rows itself.
      */
     private getRequestSort;
+    /**
+     * Gets the sort of a request, which has the fields the rows are grouped by first, so the rows of a group follow each other.
+     * A field that is also sorted keeps its direction. It only counts for the groupings that are by a field, from the outermost.
+     * @param sortBy - The sort expressions of the view.
+     * @param groupingInfos - The groupings of the view.
+     * @param localSort - Whether the view sorts the rows itself, so the sort is not changed.
+     */
+    static getRequestSort(sortBy: string | string[], groupingInfos: GroupInfo<any>[], localSort?: boolean): string[];
     private getServerRequest;
+    /**
+     * Gets the groups to ask the server for the groupings of a view, which can only be by the fields, so there are none when
+     * one of the groupings is by a function.
+     * @param groupingInfos - The groupings of the view.
+     * @param sortBy - The sort expressions of the view, which the groups of a field that is sorted descending are in the order of.
+     */
+    static getGroupByToRequest(groupingInfos: GroupInfo<any>[], sortBy: string | string[]): GroupBy[];
     private getAggregatesToRequest;
+    /**
+     * Gets what to ask the server to calculate for some aggregators, which are the ones it can calculate.
+     * @param aggregators - The aggregators of the totals and the groups.
+     */
+    static getAggregatesToRequest(aggregators: IAggregator[]): AggregateBy[];
     /**
      * Sets the grouping configuration for the view.
      * @param groupingInfo - Grouping information or array of grouping information.
      */
     setGrouping(groupingInfo: GroupInfo<TItem> | GroupInfo<TItem>[]): void;
+    /**
+     * Gets the groupings of a view from what it is given, with the defaults of a grouping. The groupings in an array
+     * are replaced with their copies that have the defaults, and the array itself is returned.
+     * @param groupingInfo - Grouping information or array of grouping information.
+     */
+    static normalizeGroupingInfos<TItem = any>(groupingInfo: GroupInfo<TItem> | GroupInfo<TItem>[]): GroupInfo<TItem>[];
     /**
      * Gets an item by its index in the items array.
      * @param i - The index of the item.
@@ -7446,6 +7488,15 @@ export declare class RemoteView<TItem = any> implements IRemoteView<TItem> {
      */
     expandAllGroups(level?: number): void;
     private resolveLevelAndGroupingKey;
+    /**
+     * Gets the level and the grouping key of a group from the arguments of collapseGroup and expandGroup, which are either
+     * its grouping key, or the values of the groups from the outermost one.
+     * @param args - The arguments.
+     */
+    static resolveLevelAndGroupingKey(args: any[]): {
+        level: number;
+        groupingKey: string;
+    };
     private expandCollapseGroup;
     /**
      * Collapses a specific group.
@@ -7562,6 +7613,12 @@ export declare class RemoteView<TItem = any> implements IRemoteView<TItem> {
      */
     get idField(): string;
     private formatGroupValue;
+    /**
+     * Formats the value of a group for its row, by the format of its grouping when it has one.
+     * @param groupingInfos - The groupings of the view.
+     * @param ctx - The formatter context, whose item is the group.
+     */
+    static formatGroupValue<TItem = any>(groupingInfos: GroupInfo<TItem>[], ctx: FormatterContext<Group<TItem>>): FormatterResult;
 }
 /**
  * Options for configuring a RemoteView instance
