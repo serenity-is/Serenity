@@ -376,6 +376,60 @@ describe('getScrollBarDimensions', () => {
         appendSpy.mockRestore();
     });
 
+    it('rounds a fractional scrollbar up, as it is when the page is zoomed', () => {
+        const appendSpy = vi.spyOn(document.body, "appendChild");
+        let inner: HTMLElement;
+        appendSpy.mockImplementation((probe: any) => {
+            inner = probe.firstElementChild;
+            // a scrollbar of 11.33px, which the rounded widths tell as 11
+            Object.defineProperty(probe, "offsetWidth", { get: () => 100 });
+            Object.defineProperty(probe, "clientWidth", { get: () => 89 });
+            Object.defineProperty(probe, "offsetHeight", { get: () => 100 });
+            Object.defineProperty(probe, "clientHeight", { get: () => 89 });
+            probe.getBoundingClientRect = () => ({ width: 100, height: 100 });
+            inner.getBoundingClientRect = () => ({ width: 88.67, height: 88.67 }) as any;
+            return probe;
+        });
+
+        const dims = getScrollBarDimensions(true);
+        expect(inner).toBeTruthy();
+        expect(dims.width).toBe(12);
+        expect(dims.height).toBe(12);
+
+        appendSpy.mockRestore();
+    });
+
+    it('doesn\'t round a scrollbar of a whole number of pixels up', () => {
+        const appendSpy = vi.spyOn(document.body, "appendChild");
+        appendSpy.mockImplementation((probe: any) => {
+            probe.getBoundingClientRect = () => ({ width: 100, height: 100 });
+            probe.firstElementChild.getBoundingClientRect = () => ({ width: 82.99999999, height: 83 });
+            return probe;
+        });
+
+        const dims = getScrollBarDimensions(true);
+        expect(dims.width).toBe(17);
+        expect(dims.height).toBe(17);
+
+        appendSpy.mockRestore();
+    });
+
+    it('measures again when the device pixel ratio changes', () => {
+        const appendSpy = vi.spyOn(document.body, "appendChild");
+        getScrollBarDimensions(true);
+        appendSpy.mockClear();
+        const ratio = window.devicePixelRatio;
+        try {
+            Object.defineProperty(window, "devicePixelRatio", { configurable: true, value: (ratio || 1) + 0.5 });
+            getScrollBarDimensions();
+            expect(appendSpy).toHaveBeenCalledTimes(1);
+        }
+        finally {
+            Object.defineProperty(window, "devicePixelRatio", { configurable: true, value: ratio });
+            appendSpy.mockRestore();
+        }
+    });
+
     it('caches the dimensions between calls', () => {
         const appendSpy = vi.spyOn(document.body, "appendChild");
         getScrollBarDimensions(true);

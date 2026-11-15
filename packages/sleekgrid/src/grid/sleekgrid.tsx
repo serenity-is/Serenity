@@ -2369,9 +2369,8 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         this.calcViewportSize();
         this.setPaneHeights();
 
-        if (!this._scrollDims || !this._scrollDims.width) {
-            this._scrollDims = getScrollBarDimensions(true);
-        }
+        // measured again when it could not be before, and when the device pixel ratio changed, e.g. as the page is zoomed
+        this._scrollDims = getScrollBarDimensions(!this._scrollDims || !this._scrollDims.width);
 
         if (this._options.forceFitColumns) {
             this.autosizeColumns();

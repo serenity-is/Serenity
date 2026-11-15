@@ -6,6 +6,7 @@ import { mapBands, type GridLayoutRefs } from "../layouts/layout-refs";
 // shared across all grids on the page
 let maxSupportedCssHeight: number;  // browser's breaking point
 let scrollbarDimensions: { width: number, height: number };
+let scrollbarDimensionsRatio: number;
 
 /**
  * Computes the absolute bounding box of `elem` with aggregated offsets and
@@ -87,17 +88,30 @@ export function getMaxSupportedCssHeight(recalc?: boolean): number {
 
 /**
  * Measures scrollbar thickness by inserting a scrolled test node.
- * Results are cached until `recalc` is set.
+ * Results are cached until `recalc` is set, or the device pixel ratio changes, e.g. when the page is zoomed.
+ *
+ * A scrollbar is not a whole number of pixels thick when the page is zoomed or the display is scaled, e.g. 11.33px
+ * at 150%, while `offsetWidth` and `clientWidth` are rounded. So the thickness is measured from the bounding
+ * rectangles, and rounded up, as columns that are fit to a width that is less than a pixel too wide get a
+ * horizontal scrollbar.
  * @param recalc - When `true`, forces re-measurement.
  * @returns Object with `width` and `height` scrollbar dimensions in pixels.
  */
 export function getScrollBarDimensions(recalc?: boolean): { width: number; height: number; } {
-    if (!scrollbarDimensions || recalc) {
-        const c = document.body.appendChild(<div style={{ position: "absolute", top: "-10000px", left: "-10000px", width: "100px", height: "100px", overflow: "scroll", border: "0" }} /> as HTMLElement);
+    const ratio = typeof window !== "undefined" ? window.devicePixelRatio : undefined;
+    if (!scrollbarDimensions || recalc || scrollbarDimensionsRatio !== ratio) {
+        const inner = <div style={{ width: "100%", height: "100%" }} /> as HTMLElement;
+        const c = document.body.appendChild(<div style={{ position: "absolute", top: "-10000px", left: "-10000px", width: "100px", height: "100px", overflow: "scroll", border: "0" }}>{inner}</div> as HTMLElement);
+        const outerRect = c.getBoundingClientRect?.();
+        const innerRect = inner.getBoundingClientRect?.();
+        // to two decimals before rounding up, as the difference of two fractions may be a little over a whole number
+        const measure = (outer: number, content: number, rounded: number) => outer > 0 && content > 0 && outer > content ?
+            Math.ceil(Math.round((outer - content) * 100) / 100) : Math.round(rounded);
         scrollbarDimensions = {
-            width: Math.round(c.offsetWidth - c.clientWidth),
-            height: Math.round(c.offsetHeight - c.clientHeight)
+            width: measure(outerRect?.width, innerRect?.width, c.offsetWidth - c.clientWidth),
+            height: measure(outerRect?.height, innerRect?.height, c.offsetHeight - c.clientHeight)
         };
+        scrollbarDimensionsRatio = ratio;
         c.remove();
     }
     return scrollbarDimensions;
