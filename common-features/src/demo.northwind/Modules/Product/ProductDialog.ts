@@ -1,9 +1,9 @@
-import { Attributes, EntityDialog } from "@serenity-is/corelib";
+import { Attributes, EntityDialog, LazyLoadInclude } from "@serenity-is/corelib";
 import { ProductForm, ProductRow, ProductService } from "../ServerTypes/Demo";
 import { nsDemoNorthwind } from "../ServerTypes/Namespaces";
 import "./ProductDialog.css";
 
-export class ProductDialog<P = {}> extends EntityDialog<ProductRow, P> {
+export class ProductDialog<P = {}> extends EntityDialog<ProductRow, P> implements LazyLoadInclude<"NorthwindDialogs"> {
     static override[Symbol.typeInfo] = this.registerClass(nsDemoNorthwind, [Attributes.maximizable]);
 
     protected override getFormKey() { return ProductForm.formKey; }

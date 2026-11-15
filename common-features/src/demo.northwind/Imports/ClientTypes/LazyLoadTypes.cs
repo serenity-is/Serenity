@@ -2,4 +2,4 @@
 
 #nullable enable
 
-[assembly: global::Serenity.Web.LazyLoadTypes("~/Serenity.Demo.Northwind/esm/Modules/ServerTypes/LazyTypeLoader.js", "Serenity.Demo.Northwind.CountryWithFlagFormatter", "Serenity.Demo.Northwind.EmployeeFormatter", "Serenity.Demo.Northwind.FreightFormatter", "Serenity.Demo.Northwind.ShipperFormatter")]
+[assembly: global::Serenity.Web.LazyLoadTypes("~/Serenity.Demo.Northwind/esm/Modules/ServerTypes/LazyTypeLoader.js", "Serenity.Demo.Northwind.CategoryDialog", "Serenity.Demo.Northwind.CountryWithFlagFormatter", "Serenity.Demo.Northwind.CustomerDialog", "Serenity.Demo.Northwind.EmployeeFormatter", "Serenity.Demo.Northwind.FreightFormatter", "Serenity.Demo.Northwind.OrderDialog", "Serenity.Demo.Northwind.ProductDialog", "Serenity.Demo.Northwind.RegionDialog", "Serenity.Demo.Northwind.ShipperDialog", "Serenity.Demo.Northwind.ShipperFormatter", "Serenity.Demo.Northwind.SupplierDialog", "Serenity.Demo.Northwind.TerritoryDialog")]

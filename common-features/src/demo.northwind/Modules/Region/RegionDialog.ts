@@ -1,8 +1,8 @@
-import { EntityDialog } from "@serenity-is/corelib";
+import { EntityDialog, LazyLoadInclude } from "@serenity-is/corelib";
 import { RegionForm, RegionRow, RegionService } from "../ServerTypes/Demo";
 import { nsDemoNorthwind } from "../ServerTypes/Namespaces";
 
-export class RegionDialog<P = {}> extends EntityDialog<RegionRow, P> {
+export class RegionDialog<P = {}> extends EntityDialog<RegionRow, P> implements LazyLoadInclude<"NorthwindDialogs"> {
     static override[Symbol.typeInfo] = this.registerClass(nsDemoNorthwind);
     
     protected override getFormKey() { return RegionForm.formKey; }

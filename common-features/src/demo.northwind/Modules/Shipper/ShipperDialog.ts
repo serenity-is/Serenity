@@ -1,8 +1,8 @@
-import { EntityDialog } from "@serenity-is/corelib";
+import { EntityDialog, LazyLoadInclude } from "@serenity-is/corelib";
 import { ShipperForm, ShipperRow, ShipperService } from "../ServerTypes/Demo";
 import { nsDemoNorthwind } from "../ServerTypes/Namespaces";
 
-export class ShipperDialog<P = {}> extends EntityDialog<ShipperRow, P> {
+export class ShipperDialog<P = {}> extends EntityDialog<ShipperRow, P> implements LazyLoadInclude<"NorthwindDialogs"> {
     static override[Symbol.typeInfo] = this.registerClass(nsDemoNorthwind);
 
     protected override getFormKey() { return ShipperForm.formKey; }
