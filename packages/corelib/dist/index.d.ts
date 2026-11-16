@@ -13737,16 +13737,27 @@ export declare class AutoNumeric {
     static readonly allowedSettingKeys: Set<string>;
 }
 /**
+ * Where the caption of a checkbox is, when it is rendered in a form field.
+ */
+export declare enum CheckLabelPosition {
+    /** The default: the caption is at the start (left in LTR) in the caption area, and the checkbox is after it, where the other editors start. */
+    Start = 0,
+    /** The checkbox is first and the caption is after it, on the end side (right in LTR). It saves horizontal space, and lets several checkboxes share a row. */
+    End = 1,
+    /** Like `End`, but the caption area before the checkbox is left empty, so the checkbox starts where the other editors do. For a checkbox alone in its row. */
+    EndAligned = 2
+}
+/**
  * Options for the {@link BooleanEditor}.
  */
 export interface BooleanEditorOptions {
     /**
-     * When true, and the editor is rendered in a form field, the checkbox is
-     * placed first and the field caption is shown after it, on the end side (right in LTR) instead of the
-     * default caption-left layout. This saves horizontal space and lets
-     * several checkboxes share a row.
+     * Where the field caption is, when the editor is rendered in a form field. At the start in the caption area by default.
+     * With `End`, the checkbox is placed first and the caption is shown after it, on the end side (right in LTR), which
+     * saves horizontal space and lets several checkboxes share a row. `EndAligned` leaves the caption area empty, so the
+     * checkbox lines up with the other editors, for one that is alone in its row.
      */
-    labelOnEnd?: boolean;
+    labelPosition?: CheckLabelPosition;
 }
 /**
  * An editor that renders a checkbox for boolean values.

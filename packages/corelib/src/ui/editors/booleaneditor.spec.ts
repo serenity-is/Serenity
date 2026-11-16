@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { BooleanEditor } from "./booleaneditor";
+import { BooleanEditor, CheckLabelPosition } from "./booleaneditor";
 
 describe("BooleanEditor", () => {
     it("updates value when checkbox is checked", () => {
@@ -17,13 +17,31 @@ describe("BooleanEditor", () => {
         editor.destroy();
     })
 
-    it("adds label-on-end class only when labelOnEnd option is set", () => {
-        const normal = new BooleanEditor({});
-        expect(normal.domNode.classList.contains("label-on-end")).toBe(false);
-        normal.destroy();
-        const right = new BooleanEditor({ labelOnEnd: true });
-        expect(right.domNode.classList.contains("label-on-end")).toBe(true);
-        right.destroy();
+    it("has no label classes by default or at the start", () => {
+        for (const options of [{}, { labelPosition: CheckLabelPosition.Start }]) {
+            const editor = new BooleanEditor(options);
+            expect(editor.domNode.classList.contains("label-on-end")).toBe(false);
+            expect(editor.domNode.classList.contains("align-with-editors")).toBe(false);
+            editor.destroy();
+        }
+    })
+
+    it("adds the label-on-end class when the label is on the end, aligned or not", () => {
+        const end = new BooleanEditor({ labelPosition: CheckLabelPosition.End });
+        expect(end.domNode.classList.contains("label-on-end")).toBe(true);
+        expect(end.domNode.classList.contains("align-with-editors")).toBe(false);
+        end.destroy();
+
+        const aligned = new BooleanEditor({ labelPosition: CheckLabelPosition.EndAligned });
+        expect(aligned.domNode.classList.contains("label-on-end")).toBe(true);
+        expect(aligned.domNode.classList.contains("align-with-editors")).toBe(true);
+        aligned.destroy();
+    })
+
+    it("reads the position as an enum editor saves it, as a string", () => {
+        const editor = new BooleanEditor({ labelPosition: String(CheckLabelPosition.EndAligned) as any });
+        expect(editor.domNode.classList.contains("align-with-editors")).toBe(true);
+        editor.destroy();
     })
 
     it("get_value returns checked state", () => {

@@ -20,13 +20,12 @@ public partial class BooleanEditorAttribute : CustomEditorAttribute
     }
 
     /// <summary>
-    /// Gets or sets a value indicating whether the checkbox is placed first
-    /// and the field caption is shown after it, on the end side (right in LTR), instead of the default
-    /// caption-left layout. Useful for fitting several checkboxes in one row.
+    /// Gets or sets where the caption of the field is, at the start in the caption area by default, or after the checkbox,
+    /// which is useful for fitting several checkboxes in one row, see <see cref="CheckLabelPosition"/>.
     /// </summary>
-    public bool LabelOnEnd
+    public CheckLabelPosition LabelPosition
     {
-        get { return GetOption<bool>("labelOnEnd"); }
-        set { SetOption("labelOnEnd", value); }
+        get { return GetOption<CheckLabelPosition>("labelPosition"); }
+        set { SetOption("labelPosition", value); }
     }
 }

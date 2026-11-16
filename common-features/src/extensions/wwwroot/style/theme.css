@@ -1398,6 +1398,24 @@ input[type=checkbox].editor,
   margin-inline: var(--s-col-gap) 0;
 }
 
+/* labelPosition EndAligned: an empty caption area before the checkbox, so it lines up with the other editors */
+.field:has(> input[type=checkbox].editor.label-on-end.align-with-editors)::before {
+  content: "";
+  order: -2;
+  flex: 0 0 150px;
+  margin-inline-end: var(--s-col-gap);
+}
+
+.s-vertical-form .field:has(> input[type=checkbox].editor.label-on-end.align-with-editors)::before {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  .field:has(> input[type=checkbox].editor.label-on-end.align-with-editors)::before {
+    display: none;
+  }
+}
+
 .slick-cell .check-box,
 .slick-header-column .select-all-items,
 .slick-cell input[type=checkbox] {
