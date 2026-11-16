@@ -171,4 +171,47 @@ public class RowInterfaceAttributeTests
         Assert.NotNull(property.GetPropertyAttribute<OriginAttribute>());
         Assert.Null(typeof(ShopRow).GetProperty(nameof(ShopRow.Name))!.GetPropertyAttribute<OriginAttribute>());
     }
+
+    /// <summary>
+    /// A combination attribute that is a foreign key to the row it is used in, whose constructor reads the attributes of the
+    /// properties of that row, which have it.
+    /// </summary>
+    public class ParentNodeAttribute : ForeignKeyAttribute, Reflection.IIntrinsicPropertyAttributeProvider
+    {
+        public ParentNodeAttribute() : base(typeof(NodeRow))
+        {
+        }
+
+        [LeftJoin("jParent")]
+        public object PropertyAttributes { get; } = null!;
+    }
+
+    [TableName("Nodes")]
+    public class NodeRow : Row<NodeRow.RowFields>
+    {
+        public class RowFields : RowFieldsBase
+        {
+            public Int32Field NodeId = null!;
+            public Int32Field ParentId = null!;
+        }
+
+        [Identity]
+        public int? NodeId { get => fields.NodeId[this]; set => fields.NodeId[this] = value; }
+
+        [ParentNode]
+        public int? ParentId { get => fields.ParentId[this]; set => fields.ParentId[this] = value; }
+    }
+
+    [Fact]
+    public void Combination_Attribute_Referring_To_Its_Own_Row_Does_Not_Recurse()
+    {
+        Assert.NotNull(typeof(NodeRow).GetProperty(nameof(NodeRow.NodeId))!.GetPropertyAttribute<IdentityAttribute>());
+        Assert.NotNull(typeof(NodeRow).GetProperty(nameof(NodeRow.ParentId))!.GetPropertyAttribute<LeftJoinAttribute>());
+
+        var fields = new NodeRow.RowFields();
+        fields.Initialize(annotations: null, dialect: SqlServer2012Dialect.Instance, userEntityOptions: null);
+
+        var join = Assert.Contains("jParent", fields.Joins);
+        Assert.Contains("jParent.[NodeId]", join.OnCriteria!.ToString());
+    }
 }

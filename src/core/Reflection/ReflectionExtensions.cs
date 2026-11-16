@@ -82,14 +82,67 @@ public static class ReflectionExtensions
         where TAttribute : Attribute
     {
         var result = property.GetCustomAttributes(typeof(TAttribute), inherit).Cast<TAttribute>().ToList();
-        foreach (var provider in property.GetCustomAttributes(typeof(Reflection.IIntrinsicPropertyAttributeProvider), inherit))
+
+        // the attributes a combination attribute carries are on the PropertyAttributes property of its type, so it is found
+        // without being created, as its constructor could read the attributes of a row too, e.g. one deriving from ForeignKey
+        foreach (var providerType in GetIntrinsicProviderTypes(property, inherit))
         {
-            var attributesProperty = provider.GetType().GetProperty(nameof(Reflection.IIntrinsicPropertyAttributeProvider.PropertyAttributes),
+            var attributesProperty = providerType.GetProperty(nameof(Reflection.IIntrinsicPropertyAttributeProvider.PropertyAttributes),
                 BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
             if (attributesProperty is not null)
                 result.AddRange(attributesProperty.GetCustomAttributes(typeof(TAttribute), inherit: false).Cast<TAttribute>());
         }
 
         return result;
+    }
+
+    /// <summary>
+    /// Gets the types of the combination attributes of a property, from the data of its attributes, so none is created. With
+    /// inherit, the ones of the properties it overrides are included like GetCustomAttributes includes them: only the ones whose
+    /// usage is inherited, and of a type that allows multiple, or that a property overriding it doesn't have already.
+    /// </summary>
+    private static List<Type> GetIntrinsicProviderTypes(PropertyInfo property, bool inherit)
+    {
+        var result = new List<Type>();
+        var level = 0;
+        for (var current = property; current is not null; current = inherit ? GetOverriddenProperty(current) : null, level++)
+        {
+            foreach (var data in current.CustomAttributes)
+            {
+                var type = data.AttributeType;
+                if (!typeof(Reflection.IIntrinsicPropertyAttributeProvider).IsAssignableFrom(type))
+                    continue;
+
+                if (level > 0)
+                {
+                    var usage = type.GetCustomAttribute<AttributeUsageAttribute>(inherit: true);
+                    if (usage?.Inherited == false ||
+                        (usage?.AllowMultiple != true && result.Contains(type)))
+                        continue;
+                }
+
+                result.Add(type);
+            }
+        }
+
+        return result;
+    }
+
+    private static PropertyInfo? GetOverriddenProperty(PropertyInfo property)
+    {
+        var accessor = property.GetMethod ?? property.SetMethod;
+        // a property that doesn't override another is where its definition is declared
+        if (accessor is null || !accessor.IsVirtual || accessor.GetBaseDefinition().DeclaringType == accessor.DeclaringType)
+            return null;
+
+        for (var type = property.DeclaringType?.BaseType; type is not null; type = type.BaseType)
+        {
+            var baseProperty = type.GetProperty(property.Name, BindingFlags.Instance | BindingFlags.Public |
+                BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
+            if (baseProperty is not null)
+                return baseProperty;
+        }
+
+        return null;
     }
 }
