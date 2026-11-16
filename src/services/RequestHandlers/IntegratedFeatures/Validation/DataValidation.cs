@@ -6,6 +6,54 @@ namespace Serenity.Services;
 public static class DataValidation
 {
     /// <summary>
+    /// Validates an object, e.g. the options of a service that is not a row, see <see cref="ValidationRules.ValidateObject"/>.
+    /// </summary>
+    /// <param name="instance">The object.</param>
+    /// <param name="options">How it is validated, e.g. by the rules of a form.</param>
+    /// <param name="localizer">Text localizer of the message of a required value.</param>
+    /// <exception cref="ValidationError">A property of the object is not valid.</exception>
+    public static void ValidateObject(object instance, ObjectValidationOptions? options = null, ITextLocalizer? localizer = null)
+    {
+        if (ValidationRules.ValidateObject(instance, options) is { } failure)
+            throw ObjectValidationError(failure, localizer);
+    }
+
+    /// <summary>
+    /// Validates an object, like <see cref="ValidateObject"/>, awaiting the rules that can be checked asynchronously.
+    /// </summary>
+    /// <param name="instance">The object.</param>
+    /// <param name="options">How it is validated, e.g. by the rules of a form.</param>
+    /// <param name="localizer">Text localizer of the message of a required value.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <exception cref="ValidationError">A property of the object is not valid.</exception>
+    public static async Task ValidateObjectAsync(object instance, ObjectValidationOptions? options = null, ITextLocalizer? localizer = null,
+        CancellationToken cancellationToken = default)
+    {
+        if (await ValidationRules.ValidateObjectAsync(instance, options, cancellationToken).ConfigureAwait(false) is { } failure)
+            throw ObjectValidationError(failure, localizer);
+    }
+
+    /// <summary>
+    /// Gets the error of a property of an object that is not valid: a required error for a missing value, with the title of
+    /// the property, else the message of the rule it is not valid by.
+    /// </summary>
+    /// <param name="failure">The failure.</param>
+    /// <param name="localizer">Text localizer of the message of a required value.</param>
+    /// <param name="name">The name the error is for, by default the name of the property, e.g. the name of the field of a row.</param>
+    /// <param name="title">The title of the property, by default its name.</param>
+    public static ValidationError ObjectValidationError(ObjectValidationFailure failure, ITextLocalizer? localizer,
+        string? name = null, string? title = null)
+    {
+        if (failure is null)
+            throw new ArgumentNullException(nameof(failure));
+
+        if (failure.IsRequired)
+            return RequiredError(name ?? failure.PropertyName, localizer, title);
+
+        return new ValidationError("CustomValidationError", name ?? failure.PropertyName, failure.Message!);
+    }
+
+    /// <summary>
     /// Automatically trims a string field value based
     /// on its <see cref="FieldFlags.TrimToEmpty"/> and
     /// <see cref="FieldFlags.Trim"/> flags.

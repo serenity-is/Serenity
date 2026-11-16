@@ -1,7 +1,8 @@
-import { Authorization, Fluent, PropertyGridTexts, addClass, appendToNode, faIcon, getType, isBS3, isPromiseLike, nsSerenity, tryGetText, type PropertyCondition, type PropertyItem } from "../../base";
+import { Authorization, Fluent, PropertyGridTexts, Validator, addClass, appendToNode, faIcon, getType, isBS3, isPromiseLike, nsSerenity, tryGetText, type PropertyCondition, type PropertyItem } from "../../base";
 import { EditorType } from "../../types/editortype";
 import { EditorTypeRegistry } from "../../types/editortyperegistry";
 import { EditorUtils } from "../editors/editorutils";
+import { checkValidationRules, loadValidationRules } from "../helpers/validationrules";
 import { isPropertyConditionMet } from "./propertyconditions";
 import { ReflectionOptionsSetter } from "./reflectionoptionssetter";
 import { Widget } from "./widget";
@@ -458,6 +459,10 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
             PropertyCategories(commonProps);
         }
 
+        for (const fieldElement of this.fieldElements)
+            if (fieldElement.propertyItem?.validationRules?.length)
+                this.attachValidationRules(fieldElement);
+
         if (this.hasConditions()) {
             // the fields are updated as the values they depend on change, which the editors tell by their events
             const update = () => this.updateConditions();
@@ -472,6 +477,54 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
             this.value = this.options.value ?? {};
         }
         this.updateInterface();
+    }
+
+    /**
+     * Adds the validation rules of a field, see {@link PropertyItem.validationRules}, to the element of its editor as a
+     * custom rule of the validator, once its editor is loaded. The editor has to be one the validator validates, i.e. an
+     * input, a select or a text area, like for the required fields.
+     * @param fieldElement - The field.
+     */
+    protected attachValidationRules(fieldElement: PropertyFieldElement): void {
+        // the classes of the rules that are loaded on demand, so they are there by the time the form is submitted
+        loadValidationRules(fieldElement.propertyItem?.validationRules);
+
+        const attach = () => {
+            const editor = fieldElement.editorWidget;
+            if (editor?.domNode)
+                Validator.addCustomRule(editor.domNode, () => this.checkValidationRules(fieldElement), "PropertyGrid.validationRules");
+        };
+
+        if (!fieldElement.editorWidget && fieldElement.editorPromise)
+            fieldElement.editorPromise.then(attach);
+        else
+            attach();
+    }
+
+    /**
+     * Checks the value of a field by its validation rules, unless it is read only, as its value can't be changed then.
+     * Hidden fields are not validated by the validator.
+     * @param fieldElement - The field.
+     * @returns The message of the first rule its value is not valid by, or null.
+     */
+    protected checkValidationRules(fieldElement: PropertyFieldElement): string | null {
+        const editor = fieldElement.editorWidget;
+        const rules = fieldElement.propertyItem?.validationRules;
+        if (!editor || !rules?.length || isEditorReadOnly(editor))
+            return null;
+
+        let value: any;
+        try {
+            value = EditorUtils.getValue(editor);
+        }
+        catch {
+            return null;
+        }
+
+        return checkValidationRules(rules, value, {
+            element: editor.domNode,
+            getValue: name => this.getConditionValue(name)
+        });
     }
 
     /**
@@ -925,6 +978,15 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
         }
         this.updateConditionContainers();
     }
+}
+
+/** Gets whether an editor is read only, by its own state when it has one, else by its element. */
+function isEditorReadOnly(editor: Widget<any>): boolean {
+    if (typeof (editor as any).get_readOnly === "function")
+        return !!(editor as any).get_readOnly();
+
+    const el = editor.domNode as HTMLInputElement;
+    return !!el && (el.classList.contains("readonly") || el.hasAttribute("readonly") || !!el.disabled);
 }
 
 /** Gets whether a property item has conditions on the values of other fields. */

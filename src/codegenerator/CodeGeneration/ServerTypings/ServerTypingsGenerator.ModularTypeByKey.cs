@@ -5,6 +5,7 @@ public partial class ServerTypingsGenerator
     protected ILookup<string, ExternalType> modularEditorTypeByKey = null!;
     protected ILookup<string, ExternalType> modularFormatterTypeByKey = null!;
     protected ILookup<string, ExternalType> modularDialogTypeByKey = null!;
+    protected ILookup<string, ExternalType> modularValidationRuleTypeByKey = null!;
 
     protected void InitModularTypeByKey()
     {
@@ -99,6 +100,22 @@ public partial class ServerTypingsGenerator
                     }
                 }
             }
+
+            return (null!, type);
+        }).Where(x => x.key != null)
+            .ToLookup(x => x.key!, x => x.type);
+
+        // the rule classes, which register by this.registerRule(...), i.e. a RuleTypeInfo
+        modularValidationRuleTypeByKey = TSTypes.Values.Select(type =>
+        {
+            if (type.IsAbstract != true &&
+                type.IsInterface != true &&
+                type.IsEnum != true &&
+                !string.IsNullOrEmpty(type.Module) &&
+                extractTypeNameViaTypeInfo(type) is var (tiKey, tiType) &&
+                !string.IsNullOrEmpty(tiKey) &&
+                tiType == "RuleTypeInfo")
+                return (key: tiKey, type);
 
             return (null!, type);
         }).Where(x => x.key != null)

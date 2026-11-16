@@ -385,6 +385,14 @@ public class PropertyItem
     [JsonPropertyName("requiredWhen")]
     public List<PropertyCondition>? RequiredWhen { get; set; }
 
+    /// <summary>
+    /// Gets or sets the validation rules the forms check for the property, from its validation attributes, see
+    /// <see cref="ValidationRules.GetClientRule"/>, with the implied text keys of their own messages.
+    /// </summary>
+    [Newtonsoft.Json.JsonProperty("validationRules")]
+    [JsonPropertyName("validationRules")]
+    public List<ClientValidationRule>? ValidationRules { get; set; }
+
 
     /// <summary>
     /// Gets or sets the allow hide flag for columns.

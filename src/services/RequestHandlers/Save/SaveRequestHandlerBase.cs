@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
@@ -281,41 +282,146 @@ public abstract class SaveRequestHandlerBase<TRow, TSaveRequest, TSaveResponse>(
     }
 
     /// <summary>
-    /// Validates field values via <see cref="ICustomValidator"/> interface.
+    /// Gets the assigned fields that have validation rules, with their rules and the context to check them in.
     /// </summary>
-    /// <exception cref="ValidationError">One of the fields has an invalid value</exception>
-    protected virtual void ValidateFieldValues()
+    protected IEnumerable<(Field Field, List<ValidationAttribute> Rules, ValidationContext Context)> GetFieldValidations()
     {
-        var context = new RowValidationContext(Connection, Row, Localizer);
+        IServiceProvider? services = null;
 
         foreach (var field in Row.GetFields())
         {
             if (!Row.IsAssigned(field))
                 continue;
 
-            var validators = field.CustomAttributes.OfType<ICustomValidator>();
-            foreach (var validator in validators)
-            {
-                context.Value = field.AsObject(Row);
+            var rules = ValidationRules.GetRules(field.CustomAttributes).ToList();
+            if (rules.Count == 0)
+                continue;
 
-                var error = CustomValidate(context, field, validator);
-
-                if (error != null)
-                    throw new ValidationError("CustomValidationError", field.PublicName, error);
-            }
+            services ??= CreateValidationServices();
+            yield return (field, rules, CreateValidationContext(field, services));
         }
     }
 
     /// <summary>
-    /// Calls custom validator.
+    /// Creates the context the validation rules of a field are checked in, of the row, with the field as its member, and the
+    /// text key of the field, which the implied text keys of the messages of its rules start with.
     /// </summary>
-    /// <param name="context">Validation context</param>
-    /// <param name="field">Field</param>
-    /// <param name="validator">Custom validator</param>
-    /// <returns>The validation error message, or <c>null</c> if the value is valid.</returns>
-    protected virtual string? CustomValidate(RowValidationContext context, Field field, ICustomValidator validator)
+    /// <param name="field">The field.</param>
+    /// <param name="services">The services of the context, see <see cref="CreateValidationServices"/>.</param>
+    protected virtual ValidationContext CreateValidationContext(Field field, IServiceProvider services)
     {
-        return validator.Validate(context);
+        var context = new ValidationContext(Row, services, new Dictionary<object, object?>
+        {
+            [ValidationRuleMessage.PropertyTextKeyItem] = field.AutoTextKey
+        })
+        {
+            MemberName = field.PropertyName ?? field.Name
+        };
+
+        var title = field.GetTitle(Localizer);
+        if (!string.IsNullOrEmpty(title))
+            context.DisplayName = title;
+
+        return context;
+    }
+
+    /// <summary>
+    /// Whether a property of the row has a <see cref="RequiredWhenAttribute"/>, so it is validated by <see cref="ValidateRequiredWhen"/>.
+    /// </summary>
+    private static readonly bool rowHasRequiredWhen = typeof(TRow).GetProperties(BindingFlags.Public | BindingFlags.Instance)
+        .Any(x => x.IsDefined(typeof(RequiredWhenAttribute), inherit: true));
+
+    /// <summary>
+    /// Validates the fields of the row that are required by their <see cref="RequiredWhenAttribute"/>s, which, unlike a
+    /// <see cref="RequiredAttribute"/> of a row, are checked on the server too, as the conditions are not something the
+    /// database can tell. Like the required fields and the validation by a form, an update only checks the fields it has,
+    /// with the conditions reading the old values of the ones it doesn't, and a field the form hides or makes read only by
+    /// the attributes of the row is not checked.
+    /// </summary>
+    /// <exception cref="ValidationError">A field required by its conditions has no value.</exception>
+    protected virtual void ValidateRequiredWhen()
+    {
+        if (!rowHasRequiredWhen)
+            return;
+
+        var options = CreateFormValidationOptions(typeof(TRow));
+        // the rules of the fields are checked by ValidateFieldValues, and a required field of a row is a not null one
+        options.CheckRules = false;
+        options.CheckRequiredAttribute = false;
+
+        if (ValidationRules.ValidateObject(Row, options) is { } failure)
+            throw FormValidationError(failure);
+    }
+
+    /// <summary>
+    /// Gets the form the row is also validated by, see <see cref="FormValidationAttribute"/>: the one of the handler, else
+    /// the one of the row, or null for none. It can be overridden to choose one, e.g. by what is saved, when the entity has
+    /// more than one form.
+    /// </summary>
+    protected virtual Type? GetValidationForm()
+    {
+        return GetType().GetCustomAttribute<FormValidationAttribute>()?.FormType ??
+            typeof(TRow).GetCustomAttribute<FormValidationAttribute>()?.FormType;
+    }
+
+    /// <summary>
+    /// Creates the options the row is validated by a form with: the values of its fields by the names of the properties of
+    /// the form, of the request or else of the old row, for the conditions of the form, only checking the fields of the
+    /// request on an update, like the required fields are.
+    /// </summary>
+    /// <param name="formType">The type of the form.</param>
+    protected virtual ObjectValidationOptions CreateFormValidationOptions(Type formType)
+    {
+        Field? field(string name) => Row.FindFieldByPropertyName(name) ?? Row.FindField(name);
+
+        return new ObjectValidationOptions
+        {
+            RulesType = formType,
+            Services = CreateValidationServices(),
+            IsInsert = IsCreate,
+            IncludeProperty = name => field(name) is { } f && (IsCreate || Row.IsAssigned(f)),
+            GetValue = name => field(name) is { } f ? (Row.IsAssigned(f) || Old is null ? f.AsObject(Row) : f.AsObject(Old)) : null
+        };
+    }
+
+    /// <summary>
+    /// Creates the error of a form validation failure, for the field of the row.
+    /// </summary>
+    /// <param name="failure">The failure.</param>
+    protected virtual ValidationError FormValidationError(ObjectValidationFailure failure)
+    {
+        if (failure is null)
+            throw new ArgumentNullException(nameof(failure));
+
+        var field = Row.FindFieldByPropertyName(failure.PropertyName) ?? Row.FindField(failure.PropertyName);
+        return DataValidation.ObjectValidationError(failure, Localizer, field?.PublicName, field?.GetTitle(Localizer));
+    }
+
+    /// <summary>
+    /// Creates the error of a field whose value is not valid by one of its rules.
+    /// </summary>
+    /// <param name="field">The field.</param>
+    /// <param name="message">The message of the rule.</param>
+    protected static ValidationError FieldValidationError(Field field, string message)
+    {
+        return new ValidationError("CustomValidationError", field.PublicName, message);
+    }
+
+    /// <summary>
+    /// Creates the services of the context the validation rules are checked in: the connection in the transaction of the
+    /// handler, the localizer and the context of the request, the unit of work and the handler itself, then the services
+    /// of the request, when the request context gives them, see <see cref="IServiceProviderAccessor"/>.
+    /// </summary>
+    protected virtual IServiceProvider CreateValidationServices()
+    {
+        return new ValidationServiceProvider(new Dictionary<Type, object?>
+        {
+            [typeof(IDbConnection)] = unitOfWork?.Connection,
+            [typeof(IUnitOfWork)] = unitOfWork,
+            [typeof(ITextLocalizer)] = Localizer,
+            [typeof(IRequestContext)] = Context,
+            [typeof(ISaveRequestHandler)] = this
+        }, (Context as IServiceProviderAccessor)?.ServiceProvider);
     }
 
     /// <summary>

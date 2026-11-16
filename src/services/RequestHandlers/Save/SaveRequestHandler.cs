@@ -313,9 +313,63 @@ public class SaveRequestHandler<TRow, TSaveRequest, TSaveResponse> :
             ValidateIsActive();
 
         ValidateFieldValues();
+        ValidateRequiredWhen();
+
+        if (GetValidationForm() is { } formType)
+            ValidateForm(formType);
 
         foreach (var behavior in behaviors.Value)
             behavior.OnValidateRequest(this);
+    }
+
+    /// <summary>
+    /// Validates the row by a form, i.e. by what the form checks in the browser that the row doesn't, see
+    /// <see cref="FormValidationAttribute"/>. It is called for the form of <see cref="SaveRequestHandlerBase{TRow, TSaveRequest, TSaveResponse}.GetValidationForm"/>,
+    /// and can be called for others.
+    /// </summary>
+    /// <param name="formType">The type of the form.</param>
+    /// <exception cref="ValidationError">A field is not valid by the form.</exception>
+    protected virtual void ValidateForm(Type formType)
+    {
+        if (formType is null)
+            throw new ArgumentNullException(nameof(formType));
+
+        if (ValidationRules.ValidateObject(Row, CreateFormValidationOptions(formType)) is { } failure)
+            throw FormValidationError(failure);
+    }
+
+    /// <summary>
+    /// Validates the values of the assigned fields by the validation rules of their properties, i.e. their
+    /// <see cref="System.ComponentModel.DataAnnotations.ValidationAttribute"/>s, like <see cref="ValidateRangeAttribute"/>, and the ones their other attributes
+    /// imply, see <see cref="IImpliesValidation"/>. A rule that is only checked by the forms is skipped.
+    /// </summary>
+    /// <exception cref="ValidationError">One of the fields has an invalid value</exception>
+    protected virtual void ValidateFieldValues()
+    {
+        foreach (var (field, rules, context) in GetFieldValidations())
+        {
+            var value = field.AsObject(Row);
+            foreach (var rule in rules)
+            {
+                var error = ValidateFieldValue(field, rule, value, context);
+                if (error != null)
+                    throw FieldValidationError(field, error);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Checks the value of a field by a validation rule.
+    /// </summary>
+    /// <param name="field">The field.</param>
+    /// <param name="rule">The rule.</param>
+    /// <param name="value">The value of the field.</param>
+    /// <param name="context">The context, of the row, for the field.</param>
+    /// <returns>The validation error message, or <c>null</c> if the value is valid.</returns>
+    protected virtual string? ValidateFieldValue(Field field, System.ComponentModel.DataAnnotations.ValidationAttribute rule, object? value,
+        System.ComponentModel.DataAnnotations.ValidationContext context)
+    {
+        return ValidationRules.Validate(rule, value, context);
     }
 
     SaveResponse ISaveRequestProcessor.Process(IUnitOfWork uow, ISaveRequest request, SaveRequestType type)

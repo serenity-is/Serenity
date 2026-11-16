@@ -6,9 +6,9 @@ public class SaveRequestHandlerTests_Coverage
         new NullRequestContext(behaviors).WithPermissions(_ => true);
 
     [AttributeUsage(AttributeTargets.Property)]
-    private class FailValidatorAttribute : Attribute, ICustomValidator
+    private class FailValidatorAttribute : System.ComponentModel.DataAnnotations.ValidationAttribute
     {
-        public string Validate(IValidationContext context) => "invalid";
+        public override bool IsValid(object? value) => false;
     }
 
     [ReadPermission(SpecialPermissionKeys.Public)]

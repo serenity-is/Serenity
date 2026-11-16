@@ -72,6 +72,32 @@ public class RepositoryTests
         }
 
         [Fact]
+        public void Gives_The_Services_Of_The_Current_Request_From_The_Accessor_On_Each_Call()
+        {
+            var first = new ServiceCollection().BuildServiceProvider();
+            var second = new ServiceCollection().BuildServiceProvider();
+            var current = first;
+
+            var context = new DefaultRequestContext(new NullBehaviorProvider(), new NullTwoLevelCache(), NullTextLocalizer.Instance,
+                new NullPermissions(), new NullUserAccessor(), serviceProviderAccessor: new CurrentProviderAccessor(() => current));
+
+            Assert.Same(first, context.ServiceProvider);
+            current = second;
+            Assert.Same(second, context.ServiceProvider);
+        }
+
+        [Fact]
+        public void Gives_No_Services_Without_The_Accessor()
+        {
+            Assert.Null(CreateContext().ServiceProvider.GetService(typeof(ITextLocalizer)));
+        }
+
+        private class CurrentProviderAccessor(Func<IServiceProvider> current) : IServiceProviderAccessor
+        {
+            public IServiceProvider ServiceProvider => current();
+        }
+
+        [Fact]
         public void Exposes_Provided_Services()
         {
             var behaviors = new NullBehaviorProvider();

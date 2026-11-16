@@ -25,3 +25,4 @@ export * from "./tooltip";
 export * from "./uploader";
 export * from "./userdefinition";
 export * from "./validator";
+export * from "./validationrule";

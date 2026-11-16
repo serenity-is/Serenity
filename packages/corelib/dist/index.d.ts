@@ -3288,6 +3288,20 @@ export interface PropertyCondition {
     isNot?: boolean;
 }
 /**
+ * A validation rule of a field as the server sends it, from a validation attribute of its property, e.g. ValidateRange,
+ * which is checked by the rule of the same name registered with {@link registerValidationRule}.
+ */
+export interface ClientValidationRule {
+    /** The name of the rule, e.g. `range`. */
+    rule: string;
+    /** The parameters of the rule, e.g. `[1, 10]` for a range. */
+    params?: any;
+    /** The local text key of the message, used when it has a text. */
+    textKey?: string;
+    /** The message as it is, used when there is no text of the key. The default message of the rule is used without both. */
+    message?: string;
+}
+/**
  * Describes a single field / column / form property as returned by server-side metadata.
  * Drives form generation, grid columns, editors, formatters and filtering. Each
  * property corresponds to a row field or an unbound UI field.
@@ -3372,6 +3386,8 @@ export interface PropertyItem {
     readOnlyWhen?: PropertyCondition[];
     /** Conditions on other fields that make the field required in forms when they are all met. */
     requiredWhen?: PropertyCondition[];
+    /** Validation rules the forms check for the field, from its validation attributes on the server, e.g. a range. */
+    validationRules?: ClientValidationRule[];
     /** Whether the user is allowed to hide the column via the column picker. */
     allowHide?: boolean;
     /** Whether the column can receive focus / be navigated via keyboard. */
@@ -5257,6 +5273,68 @@ export declare class Validator {
 export declare const addValidationRule: typeof Validator.addCustomRule;
 /** Alias for {@link Validator.removeCustomRule}. */
 export declare const removeValidationRule: typeof Validator.removeCustomRule;
+/** What a validation rule is checked with, besides the value and its parameters. */
+export interface ValidationRuleContext {
+    /** The element being validated, e.g. the input of an editor. */
+    element?: HTMLElement;
+    /** Gets the value of another field of the form, e.g. for a rule comparing two fields. */
+    getValue?: (field: string) => any;
+}
+/**
+ * The base of a validation rule that the forms check, for the fields whose properties have a validation attribute on the
+ * server with the type key of the rule as its rule name, e.g. `Serenity.Pro.DataSources.DefinitionCodeValidationRule`. It is
+ * found by its key in the type registry, see ValidationRuleTypeRegistry, so implementing LazyLoadInclude lets it be loaded on
+ * demand by the forms that use it, wherever they are, instead of being imported by them.
+ * @example
+ * ```ts
+ * export class EvenValidationRule extends ValidationRule implements LazyLoadInclude {
+ *     static override [Symbol.typeInfo] = this.registerRule("MyApp.");
+ *     override textKey = "Validation.Even";
+ *     override defaultText = "Please enter an even number.";
+ *     check(value: any) { return Number(value) % 2 === 0; }
+ * }
+ * ```
+ */
+export declare abstract class ValidationRule {
+    /**
+     * The local text key of the message of the rule, which can have the parameters of the rule as `{0}`, `{1}`, used when
+     * the attribute gives no message of its own.
+     */
+    textKey: string;
+    /** The text of the message for when its key has no text, e.g. the English one. */
+    defaultText?: string;
+    /**
+     * Checks a value by the rule. It is not called for an empty value, i.e. null, an empty string or an empty list, as
+     * being required is a rule of its own.
+     * @param value - The value, e.g. a number for a decimal editor, or a text.
+     * @param params - The parameters of the rule, as the server sends them.
+     * @param context - The element and the other fields.
+     * @returns Whether the value is valid.
+     */
+    abstract check(value: any, params: any, context: ValidationRuleContext): boolean;
+    /**
+     * Gets the local text key of the message, by default {@link textKey}, which a rule can choose by its parameters, e.g.
+     * a length rule by whether it has a minimum.
+     * @param params - The parameters of the rule.
+     */
+    getTextKey(params: any): string;
+    /**
+     * Gets the text of the message for when its key has no text, by default {@link defaultText}.
+     * @param params - The parameters of the rule.
+     */
+    getDefaultText(params: any): string | undefined;
+    /**
+     * Gets what the message has as `{0}`, `{1}` and so on, by default the parameters of the rule.
+     * @param params - The parameters of the rule.
+     */
+    getMessageArgs(params: any): any[];
+    /**
+     * Registers a rule class by its type key, e.g. `this.registerRule("MyApp.")` for `MyApp.EvenValidationRule`.
+     * @param typeName - The full name of the type, or its namespace ending with a dot.
+     */
+    protected static registerRule<TypeName>(typeName: StringLiteral<TypeName>): ClassTypeInfo<TypeName>;
+    static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
+}
 /**
  * Tests whether any element in the array satisfies the predicate.
  * @param array - Array to test.
@@ -8411,6 +8489,16 @@ declare class FormatterTypeRegistryImpl extends BaseTypeRegistry<FormatterType> 
 }
 /** Singleton registry for formatter types (keyed by full name and short name without `Formatter` suffix). */
 export declare const FormatterTypeRegistry: FormatterTypeRegistryImpl;
+declare class ValidationRuleTypeRegistryImpl extends BaseTypeRegistry<typeof ValidationRule> {
+    constructor();
+    protected isMatchingType(type: any): boolean;
+    protected loadError(key: string): void;
+}
+/**
+ * The registry of the validation rule classes, see {@link ValidationRule}, which finds them by their type keys, loading the
+ * ones implementing LazyLoadInclude on demand.
+ */
+export declare const ValidationRuleTypeRegistry: ValidationRuleTypeRegistryImpl;
 /**
  * Reflection-based helper that applies option objects to widgets using members
  * decorated with {@link OptionAttribute}. Handles PascalCase → camelCase mapping
@@ -12469,6 +12557,20 @@ export declare class PropertyGrid<P extends PropertyGridOptions = PropertyGridOp
      * @returns The rendered contents.
      */
     protected renderContents(): any;
+    /**
+     * Adds the validation rules of a field, see {@link PropertyItem.validationRules}, to the element of its editor as a
+     * custom rule of the validator, once its editor is loaded. The editor has to be one the validator validates, i.e. an
+     * input, a select or a text area, like for the required fields.
+     * @param fieldElement - The field.
+     */
+    protected attachValidationRules(fieldElement: PropertyFieldElement): void;
+    /**
+     * Checks the value of a field by its validation rules, unless it is read only, as its value can't be changed then.
+     * Hidden fields are not validated by the validator.
+     * @param fieldElement - The field.
+     * @returns The message of the first rule its value is not valid by, or null.
+     */
+    protected checkValidationRules(fieldElement: PropertyFieldElement): string | null;
     /**
      * Gets whether any field has conditions on the values of the others.
      */
@@ -17504,6 +17606,110 @@ export declare namespace TabsExtensions {
      */
     function destroy(tabs: HTMLElement | ArrayLike<HTMLElement>): void;
 }
+/** Requires a value between a minimum and a maximum, both included: numbers, or texts like dates in the ISO format. */
+export declare class RangeValidationRule extends ValidationRule {
+    static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
+    textKey: string;
+    defaultText: string;
+    check(value: any, params: any[]): boolean;
+}
+/** Requires the length of a text, or of a list, to be between a minimum and a maximum, the parameters being `[min, max]`. */
+export declare class LengthValidationRule extends ValidationRule {
+    static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
+    textKey: string;
+    defaultText: string;
+    check(value: any, params: [number, number | null]): boolean;
+    getTextKey(params: [number, number | null]): string;
+    getDefaultText(params: [number, number | null]): string;
+    getMessageArgs(params: [number, number | null]): any[];
+}
+/** Requires a text to match a regular expression as a whole, as the server checks it. */
+export declare class PatternValidationRule extends ValidationRule {
+    static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
+    textKey: string;
+    defaultText: string;
+    check(value: any, params: string): boolean;
+    getMessageArgs(): any[];
+}
+/** Requires an email address, as the email class of the validator does. */
+export declare class EmailValidationRule extends ValidationRule {
+    static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
+    textKey: string;
+    defaultText: string;
+    check(value: any, _: any, context: ValidationRuleContext): boolean;
+}
+/** Requires an address, as the url class of the validator does. */
+export declare class UrlValidationRule extends ValidationRule {
+    static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
+    textKey: string;
+    defaultText: string;
+    check(value: any, _: any, context: ValidationRuleContext): boolean;
+}
+/** Requires the same value as another field, the name of which is the parameter, an empty one being the same as another. */
+export declare class CompareValidationRule extends ValidationRule {
+    static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
+    textKey: string;
+    defaultText: string;
+    check(value: any, params: string, context: ValidationRuleContext): boolean;
+    getMessageArgs(): any[];
+}
+/**
+ * Checks a value by a validation rule registered with {@link registerValidationRule}. It is not called for an empty value,
+ * i.e. null, an empty string or an empty list, as being required is a rule of its own.
+ * @param value - The value, e.g. a number for a decimal editor, or a text.
+ * @param params - The parameters of the rule, as the server sends them.
+ * @param context - The element and the other fields.
+ * @returns Whether the value is valid.
+ */
+export type ValidationRuleCheck = (value: any, params: any, context: ValidationRuleContext) => boolean;
+/** The options of a validation rule registered with {@link registerValidationRule}. */
+export interface ValidationRuleOptions {
+    /**
+     * The local text key of the message of the rule, e.g. `Validation.Even`, which can have the parameters of the rule as
+     * `{0}`, `{1}`, used when the attribute gives no message of its own. It is `Validation.Invalid` when it is not set.
+     */
+    textKey?: string;
+    /** The text of the message for when its key has no text, e.g. the English one. */
+    defaultText?: string;
+}
+/**
+ * Registers a validation rule by a function, for the fields whose properties have a validation attribute of the same rule
+ * name on the server. A rule class deriving from {@link ValidationRule} is usually better, as it is found by its type key,
+ * and can be loaded on demand by the forms that use it, while a rule registered by a function has to be registered by the
+ * page before a form uses it, e.g. at the start of the application.
+ * @param name - The name of the rule, as the attribute gives it.
+ * @param check - Checks a value by the rule.
+ * @param options - The message of the rule.
+ */
+export declare function registerValidationRule(name: string, check: ValidationRuleCheck, options?: ValidationRuleOptions): void;
+/**
+ * Gets whether a validation rule can be checked now, i.e. it is registered by a function, or its class is loaded.
+ * @param name - The name of the rule, or the type key of its class.
+ */
+export declare function isValidationRuleRegistered(name: string): boolean;
+/**
+ * Loads the classes of the validation rules that are not loaded yet, which implement LazyLoadInclude, so they can be checked
+ * by the time the form is submitted. A form calls it once it is created.
+ * @param validationRules - The rules, as the server sends them.
+ * @returns A promise that resolves when they are loaded, or nothing when they are all loaded already.
+ */
+export declare function loadValidationRules(validationRules: ClientValidationRule[] | null | undefined): Promise<void> | void;
+/**
+ * Gets the message of a validation rule whose check failed: the text of its key, else its message, else the default message
+ * of the rule, with the parameters of the rule.
+ * @param rule - The rule, as the server sends it.
+ */
+export declare function getValidationRuleMessage(rule: ClientValidationRule): string;
+/**
+ * Checks a value by validation rules, in their order, stopping at the first one it is not valid by. An empty value is
+ * valid. A rule that is neither registered by a function nor a loaded class is skipped, as the server still checks it,
+ * with a warning unless its class is still being loaded, see {@link loadValidationRules}.
+ * @param validationRules - The rules, as the server sends them.
+ * @param value - The value.
+ * @param context - The element and the other fields.
+ * @returns The message of the first rule the value is not valid by, or null.
+ */
+export declare function checkValidationRules(validationRules: ClientValidationRule[] | null | undefined, value: any, context?: ValidationRuleContext): string | null;
 /**
  * Base class for panel-style widgets that manage a form, tabs and a toolbar.
  * It wires up validation, tab initialization and toolbar buttons from the

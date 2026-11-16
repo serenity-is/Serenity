@@ -60,6 +60,13 @@ public static class EntityLocalTexts
                     addAttributeText(placeholderAttr, placeholderAttr.Value,
                         field.AutoTextKey + "_Placeholder");
 
+                // the messages of the rules of Serenity, with their implied keys, e.g. Db.Northwind.Customer.Quantity_ValidateRange
+                foreach (var ruleAttr in field.CustomAttributes.OfType<System.ComponentModel.DataAnnotations.ValidationAttribute>())
+                {
+                    if (ValidationRules.HasLocalizableMessage(ruleAttr) && ValidationRules.GetTextKeySuffix(ruleAttr) is { } ruleSuffix)
+                        addAttributeText(ruleAttr, ruleAttr.ErrorMessage, field.AutoTextKey + ruleSuffix);
+                }
+
                 var displayAttr = field.GetAttribute<DisplayNameAttribute>();
                 if (field.Caption is not ILocalText lt)
                 {

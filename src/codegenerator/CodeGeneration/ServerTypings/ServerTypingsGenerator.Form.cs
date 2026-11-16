@@ -203,6 +203,59 @@ public partial class ServerTypingsGenerator
         return attr;
     }
 
+    /// <summary>
+    /// Imports the client side rule classes of the custom validation rules of a property, i.e. the attributes deriving from
+    /// ValidationRuleAttribute, on the form, on the field of the row, or on an annotation of it, so the forms that have them
+    /// load them with themselves, instead of on demand. The type key of a rule class is the Key constant of its attribute,
+    /// else the one it gives the constructor of its base, else the one of the convention of ValidationRuleAttribute.
+    /// </summary>
+    private void ReferenceValidationRuleTypes(PropertyDefinition item, PropertyDefinition? basedOnField,
+        IEnumerable<AnnotationTypeInfo>? rowAnnotations, HashSet<(string group, string key)> referencedTypeKeys,
+        List<(string group, string alias)> referencedTypeAliases)
+    {
+        var attributes = item.GetAttributesWithIntrinsic().AsEnumerable();
+        if (rowAnnotations != null)
+            foreach (var annotationType in rowAnnotations)
+                if (annotationType.PropertyByName.TryGetValue(item.Name, out PropertyDefinition? annotation))
+                    attributes = attributes.Concat(annotation!.GetAttributesWithIntrinsic());
+        if (basedOnField != null)
+            attributes = attributes.Concat(basedOnField.GetAttributesWithIntrinsic());
+
+        foreach (var attr in attributes)
+        {
+            if (attr.AttributeType() is not { } attributeType ||
+                !TypingsUtils.IsSubclassOf(attributeType, "Serenity.ComponentModel", "ValidationRuleAttribute"))
+                continue;
+
+            var ruleKey = TypingsUtils.GetAttributeKeyViaKeyConstant(attributeType) ??
+                GetAttributeKeyViaBaseCtorCall(attributeType) ??
+                GetConventionalValidationRuleKey(attributeType);
+
+            if (string.IsNullOrEmpty(ruleKey) || !referencedTypeKeys.Add(("ValidationRule", ruleKey!)))
+                continue;
+
+            var ruleType = FindTypeInLookup(modularValidationRuleTypeByKey, ruleKey!, "ValidationRule", containingAssembly: null);
+            if (ruleType != null)
+                referencedTypeAliases.Add(("ValidationRule", ReferenceScriptType(ruleType)));
+        }
+    }
+
+    /// <summary>
+    /// Gets the type key of the rule class of a rule attribute by the convention of ValidationRuleAttribute.GetConventionalRule:
+    /// its full name without the Validate prefix of its name and its Attribute suffix, with a ValidationRule suffix.
+    /// </summary>
+    private static string GetConventionalValidationRuleKey(TypeReference attributeType)
+    {
+        var name = attributeType.Name ?? "";
+        if (name.EndsWith("Attribute", StringComparison.Ordinal))
+            name = name[..^"Attribute".Length];
+        if (name.StartsWith("Validate", StringComparison.Ordinal) && name.Length > "Validate".Length)
+            name = name["Validate".Length..];
+
+        var ns = attributeType.NamespaceOf();
+        return (string.IsNullOrEmpty(ns) ? "" : ns + ".") + name + "ValidationRule";
+    }
+
     private void TryReferenceEnumType(TypeReference? itemType, TypeReference? basedOnFieldType,
         HashSet<(string group, string key)> referencedTypeKeys,
         List<(string group, string alias)> referencedTypeAliases)
@@ -284,6 +337,7 @@ public partial class ServerTypingsGenerator
                 }
 
                 TryReferenceEnumType(item.PropertyType(), basedOnField?.PropertyType(), referencedTypeKeys, referencedTypeAliases);
+                ReferenceValidationRuleTypes(item, basedOnField, rowAnnotations, referencedTypeKeys, referencedTypeAliases);
 
                 if (editorScriptType is null)
                 {

@@ -123,6 +123,8 @@ export * from "./ui/helpers/slicktreehelper";
 export * from "./ui/helpers/subdialoghelper";
 export * from "./ui/helpers/tabsextensions";
 export * from "./ui/helpers/uploadhelper";
+export * from "./ui/helpers/builtinvalidationrules";
+export * from "./ui/helpers/validationrules";
 export * from "./ui/widgets/basepanel";
 export * from "./ui/widgets/prefixedcontext";
 export * from "./ui/widgets/propertygrid";

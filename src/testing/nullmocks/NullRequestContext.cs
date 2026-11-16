@@ -4,11 +4,15 @@ public class NullRequestContext(IBehaviorProvider behaviors = null,
     ITwoLevelCache cache = null,
     ITextLocalizer localizer = null,
     IPermissionService permissions = null,
-    IUserAccessor userAccessor = null) : IRequestContext
+    IUserAccessor userAccessor = null) : IRequestContext, IServiceProviderAccessor
 {
     public IBehaviorProvider Behaviors { get; set; } = behaviors ?? new NullBehaviorProvider();
     public ITwoLevelCache Cache { get; set; } = cache ?? new NullTwoLevelCache();
     public ITextLocalizer Localizer { get; set; } = localizer ?? NullTextLocalizer.Instance;
+    /// <summary>
+    /// Gets or sets the services of the request, e.g. for the validation rules a save handler checks, by default none.
+    /// </summary>
+    public IServiceProvider ServiceProvider { get; set; } = new ServiceCollection().BuildServiceProvider();
     public IPermissionService Permissions { get; set; } = permissions ?? new NullPermissions();
     public IUserAccessor UserAccessor { get; set; } = userAccessor ?? new NullUserAccessor();
     public ClaimsPrincipal User => UserAccessor?.User;

@@ -50,6 +50,21 @@ export interface PropertyCondition {
 }
 
 /**
+ * A validation rule of a field as the server sends it, from a validation attribute of its property, e.g. ValidateRange,
+ * which is checked by the rule of the same name registered with {@link registerValidationRule}.
+ */
+export interface ClientValidationRule {
+    /** The name of the rule, e.g. `range`. */
+    rule: string;
+    /** The parameters of the rule, e.g. `[1, 10]` for a range. */
+    params?: any;
+    /** The local text key of the message, used when it has a text. */
+    textKey?: string;
+    /** The message as it is, used when there is no text of the key. The default message of the rule is used without both. */
+    message?: string;
+}
+
+/**
  * Describes a single field / column / form property as returned by server-side metadata.
  * Drives form generation, grid columns, editors, formatters and filtering. Each
  * property corresponds to a row field or an unbound UI field.
@@ -127,6 +142,8 @@ export interface PropertyItem {
     readOnlyWhen?: PropertyCondition[];
     /** Conditions on other fields that make the field required in forms when they are all met. */
     requiredWhen?: PropertyCondition[];
+    /** Validation rules the forms check for the field, from its validation attributes on the server, e.g. a range. */
+    validationRules?: ClientValidationRule[];
     /** Whether the user is allowed to hide the column via the column picker. */
     allowHide?: boolean;
     /** Whether the column can receive focus / be navigated via keyboard. */

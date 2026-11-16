@@ -79,6 +79,13 @@ public static class PropertyItemsLocalTextRegistration
                 if (member.GetCustomAttribute<PlaceholderAttribute>() is PlaceholderAttribute placeholderAttr)
                     addAttributeText(placeholderAttr, placeholderAttr.Value, member.Name + "_Placeholder");
 
+                // the messages of the rules of Serenity, with their implied keys, e.g. Quantity_ValidateRange
+                foreach (var ruleAttr in member.GetCustomAttributes<System.ComponentModel.DataAnnotations.ValidationAttribute>())
+                {
+                    if (ValidationRules.HasLocalizableMessage(ruleAttr) && ValidationRules.GetTextKeySuffix(ruleAttr) is { } ruleSuffix)
+                        addAttributeText(ruleAttr, ruleAttr.ErrorMessage, member.Name + ruleSuffix);
+                }
+
                 foreach (var addonAttr in member.GetCustomAttributes<EditorAddonAttribute>())
                 {
                     addonParams.Clear();

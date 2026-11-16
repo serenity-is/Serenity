@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace Serenity.ComponentModel;
 
 public class EmailEditorAttributeTests
@@ -32,25 +34,21 @@ public class EmailEditorAttributeTests
     }
 
     [Fact]
-    public void Validate_Returns_Null_For_Null_Value()
+    public void Implies_The_Email_Rule()
     {
-        var attribute = new EmailEditorAttribute();
-        Assert.Null(attribute.Validate(new MockValidationContext(null)));
+        var rule = Assert.Single(new EmailEditorAttribute().GetImpliedValidation());
+        Assert.IsType<ValidateEmailAttribute>(rule);
+        Assert.Same(ValidateEmailAttribute.Pattern, EmailEditorAttribute.EmailPattern);
     }
 
-    [Fact]
-    public void Validate_Returns_Null_For_Valid_Email()
+    [Theory]
+    [InlineData(null, true)]
+    [InlineData("user@example.com", true)]
+    [InlineData("invalid", false)]
+    public void Implied_Rule_Validates_The_Value(string? value, bool valid)
     {
-        var attribute = new EmailEditorAttribute();
-        Assert.Null(attribute.Validate(new MockValidationContext("user@example.com")));
-    }
-
-    [Fact]
-    public void Validate_Returns_Error_For_Invalid_Email()
-    {
-        var attribute = new EmailEditorAttribute();
-        var result = attribute.Validate(new MockValidationContext("invalid"));
-
-        Assert.NotNull(result);
+        var rule = Assert.Single(ValidationRules.GetRules([new EmailEditorAttribute()]));
+        var context = new ValidationContext(new object()) { MemberName = "Email" };
+        Assert.Equal(valid, ValidationRules.Validate(rule, value, context) is null);
     }
 }

@@ -23,10 +23,13 @@ namespace Serenity.Services;
 /// <param name="permissions">Permissions</param>
 /// <param name="userAccessor">User access</param>
 /// <param name="handlerSettings">Request handler settings</param>
-/// <exception cref="ArgumentNullException">Any of the arguments is <c>null</c>.</exception>
+/// <param name="serviceProviderAccessor">Gives the services of the current request, which the context gives as its
+/// <see cref="ServiceProvider"/>, e.g. for the validation rules a save handler checks.</param>
+/// <exception cref="ArgumentNullException">Any of the required arguments is <c>null</c>.</exception>
 public class DefaultRequestContext(IBehaviorProvider behaviors, ITwoLevelCache cache, ITextLocalizer localizer,
     IPermissionService permissions, IUserAccessor userAccessor,
-    IOptions<RequestHandlerSettings>? handlerSettings = null) : IRequestContext, IHasHandlerSettings
+    IOptions<RequestHandlerSettings>? handlerSettings = null,
+    IServiceProviderAccessor? serviceProviderAccessor = null) : IRequestContext, IHasHandlerSettings, IServiceProviderAccessor
 {
     private readonly IUserAccessor userAccessor = userAccessor ?? throw new ArgumentNullException(nameof(userAccessor));
 
@@ -42,5 +45,10 @@ public class DefaultRequestContext(IBehaviorProvider behaviors, ITwoLevelCache c
     public IPermissionService Permissions { get; private set; } = permissions ?? throw new ArgumentNullException(nameof(permissions));
     /// <inheritdoc/>
     public ClaimsPrincipal? User => userAccessor.User;
+    /// <summary>
+    /// Gets the services of the current request, which are looked up on each call, as the context is a singleton, or none
+    /// when it is not given the <see cref="IServiceProviderAccessor"/>.
+    /// </summary>
+    public IServiceProvider ServiceProvider => serviceProviderAccessor?.ServiceProvider ?? EmptyServiceProvider.Instance;
 }
 

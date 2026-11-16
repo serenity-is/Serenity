@@ -55,6 +55,7 @@ public partial class BasicPropertyProcessor(IOptions<PropertyProcessorOptions>? 
         SetUnbound(source, item);
         SetUpdatable(source, item);
         SetUpdatePermission(source, item);
+        SetValidationRules(source, item);
         SetVisible(source, item);
         SetWidth(source, item);
     }

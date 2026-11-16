@@ -1,10 +1,12 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace Serenity.ComponentModel;
 
 /// <summary>
 /// Email editor type with two inputs. Prefer <see cref="EmailAddressEditorAttribute"/>
 /// which uses a single input.
 /// </summary>
-public partial class EmailEditorAttribute : CustomEditorAttribute, ICustomValidator
+public partial class EmailEditorAttribute : CustomEditorAttribute, IImpliesValidation
 {
     /// <summary>
     /// The editor type key.
@@ -38,29 +40,16 @@ public partial class EmailEditorAttribute : CustomEditorAttribute, ICustomValida
     }
 
     /// <summary>
-    /// The default email validation pattern.
+    /// The default email validation pattern, which is the one of <see cref="ValidateEmailAttribute"/>.
     /// </summary>
-    public static readonly Regex EmailPattern =
-        EmailPatternRegexGen();
+    public static readonly Regex EmailPattern = ValidateEmailAttribute.Pattern;
 
     /// <summary>
-    /// Validates the email address.
+    /// Gets the rule an email editor implies, so the value is checked as an email address on the server, and by the
+    /// forms, see <see cref="ValidateEmailAttribute"/>.
     /// </summary>
-    /// <param name="context">The validation context.</param>
-    /// <returns>The validation error text, or <c>null</c> if the value is valid.</returns>
-    public string? Validate(IValidationContext context)
+    public IEnumerable<ValidationAttribute> GetImpliedValidation()
     {
-        if (context.Value == null)
-            return null;
-
-        var value = context.Value.ToString()!;
-
-        if (!EmailPattern.IsMatch(value))
-            return Web.FormValidationTexts.Email.ToString(context.Localizer);
-
-        return null;
+        yield return new ValidateEmailAttribute();
     }
-
-    [GeneratedRegex(@"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$", RegexOptions.Compiled | RegexOptions.ECMAScript)]
-    private static partial Regex EmailPatternRegexGen();
 }
