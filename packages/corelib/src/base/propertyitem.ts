@@ -33,6 +33,23 @@ registerEnum(SummaryType, 'Serenity.SummaryType');
 export type EditorAddon = (props: { propertyItem?: PropertyItem, editorElement: HTMLElement, documentFragment?: DocumentFragment }) => void;
 
 /**
+ * A condition on the value of another field of a form, which a field is shown, made read only or required by,
+ * see {@link PropertyItem.visibleWhen}, {@link PropertyItem.readOnlyWhen} and {@link PropertyItem.requiredWhen}.
+ */
+export interface PropertyCondition {
+    /** The name of the field whose value is checked. */
+    field: string;
+    /**
+     * The values that meet the condition, any of which the field can have, compared as text, e.g. `2` and `"2"`, and
+     * a list value matches when any of its items does. Without values, the condition is met when the field has a value,
+     * i.e. one that is not null, an empty string, an empty list or false.
+     */
+    values?: any[];
+    /** Whether the condition is the opposite, e.g. met when the field has none of the values, or has no value. */
+    isNot?: boolean;
+}
+
+/**
  * Describes a single field / column / form property as returned by server-side metadata.
  * Drives form generation, grid columns, editors, formatters and filtering. Each
  * property corresponds to a row field or an unbound UI field.
@@ -102,6 +119,14 @@ export interface PropertyItem {
     localizable?: boolean;
     /** Whether the column / field is visible by default. Hidden columns can still be shown via column picker. */
     visible?: boolean;
+    /** Conditions on other fields that must all be met for the field to be visible in forms. They only hide, never show a field hidden otherwise. */
+    visibleWhen?: PropertyCondition[];
+    /** Whether the value of the field is saved as empty while a condition hides it in forms, instead of being kept. */
+    clearWhenHidden?: boolean;
+    /** Conditions on other fields that make the field read only in forms when they are all met. */
+    readOnlyWhen?: PropertyCondition[];
+    /** Conditions on other fields that make the field required in forms when they are all met. */
+    requiredWhen?: PropertyCondition[];
     /** Whether the user is allowed to hide the column via the column picker. */
     allowHide?: boolean;
     /** Whether the column can receive focus / be navigated via keyboard. */

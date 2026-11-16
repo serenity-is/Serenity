@@ -126,6 +126,7 @@ export * from "./ui/helpers/uploadhelper";
 export * from "./ui/widgets/basepanel";
 export * from "./ui/widgets/prefixedcontext";
 export * from "./ui/widgets/propertygrid";
+export * from "./ui/widgets/propertyconditions";
 export * from "./ui/widgets/propertypanel";
 export * from "./ui/widgets/reflectionoptionssetter";
 export * from "./ui/widgets/toolbar";

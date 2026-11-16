@@ -353,6 +353,38 @@ public class PropertyItem
     [JsonPropertyName("visible")]
     public bool? Visible { get; set; }
 
+    /// <summary>
+    /// Gets or sets the conditions on other fields that must all be met for the property to be visible in forms,
+    /// see <see cref="VisibleWhenAttribute"/>.
+    /// </summary>
+    [Newtonsoft.Json.JsonProperty("visibleWhen")]
+    [JsonPropertyName("visibleWhen")]
+    public List<PropertyCondition>? VisibleWhen { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether the value of the property is saved as empty while a condition hides it in forms, instead
+    /// of being kept, see <see cref="VisibleWhenAttribute.ClearWhenHidden"/>.
+    /// </summary>
+    [Newtonsoft.Json.JsonProperty("clearWhenHidden")]
+    [JsonPropertyName("clearWhenHidden")]
+    public bool? ClearWhenHidden { get; set; }
+
+    /// <summary>
+    /// Gets or sets the conditions on other fields that make the property read only in forms when they are all met,
+    /// see <see cref="ReadOnlyWhenAttribute"/>.
+    /// </summary>
+    [Newtonsoft.Json.JsonProperty("readOnlyWhen")]
+    [JsonPropertyName("readOnlyWhen")]
+    public List<PropertyCondition>? ReadOnlyWhen { get; set; }
+
+    /// <summary>
+    /// Gets or sets the conditions on other fields that make the property required in forms when they are all met,
+    /// see <see cref="RequiredWhenAttribute"/>.
+    /// </summary>
+    [Newtonsoft.Json.JsonProperty("requiredWhen")]
+    [JsonPropertyName("requiredWhen")]
+    public List<PropertyCondition>? RequiredWhen { get; set; }
+
 
     /// <summary>
     /// Gets or sets the allow hide flag for columns.

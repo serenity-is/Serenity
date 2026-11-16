@@ -1,7 +1,8 @@
-import { Authorization, Fluent, PropertyGridTexts, addClass, appendToNode, faIcon, getType, isBS3, isPromiseLike, nsSerenity, tryGetText, type PropertyItem } from "../../base";
+import { Authorization, Fluent, PropertyGridTexts, addClass, appendToNode, faIcon, getType, isBS3, isPromiseLike, nsSerenity, tryGetText, type PropertyCondition, type PropertyItem } from "../../base";
 import { EditorType } from "../../types/editortype";
 import { EditorTypeRegistry } from "../../types/editortyperegistry";
 import { EditorUtils } from "../editors/editorutils";
+import { isPropertyConditionMet } from "./propertyconditions";
 import { ReflectionOptionsSetter } from "./reflectionoptionssetter";
 import { Widget } from "./widget";
 
@@ -16,6 +17,20 @@ export type PropertyFieldElement = HTMLElement & {
     editorPromise?: PromiseLike<void>;
     /** The property item this field was rendered from. */
     propertyItem?: PropertyItem;
+}
+
+/**
+ * What the conditions of a field, see {@link PropertyItem.visibleWhen}, {@link PropertyItem.readOnlyWhen} and
+ * {@link PropertyItem.requiredWhen}, make of it for the current values of the other fields. They only add to what the
+ * property item and the mode make of it, e.g. a field hidden by a permission stays hidden.
+ */
+export interface PropertyFieldConditionState {
+    /** Whether the field is hidden by a condition of its own, or by one on a field that is hidden by a condition. */
+    hidden?: boolean;
+    /** Whether the field is read only by its conditions. */
+    readOnly?: boolean;
+    /** Whether the field is required by its conditions, which a hidden or read only field is not. */
+    required?: boolean;
 }
 
 /**
@@ -411,6 +426,9 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
     static override[Symbol.typeInfo] = this.registerClass(nsSerenity);
 
     declare private fieldElements: PropertyFieldElement[];
+    /** What the conditions made of the fields that have some, when they were last applied. */
+    declare private conditionStates: Map<PropertyFieldElement, PropertyFieldConditionState>;
+    declare private updatingConditions: boolean;
 
     /**
      * Renders the property grid contents, building categories/tabs and loading
@@ -440,6 +458,16 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
             PropertyCategories(commonProps);
         }
 
+        if (this.hasConditions()) {
+            // the fields are updated as the values they depend on change, which the editors tell by their events
+            const update = () => this.updateConditions();
+            Fluent.on(this.domNode, "change." + this.uniqueName, update);
+            Fluent.on(this.domNode, "input." + this.uniqueName, update);
+            // and once the editors that are still loading have their values
+            const pending = this.fieldElements.filter(x => x.editorPromise).map(x => x.editorPromise);
+            pending.length && Promise.all(pending).then(update);
+        }
+
         if (this.options.value !== false) {
             this.value = this.options.value ?? {};
         }
@@ -447,9 +475,155 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
     }
 
     /**
+     * Gets whether any field has conditions on the values of the others.
+     */
+    protected hasConditions(): boolean {
+        return !!this.fieldElements?.some(x => hasItemConditions(x.propertyItem));
+    }
+
+    /**
+     * Gets the current value of a field, for the conditions of the others, which is undefined when there is no such
+     * field, or its editor is not loaded yet.
+     * @param name - The name of the field.
+     */
+    protected getConditionValue(name: string): any {
+        const editor = this.fieldElements?.find(x => x.propertyItem?.name === name)?.editorWidget;
+        if (!editor)
+            return undefined;
+
+        try {
+            return EditorUtils.getValue(editor);
+        }
+        catch {
+            return undefined;
+        }
+    }
+
+    /**
+     * Gets what the conditions make of the fields that have some, for the current values of the fields. A field hidden by
+     * its own condition also hides the fields whose visibility conditions are on it, as they depend on a field that can't
+     * be seen.
+     * @returns The states by the field elements.
+     */
+    protected getConditionStates(): Map<PropertyFieldElement, PropertyFieldConditionState> {
+        const states = new Map<PropertyFieldElement, PropertyFieldConditionState>();
+        const elements = (this.fieldElements ?? []).filter(x => hasItemConditions(x.propertyItem));
+        if (!elements.length)
+            return states;
+
+        const values = new Map<string, any>();
+        const valueOf = (name: string) => {
+            if (!values.has(name))
+                values.set(name, this.getConditionValue(name));
+            return values.get(name);
+        };
+        const allMet = (conditions: PropertyCondition[]) => conditions.every(x => isPropertyConditionMet(x, valueOf(x.field)));
+
+        const conditional = elements.filter(x => x.propertyItem.visibleWhen?.length);
+        const shown = new Map(conditional.map(x => [x, allMet(x.propertyItem.visibleWhen)]));
+        const hidden = new Set<string>();
+        // until no more fields are hidden by the ones they depend on, which a cycle of them can't keep going beyond
+        for (let pass = 0; pass <= conditional.length; pass++) {
+            let changed = false;
+            for (const element of conditional) {
+                const item = element.propertyItem;
+                const isHidden = !shown.get(element) || item.visibleWhen.some(x => x.field !== item.name && hidden.has(x.field));
+                if (isHidden !== hidden.has(item.name)) {
+                    if (isHidden)
+                        hidden.add(item.name);
+                    else
+                        hidden.delete(item.name);
+                    changed = true;
+                }
+            }
+
+            if (!changed)
+                break;
+        }
+
+        for (const element of elements) {
+            const item = element.propertyItem;
+            states.set(element, {
+                hidden: hidden.has(item.name),
+                readOnly: !!item.readOnlyWhen?.length && allMet(item.readOnlyWhen),
+                required: !!item.requiredWhen?.length && allMet(item.requiredWhen)
+            });
+        }
+
+        return states;
+    }
+
+    /**
+     * Updates the fields whose conditions changed by the current values of the fields, and the categories and tabs
+     * they are in. A field whose conditions didn't change is left as it is, e.g. one a dialog made read only itself.
+     * It is called as the values change, and can be called after setting the value of an editor in code, which
+     * doesn't tell it.
+     */
+    updateConditions(): void {
+        if (!this.fieldElements || this.updatingConditions)
+            return;
+
+        this.updatingConditions = true;
+        try {
+            const states = this.getConditionStates();
+            const mode = this.get_mode();
+            for (const [element, state] of states) {
+                const old = this.conditionStates?.get(element);
+                if (old && old.hidden === state.hidden && old.readOnly === state.readOnly && old.required === state.required)
+                    continue;
+
+                PropertyGrid.updateFieldElement(element, mode, !!this.canModifyItem(element.propertyItem), state);
+            }
+
+            this.conditionStates = states;
+            this.updateConditionContainers();
+        }
+        finally {
+            this.updatingConditions = false;
+        }
+    }
+
+    /**
+     * Hides the categories and the tabs whose fields are all hidden, when they have a field with a visibility condition,
+     * so the others are left as they were.
+     */
+    protected updateConditionContainers(): void {
+        const elements = this.fieldElements ?? [];
+        const conditional = elements.filter(x => x.propertyItem?.visibleWhen?.length);
+        if (!conditional.length)
+            return;
+
+        const isShown = (field: HTMLElement) => !field.hidden && field.style.display !== "none";
+        const hasShownField = (container: Element) => elements.some(x => container.contains(x) && isShown(x));
+
+        const categories = new Set(conditional.map(x => x.closest(".category")).filter(x => !!x && this.domNode.contains(x)));
+        for (const category of categories)
+            Fluent.toggle(category, hasShownField(category));
+
+        const panes = new Set(conditional.map(x => x.closest(".tab-pane")).filter(x => !!x && this.domNode.contains(x)));
+        for (const pane of panes) {
+            const tab = pane.id ? this.domNode.querySelector(`a[href="#${pane.id}"]`)?.closest("li") : null;
+            if (!tab)
+                continue;
+
+            const shown = hasShownField(pane);
+            Fluent.toggle(tab, shown);
+            // the tab that was open is hidden, so another one is opened
+            if (!shown && pane.classList.contains("active")) {
+                const other = Array.from(this.domNode.querySelectorAll<HTMLElement>(".property-tabs > li"))
+                    .find(x => !x.hidden)?.querySelector<HTMLElement>("a");
+                other?.click();
+            }
+        }
+    }
+
+    /**
      * Destroys all field editors and clears the grid contents.
      */
     override destroy() {
+
+        Fluent.off(this.domNode, "." + this.uniqueName);
+        this.conditionStates = null;
 
         if (this.fieldElements) {
             for (const fieldElement of this.fieldElements) {
@@ -563,6 +737,10 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
         for (const fieldElement of this.fieldElements) {
             PropertyGrid.loadFieldValue(source, fieldElement, mode);
         }
+
+        // the values the conditions depend on may have changed, without the events of the editors
+        if (this.hasConditions())
+            this.updateConditions();
     }
 
     /**
@@ -592,8 +770,19 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
     save(target?: any): any {
         if (target == null)
             target = Object.create(null);
+        // the values of the fields that are cleared while they are hidden, which are checked again, as the values they
+        // depend on may have been set in code
+        const states = this.fieldElements.some(x => x.propertyItem?.clearWhenHidden) ? this.getConditionStates() : null;
         for (const fieldElement of this.fieldElements) {
-            PropertyGrid.saveFieldValue(target, fieldElement, !!this.canModifyItem(fieldElement.propertyItem));
+            const item = fieldElement.propertyItem;
+            const canModify = !!this.canModifyItem(item);
+            if (item.clearWhenHidden && states?.get(fieldElement)?.hidden) {
+                if (canModify && (item.unbound ?? item.skipOnSave ?? (item as any).oneWay) !== true)
+                    target[item.name] = null;
+                continue;
+            }
+
+            PropertyGrid.saveFieldValue(target, fieldElement, canModify);
         }
         return target;
     }
@@ -679,26 +868,30 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
      * @param fieldElement - The field element to update.
      * @param mode - The grid mode.
      * @param canModify - Whether the item may be modified.
+     * @param conditions - What the conditions of the field make of it, which only add to the rest, e.g. a field hidden
+     *   by a permission stays hidden.
      */
-    static updateFieldElement(fieldElement: PropertyFieldElement, mode?: PropertyGridMode, canModify?: boolean) {
+    static updateFieldElement(fieldElement: PropertyFieldElement, mode?: PropertyGridMode, canModify?: boolean,
+        conditions?: PropertyFieldConditionState) {
         const item = fieldElement.propertyItem;
         canModify ??= PropertyGrid.canModifyItem(item, mode);
-        const readOnly = item.readOnly === true || !canModify;
+        const readOnly = item.readOnly === true || !canModify || !!conditions?.readOnly;
         const editor = fieldElement.editorWidget;
         const then = (editor: Widget<any>) => {
             if (!editor)
                 return;
             EditorUtils.setReadOnly(editor, readOnly);
-            EditorUtils.setRequired(editor, !readOnly &&
-                !!item.required && item.editorType !== 'Boolean');
+            EditorUtils.setRequired(editor, !readOnly && !conditions?.hidden &&
+                (!!item.required || !!conditions?.required) && item.editorType !== 'Boolean');
             if (item.visible === false || item.readPermission != null ||
                 item.insertPermission != null || item.updatePermission != null ||
-                item.hideOnInsert === true || item.hideOnUpdate === true) {
+                item.hideOnInsert === true || item.hideOnUpdate === true || conditions?.hidden != null) {
                 const hidden = (item.readPermission != null &&
                     !Authorization.hasPermission(item.readPermission)) ||
                     item.visible === false ||
                     (mode === PropertyGridMode.insert && item.hideOnInsert === true) ||
-                    (mode === PropertyGridMode.update && item.hideOnUpdate === true);
+                    (mode === PropertyGridMode.update && item.hideOnUpdate === true) ||
+                    !!conditions?.hidden;
 
                 editor.getGridField().toggle(!hidden);
             }
@@ -718,17 +911,25 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
      * @param fieldElement - The field element to update.
      */
     protected updateFieldElement(fieldElement: PropertyFieldElement) {
-        PropertyGrid.updateFieldElement(fieldElement, this.get_mode(), !!this.canModifyItem(fieldElement.propertyItem));
+        PropertyGrid.updateFieldElement(fieldElement, this.get_mode(), !!this.canModifyItem(fieldElement.propertyItem),
+            this.conditionStates?.get(fieldElement));
     }
 
     /**
-     * Refreshes the read-only/required state and visibility of all fields.
+     * Refreshes the read-only/required state and visibility of all fields, including what their conditions make of them.
      */
     updateInterface() {
+        this.conditionStates = this.getConditionStates();
         for (const fieldElement of this.fieldElements) {
             this.updateFieldElement(fieldElement);
         }
+        this.updateConditionContainers();
     }
+}
+
+/** Gets whether a property item has conditions on the values of other fields. */
+function hasItemConditions(item: PropertyItem): boolean {
+    return !!(item?.visibleWhen?.length || item?.readOnlyWhen?.length || item?.requiredWhen?.length);
 }
 
 function determineText(localTextPrefix: string, text: string, getKey: (s: string) => string) {

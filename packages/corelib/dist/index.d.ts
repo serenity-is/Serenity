@@ -3272,6 +3272,22 @@ export type EditorAddon = (props: {
     documentFragment?: DocumentFragment;
 }) => void;
 /**
+ * A condition on the value of another field of a form, which a field is shown, made read only or required by,
+ * see {@link PropertyItem.visibleWhen}, {@link PropertyItem.readOnlyWhen} and {@link PropertyItem.requiredWhen}.
+ */
+export interface PropertyCondition {
+    /** The name of the field whose value is checked. */
+    field: string;
+    /**
+     * The values that meet the condition, any of which the field can have, compared as text, e.g. `2` and `"2"`, and
+     * a list value matches when any of its items does. Without values, the condition is met when the field has a value,
+     * i.e. one that is not null, an empty string, an empty list or false.
+     */
+    values?: any[];
+    /** Whether the condition is the opposite, e.g. met when the field has none of the values, or has no value. */
+    isNot?: boolean;
+}
+/**
  * Describes a single field / column / form property as returned by server-side metadata.
  * Drives form generation, grid columns, editors, formatters and filtering. Each
  * property corresponds to a row field or an unbound UI field.
@@ -3348,6 +3364,14 @@ export interface PropertyItem {
     localizable?: boolean;
     /** Whether the column / field is visible by default. Hidden columns can still be shown via column picker. */
     visible?: boolean;
+    /** Conditions on other fields that must all be met for the field to be visible in forms. They only hide, never show a field hidden otherwise. */
+    visibleWhen?: PropertyCondition[];
+    /** Whether the value of the field is saved as empty while a condition hides it in forms, instead of being kept. */
+    clearWhenHidden?: boolean;
+    /** Conditions on other fields that make the field read only in forms when they are all met. */
+    readOnlyWhen?: PropertyCondition[];
+    /** Conditions on other fields that make the field required in forms when they are all met. */
+    requiredWhen?: PropertyCondition[];
     /** Whether the user is allowed to hide the column via the column picker. */
     allowHide?: boolean;
     /** Whether the column can receive focus / be navigated via keyboard. */
@@ -12290,6 +12314,19 @@ export type PropertyFieldElement = HTMLElement & {
     propertyItem?: PropertyItem;
 };
 /**
+ * What the conditions of a field, see {@link PropertyItem.visibleWhen}, {@link PropertyItem.readOnlyWhen} and
+ * {@link PropertyItem.requiredWhen}, make of it for the current values of the other fields. They only add to what the
+ * property item and the mode make of it, e.g. a field hidden by a permission stays hidden.
+ */
+export interface PropertyFieldConditionState {
+    /** Whether the field is hidden by a condition of its own, or by one on a field that is hidden by a condition. */
+    hidden?: boolean;
+    /** Whether the field is read only by its conditions. */
+    readOnly?: boolean;
+    /** Whether the field is required by its conditions, which a hidden or read only field is not. */
+    required?: boolean;
+}
+/**
  * Renders the caption (label) for a property field, including the required
  * marker and localized title/hint text.
  * @param props - Caption rendering props.
@@ -12423,12 +12460,44 @@ export declare function PropertyTabs(props: {
 export declare class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> extends Widget<P> {
     static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
     private fieldElements;
+    /** What the conditions made of the fields that have some, when they were last applied. */
+    private conditionStates;
+    private updatingConditions;
     /**
      * Renders the property grid contents, building categories/tabs and loading
      * the initial value.
      * @returns The rendered contents.
      */
     protected renderContents(): any;
+    /**
+     * Gets whether any field has conditions on the values of the others.
+     */
+    protected hasConditions(): boolean;
+    /**
+     * Gets the current value of a field, for the conditions of the others, which is undefined when there is no such
+     * field, or its editor is not loaded yet.
+     * @param name - The name of the field.
+     */
+    protected getConditionValue(name: string): any;
+    /**
+     * Gets what the conditions make of the fields that have some, for the current values of the fields. A field hidden by
+     * its own condition also hides the fields whose visibility conditions are on it, as they depend on a field that can't
+     * be seen.
+     * @returns The states by the field elements.
+     */
+    protected getConditionStates(): Map<PropertyFieldElement, PropertyFieldConditionState>;
+    /**
+     * Updates the fields whose conditions changed by the current values of the fields, and the categories and tabs
+     * they are in. A field whose conditions didn't change is left as it is, e.g. one a dialog made read only itself.
+     * It is called as the values change, and can be called after setting the value of an editor in code, which
+     * doesn't tell it.
+     */
+    updateConditions(): void;
+    /**
+     * Hides the categories and the tabs whose fields are all hidden, when they have a field with a visibility condition,
+     * so the others are left as they were.
+     */
+    protected updateConditionContainers(): void;
     /**
      * Destroys all field editors and clears the grid contents.
      */
@@ -12526,15 +12595,17 @@ export declare class PropertyGrid<P extends PropertyGridOptions = PropertyGridOp
      * @param fieldElement - The field element to update.
      * @param mode - The grid mode.
      * @param canModify - Whether the item may be modified.
+     * @param conditions - What the conditions of the field make of it, which only add to the rest, e.g. a field hidden
+     *   by a permission stays hidden.
      */
-    static updateFieldElement(fieldElement: PropertyFieldElement, mode?: PropertyGridMode, canModify?: boolean): void;
+    static updateFieldElement(fieldElement: PropertyFieldElement, mode?: PropertyGridMode, canModify?: boolean, conditions?: PropertyFieldConditionState): void;
     /**
      * Updates a single field element in the current mode.
      * @param fieldElement - The field element to update.
      */
     protected updateFieldElement(fieldElement: PropertyFieldElement): void;
     /**
-     * Refreshes the read-only/required state and visibility of all fields.
+     * Refreshes the read-only/required state and visibility of all fields, including what their conditions make of them.
      */
     updateInterface(): void;
 }
@@ -17541,6 +17612,20 @@ export declare class PrefixedContext {
         new (...args: any[]): TWidget;
     }): TWidget;
 }
+/**
+ * Gets whether a value is one, as a condition without values checks it: it is not null, an empty string, an empty list
+ * or false, so a checkbox has a value while it is checked.
+ * @param value - The value of a field.
+ */
+export declare function hasPropertyValue(value: any): boolean;
+/**
+ * Gets whether the value of a field meets a condition: it has one of the values of the condition, compared as text,
+ * or a list value has one of them as an item, or, without values, it has a value at all, see {@link hasPropertyValue}.
+ * The result is the opposite for a condition with `isNot`.
+ * @param condition - The condition.
+ * @param value - The value of the field the condition is on.
+ */
+export declare function isPropertyConditionMet(condition: PropertyCondition, value: any): boolean;
 /**
  * A panel that hosts a {@link PropertyGrid} for editing an entity, providing
  * load/save of the entity and its id, and deriving form options from the

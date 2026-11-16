@@ -21,6 +21,7 @@ public partial class BasicPropertyProcessor(IOptions<PropertyProcessorOptions>? 
         SetAllowHide(source, item);
         SetCategory(source, item);
         SetCollapsible(source, item);
+        SetConditions(source, item);
         SetTab(source, item);
         SetCssClass(source, item);
         SetDefaultValue(source, item);
