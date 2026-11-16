@@ -85,7 +85,49 @@ public partial class ServerTypingsGenerator
             (baseClass == null || !TypingsUtils.IsAssignableFrom(current, baseClass)));
     }
 
-    protected static TypeReference? GetBasicTypeBaseClass(TypeDefinition type)
+    /// <summary>
+    /// Gets the base class a basic type extends, whose members it doesn't repeat: a request or a response type of
+    /// Serenity.Services, or else the nearest base class of a Serenity.Net assembly that corelib has a type of the same
+    /// name for, e.g. PropertyItem. Other base classes, like the ones of the project, have their members listed in the
+    /// type, as they have no script type of their own to extend.
+    /// </summary>
+    /// <param name="type">The basic type.</param>
+    protected TypeReference? GetBasicTypeBaseClass(TypeDefinition type)
+    {
+        return GetServiceBaseClass(type) ?? GetCorelibBaseClass(type);
+    }
+
+    /// <summary>
+    /// Gets the nearest base class of a type that is of a Serenity.Net assembly and has a type of the same name in corelib,
+    /// which is not generic, as its script type can't be told to have the same type parameters, nor an enum.
+    /// </summary>
+    /// <param name="type">The type.</param>
+    protected TypeReference? GetCorelibBaseClass(TypeDefinition type)
+    {
+        foreach (var t in type.SelfAndBaseClasses().Skip(1))
+        {
+            if (t.FullNameOf() == "System.Object")
+                break;
+
+            var assembly = GetAssemblyNameFor(t);
+            if (assembly is null || !SerenityNetAssemblies.Contains(assembly))
+                continue;
+
+#if ISSOURCEGENERATOR
+            if (t is INamedTypeSymbol { IsGenericType: true })
+#else
+            if (t.IsGenericInstanceType(out _) || t.HasGenericParameters)
+#endif
+                continue;
+
+            if (GetScriptType("@serenity-is/corelib:" + t.Name) is { IsEnum: not true })
+                return t;
+        }
+
+        return null;
+    }
+
+    private static TypeReference? GetServiceBaseClass(TypeDefinition type)
     {
         foreach (var t in type.SelfAndBaseClasses())
         {

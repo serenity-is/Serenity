@@ -29,6 +29,45 @@ namespace Serenity.CodeGeneration
             Assert.Contains("DerivedProp?: string;", code);
             Assert.Contains("BaseProp?: string;", code);
         }
+
+        [Fact]
+        public void BasicType_Extends_A_Base_Class_Of_Serenity_That_Corelib_Has_Without_Repeating_Its_Members()
+        {
+            var generator = CreateGenerator(typeof(BasicTypeOfPropertyItem));
+            var result = generator.Run();
+            var code = Assert.Single(result, x => x.Filename == "BasicTypes/BasicTypeOfPropertyItem.ts").Text;
+
+            Assert.Contains("import { PropertyItem } from \"@serenity-is/corelib\";", code);
+            Assert.Contains("export interface BasicTypeOfPropertyItem extends PropertyItem {", code);
+            Assert.Contains("IsNumeric?: boolean;", code);
+            Assert.DoesNotContain("editorType?:", code);
+            Assert.DoesNotContain("visibleWhen?:", code);
+        }
+
+        [Fact]
+        public void BasicType_Lists_The_Members_Of_The_Classes_Between_It_And_The_Base_Class_Of_Serenity()
+        {
+            var generator = CreateGenerator(typeof(BasicTypeOfMiddle));
+            var result = generator.Run();
+            var code = Assert.Single(result, x => x.Filename == "BasicTypes/BasicTypeOfMiddle.ts").Text;
+
+            Assert.Contains("export interface BasicTypeOfMiddle extends PropertyItem {", code);
+            Assert.Contains("Own?: string;", code);
+            Assert.Contains("IsNumeric?: boolean;", code);
+            Assert.DoesNotContain("editorType?:", code);
+        }
+
+        [Fact]
+        public void BasicType_Lists_The_Members_Of_A_Base_Class_Of_Serenity_That_Corelib_Has_No_Type_For()
+        {
+            var generator = CreateGeneratorModules(typeof(BasicTypeOfPropertyItem));
+            // without the built-in script types, so corelib has no PropertyItem
+            var result = generator.Run();
+            var code = Assert.Single(result, x => x.Filename == "BasicTypes/BasicTypeOfPropertyItem.ts").Text;
+
+            Assert.Contains("export interface BasicTypeOfPropertyItem {", code);
+            Assert.Contains("editorType?:", code);
+        }
     }
 }
 
@@ -61,5 +100,17 @@ namespace ServerTypingsTest.BasicTypes
     public class BasicTypeDerived : BasicTypeBase
     {
         public string DerivedProp { get; set; }
+    }
+
+    [ScriptInclude]
+    public class BasicTypeOfPropertyItem : Serenity.ComponentModel.PropertyItem
+    {
+        public bool? IsNumeric { get; set; }
+    }
+
+    [ScriptInclude]
+    public class BasicTypeOfMiddle : BasicTypeOfPropertyItem
+    {
+        public string Own { get; set; }
     }
 }
