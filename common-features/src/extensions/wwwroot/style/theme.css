@@ -1605,6 +1605,8 @@ textarea.error,
     line-height: 1;
     font-size: 1.5em;
     width: 1.5rem;
+    /* the icon has no content of its own, so it would shrink to nothing next to the text of the label */
+    flex: 0 0 auto;
     color: var(--bs-form-invalid-border-color);
     --s-ico: var(--s-icon-vx-label-error, var(--s-icon-exclamation-circle));
 }
@@ -1617,7 +1619,8 @@ textarea.error,
   content: none;
 }
 
-.error~.vx {
+.error~.vx,
+.input-group:has(> .error)~.vx {
   display: flex;
 }
 
@@ -1639,6 +1642,13 @@ flex-layout .caption {
 .field .widget-wrapper {
   flex: 1 1 auto;
   min-width: 0;
+}
+
+/* an input group of a field shares the row with the validation icon, instead of being as wide as the field */
+.field > .input-group {
+  flex: 1 1 0.01%;
+  min-width: 0;
+  width: auto;
 }
 
 .input-group>.editor,
