@@ -130,7 +130,13 @@ public class WrappedProperty(PropertyInfo property) : IPropertyInfo
                 if (providerAttributesProperty == null)
                     continue;
 
-                allAttributes.AddRange(providerAttributesProperty.GetCustomAttributes<Attribute>(inherit: false));
+                // an attribute of the property itself wins over the one of the same type a combination attribute has
+                foreach (var intrinsicAttr in providerAttributesProperty.GetCustomAttributes<Attribute>(inherit: false))
+                {
+                    var type = intrinsicAttr.GetType();
+                    if (AllowsMultiple(type) || !directAttributes.Any(x => x.GetType() == type))
+                        allAttributes.Add(intrinsicAttr);
+                }
             }
         }
 

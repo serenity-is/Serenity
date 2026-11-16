@@ -82,6 +82,7 @@ public static class ReflectionExtensions
         where TAttribute : Attribute
     {
         var result = property.GetCustomAttributes(typeof(TAttribute), inherit).Cast<TAttribute>().ToList();
+        var ownTypes = new HashSet<Type>(result.Select(x => x.GetType()));
 
         // the attributes a combination attribute carries are on the PropertyAttributes property of its type, so it is found
         // without being created, as its constructor could read the attributes of a row too, e.g. one deriving from ForeignKey
@@ -90,7 +91,15 @@ public static class ReflectionExtensions
             var attributesProperty = providerType.GetProperty(nameof(Reflection.IIntrinsicPropertyAttributeProvider.PropertyAttributes),
                 BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
             if (attributesProperty is not null)
-                result.AddRange(attributesProperty.GetCustomAttributes(typeof(TAttribute), inherit: false).Cast<TAttribute>());
+            {
+                // an attribute of the property itself wins over the one of the same type a combination attribute has
+                foreach (var attr in attributesProperty.GetCustomAttributes(typeof(TAttribute), inherit: false).Cast<TAttribute>())
+                {
+                    var type = attr.GetType();
+                    if (!ownTypes.Contains(type) || Reflection.WrappedProperty.AllowsMultiple(type))
+                        result.Add(attr);
+                }
+            }
         }
 
         return result;

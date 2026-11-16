@@ -176,4 +176,23 @@ public class WrappedPropertyInterfaceTests
 
         Assert.Equal([typeof(IAddress), typeof(IOther)], properties.Select(x => x.DeclaringType));
     }
+
+    private class OwnOverCombined
+    {
+        [Combined, Title("Own Title")]
+        public string? Value { get; set; }
+    }
+
+    [Fact]
+    public void OwnAttribute_WinsOverTheOneOfItsCombinationAttribute_WhileTheOnesAllowingMultipleAreAdded()
+    {
+        var property = typeof(OwnOverCombined).GetProperty(nameof(OwnOverCombined.Value))!;
+        var wrapped = new WrappedProperty(property);
+
+        Assert.Equal("Own Title", wrapped.GetAttribute<TitleAttribute>()?.Text);
+        Assert.Equal(["FromCombined"], wrapped.GetAttributes<TagAttribute>().Select(x => x.Name));
+        // the filtered lookup resolves the same
+        Assert.Equal("Own Title", property.GetPropertyAttribute<TitleAttribute>()?.Text);
+        Assert.Equal(["FromCombined"], property.GetPropertyAttributes<TagAttribute>().Select(x => x.Name));
+    }
 }
