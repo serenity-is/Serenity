@@ -720,6 +720,16 @@ export class PropertyGrid<P extends PropertyGridOptions = PropertyGridOptions> e
     }
 
     /**
+     * Gets a promise for the editors that are still loading, as their types are loaded on demand, e.g. a lazily loaded
+     * editor. The values can't be saved, see {@link save}, until they are loaded.
+     * @returns The promise, or null when all the editors are loaded.
+     */
+    getEditorsLoading(): Promise<void> | null {
+        const pending = this.fieldElements?.filter(x => !x.editorWidget && x.editorPromise).map(x => x.editorPromise) ?? [];
+        return pending.length ? Promise.all(pending).then(() => { }) : null;
+    }
+
+    /**
      * Invokes a callback for each rendered field with its property item and
      * editor widget.
      * @param callback - Callback receiving the property item and editor widget.

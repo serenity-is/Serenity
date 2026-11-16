@@ -59,7 +59,7 @@ public sealed class EmployeeRow : Row<EmployeeRow.RowFields>, IIdRow, INameRow
     [DisplayText("Extension"), Size(4)]
     public string? Extension { get => fields.Extension[this]; set => fields.Extension[this] = value; }
 
-    [DisplayText("Photo")]
+    [DisplayText("Photo"), NotMapped]
     public Stream? Photo { get => fields.Photo[this]; set => fields.Photo[this] = value; }
 
     [DisplayText("Notes")]
