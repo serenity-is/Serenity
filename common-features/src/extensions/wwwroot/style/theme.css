@@ -1560,6 +1560,7 @@ a.category-link {
 }
 
 .editor.readonly,
+.editor-like.readonly,
 input.readonly,
 textarea.readonly {
   background-color: var(--s-input-readonly-bg);
@@ -1638,7 +1639,13 @@ flex-layout .caption {
   flex: 0 0 auto;
 }
 
+/*
+ * editor-like is for what takes the place of an editor in a field, e.g. the input group that wraps one to add addons, or the
+ * container select2 inserts before its input, so it has the width of an editor. It is not for finding the editor of a field,
+ * which is what the editor class is for, so it is only about the layout.
+ */
 .field .editor,
+.field .editor-like,
 .field .widget-wrapper {
   flex: 1 1 auto;
   min-width: 0;
@@ -1652,6 +1659,7 @@ flex-layout .caption {
 }
 
 .input-group>.editor,
+.input-group>.editor-like,
 .input-group>.widget-wrapper {
   width: 1%;
 }

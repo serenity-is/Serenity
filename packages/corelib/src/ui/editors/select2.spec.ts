@@ -1415,6 +1415,24 @@ describe("Select2 wrapper", () => {
         internal.destroy();
     });
 
+    it("gives the container editor-like instead of editor, so the input stays the editor of its field", () => {
+        const input = document.createElement("input");
+        input.className = "editor s-StringEditor custom-source";
+        document.body.appendChild(input);
+        new Select2({
+            element: input,
+            initSelection: (_e, callback) => callback(null),
+            query: query => query.callback({ results: [], more: false })
+        } as any);
+        const internal: any = (input as any).select2;
+        expect(internal.container.classList.contains("editor-like")).toBe(true);
+        expect(internal.container.classList.contains("editor")).toBe(false);
+        expect(internal.container.classList.contains("custom-source")).toBe(true);
+        expect(input.classList.contains("editor")).toBe(true);
+        internal.destroy();
+        input.remove();
+    });
+
     it("loads tags from a data attribute and restores tabindex on destroy", () => {
         const input = document.createElement("input");
         input.dataset.select2Tags = JSON.stringify([{ id: "a", text: "A" }]);

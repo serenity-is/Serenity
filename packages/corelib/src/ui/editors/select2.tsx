@@ -823,7 +823,9 @@ export class Select2 {
         escapeMarkup: defaultEscapeMarkup,
         blurOnChange: false,
         selectOnBlur: false,
-        adaptContainerCssClass: function (c) { return c; },
+        // the container stands in for the input in the layout of a field, but it is not the editor, so it gets editor-like instead of editor,
+        // which would make code that looks for the editor of a field find the container first, as it is inserted before the input
+        adaptContainerCssClass: function (c) { return c === "editor" ? "editor-like" : c; },
         adaptDropdownCssClass: function (c) { return null; },
         nextSearchTerm: function (selectedObject, currentSearchTerm) { return undefined; },
         searchInputPlaceholder: '',
