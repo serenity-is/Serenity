@@ -96,6 +96,9 @@
     <Using Include="Serenity" />
     <Using Include="Serenity.Abstractions" />
     <Using Include="Serenity.ComponentModel" />
+    <Using Include="Serenity.ComponentModel.DisplayFormatAttribute" Alias="DisplayFormatAttribute" />
+    <Using Include="Serenity.ComponentModel.MaxLengthAttribute" Alias="MaxLengthAttribute" />
+    <Using Include="Serenity.ComponentModel.RequiredAttribute" Alias="RequiredAttribute" />
     <Using Include="Serenity.Data" />
     <Using Include="Serenity.Data.Mapping" />
     <Using Include="Serenity.Extensions" />

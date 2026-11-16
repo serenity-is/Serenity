@@ -333,7 +333,7 @@ public abstract class SaveRequestHandlerBase<TRow, TSaveRequest, TSaveResponse>(
 
     /// <summary>
     /// Validates the fields of the row that are required by their <see cref="RequiredWhenAttribute"/>s, which, unlike a
-    /// <see cref="RequiredAttribute"/> of a row, are checked on the server too, as the conditions are not something the
+    /// <see cref="ComponentModel.RequiredAttribute"/> of a row, are checked on the server too, as the conditions are not something the
     /// database can tell. Like the required fields and the validation by a form, an update only checks the fields it has,
     /// with the conditions reading the old values of the ones it doesn't, and a field the form hides or makes read only by
     /// the attributes of the row is not checked.

@@ -68,7 +68,7 @@ public static class ValidationRuleMessage
 
     /// <summary>
     /// Gets the result for an attribute whose value is not valid, with its message, see
-    /// <see cref="Format(ValidationAttribute, ITextLocalizer?, string, object?[])"/>, for the member being validated.
+    /// <see cref="Format(ValidationAttribute, ITextLocalizer?, string?, string, object?[])"/>, for the member being validated.
     /// </summary>
     /// <param name="attribute">The attribute.</param>
     /// <param name="context">The context, whose localizer is used, see <see cref="ValidationContextExtensions.GetLocalizer"/>,
