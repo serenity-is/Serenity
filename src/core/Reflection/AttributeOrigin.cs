@@ -11,7 +11,9 @@ public enum AttributeOrigin
     Explicit = 0,
 
     /// <summary>
-    /// Attributes inherited from base classes or interfaces. This includes attributes that are declared on base classes or interfaces and are inherited by the property. 
+    /// Attributes inherited from base classes or interfaces. This includes attributes that are declared on base classes or interfaces and are inherited by the property.
+    /// The attributes of the members of the interfaces the property implements are inherited like the ones of base classes: an
+    /// attribute of a type that doesn't allow multiple is only used when the property doesn't have one of the same type itself.
     /// </summary>
     Inherit = 1,
 

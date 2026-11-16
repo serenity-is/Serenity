@@ -10,6 +10,8 @@ namespace Serenity.Reflection;
 public class WrappedProperty(PropertyInfo property) : IPropertyInfo
 {
     private static readonly ConcurrentDictionary<Type, PropertyInfo?> providerAttributesPropertyByType = new();
+    private static readonly ConcurrentDictionary<PropertyInfo, PropertyInfo[]> interfacePropertiesByProperty = new();
+    private static readonly ConcurrentDictionary<Type, bool> allowMultipleByType = new();
 
     private readonly PropertyInfo property = property;
     // cache slots indexed by (inherit ? 2 : 0) | (intrinsic ? 1 : 0)
@@ -77,6 +79,38 @@ public class WrappedProperty(PropertyInfo property) : IPropertyInfo
         bool inherit = (index & 2) != 0;
         bool intrinsic = (index & 1) != 0;
 
+        var attributes = GetAttributesOf(property, inherit, intrinsic);
+
+        // the attributes of the members of the interfaces the property implements are inherited like the ones of the
+        // base classes, so one of a type that doesn't allow multiple is only used when the property doesn't have one itself
+        if (inherit && GetImplementedInterfaceProperties(property) is { Length: > 0 } interfaceProperties)
+        {
+            var ownTypes = new HashSet<Type>(attributes.Select(x => x.GetType()));
+            var merged = new List<Attribute>(attributes);
+            foreach (var interfaceProperty in interfaceProperties)
+            {
+                foreach (var attr in GetAttributesOf(interfaceProperty, inherit: false, intrinsic))
+                {
+                    var type = attr.GetType();
+                    if (!ownTypes.Contains(type) || AllowsMultiple(type))
+                        merged.Add(attr);
+                }
+            }
+
+            attributes = [.. merged];
+        }
+
+        return cachedAttributesByOrigin[index] = attributes;
+    }
+
+    internal static bool AllowsMultiple(Type attributeType)
+    {
+        return allowMultipleByType.GetOrAdd(attributeType, static type =>
+            type.GetCustomAttribute<AttributeUsageAttribute>(inherit: true)?.AllowMultiple ?? false);
+    }
+
+    private static Attribute[] GetAttributesOf(PropertyInfo property, bool inherit, bool intrinsic)
+    {
         var directAttributes = property.GetCustomAttributes<Attribute>(inherit);
         var allAttributes = new List<Attribute>(directAttributes);
 
@@ -100,6 +134,61 @@ public class WrappedProperty(PropertyInfo property) : IPropertyInfo
             }
         }
 
-        return cachedAttributesByOrigin[index] = [.. allAttributes];
+        return [.. allAttributes];
+    }
+
+    /// <summary>
+    /// Gets the properties of the interfaces that a property implements, in the type it was obtained from, ordered by the full
+    /// names of the interfaces, so the result doesn't depend on the order the runtime lists them in.
+    /// </summary>
+    /// <param name="property">The property.</param>
+    /// <returns>The properties of the interfaces, or an empty array when it implements none.</returns>
+    public static PropertyInfo[] GetImplementedInterfaceProperties(PropertyInfo property)
+    {
+        if (property is null)
+            throw new ArgumentNullException(nameof(property));
+
+        return interfacePropertiesByProperty.GetOrAdd(property, static property =>
+        {
+            var type = property.ReflectedType;
+            var accessor = property.GetMethod ?? property.SetMethod;
+            if (type is null || type.IsInterface || accessor is null || accessor.IsStatic)
+                return [];
+
+            var result = new List<PropertyInfo>();
+            foreach (var interfaceType in type.GetInterfaces().OrderBy(x => x.FullName ?? x.Name, StringComparer.Ordinal))
+            {
+                InterfaceMapping map;
+                try
+                {
+                    map = type.GetInterfaceMap(interfaceType);
+                }
+                catch (ArgumentException)
+                {
+                    // e.g. a generic type definition, which has no mapping
+                    continue;
+                }
+
+                for (var i = 0; i < map.TargetMethods.Length; i++)
+                {
+                    var target = map.TargetMethods[i];
+                    if (target is null ||
+                        target.MetadataToken != accessor.MetadataToken ||
+                        target.Module != accessor.Module ||
+                        target.DeclaringType != accessor.DeclaringType)
+                        continue;
+
+                    var interfaceMethod = map.InterfaceMethods[i];
+                    foreach (var interfaceProperty in interfaceType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+                    {
+                        if ((interfaceProperty.GetMethod == interfaceMethod || interfaceProperty.SetMethod == interfaceMethod) &&
+                            !result.Contains(interfaceProperty))
+                            result.Add(interfaceProperty);
+                    }
+                }
+            }
+
+            return [.. result];
+        });
     }
 }

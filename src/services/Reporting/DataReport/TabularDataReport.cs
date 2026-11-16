@@ -260,7 +260,7 @@ public class TabularDataReport : IDataOnlyReport
 
         if (property != null)
         {
-            var decorator = property.GetCustomAttribute<CellDecoratorAttribute>();
+            var decorator = property.GetPropertyAttribute<CellDecoratorAttribute>();
             if (decorator != null && decorator.DecoratorType != null)
                 result.Decorator = (ICellDecorator)ActivatorUtilities.CreateInstance(provider, 
                     decorator.DecoratorType);

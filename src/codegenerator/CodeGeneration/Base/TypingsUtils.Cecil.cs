@@ -140,6 +140,62 @@ public static partial class TypingsUtils
         }
     }
 
+    /// <summary>
+    /// Gets the properties of the interfaces of a type that a property of it implements, ordered by the names of the interfaces,
+    /// whose attributes it inherits, like the runtime does, see WrappedProperty. A property implements the one of an interface
+    /// with its name, unless the type, or one of its base types, implements that one explicitly.
+    /// </summary>
+    /// <param name="prop">The property.</param>
+    /// <param name="type">The type the property is of, which can also be a type inheriting the one that declares it.</param>
+    public static IEnumerable<PropertyDefinition> GetImplementedInterfaceProperties(this PropertyDefinition prop, TypeDefinition type)
+    {
+        if ((prop.GetMethod ?? prop.SetMethod)?.IsStatic == true || type.IsInterface)
+            yield break;
+
+        var interfaces = new Dictionary<string, TypeDefinition>(StringComparer.Ordinal);
+        var explicitNames = new HashSet<string>(StringComparer.Ordinal);
+        for (var current = type; current != null; current = current.BaseType?.Resolve())
+        {
+            foreach (var implementation in current.Interfaces)
+            {
+                if (implementation.InterfaceType?.Resolve() is TypeDefinition interfaceType)
+                    interfaces[interfaceType.FullName] = interfaceType;
+            }
+
+            // an explicit implementation is named by its interface, e.g. My.IFoo.Bar
+            foreach (var property in current.Properties)
+                if (property.Name.Contains('.'))
+                    explicitNames.Add(property.Name);
+        }
+
+        foreach (var pair in interfaces.OrderBy(x => x.Key, StringComparer.Ordinal))
+        {
+            foreach (var interfaceProperty in pair.Value.Properties)
+            {
+                if (interfaceProperty.Name == prop.Name &&
+                    !explicitNames.Any(x => x.EndsWith("." + prop.Name, StringComparison.Ordinal) &&
+                        x.StartsWith(pair.Value.FullName.Split('`')[0], StringComparison.Ordinal)))
+                    yield return interfaceProperty;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Gets the attributes of a property with the intrinsic ones, then the ones of the members of the interfaces it implements,
+    /// so the first one of a type that is found is the one the runtime uses.
+    /// </summary>
+    /// <param name="prop">The property.</param>
+    /// <param name="type">The type the property is of, which can also be a type inheriting the one that declares it.</param>
+    public static IEnumerable<CustomAttribute> GetAttributesWithInterfaces(this PropertyDefinition prop, TypeDefinition type)
+    {
+        foreach (var attr in prop.GetAttributesWithIntrinsic())
+            yield return attr;
+
+        foreach (var interfaceProperty in prop.GetImplementedInterfaceProperties(type))
+            foreach (var attr in interfaceProperty.GetAttributesWithIntrinsic())
+                yield return attr;
+    }
+
     public static (string, string) GetCacheKey(TypeReference type)
     {
         if (type.Scope is Mono.Cecil.ModuleDefinition md)

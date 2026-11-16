@@ -11,6 +11,12 @@ internal static class ObjectValidator
 {
     private static readonly object Missing = new();
 
+    /// <summary>
+    /// Where the attributes of a property are read from: itself, its base classes and the interfaces it implements, and the
+    /// combination attributes it has, see <see cref="Reflection.IIntrinsicPropertyAttributeProvider"/>.
+    /// </summary>
+    private const AttributeOrigin Origin = AttributeOrigin.Inherit | AttributeOrigin.Intrinsic;
+
     public static IEnumerable<ObjectValidationCheck> GetChecks(object instance, ObjectValidationOptions? options)
     {
         if (instance is null)
@@ -18,8 +24,11 @@ internal static class ObjectValidator
 
         options ??= new ObjectValidationOptions();
         var rulesType = options.RulesType ?? instance.GetType();
+        // the attributes are read as the property items have them, with the ones of combination attributes, and of the
+        // members of the interfaces the properties implement
         var properties = rulesType.GetProperties(BindingFlags.Public | BindingFlags.Instance)
             .Where(x => x.GetIndexParameters().Length == 0)
+            .Select(x => new Reflection.WrappedProperty(x))
             .ToList();
 
         var values = new Dictionary<string, object?>(StringComparer.Ordinal);
@@ -58,21 +67,21 @@ internal static class ObjectValidator
                 continue;
 
             // the browser doesn't validate what can't be changed
-            if (property.GetCustomAttribute<System.ComponentModel.ReadOnlyAttribute>()?.IsReadOnly == true)
+            if (property.GetAttribute<System.ComponentModel.ReadOnlyAttribute>(Origin)?.IsReadOnly == true)
                 continue;
 
-            var readOnlyWhen = property.GetCustomAttributes<ReadOnlyWhenAttribute>().ToList();
+            var readOnlyWhen = property.GetAttributes<ReadOnlyWhenAttribute>(Origin).ToList();
             if (readOnlyWhen.Count > 0 && allMet(readOnlyWhen))
                 continue;
 
-            var requiredWhen = property.GetCustomAttributes<RequiredWhenAttribute>().ToList();
+            var requiredWhen = property.GetAttributes<RequiredWhenAttribute>(Origin).ToList();
             var type = Nullable.GetUnderlyingType(property.PropertyType) ?? property.PropertyType;
             // a checkbox is not required, as false is a value of it, like in the browser
             var required = type != typeof(bool) &&
-                ((options.CheckRequiredAttribute && property.GetCustomAttribute<RequiredAttribute>()?.IsRequired == true) ||
+                ((options.CheckRequiredAttribute && property.GetAttribute<RequiredAttribute>(Origin)?.IsRequired == true) ||
                  (requiredWhen.Count > 0 && allMet(requiredWhen)));
 
-            var rules = options.CheckRules ? ValidationRules.GetRules(property.GetCustomAttributes()).ToList() : [];
+            var rules = options.CheckRules ? ValidationRules.GetRules(property.GetAttributes<Attribute>(Origin)).ToList() : [];
             if (!required && rules.Count == 0)
                 continue;
 
@@ -89,20 +98,20 @@ internal static class ObjectValidator
     /// Gets the properties that are hidden, as the browser hides them: by <see cref="VisibleAttribute"/>, on insert or update,
     /// or by their visibility conditions, where one hidden by its conditions also hides the ones whose conditions are on it.
     /// </summary>
-    private static HashSet<string> GetHidden(List<PropertyInfo> properties, bool? isInsert,
+    private static HashSet<string> GetHidden(List<Reflection.WrappedProperty> properties, bool? isInsert,
         Func<IEnumerable<PropertyConditionAttribute>, bool> allMet)
     {
         var hidden = new HashSet<string>(StringComparer.Ordinal);
         foreach (var property in properties)
         {
-            if (property.GetCustomAttribute<VisibleAttribute>()?.Value == false ||
-                (isInsert == true && property.GetCustomAttribute<HideOnInsertAttribute>()?.Value == true) ||
-                (isInsert == false && property.GetCustomAttribute<HideOnUpdateAttribute>()?.Value == true))
+            if (property.GetAttribute<VisibleAttribute>(Origin)?.Value == false ||
+                (isInsert == true && property.GetAttribute<HideOnInsertAttribute>(Origin)?.Value == true) ||
+                (isInsert == false && property.GetAttribute<HideOnUpdateAttribute>(Origin)?.Value == true))
                 hidden.Add(property.Name);
         }
 
         var conditional = properties
-            .Select(x => (x.Name, Conditions: x.GetCustomAttributes<VisibleWhenAttribute>().ToList()))
+            .Select(x => (x.Name, Conditions: x.GetAttributes<VisibleWhenAttribute>(Origin).ToList()))
             .Where(x => x.Conditions.Count > 0 && !hidden.Contains(x.Name))
             .ToList();
 

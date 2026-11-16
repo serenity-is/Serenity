@@ -56,8 +56,8 @@ public class ForeignKeyAttribute : Attribute
         if (string.IsNullOrEmpty(field))
         {
             var identityOrPrimaryKey = rowType.GetProperties()
-                .Where(x => x.GetCustomAttribute<IdentityAttribute>() != null ||
-                    x.GetCustomAttribute<PrimaryKeyAttribute>() != null).ToArray();
+                .Where(x => x.GetPropertyAttribute<IdentityAttribute>() != null ||
+                    x.GetPropertyAttribute<PrimaryKeyAttribute>() != null).ToArray();
 
             if (identityOrPrimaryKey.Length == 0)
                 throw new ArgumentOutOfRangeException(nameof(rowType),
@@ -68,7 +68,7 @@ public class ForeignKeyAttribute : Attribute
             if (identityOrPrimaryKey.Length > 1)
             {
                 var identity = identityOrPrimaryKey.Where(x =>
-                    x.GetCustomAttribute<IdentityAttribute>() != null);
+                    x.GetPropertyAttribute<IdentityAttribute>() != null);
 
                 if (identity.Count() != 1)
                     throw new ArgumentOutOfRangeException(nameof(rowType),

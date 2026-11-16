@@ -20,10 +20,10 @@ public class SaveRequestHandlerTests_FormValidation
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id;
-            public StringField Name;
-            public StringField Kind;
-            public StringField Company;
+            public Int32Field Id = null!;
+            public StringField Name = null!;
+            public StringField Kind = null!;
+            public StringField Company = null!;
         }
     }
 
@@ -127,10 +127,10 @@ public class SaveRequestHandlerTests_FormValidation
         var handler = New(c => new AsyncHandler(c));
         handler.SetRow(new FormRow { Kind = "company" });
 
-        var error = await Assert.ThrowsAsync<ValidationError>(() => handler.DoValidateFormAsync(typeof(CompanyForm)));
+        var error = await Assert.ThrowsAsync<ValidationError>(() => handler.DoValidateFormAsync(typeof(CompanyForm), TestContext.Current.CancellationToken));
         Assert.Equal("Company", error.Arguments);
 
         handler.SetRow(new FormRow { Kind = "person" });
-        await handler.DoValidateFormAsync(typeof(CompanyForm));
+        await handler.DoValidateFormAsync(typeof(CompanyForm), TestContext.Current.CancellationToken);
     }
 }

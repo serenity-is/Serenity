@@ -17,8 +17,8 @@ public class SaveRequestHandlerTests_Validation
     /// <summary>A rule that needs services of the request, the handler and its connection.</summary>
     private class ValidateFreeCodeAttribute : ValidationRuleAttribute
     {
-        public static ISaveRequestHandler? Handler;
-        public static IDbConnection? Connection;
+        public static ISaveRequestHandler? Handler = null!;
+        public static IDbConnection? Connection = null!;
 
         public override string Rule => "freeCode";
 
@@ -51,11 +51,11 @@ public class SaveRequestHandlerTests_Validation
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id;
-            public Int32Field Quantity;
-            public StringField Email;
-            public Int32Field Hint;
-            public StringField Code;
+            public Int32Field Id = null!;
+            public Int32Field Quantity = null!;
+            public StringField Email = null!;
+            public Int32Field Hint = null!;
+            public StringField Code = null!;
         }
     }
 

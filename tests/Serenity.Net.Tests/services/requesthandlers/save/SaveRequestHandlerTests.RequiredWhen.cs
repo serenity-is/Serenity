@@ -22,11 +22,11 @@ public class SaveRequestHandlerTests_RequiredWhen
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id;
-            public StringField Kind;
-            public StringField Company;
-            public StringField Note;
-            public StringField HiddenForCompanies;
+            public Int32Field Id = null!;
+            public StringField Kind = null!;
+            public StringField Company = null!;
+            public StringField Note = null!;
+            public StringField HiddenForCompanies = null!;
         }
     }
 

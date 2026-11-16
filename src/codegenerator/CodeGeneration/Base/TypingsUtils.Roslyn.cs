@@ -102,6 +102,44 @@ public static partial class TypingsUtils
         }
     }
 
+    /// <summary>
+    /// Gets the properties of the interfaces of a type that a property of it implements, ordered by the names of the interfaces,
+    /// whose attributes it inherits, like the runtime does, see WrappedProperty.
+    /// </summary>
+    /// <param name="prop">The property.</param>
+    /// <param name="type">The type the property is of, which can also be a type inheriting the one that declares it.</param>
+    public static IEnumerable<PropertyDefinition> GetImplementedInterfaceProperties(this PropertyDefinition prop, TypeDefinition type)
+    {
+        if (prop.IsStatic || type.TypeKind == TypeKind.Interface)
+            yield break;
+
+        foreach (var interfaceType in type.AllInterfaces.OrderBy(x => x.ToDisplayString(), StringComparer.Ordinal))
+        {
+            foreach (var member in interfaceType.GetMembers(prop.Name).OfType<PropertyDefinition>())
+            {
+                if (SymbolEqualityComparer.Default.Equals(type.FindImplementationForInterfaceMember(member), prop) ||
+                    SymbolEqualityComparer.Default.Equals(type.FindImplementationForInterfaceMember(member), prop.OriginalDefinition))
+                    yield return member;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Gets the attributes of a property with the intrinsic ones, then the ones of the members of the interfaces it implements,
+    /// so the first one of a type that is found is the one the runtime uses.
+    /// </summary>
+    /// <param name="prop">The property.</param>
+    /// <param name="type">The type the property is of, which can also be a type inheriting the one that declares it.</param>
+    public static IEnumerable<CustomAttribute> GetAttributesWithInterfaces(this PropertyDefinition prop, TypeDefinition type)
+    {
+        foreach (var attr in prop.GetAttributesWithIntrinsic())
+            yield return attr;
+
+        foreach (var interfaceProperty in prop.GetImplementedInterfaceProperties(type))
+            foreach (var attr in interfaceProperty.GetAttributesWithIntrinsic())
+                yield return attr;
+    }
+
     public static TypeDefinition? GetEnumTypeFrom(TypeReference type)
     {
         type = GetNullableUnderlyingType(type) ?? type;

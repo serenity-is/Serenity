@@ -94,11 +94,11 @@ public partial class ServerTypingsGenerator
                 if (basedOnByName != null)
                     basedOnField = basedOnByName[item.Name].FirstOrDefault();
 
-                if (GetAttribute(item, basedOnField, rowAnnotations, "Serenity.ComponentModel", "IgnoreUIFieldAttribute") != null ||
-                    GetAttribute(item, basedOnField, rowAnnotations, "Serenity.ComponentModel", "TransformIgnoreAttribute") != null)
+                if (GetAttribute(type, item, basedOnField, basedOnRow, rowAnnotations, "Serenity.ComponentModel", "IgnoreUIFieldAttribute") != null ||
+                    GetAttribute(type, item, basedOnField, basedOnRow, rowAnnotations, "Serenity.ComponentModel", "TransformIgnoreAttribute") != null)
                     continue;
 
-                var formatterTypeAttr = GetAttribute(item, basedOnField, rowAnnotations, "Serenity.ComponentModel", "FormatterTypeAttribute");
+                var formatterTypeAttr = GetAttribute(type, item, basedOnField, basedOnRow, rowAnnotations, "Serenity.ComponentModel", "FormatterTypeAttribute");
                 var formatterTypeKey = GetFormatterTypeKeyFrom(item.PropertyType(), basedOnField?.PropertyType(), formatterTypeAttr);
 
                 if (formatterTypeKey is null)

@@ -63,30 +63,38 @@ public static class PropertyItemsLocalTextRegistration
 
             foreach (var member in type.GetMembers(BindingFlags.Instance | BindingFlags.Public))
             {
-                if (member.GetCustomAttribute<CategoryAttribute>() is CategoryAttribute categoryAttr)
+                // a property also has the attributes of the combination attributes it has, and of the members of the
+                // interfaces it implements, as its property items do
+                var property = member is PropertyInfo propertyInfo ? new Reflection.WrappedProperty(propertyInfo) : null;
+                TAttr? getAttribute<TAttr>() where TAttr : Attribute => property is not null ?
+                    property.GetAttribute<TAttr>(AttributeOrigin.Inherit | AttributeOrigin.Intrinsic) : member.GetCustomAttribute<TAttr>();
+                IEnumerable<TAttr> getAttributes<TAttr>() where TAttr : Attribute => property is not null ?
+                    property.GetAttributes<TAttr>(AttributeOrigin.Inherit | AttributeOrigin.Intrinsic) : member.GetCustomAttributes<TAttr>();
+
+                if (getAttribute<CategoryAttribute>() is CategoryAttribute categoryAttr)
                     addAttributeText(categoryAttr, categoryAttr.Category,
                         "Categories." + categoryAttr.Category);
 
-                if (member.GetCustomAttribute<TabAttribute>() is TabAttribute tabAttr)
+                if (getAttribute<TabAttribute>() is TabAttribute tabAttr)
                     addAttributeText(tabAttr, tabAttr.Value, "Tabs." + tabAttr.Value);
 
-                if (member.GetCustomAttribute<DisplayNameAttribute>() is DisplayNameAttribute displayAttr)
+                if (getAttribute<DisplayNameAttribute>() is DisplayNameAttribute displayAttr)
                     addAttributeText(displayAttr, displayAttr.DisplayName, member.Name);
 
-                if (member.GetCustomAttribute<HintAttribute>() is HintAttribute hintAttr)
+                if (getAttribute<HintAttribute>() is HintAttribute hintAttr)
                     addAttributeText(hintAttr, hintAttr.Hint, member.Name + "_Hint");
 
-                if (member.GetCustomAttribute<PlaceholderAttribute>() is PlaceholderAttribute placeholderAttr)
+                if (getAttribute<PlaceholderAttribute>() is PlaceholderAttribute placeholderAttr)
                     addAttributeText(placeholderAttr, placeholderAttr.Value, member.Name + "_Placeholder");
 
                 // the messages of the rules of Serenity, with their implied keys, e.g. Quantity_ValidateRange
-                foreach (var ruleAttr in member.GetCustomAttributes<System.ComponentModel.DataAnnotations.ValidationAttribute>())
+                foreach (var ruleAttr in getAttributes<System.ComponentModel.DataAnnotations.ValidationAttribute>())
                 {
                     if (ValidationRules.HasLocalizableMessage(ruleAttr) && ValidationRules.GetTextKeySuffix(ruleAttr) is { } ruleSuffix)
                         addAttributeText(ruleAttr, ruleAttr.ErrorMessage, member.Name + ruleSuffix);
                 }
 
-                foreach (var addonAttr in member.GetCustomAttributes<EditorAddonAttribute>())
+                foreach (var addonAttr in getAttributes<EditorAddonAttribute>())
                 {
                     addonParams.Clear();
                     addonAttr.SetParams(addonParams);

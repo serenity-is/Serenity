@@ -40,9 +40,9 @@ public class SaveRequestHandlerTests_AsyncValidation
 
         public class RowFields : RowFieldsBase
         {
-            public Int32Field Id;
-            public StringField Code;
-            public Int32Field Quantity;
+            public Int32Field Id = null!;
+            public StringField Code = null!;
+            public Int32Field Quantity = null!;
         }
     }
 
@@ -73,7 +73,7 @@ public class SaveRequestHandlerTests_AsyncValidation
         Assert.Equal(cancellation.Token, ValidateFreeAsyncAttribute.LastToken);
 
         handler.SetRow(new AsyncRow { Code = "free" });
-        await handler.DoValidateFieldValuesAsync();
+        await handler.DoValidateFieldValuesAsync(TestContext.Current.CancellationToken);
     }
 
     [Fact]
@@ -90,7 +90,7 @@ public class SaveRequestHandlerTests_AsyncValidation
         var handler = NewHandler();
         handler.SetRow(new AsyncRow { Quantity = 11 });
 
-        var error = await Assert.ThrowsAsync<ValidationError>(() => handler.DoValidateFieldValuesAsync());
+        var error = await Assert.ThrowsAsync<ValidationError>(() => handler.DoValidateFieldValuesAsync(TestContext.Current.CancellationToken));
         Assert.Equal("Quantity", error.Arguments);
         Assert.Equal("Please enter a value between 1 and 10.", error.Message);
     }
@@ -99,8 +99,8 @@ public class SaveRequestHandlerTests_AsyncValidation
     public async Task ValidateAsync_Skips_A_Rule_Only_Checked_By_The_Forms_And_Skips_Empty_Values()
     {
         var context = new ValidationContext(new object()) { MemberName = "Code" };
-        Assert.Null(await ValidationRules.ValidateAsync(new ValidateFreeAsyncAttribute { Side = ValidationSide.Client }, "taken", context));
-        Assert.Null(await ValidationRules.ValidateAsync(new ValidateFreeAsyncAttribute(), null, context));
-        Assert.Equal("Please enter a valid value.", await ValidationRules.ValidateAsync(new ValidateFreeAsyncAttribute(), "taken", context));
+        Assert.Null(await ValidationRules.ValidateAsync(new ValidateFreeAsyncAttribute { Side = ValidationSide.Client }, "taken", context, TestContext.Current.CancellationToken));
+        Assert.Null(await ValidationRules.ValidateAsync(new ValidateFreeAsyncAttribute(), null, context, TestContext.Current.CancellationToken));
+        Assert.Equal("Please enter a valid value.", await ValidationRules.ValidateAsync(new ValidateFreeAsyncAttribute(), "taken", context, TestContext.Current.CancellationToken));
     }
 }

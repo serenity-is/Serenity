@@ -29,7 +29,7 @@ public class UserEntityOptions : IOptions<UserEntityOptions>
                     throw new ArgumentException("UserRowSettings.RowType must be a type that implements IRow.");
 
                 if (value.GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                    .FirstOrDefault(x => x.GetCustomAttribute<IdPropertyAttribute>() is not null) is not { } idProperty)
+                    .FirstOrDefault(x => x.GetPropertyAttribute<IdPropertyAttribute>() is not null) is not { } idProperty)
                 {
                     throw new ArgumentException("UserRowSettings.RowType must have a property with the [IdProperty] attribute.");
                 }

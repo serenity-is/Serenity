@@ -32,12 +32,12 @@ internal class OriginPropertyDictionary
         joinPropertyByName = new(StringComparer.Ordinal);
         foreach (var property in propertyByName.Values)
         {
-            var originAttr = property.GetCustomAttribute<OriginAttribute>();
+            var originAttr = property.GetPropertyAttribute<OriginAttribute>();
             if (originAttr != null)
                 originAttrByPropertyName[property.Name] = originAttr;
 
-            var lj = property.GetCustomAttribute<LeftJoinAttribute>();
-            var fk = property.GetCustomAttributes<ForeignKeyAttribute>().ToArray();
+            var lj = property.GetPropertyAttribute<LeftJoinAttribute>();
+            var fk = property.GetPropertyAttributes<ForeignKeyAttribute>().ToArray();
             if (lj != null && fk != null)
             {
                 joinPropertyByAlias[lj.Alias] = new(property.Name, fk, lj);
@@ -227,14 +227,14 @@ internal class OriginPropertyDictionary
         else
             aliasPrefix = aliasPrefix + "_" + joinAlias;
 
-        var columnAttr = originProperty.GetCustomAttribute<ColumnAttribute>();
+        var columnAttr = originProperty.GetPropertyAttribute<ColumnAttribute>();
         if (columnAttr != null)
             return aliasPrefix + "." + SqlSyntax.AutoBracket(columnAttr.Name, expressionSelector.Dialect);
         else
         {
             var originDictionary = GetPropertyDictionary(org.Item2, userEntityOptions);
 
-            var expressionAttr = originProperty.GetCustomAttributes<BaseExpressionAttribute>();
+            var expressionAttr = originProperty.GetPropertyAttributes<BaseExpressionAttribute>();
             if (expressionAttr.Any())
             {
                 var expression = expressionSelector.GetBestMatch(expressionAttr, 
@@ -244,7 +244,7 @@ internal class OriginPropertyDictionary
             }
             else
             {
-                var originOrigin = originProperty.GetCustomAttribute<OriginAttribute>();
+                var originOrigin = originProperty.GetPropertyAttribute<OriginAttribute>();
                 if (originOrigin != null)
                 {
                     originDictionary.PrefixAliases(GetJoinAlias(originOrigin) + ".Dummy", aliasPrefix, expressionSelector, extraJoins);
@@ -266,11 +266,11 @@ internal class OriginPropertyDictionary
         var org = GetOriginProperty(propertyName, expressionSelector);
         var originProperty = org.Item1;
 
-        var attr = originProperty.GetCustomAttribute<TAttr>();
+        var attr = originProperty.GetPropertyAttribute<TAttr>();
         if (attr != null)
             return attr;
 
-        var originOrigin = originProperty.GetCustomAttribute<OriginAttribute>();
+        var originOrigin = originProperty.GetPropertyAttribute<OriginAttribute>();
         if (originOrigin != null)
         {
             var originDictionary = GetPropertyDictionary(org.Item2, userEntityOptions);
@@ -296,7 +296,7 @@ internal class OriginPropertyDictionary
                 prefix = propJoin.join.TitlePrefix;
             else
             {
-                attr = propertyByName[propJoin.propertyName].GetCustomAttribute<DisplayNameAttribute>();
+                attr = propertyByName[propJoin.propertyName].GetPropertyAttribute<DisplayNameAttribute>();
                 if (attr is not null && !string.IsNullOrEmpty(attr.DisplayName) &&
                     (attr is DisplayTextAttribute ||
                     !LocalText.IsLocalTextKeyCandidate(attr.DisplayName, uiKeyOnly: true)))
@@ -325,7 +325,7 @@ internal class OriginPropertyDictionary
         var org = GetOriginProperty(propertyName, expressionSelector);
         var originProperty = org.Item1;
 
-        attr = originProperty.GetCustomAttribute<DisplayNameAttribute>();
+        attr = originProperty.GetPropertyAttribute<DisplayNameAttribute>();
         if (attr is DisplayTextAttribute displayText)
         {
             if (string.IsNullOrEmpty(displayText.DisplayName))
@@ -353,7 +353,7 @@ internal class OriginPropertyDictionary
                 new DisplayTextAttribute(prefixedName);
         }
 
-        var originOrigin = originProperty.GetCustomAttribute<OriginAttribute>();
+        var originOrigin = originProperty.GetPropertyAttribute<OriginAttribute>();
         if (originOrigin != null)
         {
             var originDictionary = GetPropertyDictionary(org.Item2, userEntityOptions);
@@ -416,19 +416,19 @@ internal class OriginPropertyDictionary
                 var propertyInfo = propertyByName[propJoin.propertyName];
                 string leftExpression;
                 var newAlias = aliasPrefix + x;
-                var columnAttr = propertyInfo.GetCustomAttribute<ColumnAttribute>();
+                var columnAttr = propertyInfo.GetPropertyAttribute<ColumnAttribute>();
                 if (columnAttr != null)
                     leftExpression = alias + "." + SqlSyntax.AutoBracket(columnAttr.Name, expressionSelector.Dialect);
                 else
                 {
-                    var expressionAttr = propertyInfo.GetCustomAttributes<BaseExpressionAttribute>();
+                    var expressionAttr = propertyInfo.GetPropertyAttributes<BaseExpressionAttribute>();
                     var expression = expressionSelector.GetBestMatch(expressionAttr,
                         x => x is ExpressionAttribute exp ? exp.Dialect : null);
                     if (expression != null)
                         leftExpression = mapExpression(expression.ToString(expressionSelector.Dialect))!;
                     else
                     {
-                        var origin = propertyInfo.GetCustomAttribute<OriginAttribute>();
+                        var origin = propertyInfo.GetPropertyAttribute<OriginAttribute>();
                         if (origin != null)
                             leftExpression = OriginExpression(propertyInfo.Name, origin, expressionSelector, alias, extraJoins);
                         else

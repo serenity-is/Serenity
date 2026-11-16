@@ -7,6 +7,15 @@ namespace Serenity.Reporting;
 /// </summary>
 public static class ReportColumnConverter
 {
+    /// <summary>
+    /// Gets an attribute of a member, which for a property is the one Serenity resolves, with the ones of the members of the
+    /// interfaces it implements and of its combination attributes, as its property items have them.
+    /// </summary>
+    private static TAttribute? GetMemberAttribute<TAttribute>(MemberInfo member) where TAttribute : Attribute
+    {
+        return member is PropertyInfo property ? property.GetPropertyAttribute<TAttribute>() : member.GetCustomAttribute<TAttribute>();
+    }
+
     private static ReportColumn FromMember(MemberInfo member, Type dataType,
         Field? baseField, ITextLocalizer localizer)
     {
@@ -16,7 +25,7 @@ public static class ReportColumnConverter
         {
             Name = member.Name
         };
-        var displayAttr = member.GetCustomAttribute<DisplayNameAttribute>();
+        var displayAttr = GetMemberAttribute<DisplayNameAttribute>(member);
         if (displayAttr != null)
         {
             var resolved = LocalText.ResolveFromAttribute(displayAttr,
@@ -25,11 +34,11 @@ public static class ReportColumnConverter
                 localizer.TryGet(key) ?? resolved.Text ?? key : resolved.Text;
         }
 
-        var sizeAttr = member.GetCustomAttribute<SizeAttribute>();
+        var sizeAttr = GetMemberAttribute<SizeAttribute>(member);
         if (sizeAttr != null && sizeAttr.Value != 0)
             result.Width = sizeAttr.Value;
 
-        var formatAttr = member.GetCustomAttribute<DisplayFormatAttribute>();
+        var formatAttr = GetMemberAttribute<DisplayFormatAttribute>(member);
         if (formatAttr != null)
             result.Format = formatAttr.Value;
         else
@@ -108,8 +117,8 @@ public static class ReportColumnConverter
                 propertyInfo == null)
                 continue;
 
-            if (member.GetCustomAttribute<IgnoreUIFieldAttribute>() != null ||
-                member.GetCustomAttribute<TransformIgnoreAttribute>() != null)
+            if (GetMemberAttribute<IgnoreUIFieldAttribute>(member) != null ||
+                GetMemberAttribute<TransformIgnoreAttribute>(member) != null)
                 continue;
 
             Field? baseField;
@@ -129,7 +138,7 @@ public static class ReportColumnConverter
             else
                 column = FromPropertyInfo(propertyInfo!, localizer, baseField);
 
-            var cellDecorator = member.GetCustomAttribute<CellDecoratorAttribute>();
+            var cellDecorator = GetMemberAttribute<CellDecoratorAttribute>(member);
             if (cellDecorator != null)
             {
                 var decorator = (ICellDecorator)ActivatorUtilities.CreateInstance(

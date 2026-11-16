@@ -267,7 +267,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
             var quickSearchFields = itemType.GetProperties()
                 .Where(property => property.GetMethod is { IsPublic: true, IsStatic: false } &&
                     property.GetIndexParameters().Length == 0)
-                .Where(property => property.GetCustomAttribute<Serenity.Data.Mapping.QuickSearchAttribute>() is
+                .Where(property => property.GetPropertyAttribute<Serenity.Data.Mapping.QuickSearchAttribute>() is
                     { IsExplicit: false })
                 .Select(property => property.Name)
                 .ToArray();
@@ -294,7 +294,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
             if (idFieldMissing)
             {
                 var idProperty = FindPropertyByAttributeOrName(properties,
-                    property => property.GetCustomAttribute<IdPropertyAttribute>() != null,
+                    property => property.GetPropertyAttribute<IdPropertyAttribute>() != null,
                     "Id", "Key", "Code", "Value");
                 if (idProperty != null)
                     editorParams["idField"] = idProperty.Name;
@@ -303,7 +303,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
             if (textFieldMissing)
             {
                 var textProperty = FindPropertyByAttributeOrName(properties,
-                    property => property.GetCustomAttribute<NamePropertyAttribute>() != null,
+                    property => property.GetPropertyAttribute<NamePropertyAttribute>() != null,
                     "Name", "DisplayName", "Text");
                 if (textProperty != null)
                     editorParams["textField"] = textProperty.Name;
@@ -385,21 +385,21 @@ public partial class BasicPropertyProcessor : PropertyProcessor
             if (idFieldMissing)
             {
                 var idFieldName = itemType.GetProperties().FirstOrDefault(x =>
-                    x.GetCustomAttribute<IdPropertyAttribute>() != null)?.Name;
+                    x.GetPropertyAttribute<IdPropertyAttribute>() != null)?.Name;
                 if (idFieldName != null)
                     editorParams["idField"] = idFieldName;
             }
             if (textFieldMissing)
             {
                 var textFieldName = itemType.GetProperties().FirstOrDefault(x =>
-                    x.GetCustomAttribute<NamePropertyAttribute>() != null)?.Name;
+                    x.GetPropertyAttribute<NamePropertyAttribute>() != null)?.Name;
                 if (textFieldName != null)
                     editorParams["textField"] = textFieldName;
             }
             if (columnsMissing)
             {
                 // play safe as other service types may not support includeColumns property
-                editorParams["includeColumns"] = itemType.GetProperties().Where(x => x.GetCustomAttribute<LookupIncludeAttribute>() != null).Select(x => x.Name).ToArray();
+                editorParams["includeColumns"] = itemType.GetProperties().Where(x => x.GetPropertyAttribute<LookupIncludeAttribute>() != null).Select(x => x.Name).ToArray();
             }
         }
 

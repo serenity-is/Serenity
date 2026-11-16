@@ -44,7 +44,7 @@ public class DistinctValuesRegistration
 
             foreach (var property in type.GetProperties(BindingFlags.Instance | BindingFlags.Public))
             {
-                var attr = property.GetCustomAttribute<DistinctValuesEditorAttribute>();
+                var attr = property.GetPropertyAttribute<DistinctValuesEditorAttribute>();
                 if (attr == null)
                     continue;
 

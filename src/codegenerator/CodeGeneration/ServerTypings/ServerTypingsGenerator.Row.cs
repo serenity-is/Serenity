@@ -78,6 +78,8 @@ public partial class ServerTypingsGenerator
 
     private static IEnumerable<(PropertyDefinition Property, FieldDefinition Field)> EnumerateFieldPropertiesWithFields(TypeDefinition rowType)
     {
+        // the interfaces are the ones of the row itself, which a property declared in a base row can implement
+        var originalRowType = rowType;
         do
         {
             var propertyByName = rowType.PropertiesOf().Where(x =>
@@ -123,7 +125,7 @@ public partial class ServerTypingsGenerator
                     var property = propertyByName[field.Name].FirstOrDefault();
                     if (property != null)
                     {
-                        var attrs = property.GetAttributesWithIntrinsic();
+                        var attrs = property.GetAttributesWithInterfaces(originalRowType);
                         if (TypingsUtils.FindAttr(attrs, "Serenity.ComponentModel", "IgnoreUIFieldAttribute") is null &&
                             TypingsUtils.FindAttr(attrs, "Serenity.ComponentModel", "TransformIgnoreAttribute") is null)
                             yield return (property, field);
@@ -464,13 +466,13 @@ public partial class ServerTypingsGenerator
         var properties = EnumerateProperties(rowType).ToList();
 
         metadata.IdProperty ??= properties.FirstOrDefault(x =>
-                x.HasCustomAttributes() && TypingsUtils.FindAttr(x.GetAttributesWithIntrinsic(),
+                TypingsUtils.FindAttr(x.GetAttributesWithInterfaces(rowType),
                     "Serenity.Data", "IdPropertyAttribute") != null)?.Name;
 
         if (metadata.IdProperty == null)
         {
             var identities = properties.Where(x =>
-                x.HasCustomAttributes() && TypingsUtils.FindAttr(x.GetAttributesWithIntrinsic(),
+                TypingsUtils.FindAttr(x.GetAttributesWithInterfaces(rowType),
                     "Serenity.Data.Mapping", "IdentityAttribute") != null);
 
             if (identities.Count() == 1)
@@ -478,7 +480,7 @@ public partial class ServerTypingsGenerator
             else if (!identities.Any())
             {
                 var primaryKeys = properties.Where(x =>
-                    x.HasCustomAttributes() && TypingsUtils.FindAttr(x.GetAttributesWithIntrinsic(),
+                    TypingsUtils.FindAttr(x.GetAttributesWithInterfaces(rowType),
                         "Serenity.Data.Mapping", "PrimaryKeyAttribute") != null);
 
                 if (primaryKeys.Count() == 1)
@@ -491,7 +493,7 @@ public partial class ServerTypingsGenerator
                 "Serenity.Data.StringField Serenity.Data.INameRow::get_NameField()");
 
         metadata.NameProperty ??= properties.FirstOrDefault(x =>
-                x.HasCustomAttributes() && TypingsUtils.FindAttr(x.GetAttributesWithIntrinsic(),
+                TypingsUtils.FindAttr(x.GetAttributesWithInterfaces(rowType),
                     "Serenity.Data", "NamePropertyAttribute") != null)?.Name;
 
         metadata.IsActiveProperty = ExtractInterfacePropertyFromRow(rowType,

@@ -179,10 +179,11 @@ public partial class ServerTypingsGenerator
         return basedOnRow;
     }
 
-    private static CustomAttribute? GetAttribute(PropertyDefinition item, PropertyDefinition? basedOnField,
-        IEnumerable<AnnotationTypeInfo>? rowAnnotations, string ns, string name)
+    private static CustomAttribute? GetAttribute(TypeDefinition type, PropertyDefinition item, PropertyDefinition? basedOnField,
+        TypeDefinition? basedOnRow, IEnumerable<AnnotationTypeInfo>? rowAnnotations, string ns, string name)
     {
-        var attr = TypingsUtils.FindAttr(item.GetAttributesWithIntrinsic(), ns, name);
+        // the attributes of the property, then the ones of the members of the interfaces it implements, as the runtime has them
+        var attr = TypingsUtils.FindAttr(item.GetAttributesWithInterfaces(type), ns, name);
 
         if (attr == null && rowAnnotations != null)
         {
@@ -198,7 +199,7 @@ public partial class ServerTypingsGenerator
         }
 
         if (attr == null && basedOnField != null)
-            attr = TypingsUtils.FindAttr(basedOnField.GetAttributesWithIntrinsic(), ns, name);
+            attr = TypingsUtils.FindAttr(basedOnField.GetAttributesWithInterfaces(basedOnRow!), ns, name);
 
         return attr;
     }
@@ -209,17 +210,17 @@ public partial class ServerTypingsGenerator
     /// load them with themselves, instead of on demand. The type key of a rule class is the Key constant of its attribute,
     /// else the one it gives the constructor of its base, else the one of the convention of ValidationRuleAttribute.
     /// </summary>
-    private void ReferenceValidationRuleTypes(PropertyDefinition item, PropertyDefinition? basedOnField,
-        IEnumerable<AnnotationTypeInfo>? rowAnnotations, HashSet<(string group, string key)> referencedTypeKeys,
+    private void ReferenceValidationRuleTypes(TypeDefinition type, PropertyDefinition item, PropertyDefinition? basedOnField,
+        TypeDefinition? basedOnRow, IEnumerable<AnnotationTypeInfo>? rowAnnotations, HashSet<(string group, string key)> referencedTypeKeys,
         List<(string group, string alias)> referencedTypeAliases)
     {
-        var attributes = item.GetAttributesWithIntrinsic().AsEnumerable();
+        var attributes = item.GetAttributesWithInterfaces(type).AsEnumerable();
         if (rowAnnotations != null)
             foreach (var annotationType in rowAnnotations)
                 if (annotationType.PropertyByName.TryGetValue(item.Name, out PropertyDefinition? annotation))
                     attributes = attributes.Concat(annotation!.GetAttributesWithIntrinsic());
         if (basedOnField != null)
-            attributes = attributes.Concat(basedOnField.GetAttributesWithIntrinsic());
+            attributes = attributes.Concat(basedOnField.GetAttributesWithInterfaces(basedOnRow!));
 
         foreach (var attr in attributes)
         {
@@ -315,11 +316,11 @@ public partial class ServerTypingsGenerator
                 if (basedOnByName != null)
                     basedOnField = basedOnByName[item.Name].FirstOrDefault();
 
-                if (GetAttribute(item, basedOnField, rowAnnotations, "Serenity.ComponentModel", "IgnoreUIFieldAttribute") != null ||
-                    GetAttribute(item, basedOnField, rowAnnotations, "Serenity.ComponentModel", "TransformIgnoreAttribute") != null)
+                if (GetAttribute(type, item, basedOnField, basedOnRow, rowAnnotations, "Serenity.ComponentModel", "IgnoreUIFieldAttribute") != null ||
+                    GetAttribute(type, item, basedOnField, basedOnRow, rowAnnotations, "Serenity.ComponentModel", "TransformIgnoreAttribute") != null)
                     continue;
 
-                var editorTypeAttr = GetAttribute(item, basedOnField, rowAnnotations, "Serenity.ComponentModel", "EditorTypeAttribute");
+                var editorTypeAttr = GetAttribute(type, item, basedOnField, basedOnRow, rowAnnotations, "Serenity.ComponentModel", "EditorTypeAttribute");
                 var editorTypeKey = GetEditorTypeKeyFrom(item.PropertyType(), basedOnField?.PropertyType(), editorTypeAttr);
 
                 ExternalType? editorScriptType = null;
@@ -337,7 +338,7 @@ public partial class ServerTypingsGenerator
                 }
 
                 TryReferenceEnumType(item.PropertyType(), basedOnField?.PropertyType(), referencedTypeKeys, referencedTypeAliases);
-                ReferenceValidationRuleTypes(item, basedOnField, rowAnnotations, referencedTypeKeys, referencedTypeAliases);
+                ReferenceValidationRuleTypes(type, item, basedOnField, basedOnRow, rowAnnotations, referencedTypeKeys, referencedTypeAliases);
 
                 if (editorScriptType is null)
                 {
