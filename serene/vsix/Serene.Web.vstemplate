@@ -45,6 +45,7 @@
           <ProjectItem ReplaceParameters="true" TargetFileName="DefaultDB_20141111_1130_Permissions.cs">DefaultDB_20141111_1130_Permissions.cs</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="DefaultDB_20160515_0726_UserPreferences.cs">DefaultDB_20160515_0726_UserPreferences.cs</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="DefaultDB_20161029_1300_ExceptionLog.cs">DefaultDB_20161029_1300_ExceptionLog.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="DefaultDB_20261105_1200_NormalizedUsernameAndEmail.cs">DefaultDB_20261105_1200_NormalizedUsernameAndEmail.cs</ProjectItem>
         </Folder>
       </Folder>
       <Folder Name="Modules" TargetFolderName="Modules">
@@ -166,10 +167,12 @@
             </Folder>
             <ProjectItem ReplaceParameters="true" TargetFileName="PermissionKeyLister.cs">PermissionKeyLister.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="PermissionService.cs">PermissionService.cs</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="RoleListService.cs">RoleListService.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="RolePermissionService.cs">RolePermissionService.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="SkiaSharpImageProcessor.cs">SkiaSharpImageProcessor.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="UserAccessor.cs">UserAccessor.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="UserCultureProvider.cs">UserCultureProvider.cs</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="UserListService.cs">UserListService.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="UserPasswordValidator.cs">UserPasswordValidator.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="UserRetrieveService.cs">UserRetrieveService.cs</ProjectItem>
           </Folder>
@@ -317,11 +320,11 @@
         <Folder Name="esm" TargetFolderName="esm">
           <Folder Name="_chunks" TargetFolderName="_chunks">
             <ProjectItem ReplaceParameters="true" TargetFileName="chunk-4RRITRPO.js">chunk-4RRITRPO.js</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-6WBDC6IK.js">chunk-6WBDC6IK.js</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-5BIDJAG6.js">chunk-5BIDJAG6.js</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="chunk-BGXO3CPC.js">chunk-BGXO3CPC.js</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-C2YFWUCF.js">chunk-C2YFWUCF.js</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-EYHTJNN2.js">chunk-EYHTJNN2.js</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-TJGMM5KO.js">chunk-TJGMM5KO.js</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-EBMZRGMG.js">chunk-EBMZRGMG.js</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-TIEKRHXH.js">chunk-TIEKRHXH.js</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-VJZ7KFIT.js">chunk-VJZ7KFIT.js</ProjectItem>
           </Folder>
           <Folder Name="Modules" TargetFolderName="Modules">
             <Folder Name="Administration" TargetFolderName="Administration">

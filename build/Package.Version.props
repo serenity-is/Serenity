@@ -1,7 +1,7 @@
 <Project>
   <PropertyGroup>
-    <SerenityVersion Condition="'$(SerenityVersion)' == ''">10.6.3</SerenityVersion>
-    <CFPackageVersion Condition="'$(CFPackageVersion)' == ''">10.6.3.0</CFPackageVersion>
-    <SereneTemplateVersion Condition="'$(SereneTemplateVersion)' == ''">10.6.3.0</SereneTemplateVersion>
+    <SerenityVersion Condition="'$(SerenityVersion)' == ''">10.7.0</SerenityVersion>
+    <CFPackageVersion Condition="'$(CFPackageVersion)' == ''">10.7.0.0</CFPackageVersion>
+    <SereneTemplateVersion Condition="'$(SereneTemplateVersion)' == ''">10.7.0.0</SereneTemplateVersion>
   </PropertyGroup>
 </Project>
