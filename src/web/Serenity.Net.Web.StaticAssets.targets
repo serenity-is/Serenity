@@ -113,6 +113,25 @@
   </Target>
 
   <!--
+    The manifest is added to the output as a None item inside ResolveSerenityStaticAssetRoots.
+    That is enough for the app's own build, but a referencing project (e.g. a functional test
+    project that needs the manifest next to its assembly) collects content through
+    GetCopyToOutputDirectoryItems, whose AssignTargetPaths step has usually already run by the
+    time ResolveProjectReferences (and so ResolveSerenityStaticAssetRoots) runs in that instance,
+    so the manifest was only sometimes propagated, depending on build order and incrementality.
+    Resolving the roots first makes the item exist before AssignTargetPaths assigns target paths.
+    Prepended, as this file may be imported before or after Microsoft.Common.targets defines the
+    property, and the target has to come before AssignTargetPaths either way.
+  -->
+  <PropertyGroup>
+    <GetCopyToOutputDirectoryItemsDependsOn>_ResolveSerenityStaticAssetsForContent;$(GetCopyToOutputDirectoryItemsDependsOn)</GetCopyToOutputDirectoryItemsDependsOn>
+  </PropertyGroup>
+
+  <Target Name="_ResolveSerenityStaticAssetsForContent"
+          DependsOnTargets="AssignProjectConfiguration;_SplitProjectReferencesByFileExistence;_GetProjectReferenceTargetFrameworkProperties;ResolveSerenityStaticAssetRoots"
+          Condition="'$(OutputType)' == 'Exe'" />
+
+  <!--
     SerenityStaticAssetRoot items of packages come from their buildTransitive props,
     the ones of referenced projects are added here
   -->
