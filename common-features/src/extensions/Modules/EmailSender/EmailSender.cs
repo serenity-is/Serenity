@@ -39,7 +39,7 @@ public class EmailSender(IWebHostEnvironment host, IOptions<SmtpSettings> settin
             if (!string.IsNullOrEmpty(settings.Username))
                 client.Authenticate(settings.Username, settings.Password ?? "");
 
-            client.Send(message);
+            client.Send(new MailKit.SendRequest(message));
             client.Disconnect(true);
         }
         else

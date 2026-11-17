@@ -174,7 +174,7 @@ public class ValidateObjectTests
     {
         var model = Valid();
         model.Action = "dialog";
-        Assert.Equal("Dialog", (await ValidationRules.ValidateObjectAsync(model))!.PropertyName);
-        Assert.Null(await ValidationRules.ValidateObjectAsync(Valid()));
+        Assert.Equal("Dialog", (await ValidationRules.ValidateObjectAsync(model, cancellationToken: TestContext.Current.CancellationToken))!.PropertyName);
+        Assert.Null(await ValidationRules.ValidateObjectAsync(Valid(), cancellationToken: TestContext.Current.CancellationToken));
     }
 }

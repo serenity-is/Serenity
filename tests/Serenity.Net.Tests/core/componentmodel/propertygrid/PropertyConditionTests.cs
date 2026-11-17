@@ -15,11 +15,13 @@ public class PropertyConditionTests
     [InlineData("a", true)]
     [InlineData(0, true)]
     [InlineData(true, true)]
-    public void HasValue_Is_False_For_Null_Empty_And_False(object value, bool expected)
+    public void HasValue_Is_False_For_Null_Empty_And_False(object? value, bool expected)
     {
         Assert.Equal(expected, PropertyCondition.HasValue(value));
         Assert.False(PropertyCondition.HasValue(Array.Empty<string>()));
+#pragma warning disable CA1861 // Avoid constant arrays as arguments
         Assert.True(PropertyCondition.HasValue(new[] { "a" }));
+#pragma warning restore CA1861 // Avoid constant arrays as arguments
     }
 
     [Fact]
@@ -46,8 +48,12 @@ public class PropertyConditionTests
     public void IsMet_Matches_A_List_By_Any_Item_And_Is_Opposite_With_IsNot()
     {
         var condition = new VisibleWhenAttribute("Tags", "a") { IsNot = false }.ToCondition();
+#pragma warning disable CA1861 // Avoid constant arrays as arguments
         Assert.True(condition.IsMet(new[] { "b", "a" }));
+#pragma warning restore CA1861 // Avoid constant arrays as arguments
+#pragma warning disable CA1861 // Avoid constant arrays as arguments
         Assert.False(condition.IsMet(new[] { "b" }));
+#pragma warning restore CA1861 // Avoid constant arrays as arguments
 
         var empty = new VisibleWhenAttribute("Column") { IsNot = true }.ToCondition();
         Assert.True(empty.IsMet(""));
