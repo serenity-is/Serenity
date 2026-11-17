@@ -31,7 +31,7 @@ public partial class ServerTypingsGenerator
             if (module.EndsWith(".Entities", StringComparison.Ordinal))
                 module = module[0..^9];
             else if (module.EndsWith(".Enums", StringComparison.Ordinal))
-                module = module[0..^8];
+                module = module[0..^6];
 
             var idx = module.IndexOf('.');
             if (idx >= 0)

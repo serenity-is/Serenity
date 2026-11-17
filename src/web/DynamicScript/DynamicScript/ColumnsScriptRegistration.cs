@@ -29,7 +29,7 @@ public class ColumnsScriptRegistration
             var attr = type.GetCustomAttribute<ColumnsScriptAttribute>();
             if (attr == null)
                 continue;
-            var key = attr.Key ?? type.FullName!;
+            var key = attr.Key ?? (attr.InferKey ? ColumnsScriptAttribute.AutoColumnsKeyFor(type) : type.FullName!);
             var script = new ColumnsScript(key, type, propertyProvider, serviceProvider);
             scriptManager.Register(script);
             scripts.Add(script);

@@ -45,4 +45,26 @@ public class ColumnsScriptAttributeTests
         };
         Assert.Equal("TestPrefix", attribute.LocalTextPrefix);
     }
+
+    [Fact]
+    public void AutoColumnsKeyFor_Strips_Root_And_Columns_Namespace()
+    {
+        Assert.Equal("Core.VersionInfo",
+            ColumnsScriptAttribute.AutoColumnsKeyFor(typeof(Acme.Core.Columns.VersionInfoColumns)));
+    }
+
+    [Fact]
+    public void AutoColumnsKeyFor_Infers_The_Same_Key_As_AutoFormKeyFor()
+    {
+        // a columns key is inferred exactly like a form key, see the attribute docs
+        var type = typeof(Acme.Core.Columns.VersionInfoColumns);
+        Assert.Equal(FormScriptAttribute.AutoFormKeyFor(type), ColumnsScriptAttribute.AutoColumnsKeyFor(type));
+    }
+
+    [Fact]
+    public void AutoColumnsKeyFor_Uses_Module_Attribute_On_Type()
+    {
+        Assert.Equal("SomeModule.Module",
+            ColumnsScriptAttribute.AutoColumnsKeyFor(typeof(Acme.Core.Modules.ModuleForm)));
+    }
 }

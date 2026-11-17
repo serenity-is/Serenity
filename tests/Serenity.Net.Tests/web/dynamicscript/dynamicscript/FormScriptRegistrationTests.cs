@@ -1,3 +1,5 @@
+using Serenity.Localization;
+
 namespace Serenity.Web;
 
 public class FormScriptRegistrationTests
@@ -54,5 +56,53 @@ public class FormScriptRegistrationTests
     [FormScript]
     private class NoKeyFormType
     {
+    }
+
+    [Fact]
+    public void RegisterFormScripts_Uses_Inferred_Key_When_InferKey()
+    {
+        var manager = new MockDynamicScriptManager();
+        var services = new ServiceCollection().BuildServiceProvider();
+
+        var scripts = FormScriptRegistration.RegisterFormScripts(manager,
+            new MockTypeSource(typeof(Acme.Default.Forms.VersionInfoForm)),
+            new MockPropertyItemProvider(), services).ToList();
+
+        Assert.Single(scripts);
+        Assert.Equal("Form.Default.VersionInfo", scripts[0].ScriptName);
+        Assert.True(manager.IsRegistered("Form.Default.VersionInfo"));
+        Assert.False(manager.IsRegistered("Form." + typeof(Acme.Default.Forms.VersionInfoForm).FullName));
+    }
+
+    [Fact]
+    public void RegisterFormScripts_Uses_FullName_When_InferKey_Is_False()
+    {
+        var manager = new MockDynamicScriptManager();
+        var services = new ServiceCollection().BuildServiceProvider();
+
+        var scripts = FormScriptRegistration.RegisterFormScripts(manager,
+            new MockTypeSource(typeof(Acme.Default.Forms.ExplicitFalseForm)),
+            new MockPropertyItemProvider(), services).ToList();
+
+        Assert.Single(scripts);
+        Assert.Equal("Form." + typeof(Acme.Default.Forms.ExplicitFalseForm).FullName,
+            scripts[0].ScriptName);
+    }
+
+    [Fact]
+    public void RegisterFormScripts_Texts_Use_The_Inferred_Key()
+    {
+        var manager = new MockDynamicScriptManager();
+        var services = new ServiceCollection().BuildServiceProvider();
+
+        var type = typeof(Acme.Default.Forms.VersionInfoForm);
+        var scripts = FormScriptRegistration.RegisterFormScripts(manager,
+            new MockTypeSource(type), new MockPropertyItemProvider(), services).ToList();
+
+        // field texts use the Forms. prefix (unlike the Form. script key), but the
+        // same inferred key: neither may fall back to the full type name
+        Assert.Equal("Form.Default.VersionInfo", scripts[0].ScriptName);
+        Assert.Equal("Forms.Default.VersionInfo.",
+            PropertyItemsLocalTextRegistration.GetPropertyItemsTextPrefix(type));
     }
 }

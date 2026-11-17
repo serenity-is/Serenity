@@ -491,8 +491,6 @@ public partial class ServerTypingsGenerator
                 module = module[0..^6];
             else if (module.EndsWith(".Columns", StringComparison.Ordinal))
                 module = module[0..^8];
-            else if (module.EndsWith(".Lookups", StringComparison.Ordinal))
-                module = module[0..^8];
 
             var idx = module.IndexOf('.');
             if (idx >= 0)
