@@ -14,7 +14,7 @@
     "typescript": "catalog:serenity"
   },
   "devDependencies": {
-    "@types/node": "^26.0.0"
+    "@types/node": "catalog:serenity"
   },
   "exports": {
     ".": {

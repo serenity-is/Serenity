@@ -277,6 +277,9 @@ ViewData["PageId"] = "Dashboard";
 
     $(function () {
         $('.daterange').daterangepicker({
+            // without this the picker only lists the ranges below: the plugin hides
+            // its calendars whenever `ranges` is set
+            alwaysShowCalendars: true,
             ranges: {
                 'Today': [moment(), moment()],
                 'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],

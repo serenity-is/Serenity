@@ -156,7 +156,7 @@ export function layoutFillHeightValue(element: HTMLElement | ArrayLike<HTMLEleme
     let $ = getjQuery();
     element = isArrayLike(element) ? element[0] : element
     if (!$ || !element)
-        return element ? parseInt(getComputedStyle(element).height, 10) : 0;
+        return element ? computedHeight(element) : 0;
 
     $(element).parent().children().not(element).each(function (i: number, e: HTMLElement) {
         let q = $(e);
@@ -169,6 +169,16 @@ export function layoutFillHeightValue(element: HTMLElement | ArrayLike<HTMLEleme
         h = h - ($(element).outerHeight(true) - $(element).height());
     }
     return h;
+}
+
+/**
+ * Reads an element's height from its computed style, falling back to the inline
+ * style. An element without a layout box (a detached node, or jsdom) has no
+ * computed height, so `parseInt` on it would produce `NaN`.
+ */
+function computedHeight(element: HTMLElement) {
+    const computed = parseInt(getComputedStyle(element).height, 10);
+    return isFinite(computed) ? computed : (parseInt(element.style.height, 10) || 0);
 }
 
 /**
