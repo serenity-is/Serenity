@@ -1,11 +1,10 @@
-import { mockDynamicData, mockFetch, mockGridSize, unmockFetch } from "test-utils";
+import { mockFetch, mockGridSize, unmockFetch } from "test-utils";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { ShipperColumns, ShipperRow, ShipperService } from "../../Modules/ServerTypes/Demo";
 import { ShipperDialog } from "../../Modules/Shipper/ShipperDialog";
 import { ShipperGrid } from "../../Modules/Shipper/ShipperGrid";
 
 beforeAll(() => {
-    mockDynamicData();
     mockGridSize();
 });
 

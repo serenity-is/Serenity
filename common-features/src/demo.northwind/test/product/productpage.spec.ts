@@ -1,11 +1,10 @@
 import * as corelib from "@serenity-is/corelib";
-import { mockDynamicData, mockFetch, mockGridSize, unmockFetch } from "test-utils";
+import { mockFetch, mockGridSize, unmockFetch } from "test-utils";
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { ProductGrid } from "../../Modules/Product/ProductGrid";
 import initPage from "../../Modules/Product/ProductPage";
 
 beforeAll(() => {
-    mockDynamicData();
     mockGridSize();
     mockFetch({ "*": () => ({ Entities: [], TotalCount: 0 }) });
 });

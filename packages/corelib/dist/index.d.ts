@@ -3630,6 +3630,18 @@ export declare function getWindowLocation(opt?: {
     top?: boolean;
 }): Location;
 /**
+ * Opens an address in a new window or tab.
+ *
+ * Applications should open addresses through this function instead of calling
+ * `window.open` directly, so tests can replace it: jsdom does not implement it,
+ * and it cannot always be spied on.
+ * @param url - The address.
+ * @param target - Where to open it, `_blank` for a new tab.
+ * @param features - The features of the new window, e.g. `noopener`.
+ * @returns The new window, or null when the browser blocked it.
+ */
+export declare function windowOpen(url?: string | URL, target?: string, features?: string): Window;
+/**
  * Resolves a Serenity service endpoint to a full URL.
  * Bare service keys like `"Administration/User/List"` are prefixed with `~/Services/`;
  * already rooted (`~/`, `/`) or absolute (`://`) URLs are resolved via {@link resolveUrl} unchanged.

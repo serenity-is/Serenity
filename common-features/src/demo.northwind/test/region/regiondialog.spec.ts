@@ -1,11 +1,10 @@
 import { DeleteRequest, DeleteResponse, RetrieveRequest, RetrieveResponse, SaveRequest, SaveResponse } from "@serenity-is/corelib";
-import { EntityDialogWrapper, mockAdmin, mockDynamicData, mockFetch, typeNumber, typeText, unmockFetch } from "test-utils";
+import { EntityDialogWrapper, mockAdmin, mockFetch, typeNumber, typeText, unmockFetch } from "test-utils";
 import { afterEach, beforeAll, describe, expect, it } from "vitest";
 import { RegionDialog } from "../../Modules/Region/RegionDialog";
 import { RegionForm, RegionRow, RegionService } from "../../Modules/ServerTypes/Demo";
 
 beforeAll(() => {
-    mockDynamicData();
     mockAdmin();
 });
 

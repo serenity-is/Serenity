@@ -1,6 +1,6 @@
 import { execFileSync } from "child_process";
 import { createHash } from "crypto";
-import { existsSync, readdirSync, readFileSync, readlinkSync } from "fs";
+import { existsSync, readdirSync, readFileSync, readlinkSync, realpathSync } from "fs";
 import { basename, dirname, join, resolve, sep } from "path";
 import { fileURLToPath } from 'url';
 import { defineConfig } from "vitest/config";
@@ -117,7 +117,62 @@ export default (opt) => {
         }
     }
 
-    const provide = {};
+    // texts of the framework and of the @serenity-is packages this project can
+    // reach, as the server would send them to the application: a package's own
+    // texts, the framework's, and those of its dependencies. Following each
+    // package's own node_modules reaches the whole closure, and a package that is
+    // not referenced (e.g. the meeting module in a dashboards test) is not loaded.
+    const localTexts = {};
+    const addTexts = dir => {
+        const folder = join(dir, "texts", "resources");
+        if (!existsSync(folder))
+            return;
+        for (const file of readdirSync(folder)) {
+            if (!file.endsWith(".texts.__.json"))
+                continue;
+            const { __comment__, ...texts } = JSON.parse(readFileSync(join(folder, file), "utf8"));
+            Object.assign(localTexts, texts);
+        }
+    };
+    const addDependencyTexts = (dir, depth) => {
+        // a guard against a pathological dependency graph; real chains are 2-3 deep
+        if (depth > 10)
+            return;
+        const folder = join(dir, "node_modules", "@serenity-is");
+        if (!existsSync(folder))
+            return;
+        for (const entry of readdirSync(folder, { withFileTypes: true })) {
+            if (entry.isDirectory() || entry.isSymbolicLink())
+                pending.push({ dir: join(folder, entry.name), depth });
+        }
+    };
+
+    const pending = [];
+    const visited = new Set();
+    addTexts(projectRoot);
+    for (const folder of readdirSync(join(serenityRoot, "src"))) {
+        const dir = join(serenityRoot, "src", folder);
+        if (existsSync(join(dir, "texts", "resources")))
+            addTexts(dir);
+    }
+    addDependencyTexts(projectRoot, 1);
+    while (pending.length) {
+        const { dir, depth } = pending.shift();
+        let real;
+        try {
+            real = realpathSync(dir);
+        }
+        catch {
+            continue;
+        }
+        if (visited.has(real))
+            continue;
+        visited.add(real);
+        addTexts(real);
+        addDependencyTexts(dir, depth + 1);
+    }
+
+    const provide = { localTexts };
     if (opt?.dynamicData ?? true) {
         for (var folder of [join(testUtils, "dynamic-data"), join(projectRoot, "dynamic-data")]) {
             if (existsSync(folder)) {
@@ -139,6 +194,7 @@ export default (opt) => {
         test: {
             name: opt?.name,
             environment: "jsdom",
+            setupFiles: [join(testUtils, "vitest-setup.js")],
             ...serenityTestOptions(projectRoot),
             execArgv: [
                 Number(process.versions.node.split('.')[0]) >= 25 ? '--no-webstorage' : null

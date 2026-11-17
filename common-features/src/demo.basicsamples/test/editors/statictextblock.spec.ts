@@ -1,11 +1,10 @@
 import { PropertyDialog } from "@serenity-is/corelib";
-import { EntityDialogWrapper, mockAdmin, mockDynamicData, mockFetch, mockGridSize, unmockFetch } from "test-utils";
+import { EntityDialogWrapper, mockAdmin, mockFetch, mockGridSize, unmockFetch } from "test-utils";
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import initPage, { StaticTextBlockDialog } from "../../Modules/Editors/StaticTextBlock/StaticTextBlockPage";
 import { StaticTextBlockForm } from "../../Modules/ServerTypes/Demo";
 
 beforeAll(() => {
-    mockDynamicData();
     mockAdmin();
     mockGridSize();
     mockFetch({ "*": () => ({ Entities: [], TotalCount: 0 }) });

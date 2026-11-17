@@ -1,11 +1,10 @@
 import * as corelib from "@serenity-is/corelib";
 import { ProductColumns, ProductRow, ProductService } from "@serenity-is/demo.northwind";
-import { EntityDialogWrapper, mockAdmin, mockDynamicData, mockFetch, mockGridSize, unmockFetch } from "test-utils";
+import { EntityDialogWrapper, mockAdmin, mockFetch, mockGridSize, unmockFetch } from "test-utils";
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import initPage, { CloneableEntityDialog, CloneableEntityGrid } from "../../Modules/Dialogs/CloneableEntityDialog/CloneableEntityDialogPage";
 
 beforeAll(() => {
-    mockDynamicData();
     mockAdmin();
     mockGridSize();
     mockFetch({ "*": () => ({ Entities: [], TotalCount: 0 }) });

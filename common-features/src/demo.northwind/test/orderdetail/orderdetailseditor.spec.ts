@@ -1,12 +1,11 @@
 import * as corelib from "@serenity-is/corelib";
-import { mockDynamicData, mockFetch, mockGridSize, mockRowLookup, unmockFetch } from "test-utils";
+import { mockFetch, mockGridSize, mockRowLookup, unmockFetch } from "test-utils";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { OrderDetailDialog } from "../../Modules/OrderDetail/OrderDetailDialog";
 import { OrderDetailsEditor } from "../../Modules/OrderDetail/OrderDetailsEditor";
 import { OrderDetailColumns, OrderDetailRow, OrderDetailService, ProductRow } from "../../Modules/ServerTypes/Demo";
 
 beforeAll(() => {
-    mockDynamicData();
     mockGridSize();
     mockRowLookup(ProductRow, [
         { ProductID: 1, ProductName: "Chai", UnitPrice: 18 },

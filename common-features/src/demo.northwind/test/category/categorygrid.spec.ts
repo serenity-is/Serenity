@@ -1,11 +1,10 @@
-import { mockDynamicData, mockFetch, mockGridSize, unmockFetch } from "test-utils";
+import { mockFetch, mockGridSize, unmockFetch } from "test-utils";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { CategoryDialog } from "../../Modules/Category/CategoryDialog";
 import { CategoryGrid } from "../../Modules/Category/CategoryGrid";
 import { CategoryColumns, CategoryRow, CategoryService } from "../../Modules/ServerTypes/Demo";
 
 beforeAll(() => {
-    mockDynamicData();
     mockGridSize();
 });
 

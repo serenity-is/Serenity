@@ -1,7 +1,7 @@
 import * as corelib from "@serenity-is/corelib";
 import { Fluent, confirmDialog } from "@serenity-is/corelib";
 import { CustomerService } from "@serenity-is/demo.northwind";
-import { mockAdmin, mockDynamicData, mockGridSize } from "test-utils";
+import { mockAdmin, mockGridSize } from "test-utils";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import initPage, { InlineActionGrid } from "../../Modules/Grids/InlineActionButtons/InlineActionButtonsPage";
 
@@ -28,10 +28,8 @@ vi.mock(import("@serenity-is/demo.northwind"), async (importOriginal) => {
     }
 });
 
-
 beforeAll(() => {
     mockAdmin();
-    mockDynamicData();
     mockGridSize();
     vi.useFakeTimers();
 });

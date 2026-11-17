@@ -1,5 +1,5 @@
 import { formatterContext } from "@serenity-is/sleekgrid";
-import { mockDynamicData, mockRowLookup } from "test-utils";
+import { mockRowLookup } from "test-utils";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { EmployeeListFormatter } from "../../Modules/Customer/EmployeeListFormatter";
 import { EmployeeRow } from "../../Modules/ServerTypes/Demo";
@@ -12,7 +12,6 @@ function render(result: any): string {
 }
 
 beforeAll(() => {
-    mockDynamicData();
     mockRowLookup(EmployeeRow, [
         { EmployeeID: 1, FullName: "John" },
         { EmployeeID: 2, FullName: "Jane" }

@@ -1,4 +1,4 @@
-import { mockDynamicData } from "test-utils";
+
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { BasicSamplesService } from "../../Modules/ServerTypes/Demo";
 
@@ -23,10 +23,6 @@ vi.mock(import("../../Modules/Dialogs/ChartInDialog/modal-utils"), async () => (
 
 import initPage, { ChartInDialog } from "../../Modules/Dialogs/ChartInDialog/ChartInDialogPage";
 import { makeModalDraggable, makeModalMaximizable } from "../../Modules/Dialogs/ChartInDialog/modal-utils";
-
-beforeAll(() => {
-    mockDynamicData();
-});
 
 beforeEach(() => {
     document.body.innerHTML = "";

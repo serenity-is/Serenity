@@ -1,11 +1,10 @@
 import * as corelib from "@serenity-is/corelib";
-import { mockAdmin, mockDynamicData } from "test-utils";
+import { mockAdmin } from "test-utils";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { NoteDialog } from "../../Modules/Note/NoteDialog";
 import { NotesEditor } from "../../Modules/Note/NotesEditor";
 
 beforeAll(() => {
-    mockDynamicData();
     mockAdmin();
 });
 

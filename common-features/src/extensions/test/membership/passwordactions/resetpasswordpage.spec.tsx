@@ -1,11 +1,10 @@
 import * as corelib from "@serenity-is/corelib";
-import { mockDynamicData, mockFetch, unmockDynamicData, unmockFetch } from "test-utils";
+import { mockFetch, unmockFetch } from "test-utils";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import pageInit, { ResetPasswordPanel } from "../../../Modules/Membership/PasswordActions/ResetPasswordPage";
 
 beforeEach(() => {
     document.body.innerHTML = '<div id="PanelDiv"></div>';
-    mockDynamicData();
     mockFetch({ "*": () => ({}) });
     vi.spyOn(corelib, "getRemoteDataAsync").mockResolvedValue({
         MinPasswordLength: 6,
@@ -18,7 +17,6 @@ beforeEach(() => {
 
 afterEach(() => {
     document.body.innerHTML = "";
-    unmockDynamicData();
     unmockFetch();
     vi.restoreAllMocks();
 });

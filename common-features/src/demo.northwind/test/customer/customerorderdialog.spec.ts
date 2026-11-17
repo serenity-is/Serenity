@@ -1,10 +1,9 @@
-import { mockDynamicData, mockFetch, mockGridSize, mockRowLookup, unmockFetch } from "test-utils";
+import { mockFetch, mockGridSize, mockRowLookup, unmockFetch } from "test-utils";
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { CustomerOrderDialog } from "../../Modules/Customer/CustomerOrderDialog";
 import { CustomerRow } from "../../Modules/ServerTypes/Demo";
 
 beforeAll(() => {
-    mockDynamicData();
     mockGridSize();
     mockRowLookup(CustomerRow, [{ CustomerID: "ALFKI", CompanyName: "Alfreds" }]);
     mockFetch({ "*": () => ({ Entities: [], TotalCount: 0 }) });

@@ -1,11 +1,10 @@
 import * as corelib from "@serenity-is/corelib";
-import { mockDynamicData, mockFetch, mockGridSize, unmockFetch } from "test-utils";
+import { mockFetch, mockGridSize, unmockFetch } from "test-utils";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { RegionGrid } from "../../Modules/Region/RegionGrid";
 import initPage from "../../Modules/Region/RegionPage";
 
 beforeAll(() => {
-    mockDynamicData();
     mockGridSize();
 });
 

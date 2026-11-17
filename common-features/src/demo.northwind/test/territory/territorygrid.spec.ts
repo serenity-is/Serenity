@@ -1,11 +1,10 @@
-import { mockDynamicData, mockFetch, mockGridSize, unmockFetch } from "test-utils";
+import { mockFetch, mockGridSize, unmockFetch } from "test-utils";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { TerritoryDialog } from "../../Modules/Territory/TerritoryDialog";
 import { TerritoryGrid } from "../../Modules/Territory/TerritoryGrid";
 import { TerritoryColumns, TerritoryRow, TerritoryService } from "../../Modules/ServerTypes/Demo";
 
 beforeAll(() => {
-    mockDynamicData();
     mockGridSize();
 });
 

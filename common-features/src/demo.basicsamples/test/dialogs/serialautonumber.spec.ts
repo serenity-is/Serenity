@@ -1,11 +1,10 @@
 import * as corelib from "@serenity-is/corelib";
 import { CustomerDialog, CustomerGrid, CustomerService } from "@serenity-is/demo.northwind";
-import { EntityDialogWrapper, mockAdmin, mockDynamicData, mockFetch, mockGridSize, unmockFetch, waitUntil } from "test-utils";
+import { EntityDialogWrapper, mockAdmin, mockFetch, mockGridSize, unmockFetch, waitUntil } from "test-utils";
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import initPage, { SerialAutoNumberDialog, SerialAutoNumberGrid } from "../../Modules/Dialogs/SerialAutoNumber/SerialAutoNumberPage";
 
 beforeAll(() => {
-    mockDynamicData();
     mockAdmin();
     mockGridSize();
     mockFetch({ "*": () => ({ Entities: [], TotalCount: 0 }) });

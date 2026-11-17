@@ -1,11 +1,10 @@
 import * as corelib from "@serenity-is/corelib";
 import { SupplierColumns, SupplierDialog, SupplierRow, SupplierService } from "@serenity-is/demo.northwind";
-import { mockDynamicData, mockFetch, mockGridSize, unmockFetch } from "test-utils";
+import { mockFetch, mockGridSize, unmockFetch } from "test-utils";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import initPage, { RowSelectionGrid } from "../../Modules/Grids/EnablingRowSelection/EnablingRowSelectionPage";
 
 beforeAll(() => {
-    mockDynamicData();
     mockGridSize();
 });
 

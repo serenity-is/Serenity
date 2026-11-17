@@ -1,13 +1,12 @@
 import { DecimalEditor } from "@serenity-is/corelib";
 import { OrderDetailRow, ProductRow } from "@serenity-is/demo.northwind";
 import { GridEditorDialog } from "@serenity-is/extensions";
-import { EntityDialogWrapper, mockAdmin, mockDynamicData, mockFetch, mockGridSize, mockRowLookup, unmockFetch } from "test-utils";
+import { EntityDialogWrapper, mockAdmin, mockFetch, mockGridSize, mockRowLookup, unmockFetch } from "test-utils";
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import initPage, { ChangingLookupTextDialog, ChangingLookupTextEditor } from "../../Modules/Editors/ChangingLookupText/ChangingLookupTextPage";
 import { ChangingLookupTextForm } from "../../Modules/ServerTypes/Demo";
 
 beforeAll(() => {
-    mockDynamicData();
     mockAdmin();
     mockGridSize();
     mockRowLookup(ProductRow, [{ ProductID: 1, ProductName: "Chai", UnitPrice: 18.5, UnitsInStock: 5, SupplierCompanyName: "Exotic" }]);

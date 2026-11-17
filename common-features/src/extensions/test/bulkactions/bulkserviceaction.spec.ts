@@ -48,7 +48,9 @@ describe("BulkServiceAction texts and confirmation", () => {
     it("returns format and message values", () => {
         const action = new TestAction();
         expect(action["getConfirmationFormat"]()).toBe(BulkServiceActionTexts.ConfirmationFormat);
-        expect(action["getConfirmationMessage"](3)).toBe(BulkServiceActionTexts.ConfirmationFormat);
+        // the message is the format with the count in place of the placeholder
+        expect(action["getConfirmationMessage"](3))
+            .toBe(corelib.stringFormat(BulkServiceActionTexts.ConfirmationFormat, 3));
         expect(action["getNothingToProcessMessage"]()).toBe(BulkServiceActionTexts.NothingToProcess);
         expect(action["getAllHadErrorsFormat"]()).toBe(BulkServiceActionTexts.AllHadErrorsFormat);
         expect(action["getSomeHadErrorsFormat"]()).toBe(BulkServiceActionTexts.SomeHadErrorsFormat);

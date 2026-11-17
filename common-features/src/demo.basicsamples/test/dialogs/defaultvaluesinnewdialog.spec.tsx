@@ -1,11 +1,10 @@
 import * as corelib from "@serenity-is/corelib";
 import { EmployeeRow, OrderDialog, OrderGrid, ProductRow, ShipperRow } from "@serenity-is/demo.northwind";
-import { mockAdmin, mockDynamicData, mockFetch, mockGridSize, mockRowLookup, unmockFetch } from "test-utils";
+import { mockAdmin, mockFetch, mockGridSize, mockRowLookup, unmockFetch } from "test-utils";
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import initPage, { DefaultValuesInNewGrid } from "../../Modules/Dialogs/DefaultValuesInNewDialog/DefaultValuesInNewDialogPage";
 
 beforeAll(() => {
-    mockDynamicData();
     mockAdmin();
     mockGridSize();
     mockRowLookup(EmployeeRow, [

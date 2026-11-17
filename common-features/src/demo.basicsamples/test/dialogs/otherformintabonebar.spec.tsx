@@ -1,11 +1,10 @@
 import * as corelib from "@serenity-is/corelib";
 import { CustomerRow, CustomerService, OrderDialog, OrderGrid } from "@serenity-is/demo.northwind";
-import { EntityDialogWrapper, mockAdmin, mockDynamicData, mockFetch, mockGridSize, mockRowLookup, unmockFetch } from "test-utils";
+import { EntityDialogWrapper, mockAdmin, mockFetch, mockGridSize, mockRowLookup, unmockFetch } from "test-utils";
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import initPage, { OtherFormInTabOneBarGrid, OtherFormOneBarDialog } from "../../Modules/Dialogs/OtherFormInTabOneBar/OtherFormInTabOneBarPage";
 
 beforeAll(() => {
-    mockDynamicData();
     mockAdmin();
     mockGridSize();
     mockRowLookup(CustomerRow, [{ CustomerID: "ALFKI", CompanyName: "Alfreds" }]);

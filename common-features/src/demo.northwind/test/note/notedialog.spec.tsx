@@ -1,10 +1,6 @@
-import { mockDynamicData } from "test-utils";
+
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { NoteDialog } from "../../Modules/Note/NoteDialog";
-
-beforeAll(() => {
-    mockDynamicData();
-});
 
 describe("NoteDialog", () => {
     it("text property can be set and get", () => {

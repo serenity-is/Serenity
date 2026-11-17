@@ -1,12 +1,11 @@
 import { DeleteRequest, DeleteResponse, RetrieveRequest, RetrieveResponse, SaveRequest, SaveResponse } from "@serenity-is/corelib";
 import { ReportHelper } from "@serenity-is/extensions";
-import { EntityDialogWrapper, mockAdmin, mockDynamicData, mockFetch, mockRowLookup, typeText, unmockFetch } from "test-utils";
+import { EntityDialogWrapper, mockAdmin, mockFetch, mockRowLookup, typeText, unmockFetch } from "test-utils";
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { OrderDialog } from "../../Modules/Order/OrderDialog";
 import { CustomerRow, OrderForm, OrderRow, OrderService } from "../../Modules/ServerTypes/Demo";
 
 beforeAll(() => {
-    mockDynamicData();
     mockAdmin();
     mockRowLookup(CustomerRow, [{ CustomerID: "ALFKI", CompanyName: "Alfreds" }]);
     mockFetch({ "*": () => ({ Entities: [], TotalCount: 0 }) });

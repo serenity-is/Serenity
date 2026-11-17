@@ -1,11 +1,10 @@
 import * as corelib from "@serenity-is/corelib";
 import { OrderDialog } from "@serenity-is/demo.northwind";
-import { mockAdmin, mockDynamicData, mockFetch, mockGridSize, unmockFetch } from "test-utils";
+import { mockAdmin, mockFetch, mockGridSize, unmockFetch } from "test-utils";
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import initPage, { EntityDialogAsPanel } from "../../Modules/Dialogs/EntityDialogAsPanel/EntityDialogAsPanelPage";
 
 beforeAll(() => {
-    mockDynamicData();
     mockAdmin();
     mockGridSize();
     mockFetch({ "*": () => ({ Entities: [], TotalCount: 0 }) });

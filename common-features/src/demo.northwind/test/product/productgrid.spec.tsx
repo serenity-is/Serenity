@@ -1,6 +1,6 @@
 import * as corelib from "@serenity-is/corelib";
 import { formatterContext } from "@serenity-is/sleekgrid";
-import { mockDynamicData, mockFetch, mockGridSize, mockRowLookup, unmockFetch } from "test-utils";
+import { mockFetch, mockGridSize, mockRowLookup, unmockFetch } from "test-utils";
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { ProductDialog } from "../../Modules/Product/ProductDialog";
 import { ProductGrid } from "../../Modules/Product/ProductGrid";
@@ -34,7 +34,6 @@ function setupGrid(): any {
 }
 
 beforeAll(() => {
-    mockDynamicData();
     mockGridSize();
     mockRowLookup(CategoryRow, [{ CategoryID: 1, CategoryName: "Beverages" }]);
     mockRowLookup(SupplierRow, [{ SupplierID: 1, CompanyName: "Exotic Liquids" }]);

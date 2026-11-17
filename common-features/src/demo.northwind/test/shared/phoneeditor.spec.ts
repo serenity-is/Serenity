@@ -1,10 +1,6 @@
-import { mockDynamicData } from "test-utils";
+
 import { beforeAll, describe, expect, it } from "vitest";
 import { PhoneEditor } from "../../Modules/Shared/PhoneEditor";
-
-beforeAll(() => {
-    mockDynamicData();
-});
 
 describe("PhoneEditor static validation", () => {
     it("isValidPhone rejects empty and short values", () => {

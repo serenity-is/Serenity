@@ -1,6 +1,6 @@
 import * as corelib from "@serenity-is/corelib";
 import { OrderDetailDialog, OrderGrid, OrderRow, OrderService, ProductRow } from "@serenity-is/demo.northwind";
-import { EntityDialogWrapper, mockAdmin, mockDynamicData, mockFetch, mockGridSize, unmockFetch } from "test-utils";
+import { EntityDialogWrapper, mockAdmin, mockFetch, mockGridSize, unmockFetch } from "test-utils";
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import initPage, {
     FilteredLookupDetailEditor,
@@ -11,7 +11,6 @@ import initPage, {
 import { FilteredLookupInDetailForm } from "../../Modules/ServerTypes/Demo";
 
 beforeAll(() => {
-    mockDynamicData();
     mockAdmin();
     mockGridSize();
     mockFetch({ "*": () => ({ Entities: [], TotalCount: 0 }) });
