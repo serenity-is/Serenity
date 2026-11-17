@@ -39,3 +39,6 @@ overrides:
   fflate@>=0.8.0 <0.8.3: ^0.8.3
   prosemirror-view@<1.42.3: ^1.42.3
   source-map-js@>=1.0.0 <1.2.2: ^1.2.2
+  # one copy of the Node typings: vite's peer range and the catalog would
+  # otherwise install two, and tsc reports every Node global as a duplicate
+  "@types/node": 26.6.6

@@ -9,9 +9,6 @@ catalogs:
     '@preact/signals-core':
       specifier: 1.14.5
       version: 1.14.5
-    '@types/node':
-      specifier: 26.6.6
-      version: 26.6.6
     '@vitest/coverage-v8':
       specifier: 5.1.0
       version: 5.1.0
@@ -59,6 +56,7 @@ overrides:
   fflate@>=0.8.0 <0.8.3: ^0.8.3
   prosemirror-view@<1.42.3: ^1.42.3
   source-map-js@>=1.0.0 <1.2.2: ^1.2.2
+  '@types/node': 26.6.6
 
 importers:
 
@@ -201,7 +199,7 @@ importers:
         version: 7.1.0-beta
     devDependencies:
       '@types/node':
-        specifier: catalog:serenity
+        specifier: 26.6.6
         version: 26.6.6
 
   packages/sleekgrid:
@@ -1471,7 +1469,7 @@ packages:
     peerDependencies:
       '@edge-runtime/vm': '*'
       '@opentelemetry/api': ^1.9.0
-      '@types/node': ^22.0.0 || >=24.0.0
+      '@types/node': 26.6.6
       '@vitest/browser-playwright': 5.1.0
       '@vitest/browser-preview': 5.1.0
       '@vitest/browser-webdriverio': ^5.0.0-beta.5 || >=5.0.0
