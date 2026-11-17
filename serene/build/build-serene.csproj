@@ -24,4 +24,11 @@
     <Compile Include="..\..\src\codegenerator\Models\IArgumentReader.cs" Link="shared\IArgumentReader.cs" />
     <Compile Include="..\..\src\core\IO\GlobFilter.cs" Link="shared\GlobFilter.cs" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="System" />
+    <Using Include="System.Collections.Generic" />
+    <Using Include="System.Linq" />
+    <Using Include="System.Text.RegularExpressions" />
+  </ItemGroup>
 </Project>

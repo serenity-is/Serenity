@@ -967,7 +967,7 @@ export declare namespace TerritoryService {
         readonly List: "Northwind/Territory/List";
     };
 }
-export declare class CategoryDialog<P = {}> extends EntityDialog<CategoryRow, P> {
+export declare class CategoryDialog<P = {}> extends EntityDialog<CategoryRow, P> implements LazyLoadInclude<"NorthwindDialogs"> {
     static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.Demo.Northwind.">;
     protected getFormKey(): string;
     protected getRowDefinition(): typeof CategoryRow;
@@ -981,7 +981,7 @@ export declare class CategoryGrid<P = {}> extends EntityGrid<CategoryRow, P> {
     protected getRowDefinition(): typeof CategoryRow;
     protected getService(): string;
 }
-export declare class CustomerDialog<P = {}> extends EntityDialog<CustomerRow, P> {
+export declare class CustomerDialog<P = {}> extends EntityDialog<CustomerRow, P> implements LazyLoadInclude<"NorthwindDialogs"> {
     static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.Demo.Northwind.">;
     protected getFormKey(): string;
     protected getRowDefinition(): typeof CustomerRow;
@@ -1004,7 +1004,7 @@ export declare class CustomerGrid<P = {}> extends EntityGrid<CustomerRow, P> {
     protected getRowDefinition(): typeof CustomerRow;
     protected getService(): string;
 }
-export declare class OrderDialog<P = {}> extends EntityDialog<OrderRow, P> {
+export declare class OrderDialog<P = {}> extends EntityDialog<OrderRow, P> implements LazyLoadInclude<"NorthwindDialogs"> {
     static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.Demo.Northwind.">;
     protected getFormKey(): string;
     protected getRowDefinition(): typeof OrderRow;
@@ -1074,7 +1074,7 @@ export declare class FreightFormatter implements Formatter, LazyLoadInclude {
     static [Symbol.typeInfo]: FormatterTypeInfo<"Serenity.Demo.Northwind.">;
     format(ctx: FormatterContext): FormatterResult;
 }
-export declare class ProductDialog<P = {}> extends EntityDialog<ProductRow, P> {
+export declare class ProductDialog<P = {}> extends EntityDialog<ProductRow, P> implements LazyLoadInclude<"NorthwindDialogs"> {
     static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.Demo.Northwind.">;
     protected getFormKey(): string;
     protected getRowDefinition(): typeof ProductRow;
@@ -1101,7 +1101,7 @@ export declare class ProductGrid<P = {}> extends EntityGrid<ProductRow, P> {
     private saveClick;
     protected getQuickFilters(): QuickFilter<Widget<any>, any>[];
 }
-export declare class RegionDialog<P = {}> extends EntityDialog<RegionRow, P> {
+export declare class RegionDialog<P = {}> extends EntityDialog<RegionRow, P> implements LazyLoadInclude<"NorthwindDialogs"> {
     static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.Demo.Northwind.">;
     protected getFormKey(): string;
     protected getRowDefinition(): typeof RegionRow;
@@ -1122,7 +1122,7 @@ export declare class CountryWithFlagFormatter implements Formatter, LazyLoadIncl
 export declare const iso2CodesByCountryName: Record<string, string>;
 export declare const validIso2CountryCodes: Set<string>;
 export declare function getCountryFlagEmoji(codeOrName: string): string;
-export declare class ShipperDialog<P = {}> extends EntityDialog<ShipperRow, P> {
+export declare class ShipperDialog<P = {}> extends EntityDialog<ShipperRow, P> implements LazyLoadInclude<"NorthwindDialogs"> {
     static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.Demo.Northwind.">;
     protected getFormKey(): string;
     protected getRowDefinition(): typeof ShipperRow;
@@ -1140,7 +1140,7 @@ export declare class ShipperGrid<P = {}> extends EntityGrid<ShipperRow, P> {
     protected getRowDefinition(): typeof ShipperRow;
     protected getService(): string;
 }
-export declare class SupplierDialog<P = {}> extends EntityDialog<SupplierRow, P> {
+export declare class SupplierDialog<P = {}> extends EntityDialog<SupplierRow, P> implements LazyLoadInclude<"NorthwindDialogs"> {
     static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.Demo.Northwind.">;
     protected getFormKey(): string;
     protected getRowDefinition(): typeof SupplierRow;
@@ -1154,7 +1154,7 @@ export declare class SupplierGrid<P = {}> extends EntityGrid<SupplierRow, P> {
     protected getRowDefinition(): typeof SupplierRow;
     protected getService(): string;
 }
-export declare class TerritoryDialog<P = {}> extends EntityDialog<TerritoryRow, P> {
+export declare class TerritoryDialog<P = {}> extends EntityDialog<TerritoryRow, P> implements LazyLoadInclude<"NorthwindDialogs"> {
     static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.Demo.Northwind.">;
     protected getFormKey(): string;
     protected getRowDefinition(): typeof TerritoryRow;
