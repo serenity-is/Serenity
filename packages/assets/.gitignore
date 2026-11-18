@@ -2,3 +2,5 @@
 /wwwroot/glightbox/**/*.css
 /wwwroot/nprogress/**/*.css
 /wwwroot/tabler-icons/**/*.css
+/wwwroot/fonts/geist-mono/
+/wwwroot/fonts/inter/

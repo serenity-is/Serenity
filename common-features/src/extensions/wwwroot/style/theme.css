@@ -1,4 +1,5 @@
 @import "../../../../../packages/sleekgrid/css/slick.base.css";
+@import "./tokens.css";
 
 /*
  * Generic SVG icon helper classes.
@@ -222,22 +223,6 @@ button.ui-datepicker-trigger::before,
     mask-size: contain;
 }
 
-:root {
-  --s-col-gap: 0.7rem;
-  --s-icon-font: "Font Awesome 5 Free";
-  --s-icon-solid: 900;
-  --s-row-gap: 1rem;
-  --s-tool-icon-size: 1.5rem;
-  --s-input-padding-v: 0.375rem;
-  --s-input-line-height: 1.5rem;
-  --s-input-inner-height: 2.25rem;
-  --s-tabular-font:
-    "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
-  --bs-body-font-family:
-    "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
-  --bs-body-font-size: 14px;
-}
-
 html {
   font-size: var(--bs-body-font-size);
 }
@@ -444,7 +429,7 @@ body.disable-css-transitions *:before {
 
 .form-control:focus {
   background-color: var(--s-input-bg);
-  color: var(--s-input-text);
+  color: var(--s-input-text, currentcolor);
 }
 
 .nav-tabs {
@@ -481,7 +466,23 @@ body.disable-css-transitions *:before {
 }
 
 .dropdown-menu {
-  --bs-dropdown-link-hover-bg: rgba(var(--bs-primary-rgb), 0.35);
+  --bs-dropdown-link-hover-bg: var(--s-menu-item-hover-bg);
+}
+
+/* lets themes restyle primary buttons, the fallbacks are the values compiled into Bootstrap */
+.btn-primary {
+  --bs-btn-color: var(--s-btn-primary-color, #fff);
+  --bs-btn-bg: var(--s-btn-primary-bg, #0d6efd);
+  --bs-btn-border-color: var(--s-btn-primary-bg, #0d6efd);
+  --bs-btn-hover-color: var(--s-btn-primary-color, #fff);
+  --bs-btn-hover-bg: var(--s-btn-primary-hover-bg, #0b5ed7);
+  --bs-btn-hover-border-color: var(--s-btn-primary-hover-bg, #0a58ca);
+  --bs-btn-active-color: var(--s-btn-primary-color, #fff);
+  --bs-btn-active-bg: var(--s-btn-primary-active-bg, #0a58ca);
+  --bs-btn-active-border-color: var(--s-btn-primary-active-bg, #0a53be);
+  --bs-btn-disabled-color: var(--s-btn-primary-color, #fff);
+  --bs-btn-disabled-bg: var(--s-btn-primary-bg, #0d6efd);
+  --bs-btn-disabled-border-color: var(--s-btn-primary-bg, #0d6efd);
 }
 
 body {
@@ -811,7 +812,7 @@ section.content-header>h1 {
 
 .s-FilterDisplayBar a.edit,
 .s-FilterDisplayBar a.edit:hover {
-  color: var(--s-tool-button);
+  color: var(--s-tool-button, currentcolor);
 }
 
 .s-FilterDisplayBar .edit::before {
@@ -879,7 +880,7 @@ section.content-header>h1 {
 
 .s-ColumnPickerDialog .search-bar {
     padding: 7px 10px;
-    background-color: var(--s-column-header-bg);
+    background-color: var(--s-column-header-bg, transparent);
 }
 
 .s-ColumnPickerDialog .search-bar input[type="text"] {
@@ -1141,18 +1142,18 @@ select,
 textarea,
 .form-control {
   background-color: var(--s-input-bg);
-  border-color: var(--bs-border-color);
+  border-color: var(--s-input-border-color, var(--bs-border-color));
   border-radius: var(--bs-border-radius);
   border-style: solid;
   border-width: 1px;
-  color: var(--s-input-text);
+  color: var(--s-input-text, currentcolor);
   padding: var(--s-input-padding-v) 0.75rem;
   transition: border-color 0.25s ease-in-out, box-shadow 0.25s ease-in-out;
   background-clip: padding-box;
 }
 
 .input-group-text {
-  border-color: var(--bs-border-color);
+  border-color: var(--s-input-border-color, var(--bs-border-color));
 }
 
 input:focus,
@@ -1167,14 +1168,14 @@ input[type=checkbox]:focus,
 input[type=radio]:focus,
 .select2-container-active {
   outline: 0;
-  box-shadow: 0 0 0 0.15rem var(--s-input-outline);
+  box-shadow: 0 0 0 var(--s-focus-ring-width) var(--s-input-outline);
 }
 
 input.error:focus,
 select.error:focus,
 textarea.error:focus,
 .select2-container-active.error {
-  box-shadow: 0 0 0 0.15rem var(--s-input-outline-error);
+  box-shadow: 0 0 0 var(--s-focus-ring-width) var(--s-input-outline-error);
 }
 
 input[type=checkbox],
@@ -1187,7 +1188,7 @@ input[type=checkbox],
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
-  border: 1px solid var(--bs-border-color);
+  border: 1px solid var(--s-input-border-color, var(--bs-border-color));
   appearance: none;
   padding: 0;
   border-radius: 0.25em;
@@ -1287,7 +1288,7 @@ input[type=checkbox]:disabled {
   height: calc(var(--s-input-inner-height) + 2px);
   width: calc(var(--s-input-inner-height) + 2px);
   margin-left: 0.2rem;
-  border: 1px solid var(--bs-border-color);
+  border: 1px solid var(--s-button-border-color, var(--bs-border-color));
   border-radius: var(--bs-border-radius);
   background-clip: padding-box;
   cursor: pointer;
@@ -2679,7 +2680,7 @@ button.ui-state-hover .ui-button-text {
 
 .ui-menu-item>a:hover,
 .ui-menu-item>a:focus {
-  background-color: rgba(var(--bs-primary-rgb), 0.35);
+  background-color: var(--s-menu-item-hover-bg);
   color: var(--bs-body-color);
 }
 
@@ -2808,7 +2809,7 @@ button.panel-titlebar-close::after {
   top: 0;
   bottom: 0;
   display: flex;
-  color: var(--s-input-text);
+  color: var(--s-input-text, currentcolor);
   font-size: 1.215rem;
   align-items: center;
   transform: scale(-1, 1);
@@ -2920,7 +2921,7 @@ button.panel-titlebar-close::after {
   display: inline-block;
   vertical-align: middle;
   border-radius: var(--bs-border-radius);
-  border: 1px solid var(--bs-border-color);
+  border: 1px solid var(--s-input-border-color, var(--bs-border-color));
   border-radius: var(--bs-border-radius);
 }
 
@@ -2930,16 +2931,16 @@ button.panel-titlebar-close::after {
 
 .select2-choice {
   display: block;
-  height: calc(var(--s-input-inner-height) + 2px);
+  height: var(--s-input-inner-height);
   padding: 0 0 0 8px;
   overflow: hidden;
   position: relative;
   white-space: nowrap;
   line-height: var(--s-input-inner-height);
-  color: var(--s-input-text);
+  color: var(--s-input-text, currentcolor);
   text-decoration: none;
   background-color: var(--s-input-bg);
-  border-radius: inherit;
+  border-radius: calc(var(--bs-border-radius) - 1px);
   background-clip: padding-box;
   user-select: none;
 }
@@ -2949,15 +2950,17 @@ button.panel-titlebar-close::after {
 }
 
 .select2-choice:hover {
-  color: var(--s-input-text);
+  color: var(--s-input-text, currentcolor);
 }
 
-.select2-dropdown-open:not(.select2-drop-above) {
+.select2-dropdown-open:not(.select2-drop-above),
+.select2-dropdown-open:not(.select2-drop-above) > :is(.select2-choice, .select2-choices) {
   border-bottom-right-radius: 0;
   border-bottom-left-radius: 0;
 }
 
-.select2-dropdown-open.select2-drop-above {
+.select2-dropdown-open.select2-drop-above,
+.select2-dropdown-open.select2-drop-above > :is(.select2-choice, .select2-choices) {
   border-top-left-radius: 0;
   border-top-right-radius: 0;
 }
@@ -3014,7 +3017,7 @@ button.panel-titlebar-close::after {
 }
 
 .select2-choices .select2-search-choice-close {
-  color: var(--s-input-text);
+  color: var(--s-input-text, currentcolor);
   left: 3px;
 }
 
@@ -3049,18 +3052,18 @@ button.panel-titlebar-close::after {
   z-index: 9999;
   top: 100%;
   background: var(--s-input-bg);
-  color: var(--s-input-text);
+  color: var(--s-input-text, currentcolor);
   border: 1px solid var(--bs-border-color);
   border-top: 0;
   border-radius: 0 0 var(--bs-border-radius) var(--bs-border-radius);
-  box-shadow: 0 4px 5px rgba(0, 0, 0, .15);
+  box-shadow: var(--s-popup-shadow);
 }
 
 .select2-drop.select2-drop-above {
   margin-top: 1px;
   border-bottom: 0;
   border-radius: var(--bs-border-radius) var(--bs-border-radius) 0 0;
-  box-shadow: 0 -4px 5px rgba(0, 0, 0, .15);
+  box-shadow: var(--s-popup-shadow-above);
 }
 
 .select2-drop-active {
@@ -3124,7 +3127,7 @@ button.panel-titlebar-close::after {
   padding: 4px 1.5em 4px 5px;
   margin: 0;
   outline: 0;
-  border: 1px solid var(--bs-border-color);
+  border: 1px solid var(--s-input-border-color, var(--bs-border-color));
   border-radius: 0;
   box-shadow: none;
 }
@@ -3138,7 +3141,7 @@ button.panel-titlebar-close::after {
 .select2-more-results.select2-active::after {
   font-weight: 900;
   font-style: normal;
-  color: var(--s-input-text);
+  color: var(--s-input-text, currentcolor);
   position: absolute;
   right: 8px;
   top: 5px;
@@ -3228,8 +3231,8 @@ button.panel-titlebar-close::after {
 }
 
 .select2-results .select2-highlighted {
-  background: #3875d7;
-  color: #fff;
+  background: var(--s-option-highlight-bg);
+  color: var(--s-option-highlight-color);
 }
 
 .select2-results li em {
@@ -3288,8 +3291,8 @@ button.panel-titlebar-close::after {
   position: relative;
   background-color: var(--s-input-bg);
   background-clip: padding-box;
-  min-height: calc(var(--s-input-inner-height) + 2px);
-  border-radius: inherit;
+  min-height: var(--s-input-inner-height);
+  border-radius: calc(var(--bs-border-radius) - 1px);
   cursor: text;
   overflow: hidden;
 }
@@ -3312,7 +3315,7 @@ button.panel-titlebar-close::after {
 .select2-choices .select2-input {
   padding: calc(var(--s-input-padding-v) - 2px) 0.75rem;
   margin: 2px 0;
-  color: var(--s-input-text);
+  color: var(--s-input-text, currentcolor);
   outline: 0;
   border: 0;
   box-shadow: none;
@@ -3403,7 +3406,7 @@ button.panel-titlebar-close::after {
 .slick-sort-indicator {
   display: none;
   font-size: 15px;
-  color: var(--s-header-text);
+  color: var(--s-header-text, currentcolor);
 }
 
 .slick-sort-indicator::before {
@@ -3746,11 +3749,11 @@ button.panel-titlebar-close::after {
 }
 
 .slick-row.active {
-  background-color: rgba(var(--bs-primary-rgb), 0.20);
+  background-color: var(--s-row-active-bg);
 }
 
 .slick-cell.active {
-  background-color: rgb(0, 114, 255, 0.2);
+  background-color: var(--s-cell-active-bg);
 }
 
 .slick-cell.editable {
@@ -4052,7 +4055,7 @@ button.toast-close-button {
 }
 
 .tool-group-like {
-  border: 1px solid var(--bs-border-color);
+  border: 1px solid var(--s-button-border-color, var(--bs-border-color));
 }
 
 .tool-group:empty {
@@ -4060,7 +4063,7 @@ button.toast-close-button {
 }
 
 .tool-button {
-  border: 1px solid var(--bs-border-color);
+  border: 1px solid var(--s-button-border-color, var(--bs-border-color));
   padding: var(--s-input-padding-v) 0.75rem;
   min-width: 2.4em;
   margin-left: -1px;
@@ -4155,7 +4158,7 @@ button.toast-close-button {
   width: 2.35em;
   height: 2.35em;
   align-self: flex-end;
-  border: 1px solid var(--bs-border-color);
+  border: 1px solid var(--s-button-border-color, var(--bs-border-color));
   border-radius: var(--bs-border-radius);
   display: flex;
   align-items: center;
@@ -4174,38 +4177,6 @@ button.toast-close-button {
 .s-IncludeDeletedToggle>a::before {
     font-size: 19px;
     --s-ico: var(--s-icon-include-deleted-toggle, var(--s-icon-trash-restore));
-}
-
-:root {
-  --bs-body-font-size: 13px;
-  --s-sidebar-band-bg: var(--bs-primary);
-  --s-alt-row-bg: rgba(139, 177, 205, 0.1);
-  --s-bright-rgb: 11, 12, 15;
-  --s-card-bg: var(--bs-body-bg);
-  --s-card-border: var(--bs-border-color-translucent);
-  --s-category-title: #39a7b9;
-  --s-deleted: #999;
-  --s-disabled: #606570;
-  --s-inactive: #999;
-  --s-input-bg: #fff;
-  --s-input-outline: rgba(38, 113, 203, 0.25);
-  --s-input-outline-error: rgba(203, 48, 48, 0.25);
-  --s-input-readonly-bg: #f3f3f3;
-  --s-modal-shadow: 0 0 6px 3px rgba(0, 0, 0, 0.10);
-  --s-placeholder: #777;
-  --s-pager-icon: #5b3df1;
-  --s-pager-text: #555;
-  --s-cell-border: rgba(53, 68, 78, 0.1);
-  --s-cell-input-border: rgba(221, 221, 221, 0.5);
-  --s-column-header: var(--bs-secondary);
-  --s-column-header-hover-bg: rgba(68, 129, 239, 0.05);
-  --s-column-header-border: #ebeff2;
-  --s-column-footer: #3cacbf;
-  --s-tabs-border: rgba(0, 0, 0, 0.1);
-  --s-tabs-border-active: #3c78ff;
-  --s-tabs-text: #7f8bb5;
-  --s-tabs-text-active: #3c78ff;
-  --s-tool-icon: #4a4a8e;
 }
 
 .s-sidebar {
@@ -4286,6 +4257,7 @@ button.toast-close-button {
   font-weight: 500;
   letter-spacing: 0.01em;
   text-transform: none;
+  margin: var(--s-sidebar-link-margin, 0);
 }
 
 .s-sidebar-link:hover,
@@ -4296,6 +4268,17 @@ button.toast-close-button {
 .s-sidebar-link:hover .s-sidebar-icon,
 .active>.s-sidebar-link>.s-sidebar-icon {
   color: #007eff;
+}
+
+/* hover and the item of the current page (not the groups above it that only expand) */
+.s-sidebar-link:hover {
+  background-color: var(--s-sidebar-link-hover-bg, transparent);
+  border-radius: var(--s-sidebar-link-radius, 0);
+}
+
+.s-sidebar-pane .active>.s-sidebar-link:not([data-bs-toggle]) {
+  background-color: var(--s-sidebar-link-active-bg, transparent);
+  border-radius: var(--s-sidebar-link-radius, 0);
 }
 
 .s-sidebar-menu .s-sidebar-menu {
@@ -4351,6 +4334,8 @@ button.toast-close-button {
 .s-sidebar-header-logo {
   width: 30px;
   height: 30px;
+  background-color: var(--s-logo-bg, transparent);
+  border-radius: var(--s-logo-radius, 0);
 }
 
 .s-sidebar-header-title {
@@ -4422,7 +4407,7 @@ button.toast-close-button {
 }
 
 .s-form-title-logo {
-  background-color: var(--s-sidebar-band-bg);
+  background-color: var(--s-logo-bg, var(--s-sidebar-band-bg));
   height: 50px;
   width: 50px;
   border-radius: 50%;

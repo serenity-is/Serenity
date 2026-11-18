@@ -106,6 +106,26 @@ for (const file of [
     copyFileIfChanged(`node_modules/nprogress/${file}`, `wwwroot/nprogress/${file}`);
 };
 
+// Fonts from Fontsource, all under the SIL Open Font License 1.1 which has to ship next to them.
+// Only the upright styles in index.css are copied (font families "Inter Variable" and
+// "Geist Mono Variable"). A static (non variable) package can list its weight files instead.
+for (const [pkg, font, cssFiles] of [
+    ["@fontsource-variable/inter", "inter", ["index.css"]],
+    ["@fontsource-variable/geist-mono", "geist-mono", ["index.css"]]
+]) {
+    const src = `node_modules/${pkg}`;
+    const dst = `wwwroot/fonts/${font}`;
+    const css = cssFiles.map(file => readFileSync(`${src}/${file}`, 'utf-8')).join('\n');
+    for (const [, file] of css.matchAll(/url\(\.\/files\/([^)]+)\)/g)) {
+        copyFileIfChanged(`${src}/files/${file}`, `${dst}/${file}`);
+    }
+    copyFileIfChanged(`${src}/${cssFiles[0]}`, `${dst}/${font}.css`, {
+        encoding: 'utf-8',
+        patchContents: () => css.replace(/url\(\.\/files\//g, 'url(./')
+    });
+    copyFileIfChanged(`${src}/LICENSE`, `${dst}/LICENSE.txt`);
+}
+
 // Apply RTL support from SortableJS PR #2368 (https://github.com/SortableJS/Sortable/pull/2368).
 // This PR is not yet merged upstream, so patch the copied global dist file manually.
 function patchSortableRtl(content) {

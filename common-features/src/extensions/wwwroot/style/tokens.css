@@ -1,0 +1,106 @@
+/*
+ * Design tokens shared by the Serene theme and the pro themes.
+ *
+ * These are the default values, which match the Serene (simplified Azure light) look.
+ * Themes override them on `:root.theme-{id}` and `:root.theme-{id}[data-bs-theme=dark]`,
+ * applications on `:root` in their own site CSS, loaded after this file.
+ *
+ * Only theme independent values (sizes, fonts, colors) belong here. No component rules,
+ * no theme names. Bootstrap variables (--bs-*) are only set when the default differs
+ * from Bootstrap's, and only for values that do not depend on the color scheme.
+ *
+ * Optional tokens are not set here, as their default is a Bootstrap variable or value that
+ * is applied where they are used, so it still follows a nested data-bs-theme:
+ *
+ *   --s-input-border-color     border of inputs, select2 fields and addon buttons
+ *                              (default: --bs-border-color)
+ *   --s-button-border-color    border of tool buttons, inplace buttons and toggles
+ *                              (default: --bs-border-color)
+ *   --s-btn-primary-color, --s-btn-primary-bg, --s-btn-primary-hover-bg,
+ *   --s-btn-primary-active-bg  primary buttons (default: Bootstrap's compiled colors)
+ *   --s-logo                   site logo image, one of --s-logo-on-dark (for dark or brand
+ *                              colored backgrounds) and --s-logo-on-light, which the application
+ *                              defines next to its .s-site-logo-img rule (default: --s-logo-on-dark)
+ *   --s-logo-bg                background behind the site logo (default: the sidebar
+ *                              band color for form titles, transparent in the sidebar)
+ *   --s-logo-radius            corner radius of the sidebar logo, e.g. 50% when it has a
+ *                              background (default: 0)
+ *   --s-sidebar-link-hover-bg  background of a hovered sidebar item (default: transparent)
+ *   --s-sidebar-link-active-bg background of the sidebar item of the current page
+ *                              (default: transparent)
+ *   --s-sidebar-link-radius    corner radius of sidebar items (default: 0)
+ *   --s-sidebar-link-margin    margin around sidebar items, e.g. to inset their hover and
+ *                              active backgrounds from the edges (default: 0)
+ *   --s-brand-card-bg          background of cards in the brand color with light text, like
+ *                              the dashboard's visitors card (default: the card background)
+ */
+:root {
+  /* layout */
+  --s-col-gap: 0.7rem;
+  --s-row-gap: 1rem;
+
+  /* typography */
+  --bs-body-font-family:
+    "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  --bs-body-font-size: 13px;
+  --s-tabular-font:
+    "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+
+  /* icons */
+  --s-icon-font: "Font Awesome 5 Free";
+  --s-icon-solid: 900;
+  --s-tool-icon-size: 1.5rem;
+  --s-tool-icon: #4a4a8e;
+
+  /* inputs */
+  --s-input-padding-v: 0.375rem;
+  --s-input-line-height: 1.5rem;
+  --s-input-inner-height: 2.25rem;
+  --s-input-bg: #fff;
+  --s-input-outline: rgba(38, 113, 203, 0.25);
+  --s-input-outline-error: rgba(203, 48, 48, 0.25);
+  --s-input-readonly-bg: #f3f3f3;
+  --s-placeholder: #777;
+  --s-focus-ring-width: 0.15rem;
+
+  /* dropdowns, menus and popups */
+  --s-menu-item-hover-bg: rgba(var(--bs-primary-rgb), 0.35);
+  --s-option-highlight-bg: #3875d7;
+  --s-option-highlight-color: #fff;
+  --s-popup-shadow: 0 4px 5px rgba(0, 0, 0, .15);
+  --s-popup-shadow-above: 0 -4px 5px rgba(0, 0, 0, .15);
+
+  /* cards, panels and dialogs */
+  --s-card-bg: var(--bs-body-bg);
+  --s-card-border: var(--bs-border-color-translucent);
+  --s-category-title: #39a7b9;
+  --s-modal-shadow: 0 0 6px 3px rgba(0, 0, 0, 0.10);
+
+  /* tabs */
+  --s-tabs-border: rgba(0, 0, 0, 0.1);
+  --s-tabs-border-active: #3c78ff;
+  --s-tabs-text: #7f8bb5;
+  --s-tabs-text-active: #3c78ff;
+
+  /* grid */
+  --s-alt-row-bg: rgba(139, 177, 205, 0.1);
+  --s-cell-border: rgba(53, 68, 78, 0.1);
+  --s-cell-input-border: rgba(221, 221, 221, 0.5);
+  --s-column-header: var(--bs-secondary);
+  --s-column-header-hover-bg: rgba(68, 129, 239, 0.05);
+  --s-column-header-border: #ebeff2;
+  --s-column-footer: #3cacbf;
+  --s-row-active-bg: rgba(var(--bs-primary-rgb), 0.20);
+  --s-cell-active-bg: rgb(0, 114, 255, 0.2);
+  --s-pager-icon: #5b3df1;
+  --s-pager-text: #555;
+
+  /* states */
+  --s-bright-rgb: 11, 12, 15;
+  --s-deleted: #999;
+  --s-disabled: #606570;
+  --s-inactive: #999;
+
+  /* navigation */
+  --s-sidebar-band-bg: var(--bs-primary);
+}
