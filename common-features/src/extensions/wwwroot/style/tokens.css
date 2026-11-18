@@ -25,6 +25,8 @@
  *                              band color for form titles, transparent in the sidebar)
  *   --s-logo-radius            corner radius of the sidebar logo, e.g. 50% when it has a
  *                              background (default: 0)
+ *   --s-sidebar-pane-bg        background of the navigation pane of the sidebar (default: the
+ *                              card background in StartSharp, white in Serene)
  *   --s-sidebar-link-hover-bg  background of a hovered sidebar item (default: transparent)
  *   --s-sidebar-link-active-bg background of the sidebar item of the current page
  *                              (default: transparent)

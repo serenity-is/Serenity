@@ -4225,7 +4225,7 @@ button.toast-close-button {
   right: 0;
   width: 300px;
   bottom: 0;
-  background: #fff;
+  background: var(--s-sidebar-pane-bg, #fff);
   border-right: 1px solid #e8e9ea;
   font-size: 14px;
   display: flex;
