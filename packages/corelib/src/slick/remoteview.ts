@@ -77,6 +77,31 @@ export interface ArgsRecalcRows extends ArgsRemoteView {
 
 const groupingDelimiter = ':|:';
 
+/** Row stripes: none for group header and totals rows, even and odd for data rows. */
+const stripeNone = 0, stripeEven = 1, stripeOdd = 2;
+
+/** Gets the stripe of a row, which is by its index when there are no grouped stripes. */
+function stripeAt(stripes: Uint8Array, row: number): number {
+    return stripes ? (stripes[row] ?? stripeNone) : (row % 2 == 1 ? stripeOdd : stripeEven);
+}
+
+function stripeName(stripe: number): "odd" | "even" | null {
+    return stripe === stripeOdd ? "odd" : stripe === stripeEven ? "even" : null;
+}
+
+/** Counts data rows from the last group header or totals row, so every group starts with an odd row. */
+function getGroupedRowStripes(rows: any[]): Uint8Array {
+    const stripes = new Uint8Array(rows.length);
+    for (let i = 0, n = 0, l = rows.length; i < l; i++) {
+        if ((rows[i] as NonDataRow)?.__nonDataRow) {
+            n = 0;
+            continue;
+        }
+        stripes[i] = n++ % 2 == 1 ? stripeOdd : stripeEven;
+    }
+    return stripes;
+}
+
 /**
  * A data view that supports remote data loading, sorting, filtering, grouping, and paging.
  * Extends the functionality of SleekGrid's DataView with server-side data operations.
@@ -117,6 +142,8 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
     private prevRefreshHints: any = {};
     private refreshHints: any = {};
     private rows: (TItem | Group | GroupTotals)[] = [];
+    /** Stripes of the rows while grouping (see {@link getRowStripe}), null when rows are striped by index. */
+    private rowStripes: Uint8Array = null;
     private rowsById: Record<any, number> = null;
     private rowsPerPage: number;
     private actualRowsPerPage: number = null;
@@ -1040,6 +1067,18 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
     }
 
     /**
+     * Gets the stripe (odd / even row style) of the specified row. Without grouping, rows are
+     * striped by their index. While grouping, the data rows of each group are counted from the
+     * group header, so the first row of every group is odd like the first row of the grid, and
+     * group header and totals rows have no stripe.
+     * @param row - The row index.
+     * @returns `"odd"`, `"even"`, or null for a group header or totals row.
+     */
+    public getRowStripe(row: number): "odd" | "even" | null {
+        return stripeName(stripeAt(this.rowStripes, row));
+    }
+
+    /**
      * Gets metadata for the specified row.
      * @param row - The row index.
      * @returns The item metadata, or null.
@@ -1368,7 +1407,8 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         return { totalRows: this.filteredItems.length, rows: this.filteredItems };
     }
 
-    private getRowDiffs(rows: (TItem | Group | GroupTotals)[], newRows: (TItem | Group | GroupTotals)[]): number[] {
+    private getRowDiffs(rows: (TItem | Group | GroupTotals)[], newRows: (TItem | Group | GroupTotals)[],
+        stripes?: Uint8Array, newStripes?: Uint8Array): number[] {
         let item: TItem | Group | GroupTotals, r: TItem | Group | GroupTotals, eitherIsNonData: boolean, diff: number[] = [];
         let from = 0, to = newRows.length;
 
@@ -1399,6 +1439,8 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
                         ((item as GroupTotals).__groupTotals || (r as GroupTotals).__groupTotals))
                     || (item as any)[this.idProperty] != (r as any)[this.idProperty]
                     || (this.updated && this.updated[(item as any)[this.idProperty]])
+                    // a row keeps its item but changes its stripe when rows before it move between groups
+                    || stripeAt(stripes, i) !== stripeAt(newStripes, i)
                 ) {
                     diff[diff.length] = i;
                 }
@@ -1435,9 +1477,11 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         oldRows = e.oldRows || oldRows;
         newRows = e.newRows || newRows;
 
-        const diff = this.getRowDiffs(oldRows, newRows);
+        const newStripes = this.groupingInfos.length ? getGroupedRowStripes(newRows) : null;
+        const diff = this.getRowDiffs(oldRows, newRows, this.rowStripes, newStripes);
 
         this.rows = newRows;
+        this.rowStripes = newStripes;
 
         return diff;
     }

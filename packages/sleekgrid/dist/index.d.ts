@@ -2484,6 +2484,14 @@ export interface IDataView<TItem = any> {
      * @returns Metadata object or `undefined` when none applies.
      */
     getItemMetadata?(row: number): ItemMetadata<TItem>;
+    /**
+     * Gets the stripe (odd / even row style) of the specified view row. When not implemented,
+     * rows are striped by their index. Grouping views use it to start each group with an odd
+     * row like the first row of the grid, and to leave group header and totals rows unstriped.
+     * @param row - Zero-based view index.
+     * @returns `"odd"`, `"even"`, or `null` for a row that has neither class.
+     */
+    getRowStripe?(row: number): "odd" | "even" | null;
     /** Event fired when the underlying data set changes. */
     readonly onDataChanged?: EventEmitter<{}>;
     /**
@@ -2672,6 +2680,8 @@ export declare class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     private _activeCellNode;
     private _activePosX;
     private _activeRow;
+    /** The row under the mouse, whose row nodes in all the panes have the "hover" class, or null. */
+    private _hoverRow;
     private _activeViewportNode;
     private _cellCssClasses;
     private _cellHeightDiff;
@@ -3366,6 +3376,14 @@ export declare class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     private handleHeaderClick;
     private handleMouseEnter;
     private handleMouseLeave;
+    private handleRowMouseOver;
+    /**
+     * Marks the row under the mouse with the "hover" class, on its row nodes in all the panes, so a hover style
+     * covers the whole row when some columns are pinned, which a :hover selector can't do as each pane has its own
+     * node for the row.
+     */
+    private setHoverRow;
+    private toggleRowClass;
     private cellExists;
     /**
      * Resolves a `row`/`cell` for the given content-space point.

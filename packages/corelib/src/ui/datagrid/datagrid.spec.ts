@@ -4,6 +4,7 @@ import { Fluent } from "../../base";
 import { ScriptData } from "../../compat";
 import { DataGrid, omitAllGridPersistenceFlags } from "./datagrid";
 import { dataGridDefaults } from "./datagrid-defaults";
+import { GridStyle } from "./gridstyle";
 
 function createGrid(): DataGrid<any, any> {
     class DefaultGrid extends DataGrid<any, any> { }
@@ -1204,5 +1205,73 @@ describe("DataGrid remaining branches", () => {
         grid["setIncludeColumnsParameter"]();
         expect(grid.view.params.IncludeColumns).toEqual(["A"]);
         grid.destroy();
+    });
+});
+
+describe("DataGrid destroy", () => {
+    it("takes what it gave the view back, so a response that arrives later does not reach the destroyed grid", () => {
+        const grid = createGrid();
+        const view = grid.view;
+        const onProcessData = vi.fn();
+
+        grid.destroy();
+
+        // the view still called these when the response of a request made before the grid was destroyed arrived
+        expect(view.onProcessData).toBeNull();
+        expect(view.onSubmit).toBeNull();
+        expect(grid.view).toBeNull();
+        expect(grid.sleekGrid).toBeNull();
+    });
+});
+
+describe("DataGrid grid style", () => {
+    const styleClasses = ["slick-no-odd-even", "slick-no-cell-border", "slick-no-header-chrome"];
+    const classesOf = (grid: DataGrid<any, any>) => styleClasses.filter(x => grid.domNode.classList.contains(x));
+
+    it("has none of the classes by default, so the grid looks as its theme says", () => {
+        expect(classesOf(createGrid())).toEqual([]);
+    });
+
+    it("adds the classes of the members that getInitialGridStyle returns while the grid is created", () => {
+        class LinesGrid extends DataGrid<any, any> {
+            protected override getInitialGridStyle() { return GridStyle.Lines; }
+        }
+        expect(classesOf(new LinesGrid({}))).toEqual(["slick-no-odd-even", "slick-no-header-chrome"]);
+
+        class PlainGrid extends DataGrid<any, any> {
+            protected override getInitialGridStyle() { return GridStyle.Plain; }
+        }
+        expect(classesOf(new PlainGrid({}))).toEqual(styleClasses);
+    });
+
+    it("can read the style from the options of the grid", () => {
+        class OptionGrid extends DataGrid<any, { style?: GridStyle }> {
+            protected override getInitialGridStyle() { return this.options.style; }
+        }
+        expect(classesOf(new OptionGrid({ style: GridStyle.NoCellBorders }))).toEqual(["slick-no-cell-border"]);
+    });
+
+    it("changes the classes when the style is set again, and removes only the ones it added", () => {
+        const grid = createGrid();
+        grid.domNode.classList.add("slick-no-cell-border");
+        grid.setGridStyle(GridStyle.NoStripes);
+        expect(classesOf(grid)).toEqual(["slick-no-odd-even", "slick-no-cell-border"]);
+        grid.setGridStyle(GridStyle.NoHeaderChrome);
+        expect(classesOf(grid)).toEqual(["slick-no-cell-border", "slick-no-header-chrome"]);
+        grid.setGridStyle(null);
+        expect(classesOf(grid)).toEqual(["slick-no-cell-border"]);
+    });
+
+    it("keeps a class that was on the element before, which the style also has", () => {
+        const grid = createGrid();
+        grid.domNode.classList.add("slick-no-odd-even");
+        grid.setGridStyle(null);
+        expect(classesOf(grid)).toEqual(["slick-no-odd-even"]);
+    });
+
+    it("accepts the number as a text, as the enum editor stores it", () => {
+        const grid = createGrid();
+        grid.setGridStyle("5" as any);
+        expect(classesOf(grid)).toEqual(["slick-no-odd-even", "slick-no-header-chrome"]);
     });
 });

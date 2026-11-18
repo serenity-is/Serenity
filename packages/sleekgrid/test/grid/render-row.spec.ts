@@ -63,6 +63,20 @@ describe('renderRow', () => {
         expect(args.sbCenter[0]).toBe('<div class="slick-row odd" data-row="1">');
     });
 
+    it('uses the stripe of the data view instead of the row index when the view has one', () => {
+        const grid = makeGrid({ getData: () => ({ getItemMetadata: () => null, getRowStripe: (row: number) => row === 1 ? "even" : null }) });
+        const args = makeArgs({ grid, row: 1 });
+        renderRow(args);
+        expect(args.sbCenter[0]).toBe('<div class="slick-row even" data-row="1">');
+    });
+
+    it('gives a row neither the odd nor the even class when the data view returns no stripe for it', () => {
+        const grid = makeGrid({ getData: () => ({ getItemMetadata: () => null, getRowStripe: (): null => null }) });
+        const args = makeArgs({ grid, row: 1 });
+        renderRow(args);
+        expect(args.sbCenter[0]).toBe('<div class="slick-row" data-row="1">');
+    });
+
     it('marks the active row', () => {
         const args = makeArgs({ activeRow: 0 });
         renderRow(args);

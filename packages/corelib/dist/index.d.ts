@@ -7245,6 +7245,8 @@ export declare class RemoteView<TItem = any> implements IRemoteView<TItem> {
     private prevRefreshHints;
     private refreshHints;
     private rows;
+    /** Stripes of the rows while grouping (see {@link getRowStripe}), null when rows are striped by index. */
+    private rowStripes;
     private rowsById;
     private rowsPerPage;
     private actualRowsPerPage;
@@ -7584,6 +7586,15 @@ export declare class RemoteView<TItem = any> implements IRemoteView<TItem> {
      * @returns The item at the row.
      */
     getItem(i: number): any;
+    /**
+     * Gets the stripe (odd / even row style) of the specified row. Without grouping, rows are
+     * striped by their index. While grouping, the data rows of each group are counted from the
+     * group header, so the first row of every group is odd like the first row of the grid, and
+     * group header and totals rows have no stripe.
+     * @param row - The row index.
+     * @returns `"odd"`, `"even"`, or null for a group header or totals row.
+     */
+    getRowStripe(row: number): "odd" | "even" | null;
     /**
      * Gets metadata for the specified row.
      * @param row - The row index.
@@ -10783,6 +10794,22 @@ export interface DataGridPersistenceEvent extends DataGridEvent {
     readonly persisting: boolean;
 }
 /**
+ * What a grid hides of the look its theme gives to grids, like the stripes of its rows, so it looks more like a plain table.
+ * The members are flags, so they can be combined. A grid that has none of them, or has no style, looks as the theme says.
+ */
+export declare enum GridStyle {
+    /** The rows are not striped, which is only a change for a theme that stripes them. */
+    NoStripes = 1,
+    /** There are no lines between the rows. */
+    NoCellBorders = 2,
+    /** The header is plain, without a background, a shadow, a top border, separators between the columns or menu buttons that are always visible. */
+    NoHeaderChrome = 4,
+    /** A plain header, and lines between the rows without stripes. */
+    Lines = 5,
+    /** None of the stripes, the lines between the rows and the chrome of the header, so the grid looks like a plain table. */
+    Plain = 7
+}
+/**
  * Metadata that describes a row type for grid and dialog integration.
  * Implementations are resolved from the row type registry and used for
  * permissions, identity and display name resolution.
@@ -11184,6 +11211,7 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
     private _grid;
     private _initialSettings;
     private _layoutTimer;
+    private _gridStyleApplied;
     /** The title element. */
     protected titleDiv: Fluent;
     /** The toolbar widget. */
@@ -11291,6 +11319,22 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
      * @returns True when async loading is used.
      */
     protected useAsync(): boolean;
+    /**
+     * What the grid hides of the look its theme gives to grids, so it looks more like a plain table, which is nothing
+     * by default, so the grid looks as the theme says. It is called while the grid is being created, so it can only
+     * use the options and static values.
+     * @returns The members of {@link GridStyle} to apply, combined, or null.
+     */
+    protected getInitialGridStyle(): GridStyle | null;
+    /**
+     * Sets what the grid hides of the look its theme gives to grids, which a grid does at its creation from
+     * {@link getInitialGridStyle}. It adds or removes the `slick-no-odd-even`, `slick-no-cell-border` and `slick-no-header-chrome`
+     * classes of the grid's element, which set the `--s-stripes`, `--s-cell-borders` and `--s-header-chrome` variables
+     * to 0, so the theme decides for the others.
+     * @param style The members of {@link GridStyle} to apply, combined, or null for the look of the theme. A number
+     * given as text, as an enum editor stores it, is accepted.
+     */
+    setGridStyle(style: GridStyle | null | undefined): void;
     /**
      * Whether the grid should use the layout timer for responsive resizing.
      * @returns True when the layout timer is used.

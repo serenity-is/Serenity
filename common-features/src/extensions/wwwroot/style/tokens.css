@@ -35,6 +35,28 @@
  *                              active backgrounds from the edges (default: 0)
  *   --s-popup-bg               background of dropdown lists like the select2 one, e.g. a less
  *                              transparent one than the inputs (default: --s-input-bg)
+ *   --s-stripes                1 or 0, whether the odd rows of grids have the --s-alt-row-bg
+ *                              background; set it on :root for the whole page, or on a grid
+ *                              for that grid only, and themes never set it (default:
+ *                              --s-stripes-default)
+ *   --s-stripes-default        1 or 0, whether a theme stripes the rows of grids when
+ *                              --s-stripes isn't set (default: 1)
+ *   --s-cell-borders           1 or 0, whether grid cells have their --s-cell-border lines; like
+ *                              --s-stripes, set it on :root or on a grid, themes never set it
+ *                              (default: --s-cell-borders-default)
+ *   --s-cell-borders-default   1 or 0, whether a theme shows the lines of grid cells when
+ *                              --s-cell-borders isn't set (default: 1)
+ *   --s-header-chrome          1 or 0, whether grid headers have their background, top border,
+ *                              shadow, column separators and always visible menu buttons, or
+ *                              look like a plain table's; like --s-stripes, set it on :root or
+ *                              on a grid (default: --s-header-chrome-default; StartSharp only,
+ *                              as Serene's grid headers are plain already)
+ *   --s-header-chrome-default  1 or 0, the theme's choice for --s-header-chrome (default: 1)
+ *   --s-row-hover-bg           tint over the background of the grid data row under the mouse
+ *                              (default: transparent, no hover effect)
+ *   --s-group-row-bg           background of the group header rows of grids, which are not
+ *                              striped like the data rows (default: a light blue, a bit stronger
+ *                              than the alternate rows)
  *   --s-group-totals-bg, --s-group-totals-border, --s-group-totals-text
  *                              background, top border and text of the group totals rows of grids
  *                              (default: a light blue background with blue text)

@@ -244,3 +244,43 @@ describe('options.frozenColumns', () => {
         expect(cols2[2].frozen).toBeFalsy();
     });
 });
+
+describe('row hover', () => {
+    function hoverGrid() {
+        const data = [{ c1: 'a', c2: 'b', c3: 'c' }, { c1: 'd', c2: 'e', c3: 'f' }];
+        // the main pane needs room for the pinned column to be in its own pane
+        const el = container();
+        el.style.width = "1000px";
+        el.style.height = "300px";
+        const grid = new SleekGrid(el, data, threeCols(), {
+            enableColumnReorder: false,
+            frozenColumns: 1,
+            layoutEngine: new FrozenLayout()
+        });
+        const nodes = (row: number) => Array.from(grid.getContainerNode().querySelectorAll<HTMLElement>(`.slick-row[data-row="${row}"]`));
+        const hovered = () => Array.from(grid.getContainerNode().querySelectorAll<HTMLElement>(".slick-row.hover")).map(x => x.dataset.row);
+        return { grid, nodes, hovered };
+    }
+
+    it('marks the row nodes of all the panes when the mouse is over one of them, and unmarks them when it leaves', () => {
+        const { nodes, hovered } = hoverGrid();
+        expect(nodes(1).length).toBe(2);
+
+        nodes(1)[1].querySelector(".slick-cell").dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
+        expect(hovered()).toEqual(["1", "1"]);
+
+        nodes(0)[0].querySelector(".slick-cell").dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
+        expect(hovered()).toEqual(["0", "0"]);
+
+        nodes(0)[0].parentElement.dispatchEvent(new MouseEvent("mouseleave"));
+        expect(hovered()).toEqual([]);
+    });
+
+    it('keeps the mark of the row under the mouse when the row is rendered again', () => {
+        const { grid, nodes, hovered } = hoverGrid();
+        nodes(1)[0].querySelector(".slick-cell").dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
+        grid.invalidateRows([1]);
+        grid.render();
+        expect(hovered()).toEqual(["1", "1"]);
+    });
+});

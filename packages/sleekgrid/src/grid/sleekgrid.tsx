@@ -44,6 +44,8 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     declare private _activeCellNode: HTMLElement;
     declare private _activePosX: number;
     declare private _activeRow: number;
+    /** The row under the mouse, whose row nodes in all the panes have the "hover" class, or null. */
+    private _hoverRow: number = null;
     declare private _activeViewportNode: HTMLElement;
     private _cellCssClasses: Record<string, CellStylesHash> = {};
     private _cellHeightDiff: number = 0;
@@ -460,6 +462,8 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
             this._on(canvas, "click", boundThis.handleClick)
             this._on(canvas, "dblclick", boundThis.handleDblClick)
             this._on(canvas, "contextmenu", boundThis.handleContextMenu);
+            this._on(canvas, "mouseover", boundThis.handleRowMouseOver);
+            this._on(canvas, "mouseleave", () => this.setHoverRow(null));
         });
 
         this._draggableInstance = Draggable({
@@ -2831,6 +2835,8 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
             cache.rowNodeS && (cache.rowNodeS.style.top = rowTop);
             cache.rowNodeC && (cache.rowNodeC.style.top = rowTop);
             cache.rowNodeE && (cache.rowNodeE.style.top = rowTop);
+            if (row === this._hoverRow)
+                this.toggleRowClass(row, "hover", true);
             if (cache.cellRenderContent.some(x => x instanceof Node))
                 this.ensureCellNodesInRowsCache(row);
         }
@@ -3545,6 +3551,34 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
 
     private handleMouseLeave(e: Event): void {
         this._trigger(this.onMouseLeave, {}, e);
+    }
+
+    private handleRowMouseOver(e: MouseEvent): void {
+        const rowNode = (e.target as HTMLElement)?.closest?.(".slick-row") as HTMLElement;
+        const row = rowNode?.parentElement === e.currentTarget ? parseInt(rowNode.dataset.row, 10) : NaN;
+        this.setHoverRow(isNaN(row) ? null : row);
+    }
+
+    /**
+     * Marks the row under the mouse with the "hover" class, on its row nodes in all the panes, so a hover style
+     * covers the whole row when some columns are pinned, which a :hover selector can't do as each pane has its own
+     * node for the row.
+     */
+    private setHoverRow(row: number): void {
+        if (row === this._hoverRow)
+            return;
+        this.toggleRowClass(this._hoverRow, "hover", false);
+        this._hoverRow = row;
+        this.toggleRowClass(row, "hover", true);
+    }
+
+    private toggleRowClass(row: number, cssClass: string, add: boolean): void {
+        const c = row != null ? this._rowsCache[row] : null;
+        if (!c)
+            return;
+        c.rowNodeS?.classList.toggle(cssClass, add);
+        c.rowNodeC?.classList.toggle(cssClass, add);
+        c.rowNodeE?.classList.toggle(cssClass, add);
     }
 
     private cellExists(row: number, cell: number): boolean {

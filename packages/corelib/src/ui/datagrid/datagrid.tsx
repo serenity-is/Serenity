@@ -23,6 +23,7 @@ import type { AutoRegisterArgs } from "./datagrid-autoregisterargs";
 import { dataGridDefaults } from "./datagrid-defaults";
 import { getDefaultSortBy, getItemCssClass, propertyItemToQuickFilter, sleekGridOnSort } from "./datagrid-internal";
 import { GridPersistenceFlags, PersistedGridSettings, SettingStorage, getCurrentSettings, restoreSettingsFrom, type DataGridPersistenceEvent } from "./datagrid-persistence";
+import { GridStyle } from "./gridstyle";
 import { IDataGrid } from "./idatagrid";
 import { IRowDefinition } from "./irowdefinition";
 import { QuickFilter } from "./quickfilter";
@@ -33,6 +34,13 @@ import { SlickPager } from "./slickpager";
 export type { AutoRegisterArgs, AutoRegisterHandler } from "./datagrid-autoregisterargs";
 export { omitAllGridPersistenceFlags } from "./datagrid-persistence";
 export type { DataGridPersistenceEvent, GridPersistenceFlags, PersistedGridColumn, PersistedGridSettings, SettingStorage } from "./datagrid-persistence";
+
+/** The classes of the grid's element that set the variables a grid style turns off, by the member that turns each one off. */
+const gridStyleClasses: [GridStyle, string][] = [
+    [GridStyle.NoStripes, "slick-no-odd-even"],
+    [GridStyle.NoCellBorders, "slick-no-cell-border"],
+    [GridStyle.NoHeaderChrome, "slick-no-header-chrome"]
+];
 
 /**
  * Base data grid widget that renders tabular data using SleekGrid, with
@@ -48,6 +56,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     declare private _grid: ISleekGrid<TItem>;
     declare private _initialSettings: PersistedGridSettings;
     declare private _layoutTimer: number;
+    declare private _gridStyleApplied: number;
 
     /** The title element. */
     declare protected titleDiv: Fluent;
@@ -135,6 +144,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
 
         this.restoringSettings = 0;
         this.domNode.classList.add('s-DataGrid');
+        this.setGridStyle(this.getInitialGridStyle());
 
         const layout = bindThis(this).layoutTimerCallback;
         this.element.addClass('require-layout').on('layout.' + this.uniqueName, layout);
@@ -225,6 +235,38 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
      */
     protected useAsync() {
         return false;
+    }
+
+    /**
+     * What the grid hides of the look its theme gives to grids, so it looks more like a plain table, which is nothing
+     * by default, so the grid looks as the theme says. It is called while the grid is being created, so it can only
+     * use the options and static values.
+     * @returns The members of {@link GridStyle} to apply, combined, or null.
+     */
+    protected getInitialGridStyle(): GridStyle | null {
+        return null;
+    }
+
+    /**
+     * Sets what the grid hides of the look its theme gives to grids, which a grid does at its creation from
+     * {@link getInitialGridStyle}. It adds or removes the `slick-no-odd-even`, `slick-no-cell-border` and `slick-no-header-chrome`
+     * classes of the grid's element, which set the `--s-stripes`, `--s-cell-borders` and `--s-header-chrome` variables
+     * to 0, so the theme decides for the others.
+     * @param style The members of {@link GridStyle} to apply, combined, or null for the look of the theme. A number
+     * given as text, as an enum editor stores it, is accepted.
+     */
+    public setGridStyle(style: GridStyle | null | undefined): void {
+        const flags = Number(style) || 0;
+        // only the classes this method added are removed, as the element may have the same classes from its props or markup
+        const applied = this._gridStyleApplied ?? 0;
+        for (const [flag, cssClass] of gridStyleClasses) {
+            const on = (flags & flag) === flag;
+            if (on)
+                this.domNode.classList.add(cssClass);
+            else if ((applied & flag) === flag)
+                this.domNode.classList.remove(cssClass);
+        }
+        this._gridStyleApplied = flags;
     }
 
     /**
@@ -426,6 +468,9 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         if (this.view) {
             this.view.onDataChanged.unsubscribe(this.viewDataChanged);
             this.view.onSubmit = null;
+            // the rows the view asked for may still arrive, e.g. when a toolbar action of a dashboard rebuilds the grid while
+            // it loads, and processing them would reach the grid and the cells that are destroyed
+            this.view.onProcessData = null;
             this.view.setFilter(null);
             this.view = null;
         }

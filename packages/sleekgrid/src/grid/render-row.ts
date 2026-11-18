@@ -15,16 +15,18 @@ export function renderRow<TItem>(this: void, args: RowRenderArgs<TItem>): void {
     const { pinnedStartLast, pinnedEndFirst, frozenTopLast, frozenBottomFirst } = frozenPinned;
     const dataLoading = row < grid.getDataLength() && !item;
     const cols = grid.getColumns();
+    const data = grid.getData() as IDataView<TItem>;
+    const stripe = data.getRowStripe ? data.getRowStripe(row) : (row % 2 == 1 ? "odd" : "even");
     let rowCss = "slick-row" +
         (row <= frozenTopLast || frozenBottomFirst <= row ? ' frozen' : '') +
         (dataLoading ? " loading" : "") +
         (activeRow === row ? " active" : "") +
-        (row % 2 == 1 ? " odd" : " even");
+        (stripe ? " " + stripe : "");
 
     if (item == null && row < 0)
         rowCss += " " + grid.getOptions().addNewRowCssClass;
 
-    const itemMetadata = (grid.getData() as IDataView<TItem>).getItemMetadata?.(row);
+    const itemMetadata = data.getItemMetadata?.(row);
 
     if (itemMetadata && itemMetadata.cssClasses) {
         rowCss += " " + itemMetadata.cssClasses;

@@ -3443,16 +3443,24 @@ button.panel-titlebar-close::after {
   background: rgba(var(--s-body-bg-grb) 0.5);
 }
 
+/* --s-stripes (1 or 0) turns the stripes on or off for the page or a grid, over the theme's --s-stripes-default */
 .slick-row.odd {
-  background-color: var(--s-alt-row-bg);
+  background-color: color-mix(in srgb, var(--s-alt-row-bg) calc(var(--s-stripes, var(--s-stripes-default, 1)) * 100%), transparent);
+}
+
+/* a layer over the row background, so the stripe and the active row color still show below it;
+   the grid adds the hover class to the row's nodes in all the panes when some columns are pinned */
+.slick-row.hover:not(.slick-group, .slick-group-totals) {
+  background-image: linear-gradient(var(--s-row-hover-bg, transparent), var(--s-row-hover-bg, transparent));
 }
 
 .slick-row.editing-item {
   background-color: rgba(var(--bs-success-rgb), 0.2);
 }
 
-.slick-no-odd-even .slick-row.odd {
-  background-color: transparent;
+/* no stripes in a grid with this class, e.g. a check tree, like --s-stripes: 0 */
+.slick-no-odd-even {
+  --s-stripes: 0;
 }
 
 .slick-cell,
@@ -3465,9 +3473,11 @@ button.panel-titlebar-close::after {
   overflow: visible;
 }
 
+/* --s-cell-borders (1 or 0) shows or hides the lines between rows for the page or a grid, over the theme's
+   --s-cell-borders-default; hidden lines are transparent, so the rows keep their height */
 .slick-cell {
   border-style: none none solid none;
-  border-color: var(--s-cell-border);
+  border-color: color-mix(in srgb, var(--s-cell-border) calc(var(--s-cell-borders, var(--s-cell-borders-default, 1)) * 100%), transparent);
   line-height: 30px;
 }
 
@@ -3574,9 +3584,20 @@ button.panel-titlebar-close::after {
   cursor: pointer;
 }
 
-.slick-no-cell-border .grid-container .slick-cell,
+/* no lines between the rows or the header columns of a grid with this class, e.g. a check tree */
+.slick-no-cell-border {
+  --s-cell-borders: 0;
+}
+
 .slick-no-cell-border .grid-container .slick-header-column {
   border-width: 0px;
+}
+
+/* a grid with this class looks like a plain table, with no stripes, no lines between the rows and a plain header */
+.slick-plain-table {
+  --s-stripes: 0;
+  --s-cell-borders: 0;
+  --s-header-chrome: 0;
 }
 
 .slick-hide-header .slick-header-columns {
@@ -3600,6 +3621,10 @@ button.panel-titlebar-close::after {
   border-top: 1px solid var(--s-group-totals-border, #AFC1C7);
   color: var(--s-group-totals-text, #2A75AD);
   font-weight: bold;
+}
+
+.slick-group {
+  background-color: var(--s-group-row-bg, rgba(139, 177, 205, 0.22));
 }
 
 .slick-group .slick-cell {

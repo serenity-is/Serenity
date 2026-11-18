@@ -29,6 +29,7 @@ export * from "./types";
 export * from "./ui/datagrid/columnpickerdialog";
 export * from "./ui/datagrid/datagrid";
 export * from "./ui/datagrid/entitygrid";
+export * from "./ui/datagrid/gridstyle";
 export * from "./ui/datagrid/idatagrid";
 export * from "./ui/datagrid/irowdefinition";
 export * from "./ui/datagrid/islickformatter";
