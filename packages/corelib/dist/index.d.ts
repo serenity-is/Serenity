@@ -17334,6 +17334,8 @@ export interface GridRowSelectionMixinOptions {
  */
 export declare class GridRowSelectionMixin {
     static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
+    /** The id of the column that the mixin adds, which shows the checkboxes of the rows. */
+    static readonly selectColumnId = "__select__";
     private idField;
     private include;
     private grid;
@@ -17349,6 +17351,23 @@ export declare class GridRowSelectionMixin {
      */
     destroy(): void;
     private handleGridClick;
+    /**
+     * Key handler that toggles the checkbox of the active row on Space, like clicking it.
+     * @param e - Cell keyboard event from the grid's `onKeyDown`.
+     */
+    private handleGridKeyDown;
+    /**
+     * Returns the index of the select column of the grid.
+     * @param grid - The grid, defaults to the one of the mixin.
+     * @returns The index of the column, or `null` when the grid has no select column.
+     */
+    private getSelectColumnIndex;
+    /**
+     * Selects or deselects a row, or all the rows of a group, and refreshes the grid.
+     * @param item - The item of the row, or the group of the row of a group.
+     * @returns `true` if the selection changed, `false` when the row can't be selected.
+     */
+    private toggleSelection;
     /**
      * Refreshes the rows after a change of the selection, and the state of the select all button.
      */

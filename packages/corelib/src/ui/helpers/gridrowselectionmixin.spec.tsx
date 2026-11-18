@@ -7,13 +7,18 @@ describe("GridRowSelectionMixin", () => {
     let viewObj: any;
     let onClickHandler: Function;
     let onHeaderClickHandler: Function;
+    let onKeyDownHandler: Function;
 
     beforeEach(() => {
         onClickHandler = null as any;
         onHeaderClickHandler = null as any;
+        onKeyDownHandler = null as any;
         gridObj = {
             onClick: { subscribe: vi.fn((h: any) => { onClickHandler = h; }), unsubscribe: vi.fn() },
             onHeaderClick: { subscribe: vi.fn((h: any) => { onHeaderClickHandler = h; }), unsubscribe: vi.fn() },
+            onKeyDown: { subscribe: vi.fn((h: any) => { onKeyDownHandler = h; }), unsubscribe: vi.fn() },
+            getActiveCell: vi.fn(() => null),
+            getColumnIndex: vi.fn(() => 0),
             invalidate: vi.fn(),
             updateRow: vi.fn()
         };
@@ -479,6 +484,66 @@ describe("GridRowSelectionMixin", () => {
             const column = GridRowSelectionMixin.createSelectColumn(() => mixin);
 
             expect((column.format as any)({ item: group })).toBe("");
+        });
+    });
+
+    describe("keyboard selection", () => {
+        function keyEvent(key: string) {
+            return { key, preventDefault: vi.fn(), stopImmediatePropagation: vi.fn() } as any;
+        }
+
+        it("toggles the checkbox of the active row on space", () => {
+            viewObj.getItem = vi.fn(() => ({ id: 42 }));
+            const mixin = new GridRowSelectionMixin(mockGrid);
+            gridObj.getActiveCell.mockReturnValue({ row: 0, cell: 0 });
+
+            const e = keyEvent(" ");
+            onKeyDownHandler(e);
+
+            expect((mixin as any).include).toEqual({ "42": true });
+            expect(e.preventDefault).toHaveBeenCalled();
+            expect(gridObj.invalidate).toHaveBeenCalled();
+
+            onKeyDownHandler(keyEvent(" "));
+            expect((mixin as any).include).toEqual({});
+        });
+
+        it("ignores the space key when the active cell is not the select column", () => {
+            viewObj.getItem = vi.fn(() => ({ id: 42 }));
+            new GridRowSelectionMixin(mockGrid);
+            gridObj.getActiveCell.mockReturnValue({ row: 0, cell: 3 });
+
+            const e = keyEvent(" ");
+            onKeyDownHandler(e);
+
+            expect(e.preventDefault).not.toHaveBeenCalled();
+            expect(gridObj.invalidate).not.toHaveBeenCalled();
+        });
+
+        it("ignores keys other than space, and grids without a select column", () => {
+            viewObj.getItem = vi.fn(() => ({ id: 42 }));
+            new GridRowSelectionMixin(mockGrid);
+            gridObj.getActiveCell.mockReturnValue({ row: 0, cell: 0 });
+
+            const enter = keyEvent("Enter");
+            onKeyDownHandler(enter);
+            expect(enter.preventDefault).not.toHaveBeenCalled();
+
+            gridObj.getColumnIndex.mockReturnValue(-1);
+            const space = keyEvent(" ");
+            onKeyDownHandler(space);
+            expect(space.preventDefault).not.toHaveBeenCalled();
+        });
+
+        it("toggles all the rows of a group on space", () => {
+            const group = { __group: true, __nonDataRow: true, rows: [{ id: 1 }, { id: 2 }], count: 2 } as any;
+            viewObj.getItem = vi.fn(() => group);
+            const mixin = new GridRowSelectionMixin(mockGrid);
+            gridObj.getActiveCell.mockReturnValue({ row: 0, cell: 0 });
+
+            onKeyDownHandler(keyEvent(" "));
+
+            expect((mixin as any).include).toEqual({ "1": true, "2": true });
         });
     });
 });

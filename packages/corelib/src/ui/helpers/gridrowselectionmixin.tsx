@@ -1,5 +1,5 @@
 import { bindThis } from "@serenity-is/domwise";
-import { Column, Group, type ArgsCell } from "@serenity-is/sleekgrid";
+import { Column, Group, type ArgsCell, type CellKeyboardEvent, type ISleekGrid } from "@serenity-is/sleekgrid";
 import { classTypeInfo, Fluent, nsSerenity, registerType } from "../../base";
 import { clearKeys } from "../../compat";
 import type { IRemoteView } from "../../slick/iremoteview";
@@ -30,6 +30,9 @@ export class GridRowSelectionMixin {
 
     static [Symbol.typeInfo] = classTypeInfo(nsSerenity); static { registerType(this); }
 
+    /** The id of the column that the mixin adds, which shows the checkboxes of the rows. */
+    static readonly selectColumnId = "__select__";
+
     declare private idField: string;
     declare private include: { [key: string]: boolean }
     declare private grid: IDataGrid;
@@ -49,6 +52,7 @@ export class GridRowSelectionMixin {
         const boundThis = bindThis(this);
         grid.getGrid().onClick.subscribe(boundThis.handleGridClick);
         grid.getGrid().onHeaderClick.subscribe(boundThis.handleHeaderClick);
+        grid.getGrid().onKeyDown?.subscribe(boundThis.handleGridKeyDown);
         (grid.getView() as IRemoteView).onRowsChanged?.subscribe(boundThis.updateSelectAll);
     }
 
@@ -59,6 +63,7 @@ export class GridRowSelectionMixin {
         this.include = Object.create(null);
         this.grid?.getGrid()?.onClick?.unsubscribe(this.handleGridClick);
         this.grid?.getGrid()?.onHeaderClick?.unsubscribe(this.handleHeaderClick);
+        this.grid?.getGrid()?.onKeyDown?.unsubscribe(this.handleGridKeyDown);
         (this.grid?.getView() as IRemoteView).onRowsChanged?.unsubscribe(this.updateSelectAll);
         delete this.grid;
         delete this.options?.selectable;
@@ -69,14 +74,57 @@ export class GridRowSelectionMixin {
         if (!(e.target as HTMLElement).classList.contains('select-item'))
             return;
 
-        const item = this.grid.getView().getItem(e.row);
+        if (!this.toggleSelection(this.grid.getView().getItem(e.row)))
+            return;
 
+        e.preventDefault();
+    }
+
+    /**
+     * Key handler that toggles the checkbox of the active row on Space, like clicking it.
+     * @param e - Cell keyboard event from the grid's `onKeyDown`.
+     */
+    private handleGridKeyDown(e: CellKeyboardEvent): void {
+        if (e?.key !== " ")
+            return;
+
+        const grid = this.grid?.getGrid();
+        const activeCell = grid?.getActiveCell?.();
+        if (!activeCell)
+            return;
+
+        const selectCell = this.getSelectColumnIndex(grid);
+        if (selectCell == null || activeCell.cell !== selectCell)
+            return;
+
+        if (!this.toggleSelection(this.grid.getView().getItem(activeCell.row)))
+            return;
+
+        e.preventDefault();
+        e.stopImmediatePropagation();
+    }
+
+    /**
+     * Returns the index of the select column of the grid.
+     * @param grid - The grid, defaults to the one of the mixin.
+     * @returns The index of the column, or `null` when the grid has no select column.
+     */
+    private getSelectColumnIndex(grid?: ISleekGrid): number | null {
+        const index = (grid ?? this.grid?.getGrid())?.getColumnIndex?.(GridRowSelectionMixin.selectColumnId);
+        return index == null || index < 0 ? null : index;
+    }
+
+    /**
+     * Selects or deselects a row, or all the rows of a group, and refreshes the grid.
+     * @param item - The item of the row, or the group of the row of a group.
+     * @returns `true` if the selection changed, `false` when the row can't be selected.
+     */
+    private toggleSelection(item: any): boolean {
         if ((item as Group)?.__group) {
             const ids = this.getGroupIds(item as Group);
             if (!ids)
-                return;
+                return false;
 
-            e.preventDefault();
             const all = ids.every(id => this.include[id]);
             for (const id of ids) {
                 if (all)
@@ -86,25 +134,22 @@ export class GridRowSelectionMixin {
             }
 
             this.refreshSelection();
-            return;
+            return true;
         }
 
         // the cell of a totals row is rendered too, as the group cell starts after the select
         // column, but only the data rows have an id to select
         if (!this.isSelectable(item))
-            return;
+            return false;
 
-        e.preventDefault();
         const id = item[this.idField].toString();
-
-        if (this.include[id]) {
+        if (this.include[id])
             delete this.include[id];
-        }
-        else {
+        else
             this.include[id] = true;
-        }
 
         this.refreshSelection();
+        return true;
     }
 
     /**
@@ -299,7 +344,7 @@ export class GridRowSelectionMixin {
             name: "[×]",
             nameFormat: () => <span class="select-all-items check-box no-float"></span>,
             toolTip: ' ',
-            id: '__select__',
+            id: GridRowSelectionMixin.selectColumnId,
             resizable: false,
             width: 27,
             minWidth: 27,

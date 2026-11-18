@@ -294,12 +294,45 @@ export class GroupItemMetadataProvider implements GridPlugin {
     }
 
     /**
-     * Key handler that toggles group collapse on Space / `+` / `-` when a group row is active.
+     * Returns the first and the last cell of a row that can be navigated to, ignoring the columns a
+     * cell spans. The arrow keys are only used for the group at these ends of the row, as they don't
+     * go to another cell there.
+     * @param grid - The grid that shows the row.
+     * @param row - The row to find the cells of.
+     * @returns The first and the last navigable cell, both `null` when there is none.
+     */
+    protected getFocusableCellRange(grid: ISleekGrid, row: number): { first: number, last: number } {
+        const colCount = grid.getColumns?.()?.length ?? 0;
+        let cell = 0, first: number = null, last: number = null;
+
+        while (cell < colCount) {
+            if (grid.canCellBeActive?.(row, cell)) {
+                if (first == null)
+                    first = cell;
+                last = cell;
+            }
+
+            cell += Math.max(1, (grid.getColspan?.(row, cell) as number) || 1);
+        }
+
+        return { first, last };
+    }
+
+    /**
+     * Key handler that toggles group collapse on Space / `+` / `-` when the group cell is active, and
+     * on the arrow keys at the ends of a group row, e.g. Left collapses the group on the first cell of
+     * its row and Right expands it on the last one.
      * @param e - Cell keyboard event from the grid's `onKeyDown`.
      */
     handleGridKeyDown = (e: CellKeyboardEvent): void => {
-        if (!this.options.enableExpandCollapse ||
-            (e.key !== " " && e.key !== "-" && e.key !== "+"))
+        if (!this.options.enableExpandCollapse)
+            return;
+
+        const key = e?.key;
+        const isLeft = key === "ArrowLeft";
+        const isRight = key === "ArrowRight";
+        const isArrow = isLeft || isRight;
+        if (!isArrow && key !== " " && key !== "-" && key !== "+")
             return;
 
         const grid = e?.grid ?? this.grid;
@@ -314,23 +347,55 @@ export class GroupItemMetadataProvider implements GridPlugin {
         if (!item || !(item instanceof Group))
             return;
 
+        // the state the key asks for, which is the opposite of the current one for the space key
+        const collapse: boolean = key === " " ? !item.collapsed : key === "-" || isLeft;
+
+        if (isArrow) {
+            // the arrows belong to the group only at the ends of the cells of its row that can be
+            // navigated to, where they would not go to another cell, and only when they change its
+            // state, otherwise they are left to the grid
+            const range = this.getFocusableCellRange(grid, activeCell.row);
+            if (range.first == null)
+                return;
+
+            // the columns are mirrored in an rtl grid, so the ends are swapped as well
+            const rtl = !!grid.getOptions?.()?.rtl;
+            const atStart = activeCell.cell === (rtl ? range.last : range.first);
+            const atEnd = activeCell.cell === (rtl ? range.first : range.last);
+
+            if (collapse ? !atStart : !atEnd)
+                return;
+
+            if (collapse === !!item.collapsed)
+                return;
+        }
+        else {
+            // the other keys belong to the cell the group is in, and not to e.g. a checkbox cell
+            // before it, which handles them itself
+            if (activeCell.cell !== this.groupCellPosition().cell)
+                return;
+        }
+
+        // the keys are ours from here, even when `+` or `-` is pressed on a group that is already in
+        // the state it asks for
         e.stopImmediatePropagation();
         e.preventDefault();
 
-        if ((e.key == "+" && !item.collapsed) ||
-            (e.key == "-" && item.collapsed))
+        if (collapse === !!item.collapsed)
             return;
 
-        const range = (grid.getRenderedRange as any)();
-        grid.getData().setRefreshHints?.({
-            ignoreDiffsBefore: range.top,
-            ignoreDiffsAfter: range.bottom + 1
-        });
+        const range = grid.getRenderedRange?.();
+        if (range) {
+            grid.getData().setRefreshHints?.({
+                ignoreDiffsBefore: range.top,
+                ignoreDiffsAfter: range.bottom + 1
+            });
+        }
 
-        if (item.collapsed)
-            grid.getData().expandGroup?.(item.groupingKey);
-        else
+        if (collapse)
             grid.getData().collapseGroup?.(item.groupingKey);
+        else
+            grid.getData().expandGroup?.(item.groupingKey);
     }
 
     /**

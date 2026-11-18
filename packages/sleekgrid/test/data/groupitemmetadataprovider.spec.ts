@@ -237,9 +237,24 @@ function mockGrid() {
         },
         getActiveCell: <any>null,
         getColumns: <any>null,
+        getOptions: () => ({}),
+        canCellBeActive: () => true,
+        getColspan: () => 1,
         groupTotalsFormatter: <any>null
     };
     return grid as any;
+}
+
+function keyGrid() {
+    const grid = mockGrid();
+    // a select column that the group cell skips, and a group cell that spans the rest of the row
+    grid.getColumns = () => [
+        { id: "__select__", minWidth: 27, maxWidth: 27 },
+        { id: "name" },
+        { id: "other" }
+    ];
+    grid.getColspan = (_row: number, cell: number) => cell === 1 ? 2 : 1;
+    return grid;
 }
 
 describe("GroupItemMetadataProvider.init", () => {
@@ -482,6 +497,7 @@ describe("GroupItemMetadataProvider keyboard and lifecycle edge cases", () => {
         expect(event.preventDefaultCalls).toBe(0);
 
         const enabled = new GroupItemMetadataProvider();
+        grid.getActiveCell = () => ({ row: 1, cell: 0 });
         const expandedEvent = mockEvent({ grid, key: "+" });
         grid.getDataItem = () => {
             const group = new Group();
@@ -503,7 +519,7 @@ describe("GroupItemMetadataProvider keyboard and lifecycle edge cases", () => {
 
     it("handles keyboard expansion and collapse through the initialized grid", () => {
         const grid = mockGrid();
-        grid.getActiveCell = () => ({ row: 1 });
+        grid.getActiveCell = () => ({ row: 1, cell: 0 });
         const provider = new GroupItemMetadataProvider();
         provider.init(grid);
 
@@ -512,7 +528,7 @@ describe("GroupItemMetadataProvider keyboard and lifecycle edge cases", () => {
         expect(expandEvent.preventDefaultCalls).toBe(1);
         expect(grid.__data.expandGroupCalls).toEqual(["gk1"]);
 
-        grid.getActiveCell = () => ({ row: 3 });
+        grid.getActiveCell = () => ({ row: 3, cell: 0 });
         const collapseEvent = mockEvent({ key: "-" });
         provider.handleGridKeyDown(collapseEvent);
         expect(collapseEvent.preventDefaultCalls).toBe(1);
@@ -533,9 +549,129 @@ describe("GroupItemMetadataProvider keyboard and lifecycle edge cases", () => {
         expect(grid.__data.expandGroupCalls).toHaveLength(0);
     });
 
+    it("ignores the space key when the active cell is not the group cell", () => {
+        // the select column is skipped, so the group cell starts at the second column
+        const grid = keyGrid();
+        const provider = new GroupItemMetadataProvider();
+        provider.init(grid);
+
+        grid.getActiveCell = () => ({ row: 1, cell: 0 });
+        const space = mockEvent({ key: " " });
+        provider.handleGridKeyDown(space);
+
+        expect(space.preventDefaultCalls).toBe(0);
+        expect(grid.__data.expandGroupCalls).toHaveLength(0);
+
+        grid.getActiveCell = () => ({ row: 1, cell: 1 });
+        const onGroupCell = mockEvent({ key: " " });
+        provider.handleGridKeyDown(onGroupCell);
+
+        expect(onGroupCell.preventDefaultCalls).toBe(1);
+        expect(grid.__data.expandGroupCalls).toEqual(["gk1"]);
+    });
+
+    it("toggles the group on the space key", () => {
+        const grid = keyGrid();
+        const provider = new GroupItemMetadataProvider();
+        provider.init(grid);
+
+        // row 1 is a collapsed group and row 3 is an expanded one
+        grid.getActiveCell = () => ({ row: 1, cell: 1 });
+        provider.handleGridKeyDown(mockEvent({ key: " " }));
+        expect(grid.__data.expandGroupCalls).toEqual(["gk1"]);
+
+        grid.getActiveCell = () => ({ row: 3, cell: 1 });
+        provider.handleGridKeyDown(mockEvent({ key: " " }));
+        expect(grid.__data.collapseGroupCalls).toEqual(["gk3"]);
+
+        // now it is collapsed, so the same key expands it again
+        const collapsed = new Group();
+        collapsed.groupingKey = "gk3";
+        collapsed.collapsed = true;
+        grid.getDataItem = () => collapsed;
+        provider.handleGridKeyDown(mockEvent({ key: " " }));
+        expect(grid.__data.expandGroupCalls).toEqual(["gk1", "gk3"]);
+    });
+
+    it("only acts on + and - in the direction they are for", () => {
+        const grid = keyGrid();
+        const provider = new GroupItemMetadataProvider();
+        provider.init(grid);
+
+        // row 3 is expanded, so + has nothing to do, but the key is still ours
+        grid.getActiveCell = () => ({ row: 3, cell: 1 });
+        const plus = mockEvent({ key: "+" });
+        provider.handleGridKeyDown(plus);
+        expect(plus.preventDefaultCalls).toBe(1);
+        expect(grid.__data.expandGroupCalls).toHaveLength(0);
+
+        // row 1 is collapsed, so - has nothing to do either
+        grid.getActiveCell = () => ({ row: 1, cell: 1 });
+        const minus = mockEvent({ key: "-" });
+        provider.handleGridKeyDown(minus);
+        expect(minus.preventDefaultCalls).toBe(1);
+        expect(grid.__data.collapseGroupCalls).toHaveLength(0);
+    });
+
+    it("collapses on the left arrow at the start of a group row and expands on the right arrow at its end", () => {
+        const grid = keyGrid();
+        const provider = new GroupItemMetadataProvider();
+        provider.init(grid);
+
+        grid.getActiveCell = () => ({ row: 3, cell: 0 });
+        const left = mockEvent({ key: "ArrowLeft" });
+        provider.handleGridKeyDown(left);
+
+        expect(left.preventDefaultCalls).toBe(1);
+        expect(grid.__data.collapseGroupCalls).toEqual(["gk3"]);
+
+        grid.getActiveCell = () => ({ row: 1, cell: 1 });
+        const right = mockEvent({ key: "ArrowRight" });
+        provider.handleGridKeyDown(right);
+
+        expect(right.preventDefaultCalls).toBe(1);
+        expect(grid.__data.expandGroupCalls).toEqual(["gk1"]);
+    });
+
+    it("leaves the arrow keys to the grid when they navigate to another cell", () => {
+        const grid = keyGrid();
+        const provider = new GroupItemMetadataProvider();
+        provider.init(grid);
+
+        // the left arrow goes to the first cell, and the right one goes to the collapsed group
+        grid.getActiveCell = () => ({ row: 3, cell: 1 });
+        const left = mockEvent({ key: "ArrowLeft" });
+        provider.handleGridKeyDown(left);
+
+        grid.getActiveCell = () => ({ row: 1, cell: 0 });
+        const right = mockEvent({ key: "ArrowRight" });
+        provider.handleGridKeyDown(right);
+
+        expect(left.preventDefaultCalls).toBe(0);
+        expect(right.preventDefaultCalls).toBe(0);
+        expect(grid.__data.collapseGroupCalls).toHaveLength(0);
+        expect(grid.__data.expandGroupCalls).toHaveLength(0);
+    });
+
+    it("swaps the arrow keys at the ends of the row in an rtl grid", () => {
+        const grid = keyGrid();
+        grid.getOptions = () => ({ rtl: true });
+        const provider = new GroupItemMetadataProvider();
+        provider.init(grid);
+
+        grid.getActiveCell = () => ({ row: 3, cell: 1 });
+        provider.handleGridKeyDown(mockEvent({ key: "ArrowLeft" }));
+
+        grid.getActiveCell = () => ({ row: 1, cell: 0 });
+        provider.handleGridKeyDown(mockEvent({ key: "ArrowRight" }));
+
+        expect(grid.__data.collapseGroupCalls).toEqual(["gk3"]);
+        expect(grid.__data.expandGroupCalls).toEqual(["gk1"]);
+    });
+
     it("handles missing optional data methods during keyboard expansion", () => {
         const grid = mockGrid();
-        grid.getActiveCell = () => ({ row: 1 });
+        grid.getActiveCell = () => ({ row: 1, cell: 0 });
         grid.__data.setRefreshHints = undefined;
         grid.__data.expandGroup = undefined;
         const provider = new GroupItemMetadataProvider();

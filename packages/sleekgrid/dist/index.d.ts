@@ -4101,7 +4101,21 @@ export declare class GroupItemMetadataProvider implements GridPlugin {
      */
     handleGridClick: (e: CellMouseEvent) => void;
     /**
-     * Key handler that toggles group collapse on Space / `+` / `-` when a group row is active.
+     * Returns the first and the last cell of a row that can be navigated to, ignoring the columns a
+     * cell spans. The arrow keys are only used for the group at these ends of the row, as they don't
+     * go to another cell there.
+     * @param grid - The grid that shows the row.
+     * @param row - The row to find the cells of.
+     * @returns The first and the last navigable cell, both `null` when there is none.
+     */
+    protected getFocusableCellRange(grid: ISleekGrid, row: number): {
+        first: number;
+        last: number;
+    };
+    /**
+     * Key handler that toggles group collapse on Space / `+` / `-` when the group cell is active, and
+     * on the arrow keys at the ends of a group row, e.g. Left collapses the group on the first cell of
+     * its row and Right expands it on the last one.
      * @param e - Cell keyboard event from the grid's `onKeyDown`.
      */
     handleGridKeyDown: (e: CellKeyboardEvent) => void;
