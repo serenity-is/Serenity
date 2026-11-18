@@ -3596,9 +3596,9 @@ button.panel-titlebar-close::after {
 }
 
 .slick-group-totals .slick-cell {
-  background-color: #f7fcff;
-  border-top: 1px solid #AFC1C7;
-  color: #2A75AD;
+  background-color: var(--s-group-totals-bg, #f7fcff);
+  border-top: 1px solid var(--s-group-totals-border, #AFC1C7);
+  color: var(--s-group-totals-text, #2A75AD);
   font-weight: bold;
 }
 
@@ -3615,7 +3615,7 @@ button.panel-titlebar-close::after {
 
 .slick-group-totals {
   color: gray;
-  background: white;
+  background: var(--s-group-totals-bg, white);
 }
 
 .slick-pg {

@@ -35,6 +35,9 @@
  *                              active backgrounds from the edges (default: 0)
  *   --s-popup-bg               background of dropdown lists like the select2 one, e.g. a less
  *                              transparent one than the inputs (default: --s-input-bg)
+ *   --s-group-totals-bg, --s-group-totals-border, --s-group-totals-text
+ *                              background, top border and text of the group totals rows of grids
+ *                              (default: a light blue background with blue text)
  *   --s-brand-card-bg          background of cards in the brand color with light text, like
  *                              the dashboard's visitors card (default: the card background)
  */
