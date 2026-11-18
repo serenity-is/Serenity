@@ -1,4 +1,5 @@
 import type { ISleekGrid } from "../core";
+import type { ColumnMetadata } from "../core/column";
 import type { CellStylesHash } from "../core/formatting";
 import type { ViewRange } from "../core/viewrange";
 import type { CachedRow } from "./internal";
@@ -44,7 +45,8 @@ export interface RowRenderArgs<TItem> extends RowCellCommonRenderArgs<TItem> {
  */
 export interface CellRenderArgs<TItem> extends RowCellCommonRenderArgs<TItem> {
     cell: number;
-    colMetadata?: any;
+    /** The per cell metadata of the row, e.g. its `colspan`, `cssClass` or `format`, if any. */
+    colMetadata?: ColumnMetadata<TItem>;
     colspan: number;
     sb: string[];
 }

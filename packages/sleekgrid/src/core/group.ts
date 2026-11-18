@@ -1,5 +1,34 @@
 import { NonDataRow } from "./base";
+import type { ItemMetadata } from "./column";
 import type { FormatterContext, FormatterResult } from "./formatting";
+
+/**
+ * The metadata hooks of a group item metadata provider, i.e. what a view and a grid need from it to
+ * render the rows of a grouping. Implemented by `GroupItemMetadataProvider`, which is a grid plugin,
+ * so the grid and the view can share the same instance.
+ */
+export interface IGroupItemMetadataProvider {
+    /**
+     * Returns the metadata of the row of a group.
+     * @param item - The group of the row.
+     * @returns Metadata describing how the row should be rendered.
+     */
+    getGroupRowMetadata(item: Group): ItemMetadata;
+    /**
+     * Returns the metadata of the row that shows the totals of a group.
+     * @param item - The totals of the row.
+     * @returns Metadata describing how the row should be rendered.
+     */
+    getTotalsRowMetadata(item: IGroupTotals): ItemMetadata;
+    /**
+     * Returns the metadata of a data row that is inside a group, e.g. its indentation.
+     * @param row - The row index in the view.
+     * @param level - The grouping level of the row.
+     * @param baseMetadata - The metadata the view has already built for the row, if any.
+     * @returns Metadata for the row, or `null` when there is none.
+     */
+    getDataRowMetadata?(row: number, level: number, baseMetadata?: ItemMetadata): ItemMetadata;
+}
 
 /**
  * Represents a group of rows produced by a `DataView` grouping.

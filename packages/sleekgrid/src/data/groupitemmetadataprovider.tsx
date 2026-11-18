@@ -10,7 +10,35 @@ export interface GroupItemMetadataProviderOptions {
     groupCellCssClass?: string;
     /** CSS class applied to the entire group row. Defaults to `"slick-group"`. */
     groupCssClass?: string;
-    /** Indentation in pixels per grouping level for the toggle. Defaults to `15`. */
+    /**
+     * Whether the first cell of the data rows inside a group is indented according to the grouping
+     * level, so that they look nested under the group rows. Defaults to `true`.
+     *
+     * The indentation goes to the column the group cell starts at, see {@link groupCellPosition},
+     * which the provider can only find when it knows the grid and so its columns, i.e. when it is
+     * registered as a plugin of the grid, which also makes the view use the same instance.
+     */
+    indentDataRows?: boolean;
+    /** CSS class applied to the indented first cell of grouped data rows. Defaults to `"slick-group-data"`. */
+    dataCellCssClass?: string;
+    /**
+     * Columns that have a fixed width, i.e. the same `minWidth` and `maxWidth`, and that are
+     * narrower than this many pixels are skipped when finding the group cell column, like the
+     * columns marked with `skipGroupCell`. It finds the narrow utility columns, e.g. a checkbox
+     * column of 27px, without needing a flag. The declared width is used, not the current one, so
+     * `forceFitColumns` and resizing don't move the group cell column. Set it to `0` to disable it,
+     * and set `skipGroupCell` on a column to skip a column that is not fixed.
+     * Defaults to `40`.
+     */
+    minGroupCellWidth?: number;
+    /**
+     * Indentation in pixels per grouping level. Defaults to `15`.
+     * @deprecated It is not used to emit an inline style anymore, as that doesn't work with a
+     * content security policy that disallows inline styles. The indentation is now applied by
+     * the `slick-group-level-N` classes that the provider puts on group rows, toggles and data
+     * cells, see `--sg-group-indent` in `css/slick.grid.css`. Set that CSS variable to change
+     * the step. This option is kept for compatibility.
+     */
     groupIndentation?: number;
     /** Whether group rows can receive focus. Defaults to `true`. */
     groupFocusable?: boolean;
@@ -66,6 +94,25 @@ export class GroupItemMetadataProvider implements GridPlugin {
     declare private options: GroupItemMetadataProviderOptions;
 
     /**
+     * The deepest grouping level that has an indentation rule in `css/slick.grid.css`, which
+     * defines the rules for levels 1 to 8, as CSS can't multiply a custom property by a level
+     * that is only known at runtime. Deeper levels are clamped to it. If you need more levels,
+     * add the matching `.slick-group-level-N` rules to your own stylesheet and raise this value.
+     */
+    public static maxIndentLevel = 8;
+
+    /**
+     * Clamps a grouping level to {@link GroupItemMetadataProvider.maxIndentLevel}, so that a level
+     * that has no CSS rule still gets the deepest indentation instead of none. Level 0, the top
+     * level groups, is not indented, and has no CSS rule.
+     * @param level - The grouping level.
+     * @returns The level, between 0 and {@link GroupItemMetadataProvider.maxIndentLevel}.
+     */
+    public static clampIndentLevel(level: number): number {
+        return Math.max(0, Math.min(level ?? 0, GroupItemMetadataProvider.maxIndentLevel));
+    }
+
+    /**
      * Creates a new provider.
      * @param opt - Partial options merged with {@link GroupItemMetadataProvider.defaults}.
      */
@@ -82,6 +129,7 @@ export class GroupItemMetadataProvider implements GridPlugin {
      */
     public static readonly defaults: GroupItemMetadataProviderOptions = {
         enableExpandCollapse: true,
+        dataCellCssClass: "slick-group-data",
         groupCellCssClass: "slick-group-cell",
         groupCssClass: "slick-group",
         groupFocusable: true,
@@ -89,6 +137,8 @@ export class GroupItemMetadataProvider implements GridPlugin {
         groupLevelPrefix: "slick-group-level-",
         groupTitleCssClass: "slick-group-title",
         hasSummaryType: (col: any) => col.summaryType && col.summaryType != -1,
+        indentDataRows: true,
+        minGroupCellWidth: 40,
         totalsCssClass: "slick-group-totals",
         toggleCssClass: "slick-group-toggle",
         toggleCollapsedCssClass: "collapsed",
@@ -122,14 +172,20 @@ export class GroupItemMetadataProvider implements GridPlugin {
             return fmtResultTitle;
         }
 
-        const indentation = group.level * opt.groupIndentation;
+        // the indentation is applied by the level class, and not by an inline style, so that it
+        // works with a content security policy that disallows inline styles
+        const level = GroupItemMetadataProvider.clampIndentLevel(group.level);
+        const toggleCssClass = [opt.toggleCssClass,
+            group.collapsed ? opt.toggleCollapsedCssClass : opt.toggleExpandedCssClass,
+            opt.groupLevelPrefix ? opt.groupLevelPrefix + level : null
+        ].filter(x => !!x).join(" ");
+
         const titleSpan = <span class={opt.groupTitleCssClass} data-level={group.level.toString()}>
             {fmtResultTitle}
         </span> as HTMLElement;
         applyFormatterResultToCellNode(ctx, fmtResultTitle, titleSpan, contentOnly);
         return <>
-            <span class={opt.toggleCssClass + " " + (group.collapsed ? opt.toggleCollapsedCssClass : opt.toggleExpandedCssClass)}
-                style={{ marginLeft: indentation + "px" }}></span>
+            <span class={toggleCssClass}></span>
             {titleSpan}
         </>
     }
@@ -158,11 +214,22 @@ export class GroupItemMetadataProvider implements GridPlugin {
     }
 
     /**
+     * Sets the grid the provider reads the columns from, e.g. to find the column a group cell starts
+     * at, without attaching the event handlers of {@link init}. A view that has a grid attached, like
+     * `VirtualScrollView`, calls it; a provider registered with `registerPlugin` gets the grid from
+     * {@link init}.
+     * @param grid - The grid that shows the rows the provider gives metadata for.
+     */
+    public setGrid(grid: ISleekGrid): void {
+        this.grid = grid;
+    }
+
+    /**
      * Initializes the plugin, attaching click and key handlers for expand/collapse.
      * @param grid - Host grid instance.
      */
     init(grid: ISleekGrid): void {
-        this.grid = grid;
+        this.setGrid(grid);
         grid.onClick.subscribe(this.handleGridClick);
         grid.onKeyDown.subscribe(this.handleGridKeyDown);
     }
@@ -267,8 +334,55 @@ export class GroupItemMetadataProvider implements GridPlugin {
     }
 
     /**
+     * Returns whether a column can be the start of a group cell, and so the column the data rows
+     * of a group are indented in. Summary columns are skipped, as they show the totals of a group,
+     * and so are the columns marked with `skipGroupCell` and the narrow columns with a fixed width
+     * (see {@link GroupItemMetadataProviderOptions.minGroupCellWidth}), like a checkbox column,
+     * which stay in front of the group cell.
+     * @param column - The column to test.
+     * @returns `true` if the group cell can start at the column.
+     */
+    public isGroupCellColumn(column: Column): boolean {
+        return !!column &&
+            !column.skipGroupCell &&
+            !this.isFixedNarrowColumn(column) &&
+            !this.options.hasSummaryType?.(column);
+    }
+
+    /**
+     * Returns whether a column has a fixed width narrower than
+     * {@link GroupItemMetadataProviderOptions.minGroupCellWidth}, which marks a utility column
+     * like a checkbox or a row number column. The declared width is used, as the current one
+     * changes with `forceFitColumns` and resizing, which would move the group cell column.
+     *
+     * A width of `0` is treated as not set, like the column sizing code does, e.g. the fitting of
+     * the columns uses `maxWidth || Infinity`, so a column with a zero minimum and maximum is a
+     * normal column that can be resized and is not skipped.
+     * @param column - The column to test.
+     * @returns `true` if the column is a narrow column with a fixed width.
+     */
+    protected isFixedNarrowColumn(column: Column): boolean {
+        const limit = this.options.minGroupCellWidth;
+        if (!(limit > 0))
+            return false;
+
+        const minWidth = column?.minWidth;
+        const maxWidth = column?.maxWidth;
+
+        if (typeof minWidth !== "number" ||
+            typeof maxWidth !== "number" ||
+            !(minWidth > 0) ||
+            minWidth !== maxWidth) {
+            return false;
+        }
+
+        return maxWidth < limit;
+    }
+
+    /**
      * Computes the cell index and colspan for the spanned group cell, taking
-     * summary columns and frozen columns into account.
+     * summary columns, columns marked with `skipGroupCell`, narrow fixed width columns and frozen
+     * columns into account.
      * @returns Object with `cell` start index and `colspan` span width (`"*"` means full row when no totals).
      */
     groupCellPosition = (): {
@@ -281,25 +395,37 @@ export class GroupItemMetadataProvider implements GridPlugin {
             colspan: "*" as (number | "*")
         }
 
-        if (!this.options.groupRowTotals ||
-            !this.grid) {
+        const cols = this.grid?.getColumns?.();
+        if (!cols?.length) {
             return result;
         }
 
-        const cols = this.grid.getColumns();
-        let col1: Column;
+        // the group cell starts at the first column that is not a summary column and not skipped,
+        // so that columns like a checkbox stay visible in the group rows too
+        let cell = -1;
         for (let idx = 0; idx < cols.length; idx++) {
-            col1 = cols[idx];
-            if (!this.options.hasSummaryType?.(cols[idx])) {
-                result.cell = idx;
+            if (this.isGroupCellColumn(cols[idx])) {
+                cell = idx;
                 break;
             }
         }
 
+        if (cell < 0) {
+            // every column is a summary or a skipped column, so there is nothing to span
+            return result;
+        }
+
+        result.cell = cell;
+
+        if (!this.options.groupRowTotals) {
+            return result;
+        }
+
+        const col1 = cols[cell];
         result.colspan = 0;
-        for (let idx = result.cell + 1; idx < cols.length; idx++) {
+        for (let idx = cell + 1; idx < cols.length; idx++) {
             const col2 = cols[idx];
-            if (!this.options.hasSummaryType?.(col2) &&
+            if (this.isGroupCellColumn(col2) &&
                 (!!(col1?.frozen) === !!(col2?.frozen))) {
                 result.colspan++;
             }
@@ -328,7 +454,7 @@ export class GroupItemMetadataProvider implements GridPlugin {
             columns: {
                 [gcp.cell]: {
                     colspan: gcp.colspan,
-                    cssClasses: opt.groupCellCssClass,
+                    cssClass: opt.groupCellCssClass,
                     format: opt.groupFormat,
                     editor: null
                 }
@@ -337,6 +463,98 @@ export class GroupItemMetadataProvider implements GridPlugin {
 
         if (opt.groupRowTotals)
             result.format = opt.totalsFormat;
+
+        return result;
+    }
+
+    /**
+     * Returns row metadata for a data row that is inside one or more groups. Views that
+     * support grouping call this for their data rows and merge the result with their own
+     * metadata (see {@link mergeMetadata}).
+     *
+     * When {@link GroupItemMetadataProviderOptions.indentDataRows} is `true`, the first cell
+     * gets the level class (e.g. `slick-group-level-2`) and `css/slick.grid.css` indents it by
+     * `level * var(--sg-group-indent)`, so the data rows of nested groups line up under their
+     * group rows. No inline style is used, so that it works with a content security policy
+     * that disallows inline styles.
+     *
+     * @param row - The row index of the data row in the view.
+     * @param level - The grouping level of the data row. Data rows are normally at the leaf
+     * level, i.e. the number of active groupings, so two levels of grouping indent them by
+     * two steps.
+     * @param baseMetadata - Metadata the view has already built for the row, e.g. from its
+     * `getItemMetadata` callback. It is merged with the indentation metadata when the row is
+     * indented, and returned as is otherwise.
+     * @returns Metadata for the row, or `null` when there is none and the row is not indented.
+     */
+    public getDataRowMetadata(row: number, level: number, baseMetadata?: ItemMetadata): ItemMetadata {
+        const opt = this.options;
+
+        if (!opt.indentDataRows ||
+            level == null ||
+            !(level > 0))
+            return baseMetadata ?? null;
+
+        // the indentation is applied by the level class, and not by an inline style, so that it
+        // works with a content security policy that disallows inline styles
+        const cssClasses = [opt.dataCellCssClass,
+            opt.groupLevelPrefix ? opt.groupLevelPrefix + GroupItemMetadataProvider.clampIndentLevel(level) : null
+        ].filter(x => !!x).join(" ");
+
+        // the indentation goes to the column the group cell starts at, so that the data rows of
+        // the groups line up under their group rows
+        return GroupItemMetadataProvider.mergeMetadata(baseMetadata, {
+            columns: {
+                [this.groupCellPosition().cell]: {
+                    cssClass: cssClasses
+                }
+            }
+        });
+    }
+
+    /**
+     * Merges metadata returned for a row, e.g. the metadata a view or a column provider has
+     * already built and the metadata {@link getDataRowMetadata} returns, into a single object.
+     * CSS classes are concatenated, other properties of `extra` win.
+     * @param base - The metadata built by the view or a user callback, if any.
+     * @param extra - The metadata to apply on top of it, if any.
+     * @returns The merged metadata, or `null` when both arguments are empty.
+     */
+    public static mergeMetadata(base: ItemMetadata, extra: ItemMetadata): ItemMetadata {
+        if (!extra)
+            return base ?? null;
+
+        if (!base)
+            return extra;
+
+        const result: ItemMetadata = { ...base, ...extra };
+
+        const cssClasses = [base.cssClasses, extra.cssClasses].filter(x => !!x).join(" ");
+        if (cssClasses.length)
+            result.cssClasses = cssClasses;
+
+        if (extra.columns) {
+            const columns: { [key: string]: any } = { ...(base.columns ?? {}) };
+            for (const key in extra.columns) {
+                const baseCol = columns[key];
+                const extraCol = extra.columns[key];
+                if (!baseCol) {
+                    columns[key] = extraCol;
+                    continue;
+                }
+
+                const merged: any = { ...baseCol, ...extraCol };
+                const classes = [baseCol.cssClass ?? baseCol.cssClasses, extraCol.cssClass ?? extraCol.cssClasses]
+                    .filter(x => !!x).join(" ");
+                if (classes.length)
+                    merged.cssClass = classes;
+                delete merged.cssClasses;
+
+                columns[key] = merged;
+            }
+
+            result.columns = columns;
+        }
 
         return result;
     }

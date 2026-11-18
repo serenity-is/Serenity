@@ -1,4 +1,4 @@
-import { expect, it } from "vitest";
+import { expect, it, vi } from "vitest";
 import type { ISleekGrid } from "../../src/core";
 import type { GridPlugin } from "../../src/core/grid-plugin";
 import { SleekGrid } from "../../src/grid/sleekgrid";
@@ -88,4 +88,27 @@ it('should be able to get plugins without names', () => {
     grid.unregisterPlugin(firstPlugin);
 
     expect(grid.getPluginByName(undefined)).toEqual(secondPlugin);
+});
+
+it('should give the view the group item metadata provider that is registered as a plugin', () => {
+    const view = {
+        setGroupItemMetadataProvider: vi.fn(),
+        getGroupItemMetadataProvider: () => null
+    };
+
+    const grid = new SleekGrid(document.createElement('div'), view as any, [], {});
+    const other: GridPlugin = { init: () => { } };
+    grid.registerPlugin(other);
+    expect(view.setGroupItemMetadataProvider).not.toHaveBeenCalled();
+
+    const provider = {
+        init: () => { },
+        getGroupRowMetadata: () => ({}),
+        getTotalsRowMetadata: () => ({})
+    };
+
+    grid.registerPlugin(provider);
+
+    // the view and the grid share the provider, so the provider can read the columns of the grid
+    expect(view.setGroupItemMetadataProvider).toHaveBeenCalledWith(provider);
 });

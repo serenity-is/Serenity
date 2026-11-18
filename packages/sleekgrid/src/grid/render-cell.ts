@@ -24,8 +24,11 @@ export function renderCell<TItem>(this: void, { activeCell, activeRow, cell, cel
     if (activeCell === cell && activeRow === row)
         klass += " active";
 
-    if (colMetadata && colMetadata.cssClass) {
-        klass += " " + colMetadata.cssClass;
+    // cssClass is the name SlickGrid uses for the cell metadata, cssClasses is the deprecated
+    // alias that the type had, which nothing read, so it is only a fallback
+    const colMetadataCssClass = colMetadata?.cssClass ?? colMetadata?.cssClasses;
+    if (colMetadataCssClass) {
+        klass += " " + colMetadataCssClass;
     }
 
     for (const key in cellCssClasses) {

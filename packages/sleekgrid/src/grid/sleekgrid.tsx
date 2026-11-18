@@ -10,6 +10,7 @@ import type { ArgsAddNewRow, ArgsCell, ArgsCellChange, ArgsCellEdit, ArgsColumn,
 import { applyFormatterResultToCellNode, convertCompatFormatter, defaultColumnFormat, formatterContext, type CellStylesHash, type ColumnFormat, type FormatterContext, type FormatterResult } from "../core/formatting";
 import type { GridPlugin } from "../core/grid-plugin";
 import type { GridSignals } from "../core/grid-signals";
+import type { IGroupItemMetadataProvider } from "../core/group";
 import { gridDefaults, type GridOptions } from "../core/gridoptions";
 import type { IGroupTotals } from "../core/group";
 import { type IDataView } from "../core/idataview";
@@ -510,6 +511,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     registerPlugin(plugin: GridPlugin): void {
         this._plugins.unshift(plugin);
         plugin.init(this);
+        this.bindGroupItemMetadataProvider(plugin);
     }
 
     /**
@@ -1821,7 +1823,28 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
             view.onRowCountChanged && view.onRowCountChanged.subscribe(boundThis.viewOnRowCountChanged);
             view.onRowsChanged && view.onRowsChanged.subscribe(boundThis.viewOnRowsChanged);
             view.onDataChanged && view.onDataChanged.subscribe(boundThis.viewOnDataChanged);
+            this.bindGroupItemMetadataProvider();
         }
+    }
+
+    /**
+     * Gives the data view the group item metadata provider the grid has, so that both use the same
+     * instance. A provider is a grid plugin, which is how it gets the grid and reads its columns, so
+     * the view doesn't need a reference to the grid.
+     * @param plugin - The plugin that was just registered, if any.
+     */
+    private bindGroupItemMetadataProvider(plugin?: GridPlugin): void {
+        const view = this._data as IDataView;
+        if (!view?.setGroupItemMetadataProvider)
+            return;
+
+        const isProvider = (value: GridPlugin): value is GridPlugin & IGroupItemMetadataProvider =>
+            typeof (value as unknown as IGroupItemMetadataProvider)?.getGroupRowMetadata === "function" &&
+            typeof (value as unknown as IGroupItemMetadataProvider)?.getTotalsRowMetadata === "function";
+
+        const provider = isProvider(plugin) ? plugin : this._plugins.find(isProvider);
+        if (provider)
+            view.setGroupItemMetadataProvider(provider);
     }
 
     private unbindFromData(): void {

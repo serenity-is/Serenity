@@ -61,7 +61,8 @@ export class GridRadioSelectionMixin {
     }
 
     private isSelectable(item: any) {
-        return item && (
+        // rows of a group or its totals are not data, so they can't be selected
+        return item && !item.__nonDataRow && (
             this.options.selectable == null ||
             this.options.selectable(item));
     }
@@ -151,6 +152,9 @@ export class GridRadioSelectionMixin {
             width: 27,
             minWidth: 27,
             maxWidth: 27,
+            // not a data column, so the group cell should start after it and the data rows of a
+            // group should be indented after it
+            skipGroupCell: true,
             headerCssClass: '',
             sortable: false,
             format: function (ctx) {

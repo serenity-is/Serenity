@@ -1,6 +1,6 @@
 import { ItemMetadata } from "./column";
 import { EventEmitter, EventData } from "./event";
-import { Group, IGroupTotals } from "./group";
+import { Group, IGroupItemMetadataProvider, IGroupTotals } from "./group";
 
 
 /**
@@ -38,6 +38,12 @@ export interface IDataView<TItem = any> {
      * @returns `"odd"`, `"even"`, or `null` for a row that has neither class.
      */
     getRowStripe?(row: number): "odd" | "even" | null;
+    /**
+     * Sets the provider that gives the metadata of the rows of a group, so that the view and the
+     * grid share one instance, which is what lets the provider read the columns of the grid.
+     * @param provider - The provider, or `null` when the grid no longer has one.
+     */
+    setGroupItemMetadataProvider?(provider: IGroupItemMetadataProvider): void;
     /** Event fired when the underlying data set changes. */
     readonly onDataChanged?: EventEmitter<{}>;
     /**

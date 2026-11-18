@@ -1150,3 +1150,34 @@
 }
 
 /*!rtl:end:ignore*/
+
+/* The step of the indentation of grouping, see the rules at the end of this file */
+.slick-container {
+  --sg-group-indent: 15px;
+}
+
+/*
+Indentation of grouping: the toggle of a group row and the first cell of the data rows that are
+inside a group (`GroupItemMetadataProvider.indentDataRows`) are indented by the `slick-group-level-N`
+class each of them carries. It is done with classes and not with inline styles, so that it works
+with a content security policy that disallows inline styles. Levels go up to 8, which is
+`GroupItemMetadataProvider.maxIndentLevel`, as CSS can't multiply `--sg-group-indent` by a level
+that is only known at runtime. Change `--sg-group-indent` to change the step.
+*/
+.slick-group-toggle.slick-group-level-1 { margin-inline-start: calc(1 * var(--sg-group-indent, 15px)); }
+.slick-group-toggle.slick-group-level-2 { margin-inline-start: calc(2 * var(--sg-group-indent, 15px)); }
+.slick-group-toggle.slick-group-level-3 { margin-inline-start: calc(3 * var(--sg-group-indent, 15px)); }
+.slick-group-toggle.slick-group-level-4 { margin-inline-start: calc(4 * var(--sg-group-indent, 15px)); }
+.slick-group-toggle.slick-group-level-5 { margin-inline-start: calc(5 * var(--sg-group-indent, 15px)); }
+.slick-group-toggle.slick-group-level-6 { margin-inline-start: calc(6 * var(--sg-group-indent, 15px)); }
+.slick-group-toggle.slick-group-level-7 { margin-inline-start: calc(7 * var(--sg-group-indent, 15px)); }
+.slick-group-toggle.slick-group-level-8 { margin-inline-start: calc(8 * var(--sg-group-indent, 15px)); }
+
+.slick-cell.slick-group-data.slick-group-level-1 { padding-inline-start: calc(var(--sg-padding-h, 6px) + 1 * var(--sg-group-indent, 15px)); }
+.slick-cell.slick-group-data.slick-group-level-2 { padding-inline-start: calc(var(--sg-padding-h, 6px) + 2 * var(--sg-group-indent, 15px)); }
+.slick-cell.slick-group-data.slick-group-level-3 { padding-inline-start: calc(var(--sg-padding-h, 6px) + 3 * var(--sg-group-indent, 15px)); }
+.slick-cell.slick-group-data.slick-group-level-4 { padding-inline-start: calc(var(--sg-padding-h, 6px) + 4 * var(--sg-group-indent, 15px)); }
+.slick-cell.slick-group-data.slick-group-level-5 { padding-inline-start: calc(var(--sg-padding-h, 6px) + 5 * var(--sg-group-indent, 15px)); }
+.slick-cell.slick-group-data.slick-group-level-6 { padding-inline-start: calc(var(--sg-padding-h, 6px) + 6 * var(--sg-group-indent, 15px)); }
+.slick-cell.slick-group-data.slick-group-level-7 { padding-inline-start: calc(var(--sg-padding-h, 6px) + 7 * var(--sg-group-indent, 15px)); }
+.slick-cell.slick-group-data.slick-group-level-8 { padding-inline-start: calc(var(--sg-padding-h, 6px) + 8 * var(--sg-group-indent, 15px)); }

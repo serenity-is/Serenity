@@ -92,6 +92,18 @@ describe("GridRadioSelectionMixin", () => {
             expect((mixin as any).include).toEqual({});
         });
 
+        it("ignores the click on the select cell of a group row", () => {
+            // the group cell starts after the select column, so group rows render that cell too
+            viewObj.getItem = vi.fn(() => ({ __nonDataRow: true } as any));
+            const mixin = new GridRadioSelectionMixin(mockGrid);
+
+            const e = { target: { classList: { contains: (c: string) => c === 'rad-select-item' } }, preventDefault: vi.fn() } as any;
+
+            expect(() => subscribeHandler(e, { row: 0 })).not.toThrow();
+            expect((mixin as any).include).toEqual({});
+            expect(gridObj.updateRow).not.toHaveBeenCalled();
+        });
+
         it("treats prototype property names as ordinary keys", () => {
             viewObj.getItem = vi.fn(() => ({ id: "constructor" }));
             viewObj.getLength = vi.fn(() => 1);
@@ -204,6 +216,8 @@ describe("GridRadioSelectionMixin", () => {
 
             expect(column.id).toBe("__select__");
             expect(column.sortable).toBe(false);
+            // the group cell and the indentation of the data rows start after this column
+            expect(column.skipGroupCell).toBe(true);
             expect(typeof column.nameFormat).toBe("function");
             expect((column.nameFormat as any)()).toBe("");
         });
@@ -212,6 +226,14 @@ describe("GridRadioSelectionMixin", () => {
             const getMixin = vi.fn(() => null);
             const column = GridRadioSelectionMixin.createSelectColumn(getMixin);
             const result = column.format({ item: { id: 1 } } as any);
+            expect(result).toBe("");
+        });
+
+        it("format returns empty string for the rows of a group", () => {
+            const mixin = new GridRadioSelectionMixin(mockGrid);
+            const getMixin = vi.fn(() => mixin);
+            const column = GridRadioSelectionMixin.createSelectColumn(getMixin);
+            const result = column.format({ item: { __nonDataRow: true } } as any);
             expect(result).toBe("");
         });
 

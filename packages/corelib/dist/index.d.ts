@@ -7235,6 +7235,12 @@ export declare class RemoteView<TItem = any> implements IRemoteView<TItem> {
     private idxById;
     private itemMetadataCallback?;
     private items;
+    /**
+     * Whether the first cell of the data rows inside a group is indented, see
+     * {@link RemoteViewOptions.indentDataRows}. It is passed to the group item metadata
+     * provider the view creates, leaving it undefined keeps the provider defaults.
+     */
+    private indentDataRows;
     private loading;
     private localSort;
     private method;
@@ -7253,6 +7259,7 @@ export declare class RemoteView<TItem = any> implements IRemoteView<TItem> {
     private sortAsc;
     private sortComparer;
     private suspend;
+    private destroyed;
     private toggledGroupsByLevel;
     /** The total number of the rows, or the number of the ones known so far when paging is indeterminate. */
     protected totalCount: number;
@@ -7476,6 +7483,13 @@ export declare class RemoteView<TItem = any> implements IRemoteView<TItem> {
      * @param aggregators - The aggregators of the totals and the groups.
      */
     static getAggregatesToRequest(aggregators: IAggregator[]): AggregateBy[];
+    /**
+     * Returns the group item metadata provider the view creates when it doesn't have one, with
+     * the options of the view applied. Options that are not set are not passed, so the defaults
+     * of the provider, which can be changed via `GroupItemMetadataProvider.defaults`, still apply.
+     * @returns A new group item metadata provider.
+     */
+    protected createGroupItemMetadataProvider(): GroupItemMetadataProvider;
     /**
      * Sets the grouping configuration for the view.
      * @param groupingInfo - Grouping information or array of grouping information.
@@ -7708,6 +7722,11 @@ export declare class RemoteView<TItem = any> implements IRemoteView<TItem> {
      * @returns False if the operation was cancelled or no URL is configured.
      */
     populate(): boolean;
+    /**
+     * Stops the view, which is what a grid does when it is destroyed: the rows it asked for that arrive after that are
+     * ignored, and it notifies nothing, as what it notified may not be there anymore.
+     */
+    destroy(): void;
     /** Locks population to prevent automatic data loading. */
     populateLock(): void;
     /** Unlocks population; executes pending populate calls if any. */
@@ -7763,6 +7782,14 @@ export interface RemoteViewOptions<TItem = any> {
     getItemMetadata?: (item: TItem, row: number) => ItemMetadata<TItem>;
     /** Provider for group item metadata in grouped views */
     groupItemMetadataProvider?: GroupItemMetadataProvider;
+    /**
+     * Whether the first cell of the data rows inside a group is indented according to the grouping
+     * level, so that the data rows of nested groups line up under their group rows, which is also
+     * an option of `GroupItemMetadataProvider` (see `indentDataRows`). It is passed to the provider a
+     * view creates for itself; when not set, the provider defaults are used, which is `true`. Data
+     * rows are at the leaf level, so two levels of grouping indent them by two steps.
+     */
+    indentDataRows?: boolean;
     /** Name of the field containing unique item identifiers */
     idField?: string;
     /** Whether to perform sorting locally instead of server-side */
@@ -7901,6 +7928,10 @@ export interface IRemoteView<TItem = any> extends IDataView<TItem> {
      * Gets a callback function to retrieve item metadata. This can be used to dynamically assign CSS classes or other properties to items.
      */
     getItemMetadataCallback(): (item: TItem, row: number) => ItemMetadata<TItem> | undefined;
+    /**
+     * Stops the view when it is no longer used, e.g. with the grid of it, so the rows it asked for before are ignored.
+     */
+    destroy?(): void;
     /**
      * Gets all items in the view.
      * @returns Array of all items
@@ -11237,6 +11268,7 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
         columnWidthDelta: number;
         columnWidthScale: number;
         enableAdvancedFiltering: (boolean | ((grid: DataGrid<any>) => boolean));
+        indentDataRows: boolean;
         openDialogsAsPanel: boolean;
         serverAggregates: boolean;
         rowHeight: number;
@@ -17288,6 +17320,13 @@ export interface GridRowSelectionMixinOptions {
      * A function that determines whether an item can be selected.
      */
     selectable?: (item: any) => boolean;
+    /**
+     * Whether the checkbox of a group row selects all the rows of the group, and deselects them when
+     * they are all selected. Defaults to `true`. Set it to `false` for the views that don't have the
+     * rows of a group on the client, like a virtual scroll view, where the checkbox is hidden anyway
+     * because the ids of the rows are not known, or when the groups should not be selectable at all.
+     */
+    selectGroups?: boolean;
 }
 /**
  * A mixin that adds multi (checkbox) row selection behavior to a data grid,
@@ -17310,6 +17349,32 @@ export declare class GridRowSelectionMixin {
      */
     destroy(): void;
     private handleGridClick;
+    /**
+     * Refreshes the rows after a change of the selection, and the state of the select all button.
+     */
+    private refreshSelection;
+    /**
+     * Collects the rows of a group and of its subgroups, by the id of the rows, keeping the last of
+     * the rows with the same id.
+     * @param group - The group to collect the rows of.
+     * @param rows - The rows collected so far.
+     * @returns The rows, by their id.
+     */
+    private collectGroupRows;
+    /**
+     * Returns the ids of the rows of a group that can be selected, so that the checkbox of the row of
+     * the group can select and deselect them.
+     * @param group - The group of the row.
+     * @returns The ids, or `null` when the group can't be selected or its rows are not all known,
+     * e.g. when the view loads them from the server as they are needed.
+     */
+    private getGroupIds;
+    /**
+     * Returns the state of the checkbox of the row of a group.
+     * @param group - The group of the row.
+     * @returns The css classes of the checkbox, or `null` when the group can't be selected.
+     */
+    private getGroupCheckBoxCssClass;
     private handleHeaderClick;
     /**
      * Updates the checked state of the select-all header button based on the

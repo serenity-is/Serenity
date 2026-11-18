@@ -34,7 +34,6 @@ vi.mock("@serenity-is/sleekgrid", () => ({
         this.level = 0;
         this.count = 0;
         this.rows = [];
-        this.groups = [];
         this.collapsed = false;
         this.totals = null;
         this.equals = vi.fn(function (other: any) {
@@ -1905,6 +1904,38 @@ describe("RemoteView", () => {
 
             expect(itemMetadataCallback).toHaveBeenCalledWith({ id: 1, name: "Item 1" }, 0);
             expect(metadata).toEqual({ cssClasses: "row-0", selectable: true });
+        });
+
+        it("passes the data rows to the provider with their grouping level and its metadata", () => {
+            const provider = {
+                getGroupRowMetadata: vi.fn(() => ({ cssClasses: "group-row" })),
+                getTotalsRowMetadata: vi.fn(() => ({ cssClasses: "totals-row" })),
+                getDataRowMetadata: vi.fn((row: number, level: number, base: any) => ({
+                    ...base,
+                    columns: { 0: { cssClass: "slick-group-data", colspan: 2 } }
+                }))
+            };
+            const viewWithProvider = new RemoteView({
+                idField: "id",
+                getItemMetadata: () => ({ cssClasses: "deleted" }),
+                groupItemMetadataProvider: provider as any
+            });
+
+            viewWithProvider.addItem({ id: 1, name: "Apple", category: "fruit" });
+            viewWithProvider.addItem({ id: 2, name: "Banana", category: "fruit" });
+            viewWithProvider.setGrouping([
+                { getter: (item: any) => item.category, formatter: (g: any) => g.value },
+                { getter: (item: any) => item.name, formatter: (g: any) => g.value }
+            ]);
+
+            const rows = viewWithProvider.getRows();
+            const dataRowIdx = rows.findIndex(r => !r.__nonDataRow);
+            const metadata = viewWithProvider.getItemMetadata(dataRowIdx);
+
+            // data rows are at the leaf level, so two groupings indent them by two steps
+            expect(provider.getDataRowMetadata).toHaveBeenCalledWith(dataRowIdx, 2, { cssClasses: "deleted" });
+            expect(metadata.cssClasses).toBe("deleted");
+            expect(metadata.columns[0]).toEqual({ cssClass: "slick-group-data", colspan: 2 });
         });
     });
 

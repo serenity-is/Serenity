@@ -6,6 +6,8 @@ describe("GroupItemMetadataProvider.defaults", () => {
     it("has expected default values", () => {
         expect(GroupItemMetadataProvider.defaults.enableExpandCollapse).toBe(true);
         expect(GroupItemMetadataProvider.defaults.groupIndentation).toBe(15);
+        expect(GroupItemMetadataProvider.defaults.indentDataRows).toBe(true);
+        expect(GroupItemMetadataProvider.defaults.minGroupCellWidth).toBe(40);
         expect(GroupItemMetadataProvider.defaults.groupFocusable).toBe(true);
         expect(GroupItemMetadataProvider.defaults.totalsFocusable).toBe(false);
     });
@@ -389,6 +391,26 @@ describe("GroupItemMetadataProvider formatters and metadata", () => {
         expect(group.formatValue).toBeUndefined();
     });
 
+    it("indents the toggle with the level class instead of an inline style", () => {
+        const group = new Group();
+        group.level = 2;
+        group.value = "x";
+
+        const result = GroupItemMetadataProvider.defaultGroupFormat(ctx({ item: group }));
+        const node = document.createElement("div");
+        if (result instanceof Node)
+            node.appendChild(result);
+        else
+            node.innerHTML = String(result);
+        const html = node.innerHTML;
+
+        expect(html).toContain("slick-group-toggle");
+        expect(html).toContain("slick-group-level-2");
+        // an inline style would be dropped by a content security policy
+        expect(html).not.toContain("style=");
+        expect(html).not.toContain("margin-left");
+    });
+
     it("uses a group's formatValue when supplied", () => {
         const group = new Group();
         const formatValue = vi.fn(() => "formatted");
@@ -524,8 +546,102 @@ describe("GroupItemMetadataProvider keyboard and lifecycle edge cases", () => {
 });
 
 describe("GroupItemMetadataProvider.groupCellPosition", () => {
-    it("returns the default position until group row totals are enabled", () => {
+    it("returns the default position when it has no grid or no columns", () => {
         const provider = new GroupItemMetadataProvider();
+        expect(provider.groupCellPosition()).toEqual({ cell: 0, colspan: "*" });
+
+        const withEmptyGrid = new GroupItemMetadataProvider();
+        const grid = mockGrid();
+        grid.getColumns = () => [];
+        withEmptyGrid.init(grid);
+        expect(withEmptyGrid.groupCellPosition()).toEqual({ cell: 0, colspan: "*" });
+    });
+
+    it("skips summary columns", () => {
+        const provider = new GroupItemMetadataProvider();
+        const grid = mockGrid();
+        grid.getColumns = () => [{ summaryType: 1 }, { id: "name" }];
+        provider.init(grid);
+        expect(provider.groupCellPosition()).toEqual({ cell: 1, colspan: "*" });
+    });
+
+    it("skips the columns marked with skipGroupCell", () => {
+        const provider = new GroupItemMetadataProvider();
+        const grid = mockGrid();
+        grid.getColumns = () => [
+            { id: "__select__", width: 200, skipGroupCell: true },
+            { id: "__rowNumber__", width: 100, skipGroupCell: true },
+            { id: "name" }
+        ];
+        provider.init(grid);
+
+        expect(provider.groupCellPosition()).toEqual({ cell: 2, colspan: "*" });
+        // the data rows of a group are indented in the same column as the group cell starts at
+        const providerWithIndent = new GroupItemMetadataProvider({ indentDataRows: true });
+        providerWithIndent.init(grid);
+        expect(providerWithIndent.getDataRowMetadata(5, 2).columns[2]).toEqual({
+            cssClass: "slick-group-data slick-group-level-2"
+        });
+    });
+
+    it("skips narrow columns that have a fixed width, like a checkbox column", () => {
+        const provider = new GroupItemMetadataProvider();
+        const grid = mockGrid();
+        grid.getColumns = () => [
+            { id: "__select__", width: 27, minWidth: 27, maxWidth: 27, resizable: false },
+            { id: "name", width: 200 }
+        ];
+        provider.init(grid);
+
+        expect(provider.groupCellPosition()).toEqual({ cell: 1, colspan: "*" });
+    });
+
+    it("uses the declared width of a fixed column, so that resizing does not move the group cell", () => {
+        const provider = new GroupItemMetadataProvider();
+        const grid = mockGrid();
+        const selectColumn: any = { id: "__select__", width: 90, minWidth: 27, maxWidth: 27 };
+        grid.getColumns = () => [selectColumn, { id: "name" }];
+        provider.init(grid);
+
+        // minWidth is 27, which is the fixed width, so the current width does not matter
+        expect(provider.groupCellPosition()).toEqual({ cell: 1, colspan: "*" });
+
+        const noHeuristic = new GroupItemMetadataProvider({ minGroupCellWidth: 0 });
+        noHeuristic.init(grid);
+        expect(noHeuristic.groupCellPosition()).toEqual({ cell: 0, colspan: "*" });
+    });
+
+    it("does not skip a column whose minimum and maximum width are zero, as zero means not set", () => {
+        const provider = new GroupItemMetadataProvider();
+        const grid = mockGrid();
+        grid.getColumns = () => [
+            { id: "unset", width: 20, minWidth: 0, maxWidth: 0 },
+            { id: "name" }
+        ];
+        provider.init(grid);
+
+        expect(provider.groupCellPosition()).toEqual({ cell: 0, colspan: "*" });
+        expect(provider.isGroupCellColumn(grid.getColumns()[0])).toBe(true);
+    });
+
+    it("does not skip a narrow column that is resizable, as its width is not fixed", () => {
+        const provider = new GroupItemMetadataProvider();
+        const grid = mockGrid();
+        grid.getColumns = () => [{ id: "narrow", width: 20 }, { id: "name" }];
+        provider.init(grid);
+
+        expect(provider.groupCellPosition()).toEqual({ cell: 0, colspan: "*" });
+    });
+
+    it("keeps the default cell when every column is skipped", () => {
+        const provider = new GroupItemMetadataProvider();
+        const grid = mockGrid();
+        grid.getColumns = () => [
+            { id: "__select__", minWidth: 27, maxWidth: 27 },
+            { id: "__rowNumber__", minWidth: 30, maxWidth: 30 }
+        ];
+        provider.init(grid);
+
         expect(provider.groupCellPosition()).toEqual({ cell: 0, colspan: "*" });
     });
 
@@ -557,3 +673,84 @@ describe("GroupItemMetadataProvider.groupCellPosition", () => {
     });
 });
 
+describe("GroupItemMetadataProvider data row indentation", () => {
+    it("indents data rows by default", () => {
+        const provider = new GroupItemMetadataProvider();
+        expect(provider.getDataRowMetadata(10, 2).columns[0].cssClass)
+            .toBe("slick-group-data slick-group-level-2");
+    });
+
+    it("does not indent data rows when indentDataRows is disabled", () => {
+        const provider = new GroupItemMetadataProvider({ indentDataRows: false });
+        expect(provider.getDataRowMetadata(10, 2)).toBeNull();
+    });
+
+    it("returns null for rows that are not in a group", () => {
+        const provider = new GroupItemMetadataProvider({ indentDataRows: true });
+        expect(provider.getDataRowMetadata(0, 0)).toBeNull();
+        expect(provider.getDataRowMetadata(0, undefined)).toBeNull();
+    });
+
+    it("marks the first cell with the level class and does not use an inline style", () => {
+        const provider = new GroupItemMetadataProvider({ indentDataRows: true });
+        const metadata = provider.getDataRowMetadata(10, 2);
+        const cell = metadata.columns[0];
+
+        expect(cell.cssClass).toBe("slick-group-data slick-group-level-2");
+        // the inline style would be dropped by a content security policy
+        expect(cell.style).toBeUndefined();
+        // only the first cell is indented, the rest of the row stays aligned with the columns
+        expect(Object.keys(metadata.columns)).toEqual(["0"]);
+    });
+
+    it("uses the configured css classes", () => {
+        const provider = new GroupItemMetadataProvider({
+            indentDataRows: true,
+            dataCellCssClass: "my-indent",
+            groupLevelPrefix: "lvl-"
+        });
+        const cell = provider.getDataRowMetadata(5, 3).columns[0];
+        expect(cell.cssClass).toBe("my-indent lvl-3");
+    });
+
+    it("clamps levels deeper than the levels that have a css rule", () => {
+        const provider = new GroupItemMetadataProvider({ indentDataRows: true });
+        const cell = provider.getDataRowMetadata(5, GroupItemMetadataProvider.maxIndentLevel + 4).columns[0];
+        expect(cell.cssClass).toBe("slick-group-data slick-group-level-8");
+        expect(GroupItemMetadataProvider.clampIndentLevel(0)).toBe(0);
+        expect(GroupItemMetadataProvider.clampIndentLevel(1)).toBe(1);
+        expect(GroupItemMetadataProvider.clampIndentLevel(3)).toBe(3);
+    });
+
+    it("keeps the metadata it is given for the row", () => {
+        const provider = new GroupItemMetadataProvider({ indentDataRows: true });
+        const merged = provider.getDataRowMetadata(5, 2, {
+            cssClasses: "deleted",
+            columns: { 0: { cssClass: "c1", format: () => "a" } }
+        } as any);
+
+        expect(merged.cssClasses).toBe("deleted");
+        expect(merged.columns[0].cssClass).toBe("c1 slick-group-data slick-group-level-2");
+        expect(merged.columns[0].format).toBeTruthy();
+    });
+});
+
+describe("GroupItemMetadataProvider.mergeMetadata", () => {
+    it("returns the other side when one of them is empty", () => {
+        const base: any = { cssClasses: "x" };
+        expect(GroupItemMetadataProvider.mergeMetadata(base, null)).toBe(base);
+        expect(GroupItemMetadataProvider.mergeMetadata(null, base)).toBe(base);
+        expect(GroupItemMetadataProvider.mergeMetadata(null, null)).toBeNull();
+    });
+
+    it("concatenates row classes and merges per column metadata", () => {
+        const merged = GroupItemMetadataProvider.mergeMetadata(
+            { cssClasses: "deleted", columns: { 0: { cssClass: "c1", format: () => "a" } } },
+            { cssClasses: "slick-group-2", columns: { 0: { cssClass: "c2", colspan: 2 } } });
+
+        expect(merged.cssClasses).toBe("deleted slick-group-2");
+        expect(merged.columns[0].cssClass).toBe("c1 c2");
+        expect(merged.columns[0].colspan).toBe(2);
+        expect(merged.columns[0].format).toBeTruthy();
+    });
+});

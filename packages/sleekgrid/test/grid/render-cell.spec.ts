@@ -222,3 +222,23 @@ describe('renderCell', () => {
         expect(args.sb.join("")).toBe('<div class="slick-cell l0 r0"></div>');
     });
 });
+
+describe('renderCell with per cell metadata classes', () => {
+    it('applies the cssClass of the column metadata', () => {
+        const args = makeArgs({ colMetadata: { cssClass: "slick-group-data slick-group-level-2" } });
+        renderCell(args);
+        expect(args.sb.join("")).toContain('class="slick-cell l0 r0 slick-group-data slick-group-level-2"');
+    });
+
+    it('still applies the deprecated cssClasses alias of the column metadata', () => {
+        const args = makeArgs({ colMetadata: { cssClasses: "legacy" } });
+        renderCell(args);
+        expect(args.sb.join("")).toContain('class="slick-cell l0 r0 legacy"');
+    });
+
+    it('prefers cssClass when both are set', () => {
+        const args = makeArgs({ colMetadata: { cssClass: "new", cssClasses: "old" } });
+        renderCell(args);
+        expect(args.sb.join("")).toContain('class="slick-cell l0 r0 new"');
+    });
+});

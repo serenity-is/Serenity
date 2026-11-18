@@ -132,6 +132,12 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
     private idxById: Record<any, number> = Object.create(null);
     private itemMetadataCallback?: (item?: TItem, row?: number) => ItemMetadata<TItem>;
     private items: TItem[] = [];
+    /**
+     * Whether the first cell of the data rows inside a group is indented, see
+     * {@link RemoteViewOptions.indentDataRows}. It is passed to the group item metadata
+     * provider the view creates, leaving it undefined keeps the provider defaults.
+     */
+    private indentDataRows: boolean;
     private loading: AbortController | boolean = false;
     private localSort: boolean;
     private method: string;
@@ -219,6 +225,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         options ??= {}
         AggregateFormatting.initGridDefaults();
         this.groupItemMetadataProvider = options.groupItemMetadataProvider;
+        this.indentDataRows = options.indentDataRows;
         this.localSort = options.localSort ?? false;
         this.serverAggregates = options.serverAggregates ?? false;
         this.indeterminatePaging = options.indeterminatePaging ?? false;
@@ -769,12 +776,24 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
     }
 
     /**
+     * Returns the group item metadata provider the view creates when it doesn't have one, with
+     * the options of the view applied. Options that are not set are not passed, so the defaults
+     * of the provider, which can be changed via `GroupItemMetadataProvider.defaults`, still apply.
+     * @returns A new group item metadata provider.
+     */
+    protected createGroupItemMetadataProvider(): GroupItemMetadataProvider {
+        return new GroupItemMetadataProvider(this.indentDataRows == null ? undefined : {
+            indentDataRows: this.indentDataRows
+        });
+    }
+
+    /**
      * Sets the grouping configuration for the view.
      * @param groupingInfo - Grouping information or array of grouping information.
      */
     public setGrouping(groupingInfo: GroupInfo<TItem> | GroupInfo<TItem>[]): void {
         if (!this.groupItemMetadataProvider) {
-            this.groupItemMetadataProvider = new GroupItemMetadataProvider();
+            this.groupItemMetadataProvider = this.createGroupItemMetadataProvider();
         }
 
         this.groups = [];
@@ -1100,7 +1119,15 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
             return this.groupItemMetadataProvider.getTotalsRowMetadata(item);
         }
 
-        return (this.itemMetadataCallback && this.itemMetadataCallback(item as TItem, row)) || null;
+        const metadata = (this.itemMetadataCallback && this.itemMetadataCallback(item as TItem, row)) || null;
+
+        // indentation of the data rows by their grouping level, e.g. data rows are at the leaf
+        // level, so two levels of grouping indent them by two steps under the group rows
+        if (this.groupingInfos.length && this.groupItemMetadataProvider) {
+            return this.groupItemMetadataProvider.getDataRowMetadata(row, this.groupingInfos.length, metadata);
+        }
+
+        return metadata;
     }
 
     private expandCollapseAllGroups(level: number, collapse: boolean) {
@@ -1986,6 +2013,14 @@ export interface RemoteViewOptions<TItem = any> {
     getItemMetadata?: (item: TItem, row: number) => ItemMetadata<TItem>;
     /** Provider for group item metadata in grouped views */
     groupItemMetadataProvider?: GroupItemMetadataProvider;
+    /**
+     * Whether the first cell of the data rows inside a group is indented according to the grouping
+     * level, so that the data rows of nested groups line up under their group rows, which is also
+     * an option of `GroupItemMetadataProvider` (see `indentDataRows`). It is passed to the provider a
+     * view creates for itself; when not set, the provider defaults are used, which is `true`. Data
+     * rows are at the leaf level, so two levels of grouping indent them by two steps.
+     */
+    indentDataRows?: boolean;
     /** Name of the field containing unique item identifiers */
     idField?: string;
     /** Whether to perform sorting locally instead of server-side */

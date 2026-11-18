@@ -32,6 +32,14 @@ export interface Column<TItem = any> {
     focusable?: boolean;
     /** CSS class(es) applied to footer row cells in this column. */
     footerCssClass?: string;
+    /**
+     * Whether the column is skipped when finding the column a group cell starts at, which is also
+     * the column the data rows of a group are indented in. Set it for the columns that are not part
+     * of the data, like a checkbox (row selection) or a row number column, so that they stay visible
+     * in the group rows and in front of the indented data rows, instead of being covered by the group
+     * cell. Summary columns are skipped as well, see `GroupItemMetadataProvider.hasSummaryType`.
+     */
+    skipGroupCell?: boolean;
     /** Modern formatter for body cells. Prefer this over the deprecated `formatter`. */
     format?: ColumnFormat<TItem>;
     /**
@@ -112,7 +120,17 @@ export const columnDefaults: Partial<Column> = {
 export interface ColumnMetadata<TItem = any> {
     /** Column span for this cell. Use `"*"` to span to the end of the row. */
     colspan?: number | '*';
-    /** Extra CSS classes applied to the cell node. */
+    /**
+     * Extra CSS classes applied to the cell node, like `Column.cssClass` which applies to every
+     * cell of the column. Note that the row level {@link ItemMetadata.cssClasses} is plural, as in
+     * SlickGrid, but this one is singular.
+     */
+    cssClass?: string;
+    /**
+     * Extra CSS classes applied to the cell node.
+     * @deprecated Use {@link ColumnMetadata.cssClass} instead, which is what the renderer reads and
+     * what SlickGrid uses. It still works as a fallback.
+     */
     cssClasses?: string;
     /** Whether the cell can receive focus. */
     focusable?: boolean;

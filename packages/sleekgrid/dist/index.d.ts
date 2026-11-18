@@ -945,6 +945,33 @@ export interface LayoutEngine {
     supportFrozenBottom?: boolean;
 }
 /**
+ * The metadata hooks of a group item metadata provider, i.e. what a view and a grid need from it to
+ * render the rows of a grouping. Implemented by `GroupItemMetadataProvider`, which is a grid plugin,
+ * so the grid and the view can share the same instance.
+ */
+export interface IGroupItemMetadataProvider {
+    /**
+     * Returns the metadata of the row of a group.
+     * @param item - The group of the row.
+     * @returns Metadata describing how the row should be rendered.
+     */
+    getGroupRowMetadata(item: Group): ItemMetadata;
+    /**
+     * Returns the metadata of the row that shows the totals of a group.
+     * @param item - The totals of the row.
+     * @returns Metadata describing how the row should be rendered.
+     */
+    getTotalsRowMetadata(item: IGroupTotals): ItemMetadata;
+    /**
+     * Returns the metadata of a data row that is inside a group, e.g. its indentation.
+     * @param row - The row index in the view.
+     * @param level - The grouping level of the row.
+     * @param baseMetadata - The metadata the view has already built for the row, if any.
+     * @returns Metadata for the row, or `null` when there is none.
+     */
+    getDataRowMetadata?(row: number, level: number, baseMetadata?: ItemMetadata): ItemMetadata;
+}
+/**
  * Represents a group of rows produced by a `DataView` grouping.
  * @template TEntity - Row item type being grouped.
  */
@@ -2220,6 +2247,14 @@ export interface Column<TItem = any> {
     focusable?: boolean;
     /** CSS class(es) applied to footer row cells in this column. */
     footerCssClass?: string;
+    /**
+     * Whether the column is skipped when finding the column a group cell starts at, which is also
+     * the column the data rows of a group are indented in. Set it for the columns that are not part
+     * of the data, like a checkbox (row selection) or a row number column, so that they stay visible
+     * in the group rows and in front of the indented data rows, instead of being covered by the group
+     * cell. Summary columns are skipped as well, see `GroupItemMetadataProvider.hasSummaryType`.
+     */
+    skipGroupCell?: boolean;
     /** Modern formatter for body cells. Prefer this over the deprecated `formatter`. */
     format?: ColumnFormat<TItem>;
     /**
@@ -2288,7 +2323,17 @@ export declare const columnDefaults: Partial<Column>;
 export interface ColumnMetadata<TItem = any> {
     /** Column span for this cell. Use `"*"` to span to the end of the row. */
     colspan?: number | '*';
-    /** Extra CSS classes applied to the cell node. */
+    /**
+     * Extra CSS classes applied to the cell node, like `Column.cssClass` which applies to every
+     * cell of the column. Note that the row level {@link ItemMetadata.cssClasses} is plural, as in
+     * SlickGrid, but this one is singular.
+     */
+    cssClass?: string;
+    /**
+     * Extra CSS classes applied to the cell node.
+     * @deprecated Use {@link ColumnMetadata.cssClass} instead, which is what the renderer reads and
+     * what SlickGrid uses. It still works as a fallback.
+     */
     cssClasses?: string;
     /** Whether the cell can receive focus. */
     focusable?: boolean;
@@ -2492,6 +2537,12 @@ export interface IDataView<TItem = any> {
      * @returns `"odd"`, `"even"`, or `null` for a row that has neither class.
      */
     getRowStripe?(row: number): "odd" | "even" | null;
+    /**
+     * Sets the provider that gives the metadata of the rows of a group, so that the view and the
+     * grid share one instance, which is what lets the provider read the columns of the grid.
+     * @param provider - The provider, or `null` when the grid no longer has one.
+     */
+    setGroupItemMetadataProvider?(provider: IGroupItemMetadataProvider): void;
     /** Event fired when the underlying data set changes. */
     readonly onDataChanged?: EventEmitter<{}>;
     /**
@@ -3135,6 +3186,13 @@ export declare class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     private viewOnRowsChanged;
     private viewOnDataChanged;
     private bindToData;
+    /**
+     * Gives the data view the group item metadata provider the grid has, so that both use the same
+     * instance. A provider is a grid plugin, which is how it gets the grid and reads its columns, so
+     * the view doesn't need a reference to the grid.
+     * @param plugin - The plugin that was just registered, if any.
+     */
+    private bindGroupItemMetadataProvider;
     private unbindFromData;
     /**
      * Replaces the data source and rebinds view events.
@@ -3887,7 +3945,35 @@ export interface GroupItemMetadataProviderOptions {
     groupCellCssClass?: string;
     /** CSS class applied to the entire group row. Defaults to `"slick-group"`. */
     groupCssClass?: string;
-    /** Indentation in pixels per grouping level for the toggle. Defaults to `15`. */
+    /**
+     * Whether the first cell of the data rows inside a group is indented according to the grouping
+     * level, so that they look nested under the group rows. Defaults to `true`.
+     *
+     * The indentation goes to the column the group cell starts at, see {@link groupCellPosition},
+     * which the provider can only find when it knows the grid and so its columns, i.e. when it is
+     * registered as a plugin of the grid, which also makes the view use the same instance.
+     */
+    indentDataRows?: boolean;
+    /** CSS class applied to the indented first cell of grouped data rows. Defaults to `"slick-group-data"`. */
+    dataCellCssClass?: string;
+    /**
+     * Columns that have a fixed width, i.e. the same `minWidth` and `maxWidth`, and that are
+     * narrower than this many pixels are skipped when finding the group cell column, like the
+     * columns marked with `skipGroupCell`. It finds the narrow utility columns, e.g. a checkbox
+     * column of 27px, without needing a flag. The declared width is used, not the current one, so
+     * `forceFitColumns` and resizing don't move the group cell column. Set it to `0` to disable it,
+     * and set `skipGroupCell` on a column to skip a column that is not fixed.
+     * Defaults to `40`.
+     */
+    minGroupCellWidth?: number;
+    /**
+     * Indentation in pixels per grouping level. Defaults to `15`.
+     * @deprecated It is not used to emit an inline style anymore, as that doesn't work with a
+     * content security policy that disallows inline styles. The indentation is now applied by
+     * the `slick-group-level-N` classes that the provider puts on group rows, toggles and data
+     * cells, see `--sg-group-indent` in `css/slick.grid.css`. Set that CSS variable to change
+     * the step. This option is kept for compatibility.
+     */
     groupIndentation?: number;
     /** Whether group rows can receive focus. Defaults to `true`. */
     groupFocusable?: boolean;
@@ -3941,6 +4027,21 @@ export declare class GroupItemMetadataProvider implements GridPlugin {
     /** Resolved options merged with {@link GroupItemMetadataProvider.defaults}. */
     private options;
     /**
+     * The deepest grouping level that has an indentation rule in `css/slick.grid.css`, which
+     * defines the rules for levels 1 to 8, as CSS can't multiply a custom property by a level
+     * that is only known at runtime. Deeper levels are clamped to it. If you need more levels,
+     * add the matching `.slick-group-level-N` rules to your own stylesheet and raise this value.
+     */
+    static maxIndentLevel: number;
+    /**
+     * Clamps a grouping level to {@link GroupItemMetadataProvider.maxIndentLevel}, so that a level
+     * that has no CSS rule still gets the deepest indentation instead of none. Level 0, the top
+     * level groups, is not indented, and has no CSS rule.
+     * @param level - The grouping level.
+     * @returns The level, between 0 and {@link GroupItemMetadataProvider.maxIndentLevel}.
+     */
+    static clampIndentLevel(level: number): number;
+    /**
      * Creates a new provider.
      * @param opt - Partial options merged with {@link GroupItemMetadataProvider.defaults}.
      */
@@ -3965,6 +4066,14 @@ export declare class GroupItemMetadataProvider implements GridPlugin {
      * @returns Rendered totals content, or empty string when no formatter is found.
      */
     static defaultTotalsFormat(ctx: FormatterContext, grid?: ISleekGrid): FormatterResult;
+    /**
+     * Sets the grid the provider reads the columns from, e.g. to find the column a group cell starts
+     * at, without attaching the event handlers of {@link init}. A view that has a grid attached, like
+     * `VirtualScrollView`, calls it; a provider registered with `registerPlugin` gets the grid from
+     * {@link init}.
+     * @param grid - The grid that shows the rows the provider gives metadata for.
+     */
+    setGrid(grid: ISleekGrid): void;
     /**
      * Initializes the plugin, attaching click and key handlers for expand/collapse.
      * @param grid - Host grid instance.
@@ -3997,8 +4106,32 @@ export declare class GroupItemMetadataProvider implements GridPlugin {
      */
     handleGridKeyDown: (e: CellKeyboardEvent) => void;
     /**
+     * Returns whether a column can be the start of a group cell, and so the column the data rows
+     * of a group are indented in. Summary columns are skipped, as they show the totals of a group,
+     * and so are the columns marked with `skipGroupCell` and the narrow columns with a fixed width
+     * (see {@link GroupItemMetadataProviderOptions.minGroupCellWidth}), like a checkbox column,
+     * which stay in front of the group cell.
+     * @param column - The column to test.
+     * @returns `true` if the group cell can start at the column.
+     */
+    isGroupCellColumn(column: Column): boolean;
+    /**
+     * Returns whether a column has a fixed width narrower than
+     * {@link GroupItemMetadataProviderOptions.minGroupCellWidth}, which marks a utility column
+     * like a checkbox or a row number column. The declared width is used, as the current one
+     * changes with `forceFitColumns` and resizing, which would move the group cell column.
+     *
+     * A width of `0` is treated as not set, like the column sizing code does, e.g. the fitting of
+     * the columns uses `maxWidth || Infinity`, so a column with a zero minimum and maximum is a
+     * normal column that can be resized and is not skipped.
+     * @param column - The column to test.
+     * @returns `true` if the column is a narrow column with a fixed width.
+     */
+    protected isFixedNarrowColumn(column: Column): boolean;
+    /**
      * Computes the cell index and colspan for the spanned group cell, taking
-     * summary columns and frozen columns into account.
+     * summary columns, columns marked with `skipGroupCell`, narrow fixed width columns and frozen
+     * columns into account.
      * @returns Object with `cell` start index and `colspan` span width (`"*"` means full row when no totals).
      */
     groupCellPosition: () => {
@@ -4012,6 +4145,36 @@ export declare class GroupItemMetadataProvider implements GridPlugin {
      * @returns Metadata describing how the group row should be rendered.
      */
     getGroupRowMetadata: ((item: Group) => ItemMetadata);
+    /**
+     * Returns row metadata for a data row that is inside one or more groups. Views that
+     * support grouping call this for their data rows and merge the result with their own
+     * metadata (see {@link mergeMetadata}).
+     *
+     * When {@link GroupItemMetadataProviderOptions.indentDataRows} is `true`, the first cell
+     * gets the level class (e.g. `slick-group-level-2`) and `css/slick.grid.css` indents it by
+     * `level * var(--sg-group-indent)`, so the data rows of nested groups line up under their
+     * group rows. No inline style is used, so that it works with a content security policy
+     * that disallows inline styles.
+     *
+     * @param row - The row index of the data row in the view.
+     * @param level - The grouping level of the data row. Data rows are normally at the leaf
+     * level, i.e. the number of active groupings, so two levels of grouping indent them by
+     * two steps.
+     * @param baseMetadata - Metadata the view has already built for the row, e.g. from its
+     * `getItemMetadata` callback. It is merged with the indentation metadata when the row is
+     * indented, and returned as is otherwise.
+     * @returns Metadata for the row, or `null` when there is none and the row is not indented.
+     */
+    getDataRowMetadata(row: number, level: number, baseMetadata?: ItemMetadata): ItemMetadata;
+    /**
+     * Merges metadata returned for a row, e.g. the metadata a view or a column provider has
+     * already built and the metadata {@link getDataRowMetadata} returns, into a single object.
+     * CSS classes are concatenated, other properties of `extra` win.
+     * @param base - The metadata built by the view or a user callback, if any.
+     * @param extra - The metadata to apply on top of it, if any.
+     * @returns The merged metadata, or `null` when both arguments are empty.
+     */
+    static mergeMetadata(base: ItemMetadata, extra: ItemMetadata): ItemMetadata;
     /**
      * Returns row metadata for a group totals row.
      * @param item - Totals row item.

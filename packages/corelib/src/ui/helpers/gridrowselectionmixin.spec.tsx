@@ -14,6 +14,7 @@ describe("GridRowSelectionMixin", () => {
         gridObj = {
             onClick: { subscribe: vi.fn((h: any) => { onClickHandler = h; }), unsubscribe: vi.fn() },
             onHeaderClick: { subscribe: vi.fn((h: any) => { onHeaderClickHandler = h; }), unsubscribe: vi.fn() },
+            invalidate: vi.fn(),
             updateRow: vi.fn()
         };
         viewObj = {
@@ -78,8 +79,7 @@ describe("GridRowSelectionMixin", () => {
 
             expect(e.preventDefault).toHaveBeenCalled();
             expect((mixin as any).include["42"]).toBe(true);
-            expect(gridObj.updateRow).toHaveBeenCalledWith(0);
-            expect(gridObj.updateRow).toHaveBeenCalledWith(1);
+            expect(gridObj.invalidate).toHaveBeenCalled();
         });
 
         it("deselects item when clicking already selected item", () => {
@@ -95,6 +95,21 @@ describe("GridRowSelectionMixin", () => {
             onClickHandler(e, { row: 0 });
 
             expect('42' in (mixin as any).include).toBe(false);
+        });
+
+        it("ignores the click on the select cell of a group row", () => {
+            // the group cell starts after the select column, so group rows render that cell too
+            viewObj.getItem = vi.fn(() => ({ __nonDataRow: true } as any));
+            const mixin = new GridRowSelectionMixin(mockGrid);
+
+            const e = {
+                target: { classList: { contains: (c: string) => c === 'select-item' } },
+                preventDefault: vi.fn()
+            } as any;
+
+            expect(() => onClickHandler(e, { row: 0 })).not.toThrow();
+            expect((mixin as any).include).toEqual({});
+            expect(gridObj.invalidate).not.toHaveBeenCalled();
         });
 
         it("does nothing when clicking non-select-item", () => {
@@ -316,12 +331,22 @@ describe("GridRowSelectionMixin", () => {
             expect(column.id).toBe("__select__");
             expect(column.sortable).toBe(false);
             expect(column.headerCssClass).toBe("select-all-header");
+            // the group cell and the indentation of the data rows start after this column
+            expect(column.skipGroupCell).toBe(true);
         });
 
         it("format returns empty string when mixin is null", () => {
             const getMixin = vi.fn(() => null);
             const column = GridRowSelectionMixin.createSelectColumn(getMixin);
             const result = column.format({ item: { id: 1 } } as any);
+            expect(result).toBe("");
+        });
+
+        it("format returns empty string for the rows of a group", () => {
+            const mixin = new GridRowSelectionMixin(mockGrid);
+            const getMixin = vi.fn(() => mixin);
+            const column = GridRowSelectionMixin.createSelectColumn(getMixin);
+            const result = column.format({ item: { __nonDataRow: true } } as any);
             expect(result).toBe("");
         });
 
@@ -359,6 +384,101 @@ describe("GridRowSelectionMixin", () => {
             const result = column.format({ item: { id: "constructor" } } as any);
             expect(result).toBeTruthy();
             expect((result as any).classList.contains('checked')).toBe(false);
+        });
+    });
+
+    describe("group row selection", () => {
+        function makeGroup(value: string, rows: any[], groups: any[] = [], count = rows.length) {
+            return { __group: true, __nonDataRow: true, value, rows, groups, count, level: 0 } as any;
+        }
+
+        function selectItemClick() {
+            return {
+                target: { classList: { contains: (c: string) => c === 'select-item' } },
+                preventDefault: vi.fn()
+            } as any;
+        }
+
+        it("selects all the rows of a group and then deselects them", () => {
+            const group = makeGroup("A", [{ id: 1 }, { id: 2 }]);
+            viewObj.getItem = vi.fn(() => group);
+            const mixin = new GridRowSelectionMixin(mockGrid);
+            const e = selectItemClick();
+
+            onClickHandler(e, { row: 0 });
+            expect((mixin as any).include).toEqual({ "1": true, "2": true });
+            expect(gridObj.invalidate).toHaveBeenCalled();
+
+            onClickHandler(e, { row: 0 });
+            expect((mixin as any).include).toEqual({});
+        });
+
+        it("selects the rows of the subgroups, without repeating them", () => {
+            const child1 = makeGroup("A/1", [{ id: 1 }]);
+            const child2 = makeGroup("A/2", [{ id: 2 }, { id: 3 }]);
+            // the rows of a group also include the rows of its subgroups, as the view builds them
+            const group = makeGroup("A", [{ id: 1 }, { id: 2 }, { id: 3 }], [child1, child2], 3);
+            viewObj.getItem = vi.fn(() => group);
+            const mixin = new GridRowSelectionMixin(mockGrid);
+
+            onClickHandler(selectItemClick(), { row: 0 });
+
+            expect((mixin as any).include).toEqual({ "1": true, "2": true, "3": true });
+        });
+
+        it("does not select the rows that can't be selected", () => {
+            const group = makeGroup("A", [{ id: 1, locked: true }, { id: 2 }]);
+            viewObj.getItem = vi.fn(() => group);
+            const mixin = new GridRowSelectionMixin(mockGrid, { selectable: (x: any) => !x.locked });
+
+            onClickHandler(selectItemClick(), { row: 0 });
+
+            expect((mixin as any).include).toEqual({ "2": true });
+        });
+
+        it("does nothing when the rows of the group are not known", () => {
+            // a virtual scroll view knows the number of the rows of a group, but not the rows
+            const group = makeGroup("A", [], [], 4000);
+            viewObj.getItem = vi.fn(() => group);
+            const mixin = new GridRowSelectionMixin(mockGrid);
+
+            onClickHandler(selectItemClick(), { row: 0 });
+
+            expect((mixin as any).include).toEqual({});
+            expect(gridObj.invalidate).not.toHaveBeenCalled();
+        });
+
+        it("renders the state of the group selection in the select column", () => {
+            const group = makeGroup("A", [{ id: 1 }, { id: 2 }]);
+            const mixin = new GridRowSelectionMixin(mockGrid, { selectGroups: true });
+            const column = GridRowSelectionMixin.createSelectColumn(() => mixin);
+            const format = column.format as any;
+
+            expect(format({ item: group }).className).toContain("check-box");
+            expect(format({ item: group }).className).not.toContain("checked");
+            expect(format({ item: group }).className).not.toContain("partial");
+
+            (mixin as any).include = { "1": true };
+            expect(format({ item: group }).className).toContain("partial");
+
+            (mixin as any).include = { "1": true, "2": true };
+            expect(format({ item: group }).className).toContain("checked");
+        });
+
+        it("hides the checkbox of the groups when selectGroups is false", () => {
+            const group = makeGroup("A", [{ id: 1 }]);
+            const mixin = new GridRowSelectionMixin(mockGrid, { selectGroups: false });
+            const column = GridRowSelectionMixin.createSelectColumn(() => mixin);
+
+            expect((column.format as any)({ item: group })).toBe("");
+        });
+
+        it("hides the checkbox of a group whose rows are not known", () => {
+            const group = makeGroup("A", [], [], 100);
+            const mixin = new GridRowSelectionMixin(mockGrid);
+            const column = GridRowSelectionMixin.createSelectColumn(() => mixin);
+
+            expect((column.format as any)({ item: group })).toBe("");
         });
     });
 });

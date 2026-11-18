@@ -1,5 +1,5 @@
 import { bindThis } from "@serenity-is/domwise";
-import { Column, type ArgsCell } from "@serenity-is/sleekgrid";
+import { Column, Group, type ArgsCell } from "@serenity-is/sleekgrid";
 import { classTypeInfo, Fluent, nsSerenity, registerType } from "../../base";
 import { clearKeys } from "../../compat";
 import type { IRemoteView } from "../../slick/iremoteview";
@@ -13,6 +13,13 @@ export interface GridRowSelectionMixinOptions {
      * A function that determines whether an item can be selected.
      */
     selectable?: (item: any) => boolean;
+    /**
+     * Whether the checkbox of a group row selects all the rows of the group, and deselects them when
+     * they are all selected. Defaults to `true`. Set it to `false` for the views that don't have the
+     * rows of a group on the client, like a virtual scroll view, where the checkbox is hidden anyway
+     * because the ids of the rows are not known, or when the groups should not be selectable at all.
+     */
+    selectGroups?: boolean;
 }
 
 /**
@@ -61,9 +68,33 @@ export class GridRowSelectionMixin {
     private handleGridClick(e: Event & Partial<ArgsCell>): void {
         if (!(e.target as HTMLElement).classList.contains('select-item'))
             return;
-        const grid = this.grid;
+
+        const item = this.grid.getView().getItem(e.row);
+
+        if ((item as Group)?.__group) {
+            const ids = this.getGroupIds(item as Group);
+            if (!ids)
+                return;
+
+            e.preventDefault();
+            const all = ids.every(id => this.include[id]);
+            for (const id of ids) {
+                if (all)
+                    delete this.include[id];
+                else
+                    this.include[id] = true;
+            }
+
+            this.refreshSelection();
+            return;
+        }
+
+        // the cell of a totals row is rendered too, as the group cell starts after the select
+        // column, but only the data rows have an id to select
+        if (!this.isSelectable(item))
+            return;
+
         e.preventDefault();
-        const item = grid.getView().getItem(e.row);
         const id = item[this.idField].toString();
 
         if (this.include[id]) {
@@ -73,11 +104,69 @@ export class GridRowSelectionMixin {
             this.include[id] = true;
         }
 
-        for (let i = 0; i < (grid.getView() as any).getLength(); i++) {
-            grid.getGrid().updateRow(i);
-        }
+        this.refreshSelection();
+    }
 
+    /**
+     * Refreshes the rows after a change of the selection, and the state of the select all button.
+     */
+    private refreshSelection(): void {
+        this.grid.getGrid().invalidate();
         this.updateSelectAll();
+    }
+
+    /**
+     * Collects the rows of a group and of its subgroups, by the id of the rows, keeping the last of
+     * the rows with the same id.
+     * @param group - The group to collect the rows of.
+     * @param rows - The rows collected so far.
+     * @returns The rows, by their id.
+     */
+    private collectGroupRows(group: Group<any>, rows = new Map<string, any>()): Map<string, any> {
+        // the rows of a group also include the rows of its subgroups, so some of them are repeated,
+        // and a view that gets the groups from the server may only have the subgroups
+        for (const item of group?.rows ?? [])
+            rows.set(String(item?.[this.idField]), item);
+
+        for (const child of group?.groups ?? [])
+            this.collectGroupRows(child, rows);
+
+        return rows;
+    }
+
+    /**
+     * Returns the ids of the rows of a group that can be selected, so that the checkbox of the row of
+     * the group can select and deselect them.
+     * @param group - The group of the row.
+     * @returns The ids, or `null` when the group can't be selected or its rows are not all known,
+     * e.g. when the view loads them from the server as they are needed.
+     */
+    private getGroupIds(group: Group<any>): string[] | null {
+        if (this.options.selectGroups === false)
+            return null;
+
+        const rows = this.collectGroupRows(group);
+        // a view that has the rows of a group on the client knows all of them, e.g. the number of the
+        // rows of a virtual scroll view is known from the group, but not the rows themselves
+        if (!rows.size || rows.size !== group.count)
+            return null;
+
+        const ids = [...rows.keys()].filter(id => this.isSelectable(rows.get(id)));
+        return ids.length ? ids : null;
+    }
+
+    /**
+     * Returns the state of the checkbox of the row of a group.
+     * @param group - The group of the row.
+     * @returns The css classes of the checkbox, or `null` when the group can't be selected.
+     */
+    private getGroupCheckBoxCssClass(group: Group<any>): string | null {
+        const ids = this.getGroupIds(group);
+        if (!ids)
+            return null;
+
+        const selected = ids.filter(id => !!this.include[id]).length;
+        return selected === 0 ? "" : selected === ids.length ? " checked" : " partial";
     }
 
     private handleHeaderClick(e: Event): void {
@@ -193,7 +282,8 @@ export class GridRowSelectionMixin {
     }
 
     private isSelectable(item: any) {
-        return item && (
+        // rows of a group or its totals are not data, so they can't be selected
+        return item && !item.__nonDataRow && (
             this.options.selectable == null ||
             this.options.selectable(item));
     }
@@ -214,14 +304,28 @@ export class GridRowSelectionMixin {
             width: 27,
             minWidth: 27,
             maxWidth: 27,
+            // not a data column, so the group cell should start after it and the data rows of a
+            // group should be indented after it
+            skipGroupCell: true,
             headerCssClass: 'select-all-header',
             sortable: false,
             format: function (ctx) {
                 const item = ctx.item;
                 const mixin = getMixin();
-                if (!mixin || !mixin.isSelectable(item)) {
+                if (!mixin)
                     return '';
+
+                // the group cell starts after the select column, so the rows of a group show it too,
+                // and it selects and deselects all the rows of the group
+                if ((item as Group)?.__group) {
+                    const cssClass = mixin.getGroupCheckBoxCssClass(item as Group);
+                    return cssClass == null ? '' :
+                        <span class={'select-item check-box no-float' + cssClass}></span>;
                 }
+
+                if (!mixin.isSelectable(item))
+                    return '';
+
                 const isChecked = mixin.include[ctx.item[mixin.idField]];
                 return <span class={'select-item check-box no-float' + (isChecked ? ' checked' : '')}></span>;
             },

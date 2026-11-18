@@ -1061,6 +1061,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         opt.idField = this.getIdProperty();
         opt.sortBy = this.getDefaultSortBy();
         opt.serverAggregates = dataGridDefaults.serverAggregates ?? false;
+        opt.indentDataRows = dataGridDefaults.indentDataRows;
 
         if (!this.usePager()) {
             opt.rowsPerPage = 0;
