@@ -3051,7 +3051,7 @@ button.panel-titlebar-close::after {
   position: absolute;
   z-index: 9999;
   top: 100%;
-  background: var(--s-input-bg);
+  background: var(--s-popup-bg, var(--s-input-bg));
   color: var(--s-input-text, currentcolor);
   border: 1px solid var(--bs-border-color);
   border-top: 0;
