@@ -2503,6 +2503,16 @@ export declare function Draggable(options: DraggableOption): {
     destroy: () => void;
 };
 /**
+ * The grouping of the rows of a view, as much as the grid needs to know about it to render them.
+ */
+export interface IDataViewGroupingInfo {
+    /**
+     * Where the totals of a group of this level are shown: on a row of their own (`true`), on the row
+     * of the group itself (`"groupheader"`), or not at all (`false`).
+     */
+    displayTotalsRow?: boolean | "groupheader";
+}
+/**
  * Minimal data-view contract consumed by the grid. Implemented by `DataView`.
  * @template TItem - Row item type.
  */
@@ -2543,6 +2553,12 @@ export interface IDataView<TItem = any> {
      * @param provider - The provider, or `null` when the grid no longer has one.
      */
     setGroupItemMetadataProvider?(provider: IGroupItemMetadataProvider): void;
+    /**
+     * Gets the grouping of the rows, when the view groups them, so that the grid can render the rows
+     * of a group, e.g. where the totals of a group go.
+     * @returns The grouping information, one for each level, or `undefined` when not grouped.
+     */
+    getGrouping?(): IDataViewGroupingInfo[];
     /** Event fired when the underlying data set changes. */
     readonly onDataChanged?: EventEmitter<{}>;
     /**
@@ -3986,8 +4002,6 @@ export interface GroupItemMetadataProviderOptions {
     groupFormatter?: CompatFormatter<Group>;
     /** CSS class prefix for grouping level (appended with level number). Defaults to `"slick-group-level-"`. */
     groupLevelPrefix?: string;
-    /** Whether totals rows should be considered part of the group row span calculation. */
-    groupRowTotals?: boolean;
     /** CSS class applied to the title span inside the group cell. Defaults to `"slick-group-title"`. */
     groupTitleCssClass?: string;
     /**
@@ -4120,6 +4134,14 @@ export declare class GroupItemMetadataProvider implements GridPlugin {
      */
     handleGridKeyDown: (e: CellKeyboardEvent) => void;
     /**
+     * Returns where the totals of a group of the given level are shown, which the view that groups
+     * the rows knows: on a row of their own, on the row of the group itself, or not at all. It
+     * defaults to a row of their own when the view doesn't tell, like the grouping defaults of a view.
+     * @param level - The level of the grouping, `0` when not given.
+     * @returns `true` for a totals row, `"groupheader"` for the row of the group, `false` for none.
+     */
+    getTotalsDisplay(level?: number): boolean | "groupheader";
+    /**
      * Returns whether a column can be the start of a group cell, and so the column the data rows
      * of a group are indented in. Summary columns are skipped, as they show the totals of a group,
      * and so are the columns marked with `skipGroupCell` and the narrow columns with a fixed width
@@ -4129,6 +4151,15 @@ export declare class GroupItemMetadataProvider implements GridPlugin {
      * @returns `true` if the group cell can start at the column.
      */
     isGroupCellColumn(column: Column): boolean;
+    /**
+     * Returns whether a column stays in front of the group cell, i.e. it is marked with
+     * `skipGroupCell`, or it is a narrow column with a fixed width, like a checkbox or a row number
+     * column. Such columns keep their own cell in the rows of a group, where the group cell, and the
+     * indentation of the data rows, start after them.
+     * @param column - The column to test.
+     * @returns `true` if the group cell starts after the column.
+     */
+    protected isSkippedColumn(column: Column): boolean;
     /**
      * Returns whether a column has a fixed width narrower than
      * {@link GroupItemMetadataProviderOptions.minGroupCellWidth}, which marks a utility column
@@ -4143,12 +4174,13 @@ export declare class GroupItemMetadataProvider implements GridPlugin {
      */
     protected isFixedNarrowColumn(column: Column): boolean;
     /**
-     * Computes the cell index and colspan for the spanned group cell, taking
-     * summary columns, columns marked with `skipGroupCell`, narrow fixed width columns and frozen
-     * columns into account.
-     * @returns Object with `cell` start index and `colspan` span width (`"*"` means full row when no totals).
+     * Computes the cell index and colspan for the spanned group cell, taking summary columns, columns
+     * marked with `skipGroupCell`, narrow fixed width columns and frozen columns into account.
+     * @param level - The level of the grouping, which decides where the totals of a group are shown.
+     * @returns Object with `cell` start index and `colspan` span width (`"*"` when the totals are not
+     * on the row of the group, so that the group cell spans the rest of the row).
      */
-    groupCellPosition: () => {
+    groupCellPosition: (level?: number) => {
         cell: number;
         colspan: (number | "*");
     };

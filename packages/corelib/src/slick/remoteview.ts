@@ -138,6 +138,11 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
      * provider the view creates, leaving it undefined keeps the provider defaults.
      */
     private indentDataRows: boolean;
+    /**
+     * Where the totals of a group are shown when its grouping doesn't say, see
+     * {@link RemoteViewOptions.displayTotalsRow}.
+     */
+    private displayTotalsRow: boolean | "groupheader";
     private loading: AbortController | boolean = false;
     private localSort: boolean;
     private method: string;
@@ -226,6 +231,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         AggregateFormatting.initGridDefaults();
         this.groupItemMetadataProvider = options.groupItemMetadataProvider;
         this.indentDataRows = options.indentDataRows;
+        this.displayTotalsRow = options.displayTotalsRow;
         this.localSort = options.localSort ?? false;
         this.serverAggregates = options.serverAggregates ?? false;
         this.indeterminatePaging = options.indeterminatePaging ?? false;
@@ -798,7 +804,8 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
 
         this.groups = [];
         this.toggledGroupsByLevel = [];
-        this.groupingInfos = RemoteView.normalizeGroupingInfos(groupingInfo);
+        this.groupingInfos = RemoteView.normalizeGroupingInfos(groupingInfo,
+            this.displayTotalsRow == null ? null : { displayTotalsRow: this.displayTotalsRow });
 
         for (let i = 0; i < this.groupingInfos.length; i++)
             this.toggledGroupsByLevel[i] = {};
@@ -811,12 +818,17 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
      * Gets the groupings of a view from what it is given, with the defaults of a grouping. The groupings in an array
      * are replaced with their copies that have the defaults, and the array itself is returned.
      * @param groupingInfo - Grouping information or array of grouping information.
+     * @param defaults - Defaults that replace those of `groupingInfoDefaults` for this view, e.g. the
+     * `displayTotalsRow` of its options. A value a grouping sets itself still wins.
      */
-    static normalizeGroupingInfos<TItem = any>(groupingInfo: GroupInfo<TItem> | GroupInfo<TItem>[]): GroupInfo<TItem>[] {
+    static normalizeGroupingInfos<TItem = any>(groupingInfo: GroupInfo<TItem> | GroupInfo<TItem>[],
+        defaults?: Partial<GroupInfo<TItem>>): GroupInfo<TItem>[] {
         groupingInfo = groupingInfo || [];
         const infos = (groupingInfo instanceof Array) ? groupingInfo : [groupingInfo];
+        const groupDefaults = defaults ? Object.assign({}, RemoteView.groupingInfoDefaults, defaults) :
+            RemoteView.groupingInfoDefaults;
         for (let i = 0; i < infos.length; i++) {
-            const gi = infos[i] = Object.assign({}, RemoteView.groupingInfoDefaults, infos[i]);
+            const gi = infos[i] = Object.assign({}, groupDefaults, infos[i]);
             gi.getterIsAFn ??= typeof gi.getter == "function";
         }
         return infos;
@@ -1073,7 +1085,8 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         // if this is a group row, make sure totals are calculated and update the title
         if (group && group.__group && group.totals && !group.totals.initialized) {
             const gi = this.groupingInfos[group.level];
-            if (!gi.displayTotalsRow) {
+            // the totals are on the row of the group when it has no totals row of its own
+            if (gi.displayTotalsRow !== true) {
                 this.calculateTotals(group.totals);
                 group.formatValue = this.formatGroupValue;
             }
@@ -1378,7 +1391,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
                 }
             }
 
-            if (g.totals && gi.displayTotalsRow && (!g.collapsed || gi.aggregateCollapsed)) {
+            if (g.totals && gi.displayTotalsRow === true && (!g.collapsed || gi.aggregateCollapsed)) {
                 groupedRows[gl++] = g.totals;
             }
         }
@@ -2042,6 +2055,14 @@ export interface RemoteViewOptions<TItem = any> {
      * matches and not only from the current page, which only a server that supports them returns. Default is false.
      */
     serverAggregates?: boolean;
+    /**
+     * Where the totals of a group, e.g. the aggregates of the summary columns, are shown by default:
+     * on a row of their own (`true`), on the row of the group itself (`"groupheader"`), or not at all
+     * (`false`). It is the default of the grouping levels that don't set it, which a grid can override
+     * in its `getViewOptions`, like the other options of the view. When it is not set, the
+     * `groupingInfoDefaults` of `RemoteView` apply, which is `true`, i.e. a row of their own.
+     */
+    displayTotalsRow?: boolean | "groupheader";
     /**
      * Whether to page without the total number of the rows, by asking the server whether there are more rows after the page,
      * which is faster for large tables. Default is false.

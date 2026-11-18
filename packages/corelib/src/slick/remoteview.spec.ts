@@ -1878,6 +1878,8 @@ describe("RemoteView", () => {
                 getter: (item: any) => item.category,
                 formatter: (g: any) => g.value,
                 collapsed: false,
+                // the totals are shown on the group rows by default, not on a row of their own
+                displayTotalsRow: true,
                 aggregators: [new Aggregators.Sum('price')]
             }]);
 
@@ -1887,6 +1889,19 @@ describe("RemoteView", () => {
 
             const metadata = view.getItemMetadata(totalsRowIdx);
             expect(metadata).toEqual({ cssClasses: "totals-row" });
+        });
+
+        it("uses the displayTotalsRow of its options as the default of the grouping levels", () => {
+            const view = new RemoteView({ idField: "id", displayTotalsRow: true });
+            view.addItem({ id: 1, category: "fruit" });
+            view.addItem({ id: 2, category: "fruit" });
+
+            view.setGrouping([{ getter: (item: any) => item.category }]);
+            expect(view.getGrouping()[0].displayTotalsRow).toBe(true);
+
+            // an explicit value of a level wins over the option
+            view.setGrouping([{ getter: (item: any) => item.category, displayTotalsRow: "groupheader" }]);
+            expect(view.getGrouping()[0].displayTotalsRow).toBe("groupheader");
         });
 
         it("returns itemMetadataCallback result for regular rows", () => {

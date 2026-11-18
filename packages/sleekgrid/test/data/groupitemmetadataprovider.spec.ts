@@ -245,6 +245,16 @@ function mockGrid() {
     return grid as any;
 }
 
+function totalsGrouping(displayTotalsRow?: boolean | "groupheader", count = 1) {
+    return Array.from({ length: count }, () => ({ displayTotalsRow }));
+}
+
+/** Makes the view show the totals of a group on a row of their own, so the group cell spans the row. */
+function withTotalsRow(grid: any) {
+    grid.getData = () => ({ getGrouping: () => totalsGrouping(true) } as any);
+    return grid;
+}
+
 function keyGrid() {
     const grid = mockGrid();
     // a select column that the group cell skips, and a group cell that spans the rest of the row
@@ -467,8 +477,33 @@ describe("GroupItemMetadataProvider formatters and metadata", () => {
         expect(formatter).toHaveBeenCalledOnce();
     });
 
+    it("puts the totals on the group row only when the grouping says so", () => {
+        const provider = new GroupItemMetadataProvider();
+        const grid = mockGrid();
+        grid.getColumns = () => [{ summaryType: 1 }, { id: "name" }, { id: "other" }];
+        grid.getData = () => ({ getGrouping: () => totalsGrouping("groupheader") } as any);
+        provider.init(grid);
+
+        const group = new Group();
+        const metadata = provider.getGroupRowMetadata(group);
+
+        expect(metadata.format).toBe(provider.getOptions().totalsFormat);
+        // starts after the summary column, and spans the columns that are not summaries
+        expect(metadata.columns[1].colspan).toBe(2);
+
+        grid.getData = () => ({ getGrouping: () => totalsGrouping(true) } as any);
+        // with a totals row of its own, the group cell covers the summary columns as well
+        expect(provider.getGroupRowMetadata(group).format).toBeUndefined();
+        expect(provider.getGroupRowMetadata(group).columns[0].colspan).toBe("*");
+    });
+
     it("returns group and totals row metadata using configured options", () => {
-        const provider = new GroupItemMetadataProvider({ groupRowTotals: true, groupFocusable: false, totalsFocusable: true });
+        const provider = new GroupItemMetadataProvider({ groupFocusable: false, totalsFocusable: true });
+        const grid = mockGrid();
+        grid.getColumns = () => [{ summaryType: 1 }, { id: "name" }];
+        grid.getData = () => ({ getGrouping: () => totalsGrouping("groupheader", 4) } as any);
+        provider.init(grid);
+
         const group = new Group();
         group.level = 3;
         const totals = new GroupTotals();
@@ -480,7 +515,8 @@ describe("GroupItemMetadataProvider formatters and metadata", () => {
         expect(groupMetadata.selectable).toBe(false);
         expect(groupMetadata.focusable).toBe(false);
         expect(groupMetadata.format).toBe(provider.getOptions().totalsFormat);
-        expect(groupMetadata.columns?.[0]?.editor).toBeNull();
+        // the group cell starts after the summary column
+        expect(groupMetadata.columns?.[1]?.editor).toBeNull();
         expect(totalsMetadata.focusable).toBe(true);
         expect(totalsMetadata.cssClasses).toContain("slick-group-level-3");
     });
@@ -682,6 +718,25 @@ describe("GroupItemMetadataProvider keyboard and lifecycle edge cases", () => {
 });
 
 describe("GroupItemMetadataProvider.groupCellPosition", () => {
+    it("spans the whole row unless the totals of the group are on its row", () => {
+        const provider = new GroupItemMetadataProvider();
+        const grid = mockGrid();
+        grid.getColumns = () => [{ id: "a" }, { id: "b" }, { id: "c" }];
+        provider.init(grid);
+
+        // a view that doesn't say where the totals are shown, the default of a grouping is a row of
+        // their own, so the group cell spans the whole row
+        expect(provider.getTotalsDisplay()).toBe(true);
+        expect(provider.groupCellPosition()).toEqual({ cell: 0, colspan: "*" });
+
+        // with the totals on the row of the group, but no summary columns, it still covers them all
+        grid.getData = () => ({ getGrouping: () => totalsGrouping("groupheader") } as any);
+        expect(provider.groupCellPosition()).toEqual({ cell: 0, colspan: 3 });
+
+        grid.getData = () => ({ getGrouping: () => totalsGrouping(false) } as any);
+        expect(provider.groupCellPosition()).toEqual({ cell: 0, colspan: "*" });
+    });
+
     it("returns the default position when it has no grid or no columns", () => {
         const provider = new GroupItemMetadataProvider();
         expect(provider.groupCellPosition()).toEqual({ cell: 0, colspan: "*" });
@@ -694,16 +749,18 @@ describe("GroupItemMetadataProvider.groupCellPosition", () => {
     });
 
     it("skips summary columns", () => {
+        // the totals of the group are in the summary column, so the group cell starts after it
         const provider = new GroupItemMetadataProvider();
         const grid = mockGrid();
         grid.getColumns = () => [{ summaryType: 1 }, { id: "name" }];
+        grid.getData = () => ({ getGrouping: () => totalsGrouping("groupheader") } as any);
         provider.init(grid);
-        expect(provider.groupCellPosition()).toEqual({ cell: 1, colspan: "*" });
+        expect(provider.groupCellPosition()).toEqual({ cell: 1, colspan: 1 });
     });
 
     it("skips the columns marked with skipGroupCell", () => {
         const provider = new GroupItemMetadataProvider();
-        const grid = mockGrid();
+        const grid = withTotalsRow(mockGrid());
         grid.getColumns = () => [
             { id: "__select__", width: 200, skipGroupCell: true },
             { id: "__rowNumber__", width: 100, skipGroupCell: true },
@@ -722,7 +779,7 @@ describe("GroupItemMetadataProvider.groupCellPosition", () => {
 
     it("skips narrow columns that have a fixed width, like a checkbox column", () => {
         const provider = new GroupItemMetadataProvider();
-        const grid = mockGrid();
+        const grid = withTotalsRow(mockGrid());
         grid.getColumns = () => [
             { id: "__select__", width: 27, minWidth: 27, maxWidth: 27, resizable: false },
             { id: "name", width: 200 }
@@ -734,7 +791,7 @@ describe("GroupItemMetadataProvider.groupCellPosition", () => {
 
     it("uses the declared width of a fixed column, so that resizing does not move the group cell", () => {
         const provider = new GroupItemMetadataProvider();
-        const grid = mockGrid();
+        const grid = withTotalsRow(mockGrid());
         const selectColumn: any = { id: "__select__", width: 90, minWidth: 27, maxWidth: 27 };
         grid.getColumns = () => [selectColumn, { id: "name" }];
         provider.init(grid);
@@ -749,7 +806,7 @@ describe("GroupItemMetadataProvider.groupCellPosition", () => {
 
     it("does not skip a column whose minimum and maximum width are zero, as zero means not set", () => {
         const provider = new GroupItemMetadataProvider();
-        const grid = mockGrid();
+        const grid = withTotalsRow(mockGrid());
         grid.getColumns = () => [
             { id: "unset", width: 20, minWidth: 0, maxWidth: 0 },
             { id: "name" }
@@ -762,7 +819,7 @@ describe("GroupItemMetadataProvider.groupCellPosition", () => {
 
     it("does not skip a narrow column that is resizable, as its width is not fixed", () => {
         const provider = new GroupItemMetadataProvider();
-        const grid = mockGrid();
+        const grid = withTotalsRow(mockGrid());
         grid.getColumns = () => [{ id: "narrow", width: 20 }, { id: "name" }];
         provider.init(grid);
 
@@ -782,8 +839,9 @@ describe("GroupItemMetadataProvider.groupCellPosition", () => {
     });
 
     it("finds the first non-summary column and spans matching frozen columns", () => {
-        const provider = new GroupItemMetadataProvider({ groupRowTotals: true });
+        const provider = new GroupItemMetadataProvider();
         const grid = mockGrid();
+        grid.getData = () => ({ getGrouping: () => totalsGrouping("groupheader") } as any);
         grid.getColumns = () => [
             { summaryType: 1, frozen: true },
             { id: "first", frozen: true },
@@ -793,12 +851,13 @@ describe("GroupItemMetadataProvider.groupCellPosition", () => {
         ];
         provider.init(grid);
 
-        expect(provider.groupCellPosition()).toEqual({ cell: 1, colspan: 1 });
+        expect(provider.groupCellPosition()).toEqual({ cell: 1, colspan: 2 });
     });
 
     it("enforces a minimum colspan when the next column is a summary or boundary", () => {
-        const provider = new GroupItemMetadataProvider({ groupRowTotals: true });
+        const provider = new GroupItemMetadataProvider();
         const grid = mockGrid();
+        grid.getData = () => ({ getGrouping: () => totalsGrouping("groupheader") } as any);
         grid.getColumns = () => [
             { id: "first", frozen: true },
             { id: "summary", summaryType: 1, frozen: true }

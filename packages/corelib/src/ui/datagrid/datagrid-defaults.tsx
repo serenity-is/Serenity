@@ -15,6 +15,14 @@ export const dataGridDefaults = {
      * is null, which leaves it to `GroupItemMetadataProvider.defaults.indentDataRows`, which is true.
      */
     indentDataRows: null as boolean,
+    /**
+     * Where the totals of a group, e.g. the aggregates of the summary columns, are shown by default:
+     * on a row of their own (`true`), on the row of the group itself (`"groupheader"`), or not at all
+     * (`false`). It is passed to the view in getViewOptions, and is the default of the grouping levels
+     * that don't set it. Default is null, which leaves it to the `groupingInfoDefaults` of `RemoteView`,
+     * which is `true`, i.e. a row of their own.
+     */
+    displayTotalsRow: null as (boolean | "groupheader"),
     /** Controls whether to open dialogs as panels. Default is null. */
     openDialogsAsPanel: null as boolean,
     /** Controls whether the views of the grids ask the server for the aggregates of the summary options, e.g. the totals in the footer, from all the rows and not only the page. Grids can override it in getViewOptions. Default is null, which is false. */

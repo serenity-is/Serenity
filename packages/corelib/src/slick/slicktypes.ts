@@ -50,8 +50,12 @@ export interface GroupInfo<TItem> {
     aggregateEmpty?: boolean;
     /** True if groups start collapsed. */
     collapsed?: boolean;
-    /** True to render a totals row for this level. */
-    displayTotalsRow?: boolean;
+    /**
+     * Where the totals of a group of this level are shown, e.g. the aggregates of the summary columns:
+     * on a row of their own (`true`), on the row of the group itself (`"groupheader"`), or not at all
+     * (`false`). Defaults to `true`.
+     */
+    displayTotalsRow?: boolean | "groupheader";
     /** True to calculate totals lazily. */
     lazyTotalsCalculation?: boolean;
     /** Predefined group values to ensure groups exist even without data. */

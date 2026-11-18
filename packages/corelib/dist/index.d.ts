@@ -7103,8 +7103,12 @@ export interface GroupInfo<TItem> {
     aggregateEmpty?: boolean;
     /** True if groups start collapsed. */
     collapsed?: boolean;
-    /** True to render a totals row for this level. */
-    displayTotalsRow?: boolean;
+    /**
+     * Where the totals of a group of this level are shown, e.g. the aggregates of the summary columns:
+     * on a row of their own (`true`), on the row of the group itself (`"groupheader"`), or not at all
+     * (`false`). Defaults to `true`.
+     */
+    displayTotalsRow?: boolean | "groupheader";
     /** True to calculate totals lazily. */
     lazyTotalsCalculation?: boolean;
     /** Predefined group values to ensure groups exist even without data. */
@@ -7241,6 +7245,11 @@ export declare class RemoteView<TItem = any> implements IRemoteView<TItem> {
      * provider the view creates, leaving it undefined keeps the provider defaults.
      */
     private indentDataRows;
+    /**
+     * Where the totals of a group are shown when its grouping doesn't say, see
+     * {@link RemoteViewOptions.displayTotalsRow}.
+     */
+    private displayTotalsRow;
     private loading;
     private localSort;
     private method;
@@ -7499,8 +7508,10 @@ export declare class RemoteView<TItem = any> implements IRemoteView<TItem> {
      * Gets the groupings of a view from what it is given, with the defaults of a grouping. The groupings in an array
      * are replaced with their copies that have the defaults, and the array itself is returned.
      * @param groupingInfo - Grouping information or array of grouping information.
+     * @param defaults - Defaults that replace those of `groupingInfoDefaults` for this view, e.g. the
+     * `displayTotalsRow` of its options. A value a grouping sets itself still wins.
      */
-    static normalizeGroupingInfos<TItem = any>(groupingInfo: GroupInfo<TItem> | GroupInfo<TItem>[]): GroupInfo<TItem>[];
+    static normalizeGroupingInfos<TItem = any>(groupingInfo: GroupInfo<TItem> | GroupInfo<TItem>[], defaults?: Partial<GroupInfo<TItem>>): GroupInfo<TItem>[];
     /**
      * Gets an item by its index in the items array.
      * @param i - The index of the item.
@@ -7811,6 +7822,14 @@ export interface RemoteViewOptions<TItem = any> {
      * matches and not only from the current page, which only a server that supports them returns. Default is false.
      */
     serverAggregates?: boolean;
+    /**
+     * Where the totals of a group, e.g. the aggregates of the summary columns, are shown by default:
+     * on a row of their own (`true`), on the row of the group itself (`"groupheader"`), or not at all
+     * (`false`). It is the default of the grouping levels that don't set it, which a grid can override
+     * in its `getViewOptions`, like the other options of the view. When it is not set, the
+     * `groupingInfoDefaults` of `RemoteView` apply, which is `true`, i.e. a row of their own.
+     */
+    displayTotalsRow?: boolean | "groupheader";
     /**
      * Whether to page without the total number of the rows, by asking the server whether there are more rows after the page,
      * which is faster for large tables. Default is false.
@@ -11269,6 +11288,7 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
         columnWidthScale: number;
         enableAdvancedFiltering: (boolean | ((grid: DataGrid<any>) => boolean));
         indentDataRows: boolean;
+        displayTotalsRow: (boolean | "groupheader");
         openDialogsAsPanel: boolean;
         serverAggregates: boolean;
         rowHeight: number;

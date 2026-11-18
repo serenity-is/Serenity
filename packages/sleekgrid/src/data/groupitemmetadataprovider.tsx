@@ -1,4 +1,4 @@
-import { applyFormatterResultToCellNode, Column, ColumnFormat, CompatFormatter, convertCompatFormatter, FormatterContext, FormatterResult, Group, IGroupTotals, ItemMetadata, type CellKeyboardEvent, type CellMouseEvent, type GridPlugin, type ISleekGrid } from "../core";
+import { applyFormatterResultToCellNode, Column, ColumnFormat, CompatFormatter, convertCompatFormatter, FormatterContext, FormatterResult, Group, IGroupTotals, ItemMetadata, type CellKeyboardEvent, type CellMouseEvent, type GridPlugin, type IDataView, type ISleekGrid } from "../core";
 
 /**
  * Options controlling how {@link GroupItemMetadataProvider} renders group and totals rows.
@@ -51,8 +51,6 @@ export interface GroupItemMetadataProviderOptions {
     groupFormatter?: CompatFormatter<Group>;
     /** CSS class prefix for grouping level (appended with level number). Defaults to `"slick-group-level-"`. */
     groupLevelPrefix?: string;
-    /** Whether totals rows should be considered part of the group row span calculation. */
-    groupRowTotals?: boolean;
     /** CSS class applied to the title span inside the group cell. Defaults to `"slick-group-title"`. */
     groupTitleCssClass?: string;
     /**
@@ -399,6 +397,18 @@ export class GroupItemMetadataProvider implements GridPlugin {
     }
 
     /**
+     * Returns where the totals of a group of the given level are shown, which the view that groups
+     * the rows knows: on a row of their own, on the row of the group itself, or not at all. It
+     * defaults to a row of their own when the view doesn't tell, like the grouping defaults of a view.
+     * @param level - The level of the grouping, `0` when not given.
+     * @returns `true` for a totals row, `"groupheader"` for the row of the group, `false` for none.
+     */
+    public getTotalsDisplay(level?: number): boolean | "groupheader" {
+        const grouping = (this.grid?.getData() as IDataView)?.getGrouping?.();
+        return grouping?.[level ?? 0]?.displayTotalsRow ?? true;
+    }
+
+    /**
      * Returns whether a column can be the start of a group cell, and so the column the data rows
      * of a group are indented in. Summary columns are skipped, as they show the totals of a group,
      * and so are the columns marked with `skipGroupCell` and the narrow columns with a fixed width
@@ -409,9 +419,20 @@ export class GroupItemMetadataProvider implements GridPlugin {
      */
     public isGroupCellColumn(column: Column): boolean {
         return !!column &&
-            !column.skipGroupCell &&
-            !this.isFixedNarrowColumn(column) &&
+            !this.isSkippedColumn(column) &&
             !this.options.hasSummaryType?.(column);
+    }
+
+    /**
+     * Returns whether a column stays in front of the group cell, i.e. it is marked with
+     * `skipGroupCell`, or it is a narrow column with a fixed width, like a checkbox or a row number
+     * column. Such columns keep their own cell in the rows of a group, where the group cell, and the
+     * indentation of the data rows, start after them.
+     * @param column - The column to test.
+     * @returns `true` if the group cell starts after the column.
+     */
+    protected isSkippedColumn(column: Column): boolean {
+        return !!column?.skipGroupCell || this.isFixedNarrowColumn(column);
     }
 
     /**
@@ -445,12 +466,13 @@ export class GroupItemMetadataProvider implements GridPlugin {
     }
 
     /**
-     * Computes the cell index and colspan for the spanned group cell, taking
-     * summary columns, columns marked with `skipGroupCell`, narrow fixed width columns and frozen
-     * columns into account.
-     * @returns Object with `cell` start index and `colspan` span width (`"*"` means full row when no totals).
+     * Computes the cell index and colspan for the spanned group cell, taking summary columns, columns
+     * marked with `skipGroupCell`, narrow fixed width columns and frozen columns into account.
+     * @param level - The level of the grouping, which decides where the totals of a group are shown.
+     * @returns Object with `cell` start index and `colspan` span width (`"*"` when the totals are not
+     * on the row of the group, so that the group cell spans the rest of the row).
      */
-    groupCellPosition = (): {
+    groupCellPosition = (level?: number): {
         cell: number;
         colspan: (number | "*");
     } => {
@@ -465,29 +487,38 @@ export class GroupItemMetadataProvider implements GridPlugin {
             return result;
         }
 
-        // the group cell starts at the first column that is not a summary column and not skipped,
-        // so that columns like a checkbox stay visible in the group rows too
+        // the totals of a group are in the summary columns before the group cell, which then spans
+        // only through the columns that are not summaries; when the totals are on a row of their
+        // own, the group cell covers the summary columns as well
+        const totalsOnGroupRow = this.getTotalsDisplay(level) === "groupheader";
+
+        // the group cell starts at the first column that is not skipped, so that the columns like a
+        // checkbox stay visible in the rows of a group too
         let cell = -1;
         for (let idx = 0; idx < cols.length; idx++) {
-            if (this.isGroupCellColumn(cols[idx])) {
+            const column = cols[idx];
+            if (!this.isSkippedColumn(column) &&
+                (!totalsOnGroupRow || !this.options.hasSummaryType?.(column))) {
                 cell = idx;
                 break;
             }
         }
 
         if (cell < 0) {
-            // every column is a summary or a skipped column, so there is nothing to span
+            // every column is a skipped column, so there is nothing to span
             return result;
         }
 
         result.cell = cell;
 
-        if (!this.options.groupRowTotals) {
+        if (!totalsOnGroupRow) {
             return result;
         }
 
+        // the span starts with the group cell itself, and grows through the columns after it that
+        // the group cell also covers, e.g. stops at the summary columns
         const col1 = cols[cell];
-        result.colspan = 0;
+        result.colspan = 1;
         for (let idx = cell + 1; idx < cols.length; idx++) {
             const col2 = cols[idx];
             if (this.isGroupCellColumn(col2) &&
@@ -498,7 +529,6 @@ export class GroupItemMetadataProvider implements GridPlugin {
                 break;
         }
 
-        result.colspan = Math.max(1, result.colspan);
         return result;
     }
 
@@ -511,7 +541,7 @@ export class GroupItemMetadataProvider implements GridPlugin {
     getGroupRowMetadata: ((item: Group) => ItemMetadata) = (item) => {
 
         const opt = this.options;
-        const gcp = this.groupCellPosition();
+        const gcp = this.groupCellPosition(item?.level);
         const result: ItemMetadata = {
             selectable: false,
             focusable: opt.groupFocusable,
@@ -526,7 +556,7 @@ export class GroupItemMetadataProvider implements GridPlugin {
             }
         };
 
-        if (opt.groupRowTotals)
+        if (this.getTotalsDisplay(item?.level) === "groupheader")
             result.format = opt.totalsFormat;
 
         return result;
@@ -570,7 +600,7 @@ export class GroupItemMetadataProvider implements GridPlugin {
         // the groups line up under their group rows
         return GroupItemMetadataProvider.mergeMetadata(baseMetadata, {
             columns: {
-                [this.groupCellPosition().cell]: {
+                [this.groupCellPosition(level).cell]: {
                     cssClass: cssClasses
                 }
             }

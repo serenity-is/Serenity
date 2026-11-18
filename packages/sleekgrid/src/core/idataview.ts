@@ -4,6 +4,17 @@ import { Group, IGroupItemMetadataProvider, IGroupTotals } from "./group";
 
 
 /**
+ * The grouping of the rows of a view, as much as the grid needs to know about it to render them.
+ */
+export interface IDataViewGroupingInfo {
+    /**
+     * Where the totals of a group of this level are shown: on a row of their own (`true`), on the row
+     * of the group itself (`"groupheader"`), or not at all (`false`).
+     */
+    displayTotalsRow?: boolean | "groupheader";
+}
+
+/**
  * Minimal data-view contract consumed by the grid. Implemented by `DataView`.
  * @template TItem - Row item type.
  */
@@ -44,6 +55,12 @@ export interface IDataView<TItem = any> {
      * @param provider - The provider, or `null` when the grid no longer has one.
      */
     setGroupItemMetadataProvider?(provider: IGroupItemMetadataProvider): void;
+    /**
+     * Gets the grouping of the rows, when the view groups them, so that the grid can render the rows
+     * of a group, e.g. where the totals of a group go.
+     * @returns The grouping information, one for each level, or `undefined` when not grouped.
+     */
+    getGrouping?(): IDataViewGroupingInfo[];
     /** Event fired when the underlying data set changes. */
     readonly onDataChanged?: EventEmitter<{}>;
     /**

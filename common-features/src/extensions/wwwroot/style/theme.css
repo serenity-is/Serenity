@@ -3627,7 +3627,9 @@ button.panel-titlebar-close::after {
   background-color: var(--s-group-row-bg, rgba(139, 177, 205, 0.22));
 }
 
-.slick-group .slick-cell {
+/* the group title is always left aligned, but the cells of a group row that show the totals of a
+   summary column keep the alignment of their column */
+.slick-group .slick-group-cell {
   text-align: left !important;
 }
 
