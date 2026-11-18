@@ -902,6 +902,32 @@ describe("DataGrid advanced filtering and pager", () => {
         }
     });
 
+    it("getViewOptions has displayTotalsRow from dataGridDefaults, which a grid can override", () => {
+        class DefaultGrid extends DataGrid<any, any> { }
+        class OverridingGrid extends DataGrid<any, any> {
+            protected override getViewOptions() {
+                return { ...super.getViewOptions(), displayTotalsRow: true };
+            }
+        }
+
+        const grid = new DefaultGrid({});
+        const overriding = new OverridingGrid({});
+        try {
+            // without a default, the views keep their own, which is a totals row
+            expect(grid["getViewOptions"]().displayTotalsRow).toBeNull();
+
+            // e.g. what the application template sets, to show the totals on the group rows
+            dataGridDefaults.displayTotalsRow = "groupheader";
+            expect(grid["getViewOptions"]().displayTotalsRow).toBe("groupheader");
+            expect(overriding["getViewOptions"]().displayTotalsRow).toBe(true);
+        }
+        finally {
+            dataGridDefaults.displayTotalsRow = null;
+            grid.destroy();
+            overriding.destroy();
+        }
+    });
+
     it("getViewOptions uses responsive height rows per page", () => {
         class PagerGrid extends DataGrid<any, any> {
             usePager() { return true; }
