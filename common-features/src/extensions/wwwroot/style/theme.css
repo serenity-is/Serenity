@@ -2923,6 +2923,9 @@ button.panel-titlebar-close::after {
   border-radius: var(--bs-border-radius);
   border: 1px solid var(--s-input-border-color, var(--bs-border-color));
   border-radius: var(--bs-border-radius);
+  /* the field background follows the inside of the border, whichever corners are rounded
+     (input groups and the open dropdown square some of them) */
+  overflow: clip;
 }
 
 .select2-default {
@@ -2940,7 +2943,7 @@ button.panel-titlebar-close::after {
   color: var(--s-input-text, currentcolor);
   text-decoration: none;
   background-color: var(--s-input-bg);
-  border-radius: calc(var(--bs-border-radius) - 1px);
+  border-radius: 0;
   background-clip: padding-box;
   user-select: none;
 }
@@ -2953,14 +2956,12 @@ button.panel-titlebar-close::after {
   color: var(--s-input-text, currentcolor);
 }
 
-.select2-dropdown-open:not(.select2-drop-above),
-.select2-dropdown-open:not(.select2-drop-above) > :is(.select2-choice, .select2-choices) {
+.select2-dropdown-open:not(.select2-drop-above) {
   border-bottom-right-radius: 0;
   border-bottom-left-radius: 0;
 }
 
-.select2-dropdown-open.select2-drop-above,
-.select2-dropdown-open.select2-drop-above > :is(.select2-choice, .select2-choices) {
+.select2-dropdown-open.select2-drop-above {
   border-top-left-radius: 0;
   border-top-right-radius: 0;
 }
@@ -3292,7 +3293,7 @@ button.panel-titlebar-close::after {
   background-color: var(--s-input-bg);
   background-clip: padding-box;
   min-height: var(--s-input-inner-height);
-  border-radius: calc(var(--bs-border-radius) - 1px);
+  border-radius: 0;
   cursor: text;
   overflow: hidden;
 }
