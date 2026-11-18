@@ -150,6 +150,7 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
     private sortAsc = true;
     private sortComparer: any;
     private suspend = 0;
+    private destroyed = false;
     private toggledGroupsByLevel: any[] = [];
     /** The total number of the rows, or the number of the ones known so far when paging is indeterminate. */
     protected totalCount: number = null;
@@ -1655,6 +1656,10 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
      */
     public addData(data: any) {
 
+        // the view was destroyed, e.g. with its grid, so what it asked for before is not used
+        if (this.destroyed)
+            return false;
+
         this.errorMessage = null;
         this.loading && typeof this.loading !== "boolean" && this.loading.abort();
         this.loading = false;
@@ -1754,6 +1759,9 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
      * @returns False if the operation was cancelled or no URL is configured.
      */
     public populate() {
+        if (this.destroyed)
+            return false;
+
         if (this.populateLocks > 0) {
             this.populateCalls++;
             return;
@@ -1834,6 +1842,8 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
                 self.addData(response);
             },
             onCleanup: function (this: void) {
+                if (self.destroyed)
+                    return;
                 // not the one of a request that was made while this one was processed
                 if (self.loading === controller || self.loading === true)
                     self.loading = false;
@@ -1854,6 +1864,16 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         serviceCall(serviceOptions);
         this.onPagingInfoChanged.notify({ pagingInfo: this.getPagingInfo(), dataView: this });
         this.loading = controller;
+    }
+
+    /**
+     * Stops the view, which is what a grid does when it is destroyed: the rows it asked for that arrive after that are
+     * ignored, and it notifies nothing, as what it notified may not be there anymore.
+     */
+    public destroy(): void {
+        this.destroyed = true;
+        this.loading && typeof this.loading !== "boolean" && this.loading.abort();
+        this.loading = false;
     }
 
     /** Locks population to prevent automatic data loading. */

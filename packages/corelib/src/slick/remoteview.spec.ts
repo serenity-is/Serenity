@@ -1456,6 +1456,38 @@ describe("RemoteView", () => {
         });
     });
 
+    describe("destroy", () => {
+        it("ignores the rows it asked for that arrive after it is destroyed", () => {
+            const view = new RemoteView<any>({ idField: "id", url: "/api/test" });
+            const processed = vi.fn();
+            view.onProcessData = processed;
+            const loaded: string[] = [];
+            view.onDataLoaded.subscribe(() => loaded.push("loaded"));
+
+            let response: any;
+            vi.mocked(serviceCall).mockImplementation((options: any) => {
+                response = () => options.onSuccess({ Entities: [{ id: 1 }], TotalCount: 1 });
+                return {} as any;
+            });
+            view.populate();
+            view.destroy();
+
+            response();
+            view.addData({ Entities: [{ id: 2 }], TotalCount: 2 });
+
+            expect(processed).not.toHaveBeenCalled();
+            expect(loaded).toEqual([]);
+            expect(view.getLength()).toBe(0);
+        });
+
+        it("makes no request after it is destroyed", () => {
+            const view = new RemoteView<any>({ idField: "id", url: "/api/test" });
+            view.destroy();
+            expect(view.populate()).toBe(false);
+            expect(vi.mocked(serviceCall)).not.toHaveBeenCalled();
+        });
+    });
+
     describe("grid synchronization", () => {
         let view: RemoteView<any>;
         let mockGrid: any;

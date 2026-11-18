@@ -111,6 +111,10 @@ export interface IRemoteView<TItem = any> extends IDataView<TItem> {
      */
     getItemMetadataCallback(): (item: TItem, row: number) => ItemMetadata<TItem> | undefined;
     /**
+     * Stops the view when it is no longer used, e.g. with the grid of it, so the rows it asked for before are ignored.
+     */
+    destroy?(): void;
+    /**
      * Gets all items in the view.
      * @returns Array of all items
      */

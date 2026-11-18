@@ -468,10 +468,10 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         if (this.view) {
             this.view.onDataChanged.unsubscribe(this.viewDataChanged);
             this.view.onSubmit = null;
-            // the rows the view asked for may still arrive, e.g. when a toolbar action of a dashboard rebuilds the grid while
-            // it loads, and processing them would reach the grid and the cells that are destroyed
-            this.view.onProcessData = null;
             this.view.setFilter(null);
+            // the rows the view asked for may still arrive, e.g. when a widget of a dashboard is designed while it loads,
+            // and they would reach the grid and the cells that are destroyed
+            this.view.destroy?.();
             this.view = null;
         }
 

@@ -1209,18 +1209,20 @@ describe("DataGrid remaining branches", () => {
 });
 
 describe("DataGrid destroy", () => {
-    it("takes what it gave the view back, so a response that arrives later does not reach the destroyed grid", () => {
+    it("stops the view, so the rows it asked for that arrive later do not reach the destroyed grid", () => {
         const grid = createGrid();
         const view = grid.view;
-        const onProcessData = vi.fn();
+        const onProcessData = vi.fn(() => ({ Entities: [] }));
 
+        view.onProcessData = onProcessData;
         grid.destroy();
 
-        // the view still called these when the response of a request made before the grid was destroyed arrived
-        expect(view.onProcessData).toBeNull();
-        expect(view.onSubmit).toBeNull();
         expect(grid.view).toBeNull();
         expect(grid.sleekGrid).toBeNull();
+
+        // the response of a request that was made before the grid was destroyed
+        expect(view.addData({ TotalCount: 1, Entities: [{ ID: 1 }] })).toBe(false);
+        expect(onProcessData).not.toHaveBeenCalled();
     });
 });
 
