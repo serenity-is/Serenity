@@ -19,10 +19,10 @@ public class UserPreferenceRepository(IRequestContext context) : BaseRepository(
         ArgumentNullException.ThrowIfNull(request.Name);
         ArgumentNullException.ThrowIfNull(request.PreferenceType);
 
-        var userId = Convert.ToInt32(Context.User.GetIdentifier(), CultureInfo.InvariantCulture);
         var fld = MyRow.Fields;
+        var userId = fld.UserId.ConvertValue(Context.User.GetIdentifier(), CultureInfo.InvariantCulture);
 
-        var criteria = fld.UserId == userId &
+        var criteria = fld.UserId == new ValueCriteria(userId) &
             fld.PreferenceType == request.PreferenceType &
             fld.Name == request.Name;
 
@@ -80,9 +80,9 @@ public class UserPreferenceRepository(IRequestContext context) : BaseRepository(
         ArgumentNullException.ThrowIfNull(request.PreferenceType);
 
         var fld = MyRow.Fields;
-        var userId = Convert.ToInt32(Context.User.GetIdentifier(), CultureInfo.InvariantCulture);
+        var userId = fld.UserId.ConvertValue(Context.User.GetIdentifier(), CultureInfo.InvariantCulture);
         var row = connection.TryFirst<MyRow>(
-            fld.UserId == userId &
+            fld.UserId == new ValueCriteria(userId) &
             fld.PreferenceType == request.PreferenceType &
             fld.Name == request.Name);
 
