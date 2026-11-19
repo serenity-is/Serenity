@@ -293,14 +293,19 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         this._signalsDisposers.push(observeSignal(signals.pinnedStartCols, pinnedStartEndChanged));
         this._signalsDisposers.push(observeSignal(signals.pinnedEndCols, pinnedStartEndChanged));
 
-        // the bands at the sides are only shown when they have columns, and a style can't tell that from the
-        // band itself, as each one is a separate element, so the container tells whether they are there
-        const updatePinnedBands = () => {
+        // the pinned bands and the frozen panes are only shown when they have columns or rows, and a style
+        // can't tell that from them, as each one is a separate element, so the container tells whether they
+        // are there, e.g. for the styles of the edges of the grid
+        const updateFrozenPinned = () => {
             this._container.classList.toggle("sg-has-start", signals.pinnedStartCols.value > 0);
             this._container.classList.toggle("sg-has-end", signals.pinnedEndCols.value > 0);
+            this._container.classList.toggle("sg-has-top", signals.frozenTopRows.value > 0);
+            this._container.classList.toggle("sg-has-bottom", signals.frozenBottomRows.value > 0);
         };
-        this._signalsDisposers.push(observeSignal(signals.pinnedStartCols, updatePinnedBands));
-        this._signalsDisposers.push(observeSignal(signals.pinnedEndCols, updatePinnedBands));
+        this._signalsDisposers.push(observeSignal(signals.pinnedStartCols, updateFrozenPinned));
+        this._signalsDisposers.push(observeSignal(signals.pinnedEndCols, updateFrozenPinned));
+        this._signalsDisposers.push(observeSignal(signals.frozenTopRows, updateFrozenPinned));
+        this._signalsDisposers.push(observeSignal(signals.frozenBottomRows, updateFrozenPinned));
 
         this.validateAndEnforceOptions();
         this.setOptionDependentSignals();

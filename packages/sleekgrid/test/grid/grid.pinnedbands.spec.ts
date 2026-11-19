@@ -16,8 +16,8 @@ function createGrid() {
     return { el, grid, signals: (grid as any)._signals };
 }
 
-describe("the pinned bands of the container", () => {
-    it("tells whether the pinned start and end bands are there, as the layout pins the columns", () => {
+describe("the frozen and pinned parts of the container", () => {
+    it("tells whether the pinned bands and the frozen panes are there, as the layout pins and freezes", () => {
         // the columns are pinned by the layout, from their size, so the counts are set on its signals here,
         // as a container in a test has no size
         const { el, signals } = createGrid();
@@ -39,5 +39,23 @@ describe("the pinned bands of the container", () => {
 
         signals.pinnedEndCols.value = 0;
         expect(el.classList.contains("sg-has-end")).toBe(false);
+    });
+
+    it("tells whether the top and bottom frozen panes are there", () => {
+        const { el, signals } = createGrid();
+
+        expect(el.classList.contains("sg-has-top")).toBe(false);
+        expect(el.classList.contains("sg-has-bottom")).toBe(false);
+
+        signals.frozenTopRows.value = 2;
+        expect(el.classList.contains("sg-has-top")).toBe(true);
+        expect(el.classList.contains("sg-has-bottom")).toBe(false);
+
+        signals.frozenBottomRows.value = 1;
+        expect(el.classList.contains("sg-has-bottom")).toBe(true);
+
+        signals.frozenTopRows.value = 0;
+        expect(el.classList.contains("sg-has-top")).toBe(false);
+        expect(el.classList.contains("sg-has-bottom")).toBe(true);
     });
 });
