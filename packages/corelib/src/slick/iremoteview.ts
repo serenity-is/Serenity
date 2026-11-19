@@ -1,5 +1,5 @@
 import { EventEmitter, Group, GroupItemMetadataProvider, GroupTotals, IDataView, ISleekGrid, type ItemMetadata } from "@serenity-is/sleekgrid";
-import { ListResponse, ServiceOptions } from "../base";
+import { ListResponse, RenderableContent, ServiceOptions } from "../base";
 import type { ArgsGroupToggle, ArgsPagingInfo, ArgsRecalcRows, ArgsRemoteView, ArgsRowCountChanged, ArgsRowsOrCountChanged } from "./remoteview";
 import { GroupInfo, PagingOptions, SummaryOptions } from "./slicktypes";
 
@@ -129,6 +129,14 @@ export interface IRemoteView<TItem = any> extends IDataView<TItem> {
      * @returns Object containing paging state information
      */
     getPagingInfo(): PagingInfo;
+    /**
+     * Gets the content a pager can show before its controls, e.g. the totals of the page and of all the
+     * rows. The pager calls it on every update, and shows nothing when it returns nothing, so a view
+     * without aggregates does not have to implement it. A string is shown as text, so anything with
+     * markup is returned as an element or a fragment instead.
+     * @returns The content to show, or nothing.
+     */
+    getPagingInfoText?(): RenderableContent;
     /**
      * Gets the row index for an item by its ID.
      * @param id The ID of the item
@@ -290,6 +298,19 @@ export interface IRemoteView<TItem = any> extends IDataView<TItem> {
 /**
  * Information about the current paging state of the view
  */
+/**
+ * The rows a pager tells of, by their numbers, when the view shows a range of them instead of a page of
+ * them, e.g. the rows it has loaded, or the ones in the viewport of the grid.
+ */
+export interface PagingRowRange {
+    /** The number of the first row shown, starting from 1. */
+    from: number;
+    /** The number of the last row shown, starting from 1. */
+    to: number;
+    /** The number of all the rows, which is not set when it is not known. */
+    total?: number;
+}
+
 export interface PagingInfo {
     /** Reference to the RemoteView instance */
     dataView: IRemoteView<any>;
@@ -313,6 +334,29 @@ export interface PagingInfo {
     indeterminate?: boolean;
     /** Whether there are more rows after the current page, for a view that is {@link indeterminate}. */
     hasMore?: boolean;
+    /**
+     * Whether the view shows a page of the rows, or a range of them, e.g. the rows it has loaded, or the
+     * ones in the viewport of the grid. A range view has no pages, so a pager shows no page navigation
+     * for it. It is set even before there are any rows, so that a pager knows its layout from the start.
+     * Default is `"pages"`.
+     */
+    pagingMode?: "pages" | "rows";
+    /**
+     * The rows a pager tells of when {@link pagingMode} is `"rows"`. It is not set when there are none yet.
+     */
+    rowRange?: PagingRowRange;
+}
+
+/**
+ * A view that loads its rows as the grid it is bound to is scrolled, so it needs to know the grid, e.g.
+ * to load the next rows when its viewport gets near the last one.
+ */
+export interface IGridBoundView<TItem = any> extends IRemoteView<TItem> {
+    /**
+     * Binds the view to a grid, so it loads its rows as the grid is scrolled.
+     * @param grid - The grid that shows the rows of the view.
+     */
+    bindToGrid(grid: ISleekGrid): void;
 }
 
 /**

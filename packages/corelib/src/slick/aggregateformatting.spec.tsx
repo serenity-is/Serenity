@@ -290,6 +290,59 @@ describe("AggregateFormatting.groupTotalsFormat", () => {
     });
 });
 
+describe("AggregateFormatting.formatAggregateValue", () => {
+    it("formats a number by the display format of its column", () => {
+        const column: any = { field: "Amount", sourceItem: { displayFormat: "#,##0.00" } };
+        expect(AggregateFormatting.formatAggregateValue(column, 62335.47))
+            .toBe("62,335.47");
+    });
+
+    it("escapes a text value, so it can be used in a markup context", () => {
+        const column: any = { field: "Name" };
+        expect(AggregateFormatting.formatAggregateValue(column, "<b>x</b>"))
+            .toBe("&lt;b&gt;x&lt;/b&gt;");
+    });
+
+    it("uses the formatter of the column, with the value as a field of a non data row", () => {
+        const column: any = {
+            field: "Amount",
+            format: (ctx: any) => "fmt:" + ctx.value + ":" + ctx.item.Amount + ":" + ctx.purpose
+        };
+        expect(AggregateFormatting.formatAggregateValue(column, 5))
+            .toBe("fmt:5:5:group-totals");
+    });
+
+    it("falls back to the display format when the column formatter throws", () => {
+        const column: any = {
+            field: "Amount",
+            sourceItem: { displayFormat: "#,##0.00" },
+            format: () => { throw new Error("bad formatter"); }
+        };
+        expect(AggregateFormatting.formatAggregateValue(column, 62335.47)).toBe("62,335.47");
+    });
+});
+
+describe("AggregateFormatting.createAggregateValueNode", () => {
+    it("creates an element with the formatted value", () => {
+        const column: any = { field: "Amount", sourceItem: { displayFormat: "#,##0.00" } };
+        const node = AggregateFormatting.createAggregateValueNode(column, 62335.47);
+        expect(node.textContent).toBe("62,335.47");
+    });
+
+    it("appends a node the column formatter returns", () => {
+        const column: any = {
+            field: "Amount",
+            format: () => {
+                const b = document.createElement("b");
+                b.textContent = "bold";
+                return b;
+            }
+        };
+        const node = AggregateFormatting.createAggregateValueNode(column, 1);
+        expect(node.querySelector("b")?.textContent).toBe("bold");
+    });
+});
+
 describe("AggregateFormatting.initGridDefaults", () => {
     it("should set groupTotalsFormat when not already set", () => {
         // Reset gridDefaults

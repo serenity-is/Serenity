@@ -3364,8 +3364,16 @@ button.panel-titlebar-close::after {
   border-bottom: 2px solid var(--s-column-header-border);
 }
 
+/* the footer row of totals mirrors the header: its background and the line below it follow the header
+   chrome, so a plain grid has neither, while the line above it stays, like the line below a header; its
+   totals are told apart by their text color, so it does not read as empty space below the rows */
 .slick-footerrow {
-  border-top: 2px solid var(--s-column-header-border);
+  --s-header-chrome-on: var(--s-header-chrome, var(--s-header-chrome-default, 1));
+  border-top: 1px solid var(--s-footer-row-border, var(--bs-border-color));
+  border-bottom: 1px solid color-mix(in srgb, var(--s-footer-row-border, var(--bs-border-color)) calc(var(--s-header-chrome-on) * 100%), transparent);
+  /* the fallback is the body background, as the band can sit over the rows where a theme has no header
+     background of its own, e.g. Glassy, and a see-through band would show the text behind it */
+  background-color: color-mix(in srgb, var(--s-footer-row-bg, var(--s-column-header-bg, var(--bs-body-bg))) calc(var(--s-header-chrome-on) * 100%), transparent);
 }
 
 .slick-header-column,
@@ -3395,13 +3403,15 @@ button.panel-titlebar-close::after {
   background: var(--s-column-header-hover-bg);
 }
 
+/* the totals read like the column headers, with tabular numbers so they line up under them */
 .slick-footerrow-column {
   float: left;
   height: 1.4em;
   line-height: 1.4em;
   color: var(--s-column-footer);
-  font-weight: 600;
+  font-weight: 500;
   font-family: var(--s-tabular-font);
+  font-variant-numeric: tabular-nums;
 }
 
 .slick-sort-indicator {
@@ -3569,9 +3579,13 @@ button.panel-titlebar-close::after {
 
 .slick-top-panel,
 .slick-grouping-panel,
-.slick-headerrow-columns,
-.slick-footerrow-columns {
+.slick-headerrow-columns {
   height: 30px;
+}
+
+/* the totals of a footer row are a single line, so it needs less room than the panels above */
+.slick-footerrow-columns {
+  height: 26px;
 }
 
 .slick-viewport {
@@ -3646,33 +3660,61 @@ button.panel-titlebar-close::after {
 }
 
 .slick-pg {
-  margin-top: var(--s-row-gap);
+  margin-top: 7px;
   color: var(--s-pager-text);
+  container-type: inline-size;
 }
 
 .slick-pg input,
 .slick-pg select {
   color: var(--s-pager-text);
+  padding: 1px 3px;
 }
 
 .slick-pg-in {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  gap: 4px;
 }
 
-.slick-pg-grp:first-child {
-  order: 2;
+/* the status is at the start of the row, and the controls that change what it tells of are at the end,
+   in one cluster, which drops under the status when the row is too narrow for both */
+.slick-pg-info,
+.slick-pg-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
 }
 
-.slick-pg-grp:last-child {
-  order: 1;
-  margin-left: auto;
-  margin-right: var(--s-col-gap);
+.slick-pg-info {
+  gap: var(--s-col-gap);
 }
 
+.slick-pg-nav {
+  margin-inline-start: auto;
+}
+
+/* the extra content the grid or the view gives, e.g. totals, comes before the controls, and is the
+   first thing to drop when the row gets narrow, as the status already tells of the rows */
+.slick-pg-extra {
+  margin-inline-end: 4px;
+  color: var(--s-pager-text);
+}
+
+/* it is dropped when the pager itself gets narrow, e.g. in a dashboard widget on a wide screen */
+@container (max-width: 40em) {
+  .slick-pg-extra {
+    display: none;
+  }
+}
+
+/* the rows per page selector is told apart from the page buttons, and has no label of its own; it is as
+   wide as its widest choice, instead of a fixed width that leaves room when the rows per page is small */
 .slick-pg-size {
-  width: 6em;
+  width: auto;
+  margin-inline-end: 4px;
 }
 
 .slick-pg-control {
@@ -3691,17 +3733,44 @@ button.panel-titlebar-close::after {
   -webkit-font-smoothing: antialiased;
 }
 
+/* the icon buttons are compact bordered squares, and the same height as the page box */
+/* the buttons must not start a text selection when clicked, which a div does by default */
 .slick-pg-btn {
-  display: inline-block;
-  width: 2em;
-  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  -webkit-user-select: none;
+  width: 1.75em;
+  height: 1.75em;
+  border: 1px solid var(--s-pager-btn-border, var(--bs-border-color));
+  border-radius: var(--s-pager-btn-radius, 0.375rem);
+  background: var(--s-pager-btn-bg, transparent);
   color: var(--s-pager-icon);
   cursor: pointer;
 }
 
+/* the icon is centered in its button, as it would otherwise sit at the top: an inline icon is placed on
+   the baseline, and the line box keeps more room below it for the descenders than above it for the icon */
+.slick-pg-btn > span {
+  display: flex;
+  justify-content: center;
+}
+
+.slick-pg-btn > span:before {
+  vertical-align: initial;
+  font-size: 1em;
+}
+
+/* a button that is disabled stays in place, with its border, and only its icon is dimmed, so it reads as
+   disabled instead of missing, and the row does not jump when it is enabled */
 .slick-pg-btn.slick-pg-disabled {
-  opacity: 0.35;
+  opacity: 1;
   pointer-events: none;
+}
+
+.slick-pg-btn.slick-pg-disabled > span {
+  opacity: 0.4;
 }
 
 .slick-pg-first>span:before {
@@ -3720,8 +3789,8 @@ button.panel-titlebar-close::after {
     --s-ico: var(--s-icon-slick-pg-last-span, var(--s-icon-angle-double-right));
 }
 
+/* the spacing around it comes from the gaps of the cluster it is in */
 .slick-pg-reload {
-  margin: 0 1em;
   color: #3d9970;
 }
 

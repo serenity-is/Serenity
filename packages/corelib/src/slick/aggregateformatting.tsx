@@ -1,5 +1,5 @@
-import { applyFormatterResultToCellNode, convertCompatFormatter, formatterContext, FormatterContext, FormatterResult, gridDefaults, IGroupTotals, NonDataRow } from "@serenity-is/sleekgrid";
-import { formatNumber, localText, SummaryType } from "../base";
+import { applyFormatterResultToCellNode, Column, convertCompatFormatter, formatterContext, FormatterContext, FormatterResult, gridDefaults, IGroupTotals, NonDataRow } from "@serenity-is/sleekgrid";
+import { formatNumber, htmlEncode, localText, SummaryType } from "../base";
 import { AggregatorTypeRegistry, IAggregatorConstructor } from "./aggregatortyperegistry";
 
 declare module "@serenity-is/sleekgrid" {
@@ -14,6 +14,72 @@ export namespace AggregateFormatting {
     const contentOnly = {
         contentOnly: true
     };
+
+    /**
+     * Formats the value of an aggregate, e.g. a total, as the cells of a totals row show it, so that a text
+     * like the totals of a pager uses the same formatting. It uses the formatter of the column, and falls
+     * back to a number formatted by its display format.
+     * @param column - The column the aggregate belongs to.
+     * @param value - The value of the aggregate for that column.
+     * @param ctx - The formatter context to take the grid, escaping and sanitizer from, when available.
+     * @returns The formatted value, which may be markup when the column formatter returns an element.
+     */
+    export function formatAggregateValue(column: Column, value: any,
+        ctx?: Partial<FormatterContext>): FormatterResult {
+        const field = column?.field;
+        const formatter = column?.format ?? ((column as any)?.formatter ?
+            convertCompatFormatter((column as any).formatter) : null);
+
+        const escape = ctx?.escape ?? htmlEncode;
+        const defaultFormatValue = (): FormatterResult => {
+            if (typeof value === "number")
+                return escape(formatNumber(value, column?.sourceItem?.displayFormat ?? "#,##0.##"));
+            return escape(value);
+        };
+
+        if (formatter == null)
+            return defaultFormatValue();
+
+        const cellItem = new NonDataRow();
+        if (field)
+            (cellItem as any)[field] = value;
+
+        try {
+            return formatter(formatterContext({
+                grid: ctx?.grid,
+                escape,
+                sanitizer: ctx?.sanitizer,
+                column,
+                item: cellItem,
+                value,
+                purpose: ctx?.purpose ?? "group-totals"
+            }));
+        }
+        catch {
+            return defaultFormatValue();
+        }
+    }
+
+    /**
+     * Creates an element that shows the value of an aggregate, formatted as the cells of a totals row show
+     * it, e.g. to put it in the content a pager shows next to its controls. Use {@link formatAggregateValue}
+     * when the formatted value goes into a node of your own.
+     * @param column - The column the aggregate belongs to.
+     * @param value - The value of the aggregate for that column.
+     * @param ctx - The formatter context to take the grid, escaping and sanitizer from, when available.
+     * @returns An element with the formatted value.
+     */
+    export function createAggregateValueNode(column: Column, value: any,
+        ctx?: Partial<FormatterContext>): HTMLElement {
+        const span = document.createElement("span");
+        applyFormatterResultToCellNode({
+            ...(ctx as FormatterContext),
+            escape: ctx?.escape ?? htmlEncode,
+            sanitizer: ctx?.sanitizer ?? gridDefaults?.sanitizer,
+            enableHtmlRendering: true
+        } as FormatterContext, formatAggregateValue(column, value, ctx), span, contentOnly);
+        return span;
+    }
 
     /**
      * Formats a group totals cell (aggregate badge/value) based on the column's summaryType.
@@ -59,39 +125,7 @@ export namespace AggregateFormatting {
             displayName = localText("Enums.Serenity.SummaryType." + textKey, textKey);
         }
         const span = <span class={"aggregate agg-" + aggKey} title={displayName}></span> as HTMLElement;
-        const formatter = column.format ?? ((column as any).formatter ? convertCompatFormatter((column as any).formatter) : null);
-
-        function defaultFormatValue() {
-            if (typeof value === "number") {
-                const displayFormat = column.sourceItem?.displayFormat ?? "#,##0.##";
-                return ctx.escape(formatNumber(value, displayFormat));
-            }
-            return ctx.escape(value);
-        }
-
-        let fmtResult: FormatterResult;
-        if (formatter != null) {
-            const cellItem = new NonDataRow();
-            (cellItem as any)[field] = value;
-            try {
-                fmtResult = formatter(formatterContext({
-                    grid: ctx.grid,
-                    escape: ctx.escape,
-                    sanitizer: ctx.sanitizer,
-                    column,
-                    item: cellItem,
-                    value,
-                    purpose: ctx.purpose ?? "group-totals"
-                }));
-            }
-            catch (e) {
-                fmtResult = defaultFormatValue();
-            }
-        }
-        else {
-            fmtResult = defaultFormatValue();
-        }
-
+        const fmtResult = formatAggregateValue(column, value, ctx);
         applyFormatterResultToCellNode(ctx, fmtResult, span, contentOnly);
         return span;
     }

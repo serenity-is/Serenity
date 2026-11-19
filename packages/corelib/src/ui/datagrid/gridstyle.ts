@@ -17,4 +17,4 @@ export enum GridStyle {
     Plain = NoStripes | NoCellBorders | NoHeaderChrome
 }
 
-registerEnum(GridStyle, "Serenity.ComponentModel.GridStyle", { enumFlags: true });
+registerEnum(GridStyle, "Serenity.ComponentModel.GridStyle", { enumFlags: true, enumKey: "Serenity.GridStyle" });

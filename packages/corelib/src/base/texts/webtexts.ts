@@ -175,9 +175,15 @@ namespace webTexts {
             export const DefaultLoadError: string;
             export const LoadingStatus: string;
             export const NoRowStatus: string;
+            export const FirstPage: string;
+            export const LastPage: string;
+            export const NextPage: string;
             export const Page: string;
             export const PageStatus: string;
+            export const PreviousPage: string;
             export const RangeStatus: string;
+            export const Refresh: string;
+            export const RowsPerPage: string;
         }
         namespace PropertyGrid {
             export function asKey(): typeof PropertyGrid;

@@ -1,6 +1,7 @@
-﻿import { FormatterContext, FormatterResult, Group } from "@serenity-is/sleekgrid";
-import { PropertyItem } from "../base";
+﻿import { FormatterContext, FormatterResult, Group, ISleekGrid } from "@serenity-is/sleekgrid";
+import { PropertyItem, RenderableContent } from "../base";
 import { IAggregator } from "./aggregators";
+import type { PagingInfo } from "./iremoteview";
 
 /** Formatter function type that maps a formatter context to a result. @typeParam TItem - Row item type. */
 export type Format<TItem = any> = (ctx: FormatterContext<TItem>) => FormatterResult;
@@ -66,8 +67,30 @@ export interface GroupInfo<TItem> {
 export interface PagerOptions {
     /** Data view instance. */
     view?: any;
+    /**
+     * The grid that shows the rows of the view. It is given to a view that loads its rows as the grid is
+     * scrolled, see {@link IGridBoundView.bindToGrid}.
+     */
+    grid?: ISleekGrid;
+    /**
+     * Gets the content the pager shows before its controls, e.g. the totals of the page and of all the rows.
+     * It is called on every update, so it can follow the rows, and it is not shown when it returns nothing.
+     * A string is shown as text, so anything with markup is returned as an element or a fragment instead.
+     * The content is only rendered again when what it returns changes, so a function that builds a new
+     * element on every call renders on every update too.
+     * Default is what the view gives, see {@link IRemoteView.getPagingInfoText}.
+     */
+    getInfoText?: (info: PagingInfo) => RenderableContent;
     /** Whether to show rows-per-page selector. */
     showRowsPerPage?: boolean;
+    /**
+     * Whether to show the buttons that go to the first and last pages, which most pagers leave out, as
+     * the page box takes a number anyway. Shift+click on the previous and next buttons goes to the first and last
+     * pages instead, while they are left out. Default is `SlickPager.defaults.showFirstLast`, which is false.
+     */
+    showFirstLast?: boolean;
+    /** Whether to show a reload button. Default is true, even when the grid has a refresh button of its own. */
+    showReload?: boolean;
     /** Current rows per page. */
     rowsPerPage?: number;
     /** Choices for rows-per-page selector. */

@@ -4357,9 +4357,15 @@ declare namespace webTexts {
             const DefaultLoadError: string;
             const LoadingStatus: string;
             const NoRowStatus: string;
+            const FirstPage: string;
+            const LastPage: string;
+            const NextPage: string;
             const Page: string;
             const PageStatus: string;
+            const PreviousPage: string;
             const RangeStatus: string;
+            const Refresh: string;
+            const RowsPerPage: string;
         }
         namespace PropertyGrid {
             function asKey(): typeof PropertyGrid;
@@ -7047,6 +7053,26 @@ declare module "@serenity-is/sleekgrid" {
 /** Formatting helpers for aggregate / group-totals rows. */
 export declare namespace AggregateFormatting {
     /**
+     * Formats the value of an aggregate, e.g. a total, as the cells of a totals row show it, so that a text
+     * like the totals of a pager uses the same formatting. It uses the formatter of the column, and falls
+     * back to a number formatted by its display format.
+     * @param column - The column the aggregate belongs to.
+     * @param value - The value of the aggregate for that column.
+     * @param ctx - The formatter context to take the grid, escaping and sanitizer from, when available.
+     * @returns The formatted value, which may be markup when the column formatter returns an element.
+     */
+    function formatAggregateValue(column: Column, value: any, ctx?: Partial<FormatterContext>): FormatterResult;
+    /**
+     * Creates an element that shows the value of an aggregate, formatted as the cells of a totals row show
+     * it, e.g. to put it in the content a pager shows next to its controls. Use {@link formatAggregateValue}
+     * when the formatted value goes into a node of your own.
+     * @param column - The column the aggregate belongs to.
+     * @param value - The value of the aggregate for that column.
+     * @param ctx - The formatter context to take the grid, escaping and sanitizer from, when available.
+     * @returns An element with the formatted value.
+     */
+    function createAggregateValueNode(column: Column, value: any, ctx?: Partial<FormatterContext>): HTMLElement;
+    /**
      * Formats a group totals cell (aggregate badge/value) based on the column's summaryType.
      * @param ctx - Formatter context containing group totals item and column.
      * @returns Rendered aggregate markup or empty string.
@@ -7118,8 +7144,30 @@ export interface GroupInfo<TItem> {
 export interface PagerOptions {
     /** Data view instance. */
     view?: any;
+    /**
+     * The grid that shows the rows of the view. It is given to a view that loads its rows as the grid is
+     * scrolled, see {@link IGridBoundView.bindToGrid}.
+     */
+    grid?: ISleekGrid;
+    /**
+     * Gets the content the pager shows before its controls, e.g. the totals of the page and of all the rows.
+     * It is called on every update, so it can follow the rows, and it is not shown when it returns nothing.
+     * A string is shown as text, so anything with markup is returned as an element or a fragment instead.
+     * The content is only rendered again when what it returns changes, so a function that builds a new
+     * element on every call renders on every update too.
+     * Default is what the view gives, see {@link IRemoteView.getPagingInfoText}.
+     */
+    getInfoText?: (info: PagingInfo) => RenderableContent;
     /** Whether to show rows-per-page selector. */
     showRowsPerPage?: boolean;
+    /**
+     * Whether to show the buttons that go to the first and last pages, which most pagers leave out, as
+     * the page box takes a number anyway. Shift+click on the previous and next buttons goes to the first and last
+     * pages instead, while they are left out. Default is `SlickPager.defaults.showFirstLast`, which is false.
+     */
+    showFirstLast?: boolean;
+    /** Whether to show a reload button. Default is true, even when the grid has a refresh button of its own. */
+    showReload?: boolean;
     /** Current rows per page. */
     rowsPerPage?: number;
     /** Choices for rows-per-page selector. */
@@ -7967,6 +8015,14 @@ export interface IRemoteView<TItem = any> extends IDataView<TItem> {
      */
     getPagingInfo(): PagingInfo;
     /**
+     * Gets the content a pager can show before its controls, e.g. the totals of the page and of all the
+     * rows. The pager calls it on every update, and shows nothing when it returns nothing, so a view
+     * without aggregates does not have to implement it. A string is shown as text, so anything with
+     * markup is returned as an element or a fragment instead.
+     * @returns The content to show, or nothing.
+     */
+    getPagingInfoText?(): RenderableContent;
+    /**
      * Gets the row index for an item by its ID.
      * @param id The ID of the item
      * @returns The row index of the item
@@ -8126,6 +8182,18 @@ export interface IRemoteView<TItem = any> extends IDataView<TItem> {
 /**
  * Information about the current paging state of the view
  */
+/**
+ * The rows a pager tells of, by their numbers, when the view shows a range of them instead of a page of
+ * them, e.g. the rows it has loaded, or the ones in the viewport of the grid.
+ */
+export interface PagingRowRange {
+    /** The number of the first row shown, starting from 1. */
+    from: number;
+    /** The number of the last row shown, starting from 1. */
+    to: number;
+    /** The number of all the rows, which is not set when it is not known. */
+    total?: number;
+}
 export interface PagingInfo {
     /** Reference to the RemoteView instance */
     dataView: IRemoteView<any>;
@@ -8149,6 +8217,28 @@ export interface PagingInfo {
     indeterminate?: boolean;
     /** Whether there are more rows after the current page, for a view that is {@link indeterminate}. */
     hasMore?: boolean;
+    /**
+     * Whether the view shows a page of the rows, or a range of them, e.g. the rows it has loaded, or the
+     * ones in the viewport of the grid. A range view has no pages, so a pager shows no page navigation
+     * for it. It is set even before there are any rows, so that a pager knows its layout from the start.
+     * Default is `"pages"`.
+     */
+    pagingMode?: "pages" | "rows";
+    /**
+     * The rows a pager tells of when {@link pagingMode} is `"rows"`. It is not set when there are none yet.
+     */
+    rowRange?: PagingRowRange;
+}
+/**
+ * A view that loads its rows as the grid it is bound to is scrolled, so it needs to know the grid, e.g.
+ * to load the next rows when its viewport gets near the last one.
+ */
+export interface IGridBoundView<TItem = any> extends IRemoteView<TItem> {
+    /**
+     * Binds the view to a grid, so it loads its rows as the grid is scrolled.
+     * @param grid - The grid that shows the rows of the view.
+     */
+    bindToGrid(grid: ISleekGrid): void;
 }
 /**
  * Callback function that can cancel a view operation
@@ -12360,18 +12450,35 @@ export declare class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
     protected getDialogType(): DialogType | PromiseLike<DialogType>;
 }
 /**
- * Pager widget for SlickGrid / SleekGrid views that provides page navigation,
- * page size selection, and status information.
+ * Pager widget for SlickGrid / SleekGrid views that provides page navigation, page size selection, and
+ * status information. A view that shows a range of the rows instead of a page of them, e.g. the rows it
+ * has loaded as the grid is scrolled, gets no page navigation, and a status that tells of its range.
  * @typeParam P - Options type for the widget.
  */
 export declare class SlickPager<P extends PagerOptions = PagerOptions> extends Widget<P> {
     static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
+    /**
+     * The defaults of the options of every pager, which a pager or an application can change, e.g. to
+     * bring back the first and last page buttons that most pagers leave out, as the page box takes a
+     * number anyway.
+     */
+    static readonly defaults: PagerOptions;
     private currentPage;
     private totalPages;
     private pageSize;
     private stat;
+    private extra;
+    private firstButton;
+    private prevButton;
     private nextButton;
+    private lastButton;
     private indeterminate;
+    /** Whether the view shows a range of the rows instead of a page of them, so there is no page navigation. */
+    private rowsMode;
+    /** What the extra content of the last update was, so it is not rendered again when it did not change. */
+    private lastExtra;
+    /** The subscription to the paging info of the view, which is removed when the pager is destroyed. */
+    private pagingInfoChanged;
     /**
      * Creates a pager for the view specified in the options.
      * @param props - Widget props including the view to page.
@@ -12383,6 +12490,32 @@ export declare class SlickPager<P extends PagerOptions = PagerOptions> extends W
      * @returns True if the page change was handled, false otherwise.
      */
     _changePage(ctype: string): boolean;
+    /**
+     * Dims a navigation button that can't go anywhere, and tells it to assistive technology.
+     * @param button - The button to set the state of.
+     * @param disabled - Whether the button is disabled.
+     */
+    protected setDisabled(button: HTMLDivElement, disabled: boolean): void;
+    /**
+     * Shows the extra content the grid or the view gives before the controls, e.g. the totals of the page
+     * and of all the rows. A string is text, an element or a fragment is appended as it is, so the pager
+     * never parses markup. It is only rendered again when the content changes.
+     * @param info - The paging info of the view.
+     */
+    protected updateExtra(info: PagingInfo): void;
+    /**
+     * Removes the subscription to the view, so a view that outlives its pager does not keep updating it.
+     * The grid binding of a scroll view is left alone, as the view belongs to the grid, which may set
+     * another pager for it.
+     */
+    destroy(): void;
+    /**
+     * Gets the rows the pager tells of, which the view gives for a range view, and are the rows of its
+     * current page for a paged one.
+     * @param info - The paging info of the view.
+     * @returns The rows, or null when there are none.
+     */
+    protected getRowRange(info: PagingInfo): PagingRowRange;
     /**
      * Refreshes the pager UI from the current view paging info.
      */

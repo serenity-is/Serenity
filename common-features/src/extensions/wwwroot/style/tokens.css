@@ -54,9 +54,16 @@
  *   --s-header-chrome-default  1 or 0, the theme's choice for --s-header-chrome (default: 1)
  *   --s-row-hover-bg           tint over the background of the grid data row under the mouse
  *                              (default: transparent, no hover effect)
+ *   --s-pager-btn-border       border of the icon buttons of a pager (default: --bs-border-color)
+ *   --s-pager-btn-bg           background of the icon buttons of a pager (default: transparent)
+ *   --s-pager-btn-radius       corner radius of the icon buttons of a pager (default: 0.375rem)
  *   --s-group-row-bg           background of the group header rows of grids, which are not
  *                              striped like the data rows (default: a light blue, a bit stronger
  *                              than the alternate rows)
+ *   --s-footer-row-bg          background of the footer row of a grid, e.g. one with totals (default:
+ *                              --s-column-header-bg, the background of the column headers)
+ *   --s-footer-row-border      the lines above and below the footer row of a grid, like the ones of the
+ *                              grouping panel (default: --bs-border-color)
  *   --s-group-totals-bg, --s-group-totals-border, --s-group-totals-text
  *                              background, top border and text of the group totals rows of grids
  *                              (default: a light blue background with blue text)
@@ -118,7 +125,7 @@
   --s-column-header: var(--bs-secondary);
   --s-column-header-hover-bg: rgba(68, 129, 239, 0.05);
   --s-column-header-border: #ebeff2;
-  --s-column-footer: #3cacbf;
+  --s-column-footer: var(--bs-body-color);
   --s-row-active-bg: rgba(var(--bs-primary-rgb), 0.20);
   --s-cell-active-bg: rgb(0, 114, 255, 0.2);
   --s-pager-icon: #5b3df1;

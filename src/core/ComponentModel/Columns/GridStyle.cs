@@ -6,7 +6,7 @@ namespace Serenity.ComponentModel;
 /// What a grid hides of the look its theme gives to grids, like the stripes of its rows, so it looks more like a plain table.
 /// The members are flags, so they can be combined. A grid that has none of them, or has no style, looks as the theme says.
 /// </summary>
-[Flags]
+[EnumKey("Serenity.GridStyle"), Flags]
 public enum GridStyle
 {
     /// <summary>

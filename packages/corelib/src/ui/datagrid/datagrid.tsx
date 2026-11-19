@@ -1049,7 +1049,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
      * Creates the pager widget for this grid.
      */
     protected createPager(): void {
-        new SlickPager({ ...this.getPagerOptions(), element: el => this.domNode.append(el) });
+        new SlickPager({ ...this.getPagerOptions(), grid: this.sleekGrid, element: el => this.domNode.append(el) });
     }
 
     /**
