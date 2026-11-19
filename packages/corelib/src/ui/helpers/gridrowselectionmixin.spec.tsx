@@ -51,6 +51,73 @@ describe("GridRowSelectionMixin", () => {
         });
     });
 
+    describe("tryGetInstance", () => {
+        it("finds the mixin of a grid, and forgets it when it is destroyed", () => {
+            const mixin = new GridRowSelectionMixin(mockGrid);
+
+            expect(GridRowSelectionMixin.tryGetInstance(mockGrid)).toBe(mixin);
+            expect(GridRowSelectionMixin.tryGetInstance(gridObj)).toBe(mixin);
+
+            mixin.destroy();
+
+            expect(GridRowSelectionMixin.tryGetInstance(mockGrid)).toBeNull();
+            expect(GridRowSelectionMixin.tryGetInstance(gridObj)).toBeNull();
+        });
+
+        it("returns null for a grid without a mixin", () => {
+            expect(GridRowSelectionMixin.tryGetInstance(mockGrid)).toBeNull();
+        });
+    });
+
+    describe("the state of the checked rows", () => {
+        it("tells the keys, their number, and how many of them the page has", () => {
+            viewObj.getLength = vi.fn(() => 3);
+            viewObj.getItem = vi.fn((row: number) => [{ id: 1 }, { id: 2 }, { id: 3 }][row]);
+            const mixin = new GridRowSelectionMixin(mockGrid);
+
+            mixin.selectKeys(["1", "2", "3", "9"]);
+
+            expect(mixin.getSelectionState()).toEqual({
+                keys: ["1", "2", "3", "9"],
+                count: 4,
+                onPage: 3,
+                selectableOnPage: 3
+            });
+        });
+
+        it("keeps the rows of a group or of the totals out of the page counts", () => {
+            viewObj.getLength = vi.fn(() => 3);
+            viewObj.getItem = vi.fn((row: number) => [
+                { id: 1 },
+                { __group: true, __nonDataRow: true, key: "g" },
+                { __groupTotals: true, __nonDataRow: true, id: 2 }
+            ][row]);
+            const mixin = new GridRowSelectionMixin(mockGrid);
+
+            mixin.selectKeys(["1", "2"]);
+
+            expect(mixin.getSelectionState()).toMatchObject({ count: 2, onPage: 1, selectableOnPage: 1 });
+        });
+
+        it("is notified to the subscribers after a change", () => {
+            viewObj.getLength = vi.fn(() => 1);
+            viewObj.getItem = vi.fn(() => ({ id: 1 }));
+            const mixin = new GridRowSelectionMixin(mockGrid);
+            const changed = vi.fn();
+            mixin.onSelectionChanged.subscribe(changed);
+
+            mixin.selectKeys(["1"]);
+            expect(changed).toHaveBeenLastCalledWith(expect.objectContaining({ count: 1, onPage: 1 }));
+
+            mixin.clear();
+            expect(changed).toHaveBeenLastCalledWith(expect.objectContaining({ count: 0, onPage: 0 }));
+
+            mixin.destroy();
+            mixin.updateSelectAll();
+            expect(changed).toHaveBeenCalledTimes(2);
+        });
+    });
+
     describe("the selected rows", () => {
         it("adds the checked-row class through the metadata of the view, keeping the classes it gives", () => {
             let callback: any;
@@ -384,6 +451,25 @@ describe("GridRowSelectionMixin", () => {
             expect(column.headerCssClass).toBe("select-all-header");
             // the group cell and the indentation of the data rows start after this column
             expect(column.skipGroupCell).toBe(true);
+        });
+
+        it("finds the mixin of the grid that is rendered, when it is not given a getter", () => {
+            const mixin = new GridRowSelectionMixin(mockGrid);
+            mixin.selectKeys(["1"]);
+            const column = GridRowSelectionMixin.createSelectColumn({ frozen: "start" });
+
+            expect(column.frozen).toBe("start");
+
+            const checked = column.format({ item: { id: 1 }, grid: gridObj } as any) as HTMLElement;
+            expect(checked.className).toContain("select-item");
+            expect(checked.className).toContain("checked");
+
+            const unchecked = column.format({ item: { id: 2 }, grid: gridObj } as any) as HTMLElement;
+            expect(unchecked.className).toContain("select-item");
+            expect(unchecked.className).not.toContain("checked");
+
+            // a grid without a mixin shows no checkbox
+            expect(column.format({ item: { id: 1 }, grid: {} } as any)).toBe("");
         });
 
         it("format returns empty string when mixin is null", () => {
