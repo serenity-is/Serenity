@@ -3482,6 +3482,16 @@ export interface PropertyItemsData {
  * Prefer {@link UIFieldSet} for new code; `PropertyItemsData` is kept for compatibility.
  */
 export type UIFieldSet = PropertyItemsData;
+/** A simple publisher-subscriber implementation. */
+export declare class PubSub<TEvent = {}> {
+    #private;
+    subscribe(fn: (e: TEvent) => void): void;
+    unsubscribe(fn: (e: TEvent) => void): void;
+    notify(e: TEvent, opt?: {
+        isCancelled: (e: TEvent) => boolean;
+    }): void;
+    clear(): void;
+}
 /**
  * Gets the known hash value for a given dynamic script name. They are usually
  * registered server-side via dynamic script manager and their latest known
@@ -9273,16 +9283,6 @@ export declare class ColumnPickerDialog<P extends ColumnPickerDialogOptions = Co
      * @param opt - Options for the dialog.
      */
     static openDialog(opt: ColumnPickerDialogOptions): void;
-}
-/** A simple publisher-subscriber implementation. */
-declare class PubSub<TEvent = {}> {
-    #private;
-    subscribe(fn: (e: TEvent) => void): void;
-    unsubscribe(fn: (e: TEvent) => void): void;
-    notify(e: TEvent, opt?: {
-        isCancelled: (e: TEvent) => boolean;
-    }): void;
-    clear(): void;
 }
 /**
  * Props for editor widgets, extending widget props with editor-specific options.
