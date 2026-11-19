@@ -16,6 +16,20 @@ function createGrid() {
     return { el, grid, signals: (grid as any)._signals };
 }
 
+describe("the active row highlight", () => {
+    it("is off by default, and the container tells when it is asked for", () => {
+        const { el, grid } = createGrid();
+
+        expect(el.classList.contains("slick-highlight-active-row")).toBe(false);
+
+        grid.setOptions({ highlightActiveRow: true });
+        expect(el.classList.contains("slick-highlight-active-row")).toBe(true);
+
+        grid.setOptions({ highlightActiveRow: false });
+        expect(el.classList.contains("slick-highlight-active-row")).toBe(false);
+    });
+});
+
 describe("the frozen and pinned parts of the container", () => {
     it("tells whether the pinned bands and the frozen panes are there, as the layout pins and freezes", () => {
         // the columns are pinned by the layout, from their size, so the counts are set on its signals here,

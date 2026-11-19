@@ -2,6 +2,7 @@ import { Column } from "@serenity-is/sleekgrid";
 import { describe, expect, it, vi } from "vitest";
 import { Fluent } from "../../base";
 import { ScriptData } from "../../compat";
+import { GridRowSelectionMixin } from "../helpers/gridrowselectionmixin";
 import { DataGrid, omitAllGridPersistenceFlags } from "./datagrid";
 import { dataGridDefaults } from "./datagrid-defaults";
 import { GridStyle } from "./gridstyle";
@@ -14,6 +15,46 @@ function createGrid(): DataGrid<any, any> {
 function getIdProperty(grid: DataGrid<any, any>): string {
     return grid["getIdProperty"]();
 }
+
+describe('DataGrid.ensureRowSelection', () => {
+    function gridWithColumns(columns: Column[]): DataGrid<any, any> {
+        class TestGrid extends DataGrid<any, any> { }
+        const grid = new TestGrid({});
+        const event = () => ({ subscribe: vi.fn(), unsubscribe: vi.fn() });
+        (grid as any)._grid = {
+            getColumns: () => columns,
+            onClick: event(),
+            onHeaderClick: event(),
+            onKeyDown: event()
+        };
+        (grid.view as any).idProperty = "Id";
+        return grid;
+    }
+
+    it("creates the mixin for the column of the check boxes of a columns class", () => {
+        const grid = gridWithColumns([
+            GridRowSelectionMixin.createSelectColumn(),
+            { id: "Name", field: "Name" } as Column
+        ]);
+
+        grid["initRowSelector"]();
+
+        expect(GridRowSelectionMixin.tryGetInstance(grid)).toBeInstanceOf(GridRowSelectionMixin);
+
+        // a second call does not create another one
+        const first = GridRowSelectionMixin.tryGetInstance(grid);
+        grid["initRowSelector"]();
+        expect(GridRowSelectionMixin.tryGetInstance(grid)).toBe(first);
+
+        first.destroy();
+    });
+
+    it("does nothing for a grid without the column", () => {
+        const plain = gridWithColumns([{ id: "Name", field: "Name" } as Column]);
+        plain["initRowSelector"]();
+        expect(GridRowSelectionMixin.tryGetInstance(plain)).toBeNull();
+    });
+});
 
 describe('DataGrid.getIdProperty', () => {
     it('returns ID by default', () => {

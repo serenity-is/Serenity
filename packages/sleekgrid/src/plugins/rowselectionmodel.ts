@@ -44,7 +44,13 @@ export class RowSelectionModel implements GridPlugin, SelectionModel {
     /** Resolved options merged with {@link RowSelectionModel.defaults}. */
     declare private options: RowSelectionModelOptions;
     /** Internal full-width ranges representing selected rows. */
-    declare private ranges: CellRange[];
+    private ranges: CellRange[] = [];
+
+    /**
+     * The row the selection was last made from, which the arrow keys extend it from when the grid has no
+     * active cell to take that place, e.g. a grid without cell navigation.
+     */
+    private anchorRow: number | null = null;
     /** Emits when selected ranges change; used by the grid to update UI state. */
     onSelectedRangesChanged: EventEmitter<CellRange[]> = new EventEmitter<CellRange[]>();
 
@@ -112,6 +118,7 @@ export class RowSelectionModel implements GridPlugin, SelectionModel {
      * @param rows - Row indices to select.
      */
     setSelectedRows(rows: number[]): void {
+        this.anchorRow = rows?.length ? rows[rows.length - 1] : null;
         this.setSelectedRanges(this.rowsToRanges(rows));
     }
 
@@ -137,32 +144,36 @@ export class RowSelectionModel implements GridPlugin, SelectionModel {
 
     private handleActiveCellChange({ row }: CellEvent) {
         if (this.options.selectActiveRow && row != null) {
+            this.anchorRow = row;
             this.setSelectedRanges([new CellRange(row, 0, row, this.grid.getColumns().length - 1)]);
         }
     }
 
     private handleKeyDown(e: KeyboardEvent) {
-        let activeRow = this.grid.getActiveCell();
-        if (!(activeRow && e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey && ((e as any).which == 38 || (e as any).which == 40)))
+        const which = (e as any).which;
+        if (!(e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey && (which == 38 || which == 40)))
             return;
 
-        let selectedRows = this.getSelectedRows();
-        selectedRows.sort(function (x, y) {
-            return x - y
-        });
+        const selectedRows = this.getSelectedRows();
+        selectedRows.sort((x, y) => x - y);
 
-        if (!selectedRows.length) {
-            selectedRows = [activeRow.row];
-        }
+        // the keys move the end of the selection that is at the side of the active cell, and a grid without
+        // cell navigation has no active cell, so the selection itself is where they move from
+        const activeRow = this.grid.getActiveCell()?.row ?? this.anchorRow;
+        if (activeRow == null)
+            return;
+
+        if (!selectedRows.length)
+            selectedRows.push(activeRow);
 
         let top = selectedRows[0];
         let bottom = selectedRows[selectedRows.length - 1];
         let active;
 
-        if ((e as any).which == 40) {
-            active = activeRow.row < bottom || top == bottom ? ++bottom : ++top;
+        if (which == 40) {
+            active = activeRow < bottom || top == bottom ? ++bottom : ++top;
         } else {
-            active = activeRow.row < bottom ? --bottom : --top;
+            active = activeRow < bottom ? --bottom : --top;
         }
 
         if (active >= 0 && active < this.grid.getDataLength()) {
@@ -176,13 +187,38 @@ export class RowSelectionModel implements GridPlugin, SelectionModel {
     }
 
     private handleClick(e: MouseEvent) {
-        let cell = this.grid.getCellFromEvent(e);
-        if (!cell || !this.grid.canCellBeActive(cell.row, cell.cell)) {
+        const cell = this.grid.getCellFromEvent(e);
+        if (!cell || !this.grid.canCellBeSelected(cell.row, cell.cell)) {
             return false;
         }
 
-        if (!this.grid.getOptions().multiSelect || (
-            !e.ctrlKey && !e.shiftKey && !e.metaKey)) {
+        const withModifiers = e.ctrlKey || e.shiftKey || e.metaKey;
+        const cellNavigation = this.grid.getOptions().enableCellNavigation;
+        const canBeActive = this.grid.canCellBeActive(cell.row, cell.cell);
+        const multiSelect = this.grid.getOptions().multiSelect;
+
+        if (!withModifiers) {
+            // a grid with cell navigation selects the row of the cell that becomes the active one, which
+            // the grid does after this, and a cell that cannot be active leaves the selection alone
+            if (cellNavigation)
+                return false;
+
+            // a grid without cell navigation has no active cell to follow, so a plain click selects the row
+            // it is on, and the model works for a grid that selects rows rather than moving a cursor around
+            // a click that selects nothing is left to the other handlers of the grid
+            if (!this.options.selectActiveRow)
+                return false;
+
+            this.anchorRow = cell.row;
+            this.setSelectedRanges(this.rowsToRanges([cell.row]));
+            e.stopImmediatePropagation();
+            return true;
+        }
+
+        // the rows a modified click extends are the ones of the selection, not the one of the active cell,
+        // so it works in a grid without cell navigation too, where a cell that cannot be active is only one
+        // that cannot be selected, which is checked above
+        if (!multiSelect || (cellNavigation && !canBeActive)) {
             return false;
         }
 
@@ -211,6 +247,7 @@ export class RowSelectionModel implements GridPlugin, SelectionModel {
             this.grid.setActiveCell(cell.row, cell.cell);
         }
 
+        this.anchorRow = cell.row;
         this.ranges = this.rowsToRanges(selection);
         this.setSelectedRanges(this.ranges);
         e.stopImmediatePropagation();

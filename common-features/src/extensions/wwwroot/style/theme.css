@@ -3845,12 +3845,25 @@ button.panel-titlebar-close::after {
   display: none;
 }
 
-.slick-row.active {
+/* cell navigation marks the cell that has the cursor, so only the cell is tinted, and the row is tinted
+   only when the grid asks for it with the highlightActiveRow option, e.g. a grid that is edited a row at
+   a time, where the row of the cursor is the row being edited */
+.slick-highlight-active-row .slick-row.active {
   background-color: var(--s-row-active-bg);
 }
 
 .slick-cell.active {
   background-color: var(--s-cell-active-bg);
+  /* a ring around the cell that has the cursor, which says where the cursor is without moving the cell,
+     as a box shadow does not take room, like the themes of SlickGrid do */
+  box-shadow: inset 0 0 0 1px var(--s-cell-active-ring);
+}
+
+/* the cells of a selection range, which the selected cell css class of the grid marks, are filled, like
+   the selected cells of the themes of SlickGrid, which leave their borders alone as the grid measures the
+   cells by them; an outline around the range, if wanted, is a decorating element drawn over it */
+.slick-cell.selected {
+  background-color: var(--s-cell-selected-bg);
 }
 
 .slick-cell.editable {

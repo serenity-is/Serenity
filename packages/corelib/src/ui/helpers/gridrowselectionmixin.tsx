@@ -1,5 +1,5 @@
 import { bindThis } from "@serenity-is/domwise";
-import { Column, Group, type ArgsCell, type CellKeyboardEvent, type ISleekGrid, type ItemMetadata } from "@serenity-is/sleekgrid";
+import { Column, Group, type ArgsCell, type CellKeyboardEvent, type FormatterContext, type FormatterResult, type ISleekGrid, type ItemMetadata } from "@serenity-is/sleekgrid";
 import { classTypeInfo, Fluent, nsSerenity, PubSub, registerType } from "../../base";
 import { clearKeys } from "../../compat";
 import type { IRemoteView } from "../../slick/iremoteview";
@@ -47,8 +47,38 @@ export class GridRowSelectionMixin {
 
     static [Symbol.typeInfo] = classTypeInfo(nsSerenity); static { registerType(this); }
 
-    /** The id of the column that the mixin adds, which shows the checkboxes of the rows. */
+    /** The id of the column that shows the checkboxes of the rows, which the mixin creates. */
     static readonly selectColumnId = "__select__";
+
+    /**
+     * Formats a cell of the column of the checkboxes that select the rows, and is also what tells that
+     * column apart from the others, see {@link isSelectColumn}. It is a static method, instead of a closure
+     * of {@link createSelectColumn}, so that the same function is the format of every such column, and the
+     * column can be found whatever its id is.
+     * @param ctx - The formatter context.
+     * @returns The check box of the row, or an empty string for a row that has none.
+     */
+    static formatSelectItem(ctx: FormatterContext): FormatterResult {
+        const item = ctx.item;
+        // the mixin of the grid that is rendered, which is the one the grid or the page created for it
+        const mixin = GridRowSelectionMixin.tryGetInstance(ctx.grid);
+        if (!mixin)
+            return '';
+
+        // the group cell starts after the select column, so the rows of a group show it too,
+        // and it selects and deselects all the rows of the group
+        if ((item as Group)?.__group) {
+            const cssClass = mixin.getGroupCheckBoxCssClass(item as Group);
+            return cssClass == null ? '' :
+                <span class={'select-item check-box no-float' + cssClass}></span>;
+        }
+
+        if (!mixin.isSelectable(item))
+            return '';
+
+        const isChecked = mixin.include[ctx.item[mixin.idField]];
+        return <span class={'select-item check-box no-float' + (isChecked ? ' checked' : '')}></span>;
+    }
 
     /**
      * The css class of the rows that are checked, which is not the one the selection models of the grid
@@ -64,9 +94,11 @@ export class GridRowSelectionMixin {
     declare private itemMetadata: (item: any, row: number) => ItemMetadata<any>;
     /**
      * Notified with the state of the checked rows, after every change of them, e.g. to enable or disable
-     * the actions of a bar that acts on them.
+     * the actions of a bar that acts on them. A mixin that replaces another one for the same grid keeps the
+     * subscribers of it, as the rows are the same ones, so a widget that was given the one before it goes
+     * on being told about them.
      */
-    readonly onSelectionChanged = new PubSub<GridRowSelectionState>();
+    onSelectionChanged = new PubSub<GridRowSelectionState>();
 
     /**
      * Creates a new GridRowSelectionMixin for the given grid.
@@ -79,6 +111,18 @@ export class GridRowSelectionMixin {
         this.grid = grid;
         this.idField = grid.getView().getIdPropertyName();
         this.options = options || {};
+
+        // the grid makes a mixin for the select column of its columns, and a page may make one of its own
+        // as well, e.g. in its constructor, so the later one replaces the earlier one, as leaving the
+        // handlers of the earlier one on the grid would toggle a check box twice; the subscribers of the
+        // checked rows go on with the new one, e.g. a bar of them that was made for the grid
+        const previous = instances.get(grid.getGrid());
+        if (previous && previous !== this) {
+            this.onSelectionChanged = previous.onSelectionChanged;
+            previous.onSelectionChanged = new PubSub<GridRowSelectionState>();
+            previous.destroy();
+        }
+
         instances.set(grid.getGrid(), this);
         const boundThis = bindThis(this);
         grid.getGrid().onClick.subscribe(boundThis.handleGridClick);
@@ -120,10 +164,13 @@ export class GridRowSelectionMixin {
      */
     destroy(): void {
         this.include = Object.create(null);
+        // the subscribers go with the mixin, e.g. a bar of the checked rows that outlives it
+        this.onSelectionChanged?.clear();
         this.grid?.getGrid()?.onClick?.unsubscribe(this.handleGridClick);
         this.grid?.getGrid()?.onHeaderClick?.unsubscribe(this.handleHeaderClick);
         this.grid?.getGrid()?.onKeyDown?.unsubscribe(this.handleGridKeyDown);
-        (this.grid?.getView() as IRemoteView).onRowsChanged?.unsubscribe(this.updateSelectAll);
+        // it may be destroyed twice, e.g. when a page destroys the mixin that a newer one replaced
+        (this.grid?.getView() as IRemoteView)?.onRowsChanged?.unsubscribe(this.updateSelectAll);
         (this.grid?.getView() as IRemoteView)?.setItemMetadataCallback?.(this.itemMetadata);
         instances.delete(this.grid?.getGrid());
         delete this.itemMetadata;
@@ -172,8 +219,9 @@ export class GridRowSelectionMixin {
      * @returns The index of the column, or `null` when the grid has no select column.
      */
     private getSelectColumnIndex(grid?: ISleekGrid): number | null {
-        const index = (grid ?? this.grid?.getGrid())?.getColumnIndex?.(GridRowSelectionMixin.selectColumnId);
-        return index == null || index < 0 ? null : index;
+        const columns = (grid ?? this.grid?.getGrid())?.getColumns?.() ?? [];
+        const index = columns.findIndex(GridRowSelectionMixin.isSelectColumn);
+        return index < 0 ? null : index;
     }
 
     /**
@@ -242,20 +290,21 @@ export class GridRowSelectionMixin {
     }
 
     /**
-     * Returns the ids of the rows of a group that can be selected, so that the checkbox of the row of
-     * the group can select and deselect them.
+     * Returns the ids of the rows of a group that can be selected, so that the checkbox of the row of the
+     * group can select and deselect them.
      * @param group - The group of the row.
-     * @returns The ids, or `null` when the group can't be selected or its rows are not all known,
-     * e.g. when the view loads them from the server as they are needed.
+     * @returns The ids, or `null` when the group can't be selected, or the view has none of its rows, e.g.
+     * when it gets them from the server only as they are needed.
      */
     private getGroupIds(group: Group<any>): string[] | null {
         if (this.options.selectGroups === false)
             return null;
 
         const rows = this.collectGroupRows(group);
-        // a view that has the rows of a group on the client knows all of them, e.g. the number of the
-        // rows of a virtual scroll view is known from the group, but not the rows themselves
-        if (!rows.size || rows.size !== group.count)
+        // a group may have more rows than the ones the view has, e.g. when the view pages them or gets
+        // them from the server, and its checkbox is about the ones that are there, like the select all of
+        // the header is about the rows of the page, as the ids of the rest are not known to select them
+        if (!rows.size)
             return null;
 
         const ids = [...rows.keys()].filter(id => this.isSelectable(rows.get(id)));
@@ -361,18 +410,28 @@ export class GridRowSelectionMixin {
     }
 
     /**
-     * Clears the current selection.
+     * Clears the checked rows, and repaints the rows, so that the check boxes and the rows that are told
+     * apart by {@link checkedRowClass} are shown unchecked right away.
      */
     clear(): void {
         clearKeys(this.include);
+        if (!this.grid)
+            return;
+
+        this.grid.getGrid().invalidate();
         this.updateSelectAll();
     }
 
     /**
-     * Clears the current selection and refreshes the grid view.
+     * Clears the checked rows, and refreshes the grid view, e.g. after the rows are changed, so that the
+     * groups and the filters of the view are applied again, as well as the check boxes of the rows.
      */
     resetCheckedAndRefresh(): void {
-        this.include = Object.create(null);
+        clearKeys(this.include);
+        if (!this.grid)
+            return;
+
+        // the rows are rendered again by the view it populates, so it does not invalidate them as well
         this.updateSelectAll();
         this.grid.getView().populate();
     }
@@ -438,6 +497,21 @@ export class GridRowSelectionMixin {
     }
 
     /**
+     * Whether a column is the column of the checkboxes that select the rows of this mixin, which is a
+     * utility column of the grid and not a data column, e.g. for the column picker or an export that leaves
+     * it out. The column is told apart by its format function, which {@link formatSelectItem} sets, rather
+     * than by its id, as a columns class can declare it with a `RowSelectionColumn` attribute of the server.
+     * A column of the radio buttons of {@link GridRadioSelectionMixin} has an id of its own, so it is not
+     * taken for this one.
+     * @param column - The column to check.
+     */
+    static isSelectColumn(column: Column): boolean {
+        return column?.format === GridRowSelectionMixin.formatSelectItem ||
+            (column?.id === GridRowSelectionMixin.selectColumnId &&
+            column?.headerCssClass?.indexOf('select-all-header') >= 0);
+    }
+
+    /**
      * Creates a checkbox select column for the grid, including a select-all header.
      * @param getMixinOrOptions - A function that returns the mixin instance, or the options of the column.
      * When it is omitted, the mixin of the grid that is being rendered is used, which
@@ -452,8 +526,10 @@ export class GridRowSelectionMixin {
     static createSelectColumn(getMixinOrOptions?: (() => GridRowSelectionMixin) | Partial<Column>,
         columnOptions?: Partial<Column>): Column {
 
-        const getMixin: () => GridRowSelectionMixin = typeof getMixinOrOptions === "function" ?
-            getMixinOrOptions : null;
+        // the getter is not called any more, as the format of the column finds the mixin of the grid that
+        // is rendered, so a page that calls this with one keeps working as long as that is the mixin of
+        // its grid; it is kept so that the call does not have to change
+
         const options: Partial<Column> = typeof getMixinOrOptions === "function" ?
             columnOptions : getMixinOrOptions;
 
@@ -471,27 +547,7 @@ export class GridRowSelectionMixin {
             skipGroupCell: true,
             headerCssClass: 'select-all-header',
             sortable: false,
-            format: function (ctx) {
-                const item = ctx.item;
-                // the mixin of the grid that is rendered, when the column is not given a way to get it
-                const mixin = getMixin?.() ?? GridRowSelectionMixin.tryGetInstance(ctx.grid);
-                if (!mixin)
-                    return '';
-
-                // the group cell starts after the select column, so the rows of a group show it too,
-                // and it selects and deselects all the rows of the group
-                if ((item as Group)?.__group) {
-                    const cssClass = mixin.getGroupCheckBoxCssClass(item as Group);
-                    return cssClass == null ? '' :
-                        <span class={'select-item check-box no-float' + cssClass}></span>;
-                }
-
-                if (!mixin.isSelectable(item))
-                    return '';
-
-                const isChecked = mixin.include[ctx.item[mixin.idField]];
-                return <span class={'select-item check-box no-float' + (isChecked ? ' checked' : '')}></span>;
-            },
+            format: GridRowSelectionMixin.formatSelectItem,
             ...options
         };
     }

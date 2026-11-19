@@ -11,6 +11,7 @@ import { SelectEditor } from "../editors/selecteditor";
 import { FilterDisplayBar } from "../filtering/filterdisplaybar";
 import { FilterStore } from "../filtering/filterstore";
 import { EditLink, skipEditLinkFormatPurposes } from "../helpers/editlink";
+import { GridRowSelectionMixin } from "../helpers/gridrowselectionmixin";
 import { GridUtils } from "../helpers/gridutils";
 import { LazyLoadHelper } from "../helpers/lazyloadhelper";
 import { PropertyItemColumnConverter } from "../helpers/propertyitemcolumnconverter";
@@ -190,6 +191,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         const sleekGrid = (this as any).createSlickGrid();
         this._grid ??= sleekGrid;
         this.initSleekGrid();
+        this.initRowSelector();
 
         if (this.enableAdvancedFiltering()) {
             this.createFilterBar();
@@ -221,6 +223,32 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
             (restoreResult as Promise<void>).then(() => window.setTimeout(() => this.initialPopulate(), 0));
         else
             window.setTimeout(() => this.initialPopulate(), 0);
+    }
+
+    /**
+     * The mixin of the check boxes that select the rows of the grid, if it has one, e.g. when a page created
+     * it, or when a columns class declares the column with a `RowSelectionColumn` attribute and
+     * {@link ensureRowSelection} created it. It is not stored by the grid, as the mixin keeps itself in a
+     * registry, which {@link GridRowSelectionMixin.tryGetInstance} reads. It is named `rowSelector`, and not
+     * `rowSelection`, so that it does not clash with the field of the same name that the pages keep.
+     */
+    protected get rowSelector(): GridRowSelectionMixin {
+        return GridRowSelectionMixin.tryGetInstance(this);
+    }
+
+    /**
+     * Creates the row selection mixin of the grid when its columns have the column of the check boxes that
+     * select the rows, which a columns class gets with a `RowSelectionColumn` attribute of the server, so
+     * that a page does not have to create the mixin, nor add the column itself. The mixin keeps itself in a
+     * registry of its own, so a page that created one already keeps it, and the grid does not hold it.
+     */
+    protected initRowSelector(): void {
+        if (!this._grid ||
+            GridRowSelectionMixin.tryGetInstance(this) ||
+            !this._grid.getColumns()?.some(GridRowSelectionMixin.isSelectColumn))
+            return;
+
+        new GridRowSelectionMixin(this);
     }
 
     /**
@@ -455,6 +483,9 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
             this.toolbar.destroy();
             this.toolbar = null;
         }
+
+        // the mixin belongs to the grid, so it goes with it, whether a page created it or the grid did
+        GridRowSelectionMixin.tryGetInstance(this)?.destroy();
 
         if (this._grid) {
             this._grid.onClick.unsubscribe(this.handleGridClick);

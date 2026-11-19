@@ -193,6 +193,9 @@ function mockGrid() {
                 grid.onKeyDownList.splice(idx, 1);
             }
         } as any,
+        getTotalsFormatter: function(column: any) {
+            return (ctx: any) => "totals of " + (column?.id ?? "") + ":" + (ctx?.item?.field ?? "");
+        },
         getDataItemCalls: 0,
         getRenderedRangeCalls: 0,
         getRenderedRange: function() {
@@ -285,6 +288,22 @@ describe("GroupItemMetadataProvider.init", () => {
         expect(grid.onKeyDownList.length).toBe(1);
         plugin.destroy();
         expect(grid.onKeyDownList.length).toBe(0);
+    });
+
+    it("renders the rows again when it gets the grid later", () => {
+        // a view can make the provider before a grid is registered with it, and the columns of the grid
+        // decide where the group cell starts, e.g. which columns a group row keeps in front of it
+        const plugin = new GroupItemMetadataProvider();
+        const grid = mockGrid();
+        grid.invalidate = vi.fn();
+
+        plugin.setGrid(grid);
+        expect(grid.invalidate).toHaveBeenCalled();
+
+        // the same grid again changes nothing
+        grid.invalidate.mockClear();
+        plugin.setGrid(grid);
+        expect(grid.invalidate).not.toHaveBeenCalled();
     });
 
 });
@@ -487,14 +506,42 @@ describe("GroupItemMetadataProvider formatters and metadata", () => {
         const group = new Group();
         const metadata = provider.getGroupRowMetadata(group);
 
-        expect(metadata.format).toBe(provider.getOptions().totalsFormat);
         // starts after the summary column, and spans the columns that are not summaries
         expect(metadata.columns[1].colspan).toBe(2);
+        // only the summary column gets the totals formatter, and not the cells of the row as a whole
+        expect(metadata.format).toBeUndefined();
+        expect(metadata.columns[0].format).toBe(provider.getOptions().totalsFormat);
+        expect(metadata.columns[1].format).toBe(provider.getOptions().groupFormat);
+        expect(metadata.columns[2]).toBeUndefined();
 
         grid.getData = () => ({ getGrouping: () => totalsGrouping(true) } as any);
         // with a totals row of its own, the group cell covers the summary columns as well
         expect(provider.getGroupRowMetadata(group).format).toBeUndefined();
         expect(provider.getGroupRowMetadata(group).columns[0].colspan).toBe("*");
+    });
+
+    it("leaves the formatter of the columns a group row keeps in front of its group cell", () => {
+        const provider = new GroupItemMetadataProvider();
+        const grid = mockGrid();
+        const selectFormat = vi.fn(() => "check-box");
+        const columns: any[] = [
+            { id: "sel", name: "sel", format: selectFormat, skipGroupCell: true },
+            { id: "name", name: "name" },
+            { id: "total", name: "total", summaryType: 1 }
+        ];
+        grid.getColumns = () => columns;
+        grid.getData = () => ({ getGrouping: () => totalsGrouping("groupheader") } as any);
+        provider.init(grid);
+
+        const metadata = provider.getGroupRowMetadata(new Group());
+
+        // the group cell starts after the column that the group row keeps, e.g. the check boxes, and it
+        // gets no metadata of its own, so its own formatter stays, which a formatter of the row replaced
+        expect(metadata.columns[1].colspan).toBe(1);
+        expect(metadata.columns[0]).toBeUndefined();
+
+        // the summary column is the one that shows the totals of the group
+        expect(metadata.columns[2].format).toBe(provider.getOptions().totalsFormat);
     });
 
     it("returns group and totals row metadata using configured options", () => {
@@ -514,7 +561,9 @@ describe("GroupItemMetadataProvider formatters and metadata", () => {
 
         expect(groupMetadata.selectable).toBe(false);
         expect(groupMetadata.focusable).toBe(false);
-        expect(groupMetadata.format).toBe(provider.getOptions().totalsFormat);
+        // the summary column, and not the row, is what shows the totals of the group
+        expect(groupMetadata.format).toBeUndefined();
+        expect(groupMetadata.columns?.[0]?.format).toBe(provider.getOptions().totalsFormat);
         // the group cell starts after the summary column
         expect(groupMetadata.columns?.[1]?.editor).toBeNull();
         expect(totalsMetadata.focusable).toBe(true);

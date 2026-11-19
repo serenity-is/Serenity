@@ -1808,6 +1808,8 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     private setOptionDependentSignals() {
         const sig = this._signals;
         const opt = this._options;
+        // a style can tell the active cell from its row, but not whether the row should be highlighted
+        this._container?.classList.toggle("slick-highlight-active-row", opt.highlightActiveRow === true);
         sig.showColumnHeader.value = opt.showColumnHeader;
         sig.showTopPanel.value = opt.showTopPanel;
         sig.showHeaderRow.value = opt.showHeaderRow;

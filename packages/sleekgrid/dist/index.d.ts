@@ -1344,6 +1344,13 @@ export interface GridOptions<TItem = any> {
      */
     showCellSelection?: boolean;
     /**
+     * Defaults to `false`. If `true`, the row of the active cell is highlighted as well as the cell, e.g.
+     * for a grid that is edited a row at a time, where the row that has the cursor is the one being edited.
+     * It only shows when a style tells what the highlight is, e.g. through the `slick-highlight-active-row`
+     * class of the container, which this option sets.
+     */
+    highlightActiveRow?: boolean;
+    /**
      * Defaults to `true`. If `true`, displays the column header.
      */
     showColumnHeader?: boolean;
@@ -4345,6 +4352,11 @@ export declare class RowSelectionModel implements GridPlugin, SelectionModel {
     private options;
     /** Internal full-width ranges representing selected rows. */
     private ranges;
+    /**
+     * The row the selection was last made from, which the arrow keys extend it from when the grid has no
+     * active cell to take that place, e.g. a grid without cell navigation.
+     */
+    private anchorRow;
     /** Emits when selected ranges change; used by the grid to update UI state. */
     onSelectedRangesChanged: EventEmitter<CellRange[]>;
     /**

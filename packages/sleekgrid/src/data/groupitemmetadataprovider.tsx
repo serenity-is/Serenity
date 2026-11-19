@@ -219,7 +219,14 @@ export class GroupItemMetadataProvider implements GridPlugin {
      * @param grid - The grid that shows the rows the provider gives metadata for.
      */
     public setGrid(grid: ISleekGrid): void {
+        if (this.grid === grid)
+            return;
+
         this.grid = grid;
+
+        // the columns of the grid decide where the group cell starts, e.g. which columns a group row keeps
+        // in front of it, so the rows that were rendered before it had a grid have to be rendered again
+        grid?.invalidate?.();
     }
 
     /**
@@ -556,8 +563,16 @@ export class GroupItemMetadataProvider implements GridPlugin {
             }
         };
 
-        if (this.getTotalsDisplay(item?.level) === "groupheader")
-            result.format = opt.totalsFormat;
+        if (this.getTotalsDisplay(item?.level) === "groupheader") {
+            // the totals are in the summary columns, which the group cell leaves out, so only they get the
+            // totals formatter; a formatter of the row would replace the one of every cell of the row,
+            // including the columns it keeps in front of the group cell, e.g. the check boxes
+            const cols = this.grid?.getColumns?.() ?? [];
+            for (let idx = 0; idx < cols.length; idx++) {
+                if (opt.hasSummaryType?.(cols[idx]))
+                    result.columns[idx] = { format: opt.totalsFormat };
+            }
+        }
 
         return result;
     }

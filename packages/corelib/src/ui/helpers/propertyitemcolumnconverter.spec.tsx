@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { addLocalText, Authorization, Culture } from "../../base";
 import { DateFormatter } from "../formatters/dateformatter";
 import { DateTimeFormatter } from "../formatters/datetimeformatter";
+import { GridRowSelectionMixin } from "./gridrowselectionmixin";
 import { PropertyItemColumnConverter } from "./propertyitemcolumnconverter";
 
 describe('PropertyItemColumnConverter', () => {
@@ -24,6 +25,41 @@ describe('PropertyItemColumnConverter', () => {
             expect(result).toHaveLength(2);
             expect(result[0].field).toBe('Field1');
             expect(result[1].field).toBe('Field2');
+        });
+    });
+
+    describe('row selection column', () => {
+        it('converts the item of a columns class into the column of the check boxes', () => {
+            const column = PropertyItemColumnConverter.toColumn({
+                name: 'RowSelection', unbound: true, width: 27, minWidth: 27, maxWidth: 27
+            });
+
+            // the declared property is turned into the column the mixin creates, with its own id
+            expect(column.id).toBe("__select__");
+            expect(column.id).toBe(GridRowSelectionMixin.selectColumnId);
+            expect(column.field).toBeFalsy();
+            expect(column.skipGroupCell).toBe(true);
+            expect(column.headerCssClass).toBe('select-all-header');
+            expect(column.sortable).toBe(false);
+            expect(typeof column.format).toBe('function');
+            expect(typeof column.nameFormat).toBe('function');
+        });
+
+        it('keeps the width and the pinning of the item', () => {
+            const column = PropertyItemColumnConverter.toColumn({
+                name: 'RowSelection', unbound: true, pin: 'start', width: 30
+            });
+
+            expect(column.frozen).toBe('start');
+            expect(column.width).toBe(30);
+        });
+
+        it('leaves the other columns as they are', () => {
+            const column = PropertyItemColumnConverter.toColumn({ name: 'Name', title: 'Name' });
+
+            expect(column.id).toBeFalsy();
+            expect(column.field).toBe('Name');
+            expect(column.skipGroupCell).toBeFalsy();
         });
     });
 

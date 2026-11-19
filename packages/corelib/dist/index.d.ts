@@ -10811,6 +10811,206 @@ export declare class FilterDisplayBar<P = {}> extends FilterWidgetBase<P> {
     static createToolButton(opt: Partial<ToolButtonProps>): ToolButton;
 }
 /**
+ * Options for the {@link GridRowSelectionMixin}.
+ */
+export interface GridRowSelectionMixinOptions {
+    /**
+     * A function that determines whether an item can be selected.
+     */
+    selectable?: (item: any) => boolean;
+    /**
+     * Whether the checkbox of a group row selects all the rows of the group, and deselects them when
+     * they are all selected. Defaults to `true`. Set it to `false` for the views that don't have the
+     * rows of a group on the client, like a virtual scroll view, where the checkbox is hidden anyway
+     * because the ids of the rows are not known, or when the groups should not be selectable at all.
+     */
+    selectGroups?: boolean;
+}
+/**
+ * The state of the checked rows of a grid, as {@link GridRowSelectionMixin.getSelectionState} reports it.
+ */
+export interface GridRowSelectionState {
+    /** The keys of the checked rows, which may be on the pages the grid does not show. */
+    keys: string[];
+    /** The number of the checked rows, which is the length of {@link GridRowSelectionState.keys}. */
+    count: number;
+    /** The number of the checked rows that the page the grid shows has, e.g. to tell it apart from the rest. */
+    onPage: number;
+    /** The number of the rows of the page that can be checked, e.g. to tell whether all of them are. */
+    selectableOnPage: number;
+}
+/**
+ * A mixin that adds multi (checkbox) row selection behavior to a data grid,
+ * including a select-all header checkbox.
+ */
+export declare class GridRowSelectionMixin {
+    static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
+    /** The id of the column that shows the checkboxes of the rows, which the mixin creates. */
+    static readonly selectColumnId = "__select__";
+    /**
+     * Formats a cell of the column of the checkboxes that select the rows, and is also what tells that
+     * column apart from the others, see {@link isSelectColumn}. It is a static method, instead of a closure
+     * of {@link createSelectColumn}, so that the same function is the format of every such column, and the
+     * column can be found whatever its id is.
+     * @param ctx - The formatter context.
+     * @returns The check box of the row, or an empty string for a row that has none.
+     */
+    static formatSelectItem(ctx: FormatterContext): FormatterResult;
+    /**
+     * The css class of the rows that are checked, which is not the one the selection models of the grid
+     * add to the cells of a selection range, so the two can be styled apart.
+     */
+    static readonly checkedRowClass = "checked-row";
+    private idField;
+    private include;
+    private grid;
+    private options;
+    /** What the view used to tell the css classes of a row before the mixin, restored when it is destroyed. */
+    private itemMetadata;
+    /**
+     * Notified with the state of the checked rows, after every change of them, e.g. to enable or disable
+     * the actions of a bar that acts on them. A mixin that replaces another one for the same grid keeps the
+     * subscribers of it, as the rows are the same ones, so a widget that was given the one before it goes
+     * on being told about them.
+     */
+    onSelectionChanged: PubSub<GridRowSelectionState>;
+    /**
+     * Creates a new GridRowSelectionMixin for the given grid.
+     * @param grid - The data grid to attach the mixin to.
+     * @param options - Optional mixin options.
+     */
+    constructor(grid: IDataGrid, options?: GridRowSelectionMixinOptions);
+    /**
+     * Returns the mixin attached to a grid, if it has one, e.g. for the column that shows the checkboxes,
+     * or for a widget that acts on the checked rows.
+     * @param grid - The data grid, or the sleek grid of it.
+     * @returns The mixin, or `null` when the grid has none.
+     */
+    static tryGetInstance(grid: IDataGrid | ISleekGrid): GridRowSelectionMixin | null;
+    /**
+     * Detaches the mixin from the grid and cleans up event subscriptions.
+     */
+    destroy(): void;
+    private handleGridClick;
+    /**
+     * Key handler that toggles the checkbox of the active row on Space, like clicking it.
+     * @param e - Cell keyboard event from the grid's `onKeyDown`.
+     */
+    private handleGridKeyDown;
+    /**
+     * Returns the index of the select column of the grid.
+     * @param grid - The grid, defaults to the one of the mixin.
+     * @returns The index of the column, or `null` when the grid has no select column.
+     */
+    private getSelectColumnIndex;
+    /**
+     * Selects or deselects a row, or all the rows of a group, and refreshes the grid.
+     * @param item - The item of the row, or the group of the row of a group.
+     * @returns `true` if the selection changed, `false` when the row can't be selected.
+     */
+    private toggleSelection;
+    /**
+     * Refreshes the rows after a change of the selection, and the state of the select all button.
+     */
+    private refreshSelection;
+    /**
+     * Collects the rows of a group and of its subgroups, by the id of the rows, keeping the last of
+     * the rows with the same id.
+     * @param group - The group to collect the rows of.
+     * @param rows - The rows collected so far.
+     * @returns The rows, by their id.
+     */
+    private collectGroupRows;
+    /**
+     * Returns the ids of the rows of a group that can be selected, so that the checkbox of the row of the
+     * group can select and deselect them.
+     * @param group - The group of the row.
+     * @returns The ids, or `null` when the group can't be selected, or the view has none of its rows, e.g.
+     * when it gets them from the server only as they are needed.
+     */
+    private getGroupIds;
+    /**
+     * Returns the state of the checkbox of the row of a group.
+     * @param group - The group of the row.
+     * @returns The css classes of the checkbox, or `null` when the group can't be selected.
+     */
+    private getGroupCheckBoxCssClass;
+    /**
+     * Whether the item of a row is in the selection, which is by its key, as the rows of the view may be
+     * refreshed, and their items may be new objects.
+     * @param item - The item of the row, which may be a group or a totals row, which have no id.
+     */
+    private isSelected;
+    private handleHeaderClick;
+    /**
+     * Returns the state of the checked rows, including the ones the page the grid shows does not have.
+     */
+    getSelectionState(): GridRowSelectionState;
+    /**
+     * Updates the checked state of the select-all header button based on the
+     * current selection, and tells the subscribers of its change.
+     */
+    updateSelectAll(): void;
+    /**
+     * Clears the checked rows, and repaints the rows, so that the check boxes and the rows that are told
+     * apart by {@link checkedRowClass} are shown unchecked right away.
+     */
+    clear(): void;
+    /**
+     * Clears the checked rows, and refreshes the grid view, e.g. after the rows are changed, so that the
+     * groups and the filters of the view are applied again, as well as the check boxes of the rows.
+     */
+    resetCheckedAndRefresh(): void;
+    /**
+     * Selects the items with the given keys, keeping any existing selection.
+     * @param keys - The keys of the items to select.
+     */
+    selectKeys(keys: string[]): void;
+    /**
+     * Returns the keys of the currently selected items.
+     * @returns The selected keys.
+     */
+    getSelectedKeys(): string[];
+    /**
+     * Returns the selected keys parsed as 32-bit integers.
+     * @returns The selected keys as int32 values.
+     */
+    getSelectedAsInt32(): number[];
+    /**
+     * Returns the selected keys parsed as 64-bit integers.
+     * @returns The selected keys as int64 values.
+     */
+    getSelectedAsInt64(): number[];
+    /**
+     * Replaces the current selection with the items having the given keys.
+     * @param keys - The keys of the items to select.
+     */
+    setSelectedKeys(keys: string[]): void;
+    private isSelectable;
+    /**
+     * Whether a column is the column of the checkboxes that select the rows of this mixin, which is a
+     * utility column of the grid and not a data column, e.g. for the column picker or an export that leaves
+     * it out. The column is told apart by its format function, which {@link formatSelectItem} sets, rather
+     * than by its id, as a columns class can declare it with a `RowSelectionColumn` attribute of the server.
+     * A column of the radio buttons of {@link GridRadioSelectionMixin} has an id of its own, so it is not
+     * taken for this one.
+     * @param column - The column to check.
+     */
+    static isSelectColumn(column: Column): boolean;
+    /**
+     * Creates a checkbox select column for the grid, including a select-all header.
+     * @param getMixinOrOptions - A function that returns the mixin instance, or the options of the column.
+     * When it is omitted, the mixin of the grid that is being rendered is used, which
+     * {@link GridRowSelectionMixin.tryGetInstance} finds, so a grid that creates its mixin can just add
+     * this column.
+     * @param columnOptions - Optional column options to merge into the select column, when the first
+     * argument is the function that returns the mixin.
+     * @returns The select column definition.
+     */
+    static createSelectColumn(columnOptions?: Partial<Column>): Column;
+    static createSelectColumn(getMixin?: () => GridRowSelectionMixin, columnOptions?: Partial<Column>): Column;
+}
+/**
  * Arguments for auto register callback
  */
 export interface AutoRegisterArgs<P = any, T = any> {
@@ -11452,6 +11652,21 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
      * @param itemsData - Property items and additional items for the grid.
      */
     protected propertyItemsReady(itemsData: PropertyItemsData): void;
+    /**
+     * The mixin of the check boxes that select the rows of the grid, if it has one, e.g. when a page created
+     * it, or when a columns class declares the column with a `RowSelectionColumn` attribute and
+     * {@link ensureRowSelection} created it. It is not stored by the grid, as the mixin keeps itself in a
+     * registry, which {@link GridRowSelectionMixin.tryGetInstance} reads. It is named `rowSelector`, and not
+     * `rowSelection`, so that it does not clash with the field of the same name that the pages keep.
+     */
+    protected get rowSelector(): GridRowSelectionMixin;
+    /**
+     * Creates the row selection mixin of the grid when its columns have the column of the check boxes that
+     * select the rows, which a columns class gets with a `RowSelectionColumn` attribute of the server, so
+     * that a page does not have to create the mixin, nor add the column itself. The mixin keeps itself in a
+     * registry of its own, so a page that created one already keeps it, and the grid does not hold it.
+     */
+    protected initRowSelector(): void;
     /**
      * Hook invoked after the grid is initialized and settings are restored.
      */
@@ -17418,6 +17633,22 @@ export interface GridRadioSelectionMixinOptions {
  */
 export declare class GridRadioSelectionMixin {
     static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
+    /** The id of the column that shows the radio buttons of the rows, which the mixin creates. */
+    static readonly radioColumnId = "__radio__";
+    /**
+     * Formats a cell of the column of the radio buttons that select a row, and is also what tells that
+     * column apart from the column of the check boxes, see {@link GridRowSelectionMixin.formatSelectItem},
+     * which has an id of its own, `__select__`, as this one has {@link radioColumnId}.
+     * @param ctx - The formatter context.
+     * @returns The radio button of the row, or an empty string for a row that has none.
+     */
+    static formatRadioItem(ctx: FormatterContext): FormatterResult;
+    /**
+     * Returns the mixin attached to a grid, if it has one.
+     * @param grid - The data grid, or the sleek grid of it.
+     * @returns The mixin, or `null` when the grid has none.
+     */
+    static tryGetInstance(grid: IDataGrid | ISleekGrid): GridRadioSelectionMixin | null;
     private idField;
     private include;
     private grid;
@@ -17428,6 +17659,12 @@ export declare class GridRadioSelectionMixin {
      * @param options - Optional mixin options.
      */
     constructor(grid: IDataGrid, options?: GridRadioSelectionMixinOptions);
+    /** The handler of the clicks of the radio buttons, which is removed when the mixin is destroyed. */
+    private clickHandler;
+    /**
+     * Detaches the mixin from the grid and cleans up event subscriptions.
+     */
+    destroy(): void;
     private isSelectable;
     /**
      * Clears the current selection.
@@ -17464,183 +17701,6 @@ export declare class GridRadioSelectionMixin {
      * @returns The select column definition.
      */
     static createSelectColumn(getMixin: () => GridRadioSelectionMixin, columnOptions?: Partial<Column>): Column;
-}
-/**
- * Options for the {@link GridRowSelectionMixin}.
- */
-export interface GridRowSelectionMixinOptions {
-    /**
-     * A function that determines whether an item can be selected.
-     */
-    selectable?: (item: any) => boolean;
-    /**
-     * Whether the checkbox of a group row selects all the rows of the group, and deselects them when
-     * they are all selected. Defaults to `true`. Set it to `false` for the views that don't have the
-     * rows of a group on the client, like a virtual scroll view, where the checkbox is hidden anyway
-     * because the ids of the rows are not known, or when the groups should not be selectable at all.
-     */
-    selectGroups?: boolean;
-}
-/**
- * The state of the checked rows of a grid, as {@link GridRowSelectionMixin.getSelectionState} reports it.
- */
-export interface GridRowSelectionState {
-    /** The keys of the checked rows, which may be on the pages the grid does not show. */
-    keys: string[];
-    /** The number of the checked rows, which is the length of {@link GridRowSelectionState.keys}. */
-    count: number;
-    /** The number of the checked rows that the page the grid shows has, e.g. to tell it apart from the rest. */
-    onPage: number;
-    /** The number of the rows of the page that can be checked, e.g. to tell whether all of them are. */
-    selectableOnPage: number;
-}
-/**
- * A mixin that adds multi (checkbox) row selection behavior to a data grid,
- * including a select-all header checkbox.
- */
-export declare class GridRowSelectionMixin {
-    static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
-    /** The id of the column that the mixin adds, which shows the checkboxes of the rows. */
-    static readonly selectColumnId = "__select__";
-    /**
-     * The css class of the rows that are checked, which is not the one the selection models of the grid
-     * add to the cells of a selection range, so the two can be styled apart.
-     */
-    static readonly checkedRowClass = "checked-row";
-    private idField;
-    private include;
-    private grid;
-    private options;
-    /** What the view used to tell the css classes of a row before the mixin, restored when it is destroyed. */
-    private itemMetadata;
-    /**
-     * Notified with the state of the checked rows, after every change of them, e.g. to enable or disable
-     * the actions of a bar that acts on them.
-     */
-    readonly onSelectionChanged: PubSub<GridRowSelectionState>;
-    /**
-     * Creates a new GridRowSelectionMixin for the given grid.
-     * @param grid - The data grid to attach the mixin to.
-     * @param options - Optional mixin options.
-     */
-    constructor(grid: IDataGrid, options?: GridRowSelectionMixinOptions);
-    /**
-     * Returns the mixin attached to a grid, if it has one, e.g. for the column that shows the checkboxes,
-     * or for a widget that acts on the checked rows.
-     * @param grid - The data grid, or the sleek grid of it.
-     * @returns The mixin, or `null` when the grid has none.
-     */
-    static tryGetInstance(grid: IDataGrid | ISleekGrid): GridRowSelectionMixin | null;
-    /**
-     * Detaches the mixin from the grid and cleans up event subscriptions.
-     */
-    destroy(): void;
-    private handleGridClick;
-    /**
-     * Key handler that toggles the checkbox of the active row on Space, like clicking it.
-     * @param e - Cell keyboard event from the grid's `onKeyDown`.
-     */
-    private handleGridKeyDown;
-    /**
-     * Returns the index of the select column of the grid.
-     * @param grid - The grid, defaults to the one of the mixin.
-     * @returns The index of the column, or `null` when the grid has no select column.
-     */
-    private getSelectColumnIndex;
-    /**
-     * Selects or deselects a row, or all the rows of a group, and refreshes the grid.
-     * @param item - The item of the row, or the group of the row of a group.
-     * @returns `true` if the selection changed, `false` when the row can't be selected.
-     */
-    private toggleSelection;
-    /**
-     * Refreshes the rows after a change of the selection, and the state of the select all button.
-     */
-    private refreshSelection;
-    /**
-     * Collects the rows of a group and of its subgroups, by the id of the rows, keeping the last of
-     * the rows with the same id.
-     * @param group - The group to collect the rows of.
-     * @param rows - The rows collected so far.
-     * @returns The rows, by their id.
-     */
-    private collectGroupRows;
-    /**
-     * Returns the ids of the rows of a group that can be selected, so that the checkbox of the row of
-     * the group can select and deselect them.
-     * @param group - The group of the row.
-     * @returns The ids, or `null` when the group can't be selected or its rows are not all known,
-     * e.g. when the view loads them from the server as they are needed.
-     */
-    private getGroupIds;
-    /**
-     * Returns the state of the checkbox of the row of a group.
-     * @param group - The group of the row.
-     * @returns The css classes of the checkbox, or `null` when the group can't be selected.
-     */
-    private getGroupCheckBoxCssClass;
-    /**
-     * Whether the item of a row is in the selection, which is by its key, as the rows of the view may be
-     * refreshed, and their items may be new objects.
-     * @param item - The item of the row, which may be a group or a totals row, which have no id.
-     */
-    private isSelected;
-    private handleHeaderClick;
-    /**
-     * Returns the state of the checked rows, including the ones the page the grid shows does not have.
-     */
-    getSelectionState(): GridRowSelectionState;
-    /**
-     * Updates the checked state of the select-all header button based on the
-     * current selection, and tells the subscribers of its change.
-     */
-    updateSelectAll(): void;
-    /**
-     * Clears the current selection.
-     */
-    clear(): void;
-    /**
-     * Clears the current selection and refreshes the grid view.
-     */
-    resetCheckedAndRefresh(): void;
-    /**
-     * Selects the items with the given keys, keeping any existing selection.
-     * @param keys - The keys of the items to select.
-     */
-    selectKeys(keys: string[]): void;
-    /**
-     * Returns the keys of the currently selected items.
-     * @returns The selected keys.
-     */
-    getSelectedKeys(): string[];
-    /**
-     * Returns the selected keys parsed as 32-bit integers.
-     * @returns The selected keys as int32 values.
-     */
-    getSelectedAsInt32(): number[];
-    /**
-     * Returns the selected keys parsed as 64-bit integers.
-     * @returns The selected keys as int64 values.
-     */
-    getSelectedAsInt64(): number[];
-    /**
-     * Replaces the current selection with the items having the given keys.
-     * @param keys - The keys of the items to select.
-     */
-    setSelectedKeys(keys: string[]): void;
-    private isSelectable;
-    /**
-     * Creates a checkbox select column for the grid, including a select-all header.
-     * @param getMixinOrOptions - A function that returns the mixin instance, or the options of the column.
-     * When it is omitted, the mixin of the grid that is being rendered is used, which
-     * {@link GridRowSelectionMixin.tryGetInstance} finds, so a grid that creates its mixin can just add
-     * this column.
-     * @param columnOptions - Optional column options to merge into the select column, when the first
-     * argument is the function that returns the mixin.
-     * @returns The select column definition.
-     */
-    static createSelectColumn(columnOptions?: Partial<Column>): Column;
-    static createSelectColumn(getMixin?: () => GridRowSelectionMixin, columnOptions?: Partial<Column>): Column;
 }
 /**
  * Helper functions for managing a "select all" toolbar button on a data grid.

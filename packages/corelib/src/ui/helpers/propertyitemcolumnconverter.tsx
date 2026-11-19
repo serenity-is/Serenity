@@ -3,6 +3,7 @@ import { Authorization, faIcon, isPromiseLike, tryGetText, type PropertyItem } f
 import { FormatterType } from "../../types/formattertype";
 import { FormatterTypeRegistry } from "../../types/formattertyperegistry";
 import { IInitializeColumn } from "../formatters/iinitializecolumn";
+import { GridRowSelectionMixin } from "./gridrowselectionmixin";
 import { ReflectionOptionsSetter } from "../widgets/reflectionoptionssetter";
 
 /**
@@ -71,6 +72,23 @@ export namespace PropertyItemColumnConverter {
 
         if (item.pin != null && item.pin !== false) {
             result.frozen = item.pin === "end" ? "end" : "start";
+        }
+
+        // the column of the checkboxes that select the rows is not a data column, so its cell, its header
+        // and its group cell are set by the mixin, e.g. its select all checkbox, and the server only tells
+        // that it is there, with the RowSelectionColumn attribute of the columns class
+        if (item.name === "RowSelection") {
+            const template = GridRowSelectionMixin.createSelectColumn();
+            return {
+                ...template,
+                width: result.width,
+                minWidth: result.minWidth,
+                maxWidth: result.maxWidth,
+                visible: result.visible,
+                frozen: result.frozen,
+                sourceItem: item,
+                name: result.name ?? template.name
+            };
         }
 
         if (!item.formatterType)

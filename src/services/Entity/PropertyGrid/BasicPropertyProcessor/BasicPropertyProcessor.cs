@@ -47,6 +47,7 @@ public partial class BasicPropertyProcessor(IOptions<PropertyProcessorOptions>? 
         SetReadPermission(source, item);
         SetRequired(source, item);
         SetResizable(source, item);
+        SetRowSelectionColumn(source, item);
         SetShowSelection(source, item);
         SetSorting(source, item);
         SetSummaryType(source, item);

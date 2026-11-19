@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { GridRadioSelectionMixin } from "./gridradioselectionmixin";
 import { GridRowSelectionMixin } from "./gridrowselectionmixin";
 
 describe("GridRowSelectionMixin", () => {
@@ -19,6 +20,7 @@ describe("GridRowSelectionMixin", () => {
             onKeyDown: { subscribe: vi.fn((h: any) => { onKeyDownHandler = h; }), unsubscribe: vi.fn() },
             getActiveCell: vi.fn(() => null),
             getColumnIndex: vi.fn(() => 0),
+            getColumns: vi.fn(() => [{ id: GridRowSelectionMixin.selectColumnId, format: GridRowSelectionMixin.formatSelectItem }]),
             invalidate: vi.fn(),
             updateRow: vi.fn()
         };
@@ -66,6 +68,53 @@ describe("GridRowSelectionMixin", () => {
 
         it("returns null for a grid without a mixin", () => {
             expect(GridRowSelectionMixin.tryGetInstance(mockGrid)).toBeNull();
+        });
+
+        it("replaces the mixin a page created, instead of leaving its handlers on the grid", () => {
+            // a page may create its own mixin although the grid makes one for the select column, and the
+            // handlers of the one before it would toggle a check box twice
+            const pageMixin = new GridRowSelectionMixin(mockGrid);
+            const subscribeCount = gridObj.onClick.subscribe.mock.calls.length;
+
+            const gridMixin = new GridRowSelectionMixin(mockGrid);
+
+            expect(GridRowSelectionMixin.tryGetInstance(mockGrid)).toBe(gridMixin);
+            // the handlers of the one before it are off the grid, and the includes of it are gone
+            expect(gridObj.onClick.unsubscribe).toHaveBeenCalledWith(
+                gridObj.onClick.subscribe.mock.calls[subscribeCount - 1][0]);
+            expect((pageMixin as any).grid).toBeUndefined();
+
+            gridMixin.destroy();
+        });
+
+        it("can be destroyed twice, as a page may destroy the mixin that a newer one replaced", () => {
+            const pageMixin = new GridRowSelectionMixin(mockGrid);
+            const gridMixin = new GridRowSelectionMixin(mockGrid);
+
+            expect(() => pageMixin.destroy()).not.toThrow();
+            expect(() => pageMixin.destroy()).not.toThrow();
+            // the mixin that is in use is still there
+            expect(GridRowSelectionMixin.tryGetInstance(mockGrid)).toBe(gridMixin);
+
+            gridMixin.destroy();
+        });
+
+        it("keeps the subscribers of the mixin it replaces, as the rows are the same ones", () => {
+            const pageMixin = new GridRowSelectionMixin(mockGrid);
+            const changed = vi.fn();
+            pageMixin.onSelectionChanged.subscribe(changed);
+            const notified = pageMixin.onSelectionChanged;
+
+            // the new mixin tells the subscribers of the one it replaces, and the one that goes is given
+            // an empty one, so that its destroy clears nothing that is still in use
+            const gridMixin = new GridRowSelectionMixin(mockGrid);
+            gridMixin.selectKeys(["1"]);
+
+            expect(changed).toHaveBeenCalledWith(expect.objectContaining({ count: 1 }));
+            expect(gridMixin.onSelectionChanged).toBe(notified);
+            expect(pageMixin.onSelectionChanged).not.toBe(notified);
+
+            gridMixin.destroy();
         });
     });
 
@@ -372,11 +421,25 @@ describe("GridRowSelectionMixin", () => {
     });
 
     describe("clear", () => {
-        it("clears all selections and updates select all", () => {
+        it("clears all selections and repaints the rows", () => {
             const mixin = new GridRowSelectionMixin(mockGrid);
             (mixin as any).include = { "1": true, "2": true };
+            gridObj.invalidate.mockClear();
             mixin.clear();
+
             expect((mixin as any).include).toEqual({});
+            // the rows have to be painted again, or they would keep their check boxes and their tint
+            expect(gridObj.invalidate).toHaveBeenCalled();
+        });
+
+        it("does nothing after it is destroyed", () => {
+            const mixin = new GridRowSelectionMixin(mockGrid);
+            (mixin as any).include = { "1": true };
+            mixin.destroy();
+            gridObj.invalidate.mockClear();
+
+            expect(() => mixin.clear()).not.toThrow();
+            expect(gridObj.invalidate).not.toHaveBeenCalled();
         });
     });
 
@@ -440,13 +503,45 @@ describe("GridRowSelectionMixin", () => {
         });
     });
 
+    describe("the column of the check boxes", () => {
+        it("is told apart from the others by its format, not by its id", () => {
+            const column = GridRowSelectionMixin.createSelectColumn();
+
+            expect(GridRowSelectionMixin.isSelectColumn(column)).toBe(true);
+            expect(column.id).toBe("__select__");
+            expect(column.format).toBe(GridRowSelectionMixin.formatSelectItem);
+
+            // the id alone is not enough, e.g. for a column that a page adds with the same id and no format
+            expect(GridRowSelectionMixin.isSelectColumn({ id: "__select__", field: "__select__" })).toBe(false);
+            expect(GridRowSelectionMixin.isSelectColumn({ id: "Name", field: "Name", format: () => "" })).toBe(false);
+            expect(GridRowSelectionMixin.isSelectColumn(null)).toBe(false);
+        });
+
+        it("is also found in a grid that added it before, without the format of the mixin", () => {
+            // the columns that the pages add themselves have the header of the select all check box
+            expect(GridRowSelectionMixin.isSelectColumn({
+                id: "__select__", field: "__select__", headerCssClass: "select-all-header"
+            })).toBe(true);
+
+            // the id alone is not enough, e.g. for a column that a page adds with the same id and no header
+            expect(GridRowSelectionMixin.isSelectColumn({
+                id: "__select__", field: "__select__", headerCssClass: "some-header"
+            })).toBe(false);
+        });
+
+        it("is not the column of the radio buttons, which has an id of its own", () => {
+            expect(GridRowSelectionMixin.isSelectColumn(
+                GridRadioSelectionMixin.createSelectColumn(() => null))).toBe(false);
+        });
+    });
+
     describe("createSelectColumn", () => {
         it("returns a column with format function", () => {
             const mixin = new GridRowSelectionMixin(mockGrid);
             const getMixin = vi.fn(() => mixin);
             const column = GridRowSelectionMixin.createSelectColumn(getMixin);
 
-            expect(column.id).toBe("__select__");
+            expect(column.id).toBe(GridRowSelectionMixin.selectColumnId);
             expect(column.sortable).toBe(false);
             expect(column.headerCssClass).toBe("select-all-header");
             // the group cell and the indentation of the data rows start after this column
@@ -475,7 +570,7 @@ describe("GridRowSelectionMixin", () => {
         it("format returns empty string when mixin is null", () => {
             const getMixin = vi.fn(() => null);
             const column = GridRowSelectionMixin.createSelectColumn(getMixin);
-            const result = column.format({ item: { id: 1 } } as any);
+            const result = column.format({ item: { id: 1 }, grid: gridObj } as any);
             expect(result).toBe("");
         });
 
@@ -483,7 +578,7 @@ describe("GridRowSelectionMixin", () => {
             const mixin = new GridRowSelectionMixin(mockGrid);
             const getMixin = vi.fn(() => mixin);
             const column = GridRowSelectionMixin.createSelectColumn(getMixin);
-            const result = column.format({ item: { __nonDataRow: true } } as any);
+            const result = column.format({ item: { __nonDataRow: true }, grid: gridObj } as any);
             expect(result).toBe("");
         });
 
@@ -491,7 +586,7 @@ describe("GridRowSelectionMixin", () => {
             const mixin = new GridRowSelectionMixin(mockGrid, { selectable: () => false });
             const getMixin = vi.fn(() => mixin);
             const column = GridRowSelectionMixin.createSelectColumn(getMixin);
-            const result = column.format({ item: { id: 1 } } as any);
+            const result = column.format({ item: { id: 1 }, grid: gridObj } as any);
             expect(result).toBe("");
         });
 
@@ -500,7 +595,7 @@ describe("GridRowSelectionMixin", () => {
             (mixin as any).include = { "1": true };
             const getMixin = vi.fn(() => mixin);
             const column = GridRowSelectionMixin.createSelectColumn(getMixin);
-            const result = column.format({ item: { id: 1 } } as any);
+            const result = column.format({ item: { id: 1 }, grid: gridObj } as any);
             expect(result).toBeTruthy();
             expect((result as any).classList.contains('checked')).toBe(true);
         });
@@ -509,7 +604,7 @@ describe("GridRowSelectionMixin", () => {
             const mixin = new GridRowSelectionMixin(mockGrid);
             const getMixin = vi.fn(() => mixin);
             const column = GridRowSelectionMixin.createSelectColumn(getMixin);
-            const result = column.format({ item: { id: 2 } } as any);
+            const result = column.format({ item: { id: 2 }, grid: gridObj } as any);
             expect(result).toBeTruthy();
             expect((result as any).classList.contains('checked')).toBe(false);
         });
@@ -518,7 +613,7 @@ describe("GridRowSelectionMixin", () => {
             const mixin = new GridRowSelectionMixin(mockGrid);
             const getMixin = vi.fn(() => mixin);
             const column = GridRowSelectionMixin.createSelectColumn(getMixin);
-            const result = column.format({ item: { id: "constructor" } } as any);
+            const result = column.format({ item: { id: "constructor" }, grid: gridObj } as any);
             expect(result).toBeTruthy();
             expect((result as any).classList.contains('checked')).toBe(false);
         });
@@ -591,15 +686,15 @@ describe("GridRowSelectionMixin", () => {
             const column = GridRowSelectionMixin.createSelectColumn(() => mixin);
             const format = column.format as any;
 
-            expect(format({ item: group }).className).toContain("check-box");
-            expect(format({ item: group }).className).not.toContain("checked");
-            expect(format({ item: group }).className).not.toContain("partial");
+            expect(format({ item: group, grid: gridObj }).className).toContain("check-box");
+            expect(format({ item: group, grid: gridObj }).className).not.toContain("checked");
+            expect(format({ item: group, grid: gridObj }).className).not.toContain("partial");
 
             (mixin as any).include = { "1": true };
-            expect(format({ item: group }).className).toContain("partial");
+            expect(format({ item: group, grid: gridObj }).className).toContain("partial");
 
             (mixin as any).include = { "1": true, "2": true };
-            expect(format({ item: group }).className).toContain("checked");
+            expect(format({ item: group, grid: gridObj }).className).toContain("checked");
         });
 
         it("hides the checkbox of the groups when selectGroups is false", () => {
@@ -608,6 +703,22 @@ describe("GridRowSelectionMixin", () => {
             const column = GridRowSelectionMixin.createSelectColumn(() => mixin);
 
             expect((column.format as any)({ item: group })).toBe("");
+        });
+
+        it("selects the rows of a group that the view has, when the group has more of them", () => {
+            // the view has two of the ten rows of the group, as it pages them, and the checkbox is about
+            // the ones that are there, like the select all of the header is about the rows of the page
+            const group = makeGroup("A", [{ id: 1 }, { id: 2 }], [], 10);
+            viewObj.getItem = vi.fn(() => group);
+            const mixin = new GridRowSelectionMixin(mockGrid);
+            const column = GridRowSelectionMixin.createSelectColumn(() => mixin);
+            const format = column.format as any;
+
+            expect(format({ item: group, grid: gridObj }).className).toContain("check-box");
+
+            onClickHandler(selectItemClick(), { row: 0 });
+            expect((mixin as any).include).toEqual({ "1": true, "2": true });
+            expect(format({ item: group, grid: gridObj }).className).toContain("checked");
         });
 
         it("hides the checkbox of a group whose rows are not known", () => {
@@ -661,7 +772,7 @@ describe("GridRowSelectionMixin", () => {
             onKeyDownHandler(enter);
             expect(enter.preventDefault).not.toHaveBeenCalled();
 
-            gridObj.getColumnIndex.mockReturnValue(-1);
+            gridObj.getColumns.mockReturnValue([]);
             const space = keyEvent(" ");
             onKeyDownHandler(space);
             expect(space.preventDefault).not.toHaveBeenCalled();

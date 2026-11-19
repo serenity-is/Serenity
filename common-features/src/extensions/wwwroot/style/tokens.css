@@ -131,8 +131,10 @@
   --s-column-header-hover-bg: rgba(68, 129, 239, 0.05);
   --s-column-header-border: #ebeff2;
   --s-column-footer: var(--bs-body-color);
-  --s-row-active-bg: rgba(var(--bs-primary-rgb), 0.20);
+  --s-row-active-bg: rgba(var(--bs-primary-rgb), 0.15);
   --s-cell-active-bg: rgb(0, 114, 255, 0.2);
+  --s-cell-active-ring: rgba(var(--bs-primary-rgb), 0.85);
+  --s-cell-selected-bg: rgba(var(--bs-primary-rgb), 0.30);
   --s-pager-icon: #5b3df1;
   --s-pager-text: #555;
 

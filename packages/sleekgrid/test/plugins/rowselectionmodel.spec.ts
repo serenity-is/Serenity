@@ -75,7 +75,7 @@ describe("RowSelectionModel active cell change", () => {
         grid.setSelectionModel(m);
         grid.setActiveCell(2, 0);
         expect(grid.getSelectedRows()).toEqual([]);
-        expect(m.getSelectedRanges()).toBeUndefined();
+        expect(m.getSelectedRanges()).toEqual([]);
         grid.destroy();
     });
 
@@ -219,6 +219,96 @@ describe("RowSelectionModel click", () => {
         expect(model.getSelectedRows()).toEqual([0]);
         fireClick(grid, 0, 0, { ctrlKey: true });
         expect(model.getSelectedRows()).toEqual([0]);
+        grid.destroy();
+        container.remove();
+    });
+
+    it("selects the clicked row without cell navigation", () => {
+        const { grid, model } = setup(10, { enableCellNavigation: false });
+
+        fireClick(grid, 3, 0);
+        expect(model.getSelectedRows()).toEqual([3]);
+
+        fireClick(grid, 7, 0);
+        expect(model.getSelectedRows()).toEqual([7]);
+
+        grid.destroy();
+    });
+
+    it("extends the selection with a modified click without cell navigation", () => {
+        const { grid, model } = setup(10, { enableCellNavigation: false, multiSelect: true });
+
+        fireClick(grid, 3, 0);
+        expect(model.getSelectedRows()).toEqual([3]);
+
+        fireClick(grid, 7, 0, { ctrlKey: true });
+        expect(model.getSelectedRows()).toEqual([3, 7]);
+
+        // the second ctrl click removes it again
+        fireClick(grid, 3, 0, { ctrlKey: true });
+        expect(model.getSelectedRows()).toEqual([7]);
+
+        grid.destroy();
+    });
+
+    it("extends the selection with shift and the arrow keys without cell navigation", () => {
+        const { grid, model } = setup(10, { enableCellNavigation: false });
+
+        fireClick(grid, 3, 0);
+        expect(model.getSelectedRows()).toEqual([3]);
+
+        fireKey(grid, 40, { shiftKey: true });
+        expect(model.getSelectedRows()).toEqual([3, 4]);
+
+        fireKey(grid, 40, { shiftKey: true });
+        expect(model.getSelectedRows()).toEqual([3, 4, 5]);
+
+        fireKey(grid, 38, { shiftKey: true });
+        expect(model.getSelectedRows()).toEqual([3, 4]);
+
+        grid.destroy();
+    });
+
+    it("does nothing with shift and the arrow keys when nothing is selected, without cell navigation", () => {
+        const { grid, model } = setup(10, { enableCellNavigation: false });
+
+        fireKey(grid, 40, { shiftKey: true });
+        expect(model.getSelectedRows()).toEqual([]);
+
+        grid.destroy();
+    });
+
+    it("leaves a plain click without cell navigation to the other handlers when selectActiveRow is off", () => {
+        const { grid } = setup(10, { enableCellNavigation: false });
+        const model = new RowSelectionModel({ selectActiveRow: false });
+        grid.setSelectionModel(model);
+
+        let reached = false;
+        grid.onClick.subscribe(() => { reached = true; });
+
+        fireClick(grid, 3, 0);
+        expect(model.getSelectedRows()).toEqual([]);
+        // the click is not swallowed by the model when it selects nothing
+        expect(reached).toBe(true);
+
+        grid.destroy();
+    });
+
+    it("does not select a cell that cannot be selected, without cell navigation", () => {
+        const cols = [
+            { id: "c1", name: "c1", field: "c1", selectable: false },
+            { id: "c2", name: "c2", field: "c2" }
+        ];
+        const container = document.createElement("div");
+        container.style.height = "100px";
+        document.body.appendChild(container);
+        const grid = new SleekGrid(container, makeData(10), cols, { enableCellNavigation: false });
+        const model = new RowSelectionModel();
+        grid.setSelectionModel(model);
+
+        fireClick(grid, 3, 0);
+        expect(model.getSelectedRows()).toEqual([]);
+
         grid.destroy();
         container.remove();
     });

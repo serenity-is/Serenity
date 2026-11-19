@@ -1,7 +1,8 @@
-import { Column } from "@serenity-is/sleekgrid";
+import { Column, type ArgsCell, type FormatterContext, type FormatterResult, type ISleekGrid } from "@serenity-is/sleekgrid";
 import { classTypeInfo, nsSerenity, registerType } from "../../base";
 import { clearKeys } from "../../compat";
 import { IDataGrid } from "../datagrid/idatagrid";
+import { GridRowSelectionMixin } from "./gridrowselectionmixin";
 
 /**
  * Options for the {@link GridRadioSelectionMixin}.
@@ -13,12 +14,44 @@ export interface GridRadioSelectionMixinOptions {
     selectable?: (item: any) => boolean;
 }
 
+/** The mixin of each grid, so that its column and the widgets that act on its checked rows can find it. */
+const instances = new WeakMap<ISleekGrid, GridRadioSelectionMixin>();
+
 /**
  * A mixin that adds single (radio) row selection behavior to a data grid.
  */
 export class GridRadioSelectionMixin {
 
     static [Symbol.typeInfo] = classTypeInfo(nsSerenity); static { registerType(this) }
+    /** The id of the column that shows the radio buttons of the rows, which the mixin creates. */
+    static readonly radioColumnId = "__radio__";
+
+    /**
+     * Formats a cell of the column of the radio buttons that select a row, and is also what tells that
+     * column apart from the column of the check boxes, see {@link GridRowSelectionMixin.formatSelectItem},
+     * which has an id of its own, `__select__`, as this one has {@link radioColumnId}.
+     * @param ctx - The formatter context.
+     * @returns The radio button of the row, or an empty string for a row that has none.
+     */
+    static formatRadioItem(ctx: FormatterContext): FormatterResult {
+        const mixin = GridRadioSelectionMixin.tryGetInstance(ctx.grid);
+        if (!mixin || !mixin.isSelectable(ctx.item))
+            return '';
+
+        const isChecked = mixin.include[ctx.item[mixin.idField]];
+        return <input type="radio" name="radio-selection-group" class="rad-select-item no-float"
+            style={{ cursor: "pointer" }} checked={isChecked} />;
+    }
+
+    /**
+     * Returns the mixin attached to a grid, if it has one.
+     * @param grid - The data grid, or the sleek grid of it.
+     * @returns The mixin, or `null` when the grid has none.
+     */
+    static tryGetInstance(grid: IDataGrid | ISleekGrid): GridRadioSelectionMixin | null {
+        const sleekGrid = (grid as IDataGrid)?.getGrid?.() ?? grid as ISleekGrid;
+        return sleekGrid ? (instances.get(sleekGrid) ?? null) : null;
+    }
 
     declare private idField: string;
     declare private include: { [key: string]: boolean };
@@ -36,8 +69,9 @@ export class GridRadioSelectionMixin {
         this.grid = grid;
         this.idField = grid.getView().getIdPropertyName();
         this.options = options || {};
+        instances.set(grid.getGrid(), this);
 
-        grid.getGrid().onClick.subscribe((e, p) => {
+        this.clickHandler = (e: Event, p: Partial<ArgsCell>) => {
             if ((e.target as HTMLElement).classList.contains('rad-select-item')) {
                 e.preventDefault();
                 const item = grid.getView().getItem(p.row);
@@ -57,7 +91,28 @@ export class GridRadioSelectionMixin {
                     grid.getGrid().updateRow(i);
                 }
             }
-        });
+        };
+
+        grid.getGrid().onClick.subscribe(this.clickHandler);
+    }
+
+    /** The handler of the clicks of the radio buttons, which is removed when the mixin is destroyed. */
+    declare private clickHandler: (e: Event, p: Partial<ArgsCell>) => void;
+
+    /**
+     * Detaches the mixin from the grid and cleans up event subscriptions.
+     */
+    destroy(): void {
+        this.include = Object.create(null);
+        if (this.clickHandler) {
+            this.grid?.getGrid()?.onClick?.unsubscribe(this.clickHandler);
+            this.clickHandler = null;
+        }
+
+        instances.delete(this.grid?.getGrid());
+        delete this.grid;
+        delete this.options?.selectable;
+        this.options = null;
     }
 
     private isSelectable(item: any) {
@@ -144,10 +199,10 @@ export class GridRadioSelectionMixin {
      */
     static createSelectColumn(getMixin: () => GridRadioSelectionMixin, columnOptions?: Partial<Column>): Column {
         return {
-            name: '[×]',
+            name: '(o)',
             nameFormat: () => "",
             toolTip: ' ',
-            id: '__select__',
+            id: GridRadioSelectionMixin.radioColumnId,
             resizable: false,
             width: 27,
             minWidth: 27,
@@ -157,16 +212,7 @@ export class GridRadioSelectionMixin {
             skipGroupCell: true,
             headerCssClass: '',
             sortable: false,
-            format: function (ctx) {
-                const mixin = getMixin();
-                if (!mixin || !mixin.isSelectable(ctx.item)) {
-                    return '';
-                }
-
-                const isChecked = mixin.include[ctx.item[mixin.idField]];
-                return <input type="radio" name="radio-selection-group" class="rad-select-item no-float"
-                    style={{ cursor: "pointer" }} checked={isChecked} />;
-            }
+            format: GridRadioSelectionMixin.formatRadioItem
         };
     }
 }

@@ -109,7 +109,8 @@ export namespace PdfExportHelper {
             request.Sort = sortBy;
 
         let gridColumns = dataGrid.columns;
-        gridColumns = gridColumns.filter(x => x.id !== "__select__");
+        // the column that selects the rows is not a data column, so it is left out of the export
+        gridColumns = gridColumns.filter(x => x.id != "__select__" && x.id != "__radio__");
 
         request.IncludeColumns = [];
         for (const column of gridColumns)

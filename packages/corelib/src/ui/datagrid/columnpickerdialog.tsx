@@ -420,8 +420,11 @@ export class ColumnPickerDialog<P extends ColumnPickerDialogOptions = ColumnPick
     }
 
     private getTitle(col: Column) {
-        if (col.id == "__select__")
-            return "[x]";
+        if (col.id === "__select__")
+            return "[×]";
+
+        if (col.id === "__radio__")
+            return "(o)";
 
         return col.name || col.toolTip || col.id;
     }

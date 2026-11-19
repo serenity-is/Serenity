@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { GridRadioSelectionMixin } from "./gridradioselectionmixin";
+import { GridRowSelectionMixin } from "./gridrowselectionmixin";
 
 describe("GridRadioSelectionMixin", () => {
     let mockGrid: any;
@@ -208,13 +209,26 @@ describe("GridRadioSelectionMixin", () => {
         });
     });
 
+    describe("the column of the radio buttons", () => {
+        it("has an id of its own, so the column of the check boxes is not taken for it", () => {
+            const column = GridRadioSelectionMixin.createSelectColumn(() => null);
+
+            expect(column.id).toBe(GridRadioSelectionMixin.radioColumnId);
+            expect(column.id).toBe("__radio__");
+            expect(column.format).toBe(GridRadioSelectionMixin.formatRadioItem);
+
+            // the mixin of the check boxes does not take it for its own column
+            expect(GridRowSelectionMixin.isSelectColumn(column)).toBe(false);
+        });
+    });
+
     describe("createSelectColumn", () => {
         it("returns a column with format function", () => {
             const mixin = new GridRadioSelectionMixin(mockGrid);
             const getMixin = vi.fn(() => mixin);
             const column = GridRadioSelectionMixin.createSelectColumn(getMixin);
 
-            expect(column.id).toBe("__select__");
+            expect(column.id).toBe(GridRadioSelectionMixin.radioColumnId);
             expect(column.sortable).toBe(false);
             // the group cell and the indentation of the data rows start after this column
             expect(column.skipGroupCell).toBe(true);
@@ -225,7 +239,7 @@ describe("GridRadioSelectionMixin", () => {
         it("format returns empty string when mixin is null", () => {
             const getMixin = vi.fn(() => null);
             const column = GridRadioSelectionMixin.createSelectColumn(getMixin);
-            const result = column.format({ item: { id: 1 } } as any);
+            const result = column.format({ item: { id: 1 }, grid: gridObj } as any);
             expect(result).toBe("");
         });
 
@@ -233,7 +247,7 @@ describe("GridRadioSelectionMixin", () => {
             const mixin = new GridRadioSelectionMixin(mockGrid);
             const getMixin = vi.fn(() => mixin);
             const column = GridRadioSelectionMixin.createSelectColumn(getMixin);
-            const result = column.format({ item: { __nonDataRow: true } } as any);
+            const result = column.format({ item: { __nonDataRow: true }, grid: gridObj } as any);
             expect(result).toBe("");
         });
 
@@ -241,7 +255,7 @@ describe("GridRadioSelectionMixin", () => {
             const mixin = new GridRadioSelectionMixin(mockGrid, { selectable: () => false });
             const getMixin = vi.fn(() => mixin);
             const column = GridRadioSelectionMixin.createSelectColumn(getMixin);
-            const result = column.format({ item: { id: 1 } } as any);
+            const result = column.format({ item: { id: 1 }, grid: gridObj } as any);
             expect(result).toBe("");
         });
 
@@ -250,7 +264,7 @@ describe("GridRadioSelectionMixin", () => {
             (mixin as any).include = { "1": true };
             const getMixin = vi.fn(() => mixin);
             const column = GridRadioSelectionMixin.createSelectColumn(getMixin);
-            const result = column.format({ item: { id: 1 } } as any);
+            const result = column.format({ item: { id: 1 }, grid: gridObj } as any);
             expect(result).toBeTruthy();
             expect((result as any).type).toBe("radio");
         });
@@ -259,7 +273,7 @@ describe("GridRadioSelectionMixin", () => {
             const mixin = new GridRadioSelectionMixin(mockGrid);
             const getMixin = vi.fn(() => mixin);
             const column = GridRadioSelectionMixin.createSelectColumn(getMixin);
-            const result = column.format({ item: { id: 2 } } as any);
+            const result = column.format({ item: { id: 2 }, grid: gridObj } as any);
             expect(result).toBeTruthy();
             expect((result as any).type).toBe("radio");
             expect((result as any).checked).toBeFalsy();
@@ -269,7 +283,7 @@ describe("GridRadioSelectionMixin", () => {
             const mixin = new GridRadioSelectionMixin(mockGrid);
             const getMixin = vi.fn(() => mixin);
             const column = GridRadioSelectionMixin.createSelectColumn(getMixin);
-            const result = column.format({ item: { id: "constructor" } } as any);
+            const result = column.format({ item: { id: "constructor" }, grid: gridObj } as any);
             expect(result).toBeTruthy();
             expect((result as any).checked).toBeFalsy();
         });
