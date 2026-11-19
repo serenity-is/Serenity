@@ -293,6 +293,15 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         this._signalsDisposers.push(observeSignal(signals.pinnedStartCols, pinnedStartEndChanged));
         this._signalsDisposers.push(observeSignal(signals.pinnedEndCols, pinnedStartEndChanged));
 
+        // the bands at the sides are only shown when they have columns, and a style can't tell that from the
+        // band itself, as each one is a separate element, so the container tells whether they are there
+        const updatePinnedBands = () => {
+            this._container.classList.toggle("sg-has-start", signals.pinnedStartCols.value > 0);
+            this._container.classList.toggle("sg-has-end", signals.pinnedEndCols.value > 0);
+        };
+        this._signalsDisposers.push(observeSignal(signals.pinnedStartCols, updatePinnedBands));
+        this._signalsDisposers.push(observeSignal(signals.pinnedEndCols, updatePinnedBands));
+
         this.validateAndEnforceOptions();
         this.setOptionDependentSignals();
 
