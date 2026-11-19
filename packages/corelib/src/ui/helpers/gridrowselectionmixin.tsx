@@ -1,5 +1,5 @@
 import { bindThis } from "@serenity-is/domwise";
-import { Column, Group, type ArgsCell, type CellKeyboardEvent, type ISleekGrid } from "@serenity-is/sleekgrid";
+import { Column, Group, type ArgsCell, type CellKeyboardEvent, type ISleekGrid, type ItemMetadata } from "@serenity-is/sleekgrid";
 import { classTypeInfo, Fluent, nsSerenity, registerType } from "../../base";
 import { clearKeys } from "../../compat";
 import type { IRemoteView } from "../../slick/iremoteview";
@@ -33,10 +33,18 @@ export class GridRowSelectionMixin {
     /** The id of the column that the mixin adds, which shows the checkboxes of the rows. */
     static readonly selectColumnId = "__select__";
 
+    /**
+     * The css class of the rows that are checked, which is not the one the selection models of the grid
+     * add to the cells of a selection range, so the two can be styled apart.
+     */
+    static readonly checkedRowClass = "checked-row";
+
     declare private idField: string;
     declare private include: { [key: string]: boolean }
     declare private grid: IDataGrid;
     declare private options: GridRowSelectionMixinOptions;
+    /** What the view used to tell the css classes of a row before the mixin, restored when it is destroyed. */
+    declare private itemMetadata: (item: any, row: number) => ItemMetadata<any>;
 
     /**
      * Creates a new GridRowSelectionMixin for the given grid.
@@ -54,6 +62,23 @@ export class GridRowSelectionMixin {
         grid.getGrid().onHeaderClick.subscribe(boundThis.handleHeaderClick);
         grid.getGrid().onKeyDown?.subscribe(boundThis.handleGridKeyDown);
         (grid.getView() as IRemoteView).onRowsChanged?.subscribe(boundThis.updateSelectAll);
+
+        // the class is checked-row, and not the selected one, which the selection models of the grid add to
+        // the cells of a range, so a row that is checked with its checkbox is told apart from a selection
+        const view = grid.getView() as IRemoteView;
+        this.itemMetadata = view.getItemMetadataCallback?.();
+        view.setItemMetadataCallback?.((item: any, row: number) => {
+            const metadata = this.itemMetadata?.(item, row);
+            if (!this.isSelected(item))
+                return metadata;
+
+            return {
+                ...metadata,
+                cssClasses: metadata?.cssClasses ?
+                    metadata.cssClasses + " " + GridRowSelectionMixin.checkedRowClass :
+                    GridRowSelectionMixin.checkedRowClass
+            };
+        });
     }
 
     /**
@@ -65,6 +90,8 @@ export class GridRowSelectionMixin {
         this.grid?.getGrid()?.onHeaderClick?.unsubscribe(this.handleHeaderClick);
         this.grid?.getGrid()?.onKeyDown?.unsubscribe(this.handleGridKeyDown);
         (this.grid?.getView() as IRemoteView).onRowsChanged?.unsubscribe(this.updateSelectAll);
+        (this.grid?.getView() as IRemoteView)?.setItemMetadataCallback?.(this.itemMetadata);
+        delete this.itemMetadata;
         delete this.grid;
         delete this.options?.selectable;
         this.options = null;
@@ -212,6 +239,16 @@ export class GridRowSelectionMixin {
 
         const selected = ids.filter(id => !!this.include[id]).length;
         return selected === 0 ? "" : selected === ids.length ? " checked" : " partial";
+    }
+
+    /**
+     * Whether the item of a row is in the selection, which is by its key, as the rows of the view may be
+     * refreshed, and their items may be new objects.
+     * @param item - The item of the row, which may be a group or a totals row, which have no id.
+     */
+    private isSelected(item: any): boolean {
+        const id = item?.[this.idField];
+        return id != null && !!this.include[String(id)];
     }
 
     private handleHeaderClick(e: Event): void {

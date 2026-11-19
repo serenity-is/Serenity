@@ -54,6 +54,11 @@
  *   --s-header-chrome-default  1 or 0, the theme's choice for --s-header-chrome (default: 1)
  *   --s-row-hover-bg           tint over the background of the grid data row under the mouse
  *                              (default: transparent, no hover effect)
+ *   --s-row-checked-bg         tint over the background of a grid data row that is checked with its
+ *                              checkbox, and --s-row-checked-hover-bg the same tint under the mouse
+ *                              (default: a light tint of --bs-primary, a bit stronger on hover)
+ *   --s-row-checked-accent     the band at the start edge of a checked row, e.g. --bs-primary
+ *                              (default: --bs-primary)
  *   --s-pager-btn-border       border of the icon buttons of a pager (default: --bs-border-color)
  *   --s-pager-btn-bg           background of the icon buttons of a pager (default: transparent)
  *   --s-pager-btn-radius       corner radius of the icon buttons of a pager (default: 0.375rem)

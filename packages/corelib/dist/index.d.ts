@@ -17489,10 +17489,17 @@ export declare class GridRowSelectionMixin {
     static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
     /** The id of the column that the mixin adds, which shows the checkboxes of the rows. */
     static readonly selectColumnId = "__select__";
+    /**
+     * The css class of the rows that are checked, which is not the one the selection models of the grid
+     * add to the cells of a selection range, so the two can be styled apart.
+     */
+    static readonly checkedRowClass = "checked-row";
     private idField;
     private include;
     private grid;
     private options;
+    /** What the view used to tell the css classes of a row before the mixin, restored when it is destroyed. */
+    private itemMetadata;
     /**
      * Creates a new GridRowSelectionMixin for the given grid.
      * @param grid - The data grid to attach the mixin to.
@@ -17547,6 +17554,12 @@ export declare class GridRowSelectionMixin {
      * @returns The css classes of the checkbox, or `null` when the group can't be selected.
      */
     private getGroupCheckBoxCssClass;
+    /**
+     * Whether the item of a row is in the selection, which is by its key, as the rows of the view may be
+     * refreshed, and their items may be new objects.
+     * @param item - The item of the row, which may be a group or a totals row, which have no id.
+     */
+    private isSelected;
     private handleHeaderClick;
     /**
      * Updates the checked state of the select-all header button based on the

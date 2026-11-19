@@ -51,6 +51,52 @@ describe("GridRowSelectionMixin", () => {
         });
     });
 
+    describe("the selected rows", () => {
+        it("adds the checked-row class through the metadata of the view, keeping the classes it gives", () => {
+            let callback: any;
+            viewObj.getItemMetadataCallback = vi.fn(() => (item: any) => ({ cssClasses: "noted" }));
+            viewObj.setItemMetadataCallback = vi.fn((value: any) => { callback = value; });
+            const mixin = new GridRowSelectionMixin(mockGrid);
+
+            mixin.selectKeys(["42"]);
+
+            expect(callback({ id: 42 }, 0)).toEqual({ cssClasses: "noted checked-row" });
+            expect(callback({ id: 7 }, 1)).toEqual({ cssClasses: "noted" });
+        });
+
+        it("uses the checked-row class alone when the view has no metadata of its own", () => {
+            let callback: any;
+            viewObj.setItemMetadataCallback = vi.fn((value: any) => { callback = value; });
+            const mixin = new GridRowSelectionMixin(mockGrid);
+
+            mixin.selectKeys(["42"]);
+
+            expect(callback({ id: 42 }, 0)).toEqual({ cssClasses: GridRowSelectionMixin.checkedRowClass });
+        });
+
+        it("tells the rows of a group or of the totals apart, which have no id to select", () => {
+            let callback: any;
+            viewObj.setItemMetadataCallback = vi.fn((value: any) => { callback = value; });
+            const mixin = new GridRowSelectionMixin(mockGrid);
+
+            mixin.selectKeys(["42"]);
+
+            expect(callback({ __group: true, key: "a" }, 0)).toBeUndefined();
+            expect(callback({ __groupTotals: true, id: 42 }, 1)).toEqual({ cssClasses: GridRowSelectionMixin.checkedRowClass });
+        });
+
+        it("gives the view its own metadata back when the mixin is destroyed", () => {
+            const previous = vi.fn();
+            viewObj.getItemMetadataCallback = vi.fn(() => previous);
+            viewObj.setItemMetadataCallback = vi.fn();
+            const mixin = new GridRowSelectionMixin(mockGrid);
+
+            mixin.destroy();
+
+            expect(viewObj.setItemMetadataCallback).toHaveBeenLastCalledWith(previous);
+        });
+    });
+
     describe("destroy", () => {
         it("unsubscribes events and cleans up", () => {
             const mixin = new GridRowSelectionMixin(mockGrid);
