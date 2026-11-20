@@ -5,14 +5,7 @@
 }
 
 @section Head {
-@Html.Script("dynamic://Lookup.Northwind.Customer")
-@Html.Script("dynamic://Lookup.Northwind.CustomerCountry")
-@Html.Script("dynamic://Lookup.Northwind.CustomerCity")
-@Html.Script("dynamic://Lookup.Northwind.Employee")
-@Html.Script("dynamic://Lookup.Northwind.OrderShipCountry")
-@Html.Script("dynamic://Lookup.Northwind.OrderShipCity")
-@Html.Script("dynamic://Lookup.Northwind.Product")
-@Html.Script("dynamic://Lookup.Northwind.Shipper")
+@Html.OrderLookupScripts()
 }
 
 <div id="GridDiv"></div>
