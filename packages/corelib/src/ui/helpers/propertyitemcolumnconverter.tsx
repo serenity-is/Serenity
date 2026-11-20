@@ -87,8 +87,11 @@ export namespace PropertyItemColumnConverter {
                 maxWidth: result.maxWidth,
                 visible: result.visible,
                 frozen: result.frozen,
+                togglable: false,
                 sourceItem: item,
-                name: result.name ?? template.name
+                // the title of the property is its name when the columns class gives it none, which the column
+                // picker would show, so the column keeps the name of the template, e.g. [×], unless it has a title
+                name: item.title && item.title !== item.name ? result.name : template.name
             };
         }
 
@@ -105,6 +108,7 @@ export namespace PropertyItemColumnConverter {
                 maxWidth: result.maxWidth,
                 visible: result.visible,
                 frozen: result.frozen,
+                togglable: false,
                 sortable: false,
                 resizable: false,
                 groupable: false,

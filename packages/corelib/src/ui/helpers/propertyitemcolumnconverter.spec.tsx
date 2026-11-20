@@ -39,6 +39,7 @@ describe('PropertyItemColumnConverter', () => {
             expect(column.frozen).toBe('end');
             expect(column.width).toBe(40);
             expect(column.sortable).toBe(false);
+            expect(column.togglable).toBe(false);
             expect(column.skipGroupCell).toBe(true);
             expect(column.sourceItem?.name).toBe('RowActions');
             // the mixin of the row actions renders the cells, which are empty without it
@@ -59,8 +60,18 @@ describe('PropertyItemColumnConverter', () => {
             expect(column.skipGroupCell).toBe(true);
             expect(column.headerCssClass).toBe('select-all-header');
             expect(column.sortable).toBe(false);
+            // the column picker does not let it be hidden
+            expect(column.togglable).toBe(false);
             expect(typeof column.format).toBe('function');
             expect(typeof column.nameFormat).toBe('function');
+        });
+
+        it('keeps the name of the template, which the column picker shows, unless the item has a title of its own', () => {
+            expect(PropertyItemColumnConverter.toColumn({ name: 'RowSelection', title: 'RowSelection' }).name)
+                .toBe(GridRowSelectionMixin.createSelectColumn().name);
+            expect(PropertyItemColumnConverter.toColumn({ name: 'RowSelection' }).name)
+                .toBe(GridRowSelectionMixin.createSelectColumn().name);
+            expect(PropertyItemColumnConverter.toColumn({ name: 'RowSelection', title: 'Select' }).name).toBe('Select');
         });
 
         it('keeps the width and the pinning of the item', () => {

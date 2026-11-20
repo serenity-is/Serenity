@@ -214,6 +214,8 @@ export class GridRadioSelectionMixin {
             skipGroupCell: true,
             headerCssClass: '',
             sortable: false,
+            // the column picker lists it, but does not let it be hidden
+            togglable: false,
             format: GridRadioSelectionMixin.formatRadioItem
         };
     }

@@ -554,6 +554,9 @@ export class GridRowSelectionMixin {
             skipGroupCell: true,
             headerCssClass: 'select-all-header',
             sortable: false,
+            // the column picker lists it, but does not let it be hidden, which would leave the checked rows
+            // without their check boxes
+            togglable: false,
             format: GridRowSelectionMixin.formatSelectItem,
             ...options
         };
