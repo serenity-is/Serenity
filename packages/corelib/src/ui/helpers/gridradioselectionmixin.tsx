@@ -3,6 +3,7 @@ import { classTypeInfo, nsSerenity, registerType } from "../../base";
 import { clearKeys } from "../../compat";
 import { IDataGrid } from "../datagrid/idatagrid";
 import { GridRowSelectionMixin } from "./gridrowselectionmixin";
+import { UtilityColumns } from "./utilitycolumns";
 
 /**
  * Options for the {@link GridRadioSelectionMixin}.
@@ -23,8 +24,9 @@ const instances = new WeakMap<ISleekGrid, GridRadioSelectionMixin>();
 export class GridRadioSelectionMixin {
 
     static [Symbol.typeInfo] = classTypeInfo(nsSerenity); static { registerType(this) }
+
     /** The id of the column that shows the radio buttons of the rows, which the mixin creates. */
-    static readonly radioColumnId = "__radio__";
+    static get radioColumnId() { return UtilityColumns.radioId; }
 
     /**
      * Formats a cell of the column of the radio buttons that select a row, and is also what tells that
@@ -202,7 +204,7 @@ export class GridRadioSelectionMixin {
             name: '(o)',
             nameFormat: () => "",
             toolTip: ' ',
-            id: GridRadioSelectionMixin.radioColumnId,
+            id: UtilityColumns.radioId,
             resizable: false,
             width: 27,
             minWidth: 27,

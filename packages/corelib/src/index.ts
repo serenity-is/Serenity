@@ -111,6 +111,7 @@ export * from "./ui/formatters/minuteformatter";
 export * from "./ui/formatters/numberformatter";
 export * from "./ui/formatters/urlformatter";
 export * from "./ui/helpers/columnsbase";
+export * from "./ui/helpers/utilitycolumns";
 export * from "./ui/helpers/editlink";
 export * from "./ui/helpers/gridradioselectionmixin";
 export * from "./ui/helpers/gridrowselectionmixin";

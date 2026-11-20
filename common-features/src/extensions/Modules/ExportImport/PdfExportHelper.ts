@@ -1,4 +1,4 @@
-import { DataGrid, deepClone, Fluent, formatDate, getGlobalObject, ListRequest, ListResponse, notifyError, resolveUrl, serviceCall, stringFormat, ToolButton } from "@serenity-is/corelib";
+import { DataGrid, deepClone, Fluent, formatDate, getGlobalObject, ListRequest, ListResponse, notifyError, resolveUrl, serviceCall, stringFormat, ToolButton, UtilityColumns } from "@serenity-is/corelib";
 import { applyFormatterResultToCellNode, Column, FormatterResult, ISleekGrid } from "@serenity-is/sleekgrid";
 import { type jsPDF } from "./JsPdfAutoTable";
 
@@ -110,7 +110,7 @@ export namespace PdfExportHelper {
 
         let gridColumns = dataGrid.columns;
         // the column that selects the rows is not a data column, so it is left out of the export
-        gridColumns = gridColumns.filter(x => x.id != "__select__" && x.id != "__radio__");
+        gridColumns = gridColumns.filter(UtilityColumns.isExportable);
 
         request.IncludeColumns = [];
         for (const column of gridColumns)

@@ -1,5 +1,6 @@
 ﻿import { bindThis } from "@serenity-is/domwise";
 import { Column, type ISleekGrid } from "@serenity-is/sleekgrid";
+import { UtilityColumns } from "../helpers/utilitycolumns";
 import { ColumnPickerDialogTexts, DialogButton, faIcon, Fluent, localText, nsSerenity, tryGetText } from "../../base";
 import { Router } from "../../compat/router";
 import type { IRemoteView } from "../../slick";
@@ -420,13 +421,7 @@ export class ColumnPickerDialog<P extends ColumnPickerDialogOptions = ColumnPick
     }
 
     private getTitle(col: Column) {
-        if (col.id === "__select__")
-            return "[×]";
-
-        if (col.id === "__radio__")
-            return "(o)";
-
-        return col.name || col.toolTip || col.id;
+        return UtilityColumns.getDisplayName(col);
     }
 
     private isAlwaysHidden(col: Column): boolean {

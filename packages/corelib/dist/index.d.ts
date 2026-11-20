@@ -10846,7 +10846,7 @@ export interface GridRowSelectionState {
 export declare class GridRowSelectionMixin {
     static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
     /** The id of the column that shows the checkboxes of the rows, which the mixin creates. */
-    static readonly selectColumnId = "__select__";
+    static get selectColumnId(): string;
     /**
      * Formats a cell of the column of the checkboxes that select the rows, and is also what tells that
      * column apart from the others, see {@link isSelectColumn}. It is a static method, instead of a closure
@@ -17581,6 +17581,23 @@ export declare class ColumnsBase<TRow = any> {
     valueOf(): Column<TRow>[];
 }
 /**
+ * Utility functions for working with grid columns.
+ */
+export declare namespace ColumnUtils {
+    const utilityColumnPrefix = "__";
+    const selectColumnId = "__select__";
+    const radioColumnId = "__radio__";
+    const actionsColumnId = "__actions__";
+    function isExportable(column: Column): boolean;
+    /**
+     * Checks if a column is a utility column. The utility columns are typically used for internal purposes
+     * and have names starting and ending with "__" like "__select__" or "__radio__" or "__actions__".
+     * @param column Column to check if it is a utility column.
+     * @returns True if the column is a utility column, otherwise false.
+     */
+    function isUtilityColumn(column: Column): boolean;
+}
+/**
  * Renders an edit link for a given item type and ID.
  * The link will have a CSS class based on the item type and will point to a URL fragment
  * that includes the item type and ID.
@@ -17633,8 +17650,6 @@ export interface GridRadioSelectionMixinOptions {
  */
 export declare class GridRadioSelectionMixin {
     static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
-    /** The id of the column that shows the radio buttons of the rows, which the mixin creates. */
-    static readonly radioColumnId = "__radio__";
     /**
      * Formats a cell of the column of the radio buttons that select a row, and is also what tells that
      * column apart from the column of the check boxes, see {@link GridRowSelectionMixin.formatSelectItem},

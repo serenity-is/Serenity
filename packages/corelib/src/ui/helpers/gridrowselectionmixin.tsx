@@ -4,6 +4,7 @@ import { classTypeInfo, Fluent, nsSerenity, PubSub, registerType } from "../../b
 import { clearKeys } from "../../compat";
 import type { IRemoteView } from "../../slick/iremoteview";
 import { IDataGrid } from "../datagrid/idatagrid";
+import { UtilityColumns } from "./utilitycolumns";
 
 /**
  * Options for the {@link GridRowSelectionMixin}.
@@ -48,7 +49,7 @@ export class GridRowSelectionMixin {
     static [Symbol.typeInfo] = classTypeInfo(nsSerenity); static { registerType(this); }
 
     /** The id of the column that shows the checkboxes of the rows, which the mixin creates. */
-    static readonly selectColumnId = "__select__";
+    static get selectColumnId() { return UtilityColumns.selectId; }
 
     /**
      * Formats a cell of the column of the checkboxes that select the rows, and is also what tells that
