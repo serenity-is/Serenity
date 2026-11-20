@@ -116,6 +116,11 @@
   --s-card-border: var(--bs-border-color-translucent);
   --s-category-title: #39a7b9;
   --s-modal-shadow: 0 0 6px 3px rgba(0, 0, 0, 0.10);
+  /* where a Bootstrap modal that is not centered starts, so it grows downwards (the centered option of Dialog) */
+  --s-modal-top: max(1.75rem, 8dvh);
+  /* fixed heights of Bootstrap modals, for the height option of Dialog; capped to the viewport */
+  --s-modal-height-md: 40rem;
+  --s-modal-height-lg: 48rem;
 
   /* tabs */
   --s-tabs-border: rgba(0, 0, 0, 0.1);

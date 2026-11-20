@@ -61,7 +61,11 @@ export interface DialogOptions {
     backdrop?: boolean | "static"
     /** Buttons rendered in the dialog footer. */
     buttons?: DialogButton[];
-    /** Vertically centers a Bootstrap modal via `modal-dialog-centered`. @defaultValue `true` */
+    /**
+     * Vertically centers a Bootstrap modal via `modal-dialog-centered`. When `false`, the modal is anchored at the
+     * `--s-modal-top` theme token, so it grows downwards instead of moving as its content changes; combine with
+     * {@link scrollable} to scroll its body once it reaches the bottom of the viewport. @defaultValue `true`
+     */
     centered?: boolean;
     /** Whether to render the header close (`×` / `btn-close`) button. @defaultValue `true` */
     closeButton?: boolean;
@@ -73,6 +77,14 @@ export interface DialogOptions {
     element?: HTMLElement | ArrayLike<HTMLElement> | ((element: HTMLElement) => void);
     /** Enables fade animation for Bootstrap modals. @defaultValue `false` for message dialogs, `true` otherwise */
     fade?: boolean;
+    /**
+     * Fixed height of a Bootstrap modal: `"md"` and `"lg"` take the `--s-modal-height-md` and `--s-modal-height-lg`
+     * theme tokens, `"full"` the height of the viewport. A modal with a fixed height keeps its size and position
+     * while its content changes, and its body scrolls. The height is capped to the viewport, and a fullscreen modal
+     * keeps its full height. `"auto"`, or leaving it unset, sizes the modal to its content. Only effective for
+     * Bootstrap modals. @defaultValue `undefined` (auto)
+     */
+    height?: "auto" | "md" | "lg" | "full";
     /** Applies a `modal-fullscreen[-{breakpoint}-down]` class. Only effective for Bootstrap modals. */
     fullScreen?: boolean | "sm-down" | "md-down" | "lg-down" | "xl-down" | "xxl-down",
     /** jQuery UI `modal` flag. Retained for backward compatibility; does not affect Bootstrap modals. */
@@ -530,7 +542,9 @@ export class Dialog {
                     opt.size && "modal-" + opt.size,
                     opt.fullScreen && "modal-fullscreen" + (typeof opt.fullScreen === "string" ? `-${opt.fullScreen}` : ""),
                     opt.centered && "modal-dialog-centered",
-                    opt.scrollable && "modal-scrollable"]}>
+                    opt.scrollable && "modal-dialog-scrollable",
+                    opt.height && opt.height !== "auto" && "s-modal-height",
+                    opt.height && opt.height !== "auto" && "s-modal-height-" + opt.height]}>
                     <div class="modal-content">
                         {header}
                         {this.el}

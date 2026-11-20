@@ -1,0 +1,107 @@
+/*
+ * Placement and heights of Bootstrap modals, for the `centered`, `scrollable` and `height` options of `Dialog`.
+ *
+ * - A modal that is not centered is anchored at `--s-modal-top`, so it grows downwards as its content changes,
+ *   instead of moving. With `scrollable`, it fits its content until it reaches the bottom of the viewport, and
+ *   then its body scrolls.
+ * - A modal with a fixed `height` ("md", "lg" or "full") keeps its size and position while its content changes:
+ *   the header and the footer stay in place, and the body scrolls. The height is capped to the viewport.
+ * - A fullscreen modal, including one that is fullscreen below a breakpoint or maximized, keeps its full size.
+ *
+ * Shared by the Serene theme and the pro themes.
+ */
+
+/* ── Not centered: anchored near the top ── */
+
+.modal-dialog:not(.modal-dialog-centered) {
+  margin-top: var(--s-modal-top, var(--bs-modal-margin));
+}
+
+/* the scrollable modal of Bootstrap is as tall as the viewport less its margins, and the content fits in it, so
+   the top offset is taken off too */
+.modal-dialog.modal-dialog-scrollable:not(.modal-dialog-centered) {
+  height: calc(100% - var(--s-modal-top, var(--bs-modal-margin)) - var(--bs-modal-margin));
+}
+
+/* ── Fixed heights ── */
+
+.modal-dialog.s-modal-height {
+  /* viewport units, and not percentages, as the margin of a centered modal is computed from it too */
+  --s-modal-height-used: min(var(--s-modal-height),
+    100dvh - var(--s-modal-top, var(--bs-modal-margin)) - var(--bs-modal-margin));
+  height: var(--s-modal-height-used);
+}
+
+/* a centered modal is centered by a minimum height of the viewport, which would win over the fixed height,
+   so it is centered by its top margin instead */
+.modal-dialog.s-modal-height.modal-dialog-centered {
+  --s-modal-height-used: min(var(--s-modal-height), 100dvh - var(--bs-modal-margin) * 2);
+  min-height: 0;
+  margin-top: calc((100dvh - var(--s-modal-height-used)) / 2);
+  margin-bottom: 0;
+}
+
+.s-modal-height-md {
+  --s-modal-height: var(--s-modal-height-md, 40rem);
+}
+
+.s-modal-height-lg {
+  --s-modal-height: var(--s-modal-height-lg, 48rem);
+}
+
+.s-modal-height-full {
+  --s-modal-height: 100dvh;
+}
+
+.modal-dialog.s-modal-height > .modal-content {
+  height: 100%;
+  overflow: hidden;
+}
+
+.modal-dialog.s-modal-height > .modal-content > .modal-body {
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* ── Fullscreen ── */
+
+/* the rules above are more specific than the ones of the fullscreen modals of Bootstrap, so these restore them */
+.modal > .modal-dialog.modal-fullscreen {
+  height: 100%;
+  margin: 0;
+}
+
+@media (max-width: 575.98px) {
+  .modal > .modal-dialog.modal-fullscreen-sm-down {
+    height: 100%;
+    margin: 0;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .modal > .modal-dialog.modal-fullscreen-md-down {
+    height: 100%;
+    margin: 0;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .modal > .modal-dialog.modal-fullscreen-lg-down {
+    height: 100%;
+    margin: 0;
+  }
+}
+
+@media (max-width: 1199.98px) {
+  .modal > .modal-dialog.modal-fullscreen-xl-down {
+    height: 100%;
+    margin: 0;
+  }
+}
+
+@media (max-width: 1399.98px) {
+  .modal > .modal-dialog.modal-fullscreen-xxl-down {
+    height: 100%;
+    margin: 0;
+  }
+}

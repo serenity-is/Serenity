@@ -1,7 +1,7 @@
 // @ts-ignore
 import { afterEach, beforeEach, describe, expect, it, type Mock, type MockInstance, vi } from "vitest";
 import { mockJQuery, unmockBSAndJQuery } from "../test/mocks";
-import { Dialog, alertDialog, cancelDialogButton, confirmDialog, iframeDialog, informationDialog, noDialogButton, okDialogButton, successDialog, uiAndBSButtonNoConflict, warningDialog, yesDialogButton, type MessageDialogOptions } from "./dialogs";
+import { Dialog, alertDialog, cancelDialogButton, confirmDialog, iframeDialog, informationDialog, noDialogButton, okDialogButton, successDialog, uiAndBSButtonNoConflict, warningDialog, yesDialogButton, type DialogOptions, type MessageDialogOptions } from "./dialogs";
 
 afterEach(function cleanup() {
     document.body.innerHTML = "";
@@ -272,6 +272,30 @@ describe("Dialog constructor", () => {
     });
 });
 
+
+describe("Dialog Bootstrap modal classes", () => {
+    function modalDialogOf(opt: DialogOptions) {
+        mockBS5Plus();
+        const dlg = new Dialog({ preferBSModal: true, preferPanel: false, autoOpen: false, ...opt });
+        return dlg.getDialogNode().querySelector(".modal-dialog");
+    }
+
+    it.each(["md", "lg", "full"] as const)("adds the fixed height classes for height %s", height => {
+        const modalDialog = modalDialogOf({ height });
+        expect(modalDialog.classList.contains("s-modal-height")).toBe(true);
+        expect(modalDialog.classList.contains("s-modal-height-" + height)).toBe(true);
+    });
+
+    it.each([undefined, "auto"] as const)("adds no fixed height class for height %s", height => {
+        const modalDialog = modalDialogOf({ height });
+        expect([...modalDialog.classList].some(x => x.startsWith("s-modal-height"))).toBe(false);
+    });
+
+    it("uses the scrollable class of Bootstrap for scrollable", () => {
+        expect(modalDialogOf({ scrollable: true }).classList.contains("modal-dialog-scrollable")).toBe(true);
+        expect(modalDialogOf({}).classList.contains("modal-dialog-scrollable")).toBe(false);
+    });
+});
 
 describe("alertDialog", () => {
     it('alertDialog uses window.alert when no BS/jQuery UI loaded', async function () {
