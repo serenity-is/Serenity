@@ -25,7 +25,7 @@ public class DefaultElevationHandlerTests
         return context;
     }
 
-    private static string CreateToken(IDataProtectionProvider provider, DateTime expires, int userId)
+    private static string CreateToken(IDataProtectionProvider provider, DateTime expires, string userId)
     {
         return provider.CreateProtector(ElevationPurpose).ProtectBinary(bw =>
         {
@@ -102,7 +102,7 @@ public class DefaultElevationHandlerTests
         var handler = new DefaultElevationHandler(new NullRequestContext(),
             accessor, provider, new FixedTimeProvider(DateTimeOffset.UtcNow));
 
-        var token = CreateToken(provider, DateTime.UtcNow.AddMinutes(10), 5);
+        var token = CreateToken(provider, DateTime.UtcNow.AddMinutes(10), "5");
         accessor.HttpContext!.Request.Headers.Cookie = "ElevationToken=" + Uri.EscapeDataString(token);
 
         handler.ValidateElevationToken();
@@ -117,7 +117,7 @@ public class DefaultElevationHandlerTests
         var handler = new DefaultElevationHandler(new NullRequestContext(),
             accessor, provider, timeProvider);
 
-        var token = CreateToken(provider, timeProvider.Now.AddMinutes(-1).DateTime, 5);
+        var token = CreateToken(provider, timeProvider.Now.AddMinutes(-1).DateTime, "5");
         accessor.HttpContext!.Request.Headers.Cookie = "ElevationToken=" + Uri.EscapeDataString(token);
 
         var error = Assert.Throws<ValidationError>(() => handler.ValidateElevationToken());
@@ -145,7 +145,22 @@ public class DefaultElevationHandlerTests
         var handler = new DefaultElevationHandler(new NullRequestContext(),
             accessor, provider, new FixedTimeProvider(DateTimeOffset.UtcNow));
 
-        var token = CreateToken(provider, DateTime.UtcNow.AddMinutes(10), 5);
+        var token = CreateToken(provider, DateTime.UtcNow.AddMinutes(10), "5");
+        accessor.HttpContext!.Request.Headers.Cookie = "ElevationToken=" + Uri.EscapeDataString(token);
+
+        var error = Assert.Throws<ValidationError>(() => handler.ValidateElevationToken());
+        Assert.Equal("Invalid elevation token", error.Message);
+    }
+
+    [Fact]
+    public void ValidateElevationToken_Throws_For_Different_Guid_User()
+    {
+        var provider = new EphemeralDataProtectionProvider();
+        var accessor = new MockHttpContextAccessor { HttpContext = CreateContext("74b18782-9c57-4041-86d2-2db120feb28a") };
+        var handler = new DefaultElevationHandler(new NullRequestContext(),
+            accessor, provider, new FixedTimeProvider(DateTimeOffset.UtcNow));
+
+        var token = CreateToken(provider, DateTime.UtcNow.AddMinutes(10), "8dbb43ef-eb63-4cf1-9fca-1853448ae35d");
         accessor.HttpContext!.Request.Headers.Cookie = "ElevationToken=" + Uri.EscapeDataString(token);
 
         var error = Assert.Throws<ValidationError>(() => handler.ValidateElevationToken());
