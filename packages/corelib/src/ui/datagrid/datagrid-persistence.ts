@@ -51,7 +51,9 @@ export interface PersistedGridColumn {
  */
 export interface PersistedGridSettings {
     /** Flags that indicate which parts of the settings were persisted. */
-    flags?: GridPersistenceFlags;
+    flags?: Omit<GridPersistenceFlags, "restoreOptions">;
+    /** Columns revision at the time the snapshot was saved (0 or undefined means no revision). */
+    columnsRevision?: number;
     /** Column state (order, width, visibility, pinning, sort). */
     columns?: PersistedGridColumn[];
     /** Advanced filter panel items. */
@@ -91,6 +93,13 @@ export interface GridPersistenceFlags {
     quickSearch?: boolean;
     /** Include deleted toggle state. Defaults to persist unless explicitly set to false. */
     includeDeleted?: boolean;
+    /** Restore-only options; not stored in snapshots. Null values inherit defaults. */
+    restoreOptions?: {
+        /** Show default-visible columns absent from a complete snapshot. Defaults to true for personal settings restored from storage, false otherwise. */
+        newVisibleColumns?: boolean | null;
+        /** Reset the column layout to the initial one, or keep (merge) the saved one when the columns revision differs. Defaults to "reset" for personal settings restored from storage, "merge" otherwise. */
+        onRevisionMismatch?: "reset" | "merge" | null;
+    } | null;
 }
 
 /**
@@ -129,6 +138,7 @@ export const omitAllGridPersistenceFlags: GridPersistenceFlags = {
  * @returns Snapshot of the current grid settings.
  */
 export function getCurrentSettings(this: void, opt: {
+    columnsRevision?: number,
     filterStore: FilterStore,
     flags: GridPersistenceFlags,
     includeDeletedToggle: HTMLElement,
@@ -139,13 +149,19 @@ export function getCurrentSettings(this: void, opt: {
 }): PersistedGridSettings {
 
     const flags = Object.assign({}, defaultGridPersistenceFlags, opt.flags || {});
+    const persistedFlags: GridPersistenceFlags = { ...flags };
+    delete persistedFlags.restoreOptions;
     const settings: PersistedGridSettings = {
-        flags: flags
+        flags: persistedFlags
     };
     if (flags.columnVisibility ||
         flags.columnWidths ||
         flags.columnPinning ||
         flags.sortColumns) {
+        const columnsRevision = opt.columnsRevision || 0;
+        if (columnsRevision > 0) {
+            settings.columnsRevision = columnsRevision;
+        }
         settings.columns = [];
         const sortColumns = opt.sleekGrid.getSortColumns();
         const columns = opt.sleekGrid.getAllColumns();
@@ -243,9 +259,11 @@ export function getCurrentSettings(this: void, opt: {
  */
 export function restoreSettingsFrom(this: void, opt: {
     canShowColumn?: (column: Column) => boolean,
+    columnsRevision?: number,
     filterStore: FilterStore,
     flags: GridPersistenceFlags,
     includeDeletedToggle: HTMLElement,
+    initialColumns?: PersistedGridColumn[],
     quickFiltersDiv: HTMLElement,
     sleekGrid: ISleekGrid,
     settings: PersistedGridSettings,
@@ -261,10 +279,40 @@ export function restoreSettingsFrom(this: void, opt: {
 
     const flags = Object.assign({}, defaultGridPersistenceFlags, opt.flags || {});
     const settings = opt.settings || {};
+    let columnLayoutReset = false;
+    let columnWidthsRestored = false;
 
     if (settings.columns != null) {
 
-        if (flags.columnPinning &&
+        const revisionMismatch = (opt.columnsRevision || 0) > 0 &&
+            opt.columnsRevision !== (settings.columnsRevision || 0);
+        const resetColumnsForRevision = revisionMismatch &&
+            flags.restoreOptions?.onRevisionMismatch === "reset";
+        columnLayoutReset = resetColumnsForRevision;
+
+        if (resetColumnsForRevision && opt.initialColumns?.length) {
+            const initialById = new Map(opt.initialColumns.map(column => [column.id, column]));
+            for (const column of allColumns) {
+                const initial = initialById.get(column.id);
+                if (!initial)
+                    continue;
+                if (flags.columnWidths && initial.width != null && initial.width !== 0)
+                    column.width = initial.width;
+                if (flags.columnPinning && initial.pin !== undefined)
+                    column.frozen = initial.pin === "start" || initial.pin === "end" ? initial.pin : null;
+            }
+
+            if (flags.columnVisibility && opt.initialColumns.some(column => column.visible != null)) {
+                const visible = allColumns.filter(column =>
+                    (initialById.get(column.id)?.visible ?? (column.visible !== false)) &&
+                    (opt.canShowColumn ?? isVisibleOrTogglable)(column)).map(column => column.id);
+                const order = opt.initialColumns.map(column => column.id)
+                    .concat(allColumns.filter(column => !initialById.has(column.id)).map(column => column.id));
+                opt.sleekGrid.reorderColumns(order, { notify: false, setVisible: visible });
+            }
+        }
+
+        if (!resetColumnsForRevision && flags.columnPinning &&
             (settings.flags?.columnPinning 
                 ?? settings.columns.some(x => "pin" in x))) {
             for (let x1 of settings.columns) {
@@ -278,13 +326,14 @@ export function restoreSettingsFrom(this: void, opt: {
             }
         }
 
-        if (flags.columnWidths && (settings.flags?.columnWidths 
+        if (!resetColumnsForRevision && flags.columnWidths && (settings.flags?.columnWidths 
                 ?? settings.columns.some(c => "width" in c))) {
             for (let x2 of settings.columns) {
                 if (x2.id != null && x2.width != null && x2.width !== 0) {
                     const column1 = colById[x2.id];
                     if (column1 != null) {
                         column1.width = x2.width;
+                        columnWidthsRestored = true;
                     }
                 }
             }
@@ -320,7 +369,7 @@ export function restoreSettingsFrom(this: void, opt: {
             opt.sleekGrid.setSortColumns(list);
         }
 
-        if (flags.columnVisibility && (settings.flags?.columnVisibility
+        if (!resetColumnsForRevision && flags.columnVisibility && (settings.flags?.columnVisibility
                 ?? settings.columns.some(x => "visible" in x))) {
             let visibleColumns = settings.columns.filter(x => x.id != null &&
                 x.visible === true &&
@@ -328,7 +377,49 @@ export function restoreSettingsFrom(this: void, opt: {
                 (opt.canShowColumn ?? isVisibleOrTogglable)(colById[x.id])
             ).map(x => x.id);
 
-            const alwaysVisibleColumns = allColumns.filter(c => c.visible !== false && 
+            if (flags.restoreOptions?.newVisibleColumns && settings.flags != null) {
+                const persistedIds = new Set(settings.columns.map(x => x.id));
+                const visibleIds = new Set(visibleColumns);
+                const initialVisibility = new Map(opt.initialColumns?.map(column => [column.id, column.visible]));
+                const after = new Map<string, string[]>();
+                const leading: string[] = [];
+                // the initial order is the default position of columns, whatever order a previous view left in the grid
+                const ordered = opt.initialColumns?.length ?
+                    opt.initialColumns.map(c => colById[c.id]).filter(c => c != null)
+                        .concat(allColumns.filter(c => !opt.initialColumns.some(i => i.id === c.id))) :
+                    allColumns;
+
+                for (const [index, column] of ordered.entries()) {
+                    if (persistedIds.has(column.id) ||
+                        (initialVisibility.get(column.id) ?? (column.visible !== false)) === false ||
+                        !(opt.canShowColumn ?? isVisibleOrTogglable)(column)) {
+                        continue;
+                    }
+
+                    let previous: Column;
+                    for (let previousIndex = index - 1; previousIndex >= 0; previousIndex--) {
+                        if (visibleIds.has(ordered[previousIndex].id)) {
+                            previous = ordered[previousIndex];
+                            break;
+                        }
+                    }
+                    if (previous) {
+                        const additions = after.get(previous.id) ?? [];
+                        additions.push(column.id);
+                        after.set(previous.id, additions);
+                    }
+                    else {
+                        leading.push(column.id);
+                    }
+                }
+
+                visibleColumns = leading.concat(visibleColumns.flatMap(id => [
+                    id,
+                    ...(after.get(id) ?? [])
+                ]));
+            }
+
+            const alwaysVisibleColumns = allColumns.filter(c => c.visible !== false &&
                 c.togglable === false).map(c => c.id).filter(id => !visibleColumns.includes(id));
             visibleColumns = alwaysVisibleColumns.concat(visibleColumns);
 
@@ -391,6 +482,8 @@ export function restoreSettingsFrom(this: void, opt: {
             qsWidget && qsWidget.restoreState(settings.quickSearchText, settings.quickSearchField);
         }
     }
+
+    return { columnLayoutReset, columnWidthsRestored };
 }
 
 /**
@@ -411,6 +504,14 @@ export interface DataGridPersistenceEvent extends DataGridEvent {
     readonly restoring: boolean;
     /** True while the grid is persisting settings. */
     readonly persisting: boolean;
+    /** True when persistence was triggered by a column resize. */
+    readonly columnResized?: boolean;
+    /** True when restoring the user's personal settings from storage, e.g. on startup, where unset restore options get their defaults after the event. */
+    readonly automaticRestore?: boolean;
+    /** True after restoring when a revision mismatch discarded the saved column layout. */
+    columnLayoutReset?: boolean;
+    /** True after restoring when at least one saved column width was applied. */
+    columnWidthsRestored?: boolean;
 }
 
 function isVisibleOrTogglable(column: Column): boolean {

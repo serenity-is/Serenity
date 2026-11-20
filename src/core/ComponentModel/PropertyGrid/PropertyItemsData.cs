@@ -19,4 +19,11 @@ public class PropertyItemsData
     [JsonPropertyName("additionalItems")]
     [Newtonsoft.Json.JsonProperty("additionalItems")]
     public List<PropertyItem>? AdditionalItems { get; set; }
+
+    /// <summary>
+    /// Optional revision number for the property items (0 or null means no revision).
+    /// </summary>
+    [JsonPropertyName("revision")]
+    [Newtonsoft.Json.JsonProperty("revision")]
+    public int? Revision { get; set; }
 }

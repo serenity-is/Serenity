@@ -3502,6 +3502,8 @@ export interface PropertyItemsData {
     items: PropertyItem[];
     /** Extra fields available on demand (e.g. via column picker); not rendered initially. */
     additionalItems: PropertyItem[];
+    /** Optional revision number for the property items (0 or undefined means no revision). */
+    revision?: number;
 }
 /**
  * Alias for {@link PropertyItemsData}.
@@ -11098,7 +11100,9 @@ export interface PersistedGridColumn {
  */
 export interface PersistedGridSettings {
     /** Flags that indicate which parts of the settings were persisted. */
-    flags?: GridPersistenceFlags;
+    flags?: Omit<GridPersistenceFlags, "restoreOptions">;
+    /** Columns revision at the time the snapshot was saved (0 or undefined means no revision). */
+    columnsRevision?: number;
     /** Column state (order, width, visibility, pinning, sort). */
     columns?: PersistedGridColumn[];
     /** Advanced filter panel items. */
@@ -11139,6 +11143,13 @@ export interface GridPersistenceFlags {
     quickSearch?: boolean;
     /** Include deleted toggle state. Defaults to persist unless explicitly set to false. */
     includeDeleted?: boolean;
+    /** Restore-only options; not stored in snapshots. Null values inherit defaults. */
+    restoreOptions?: {
+        /** Show default-visible columns absent from a complete snapshot. Defaults to true for personal settings restored from storage, false otherwise. */
+        newVisibleColumns?: boolean | null;
+        /** Reset the column layout to the initial one, or keep (merge) the saved one when the columns revision differs. Defaults to "reset" for personal settings restored from storage, "merge" otherwise. */
+        onRevisionMismatch?: "reset" | "merge" | null;
+    } | null;
 }
 /** Flags that disable persistence for every grid aspect. */
 export declare const omitAllGridPersistenceFlags: GridPersistenceFlags;
@@ -11160,6 +11171,12 @@ export interface DataGridPersistenceEvent extends DataGridEvent {
     readonly restoring: boolean;
     /** True while the grid is persisting settings. */
     readonly persisting: boolean;
+    /** True when persistence was triggered by a column resize. */
+    readonly columnResized?: boolean;
+    /** True after restoring when a revision mismatch discarded the saved column layout. */
+    columnLayoutReset?: boolean;
+    /** True after restoring when at least one saved column width was applied. */
+    columnWidthsRestored?: boolean;
 }
 /**
  * What a grid hides of the look its theme gives to grids, like the stripes of its rows, so it looks more like a plain table.
@@ -11580,6 +11597,8 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
     private _initialSettings;
     private _layoutTimer;
     private _gridStyleApplied;
+    private persistingColumnResize;
+    private automaticRestore;
     /** The title element. */
     protected titleDiv: Fluent;
     /** The toolbar widget. */
@@ -12131,6 +12150,11 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
      */
     protected getColumnsKey(): string;
     /**
+     * Returns the columns revision used to detect incompatible persisted column layouts.
+     * @returns The columns revision number (0 means no revision).
+     */
+    protected getColumnsRevision(): number;
+    /**
      * Returns the property items for this grid.
      * @returns The property items.
      */
@@ -12368,7 +12392,7 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
      */
     protected getPersistenceKey(): string;
     /**
-     * Returns the default persistence flags for this grid.
+     * Returns the default persistence flags for this grid. Restore options apply to automatic storage restores.
      * @returns Grid persistence flags.
      */
     protected gridPersistenceFlags(): GridPersistenceFlags;
@@ -12380,14 +12404,14 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
     /**
      * Restores grid settings from the given settings or from storage.
      * @param settings - Optional settings to restore; defaults to persisted settings.
-     * @param flags - Optional persistence flags.
+     * @param flags - Optional flags; storage restores show new visible columns and reset the layout on a revision mismatch unless restoreOptions say otherwise.
      * @returns Void or a promise that resolves when restoration completes.
      */
     protected restoreSettings(settings?: PersistedGridSettings, flags?: GridPersistenceFlags): void | Promise<void>;
     /**
      * Restores grid state from a persisted settings snapshot.
      * @param settings - The settings to restore.
-     * @param flags - Optional persistence flags.
+     * @param flags - Optional flags; direct restores keep the snapshot as is unless restoreOptions say otherwise.
      */
     protected restoreSettingsFrom(settings: PersistedGridSettings, flags?: GridPersistenceFlags): void;
     private _persistenceLock;

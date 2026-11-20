@@ -63,6 +63,8 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     declare private _initialSettings: PersistedGridSettings;
     declare private _layoutTimer: number;
     declare private _gridStyleApplied: number;
+    private persistingColumnResize = false;
+    private automaticFlags: GridPersistenceFlags | null = null;
 
     /** The title element. */
     declare protected titleDiv: Fluent;
@@ -221,7 +223,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         this.onAfterInit.notify({ dataGrid: this });
         this.afterInit();
 
-        this.initialSettings = this.getCurrentSettings(null);
+        this.initialSettings = this.getCurrentSettings({ columnWidths: true });
 
         const restoreResult = this.restoreSettings(null, null);
         if ((restoreResult as any)?.then)
@@ -778,7 +780,14 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
      * Persists settings when columns are resized.
      */
     protected handleGridColumnsResized() {
-        this.persistSettings();
+        const previous = this.persistingColumnResize;
+        this.persistingColumnResize = true;
+        try {
+            this.persistSettings();
+        }
+        finally {
+            this.persistingColumnResize = previous;
+        }
     }
 
     /**
@@ -1256,6 +1265,14 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
      */
     protected getColumnsKey(): string {
         return null;
+    }
+
+    /**
+     * Returns the columns revision used to detect incompatible persisted column layouts.
+     * @returns The columns revision number (0 means no revision).
+     */
+    protected getColumnsRevision(): number {
+        return this.propertyItemsData?.revision || 0;
     }
 
     /**
@@ -1779,7 +1796,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     }
 
     /**
-     * Returns the default persistence flags for this grid.
+     * Returns the default persistence flags for this grid. Restore options apply to automatic storage restores.
      * @returns Grid persistence flags.
      */
     protected gridPersistenceFlags(): GridPersistenceFlags {
@@ -1814,26 +1831,66 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     /**
      * Restores grid settings from the given settings or from storage.
      * @param settings - Optional settings to restore; defaults to persisted settings.
-     * @param flags - Optional persistence flags.
+     * @param flags - Optional flags; storage restores show new visible columns and reset the layout on a revision mismatch unless restoreOptions say otherwise.
      * @returns Void or a promise that resolves when restoration completes.
      */
     protected restoreSettings(settings?: PersistedGridSettings, flags?: GridPersistenceFlags): void | Promise<void> {
         if (settings != null)
             return this.restoreSettingsFrom(settings, flags);
 
+        const flagsDefault = this.gridPersistenceFlags();
+        const personalFlags: GridPersistenceFlags = {
+            ...flagsDefault,
+            ...flags,
+            restoreOptions: {
+                newVisibleColumns: flags?.restoreOptions?.newVisibleColumns ??
+                    flagsDefault?.restoreOptions?.newVisibleColumns,
+                onRevisionMismatch: flags?.restoreOptions?.onRevisionMismatch ??
+                    flagsDefault?.restoreOptions?.onRevisionMismatch
+            }
+        };
+        const restoreAutomatic = (s: PersistedGridSettings) => {
+            this.automaticFlags = personalFlags;
+            try {
+                this.restoreSettingsFrom(s, personalFlags);
+            }
+            finally {
+                this.automaticFlags = null;
+            }
+        };
         const settingsOrPromise = this.getPersistedSettings();
         if ((settingsOrPromise as any)?.then)
-            return (settingsOrPromise as Promise<PersistedGridSettings>).then((s) => this.restoreSettingsFrom(s));
+            return (settingsOrPromise as Promise<PersistedGridSettings>).then(restoreAutomatic);
 
-        this.restoreSettingsFrom(settingsOrPromise as PersistedGridSettings);
+        restoreAutomatic(settingsOrPromise as PersistedGridSettings);
     }
 
     /**
      * Restores grid state from a persisted settings snapshot.
      * @param settings - The settings to restore.
-     * @param flags - Optional persistence flags.
+     * @param flags - Optional flags; direct restores keep the snapshot as is unless restoreOptions say otherwise.
      */
     protected restoreSettingsFrom(settings: PersistedGridSettings, flags?: GridPersistenceFlags): void {
+        // set by restoreSettings for its own call only; overrides of this method may not pass the arguments through
+        const automaticFlags = this.automaticFlags;
+        this.automaticFlags = null;
+        const automatic = automaticFlags != null;
+        if (automatic && flags && flags !== automaticFlags) {
+            flags = {
+                ...automaticFlags,
+                ...flags,
+                restoreOptions: {
+                    ...automaticFlags.restoreOptions,
+                    ...flags.restoreOptions,
+                    newVisibleColumns: flags.restoreOptions?.newVisibleColumns ??
+                        automaticFlags.restoreOptions?.newVisibleColumns,
+                    onRevisionMismatch: flags.restoreOptions?.onRevisionMismatch ??
+                        automaticFlags.restoreOptions?.onRevisionMismatch
+                }
+            };
+        }
+        else
+            flags ??= automaticFlags ?? undefined;
         if (!this._grid || !settings)
             return;
 
@@ -1842,24 +1899,44 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         try {
 
             const flagsDefault = this.gridPersistenceFlags();
+            const directFlagsDefault: GridPersistenceFlags = { ...flagsDefault };
+            delete directFlagsDefault.restoreOptions;
             const event: DataGridPersistenceEvent = {
                 after: false,
                 dataGrid: this,
                 flagsArgument: flags,
                 flagsDefault,
-                flagsToUse: flags || flagsDefault,
+                flagsToUse: flags || directFlagsDefault,
                 restoring: true,
                 persisting: false,
+                automaticRestore: automatic,
                 settings,
             };
 
             this.onPersistence.notify(event);
-            event.flagsToUse ??= event.flagsDefault;
+            event.flagsToUse ??= directFlagsDefault;
 
-            restoreSettingsFrom({
+            let flagsToUse = event.flagsToUse;
+            if (automatic) {
+                const options = flagsToUse.restoreOptions;
+                flagsToUse = {
+                    ...flagsToUse,
+                    restoreOptions: {
+                        ...options,
+                        newVisibleColumns: options?.newVisibleColumns ?? true,
+                        onRevisionMismatch: options?.onRevisionMismatch ?? "reset"
+                    }
+                };
+            }
+
+            event.flagsToUse = flagsToUse;
+
+            const restoreResult = restoreSettingsFrom({
+                columnsRevision: this.getColumnsRevision(),
                 filterStore: this.filterBar?.get_store(),
-                flags: event.flagsToUse,
+                flags: flagsToUse,
                 includeDeletedToggle: this.domNode.querySelector('.s-IncludeDeletedToggle'),
+                initialColumns: this.initialSettings?.columns,
                 quickFiltersDiv: this.quickFiltersDiv?.getNode(),
                 sleekGrid: this._grid,
                 settings: event.settings,
@@ -1868,6 +1945,8 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
                 view: this.view
             });
 
+            event.columnLayoutReset = restoreResult.columnLayoutReset;
+            event.columnWidthsRestored = restoreResult.columnWidthsRestored;
             event.after = true;
             this.onPersistence.notify(event);
         }
@@ -1924,17 +2003,20 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
             dataGrid: this,
             flagsArgument: flags,
             flagsDefault,
-            flagsToUse: flags || flagsDefault,
+            flagsToUse: { ...(flags || flagsDefault) },
             restoring: false,
             persisting: true,
+            columnResized: this.persistingColumnResize,
             settings: null
         }
 
-        event.flagsToUse ||= event.flagsDefault;
+        this.onPersistence.notify(event);
+        event.flagsToUse ??= event.flagsDefault;
 
         event.settings = getCurrentSettings({
+            columnsRevision: this.getColumnsRevision(),
             filterStore: this.filterBar?.get_store(),
-            flags,
+            flags: event.flagsToUse,
             includeDeletedToggle: this.domNode.querySelector('.s-IncludeDeletedToggle'),
             quickFiltersDiv: this.quickFiltersDiv?.getNode(),
             sleekGrid: this._grid,

@@ -56,6 +56,13 @@ public sealed class ColumnsScriptAttribute : Attribute
     public string? LocalTextPrefix { get; set; }
 
     /// <summary>
+    /// Optional revision number for the columns layout. Changing this value
+    /// resets persisted personal grid column layouts from different revisions on restore.
+    /// 0 means no revision.
+    /// </summary>
+    public int Revision { get; set; }
+
+    /// <summary>
     /// Gets the automatically inferred columns key for the specified type.
     /// </summary>
     /// <param name="type">The type for which to infer the columns key.</param>

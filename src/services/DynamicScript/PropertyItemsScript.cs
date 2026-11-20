@@ -75,6 +75,10 @@ public abstract partial class PropertyItemsScript(string scriptName, Type type,
             AdditionalItems = []
         };
 
+        var columnsAttr = type.GetCustomAttribute<ColumnsScriptAttribute>();
+        if (columnsAttr?.Revision > 0)
+            data.Revision = columnsAttr.Revision;
+
         if (typeof(ICustomizePropertyItems).IsAssignableFrom(type))
         {
             var instance = ActivatorUtilities.CreateInstance(

@@ -1,4 +1,4 @@
-﻿import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Column, ISleekGrid } from "@serenity-is/sleekgrid";
 import { cssEscape, Fluent } from "../../base";
 import type { FilterLine } from "../filtering/filterline";
@@ -38,6 +38,7 @@ function mockSleekGrid(columns?: any[], sortColumns?: any[]): ISleekGrid {
         getSortColumns: vi.fn(() => sortColumns || []),
         invalidate: vi.fn(),
         invalidateColumns: vi.fn(),
+        reorderColumns: vi.fn(),
         setVisibleColumns: vi.fn(),
         setSortColumns: vi.fn()
     } satisfies Partial<ISleekGrid> as unknown as ISleekGrid;
@@ -51,6 +52,39 @@ function mockFilterStore(items?: FilterLine[]): FilterStore {
 }
 
 describe("getCurrentSettings", () => {
+    it("does not persist restore options or mutate supplied flags", () => {
+        const flags = { ...omitAllGridPersistenceFlags, restoreOptions: { newVisibleColumns: true }, customFlag: true };
+        const settings = getCurrentSettings({
+            filterStore: null,
+            flags,
+            includeDeletedToggle: null,
+            quickFiltersDiv: null,
+            sleekGrid: mockSleekGrid(),
+            toolbarNode: null,
+            uniqueName: "TestGrid"
+        });
+
+        expect(settings.flags).not.toHaveProperty("restoreOptions");
+        expect(settings.flags).toHaveProperty("customFlag", true);
+        expect(flags.restoreOptions).toEqual({ newVisibleColumns: true });
+    });
+
+    it("stores columnsRevision only when positive and columns are persisted", () => {
+        const base = {
+            filterStore: null,
+            flags: { ...omitAllGridPersistenceFlags, columnVisibility: true },
+            includeDeletedToggle: null,
+            quickFiltersDiv: null,
+            sleekGrid: mockSleekGrid([{ id: "col1" }]),
+            toolbarNode: null,
+            uniqueName: "TestGrid"
+        };
+
+        expect(getCurrentSettings({ ...base, columnsRevision: 2 }).columnsRevision).toBe(2);
+        expect(getCurrentSettings({ ...base, columnsRevision: 0 }).columnsRevision).toBeUndefined();
+        expect(getCurrentSettings({ ...base, columnsRevision: 2, flags: omitAllGridPersistenceFlags }).columnsRevision).toBeUndefined();
+    });
+
     it("omits all settings when all flags are false", () => {
         const grid = mockSleekGrid();
         const settings = getCurrentSettings({
@@ -608,6 +642,407 @@ describe("restoreSettingsFrom", () => {
         expect(grid.setVisibleColumns).not.toHaveBeenCalled();
         expect(grid.invalidateColumns).toHaveBeenCalled();
         expect(grid.invalidate).toHaveBeenCalled();
+    });
+
+    it("merges newly added columns into their default positions", () => {
+        const columns = [
+            { id: "col1" },
+            { id: "col2" },
+            { id: "col3" }
+        ];
+        const grid = mockSleekGrid(columns);
+        restoreSettingsFrom(restoreSettingsArgs({
+            sleekGrid: grid,
+            flags: { ...omitAllGridPersistenceFlags, columnVisibility: true, restoreOptions: { newVisibleColumns: true } },
+            settings: {
+                flags: { columnVisibility: true },
+                columns: [
+                    { id: "col1", visible: true },
+                    { id: "col3", visible: true }
+                ]
+            }
+        }));
+
+        expect(grid.setVisibleColumns).toHaveBeenCalledWith(["col1", "col2", "col3"], { notify: false });
+    });
+
+    it.each([
+        [{ newVisibleColumns: true }, ["col1", "col2"]],
+        [{ newVisibleColumns: false }, ["col1"]],
+        [{ newVisibleColumns: null }, ["col1"]],
+        [{}, ["col1"]]
+    ])("resolves visibility restore options %o", (restoreOptions, expected) => {
+        const grid = mockSleekGrid([{ id: "col1" }, { id: "col2" }]);
+        restoreSettingsFrom(restoreSettingsArgs({
+            sleekGrid: grid,
+            flags: { ...omitAllGridPersistenceFlags, columnVisibility: true, restoreOptions },
+            settings: { flags: { columnVisibility: true }, columns: [{ id: "col1", visible: true }] }
+        }));
+
+        expect(grid.setVisibleColumns).toHaveBeenCalledWith(expected, { notify: false });
+    });
+
+    it("preserves the persisted order of existing columns while merging additions", () => {
+        const columns = [
+            { id: "col1" },
+            { id: "col2" },
+            { id: "col3" },
+            { id: "col4" }
+        ];
+        const grid = mockSleekGrid(columns);
+        restoreSettingsFrom(restoreSettingsArgs({
+            sleekGrid: grid,
+            flags: { ...omitAllGridPersistenceFlags, columnVisibility: true, restoreOptions: { newVisibleColumns: true } },
+            settings: {
+                flags: { columnVisibility: true },
+                columns: [
+                    { id: "col3", visible: true },
+                    { id: "col1", visible: true },
+                    { id: "col4", visible: true }
+                ]
+            }
+        }));
+
+        expect(grid.setVisibleColumns).toHaveBeenCalledWith(["col3", "col1", "col2", "col4"], { notify: false });
+    });
+
+    it("does not merge newly added columns that are hidden by default", () => {
+        const columns = [
+            { id: "col1" },
+            { id: "col2", visible: false },
+            { id: "col3" }
+        ];
+        const grid = mockSleekGrid(columns);
+        restoreSettingsFrom(restoreSettingsArgs({
+            sleekGrid: grid,
+            flags: { ...omitAllGridPersistenceFlags, columnVisibility: true, restoreOptions: { newVisibleColumns: true } },
+            settings: {
+                flags: { columnVisibility: true },
+                columns: [
+                    { id: "col1", visible: true },
+                    { id: "col3", visible: true }
+                ]
+            }
+        }));
+
+        expect(grid.setVisibleColumns).toHaveBeenCalledWith(["col1", "col3"], { notify: false });
+    });
+
+    it("merges new columns using initial visibility while honoring restrictions", () => {
+        const grid = mockSleekGrid([
+            { id: "col1", visible: true },
+            { id: "col2", visible: false },
+            { id: "col3", visible: true },
+            { id: "col4", visible: false }
+        ]);
+        restoreSettingsFrom(restoreSettingsArgs({
+            sleekGrid: grid,
+            canShowColumn: column => column.id !== "col4",
+            initialColumns: [
+                { id: "col1", visible: true },
+                { id: "col2", visible: true },
+                { id: "col3", visible: false },
+                { id: "col4", visible: true }
+            ],
+            flags: { ...omitAllGridPersistenceFlags, columnVisibility: true, restoreOptions: { newVisibleColumns: true } },
+            settings: {
+                flags: { columnVisibility: true },
+                columns: [{ id: "col1", visible: true }]
+            }
+        }));
+
+        expect(grid.setVisibleColumns).toHaveBeenCalledWith(["col1", "col2"], { notify: false });
+    });
+
+    it("does not merge newly added columns with snapshot policy", () => {
+        const columns = [
+            { id: "col1" },
+            { id: "col2" },
+            { id: "col3" }
+        ];
+        const grid = mockSleekGrid(columns);
+        restoreSettingsFrom(restoreSettingsArgs({
+            sleekGrid: grid,
+            flags: { ...omitAllGridPersistenceFlags, columnVisibility: true, restoreOptions: { newVisibleColumns: false } },
+            settings: {
+                flags: { columnVisibility: true },
+                columns: [
+                    { id: "col1", visible: true },
+                    { id: "col3", visible: true }
+                ]
+            }
+        }));
+
+        expect(grid.setVisibleColumns).toHaveBeenCalledWith(["col1", "col3"], { notify: false });
+    });
+
+    it("merges snapshots that contain persisted flags", () => {
+        const columns = [
+            { id: "col1" },
+            { id: "col2" },
+            { id: "col3" }
+        ];
+        const grid = mockSleekGrid(columns);
+        restoreSettingsFrom(restoreSettingsArgs({
+            sleekGrid: grid,
+            flags: { ...omitAllGridPersistenceFlags, columnVisibility: true, restoreOptions: { newVisibleColumns: true } },
+            settings: {
+                flags: { columnVisibility: true },
+                columns: [
+                    { id: "col1", visible: true },
+                    { id: "col3", visible: true }
+                ]
+            }
+        }));
+
+        expect(grid.setVisibleColumns).toHaveBeenCalledWith(["col1", "col2", "col3"], { notify: false });
+    });
+
+    it("does not merge unflagged snapshots even if they contain hidden columns", () => {
+        const columns = [
+            { id: "col1" },
+            { id: "col2" },
+            { id: "col3" }
+        ];
+        const grid = mockSleekGrid(columns);
+        restoreSettingsFrom(restoreSettingsArgs({
+            sleekGrid: grid,
+            flags: { ...omitAllGridPersistenceFlags, columnVisibility: true, restoreOptions: { newVisibleColumns: true } },
+            settings: {
+                columns: [
+                    { id: "col1", visible: true },
+                    { id: "col3", visible: false }
+                ]
+            }
+        }));
+
+        expect(grid.setVisibleColumns).toHaveBeenCalledWith(["col1"], { notify: false });
+    });
+
+    it("does not merge columns from an unflagged legacy snapshot", () => {
+        const columns = [
+            { id: "col1" },
+            { id: "col2" },
+            { id: "col3" }
+        ];
+        const grid = mockSleekGrid(columns);
+        restoreSettingsFrom(restoreSettingsArgs({
+            sleekGrid: grid,
+            flags: { ...omitAllGridPersistenceFlags, columnVisibility: true, restoreOptions: { newVisibleColumns: true } },
+            settings: {
+                columns: [
+                    { id: "col1", visible: true },
+                    { id: "col3", visible: true }
+                ]
+            }
+        }));
+
+        expect(grid.setVisibleColumns).toHaveBeenCalledWith(["col1", "col3"], { notify: false });
+    });
+
+    it("resets column layout on revision mismatch when onRevisionMismatch is reset", () => {
+        const columns = [
+            { id: "col1", width: 100, frozen: null as any },
+            { id: "col2", width: 120 }
+        ];
+        const grid = mockSleekGrid(columns);
+        const filterStore = mockFilterStore([]);
+        restoreSettingsFrom(restoreSettingsArgs({
+            columnsRevision: 2,
+            filterStore,
+            sleekGrid: grid,
+            flags: {
+                ...omitAllGridPersistenceFlags,
+                columnVisibility: true,
+                columnWidths: true,
+                columnPinning: true,
+                filterItems: true,
+                restoreOptions: { newVisibleColumns: true, onRevisionMismatch: "reset" }
+            },
+            settings: {
+                columnsRevision: 1,
+                flags: { columnVisibility: true, columnWidths: true, columnPinning: true, filterItems: true },
+                columns: [
+                    { id: "col1", visible: false, width: 250, pin: "start" }
+                ],
+                filterItems: [{ field: "col1", operator: "eq", criteria: ["x"] }]
+            }
+        }));
+
+        expect(grid.setVisibleColumns).not.toHaveBeenCalled();
+        expect(columns[0].width).toBe(100);
+        expect(columns[0].frozen).toBeNull();
+        expect(filterStore.get_items()).toHaveLength(1);
+    });
+
+    it("resets enabled layout fields without showing restricted columns", () => {
+        const columns = [
+            { id: "B", width: 240, frozen: "end", visible: true },
+            { id: "A", width: 220, frozen: null, visible: false },
+            { id: "C", width: 260, visible: false },
+            { id: "D", width: 180, visible: true }
+        ];
+        const grid = mockSleekGrid(columns);
+        restoreSettingsFrom(restoreSettingsArgs({
+            columnsRevision: 2,
+            sleekGrid: grid,
+            canShowColumn: column => column.id !== "C",
+            initialColumns: [
+                { id: "A", width: 100, pin: "start", visible: true },
+                { id: "B", width: 120, pin: false, visible: false },
+                { id: "C", width: 140, pin: false, visible: true }
+            ],
+            flags: {
+                ...omitAllGridPersistenceFlags,
+                columnVisibility: true,
+                columnWidths: true,
+                columnPinning: false,
+                restoreOptions: { onRevisionMismatch: "reset" }
+            },
+            settings: { columnsRevision: 1, columns: [{ id: "B", visible: true, width: 300 }] }
+        }));
+
+        expect(grid.reorderColumns).toHaveBeenCalledWith(["A", "B", "C", "D"], {
+            notify: false, setVisible: ["A", "D"]
+        });
+        expect(columns.map(column => column.width)).toEqual([120, 100, 140, 180]);
+        expect(columns[0].frozen).toBe("end");
+    });
+
+    it("merges column layout on revision mismatch when onRevisionMismatch is merge", () => {
+        const columns = [
+            { id: "col1", width: 100 },
+            { id: "col2", width: 120 }
+        ];
+        const grid = mockSleekGrid(columns);
+        restoreSettingsFrom(restoreSettingsArgs({
+            columnsRevision: 2,
+            sleekGrid: grid,
+            flags: {
+                ...omitAllGridPersistenceFlags,
+                columnVisibility: true,
+                columnWidths: true,
+                restoreOptions: { newVisibleColumns: true, onRevisionMismatch: "merge" }
+            },
+            settings: {
+                columnsRevision: 1,
+                flags: { columnVisibility: true, columnWidths: true },
+                columns: [{ id: "col1", visible: true, width: 250 }]
+            }
+        }));
+
+        expect(grid.setVisibleColumns).toHaveBeenCalledWith(["col1", "col2"], { notify: false });
+        expect(columns[0].width).toBe(250);
+    });
+
+    it("treats 0 and null/undefined columnsRevision as matching", () => {
+        const grid = mockSleekGrid([{ id: "col1" }, { id: "col2" }]);
+        restoreSettingsFrom(restoreSettingsArgs({
+            columnsRevision: 0,
+            sleekGrid: grid,
+            flags: { ...omitAllGridPersistenceFlags, columnVisibility: true, restoreOptions: { newVisibleColumns: true } },
+            settings: {
+                flags: { columnVisibility: true },
+                columns: [{ id: "col1", visible: true }]
+            }
+        }));
+
+        expect(grid.setVisibleColumns).toHaveBeenCalledWith(["col1", "col2"], { notify: false });
+    });
+
+    it.each([undefined, 0, 2])("keeps saved layout when current revision %s is disabled or matches", columnsRevision => {
+        const columns = [{ id: "col1", width: 100 }, { id: "col2", width: 120 }];
+        const grid = mockSleekGrid(columns);
+        restoreSettingsFrom(restoreSettingsArgs({
+            columnsRevision,
+            sleekGrid: grid,
+            flags: { ...omitAllGridPersistenceFlags, columnVisibility: true, columnWidths: true, restoreOptions: { newVisibleColumns: true, onRevisionMismatch: "reset" } },
+            settings: {
+                columnsRevision: 2,
+                flags: { columnVisibility: true, columnWidths: true },
+                columns: [{ id: "col1", visible: true, width: 250 }]
+            }
+        }));
+
+        expect(grid.setVisibleColumns).toHaveBeenCalledWith(["col1", "col2"], { notify: false });
+        expect(columns[0].width).toBe(250);
+    });
+
+    it.each([1, 3])("resets saved layout when current revision %s differs", columnsRevision => {
+        const columns = [{ id: "col1", width: 100 }, { id: "col2", width: 120 }];
+        const grid = mockSleekGrid(columns);
+        restoreSettingsFrom(restoreSettingsArgs({
+            columnsRevision,
+            sleekGrid: grid,
+            flags: { ...omitAllGridPersistenceFlags, columnVisibility: true, columnWidths: true, restoreOptions: { newVisibleColumns: true, onRevisionMismatch: "reset" } },
+            settings: {
+                columnsRevision: 2,
+                flags: { columnVisibility: true, columnWidths: true },
+                columns: [{ id: "col1", visible: true, width: 250 }]
+            }
+        }));
+
+        expect(grid.setVisibleColumns).not.toHaveBeenCalled();
+        expect(columns[0].width).toBe(100);
+    });
+
+    it("resets saved layout when a revision is introduced", () => {
+        const columns = [{ id: "col1", width: 100 }, { id: "col2", width: 120 }];
+        const grid = mockSleekGrid(columns);
+        restoreSettingsFrom(restoreSettingsArgs({
+            columnsRevision: 1,
+            sleekGrid: grid,
+            flags: { ...omitAllGridPersistenceFlags, columnVisibility: true, columnWidths: true, restoreOptions: { newVisibleColumns: true, onRevisionMismatch: "reset" } },
+            settings: {
+                flags: { columnVisibility: true, columnWidths: true },
+                columns: [{ id: "col1", visible: true, width: 250 }]
+            }
+        }));
+
+        expect(grid.setVisibleColumns).not.toHaveBeenCalled();
+        expect(columns[0].width).toBe(100);
+    });
+
+    it("does not reset column layout on revision mismatch for a direct restore by default", () => {
+        const grid = mockSleekGrid([{ id: "col1" }, { id: "col2" }]);
+        restoreSettingsFrom(restoreSettingsArgs({
+            columnsRevision: 2,
+            sleekGrid: grid,
+            flags: { ...omitAllGridPersistenceFlags, columnVisibility: true },
+            settings: {
+                columnsRevision: 1,
+                flags: { columnVisibility: true },
+                columns: [{ id: "col1", visible: true }]
+            }
+        }));
+
+        expect(grid.setVisibleColumns).toHaveBeenCalledWith(["col1"], { notify: false });
+    });
+
+    it.each([
+        [undefined, false],
+        [null, false],
+        ["merge", false],
+        ["reset", true]
+    ] as const)("resets the layout only when onRevisionMismatch is reset (%s)", (onRevisionMismatch, resetLayout) => {
+        const columns = [{ id: "col1", width: 100 }];
+        const grid = mockSleekGrid(columns);
+        restoreSettingsFrom(restoreSettingsArgs({
+            columnsRevision: 2,
+            sleekGrid: grid,
+            flags: {
+                ...omitAllGridPersistenceFlags,
+                columnWidths: true,
+                restoreOptions: { onRevisionMismatch }
+            },
+            settings: {
+                columnsRevision: 1,
+                flags: { columnWidths: true },
+                columns: [{ id: "col1", width: 250 }]
+            }
+        }));
+
+        expect(columns[0].width).toBe(resetLayout ? 100 : 250);
     });
 
     it("restores filter items when flag is true", () => {

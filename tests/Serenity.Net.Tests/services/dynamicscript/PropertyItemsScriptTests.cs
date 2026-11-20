@@ -222,6 +222,11 @@ public class PropertyItemsScriptTests
         script.CheckRights(new MockPermissions(_ => false), NullTextLocalizer.Instance);
     }
 
+    [ColumnsScript("Revised", Revision = 2)]
+    private class RevisedColumns
+    {
+    }
+
     [Fact]
     public void ExpirationAndGroupKey_AreSettable()
     {
@@ -230,6 +235,44 @@ public class PropertyItemsScriptTests
         script.GroupKey = "G";
         Assert.Equal(TimeSpan.FromMinutes(5), script.Expiration);
         Assert.Equal("G", script.GroupKey);
+    }
+
+    [Fact]
+    public void ColumnsScript_IncludesRevision_WhenPositive()
+    {
+        var provider = new TestProvider();
+        var services = new ServiceCollection().BuildServiceProvider();
+        var script = new ColumnsScript("Revised", typeof(RevisedColumns), provider, services);
+
+        var data = Assert.IsType<PropertyItemsData>(script.GetScriptData());
+        Assert.Equal(2, data.Revision);
+        Assert.Contains("\"revision\":2", script.GetScript(), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ColumnsScript_OmitsRevision_WhenZero()
+    {
+        var provider = new TestProvider();
+        var services = new ServiceCollection().BuildServiceProvider();
+        var script = new ColumnsScript("Test", typeof(object), provider, services);
+
+        var data = Assert.IsType<PropertyItemsData>(script.GetScriptData());
+        Assert.Null(data.Revision);
+        Assert.DoesNotContain("revision", script.GetScript(), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Compact_IncludesRevision_WhenPositive()
+    {
+        var result = PropertyItemsScript.Compact([
+            ("Columns.A", new PropertyItemsData { Items = [new PropertyItem { Name = "A" }], Revision = 3 }),
+            ("Columns.B", new PropertyItemsData { Items = [new PropertyItem { Name = "B" }], AdditionalItems = [new PropertyItem { Name = "Extra" }], Revision = 4 }),
+            ("Columns.C", new PropertyItemsData { Items = [new PropertyItem { Name = "C" }], Revision = 0 })
+        ]);
+
+        Assert.Contains(",[],3]", result, StringComparison.Ordinal);
+        Assert.Contains(",4]", result, StringComparison.Ordinal);
+        Assert.Contains("revision:d[3]", result, StringComparison.Ordinal);
     }
 }
 

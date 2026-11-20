@@ -258,6 +258,44 @@ describe('DataGrid.getLocalTextPrefix', () => {
 });
 
 describe("DataGrid.getCurrentSettings", () => {
+    it("identifies persistence triggered by a column resize", () => {
+        const grid = createGrid();
+        vi.spyOn(grid as any, "getPersistenceStorage").mockReturnValue({ setItem: vi.fn() });
+        const resized: boolean[] = [];
+        grid.onPersistence.subscribe(event => {
+            if (event.persisting && !event.after)
+                resized.push(event.columnResized);
+        });
+
+        grid.sleekGrid.columnsResized();
+        grid.persistSettings();
+
+        expect(resized).toEqual([true, false]);
+        grid.destroy();
+    });
+
+    it("lets persistence handlers adjust flags before capturing settings", () => {
+        const grid = createGrid();
+        grid.sleekGrid.setColumns([{ id: "A", width: 120 }]);
+        const flags = { columnVisibility: true };
+        const phases: boolean[] = [];
+        grid.onPersistence.subscribe(event => {
+            if (event.persisting) {
+                phases.push(event.after);
+                if (!event.after)
+                    event.flagsToUse.columnWidths = false;
+            }
+        });
+
+        const settings = grid.getCurrentSettings(flags);
+
+        expect(phases).toEqual([false, true]);
+        expect(settings.flags.columnWidths).toBe(false);
+        expect(settings.columns).toEqual([{ id: "A", visible: true, pin: false }]);
+        expect(flags).toEqual({ columnVisibility: true });
+        grid.destroy();
+    });
+
     it("returns an empty object with columns for a default grid", () => {
         class MyGrid extends DataGrid<any, any> {
         }
@@ -759,11 +797,319 @@ describe("DataGrid persistence", () => {
         grid.destroy();
     });
 
-    it("restoreSettings with settings calls restoreSettingsFrom", () => {
+    it("restoreSettings with settings calls restoreSettingsFrom with snapshot defaults", () => {
         const grid = createGrid();
         const restoreFromSpy = vi.spyOn(grid as any, "restoreSettingsFrom").mockImplementation(() => { });
         grid["restoreSettings"]({ columns: [] } as any, {} as any);
         expect(restoreFromSpy).toHaveBeenCalledWith({ columns: [] }, {});
+        grid.destroy();
+    });
+
+    it("restoreSettings flags automatic storage restores and leaves restore options to be defaulted after persistence handlers", () => {
+        const grid = createGrid();
+        const settings = { flags: { columnVisibility: true }, columns: [] };
+        vi.spyOn(grid as any, "getPersistedSettings").mockReturnValue(settings);
+        const restoreFromSpy = vi.spyOn(grid as any, "restoreSettingsFrom").mockImplementation(() => { });
+
+        grid["restoreSettings"]();
+
+        expect(restoreFromSpy).toHaveBeenCalledWith(settings, {
+            restoreOptions: { newVisibleColumns: undefined, onRevisionMismatch: undefined }
+        });
+        grid.destroy();
+    });
+
+    it("automatic restores default restore options after persistence handlers, which can set their own", () => {
+        const grid = createGrid();
+        grid["propertyItemsData"] = { items: [], additionalItems: [], revision: 2 };
+        vi.spyOn(grid.getGrid(), "getAllColumns").mockReturnValue([{ id: "A" }, { id: "B" }]);
+        const setVisibleColumns = vi.spyOn(grid.getGrid(), "setVisibleColumns").mockImplementation(() => { });
+        const settings = { columnsRevision: 1, flags: { columnVisibility: true }, columns: [{ id: "A", visible: true }] };
+        vi.spyOn(grid as any, "getPersistedSettings").mockReturnValue(settings);
+        grid.onPersistence.subscribe(event => {
+            if (event.restoring && !event.after)
+                (event.flagsToUse.restoreOptions ??= {}).onRevisionMismatch ??= "merge";
+        });
+
+        grid["restoreSettings"]();
+
+        expect(setVisibleColumns).toHaveBeenCalledWith(["A", "B"], { notify: false });
+        grid.destroy();
+    });
+
+    it("restoreSettings permits disabling new column merging for automatic storage restores", () => {
+        const grid = createGrid();
+        const settings = { flags: { columnVisibility: true }, columns: [] };
+        vi.spyOn(grid as any, "getPersistedSettings").mockReturnValue(settings);
+        vi.spyOn(grid as any, "gridPersistenceFlags").mockReturnValue({
+            restoreOptions: { newVisibleColumns: false }, columnWidths: false
+        });
+        const restoreFromSpy = vi.spyOn(grid as any, "restoreSettingsFrom").mockImplementation(() => { });
+
+        grid["restoreSettings"]();
+
+        expect(restoreFromSpy).toHaveBeenCalledWith(settings, {
+            restoreOptions: { newVisibleColumns: false, onRevisionMismatch: undefined }, columnWidths: false
+        });
+        grid.destroy();
+    });
+
+    it("merges automatic restore flags with grid defaults and honors explicit restore options", async () => {
+        const grid = createGrid();
+        const settings = { flags: { columnVisibility: true }, columns: [] };
+        vi.spyOn(grid as any, "getPersistedSettings").mockResolvedValue(settings);
+        vi.spyOn(grid as any, "gridPersistenceFlags").mockReturnValue({
+            restoreOptions: { newVisibleColumns: false }, columnWidths: false
+        });
+        const restoreFromSpy = vi.spyOn(grid as any, "restoreSettingsFrom").mockImplementation(() => { });
+        const flags = { restoreOptions: { newVisibleColumns: true }, sortColumns: false };
+
+        await grid["restoreSettings"](null, flags);
+
+        expect(restoreFromSpy).toHaveBeenCalledWith(settings, {
+            restoreOptions: { newVisibleColumns: true, onRevisionMismatch: undefined }, columnWidths: false, sortColumns: false
+        });
+        expect(flags).toEqual({ restoreOptions: { newVisibleColumns: true }, sortColumns: false });
+        grid.destroy();
+    });
+
+    it("inherits null automatic restore options from grid defaults", () => {
+        const grid = createGrid();
+        const settings = { flags: { columnVisibility: true }, columns: [] };
+        vi.spyOn(grid as any, "getPersistedSettings").mockReturnValue(settings);
+        vi.spyOn(grid as any, "gridPersistenceFlags").mockReturnValue({
+            restoreOptions: { newVisibleColumns: false, onRevisionMismatch: "merge" }
+        });
+        const restoreFromSpy = vi.spyOn(grid as any, "restoreSettingsFrom").mockImplementation(() => { });
+
+        grid["restoreSettings"](null, { restoreOptions: { newVisibleColumns: null, onRevisionMismatch: null } });
+
+        expect(restoreFromSpy).toHaveBeenCalledWith(settings, {
+            restoreOptions: { newVisibleColumns: false, onRevisionMismatch: "merge" }
+        });
+        grid.destroy();
+    });
+
+    it.each([
+        { name: "drops flags", overrideFlags: undefined, expectedVisible: ["A"], expectedWidth: 250, reset: false },
+        { name: "supplies partial flags", overrideFlags: { columnWidths: false }, expectedVisible: ["A"], expectedWidth: 120, reset: false },
+        { name: "overrides a restore option", overrideFlags: { columnWidths: false, restoreOptions: { newVisibleColumns: true } }, expectedVisible: ["A", "B"], expectedWidth: 120, reset: false },
+        { name: "inherits a null restore option", overrideFlags: { columnWidths: false, restoreOptions: { onRevisionMismatch: null } }, expectedVisible: ["A"], expectedWidth: 120, reset: false },
+        { name: "overrides revision handling", overrideFlags: { columnWidths: false, restoreOptions: { onRevisionMismatch: "reset" } }, expectedVisible: ["A", "B"], expectedWidth: 120, reset: true }
+    ])("preserves automatic flags when a restore override $name", ({ overrideFlags, expectedVisible, expectedWidth, reset }) => {
+        const grid = createGrid();
+        grid["propertyItemsData"] = { items: [], additionalItems: [], revision: 2 };
+        grid.sleekGrid.setColumns([{ id: "A", width: 120 }, { id: "B", width: 140 }]);
+        grid["initialSettings"] = grid.getCurrentSettings();
+        vi.spyOn(grid as any, "gridPersistenceFlags").mockReturnValue({
+            restoreOptions: { newVisibleColumns: false, onRevisionMismatch: "merge" }
+        });
+        vi.spyOn(grid as any, "getPersistedSettings").mockReturnValue({
+            columnsRevision: 1,
+            flags: { columnVisibility: true, columnWidths: true },
+            columns: [{ id: "A", visible: true, width: 250 }]
+        });
+        const restoreFrom = grid["restoreSettingsFrom"].bind(grid);
+        vi.spyOn(grid as any, "restoreSettingsFrom").mockImplementation(settings => restoreFrom(settings, overrideFlags as any));
+        let resetLayout: boolean;
+        grid.onPersistence.subscribe(event => {
+            if (event.restoring && event.after)
+                resetLayout = event.columnLayoutReset;
+        });
+
+        grid["restoreSettings"]();
+
+        expect(resetLayout).toBe(reset);
+        expect(grid.columns.map(column => column.id)).toEqual(expectedVisible);
+        expect(grid.allColumns.find(column => column.id === "A").width).toBe(expectedWidth);
+        grid.destroy();
+    });
+
+    it("reports effective automatic restore options after persistence handlers", () => {
+        const grid = createGrid();
+        vi.spyOn(grid as any, "getPersistedSettings").mockReturnValue({ columns: [] });
+        const options: any[] = [];
+        grid.onPersistence.subscribe(event => {
+            if (event.restoring)
+                options.push({ ...event.flagsToUse.restoreOptions });
+        });
+
+        grid["restoreSettings"]();
+
+        expect(options).toEqual([
+            { newVisibleColumns: undefined, onRevisionMismatch: undefined },
+            { newVisibleColumns: true, onRevisionMismatch: "reset" }
+        ]);
+        grid.destroy();
+    });
+
+    it("uses snapshot semantics for direct restores even when the grid enables new column merging", () => {
+        const grid = createGrid();
+        vi.spyOn(grid as any, "gridPersistenceFlags").mockReturnValue({ restoreOptions: { newVisibleColumns: true } });
+        vi.spyOn(grid.getGrid(), "getAllColumns").mockReturnValue([{ id: "A" }, { id: "B" }]);
+        const setVisibleColumns = vi.spyOn(grid.getGrid(), "setVisibleColumns").mockImplementation(() => { });
+        const settings = { flags: { columnVisibility: true }, columns: [{ id: "A", visible: true }] };
+
+        grid["restoreSettingsFrom"](settings);
+        expect(setVisibleColumns).toHaveBeenLastCalledWith(["A"], { notify: false });
+
+        grid["restoreSettingsFrom"](settings, { restoreOptions: { newVisibleColumns: true } });
+        expect(setVisibleColumns).toHaveBeenLastCalledWith(["A", "B"], { notify: false });
+        grid.destroy();
+    });
+
+    it("merges new columns according to initial visibility after restoring a saved view", () => {
+        const grid = createGrid();
+        grid.sleekGrid.setColumns([
+            { id: "A" },
+            { id: "B" },
+            { id: "C", visible: false }
+        ]);
+        grid["initialSettings"] = grid.getCurrentSettings();
+        grid["restoreSettingsFrom"]({
+            flags: { columnVisibility: true },
+            columns: [{ id: "A", visible: true }, { id: "C", visible: true }]
+        });
+        expect(grid.columns.map(column => column.id)).toEqual(["A", "C"]);
+
+        vi.spyOn(grid as any, "getPersistedSettings").mockReturnValue({
+            flags: { columnVisibility: true },
+            columns: [{ id: "A", visible: true }]
+        });
+        grid["restoreSettings"]();
+
+        expect(grid.columns.map(column => column.id)).toEqual(["A", "B"]);
+        grid.destroy();
+    });
+
+    it("merges new columns in initial order after a saved view reorders the grid", () => {
+        const grid = createGrid();
+        grid.sleekGrid.setColumns([{ id: "A" }, { id: "B" }, { id: "C" }]);
+        grid["initialSettings"] = grid.getCurrentSettings();
+        grid["restoreSettingsFrom"]({
+            flags: { columnVisibility: true },
+            columns: [{ id: "B", visible: true }, { id: "C", visible: true }, { id: "A", visible: true }]
+        });
+        expect(grid.columns.map(column => column.id)).toEqual(["B", "C", "A"]);
+        vi.spyOn(grid as any, "getPersistedSettings").mockReturnValue({
+            flags: { columnVisibility: true },
+            columns: [{ id: "A", visible: true }, { id: "C", visible: true }]
+        });
+
+        grid["restoreSettings"]();
+
+        expect(grid.columns.map(column => column.id)).toEqual(["A", "B", "C"]);
+        grid.destroy();
+    });
+
+    it("allows persistence event handlers to set restore options", () => {
+        const grid = createGrid();
+        vi.spyOn(grid.getGrid(), "getAllColumns").mockReturnValue([{ id: "A" }, { id: "B" }]);
+        const setVisibleColumns = vi.spyOn(grid.getGrid(), "setVisibleColumns").mockImplementation(() => { });
+        grid.onPersistence.subscribe(event => {
+            if (event.restoring && !event.after)
+                event.flagsToUse.restoreOptions = { newVisibleColumns: true };
+        });
+
+        grid["restoreSettingsFrom"]({ flags: { columnVisibility: true }, columns: [{ id: "A", visible: true }] });
+
+        expect(setVisibleColumns).toHaveBeenCalledWith(["A", "B"], { notify: false });
+        grid.destroy();
+    });
+
+    it("reads columnsRevision from propertyItemsData and resets on automatic restore mismatch", () => {
+        const grid = createGrid();
+        grid["propertyItemsData"] = { items: [], additionalItems: [], revision: 2 };
+        expect(grid["getColumnsRevision"]()).toBe(2);
+
+        vi.spyOn(grid.getGrid(), "getAllColumns").mockReturnValue([{ id: "A" }, { id: "B" }]);
+        const setVisibleColumns = vi.spyOn(grid.getGrid(), "setVisibleColumns").mockImplementation(() => { });
+        const settings = { columnsRevision: 1, flags: { columnVisibility: true }, columns: [{ id: "A", visible: true }] };
+
+        // Direct restore ignores revision mismatch
+        grid["restoreSettingsFrom"](settings);
+        expect(setVisibleColumns).not.toHaveBeenCalledWith(["A", "B"], expect.anything());
+        expect(setVisibleColumns).toHaveBeenCalledWith(["A"], { notify: false });
+
+        // Automatic restore resets column layout on revision mismatch
+        setVisibleColumns.mockClear();
+        vi.spyOn(grid as any, "getPersistedSettings").mockReturnValue(settings);
+        grid["restoreSettings"]();
+        expect(setVisibleColumns).not.toHaveBeenCalled();
+
+        // Persist captures current columnsRevision
+        expect(grid.getCurrentSettings().columnsRevision).toBe(2);
+        grid.destroy();
+    });
+
+    it("uses independent mismatch defaults for automatic and direct restores", () => {
+        const grid = createGrid();
+        grid["propertyItemsData"] = { items: [], additionalItems: [], revision: 2 };
+        vi.spyOn(grid.getGrid(), "getAllColumns").mockReturnValue([{ id: "A" }, { id: "B" }]);
+        const setVisibleColumns = vi.spyOn(grid.getGrid(), "setVisibleColumns").mockImplementation(() => { });
+        const settings = { columnsRevision: 1, flags: { columnVisibility: true }, columns: [{ id: "A", visible: true }] };
+
+        grid["restoreSettingsFrom"](settings, { restoreOptions: { newVisibleColumns: true } });
+        expect(setVisibleColumns).toHaveBeenCalledWith(["A", "B"], { notify: false });
+
+        setVisibleColumns.mockClear();
+        vi.spyOn(grid as any, "gridPersistenceFlags").mockReturnValue({ restoreOptions: { newVisibleColumns: false } });
+        vi.spyOn(grid as any, "getPersistedSettings").mockReturnValue(settings);
+        grid["restoreSettings"]();
+        expect(setVisibleColumns).not.toHaveBeenCalled();
+        grid.destroy();
+    });
+
+    it("restores the initial column layout and saved sorting on a revision mismatch", () => {
+        const grid = createGrid();
+        grid["propertyItemsData"] = { items: [], additionalItems: [], revision: 2 };
+        grid.sleekGrid.setColumns([
+            { id: "A", width: 120, frozen: "start" },
+            { id: "B", width: 150 },
+            { id: "C", width: 160, visible: false }
+        ]);
+        grid["initialSettings"] = grid.getCurrentSettings();
+        grid.sleekGrid.reorderColumns(["B", "C", "A"], { setVisible: ["B", "C"], notify: false });
+        grid.allColumns.find(column => column.id === "A").width = 400;
+        grid.allColumns.find(column => column.id === "A").frozen = null;
+        grid.allColumns.find(column => column.id === "B").frozen = "end";
+
+        grid["restoreSettingsFrom"]({
+            columnsRevision: 1,
+            flags: { columnVisibility: true, columnWidths: true, columnPinning: true, sortColumns: true },
+            columns: [{ id: "B", visible: true, width: 300, pin: "end", sort: -1 }]
+        }, { restoreOptions: { onRevisionMismatch: "reset" } });
+
+        expect(grid.allColumns.map(column => column.id)).toEqual(["A", "B", "C"]);
+        expect(grid.columns.map(column => column.id)).toEqual(["A", "B"]);
+        expect(grid.allColumns.map(column => column.width)).toEqual([120, 150, 160]);
+        expect(grid.allColumns.map(column => column.frozen)).toEqual(["start", null, null]);
+        expect(grid.view.sortBy).toEqual(["B DESC"]);
+        expect(grid.sleekGrid.getSortColumns()).toEqual([{ columnId: "B", sortAsc: false }]);
+        grid.destroy();
+    });
+
+    it("reports whether column widths were restored or discarded on revision mismatch", () => {
+        const grid = createGrid();
+        grid["propertyItemsData"] = { items: [], additionalItems: [], revision: 2 };
+        grid.sleekGrid.setColumns([{ id: "A", width: 120 }]);
+        grid["initialSettings"] = grid.getCurrentSettings();
+        const outcomes: { columnLayoutReset: boolean, columnWidthsRestored: boolean }[] = [];
+        grid.onPersistence.subscribe(event => {
+            if (event.restoring && event.after)
+                outcomes.push({ columnLayoutReset: event.columnLayoutReset, columnWidthsRestored: event.columnWidthsRestored });
+        });
+        const settings = { columnsRevision: 1, flags: { columnWidths: true }, columns: [{ id: "A", width: 200 }] };
+
+        grid["restoreSettingsFrom"](settings, { restoreOptions: { onRevisionMismatch: "reset" } });
+        grid["restoreSettingsFrom"](settings, { restoreOptions: { onRevisionMismatch: "merge" } });
+        grid["restoreSettingsFrom"](settings, { columnWidths: false });
+
+        expect(outcomes).toEqual([
+            { columnLayoutReset: true, columnWidthsRestored: false },
+            { columnLayoutReset: false, columnWidthsRestored: true },
+            { columnLayoutReset: false, columnWidthsRestored: false }
+        ]);
         grid.destroy();
     });
 

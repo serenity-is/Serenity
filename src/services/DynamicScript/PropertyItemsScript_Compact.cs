@@ -270,24 +270,33 @@ public abstract partial class PropertyItemsScript
             sb.Append(']');
 
             var addi = input.data?.AdditionalItems;
-            if (addi?.Count > 0)
+            var revision = input.data?.Revision;
+            if (addi?.Count > 0 || revision > 0)
             {
                 sb.Append("\n,[");
-                firstItem = true;
-                foreach (var item in addi)
+                if (addi?.Count > 0)
                 {
-                    if (firstItem)
-                        firstItem = false;
-                    else
-                        sb.Append("\n,");
-                    serializeItem(item);
+                    firstItem = true;
+                    foreach (var item in addi)
+                    {
+                        if (firstItem)
+                            firstItem = false;
+                        else
+                            sb.Append("\n,");
+                        serializeItem(item);
+                    }
                 }
                 sb.Append(']');
+                if (revision > 0)
+                {
+                    sb.Append(',');
+                    sb.Append(Invariants.ToInvariant(revision.Value));
+                }
             }
             sb.Append(']');
         }
         sb.Append("].forEach(d=>");
-        sb.AppendFormat(DataScript.SetScriptDataFormat.TrimEnd(';'), "d[0]", "{items:d[1],additionalItems:(d[2]||[])}");
+        sb.AppendFormat(DataScript.SetScriptDataFormat.TrimEnd(';'), "d[0]", "{items:d[1],additionalItems:(d[2]||[]),revision:d[3]}");
         sb.Append(")})();");
         return "(function(){var " + string.Join(",", strMap.OrderBy(x => x.Value.Length).ThenBy(x => x.Value, StringComparer.Ordinal)
                 .Select((x, i) => $"{((i % 30) == 1 ? "\n" : "")}{x.Value}={StringHelper.ToSingleQuoted(x.Key)}")) + ";\n" +

@@ -232,6 +232,8 @@ export interface PropertyItemsData {
     items: PropertyItem[];
     /** Extra fields available on demand (e.g. via column picker); not rendered initially. */
     additionalItems: PropertyItem[];
+    /** Optional revision number for the property items (0 or undefined means no revision). */
+    revision?: number;
 }
 
 /**
