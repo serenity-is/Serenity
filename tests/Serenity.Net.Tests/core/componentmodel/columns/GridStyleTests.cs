@@ -19,10 +19,10 @@ public class GridStyleTests
         registry.AddEnumTexts(new MockTypeSource(typeof(GridStyle)));
 
         var texts = registry.AddedList.ToDictionary(x => x.Item2, x => x.Item3);
-        Assert.Equal("No Stripes", texts["Enums.Serenity.ComponentModel.GridStyle.NoStripes"]);
-        Assert.Equal("No Cell Borders", texts["Enums.Serenity.ComponentModel.GridStyle.NoCellBorders"]);
-        Assert.Equal("No Header Chrome", texts["Enums.Serenity.ComponentModel.GridStyle.NoHeaderChrome"]);
-        Assert.Equal("Lines", texts["Enums.Serenity.ComponentModel.GridStyle.Lines"]);
-        Assert.Equal("Plain", texts["Enums.Serenity.ComponentModel.GridStyle.Plain"]);
+        Assert.Equal("No Stripes", texts["Enums.Serenity.GridStyle.NoStripes"]);
+        Assert.Equal("No Cell Borders", texts["Enums.Serenity.GridStyle.NoCellBorders"]);
+        Assert.Equal("No Header Chrome", texts["Enums.Serenity.GridStyle.NoHeaderChrome"]);
+        Assert.Equal("Lines", texts["Enums.Serenity.GridStyle.Lines"]);
+        Assert.Equal("Plain", texts["Enums.Serenity.GridStyle.Plain"]);
     }
 }
