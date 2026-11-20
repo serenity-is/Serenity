@@ -28,6 +28,24 @@ describe('PropertyItemColumnConverter', () => {
         });
     });
 
+    describe('row actions column', () => {
+        it('converts the item of a columns class into the utility column of the row actions', () => {
+            const column = PropertyItemColumnConverter.toColumn({
+                name: 'RowActions', unbound: true, width: 40, minWidth: 40, maxWidth: 40, pin: 'end'
+            });
+
+            expect(column.id).toBe("__actions__");
+            expect(column.field).toBeFalsy();
+            expect(column.frozen).toBe('end');
+            expect(column.width).toBe(40);
+            expect(column.sortable).toBe(false);
+            expect(column.skipGroupCell).toBe(true);
+            expect(column.sourceItem?.name).toBe('RowActions');
+            // the mixin of the row actions renders the cells, which are empty without it
+            expect(column.format({} as any)).toBe("");
+        });
+    });
+
     describe('row selection column', () => {
         it('converts the item of a columns class into the column of the check boxes', () => {
             const column = PropertyItemColumnConverter.toColumn({

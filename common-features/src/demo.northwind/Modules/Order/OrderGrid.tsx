@@ -60,7 +60,9 @@ export class OrderGrid<P = {}> extends EntityGrid<OrderRow, P> {
     protected override createColumns() {
         const columns = new OrderColumns(super.createColumns());
 
-        columns.PrintInvoice.format = () => <a class="inline-action" data-action="print-invoice" title="invoice">
+        // a grid that extends this one may leave the column out, e.g. for an invoice action of its own
+        if (columns.PrintInvoice)
+            columns.PrintInvoice.format = () => <a class="inline-action" data-action="print-invoice" title="invoice">
             <i class={faIcon("file-pdf", "red")}></i></a>;
 
         return columns.valueOf();

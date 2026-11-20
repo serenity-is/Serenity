@@ -4,6 +4,7 @@ import { FormatterType } from "../../types/formattertype";
 import { FormatterTypeRegistry } from "../../types/formattertyperegistry";
 import { IInitializeColumn } from "../formatters/iinitializecolumn";
 import { GridRowSelectionMixin } from "./gridrowselectionmixin";
+import { UtilityColumns } from "./utilitycolumns";
 import { ReflectionOptionsSetter } from "../widgets/reflectionoptionssetter";
 
 /**
@@ -88,6 +89,32 @@ export namespace PropertyItemColumnConverter {
                 frozen: result.frozen,
                 sourceItem: item,
                 name: result.name ?? template.name
+            };
+        }
+
+        // the column of the buttons of the row actions is not a data column either: the server tells where it
+        // is, with the RowActionsColumn attribute of the columns class, and the RowActionsMixin of
+        // Serenity.Pro.Extensions renders its buttons, finding the column by its id
+        if (item.name === "RowActions") {
+            return {
+                id: UtilityColumns.actionsId,
+                name: "",
+                field: null,
+                width: result.width,
+                minWidth: result.minWidth,
+                maxWidth: result.maxWidth,
+                visible: result.visible,
+                frozen: result.frozen,
+                sortable: false,
+                resizable: false,
+                groupable: false,
+                focusable: true,
+                selectable: false,
+                skipGroupCell: true,
+                cssClass: "s-row-actions-cell",
+                headerCssClass: "s-row-actions-header",
+                sourceItem: item,
+                format: () => ""
             };
         }
 
