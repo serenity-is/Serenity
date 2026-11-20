@@ -2675,6 +2675,14 @@ export interface DateFormat {
     monthNames?: string[];
     /** Abbreviated month names (e.g. `"Jan"`, `"Feb"`). — 12 entries plus a trailing empty slot. */
     shortMonthNames?: string[];
+    /**
+     * Full month names in the genitive case, used by {@link formatDate} instead of {@link monthNames} when the
+     * format also has a day number (`d` or `dd`), as .NET does, e.g. "17 listopada" instead of "17 listopad" in
+     * Polish. Not set when they are the same as the month names, which they are in most languages.
+     */
+    monthGenitiveNames?: string[];
+    /** Abbreviated month names in the genitive case, see {@link monthGenitiveNames}. Not set when they are the same as {@link shortMonthNames}. */
+    shortMonthGenitiveNames?: string[];
 }
 /**
  * Combined locale settings, mirroring .NET `CultureInfo`.
@@ -2703,7 +2711,7 @@ export declare let Invariant: Locale;
 /**
  * Current culture used by all formatting and parsing helpers, analogous to `CultureInfo.CurrentCulture`.
  * @remarks
- * Initialized by {@link resetCultureSettings}. When a `<script id="ScriptCulture">` element containing a JSON object is present (rendered by `_LayoutHead.cshtml`), its values override the defaults. The `DecimalSeparator` / `GroupSeparator` keys are mapped explicitly; remaining keys are camel-cased from PascalCase.
+ * Initialized by {@link resetCultureSettings}. When a `<script id="ScriptCulture">` element containing a JSON object is present (rendered by `_LayoutHead.cshtml`), its values override the defaults. The `DecimalSeparator` / `GroupSeparator` keys are mapped explicitly; remaining keys are camel-cased from PascalCase. The server sends the names of the months and days, the AM / PM designators, the time separator and the first day of the week of its current culture there, so they are localized; without it they are the English ones of {@link Invariant}.
  */
 export declare let Culture: Locale;
 /**

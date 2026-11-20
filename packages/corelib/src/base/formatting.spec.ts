@@ -944,3 +944,66 @@ describe("trunc", () => {
 
 export { };
 
+
+describe("ScriptCulture names", () => {
+    // what the server sends for pl-PL, the month names being in the genitive case next to a day number
+    const pl = {
+        MonthNames: ["styczeń", "luty", "marzec", "kwiecień", "maj", "czerwiec", "lipiec", "sierpień", "wrzesień", "październik", "listopad", "grudzień", ""],
+        ShortMonthNames: ["sty", "lut", "mar", "kwi", "maj", "cze", "lip", "sie", "wrz", "paź", "lis", "gru", ""],
+        MonthGenitiveNames: ["stycznia", "lutego", "marca", "kwietnia", "maja", "czerwca", "lipca", "sierpnia", "września", "października", "listopada", "grudnia", ""],
+        DayNames: ["niedziela", "poniedziałek", "wtorek", "środa", "czwartek", "piątek", "sobota"],
+        ShortDayNames: ["niedz.", "pon.", "wt.", "śr.", "czw.", "pt.", "sob."],
+        AmDesignator: "AM", PmDesignator: "PM", TimeSeparator: ":", FirstDayOfWeek: 1
+    };
+
+    function withScriptCulture(json: any, test: () => void) {
+        const script = document.head.appendChild(document.createElement('script'));
+        try {
+            script.type = "application/json";
+            script.id = "ScriptCulture";
+            script.textContent = JSON.stringify(json);
+            formatting.resetCultureSettings();
+            test();
+        }
+        finally {
+            script.remove();
+            formatting.resetCultureSettings();
+        }
+    }
+
+    it("takes the names of the months and days, and the first day of the week, from the server", () => {
+        withScriptCulture(pl, () => {
+            expect(formatting.Culture.monthNames[10]).toBe("listopad");
+            expect(formatting.Culture.shortDayNames[1]).toBe("pon.");
+            expect(formatting.Culture.firstDayOfWeek).toBe(1);
+            expect(formatting.formatDate(new Date(2026, 10, 20), "dddd")).toBe("piątek");
+        });
+    });
+
+    it("uses the genitive month names with a day number, like .NET, and the plain ones without", () => {
+        withScriptCulture(pl, () => {
+            expect(formatting.formatDate(new Date(2026, 10, 17), "d MMMM yyyy")).toBe("17 listopada 2026");
+            expect(formatting.formatDate(new Date(2026, 10, 17), "dd MMMM")).toBe("17 listopada");
+            expect(formatting.formatDate(new Date(2026, 10, 17), "MMMM yyyy")).toBe("listopad 2026");
+            // a day name is not a day number
+            expect(formatting.formatDate(new Date(2026, 10, 17), "dddd, MMMM")).toBe("wtorek, listopad");
+            // there are no short genitive names for pl-PL, so the short ones are used
+            expect(formatting.formatDate(new Date(2026, 10, 17), "d MMM")).toBe("17 lis");
+        });
+    });
+
+    it("pairs genitive names with the names of the locale given to it", () => {
+        withScriptCulture(pl, () => {
+            const en = { decimalSeparator: ".", monthNames: formatting.Invariant.monthNames };
+            expect(formatting.formatDate(new Date(2026, 10, 17), "d MMMM", en)).toBe("17 November");
+            // a locale without month names of its own takes the names of the culture, with their genitive ones
+            expect(formatting.formatDate(new Date(2026, 10, 17), "d MMMM", { decimalSeparator: ".", dateSeparator: "." })).toBe("17 listopada");
+        });
+    });
+
+    it("keeps formatting tokens after the month in a format with a day number", () => {
+        withScriptCulture(pl, () => {
+            expect(formatting.formatDate(new Date(2026, 10, 17, 9, 5), "d MMMM yyyy HH:mm")).toBe("17 listopada 2026 09:05");
+        });
+    });
+});

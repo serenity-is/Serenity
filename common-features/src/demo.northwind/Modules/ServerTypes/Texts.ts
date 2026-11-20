@@ -184,6 +184,7 @@ namespace texts {
                 export const ShipViaCompanyName: string;
                 export const ShippedDate: string;
                 export const ShippingState: string;
+                export const Total: string;
             }
             namespace OrderDetail {
                 export function asKey(): typeof OrderDetail;

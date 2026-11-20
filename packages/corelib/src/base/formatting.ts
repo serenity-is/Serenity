@@ -52,6 +52,14 @@ export interface DateFormat {
     monthNames?: string[];
     /** Abbreviated month names (e.g. `"Jan"`, `"Feb"`). — 12 entries plus a trailing empty slot. */
     shortMonthNames?: string[];
+    /**
+     * Full month names in the genitive case, used by {@link formatDate} instead of {@link monthNames} when the
+     * format also has a day number (`d` or `dd`), as .NET does, e.g. "17 listopada" instead of "17 listopad" in
+     * Polish. Not set when they are the same as the month names, which they are in most languages.
+     */
+    monthGenitiveNames?: string[];
+    /** Abbreviated month names in the genitive case, see {@link monthGenitiveNames}. Not set when they are the same as {@link shortMonthNames}. */
+    shortMonthGenitiveNames?: string[];
 }
 
 /**
@@ -107,7 +115,7 @@ export let Invariant: Locale = {
 /**
  * Current culture used by all formatting and parsing helpers, analogous to `CultureInfo.CurrentCulture`.
  * @remarks
- * Initialized by {@link resetCultureSettings}. When a `<script id="ScriptCulture">` element containing a JSON object is present (rendered by `_LayoutHead.cshtml`), its values override the defaults. The `DecimalSeparator` / `GroupSeparator` keys are mapped explicitly; remaining keys are camel-cased from PascalCase.
+ * Initialized by {@link resetCultureSettings}. When a `<script id="ScriptCulture">` element containing a JSON object is present (rendered by `_LayoutHead.cshtml`), its values override the defaults. The `DecimalSeparator` / `GroupSeparator` keys are mapped explicitly; remaining keys are camel-cased from PascalCase. The server sends the names of the months and days, the AM / PM designators, the time separator and the first day of the week of its current culture there, so they are localized; without it they are the English ones of {@link Invariant}.
  */
 export let Culture: Locale;
 
@@ -727,6 +735,18 @@ export function formatDate(d: Date | string, format?: string, locale?: Locale) {
     const re = _dateFormatRE;
     const sb = [];
 
+    // like .NET, the month names are in the genitive case when the format has a day number, e.g. "d MMMM"; the
+    // tokens are found before the loop below, as matching resets the lastIndex of the regex that it uses
+    const genitive = format.indexOf("MMM") >= 0 && (format.match(re) ?? []).some(t => t === "d" || t === "dd");
+    // the genitive names go with the names they are a case of, i.e. the ones of the culture when the locale
+    // has no names of its own
+    const monthNames = (full: boolean) => {
+        const names = full ? locale.monthNames : locale.shortMonthNames;
+        const source = names ? locale : Culture;
+        return (genitive && (full ? source.monthGenitiveNames : source.shortMonthGenitiveNames)) ||
+            names || (full ? Culture.monthNames : Culture.shortMonthNames);
+    };
+
     re.lastIndex = 0;
     while (true) {
         const index = re.lastIndex;
@@ -757,10 +777,10 @@ export function formatDate(d: Date | string, format?: string, locale?: Locale) {
                 part = date.getDate().toString();
                 break;
             case 'MMMM':
-                part = (locale.monthNames ?? Culture.monthNames)[date.getMonth()];
+                part = monthNames(true)[date.getMonth()];
                 break;
             case 'MMM':
-                part = (locale.shortMonthNames ?? Culture.shortMonthNames)[date.getMonth()];
+                part = monthNames(false)[date.getMonth()];
                 break;
             case 'MM':
                 part = (date.getMonth() + 1).toString().padStart(2, '0');

@@ -30,6 +30,7 @@ export interface OrderRow {
     EmployeeGender?: Gender;
     ShipViaCompanyName?: string;
     ShippingState?: OrderShippingState;
+    Total?: number;
     DetailList?: OrderDetailRow[];
 }
 

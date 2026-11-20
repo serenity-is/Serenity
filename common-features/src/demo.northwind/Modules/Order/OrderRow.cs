@@ -1,6 +1,11 @@
 namespace Serenity.Demo.Northwind;
 
 [NorthwindConnection, NorthwindModule, TableName("Orders")]
+// the totals of the orders from their details, as a join instead of a subquery in the expression of Total, so
+// that the total can be aggregated, e.g. summed in the footer of a grid, which SQL Server does not allow for a
+// subquery; the cast gives the same type in every dialect
+[LeftJoin("jTotal", "(SELECT d.[OrderID], CAST(SUM(d.[UnitPrice] * d.[Quantity] - d.[Discount]) AS DECIMAL(19, 2)) AS [Total] " +
+    "FROM [OrderDetails] d GROUP BY d.[OrderID])", "jTotal.[OrderID] = T0.[OrderID]")]
 [DisplayText("Orders"), InstanceName("Order")]
 [ReadPermission(PermissionKeys.General)]
 [ModifyPermission(PermissionKeys.General)]
@@ -10,6 +15,7 @@ public sealed class OrderRow : Row<OrderRow.RowFields>, IIdRow, INameRow
     const string jCustomer = nameof(jCustomer);
     const string jEmployee = nameof(jEmployee);
     const string jShipVia = nameof(jShipVia);
+    const string jTotal = nameof(jTotal);
 
     [DisplayText("Order ID"), NotNull, Identity, QuickSearch, IdProperty]
     public int? OrderID { get => fields.OrderID[this]; set => fields.OrderID[this] = value; }
@@ -25,7 +31,7 @@ public sealed class OrderRow : Row<OrderRow.RowFields>, IIdRow, INameRow
     [TextualField(nameof(EmployeeFullName))]
     public int? EmployeeID { get => fields.EmployeeID[this]; set => fields.EmployeeID[this] = value; }
 
-    [Origin(jEmployee, nameof(EmployeeRow.FullName)), DisplayText("Employee")]
+    [DisplayText("Employee"), Origin(jEmployee, nameof(EmployeeRow.FullName))]
     public string? EmployeeFullName { get => fields.EmployeeFullName[this]; set => fields.EmployeeFullName[this] = value; }
 
     [Origin(jEmployee, nameof(EmployeeRow.Gender))]
@@ -43,6 +49,10 @@ public sealed class OrderRow : Row<OrderRow.RowFields>, IIdRow, INameRow
     [DisplayText("Shipping State"), Case($"T0.[{nameof(ShippedDate)}] IS NULL",
         (int)OrderShippingState.NotShipped, (int)OrderShippingState.Shipped)]
     public OrderShippingState? ShippingState { get => fields.ShippingState[this]; set => fields.ShippingState[this] = value; }
+
+    [DisplayText("Total"), DisplayFormat("#,##0.00"), AlignRight]
+    [Expression($"{jTotal}.[Total]")]
+    public decimal? Total { get => fields.Total[this]; set => fields.Total[this] = value; }
 
     [DisplayText("Ship Via"), ForeignKey(typeof(ShipperRow)), LeftJoin(jShipVia)]
     public int? ShipVia { get => fields.ShipVia[this]; set => fields.ShipVia[this] = value; }
@@ -89,7 +99,7 @@ public sealed class OrderRow : Row<OrderRow.RowFields>, IIdRow, INameRow
     [Origin(jCustomer, nameof(CustomerRow.Fax))]
     public string? CustomerFax { get => fields.CustomerFax[this]; set => fields.CustomerFax[this] = value; }
 
-    [Origin(jShipVia, nameof(ShipperRow.CompanyName)), DisplayText("Ship Via")]
+    [Origin(jShipVia, nameof(ShipperRow.CompanyName)), DisplayText("Shipper")]
     public string? ShipViaCompanyName { get => fields.ShipViaCompanyName[this]; set => fields.ShipViaCompanyName[this] = value; }
 
     [DisplayText("Details"), MasterDetailRelation(foreignKey: nameof(OrderDetailRow.OrderID)), NotMapped]
@@ -128,6 +138,7 @@ public sealed class OrderRow : Row<OrderRow.RowFields>, IIdRow, INameRow
         public StringField ShipViaCompanyName = null!;
 
         public EnumField<OrderShippingState> ShippingState = null!;
+        public DecimalField Total = null!;
         public RowListField<OrderDetailRow> DetailList = null!;
     }
 }

@@ -37,6 +37,47 @@ public class ScriptCultureTests
     }
 
     [Fact]
+    public void Constructor_Reads_Names_And_Designators()
+    {
+        var info = new CultureInfo("tr-TR");
+        var culture = new ScriptCulture(info);
+        var dtf = info.DateTimeFormat;
+
+        Assert.Equal(dtf.MonthNames, culture.MonthNames);
+        Assert.Equal(dtf.AbbreviatedMonthNames, culture.ShortMonthNames);
+        Assert.Equal(dtf.DayNames, culture.DayNames);
+        Assert.Equal(dtf.AbbreviatedDayNames, culture.ShortDayNames);
+        Assert.Equal(dtf.ShortestDayNames, culture.MinimizedDayNames);
+        Assert.Equal(dtf.AMDesignator, culture.AmDesignator);
+        Assert.Equal(dtf.PMDesignator, culture.PmDesignator);
+        Assert.Equal(dtf.TimeSeparator, culture.TimeSeparator);
+        Assert.Equal(1, culture.FirstDayOfWeek);
+        Assert.Equal("Kasım", culture.MonthNames[10]);
+        Assert.Equal(13, culture.MonthNames.Length);
+    }
+
+    [Fact]
+    public void Constructor_Leaves_Out_Genitive_Names_That_Are_The_Same()
+    {
+        var culture = new ScriptCulture(new CultureInfo("en-US"));
+        Assert.Null(culture.MonthGenitiveNames);
+        Assert.Null(culture.ShortMonthGenitiveNames);
+        Assert.Equal(0, culture.FirstDayOfWeek);
+        Assert.DoesNotContain("MonthGenitiveNames", JSON.Stringify(culture));
+    }
+
+    [Fact]
+    public void Constructor_Reads_Genitive_Names_That_Differ()
+    {
+        var info = new CultureInfo("pl-PL");
+        var culture = new ScriptCulture(info);
+
+        Assert.Equal(info.DateTimeFormat.MonthGenitiveNames, culture.MonthGenitiveNames);
+        Assert.Equal("listopad", culture.MonthNames[10]);
+        Assert.Equal("listopada", culture.MonthGenitiveNames![10]);
+    }
+
+    [Fact]
     public void Constructor_FallsBack_When_Culture_Has_Empty_DateSeparator()
     {
         var culture = (CultureInfo)CultureInfo.InvariantCulture.Clone();
