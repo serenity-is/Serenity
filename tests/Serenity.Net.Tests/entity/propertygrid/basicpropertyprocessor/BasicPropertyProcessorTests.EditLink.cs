@@ -36,6 +36,12 @@ public partial class BasicPropertyProcessorTests
 
         [EditLink(false)]
         public int? ID { get; set; }
+
+        [EditLink(Quiet = true)]
+        public string? QuietLink { get; set; }
+
+        [EditLink(Quiet = false)]
+        public string? FullLink { get; set; }
     }
 
     private static string? AutoDetermineIdField(Field? field)
@@ -61,6 +67,23 @@ public partial class BasicPropertyProcessorTests
         Assert.Equal("MyItem", item.EditLinkItemType);
         Assert.Equal("elc", item.EditLinkCssClass);
         Assert.Null(item.EditLinkIdField);
+    }
+
+    [Fact]
+    public void EditLink_Does_Not_Set_Quiet_When_Not_Set()
+    {
+        var item = Process<EditLinkForm>(nameof(EditLinkForm.Name), NewEditLinkRow());
+        Assert.Null(item.EditLinkQuiet);
+    }
+
+    [Theory]
+    [InlineData(nameof(EditLinkForm.QuietLink), true)]
+    [InlineData(nameof(EditLinkForm.FullLink), false)]
+    public void EditLink_Sets_Quiet_When_Set(string property, bool expected)
+    {
+        var item = Process<EditLinkForm>(property, NewEditLinkRow());
+        Assert.True(item.EditLink);
+        Assert.Equal(expected, item.EditLinkQuiet);
     }
 
     [Fact]

@@ -3454,6 +3454,12 @@ export interface PropertyItem {
     editLinkIdField?: string;
     /** Extra CSS class for the edit link anchor. */
     editLinkCssClass?: string;
+    /**
+     * Whether the edit link is a quiet one, which looks like the text of its cell until the row is hovered or
+     * the link has the focus (`true`), a full link (`false`), or as the grid decides (not set), see
+     * `DataGrid.getEditLinks`.
+     */
+    editLinkQuiet?: boolean;
     /** Filter editor type key that determines the filtering UI for this field (e.g. `"String"`, `"Date"`). */
     filteringType?: string;
     /** Options passed to the filtering editor. */
@@ -11590,6 +11596,7 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
     static readonly defaultOptions: {
         columnWidthDelta: number;
         columnWidthScale: number;
+        editLinks: ("all" | "primary");
         enableAdvancedFiltering: (boolean | ((grid: DataGrid<any>) => boolean));
         indentDataRows: boolean;
         displayTotalsRow: (boolean | "groupheader");
@@ -12138,6 +12145,31 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
      * @param item - Property item describing the edit link.
      */
     protected wrapFormatterWithEditLink(column: Column, item: PropertyItem): void;
+    private primaryEditLinkCache;
+    /**
+     * Returns how the columns with an edit link to the record of their row show it, `"all"` for each as a link,
+     * or `"primary"` for only the primary one, see `getPrimaryEditLinkColumn`, while the others are quiet links.
+     * A column whose `EditLink` attribute sets `Quiet` (the `editLinkQuiet` of its property item) is quiet or a
+     * full link as it says, in both. Defaults to `DataGrid.defaultOptions.editLinks`, which is `"all"` when not set.
+     */
+    protected getEditLinks(): "all" | "primary";
+    /**
+     * Returns the column whose edit link to the record of its row is shown as a link, when `getEditLinks` is
+     * `"primary"`: the first visible one, in the order they are shown, so that another one takes its place when
+     * it is hidden or moved. It is called again after the columns change. A column that is quiet by its
+     * `EditLink` attribute is not one of them, while one that is a full link by it is, so that the ones after it
+     * are quiet.
+     * @param columns - The visible columns with an edit link to the record of their row, which are not quiet by
+     * their attribute, in the order shown.
+     * @returns The primary column, or null for none.
+     */
+    protected getPrimaryEditLinkColumn(columns: Column[]): Column;
+    /**
+     * Tells whether the edit link of a column is a quiet one: as its `EditLink` attribute says when it sets
+     * `Quiet`, and otherwise when it links to the record of its row and is not the primary one, see `getEditLinks`.
+     * @param column - The column.
+     */
+    protected isQuietEditLinkColumn(column: Column): boolean;
     /**
      * Converts property items to grid columns, wrapping edit-link columns.
      * @param propertyItems - Property items to convert.

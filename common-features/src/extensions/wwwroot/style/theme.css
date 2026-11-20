@@ -3573,6 +3573,18 @@ button.panel-titlebar-close::after {
   text-decoration: none;
 }
 
+/* an edit link to the record of its row that another one of the row repeats, see the editLinks option of
+   DataGrid: it looks like the text of the cell until the row is hovered (the grid marks both halves of a
+   row with pinned columns with the hover class) or the link has the focus */
+.slick-cell a.s-EditLink-quiet {
+  color: var(--s-edit-link-quiet-color, inherit);
+}
+
+.slick-row.hover a.s-EditLink-quiet,
+.slick-cell a.s-EditLink-quiet:focus-visible {
+  color: rgba(var(--bs-link-color-rgb), var(--bs-link-opacity, 1));
+}
+
 .slick-group-toggle {
   display: inline-block;
 }

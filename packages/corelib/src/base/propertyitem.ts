@@ -190,6 +190,12 @@ export interface PropertyItem {
     editLinkIdField?: string;
     /** Extra CSS class for the edit link anchor. */
     editLinkCssClass?: string;
+    /**
+     * Whether the edit link is a quiet one, which looks like the text of its cell until the row is hovered or
+     * the link has the focus (`true`), a full link (`false`), or as the grid decides (not set), see
+     * `DataGrid.getEditLinks`.
+     */
+    editLinkQuiet?: boolean;
     /** Filter editor type key that determines the filtering UI for this field (e.g. `"String"`, `"Date"`). */
     filteringType?: string;
     /** Options passed to the filtering editor. */

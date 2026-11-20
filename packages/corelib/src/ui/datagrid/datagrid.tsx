@@ -43,6 +43,11 @@ const gridStyleClasses: [GridStyle, string][] = [
     [GridStyle.NoHeaderChrome, "slick-no-header-chrome"]
 ];
 
+/** Marks a column whose edit link goes to the record of its row, see `DataGrid.getEditLinks`. */
+const ownRecordEditLink = Symbol("ownRecordEditLink");
+/** The `editLinkQuiet` of the property item of a column, when it is set, see `DataGrid.getEditLinks`. */
+const quietEditLink = Symbol("quietEditLink");
+
 /**
  * Base data grid widget that renders tabular data using SleekGrid, with
  * support for columns, sorting, filtering, quick filters, paging, persistence,
@@ -1313,14 +1318,75 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         const itemType = item.editLinkItemType || null;
         const idField = item.editLinkIdField || null;
         const linkClass = item.editLinkCssClass || null;
+        // a link to the record of the row itself, which the other such links of the row repeat
+        const toOwnRecord = (!itemType || itemType === this.getItemType()) &&
+            (!idField || idField === this.getIdProperty());
+        if (toOwnRecord)
+            (column as any)[ownRecordEditLink] = true;
+        if (item.editLinkQuiet != null)
+            (column as any)[quietEditLink] = !!item.editLinkQuiet;
         column.format = this.itemLink(itemType, idField,
             ctx => orgFormat != null ? orgFormat(ctx) : ctx.escape(),
-            () => linkClass, /*encode*/false);
+            ctx => this.isQuietEditLinkColumn(ctx.column ?? column) ?
+                (linkClass ? linkClass + " " : "") + "s-EditLink-quiet" : linkClass, /*encode*/false);
 
         if (idField) {
             column.referencedFields = column.referencedFields || [];
             column.referencedFields.push(idField);
         }
+    }
+
+    declare private primaryEditLinkCache: { columns: Column[], primary: Column };
+
+    /**
+     * Returns how the columns with an edit link to the record of their row show it, `"all"` for each as a link,
+     * or `"primary"` for only the primary one, see `getPrimaryEditLinkColumn`, while the others are quiet links.
+     * A column whose `EditLink` attribute sets `Quiet` (the `editLinkQuiet` of its property item) is quiet or a
+     * full link as it says, in both. Defaults to `DataGrid.defaultOptions.editLinks`, which is `"all"` when not set.
+     */
+    protected getEditLinks(): "all" | "primary" {
+        return dataGridDefaults.editLinks ?? "all";
+    }
+
+    /**
+     * Returns the column whose edit link to the record of its row is shown as a link, when `getEditLinks` is
+     * `"primary"`: the first visible one, in the order they are shown, so that another one takes its place when
+     * it is hidden or moved. It is called again after the columns change. A column that is quiet by its
+     * `EditLink` attribute is not one of them, while one that is a full link by it is, so that the ones after it
+     * are quiet.
+     * @param columns - The visible columns with an edit link to the record of their row, which are not quiet by
+     * their attribute, in the order shown.
+     * @returns The primary column, or null for none.
+     */
+    protected getPrimaryEditLinkColumn(columns: Column[]): Column {
+        return columns[0] ?? null;
+    }
+
+    /**
+     * Tells whether the edit link of a column is a quiet one: as its `EditLink` attribute says when it sets
+     * `Quiet`, and otherwise when it links to the record of its row and is not the primary one, see `getEditLinks`.
+     * @param column - The column.
+     */
+    protected isQuietEditLinkColumn(column: Column): boolean {
+        const quiet: boolean = (column as any)?.[quietEditLink];
+        if (quiet != null)
+            return quiet;
+
+        if (!(column as any)?.[ownRecordEditLink] || this.getEditLinks() !== "primary")
+            return false;
+
+        // the grid replaces the array of the visible columns when they change, e.g. are hidden, shown or reordered
+        const columns = this._grid?.getColumns();
+        if (!columns)
+            return false;
+        let cache = this.primaryEditLinkCache;
+        if (cache?.columns !== columns) {
+            cache = this.primaryEditLinkCache = {
+                columns,
+                primary: this.getPrimaryEditLinkColumn(columns.filter(x => (x as any)[ownRecordEditLink] && !(x as any)[quietEditLink]))
+            };
+        }
+        return cache.primary !== column;
     }
 
     /**

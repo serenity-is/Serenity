@@ -64,6 +64,9 @@
  *                              (enableCellNavigation: "row") (default: --s-cell-selected-bg)
  *   --s-cell-flash-bg          fill of a grid cell that the grid flashes, e.g. after a change
  *                              (default: a tint of --bs-primary)
+ *   --s-edit-link-quiet-color  color of a quiet edit link of a grid, one that repeats the primary
+ *                              link of its row (DataGrid editLinks: "primary"), until the row is
+ *                              hovered or the link has the focus (default: the text of the cell)
  *
  * Grid row and cell states each have one channel, so that they add up instead of competing (see
  * slickgrid.css): the fill of the cells belongs to one state, by priority, --s-alt-row-bg (odd row)

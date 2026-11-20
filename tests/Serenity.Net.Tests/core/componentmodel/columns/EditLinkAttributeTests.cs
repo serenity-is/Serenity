@@ -3,6 +3,24 @@ namespace Serenity.ComponentModel;
 public class EditLinkAttributeTests()
 {
     [Fact]
+    public void Quiet_IsNotSet_ByDefault()
+    {
+        var attribute = new EditLinkAttribute();
+        Assert.False(attribute.Quiet);
+        Assert.Null(attribute.GetQuiet());
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void Quiet_IsSet_WhenAssigned(bool value)
+    {
+        var attribute = new EditLinkAttribute { Quiet = value };
+        Assert.Equal(value, attribute.Quiet);
+        Assert.Equal(value, attribute.GetQuiet());
+    }
+
+    [Fact]
     public void Value_IsTrue_ByDefault()
     {
         var attribute = new EditLinkAttribute();

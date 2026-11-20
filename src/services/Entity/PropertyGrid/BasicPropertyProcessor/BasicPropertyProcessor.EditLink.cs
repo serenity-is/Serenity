@@ -20,6 +20,9 @@ public partial class BasicPropertyProcessor : PropertyProcessor
         if (attr.CssClass != null)
             item.EditLinkCssClass = attr.CssClass;
 
+        if (attr.GetQuiet() is bool quiet)
+            item.EditLinkQuiet = quiet;
+
         if (item.EditLinkItemType != null &&
             item.EditLinkIdField == null)
         {

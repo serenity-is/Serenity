@@ -6,6 +6,14 @@ export const dataGridDefaults = {
     columnWidthDelta: null as number,
     /** Default column width scale. This value if specified, is multiplied with the width of columns defined server side. Default is null */
     columnWidthScale: null as number,
+    /**
+     * How the columns with an edit link to the record of their row, e.g. the ones with the EditLink attribute
+     * and no item type of their own, show it: each as a link (`"all"`), or only the first visible one of them,
+     * the primary, while the others are quiet links, which look like the text of the cell until the row is
+     * hovered or the link has the focus, and open the record all the same (`"primary"`). Links to the records
+     * of other types are always shown. Default is null, which is `"all"`.
+     */
+    editLinks: null as ("all" | "primary"),
     /** Controls whether to enable advanced filtering, e.g. via filter dialog/bar. Default is null. */
     enableAdvancedFiltering: null as (boolean | ((grid: DataGrid<any>) => boolean)),
     /**

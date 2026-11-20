@@ -1,4 +1,4 @@
-import { Column } from "@serenity-is/sleekgrid";
+import { Column, formatterContext } from "@serenity-is/sleekgrid";
 import { describe, expect, it, vi } from "vitest";
 import { Fluent } from "../../base";
 import { ScriptData } from "../../compat";
@@ -1342,5 +1342,154 @@ describe("DataGrid grid style", () => {
         const grid = createGrid();
         grid.setGridStyle("5" as any);
         expect(classesOf(grid)).toEqual(["slick-no-odd-even", "slick-no-header-chrome"]);
+    });
+});
+
+describe("DataGrid edit links", () => {
+    // OrderID, Customer and Date link to the order of the row, Employee to an employee of its own
+    const items = () => [
+        { name: "OrderID", title: "OrderID", editLink: true },
+        { name: "Customer", title: "Customer", editLink: true },
+        { name: "Date", title: "Date", editLink: true },
+        { name: "Employee", title: "Employee", editLink: true, editLinkItemType: "Northwind.Employee", editLinkIdField: "EmployeeID" },
+        { name: "Freight", title: "Freight" }
+    ] as any[];
+
+    function setup(editLinks: "all" | "primary", grid?: DataGrid<any, any>) {
+        grid ??= createGrid();
+        vi.spyOn(grid as any, "getEditLinks").mockReturnValue(editLinks);
+        const columns = grid["propertyItemsToColumns"](items());
+        grid.sleekGrid.setColumns(columns);
+        return grid;
+    }
+
+    /** The css class of the link that the column renders for a row, after the grid has the given visible columns. */
+    function linkClass(grid: DataGrid<any, any>, id: string): string {
+        const column = grid.allColumns.find(x => x.id === id);
+        const link = column.format(formatterContext({
+            column, item: { ID: 1, EmployeeID: 2, [id]: "x" }, value: "x"
+        })) as HTMLElement;
+        return link.className;
+    }
+
+    const quiet = (grid: DataGrid<any, any>, id: string) => linkClass(grid, id).split(" ").includes("s-EditLink-quiet");
+
+    it("are all links by default", () => {
+        const grid = setup("all");
+        expect(["OrderID", "Customer", "Date", "Employee"].map(x => quiet(grid, x))).toEqual([false, false, false, false]);
+        grid.destroy();
+    });
+
+    it("are links by default, as editLinks of the defaults is null", () => {
+        const grid = createGrid();
+        expect(dataGridDefaults.editLinks).toBeNull();
+        expect(grid["getEditLinks"]()).toBe("all");
+        try {
+            dataGridDefaults.editLinks = "primary";
+            expect(grid["getEditLinks"]()).toBe("primary");
+        }
+        finally {
+            dataGridDefaults.editLinks = null;
+            grid.destroy();
+        }
+    });
+
+    it("with primary, are quiet except the first visible one to the record of the row and the ones to other records", () => {
+        const grid = setup("primary");
+        expect(quiet(grid, "OrderID")).toBe(false);
+        expect(quiet(grid, "Customer")).toBe(true);
+        expect(quiet(grid, "Date")).toBe(true);
+        expect(quiet(grid, "Employee")).toBe(false);
+        expect(linkClass(grid, "Customer")).toContain("s-EditLink");
+        grid.destroy();
+    });
+
+    it("with primary, pass the primary to the next one when the first is hidden, and back when it is shown", () => {
+        const grid = setup("primary");
+        grid.sleekGrid.reorderColumns(["Customer", "Date", "Employee", "Freight"], { setVisible: ["Customer", "Date", "Employee", "Freight"] });
+        expect(quiet(grid, "Customer")).toBe(false);
+        expect(quiet(grid, "Date")).toBe(true);
+
+        grid.sleekGrid.reorderColumns(["OrderID", "Customer", "Date", "Employee", "Freight"], { setVisible: ["OrderID", "Customer", "Date", "Employee", "Freight"] });
+        expect(quiet(grid, "OrderID")).toBe(false);
+        expect(quiet(grid, "Customer")).toBe(true);
+        grid.destroy();
+    });
+
+    it("with primary, follow the order the columns are shown in", () => {
+        const grid = setup("primary");
+        grid.sleekGrid.reorderColumns(["Date", "OrderID", "Customer", "Employee", "Freight"]);
+        expect(quiet(grid, "Date")).toBe(false);
+        expect(quiet(grid, "OrderID")).toBe(true);
+        grid.destroy();
+    });
+
+    it("with primary, keep the css class of the EditLink attribute", () => {
+        const grid = createGrid();
+        vi.spyOn(grid as any, "getEditLinks").mockReturnValue("primary");
+        const columns = grid["propertyItemsToColumns"]([
+            { name: "A", title: "A", editLink: true },
+            { name: "B", title: "B", editLink: true, editLinkCssClass: "my-link" }
+        ] as any[]);
+        grid.sleekGrid.setColumns(columns);
+        expect(linkClass(grid, "B").split(" ")).toEqual(expect.arrayContaining(["s-EditLink", "my-link", "s-EditLink-quiet"]));
+        grid.destroy();
+    });
+
+    it("with primary, let a grid pick its primary column", () => {
+        class PickGrid extends DataGrid<any, any> {
+            protected override getPrimaryEditLinkColumn(columns: Column[]) {
+                return columns.find(x => x.id === "Customer");
+            }
+        }
+        const grid = setup("primary", new PickGrid({}));
+        expect(quiet(grid, "OrderID")).toBe(true);
+        expect(quiet(grid, "Customer")).toBe(false);
+        grid.destroy();
+    });
+});
+
+describe("DataGrid edit links set quiet by their attribute", () => {
+    function setup(editLinks: "all" | "primary", items: any[]) {
+        const grid = createGrid();
+        vi.spyOn(grid as any, "getEditLinks").mockReturnValue(editLinks);
+        grid.sleekGrid.setColumns(grid["propertyItemsToColumns"](items.map(x => ({ title: x.name, editLink: true, ...x }))));
+        return grid;
+    }
+
+    const quiet = (grid: DataGrid<any, any>, id: string) => {
+        const column = grid.allColumns.find(x => x.id === id);
+        const link = column.format(formatterContext({ column, item: { ID: 1, EmployeeID: 2 }, value: "x" })) as HTMLElement;
+        return link.classList.contains("s-EditLink-quiet");
+    };
+
+    it("are quiet or full links as it says, whatever the editLinks of the grid", () => {
+        for (const mode of ["all", "primary"] as const) {
+            const grid = setup(mode, [
+                { name: "A", editLinkQuiet: true },
+                { name: "B", editLinkQuiet: false },
+                { name: "C", editLinkQuiet: false },
+                { name: "Employee", editLinkItemType: "Northwind.Employee", editLinkIdField: "EmployeeID", editLinkQuiet: true }
+            ]);
+            expect([quiet(grid, "A"), quiet(grid, "B"), quiet(grid, "C"), quiet(grid, "Employee")]).toEqual([true, false, false, true]);
+            grid.destroy();
+        }
+    });
+
+    it("with primary, a quiet one is not the primary, so the next one is", () => {
+        const grid = setup("primary", [{ name: "A", editLinkQuiet: true }, { name: "B" }, { name: "C" }]);
+        expect([quiet(grid, "A"), quiet(grid, "B"), quiet(grid, "C")]).toEqual([true, false, true]);
+        grid.destroy();
+    });
+
+    it("with primary, a full one is the primary when it comes first, so the ones after it are quiet", () => {
+        const grid = setup("primary", [{ name: "A" }, { name: "B", editLinkQuiet: false }, { name: "C" }]);
+        grid.sleekGrid.reorderColumns(["B", "A", "C"]);
+        expect([quiet(grid, "B"), quiet(grid, "A"), quiet(grid, "C")]).toEqual([false, true, true]);
+
+        // when it comes after one that the grid decides for, that one is the primary
+        grid.sleekGrid.reorderColumns(["A", "B", "C"]);
+        expect([quiet(grid, "A"), quiet(grid, "B"), quiet(grid, "C")]).toEqual([false, false, true]);
+        grid.destroy();
     });
 });

@@ -648,6 +648,14 @@ public class PropertyItem
     public string? EditLinkCssClass { get; set; }
 
     /// <summary>
+    /// Gets or sets whether the edit link is a quiet one (true), a full link (false), or as the grid
+    /// decides (null). See <see cref="EditLinkAttribute.Quiet"/>.
+    /// </summary>
+    [Newtonsoft.Json.JsonProperty("editLinkQuiet")]
+    [JsonPropertyName("editLinkQuiet")]
+    public bool? EditLinkQuiet { get; set; }
+
+    /// <summary>
     /// Gets or sets the type of the filtering for the column.
     /// </summary>
     /// <value>
