@@ -17581,21 +17581,44 @@ export declare class ColumnsBase<TRow = any> {
     valueOf(): Column<TRow>[];
 }
 /**
- * Utility functions for working with grid columns.
+ * Helpers for the utility columns of a grid, which are the columns the framework adds for its own
+ * purposes, like the checkbox column of {@link GridRowSelectionMixin}, rather than showing data.
+ * The id of a utility column starts and ends with two underscores, like `__select__`.
+ *
+ * The functions are meant to be overridable by assigning to them, e.g. `UtilityColumns.isExportable = ...`.
+ * They call each other through the namespace, so an override of one is also used by the others.
  */
-export declare namespace ColumnUtils {
-    const utilityColumnPrefix = "__";
-    const selectColumnId = "__select__";
-    const radioColumnId = "__radio__";
-    const actionsColumnId = "__actions__";
-    function isExportable(column: Column): boolean;
+export declare namespace UtilityColumns {
+    /** The prefix and the suffix of the id of a utility column. */
+    const idAffix = "__";
+    /** The id of the column that shows the checkboxes of the rows. */
+    const selectId = "__select__";
+    /** The id of the column that shows the radio buttons of the rows. */
+    const radioId = "__radio__";
+    /** The id of the column that shows the row actions. */
+    const actionsId = "__actions__";
     /**
-     * Checks if a column is a utility column. The utility columns are typically used for internal purposes
-     * and have names starting and ending with "__" like "__select__" or "__radio__" or "__actions__".
-     * @param column Column to check if it is a utility column.
+     * Checks if a column is a utility column, which means its id starts and ends with `__`,
+     * like `__select__`, `__radio__` or `__actions__`.
+     * @param column The column to check.
      * @returns True if the column is a utility column, otherwise false.
      */
-    function isUtilityColumn(column: Column): boolean;
+    function isUtility(column: Column): boolean;
+    /**
+     * Checks if a column can be included in an export, which only data columns can.
+     * @param column The column to check.
+     * @returns True if the column is not a utility column, otherwise false.
+     */
+    function isExportable(column: Column): boolean;
+    /**
+     * Gets the text that identifies a column to the user in places like the column picker.
+     * For a utility column, the name is often blank, so this falls back to its tooltip,
+     * then to a symbol for the known ones, and then to its id without the underscores.
+     * For other columns it is the name, the tooltip or the id.
+     * @param column The column to get the display name of.
+     * @returns The display name, or an empty string if the column is null.
+     */
+    function getDisplayName(column: Column): string;
 }
 /**
  * Renders an edit link for a given item type and ID.
@@ -17650,6 +17673,8 @@ export interface GridRadioSelectionMixinOptions {
  */
 export declare class GridRadioSelectionMixin {
     static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
+    /** The id of the column that shows the radio buttons of the rows, which the mixin creates. */
+    static get radioColumnId(): string;
     /**
      * Formats a cell of the column of the radio buttons that select a row, and is also what tells that
      * column apart from the column of the check boxes, see {@link GridRowSelectionMixin.formatSelectItem},
