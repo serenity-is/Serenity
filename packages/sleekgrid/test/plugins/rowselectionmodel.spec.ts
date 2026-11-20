@@ -41,6 +41,48 @@ function fireClick(grid: SleekGrid, row: number, cell: number, opts: any = {}) {
     return ev;
 }
 
+describe("replacing the selection model of a grid", () => {
+    it("clears the cells the previous model selected, and tells that its rows are not selected", () => {
+        const { grid, model } = setup(5, { renderAllRows: true, renderAllCells: true });
+        model.setSelectedRows([1, 2]);
+        expect(grid.getCellNode(1, 0).classList.contains("selected")).toBe(true);
+
+        let changed: any;
+        grid.onSelectedRowsChanged.subscribe((_, args) => changed = args);
+        grid.setSelectionModel(null);
+
+        // a grid without a selection model throws on getSelectedRows, so the rows are read from the event
+        expect(changed?.rows).toEqual([]);
+        expect(changed?.previousSelectedRows).toEqual([1, 2]);
+        expect(grid.getCellNode(1, 0).classList.contains("selected")).toBe(false);
+    });
+
+    it("starts the new model without the selection of the previous one", () => {
+        const { grid, model } = setup(5, { renderAllRows: true, renderAllCells: true });
+        model.setSelectedRows([3]);
+
+        grid.setSelectionModel(new RowSelectionModel());
+
+        expect(grid.getSelectedRows()).toEqual([]);
+        expect(grid.getCellNode(3, 1).classList.contains("selected")).toBe(false);
+    });
+});
+
+describe("turning cell navigation off", () => {
+    it("clears the active cell, which would stay marked otherwise", () => {
+        const { grid } = setup(5, { renderAllRows: true, renderAllCells: true });
+        grid.setActiveCell(2, 1);
+        expect(grid.getActiveCell()).toEqual({ row: 2, cell: 1 });
+
+        grid.setOptions({ enableCellNavigation: "row" });
+        expect(grid.getActiveCell()).toEqual({ row: 2, cell: 1 });
+
+        grid.setOptions({ enableCellNavigation: false });
+        expect(grid.getActiveCell()).toBeNull();
+        expect(grid.getCellNode(2, 1).classList.contains("active")).toBe(false);
+    });
+});
+
 describe("RowSelectionModel defaults", () => {
     it("selectActiveRow defaults to true", () => {
         expect(RowSelectionModel.defaults.selectActiveRow).toBe(true);

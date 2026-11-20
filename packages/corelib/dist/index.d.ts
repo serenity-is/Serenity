@@ -1,4 +1,4 @@
-import { CellMouseEvent, Column, EventEmitter, FormatterContext, FormatterResult, GridOptions, GridSortEvent, Group, GroupItemMetadataProvider, GroupTotals, IDataView, IGroupTotals, ISleekGrid, ItemMetadata } from '@serenity-is/sleekgrid';
+import { CellKeyboardEvent, CellMouseEvent, Column, EventEmitter, FormatterContext, FormatterResult, GridOptions, GridSortEvent, Group, GroupItemMetadataProvider, GroupTotals, IDataView, IGroupTotals, ISleekGrid, ItemMetadata } from '@serenity-is/sleekgrid';
 
 /**
  * Describes the currently authenticated user as resolved on the client.
@@ -10905,7 +10905,9 @@ export declare class GridRowSelectionMixin {
     destroy(): void;
     private handleGridClick;
     /**
-     * Key handler that toggles the checkbox of the active row on Space, like clicking it.
+     * Key handler that toggles the checkbox of the active row on Space, like clicking it. With cell navigation,
+     * the cursor has to be on the checkbox; when the grid navigates rows (`enableCellNavigation: "row"`), the
+     * cursor is the row, so Space, or X as in a mail client, toggles it from any column.
      * @param e - Cell keyboard event from the grid's `onKeyDown`.
      */
     private handleGridKeyDown;
@@ -11888,6 +11890,11 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
      */
     protected handleGridClick(e: CellMouseEvent): void;
     /**
+     * Handles grid key down events by delegating to onKeyDown.
+     * @param e - Cell keyboard event.
+     */
+    protected handleGridKeyDown(e: CellKeyboardEvent): void;
+    /**
      * Persists settings when columns are reordered.
      */
     protected handleGridColumnsReordered(): void;
@@ -11927,6 +11934,14 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
      * @param cell - Cell index.
      */
     protected onClick(e: Event, row: number, cell: number): void;
+    /**
+     * Handles a key pressed in the grid, before the grid itself does. Does nothing by default; a grid that
+     * handles a key calls `preventDefault()` and `stopImmediatePropagation()` on the event, so the grid leaves it.
+     * @param e - Cell keyboard event, which tells the key and the active cell.
+     * @param row - Row index of the active cell, if any.
+     * @param cell - Cell index of the active cell, if any.
+     */
+    protected onKeyDown(e: CellKeyboardEvent, row: number, cell: number): void;
     /**
      * Handles view data changes by notifying subscribers and relaying out.
      */
@@ -12546,6 +12561,15 @@ export declare class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
      * @param entityOrId - Entity instance or identifier to edit.
      */
     protected editItem(entityOrId: any): void;
+    /**
+     * Opens the dialog of the row of the cursor on Enter, like a click on its edit link, when the grid navigates
+     * rows (`enableCellNavigation: "row"`), e.g. a list whose rows open a dialog. A grid whose cells are edited
+     * in place leaves Enter to its cell editors.
+     * @param e - Cell keyboard event.
+     * @param row - Row index of the cursor.
+     * @param cell - Cell index of the cursor.
+     */
+    protected onKeyDown(e: CellKeyboardEvent, row: number, cell: number): void;
     /**
      * Opens an edit dialog for a specific item type, used for polymorphic entities.
      * @param itemType - Entity type key.

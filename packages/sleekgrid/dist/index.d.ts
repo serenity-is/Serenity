@@ -1183,9 +1183,16 @@ export interface GridOptions<TItem = any> {
      */
     enableAsyncPostRenderCleanup?: boolean;
     /**
-     * Defaults to `true`. If `true`, enables cell navigation with arrow keys.
+     * Defaults to `true`. If `true`, enables cell navigation with arrow keys: the grid has an active cell, the
+     * cursor, which the arrow keys, Tab, Home and End move between the cells.
+     *
+     * `"row"` makes the cursor a row instead, e.g. for a list whose rows open a dialog: Up, Down, Page Up,
+     * Page Down, Home and End move it between the rows, Left and Right scroll the columns, and Tab leaves the
+     * grid. The grid still has an active cell, on the row of the cursor, so the active cell API, its events and
+     * a selection model that follows it work the same, but its cell is not marked; the row is, through the
+     * `slick-row-navigation` class of the container, which this value sets.
      */
-    enableCellNavigation?: boolean;
+    enableCellNavigation?: boolean | "row";
     /**
      * Defaults to `false`. If `true`, allows selection of cell ranges.
      */
@@ -3648,6 +3655,12 @@ export declare class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
      * @param dir - Direction (`"up"`, `"down"`, `"left"`, `"right"`, `"next"`, `"prev"`, `"home"`, `"end"`).
      */
     navigate(dir: string): boolean;
+    /**
+     * Makes the first cell of a row that can be active the active cell, scrolling the row into view.
+     * @param row - The row.
+     * @returns `true` when a cell of the row became active.
+     */
+    private activateFirstFocusableCell;
     /**
      * Returns the cell DOM node for `row`/`cell` if rendered (`rowsCache` hit).
      * @param row - View row index.

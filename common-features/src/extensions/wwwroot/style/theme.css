@@ -3453,19 +3453,81 @@ button.panel-titlebar-close::after {
   background: rgba(var(--s-body-bg-grb) 0.5);
 }
 
-/* --s-stripes (1 or 0) turns the stripes on or off for the page or a grid, over the theme's --s-stripes-default */
-.slick-row.odd {
+/* ── Row and cell states ──
+   The states of a grid have one meaning each, and one channel each, so they add up instead of competing:
+
+   - hover: the row under the mouse, a translucent layer (background-image of the cells) over any fill
+   - active: the cell that has the keyboard cursor, a ring (inset box shadow) without a fill, and its row,
+     the current row, which is filled only when the grid asks for it with the highlightActiveRow option
+   - selected: the cells that a selection model picks, whole rows (RowSelectionModel) or a range, filled
+   - checked: the rows ticked with their checkbox, which bulk actions act on and which survive paging,
+     filled and marked with a band at their start edge (a pseudo element of the row)
+
+   The fill of the cells (background-color) belongs to one state, by priority: the stripe of an odd row, the
+   current row, a checked row, a selected cell, and a row that is being edited. The fill of a state replaces
+   the stripe, instead of being laid over it. The fills are on the cells, and not on the rows, as a cell with
+   a fill of its own covers the fill of its row; the stripe is on the cells too, so that a fill replaces it.
+   The selectors weigh the same (one class, the rest is in :where), so their order below is their priority,
+   and the fill of a cell in another state, e.g. an editor, an invalid value or a flash, wins over them.
+
+   --s-stripes (1 or 0) turns the stripes on or off for the page or a grid, over the theme's --s-stripes-default */
+:where(.slick-row.odd) > .slick-cell {
   background-color: color-mix(in srgb, var(--s-alt-row-bg) calc(var(--s-stripes, var(--s-stripes-default, 1)) * 100%), transparent);
 }
 
-/* a layer over the row background, so the stripe and the active row color still show below it;
-   the grid adds the hover class to the row's nodes in all the panes when some columns are pinned */
-.slick-row.hover:not(.slick-group, .slick-group-totals) {
+/* the current row: the row of the cell cursor, with the highlightActiveRow option, filled lightly */
+:where(.slick-highlight-active-row .slick-row.active) > .slick-cell {
+  background-color: var(--s-row-active-bg);
+}
+
+:where(.slick-row.checked-row) > .slick-cell {
+  background-color: var(--s-row-checked-bg, color-mix(in srgb, var(--bs-primary) 12%, transparent));
+}
+
+/* the row cursor (enableCellNavigation: "row") is what the keyboard acts on, so it is filled like the rows of a
+   selection model, also over a checked row, whose band still tells that it is checked */
+:where(.slick-row-navigation .slick-row.active) > .slick-cell {
+  background-color: var(--s-row-cursor-bg, var(--s-cell-selected-bg));
+}
+
+/* the selected cell css class of the grid, which the selection models set */
+.slick-cell:where(.selected) {
+  background-color: var(--s-cell-selected-bg);
+}
+
+:where(.slick-row.editing-item) > .slick-cell {
+  background-color: var(--s-row-editing-bg, rgba(var(--bs-success-rgb), 0.2));
+}
+
+/* the grid adds the hover class to the row's nodes in all the panes when some columns are pinned */
+:where(.slick-row.hover:not(.slick-group, .slick-group-totals)) > .slick-cell:not(.editable) {
   background-image: linear-gradient(var(--s-row-hover-bg, transparent), var(--s-row-hover-bg, transparent));
 }
 
-.slick-row.editing-item {
-  background-color: rgba(var(--bs-success-rgb), 0.2);
+/* the cell that has the cursor gets a ring, which says where the cursor is without moving the cell, as a box
+   shadow does not take room; it has no fill, so the fill of its row or its selection shows through */
+.slick-cell.active {
+  box-shadow: inset 0 0 0 2px var(--s-cell-active-ring);
+}
+
+/* when the grid navigates rows, the cursor is the row, which its fill marks, so its cell has no ring */
+.slick-row-navigation .slick-cell.active:not(.editable) {
+  box-shadow: none;
+}
+
+/* the band of a checked row is drawn by a pseudo element of the row, and not as an inset shadow of the cell,
+   as a cell hides what overflows it and its bottom border would cut the band at every row. it goes at the
+   start of the row: in the pinned band when the grid has one, which its container tells with sg-has-start,
+   and in the main band otherwise, whatever band the cell of the checkbox is in */
+.sg-start .slick-row.checked-row::after,
+.slick-container:not(.sg-has-start) .sg-main .slick-row.checked-row::after {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  inline-size: 3px;
+  background-color: var(--s-row-checked-accent, var(--bs-primary));
+  pointer-events: none;
 }
 
 /* no stripes in a grid with this class, e.g. a check tree, like --s-stripes: 0 */
@@ -3515,12 +3577,10 @@ button.panel-titlebar-close::after {
   display: inline-block;
 }
 
+/* a cell that the grid flashes, e.g. after it changes; it wins over the fill of any state of the row */
 .slick-cell.highlighted {
-  background: rgba(0, 0, 255, 0.2);
-  -webkit-transition: all 0.5s;
-  -moz-transition: all 0.5s;
-  -o-transition: all 0.5s;
-  transition: all 0.5s;
+  background-color: var(--s-cell-flash-bg, rgba(var(--bs-primary-rgb), 0.25));
+  transition: background-color 0.5s;
 }
 
 .slick-cell.flashing {
@@ -3843,27 +3903,6 @@ button.panel-titlebar-close::after {
 
 .s-group-name {
   display: none;
-}
-
-/* cell navigation marks the cell that has the cursor, so only the cell is tinted, and the row is tinted
-   only when the grid asks for it with the highlightActiveRow option, e.g. a grid that is edited a row at
-   a time, where the row of the cursor is the row being edited */
-.slick-highlight-active-row .slick-row.active {
-  background-color: var(--s-row-active-bg);
-}
-
-.slick-cell.active {
-  background-color: var(--s-cell-active-bg);
-  /* a ring around the cell that has the cursor, which says where the cursor is without moving the cell,
-     as a box shadow does not take room, like the themes of SlickGrid do */
-  box-shadow: inset 0 0 0 1px var(--s-cell-active-ring);
-}
-
-/* the cells of a selection range, which the selected cell css class of the grid marks, are filled, like
-   the selected cells of the themes of SlickGrid, which leave their borders alone as the grid measures the
-   cells by them; an outline around the range, if wanted, is a decorating element drawn over it */
-.slick-cell.selected {
-  background-color: var(--s-cell-selected-bg);
 }
 
 .slick-cell.editable {

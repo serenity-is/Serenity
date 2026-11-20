@@ -3,6 +3,7 @@ import { bindThis } from "@serenity-is/domwise";
 import { Authorization, EntityGridTexts, Fluent, RenderableContent, faIcon, getActiveRequests, getInstanceType, getTypeFullName, isPromiseLike, localText, nsSerenity, resolveUrl, stringFormat } from "../../base";
 import { HandleRouteEvent, Router, safeCast } from "../../compat";
 import { IEditDialog } from "../../interfaces";
+import type { CellKeyboardEvent } from "@serenity-is/sleekgrid";
 import { RemoteViewOptions } from "../../slick";
 import { DialogType } from "../../types/dialogtype";
 import { DialogTypeRegistry } from "../../types/dialogtyperegistry";
@@ -304,6 +305,37 @@ export class EntityGrid<TItem, P = {}> extends DataGrid<TItem, P> {
                 stringFormat("{0} doesn't implement IEditDialog!",
                     getTypeFullName(getInstanceType(dlg))));
         });
+    }
+
+    /**
+     * Opens the dialog of the row of the cursor on Enter, like a click on its edit link, when the grid navigates
+     * rows (`enableCellNavigation: "row"`), e.g. a list whose rows open a dialog. A grid whose cells are edited
+     * in place leaves Enter to its cell editors.
+     * @param e - Cell keyboard event.
+     * @param row - Row index of the cursor.
+     * @param cell - Cell index of the cursor.
+     */
+    protected override onKeyDown(e: CellKeyboardEvent, row: number, cell: number): void {
+        super.onKeyDown(e, row, cell);
+
+        if (e.key !== "Enter" || e.ctrlKey || e.altKey || e.shiftKey || e.metaKey || Fluent.isDefaultPrevented(e))
+            return;
+
+        const options = this.sleekGrid?.getOptions();
+        if (options?.enableCellNavigation !== "row" || options.editable || row == null)
+            return;
+
+        const item = this.view?.getItem(row) as any;
+        if (!item || item.__nonDataRow || item.__group)
+            return;
+
+        const id = item[this.getIdProperty()];
+        if (id == null)
+            return;
+
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        this.editItem(id);
     }
 
     /**

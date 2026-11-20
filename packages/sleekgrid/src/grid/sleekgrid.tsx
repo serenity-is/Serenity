@@ -561,7 +561,13 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
      * @param model - The new selection model, or `null` to detach.
      */
     setSelectionModel(model: SelectionModel): void {
+        const hadModel = !!this._selectionModel;
         this.unregisterSelectionModel();
+
+        // the cells that the previous model selected would stay marked as selected otherwise, so its selection
+        // is cleared, which also tells the subscribers of onSelectedRowsChanged that its rows are not selected
+        if (hadModel)
+            this.handleSelectedRangesChanged(null, []);
 
         this._selectionModel = model;
         if (this._selectionModel) {
@@ -1782,6 +1788,10 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         this._options = Object.assign(this._options, args);
         this.validateAndEnforceOptions();
         this.setOptionDependentSignals();
+
+        // a grid without a cursor has no active cell, and the one it had would stay marked otherwise
+        if ("enableCellNavigation" in args && !args.enableCellNavigation && this._activeCellNode)
+            this.resetActiveCell();
         this.handleFrozenColsOption(this._cols, args);
         this._layout.afterSetOptions(args);
 
@@ -1810,6 +1820,8 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         const opt = this._options;
         // a style can tell the active cell from its row, but not whether the row should be highlighted
         this._container?.classList.toggle("slick-highlight-active-row", opt.highlightActiveRow === true);
+        // the cursor is a row, so a style marks the row of the active cell, and not the cell
+        this._container?.classList.toggle("slick-row-navigation", opt.enableCellNavigation === "row");
         sig.showColumnHeader.value = opt.showColumnHeader;
         sig.showTopPanel.value = opt.showTopPanel;
         sig.showHeaderRow.value = opt.showHeaderRow;
@@ -3392,8 +3404,11 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
                     }
                 }
 
+                // with a row cursor there are no cells to go to the start or the end of, so Home and End go to
+                // the first and the last row, as Ctrl+Home and Ctrl+End do
+                const rowNavigation = this._options.enableCellNavigation === "row";
                 if (e.key === "Home") {
-                    if (e.ctrlKey) {
+                    if (e.ctrlKey || rowNavigation) {
                         this.navigateTop();
                         handled = true;
                     }
@@ -3401,7 +3416,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
                         handled = this.navigateRowStart();
                 }
                 else if (e.key === "End") {
-                    if (e.ctrlKey) {
+                    if (e.ctrlKey || rowNavigation) {
                         this.navigateBottom();
                         handled = true;
                     }
@@ -4340,6 +4355,28 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
             return false;
         }
 
+        // a row cursor only moves between the rows: Left and Right scroll the columns instead, and Tab is not
+        // handled, so it leaves the grid
+        if (this._options.enableCellNavigation === "row" && dir != "up" && dir != "down") {
+            if (dir == "left" || dir == "right") {
+                const scrollContainer = this.getScrollContainerX();
+                if (!scrollContainer)
+                    return false;
+
+                // the arrow keys scroll a page by about this much, and scrollLeft is visual, also right to left
+                scrollContainer.scrollLeft += dir == "left" ? -40 : 40;
+                return true;
+            }
+
+            return false;
+        }
+
+        // a list with a row cursor starts it at the first row on Down, or at the last one on Up, when no row has
+        // it yet, e.g. right after the grid gets the focus
+        if (this._options.enableCellNavigation === "row" && !this._activeCellNode) {
+            return this.activateFirstFocusableCell(dir == "down" ? 0 : this.getDataLength() - 1);
+        }
+
         if (!this._activeCellNode && dir != "prev" && dir != "next") {
             return false;
         }
@@ -4382,6 +4419,26 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
             this.setActiveCellInternal(this.getCellNode(this._activeRow, this._activeCell));
             return false;
         }
+    }
+
+    /**
+     * Makes the first cell of a row that can be active the active cell, scrolling the row into view.
+     * @param row - The row.
+     * @returns `true` when a cell of the row became active.
+     */
+    private activateFirstFocusableCell(row: number): boolean {
+        if (row < 0 || row >= this.getDataLength())
+            return false;
+
+        for (let cell = 0; cell < this.getColumnCount(); cell += this.getColspan(row, cell)) {
+            if (this.canCellBeActive(row, cell)) {
+                this.scrollCellIntoView(row, cell, true);
+                this.setActiveCellInternal(this.getCellNode(row, cell));
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

@@ -778,6 +778,40 @@ describe("GridRowSelectionMixin", () => {
             expect(space.preventDefault).not.toHaveBeenCalled();
         });
 
+        it("toggles the row of the cursor from any column on space or x when the grid navigates rows", () => {
+            viewObj.getItem = vi.fn(() => ({ id: 42 }));
+            gridObj.getOptions = vi.fn(() => ({ enableCellNavigation: "row" }));
+            const mixin = new GridRowSelectionMixin(mockGrid);
+            gridObj.getActiveCell.mockReturnValue({ row: 0, cell: 3 });
+
+            const space = keyEvent(" ");
+            onKeyDownHandler(space);
+            expect((mixin as any).include).toEqual({ "42": true });
+            expect(space.stopImmediatePropagation).toHaveBeenCalled();
+
+            onKeyDownHandler(keyEvent("x"));
+            expect((mixin as any).include).toEqual({});
+
+            onKeyDownHandler(keyEvent("X"));
+            expect((mixin as any).include).toEqual({ "42": true });
+        });
+
+        it("ignores x with cell navigation, and x or space with a modifier", () => {
+            viewObj.getItem = vi.fn(() => ({ id: 42 }));
+            gridObj.getOptions = vi.fn(() => ({ enableCellNavigation: true }));
+            const mixin = new GridRowSelectionMixin(mockGrid);
+            gridObj.getActiveCell.mockReturnValue({ row: 0, cell: 0 });
+
+            const x = keyEvent("x");
+            onKeyDownHandler(x);
+            expect(x.preventDefault).not.toHaveBeenCalled();
+
+            gridObj.getOptions = vi.fn(() => ({ enableCellNavigation: "row" }));
+            onKeyDownHandler({ ...keyEvent("x"), ctrlKey: true });
+            onKeyDownHandler({ ...keyEvent(" "), metaKey: true });
+            expect((mixin as any).include).toEqual({});
+        });
+
         it("toggles all the rows of a group on space", () => {
             const group = { __group: true, __nonDataRow: true, rows: [{ id: 1 }, { id: 2 }], count: 2 } as any;
             viewObj.getItem = vi.fn(() => group);

@@ -1,5 +1,5 @@
 import { bindThis } from "@serenity-is/domwise";
-import { AutoTooltips, Column, ColumnSort, FormatterContext, SleekGrid, type CellMouseEvent, type GridOptions, type GridSortEvent, type ISleekGrid } from "@serenity-is/sleekgrid";
+import { AutoTooltips, Column, ColumnSort, FormatterContext, SleekGrid, type CellKeyboardEvent, type CellMouseEvent, type GridOptions, type GridSortEvent, type ISleekGrid } from "@serenity-is/sleekgrid";
 import { Authorization, Criteria, DataGridTexts, Fluent, ListResponse, RenderableContent, cssEscape, debounce, getInstanceType, getTypeFullName, getjQuery, nsSerenity, tryGetText, type PropertyItem, type PropertyItemsData } from "../../base";
 import { PubSub } from "../../base/pubsub";
 import { LayoutTimer, canLoadScriptData, getColumnsData, getColumnsDataAsync } from "../../compat";
@@ -489,6 +489,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
 
         if (this._grid) {
             this._grid.onClick.unsubscribe(this.handleGridClick);
+            this._grid.onKeyDown?.unsubscribe(this.handleGridKeyDown);
             this._grid.onSort.unsubscribe(this.handleGridSort);
             this._grid.onColumnsResized.unsubscribe(this.handleGridColumnsResized);
             this._grid.onColumnsReordered.unsubscribe(this.handleGridColumnsReordered);
@@ -754,6 +755,14 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     }
 
     /**
+     * Handles grid key down events by delegating to onKeyDown.
+     * @param e - Cell keyboard event.
+     */
+    protected handleGridKeyDown(e: CellKeyboardEvent) {
+        this.onKeyDown(e, e.row, e.cell);
+    }
+
+    /**
      * Persists settings when columns are reordered.
      */
     protected handleGridColumnsReordered() {
@@ -774,6 +783,7 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         const boundThis = bindThis(this);
         this._grid.onSort.subscribe(boundThis.handleGridSort);
         this._grid.onClick.subscribe(boundThis.handleGridClick);
+        this._grid.onKeyDown?.subscribe(boundThis.handleGridKeyDown);
         this._grid.onColumnsReordered.subscribe(boundThis.handleGridColumnsReordered);
         this._grid.onColumnsResized.subscribe(boundThis.handleGridColumnsResized);
     }
@@ -836,6 +846,16 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
             e.preventDefault();
             this.editItemOfType(target.dataset.itemType, target.dataset.itemId);
         }
+    }
+
+    /**
+     * Handles a key pressed in the grid, before the grid itself does. Does nothing by default; a grid that
+     * handles a key calls `preventDefault()` and `stopImmediatePropagation()` on the event, so the grid leaves it.
+     * @param e - Cell keyboard event, which tells the key and the active cell.
+     * @param row - Row index of the active cell, if any.
+     * @param cell - Cell index of the active cell, if any.
+     */
+    protected onKeyDown(e: CellKeyboardEvent, row: number, cell: number): void {
     }
 
     /**

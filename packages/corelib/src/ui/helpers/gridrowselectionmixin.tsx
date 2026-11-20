@@ -191,20 +191,26 @@ export class GridRowSelectionMixin {
     }
 
     /**
-     * Key handler that toggles the checkbox of the active row on Space, like clicking it.
+     * Key handler that toggles the checkbox of the active row on Space, like clicking it. With cell navigation,
+     * the cursor has to be on the checkbox; when the grid navigates rows (`enableCellNavigation: "row"`), the
+     * cursor is the row, so Space, or X as in a mail client, toggles it from any column.
      * @param e - Cell keyboard event from the grid's `onKeyDown`.
      */
     private handleGridKeyDown(e: CellKeyboardEvent): void {
-        if (e?.key !== " ")
+        if (!e || e.ctrlKey || e.altKey || e.metaKey)
             return;
 
         const grid = this.grid?.getGrid();
+        const rowNavigation = grid?.getOptions?.()?.enableCellNavigation === "row";
+        if (e.key !== " " && !(rowNavigation && (e.key === "x" || e.key === "X")))
+            return;
+
         const activeCell = grid?.getActiveCell?.();
         if (!activeCell)
             return;
 
         const selectCell = this.getSelectColumnIndex(grid);
-        if (selectCell == null || activeCell.cell !== selectCell)
+        if (selectCell == null || (!rowNavigation && activeCell.cell !== selectCell))
             return;
 
         if (!this.toggleSelection(this.grid.getView().getItem(activeCell.row)))

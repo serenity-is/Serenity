@@ -507,6 +507,62 @@ describe("EntityGrid buttons", () => {
     });
 });
 
+describe("EntityGrid row navigation", () => {
+    class RowGrid extends EntityGrid<any, any> {
+    }
+
+    function enterEvent(opt: Record<string, unknown> = {}) {
+        return { key: "Enter", preventDefault: vi.fn(), stopImmediatePropagation: vi.fn(), ...opt } as any;
+    }
+
+    function rowGrid(options: Record<string, unknown> = { enableCellNavigation: "row" }) {
+        const grid = new RowGrid({});
+        grid.sleekGrid.setOptions(options);
+        vi.spyOn(grid.view, "getItem").mockImplementation((row: number) => row === 0 ? { ID: 5 } :
+            row === 1 ? { __group: true, __nonDataRow: true } : undefined);
+        const editItem = vi.spyOn(grid as any, "editItem").mockImplementation(() => { });
+        return { grid, editItem };
+    }
+
+    it("opens the dialog of the row of the cursor on Enter, and stops the grid from handling the key", () => {
+        const { grid, editItem } = rowGrid();
+        const e = enterEvent();
+        grid["onKeyDown"](e, 0, 2);
+
+        expect(editItem).toHaveBeenCalledWith(5);
+        expect(e.preventDefault).toHaveBeenCalled();
+        expect(e.stopImmediatePropagation).toHaveBeenCalled();
+    });
+
+    it("gets the key from the onKeyDown event of the grid, with the row and cell of the cursor", () => {
+        const { grid, editItem } = rowGrid();
+        const onKeyDown = vi.spyOn(grid as any, "onKeyDown");
+        const e = { ...enterEvent(), row: 0, cell: 1 };
+
+        grid["handleGridKeyDown"](e);
+
+        expect(onKeyDown).toHaveBeenCalledWith(e, 0, 1);
+        expect(editItem).toHaveBeenCalledWith(5);
+    });
+
+    it("leaves Enter alone with cell navigation, in an editable grid, with a modifier, or on a group row", () => {
+        const cells = rowGrid({ enableCellNavigation: true });
+        cells.grid["onKeyDown"](enterEvent(), 0, 0);
+        expect(cells.editItem).not.toHaveBeenCalled();
+
+        const editable = rowGrid({ enableCellNavigation: "row", editable: true });
+        editable.grid["onKeyDown"](enterEvent(), 0, 0);
+        expect(editable.editItem).not.toHaveBeenCalled();
+
+        const rows = rowGrid();
+        rows.grid["onKeyDown"](enterEvent({ ctrlKey: true }), 0, 0);
+        rows.grid["onKeyDown"](enterEvent(), 1, 0);
+        rows.grid["onKeyDown"](enterEvent(), 2, 0);
+        rows.grid["onKeyDown"]({ ...enterEvent(), key: "a" }, 0, 0);
+        expect(rows.editItem).not.toHaveBeenCalled();
+    });
+});
+
 describe("EntityGrid filter bar", () => {
     it("setFilterBarVisibility toggles and lays out when store has no items", () => {
         class G extends EntityGrid<any, any> { }
