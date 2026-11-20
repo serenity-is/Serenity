@@ -16,8 +16,9 @@ describe("SelectableEntityGrid", () => {
         const grid = new SelectableEntityGrid({});
         const opt = grid["getSlickOptions"]();
         expect(opt.enableTextSelectionOnCells).toBe(true);
-        expect(opt.selectedCellCssClass).toBe("slick-row-selected");
         expect(opt.enableCellNavigation).toBe(true);
+        // the selected rows are marked with the default class of the grid, which the themes style
+        expect(opt.selectedCellCssClass).toBeUndefined();
         grid.destroy();
     });
 
