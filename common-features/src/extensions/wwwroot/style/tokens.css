@@ -64,6 +64,12 @@
  *                              (enableCellNavigation: "row") (default: --s-cell-selected-bg)
  *   --s-cell-flash-bg          fill of a grid cell that the grid flashes, e.g. after a change
  *                              (default: a tint of --bs-primary)
+ *   --s-pinned-border          color of the line between the pinned columns or rows of a grid and
+ *                              the scrolling ones (default: --bs-border-color)
+ *   --s-pinned-border-style    style of that line, e.g. solid or dotted (default: none, no line)
+ *   --s-pinned-shadow          color of the shadow a pinned column pane casts over the columns
+ *                              scrolled under it; transparent turns it off (default: a tint of
+ *                              --bs-body-color)
  *   --s-edit-link-quiet-color  color of a quiet edit link of a grid, one that repeats the primary
  *                              link of its row (DataGrid editLinks: "primary"), until the row is
  *                              hovered or the link has the focus (default: the text of the cell)

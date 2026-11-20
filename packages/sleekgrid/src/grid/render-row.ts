@@ -83,6 +83,11 @@ export function renderRow<TItem>(this: void, args: RowRenderArgs<TItem>): void {
         }
     }
 
+    // an empty cell that fills the rest of the width of the main pane, for the lines and the fills of the row; it has
+    // no column, so the grid leaves it out of the cells of the row, see SleekGrid.ensureCellNodesInRowsCache
+    if (grid.getOptions().fillRows !== false)
+        sbCenter.push('<div class="slick-cell sg-fill" aria-hidden="true"></div>');
+
     sbCenter.push("</div>");
 
     if (pinnedStartLast >= 0) {

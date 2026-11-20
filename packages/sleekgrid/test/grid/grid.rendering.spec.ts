@@ -42,8 +42,32 @@ describe("SleekGrid rendering and invalidation", () => {
         grids.push(grid);
 
         expect(container.querySelectorAll(".slick-row")).toHaveLength(3);
-        expect(container.querySelectorAll(".slick-cell")).toHaveLength(6);
+        // each row also has the cell that fills the rest of its width, which is no column's
+        expect(container.querySelectorAll(".slick-cell:not(.sg-fill)")).toHaveLength(6);
+        expect(container.querySelectorAll(".slick-cell.sg-fill")).toHaveLength(3);
         expect(grid.getRenderedRange()).toMatchObject({ top: 0, bottom: 2 });
+    });
+
+    it("fills each row with a last cell that belongs to no column, unless fillRows is off", () => {
+        const data = [{ first: "a", second: "b" }, { first: "c", second: "d" }];
+        const { container, grid } = createGrid(data);
+        grids.push(grid);
+
+        expect(container.classList.contains("sg-fill-rows")).toBe(true);
+        const row = container.querySelector<HTMLElement>(".slick-row");
+        const filler = row.lastElementChild as HTMLElement;
+        expect(filler.classList.contains("sg-fill")).toBe(true);
+        expect(filler.getAttribute("aria-hidden")).toBe("true");
+        // the cells of the row are still the ones of the columns
+        expect(grid.getCellNode(0, 0).textContent).toBe("a");
+        expect(grid.getCellNode(0, 1).textContent).toBe("b");
+        expect(grid.getCellFromEvent({ target: filler })).toBeNull();
+
+        grid.setOptions({ fillRows: false });
+        grid.render();
+        expect(container.classList.contains("sg-fill-rows")).toBe(false);
+        expect(container.querySelectorAll(".slick-cell.sg-fill")).toHaveLength(0);
+        expect(grid.getCellNode(1, 1).textContent).toBe("d");
     });
 
     it("updates a rendered cell through updateCell", () => {

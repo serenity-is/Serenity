@@ -114,6 +114,36 @@
   overflow: hidden;
 }
 
+/* the vertical scrollbar after the columns pinned to the end (the endPaneScrollbar option): the end pane has it, and
+   covers the scrollbar of the main pane, which reaches under it by its width, --sg-vbar-hide; --sg-vbar-pad widens the
+   canvas of the main pane for an overlay scrollbar, which takes no room */
+.sg-vbar-end .slick-viewport.sg-body.sg-end {
+  overflow-x: hidden;
+  overflow-y: auto;
+  z-index: 1;
+  background-color: var(--sg-pane-bg, Canvas);
+}
+
+.sg-vbar-end .slick-viewport.sg-body.sg-main {
+  width: calc(100% + var(--sg-vbar-hide, 0px));
+  margin-inline-end: calc(-1 * var(--sg-vbar-hide, 0px));
+}
+
+.sg-vbar-end .grid-canvas.sg-body.sg-main {
+  width: calc(var(--sg-virtual-width) + var(--sg-vbar-pad, 0px));
+}
+
+/* the rows fill the width of the main pane (the fillRows option), with a cell after the last column that reaches
+   past the end of the canvas, which keeps its width, as the cells are placed from both of its edges; the pane is a
+   container, so that the cell is as wide as the room the columns leave in it */
+.sg-fill-rows .slick-viewport.sg-main {
+  container-type: inline-size;
+}
+
+.sg-fill-rows .grid-canvas.sg-main {
+  overflow: visible;
+}
+
 .grid-canvas {
   position: relative;
   outline: 0;
@@ -339,6 +369,30 @@
 .rtl .grid-canvas.sg-bottom.sg-main {
   margin-right: 0;
   margin-left: var(--sg-scrollbar-w);
+}
+
+/* the main pane has no scrollbar of its own to keep room for when the end pane has it */
+.sg-vbar-end .slick-hscrollspacer,
+.sg-vbar-end .slick-footerrow-columns.sg-main,
+.sg-vbar-end .slick-headerrow-columns.sg-main,
+.sg-vbar-end .slick-header-columns.sg-main,
+.sg-vbar-end .grid-canvas.sg-top.sg-main,
+.sg-vbar-end .grid-canvas.sg-bottom.sg-main {
+  margin-right: 0;
+  margin-left: 0;
+}
+
+/* the cell that fills a row after its last column, from the end of the columns to the end of the main pane */
+.slick-cell.sg-fill {
+  left: 100%;
+  right: auto;
+  width: max(0px, calc(100cqw - 100% - var(--sg-fill-trim, 0px)));
+  padding: 0;
+}
+
+.rtl .slick-cell.sg-fill {
+  left: auto;
+  right: 100%;
 }
 
 .sleek-vars .l0 {

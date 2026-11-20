@@ -1095,6 +1095,20 @@ export interface GridOptions<TItem = any> {
      */
     alwaysShowVerticalScroll?: boolean;
     /**
+     * Defaults to `true`. Whether the vertical scrollbar is shown at the far end of the grid, after the columns that are
+     * pinned to the end, instead of between them and the scrolling columns. The pane of the pinned columns then has the
+     * scrollbar, and the main pane reaches under it, so that its own scrollbar is covered. It only applies to a grid that
+     * has columns pinned to the end, and not to one with `autoHeight`. The container of the grid gets the `sg-vbar-end`
+     * class while it applies.
+     */
+    endPaneScrollbar?: boolean;
+    /**
+     * Defaults to `true`. Whether the rows fill the width of the main pane when the columns are narrower than it, with an
+     * empty `slick-cell sg-fill` cell after the last column, so that the lines, the stripes and the fills of the rows reach
+     * the columns that are pinned to the end, or the end of the grid. The container gets the `sg-fill-rows` class.
+     */
+    fillRows?: boolean;
+    /**
      * Defaults to `100`. Delay in milliseconds before asynchronous loading of editors.
      */
     asyncEditorLoadDelay?: number;
@@ -3031,6 +3045,19 @@ export declare class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     private applyColumnWidths;
     private adjustPinnedColsLimit;
     private calcCanvasBandWidths;
+    /**
+     * Places the vertical scrollbar after the columns pinned to the end, see the `endPaneScrollbar` option: the end pane
+     * gets the `sg-vbar-end` class of the container, and the main pane reaches under it by the width of its scrollbar,
+     * `--sg-vbar-hide`, so that the scrollbar of the main pane is covered. An overlay scrollbar takes no room, so 12px
+     * hide it, and the canvas of the main pane grows by that, `--sg-vbar-pad`, to keep its last column in reach.
+     * @returns Whether the scrollbar moved, or its width changed, so the widths of the panes should be measured again.
+     */
+    private updateEndPaneScrollbar;
+    /**
+     * Marks the container with `sg-scrolled-start` while the main pane is scrolled from its start, and with
+     * `sg-scrolled-end` while there is more to scroll towards its end, e.g. for the shadows of the pinned panes.
+     */
+    private updateScrollEdges;
     private updateBandCanvasWidths;
     private updateCanvasWidth;
     private bindAncestorScrollEvents;

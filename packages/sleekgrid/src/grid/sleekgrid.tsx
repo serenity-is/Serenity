@@ -430,6 +430,14 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         this.getViewports().forEach(vp => {
             let scrollTicking = false;
             this._on(vp, "scroll", (e) => {
+                // a pinned pane scrolled on its own, e.g. with the scrollbar of the end pane, or the focus moving into a
+                // row that was hidden, so the main pane follows it, and then brings every pane to its position; the
+                // position the grid gave the pane itself is not followed back, so a late echo can not undo a newer one
+                if (vp !== scrollContainerX && vp.classList.contains("sg-body")) {
+                    const top = vp.scrollTop;
+                    if (Math.abs(top - scrollContainerX.scrollTop) >= 1 && Math.abs(top - this._scrollTop) >= 1)
+                        scrollContainerX.scrollTop = top;
+                }
                 if (!scrollTicking) {
                     scrollTicking = true;
 
@@ -787,7 +795,59 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         return result;
     }
 
+    /**
+     * Places the vertical scrollbar after the columns pinned to the end, see the `endPaneScrollbar` option: the end pane
+     * gets the `sg-vbar-end` class of the container, and the main pane reaches under it by the width of its scrollbar,
+     * `--sg-vbar-hide`, so that the scrollbar of the main pane is covered. An overlay scrollbar takes no room, so 12px
+     * hide it, and the canvas of the main pane grows by that, `--sg-vbar-pad`, to keep its last column in reach.
+     * @returns Whether the scrollbar moved, or its width changed, so the widths of the panes should be measured again.
+     */
+    private updateEndPaneScrollbar(): boolean {
+        const container = this._container;
+        if (!container)
+            return false;
+
+        const opt = this._options;
+        const refs = this._refs;
+        const enabled = opt.endPaneScrollbar !== false && !opt.autoHeight &&
+            refs.pinnedEndFirst != null && refs.pinnedEndFirst != Infinity && refs.pinnedEndFirst < this._cols.length;
+        const hasBar = enabled && (this._viewportInfo.hasVScroll || !!opt.alwaysShowVerticalScroll);
+        const barWidth = this._scrollDims?.width || 0;
+        const hide = hasBar ? (barWidth || 12) : 0;
+        const pad = hasBar && !barWidth ? hide : 0;
+
+        const style = container.style;
+        const changed = container.classList.contains("sg-vbar-end") !== enabled ||
+            style.getPropertyValue("--sg-vbar-hide") !== hide + "px";
+        container.classList.toggle("sg-vbar-end", enabled);
+        style.setProperty("--sg-vbar-hide", hide + "px");
+        style.setProperty("--sg-vbar-pad", pad + "px");
+        // the width of the main pane that a container query gives the cell that fills its rows includes its
+        // vertical scrollbar, or the part of the pane under the end pane, which the cell leaves out
+        const ownBar = !enabled && (this._viewportInfo.hasVScroll || !!opt.alwaysShowVerticalScroll) ? barWidth : 0;
+        style.setProperty("--sg-fill-trim", (enabled ? hide : ownBar) + "px");
+        return changed;
+    }
+
+    /**
+     * Marks the container with `sg-scrolled-start` while the main pane is scrolled from its start, and with
+     * `sg-scrolled-end` while there is more to scroll towards its end, e.g. for the shadows of the pinned panes.
+     */
+    private updateScrollEdges(): void {
+        const container = this._container;
+        const vp = this._refs?.main?.canvas?.body?.parentElement;
+        if (!container || !vp)
+            return;
+
+        // the scroll position is negative in a right to left grid, as it starts from the right
+        const left = Math.abs(vp.scrollLeft);
+        container.classList.toggle("sg-scrolled-start", left > 1);
+        container.classList.toggle("sg-scrolled-end", Math.ceil(left + vp.clientWidth) < vp.scrollWidth - 1);
+    }
+
     private updateBandCanvasWidths(): boolean {
+        // the end pane may get the scrollbar, which its width is measured with below
+        this.updateEndPaneScrollbar();
         const oldCanvasWidths = this._mapBands(x => x.canvasWidth);;
         const newCanvasWidths = this.calcCanvasBandWidths();
         const { start, main, end } = this._refs;
@@ -805,6 +865,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         setStyleProp(style, "--sg-end-width", newCanvasWidths.endBand + "px");
         setStyleProp(style, "--sg-main-width", newCanvasWidths.mainBand + "px");
         setStyleProp(style, "--sg-virtual-width", newCanvasWidths.main + "px");
+        this.updateScrollEdges();
         return widthChanged;
     }
 
@@ -1795,6 +1856,12 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         this.handleFrozenColsOption(this._cols, args);
         this._layout.afterSetOptions(args);
 
+        // the panes are measured again for the place of the scrollbar, and the rows rendered again for their filler
+        if ("endPaneScrollbar" in args || "autoHeight" in args)
+            this.updateCanvasWidth(true);
+        if ("fillRows" in args)
+            this.invalidateAllRows();
+
         if (args.columns && !suppressColumnSet) {
             this.setColumns(args.columns ?? this._allCols);
         }
@@ -1822,6 +1889,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         this._container?.classList.toggle("slick-highlight-active-row", opt.highlightActiveRow === true);
         // the cursor is a row, so a style marks the row of the active cell, and not the cell
         this._container?.classList.toggle("slick-row-navigation", opt.enableCellNavigation === "row");
+        this._container?.classList.toggle("sg-fill-rows", opt.fillRows !== false);
         sig.showColumnHeader.value = opt.showColumnHeader;
         sig.showTopPanel.value = opt.showTopPanel;
         sig.showHeaderRow.value = opt.showHeaderRow;
@@ -2484,6 +2552,9 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         const oldViewportHasVScroll = vpi.hasVScroll;
         // with autoHeight, we do not need to accommodate the vertical scroll bar
         vpi.hasVScroll = !this._options.autoHeight && (numberOfRows * this._options.rowHeight > tempViewportH);
+        // the end pane gets or loses the scrollbar, which its width includes
+        if (oldViewportHasVScroll !== vpi.hasVScroll && this.updateEndPaneScrollbar())
+            this.updateCanvasWidth(true);
 
         this.makeActiveCellNormal();
 
@@ -2643,6 +2714,10 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
             for (const rowNode of [cacheEntry.rowNodeE, cacheEntry.rowNodeC, cacheEntry.rowNodeS]) {
                 let lastChild = rowNode?.lastElementChild;
                 while (lastChild && cacheEntry.cellRenderQueue.length) {
+                    if (lastChild.classList.contains("sg-fill")) {
+                        lastChild = lastChild.previousElementSibling;
+                        continue;
+                    }
                     const columnIdx = cacheEntry.cellRenderQueue.pop();
                     const element = cacheEntry.cellRenderContent.pop();
 
@@ -3105,6 +3180,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
         if (hScrollDist || opt?.forceSync) {
             const scrollLeft = this._scrollLeftPrev = this._scrollLeft;
             getAllHScrollContainers(this._refs).forEach(sc => sc.scrollLeft = scrollLeft);
+            this.updateScrollEdges();
         }
 
         const vpi = this._viewportInfo;

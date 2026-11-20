@@ -3499,6 +3499,62 @@ button.panel-titlebar-close::after {
   background-color: var(--s-row-editing-bg, rgba(var(--bs-success-rgb), 0.2));
 }
 
+/* the panes of the pinned columns and rows: a shadow that a pinned column pane casts over the columns that are
+   scrolled under it, which the grid tells with its sg-scrolled-start and sg-scrolled-end classes, and no line
+   between them and the scrolling panes by default; --s-pinned-border-style: solid, or dotted for the earlier look,
+   draws one, and --s-pinned-shadow: transparent turns the shadow off. The end pane covers the scrollbar of the main pane
+   when it has the scrollbar of the grid, so it takes the background of the grid (--sg-pane-bg). */
+.slick-container {
+  --sg-pane-bg: var(--s-card-bg, var(--bs-body-bg));
+}
+
+/* the line goes along the whole pane, from its header to its footer row */
+:is(.slick-header, .slick-headerrow, .slick-viewport, .slick-footerrow).sg-start {
+  border-right: 1px var(--s-pinned-border-style, none) var(--s-pinned-border, var(--bs-border-color));
+}
+
+:is(.slick-header, .slick-headerrow, .slick-viewport, .slick-footerrow).sg-end {
+  border-left: 1px var(--s-pinned-border-style, none) var(--s-pinned-border, var(--bs-border-color));
+}
+
+.slick-viewport.sg-top {
+  border-bottom: 1px var(--s-pinned-border-style, none) var(--s-pinned-border, var(--bs-border-color));
+}
+
+.slick-viewport.sg-bottom {
+  border-top: 1px var(--s-pinned-border-style, none) var(--s-pinned-border, var(--bs-border-color));
+}
+
+:is(.slick-header, .slick-headerrow, .slick-viewport, .slick-footerrow):is(.sg-start, .sg-end) {
+  position: relative;
+  z-index: 1;
+  transition: box-shadow 0.15s;
+}
+
+/* above the rows of its pane, so that its shadow below it is not covered by them, like the one of the main pane */
+.slick-header:is(.sg-start, .sg-end) {
+  z-index: 2;
+}
+
+.sg-scrolled-start > :is(.slick-header, .slick-headerrow, .slick-viewport, .slick-footerrow).sg-start {
+  box-shadow: 6px 0 8px -6px var(--s-pinned-shadow, color-mix(in srgb, var(--bs-body-color) 28%, transparent));
+}
+
+.sg-scrolled-end > :is(.slick-header, .slick-headerrow, .slick-viewport, .slick-footerrow).sg-end {
+  box-shadow: -6px 0 8px -6px var(--s-pinned-shadow, color-mix(in srgb, var(--bs-body-color) 28%, transparent));
+}
+
+/* a header keeps the shadow below it, which the theme gives in --s-column-header-shadow, under the one of the pane */
+.sg-scrolled-start > .slick-header.sg-start {
+  box-shadow: var(--s-column-header-shadow, 0 0 transparent),
+    6px 0 8px -6px var(--s-pinned-shadow, color-mix(in srgb, var(--bs-body-color) 28%, transparent));
+}
+
+.sg-scrolled-end > .slick-header.sg-end {
+  box-shadow: var(--s-column-header-shadow, 0 0 transparent),
+    -6px 0 8px -6px var(--s-pinned-shadow, color-mix(in srgb, var(--bs-body-color) 28%, transparent));
+}
+
 /* the grid adds the hover class to the row's nodes in all the panes when some columns are pinned */
 :where(.slick-row.hover:not(.slick-group, .slick-group-totals)) > .slick-cell:not(.editable) {
   background-image: linear-gradient(var(--s-row-hover-bg, transparent), var(--s-row-hover-bg, transparent));
