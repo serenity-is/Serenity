@@ -27,7 +27,7 @@ public class DefaultElevationHandler(IRequestContext context, IHttpContextAccess
         if (httpContextAccessor.HttpContext is null)
             throw new ArgumentNullException(nameof(httpContextAccessor.HttpContext));
 
-        var userId = Convert.ToInt32(httpContextAccessor.HttpContext.User.GetIdentifier() ?? throw new ArgumentNullException(nameof(User)));
+        var userId = httpContextAccessor.HttpContext.User.GetIdentifier() ?? throw new ArgumentNullException(nameof(User));
         var token = dataProtectionProvider.CreateProtector(ElevationPurpose)
             .ProtectBinary(bw =>
             {
@@ -52,10 +52,10 @@ public class DefaultElevationHandler(IRequestContext context, IHttpContextAccess
 
         var token = (httpContextAccessor.HttpContext?.Request.Cookies["ElevationToken"]) ??
             throw new ValidationError("RequiresElevation", "Token not found");
-        var currentUserId = Convert.ToInt32(httpContextAccessor.HttpContext.User.GetIdentifier() ??
-            throw new ArgumentNullException(nameof(User)));
+        var currentUserId = httpContextAccessor.HttpContext.User.GetIdentifier() ??
+            throw new ArgumentNullException(nameof(User));
 
-        int userId;
+        string userId;
         try
         {
             using var br = dataProtectionProvider.CreateProtector(ElevationPurpose)
@@ -65,7 +65,7 @@ public class DefaultElevationHandler(IRequestContext context, IHttpContextAccess
             if (dt < UtcNow)
                 throw new ValidationError("Token expired");
 
-            userId = br.ReadInt32();
+            userId = br.ReadString();
         }
         catch (ValidationError)
         {
@@ -76,7 +76,7 @@ public class DefaultElevationHandler(IRequestContext context, IHttpContextAccess
             throw new ValidationError("Invalid elevation token");
         }
 
-        if (currentUserId != userId)
+        if (!string.Equals(currentUserId, userId, StringComparison.Ordinal))
             throw new ValidationError("Invalid elevation token");
     }
 
