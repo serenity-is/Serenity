@@ -12052,28 +12052,6 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
      */
     protected setEquality(field: string, value: any): void;
     /**
-     * Makes the grid load fields, besides the ones of its columns, e.g. what an alternate view of the rows, such as a
-     * card view, shows from columns that are hidden or that the grid does not have, as the grid loads only the fields of
-     * the table and of its visible columns by default, and only the visible ones when so configured. They are in the
-     * `IncludeColumns` of the list request, whatever else is configured. Each owner has its own fields, which it
-     * replaces by calling this again, and removes by passing null. The grid keeps a reference to the owner, and to what
-     * the callback uses, until the owner is removed or the grid is destroyed, so an owner that goes away before its grid
-     * removes itself, e.g. a mixin in its `destroy`.
-     * @param owner - Who needs the fields, e.g. a mixin, or a string for a script that has no object, so that what it
-     * needs is replaced, and not added to. Two owners that are the same object, or the same string, are one owner.
-     * @param fields - The names of the fields, or a function that returns them, which the grid calls when it builds the
-     * request, so it can follow what the owner shows, e.g. none while its view is not the one that is shown, and
-     * should be quick and have no side effects; one that throws is logged and counts as no fields. Null removes the
-     * fields of the owner.
-     * @returns Whether fields were added to what the grid loads, so that the caller can refresh it, e.g. when its view
-     * that needs them became the one shown. Removing fields needs no refresh.
-     */
-    requireFields(owner: object | string, fields: string[] | (() => string[] | null | undefined) | null | undefined): boolean;
-    /**
-     * Returns the fields that owners require of the grid to load, see {@link requireFields}.
-     */
-    getRequiredFields(): Set<string>;
-    /**
      * Sets the IncludeColumns view parameter from the grid columns.
      */
     protected setIncludeColumnsParameter(): void;
@@ -12221,7 +12199,6 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
      */
     protected wrapFormatterWithEditLink(column: Column, item: PropertyItem): void;
     private primaryEditLinkCache;
-    private requiredFields;
     /**
      * Returns how the columns with an edit link to the record of their row show it, `"all"` for each as a link,
      * or `"primary"` for only the primary one, see `getPrimaryEditLinkColumn`, while the others are quiet links.

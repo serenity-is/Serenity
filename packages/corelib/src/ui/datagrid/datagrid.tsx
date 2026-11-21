@@ -473,9 +473,6 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
      * Cleans up event subscriptions, widgets, and the underlying grid.
      */
     public override destroy() {
-        // the owners of the required fields, e.g. mixins, are not kept by a grid that is destroyed
-        this.requiredFields?.clear();
-
         this.onAfterInit?.clear();
         this.onDataChanged?.clear();
         this.onPersistence?.clear();
@@ -993,65 +990,11 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     }
 
     /**
-     * Makes the grid load fields, besides the ones of its columns, e.g. what an alternate view of the rows, such as a
-     * card view, shows from columns that are hidden or that the grid does not have, as the grid loads only the fields of
-     * the table and of its visible columns by default, and only the visible ones when so configured. They are in the
-     * `IncludeColumns` of the list request, whatever else is configured. Each owner has its own fields, which it
-     * replaces by calling this again, and removes by passing null. The grid keeps a reference to the owner, and to what
-     * the callback uses, until the owner is removed or the grid is destroyed, so an owner that goes away before its grid
-     * removes itself, e.g. a mixin in its `destroy`.
-     * @param owner - Who needs the fields, e.g. a mixin, or a string for a script that has no object, so that what it
-     * needs is replaced, and not added to. Two owners that are the same object, or the same string, are one owner.
-     * @param fields - The names of the fields, or a function that returns them, which the grid calls when it builds the
-     * request, so it can follow what the owner shows, e.g. none while its view is not the one that is shown, and
-     * should be quick and have no side effects; one that throws is logged and counts as no fields. Null removes the
-     * fields of the owner.
-     * @returns Whether fields were added to what the grid loads, so that the caller can refresh it, e.g. when its view
-     * that needs them became the one shown. Removing fields needs no refresh.
-     */
-    public requireFields(owner: object | string, fields: string[] | (() => string[] | null | undefined) | null | undefined): boolean {
-        if (owner == null || owner === "")
-            throw new Error("requireFields needs an owner!");
-
-        const previous = this.getRequiredFields();
-        this.requiredFields ??= new Map();
-        if (typeof fields === "function")
-            this.requiredFields.set(owner, fields);
-        else if (fields?.some(x => x))
-            this.requiredFields.set(owner, fields);
-        else
-            this.requiredFields.delete(owner);
-
-        const next = this.getRequiredFields();
-        return [...next].some(x => !previous.has(x));
-    }
-
-    /**
-     * Returns the fields that owners require of the grid to load, see {@link requireFields}.
-     */
-    public getRequiredFields(): Set<string> {
-        const result = new Set<string>();
-        this.requiredFields?.forEach(source => {
-            let list: string[];
-            try {
-                list = typeof source === "function" ? source() : source;
-            }
-            catch (e) {
-                console.error("The function of requireFields threw an error!", e);
-                return;
-            }
-            list?.forEach(x => x && result.add(x));
-        });
-        return result;
-    }
-
-    /**
      * Sets the IncludeColumns view parameter from the grid columns.
      */
     protected setIncludeColumnsParameter(): void {
-        const include: { [key: string]: boolean } = {};
+        const include = {};
         this.getIncludeColumns(include);
-        this.getRequiredFields().forEach(x => include[x] = true);
         const array = [];
         for (const key of Object.keys(include)) {
             array.push(key);
@@ -1410,7 +1353,6 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     }
 
     declare private primaryEditLinkCache: { columns: Column[], primary: Column };
-    declare private requiredFields: Map<object | string, string[] | (() => string[] | null | undefined)>;
 
     /**
      * Returns how the columns with an edit link to the record of their row show it, `"all"` for each as a link,
