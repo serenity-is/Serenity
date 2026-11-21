@@ -2448,9 +2448,11 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     private calcViewportSize(): void {
         const refs = this._refs;
         const vs = this._viewportInfo;
+        // the width is measured first, as the pinned columns are limited by it and the bands are sized with it; otherwise
+        // a size change, e.g. a grid that is shown again after it was hidden, would keep the bands of the old size
+        vs.width = getInnerWidth(this._container);
         this.adjustPinnedColsLimit();
         this.updateBandCanvasWidths();
-        vs.width = getInnerWidth(this._container);
         vs.groupingPanelHeight = (this._options.groupingPanel && this._options.showGroupingPanel) ? this._groupingPanel?.offsetHeight || 0 : 0;
         vs.topPanelHeight = this._options.showTopPanel ? (refs.topPanel?.parentElement?.offsetHeight || 0) : 0;
         vs.headerRowHeight = this._options.showHeaderRow ? refs.main.headerRowCols?.parentElement?.offsetHeight || 0 : 0;
@@ -3051,7 +3053,11 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
                 ctx.column = m;
                 ctx.purpose = "grand-totals";
                 const fmtResult = formatter(ctx);
+                // a column has no footer cell when its band has no footer row, e.g. while the grid is hidden, as a band
+                // that is not laid out yet gives each column the footer cells of another one, if any
                 const footerNode = this.getFooterRowColumn(m.id);
+                if (!footerNode)
+                    continue;
                 this._emptyNode(footerNode);
                 applyFormatterResultToCellNode(ctx, fmtResult, footerNode, contentOnly);
             }

@@ -68,6 +68,20 @@ public class RecordViewTypeAttribute(string viewType) : Attribute
     }
 
     /// <summary>
+    /// Gets or sets where the buttons that switch between the views of the grid go, when the view is on a columns
+    /// class, e.g. a card view: <see cref="CardViewSwitchPlacement.Closest"/>, the default, which is at the end of the
+    /// quick filters, else of the toolbar, else in the title bar, or a part of the grid to put them in. A grid that
+    /// lacks the part it names puts the buttons in the closest one it has.
+    /// </summary>
+    public CardViewSwitchPlacement? SwitchPlacement
+    {
+        // the views get their options as the client side names them, e.g. "toolbar" for Toolbar
+        get => GetOption<string>("switchPlacement") is { } placement ?
+            Enum.Parse<CardViewSwitchPlacement>(placement, ignoreCase: true) : null;
+        set => SetOption("switchPlacement", value?.ToString().ToLowerInvariant());
+    }
+
+    /// <summary>
     /// Copies the options of the view to the parameters of its <see cref="RecordViewInfo"/>.
     /// </summary>
     /// <param name="viewParams">The parameters.</param>

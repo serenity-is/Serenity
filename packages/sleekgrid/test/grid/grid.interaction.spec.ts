@@ -454,6 +454,19 @@ describe("SleekGrid interaction behavior", () => {
         expect(totalsFormat).toHaveBeenCalled();
     });
 
+    it("leaves the totals of a column whose footer cell is missing, e.g. while the grid is hidden", () => {
+        const totalsFormat = vi.fn(() => "T");
+        const { grid } = makeGrid([{ first: "a", second: "b" }], { showFooterRow: true }, [
+            { ...baseColumns[0], groupTotalsFormat: totalsFormat },
+            { ...baseColumns[1] }
+        ]);
+        grids.push(grid);
+        vi.spyOn(grid, "getFooterRowColumn").mockReturnValue(null);
+
+        expect(() => grid["updateGrandTotals"]()).not.toThrow();
+        expect(totalsFormat).toHaveBeenCalled();
+    });
+
     it("covers handleMouseWheel branches directly", () => {
         const { grid } = makeGrid();
         grids.push(grid);

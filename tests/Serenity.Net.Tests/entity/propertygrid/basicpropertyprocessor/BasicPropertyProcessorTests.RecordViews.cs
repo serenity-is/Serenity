@@ -50,13 +50,22 @@ public partial class BasicPropertyProcessorTests
     [Fact]
     public void RecordViewInfo_FromAttribute_Has_The_Placement_And_The_Options_Of_A_Card_View()
     {
-        var info = RecordViewInfo.FromAttribute(new CardTypeAttribute { Default = true, Below = "lg", HideSwitch = true });
+        var attribute = new CardTypeAttribute
+        {
+            Default = true,
+            Below = "lg",
+            HideSwitch = true,
+            SwitchPlacement = CardViewSwitchPlacement.Toolbar
+        };
+        var info = RecordViewInfo.FromAttribute(attribute);
 
+        Assert.Equal(CardViewSwitchPlacement.Toolbar, attribute.SwitchPlacement);
         Assert.Equal("Test.CardType", info.Type);
         Assert.Equal("card", info.Placement);
         Assert.Equal(true, info.Params["default"]);
         Assert.Equal("lg", info.Params["below"]);
         Assert.Equal(true, info.Params["hideSwitch"]);
+        Assert.Equal("toolbar", info.Params["switchPlacement"]);
         Assert.False(info.Params.ContainsKey("idField"));
     }
 

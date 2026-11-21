@@ -61,9 +61,9 @@ public partial class ClientTypesGeneratorTests
                 import { CardView } from "@serenity-is/pro.extensions"
                 import { nsTest } from "./Ns"
 
-                export class TestCardView extends CardView<{ idField?: string, default?: boolean, below?: string, hideSwitch?: boolean, columns?: number }> {
+                export class TestCardView extends CardView<{ idField?: string, default?: boolean, below?: string, hideSwitch?: boolean, switchPlacement?: string, columns?: number }> {
                     static override [Symbol.typeInfo] = this.registerRecordView(nsTest);
-                    constructor(props: { idField?: string, default?: boolean, below?: string, hideSwitch?: boolean, columns?: number }) {
+                    constructor(props: { idField?: string, default?: boolean, below?: string, hideSwitch?: boolean, switchPlacement?: string, columns?: number }) {
                         super(props);
                     }
                 }
@@ -78,6 +78,7 @@ public partial class ClientTypesGeneratorTests
         Assert.DoesNotContain("Below", text);
         Assert.DoesNotContain("HideSwitch", text);
         Assert.DoesNotContain("IdField", text);
+        Assert.DoesNotContain("SwitchPlacement", text);
     }
 
     [Fact]

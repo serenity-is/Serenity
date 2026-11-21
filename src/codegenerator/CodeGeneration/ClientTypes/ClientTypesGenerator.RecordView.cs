@@ -11,7 +11,8 @@ public partial class ClientTypesGenerator
         "Default",
         "HideSwitch",
         "IdField",
-        "Placement"
+        "Placement",
+        "SwitchPlacement"
     };
 
     /// <summary>
