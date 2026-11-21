@@ -20,6 +20,22 @@ public partial class ServerTypingsGenerator
         if (basedOnField != null)
             attributes = attributes.Concat(basedOnField.GetAttributesWithInterfaces(basedOnRow!));
 
+        ReferenceRecordViewTypes(attributes, referencedTypeKeys, referencedTypeAliases);
+    }
+
+    /// <summary>
+    /// Imports the client side classes of the record views of a columns class as a whole, e.g. a card view that is an
+    /// alternate view of its rows, so the grids that have them load them with themselves.
+    /// </summary>
+    private void ReferenceRecordViewTypes(TypeDefinition type, HashSet<(string group, string key)> referencedTypeKeys,
+        List<(string group, string alias)> referencedTypeAliases)
+    {
+        ReferenceRecordViewTypes(type.GetAttributes(), referencedTypeKeys, referencedTypeAliases);
+    }
+
+    private void ReferenceRecordViewTypes(IEnumerable<CustomAttribute> attributes,
+        HashSet<(string group, string key)> referencedTypeKeys, List<(string group, string alias)> referencedTypeAliases)
+    {
         foreach (var attr in attributes)
         {
             if (attr.AttributeType() is not { } attributeType)

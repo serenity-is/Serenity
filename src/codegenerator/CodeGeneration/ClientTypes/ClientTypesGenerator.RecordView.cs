@@ -7,9 +7,22 @@ public partial class ClientTypesGenerator
     /// </summary>
     private static readonly HashSet<string> recordViewBaseOptions = new(StringComparer.OrdinalIgnoreCase)
     {
+        "Below",
+        "Default",
+        "HideSwitch",
         "IdField",
         "Placement"
     };
+
+    /// <summary>
+    /// The names of the base class of the card views, whose attributes have the card placement.
+    /// </summary>
+    private static readonly string[] cardViewBaseClasses =
+    [
+        "CardView",
+        "Serenity.Pro.Extensions.CardView",
+        "@serenity-is/pro.extensions:CardView"
+    ];
 
     private void GenerateRecordView(ExternalType type, string name, string? key)
     {
@@ -35,6 +48,8 @@ public partial class ClientTypesGenerator
             sb.AppendLine("()");
             cw.IndentedLine("    : base(Key)");
             cw.IndentedLine("{");
+            if (HasBaseType(type, cardViewBaseClasses))
+                cw.IndentedLine("    Placement = RecordViewPlacement.Card;");
             cw.IndentedLine("}");
 
             GenerateOptionMembers(type, skip: recordViewBaseOptions);

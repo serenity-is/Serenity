@@ -79,6 +79,11 @@ public abstract partial class PropertyItemsScript(string scriptName, Type type,
         if (columnsAttr?.Revision > 0)
             data.Revision = columnsAttr.Revision;
 
+        // the views of the grid as a whole, e.g. a card view
+        var recordViews = type.GetCustomAttributes<RecordViewTypeAttribute>(inherit: true).ToList();
+        if (recordViews.Count > 0)
+            data.RecordViews = [.. recordViews.Select(x => RecordViewInfo.FromAttribute(x))];
+
         if (typeof(ICustomizePropertyItems).IsAssignableFrom(type))
         {
             var instance = ActivatorUtilities.CreateInstance(

@@ -38,6 +38,41 @@ public partial class BasicPropertyProcessorTests
         public string? Name { get; set; }
     }
 
+    private class CardTypeAttribute : RecordViewTypeAttribute
+    {
+        public CardTypeAttribute()
+            : base("Test.CardType")
+        {
+            Placement = RecordViewPlacement.Card;
+        }
+    }
+
+    [Fact]
+    public void RecordViewInfo_FromAttribute_Has_The_Placement_And_The_Options_Of_A_Card_View()
+    {
+        var info = RecordViewInfo.FromAttribute(new CardTypeAttribute { Default = true, Below = "lg", HideSwitch = true });
+
+        Assert.Equal("Test.CardType", info.Type);
+        Assert.Equal("card", info.Placement);
+        Assert.Equal(true, info.Params["default"]);
+        Assert.Equal("lg", info.Params["below"]);
+        Assert.Equal(true, info.Params["hideSwitch"]);
+        Assert.False(info.Params.ContainsKey("idField"));
+    }
+
+    [Fact]
+    public void RecordViewInfo_FromAttribute_Prefers_The_IdField_Of_The_Attribute()
+    {
+        Assert.Equal("Own", RecordViewInfo.FromAttribute(new TestCardAttribute { IdField = "Own" }, "Joined").Params["idField"]);
+        Assert.Equal("Joined", RecordViewInfo.FromAttribute(new TestCardAttribute(), "Joined").Params["idField"]);
+    }
+
+    [Fact]
+    public void RecordViewInfo_FromAttribute_Throws_For_Null()
+    {
+        Assert.Throws<ArgumentNullException>(() => RecordViewInfo.FromAttribute(null!));
+    }
+
     [Fact]
     public void RecordViews_Is_Null_Without_Views()
     {

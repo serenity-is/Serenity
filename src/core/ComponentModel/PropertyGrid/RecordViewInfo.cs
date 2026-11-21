@@ -31,6 +31,39 @@ public class RecordViewInfo
     } = [];
 
     /// <summary>
+    /// Creates the info of a record view from its attribute.
+    /// </summary>
+    /// <param name="attribute">The attribute.</param>
+    /// <param name="idField">The property that has the id of the record the view shows, when the attribute does not
+    /// say it, e.g. the one that the join of the property tells.</param>
+    public static RecordViewInfo FromAttribute(RecordViewTypeAttribute attribute, string? idField = null)
+    {
+        if (attribute is null)
+            throw new ArgumentNullException(nameof(attribute));
+
+        string? placement = null;
+        if (attribute.Placement != RecordViewPlacement.Trigger)
+        {
+            placement = attribute.Placement.ToString();
+            placement = placement[..1].ToLowerInvariant() + placement[1..];
+        }
+
+        var info = new RecordViewInfo
+        {
+            Type = attribute.ViewType,
+            Placement = placement
+        };
+
+        attribute.SetParams(info.Params);
+
+        idField = attribute.IdField ?? idField;
+        if (idField != null)
+            info.Params["idField"] = idField;
+
+        return info;
+    }
+
+    /// <summary>
     /// Should the Params property be serialized by JSON.NET, used to reduce JSON size.
     /// </summary>
     public bool ShouldSerializeParams()

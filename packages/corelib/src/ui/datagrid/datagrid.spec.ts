@@ -748,6 +748,18 @@ describe("DataGrid property items", () => {
         grid.destroy();
     });
 
+    it("getRecordViews gives the record views of the columns class, none by default", () => {
+        const grid = createGrid();
+        expect(grid.getRecordViews()).toEqual([]);
+
+        const views = [{ type: "MyApp.CardView", placement: "card", params: { default: true } }];
+        grid["propertyItemsData"] = { items: [], additionalItems: [], recordViews: views };
+        expect(grid.getRecordViews()).toBe(views);
+        grid["propertyItemsData"] = null;
+        expect(grid.getRecordViews()).toEqual([]);
+        grid.destroy();
+    });
+
     it("getPropertyItemsData uses custom items when ScriptData cannot load", () => {
         const canLoadSpy = vi.spyOn(ScriptData, "canLoad").mockReturnValue(false);
         class CustomGrid extends DataGrid<any, any> {

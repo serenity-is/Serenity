@@ -18,6 +18,19 @@ namespace Serenity.CodeGeneration
             Assert.Contains("[CustomerCard, EmployeeCard]; // referenced types", code);
         }
 
+        [Fact]
+        public void Columns_With_A_Card_View_On_The_Class_References_Its_Type()
+        {
+            var generator = CreateGenerator(typeof(ColumnsWithClassRecordView));
+            generator.AddTSType(RecordViewTypeFor("ProductCardView", "Views.ProductCardView"));
+
+            var result = generator.Run();
+            var code = Assert.Single(result, x => x.Filename.EndsWith("ColumnsWithClassRecordView.ts", StringComparison.Ordinal)).Text;
+
+            Assert.Contains("import { ProductCardView } from \"MyModule\";", code);
+            Assert.Contains("[ProductCardView]; // referenced types", code);
+        }
+
         private static ExternalType RecordViewTypeFor(string name, string key)
         {
             return new ExternalType
@@ -52,6 +65,23 @@ namespace ServerTypingsTest.RecordViews
         public string Employee { get; set; }
 
         public string Plain { get; set; }
+    }
+
+    [ColumnsScript, ProductCardView(Default = true, Below = "md")]
+    public class ColumnsWithClassRecordView
+    {
+        public string Name { get; set; }
+    }
+
+    public class ProductCardViewAttribute : RecordViewTypeAttribute
+    {
+        public const string Key = "Views.ProductCardView";
+
+        public ProductCardViewAttribute()
+            : base(Key)
+        {
+            Placement = RecordViewPlacement.Card;
+        }
     }
 
     public class CustomerCardAttribute : RecordViewTypeAttribute

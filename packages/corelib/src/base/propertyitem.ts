@@ -252,6 +252,12 @@ export interface PropertyItemsData {
     additionalItems: PropertyItem[];
     /** Optional revision number for the property items (0 or undefined means no revision). */
     revision?: number;
+    /**
+     * The record views of the columns class as a whole, e.g. a card view that is an alternate view of the rows of the
+     * grid, from the `RecordViewTypeAttribute`s on the class. The ones of a property are on its item, see
+     * {@link PropertyItem.recordViews}.
+     */
+    recordViews?: RecordViewInfo[];
 }
 
 /**

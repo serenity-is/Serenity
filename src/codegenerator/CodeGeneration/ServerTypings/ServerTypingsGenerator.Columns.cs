@@ -57,6 +57,9 @@ public partial class ServerTypingsGenerator
             sb.Append('>');
         }
 
+        // the card views of the columns class as a whole
+        ReferenceRecordViewTypes(type, referencedTypeKeys, referencedTypeAliases);
+
         cw.InBrace(delegate
         {
             cw.Indented("static readonly columnsKey = '");

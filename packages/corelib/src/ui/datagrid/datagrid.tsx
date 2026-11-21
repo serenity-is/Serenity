@@ -1,6 +1,6 @@
 import { bindThis } from "@serenity-is/domwise";
 import { AutoTooltips, Column, ColumnSort, FormatterContext, SleekGrid, type CellKeyboardEvent, type CellMouseEvent, type GridOptions, type GridSortEvent, type ISleekGrid } from "@serenity-is/sleekgrid";
-import { Authorization, Criteria, DataGridTexts, Fluent, ListResponse, RenderableContent, cssEscape, debounce, getInstanceType, getTypeFullName, getjQuery, nsSerenity, tryGetText, type PropertyItem, type PropertyItemsData } from "../../base";
+import { Authorization, Criteria, DataGridTexts, Fluent, ListResponse, RenderableContent, cssEscape, debounce, getInstanceType, getTypeFullName, getjQuery, nsSerenity, tryGetText, type PropertyItem, type PropertyItemsData, type RecordViewInfo } from "../../base";
 import { PubSub } from "../../base/pubsub";
 import { LayoutTimer, canLoadScriptData, getColumnsData, getColumnsDataAsync } from "../../compat";
 import { IReadOnly } from "../../interfaces";
@@ -230,6 +230,16 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
             (restoreResult as Promise<void>).then(() => window.setTimeout(() => this.initialPopulate(), 0));
         else
             window.setTimeout(() => this.initialPopulate(), 0);
+    }
+
+    /**
+     * Returns the record views that the columns class of the grid has as a whole, e.g. a card view that is an
+     * alternate view of its rows, from the `RecordViewTypeAttribute`s on the class, which the mixins of the grid read to
+     * create the views, e.g. `CardViewMixin` of Serenity.Pro.Extensions. The ones of a property are on its column.
+     * @returns The record views, an empty list when there are none.
+     */
+    public getRecordViews(): RecordViewInfo[] {
+        return this.propertyItemsData?.recordViews ?? [];
     }
 
     /**

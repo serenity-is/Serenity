@@ -244,6 +244,20 @@ public abstract partial class PropertyItemsScript
             sb.Append('}');
         }
 
+        // the views of the columns class as a whole are only in the output when some script has them
+        inputs = inputs.ToList();
+        var anyRecordViews = inputs.Any(x => x.data?.RecordViews?.Count > 0);
+
+        void serializeRecordView(RecordViewInfo view)
+        {
+            Dictionary<string, object?> dict = new() { ["type"] = view.Type };
+            if (view.Placement != null)
+                dict["placement"] = view.Placement;
+            if (view.Params.Count > 0)
+                dict["params"] = view.Params;
+            writeValue(dict);
+        }
+
         var firstInput = true;
         foreach (var input in inputs)
         {
@@ -271,7 +285,8 @@ public abstract partial class PropertyItemsScript
 
             var addi = input.data?.AdditionalItems;
             var revision = input.data?.Revision;
-            if (addi?.Count > 0 || revision > 0)
+            var recordViews = input.data?.RecordViews;
+            if (addi?.Count > 0 || revision > 0 || recordViews?.Count > 0)
             {
                 sb.Append("\n,[");
                 if (addi?.Count > 0)
@@ -287,16 +302,31 @@ public abstract partial class PropertyItemsScript
                     }
                 }
                 sb.Append(']');
-                if (revision > 0)
+                if (revision > 0 || recordViews?.Count > 0)
                 {
                     sb.Append(',');
-                    sb.Append(Invariants.ToInvariant(revision.Value));
+                    sb.Append(Invariants.ToInvariant(revision > 0 ? revision.Value : 0));
+                }
+                if (recordViews?.Count > 0)
+                {
+                    sb.Append(",[");
+                    firstItem = true;
+                    foreach (var view in recordViews)
+                    {
+                        if (firstItem)
+                            firstItem = false;
+                        else
+                            sb.Append(',');
+                        serializeRecordView(view);
+                    }
+                    sb.Append(']');
                 }
             }
             sb.Append(']');
         }
         sb.Append("].forEach(d=>");
-        sb.AppendFormat(DataScript.SetScriptDataFormat.TrimEnd(';'), "d[0]", "{items:d[1],additionalItems:(d[2]||[]),revision:d[3]}");
+        sb.AppendFormat(DataScript.SetScriptDataFormat.TrimEnd(';'), "d[0]", anyRecordViews ? "{items:d[1],additionalItems:(d[2]||[]),revision:d[3],recordViews:d[4]}" :
+            "{items:d[1],additionalItems:(d[2]||[]),revision:d[3]}");
         sb.Append(")})();");
         return "(function(){var " + string.Join(",", strMap.OrderBy(x => x.Value.Length).ThenBy(x => x.Value, StringComparer.Ordinal)
                 .Select((x, i) => $"{((i % 30) == 1 ? "\n" : "")}{x.Value}={StringHelper.ToSingleQuoted(x.Key)}")) + ";\n" +

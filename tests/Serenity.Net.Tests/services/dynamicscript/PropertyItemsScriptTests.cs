@@ -37,6 +37,24 @@ public class PropertyItemsScriptTests
     {
     }
 
+    private class TestCardViewAttribute : RecordViewTypeAttribute
+    {
+        public TestCardViewAttribute()
+            : base("MyApp.CardView")
+        {
+            Placement = RecordViewPlacement.Card;
+        }
+    }
+
+    [TestCardView(Default = true, Below = "md")]
+    private class CardViewType
+    {
+    }
+
+    private class DerivedCardViewType : CardViewType
+    {
+    }
+
     private static (FormScript script, TestProvider provider) CreateFormScript(Type type,
         Func<Type, Func<PropertyInfo, bool>?, IEnumerable<PropertyItem>>? factory = null)
     {
@@ -122,6 +140,90 @@ public class PropertyItemsScriptTests
         ]);
 
         Assert.NotNull(result);
+    }
+
+    private static string CompactWithRecordViews(int? revision = null)
+    {
+        return PropertyItemsScript.Compact([
+            ("Columns.A", new PropertyItemsData
+            {
+                Items = [new PropertyItem { Name = "A" }],
+                Revision = revision,
+                RecordViews =
+                [
+                    new RecordViewInfo { Type = "MyApp.CardView", Placement = "card", Params = { ["default"] = true } }
+                ]
+            }),
+            ("Columns.B", new PropertyItemsData { Items = [new PropertyItem { Name = "B" }] })
+        ]);
+    }
+
+    [Fact]
+    public void Compact_WithRecordViews_AddsThemAsTheFifthEntry()
+    {
+        var result = CompactWithRecordViews();
+
+        Assert.Contains("recordViews:d[4]", result, StringComparison.Ordinal);
+        Assert.Contains("='CardView'", result, StringComparison.Ordinal);
+        Assert.Contains("='placement'", result, StringComparison.Ordinal);
+        // without a revision or additional items, the entries before them are empty
+        Assert.Contains(",[],0,[{", result, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Compact_WithRecordViews_KeepsTheRevision()
+    {
+        var result = CompactWithRecordViews(revision: 7);
+        Assert.Contains(",[],7,[{", result, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Compact_WithoutRecordViews_KeepsTheShortFormat()
+    {
+        var result = PropertyItemsScript.Compact([
+            ("Form.A", new PropertyItemsData { Items = [new PropertyItem { Name = "A" }], Revision = 3 })
+        ]);
+
+        Assert.DoesNotContain("recordViews", result, StringComparison.Ordinal);
+        Assert.Contains("{items:d[1],additionalItems:(d[2]||[]),revision:d[3]}", result, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void GetScriptData_AddsTheRecordViewsOfTheClass()
+    {
+        var (script, _) = CreateFormScript(typeof(CardViewType), (_, _) => [new PropertyItem { Name = "A" }]);
+
+        var data = Assert.IsType<PropertyItemsData>(script.GetScriptData());
+
+        var view = Assert.Single(data.RecordViews!);
+        Assert.Equal("MyApp.CardView", view.Type);
+        Assert.Equal("card", view.Placement);
+        Assert.Equal(true, view.Params["default"]);
+        Assert.Equal("md", view.Params["below"]);
+    }
+
+    [Fact]
+    public void GetScriptData_AddsTheRecordViewsOfTheBaseClassToo()
+    {
+        var (script, _) = CreateFormScript(typeof(DerivedCardViewType), (_, _) => [new PropertyItem { Name = "A" }]);
+        var data = Assert.IsType<PropertyItemsData>(script.GetScriptData());
+        Assert.Single(data.RecordViews!);
+    }
+
+    [Fact]
+    public void GetScriptData_Has_No_RecordViews_Without_Attributes()
+    {
+        var (script, _) = CreateFormScript(typeof(object), (_, _) => [new PropertyItem { Name = "A" }]);
+        var data = Assert.IsType<PropertyItemsData>(script.GetScriptData());
+        Assert.Null(data.RecordViews);
+    }
+
+    [Fact]
+    public void GetScript_Has_The_RecordViews_Of_The_Class()
+    {
+        var (script, _) = CreateFormScript(typeof(CardViewType), (_, _) => [new PropertyItem { Name = "A" }]);
+        var text = script.GetScript();
+        Assert.Contains("\"recordViews\":[{\"type\":\"MyApp.CardView\",\"placement\":\"card\"", text, StringComparison.Ordinal);
     }
 
     [Fact]

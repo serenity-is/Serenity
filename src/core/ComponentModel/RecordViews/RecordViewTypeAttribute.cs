@@ -7,10 +7,11 @@ namespace Serenity.ComponentModel;
 /// e.g. a card with the details of the customer of an order when its customer name is hovered in a grid. The view is
 /// shown where its <see cref="Placement"/> says, which the host of the property, e.g. a grid, supports or not. The
 /// view classes generate their own attributes, which derive from this one, with their options as properties.
-/// A property may have more than one view.
+/// A property may have more than one view. A view that is not about the value of a property, but about the
+/// records of the whole grid, e.g. a card view, is added to its columns class instead.
 /// </summary>
 /// <param name="viewType">The key of the view type, e.g. "MyProject.Northwind.CustomerHoverCard".</param>
-[AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Class, AllowMultiple = true)]
 public class RecordViewTypeAttribute(string viewType) : Attribute
 {
     private Dictionary<string, object?>? options;
@@ -31,6 +32,40 @@ public class RecordViewTypeAttribute(string viewType) : Attribute
     /// it is for the <see cref="EditLinkAttribute.IdField"/>.
     /// </summary>
     public string? IdField { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether the view is the one that is shown first, when it is on a columns class, e.g. a card view
+    /// that a grid opens with instead of its table. A user who has chosen another view of the grid keeps it.
+    /// </summary>
+    public bool Default
+    {
+        get => GetOption<bool>("default");
+        set => SetOption("default", value);
+    }
+
+    /// <summary>
+    /// Gets or sets the width of the screen below which the view is shown instead of the table, when it is on a
+    /// columns class, e.g. a card view on a phone: the name of a Bootstrap breakpoint, "sm", "md", "lg", "xl" or "xxl",
+    /// for the screens that are narrower than it, or a width in pixels, e.g. "700". It applies until the user chooses a
+    /// view of the grid, which they then keep.
+    /// </summary>
+    public string? Below
+    {
+        get => GetOption<string>("below");
+        set => SetOption("below", value);
+    }
+
+    /// <summary>
+    /// Gets or sets whether the buttons that switch between the views of the grid are hidden, when the view is on a
+    /// columns class, e.g. a card view: the grid only follows the width of the screen, with <see cref="Below"/>, or keeps
+    /// the view that is shown first, with <see cref="Default"/>, and does not save the view in its settings. Without them
+    /// the grid shows its table.
+    /// </summary>
+    public bool HideSwitch
+    {
+        get => GetOption<bool>("hideSwitch");
+        set => SetOption("hideSwitch", value);
+    }
 
     /// <summary>
     /// Copies the options of the view to the parameters of its <see cref="RecordViewInfo"/>.

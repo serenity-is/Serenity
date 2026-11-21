@@ -3523,6 +3523,12 @@ export interface PropertyItemsData {
     additionalItems: PropertyItem[];
     /** Optional revision number for the property items (0 or undefined means no revision). */
     revision?: number;
+    /**
+     * The record views of the columns class as a whole, e.g. a card view that is an alternate view of the rows of the
+     * grid, from the `RecordViewTypeAttribute`s on the class. The ones of a property are on its item, see
+     * {@link PropertyItem.recordViews}.
+     */
+    recordViews?: RecordViewInfo[];
 }
 /**
  * Alias for {@link PropertyItemsData}.
@@ -11721,6 +11727,13 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
      * @param itemsData - Property items and additional items for the grid.
      */
     protected propertyItemsReady(itemsData: PropertyItemsData): void;
+    /**
+     * Returns the record views that the columns class of the grid has as a whole, e.g. a card view that is an
+     * alternate view of its rows, from the `RecordViewTypeAttribute`s on the class, which the mixins of the grid read to
+     * create the views, e.g. `CardViewMixin` of Serenity.Pro.Extensions. The ones of a property are on its column.
+     * @returns The record views, an empty list when there are none.
+     */
+    getRecordViews(): RecordViewInfo[];
     /**
      * The mixin of the check boxes that select the rows of the grid, if it has one, e.g. when a page created
      * it, or when a columns class declares the column with a `RowSelectionColumn` attribute and

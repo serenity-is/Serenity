@@ -26,4 +26,12 @@ public class PropertyItemsData
     [JsonPropertyName("revision")]
     [Newtonsoft.Json.JsonProperty("revision")]
     public int? Revision { get; set; }
+
+    /// <summary>
+    /// The record views of the columns class as a whole, e.g. a card view that is an alternate view of the rows of the
+    /// grid, from the <see cref="RecordViewTypeAttribute"/>s on the class. The ones of a property are on its item.
+    /// </summary>
+    [JsonPropertyName("recordViews")]
+    [Newtonsoft.Json.JsonProperty("recordViews")]
+    public List<RecordViewInfo>? RecordViews { get; set; }
 }
