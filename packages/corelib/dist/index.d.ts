@@ -3325,7 +3325,7 @@ export interface ClientValidationRule {
  * A record view of a {@link PropertyItem}, see {@link PropertyItem.recordViews}.
  */
 export interface RecordViewInfo {
-    /** The key of the view type, e.g. `"MyProject.Northwind.CustomerCard"`. */
+    /** The key of the view type, e.g. `"MyProject.Northwind.CustomerHoverCard"`. */
     type: string;
     /** Where the view is shown, e.g. `"trigger"` for a popup that the value opens; `"trigger"` when not set. */
     placement?: string;

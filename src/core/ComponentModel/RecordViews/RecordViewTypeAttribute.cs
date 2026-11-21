@@ -9,7 +9,7 @@ namespace Serenity.ComponentModel;
 /// view classes generate their own attributes, which derive from this one, with their options as properties.
 /// A property may have more than one view.
 /// </summary>
-/// <param name="viewType">The key of the view type, e.g. "MyProject.Northwind.CustomerCard".</param>
+/// <param name="viewType">The key of the view type, e.g. "MyProject.Northwind.CustomerHoverCard".</param>
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
 public class RecordViewTypeAttribute(string viewType) : Attribute
 {
