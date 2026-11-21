@@ -799,7 +799,7 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
      * Places the vertical scrollbar after the columns pinned to the end, see the `endPaneScrollbar` option: the end pane
      * gets the `sg-vbar-end` class of the container, and the main pane reaches under it by the width of its scrollbar,
      * `--sg-vbar-hide`, so that the scrollbar of the main pane is covered. An overlay scrollbar takes no room, so 12px
-     * hide it, and the canvas of the main pane grows by that, `--sg-vbar-pad`, to keep its last column in reach.
+     * hide it, and the main pane can scroll further by that, `--sg-vbar-pad`, to keep its last column in reach.
      * @returns Whether the scrollbar moved, or its width changed, so the widths of the panes should be measured again.
      */
     private updateEndPaneScrollbar(): boolean {

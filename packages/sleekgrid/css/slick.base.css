@@ -115,8 +115,9 @@
 }
 
 /* the vertical scrollbar after the columns pinned to the end (the endPaneScrollbar option): the end pane has it, and
-   covers the scrollbar of the main pane, which reaches under it by its width, --sg-vbar-hide; --sg-vbar-pad widens the
-   canvas of the main pane for an overlay scrollbar, which takes no room */
+   covers the scrollbar of the main pane, which reaches under it by its width, --sg-vbar-hide; for an overlay
+   scrollbar, which takes no room, the main pane can scroll further by --sg-vbar-pad, so that its last column is still
+   in reach */
 .sg-vbar-end .slick-viewport.sg-body.sg-end {
   overflow-x: hidden;
   overflow-y: auto;
@@ -129,8 +130,20 @@
   margin-inline-end: calc(-1 * var(--sg-vbar-hide, 0px));
 }
 
+/* the room is made by an empty box after the canvas, and not by a wider canvas, whose cells would be wider too, as
+   they are placed from both of its edges, and overlap each other by it */
 .sg-vbar-end .grid-canvas.sg-body.sg-main {
-  width: calc(var(--sg-virtual-width) + var(--sg-vbar-pad, 0px));
+  overflow: visible;
+}
+
+.sg-vbar-end .grid-canvas.sg-body.sg-main::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  inset-inline-start: 100%;
+  width: var(--sg-vbar-pad, 0px);
+  height: 1px;
+  pointer-events: none;
 }
 
 /* the rows fill the width of the main pane (the fillRows option), with a cell after the last column that reaches
