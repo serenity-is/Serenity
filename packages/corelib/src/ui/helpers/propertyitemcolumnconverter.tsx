@@ -111,6 +111,7 @@ export namespace PropertyItemColumnConverter {
                 togglable: false,
                 sortable: false,
                 resizable: false,
+                // the draggable grouping mixin of Serenity.Pro.Extensions, which declares it, leaves it alone
                 groupable: false,
                 focusable: true,
                 selectable: false,
@@ -119,7 +120,7 @@ export namespace PropertyItemColumnConverter {
                 headerCssClass: "s-row-actions-header",
                 sourceItem: item,
                 format: () => ""
-            };
+            } as Column;
         }
 
         if (!item.formatterType)

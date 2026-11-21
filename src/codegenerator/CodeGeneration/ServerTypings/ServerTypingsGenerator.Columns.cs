@@ -98,6 +98,8 @@ public partial class ServerTypingsGenerator
                     GetAttribute(type, item, basedOnField, basedOnRow, rowAnnotations, "Serenity.ComponentModel", "TransformIgnoreAttribute") != null)
                     continue;
 
+                ReferenceRecordViewTypes(type, item, basedOnField, basedOnRow, rowAnnotations, referencedTypeKeys, referencedTypeAliases);
+
                 var formatterTypeAttr = GetAttribute(type, item, basedOnField, basedOnRow, rowAnnotations, "Serenity.ComponentModel", "FormatterTypeAttribute");
                 var formatterTypeKey = GetFormatterTypeKeyFrom(item.PropertyType(), basedOnField?.PropertyType(), formatterTypeAttr);
 

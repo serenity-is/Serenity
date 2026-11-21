@@ -6,6 +6,7 @@ public partial class ServerTypingsGenerator
     protected ILookup<string, ExternalType> modularFormatterTypeByKey = null!;
     protected ILookup<string, ExternalType> modularDialogTypeByKey = null!;
     protected ILookup<string, ExternalType> modularValidationRuleTypeByKey = null!;
+    protected ILookup<string, ExternalType> modularRecordViewTypeByKey = null!;
 
     protected void InitModularTypeByKey()
     {
@@ -115,6 +116,22 @@ public partial class ServerTypingsGenerator
                 extractTypeNameViaTypeInfo(type) is var (tiKey, tiType) &&
                 !string.IsNullOrEmpty(tiKey) &&
                 tiType == "RuleTypeInfo")
+                return (key: tiKey, type);
+
+            return (null!, type);
+        }).Where(x => x.key != null)
+            .ToLookup(x => x.key!, x => x.type);
+
+        // the record view classes, which register by this.registerRecordView(...), i.e. a RecordViewTypeInfo
+        modularRecordViewTypeByKey = TSTypes.Values.Select(type =>
+        {
+            if (type.IsAbstract != true &&
+                type.IsInterface != true &&
+                type.IsEnum != true &&
+                !string.IsNullOrEmpty(type.Module) &&
+                extractTypeNameViaTypeInfo(type) is var (tiKey, tiType) &&
+                !string.IsNullOrEmpty(tiKey) &&
+                tiType == "RecordViewTypeInfo")
                 return (key: tiKey, type);
 
             return (null!, type);

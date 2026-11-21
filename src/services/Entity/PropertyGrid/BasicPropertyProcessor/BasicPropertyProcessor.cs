@@ -45,6 +45,7 @@ public partial class BasicPropertyProcessor(IOptions<PropertyProcessorOptions>? 
         SetPlaceholder(source, item);
         SetReadOnly(source, item);
         SetReadPermission(source, item);
+        SetRecordViews(source, item);
         SetRequired(source, item);
         SetResizable(source, item);
         SetRowSelectionColumn(source, item);

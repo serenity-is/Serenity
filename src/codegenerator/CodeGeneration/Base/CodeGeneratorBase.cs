@@ -459,6 +459,26 @@ public abstract class CodeGeneratorBase
             x?.EndsWith("ISlickFormatter", StringComparison.Ordinal) == true);
     }
 
+    /// <summary>
+    /// Tells whether a type is a record view, a client side component that shows something about a record, e.g. a hover
+    /// card, which registers with <c>this.registerRecordView(...)</c>, so that its type info is a <c>RecordViewTypeInfo</c>.
+    /// </summary>
+    protected static bool IsRecordViewType(ExternalType type)
+    {
+        if (type.IsAbstract == true ||
+            type.IsEnum == true ||
+            type.IsInterface == true)
+            return false;
+
+        if (type.GenericParameters?.Any(x => string.IsNullOrEmpty(x.Default)) == true)
+            return false;
+
+        return type.Fields != null &&
+            type.Fields.Any(x => x.IsStatic == true &&
+                x.Name == "[Symbol.typeInfo]" &&
+                x.Type == "RecordViewTypeInfo");
+    }
+
     protected abstract void GenerateAll();
 
     public List<GeneratedSource> Run()

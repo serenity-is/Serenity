@@ -65,6 +65,18 @@ export interface ClientValidationRule {
 }
 
 /**
+ * A record view of a {@link PropertyItem}, see {@link PropertyItem.recordViews}.
+ */
+export interface RecordViewInfo {
+    /** The key of the view type, e.g. `"MyProject.Northwind.CustomerCard"`. */
+    type: string;
+    /** Where the view is shown, e.g. `"trigger"` for a popup that the value opens; `"trigger"` when not set. */
+    placement?: string;
+    /** The options of the view, including the `idField` that has the id of its record. */
+    params?: { [key: string]: any };
+}
+
+/**
  * Describes a single field / column / form property as returned by server-side metadata.
  * Drives form generation, grid columns, editors, formatters and filtering. Each
  * property corresponds to a row field or an unbound UI field.
@@ -196,6 +208,12 @@ export interface PropertyItem {
      * `DataGrid.getEditLinks`.
      */
     editLinkQuiet?: boolean;
+    /**
+     * The record views of the property, client side components that show something about the record of the property,
+     * e.g. a hover card of the customer of an order on its customer name, from the `RecordViewTypeAttribute`s of the
+     * property. The host of the property, e.g. a grid, shows the ones whose placement it supports.
+     */
+    recordViews?: RecordViewInfo[];
     /** Filter editor type key that determines the filtering UI for this field (e.g. `"String"`, `"Date"`). */
     filteringType?: string;
     /** Options passed to the filtering editor. */

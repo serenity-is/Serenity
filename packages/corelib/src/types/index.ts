@@ -1,4 +1,5 @@
 export * from "./attributes";
+export * from "./basetyperegistry";
 export * from "./captureoperationtype";
 export * from "./datachangeinfo";
 export * from "./decorators";

@@ -149,12 +149,13 @@ public partial class ClientTypesGenerator : CodeGeneratorBase
     {
         bool isEditorType = IsEditorType(type);
         bool isFormatterType = IsFormatterType(type);
-        bool isBasicType = !isEditorType && !isFormatterType && type.IsAbstract != true &&
+        bool isRecordViewType = !isEditorType && !isFormatterType && IsRecordViewType(type);
+        bool isBasicType = !isEditorType && !isFormatterType && !isRecordViewType && type.IsAbstract != true &&
             (type.IsInterface == true || type.IsIntersectionType == true) &&
             type.Interfaces != null && type.Interfaces.Any(x =>
                 x == "TransformInclude" || x == "@serenity-is/corelib:TransformInclude");
 
-        if (isEditorType || isFormatterType)
+        if (isEditorType || isFormatterType || isRecordViewType)
         {
             foreach (var defaultUsing in new string[] {
                 "Serenity",
@@ -211,6 +212,8 @@ public partial class ClientTypesGenerator : CodeGeneratorBase
                     GenerateEditor(type, name, key);
                 else if (isFormatterType)
                     GenerateFormatter(type, name, key);
+                else
+                    GenerateRecordView(type, name, key);
             });
 
             AddFile(RemoveRootNamespace(ns, name) + ".cs");

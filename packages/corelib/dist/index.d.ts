@@ -3322,6 +3322,19 @@ export interface ClientValidationRule {
     message?: string;
 }
 /**
+ * A record view of a {@link PropertyItem}, see {@link PropertyItem.recordViews}.
+ */
+export interface RecordViewInfo {
+    /** The key of the view type, e.g. `"MyProject.Northwind.CustomerCard"`. */
+    type: string;
+    /** Where the view is shown, e.g. `"trigger"` for a popup that the value opens; `"trigger"` when not set. */
+    placement?: string;
+    /** The options of the view, including the `idField` that has the id of its record. */
+    params?: {
+        [key: string]: any;
+    };
+}
+/**
  * Describes a single field / column / form property as returned by server-side metadata.
  * Drives form generation, grid columns, editors, formatters and filtering. Each
  * property corresponds to a row field or an unbound UI field.
@@ -3468,6 +3481,12 @@ export interface PropertyItem {
      * `DataGrid.getEditLinks`.
      */
     editLinkQuiet?: boolean;
+    /**
+     * The record views of the property, client side components that show something about the record of the property,
+     * e.g. a hover card of the customer of an order on its customer name, from the `RecordViewTypeAttribute`s of the
+     * property. The host of the property, e.g. a grid, shows the ones whose placement it supports.
+     */
+    recordViews?: RecordViewInfo[];
     /** Filter editor type key that determines the filtering UI for this field (e.g. `"String"`, `"Date"`). */
     filteringType?: string;
     /** Options passed to the filtering editor. */
@@ -8425,6 +8444,106 @@ export declare namespace Attributes {
 /** [DEPRECATED] Use Attributes.advancedFiltering() instead */
 export declare const FilterableAttribute: typeof AdvancedFilteringAttribute;
 /**
+ * Base class for type registries that manage registration and lookup of user-defined types.
+ * Provides common functionality for finding types by key, lazy loading, and root namespace searching.
+ *
+ * Subclasses should override {@link isMatchingType} to define which types they handle,
+ * and {@link loadError} to provide appropriate error messages.
+ */
+export declare abstract class BaseTypeRegistry<TType> {
+    /** The kind of loading this registry performs for lazy loading */
+    protected loadKind: string;
+    /** Default suffix to strip from type names (e.g., "Editor", "Dialog") */
+    protected defaultSuffix: string;
+    /** Cache of registered types indexed by their keys */
+    protected registeredTypes: {
+        [key: string]: TType;
+    };
+    /**
+     * Creates a new type registry instance.
+     * @param options Configuration options for the registry
+     */
+    constructor(options: {
+        /** The kind of loading for lazy type loading */
+        loadKind?: string;
+        /** Default suffix to strip from type names */
+        defaultSuffix?: string;
+    });
+    /**
+     * Gets a secondary type key for the given type.
+     * Only enums override this to provide legacy enum key support.
+     * @param type The type to get a secondary key for
+     * @returns The secondary key, or undefined if none
+     */
+    protected getSecondaryTypeKey(type: any): string;
+    /**
+     * Determines if the given type matches the criteria for this registry.
+     * Subclasses should override this to define which types they handle.
+     * @param type The type to check
+     * @returns True if the type matches this registry's criteria
+     */
+    protected isMatchingType(type: any): boolean;
+    /**
+     * Called when a type cannot be found or loaded.
+     * Subclasses must implement this to provide appropriate error messages.
+     * @param key The key that could not be found
+     */
+    protected abstract loadError(key: string): void;
+    /**
+     * Searches for a type in the global type registry and root namespaces.
+     * @param key The key to search for
+     * @returns The found type, or null if not found
+     */
+    protected searchSystemTypes(key: string): TType;
+    /**
+     * Initializes the registry by scanning the global type registry
+     * and building the local cache of matching types.
+     */
+    protected init(): void;
+    /**
+     * Gets a type by key, throwing an error if not found.
+     * @param key The key to look up
+     * @returns The found type
+     * @throws When the type is not found
+     */
+    get(key: string): TType;
+    /**
+     * Gets a type by key, attempting lazy loading if not found.
+     * @param key The key to look up
+     * @returns The found type or a promise that resolves to it
+     * @throws When the type cannot be found or loaded
+     */
+    getOrLoad(key: string): TType | PromiseLike<TType>;
+    /**
+     * Clears the registry cache, forcing re-initialization on next access.
+     */
+    reset(): void;
+    /**
+     * Attempts to get a type by key without throwing errors.
+     * @param key The key to look up
+     * @returns The found type, or null if not found
+     */
+    tryGet(key: string): TType;
+    /**
+     * Gets the forms of a key a lazy type can be registered with, in the order they are tried.
+     * @param key The key to look up
+     */
+    private getLazyKeys;
+    /**
+     * Checks whether a type seems to be available, either as it is already registered or as `Config.lazyTypeLoader`
+     * says it can load it, without loading it. A lazy type may still turn out to be of another kind once it is loaded.
+     * @param key The key to look up
+     * @returns True if the type seems to be available
+     */
+    isAvailable(key: string): boolean;
+    /**
+     * Attempts to get a type by key, with lazy loading support.
+     * @param key The key to look up
+     * @returns The found type, a promise that resolves to it, or null if not found
+     */
+    tryGetOrLoad(key: string): TType | PromiseLike<TType>;
+}
+/**
  * Operation type for data change capture (used by history / audit features).
  */
 export declare enum CaptureOperationType {
@@ -8553,106 +8672,6 @@ export type DialogType = ({
         init?: () => void;
     };
 });
-/**
- * Base class for type registries that manage registration and lookup of user-defined types.
- * Provides common functionality for finding types by key, lazy loading, and root namespace searching.
- *
- * Subclasses should override {@link isMatchingType} to define which types they handle,
- * and {@link loadError} to provide appropriate error messages.
- */
-declare abstract class BaseTypeRegistry<TType> {
-    /** The kind of loading this registry performs for lazy loading */
-    protected loadKind: string;
-    /** Default suffix to strip from type names (e.g., "Editor", "Dialog") */
-    protected defaultSuffix: string;
-    /** Cache of registered types indexed by their keys */
-    protected registeredTypes: {
-        [key: string]: TType;
-    };
-    /**
-     * Creates a new type registry instance.
-     * @param options Configuration options for the registry
-     */
-    constructor(options: {
-        /** The kind of loading for lazy type loading */
-        loadKind?: string;
-        /** Default suffix to strip from type names */
-        defaultSuffix?: string;
-    });
-    /**
-     * Gets a secondary type key for the given type.
-     * Only enums override this to provide legacy enum key support.
-     * @param type The type to get a secondary key for
-     * @returns The secondary key, or undefined if none
-     */
-    protected getSecondaryTypeKey(type: any): string;
-    /**
-     * Determines if the given type matches the criteria for this registry.
-     * Subclasses should override this to define which types they handle.
-     * @param type The type to check
-     * @returns True if the type matches this registry's criteria
-     */
-    protected isMatchingType(type: any): boolean;
-    /**
-     * Called when a type cannot be found or loaded.
-     * Subclasses must implement this to provide appropriate error messages.
-     * @param key The key that could not be found
-     */
-    protected abstract loadError(key: string): void;
-    /**
-     * Searches for a type in the global type registry and root namespaces.
-     * @param key The key to search for
-     * @returns The found type, or null if not found
-     */
-    protected searchSystemTypes(key: string): TType;
-    /**
-     * Initializes the registry by scanning the global type registry
-     * and building the local cache of matching types.
-     */
-    protected init(): void;
-    /**
-     * Gets a type by key, throwing an error if not found.
-     * @param key The key to look up
-     * @returns The found type
-     * @throws When the type is not found
-     */
-    get(key: string): TType;
-    /**
-     * Gets a type by key, attempting lazy loading if not found.
-     * @param key The key to look up
-     * @returns The found type or a promise that resolves to it
-     * @throws When the type cannot be found or loaded
-     */
-    getOrLoad(key: string): TType | PromiseLike<TType>;
-    /**
-     * Clears the registry cache, forcing re-initialization on next access.
-     */
-    reset(): void;
-    /**
-     * Attempts to get a type by key without throwing errors.
-     * @param key The key to look up
-     * @returns The found type, or null if not found
-     */
-    tryGet(key: string): TType;
-    /**
-     * Gets the forms of a key a lazy type can be registered with, in the order they are tried.
-     * @param key The key to look up
-     */
-    private getLazyKeys;
-    /**
-     * Checks whether a type seems to be available, either as it is already registered or as `Config.lazyTypeLoader`
-     * says it can load it, without loading it. A lazy type may still turn out to be of another kind once it is loaded.
-     * @param key The key to look up
-     * @returns True if the type seems to be available
-     */
-    isAvailable(key: string): boolean;
-    /**
-     * Attempts to get a type by key, with lazy loading support.
-     * @param key The key to look up
-     * @returns The found type, a promise that resolves to it, or null if not found
-     */
-    tryGetOrLoad(key: string): TType | PromiseLike<TType>;
-}
 declare class DialogTypeRegistryImpl extends BaseTypeRegistry<DialogType> {
     constructor();
     protected isMatchingType(type: any): boolean;
@@ -11173,6 +11192,8 @@ export interface DataGridPersistenceEvent extends DataGridEvent {
     readonly persisting: boolean;
     /** True when persistence was triggered by a column resize. */
     readonly columnResized?: boolean;
+    /** True when restoring the user's personal settings from storage, e.g. on startup, where unset restore options get their defaults after the event. */
+    readonly automaticRestore?: boolean;
     /** True after restoring when a revision mismatch discarded the saved column layout. */
     columnLayoutReset?: boolean;
     /** True after restoring when at least one saved column width was applied. */
@@ -11598,7 +11619,7 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
     private _layoutTimer;
     private _gridStyleApplied;
     private persistingColumnResize;
-    private automaticRestore;
+    private automaticFlags;
     /** The title element. */
     protected titleDiv: Fluent;
     /** The toolbar widget. */

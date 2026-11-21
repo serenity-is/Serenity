@@ -656,6 +656,13 @@ public class PropertyItem
     public bool? EditLinkQuiet { get; set; }
 
     /// <summary>
+    /// Gets or sets the record views of the property, e.g. a hover card, see <see cref="RecordViewTypeAttribute"/>.
+    /// </summary>
+    [Newtonsoft.Json.JsonProperty("recordViews")]
+    [JsonPropertyName("recordViews")]
+    public List<RecordViewInfo>? RecordViews { get; set; }
+
+    /// <summary>
     /// Gets or sets the type of the filtering for the column.
     /// </summary>
     /// <value>
