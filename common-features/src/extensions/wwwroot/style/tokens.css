@@ -123,7 +123,6 @@
   --s-input-outline-error: rgba(203, 48, 48, 0.25);
   --s-input-readonly-bg: #f3f3f3;
   --s-placeholder: #777;
-  --s-focus-ring-width: 0.15rem;
 
   /* dropdowns, menus and popups */
   --s-menu-item-hover-bg: rgba(var(--bs-primary-rgb), 0.35);

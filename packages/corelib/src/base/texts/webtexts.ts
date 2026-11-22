@@ -201,6 +201,7 @@ namespace webTexts {
             export function asKey(): typeof SelectEditor;
             export function asTry(): typeof SelectEditor;
             export const AjaxError: string;
+            export const ClearAll: string;
             export const ClickToDefine: string;
             export const EmptyItemText: string;
             export const InplaceAdd: string;
@@ -212,7 +213,9 @@ namespace webTexts {
             export const NoMatches: string;
             export const NoResultsClickToDefine: string;
             export const Searching: string;
+            export const SelectedItems: string;
             export const SelectionTooBig: string;
+            export const SelectAll: string;
             export const SingleMatch: string;
         }
     }

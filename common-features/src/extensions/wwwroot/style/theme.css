@@ -1168,14 +1168,14 @@ input[type=checkbox]:focus,
 input[type=radio]:focus,
 .select2-container-active {
   outline: 0;
-  box-shadow: 0 0 0 var(--s-focus-ring-width) var(--s-input-outline);
+  box-shadow: 0 0 0 var(--bs-focus-ring-width, .25rem) var(--s-input-outline);
 }
 
 input.error:focus,
 select.error:focus,
 textarea.error:focus,
 .select2-container-active.error {
-  box-shadow: 0 0 0 var(--s-focus-ring-width) var(--s-input-outline-error);
+  box-shadow: 0 0 0 var(--bs-focus-ring-width, .25rem) var(--s-input-outline-error);
 }
 
 input[type=checkbox],
@@ -3114,8 +3114,7 @@ button.panel-titlebar-close::after {
   width: 100%;
   min-height: 26px;
   margin: 0;
-  padding-left: 4px;
-  padding-right: 4px;
+  padding: 0;
   position: relative;
   z-index: 10000;
   white-space: nowrap;
@@ -3125,16 +3124,17 @@ button.panel-titlebar-close::after {
   width: 100%;
   height: auto !important;
   min-height: 26px;
-  padding: 4px 1.5em 4px 5px;
+  padding: 4px 18px 4px 8px;
   margin: 0;
   outline: 0;
-  border: 1px solid var(--s-input-border-color, var(--bs-border-color));
+  border: none;
+  border-bottom: 1px solid var(--s-input-border-color, var(--bs-border-color));
   border-radius: 0;
   box-shadow: none;
 }
 
 .select2-search::after {
-    --s-ico: var(--s-icon-select2-search, var(--s-icon-search));
+  --s-ico: var(--s-icon-select2-search, var(--s-icon-search));
 }
 
 .select2-search::after,
@@ -3144,8 +3144,8 @@ button.panel-titlebar-close::after {
   font-style: normal;
   color: var(--s-input-text, currentcolor);
   position: absolute;
-  right: 8px;
-  top: 5px;
+  right: 4px;
+  top: 7px;
 }
 
 .select2-search.select2-active::after,
@@ -3172,8 +3172,8 @@ button.panel-titlebar-close::after {
 
 .select2-results {
   max-height: 200px;
-  padding: 0 0 0 4px;
-  margin: 4px 4px 4px 0;
+  padding: 0;
+  margin: 0;
   position: relative;
   overflow-x: hidden;
   overflow-y: auto;
@@ -3196,7 +3196,7 @@ button.panel-titlebar-close::after {
 }
 
 .select2-results .select2-result-label {
-  padding: 3px 7px 4px;
+  padding: 4px 8px;
   margin: 0;
   cursor: pointer;
   min-height: 1em;
