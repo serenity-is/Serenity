@@ -1,5 +1,6 @@
 ﻿import { addDisposingListener } from "@serenity-is/domwise";
 import { Criteria, FilterPanelTexts, Fluent, FormValidationTexts, ListRequest, QuickFilterBarTexts, formatDate, isPromiseLike, notifyWarning, nsSerenity, parseDate, toId, tryGetText } from "../../base";
+import { ComboboxEditor } from "../editors/comboboxeditor";
 import { DateEditor } from "../editors/dateeditor";
 import { DateTimeEditor, DateTimeEditorOptions } from "../editors/datetimeeditor";
 import { EditorUtils } from "../editors/editorutils";
@@ -384,6 +385,9 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
                         opt.element(Fluent(el));
                     }
                 },
+                // the dropdown of a select fits its results, which can be longer than the filter is wide, unless it is
+                // told otherwise
+                ...((type.prototype as any) instanceof ComboboxEditor ? { dropdownAutoWidth: true } : null),
                 ...opt.options
             }
         });

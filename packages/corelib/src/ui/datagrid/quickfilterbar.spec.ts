@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Fluent } from "../../base";
 import { DateEditor } from "../editors/dateeditor";
 import { EditorUtils } from "../editors/editorutils";
+import { SelectEditor } from "../editors/selecteditor";
 import { Widget } from "../widgets/widget";
 import { getWidgetFrom, tryGetWidget } from "../widgets/widgetutils";
 import { QuickFilterBar } from "./quickfilterbar";
@@ -450,5 +451,21 @@ describe("QuickFilterBar", () => {
         const args = { field: "Active", value: "0", equalityFilter: {} } as any;
         qf.handler!(args);
         expect(args.equalityFilter.Active).toBe(false);
+    });
+});
+
+describe("the dropdown of a select in a quick filter bar", () => {
+    afterEach(() => { document.body.innerHTML = ""; });
+
+    it("fits its results, which can be longer than the filter is wide, unless the filter says otherwise", () => {
+        const { bar } = createBar([
+            { field: "A", title: "A", type: SelectEditor, options: { items: ["Ana Trujillo Emparedados y helados"] } },
+            { field: "B", title: "B", type: SelectEditor, options: { items: ["X"], dropdownAutoWidth: false } },
+            { field: "C", title: "C", type: TestWidget }
+        ]);
+        expect(bar.find(SelectEditor, "A")["getComboboxOptions"]().dropdownAutoWidth).toBe(true);
+        expect(bar.find(SelectEditor, "B")["getComboboxOptions"]().dropdownAutoWidth).toBe(false);
+        expect((bar.find(TestWidget, "C") as any).options.dropdownAutoWidth).toBeUndefined();
+        bar.destroy();
     });
 });
