@@ -62,7 +62,12 @@ public sealed class StringEnumInfo
             };
             var resolved = textAttr != null ? LocalText.ResolveFromAttribute(textAttr, text, defaultKey: null) : null;
 
-            var member = new StringEnumMember(field.Name, value, resolved?.Key, resolved?.Text, isVisible: !hidden);
+            // the raw key of the attribute tells an empty one, i.e. a literal text, from one that is not set, which the
+            // resolved key cannot, as it normalizes an empty key to null
+            var textKey = textAttr is IHasTextKey hasTextKey && hasTextKey.TextKey != null ?
+                hasTextKey.TextKey : resolved?.Key;
+
+            var member = new StringEnumMember(field.Name, value, textKey, resolved?.Text, isVisible: !hidden);
             members.Add(member);
 
             // the first member with a value wins, as in the icons of aliases in a numeric enum

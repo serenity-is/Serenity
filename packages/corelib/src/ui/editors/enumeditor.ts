@@ -73,9 +73,12 @@ export class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions> extends
      */
     protected mapEnum(value: number | string, opt: { enumKey: string, enumType: any }): ComboboxItem<any> {
         const name = Enum.toString(opt.enumType, value);
+        // a member may declare a key of its own, or none, in which case its text is shown as it is
+        const textKey = Enum.getTextKey(opt.enumType, value);
+        const text = Enum.getText(opt.enumType, value) ?? name;
         return {
             id: String(value),
-            text: localText("Enums." + opt.enumKey + "." + name, name),
+            text: textKey === "" ? text : localText(textKey ?? "Enums." + opt.enumKey + "." + name, text),
             icon: this.mapIcon(value, opt)
         }
     }

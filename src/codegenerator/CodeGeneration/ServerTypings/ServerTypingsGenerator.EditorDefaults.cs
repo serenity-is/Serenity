@@ -243,6 +243,12 @@ public partial class ServerTypingsGenerator
 
             if (!has("iconField") && FindPropertyByName(properties, "IconClass", "Icon") is string iconField)
                 options.Add(("iconField", iconField));
+
+            if (!has("textKeyField") && FindPropertyByName(properties, "TextKey", "LocalTextKey") is string textKeyField)
+                options.Add(("textKeyField", textKeyField));
+
+            if (!has("cssClassField") && FindPropertyByName(properties, "CssClass", "CssClasses", "CssClassName") is string cssClassField)
+                options.Add(("cssClassField", cssClassField));
         }
 
         return options;

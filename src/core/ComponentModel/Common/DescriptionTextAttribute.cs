@@ -29,7 +29,8 @@ public class DescriptionTextAttribute : DescriptionAttribute, IHasTextKey
     }
 
     /// <summary>
-    /// Gets or sets the local text key for the Description text.
+    /// Gets or sets the local text key for the Description text. An empty string can be used to mark the text as literal,
+    /// and no inferred text key should be generated for the property this attribute is placed on.
     /// </summary>
     public string? TextKey { get; set => field = value ?? throw new ArgumentNullException(nameof(value)); }
 }

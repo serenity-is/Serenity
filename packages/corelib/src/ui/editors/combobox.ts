@@ -20,6 +20,15 @@ export interface ComboboxItem<TSource = any> {
     icon?: IconClassName;
     /** The source item. */
     source?: TSource;
+    /**
+     * The local text key of the text of the item, which the editor localizes when it is told which field of an item
+     * holds it, see `ComboboxCommonOptions.textKeyField`. An item whose text is not given has the text of its key.
+     */
+    textKey?: string;
+    /**
+     * The CSS class of the item, e.g. "text-danger", which the editors that show the class of an item add to it.
+     */
+    cssClass?: string;
     /** Whether the item is disabled. */
     disabled?: boolean;
 }

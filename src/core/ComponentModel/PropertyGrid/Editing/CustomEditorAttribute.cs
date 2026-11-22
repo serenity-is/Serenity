@@ -41,6 +41,16 @@ public abstract class CustomEditorAttribute(string editorType) : EditorTypeAttri
     }
 
     /// <summary>
+    /// Removes the editor option, so that the editor uses its default, e.g. for a property that unsets it with a value
+    /// that means none, as an attribute property cannot be set to null.
+    /// </summary>
+    /// <param name="key">The key.</param>
+    protected void RemoveOption(string key)
+    {
+        options?.Remove(key);
+    }
+
+    /// <summary>
     /// Gets the editor option.
     /// </summary>
     /// <typeparam name="TType">The type of the option.</typeparam>

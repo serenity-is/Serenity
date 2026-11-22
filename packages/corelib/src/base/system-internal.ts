@@ -41,6 +41,13 @@ export type TypeInfo<TypeName> = {
     enumKind?: "numeric" | "string";
     /** Icon classes mapping enum values (numeric or string) to icon class names */
     enumIcons?: Record<string | number, string>;
+    /**
+     * Local text keys of the enum members that do not use the one their enum implies, e.g.
+     * `{ '2': 'My.Read.Key' }`, of which an empty string means the member has no key, and its text is shown as it is.
+     */
+    enumTextKeys?: Record<string | number, string>;
+    /** Texts of the enum members that are shown as they are, i.e. the ones that have no local text key */
+    enumTexts?: Record<string | number, string>;
     /** Registered flag */
     registered?: boolean;
 }

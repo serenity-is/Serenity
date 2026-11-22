@@ -2276,8 +2276,12 @@ export abstract class AbstractSelect2 {
     }
 
     protected loadMoreIfNeeded() {
-        let results = this.results,
-            more = results.querySelector<HTMLElement>("li.select2-more-results"),
+        // a select that was destroyed, or never opened, has no results to load more of
+        let results = this.results;
+        if (!results || !this.opened())
+            return;
+
+        let more = results.querySelector<HTMLElement>("li.select2-more-results"),
             below, // pixels the element is below the scroll fold, below==0 is when the element is starting to be visible
             page = this.resultsPage + 1,
             self = this,

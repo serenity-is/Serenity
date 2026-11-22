@@ -10,7 +10,8 @@ public sealed class StringEnumMember
     /// </summary>
     /// <param name="name">The name of the member, which is the name of its field.</param>
     /// <param name="value">The string value of the member.</param>
-    /// <param name="textKey">The local text key of the member, if it has a text attribute with a key.</param>
+    /// <param name="textKey">The local text key of the member, if it has a text attribute with a key. One that is an
+    /// empty string is no key, which means the text of the member is shown as it is, e.g. for a name.</param>
     /// <param name="text">The invariant text of the member, if it has a text attribute.</param>
     /// <param name="isVisible">Whether the member is sent to the client, i.e. it is not hidden with
     /// <see cref="IgnoreUIFieldAttribute"/> or <see cref="TransformIgnoreAttribute"/>.</param>
@@ -34,7 +35,9 @@ public sealed class StringEnumMember
     public string Value { get; }
 
     /// <summary>
-    /// Gets the local text key of the member, if it has a text attribute with a key.
+    /// Gets the local text key of the member, if it has a text attribute with a key. One that is an empty string is no
+    /// key: the text of the member is shown as it is, and it is not registered under the key that its enum implies,
+    /// e.g. for a text that is a name.
     /// </summary>
     public string? TextKey { get; }
 

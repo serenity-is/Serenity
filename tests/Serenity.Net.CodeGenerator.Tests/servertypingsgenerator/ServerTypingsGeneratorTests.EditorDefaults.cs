@@ -29,6 +29,17 @@ namespace Serenity.CodeGeneration
         }
 
         [Fact]
+        public void EditorDefaults_Infer_The_Text_Key_And_Css_Class_Fields()
+        {
+            var code = GenerateEditorDefaults(typeof(TextsEditorAttribute), "TextsEditorDefaults");
+
+            // a field named TextKey or LocalTextKey holds the keys of the texts of the items, and one named CssClass,
+            // CssClasses or CssClassName their classes, like IconClass holds their icons
+            Assert.Contains("textKeyField: \"LocalTextKey\"", code);
+            Assert.Contains("cssClassField: \"CssClassName\"", code);
+        }
+
+        [Fact]
         public void EditorDefaults_Use_Default_Action_And_Omit_Unknown_Capabilities()
         {
             var code = GenerateEditorDefaults(typeof(DefaultActionEditorAttribute), "DefaultActionEditorDefaults");
@@ -208,6 +219,14 @@ namespace Serenity.CodeGeneration
 
 namespace ServerTypingsTest.EditorDefaults
 {
+    public class LookupItemWithTexts
+    {
+        public string Key { get; set; }
+        public string Name { get; set; }
+        public string LocalTextKey { get; set; }
+        public string CssClassName { get; set; }
+    }
+
     public class LookupItem
     {
         public string Key { get; set; }
@@ -258,6 +277,17 @@ namespace ServerTypingsTest.EditorDefaults
 
     [ServiceLookupEditor(typeof(LookupItem), EndpointType = typeof(LookupItemEndpoint))]
     public partial class DefaultActionEditorAttribute() : ServiceLookupEditorBaseAttribute("Test.DefaultActionEditor")
+    {
+    }
+
+    [Route("Services/Test/LookupItemWithTexts/[action]")]
+    public class LookupItemWithTextsEndpoint : ServiceEndpoint
+    {
+        public ListResponse<LookupItemWithTexts> List(ListRequest request) => new();
+    }
+
+    [ServiceLookupEditor(typeof(LookupItemWithTexts), EndpointType = typeof(LookupItemWithTextsEndpoint))]
+    public partial class TextsEditorAttribute() : ServiceLookupEditorBaseAttribute("Test.TextsEditor")
     {
     }
 

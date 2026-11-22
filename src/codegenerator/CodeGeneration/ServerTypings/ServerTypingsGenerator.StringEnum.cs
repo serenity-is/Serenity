@@ -64,6 +64,25 @@ public partial class ServerTypingsGenerator
             .Select(group => (Key: group.Key.ToSingleQuoted(), Icon: group.First().Icon!))
             .ToList();
 
-        WriteEnumRegistration(identifier, fullName, enumKey, icons);
+        // like an enum, only the members whose text key is not the implied one, or that are literal, are told
+        var textKeys = new List<(string Key, string Value)>();
+        var texts = new List<(string Key, string Value)>();
+        foreach (var member in members.GroupBy(x => x.Value, StringComparer.Ordinal).Select(group => group.First()))
+        {
+            var impliedKey = "Enums." + enumKey + "." + member.Field.Name;
+            var (text, textKey) = GetEnumTextFor(member.Field);
+            var valueKey = member.Value.ToSingleQuoted();
+
+            if (textKey is { Length: 0 })
+            {
+                textKeys.Add((valueKey, ""));
+                if (!string.IsNullOrEmpty(text))
+                    texts.Add((valueKey, text));
+            }
+            else if (!string.IsNullOrEmpty(textKey) && textKey != impliedKey)
+                textKeys.Add((valueKey, textKey));
+        }
+
+        WriteEnumRegistration(identifier, fullName, enumKey, icons, textKeys: textKeys, texts: texts);
     }
 }

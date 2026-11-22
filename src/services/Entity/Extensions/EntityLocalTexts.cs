@@ -41,6 +41,10 @@ public static class EntityLocalTexts
         void addAttributeText(Attribute attribute, string? text, string defaultKey)
         {
             var resolved = LocalText.ResolveFromAttribute(attribute, text, defaultKey);
+            // a text with an empty key is shown as it is, so it has no key of its own, nor an implied one
+            if (resolved.Literal)
+                return;
+
             if (resolved.Key is not string key)
             {
                 if (!string.IsNullOrEmpty(resolved.Text))

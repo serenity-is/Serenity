@@ -2,12 +2,19 @@ import { describe, expect, it, vi } from "vitest";
 import { SelectEditor } from "./selecteditor";
 import { ComboboxEditor } from "./comboboxeditor";
 import { Select2, type Select2Item } from "./select2";
-import { addLocalText } from "../../base";
+import { addLocalText, registerEnum } from "../../base";
+import { EnumEditor } from "./enumeditor";
 
 const item = (id: string, text: string): Select2Item => ({ id, text });
 
 // the texts of the widget are local texts, which the tests load for the ones they check
 addLocalText({
+    Tests: {
+        ComboboxEditor: {
+            Low: "Low priority",
+            High: "High priority"
+        }
+    },
     Controls: {
         SelectEditor: {
             ClearAll: "Clear all",
@@ -62,6 +69,206 @@ function createChecklist(opt: any = {}) {
 }
 
 const click = (element: Element) => element.dispatchEvent(new Event("mouseup", { bubbles: true }));
+
+describe("the options that imply a multiple editor", () => {
+    const items = [["1", "One"], ["2", "Two"], ["3", "Three"]];
+    const multiple = (options: any) => {
+        const editor = new SelectEditor({ items, ...options } as any);
+        const result = editor["isMultiple"]();
+        editor.destroy();
+        return result;
+    };
+
+    it("make an editor multiple on their own, as neither means anything without it", () => {
+        expect(multiple({})).toBe(false);
+        expect(multiple({ multiple: true })).toBe(true);
+        expect(multiple({ checkList: true })).toBe(true);
+        expect(multiple({ delimited: true })).toBe(true);
+    });
+
+    it("give a checklist the check boxes, the item that selects all and the summary", () => {
+        const editor = new SelectEditor({ items, checkList: true } as any);
+        const opt = editor["getComboboxOptions"]();
+        expect(opt.multiple).toBe(true);
+        expect(opt.checkList).toBe(true);
+        expect(opt.selectAll).toBe(true);
+        expect(typeof opt.selectionSummary).toBe("function");
+        editor.destroy();
+    });
+
+    it("write the value of a checklist as a list, like a multiple editor does", () => {
+        const editor = new SelectEditor({ items, checkList: true } as any);
+        editor.value = "1,3";
+        const target: any = {};
+        editor.getEditValue({ name: "Values" } as any, target);
+        expect(target.Values).toEqual(["1", "3"]);
+        editor.destroy();
+
+        const delimited = new SelectEditor({ items, delimited: true } as any);
+        delimited.value = "1,3";
+        const delimiterTarget: any = {};
+        delimited.getEditValue({ name: "Values" } as any, delimiterTarget);
+        expect(delimiterTarget.Values).toBe("1,3");
+        delimited.destroy();
+    });
+});
+
+describe("the texts of the members of an enum", () => {
+    it("come from the key of a member, the one its enum implies, or the text that travels with the enum", () => {
+        enum TestEnum {
+            Plain = 1,
+            Keyed = 2,
+            Literal = 3
+        }
+
+        const name = "EnumTestTexts.TestEnum";
+        registerEnum(TestEnum, name, {
+            enumKey: "EnumTestTexts.TestEnum",
+            enumTextKeys: { [TestEnum.Keyed]: "EnumTestTexts.Keyed", [TestEnum.Literal]: "" },
+            enumTexts: { [TestEnum.Literal]: "Shown as it is" }
+        });
+        addLocalText({
+            Enums: { EnumTestTexts: { TestEnum: { Plain: "Plain text" } } },
+            EnumTestTexts: { Keyed: "Keyed text" }
+        });
+
+        const texts = (options: any) => {
+            const editor = new EnumEditor({ enumType: TestEnum, ...options } as any);
+            const result = Object.fromEntries(editor.items.map(x => [x.id, x.text]));
+            editor.destroy();
+            return result;
+        };
+
+        expect(texts({})).toEqual({
+            // a member without a key uses the one its enum implies, i.e. Enums.<enumKey>.<Member>
+            "1": "Plain text",
+            // a member with a key of its own is localized by it
+            "2": "Keyed text",
+            // a member with an empty key is shown as it is, with the text that travels with the enum
+            "3": "Shown as it is"
+        });
+    });
+});
+
+describe("the text keys of the items of an editor", () => {
+    it("localize the text of an item by its key field, and show the text as it is when it has no key", () => {
+        const editor = new SelectEditor({
+            items: [["1", "One"], ["2", "Two"]],
+            textKeyField: "textKey"
+        } as any);
+        editor.addOption("3", "Three", { textKey: "Tests.ComboboxEditor.Low" });
+        editor.addOption("4", "Four", { textKey: "Tests.ComboboxEditor.Unknown" });
+
+        const texts = Object.fromEntries(editor.items.map(x => [x.id, x.text]));
+        // an item of its own gives the text, and the key of its source, which the editor localizes
+        expect(texts["3"]).toBe("Low priority");
+        // a key without a text shows the text of the item, which tells more than the key
+        expect(texts["4"]).toBe("Four");
+        // an item without a key shows its text
+        expect(texts["2"]).toBe("Two");
+
+        editor.destroy();
+    });
+
+    it("localize the text of an item by itself, when the text is its key", () => {
+        const editor = new SelectEditor({
+            items: [["low", "Tests.ComboboxEditor.Low"], ["high", "Tests.ComboboxEditor.High"], ["none", "None"]],
+            textKeyField: "text"
+        } as any);
+
+        expect(editor.items.map(x => x.text)).toEqual(["Low priority", "High priority", "None"]);
+        // the ids are what the values are, not the texts
+        expect(editor.items.map(x => x.id)).toEqual(["low", "high", "none"]);
+
+        editor.destroy();
+    });
+
+    it("give an item its text from its key alone, when it has no text of its own", () => {
+        const editor = new SelectEditor({ items: [], textField: "text", textKeyField: "textKey" } as any);
+
+        // an item that has only a key, e.g. one that a source gives, has the text of its key
+        expect(editor["itemText"]({ textKey: "Tests.ComboboxEditor.Low" } as any)).toBe("Low priority");
+        // without a text for the key, the key is the text, as it is readable enough
+        expect(editor["itemText"]({ textKey: "Tests.ComboboxEditor.Unknown" } as any)).toBe("Tests.ComboboxEditor.Unknown");
+        // without a key either, an item has no text
+        expect(editor["itemText"]({} as any)).toBe("");
+        expect(editor["itemText"]({ text: null, textKey: "Tests.ComboboxEditor.High" } as any)).toBe("High priority");
+
+        editor.destroy();
+    });
+
+    it("localize the text where the editor reads it, so a search and a selection see the same text", () => {
+        const editor = new SelectEditor({
+            items: [["1", "One"]],
+            textField: "text",
+            textKeyField: "textKey"
+        } as any);
+
+        const mapped = editor["mapItem"]({ id: "3", text: "Three", textKey: "Tests.ComboboxEditor.High" } as any);
+        expect(mapped.text).toBe("High priority");
+
+        editor.destroy();
+    });
+
+    it("take the items of a select editor as objects, e.g. the ones that a form field gives", () => {
+        const editor = new SelectEditor({
+            items: [
+                { id: "low", textKey: "Tests.ComboboxEditor.Low" },
+                { id: "high", textKey: "Tests.ComboboxEditor.High", text: "High" },
+                { id: "none", text: "None" },
+                { id: "10" },
+                { id: "20", text: "Twenty", icon: "fa fa-truck" }
+            ],
+            textKeyField: "textKey"
+        } as any);
+
+        expect(editor.items.map(x => x.id)).toEqual(["low", "high", "none", "10", "20"]);
+        expect(editor.items.map(x => x.text)).toEqual([
+            // a text key gives the text of an item, which falls back to the key when there is no text for it, and an
+            // item whose text is not given has none, as the value of an item is not a fallback of the editor
+            "Low priority", "High priority", "None", "", "Twenty"
+        ]);
+        expect(editor.items[4].icon).toBe("fa fa-truck");
+
+        editor.destroy();
+    });
+
+    it("show the texts of an item as they are when the editor does not say where their keys are", () => {
+        // e.g. a lookup, whose texts are data, and may look like keys
+        const editor = new SelectEditor({
+            items: [["low", "Tests.ComboboxEditor.Low"], ["high", "Tests.ComboboxEditor.High"]]
+        } as any);
+
+        expect(editor.items.map(x => x.text)).toEqual(["Tests.ComboboxEditor.Low", "Tests.ComboboxEditor.High"]);
+
+        editor.destroy();
+    });
+});
+
+describe("the CSS class of the items of an editor", () => {
+    it("comes from the field that the editor gives, or from the item itself, and the results show it", () => {
+        const byField = new SelectEditor({
+            items: [],
+            textField: "text",
+            cssClassField: "CssClass"
+        } as any);
+        // the class comes from the field of the source item that the editor gives, e.g. a column of an item type
+        byField.addOption("1", "One", { CssClass: "text-danger" });
+        expect(byField.items[0].cssClass).toBe("text-danger");
+        expect(byField["getComboboxOptions"]().formatResultCssClass?.({ cssClass: "text-danger" } as any))
+            .toBe("text-danger");
+        byField.destroy();
+
+        // an item of its own gives the class as well, e.g. one that a form field gives
+        const own = new SelectEditor({
+            items: [{ id: "danger", text: "Danger", cssClass: "text-danger" }]
+        } as any);
+        expect(own.items[0].cssClass).toBe("text-danger");
+        // an item without a class has none, which the editor passes as it is
+        expect(own["getComboboxOptions"]().formatResultCssClass?.({} as any)).toBeUndefined();
+        own.destroy();
+    });
+});
 
 describe("the placeholder of a combobox editor", () => {
     it("shows the icon of the placeholder, e.g. that of the field it filters, when nothing is selected", () => {
@@ -218,6 +425,17 @@ describe("the options of the checklist of a select editor", () => {
         editor.destroy();
     });
 
+    it("pages a source by the page size of the editor, e.g. a list service", () => {
+        const editor = new SelectEditor({ items, pageSize: 8 } as any);
+        const opt = editor["getComboboxOptions"]();
+        expect(opt.pageSize).toBe(8);
+        editor.destroy();
+
+        const standard = new SelectEditor({ items } as any);
+        expect(standard["getComboboxOptions"]().pageSize).toBe(100);
+        standard.destroy();
+    });
+
     it("is not used unless the editor asks for it", () => {
         const editor = new SelectEditor({ items, multiple: true } as any);
         const opt = editor["getComboboxOptions"]();
@@ -311,12 +529,64 @@ describe("the defaults of the combobox editors", () => {
             expect(container.textContent).toBe("A, B, C");
             expect(container.querySelector(".select2-selection-summary-more")).toBeNull();
 
+            // -1 names them all against such a default
+            const all = new SelectEditor({ items, multiple: true, checkList: true, maxSummaryItems: -1 } as any);
+            all["renderSelectionSummary"](items.map(([id, text]) => ({ id, text })), container);
+            expect(container.querySelector(".select2-selection-summary-text").textContent).toBe("A, B, C");
+            expect(container.querySelector(".select2-selection-summary-more").textContent).toBe("(3)");
+
+            // while null is not a value of its own, and takes the default, like an option that is not given
+            const none = new SelectEditor({ items, multiple: true, checkList: true, maxSummaryItems: null } as any);
+            none["renderSelectionSummary"](items.map(([id, text]) => ({ id, text })), container);
+            expect(container.querySelector(".select2-selection-summary-text").textContent).toBe("A, B");
+            expect(container.querySelector(".select2-selection-summary-more").textContent).toBe("+1");
+
             editor.destroy();
             own.destroy();
+            all.destroy();
+            none.destroy();
         }
         finally {
             ComboboxEditor.defaults.maxSummaryItems = saved;
         }
+    });
+
+    it("name every item in the summary by default, and show how many are selected after them", () => {
+        const items = [["1", "A"], ["2", "B"], ["3", "C"], ["4", "D"], ["5", "E"]];
+        const editor = new SelectEditor({ items, multiple: true, checkList: true } as any);
+        const container = document.createElement("div");
+        editor["renderSelectionSummary"](items.map(([id, text]) => ({ id, text })), container);
+
+        // the styles cut the names that do not fit, so the whole list is there, and the count is the selection
+        expect(ComboboxEditor.defaults.maxSummaryItems).toBe(-1);
+        expect(container.querySelector(".select2-selection-summary-text").textContent).toBe("A, B, C, D, E");
+        expect(container.querySelector(".select2-selection-summary-more").textContent).toBe("(5)");
+        expect(container.title).toBe("A, B, C, D, E");
+
+        // -1, which is the default, says the same, and so do the other negative values, which are reserved for
+        // summaries to come
+        for (const maxSummaryItems of [-1, -2]) {
+            const explicit = new SelectEditor({ items, multiple: true, checkList: true, maxSummaryItems } as any);
+            explicit["renderSelectionSummary"](items.map(([id, text]) => ({ id, text })), container);
+            expect(container.querySelector(".select2-selection-summary-text").textContent).toBe("A, B, C, D, E");
+            expect(container.querySelector(".select2-selection-summary-more").textContent).toBe("(5)");
+            explicit.destroy();
+        }
+
+        editor.destroy();
+    });
+
+    it("show only how many are selected when maxSummaryItems is zero", () => {
+        const items = [["1", "A"], ["2", "B"], ["3", "C"]];
+        const editor = new SelectEditor({ items, multiple: true, checkList: true, maxSummaryItems: 0 } as any);
+        const container = document.createElement("div");
+        editor["renderSelectionSummary"](items.map(([id, text]) => ({ id, text })), container);
+
+        expect(container.textContent).toBe("3 selected");
+        // the names are still there for whoever looks at the tooltip
+        expect(container.title).toBe("A, B, C");
+
+        editor.destroy();
     });
 
     it("take a callback for the empty item text, which is called when the editor is created", () => {

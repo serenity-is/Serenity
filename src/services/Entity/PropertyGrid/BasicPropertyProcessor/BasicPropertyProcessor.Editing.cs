@@ -14,6 +14,7 @@ public partial class BasicPropertyProcessor : PropertyProcessor
         {
             item.EditorType = editorTypeAttr.EditorType;
             SetEditorParams(editorTypeAttr, item.EditorParams);
+            SetMultipleFromEditorParams(source, item);
             if (item.EditorType == "Lookup" &&
                 !item.EditorParams.ContainsKey("lookupKey"))
             {
@@ -141,6 +142,8 @@ public partial class BasicPropertyProcessor : PropertyProcessor
         }
 
         SetServiceLookupParams(editorTypeAttr, item.EditorParams);
+        // the items of a property imply the editor, so they come after the editor and its options are set
+        SetSelectItems(source, item);
     }
 
     /// <summary>
@@ -232,6 +235,8 @@ public partial class BasicPropertyProcessor : PropertyProcessor
         bool idFieldMissing = !editorParams.ContainsKey("idField");
         bool textFieldMissing = !editorParams.ContainsKey("textField");
         bool iconFieldMissing = !editorParams.ContainsKey("iconField");
+        bool textKeyFieldMissing = !editorParams.ContainsKey("textKeyField");
+        bool cssClassFieldMissing = !editorParams.ContainsKey("cssClassField");
 
         var resultEndpointType = endpointSource.EndpointType;
         if (resultEndpointType is null &&
@@ -281,7 +286,8 @@ public partial class BasicPropertyProcessor : PropertyProcessor
             !editorParams.ContainsKey("includeColumns") &&
             !editorParams.ContainsKey("columnSelection");
 
-        if (!idFieldMissing && !textFieldMissing && !columnsMissing && !iconFieldMissing)
+        if (!idFieldMissing && !textFieldMissing && !columnsMissing && !iconFieldMissing &&
+            !textKeyFieldMissing && !cssClassFieldMissing)
             return;
 
         if (!isRowType)
@@ -326,6 +332,20 @@ public partial class BasicPropertyProcessor : PropertyProcessor
                     editorParams["iconField"] = iconProperty.Name;
             }
 
+            if (textKeyFieldMissing)
+            {
+                var textKeyProperty = FindPropertyByName(properties, "TextKey", "LocalTextKey");
+                if (textKeyProperty != null)
+                    editorParams["textKeyField"] = textKeyProperty.Name;
+            }
+
+            if (cssClassFieldMissing)
+            {
+                var cssClassProperty = FindPropertyByName(properties, "CssClass", "CssClasses", "CssClassName");
+                if (cssClassProperty != null)
+                    editorParams["cssClassField"] = cssClassProperty.Name;
+            }
+
             if (validateInferredFields)
                 ThrowIfLookupFieldsMissing(itemType, editorParams);
 
@@ -362,6 +382,32 @@ public partial class BasicPropertyProcessor : PropertyProcessor
                 {
                     if (rowInstance?.FindFieldByPublicName("IconClass") is StringField iconField)
                         editorParams["iconField"] = iconField.PublicName;
+                }
+
+                if (textKeyFieldMissing)
+                {
+                    // a row field that tells the key of the text of an item by its name, like the properties of an item type
+                    foreach (var name in new[] { "TextKey", "LocalTextKey" })
+                    {
+                        if (rowInstance?.FindFieldByPublicName(name) is StringField textKeyField)
+                        {
+                            editorParams["textKeyField"] = textKeyField.PublicName;
+                            break;
+                        }
+                    }
+                }
+
+                if (cssClassFieldMissing)
+                {
+                    // a row field that tells the class of an item by its name, like the properties of an item type
+                    foreach (var name in new[] { "CssClass", "CssClasses", "CssClassName" })
+                    {
+                        if (rowInstance?.FindFieldByPublicName(name) is StringField cssClassField)
+                        {
+                            editorParams["cssClassField"] = cssClassField.PublicName;
+                            break;
+                        }
+                    }
                 }
 
                 if (columnsMissing)
@@ -508,6 +554,85 @@ public partial class BasicPropertyProcessor : PropertyProcessor
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Sets the multiple option of an editor that has an option which means more than one value, e.g. a checklist or a
+    /// delimited value, as neither means anything on its own, and checks that the property can hold more than one value,
+    /// which a list or an array can, a string for a delimited value, and a set of flags, i.e. a [Flags] enum, whose
+    /// members selected are OR-ed together, for a checklist.
+    /// </summary>
+    /// <param name="source">The property source.</param>
+    /// <param name="item">The property item.</param>
+    private static void SetMultipleFromEditorParams(IPropertySource source, PropertyItem item)
+    {
+        var checkList = IsEditorOptionTrue(item.EditorParams, "checkList");
+        var delimited = IsEditorOptionTrue(item.EditorParams, "delimited");
+        if (!checkList && !delimited)
+            return;
+
+        if (!item.EditorParams.ContainsKey("multiple"))
+            item.EditorParams["multiple"] = true;
+
+        var valueType = source.ValueType;
+        if (valueType == null || valueType == typeof(object) ||
+            IsMultipleValueType(valueType) ||
+            (delimited && valueType == typeof(string)) ||
+            (!delimited && IsFlagsEnum(source.EnumType ?? valueType)))
+        {
+            return;
+        }
+
+        throw new InvalidOperationException(string.Format(
+            "The property '{0}' of '{1}' has an editor with the {2} option, but the property cannot hold more than one " +
+            "value. Use a list property, a string property along with the delimited option, or a [Flags] enum.",
+            source.Property?.Name ?? item.Name,
+            source.ReflectedType?.FullName ?? source.Property?.DeclaringType?.FullName,
+            checkList ? "checkList" : "delimited"));
+    }
+
+    /// <summary>
+    /// Whether an editor option is set to true, which an attribute sets as a boolean, and a script may set as a string.
+    /// </summary>
+    /// <param name="editorParams">The editor options.</param>
+    /// <param name="key">The key of the option.</param>
+    /// <returns>True when the option is set to true.</returns>
+    private static bool IsEditorOptionTrue(IDictionary<string, object?> editorParams, string key)
+    {
+        if (!editorParams.TryGetValue(key, out var value) || value == null)
+            return false;
+
+        return value is bool flag ? flag :
+            value is string text && string.Equals(text, "true", StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// Whether a type holds more than one value, e.g. a list or an array. A string is not one, though it is a list of
+    /// characters, as it holds more than one value only along with the delimited option.
+    /// </summary>
+    /// <param name="valueType">The type of the value.</param>
+    /// <returns>True when the type holds more than one value.</returns>
+    private static bool IsMultipleValueType(Type valueType)
+    {
+        if (valueType == typeof(string))
+            return false;
+
+        if (valueType.IsArray)
+            return true;
+
+        return valueType.GetInterfaces().Any(type => type.IsGenericType &&
+            type.GetGenericTypeDefinition() == typeof(IEnumerable<>));
+    }
+
+    /// <summary>
+    /// Whether a type is a set of flags, i.e. an enum with the <see cref="FlagsAttribute"/>, or a nullable one.
+    /// </summary>
+    /// <param name="type">The type.</param>
+    /// <returns>True for a set of flags.</returns>
+    private static bool IsFlagsEnum(Type? type)
+    {
+        type = type is null ? null : Nullable.GetUnderlyingType(type) ?? type;
+        return type is { IsEnum: true } && type.IsDefined(typeof(FlagsAttribute), inherit: false);
     }
 
     private static string AutoDetermineEditorType(Type valueType, Type? enumType, Dictionary<string, object?> editorParams)

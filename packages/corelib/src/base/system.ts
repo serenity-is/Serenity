@@ -280,6 +280,16 @@ export function registerEnum(enumType: any, name: string, optOrEnumKey?: string 
     enumKey?: string,
     /** Icon classes for enum values, numeric or string */
     enumIcons?: Record<string | number, string>,
+    /**
+     * Local text keys of the members that do not use the one their enum implies, i.e. `Enums.<enumKey>.<Member>`, e.g.
+     * `{ '2': 'My.Read.Key' }`. An empty string means the member has no key, and its text is shown as it is.
+     */
+    enumTextKeys?: Record<string | number, string>,
+    /**
+     * Texts of the members that are shown as they are, i.e. the ones that have no local text key, e.g.
+     * `{ '2': 'Read' }`. A member with a key does not need one, as its text comes from the local texts.
+     */
+    enumTexts?: Record<string | number, string>,
     /** Whether the enum is a set of flags, like a [Flags] enum on the server side, whose values are OR-ed together */
     enumFlags?: boolean
 }) {
@@ -306,6 +316,14 @@ export function registerEnum(enumType: any, name: string, optOrEnumKey?: string 
 
     if (iconClasses)
         typeInfo.enumIcons = Object.assign(typeInfo.enumIcons ?? {}, iconClasses);
+
+    if (optOrEnumKey != null && typeof optOrEnumKey === "object") {
+        if (optOrEnumKey.enumTextKeys)
+            typeInfo.enumTextKeys = Object.assign(typeInfo.enumTextKeys ?? {}, optOrEnumKey.enumTextKeys);
+
+        if (optOrEnumKey.enumTexts)
+            typeInfo.enumTexts = Object.assign(typeInfo.enumTexts ?? {}, optOrEnumKey.enumTexts);
+    }
 
     if (optOrEnumKey != null && typeof optOrEnumKey === "object" && optOrEnumKey.enumFlags != null)
         typeInfo.enumFlags = !!optOrEnumKey.enumFlags;
@@ -437,6 +455,31 @@ export const Enum = {
     getIconClass: (enumType: any, value: string | number): string | undefined => {
         const typeInfo = peekTypeInfo(enumType);
         return typeInfo?.enumIcons?.[value];
+    },
+
+    /**
+     * Returns the local text key that a member of an enum declares, which is not the one that its enum implies, i.e.
+     * `Enums.<enumKey>.<Member>`, e.g. one that a text attribute of the member gives. An empty string means the member
+     * has no key, and its text is shown as it is, see {@link getText}.
+     * @param enumType - Enum object.
+     * @param value - The value of the member.
+     * @returns The local text key of the member, or `undefined` when it uses the one its enum implies.
+     */
+    getTextKey: (enumType: any, value: string | number): string | undefined => {
+        const typeInfo = peekTypeInfo(enumType);
+        return typeInfo?.enumTextKeys?.[value];
+    },
+
+    /**
+     * Returns the text that a member of an enum shows as it is, e.g. the one of a member that has no local text key, and
+     * which the generator sends with the enum. A member with a key gets its text from the local texts instead.
+     * @param enumType - Enum object.
+     * @param value - The value of the member.
+     * @returns The literal text of the member, or `undefined` when it has a key.
+     */
+    getText: (enumType: any, value: string | number): string | undefined => {
+        const typeInfo = peekTypeInfo(enumType);
+        return typeInfo?.enumTexts?.[value];
     },
 
     /**

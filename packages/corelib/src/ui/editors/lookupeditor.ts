@@ -128,7 +128,25 @@ export abstract class LookupEditorBase<P extends LookupEditorOptions, TItem> ext
             return super.itemText(item);
 
         const textValue = (item as any)[lookup.textField];
-        return textValue == null ? '' : textValue.toString();
+        // an item may have no text of its own, and only a key, which localizeItemText gives the text of
+        return this.localizeItemText(textValue == null ? null : textValue.toString(), item);
+    }
+
+    /**
+     * Returns the field of an item that holds its local text key, which the lookup script can tell when the editor does
+     * not, e.g. one of a table that keeps its texts as keys.
+     * @returns The text key field.
+     */
+    protected override getTextKeyField() {
+        return super.getTextKeyField() ?? this.lookup?.textKeyField;
+    }
+
+    /**
+     * Returns the field of an item that holds its CSS class, which the lookup script can tell when the editor does not.
+     * @returns The CSS class field.
+     */
+    protected override getCssClassField() {
+        return super.getCssClassField() ?? this.lookup?.cssClassField;
     }
 
     protected getItemIcon(item: TItem, lookup: Lookup<TItem>): IconClassName {

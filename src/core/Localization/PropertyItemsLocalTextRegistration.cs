@@ -3,7 +3,7 @@ namespace Serenity.Localization;
 /// <summary>
 /// Contains initialization methods for adding local text keys implicitly defined by
 /// <see cref="DisplayNameAttribute"/>, <see cref="TabAttribute"/>, <see cref="PlaceholderAttribute"/>,
-/// <see cref="HintAttribute"/>, etc. attributes used in Form definitions.
+/// <see cref="HintAttribute"/>, <see cref="SelectItemAttribute"/>, etc. attributes used in Form definitions.
 /// </summary>
 public static class PropertyItemsLocalTextRegistration
 {
@@ -45,11 +45,11 @@ public static class PropertyItemsLocalTextRegistration
 
             // a text with a key property of its own, e.g. the placeholder of a quick filter: the text is the default
             // text of the key, or of the implied one when there is no key, and is never taken as a key itself
-            void addKeyedText(string? textKey, string? text, string impliedKey)
+            void addKeyedText(string? textKey, string? text, string? impliedKey)
             {
                 if (string.IsNullOrEmpty(textKey))
                 {
-                    if (!string.IsNullOrEmpty(text))
+                    if (!string.IsNullOrEmpty(text) && impliedKey != null)
                         registry.Add(languageID, impliedKey, text);
                 }
                 else if (!string.IsNullOrEmpty(text))
@@ -61,6 +61,10 @@ public static class PropertyItemsLocalTextRegistration
             void addAttributeText(Attribute attribute, string? text, string suffix)
             {
                 var resolved = LocalText.ResolveFromAttribute(attribute, text, textPrefix + suffix);
+                // a text with an empty key is shown as it is, so it has no key of its own, nor an implied one
+                if (resolved.Literal)
+                    return;
+
                 if (resolved.Key is not string key)
                 {
                     if (!string.IsNullOrEmpty(resolved.Text))
@@ -101,6 +105,22 @@ public static class PropertyItemsLocalTextRegistration
 
                 if (getAttribute<PlaceholderAttribute>() is PlaceholderAttribute placeholderAttr)
                     addAttributeText(placeholderAttr, placeholderAttr.Value, member.Name + "_Placeholder");
+
+                // the items of a select editor, with the keys that their form implies for them, e.g.
+                // Priority_SelectItem_low, which the editor localizes, and whose text is what the key falls back to; an
+                // item without a text has nothing to translate, as its value is its text, and one with an empty key,
+                // i.e. LocalText.Literal, is shown as it is, e.g. one whose text is a name
+                foreach (var selectItemAttr in getAttributes<SelectItemAttribute>())
+                {
+                    var resolved = LocalText.ResolveFromAttribute(selectItemAttr, selectItemAttr.Text,
+                        string.IsNullOrEmpty(selectItemAttr.Text) ? null :
+                            textPrefix + member.Name + "_SelectItem_" + selectItemAttr.Value);
+
+                    if (resolved.Literal || string.IsNullOrEmpty(resolved.Key))
+                        continue;
+
+                    addKeyedText(resolved.Key, resolved.Text, impliedKey: null);
+                }
 
                 if (getAttribute<QuickFilterAttribute>() is QuickFilterAttribute quickFilterAttr)
                     addKeyedText(quickFilterAttr.PlaceholderKey, quickFilterAttr.Placeholder,

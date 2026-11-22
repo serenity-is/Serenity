@@ -18,6 +18,15 @@ public class LocalText(string? key) : ILocalText
     public const string InvariantLanguageID = "";
 
     /// <summary>
+    /// An empty local text key, which tells that a text is shown as it is, e.g. a text that is a name. Set it as the
+    /// <c>TextKey</c> of a text attribute, e.g. <c>[DisplayText("Acme Corporation", TextKey = LocalText.Literal)]</c>, so
+    /// that the text is neither used as a key nor registered under the key that its type implies for it, e.g.
+    /// <c>Forms.….Field</c>. A key that is not set is different: the text then takes the implied key, so it can be
+    /// translated. An empty key is also no key in the texts of the members of an enum and the items of a select editor.
+    /// </summary>
+    public const string Literal = "";
+
+    /// <summary>
     /// An empty local text instance, similar to <see cref="string.Empty"/>.
     /// </summary>
     public static readonly LocalText Empty;
@@ -115,9 +124,14 @@ public class LocalText(string? key) : ILocalText
 
         if (attribute is IHasTextKey hasTextKey)
         {
+            // the attribute properties that hold a key do not accept null, so an empty one is a key that is explicitly
+            // set to none, e.g. a text that is a name, while one that is not set takes the key that its type implies
             var textKey = hasTextKey.TextKey;
             if (!string.IsNullOrEmpty(textKey))
                 return new(textKey, text, true);
+
+            if (textKey != null)
+                return new(null, text, false, literal: true);
 
             return new(defaultKey, text, false);
         }

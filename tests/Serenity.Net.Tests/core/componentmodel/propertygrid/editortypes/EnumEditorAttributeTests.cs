@@ -125,4 +125,33 @@ public class EnumEditorAttributeTests
 
         Assert.Equal("My.WidgetCategory", attribute.EnumKey);
     }
+
+    [Fact]
+    public void SummaryConstants_Are_The_Same_On_All_The_Attributes()
+    {
+        // an attribute can not pass null, so -1 is the value that names all the selected items, as null does on the client
+        Assert.Equal(-1, LookupEditorBaseAttribute.SummaryNamesAll);
+        Assert.Equal(0, LookupEditorBaseAttribute.SummaryCountOnly);
+        Assert.Equal(LookupEditorBaseAttribute.SummaryNamesAll, ServiceLookupEditorBaseAttribute.SummaryNamesAll);
+        Assert.Equal(LookupEditorBaseAttribute.SummaryCountOnly, ServiceLookupEditorBaseAttribute.SummaryCountOnly);
+
+        var attribute = new EnumEditorAttribute { MaxSummaryItems = EnumEditorAttribute.SummaryNamesAll };
+        var options = new Dictionary<string, object?>();
+        attribute.SetParams(options);
+        Assert.Equal(-1, options["maxSummaryItems"]);
+    }
+
+    [Fact]
+    public void SearchConstants_Are_The_Same_On_All_The_Attributes()
+    {
+        Assert.Equal(0, LookupEditorBaseAttribute.AlwaysShowSearch);
+        Assert.Equal(-1, LookupEditorBaseAttribute.NeverShowSearch);
+        Assert.Equal(LookupEditorBaseAttribute.AlwaysShowSearch, ServiceLookupEditorBaseAttribute.AlwaysShowSearch);
+        Assert.Equal(LookupEditorBaseAttribute.NeverShowSearch, ServiceLookupEditorBaseAttribute.NeverShowSearch);
+
+        var attribute = new EnumEditorAttribute { MinimumResultsForSearch = EnumEditorAttribute.NeverShowSearch };
+        var options = new Dictionary<string, object?>();
+        attribute.SetParams(options);
+        Assert.Equal(-1, options["minimumResultsForSearch"]);
+    }
 }

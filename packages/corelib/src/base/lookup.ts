@@ -11,6 +11,10 @@ export interface LookupOptions<TItem> {
     textField?: string;
     /** Name of the field that holds the icon for an item. */
     iconField?: string;
+    /** Name of the field that holds the local text key of an item, e.g. of a table that keeps its texts as keys. */
+    textKeyField?: string;
+    /** Name of the field that holds the CSS class of an item, e.g. "text-danger". */
+    cssClassField?: string;
 }
 
 /**
@@ -31,6 +35,10 @@ export interface Lookup<TItem> {
     textField: string;
     /** Name of the icon field (copied from {@link LookupOptions.iconField}). */
     iconField: string;
+    /** Name of the text key field (copied from {@link LookupOptions.textKeyField}). */
+    textKeyField: string;
+    /** Name of the CSS class field (copied from {@link LookupOptions.cssClassField}). */
+    cssClassField: string;
 }
 
 /**
@@ -56,6 +64,10 @@ export class Lookup<TItem> {
     declare public textField: string;
     /** Name of the field that holds the icon for an item (from constructor options). */
     declare public iconField: string;
+    /** Name of the field that holds the local text key of an item (from constructor options). */
+    declare public textKeyField: string;
+    /** Name of the field that holds the CSS class of an item (from constructor options). */
+    declare public cssClassField: string;
 
     /**
      * Creates a new lookup instance.
@@ -70,6 +82,8 @@ export class Lookup<TItem> {
         this.parentIdField = options.parentIdField;
         this.textField = options.textField;
         this.iconField = options.iconField;
+        this.textKeyField = options.textKeyField;
+        this.cssClassField = options.cssClassField;
 
         if (items != null)
             this.update(items);

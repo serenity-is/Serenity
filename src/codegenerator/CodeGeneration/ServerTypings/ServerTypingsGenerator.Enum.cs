@@ -42,6 +42,28 @@ public partial class ServerTypingsGenerator
         return string.IsNullOrEmpty(module) ? name : module + "." + name;
     }    
 
+    /// <summary>
+    /// Returns the text and the local text key of an enum member, which its text attributes give, along with whether
+    /// the key is empty, i.e. the text is shown as it is, and nothing is registered for it. A member whose key is the one
+    /// its enum implies, i.e. "Enums.&lt;enumKey&gt;.&lt;Member&gt;", needs neither to travel to the client.
+    /// </summary>
+    private static (string? Text, string? TextKey) GetEnumTextFor(FieldDefinition field)
+    {
+        var textAttr = TypingsUtils.FindAttr(field.GetAttributes(), "Serenity.ComponentModel", "DisplayTextAttribute") ??
+            TypingsUtils.FindAttr(field.GetAttributes(), "Serenity.ComponentModel", "DescriptionTextAttribute") ??
+            TypingsUtils.FindAttr(field.GetAttributes(), "System.ComponentModel", "DescriptionAttribute");
+        if (textAttr is null)
+            return (null, null);
+
+        var text = textAttr.ConstructorArguments()?.Count > 0 ? textAttr.ConstructorArguments()[0].Value as string : null;
+        string? textKey = null;
+        var named = textAttr.NamedArguments();
+        if (named != null && named.FirstOrDefault(x => string.Equals(x.Name(), "TextKey")) is { } keyArg)
+            textKey = keyArg.ArgumentValue() as string;
+
+        return (text, textKey);
+    }
+
     private static string? GetEnumIconFor(FieldDefinition field)
     {
         var iconAttr = field.HasCustomAttributes() ?
@@ -61,7 +83,8 @@ public partial class ServerTypingsGenerator
     /// option gives the members selected as one number.
     /// </summary>
     private void WriteEnumRegistration(string identifier, string fullName, string? enumKey,
-        IReadOnlyList<(string Key, string Icon)> icons, bool flags = false)
+        IReadOnlyList<(string Key, string Value)> icons, bool flags = false,
+        IReadOnlyList<(string Key, string Value)>? textKeys = null, IReadOnlyList<(string Key, string Value)>? texts = null)
     {
         var registerEnum = ImportFromCorelib("registerEnum");
         cw.Indented($"{registerEnum}(");
@@ -71,9 +94,12 @@ public partial class ServerTypingsGenerator
         sb.Append(fullName);
         sb.Append('\'');
 
-        // the options are only written when a member has an icon or the enum is a set of flags, so the others keep the
-        // simpler calls
-        if (icons.Count == 0 && !flags)
+        var hasTextKeys = textKeys?.Count > 0;
+        var hasTexts = texts?.Count > 0;
+
+        // the options are only written when a member has an icon, a text key of its own, a literal text, or the enum is
+        // a set of flags, so the others keep the simpler calls
+        if (icons.Count == 0 && !flags && !hasTextKeys && !hasTexts)
         {
             if (enumKey != fullName)
             {
@@ -90,39 +116,65 @@ public partial class ServerTypingsGenerator
         sb.AppendLine(", {");
         cw.Block(delegate
         {
+            // the options that are written, in their order, each followed by a comma when another follows
+            var parts = new List<Action>();
+
             if (enumKey != fullName)
             {
-                cw.Indented("enumKey: '");
-                sb.Append(enumKey);
-                sb.Append('\'');
-                sb.AppendLine(flags || icons.Count > 0 ? "," : "");
+                parts.Add(delegate
+                {
+                    cw.Indented("enumKey: '");
+                    sb.Append(enumKey);
+                    sb.Append('\'');
+                });
             }
 
             if (flags)
-                cw.IndentedLine(icons.Count > 0 ? "enumFlags: true," : "enumFlags: true");
+                parts.Add(() => cw.Indented("enumFlags: true"));
 
-            if (icons.Count == 0)
-                return;
+            if (hasTextKeys)
+                parts.Add(() => WriteEnumMap("enumTextKeys", textKeys!));
 
-            cw.IndentedLine("enumIcons: {");
-            cw.Block(delegate
+            if (hasTexts)
+                parts.Add(() => WriteEnumMap("enumTexts", texts!));
+
+            if (icons.Count > 0)
+                parts.Add(() => WriteEnumMap("enumIcons", icons));
+
+            for (var i = 0; i < parts.Count; i++)
             {
-                for (var i = 0; i < icons.Count; i++)
-                {
-                    if (i > 0)
-                        sb.AppendLine(",");
+                if (i > 0)
+                    sb.AppendLine(",");
 
-                    cw.Indented(icons[i].Key);
-                    sb.Append(": ");
-                    sb.Append(icons[i].Icon.ToSingleQuoted());
-                }
+                parts[i]();
+            }
 
-                sb.AppendLine();
-            });
-            cw.Indented("}");
             sb.AppendLine();
         });
         cw.IndentedLine("});");
+    }
+
+    /// <summary>
+    /// Writes a map of enum values to strings, e.g. the local text keys of the members of an enum.
+    /// </summary>
+    private void WriteEnumMap(string name, IReadOnlyList<(string Key, string Value)> entries)
+    {
+        cw.IndentedLine(name + ": {");
+        cw.Block(delegate
+        {
+            for (var i = 0; i < entries.Count; i++)
+            {
+                if (i > 0)
+                    sb.AppendLine(",");
+
+                cw.Indented(entries[i].Key);
+                sb.Append(": ");
+                sb.Append(entries[i].Value.ToSingleQuoted());
+            }
+
+            sb.AppendLine();
+        });
+        cw.Indented("}");
     }
 
     private void GenerateEnum(TypeDefinition enumType)
@@ -165,11 +217,32 @@ public partial class ServerTypingsGenerator
         // quoted as a negative number is not valid as an object key
         var icons = fields.Where(x => !string.IsNullOrEmpty(x.Icon))
             .GroupBy(x => x.Value)
-            .Select(group => (Key: $"'{group.Key}'", Icon: group.First().Icon!))
+            .Select(group => (Key: $"'{group.Key}'", Value: group.First().Icon!))
             .ToList();
 
         var flags = TypingsUtils.FindAttr(enumType.GetAttributes(), "System", "FlagsAttribute") != null;
 
-        WriteEnumRegistration(identifier, fullName, enumKey, icons, flags);
+        // a member whose text key is the one its enum implies, i.e. "Enums.<enumKey>.<Member>", needs nothing, as the
+        // client can work it out; only one with a key of its own, or with an empty key, is told
+        var textKeys = new List<(string Key, string Value)>();
+        var texts = new List<(string Key, string Value)>();
+        foreach (var field in fields.GroupBy(x => x.Value).Select(group => group.First()))
+        {
+            var impliedKey = "Enums." + enumKey + "." + field.Field.Name;
+            var (text, textKey) = GetEnumTextFor(field.Field);
+            var valueKey = $"'{field.Value}'";
+
+            // an empty key is no key: the member is shown as it is, and its text travels with the enum
+            if (textKey is { Length: 0 })
+            {
+                textKeys.Add((valueKey, ""));
+                if (!string.IsNullOrEmpty(text))
+                    texts.Add((valueKey, text));
+            }
+            else if (!string.IsNullOrEmpty(textKey) && textKey != impliedKey)
+                textKeys.Add((valueKey, textKey));
+        }
+
+        WriteEnumRegistration(identifier, fullName, enumKey, icons, flags, textKeys, texts);
     }
 }

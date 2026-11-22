@@ -2983,6 +2983,10 @@ export interface LookupOptions<TItem> {
     textField?: string;
     /** Name of the field that holds the icon for an item. */
     iconField?: string;
+    /** Name of the field that holds the local text key of an item, e.g. of a table that keeps its texts as keys. */
+    textKeyField?: string;
+    /** Name of the field that holds the CSS class of an item, e.g. "text-danger". */
+    cssClassField?: string;
 }
 /**
  * Client-side lookup data structure that holds a flat list of items and a fast key-based index.
@@ -3004,6 +3008,10 @@ export interface Lookup<TItem> {
     textField: string;
     /** Name of the icon field (copied from {@link LookupOptions.iconField}). */
     iconField: string;
+    /** Name of the text key field (copied from {@link LookupOptions.textKeyField}). */
+    textKeyField: string;
+    /** Name of the CSS class field (copied from {@link LookupOptions.cssClassField}). */
+    cssClassField: string;
 }
 /**
  * Concrete implementation of the {@link Lookup} interface for client-side use.
@@ -3030,6 +3038,10 @@ export declare class Lookup<TItem> {
     textField: string;
     /** Name of the field that holds the icon for an item (from constructor options). */
     iconField: string;
+    /** Name of the field that holds the local text key of an item (from constructor options). */
+    textKeyField: string;
+    /** Name of the field that holds the CSS class of an item (from constructor options). */
+    cssClassField: string;
     /**
      * Creates a new lookup instance.
      * @param options - Field mapping for id/parent/text. Pass `null`/`undefined` for an empty configuration (fields remain `undefined`).
@@ -3788,6 +3800,13 @@ export type TypeInfo<TypeName> = {
     enumKind?: "numeric" | "string";
     /** Icon classes mapping enum values (numeric or string) to icon class names */
     enumIcons?: Record<string | number, string>;
+    /**
+     * Local text keys of the enum members that do not use the one their enum implies, e.g.
+     * `{ '2': 'My.Read.Key' }`, of which an empty string means the member has no key, and its text is shown as it is.
+     */
+    enumTextKeys?: Record<string | number, string>;
+    /** Texts of the enum members that are shown as they are, i.e. the ones that have no local text key */
+    enumTexts?: Record<string | number, string>;
     /** Registered flag */
     registered?: boolean;
 };
@@ -3928,6 +3947,16 @@ export declare function registerEnum(enumType: any, name: string, optOrEnumKey?:
     enumKey?: string;
     /** Icon classes for enum values, numeric or string */
     enumIcons?: Record<string | number, string>;
+    /**
+     * Local text keys of the members that do not use the one their enum implies, i.e. `Enums.<enumKey>.<Member>`, e.g.
+     * `{ '2': 'My.Read.Key' }`. An empty string means the member has no key, and its text is shown as it is.
+     */
+    enumTextKeys?: Record<string | number, string>;
+    /**
+     * Texts of the members that are shown as they are, i.e. the ones that have no local text key, e.g.
+     * `{ '2': 'Read' }`. A member with a key does not need one, as its text comes from the local texts.
+     */
+    enumTexts?: Record<string | number, string>;
     /** Whether the enum is a set of flags, like a [Flags] enum on the server side, whose values are OR-ed together */
     enumFlags?: boolean;
 }): void;
@@ -3965,6 +3994,23 @@ export declare const Enum: {
      * @returns Icon class name or undefined if not found
      */
     getIconClass: (enumType: any, value: string | number) => string | undefined;
+    /**
+     * Returns the local text key that a member of an enum declares, which is not the one that its enum implies, i.e.
+     * `Enums.<enumKey>.<Member>`, e.g. one that a text attribute of the member gives. An empty string means the member
+     * has no key, and its text is shown as it is, see {@link getText}.
+     * @param enumType - Enum object.
+     * @param value - The value of the member.
+     * @returns The local text key of the member, or `undefined` when it uses the one its enum implies.
+     */
+    getTextKey: (enumType: any, value: string | number) => string | undefined;
+    /**
+     * Returns the text that a member of an enum shows as it is, e.g. the one of a member that has no local text key, and
+     * which the generator sends with the enum. A member with a key gets its text from the local texts instead.
+     * @param enumType - Enum object.
+     * @param value - The value of the member.
+     * @returns The literal text of the member, or `undefined` when it has a key.
+     */
+    getText: (enumType: any, value: string | number) => string | undefined;
     /**
      * Returns all values of an enum as an array, in their declaration order. A numeric enum returns its numeric
      * values, a string enum returns the string values of its members.
@@ -10229,6 +10275,15 @@ export interface ComboboxItem<TSource = any> {
     icon?: IconClassName;
     /** The source item. */
     source?: TSource;
+    /**
+     * The local text key of the text of the item, which the editor localizes when it is told which field of an item
+     * holds it, see `ComboboxCommonOptions.textKeyField`. An item whose text is not given has the text of its key.
+     */
+    textKey?: string;
+    /**
+     * The CSS class of the item, e.g. "text-danger", which the editors that show the class of an item add to it.
+     */
+    cssClass?: string;
     /** Whether the item is disabled. */
     disabled?: boolean;
 }
@@ -10472,7 +10527,11 @@ export interface ComboboxCommonOptions {
     allowClear?: boolean;
     /** Whether multiple items can be selected. */
     delimited?: boolean;
-    /** Minimum results required to show the search box. */
+    /**
+     * Minimum results required to show the search box. 0 shows it for any number of results, and a negative value,
+     * e.g. -1, hides it permanently, see `AlwaysShowSearch` and `NeverShowSearch` of the attributes. When it is not set,
+     * it is {@link ComboboxEditorDefaults.minimumResultsForSearch}.
+     */
     minimumResultsForSearch?: number;
     /** Whether multiple items can be selected. */
     multiple?: boolean;
@@ -10491,6 +10550,17 @@ export interface ComboboxCommonOptions {
      */
     placeholderIcon?: IconClassName;
     /**
+     * The field of an item, e.g. the column of a lookup, that holds its local text key, which the editor localizes, or
+     * "text" when the text of an item is its key. When it is not set, the text of an item is shown as it is, which is
+     * what a lookup or a list service does by default, as their texts are data, and may look like keys.
+     */
+    textKeyField?: string;
+    /**
+     * The field of an item, e.g. the column of a lookup, that holds its CSS class, e.g. "text-danger", which the editor
+     * adds to the item in its results, as a class of the item itself does.
+     */
+    cssClassField?: string;
+    /**
      * Whether a checklist, see {@link checkList}, has an item that selects all the results that are shown, or clears
      * them when they are all selected. Its text tells which: "Select all", "Select all matching" when something is
      * typed, or "Select shown" when there are more results than the ones that are loaded, e.g. of an asynchronous
@@ -10499,7 +10569,11 @@ export interface ComboboxCommonOptions {
     selectAll?: boolean;
     /**
      * How many of the selected items the summary of a checklist, see {@link checkList}, names before it counts the
-     * rest, e.g. 3 for "A, B, C +2". Default is {@link ComboboxEditorDefaults.maxSummaryItems}.
+     * rest, e.g. 3 for "A, B, C +2". Zero names none of them, and shows how many are selected, e.g. "4 selected", and
+     * -1 names them all, and shows how many are selected at the end, e.g. "A, B, C, D (4)", of which the styles cut what
+     * does not fit, see `SummaryCountOnly` and `SummaryNamesAll` of the attributes. The other negative values are
+     * reserved for summaries to come, which name them all until then. When it is not set, or null, it is
+     * {@link ComboboxEditorDefaults.maxSummaryItems}, which is -1.
      */
     maxSummaryItems?: number;
 }
@@ -10553,7 +10627,10 @@ export interface ComboboxEditorDefaults {
     emptyItemText: string | (() => string);
     /** The default of {@link ComboboxCommonOptions.minimumResultsForSearch}. Not set by default, so the select shows a search box for any number of results. */
     minimumResultsForSearch?: number;
-    /** The default of {@link ComboboxCommonOptions.maxSummaryItems}. Default is 3. */
+    /**
+     * The default of {@link ComboboxCommonOptions.maxSummaryItems}. Default is -1, which names them all, with the count
+     * of the selection after them.
+     */
     maxSummaryItems: number;
 }
 /**
@@ -10764,6 +10841,28 @@ export declare class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
      * @param disabled - Whether the option is disabled.
      */
     addOption(key: string, text: string, source?: any, disabled?: boolean): void;
+    /**
+     * Returns the field of an item that holds its local text key, see {@link ComboboxCommonOptions.textKeyField}, which
+     * a lookup can also tell in its script, e.g. one of a table that keeps its texts as keys.
+     */
+    protected getTextKeyField(): string;
+    /**
+     * Returns the field of an item that holds its CSS class, see {@link ComboboxCommonOptions.cssClassField}, which a
+     * lookup can also tell in its script.
+     */
+    protected getCssClassField(): string;
+    /**
+     * Returns the CSS class of an item, from the field that the editor or its source gives, see
+     * {@link ComboboxCommonOptions.cssClassField}.
+     */
+    protected itemCssClass(item: any): string;
+    /**
+     * Returns the text of an item, localized when the editor says which field of it holds the local text key, see
+     * {@link ComboboxCommonOptions.textKeyField}. An item may have no text of its own, only the key, in which case its
+     * text is what the key gives, and the key itself when there is no text for it, as a key is readable enough. A null
+     * or an empty text is no text, which the styles show as an empty cell, not as a missing one.
+     */
+    protected localizeItemText(text: string | null | undefined, source?: any): string;
     /**
      * Adds the in-place create button.
      * @param addTitle - Title for the add button.
@@ -11085,7 +11184,11 @@ export declare class SelectEditor<P extends SelectEditorOptions = SelectEditorOp
  * Options for the {@link SelectEditor}.
  */
 export interface SelectEditorOptions extends ComboboxCommonOptions {
-    /** Items to display; each is a value or a [value, text] pair. */
+    /**
+     * Items to display; each is a value, a [value, text] pair, or an object with the fields of a combobox item, e.g.
+     * `{ id, text, textKey, icon }`, whose text key is localized when the editor gives its field, see
+     * {@link ComboboxCommonOptions.textKeyField}.
+     */
     items?: any[];
     /** Text for the empty option. */
     emptyOptionText?: string;
@@ -15718,7 +15821,18 @@ export declare abstract class LookupEditorBase<P extends LookupEditorOptions, TI
      * @param lookup - The lookup.
      * @returns The item text.
      */
-    protected getItemText(item: TItem, lookup: Lookup<TItem>): any;
+    protected getItemText(item: TItem, lookup: Lookup<TItem>): string;
+    /**
+     * Returns the field of an item that holds its local text key, which the lookup script can tell when the editor does
+     * not, e.g. one of a table that keeps its texts as keys.
+     * @returns The text key field.
+     */
+    protected getTextKeyField(): string;
+    /**
+     * Returns the field of an item that holds its CSS class, which the lookup script can tell when the editor does not.
+     * @returns The CSS class field.
+     */
+    protected getCssClassField(): string;
     protected getItemIcon(item: TItem, lookup: Lookup<TItem>): IconClassName;
     /**
      * Maps an item to a combobox item.

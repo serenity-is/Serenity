@@ -1,5 +1,5 @@
 import { bindThis } from "@serenity-is/domwise";
-import { Authorization, Fluent, IconClassName, PropertyItem, SelectEditorTexts, iconClassName, isPromiseLike, nsSerenity, setElementReadOnly, stringFormat } from "../../base";
+import { Authorization, Fluent, IconClassName, PropertyItem, SelectEditorTexts, iconClassName, isPromiseLike, localText, nsSerenity, setElementReadOnly, stringFormat } from "../../base";
 import { ValidationHelper } from "../../compat";
 import { IEditDialog, IGetEditValue, IReadOnly, ISetEditValue, IStringValue } from "../../interfaces";
 import { DialogType } from "../../types/dialogtype";
@@ -20,7 +20,11 @@ export interface ComboboxCommonOptions {
     allowClear?: boolean;
     /** Whether multiple items can be selected. */
     delimited?: boolean;
-    /** Minimum results required to show the search box. */
+    /**
+     * Minimum results required to show the search box. 0 shows it for any number of results, and a negative value,
+     * e.g. -1, hides it permanently, see `AlwaysShowSearch` and `NeverShowSearch` of the attributes. When it is not set,
+     * it is {@link ComboboxEditorDefaults.minimumResultsForSearch}.
+     */
     minimumResultsForSearch?: number;
     /** Whether multiple items can be selected. */
     multiple?: boolean;
@@ -39,6 +43,17 @@ export interface ComboboxCommonOptions {
      */
     placeholderIcon?: IconClassName;
     /**
+     * The field of an item, e.g. the column of a lookup, that holds its local text key, which the editor localizes, or
+     * "text" when the text of an item is its key. When it is not set, the text of an item is shown as it is, which is
+     * what a lookup or a list service does by default, as their texts are data, and may look like keys.
+     */
+    textKeyField?: string;
+    /**
+     * The field of an item, e.g. the column of a lookup, that holds its CSS class, e.g. "text-danger", which the editor
+     * adds to the item in its results, as a class of the item itself does.
+     */
+    cssClassField?: string;
+    /**
      * Whether a checklist, see {@link checkList}, has an item that selects all the results that are shown, or clears
      * them when they are all selected. Its text tells which: "Select all", "Select all matching" when something is
      * typed, or "Select shown" when there are more results than the ones that are loaded, e.g. of an asynchronous
@@ -47,7 +62,11 @@ export interface ComboboxCommonOptions {
     selectAll?: boolean;
     /**
      * How many of the selected items the summary of a checklist, see {@link checkList}, names before it counts the
-     * rest, e.g. 3 for "A, B, C +2". Default is {@link ComboboxEditorDefaults.maxSummaryItems}.
+     * rest, e.g. 3 for "A, B, C +2". Zero names none of them, and shows how many are selected, e.g. "4 selected", and
+     * -1 names them all, and shows how many are selected at the end, e.g. "A, B, C, D (4)", of which the styles cut what
+     * does not fit, see `SummaryCountOnly` and `SummaryNamesAll` of the attributes. The other negative values are
+     * reserved for summaries to come, which name them all until then. When it is not set, or null, it is
+     * {@link ComboboxEditorDefaults.maxSummaryItems}, which is -1.
      */
     maxSummaryItems?: number;
 }
@@ -105,7 +124,10 @@ export interface ComboboxEditorDefaults {
     emptyItemText: string | (() => string);
     /** The default of {@link ComboboxCommonOptions.minimumResultsForSearch}. Not set by default, so the select shows a search box for any number of results. */
     minimumResultsForSearch?: number;
-    /** The default of {@link ComboboxCommonOptions.maxSummaryItems}. Default is 3. */
+    /**
+     * The default of {@link ComboboxCommonOptions.maxSummaryItems}. Default is -1, which names them all, with the count
+     * of the selection after them.
+     */
     maxSummaryItems: number;
 }
 
@@ -291,9 +313,8 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
      */
     protected itemText(item: TItem): string {
         const value = (item as any)[this.getTextField()];
-        if (value == null)
-            return '';
-        return value.toString();
+        // an item may have no text of its own, and only a key, which localizeItemText gives the text of
+        return this.localizeItemText(value == null ? null : value.toString(), item);
     }
 
     /**
@@ -335,6 +356,7 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
             text: this.itemText(item),
             disabled: this.itemDisabled(item),
             icon: this.itemIcon(item),
+            cssClass: this.itemCssClass(item),
             source: item
         };
     }
@@ -362,7 +384,10 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
      * @returns True when multiple.
      */
     protected isMultiple() {
-        return !!(this.options as ComboboxEditorOptions).multiple;
+        const options = this.options as ComboboxEditorOptions;
+        // a checklist is a shape of a multiple editor, and a delimited value is one of more than one item, so both imply
+        // it, as neither means anything on its own
+        return !!options.multiple || !!options.checkList || !!options.delimited;
     }
 
     /**
@@ -375,7 +400,7 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
     /** The defaults of the combobox editors, see {@link ComboboxEditorDefaults}. */
     public static readonly defaults: ComboboxEditorDefaults = {
         emptyItemText: "",
-        maxSummaryItems: 3
+        maxSummaryItems: -1
     };
 
     /**
@@ -388,7 +413,9 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
             multiple: this.isMultiple(),
             placeholder: emptyItemText || null,
             allowClear: this.allowClear(),
-            arbitraryValues: this.isAutoComplete()
+            arbitraryValues: this.isAutoComplete(),
+            // the size of the pages that a source, e.g. a list service, is asked for, see getPageSize
+            pageSize: this.getPageSize()
         }
 
         if (this.hasAsyncSource()) {
@@ -462,6 +489,10 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
                 };
             };
         }
+
+        // the class of an item, e.g. text-danger, is a class of the result itself, which the styles of a select show,
+        // along with the css of an item, which is what select2 reads by default
+        opt.formatResultCssClass ??= item => [item?.cssClass, (item as any)?.css].filter(x => x).join(" ") || undefined;
 
         const minSearch = (this.options as ComboboxEditorOptions).minimumResultsForSearch ?? ComboboxEditor.defaults.minimumResultsForSearch;
         if (minSearch != null)
@@ -550,21 +581,39 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
         }
 
         container.classList.remove("select2-selection-placeholder");
-        const texts = items.map(x => x.text).filter(x => x != null && x !== "");
-        const max = this.comboboxOptions.maxSummaryItems ?? ComboboxEditor.defaults.maxSummaryItems;
+        const named = items.filter(x => x.text != null && x.text !== "");
+        // an option that is not given, or null, takes the default, which may also be not set
+        const max = this.comboboxOptions.maxSummaryItems ?? ComboboxEditor.defaults.maxSummaryItems ?? -1;
 
-        if (!texts.length) {
+        if (named.length)
+            container.setAttribute("title", named.map(x => x.text).join(", "));
+
+        // an editor whose items have no text, or one that is told to name none of them, shows the count of the selection
+        if (!named.length || max === 0) {
             container.textContent = stringFormat(SelectEditorTexts.SelectedItems, items.length);
             return;
         }
 
-        // the count of the rest is an element of its own, which the styles keep whole, so that the names are the ones
-        // that are cut when the summary does not fit, and the count is always seen
-        container.append(<span class="select2-selection-summary-text">{texts.slice(0, max).join(", ")}</span>);
-        if (texts.length > max)
-            container.append(<span class="select2-selection-summary-more">{"+" + (texts.length - max)}</span>);
+        // a summary without a limit names every item, and leaves the cutting to the styles, as the width of the control
+        // is what decides how many of the names are seen, so it shows how many are selected instead of the rest, which
+        // is what -1 says, while the other negative ones are reserved for summaries to come
+        const namesAll = max < 0;
+        const shown = namesAll ? named : named.slice(0, max);
 
-        container.setAttribute("title", texts.join(", "));
+        // the count is an element of its own, which the styles keep whole, so that the names are the ones that are cut
+        // when the summary does not fit, and the count is always seen
+        container.append(<span class="select2-selection-summary-text">
+            {shown.map((item, i) => <>
+                {i ? ", " : null}
+                {item.icon ? <><i class={iconClassName(item.icon)}></i>{" "}</> : null}
+                {item.text}
+            </>)}
+        </span>);
+
+        if (namesAll)
+            container.append(<span class="select2-selection-summary-more">{"(" + items.length + ")"}</span>);
+        else if (named.length > max)
+            container.append(<span class="select2-selection-summary-more">{"+" + (named.length - max)}</span>);
     }
 
     /**
@@ -645,10 +694,55 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
     public addOption(key: string, text: string, source?: any, disabled?: boolean) {
         this.addItem({
             id: key,
-            text: text,
+            text: this.localizeItemText(text, source),
+            cssClass: source?.cssClass ?? this.itemCssClass(source),
             source: source,
             disabled: disabled
         });
+    }
+
+    /**
+     * Returns the field of an item that holds its local text key, see {@link ComboboxCommonOptions.textKeyField}, which
+     * a lookup can also tell in its script, e.g. one of a table that keeps its texts as keys.
+     */
+    protected getTextKeyField(): string {
+        return this.comboboxOptions.textKeyField;
+    }
+
+    /**
+     * Returns the field of an item that holds its CSS class, see {@link ComboboxCommonOptions.cssClassField}, which a
+     * lookup can also tell in its script.
+     */
+    protected getCssClassField(): string {
+        return this.comboboxOptions.cssClassField;
+    }
+
+    /**
+     * Returns the CSS class of an item, from the field that the editor or its source gives, see
+     * {@link ComboboxCommonOptions.cssClassField}.
+     */
+    protected itemCssClass(item: any): string {
+        const field = this.getCssClassField();
+        const value = field ? item?.[field] : undefined;
+        return value == null ? undefined : value.toString();
+    }
+
+    /**
+     * Returns the text of an item, localized when the editor says which field of it holds the local text key, see
+     * {@link ComboboxCommonOptions.textKeyField}. An item may have no text of its own, only the key, in which case its
+     * text is what the key gives, and the key itself when there is no text for it, as a key is readable enough. A null
+     * or an empty text is no text, which the styles show as an empty cell, not as a missing one.
+     */
+    protected localizeItemText(text: string | null | undefined, source?: any) {
+        const field = this.getTextKeyField();
+        if (!field)
+            return text ?? "";
+
+        const key = field === "text" ? text : source?.[field];
+        if (key == null || key === "")
+            return text ?? "";
+
+        return localText(key, text ?? undefined);
     }
 
     /**

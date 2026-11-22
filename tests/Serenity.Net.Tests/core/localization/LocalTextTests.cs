@@ -4,7 +4,7 @@ namespace Serenity;
 
 public class LocalTextTests
 {
-    [DisplayText("Literal display", TextKey = "")]
+    [DisplayText("Literal display", TextKey = LocalText.Literal)]
     private class AttributeWithEmptyTextKey
     {
     }
@@ -37,15 +37,31 @@ public class LocalTextTests
     }
 
     [Fact]
-    public void ResolveFromAttribute_Treats_EmptyTextKey_As_Unspecified()
+    public void ResolveFromAttribute_Treats_EmptyTextKey_As_A_Literal_Text()
     {
         var attribute = typeof(AttributeWithEmptyTextKey).GetCustomAttribute<DisplayTextAttribute>();
 
+        // the attribute properties that hold a key do not accept null, so an empty key is one that is explicitly set to
+        // none, e.g. for a text that is a name, and the key that the type implies for it is not used either
         var result = LocalText.ResolveFromAttribute(attribute!, "Literal display", "Forms.Test.Field");
 
-        Assert.Equal("Forms.Test.Field", result.Key);
+        Assert.Null(result.Key);
         Assert.Equal("Literal display", result.Text);
         Assert.False(result.IsKey);
+        Assert.True(result.Literal);
+    }
+
+    [Fact]
+    public void ResolveFromAttribute_Uses_The_Implied_Key_When_TextKey_Is_Not_Set()
+    {
+        var attribute = new DisplayTextAttribute("Some display");
+
+        var result = LocalText.ResolveFromAttribute(attribute, "Some display", "Forms.Test.Field");
+
+        Assert.Equal("Forms.Test.Field", result.Key);
+        Assert.Equal("Some display", result.Text);
+        Assert.False(result.IsKey);
+        Assert.False(result.Literal);
     }
 
     [Fact]

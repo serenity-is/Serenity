@@ -96,6 +96,25 @@ namespace Serenity.CodeGeneration
         }
 
         [Fact]
+        public void Enum_Members_With_A_Key_Of_Their_Own_Or_None_Carry_Their_Key_And_Text()
+        {
+            var generator = CreateGenerator(typeof(EnumContainer));
+            var result = generator.Run();
+            var code = Assert.Single(result, x => x.Filename == "Enums/StatusWithTexts.ts").Text;
+            code = code.Replace("\r\n", "\n");
+
+            // a member with a key of its own tells that key, and one with an empty key tells no key and its text, as it
+            // is shown as it is; a member with neither needs nothing, as its key is the one its enum implies
+            Assert.Contains("    enumTextKeys: {\n", code);
+            Assert.Contains("        '1': 'Test.StatusTexts.Active',\n", code);
+            Assert.Contains("        '3': ''\n", code);
+            Assert.Contains("    enumTexts: {\n", code);
+            Assert.Contains("        '3': 'Shown as it is'\n", code);
+            Assert.DoesNotContain("'0'", code);
+            Assert.DoesNotContain("'2'", code);
+        }
+
+        [Fact]
         public void Enum_Without_Flags_Has_No_EnumFlags()
         {
             var generator = CreateGenerator(typeof(EnumContainer));
@@ -118,6 +137,7 @@ namespace ServerTypingsTest.Enums
         public StatusWithIconsWithoutKey? WithIconsWithoutKey { get; set; }
         public AccessFlags? Access { get; set; }
         public AccessFlagsWithIcons? AccessWithIcons { get; set; }
+        public StatusWithTexts? WithTexts { get; set; }
     }
 
     [EnumKey("Test.Status")]
@@ -157,6 +177,19 @@ namespace ServerTypingsTest.Enums
     {
         [IconClass("sv-two")]
         Two = 2
+    }
+
+    [EnumKey("Test.StatusTexts")]
+    public enum StatusWithTexts
+    {
+        [DescriptionText("Inactive")]
+        Inactive = 0,
+        [DescriptionText("Active", TextKey = "Test.StatusTexts.Active")]
+        Active = 1,
+        [DescriptionText("Plain")]
+        Plain = 2,
+        [DescriptionText("Shown as it is", TextKey = LocalText.Literal)]
+        Literal = 3
     }
 
     [Flags]

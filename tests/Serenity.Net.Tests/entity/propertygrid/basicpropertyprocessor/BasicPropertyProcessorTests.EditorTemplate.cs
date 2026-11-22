@@ -7,6 +7,8 @@ public partial class BasicPropertyProcessorTests
         public string Key { get; set; } = null!;
         public string Name { get; set; } = null!;
         public string? IconClass { get; set; }
+        public string? LocalTextKey { get; set; }
+        public string? CssClasses { get; set; }
     }
 
     private class TemplateItemListRequest : ListRequest
@@ -75,6 +77,10 @@ public partial class BasicPropertyProcessorTests
         Assert.Equal("Key", item.EditorParams["idField"]);
         Assert.Equal("Name", item.EditorParams["textField"]);
         Assert.Equal("IconClass", item.EditorParams["iconField"]);
+        // a field named TextKey or LocalTextKey holds the keys of the texts of the items, and one named CssClass,
+        // CssClasses or CssClassName their classes
+        Assert.Equal("LocalTextKey", item.EditorParams["textKeyField"]);
+        Assert.Equal("CssClasses", item.EditorParams["cssClassField"]);
     }
 
     [Fact]

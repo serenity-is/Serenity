@@ -46,13 +46,34 @@ export class SelectEditor<P extends SelectEditorOptions = SelectEditorOptions> e
         const items = this.getItems();
         this.clearItems();
 
-        if (items.length > 0) {
-            const isStrings = typeof (items[0]) === 'string';
-            for (const item of items) {
-                const key = isStrings ? item : item[0];
-                const text = isStrings ? item : (item[1] ?? item[0]);
-                this.addOption(key, text, item, false);
+        for (const item of items) {
+            if (item == null)
+                continue;
+
+            // an item of the editor is a value, a [value, text] pair, or an object with the fields of a combobox item,
+            // e.g. one that a form field gives, see SelectItemAttribute; an object gives its text, and the text of its
+            // key when it has one, see textKeyField, without a fallback to its value, which the one that gives the items
+            // is to make, e.g. as the text of an item that has no key
+            if (typeof item === "string") {
+                this.addOption(item, item, item, false);
+                continue;
             }
+
+            if (Array.isArray(item)) {
+                this.addOption(item[0], item[1] ?? item[0], item, false);
+                continue;
+            }
+
+            const obj = item as ComboboxItem;
+            const id = obj.id == null ? "" : String(obj.id);
+            this.addItem({
+                id: id,
+                text: this.localizeItemText(obj.text, item),
+                disabled: !!obj.disabled,
+                icon: obj.icon,
+                cssClass: obj.cssClass,
+                source: item
+            });
         }
     }
 }
@@ -61,7 +82,11 @@ export class SelectEditor<P extends SelectEditorOptions = SelectEditorOptions> e
  * Options for the {@link SelectEditor}.
  */
 export interface SelectEditorOptions extends ComboboxCommonOptions {
-    /** Items to display; each is a value or a [value, text] pair. */
+    /**
+     * Items to display; each is a value, a [value, text] pair, or an object with the fields of a combobox item, e.g.
+     * `{ id, text, textKey, icon }`, whose text key is localized when the editor gives its field, see
+     * {@link ComboboxCommonOptions.textKeyField}.
+     */
     items?: any[];
     /** Text for the empty option. */
     emptyOptionText?: string;

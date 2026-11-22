@@ -51,6 +51,7 @@ public static class EnumLocalTextRegistration
 
                     var defaultKey = "Enums." + enumKey + "." + name;
                     var resolved = LocalText.ResolveFromAttribute(descAttr, descAttr.Description, defaultKey);
+                    // a description with an empty text key is shown as it is: its key is null, so nothing is registered
                     if (resolved.Key is string key)
                         AddText(registry, owners, type, key, resolved.Text, languageID);
                 }
@@ -62,6 +63,11 @@ public static class EnumLocalTextRegistration
                 foreach (var member in info.Members)
                 {
                     if (member.TextKey is null && member.Text is null)
+                        continue;
+
+                    // a member with an empty text key is shown as it is, so nothing is registered for it, nor under the
+                    // key that its enum implies
+                    if (member.TextKey is { Length: 0 })
                         continue;
 
                     var key = member.TextKey ?? "Enums." + info.EnumKey + "." + member.Name;

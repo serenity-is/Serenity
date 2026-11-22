@@ -11,7 +11,7 @@ public partial class BasicPropertyProcessorTests
         public string Set { get; set; }
 
         [QuickFilter(Multiple = false, CheckList = false), LookupEditor("Test", Multiple = true, CheckList = true)]
-        public string TurnedOff { get; set; }
+        public List<string> TurnedOff { get; set; }
 
         [QuickFilter(Multiple = true), QuickFilterOption("multiple", false)]
         public string Overridden { get; set; }

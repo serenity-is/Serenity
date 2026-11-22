@@ -121,6 +121,44 @@ public abstract class LookupScript : DynamicScript, INamedDynamicScript, IGetScr
     }
 
     /// <summary>
+    /// Gets or sets the name of the field that holds the local text key of an item, which the editors localize, or
+    /// "text" when the text of an item is its key.
+    /// </summary>
+    public string? TextKeyField
+    {
+        get
+        {
+            if (lookupParams.TryGetValue("textKeyField", out object? value) && value != null)
+                return value.ToString();
+
+            return null;
+        }
+        set
+        {
+            LookupParams["textKeyField"] = value;
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets the name of the field that holds the CSS class of an item, e.g. "text-danger", which the editors
+    /// that show the class of an item add to it.
+    /// </summary>
+    public string? CssClassField
+    {
+        get
+        {
+            if (lookupParams.TryGetValue("cssClassField", out object? value) && value != null)
+                return value.ToString();
+
+            return null;
+        }
+        set
+        {
+            LookupParams["cssClassField"] = value;
+        }
+    }
+
+    /// <summary>
     /// Gets or sets the lookup icon field.
     /// </summary>
     public string? IconField

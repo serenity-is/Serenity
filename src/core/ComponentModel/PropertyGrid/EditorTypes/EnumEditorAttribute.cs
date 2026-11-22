@@ -1,4 +1,4 @@
-namespace Serenity.ComponentModel;
+﻿namespace Serenity.ComponentModel;
 
 /// <summary>
 /// Indicates that the target property should use a "Enum" editor.
@@ -97,9 +97,24 @@ public partial class EnumEditorAttribute : CustomEditorAttribute
     }
 
     /// <summary>
-    /// The minimum number of results that must be initially (after opening the dropdown for the first time) populated in order to keep the search field. 
-    /// This is useful for cases where local data is used with just a few results, in which case the search box is not very useful and wastes screen space.
-    /// The option can be set to a negative value to permanently hide the search field.
+    /// The value of <see cref="MinimumResultsForSearch"/> that shows the search field for any number of results, see
+    /// <see cref="LookupEditorBaseAttribute.AlwaysShowSearch"/>.
+    /// </summary>
+    public const int AlwaysShowSearch = LookupEditorBaseAttribute.AlwaysShowSearch;
+
+    /// <summary>
+    /// The value of <see cref="MinimumResultsForSearch"/> that hides the search field permanently, see
+    /// <see cref="LookupEditorBaseAttribute.NeverShowSearch"/>.
+    /// </summary>
+    public const int NeverShowSearch = LookupEditorBaseAttribute.NeverShowSearch;
+
+    /// <summary>
+    /// The minimum number of results that must be initially (after opening the dropdown for the first time) populated in
+    /// order to keep the search field. This is useful for cases where local data is used with just a few results, in
+    /// which case the search box is not very useful and wastes screen space. <see cref="AlwaysShowSearch"/> shows it for
+    /// any number of results, which is what the editor does when it is not set, unless
+    /// ComboboxEditor.defaults.minimumResultsForSearch says otherwise, and <see cref="NeverShowSearch"/>, or any other
+    /// negative value, hides it permanently.
     /// </summary>
     public int MinimumResultsForSearch
     {
@@ -146,8 +161,23 @@ public partial class EnumEditorAttribute : CustomEditorAttribute
     }
 
     /// <summary>
+    /// The value of <see cref="MaxSummaryItems"/> that names all the selected items, see
+    /// <see cref="LookupEditorBaseAttribute.SummaryNamesAll"/>.
+    /// </summary>
+    public const int SummaryNamesAll = LookupEditorBaseAttribute.SummaryNamesAll;
+
+    /// <summary>
+    /// The value of <see cref="MaxSummaryItems"/> that names none of the selected items, and shows only how many are
+    /// selected, see <see cref="LookupEditorBaseAttribute.SummaryCountOnly"/>.
+    /// </summary>
+    public const int SummaryCountOnly = LookupEditorBaseAttribute.SummaryCountOnly;
+
+    /// <summary>
     /// How many of the selected members the summary of a checklist, see <see cref="CheckList"/>, names before it counts
-    /// the rest, see <see cref="LookupEditorBaseAttribute.MaxSummaryItems"/>. Default is 3.
+    /// the rest, see <see cref="LookupEditorBaseAttribute.MaxSummaryItems"/>, of which <see cref="SummaryCountOnly"/>
+    /// names none and shows only how many are selected, and <see cref="SummaryNamesAll"/> names them all, which is what
+    /// ComboboxEditor.defaults.maxSummaryItems, that the editor uses when it is not set, is by default. The other negative
+    /// values are reserved for summaries to come.
     /// </summary>
     public int MaxSummaryItems
     {
