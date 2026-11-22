@@ -137,6 +137,8 @@
   "Controls.Pager.Refresh": "Yenile",
   "Controls.Pager.RowsPerPage": "Satır",
   "Controls.PropertyGrid.RequiredHint": "Bu alan zorunludur",
+  "Controls.QuickFilterBar.ClearFilters": "Temizle",
+  "Controls.QuickFilterBar.ClearFiltersHint": "Tüm hızlı filtreleri temizle",
   "Controls.QuickSearch.FieldSelection": "arama yapılacak alanı seç",
   "Controls.QuickSearch.Hint": "aranacak kelimeyi giriniz",
   "Controls.QuickSearch.Placeholder": "ara...",

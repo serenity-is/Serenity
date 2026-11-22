@@ -137,6 +137,8 @@
   "Controls.Pager.Refresh": "Uppdatera",
   "Controls.Pager.RowsPerPage": "Rader",
   "Controls.PropertyGrid.RequiredHint": "Detta fält är obligatoriskt",
+  "Controls.QuickFilterBar.ClearFilters": "Rensa",
+  "Controls.QuickFilterBar.ClearFiltersHint": "Rensa alla snabbfilter",
   "Controls.QuickSearch.FieldSelection": "Välj fält för sökning",
   "Controls.QuickSearch.Hint": "Ange texten för att söka",
   "Controls.QuickSearch.Placeholder": "Sök",

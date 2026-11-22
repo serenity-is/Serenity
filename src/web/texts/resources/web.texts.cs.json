@@ -137,6 +137,8 @@
   "Controls.Pager.Refresh": "Obnovit",
   "Controls.Pager.RowsPerPage": "Řádků",
   "Controls.PropertyGrid.RequiredHint": "Toto pole je povinné",
+  "Controls.QuickFilterBar.ClearFilters": "Vymazat",
+  "Controls.QuickFilterBar.ClearFiltersHint": "Vymazat všechny rychlé filtry",
   "Controls.QuickSearch.FieldSelection": "Vyberte pole pro vyhledávání",
   "Controls.QuickSearch.Hint": "Zadejte text pro hledání",
   "Controls.QuickSearch.Placeholder": "Vyhledávání",

@@ -176,6 +176,7 @@
 .select2-dropdown-open .select2-arrow::after,
 .select2-arrow::after,
 .select2-search-choice-close::after,
+.quick-filters-clear::before,
 .quick-search-field::after,
 .quick-search-icon>i::before,
 button.panel-titlebar-close::after,
@@ -2749,10 +2750,6 @@ button.panel-titlebar-close::after {
   line-height: 1.5rem;
 }
 
-.quick-filter-item>input {
-  line-height: 1;
-}
-
 .quick-filter-item .s-DateEditor,
 .quick-filter-item .s-DateTimeEditor.dateQ {
   width: 8em;
@@ -2780,6 +2777,37 @@ button.panel-titlebar-close::after {
   display: block;
   font-size: calc(1rem - 2px);
   padding-bottom: 2px;
+}
+
+/* the button at the end of the bar that clears all its filters, shown while any of them is applied, which lines up with
+   the controls of the filters, below their labels when they are above them */
+.quick-filters-clear {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-end;
+  gap: 0.35em;
+  margin: 0 0 12px 0;
+  padding: var(--s-input-padding-v, 0.375rem) 0.5em;
+  line-height: 1.5rem;
+  border: 1px solid transparent;
+  border-radius: var(--bs-border-radius);
+  background: transparent;
+  color: var(--bs-secondary-color);
+  cursor: pointer;
+}
+
+.quick-filters-clear:hover {
+  color: var(--bs-body-color);
+  background-color: var(--bs-tertiary-bg);
+}
+
+.quick-filters-clear[hidden] {
+  display: none;
+}
+
+.quick-filters-clear::before {
+  line-height: 1;
+  --s-ico: var(--s-icon-times);
 }
 
 .s-QuickSearchBar {
@@ -4410,8 +4438,12 @@ button.toast-close-button {
   margin-bottom: 0;
 }
 
+/* a select of a toolbar, e.g. a quick filter, single or checklist alike, fits what it shows, though a long text, or the
+   names of a summary, which keeps its count, are cut instead of pushing the toolbar out; a checklist keeps its width
+   while its dropdown is open, so that ticking an item does not move the controls after it */
 .s-Toolbar .select2-container {
   min-width: 10em;
+  max-width: var(--s-quick-filter-max-width, 18rem);
 }
 
 .tool-group,

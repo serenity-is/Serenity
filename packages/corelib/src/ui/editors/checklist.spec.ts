@@ -1112,3 +1112,40 @@ describe("the width of the dropdown of a checklist", () => {
         }
     });
 });
+
+describe("the width of a checklist that fits its summary", () => {
+    it("is kept while its dropdown is open, and fits the summary again when it is closed", () => {
+        const original = window.getComputedStyle;
+        vi.spyOn(window, "getComputedStyle").mockImplementation(function (element: Element, pseudo?: string) {
+            const style = original.call(window, element, pseudo);
+            if (!(element as HTMLElement).classList?.contains("select2-container"))
+                return style;
+            return new Proxy(style, { get: (target, key) => key === "width" ? "150px" : (target as any)[key] });
+        });
+
+        try {
+            const { select, internal } = createChecklist();
+            expect(internal.container.style.width).toBe("");
+
+            select.open();
+            // ticking an item changes the summary, which would make the control wider while the dropdown is open
+            expect(internal.container.style.width).toBe("150px");
+
+            select.close();
+            expect(internal.container.style.width).toBe("");
+            select.destroy();
+        }
+        finally {
+            vi.restoreAllMocks();
+        }
+    });
+
+    it("keeps a width that it was given of its own", () => {
+        const { select, internal } = createChecklist();
+        internal.container.style.width = "12rem";
+        select.open();
+        select.close();
+        expect(internal.container.style.width).toBe("12rem");
+        select.destroy();
+    });
+});

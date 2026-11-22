@@ -137,6 +137,8 @@
   "Controls.Pager.Refresh": "Aktualisieren",
   "Controls.Pager.RowsPerPage": "Zeilen",
   "Controls.PropertyGrid.RequiredHint": "Dieses Feld ist erforderlich",
+  "Controls.QuickFilterBar.ClearFilters": "Löschen",
+  "Controls.QuickFilterBar.ClearFiltersHint": "Alle Schnellfilter löschen",
   "Controls.QuickSearch.FieldSelection": "Wählen Sie das Feld aus, nach dem gesucht werden soll",
   "Controls.QuickSearch.Hint": "Geben Sie den Text zur Suche ein",
   "Controls.QuickSearch.Placeholder": "Suche",

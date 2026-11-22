@@ -137,6 +137,8 @@
   "Controls.Pager.Refresh": "Segarkan",
   "Controls.Pager.RowsPerPage": "Baris",
   "Controls.PropertyGrid.RequiredHint": "Bidang ini diperlukan",
+  "Controls.QuickFilterBar.ClearFilters": "Bersihkan",
+  "Controls.QuickFilterBar.ClearFiltersHint": "Bersihkan semua filter cepat",
   "Controls.QuickSearch.FieldSelection": "Pilih bidang untuk mencari",
   "Controls.QuickSearch.Hint": "Masukkan teks untuk mencari",
   "Controls.QuickSearch.Placeholder": "Cari",

@@ -190,6 +190,12 @@ namespace webTexts {
             export function asTry(): typeof PropertyGrid;
             export const RequiredHint: string;
         }
+        namespace QuickFilterBar {
+            export function asKey(): typeof QuickFilterBar;
+            export function asTry(): typeof QuickFilterBar;
+            export const ClearFilters: string;
+            export const ClearFiltersHint: string;
+        }
         namespace QuickSearch {
             export function asKey(): typeof QuickSearch;
             export function asTry(): typeof QuickSearch;
@@ -285,6 +291,7 @@ const textsProxy: typeof webTexts = proxyTexts({}, '', {
         HtmlContentEditor: {},
         Pager: {},
         PropertyGrid: {},
+        QuickFilterBar: {},
         QuickSearch: {},
         SelectEditor: {}
     },
@@ -303,5 +310,6 @@ export const FormValidationTexts = textsProxy.Validation;
 export const HtmlContentEditorTexts = textsProxy.Controls.HtmlContentEditor;
 export const PagerTexts = textsProxy.Controls.Pager;
 export const PropertyGridTexts = textsProxy.Controls.PropertyGrid;
+export const QuickFilterBarTexts = textsProxy.Controls.QuickFilterBar;
 export const QuickSearchTexts = textsProxy.Controls.QuickSearch;
 export const SelectEditorTexts = textsProxy.Controls.SelectEditor;

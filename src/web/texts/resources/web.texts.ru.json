@@ -137,6 +137,8 @@
   "Controls.Pager.Refresh": "Обновить",
   "Controls.Pager.RowsPerPage": "Строк",
   "Controls.PropertyGrid.RequiredHint": "Это поле обязательно",
+  "Controls.QuickFilterBar.ClearFilters": "Очистить",
+  "Controls.QuickFilterBar.ClearFiltersHint": "Очистить все быстрые фильтры",
   "Controls.QuickSearch.FieldSelection": "Выберите поле для поиска",
   "Controls.QuickSearch.Hint": "Введите текст для поиска",
   "Controls.QuickSearch.Placeholder": "Поиск",

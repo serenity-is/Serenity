@@ -99,6 +99,20 @@ describe("propertyItemToQuickFilter", () => {
         expect(result.type).toBeDefined();
     });
 
+    it("returns the date range filter that the application gives, when it gives one", () => {
+        vi.spyOn(FilteringTypeRegistry, "get").mockReturnValue(DateFiltering as any);
+        const own = vi.fn((field: string, title?: string) => ({ field, title, type: class { } as any }));
+        QuickFilterBar.defaults.dateRangeFilter = own;
+        try {
+            const result = propertyItemToQuickFilter({ name: "Date", title: "Order Date" } as any);
+            expect(own).toHaveBeenCalledWith("Date", "Order Date");
+            expect(result.title).toBe("Order Date");
+        }
+        finally {
+            delete QuickFilterBar.defaults.dateRangeFilter;
+        }
+    });
+
     it("returns date time range filter for DateTimeFiltering", () => {
         vi.spyOn(FilteringTypeRegistry, "get").mockReturnValue(DateTimeFiltering as any);
         const result = propertyItemToQuickFilter({ name: "Date", title: "Date" } as any);

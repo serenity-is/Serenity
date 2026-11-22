@@ -4481,6 +4481,12 @@ declare namespace webTexts {
             function asTry(): typeof PropertyGrid;
             const RequiredHint: string;
         }
+        namespace QuickFilterBar {
+            function asKey(): typeof QuickFilterBar;
+            function asTry(): typeof QuickFilterBar;
+            const ClearFilters: string;
+            const ClearFiltersHint: string;
+        }
         namespace QuickSearch {
             function asKey(): typeof QuickSearch;
             function asTry(): typeof QuickSearch;
@@ -4570,6 +4576,7 @@ export declare const FormValidationTexts: typeof webTexts.Validation;
 export declare const HtmlContentEditorTexts: typeof webTexts.Controls.HtmlContentEditor;
 export declare const PagerTexts: typeof webTexts.Controls.Pager;
 export declare const PropertyGridTexts: typeof webTexts.Controls.PropertyGrid;
+export declare const QuickFilterBarTexts: typeof webTexts.Controls.QuickFilterBar;
 export declare const QuickSearchTexts: typeof webTexts.Controls.QuickSearch;
 export declare const SelectEditorTexts: typeof webTexts.Controls.SelectEditor;
 /**
@@ -10185,6 +10192,8 @@ export declare class MultiSelect2 extends AbstractSelect2 {
      * Opens the dropdown of a checklist, whose search box takes what was typed in the focusser, and the focus, as the one
      * of a single select does.
      */
+    /** The width the control had of its own before its dropdown was opened, see openingCheckList. */
+    private widthBeforeOpen;
     private openingCheckList;
     close(): void;
     focus(): void;
@@ -11889,6 +11898,45 @@ export interface QuickFilterBarOptions {
     getTitle?: (filter: QuickFilter<Widget<any>, any>) => string;
     /** Prefix used for generated element ids; defaults to the widget unique name. */
     idPrefix?: string;
+    /**
+     * Whether the bar has a button at its end that clears all its filters, which is shown while any of them is applied.
+     * Default is {@link QuickFilterBarDefaults.clearButton}.
+     */
+    clearButton?: boolean;
+}
+/** What {@link QuickFilterBarDefaults.filterAdded} is called with, for a filter that is added to a bar. */
+export interface QuickFilterAddedArgs {
+    /** The bar. */
+    bar: QuickFilterBar;
+    /** The definition of the filter. */
+    filter: QuickFilter<Widget<any>, any>;
+    /** The element of the filter, which holds its label and its widget. */
+    element: HTMLElement;
+    /** The label of the filter. */
+    label: HTMLElement;
+    /** The widget of the filter, which is created by then, also when its type was loaded later. */
+    widget: Widget<any>;
+}
+/** The defaults of the quick filter bars, which an application can set once, see {@link QuickFilterBar.defaults}. */
+export interface QuickFilterBarDefaults {
+    /** The default of {@link QuickFilterBarOptions.clearButton}. Default is true. */
+    clearButton: boolean;
+    /**
+     * Creates the quick filter of a date field that a grid makes from its columns, instead of
+     * {@link QuickFilterBar.dateRange}, which has two date editors, e.g. one that edits the range in one input along with
+     * the ranges that follow the current date, like the date range editor of Pro.Extensions. Not set by default.
+     */
+    dateRangeFilter?: (field: string, title?: string) => QuickFilter<Widget<any>, any>;
+    /**
+     * Called when a bar is created, before its filters are added, e.g. to give it a class that changes how its filters
+     * look. Not set by default.
+     */
+    created?: (bar: QuickFilterBar) => void;
+    /**
+     * Called when a filter is added to a bar, once its widget is created, which is when its type is loaded for a type
+     * that is loaded later, e.g. to change how the filter looks. Not set by default.
+     */
+    filterAdded?: (args: QuickFilterAddedArgs) => void;
 }
 /**
  * Per-item data attached to a quick filter element for state persistence and display.
@@ -11909,6 +11957,8 @@ export interface QuickFilterItemData<TWidget> {
  */
 export declare class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOptions> extends Widget<P> {
     static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.">;
+    /** The defaults of the quick filter bars, see {@link QuickFilterBarDefaults}. */
+    static readonly defaults: QuickFilterBarDefaults;
     /**
      * Creates a quick filter bar and adds all configured filters.
      * @param props - Widget props including the filter definitions.
@@ -11925,6 +11975,22 @@ export declare class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilte
      * Adds a visual separator to the bar.
      */
     addSeparator(): void;
+    /** The filters of the bar, with their elements and widgets, which the clear button clears, see {@link clear}. */
+    private readonly items;
+    /** The button that clears all the filters, see {@link QuickFilterBarOptions.clearButton}. */
+    private clearButton;
+    /** Whether the filters are being cleared, when their changes are told as one, see {@link clear}. */
+    private clearing;
+    /**
+     * Clears all the filters of the bar, as its clear button does, and tells the change once, e.g. to the grid, which
+     * reloads its rows, instead of once for each filter. A filter that saves its state, e.g. a date range, is cleared by
+     * loading an empty state, and any other one by an empty value.
+     */
+    clear(): void;
+    /**
+     * Shows the clear button while any filter is applied, and keeps it at the end of the bar.
+     */
+    protected updateClearButton(): void;
     /**
      * Adds a quick filter widget to the bar and wires its submit handler.
      * @param opt - Quick filter definition.

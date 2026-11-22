@@ -1,5 +1,5 @@
 ﻿import { addDisposingListener } from "@serenity-is/domwise";
-import { Criteria, FilterPanelTexts, Fluent, FormValidationTexts, ListRequest, formatDate, isPromiseLike, notifyWarning, nsSerenity, parseDate, toId, tryGetText } from "../../base";
+import { Criteria, FilterPanelTexts, Fluent, FormValidationTexts, ListRequest, QuickFilterBarTexts, formatDate, isPromiseLike, notifyWarning, nsSerenity, parseDate, toId, tryGetText } from "../../base";
 import { DateEditor } from "../editors/dateeditor";
 import { DateTimeEditor, DateTimeEditorOptions } from "../editors/datetimeeditor";
 import { EditorUtils } from "../editors/editorutils";
@@ -19,6 +19,47 @@ export interface QuickFilterBarOptions {
     getTitle?: (filter: QuickFilter<Widget<any>, any>) => string;
     /** Prefix used for generated element ids; defaults to the widget unique name. */
     idPrefix?: string;
+    /**
+     * Whether the bar has a button at its end that clears all its filters, which is shown while any of them is applied.
+     * Default is {@link QuickFilterBarDefaults.clearButton}.
+     */
+    clearButton?: boolean;
+}
+
+/** What {@link QuickFilterBarDefaults.filterAdded} is called with, for a filter that is added to a bar. */
+export interface QuickFilterAddedArgs {
+    /** The bar. */
+    bar: QuickFilterBar;
+    /** The definition of the filter. */
+    filter: QuickFilter<Widget<any>, any>;
+    /** The element of the filter, which holds its label and its widget. */
+    element: HTMLElement;
+    /** The label of the filter. */
+    label: HTMLElement;
+    /** The widget of the filter, which is created by then, also when its type was loaded later. */
+    widget: Widget<any>;
+}
+
+/** The defaults of the quick filter bars, which an application can set once, see {@link QuickFilterBar.defaults}. */
+export interface QuickFilterBarDefaults {
+    /** The default of {@link QuickFilterBarOptions.clearButton}. Default is true. */
+    clearButton: boolean;
+    /**
+     * Creates the quick filter of a date field that a grid makes from its columns, instead of
+     * {@link QuickFilterBar.dateRange}, which has two date editors, e.g. one that edits the range in one input along with
+     * the ranges that follow the current date, like the date range editor of Pro.Extensions. Not set by default.
+     */
+    dateRangeFilter?: (field: string, title?: string) => QuickFilter<Widget<any>, any>;
+    /**
+     * Called when a bar is created, before its filters are added, e.g. to give it a class that changes how its filters
+     * look. Not set by default.
+     */
+    created?: (bar: QuickFilterBar) => void;
+    /**
+     * Called when a filter is added to a bar, once its widget is created, which is when its type is loaded for a type
+     * that is loaded later, e.g. to change how the filter looks. Not set by default.
+     */
+    filterAdded?: (args: QuickFilterAddedArgs) => void;
 }
 
 /**
@@ -43,6 +84,11 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
 
     static override[Symbol.typeInfo] = this.registerClass(nsSerenity);
 
+    /** The defaults of the quick filter bars, see {@link QuickFilterBarDefaults}. */
+    public static readonly defaults: QuickFilterBarDefaults = {
+        clearButton: true
+    };
+
     /**
      * Creates a quick filter bar and adds all configured filters.
      * @param props - Widget props including the filter definitions.
@@ -51,14 +97,16 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
         super(props);
 
         this.domNode.classList.add('quick-filters-bar', 'clear');
+        QuickFilterBar.defaults.created?.(this);
+
+        // before the filters are added, as the ids of their elements start with it
+        this.options.idPrefix = (this.options.idPrefix ?? this.uniqueName + '_');
 
         const filters = this.options.filters;
         for (let f = 0; f < filters.length; f++) {
             const filter = filters[f];
             this.add(filter);
         }
-
-        this.options.idPrefix = (this.options.idPrefix ?? this.uniqueName + '_');
     }
 
     private static readonly itemDataMap = new WeakMap<Node, QuickFilterItemData<any>>();
@@ -76,7 +124,64 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
      * Adds a visual separator to the bar.
      */
     public addSeparator(): void {
-        this.domNode.append(<hr />)
+        this.domNode.insertBefore(<hr />, this.clearButton ?? null);
+    }
+
+    /** The filters of the bar, with their elements and widgets, which the clear button clears, see {@link clear}. */
+    private readonly items: { element: HTMLElement, widget: () => Widget<any> }[] = [];
+
+    /** The button that clears all the filters, see {@link QuickFilterBarOptions.clearButton}. */
+    declare private clearButton: HTMLButtonElement;
+
+    /** Whether the filters are being cleared, when their changes are told as one, see {@link clear}. */
+    declare private clearing: boolean;
+
+    /**
+     * Clears all the filters of the bar, as its clear button does, and tells the change once, e.g. to the grid, which
+     * reloads its rows, instead of once for each filter. A filter that saves its state, e.g. a date range, is cleared by
+     * loading an empty state, and any other one by an empty value.
+     */
+    public clear(): void {
+        this.clearing = true;
+        try {
+            for (const item of this.items) {
+                const widget = item.widget();
+                if (!widget?.domNode)
+                    continue;
+
+                const data = QuickFilterBar.getItemData<Widget<any>>(item.element);
+                if (data?.loadState)
+                    data.loadState(widget, null);
+                else
+                    EditorUtils.setValue(widget, null);
+            }
+        }
+        finally {
+            // after the changes of the filters, which are told with a timeout, so that they are skipped
+            window.setTimeout(() => {
+                this.clearing = false;
+                if (this.domNode)
+                    this.onChange?.(new Event("change"));
+            }, 0);
+        }
+    }
+
+    /**
+     * Shows the clear button while any filter is applied, and keeps it at the end of the bar.
+     */
+    protected updateClearButton(): void {
+        if (!(this.options.clearButton ?? QuickFilterBar.defaults.clearButton ?? true) || !this.domNode)
+            return;
+
+        if (!this.clearButton) {
+            this.clearButton = <button type="button" class="quick-filters-clear" hidden title={QuickFilterBarTexts.ClearFiltersHint}
+                onClick={() => this.clear()}>{QuickFilterBarTexts.ClearFilters}</button> as HTMLButtonElement;
+        }
+
+        if (this.domNode.lastElementChild !== this.clearButton)
+            this.domNode.append(this.clearButton);
+
+        this.clearButton.hidden = !this.domNode.querySelector(":scope > .quick-filter-active");
     }
 
     /**
@@ -93,7 +198,8 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
             this.addSeparator();
         }
 
-        const qfElement = this.domNode.appendChild(<div class="quick-filter-item" data-qffield={opt.field}></div>) as HTMLDivElement;
+        const qfElement = this.domNode.insertBefore(<div class="quick-filter-item" data-qffield={opt.field}></div>,
+            this.clearButton ?? null) as HTMLDivElement;
 
         let title = tryGetText(opt.title) ?? opt.title;
         if (title == null) {
@@ -103,7 +209,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
             }
         }
 
-        qfElement.appendChild(<span class="quick-filter-label">{title}</span>);
+        const qfLabel = qfElement.appendChild(<span class="quick-filter-label">{title}</span>) as HTMLElement;
 
         const qfData = {} as QuickFilterItemData<TWidget>;
 
@@ -153,9 +259,11 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
 
         const activate = (w: TWidget) => {
             opt.init?.(w);
+            QuickFilterBar.defaults.filterAdded?.({ bar: this, filter: opt, element: qfElement, label: qfLabel, widget: w });
             w.changeSelect2(e1 => {
-                // use timeout give cascaded dropdowns a chance to update / clear themselves
-                window.setTimeout(() => this.onChange && this.onChange(e1), 0);
+                // use timeout give cascaded dropdowns a chance to update / clear themselves; while all the filters
+                // are cleared, their changes are told once, see clear
+                window.setTimeout(() => !this.clearing && this.onChange && this.onChange(e1), 0);
             });
             removeHandlerOnDisposing(w);
         };
@@ -192,6 +300,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
         };
 
         this.submitHandlers.push(submitHandler);
+        this.items.push({ element: qfElement, widget: () => widget });
 
         if (isPromiseLike(opt.type)) {
             const placeholder = new QuickFilterPlaceholder({
@@ -482,6 +591,8 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
      */
     public onSubmit(request: ListRequest) {
         this.submitHandlers?.forEach(handler => handler(request));
+        // the handlers tell which filters are applied
+        this.updateClearButton();
     }
 
     /**

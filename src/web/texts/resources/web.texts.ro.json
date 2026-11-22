@@ -137,6 +137,8 @@
   "Controls.Pager.Refresh": "Reîmprospăta",
   "Controls.Pager.RowsPerPage": "Rânduri",
   "Controls.PropertyGrid.RequiredHint": "Acest câmp este obligatoriu",
+  "Controls.QuickFilterBar.ClearFilters": "Șterge",
+  "Controls.QuickFilterBar.ClearFiltersHint": "Șterge toate filtrele rapide",
   "Controls.QuickSearch.FieldSelection": "Selectați câmpul pentru căutare",
   "Controls.QuickSearch.Hint": "Introduceți textul pentru căutare",
   "Controls.QuickSearch.Placeholder": "Căutați",

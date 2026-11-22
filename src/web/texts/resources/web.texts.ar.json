@@ -137,6 +137,8 @@
   "Controls.Pager.Refresh": "تحديث",
   "Controls.Pager.RowsPerPage": "صفوف",
   "Controls.PropertyGrid.RequiredHint": "هذا الحقل مطلوب",
+  "Controls.QuickFilterBar.ClearFilters": "مسح",
+  "Controls.QuickFilterBar.ClearFiltersHint": "مسح جميع عوامل التصفية السريعة",
   "Controls.QuickSearch.FieldSelection": "اختر الحقل للبحث عنه",
   "Controls.QuickSearch.Hint": "أدخل النص للبحث عنه",
   "Controls.QuickSearch.Placeholder": "البحث",

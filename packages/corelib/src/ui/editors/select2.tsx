@@ -3984,7 +3984,17 @@ export class MultiSelect2 extends AbstractSelect2 {
      * Opens the dropdown of a checklist, whose search box takes what was typed in the focusser, and the focus, as the one
      * of a single select does.
      */
+    /** The width the control had of its own before its dropdown was opened, see openingCheckList. */
+    declare private widthBeforeOpen: string;
+
     private openingCheckList() {
+        // the summary changes with each item that is ticked, which would change the width of a control that fits its
+        // content, e.g. a quick filter, with the dropdown open, so it keeps the width it has until it is closed
+        this.widthBeforeOpen = this.container.style.width;
+        const width = getComputedStyle(this.container).width;
+        if (width && width.endsWith("px"))
+            this.container.style.width = width;
+
         super.opening();
 
         // the search box is shown again for each opening, until the results tell whether the list is long enough for it
@@ -4012,6 +4022,12 @@ export class MultiSelect2 extends AbstractSelect2 {
         super.close();
 
         if (this.isChecklist()) {
+            // it fits its summary again, see openingCheckList
+            if (this.widthBeforeOpen !== undefined) {
+                this.container.style.width = this.widthBeforeOpen;
+                this.widthBeforeOpen = undefined;
+            }
+
             this.focusser.disabled = !this.isInterfaceEnabled();
             this.focusser.setAttribute("aria-expanded", "false");
             if (this.opts.shouldFocusInput(this))

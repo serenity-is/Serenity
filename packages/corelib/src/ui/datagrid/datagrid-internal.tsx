@@ -77,7 +77,8 @@ export function propertyItemToQuickFilter(item: PropertyItem): QuickFilter<any, 
 
     const filteringType = FilteringTypeRegistry.get((item.filteringType ?? 'String'));
     if (filteringType === DateFiltering) {
-        result = QuickFilterBar.dateRange(name, title);
+        // an application can give the date fields a filter of its own, e.g. one that edits the range in one input
+        result = (QuickFilterBar.defaults.dateRangeFilter ?? QuickFilterBar.dateRange)(name, title);
     }
     else if (filteringType === DateTimeFiltering) {
         result = QuickFilterBar.dateTimeRange(name, title, item.editorParams?.useUtc);
