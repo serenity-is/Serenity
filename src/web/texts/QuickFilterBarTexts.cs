@@ -5,4 +5,5 @@ public static class QuickFilterBarTexts
 {
     public static readonly LocalText ClearFilters = "Clear";
     public static readonly LocalText ClearFiltersHint = "Clear all the quick filters";
+    public static readonly LocalText Filters = "Filters";
 }

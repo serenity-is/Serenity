@@ -177,6 +177,9 @@
 .select2-arrow::after,
 .select2-search-choice-close::after,
 .quick-filters-clear::before,
+.quick-filters-toggle::before,
+.quick-filters-toggle::after,
+.quick-filters-toggle[aria-expanded=true]::after,
 .quick-search-field::after,
 .quick-search-icon>i::before,
 button.panel-titlebar-close::after,
@@ -2808,6 +2811,92 @@ button.panel-titlebar-close::after {
 .quick-filters-clear::before {
   line-height: 1;
   --s-ico: var(--s-icon-times);
+}
+
+/* the button at the start of the bar that opens and closes its filters while it is narrow, e.g. on a phone, when they
+   are collapsed behind it, except the pinned ones; it shows how many of them are applied */
+.quick-filters-toggle {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-end;
+  gap: 0.35em;
+  margin: 0 12px 12px 0;
+  padding: var(--s-input-padding-v, 0.375rem) 0.75em;
+  line-height: 1.5rem;
+  border: 1px solid var(--s-input-border-color, var(--bs-border-color));
+  border-radius: var(--bs-border-radius);
+  background-color: var(--s-input-bg, var(--bs-body-bg));
+  color: var(--s-input-text, var(--bs-body-color));
+  cursor: pointer;
+}
+
+.quick-filters-toggle:hover {
+  background-color: var(--bs-tertiary-bg);
+}
+
+/* opened, it is tinted like an applied filter, and its caret points up */
+.quick-filters-toggle[aria-expanded=true] {
+  color: var(--bs-primary-text-emphasis);
+  background-color: var(--bs-primary-bg-subtle);
+  border-color: var(--bs-primary-border-subtle);
+}
+
+.quick-filters-toggle[aria-expanded=true] .quick-filters-count {
+  background-color: var(--s-input-bg, var(--bs-body-bg));
+}
+
+.quick-filters-toggle::after {
+  line-height: 1;
+  font-size: 0.85em;
+  --s-ico: var(--s-icon-angle-down);
+}
+
+.quick-filters-toggle[aria-expanded=true]::after {
+  --s-ico: var(--s-icon-angle-up);
+}
+
+.quick-filters-toggle[hidden],
+.quick-filters-count[hidden] {
+  display: none;
+}
+
+.quick-filters-toggle::before {
+  line-height: 1;
+  --s-ico: var(--s-icon-filter);
+}
+
+.quick-filters-count {
+  min-width: 1.5em;
+  padding: 0 0.4em;
+  border-radius: 0.75em;
+  font-size: 0.85em;
+  line-height: 1.5em;
+  text-align: center;
+  color: var(--bs-primary-text-emphasis);
+  background-color: var(--bs-primary-bg-subtle);
+}
+
+/* not wider than where it is, e.g. the toolbar of a grid, by its filters when they are opened */
+.quick-filters-narrow {
+  min-width: 0;
+}
+
+.quick-filters-narrow:not(.quick-filters-expanded) > .quick-filter-item:not(.quick-filter-pinned),
+.quick-filters-narrow:not(.quick-filters-expanded) > hr {
+  display: none;
+}
+
+/* opened, the filters are one in each row, as wide as the bar */
+.quick-filters-narrow.quick-filters-expanded > .quick-filter-item {
+  flex: 1 1 100%;
+  /* not wider than the bar, by what is selected in it, which is cut instead */
+  min-width: 0;
+  margin-inline-end: 0;
+}
+
+.s-Toolbar .quick-filters-narrow.quick-filters-expanded > .quick-filter-item .select2-container {
+  width: 100% !important;
+  max-width: none;
 }
 
 .s-QuickSearchBar {

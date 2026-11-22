@@ -54,6 +54,9 @@ public partial class BasicPropertyProcessorTests
         [QuickFilter(Separator = true, CssClass = "qfc")]
         public string? QuickFiltered { get; set; }
 
+        [QuickFilter(Pinned = true)]
+        public string? QuickFilterPinned { get; set; }
+
         [FilteringIdField("SomeId")]
         public int? FilterById { get; set; }
 
@@ -603,6 +606,16 @@ public partial class BasicPropertyProcessorTests
         Assert.True(item.QuickFilter);
         Assert.True(item.QuickFilterSeparator);
         Assert.Equal("qfc", item.QuickFilterCssClass);
+        Assert.Null(item.QuickFilterPinned);
+    }
+
+    [Fact]
+    public void Sets_QuickFilterPinned()
+    {
+        var item = Process<DecoratedForm>(nameof(DecoratedForm.QuickFilterPinned));
+
+        Assert.True(item.QuickFilter);
+        Assert.True(item.QuickFilterPinned);
     }
 
     [Fact]

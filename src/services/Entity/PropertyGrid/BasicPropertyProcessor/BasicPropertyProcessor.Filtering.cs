@@ -25,6 +25,9 @@ public partial class BasicPropertyProcessor : PropertyProcessor
 
             if (!string.IsNullOrEmpty(quickFilterAttr.CssClass))
                 item.QuickFilterCssClass = quickFilterAttr.CssClass;
+
+            if (quickFilterAttr.Pinned)
+                item.QuickFilterPinned = true;
             
             if (quickFilterAttr.CascadeFrom != null)
                 item.QuickFilterParams["cascadeFrom"] = quickFilterAttr.CascadeFrom;

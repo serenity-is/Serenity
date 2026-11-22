@@ -139,6 +139,7 @@
   "Controls.PropertyGrid.RequiredHint": "Trường này là bắt buộc",
   "Controls.QuickFilterBar.ClearFilters": "Xóa",
   "Controls.QuickFilterBar.ClearFiltersHint": "Xóa tất cả bộ lọc nhanh",
+  "Controls.QuickFilterBar.Filters": "Bộ lọc",
   "Controls.QuickSearch.FieldSelection": "Chọn trường để tìm kiếm",
   "Controls.QuickSearch.Hint": "Nhập văn bản để tìm kiếm",
   "Controls.QuickSearch.Placeholder": "Tìm kiếm",

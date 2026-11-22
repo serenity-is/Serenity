@@ -24,6 +24,13 @@ export interface QuickFilterBarOptions {
      * Default is {@link QuickFilterBarDefaults.clearButton}.
      */
     clearButton?: boolean;
+    /**
+     * Whether the filters are collapsed behind a "Filters" button while the bar is narrower than
+     * {@link QuickFilterBarDefaults.collapseWidth}, e.g. on a phone. The button shows how many filters are applied,
+     * and opens the filters, one in each row. The filters that are pinned, see {@link QuickFilter.pinned}, stay visible.
+     * Default is {@link QuickFilterBarDefaults.collapsible}.
+     */
+    collapsible?: boolean;
 }
 
 /** What {@link QuickFilterBarDefaults.filterAdded} is called with, for a filter that is added to a bar. */
@@ -44,6 +51,13 @@ export interface QuickFilterAddedArgs {
 export interface QuickFilterBarDefaults {
     /** The default of {@link QuickFilterBarOptions.clearButton}. Default is true. */
     clearButton: boolean;
+    /** The default of {@link QuickFilterBarOptions.collapsible}. Default is true. */
+    collapsible: boolean;
+    /**
+     * The width, in pixels, that a bar is collapsed below, see {@link QuickFilterBarOptions.collapsible}. Default is 768,
+     * the width below which the filters with the hidden-xs class were hidden, which are collapsed instead while it is.
+     */
+    collapseWidth: number;
     /**
      * Creates the quick filter of a date field that a grid makes from its columns, instead of
      * {@link QuickFilterBar.dateRange}, which has two date editors, e.g. one that edits the range in one input along with
@@ -86,7 +100,9 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
 
     /** The defaults of the quick filter bars, see {@link QuickFilterBarDefaults}. */
     public static readonly defaults: QuickFilterBarDefaults = {
-        clearButton: true
+        clearButton: true,
+        collapsible: true,
+        collapseWidth: 768
     };
 
     /**
@@ -107,6 +123,8 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
             const filter = filters[f];
             this.add(filter);
         }
+
+        this.observeWidth();
     }
 
     private static readonly itemDataMap = new WeakMap<Node, QuickFilterItemData<any>>();
@@ -124,7 +142,16 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
      * Adds a visual separator to the bar.
      */
     public addSeparator(): void {
-        this.domNode.insertBefore(<hr />, this.clearButton ?? null);
+        this.domNode.insertBefore(<hr />, this.getInsertionPoint());
+    }
+
+    /** Where a filter, or a separator, is added: after the last one, which the clear button is after unless collapsed. */
+    private getInsertionPoint(): Node | null {
+        const added = this.domNode.querySelectorAll(":scope > .quick-filter-item, :scope > hr");
+        const last = added[added.length - 1];
+        if (last)
+            return last.nextSibling;
+        return this.clearButton?.parentNode === this.domNode ? this.clearButton : null;
     }
 
     /** The filters of the bar, with their elements and widgets, which the clear button clears, see {@link clear}. */
@@ -167,7 +194,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
     }
 
     /**
-     * Shows the clear button while any filter is applied, and keeps it at the end of the bar.
+     * Shows the clear button while any filter is applied, and keeps it after the last filter.
      */
     protected updateClearButton(): void {
         if (!(this.options.clearButton ?? QuickFilterBar.defaults.clearButton ?? true) || !this.domNode)
@@ -178,10 +205,113 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
                 onClick={() => this.clear()}>{QuickFilterBarTexts.ClearFilters}</button> as HTMLButtonElement;
         }
 
-        if (this.domNode.lastElementChild !== this.clearButton)
-            this.domNode.append(this.clearButton);
+        // beside the "Filters" button while the filters are collapsed behind it, and otherwise after the last filter,
+        // and before what else is in the bar, e.g. the view switch of a grid
+        const items = this.domNode.querySelectorAll(":scope > .quick-filter-item");
+        const anchor = this.narrow && this.toggleButton && !this.toggleButton.hidden ? this.toggleButton : items[items.length - 1];
+        if (!anchor)
+            this.clearButton.parentNode !== this.domNode && this.domNode.append(this.clearButton);
+        else if (anchor.nextElementSibling !== this.clearButton)
+            anchor.after(this.clearButton);
 
         this.clearButton.hidden = !this.domNode.querySelector(":scope > .quick-filter-active");
+    }
+
+    /** The button that opens and closes the filters while the bar is collapsed, see {@link QuickFilterBarOptions.collapsible}. */
+    declare private toggleButton: HTMLButtonElement;
+
+    /** Whether the bar is narrower than {@link QuickFilterBarDefaults.collapseWidth}, when its filters are collapsed. */
+    declare private narrow: boolean;
+
+    /** Whether the filters are opened while the bar is collapsed. */
+    declare private expanded: boolean;
+
+    declare private resizeObserver: ResizeObserver;
+
+    private isCollapsible(): boolean {
+        return !!(this.options.collapsible ?? QuickFilterBar.defaults.collapsible ?? true);
+    }
+
+    /** Collapses the filters while the bar is narrow, which it watches, where it can. */
+    private observeWidth(): void {
+        if (!this.isCollapsible() || typeof ResizeObserver === "undefined")
+            return;
+
+        let frame: number;
+        this.resizeObserver = new ResizeObserver(() => {
+            // in the next frame, as collapsing changes the layout, which the browser would report as a loop of the
+            // observer if it was changed while it notifies
+            cancelAnimationFrame(frame);
+            frame = requestAnimationFrame(() => {
+                const width = this.domNode?.clientWidth;
+                // a bar that is not shown, e.g. in a tab that is not open, keeps how it is
+                if (width)
+                    this.setNarrow(width < (QuickFilterBar.defaults.collapseWidth ?? 768));
+            });
+        });
+        this.resizeObserver.observe(this.domNode);
+    }
+
+    /**
+     * Sets whether the bar is narrow, when its filters, except the pinned ones, are collapsed behind its "Filters"
+     * button, which it does by itself as its width changes, see {@link QuickFilterBarOptions.collapsible}.
+     * @param narrow - Whether the bar is narrow.
+     */
+    public setNarrow(narrow: boolean): void {
+        narrow = !!narrow && this.isCollapsible();
+        if (!this.domNode || narrow === !!this.narrow)
+            return;
+
+        this.narrow = narrow;
+        this.domNode.classList.toggle("quick-filters-narrow", narrow);
+        // the filters that were hidden on a small screen are collapsed instead, so that they can be opened
+        this.domNode.querySelectorAll(narrow ? ":scope > .quick-filter-item.hidden-xs" : ":scope > .quick-filter-item.quick-filter-hidden-xs")
+            .forEach(el => {
+                el.classList.toggle("hidden-xs", !narrow);
+                el.classList.toggle("quick-filter-hidden-xs", narrow);
+            });
+        this.updateToggleButton();
+        // the clear button moves beside the toggle button, or back after the filters
+        if (this.clearButton)
+            this.updateClearButton();
+    }
+
+    /**
+     * Opens or closes the filters while the bar is collapsed, as its "Filters" button does.
+     * @param expanded - Whether the filters are opened.
+     */
+    public setExpanded(expanded: boolean): void {
+        this.expanded = !!expanded;
+        this.domNode?.classList.toggle("quick-filters-expanded", this.expanded);
+        this.toggleButton?.setAttribute("aria-expanded", this.expanded ? "true" : "false");
+    }
+
+    /**
+     * Shows the "Filters" button while the bar is narrow and it has a filter to collapse, with how many of those
+     * filters are applied, and keeps it at the start of the bar.
+     */
+    protected updateToggleButton(): void {
+        if (!this.domNode || (!this.narrow && !this.toggleButton))
+            return;
+
+        if (!this.toggleButton) {
+            this.toggleButton = <button type="button" class="quick-filters-toggle" aria-expanded="false" onClick={() => this.setExpanded(!this.expanded)}>
+                <span class="quick-filters-toggle-text">{QuickFilterBarTexts.Filters}</span>
+                <span class="quick-filters-count" hidden></span>
+            </button> as HTMLButtonElement;
+            this.setExpanded(this.expanded);
+        }
+
+        if (this.domNode.firstElementChild !== this.toggleButton)
+            this.domNode.prepend(this.toggleButton);
+
+        const collapsed = this.domNode.querySelectorAll(":scope > .quick-filter-item:not(.quick-filter-pinned)");
+        this.toggleButton.hidden = !this.narrow || !collapsed.length;
+
+        const active = Array.from(collapsed).filter(el => el.classList.contains("quick-filter-active")).length;
+        const count = this.toggleButton.querySelector<HTMLElement>(".quick-filters-count");
+        count.textContent = active ? String(active) : "";
+        count.hidden = !active;
     }
 
     /**
@@ -199,7 +329,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
         }
 
         const qfElement = this.domNode.insertBefore(<div class="quick-filter-item" data-qffield={opt.field}></div>,
-            this.clearButton ?? null) as HTMLDivElement;
+            this.getInsertionPoint()) as HTMLDivElement;
 
         let title = tryGetText(opt.title) ?? opt.title;
         if (title == null) {
@@ -231,6 +361,15 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
 
         if (opt.cssClass) {
             Fluent.addClass(qfElement, opt.cssClass);
+        }
+
+        if (opt.pinned) {
+            qfElement.classList.add("quick-filter-pinned");
+        }
+
+        if (this.narrow && qfElement.classList.contains("hidden-xs")) {
+            qfElement.classList.remove("hidden-xs");
+            qfElement.classList.add("quick-filter-hidden-xs");
         }
 
         const createWidget = (type: { new(options?: TOptions): TWidget, prototype: TWidget }, place: (el: HTMLElement) => void) => Widget.create({
@@ -301,6 +440,7 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
 
         this.submitHandlers.push(submitHandler);
         this.items.push({ element: qfElement, widget: () => widget });
+        this.updateToggleButton();
 
         if (isPromiseLike(opt.type)) {
             const placeholder = new QuickFilterPlaceholder({
@@ -582,6 +722,8 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
      */
     override destroy() {
         this.submitHandlers = null;
+        this.resizeObserver?.disconnect();
+        this.resizeObserver = null;
         super.destroy();
     }
 
@@ -592,6 +734,8 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
     public onSubmit(request: ListRequest) {
         this.submitHandlers?.forEach(handler => handler(request));
         // the handlers tell which filters are applied
+        // the toggle button first, as the clear button is beside it while the filters are collapsed
+        this.updateToggleButton();
         this.updateClearButton();
     }
 

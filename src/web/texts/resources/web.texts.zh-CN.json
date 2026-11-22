@@ -139,6 +139,7 @@
   "Controls.PropertyGrid.RequiredHint": "此字段为必填",
   "Controls.QuickFilterBar.ClearFilters": "清除",
   "Controls.QuickFilterBar.ClearFiltersHint": "清除所有快速筛选",
+  "Controls.QuickFilterBar.Filters": "筛选",
   "Controls.QuickSearch.FieldSelection": "选择要搜索的字段",
   "Controls.QuickSearch.Hint": "输入要搜索的文本",
   "Controls.QuickSearch.Placeholder": "搜索",

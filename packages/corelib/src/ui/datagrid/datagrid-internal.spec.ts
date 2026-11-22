@@ -136,6 +136,13 @@ describe("propertyItemToQuickFilter", () => {
         const result = propertyItemToQuickFilter({ name: "Date", title: "Date", quickFilterSeparator: true, quickFilterCssClass: "c" } as any);
         expect(result.separator).toBe(true);
         expect(result.cssClass).toBe("c");
+        expect(result.pinned).toBeUndefined();
+    });
+
+    it("pins the quick filter that the server pins, see QuickFilterAttribute.Pinned", () => {
+        vi.spyOn(FilteringTypeRegistry, "get").mockReturnValue(DateFiltering as any);
+        const result = propertyItemToQuickFilter({ name: "Date", title: "Date", quickFilterPinned: true } as any);
+        expect(result.pinned).toBe(true);
     });
 });
 

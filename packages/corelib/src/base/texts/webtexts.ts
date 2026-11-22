@@ -195,6 +195,7 @@ namespace webTexts {
             export function asTry(): typeof QuickFilterBar;
             export const ClearFilters: string;
             export const ClearFiltersHint: string;
+            export const Filters: string;
         }
         namespace QuickSearch {
             export function asKey(): typeof QuickSearch;

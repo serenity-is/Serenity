@@ -110,6 +110,8 @@ export function propertyItemToQuickFilter(item: PropertyItem): QuickFilter<any, 
     }
 
     result.cssClass = item.quickFilterCssClass;
+    if (item.quickFilterPinned)
+        result.pinned = true;
     return result;
 }
 

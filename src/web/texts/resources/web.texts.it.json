@@ -139,6 +139,7 @@
   "Controls.PropertyGrid.RequiredHint": "Questo campo è obbligatorio",
   "Controls.QuickFilterBar.ClearFilters": "Cancella",
   "Controls.QuickFilterBar.ClearFiltersHint": "Cancella tutti i filtri rapidi",
+  "Controls.QuickFilterBar.Filters": "Filtri",
   "Controls.QuickSearch.FieldSelection": "Seleziona il campo da cercare",
   "Controls.QuickSearch.Hint": "Inserire il testo da cercare",
   "Controls.QuickSearch.Placeholder": "Cerca",

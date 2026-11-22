@@ -139,6 +139,7 @@
   "Controls.PropertyGrid.RequiredHint": "এই ক্ষেত্রটি আবশ্যক",
   "Controls.QuickFilterBar.ClearFilters": "মুছুন",
   "Controls.QuickFilterBar.ClearFiltersHint": "সব দ্রুত ফিল্টার মুছুন",
+  "Controls.QuickFilterBar.Filters": "ফিল্টার",
   "Controls.QuickSearch.FieldSelection": "অনুসন্ধানের জন্য ক্ষেত্র নির্বাচন করুন",
   "Controls.QuickSearch.Hint": "অনুসন্ধানের জন্য লেখা প্রবেশ করুন",
   "Controls.QuickSearch.Placeholder": "অনুসন্ধান করুন",

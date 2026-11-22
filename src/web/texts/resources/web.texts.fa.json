@@ -139,6 +139,7 @@
   "Controls.PropertyGrid.RequiredHint": "این فیلد الزامی است",
   "Controls.QuickFilterBar.ClearFilters": "پاک کردن",
   "Controls.QuickFilterBar.ClearFiltersHint": "پاک کردن همه فیلترهای سریع",
+  "Controls.QuickFilterBar.Filters": "فیلترها",
   "Controls.QuickSearch.FieldSelection": "فیلد را برای جستجو انتخاب کنید",
   "Controls.QuickSearch.Hint": "برای جستجو متن را وارد کنید",
   "Controls.QuickSearch.Placeholder": "جستجو کنید",

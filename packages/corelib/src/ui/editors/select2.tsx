@@ -1209,7 +1209,8 @@ export abstract class AbstractSelect2 {
 
     declare private _enabled: boolean;
     declare private _readonly: boolean;
-    declare private _touchEvent: boolean;
+    /** Whether the results were touched, when the click that follows selects what is highlighted, see handleDropdownClick. */
+    declare protected _touchEvent: boolean;
     declare private _touchMoved: boolean;
 
     declare protected autofocus: boolean;
@@ -1475,6 +1476,9 @@ export abstract class AbstractSelect2 {
 
     protected handleDropdownMouseUp(e: Event) {
         if ((e.target as HTMLElement).closest(".select2-result-selectable")) {
+            // a tap is followed by a click, which selects what is highlighted after a touch, see handleDropdownClick,
+            // and would select it again, which unchecks the result that was just checked in a checklist
+            this._touchEvent = false;
             this.highlightUnderEvent(e);
             this.selectHighlighted(e);
         }
@@ -3980,20 +3984,21 @@ export class MultiSelect2 extends AbstractSelect2 {
         Fluent.trigger(this.opts.element, "select2-open");
     }
 
+    /** The minimum width the control had of its own before its dropdown was opened, see openingCheckList. */
+    declare private minWidthBeforeOpen: string;
+
     /**
      * Opens the dropdown of a checklist, whose search box takes what was typed in the focusser, and the focus, as the one
      * of a single select does.
      */
-    /** The width the control had of its own before its dropdown was opened, see openingCheckList. */
-    declare private widthBeforeOpen: string;
-
     private openingCheckList() {
-        // the summary changes with each item that is ticked, which would change the width of a control that fits its
-        // content, e.g. a quick filter, with the dropdown open, so it keeps the width it has until it is closed
-        this.widthBeforeOpen = this.container.style.width;
+        // the summary changes with each item that is ticked, which changes the width of a control that fits its content,
+        // e.g. a quick filter: while the dropdown is open, it can grow, up to its maximum width, so that the summary is
+        // seen, but it does not shrink, e.g. when an item is unticked, until it is closed
+        this.minWidthBeforeOpen = this.container.style.minWidth;
         const width = getComputedStyle(this.container).width;
         if (width && width.endsWith("px"))
-            this.container.style.width = width;
+            this.container.style.minWidth = width;
 
         super.opening();
 
@@ -4023,9 +4028,9 @@ export class MultiSelect2 extends AbstractSelect2 {
 
         if (this.isChecklist()) {
             // it fits its summary again, see openingCheckList
-            if (this.widthBeforeOpen !== undefined) {
-                this.container.style.width = this.widthBeforeOpen;
-                this.widthBeforeOpen = undefined;
+            if (this.minWidthBeforeOpen !== undefined) {
+                this.container.style.minWidth = this.minWidthBeforeOpen;
+                this.minWidthBeforeOpen = undefined;
             }
 
             this.focusser.disabled = !this.isInterfaceEnabled();
@@ -4091,6 +4096,9 @@ export class MultiSelect2 extends AbstractSelect2 {
         this.opts.selectionSummary(this.summaryItems ?? [], content);
         Fluent(summary).insertBefore(this.searchContainer);
         this.updateAllowClear();
+        // the control can grow with its summary while its dropdown is open, see openingCheckList, which stays as wide
+        if (this.opened())
+            this.positionDropdown();
     }
 
     protected override tokenize(): string {
@@ -4531,6 +4539,8 @@ export class MultiSelect2 extends AbstractSelect2 {
     protected override handleDropdownMouseUp(e: Event) {
         const row = (e.target as HTMLElement)?.closest?.(".select2-result.select2-selected") as HTMLElement;
         if (this.isChecklist() && row?.classList.contains("select2-result-selectable")) {
+            // the click that follows a tap would check it again, see the base method
+            this._touchEvent = false;
             this.unselectById(this.id((row as any).select2data as Select2Item));
             return;
         }

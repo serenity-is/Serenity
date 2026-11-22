@@ -139,6 +139,7 @@
   "Controls.PropertyGrid.RequiredHint": "Bidang ini diperlukan",
   "Controls.QuickFilterBar.ClearFilters": "Bersihkan",
   "Controls.QuickFilterBar.ClearFiltersHint": "Bersihkan semua filter cepat",
+  "Controls.QuickFilterBar.Filters": "Filter",
   "Controls.QuickSearch.FieldSelection": "Pilih bidang untuk mencari",
   "Controls.QuickSearch.Hint": "Masukkan teks untuk mencari",
   "Controls.QuickSearch.Placeholder": "Cari",

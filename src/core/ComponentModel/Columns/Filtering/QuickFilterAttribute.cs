@@ -41,6 +41,13 @@ public class QuickFilterAttribute(bool value = true) : Attribute
     /// </value>
     public string? CssClass { get; set; }
 
+    /// <summary>
+    /// Gets or sets a value indicating whether the quick filter stays visible while the quick filter bar
+    /// is collapsed behind its "Filters" button, which it is when it is narrow, e.g. on a phone.
+    /// Use it for the one or two filters that are used most.
+    /// </summary>
+    public bool Pinned { get; set; }
+
     private bool? multiple;
 
     /// <summary>

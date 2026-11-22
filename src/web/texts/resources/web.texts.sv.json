@@ -139,6 +139,7 @@
   "Controls.PropertyGrid.RequiredHint": "Detta fält är obligatoriskt",
   "Controls.QuickFilterBar.ClearFilters": "Rensa",
   "Controls.QuickFilterBar.ClearFiltersHint": "Rensa alla snabbfilter",
+  "Controls.QuickFilterBar.Filters": "Filter",
   "Controls.QuickSearch.FieldSelection": "Välj fält för sökning",
   "Controls.QuickSearch.Hint": "Ange texten för att söka",
   "Controls.QuickSearch.Placeholder": "Sök",

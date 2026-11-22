@@ -768,6 +768,14 @@ public class PropertyItem
     public string? QuickFilterCssClass { get; set; }
 
     /// <summary>
+    /// Gets or sets a value indicating whether the quick filter stays visible while the quick filter bar is collapsed,
+    /// e.g. on a phone.
+    /// </summary>
+    [Newtonsoft.Json.JsonProperty("quickFilterPinned")]
+    [JsonPropertyName("quickFilterPinned")]
+    public bool? QuickFilterPinned { get; set; }
+
+    /// <summary>
     /// Gets or sets the extension data, used for JSON.NET
     /// serialization / deserialization of dynamic properties.
     /// </summary>

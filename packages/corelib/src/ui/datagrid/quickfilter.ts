@@ -51,6 +51,11 @@ export interface QuickFilter<TWidget extends Widget<P>, P> {
     separator?: boolean;
     /** Extra CSS class applied to the filter item container. */
     cssClass?: string;
+    /**
+     * When true, the filter stays visible while the bar is collapsed behind its "Filters" button, which it is when it
+     * is narrow, e.g. on a phone, see {@link QuickFilterBarOptions.collapsible}.
+     */
+    pinned?: boolean;
     /** Restores persisted filter state into the widget. */
     loadState?: (w: TWidget, state: any) => void;
     /** Persists widget state for grid settings. */

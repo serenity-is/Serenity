@@ -672,6 +672,34 @@ describe("the search box of a checklist", () => {
         select.destroy();
     });
 
+    it("checks a result once when it is tapped, which is followed by the mouse events and a click", () => {
+        const { element, select, internal } = createChecklist();
+        let changes = 0;
+        element.addEventListener("change", () => changes++);
+        select.open();
+
+        const label = [...(internal.results as HTMLElement).querySelectorAll<HTMLElement>(".select2-result")]
+            .find(x => x.textContent === "One").querySelector(".select2-result-label");
+        label.dispatchEvent(new TouchEvent("touchstart", { bubbles: true }));
+        label.dispatchEvent(new TouchEvent("touchend", { bubbles: true }));
+        label.dispatchEvent(new MouseEvent("mouseup", { bubbles: true }));
+        label.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+
+        expect(select.val).toEqual(["1"]);
+        expect(changes).toBe(1);
+
+        // and unchecks it once when it is tapped again
+        const checked = [...(internal.results as HTMLElement).querySelectorAll<HTMLElement>(".select2-result")]
+            .find(x => x.textContent === "One").querySelector(".select2-result-label");
+        checked.dispatchEvent(new TouchEvent("touchstart", { bubbles: true }));
+        checked.dispatchEvent(new TouchEvent("touchend", { bubbles: true }));
+        checked.dispatchEvent(new MouseEvent("mouseup", { bubbles: true }));
+        checked.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+        expect(select.val).toEqual([]);
+        expect(changes).toBe(2);
+        select.destroy();
+    });
+
     it("ticks the highlighted result with Space, as a check box, and accepts the selection with Enter, which closes it", () => {
         const { select, internal } = createChecklist({ selectAll: false, shouldFocusInput: () => true });
         select.open();
@@ -1111,10 +1139,36 @@ describe("the width of the dropdown of a checklist", () => {
             vi.restoreAllMocks();
         }
     });
+
+    it("stays as wide as the control, when the control grows with its summary while it is open", () => {
+        const widths = { container: 100, dropdown: 60 };
+        vi.spyOn(HTMLElement.prototype, "offsetWidth", "get").mockImplementation(function (this: HTMLElement) {
+            if (this.classList.contains("select2-drop"))
+                return widths.dropdown;
+            if (this.classList.contains("select2-container"))
+                return widths.container;
+            return 0;
+        });
+
+        try {
+            const { select, internal } = createChecklist({ dropdownAutoWidth: true });
+            select.open();
+            expect(internal.dropdown.style.width).toBe("100px");
+
+            // ticking an item makes the summary, so the control, wider
+            widths.container = 250;
+            internal.onSelect({ id: "1", text: "One" }, {});
+            expect(internal.dropdown.style.width).toBe("250px");
+            select.destroy();
+        }
+        finally {
+            vi.restoreAllMocks();
+        }
+    });
 });
 
 describe("the width of a checklist that fits its summary", () => {
-    it("is kept while its dropdown is open, and fits the summary again when it is closed", () => {
+    it("does not shrink while its dropdown is open, but can grow, and fits the summary again when it is closed", () => {
         const original = window.getComputedStyle;
         vi.spyOn(window, "getComputedStyle").mockImplementation(function (element: Element, pseudo?: string) {
             const style = original.call(window, element, pseudo);
@@ -1125,14 +1179,16 @@ describe("the width of a checklist that fits its summary", () => {
 
         try {
             const { select, internal } = createChecklist();
-            expect(internal.container.style.width).toBe("");
+            expect(internal.container.style.minWidth).toBe("");
 
             select.open();
-            // ticking an item changes the summary, which would make the control wider while the dropdown is open
-            expect(internal.container.style.width).toBe("150px");
+            // unticking an item makes the summary shorter, which would make the control narrower while the dropdown is
+            // open, but ticking one can make it wider, so that the summary is seen
+            expect(internal.container.style.minWidth).toBe("150px");
+            expect(internal.container.style.width).toBe("");
 
             select.close();
-            expect(internal.container.style.width).toBe("");
+            expect(internal.container.style.minWidth).toBe("");
             select.destroy();
         }
         finally {
@@ -1140,12 +1196,14 @@ describe("the width of a checklist that fits its summary", () => {
         }
     });
 
-    it("keeps a width that it was given of its own", () => {
+    it("keeps a width, and a minimum width, that it was given of its own", () => {
         const { select, internal } = createChecklist();
         internal.container.style.width = "12rem";
+        internal.container.style.minWidth = "8rem";
         select.open();
         select.close();
         expect(internal.container.style.width).toBe("12rem");
+        expect(internal.container.style.minWidth).toBe("8rem");
         select.destroy();
     });
 });

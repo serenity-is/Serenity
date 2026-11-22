@@ -3517,6 +3517,8 @@ export interface PropertyItem {
     quickFilterSeparator?: boolean;
     /** Extra CSS class for the quick-filter item. */
     quickFilterCssClass?: string;
+    /** When true the quick filter stays visible while the bar is collapsed, e.g. on a phone. */
+    quickFilterPinned?: boolean;
 }
 /**
  * Alias for {@link PropertyItem}.
@@ -4486,6 +4488,7 @@ declare namespace webTexts {
             function asTry(): typeof QuickFilterBar;
             const ClearFilters: string;
             const ClearFiltersHint: string;
+            const Filters: string;
         }
         namespace QuickSearch {
             function asKey(): typeof QuickSearch;
@@ -9955,7 +9958,8 @@ export declare class Select2 {
 export declare abstract class AbstractSelect2 {
     private _enabled;
     private _readonly;
-    private _touchEvent;
+    /** Whether the results were touched, when the click that follows selects what is highlighted, see handleDropdownClick. */
+    protected _touchEvent: boolean;
     private _touchMoved;
     protected autofocus: boolean;
     container: HTMLElement;
@@ -10188,12 +10192,12 @@ export declare class MultiSelect2 extends AbstractSelect2 {
     protected clearSearch(): void;
     protected clearPlaceholder(): void;
     protected opening(): void;
+    /** The minimum width the control had of its own before its dropdown was opened, see openingCheckList. */
+    private minWidthBeforeOpen;
     /**
      * Opens the dropdown of a checklist, whose search box takes what was typed in the focusser, and the focus, as the one
      * of a single select does.
      */
-    /** The width the control had of its own before its dropdown was opened, see openingCheckList. */
-    private widthBeforeOpen;
     private openingCheckList;
     close(): void;
     focus(): void;
@@ -11712,6 +11716,11 @@ export interface QuickFilter<TWidget extends Widget<P>, P> {
     separator?: boolean;
     /** Extra CSS class applied to the filter item container. */
     cssClass?: string;
+    /**
+     * When true, the filter stays visible while the bar is collapsed behind its "Filters" button, which it is when it
+     * is narrow, e.g. on a phone, see {@link QuickFilterBarOptions.collapsible}.
+     */
+    pinned?: boolean;
     /** Restores persisted filter state into the widget. */
     loadState?: (w: TWidget, state: any) => void;
     /** Persists widget state for grid settings. */
@@ -11903,6 +11912,13 @@ export interface QuickFilterBarOptions {
      * Default is {@link QuickFilterBarDefaults.clearButton}.
      */
     clearButton?: boolean;
+    /**
+     * Whether the filters are collapsed behind a "Filters" button while the bar is narrower than
+     * {@link QuickFilterBarDefaults.collapseWidth}, e.g. on a phone. The button shows how many filters are applied,
+     * and opens the filters, one in each row. The filters that are pinned, see {@link QuickFilter.pinned}, stay visible.
+     * Default is {@link QuickFilterBarDefaults.collapsible}.
+     */
+    collapsible?: boolean;
 }
 /** What {@link QuickFilterBarDefaults.filterAdded} is called with, for a filter that is added to a bar. */
 export interface QuickFilterAddedArgs {
@@ -11921,6 +11937,13 @@ export interface QuickFilterAddedArgs {
 export interface QuickFilterBarDefaults {
     /** The default of {@link QuickFilterBarOptions.clearButton}. Default is true. */
     clearButton: boolean;
+    /** The default of {@link QuickFilterBarOptions.collapsible}. Default is true. */
+    collapsible: boolean;
+    /**
+     * The width, in pixels, that a bar is collapsed below, see {@link QuickFilterBarOptions.collapsible}. Default is 768,
+     * the width below which the filters with the hidden-xs class were hidden, which are collapsed instead while it is.
+     */
+    collapseWidth: number;
     /**
      * Creates the quick filter of a date field that a grid makes from its columns, instead of
      * {@link QuickFilterBar.dateRange}, which has two date editors, e.g. one that edits the range in one input along with
@@ -11975,6 +11998,8 @@ export declare class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilte
      * Adds a visual separator to the bar.
      */
     addSeparator(): void;
+    /** Where a filter, or a separator, is added: after the last one, which the clear button is after unless collapsed. */
+    private getInsertionPoint;
     /** The filters of the bar, with their elements and widgets, which the clear button clears, see {@link clear}. */
     private readonly items;
     /** The button that clears all the filters, see {@link QuickFilterBarOptions.clearButton}. */
@@ -11988,9 +12013,35 @@ export declare class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilte
      */
     clear(): void;
     /**
-     * Shows the clear button while any filter is applied, and keeps it at the end of the bar.
+     * Shows the clear button while any filter is applied, and keeps it after the last filter.
      */
     protected updateClearButton(): void;
+    /** The button that opens and closes the filters while the bar is collapsed, see {@link QuickFilterBarOptions.collapsible}. */
+    private toggleButton;
+    /** Whether the bar is narrower than {@link QuickFilterBarDefaults.collapseWidth}, when its filters are collapsed. */
+    private narrow;
+    /** Whether the filters are opened while the bar is collapsed. */
+    private expanded;
+    private resizeObserver;
+    private isCollapsible;
+    /** Collapses the filters while the bar is narrow, which it watches, where it can. */
+    private observeWidth;
+    /**
+     * Sets whether the bar is narrow, when its filters, except the pinned ones, are collapsed behind its "Filters"
+     * button, which it does by itself as its width changes, see {@link QuickFilterBarOptions.collapsible}.
+     * @param narrow - Whether the bar is narrow.
+     */
+    setNarrow(narrow: boolean): void;
+    /**
+     * Opens or closes the filters while the bar is collapsed, as its "Filters" button does.
+     * @param expanded - Whether the filters are opened.
+     */
+    setExpanded(expanded: boolean): void;
+    /**
+     * Shows the "Filters" button while the bar is narrow and it has a filter to collapse, with how many of those
+     * filters are applied, and keeps it at the start of the bar.
+     */
+    protected updateToggleButton(): void;
     /**
      * Adds a quick filter widget to the bar and wires its submit handler.
      * @param opt - Quick filter definition.

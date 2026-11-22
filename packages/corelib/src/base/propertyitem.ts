@@ -232,6 +232,8 @@ export interface PropertyItem {
     quickFilterSeparator?: boolean;
     /** Extra CSS class for the quick-filter item. */
     quickFilterCssClass?: string;
+    /** When true the quick filter stays visible while the bar is collapsed, e.g. on a phone. */
+    quickFilterPinned?: boolean;
 }
 
 /**

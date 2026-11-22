@@ -60,7 +60,7 @@ public sealed class CustomerRow : Row<CustomerRow.RowFields>, IIdRow, INameRow
     
     [DisplayText("Representatives"), AsyncLookupEditor(typeof(EmployeeRow), Multiple = true), NotMapped]
     [LinkingSetRelation(typeof(CustomerRepresentativesRow), "CustomerId", "EmployeeId")]
-    [MinSelectLevel(SelectLevel.Details), QuickFilter(CssClass = "hidden-xs")]
+    [MinSelectLevel(SelectLevel.Details), QuickFilter(CssClass = "hidden-xs", CheckList = true)]
     public List<int>? Representatives { get => fields.Representatives[this]; set => fields.Representatives[this] = value; }
 
     public class RowFields : RowFieldsBase

@@ -40,6 +40,20 @@ describe("the clear button of a quick filter bar", () => {
         bar.destroy();
     });
 
+    it("is after the last filter, and before what else is in the bar, e.g. the view switch of a grid", () => {
+        const bar = createBar();
+        const viewSwitch = bar.domNode.appendChild(document.createElement("div"));
+        bar.find(SelectEditor, "Category").value = "A";
+        bar.onSubmit({} as any);
+        expect(button(bar).previousElementSibling.getAttribute("data-qffield")).toBe("Supplier");
+        expect(button(bar).nextElementSibling).toBe(viewSwitch);
+
+        bar.add({ field: "Other", title: "Other", type: SelectEditor, options: { items: ["Z"] } } as any);
+        bar.onSubmit({} as any);
+        expect(button(bar).previousElementSibling.getAttribute("data-qffield")).toBe("Other");
+        bar.destroy();
+    });
+
     it("clears all the filters, and tells the change once", () => {
         vi.useFakeTimers();
         const bar = createBar();

@@ -140,6 +140,7 @@
   "Controls.PropertyGrid.RequiredHint": "this field is required",
   "Controls.QuickFilterBar.ClearFilters": "Clear",
   "Controls.QuickFilterBar.ClearFiltersHint": "Clear all the quick filters",
+  "Controls.QuickFilterBar.Filters": "Filters",
   "Controls.QuickSearch.FieldSelection": "select the field to search on",
   "Controls.QuickSearch.Hint": "enter the text to search for...",
   "Controls.QuickSearch.Placeholder": "search...",

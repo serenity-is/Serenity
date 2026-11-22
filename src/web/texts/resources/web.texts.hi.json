@@ -139,6 +139,7 @@
   "Controls.PropertyGrid.RequiredHint": "यह फ़ील्ड आवश्यक है",
   "Controls.QuickFilterBar.ClearFilters": "साफ़ करें",
   "Controls.QuickFilterBar.ClearFiltersHint": "सभी त्वरित फ़िल्टर साफ़ करें",
+  "Controls.QuickFilterBar.Filters": "फ़िल्टर",
   "Controls.QuickSearch.FieldSelection": "खोज के लिए फील्ड का चयन करें",
   "Controls.QuickSearch.Hint": "खोजने के लिए पाठ दर्ज करें",
   "Controls.QuickSearch.Placeholder": "खोजें",

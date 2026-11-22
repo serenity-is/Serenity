@@ -139,6 +139,7 @@
   "Controls.PropertyGrid.RequiredHint": "هذا الحقل مطلوب",
   "Controls.QuickFilterBar.ClearFilters": "مسح",
   "Controls.QuickFilterBar.ClearFiltersHint": "مسح جميع عوامل التصفية السريعة",
+  "Controls.QuickFilterBar.Filters": "عوامل التصفية",
   "Controls.QuickSearch.FieldSelection": "اختر الحقل للبحث عنه",
   "Controls.QuickSearch.Hint": "أدخل النص للبحث عنه",
   "Controls.QuickSearch.Placeholder": "البحث",

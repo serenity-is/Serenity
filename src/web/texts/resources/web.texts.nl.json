@@ -139,6 +139,7 @@
   "Controls.PropertyGrid.RequiredHint": "Dit veld is verplicht",
   "Controls.QuickFilterBar.ClearFilters": "Wissen",
   "Controls.QuickFilterBar.ClearFiltersHint": "Alle snelfilters wissen",
+  "Controls.QuickFilterBar.Filters": "Filters",
   "Controls.QuickSearch.FieldSelection": "Selecteer het veld om op te zoeken",
   "Controls.QuickSearch.Hint": "Voer de tekst in om te zoeken",
   "Controls.QuickSearch.Placeholder": "Zoeken",

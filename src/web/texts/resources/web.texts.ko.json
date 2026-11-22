@@ -139,6 +139,7 @@
   "Controls.PropertyGrid.RequiredHint": "이 필드는 필수입니다",
   "Controls.QuickFilterBar.ClearFilters": "지우기",
   "Controls.QuickFilterBar.ClearFiltersHint": "모든 빠른 필터 지우기",
+  "Controls.QuickFilterBar.Filters": "필터",
   "Controls.QuickSearch.FieldSelection": "검색할 필드를 선택하십시오",
   "Controls.QuickSearch.Hint": "검색할 텍스트를 입력하십시오",
   "Controls.QuickSearch.Placeholder": "검색",
