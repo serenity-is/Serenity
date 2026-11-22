@@ -1,4 +1,4 @@
-﻿namespace Serenity.ComponentModel;
+namespace Serenity.ComponentModel;
 
 /// <summary>
 /// Indicates that the target property should use a "Enum" editor.
@@ -115,5 +115,43 @@ public partial class EnumEditorAttribute : CustomEditorAttribute
     {
         get { return GetOption<bool>("multiple"); }
         set { SetOption("multiple", value); }
+    }
+
+    /// <summary>
+    /// Shows a multiple editor as a checklist, see <see cref="LookupEditorBaseAttribute.CheckList"/>.
+    /// </summary>
+    public bool CheckList
+    {
+        get { return GetOption<bool>("checkList"); }
+        set { SetOption("checkList", value); }
+    }
+
+    /// <summary>
+    /// The icon of the placeholder, see <see cref="LookupEditorBaseAttribute.PlaceholderIcon"/>.
+    /// </summary>
+    public string? PlaceholderIcon
+    {
+        get { return GetOption<string>("placeholderIcon"); }
+        set { SetOption("placeholderIcon", value); }
+    }
+
+    /// <summary>
+    /// Whether a checklist, see <see cref="CheckList"/>, has an item that selects all the members, or clears them when
+    /// they are all selected, see <see cref="LookupEditorBaseAttribute.SelectAll"/>. Default is true.
+    /// </summary>
+    public bool SelectAll
+    {
+        get { return GetOption<bool>("selectAll"); }
+        set { SetOption("selectAll", value); }
+    }
+
+    /// <summary>
+    /// How many of the selected members the summary of a checklist, see <see cref="CheckList"/>, names before it counts
+    /// the rest, see <see cref="LookupEditorBaseAttribute.MaxSummaryItems"/>. Default is 3.
+    /// </summary>
+    public int MaxSummaryItems
+    {
+        get { return GetOption<int>("maxSummaryItems"); }
+        set { SetOption("maxSummaryItems", value); }
     }
 }

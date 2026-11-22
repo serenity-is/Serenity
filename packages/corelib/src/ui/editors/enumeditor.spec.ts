@@ -68,6 +68,55 @@ describe("EnumEditor with a set of flags", () => {
         editor.destroy();
     });
 
+    it("shows a value as a checklist with every member whose bits are set, the combined ones too", () => {
+        const editor = create({ enumType: TestFlags, flags: true, multiple: true, checkList: true });
+        editor.setEditValue({ Access: TestFlags.ReadWrite | TestFlags.Delete }, property);
+        expect(editor.values).toEqual(["1", "2", "3", "4"]);
+
+        editor.setEditValue({ Access: TestFlags.Read }, property);
+        expect(editor.values).toEqual(["1"]);
+        editor.destroy();
+    });
+
+    it("shows the selection that the user makes in a checklist as it is shown after the value is saved and loaded", () => {
+        const editor = create({ enumType: TestFlags, flags: true, multiple: true, checkList: true });
+        const target: any = {};
+
+        // ticking Read and Write sets the bits of ReadWrite, which is ticked too
+        editor.value = "1,2";
+        expect(editor.values).toEqual(["1", "2", "3"]);
+
+        // unticking ReadWrite removes its bits, instead of leaving them to Read and Write
+        editor.value = "1,2";
+        expect(editor.values).toEqual([]);
+
+        // ticking all, then unticking Read, leaves Write and Delete, as ReadWrite no longer has all its bits
+        editor.value = "1,2,3,4";
+        editor.value = "2,3,4";
+        expect(editor.values).toEqual(["2", "4"]);
+        editor.getEditValue(property, target);
+        expect(target.Access).toBe(TestFlags.Write | TestFlags.Delete);
+
+        // and it is shown the same after it is saved and loaded
+        editor.setEditValue({ Access: target.Access }, property);
+        expect(editor.values).toEqual(["2", "4"]);
+        editor.destroy();
+    });
+
+    it("shows the choices that the user selects with the fewest members, as they are after the value is saved and loaded", () => {
+        const editor = create({ enumType: TestFlags, flags: true, multiple: true });
+
+        editor.value = "1";
+        expect(editor.values).toEqual(["1"]);
+        editor.value = "1,2";
+        expect(editor.values).toEqual(["3"]);
+
+        // removing the choice of ReadWrite removes its bits
+        editor.value = "";
+        expect(editor.values).toEqual([]);
+        editor.destroy();
+    });
+
     it("gives the members selected OR-ed together as the value, and null for none", () => {
         const editor = create({ enumType: TestFlags, flags: true, multiple: true });
         const target: any = {};

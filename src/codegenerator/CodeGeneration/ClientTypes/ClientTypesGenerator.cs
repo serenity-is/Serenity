@@ -13,6 +13,7 @@ public partial class ClientTypesGenerator : CodeGeneratorBase
             "AutoComplete",
             "CascadeField",
             "CascadeValue",
+            "CheckList",
             "Delimited",
             "DialogType",
             "FilterField",
@@ -20,9 +21,12 @@ public partial class ClientTypesGenerator : CodeGeneratorBase
             "InplaceAdd",
             "InplaceAddPermission",
             "LookupKey",
+            "MaxSummaryItems",
             "MinimumResultsForSearch",
             "Multiple",
-            "OpenDialogAsPanel"
+            "OpenDialogAsPanel",
+            "PlaceholderIcon",
+            "SelectAll"
         };
 
         var lookupEditorBaseAttr = Type.GetType("Serenity.ComponentModel.LookupEditorBaseAttribute, Serenity.Net.Core");
@@ -39,6 +43,7 @@ public partial class ClientTypesGenerator : CodeGeneratorBase
             "Capabilities",
             "CascadeField",
             "CascadeValue",
+            "CheckList",
             "ColumnSelection",
             "ContainsField",
             "Criteria",
@@ -55,11 +60,14 @@ public partial class ClientTypesGenerator : CodeGeneratorBase
             "InplaceAdd",
             "InplaceAddPermission",
             "ItemType",
+            "MaxSummaryItems",
             "MinimumResultsForSearch",
             "Multiple",
             "OpenDialogAsPanel",
             "PageSize",
+            "PlaceholderIcon",
             "QuickSearchFields",
+            "SelectAll",
             "Service",
             "Sort"
         };

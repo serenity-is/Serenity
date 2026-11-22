@@ -1,5 +1,5 @@
 import { bindThis } from "@serenity-is/domwise";
-import { Authorization, Fluent, IconClassName, PropertyItem, SelectEditorTexts, isPromiseLike, nsSerenity, setElementReadOnly } from "../../base";
+import { Authorization, Fluent, IconClassName, PropertyItem, SelectEditorTexts, iconClassName, isPromiseLike, nsSerenity, setElementReadOnly, stringFormat } from "../../base";
 import { ValidationHelper } from "../../compat";
 import { IEditDialog, IGetEditValue, IReadOnly, ISetEditValue, IStringValue } from "../../interfaces";
 import { DialogType } from "../../types/dialogtype";
@@ -10,6 +10,7 @@ import { CascadedWidgetLink } from "./cascadedwidgetlink";
 import { Combobox, ComboboxItem, ComboboxOptions, ComboboxSearchQuery, ComboboxSearchResult, stripDiacritics } from "./combobox";
 import { EditorUtils } from "./editorutils";
 import { EditorProps, EditorWidget } from "./editorwidget";
+import { Select2, type Select2QueryOptions } from "./select2";
 
 /**
  * Common options shared by combobox-based editors.
@@ -20,11 +21,35 @@ export interface ComboboxCommonOptions {
     /** Whether multiple items can be selected. */
     delimited?: boolean;
     /** Minimum results required to show the search box. */
-    minimumResultsForSearch?: any;
+    minimumResultsForSearch?: number;
     /** Whether multiple items can be selected. */
     multiple?: boolean;
     /** Name of the item field containing the icon class. */
     iconField?: string;
+    /**
+     * Shows a multiple editor as a checklist, instead of a combobox with a choice for each selected item: the results
+     * have check boxes, of which the ones that are selected stay in the list, the first item selects all the results
+     * that are shown, or clears them, and the selection is shown as one summary, e.g. "A, B, C +2". It has no effect on a
+     * single editor.
+     */
+    checkList?: boolean;
+    /**
+     * The icon of the placeholder, e.g. the icon of the field or of the filter, which the editor shows when nothing is
+     * selected.
+     */
+    placeholderIcon?: IconClassName;
+    /**
+     * Whether a checklist, see {@link checkList}, has an item that selects all the results that are shown, or clears
+     * them when they are all selected. Its text tells which: "Select all", "Select all matching" when something is
+     * typed, or "Select shown" when there are more results than the ones that are loaded, e.g. of an asynchronous
+     * source, whose results come in pages. Default is true.
+     */
+    selectAll?: boolean;
+    /**
+     * How many of the selected items the summary of a checklist, see {@link checkList}, names before it counts the
+     * rest, e.g. 3 for "A, B, C +2". Default is {@link ComboboxEditorDefaults.maxSummaryItems}.
+     */
+    maxSummaryItems?: number;
 }
 
 /**
@@ -63,6 +88,25 @@ export interface ComboboxInplaceAddOptions {
  * Options for the {@link ComboboxEditor}.
  */
 export interface ComboboxEditorOptions extends ComboboxFilterOptions, ComboboxInplaceAddOptions, ComboboxCommonOptions {
+}
+
+/**
+ * The defaults of the combobox editors, see {@link ComboboxEditor.defaults}, which an application can change once, e.g.
+ * in its script initialization, before the editors are created. An option of an editor takes precedence over them.
+ */
+export interface ComboboxEditorDefaults {
+    /**
+     * The text of the empty item, which is the placeholder of an editor that has nothing selected, when the editor has
+     * no placeholder of its own. Default is an empty string, which shows no text, but still lets the selection be
+     * cleared, while `null` shows no placeholder, and does not let it be cleared. A callback is called each time it is
+     * needed, so it can return a local text that is not loaded yet when the default is set, e.g. to show "--select--"
+     * as before: `ComboboxEditor.defaults.emptyItemText = () => SelectEditorTexts.EmptyItemText`.
+     */
+    emptyItemText: string | (() => string);
+    /** The default of {@link ComboboxCommonOptions.minimumResultsForSearch}. Not set by default, so the select shows a search box for any number of results. */
+    minimumResultsForSearch?: number;
+    /** The default of {@link ComboboxCommonOptions.maxSummaryItems}. Default is 3. */
+    maxSummaryItems: number;
 }
 
 /**
@@ -200,8 +244,8 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
      * @returns The empty item text.
      */
     protected emptyItemText() {
-        return this.domNode.getAttribute("placeholder") ??
-            SelectEditorTexts.EmptyItemText;
+        const text = ComboboxEditor.defaults.emptyItemText;
+        return this.domNode.getAttribute("placeholder") ?? (typeof text === "function" ? text() : text);
     }
 
     /**
@@ -328,6 +372,12 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
         this.combobox?.abortPendingQuery();
     }
 
+    /** The defaults of the combobox editors, see {@link ComboboxEditorDefaults}. */
+    public static readonly defaults: ComboboxEditorDefaults = {
+        emptyItemText: "",
+        maxSummaryItems: 3
+    };
+
     /**
      * Returns the combobox options for this editor.
      * @returns Combobox options.
@@ -413,13 +463,108 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
             };
         }
 
-        if ((this.options as ComboboxEditorOptions).minimumResultsForSearch != null)
-            opt.minimumResultsForSearch = (this.options as ComboboxEditorOptions).minimumResultsForSearch;
+        const minSearch = (this.options as ComboboxEditorOptions).minimumResultsForSearch ?? ComboboxEditor.defaults.minimumResultsForSearch;
+        if (minSearch != null)
+            opt.minimumResultsForSearch = minSearch;
 
         if (this.isAutoComplete() || this.useInplaceAdd())
             opt.createSearchChoice = this.getCreateSearchChoice(null);
 
+        this.applyCheckList(opt);
+
         return opt;
+    }
+
+    /** The options of the editor that the comboboxes share, see {@link ComboboxCommonOptions}. */
+    protected get comboboxOptions(): ComboboxCommonOptions {
+        return this.options as ComboboxCommonOptions;
+    }
+
+    /** Whether the editor shows a multiple selection as a checklist, see {@link ComboboxCommonOptions.checkList}. */
+    protected useCheckList() {
+        return !!this.comboboxOptions.checkList && this.isMultiple();
+    }
+
+    /**
+     * Gives a checklist its options: the check boxes and the item that selects all the results of the list, and the
+     * summary that takes the place of the choice of each selected item.
+     * @param opt - The options to change.
+     */
+    protected applyCheckList(opt: ComboboxOptions) {
+        if (this.comboboxOptions.placeholderIcon)
+            opt.placeholderIcon = this.comboboxOptions.placeholderIcon;
+
+        if (!this.useCheckList())
+            return;
+
+        opt.checkList = true;
+        opt.containerCssClass = [opt.containerCssClass, "select2-container-checklist"].filter(Boolean).join(" ");
+        opt.dropdownCssClass = [opt.dropdownCssClass, "select2-dropdown-checklist"].filter(Boolean).join(" ");
+        opt.formatResult = (item, container, query) => this.formatCheckListResult(item, container, query);
+        opt.formatSelectAll = (item, container, query) => this.formatSelectAll(item, container, query);
+        opt.selectionSummary = (items, container) => this.renderSelectionSummary(items, container);
+
+        // the select adds the item to the results that are loaded, with a text that tells which they are, e.g. the ones
+        // that are shown of an asynchronous source, whose results come in pages
+        if (this.comboboxOptions.selectAll !== false)
+            opt.selectAll = true;
+    }
+
+    /**
+     * Renders a result of a checklist, with a check box before it, which the styles mark when it is selected.
+     */
+    protected formatCheckListResult(item: ComboboxItem, container: HTMLElement, query: Select2QueryOptions) {
+        return <><i class="select2-checkbox" aria-hidden="true"></i>{this.formatCheckListContent(item, query)}</>;
+    }
+
+    /**
+     * Renders the item that selects all the results of a checklist, or clears them, with a check box, and a text that
+     * the select keeps up to date.
+     */
+    protected formatSelectAll(item: ComboboxItem, container: HTMLElement, query: Select2QueryOptions) {
+        return <><i class="select2-checkbox" aria-hidden="true"></i>
+            <span class="select2-select-all-text">{item.text}</span></>;
+    }
+
+    /** Renders the icon of an item, when it has one, and its text, which the matching part of the search is marked in. */
+    protected formatCheckListContent(item: ComboboxItem, query: Select2QueryOptions) {
+        return item.icon ?
+            <><i class={iconClassName(item.icon)}></i> {Select2.highlightMatch(item.text, query?.term)}</> :
+            Select2.highlightMatch(item.text, query?.term);
+    }
+
+    /**
+     * Renders the selection of a checklist in one element, e.g. "A, B, C +2", with the full list in its tooltip, or
+     * the placeholder of the editor, with {@link ComboboxCommonOptions.placeholderIcon}, when nothing is selected.
+     */
+    protected renderSelectionSummary(items: ComboboxItem[], container: HTMLElement) {
+        container.replaceChildren();
+        container.removeAttribute("title");
+
+        if (!items.length) {
+            container.classList.add("select2-selection-placeholder");
+            if (this.comboboxOptions.placeholderIcon)
+                container.append(<i class={iconClassName(this.comboboxOptions.placeholderIcon)}></i>);
+            container.append(this.emptyItemText() ?? "");
+            return;
+        }
+
+        container.classList.remove("select2-selection-placeholder");
+        const texts = items.map(x => x.text).filter(x => x != null && x !== "");
+        const max = this.comboboxOptions.maxSummaryItems ?? ComboboxEditor.defaults.maxSummaryItems;
+
+        if (!texts.length) {
+            container.textContent = stringFormat(SelectEditorTexts.SelectedItems, items.length);
+            return;
+        }
+
+        // the count of the rest is an element of its own, which the styles keep whole, so that the names are the ones
+        // that are cut when the summary does not fit, and the count is always seen
+        container.append(<span class="select2-selection-summary-text">{texts.slice(0, max).join(", ")}</span>);
+        if (texts.length > max)
+            container.append(<span class="select2-selection-summary-more">{"+" + (texts.length - max)}</span>);
+
+        container.setAttribute("title", texts.join(", "));
     }
 
     /**

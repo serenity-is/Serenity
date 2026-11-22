@@ -26,14 +26,14 @@ public class OrderColumns
 
     public DateTime? ShippedDate { get; set; }
 
-    [Width(140), ShipperFormatter, QuickFilter(CssClass = "hidden-xs"), QuickFilterOption("multiple", true)]
+    [Width(140), ShipperFormatter, QuickFilter(CssClass = "hidden-xs", Multiple = true)]
     public string? ShipViaCompanyName { get; set; }
 
     [Width(100), QuickFilter(CssClass = "hidden-xs"), AsyncLookupEditor(typeof(Lookups.OrderShipCountryLookup)), CountryWithFlagFormatter]
     public string? ShipCountry { get; set; }
 
     [Width(100), AsyncLookupEditor(typeof(Lookups.OrderShipCityLookup))]
-    [QuickFilter(CssClass = "hidden-xs"), QuickFilterOption("CascadeFrom", "ShipCountry")]
+    [QuickFilter(CssClass = "hidden-xs", CascadeFrom = nameof(ShipCountry))]
     public string? ShipCity { get; set; }
 
     [FreightFormatter]

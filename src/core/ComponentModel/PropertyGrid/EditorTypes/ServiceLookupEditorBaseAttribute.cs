@@ -280,4 +280,48 @@ public abstract class ServiceLookupEditorBaseAttribute(string editorType) : Cust
         get { return GetOption<ListRequestCapabilities>("capabilities"); }
         set { SetOption("capabilities", value); }
     }
+
+    /// <summary>
+    /// Shows a multiple editor as a checklist, instead of a combobox with a choice for each selected item: the results
+    /// have check boxes, of which the ones that are selected stay in the list, the first item selects all the results
+    /// that are shown, or clears them, and the selection is shown as one summary, e.g. "A, B, C +2". It has no effect on
+    /// a single editor.
+    /// </summary>
+    public bool CheckList
+    {
+        get { return GetOption<bool>("checkList"); }
+        set { SetOption("checkList", value); }
+    }
+
+    /// <summary>
+    /// The icon of the placeholder, e.g. the icon of the field or of the filter, which the editor shows when nothing is
+    /// selected.
+    /// </summary>
+    public string? PlaceholderIcon
+    {
+        get { return GetOption<string>("placeholderIcon"); }
+        set { SetOption("placeholderIcon", value); }
+    }
+
+    /// <summary>
+    /// Whether a checklist, see <see cref="CheckList"/>, has an item that selects all the results that are shown, or
+    /// clears them when they are all selected. Default is true. Its text tells which: "Select all", "Select all matching"
+    /// when something is typed, or "Select shown" when there are more results than the ones loaded, e.g. of an
+    /// asynchronous lookup, whose results come in pages.
+    /// </summary>
+    public bool SelectAll
+    {
+        get { return GetOption<bool>("selectAll"); }
+        set { SetOption("selectAll", value); }
+    }
+
+    /// <summary>
+    /// How many of the selected items the summary of a checklist, see <see cref="CheckList"/>, names before it counts the
+    /// rest, e.g. 3 for "A, B, C +2". Default is 3, which ComboboxEditor.defaults.maxSummaryItems sets on the client.
+    /// </summary>
+    public int MaxSummaryItems
+    {
+        get { return GetOption<int>("maxSummaryItems"); }
+        set { SetOption("maxSummaryItems", value); }
+    }
 }

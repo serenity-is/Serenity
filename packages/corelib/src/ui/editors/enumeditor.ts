@@ -1,4 +1,4 @@
-import { Enum, EnumKeyAttribute, getCustomAttribute, getTypeFullName, IconClassName, isPromiseLike, localText, nsSerenity, peekTypeInfo, PropertyItem } from "../../base";
+import { Enum, EnumKeyAttribute, Fluent, getCustomAttribute, getTypeFullName, IconClassName, isPromiseLike, localText, nsSerenity, peekTypeInfo, PropertyItem } from "../../base";
 import { EnumTypeRegistry } from "../../types/enumtyperegistry";
 import { ComboboxItem } from "./combobox";
 import { ComboboxCommonOptions, ComboboxEditor } from "./comboboxeditor";
@@ -36,7 +36,13 @@ export class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions> extends
         super(props);
 
         this.updateItems();
+
+        // the selection of a set of flags is shown as it is after its value is saved and loaded, see flagsValue
+        Fluent.on(this.domNode, "change." + this.uniqueName, () => this.normalizeFlags());
     }
+
+    /** The selection of a set of flags after it was last set or normalized, see normalizeFlags. */
+    declare private flagsSelection: string[];
 
     /**
      * Whether the enum is a set of flags, by the flags option, or else by the registration of the enum, when it is already
@@ -125,8 +131,13 @@ export class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions> extends
 
     /**
      * Gets or sets the value of a set of flags with the multiple option, which is the members selected OR-ed together, or null when
-     * none is selected. Setting it selects the fewest members that make it: the ones combining others first, the larger first, as
-     * long as all their bits are in the value and some are not covered yet, and then the single bits left.
+     * none is selected. Setting it selects the members that show it:
+     * - for a checklist, see the checkList option, every member whose bits are all in the value, so that the check box of a member
+     *   combining others, like SourceAdapter, is checked when they are, as each check box tells whether its bits are set;
+     * - otherwise, the fewest members that make it, so that there is a choice for each: the ones combining others first, the larger
+     *   first, as long as all their bits are in the value and some are not covered yet, and then the single bits left.
+     * The selection that the user makes is shown the same way, see normalizeFlags, so that it is shown as it is after the value is
+     * saved and loaded.
      */
     get flagsValue(): number | null {
         const values = this.get_values() ?? [];
@@ -134,22 +145,67 @@ export class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions> extends
     }
 
     set flagsValue(value: number | string | null) {
-        const flags = value == null || value === "" ? 0 : Number(value);
-        const members = Object.keys(this.itemById ?? {}).map(Number)
-            .filter(member => member > 0 && (member & flags) === member)
-            .sort((a, b) => bitCount(b) - bitCount(a) || b - a);
+        this.set_values(this.flagsSelectionOf(value == null || value === "" ? 0 : Number(value)));
+    }
 
-        let covered = 0;
+    /**
+     * Returns the members that show a value of a set of flags, see {@link flagsValue}, in the order of the members.
+     * @param flags - The value.
+     */
+    protected flagsSelectionOf(flags: number): string[] {
+        const members = Object.keys(this.itemById ?? {}).map(Number)
+            .filter(member => member > 0 && (member & flags) === member);
+
         const selected = new Set<string>();
-        for (const member of members) {
-            if ((member & ~covered) !== 0) {
-                selected.add(String(member));
-                covered |= member;
+        if (this.useCheckList()) {
+            members.forEach(member => selected.add(String(member)));
+        }
+        else {
+            let covered = 0;
+            for (const member of members.sort((a, b) => bitCount(b) - bitCount(a) || b - a)) {
+                if ((member & ~covered) !== 0) {
+                    selected.add(String(member));
+                    covered |= member;
+                }
             }
         }
 
         // in the order of the members, not the one they were picked in
-        this.set_values(Object.keys(this.itemById ?? {}).filter(id => selected.has(id)));
+        return Object.keys(this.itemById ?? {}).filter(id => selected.has(id));
+    }
+
+    protected override set_values(value: string[]) {
+        super.set_values(value);
+        this.flagsSelection = this.get_values()?.slice() ?? [];
+    }
+
+    /**
+     * Shows the selection of a set of flags with the multiple option as it is after its value is saved and loaded, see
+     * {@link flagsValue}, after the user changes it: the value is the one before, with the bits of the members that were
+     * selected, and without the ones of the members that were unselected, so that unselecting a member combining others, e.g.
+     * one whose check box is checked as its bits are set, removes its bits, instead of leaving them to the others.
+     */
+    protected normalizeFlags() {
+        if (!this.isMultipleFlags())
+            return;
+
+        const current = this.get_values() ?? [];
+        const before = this.flagsSelection;
+
+        let flags = 0;
+        if (before) {
+            flags = before.reduce((sum, id) => sum | Number(id), 0);
+            current.filter(id => !before.includes(id)).forEach(id => flags |= Number(id));
+            before.filter(id => !current.includes(id)).forEach(id => flags &= ~Number(id));
+        }
+        else
+            flags = current.reduce((sum, id) => sum | Number(id), 0);
+
+        const normalized = this.flagsSelectionOf(flags);
+        if (normalized.join(",") !== current.join(","))
+            this.set_values(normalized);
+        else
+            this.flagsSelection = current.slice();
     }
 
     /**

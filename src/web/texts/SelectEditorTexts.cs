@@ -4,6 +4,9 @@ namespace Serenity.Web;
 public static class SelectEditorTexts
 {
     public static readonly LocalText AjaxError = "Loading failed";
+    public static readonly LocalText ClearAll = "Clear all";
+    public static readonly LocalText ClearAllMatching = "Clear all matching";
+    public static readonly LocalText ClearShown = "Clear shown";
     public static readonly LocalText ClickToDefine = "*** Click to define a new one ***";
     public static readonly LocalText EmptyItemText = "--select--";
     public static readonly LocalText MultipleMatches = "{0} results are available, use up and down arrow keys to navigate.";
@@ -16,5 +19,9 @@ public static class SelectEditorTexts
     public static readonly LocalText LoadMore = "Loading more results…";
     public static readonly LocalText NoResultsClickToDefine = "*** No results. Click to define a new one ***";
     public static readonly LocalText Searching = "Searching…";
+    public static readonly LocalText SelectedItems = "{0} selected";
+    public static readonly LocalText SelectAll = "Select all";
+    public static readonly LocalText SelectAllMatching = "Select all matching";
+    public static readonly LocalText SelectShown = "Select shown";
     public static readonly LocalText SingleMatch = "One result is available, press enter to select it.";
 }

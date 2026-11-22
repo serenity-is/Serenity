@@ -4446,6 +4446,9 @@ declare namespace webTexts {
             function asKey(): typeof SelectEditor;
             function asTry(): typeof SelectEditor;
             const AjaxError: string;
+            const ClearAll: string;
+            const ClearAllMatching: string;
+            const ClearShown: string;
             const ClickToDefine: string;
             const EmptyItemText: string;
             const InplaceAdd: string;
@@ -4457,7 +4460,11 @@ declare namespace webTexts {
             const NoMatches: string;
             const NoResultsClickToDefine: string;
             const Searching: string;
+            const SelectedItems: string;
             const SelectionTooBig: string;
+            const SelectAll: string;
+            const SelectAllMatching: string;
+            const SelectShown: string;
             const SingleMatch: string;
         }
     }
@@ -9566,6 +9573,25 @@ export interface Select2Item {
     locked?: boolean;
 }
 /**
+ * The texts of the item that selects all the results of a multiple select, or clears them, see
+ * {@link Select2Options.selectAll}. The item tells what it acts on: all the results, the ones that match what is typed,
+ * or the ones that are shown, when there are more pages of results that are not loaded yet.
+ */
+export interface SelectAllOptions {
+    /** The text of the item, e.g. "Select all". */
+    text?: string;
+    /** The text of the item when all the results are selected, e.g. "Clear all". */
+    clearText?: string;
+    /** The text of the item when something is typed, e.g. "Select all matching". */
+    matchingText?: string;
+    /** The text of the item when something is typed and all the results are selected, e.g. "Clear all matching". */
+    clearMatchingText?: string;
+    /** The text of the item when there are more results than the ones that are loaded, e.g. "Select shown". */
+    shownText?: string;
+    /** The text of the item when there are more results than the ones loaded, all selected, e.g. "Clear shown". */
+    clearShownText?: string;
+}
+/**
  * Result of a Select2 query.
  */
 export interface Select2Result {
@@ -9622,6 +9648,11 @@ export interface Select2Options {
     maximumSelectionSize?: number | (() => number);
     /** Placeholder text. */
     placeholder?: string;
+    /**
+     * Icon of the placeholder, e.g. the icon of the field or of the filter of an editor, which the control shows before
+     * the placeholder text when nothing is selected.
+     */
+    placeholderIcon?: IconClassName;
     /** Placeholder option. */
     placeholderOption?: "first" | ((select: HTMLSelectElement) => HTMLOptionElement);
     /** Separator for multiple values. */
@@ -9648,6 +9679,11 @@ export interface Select2Options {
     formatSelection?: (data: Select2Item, container: HTMLElement, escapeMarkup: (markup: string) => string) => Select2FormatResult;
     /** Formatter for result items. */
     formatResult?: (result: Select2Item, container: HTMLElement, query: Select2QueryOptions, escapeMarkup: (markup: string) => string) => Select2FormatResult;
+    /**
+     * Formatter for the item that selects all the results of a checklist, or clears them when they are all selected,
+     * see {@link selectAll}. It defaults to {@link formatResult}.
+     */
+    formatSelectAll?: (item: Select2Item, container: HTMLElement, query: Select2QueryOptions) => Select2FormatResult;
     /** Formatter for result CSS classes. */
     formatResultCssClass?: (data: Select2Item) => string;
     /** Formatter for selection CSS classes. */
@@ -9666,6 +9702,32 @@ export interface Select2Options {
     formatSelectionTooBig?: (limit: number) => Select2FormatResult;
     /** Callback that creates a search choice. */
     createSearchChoice?: (term: string) => Select2Item;
+    /**
+     * Adds an item at the top of the results of a multiple select, which selects them all, or clears the ones it shows
+     * when they are all selected. The select adds the item itself, to the first page of results, when there is a result
+     * it can select, and tells it apart by its identity, not by its id. It is rendered with {@link formatSelectAll}.
+     *
+     * It acts on the results that are loaded, which a search term filters, and its text tells which, see
+     * {@link SelectAllOptions}: "Select all" when nothing is typed, "Select all matching" when something is, and
+     * "Select shown" when the source pages its results, see `Select2Result.more`, and the pages that are not loaded yet
+     * are not selected. The texts default to the ones of `SelectEditorTexts`.
+     */
+    selectAll?: boolean | SelectAllOptions;
+    /**
+     * Makes a multiple select a checklist: the results that are selected stay in the list, marked as selected, see
+     * the `aria-selected` attribute of the results, e.g. for a check box that the styles or {@link formatResult} draw,
+     * and a click on one of them unselects it, instead of selecting it again. It is usually used with
+     * {@link selectionSummary}, as the choices of the selection would repeat the list, and {@link selectAll}.
+     */
+    checkList?: boolean;
+    /**
+     * Renders the selection of a multiple select as one element, e.g. a summary of the selected items, instead of a
+     * choice for each item, which keeps the search field of the control after it. The items are kept for
+     * {@link AbstractSelect2.data}. It does not change how the results behave, see {@link checkList}.
+     * @param items - The selected items.
+     * @param container - The element to render the selection in.
+     */
+    selectionSummary?: (items: Select2Item[], container: HTMLElement) => void;
     /** Position of the create-search-choice item. */
     createSearchChoicePosition?: string | ((list: Select2Item[], item: Select2Item) => void);
     /** Callback that initializes the selection. */
@@ -9856,6 +9918,28 @@ export declare abstract class AbstractSelect2 {
     search: HTMLInputElement;
     protected selection: HTMLElement;
     protected showSearchInput: boolean;
+    /**
+     * Whether an item is the one that selects all the results that are shown, or clears them, which the select adds
+     * itself, see {@link Select2Options.selectAll}. Only a multiple select has one.
+     */
+    protected isSelectAllItem(item: Select2Item): boolean;
+    /**
+     * Returns the first page of results with the item that selects them all, when the select has one, see
+     * {@link Select2Options.selectAll}. The results are not changed.
+     * @param results - The first page of results.
+     */
+    protected withSelectAllItem(results: Select2Item[], more?: boolean): Select2Item[];
+    /**
+     * Handles Space while the dropdown is open, before it is typed in the search input, which it is when this returns
+     * false, see {@link MultiSelect2}, whose checklist ticks the item that selects all the results with it.
+     * @returns True when Space was handled.
+     */
+    protected handleSpace(): boolean;
+    /**
+     * Handles Enter while the dropdown is open, which selects the highlighted result, unless a select does otherwise, see
+     * {@link MultiSelect2}, whose checklist accepts its selection with it, and closes.
+     */
+    protected handleEnter(): void;
     protected abstract createContainer(): HTMLElement;
     abstract data(value?: Select2Item | Select2Item[], triggerChange?: boolean): Select2Item | Select2Item[] | void;
     abstract focus(): void;
@@ -9871,7 +9955,7 @@ export declare abstract class AbstractSelect2 {
     destroy(): void;
     optionToData(element: HTMLOptionElement | HTMLOptGroupElement): Select2Item;
     protected select: HTMLSelectElement;
-    private handleDropdownMouseUp;
+    protected handleDropdownMouseUp(e: Event): void;
     private handleDropdownTouchStartMoveEnd;
     private handleDropdownTouchMove;
     private handleDropdownTouchStartEnd;
@@ -9915,9 +9999,33 @@ export declare abstract class AbstractSelect2 {
      */
     protected externalSearch(term: string): void;
     protected clearSearch(): void;
+    /**
+     * Shows or hides the search box of the dropdown, which stays focusable when it is hidden, so that the keys still
+     * reach the results. Only a select that has its search box in the dropdown has one, e.g. a single select, or a
+     * checklist, see {@link Select2Options.checkList}.
+     * @param showSearchInput - Whether to show the search box.
+     */
+    protected showSearch(showSearchInput: boolean): void;
     protected getMaximumSelectionSize(): any;
     protected ensureHighlightVisible(): void;
     protected findHighlightableChoices(): Element[];
+    /** Whether the highlight was moved with the arrow keys since the dropdown was opened, see {@link tabSelects}. */
+    protected highlightNavigated: boolean;
+    /**
+     * Whether Tab selects the highlighted result as it leaves the control: only when the user pointed at it, by typing a
+     * search, which highlights a result that is found, or by moving the highlight with the arrow keys, so that opening
+     * the dropdown and leaving it with Tab does not change the value to the result that happens to be highlighted. The
+     * mouse does not count, as it often rests over the results by chance.
+     */
+    protected tabSelects(): boolean;
+    /**
+     * Leaves the control with Tab, or Shift+Tab, from its dropdown: closes it, which the select does before, and moves
+     * the focus to the next element, or the previous one, from the control, as the search input is in the dropdown, at
+     * the end of the page, from which the browser would move it.
+     * @param e - The key event.
+     * @param from - The element of the control that takes the focus, from which the focus moves.
+     */
+    protected tabOut(e: KeyboardEvent, from: HTMLElement): void;
     protected moveHighlight(delta: number): void;
     protected highlight(index?: number): number;
     protected removeHighlight(): void;
@@ -9973,7 +10081,6 @@ export declare class SingleSelect2 extends AbstractSelect2 {
     protected getPlaceholder(): string;
     protected setPlaceholder(): void;
     protected postprocessResults(data: Select2Result, initial: boolean, noHighlightUpdate?: boolean): void;
-    protected showSearch(showSearchInput: boolean): void;
     protected onSelect(data: Select2Item, options: any): void;
     protected updateSelection(data: Select2Item): void;
     val(val?: string, triggerChange?: boolean): string;
@@ -9981,6 +10088,14 @@ export declare class SingleSelect2 extends AbstractSelect2 {
     data(value?: Select2Item): (void | Select2Item);
 }
 export declare class MultiSelect2 extends AbstractSelect2 {
+    /** The state of the selection over the results that are shown, for the item that selects them all. */
+    private selectAllState;
+    /** The selected items, when the selection is rendered as a summary instead of a choice for each item. */
+    private summaryItems;
+    /** The item that selects all the results, which the select adds to them, see {@link Select2Options.selectAll}. */
+    private selectAllItem;
+    /** The input that has the focus of a checklist while it is closed, see {@link Select2Options.checkList}. */
+    protected focusser: HTMLInputElement;
     protected createContainer(): HTMLElement;
     protected prepareOpts(opts: Select2Options): Select2Options;
     protected selectChoice(choice: HTMLElement): void;
@@ -9988,22 +10103,102 @@ export declare class MultiSelect2 extends AbstractSelect2 {
     private searchContainer;
     private keydowns;
     protected initContainer(): void;
+    /**
+     * Initializes the container of a checklist, see {@link Select2Options.checkList}, which works as the one of a single
+     * select: the focusser has the focus while it is closed, and opens it with the arrow keys, Enter or Space, or with
+     * a key that is typed, which goes to the search box of the dropdown, which has the focus while it is open.
+     */
+    private initCheckListContainer;
+    /**
+     * Shows the button that clears the selection of a checklist when there is one, and the select allows it, see
+     * {@link Select2Options.allowClear}, as the one of a single select.
+     */
+    private updateAllowClear;
+    /**
+     * Handles Backspace and Delete on a checklist, which has no choice for each item to remove one by one: Backspace
+     * unticks the last item that was ticked, and Delete clears them all, as the clear button does, when the select allows
+     * it, see {@link Select2Options.allowClear}.
+     * @param key - The key.
+     * @returns True when the key was handled.
+     */
+    protected handleRemoveKey(key: string): boolean;
+    /** Clears the selection of a checklist, as its clear button does. */
+    protected clearCheckList(): void;
     protected enableInterface(): boolean;
     protected initSelection(): void;
     protected clearSearch(): void;
     protected clearPlaceholder(): void;
     protected opening(): void;
+    /**
+     * Opens the dropdown of a checklist, whose search box takes what was typed in the focusser, and the focus, as the one
+     * of a single select does.
+     */
+    private openingCheckList;
     close(): void;
     focus(): void;
     isFocused(): boolean;
     protected updateSelection(data: Select2Item[]): void;
+    /** Renders the selection in one element, as {@link Select2Options.selectionSummary} does, instead of choices. */
+    private renderSelectionSummary;
     protected tokenize(): string;
     protected onSelect(data: Select2Item, options: any): void;
     protected cancel(e?: Event): void;
     protected addSelectedChoice(data: Select2Item): void;
     protected unselect(selected: HTMLElement): boolean;
     protected postprocessResults(data?: Select2Result, initial?: boolean, noHighlightUpdate?: boolean): void;
+    /**
+     * Updates the item that selects all the results, after the results or the selection change: its check state, the
+     * text it shows, which becomes the one that clears them when they are all selected, and its label.
+     */
+    private updateSelectAllItem;
+    /** Whether the source has more results than the ones that are loaded, by the last page of them that was loaded. */
+    private resultsHaveMore;
+    /**
+     * What the item that selects all the results acts on: the ones that are shown, when there are more that are not
+     * loaded yet, the ones that match what is typed, or all of them.
+     */
+    private getSelectAllScope;
+    /**
+     * The texts of the item that selects all the results, for what it acts on, see getSelectAllScope, with their
+     * defaults, see {@link Select2Options.selectAll}.
+     */
+    private getSelectAllTexts;
+    protected isSelectAllItem(item: Select2Item): boolean;
+    protected withSelectAllItem(results: Select2Item[], more?: boolean): Select2Item[];
+    /**
+     * Space ticks, or unticks, the highlighted result of a checklist, as for a check box, and is typed in the search when
+     * no result is highlighted, which is the case after something is typed, see postprocessResults, so that a space can
+     * still be searched for after a word, e.g. "Dairy Products". It is the same whether the search input has the focus
+     * or not, e.g. on a touch device with a hardware keyboard, where it does not get the focus on opening.
+     */
+    protected handleSpace(): boolean;
+    /** Enter accepts the selection of a checklist, which Space and clicks make, and closes it. */
+    protected handleEnter(): void;
+    protected moveHighlight(delta: number): void;
+    /**
+     * Whether the selection is a checklist, which keeps the selected results in the list, and toggles them, see
+     * {@link Select2Options.checkList}.
+     */
+    protected isChecklist(): boolean;
+    /** The results that can be highlighted: a checklist keeps the ones that are selected, which a click toggles. */
+    protected findHighlightableChoices(): Element[];
+    protected handleDropdownMouseUp(e: Event): void;
+    /** Unselects an item by its id, e.g. when the row of a checklist that is checked is clicked again. */
+    protected unselectById(id: string): void;
+    /** Returns the items of the results that the item that selects them all acts on, with their ids. */
+    private getSelectAllItems;
+    /**
+     * Selects all the results that are shown, or clears them when they are all selected, as the item that selects them
+     * all does, respecting the maximum number of items that can be selected.
+     */
+    private toggleSelectAll;
     protected getMaxSearchWidth(): number;
+    /**
+     * Sizes the search field of the choices, which the styles do: it takes the rest of the line after the choices, and
+     * goes to a line of its own when too little is left. It used to be given a width in pixels, from the text typed and
+     * the width of the container, which made a container whose width is not set, e.g. in a grid of fields, grow as the
+     * user typed, so any width it has is removed.
+     */
     protected resizeSearch(): void;
     protected getVal(): string[];
     protected setVal(val: string[]): void;
@@ -10083,6 +10278,8 @@ export interface ComboboxOptions<TSource = any> {
     formatSelection?: (item: ComboboxItem<TSource>) => ComboboxFormatResult;
     /** Formatter for result items. */
     formatResult?: (result: ComboboxItem<TSource>, container: HTMLElement, query: Select2QueryOptions) => ComboboxFormatResult;
+    /** See `Select2Options.formatSelectAll`. */
+    formatSelectAll?: (item: ComboboxItem<TSource>, container: HTMLElement, query: Select2QueryOptions) => ComboboxFormatResult;
     /** Minimum results required to show the search box. */
     minimumResultsForSearch?: number;
     /** Whether multiple items can be selected. */
@@ -10091,12 +10288,26 @@ export interface ComboboxOptions<TSource = any> {
     pageSize?: number;
     /** Placeholder text. */
     placeholder?: string;
+    /** See `Select2Options.placeholderIcon`. */
+    placeholderIcon?: IconClassName;
     /** Callback to get options specific to the combobox provider type. */
     providerOptions?: (type: ComboboxType, opt: ComboboxOptions) => any;
     /** Callback that performs the search. */
     search?: (query: ComboboxSearchQuery) => (PromiseLike<ComboboxSearchResult<ComboboxItem<TSource>>> | ComboboxSearchResult<ComboboxItem<TSource>>);
     /** Type delay for searching, default is 200. */
     typeDelay?: number;
+    /** See `Select2Options.selectAll`. */
+    selectAll?: boolean | SelectAllOptions;
+    /** See `Select2Options.checkList`. */
+    checkList?: boolean;
+    /** See `Select2Options.selectionSummary`. */
+    selectionSummary?: (items: ComboboxItem<TSource>[], container: HTMLElement) => void;
+    /** CSS class(es) of the control that wraps the element. */
+    containerCssClass?: string;
+    /** CSS class(es) of the dropdown, which is appended to the body, not to the control. */
+    dropdownCssClass?: string;
+    /** Callback that returns the CSS class(es) of a result. */
+    formatResultCssClass?: (item: ComboboxItem<TSource>) => string;
 }
 /**
  * A combobox widget that provides searchable selection over a set of items.
@@ -10262,11 +10473,35 @@ export interface ComboboxCommonOptions {
     /** Whether multiple items can be selected. */
     delimited?: boolean;
     /** Minimum results required to show the search box. */
-    minimumResultsForSearch?: any;
+    minimumResultsForSearch?: number;
     /** Whether multiple items can be selected. */
     multiple?: boolean;
     /** Name of the item field containing the icon class. */
     iconField?: string;
+    /**
+     * Shows a multiple editor as a checklist, instead of a combobox with a choice for each selected item: the results
+     * have check boxes, of which the ones that are selected stay in the list, the first item selects all the results
+     * that are shown, or clears them, and the selection is shown as one summary, e.g. "A, B, C +2". It has no effect on a
+     * single editor.
+     */
+    checkList?: boolean;
+    /**
+     * The icon of the placeholder, e.g. the icon of the field or of the filter, which the editor shows when nothing is
+     * selected.
+     */
+    placeholderIcon?: IconClassName;
+    /**
+     * Whether a checklist, see {@link checkList}, has an item that selects all the results that are shown, or clears
+     * them when they are all selected. Its text tells which: "Select all", "Select all matching" when something is
+     * typed, or "Select shown" when there are more results than the ones that are loaded, e.g. of an asynchronous
+     * source, whose results come in pages. Default is true.
+     */
+    selectAll?: boolean;
+    /**
+     * How many of the selected items the summary of a checklist, see {@link checkList}, names before it counts the
+     * rest, e.g. 3 for "A, B, C +2". Default is {@link ComboboxEditorDefaults.maxSummaryItems}.
+     */
+    maxSummaryItems?: number;
 }
 /**
  * Options for cascading and filtering combobox editors.
@@ -10302,6 +10537,24 @@ export interface ComboboxInplaceAddOptions {
  * Options for the {@link ComboboxEditor}.
  */
 export interface ComboboxEditorOptions extends ComboboxFilterOptions, ComboboxInplaceAddOptions, ComboboxCommonOptions {
+}
+/**
+ * The defaults of the combobox editors, see {@link ComboboxEditor.defaults}, which an application can change once, e.g.
+ * in its script initialization, before the editors are created. An option of an editor takes precedence over them.
+ */
+export interface ComboboxEditorDefaults {
+    /**
+     * The text of the empty item, which is the placeholder of an editor that has nothing selected, when the editor has
+     * no placeholder of its own. Default is an empty string, which shows no text, but still lets the selection be
+     * cleared, while `null` shows no placeholder, and does not let it be cleared. A callback is called each time it is
+     * needed, so it can return a local text that is not loaded yet when the default is set, e.g. to show "--select--"
+     * as before: `ComboboxEditor.defaults.emptyItemText = () => SelectEditorTexts.EmptyItemText`.
+     */
+    emptyItemText: string | (() => string);
+    /** The default of {@link ComboboxCommonOptions.minimumResultsForSearch}. Not set by default, so the select shows a search box for any number of results. */
+    minimumResultsForSearch?: number;
+    /** The default of {@link ComboboxCommonOptions.maxSummaryItems}. Default is 3. */
+    maxSummaryItems: number;
 }
 /**
  * Base editor that renders a searchable combobox over a set of items.
@@ -10442,11 +10695,39 @@ export declare class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
      * Aborts any pending search query.
      */
     protected abortPendingQuery(): void;
+    /** The defaults of the combobox editors, see {@link ComboboxEditorDefaults}. */
+    static readonly defaults: ComboboxEditorDefaults;
     /**
      * Returns the combobox options for this editor.
      * @returns Combobox options.
      */
     protected getComboboxOptions(): ComboboxOptions;
+    /** The options of the editor that the comboboxes share, see {@link ComboboxCommonOptions}. */
+    protected get comboboxOptions(): ComboboxCommonOptions;
+    /** Whether the editor shows a multiple selection as a checklist, see {@link ComboboxCommonOptions.checkList}. */
+    protected useCheckList(): boolean;
+    /**
+     * Gives a checklist its options: the check boxes and the item that selects all the results of the list, and the
+     * summary that takes the place of the choice of each selected item.
+     * @param opt - The options to change.
+     */
+    protected applyCheckList(opt: ComboboxOptions): void;
+    /**
+     * Renders a result of a checklist, with a check box before it, which the styles mark when it is selected.
+     */
+    protected formatCheckListResult(item: ComboboxItem, container: HTMLElement, query: Select2QueryOptions): import("@serenity-is/domwise").JSXElement;
+    /**
+     * Renders the item that selects all the results of a checklist, or clears them, with a check box, and a text that
+     * the select keeps up to date.
+     */
+    protected formatSelectAll(item: ComboboxItem, container: HTMLElement, query: Select2QueryOptions): import("@serenity-is/domwise").JSXElement;
+    /** Renders the icon of an item, when it has one, and its text, which the matching part of the search is marked in. */
+    protected formatCheckListContent(item: ComboboxItem, query: Select2QueryOptions): string | DocumentFragment | Element | SVGElement;
+    /**
+     * Renders the selection of a checklist in one element, e.g. "A, B, C +2", with the full list in its tooltip, or
+     * the placeholder of the editor, with {@link ComboboxCommonOptions.placeholderIcon}, when nothing is selected.
+     */
+    protected renderSelectionSummary(items: ComboboxItem[], container: HTMLElement): void;
     /**
      * Returns whether the value is delimited.
      * @returns True when delimited.
@@ -14989,6 +15270,8 @@ export declare class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions>
      * @param props - Widget props.
      */
     constructor(props: EditorProps<P>);
+    /** The selection of a set of flags after it was last set or normalized, see normalizeFlags. */
+    private flagsSelection;
     /**
      * Whether the enum is a set of flags, by the flags option, or else by the registration of the enum, when it is already
      * loaded.
@@ -15027,11 +15310,29 @@ export declare class EnumEditor<P extends EnumEditorOptions = EnumEditorOptions>
     protected updateItems(): void | PromiseLike<void>;
     /**
      * Gets or sets the value of a set of flags with the multiple option, which is the members selected OR-ed together, or null when
-     * none is selected. Setting it selects the fewest members that make it: the ones combining others first, the larger first, as
-     * long as all their bits are in the value and some are not covered yet, and then the single bits left.
+     * none is selected. Setting it selects the members that show it:
+     * - for a checklist, see the checkList option, every member whose bits are all in the value, so that the check box of a member
+     *   combining others, like SourceAdapter, is checked when they are, as each check box tells whether its bits are set;
+     * - otherwise, the fewest members that make it, so that there is a choice for each: the ones combining others first, the larger
+     *   first, as long as all their bits are in the value and some are not covered yet, and then the single bits left.
+     * The selection that the user makes is shown the same way, see normalizeFlags, so that it is shown as it is after the value is
+     * saved and loaded.
      */
     get flagsValue(): number | null;
     set flagsValue(value: number | string | null);
+    /**
+     * Returns the members that show a value of a set of flags, see {@link flagsValue}, in the order of the members.
+     * @param flags - The value.
+     */
+    protected flagsSelectionOf(flags: number): string[];
+    protected set_values(value: string[]): void;
+    /**
+     * Shows the selection of a set of flags with the multiple option as it is after its value is saved and loaded, see
+     * {@link flagsValue}, after the user changes it: the value is the one before, with the bits of the members that were
+     * selected, and without the ones of the members that were unselected, so that unselecting a member combining others, e.g.
+     * one whose check box is checked as its bits are set, removes its bits, instead of leaving them to the others.
+     */
+    protected normalizeFlags(): void;
     /**
      * Sets the edit value from a source object, which is a number for several members of a set of flags.
      * @param source - The source object.

@@ -51,6 +51,26 @@ export interface Select2Item {
 }
 
 /**
+ * The texts of the item that selects all the results of a multiple select, or clears them, see
+ * {@link Select2Options.selectAll}. The item tells what it acts on: all the results, the ones that match what is typed,
+ * or the ones that are shown, when there are more pages of results that are not loaded yet.
+ */
+export interface SelectAllOptions {
+    /** The text of the item, e.g. "Select all". */
+    text?: string;
+    /** The text of the item when all the results are selected, e.g. "Clear all". */
+    clearText?: string;
+    /** The text of the item when something is typed, e.g. "Select all matching". */
+    matchingText?: string;
+    /** The text of the item when something is typed and all the results are selected, e.g. "Clear all matching". */
+    clearMatchingText?: string;
+    /** The text of the item when there are more results than the ones that are loaded, e.g. "Select shown". */
+    shownText?: string;
+    /** The text of the item when there are more results than the ones loaded, all selected, e.g. "Clear shown". */
+    clearShownText?: string;
+}
+
+/**
  * Result of a Select2 query.
  */
 export interface Select2Result {
@@ -109,6 +129,11 @@ export interface Select2Options {
     maximumSelectionSize?: number | (() => number);
     /** Placeholder text. */
     placeholder?: string;
+    /**
+     * Icon of the placeholder, e.g. the icon of the field or of the filter of an editor, which the control shows before
+     * the placeholder text when nothing is selected.
+     */
+    placeholderIcon?: IconClassName;
     /** Placeholder option. */
     placeholderOption?: "first" | ((select: HTMLSelectElement) => HTMLOptionElement);
     /** Separator for multiple values. */
@@ -135,6 +160,11 @@ export interface Select2Options {
     formatSelection?: (data: Select2Item, container: HTMLElement, escapeMarkup: (markup: string) => string) => Select2FormatResult;
     /** Formatter for result items. */
     formatResult?: (result: Select2Item, container: HTMLElement, query: Select2QueryOptions, escapeMarkup: (markup: string) => string) => Select2FormatResult;
+    /**
+     * Formatter for the item that selects all the results of a checklist, or clears them when they are all selected,
+     * see {@link selectAll}. It defaults to {@link formatResult}.
+     */
+    formatSelectAll?: (item: Select2Item, container: HTMLElement, query: Select2QueryOptions) => Select2FormatResult;
     /** Formatter for result CSS classes. */
     formatResultCssClass?: (data: Select2Item) => string;
     /** Formatter for selection CSS classes. */
@@ -153,6 +183,32 @@ export interface Select2Options {
     formatSelectionTooBig?: (limit: number) => Select2FormatResult;
     /** Callback that creates a search choice. */
     createSearchChoice?: (term: string) => Select2Item;
+    /**
+     * Adds an item at the top of the results of a multiple select, which selects them all, or clears the ones it shows
+     * when they are all selected. The select adds the item itself, to the first page of results, when there is a result
+     * it can select, and tells it apart by its identity, not by its id. It is rendered with {@link formatSelectAll}.
+     *
+     * It acts on the results that are loaded, which a search term filters, and its text tells which, see
+     * {@link SelectAllOptions}: "Select all" when nothing is typed, "Select all matching" when something is, and
+     * "Select shown" when the source pages its results, see `Select2Result.more`, and the pages that are not loaded yet
+     * are not selected. The texts default to the ones of `SelectEditorTexts`.
+     */
+    selectAll?: boolean | SelectAllOptions;
+    /**
+     * Makes a multiple select a checklist: the results that are selected stay in the list, marked as selected, see
+     * the `aria-selected` attribute of the results, e.g. for a check box that the styles or {@link formatResult} draw,
+     * and a click on one of them unselects it, instead of selecting it again. It is usually used with
+     * {@link selectionSummary}, as the choices of the selection would repeat the list, and {@link selectAll}.
+     */
+    checkList?: boolean;
+    /**
+     * Renders the selection of a multiple select as one element, e.g. a summary of the selected items, instead of a
+     * choice for each item, which keeps the search field of the control after it. The items are kept for
+     * {@link AbstractSelect2.data}. It does not change how the results behave, see {@link checkList}.
+     * @param items - The selected items.
+     * @param container - The element to render the selection in.
+     */
+    selectionSummary?: (items: Select2Item[], container: HTMLElement) => void;
     /** Position of the create-search-choice item. */
     createSearchChoicePosition?: string | ((list: Select2Item[], item: Select2Item) => void);
     /** Callback that initializes the selection. */
@@ -501,30 +557,34 @@ function killEventImmediately(event: Event) {
     event.stopImmediatePropagation();
 }
 
-let sizer: HTMLDivElement;
+const tabbableSelector = 'a[href], area[href], button, input, select, textarea, iframe, summary, [tabindex], ' +
+    '[contenteditable=""], [contenteditable="true"]';
 
-function measureTextWidth(e: Element) {
-    if (!sizer) {
-        const style = getComputedStyle(e, null);
-        sizer = document.createElement("div");
-        Object.assign(sizer.style, {
-            position: "absolute",
-            left: "-10000px",
-            top: "-10000px",
-            display: "none",
-            fontSize: style.fontSize,
-            fontFamily: style.fontFamily,
-            fontStyle: style.fontStyle,
-            fontWeight: style.fontWeight,
-            letterSpacing: style.letterSpacing,
-            textTransform: style.textTransform,
-            whiteSpace: "nowrap"
-        });
-        sizer.setAttribute("class", "select2-sizer");
-        document.body.appendChild(sizer);
-    }
-    sizer.textContent = (e as any).value;
-    return sizer.offsetWidth;
+/**
+ * Returns the element that Tab, or Shift+Tab, moves the focus to from an element, in the order of the document: one that
+ * can take the focus, and is not disabled, hidden, inert, or in a dropdown. The order of positive tab indexes is not
+ * followed, as it is rarely used, and would make the order of the page different from that of the document.
+ * @param from - The element the focus moves from.
+ * @param backwards - Whether it moves backwards, as with Shift+Tab.
+ */
+function findTabbable(from: HTMLElement, backwards: boolean): HTMLElement {
+    const candidates = Array.from(document.querySelectorAll<HTMLElement>(tabbableSelector)).filter(el => {
+        if (el === from)
+            return true;
+        if ((el as HTMLInputElement).disabled || el.tabIndex < 0 || (el as HTMLInputElement).type === "hidden")
+            return false;
+        if (el.closest(".select2-drop, [inert]"))
+            return false;
+        if (!el.getClientRects().length || getComputedStyle(el).visibility === "hidden")
+            return false;
+        return true;
+    });
+
+    const index = candidates.indexOf(from);
+    if (index < 0)
+        return null;
+
+    return candidates[index + (backwards ? -1 : 1)] ?? null;
 }
 
 function syncCssClasses(dest: Element, src: Element, adapter: (kls: string) => string) {
@@ -1167,6 +1227,40 @@ export abstract class AbstractSelect2 {
     declare protected selection: HTMLElement;
     declare protected showSearchInput: boolean;
 
+    /**
+     * Whether an item is the one that selects all the results that are shown, or clears them, which the select adds
+     * itself, see {@link Select2Options.selectAll}. Only a multiple select has one.
+     */
+    protected isSelectAllItem(item: Select2Item): boolean {
+        return false;
+    }
+
+    /**
+     * Returns the first page of results with the item that selects them all, when the select has one, see
+     * {@link Select2Options.selectAll}. The results are not changed.
+     * @param results - The first page of results.
+     */
+    protected withSelectAllItem(results: Select2Item[], more?: boolean): Select2Item[] {
+        return results;
+    }
+
+    /**
+     * Handles Space while the dropdown is open, before it is typed in the search input, which it is when this returns
+     * false, see {@link MultiSelect2}, whose checklist ticks the item that selects all the results with it.
+     * @returns True when Space was handled.
+     */
+    protected handleSpace(): boolean {
+        return false;
+    }
+
+    /**
+     * Handles Enter while the dropdown is open, which selects the highlighted result, unless a select does otherwise, see
+     * {@link MultiSelect2}, whose checklist accepts its selection with it, and closes.
+     */
+    protected handleEnter(): void {
+        this.selectHighlighted();
+    }
+
     protected abstract createContainer(): HTMLElement;
     abstract data(value?: Select2Item | Select2Item[], triggerChange?: boolean): Select2Item | Select2Item[] | void;
     abstract focus(): void;
@@ -1375,7 +1469,7 @@ export abstract class AbstractSelect2 {
 
     declare protected select: HTMLSelectElement;
 
-    private handleDropdownMouseUp(e: Event) {
+    protected handleDropdownMouseUp(e: Event) {
         if ((e.target as HTMLElement).closest(".select2-result-selectable")) {
             this.highlightUnderEvent(e);
             this.selectHighlighted(e);
@@ -1449,6 +1543,10 @@ export abstract class AbstractSelect2 {
                         if (disabled) { node.classList.add("select2-disabled"); }
                         if (compound) { node.classList.add("select2-result-with-children"); }
                         Fluent.addClass(node, self.opts.formatResultCssClass(result));
+                        // the item that selects all the results of a checklist is told apart, as the select updates it
+                        // as the selection changes
+                        if (self.isSelectAllItem(result))
+                            node.classList.add("select2-select-all");
                         node.setAttribute("role", "presentation");
 
                         label = document.createElement("div");
@@ -1456,7 +1554,11 @@ export abstract class AbstractSelect2 {
                         label.setAttribute("id", "select2-result-label-" + nextUid());
                         label.setAttribute("role", "option");
 
-                        formatted = opts.formatResult(result, label, query, self.opts.escapeMarkup);
+                        // the item that selects all the results of a checklist is not one of them, and is rendered its way
+                        if (self.isSelectAllItem(result))
+                            formatted = opts.formatSelectAll?.(result, label, query) ?? opts.formatResult(result, label, query, self.opts.escapeMarkup);
+                        else
+                            formatted = opts.formatResult(result, label, query, self.opts.escapeMarkup);
                         if (formatted !== undefined) {
                             if (formatted instanceof Node) {
                                 Fluent.empty(label);
@@ -1866,6 +1968,8 @@ export abstract class AbstractSelect2 {
      * Performs the opening of the dropdown
      */
     protected opening() {
+        this.highlightNavigated = false;
+
         let cid = this.containerEventName,
             scroll = "scroll." + cid,
             resize = "resize." + cid,
@@ -1999,6 +2103,24 @@ export abstract class AbstractSelect2 {
 
     }
 
+    /**
+     * Shows or hides the search box of the dropdown, which stays focusable when it is hidden, so that the keys still
+     * reach the results. Only a select that has its search box in the dropdown has one, e.g. a single select, or a
+     * checklist, see {@link Select2Options.checkList}.
+     * @param showSearchInput - Whether to show the search box.
+     */
+    protected showSearch(showSearchInput: boolean) {
+        if (this.showSearchInput === showSearchInput) return;
+
+        this.showSearchInput = showSearchInput;
+
+        this.dropdown.querySelector(".select2-search")?.classList.toggle("select2-search-hidden", !showSearchInput);
+        this.dropdown.querySelector(".select2-search")?.classList.toggle("select2-offscreen", !showSearchInput);
+        //add "select2-with-searchbox" to the container if search box is shown
+        this.dropdown.classList.toggle("select2-with-searchbox", showSearchInput);
+        this.container.classList.toggle("select2-with-searchbox", showSearchInput);
+    }
+
     protected getMaximumSelectionSize() {
         return evaluate(this.opts.maximumSelectionSize, this.opts.element);
     }
@@ -2054,7 +2176,37 @@ export abstract class AbstractSelect2 {
         return Array.from(this.results.querySelectorAll(".select2-result-selectable:not(.select2-disabled):not(.select2-selected)"));
     }
 
+    /** Whether the highlight was moved with the arrow keys since the dropdown was opened, see {@link tabSelects}. */
+    declare protected highlightNavigated: boolean;
+
+    /**
+     * Whether Tab selects the highlighted result as it leaves the control: only when the user pointed at it, by typing a
+     * search, which highlights a result that is found, or by moving the highlight with the arrow keys, so that opening
+     * the dropdown and leaving it with Tab does not change the value to the result that happens to be highlighted. The
+     * mouse does not count, as it often rests over the results by chance.
+     */
+    protected tabSelects(): boolean {
+        return !!this.highlightNavigated || !!this.search?.value;
+    }
+
+    /**
+     * Leaves the control with Tab, or Shift+Tab, from its dropdown: closes it, which the select does before, and moves
+     * the focus to the next element, or the previous one, from the control, as the search input is in the dropdown, at
+     * the end of the page, from which the browser would move it.
+     * @param e - The key event.
+     * @param from - The element of the control that takes the focus, from which the focus moves.
+     */
+    protected tabOut(e: KeyboardEvent, from: HTMLElement) {
+        const target = from ? findTabbable(from, e.shiftKey) : null;
+        this.close();
+        if (target) {
+            killEvent(e);
+            target.focus();
+        }
+    }
+
     protected moveHighlight(delta: number) {
+        this.highlightNavigated = true;
         let choices = this.findHighlightableChoices(),
             index = this.highlight();
 
@@ -2225,9 +2377,9 @@ export abstract class AbstractSelect2 {
                 return;
 
             case "Enter":
-                // select the highlighted item, as the search input would normally do;
+                // as the search input would normally do, e.g. select the highlighted item;
                 // no need to focus the search input for this key
-                this.selectHighlighted();
+                this.handleEnter();
                 killEvent(e);
                 return;
 
@@ -2244,6 +2396,13 @@ export abstract class AbstractSelect2 {
 
         if (e.key.length !== 1)
             return;
+
+        // Space may tick the highlighted result, e.g. the item that selects all the results of a checklist, instead of
+        // being typed in the search input, as it would be if the input had the focus
+        if (e.key === " " && this.handleSpace()) {
+            killEvent(e);
+            return;
+        }
 
         // The user is typing with a hardware keyboard (virtual keyboards only exist
         // while an input is focused, so this can't be a virtual keyboard). Focus the
@@ -2404,7 +2563,7 @@ export abstract class AbstractSelect2 {
                 this.dropdown?.classList.add("select2-position-fixed");
                 try {
                     Fluent.empty(results);
-                    self.opts.populateResults.call(this, results, data.results, { term: search.value, page: this.resultsPage, context: null });
+                    self.opts.populateResults.call(this, results, this.withSelectAllItem(data.results, data.more), { term: search.value, page: this.resultsPage, context: null });
 
                     if (data.more === true && checkFormatter(opts.formatLoadMore, "formatLoadMore")) {
                         results.appendChild(createLi("select2-more-results", evaluate(opts.formatLoadMore, opts.element, this.resultsPage)));
@@ -2462,10 +2621,17 @@ export abstract class AbstractSelect2 {
     }
 
     protected getPlaceholder() {
+        // an empty placeholder is a placeholder too, e.g. when the editor shows only its icon when nothing is selected
+        const attribute = this.opts.element.getAttribute("placeholder");
+        if (attribute != null)
+            return attribute;
+
+        const dataAttribute = this.opts.element.dataset.placeholder;
+        if (dataAttribute != null)
+            return dataAttribute;
+
         let placeholderOption;
-        return this.opts.element.getAttribute("placeholder") ||
-            this.opts.element.dataset.placeholder ||
-            this.opts.placeholder ||
+        return this.opts.placeholder ??
             ((placeholderOption = this.getPlaceholderOption()) !== undefined ? placeholderOption?.textContent : undefined);
     }
 
@@ -2719,7 +2885,10 @@ export class SingleSelect2 extends AbstractSelect2 {
                     killEvent(e);
                     return;
                 case "Tab":
-                    this.selectHighlighted({ noFocus: true });
+                    // selects the highlighted result only when the user pointed at it, see tabSelects, and moves on
+                    if (this.tabSelects())
+                        this.selectHighlighted({ noFocus: true });
+                    this.tabOut(e, this.focusser);
                     return;
                 case "Escape":
                     this.cancel(e);
@@ -2949,7 +3118,17 @@ export class SingleSelect2 extends AbstractSelect2 {
             if (this.select && this.getPlaceholderOption() === undefined) return;
 
             const chosen = this.selection.querySelector(".select2-chosen");
-            chosen && (chosen.textContent = placeholder);
+            if (chosen) {
+                const icon = this.opts.placeholderIcon;
+                const formatted = icon ? this.opts.formatSelection({ text: placeholder, icon } as Select2Item,
+                    chosen as HTMLElement, this.opts.escapeMarkup) : undefined;
+                if (formatted === undefined)
+                    chosen.textContent = placeholder;
+                else if (formatted instanceof Node)
+                    chosen.replaceChildren(formatted);
+                else
+                    chosen.textContent = formatted ?? "";
+            }
 
             this.selection.classList.add("select2-default");
 
@@ -2986,18 +3165,6 @@ export class SingleSelect2 extends AbstractSelect2 {
                 this.showSearch(countResults(data.results) >= min);
             }
         }
-    }
-
-    protected showSearch(showSearchInput: boolean) {
-        if (this.showSearchInput === showSearchInput) return;
-
-        this.showSearchInput = showSearchInput;
-
-        this.dropdown.querySelector(".select2-search")?.classList.toggle("select2-search-hidden", !showSearchInput);
-        this.dropdown.querySelector(".select2-search")?.classList.toggle("select2-offscreen", !showSearchInput);
-        //add "select2-with-searchbox" to the container if search box is shown
-        this.dropdown.classList.toggle("select2-with-searchbox", showSearchInput);
-        this.container.classList.toggle("select2-with-searchbox", showSearchInput);
     }
 
     protected onSelect(data: Select2Item, options: any) {
@@ -3131,7 +3298,41 @@ export class SingleSelect2 extends AbstractSelect2 {
 
 export class MultiSelect2 extends AbstractSelect2 {
 
+    /** The state of the selection over the results that are shown, for the item that selects them all. */
+    declare private selectAllState: "none" | "partial" | "all";
+    /** The selected items, when the selection is rendered as a summary instead of a choice for each item. */
+    declare private summaryItems: Select2Item[];
+    /** The item that selects all the results, which the select adds to them, see {@link Select2Options.selectAll}. */
+    declare private selectAllItem: Select2Item;
+
+    /** The input that has the focus of a checklist while it is closed, see {@link Select2Options.checkList}. */
+    declare protected focusser: HTMLInputElement;
+
     protected createContainer(): HTMLElement {
+        // a checklist shows its selection as a whole, so it has nothing to type in: its search box is in the dropdown, as
+        // the one of a single select, and an offscreen input takes the focus, and the keys typed, while it is closed
+        if (this.isChecklist()) {
+            return (
+                <div class="select2-container select2-container-multi">
+                    <ul class="select2-choices">
+                        <li class="select2-search-field">
+                            <label for="" class="select2-offscreen"></label>
+                            <input type="text" autocomplete="off" class="select2-focusser select2-offscreen" role="combobox" aria-haspopup="listbox" aria-expanded="false" />
+                        </li>
+                    </ul>
+                    <abbr class="select2-search-choice-close"></abbr>
+                    <span class="select2-arrow" role="presentation"><b role="presentation"></b></span>
+                    <div class="select2-drop select2-drop-multi select2-display-none">
+                        <div class="select2-search">
+                            <label for="" class="select2-offscreen"></label>
+                            <input type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" class="select2-input" role="combobox" aria-expanded="true" aria-autocomplete="list" />
+                        </div>
+                        <ul class="select2-results" role="listbox" aria-multiselectable="true"></ul>
+                    </div>
+                </div>
+            ) as HTMLElement;
+        }
+
         return (
             <div class="select2-container select2-container-multi">
                 <ul class="select2-choices">
@@ -3221,14 +3422,17 @@ export class MultiSelect2 extends AbstractSelect2 {
     }
 
     override destroy() {
-        document.querySelector("label[for='" + this.search.getAttribute('id') + "']")?.setAttribute(
+        // the label of the element was moved to the input that takes the focus
+        const labelled = this.focusser ?? this.search;
+        document.querySelector("label[for='" + labelled.getAttribute('id') + "']")?.setAttribute(
             'for', this.opts.element.getAttribute("id"));
 
         super.destroy();
 
         cleanupElements.call(this,
             "searchContainer",
-            "selection"
+            "selection",
+            "focusser"
         );
     }
 
@@ -3236,6 +3440,11 @@ export class MultiSelect2 extends AbstractSelect2 {
     declare private keydowns: number;
 
     protected override initContainer() {
+
+        if (this.isChecklist()) {
+            this.initCheckListContainer();
+            return;
+        }
 
         const selector = ".select2-choices";
 
@@ -3288,12 +3497,12 @@ export class MultiSelect2 extends AbstractSelect2 {
                 }
                 else if (e.key === "Backspace") {
                     if (this.unselect(selected)) {
-                        this.search.style.width = "10px";
+                        this.resizeSearch();
                         selectedChoice = prev ? prev : next;
                     }
                 } else if (e.key == "Delete") {
                     if (this.unselect(selected)) {
-                        this.search.style.width = "10px";
+                        this.resizeSearch();
                         selectedChoice = next ? next : null;
                     }
                 } else if (e.key == "Enter") {
@@ -3328,7 +3537,9 @@ export class MultiSelect2 extends AbstractSelect2 {
                         killEvent(e);
                         return;
                     case "Tab":
-                        this.selectHighlighted({ noFocus: true });
+                        // adds the highlighted result only when the user pointed at it, see tabSelects
+                        if (this.tabSelects())
+                            this.selectHighlighted({ noFocus: true });
                         this.close();
                         return;
                     case "Escape":
@@ -3413,10 +3624,235 @@ export class MultiSelect2 extends AbstractSelect2 {
         this.clearSearch();
     }
 
+    /**
+     * Initializes the container of a checklist, see {@link Select2Options.checkList}, which works as the one of a single
+     * select: the focusser has the focus while it is closed, and opens it with the arrow keys, Enter or Space, or with
+     * a key that is typed, which goes to the search box of the dropdown, which has the focus while it is open.
+     */
+    private initCheckListContainer() {
+        const container = this.container,
+            dropdown = this.dropdown,
+            idSuffix = nextUid();
+
+        this.searchContainer = container.querySelector(".select2-search-field");
+        this.selection = container.querySelector(".select2-choices");
+        this.focusser = container.querySelector(".select2-focusser");
+
+        this.showSearch(!(this.opts.minimumResultsForSearch < 0));
+
+        // the labels of the element go to the focusser, and from it to the search box
+        this.results.setAttribute("id", "select2-results-" + idSuffix);
+        this.search.setAttribute("aria-controls", "select2-results-" + idSuffix);
+        this.focusser.setAttribute("aria-controls", "select2-results-" + idSuffix);
+        this.focusser.setAttribute("id", "s2id_autogen" + idSuffix);
+
+        const elementLabel = document.querySelector("label[for='" + this.opts.element.getAttribute("id") + "']");
+        this.focusser.previousElementSibling.textContent = elementLabel?.textContent ?? "";
+        this.focusser.previousElementSibling.setAttribute("for", this.focusser.getAttribute("id"));
+        this.focusser.setAttribute("tabindex", this.elementTabIndex);
+
+        this.search.setAttribute("id", this.focusser.getAttribute("id") + "_search");
+        this.search.previousElementSibling.textContent = elementLabel?.textContent ?? "";
+        this.search.previousElementSibling.setAttribute("for", this.search.getAttribute("id"));
+
+        Fluent.on(this.focusser, "keydown", (e: KeyboardEvent) => {
+            if (!this.isInterfaceEnabled() || e.isComposing)
+                return;
+
+            if (e.key === "Tab" || e.key === "Shift" || e.key === "Control" || e.key === "Alt" || e.metaKey
+                || /^F(?:1[0-2]|[1-9])$/.test(e.key) || e.key === "Escape")
+                return;
+
+            if (e.key === "ArrowDown" || e.key === "ArrowUp" || e.key === " " ||
+                (e.key === "Enter" && this.opts.openOnEnter !== false)) {
+                if (e.altKey || e.ctrlKey || e.shiftKey || e.metaKey)
+                    return;
+                this.open();
+                killEvent(e);
+                return;
+            }
+
+            // Backspace unticks the last item that was ticked, and Delete clears them all, see handleRemoveKey
+            if (this.handleRemoveKey(e.key)) {
+                killEvent(e);
+                return;
+            }
+
+            // Enter does not submit a form
+            if (e.key === "Enter")
+                killEvent(e);
+        });
+
+        // a key that is typed opens the dropdown, which takes it to its search box, see opening
+        installKeyUpChangeEvent(this.focusser);
+        ["keyup-change", "input"].forEach(ev => Fluent.on(this.focusser, ev, (e: Event) => {
+            e.stopPropagation();
+            if (!this.focusser.value || this.opened() || !this.isInterfaceEnabled())
+                return;
+            this.open();
+        }));
+
+        Fluent.on(this.focusser, "focus", () => {
+            if (!container.classList.contains("select2-container-active"))
+                Fluent.trigger(this.opts.element, "select2-focus");
+            container.classList.add("select2-container-active");
+        });
+
+        Fluent.on(this.focusser, "blur", () => {
+            if (!this.opened()) {
+                container.classList.remove("select2-container-active");
+                Fluent.trigger(this.opts.element, "select2-blur");
+            }
+        });
+
+        Fluent.on(this.search, "keydown", (e: KeyboardEvent) => {
+            if (!this.isInterfaceEnabled() || e.isComposing)
+                return;
+
+            switch (e.key) {
+                case "PageUp":
+                case "PageDown":
+                    // prevent the page from scrolling
+                    killEvent(e);
+                    return;
+                case "ArrowUp":
+                case "ArrowDown":
+                    this.moveHighlight((e.key === "ArrowUp") ? -1 : 1);
+                    killEvent(e);
+                    return;
+                case "Enter":
+                    // accepts the selection, see handleEnter
+                    this.handleEnter();
+                    killEvent(e);
+                    return;
+                case " ":
+                    if (this.handleSpace())
+                        killEvent(e);
+                    return;
+                case "Backspace":
+                case "Delete":
+                    // they edit what is typed, and act on the selection only when nothing is
+                    if (!this.search.value && this.handleRemoveKey(e.key))
+                        killEvent(e);
+                    return;
+                case "Tab":
+                    // moves on from the control; a result is not checked by leaving it, which the user would not
+                    // expect of a check box
+                    this.tabOut(e, this.focusser);
+                    return;
+                case "Escape":
+                    this.cancel(e);
+                    killEvent(e);
+                    return;
+            }
+        });
+
+        Fluent.on(this.search, "blur", () => {
+            // keeps the search box focused when the scroll bar of the dropdown is used, which focuses the body
+            if (document.activeElement === document.body && this.opts.shouldFocusInput(this)) {
+                window.setTimeout(() => {
+                    if (this.opened())
+                        this.search.focus();
+                }, 0);
+            }
+        });
+
+        Fluent.on(this.search, "focus", () => {
+            if (!container.classList.contains("select2-container-active"))
+                Fluent.trigger(this.opts.element, "select2-focus");
+            container.classList.add("select2-container-active");
+        });
+
+        Fluent.on(this.selection, "dragstart", (e: Event) => { e.preventDefault(); return false; });
+
+        // the button that clears the selection, which is shown when there is one, see updateAllowClear
+        Fluent.on(container, "click", ".select2-search-choice-close", (e: Event) => {
+            if (!this.isInterfaceEnabled())
+                return;
+            this.clearCheckList();
+            killEventImmediately(e);
+            this.close();
+            if (this.opts.shouldFocusInput(this))
+                this.focusser.focus();
+        });
+
+        // a click anywhere on the control, e.g. on its caret, opens or closes it
+        Fluent.on(container, "click", (e: Event) => {
+            if (!container.classList.contains("select2-container-active"))
+                Fluent.trigger(this.opts.element, "select2-focus");
+
+            if (this.opened())
+                this.close();
+            else if (this.isInterfaceEnabled())
+                this.open();
+
+            killEvent(e);
+        });
+
+        // a click on the results keeps the focus in the search box, for the keys
+        ["mousedown", "touchstart"].forEach(ev => dropdown.addEventListener(ev, () => {
+            if (this.opts.shouldFocusInput(this))
+                this.search.focus();
+        }, { passive: true }));
+
+        this.initContainerWidth();
+        this.opts.element.classList.add("select2-offscreen");
+        this.updateAllowClear();
+    }
+
+    /**
+     * Shows the button that clears the selection of a checklist when there is one, and the select allows it, see
+     * {@link Select2Options.allowClear}, as the one of a single select.
+     */
+    private updateAllowClear() {
+        if (this.isChecklist())
+            this.container?.classList.toggle("select2-allowclear", !!this.opts.allowClear && this.getVal().length > 0);
+    }
+
+    /**
+     * Handles Backspace and Delete on a checklist, which has no choice for each item to remove one by one: Backspace
+     * unticks the last item that was ticked, and Delete clears them all, as the clear button does, when the select allows
+     * it, see {@link Select2Options.allowClear}.
+     * @param key - The key.
+     * @returns True when the key was handled.
+     */
+    protected handleRemoveKey(key: string): boolean {
+        if (!this.isChecklist() || !this.isInterfaceEnabled())
+            return false;
+
+        if (key === "Backspace") {
+            const items = (this.data() ?? []) as Select2Item[];
+            if (!items.length)
+                return false;
+            this.unselectById(this.id(items[items.length - 1]));
+            return true;
+        }
+
+        if (key === "Delete" && this.opts.allowClear && this.getVal().length) {
+            this.clearCheckList();
+            return true;
+        }
+
+        return false;
+    }
+
+    /** Clears the selection of a checklist, as its clear button does. */
+    protected clearCheckList() {
+        const removed = (this.data() ?? []) as Select2Item[];
+        if (!removed.length && !this.getVal().length)
+            return;
+
+        this.setVal([]);
+        this.updateSelection([]);
+        this.triggerChange({ removed });
+    }
+
     protected override enableInterface() {
         const result = super.enableInterface();
         if (result) {
             this.search.disabled = !this.isInterfaceEnabled();
+            if (this.focusser)
+                this.focusser.disabled = !this.isInterfaceEnabled();
         }
         return result;
     }
@@ -3444,18 +3880,32 @@ export class MultiSelect2 extends AbstractSelect2 {
     }
 
     protected override clearSearch() {
-        const placeholder = this.getPlaceholder(),
-            maxWidth = this.getMaxSearchWidth();
+
+        // the search box of a checklist is in the dropdown, and keeps its width
+        if (this.isChecklist()) {
+            this.search.value = "";
+            return;
+        }
+
+        // with a summary, the search field only has what is typed in it, as the summary shows the placeholder, and the
+        // selection, on its own
+        if (this.opts.selectionSummary) {
+            this.search.value = "";
+            this.resizeSearch();
+            return;
+        }
+
+        const placeholder = this.getPlaceholder();
 
         if (placeholder !== undefined && this.getVal().length === 0 && !this.search.classList.contains("select2-focused")) {
             this.search.value = placeholder ?? "";
             this.search.classList.add("select2-default");
-            // stretch the search box to full width of the container so as much of the placeholder is visible as possible
-            // we could call this.resizeSearch(), but we do not because that requires a sizer and we do not want to create one so early because of a firefox bug, see #944
-            this.search.style.width = maxWidth > 0 ? (maxWidth + "px") : getComputedStyle(this.container).width;
+            // the search field takes the rest of its line, see resizeSearch, which is all of it with nothing selected,
+            // so the placeholder is shown in full
+            this.resizeSearch();
         } else {
             this.search.value = "";
-            this.search.style.width = "10px";
+            this.resizeSearch();
         }
     }
 
@@ -3467,6 +3917,11 @@ export class MultiSelect2 extends AbstractSelect2 {
     }
 
     protected override opening() {
+        if (this.isChecklist()) {
+            this.openingCheckList();
+            return;
+        }
+
         this.clearPlaceholder(); // should be done before super so placeholder is not used to search
         this.resizeSearch();
 
@@ -3491,17 +3946,54 @@ export class MultiSelect2 extends AbstractSelect2 {
         Fluent.trigger(this.opts.element, "select2-open");
     }
 
+    /**
+     * Opens the dropdown of a checklist, whose search box takes what was typed in the focusser, and the focus, as the one
+     * of a single select does.
+     */
+    private openingCheckList() {
+        super.opening();
+
+        // the search box is shown again for each opening, until the results tell whether the list is long enough for it
+        if (!(this.opts.minimumResultsForSearch < 0))
+            this.showSearch(true);
+
+        this.search.value = this.focusser.value;
+        this.focusser.value = "";
+        this.focusser.setAttribute("aria-expanded", "true");
+
+        if (this.opts.shouldFocusInput(this)) {
+            this.search.focus();
+            // the cursor goes after what was typed
+            const length = this.search.value.length;
+            this.search.setSelectionRange?.(length, length);
+        }
+
+        this.focusser.disabled = true;
+        this.updateResults(true);
+        Fluent.trigger(this.opts.element, "select2-open");
+    }
+
     override close() {
         if (!this.opened()) return;
         super.close();
+
+        if (this.isChecklist()) {
+            this.focusser.disabled = !this.isInterfaceEnabled();
+            this.focusser.setAttribute("aria-expanded", "false");
+            if (this.opts.shouldFocusInput(this))
+                this.focusser.focus();
+        }
     }
 
     override focus() {
         this.close();
-        this.search.focus();
+        (this.isChecklist() ? this.focusser : this.search).focus();
     }
 
     override isFocused() {
+        if (this.isChecklist())
+            return this.container.classList.contains("select2-container-active");
+
         return this.search.classList.contains("select2-focused");
     }
 
@@ -3517,11 +4009,38 @@ export class MultiSelect2 extends AbstractSelect2 {
         });
         data = filtered;
 
-        this.selection.querySelectorAll(".select2-search-choice").forEach(el => Fluent.remove(el));
+        this.selection.querySelectorAll(":scope > .select2-search-choice").forEach(el => Fluent.remove(el));
+
+        // a summary shows the selection as a whole, and keeps the items for data(), as there are no choices to read
+        if (this.opts.selectionSummary) {
+            this.summaryItems = data;
+            this.renderSelectionSummary();
+            self.postprocessResults();
+            return;
+        }
+
+        this.summaryItems = null;
+        this.selection.querySelector(":scope > .select2-selection-summary")?.remove();
+
         data.forEach(function (x) {
             self.addSelectedChoice(x);
         });
         self.postprocessResults();
+    }
+
+    /** Renders the selection in one element, as {@link Select2Options.selectionSummary} does, instead of choices. */
+    private renderSelectionSummary(): void {
+        this.selection.querySelector(":scope > .select2-selection-summary")?.remove();
+        if (!this.opts.selectionSummary)
+            return;
+
+        const summary = document.createElement("li");
+        summary.classList.add("select2-selection-summary");
+        const content = summary.appendChild(document.createElement("div"));
+        content.classList.add("select2-selection-summary-content");
+        this.opts.selectionSummary(this.summaryItems ?? [], content);
+        Fluent(summary).insertBefore(this.searchContainer);
+        this.updateAllowClear();
     }
 
     protected override tokenize(): string {
@@ -3540,6 +4059,31 @@ export class MultiSelect2 extends AbstractSelect2 {
 
         if (!this.triggerSelect(data) || data.text === "") { return; }
 
+        // the item that selects all the results, or clears them, stays in the dropdown, which stays open
+        if (this.isSelectAllItem(data)) {
+            this.toggleSelectAll();
+            return;
+        }
+
+        // a checklist shows its results with check boxes, so the ones that are selected can be unchecked by a click
+        if (this.isChecklist() && indexOf(this.id(data), this.getVal()) >= 0) {
+            this.unselectById(this.id(data));
+            return;
+        }
+
+        // a checklist keeps its dropdown open, and its search, so that more results can be checked in the same list
+        if (this.isChecklist()) {
+            const max = this.getMaximumSelectionSize();
+            if (max > 0 && this.getVal().length >= max)
+                return;
+
+            this.addSelectedChoice(data);
+            Fluent.trigger(this.opts.element, "selected", { val: this.id(data), choice: data });
+            this.postprocessResults(undefined, false, false);
+            this.triggerChange({ added: data });
+            return;
+        }
+
         this.addSelectedChoice(data);
 
         Fluent.trigger(this.opts.element, "selected", { val: this.id(data), choice: data });
@@ -3554,10 +4098,10 @@ export class MultiSelect2 extends AbstractSelect2 {
 
         if (this.opts.closeOnSelect) {
             this.close();
-            this.search.style.width = "10px";
+            this.resizeSearch();
         } else {
             if (this.countSelectableResults() > 0) {
-                this.search.style.width = "10px";
+                this.resizeSearch();
                 this.resizeSearch();
                 if (this.getMaximumSelectionSize() > 0 && this.val().length >= this.getMaximumSelectionSize()) {
                     // if we reached max selection size repaint the results so choices
@@ -3575,7 +4119,7 @@ export class MultiSelect2 extends AbstractSelect2 {
             } else {
                 // if nothing left to select close
                 this.close();
-                this.search.style.width = "10px";
+                this.resizeSearch();
             }
         }
 
@@ -3589,11 +4133,28 @@ export class MultiSelect2 extends AbstractSelect2 {
 
     protected override cancel(e?: Event) {
         this.close();
-        if (this.opts.shouldFocusInput(this))
+        // a checklist focuses its focusser as it closes
+        if (this.opts.shouldFocusInput(this) && !this.isChecklist())
             this.focusSearch();
     }
 
     protected addSelectedChoice(data: Select2Item) {
+
+        // the selection is rendered as a summary, which has no choice to add
+        if (this.opts.selectionSummary) {
+            const items = this.summaryItems ??= [];
+            const id = this.id(data);
+            if (!items.some(x => equal(this.id(x), id)))
+                items.push(data);
+            this.renderSelectionSummary();
+            const val = this.getVal();
+            if (indexOf(id, val) < 0) {
+                val.push(id);
+                this.setVal(val);
+            }
+            return;
+        }
+
         const enableChoice = !data.locked;
         let choice = document.createElement("li"),
             id = this.id(data),
@@ -3693,6 +4254,11 @@ export class MultiSelect2 extends AbstractSelect2 {
     }
 
     protected override postprocessResults(data?: Select2Result, initial?: boolean, noHighlightUpdate?: boolean) {
+        // a page that is loaded tells whether there are more, e.g. the last one, after which the item that selects all
+        // the results acts on all of them
+        if (data)
+            this.resultsHaveMore = !!data.more;
+
         const val = this.getVal(),
             choices = this.results.querySelectorAll(".select2-result"),
             compound = this.results.querySelectorAll(".select2-result-with-children"),
@@ -3700,23 +4266,38 @@ export class MultiSelect2 extends AbstractSelect2 {
 
         choices.forEach(function (choice) {
             const id = self.id((choice as any).select2data);
-            if (indexOf(id, val) >= 0) {
-                choice.classList.add("select2-selected");
-                // mark all children of the selected parent as selected
-                choice.querySelectorAll(".select2-result-selectable").forEach(x => x.classList.add("select2-selected"));
-            }
+            const selected = indexOf(id, val) >= 0;
+            // toggled, as a checklist keeps the results that are selected in its list, and unchecks them
+            choice.classList.toggle("select2-selected", selected);
+            // mark all children of the selected parent as selected
+            choice.querySelectorAll(".select2-result-selectable").forEach(x => x.classList.toggle("select2-selected", selected));
+            // tell a screen reader, and the styles, e.g. of the check box of a checklist
+            (choice as HTMLElement).setAttribute("aria-selected", selected ? "true" : "false");
         });
 
         compound.forEach(function (choice) {
             // hide an optgroup if it doesn't have any selectable children
-            if (!choice.matches('.select2-result-selectable')
-                && !choice.querySelector(".select2-result-selectable:not(.select2-selected)")) {
-                choice.classList.add("select2-selected");
-            }
+            choice.classList.toggle("select2-selected", !choice.matches('.select2-result-selectable')
+                && !choice.querySelector(".select2-result-selectable:not(.select2-selected)"));
         });
 
-        if (this.highlight() == -1 && noHighlightUpdate !== false) {
+        // the results of a checklist that are found for what is typed are not highlighted, so that Space is typed in the
+        // search, until a result is highlighted with the arrow keys or the mouse, which Space then ticks, see handleSpace
+        if (this.highlight() == -1 && noHighlightUpdate !== false && !(this.isChecklist() && this.search.value)) {
             self.highlight(0);
+        }
+
+        this.updateSelectAllItem();
+
+        if (this.isChecklist()) {
+            // the search box of a checklist is hidden for a short list, as the one of a single select, unless something
+            // is typed already, which is searched for
+            const min = this.opts.minimumResultsForSearch;
+            if (initial === true && min >= 0 && !this.search.value)
+                this.showSearch(countResults(data?.results ?? []) >= min);
+
+            // a checklist keeps its selected results in the list, so it is never left without results to show
+            return;
         }
 
         //If all results are chosen render formatNoMatches
@@ -3736,36 +4317,256 @@ export class MultiSelect2 extends AbstractSelect2 {
 
     }
 
+    /**
+     * Updates the item that selects all the results, after the results or the selection change: its check state, the
+     * text it shows, which becomes the one that clears them when they are all selected, and its label.
+     */
+    private updateSelectAllItem(): void {
+        const row = this.results.querySelector<HTMLElement>(".select2-select-all");
+        if (!row)
+            return;
+
+        const items = this.getSelectAllItems();
+        const val = this.getVal();
+        const selected = items.filter(x => indexOf(x.id, val) >= 0).length;
+        const state = !items.length || !selected ? "none" : selected === items.length ? "all" : "partial";
+        this.selectAllState = state;
+
+        const texts = this.getSelectAllTexts();
+        const text = state === "all" ? texts.clearText : texts.text;
+        row.dataset.scope = this.getSelectAllScope();
+
+        row.classList.toggle("select2-select-all-checked", state === "all");
+        row.classList.toggle("select2-select-all-partial", state === "partial");
+        row.setAttribute("aria-selected", state === "none" ? "false" : "true");
+        row.setAttribute("aria-label", text);
+
+        const textNode = row.querySelector<HTMLElement>(".select2-select-all-text");
+        if (textNode)
+            textNode.textContent = text;
+        else
+            (row.querySelector(".select2-result-label") as HTMLElement)?.replaceChildren(text);
+    }
+
+    /** Whether the source has more results than the ones that are loaded, by the last page of them that was loaded. */
+    declare private resultsHaveMore: boolean;
+
+    /**
+     * What the item that selects all the results acts on: the ones that are shown, when there are more that are not
+     * loaded yet, the ones that match what is typed, or all of them.
+     */
+    private getSelectAllScope(): "all" | "matching" | "shown" {
+        if (this.resultsHaveMore)
+            return "shown";
+        return this.search?.value ? "matching" : "all";
+    }
+
+    /**
+     * The texts of the item that selects all the results, for what it acts on, see getSelectAllScope, with their
+     * defaults, see {@link Select2Options.selectAll}.
+     */
+    private getSelectAllTexts(): { text: string, clearText: string } {
+        const opts = typeof this.opts.selectAll === "object" ? this.opts.selectAll : null;
+        switch (this.getSelectAllScope()) {
+            case "shown":
+                return {
+                    text: opts?.shownText ?? SelectEditorTexts.SelectShown,
+                    clearText: opts?.clearShownText ?? SelectEditorTexts.ClearShown
+                };
+            case "matching":
+                return {
+                    text: opts?.matchingText ?? SelectEditorTexts.SelectAllMatching,
+                    clearText: opts?.clearMatchingText ?? SelectEditorTexts.ClearAllMatching
+                };
+            default:
+                return {
+                    text: opts?.text ?? SelectEditorTexts.SelectAll,
+                    clearText: opts?.clearText ?? SelectEditorTexts.ClearAll
+                };
+        }
+    }
+
+    protected override isSelectAllItem(item: Select2Item): boolean {
+        // told apart by its identity, as an item without an id, e.g. the parent of a group, is not the one
+        return item != null && item === this.selectAllItem;
+    }
+
+    protected override withSelectAllItem(results: Select2Item[], more?: boolean): Select2Item[] {
+        this.resultsHaveMore = !!more;
+        if (!this.opts.selectAll || !results?.length)
+            return results;
+
+        // only when there is a result that it can select, which may be a child of a group
+        const selectable = (items: Select2Item[]): boolean => items?.some(x => !x.disabled &&
+            (x.children?.length ? selectable(x.children) : this.id(x) != null));
+        if (!selectable(results))
+            return results;
+
+        // a null id keeps it selectable, unlike an undefined one, e.g. of the parent of a group
+        this.selectAllItem = { id: null, text: this.getSelectAllTexts().text };
+        return [this.selectAllItem, ...results];
+    }
+
+    /**
+     * Space ticks, or unticks, the highlighted result of a checklist, as for a check box, and is typed in the search when
+     * no result is highlighted, which is the case after something is typed, see postprocessResults, so that a space can
+     * still be searched for after a word, e.g. "Dairy Products". It is the same whether the search input has the focus
+     * or not, e.g. on a touch device with a hardware keyboard, where it does not get the focus on opening.
+     */
+    protected override handleSpace(): boolean {
+        if (!this.isChecklist() || !this.results.querySelector(".select2-highlighted"))
+            return false;
+
+        this.selectHighlighted();
+        return true;
+    }
+
+    /** Enter accepts the selection of a checklist, which Space and clicks make, and closes it. */
+    protected override handleEnter(): void {
+        if (this.isChecklist())
+            this.close();
+        else
+            super.handleEnter();
+    }
+
+    protected override moveHighlight(delta: number) {
+        this.highlightNavigated = true;
+        if (!this.isChecklist()) {
+            super.moveHighlight(delta);
+            return;
+        }
+
+        // the results of a checklist that are checked are in its list too, and are moved to, so that they can be
+        // unchecked, unlike the selected ones of a multiple select, which are hidden
+        const choices = this.findHighlightableChoices();
+        const current = this.highlight();
+
+        // with no highlight, after something is typed, Down goes to the first result that is found, past the item that
+        // selects them all, which is the one Up then goes to
+        if (current < 0 && delta > 0) {
+            const first = choices.findIndex(x => !this.isSelectAllItem((x as any).select2data));
+            if (first >= 0)
+                this.highlight(first);
+            return;
+        }
+
+        // and Up goes to the last one
+        if (current < 0 && delta < 0) {
+            if (choices.length)
+                this.highlight(choices.length - 1);
+            return;
+        }
+
+        const index = current + delta;
+        if (index >= 0 && index < choices.length)
+            this.highlight(index);
+    }
+
+    /**
+     * Whether the selection is a checklist, which keeps the selected results in the list, and toggles them, see
+     * {@link Select2Options.checkList}.
+     */
+    protected isChecklist(): boolean {
+        return !!this.opts.checkList;
+    }
+
+    /** The results that can be highlighted: a checklist keeps the ones that are selected, which a click toggles. */
+    protected override findHighlightableChoices() {
+        if (!this.isChecklist())
+            return super.findHighlightableChoices();
+
+        return Array.from(this.results.querySelectorAll(".select2-result-selectable:not(.select2-disabled)"));
+    }
+
+    protected override handleDropdownMouseUp(e: Event) {
+        const row = (e.target as HTMLElement)?.closest?.(".select2-result.select2-selected") as HTMLElement;
+        if (this.isChecklist() && row?.classList.contains("select2-result-selectable")) {
+            this.unselectById(this.id((row as any).select2data as Select2Item));
+            return;
+        }
+
+        super.handleDropdownMouseUp(e);
+    }
+
+    /** Unselects an item by its id, e.g. when the row of a checklist that is checked is clicked again. */
+    protected unselectById(id: string) {
+        const items = this.data() ?? [];
+        const remaining = items.filter(x => !equal(this.id(x), id));
+        if (remaining.length === items.length)
+            return;
+
+        this.setVal(remaining.map(x => this.id(x)));
+        this.updateSelection(remaining);
+        this.triggerChange({ removed: items.find(x => equal(this.id(x), id)) });
+    }
+
+    /** Returns the items of the results that the item that selects them all acts on, with their ids. */
+    private getSelectAllItems(): { id: string, item: Select2Item }[] {
+        const items: { id: string, item: Select2Item }[] = [];
+        this.results.querySelectorAll<HTMLElement>(".select2-result").forEach(row => {
+            if (row.classList.contains("select2-disabled"))
+                return;
+            const item = (row as any).select2data as Select2Item;
+            const id = this.id(item);
+            if (id == null || !item?.text || item.disabled || this.isSelectAllItem(item))
+                return;
+            items.push({ id, item });
+        });
+        return items;
+    }
+
+    /**
+     * Selects all the results that are shown, or clears them when they are all selected, as the item that selects them
+     * all does, respecting the maximum number of items that can be selected.
+     */
+    private toggleSelectAll(): void {
+        const items = this.getSelectAllItems();
+        if (!items.length)
+            return;
+
+        const val = this.getVal();
+        const known = new Map<string, Select2Item>();
+        for (const item of this.summaryItems ?? [])
+            known.set(this.id(item), item);
+        for (const { id, item } of items)
+            known.set(id, item);
+
+        let ids: string[];
+        if (this.selectAllState === "all") {
+            ids = val.filter(id => !items.some(x => equal(x.id, id)));
+        }
+        else {
+            ids = val.slice();
+            const max = this.getMaximumSelectionSize();
+            for (const { id } of items) {
+                if (indexOf(id, ids) >= 0)
+                    continue;
+                if (max > 0 && ids.length >= max)
+                    break;
+                ids.push(id);
+            }
+        }
+
+        if (equal(ids.join(this.opts.separator), val.join(this.opts.separator)))
+            return;
+
+        this.setVal(ids);
+        this.updateSelection(ids.map(id => known.get(id)).filter(x => x));
+        this.triggerChange();
+    }
+
     protected getMaxSearchWidth() {
         return this.selection.getBoundingClientRect().width - getSideBorderPadding(this.search);
     }
 
+    /**
+     * Sizes the search field of the choices, which the styles do: it takes the rest of the line after the choices, and
+     * goes to a line of its own when too little is left. It used to be given a width in pixels, from the text typed and
+     * the width of the container, which made a container whose width is not set, e.g. in a grid of fields, grow as the
+     * user typed, so any width it has is removed.
+     */
     protected resizeSearch() {
-        let minimumWidth, left, maxWidth, containerLeft, searchWidth,
-            sideBorderPadding = getSideBorderPadding(this.search);
-
-        minimumWidth = measureTextWidth(this.search) + 10;
-
-        left = getOffset(this.search).left;
-
-        maxWidth = this.selection.getBoundingClientRect().width;
-        containerLeft = getOffset(this.selection).left;
-
-        searchWidth = maxWidth - (left - containerLeft) - sideBorderPadding;
-
-        if (searchWidth < minimumWidth) {
-            searchWidth = maxWidth - sideBorderPadding;
-        }
-
-        if (searchWidth < 40) {
-            searchWidth = maxWidth - sideBorderPadding;
-        }
-
-        if (searchWidth <= 0) {
-            searchWidth = minimumWidth;
-        }
-
-        this.search.style.width = (Math.floor(searchWidth)) + "px";
+        this.search.style.width = "";
     }
 
     protected getVal(): string[] {
@@ -3792,6 +4593,7 @@ export class MultiSelect2 extends AbstractSelect2 {
             unique = unique.filter((x, i) => unique.indexOf(x) === i);
             this.opts.element.value = (unique.length === 0 ? "" : unique.join(this.opts.separator));
         }
+        this.updateAllowClear();
     }
 
     protected buildChangeDetails(old: Select2Item[], current: Select2Item[]) {
@@ -3884,11 +4686,13 @@ export class MultiSelect2 extends AbstractSelect2 {
         // since we collapsed the width in dragStarted, we resize it here
         this.resizeSearch();
 
-        // update selection
-        this.selection.querySelectorAll(".select2-search-choice").forEach(el => {
-            val.push(self.opts.id((el as any).select2data));
-        });
-        this.setVal(val);
+        // update selection, which a summary keeps in its items, as it has no choices to read
+        if (!this.opts.selectionSummary) {
+            this.selection.querySelectorAll(".select2-search-choice").forEach(el => {
+                val.push(self.opts.id((el as any).select2data));
+            });
+            this.setVal(val);
+        }
         this.triggerChange();
     }
 
@@ -3897,6 +4701,10 @@ export class MultiSelect2 extends AbstractSelect2 {
     data(values?: Select2Item[], triggerChange?: boolean): Select2Item[] | void {
         let self = this, ids, old;
         if (arguments.length === 0) {
+            // a summary keeps the items, as there are no choices to read them from
+            if (this.opts.selectionSummary)
+                return (this.summaryItems ?? []).slice();
+
             const result: Select2Item[] = [];
             this.selection
                 .querySelectorAll(":scope > .select2-search-choice")

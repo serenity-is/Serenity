@@ -2,7 +2,7 @@ namespace Serenity.PropertyGrid;
 
 public partial class BasicPropertyProcessor : PropertyProcessor
 {
-    private static void SetFiltering(IPropertySource source, PropertyItem item)
+    private void SetFiltering(IPropertySource source, PropertyItem item)
     {
         var filterOnlyAttr = source.GetAttribute<FilterOnlyAttribute>();
         var filterableAttribute = source.GetAttribute<FilterableAttribute>();
@@ -25,6 +25,18 @@ public partial class BasicPropertyProcessor : PropertyProcessor
 
             if (!string.IsNullOrEmpty(quickFilterAttr.CssClass))
                 item.QuickFilterCssClass = quickFilterAttr.CssClass;
+            
+            if (quickFilterAttr.CascadeFrom != null)
+                item.QuickFilterParams["cascadeFrom"] = quickFilterAttr.CascadeFrom;
+
+            // only when set, as false turns off the option of the editor, e.g. a multiple lookup editor
+            if (quickFilterAttr.GetMultiple() is bool multiple)
+                item.QuickFilterParams["multiple"] = multiple;
+
+            if (quickFilterAttr.GetCheckList() is bool checkList)
+                item.QuickFilterParams["checkList"] = checkList;
+
+            SetQuickFilterPlaceholder(source, quickFilterAttr, item);
         }
 
         var basedOnField = source.BasedOnField;
@@ -220,6 +232,27 @@ public partial class BasicPropertyProcessor : PropertyProcessor
 
             item.QuickFilterParams[key!] = param.Value;
         }
+    }
+
+    /// <summary>
+    /// Sets the placeholder of the quick filter, see <see cref="QuickFilterAttribute.Placeholder"/>, as a local text key,
+    /// which the client resolves, or as the text itself, when the property has no text key, e.g. its type has no columns
+    /// or form script, like the placeholder of the property, see <see cref="SetPlaceholder"/>.
+    /// </summary>
+    private void SetQuickFilterPlaceholder(IPropertySource source, QuickFilterAttribute attr, PropertyItem item)
+    {
+        if (!string.IsNullOrEmpty(attr.PlaceholderKey))
+        {
+            item.QuickFilterParams["placeholder"] = attr.PlaceholderKey;
+            return;
+        }
+
+        if (attr.Placeholder is null)
+            return;
+
+        // a placeholder text is never taken as a key, as the key has a property of its own
+        item.QuickFilterParams["placeholder"] = GetLocalizableTextValue<QuickFilterAttribute>(source, attr.Placeholder,
+            () => source.Name + "_QuickFilter_Placeholder", inferTextKey: false);
     }
 
     private static readonly string[] lookupCopyToFilterParams =

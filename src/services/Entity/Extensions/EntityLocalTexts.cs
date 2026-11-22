@@ -23,6 +23,21 @@ public static class EntityLocalTexts
 
         ArgumentNullException.ThrowIfNull(rowInstances);
 
+        // a text with a key property of its own, e.g. the placeholder of a quick filter: the text is the default text of
+        // the key, or of the implied one when there is no key, and is never taken as a key itself
+        void addKeyedText(string? textKey, string? text, string impliedKey)
+        {
+            if (string.IsNullOrEmpty(textKey))
+            {
+                if (!string.IsNullOrEmpty(text))
+                    provider.Add(languageID, impliedKey, text);
+            }
+            else if (!string.IsNullOrEmpty(text))
+                provider.Add(languageID, textKey, text);
+            else if (provider.TryGet(languageID, textKey, false) is null)
+                provider.Add(languageID, textKey, null);
+        }
+
         void addAttributeText(Attribute attribute, string? text, string defaultKey)
         {
             var resolved = LocalText.ResolveFromAttribute(attribute, text, defaultKey);
@@ -59,6 +74,10 @@ public static class EntityLocalTexts
                 if (field.GetAttribute<PlaceholderAttribute>() is PlaceholderAttribute placeholderAttr)
                     addAttributeText(placeholderAttr, placeholderAttr.Value,
                         field.AutoTextKey + "_Placeholder");
+
+                if (field.GetAttribute<QuickFilterAttribute>() is QuickFilterAttribute quickFilterAttr)
+                    addKeyedText(quickFilterAttr.PlaceholderKey, quickFilterAttr.Placeholder,
+                        field.AutoTextKey + "_QuickFilter_Placeholder");
 
                 // the messages of the rules of Serenity, with their implied keys, e.g. Db.Northwind.Customer.Quantity_ValidateRange
                 foreach (var ruleAttr in field.CustomAttributes.OfType<System.ComponentModel.DataAnnotations.ValidationAttribute>())

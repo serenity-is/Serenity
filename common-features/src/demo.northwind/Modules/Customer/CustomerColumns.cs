@@ -21,7 +21,7 @@ public class CustomerColumns
     [Width(130), AsyncLookupEditor(typeof(Lookups.CustomerCountryLookup)), QuickFilter(CssClass = "hidden-xs"), CountryWithFlagFormatter]
     public string? Country { get; set; }
     [Width(120), AsyncLookupEditor(typeof(Lookups.CustomerCityLookup))]
-    [QuickFilter(CssClass = "hidden-xs"), QuickFilterOption("cascadeFrom", "Country")]
+    [QuickFilter(CssClass = "hidden-xs", CascadeFrom = nameof(Country))]
     public string? City { get; set; }
     [Width(120)]
     public string? Phone { get; set; }

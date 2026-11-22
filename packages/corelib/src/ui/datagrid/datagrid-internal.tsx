@@ -1,6 +1,6 @@
 
 import { ArgsSort, ISleekGrid } from "@serenity-is/sleekgrid";
-import { isInstanceOfType, localText, PropertyItem } from "../../base";
+import { isInstanceOfType, localText, PropertyItem, tryGetText } from "../../base";
 import { deepClone } from "../../compat";
 import { IRemoteView } from "../../slick";
 import { BooleanFiltering } from "../filtering/booleanfiltering";
@@ -95,6 +95,9 @@ export function propertyItemToQuickFilter(item: PropertyItem): QuickFilter<any, 
             filtering.set_operator({ key: FilterOperators.EQ });
             (filtering as any).initQuickFilter(result);
             result.options = Object.assign(deepClone(result.options ?? {}), item.quickFilterParams ?? {});
+            // the placeholder of the quick filter is a local text key, or the text itself, see QuickFilterAttribute
+            if (typeof result.options.placeholder === "string")
+                result.options.placeholder = tryGetText(result.options.placeholder) ?? result.options.placeholder;
         }
         else {
             return null;

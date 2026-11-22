@@ -3,7 +3,10 @@ import { BooleanFiltering } from "../filtering/booleanfiltering";
 import { DateFiltering } from "../filtering/datefiltering";
 import { DateTimeFiltering } from "../filtering/datetimefiltering";
 import { FilteringTypeRegistry } from "../filtering/filteringtyperegistry";
+import { addLocalText } from "../../base";
 import { getDefaultSortBy, getItemCssClass, propertyItemToQuickFilter, sleekGridOnSort } from "./datagrid-internal";
+import { QuickFilterBar } from "./quickfilterbar";
+import "../filtering/stringfiltering";
 
 describe("getDefaultSortBy", () => {
     it("returns empty array for null grid", () => {
@@ -119,5 +122,42 @@ describe("propertyItemToQuickFilter", () => {
         const result = propertyItemToQuickFilter({ name: "Date", title: "Date", quickFilterSeparator: true, quickFilterCssClass: "c" } as any);
         expect(result.separator).toBe(true);
         expect(result.cssClass).toBe("c");
+    });
+});
+
+describe("the placeholder of a quick filter", () => {
+    beforeEach(() => { vi.restoreAllMocks(); });
+
+    it("is resolved from its local text key, which the server gives, see QuickFilterAttribute.Placeholder", () => {
+        addLocalText("Columns.Test.City_QuickFilter_Placeholder", "Any city");
+        const result = propertyItemToQuickFilter({
+            name: "City", title: "City", filteringType: "String",
+            quickFilterParams: { placeholder: "Columns.Test.City_QuickFilter_Placeholder" }
+        } as any);
+        expect(result.options.placeholder).toBe("Any city");
+    });
+
+    it("is the text itself when it is not a key, or an empty text to show none", () => {
+        const text = propertyItemToQuickFilter({
+            name: "City", title: "City", filteringType: "String", quickFilterParams: { placeholder: "Any city" }
+        } as any);
+        expect(text.options.placeholder).toBe("Any city");
+
+        const empty = propertyItemToQuickFilter({
+            name: "City", title: "City", filteringType: "String", quickFilterParams: { placeholder: "" }
+        } as any);
+        expect(empty.options.placeholder).toBe("");
+    });
+
+    it("is the placeholder of the editor in the quick filter bar", () => {
+        addLocalText("Columns.Test.Region_QuickFilter_Placeholder", "Any region");
+        const filter = propertyItemToQuickFilter({
+            name: "Region", title: "Region", filteringType: "String",
+            quickFilterParams: { placeholder: "Columns.Test.Region_QuickFilter_Placeholder" }
+        } as any);
+
+        const bar = new QuickFilterBar({ filters: [filter], element: document.body.appendChild(document.createElement("div")) } as any);
+        expect(bar.domNode.querySelector("[data-qffield=Region] input").getAttribute("placeholder")).toBe("Any region");
+        bar.destroy();
     });
 });

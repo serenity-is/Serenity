@@ -58,7 +58,8 @@ describe("LookupEditor", () => {
             lookupKey: "Test"
         });
 
-        expect(editor.domNode.getAttribute("placeholder")).toBe("Controls.SelectEditor.EmptyItemText");
+        // the default empty item text is an empty one, see ComboboxEditor.defaults
+        expect(editor.domNode.getAttribute("placeholder")).toBe("");
     });
 
     it('doesn\'t set placeholder if its not null', () => {

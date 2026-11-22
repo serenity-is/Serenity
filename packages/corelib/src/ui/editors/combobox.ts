@@ -1,6 +1,6 @@
 import { bindThis } from "@serenity-is/domwise";
 import { Fluent, IconClassName, isArrayLike, isPromiseLike } from "../../base";
-import { Select2, Select2Options, Select2QueryOptions } from "./select2";
+import { Select2, Select2Options, Select2QueryOptions, SelectAllOptions } from "./select2";
 
 /** The combobox provider type. */
 export type ComboboxType = "select2";
@@ -72,6 +72,8 @@ export interface ComboboxOptions<TSource = any> {
     formatSelection?: (item: ComboboxItem<TSource>) => ComboboxFormatResult;
     /** Formatter for result items. */
     formatResult?: (result: ComboboxItem<TSource>, container: HTMLElement, query: Select2QueryOptions) => ComboboxFormatResult;
+    /** See `Select2Options.formatSelectAll`. */
+    formatSelectAll?: (item: ComboboxItem<TSource>, container: HTMLElement, query: Select2QueryOptions) => ComboboxFormatResult;
     /** Minimum results required to show the search box. */
     minimumResultsForSearch?: number;
     /** Whether multiple items can be selected. */
@@ -80,12 +82,26 @@ export interface ComboboxOptions<TSource = any> {
     pageSize?: number;
     /** Placeholder text. */
     placeholder?: string;
+    /** See `Select2Options.placeholderIcon`. */
+    placeholderIcon?: IconClassName;
     /** Callback to get options specific to the combobox provider type. */
     providerOptions?: (type: ComboboxType, opt: ComboboxOptions) => any;
     /** Callback that performs the search. */
     search?: (query: ComboboxSearchQuery) => (PromiseLike<ComboboxSearchResult<ComboboxItem<TSource>>> | ComboboxSearchResult<ComboboxItem<TSource>>);
     /** Type delay for searching, default is 200. */
     typeDelay?: number;
+    /** See `Select2Options.selectAll`. */
+    selectAll?: boolean | SelectAllOptions;
+    /** See `Select2Options.checkList`. */
+    checkList?: boolean;
+    /** See `Select2Options.selectionSummary`. */
+    selectionSummary?: (items: ComboboxItem<TSource>[], container: HTMLElement) => void;
+    /** CSS class(es) of the control that wraps the element. */
+    containerCssClass?: string;
+    /** CSS class(es) of the dropdown, which is appended to the body, not to the control. */
+    dropdownCssClass?: string;
+    /** Callback that returns the CSS class(es) of a result. */
+    formatResultCssClass?: (item: ComboboxItem<TSource>) => string;
 }
 
 type SelectionLoad = {
@@ -193,6 +209,7 @@ export class Combobox<TItem = any> {
             element: this.el,
             multiple: opt.multiple,
             placeholder: opt.placeholder || null,
+            placeholderIcon: opt.placeholderIcon,
             allowClear: opt.allowClear,
             createSearchChoicePosition: 'bottom'
         }
@@ -336,8 +353,32 @@ export class Combobox<TItem = any> {
         if (opt.formatResult)
             select2Opt.formatResult = opt.formatResult;
 
+        if (opt.formatSelectAll)
+            select2Opt.formatSelectAll = opt.formatSelectAll;
+
+        if (opt.formatResultCssClass)
+            select2Opt.formatResultCssClass = opt.formatResultCssClass;
+
         if (opt.formatSelection)
             select2Opt.formatSelection = opt.formatSelection;
+
+        if (opt.minimumResultsForSearch != null)
+            select2Opt.minimumResultsForSearch = opt.minimumResultsForSearch;
+
+        if (opt.containerCssClass)
+            select2Opt.containerCssClass = opt.containerCssClass;
+
+        if (opt.dropdownCssClass)
+            select2Opt.dropdownCssClass = opt.dropdownCssClass;
+
+        if (opt.selectAll)
+            select2Opt.selectAll = opt.selectAll;
+
+        if (opt.selectionSummary)
+            select2Opt.selectionSummary = opt.selectionSummary;
+
+        if (opt.checkList)
+            select2Opt.checkList = opt.checkList;
 
         if (opt.providerOptions)
             select2Opt = Object.assign(select2Opt, opt.providerOptions("select2", opt));

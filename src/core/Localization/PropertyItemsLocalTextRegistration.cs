@@ -43,6 +43,21 @@ public static class PropertyItemsLocalTextRegistration
                     registry.Add(languageID, textPrefix + suffix, text);
             }
 
+            // a text with a key property of its own, e.g. the placeholder of a quick filter: the text is the default
+            // text of the key, or of the implied one when there is no key, and is never taken as a key itself
+            void addKeyedText(string? textKey, string? text, string impliedKey)
+            {
+                if (string.IsNullOrEmpty(textKey))
+                {
+                    if (!string.IsNullOrEmpty(text))
+                        registry.Add(languageID, impliedKey, text);
+                }
+                else if (!string.IsNullOrEmpty(text))
+                    registry.Add(languageID, textKey, text);
+                else if (registry.TryGet(languageID, textKey, false) is null)
+                    registry.Add(languageID, textKey, null);
+            }
+
             void addAttributeText(Attribute attribute, string? text, string suffix)
             {
                 var resolved = LocalText.ResolveFromAttribute(attribute, text, textPrefix + suffix);
@@ -86,6 +101,10 @@ public static class PropertyItemsLocalTextRegistration
 
                 if (getAttribute<PlaceholderAttribute>() is PlaceholderAttribute placeholderAttr)
                     addAttributeText(placeholderAttr, placeholderAttr.Value, member.Name + "_Placeholder");
+
+                if (getAttribute<QuickFilterAttribute>() is QuickFilterAttribute quickFilterAttr)
+                    addKeyedText(quickFilterAttr.PlaceholderKey, quickFilterAttr.Placeholder,
+                        textPrefix + member.Name + "_QuickFilter_Placeholder");
 
                 // the messages of the rules of Serenity, with their implied keys, e.g. Quantity_ValidateRange
                 foreach (var ruleAttr in getAttributes<System.ComponentModel.DataAnnotations.ValidationAttribute>())

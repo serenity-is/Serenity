@@ -1168,14 +1168,14 @@ input[type=checkbox]:focus,
 input[type=radio]:focus,
 .select2-container-active {
   outline: 0;
-  box-shadow: 0 0 0 var(--bs-focus-ring-width, .25rem) var(--s-input-outline);
+  box-shadow: 0 0 0 var(--bs-focus-ring-width, 1.5px) var(--s-input-outline);
 }
 
 input.error:focus,
 select.error:focus,
 textarea.error:focus,
 .select2-container-active.error {
-  box-shadow: 0 0 0 var(--bs-focus-ring-width, .25rem) var(--s-input-outline-error);
+  box-shadow: 0 0 0 var(--bs-focus-ring-width, 1.5px) var(--s-input-outline-error);
 }
 
 input[type=checkbox],
@@ -3284,7 +3284,12 @@ button.panel-titlebar-close::after {
   display: list-item;
 }
 
+/* the choices wrap, and the search field takes the rest of the line after them, so the control keeps the width of its
+   field however much is typed, which it sizes on its own */
 .select2-choices {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
   height: auto !important;
   height: 1%;
   margin: 0;
@@ -3303,17 +3308,23 @@ button.panel-titlebar-close::after {
 }
 
 .select2-choices li {
-  float: left;
+  flex: none;
   list-style: none;
 }
 
-.select2-search-field {
+.select2-choices .select2-search-field {
+  flex: 1 1 4em;
+  min-width: 4em;
   margin: 0;
   padding: 0;
   white-space: nowrap;
 }
 
 .select2-choices .select2-input {
+  /* fills its field, without making the field wider than its line, as its own width would */
+  box-sizing: border-box;
+  width: 0;
+  min-width: 100%;
   padding: calc(var(--s-input-padding-v) - 2px) 0.75rem;
   margin: 2px 0;
   color: var(--s-input-text, currentcolor);
@@ -3358,6 +3369,127 @@ button.panel-titlebar-close::after {
 .select2-result-selectable .select2-match,
 .select2-result-unselectable .select2-match {
   text-decoration: underline;
+}
+
+/* The checklist of a combobox editor, see the checkList option of ComboboxCommonOptions: a check box before each result,
+   an item that selects them all, and the selection as a summary instead of a choice for each item. */
+
+/* the check box of a result of a checklist, which follows the state of the item */
+.select2-results .select2-checkbox {
+  position: relative;
+  display: inline-block;
+  flex: none;
+  width: 1em;
+  height: 1em;
+  margin-inline-end: 0.5em;
+  border: 1px solid var(--s-input-border-color, var(--bs-border-color));
+  border-radius: var(--bs-border-radius-sm);
+  background-color: var(--s-input-bg, var(--bs-body-bg));
+  vertical-align: -0.125em;
+}
+
+.select2-results .select2-selected .select2-checkbox,
+.select2-results .select2-select-all-checked .select2-checkbox {
+  border-color: var(--bs-primary);
+  background-color: var(--bs-primary);
+}
+
+.select2-results .select2-selected .select2-checkbox::after,
+.select2-results .select2-select-all-checked .select2-checkbox::after {
+  content: "";
+  position: absolute;
+  inset: 0.15em;
+  background-color: var(--s-btn-primary-color, var(--bs-body-bg));
+  --s-select2-checkbox-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 12.5 4.5 4.5L19 7.5'/%3E%3C/svg%3E");
+  -webkit-mask: var(--s-select2-checkbox-check) center / contain no-repeat;
+  mask: var(--s-select2-checkbox-check) center / contain no-repeat;
+}
+
+/* some of the results are selected, so the item that selects all of them clears them, which it shows with a dash */
+.select2-results .select2-select-all-partial .select2-checkbox {
+  border-color: var(--bs-primary);
+  background-color: color-mix(in oklab, var(--bs-primary) 20%, transparent);
+}
+
+.select2-results .select2-select-all-partial .select2-checkbox::after {
+  content: "";
+  position: absolute;
+  inset: 0.35em 0.15em;
+  background-color: var(--bs-primary);
+  border-radius: 1px;
+}
+
+/* the results of a checklist keep the items that are selected, which they show checked, so that a click can uncheck
+   them, unlike a combobox, where a selected item is replaced with a choice of its own */
+.select2-dropdown-checklist .select2-results .select2-selected {
+  display: list-item;
+}
+
+/* the item that selects all the results sits above them, and is told apart from them */
+.select2-results .select2-select-all {
+  margin-bottom: 2px;
+  border-bottom: 1px solid var(--s-cell-border, var(--bs-border-color));
+}
+
+.select2-results .select2-select-all .select2-result-label {
+  font-weight: 500;
+}
+
+/* a checklist shows its selection in one line, with the placeholder when nothing is selected, and looks like a single
+   select, with its caret, and its clear button when something is selected; its search box is in the dropdown, as the one
+   of a single select, and the input that has the focus while it is closed is offscreen */
+.select2-container-multi.select2-container-checklist .select2-choices {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.35em;
+  height: auto !important;
+  padding: 0 1.75rem 0 0.75rem;
+  /* nothing is typed in it, as in a single select, so a click is what it takes */
+  cursor: pointer;
+}
+
+.select2-container-multi.select2-container-checklist.select2-allowclear .select2-choices {
+  padding-right: 2.75rem;
+}
+
+.select2-container-multi.select2-container-checklist .select2-selection-summary {
+  flex: 1 1 auto;
+  min-width: 0;
+  list-style: none;
+}
+
+/* the names are cut when they do not fit, and not the count of the rest, e.g. "Beverages, Condim… +2" */
+.select2-container-multi.select2-container-checklist .select2-selection-summary-content {
+  display: flex;
+  align-items: baseline;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.select2-container-multi.select2-container-checklist .select2-selection-summary-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.select2-container-multi.select2-container-checklist .select2-selection-summary-more {
+  flex: none;
+  margin-inline-start: 0.35em;
+  color: var(--bs-secondary-color);
+}
+
+.select2-container-multi.select2-container-checklist .select2-selection-placeholder {
+  color: var(--s-placeholder);
+}
+
+.select2-container-multi.select2-container-checklist .select2-selection-placeholder i {
+  margin-inline-end: 0.35em;
+}
+
+.select2-container-multi.select2-container-checklist .select2-search-field {
+  flex: none;
+  min-width: 0;
 }
 
 .slick-header {

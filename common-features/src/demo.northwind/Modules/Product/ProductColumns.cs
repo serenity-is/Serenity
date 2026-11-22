@@ -12,7 +12,7 @@ public class ProductColumns
     public bool Discontinued { get; set; }
     [EditLink(ItemType = "Demo.Northwind.Supplier"), QuickFilter]
     public string? SupplierCompanyName { get; set; }
-    [EditLink(ItemType = "Demo.Northwind.Category"), Width(150), QuickFilter, QuickFilterOption("multiple", true)]
+    [EditLink(ItemType = "Demo.Northwind.Category"), Width(150), QuickFilter(Multiple = true)]
     public string? CategoryName { get; set; }
     [Width(130)]
     public string? QuantityPerUnit { get; set; }

@@ -35,7 +35,8 @@ describe("SelectEditor", () => {
 
     it("emptyItemText falls back to base when not set", () => {
         const editor = new SelectEditor({ items: [] } as any);
-        expect((editor as any).emptyItemText()).toBeTruthy();
+        // the default of the base, see ComboboxEditor.defaults, which is an empty text, and not null
+        expect((editor as any).emptyItemText()).toBe("");
         editor.destroy();
     });
 });
