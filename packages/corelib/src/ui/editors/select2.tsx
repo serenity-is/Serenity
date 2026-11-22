@@ -233,7 +233,11 @@ export interface Select2Options {
     dropdownCss?: Record<string, string> | (() => Record<string, string>);
     /** Dropdown CSS class. */
     dropdownCssClass?: string | (() => string);
-    /** Whether the dropdown auto-widths. */
+    /**
+     * Whether the dropdown is as wide as its widest result, instead of as wide as the control, though never narrower
+     * than the control, nor wider than the `max-width` that the styles give the `select2-drop-auto-width` class. It
+     * keeps the widest width it took while it is open, so that it does not shrink as what is typed filters the results.
+     */
     dropdownAutoWidth?: boolean;
     /** Callback that returns the dropdown parent. */
     dropdownParent?: (input: HTMLElement) => HTMLElement;
@@ -1873,18 +1877,37 @@ export abstract class AbstractSelect2 {
             }
         }
 
+        let maxWidth: string;
         if (this.opts.dropdownAutoWidth) {
             resultsListNode = dropdown.querySelector('.select2-results');
             dropdown.classList.add('select2-drop-auto-width');
             dropdown.style.width = "";
+            dropdown.style.maxWidth = "";
             // Add scrollbar width to dropdown if vertical scrollbar is present
             dropWidth = dropdown.offsetWidth + (resultsListNode.scrollHeight === resultsListNode.clientHeight ? 0 : scrollBarDimensions.width);
-            dropWidth > width ? width = dropWidth : dropWidth = width;
+            // the styles cap the width of the dropdown, which is not to be narrower than the control, though, and it
+            // does not shrink while it is open, as what is typed filters the results
+            dropWidth = Math.max(dropWidth, this.autoDropWidth ?? 0);
+            this.autoDropWidth = dropWidth;
+            if (dropWidth > width)
+                width = dropWidth;
+            else {
+                dropWidth = width;
+                maxWidth = "none";
+            }
             dropHeight = dropdown.offsetHeight;
             enoughRoomOnRight = dropLeft + dropWidth <= viewPortRight;
+
+            // a dropdown that is wider than the control grows towards the end of the line, which is the left in a
+            // right to left page, as long as there is room for it
+            if (dropWidth > this.container.offsetWidth && getComputedStyle(this.container).direction === "rtl") {
+                const endAligned = offset.left + this.container.offsetWidth - dropWidth;
+                if (endAligned >= window.scrollX)
+                    dropLeft = endAligned;
+            }
         }
         else {
-            this.container.classList.remove('select2-drop-auto-width');
+            dropdown.classList.remove('select2-drop-auto-width');
         }
 
         //console.log("below/ droptop:", dropTop, "dropHeight", dropHeight, "sum", (dropTop+dropHeight)+" viewport bottom", viewportBottom, "enough?", enoughRoomBelow);
@@ -1905,6 +1928,9 @@ export abstract class AbstractSelect2 {
             left: dropLeft + "px",
             width: width + "px"
         };
+
+        if (maxWidth)
+            css.maxWidth = maxWidth;
 
         if (above) {
             css.top = (offset.top - dropHeight) + "px";
@@ -1967,8 +1993,12 @@ export abstract class AbstractSelect2 {
     /**
      * Performs the opening of the dropdown
      */
+    /** The widest the dropdown was while it is open, see {@link Select2Options.dropdownAutoWidth}. */
+    declare private autoDropWidth: number;
+
     protected opening() {
         this.highlightNavigated = false;
+        this.autoDropWidth = undefined;
 
         let cid = this.containerEventName,
             scroll = "scroll." + cid,

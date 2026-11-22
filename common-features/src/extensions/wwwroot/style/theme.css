@@ -3079,6 +3079,8 @@ button.panel-titlebar-close::after {
 .select2-drop-auto-width {
   border-top: 1px solid var(--bs-border-color);
   width: auto;
+  /* the widest the dropdown grows to fit its results, which wrap beyond it, though never narrower than the control */
+  max-width: min(var(--s-select2-drop-max-width, 20rem), calc(100vw - 2rem));
 }
 
 .select2-drop-auto-width .select2-search {
@@ -3423,6 +3425,24 @@ button.panel-titlebar-close::after {
    them, unlike a combobox, where a selected item is replaced with a choice of its own */
 .select2-dropdown-checklist .select2-results .select2-selected {
   display: list-item;
+}
+
+/* the text of a result of a checklist wraps beside its check box, instead of under it, which stays with the first line */
+.select2-dropdown-checklist .select2-results .select2-result-label {
+  display: flex;
+  align-items: flex-start;
+}
+
+.select2-dropdown-checklist .select2-results .select2-result-label .select2-checkbox {
+  margin-top: 0.2em;
+  margin-top: calc((1lh - 1em) / 2);
+}
+
+.select2-dropdown-checklist .select2-checklist-text,
+.select2-dropdown-checklist .select2-select-all-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-wrap: break-word;
 }
 
 /* the item that selects all the results sits above them, and is told apart from them */

@@ -9798,7 +9798,11 @@ export interface Select2Options {
     dropdownCss?: Record<string, string> | (() => Record<string, string>);
     /** Dropdown CSS class. */
     dropdownCssClass?: string | (() => string);
-    /** Whether the dropdown auto-widths. */
+    /**
+     * Whether the dropdown is as wide as its widest result, instead of as wide as the control, though never narrower
+     * than the control, nor wider than the `max-width` that the styles give the `select2-drop-auto-width` class. It
+     * keeps the widest width it took while it is open, so that it does not shrink as what is typed filters the results.
+     */
     dropdownAutoWidth?: boolean;
     /** Callback that returns the dropdown parent. */
     dropdownParent?: (input: HTMLElement) => HTMLElement;
@@ -10038,6 +10042,8 @@ export declare abstract class AbstractSelect2 {
     /**
      * Performs the opening of the dropdown
      */
+    /** The widest the dropdown was while it is open, see {@link Select2Options.dropdownAutoWidth}. */
+    private autoDropWidth;
     protected opening(): void;
     close(): void;
     /**
@@ -10361,6 +10367,8 @@ export interface ComboboxOptions<TSource = any> {
     containerCssClass?: string;
     /** CSS class(es) of the dropdown, which is appended to the body, not to the control. */
     dropdownCssClass?: string;
+    /** See `Select2Options.dropdownAutoWidth`. */
+    dropdownAutoWidth?: boolean;
     /** Callback that returns the CSS class(es) of a result. */
     formatResultCssClass?: (item: ComboboxItem<TSource>) => string;
 }
@@ -10567,6 +10575,12 @@ export interface ComboboxCommonOptions {
      * source, whose results come in pages. Default is true.
      */
     selectAll?: boolean;
+    /**
+     * Whether the dropdown is as wide as its widest item, up to a limit that the styles give it, instead of as wide as
+     * the control, which a narrow control, e.g. a quick filter, needs for the names of its items to fit. Default is
+     * true for a checklist, see {@link checkList}, and false otherwise.
+     */
+    dropdownAutoWidth?: boolean;
     /**
      * How many of the selected items the summary of a checklist, see {@link checkList}, names before it counts the
      * rest, e.g. 3 for "A, B, C +2". Zero names none of them, and shows how many are selected, e.g. "4 selected", and

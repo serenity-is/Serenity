@@ -109,6 +109,8 @@ export interface ComboboxOptions<TSource = any> {
     containerCssClass?: string;
     /** CSS class(es) of the dropdown, which is appended to the body, not to the control. */
     dropdownCssClass?: string;
+    /** See `Select2Options.dropdownAutoWidth`. */
+    dropdownAutoWidth?: boolean;
     /** Callback that returns the CSS class(es) of a result. */
     formatResultCssClass?: (item: ComboboxItem<TSource>) => string;
 }
@@ -379,6 +381,9 @@ export class Combobox<TItem = any> {
 
         if (opt.dropdownCssClass)
             select2Opt.dropdownCssClass = opt.dropdownCssClass;
+
+        if (opt.dropdownAutoWidth != null)
+            select2Opt.dropdownAutoWidth = opt.dropdownAutoWidth;
 
         if (opt.selectAll)
             select2Opt.selectAll = opt.selectAll;

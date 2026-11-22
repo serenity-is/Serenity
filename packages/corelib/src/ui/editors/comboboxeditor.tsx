@@ -61,6 +61,12 @@ export interface ComboboxCommonOptions {
      */
     selectAll?: boolean;
     /**
+     * Whether the dropdown is as wide as its widest item, up to a limit that the styles give it, instead of as wide as
+     * the control, which a narrow control, e.g. a quick filter, needs for the names of its items to fit. Default is
+     * true for a checklist, see {@link checkList}, and false otherwise.
+     */
+    dropdownAutoWidth?: boolean;
+    /**
      * How many of the selected items the summary of a checklist, see {@link checkList}, names before it counts the
      * rest, e.g. 3 for "A, B, C +2". Zero names none of them, and shows how many are selected, e.g. "4 selected", and
      * -1 names them all, and shows how many are selected at the end, e.g. "A, B, C, D (4)", of which the styles cut what
@@ -498,6 +504,9 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
         if (minSearch != null)
             opt.minimumResultsForSearch = minSearch;
 
+        if (this.comboboxOptions.dropdownAutoWidth != null)
+            opt.dropdownAutoWidth = this.comboboxOptions.dropdownAutoWidth;
+
         if (this.isAutoComplete() || this.useInplaceAdd())
             opt.createSearchChoice = this.getCreateSearchChoice(null);
 
@@ -539,13 +548,18 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
         // that are shown of an asynchronous source, whose results come in pages
         if (this.comboboxOptions.selectAll !== false)
             opt.selectAll = true;
+
+        // the names of the items of a narrow control, e.g. a quick filter, would wrap under their check boxes
+        opt.dropdownAutoWidth ??= true;
     }
 
     /**
      * Renders a result of a checklist, with a check box before it, which the styles mark when it is selected.
      */
     protected formatCheckListResult(item: ComboboxItem, container: HTMLElement, query: Select2QueryOptions) {
-        return <><i class="select2-checkbox" aria-hidden="true"></i>{this.formatCheckListContent(item, query)}</>;
+        // the content is one element, which the styles wrap beside the check box, instead of under it
+        return <><i class="select2-checkbox" aria-hidden="true"></i>
+            <span class="select2-checklist-text">{this.formatCheckListContent(item, query)}</span></>;
     }
 
     /**

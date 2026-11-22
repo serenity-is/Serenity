@@ -1047,3 +1047,68 @@ describe("the text of the item that selects all the results", () => {
         editor.destroy();
     });
 });
+
+describe("the width of the dropdown of a checklist", () => {
+    it("is as wide as its items by default, which the editor can turn off", () => {
+        const items = [["1", "A"]];
+        const checkList = new SelectEditor({ items, checkList: true } as any);
+        expect(checkList["getComboboxOptions"]().dropdownAutoWidth).toBe(true);
+
+        const off = new SelectEditor({ items, checkList: true, dropdownAutoWidth: false } as any);
+        expect(off["getComboboxOptions"]().dropdownAutoWidth).toBe(false);
+
+        const single = new SelectEditor({ items } as any);
+        expect(single["getComboboxOptions"]().dropdownAutoWidth).toBeUndefined();
+
+        checkList.destroy();
+        off.destroy();
+        single.destroy();
+    });
+
+    it("wraps the text of an item beside its check box, as one element", () => {
+        const editor = new SelectEditor({ items: [["1", "Grains/Cereals"]], checkList: true } as any);
+        const label = document.createElement("div");
+        label.append(editor["formatCheckListResult"]({ id: "1", text: "Grains/Cereals" }, label, { term: "" } as any));
+
+        expect(label.children[0].classList.contains("select2-checkbox")).toBe(true);
+        expect(label.children[1].classList.contains("select2-checklist-text")).toBe(true);
+        expect(label.children[1].textContent).toBe("Grains/Cereals");
+        expect(label.children.length).toBe(2);
+        editor.destroy();
+    });
+
+    it("grows to fit its results, never narrower than the control, and does not shrink while it is open", () => {
+        const widths = { container: 100, dropdown: 180 };
+        vi.spyOn(HTMLElement.prototype, "offsetWidth", "get").mockImplementation(function (this: HTMLElement) {
+            if (this.classList.contains("select2-drop"))
+                return widths.dropdown;
+            if (this.classList.contains("select2-container"))
+                return widths.container;
+            return 0;
+        });
+
+        try {
+            const { select, internal } = createChecklist({ dropdownAutoWidth: true });
+            select.open();
+            expect(internal.dropdown.classList.contains("select2-drop-auto-width")).toBe(true);
+            expect(internal.dropdown.style.width).toBe("180px");
+
+            // what is typed filters the results, which would make the dropdown narrower while it is open
+            widths.dropdown = 120;
+            internal.positionDropdown();
+            expect(internal.dropdown.style.width).toBe("180px");
+
+            // it fits the results again when it is opened again, though never narrower than the control, which its
+            // cap is not to make it either
+            select.close();
+            widths.dropdown = 60;
+            select.open();
+            expect(internal.dropdown.style.width).toBe("100px");
+            expect(internal.dropdown.style.maxWidth).toBe("none");
+            select.destroy();
+        }
+        finally {
+            vi.restoreAllMocks();
+        }
+    });
+});
