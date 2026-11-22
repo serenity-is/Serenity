@@ -76,10 +76,10 @@ public partial class ServerTypingsGenerator
             if (textKey is { Length: 0 })
             {
                 textKeys.Add((valueKey, ""));
-                if (!string.IsNullOrEmpty(text))
+                if (text is { Length: > 0 })
                     texts.Add((valueKey, text));
             }
-            else if (!string.IsNullOrEmpty(textKey) && textKey != impliedKey)
+            else if (textKey is { Length: > 0 } && textKey != impliedKey)
                 textKeys.Add((valueKey, textKey));
         }
 
