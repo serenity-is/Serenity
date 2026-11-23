@@ -8,6 +8,7 @@ public partial class EntityCodeGeneratorTests
         public IFileSystem FileSystem => fileSystem;
 
         public string[]? GetAssemblyList(string[]? configured) => throw new NotSupportedException();
+        public string? GetAssemblyFile() => throw new NotSupportedException();
         public string? GetAssemblyName() => throw new NotSupportedException();
         public string? GetEsmAssetBasePath() => throw new NotSupportedException();
         public IDictionary<string, string?> GetGlobalUsings() => throw new NotSupportedException();

@@ -13,6 +13,7 @@ public static class Texts
             m[vc]             Generates IntelliSense helpers for esm entry points and view locations.
             mvct              Executes client types and mvc commands simulatenously.
             s[ervertypings]   Imports row, form, and service types from C# to TypeScript.
+            te[xtkeys]        Writes the constants of the text keys of the project (TextKeys.g.cs).
             t[ransform]       Executes clienttypes, mvc, and servertypings commands simultaneously.
 
         Switches:
@@ -66,6 +67,19 @@ public static class Texts
                                           --no-interactive is used.
 
         """;
+
+    public const string TextKeysTransforming = "Transforming text keys for {0}";
+
+    public const string TextKeysGenerated = "Wrote {0} text key constants to {1}.";
+
+    public const string TextKeysSkipped = "The text keys of the project are not written, as it has no template of them " +
+        "in its texts/resources folder, e.g. a site.texts.__.json, which its json texts command writes.";
+
+    public const string TextKeysFailed = "The text keys could not be written: {0}";
+
+    public const string TextKeysGeneratedOnBuild = "The source generators of Pro.Coder generate the text keys of this " +
+        "project while it builds, so the file written here would be a duplicate of theirs.\n" +
+        "Use 'dotnet build' to generate them. To write the file anyway, run the textkeys, mvc or transform command with --force.";
 
     public const string GeneratedOnBuild = "The source generators of Pro.Coder generate the client types and view paths of this " +
         "project while it builds, so running this command could write duplicates of them.\n" +

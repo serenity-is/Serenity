@@ -64,7 +64,7 @@
   "Site.Translation.TranslateAllText": "Traduire tout le texte",
   "Site.Translation.TranslateText": "Traduire AI",
   "Site.Translation.TranslateTextConfirmation": "AI traduit {0} des textes qui n'ont pas de traduction dans la langue cible ?",
-  "Site.Translation.TranslateTextDisabled": "La traduction automatique est désactivée !",
+  "Site.Translation.TranslateTextDisabled": "La traduction automatique est désactivée\u00A0!",
   "Site.Translation.UserTranslated": "Traduit par l'utilisateur",
   "Validation.InvalidResetToken": "Votre jeton pour réinitialiser votre mot de passe est invalide ou a expiré!",
   "Validation.MinRequiredPasswordLength": "Le mot de passe saisi ne comporte pas assez de caractères (min {0})!",

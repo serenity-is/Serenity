@@ -5,6 +5,12 @@ namespace Serenity.CodeGenerator;
 public class MvcCommand(IProjectFileInfo project, IGeneratorConsole console)
     : BaseGeneratorCommand(project, console)
 {
+    /// <summary>
+    /// Gets or sets a value indicating whether the files are written even when the source generators of the project
+    /// write them while it builds, which is what the force switch of the command asks for.
+    /// </summary>
+    public bool Force { get; set; }
+
     public override ExitCodes Run()
     {
         var projectDir = FileSystem.GetDirectoryName(FileSystem.GetFullPath(ProjectFile));
@@ -80,7 +86,9 @@ public class MvcCommand(IProjectFileInfo project, IGeneratorConsole console)
             ProjectDir = projectDir,
             RootNamespace = helperNamespace,
             FileScopedNamespaces = sergenConfig.FileScopedNamespaces == true,
-            InternalAccess = sergenConfig.MVC.InternalAccess == true
+            InternalAccess = sergenConfig.MVC.InternalAccess == true,
+            // a project that has the alias already, e.g. with a Using item of its project file, does not get another one
+            UsingAlias = sergenConfig.MVC.ESMAlias != false && !Project.HasAlias("ESM")
         };
 
         var esmAssetBasePath = Project.GetEsmAssetBasePath();
@@ -103,6 +111,10 @@ public class MvcCommand(IProjectFileInfo project, IGeneratorConsole console)
             ("MVC.cs", cw.ToString()),
             ("ESM.cs", esmCode)
         ], deleteExtraPattern: ["ESM.cs", "MVC.cs"], endOfLine: sergenConfig.EndOfLine);
+
+        // the constants of the text keys are written with the rest of the generated code, as they are C# that the build
+        // that comes after this command compiles, see TextKeysGenerator
+        new TextKeysCommand(Project, Console) { Force = Force }.Run();
 
         return ExitCodes.Success;
     }

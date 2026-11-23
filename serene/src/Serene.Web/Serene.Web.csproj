@@ -18,6 +18,7 @@
     <DefineConstants>$(DefineConstants);Northwind;BasicSamples</DefineConstants>
     <Nullable>enable</Nullable>
     <UseProjectRefs Condition="!Exists('$(SerenitySrc)..\Serenity.slnx')">false</UseProjectRefs>
+    <DefineConstants Condition="'$(UseProjectRefs)' != 'false'">$(DefineConstants);UseProjectRefs</DefineConstants>
     <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
   </PropertyGroup>
   <Import Project="$(MSBuildThisFileDirectory)..\..\..\build\Package.Version.props"
@@ -29,7 +30,6 @@
     <EmbeddedResource Include="Migrations\**\*.sql" />
     <Content Update=".eslintrc.json;libman.json;package.json;package-lock.json;sergen.json;tsconfig.json;tslint.json;Modules\tsconfig.json" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />
     <Using Include="Serenity.Extensions" />
-    <Using Include="Serene.MVC.ESM" Alias="ESM" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FluentMigrator.Runner.Firebird" />

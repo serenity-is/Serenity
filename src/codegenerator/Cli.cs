@@ -138,8 +138,10 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console, IProcessExec
             isCommand(CommandKeys.ServerTypings, CommandAliases.ServerTypings);
         bool mvc = transform || mvcAndClientTypes ||
             isCommand(CommandKeys.Mvc, CommandAliases.Mvc);
+        // the mvc command writes the text keys as well, so this one is for a project that wants them alone
+        bool textKeys = transform || isCommand(CommandKeys.TextKeys, CommandAliases.TextKeys);
 
-        if (!transform && !clientTypes && !serverTypings && !mvc)
+        if (!transform && !clientTypes && !serverTypings && !mvc && !textKeys)
         {
             WriteHelp(Console);
             return ExitCodes.InvalidCommand;
@@ -159,7 +161,7 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console, IProcessExec
 
         ExitCodes? exitCode = null;
         if (mvc)
-            exitCode = RunCommand(new MvcCommand(project, Console), exitCode);
+            exitCode = RunCommand(new MvcCommand(project, Console) { Force = force }, exitCode);
 
         if (clientTypes)
         {
@@ -169,6 +171,10 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console, IProcessExec
                 TsTypes = [.. (tsTypes ?? [])]
             }, exitCode);
         }
+
+        // the command itself leaves the file alone when the project writes it on build, see TextKeysCommand
+        if (textKeys && !mvc)
+            exitCode = RunCommand(new TextKeysCommand(project, Console) { Force = force }, exitCode);
 
         if (serverTypings)
         {
@@ -260,6 +266,7 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console, IProcessExec
         public const string MvcAndClientTypes = "mvct";
         public const string Restore = "restore";
         public const string ServerTypings = "servertypings";
+        public const string TextKeys = "textkeys";
         public const string Transform = "transform";
     }
 
@@ -271,5 +278,6 @@ public class Cli(IFileSystem fileSystem, IGeneratorConsole console, IProcessExec
         public const string Mvc = "m";
         public const string Restore = "r";
         public const string ServerTypings = "s";
+        public const string TextKeys = "te";
     }
 }

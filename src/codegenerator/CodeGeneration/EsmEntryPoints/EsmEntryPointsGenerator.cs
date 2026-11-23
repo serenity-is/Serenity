@@ -26,6 +26,14 @@ public class EsmEntryPointsGenerator(IFileSystem fileSystem)
     /// </summary>
     public bool OmitComments { get; set; }
 
+    /// <summary>
+    /// Gets or sets a value indicating whether the class is made available as ESM in every file of the project, with a
+    /// global using, as it is in a namespace under the one of the project, e.g. "MyApp.MVC", which a file would write
+    /// out otherwise. Defaults to true, and a project that has the alias of it already, e.g. one that its project file
+    /// adds with a Using item, does not get another one, see the ESMAlias option of the mvc command.
+    /// </summary>
+    public bool UsingAlias { get; set; } = true;
+
     public string Generate()
     {
         ArgumentNullException.ThrowIfNull(ProjectDir);
@@ -207,6 +215,13 @@ public class EsmEntryPointsGenerator(IFileSystem fileSystem)
                 for (var i = last.Length - 1; i > 0; i--)
                     cw.EndBrace();
             });
+        }
+
+        // the class is in a namespace under the one of the project, so a file of it writes the alias to reach it
+        if (UsingAlias && !string.IsNullOrEmpty(RootNamespace))
+        {
+            cw.AppendLine("global using ESM = " + RootNamespace + ".ESM;");
+            cw.AppendLine();
         }
 
         if (FileScopedNamespaces)

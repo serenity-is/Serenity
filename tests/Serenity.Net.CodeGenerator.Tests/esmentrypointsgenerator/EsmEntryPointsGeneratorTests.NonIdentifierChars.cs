@@ -6,6 +6,8 @@ public partial class EsmEntryPointsGeneratorTests
     public void Normalizes_NonIdentifierCharacters()
     {
         var expected = /*lang=c#*/ """
+            global using ESM = MyTest.ESM;
+
             namespace MyTest
             {
                 public static partial class ESM

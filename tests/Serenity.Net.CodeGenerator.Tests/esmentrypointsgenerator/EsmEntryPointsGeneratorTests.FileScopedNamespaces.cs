@@ -6,6 +6,8 @@ public partial class EsmEntryPointsGeneratorTests
     public void Generates_FileScopedNamespace()
     {
         var expected = /*lang=c#*/ """
+            global using ESM = MyTest.ESM;
+
             namespace MyTest;
 
             public static partial class ESM

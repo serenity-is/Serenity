@@ -6,6 +6,8 @@ public partial class EsmEntryPointsGeneratorTests
     public void Uses_InternalAccess()
     {
         var expected = /*lang=c#*/ """
+            global using ESM = MyTest.ESM;
+
             namespace MyTest
             {
                 internal static partial class ESM

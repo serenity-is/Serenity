@@ -139,6 +139,7 @@ public class GeneratorConfig
          MVC.InternalAccess != null ||
          MVC.SearchViewPaths?.Length > 0 ||
          MVC.StripViewPaths?.Length > 0 ||
+         MVC.TextKeys != null ||
          MVC.SourceGenerator == false);
 
     /// <summary>
@@ -526,6 +527,39 @@ public class GeneratorConfig
         /// So this is recommended for feature projects like Serenity.Extensions.
         /// </summary>
         public bool AsNamespace { get; set; }
+        /// <summary>
+        /// Write the constants of the text keys of the project (TextKeys), from the template of its text resources,
+        /// e.g. "texts/resources/*.texts.__.json", along with its MVC and ESM output, so that a text key is a constant
+        /// that the compiler checks rather than a string that is hard to know and easy to mistype. The default is to
+        /// write them for a project that has a template, and to say nothing for one that does not, which is what null
+        /// is for; true writes them for a project that wants them, which is told when it has no template, and false
+        /// does not write them at all.
+        /// </summary>
+        public bool? TextKeys { get; set; }
+
+        /// <summary>Used for Newtonsoft.JSON</summary>
+        public bool ShouldSerializeTextKeys() => TextKeys != null;
+
+        /// <summary>
+        /// Make the constants of the text keys of the project available as TextKeys in every file of it, with a global
+        /// using, as they are in a namespace under the one of the project, e.g. "MyApp.MVC", which a file would write
+        /// out otherwise. Defaults to true, and is only written when there is a class to use.
+        /// </summary>
+        public bool? TextKeysAlias { get; set; }
+
+        /// <summary>Used for Newtonsoft.JSON</summary>
+        public bool ShouldSerializeTextKeysAlias() => TextKeysAlias != null;
+
+        /// <summary>
+        /// Make the class of the entry points of the project available as ESM in every file of it, with a global using,
+        /// as it is in a namespace under the one of the project, e.g. "MyApp.MVC", which a file would write out
+        /// otherwise. Defaults to true, and is only written when there is a class to use.
+        /// </summary>
+        public bool? ESMAlias { get; set; }
+
+        /// <summary>Used for Newtonsoft.JSON</summary>
+        public bool ShouldSerializeESMAlias() => ESMAlias != null;
+
         /// <summary>
         /// Use internal instead of public for generated top level class (MVC/ESM).
         /// </summary>

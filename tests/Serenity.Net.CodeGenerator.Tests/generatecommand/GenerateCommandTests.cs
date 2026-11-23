@@ -16,6 +16,7 @@ public partial class GenerateCommandTests
         public string ProjectFile => GenerateCommandTests.projectFile;
         public IFileSystem FileSystem => fileSystem;
         public string[]? GetAssemblyList(string[]? configured) => assemblyList;
+        public string? GetAssemblyFile() => assemblyList?.FirstOrDefault();
         public string? GetAssemblyName() => null;
         public string? GetEsmAssetBasePath() => null;
         public IDictionary<string, string?> GetGlobalUsings() => globalUsings ?? new Dictionary<string, string?>();
