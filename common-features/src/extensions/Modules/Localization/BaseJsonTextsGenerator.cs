@@ -20,25 +20,21 @@ namespace Serenity.Localization;
 /// A project that has no template, e.g. one that is not generated with this one, is not a matter for the texts of the
 /// application, as the ones of another project are not, and it is skipped.
 /// </remarks>
-public abstract class BaseJsonTextsGenerator
+/// <remarks>
+/// Initializes a new instance of the <see cref="BaseJsonTextsGenerator"/> class.
+/// </remarks>
+/// <param name="projectFolder">The folder of the project of the application, or null for the one that the
+/// application is run from, which is the project folder of it when it is run from there, e.g. with
+/// <c>dotnet run --project YourProject.Web</c>, or from its folder with <c>dotnet YourProject.Web.dll json-texts</c>.
+/// </param>
+public abstract class BaseJsonTextsGenerator(string? projectFolder = null)
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="BaseJsonTextsGenerator"/> class.
-    /// </summary>
-    /// <param name="projectFolder">The folder of the project of the application, or null for the one that the
-    /// application is run from, which is the project folder of it when it is run from there, e.g. with
-    /// <c>dotnet run --project YourProject.Web</c>, or from its folder with <c>dotnet YourProject.Web.dll json-texts</c>.
-    /// </param>
-    protected BaseJsonTextsGenerator(string? projectFolder = null)
-    {
-        ProjectFolder = projectFolder ?? Environment.CurrentDirectory;
-    }
 
     /// <summary>
     /// Gets the folder of the project of the application, e.g. "…/YourProject.Web", which the application is run from by
     /// default, as its texts are in it.
     /// </summary>
-    public string ProjectFolder { get; }
+    public string ProjectFolder { get; } = projectFolder ?? Environment.CurrentDirectory;
 
     /// <summary>
     /// The command that runs the generator, which an application passes to <see cref="RunIf"/>.
@@ -442,7 +438,7 @@ public abstract class BaseJsonTextsGenerator
         ArgumentNullException.ThrowIfNull(oldTexts);
         ArgumentNullException.ThrowIfNull(translations);
 
-        var stale = File.Exists(stalePath) ? JsonNode.Parse(File.ReadAllText(stalePath))!.AsObject() : new JsonObject();
+        var stale = File.Exists(stalePath) ? JsonNode.Parse(File.ReadAllText(stalePath))!.AsObject() : [];
 
         foreach (var property in stale.ToList())
             if (!baseTexts.ContainsKey(property.Key))
