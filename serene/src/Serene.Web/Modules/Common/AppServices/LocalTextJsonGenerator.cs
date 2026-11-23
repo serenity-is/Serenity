@@ -1,7 +1,7 @@
 using Serenity.Localization;
 using System.Runtime.CompilerServices;
 
-namespace Serene;
+namespace Serene.AppServices;
 
 /// <summary>
 /// Regenerates the JSON texts of the projects of this application: the base template of the texts of each project,
