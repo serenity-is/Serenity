@@ -8,11 +8,24 @@ namespace Serenity.Extensions.Repositories;
 public class UserPreferenceRepository(IRequestContext context) : BaseRepository(context)
 {
     /// <summary>
-    /// Updates or deletes a user preference.
+    /// Gets the id of the current user, converted to the type of the user ID field, or null when the user has no identifier,
+    /// e.g. when not logged in, as preferences are kept per user.
+    /// </summary>
+    protected virtual object? GetUserId()
+    {
+        var identifier = Context.User?.GetIdentifier();
+        return string.IsNullOrEmpty(identifier) ? null :
+            MyRow.Fields.UserId.ConvertValue(identifier, CultureInfo.InvariantCulture);
+    }
+
+    /// <summary>
+    /// Updates or deletes a user preference of the current user.
     /// </summary>
     /// <param name="uow">The unit of work.</param>
     /// <param name="request">The update request.</param>
     /// <returns>The save response.</returns>
+    /// <exception cref="ValidationError">The current user has no identifier, e.g. is not logged in, so the preference
+    /// would be no one's.</exception>
     public SaveResponse Update(IUnitOfWork uow, UserPreferenceUpdateRequest request)
     {
         ArgumentNullException.ThrowIfNull(request);
@@ -20,7 +33,8 @@ public class UserPreferenceRepository(IRequestContext context) : BaseRepository(
         ArgumentNullException.ThrowIfNull(request.PreferenceType);
 
         var fld = MyRow.Fields;
-        var userId = fld.UserId.ConvertValue(Context.User.GetIdentifier(), CultureInfo.InvariantCulture);
+        var userId = GetUserId() ?? throw new ValidationError("NotLoggedIn", null,
+            CoreTexts.Authorization.NotLoggedIn.ToString(Context.Localizer));
 
         var criteria = fld.UserId == new ValueCriteria(userId) &
             fld.PreferenceType == request.PreferenceType &
@@ -68,7 +82,7 @@ public class UserPreferenceRepository(IRequestContext context) : BaseRepository(
     }
 
     /// <summary>
-    /// Retrieves a user preference.
+    /// Retrieves a user preference, which is empty for a user without an identifier.
     /// </summary>
     /// <param name="connection">The database connection.</param>
     /// <param name="request">The retrieve request.</param>
@@ -80,7 +94,10 @@ public class UserPreferenceRepository(IRequestContext context) : BaseRepository(
         ArgumentNullException.ThrowIfNull(request.PreferenceType);
 
         var fld = MyRow.Fields;
-        var userId = fld.UserId.ConvertValue(Context.User.GetIdentifier(), CultureInfo.InvariantCulture);
+        var userId = GetUserId();
+        if (userId is null)
+            return new UserPreferenceRetrieveResponse();
+
         var row = connection.TryFirst<MyRow>(
             fld.UserId == new ValueCriteria(userId) &
             fld.PreferenceType == request.PreferenceType &
