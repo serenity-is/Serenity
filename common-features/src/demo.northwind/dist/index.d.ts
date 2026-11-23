@@ -1116,6 +1116,328 @@ export declare class RegionGrid<P = {}> extends EntityGrid<RegionRow, P> {
     protected getRowDefinition(): typeof RegionRow;
     protected getService(): string;
 }
+declare namespace texts {
+    namespace Db {
+        function asKey(): typeof Db;
+        function asTry(): typeof Db;
+        namespace Northwind {
+            function asKey(): typeof Northwind;
+            function asTry(): typeof Northwind;
+            namespace Category {
+                function asKey(): typeof Category;
+                function asTry(): typeof Category;
+                const CategoryID: string;
+                const CategoryName: string;
+                const Description: string;
+                const EntityPlural: string;
+                const EntitySingular: string;
+                const PicturePath: string;
+            }
+            namespace CategoryLang {
+                function asKey(): typeof CategoryLang;
+                function asTry(): typeof CategoryLang;
+                const CategoryId: string;
+                const CategoryName: string;
+                const Description: string;
+                const EntityPlural: string;
+                const EntitySingular: string;
+                const Id: string;
+                const LanguageId: string;
+            }
+            namespace Customer {
+                function asKey(): typeof Customer;
+                function asTry(): typeof Customer;
+                const Address: string;
+                const City: string;
+                const CompanyName: string;
+                const ContactName: string;
+                const ContactTitle: string;
+                const Country: string;
+                const CustomerID: string;
+                const Email: string;
+                const EntityPlural: string;
+                const EntitySingular: string;
+                const Fax: string;
+                const LastContactDate: string;
+                const LastContactedBy: string;
+                const NoteList: string;
+                const Phone: string;
+                const PostalCode: string;
+                const Region: string;
+                const Representatives: string;
+                const SendBulletin: string;
+            }
+            namespace CustomerCustomerDemo {
+                function asKey(): typeof CustomerCustomerDemo;
+                function asTry(): typeof CustomerCustomerDemo;
+                const CustomerCompanyName: string;
+                const CustomerID: string;
+                const CustomerTypeID: string;
+                const EntityPlural: string;
+                const EntitySingular: string;
+                const ID: string;
+            }
+            namespace CustomerDemographic {
+                function asKey(): typeof CustomerDemographic;
+                function asTry(): typeof CustomerDemographic;
+                const CustomerDesc: string;
+                const CustomerTypeID: string;
+                const EntityPlural: string;
+                const EntitySingular: string;
+                const ID: string;
+            }
+            namespace CustomerDetails {
+                function asKey(): typeof CustomerDetails;
+                function asTry(): typeof CustomerDetails;
+                const CustomerID: string;
+                const Email: string;
+                const EntityPlural: string;
+                const EntitySingular: string;
+                const LastContactDate: string;
+                const LastContactedBy: string;
+                const LastContactedByFullName: string;
+                const SendBulletin: string;
+            }
+            namespace CustomerGrossSales {
+                function asKey(): typeof CustomerGrossSales;
+                function asTry(): typeof CustomerGrossSales;
+                const ContactName: string;
+                const CustomerId: string;
+                const EntityPlural: string;
+                const EntitySingular: string;
+                const GrossAmount: string;
+                const ProductId: string;
+                const ProductName: string;
+            }
+            namespace CustomerRepresentatives {
+                function asKey(): typeof CustomerRepresentatives;
+                function asTry(): typeof CustomerRepresentatives;
+                const CustomerId: string;
+                const EmployeeId: string;
+                const EntityPlural: string;
+                const EntitySingular: string;
+                const RepresentativeId: string;
+            }
+            namespace Employee {
+                function asKey(): typeof Employee;
+                function asTry(): typeof Employee;
+                const Address: string;
+                const BirthDate: string;
+                const City: string;
+                const Country: string;
+                const EmployeeID: string;
+                const EntityPlural: string;
+                const EntitySingular: string;
+                const Extension: string;
+                const FirstName: string;
+                const FullName: string;
+                const Gender: string;
+                const HireDate: string;
+                const HomePhone: string;
+                const LastName: string;
+                const Notes: string;
+                const Photo: string;
+                const PhotoPath: string;
+                const PostalCode: string;
+                const Region: string;
+                const ReportsTo: string;
+                const ReportsToFullName: string;
+                const Title: string;
+                const TitleOfCourtesy: string;
+            }
+            namespace EmployeeTerritory {
+                function asKey(): typeof EmployeeTerritory;
+                function asTry(): typeof EmployeeTerritory;
+                const EmployeeFullName: string;
+                const EmployeeID: string;
+                const EntityPlural: string;
+                const EntitySingular: string;
+                const TerritoryDescription: string;
+                const TerritoryID: string;
+            }
+            namespace Note {
+                function asKey(): typeof Note;
+                function asTry(): typeof Note;
+                const EntityId: string;
+                const EntityPlural: string;
+                const EntitySingular: string;
+                const EntityType: string;
+                const InsertDate: string;
+                const InsertUserDisplayName: string;
+                const InsertUserId: string;
+                const NoteId: string;
+                const Text: string;
+            }
+            namespace Order {
+                function asKey(): typeof Order;
+                function asTry(): typeof Order;
+                const CustomerCity: string;
+                const CustomerCompanyName: string;
+                const CustomerContactName: string;
+                const CustomerContactTitle: string;
+                const CustomerCountry: string;
+                const CustomerFax: string;
+                const CustomerID: string;
+                const CustomerPhone: string;
+                const CustomerRegion: string;
+                const DetailList: string;
+                const EmployeeFullName: string;
+                const EmployeeGender: string;
+                const EmployeeID: string;
+                const EntityPlural: string;
+                const EntitySingular: string;
+                const Freight: string;
+                const OrderDate: string;
+                const OrderID: string;
+                const RequiredDate: string;
+                const ShipAddress: string;
+                const ShipCity: string;
+                const ShipCountry: string;
+                const ShipName: string;
+                const ShipPostalCode: string;
+                const ShipRegion: string;
+                const ShipVia: string;
+                const ShipViaCompanyName: string;
+                const ShippedDate: string;
+                const ShippingState: string;
+                const Total: string;
+            }
+            namespace OrderDetail {
+                function asKey(): typeof OrderDetail;
+                function asTry(): typeof OrderDetail;
+                const DetailID: string;
+                const Discount: string;
+                const EntityPlural: string;
+                const EntitySingular: string;
+                const LineTotal: string;
+                const OrderCustomerID: string;
+                const OrderDate: string;
+                const OrderEmployeeID: string;
+                const OrderID: string;
+                const ProductID: string;
+                const ProductName: string;
+                const Quantity: string;
+                const UnitPrice: string;
+            }
+            namespace Product {
+                function asKey(): typeof Product;
+                function asTry(): typeof Product;
+                const CategoryID: string;
+                const CategoryName: string;
+                const Discontinued: string;
+                const EntityPlural: string;
+                const EntitySingular: string;
+                const ProductID: string;
+                const ProductImage: string;
+                const ProductName: string;
+                const QuantityPerUnit: string;
+                const ReorderLevel: string;
+                const RowVersion: string;
+                const SupplierCompanyName: string;
+                const SupplierCountry: string;
+                const SupplierID: string;
+                const UnitPrice: string;
+                const UnitsInStock: string;
+                const UnitsOnOrder: string;
+            }
+            namespace ProductLang {
+                function asKey(): typeof ProductLang;
+                function asTry(): typeof ProductLang;
+                const EntityPlural: string;
+                const EntitySingular: string;
+                const Id: string;
+                const LanguageId: string;
+                const ProductId: string;
+                const ProductName: string;
+            }
+            namespace ProductLog {
+                function asKey(): typeof ProductLog;
+                function asTry(): typeof ProductLog;
+                const CategoryID: string;
+                const ChangingUserId: string;
+                const Discontinued: string;
+                const EntityPlural: string;
+                const EntitySingular: string;
+                const OperationType: string;
+                const ProductID: string;
+                const ProductImage: string;
+                const ProductLogID: string;
+                const ProductName: string;
+                const QuantityPerUnit: string;
+                const ReorderLevel: string;
+                const SupplierID: string;
+                const UnitPrice: string;
+                const UnitsInStock: string;
+                const UnitsOnOrder: string;
+                const ValidFrom: string;
+                const ValidUntil: string;
+            }
+            namespace Region {
+                function asKey(): typeof Region;
+                function asTry(): typeof Region;
+                const EntityPlural: string;
+                const EntitySingular: string;
+                const RegionDescription: string;
+                const RegionID: string;
+            }
+            namespace SalesByCategory {
+                function asKey(): typeof SalesByCategory;
+                function asTry(): typeof SalesByCategory;
+                const CategoryId: string;
+                const CategoryName: string;
+                const EntityPlural: string;
+                const EntitySingular: string;
+                const ProductName: string;
+                const ProductSales: string;
+            }
+            namespace Shipper {
+                function asKey(): typeof Shipper;
+                function asTry(): typeof Shipper;
+                const CompanyName: string;
+                const EntityPlural: string;
+                const EntitySingular: string;
+                const Phone: string;
+                const ShipperID: string;
+            }
+            namespace Supplier {
+                function asKey(): typeof Supplier;
+                function asTry(): typeof Supplier;
+                const Address: string;
+                const City: string;
+                const CompanyName: string;
+                const ContactName: string;
+                const ContactTitle: string;
+                const Country: string;
+                const EntityPlural: string;
+                const EntitySingular: string;
+                const Fax: string;
+                const HomePage: string;
+                const Phone: string;
+                const PostalCode: string;
+                const Region: string;
+                const SupplierID: string;
+            }
+            namespace Territory {
+                function asKey(): typeof Territory;
+                function asTry(): typeof Territory;
+                const EntityPlural: string;
+                const EntitySingular: string;
+                const RegionDescription: string;
+                const RegionID: string;
+                const TerritoryDescription: string;
+                const TerritoryID: string;
+            }
+        }
+    }
+    namespace Validation {
+        function asKey(): typeof Validation;
+        function asTry(): typeof Validation;
+        const NorthwindPhone: string;
+        const NorthwindPhoneMultiple: string;
+    }
+}
+export declare const NorthwindDbTexts: typeof texts.Db.Northwind;
+export declare const NorthwindValidationTexts: typeof texts.Validation;
 export declare class CountryWithFlagFormatter implements Formatter, LazyLoadInclude {
     static [Symbol.typeInfo]: FormatterTypeInfo<"Serenity.Demo.Northwind.">;
     format(ctx: FormatterContext): FormatterResult;
