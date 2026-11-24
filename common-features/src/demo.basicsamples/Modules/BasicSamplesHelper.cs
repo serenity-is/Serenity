@@ -124,25 +124,4 @@ public static class BasicSamplesHelper
         }
         return cachedCommitId = "master";
     }
-
-    public static ModulePageResult SampleGridPage(this Controller controller, string module, LocalText pageTitle,
-        object? options = null, string? layout = null)
-    {
-        return controller.GridPage(module, pageTitle, options, layout ??
-            MVC.Views.BasicSamplesLayout);
-    }
-
-    public static ModulePageResult SampleGridPage<TRow>(this Controller controller, string module,
-        object? options = null, string? layout = null, LocalText? pageTitle = null)
-        where TRow : IRow, new()
-    {
-        return controller.GridPage<TRow>(module, options, layout ?? MVC.Views.BasicSamplesLayout, pageTitle);
-    }
-
-    public static ModulePageResult SamplePanelPage(this Controller controller, string module, LocalText pageTitle,
-        object? options = null, string? layout = null)
-    {
-        return controller.PanelPage(module, pageTitle, options, layout ??
-            MVC.Views.BasicSamplesLayout);
-    }
 }

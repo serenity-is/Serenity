@@ -6,15 +6,35 @@ public class ModulePageExtensionsTests
     {
     }
 
-    private static TestController CreateController(out DefaultHttpContext httpContext)
+    [ModulePageLayout("~/Views/LayoutAttributeLayout.cshtml")]
+    private class AttributedLayoutController : Controller
+    {
+    }
+
+    [ModulePageLayout("~/Views/BaseLayout.cshtml")]
+    private class BaseLayoutController : Controller
+    {
+    }
+
+    private class InheritedLayoutController : BaseLayoutController
+    {
+    }
+
+    private static T CreateController<T>(out DefaultHttpContext httpContext)
+        where T : Controller, new()
     {
         httpContext = new DefaultHttpContext();
-        return new TestController
+        return new T
         {
             ControllerContext = new ControllerContext { HttpContext = httpContext },
             TempData = new Microsoft.AspNetCore.Mvc.ViewFeatures.TempDataDictionary(httpContext,
                 new NullTempDataProvider())
         };
+    }
+
+    private static TestController CreateController(out DefaultHttpContext httpContext)
+    {
+        return CreateController<TestController>(out httpContext);
     }
 
     private class NullTempDataProvider : Microsoft.AspNetCore.Mvc.ViewFeatures.ITempDataProvider
@@ -123,5 +143,51 @@ public class ModulePageExtensionsTests
 
         Assert.Equal("Custom", result.Model.PageTitle!.ToString());
         Assert.Equal("_Layout", result.Model.Layout);
+    }
+
+    [Fact]
+    public void ModulePage_Uses_Layout_Of_Controller_Attribute()
+    {
+        var controller = CreateController<AttributedLayoutController>(out _);
+        var result = controller.PanelPage("mod", "Title");
+
+        Assert.Equal("~/Views/LayoutAttributeLayout.cshtml", result.Model.Layout);
+    }
+
+    [Fact]
+    public void ModulePage_Uses_Layout_Of_Inherited_Controller_Attribute()
+    {
+        var controller = CreateController<InheritedLayoutController>(out _);
+        var result = controller.GridPage<MockUserRow>("mod");
+
+        Assert.Equal("~/Views/BaseLayout.cshtml", result.Model.Layout);
+    }
+
+    [Fact]
+    public void ModulePage_Layout_Of_Page_Wins_Over_Controller_Attribute()
+    {
+        var controller = CreateController<AttributedLayoutController>(out _);
+        var result = controller.PanelPage(new ModulePageModel
+        {
+            Module = "mod",
+            Layout = "~/Views/PageLayout.cshtml"
+        });
+
+        Assert.Equal("~/Views/PageLayout.cshtml", result.Model.Layout);
+    }
+
+    [Fact]
+    public void ModulePage_Leaves_Layout_Empty_Without_Attribute()
+    {
+        var controller = CreateController(out _);
+        var result = controller.PanelPage("mod", "Title");
+
+        Assert.Null(result.Model.Layout);
+    }
+
+    [Fact]
+    public void ModulePageLayout_Throws_For_Null_Layout()
+    {
+        Assert.Throws<ArgumentNullException>(() => new ModulePageLayoutAttribute(null!));
     }
 }

@@ -1,12 +1,13 @@
 namespace Serenity.Demo.BasicSamples;
 
 [PageAuthorize, Route("BasicSamples/[action]")]
+[BasicSamplesLayout]
 public partial class BasicSamplesPage : Controller
 {
     [PageAuthorize(Northwind.PermissionKeys.General)]
     public ActionResult ChartInDialog()
     {
-        return this.SamplePanelPage(ESM.ChartInDialogPage, "Chart in a Dialog");
+        return this.PanelPage(ESM.ChartInDialogPage, "Chart in a Dialog");
     }
 
     [PageAuthorize(Northwind.PermissionKeys.General)]
@@ -18,7 +19,7 @@ public partial class BasicSamplesPage : Controller
     [PageAuthorize(Northwind.PermissionKeys.General)]
     public ActionResult CloneableEntityDialog()
     {
-        return this.SampleGridPage(ESM.CloneableEntityDialogPage, "Cloneable Entity Dialog");
+        return this.GridPage(ESM.CloneableEntityDialogPage, "Cloneable Entity Dialog");
     }
 
     [PageAuthorize(Northwind.PermissionKeys.General)]
@@ -30,12 +31,12 @@ public partial class BasicSamplesPage : Controller
     [PageAuthorize(Northwind.PermissionKeys.General)]
     public ActionResult DefaultValuesInNewDialog()
     {
-        return this.SampleGridPage(ESM.DefaultValuesInNewDialogPage, "Default Values In New Dialog");
+        return this.GridPage(ESM.DefaultValuesInNewDialogPage, "Default Values In New Dialog");
     }
 
     public ActionResult DialogBoxes()
     {
-        return this.SamplePanelPage(ESM.DialogBoxesPage, "Dialog Box Types");
+        return this.PanelPage(ESM.DialogBoxesPage, "Dialog Box Types");
     }
 
     [PageAuthorize(Northwind.PermissionKeys.General)]
@@ -48,7 +49,7 @@ public partial class BasicSamplesPage : Controller
     [PageAuthorize(Northwind.PermissionKeys.General)]
     public ActionResult EntityDialogAsPanel(int? orderID)
     {
-        return this.SamplePanelPage(ESM.EntityDialogAsPanelPage, "Entity Dialog as Panel", options: orderID);
+        return this.PanelPage(ESM.EntityDialogAsPanelPage, "Entity Dialog as Panel", options: orderID);
     }
 
     [PageAuthorize(Northwind.PermissionKeys.General)]
@@ -60,7 +61,7 @@ public partial class BasicSamplesPage : Controller
     [PageAuthorize(Northwind.PermissionKeys.General)]
     public ActionResult GetInsertedRecordId()
     {
-        return this.SampleGridPage(ESM.GetInsertedRecordIdPage, "Get Inserted Record Id From Dialog");
+        return this.GridPage(ESM.GetInsertedRecordIdPage, "Get Inserted Record Id From Dialog");
     }
 
     [PageAuthorize(Northwind.PermissionKeys.General)]

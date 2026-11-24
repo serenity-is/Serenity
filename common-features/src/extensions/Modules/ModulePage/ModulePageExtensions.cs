@@ -1,3 +1,5 @@
+using System.Reflection;
+
 namespace Serenity.Web;
 
 /// <summary>
@@ -86,6 +88,10 @@ public static class ModulePageExtensions
             if (!model.Module.EndsWith(".js", StringComparison.OrdinalIgnoreCase))
                 model.Module += ".js";
         }
+
+        // a controller can tell the layout of its module pages in one place, as the pages that are not based on a
+        // view file have no other way to do, and a layout the page gives itself still wins
+        model.Layout ??= controller.GetType().GetCustomAttribute<ModulePageLayoutAttribute>()?.Layout;
 
         controller.ViewData.Model = model;
 
