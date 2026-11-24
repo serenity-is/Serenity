@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, type MockInstance, vi } from "vitest";
 import { Fluent } from "../base";
-import { ClassicRouter, type IClassicRouter } from "./router";
+import { ClassicRouter, Router, type IClassicRouter } from "./router";
 
 function changeJSDOMURL(url: string) {
     if ((globalThis as any).jsdom?.reconfigure) {
@@ -767,5 +767,160 @@ describe("ClassicRouter coverage edges", () => {
         router.ignoreHashChange(1000);
         window.dispatchEvent(new Event("hashchange"));
         expect(() => router.destroy()).not.toThrow();
+    });
+});
+
+describe("ClassicRouter history entries of dialogs", () => {
+    let oldLocation: string;
+    let router: ClassicRouter;
+
+    beforeEach(() => {
+        oldLocation = window.location.href;
+        document.body.innerHTML = "";
+        // the singleton handles the dialog events of the document too
+        Router.enabled = false;
+        router = createRouter() as ClassicRouter;
+        changeJSDOMURL("http://example.com/page#base");
+    });
+
+    afterEach(() => {
+        vi.restoreAllMocks();
+        router.destroy();
+        Router.enabled = true;
+        document.body.innerHTML = "";
+        changeJSDOMURL(oldLocation);
+    });
+
+    function openPanel() {
+        const panel = document.createElement("div");
+        panel.classList.add("panel-body");
+        Object.defineProperties(panel, { offsetWidth: { get: () => 100 }, offsetHeight: { get: () => 100 } });
+        document.body.appendChild(panel);
+        Fluent.trigger(panel, "panelopen");
+        return panel;
+    }
+
+    function closePanel(panel: HTMLElement) {
+        const event = new Event("panelclose");
+        Object.defineProperty(event, "target", { value: panel });
+        document.dispatchEvent(event);
+    }
+
+    it("replaces the entry of the history instead of adding one", () => {
+        const push = vi.spyOn(window.history, "pushState");
+        const replace = vi.spyOn(window.history, "replaceState");
+        router.replace("other");
+        expect(window.location.hash).toBe("#other");
+        expect(replace).toHaveBeenCalled();
+        expect(push).not.toHaveBeenCalled();
+    });
+
+    it("adds an entry for a dialog the user opened, which knows the hash before it", () => {
+        const push = vi.spyOn(window.history, "pushState");
+        const panel = openPanel();
+        expect(window.location.hash).toBe("#" + panel.dataset.qroute);
+        expect(push).toHaveBeenCalledWith({ qrouterPrevHash: "base" }, "", expect.stringMatching(/#!\w+$/));
+    });
+
+    it("goes back to the entry before a dialog when it closes, so it leaves no entry behind", () => {
+        const back = vi.spyOn(window.history, "back").mockImplementation(() => { });
+        const replace = vi.spyOn(window.history, "replaceState");
+        const panel = openPanel();
+        closePanel(panel);
+        // the routers of other tests, which are not destroyed, handle the event too
+        expect(back).toHaveBeenCalled();
+        expect(replace).not.toHaveBeenCalled();
+    });
+
+    it("replaces the entry when the dialog closes on another entry than its own", () => {
+        const back = vi.spyOn(window.history, "back").mockImplementation(() => { });
+        const panel = openPanel();
+        window.history.replaceState(null, "", "#elsewhere");
+        closePanel(panel);
+        expect(back).not.toHaveBeenCalled();
+        expect(window.location.hash).toBe("#base");
+    });
+
+    it("ignores the hashchange event of a change it made itself, but not another one", () => {
+        const resolve = vi.spyOn(router, "resolve");
+        router.navigate("silent", false, true);
+        window.dispatchEvent(new Event("hashchange"));
+        expect(resolve).not.toHaveBeenCalled();
+
+        changeJSDOMURL("http://example.com/page#other");
+        window.dispatchEvent(new Event("hashchange"));
+        expect(resolve).toHaveBeenCalledTimes(1);
+    });
+});
+
+describe("ClassicRouter page routes", () => {
+    let oldLocation: string;
+    let router: ClassicRouter;
+    let handle: MockInstance<(route: string) => void>;
+    let unregister: () => void;
+
+    beforeEach(() => {
+        oldLocation = window.location.href;
+        document.body.innerHTML = "";
+        Router.enabled = false;
+        router = createRouter() as ClassicRouter;
+        changeJSDOMURL("http://example.com/page");
+        handle = vi.fn();
+        unregister = router.registerPageRoute({ match: route => route.startsWith("view/"), handle });
+    });
+
+    afterEach(() => {
+        vi.restoreAllMocks();
+        unregister();
+        router.destroy();
+        Router.enabled = true;
+        document.body.innerHTML = "";
+        changeJSDOMURL(oldLocation);
+    });
+
+    it("calls its handler when the route of the page changes, and with an empty route when it is gone", () => {
+        router.resolve("#view/2");
+        expect(handle).toHaveBeenLastCalledWith("view/2");
+        router.resolve("#view/2/+/!1");
+        expect(handle).toHaveBeenCalledTimes(1);
+        router.resolve("#view/3");
+        expect(handle).toHaveBeenLastCalledWith("view/3");
+        router.resolve("");
+        expect(handle).toHaveBeenLastCalledWith("");
+        expect(handle).toHaveBeenCalledTimes(3);
+    });
+
+    it("does not pass the route of the page to the route handler element, e.g. of an entity grid", () => {
+        const element = document.body.appendChild(document.createElement("div"));
+        element.classList.add("route-handler");
+        const routes: string[] = [];
+        Fluent.on(element, "handleroute", (e: any) => routes.push(Fluent.eventProp(e, "route")));
+        router.resolve("#view/2/+/edit/5");
+        expect(handle).toHaveBeenLastCalledWith("view/2");
+        expect(routes).toEqual(["edit/5"]);
+    });
+
+    it("keeps the route of the page before the one of a dialog opened on it", () => {
+        changeJSDOMURL("http://example.com/page#view/2");
+        const panel = document.body.appendChild(document.createElement("div"));
+        panel.classList.add("panel-body");
+        // directly, as the routers of other tests, which are not destroyed, handle the event of the document first
+        router["onDialogOpen"](document.documentElement, panel, () => "!x");
+        expect(window.location.hash).toBe("#view/2/+/!x");
+    });
+
+    it("does not call its handler for a change the page made itself", () => {
+        router.navigate("view/4", false, true);
+        window.dispatchEvent(new Event("hashchange"));
+        router.resolve();
+        expect(handle).not.toHaveBeenCalled();
+    });
+
+    it("knows the route of the page it was opened with, so Back from it shows the page without it", () => {
+        unregister();
+        changeJSDOMURL("http://example.com/page#view/7");
+        unregister = router.registerPageRoute({ match: route => route.startsWith("view/"), handle });
+        router.resolve("");
+        expect(handle).toHaveBeenCalledWith("");
     });
 });

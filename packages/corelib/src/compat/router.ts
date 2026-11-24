@@ -17,6 +17,21 @@ export interface HandleRouteEvent extends Event {
 }
 
 /**
+ * A handler of the routes of a page that are not of dialogs, e.g. "view/12" for the record a page shows, see
+ * {@link IClassicRouter.registerPageRoute}. Such a route is the first part of the hash, before the ones of the dialogs
+ * that are opened on the page, e.g. "view/12/+/!1".
+ */
+export interface PageRouteHandler {
+    /** Whether a route is one of the page, e.g. "view/12". */
+    match(route: string): boolean;
+    /**
+     * Shows what a route of the page says, or the page without one for an empty route, e.g. when the Back button of the
+     * browser takes it out of the hash. It is not called for a change the page made itself, e.g. with a silent navigate.
+     */
+    handle(route: string): void;
+}
+
+/**
  * Contract for the legacy hash-based router.
  * Compat shim for the old `Router` / `Serenity.Router` singleton. The router synchronizes dialog open/close state
  * with the URL hash using `"/+/"` delimited segments and fires `handleroute` events on designated handlers.
@@ -66,7 +81,21 @@ export interface IClassicRouter {
     ignoreHashChange(expiration?: number): void;
     /** Removes all event listeners registered by the router and releases resources. */
     destroy(): void;
+    /**
+     * Registers a handler of the routes of a page that are not of dialogs, e.g. "view/12". They are kept before the
+     * routes of the dialogs opened on the page, e.g. "view/12/+/!1", and work besides the `handleroute` event of the
+     * `.route-handler` element, e.g. of an entity grid.
+     * @param handler - The handler.
+     * @returns A function that unregisters the handler.
+     */
+    registerPageRoute?(handler: PageRouteHandler): () => void;
 }
+
+/** The key of the state of an entry of the history that the router added for a dialog, whose value is the hash before it. */
+const prevHashKey = "qrouterPrevHash";
+
+/** A hash without its leading `#`. */
+const normalizeHash = (hash: string) => (hash ?? "").replace(/^#/, "");
 
 const ignoredSelector = '.s-MessageDialog, .s-MessageModal, .s-PromptDialog, .route-ignore';
 
@@ -83,6 +112,11 @@ export class ClassicRouter implements IClassicRouter {
     private ignoreHashUntil: number = 0;
     private hashAnchorClickValue: string;
     private hashAnchorClickTime: number;
+    /** The hash of a change the router made itself, whose hashchange event is ignored, see {@link expectHash}. */
+    private expectedHash: string | null = null;
+    private pageRoutes: PageRouteHandler[] = [];
+    /** The route of the page in the hash, e.g. "view/12", or an empty string. */
+    private pageRoute = "";
     enabled: boolean = true;
 
     private isEquivalentUrl(url1: string, url2: string) {
@@ -100,26 +134,98 @@ export class ClassicRouter implements IClassicRouter {
         const newURL = window.location.href.replace(/#$/, '')
             .replace(/#.*$/, '') + newHash;
         if (newURL != window.location.href) {
-            if (tryBack && this.oldURL != null && this.isEquivalentUrl(this.oldURL, newURL)) {
-                if (silent)
-                    this.ignoreHashChange();
+            if (silent) {
+                this.expectHash(newHash);
+                // the page made the change, so it knows the route of the page already
+                this.pageRoute = this.pageRouteOf(newHash);
+            }
 
+            if (tryBack && this.oldURL != null && this.isEquivalentUrl(this.oldURL, newURL)) {
                 this.oldURL = null;
                 window.history.back();
                 return;
             }
-
-            if (silent)
-                this.ignoreHashChange();
 
             this.oldURL = window.location.href;
             window.location.hash = newHash;
         }
     }
 
-    /** @inheritdoc */
+    /**
+     * Replaces the hash without adding an entry to the history, and without a hashchange event. When the entry was
+     * added for a dialog that is closing, and the new hash is the one before it, it goes back to that entry instead,
+     * so the dialog leaves no entry behind for the Back button.
+     * @inheritdoc
+     */
     replace(newHash: string, tryBack?: boolean) {
-        this.navigate(newHash, tryBack, true);
+        if (!this.enabled || this.resolving > 0)
+            return;
+
+        newHash = normalizeHash(newHash);
+        if (newHash === normalizeHash(window.location.hash))
+            return;
+
+        const state = window.history.state;
+        const prevHash = state && typeof state === "object" ? state[prevHashKey] : null;
+        if (prevHash === newHash ||
+            (tryBack && this.oldURL != null && this.isEquivalentUrl(this.oldURL, this.urlOf(newHash)))) {
+            this.oldURL = null;
+            this.pageRoute = this.pageRouteOf(newHash);
+            this.expectHash(newHash);
+            window.history.back();
+            return;
+        }
+
+        this.pageRoute = this.pageRouteOf(newHash);
+        window.history.replaceState(state, "", this.urlOf(newHash));
+    }
+
+    /**
+     * Adds an entry with the hash to the history, e.g. for a dialog that is opened, without a hashchange event. The entry
+     * keeps the hash before it, so {@link replace} goes back to it when the dialog closes.
+     */
+    private push(newHash: string) {
+        if (!this.enabled || this.resolving > 0)
+            return;
+
+        newHash = normalizeHash(newHash);
+        const current = normalizeHash(window.location.hash);
+        if (newHash === current)
+            return;
+
+        this.pageRoute = this.pageRouteOf(newHash);
+        window.history.pushState({ [prevHashKey]: current }, "", this.urlOf(newHash));
+    }
+
+    /** The URL of the page with a hash. */
+    private urlOf(hash: string) {
+        return window.location.href.replace(/#.*$/, "") + (hash ? "#" + hash : "");
+    }
+
+    /** Ignores the hashchange event of a change to the hash that the router makes itself. */
+    private expectHash(hash: string) {
+        this.expectedHash = normalizeHash(hash);
+    }
+
+    /** @inheritdoc */
+    registerPageRoute(handler: PageRouteHandler): () => void {
+        this.pageRoutes.push(handler);
+        // e.g. a link opened the page with a route of it
+        this.pageRoute ||= this.pageRouteOf(window.location.hash);
+        return () => {
+            const index = this.pageRoutes.indexOf(handler);
+            index >= 0 && this.pageRoutes.splice(index, 1);
+        };
+    }
+
+    private findPageRoute(route: string) {
+        return route ? this.pageRoutes.find(x => x.match(route)) : undefined;
+    }
+
+    /** The route of a page in the first part of a hash, or an empty string. */
+    private pageRouteOf(hash: string) {
+        const first = normalizeHash(hash).split("/+/")[0];
+        return this.findPageRoute(first) ? first : "";
     }
 
     /** @inheritdoc */
@@ -171,8 +277,11 @@ export class ClassicRouter implements IClassicRouter {
     private pendingDialogOwner: HTMLElement;
     private pendingDialogPreHash: string;
 
-    private onDialogOpen(ownerEl: HTMLElement | ArrayLike<HTMLElement>, element: HTMLElement | ArrayLike<HTMLElement>, dialogHash: () => string) {
-        const route = [];
+    private onDialogOpen(ownerEl: HTMLElement | ArrayLike<HTMLElement>, element: HTMLElement | ArrayLike<HTMLElement>, dialogHash: () => string,
+        byRoute?: boolean) {
+        // the route of the page, e.g. "view/12", stays before the ones of the dialogs
+        const pageRoute = this.pageRouteOf(window.location.hash);
+        const route = pageRoute ? [pageRoute] : [];
         element = isArrayLike(element) ? element[0] : element;
         if (element &&
             this.pendingDialogElement &&
@@ -221,7 +330,12 @@ export class ClassicRouter implements IClassicRouter {
 
         route.push(value);
         element.dataset.qroute = value;
-        Router.replace(route.join("/+/"));
+        // a dialog that a route opened is in the hash already, while one that the user opened is a step of the history,
+        // which the Back button closes
+        if (byRoute)
+            this.replace(route.join("/+/"));
+        else
+            this.push(route.join("/+/"));
     }
 
     /** @inheritdoc */
@@ -267,6 +381,15 @@ export class ClassicRouter implements IClassicRouter {
 
         this.resolving++;
         try {
+            // the route of the page comes first, before the ones of the dialogs
+            const pageHandler = this.findPageRoute(newParts[0]);
+            const pageRoute = pageHandler ? newParts.shift() : "";
+            if (pageRoute !== this.pageRoute) {
+                const previous = this.findPageRoute(this.pageRoute);
+                this.pageRoute = pageRoute;
+                (pageHandler ?? previous)?.handle(pageRoute);
+            }
+
             const dialogs = this.getVisibleOrHiddenByDialogs();
             const oldParts = dialogs.map((el: any) => el.dataset.qroute);
 
@@ -353,6 +476,13 @@ export class ClassicRouter implements IClassicRouter {
     }
 
     private hashChange(_: Event) {
+        if (this.expectedHash != null) {
+            const expected = this.expectedHash;
+            this.expectedHash = null;
+            if (normalizeHash(window.location.hash) === expected)
+                return;
+        }
+
         if (this.ignoreHashLock > 0) {
             if (new Date().getTime() > this.ignoreHashUntil) {
                 this.ignoreHashLock = 0;
@@ -387,12 +517,13 @@ export class ClassicRouter implements IClassicRouter {
         if (dlg.dataset.qroute)
             return;
 
+        const byRoute = this.resolvingPreRoute != null || this.pendingDialogPreHash != null;
         dlg.dataset.qprhash = this.resolvingPreRoute ?? this.pendingDialogPreHash ?? window.location.hash;
         let owner = this.getVisibleOrHiddenByDialogs().filter(x => x !== dlg).pop();
         if (!owner)
             owner = document.documentElement;
 
-        this.onDialogOpen(owner, dlg, () => "!" + (++this.autoinc).toString(36));
+        this.onDialogOpen(owner, dlg, () => "!" + (++this.autoinc).toString(36), byRoute);
     }
 
     private onDocumentClick(e: Event) {

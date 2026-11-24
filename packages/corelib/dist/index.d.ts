@@ -6324,6 +6324,20 @@ export interface HandleRouteEvent extends Event {
     isInitial: boolean;
 }
 /**
+ * A handler of the routes of a page that are not of dialogs, e.g. "view/12" for the record a page shows, see
+ * {@link IClassicRouter.registerPageRoute}. Such a route is the first part of the hash, before the ones of the dialogs
+ * that are opened on the page, e.g. "view/12/+/!1".
+ */
+export interface PageRouteHandler {
+    /** Whether a route is one of the page, e.g. "view/12". */
+    match(route: string): boolean;
+    /**
+     * Shows what a route of the page says, or the page without one for an empty route, e.g. when the Back button of the
+     * browser takes it out of the hash. It is not called for a change the page made itself, e.g. with a silent navigate.
+     */
+    handle(route: string): void;
+}
+/**
  * Contract for the legacy hash-based router.
  * Compat shim for the old `Router` / `Serenity.Router` singleton. The router synchronizes dialog open/close state
  * with the URL hash using `"/+/"` delimited segments and fires `handleroute` events on designated handlers.
@@ -6373,6 +6387,14 @@ export interface IClassicRouter {
     ignoreHashChange(expiration?: number): void;
     /** Removes all event listeners registered by the router and releases resources. */
     destroy(): void;
+    /**
+     * Registers a handler of the routes of a page that are not of dialogs, e.g. "view/12". They are kept before the
+     * routes of the dialogs opened on the page, e.g. "view/12/+/!1", and work besides the `handleroute` event of the
+     * `.route-handler` element, e.g. of an entity grid.
+     * @param handler - The handler.
+     * @returns A function that unregisters the handler.
+     */
+    registerPageRoute?(handler: PageRouteHandler): () => void;
 }
 /**
  * Legacy hash-based router that maps dialog stack to `"/+/"` delimited hash segments.
@@ -6387,12 +6409,36 @@ export declare class ClassicRouter implements IClassicRouter {
     private ignoreHashUntil;
     private hashAnchorClickValue;
     private hashAnchorClickTime;
+    /** The hash of a change the router made itself, whose hashchange event is ignored, see {@link expectHash}. */
+    private expectedHash;
+    private pageRoutes;
+    /** The route of the page in the hash, e.g. "view/12", or an empty string. */
+    private pageRoute;
     enabled: boolean;
     private isEquivalentUrl;
     /** @inheritdoc */
     navigate(newHash: string, tryBack?: boolean, silent?: boolean): void;
-    /** @inheritdoc */
+    /**
+     * Replaces the hash without adding an entry to the history, and without a hashchange event. When the entry was
+     * added for a dialog that is closing, and the new hash is the one before it, it goes back to that entry instead,
+     * so the dialog leaves no entry behind for the Back button.
+     * @inheritdoc
+     */
     replace(newHash: string, tryBack?: boolean): void;
+    /**
+     * Adds an entry with the hash to the history, e.g. for a dialog that is opened, without a hashchange event. The entry
+     * keeps the hash before it, so {@link replace} goes back to it when the dialog closes.
+     */
+    private push;
+    /** The URL of the page with a hash. */
+    private urlOf;
+    /** Ignores the hashchange event of a change to the hash that the router makes itself. */
+    private expectHash;
+    /** @inheritdoc */
+    registerPageRoute(handler: PageRouteHandler): () => void;
+    private findPageRoute;
+    /** The route of a page in the first part of a hash, or an empty string. */
+    private pageRouteOf;
     /** @inheritdoc */
     replaceLast(newHash: string, tryBack?: boolean): void;
     private isIgnoredDialog;
@@ -12139,6 +12185,8 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
     private _initialSettings;
     private _layoutTimer;
     private _gridStyleApplied;
+    /** Whether the layout turned on the auto height of the grid, for a narrow screen, see {@link layout}. */
+    private _layoutAutoHeight;
     private persistingColumnResize;
     private automaticFlags;
     /** The title element. */
