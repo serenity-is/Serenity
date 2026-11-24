@@ -180,6 +180,33 @@ describe("QuickFilterBar", () => {
         expect(typeof qf.loadState).toBe("function");
     });
 
+    it("dateEqual static returns a single date filter that the default handler sends as equality", () => {
+        const qf = QuickFilterBar.dateEqual("Date", "Order Date");
+        expect(qf.field).toBe("Date");
+        expect(qf.title).toBe("Order Date");
+        expect(qf.type).toBe(DateEditor);
+        expect(qf.element).toBeFalsy();
+        expect(qf.handler).toBeFalsy();
+    });
+
+    it("dateRange returns a single date filter when the column is not a range", () => {
+        // the grid passes the quick filter params of the column, see QuickFilterAttribute.Range
+        const qf = QuickFilterBar.dateRange("Date", "Order Date", { range: false });
+        expect(qf.field).toBe("Date");
+        expect(qf.title).toBe("Order Date");
+        expect(qf.type).toBe(DateEditor);
+        expect(qf.element).toBeFalsy();
+        expect(qf.handler).toBeFalsy();
+    });
+
+    it("dateRange stays a range when the column does not tell otherwise", () => {
+        for (const params of [{ range: true }, {}, null, undefined]) {
+            const qf = QuickFilterBar.dateRange("Date", "Date", params);
+            expect(typeof qf.handler).toBe("function");
+            expect(typeof qf.element).toBe("function");
+        }
+    });
+
     it("dateTimeRange static returns config", () => {
         const qf = QuickFilterBar.dateTimeRange("Date", "Date", true);
         expect(qf.field).toBe("Date");

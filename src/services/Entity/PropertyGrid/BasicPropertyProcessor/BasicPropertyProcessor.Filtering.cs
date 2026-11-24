@@ -39,6 +39,10 @@ public partial class BasicPropertyProcessor : PropertyProcessor
             if (quickFilterAttr.GetCheckList() is bool checkList)
                 item.QuickFilterParams["checkList"] = checkList;
 
+            // only when set, as the grid decides whether the date quick filters of a property edit a range
+            if (quickFilterAttr.GetRange() is bool range)
+                item.QuickFilterParams["range"] = range;
+
             SetQuickFilterPlaceholder(source, quickFilterAttr, item);
         }
 

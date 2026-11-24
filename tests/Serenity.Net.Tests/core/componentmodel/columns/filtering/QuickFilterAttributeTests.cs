@@ -70,4 +70,24 @@ public class QuickFilterAttributeTests
         var attribute = new QuickFilterAttribute { Separator = true };
         Assert.True(attribute.Separator);
     }
+
+    [Fact]
+    public void Range_IsNotSet_ByDefault()
+    {
+        var attribute = new QuickFilterAttribute();
+        Assert.False(attribute.Range);
+        Assert.Null(attribute.GetRange());
+    }
+
+    [Fact]
+    public void Range_CanBeSet_ToFalse_And_ToTrue()
+    {
+        var attribute = new QuickFilterAttribute { Range = false };
+        Assert.False(attribute.Range);
+        Assert.Equal(false, attribute.GetRange());
+
+        attribute.Range = true;
+        Assert.True(attribute.Range);
+        Assert.Equal(true, attribute.GetRange());
+    }
 }

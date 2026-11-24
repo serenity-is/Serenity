@@ -4,6 +4,7 @@ import { DateFiltering } from "../filtering/datefiltering";
 import { DateTimeFiltering } from "../filtering/datetimefiltering";
 import { FilteringTypeRegistry } from "../filtering/filteringtyperegistry";
 import { addLocalText } from "../../base";
+import { DateEditor } from "../editors/dateeditor";
 import { getDefaultSortBy, getItemCssClass, propertyItemToQuickFilter, sleekGridOnSort } from "./datagrid-internal";
 import { QuickFilterBar } from "./quickfilterbar";
 import "../filtering/stringfiltering";
@@ -105,12 +106,35 @@ describe("propertyItemToQuickFilter", () => {
         QuickFilterBar.defaults.dateRangeFilter = own;
         try {
             const result = propertyItemToQuickFilter({ name: "Date", title: "Order Date" } as any);
-            expect(own).toHaveBeenCalledWith("Date", "Order Date");
+            expect(own).toHaveBeenCalledWith("Date", "Order Date", undefined);
             expect(result.title).toBe("Order Date");
         }
         finally {
             delete QuickFilterBar.defaults.dateRangeFilter;
         }
+    });
+
+    it("passes the quick filter params of a date column to the filter that the application gives", () => {
+        vi.spyOn(FilteringTypeRegistry, "get").mockReturnValue(DateFiltering as any);
+        const own = vi.fn((field: string, title?: string) => ({ field, title, type: class { } as any }));
+        QuickFilterBar.defaults.dateRangeFilter = own;
+        try {
+            const params = { range: false };
+            propertyItemToQuickFilter({ name: "Date", title: "Order Date", quickFilterParams: params } as any);
+            expect(own).toHaveBeenCalledWith("Date", "Order Date", params);
+        }
+        finally {
+            delete QuickFilterBar.defaults.dateRangeFilter;
+        }
+    });
+
+    it("returns a single date filter for a date column that is not a range", () => {
+        vi.spyOn(FilteringTypeRegistry, "get").mockReturnValue(DateFiltering as any);
+        const result = propertyItemToQuickFilter({ name: "Date", title: "Order Date",
+            quickFilterParams: { range: false } } as any);
+        expect(result.field).toBe("Date");
+        expect(result.type).toBe(DateEditor);
+        expect(result.handler).toBeFalsy();
     });
 
     it("returns date time range filter for DateTimeFiltering", () => {

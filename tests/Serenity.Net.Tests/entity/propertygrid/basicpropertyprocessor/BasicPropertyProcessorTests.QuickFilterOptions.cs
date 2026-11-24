@@ -15,6 +15,15 @@ public partial class BasicPropertyProcessorTests
 
         [QuickFilter(Multiple = true), QuickFilterOption("multiple", false)]
         public string Overridden { get; set; }
+
+        [QuickFilter]
+        public DateTime? DateRangeNotSet { get; set; }
+
+        [QuickFilter(Range = false)]
+        public DateTime? DateRangeOff { get; set; }
+
+        [QuickFilter(Range = true)]
+        public DateTime? DateRangeOn { get; set; }
     }
 
     private static PropertyItem ProcessQuickFilterOptions(string propertyName)
@@ -70,5 +79,22 @@ public partial class BasicPropertyProcessorTests
         attr.CheckList = true;
         Assert.Equal(false, attr.GetMultiple());
         Assert.Equal(true, attr.GetCheckList());
+    }
+
+    [Fact]
+    public void QuickFilter_Range_Is_Not_Passed_When_Not_Set_So_The_Grid_Decides()
+    {
+        var item = ProcessQuickFilterOptions(nameof(QuickFilterOptionsColumns.DateRangeNotSet));
+        Assert.False(item.QuickFilterParams.ContainsKey("range"));
+    }
+
+    [Fact]
+    public void QuickFilter_Range_Is_Passed_When_Set()
+    {
+        var off = ProcessQuickFilterOptions(nameof(QuickFilterOptionsColumns.DateRangeOff));
+        Assert.Equal(false, off.QuickFilterParams["range"]);
+
+        var on = ProcessQuickFilterOptions(nameof(QuickFilterOptionsColumns.DateRangeOn));
+        Assert.Equal(true, on.QuickFilterParams["range"]);
     }
 }

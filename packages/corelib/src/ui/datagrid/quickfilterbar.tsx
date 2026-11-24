@@ -1,7 +1,7 @@
 ﻿import { addDisposingListener } from "@serenity-is/domwise";
 import { Criteria, FilterPanelTexts, Fluent, FormValidationTexts, ListRequest, QuickFilterBarTexts, formatDate, isPromiseLike, notifyWarning, nsSerenity, parseDate, toId, tryGetText } from "../../base";
 import { ComboboxEditor } from "../editors/comboboxeditor";
-import { DateEditor } from "../editors/dateeditor";
+import { DateEditor, DateEditorOptions } from "../editors/dateeditor";
 import { DateTimeEditor, DateTimeEditorOptions } from "../editors/datetimeeditor";
 import { EditorUtils } from "../editors/editorutils";
 import { SelectEditor, SelectEditorOptions } from "../editors/selecteditor";
@@ -63,8 +63,11 @@ export interface QuickFilterBarDefaults {
      * Creates the quick filter of a date field that a grid makes from its columns, instead of
      * {@link QuickFilterBar.dateRange}, which has two date editors, e.g. one that edits the range in one input along with
      * the ranges that follow the current date, like the date range editor of Pro.Extensions. Not set by default.
+     * The third argument is the quick filter params of the property item of the field. When `range` is false in them, e.g.
+     * for a column that has `[QuickFilter(Range = false)]`, the filter should edit a single date, which matches an exact
+     * value, instead of a range, see {@link QuickFilterBar.dateEqual}.
      */
-    dateRangeFilter?: (field: string, title?: string) => QuickFilter<Widget<any>, any>;
+    dateRangeFilter?: (field: string, title?: string, quickFilterParams?: any) => QuickFilter<Widget<any>, any>;
     /**
      * Called when a bar is created, before its filters are added, e.g. to give it a class that changes how its filters
      * look. Not set by default.
@@ -491,12 +494,34 @@ export class QuickFilterBar<P extends QuickFilterBarOptions = QuickFilterBarOpti
     }
 
     /**
+     * Creates a quick filter of a date field that matches a single date, e.g. the orders of a day. Its value goes to the
+     * equality filter of the request by default, so the field has to be equal to it. It is the filter of a date column
+     * that tells its quick filter not to edit a range, see {@link QuickFilterBar.dateRange} and
+     * `QuickFilterAttribute.Range`.
+     * @param field - Field name the filter is bound to.
+     * @param title - Optional display title.
+     * @returns A quick filter definition for a single date.
+     */
+    public static dateEqual(field: string, title?: string): QuickFilter<DateEditor, DateEditorOptions> {
+        return {
+            field: field,
+            type: DateEditor,
+            title: title
+        };
+    }
+
+    /**
      * Creates a date range quick filter definition for the specified field.
      * @param field - Field name the filter is bound to.
      * @param title - Optional display title.
-     * @returns A quick filter definition for a date range.
+     * @param quickFilterParams - The quick filter params of the column of the field, if any. When `range` is false in
+     * them, e.g. for a column that has `[QuickFilter(Range = false)]`, the filter of a single date is returned instead.
+     * @returns A quick filter definition for a date range, or for a single date.
      */
-    public static dateRange(field: string, title?: string): QuickFilter<DateEditor, DateTimeEditorOptions> {
+    public static dateRange(field: string, title?: string, quickFilterParams?: any): QuickFilter<DateEditor, DateTimeEditorOptions> {
+        if (quickFilterParams?.["range"] === false)
+            return QuickFilterBar.dateEqual(field, title);
+
         let end: DateEditor = null;
         return {
             field: field,

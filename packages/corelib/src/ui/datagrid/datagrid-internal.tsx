@@ -77,8 +77,10 @@ export function propertyItemToQuickFilter(item: PropertyItem): QuickFilter<any, 
 
     const filteringType = FilteringTypeRegistry.get((item.filteringType ?? 'String'));
     if (filteringType === DateFiltering) {
-        // an application can give the date fields a filter of its own, e.g. one that edits the range in one input
-        result = (QuickFilterBar.defaults.dateRangeFilter ?? QuickFilterBar.dateRange)(name, title);
+        // an application can give the date fields a filter of its own, e.g. one that edits the range in one input, like
+        // the date range editor of Pro.Extensions, which edits a single date when the column sets the range quick filter
+        // param to false, see QuickFilterAttribute.Range
+        result = (QuickFilterBar.defaults.dateRangeFilter ?? QuickFilterBar.dateRange)(name, title, item.quickFilterParams);
     }
     else if (filteringType === DateTimeFiltering) {
         result = QuickFilterBar.dateTimeRange(name, title, item.editorParams?.useUtc);

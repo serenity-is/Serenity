@@ -93,6 +93,30 @@ public class QuickFilterAttribute(bool value = true) : Attribute
     /// </summary>
     public bool? GetCheckList() => checkList;
 
+    private bool? range;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the quick filter of a date property edits a range of dates, e.g. the
+    /// orders of this month, instead of a single date, which matches an exact value, e.g. the orders of a day. Only
+    /// applicable to properties that have a date quick filter, which edits a range when the value of this property is
+    /// true, a single date when it is false, and the way the grid decides otherwise, e.g. an application can give a
+    /// range editor to all of its date columns. See <see cref="GetRange"/> to tell whether it is set, as an attribute
+    /// property can not be nullable.
+    /// </summary>
+    /// <value>
+    ///   <c>true</c> if the quick filter edits a range; <c>false</c> if it edits a single date.
+    /// </value>
+    public bool Range
+    {
+        get => range ?? false;
+        set => range = value;
+    }
+
+    /// <summary>
+    /// Returns the value of <see cref="Range"/>, or null when it is not set, so that the grid decides.
+    /// </summary>
+    public bool? GetRange() => range;
+
     /// <summary>
     /// Gets or sets the field from which the quick filter should cascade.
     /// Only applicable to quick filters that support cascade from selection.
