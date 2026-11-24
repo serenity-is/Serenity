@@ -2811,6 +2811,8 @@ export declare class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     private _layout;
     private _ignorePinChangeUntil;
     private _numberOfPages;
+    /** Whether the canvas is being resized for the auto height, after the row count changed, see updateRowCount. */
+    private _autoHeightResizing;
     private _on;
     private _off;
     private _options;
