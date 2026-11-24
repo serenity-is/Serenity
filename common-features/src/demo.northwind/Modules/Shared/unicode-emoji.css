@@ -125,3 +125,52 @@ body {
     display: inline-block;
     min-width: 1.25em;
 }
+
+/* a flag as the content of a class, for the places that take a CSS class instead of markup, e.g. the icon of a
+   combobox item, so that an element with the classes "emoji-flag emoji-flag-us" shows the flag of a country */
+.emoji-flag {
+    font-family: "Noto Color Emoji", "Segoe UI Emoji", sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    display: inline-block;
+    min-width: 1.25em;
+    line-height: 1;
+}
+.emoji-flag-ar::before { content: "\01F1E6\01F1F7"; }
+.emoji-flag-au::before { content: "\01F1E6\01F1FA"; }
+.emoji-flag-at::before { content: "\01F1E6\01F1F9"; }
+.emoji-flag-be::before { content: "\01F1E7\01F1EA"; }
+.emoji-flag-br::before { content: "\01F1E7\01F1F7"; }
+.emoji-flag-ca::before { content: "\01F1E8\01F1E6"; }
+.emoji-flag-cl::before { content: "\01F1E8\01F1F1"; }
+.emoji-flag-cn::before { content: "\01F1E8\01F1F3"; }
+.emoji-flag-co::before { content: "\01F1E8\01F1F4"; }
+.emoji-flag-cz::before { content: "\01F1E8\01F1FF"; }
+.emoji-flag-dk::before { content: "\01F1E9\01F1F0"; }
+.emoji-flag-eg::before { content: "\01F1EA\01F1EC"; }
+.emoji-flag-fi::before { content: "\01F1EB\01F1EE"; }
+.emoji-flag-fr::before { content: "\01F1EB\01F1F7"; }
+.emoji-flag-de::before { content: "\01F1E9\01F1EA"; }
+.emoji-flag-gr::before { content: "\01F1EC\01F1F7"; }
+.emoji-flag-in::before { content: "\01F1EE\01F1F3"; }
+.emoji-flag-ie::before { content: "\01F1EE\01F1EA"; }
+.emoji-flag-it::before { content: "\01F1EE\01F1F9"; }
+.emoji-flag-jp::before { content: "\01F1EF\01F1F5"; }
+.emoji-flag-ke::before { content: "\01F1F0\01F1EA"; }
+.emoji-flag-kr::before { content: "\01F1F0\01F1F7"; }
+.emoji-flag-ma::before { content: "\01F1F2\01F1E6"; }
+.emoji-flag-mx::before { content: "\01F1F2\01F1FD"; }
+.emoji-flag-nl::before { content: "\01F1F3\01F1F1"; }
+.emoji-flag-nz::before { content: "\01F1F3\01F1FF"; }
+.emoji-flag-no::before { content: "\01F1F3\01F1F4"; }
+.emoji-flag-pl::before { content: "\01F1F5\01F1F1"; }
+.emoji-flag-pt::before { content: "\01F1F5\01F1F9"; }
+.emoji-flag-sg::before { content: "\01F1F8\01F1EC"; }
+.emoji-flag-za::before { content: "\01F1FF\01F1E6"; }
+.emoji-flag-es::before { content: "\01F1EA\01F1F8"; }
+.emoji-flag-se::before { content: "\01F1F8\01F1EA"; }
+.emoji-flag-ch::before { content: "\01F1E8\01F1ED"; }
+.emoji-flag-tr::before { content: "\01F1F9\01F1F7"; }
+.emoji-flag-ae::before { content: "\01F1E6\01F1EA"; }
+.emoji-flag-gb::before { content: "\01F1EC\01F1E7"; }
+.emoji-flag-us::before { content: "\01F1FA\01F1F8"; }
