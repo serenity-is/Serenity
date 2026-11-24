@@ -236,6 +236,15 @@ describe('options', () => {
         expect(grid.getOptions().leaveSpaceForNewRows).toBe(false);
     });
 
+    it('should not resize again and again for autoHeight when the height of the canvas does not follow, e.g. without its stylesheet', () => {
+        const container = document.body.appendChild(document.createElement("div"));
+        const grid = new SleekGrid(container, [{ c1: 1 }, { c1: 2 }], [{ field: "c1" }], { autoHeight: true });
+        // the computed height of the canvas stays 0, as the virtual height is applied by a variable of the stylesheet
+        expect(() => grid.updateRowCount()).not.toThrow();
+        grid.destroy();
+        container.remove();
+    });
+
     it('should not initialize grid if explicitInitialization is true', () => {
         const gridOptions: GridOptions = {
             explicitInitialization: true

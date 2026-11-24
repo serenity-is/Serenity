@@ -82,6 +82,8 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
     declare private _layout: LayoutEngine;
     private _ignorePinChangeUntil: number = 0;
     declare private _numberOfPages: number;
+    /** Whether the canvas is being resized for the auto height, after the row count changed, see updateRowCount. */
+    declare private _autoHeightResizing: boolean;
     declare private _on: OmitThisParameter<typeof addListener>;
     declare private _off: OmitThisParameter<typeof removeListener>;
     declare private _options: GridOptions<TItem>;
@@ -2608,8 +2610,15 @@ export class SleekGrid<TItem = any> implements ISleekGrid<TItem> {
             this.scrollTo(vpi.virtualHeight - tempViewportH);
         }
 
-        if (vpi.realScrollHeight != oldH && this._options.autoHeight) {
-            this.resizeCanvas();
+        // once, as the height that is read back may not change, e.g. without the stylesheet that applies the virtual height
+        if (vpi.realScrollHeight != oldH && this._options.autoHeight && !this._autoHeightResizing) {
+            this._autoHeightResizing = true;
+            try {
+                this.resizeCanvas();
+            }
+            finally {
+                this._autoHeightResizing = false;
+            }
         }
 
         if (this._options.forceFitColumns && oldViewportHasVScroll != vpi.hasVScroll) {

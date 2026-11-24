@@ -694,6 +694,32 @@ describe("DataGrid layout", () => {
         isVisibleSpy.mockRestore();
     });
 
+    it("layout keeps the auto height the options of the grid ask for, and turns off only the one of a narrow screen", () => {
+        class AutoHeightGrid extends DataGrid<any, any> {
+            protected override getSlickOptions() { return { ...super.getSlickOptions(), autoHeight: true }; }
+        }
+        const isVisibleSpy = vi.spyOn(Fluent, "isVisibleLike").mockReturnValue(true);
+        const grid = new AutoHeightGrid({});
+        vi.spyOn(grid.getGrid(), "resizeCanvas").mockImplementation(() => { });
+        grid["layout"]();
+        expect(grid.getGrid().getOptions().autoHeight).toBe(true);
+        grid.destroy();
+
+        // a responsive grid gets an auto height on a narrow screen, which it loses on a wide one
+        const responsive = createGrid();
+        responsive.domNode.classList.add("responsive-height");
+        vi.spyOn(responsive.getGrid(), "resizeCanvas").mockImplementation(() => { });
+        const width = vi.spyOn(window, "innerWidth", "get").mockReturnValue(500);
+        responsive["layout"]();
+        expect(responsive.getGrid().getOptions().autoHeight).toBe(true);
+        width.mockReturnValue(1200);
+        responsive["layout"]();
+        expect(responsive.getGrid().getOptions().autoHeight).toBe(false);
+        width.mockRestore();
+        responsive.destroy();
+        isVisibleSpy.mockRestore();
+    });
+
     it("setTitle creates title div and getTitle returns text", () => {
         const grid = createGrid();
         expect(grid.getTitle()).toBeNull();

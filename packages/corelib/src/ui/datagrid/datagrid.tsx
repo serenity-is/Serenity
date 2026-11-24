@@ -63,6 +63,8 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     declare private _initialSettings: PersistedGridSettings;
     declare private _layoutTimer: number;
     declare private _gridStyleApplied: number;
+    /** Whether the layout turned on the auto height of the grid, for a narrow screen, see {@link layout}. */
+    declare private _layoutAutoHeight: boolean;
     private persistingColumnResize = false;
     private automaticFlags: GridPersistenceFlags | null = null;
 
@@ -330,15 +332,18 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
             return;
 
         const responsiveHeight = this.domNode.classList.contains('responsive-height');
-        const madeAutoHeight = this._grid != null && this._grid.getOptions().autoHeight;
+        const autoHeight = this._grid.getOptions().autoHeight;
         const shouldAutoHeight = responsiveHeight && window.innerWidth < 768;
 
         if (shouldAutoHeight) {
-            if (!madeAutoHeight) {
+            if (!autoHeight) {
                 this._grid.setOptions({ autoHeight: true });
+                this._layoutAutoHeight = true;
             }
         }
-        else if (madeAutoHeight) {
+        // only an auto height that the layout turned on is turned off, as the options of a grid may ask for it
+        else if (autoHeight && this._layoutAutoHeight) {
+            this._layoutAutoHeight = false;
             this.slickContainer.getNode().style.height = "";
             this.slickContainer.findAll('.slick-viewport').forEach(x => x.style.height = "");
             this._grid.setOptions({ autoHeight: false });
