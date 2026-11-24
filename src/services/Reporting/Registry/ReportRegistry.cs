@@ -18,6 +18,8 @@ public class ReportRegistry(ITypeSource typeSource, IPermissionService permissio
             .GetTypesWithAttribute(typeof(ReportAttribute));
     private readonly IPermissionService permissions = permissions ?? throw new ArgumentNullException(nameof(permissions));
     private readonly ITextLocalizer localizer = localizer ?? throw new ArgumentNullException(nameof(localizer));
+    private readonly ITypeSource typeSource = typeSource;
+    private Dictionary<string, ReportCategoryAttribute>? categoryAttributes;
 
     /// <summary>
     /// Gets report key for the report type by looking at its ReportAttribute,
@@ -175,6 +177,29 @@ public class ReportRegistry(ITypeSource typeSource, IPermissionService permissio
         return null;
     }
 
+    /// <inheritdoc/>
+    public Category GetCategory(string categoryKey)
+    {
+        ArgumentNullException.ThrowIfNull(categoryKey);
+
+        categoryAttributes ??= typeSource.GetAssemblyAttributes<ReportCategoryAttribute>()
+            .GroupBy(x => x.Key, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(x => x.Key, x => x.First(), StringComparer.OrdinalIgnoreCase);
+
+        categoryAttributes.TryGetValue(categoryKey, out var attr);
+
+        var textKey = "Report.Category." + categoryKey.Replace("/", ".");
+        var title = localizer.TryGet(textKey) ?? attr?.Title ?? GetReportCategoryTitle(categoryKey, localizer);
+        var description = localizer.TryGet(textKey + ".Description") ?? attr?.Description;
+
+        return new Category(categoryKey, title)
+        {
+            Description = description,
+            IconClass = attr?.IconClass,
+            Order = attr?.Order ?? 0
+        };
+    }
+
     /// <summary>
     /// Metadata for a registered report.
     /// </summary>
@@ -206,6 +231,21 @@ public class ReportRegistry(ITypeSource typeSource, IPermissionService permissio
         public Category? Category { get; private set; }
 
         /// <summary>
+        /// Gets the description of the report, from its <see cref="DescriptionAttribute"/>.
+        /// </summary>
+        public string? Description { get; private set; }
+
+        /// <summary>
+        /// Gets the icon class of the report, from its <see cref="IconClassAttribute"/>.
+        /// </summary>
+        public string? IconClass { get; private set; }
+
+        /// <summary>
+        /// Gets the order of the report in its category, from its <see cref="ReportAttribute"/>.
+        /// </summary>
+        public int Order { get; private set; }
+
+        /// <summary>
         /// Initializes a new instance of the class.
         /// </summary>
         /// <param name="type">Report type</param>
@@ -228,6 +268,18 @@ public class ReportRegistry(ITypeSource typeSource, IPermissionService permissio
             }
 
             Category = GetReportCategory(type, localizer);
+
+            var descriptionAttr = type.GetCustomAttribute<DescriptionAttribute>(inherit: false);
+            if (descriptionAttr != null)
+            {
+                var resolved = LocalText.ResolveFromAttribute(descriptionAttr,
+                    descriptionAttr.Description, defaultKey: null);
+                Description = resolved.Key is string key ?
+                    localizer.TryGet(key) ?? resolved.Text ?? key : resolved.Text;
+            }
+
+            IconClass = type.GetCustomAttribute<IconClassAttribute>(inherit: false)?.Value;
+            Order = type.GetCustomAttribute<ReportAttribute>(inherit: false)?.Order ?? 0;
 
             attr = type.GetCustomAttributes(typeof(RequiredPermissionAttribute), false);
             if (attr.Length > 0)
@@ -254,5 +306,20 @@ public class ReportRegistry(ITypeSource typeSource, IPermissionService permissio
         /// Gets the category title.
         /// </summary>
         public string Title { get; private set; } = title;
+
+        /// <summary>
+        /// Gets the description of the category, from its <see cref="ReportCategoryAttribute"/>.
+        /// </summary>
+        public string? Description { get; init; }
+
+        /// <summary>
+        /// Gets the icon class of the category, from its <see cref="ReportCategoryAttribute"/>.
+        /// </summary>
+        public string? IconClass { get; init; }
+
+        /// <summary>
+        /// Gets the order of the category among its siblings, from its <see cref="ReportCategoryAttribute"/>.
+        /// </summary>
+        public int Order { get; init; }
     }
 }

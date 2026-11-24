@@ -66,6 +66,15 @@ public static class ReportColumnConverter
 
         result.DataType = dataType;
 
+        var optionsAttr = GetMemberAttribute<ReportColumnOptionsAttribute>(member);
+        if (optionsAttr != null)
+        {
+            result.Kind = optionsAttr.Kind;
+            result.Total = optionsAttr.Total;
+            result.Link = optionsAttr.Link;
+            result.Tone = optionsAttr.Tone;
+        }
+
         return result;
     }
 

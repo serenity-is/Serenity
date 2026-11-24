@@ -15,4 +15,9 @@ public class ReportAttribute(string? reportKey = null) : Attribute
     /// Gets the report key.
     /// </summary>
     public string? ReportKey { get; private set; } = reportKey;
+
+    /// <summary>
+    /// Gets or sets the order of the report in its category, for a page that lists reports in groups.
+    /// </summary>
+    public int Order { get; set; }
 }

@@ -42,6 +42,7 @@ public class DefaultReportRetrieveHandler(IPropertyItemProvider propertyItemProv
         response.InitialSettings = reportInstance;
         response.IsDataOnlyReport = reportInstance is IDataOnlyReport;
         response.IsExternalReport = reportInstance is IExternalReport;
+        response.IsStructuredReport = reportInstance is IStructuredReport;
 
         return response;
     }

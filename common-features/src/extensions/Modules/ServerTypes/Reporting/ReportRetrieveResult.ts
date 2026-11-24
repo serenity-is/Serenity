@@ -7,4 +7,5 @@ export interface ReportRetrieveResult extends ServiceResponse {
     InitialSettings?: any;
     IsDataOnlyReport?: boolean;
     IsExternalReport?: boolean;
+    IsStructuredReport?: boolean;
 }

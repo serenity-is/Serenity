@@ -58,6 +58,14 @@ public class ReportColumnConverterTests
         public string? ExtraField = null;
     }
 
+    private class OptionColumns
+    {
+        [ReportColumnOptions(ReportValueKind.Money, Total = ReportTotalKind.Sum, Link = "~/Customer#view/{CustomerID}", Tone = nameof(StatusTone))]
+        public decimal Revenue { get; set; }
+
+        public string? StatusTone { get; set; }
+    }
+
     private class NoBaseColumns
     {
         public string? Value { get; set; }
@@ -260,5 +268,21 @@ public class ReportColumnConverterTests
         Assert.Equal(2, columns.Count);
         Assert.Contains(columns, c => c.Name == "Name");
         Assert.Contains(columns, c => c.Name == "Created");
+    }
+
+    [Fact]
+    public void ObjectTypeToList_Copies_The_Options_Of_A_Column()
+    {
+        var columns = ReportColumnConverter.ObjectTypeToList(typeof(OptionColumns), CreateServices(), NullTextLocalizer.Instance);
+
+        Assert.Equal(ReportValueKind.Money, columns[0].Kind);
+        Assert.Equal(ReportTotalKind.Sum, columns[0].Total);
+        Assert.Equal("~/Customer#view/{CustomerID}", columns[0].Link);
+        Assert.Equal("StatusTone", columns[0].Tone);
+
+        Assert.Equal(ReportValueKind.Default, columns[1].Kind);
+        Assert.Equal(ReportTotalKind.None, columns[1].Total);
+        Assert.Null(columns[1].Link);
+        Assert.Null(columns[1].Tone);
     }
 }

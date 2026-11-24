@@ -47,17 +47,23 @@ export class ReportDialog<P extends ReportDialogOptions = ReportDialogOptions> e
     }
 
     protected updateInterface() {
+        const report = this.report;
+        const designed = !!report && !report.IsDataOnlyReport && !report.IsExternalReport && !report.IsStructuredReport;
+
         this.toolbar.findButton('print-preview-button')
-            .toggle(this.report && !this.report.IsDataOnlyReport && !this.report.IsExternalReport);
+            .toggle(designed);
 
         this.toolbar.findButton('run-button')
-            .toggle(this.report && this.report.IsExternalReport);
+            .toggle(!!report?.IsExternalReport);
 
         this.toolbar.findButton('export-pdf-button')
-            .toggle(this.report && !this.report.IsDataOnlyReport && !this.report.IsExternalReport);
+            .toggle(designed);
 
         this.toolbar.findButton('export-xlsx-button')
-            .toggle(this.report && this.report.IsDataOnlyReport && !this.report.IsExternalReport);
+            .toggle(!!report && (!!report.IsDataOnlyReport || !!report.IsStructuredReport) && !report.IsExternalReport);
+
+        this.toolbar.findButton('export-csv-button')
+            .toggle(!!report?.IsStructuredReport);
     }
 
     executeReport(target: string, ext: string, download: boolean) {
@@ -98,6 +104,11 @@ export class ReportDialog<P extends ReportDialogOptions = ReportDialogOptions> e
                 title: 'Excel',
                 cssClass: 'export-xlsx-button',
                 onClick: () => this.executeReport('_blank', 'xlsx', true)
+            },
+            {
+                title: 'CSV',
+                cssClass: 'export-csv-button',
+                onClick: () => this.executeReport('_blank', 'csv', true)
             }
         ];
     }

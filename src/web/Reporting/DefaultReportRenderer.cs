@@ -78,6 +78,22 @@ public class DefaultReportRenderer(IDataReportExcelRenderer excelRenderer,
     }
 
     /// <summary>
+    /// Renders a structured report with the <see cref="IStructuredReportRenderer"/> service.
+    /// </summary>
+    /// <param name="report">The report.</param>
+    /// <param name="renderOptions">The options.</param>
+    /// <returns>The render result.</returns>
+    /// <exception cref="InvalidOperationException">No <see cref="IStructuredReportRenderer"/> is registered.</exception>
+    protected virtual ReportRenderResult RenderStructuredReport(IStructuredReport report,
+        ReportRenderOptions renderOptions)
+    {
+        var renderer = serviceProvider.GetService(typeof(IStructuredReportRenderer)) as IStructuredReportRenderer ??
+            throw new InvalidOperationException("Structured reports require an IStructuredReportRenderer service to be registered!");
+
+        return renderer.Render(report, renderOptions);
+    }
+
+    /// <summary>
     /// Renders a report as HTML.
     /// </summary>
     /// <param name="report">The report.</param>
@@ -196,6 +212,9 @@ public class DefaultReportRenderer(IDataReportExcelRenderer excelRenderer,
 
         if (report is IExternalReport externalReport)
             return RenderExternalReport(externalReport, renderOptions);
+
+        if (report is IStructuredReport structuredReport)
+            return RenderStructuredReport(structuredReport, renderOptions);
 
         return RenderHtmlReport(report, renderOptions);
     }

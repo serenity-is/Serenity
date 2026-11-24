@@ -3,7 +3,7 @@ import { IconClassName, ToolButton, postToUrl } from "@serenity-is/corelib";
 export interface ReportExecuteOptions {
     reportKey: string;
     download?: boolean;
-    extension?: 'pdf' | 'htm' | 'html' | 'xlsx' | 'docx';
+    extension?: 'pdf' | 'htm' | 'html' | 'xlsx' | 'csv' | 'docx';
     getParams?: () => any;
     params?: { [key: string]: any }
     target?: string;

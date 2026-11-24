@@ -51,12 +51,13 @@ describe("ReportDialog", () => {
     it("exposes toolbar buttons with click handlers", () => {
         const dialog = makeDialog();
         const buttons = dialog["getToolbarButtons"]();
-        expect(buttons.length).toBe(4);
+        expect(buttons.length).toBe(5);
         expect(buttons.map(b => b.cssClass)).toEqual([
             "print-preview-button",
             "run-button",
             "export-pdf-button",
-            "export-xlsx-button"
+            "export-xlsx-button",
+            "export-csv-button"
         ]);
         dialog.destroy();
     });
@@ -91,6 +92,7 @@ describe("ReportDialog", () => {
         expect((executeSpy.mock.calls[1][0] as any).extension).toBeNull();
         expect((executeSpy.mock.calls[2][0] as any).extension).toBe("pdf");
         expect((executeSpy.mock.calls[3][0] as any).extension).toBe("xlsx");
+        expect((executeSpy.mock.calls[4][0] as any).extension).toBe("csv");
         dialog.destroy();
     });
 
@@ -104,6 +106,21 @@ describe("ReportDialog", () => {
     it("toggles toolbar buttons for external reports", () => {
         const dialog = makeDialog(reportData({ IsExternalReport: true }));
         dialog["updateInterface"]();
+        dialog.destroy();
+    });
+
+    it("shows only the Excel and CSV buttons for structured reports", () => {
+        const dialog = makeDialog(reportData({ IsStructuredReport: true }));
+        const shown = ["print-preview-button", "run-button", "export-pdf-button", "export-xlsx-button", "export-csv-button"]
+            .filter(x => !(dialog["toolbar"].findButton(x)[0] as HTMLElement).hidden);
+        expect(shown).toEqual(["export-xlsx-button", "export-csv-button"]);
+        dialog.destroy();
+    });
+
+    it("hides the CSV button for other reports", () => {
+        const dialog = makeDialog(reportData({ IsDataOnlyReport: true }));
+        expect((dialog["toolbar"].findButton("export-csv-button")[0] as HTMLElement).hidden).toBe(true);
+        expect((dialog["toolbar"].findButton("export-xlsx-button")[0] as HTMLElement).hidden).toBe(false);
         dialog.destroy();
     });
 });

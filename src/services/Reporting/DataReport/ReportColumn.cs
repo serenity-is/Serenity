@@ -39,4 +39,27 @@ public class ReportColumn
     /// Gets or sets the decorator to use for the column.
     /// </summary>
     public ICellDecorator? Decorator { get; set; }
+
+    /// <summary>
+    /// Gets or sets the kind of the values of the column, e.g. money, which decides how they are
+    /// formatted when the column has no <see cref="Format"/>.
+    /// </summary>
+    public ReportValueKind Kind { get; set; }
+
+    /// <summary>
+    /// Gets or sets how the total of the column is computed.
+    /// </summary>
+    public ReportTotalKind Total { get; set; }
+
+    /// <summary>
+    /// Gets or sets the link of the values of the column, with the names of the properties of the row in braces, e.g.
+    /// "~/Northwind/Customer#view/{CustomerID}". Only a report that is shown on a page uses it.
+    /// </summary>
+    public string? Link { get; set; }
+
+    /// <summary>
+    /// Gets or sets the name of the property of the row that holds the tone of the value, i.e. "ok", "warn", "danger", "info"
+    /// or "muted", which shows the value as a badge. Only a report that is shown on a page uses it.
+    /// </summary>
+    public string? Tone { get; set; }
 }

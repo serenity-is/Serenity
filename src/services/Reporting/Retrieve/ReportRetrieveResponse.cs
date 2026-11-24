@@ -35,4 +35,9 @@ public class ReportRetrieveResponse : ServiceResponse
     /// True if the report is an <see cref="IExternalReport"/>
     /// </summary>
     public bool IsExternalReport { get; set; }
+
+    /// <summary>
+    /// True if the report is an <see cref="IStructuredReport"/>
+    /// </summary>
+    public bool IsStructuredReport { get; set; }
 }

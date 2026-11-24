@@ -62,6 +62,14 @@ public class ReportRegistryTests
     {
     }
 
+    [Report("Report.Eleven", Order = 3)]
+    [Category("Cat1")]
+    [DescriptionText("What it shows", TextKey = "Site.ReportDescription")]
+    [IconClass("fa fa-chart")]
+    private class ReportWithDescription
+    {
+    }
+
     [Report("Report.Seven")]
     private class NoCategoryReport
     {
@@ -366,5 +374,72 @@ public class ReportRegistryTests
         Assert.Equal("AccessDenied", ex.ErrorCode);
 
         Assert.NotNull(registry.GetReport("Custom.Key", validatePermission: false));
+    }
+
+    private class CategoryTypeSource(params Attribute[] attributes) : ITypeSource
+    {
+        public IEnumerable<Attribute> GetAssemblyAttributes(Type attributeType) => attributes.Where(attributeType.IsInstanceOfType);
+        public IEnumerable<Type> GetTypes() => [];
+        public IEnumerable<Type> GetTypesWithAttribute(Type attributeType) => [];
+        public IEnumerable<Type> GetTypesWithInterface(Type interfaceType) => [];
+    }
+
+    [Fact]
+    public void Report_Has_The_Description_Icon_And_Order_Of_Its_Attributes()
+    {
+        var report = GetReportMeta<ReportWithDescription>();
+        Assert.Equal("What it shows", report.Description);
+        Assert.Equal("fa fa-chart", report.IconClass);
+        Assert.Equal(3, report.Order);
+
+        var localized = new ReportRegistry.Report(typeof(ReportWithDescription),
+            new MockTextLocalizer(key => key == "Site.ReportDescription" ? "Localized description" : null));
+        Assert.Equal("Localized description", localized.Description);
+
+        var plain = GetReportMeta<ReportOne>();
+        Assert.Null(plain.Description);
+        Assert.Null(plain.IconClass);
+        Assert.Equal(0, plain.Order);
+    }
+
+    [Fact]
+    public void GetCategory_Uses_The_ReportCategory_Attribute_Of_The_Category()
+    {
+        var typeSource = new CategoryTypeSource(
+            new ReportCategoryAttribute("Northwind/Sales") { Description = "Revenue over time", IconClass = "fa fa-chart", Order = 2 },
+            new ReportCategoryAttribute("Northwind/Stock") { Title = "Inventory" });
+        var registry = new ReportRegistry(typeSource, new MockPermissions(_ => true), NullTextLocalizer.Instance);
+
+        var sales = registry.GetCategory("northwind/sales");
+        Assert.Equal("northwind/sales", sales.Key);
+        Assert.Equal("sales", sales.Title);
+        Assert.Equal("Revenue over time", sales.Description);
+        Assert.Equal("fa fa-chart", sales.IconClass);
+        Assert.Equal(2, sales.Order);
+
+        Assert.Equal("Inventory", registry.GetCategory("Northwind/Stock").Title);
+
+        var other = registry.GetCategory("Northwind/Other");
+        Assert.Equal("Other", other.Title);
+        Assert.Null(other.Description);
+        Assert.Null(other.IconClass);
+        Assert.Equal(0, other.Order);
+    }
+
+    [Fact]
+    public void GetCategory_Prefers_The_Localized_Texts_Of_The_Category()
+    {
+        var typeSource = new CategoryTypeSource(
+            new ReportCategoryAttribute("Northwind/Sales") { Title = "Sales", Description = "Revenue over time" });
+        var registry = new ReportRegistry(typeSource, new MockPermissions(_ => true), new MockTextLocalizer(key => key switch
+        {
+            "Report.Category.Northwind.Sales" => "Verkauf",
+            "Report.Category.Northwind.Sales.Description" => "Umsatz",
+            _ => null
+        }));
+
+        var sales = registry.GetCategory("Northwind/Sales");
+        Assert.Equal("Verkauf", sales.Title);
+        Assert.Equal("Umsatz", sales.Description);
     }
 }

@@ -69,6 +69,17 @@ public class DefaultReportRendererTests
         public byte[] Render(IReport report, ReportRenderOptions renderOptions) => [3, 4];
     }
 
+    private class StructuredReport : IStructuredReport
+    {
+        public StructuredReportResult GetResult() => new();
+    }
+
+    private class FakeStructuredRenderer : IStructuredReportRenderer
+    {
+        public ReportRenderResult Render(IStructuredReport report, ReportRenderOptions renderOptions) =>
+            new() { FileExtension = "." + renderOptions.ExportFormat };
+    }
+
     private static DefaultReportRenderer Create(ITextLocalizer? localizer = null)
     {
         return new DefaultReportRenderer(new FakeExcelRenderer(), new FakePdfRenderer(),
@@ -196,5 +207,28 @@ public class DefaultReportRendererTests
         var result = renderer.Render(new LegacyKeyFileNameReport(), new ReportRenderOptions());
 
         Assert.StartsWith("Localized legacy report_", result.FileName);
+    }
+
+    [Fact]
+    public void Structured_Report_Data_Is_Its_Result()
+    {
+        Assert.IsType<StructuredReportResult>(((IReport)new StructuredReport()).GetData());
+    }
+
+    [Fact]
+    public void Render_Uses_The_Structured_Report_Renderer_For_A_Structured_Report()
+    {
+        var services = new ServiceCollection().AddSingleton<IStructuredReportRenderer, FakeStructuredRenderer>().BuildServiceProvider();
+        var renderer = new DefaultReportRenderer(new FakeExcelRenderer(), new FakePdfRenderer(), services);
+
+        var result = renderer.Render(new StructuredReport(), new ReportRenderOptions { ExportFormat = "csv" });
+
+        Assert.Equal(".csv", result.FileExtension);
+    }
+
+    [Fact]
+    public void Render_Throws_For_A_Structured_Report_Without_A_Structured_Report_Renderer()
+    {
+        Assert.Throws<InvalidOperationException>(() => Create().Render(new StructuredReport(), new ReportRenderOptions()));
     }
 }

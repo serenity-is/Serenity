@@ -28,4 +28,11 @@ public interface IReportRegistry
     /// </summary>
     /// <param name="categoryKey">The category key.</param>
     bool HasAvailableReportsInCategory(string categoryKey);
+
+    /// <summary>
+    /// Gets a category with its title, and its description, icon and order from its <see cref="ReportCategoryAttribute"/>, if any.
+    /// </summary>
+    /// <param name="categoryKey">The category key, e.g. "Northwind/Sales".</param>
+    ReportRegistry.Category GetCategory(string categoryKey) =>
+        new(categoryKey, ReportRegistry.GetReportCategoryTitle(categoryKey, NullTextLocalizer.Instance));
 }

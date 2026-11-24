@@ -158,6 +158,7 @@ export interface ReportRetrieveResult extends ServiceResponse {
     InitialSettings?: any;
     IsDataOnlyReport?: boolean;
     IsExternalReport?: boolean;
+    IsStructuredReport?: boolean;
 }
 declare namespace texts {
     namespace Db {
@@ -685,7 +686,7 @@ export interface ReportDialogOptions {
 export interface ReportExecuteOptions {
     reportKey: string;
     download?: boolean;
-    extension?: 'pdf' | 'htm' | 'html' | 'xlsx' | 'docx';
+    extension?: 'pdf' | 'htm' | 'html' | 'xlsx' | 'csv' | 'docx';
     getParams?: () => any;
     params?: {
         [key: string]: any;
