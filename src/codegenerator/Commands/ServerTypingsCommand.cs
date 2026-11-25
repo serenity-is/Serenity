@@ -29,7 +29,8 @@ public class ServerTypingsCommand(IProjectFileInfo project, IGeneratorConsole co
         var generator = new ServerTypingsGenerator(FileSystem, assemblyFiles.ToArray())
         {
             LocalTexts = config.ServerTypings != null && config.ServerTypings.LocalTexts,
-            ModuleReExports = config?.ServerTypings?.ModuleReExports != false
+            ModuleReExports = config?.ServerTypings?.ModuleReExports != false,
+            TextsMode = config?.ServerTypings?.GetTextsMode() ?? ServerTypingsTextsMode.Compat
         };
 
         if (config?.ServerTypings?.PreferRelativePaths ?? true)

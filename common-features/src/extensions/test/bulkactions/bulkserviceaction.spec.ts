@@ -1,7 +1,8 @@
 import * as corelib from "@serenity-is/corelib";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { BulkServiceAction } from "../../Modules/BulkActions/BulkServiceAction";
-import { BasicProgressDialogTexts, BulkServiceActionTexts } from "../../Modules/ServerTypes/Texts";
+import { BulkServiceActionTexts } from "../../Modules/ServerTypes/Extensions/BulkServiceActionTexts";
+import { BasicProgressDialogTexts } from "../../Modules/ServerTypes/Extensions/BasicProgressDialogTexts";
 
 class TestProgressDialog {
     dialogOpen = vi.fn();

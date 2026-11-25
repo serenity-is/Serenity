@@ -526,10 +526,11 @@ export function bundle(input: BundleInput): string {
 	}
 
 	function renameSymbolOf(statement: ast.Node, fromName: string): void {
-		let newName = `${fromName}2`;
-		while (takenNames.has(newName)) {
-			newName += '2';
+		let suffix = 2;
+		while (takenNames.has(`${fromName}${suffix}`)) {
+			suffix++;
 		}
+		const newName = `${fromName}${suffix}`;
 		takenNames.set(newName, { statement, exported: false });
 		const visit = (node: ast.Node): void => {
 			if (ast.isIdentifier(node) && node.text === fromName) {

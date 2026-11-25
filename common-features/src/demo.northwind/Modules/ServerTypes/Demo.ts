@@ -16,6 +16,8 @@ export * from "./Demo/Northwind.CustomerService";
 export * from "./Demo/Northwind.EmployeeRow";
 export * from "./Demo/Northwind.EmployeeTerritoryRow";
 export * from "./Demo/Northwind.Gender";
+export * from "./Demo/Northwind.NorthwindDbTexts";
+export * from "./Demo/Northwind.NorthwindValidationTexts";
 export * from "./Demo/Northwind.NoteRow";
 export * from "./Demo/Northwind.OrderColumns";
 export * from "./Demo/Northwind.OrderDetailColumns";

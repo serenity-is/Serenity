@@ -1,6 +1,6 @@
 import { BaseDialog, Dialog, DialogTexts, WidgetProps } from "@serenity-is/corelib";
+import { BasicProgressDialogTexts } from "../ServerTypes/Extensions/BasicProgressDialogTexts";
 import { nsExtensions } from "../ServerTypes/Namespaces";
-import { BasicProgressDialogTexts } from "../ServerTypes/Texts";
 
 export class BasicProgressDialog<P = {}> extends BaseDialog<P> {
     static override[Symbol.typeInfo] = this.registerClass(nsExtensions);

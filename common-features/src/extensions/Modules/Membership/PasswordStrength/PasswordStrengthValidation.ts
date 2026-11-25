@@ -1,6 +1,6 @@
-import { PasswordEditor, getRemoteDataAsync, localText, stringFormat } from "@serenity-is/corelib";
+import { PasswordEditor, getRemoteDataAsync, stringFormat } from "@serenity-is/corelib";
 import { PasswordStrengthRules } from "../../ServerTypes/Extensions/PasswordStrengthRules";
-import { PasswordStrengthValidationTexts } from "../../ServerTypes/Texts";
+import { PasswordStrengthValidationTexts } from "../../ServerTypes/Extensions/PasswordStrengthValidationTexts";
 
 export async function getPasswordStrengthRules(): Promise<PasswordStrengthRules> {
     return await getRemoteDataAsync<PasswordStrengthRules>("PasswordStrengthRules");

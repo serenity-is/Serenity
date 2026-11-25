@@ -1,7 +1,7 @@
 import { ErrorHandling, getReturnUrl, getWindowLocation, notifyError, parseQueryString, PropertyPanel, resolveUrl, serviceCall, WidgetProps } from "@serenity-is/corelib";
 import { LoginForm, LoginRequest } from "../../../ServerTypes/Membership";
-import { LoginFormTexts } from "../../../ServerTypes/Texts";
 import { AccountPanelTitle } from "../AccountPanelTitle";
+import { LoginFormTexts } from "../../../ServerTypes/Texts/LoginFormTexts";
 
 export default function pageInit(opt?: { activated: string }) {
     const loginPanel = new LoginPanel({ element: '#LoginPanel' });

@@ -1,7 +1,6 @@
 import { Dialog, cancelDialogButton, getRemoteDataAsync, notifySuccess, okDialogButton, stringFormat } from "@serenity-is/corelib";
-import { RolePermissionService } from "../../ServerTypes/Administration";
+import { RolePermissionDialogTexts, RolePermissionService } from "../../ServerTypes/Administration";
 import { RemoteDataKeys } from "../../ServerTypes/RemoteDataKeys";
-import { RolePermissionDialogTexts } from "../../ServerTypes/Texts";
 import { PermissionCheckEditor } from "../UserPermission/PermissionCheckEditor";
 
 export async function RolePermissionDialog(props: {

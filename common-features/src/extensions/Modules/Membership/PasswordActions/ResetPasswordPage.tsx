@@ -1,9 +1,10 @@
 import { getWindowLocation, informationDialog, PropertyPanel, resolveUrl, serviceCall, TransformInclude, WidgetProps } from "@serenity-is/corelib";
+import { ExtensionsTexts } from "../../ServerTypes/Extensions/ExtensionsTexts";
 import { ResetPasswordForm } from "../../ServerTypes/Extensions/ResetPasswordForm";
+import { ResetPasswordFormTexts } from "../../ServerTypes/Extensions/ResetPasswordFormTexts";
 import { ResetPasswordRequest } from "../../ServerTypes/Extensions/ResetPasswordRequest";
 import { ResetPasswordResponse } from "../../ServerTypes/Extensions/ResetPasswordResponse";
 import { nsExtensions } from "../../ServerTypes/Namespaces";
-import { ExtensionsTexts, ResetPasswordFormTexts } from "../../ServerTypes/Texts";
 import { AccountPanelTitle } from "../AccountPanelTitle";
 import { addPasswordStrengthValidation } from "../PasswordStrength/PasswordStrengthValidation";
 

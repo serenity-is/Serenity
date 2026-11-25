@@ -1,7 +1,8 @@
 import { getWindowLocation, informationDialog, PropertyPanel, resolveUrl, serviceCall, WidgetProps } from "@serenity-is/corelib";
 import { ChangePasswordForm } from "../../ServerTypes/Extensions/ChangePasswordForm";
+import { ChangePasswordFormTexts } from "../../ServerTypes/Extensions/ChangePasswordFormTexts";
 import { ChangePasswordRequest } from "../../ServerTypes/Extensions/ChangePasswordRequest";
-import { ChangePasswordFormTexts, ChangePasswordValidationTexts } from "../../ServerTypes/Texts";
+import { ChangePasswordValidationTexts } from "../../ServerTypes/Extensions/ChangePasswordValidationTexts";
 import { addPasswordStrengthValidation } from "../PasswordStrength/PasswordStrengthValidation";
 
 export default function pageInit() {

@@ -1,7 +1,7 @@
 import { getWindowLocation, informationDialog, PropertyPanel, resolveUrl, serviceCall, toggleClass } from "@serenity-is/corelib";
 import { ForgotPasswordForm } from "../../ServerTypes/Extensions/ForgotPasswordForm";
+import { ForgotPasswordFormTexts } from "../../ServerTypes/Extensions/ForgotPasswordFormTexts";
 import { ForgotPasswordRequest } from "../../ServerTypes/Extensions/ForgotPasswordRequest";
-import { ForgotPasswordFormTexts } from "../../ServerTypes/Texts";
 import { AccountPanelTitle } from "../AccountPanelTitle";
 
 export default function pageInit() {

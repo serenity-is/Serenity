@@ -1,5 +1,5 @@
-import { Dialog, Fluent, confirmDialog, isArrayLike, localText } from "@serenity-is/corelib";
-import { DialogUtilsTexts } from "../ServerTypes/Texts";
+import { Dialog, Fluent, confirmDialog, isArrayLike } from "@serenity-is/corelib";
+import { DialogUtilsTexts } from "../ServerTypes/Extensions/DialogUtilsTexts";
 
 export namespace DialogUtils {
 

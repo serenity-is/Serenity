@@ -218,6 +218,40 @@ describe("bundleDts", () => {
         expect(tscCheck(bundleDtsText({ entry, project, exportReferencedTypes: false }))).toBeUndefined();
     });
 
+    it("renames repeated local name collisions with an incrementing suffix", () => {
+        // e.g. generated ServerTypes texts files, each with a local `namespace texts`
+        const dir = mkdtempSync(join(tmpdir(), "dtsbundler-collide-"));
+        try {
+            mkdirSync(join(dir, "src"));
+            writeFileSync(join(dir, "tsconfig.json"), JSON.stringify({
+                compilerOptions: { target: "esnext", module: "esnext", moduleResolution: "bundler", strict: true },
+                include: ["src"]
+            }));
+            const names = ["A", "B", "C", "D"];
+            for (const name of names) {
+                writeFileSync(join(dir, "src", `${name}.ts`), [
+                    "namespace texts {",
+                    `    export declare namespace ${name} { export const Title: string; }`,
+                    "}",
+                    `export const ${name}Texts: typeof texts.${name} = {} as any;`
+                ].join("\n"));
+            }
+            writeFileSync(join(dir, "src", "entry.ts"), names.map(x => `export * from "./${x}";`).join("\n"));
+
+            const result = bundleDtsText({ entry: join(dir, "src", "entry.ts"), project: join(dir, "tsconfig.json") });
+
+            expect(result).toMatch(/^declare namespace texts \{/m);
+            expect(result).toMatch(/^declare namespace texts2 \{/m);
+            expect(result).toMatch(/^declare namespace texts3 \{/m);
+            expect(result).toMatch(/^declare namespace texts4 \{/m);
+            expect(result).not.toContain("texts22");
+            tscCheck(result);
+        }
+        finally {
+            rmSync(dir, { recursive: true, force: true });
+        }
+    });
+
     describe("findConfigFrom", () => {
         it("finds the nearest tsconfig.json above the entry", () => {
             expect(findConfigFrom(entry)).toBe(project);

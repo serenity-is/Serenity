@@ -1,6 +1,6 @@
 import { StringEditor, WidgetProps } from "@serenity-is/corelib";
 import { nsDemoNorthwind } from "../ServerTypes/Namespaces";
-import { NorthwindValidationTexts } from "../ServerTypes/Texts";
+import { NorthwindValidationTexts } from "../ServerTypes/Demo/Northwind.NorthwindValidationTexts";
 
 export interface PhoneEditorOptions {
     multiple?: boolean;

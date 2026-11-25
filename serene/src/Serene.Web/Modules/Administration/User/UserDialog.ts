@@ -1,7 +1,7 @@
 import { EditorUtils, EntityDialog, stringFormat } from "@serenity-is/corelib";
-import { UserForm, UserRow, UserService } from "../../ServerTypes/Administration";
+import { UserDialogTexts, UserForm, UserRow, UserService } from "../../ServerTypes/Administration";
+import { MembershipValidationTexts } from "../../ServerTypes/Membership/MembershipValidationTexts";
 import { nsAdministration } from "../../ServerTypes/Namespaces";
-import { MembershipValidationTexts, UserDialogTexts } from "../../ServerTypes/Texts";
 import { UserPermissionDialog } from "../UserPermission/UserPermissionDialog";
 
 export class UserDialog extends EntityDialog<UserRow, any> {

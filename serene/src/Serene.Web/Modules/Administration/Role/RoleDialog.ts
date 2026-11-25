@@ -1,7 +1,6 @@
 import { EntityDialog } from "@serenity-is/corelib";
-import { RoleForm, RoleRow, RoleService } from "../../ServerTypes/Administration";
+import { RoleForm, RolePermissionDialogTexts, RoleRow, RoleService } from "../../ServerTypes/Administration";
 import { nsAdministration } from "../../ServerTypes/Namespaces";
-import { RolePermissionDialogTexts } from "../../ServerTypes/Texts";
 import { RolePermissionDialog } from "../RolePermission/RolePermissionDialog";
 
 const editPermissions = "edit-permissions";

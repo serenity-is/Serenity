@@ -9,7 +9,7 @@ public class GeneratorConfig
     /// <summary>
     /// If specified, the settings in this file extends
     /// settings in a base file similar to tsconfig.json.
-    /// This can also be a special string like "defaults@9.0.0" to
+    /// This can also be a special string like "defaults@10.8.0" to
     /// apply defaults introduced in a specific Serenity version.
     /// See "GeneratorDefaults.cs" file for a list of possible
     /// version values.
@@ -428,6 +428,21 @@ public class GeneratorConfig
         public bool? ModuleReExports { get; set; }
         /// <summary>Used for Newtonsoft.JSON</summary>
         public bool ShouldSerializeModuleReExports() => ModuleReExports != null;
+
+        /// <summary>
+        /// Determines what the root Texts.ts contains, "Compat" (default) or "Remaining".
+        /// See <see cref="Serenity.CodeGeneration.ServerTypingsTextsMode"/>.
+        /// </summary>
+        public string? TextsMode { get; set; }
+        /// <summary>Used for Newtonsoft.JSON</summary>
+        public bool ShouldSerializeTextsMode() => !string.IsNullOrEmpty(TextsMode);
+
+        /// <summary>
+        /// Parses <see cref="TextsMode"/>, defaulting to <see cref="Serenity.CodeGeneration.ServerTypingsTextsMode.Compat"/>.
+        /// </summary>
+        public Serenity.CodeGeneration.ServerTypingsTextsMode GetTextsMode() =>
+            Enum.TryParse<Serenity.CodeGeneration.ServerTypingsTextsMode>(TextsMode, ignoreCase: true, out var mode) ?
+                mode : Serenity.CodeGeneration.ServerTypingsTextsMode.Compat;
 
         /// <summary>
         /// Generate module typings. Defaults to true if you

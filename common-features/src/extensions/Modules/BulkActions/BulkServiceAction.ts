@@ -1,5 +1,6 @@
 ﻿import { ServiceError, confirmDialog, notifyError, notifySuccess, notifyWarning, stringFormat } from "@serenity-is/corelib";
-import { BasicProgressDialogTexts, BulkServiceActionTexts } from "../ServerTypes/Texts";
+import { BasicProgressDialogTexts } from "../ServerTypes/Extensions/BasicProgressDialogTexts";
+import { BulkServiceActionTexts } from "../ServerTypes/Extensions/BulkServiceActionTexts";
 import { BasicProgressDialog } from "./BasicProgressDialog";
 
 export class BulkServiceAction {

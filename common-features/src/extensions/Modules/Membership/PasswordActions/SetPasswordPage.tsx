@@ -1,6 +1,6 @@
 import { BasePanel, getWindowLocation, informationDialog, parseQueryString, resolveUrl, serviceCall } from "@serenity-is/corelib";
 import { SendResetPasswordResponse } from "../../ServerTypes/Extensions/SendResetPasswordResponse";
-import { SetPasswordFormTexts } from "../../ServerTypes/Texts";
+import { SetPasswordFormTexts } from "../../ServerTypes/Extensions/SetPasswordFormTexts";
 
 export default function pageInit() {
     new SetPasswordPage({ element: "#PanelDiv", class: "s-container-tight mt-5 s-Form" });

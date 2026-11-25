@@ -1,4 +1,4 @@
-import { SiteFormTexts } from "../../ServerTypes/Texts";
+import { SiteFormTexts } from "../../ServerTypes/Texts/SiteFormTexts";
 
 export const AccountPanelTitle = () =>
     <h2 class="text-center p-4">

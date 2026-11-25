@@ -111,7 +111,7 @@ public partial class DoctorCommandTests
                 Version.Parse(SergenVersion)).ToString()
         };
 
-        public string SergenExtends { get; set; } = "defaults@9.0.0";
+        public string SergenExtends { get; set; } = "defaults@10.8.0";
         public string SergenRootNamespace { get; set; }
 
         public void WriteSergenJson()

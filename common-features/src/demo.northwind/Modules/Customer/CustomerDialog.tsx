@@ -1,10 +1,12 @@
-import { EntityDialog, SaveInitiator, SaveResponse, TabsExtensions, WidgetProps, localText, reloadLookup, LazyLoadInclude } from "@serenity-is/corelib";
+import { EntityDialog, LazyLoadInclude, SaveInitiator, SaveResponse, TabsExtensions, WidgetProps, reloadLookup } from "@serenity-is/corelib";
 import { DialogUtils } from "@serenity-is/extensions";
-import { CustomerForm, CustomerRow, CustomerService } from "../ServerTypes/Demo";
+import { CustomerForm } from "../ServerTypes/Demo/Northwind.CustomerForm";
+import { CustomerRow } from "../ServerTypes/Demo/Northwind.CustomerRow";
+import { CustomerService } from "../ServerTypes/Demo/Northwind.CustomerService";
+import { NorthwindDbTexts } from "../ServerTypes/Demo/Northwind.NorthwindDbTexts";
 import { nsDemoNorthwind } from "../ServerTypes/Namespaces";
 import "./CustomerDialog.css";
 import { CustomerOrdersGrid } from "./CustomerOrdersGrid";
-import { NorthwindDbTexts } from "../ServerTypes/Texts";
 
 export class CustomerDialog<P = {}> extends EntityDialog<CustomerRow, P> implements LazyLoadInclude<"NorthwindDialogs"> {
     static override[Symbol.typeInfo] = this.registerClass(nsDemoNorthwind);

@@ -1,6 +1,6 @@
 import { getWindowLocation, informationDialog, PropertyPanel, resolveUrl, serviceCall } from "@serenity-is/corelib";
-import { SignUpForm, SignUpRequest, SignUpResponse } from "../../../ServerTypes/Membership";
-import { MembershipValidationTexts, SignUpFormTexts } from "../../../ServerTypes/Texts";
+import { MembershipValidationTexts, SignUpForm, SignUpRequest, SignUpResponse } from "../../../ServerTypes/Membership";
+import { SignUpFormTexts } from "../../../ServerTypes/Texts/SignUpFormTexts";
 import { AccountPanelTitle } from "../AccountPanelTitle";
 
 export default function pageInit(opt: any) {

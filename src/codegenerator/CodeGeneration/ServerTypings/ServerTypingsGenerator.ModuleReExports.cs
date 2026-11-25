@@ -15,7 +15,10 @@ public partial class ServerTypingsGenerator
                     return null;
 
                 return directory;
-            }).Where(x => x.Key != null);
+            })
+            // texts files that does not belong to a module are meant to be imported
+            // directly, so that they can be split into separate ESM chunks
+            .Where(x => x.Key != null && x.Key != TextsDirectory);
 
         foreach (var files in byDirectory)
         {

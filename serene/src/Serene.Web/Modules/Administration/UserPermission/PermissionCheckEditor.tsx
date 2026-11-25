@@ -3,10 +3,9 @@ import {
     ToolButton, WidgetProps, getRemoteDataAsync, localText, stripDiacritics, toGrouping
 } from "@serenity-is/corelib";
 import { Column } from "@serenity-is/sleekgrid";
-import { UserPermissionRow } from "../../ServerTypes/Administration";
+import { UserPermissionDialogTexts, UserPermissionRow } from "../../ServerTypes/Administration";
 import { nsAdministration } from "../../ServerTypes/Namespaces";
 import { RemoteDataKeys } from "../../ServerTypes/RemoteDataKeys";
-import { UserPermissionDialogTexts } from "../../ServerTypes/Texts";
 
 export interface PermissionCheckEditorOptions {
     showRevoke?: boolean;

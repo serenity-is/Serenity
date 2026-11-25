@@ -313,43 +313,28 @@ namespace texts {
             }
         }
     }
-    export declare namespace Validation {
-        export function asKey(): typeof Validation;
-        export function asTry(): typeof Validation;
-        export const NorthwindPhone: string;
-        export const NorthwindPhoneMultiple: string;
-    }
-
 }
 
-const Texts: typeof texts = proxyTexts({}, '', {
-    Db: {
-        Northwind: {
-            Category: {},
-            CategoryLang: {},
-            Customer: {},
-            CustomerCustomerDemo: {},
-            CustomerDemographic: {},
-            CustomerDetails: {},
-            CustomerGrossSales: {},
-            CustomerRepresentatives: {},
-            Employee: {},
-            EmployeeTerritory: {},
-            Note: {},
-            Order: {},
-            OrderDetail: {},
-            Product: {},
-            ProductLang: {},
-            ProductLog: {},
-            Region: {},
-            SalesByCategory: {},
-            Shipper: {},
-            Supplier: {},
-            Territory: {}
-        }
-    },
-    Validation: {}
+export const NorthwindDbTexts: typeof texts.Db.Northwind = /*#__PURE__*/ proxyTexts({}, 'Db.Northwind.', {
+    Category: {},
+    CategoryLang: {},
+    Customer: {},
+    CustomerCustomerDemo: {},
+    CustomerDemographic: {},
+    CustomerDetails: {},
+    CustomerGrossSales: {},
+    CustomerRepresentatives: {},
+    Employee: {},
+    EmployeeTerritory: {},
+    Note: {},
+    Order: {},
+    OrderDetail: {},
+    Product: {},
+    ProductLang: {},
+    ProductLog: {},
+    Region: {},
+    SalesByCategory: {},
+    Shipper: {},
+    Supplier: {},
+    Territory: {}
 }) as any;
-
-export const NorthwindDbTexts = Texts.Db.Northwind;
-export const NorthwindValidationTexts = Texts.Validation;

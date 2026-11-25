@@ -3,7 +3,6 @@ import { mockFetch, unmockFetch } from "test-utils";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import * as Demo from "../../Modules/ServerTypes/Demo";
 import * as Namespaces from "../../Modules/ServerTypes/Namespaces";
-import "../../Modules/ServerTypes/Texts";
 
 const allExports = Object.entries(Demo as Record<string, any>);
 

@@ -8,13 +8,18 @@ import { UserPreferenceService } from "../../Modules/ServerTypes/Extensions/User
 import * as Namespaces from "../../Modules/ServerTypes/Namespaces";
 import * as RemoteDataKeys from "../../Modules/ServerTypes/RemoteDataKeys";
 import * as Reporting from "../../Modules/ServerTypes/Reporting";
-import * as Texts from "../../Modules/ServerTypes/Texts";
 
 describe("ServerTypes barrels", () => {
     it("loads all Extensions exports", () => {
         expect(Extensions).toBeTruthy();
         expect(Reporting).toBeTruthy();
-        expect(Texts).toBeTruthy();
+        expect(Extensions.PasswordStrengthValidationTexts).toBeTruthy();
+        expect(Extensions.DialogUtilsTexts).toBeTruthy();
+        expect(Extensions.ExtensionsTexts).toBeTruthy();
+        expect(Extensions.ForgotPasswordFormTexts).toBeTruthy();
+        expect(Extensions.ResetPasswordFormTexts).toBeTruthy();
+        expect(Extensions.SetPasswordFormTexts).toBeTruthy();
+        expect(Extensions.TranslationTexts).toBeTruthy();
     });
 
     it("exposes namespaces", () => {

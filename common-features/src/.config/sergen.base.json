@@ -1,6 +1,3 @@
 {
-  "Extends": "defaults@9.0.0",
-  "MVC": {
-    "AsNamespace": true
-  }
+  "Extends": "defaults@10.8.0"
 }

@@ -3,7 +3,6 @@ import { mockFetch, unmockFetch } from "test-utils";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import * as Demo from "../../Modules/ServerTypes/Demo";
 import * as Namespaces from "../../Modules/ServerTypes/Namespaces";
-import { NorthwindDbTexts, NorthwindValidationTexts } from "../../Modules/ServerTypes/Texts";
 
 const allExports = Object.entries(Demo as Record<string, any>);
 
@@ -17,7 +16,8 @@ const formTypes = allExports.filter(([, v]) =>
     typeof v === "function" && v.formKey);
 
 const serviceTypes = allExports.filter(([, v]) =>
-    v && typeof v === "object" && typeof v.baseUrl === "string" && v.Methods);
+    // texts proxies (e.g. NorthwindDbTexts) return a string for any property, so check Methods type
+    v && typeof v === "object" && typeof v.baseUrl === "string" && typeof v.Methods === "object");
 
 let serviceRequestSpy: ReturnType<typeof vi.spyOn>;
 
@@ -42,8 +42,8 @@ describe("Northwind ServerTypes namespaces", () => {
     });
 
     it("exposes texts", () => {
-        expect(typeof NorthwindDbTexts.Customer.EntitySingular).toBe("string");
-        expect(typeof NorthwindValidationTexts.NorthwindPhone).toBe("string");
+        expect(typeof Demo.NorthwindDbTexts.Customer.EntitySingular).toBe("string");
+        expect(typeof Demo.NorthwindValidationTexts.NorthwindPhone).toBe("string");
     });
 });
 

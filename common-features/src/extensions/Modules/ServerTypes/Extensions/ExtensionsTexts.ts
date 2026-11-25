@@ -126,10 +126,9 @@ namespace texts {
         export const PasswordStrengthRequireNonAlphanumeric: string;
         export const PasswordStrengthRequireUppercase: string;
     }
-
 }
 
-const Texts: typeof texts = proxyTexts({}, '', {
+export const ExtensionsTexts: typeof texts = /*#__PURE__*/ proxyTexts({}, '', {
     Db: {
         Common: {
             UserPreference: {}
@@ -151,15 +150,3 @@ const Texts: typeof texts = proxyTexts({}, '', {
     },
     Validation: {}
 }) as any;
-
-export const BasicProgressDialogTexts = Texts.Site.BasicProgressDialog;
-export const BulkServiceActionTexts = Texts.Site.BulkServiceAction;
-export const ChangePasswordFormTexts = Texts.Forms.Membership.ChangePassword;
-export const ChangePasswordValidationTexts = Texts.Validation;
-export const DialogUtilsTexts = Texts.Site.Dialogs;
-export const ExtensionsTexts = Texts;
-export const ForgotPasswordFormTexts = Texts.Forms.Membership.ForgotPassword;
-export const PasswordStrengthValidationTexts = Texts.Validation;
-export const ResetPasswordFormTexts = Texts.Forms.Membership.ResetPassword;
-export const SetPasswordFormTexts = Texts.Forms.Membership.SetPassword;
-export const TranslationTexts = Texts.Site.Translation;
