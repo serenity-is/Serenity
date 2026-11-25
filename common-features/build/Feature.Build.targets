@@ -24,4 +24,16 @@
     <Exec Command="node --run build" Condition="Exists('tsbuild.js')" ContinueOnError="true" />
     <Touch Files="$(TSBuildStampFile)" AlwaysCreate="true" Condition="'$(MSBuildLastTaskResult)' == 'true'" />
   </Target>
+  <!--
+    the texts in the code of a feature are written in English, see Serenity.ComponentModel.LocalTextLanguageAttribute;
+    a project may set LocalTextLanguage to another language, or to "none" for no attribute
+  -->
+  <PropertyGroup>
+    <LocalTextLanguage Condition="'$(LocalTextLanguage)' == '' And '$(IsRoslynComponent)' != 'true' And '$(TargetFramework)' != 'netstandard2.0'">en</LocalTextLanguage>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(LocalTextLanguage)' != '' And '$(LocalTextLanguage)' != 'none'">
+    <AssemblyAttribute Include="Serenity.ComponentModel.LocalTextLanguageAttribute">
+      <_Parameter1>$(LocalTextLanguage)</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
 </Project>

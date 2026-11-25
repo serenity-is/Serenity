@@ -35,6 +35,7 @@ public static class EnumLocalTextRegistration
 
         foreach (var type in typeSource.GetTypes())
         {
+            var typeLanguageID = LocalTextLanguages.ForType(registry, type, languageID);
             if (type.IsEnum)
             {
                 var enumKey = EnumMapper.GetEnumTypeKey(type);
@@ -53,7 +54,7 @@ public static class EnumLocalTextRegistration
                     var resolved = LocalText.ResolveFromAttribute(descAttr, descAttr.Description, defaultKey);
                     // a description with an empty text key is shown as it is: its key is null, so nothing is registered
                     if (resolved.Key is string key)
-                        AddText(registry, owners, type, key, resolved.Text, languageID);
+                        AddText(registry, owners, type, key, resolved.Text, typeLanguageID);
                 }
             }
             else if (StringEnum.IsStringEnum(type))
@@ -71,7 +72,7 @@ public static class EnumLocalTextRegistration
                         continue;
 
                     var key = member.TextKey ?? "Enums." + info.EnumKey + "." + member.Name;
-                    AddText(registry, owners, type, key, member.Text, languageID);
+                    AddText(registry, owners, type, key, member.Text, typeLanguageID);
                 }
             }
         }

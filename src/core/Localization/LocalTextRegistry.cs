@@ -11,8 +11,12 @@ namespace Serenity.Localization;
 /// some moderator is using the site by registering an ILocalTextContext provider. Thus,
 /// moderators can see unapproved texts while they are logged in to the site.
 /// </remarks>
-public class LocalTextRegistry : ILocalTextRegistry, IRemoveAll, IGetAllTexts, ILanguageFallbacks
+public class LocalTextRegistry : ILocalTextRegistry, IRemoveAll, IGetAllTexts, ILanguageFallbacks, IBaseLanguage
 {
+    private string? baseLanguageID;
+
+    private volatile string[] sourceLanguages = [];
+
     private readonly ConcurrentDictionary<LanguageIdKeyPair, string?> approvedTexts = new();
 
     private readonly ConcurrentDictionary<LanguageIdKeyPair, string?> pendingTexts = new();
@@ -32,6 +36,8 @@ public class LocalTextRegistry : ILocalTextRegistry, IRemoveAll, IGetAllTexts, I
 
         if (key == null)
             throw new ArgumentNullException(nameof(languageID));
+
+        languageID = MapLanguage(languageID);
 
         if (text is null)
         {
@@ -59,7 +65,7 @@ public class LocalTextRegistry : ILocalTextRegistry, IRemoveAll, IGetAllTexts, I
         if (key == null)
             throw new ArgumentNullException(nameof(key));
 
-        pendingTexts[new LanguageIdKeyPair(languageID, key)] = text;
+        pendingTexts[new LanguageIdKeyPair(MapLanguage(languageID), key)] = text;
     }
 
     /// <summary>
@@ -79,6 +85,7 @@ public class LocalTextRegistry : ILocalTextRegistry, IRemoveAll, IGetAllTexts, I
         if (textKey == null)
             throw new ArgumentNullException(nameof(textKey));
         
+        languageID = MapLanguage(languageID);
         var circularCheck = 0;
         LanguageIdKeyPair k;
         do
@@ -90,17 +97,69 @@ public class LocalTextRegistry : ILocalTextRegistry, IRemoveAll, IGetAllTexts, I
                 if (s != null)
                     return s;
             }
-            else if (approvedTexts.TryGetValue(k, out s))
+            else if (approvedTexts.TryGetValue(k, out s) && (s != null || languageID != LocalText.InvariantLanguageID))
                 return s;
             
+            // a key without a text, e.g. of a text file, or one with none at all, may have one in a source language
             if (languageID == LocalText.InvariantLanguageID)
-                return null;
+                return TryGetFromSourceLanguages(textKey, pending);
 
-            languageID = TryGetLanguageFallback(languageID) ?? LocalText.InvariantLanguageID;
+            languageID = MapLanguage(TryGetLanguageFallback(languageID) ?? LocalText.InvariantLanguageID);
         }
         while (circularCheck++ < 10);
 
         return null;
+    }
+
+    /// <summary>
+    /// Gets a text that the invariant language has none of in the languages that the code is written in besides
+    /// the base language, e.g. the English text of a feature that the Turkish base language has no translation of.
+    /// </summary>
+    private string? TryGetFromSourceLanguages(string textKey, bool pending)
+    {
+        foreach (var source in sourceLanguages)
+        {
+            var k = new LanguageIdKeyPair(source, textKey);
+            if (pending && pendingTexts.TryGetValue(k, out var s) && s != null)
+                return s;
+            if (approvedTexts.TryGetValue(k, out s) && s != null)
+                return s;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// The language that the texts of a language are stored for: the invariant one for the base language.
+    /// </summary>
+    private string MapLanguage(string languageID)
+    {
+        var baseID = baseLanguageID;
+        return baseID != null && string.Equals(languageID, baseID, StringComparison.OrdinalIgnoreCase) ?
+            LocalText.InvariantLanguageID : languageID;
+    }
+
+    /// <inheritdoc/>
+    public string? BaseLanguageID
+    {
+        get => baseLanguageID;
+        set => baseLanguageID = string.IsNullOrEmpty(value) ? null : value;
+    }
+
+    /// <inheritdoc/>
+    public IReadOnlyList<string> SourceLanguages => sourceLanguages;
+
+    /// <inheritdoc/>
+    public void AddSourceLanguage(string languageID)
+    {
+        if (string.IsNullOrEmpty(languageID) || MapLanguage(languageID) == LocalText.InvariantLanguageID)
+            return;
+
+        lock (approvedTexts)
+        {
+            if (!sourceLanguages.Contains(languageID, StringComparer.OrdinalIgnoreCase))
+                sourceLanguages = [.. sourceLanguages, languageID];
+        }
     }
 
 
@@ -166,7 +225,7 @@ public class LocalTextRegistry : ILocalTextRegistry, IRemoveAll, IGetAllTexts, I
 
         var texts = new Dictionary<string, string>();
 
-        var currentID = languageID;
+        var currentID = MapLanguage(languageID);
         int circularCheck = 0;
 
         void scanItems(IEnumerable<KeyValuePair<LanguageIdKeyPair, string?>> items)
@@ -196,9 +255,18 @@ public class LocalTextRegistry : ILocalTextRegistry, IRemoveAll, IGetAllTexts, I
             if (currentID == LocalText.InvariantLanguageID)
                 break;
 
-            currentID = TryGetLanguageFallback(currentID) ?? LocalText.InvariantLanguageID;
+            currentID = MapLanguage(TryGetLanguageFallback(currentID) ?? LocalText.InvariantLanguageID);
         }
         while (circularCheck++ < 10);
+
+        // the texts that the invariant language has none of, in the languages that the code is written in
+        foreach (var source in sourceLanguages)
+        {
+            currentID = source;
+            if (pending)
+                scanItems(pendingTexts);
+            scanItems(approvedTexts);
+        }
 
         return texts;
     }
@@ -230,5 +298,6 @@ public class LocalTextRegistry : ILocalTextRegistry, IRemoveAll, IGetAllTexts, I
         approvedTexts.Clear();
         pendingTexts.Clear();
         languageFallbacks.Clear();
+        sourceLanguages = [];
     }
 }

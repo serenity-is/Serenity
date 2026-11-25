@@ -25,7 +25,7 @@ public static class NestedLocalTextRegistration
             var attr = type.GetCustomAttribute<NestedLocalTextsAttribute>();
             if (attr != null)
             {
-                Initialize(registry, type, attr.LanguageID ?? LocalText.InvariantLanguageID, 
+                Initialize(registry, type, attr.LanguageID ?? LocalTextLanguages.ForType(registry, type), 
                     attr.Prefix ?? "");
             }
         }

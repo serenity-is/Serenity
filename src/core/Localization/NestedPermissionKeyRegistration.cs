@@ -29,7 +29,7 @@ public static class NestedPermissionKeyRegistration
             var attr = type.GetCustomAttribute<NestedPermissionKeysAttribute>();
             if (attr != null)
                 AddKeysFrom(permissions, registry, type, 
-                    attr.LanguageID ?? LocalText.InvariantLanguageID);
+                    attr.LanguageID ?? (registry is null ? LocalText.InvariantLanguageID : LocalTextLanguages.ForType(registry, type)));
         }
 
         return permissions;

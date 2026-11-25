@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Options;
 using Serenity.Extensions.DependencyInjection;
+using Serenity.Localization;
 
 namespace Serenity.Web;
 
@@ -12,15 +14,21 @@ namespace Serenity.Web;
 /// <param name="rowTypeRegistry">The row type registry used to discover row texts.</param>
 /// <param name="webHostEnvironment">The web host environment used to locate the texts folder.</param>
 /// <param name="dynamicSources">The sources of the texts that are kept in data, if any.</param>
+/// <param name="localizationSettings">The localization settings, which give the base language.</param>
 public class DefaultLocalTextInitializer(ITypeSource typeSource,
     IRowTypeRegistry? rowTypeRegistry = null,
     IWebHostEnvironment? webHostEnvironment = null,
-    IEnumerable<IDynamicLocalTextSource>? dynamicSources = null) : ILocalTextInitializer
+    IEnumerable<IDynamicLocalTextSource>? dynamicSources = null,
+    IOptions<LocalizationSettings>? localizationSettings = null) : ILocalTextInitializer
 {
     /// <inheritdoc/>
     public virtual void Initialize(ILocalTextRegistry registry)
     {
         ArgumentNullException.ThrowIfNull(registry, nameof(registry));
+
+        // before the texts are added, as the texts of the base language are stored as invariant ones
+        if (registry is IBaseLanguage baseLanguage)
+            baseLanguage.BaseLanguageID = localizationSettings?.Value?.BaseLanguage;
 
         ServiceCollectionExtensions.AddBaseTexts(registry, typeSource, rowTypeRegistry, includeResources: true);
         AddJsonTexts(registry);

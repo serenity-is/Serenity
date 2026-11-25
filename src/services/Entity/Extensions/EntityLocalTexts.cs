@@ -23,6 +23,9 @@ public static class EntityLocalTexts
 
         ArgumentNullException.ThrowIfNull(rowInstances);
 
+        // the language of the texts of the row being registered, see LocalTextLanguageAttribute
+        var rowLanguageID = languageID;
+
         // a text with a key property of its own, e.g. the placeholder of a quick filter: the text is the default text of
         // the key, or of the implied one when there is no key, and is never taken as a key itself
         void addKeyedText(string? textKey, string? text, string impliedKey)
@@ -30,12 +33,12 @@ public static class EntityLocalTexts
             if (string.IsNullOrEmpty(textKey))
             {
                 if (!string.IsNullOrEmpty(text))
-                    provider.Add(languageID, impliedKey, text);
+                    provider.Add(rowLanguageID, impliedKey, text);
             }
             else if (!string.IsNullOrEmpty(text))
-                provider.Add(languageID, textKey, text);
-            else if (provider.TryGet(languageID, textKey, false) is null)
-                provider.Add(languageID, textKey, null);
+                provider.Add(rowLanguageID, textKey, text);
+            else if (provider.TryGet(rowLanguageID, textKey, false) is null)
+                provider.Add(rowLanguageID, textKey, null);
         }
 
         void addAttributeText(Attribute attribute, string? text, string defaultKey)
@@ -48,18 +51,19 @@ public static class EntityLocalTexts
             if (resolved.Key is not string key)
             {
                 if (!string.IsNullOrEmpty(resolved.Text))
-                    provider.Add(languageID, defaultKey, resolved.Text);
+                    provider.Add(rowLanguageID, defaultKey, resolved.Text);
                 return;
             }
 
             if (!string.IsNullOrEmpty(resolved.Text))
-                provider.Add(languageID, key, resolved.Text);
-            else if (resolved.IsKey && provider.TryGet(languageID, key, false) is null)
-                provider.Add(languageID, key, null);
+                provider.Add(rowLanguageID, key, resolved.Text);
+            else if (resolved.IsKey && provider.TryGet(rowLanguageID, key, false) is null)
+                provider.Add(rowLanguageID, key, null);
         }
 
         foreach (var row in rowInstances)
         {
+            rowLanguageID = LocalTextLanguages.ForType(provider, row.GetType(), languageID);
             var fields = row.Fields;
             string dbPrefix = "Db." + fields.LocalTextPrefix + ".";
 
@@ -114,8 +118,8 @@ public static class EntityLocalTexts
                     if (displayAttr is not IHasTextKey &&
                         LocalText.IsLocalTextKeyCandidate(lt.Key, uiKeyOnly: true))
                     {
-                        if (registry.TryGet(languageID, lt.Key, false) is null)
-                            registry.Add(languageID, lt.Key, null);
+                        if (registry.TryGet(rowLanguageID, lt.Key, false) is null)
+                            registry.Add(rowLanguageID, lt.Key, null);
 
                         continue;
                     }
@@ -123,7 +127,7 @@ public static class EntityLocalTexts
                     lt.ReplaceKey(field.AutoTextKey);
                 }
 
-                provider.Add(languageID, lt.Key, lt.OriginalKey);
+                provider.Add(rowLanguageID, lt.Key, lt.OriginalKey);
             }
 
             var displayName = row.GetType().GetCustomAttribute<DisplayNameAttribute>();

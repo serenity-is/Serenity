@@ -22,10 +22,21 @@ public static class ImplicitLocalTextRegistration
 
         foreach (var type in typeSource.GetTypes())
         {
+            ILocalTextRegistry? typeRegistry = null;
             foreach (var attr in type.GetCustomAttributes(typeof(IImplicitLocalTextRegistrar), inherit: false))
             {
                 if (attr is IImplicitLocalTextRegistrar registrar)
-                    registrar.AddLocalTexts(registry, type);
+                {
+                    // the texts that a registrar adds for the invariant language are in the language of the assembly
+                    if (typeRegistry is null)
+                    {
+                        var languageID = LocalTextLanguages.ForType(registry, type);
+                        typeRegistry = languageID == LocalText.InvariantLanguageID ? registry :
+                            new InvariantToLanguageRegistry(registry, languageID);
+                    }
+
+                    registrar.AddLocalTexts(typeRegistry, type);
+                }
             }
         }
     }

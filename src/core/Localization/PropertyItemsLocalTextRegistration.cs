@@ -29,6 +29,8 @@ public static class PropertyItemsLocalTextRegistration
             if (GetPropertyItemsTextPrefix(type) is not string textPrefix)
                 continue;
 
+            var typeLanguageID = LocalTextLanguages.ForType(registry, type, languageID);
+
             void addText(string text, string? suffix)
             {
                 if (string.IsNullOrEmpty(text))
@@ -36,11 +38,11 @@ public static class PropertyItemsLocalTextRegistration
 
                 if (IsLocalTextKeyCandidate(text))
                 {
-                    if (registry.TryGet(languageID, text, false) is null)
-                        registry.Add(languageID, text, null);
+                    if (registry.TryGet(typeLanguageID, text, false) is null)
+                        registry.Add(typeLanguageID, text, null);
                 }
                 else if (suffix is not null)
-                    registry.Add(languageID, textPrefix + suffix, text);
+                    registry.Add(typeLanguageID, textPrefix + suffix, text);
             }
 
             // a text with a key property of its own, e.g. the placeholder of a quick filter: the text is the default
@@ -50,12 +52,12 @@ public static class PropertyItemsLocalTextRegistration
                 if (string.IsNullOrEmpty(textKey))
                 {
                     if (!string.IsNullOrEmpty(text) && impliedKey != null)
-                        registry.Add(languageID, impliedKey, text);
+                        registry.Add(typeLanguageID, impliedKey, text);
                 }
                 else if (!string.IsNullOrEmpty(text))
-                    registry.Add(languageID, textKey, text);
-                else if (registry.TryGet(languageID, textKey, false) is null)
-                    registry.Add(languageID, textKey, null);
+                    registry.Add(typeLanguageID, textKey, text);
+                else if (registry.TryGet(typeLanguageID, textKey, false) is null)
+                    registry.Add(typeLanguageID, textKey, null);
             }
 
             void addAttributeText(Attribute attribute, string? text, string suffix)
@@ -68,14 +70,14 @@ public static class PropertyItemsLocalTextRegistration
                 if (resolved.Key is not string key)
                 {
                     if (!string.IsNullOrEmpty(resolved.Text))
-                        registry.Add(languageID, textPrefix + suffix, resolved.Text);
+                        registry.Add(typeLanguageID, textPrefix + suffix, resolved.Text);
                     return;
                 }
 
                 if (!string.IsNullOrEmpty(resolved.Text))
-                    registry.Add(languageID, key, resolved.Text);
-                else if (resolved.IsKey && registry.TryGet(languageID, key, false) is null)
-                    registry.Add(languageID, key, null);
+                    registry.Add(typeLanguageID, key, resolved.Text);
+                else if (resolved.IsKey && registry.TryGet(typeLanguageID, key, false) is null)
+                    registry.Add(typeLanguageID, key, null);
             }
 
             var addonParams = new Dictionary<string, object?>(StringComparer.Ordinal);
