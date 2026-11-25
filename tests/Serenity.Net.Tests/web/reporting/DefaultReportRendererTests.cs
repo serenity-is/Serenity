@@ -277,7 +277,7 @@ public class DefaultReportRendererTests
     {
         var renderer = new DefaultReportRenderer(new FakeExcelRenderer(), new AsyncPdfRenderer(), new ServiceCollection().BuildServiceProvider());
 
-        var result = await renderer.RenderAsync(new DesignReport(), new ReportRenderOptions { ExportFormat = "PDF" });
+        var result = await renderer.RenderAsync(new DesignReport(), new ReportRenderOptions { ExportFormat = "PDF" }, TestContext.Current.CancellationToken);
 
         Assert.Equal([5, 6], result.ContentBytes);
         Assert.Equal(".pdf", result.FileExtension);
@@ -287,7 +287,7 @@ public class DefaultReportRendererTests
     [Fact]
     public async Task RenderAsync_Uses_Render_Of_A_Pdf_Renderer_That_Is_Not_Async()
     {
-        var result = await Create().RenderAsync(new DesignReport(), new ReportRenderOptions { ExportFormat = "pdf" });
+        var result = await Create().RenderAsync(new DesignReport(), new ReportRenderOptions { ExportFormat = "pdf" }, TestContext.Current.CancellationToken);
         Assert.Equal([3, 4], result.ContentBytes);
     }
 
@@ -297,11 +297,11 @@ public class DefaultReportRendererTests
         var services = new ServiceCollection().AddSingleton<IStructuredReportRenderer, FakeStructuredRenderer>().BuildServiceProvider();
         var renderer = new DefaultReportRenderer(new FakeExcelRenderer(), new FakePdfRenderer(), services);
 
-        var result = await renderer.RenderAsync(new StructuredReport(), new ReportRenderOptions { ExportFormat = "pdf" });
+        var result = await renderer.RenderAsync(new StructuredReport(), new ReportRenderOptions { ExportFormat = "pdf" }, TestContext.Current.CancellationToken);
 
         Assert.Equal(".pdf", result.FileExtension);
-        Assert.Equal("async", Assert.IsType<StructuredReportResult>(await ((IReport)new StructuredReport()).GetDataAsync()).EmptyText);
-        await Assert.ThrowsAsync<InvalidOperationException>(() => Create().RenderAsync(new StructuredReport(), new ReportRenderOptions()));
+        Assert.Equal("async", Assert.IsType<StructuredReportResult>(await ((IReport)new StructuredReport()).GetDataAsync(TestContext.Current.CancellationToken)).EmptyText);
+        await Assert.ThrowsAsync<InvalidOperationException>(() => Create().RenderAsync(new StructuredReport(), new ReportRenderOptions(), TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -309,10 +309,10 @@ public class DefaultReportRendererTests
     {
         var renderer = Create();
 
-        Assert.Equal([1, 2], (await renderer.RenderAsync(new DataOnlyReport(), new ReportRenderOptions { ExportFormat = "pdf" })).ContentBytes);
-        Assert.Equal("https://example.com/report", (await renderer.RenderAsync(new ExternalReport(), new ReportRenderOptions())).RedirectUri);
-        await Assert.ThrowsAsync<ArgumentNullException>(() => renderer.RenderAsync(null!, new ReportRenderOptions()));
-        await Assert.ThrowsAsync<ArgumentNullException>(() => renderer.RenderAsync(new DataOnlyReport(), null!));
+        Assert.Equal([1, 2], (await renderer.RenderAsync(new DataOnlyReport(), new ReportRenderOptions { ExportFormat = "pdf" }, TestContext.Current.CancellationToken)).ContentBytes);
+        Assert.Equal("https://example.com/report", (await renderer.RenderAsync(new ExternalReport(), new ReportRenderOptions(), TestContext.Current.CancellationToken)).RedirectUri);
+        await Assert.ThrowsAsync<ArgumentNullException>(() => renderer.RenderAsync(null!, new ReportRenderOptions(), TestContext.Current.CancellationToken));
+        await Assert.ThrowsAsync<ArgumentNullException>(() => renderer.RenderAsync(new DataOnlyReport(), null!, TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -333,10 +333,10 @@ public class DefaultReportRendererTests
     [Fact]
     public async Task RenderAsync_Gets_The_Data_Of_An_Html_Report_Asynchronously()
     {
-        var result = await Create().RenderAsync(new AsyncDataReport(), new ReportRenderOptions { PreviewMode = true });
+        var result = await Create().RenderAsync(new AsyncDataReport(), new ReportRenderOptions { PreviewMode = true }, TestContext.Current.CancellationToken);
 
         Assert.Equal("AsyncDesign", result.ViewName);
         Assert.Equal("async model", result.Model);
-        Assert.Equal("model", (await Create().RenderAsync(new DesignReport(), new ReportRenderOptions { PreviewMode = true })).Model);
+        Assert.Equal("model", (await Create().RenderAsync(new DesignReport(), new ReportRenderOptions { PreviewMode = true }, TestContext.Current.CancellationToken)).Model);
     }
 }

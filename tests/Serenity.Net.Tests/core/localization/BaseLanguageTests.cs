@@ -35,7 +35,7 @@ public class BaseLanguageTests
     [InlineData("en", "tr", false)]
     [InlineData("", null, true)]
     [InlineData("en", "", false)]
-    public void IsSameLanguage_Compares_A_Language_With_Its_Regions(string languageID, string otherID, bool expected)
+    public void IsSameLanguage_Compares_A_Language_With_Its_Regions(string languageID, string? otherID, bool expected)
     {
         Assert.Equal(expected, LocalTextLanguages.IsSameLanguage(languageID, otherID));
     }
