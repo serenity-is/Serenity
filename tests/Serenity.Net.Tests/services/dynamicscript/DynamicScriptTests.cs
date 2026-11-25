@@ -61,32 +61,77 @@ public class DynamicScriptTests
     }
 
     [Fact]
-    public void DynamicScript_CheckRights_Throws_WhenPermissionDenied()
+    public void DynamicScript_HasPermission_False_WhenPermissionDenied()
     {
         var script = new TestDynamicScript { Permission = "P" };
-        Assert.Throws<ValidationError>(() =>
-            script.CheckRights(new MockPermissions(_ => false), NullTextLocalizer.Instance));
+        Assert.False(script.HasPermission(new MockPermissions(_ => false)));
     }
 
     [Fact]
-    public void DynamicScript_CheckRights_Passes_WhenPermissionGranted()
+    public void DynamicScript_HasPermission_True_WhenPermissionGranted()
     {
         var script = new TestDynamicScript { Permission = "P" };
-        script.CheckRights(new MockPermissions(_ => true), NullTextLocalizer.Instance);
+        Assert.True(script.HasPermission(new MockPermissions(x => x == "P")));
     }
 
     [Fact]
-    public void DynamicScript_CheckRights_Denies_WithoutPermission()
+    public void DynamicScript_HasPermission_Denies_WithoutPermission()
     {
         var script = new TestDynamicScript();
-        Assert.Throws<ValidationError>(() =>
-            script.CheckRights(new MockPermissions(_ => false), NullTextLocalizer.Instance));
+        Assert.False(script.HasPermission(new MockPermissions(_ => true)));
     }
 
     [Fact]
     public void ConcatenatedScript_Throws_ForNullParts()
     {
-        Assert.Throws<ArgumentNullException>(() => new ConcatenatedScript(null!));
+        Assert.Throws<ArgumentNullException>(() => new ConcatenatedScript((IEnumerable<Func<string>>)null!));
+        Assert.Throws<ArgumentNullException>(() => new ConcatenatedScript((IEnumerable<ConcatenatedScriptPart>)null!));
+    }
+
+    [Fact]
+    public void ConcatenatedScript_Skips_Parts_Without_Permission()
+    {
+        var script = new ConcatenatedScript(
+        [
+            new ConcatenatedScriptPart(() => "first"),
+            new ConcatenatedScriptPart(() => "denied", hasPermission: () => false),
+            new ConcatenatedScriptPart(() => "granted", hasPermission: () => true)
+        ]);
+
+        var result = script.GetScript();
+        Assert.Contains("first", result, StringComparison.Ordinal);
+        Assert.Contains("granted", result, StringComparison.Ordinal);
+        Assert.DoesNotContain("denied", result, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ConcatenatedScript_CacheSuffix_Is_Empty_Without_Conditional_Parts()
+    {
+        var script = new ConcatenatedScript([() => "a", () => "b"]);
+        Assert.Equal("", script.CacheSuffix);
+    }
+
+    [Fact]
+    public void ConcatenatedScript_CacheSuffix_Varies_By_Accessible_Parts_And_Part_Suffixes()
+    {
+        var granted = true;
+        var nestedSuffix = "x";
+        var script = new ConcatenatedScript(
+        [
+            new ConcatenatedScriptPart(() => "always"),
+            new ConcatenatedScriptPart(() => "conditional", hasPermission: () => granted),
+            new ConcatenatedScriptPart(() => "nested", getCacheSuffix: () => nestedSuffix)
+        ]);
+
+        var first = script.CacheSuffix;
+        granted = false;
+        var second = script.CacheSuffix;
+        nestedSuffix = "y";
+        var third = script.CacheSuffix;
+
+        Assert.NotEqual(first, second);
+        Assert.NotEqual(second, third);
+        Assert.NotEqual(first, third);
     }
 
     [Fact]
@@ -100,12 +145,14 @@ public class DynamicScriptTests
     }
 
     [Fact]
-    public void ConcatenatedScript_CheckRights_InvokesCallback()
+    public void ConcatenatedScript_HasPermission_Uses_Own_Permission_Only()
     {
-        var invoked = false;
-        var script = new ConcatenatedScript([() => "x"], checkRights: (_, _) => invoked = true) { Permission = SpecialPermissionKeys.Public };
-        script.CheckRights(new MockPermissions(_ => true), NullTextLocalizer.Instance);
-        Assert.True(invoked);
+        var script = new ConcatenatedScript(
+            [new ConcatenatedScriptPart(() => "x", hasPermission: () => false)])
+        {
+            Permission = SpecialPermissionKeys.Public
+        };
+        Assert.True(script.HasPermission(new MockPermissions(x => x == SpecialPermissionKeys.Public)));
     }
 
     [Fact]

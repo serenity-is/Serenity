@@ -328,6 +328,9 @@ public abstract partial class PropertyItemsScript
         sb.AppendFormat(DataScript.SetScriptDataFormat.TrimEnd(';'), "d[0]", anyRecordViews ? "{items:d[1],additionalItems:(d[2]||[]),revision:d[3],recordViews:d[4]}" :
             "{items:d[1],additionalItems:(d[2]||[]),revision:d[3]}");
         sb.Append(")})();");
+        if (strMap.Count == 0)
+            return "(function(){" + sb.ToString();
+
         return "(function(){var " + string.Join(",", strMap.OrderBy(x => x.Value.Length).ThenBy(x => x.Value, StringComparer.Ordinal)
                 .Select((x, i) => $"{((i % 30) == 1 ? "\n" : "")}{x.Value}={StringHelper.ToSingleQuoted(x.Key)}")) + ";\n" +
             sb.ToString();

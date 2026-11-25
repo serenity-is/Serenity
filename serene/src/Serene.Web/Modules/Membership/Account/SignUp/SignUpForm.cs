@@ -1,6 +1,6 @@
 namespace Serene.Membership;
 
-[FormScript("Membership.SignUp")]
+[FormScript("Membership.SignUp", Permission = SpecialPermissionKeys.Public)]
 public class SignUpForm
 {
     [Required(true), Placeholder("full name")]

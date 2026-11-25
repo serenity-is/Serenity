@@ -1,3 +1,5 @@
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Serenity.PropertyGrid;
 
 namespace Serenity.Web;
@@ -23,6 +25,9 @@ public class ColumnsScriptRegistration
         ArgumentNullException.ThrowIfNull(typeSource);
         ArgumentNullException.ThrowIfNull(serviceProvider);
 
+        var options = serviceProvider.GetService<IOptions<PropertyItemsScriptOptions>>()?.Value ??
+            new PropertyItemsScriptOptions();
+
         var scripts = new List<ColumnsScript>();
         foreach (var type in typeSource.GetTypesWithAttribute(typeof(ColumnsScriptAttribute)))
         {
@@ -30,18 +35,16 @@ public class ColumnsScriptRegistration
             if (attr == null)
                 continue;
             var key = attr.Key ?? (attr.InferKey ? ColumnsScriptAttribute.AutoColumnsKeyFor(type) : type.FullName!);
-            var script = new ColumnsScript(key, type, propertyProvider, serviceProvider);
+            var script = new ColumnsScript(key, type, propertyProvider, serviceProvider)
+            {
+                Permission = options.GetPermissionFor(type, attr.Permission)
+            };
             scriptManager.Register(script);
             scripts.Add(script);
         }
 
-        scriptManager.Register("ColumnsBundle", new ConcatenatedScript(
-        [
-            () => PropertyItemsScript.Compact(scripts.Select(x => (x.ScriptName, (PropertyItemsData)x.GetScriptData())))
-        ])
-        {
-            Permission = SpecialPermissionKeys.Public
-        });
+        scriptManager.Register("ColumnsBundle", new PropertyItemsBundleScript(scripts,
+            serviceProvider.GetService<IPermissionService>()));
 
         return scripts;
     }

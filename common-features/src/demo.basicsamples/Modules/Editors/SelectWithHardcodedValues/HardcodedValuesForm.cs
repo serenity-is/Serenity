@@ -1,6 +1,6 @@
 namespace Serenity.Demo.BasicSamples.Forms;
 
-[FormScript("BasicSamples.HarcodedValues")]
+[FormScript("BasicSamples.HarcodedValues", Permission = Northwind.PermissionKeys.General)]
 public class HardcodedValuesForm
 {
     [DisplayText("Some Value")]

@@ -57,6 +57,15 @@ public sealed class FormScriptAttribute : Attribute
     public string? LocalTextPrefix { get; set; }
 
     /// <summary>
+    /// Permission required to access the form script. If not set, the script is public, unless the
+    /// PropertyItemsScripts:PublicByDefault option is false, in which case the ReadPermission of the row type
+    /// in its BasedOnRow attribute is used (DENY if the row has none), or PropertyItemsScripts:FallbackPermission
+    /// (DENY by default) if there is no BasedOnRow attribute.
+    /// Use "*" for forms that should be available to anonymous users, like a login form.
+    /// </summary>
+    public string? Permission { get; set; }
+
+    /// <summary>
     /// Gets the automatically inferred form key for the specified type.
     /// </summary>
     /// <param name="type">The type for which to infer the form key.</param>

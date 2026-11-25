@@ -176,29 +176,63 @@ public class DynamicScriptManagerTests
     }
 
     [Fact]
-    public void CheckScriptRights_Validates_Permission()
+    public void HasScriptPermission_False_Without_Permission()
     {
         var manager = Create(new MockPermissions(_ => false));
         manager.Register("Perm", new TestScript { Permission = "X" });
 
-        var exception = Assert.Throws<ValidationError>(() => manager.CheckScriptRights("Perm"));
-        Assert.Equal("AccessDenied", exception.ErrorCode);
+        Assert.False(manager.HasScriptPermission("Perm"));
     }
 
     [Fact]
-    public void CheckScriptRights_Passes_With_Permission()
+    public void HasScriptPermission_True_With_Permission()
     {
         var manager = Create(new MockPermissions(_ => true));
         manager.Register("Perm", new TestScript { Permission = "X" });
 
-        manager.CheckScriptRights("Perm");
+        Assert.True(manager.HasScriptPermission("Perm"));
     }
 
     [Fact]
-    public void CheckScriptRights_Does_Nothing_For_Unknown()
+    public void HasScriptPermission_True_For_Unknown()
     {
         var manager = Create();
-        manager.CheckScriptRights("Unknown");
+        Assert.True(manager.HasScriptPermission("Unknown"));
+    }
+
+    [Fact]
+    public void ReadScriptContent_Throws_AccessDenied_Without_Permission()
+    {
+        var manager = Create(new MockPermissions(_ => false));
+        manager.Register("Perm", new TestScript { Permission = "X" });
+
+        var exception = Assert.Throws<ValidationError>(() => manager.ReadScriptContent("Perm", false));
+        Assert.Equal("AccessDenied", exception.ErrorCode);
+    }
+
+    [Fact]
+    public void GetRegisteredScripts_Excludes_Scripts_Without_Permission()
+    {
+        var manager = Create(new MockPermissions(x => x == "Granted"));
+        manager.Register("GrantedScript", new TestScript { Permission = "Granted" });
+        manager.Register("DeniedScript", new TestScript { Permission = "Denied" });
+
+        var registered = manager.GetRegisteredScripts();
+        Assert.Contains("GrantedScript", registered.Keys);
+        Assert.DoesNotContain("DeniedScript", registered.Keys);
+    }
+
+    [Fact]
+    public void GetScriptCacheSuffix_Returns_Suffix_Of_CacheSuffix_Scripts()
+    {
+        var manager = Create();
+        manager.Register("Suffixed", new ConcatenatedScript(
+            [new ConcatenatedScriptPart(() => "x", getCacheSuffix: () => "abc")]));
+        manager.Register("Plain", new TestScript());
+
+        Assert.Contains("abc", manager.GetScriptCacheSuffix("Suffixed"), StringComparison.Ordinal);
+        Assert.Null(manager.GetScriptCacheSuffix("Plain"));
+        Assert.Null(manager.GetScriptCacheSuffix("Unknown"));
     }
 
     [Fact]
@@ -230,14 +264,16 @@ public class DynamicScriptManagerTests
     }
 
     [Fact]
-    public void CacheSuffix_Affects_Include_Hash()
+    public void CacheSuffix_Script_Include_Hash_Is_Unique_Until_Generated_Then_Stable()
     {
         var manager = Create();
         manager.Register("Test", new CacheSuffixScript());
 
-        var include = manager.GetScriptInclude("Test");
+        // a constant hash before generation could make browsers use a stale copy after a deployment
+        Assert.DoesNotContain("v=-", manager.GetScriptInclude("Test"), StringComparison.Ordinal);
 
-        Assert.StartsWith("Test.js?v=-", include);
+        manager.GetScriptText("Test", false);
+        Assert.Equal(manager.GetScriptInclude("Test"), manager.GetScriptInclude("Test"));
     }
 
     [Fact]
@@ -277,7 +313,7 @@ public class DynamicScriptManagerTests
     public void GetRegisteredScripts_Includes_Registered_Scripts()
     {
         var manager = Create();
-        manager.Register("Test", new TestScript());
+        manager.Register("Test", new TestScript { Permission = SpecialPermissionKeys.Public });
 
         var scripts = manager.GetRegisteredScripts();
 

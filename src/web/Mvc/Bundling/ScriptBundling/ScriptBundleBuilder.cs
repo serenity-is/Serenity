@@ -47,8 +47,7 @@ public class ScriptBundleBuilder(IOptions<ScriptBundlingOptions> options,
         if (options.NoMinimize != null)
             noMinimize.AddRange(options.NoMinimize);
 
-        var bundleParts = new List<Func<string>>();
-        var scriptNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var bundleParts = new List<ConcatenatedScriptPart>();
 
         foreach (var sourceFile in sourceFiles)
         {
@@ -58,8 +57,10 @@ public class ScriptBundleBuilder(IOptions<ScriptBundlingOptions> options,
             if (sourceFile.StartsWith("dynamic://", StringComparison.OrdinalIgnoreCase))
             {
                 var scriptName = sourceFile[10..];
-                scriptNames.Add(scriptName);
-                bundleParts.Add(() => LoadDynamicScript(scriptName, minimize));
+                bundleParts.Add(new ConcatenatedScriptPart(
+                    () => LoadDynamicScript(scriptName, minimize),
+                    () => WithRecursionCheck(scriptName, () => scriptManager.HasScriptPermission(scriptName)),
+                    () => WithRecursionCheck(scriptName, () => scriptManager.GetScriptCacheSuffix(scriptName))));
                 continue;
             }
 
@@ -70,7 +71,7 @@ public class ScriptBundleBuilder(IOptions<ScriptBundlingOptions> options,
             if (string.IsNullOrEmpty(sourceUrl) || !sourceUrl.StartsWith(rootUrl, StringComparison.Ordinal))
                 continue;
 
-            bundleParts.Add(() =>
+            bundleParts.Add(new ConcatenatedScriptPart(() =>
             {
                 var sourcePath = sourceUrl[rootUrl.Length..];
                 var sourceInfo = hostEnvironment.WebRootFileProvider.GetFileInfo(sourcePath);
@@ -117,37 +118,36 @@ public class ScriptBundleBuilder(IOptions<ScriptBundlingOptions> options,
 
                 using (var sr = new System.IO.StreamReader(sourceInfo.CreateReadStream()))
                     return sr.ReadToEnd();
-            });
+            }));
         }
 
-        return new ConcatenatedScript(bundleParts, checkRights: (permissions, localizer) =>
-        {
-            foreach (var scriptName in scriptNames)
-            {
-                if (recursionCheck != null)
-                {
-                    if (recursionCheck.Contains(scriptName) || recursionCheck.Count > 100)
-                        throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture,
-                            "Caught infinite recursion with dynamic scripts '{0}'!",
-                                string.Join(", ", recursionCheck)));
-                }
-                else
-                    recursionCheck = NewHashSet();
-
-                recursionCheck.Add(scriptName);
-                try
-                {
-                    scriptManager.CheckScriptRights(scriptName);
-                }
-                finally
-                {
-                    recursionCheck.Remove(scriptName);
-                }
-            }
-        })
+        return new ConcatenatedScript(bundleParts)
         {
             Permission = SpecialPermissionKeys.Public
         };
+    }
+
+    private static T WithRecursionCheck<T>(string scriptName, Func<T> action)
+    {
+        if (recursionCheck != null)
+        {
+            if (recursionCheck.Contains(scriptName) || recursionCheck.Count > 100)
+                throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture,
+                    "Caught infinite recursion with dynamic scripts '{0}'!",
+                        string.Join(", ", recursionCheck)));
+        }
+        else
+            recursionCheck = NewHashSet();
+
+        recursionCheck.Add(scriptName);
+        try
+        {
+            return action();
+        }
+        finally
+        {
+            recursionCheck.Remove(scriptName);
+        }
     }
 
     private static HashSet<string> NewHashSet()

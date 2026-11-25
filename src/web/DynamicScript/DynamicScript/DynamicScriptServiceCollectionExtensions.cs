@@ -213,14 +213,9 @@ public static class DynamicScriptServiceCollectionExtensions
         var formScripts = FormScriptRegistration.RegisterFormScripts(scriptManager,
             typeSource, propertyProvider, serviceProvider);
 
-        scriptManager.Register("ColumnAndFormBundle", new ConcatenatedScript(
-            [
-                () => PropertyItemsScript.Compact((columnScripts as IEnumerable<PropertyItemsScript>).Concat(formScripts)
-                    .Select(x => (x.ScriptName, (PropertyItemsData)x.GetScriptData())))
-            ])
-            {
-                Permission = SpecialPermissionKeys.Public
-            });
+        scriptManager.Register("ColumnAndFormBundle", new PropertyItemsBundleScript(
+            (columnScripts as IEnumerable<PropertyItemsScript>).Concat(formScripts),
+            serviceProvider.GetService<IPermissionService>()));
 
         RegisterLayoutCssBundle(serviceProvider, scriptManager);
         RegisterLayoutScriptBundle(serviceProvider, scriptManager);

@@ -3,7 +3,7 @@ namespace Serenity.Extensions;
 /// <summary>
 /// The request model for a change password service.
 /// </summary>
-[FormScript(LocalTextPrefix = "Forms.Membership.ChangePassword.")]
+[FormScript(LocalTextPrefix = "Forms.Membership.ChangePassword.", Permission = SpecialPermissionKeys.LoggedIn)]
 public class ChangePasswordRequest : ServiceRequest
 {
     /// <summary>

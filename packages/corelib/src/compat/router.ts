@@ -18,7 +18,7 @@ export interface HandleRouteEvent extends Event {
 
 /**
  * A handler of the routes of a page that are not of dialogs, e.g. "view/12" for the record a page shows, see
- * {@link IClassicRouter.registerPageRoute}. Such a route is the first part of the hash, before the ones of the dialogs
+ * {@link registerPageRoute}. Such a route is the first part of the hash, before the ones of the dialogs
  * that are opened on the page, e.g. "view/12/+/!1".
  */
 export interface PageRouteHandler {

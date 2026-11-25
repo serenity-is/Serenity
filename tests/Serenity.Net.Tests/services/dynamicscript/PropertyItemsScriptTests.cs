@@ -318,10 +318,19 @@ public class PropertyItemsScriptTests
     }
 
     [Fact]
-    public void CheckRights_DoesNothing()
+    public void HasPermission_True_Without_Permission()
     {
         var (script, _) = CreateFormScript(typeof(object));
-        script.CheckRights(new MockPermissions(_ => false), NullTextLocalizer.Instance);
+        Assert.True(script.HasPermission(new MockPermissions(_ => false)));
+    }
+
+    [Fact]
+    public void HasPermission_Checks_Permission_When_Set()
+    {
+        var (script, _) = CreateFormScript(typeof(object));
+        script.Permission = "P";
+        Assert.False(script.HasPermission(new MockPermissions(_ => false)));
+        Assert.True(script.HasPermission(new MockPermissions(x => x == "P")));
     }
 
     [ColumnsScript("Revised", Revision = 2)]

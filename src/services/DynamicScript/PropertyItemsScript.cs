@@ -52,9 +52,39 @@ public abstract partial class PropertyItemsScript(string scriptName, Type type,
     /// <inheritdoc/>
     public string ScriptName => scriptName;
 
-    /// <inheritdoc/>
-    public void CheckRights(IPermissionService permissions, ITextLocalizer localizer)
+    /// <summary>
+    /// Permission required to access this script. When null, the script is public.
+    /// </summary>
+    public string? Permission { get; set; }
+
+    /// <summary>
+    /// Returns true if <see cref="Permission"/> is null, or the current user has it.
+    /// </summary>
+    /// <param name="permissions">Permission service</param>
+    public bool HasPermission(IPermissionService permissions)
     {
+        ArgumentNullException.ThrowIfNull(permissions);
+        return Permission is null || permissions.HasPermission(Permission);
+    }
+
+    /// <summary>
+    /// Gets the default permission for a form or columns type, which is the
+    /// ReadPermission attribute on the row type specified with the BasedOnRow attribute.
+    /// As with rows, if the row has no ReadPermission, access is denied.
+    /// </summary>
+    /// <param name="type">Form or columns type</param>
+    /// <returns>The read permission of the row, <see cref="SpecialPermissionKeys.Deny"/>
+    /// if the row has none, or null if the type has no BasedOnRow attribute</returns>
+    public static string? GetDefaultPermission(Type type)
+    {
+        ArgumentNullException.ThrowIfNull(type);
+
+        var rowType = type.GetCustomAttribute<BasedOnRowAttribute>(true)?.RowType;
+        if (rowType is null)
+            return null;
+
+        var permission = rowType.GetCustomAttribute<ReadPermissionAttribute>(true)?.Permission;
+        return string.IsNullOrEmpty(permission) ? SpecialPermissionKeys.Deny : permission;
     }
 
     /// <inheritdoc/>

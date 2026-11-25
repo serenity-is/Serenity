@@ -26,4 +26,10 @@ if (typeof window !== "undefined") {
     // jsdom does not navigate: the location records where the page would go
     // instead, installed again before each test as a spec may restore its mocks
     beforeEach(() => mockLocation().reset());
+
+    // jsdom has these but they only log "Not implemented" to the console. The stubs
+    // behave the same (no scrolling, no 2d context) without the noise. A spec can
+    // still spy on them. Remove the canvas stub if a canvas package is ever installed.
+    window.scrollTo = () => { };
+    window.HTMLCanvasElement.prototype.getContext = () => null;
 }

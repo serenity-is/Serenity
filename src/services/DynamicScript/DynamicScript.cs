@@ -15,11 +15,16 @@ public abstract class DynamicScript : IDynamicScript
     /// <inheritdoc/>
     public abstract string GetScript();
 
-    /// <inheritdoc/>
-    public virtual void CheckRights(IPermissionService permissions, ITextLocalizer localizer)
+    /// <summary>
+    /// Returns true if the current user has the <see cref="Permission"/>.
+    /// Access is denied if no <see cref="Permission"/> is set.
+    /// </summary>
+    /// <param name="permissions">Permission service</param>
+    public virtual bool HasPermission(IPermissionService permissions)
     {
-        var permission = string.IsNullOrEmpty(Permission) ? SpecialPermissionKeys.Deny : Permission;
-        permissions.ValidatePermission(permission, localizer);
+        ArgumentNullException.ThrowIfNull(permissions);
+        return permissions.HasPermission(string.IsNullOrEmpty(Permission) ?
+            SpecialPermissionKeys.Deny : Permission);
     }
 
     /// <inheritdoc/>

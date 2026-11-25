@@ -78,7 +78,9 @@ public partial class DynamicScriptManager : IDynamicScriptManager
         foreach (var s in registeredScripts)
         {
             var key = s.Key;
-            if (key != "RegisteredScripts")
+            // scripts the user can't access are not listed, so that e.g. their keys are not exposed
+            if (key != "RegisteredScripts" &&
+                s.Value.HasPermission(permissions))
             {
                 result[key] = PeekScriptHash(key, s.Value);
             }
@@ -128,12 +130,9 @@ public partial class DynamicScriptManager : IDynamicScriptManager
         }
 
         var hash = scriptContent?.Hash;
-        if (hash == null)
-        {
-            hash = DateTime.UtcNow.Ticks.ToString(CultureInfo.InvariantCulture);
-            if (script is ICacheSuffix ics2)
-                hash = "-" + ics2.CacheSuffix.GetHashCode(StringComparison.Ordinal).ToString(CultureInfo.InvariantCulture);
-        }
+        // not generated yet, use a unique value so that a stale copy is never
+        // used from browser cache, e.g. after a deployment
+        hash ??= DateTime.UtcNow.Ticks.ToString(CultureInfo.InvariantCulture);
 
         return hash;
     }
@@ -213,10 +212,17 @@ public partial class DynamicScriptManager : IDynamicScriptManager
     }
 
     /// <inheritdoc/>
-    public void CheckScriptRights(string name)
+    public bool HasScriptPermission(string name)
     {
-        if (registeredScripts.TryGetValue(name, out var script))
-            script.CheckRights(permissions, localizer);
+        return !registeredScripts.TryGetValue(name, out var script) ||
+            script.HasPermission(permissions);
+    }
+
+    /// <inheritdoc/>
+    public string? GetScriptCacheSuffix(string name)
+    {
+        return registeredScripts.TryGetValue(name, out var script) &&
+            script is ICacheSuffix cacheSuffix ? cacheSuffix.CacheSuffix : null;
     }
 
     /// <inheritdoc/>
@@ -246,7 +252,9 @@ public partial class DynamicScriptManager : IDynamicScriptManager
         if (!registeredScripts.TryGetValue(name, out var script))
             return null;
 
-        script.CheckRights(permissions, localizer);
+        if (!script.HasPermission(permissions))
+            throw new ValidationError("AccessDenied", null,
+                CoreTexts.Authorization.AccessDenied.ToString(localizer));
 
         return EnsureScriptContent(name, script, json);
     }

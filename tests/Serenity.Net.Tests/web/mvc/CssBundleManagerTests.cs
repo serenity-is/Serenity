@@ -309,19 +309,28 @@ public class CssBundleManagerTests
     }
 
     [Fact]
-    public void Dynamic_Bundle_CheckRights_Checks_Contained_Scripts()
+    public void Dynamic_Bundle_Skips_Contained_Scripts_Without_Permission()
     {
         var (manager, scripts, _, _, _) = Create(options =>
         {
             options.Enabled = true;
-            options.Bundles["App"] = ["dynamic://MyScript"];
+            options.Bundles["App"] = ["dynamic://MyScript", "dynamic://Denied"];
         });
-        scripts.SetScriptText("MyScript", "css");
+        scripts.SetScriptText("MyScript", ".granted{}");
+        scripts.SetScriptText("Denied", ".denied{}");
+        scripts.HasScriptPermissionCallback = name => name != "Denied";
         manager.Reset();
 
-        scripts.Registered["CssBundle.App"].CheckRights(new MockPermissions(_ => true), NullTextLocalizer.Instance);
+        var bundle = scripts.Registered["CssBundle.App"];
+        var css = bundle.GetScript();
 
         Assert.Contains("MyScript", scripts.CheckedRights);
+        Assert.Contains(".granted{}", css, StringComparison.Ordinal);
+        Assert.DoesNotContain(".denied{}", css, StringComparison.Ordinal);
+
+        var suffix = ((ICacheSuffix)bundle).CacheSuffix;
+        scripts.HasScriptPermissionCallback = null;
+        Assert.NotEqual(suffix, ((ICacheSuffix)bundle).CacheSuffix);
     }
 
     [Fact]

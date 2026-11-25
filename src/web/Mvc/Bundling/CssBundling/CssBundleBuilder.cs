@@ -47,10 +47,9 @@ public partial class CssBundleBuilder(IOptions<CssBundlingOptions> options,
         if (options.NoMinimize != null)
             noMinimize.AddRange(options.NoMinimize);
 
-        var bundleParts = new List<Func<string>>();
-        var parts = new List<Func<string>>();
+        var bundleParts = new List<ConcatenatedScriptPart>();
+        var parts = new List<ConcatenatedScriptPart>();
         var dedupHolder = new HashSet<string>?[1];
-        var scriptNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         foreach (var sourceFile in sourceFiles)
         {
@@ -60,8 +59,10 @@ public partial class CssBundleBuilder(IOptions<CssBundlingOptions> options,
             if (sourceFile.StartsWith("dynamic://", StringComparison.OrdinalIgnoreCase))
             {
                 var scriptName = sourceFile[10..];
-                scriptNames.Add(scriptName);
-                parts.Add(() => LoadDynamicScript(scriptName, minimize, rootPrefix));
+                parts.Add(new ConcatenatedScriptPart(
+                    () => LoadDynamicScript(scriptName, minimize, rootPrefix),
+                    () => WithRecursionCheck(scriptName, () => scriptManager.HasScriptPermission(scriptName)),
+                    () => WithRecursionCheck(scriptName, () => scriptManager.GetScriptCacheSuffix(scriptName))));
                 continue;
             }
 
@@ -71,18 +72,22 @@ public partial class CssBundleBuilder(IOptions<CssBundlingOptions> options,
 
             var sourcePath = sourceUrl[2..];
 
-            parts.Add(() =>
+            parts.Add(new ConcatenatedScriptPart(() =>
             {
                 var stack = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { sourceUrl };
                 return LoadCssFile(sourcePath, sourceUrl, minimize,
                     options.UseMinCSS == true, rootPrefix,
                     processImports, noMinimize, dedupHolder[0], stack);
-            });
+            }));
         }
 
         if (parts.Count > 0)
         {
-            bundleParts.Add(() =>
+            // parts are combined in a single part to dedup imports, while the cache suffix
+            // is determined by a concatenated script of them, e.g. by accessible dynamic parts
+            var partsSuffix = new ConcatenatedScript(parts);
+
+            bundleParts.Add(new ConcatenatedScriptPart(() =>
             {
                 dedupHolder[0] = dedupImports ? NewHashSet() : null;
 
@@ -91,10 +96,13 @@ public partial class CssBundleBuilder(IOptions<CssBundlingOptions> options,
                     var sb = new StringBuilder();
                     foreach (var part in parts)
                     {
+                        if (part.HasPermission is not null && !part.HasPermission())
+                            continue;
+
                         if (sb.Length > 0)
                             sb.Append("\n\n");
 
-                        sb.Append(part());
+                        sb.Append(part.GetScript());
                     }
 
                     return sb.ToString();
@@ -103,37 +111,36 @@ public partial class CssBundleBuilder(IOptions<CssBundlingOptions> options,
                 {
                     dedupHolder[0] = null;
                 }
-            });
+            }, getCacheSuffix: () => partsSuffix.CacheSuffix));
         }
 
-        return new ConcatenatedScript(bundleParts, "\n\n", checkRights: (permissions, localizer) =>
-        {
-            foreach (var scriptName in scriptNames)
-            {
-                if (recursionCheck != null)
-                {
-                    if (recursionCheck.Contains(scriptName) || recursionCheck.Count > 100)
-                        throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture,
-                            "Caught infinite recursion with dynamic scripts '{0}'!",
-                                string.Join(", ", recursionCheck)));
-                }
-                else
-                    recursionCheck = NewHashSet();
-
-                recursionCheck.Add(scriptName);
-                try
-                {
-                    scriptManager.CheckScriptRights(scriptName);
-                }
-                finally
-                {
-                    recursionCheck.Remove(scriptName);
-                }
-            }
-        })
+        return new ConcatenatedScript(bundleParts, "\n\n")
         {
             Permission = SpecialPermissionKeys.Public
         };
+    }
+
+    private static T WithRecursionCheck<T>(string scriptName, Func<T> action)
+    {
+        if (recursionCheck != null)
+        {
+            if (recursionCheck.Contains(scriptName) || recursionCheck.Count > 100)
+                throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture,
+                    "Caught infinite recursion with dynamic scripts '{0}'!",
+                        string.Join(", ", recursionCheck)));
+        }
+        else
+            recursionCheck = NewHashSet();
+
+        recursionCheck.Add(scriptName);
+        try
+        {
+            return action();
+        }
+        finally
+        {
+            recursionCheck.Remove(scriptName);
+        }
     }
 
     private static HashSet<string> NewHashSet()

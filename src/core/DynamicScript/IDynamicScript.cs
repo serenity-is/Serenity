@@ -11,12 +11,10 @@ public interface IDynamicScript
     string GetScript();
 
     /// <summary>
-    /// Checks whether the current user has the permissions required to access this script,
-    /// throwing an exception if access is not allowed.
+    /// Returns true if the current user has the permissions required to access this script.
     /// </summary>
     /// <param name="permissions">Permission service used to check the required permissions.</param>
-    /// <param name="localizer">Text localizer</param>
-    void CheckRights(IPermissionService permissions, ITextLocalizer localizer);
+    bool HasPermission(IPermissionService permissions);
 
     /// <summary>
     /// Group key for cached items

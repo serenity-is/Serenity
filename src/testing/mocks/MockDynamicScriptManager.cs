@@ -11,7 +11,7 @@ public class MockDynamicScriptManager : IDynamicScriptManager
     public List<string> CheckedRights { get; } = [];
     public Dictionary<string, IDynamicScript> Registered { get; } = new(StringComparer.OrdinalIgnoreCase);
     public Func<string, bool, IScriptContent?>? ReadScriptContentCallback { get; set; }
-    public Action<string>? CheckScriptRightsCallback { get; set; }
+    public Func<string, bool>? HasScriptPermissionCallback { get; set; }
     public Dictionary<string, string> RegisteredScriptsResult { get; set; } = [];
 
     public void Changed(string name)
@@ -20,10 +20,16 @@ public class MockDynamicScriptManager : IDynamicScriptManager
         ScriptChanged?.Invoke(name);
     }
 
-    public void CheckScriptRights(string name)
+    public bool HasScriptPermission(string name)
     {
         CheckedRights.Add(name);
-        CheckScriptRightsCallback?.Invoke(name);
+        return HasScriptPermissionCallback?.Invoke(name) ?? true;
+    }
+
+    public string? GetScriptCacheSuffix(string name)
+    {
+        return Registered.TryGetValue(name, out var script) &&
+            script is ICacheSuffix cacheSuffix ? cacheSuffix.CacheSuffix : null;
     }
 
     public Dictionary<string, string> GetRegisteredScripts()

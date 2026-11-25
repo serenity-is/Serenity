@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, type MockInstance, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, type Mock, type MockInstance, vi } from "vitest";
 import { Fluent } from "../base";
 import { ClassicRouter, Router, type IClassicRouter } from "./router";
 
@@ -856,7 +856,7 @@ describe("ClassicRouter history entries of dialogs", () => {
 describe("ClassicRouter page routes", () => {
     let oldLocation: string;
     let router: ClassicRouter;
-    let handle: MockInstance<(route: string) => void>;
+    let handle: Mock<(route: string) => void>;
     let unregister: () => void;
 
     beforeEach(() => {

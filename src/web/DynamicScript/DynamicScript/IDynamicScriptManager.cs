@@ -17,10 +17,17 @@ public interface IDynamicScriptManager
     void Changed(string name);
 
     /// <summary>
-    /// Checks access rights for the dynamic script.
+    /// Returns true if the current user has permission to access the dynamic script,
+    /// or if no script with the name is registered.
     /// </summary>
     /// <param name="name">The registration name.</param>
-    void CheckScriptRights(string name);
+    bool HasScriptPermission(string name);
+
+    /// <summary>
+    /// Gets the cache suffix of the dynamic script, if it implements <see cref="ICacheSuffix"/>.
+    /// </summary>
+    /// <param name="name">The registration name.</param>
+    string? GetScriptCacheSuffix(string name);
 
     /// <summary>
     /// Gets a dictionary of registered script names and their cached hashes.

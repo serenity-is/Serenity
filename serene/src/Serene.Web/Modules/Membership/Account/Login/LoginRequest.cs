@@ -1,6 +1,6 @@
 ﻿namespace Serene.Membership;
 
-[FormScript("Membership.Login")]
+[FormScript("Membership.Login", Permission = SpecialPermissionKeys.Public)]
 [BasedOnRow(typeof(Administration.UserRow), CheckNames = true)]
 public class LoginRequest : ServiceRequest
 {

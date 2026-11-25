@@ -1,6 +1,6 @@
 namespace Serenity.Demo.BasicSamples.Forms;
 
-[FormScript("BasicSamples.StaticTextBlock")]
+[FormScript("BasicSamples.StaticTextBlock", Permission = Northwind.PermissionKeys.General)]
 public class StaticTextBlockForm
 {
     [DisplayText("Static Text")]

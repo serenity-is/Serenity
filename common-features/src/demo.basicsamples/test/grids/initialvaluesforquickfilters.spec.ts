@@ -39,17 +39,19 @@ describe("InitialValuesForQuickFilters", () => {
         const grid = new InitialValuesForQuickFilters({});
         const filters = grid["getQuickFilters"]();
 
-        const endW = { valueAsDate: null as Date };
-        const startW = {
-            valueAsDate: null as Date,
-            element: { nextSibling: () => ({ getWidget: () => endW }) }
-        };
+        // the range is set through the state of the filter, as the editor of the range can be of any kind, e.g. a
+        // single input one that the application gives to all of its date columns
         const orderDate = filters.find((x: any) => x.field === fld.OrderDate);
         expect(orderDate).toBeTruthy();
-        (orderDate as any).init(startW);
-        expect(startW.valueAsDate).toEqual(new Date(2010, 4, 1));
-        expect(endW.valueAsDate).toBeTruthy();
-        expect((orderDate as any).init).toEqual(expect.any(Function));
+        const loadState = vi.fn();
+        (orderDate as any).loadState = loadState;
+        const widget = {};
+        (orderDate as any).init(widget);
+        expect(loadState).toHaveBeenCalledTimes(1);
+        expect(loadState.mock.calls[0][0]).toBe(widget);
+        const state = loadState.mock.calls[0][1];
+        expect(state[0]).toBe("2010-05-01");
+        expect(state[1]).toMatch(/^\d{4}-11-01$/);
 
         const shippingState = filters.find((x: any) => x.field === fld.ShippingState);
         expect(shippingState).toBeTruthy();
