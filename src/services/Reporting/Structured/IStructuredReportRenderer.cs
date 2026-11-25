@@ -7,10 +7,12 @@ namespace Serenity.Reporting;
 public interface IStructuredReportRenderer
 {
     /// <summary>
-    /// Renders a structured report in the export format of the options, e.g. "xlsx" or "csv".
+    /// Renders a structured report in the export format of the options, e.g. "xlsx", "csv" or "pdf".
     /// </summary>
     /// <param name="report">The report.</param>
     /// <param name="renderOptions">The render options.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The render result.</returns>
-    ReportRenderResult Render(IStructuredReport report, ReportRenderOptions renderOptions);
+    Task<ReportRenderResult> RenderAsync(IStructuredReport report, ReportRenderOptions renderOptions,
+        CancellationToken cancellationToken = default);
 }

@@ -24,71 +24,107 @@ public class HtmlReportCallbackUrlInterceptor(
     public ReportRenderResult InterceptCallback(ReportRenderOptions renderOptions, Func<ReportRenderOptions, ReportRenderResult> action)
     {
         ArgumentNullException.ThrowIfNull(renderOptions);
+        ArgumentNullException.ThrowIfNull(action);
 
+        var (undoImpersonate, undoGrant) = ApplyTicket();
+        try
+        {
+            return action(renderOptions);
+        }
+        finally
+        {
+            UndoTicket(undoImpersonate, undoGrant);
+        }
+    }
+
+    /// <summary>
+    /// Intercepts a report callback, whose action is asynchronous, applying impersonation and transient grants from
+    /// the report auth cookie while it runs.
+    /// </summary>
+    /// <param name="renderOptions">The render options.</param>
+    /// <param name="action">The callback action.</param>
+    /// <returns>The report render result.</returns>
+    public async Task<ReportRenderResult> InterceptCallbackAsync(ReportRenderOptions renderOptions,
+        Func<ReportRenderOptions, Task<ReportRenderResult>> action)
+    {
+        ArgumentNullException.ThrowIfNull(renderOptions);
+        ArgumentNullException.ThrowIfNull(action);
+
+        var (undoImpersonate, undoGrant) = ApplyTicket();
+        try
+        {
+            return await action(renderOptions);
+        }
+        finally
+        {
+            UndoTicket(undoImpersonate, undoGrant);
+        }
+    }
+
+    private (bool undoImpersonate, bool undoGrant) ApplyTicket()
+    {
         IImpersonator? impersonator = userAccessor as IImpersonator;
         ITransientGrantor? transientGrantor = permissionService as ITransientGrantor;
         bool undoImpersonate = false;
         bool undoGrant = false;
         try
         {
-            try
+            if (dataProtectionProvider != null &&
+                (impersonator != null || transientGrantor != null) &&
+                httpContextAccessor?.HttpContext?.Request?.Cookies?.TryGetValue(
+                HtmlReportCallbackUrlBuilder.ReportAuthCookieName, out var token) == true &&
+                !string.IsNullOrEmpty(token))
             {
-                if (dataProtectionProvider != null &&
-                    (impersonator != null || transientGrantor != null) &&
-                    httpContextAccessor?.HttpContext?.Request?.Cookies?.TryGetValue(
-                    HtmlReportCallbackUrlBuilder.ReportAuthCookieName, out var token) == true &&
-                    !string.IsNullOrEmpty(token))
+                using var br = dataProtectionProvider.CreateProtector(HtmlReportCallbackUrlBuilder.ReportAuthCookieName)
+                    .UnprotectBinary(token);
+                var dt = DateTime.FromBinary(br.ReadInt64());
+                if (dt > DateTime.UtcNow)
                 {
-                    using var br = dataProtectionProvider.CreateProtector(HtmlReportCallbackUrlBuilder.ReportAuthCookieName)
-                        .UnprotectBinary(token);
-                    var dt = DateTime.FromBinary(br.ReadInt64());
-                    if (dt > DateTime.UtcNow)
+                    var username = br.ReadString();
+                    if (impersonator != null &&
+                        !string.IsNullOrEmpty(username) &&
+                        userClaimCreator != null &&
+                        userAccessor?.User?.Identity?.Name != username)
                     {
-                        var username = br.ReadString();
-                        if (impersonator != null &&
-                            !string.IsNullOrEmpty(username) &&
-                            userClaimCreator != null &&
-                            userAccessor?.User?.Identity?.Name != username)
-                        {
-                            var principal = userClaimCreator.CreatePrincipal(username, "ReportImpersonation");
-                            impersonator.Impersonate(principal);
-                            undoImpersonate = true;
-                        }
+                        var principal = userClaimCreator.CreatePrincipal(username, "ReportImpersonation");
+                        impersonator.Impersonate(principal);
+                        undoImpersonate = true;
+                    }
 
-                        if (transientGrantor != null)
+                    if (transientGrantor != null)
+                    {
+                        var count = br.ReadInt32();
+                        if (count == -1)
                         {
-                            var count = br.ReadInt32();
-                            if (count == -1)
-                            {
-                                transientGrantor.GrantAll();
-                                undoGrant = true;
-                            }
-                            else if (count > 0 && count < 10000)
-                            {
-                                var perms = new string[count];
-                                for (var i = 0; i < count; i++)
-                                    perms[i] = br.ReadString();
-                                transientGrantor.Grant(perms);
-                                undoGrant = true;
-                            }
+                            transientGrantor.GrantAll();
+                            undoGrant = true;
+                        }
+                        else if (count > 0 && count < 10000)
+                        {
+                            var perms = new string[count];
+                            for (var i = 0; i < count; i++)
+                                perms[i] = br.ReadString();
+                            transientGrantor.Grant(perms);
+                            undoGrant = true;
                         }
                     }
                 }
             }
-            catch (Exception ex)
-            {
-                // ignore errors while decrypting / deserializing / applying ticket
-                logger.LogError(ex, "Error decrypting/applying report auth ticket");
-            }
-
-            return action(renderOptions);
         }
-        finally
+        catch (Exception ex)
         {
-            if (undoImpersonate)
-                impersonator?.UndoImpersonate();
-            if (undoGrant)
-                transientGrantor?.UndoGrant();
+            // ignore errors while decrypting / deserializing / applying ticket
+            logger.LogError(ex, "Error decrypting/applying report auth ticket");
         }
+
+        return (undoImpersonate, undoGrant);
+    }
+
+    private void UndoTicket(bool undoImpersonate, bool undoGrant)
+    {
+        if (undoImpersonate)
+            (userAccessor as IImpersonator)?.UndoImpersonate();
+        if (undoGrant)
+            (permissionService as ITransientGrantor)?.UndoGrant();
     }
 }

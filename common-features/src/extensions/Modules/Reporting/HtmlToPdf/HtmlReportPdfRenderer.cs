@@ -113,4 +113,22 @@ public class HtmlReportPdfRenderer(
             renderUrl?.Dispose();
         }
     }
+
+    /// <inheritdoc/>
+    public virtual async Task<byte[]> RenderAsync(IReport report, ReportRenderOptions renderOptions,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(renderOptions);
+
+        var converterOptions = GetConverterOptions(report, renderOptions, out var renderUrl);
+        try
+        {
+            var converter = GetConverterFor(report, renderOptions);
+            return await converter.ConvertAsync(converterOptions, cancellationToken);
+        }
+        finally
+        {
+            renderUrl?.Dispose();
+        }
+    }
 }

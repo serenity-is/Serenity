@@ -9,6 +9,17 @@ public class DefaultReportRendererTests
         public IDictionary<string, object?> GetAdditionalData() => new Dictionary<string, object?> { ["k"] = "v" };
     }
 
+    [ReportDesign("AsyncDesign")]
+    private class AsyncDataReport : IReport
+    {
+        public object GetData() => throw new InvalidOperationException();
+        public async Task<object?> GetDataAsync(System.Threading.CancellationToken cancellationToken)
+        {
+            await Task.Yield();
+            return "async model";
+        }
+    }
+
     private class NoDesignReport : IReport
     {
         public object GetData() => "model";
@@ -71,13 +82,42 @@ public class DefaultReportRendererTests
 
     private class StructuredReport : IStructuredReport
     {
-        public StructuredReportResult GetResult() => new();
+        public async Task<StructuredReportResult> GetResultAsync(System.Threading.CancellationToken cancellationToken)
+        {
+            await Task.Yield();
+            return new StructuredReportResult { EmptyText = "async" };
+        }
     }
 
     private class FakeStructuredRenderer : IStructuredReportRenderer
     {
-        public ReportRenderResult Render(IStructuredReport report, ReportRenderOptions renderOptions) =>
-            new() { FileExtension = "." + renderOptions.ExportFormat };
+        public async Task<ReportRenderResult> RenderAsync(IStructuredReport report, ReportRenderOptions renderOptions,
+            System.Threading.CancellationToken cancellationToken)
+        {
+            await Task.Yield();
+            return new() { FileExtension = "." + renderOptions.ExportFormat };
+        }
+    }
+
+    private class AsyncPdfRenderer : IHtmlReportPdfRenderer
+    {
+        public byte[] Render(IReport report, ReportRenderOptions renderOptions) => throw new InvalidOperationException();
+        public async Task<byte[]> RenderAsync(IReport report, ReportRenderOptions renderOptions, System.Threading.CancellationToken cancellationToken)
+        {
+            await Task.Yield();
+            return [5, 6];
+        }
+    }
+
+    private class SyncInterceptor : IReportCallbackInterceptor
+    {
+        public List<string> Log { get; } = [];
+        public ReportRenderResult InterceptCallback(ReportRenderOptions renderOptions, Func<ReportRenderOptions, ReportRenderResult> action)
+        {
+            Log.Add("before");
+            try { return action(renderOptions); }
+            finally { Log.Add("after"); }
+        }
     }
 
     private static DefaultReportRenderer Create(ITextLocalizer? localizer = null)
@@ -212,7 +252,7 @@ public class DefaultReportRendererTests
     [Fact]
     public void Structured_Report_Data_Is_Its_Result()
     {
-        Assert.IsType<StructuredReportResult>(((IReport)new StructuredReport()).GetData());
+        Assert.Equal("async", Assert.IsType<StructuredReportResult>(((IReport)new StructuredReport()).GetData()).EmptyText);
     }
 
     [Fact]
@@ -230,5 +270,73 @@ public class DefaultReportRendererTests
     public void Render_Throws_For_A_Structured_Report_Without_A_Structured_Report_Renderer()
     {
         Assert.Throws<InvalidOperationException>(() => Create().Render(new StructuredReport(), new ReportRenderOptions()));
+    }
+
+    [Fact]
+    public async Task RenderAsync_Renders_The_Pdf_Of_An_Html_Report_Asynchronously()
+    {
+        var renderer = new DefaultReportRenderer(new FakeExcelRenderer(), new AsyncPdfRenderer(), new ServiceCollection().BuildServiceProvider());
+
+        var result = await renderer.RenderAsync(new DesignReport(), new ReportRenderOptions { ExportFormat = "PDF" });
+
+        Assert.Equal([5, 6], result.ContentBytes);
+        Assert.Equal(".pdf", result.FileExtension);
+        Assert.Equal("application/pdf", result.MimeType);
+    }
+
+    [Fact]
+    public async Task RenderAsync_Uses_Render_Of_A_Pdf_Renderer_That_Is_Not_Async()
+    {
+        var result = await Create().RenderAsync(new DesignReport(), new ReportRenderOptions { ExportFormat = "pdf" });
+        Assert.Equal([3, 4], result.ContentBytes);
+    }
+
+    [Fact]
+    public async Task RenderAsync_Renders_A_Structured_Report_Asynchronously()
+    {
+        var services = new ServiceCollection().AddSingleton<IStructuredReportRenderer, FakeStructuredRenderer>().BuildServiceProvider();
+        var renderer = new DefaultReportRenderer(new FakeExcelRenderer(), new FakePdfRenderer(), services);
+
+        var result = await renderer.RenderAsync(new StructuredReport(), new ReportRenderOptions { ExportFormat = "pdf" });
+
+        Assert.Equal(".pdf", result.FileExtension);
+        Assert.Equal("async", Assert.IsType<StructuredReportResult>(await ((IReport)new StructuredReport()).GetDataAsync()).EmptyText);
+        await Assert.ThrowsAsync<InvalidOperationException>(() => Create().RenderAsync(new StructuredReport(), new ReportRenderOptions()));
+    }
+
+    [Fact]
+    public async Task RenderAsync_Renders_The_Other_Reports_As_Render_Does()
+    {
+        var renderer = Create();
+
+        Assert.Equal([1, 2], (await renderer.RenderAsync(new DataOnlyReport(), new ReportRenderOptions { ExportFormat = "pdf" })).ContentBytes);
+        Assert.Equal("https://example.com/report", (await renderer.RenderAsync(new ExternalReport(), new ReportRenderOptions())).RedirectUri);
+        await Assert.ThrowsAsync<ArgumentNullException>(() => renderer.RenderAsync(null!, new ReportRenderOptions()));
+        await Assert.ThrowsAsync<ArgumentNullException>(() => renderer.RenderAsync(new DataOnlyReport(), null!));
+    }
+
+    [Fact]
+    public async Task InterceptCallbackAsync_Runs_An_Async_Action_In_The_Sync_Interceptor_By_Default()
+    {
+        var interceptor = new SyncInterceptor();
+        var result = await ((IReportCallbackInterceptor)interceptor).InterceptCallbackAsync(new ReportRenderOptions(), async options =>
+        {
+            await Task.Yield();
+            interceptor.Log.Add("action");
+            return new ReportRenderResult { FileExtension = ".x" };
+        });
+
+        Assert.Equal(".x", result.FileExtension);
+        Assert.Equal(["before", "action", "after"], interceptor.Log);
+    }
+
+    [Fact]
+    public async Task RenderAsync_Gets_The_Data_Of_An_Html_Report_Asynchronously()
+    {
+        var result = await Create().RenderAsync(new AsyncDataReport(), new ReportRenderOptions { PreviewMode = true });
+
+        Assert.Equal("AsyncDesign", result.ViewName);
+        Assert.Equal("async model", result.Model);
+        Assert.Equal("model", (await Create().RenderAsync(new DesignReport(), new ReportRenderOptions { PreviewMode = true })).Model);
     }
 }

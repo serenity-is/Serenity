@@ -30,7 +30,7 @@ public class ReportController(IReportFactory reportFactory,
     /// <param name="ext">The export format extension.</param>
     /// <param name="print">Whether to render in print mode.</param>
     /// <returns>The report render result.</returns>
-    public ActionResult Render(string key, string opt, string ext, int? print = 0)
+    public Task<ActionResult> Render(string key, string opt, string ext, int? print = 0)
     {
         return Execute(key, opt, ext, download: false, printing: print != 0);
     }
@@ -42,12 +42,12 @@ public class ReportController(IReportFactory reportFactory,
     /// <param name="opt">The report parameters.</param>
     /// <param name="ext">The export format extension.</param>
     /// <returns>The report download result.</returns>
-    public ActionResult Download(string key, string opt, string ext)
+    public Task<ActionResult> Download(string key, string opt, string ext)
     {
         return Execute(key, opt, ext, download: true, printing: true);
     }
 
-    private ActionResult Execute(string key, string opt, string ext, bool download, bool printing)
+    private async Task<ActionResult> Execute(string key, string opt, string ext, bool download, bool printing)
     {
         var renderOptions = new ReportRenderOptions
         {
@@ -57,14 +57,15 @@ public class ReportController(IReportFactory reportFactory,
             ReportParams = opt
         };
 
-        ReportRenderResult callback(ReportRenderOptions renderOptions)
+        var cancellationToken = HttpContext?.RequestAborted ?? default;
+        Task<ReportRenderResult> callback(ReportRenderOptions renderOptions)
         {
             var report = reportFactory.Create(renderOptions.ReportKey!, renderOptions.ReportParams, validatePermission: true);
-            return reportRenderer.Render(report, renderOptions);
+            return reportRenderer.RenderAsync(report, renderOptions, cancellationToken);
         }
 
         var result = callbackInterceptor != null ?
-            callbackInterceptor.InterceptCallback(renderOptions, callback) : callback(renderOptions);
+            await callbackInterceptor.InterceptCallbackAsync(renderOptions, callback) : await callback(renderOptions);
 
         if (!string.IsNullOrEmpty(result.RedirectUri))
             return Redirect(result.RedirectUri);
@@ -77,7 +78,7 @@ public class ReportController(IReportFactory reportFactory,
         }
 
         var downloadName = (string.IsNullOrEmpty(result.FileName) ?
-            ("Report_" + DateTime.Now.ToString("yyyyMMdd_HHss", CultureInfo.InvariantCulture))
+            ("Report_" + DateTime.Now.ToString("yyyyMMdd_HHmmss", CultureInfo.InvariantCulture))
             : result.FileName) + result.FileExtension;
 
         Response.Headers[HeaderNames.ContentDisposition] = $"{(download ? "attachment" : "inline")};filename=" +

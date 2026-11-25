@@ -87,10 +87,28 @@ public class DefaultReportRenderer(IDataReportExcelRenderer excelRenderer,
     protected virtual ReportRenderResult RenderStructuredReport(IStructuredReport report,
         ReportRenderOptions renderOptions)
     {
-        var renderer = serviceProvider.GetService(typeof(IStructuredReportRenderer)) as IStructuredReportRenderer ??
-            throw new InvalidOperationException("Structured reports require an IStructuredReportRenderer service to be registered!");
+        // the structured report renderers are asynchronous only, as the reports are, prefer RenderAsync
+        return GetStructuredReportRenderer().RenderAsync(report, renderOptions).GetAwaiter().GetResult();
+    }
 
-        return renderer.Render(report, renderOptions);
+    /// <summary>
+    /// Renders a structured report asynchronously with the <see cref="IStructuredReportRenderer"/> service.
+    /// </summary>
+    /// <param name="report">The report.</param>
+    /// <param name="renderOptions">The options.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The render result.</returns>
+    /// <exception cref="InvalidOperationException">No <see cref="IStructuredReportRenderer"/> is registered.</exception>
+    protected virtual Task<ReportRenderResult> RenderStructuredReportAsync(IStructuredReport report,
+        ReportRenderOptions renderOptions, CancellationToken cancellationToken)
+    {
+        return GetStructuredReportRenderer().RenderAsync(report, renderOptions, cancellationToken);
+    }
+
+    private IStructuredReportRenderer GetStructuredReportRenderer()
+    {
+        return serviceProvider.GetService(typeof(IStructuredReportRenderer)) as IStructuredReportRenderer ??
+            throw new InvalidOperationException("Structured reports require an IStructuredReportRenderer service to be registered!");
     }
 
     /// <summary>
@@ -101,6 +119,25 @@ public class DefaultReportRenderer(IDataReportExcelRenderer excelRenderer,
     /// <returns>The render result.</returns>
     /// <exception cref="InvalidOperationException">The report has no design attribute.</exception>
     protected virtual ReportRenderResult RenderAsHtml(IReport report, ReportRenderOptions renderOptions)
+    {
+        return RenderAsHtml(report, renderOptions, report.GetData());
+    }
+
+    /// <summary>
+    /// Renders a report as HTML, with its data from <see cref="IReport.GetDataAsync"/>.
+    /// </summary>
+    /// <param name="report">The report.</param>
+    /// <param name="renderOptions">The options.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The render result.</returns>
+    /// <exception cref="InvalidOperationException">The report has no design attribute.</exception>
+    protected virtual async Task<ReportRenderResult> RenderAsHtmlAsync(IReport report, ReportRenderOptions renderOptions,
+        CancellationToken cancellationToken)
+    {
+        return RenderAsHtml(report, renderOptions, await report.GetDataAsync(cancellationToken));
+    }
+
+    private ReportRenderResult RenderAsHtml(IReport report, ReportRenderOptions renderOptions, object? data)
     {
         var result = new ReportRenderResult()
         {
@@ -119,7 +156,7 @@ public class DefaultReportRenderer(IDataReportExcelRenderer excelRenderer,
         if (renderOptions.PreviewMode)
         {
             result.ViewName = GetViewName(report, renderOptions);
-            result.Model = report.GetData();
+            result.Model = data;
             setViewData(result.ViewData);
             return result;
         }
@@ -127,7 +164,7 @@ public class DefaultReportRenderer(IDataReportExcelRenderer excelRenderer,
         var requestServices = httpContextAccessor?.HttpContext?.RequestServices ?? serviceProvider;
 
         var html = TemplateHelper.RenderViewToString(requestServices, GetViewName(report, renderOptions), 
-            model: report.GetData(), viewContext => setViewData(viewContext.ViewData));
+            model: data, viewContext => setViewData(viewContext.ViewData));
 
         result.ContentBytes = Encoding.UTF8.GetBytes(html);
 
@@ -190,6 +227,25 @@ public class DefaultReportRenderer(IDataReportExcelRenderer excelRenderer,
     }
 
     /// <summary>
+    /// Renders an HTML report as PDF asynchronously.
+    /// </summary>
+    /// <param name="report">The report.</param>
+    /// <param name="renderOptions">The render options.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The render result.</returns>
+    protected virtual async Task<ReportRenderResult> RenderAsPdfAsync(IReport report, ReportRenderOptions renderOptions,
+        CancellationToken cancellationToken)
+    {
+        return new ReportRenderResult
+        {
+            ContentBytes = await htmlReportPdfRenderer.RenderAsync(report, renderOptions, cancellationToken),
+            FileExtension = ".pdf",
+            FileName = GetFileNameFor(report, localizer),
+            MimeType = "application/pdf",
+        };
+    }
+
+    /// <summary>
     /// Renders an unknown format. Can be overridden in derived classes.
     /// </summary>
     /// <param name="report">The report.</param>
@@ -218,6 +274,34 @@ public class DefaultReportRenderer(IDataReportExcelRenderer excelRenderer,
 
         return RenderHtmlReport(report, renderOptions);
     }
+
+    /// <inheritdoc />
+    /// <remarks>
+    /// An HTML report, with its data from <see cref="IReport.GetDataAsync"/>, its PDF, and a structured report, are
+    /// rendered asynchronously, the others as <see cref="Render"/> does.
+    /// </remarks>
+    public async Task<ReportRenderResult> RenderAsync(IReport report, ReportRenderOptions renderOptions,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(report);
+        ArgumentNullException.ThrowIfNull(renderOptions);
+
+        if (report is not IDataOnlyReport && report is not IExternalReport)
+        {
+            if (report is IStructuredReport structuredReport)
+                return await RenderStructuredReportAsync(structuredReport, renderOptions, cancellationToken);
+
+            var format = renderOptions.ExportFormat ?? "html";
+            if (string.Equals(format, "pdf", StringComparison.OrdinalIgnoreCase))
+                return await RenderAsPdfAsync(report, renderOptions, cancellationToken);
+
+            if (string.Equals(format, "htm", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(format, "html", StringComparison.OrdinalIgnoreCase))
+                return await RenderAsHtmlAsync(report, renderOptions, cancellationToken);
+        }
+
+        return Render(report, renderOptions);
+    }
     
     private static string GetFileNameFor(IReport report, ITextLocalizer? localizer)
     {
@@ -238,7 +322,7 @@ public class DefaultReportRenderer(IDataReportExcelRenderer excelRenderer,
             report.GetType().Name;
 
         return filePrefix + "_" +
-            DateTime.Now.ToString("yyyyMMdd_HHss", CultureInfo.InvariantCulture);
+            DateTime.Now.ToString("yyyyMMdd_HHmmss", CultureInfo.InvariantCulture);
     }
 
 }

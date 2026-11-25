@@ -10,8 +10,13 @@ public interface IStructuredReport : IReport
     /// <summary>
     /// Runs the report with its current parameters and returns its result.
     /// </summary>
-    StructuredReportResult GetResult();
+    /// <param name="cancellationToken">The cancellation token.</param>
+    Task<StructuredReportResult> GetResultAsync(CancellationToken cancellationToken = default);
 
     /// <inheritdoc/>
-    object? IReport.GetData() => GetResult();
+    /// <remarks>Waits for <see cref="GetResultAsync"/>, use <see cref="IReport.GetDataAsync"/> instead where possible.</remarks>
+    object? IReport.GetData() => GetResultAsync().GetAwaiter().GetResult();
+
+    /// <inheritdoc/>
+    async Task<object?> IReport.GetDataAsync(CancellationToken cancellationToken) => await GetResultAsync(cancellationToken);
 }
