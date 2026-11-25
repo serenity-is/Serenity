@@ -31,6 +31,10 @@ function initWidgetPage<TWidget extends Widget<P>, P>(widgetOrType: (CreateWidge
         oldFunction?.(widget.domNode);
         widget.init();
     }
+    // a panel resolves the route of the page too when it has a route handler, e.g. an entity grid, so a link or a refresh
+    // of "#edit/12" opens the dialog as it does on a grid page
+    if (noRoute && (widget.domNode.classList.contains("route-handler") || widget.domNode.querySelector(".route-handler")))
+        noRoute = false;
     initFullHeightGridPage(widget.domNode, { setHeight: false, noRoute: noRoute });
     return widget;
 }
@@ -78,14 +82,14 @@ export function gridPageInit<TGrid extends Widget<P>, P>(gridOrType: (CreateWidg
 }
 
 /**
- * Initializes a Serenity panel page without hash-router integration.
+ * Initializes a Serenity panel page. It resolves the hash route on load only when the panel has a route handler, e.g. an entity grid.
  * Compat shim for the legacy `panelPageInit` / `Serenity.panelPageInit` API. Accepts either an existing panel instance or a widget class + props.
  * @param panel - An existing panel widget instance (must expose `domNode`).
- * @returns The same panel widget after layout initialization (`noRoute: true`).
+ * @returns The same panel widget after layout initialization.
  */
 export function panelPageInit<TGrid extends Widget<P>, P>(panel: TGrid & { domNode: HTMLElement }): TGrid;
 /**
- * Initializes a Serenity panel page without hash-router integration.
+ * Initializes a Serenity panel page. It resolves the hash route on load only when the panel has a route handler, e.g. an entity grid.
  * @param type - Panel widget class to instantiate.
  * @param props - Optional widget properties.
  * @returns The newly created and initialized panel widget.

@@ -293,6 +293,30 @@ describe('panelPageInit', () => {
 
         document.body.removeChild(panelDiv);
     });
+
+    it('resolves the route of the page only when the panel has a route handler', async () => {
+        const { panelPageInit } = await import('./layout');
+        const { Widget } = await import('../ui/widgets/widget');
+
+        class PlainPanel extends Widget {
+        }
+
+        class GridPanel extends Widget {
+            protected override renderContents(): any {
+                const grid = document.createElement("div");
+                grid.className = "route-handler";
+                return grid;
+            }
+        }
+
+        document.body.removeAttribute('data-fhrouteinit');
+        panelPageInit(new PlainPanel({}));
+        expect(document.body.getAttribute('data-fhrouteinit')).toBeNull();
+
+        panelPageInit(new GridPanel({}));
+        expect(document.body.getAttribute('data-fhrouteinit')).toBe('true');
+        document.body.removeAttribute('data-fhrouteinit');
+    });
 });
 
 describe('initWidgetPage paths via gridPageInit', () => {
