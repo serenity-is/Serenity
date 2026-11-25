@@ -29,6 +29,19 @@ export class SelectEditor<P extends SelectEditorOptions = SelectEditorOptions> e
     }
 
     /**
+     * Replaces the items of the editor, e.g. when they depend on the value of another field. The value is kept while
+     * it is one of the new items, and cleared otherwise.
+     * @param items - The items, as for {@link SelectEditorOptions.items}.
+     */
+    setItems(items: any[]) {
+        const value = this.value;
+        this.options.items = items;
+        this.updateItems();
+        if (value)
+            this.value = this.itemById[value] ? value : null;
+    }
+
+    /**
      * Returns the text for the empty option.
      * @returns The empty option text.
      */

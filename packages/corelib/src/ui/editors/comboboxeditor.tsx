@@ -155,6 +155,7 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
     declare private combobox: Combobox;
     declare private _items: ComboboxItem<TItem>[];
     declare private _itemById: { [key: string]: ComboboxItem<TItem> };
+    declare private _itemFilter: (item: ComboboxItem<TItem>) => boolean;
     declare protected lastCreateTerm: string;
 
     /**
@@ -471,7 +472,9 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
                     items = (query.idList || []).map(id => this._itemById[id] || this._items.find(z => z.id == id)).filter(x => x != null);
                 }
                 else {
-                    items = ComboboxEditor.filterByText(this._items, x => x.text, query.searchTerm);
+                    const filter = this._itemFilter;
+                    items = ComboboxEditor.filterByText(filter ? this._items.filter(x => filter(x)) : this._items,
+                        x => x.text, query.searchTerm);
                 }
 
                 if (this.isAutoComplete() && query.idList &&
@@ -1251,6 +1254,19 @@ export class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
      * Returns the filter field name.
      * @returns The filter field.
      */
+    /**
+     * A filter of the items that the editor offers, e.g. the ones that suit the value of another field. It doesn't
+     * change the items, so the selected one is still shown when it doesn't pass. It applies to the editors whose items
+     * are in place, e.g. a select editor, not to the ones that search them on the server.
+     */
+    get itemFilter(): (item: ComboboxItem<TItem>) => boolean {
+        return this._itemFilter ?? null;
+    }
+
+    set itemFilter(value: (item: ComboboxItem<TItem>) => boolean) {
+        this._itemFilter = value ?? null;
+    }
+
     protected get_filterField() {
         return (this.options as ComboboxEditorOptions).filterField;
     }

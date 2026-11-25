@@ -39,4 +39,28 @@ describe("SelectEditor", () => {
         expect((editor as any).emptyItemText()).toBe("");
         editor.destroy();
     });
+
+    it("setItems replaces the items, and keeps the value only while it is one of them", () => {
+        const editor = new SelectEditor({ items: ["a", "b"] } as any);
+        editor.value = "b";
+        editor.setItems([["b", "Bee"], ["c", "Cee"]]);
+        expect(editor["_items"].map((x: any) => x.text)).toEqual(["Bee", "Cee"]);
+        expect(editor.value).toBe("b");
+        editor.setItems(["c"]);
+        expect(editor.value).toBeFalsy();
+        editor.destroy();
+    });
+
+    it("itemFilter limits the items it offers, but not the selected one", () => {
+        const editor = new SelectEditor({ items: ["a", "b", "c"] } as any);
+        editor.value = "b";
+        editor.itemFilter = item => item.id !== "b";
+        const options = (editor as any).getComboboxOptions();
+        expect(options.search({ searchTerm: "", skip: 0, take: 10 }).items.map((x: any) => x.id)).toEqual(["a", "c"]);
+        expect(options.search({ initSelection: true, idList: ["b"], skip: 0 }).items[0].id).toBe("b");
+        expect(editor.value).toBe("b");
+        editor.itemFilter = null;
+        expect(options.search({ searchTerm: "", skip: 0, take: 10 }).items).toHaveLength(3);
+        editor.destroy();
+    });
 });

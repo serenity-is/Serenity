@@ -6145,16 +6145,16 @@ export declare function gridPageInit<TGrid extends Widget<P>, P>(grid: TGrid & {
  */
 export declare function gridPageInit<TGrid extends Widget<P>, P>(type: CreateWidgetParams<TGrid, P>["type"], props?: WidgetProps<P>): TGrid;
 /**
- * Initializes a Serenity panel page without hash-router integration.
+ * Initializes a Serenity panel page. It resolves the hash route on load only when the panel has a route handler, e.g. an entity grid.
  * Compat shim for the legacy `panelPageInit` / `Serenity.panelPageInit` API. Accepts either an existing panel instance or a widget class + props.
  * @param panel - An existing panel widget instance (must expose `domNode`).
- * @returns The same panel widget after layout initialization (`noRoute: true`).
+ * @returns The same panel widget after layout initialization.
  */
 export declare function panelPageInit<TGrid extends Widget<P>, P>(panel: TGrid & {
     domNode: HTMLElement;
 }): TGrid;
 /**
- * Initializes a Serenity panel page without hash-router integration.
+ * Initializes a Serenity panel page. It resolves the hash route on load only when the panel has a route handler, e.g. an entity grid.
  * @param type - Panel widget class to instantiate.
  * @param props - Optional widget properties.
  * @returns The newly created and initialized panel widget.
@@ -10721,6 +10721,7 @@ export declare class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
     private combobox;
     private _items;
     private _itemById;
+    private _itemFilter;
     protected lastCreateTerm: string;
     /**
      * Creates a combobox editor.
@@ -11134,6 +11135,13 @@ export declare class ComboboxEditor<P, TItem> extends EditorWidget<P> implements
      * Returns the filter field name.
      * @returns The filter field.
      */
+    /**
+     * A filter of the items that the editor offers, e.g. the ones that suit the value of another field. It doesn't
+     * change the items, so the selected one is still shown when it doesn't pass. It applies to the editors whose items
+     * are in place, e.g. a select editor, not to the ones that search them on the server.
+     */
+    get itemFilter(): (item: ComboboxItem<TItem>) => boolean;
+    set itemFilter(value: (item: ComboboxItem<TItem>) => boolean);
     protected get_filterField(): string;
     /**
      * Returns the filter field name.
@@ -11243,6 +11251,12 @@ export declare class SelectEditor<P extends SelectEditorOptions = SelectEditorOp
      * @returns The list of items.
      */
     getItems(): any[];
+    /**
+     * Replaces the items of the editor, e.g. when they depend on the value of another field. The value is kept while
+     * it is one of the new items, and cleared otherwise.
+     * @param items - The items, as for {@link SelectEditorOptions.items}.
+     */
+    setItems(items: any[]): void;
     /**
      * Returns the text for the empty option.
      * @returns The empty option text.
