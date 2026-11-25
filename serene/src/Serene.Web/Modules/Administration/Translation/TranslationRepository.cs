@@ -146,6 +146,7 @@ public partial class TranslationRepository(IRequestContext context, IWebHostEnvi
         var translations = List(new TranslationListRequest
         {
             SourceLanguageID = request.TargetLanguageID,
+            TargetLanguageID = request.TargetLanguageID
         }).Entities.ToDictionary(x => x.Key!, x => x.CustomText);
 
         foreach (var item in request.Translations)

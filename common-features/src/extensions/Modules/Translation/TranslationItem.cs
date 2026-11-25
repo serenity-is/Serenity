@@ -27,6 +27,13 @@ public class TranslationItem
     public string? CustomText { get; set; }
 
     /// <summary>
+    /// The translation the application has in the target language under the user translation, which the target text
+    /// goes back to when the user translation is removed. It is only set for an item with a user translation: an empty
+    /// string when the application has no translation of it, and null when it is not known.
+    /// </summary>
+    public string? BuiltInText { get; set; }
+
+    /// <summary>
     /// Gets or sets a value indicating whether the item has a translation.
     /// </summary>
     public bool HasTranslation { get; set; }

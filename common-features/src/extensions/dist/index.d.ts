@@ -92,6 +92,7 @@ export interface TranslationItem {
     SourceText?: string;
     TargetText?: string;
     CustomText?: string;
+    BuiltInText?: string;
     HasTranslation?: boolean;
     UserTranslated?: boolean;
 }
