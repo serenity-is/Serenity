@@ -19,9 +19,12 @@ public class LayoutScriptFilesTests
     private static ServiceProvider CreateServices(Attribute[] attributes,
         MockDynamicScriptManager scripts, MockHostEnvironment env,
         LayoutScriptFileOptions? options = null, bool bundlingEnabled = true,
-        IFeatureToggles? featureToggles = null, IWebRootFileWatcher? layoutWatcher = null)
+        IFeatureToggles? featureToggles = null, IWebRootFileWatcher? layoutWatcher = null,
+        Func<string, bool>? hasPermission = null)
     {
         var services = new ServiceCollection();
+        // layout script files require "?" by default, which this logged-in user has
+        services.AddSingleton<IPermissionService>(new MockPermissions(hasPermission ?? (_ => true)));
         services.AddSingleton<IDynamicScriptManager>(scripts);
         services.AddSingleton<IScriptBundleManager>(new MockScriptBundleManager());
         services.AddSingleton<IContentHashCache>(new MockContentHashCache());
@@ -134,6 +137,88 @@ public class LayoutScriptFilesTests
 
         Assert.NotEqual(first, second);
         Assert.Equal(2, scripts.Registered.Count);
+    }
+
+    [Fact]
+    public void LayoutScriptFiles_Leaves_Out_Files_Without_Permission_With_One_Bundle_For_All_Users()
+    {
+        var env = new MockHostEnvironment();
+        env.AddWebFile("a.js", "A_MARK");
+        env.AddWebFile("b.js", "B_MARK");
+        env.AddWebFile("c.js", "C_MARK");
+        env.AddWebFile("esm/admin.js", "ADMIN_MODULE");
+        var scripts = new MockDynamicScriptManager();
+        var granted = new HashSet<string> { "?" };
+        var html = MockHtmlHelper.Create(CreateServices([
+            new LayoutScriptFileAttribute("~/a.js") { Permission = "*" },
+            new LayoutScriptFileAttribute("~/b.js") { Permission = "Admin" },
+            new LayoutScriptFileAttribute("~/c.js") { Permission = "*" },
+            new LayoutScriptFileAttribute("~/esm/admin.js") { Permission = "Admin" },
+        ], scripts, env, hasPermission: granted.Contains));
+
+        // the filter excludes a file for everyone, e.g. the files of an assembly
+        bool filter(string x) => x != "~/c.js";
+
+        var withoutAdmin = html.LayoutScriptFiles(filter).Value;
+        Assert.DoesNotContain("admin.js", withoutAdmin);
+        var bundle = (LayoutScriptBundleScript)Assert.Single(scripts.Registered).Value;
+        Assert.Equal("*", bundle.Permission);
+        var withoutAdminSuffix = bundle.CacheSuffix;
+        Assert.Contains("A_MARK", bundle.GetScript());
+        Assert.DoesNotContain("B_MARK", bundle.GetScript());
+        Assert.DoesNotContain("C_MARK", bundle.GetScript());
+
+        granted.Add("Admin");
+        var withAdmin = html.LayoutScriptFiles(filter).Value;
+        Assert.Contains("admin.js", withAdmin);
+        // the same registration, with another cache suffix and content
+        Assert.Single(scripts.Registered);
+        Assert.NotEqual(withoutAdminSuffix, bundle.CacheSuffix);
+        Assert.Contains("B_MARK", bundle.GetScript());
+        Assert.DoesNotContain("C_MARK", bundle.GetScript());
+    }
+
+    [Fact]
+    public void Predefined_Bundle_Contains_Files_Of_Current_User_With_A_Cache_Suffix_Per_File_Set()
+    {
+        var env = new MockHostEnvironment();
+        env.AddWebFile("a.js", "A_MARK");
+        env.AddWebFile("b.js", "B_MARK");
+        var granted = new HashSet<string>();
+        var services = CreateServices([
+            new LayoutScriptFileAttribute("~/a.js") { Permission = "*" },
+            new LayoutScriptFileAttribute("~/b.js"),
+        ], new MockDynamicScriptManager(), env, hasPermission: granted.Contains);
+
+        var script = new LayoutScriptBundleScript(services.GetRequiredService<ILayoutScriptFileProvider>(),
+            services.GetRequiredService<IScriptBundleBuilder>());
+        Assert.Equal("*", script.Permission ?? "*");
+
+        var anonymousSuffix = script.CacheSuffix;
+        var anonymousScript = script.GetScript();
+        Assert.Contains("A_MARK", anonymousScript);
+        Assert.DoesNotContain("B_MARK", anonymousScript);
+
+        granted.Add("?");
+        Assert.NotEqual(anonymousSuffix, script.CacheSuffix);
+        Assert.Contains("B_MARK", script.GetScript());
+    }
+
+    [Fact]
+    public void LayoutScriptFiles_Uses_Predefined_Bundle_When_Registered_And_No_Filter()
+    {
+        var env = new MockHostEnvironment();
+        env.AddWebFile("a.js", "A_MARK");
+        var scripts = new MockDynamicScriptManager();
+        var services = CreateServices([new LayoutScriptFileAttribute("~/a.js")], scripts, env);
+        scripts.Register(LayoutScriptBundleScript.ScriptName, new LayoutScriptBundleScript(
+            services.GetRequiredService<ILayoutScriptFileProvider>(), services.GetRequiredService<IScriptBundleBuilder>())
+        { Permission = "*" });
+
+        var result = MockHtmlHelper.Create(services).LayoutScriptFiles().Value;
+
+        Assert.Contains(LayoutScriptBundleScript.ScriptName, result);
+        Assert.Single(scripts.Registered);
     }
 
     [Fact]

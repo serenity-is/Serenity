@@ -161,7 +161,14 @@ export const esbuildOptions = (opt) => {
         opt.write = false;
     }
 
+    // by default only for an output directory under an esm folder (e.g. wwwroot/esm), where the access control
+    // looks for it, not e.g. for the dist/ bundle of an npm package
+    const isEsmOutdir = /(^|[\\/])esm([\\/]|$)/i.test(opt.outdir ?? tsbuildDefaults.outdir);
+    if (opt.esmManifest ?? ((opt.format == null || opt.format === "esm") && opt.metafile !== false && isEsmOutdir))
+        plugins.push(esmManifestPlugin());
+
     delete opt.compress;
+    delete opt.esmManifest;
     delete opt.clean;
     delete opt.importAsGlobals;
     delete opt.writeIfChanged;
@@ -447,6 +454,120 @@ export function cleanPlugin(opt) {
                     });
                 } catch (e) {
                     console.error(`esbuild clean: ${e}`);
+                }
+            });
+        }
+    };
+}
+
+export const esmManifestFileName = "build.esm-manifest";
+
+/**
+ * Builds the ESM manifest from an esbuild metafile: the entry points, and for each output file under
+ * the output directory, the indexes of the entry points that reach it via static or dynamic imports.
+ * A source map has the same entries as the file it belongs to. Files no entry point reaches have an
+ * empty list. Paths are relative to the output directory, with / separators. Pass the entryPoints of
+ * the build to tell the entry points from dynamically imported modules more precisely.
+ */
+export function buildEsmManifest(metafile, outdir, workDir, entryPoints) {
+    const normalize = (x) => x.replace(/\\/g, "/");
+    const outputs = metafile?.outputs ?? {};
+    const absOut = normalize(resolve(workDir, outdir));
+    const toRelative = (key) => {
+        const abs = normalize(resolve(workDir, key));
+        return abs.startsWith(absOut + "/") ? abs.substring(absOut.length + 1) : null;
+    };
+
+    const keys = Object.keys(outputs);
+    // the css bundle of a js entry point may also have its entryPoint set, but it is not a separate entry
+    const cssBundles = new Set(keys.map((key) => outputs[key].cssBundle).filter((x) => x));
+    // dynamically imported modules are implicit entry points with their entryPoint set, but they
+    // are not entries, they belong to the entries that import them
+    let isEntry;
+    if (entryPoints?.length) {
+        const explicit = new Set(entryPoints.map((x) => typeof x === "string" ? x : x?.in).filter((x) => x)
+            .map((x) => normalize(resolve(workDir, x))));
+        isEntry = (key) => explicit.has(normalize(resolve(workDir, outputs[key].entryPoint)));
+    } else {
+        const dynamicTargets = new Set();
+        const staticTargets = new Set();
+        for (const key of keys) {
+            for (const imp of outputs[key].imports ?? [])
+                (imp.kind === "dynamic-import" ? dynamicTargets : staticTargets).add(imp.path);
+        }
+        isEntry = (key) => !dynamicTargets.has(key) || staticTargets.has(key);
+    }
+    const entryKeys = keys.filter((key) => outputs[key].entryPoint && !key.endsWith(".map") &&
+        !cssBundles.has(key) && toRelative(key) != null && isEntry(key)).sort();
+    const reachedBy = new Map(keys.map((key) => [key, new Set()]));
+
+    entryKeys.forEach((entryKey, index) => {
+        const stack = [entryKey];
+        const visited = new Set();
+        while (stack.length) {
+            const key = stack.pop();
+            if (visited.has(key))
+                continue;
+            visited.add(key);
+            reachedBy.get(key)?.add(index);
+            const output = outputs[key];
+            if (!output)
+                continue;
+            for (const imp of output.imports ?? []) {
+                if (!imp.external && imp.path && outputs[imp.path])
+                    stack.push(imp.path);
+            }
+            if (output.cssBundle && outputs[output.cssBundle])
+                stack.push(output.cssBundle);
+        }
+    });
+
+    const entries = [];
+    for (const key of entryKeys) {
+        const rel = toRelative(key);
+        if (rel != null)
+            entries.push(rel);
+    }
+
+    const files = {};
+    for (const key of [...keys].sort()) {
+        const rel = toRelative(key);
+        if (rel == null)
+            continue;
+        const owner = key.endsWith(".map") && outputs[key.substring(0, key.length - 4)] ? key.substring(0, key.length - 4) : key;
+        files[rel] = [...(reachedBy.get(owner) ?? [])].sort((a, b) => a - b);
+    }
+
+    return { version: 1, entries, files };
+}
+
+/**
+ * Plugin that writes build.esm-manifest to the output directory, which the server side ESM access
+ * control uses to decide which files an entry point (e.g. a page) needs. Written only if changed.
+ */
+export function esmManifestPlugin() {
+    return {
+        name: "esm-manifest",
+        setup(build2) {
+            build2.onEnd((result) => {
+                try {
+                    if (!result.metafile || result.errors?.length)
+                        return;
+                    const workDir = build2.initialOptions.absWorkingDir ?? process.cwd();
+                    const outdir = build2.initialOptions.outdir;
+                    if (!outdir)
+                        return;
+                    const entryPoints = Array.isArray(build2.initialOptions.entryPoints) ? build2.initialOptions.entryPoints : null;
+                    const manifest = buildEsmManifest(result.metafile, outdir, workDir, entryPoints);
+                    const absOut = resolve(workDir, outdir);
+                    const file = join(absOut, esmManifestFileName);
+                    const content = JSON.stringify(manifest);
+                    if (existsSync(file) && readFileSync(file, "utf8") === content)
+                        return;
+                    mkdirSync(absOut, { recursive: true });
+                    writeFileSync(file, content);
+                } catch (e) {
+                    console.error(`esm manifest: ${e}`);
                 }
             });
         }

@@ -32,7 +32,8 @@ public static class HtmlLayoutFilesExtensions
         ArgumentNullException.ThrowIfNull(helper);
 
         var context = helper.ViewContext.HttpContext;
-        var files = context.RequestServices.GetService<ILayoutCssFileProvider>()?.GetFiles();
+        var fileProvider = context.RequestServices.GetService<ILayoutCssFileProvider>();
+        var files = fileProvider?.GetFiles();
         if (files == null || files.Count == 0)
             return HtmlString.Empty;
 
@@ -55,13 +56,28 @@ public static class HtmlLayoutFilesExtensions
         }
 
         var scriptManager = context.RequestServices.GetRequiredService<IDynamicScriptManager>();
-        var scriptName = GetLayoutCssScriptName(files);
-        scriptManager.IfNotRegistered(scriptName, () =>
-            context.RequestServices.GetRequiredService<ICssBundleBuilder>()
-                .BuildBundle("../", files));
+        string scriptName;
+        if (filter == null && scriptManager.IsRegistered(LayoutCssBundleScript.ScriptName))
+        {
+            // the predefined bundle has the files of the current user, with a cache suffix per file set
+            scriptName = LayoutCssBundleScript.ScriptName;
+        }
+        else
+        {
+            // the name comes from all the files (regardless of permissions) that pass the filter, which
+            // only changes with the filter or feature toggles, while the bundle itself contains the files
+            // of the current user, with a cache suffix per file set like the predefined one
+            var allFiles = fileProvider!.GetAllFiles().Where(x => filter == null || filter(x)).ToList();
+            scriptName = GetLayoutCssScriptName(allFiles);
+            scriptManager.IfNotRegistered(scriptName, () => new LayoutCssBundleScript(fileProvider,
+                context.RequestServices.GetRequiredService<ICssBundleBuilder>(), filter)
+            {
+                Permission = SpecialPermissionKeys.Public
+            });
 
-        context.RequestServices.GetService<IWebRootFileWatcher>()?.RegisterCallback(
-            scriptName, files, () => scriptManager.Changed(scriptName));
+            context.RequestServices.GetService<IWebRootFileWatcher>()?.RegisterCallback(
+                scriptName, allFiles, () => scriptManager.Changed(scriptName));
+        }
 
         var include = scriptManager.GetScriptInclude(scriptName, ".css");
         var cssUrl = VirtualPathUtility.ToAbsolute(context, "~/DynJS.axd/" + include);
@@ -107,7 +123,7 @@ public static class HtmlLayoutFilesExtensions
         }
 
         var modules = RenderLayoutModules(helper, moduleFiles);
-        return new HtmlString(RenderLayoutScripts(helper, files) + modules);
+        return new HtmlString(RenderLayoutScripts(helper, provider, files, filter) + modules);
     }
 
     private static string RenderLayoutModules(IHtmlHelper helper, IReadOnlyList<string> files)
@@ -129,7 +145,8 @@ public static class HtmlLayoutFilesExtensions
         return tags.ToString();
     }
 
-    private static string RenderLayoutScripts(IHtmlHelper helper, IReadOnlyList<string> files)
+    private static string RenderLayoutScripts(IHtmlHelper helper, ILayoutScriptFileProvider provider,
+        IReadOnlyList<string> files, Func<string, bool>? filter)
     {
         if (files.Count == 0)
             return "";
@@ -148,13 +165,28 @@ public static class HtmlLayoutFilesExtensions
         }
 
         var scriptManager = context.RequestServices.GetRequiredService<IDynamicScriptManager>();
-        var scriptName = GetLayoutScriptScriptName(files);
-        scriptManager.IfNotRegistered(scriptName, () =>
-            context.RequestServices.GetRequiredService<IScriptBundleBuilder>()
-                .BuildBundle(files));
+        string scriptName;
+        if (filter == null && scriptManager.IsRegistered(LayoutScriptBundleScript.ScriptName))
+        {
+            // the predefined bundle has the files of the current user, with a cache suffix per file set
+            scriptName = LayoutScriptBundleScript.ScriptName;
+        }
+        else
+        {
+            // the name comes from all the files (regardless of permissions) that pass the filter, which
+            // only changes with the filter or feature toggles, while the bundle itself contains the files
+            // of the current user, with a cache suffix per file set like the predefined one
+            var allFiles = provider.GetAllFiles(module: false).Where(x => filter == null || filter(x)).ToList();
+            scriptName = GetLayoutScriptScriptName(allFiles);
+            scriptManager.IfNotRegistered(scriptName, () => new LayoutScriptBundleScript(provider,
+                context.RequestServices.GetRequiredService<IScriptBundleBuilder>(), filter)
+            {
+                Permission = SpecialPermissionKeys.Public
+            });
 
-        context.RequestServices.GetService<IWebRootFileWatcher>()?.RegisterCallback(
-            scriptName, files, () => scriptManager.Changed(scriptName));
+            context.RequestServices.GetService<IWebRootFileWatcher>()?.RegisterCallback(
+                scriptName, allFiles, () => scriptManager.Changed(scriptName));
+        }
 
         var include = scriptManager.GetScriptInclude(scriptName);
         var scriptUrl = VirtualPathUtility.ToAbsolute(context, "~/DynJS.axd/" + include);

@@ -153,10 +153,12 @@ public class LayoutCssFilesTests
 
         Assert.NotEqual(first, second);
         Assert.Equal(2, scripts.Registered.Count);
-        Assert.Contains(scripts.Registered.Values,
-            s => s.GetScript().Contains("A_MARK", StringComparison.Ordinal));
-        Assert.Contains(scripts.Registered.Values,
-            s => s.GetScript().Contains("B_MARK", StringComparison.Ordinal));
+        // a bundle contains the files of the current request, e.g. the enabled features
+        Assert.All(scripts.Registered.Values, s =>
+        {
+            Assert.Contains("B_MARK", s.GetScript(), StringComparison.Ordinal);
+            Assert.DoesNotContain("A_MARK", s.GetScript(), StringComparison.Ordinal);
+        });
     }
 
     [Fact]

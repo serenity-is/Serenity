@@ -8,18 +8,19 @@ namespace Serenity.Web;
 /// or rendered with <c>@Html.Script("dynamic://Bundle.LayoutScriptFiles")</c>.
 /// </summary>
 /// <remarks>
-/// Unlike <c>Html.LayoutScriptFiles()</c>, the file set is resolved by
-/// <see cref="ILayoutScriptFileProvider.GetFiles"/> the first time the script is
-/// generated and then cached, so it does not change dynamically when feature
-/// toggles change at runtime. Use <c>Html.LayoutScriptFiles()</c> when the file set
-/// should follow feature toggles per request.
+/// The files are the ones <see cref="ILayoutScriptFileProvider.GetFiles"/> returns for the current
+/// request, e.g. filtered by feature toggles and the permissions of the current user. A hash of the
+/// file list is the <see cref="CacheSuffix"/>, so each distinct file set is generated and cached
+/// separately, and has its own content hash in urls. The bundle itself is public, as it only contains
+/// the files the requesting user may load.
 /// Initializes a new instance of the <see cref="LayoutScriptBundleScript"/> class.
 /// </remarks>
 /// <param name="fileProvider">The layout script file provider.</param>
 /// <param name="bundleBuilder">The script bundle builder.</param>
+/// <param name="filter">An optional filter applied to the file urls, e.g. to exclude the files of an assembly.</param>
 /// <exception cref="ArgumentNullException">One of the arguments is <c>null</c>.</exception>
 public class LayoutScriptBundleScript(ILayoutScriptFileProvider fileProvider,
-    IScriptBundleBuilder bundleBuilder) : DynamicScript
+    IScriptBundleBuilder bundleBuilder, Func<string, bool>? filter = null) : DynamicScript, ICacheSuffix
 {
     /// <summary>
     /// The predefined registration name of the layout script bundle.
@@ -32,9 +33,18 @@ public class LayoutScriptBundleScript(ILayoutScriptFileProvider fileProvider,
         ?? throw new ArgumentNullException(nameof(bundleBuilder));
 
     /// <inheritdoc/>
-    public override string GetScript()
+    public string CacheSuffix => LayoutFileListHash.Compute(GetFiles());
+
+    private IReadOnlyList<string> GetFiles()
     {
         var files = fileProvider.GetFiles();
+        return filter == null ? files : [.. files.Where(filter)];
+    }
+
+    /// <inheritdoc/>
+    public override string GetScript()
+    {
+        var files = GetFiles();
         if (files.Count == 0)
             return "";
 

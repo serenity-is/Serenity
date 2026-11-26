@@ -5,9 +5,11 @@ namespace Serenity.Web;
 public class LayoutScriptFileProviderTests
 {
     private static LayoutScriptFileProvider Create(Attribute[] attributes,
-        Func<string, bool>? isEnabled = null, Action<LayoutScriptFileOptions>? configure = null)
+        Func<string, bool>? isEnabled = null, Action<LayoutScriptFileOptions>? configure = null, Func<string, bool>? hasPermission = null)
     {
         var services = new ServiceCollection();
+        // layout script files require "?" by default, which this logged-in user has
+        services.AddSingleton<IPermissionService>(new MockPermissions(hasPermission ?? (_ => true)));
         if (isEnabled != null)
             services.AddSingleton<IFeatureToggles>(new MockFeatureToggles { IsEnabledCallback = isEnabled });
 

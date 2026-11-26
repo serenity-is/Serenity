@@ -29,6 +29,11 @@ export interface TSBuildOptions extends Partial<import("esbuild").BuildOptions> 
      * globs and defaults to ['Modules/** /*Page.ts', 'Modules/** /*Page.tsx', 'Modules/** /ScriptInit.ts'] */
     entryPoints?: string[];
     /**
+     * True to write build.esm-manifest to the output directory, which lists the entry points and the entry
+     * points that reach each output file, for the server side ESM access control. Default is true for ESM
+     * format builds with metafile enabled whose output directory is under an esm folder, e.g. wwwroot/esm. */
+    esmManifest?: boolean;
+    /**
      * A set of mappings to pass to the importAsGlobalsPlugin. If this is undefined or any object and the plugins
      * is not specified, importAsGlobals plugin is enabled */
     importAsGlobals?: Record<string, string> | null;
@@ -95,6 +100,23 @@ export interface CompressOptions {
     };
     extensions?: string[];
 }
+/** File name of the ESM manifest written to the output directory */
+export declare const esmManifestFileName: string;
+export interface EsmManifest {
+    version: number;
+    /** Entry point output paths, relative to the output directory */
+    entries: string[];
+    /** Output paths relative to the output directory, mapped to the indexes of the entries that reach them */
+    files: Record<string, number[]>;
+}
+/** Builds the ESM manifest from an esbuild metafile */
+export declare function buildEsmManifest(metafile: import("esbuild").Metafile, outdir: string, workDir: string,
+    entryPoints?: (string | { in: string; out: string })[]): EsmManifest;
+/** Plugin that writes build.esm-manifest to the output directory */
+export declare function esmManifestPlugin(): {
+    name: string;
+    setup(build: esbuild.PluginBuild): void;
+};
 /** Plugin for writing files only if changed */
 export declare function writeIfChanged(opt?: CompressOptions): {
     name: string;

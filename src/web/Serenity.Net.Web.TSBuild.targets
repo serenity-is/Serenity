@@ -28,7 +28,12 @@
     <PropertyGroup>
       <TSBuildStampFile>$(IntermediateOutputPath)tsbuild.stamp</TSBuildStampFile>
       <TSBuildInputsFile>$(IntermediateOutputPath)tsbuild.inputs.txt</TSBuildInputsFile>
+      <!-- in a pnpm workspace, the build tools (e.g. @serenity-is/tsbuild) may be installed in the workspace root only -->
+      <_TSBuildWorkspaceRoot>$([MSBuild]::GetDirectoryNameOfFileAbove('$(MSBuildProjectDirectory)', 'pnpm-workspace.yaml'))</_TSBuildWorkspaceRoot>
     </PropertyGroup>
+    <ItemGroup Condition="'$(_TSBuildWorkspaceRoot)' != ''">
+      <TSBuildInput Include="$(_TSBuildWorkspaceRoot)\node_modules\@serenity-is\tsbuild\package.json;$(_TSBuildWorkspaceRoot)\node_modules\@serenity-is\tsbuild\dist\**\*" />
+    </ItemGroup>
     <ItemGroup>
       <TSBuildInput Include="**\*.ts;**\*.tsx;**\*.mts;**\*.cts;**\*.js;**\*.jsx;**\*.mjs;**\*.cjs;**\*.css;**\*.json;**\*.svg;**\*.png;**\*.jpg;**\*.jpeg;**\*.gif;**\*.webp;**\*.woff;**\*.woff2;**\*.ttf;**\*.eot"
         Exclude="bin\**;obj\**;out\**;dist\**;wwwroot\**;coverage\**;test\**;texts\**;node_modules\**;Properties\**;App_Data\**" />
@@ -42,6 +47,17 @@
     <WriteLinesToFile File="$(TSBuildInputsFile)" Lines="@(_TSBuildInputLine)" Overwrite="true" WriteOnlyWhenDifferent="true" />
     <ItemGroup>
       <FileWrites Include="$(TSBuildInputsFile);$(TSBuildStampFile)" />
+    </ItemGroup>
+  </Target>
+
+  <!--
+    tsbuild writes wwwroot\esm\build.esm-manifest for the ESM access control (UseEsmAccessControl). Web app
+    project files usually publish only the .js, .css and .map files under wwwroot\esm, so add it when it exists.
+  -->
+  <Target Name="_IncludeEsmManifestInPublish" BeforeTargets="AssignTargetPaths"
+          Condition="'$(OutputType)' == 'Exe' And Exists('$(MSBuildProjectDirectory)\wwwroot\esm\build.esm-manifest')">
+    <ItemGroup>
+      <Content Include="wwwroot\esm\build.esm-manifest" Exclude="@(Content)" CopyToOutputDirectory="Never" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
     </ItemGroup>
   </Target>
 </Project>

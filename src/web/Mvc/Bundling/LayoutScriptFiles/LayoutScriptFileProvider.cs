@@ -12,6 +12,7 @@ public interface ILayoutScriptFileProvider
     /// <summary>
     /// Gets the list of app relative (<c>~/</c>) JS file urls to include in the
     /// layout, in the order they should be included, with duplicates removed.
+    /// Files with a permission the current user lacks are left out.
     /// These don't include the ES modules, see <see cref="GetModuleFiles"/>.
     /// </summary>
     /// <returns>The list of JS file urls.</returns>
@@ -20,9 +21,24 @@ public interface ILayoutScriptFileProvider
     /// <summary>
     /// Gets the list of app relative (<c>~/</c>) urls of the ES modules to include in the
     /// layout, in the order they should be included, with duplicates removed.
+    /// Files with a permission the current user lacks are left out.
     /// </summary>
     /// <returns>The list of ES module urls.</returns>
     IReadOnlyList<string> GetModuleFiles() => [];
+
+    /// <summary>
+    /// Gets the list of files like <see cref="GetFiles"/> or <see cref="GetModuleFiles"/>, but
+    /// regardless of the permissions of the current user, e.g. for file watchers.
+    /// </summary>
+    /// <param name="module">True to get the ES modules, false for the other files.</param>
+    IReadOnlyList<string> GetAllFiles(bool module) => module ? GetModuleFiles() : GetFiles();
+
+    /// <summary>
+    /// Gets the permission required to include the file, see <see cref="LayoutScriptFileAttribute.Permission"/>,
+    /// or "*" (public) for a provider that does not support permissions.
+    /// </summary>
+    /// <param name="path">The app relative file url.</param>
+    string? GetPermission(string path) => SpecialPermissionKeys.Public;
 }
 
 /// <summary>
@@ -48,14 +64,29 @@ public class LayoutScriptFileProvider(ITypeSource typeSource,
     private readonly LayoutScriptFileOptions options = (options ?? throw new ArgumentNullException(nameof(options))).Value;
 
     /// <inheritdoc/>
-    public IReadOnlyList<string> GetFiles() => GetFiles(module: false);
+    public IReadOnlyList<string> GetFiles() => GetFiles(module: false, checkPermissions: true);
 
     /// <inheritdoc/>
-    public IReadOnlyList<string> GetModuleFiles() => GetFiles(module: true);
+    public IReadOnlyList<string> GetModuleFiles() => GetFiles(module: true, checkPermissions: true);
 
-    private List<string> GetFiles(bool module)
+    /// <inheritdoc/>
+    public IReadOnlyList<string> GetAllFiles(bool module) => GetFiles(module, checkPermissions: false);
+
+    /// <inheritdoc/>
+    public string? GetPermission(string path)
+    {
+        ArgumentNullException.ThrowIfNull(path);
+        permissions ??= LayoutFilePermissions.ByPath(typeSource.GetAssemblyAttributes<LayoutScriptFileAttribute>()
+            .Select(x => (x.Path, x.Permission)));
+        return permissions.TryGetValue(path.Trim(), out var permission) ? permission : null;
+    }
+
+    private IReadOnlyDictionary<string, string>? permissions;
+
+    private List<string> GetFiles(bool module, bool checkPermissions)
     {
         var featureToggles = serviceProvider.GetService<IFeatureToggles>();
+        var permissionService = checkPermissions ? serviceProvider.GetService<IPermissionService>() : null;
         var result = new List<(decimal Order, string Path)>();
 
         foreach (var attr in typeSource.GetAssemblyAttributes<LayoutScriptFileAttribute>())
@@ -69,6 +100,9 @@ public class LayoutScriptFileProvider(ITypeSource typeSource,
                 continue;
 
             if (options.Filter != null && !options.Filter(attr))
+                continue;
+
+            if (checkPermissions && !LayoutFilePermissions.IsGranted(permissionService, attr.Permission))
                 continue;
 
             var path = (attr.Path ?? "").Trim();

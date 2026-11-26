@@ -136,6 +136,7 @@ public partial class Startup
         });
 
         app.UseHttpsRedirection();
+        app.UseEsmAccessControl();
         app.UseStaticFiles();
 
         app.UseRouting();

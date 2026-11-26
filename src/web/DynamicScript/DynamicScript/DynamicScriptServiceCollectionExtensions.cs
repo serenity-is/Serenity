@@ -245,7 +245,7 @@ public static class DynamicScriptServiceCollectionExtensions
             });
 
         serviceProvider.GetService<IWebRootFileWatcher>()?.RegisterCallback(
-            LayoutCssBundleScript.ScriptName, fileProvider.GetFiles(),
+            LayoutCssBundleScript.ScriptName, fileProvider.GetAllFiles(),
             () => scriptManager.Changed(LayoutCssBundleScript.ScriptName));
     }
 
@@ -270,7 +270,7 @@ public static class DynamicScriptServiceCollectionExtensions
             });
 
         serviceProvider.GetService<IWebRootFileWatcher>()?.RegisterCallback(
-            LayoutScriptBundleScript.ScriptName, fileProvider.GetFiles(),
+            LayoutScriptBundleScript.ScriptName, fileProvider.GetAllFiles(module: false),
             () => scriptManager.Changed(LayoutScriptBundleScript.ScriptName));
     }
 

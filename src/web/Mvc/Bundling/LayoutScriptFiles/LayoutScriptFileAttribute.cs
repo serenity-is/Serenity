@@ -61,4 +61,19 @@ public class LayoutScriptFileAttribute : Attribute
     /// <see cref="RequireFeatures"/> should be enabled instead of all of them.
     /// </summary>
     public bool RequireAnyFeature { get; set; }
+
+    private string? permission;
+
+    /// <summary>
+    /// Permission (or permission expression) required to include the file. Default is "?", e.g.
+    /// logged-in users, so set it to "*" for a file that anonymous pages like the login page need.
+    /// The file is left out of the layout for users without it, and a bundle with such a file
+    /// requires the permission too. For an ES module, the ESM access control (see
+    /// <c>UseEsmAccessControl</c>) also requires it to serve the module.
+    /// </summary>
+    public string Permission
+    {
+        get => string.IsNullOrWhiteSpace(permission) ? SpecialPermissionKeys.LoggedIn : permission;
+        set => permission = value;
+    }
 }

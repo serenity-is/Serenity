@@ -47,4 +47,18 @@ public class LayoutCssFileAttribute : Attribute
     /// <see cref="RequireFeatures"/> should be enabled instead of all of them.
     /// </summary>
     public bool RequireAnyFeature { get; set; }
+
+    private string? permission;
+
+    /// <summary>
+    /// Permission (or permission expression) required to include the file. Default is "*", e.g.
+    /// everyone including anonymous users, as layout styles are usually needed on pages like the login
+    /// page too. The file is left out of the layout for users without it, and a bundle with such a file
+    /// requires the permission too.
+    /// </summary>
+    public string Permission
+    {
+        get => string.IsNullOrWhiteSpace(permission) ? SpecialPermissionKeys.Public : permission;
+        set => permission = value;
+    }
 }
