@@ -383,7 +383,7 @@ public abstract class AccountPasswordActionsPageBase<TUserRow> : MembershipPageB
             var salt = GenerateSalt(membershipOptions.Value);
             var hash = CalculateHash(request.NewPassword, salt);
 #if (IsPublicDemo)
-            if (user.IdField.AsObject(user)?.ToString() == "1")
+            if (user.GetIdField().AsObject(user)?.ToString() == "1")
                 throw new ValidationError("Sorry, but no changes are allowed in public demo on ADMIN user!");
 #endif
             var row = new TUserRow();
