@@ -28,4 +28,14 @@ public partial class BooleanEditorAttribute : CustomEditorAttribute
         get { return GetOption<CheckLabelPosition>("labelPosition"); }
         set { SetOption("labelPosition", value); }
     }
+
+    /// <summary>
+    /// Gets or sets whether the editor shows a switch instead of a checkbox, e.g. for a setting that turns something
+    /// on or off. The value is the same boolean.
+    /// </summary>
+    public bool Switch
+    {
+        get { return GetOption<bool>("switch"); }
+        set { SetOption("switch", value); }
+    }
 }

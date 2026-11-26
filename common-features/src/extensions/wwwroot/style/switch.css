@@ -1,0 +1,82 @@
+/* A switch: a checkbox that turns something on or off, either Bootstrap's form-switch or a checkbox with the s-switch
+   class, e.g. the BooleanEditor with its switch option, which needs no wrapper. Bootstrap's is 1em high, which looked
+   thin next to text and buttons; the size comes from the optional --s-switch-width and --s-switch-height tokens.
+   Shared by the Serenity and the Pro themes, which import it after their checkbox rules. */
+
+.form-switch {
+  padding-left: calc(var(--s-switch-width, 2.25em) + 0.5em);
+}
+
+.form-switch .form-check-input,
+input[type=checkbox].s-switch {
+  --bs-form-switch-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='rgba%280, 0, 0, 0.25%29'/%3e%3c/svg%3e");
+  flex: none;
+  width: var(--s-switch-width, 2.25em);
+  height: var(--s-switch-height, 1.25em);
+  border-radius: 2em;
+  background-image: var(--bs-form-switch-bg);
+  background-position: left center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  transition: background-position 0.15s ease-in-out;
+  cursor: pointer;
+}
+
+/* the label of a switch turns it too */
+.form-switch .form-check-input:not(:disabled) ~ .form-check-label {
+  cursor: pointer;
+}
+
+.form-switch .form-check-input:disabled,
+input[type=checkbox].s-switch:disabled {
+  cursor: default;
+}
+
+/* in a line of text, the middle of the switch is on the middle of the line */
+.form-switch .form-check-input {
+  margin-top: calc((1.5em - var(--s-switch-height, 1.25em)) / 2);
+  margin-left: calc(-1 * (var(--s-switch-width, 2.25em) + 0.5em));
+}
+
+input[type=checkbox].s-switch {
+  vertical-align: middle;
+}
+
+.form-switch .form-check-input:focus,
+input[type=checkbox].s-switch:focus {
+  --bs-form-switch-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%2386b7fe'/%3e%3c/svg%3e");
+}
+
+.form-switch .form-check-input:checked,
+input[type=checkbox].s-switch:checked {
+  --bs-form-switch-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23fff'/%3e%3c/svg%3e");
+  background-image: var(--bs-form-switch-bg);
+  background-position: right center;
+}
+
+[data-bs-theme=dark] .form-switch .form-check-input:not(:checked):not(:focus),
+[data-bs-theme=dark] input[type=checkbox].s-switch:not(:checked):not(:focus) {
+  --bs-form-switch-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='rgba%28255, 255, 255, 0.25%29'/%3e%3c/svg%3e");
+}
+
+.form-switch.form-check-reverse {
+  padding-right: calc(var(--s-switch-width, 2.25em) + 0.5em);
+  padding-left: 0;
+}
+
+.form-switch.form-check-reverse .form-check-input {
+  margin-right: calc(-1 * (var(--s-switch-width, 2.25em) + 0.5em));
+  margin-left: 0;
+}
+
+/* a BooleanEditor in a form field: in the middle of the row of the caption, like the other editors */
+.field > input[type=checkbox].s-switch.editor {
+  margin-top: calc((var(--s-input-inner-height, 1.5rem) + 2px - var(--s-switch-height, 1.25em)) / 2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .form-switch .form-check-input,
+  input[type=checkbox].s-switch {
+    transition: none;
+  }
+}

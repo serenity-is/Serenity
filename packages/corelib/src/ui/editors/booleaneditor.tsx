@@ -27,10 +27,15 @@ export interface BooleanEditorOptions {
      * checkbox lines up with the other editors, for one that is alone in its row.
      */
     labelPosition?: CheckLabelPosition;
+
+    /**
+     * Shows a switch instead of a checkbox, e.g. for a setting that turns something on or off. The value is the same.
+     */
+    switch?: boolean;
 }
 
 /**
- * An editor that renders a checkbox for boolean values.
+ * An editor that renders a checkbox, or a switch with the `switch` option, for boolean values.
  * @typeParam P - Widget props type.
  */
 export class BooleanEditor<P extends BooleanEditorOptions = BooleanEditorOptions> extends EditorWidget<P> {
@@ -56,6 +61,10 @@ export class BooleanEditor<P extends BooleanEditorOptions = BooleanEditorOptions
             this.domNode.classList.add("label-on-end");
         if (position === CheckLabelPosition.EndAligned)
             this.domNode.classList.add("align-with-editors");
+        if (this.options?.switch) {
+            this.domNode.classList.add("form-check-input", "s-switch");
+            this.domNode.setAttribute("role", "switch");
+        }
     }
 
     /**

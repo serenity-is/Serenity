@@ -44,6 +44,22 @@ describe("BooleanEditor", () => {
         editor.destroy();
     })
 
+    it("shows a switch with the switch option, which keeps the same value", () => {
+        const plain = new BooleanEditor({});
+        expect(plain.domNode.classList.contains("s-switch")).toBe(false);
+        expect(plain.domNode.getAttribute("role")).toBeNull();
+        plain.destroy();
+
+        const editor = new BooleanEditor({ switch: true });
+        expect(editor.domNode.type).toBe("checkbox");
+        expect(editor.domNode.classList.contains("s-switch")).toBe(true);
+        expect(editor.domNode.classList.contains("form-check-input")).toBe(true);
+        expect(editor.domNode.getAttribute("role")).toBe("switch");
+        editor.value = true;
+        expect(editor.domNode.checked).toBe(true);
+        editor.destroy();
+    })
+
     it("get_value returns checked state", () => {
         const editor = new BooleanEditor({});
         editor.domNode.checked = true;
