@@ -58,6 +58,14 @@ public class UploadSettings : IOptions<UploadSettings>
     public string? ExtensionWhitelistExclude { get; set; }
 
     /// <summary>
+    /// Permission (or permission expression) required to upload temporary files, e.g. via
+    /// the "~/File/TemporaryUpload" route in the application templates. Default is "?",
+    /// e.g. logged-in users. Set to "*" if anonymous users must be able to upload files,
+    /// for example on a public sign-up form with a file editor.
+    /// </summary>
+    public string? TemporaryUploadPermission { get; set; } = SpecialPermissionKeys.LoggedIn;
+
+    /// <summary>
     /// Gets or sets the root path for uploads, default is "App_Data/upload/".
     /// </summary>
     public string? Path { get; set; }

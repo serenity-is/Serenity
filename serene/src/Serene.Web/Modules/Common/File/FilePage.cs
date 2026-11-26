@@ -1,11 +1,16 @@
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 
 namespace Serene.Common.Pages;
 
-public class FilePage(IUploadStorage uploadStorage, IUploadProcessor uploadProcessor) : Controller
+public class FilePage(IUploadStorage uploadStorage, IUploadProcessor uploadProcessor,
+    IPermissionService permissions, IOptions<UploadSettings> uploadSettings, ITextLocalizer localizer) : Controller
 {
     private readonly IUploadStorage uploadStorage = uploadStorage ?? throw new ArgumentNullException(nameof(uploadStorage));
     private readonly IUploadProcessor uploadProcessor = uploadProcessor ?? throw new ArgumentNullException(nameof(uploadProcessor));
+    private readonly IPermissionService permissions = permissions ?? throw new ArgumentNullException(nameof(permissions));
+    private readonly IOptions<UploadSettings> uploadSettings = uploadSettings ?? throw new ArgumentNullException(nameof(uploadSettings));
+    private readonly ITextLocalizer localizer = localizer ?? throw new ArgumentNullException(nameof(localizer));
 
     [Route("upload/{*pathInfo}")]
     public IActionResult Read(string pathInfo,
@@ -30,6 +35,16 @@ public class FilePage(IUploadStorage uploadStorage, IUploadProcessor uploadProce
     [AcceptVerbs("POST"), IgnoreAntiforgeryToken]
     public ActionResult TemporaryUploadCK()
     {
+        if (!permissions.HasPermission(uploadSettings.Value.TemporaryUploadPermission!))
+            return new JsonResult(new
+            {
+                uploaded = 0,
+                error = new
+                {
+                    message = CoreTexts.Authorization.AccessDenied.ToString(localizer)
+                }
+            });
+
         var response = (UploadResponse)HandleUploadRequest(HttpContext);
         if (response.Error != null)
             return new JsonResult(new
@@ -53,6 +68,9 @@ public class FilePage(IUploadStorage uploadStorage, IUploadProcessor uploadProce
     [NonAction]
     private UploadResponse HandleUploadRequest(HttpContext context)
     {
+        // see UploadSettings:TemporaryUploadPermission in appsettings.json, "?" (logged-in users) by default
+        permissions.ValidatePermission(uploadSettings.Value.TemporaryUploadPermission, localizer);
+
         if (context.Request.Form.Files.Count != 1)
             throw ArgumentExceptions.OutOfRange(context.Request.Form.Files);
 
