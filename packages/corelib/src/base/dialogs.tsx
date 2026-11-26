@@ -916,6 +916,16 @@ function closePanel(el: (HTMLElement | ArrayLike<HTMLElement>)) {
 
     Fluent.trigger(window, "resize");
     document.querySelectorAll(".require-layout").forEach((rl: HTMLElement) => Fluent.isVisibleLike(rl) && Fluent.trigger(rl, "layout"));
+
+    // back to where the page was, e.g. the row of a list that opened the panel
+    const scrollTop = panel.dataset.panelscrolltop;
+    if (scrollTop != null) {
+        delete panel.dataset.panelscrolltop;
+        const scroller = document.scrollingElement as HTMLElement;
+        if (scroller)
+            scroller.scrollTop = parseFloat(scrollTop) || 0;
+    }
+
     Fluent.trigger(eventsNode, "panelclose");
 }
 
@@ -937,6 +947,12 @@ function openPanel(element: HTMLElement | ArrayLike<HTMLElement>, uniqueName?: s
     let event = Fluent.trigger(eventNode, "panelbeforeopen");
     if (Fluent.isDefaultPrevented(event))
         return;
+
+    // the page may be scrolled, e.g. down a list on a phone, where the dialogs open as panels, and the panel takes the
+    // place of the content, so the page would show the panel scrolled by as much; read before the content is hidden,
+    // which makes the page shorter
+    const scroller = document.scrollingElement as HTMLElement;
+    const scrollTop = scroller?.scrollTop ?? 0;
 
     panel.dataset.paneluniquename = uniqueName || panel.id || new Date().getTime().toString();
     function setHideBy(e: HTMLElement) {
@@ -963,6 +979,24 @@ function openPanel(element: HTMLElement | ArrayLike<HTMLElement>, uniqueName?: s
 
     panel.hidden = false;
     delete panel.dataset.hiddenby;
+
+    if (scroller && scrollTop > 0) {
+        // the position of the list to return to when the panel closes; the router may add a history entry for the
+        // panel, which closing it goes back from, and the browser would then restore the position of the page as it
+        // was when the entry was added, i.e. with its content hidden, so the page, which is the current entry until
+        // then, leaves its position to this code (scrollRestoration is a setting of the current history entry)
+        panel.dataset.panelscrolltop = "" + scrollTop;
+        if ("scrollRestoration" in history)
+            history.scrollRestoration = "manual";
+        const top = panel.getBoundingClientRect().top;
+        if (top < 0) {
+            const panelTop = scroller.scrollTop + top;
+            // the top of the page, unless the panel starts below the first screen of the page
+            scroller.scrollTop = panelTop < window.innerHeight ? 0 : panelTop;
+        }
+    }
+    else
+        delete panel.dataset.panelscrolltop;
 
     Fluent.trigger(eventNode, "panelopen");
 }
