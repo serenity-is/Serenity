@@ -39,6 +39,7 @@ public static class DynamicScriptServiceCollectionExtensions
     {
         AddDynamicScriptManager(collection);
         collection.TryAddSingleton<IPropertyItemProvider, DefaultPropertyItemProvider>();
+        collection.TryAddSingleton<ILocalTextPermissionFilter, LocalTextPermissionFilter>();
         return collection;
     }
 

@@ -6,7 +6,9 @@ namespace Serenity.Web;
 /// in permission expressions.
 /// </summary>
 /// <remarks>
-/// Register this decorator at application startup to enable expressions such as <c>PermissionA &amp; !PermissionB</c>.
+/// Permission services deriving from BasePermissionService support these expressions already. Register this
+/// decorator at application startup for a permission service that doesn't, to enable expressions such as
+/// <c>PermissionA &amp; !PermissionB</c>.
 /// <code>
 /// registrar.RegisterInstance&lt;IPermissionService&gt;(new LogicOperatorPermissionService(new MyPermissionService()))
 /// </code>
@@ -17,10 +19,8 @@ namespace Serenity.Web;
 /// <param name="permissionService">The underlying permission service to delegate simple permission checks to.</param>
 public class LogicOperatorPermissionService(IPermissionService permissionService) : IPermissionService, ITransientGrantor
 {
-    private static readonly char[] chars = ['|', '&', '!', '(', ')'];
     private readonly IPermissionService permissionService = permissionService ??
             throw new ArgumentNullException(nameof(permissionService));
-    private readonly ConcurrentDictionary<string, string[]> cache = new();
 
     /// <inheritdoc/>
     public void Grant(params string[] permissions)
@@ -45,17 +45,7 @@ public class LogicOperatorPermissionService(IPermissionService permissionService
     /// <returns><c>true</c> if the expression evaluates to granted; otherwise <c>false</c>.</returns>
     public bool HasPermission(string permission)
     {
-        if (string.IsNullOrEmpty(permission) ||
-            permission.IndexOfAny(chars) < 0)
-            return permissionService.HasPermission(permission);
-
-        if (!cache.TryGetValue(permission, out string[] rpnTokens))
-        {
-            var tokens = PermissionExpressionParser.Tokenize(permission);
-            cache[permission] = rpnTokens = [.. PermissionExpressionParser.ShuntingYard(tokens)];
-        }
-
-        return PermissionExpressionParser.Evaluate(rpnTokens, permissionService.HasPermission);
+        return PermissionExpressionParser.HasPermission(permission, permissionService.HasPermission);
     }
 
     /// <inheritdoc/>

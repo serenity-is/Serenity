@@ -13,9 +13,19 @@ namespace Serenity.Web;
 /// <param name="includes">The includes regex.</param>
 /// <param name="languageId">The language ID.</param>
 /// <param name="isPending"><c>true</c> to include pending texts.</param>
+/// <param name="permissionFilter">Optional filter for texts by the permissions of the current user.</param>
 /// <exception cref="ArgumentNullException"><paramref name="registry"/> or <paramref name="package"/> is <c>null</c>.</exception>
-public class LocalTextScript(ILocalTextRegistry registry, string package, string includes, string languageId, bool isPending) : DynamicScript, INamedDynamicScript
+public class LocalTextScript(ILocalTextRegistry registry, string package, string includes, string languageId, bool isPending,
+    ILocalTextPermissionFilter? permissionFilter = null) : DynamicScript, INamedDynamicScript, ICacheSuffix
 {
+    private readonly ILocalTextPermissionFilter? permissionFilter = permissionFilter;
+
+    /// <summary>
+    /// Gets the cache suffix, which identifies the texts the current user may see when
+    /// texts are filtered by permission, otherwise empty.
+    /// </summary>
+    public string CacheSuffix => permissionFilter?.GetCacheSuffix() ?? "";
+
     private readonly string scriptName = GetScriptName(package, languageId, isPending);
     private readonly string languageId = languageId;
     private readonly string includes = includes;
@@ -69,12 +79,14 @@ public class LocalTextScript(ILocalTextRegistry registry, string package, string
     /// <param name="languageId">The language ID.</param>
     /// <param name="isPending"><c>true</c> to include pending texts.</param>
     /// <param name="packageId">The package ID.</param>
+    /// <param name="keyFilter">Optional predicate that returns true for the keys to include.</param>
     /// <returns>The script content.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="registry"/> is <c>null</c>.</exception>
-    public static string GetLocalTextPackageScript(ILocalTextRegistry registry, 
-        string? includes, string languageId, bool isPending, string? packageId = null)
+    public static string GetLocalTextPackageScript(ILocalTextRegistry registry,
+        string? includes, string languageId, bool isPending, string? packageId = null,
+        Func<string, bool>? keyFilter = null)
     {
-        var list = LocalTextDataScript.GetPackageData(registry, includes, languageId, isPending, packageId).ToList();
+        var list = LocalTextDataScript.GetPackageData(registry, includes, languageId, isPending, packageId, keyFilter).ToList();
         list.Sort((i1, i2) => string.CompareOrdinal(i1.Key, i2.Key));
 
         var ms = new System.IO.MemoryStream();
@@ -165,6 +177,7 @@ public class LocalTextScript(ILocalTextRegistry registry, string package, string
     /// <inheritdoc/>
     public override string GetScript()
     {
-        return GetLocalTextPackageScript(registry, includes, languageId, isPending, package);
+        return GetLocalTextPackageScript(registry, includes, languageId, isPending, package,
+            permissionFilter?.GetKeyFilter());
     }  
 }

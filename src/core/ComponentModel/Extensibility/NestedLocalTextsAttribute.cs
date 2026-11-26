@@ -33,4 +33,15 @@ public sealed class NestedLocalTextsAttribute : Attribute
     /// The local text prefix.
     /// </value>
     public string? Prefix { get; set; }
+
+    /// <summary>
+    /// When set, and local texts sent to the client are filtered by permission
+    /// (LocalTextPermissions:Enabled), the texts declared by this class are only sent to
+    /// users with this permission, instead of the usual rules for their prefix. Use it to
+    /// protect the texts of a module's pages (e.g. "Site.MyModule." texts), or to send a few
+    /// row captions a profile page uses to users without access to the row.
+    /// Use "*" for texts anonymous pages use. A text that a form or columns script the user
+    /// can access uses is still sent.
+    /// </summary>
+    public string? Permission { get; set; }
 }

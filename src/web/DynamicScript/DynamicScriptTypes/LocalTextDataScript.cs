@@ -13,16 +13,20 @@ namespace Serenity.Web;
 /// <param name="localTextRegistry">The local text registry.</param>
 /// <param name="localTextPackages">The package list.</param>
 /// <param name="httpContextAccessor">The HTTP context accessor.</param>
+/// <param name="permissionFilter">Optional filter for texts by the permissions of the current user.</param>
 /// <exception cref="ArgumentNullException">One of the arguments is <c>null</c>.</exception>
 [DataScript("LocalText", CacheDuration = 3600)]
-public partial class LocalTextDataScript(ILocalTextRegistry localTextRegistry, IOptions<LocalTextPackages> localTextPackages, IHttpContextAccessor httpContextAccessor) : DataScript<IDictionary<string, string>>, ICacheSuffix
+public partial class LocalTextDataScript(ILocalTextRegistry localTextRegistry, IOptions<LocalTextPackages> localTextPackages,
+    IHttpContextAccessor httpContextAccessor, ILocalTextPermissionFilter? permissionFilter = null) : DataScript<IDictionary<string, string>>, ICacheSuffix
 {
     private readonly ILocalTextRegistry localTextRegistry = localTextRegistry ?? throw new ArgumentNullException(nameof(localTextRegistry));
     private readonly IOptions<LocalTextPackages> localTextPackages = localTextPackages ?? throw new ArgumentNullException(nameof(localTextPackages));
     private readonly IHttpContextAccessor httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
+    private readonly ILocalTextPermissionFilter? permissionFilter = permissionFilter;
 
     /// <inheritdoc/>
-    public string CacheSuffix => GetLanguageId(out string packageId) + ":" + packageId;
+    public string CacheSuffix => GetLanguageId(out string packageId) + ":" + packageId +
+        (permissionFilter?.GetCacheSuffix() is { Length: > 0 } permissionSuffix ? ":" + permissionSuffix : "");
 
     private static readonly Regex LanguageIDRegex = LanguageIDRegexGen();
 
@@ -55,10 +59,13 @@ public partial class LocalTextDataScript(ILocalTextRegistry localTextRegistry, I
     /// <param name="languageId">The language ID.</param>
     /// <param name="isPending"><c>true</c> to include pending texts.</param>
     /// <param name="packageId">The package ID.</param>
+    /// <param name="keyFilter">Optional predicate that returns true for the keys to include,
+    /// e.g. from <see cref="ILocalTextPermissionFilter.GetKeyFilter"/>.</param>
     /// <returns>A dictionary of local text keys and values.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="registry"/> is <c>null</c>.</exception>
     public static IDictionary<string, string> GetPackageData(ILocalTextRegistry registry,
-        string? includes, string languageId, bool isPending, string? packageId = null)
+        string? includes, string languageId, bool isPending, string? packageId = null,
+        Func<string, bool>? keyFilter = null)
     {
         ArgumentNullException.ThrowIfNull(registry);
 
@@ -72,8 +79,9 @@ public partial class LocalTextDataScript(ILocalTextRegistry localTextRegistry, I
             ltr.GetAllAvailableTextsInLanguage(languageId, isPending) : [];
 
         foreach (var pair in texts)
-            if (regex.IsMatch(pair.Key) ||
-                (packageId == "Site" && LocalTextPackages.DefaultSitePackageIncludes.IsMatch(pair.Key)))
+            if ((regex.IsMatch(pair.Key) ||
+                (packageId == "Site" && LocalTextPackages.DefaultSitePackageIncludes.IsMatch(pair.Key))) &&
+                (keyFilter is null || keyFilter(pair.Key)))
                 result[pair.Key] = pair.Value;
 
         return result;
@@ -87,6 +95,7 @@ public partial class LocalTextDataScript(ILocalTextRegistry localTextRegistry, I
         if (localTextPackages?.Value.TryGetValue(packageId, out var includes) != true)
             includes = "^$";
 
-        return GetPackageData(localTextRegistry, includes, languageId, false, packageId);
+        return GetPackageData(localTextRegistry, includes, languageId, false, packageId,
+            permissionFilter?.GetKeyFilter());
     }
 }

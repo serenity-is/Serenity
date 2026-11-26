@@ -265,4 +265,81 @@ public class BasePermissionServiceTests
         var cached = BasePermissionService.GetImplicitPermissions(cache.Memory, typeSource);
         Assert.Same(permissions, cached);
     }
+
+    private TestPermissionService CreateDirect(params string[] granted)
+    {
+        return new TestPermissionService(new MockUserAccessor(() => "user"), new MockRolePermissions())
+        {
+            DirectPermissionFunc = (_, permission) => granted.Contains(permission) ? true : null
+        };
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    public void HasPermission_Returns_False_For_Null_Or_Empty_Permission(string permission)
+    {
+        var service = CreateDirect("A");
+        service.SuperAdminFunc = _ => true;
+        Assert.False(service.HasPermission(permission));
+    }
+
+    [Fact]
+    public void HasPermission_Evaluates_Logical_Expressions_Per_Key()
+    {
+        var service = CreateDirect("A");
+        Assert.True(service.HasPermission("A|B"));
+        Assert.False(service.HasPermission("A&B"));
+        Assert.True(service.HasPermission("A&!B"));
+        Assert.False(service.HasPermission("!A"));
+        Assert.True(service.HasPermission("(B|A)&!C"));
+    }
+
+    [Fact]
+    public void HasPermission_Applies_Deny_And_Special_Keys_Inside_Expressions()
+    {
+        var service = CreateDirect("A");
+        Assert.False(service.HasPermission("A&DENY"));
+        Assert.True(service.HasPermission("B|*"));
+        Assert.True(service.HasPermission("B|?"));
+    }
+
+    private class KeyRecordingPermissionService(IUserAccessor userAccessor, IRolePermissionService rolePermissions)
+        : BasePermissionService(userAccessor, rolePermissions)
+    {
+        public List<string> Checked { get; } = [];
+        protected override IEnumerable<string> GetUserRoles(ClaimsPrincipal user) => [];
+        protected override bool? UserHasPermission(ClaimsPrincipal user, string permission) => permission == "A";
+
+        protected override bool HasPermissionKey(string permission)
+        {
+            Checked.Add(permission);
+            return base.HasPermissionKey(permission);
+        }
+    }
+
+    [Fact]
+    public void HasPermissionKey_Override_Only_Sees_Single_Keys()
+    {
+        var service = new KeyRecordingPermissionService(new MockUserAccessor(() => "user"), new MockRolePermissions());
+        Assert.True(service.HasPermission("B|A"));
+        Assert.Equal(["B", "A"], service.Checked);
+    }
+
+    [Fact]
+    public void Transient_Grant_Of_A_Key_Satisfies_An_Expression_With_It()
+    {
+        var service = CreateDirect();
+        Assert.False(service.HasPermission("A|B"));
+        service.Grant("B");
+        try
+        {
+            Assert.True(service.HasPermission("A|B"));
+            Assert.False(service.HasPermission("A&B"));
+        }
+        finally
+        {
+            service.UndoGrant();
+        }
+    }
 }

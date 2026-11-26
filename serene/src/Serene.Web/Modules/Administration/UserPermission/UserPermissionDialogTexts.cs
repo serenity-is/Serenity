@@ -1,6 +1,6 @@
 namespace Serene.Administration;
 
-[NestedLocalTexts(Prefix = "Site.UserPermissionDialog.")]
+[NestedLocalTexts(Prefix = "Site.UserPermissionDialog.", Permission = PermissionKeys.Security)]
 public static class UserPermissionDialogTexts
 {
     public static readonly LocalText DialogTitle = "Edit User Permissions ({0})";

@@ -27,6 +27,50 @@ public static class PermissionExpressionParser
         return TokenType.Permission;
     }
 
+    private static readonly char[] expressionChars = ['|', '&', '!', '(', ')'];
+    private static readonly ConcurrentDictionary<string, string[]> rpnCache = new();
+
+    /// <summary>
+    /// Returns true if the permission is a logical expression, e.g. contains <c>!</c>, <c>&amp;</c>,
+    /// <c>|</c> or parentheses, rather than a single permission key.
+    /// </summary>
+    /// <param name="permission">Permission or permission expression</param>
+    public static bool IsExpression(string? permission)
+    {
+        return !string.IsNullOrEmpty(permission) && permission.IndexOfAny(expressionChars) >= 0;
+    }
+
+    /// <summary>
+    /// Checks a permission that may be a logical expression. A single permission key is passed to
+    /// <paramref name="hasPermissionKey"/> as is, while for an expression, each permission key in it
+    /// is passed separately and the results are combined with the operators.
+    /// </summary>
+    /// <param name="permission">Permission or permission expression</param>
+    /// <param name="hasPermissionKey">Checks a single permission key</param>
+    /// <exception cref="InvalidOperationException">The expression is malformed, e.g. "A|" or "(A",
+    /// which is usually a typo in an attribute or setting.</exception>
+    public static bool HasPermission(string permission, Func<string, bool> hasPermissionKey)
+    {
+        if (hasPermissionKey is null)
+            throw new ArgumentNullException(nameof(hasPermissionKey));
+
+        if (!IsExpression(permission))
+            return hasPermissionKey(permission);
+
+        try
+        {
+            if (!rpnCache.TryGetValue(permission, out var rpnTokens))
+                rpnCache[permission] = rpnTokens = [.. ShuntingYard(Tokenize(permission))];
+
+            return Evaluate(rpnTokens, hasPermissionKey);
+        }
+        catch (InvalidOperationException ex)
+        {
+            // e.g. a missing operand pops from an empty stack, which says nothing about the expression
+            throw new InvalidOperationException($"Invalid permission expression: '{permission}'", ex);
+        }
+    }
+
     /// <summary>
     /// Tokenizes a permission expression into individual operators, parentheses, and permission keys.
     /// </summary>

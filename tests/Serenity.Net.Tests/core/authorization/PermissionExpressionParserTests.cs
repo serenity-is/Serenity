@@ -114,4 +114,80 @@ public class PermissionExpressionParserTests
         var rpn = PermissionExpressionParser.ShuntingYard(tokens);
         Assert.Throws<ArgumentNullException>(() => PermissionExpressionParser.Evaluate(rpn, null));
     }
+
+    [Theory]
+    [InlineData("A", false)]
+    [InlineData("Module:Permission", false)]
+    [InlineData("", false)]
+    [InlineData(null, false)]
+    [InlineData("A|B", true)]
+    [InlineData("A&B", true)]
+    [InlineData("!A", true)]
+    [InlineData("(A)", true)]
+    public void IsExpression_Detects_Operators(string permission, bool expected)
+    {
+        Assert.Equal(expected, PermissionExpressionParser.IsExpression(permission));
+    }
+
+    [Fact]
+    public void HasPermission_Passes_Single_Key_As_Is()
+    {
+        var checkedKeys = new List<string>();
+        Assert.True(PermissionExpressionParser.HasPermission("Module:Key", x => { checkedKeys.Add(x); return true; }));
+        Assert.Equal(["Module:Key"], checkedKeys);
+    }
+
+    [Fact]
+    public void HasPermission_Evaluates_Expression_Per_Key()
+    {
+        var checkedKeys = new List<string>();
+        bool hasKey(string key)
+        {
+            checkedKeys.Add(key);
+            return key == "B";
+        }
+
+        Assert.True(PermissionExpressionParser.HasPermission("A|B", hasKey));
+        Assert.Contains("A", checkedKeys);
+        Assert.Contains("B", checkedKeys);
+        Assert.DoesNotContain("A|B", checkedKeys);
+        Assert.False(PermissionExpressionParser.HasPermission("A&B", hasKey));
+        // a cached expression gives the same result
+        Assert.True(PermissionExpressionParser.HasPermission("A|B", hasKey));
+    }
+
+    [Fact]
+    public void HasPermission_Throws_For_Null_Key_Check()
+    {
+        Assert.Throws<ArgumentNullException>(() => PermissionExpressionParser.HasPermission("A", null));
+    }
+
+    [Theory]
+    [InlineData("A|")]
+    [InlineData("|")]
+    [InlineData("A&&B")]
+    [InlineData("!")]
+    [InlineData("(A")]
+    [InlineData("A)")]
+    public void HasPermission_Throws_With_Expression_For_Malformed_Expression(string permission)
+    {
+        var exception = Assert.Throws<InvalidOperationException>(() =>
+            PermissionExpressionParser.HasPermission(permission, _ => true));
+        Assert.Contains("'" + permission + "'", exception.Message, StringComparison.Ordinal);
+
+        // the same message on a second call, e.g. when a parsed expression is cached
+        exception = Assert.Throws<InvalidOperationException>(() =>
+            PermissionExpressionParser.HasPermission(permission, _ => true));
+        Assert.Contains("'" + permission + "'", exception.Message, StringComparison.Ordinal);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    public void HasPermission_Passes_Null_Or_Empty_Permission_To_Key_Check(string permission)
+    {
+        var checkedKeys = new List<string>();
+        Assert.False(PermissionExpressionParser.HasPermission(permission, x => { checkedKeys.Add(x); return false; }));
+        Assert.Equal([permission], checkedKeys);
+    }
 }

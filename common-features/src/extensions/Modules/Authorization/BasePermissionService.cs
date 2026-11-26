@@ -122,8 +122,26 @@ public abstract class BasePermissionService(
         return true;
     }
 
-    /// <inheritdoc/>
-    public virtual bool HasPermission(string permission)
+    /// <summary>
+    /// Returns true if the current user has the permission. The permission may also be a logical expression
+    /// with <c>!</c>, <c>&amp;</c>, <c>|</c> and parentheses, e.g. "A|B", in which case each permission key in it
+    /// is checked separately with <see cref="HasPermissionKey"/>. Override <see cref="HasPermissionKey"/> to change
+    /// how a single permission key is checked, so that the checks apply to each key in an expression.
+    /// </summary>
+    /// <param name="permission">Permission key or expression</param>
+    public bool HasPermission(string permission)
+    {
+        if (permission is null)
+            return false;
+
+        return PermissionExpressionParser.HasPermission(permission, HasPermissionKey);
+    }
+
+    /// <summary>
+    /// Returns true if the current user has a single permission key, e.g. not an expression.
+    /// </summary>
+    /// <param name="permission">Permission key</param>
+    protected virtual bool HasPermissionKey(string permission)
     {
         if (!IsValidKey(permission) || IsDeny(permission))
             return false;

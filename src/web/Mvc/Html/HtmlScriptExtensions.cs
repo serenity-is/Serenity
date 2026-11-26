@@ -289,7 +289,8 @@ public static partial class HtmlScriptExtensions
             var registry = services.GetRequiredService<ILocalTextRegistry>();
             var packages = services.GetRequiredService<IOptions<LocalTextPackages>>();
             var includes = packages.Value.TryGetValue(package, out var s) ? s : "";
-            return new LocalTextScript(registry, package, includes, languageId, isPending) { Permission = SpecialPermissionKeys.Public };
+            return new LocalTextScript(registry, package, includes, languageId, isPending,
+                services.GetService<ILocalTextPermissionFilter>()) { Permission = SpecialPermissionKeys.Public };
         });
 
         return scriptManager.GetScriptText(scriptName) ?? "";
@@ -311,7 +312,8 @@ public static partial class HtmlScriptExtensions
             var services = page.ViewContext.HttpContext.RequestServices;
             var registry = services.GetRequiredService<ILocalTextRegistry>();
             var packages = services.GetRequiredService<IOptions<LocalTextPackages>>();
-            return new LocalTextScript(registry, package, packages.Value[package], languageId, isPending) { Permission = SpecialPermissionKeys.Public };
+            return new LocalTextScript(registry, package, packages.Value[package], languageId, isPending,
+                services.GetService<ILocalTextPermissionFilter>()) { Permission = SpecialPermissionKeys.Public };
         });
 
         return scriptManager.GetScriptInclude(scriptName);
@@ -333,7 +335,8 @@ public static partial class HtmlScriptExtensions
             var services = page.ViewContext.HttpContext.RequestServices;
             var registry = services.GetRequiredService<ILocalTextRegistry>();
             var packages = services.GetRequiredService<IOptions<LocalTextPackages>>();
-            return new LocalTextScript(registry, package, packages.Value[package], languageId, isPending) { Permission = SpecialPermissionKeys.Public };
+            return new LocalTextScript(registry, package, packages.Value[package], languageId, isPending,
+                services.GetService<ILocalTextPermissionFilter>()) { Permission = SpecialPermissionKeys.Public };
         });
 
         return Script(page, "dynamic://" + scriptName);
