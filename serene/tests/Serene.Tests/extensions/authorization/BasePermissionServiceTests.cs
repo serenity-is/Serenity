@@ -277,7 +277,7 @@ public class BasePermissionServiceTests
     [Theory]
     [InlineData(null)]
     [InlineData("")]
-    public void HasPermission_Returns_False_For_Null_Or_Empty_Permission(string permission)
+    public void HasPermission_Returns_False_For_Null_Or_Empty_Permission(string? permission)
     {
         var service = CreateDirect("A");
         service.SuperAdminFunc = _ => true;

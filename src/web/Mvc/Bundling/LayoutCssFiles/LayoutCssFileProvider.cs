@@ -64,7 +64,7 @@ public class LayoutCssFileProvider(ITypeSource typeSource,
     {
         ArgumentNullException.ThrowIfNull(path);
         permissions ??= LayoutFilePermissions.ByPath(typeSource.GetAssemblyAttributes<LayoutCssFileAttribute>()
-            .Select(x => (x.Path, x.Permission)));
+            .Select(x => ((string?)x.Path, (string?)x.Permission)));
         return permissions.TryGetValue(path.Trim(), out var permission) ? permission : null;
     }
 

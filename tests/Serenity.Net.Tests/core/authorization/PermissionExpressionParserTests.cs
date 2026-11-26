@@ -124,7 +124,7 @@ public class PermissionExpressionParserTests
     [InlineData("A&B", true)]
     [InlineData("!A", true)]
     [InlineData("(A)", true)]
-    public void IsExpression_Detects_Operators(string permission, bool expected)
+    public void IsExpression_Detects_Operators(string? permission, bool expected)
     {
         Assert.Equal(expected, PermissionExpressionParser.IsExpression(permission));
     }
@@ -184,7 +184,7 @@ public class PermissionExpressionParserTests
     [Theory]
     [InlineData(null)]
     [InlineData("")]
-    public void HasPermission_Passes_Null_Or_Empty_Permission_To_Key_Check(string permission)
+    public void HasPermission_Passes_Null_Or_Empty_Permission_To_Key_Check(string? permission)
     {
         var checkedKeys = new List<string>();
         Assert.False(PermissionExpressionParser.HasPermission(permission, x => { checkedKeys.Add(x); return false; }));

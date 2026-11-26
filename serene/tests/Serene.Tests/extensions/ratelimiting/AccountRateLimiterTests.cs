@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Configuration;
-using Serenity.Extensions.DependencyInjection;
 using System.IO;
 using System.Net;
 using System.Threading.RateLimiting;
@@ -9,7 +8,7 @@ namespace Serenity.Extensions;
 
 public class AccountRateLimiterTests
 {
-    private static IServiceProvider CreateServices(Action<AccountRateLimitOptions>? configure = null)
+    private static ServiceProvider CreateServices(Action<AccountRateLimitOptions>? configure = null)
     {
         var services = new ServiceCollection();
         services.AddOptions();
@@ -144,7 +143,8 @@ public class AccountRateLimiterTests
         using var lease = options.GlobalLimiter.AttemptAcquire(context);
         Assert.False(lease.IsAcquired);
 
-        await options.OnRejected!(new OnRejectedContext { HttpContext = context, Lease = lease }, default);
+        await options.OnRejected!(new OnRejectedContext { HttpContext = context, Lease = lease },
+            TestContext.Current.CancellationToken);
 
         Assert.Equal(StatusCodes.Status429TooManyRequests, context.Response.StatusCode);
         context.Response.Body.Position = 0;
