@@ -72,5 +72,6 @@
   "Validation.PasswordStrengthRequireDigit": "A senha deve conter um dígito (0-9).",
   "Validation.PasswordStrengthRequireLowercase": "A senha deve conter uma letra minúscula (a-z).",
   "Validation.PasswordStrengthRequireNonAlphanumeric": "A senha deve conter um caractere não alfanumérico.",
-  "Validation.PasswordStrengthRequireUppercase": "A senha deve conter uma letra maiúscula (A-Z)."
+  "Validation.PasswordStrengthRequireUppercase": "A senha deve conter uma letra maiúscula (A-Z).",
+  "Validation.TooManyRequests": "Muitas tentativas. Aguarde um momento e tente novamente."
 }

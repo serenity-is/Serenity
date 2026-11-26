@@ -72,5 +72,6 @@
   "Validation.PasswordStrengthRequireDigit": "पासवर्ड में एक अंक (0-9) होना आवश्यक है।",
   "Validation.PasswordStrengthRequireLowercase": "पासवर्ड में एक लोअरकेस (a-z) अक्षर होना चाहिए।",
   "Validation.PasswordStrengthRequireNonAlphanumeric": "पासवर्ड में एक नॉन-अल्फ़ान्यूमेरिक वर्ण होना चाहिए।",
-  "Validation.PasswordStrengthRequireUppercase": "पासवर्ड में एक अपरकेस (A-Z) अक्षर होना चाहिए।"
+  "Validation.PasswordStrengthRequireUppercase": "पासवर्ड में एक अपरकेस (A-Z) अक्षर होना चाहिए।",
+  "Validation.TooManyRequests": "बहुत अधिक प्रयास। कृपया थोड़ी देर प्रतीक्षा करें और फिर से प्रयास करें।"
 }

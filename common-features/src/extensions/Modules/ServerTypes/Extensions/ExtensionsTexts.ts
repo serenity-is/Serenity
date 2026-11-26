@@ -125,6 +125,7 @@ namespace texts {
         export const PasswordStrengthRequireLowercase: string;
         export const PasswordStrengthRequireNonAlphanumeric: string;
         export const PasswordStrengthRequireUppercase: string;
+        export const TooManyRequests: string;
     }
 }
 

@@ -72,5 +72,6 @@
   "Validation.PasswordStrengthRequireDigit": "密碼必須包含數字（0-9）。",
   "Validation.PasswordStrengthRequireLowercase": "密碼必須包含小寫字母（a-z）.",
   "Validation.PasswordStrengthRequireNonAlphanumeric": "密碼必須包含非字母數字字符.",
-  "Validation.PasswordStrengthRequireUppercase": "密碼必須包含大寫字母（A-Z）。"
+  "Validation.PasswordStrengthRequireUppercase": "密碼必須包含大寫字母（A-Z）。",
+  "Validation.TooManyRequests": "嘗試次數過多。請稍後再試。"
 }

@@ -72,5 +72,6 @@
   "Validation.PasswordStrengthRequireDigit": "Kata sandi harus mengandung angka (0-9).",
   "Validation.PasswordStrengthRequireLowercase": "Kata sandi harus mengandung huruf kecil (a-z).",
   "Validation.PasswordStrengthRequireNonAlphanumeric": "Kata sandi harus mengandung karakter non-alfanumerik.",
-  "Validation.PasswordStrengthRequireUppercase": "Kata sandi harus mengandung huruf besar (A-Z)."
+  "Validation.PasswordStrengthRequireUppercase": "Kata sandi harus mengandung huruf besar (A-Z).",
+  "Validation.TooManyRequests": "Terlalu banyak percobaan. Tunggu sebentar lalu coba lagi."
 }

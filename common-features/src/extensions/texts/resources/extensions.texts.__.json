@@ -73,5 +73,6 @@
   "Validation.PasswordStrengthRequireDigit": "Password must contain a digit (0-9).",
   "Validation.PasswordStrengthRequireLowercase": "Password must contain a lowercase (a-z) letter.",
   "Validation.PasswordStrengthRequireNonAlphanumeric": "Password must contain a non-alphanumeric character.",
-  "Validation.PasswordStrengthRequireUppercase": "Password must contain an uppercase (A-Z) letter."
+  "Validation.PasswordStrengthRequireUppercase": "Password must contain an uppercase (A-Z) letter.",
+  "Validation.TooManyRequests": "Too many attempts. Please wait a while and try again."
 }

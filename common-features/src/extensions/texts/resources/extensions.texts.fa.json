@@ -72,5 +72,6 @@
   "Validation.PasswordStrengthRequireDigit": "رمز عبور باید شامل یک رقم (0-9) باشد.",
   "Validation.PasswordStrengthRequireLowercase": "رمز عبور باید شامل یک حرف کوچک (a-z) باشد.",
   "Validation.PasswordStrengthRequireNonAlphanumeric": "رمز عبور باید شامل یک کاراکتر غیر الفبایی باشد.",
-  "Validation.PasswordStrengthRequireUppercase": "رمز عبور باید شامل یک حرف بزرگ (A-Z) باشد."
+  "Validation.PasswordStrengthRequireUppercase": "رمز عبور باید شامل یک حرف بزرگ (A-Z) باشد.",
+  "Validation.TooManyRequests": "تلاش‌های بیش از حد. لطفاً کمی صبر کنید و دوباره تلاش کنید."
 }

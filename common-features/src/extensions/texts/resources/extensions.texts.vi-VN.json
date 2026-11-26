@@ -72,5 +72,6 @@
   "Validation.PasswordStrengthRequireDigit": "Mật khẩu phải chứa ít nhất một chữ số (0-9).",
   "Validation.PasswordStrengthRequireLowercase": "Mật khẩu phải chứa ít nhất một chữ cái thường (a-z).",
   "Validation.PasswordStrengthRequireNonAlphanumeric": "Mật khẩu phải chứa ít nhất một ký tự không phải chữ số hoặc chữ cái.",
-  "Validation.PasswordStrengthRequireUppercase": "Mật khẩu phải chứa ít nhất một chữ cái hoa (A-Z)."
+  "Validation.PasswordStrengthRequireUppercase": "Mật khẩu phải chứa ít nhất một chữ cái hoa (A-Z).",
+  "Validation.TooManyRequests": "Quá nhiều lần thử. Vui lòng đợi một lúc rồi thử lại."
 }

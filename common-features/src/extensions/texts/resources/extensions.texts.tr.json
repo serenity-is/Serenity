@@ -72,5 +72,6 @@
   "Validation.PasswordStrengthRequireDigit": "Şifre en az bir rakam (0-9) içermelidir.",
   "Validation.PasswordStrengthRequireLowercase": "Şifre en az bir küçük (a-z) harf içermelidir.",
   "Validation.PasswordStrengthRequireNonAlphanumeric": "Şifre en az bir alfasayısal olmayan karakter içermelidir.",
-  "Validation.PasswordStrengthRequireUppercase": "Şifre en az bir büyük (A-Z) harf içermelidir."
+  "Validation.PasswordStrengthRequireUppercase": "Şifre en az bir büyük (A-Z) harf içermelidir.",
+  "Validation.TooManyRequests": "Çok fazla deneme. Lütfen biraz bekleyip tekrar deneyin."
 }

@@ -72,5 +72,6 @@
   "Validation.PasswordStrengthRequireDigit": "يجب أن تحتوي كلمة المرور على رقم (0-9).",
   "Validation.PasswordStrengthRequireLowercase": "يجب أن تحتوي كلمة المرور على حرف صغير (a-z).",
   "Validation.PasswordStrengthRequireNonAlphanumeric": "يجب أن تحتوي كلمة المرور على حرف غير أبجدي رقمي.",
-  "Validation.PasswordStrengthRequireUppercase": "يجب أن تحتوي كلمة المرور على حرف كبير (A-Z)."
+  "Validation.PasswordStrengthRequireUppercase": "يجب أن تحتوي كلمة المرور على حرف كبير (A-Z).",
+  "Validation.TooManyRequests": "محاولات كثيرة جدًا. يُرجى الانتظار قليلًا ثم المحاولة مرة أخرى."
 }

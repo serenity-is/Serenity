@@ -51,6 +51,7 @@ public partial class Startup
         }
 
         services.AddAntiforgery(options => options.HeaderName = "X-CSRF-TOKEN");
+        services.AddAccountRateLimiter();
         services.Configure<JsonOptions>(options => JSON.Defaults.Populate(options.JsonSerializerOptions));
         services.Configure<UserEntityOptions>(options => options.RowType = typeof(Administration.UserRow));
 
@@ -138,6 +139,7 @@ public partial class Startup
         app.UseStaticFiles();
 
         app.UseRouting();
+        app.UseRateLimiter();
         app.UseAuthentication();
         app.UseAuthorization();
 

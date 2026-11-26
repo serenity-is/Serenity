@@ -72,5 +72,6 @@
   "Validation.PasswordStrengthRequireDigit": "Пароль должен содержать цифру (0-9).",
   "Validation.PasswordStrengthRequireLowercase": "Пароль должен содержать строчную букву (a-z).",
   "Validation.PasswordStrengthRequireNonAlphanumeric": "Пароль должен содержать не буквенно-цифровой символ.",
-  "Validation.PasswordStrengthRequireUppercase": "Пароль должен содержать заглавную букву (A-Z)."
+  "Validation.PasswordStrengthRequireUppercase": "Пароль должен содержать заглавную букву (A-Z).",
+  "Validation.TooManyRequests": "Слишком много попыток. Подождите немного и попробуйте снова."
 }

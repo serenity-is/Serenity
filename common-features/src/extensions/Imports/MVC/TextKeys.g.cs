@@ -223,5 +223,7 @@ public static partial class TextKeys
         public const string PasswordStrengthRequireNonAlphanumeric = "Validation.PasswordStrengthRequireNonAlphanumeric";
         /// <summary>Password must contain an uppercase (A-Z) letter.</summary>
         public const string PasswordStrengthRequireUppercase = "Validation.PasswordStrengthRequireUppercase";
+        /// <summary>Too many attempts. Please wait a while and try again.</summary>
+        public const string TooManyRequests = "Validation.TooManyRequests";
     }
 }

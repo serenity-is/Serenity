@@ -72,5 +72,6 @@
   "Validation.PasswordStrengthRequireDigit": "পাসওয়ার্ডে একটি সংখ্যা (0-9) অবশ্যই থাকতে হবে।",
   "Validation.PasswordStrengthRequireLowercase": "পাসওয়ার্ডে একটি ছোট হাতের (a-z) অক্ষর থাকতে হবে।",
   "Validation.PasswordStrengthRequireNonAlphanumeric": "পাসওয়ার্ডে একটি অ্যালফানিউমেরিক নয় এমন চিহ্ন থাকতে হবে।",
-  "Validation.PasswordStrengthRequireUppercase": "পাসওয়ার্ডে একটি বড় হাতের (A-Z) অক্ষর থাকতে হবে।"
+  "Validation.PasswordStrengthRequireUppercase": "পাসওয়ার্ডে একটি বড় হাতের (A-Z) অক্ষর থাকতে হবে।",
+  "Validation.TooManyRequests": "অনেকবার চেষ্টা করা হয়েছে। অনুগ্রহ করে কিছুক্ষণ অপেক্ষা করে আবার চেষ্টা করুন।"
 }

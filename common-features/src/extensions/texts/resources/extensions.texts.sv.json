@@ -72,5 +72,6 @@
   "Validation.PasswordStrengthRequireDigit": "Lösenordet måste innehålla en siffra (0-9).",
   "Validation.PasswordStrengthRequireLowercase": "Lösenordet måste innehålla en liten bokstav (a-z).",
   "Validation.PasswordStrengthRequireNonAlphanumeric": "Lösenordet måste innehålla ett icke-alfanumeriskt tecken.",
-  "Validation.PasswordStrengthRequireUppercase": "Lösenordet måste innehålla en stor bokstav (A-Z)."
+  "Validation.PasswordStrengthRequireUppercase": "Lösenordet måste innehålla en stor bokstav (A-Z).",
+  "Validation.TooManyRequests": "För många försök. Vänta en stund och försök igen."
 }

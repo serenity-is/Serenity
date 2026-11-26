@@ -72,5 +72,6 @@
   "Validation.PasswordStrengthRequireDigit": "La contraseña debe contener un dígito (0-9).",
   "Validation.PasswordStrengthRequireLowercase": "La contraseña debe contener una letra minúscula (a-z).",
   "Validation.PasswordStrengthRequireNonAlphanumeric": "La contraseña debe contener un carácter no alfanumérico.",
-  "Validation.PasswordStrengthRequireUppercase": "La contraseña debe contener una letra mayúscula (A-Z)."
+  "Validation.PasswordStrengthRequireUppercase": "La contraseña debe contener una letra mayúscula (A-Z).",
+  "Validation.TooManyRequests": "Demasiados intentos. Espere un momento e inténtelo de nuevo."
 }

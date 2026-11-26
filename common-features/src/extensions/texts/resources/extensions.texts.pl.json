@@ -72,5 +72,6 @@
   "Validation.PasswordStrengthRequireDigit": "Hasło musi zawierać cyfrę (0-9).",
   "Validation.PasswordStrengthRequireLowercase": "Hasło musi zawierać małą literę (a-z).",
   "Validation.PasswordStrengthRequireNonAlphanumeric": "Hasło musi zawierać znak nieliterowy lub niesymboledowy.",
-  "Validation.PasswordStrengthRequireUppercase": "Hasło musi zawierać dużą literę (A-Z)."
+  "Validation.PasswordStrengthRequireUppercase": "Hasło musi zawierać dużą literę (A-Z).",
+  "Validation.TooManyRequests": "Zbyt wiele prób. Poczekaj chwilę i spróbuj ponownie."
 }

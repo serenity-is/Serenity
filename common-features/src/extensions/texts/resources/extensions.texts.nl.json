@@ -72,5 +72,6 @@
   "Validation.PasswordStrengthRequireDigit": "Wachtwoord moet een cijfer (0-9) bevatten.",
   "Validation.PasswordStrengthRequireLowercase": "Wachtwoord moet een kleine letter (a-z) bevatten.",
   "Validation.PasswordStrengthRequireNonAlphanumeric": "Wachtwoord moet een niet-alfanumeriek teken bevatten.",
-  "Validation.PasswordStrengthRequireUppercase": "Wachtwoord moet een grote letter (A-Z) bevatten."
+  "Validation.PasswordStrengthRequireUppercase": "Wachtwoord moet een grote letter (A-Z) bevatten.",
+  "Validation.TooManyRequests": "Te veel pogingen. Wacht even en probeer het opnieuw."
 }

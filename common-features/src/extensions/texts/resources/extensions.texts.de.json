@@ -72,5 +72,6 @@
   "Validation.PasswordStrengthRequireDigit": "Das Passwort muss eine Ziffer (0-9) enthalten.",
   "Validation.PasswordStrengthRequireLowercase": "Das Passwort muss einen Kleinbuchstaben (a-z) enthalten.",
   "Validation.PasswordStrengthRequireNonAlphanumeric": "Das Passwort muss ein nicht-alphanumerisches Zeichen enthalten.",
-  "Validation.PasswordStrengthRequireUppercase": "Das Passwort muss einen Großbuchstaben (A-Z) enthalten."
+  "Validation.PasswordStrengthRequireUppercase": "Das Passwort muss einen Großbuchstaben (A-Z) enthalten.",
+  "Validation.TooManyRequests": "Zu viele Versuche. Bitte warten Sie einen Moment und versuchen Sie es erneut."
 }

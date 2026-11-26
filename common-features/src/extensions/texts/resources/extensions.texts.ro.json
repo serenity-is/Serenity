@@ -72,5 +72,6 @@
   "Validation.PasswordStrengthRequireDigit": "Parola trebuie să conțină o cifră (0-9).",
   "Validation.PasswordStrengthRequireLowercase": "Parola trebuie să conțină o literă mică (a-z).",
   "Validation.PasswordStrengthRequireNonAlphanumeric": "Parola trebuie să conțină un caracter non-alfanumeric.",
-  "Validation.PasswordStrengthRequireUppercase": "Parola trebuie să conțină o literă mare (A-Z)."
+  "Validation.PasswordStrengthRequireUppercase": "Parola trebuie să conțină o literă mare (A-Z).",
+  "Validation.TooManyRequests": "Prea multe încercări. Așteptați puțin și încercați din nou."
 }
