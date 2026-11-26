@@ -1,4 +1,4 @@
-## Unreleased
+## 10.8.0 (2026-11-26)
 
 ### Features
 - Themes are families with a light and/or a dark scheme instead of a single fixed look, picked from the new theme menu in the sidebar, stored in the `ProTheme` and `ProThemeScheme` cookies, and rendered with the right scheme from the first request so there is no flash of the wrong colors, even for "system" (StartSharp). Azure gains the former Cosmos theme as its dark scheme, Glassy is redone with a dark scheme of frosted translucent surfaces over a photo that turn solid when the user asks for less transparency, and the new Carbon theme is a flat neutral family with its Slate, Studio, Ember (Gruvbox), Tide (Monokai) and Lilac (Catppuccin) variants, each with a light and a dark scheme. A theme chosen with the earlier `ProThemeSelection` cookie is still honored.

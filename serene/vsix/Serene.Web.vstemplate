@@ -33,6 +33,7 @@
         <Folder Name="MVC" TargetFolderName="MVC">
           <ProjectItem ReplaceParameters="true" TargetFileName="ESM.cs">ESM.cs</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="MVC.cs">MVC.cs</ProjectItem>
+          <ProjectItem ReplaceParameters="true" TargetFileName="TextKeys.g.cs">TextKeys.g.cs</ProjectItem>
         </Folder>
       </Folder>
       <Folder Name="Initialization" TargetFolderName="Initialization">
@@ -160,6 +161,7 @@
             </Folder>
             <ProjectItem ReplaceParameters="true" TargetFileName="DataMigrations.cs">DataMigrations.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="DynamicDataGenerator.cs">DynamicDataGenerator.cs</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="LocalTextJsonGenerator.cs">LocalTextJsonGenerator.cs</ProjectItem>
             <Folder Name="Models" TargetFolderName="Models">
               <ProjectItem ReplaceParameters="true" TargetFileName="DirectoryEntry.cs">DirectoryEntry.cs</ProjectItem>
               <ProjectItem ReplaceParameters="true" TargetFileName="ScriptUserDefinition.cs">ScriptUserDefinition.cs</ProjectItem>
@@ -222,6 +224,7 @@
         <Folder Name="ServerTypes" TargetFolderName="ServerTypes">
           <ProjectItem ReplaceParameters="true" TargetFileName="Administration.ts">Administration.ts</ProjectItem>
           <Folder Name="Administration" TargetFolderName="Administration">
+            <ProjectItem ReplaceParameters="true" TargetFileName="DbTexts.ts">DbTexts.ts</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="LanguageColumns.ts">LanguageColumns.ts</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="LanguageForm.ts">LanguageForm.ts</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="LanguageRow.ts">LanguageRow.ts</ProjectItem>
@@ -229,6 +232,7 @@
             <ProjectItem ReplaceParameters="true" TargetFileName="PermissionKeys.ts">PermissionKeys.ts</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="RoleColumns.ts">RoleColumns.ts</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="RoleForm.ts">RoleForm.ts</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="RolePermissionDialogTexts.ts">RolePermissionDialogTexts.ts</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="RolePermissionListRequest.ts">RolePermissionListRequest.ts</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="RolePermissionListResponse.ts">RolePermissionListResponse.ts</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="RolePermissionRow.ts">RolePermissionRow.ts</ProjectItem>
@@ -241,8 +245,10 @@
             <ProjectItem ReplaceParameters="true" TargetFileName="TranslationService.ts">TranslationService.ts</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="TranslationUpdateRequest.ts">TranslationUpdateRequest.ts</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="UserColumns.ts">UserColumns.ts</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="UserDialogTexts.ts">UserDialogTexts.ts</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="UserForm.ts">UserForm.ts</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="UserListRequest.ts">UserListRequest.ts</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="UserPermissionDialogTexts.ts">UserPermissionDialogTexts.ts</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="UserPermissionListRequest.ts">UserPermissionListRequest.ts</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="UserPermissionRow.ts">UserPermissionRow.ts</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="UserPermissionService.ts">UserPermissionService.ts</ProjectItem>
@@ -255,10 +261,16 @@
             <ProjectItem ReplaceParameters="true" TargetFileName="UserRow.ts">UserRow.ts</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="UserService.ts">UserService.ts</ProjectItem>
           </Folder>
+          <ProjectItem ReplaceParameters="true" TargetFileName="Common.ts">Common.ts</ProjectItem>
+          <Folder Name="Common" TargetFolderName="Common">
+            <ProjectItem ReplaceParameters="true" TargetFileName="AccessDeniedViewTexts.ts">AccessDeniedViewTexts.ts</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="ValidationErrorViewTexts.ts">ValidationErrorViewTexts.ts</ProjectItem>
+          </Folder>
           <ProjectItem ReplaceParameters="true" TargetFileName="Membership.ts">Membership.ts</ProjectItem>
           <Folder Name="Membership" TargetFolderName="Membership">
             <ProjectItem ReplaceParameters="true" TargetFileName="LoginForm.ts">LoginForm.ts</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="LoginRequest.ts">LoginRequest.ts</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="MembershipValidationTexts.ts">MembershipValidationTexts.ts</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="SignUpForm.ts">SignUpForm.ts</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="SignUpRequest.ts">SignUpRequest.ts</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="SignUpResponse.ts">SignUpResponse.ts</ProjectItem>
@@ -266,13 +278,19 @@
           <ProjectItem ReplaceParameters="true" TargetFileName="Namespaces.ts">Namespaces.ts</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="RemoteDataKeys.ts">RemoteDataKeys.ts</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="ScriptUserDefinition.ts">ScriptUserDefinition.ts</ProjectItem>
-          <ProjectItem ReplaceParameters="true" TargetFileName="Texts.ts">Texts.ts</ProjectItem>
+          <Folder Name="Texts" TargetFolderName="Texts">
+            <ProjectItem ReplaceParameters="true" TargetFileName="LoginFormTexts.ts">LoginFormTexts.ts</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="SignUpFormTexts.ts">SignUpFormTexts.ts</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="SiteFormTexts.ts">SiteFormTexts.ts</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="SiteLayoutTexts.ts">SiteLayoutTexts.ts</ProjectItem>
+          </Folder>
         </Folder>
       </Folder>
       <ProjectItem ReplaceParameters="true" TargetFileName="package.json">package.json</ProjectItem>
       <ProjectItem ReplaceParameters="true" TargetFileName="sergen.json">sergen.json</ProjectItem>
       <Folder Name="texts" TargetFolderName="texts">
         <Folder Name="resources" TargetFolderName="resources">
+          <ProjectItem ReplaceParameters="true" TargetFileName="site.texts.__.json">site.texts.__.json</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="site.texts.de.json">site.texts.de.json</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="site.texts.es.json">site.texts.es.json</ProjectItem>
           <ProjectItem ReplaceParameters="true" TargetFileName="site.texts.fa.json">site.texts.fa.json</ProjectItem>
@@ -319,13 +337,14 @@
         </Folder>
         <Folder Name="esm" TargetFolderName="esm">
           <Folder Name="_chunks" TargetFolderName="_chunks">
+            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-4D5MACWE.js">chunk-4D5MACWE.js</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="chunk-4RRITRPO.js">chunk-4RRITRPO.js</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-5BIDJAG6.js">chunk-5BIDJAG6.js</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-64ZAROVM.js">chunk-64ZAROVM.js</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="chunk-BGXO3CPC.js">chunk-BGXO3CPC.js</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-EBMZRGMG.js">chunk-EBMZRGMG.js</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-TIEKRHXH.js">chunk-TIEKRHXH.js</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-VJZ7KFIT.js">chunk-VJZ7KFIT.js</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-PHAWVNK5.js">chunk-PHAWVNK5.js</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-TUZYCHD7.js">chunk-TUZYCHD7.js</ProjectItem>
           </Folder>
+          <ProjectItem ReplaceParameters="false" TargetFileName="build.esm-manifest">build.esm-manifest</ProjectItem>
           <Folder Name="Modules" TargetFolderName="Modules">
             <Folder Name="Administration" TargetFolderName="Administration">
               <Folder Name="Language" TargetFolderName="Language">
@@ -446,6 +465,7 @@
       <files include="Initialization\TypeSource.cs" />
       <files include="Modules\Common\AppServices\DataMigrations.cs" />
       <files include="Modules\Common\AppServices\TypeSource.cs" />
+      <files include="Modules\Common\AppServices\LocalTextJsonGenerator.cs" />
     </conditionals>
   </WizardData>
 </VSTemplate>
