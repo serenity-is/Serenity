@@ -1,477 +1,6 @@
 import { BaseDialog, ClassTypeInfo, DataGrid, DeleteResponse, DialogButton, DialogOptions, DialogType, EditorProps, EditorTypeInfo, EmailAddressEditor, EntityDialog, EntityGrid, Formatter, FormatterTypeInfo, IconClassName, IGetEditValue, ISetEditValue, ListRequest, ListResponse, PasswordEditor, PrefixedContext, PropertyDialog, PropertyItem, RenderableContent, SaveInitiator, SaveResponse, ServiceError, ServiceOptions, ServiceRequest, ServiceResponse, SettingStorage, ToolButton, Widget, WidgetProps } from '@serenity-is/corelib';
 import { FormatterContext, FormatterResult, GridOptions } from '@serenity-is/sleekgrid';
 
-declare namespace texts11 {
-    namespace Site {
-        function asKey(): typeof Site;
-        function asTry(): typeof Site;
-        namespace BasicProgressDialog {
-            function asKey(): typeof BasicProgressDialog;
-            function asTry(): typeof BasicProgressDialog;
-            const CancelTitle: string;
-            const PleaseWait: string;
-        }
-    }
-}
-export declare const BasicProgressDialogTexts: typeof texts11.Site.BasicProgressDialog;
-declare namespace texts10 {
-    namespace Site {
-        function asKey(): typeof Site;
-        function asTry(): typeof Site;
-        namespace BulkServiceAction {
-            function asKey(): typeof BulkServiceAction;
-            function asTry(): typeof BulkServiceAction;
-            const AllHadErrorsFormat: string;
-            const AllSuccessFormat: string;
-            const ConfirmationFormat: string;
-            const ErrorCount: string;
-            const NothingToProcess: string;
-            const SomeHadErrorsFormat: string;
-            const SuccessCount: string;
-        }
-    }
-}
-export declare const BulkServiceActionTexts: typeof texts10.Site.BulkServiceAction;
-export interface ChangePasswordForm {
-    OldPassword: PasswordEditor;
-    NewPassword: PasswordEditor;
-    ConfirmPassword: PasswordEditor;
-}
-export declare class ChangePasswordForm extends PrefixedContext {
-    static readonly formKey = "Serenity.Extensions.ChangePasswordRequest";
-    private static init;
-    constructor(...args: ConstructorParameters<typeof PrefixedContext>);
-}
-declare namespace texts9 {
-    namespace Forms {
-        function asKey(): typeof Forms;
-        function asTry(): typeof Forms;
-        namespace Membership {
-            function asKey(): typeof Membership;
-            function asTry(): typeof Membership;
-            namespace ChangePassword {
-                function asKey(): typeof ChangePassword;
-                function asTry(): typeof ChangePassword;
-                const FormTitle: string;
-                const SubmitButton: string;
-                const Success: string;
-            }
-        }
-    }
-}
-export declare const ChangePasswordFormTexts: typeof texts9.Forms.Membership.ChangePassword;
-export interface ChangePasswordRequest extends ServiceRequest {
-    OldPassword?: string;
-    NewPassword?: string;
-    ConfirmPassword?: string;
-}
-declare namespace texts8 {
-    namespace Validation {
-        function asKey(): typeof Validation;
-        function asTry(): typeof Validation;
-        const InvalidResetToken: string;
-        const MinRequiredPasswordLength: string;
-        const PasswordConfirmMismatch: string;
-        const PasswordStrengthRequireDigit: string;
-        const PasswordStrengthRequireLowercase: string;
-        const PasswordStrengthRequireNonAlphanumeric: string;
-        const PasswordStrengthRequireUppercase: string;
-    }
-}
-export declare const ChangePasswordValidationTexts: typeof texts8.Validation;
-declare namespace texts7 {
-    namespace Site {
-        function asKey(): typeof Site;
-        function asTry(): typeof Site;
-        namespace Dialogs {
-            function asKey(): typeof Dialogs;
-            function asTry(): typeof Dialogs;
-            const PendingChangesConfirmation: string;
-            const PendingChangesUnloadWarning: string;
-        }
-    }
-}
-export declare const DialogUtilsTexts: typeof texts7.Site.Dialogs;
-export interface ExcelImportRequest extends ServiceRequest {
-    FileName?: string;
-}
-export interface ExcelImportResponse extends ServiceResponse {
-    Inserted?: number;
-    Updated?: number;
-    ErrorList?: string[];
-}
-declare namespace texts6 {
-    namespace Db {
-        function asKey(): typeof Db;
-        function asTry(): typeof Db;
-        namespace Common {
-            function asKey(): typeof Common;
-            function asTry(): typeof Common;
-            namespace UserPreference {
-                function asKey(): typeof UserPreference;
-                function asTry(): typeof UserPreference;
-                const EntityPlural: string;
-                const EntitySingular: string;
-                const Name: string;
-                const PreferenceType: string;
-                const UserId: string;
-                const UserPreferenceId: string;
-                const Value: string;
-            }
-        }
-    }
-    namespace Forms {
-        function asKey(): typeof Forms;
-        function asTry(): typeof Forms;
-        namespace Membership {
-            function asKey(): typeof Membership;
-            function asTry(): typeof Membership;
-            namespace ChangePassword {
-                function asKey(): typeof ChangePassword;
-                function asTry(): typeof ChangePassword;
-                const FormTitle: string;
-                const SubmitButton: string;
-                const Success: string;
-            }
-            namespace ForgotPassword {
-                function asKey(): typeof ForgotPassword;
-                function asTry(): typeof ForgotPassword;
-                const FormInfo: string;
-                const FormTitle: string;
-                const SubmitButton: string;
-                const SuccessMessage: string;
-            }
-            namespace ResetPassword {
-                function asKey(): typeof ResetPassword;
-                function asTry(): typeof ResetPassword;
-                const EmailSubject: string;
-                const FormTitle: string;
-                const SubmitButton: string;
-                const Success: string;
-            }
-            namespace SetPassword {
-                function asKey(): typeof SetPassword;
-                function asTry(): typeof SetPassword;
-                const ElevatedActionsMessage: string;
-                const EmailSentMessage: string;
-                const EmailToSetPasswordMessage: string;
-                const PageTitle: string;
-                const SendEmailButton: string;
-            }
-        }
-    }
-    namespace Site {
-        function asKey(): typeof Site;
-        function asTry(): typeof Site;
-        namespace BasicProgressDialog {
-            function asKey(): typeof BasicProgressDialog;
-            function asTry(): typeof BasicProgressDialog;
-            const CancelTitle: string;
-            const PleaseWait: string;
-        }
-        namespace BulkServiceAction {
-            function asKey(): typeof BulkServiceAction;
-            function asTry(): typeof BulkServiceAction;
-            const AllHadErrorsFormat: string;
-            const AllSuccessFormat: string;
-            const ConfirmationFormat: string;
-            const ErrorCount: string;
-            const NothingToProcess: string;
-            const SomeHadErrorsFormat: string;
-            const SuccessCount: string;
-        }
-        namespace Dialogs {
-            function asKey(): typeof Dialogs;
-            function asTry(): typeof Dialogs;
-            const PendingChangesConfirmation: string;
-            const PendingChangesUnloadWarning: string;
-        }
-        namespace Translation {
-            function asKey(): typeof Translation;
-            function asTry(): typeof Translation;
-            const AllTextsAlreadyTranslated: string;
-            const Assembly: string;
-            const CopyFailMessage: string;
-            const CopySourceTranslations: string;
-            const CopySuccessMessage: string;
-            const CopyTargetTranslations: string;
-            const CustomText: string;
-            const EntityPlural: string;
-            const HasTranslation: string;
-            const Key: string;
-            const OverrideConfirmation: string;
-            const SaveChangesButton: string;
-            const SaveSuccessMessage: string;
-            const SourceLanguage: string;
-            const SourceTargetLanguageSame: string;
-            const SourceText: string;
-            const TargetLanguage: string;
-            const TargetLanguageRequired: string;
-            const TargetText: string;
-            const TranslateAllText: string;
-            const TranslateText: string;
-            const TranslateTextConfirmation: string;
-            const TranslateTextDisabled: string;
-            const UserTranslated: string;
-        }
-    }
-    namespace Validation {
-        function asKey(): typeof Validation;
-        function asTry(): typeof Validation;
-        const InvalidResetToken: string;
-        const MinRequiredPasswordLength: string;
-        const PasswordConfirmMismatch: string;
-        const PasswordStrengthRequireDigit: string;
-        const PasswordStrengthRequireLowercase: string;
-        const PasswordStrengthRequireNonAlphanumeric: string;
-        const PasswordStrengthRequireUppercase: string;
-    }
-}
-export declare const ExtensionsTexts: typeof texts6;
-export interface ForgotPasswordForm {
-    Email: EmailAddressEditor;
-}
-export declare class ForgotPasswordForm extends PrefixedContext {
-    static readonly formKey = "Serenity.Extensions.ForgotPasswordRequest";
-    private static init;
-    constructor(...args: ConstructorParameters<typeof PrefixedContext>);
-}
-declare namespace texts5 {
-    namespace Forms {
-        function asKey(): typeof Forms;
-        function asTry(): typeof Forms;
-        namespace Membership {
-            function asKey(): typeof Membership;
-            function asTry(): typeof Membership;
-            namespace ForgotPassword {
-                function asKey(): typeof ForgotPassword;
-                function asTry(): typeof ForgotPassword;
-                const FormInfo: string;
-                const FormTitle: string;
-                const SubmitButton: string;
-                const SuccessMessage: string;
-            }
-        }
-    }
-}
-export declare const ForgotPasswordFormTexts: typeof texts5.Forms.Membership.ForgotPassword;
-export interface ForgotPasswordRequest extends ServiceRequest {
-    Email?: string;
-}
-export interface GetNextNumberRequest extends ServiceRequest {
-    Prefix?: string;
-    Length?: number;
-}
-export interface GetNextNumberResponse extends ServiceResponse {
-    Number?: number;
-    Serial?: string;
-}
-export interface PasswordStrengthRules {
-    MinPasswordLength?: number;
-    RequireDigit?: boolean;
-    RequireLowercase?: boolean;
-    RequireNonAlphanumeric?: boolean;
-    RequireUppercase?: boolean;
-}
-declare namespace texts4 {
-    namespace Validation {
-        function asKey(): typeof Validation;
-        function asTry(): typeof Validation;
-        const InvalidResetToken: string;
-        const MinRequiredPasswordLength: string;
-        const PasswordConfirmMismatch: string;
-        const PasswordStrengthRequireDigit: string;
-        const PasswordStrengthRequireLowercase: string;
-        const PasswordStrengthRequireNonAlphanumeric: string;
-        const PasswordStrengthRequireUppercase: string;
-    }
-}
-export declare const PasswordStrengthValidationTexts: typeof texts4.Validation;
-export interface ResetPasswordForm {
-    NewPassword: PasswordEditor;
-    ConfirmPassword: PasswordEditor;
-}
-export declare class ResetPasswordForm extends PrefixedContext {
-    static readonly formKey = "Serenity.Extensions.ResetPasswordRequest";
-    private static init;
-    constructor(...args: ConstructorParameters<typeof PrefixedContext>);
-}
-declare namespace texts3 {
-    namespace Forms {
-        function asKey(): typeof Forms;
-        function asTry(): typeof Forms;
-        namespace Membership {
-            function asKey(): typeof Membership;
-            function asTry(): typeof Membership;
-            namespace ResetPassword {
-                function asKey(): typeof ResetPassword;
-                function asTry(): typeof ResetPassword;
-                const EmailSubject: string;
-                const FormTitle: string;
-                const SubmitButton: string;
-                const Success: string;
-            }
-        }
-    }
-}
-export declare const ResetPasswordFormTexts: typeof texts3.Forms.Membership.ResetPassword;
-export interface ResetPasswordRequest extends ServiceRequest {
-    Token?: string;
-    NewPassword?: string;
-    ConfirmPassword?: string;
-}
-export interface ResetPasswordResponse extends ServiceResponse {
-    RedirectHome?: boolean;
-}
-export interface SendResetPasswordResponse extends ServiceResponse {
-    DemoLink?: string;
-}
-declare namespace texts2 {
-    namespace Forms {
-        function asKey(): typeof Forms;
-        function asTry(): typeof Forms;
-        namespace Membership {
-            function asKey(): typeof Membership;
-            function asTry(): typeof Membership;
-            namespace SetPassword {
-                function asKey(): typeof SetPassword;
-                function asTry(): typeof SetPassword;
-                const ElevatedActionsMessage: string;
-                const EmailSentMessage: string;
-                const EmailToSetPasswordMessage: string;
-                const PageTitle: string;
-                const SendEmailButton: string;
-            }
-        }
-    }
-}
-export declare const SetPasswordFormTexts: typeof texts2.Forms.Membership.SetPassword;
-export interface TranslateTextInput {
-    TextKey?: string;
-    TargetLanguageID?: string;
-    SourceText?: string;
-}
-export interface TranslateTextOutput {
-    TextKey?: string;
-    TargetLanguageID?: string;
-    TranslatedText?: string;
-}
-export interface TranslateTextRequest extends ServiceRequest {
-    SourceLanguageID?: string;
-    Inputs?: TranslateTextInput[];
-}
-export interface TranslateTextResponse extends ServiceResponse {
-    Translations?: TranslateTextOutput[];
-}
-export interface TranslationItem {
-    Key?: string;
-    SourceText?: string;
-    TargetText?: string;
-    CustomText?: string;
-    BuiltInText?: string;
-    HasTranslation?: boolean;
-    UserTranslated?: boolean;
-}
-export interface TranslationListRequest extends ListRequest {
-    SourceLanguageID?: string;
-    TargetLanguageID?: string;
-}
-export interface TranslationListResponse extends ListResponse<TranslationItem> {
-    KeysByAssembly?: {
-        [key: string]: string[];
-    };
-}
-declare namespace texts {
-    namespace Site {
-        function asKey(): typeof Site;
-        function asTry(): typeof Site;
-        namespace Translation {
-            function asKey(): typeof Translation;
-            function asTry(): typeof Translation;
-            const AllTextsAlreadyTranslated: string;
-            const Assembly: string;
-            const CopyFailMessage: string;
-            const CopySourceTranslations: string;
-            const CopySuccessMessage: string;
-            const CopyTargetTranslations: string;
-            const CustomText: string;
-            const EntityPlural: string;
-            const HasTranslation: string;
-            const Key: string;
-            const OverrideConfirmation: string;
-            const SaveChangesButton: string;
-            const SaveSuccessMessage: string;
-            const SourceLanguage: string;
-            const SourceTargetLanguageSame: string;
-            const SourceText: string;
-            const TargetLanguage: string;
-            const TargetLanguageRequired: string;
-            const TargetText: string;
-            const TranslateAllText: string;
-            const TranslateText: string;
-            const TranslateTextConfirmation: string;
-            const TranslateTextDisabled: string;
-            const UserTranslated: string;
-        }
-    }
-}
-export declare const TranslationTexts: typeof texts.Site.Translation;
-export interface TranslationUpdateRequest extends ServiceRequest {
-    TargetLanguageID?: string;
-    Translations?: {
-        [key: string]: string;
-    };
-}
-export interface TranslationUpdateResponse extends ServiceResponse {
-    SavedPath?: string;
-}
-export interface UserPreferenceRetrieveRequest extends ServiceRequest {
-    PreferenceType?: string;
-    Name?: string;
-}
-export interface UserPreferenceRetrieveResponse extends ServiceResponse {
-    Value?: string;
-}
-export interface UserPreferenceRow {
-    UserPreferenceId?: number;
-    UserId?: any;
-    PreferenceType?: string;
-    Name?: string;
-    Value?: string;
-}
-export declare abstract class UserPreferenceRow {
-    static readonly idProperty = "UserPreferenceId";
-    static readonly nameProperty = "Name";
-    static readonly localTextPrefix = "Common.UserPreference";
-    static readonly deletePermission = "?";
-    static readonly insertPermission = "?";
-    static readonly readPermission = "?";
-    static readonly updatePermission = "?";
-    static readonly Fields: Readonly<Record<keyof UserPreferenceRow, string>>;
-}
-export interface UserPreferenceUpdateRequest extends ServiceRequest {
-    PreferenceType?: string;
-    Name?: string;
-    Value?: string;
-}
-export declare namespace UserPreferenceService {
-    const baseUrl = "Extensions/UserPreference";
-    function Update(request: UserPreferenceUpdateRequest, onSuccess?: (response: ServiceResponse) => void, opt?: ServiceOptions<any>): PromiseLike<ServiceResponse>;
-    function Retrieve(request: UserPreferenceRetrieveRequest, onSuccess?: (response: UserPreferenceRetrieveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<UserPreferenceRetrieveResponse>;
-    const Methods: {
-        readonly Update: "Extensions/UserPreference/Update";
-        readonly Retrieve: "Extensions/UserPreference/Retrieve";
-    };
-}
-export interface ReportRetrieveResult extends ServiceResponse {
-    ReportKey?: string;
-    Title?: string;
-    Properties?: PropertyItem[];
-    InitialSettings?: any;
-    IsDataOnlyReport?: boolean;
-    IsExternalReport?: boolean;
-    IsStructuredReport?: boolean;
-}
 export declare class BasicProgressDialog<P = {}> extends BaseDialog<P> {
     static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.Extensions.">;
     private progressBar;
@@ -831,6 +360,15 @@ export declare abstract class GridEditorBase<TEntity, P = {}> extends EntityGrid
      */
     protected checkDialogType(dlg: any): GridEditorDialog<TEntity>;
 }
+export interface PasswordStrengthRules {
+    MinPasswordLength?: number;
+    RequireDigit?: boolean;
+    RequireLowercase?: boolean;
+    RequireNonAlphanumeric?: boolean;
+    RequireUppercase?: boolean;
+}
+export declare function getPasswordStrengthRules(): Promise<PasswordStrengthRules>;
+export declare function addPasswordStrengthValidation(passwordEditor: PasswordEditor, uniqueName?: string): void;
 export declare class ReportDialog<P extends ReportDialogOptions = ReportDialogOptions> extends BaseDialog<P> {
     static [Symbol.typeInfo]: ClassTypeInfo<"Serenity.Extensions.">;
     private report;
@@ -881,6 +419,488 @@ export declare class ReportPage<P = {}> extends Widget<P> {
     constructor(props: WidgetProps<P>);
     protected updateMatchFlags(text: string): void;
     protected reportLinkClick(e: Event): void;
+}
+declare namespace texts12 {
+    namespace Validation {
+        function asKey(): typeof Validation;
+        function asTry(): typeof Validation;
+        const InvalidResetToken: string;
+        const MinRequiredPasswordLength: string;
+        const PasswordConfirmMismatch: string;
+        const PasswordStrengthRequireDigit: string;
+        const PasswordStrengthRequireLowercase: string;
+        const PasswordStrengthRequireNonAlphanumeric: string;
+        const PasswordStrengthRequireUppercase: string;
+        const TooManyRequests: string;
+    }
+}
+export declare const AccountRateLimitTexts: typeof texts12.Validation;
+declare namespace texts11 {
+    namespace Site {
+        function asKey(): typeof Site;
+        function asTry(): typeof Site;
+        namespace BasicProgressDialog {
+            function asKey(): typeof BasicProgressDialog;
+            function asTry(): typeof BasicProgressDialog;
+            const CancelTitle: string;
+            const PleaseWait: string;
+        }
+    }
+}
+export declare const BasicProgressDialogTexts: typeof texts11.Site.BasicProgressDialog;
+declare namespace texts10 {
+    namespace Site {
+        function asKey(): typeof Site;
+        function asTry(): typeof Site;
+        namespace BulkServiceAction {
+            function asKey(): typeof BulkServiceAction;
+            function asTry(): typeof BulkServiceAction;
+            const AllHadErrorsFormat: string;
+            const AllSuccessFormat: string;
+            const ConfirmationFormat: string;
+            const ErrorCount: string;
+            const NothingToProcess: string;
+            const SomeHadErrorsFormat: string;
+            const SuccessCount: string;
+        }
+    }
+}
+export declare const BulkServiceActionTexts: typeof texts10.Site.BulkServiceAction;
+export interface ChangePasswordForm {
+    OldPassword: PasswordEditor;
+    NewPassword: PasswordEditor;
+    ConfirmPassword: PasswordEditor;
+}
+export declare class ChangePasswordForm extends PrefixedContext {
+    static readonly formKey = "Serenity.Extensions.ChangePasswordRequest";
+    private static init;
+    constructor(...args: ConstructorParameters<typeof PrefixedContext>);
+}
+declare namespace texts9 {
+    namespace Forms {
+        function asKey(): typeof Forms;
+        function asTry(): typeof Forms;
+        namespace Membership {
+            function asKey(): typeof Membership;
+            function asTry(): typeof Membership;
+            namespace ChangePassword {
+                function asKey(): typeof ChangePassword;
+                function asTry(): typeof ChangePassword;
+                const FormTitle: string;
+                const SubmitButton: string;
+                const Success: string;
+            }
+        }
+    }
+}
+export declare const ChangePasswordFormTexts: typeof texts9.Forms.Membership.ChangePassword;
+export interface ChangePasswordRequest extends ServiceRequest {
+    OldPassword?: string;
+    NewPassword?: string;
+    ConfirmPassword?: string;
+}
+declare namespace texts8 {
+    namespace Validation {
+        function asKey(): typeof Validation;
+        function asTry(): typeof Validation;
+        const InvalidResetToken: string;
+        const MinRequiredPasswordLength: string;
+        const PasswordConfirmMismatch: string;
+        const PasswordStrengthRequireDigit: string;
+        const PasswordStrengthRequireLowercase: string;
+        const PasswordStrengthRequireNonAlphanumeric: string;
+        const PasswordStrengthRequireUppercase: string;
+        const TooManyRequests: string;
+    }
+}
+export declare const ChangePasswordValidationTexts: typeof texts8.Validation;
+declare namespace texts7 {
+    namespace Site {
+        function asKey(): typeof Site;
+        function asTry(): typeof Site;
+        namespace Dialogs {
+            function asKey(): typeof Dialogs;
+            function asTry(): typeof Dialogs;
+            const PendingChangesConfirmation: string;
+            const PendingChangesUnloadWarning: string;
+        }
+    }
+}
+export declare const DialogUtilsTexts: typeof texts7.Site.Dialogs;
+export interface ExcelImportRequest extends ServiceRequest {
+    FileName?: string;
+}
+export interface ExcelImportResponse extends ServiceResponse {
+    Inserted?: number;
+    Updated?: number;
+    ErrorList?: string[];
+}
+declare namespace texts6 {
+    namespace Db {
+        function asKey(): typeof Db;
+        function asTry(): typeof Db;
+        namespace Common {
+            function asKey(): typeof Common;
+            function asTry(): typeof Common;
+            namespace UserPreference {
+                function asKey(): typeof UserPreference;
+                function asTry(): typeof UserPreference;
+                const EntityPlural: string;
+                const EntitySingular: string;
+                const Name: string;
+                const PreferenceType: string;
+                const UserId: string;
+                const UserPreferenceId: string;
+                const Value: string;
+            }
+        }
+    }
+    namespace Forms {
+        function asKey(): typeof Forms;
+        function asTry(): typeof Forms;
+        namespace Membership {
+            function asKey(): typeof Membership;
+            function asTry(): typeof Membership;
+            namespace ChangePassword {
+                function asKey(): typeof ChangePassword;
+                function asTry(): typeof ChangePassword;
+                const FormTitle: string;
+                const SubmitButton: string;
+                const Success: string;
+            }
+            namespace ForgotPassword {
+                function asKey(): typeof ForgotPassword;
+                function asTry(): typeof ForgotPassword;
+                const FormInfo: string;
+                const FormTitle: string;
+                const SubmitButton: string;
+                const SuccessMessage: string;
+            }
+            namespace ResetPassword {
+                function asKey(): typeof ResetPassword;
+                function asTry(): typeof ResetPassword;
+                const EmailSubject: string;
+                const FormTitle: string;
+                const SubmitButton: string;
+                const Success: string;
+            }
+            namespace SetPassword {
+                function asKey(): typeof SetPassword;
+                function asTry(): typeof SetPassword;
+                const ElevatedActionsMessage: string;
+                const EmailSentMessage: string;
+                const EmailToSetPasswordMessage: string;
+                const PageTitle: string;
+                const SendEmailButton: string;
+            }
+        }
+    }
+    namespace Site {
+        function asKey(): typeof Site;
+        function asTry(): typeof Site;
+        namespace BasicProgressDialog {
+            function asKey(): typeof BasicProgressDialog;
+            function asTry(): typeof BasicProgressDialog;
+            const CancelTitle: string;
+            const PleaseWait: string;
+        }
+        namespace BulkServiceAction {
+            function asKey(): typeof BulkServiceAction;
+            function asTry(): typeof BulkServiceAction;
+            const AllHadErrorsFormat: string;
+            const AllSuccessFormat: string;
+            const ConfirmationFormat: string;
+            const ErrorCount: string;
+            const NothingToProcess: string;
+            const SomeHadErrorsFormat: string;
+            const SuccessCount: string;
+        }
+        namespace Dialogs {
+            function asKey(): typeof Dialogs;
+            function asTry(): typeof Dialogs;
+            const PendingChangesConfirmation: string;
+            const PendingChangesUnloadWarning: string;
+        }
+        namespace Translation {
+            function asKey(): typeof Translation;
+            function asTry(): typeof Translation;
+            const AllTextsAlreadyTranslated: string;
+            const Assembly: string;
+            const CopyFailMessage: string;
+            const CopySourceTranslations: string;
+            const CopySuccessMessage: string;
+            const CopyTargetTranslations: string;
+            const CustomText: string;
+            const EntityPlural: string;
+            const HasTranslation: string;
+            const Key: string;
+            const OverrideConfirmation: string;
+            const SaveChangesButton: string;
+            const SaveSuccessMessage: string;
+            const SourceLanguage: string;
+            const SourceTargetLanguageSame: string;
+            const SourceText: string;
+            const TargetLanguage: string;
+            const TargetLanguageRequired: string;
+            const TargetText: string;
+            const TranslateAllText: string;
+            const TranslateText: string;
+            const TranslateTextConfirmation: string;
+            const TranslateTextDisabled: string;
+            const UserTranslated: string;
+        }
+    }
+    namespace Validation {
+        function asKey(): typeof Validation;
+        function asTry(): typeof Validation;
+        const InvalidResetToken: string;
+        const MinRequiredPasswordLength: string;
+        const PasswordConfirmMismatch: string;
+        const PasswordStrengthRequireDigit: string;
+        const PasswordStrengthRequireLowercase: string;
+        const PasswordStrengthRequireNonAlphanumeric: string;
+        const PasswordStrengthRequireUppercase: string;
+        const TooManyRequests: string;
+    }
+}
+export declare const ExtensionsTexts: typeof texts6;
+export interface ForgotPasswordForm {
+    Email: EmailAddressEditor;
+}
+export declare class ForgotPasswordForm extends PrefixedContext {
+    static readonly formKey = "Serenity.Extensions.ForgotPasswordRequest";
+    private static init;
+    constructor(...args: ConstructorParameters<typeof PrefixedContext>);
+}
+declare namespace texts5 {
+    namespace Forms {
+        function asKey(): typeof Forms;
+        function asTry(): typeof Forms;
+        namespace Membership {
+            function asKey(): typeof Membership;
+            function asTry(): typeof Membership;
+            namespace ForgotPassword {
+                function asKey(): typeof ForgotPassword;
+                function asTry(): typeof ForgotPassword;
+                const FormInfo: string;
+                const FormTitle: string;
+                const SubmitButton: string;
+                const SuccessMessage: string;
+            }
+        }
+    }
+}
+export declare const ForgotPasswordFormTexts: typeof texts5.Forms.Membership.ForgotPassword;
+export interface ForgotPasswordRequest extends ServiceRequest {
+    Email?: string;
+}
+export interface GetNextNumberRequest extends ServiceRequest {
+    Prefix?: string;
+    Length?: number;
+}
+export interface GetNextNumberResponse extends ServiceResponse {
+    Number?: number;
+    Serial?: string;
+}
+declare namespace texts4 {
+    namespace Validation {
+        function asKey(): typeof Validation;
+        function asTry(): typeof Validation;
+        const InvalidResetToken: string;
+        const MinRequiredPasswordLength: string;
+        const PasswordConfirmMismatch: string;
+        const PasswordStrengthRequireDigit: string;
+        const PasswordStrengthRequireLowercase: string;
+        const PasswordStrengthRequireNonAlphanumeric: string;
+        const PasswordStrengthRequireUppercase: string;
+        const TooManyRequests: string;
+    }
+}
+export declare const PasswordStrengthValidationTexts: typeof texts4.Validation;
+export interface ResetPasswordForm {
+    NewPassword: PasswordEditor;
+    ConfirmPassword: PasswordEditor;
+}
+export declare class ResetPasswordForm extends PrefixedContext {
+    static readonly formKey = "Serenity.Extensions.ResetPasswordRequest";
+    private static init;
+    constructor(...args: ConstructorParameters<typeof PrefixedContext>);
+}
+declare namespace texts3 {
+    namespace Forms {
+        function asKey(): typeof Forms;
+        function asTry(): typeof Forms;
+        namespace Membership {
+            function asKey(): typeof Membership;
+            function asTry(): typeof Membership;
+            namespace ResetPassword {
+                function asKey(): typeof ResetPassword;
+                function asTry(): typeof ResetPassword;
+                const EmailSubject: string;
+                const FormTitle: string;
+                const SubmitButton: string;
+                const Success: string;
+            }
+        }
+    }
+}
+export declare const ResetPasswordFormTexts: typeof texts3.Forms.Membership.ResetPassword;
+export interface ResetPasswordRequest extends ServiceRequest {
+    Token?: string;
+    NewPassword?: string;
+    ConfirmPassword?: string;
+}
+export interface ResetPasswordResponse extends ServiceResponse {
+    RedirectHome?: boolean;
+}
+export interface SendResetPasswordResponse extends ServiceResponse {
+    DemoLink?: string;
+}
+declare namespace texts2 {
+    namespace Forms {
+        function asKey(): typeof Forms;
+        function asTry(): typeof Forms;
+        namespace Membership {
+            function asKey(): typeof Membership;
+            function asTry(): typeof Membership;
+            namespace SetPassword {
+                function asKey(): typeof SetPassword;
+                function asTry(): typeof SetPassword;
+                const ElevatedActionsMessage: string;
+                const EmailSentMessage: string;
+                const EmailToSetPasswordMessage: string;
+                const PageTitle: string;
+                const SendEmailButton: string;
+            }
+        }
+    }
+}
+export declare const SetPasswordFormTexts: typeof texts2.Forms.Membership.SetPassword;
+export interface TranslateTextInput {
+    TextKey?: string;
+    TargetLanguageID?: string;
+    SourceText?: string;
+}
+export interface TranslateTextOutput {
+    TextKey?: string;
+    TargetLanguageID?: string;
+    TranslatedText?: string;
+}
+export interface TranslateTextRequest extends ServiceRequest {
+    SourceLanguageID?: string;
+    Inputs?: TranslateTextInput[];
+}
+export interface TranslateTextResponse extends ServiceResponse {
+    Translations?: TranslateTextOutput[];
+}
+export interface TranslationItem {
+    Key?: string;
+    SourceText?: string;
+    TargetText?: string;
+    CustomText?: string;
+    BuiltInText?: string;
+    HasTranslation?: boolean;
+    UserTranslated?: boolean;
+}
+export interface TranslationListRequest extends ListRequest {
+    SourceLanguageID?: string;
+    TargetLanguageID?: string;
+}
+export interface TranslationListResponse extends ListResponse<TranslationItem> {
+    KeysByAssembly?: {
+        [key: string]: string[];
+    };
+}
+declare namespace texts {
+    namespace Site {
+        function asKey(): typeof Site;
+        function asTry(): typeof Site;
+        namespace Translation {
+            function asKey(): typeof Translation;
+            function asTry(): typeof Translation;
+            const AllTextsAlreadyTranslated: string;
+            const Assembly: string;
+            const CopyFailMessage: string;
+            const CopySourceTranslations: string;
+            const CopySuccessMessage: string;
+            const CopyTargetTranslations: string;
+            const CustomText: string;
+            const EntityPlural: string;
+            const HasTranslation: string;
+            const Key: string;
+            const OverrideConfirmation: string;
+            const SaveChangesButton: string;
+            const SaveSuccessMessage: string;
+            const SourceLanguage: string;
+            const SourceTargetLanguageSame: string;
+            const SourceText: string;
+            const TargetLanguage: string;
+            const TargetLanguageRequired: string;
+            const TargetText: string;
+            const TranslateAllText: string;
+            const TranslateText: string;
+            const TranslateTextConfirmation: string;
+            const TranslateTextDisabled: string;
+            const UserTranslated: string;
+        }
+    }
+}
+export declare const TranslationTexts: typeof texts.Site.Translation;
+export interface TranslationUpdateRequest extends ServiceRequest {
+    TargetLanguageID?: string;
+    Translations?: {
+        [key: string]: string;
+    };
+}
+export interface TranslationUpdateResponse extends ServiceResponse {
+    SavedPath?: string;
+}
+export interface UserPreferenceRetrieveRequest extends ServiceRequest {
+    PreferenceType?: string;
+    Name?: string;
+}
+export interface UserPreferenceRetrieveResponse extends ServiceResponse {
+    Value?: string;
+}
+export interface UserPreferenceRow {
+    UserPreferenceId?: number;
+    UserId?: any;
+    PreferenceType?: string;
+    Name?: string;
+    Value?: string;
+}
+export declare abstract class UserPreferenceRow {
+    static readonly idProperty = "UserPreferenceId";
+    static readonly nameProperty = "Name";
+    static readonly localTextPrefix = "Common.UserPreference";
+    static readonly deletePermission = "?";
+    static readonly insertPermission = "?";
+    static readonly readPermission = "?";
+    static readonly updatePermission = "?";
+    static readonly Fields: Readonly<Record<keyof UserPreferenceRow, string>>;
+}
+export interface UserPreferenceUpdateRequest extends ServiceRequest {
+    PreferenceType?: string;
+    Name?: string;
+    Value?: string;
+}
+export declare namespace UserPreferenceService {
+    const baseUrl = "Extensions/UserPreference";
+    function Update(request: UserPreferenceUpdateRequest, onSuccess?: (response: ServiceResponse) => void, opt?: ServiceOptions<any>): PromiseLike<ServiceResponse>;
+    function Retrieve(request: UserPreferenceRetrieveRequest, onSuccess?: (response: UserPreferenceRetrieveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<UserPreferenceRetrieveResponse>;
+    const Methods: {
+        readonly Update: "Extensions/UserPreference/Update";
+        readonly Retrieve: "Extensions/UserPreference/Retrieve";
+    };
+}
+export interface ReportRetrieveResult extends ServiceResponse {
+    ReportKey?: string;
+    Title?: string;
+    Properties?: PropertyItem[];
+    InitialSettings?: any;
+    IsDataOnlyReport?: boolean;
+    IsExternalReport?: boolean;
+    IsStructuredReport?: boolean;
 }
 export declare class UserPreferenceStorage implements SettingStorage {
     getItem(key: string): Promise<string>;
@@ -951,7 +971,5 @@ export interface StaticTextBlockOptions {
     isLocalText: boolean;
     hideLabel: boolean;
 }
-export declare function getPasswordStrengthRules(): Promise<PasswordStrengthRules>;
-export declare function addPasswordStrengthValidation(passwordEditor: PasswordEditor, uniqueName?: string): void;
 
 export {};
