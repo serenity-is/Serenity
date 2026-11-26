@@ -227,8 +227,10 @@ public partial class CssBundleBuilder(IOptions<CssBundlingOptions> options,
         return rewrittenUrl;
     }
 
-    private static string RewriteUrls(string contentPath, string content, string rootPrefix)
+    private string RewriteUrls(string contentPath, string content, string rootPrefix)
     {
+        var sourceUrl = contentPath;
+
         if (string.IsNullOrEmpty(content) ||
             string.IsNullOrEmpty(contentPath))
             return content;
@@ -245,11 +247,20 @@ public partial class CssBundleBuilder(IOptions<CssBundlingOptions> options,
         if (!contentPath.EndsWith("/", StringComparison.OrdinalIgnoreCase))
             contentPath += "/";
 
-        var regex = CssUrlRegex();
-        return regex.Replace(content, match => "url(" +
-            match.Groups["prefix"].Value +
-            RewriteUrl(contentPath, match.Groups["url"].Value, rootPrefix) +
-            match.Groups["suffix"].Value + ")");
+        try
+        {
+            return CssUrlRegex().Replace(content, match => "url(" +
+                match.Groups["prefix"].Value +
+                RewriteUrl(contentPath, match.Groups["url"].Value, rootPrefix) +
+                match.Groups["suffix"].Value + ")");
+        }
+        catch (RegexMatchTimeoutException ex)
+        {
+            // a bundle request must never hang on a file, so its urls are left as is
+            logger?.LogWarning(ex, "Timed out while rewriting the urls in {sourceFile}, " +
+                "its relative urls are not rewritten", sourceUrl);
+            return content;
+        }
     }
 
     private string LoadCssFile(string sourcePath, string sourceUrl,
@@ -290,7 +301,15 @@ public partial class CssBundleBuilder(IOptions<CssBundlingOptions> options,
             code = sr.ReadToEnd();
         }
 
-        code = SourceMappingRegex().Replace(code, "");
+        try
+        {
+            code = SourceMappingRegex().Replace(code, "");
+        }
+        catch (RegexMatchTimeoutException ex)
+        {
+            logger?.LogWarning(ex, "Timed out while removing the source mapping comments of {sourceFile}, " +
+                "they are left as is", sourceUrl);
+        }
 
         if (!processImports)
         {
@@ -302,13 +321,25 @@ public partial class CssBundleBuilder(IOptions<CssBundlingOptions> options,
 
         var pos = 0;
         var imports = new List<(string Raw, string Url, string Media)>();
-        var match = ImportRegex().Match(code);
-        while (match.Success && match.Index == pos)
+        try
         {
-            imports.Add((match.Value, ExtractImportUrl(match.Groups["st"].Value),
-                match.Groups["media"].Value.Trim()));
-            pos = match.Index + match.Length;
-            match = ImportRegex().Match(code, pos);
+            var match = ImportRegex().Match(code);
+            while (match.Success && match.Index == pos)
+            {
+                imports.Add((match.Value, ExtractImportUrl(match.Groups["st"].Value),
+                    match.Groups["media"].Value.Trim()));
+                pos = match.Index + match.Length;
+                match = ImportRegex().Match(code, pos);
+            }
+        }
+        catch (RegexMatchTimeoutException ex)
+        {
+            // a bundle request must never hang on a file, so the file
+            // is included as is, with its @import statements untouched
+            logger?.LogWarning(ex, "Timed out while looking for @import statements in {sourceFile}, " +
+                "its imports are not processed", sourceUrl);
+            imports.Clear();
+            pos = 0;
         }
 
         // only the file's own content (excluding the leading @import lines) is
@@ -433,10 +464,21 @@ public partial class CssBundleBuilder(IOptions<CssBundlingOptions> options,
         return string.Join("/", segments);
     }
 
-    [GeneratedRegex(@"^\s*\/\*\s*[#@]\s?(source(?:Mapping)?URL)=\s*(\S+)\s*\*\/\s*$", RegexOptions.Multiline)]
+    [GeneratedRegex(@"^\s*\/\*\s*[#@]\s?(source(?:Mapping)?URL)=\s*(\S+)\s*\*\/\s*$", RegexOptions.Multiline, matchTimeoutMilliseconds: 5000)]
     private static partial Regex SourceMappingRegex();
-    [GeneratedRegex(@"\G(?:/\*.*?\*/|\s)*@import\s+(?<st>url\([^)]*\)|""[^""]*""|'[^']*')\s*(?<media>[^;]*);", RegexOptions.Singleline | RegexOptions.IgnoreCase)]
+    // the comment atom only has a single way to match, so the leading
+    // comment/whitespace run can't cause catastrophic backtracking; a plain
+    // "(?:/\*.*?\*/|\s)*" with Singleline can end a comment at any of the
+    // following "*/" positions, and go on from there whenever that one is
+    // directly followed by another comment, so the time it takes doubled with
+    // every comment in the file that directly follows another one (a CSS file
+    // with ~30 such comment pairs never finished matching). The timeout is
+    // only a safety net, the pattern is linear. The other two patterns are
+    // linear for a stylesheet that anyone would write, and quadratic for e.g.
+    // thousands of blank lines in a row, or of "url(" with no ")" after them,
+    // so they have the same timeout, as a bundle request must never hang.
+    [GeneratedRegex(@"\G(?:(?:/\*(?:[^*]|\*(?!/))*\*/)|\s)*@import\s+(?<st>url\([^)]*\)|""[^""]*""|'[^']*')\s*(?<media>[^;]*);", RegexOptions.Singleline | RegexOptions.IgnoreCase, matchTimeoutMilliseconds: 5000)]
     private static partial Regex ImportRegex();
-    [GeneratedRegex("url\\((?<prefix>['\"]?)(?<url>[^)]+?)(?<suffix>['\"]?)\\)")]
+    [GeneratedRegex("url\\((?<prefix>['\"]?)(?<url>[^)]+?)(?<suffix>['\"]?)\\)", RegexOptions.None, matchTimeoutMilliseconds: 5000)]
     private static partial Regex CssUrlRegex();
 }

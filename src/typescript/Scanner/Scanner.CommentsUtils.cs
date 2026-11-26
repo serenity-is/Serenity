@@ -148,8 +148,8 @@ partial class Scanner
 
 
 #if !NET7_0_OR_GREATER
-    private static readonly Regex commentDirectiveRegExSingleLine = new(@"^\/\/\/?\s*@(ts-expect-error|ts-ignore)/", RegexOptions.Compiled);
-    private static readonly Regex commentDirectiveRegExMultiLine = new(@"^\/\/\/?\s*@(ts-expect-error|ts-ignore)/", RegexOptions.Compiled);
+    private static readonly Regex commentDirectiveRegExSingleLine = new(@"^\/\/\/?\s*@(ts-expect-error|ts-ignore)", RegexOptions.Compiled);
+    private static readonly Regex commentDirectiveRegExMultiLine = new(@"^(?:\/|\*)*\s*@(ts-expect-error|ts-ignore)", RegexOptions.Compiled);
     private static readonly Regex jsDocSeeOrLink = new(@"@(?:see|link)", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
 #else
     // Test for whether a single line comment with leading whitespace trimmed's text contains a directive.
@@ -158,10 +158,12 @@ partial class Scanner
     // Test for whether a multi-line comment with leading whitespace trimmed's last line contains a directive.
     private static readonly Regex commentDirectiveRegExMultiLine = commentDirectiveRegExMultiLineGen();
 
-    [GeneratedRegex(@"^\/\/\/?\s*@(ts-expect-error|ts-ignore)/")]
+    [GeneratedRegex(@"^\/\/\/?\s*@(ts-expect-error|ts-ignore)")]
     private static partial Regex commentDirectiveReExSingleLineGen();
 
-    [GeneratedRegex(@"^(?:\\/|\\*)*\\s*@(ts-expect-error|ts-ignore)")]
+    // "(?:\\/|\\*)*" (escaped twice) never matched a directive, and "\\*" in
+    // a loop took exponential time for a line that starts with many backslashes
+    [GeneratedRegex(@"^(?:\/|\*)*\s*@(ts-expect-error|ts-ignore)")]
     private static partial Regex commentDirectiveRegExMultiLineGen();
 
     private static readonly Regex jsDocSeeOrLink = jsDocSeeOrLinkGen();

@@ -93,14 +93,19 @@ public static partial class CSharpSyntaxRules
     const string letterCharacter = @"\p{Lu}|\p{Ll}|\p{Lt}|\p{Lm}|\p{Lo}|\p{Nl}";
     const string identifierPartCharacter = letterCharacter + "|" + decimalDigitCharacter + "|" + 
         connectingCharacter + "|" + combiningCharacter + "|" + formattingCharacter;
-    const string identifierPartCharacters = "(" + identifierPartCharacter + ")+";
-    const string identifierStartCharacter = "(" + letterCharacter + "|_)";
-    const string identifierOrKeyword = identifierStartCharacter + "(" + identifierPartCharacters + ")*";
+    // the part characters must be repeated only once, e.g. not as "((part)+)*", which has
+    // exponentially many ways to split a run of them, and never finished for a name of ~30
+    // valid characters that are followed by an invalid one, like "A_Long_Local_Text_Key_Segment-Hint"
+    const string identifierStartCharacter = "(?:" + letterCharacter + "|_)";
+    const string identifierOrKeyword = identifierStartCharacter + "(?:" + identifierPartCharacter + ")*";
     static readonly Regex ValidIdentifierRegex = new("^" + identifierOrKeyword + "$", RegexOptions.Compiled);
-#else   
+#else
     static readonly Regex ValidIdentifierRegex = ValidIdentifierRegexGen();
 
-    [GeneratedRegex(@"^(\p{Lu}|\p{Ll}|\p{Lt}|\p{Lm}|\p{Lo}|\p{Nl}|_)((\p{Lu}|\p{Ll}|\p{Lt}|\p{Lm}|\p{Lo}|\p{Nl}|\p{Nd}|\p{Pc}|\p{Mn}|\p{Mc}|\p{Cf})+)*$", RegexOptions.Compiled)]
+    // the part characters must be repeated only once, e.g. not as "((part)+)*", which has
+    // exponentially many ways to split a run of them, and never finished for a name of ~30
+    // valid characters that are followed by an invalid one, like "A_Long_Local_Text_Key_Segment-Hint"
+    [GeneratedRegex(@"^[\p{Lu}\p{Ll}\p{Lt}\p{Lm}\p{Lo}\p{Nl}_][\p{Lu}\p{Ll}\p{Lt}\p{Lm}\p{Lo}\p{Nl}\p{Nd}\p{Pc}\p{Mn}\p{Mc}\p{Cf}]*$", RegexOptions.Compiled)]
     private static partial Regex ValidIdentifierRegexGen();
 #endif
 

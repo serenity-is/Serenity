@@ -1,3 +1,11 @@
+## Unreleased
+
+### Bugfixes
+- The CSS bundle builder could hang forever, keeping a CPU core busy in the meantime, on a stylesheet that starts with a comment and has comments that directly follow another comment, e.g. a 57 KB one with 28 such pairs, so every request for a bundle that includes it waited until the request was abandoned or the application was restarted: the leading comment/whitespace run of the `@import` pattern of `CssBundleBuilder` could be matched in exponentially many ways, doubling with every such pair, and its comment atom is unambiguous now, so matching is linear in the file size. The pattern also has a timeout of 5 seconds as a safety net, after which the file is included with its `@import` statements as is and a warning is logged, and so do the patterns that rewrite relative urls and remove source mapping comments, which could take quadratic time for unusual content. For earlier versions, setting `CssBundling:ProcessImports` to `false` avoids the pattern.
+- Sergen and the source generators could hang on a name of ~30 or more valid identifier characters followed by an invalid one, e.g. a long local text key segment or module name with a space, dash or slash in it, as the identifier pattern of `CSharpSyntaxRules` repeated its part characters twice and took exponential time; it is linear now.
+- `GlobFilter` took exponential time for a pattern with `**/` that is not one of its fast paths, e.g. `**/x.css`, and a path of many folders that does not match, e.g. 16 seconds for 30 folders; `**/` is converted to an equivalent pattern that is not ambiguous.
+- The TypeScript scanner of the code generator never recognized `@ts-ignore` and `@ts-expect-error` comment directives, as the multi-line pattern was escaped twice and the single-line one expected a trailing slash, and the multi-line pattern took exponential time for a comment line starting with many backslashes.
+
 ## 10.8.0 (2026-11-26)
 
 ### Features

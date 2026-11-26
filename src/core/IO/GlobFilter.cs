@@ -343,7 +343,9 @@ public class GlobFilter
         var pattern = Regex.Escape(wildcard);
         pattern = pattern
             .Replace(@"\.\*\*", @"\.[^/.]*") // .** should not match on ../file or ./file but will match .file
-            .Replace(@"\*\*/", "(.+/)*") //For recursive wildcards /**/, include the current directory.
+            // For recursive wildcards /**/, include the current directory. This matches the same paths as "(.+/)*",
+            // which has exponentially many ways to split the folders of a path, e.g. took seconds for 25+ levels
+            .Replace(@"\*\*/", "(.+/)?")
             .Replace(@"\*\*", ".*") // For recursive wildcards that don't end in a slash e.g. **.txt would be treated as a .txt file at any depth
             .Replace(@"\*", @"[^/]*(/)?") // For non recursive searches, limit it any character that is not a directory separator
             .Replace(@"\?", "."); // ? translates to a single any character

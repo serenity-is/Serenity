@@ -157,11 +157,22 @@ public class EsmAccessPolicyTests
     [Theory]
     [InlineData("/esm/Modules\\Administration\\User\\UserPage.js")]
     [InlineData("/esm//Modules/Administration/User/UserPage.js")]
-    [InlineData("/ESM/modules/administration/user/userpage.js")]
+    [InlineData("/esm/modules/administration/user/userpage.js")]
     public void Path_Variants_Are_Normalized(string path)
     {
         var (policy, _) = Create(o => o.Permissions = new() { ["Modules/Administration/**"] = "Administration:General" });
         AssertRestricted(policy.GetAccess(path), "Administration:General");
+    }
+
+    [Fact]
+    public void Esm_Folder_Is_Recognized_In_Any_Casing()
+    {
+        // the manifest is read from the folder as it is in the request path, so the folder is created with the
+        // same casing here: a file system that is case sensitive, e.g. on Linux, has no "/ESM/" for an "esm"
+        // folder, and nothing is served from there to control the access of
+        var (policy, _) = Create(o => o.Permissions = new() { ["Modules/Administration/**"] = "Administration:General" },
+            root: "ESM/");
+        AssertRestricted(policy.GetAccess("/ESM/modules/administration/user/userpage.js"), "Administration:General");
     }
 
     [Fact]

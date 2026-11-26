@@ -134,4 +134,51 @@ public class GlobFilterTests
         var filter = new GlobFilter(filters);
         Assert.Equal(result, filter.IsMatch(path));
     }
+
+    [Theory]
+    [InlineData("x.css", true)]
+    [InlineData("a/x.css", true)]
+    [InlineData("a/b/c/x.css", true)]
+    [InlineData("/a/x.css", true)]
+    [InlineData("a//x.css", true)]
+    [InlineData("ax.css", false)]
+    [InlineData("a/ax.css", false)]
+    [InlineData("a/x.css/b", false)]
+    [InlineData("/x.css", false)]
+    public void Recursive_Wildcard_Matches_Any_Number_Of_Folders(string path, bool result)
+    {
+        var filter = new GlobFilter(["**/x.css"]);
+        Assert.Equal(result, filter.IsMatch(path));
+    }
+
+    [Theory]
+    [InlineData("a/z/x.css", true)]
+    [InlineData("a/b/z/c/d/x.css", true)]
+    [InlineData("a/z/x.cs", false)]
+    [InlineData("a/b/c/x.css", false)]
+    public void Multiple_Recursive_Wildcards_Match_Any_Number_Of_Folders(string path, bool result)
+    {
+        var filter = new GlobFilter(["a/**/z/**/x.css"]);
+        Assert.Equal(result, filter.IsMatch(path));
+    }
+
+    /// <summary>
+    /// The pattern "**/" was converted to "(.+/)*", which has exponentially many
+    /// ways to split the folders of a path, so a path that does not match took
+    /// a second for 26 folders and 16 seconds for 30 of them.
+    /// </summary>
+    [Fact]
+    public void Recursive_Wildcard_Is_Matched_In_Polynomial_Time_For_Deep_Paths()
+    {
+        var filter = new GlobFilter(["**/x.css", "a/**/a/**/x.css"]);
+        var path = string.Concat(Enumerable.Repeat("a/", 60)) + "y.css";
+
+        var sw = System.Diagnostics.Stopwatch.StartNew();
+        var actual = filter.IsMatch(path);
+        sw.Stop();
+
+        Assert.False(actual);
+        Assert.True(sw.Elapsed < TimeSpan.FromSeconds(3),
+            $"Matching a path with 60 folders took {sw.Elapsed}.");
+    }
 }
