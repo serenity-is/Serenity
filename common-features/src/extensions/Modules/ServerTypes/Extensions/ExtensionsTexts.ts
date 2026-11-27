@@ -48,6 +48,14 @@ namespace texts {
                 export const SubmitButton: string;
                 export const SuccessMessage: string;
             }
+            namespace MyAccount {
+                export function asKey(): typeof MyAccount;
+                export function asTry(): typeof MyAccount;
+                export const ChangePasswordDescription: string;
+                export const ChangePasswordRequired: string;
+                export const PasswordTitle: string;
+                export const SetPasswordDescription: string;
+            }
             namespace ResetPassword {
                 export function asKey(): typeof ResetPassword;
                 export function asTry(): typeof ResetPassword;
@@ -156,6 +164,7 @@ export const ExtensionsTexts: typeof texts = /*#__PURE__*/ proxyTexts({}, '', {
             AccountSetup: {},
             ChangePassword: {},
             ForgotPassword: {},
+            MyAccount: {},
             ResetPassword: {},
             SetPassword: {}
         }

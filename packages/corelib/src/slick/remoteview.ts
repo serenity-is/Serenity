@@ -1312,8 +1312,11 @@ export class RemoteView<TItem = any> implements IRemoteView<TItem> {
         // what the server calculated is of all the rows of the group, and not only of the ones on this page
         const server = this.getServerGroupTotals(group);
         if (server) {
-            for (const [key, byField] of Object.entries(server))
+            for (const [key, byField] of Object.entries(server)) {
+                if (isPollutingKey(key))
+                    continue;
                 (totals as any)[key] = { ...((totals as any)[key] ?? {}), ...byField };
+            }
         }
 
         while (idx--) {
@@ -2074,4 +2077,8 @@ export interface RemoteViewOptions<TItem = any> {
     sortBy?: string | string[];
     /** URL of the service endpoint for data requests */
     url?: string;
+}
+
+function isPollutingKey(key: string | null | undefined): boolean {
+    return key === '__proto__' || key === 'constructor' || key === 'prototype';
 }

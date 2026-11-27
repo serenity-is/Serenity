@@ -41,5 +41,9 @@ public enum AccountEventKind
     ElevationFailed = 24,
 
     /// <summary>A link to reset the password was emailed to the user.</summary>
-    PasswordResetRequested = 25
+    PasswordResetRequested = 25,
+
+    /// <summary>Sessions of the user were signed out, why in <see cref="AccountEvent.Reason"/> (an
+    /// <see cref="AccountSessionEndReason"/>), and how many in <see cref="AccountEvent.NewValue"/>.</summary>
+    SessionsRevoked = 26
 }

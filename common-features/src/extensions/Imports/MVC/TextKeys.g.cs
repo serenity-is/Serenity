@@ -132,6 +132,19 @@ public static partial class TextKeys
                 public const string SuccessMessage = "Forms.Membership.ForgotPassword.SuccessMessage";
             }
 
+            /// <summary>The text keys under "Forms.Membership.MyAccount".</summary>
+            public static partial class MyAccount
+            {
+                /// <summary>Change the password you sign in with.</summary>
+                public const string ChangePasswordDescription = "Forms.Membership.MyAccount.ChangePasswordDescription";
+                /// <summary>Change required</summary>
+                public const string ChangePasswordRequired = "Forms.Membership.MyAccount.ChangePasswordRequired";
+                /// <summary>Password</summary>
+                public const string PasswordTitle = "Forms.Membership.MyAccount.PasswordTitle";
+                /// <summary>Your account has no password. Set one, e.g. to confirm sensitive actions.</summary>
+                public const string SetPasswordDescription = "Forms.Membership.MyAccount.SetPasswordDescription";
+            }
+
             /// <summary>The text keys under "Forms.Membership.ResetPassword".</summary>
             public static partial class ResetPassword
             {
