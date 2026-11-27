@@ -49,18 +49,30 @@ public class AccountSessionCookieValidator(IOptionsMonitor<AccountSessionOptions
         try
         {
             var now = UtcNow;
-            // the cookie of another sign-in in this browser, e.g. of another user, ends with it
-            if (context.HttpContext.User.GetSessionId() is string previous)
+            var user = string.IsNullOrEmpty(identity.Name) ? null : userRetriever.ByUsername(identity.Name);
+
+            // a return from an impersonation signs in with the identity of the impersonator, whose session goes on
+            var existing = identity.FindFirst(AccountSessionClaimTypes.SessionId)?.Value;
+            var resumed = existing != null && user != null && store!.Get(existing) is { EndedDate: null } own &&
+                string.Equals(own.UserId, user.Id, StringComparison.Ordinal);
+
+            // the cookie of another sign-in in this browser, e.g. of another user, ends with it, but not the session of an
+            // impersonator, who returns to it
+            var impersonatorSession = identity.Actor?.FindFirst(AccountSessionClaimTypes.SessionId)?.Value;
+            if (context.HttpContext.User.GetSessionId() is string previous && previous != existing && previous != impersonatorSession)
                 store!.End(previous, AccountSessionEndReason.SignedOut, now);
 
-            var user = string.IsNullOrEmpty(identity.Name) ? null : userRetriever.ByUsername(identity.Name);
             if (user == null)
                 return;
 
-            var session = StartSession(identity, user, context.HttpContext, now);
             context.Properties.Items[ValidatedItem] = now.Ticks.ToString(CultureInfo.InvariantCulture);
+            if (resumed)
+                return;
 
-            if (options.CurrentValue.Concurrent == AccountSessionConcurrency.SignOutOthers)
+            var session = StartSession(identity, user, context.HttpContext, now);
+
+            // an impersonation doesn't sign the user out elsewhere
+            if (identity.Actor == null && options.CurrentValue.Concurrent == AccountSessionConcurrency.SignOutOthers)
                 sessions.EndAll(user.Id, AccountSessionEndReason.Replaced, session.SessionId);
         }
         catch (Exception ex)
@@ -109,7 +121,7 @@ public class AccountSessionCookieValidator(IOptionsMonitor<AccountSessionOptions
     }
 
     /// <summary>
-    /// Ends the session of a cookie that is signed out.
+    /// Ends the session of a cookie that is signed out, and the one of its impersonator, if any.
     /// </summary>
     /// <param name="context">The context of the sign-out.</param>
     public virtual void SigningOut(CookieSigningOutContext context)
@@ -120,7 +132,11 @@ public class AccountSessionCookieValidator(IOptionsMonitor<AccountSessionOptions
 
         try
         {
-            store!.End(sessionId, AccountSessionEndReason.SignedOut, UtcNow);
+            var now = UtcNow;
+            store!.End(sessionId, AccountSessionEndReason.SignedOut, now);
+            // signing out while impersonating signs the impersonator out too, whose session the cookie has
+            if (context.HttpContext.User.GetImpersonator()?.FindFirst(AccountSessionClaimTypes.SessionId)?.Value is string impersonatorSession)
+                store.End(impersonatorSession, AccountSessionEndReason.SignedOut, now);
         }
         catch (Exception ex)
         {
@@ -139,6 +155,14 @@ public class AccountSessionCookieValidator(IOptionsMonitor<AccountSessionOptions
         var session = store!.Get(sessionId);
         if (session == null || session.EndedDate != null)
             return false;
+
+        // an impersonation ends with the session of its impersonator, e.g. signed out everywhere
+        if (identity.Actor?.FindFirst(AccountSessionClaimTypes.SessionId)?.Value is string impersonatorSession &&
+            store.Get(impersonatorSession) is not { EndedDate: null })
+        {
+            store.End(sessionId, AccountSessionEndReason.SignedOut, now);
+            return false;
+        }
 
         // the cookie is of the user of the session, who is still active
         var userId = identity.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -193,6 +217,7 @@ public class AccountSessionCookieValidator(IOptionsMonitor<AccountSessionOptions
             CreatedDate = now,
             LastSeenDate = now,
             Method = identity.AuthenticationType,
+            ImpersonatorUserId = identity.Actor?.FindFirst(ClaimTypes.NameIdentifier)?.Value,
             IPAddress = httpContext.Connection.RemoteIpAddress?.ToString(),
             UserAgent = httpContext.Request.Headers.UserAgent.ToString() is { Length: > 0 } agent ? agent : null
         };

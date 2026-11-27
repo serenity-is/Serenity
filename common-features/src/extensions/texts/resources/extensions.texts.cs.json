@@ -40,6 +40,7 @@
   "Forms.Membership.ForgotPassword.FormTitle": "Zapomněl jsem své heslo",
   "Forms.Membership.ForgotPassword.SubmitButton": "Resetovat mé heslo",
   "Forms.Membership.ForgotPassword.SuccessMessage": "Pokud tento uživatel existuje, poslali jsme vám email s pokyny k obnovení hesla.",
+  "Forms.Membership.Impersonation.Restricted": "Toto není k dispozici, pokud jste přihlášeni jako jiný uživatel. Nejprve se vraťte na svůj účet.",
   "Forms.Membership.MyAccount.ChangePasswordDescription": "Změňte heslo, kterým se přihlašujete.",
   "Forms.Membership.MyAccount.ChangePasswordRequired": "Vyžadována změna",
   "Forms.Membership.MyAccount.PasswordTitle": "Heslo",

@@ -33,7 +33,7 @@ public class CaptureLogBehavior : BaseSaveDeleteBehaviorAsync, ISaveBehaviorSync
             return;
 
         var newRow = GetDeletedLogRow(handler.Row);
-        Log(handler.UnitOfWork, handler.Row, newRow, handler.Context.User?.GetIdentifier());
+        Log(handler.UnitOfWork, handler.Row, newRow, handler.Context.User?.GetAuditIdentifier());
     }
 
     /// <inheritdoc/>
@@ -43,7 +43,7 @@ public class CaptureLogBehavior : BaseSaveDeleteBehaviorAsync, ISaveBehaviorSync
             return Task.CompletedTask;
 
         var newRow = GetDeletedLogRow(handler.Row);
-        return LogAsync(handler.UnitOfWork, handler.Row, newRow, handler.Context.User?.GetIdentifier(), cancellationToken);
+        return LogAsync(handler.UnitOfWork, handler.Row, newRow, handler.Context.User?.GetAuditIdentifier(), cancellationToken);
     }
 
     /// <inheritdoc/>
@@ -56,7 +56,7 @@ public class CaptureLogBehavior : BaseSaveDeleteBehaviorAsync, ISaveBehaviorSync
         if (newRow == null)
             return;
 
-        Log(handler.UnitOfWork, handler.Row, newRow, handler.Context.User?.GetIdentifier());
+        Log(handler.UnitOfWork, handler.Row, newRow, handler.Context.User?.GetAuditIdentifier());
     }
 
     /// <inheritdoc/>
@@ -69,7 +69,7 @@ public class CaptureLogBehavior : BaseSaveDeleteBehaviorAsync, ISaveBehaviorSync
         if (newRow == null)
             return Task.CompletedTask;
 
-        return LogAsync(handler.UnitOfWork, handler.Row, newRow, handler.Context.User?.GetIdentifier(), cancellationToken);
+        return LogAsync(handler.UnitOfWork, handler.Row, newRow, handler.Context.User?.GetAuditIdentifier(), cancellationToken);
     }
 
     private static IRow? GetDeletedLogRow(IRow row)
@@ -123,13 +123,13 @@ public class CaptureLogBehavior : BaseSaveDeleteBehaviorAsync, ISaveBehaviorSync
 
         if (handler.IsCreate)
         {
-            Log(handler.UnitOfWork, null, handler.Row, handler.Context.User?.GetIdentifier());
+            Log(handler.UnitOfWork, null, handler.Row, handler.Context.User?.GetAuditIdentifier());
 
             return;
         }
 
         if (HasAnyChanged(handler))
-            Log(handler.UnitOfWork, handler.Old, handler.Row, handler.Context.User?.GetIdentifier());
+            Log(handler.UnitOfWork, handler.Old, handler.Row, handler.Context.User?.GetAuditIdentifier());
     }
 
     /// <inheritdoc/>
@@ -139,10 +139,10 @@ public class CaptureLogBehavior : BaseSaveDeleteBehaviorAsync, ISaveBehaviorSync
             return Task.CompletedTask;
 
         if (handler.IsCreate)
-            return LogAsync(handler.UnitOfWork, null, handler.Row, handler.Context.User?.GetIdentifier(), cancellationToken);
+            return LogAsync(handler.UnitOfWork, null, handler.Row, handler.Context.User?.GetAuditIdentifier(), cancellationToken);
 
         if (HasAnyChanged(handler))
-            return LogAsync(handler.UnitOfWork, handler.Old, handler.Row, handler.Context.User?.GetIdentifier(), cancellationToken);
+            return LogAsync(handler.UnitOfWork, handler.Old, handler.Row, handler.Context.User?.GetAuditIdentifier(), cancellationToken);
 
         return Task.CompletedTask;
     }

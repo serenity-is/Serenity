@@ -53,6 +53,8 @@ public class DefaultElevationHandler(IRequestContext context, IHttpContextAccess
     /// <inheritdoc />
     public void AppendElevationTokenToCookies()
     {
+        // an impersonator doesn't confirm the password of the impersonated user
+        httpContextAccessor.HttpContext?.User.ValidateNotImpersonating(Localizer);
         if (httpContextAccessor.HttpContext is null)
             throw new ArgumentNullException(nameof(httpContextAccessor.HttpContext));
 
@@ -76,6 +78,8 @@ public class DefaultElevationHandler(IRequestContext context, IHttpContextAccess
     /// <inheritdoc />
     public void ValidateElevationToken()
     {
+        // the sensitive actions are not available while impersonating
+        httpContextAccessor.HttpContext?.User.ValidateNotImpersonating(Localizer);
         if (httpContextAccessor.HttpContext is null)
             throw new ArgumentNullException(nameof(httpContextAccessor.HttpContext));
 

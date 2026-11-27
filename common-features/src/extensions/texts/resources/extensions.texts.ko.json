@@ -40,6 +40,7 @@
   "Forms.Membership.ForgotPassword.FormTitle": "내 비밀번호를 잊어버렸어",
   "Forms.Membership.ForgotPassword.SubmitButton": "내 비밀번호 재설정",
   "Forms.Membership.ForgotPassword.SuccessMessage": "이 사용자가 존재하는 경우, 비밀번호 재설정 지침이 포함 된 이메일을 보내 드렸습니다.",
+  "Forms.Membership.Impersonation.Restricted": "다른 사용자로 로그인한 동안에는 사용할 수 없습니다. 먼저 자신의 계정으로 돌아가세요.",
   "Forms.Membership.MyAccount.ChangePasswordDescription": "로그인에 사용하는 비밀번호를 변경합니다.",
   "Forms.Membership.MyAccount.ChangePasswordRequired": "변경 필요",
   "Forms.Membership.MyAccount.PasswordTitle": "비밀번호",

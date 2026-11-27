@@ -40,6 +40,7 @@
   "Forms.Membership.ForgotPassword.FormTitle": "Şifremi Unuttum",
   "Forms.Membership.ForgotPassword.SubmitButton": "Şifremi Sıfırla",
   "Forms.Membership.ForgotPassword.SuccessMessage": "Bu kullanıcı varsa, size şifre sıfırlama talimatları içeren bir e-posta gönderdik.",
+  "Forms.Membership.Impersonation.Restricted": "Başka bir kullanıcı olarak oturum açtığınızda bu kullanılamaz. Önce kendi hesabınıza dönün.",
   "Forms.Membership.MyAccount.ChangePasswordDescription": "Oturum açtığınız şifreyi değiştirin.",
   "Forms.Membership.MyAccount.ChangePasswordRequired": "Değişiklik gerekli",
   "Forms.Membership.MyAccount.PasswordTitle": "Şifre",

@@ -40,6 +40,7 @@
   "Forms.Membership.ForgotPassword.FormTitle": "Jag har glömt mitt lösenord",
   "Forms.Membership.ForgotPassword.SubmitButton": "Återställ mitt lösenord",
   "Forms.Membership.ForgotPassword.SuccessMessage": "Om denna användare finns har vi skickat ett e-postmeddelande till dig med instruktioner för återställning av lösenordet.",
+  "Forms.Membership.Impersonation.Restricted": "Detta är inte tillgängligt medan du är inloggad som en annan användare. Gå först tillbaka till ditt eget konto.",
   "Forms.Membership.MyAccount.ChangePasswordDescription": "Byt lösenordet du loggar in med.",
   "Forms.Membership.MyAccount.ChangePasswordRequired": "Ändring krävs",
   "Forms.Membership.MyAccount.PasswordTitle": "Lösenord",

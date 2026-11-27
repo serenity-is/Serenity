@@ -41,6 +41,7 @@
   "Forms.Membership.ForgotPassword.FormTitle": "Forgot My Password",
   "Forms.Membership.ForgotPassword.SubmitButton": "Reset My Password",
   "Forms.Membership.ForgotPassword.SuccessMessage": "If this user exists, we have sent you an email with password reset instructions.",
+  "Forms.Membership.Impersonation.Restricted": "This isn't available while you are signed in as another user. Return to your own account first.",
   "Forms.Membership.MyAccount.ChangePasswordDescription": "Change the password you sign in with.",
   "Forms.Membership.MyAccount.ChangePasswordRequired": "Change required",
   "Forms.Membership.MyAccount.PasswordTitle": "Password",

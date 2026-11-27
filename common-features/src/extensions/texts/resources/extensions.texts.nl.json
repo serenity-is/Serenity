@@ -40,6 +40,7 @@
   "Forms.Membership.ForgotPassword.FormTitle": "Ik ben mijn wachtwoord vergeten",
   "Forms.Membership.ForgotPassword.SubmitButton": "Mijn wachtwoord opnieuw instellen",
   "Forms.Membership.ForgotPassword.SuccessMessage": "Als deze gebruiker bestaat, hebben we u een email gestuurd met instructies voor het opnieuw instellen van het wachtwoord.",
+  "Forms.Membership.Impersonation.Restricted": "Dit is niet beschikbaar terwijl je als een andere gebruiker bent aangemeld. Keer eerst terug naar je eigen account.",
   "Forms.Membership.MyAccount.ChangePasswordDescription": "Wijzig het wachtwoord waarmee je aanmeldt.",
   "Forms.Membership.MyAccount.ChangePasswordRequired": "Wijziging vereist",
   "Forms.Membership.MyAccount.PasswordTitle": "Wachtwoord",

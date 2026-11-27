@@ -40,6 +40,7 @@
   "Forms.Membership.ForgotPassword.FormTitle": "من پسوردم را فراموش کرده ام",
   "Forms.Membership.ForgotPassword.SubmitButton": "رمز عبورم را بازنشانی کنید",
   "Forms.Membership.ForgotPassword.SuccessMessage": "اگر این کاربر وجود داشت، ما به شما یک ایمیل با دستورالعمل تنظیم مجدد رمز عبور فرستاده‌ایم.",
+  "Forms.Membership.Impersonation.Restricted": "این گزینه هنگام ورود به‌عنوان کاربر دیگر در دسترس نیست. ابتدا به حساب خود بازگردید.",
   "Forms.Membership.MyAccount.ChangePasswordDescription": "گذرواژه‌ای را که با آن وارد می‌شوید تغییر دهید.",
   "Forms.Membership.MyAccount.ChangePasswordRequired": "تغییر لازم است",
   "Forms.Membership.MyAccount.PasswordTitle": "گذرواژه",

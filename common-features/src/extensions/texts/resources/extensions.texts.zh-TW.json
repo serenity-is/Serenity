@@ -40,6 +40,7 @@
   "Forms.Membership.ForgotPassword.FormTitle": "我忘記我的密碼",
   "Forms.Membership.ForgotPassword.SubmitButton": "我的密碼重設",
   "Forms.Membership.ForgotPassword.SuccessMessage": "如果該使用者存在，我們已向您發送一封包含重設密碼說明的電子郵件。",
+  "Forms.Membership.Impersonation.Restricted": "以其他使用者身分登入期間無法使用。請先返回您自己的帳戶。",
   "Forms.Membership.MyAccount.ChangePasswordDescription": "變更您用於登入的密碼。",
   "Forms.Membership.MyAccount.ChangePasswordRequired": "需要變更",
   "Forms.Membership.MyAccount.PasswordTitle": "密碼",

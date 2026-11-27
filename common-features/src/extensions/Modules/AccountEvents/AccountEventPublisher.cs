@@ -57,11 +57,12 @@ public class AccountEventPublisher(IEnumerable<IAccountEventHandler> handlers,
         if (accountEvent.Time == default)
             accountEvent.Time = (timeProvider ?? TimeProvider.System).GetUtcNow().UtcDateTime;
 
+        // who is responsible, the impersonator of an impersonated user
         var principal = userAccessor.User;
         if (accountEvent.ActorUserId == null && principal?.Identity?.IsAuthenticated == true)
         {
-            accountEvent.ActorUserId = principal.GetIdentifier();
-            accountEvent.ActorUsername ??= principal.Identity.Name;
+            accountEvent.ActorUserId = principal.GetAuditIdentifier();
+            accountEvent.ActorUsername ??= principal.GetImpersonator()?.Name ?? principal.Identity.Name;
         }
 
         var context = httpContextAccessor?.HttpContext;

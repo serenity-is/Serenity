@@ -45,5 +45,12 @@ public enum AccountEventKind
 
     /// <summary>Sessions of the user were signed out, why in <see cref="AccountEvent.Reason"/> (an
     /// <see cref="AccountSessionEndReason"/>), and how many in <see cref="AccountEvent.NewValue"/>.</summary>
-    SessionsRevoked = 26
+    SessionsRevoked = 26,
+
+    /// <summary>Someone began to impersonate the user, who is in <see cref="AccountEvent.ActorUserId"/>.</summary>
+    ImpersonationStarted = 27,
+
+    /// <summary>An impersonation of the user ended, by its impersonator, or for <see cref="AccountEvent.Reason"/>, e.g. its
+    /// time was up.</summary>
+    ImpersonationEnded = 28
 }

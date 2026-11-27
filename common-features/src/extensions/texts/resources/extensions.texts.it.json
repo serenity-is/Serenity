@@ -40,6 +40,7 @@
   "Forms.Membership.ForgotPassword.FormTitle": "Ho dimenticato la mia password",
   "Forms.Membership.ForgotPassword.SubmitButton": "Reimposta la mia password",
   "Forms.Membership.ForgotPassword.SuccessMessage": "Se questo utente esiste, ti abbiamo inviato un'email con le istruzioni per reimpostare la password.",
+  "Forms.Membership.Impersonation.Restricted": "Non è disponibile mentre hai effettuato l’accesso come un altro utente. Torna prima al tuo account.",
   "Forms.Membership.MyAccount.ChangePasswordDescription": "Cambia la password con cui accedi.",
   "Forms.Membership.MyAccount.ChangePasswordRequired": "Cambio richiesto",
   "Forms.Membership.MyAccount.PasswordTitle": "Password",

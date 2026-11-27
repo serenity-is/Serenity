@@ -40,6 +40,7 @@
   "Forms.Membership.ForgotPassword.FormTitle": "Esqueci-me da minha palavra-passe",
   "Forms.Membership.ForgotPassword.SubmitButton": "Redefinir a minha palavra-passe",
   "Forms.Membership.ForgotPassword.SuccessMessage": "Se este utilizador existir, enviamos-lhe um email com as instruções para redefinir a palavra-passe.",
+  "Forms.Membership.Impersonation.Restricted": "Não está disponível enquanto tem sessão iniciada como outro utilizador. Volte primeiro à sua própria conta.",
   "Forms.Membership.MyAccount.ChangePasswordDescription": "Altere a palavra-passe com que inicia sessão.",
   "Forms.Membership.MyAccount.ChangePasswordRequired": "Alteração necessária",
   "Forms.Membership.MyAccount.PasswordTitle": "Palavra-passe",

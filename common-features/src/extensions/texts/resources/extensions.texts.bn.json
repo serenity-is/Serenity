@@ -40,6 +40,7 @@
   "Forms.Membership.ForgotPassword.FormTitle": "পাসওয়ার্ড ভুলে গেছি",
   "Forms.Membership.ForgotPassword.SubmitButton": "পাসওয়ার্ড রিসেট করুন",
   "Forms.Membership.ForgotPassword.SuccessMessage": "যদি এই ব্যবহারকারী বিদ্যমান হয়, তবে আমরা পাসওয়ার্ড রিসেট নির্দেশাবলী সহ আপনাকে একটি ই-মেইল পাঠিয়ে দিয়েছি।",
+  "Forms.Membership.Impersonation.Restricted": "অন্য ব্যবহারকারী হিসেবে সাইন ইন থাকাকালীন এটি উপলব্ধ নয়। প্রথমে আপনার নিজের অ্যাকাউন্টে ফিরুন।",
   "Forms.Membership.MyAccount.ChangePasswordDescription": "যে পাসওয়ার্ড দিয়ে সাইন ইন করেন তা পরিবর্তন করুন।",
   "Forms.Membership.MyAccount.ChangePasswordRequired": "পরিবর্তন প্রয়োজন",
   "Forms.Membership.MyAccount.PasswordTitle": "পাসওয়ার্ড",

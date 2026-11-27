@@ -20,10 +20,22 @@ public class RequiresElevationAttribute : Attribute, IResourceFilter
         {
             elevationHandler.ValidateElevationToken();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             if (!string.Equals(method, "GET", StringComparison.OrdinalIgnoreCase))
                 throw;
+
+            // an impersonator can't confirm the password of the impersonated user, so the page is not available
+            if (ex is ValidationError { ErrorCode: Serenity.Extensions.ImpersonationExtensions.RestrictedCode })
+            {
+                context.Result = new Microsoft.AspNetCore.Mvc.ContentResult
+                {
+                    StatusCode = Microsoft.AspNetCore.Http.StatusCodes.Status403Forbidden,
+                    ContentType = "text/plain; charset=utf-8",
+                    Content = ex.Message
+                };
+                return;
+            }
 
             var userRetrieveService = context.HttpContext.RequestServices.GetRequiredService<IUserRetrieveService>();
 

@@ -40,6 +40,7 @@
   "Forms.Membership.ForgotPassword.FormTitle": "Am uitat parola mea",
   "Forms.Membership.ForgotPassword.SubmitButton": "Resetează parola mea",
   "Forms.Membership.ForgotPassword.SuccessMessage": "Dacă acest utilizator există, v-am trimis un email cu instrucțiuni de resetare a parolei.",
+  "Forms.Membership.Impersonation.Restricted": "Nu este disponibil cât timp sunteți autentificat ca alt utilizator. Reveniți mai întâi la propriul cont.",
   "Forms.Membership.MyAccount.ChangePasswordDescription": "Schimbați parola cu care vă autentificați.",
   "Forms.Membership.MyAccount.ChangePasswordRequired": "Schimbare necesară",
   "Forms.Membership.MyAccount.PasswordTitle": "Parolă",

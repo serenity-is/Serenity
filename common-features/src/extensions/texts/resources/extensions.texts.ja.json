@@ -40,6 +40,7 @@
   "Forms.Membership.ForgotPassword.FormTitle": "私はパスワードを忘れました",
   "Forms.Membership.ForgotPassword.SubmitButton": "私のパスワードをリセットする",
   "Forms.Membership.ForgotPassword.SuccessMessage": "このユーザーが存在する場合、パスワードリセットの手順を記載したメールをお送りしています。",
+  "Forms.Membership.Impersonation.Restricted": "別のユーザーとしてサインインしている間は利用できません。先に自分のアカウントに戻ってください。",
   "Forms.Membership.MyAccount.ChangePasswordDescription": "サインインに使用するパスワードを変更します。",
   "Forms.Membership.MyAccount.ChangePasswordRequired": "変更が必要",
   "Forms.Membership.MyAccount.PasswordTitle": "パスワード",

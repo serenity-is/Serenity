@@ -40,6 +40,7 @@
   "Forms.Membership.ForgotPassword.FormTitle": "Eu esqueci minha senha",
   "Forms.Membership.ForgotPassword.SubmitButton": "Redefinir a minha senha",
   "Forms.Membership.ForgotPassword.SuccessMessage": "Se este usuário existir, nós enviamos um email com as instruções para redefinir a senha.",
+  "Forms.Membership.Impersonation.Restricted": "Isso não está disponível enquanto você estiver conectado como outro usuário. Volte primeiro para sua própria conta.",
   "Forms.Membership.MyAccount.ChangePasswordDescription": "Altere a senha com que você entra.",
   "Forms.Membership.MyAccount.ChangePasswordRequired": "Alteração necessária",
   "Forms.Membership.MyAccount.PasswordTitle": "Senha",

@@ -40,6 +40,7 @@
   "Forms.Membership.ForgotPassword.FormTitle": "Zapomniałem hasła",
   "Forms.Membership.ForgotPassword.SubmitButton": "Zresetuj moje hasło",
   "Forms.Membership.ForgotPassword.SuccessMessage": "Jeśli ten użytkownik istnieje, wysłaliśmy Ci email z instrukcjami resetowania hasła.",
+  "Forms.Membership.Impersonation.Restricted": "Niedostępne, gdy jesteś zalogowany jako inny użytkownik. Najpierw wróć do swojego konta.",
   "Forms.Membership.MyAccount.ChangePasswordDescription": "Zmień hasło, którym się logujesz.",
   "Forms.Membership.MyAccount.ChangePasswordRequired": "Wymagana zmiana",
   "Forms.Membership.MyAccount.PasswordTitle": "Hasło",

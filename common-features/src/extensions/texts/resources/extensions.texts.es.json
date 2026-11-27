@@ -40,6 +40,7 @@
   "Forms.Membership.ForgotPassword.FormTitle": "He olvidado mi contraseña",
   "Forms.Membership.ForgotPassword.SubmitButton": "Restablecer mi contraseña",
   "Forms.Membership.ForgotPassword.SuccessMessage": "Si este usuario existe, le hemos enviado un correo electrónico con instrucciones para restablecer la contraseña.",
+  "Forms.Membership.Impersonation.Restricted": "No está disponible mientras haya iniciado sesión como otro usuario. Vuelva antes a su propia cuenta.",
   "Forms.Membership.MyAccount.ChangePasswordDescription": "Cambie la contraseña con la que inicia sesión.",
   "Forms.Membership.MyAccount.ChangePasswordRequired": "Cambio requerido",
   "Forms.Membership.MyAccount.PasswordTitle": "Contraseña",

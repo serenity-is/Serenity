@@ -40,6 +40,7 @@
   "Forms.Membership.ForgotPassword.FormTitle": "मैंने अपना पासवर्ड भूल गया",
   "Forms.Membership.ForgotPassword.SubmitButton": "मेरा पासवर्ड रीसेट करें",
   "Forms.Membership.ForgotPassword.SuccessMessage": "यदि यह उपयोगकर्ता मौजूद है, तो हमने आपको पासवर्ड रीसेट निर्देशों के साथ एक ईमेल भेजा है।",
+  "Forms.Membership.Impersonation.Restricted": "किसी अन्य उपयोगकर्ता के रूप में साइन इन होने पर यह उपलब्ध नहीं है। पहले अपने खाते पर लौटें।",
   "Forms.Membership.MyAccount.ChangePasswordDescription": "जिस पासवर्ड से आप साइन इन करते हैं उसे बदलें।",
   "Forms.Membership.MyAccount.ChangePasswordRequired": "बदलना आवश्यक",
   "Forms.Membership.MyAccount.PasswordTitle": "पासवर्ड",

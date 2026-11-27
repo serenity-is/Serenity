@@ -40,6 +40,7 @@
   "Forms.Membership.ForgotPassword.FormTitle": "Я забыл свой пароль",
   "Forms.Membership.ForgotPassword.SubmitButton": "Сбросить мой пароль",
   "Forms.Membership.ForgotPassword.SuccessMessage": "Если такой пользователь существует, мы отправили вам электронное письмо с инструкциями по сбросу пароля.",
+  "Forms.Membership.Impersonation.Restricted": "Недоступно, пока вы вошли как другой пользователь. Сначала вернитесь в свою учётную запись.",
   "Forms.Membership.MyAccount.ChangePasswordDescription": "Смените пароль, с которым вы входите.",
   "Forms.Membership.MyAccount.ChangePasswordRequired": "Требуется смена",
   "Forms.Membership.MyAccount.PasswordTitle": "Пароль",

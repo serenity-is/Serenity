@@ -15,6 +15,7 @@ export * from "./Extensions/ForgotPasswordFormTexts";
 export * from "./Extensions/ForgotPasswordRequest";
 export * from "./Extensions/GetNextNumberRequest";
 export * from "./Extensions/GetNextNumberResponse";
+export * from "./Extensions/ImpersonationTexts";
 export * from "./Extensions/MyAccountTexts";
 export * from "./Extensions/PasswordStrengthRules";
 export * from "./Extensions/PasswordStrengthValidationTexts";

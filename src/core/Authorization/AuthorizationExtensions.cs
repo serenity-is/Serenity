@@ -74,6 +74,21 @@ public static class AuthorizationExtensions
     }
 
     /// <summary>
+    /// Gets the identifier of the user who is responsible for what the principal does, for the audit fields and logs, e.g.
+    /// <c>InsertUserId</c>: the user who acts on behalf of the principal (<see cref="ClaimsIdentity.Actor"/>), e.g. an
+    /// administrator who impersonates the user, else the user of the principal (<see cref="GetIdentifier"/>).
+    /// </summary>
+    /// <param name="identity">The principal to extract the identifier from.</param>
+    /// <returns>The identifier claim value, or <c>null</c> if the principal or claim is not present.</returns>
+    public static string? GetAuditIdentifier(this ClaimsPrincipal? identity)
+    {
+        if ((identity?.Identity as ClaimsIdentity)?.Actor?.FindFirst(ClaimTypes.NameIdentifier)?.Value is string actor)
+            return actor;
+
+        return identity.GetIdentifier();
+    }
+
+    /// <summary>
     /// Gets the typed user definition for the specified principal.
     /// </summary>
     /// <typeparam name="TUserDefinition">The concrete user definition type.</typeparam>

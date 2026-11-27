@@ -40,6 +40,7 @@
   "Forms.Membership.ForgotPassword.FormTitle": "نسيت كلمة المرور الخاصة بي",
   "Forms.Membership.ForgotPassword.SubmitButton": "إعادة ضبط كلمة المرور الخاصة بي",
   "Forms.Membership.ForgotPassword.SuccessMessage": "إذا كان المستخدم موجودًا، فقد أرسلنا لك بريدًا إلكترونيًا يحتوي على تعليمات إعادة تعيين كلمة المرور.",
+  "Forms.Membership.Impersonation.Restricted": "هذا غير متاح أثناء تسجيل دخولك كمستخدم آخر. عُد إلى حسابك أولًا.",
   "Forms.Membership.MyAccount.ChangePasswordDescription": "غيّر كلمة المرور التي تسجّل الدخول بها.",
   "Forms.Membership.MyAccount.ChangePasswordRequired": "التغيير مطلوب",
   "Forms.Membership.MyAccount.PasswordTitle": "كلمة المرور",

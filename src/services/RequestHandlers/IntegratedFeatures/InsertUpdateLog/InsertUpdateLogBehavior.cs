@@ -34,11 +34,11 @@ public class UpdateInsertLogBehavior : BaseSaveBehaviorAsync, ISaveBehaviorSync,
 
         if (row is IUpdateUserIdRow updateLogRow && (handler.IsUpdate || insertUserIdRow == null))
         {
-            updateLogRow.UpdateUserIdField.AsInvariant(row, handler.Context.User?.GetIdentifier());
+            updateLogRow.UpdateUserIdField.AsInvariant(row, handler.Context.User?.GetAuditIdentifier());
         }
         else if (insertUserIdRow != null && handler.IsCreate)
         {
-            insertUserIdRow.InsertUserIdField.AsInvariant(row, handler.Context.User?.GetIdentifier());
+            insertUserIdRow.InsertUserIdField.AsInvariant(row, handler.Context.User?.GetAuditIdentifier());
         }
     }
 

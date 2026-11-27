@@ -9,6 +9,7 @@ namespace Serenity.Extensions;
 /// set password, forgot password, and reset password.
 /// </summary>
 [AllowDuringAccountSetup]
+[NotDuringImpersonation]
 public abstract class AccountPasswordActionsPageBase<TUserRow> : MembershipPageBase<TUserRow>
     where TUserRow : class, IRow, IIdRow, IEmailRow, IPasswordRow, new()
 {

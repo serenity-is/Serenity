@@ -40,6 +40,7 @@
   "Forms.Membership.ForgotPassword.FormTitle": "Saya lupa kata sandi saya",
   "Forms.Membership.ForgotPassword.SubmitButton": "Atur Ulang Kata Sandi Saya",
   "Forms.Membership.ForgotPassword.SuccessMessage": "Jika pengguna ini ada, kami telah mengirimkan email kepada Anda dengan petunjuk pengaturan ulang kata sandi.",
+  "Forms.Membership.Impersonation.Restricted": "Ini tidak tersedia saat Anda masuk sebagai pengguna lain. Kembali ke akun Anda sendiri terlebih dahulu.",
   "Forms.Membership.MyAccount.ChangePasswordDescription": "Ubah kata sandi yang Anda gunakan untuk masuk.",
   "Forms.Membership.MyAccount.ChangePasswordRequired": "Perubahan diperlukan",
   "Forms.Membership.MyAccount.PasswordTitle": "Kata sandi",
