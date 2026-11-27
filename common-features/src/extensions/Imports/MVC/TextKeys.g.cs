@@ -87,6 +87,17 @@ public static partial class TextKeys
         /// <summary>The text keys under "Forms.Membership".</summary>
         public static partial class Membership
         {
+            /// <summary>The text keys under "Forms.Membership.AccountSetup".</summary>
+            public static partial class AccountSetup
+            {
+                /// <summary>Change your password to continue.</summary>
+                public const string PasswordChangeRequired = "Forms.Membership.AccountSetup.PasswordChangeRequired";
+                /// <summary>Your password was set by an administrator. Choose a new one to continue to the application.</summary>
+                public const string PasswordChangeRequiredHint = "Forms.Membership.AccountSetup.PasswordChangeRequiredHint";
+                /// <summary>Change your password</summary>
+                public const string PasswordChangeRequiredTitle = "Forms.Membership.AccountSetup.PasswordChangeRequiredTitle";
+            }
+
             /// <summary>The text keys under "Forms.Membership.ChangePassword".</summary>
             public static partial class ChangePassword
             {

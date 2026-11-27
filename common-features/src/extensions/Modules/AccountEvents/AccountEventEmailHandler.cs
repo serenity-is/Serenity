@@ -22,7 +22,7 @@ public class AccountEventEmailHandler(IOptions<AccountEventEmailOptions> options
     public virtual Task HandleAsync(AccountEvent accountEvent, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(accountEvent);
-        if (emailSender == null || options?.Value?.IsEnabledFor(accountEvent.Kind) == false)
+        if (emailSender == null || !IsEmailed(accountEvent.Kind) || options?.Value?.IsEnabledFor(accountEvent.Kind) == false)
             return Task.CompletedTask;
 
         var mailTo = GetRecipient(accountEvent);
@@ -34,6 +34,14 @@ public class AccountEventEmailHandler(IOptions<AccountEventEmailOptions> options
         emailSender.Send(subject: model.Subject, body: body, mailTo: mailTo);
         return Task.CompletedTask;
     }
+
+    /// <summary>
+    /// Whether the user is emailed about this kind of event: the changes of the account, not e.g. the sign-ins.
+    /// </summary>
+    /// <param name="kind">The kind of the event.</param>
+    protected virtual bool IsEmailed(AccountEventKind kind) => kind is AccountEventKind.PasswordChanged or
+        AccountEventKind.EmailChanged or AccountEventKind.UsernameChanged or AccountEventKind.TwoFactorEnabled or
+        AccountEventKind.TwoFactorDisabled or AccountEventKind.TwoFactorReset;
 
     /// <summary>
     /// Gets who the email goes to: the old address of a changed email address, else the address of the user.

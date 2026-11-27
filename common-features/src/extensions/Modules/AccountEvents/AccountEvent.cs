@@ -28,8 +28,12 @@ public class AccountEvent
     /// <summary>The value after, e.g. the new email address of <see cref="AccountEventKind.EmailChanged"/>.</summary>
     public string? NewValue { get; set; }
 
-    /// <summary>The key of the two-factor authentication method, e.g. "Email", for the two-factor events.</summary>
+    /// <summary>The key of the two-factor authentication method, e.g. "Email", for the two-factor events, or how the user
+    /// signed in, e.g. "Password" or "Google", for the sign-in events.</summary>
     public string? Method { get; set; }
+
+    /// <summary>Why it failed, e.g. "InvalidPassword" of <see cref="SignInFailureReasons"/>, for the failed events.</summary>
+    public string? Reason { get; set; }
 
     /// <summary>The ID of the user who did it, which is not set when no one was signed in, e.g. for a reset link.</summary>
     public string? ActorUserId { get; set; }

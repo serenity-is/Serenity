@@ -261,6 +261,13 @@ public abstract class AccountPasswordActionsPageBase<TUserRow> : MembershipPageB
 
             emailSender.Send(subject: emailSubject, body: emailBody, mailTo: user.EmailField[user]!);
 
+            // by the user, or by an administrator for the user
+            HttpContext?.RequestServices?.GetService<IAccountEventPublisher>()?.Publish(new AccountEvent
+            {
+                Kind = AccountEventKind.PasswordResetRequested,
+                UserId = Convert.ToString(user.GetIdField().AsObject(user), CultureInfo.InvariantCulture)
+            });
+
             return new ServiceResponse();
         });
     }

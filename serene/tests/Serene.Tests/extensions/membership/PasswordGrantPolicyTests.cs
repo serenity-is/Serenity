@@ -27,6 +27,7 @@ public class PasswordGrantPolicyTests
         public string Id => id;
         public string DisplayName => username;
         public string Username => username;
+        public string? Email => null;
         public short IsActive => 1;
         public bool PasswordChangeRequired => changeRequired;
     }
