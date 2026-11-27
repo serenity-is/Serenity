@@ -699,6 +699,8 @@ export namespace Fluent {
             return;
         let $ = getjQuery();
         if ($) {
+            if (!(element instanceof Element))
+                return;
             $(element).remove();
         }
         else {
