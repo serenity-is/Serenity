@@ -30,22 +30,55 @@ public class AccountEventPublisher(IEnumerable<IAccountEventHandler> handlers,
         if (handlers.Length == 0)
             return;
 
-        Prepare(accountEvent);
+        // what the request tells is taken now, and the users are read after the commit, as the transaction of the change
+        // may lock the row of the user, which the user retrieve service reads with a connection of its own, and would wait
+        // for until the command times out, blocking the others that read the users meanwhile
+        PrepareRequest(accountEvent);
         if (unitOfWork != null)
-            unitOfWork.OnCommit += () => Dispatch(accountEvent);
+            unitOfWork.OnCommit += () =>
+            {
+                PrepareUsers(accountEvent);
+                Dispatch(accountEvent);
+            };
         else
+        {
+            PrepareUsers(accountEvent);
             Dispatch(accountEvent);
+        }
     }
 
     /// <summary>
-    /// Fills what the event leaves out: the user, who did it, when, and from where.
+    /// Fills what the request tells: who did it, from the claims of the current user, when, and from where. It doesn't read
+    /// the database, as it is called in the transaction of the change.
     /// </summary>
     /// <param name="accountEvent">The event.</param>
-    protected virtual void Prepare(AccountEvent accountEvent)
+    protected virtual void PrepareRequest(AccountEvent accountEvent)
     {
         if (accountEvent.Time == default)
             accountEvent.Time = (timeProvider ?? TimeProvider.System).GetUtcNow().UtcDateTime;
 
+        var principal = userAccessor.User;
+        if (accountEvent.ActorUserId == null && principal?.Identity?.IsAuthenticated == true)
+        {
+            accountEvent.ActorUserId = principal.GetIdentifier();
+            accountEvent.ActorUsername ??= principal.Identity.Name;
+        }
+
+        var context = httpContextAccessor?.HttpContext;
+        if (context != null)
+        {
+            accountEvent.IPAddress ??= context.Connection.RemoteIpAddress?.ToString();
+            accountEvent.UserAgent ??= context.Request.Headers.UserAgent.ToString() is { Length: > 0 } agent ? agent : null;
+        }
+    }
+
+    /// <summary>
+    /// Fills the user of the event from its ID, and the display name of who did it, which are read from the user retrieve
+    /// service, after the transaction of the change is committed.
+    /// </summary>
+    /// <param name="accountEvent">The event.</param>
+    protected virtual void PrepareUsers(AccountEvent accountEvent)
+    {
         if (!string.IsNullOrEmpty(accountEvent.UserId) &&
             (accountEvent.Username == null || accountEvent.DisplayName == null || accountEvent.Email == null))
         {
@@ -58,20 +91,8 @@ public class AccountEventPublisher(IEnumerable<IAccountEventHandler> handlers,
             }
         }
 
-        var principal = userAccessor.User;
-        if (accountEvent.ActorUserId == null && principal?.Identity?.IsAuthenticated == true)
-        {
-            accountEvent.ActorUserId = principal.GetIdentifier();
-            accountEvent.ActorUsername ??= principal.Identity.Name;
-            accountEvent.ActorDisplayName ??= userRetriever.GetUserDefinition(principal)?.DisplayName ?? principal.Identity.Name;
-        }
-
-        var context = httpContextAccessor?.HttpContext;
-        if (context != null)
-        {
-            accountEvent.IPAddress ??= context.Connection.RemoteIpAddress?.ToString();
-            accountEvent.UserAgent ??= context.Request.Headers.UserAgent.ToString() is { Length: > 0 } agent ? agent : null;
-        }
+        if (accountEvent.ActorDisplayName == null && !string.IsNullOrEmpty(accountEvent.ActorUserId))
+            accountEvent.ActorDisplayName = userRetriever.ById(accountEvent.ActorUserId)?.DisplayName ?? accountEvent.ActorUsername;
     }
 
     /// <summary>

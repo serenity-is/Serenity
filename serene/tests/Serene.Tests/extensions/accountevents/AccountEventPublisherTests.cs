@@ -6,8 +6,10 @@ public class AccountEventPublisherTests
 {
     private sealed class Users(params IUserDefinition[] users) : IUserRetrieveService
     {
-        public IUserDefinition? ById(string id) => users.FirstOrDefault(x => x.Id == id);
-        public IUserDefinition? ByUsername(string username) => users.FirstOrDefault(x => x.Username == username);
+        /// <summary>The number of the reads, which would wait for the lock of a transaction that changed the user.</summary>
+        public int Reads;
+        public IUserDefinition? ById(string id) { Reads++; return users.FirstOrDefault(x => x.Id == id); }
+        public IUserDefinition? ByUsername(string username) { Reads++; return users.FirstOrDefault(x => x.Username == username); }
     }
 
     private sealed class CaptureHandler(bool fail = false) : IAccountEventHandler
@@ -36,7 +38,11 @@ public class AccountEventPublisherTests
         new MockUserDefinition("5", "nancy", "Nancy Davolio", "nancy@example.test"));
 
     private static AccountEventPublisher Publisher(string? currentUser, params IAccountEventHandler[] handlers) =>
-        new(handlers, users, new MockUserAccessor(() => currentUser!, () => users.ByUsername(currentUser ?? "")?.Id!));
+        Publisher(users, currentUser, handlers);
+
+    private static AccountEventPublisher Publisher(Users retriever, string? currentUser, params IAccountEventHandler[] handlers) =>
+        new(handlers, retriever, new MockUserAccessor(() => currentUser!,
+            () => currentUser == "admin" ? "1" : currentUser == "nancy" ? "5" : null!));
 
     [Fact]
     public void Fills_The_User_And_Who_Did_It()
@@ -70,11 +76,15 @@ public class AccountEventPublisherTests
     {
         var handler = new CaptureHandler();
         var uow = new TestUnitOfWork();
-        Publisher("admin", handler).Publish(new AccountEvent { Kind = AccountEventKind.EmailChanged, UserId = "5" }, uow);
+        var retriever = new Users(new MockUserDefinition("1", "admin", "Administrator"), new MockUserDefinition("5", "nancy", "Nancy"));
+        Publisher(retriever, "admin", handler).Publish(new AccountEvent { Kind = AccountEventKind.EmailChanged, UserId = "5" }, uow);
         Assert.Empty(handler.Events);
+        // the users are not read in the transaction, which may lock the row of the user that they are read from
+        Assert.Equal(0, retriever.Reads);
 
         uow.Commit();
-        Assert.Single(handler.Events);
+        var e = Assert.Single(handler.Events);
+        Assert.Equal(("nancy", "Administrator"), (e.Username, e.ActorDisplayName));
     }
 
     [Fact]
