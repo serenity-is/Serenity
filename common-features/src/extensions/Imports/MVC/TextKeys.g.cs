@@ -132,6 +132,13 @@ public static partial class TextKeys
                 public const string SuccessMessage = "Forms.Membership.ForgotPassword.SuccessMessage";
             }
 
+            /// <summary>The text keys under "Forms.Membership.Impersonation".</summary>
+            public static partial class Impersonation
+            {
+                /// <summary>This isn't available while you are signed in as another user. Return to your own account first.</summary>
+                public const string Restricted = "Forms.Membership.Impersonation.Restricted";
+            }
+
             /// <summary>The text keys under "Forms.Membership.MyAccount".</summary>
             public static partial class MyAccount
             {
