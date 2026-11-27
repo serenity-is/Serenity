@@ -14,7 +14,7 @@ public class LocalTextPackages : Dictionary<string, string>
     /// <summary>
     /// Default regex for the set of texts included in the Site package.
     /// </summary>
-    public static readonly Regex DefaultSitePackageIncludes = new(@"^(Columns|Controls|Db|Dialogs|Enums|Forms|Permission|Site|Validation)\.", RegexOptions.Compiled);
+    public static readonly Regex DefaultSitePackageIncludes = new(@"^(Columns|Controls|Db|Dialogs|Enums|Forms|Pages|Permission|Site|Validation)\.", RegexOptions.Compiled);
 
     /// <summary>
     /// Creates a new instance of the class

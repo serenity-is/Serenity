@@ -90,7 +90,7 @@ public class LocalText(string? key) : ILocalText
 
     private static readonly Regex LocalTextKeyLike = new(@"^([A-Z][A-za-z0-9_]*\.)+[A-Z][A-za-z0-9_]*$", RegexOptions.Compiled);
 
-    private static readonly Regex UIKeyCandidates = new(@"^(Columns|Controls|Db|Dialogs|Enums|Forms|Permission|Site|Validation)\.", RegexOptions.Compiled);
+    private static readonly Regex UIKeyCandidates = new(@"^(Columns|Controls|Db|Dialogs|Enums|Forms|Pages|Permission|Site|Validation)\.", RegexOptions.Compiled);
 
 
     /// <summary>

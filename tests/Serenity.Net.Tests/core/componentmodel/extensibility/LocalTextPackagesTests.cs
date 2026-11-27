@@ -19,6 +19,7 @@ public class LocalTextPackagesTests
         Assert.Matches(regex.ToString(), "Dialogs.Test");
         Assert.Matches(regex.ToString(), "Enums.Test");
         Assert.Matches(regex.ToString(), "Forms.Test");
+        Assert.Matches(regex.ToString(), "Pages.Pro.Roles.Title");
         Assert.Matches(regex.ToString(), "Permission.Test");
         Assert.Matches(regex.ToString(), "Site.Test");
         Assert.Matches(regex.ToString(), "Validation.Test");

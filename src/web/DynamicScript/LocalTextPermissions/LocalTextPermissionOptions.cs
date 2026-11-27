@@ -20,7 +20,7 @@ public class LocalTextPermissionOptions
     /// texts of a NestedLocalTexts class with a Permission require that permission, and permission key
     /// texts require <see cref="PermissionTextsPermission"/>. Texts used by the forms and columns the
     /// user can access are always sent, as are texts that don't belong to any of these, like
-    /// "Controls.", "Dialogs.", "Validation." or "Site." texts. Defaults to false.
+    /// "Controls.", "Dialogs.", "Pages.", "Validation." or "Site." texts. Defaults to false.
     /// </summary>
     public bool Enabled { get; set; }
 
