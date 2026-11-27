@@ -79,4 +79,15 @@ public class AccountEventEmailHandlerTests
         Assert.Empty(sender.Messages);
         Assert.True(new AccountEventEmailOptions { Skip = "UsernameChanged" }.IsEnabledFor(AccountEventKind.PasswordChanged));
     }
+
+    [Fact]
+    public async Task Sends_Nothing_For_The_Sign_Ins()
+    {
+        var sender = new CaptureEmailSender();
+        foreach (var kind in new[] { AccountEventKind.SignedIn, AccountEventKind.SignInFailed, AccountEventKind.SignedOut,
+            AccountEventKind.Elevated, AccountEventKind.ElevationFailed, AccountEventKind.PasswordResetRequested })
+            await new TestHandler(new(), sender).HandleAsync(Event(kind), TestContext.Current.CancellationToken);
+
+        Assert.Empty(sender.Messages);
+    }
 }
