@@ -156,4 +156,34 @@ public abstract class BaseUploadEditorAttribute(string editorType) : CustomEdito
 
     /// <inheritdoc/>
     public bool IgnoreInvalidImage { get; set; }
+
+    /// <summary>
+    /// Whether the editor shows its toolbar with the select file button, as it did before, instead of a drop box while
+    /// it has no file and buttons by its files. When not set, the editor shows it only when its toolbar has buttons of
+    /// its own, see FileUploadEditor.defaults and MultipleFileUploadEditor.defaults on the client.
+    /// </summary>
+    public bool Toolbar
+    {
+        get { return GetOption<bool>("toolbar"); }
+        set { SetOption("toolbar", value); }
+    }
+
+    /// <summary>
+    /// The text of the drop box of the editor while it has no file, in place of "Drop a file here or click to choose",
+    /// as a text or a local text key.
+    /// </summary>
+    public string? DropHint
+    {
+        get { return GetOption<string>("dropHint"); }
+        set { SetOption("dropHint", value); }
+    }
+
+    /// <summary>
+    /// A line under the text of the drop box, e.g. the kind or the size of the files, as a text or a local text key.
+    /// </summary>
+    public string? DropHintDetail
+    {
+        get { return GetOption<string>("dropHintDetail"); }
+        set { SetOption("dropHintDetail", value); }
+    }
 }

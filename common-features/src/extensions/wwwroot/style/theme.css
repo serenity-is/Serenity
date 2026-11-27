@@ -153,6 +153,10 @@
 /* SVG icon masks (generated): replaces s-icon-font glyphs */
 .s-IncludeDeletedToggle>a::before,
 .add-file-button:not(.icon-tool-button) .button-inner:before,
+.file-drop-icon::before,
+.file-menu-icon::before,
+.file-remove-icon::before,
+.file-replace-icon::before,
 .delete-button:not(.icon-tool-button) .button-inner:before,
 .localization-button:not(.icon-tool-button) .button-inner:before,
 .export-xlsx-button:not(.icon-tool-button) .button-inner:before,
@@ -1076,8 +1080,8 @@ section.content-header>h1 {
   padding: 0.5em;
 }
 
-.s-ImageUploadEditor ul,
-.s-MultipleImageUploadEditor ul {
+.s-ImageUploadEditor ul.file-items,
+.s-MultipleImageUploadEditor ul.file-items {
   padding: 6px 6px 8px 6px;
   overflow-y: auto;
   min-height: 116px;
@@ -1089,12 +1093,12 @@ section.content-header>h1 {
   border: 1px solid var(--bs-danger);
 }
 
-.s-ImageUploadEditor.error ul,
-.s-MultipleImageUploadEditor.error ul {
+.s-ImageUploadEditor.error ul.file-items,
+.s-MultipleImageUploadEditor.error ul.file-items {
   background-color: rgba(var(--bs-danger-rgb), 0.1);
 }
 
-.s-MultipleImageUploadEditor li {
+.s-MultipleImageUploadEditor .file-items > li {
   float: left;
   margin-right: 6px;
   list-style: none;
@@ -1121,7 +1125,7 @@ section.content-header>h1 {
   opacity: 1;
 }
 
-.s-ImageUploadEditor.hide-original-name ul {
+.s-ImageUploadEditor.hide-original-name ul.file-items {
   min-height: 100px;
 }
 

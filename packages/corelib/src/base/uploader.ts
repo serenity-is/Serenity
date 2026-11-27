@@ -244,10 +244,25 @@ export class Uploader {
         });
     }
 
+    /** Whether the file input is disabled, e.g. as the editor is read-only, when files dropped or pasted are ignored. */
+    private isDisabled() {
+        return !!(this.opt?.input as HTMLInputElement)?.disabled;
+    }
+
+    /** Takes the drop zone out of the dragging state, as no dragleave comes after a drop. */
+    private resetDropZone(node: HTMLElement) {
+        (node as any).dragEnterCount = 0;
+        node.classList.remove('drop-valid');
+        node.classList.remove('drop-invalid');
+    }
+
     private watchDropZone(node: HTMLElement) {
+        // the browser would otherwise open a file dropped on the zone, also when it is disabled
         const stop = (e: Event) => e.preventDefault();
         node.addEventListener("dragover", stop);
         node.addEventListener("dragenter", e => {
+            if (this.isDisabled())
+                return;
             (node as any).dragEnterCount = ((node as any).dragEnterCount || 0) + 1;
             if ((node as any).dragEnterCount > 1) {
                 return;
@@ -281,6 +296,9 @@ export class Uploader {
 
         node.addEventListener("drop", (e) => {
             e.preventDefault();
+            this.resetDropZone(node);
+            if (this.isDisabled())
+                return;
             if (e.dataTransfer.items?.[0]?.webkitGetAsEntry() || (e.dataTransfer.items?.[0] as any)?.getAsEntry()) {
                 this.entriesApi(e, e.dataTransfer.items);
             } else if (e.dataTransfer.files) {
@@ -291,6 +309,8 @@ export class Uploader {
         });
 
         node.addEventListener("paste", (e) => {
+            if (this.isDisabled())
+                return;
             if (e.clipboardData.items?.[0]?.webkitGetAsEntry() || (e.clipboardData.items?.[0] as any)?.getAsEntry()) {
                 this.entriesApi(e, e.clipboardData.items);
             } else if (e.clipboardData.files) {

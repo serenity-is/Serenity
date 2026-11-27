@@ -122,6 +122,133 @@ describe("FileUploadEditor", () => {
         editor.destroy();
     });
 
+    it("shows the drop hint in place of the empty list, and hides the delete button without a file", () => {
+        const editor = create();
+        const hint = editor.domNode.querySelector<HTMLButtonElement>(".file-drop-hint");
+        const list = editor.domNode.querySelector<HTMLElement>("ul.file-items");
+        const del = editor.domNode.querySelector<HTMLElement>(".delete-button");
+        expect(hint.hidden).toBe(false);
+        expect(list.hidden).toBe(true);
+        expect(hint.textContent).toBe("Controls.ImageUpload.DropFileHint");
+        expect(del.hidden).toBe(true);
+
+        editor.set_value({ Filename: "x.jpg", OriginalName: "x.jpg" });
+        expect(hint.hidden).toBe(true);
+        expect(list.hidden).toBe(false);
+        expect(del.hidden).toBe(false);
+
+        del.click();
+        expect(hint.hidden).toBe(false);
+        expect(del.hidden).toBe(true);
+        editor.destroy();
+    });
+
+    it("hides the drop hint while read-only, and opens the file chooser when it is clicked", () => {
+        const editor = create();
+        const hint = editor.domNode.querySelector<HTMLButtonElement>(".file-drop-hint");
+        const input = (editor as any).uploadInput.getNode() as HTMLInputElement;
+        const click = vi.spyOn(input, "click").mockImplementation(() => { });
+        hint.click();
+        expect(click).toHaveBeenCalledTimes(1);
+
+        editor.set_readOnly(true);
+        expect(hint.hidden).toBe(true);
+        expect(editor.domNode.querySelector<HTMLElement>("ul.file-items").hidden).toBe(false);
+        editor.set_readOnly(false);
+        expect(hint.hidden).toBe(false);
+        editor.destroy();
+    });
+
+    it("hides the toolbar by default, with a menu on the corner of the file that replaces and removes it", () => {
+        const editor = create();
+        expect(editor.domNode.classList.contains("s-upload-compact")).toBe(true);
+        expect(editor.domNode.querySelector<HTMLElement>(".s-Toolbar").hidden).toBe(true);
+        expect(editor.domNode.querySelector(".file-menu")).toBeNull();
+
+        editor.set_value({ Filename: "x.jpg", OriginalName: "x.jpg" });
+        const menu = editor.domNode.querySelector<HTMLElement>("ul.file-items > li .file-menu");
+        expect(menu.hidden).toBe(false);
+        expect(menu.querySelector(".file-menu-toggle").getAttribute("data-bs-toggle")).toBe("dropdown");
+        const input = (editor as any).uploadInput.getNode() as HTMLInputElement;
+        const click = vi.spyOn(input, "click").mockImplementation(() => { });
+        menu.querySelector<HTMLElement>(".file-replace").click();
+        expect(click).toHaveBeenCalledTimes(1);
+
+        editor.set_readOnly(true);
+        expect(menu.hidden).toBe(true);
+        editor.set_readOnly(false);
+        expect(menu.hidden).toBe(false);
+        menu.querySelector<HTMLElement>(".file-remove").click();
+        expect(editor.get_value()).toBeNull();
+        expect(editor.domNode.querySelector(".file-menu")).toBeNull();
+        editor.destroy();
+    });
+
+    it("shows the toolbar with the option, the defaults, or buttons of its own", () => {
+        const withOption = create({ toolbar: true });
+        expect(withOption.domNode.querySelector<HTMLElement>(".s-Toolbar").hidden).toBe(false);
+        withOption.set_value({ Filename: "x.jpg", OriginalName: "x.jpg" });
+        expect(withOption.domNode.querySelector(".file-menu")).toBeNull();
+        withOption.destroy();
+
+        FileUploadEditor.defaults.toolbar = true;
+        try {
+            const withDefault = create();
+            expect(withDefault.domNode.querySelector<HTMLElement>(".s-Toolbar").hidden).toBe(false);
+            withDefault.destroy();
+            const optionWins = create({ toolbar: false });
+            expect(optionWins.domNode.querySelector<HTMLElement>(".s-Toolbar").hidden).toBe(true);
+            optionWins.destroy();
+        }
+        finally {
+            delete FileUploadEditor.defaults.toolbar;
+        }
+
+        class CustomButtons extends FileUploadEditor<any> {
+            protected override getToolButtons() {
+                return [...super.getToolButtons(), { title: "Scan", action: "scan", onClick: () => { } }];
+            }
+        }
+        const custom = new CustomButtons({ element: (el: HTMLElement) => document.body.appendChild(el) } as any);
+        expect(custom.domNode.querySelector<HTMLElement>(".s-Toolbar").hidden).toBe(false);
+        expect(custom.domNode.classList.contains("s-upload-compact")).toBe(false);
+        custom.destroy();
+    });
+
+    it("takes the text and the detail of the drop box from the options", () => {
+        const editor = create({ dropHint: "Drop the contract", dropHintDetail: "PDF only" });
+        expect(editor.domNode.querySelector(".file-drop-text").textContent).toBe("Drop the contract");
+        expect(editor.domNode.querySelector(".file-drop-detail").textContent).toBe("PDF only");
+        editor.destroy();
+        const plain = create();
+        expect(plain.domNode.querySelector(".file-drop-detail")).toBeNull();
+        plain.destroy();
+    });
+
+    it("raises change when a file is uploaded or removed, but not when the value is set in code", () => {
+        const editor = create();
+        const changed = vi.fn();
+        editor.domNode.parentElement.addEventListener("change", changed);
+        editor.set_value({ Filename: "x.jpg", OriginalName: "x.jpg" });
+        expect(changed).not.toHaveBeenCalled();
+
+        capturedOptions[0].fileDone({ TemporaryFile: "temporary/y.jpg" } as any, "y.jpg", null);
+        expect(changed).toHaveBeenCalledTimes(1);
+        expect(editor.get_value().Filename).toBe("temporary/y.jpg");
+
+        editor.domNode.querySelector<HTMLElement>(".file-remove").click();
+        expect(changed).toHaveBeenCalledTimes(2);
+        editor.destroy();
+    });
+
+    it("ignores a file that comes while it is read-only", () => {
+        const editor = create();
+        editor.set_readOnly(true);
+        capturedOptions[0].fileDone({ TemporaryFile: "temporary/y.jpg" } as any, "y.jpg", null);
+        expect(editor.get_value()).toBeNull();
+        editor.destroy();
+    });
+
     it("toggles the required class on the hidden input", () => {
         const editor = create();
         editor.set_required(true);
@@ -276,6 +403,57 @@ describe("MultipleFileUploadEditor", () => {
         const hidden = (editor as any).hiddenInput as HTMLInputElement;
         expect(hidden.classList.contains("s-offscreen")).toBe(true);
         expect(hidden.hasAttribute("multiple")).toBe(true);
+        editor.destroy();
+    });
+
+    it("shows the drop hint while there are no files", () => {
+        const editor = create();
+        const hint = editor.domNode.querySelector<HTMLButtonElement>(".file-drop-hint");
+        expect(hint.hidden).toBe(false);
+        expect(hint.textContent).toBe("Controls.ImageUpload.DropFilesHint");
+        editor.set_value([{ Filename: "a.txt", OriginalName: "a.txt" }]);
+        expect(hint.hidden).toBe(true);
+        (editor.domNode.querySelector("a.delete") as HTMLElement).click();
+        expect(hint.hidden).toBe(false);
+        editor.set_readOnly(true);
+        expect(hint.hidden).toBe(true);
+        editor.destroy();
+    });
+
+    it("adds a tile after the files that adds more, without the toolbar", () => {
+        const editor = create();
+        expect(editor.domNode.querySelector<HTMLElement>(".s-Toolbar").hidden).toBe(true);
+        expect(editor.domNode.querySelector(".file-add-tile")).toBeNull();
+        editor.set_value([{ Filename: "a.txt", OriginalName: "a.txt" }]);
+        const tile = editor.domNode.querySelector<HTMLElement>("ul.file-items > li.file-add-tile");
+        expect(tile).toBeTruthy();
+        expect(tile.textContent).toBe("Controls.ImageUpload.AddMoreButton");
+        const input = (editor as any).uploadInput.getNode() as HTMLInputElement;
+        const click = vi.spyOn(input, "click").mockImplementation(() => { });
+        tile.querySelector("button").click();
+        expect(click).toHaveBeenCalledTimes(1);
+        editor.set_readOnly(true);
+        expect(tile.hidden).toBe(true);
+        editor.destroy();
+
+        const withToolbar = create({ toolbar: true });
+        withToolbar.set_value([{ Filename: "a.txt", OriginalName: "a.txt" }]);
+        expect(withToolbar.domNode.querySelector(".file-add-tile")).toBeNull();
+        expect(withToolbar.domNode.querySelector<HTMLElement>(".s-Toolbar").hidden).toBe(false);
+        withToolbar.destroy();
+    });
+
+    it("raises change when a file is uploaded or deleted", () => {
+        const editor = create();
+        const changed = vi.fn();
+        editor.domNode.parentElement.addEventListener("change", changed);
+        editor.set_value([{ Filename: "a.txt", OriginalName: "a.txt" }]);
+        expect(changed).not.toHaveBeenCalled();
+        capturedOptions[0].fileDone({ TemporaryFile: "temporary/b.txt" } as any, "b.txt", null);
+        expect(changed).toHaveBeenCalledTimes(1);
+        (editor.domNode.querySelector("a.delete") as HTMLElement).click();
+        expect(changed).toHaveBeenCalledTimes(2);
+        expect(editor.get_value().map(x => x.Filename)).toEqual(["temporary/b.txt"]);
         editor.destroy();
     });
 

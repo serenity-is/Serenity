@@ -4,11 +4,16 @@ namespace Serenity.Web;
 public static class FileUploadTexts
 {
     public static readonly LocalText AddFileButton = "Select File";
+    public static readonly LocalText AddMoreButton = "Add more";
     public static readonly LocalText ColorboxClose = "close";
     public static readonly LocalText ColorboxCurrent = "image {current} / {total}";
     public static readonly LocalText ColorboxNext = "next";
     public static readonly LocalText ColorboxPrior = "prior";
     public static readonly LocalText DeleteButtonHint = "Remove";
+    public static readonly LocalText DropFileHint = "Drop a file here or click to choose";
+    public static readonly LocalText DropFilesHint = "Drop files here or click to choose";
+    public static readonly LocalText FileMenuHint = "Actions";
+    public static readonly LocalText ReplaceButton = "Replace";
     public static readonly LocalText ExtensionBlacklisted = "Uploaded file extension '{0}' is not allowed!";
     public static readonly LocalText ExtensionNotAllowed = "Uploaded file extension '{0}' is not in the list of allowed extensions: '{1}'!";
     public static readonly LocalText FailedScan = "An error occurred while scanning the uploaded file for viruses! For more information, visit https://serenity.is/docs/av";

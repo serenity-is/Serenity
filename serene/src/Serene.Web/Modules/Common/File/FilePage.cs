@@ -79,8 +79,8 @@ public class FilePage(IUploadStorage uploadStorage, IUploadProcessor uploadProce
 
         IUploadOptions uploadOptions = new UploadOptions
         {
-            ThumbWidth = 128,
-            ThumbHeight = 96,
+            ThumbWidth = 160,
+            ThumbHeight = 120,
             ThumbMode = ImageScaleMode.PreserveRatioNoFill
         };
 

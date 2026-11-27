@@ -343,6 +343,56 @@ describe("Uploader constructor", () => {
     });
 });
 
+describe("Uploader drop zone", () => {
+    function dragEvent(type: string, files: any[] = []) {
+        const e = new Event(type, { bubbles: true, cancelable: true });
+        Object.defineProperty(e, "dataTransfer", { value: { items: [], files } });
+        return e;
+    }
+
+    function pasteEvent(files: any[] = []) {
+        const e = new Event("paste", { bubbles: true, cancelable: true });
+        Object.defineProperty(e, "clipboardData", { value: { items: [], files } });
+        return e;
+    }
+
+    it("uploads dropped files, and leaves the dragging state after the drop", () => {
+        const input = document.createElement("input");
+        const dropZone = document.createElement("div");
+        const arrayApi = vi.spyOn(Uploader.prototype as any, "arrayApi").mockResolvedValue(undefined);
+        new Uploader({ input, dropZone });
+
+        dropZone.dispatchEvent(dragEvent("dragenter"));
+        expect(dropZone.classList.contains("drop-valid")).toBe(true);
+        const drop = dragEvent("drop", [new File(["x"], "a.txt")]);
+        dropZone.dispatchEvent(drop);
+        expect(drop.defaultPrevented).toBe(true);
+        expect(arrayApi).toHaveBeenCalledTimes(1);
+        expect(dropZone.classList.contains("drop-valid")).toBe(false);
+        expect((dropZone as any).dragEnterCount).toBe(0);
+    });
+
+    it("ignores files dropped or pasted while the input is disabled, without opening them", () => {
+        const input = document.createElement("input");
+        input.disabled = true;
+        const dropZone = document.createElement("div");
+        const arrayApi = vi.spyOn(Uploader.prototype as any, "arrayApi").mockResolvedValue(undefined);
+        new Uploader({ input, dropZone });
+
+        dropZone.dispatchEvent(dragEvent("dragenter"));
+        expect(dropZone.classList.contains("drop-valid")).toBe(false);
+        const drop = dragEvent("drop", [new File(["x"], "a.txt")]);
+        dropZone.dispatchEvent(drop);
+        expect(drop.defaultPrevented).toBe(true);
+        dropZone.dispatchEvent(pasteEvent([new File(["x"], "a.txt")]));
+        expect(arrayApi).not.toHaveBeenCalled();
+
+        input.disabled = false;
+        dropZone.dispatchEvent(pasteEvent([new File(["x"], "a.txt")]));
+        expect(arrayApi).toHaveBeenCalledTimes(1);
+    });
+});
+
 describe("Uploader.getTypePredicate", () => {
     it("returns alwaysTrue when ignoreType is true", () => {
         const uploader = new Uploader({ ignoreType: true });
@@ -408,10 +458,12 @@ describe("Uploader.watchDropZone", () => {
 
         dropZone.dispatchEvent(dragOverEvent);
         dropZone.dispatchEvent(dragEnterEvent);
+        expect(dropZone.classList.contains("drop-valid")).toBe(true);
         dropZone.dispatchEvent(dropEvent);
 
         expect(uploadBatchSpy).toHaveBeenCalled();
-        expect(dropZone.classList.contains("drop-valid")).toBe(true);
+        // no dragleave comes after a drop, so the drop itself ends the dragging state
+        expect(dropZone.classList.contains("drop-valid")).toBe(false);
     });
 
     it("handles drop event with multiple files and calls uploadBatch for each via arrayApi", async () => {

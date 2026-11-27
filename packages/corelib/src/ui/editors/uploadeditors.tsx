@@ -1,4 +1,4 @@
-import { FileUploadTexts, Fluent, PropertyItem, getjQuery, nsSerenity } from "../../base";
+import { FileUploadTexts, Fluent, PropertyItem, getjQuery, localText, nsSerenity } from "../../base";
 import { ValidationHelper } from "../../compat";
 import { IGetEditValue, IReadOnly, ISetEditValue, IValidateRequired } from "../../interfaces";
 import { FileUploadConstraints, UploadHelper, UploadInputOptions, UploadedFile } from "../helpers/uploadhelper";
@@ -6,9 +6,60 @@ import { ToolButton, Toolbar } from "../widgets/toolbar";
 import { EditorProps, EditorWidget } from "./editorwidget";
 
 /**
+ * The box that an empty upload editor shows in place of its list of files, which says that files can be dropped on
+ * it, and opens the file chooser when clicked, like the add file button.
+ * @param props.text - The text, e.g. "Drop a file here or click to choose".
+ * @param props.detail - An optional line under the text, e.g. the kind or the size of the files.
+ * @param props.choose - Opens the file chooser.
+ */
+function FileDropHint(props: { text: string, detail?: string, choose: () => void }): HTMLButtonElement {
+    return <button type="button" class="file-drop-hint" hidden onClick={() => props.choose()}>
+        <span class="file-drop-icon" aria-hidden="true" />
+        <span class="file-drop-text">{props.text}</span>
+        {props.detail ? <span class="file-drop-detail">{props.detail}</span> : null}
+    </button> as HTMLButtonElement;
+}
+
+/**
+ * Shows the drop hint in place of the list of files while there are none and files can be added.
+ */
+function updateFileDropHint(hint: HTMLElement, fileSymbols: HTMLElement, empty: boolean, readOnly: boolean) {
+    if (!hint || !fileSymbols)
+        return;
+    const show = empty && !readOnly;
+    hint.hidden = !show;
+    fileSymbols.hidden = show;
+}
+
+/** The actions of the toolbar of the upload editors that the drop box and the buttons by the files replace. */
+const builtInToolActions = ["add-file", "delete"];
+
+/**
+ * Whether an upload editor shows its toolbar: the option of the editor, else the one of the defaults of its class,
+ * else only when the toolbar has buttons other than the built-in ones, e.g. ones that a subclass adds.
+ */
+function shouldUseToolbar(option: boolean, defaultOption: boolean, buttons: ToolButton[]) {
+    return option ?? defaultOption ?? (buttons ?? []).some(x => !builtInToolActions.includes(x?.action));
+}
+
+/**
  * Options for the {@link FileUploadEditor}.
  */
 export interface FileUploadEditorOptions extends FileUploadConstraints {
+    /**
+     * Whether the editor shows its toolbar with the select file (and delete) buttons, as it did before, instead of a
+     * drop box while it has no file and buttons by its files. By default it shows it only when its toolbar has buttons
+     * of its own besides the built-in ones, e.g. ones that a subclass adds in getToolButtons. The default can be changed
+     * for all the editors with `FileUploadEditor.defaults.toolbar` and `MultipleFileUploadEditor.defaults.toolbar`.
+     */
+    toolbar?: boolean;
+    /**
+     * The text of the drop box while the editor has no file, in place of "Drop a file here or click to choose" (or
+     * "Drop files here..." for a multiple editor), as a text or a local text key.
+     */
+    dropHint?: string;
+    /** A line under the text of the drop box, e.g. the kind or the size of the files, as a text or a local text key. */
+    dropHintDetail?: string;
     /** Whether to display the original file name. */
     displayFileName?: boolean;
     /** Upload intent for the upload service. */
@@ -34,6 +85,12 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
     static override[Symbol.typeInfo] = this.registerEditor(nsSerenity, [IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired]);
 
     /**
+     * The defaults of the options of the single file and image upload editors, e.g. `toolbar`, which an option of an
+     * editor overrides.
+     */
+    static defaults: Pick<FileUploadEditorOptions, "toolbar"> = {};
+
+    /**
      * Creates a file upload editor.
      * @param props - Widget props.
      */
@@ -47,12 +104,18 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
         if (!this.options.originalNameProperty)
             this.domNode.classList.add('hide-original-name');
 
+        const buttons = this.getToolButtons();
         this.toolbar = new Toolbar({
-            buttons: this.getToolButtons(),
+            buttons,
             element: el => this.domNode.appendChild(el)
         }).init();
 
-        this.progress = this.toolbar.domNode.appendChild(<div class="upload-progress"><div /></div> as HTMLElement);
+        // without the toolbar, it is kept hidden, as the file input is in its add button, and subclasses may use it
+        const compact = this.compact = !this.useToolbar(buttons);
+        this.toolbar.domNode.hidden = compact;
+        this.domNode.classList.toggle('s-upload-compact', compact);
+
+        this.progress = (compact ? this.domNode : this.toolbar.domNode).appendChild(<div class="upload-progress"><div /></div> as HTMLElement);
 
         const uio = this.getUploadInputOptions();
         this.uploadInput = UploadHelper.addUploadInput(uio);
@@ -60,6 +123,7 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
             this.set_readOnly(true);
 
         this.fileSymbols = this.domNode.appendChild(<ul class="file-items" /> as HTMLUListElement);
+        this.dropHint = this.domNode.appendChild(<FileDropHint text={this.dropHintText()} detail={this.dropHintDetail()} choose={() => this.chooseFile()} /> as HTMLButtonElement);
 
         if (!this.domNode.id) {
             this.domNode.id = this.uniqueName;
@@ -69,6 +133,29 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
             data-vx-highlight={this.domNode.id} /> as HTMLInputElement);
 
         this.updateInterface();
+    }
+
+    /**
+     * Returns whether the editor shows its toolbar instead of the drop box and the buttons by the file, see
+     * {@link FileUploadEditorOptions.toolbar}.
+     * @param buttons - The buttons of the toolbar, from getToolButtons.
+     * @returns True to show the toolbar.
+     */
+    protected useToolbar(buttons: ToolButton[]): boolean {
+        return shouldUseToolbar(this.options.toolbar, FileUploadEditor.defaults?.toolbar, buttons);
+    }
+
+    /**
+     * Removes the file, as the delete button and the remove button by the file do.
+     */
+    protected removeFile(): void {
+        this.entity = null;
+        this.populate();
+        this.updateInterface();
+
+        ValidationHelper.validateElement(this.hiddenInput);
+        // e.g. a form that tracks its unsaved changes listens to the change event, as for the other editors
+        Fluent.trigger(this.domNode, "change");
     }
 
     /**
@@ -84,6 +171,10 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
             uploadIntent: this.options.uploadIntent,
             uploadUrl: this.options.uploadUrl,
             fileDone: (response, name, data) => {
+                // a file that was uploading when the editor became read-only
+                if (this.get_readOnly())
+                    return;
+
                 if (!UploadHelper.checkImageConstraints(response, this.options)) {
                     return;
                 }
@@ -98,6 +189,8 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
                 this.updateInterface();
 
                 ValidationHelper.validateElement(this.hiddenInput);
+                // e.g. a form that tracks its unsaved changes listens to the change event, as for the other editors
+                Fluent.trigger(this.domNode, "change");
             }
         }
     }
@@ -108,6 +201,30 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
      */
     protected addFileButtonText(): string {
         return FileUploadTexts.AddFileButton;
+    }
+
+    /**
+     * Returns the text that the editor shows while it has no file.
+     * @returns The text of the drop hint.
+     */
+    protected dropHintText(): string {
+        return this.options.dropHint ? localText(this.options.dropHint) : FileUploadTexts.DropFileHint;
+    }
+
+    /**
+     * Returns the line under the text of the drop box, if any.
+     * @returns The detail of the drop hint, from the dropHintDetail option.
+     */
+    protected dropHintDetail(): string {
+        return this.options.dropHintDetail ? localText(this.options.dropHintDetail) : null;
+    }
+
+    /**
+     * Opens the file chooser, as the add file button does.
+     */
+    protected chooseFile(): void {
+        if (!this.get_readOnly())
+            this.uploadInput?.getNode()?.click();
     }
 
     /**
@@ -128,13 +245,7 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
                 hint: FileUploadTexts.DeleteButtonHint,
                 action: 'delete',
                 cssClass: 'delete-button',
-                onClick: () => {
-                    this.entity = null;
-                    this.populate();
-                    this.updateInterface();
-
-                    ValidationHelper.validateElement(this.hiddenInput);
-                }
+                onClick: () => this.removeFile()
             }
         ];
     }
@@ -162,9 +273,33 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
             UploadHelper.populateFileSymbols(
                 this.fileSymbols, [this.entity], displayOriginalName,
                 this.options.urlPrefix);
+
+            // without the toolbar, a menu on the corner of the file replaces and removes it
+            if (this.compact)
+                this.fileSymbols.querySelector("li")?.appendChild(this.renderFileMenu());
         }
 
         this.hiddenInput.value = ((this.get_value() || {}).Filename)?.trim() || null;
+    }
+
+    /**
+     * Renders the menu on the corner of the file, when the editor has no toolbar, which replaces and removes it. It is a
+     * dropdown of Bootstrap, like the field selection of the quick search.
+     * @returns The menu.
+     */
+    protected renderFileMenu(): HTMLElement {
+        return <div class="dropdown file-menu" hidden={this.get_readOnly()}>
+            <button type="button" class="file-menu-toggle" data-bs-toggle="dropdown" aria-expanded="false"
+                data-bs-popper-config='{"strategy":"fixed"}' title={FileUploadTexts.FileMenuHint} aria-label={FileUploadTexts.FileMenuHint}>
+                <span class="file-menu-icon" aria-hidden="true" />
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li><button type="button" class="dropdown-item file-replace" onClick={() => this.chooseFile()}>
+                    <span class="file-replace-icon" aria-hidden="true" />{FileUploadTexts.ReplaceButton}</button></li>
+                <li><button type="button" class="dropdown-item text-danger file-remove" onClick={() => this.removeFile()}>
+                    <span class="file-remove-icon" aria-hidden="true" />{FileUploadTexts.DeleteButtonHint}</button></li>
+            </ul>
+        </div> as HTMLElement;
     }
 
     /**
@@ -176,6 +311,10 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
         addButton.toggleClass('disabled', this.get_readOnly());
         delButton.toggleClass('disabled', this.get_readOnly() ||
             this.entity == null);
+        // there is nothing to remove without a file
+        delButton.toggle(this.entity != null);
+        updateFileDropHint(this.dropHint, this.fileSymbols, this.entity == null, this.get_readOnly());
+        this.fileSymbols?.querySelector<HTMLElement>('.file-menu')?.toggleAttribute('hidden', this.get_readOnly());
     }
 
     /**
@@ -331,6 +470,9 @@ export class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEdit
     declare protected fileSymbols: HTMLElement;
     declare protected uploadInput: Fluent;
     declare protected hiddenInput: HTMLInputElement;
+    declare protected dropHint: HTMLButtonElement;
+    /** Whether the editor has no toolbar, but the drop box and the menu on the corner of the file. */
+    declare protected compact: boolean;
 }
 
 /**
@@ -381,6 +523,14 @@ export class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions 
     declare private uploadInput: Fluent;
     declare protected progress: HTMLElement;
     declare protected hiddenInput: HTMLInputElement;
+    declare protected dropHint: HTMLButtonElement;
+    declare private compact: boolean;
+
+    /**
+     * The defaults of the options of the multiple file and image upload editors, e.g. `toolbar`, which an option of an
+     * editor overrides.
+     */
+    static defaults: Pick<MultipleFileUploadEditorOptions, "toolbar"> = {};
 
     /**
      * Creates a multiple file upload editor.
@@ -393,16 +543,23 @@ export class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions 
 
         this.entities = [];
         this.domNode.classList.add('s-MultipleFileUploadEditor');
+        const buttons = this.getToolButtons();
         this.toolbar = new Toolbar({
-            buttons: this.getToolButtons(),
+            buttons,
             element: el => this.domNode.append(el)
         }).init();
 
-        this.progress = this.toolbar.domNode.appendChild(<div class="upload-progress"><div /></div> as HTMLElement);
+        // without the toolbar, it is kept hidden, as the file input is in its add button, and subclasses may use it
+        this.compact = !this.useToolbar(buttons);
+        this.toolbar.domNode.hidden = this.compact;
+        this.domNode.classList.toggle('s-upload-compact', this.compact);
+
+        this.progress = (this.compact ? this.domNode : this.toolbar.domNode).appendChild(<div class="upload-progress"><div /></div> as HTMLElement);
 
         this.uploadInput = UploadHelper.addUploadInput(this.getUploadInputOptions());
 
         this.fileSymbols = this.domNode.appendChild(<ul class="file-items" /> as HTMLUListElement);
+        this.dropHint = this.domNode.appendChild(<FileDropHint text={this.dropHintText()} detail={this.dropHintDetail()} choose={() => this.chooseFile()} /> as HTMLButtonElement);
         if (!this.domNode.id) {
             this.domNode.id = this.uniqueName;
         }
@@ -410,6 +567,16 @@ export class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions 
         this.hiddenInput = <input class="s-offscreen" type="text" name={this.uniqueName + "_Validator"} data-vx-highlight={this.domNode.id} multiple={true} /> as HTMLInputElement;
 
         this.updateInterface();
+    }
+
+    /**
+     * Returns whether the editor shows its toolbar instead of the drop box and the tile that adds more files, see
+     * {@link FileUploadEditorOptions.toolbar}.
+     * @param buttons - The buttons of the toolbar, from getToolButtons.
+     * @returns True to show the toolbar.
+     */
+    protected useToolbar(buttons: ToolButton[]): boolean {
+        return shouldUseToolbar(this.options.toolbar, MultipleFileUploadEditor.defaults?.toolbar, buttons);
     }
 
     /**
@@ -428,6 +595,10 @@ export class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions 
             uploadUrl: this.options.uploadUrl,
             allowMultiple: true,
             fileDone: (response, name) => {
+                // a file that was uploading when the editor became read-only
+                if (this.get_readOnly())
+                    return;
+
                 if (!UploadHelper.checkImageConstraints(response, this.options)) {
                     return;
                 }
@@ -436,6 +607,8 @@ export class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions 
                 this.populate();
 
                 ValidationHelper.validateElement(this.hiddenInput);
+                // e.g. a form that tracks its unsaved changes listens to the change event, as for the other editors
+                Fluent.trigger(this.domNode, "change");
 
                 this.updateInterface();
             }
@@ -448,6 +621,30 @@ export class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions 
      */
     protected addFileButtonText(): string {
         return FileUploadTexts.AddFileButton;
+    }
+
+    /**
+     * Returns the text that the editor shows while it has no files.
+     * @returns The text of the drop hint.
+     */
+    protected dropHintText(): string {
+        return this.options.dropHint ? localText(this.options.dropHint) : FileUploadTexts.DropFilesHint;
+    }
+
+    /**
+     * Returns the line under the text of the drop box, if any.
+     * @returns The detail of the drop hint, from the dropHintDetail option.
+     */
+    protected dropHintDetail(): string {
+        return this.options.dropHintDetail ? localText(this.options.dropHintDetail) : null;
+    }
+
+    /**
+     * Opens the file chooser, as the add file button does.
+     */
+    protected chooseFile(): void {
+        if (!this.get_readOnly())
+            this.uploadInput?.getNode()?.click();
     }
 
     /**
@@ -478,10 +675,23 @@ export class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions 
                     ev.preventDefault();
                     this.entities.splice(x, 1);
                     this.populate();
+                    this.updateInterface();
 
                     ValidationHelper.validateElement(this.hiddenInput);
+                    // e.g. a form that tracks its unsaved changes listens to the change event, as for the other editors
+                    Fluent.trigger(this.domNode, "change");
                 });
         });
+
+        // without the toolbar, a tile after the files adds more
+        if (this.compact && this.entities.length) {
+            this.fileSymbols.appendChild(<li class="file-add-tile" hidden={this.get_readOnly()}>
+                <button type="button" onClick={() => this.chooseFile()}>
+                    <span class="file-drop-icon" aria-hidden="true" />
+                    <span>{FileUploadTexts.AddMoreButton}</span>
+                </button>
+            </li>);
+        }
 
         this.hiddenInput.value = this.get_value()[0]?.Filename || null;
     }
@@ -493,6 +703,8 @@ export class MultipleFileUploadEditor<P extends MultipleFileUploadEditorOptions 
         const addButton = this.toolbar.findButton('add-file-button');
         addButton.toggleClass('disabled', this.get_readOnly());
         this.fileSymbols.querySelectorAll('a.delete').forEach(x => Fluent(x).toggle(!this.get_readOnly()));
+        updateFileDropHint(this.dropHint, this.fileSymbols, !this.entities.length, this.get_readOnly());
+        this.fileSymbols.querySelector<HTMLElement>('.file-add-tile')?.toggleAttribute('hidden', this.get_readOnly());
     }
 
     /**

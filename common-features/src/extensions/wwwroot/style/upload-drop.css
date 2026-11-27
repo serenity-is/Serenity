@@ -1,0 +1,206 @@
+/* The box that an empty upload editor shows in place of its list of files, which says that files can be dropped on it
+   and opens the file chooser when clicked (.file-drop-hint, see uploadeditors.tsx). Without its toolbar (s-upload-compact),
+   a single file editor has a menu on the corner of its file to replace and remove it (.file-menu), and a multiple one a
+   tile after its files that adds more (.file-add-tile). While files are dragged over the editor, which is its drop zone, the
+   uploader adds the drop-valid or drop-invalid class to it. Shared by the Serenity and the Pro themes, which import it
+   after their file upload rules. */
+
+.file-drop-hint {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  width: 100%;
+  min-height: 4.5rem;
+  margin-top: 0.5rem;
+  padding: 0.75rem 1rem;
+  border: 2px dashed var(--bs-border-color);
+  border-radius: var(--bs-border-radius-lg);
+  background: none;
+  color: var(--bs-secondary-color);
+  font-size: 0.875rem;
+  text-align: center;
+  cursor: pointer;
+}
+
+.file-drop-hint[hidden] {
+  display: none;
+}
+
+/* without the toolbar above it, the box starts at the top of the editor */
+.s-upload-compact > .file-drop-hint {
+  margin-top: 0;
+}
+
+/* the image editors keep the height of their list, so the box does not jump when an image comes */
+.s-ImageUploadEditor .file-drop-hint,
+.s-MultipleImageUploadEditor .file-drop-hint {
+  min-height: 116px;
+}
+
+.s-ImageUploadEditor.hide-original-name .file-drop-hint {
+  min-height: 100px;
+}
+
+/* without the toolbar, the files take the space it left: 160 x 120 thumbnails, which fill their tile, as a stored
+   thumbnail may be smaller or of another shape */
+.s-upload-compact .file-item {
+  width: 162px;
+  padding: 0;
+  border-radius: var(--bs-border-radius);
+  overflow: hidden;
+}
+
+.s-upload-compact .file-item .thumb {
+  width: 160px;
+  height: 120px;
+  background-position: center;
+  background-size: cover;
+}
+
+.s-upload-compact.s-ImageUploadEditor ul.file-items,
+.s-upload-compact.s-MultipleImageUploadEditor ul.file-items,
+.s-upload-compact.s-ImageUploadEditor .file-drop-hint,
+.s-upload-compact.s-MultipleImageUploadEditor .file-drop-hint {
+  min-height: 136px;
+}
+
+.s-upload-compact.s-ImageUploadEditor.hide-original-name ul.file-items,
+.s-upload-compact.s-ImageUploadEditor.hide-original-name .file-drop-hint {
+  min-height: 120px;
+}
+
+/* the icon mask rule of the theme draws it, which lists the selector; this sets the icon and its size */
+.file-drop-icon::before {
+  --s-ico: var(--s-icon-upload);
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.file-drop-text {
+  color: var(--bs-body-color);
+  font-weight: 500;
+}
+
+.file-drop-detail {
+  font-size: 0.8125rem;
+}
+
+/* the menu on the top end corner of the file of a single file editor without its toolbar */
+.s-upload-compact .file-item {
+  position: relative;
+}
+
+/* like the actions of the tiles of the File Explorer sample: a faint button that is solid on hover, with a light
+   background, so that it is seen on an image too */
+.file-menu {
+  position: absolute;
+  top: 4px;
+  inset-inline-end: 4px;
+}
+
+.file-menu[hidden] {
+  display: none;
+}
+
+.file-menu-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.75rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--bs-border-radius);
+  background-color: color-mix(in srgb, var(--bs-body-bg) 70%, transparent);
+  color: var(--bs-body-color);
+  opacity: 0.6;
+  cursor: pointer;
+}
+
+.file-menu-toggle:hover,
+.file-menu-toggle:focus-visible,
+.file-menu-toggle[aria-expanded=true] {
+  background-color: var(--bs-body-bg);
+  opacity: 1;
+}
+
+.file-menu-icon::before {
+  --s-ico: var(--s-icon-ellipsis-v);
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+.file-menu .dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.file-replace-icon::before {
+  --s-ico: var(--s-icon-sync);
+}
+
+.file-remove-icon::before {
+  --s-ico: var(--s-icon-trash-alt);
+}
+
+/* the tile after the files of a multiple editor without its toolbar, the size of a file */
+.file-add-tile {
+  list-style: none;
+}
+
+.file-add-tile[hidden] {
+  display: none;
+}
+
+/* the files of a multiple file editor are under each other, the images side by side */
+.s-MultipleFileUploadEditor:not(.s-MultipleImageUploadEditor) .file-add-tile {
+  margin-top: 6px;
+}
+
+.file-add-tile > button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  width: 162px;
+  height: 100%;
+  min-height: 142px;
+  padding: 0.5rem;
+  border: 2px dashed var(--bs-border-color);
+  border-radius: var(--bs-border-radius);
+  background: none;
+  color: var(--bs-secondary-color);
+  font-size: 0.8125rem;
+  cursor: pointer;
+}
+
+.file-add-tile > button:hover,
+.file-add-tile > button:focus-visible,
+.drop-valid .file-add-tile > button {
+  border-color: var(--bs-primary);
+  background-color: var(--bs-primary-bg-subtle);
+  color: var(--bs-body-color);
+}
+
+.file-drop-hint:hover,
+.file-drop-hint:focus-visible,
+.drop-valid > .file-drop-hint {
+  border-color: var(--bs-primary);
+  background-color: var(--bs-primary-bg-subtle);
+}
+
+.drop-invalid > .file-drop-hint {
+  border-color: var(--bs-danger);
+  background-color: var(--bs-danger-bg-subtle);
+}
+
+/* with files in it, the editor itself shows where they can be dropped */
+.s-FileUploadEditor.drop-valid,
+.s-MultipleFileUploadEditor.drop-valid {
+  outline: 2px dashed var(--bs-primary);
+  outline-offset: 2px;
+}

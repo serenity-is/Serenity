@@ -4235,14 +4235,18 @@ declare namespace servicesTexts {
             function asKey(): typeof ImageUpload;
             function asTry(): typeof ImageUpload;
             const AddFileButton: string;
+            const AddMoreButton: string;
             const ColorboxClose: string;
             const ColorboxCurrent: string;
             const ColorboxNext: string;
             const ColorboxPrior: string;
             const DeleteButtonHint: string;
+            const DropFileHint: string;
+            const DropFilesHint: string;
             const ExtensionBlacklisted: string;
             const ExtensionNotAllowed: string;
             const FailedScan: string;
+            const FileMenuHint: string;
             const ImageExtensionMismatch: string;
             const InfectedFile: string;
             const InfectedFileOrError: string;
@@ -4252,6 +4256,7 @@ declare namespace servicesTexts {
             const MinWidth: string;
             const NotAnImageFile: string;
             const NotAnImageWithExtensions: string;
+            const ReplaceButton: string;
             const UploadFileTooBig: string;
             const UploadFileTooSmall: string;
         }
@@ -4788,6 +4793,10 @@ export declare class Uploader {
     private getTypePredicate;
     private getMatchingItems;
     private watchInput;
+    /** Whether the file input is disabled, e.g. as the editor is read-only, when files dropped or pasted are ignored. */
+    private isDisabled;
+    /** Takes the drop zone out of the dragging state, as no dragleave comes after a drop. */
+    private resetDropZone;
     private watchDropZone;
     private arrayApi;
     private entriesApi;
@@ -14946,9 +14955,13 @@ export interface BooleanEditorOptions {
      * checkbox lines up with the other editors, for one that is alone in its row.
      */
     labelPosition?: CheckLabelPosition;
+    /**
+     * Shows a switch instead of a checkbox, e.g. for a setting that turns something on or off. The value is the same.
+     */
+    switch?: boolean;
 }
 /**
- * An editor that renders a checkbox for boolean values.
+ * An editor that renders a checkbox, or a switch with the `switch` option, for boolean values.
  * @typeParam P - Widget props type.
  */
 export declare class BooleanEditor<P extends BooleanEditorOptions = BooleanEditorOptions> extends EditorWidget<P> {
@@ -16743,6 +16756,20 @@ export interface FileUploadConstraints {
  * Options for the {@link FileUploadEditor}.
  */
 export interface FileUploadEditorOptions extends FileUploadConstraints {
+    /**
+     * Whether the editor shows its toolbar with the select file (and delete) buttons, as it did before, instead of a
+     * drop box while it has no file and buttons by its files. By default it shows it only when its toolbar has buttons
+     * of its own besides the built-in ones, e.g. ones that a subclass adds in getToolButtons. The default can be changed
+     * for all the editors with `FileUploadEditor.defaults.toolbar` and `MultipleFileUploadEditor.defaults.toolbar`.
+     */
+    toolbar?: boolean;
+    /**
+     * The text of the drop box while the editor has no file, in place of "Drop a file here or click to choose" (or
+     * "Drop files here..." for a multiple editor), as a text or a local text key.
+     */
+    dropHint?: string;
+    /** A line under the text of the drop box, e.g. the kind or the size of the files, as a text or a local text key. */
+    dropHintDetail?: string;
     /** Whether to display the original file name. */
     displayFileName?: boolean;
     /** Upload intent for the upload service. */
@@ -16764,10 +16791,26 @@ export interface ImageUploadEditorOptions extends FileUploadEditorOptions {
 export declare class FileUploadEditor<P extends FileUploadEditorOptions = FileUploadEditorOptions> extends EditorWidget<P> implements IReadOnly, IGetEditValue, ISetEditValue, IValidateRequired {
     static [Symbol.typeInfo]: EditorTypeInfo<"Serenity.">;
     /**
+     * The defaults of the options of the single file and image upload editors, e.g. `toolbar`, which an option of an
+     * editor overrides.
+     */
+    static defaults: Pick<FileUploadEditorOptions, "toolbar">;
+    /**
      * Creates a file upload editor.
      * @param props - Widget props.
      */
     constructor(props: EditorProps<P>);
+    /**
+     * Returns whether the editor shows its toolbar instead of the drop box and the buttons by the file, see
+     * {@link FileUploadEditorOptions.toolbar}.
+     * @param buttons - The buttons of the toolbar, from getToolButtons.
+     * @returns True to show the toolbar.
+     */
+    protected useToolbar(buttons: ToolButton[]): boolean;
+    /**
+     * Removes the file, as the delete button and the remove button by the file do.
+     */
+    protected removeFile(): void;
     /**
      * Returns the upload input options.
      * @returns Upload input options.
@@ -16778,6 +16821,20 @@ export declare class FileUploadEditor<P extends FileUploadEditorOptions = FileUp
      * @returns The button text.
      */
     protected addFileButtonText(): string;
+    /**
+     * Returns the text that the editor shows while it has no file.
+     * @returns The text of the drop hint.
+     */
+    protected dropHintText(): string;
+    /**
+     * Returns the line under the text of the drop box, if any.
+     * @returns The detail of the drop hint, from the dropHintDetail option.
+     */
+    protected dropHintDetail(): string;
+    /**
+     * Opens the file chooser, as the add file button does.
+     */
+    protected chooseFile(): void;
     /**
      * Returns the toolbar buttons for the editor.
      * @returns Tool button definitions.
@@ -16792,6 +16849,12 @@ export declare class FileUploadEditor<P extends FileUploadEditorOptions = FileUp
      * Populates the file symbols from the current entity.
      */
     protected populate(): void;
+    /**
+     * Renders the menu on the corner of the file, when the editor has no toolbar, which replaces and removes it. It is a
+     * dropdown of Bootstrap, like the field selection of the quick search.
+     * @returns The menu.
+     */
+    protected renderFileMenu(): HTMLElement;
     /**
      * Updates the interface to reflect the current state.
      */
@@ -16852,6 +16915,9 @@ export declare class FileUploadEditor<P extends FileUploadEditorOptions = FileUp
     protected fileSymbols: HTMLElement;
     protected uploadInput: Fluent;
     protected hiddenInput: HTMLInputElement;
+    protected dropHint: HTMLButtonElement;
+    /** Whether the editor has no toolbar, but the drop box and the menu on the corner of the file. */
+    protected compact: boolean;
 }
 /**
  * An editor that uploads and displays a single image.
@@ -16889,11 +16955,25 @@ export declare class MultipleFileUploadEditor<P extends MultipleFileUploadEditor
     private uploadInput;
     protected progress: HTMLElement;
     protected hiddenInput: HTMLInputElement;
+    protected dropHint: HTMLButtonElement;
+    private compact;
+    /**
+     * The defaults of the options of the multiple file and image upload editors, e.g. `toolbar`, which an option of an
+     * editor overrides.
+     */
+    static defaults: Pick<MultipleFileUploadEditorOptions, "toolbar">;
     /**
      * Creates a multiple file upload editor.
      * @param props - Widget props.
      */
     constructor(props: EditorProps<P>);
+    /**
+     * Returns whether the editor shows its toolbar instead of the drop box and the tile that adds more files, see
+     * {@link FileUploadEditorOptions.toolbar}.
+     * @param buttons - The buttons of the toolbar, from getToolButtons.
+     * @returns True to show the toolbar.
+     */
+    protected useToolbar(buttons: ToolButton[]): boolean;
     /**
      * Returns the upload input options.
      * @returns Upload input options.
@@ -16904,6 +16984,20 @@ export declare class MultipleFileUploadEditor<P extends MultipleFileUploadEditor
      * @returns The button text.
      */
     protected addFileButtonText(): string;
+    /**
+     * Returns the text that the editor shows while it has no files.
+     * @returns The text of the drop hint.
+     */
+    protected dropHintText(): string;
+    /**
+     * Returns the line under the text of the drop box, if any.
+     * @returns The detail of the drop hint, from the dropHintDetail option.
+     */
+    protected dropHintDetail(): string;
+    /**
+     * Opens the file chooser, as the add file button does.
+     */
+    protected chooseFile(): void;
     /**
      * Returns the toolbar buttons for the editor.
      * @returns Tool button definitions.

@@ -8,14 +8,18 @@ namespace servicesTexts {
             export function asKey(): typeof ImageUpload;
             export function asTry(): typeof ImageUpload;
             export const AddFileButton: string;
+            export const AddMoreButton: string;
             export const ColorboxClose: string;
             export const ColorboxCurrent: string;
             export const ColorboxNext: string;
             export const ColorboxPrior: string;
             export const DeleteButtonHint: string;
+            export const DropFileHint: string;
+            export const DropFilesHint: string;
             export const ExtensionBlacklisted: string;
             export const ExtensionNotAllowed: string;
             export const FailedScan: string;
+            export const FileMenuHint: string;
             export const ImageExtensionMismatch: string;
             export const InfectedFile: string;
             export const InfectedFileOrError: string;
@@ -25,6 +29,7 @@ namespace servicesTexts {
             export const MinWidth: string;
             export const NotAnImageFile: string;
             export const NotAnImageWithExtensions: string;
+            export const ReplaceButton: string;
             export const UploadFileTooBig: string;
             export const UploadFileTooSmall: string;
         }
