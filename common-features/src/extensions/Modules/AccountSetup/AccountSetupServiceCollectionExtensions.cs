@@ -21,6 +21,8 @@ public static class AccountSetupServiceCollectionExtensions
         ArgumentNullException.ThrowIfNull(collection);
         collection.TryAddEnumerable(ServiceDescriptor.Singleton<IConfigureOptions<MvcOptions>, AccountSetupMvcOptionsSetup>());
         collection.TryAddEnumerable(ServiceDescriptor.Singleton<IAccountSetupRequirement, PasswordChangeRequirement>());
+        // a token with the password can't be used to do them
+        collection.TryAddEnumerable(ServiceDescriptor.Singleton<IPasswordGrantPolicy, AccountSetupPasswordGrantPolicy>());
         return collection;
     }
 }
