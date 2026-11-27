@@ -209,6 +209,10 @@ class JsonResponse {
     json() {
         return this.response;
     }
+
+    clone() {
+        return new JsonResponse(this.response, this.info);
+    }
 }
 
 let xhrOriginal: any;

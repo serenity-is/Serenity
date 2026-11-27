@@ -249,17 +249,26 @@ function serviceFetch<TResponse extends ServiceResponse>(options: ServiceOptions
                 }
 
                 if (!fetchResponse.ok) {
-                    await handleFetchError(fetchResponse, options);
-                    return Promise.reject(reason(`Service fetch to '${url}' resulted in HTTP ${fetchResponse.status} error: ${fetchResponse.statusText}!`,
-                        "http-error", { fetchResponse, url }));
+                    // a service error, e.g. a validation error with the 400 status, may be fixed too
+                    const errorResponse = await peekErrorResponse(fetchResponse);
+                    recovery = errorResponse?.Error ? tryRecover(errorResponse.Error, options) : undefined;
+                    if (!recovery) {
+                        await handleFetchError(fetchResponse, options);
+                        return Promise.reject(reason(`Service fetch to '${url}' resulted in HTTP ${fetchResponse.status} error: ${fetchResponse.statusText}!`,
+                            "http-error", { fetchResponse, url }));
+                    }
+                    failed = { response: errorResponse as TResponse, fetchResponse };
                 }
 
-                let response = await fetchResponse.json() as TResponse;
-                if (!response)
+                let response = recovery ? null : await fetchResponse.json() as TResponse;
+                if (!response && !recovery)
                     return Promise.reject(reason(`Received empty response from service fetch to '${url}'!`,
                         "empty-response", { fetchResponse, url }));
 
-                if (response.Error) {
+                if (recovery) {
+                    // the error of the failed request is fixed below
+                }
+                else if (response.Error) {
                     // a function may fix the error, e.g. ask for the password, after the UI is unblocked below
                     recovery = tryRecover(response.Error, options);
                     if (!recovery) {
@@ -445,6 +454,18 @@ function handleRedirect(getHeader: (key: string) => string): boolean {
     if (l) {
         getWindowLocation({ top: true }).href = l;
         return true;
+    }
+}
+
+/** Reads the service response of a failed fetch, if it is JSON, from a clone, so it can still be read to handle it. */
+async function peekErrorResponse(response: Response): Promise<ServiceResponse | null> {
+    if (!errorRecoveries.length || (response.headers.get('content-type') || '').toLowerCase().indexOf('json') < 0)
+        return null;
+    try {
+        return await response.clone().json() as ServiceResponse;
+    }
+    catch {
+        return null;
     }
 }
 

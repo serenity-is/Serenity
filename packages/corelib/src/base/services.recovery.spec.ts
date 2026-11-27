@@ -47,6 +47,29 @@ describe("addServiceErrorRecovery", () => {
         expect(ErrorHandling.showServiceError).not.toHaveBeenCalled();
     });
 
+    it("recovers an error that comes with an HTTP error status, as a validation error does", async () => {
+        let allowed = false;
+        let calls = 0;
+        mockFetch({
+            "/test": info => {
+                calls++;
+                if (allowed)
+                    return { Value: 7 };
+                info.status = 400;
+                info.statusText = "Bad Request";
+                return { Error: { Code: "RequiresElevation", Message: "needs it" } };
+            }
+        });
+        removers.push(addServiceErrorRecovery(error => error.Code === "RequiresElevation" ?
+            Promise.resolve().then(() => { allowed = true; return true; }) : undefined));
+
+        const response = await serviceCall<any>({ url: "/test" });
+
+        expect(response.Value).toBe(7);
+        expect(calls).toBe(2);
+        expect(ErrorHandling.showServiceError).not.toHaveBeenCalled();
+    });
+
     it("does not recover the call that is made again, which shows its error", async () => {
         const state = mockService();
         removers.push(addServiceErrorRecovery(() => Promise.resolve(true)));

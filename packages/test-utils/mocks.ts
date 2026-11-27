@@ -141,6 +141,10 @@ class JsonResponse {
     json() {
         return this.response;
     }
+
+    clone() {
+        return new JsonResponse(this.response, this.info);
+    }
 }
 
 var xhrOriginal: any;
