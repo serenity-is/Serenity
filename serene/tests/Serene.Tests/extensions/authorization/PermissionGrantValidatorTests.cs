@@ -16,13 +16,30 @@ public class PermissionGrantValidatorTests
         public IEnumerable<string> GetGrantedPermissions(string userId) => byUserId.TryGetValue(userId, out var keys) ? keys : [];
     }
 
+    /// <summary>An elevation handler that tells whether the password was confirmed lately, and counts the checks.</summary>
+    private sealed class TestElevation(bool elevated) : IElevationHandler
+    {
+        public int Checks;
+
+        public void AppendElevationTokenToCookies() { }
+
+        public void ValidateElevationToken()
+        {
+            Checks++;
+            if (!elevated)
+                throw new ValidationError("RequiresElevation", "Token not found");
+        }
+
+        public void DeleteToken() { }
+    }
+
     private sealed class ListedKeys(params string[] keys) : IPermissionKeyLister
     {
         public IEnumerable<string> ListPermissionKeys(bool includeRoles) => keys;
     }
 
     private static PermissionGrantValidator Validator(string username, Func<string, bool> has, IUserGrantedPermissionsProvider? granted = null,
-        IPermissionKeyLister? keyLister = null)
+        IPermissionKeyLister? keyLister = null, IElevationHandler? elevation = null)
     {
         var grants = new PermissionGrantOptions
         {
@@ -33,7 +50,7 @@ public class PermissionGrantValidatorTests
         return new PermissionGrantValidator(new MockPermissions(has), new MockUserAccessor(() => username),
             Options.Create(grants), Options.Create(new PermissionServiceOptions()),
             new MemoryCache(new MemoryCacheOptions()), new MockTypeSource([typeof(TestKeys)]), NullTextLocalizer.Instance, granted,
-            keyLister);
+            keyLister, elevation);
     }
 
     private static IUserDefinition User(string id, string username) =>
@@ -70,6 +87,46 @@ public class PermissionGrantValidatorTests
         Assert.True(validator.IsSuperAdmin);
         Assert.Null(validator.GetDenial("Administration:Security"));
         validator.ValidateGrants(["Administration:Security", "Administration:DataExplorer"]);
+    }
+
+    [Fact]
+    public void A_Permission_That_Is_Not_Grantable_By_Anyone_Or_Implies_One_Is_Sensitive()
+    {
+        var validator = Validator("sec", _ => true);
+        Assert.False(validator.IsSensitive("Northwind:General"));
+        Assert.True(validator.IsSensitive("Administration:Translation"));
+        Assert.True(validator.IsSensitive("Administration:Security"));
+        // grantable itself, but it implies a holder-only one
+        Assert.True(validator.IsSensitive(TestKeys.Visible));
+    }
+
+    [Fact]
+    public void Granting_A_Sensitive_Permission_Needs_The_Password_Confirmed_Lately_Also_For_A_Super_Admin()
+    {
+        foreach (var username in new[] { "sec", "admin" })
+        {
+            var notElevated = new TestElevation(false);
+            var validator = Validator(username, _ => true, elevation: notElevated);
+            validator.ValidateGrants(["Northwind:General"]);
+            Assert.Equal(0, notElevated.Checks);
+
+            var error = Assert.Throws<ValidationError>(() => validator.ValidateGrants(["Northwind:General", "Administration:Translation"]));
+            Assert.Equal("RequiresElevation", error.ErrorCode);
+
+            var elevated = new TestElevation(true);
+            Validator(username, _ => true, elevation: elevated).ValidateGrants(["Administration:Translation"]);
+            Assert.Equal(1, elevated.Checks);
+        }
+    }
+
+    [Fact]
+    public void A_Denied_Grant_Is_Told_Before_The_Password_Is_Asked_For()
+    {
+        var elevation = new TestElevation(false);
+        var error = Assert.Throws<ValidationError>(() =>
+            Validator("sec", _ => false, elevation: elevation).ValidateGrants(["Administration:DataExplorer"]));
+        Assert.Equal("PermissionGrantDenied", error.ErrorCode);
+        Assert.Equal(0, elevation.Checks);
     }
 
     [Fact]

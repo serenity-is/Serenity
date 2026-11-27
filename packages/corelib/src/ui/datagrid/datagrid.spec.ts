@@ -720,6 +720,36 @@ describe("DataGrid layout", () => {
         isVisibleSpy.mockRestore();
     });
 
+    it("layout gives an auto height on a narrow screen to a grid that asks, unless its view can't have it", () => {
+        const isVisibleSpy = vi.spyOn(Fluent, "isVisibleLike").mockReturnValue(true);
+        const width = vi.spyOn(window, "innerWidth", "get").mockReturnValue(500);
+        try {
+            class NarrowGrid extends DataGrid<any, any> {
+                protected override useNarrowAutoHeight() { return true; }
+            }
+            const grid = new NarrowGrid({});
+            vi.spyOn(grid.getGrid(), "resizeCanvas").mockImplementation(() => { });
+            grid["layout"]();
+            expect(grid.getGrid().getOptions().autoHeight).toBe(true);
+            expect(grid.domNode.classList.contains("s-narrow-fixed-height")).toBe(false);
+
+            // a view that loads the rows in the viewport can't, as all its rows would be in it, so the grid keeps a height
+            (grid.view as any).supportsAutoHeight = false;
+            grid["layout"]();
+            expect(grid.getGrid().getOptions().autoHeight).toBe(false);
+            expect(grid.domNode.classList.contains("s-narrow-fixed-height")).toBe(true);
+
+            width.mockReturnValue(1200);
+            grid["layout"]();
+            expect(grid.domNode.classList.contains("s-narrow-fixed-height")).toBe(false);
+            grid.destroy();
+        }
+        finally {
+            width.mockRestore();
+            isVisibleSpy.mockRestore();
+        }
+    });
+
     it("setTitle creates title div and getTitle returns text", () => {
         const grid = createGrid();
         expect(grid.getTitle()).toBeNull();

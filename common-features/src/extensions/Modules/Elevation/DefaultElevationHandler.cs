@@ -16,6 +16,12 @@ public class DefaultElevationHandler(IRequestContext context, IHttpContextAccess
     /// </summary>
     public const int ElevationTokenDuration = 15;
 
+    /// <summary>
+    /// The error code of the validation error for a missing, expired or invalid elevation token, which a page handles by
+    /// asking for the password, and calling the service again.
+    /// </summary>
+    public const string RequiresElevationCode = "RequiresElevation";
+
     private readonly IHttpContextAccessor httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
     private readonly IDataProtectionProvider dataProtectionProvider = dataProtectionProvider ?? throw new ArgumentNullException(nameof(dataProtectionProvider));
 
@@ -51,7 +57,7 @@ public class DefaultElevationHandler(IRequestContext context, IHttpContextAccess
             throw new ArgumentNullException(nameof(httpContextAccessor.HttpContext));
 
         var token = (httpContextAccessor.HttpContext?.Request.Cookies["ElevationToken"]) ??
-            throw new ValidationError("RequiresElevation", "Token not found");
+            throw new ValidationError(RequiresElevationCode, "Token not found");
         var currentUserId = httpContextAccessor.HttpContext.User.GetIdentifier() ??
             throw new ArgumentNullException(nameof(User));
 
@@ -63,7 +69,7 @@ public class DefaultElevationHandler(IRequestContext context, IHttpContextAccess
 
             var dt = DateTime.SpecifyKind(DateTime.FromBinary(br.ReadInt64()), DateTimeKind.Utc);
             if (dt < UtcNow)
-                throw new ValidationError("Token expired");
+                throw new ValidationError(RequiresElevationCode, "Token expired");
 
             userId = br.ReadString();
         }
@@ -73,11 +79,11 @@ public class DefaultElevationHandler(IRequestContext context, IHttpContextAccess
         }
         catch (Exception)
         {
-            throw new ValidationError("Invalid elevation token");
+            throw new ValidationError(RequiresElevationCode, "Invalid elevation token");
         }
 
         if (!string.Equals(currentUserId, userId, StringComparison.Ordinal))
-            throw new ValidationError("Invalid elevation token");
+            throw new ValidationError(RequiresElevationCode, "Invalid elevation token");
     }
 
     /// <inheritdoc />

@@ -18,6 +18,8 @@ namespace Serenity.Extensions;
 /// <param name="localizer">The localizer of the messages.</param>
 /// <param name="grantedPermissions">Gives the permissions of a user, without which only super admins are protected.</param>
 /// <param name="keyLister">Lists the permissions that can be added, without which any key can.</param>
+/// <param name="elevation">Checks that the user confirmed the password lately, for the sensitive permissions, without
+/// which it is not asked for.</param>
 public class PermissionGrantValidator(IPermissionService permissions,
     IUserAccessor userAccessor,
     IOptions<PermissionGrantOptions> grantOptions,
@@ -26,7 +28,8 @@ public class PermissionGrantValidator(IPermissionService permissions,
     ITypeSource typeSource,
     ITextLocalizer localizer,
     IUserGrantedPermissionsProvider? grantedPermissions = null,
-    IPermissionKeyLister? keyLister = null) : IPermissionGrantValidator
+    IPermissionKeyLister? keyLister = null,
+    IElevationHandler? elevation = null) : IPermissionGrantValidator
 {
     private readonly IPermissionService permissions = permissions ?? throw new ArgumentNullException(nameof(permissions));
     private readonly IUserAccessor userAccessor = userAccessor ?? throw new ArgumentNullException(nameof(userAccessor));
@@ -44,6 +47,23 @@ public class PermissionGrantValidator(IPermissionService permissions,
             return PermissionGrantDenial.NotHeld;
 
         return null;
+    }
+
+    private PermissionGrantTier GetTier(string permissionKey) =>
+        (grantOptions?.Value ?? new PermissionGrantOptions()).GetTier(permissionKey);
+
+    /// <inheritdoc/>
+    public bool IsSensitive(string permissionKey)
+    {
+        if (string.IsNullOrEmpty(permissionKey))
+            return false;
+
+        if (GetTier(permissionKey) != PermissionGrantTier.Grantable)
+            return true;
+
+        var implicitPermissions = BasePermissionService.GetImplicitPermissions(memoryCache, typeSource);
+        return implicitPermissions.TryGetValue(permissionKey, out var implied) &&
+            implied.Any(x => GetTier(x) != PermissionGrantTier.Grantable);
     }
 
     /// <inheritdoc/>
@@ -69,17 +89,23 @@ public class PermissionGrantValidator(IPermissionService permissions,
     /// <inheritdoc/>
     public void ValidateGrants(IEnumerable<string> permissionKeys)
     {
-        if (IsSuperAdmin)
-            return;
-
-        foreach (var key in permissionKeys ?? [])
+        var keys = (permissionKeys ?? []).ToList();
+        if (!IsSuperAdmin)
         {
-            var denial = GetDenial(key);
-            if (denial != null)
-                throw new ValidationError("PermissionGrantDenied", key, string.Format(CultureInfo.CurrentCulture,
-                    (denial == PermissionGrantDenial.SuperAdminOnly ? PermissionGrantTexts.SuperAdminOnly : PermissionGrantTexts.NotHeld)
-                        .ToString(localizer), key));
+            foreach (var key in keys)
+            {
+                var denial = GetDenial(key);
+                if (denial != null)
+                    throw new ValidationError("PermissionGrantDenied", key, string.Format(CultureInfo.CurrentCulture,
+                        (denial == PermissionGrantDenial.SuperAdminOnly ? PermissionGrantTexts.SuperAdminOnly : PermissionGrantTexts.NotHeld)
+                            .ToString(localizer), key));
+            }
         }
+
+        // the sensitive ones need the password confirmed lately, also for a super admin, after the denials, so someone
+        // who can't grant them is not asked for it
+        if (elevation != null && keys.Any(IsSensitive))
+            elevation.ValidateElevationToken();
     }
 
     /// <inheritdoc/>

@@ -2,7 +2,46 @@
 import { Config } from "./config";
 import { getjQuery } from "./environment";
 import { ErrorHandling } from "./errorhandling";
-import { RequestErrorInfo, ServiceOptions, ServiceResponse } from "./servicetypes";
+import { RequestErrorInfo, ServiceError, ServiceOptions, ServiceResponse } from "./servicetypes";
+
+/**
+ * Tries to fix the error of a service call, e.g. by asking the user to confirm the password for an action that needs it,
+ * see {@link addServiceErrorRecovery}.
+ * @param error - The error of the service.
+ * @param options - The options of the call.
+ * @returns Undefined for an error it does not handle, else a promise that resolves to true when the call should be made
+ * again, or false when the user gave up, e.g. closed a dialog, in which case the error is not shown.
+ */
+export type ServiceErrorRecovery = (error: ServiceError, options: ServiceOptions<any>) => PromiseLike<boolean> | undefined;
+
+const errorRecoveries: ServiceErrorRecovery[] = [];
+const recoveredKey = Symbol("serviceErrorRecovered");
+
+/**
+ * Adds a function that tries to fix the errors of the service calls that are made with `fetch` (the default), e.g. one
+ * that asks the user to confirm the password when a service says that the action needs it, so the call is made again
+ * after it, once. The first function that handles an error decides.
+ * @param recovery - The function, see {@link ServiceErrorRecovery}.
+ * @returns A function that removes it.
+ */
+export function addServiceErrorRecovery(recovery: ServiceErrorRecovery): () => void {
+    errorRecoveries.push(recovery);
+    return () => {
+        const index = errorRecoveries.indexOf(recovery);
+        index >= 0 && errorRecoveries.splice(index, 1);
+    };
+}
+
+function tryRecover(error: ServiceError, options: ServiceOptions<any>): PromiseLike<boolean> | undefined {
+    if (!error || (options as any)?.[recoveredKey])
+        return undefined;
+    for (const recovery of errorRecoveries) {
+        const result = recovery(error, options);
+        if (result)
+            return result;
+    }
+    return undefined;
+}
 
 /**
  * Resolves a `~/`-prefixed application-relative URL against {@link Config.applicationPath}.
@@ -168,10 +207,13 @@ function serviceFetch<TResponse extends ServiceResponse>(options: ServiceOptions
     if (typeof fetch !== "function")
         return Promise.reject(reason("The fetch method is not available!", "fetch-missing"));
 
+    const input = options;
     return (async function () {
 
         options = getServiceOptions(options);
         const url = options.url;
+        let recovery: PromiseLike<boolean> | undefined;
+        let failed: { response: TResponse, fetchResponse: Response };
 
         requestStarting();
         try {
@@ -218,22 +260,44 @@ function serviceFetch<TResponse extends ServiceResponse>(options: ServiceOptions
                         "empty-response", { fetchResponse, url }));
 
                 if (response.Error) {
-                    handleError(response, { status: fetchResponse.status, statusText: fetchResponse.statusText }, options);
-                    return Promise.reject(reason(`Service fetch to '${url}' resulted in error: ${response.Error.Message ?? response.Error.Code}!`,
-                        "service-error", { response, fetchResponse, url }));
+                    // a function may fix the error, e.g. ask for the password, after the UI is unblocked below
+                    recovery = tryRecover(response.Error, options);
+                    if (!recovery) {
+                        handleError(response, { status: fetchResponse.status, statusText: fetchResponse.statusText }, options);
+                        return Promise.reject(reason(`Service fetch to '${url}' resulted in error: ${response.Error.Message ?? response.Error.Code}!`,
+                            "service-error", { response, fetchResponse, url }));
+                    }
+                    failed = { response, fetchResponse };
                 }
-
-                options.onSuccess?.(response);
-                return response;
+                else {
+                    options.onSuccess?.(response);
+                    return response;
+                }
             }
             finally {
                 options.blockUI && blockUndo();
-                options.onCleanup && options.onCleanup();
+                // the call that is made again cleans up instead
+                !recovery && options.onCleanup && options.onCleanup();
             }
         }
         finally {
             requestFinished();
         }
+
+        let again = false;
+        try {
+            again = !!(await recovery);
+        }
+        catch {
+            again = false;
+        }
+
+        if (again)
+            return serviceFetch<TResponse>({ ...input, [recoveredKey]: true } as ServiceOptions<TResponse>);
+
+        options.onCleanup && options.onCleanup();
+        return Promise.reject(reason(`Service fetch to '${url}' resulted in error: ${failed.response.Error.Message ?? failed.response.Error.Code}!`,
+            "service-error", { response: failed.response, fetchResponse: failed.fetchResponse, url }));
     })();
 }
 

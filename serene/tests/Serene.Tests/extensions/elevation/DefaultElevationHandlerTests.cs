@@ -121,6 +121,7 @@ public class DefaultElevationHandlerTests
         accessor.HttpContext!.Request.Headers.Cookie = "ElevationToken=" + Uri.EscapeDataString(token);
 
         var error = Assert.Throws<ValidationError>(() => handler.ValidateElevationToken());
+        Assert.Equal("RequiresElevation", error.ErrorCode);
         Assert.Equal("Token expired", error.Message);
     }
 
@@ -134,6 +135,7 @@ public class DefaultElevationHandlerTests
         accessor.HttpContext!.Request.Headers.Cookie = "ElevationToken=invalidtoken";
 
         var error = Assert.Throws<ValidationError>(() => handler.ValidateElevationToken());
+        Assert.Equal("RequiresElevation", error.ErrorCode);
         Assert.Equal("Invalid elevation token", error.Message);
     }
 
@@ -149,6 +151,7 @@ public class DefaultElevationHandlerTests
         accessor.HttpContext!.Request.Headers.Cookie = "ElevationToken=" + Uri.EscapeDataString(token);
 
         var error = Assert.Throws<ValidationError>(() => handler.ValidateElevationToken());
+        Assert.Equal("RequiresElevation", error.ErrorCode);
         Assert.Equal("Invalid elevation token", error.Message);
     }
 
@@ -164,6 +167,7 @@ public class DefaultElevationHandlerTests
         accessor.HttpContext!.Request.Headers.Cookie = "ElevationToken=" + Uri.EscapeDataString(token);
 
         var error = Assert.Throws<ValidationError>(() => handler.ValidateElevationToken());
+        Assert.Equal("RequiresElevation", error.ErrorCode);
         Assert.Equal("Invalid elevation token", error.Message);
     }
 

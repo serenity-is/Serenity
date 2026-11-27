@@ -3688,6 +3688,23 @@ export declare function setRegisteredScripts(scripts: Record<string, string>): v
  */
 export declare function setScriptData(name: string, value: any): void;
 /**
+ * Tries to fix the error of a service call, e.g. by asking the user to confirm the password for an action that needs it,
+ * see {@link addServiceErrorRecovery}.
+ * @param error - The error of the service.
+ * @param options - The options of the call.
+ * @returns Undefined for an error it does not handle, else a promise that resolves to true when the call should be made
+ * again, or false when the user gave up, e.g. closed a dialog, in which case the error is not shown.
+ */
+export type ServiceErrorRecovery = (error: ServiceError, options: ServiceOptions<any>) => PromiseLike<boolean> | undefined;
+/**
+ * Adds a function that tries to fix the errors of the service calls that are made with `fetch` (the default), e.g. one
+ * that asks the user to confirm the password when a service says that the action needs it, so the call is made again
+ * after it, once. The first function that handles an error decides.
+ * @param recovery - The function, see {@link ServiceErrorRecovery}.
+ * @returns A function that removes it.
+ */
+export declare function addServiceErrorRecovery(recovery: ServiceErrorRecovery): () => void;
+/**
  * Resolves a `~/`-prefixed application-relative URL against {@link Config.applicationPath}.
  * Non-tilde URLs are returned unchanged.
  * @param url - URL to resolve; may be `null`/`undefined` or already absolute.
@@ -12381,7 +12398,17 @@ export declare class DataGrid<TItem, P = {}> extends Widget<P> implements IDataG
      */
     protected useLayoutTimer(): boolean;
     /**
-     * Recalculates the grid layout, handling responsive height behavior.
+     * Whether the grid is as high as its rows on a narrow screen, so the page scrolls instead of the grid, which a grid
+     * with the `responsive-height` class is, e.g. of a full height grid page. See {@link layout}.
+     * @returns True for the auto height on a narrow screen.
+     */
+    protected useNarrowAutoHeight(): boolean;
+    /**
+     * Recalculates the grid layout, handling responsive height behavior. On a screen narrower than 768 pixels, a grid
+     * that {@link useNarrowAutoHeight} says so is as high as its rows, unless its view can't be, i.e. one that has a row
+     * for each row of the server and loads the ones in the viewport, which says so with a `supportsAutoHeight` property
+     * that is false, as all its rows would be in view and loaded. Such a grid gets the `s-narrow-fixed-height` class
+     * instead, which gives it a height of its own, so it scrolls.
      */
     protected layout(): void;
     /**

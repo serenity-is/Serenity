@@ -528,6 +528,16 @@ section.content>.s-DataGrid {
   flex: 1 1 auto;
 }
 
+/* a grid that can't be as high as its rows on a narrow screen, e.g. one that loads the rows in its viewport, keeps a
+   height of its own, so it scrolls, see DataGrid.layout */
+@media (max-width: 767.98px) {
+  .s-DataGrid.s-narrow-fixed-height > .grid-container {
+    flex: none;
+    height: calc(100dvh - var(--s-narrow-grid-offset, 12rem));
+    min-height: 16rem;
+  }
+}
+
 .full-height-page section.content>.s-Panel,
 .full-height-page section.content>.s-DataGrid {
   border: none;

@@ -21,7 +21,17 @@ public interface IPermissionGrantValidator
     PermissionGrantDenial? GetDenial(string permissionKey);
 
     /// <summary>
-    /// Throws a validation error when the current user can't grant or revoke one of the permissions.
+    /// Whether a permission is sensitive: one that is not grantable by anyone who manages permissions, by itself or by a
+    /// permission that it implies, which needs the user to confirm the password to grant or revoke (see
+    /// <see cref="IElevationHandler"/>), also a super admin.
+    /// </summary>
+    /// <param name="permissionKey">The permission key.</param>
+    bool IsSensitive(string permissionKey);
+
+    /// <summary>
+    /// Throws a validation error when the current user can't grant or revoke one of the permissions, or, when one of them
+    /// is sensitive (see <see cref="IsSensitive"/>), has not confirmed the password lately, with the "RequiresElevation"
+    /// code, which a page handles by asking for the password and calling the service again.
     /// </summary>
     /// <param name="permissionKeys">The permissions that change, e.g. the ones granted to a role and the ones removed.</param>
     void ValidateGrants(IEnumerable<string> permissionKeys);

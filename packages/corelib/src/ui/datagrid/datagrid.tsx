@@ -325,15 +325,30 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
     }
 
     /**
-     * Recalculates the grid layout, handling responsive height behavior.
+     * Whether the grid is as high as its rows on a narrow screen, so the page scrolls instead of the grid, which a grid
+     * with the `responsive-height` class is, e.g. of a full height grid page. See {@link layout}.
+     * @returns True for the auto height on a narrow screen.
+     */
+    protected useNarrowAutoHeight(): boolean {
+        return this.domNode.classList.contains('responsive-height');
+    }
+
+    /**
+     * Recalculates the grid layout, handling responsive height behavior. On a screen narrower than 768 pixels, a grid
+     * that {@link useNarrowAutoHeight} says so is as high as its rows, unless its view can't be, i.e. one that has a row
+     * for each row of the server and loads the ones in the viewport, which says so with a `supportsAutoHeight` property
+     * that is false, as all its rows would be in view and loaded. Such a grid gets the `s-narrow-fixed-height` class
+     * instead, which gives it a height of its own, so it scrolls.
      */
     protected layout(): void {
         if (!this.domNode || !Fluent.isVisibleLike(this.domNode) || !this.slickContainer || !this._grid)
             return;
 
-        const responsiveHeight = this.domNode.classList.contains('responsive-height');
+        const narrowAutoHeight = this.useNarrowAutoHeight() && window.innerWidth < 768;
+        const viewSupportsAutoHeight = (this.view as any)?.supportsAutoHeight !== false;
+        this.domNode.classList.toggle('s-narrow-fixed-height', narrowAutoHeight && !viewSupportsAutoHeight);
         const autoHeight = this._grid.getOptions().autoHeight;
-        const shouldAutoHeight = responsiveHeight && window.innerWidth < 768;
+        const shouldAutoHeight = narrowAutoHeight && viewSupportsAutoHeight;
 
         if (shouldAutoHeight) {
             if (!autoHeight) {
