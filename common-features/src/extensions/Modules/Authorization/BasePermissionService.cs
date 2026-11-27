@@ -11,10 +11,13 @@ namespace Serenity.Extensions;
 /// <param name="userAccessor">User accessor</param>
 /// <param name="rolePermissions">Role permission service</param>
 /// <param name="httpContextItemsAccessor">HTTP context items accessor</param>
+/// <param name="options">The options, with the super admins. Without them, there is no super admin unless
+/// <see cref="IsSuperAdmin"/> is overridden.</param>
 public abstract class BasePermissionService(
     IUserAccessor userAccessor,
     IRolePermissionService rolePermissions,
-    IHttpContextItemsAccessor? httpContextItemsAccessor = null) : IPermissionService, ITransientGrantor
+    IHttpContextItemsAccessor? httpContextItemsAccessor = null,
+    IOptions<PermissionServiceOptions>? options = null) : IPermissionService, ITransientGrantor
 {
     private readonly IRolePermissionService rolePermissions = rolePermissions ?? throw new ArgumentNullException(nameof(rolePermissions));
     private readonly IUserAccessor userAccessor = userAccessor ?? throw new ArgumentNullException(nameof(userAccessor));
@@ -102,12 +105,13 @@ public abstract class BasePermissionService(
     }
 
     /// <summary>
-    /// Gets whether the specified user is a super admin.
+    /// Gets whether the specified user is a super admin: one of the <see cref="PermissionServiceOptions.SuperAdmins"/>
+    /// when the options are given, otherwise no one.
     /// </summary>
     /// <param name="user">User</param>
     protected virtual bool IsSuperAdmin(ClaimsPrincipal user)
     {
-        return false;
+        return options?.Value?.IsSuperAdmin(user?.Identity?.Name) == true;
     }
 
     /// <summary>

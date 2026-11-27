@@ -1,5 +1,4 @@
 using Serene.Administration;
-using System.Security.Claims;
 
 namespace Serene.AppServices;
 
@@ -8,13 +7,10 @@ public class PermissionService(ITwoLevelCache cache,
     ITypeSource typeSource,
     IUserAccessor userAccessor,
     IRolePermissionService rolePermissions,
-    IHttpContextItemsAccessor? httpContextItemsAccessor = null) :
+    IHttpContextItemsAccessor? httpContextItemsAccessor = null,
+    IOptions<PermissionServiceOptions>? options = null) :
     BasePermissionService<UserPermissionRow, UserRoleRow>(cache, sqlConnections, typeSource,
-        userAccessor, rolePermissions, httpContextItemsAccessor)
+        userAccessor, rolePermissions, httpContextItemsAccessor, options)
 {
-    /// <inheritdoc/>
-    protected override bool IsSuperAdmin(ClaimsPrincipal user)
-    {
-        return user.Identity?.Name == "admin";
-    }
+    // the super admins come from the PermissionService:SuperAdmins setting, "admin" by default
 }

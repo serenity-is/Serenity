@@ -14,14 +14,16 @@ namespace Serenity.Extensions;
 /// <param name="userAccessor">User accessor</param>
 /// <param name="rolePermissions">Role permissions</param>
 /// <param name="httpContextItemsAccessor">HTTP context items accessor</param>
+/// <param name="options">The options, with the super admins, see <see cref="BasePermissionService"/>.</param>
 public abstract class BasePermissionService<TUserPermissionRow, TUserRoleRow>(
     ITwoLevelCache cache,
     ISqlConnections sqlConnections,
     ITypeSource typeSource,
     IUserAccessor userAccessor,
     IRolePermissionService rolePermissions,
-    IHttpContextItemsAccessor? httpContextItemsAccessor = null) :
-    BasePermissionService(userAccessor, rolePermissions, httpContextItemsAccessor)
+    IHttpContextItemsAccessor? httpContextItemsAccessor = null,
+    IOptions<PermissionServiceOptions>? options = null) :
+    BasePermissionService(userAccessor, rolePermissions, httpContextItemsAccessor, options)
     where TUserPermissionRow : class, IUserPermissionRow, new()
     where TUserRoleRow : class, IUserRoleRow, new()
 {

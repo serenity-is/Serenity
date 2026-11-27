@@ -5,7 +5,8 @@ namespace Serene.Administration;
 /// </summary>
 [DataScript("UserData", CacheDuration = -1, Permission = SpecialPermissionKeys.Public)]
 public class UserDataScript(ITwoLevelCache cache, IPermissionService permissions,
-    IPermissionKeyLister permissionKeyLister, IUserProvider userProvider) : DataScript<ScriptUserDefinition>
+    IPermissionKeyLister permissionKeyLister, IUserProvider userProvider,
+    IOptions<PermissionServiceOptions> permissionOptions) : DataScript<ScriptUserDefinition>
 {
     private readonly ITwoLevelCache cache = cache ?? throw new ArgumentNullException(nameof(cache));
     private readonly IPermissionService permissions = permissions ?? throw new ArgumentNullException(nameof(permissions));
@@ -24,7 +25,7 @@ public class UserDataScript(ITwoLevelCache cache, IPermissionService permissions
 
         result.Username = user.Username;
         result.DisplayName = user.DisplayName;
-        result.IsAdmin = user.Username == "admin";
+        result.IsAdmin = permissionOptions?.Value?.IsSuperAdmin(user.Username) == true;
 
         result.Permissions = cache.GetLocalStoreOnly("ScriptUserPermissions:" + user.Id, TimeSpan.Zero,
             UserPermissionRow.Fields.GenerationKey, () =>
