@@ -34,6 +34,53 @@ public static partial class TextKeys
         }
     }
 
+    /// <summary>The text keys under "Emails".</summary>
+    public static partial class Emails
+    {
+        /// <summary>The text keys under "Emails.AccountEvent".</summary>
+        public static partial class AccountEvent
+        {
+            /// <summary>This was done by {0}.</summary>
+            public const string ByOther = "Emails.AccountEvent.ByOther";
+            /// <summary>This was done from your account.</summary>
+            public const string BySelf = "Emails.AccountEvent.BySelf";
+            /// <summary>The email address of your account was changed from {0} to {1}.</summary>
+            public const string EmailChanged = "Emails.AccountEvent.EmailChanged";
+            /// <summary>Your email address was changed</summary>
+            public const string EmailChangedSubject = "Emails.AccountEvent.EmailChangedSubject";
+            /// <summary>Hello {0},</summary>
+            public const string Greeting = "Emails.AccountEvent.Greeting";
+            /// <summary>If you didn't expect this, contact your administrator right away.</summary>
+            public const string NotYou = "Emails.AccountEvent.NotYou";
+            /// <summary>The password of your account was changed.</summary>
+            public const string PasswordChanged = "Emails.AccountEvent.PasswordChanged";
+            /// <summary>Your password was changed</summary>
+            public const string PasswordChangedSubject = "Emails.AccountEvent.PasswordChangedSubject";
+            /// <summary>The {0} team</summary>
+            public const string Signature = "Emails.AccountEvent.Signature";
+            /// <summary>{1} was removed from the two-factor authentication of your account.</summary>
+            public const string TwoFactorDisabled = "Emails.AccountEvent.TwoFactorDisabled";
+            /// <summary>A two-factor authentication method was removed</summary>
+            public const string TwoFactorDisabledSubject = "Emails.AccountEvent.TwoFactorDisabledSubject";
+            /// <summary>{1} was set up for two-factor authentication on your account.</summary>
+            public const string TwoFactorEnabled = "Emails.AccountEvent.TwoFactorEnabled";
+            /// <summary>A two-factor authentication method was added</summary>
+            public const string TwoFactorEnabledSubject = "Emails.AccountEvent.TwoFactorEnabledSubject";
+            /// <summary>The two-factor authentication of your account was reset, so you can set it up again the next time you sign in.</summary>
+            public const string TwoFactorReset = "Emails.AccountEvent.TwoFactorReset";
+            /// <summary>Your two-factor authentication was reset</summary>
+            public const string TwoFactorResetSubject = "Emails.AccountEvent.TwoFactorResetSubject";
+            /// <summary>The username of your account was changed from {0} to {1}. Use the new one to sign in.</summary>
+            public const string UsernameChanged = "Emails.AccountEvent.UsernameChanged";
+            /// <summary>Your username was changed</summary>
+            public const string UsernameChangedSubject = "Emails.AccountEvent.UsernameChangedSubject";
+            /// <summary>When: {0} (UTC)</summary>
+            public const string When = "Emails.AccountEvent.When";
+            /// <summary>IP address: {0}</summary>
+            public const string Where = "Emails.AccountEvent.Where";
+        }
+    }
+
     /// <summary>The text keys under "Forms".</summary>
     public static partial class Forms
     {

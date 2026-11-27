@@ -8,6 +8,13 @@ public static partial class Views
     /// <summary>Provides view paths in the <c>Membership</c> folder.</summary>
     public static partial class Membership
     {
+        /// <summary>Provides view paths in the <c>Membership/AccountEvents</c> folder.</summary>
+        public static partial class AccountEvents
+        {
+            /// <summary>The path to the <c>AccountEventEmail</c> view.</summary>
+            public const string AccountEventEmail = "~/Areas/Serenity.Extensions/Membership/AccountEvents/AccountEventEmail.cshtml";
+        }
+
         /// <summary>Provides view paths in the <c>Membership/PasswordActions</c> folder.</summary>
         public static partial class PasswordActions
         {

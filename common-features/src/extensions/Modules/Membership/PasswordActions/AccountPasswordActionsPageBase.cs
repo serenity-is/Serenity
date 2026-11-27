@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
 namespace Serenity.Extensions;
@@ -158,6 +159,7 @@ public abstract class AccountPasswordActionsPageBase<TUserRow> : MembershipPageB
             uow.Connection.UpdateById(row);
 
             cache.InvalidateOnCommit(uow, row.Fields);
+            PublishPasswordChanged(uow, userId);
 
             return new ServiceResponse();
         });
@@ -252,6 +254,24 @@ public abstract class AccountPasswordActionsPageBase<TUserRow> : MembershipPageB
 
             return new ServiceResponse();
         });
+    }
+
+    /// <summary>
+    /// Tells the account event handlers, e.g. the one that emails the user, that the password of a user was changed, when
+    /// the transaction is committed, if there is an <see cref="IAccountEventPublisher"/>.
+    /// </summary>
+    /// <param name="uow">The unit of work of the change.</param>
+    /// <param name="userId">The ID of the user.</param>
+    protected virtual void PublishPasswordChanged(IUnitOfWork uow, string? userId)
+    {
+        if (string.IsNullOrEmpty(userId))
+            return;
+
+        HttpContext?.RequestServices?.GetService<IAccountEventPublisher>()?.Publish(new AccountEvent
+        {
+            Kind = AccountEventKind.PasswordChanged,
+            UserId = userId
+        }, uow);
     }
 
     /// <summary>
@@ -395,6 +415,7 @@ public abstract class AccountPasswordActionsPageBase<TUserRow> : MembershipPageB
             uow.Connection.UpdateById(row);
 
             cache.InvalidateOnCommit(uow, row.Fields);
+            PublishPasswordChanged(uow, Convert.ToString(user.GetIdField().AsObject(user), CultureInfo.InvariantCulture));
 
             return new ResetPasswordResponse
             {
