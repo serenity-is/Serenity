@@ -73,5 +73,10 @@
   "Validation.PasswordStrengthRequireLowercase": "رمز عبور باید شامل یک حرف کوچک (a-z) باشد.",
   "Validation.PasswordStrengthRequireNonAlphanumeric": "رمز عبور باید شامل یک کاراکتر غیر الفبایی باشد.",
   "Validation.PasswordStrengthRequireUppercase": "رمز عبور باید شامل یک حرف بزرگ (A-Z) باشد.",
+  "Validation.PermissionGrant.NotHeld": "نمی‌توانید {0} را اعطا یا لغو کنید، چون آن را ندارید.",
+  "Validation.PermissionGrant.NotListed": "{0} مجوزی نیست که قابل اعطا باشد.",
+  "Validation.PermissionGrant.SuperAdminOnly": "فقط یک ابرمدیر می‌تواند {0} را اعطا یا لغو کند.",
+  "Validation.PermissionGrant.UserNotHeld": "نمی‌توانید حساب {0} را تغییر دهید، چون مجوزهایی دارد که شما نمی‌توانید اعطا کنید.",
+  "Validation.PermissionGrant.UserSuperAdmin": "فقط یک ابرمدیر می‌تواند حساب {0} را تغییر دهد.",
   "Validation.TooManyRequests": "تلاش‌های بیش از حد. لطفاً کمی صبر کنید و دوباره تلاش کنید."
 }

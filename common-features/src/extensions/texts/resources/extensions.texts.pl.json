@@ -73,5 +73,10 @@
   "Validation.PasswordStrengthRequireLowercase": "Hasło musi zawierać małą literę (a-z).",
   "Validation.PasswordStrengthRequireNonAlphanumeric": "Hasło musi zawierać znak nieliterowy lub niesymboledowy.",
   "Validation.PasswordStrengthRequireUppercase": "Hasło musi zawierać dużą literę (A-Z).",
+  "Validation.PermissionGrant.NotHeld": "Nie możesz przyznać ani odebrać {0}, ponieważ go nie masz.",
+  "Validation.PermissionGrant.NotListed": "{0} nie jest uprawnieniem, które można przyznać.",
+  "Validation.PermissionGrant.SuperAdminOnly": "Tylko superadministrator może przyznać lub odebrać {0}.",
+  "Validation.PermissionGrant.UserNotHeld": "Nie możesz zmienić konta {0}, które ma uprawnienia, których nie możesz przyznać.",
+  "Validation.PermissionGrant.UserSuperAdmin": "Tylko superadministrator może zmienić konto {0}.",
   "Validation.TooManyRequests": "Zbyt wiele prób. Poczekaj chwilę i spróbuj ponownie."
 }

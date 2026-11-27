@@ -73,5 +73,10 @@
   "Validation.PasswordStrengthRequireLowercase": "Le mot de passe doit contenir une lettre minuscule (a-z).",
   "Validation.PasswordStrengthRequireNonAlphanumeric": "Le mot de passe doit contenir un caractère non alphanumérique.",
   "Validation.PasswordStrengthRequireUppercase": "Le mot de passe doit contenir au moins une lettre majuscule (A-Z).",
+  "Validation.PermissionGrant.NotHeld": "Vous ne pouvez pas accorder ni retirer {0}, car vous ne l’avez pas.",
+  "Validation.PermissionGrant.NotListed": "{0} n’est pas une autorisation qui peut être accordée.",
+  "Validation.PermissionGrant.SuperAdminOnly": "Seul un superadministrateur peut accorder ou retirer {0}.",
+  "Validation.PermissionGrant.UserNotHeld": "Vous ne pouvez pas modifier le compte de {0}, qui a des autorisations que vous ne pouvez pas accorder.",
+  "Validation.PermissionGrant.UserSuperAdmin": "Seul un superadministrateur peut modifier le compte de {0}.",
   "Validation.TooManyRequests": "Trop de tentatives. Veuillez patienter un instant puis réessayer."
 }

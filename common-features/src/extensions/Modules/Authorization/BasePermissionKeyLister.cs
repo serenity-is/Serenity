@@ -150,11 +150,23 @@ public abstract class BasePermissionKeyLister(ITwoLevelCache cache, ITypeSource 
 
     /// <summary>
     /// Gets a list of permissions that are private and should not be listed.
-    /// Default implementation returns ["ImpersonateAs"]
+    /// Default implementation returns ["ImpersonateAs"]. Prefer <see cref="IsPrivatePermission"/>, which also covers
+    /// keys that start with a text.
     /// </summary>
     protected virtual IEnumerable<string> GetPrivatePermissions()
     {
         return ["ImpersonateAs"];
+    }
+
+    /// <summary>
+    /// Checks whether a permission is private: one that the permission service decides by itself, so it is not listed,
+    /// and can't be granted (see <see cref="IPermissionGrantValidator.ValidateListed"/>). By default, the ones that start
+    /// with "ImpersonateAs", as <see cref="BasePermissionService"/> decides those for the super admins.
+    /// </summary>
+    /// <param name="key">The permission key.</param>
+    protected virtual bool IsPrivatePermission(string key)
+    {
+        return key.StartsWith("ImpersonateAs", StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>
@@ -224,6 +236,8 @@ public abstract class BasePermissionKeyLister(ITwoLevelCache cache, ITypeSource 
 
         foreach (var x in GetPrivatePermissions())
             target.Remove(x);
+
+        target.RemoveWhere(IsPrivatePermission);
 
         foreach (var x in GetMarkerPermissions())
             target.Remove(x);

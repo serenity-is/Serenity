@@ -73,5 +73,10 @@
   "Validation.PasswordStrengthRequireLowercase": "Parola trebuie să conțină o literă mică (a-z).",
   "Validation.PasswordStrengthRequireNonAlphanumeric": "Parola trebuie să conțină un caracter non-alfanumeric.",
   "Validation.PasswordStrengthRequireUppercase": "Parola trebuie să conțină o literă mare (A-Z).",
+  "Validation.PermissionGrant.NotHeld": "Nu puteți acorda sau retrage {0}, deoarece nu îl aveți.",
+  "Validation.PermissionGrant.NotListed": "{0} nu este o permisiune care poate fi acordată.",
+  "Validation.PermissionGrant.SuperAdminOnly": "Doar un super administrator poate acorda sau retrage {0}.",
+  "Validation.PermissionGrant.UserNotHeld": "Nu puteți modifica contul lui {0}, care are permisiuni pe care nu le puteți acorda.",
+  "Validation.PermissionGrant.UserSuperAdmin": "Doar un super administrator poate modifica contul lui {0}.",
   "Validation.TooManyRequests": "Prea multe încercări. Așteptați puțin și încercați din nou."
 }

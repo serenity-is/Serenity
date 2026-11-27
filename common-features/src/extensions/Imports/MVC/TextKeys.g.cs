@@ -209,6 +209,21 @@ public static partial class TextKeys
     /// <summary>The text keys under "Validation".</summary>
     public static partial class Validation
     {
+        /// <summary>The text keys under "Validation.PermissionGrant".</summary>
+        public static partial class PermissionGrant
+        {
+            /// <summary>You can't grant or revoke {0}, as you don't have it.</summary>
+            public const string NotHeld = "Validation.PermissionGrant.NotHeld";
+            /// <summary>{0} is not a permission that can be granted.</summary>
+            public const string NotListed = "Validation.PermissionGrant.NotListed";
+            /// <summary>Only a super admin can grant or revoke {0}.</summary>
+            public const string SuperAdminOnly = "Validation.PermissionGrant.SuperAdminOnly";
+            /// <summary>You can't change the account of {0}, who has permissions that you can't grant.</summary>
+            public const string UserNotHeld = "Validation.PermissionGrant.UserNotHeld";
+            /// <summary>Only a super admin can change the account of {0}.</summary>
+            public const string UserSuperAdmin = "Validation.PermissionGrant.UserSuperAdmin";
+        }
+
         /// <summary>Your token to reset your password is invalid or has expired!</summary>
         public const string InvalidResetToken = "Validation.InvalidResetToken";
         /// <summary>Entered password doesn't have enough characters (min {0})!</summary>

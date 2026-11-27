@@ -73,5 +73,10 @@
   "Validation.PasswordStrengthRequireLowercase": "पासवर्ड में एक लोअरकेस (a-z) अक्षर होना चाहिए।",
   "Validation.PasswordStrengthRequireNonAlphanumeric": "पासवर्ड में एक नॉन-अल्फ़ान्यूमेरिक वर्ण होना चाहिए।",
   "Validation.PasswordStrengthRequireUppercase": "पासवर्ड में एक अपरकेस (A-Z) अक्षर होना चाहिए।",
+  "Validation.PermissionGrant.NotHeld": "आप {0} प्रदान या रद्द नहीं कर सकते, क्योंकि आपके पास यह नहीं है।",
+  "Validation.PermissionGrant.NotListed": "{0} ऐसी अनुमति नहीं है जो प्रदान की जा सके।",
+  "Validation.PermissionGrant.SuperAdminOnly": "केवल सुपर एडमिन {0} प्रदान या रद्द कर सकता है।",
+  "Validation.PermissionGrant.UserNotHeld": "आप {0} का खाता नहीं बदल सकते, जिसके पास ऐसी अनुमतियाँ हैं जो आप प्रदान नहीं कर सकते।",
+  "Validation.PermissionGrant.UserSuperAdmin": "केवल सुपर एडमिन {0} का खाता बदल सकता है।",
   "Validation.TooManyRequests": "बहुत अधिक प्रयास। कृपया थोड़ी देर प्रतीक्षा करें और फिर से प्रयास करें।"
 }

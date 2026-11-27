@@ -15,15 +15,16 @@ public class PermissionServiceOptions
     /// <summary>
     /// The super admins when <see cref="SuperAdmins"/> is not set: the "admin" user of the templates.
     /// </summary>
-    public static IReadOnlyList<string> DefaultSuperAdmins { get; } = ["admin"];
+    public const string DefaultSuperAdmins = "admin";
 
     /// <summary>
     /// The usernames of the super admins, who have every permission and are the only ones who can impersonate other
-    /// users, compared ignoring case. When not set, <see cref="DefaultSuperAdmins"/>; an empty list means no super
-    /// admin. It is an array that is null by default, as the settings would add to a list with a default value instead
-    /// of replacing it.
+    /// users, compared ignoring case, e.g. "admin, ops", separated by commas, semicolons or white space (see
+    /// <see cref="SettingsList"/>). When not set, <see cref="DefaultSuperAdmins"/>; an empty text means no super admin.
+    /// It is a text rather than an array, as a settings file or an environment variable replaces a text as a whole,
+    /// where the items of an array would be merged by their index.
     /// </summary>
-    public string[]? SuperAdmins { get; set; }
+    public string? SuperAdmins { get; set; }
 
     /// <summary>
     /// Checks whether a user is a super admin.
@@ -34,8 +35,8 @@ public class PermissionServiceOptions
         if (string.IsNullOrEmpty(username))
             return false;
 
-        foreach (var superAdmin in SuperAdmins ?? DefaultSuperAdmins)
-            if (string.Equals(superAdmin?.Trim(), username, StringComparison.OrdinalIgnoreCase))
+        foreach (var superAdmin in SettingsList.Split(SuperAdmins ?? DefaultSuperAdmins))
+            if (string.Equals(superAdmin, username, StringComparison.OrdinalIgnoreCase))
                 return true;
 
         return false;

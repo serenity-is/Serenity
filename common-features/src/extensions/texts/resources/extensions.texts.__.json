@@ -74,5 +74,10 @@
   "Validation.PasswordStrengthRequireLowercase": "Password must contain a lowercase (a-z) letter.",
   "Validation.PasswordStrengthRequireNonAlphanumeric": "Password must contain a non-alphanumeric character.",
   "Validation.PasswordStrengthRequireUppercase": "Password must contain an uppercase (A-Z) letter.",
+  "Validation.PermissionGrant.NotHeld": "You can't grant or revoke {0}, as you don't have it.",
+  "Validation.PermissionGrant.NotListed": "{0} is not a permission that can be granted.",
+  "Validation.PermissionGrant.SuperAdminOnly": "Only a super admin can grant or revoke {0}.",
+  "Validation.PermissionGrant.UserNotHeld": "You can't change the account of {0}, who has permissions that you can't grant.",
+  "Validation.PermissionGrant.UserSuperAdmin": "Only a super admin can change the account of {0}.",
   "Validation.TooManyRequests": "Too many attempts. Please wait a while and try again."
 }

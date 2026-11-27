@@ -26,24 +26,29 @@ public class PermissionServiceOptionsTests
     [Fact]
     public void IsSuperAdmin_Uses_The_SuperAdmins_Instead_Of_The_Default()
     {
-        var options = new PermissionServiceOptions { SuperAdmins = ["root", " ops "] };
+        var options = new PermissionServiceOptions { SuperAdmins = "root, ops;\nboss" };
         Assert.True(options.IsSuperAdmin("root"));
         Assert.True(options.IsSuperAdmin("Ops"));
+        Assert.True(options.IsSuperAdmin("boss"));
         Assert.False(options.IsSuperAdmin("admin"));
 
-        Assert.False(new PermissionServiceOptions { SuperAdmins = [] }.IsSuperAdmin("admin"));
+        Assert.False(new PermissionServiceOptions { SuperAdmins = "" }.IsSuperAdmin("admin"));
     }
 
     [Fact]
     public void SuperAdmins_From_The_Settings_Replace_The_Default()
     {
         var configuration = new ConfigurationBuilder()
-            .AddInMemoryCollection(new Dictionary<string, string?> { ["PermissionService:SuperAdmins:0"] = "root" })
+            .AddInMemoryCollection(new Dictionary<string, string?> { ["PermissionService:SuperAdmins"] = "admin, ops" })
+            .AddInMemoryCollection(new Dictionary<string, string?> { ["PermissionService:SuperAdmins"] = "root" })
             .Build();
         var options = new PermissionServiceOptions();
         configuration.GetSection(PermissionServiceOptions.SectionKey).Bind(options);
 
-        Assert.Equal(["root"], options.SuperAdmins);
+        // a later settings file replaces the whole list, where the items of an array would be merged by their index
+        Assert.Equal("root", options.SuperAdmins);
+        Assert.True(options.IsSuperAdmin("root"));
+        Assert.False(options.IsSuperAdmin("ops"));
         Assert.False(options.IsSuperAdmin("admin"));
     }
 

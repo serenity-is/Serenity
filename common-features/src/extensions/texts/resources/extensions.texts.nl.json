@@ -73,5 +73,10 @@
   "Validation.PasswordStrengthRequireLowercase": "Wachtwoord moet een kleine letter (a-z) bevatten.",
   "Validation.PasswordStrengthRequireNonAlphanumeric": "Wachtwoord moet een niet-alfanumeriek teken bevatten.",
   "Validation.PasswordStrengthRequireUppercase": "Wachtwoord moet een grote letter (A-Z) bevatten.",
+  "Validation.PermissionGrant.NotHeld": "Je kunt {0} niet toekennen of intrekken, omdat je het niet hebt.",
+  "Validation.PermissionGrant.NotListed": "{0} is geen machtiging die kan worden toegekend.",
+  "Validation.PermissionGrant.SuperAdminOnly": "Alleen een superbeheerder kan {0} toekennen of intrekken.",
+  "Validation.PermissionGrant.UserNotHeld": "Je kunt het account van {0} niet wijzigen, omdat het machtigingen heeft die je niet kunt toekennen.",
+  "Validation.PermissionGrant.UserSuperAdmin": "Alleen een superbeheerder kan het account van {0} wijzigen.",
   "Validation.TooManyRequests": "Te veel pogingen. Wacht even en probeer het opnieuw."
 }

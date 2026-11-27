@@ -73,5 +73,10 @@
   "Validation.PasswordStrengthRequireLowercase": "パスワードには小文字（a-z）を含める必要があります。",
   "Validation.PasswordStrengthRequireNonAlphanumeric": "パスワードには非英数字文字を含める必要があります。",
   "Validation.PasswordStrengthRequireUppercase": "パスワードには大文字（A-Z）を含める必要があります。",
+  "Validation.PermissionGrant.NotHeld": "{0} を持っていないため、付与も取り消しもできません。",
+  "Validation.PermissionGrant.NotListed": "{0} は付与できる権限ではありません。",
+  "Validation.PermissionGrant.SuperAdminOnly": "{0} を付与または取り消せるのはスーパー管理者のみです。",
+  "Validation.PermissionGrant.UserNotHeld": "{0} にはあなたが付与できない権限があるため、そのアカウントを変更できません。",
+  "Validation.PermissionGrant.UserSuperAdmin": "{0} のアカウントを変更できるのはスーパー管理者のみです。",
   "Validation.TooManyRequests": "試行回数が多すぎます。しばらく待ってからもう一度お試しください。"
 }

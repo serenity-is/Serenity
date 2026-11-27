@@ -73,5 +73,10 @@
   "Validation.PasswordStrengthRequireLowercase": "비밀번호에는 소문자(a-z)가 포함되어야 합니다.",
   "Validation.PasswordStrengthRequireNonAlphanumeric": "비밀번호에는 비알파벳 문자가 포함되어야 합니다.",
   "Validation.PasswordStrengthRequireUppercase": "비밀번호에는 대문자(A-Z)가 포함되어야 합니다.",
+  "Validation.PermissionGrant.NotHeld": "{0} 권한이 없으므로 부여하거나 취소할 수 없습니다.",
+  "Validation.PermissionGrant.NotListed": "{0}은(는) 부여할 수 있는 권한이 아닙니다.",
+  "Validation.PermissionGrant.SuperAdminOnly": "슈퍼 관리자만 {0}을(를) 부여하거나 취소할 수 있습니다.",
+  "Validation.PermissionGrant.UserNotHeld": "{0}에게는 부여할 수 없는 권한이 있어 해당 계정을 변경할 수 없습니다.",
+  "Validation.PermissionGrant.UserSuperAdmin": "슈퍼 관리자만 {0}의 계정을 변경할 수 있습니다.",
   "Validation.TooManyRequests": "시도가 너무 많습니다. 잠시 기다린 후 다시 시도하세요."
 }

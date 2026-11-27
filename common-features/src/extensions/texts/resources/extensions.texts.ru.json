@@ -73,5 +73,10 @@
   "Validation.PasswordStrengthRequireLowercase": "Пароль должен содержать строчную букву (a-z).",
   "Validation.PasswordStrengthRequireNonAlphanumeric": "Пароль должен содержать не буквенно-цифровой символ.",
   "Validation.PasswordStrengthRequireUppercase": "Пароль должен содержать заглавную букву (A-Z).",
+  "Validation.PermissionGrant.NotHeld": "Вы не можете выдать или отозвать {0}, так как у вас его нет.",
+  "Validation.PermissionGrant.NotListed": "{0} — не разрешение, которое можно выдать.",
+  "Validation.PermissionGrant.SuperAdminOnly": "Только супер администратор может выдать или отозвать {0}.",
+  "Validation.PermissionGrant.UserNotHeld": "Вы не можете изменить учётную запись {0}: у неё есть разрешения, которые вы не можете выдать.",
+  "Validation.PermissionGrant.UserSuperAdmin": "Только супер администратор может изменить учётную запись {0}.",
   "Validation.TooManyRequests": "Слишком много попыток. Подождите немного и попробуйте снова."
 }

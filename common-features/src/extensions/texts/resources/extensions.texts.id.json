@@ -73,5 +73,10 @@
   "Validation.PasswordStrengthRequireLowercase": "Kata sandi harus mengandung huruf kecil (a-z).",
   "Validation.PasswordStrengthRequireNonAlphanumeric": "Kata sandi harus mengandung karakter non-alfanumerik.",
   "Validation.PasswordStrengthRequireUppercase": "Kata sandi harus mengandung huruf besar (A-Z).",
+  "Validation.PermissionGrant.NotHeld": "Anda tidak dapat memberikan atau mencabut {0}, karena Anda tidak memilikinya.",
+  "Validation.PermissionGrant.NotListed": "{0} bukan izin yang dapat diberikan.",
+  "Validation.PermissionGrant.SuperAdminOnly": "Hanya super admin yang dapat memberikan atau mencabut {0}.",
+  "Validation.PermissionGrant.UserNotHeld": "Anda tidak dapat mengubah akun {0}, yang memiliki izin yang tidak dapat Anda berikan.",
+  "Validation.PermissionGrant.UserSuperAdmin": "Hanya super admin yang dapat mengubah akun {0}.",
   "Validation.TooManyRequests": "Terlalu banyak percobaan. Tunggu sebentar lalu coba lagi."
 }

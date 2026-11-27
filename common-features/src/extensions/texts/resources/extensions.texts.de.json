@@ -73,5 +73,10 @@
   "Validation.PasswordStrengthRequireLowercase": "Das Passwort muss einen Kleinbuchstaben (a-z) enthalten.",
   "Validation.PasswordStrengthRequireNonAlphanumeric": "Das Passwort muss ein nicht-alphanumerisches Zeichen enthalten.",
   "Validation.PasswordStrengthRequireUppercase": "Das Passwort muss einen Großbuchstaben (A-Z) enthalten.",
+  "Validation.PermissionGrant.NotHeld": "Sie können {0} nicht erteilen oder entziehen, da Sie es nicht haben.",
+  "Validation.PermissionGrant.NotListed": "{0} ist keine Berechtigung, die erteilt werden kann.",
+  "Validation.PermissionGrant.SuperAdminOnly": "Nur ein Superadministrator kann {0} erteilen oder entziehen.",
+  "Validation.PermissionGrant.UserNotHeld": "Sie können das Konto von {0} nicht ändern, da es Berechtigungen hat, die Sie nicht erteilen können.",
+  "Validation.PermissionGrant.UserSuperAdmin": "Nur ein Superadministrator kann das Konto von {0} ändern.",
   "Validation.TooManyRequests": "Zu viele Versuche. Bitte warten Sie einen Moment und versuchen Sie es erneut."
 }

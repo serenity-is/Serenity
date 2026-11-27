@@ -73,5 +73,10 @@
   "Validation.PasswordStrengthRequireLowercase": "A senha deve conter uma letra minúscula (a-z).",
   "Validation.PasswordStrengthRequireNonAlphanumeric": "A senha deve conter um caractere não alfanumérico.",
   "Validation.PasswordStrengthRequireUppercase": "A senha deve conter uma letra maiúscula (A-Z).",
+  "Validation.PermissionGrant.NotHeld": "Você não pode conceder nem revogar {0}, porque não a tem.",
+  "Validation.PermissionGrant.NotListed": "{0} não é uma permissão que possa ser concedida.",
+  "Validation.PermissionGrant.SuperAdminOnly": "Apenas um superadministrador pode conceder ou revogar {0}.",
+  "Validation.PermissionGrant.UserNotHeld": "Você não pode alterar a conta de {0}, que tem permissões que você não pode conceder.",
+  "Validation.PermissionGrant.UserSuperAdmin": "Apenas um superadministrador pode alterar a conta de {0}.",
   "Validation.TooManyRequests": "Muitas tentativas. Aguarde um momento e tente novamente."
 }

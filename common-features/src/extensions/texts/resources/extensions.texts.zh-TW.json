@@ -73,5 +73,10 @@
   "Validation.PasswordStrengthRequireLowercase": "密碼必須包含小寫字母（a-z）.",
   "Validation.PasswordStrengthRequireNonAlphanumeric": "密碼必須包含非字母數字字符.",
   "Validation.PasswordStrengthRequireUppercase": "密碼必須包含大寫字母（A-Z）。",
+  "Validation.PermissionGrant.NotHeld": "您沒有 {0}，因此無法授予或撤銷它。",
+  "Validation.PermissionGrant.NotListed": "{0} 不是可授予的權限。",
+  "Validation.PermissionGrant.SuperAdminOnly": "只有超級管理員才能授予或撤銷 {0}。",
+  "Validation.PermissionGrant.UserNotHeld": "{0} 擁有您無法授予的權限，因此無法變更其帳戶。",
+  "Validation.PermissionGrant.UserSuperAdmin": "只有超級管理員才能變更 {0} 的帳戶。",
   "Validation.TooManyRequests": "嘗試次數過多。請稍後再試。"
 }

@@ -73,5 +73,10 @@
   "Validation.PasswordStrengthRequireLowercase": "يجب أن تحتوي كلمة المرور على حرف صغير (a-z).",
   "Validation.PasswordStrengthRequireNonAlphanumeric": "يجب أن تحتوي كلمة المرور على حرف غير أبجدي رقمي.",
   "Validation.PasswordStrengthRequireUppercase": "يجب أن تحتوي كلمة المرور على حرف كبير (A-Z).",
+  "Validation.PermissionGrant.NotHeld": "لا يمكنك منح {0} أو سحبه لأنك لا تملكه.",
+  "Validation.PermissionGrant.NotListed": "{0} ليس إذنًا يمكن منحه.",
+  "Validation.PermissionGrant.SuperAdminOnly": "لا يمكن إلا لمسؤول أعلى منح {0} أو سحبه.",
+  "Validation.PermissionGrant.UserNotHeld": "لا يمكنك تغيير حساب {0} لأنه يملك أذونات لا يمكنك منحها.",
+  "Validation.PermissionGrant.UserSuperAdmin": "لا يمكن إلا لمسؤول أعلى تغيير حساب {0}.",
   "Validation.TooManyRequests": "محاولات كثيرة جدًا. يُرجى الانتظار قليلًا ثم المحاولة مرة أخرى."
 }

@@ -222,6 +222,17 @@ public class BasePermissionKeyListerTests
     }
 
     [Fact]
+    public void ListPermissionKeys_Excludes_Keys_Starting_With_ImpersonateAs()
+    {
+        var lister = new TestPermissionKeyLister(new TestTwoLevelCache(), new MockTypeSource())
+        {
+            ExternalFunc = () => ["ImpersonateAs", "impersonateas:Sales", "Test:External"]
+        };
+
+        Assert.Equal(["Test:External"], lister.ListPermissionKeys(false));
+    }
+
+    [Fact]
     public void ListPermissionKeys_With_Roles_Adds_Role_Prefixed_Keys()
     {
         var typeSource = new MockTypeSource(typeof(TypeWithPermissions));

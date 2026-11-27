@@ -73,5 +73,10 @@
   "Validation.PasswordStrengthRequireLowercase": "Heslo musí obsahovat malé písmeno (a-z).",
   "Validation.PasswordStrengthRequireNonAlphanumeric": "Heslo musí obsahovat znak, který není alfanumerický.",
   "Validation.PasswordStrengthRequireUppercase": "Heslo musí obsahovat velké písmeno (A-Z).",
+  "Validation.PermissionGrant.NotHeld": "Nemůžete přidělit ani odebrat {0}, protože je nemáte.",
+  "Validation.PermissionGrant.NotListed": "{0} není oprávnění, které lze přidělit.",
+  "Validation.PermissionGrant.SuperAdminOnly": "Pouze super administrátor může přidělit nebo odebrat {0}.",
+  "Validation.PermissionGrant.UserNotHeld": "Nemůžete změnit účet {0}, který má oprávnění, jež nemůžete přidělit.",
+  "Validation.PermissionGrant.UserSuperAdmin": "Pouze super administrátor může změnit účet {0}.",
   "Validation.TooManyRequests": "Příliš mnoho pokusů. Počkejte prosím chvíli a zkuste to znovu."
 }

@@ -73,5 +73,10 @@
   "Validation.PasswordStrengthRequireLowercase": "Mật khẩu phải chứa ít nhất một chữ cái thường (a-z).",
   "Validation.PasswordStrengthRequireNonAlphanumeric": "Mật khẩu phải chứa ít nhất một ký tự không phải chữ số hoặc chữ cái.",
   "Validation.PasswordStrengthRequireUppercase": "Mật khẩu phải chứa ít nhất một chữ cái hoa (A-Z).",
+  "Validation.PermissionGrant.NotHeld": "Bạn không thể cấp hoặc thu hồi {0} vì bạn không có quyền đó.",
+  "Validation.PermissionGrant.NotListed": "{0} không phải là quyền có thể cấp.",
+  "Validation.PermissionGrant.SuperAdminOnly": "Chỉ quản trị viên cấp cao mới có thể cấp hoặc thu hồi {0}.",
+  "Validation.PermissionGrant.UserNotHeld": "Bạn không thể thay đổi tài khoản của {0}, người có các quyền bạn không thể cấp.",
+  "Validation.PermissionGrant.UserSuperAdmin": "Chỉ quản trị viên cấp cao mới có thể thay đổi tài khoản của {0}.",
   "Validation.TooManyRequests": "Quá nhiều lần thử. Vui lòng đợi một lúc rồi thử lại."
 }

@@ -125,6 +125,15 @@ namespace texts {
         export const PasswordStrengthRequireLowercase: string;
         export const PasswordStrengthRequireNonAlphanumeric: string;
         export const PasswordStrengthRequireUppercase: string;
+        namespace PermissionGrant {
+            export function asKey(): typeof PermissionGrant;
+            export function asTry(): typeof PermissionGrant;
+            export const NotHeld: string;
+            export const NotListed: string;
+            export const SuperAdminOnly: string;
+            export const UserNotHeld: string;
+            export const UserSuperAdmin: string;
+        }
         export const TooManyRequests: string;
     }
 }
@@ -149,5 +158,7 @@ export const ExtensionsTexts: typeof texts = /*#__PURE__*/ proxyTexts({}, '', {
         Dialogs: {},
         Translation: {}
     },
-    Validation: {}
+    Validation: {
+        PermissionGrant: {}
+    }
 }) as any;
