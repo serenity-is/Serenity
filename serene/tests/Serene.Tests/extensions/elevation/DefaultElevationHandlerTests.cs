@@ -83,6 +83,37 @@ public class DefaultElevationHandlerTests
         Assert.Throws<ArgumentNullException>(() => handler.ValidateElevationToken());
     }
 
+    private sealed class PasswordUser(bool hasPassword) : IUserDefinition, IHasPassword
+    {
+        public string Id => "5";
+        public string Username => "user";
+        public string DisplayName => "User";
+        public string? Email => null;
+        public short IsActive => 1;
+        public bool HasPassword => hasPassword;
+    }
+
+    private sealed class SingleUserRetriever(IUserDefinition user) : IUserRetrieveService
+    {
+        public IUserDefinition? ById(string id) => user;
+        public IUserDefinition? ByUsername(string username) => user;
+    }
+
+    [Fact]
+    public void ValidateElevationToken_Tells_When_The_User_Has_No_Password_To_Confirm()
+    {
+        var accessor = new MockHttpContextAccessor { HttpContext = CreateContext("5") };
+        var noPassword = new DefaultElevationHandler(new NullRequestContext(), accessor, new EphemeralDataProtectionProvider(),
+            userRetriever: new SingleUserRetriever(new PasswordUser(false)));
+        var error = Assert.Throws<ValidationError>(() => noPassword.ValidateElevationToken());
+        Assert.Equal("RequiresElevation", error.ErrorCode);
+        Assert.Equal(DefaultElevationHandler.NoPasswordArgument, error.Arguments);
+
+        var withPassword = new DefaultElevationHandler(new NullRequestContext(), accessor, new EphemeralDataProtectionProvider(),
+            userRetriever: new SingleUserRetriever(new PasswordUser(true)));
+        Assert.Null(Assert.Throws<ValidationError>(() => withPassword.ValidateElevationToken()).Arguments);
+    }
+
     [Fact]
     public void ValidateElevationToken_Throws_When_Token_Missing()
     {

@@ -3,13 +3,19 @@ import { ChangePasswordForm } from "../../ServerTypes/Extensions/ChangePasswordF
 import { ChangePasswordFormTexts } from "../../ServerTypes/Extensions/ChangePasswordFormTexts";
 import { ChangePasswordRequest } from "../../ServerTypes/Extensions/ChangePasswordRequest";
 import { ChangePasswordValidationTexts } from "../../ServerTypes/Extensions/ChangePasswordValidationTexts";
+import { AccountSetupTexts } from "../../ServerTypes/Extensions/AccountSetupTexts";
 import { addPasswordStrengthValidation } from "../PasswordStrength/PasswordStrengthValidation";
 
-export default function pageInit() {
-    new ChangePasswordPanel({ element: "#PanelDiv", class: 's-container-tight mt-5 s-Form flex-grow-0' });
+export interface ChangePasswordPageOptions {
+    /** Whether the user must change the password before using the application, e.g. one that an administrator set. */
+    passwordChangeRequired?: boolean;
 }
 
-class ChangePasswordPanel<P = {}> extends PropertyPanel<ChangePasswordRequest, P> {
+export default function pageInit(options?: ChangePasswordPageOptions) {
+    new ChangePasswordPanel({ element: "#PanelDiv", class: 's-container-tight mt-5 s-Form flex-grow-0', ...options });
+}
+
+class ChangePasswordPanel<P extends ChangePasswordPageOptions = ChangePasswordPageOptions> extends PropertyPanel<ChangePasswordRequest, P> {
 
     protected override getFormKey() { return ChangePasswordForm.formKey; }
 
@@ -48,6 +54,10 @@ class ChangePasswordPanel<P = {}> extends PropertyPanel<ChangePasswordRequest, P
         return (
             <div class="s-Panel">
                 <h3 class="page-title mb-4 text-center">{ChangePasswordFormTexts.FormTitle}</h3>
+                {this.options.passwordChangeRequired ? <div class="alert alert-warning s-password-change-required" role="alert">
+                    <b>{AccountSetupTexts.PasswordChangeRequiredTitle}</b>
+                    <p class="mb-0">{AccountSetupTexts.PasswordChangeRequiredHint}</p>
+                </div> : null}
                 <form id={id.Form} action="">
                     <div id={id.PropertyGrid}></div>
                     <div class="px-field mt-4">

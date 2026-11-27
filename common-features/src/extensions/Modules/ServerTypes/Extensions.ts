@@ -1,4 +1,5 @@
 ﻿export * from "./Extensions/AccountRateLimitTexts";
+export * from "./Extensions/AccountSetupTexts";
 export * from "./Extensions/BasicProgressDialogTexts";
 export * from "./Extensions/BulkServiceActionTexts";
 export * from "./Extensions/ChangePasswordForm";

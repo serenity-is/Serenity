@@ -6,8 +6,15 @@ namespace Serenity.Extensions;
 /// <summary>
 /// Default implementation of <see cref="IElevationHandler"/>
 /// </summary>
+/// <param name="context">The request context.</param>
+/// <param name="httpContextAccessor">Gives the request, with the cookie of the token.</param>
+/// <param name="dataProtectionProvider">Protects the token.</param>
+/// <param name="systemClock">Gives the time.</param>
+/// <param name="userRetriever">Gives the current user, to tell when the user has no password to confirm, see
+/// <see cref="NoPasswordArgument"/>.</param>
 public class DefaultElevationHandler(IRequestContext context, IHttpContextAccessor httpContextAccessor,
-    IDataProtectionProvider dataProtectionProvider, TimeProvider? systemClock = null) : BaseRequestHandler(context), IElevationHandler
+    IDataProtectionProvider dataProtectionProvider, TimeProvider? systemClock = null,
+    IUserRetrieveService? userRetriever = null) : BaseRequestHandler(context), IElevationHandler
 {
     private const string ElevationPurpose = "Elevation";
 
@@ -21,6 +28,22 @@ public class DefaultElevationHandler(IRequestContext context, IHttpContextAccess
     /// asking for the password, and calling the service again.
     /// </summary>
     public const string RequiresElevationCode = "RequiresElevation";
+
+    /// <summary>
+    /// The arguments of the <see cref="RequiresElevationCode"/> error for a user who has no password to confirm, e.g. one
+    /// who signs in with an external provider, whom a page asks to set a password instead.
+    /// </summary>
+    public const string NoPasswordArgument = "NoPassword";
+
+    /// <summary>
+    /// The error of a missing, expired or invalid token, which tells when the user has no password to confirm.
+    /// </summary>
+    private ValidationError Required(string message)
+    {
+        var user = httpContextAccessor.HttpContext?.User;
+        var noPassword = user != null && userRetriever?.GetUserDefinition(user) is IHasPassword { HasPassword: false };
+        return new ValidationError(RequiresElevationCode, noPassword ? NoPasswordArgument : null, message);
+    }
 
     private readonly IHttpContextAccessor httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
     private readonly IDataProtectionProvider dataProtectionProvider = dataProtectionProvider ?? throw new ArgumentNullException(nameof(dataProtectionProvider));
@@ -57,7 +80,7 @@ public class DefaultElevationHandler(IRequestContext context, IHttpContextAccess
             throw new ArgumentNullException(nameof(httpContextAccessor.HttpContext));
 
         var token = (httpContextAccessor.HttpContext?.Request.Cookies["ElevationToken"]) ??
-            throw new ValidationError(RequiresElevationCode, "Token not found");
+            throw Required("Token not found");
         var currentUserId = httpContextAccessor.HttpContext.User.GetIdentifier() ??
             throw new ArgumentNullException(nameof(User));
 
@@ -69,7 +92,7 @@ public class DefaultElevationHandler(IRequestContext context, IHttpContextAccess
 
             var dt = DateTime.SpecifyKind(DateTime.FromBinary(br.ReadInt64()), DateTimeKind.Utc);
             if (dt < UtcNow)
-                throw new ValidationError(RequiresElevationCode, "Token expired");
+                throw Required("Token expired");
 
             userId = br.ReadString();
         }
@@ -79,11 +102,11 @@ public class DefaultElevationHandler(IRequestContext context, IHttpContextAccess
         }
         catch (Exception)
         {
-            throw new ValidationError(RequiresElevationCode, "Invalid elevation token");
+            throw Required("Invalid elevation token");
         }
 
         if (!string.Equals(currentUserId, userId, StringComparison.Ordinal))
-            throw new ValidationError(RequiresElevationCode, "Invalid elevation token");
+            throw Required("Invalid elevation token");
     }
 
     /// <inheritdoc />

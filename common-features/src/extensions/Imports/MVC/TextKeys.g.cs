@@ -58,11 +58,11 @@ public static partial class TextKeys
             public const string PasswordChangedSubject = "Emails.AccountEvent.PasswordChangedSubject";
             /// <summary>The {0} team</summary>
             public const string Signature = "Emails.AccountEvent.Signature";
-            /// <summary>{1} was removed from the two-factor authentication of your account.</summary>
+            /// <summary>{0} was removed from the two-factor authentication of your account.</summary>
             public const string TwoFactorDisabled = "Emails.AccountEvent.TwoFactorDisabled";
             /// <summary>A two-factor authentication method was removed</summary>
             public const string TwoFactorDisabledSubject = "Emails.AccountEvent.TwoFactorDisabledSubject";
-            /// <summary>{1} was set up for two-factor authentication on your account.</summary>
+            /// <summary>{0} was set up for two-factor authentication on your account.</summary>
             public const string TwoFactorEnabled = "Emails.AccountEvent.TwoFactorEnabled";
             /// <summary>A two-factor authentication method was added</summary>
             public const string TwoFactorEnabledSubject = "Emails.AccountEvent.TwoFactorEnabledSubject";

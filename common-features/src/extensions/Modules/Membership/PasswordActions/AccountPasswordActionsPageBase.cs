@@ -8,6 +8,7 @@ namespace Serenity.Extensions;
 /// Base class for account password action pages, such as change password,
 /// set password, forgot password, and reset password.
 /// </summary>
+[AllowDuringAccountSetup]
 public abstract class AccountPasswordActionsPageBase<TUserRow> : MembershipPageBase<TUserRow>
     where TUserRow : class, IRow, IIdRow, IEmailRow, IPasswordRow, new()
 {
@@ -37,8 +38,14 @@ public abstract class AccountPasswordActionsPageBase<TUserRow> : MembershipPageB
             return SetPassword();
         }
 
-        return this.PanelPage(ModulePath(nameof(ChangePassword)),
-            ChangePasswordFormTexts.FormTitle);
+        // a user who must change the password, e.g. one that an administrator set, is told why
+        return this.PanelPage(new()
+        {
+            Module = ModulePath(nameof(ChangePassword)),
+            PageTitle = ChangePasswordFormTexts.FormTitle,
+            Options = userRetriever.GetUserDefinition(User) is IHasPasswordChangeRequired { PasswordChangeRequired: true } ?
+                new { passwordChangeRequired = true } : null
+        });
     }
 
     /// <summary>
@@ -156,6 +163,8 @@ public abstract class AccountPasswordActionsPageBase<TUserRow> : MembershipPageB
                 updateDateRow.UpdateDateField[row] = DateTime.UtcNow;
             row.PasswordHashField[row] = hash;
             row.PasswordSaltField[row] = salt;
+            if (row is IPasswordChangeRequiredRow changeRequiredRow)
+                changeRequiredRow.PasswordChangeRequiredField[row] = false;
             uow.Connection.UpdateById(row);
 
             cache.InvalidateOnCommit(uow, row.Fields);
@@ -412,6 +421,8 @@ public abstract class AccountPasswordActionsPageBase<TUserRow> : MembershipPageB
                 updateDateRow.UpdateDateField[row] = DateTime.UtcNow;
             row.PasswordHashField[row] = hash;
             row.PasswordSaltField[row] = salt;
+            if (row is IPasswordChangeRequiredRow changeRequiredRow)
+                changeRequiredRow.PasswordChangeRequiredField[row] = false;
             uow.Connection.UpdateById(row);
 
             cache.InvalidateOnCommit(uow, row.Fields);

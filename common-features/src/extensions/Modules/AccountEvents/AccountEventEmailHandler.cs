@@ -71,9 +71,10 @@ public class AccountEventEmailHandler(IOptions<AccountEventEmailOptions> options
             Event = accountEvent,
             SiteTitle = siteTitle,
             Subject = string.IsNullOrEmpty(siteTitle) ? subjectText : siteTitle + ": " + subjectText,
-            Message = string.Format(CultureInfo.CurrentCulture, message.ToString(localizer),
-                accountEvent.OldValue, accountEvent.Kind is AccountEventKind.TwoFactorEnabled or AccountEventKind.TwoFactorDisabled ?
-                    accountEvent.Method : accountEvent.NewValue)
+            // the two-factor events have the method instead of the old and the new values
+            Message = accountEvent.Kind is AccountEventKind.TwoFactorEnabled or AccountEventKind.TwoFactorDisabled ?
+                string.Format(CultureInfo.CurrentCulture, message.ToString(localizer), accountEvent.Method) :
+                string.Format(CultureInfo.CurrentCulture, message.ToString(localizer), accountEvent.OldValue, accountEvent.NewValue)
         };
     }
 

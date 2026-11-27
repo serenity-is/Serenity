@@ -26,6 +26,13 @@ namespace texts {
         namespace Membership {
             export function asKey(): typeof Membership;
             export function asTry(): typeof Membership;
+            namespace AccountSetup {
+                export function asKey(): typeof AccountSetup;
+                export function asTry(): typeof AccountSetup;
+                export const PasswordChangeRequired: string;
+                export const PasswordChangeRequiredHint: string;
+                export const PasswordChangeRequiredTitle: string;
+            }
             namespace ChangePassword {
                 export function asKey(): typeof ChangePassword;
                 export function asTry(): typeof ChangePassword;
@@ -146,6 +153,7 @@ export const ExtensionsTexts: typeof texts = /*#__PURE__*/ proxyTexts({}, '', {
     },
     Forms: {
         Membership: {
+            AccountSetup: {},
             ChangePassword: {},
             ForgotPassword: {},
             ResetPassword: {},
