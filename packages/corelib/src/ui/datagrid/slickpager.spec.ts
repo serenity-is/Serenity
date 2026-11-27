@@ -344,9 +344,14 @@ describe("SlickPager", () => {
             expect(pager.domNode.querySelector(".slick-pg-last")).toBeNull();
             expect(pager.domNode.classList.contains("slick-pg-range")).toBe(true);
             expect(pager.domNode.querySelector(".slick-pg-info .slick-pg-stat")).not.toBeNull();
-            // the page size stays at the end, as it is the chunk size of a scroll view
-            expect(pager.domNode.querySelector(".slick-pg-nav .slick-pg-size")).not.toBeNull();
+            // the number of the rows it asks for at once is for the developer to set, so there is no page size
+            expect(pager.domNode.querySelector(".slick-pg-nav .slick-pg-size")).toBeNull();
             pager.destroy();
+
+            // unless the grid asks for it
+            const withSize = createPager(view, { showRowsPerPage: true });
+            expect(withSize.domNode.querySelector(".slick-pg-nav .slick-pg-size")).not.toBeNull();
+            withSize.destroy();
         });
 
         it("shows the reload button by default, also when the grid has a refresh button of its own", () => {
@@ -394,8 +399,8 @@ describe("SlickPager", () => {
             expect(document.body.querySelector(".slick-pg-prev")).toBeNull();
             expect(document.body.querySelector(".slick-pg-current")).toBeNull();
             expect(document.body.querySelector(".slick-pg-next")).toBeNull();
-            // it still has the rows per page, reload and status of a pager
-            expect(document.body.querySelector(".slick-pg-size")).not.toBeNull();
+            // it still has the reload and status of a pager, but not the rows per page
+            expect(document.body.querySelector(".slick-pg-size")).toBeNull();
             expect(document.body.querySelector(".slick-pg-reload")).not.toBeNull();
             expect(pager["stat"].textContent).toBe(PagerTexts.PageStatus
                 .replace(/{from}/, "1").replace(/{to}/, "20").replace(/{total}/, "500"));

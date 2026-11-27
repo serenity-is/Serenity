@@ -48,13 +48,14 @@ export class SlickPager<P extends PagerOptions = PagerOptions> extends Widget<P>
         for (const key of Object.keys(SlickPager.defaults) as Array<keyof PagerOptions>)
             (opt as any)[key] ??= SlickPager.defaults[key];
 
-        opt.showRowsPerPage ??= true;
         opt.rowsPerPageOptions ??= [20, 100, 500, 2000];
         const v = opt.view; if (!v) throw new Error("SlickPager requires view option to be set!");
         // the total of the rows is not known, so there is no last page, or total of the pages
         this.indeterminate = opt.indeterminatePaging ?? v.indeterminatePaging ?? false;
         // a view that loads its rows as the grid is scrolled shows a range of them, and needs the grid to do it
         this.rowsMode = v.getPagingInfo?.()?.pagingMode === "rows";
+        // such a view has no pages, and the number of the rows it asks for at once is for the developer to set
+        opt.showRowsPerPage ??= !this.rowsMode;
         (v as IGridBoundView<any>).bindToGrid?.(opt.grid);
 
         const p = "slick-pg-";

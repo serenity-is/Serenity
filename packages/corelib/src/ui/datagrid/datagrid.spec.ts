@@ -1389,9 +1389,19 @@ describe("DataGrid advanced filtering and pager", () => {
         }
         const grid = new PagerGrid({});
         grid.domNode.classList.add("responsive-height");
-        const opt = grid["getViewOptions"]();
-        expect(typeof opt.rowsPerPage).toBe("number");
-        grid.destroy();
+        const width = vi.spyOn(window, "innerWidth", "get").mockReturnValue(500);
+        try {
+            // the options are for any view, e.g. one that loads its rows as the grid is scrolled
+            expect(grid["getViewOptions"]().rowsPerPage).toBe(100);
+            // the pages of the default view are shorter on a narrow screen
+            expect((grid["createView"]() as any).rowsPerPage).toBe(20);
+            width.mockReturnValue(1200);
+            expect((grid["createView"]() as any).rowsPerPage).toBe(100);
+        }
+        finally {
+            width.mockRestore();
+            grid.destroy();
+        }
     });
 });
 

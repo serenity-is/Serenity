@@ -1076,6 +1076,11 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
      */
     protected createView(): IRemoteView<TItem> {
         const opt = this.getViewOptions();
+        // a page of a responsive grid is shorter on a narrow screen, where it is as high as its rows. it is only for the
+        // pages of this view, and not for the views of the grids that load their rows as they are scrolled, whose number
+        // of rows a request asks for is not a page
+        if (opt.rowsPerPage && this.domNode.classList.contains('responsive-height') && window.innerWidth < 768)
+            opt.rowsPerPage = 20;
         return new RemoteView<TItem>(opt) as any;
     }
 
@@ -1158,15 +1163,8 @@ export class DataGrid<TItem, P = {}> extends Widget<P> implements IDataGrid, IRe
         opt.indentDataRows = dataGridDefaults.indentDataRows;
         opt.displayTotalsRow = dataGridDefaults.displayTotalsRow;
 
-        if (!this.usePager()) {
-            opt.rowsPerPage = 0;
-        }
-        else if (this.domNode.classList.contains('responsive-height')) {
-            opt.rowsPerPage = window.innerWidth < 768 ? 20 : 100;
-        }
-        else {
-            opt.rowsPerPage = 100;
-        }
+        // see createView for the fewer rows of a page of a responsive grid on a narrow screen
+        opt.rowsPerPage = this.usePager() ? 100 : 0;
 
         opt.getItemMetadata = (item, index) => {
             return this.getItemMetadata(item, index);

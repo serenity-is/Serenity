@@ -81,7 +81,7 @@ export interface PagerOptions {
      * Default is what the view gives, see {@link IRemoteView.getPagingInfoText}.
      */
     getInfoText?: (info: PagingInfo) => RenderableContent;
-    /** Whether to show rows-per-page selector. */
+    /** Whether to show rows-per-page selector. Default is true, but false for a view that shows a range of its rows, e.g. an infinite scroll view, whose number of rows is set by the developer. */
     showRowsPerPage?: boolean;
     /**
      * Whether to show the buttons that go to the first and last pages, which most pagers leave out, as
