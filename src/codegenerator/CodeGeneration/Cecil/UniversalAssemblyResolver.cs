@@ -638,15 +638,18 @@ public class UniversalAssemblyResolver : IAssemblyResolver
 
     public class CachedMetadataResolver(IAssemblyResolver assemblyResolver) : MetadataResolver(assemblyResolver)
     {
-        private readonly Dictionary<(string, string), TypeDefinition> typeCache = [];
-        private readonly Dictionary<(string, string), MethodDefinition> methodCache = [];
+        // the types may be resolved from several threads at once, e.g. by the server typings generator, and resolving one
+        // twice is harmless, so the caches only need to be safe for concurrent use
+        private readonly System.Collections.Concurrent.ConcurrentDictionary<(string, string), TypeDefinition> typeCache = [];
+        private readonly System.Collections.Concurrent.ConcurrentDictionary<(string, string), MethodDefinition> methodCache = [];
 
         public override MethodDefinition Resolve(MethodReference method)
         {
             var key = (method.FullName, method.Module.Assembly.FullName);
             if (methodCache.TryGetValue(key, out var def))
                 return def;
-            methodCache[key] = def = base.Resolve(method);
+            def = base.Resolve(method);
+            methodCache[key] = def;
             return def;
         }
 
@@ -666,7 +669,8 @@ public class UniversalAssemblyResolver : IAssemblyResolver
                 key = (type.FullName, type.Scope.Name);
             if (typeCache.TryGetValue(key, out var def))
                 return def;
-            typeCache[key] = def = base.Resolve(type);
+            def = base.Resolve(type);
+            typeCache[key] = def;
             return def;
         }
     }

@@ -50,6 +50,7 @@
 - Add the `switch` option to `BooleanEditor` (`[BooleanEditor(Switch = true)]`), which shows a switch instead of a checkbox for the same value, without a wrapper element. Switches, including Bootstrap's `form-switch`, are 2.25em by 1.25em instead of 2em by 1em, so they no longer look thin next to text and buttons, have a pointer cursor, and take their size from the optional `--s-switch-width` and `--s-switch-height` tokens, in the new `switch.css` of Serenity.Extensions that the Serene and StartSharp themes share.
 
 ### Bugfixes
+- Generating the server typings could fail now and then with "Operations that change non-concurrent collections must have exclusive access", as the cache of the resolved types of the code generator was not safe for the threads that resolve them at once.
 - The set password page was a card as high as the page, and the change password page was at the top; they are in the middle of the page, as high as their content, like the other pages of the account.
 - The impersonation banner was not shown, as it read the user data before the page had it, which fetched a copy that the browser could have cached before the impersonation; it waits for the page now.
 - `RecordViewClass` did not accept a record view with options of its own, e.g. `recordViews: [{ type: MyView }]`, as it required the generic constructor of `RecordView` (Pro).
