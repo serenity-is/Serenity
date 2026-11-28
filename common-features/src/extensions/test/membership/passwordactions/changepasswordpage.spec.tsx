@@ -26,7 +26,8 @@ describe("ChangePasswordPage", () => {
     it("renders the change password form", () => {
         pageInit();
         const panelDiv = document.getElementById("PanelDiv");
-        expect(panelDiv.querySelector("h3.page-title")).toBeTruthy();
+        expect(panelDiv.querySelector(".s-container-tight > .s-Panel > h5")).toBeTruthy();
+        expect(panelDiv.classList.contains("align-items-center")).toBe(true);
         expect(panelDiv.querySelector("form")).toBeTruthy();
         expect(panelDiv.querySelector("button[type=submit]")).toBeTruthy();
     });

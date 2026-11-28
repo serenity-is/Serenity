@@ -29,8 +29,14 @@ public class RequiresElevationAttributeTests
         public bool HasPassword { get; set; }
     }
 
+    private class StubExternalProviders(params string[] names) : Serenity.Extensions.IExternalElevationProviders
+    {
+        public IReadOnlyList<Serenity.Extensions.ExternalElevationProvider> GetProviders(ClaimsPrincipal user) =>
+            [.. names.Select(x => new Serenity.Extensions.ExternalElevationProvider { Name = x, DisplayName = x })];
+    }
+
     private static ResourceExecutingContext CreateContext(string method, string path,
-        StubElevationHandler handler, IUserDefinition? user = null, bool loggedIn = true)
+        StubElevationHandler handler, IUserDefinition? user = null, bool loggedIn = true, Serenity.Extensions.IExternalElevationProviders? providers = null)
     {
         var httpContext = new DefaultHttpContext();
         if (loggedIn)
@@ -44,6 +50,8 @@ public class RequiresElevationAttributeTests
         var services = new ServiceCollection();
         services.AddSingleton<IElevationHandler>(handler);
         services.AddSingleton<IUserRetrieveService>(new MockUserRetrieveService(user!));
+        if (providers != null)
+            services.AddSingleton(providers);
         httpContext.RequestServices = services.BuildServiceProvider();
 
         var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
@@ -73,6 +81,23 @@ public class RequiresElevationAttributeTests
 
         var redirect = Assert.IsType<LocalRedirectResult>(context.Result);
         Assert.Contains("/Account/SetPassword?reason=elevate", redirect.Url);
+    }
+
+    [Fact]
+    public void OnResourceExecuting_Redirects_To_Elevate_When_No_Password_But_A_Provider_Can_Confirm()
+    {
+        var handler = new StubElevationHandler { OnValidate = () => throw new ValidationError("x") };
+        var user = new PasswordUserDefinition { Id = "1", Username = "user", HasPassword = false };
+
+        var context = CreateContext("GET", "/Account/ExternalLogins", handler, user, providers: new StubExternalProviders("Google"));
+        new RequiresElevationAttribute().OnResourceExecuting(context);
+        var redirect = Assert.IsType<LocalRedirectResult>(context.Result);
+        Assert.Contains("/Account/Elevate?returnUrl=", redirect.Url);
+
+        // none of the providers of the user can
+        context = CreateContext("GET", "/Account/ExternalLogins", handler, user, providers: new StubExternalProviders());
+        new RequiresElevationAttribute().OnResourceExecuting(context);
+        Assert.Contains("/Account/SetPassword?reason=elevate", Assert.IsType<LocalRedirectResult>(context.Result).Url);
     }
 
     [Fact]

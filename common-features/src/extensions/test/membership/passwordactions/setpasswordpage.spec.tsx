@@ -18,7 +18,9 @@ describe("SetPasswordPage", () => {
     it("renders the set password form", () => {
         pageInit();
         const panelDiv = document.getElementById("PanelDiv");
-        expect(panelDiv.querySelector("h3.page-title")).toBeTruthy();
+        expect(panelDiv.querySelector(".s-container-tight > .s-Panel > h5")).toBeTruthy();
+        // in the middle of the page, as tall as its content, not stretched to the height of the page
+        expect(panelDiv.classList.contains("align-items-center")).toBe(true);
         expect(panelDiv.querySelector("form")).toBeTruthy();
         expect(panelDiv.querySelector("button")).toBeTruthy();
     });

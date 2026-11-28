@@ -420,7 +420,7 @@ export declare class ReportPage<P = {}> extends Widget<P> {
     protected updateMatchFlags(text: string): void;
     protected reportLinkClick(e: Event): void;
 }
-declare namespace texts12 {
+declare namespace texts16 {
     namespace Validation {
         function asKey(): typeof Validation;
         function asTry(): typeof Validation;
@@ -431,11 +431,38 @@ declare namespace texts12 {
         const PasswordStrengthRequireLowercase: string;
         const PasswordStrengthRequireNonAlphanumeric: string;
         const PasswordStrengthRequireUppercase: string;
+        namespace PermissionGrant {
+            function asKey(): typeof PermissionGrant;
+            function asTry(): typeof PermissionGrant;
+            const NotHeld: string;
+            const NotListed: string;
+            const SuperAdminOnly: string;
+            const UserNotHeld: string;
+            const UserSuperAdmin: string;
+        }
         const TooManyRequests: string;
     }
 }
-export declare const AccountRateLimitTexts: typeof texts12.Validation;
-declare namespace texts11 {
+export declare const AccountRateLimitTexts: typeof texts16.Validation;
+declare namespace texts15 {
+    namespace Forms {
+        function asKey(): typeof Forms;
+        function asTry(): typeof Forms;
+        namespace Membership {
+            function asKey(): typeof Membership;
+            function asTry(): typeof Membership;
+            namespace AccountSetup {
+                function asKey(): typeof AccountSetup;
+                function asTry(): typeof AccountSetup;
+                const PasswordChangeRequired: string;
+                const PasswordChangeRequiredHint: string;
+                const PasswordChangeRequiredTitle: string;
+            }
+        }
+    }
+}
+export declare const AccountSetupTexts: typeof texts15.Forms.Membership.AccountSetup;
+declare namespace texts14 {
     namespace Site {
         function asKey(): typeof Site;
         function asTry(): typeof Site;
@@ -447,8 +474,8 @@ declare namespace texts11 {
         }
     }
 }
-export declare const BasicProgressDialogTexts: typeof texts11.Site.BasicProgressDialog;
-declare namespace texts10 {
+export declare const BasicProgressDialogTexts: typeof texts14.Site.BasicProgressDialog;
+declare namespace texts13 {
     namespace Site {
         function asKey(): typeof Site;
         function asTry(): typeof Site;
@@ -465,7 +492,7 @@ declare namespace texts10 {
         }
     }
 }
-export declare const BulkServiceActionTexts: typeof texts10.Site.BulkServiceAction;
+export declare const BulkServiceActionTexts: typeof texts13.Site.BulkServiceAction;
 export interface ChangePasswordForm {
     OldPassword: PasswordEditor;
     NewPassword: PasswordEditor;
@@ -476,7 +503,7 @@ export declare class ChangePasswordForm extends PrefixedContext {
     private static init;
     constructor(...args: ConstructorParameters<typeof PrefixedContext>);
 }
-declare namespace texts9 {
+declare namespace texts12 {
     namespace Forms {
         function asKey(): typeof Forms;
         function asTry(): typeof Forms;
@@ -493,13 +520,13 @@ declare namespace texts9 {
         }
     }
 }
-export declare const ChangePasswordFormTexts: typeof texts9.Forms.Membership.ChangePassword;
+export declare const ChangePasswordFormTexts: typeof texts12.Forms.Membership.ChangePassword;
 export interface ChangePasswordRequest extends ServiceRequest {
     OldPassword?: string;
     NewPassword?: string;
     ConfirmPassword?: string;
 }
-declare namespace texts8 {
+declare namespace texts11 {
     namespace Validation {
         function asKey(): typeof Validation;
         function asTry(): typeof Validation;
@@ -510,11 +537,20 @@ declare namespace texts8 {
         const PasswordStrengthRequireLowercase: string;
         const PasswordStrengthRequireNonAlphanumeric: string;
         const PasswordStrengthRequireUppercase: string;
+        namespace PermissionGrant {
+            function asKey(): typeof PermissionGrant;
+            function asTry(): typeof PermissionGrant;
+            const NotHeld: string;
+            const NotListed: string;
+            const SuperAdminOnly: string;
+            const UserNotHeld: string;
+            const UserSuperAdmin: string;
+        }
         const TooManyRequests: string;
     }
 }
-export declare const ChangePasswordValidationTexts: typeof texts8.Validation;
-declare namespace texts7 {
+export declare const ChangePasswordValidationTexts: typeof texts11.Validation;
+declare namespace texts10 {
     namespace Site {
         function asKey(): typeof Site;
         function asTry(): typeof Site;
@@ -526,7 +562,7 @@ declare namespace texts7 {
         }
     }
 }
-export declare const DialogUtilsTexts: typeof texts7.Site.Dialogs;
+export declare const DialogUtilsTexts: typeof texts10.Site.Dialogs;
 export interface ExcelImportRequest extends ServiceRequest {
     FileName?: string;
 }
@@ -535,7 +571,7 @@ export interface ExcelImportResponse extends ServiceResponse {
     Updated?: number;
     ErrorList?: string[];
 }
-declare namespace texts6 {
+declare namespace texts9 {
     namespace Db {
         function asKey(): typeof Db;
         function asTry(): typeof Db;
@@ -561,6 +597,13 @@ declare namespace texts6 {
         namespace Membership {
             function asKey(): typeof Membership;
             function asTry(): typeof Membership;
+            namespace AccountSetup {
+                function asKey(): typeof AccountSetup;
+                function asTry(): typeof AccountSetup;
+                const PasswordChangeRequired: string;
+                const PasswordChangeRequiredHint: string;
+                const PasswordChangeRequiredTitle: string;
+            }
             namespace ChangePassword {
                 function asKey(): typeof ChangePassword;
                 function asTry(): typeof ChangePassword;
@@ -575,6 +618,19 @@ declare namespace texts6 {
                 const FormTitle: string;
                 const SubmitButton: string;
                 const SuccessMessage: string;
+            }
+            namespace Impersonation {
+                function asKey(): typeof Impersonation;
+                function asTry(): typeof Impersonation;
+                const Restricted: string;
+            }
+            namespace MyAccount {
+                function asKey(): typeof MyAccount;
+                function asTry(): typeof MyAccount;
+                const ChangePasswordDescription: string;
+                const ChangePasswordRequired: string;
+                const PasswordTitle: string;
+                const SetPasswordDescription: string;
             }
             namespace ResetPassword {
                 function asKey(): typeof ResetPassword;
@@ -660,10 +716,19 @@ declare namespace texts6 {
         const PasswordStrengthRequireLowercase: string;
         const PasswordStrengthRequireNonAlphanumeric: string;
         const PasswordStrengthRequireUppercase: string;
+        namespace PermissionGrant {
+            function asKey(): typeof PermissionGrant;
+            function asTry(): typeof PermissionGrant;
+            const NotHeld: string;
+            const NotListed: string;
+            const SuperAdminOnly: string;
+            const UserNotHeld: string;
+            const UserSuperAdmin: string;
+        }
         const TooManyRequests: string;
     }
 }
-export declare const ExtensionsTexts: typeof texts6;
+export declare const ExtensionsTexts: typeof texts9;
 export interface ForgotPasswordForm {
     Email: EmailAddressEditor;
 }
@@ -672,7 +737,7 @@ export declare class ForgotPasswordForm extends PrefixedContext {
     private static init;
     constructor(...args: ConstructorParameters<typeof PrefixedContext>);
 }
-declare namespace texts5 {
+declare namespace texts8 {
     namespace Forms {
         function asKey(): typeof Forms;
         function asTry(): typeof Forms;
@@ -690,7 +755,7 @@ declare namespace texts5 {
         }
     }
 }
-export declare const ForgotPasswordFormTexts: typeof texts5.Forms.Membership.ForgotPassword;
+export declare const ForgotPasswordFormTexts: typeof texts8.Forms.Membership.ForgotPassword;
 export interface ForgotPasswordRequest extends ServiceRequest {
     Email?: string;
 }
@@ -702,7 +767,42 @@ export interface GetNextNumberResponse extends ServiceResponse {
     Number?: number;
     Serial?: string;
 }
-declare namespace texts4 {
+declare namespace texts7 {
+    namespace Forms {
+        function asKey(): typeof Forms;
+        function asTry(): typeof Forms;
+        namespace Membership {
+            function asKey(): typeof Membership;
+            function asTry(): typeof Membership;
+            namespace Impersonation {
+                function asKey(): typeof Impersonation;
+                function asTry(): typeof Impersonation;
+                const Restricted: string;
+            }
+        }
+    }
+}
+export declare const ImpersonationTexts: typeof texts7.Forms.Membership.Impersonation;
+declare namespace texts6 {
+    namespace Forms {
+        function asKey(): typeof Forms;
+        function asTry(): typeof Forms;
+        namespace Membership {
+            function asKey(): typeof Membership;
+            function asTry(): typeof Membership;
+            namespace MyAccount {
+                function asKey(): typeof MyAccount;
+                function asTry(): typeof MyAccount;
+                const ChangePasswordDescription: string;
+                const ChangePasswordRequired: string;
+                const PasswordTitle: string;
+                const SetPasswordDescription: string;
+            }
+        }
+    }
+}
+export declare const MyAccountTexts: typeof texts6.Forms.Membership.MyAccount;
+declare namespace texts5 {
     namespace Validation {
         function asKey(): typeof Validation;
         function asTry(): typeof Validation;
@@ -713,10 +813,51 @@ declare namespace texts4 {
         const PasswordStrengthRequireLowercase: string;
         const PasswordStrengthRequireNonAlphanumeric: string;
         const PasswordStrengthRequireUppercase: string;
+        namespace PermissionGrant {
+            function asKey(): typeof PermissionGrant;
+            function asTry(): typeof PermissionGrant;
+            const NotHeld: string;
+            const NotListed: string;
+            const SuperAdminOnly: string;
+            const UserNotHeld: string;
+            const UserSuperAdmin: string;
+        }
         const TooManyRequests: string;
     }
 }
-export declare const PasswordStrengthValidationTexts: typeof texts4.Validation;
+export declare const PasswordStrengthValidationTexts: typeof texts5.Validation;
+export interface PermissionGrantListRequest extends ServiceRequest {
+    PermissionKeys?: string[];
+}
+export interface PermissionGrantListResponse extends ServiceResponse {
+    IsSuperAdmin?: boolean;
+    Denied?: {
+        [key: string]: string;
+    };
+}
+export declare namespace PermissionGrantService {
+    const baseUrl = "Extensions/PermissionGrant";
+    function List(request: PermissionGrantListRequest, onSuccess?: (response: PermissionGrantListResponse) => void, opt?: ServiceOptions<any>): PromiseLike<PermissionGrantListResponse>;
+    const Methods: {
+        readonly List: "Extensions/PermissionGrant/List";
+    };
+}
+declare namespace texts4 {
+    namespace Validation {
+        function asKey(): typeof Validation;
+        function asTry(): typeof Validation;
+        namespace PermissionGrant {
+            function asKey(): typeof PermissionGrant;
+            function asTry(): typeof PermissionGrant;
+            const NotHeld: string;
+            const NotListed: string;
+            const SuperAdminOnly: string;
+            const UserNotHeld: string;
+            const UserSuperAdmin: string;
+        }
+    }
+}
+export declare const PermissionGrantTexts: typeof texts4.Validation.PermissionGrant;
 export interface ResetPasswordForm {
     NewPassword: PasswordEditor;
     ConfirmPassword: PasswordEditor;

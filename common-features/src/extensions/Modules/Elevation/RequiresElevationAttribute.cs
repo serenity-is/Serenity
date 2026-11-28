@@ -44,7 +44,11 @@ public class RequiresElevationAttribute : Attribute, IResourceFilter
             if (string.IsNullOrEmpty(path))
                 path = "/";
                 
-            if (userRetrieveService.GetUserDefinition(context.HttpContext.User) is IHasPassword { HasPassword: false })
+            // a user without a password sets one, unless an external provider linked to the account can confirm instead,
+            // which the elevation page offers
+            if (userRetrieveService.GetUserDefinition(context.HttpContext.User) is IHasPassword { HasPassword: false } &&
+                (context.HttpContext.RequestServices.GetService<Serenity.Extensions.IExternalElevationProviders>()?
+                    .GetProviders(context.HttpContext.User).Count ?? 0) == 0)
                 context.Result = new LocalRedirectResult("~/Account/SetPassword?reason=elevate");
             else
                 context.Result = new LocalRedirectResult("~/Account/Elevate?returnUrl=" + Uri.EscapeDataString(path));

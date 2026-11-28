@@ -3,7 +3,8 @@ import { SendResetPasswordResponse } from "../../ServerTypes/Extensions/SendRese
 import { SetPasswordFormTexts } from "../../ServerTypes/Extensions/SetPasswordFormTexts";
 
 export default function pageInit() {
-    new SetPasswordPage({ element: "#PanelDiv", class: "s-container-tight mt-5 s-Form" });
+    // in the middle of the page, as tall as its content, like the other pages of the account
+    new SetPasswordPage({ element: "#PanelDiv", class: "s-Form" }).domNode?.classList.add("d-flex", "flex-grow-1", "align-items-center");
 }
 
 class SetPasswordPage extends BasePanel {
@@ -32,19 +33,21 @@ class SetPasswordPage extends BasePanel {
 
     protected override renderContents(): any {
         return (
-            <div class="s-Panel">
-                <h3 class="page-title mb-4 text-center">{SetPasswordFormTexts.PageTitle}</h3>
-                {
-                    parseQueryString()["reason"] == "elevate" ?
-                        <p>{SetPasswordFormTexts.ElevatedActionsMessage}</p> :
-                        <p>{SetPasswordFormTexts.EmailToSetPasswordMessage}</p>
-                }
-                <form>
-                    <button class="btn btn-primary w-100" onClick={e => {
-                        e.preventDefault();
-                        this.submitClick()
-                    }}>{SetPasswordFormTexts.SendEmailButton}</button>
-                </form>
+            <div class="s-container-tight">
+                <div class="s-Panel p-4">
+                    <h5 class="text-center mb-4">{SetPasswordFormTexts.PageTitle}</h5>
+                    {
+                        parseQueryString()["reason"] == "elevate" ?
+                            <p class="text-center">{SetPasswordFormTexts.ElevatedActionsMessage}</p> :
+                            <p class="text-center">{SetPasswordFormTexts.EmailToSetPasswordMessage}</p>
+                    }
+                    <form>
+                        <button class="btn btn-primary w-100" onClick={e => {
+                            e.preventDefault();
+                            this.submitClick()
+                        }}>{SetPasswordFormTexts.SendEmailButton}</button>
+                    </form>
+                </div>
             </div>
         );
     }
