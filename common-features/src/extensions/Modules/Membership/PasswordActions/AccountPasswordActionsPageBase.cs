@@ -251,10 +251,15 @@ public abstract class AccountPasswordActionsPageBase<TUserRow> : MembershipPageB
             var emailModel = new ResetPasswordEmailModel
             {
                 DisplayName = displayNameField[user],
-                ResetLink = resetLink
+                ResetLink = resetLink,
+                LinkHours = ResetPasswordTokenLifetime.TotalHours
             };
 
+            // with the title of the site, like the other emails of the account
+            var siteTitle = localizer.TryGet("Navigation.SiteTitle");
             var emailSubject = ResetPasswordFormTexts.EmailSubject.ToString(localizer);
+            if (!string.IsNullOrEmpty(siteTitle))
+                emailSubject = siteTitle + ": " + emailSubject;
             var emailBody = TemplateHelper.RenderViewToString(HttpContext.RequestServices,
                 MVC.Views.Membership.PasswordActions.ResetPasswordEmail, emailModel);
 
@@ -262,12 +267,13 @@ public abstract class AccountPasswordActionsPageBase<TUserRow> : MembershipPageB
 
             emailSender.Send(subject: emailSubject, body: emailBody, mailTo: user.EmailField[user]!);
 
-            // by the user, or by an administrator for the user
+            // by the user, or by an administrator for the user; after the commit, as the publisher reads the user with a
+            // connection of its own, which would wait for the lock of the row that this transaction updated
             HttpContext?.RequestServices?.GetService<IAccountEventPublisher>()?.Publish(new AccountEvent
             {
                 Kind = AccountEventKind.PasswordResetRequested,
                 UserId = Convert.ToString(user.GetIdField().AsObject(user), CultureInfo.InvariantCulture)
-            });
+            }, uow);
 
             return new ServiceResponse();
         });
@@ -292,6 +298,11 @@ public abstract class AccountPasswordActionsPageBase<TUserRow> : MembershipPageB
     }
 
     /// <summary>
+    /// How long a reset password link works, 3 hours by default.
+    /// </summary>
+    protected virtual TimeSpan ResetPasswordTokenLifetime => TimeSpan.FromHours(3);
+
+    /// <summary>
     /// Generates a protected reset password token for the specified user.
     /// </summary>
     /// <param name="user">The user row.</param>
@@ -300,7 +311,7 @@ public abstract class AccountPasswordActionsPageBase<TUserRow> : MembershipPageB
     {
         return HttpContext.RequestServices.GetDataProtector("ResetPassword").ProtectBinary(bw =>
         {
-            bw.Write(DateTime.UtcNow.AddHours(3).ToBinary());
+            bw.Write(DateTime.UtcNow.Add(ResetPasswordTokenLifetime).ToBinary());
             bw.Write(Convert.ToString(user.GetIdField().AsObject(user), CultureInfo.InvariantCulture) ?? "");
             bw.Write(GetNonceFor(user));
         });

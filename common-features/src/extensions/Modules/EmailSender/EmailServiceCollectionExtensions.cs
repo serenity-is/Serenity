@@ -15,6 +15,7 @@ public static class EmailServiceCollectionExtensions
     public static IServiceCollection AddEmailSender(this IServiceCollection collection)
     {
         collection.TryAddSingleton<IEmailSender, EmailSender>();
+        collection.TryAddSingleton<IEmailMessageRenderer, RazorEmailMessageRenderer>();
         return collection;
     }
 }

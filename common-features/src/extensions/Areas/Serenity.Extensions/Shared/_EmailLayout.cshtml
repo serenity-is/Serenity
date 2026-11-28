@@ -1,0 +1,55 @@
+@inject Serenity.ITextLocalizer Localizer
+@using System.Globalization
+@using Serenity.Extensions
+@*
+    The layout of the emails that the application sends, e.g. the password reset and account change emails, which their views
+    set with Layout = "~/Areas/Serenity.Extensions/Shared/_EmailLayout.cshtml". An application changes the look of all of them
+    with a view of the same path in its own project. Email clients ignore the style sheets and many CSS rules, so it uses
+    tables and inline styles. ViewData["Title"] is the title of the email, e.g. its subject.
+*@
+@{
+    var siteTitle = ViewData["SiteTitle"] as string ?? Localizer.TryGet("Navigation.SiteTitle") ?? "";
+    var title = ViewData["Title"] as string ?? siteTitle;
+    var culture = CultureInfo.CurrentUICulture;
+    const string font = "-apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
+    string T(LocalText text, params object?[] args) => string.Format(CultureInfo.CurrentCulture, text.ToString(Localizer), args);
+}
+<!DOCTYPE html>
+<html lang="@culture.Name" dir="@(culture.TextInfo.IsRightToLeft ? "rtl" : "ltr")">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <title>@title</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f3f4f6;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f3f4f6;">
+        <tr>
+            <td align="center" style="padding: 24px 12px;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width: 560px;">
+                    @if (!string.IsNullOrEmpty(siteTitle))
+                    {
+                        <tr>
+                            <td style="padding: 0 4px 12px; font-family: @font; font-size: 18px; font-weight: 600; color: #111827;">@siteTitle</td>
+                        </tr>
+                    }
+                    <tr>
+                        <td style="padding: 28px 28px 12px; background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; font-family: @font; font-size: 15px; line-height: 1.55; color: #1f2937;">
+                            @RenderBody()
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 16px 4px; font-family: @font; font-size: 12px; line-height: 1.5; color: #6b7280;">
+                            @if (!string.IsNullOrEmpty(siteTitle))
+                            {
+                                @T(EmailLayoutTexts.Signature, siteTitle)<br />
+                            }
+                            @T(EmailLayoutTexts.Automatic)
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

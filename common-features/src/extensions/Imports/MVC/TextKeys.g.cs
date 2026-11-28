@@ -56,8 +56,6 @@ public static partial class TextKeys
             public const string PasswordChanged = "Emails.AccountEvent.PasswordChanged";
             /// <summary>Your password was changed</summary>
             public const string PasswordChangedSubject = "Emails.AccountEvent.PasswordChangedSubject";
-            /// <summary>The {0} team</summary>
-            public const string Signature = "Emails.AccountEvent.Signature";
             /// <summary>{0} was removed from the two-factor authentication of your account.</summary>
             public const string TwoFactorDisabled = "Emails.AccountEvent.TwoFactorDisabled";
             /// <summary>A two-factor authentication method was removed</summary>
@@ -78,6 +76,32 @@ public static partial class TextKeys
             public const string When = "Emails.AccountEvent.When";
             /// <summary>IP address: {0}</summary>
             public const string Where = "Emails.AccountEvent.Where";
+        }
+
+        /// <summary>The text keys under "Emails.Layout".</summary>
+        public static partial class Layout
+        {
+            /// <summary>This email was sent automatically.</summary>
+            public const string Automatic = "Emails.Layout.Automatic";
+            /// <summary>The {0} team</summary>
+            public const string Signature = "Emails.Layout.Signature";
+        }
+
+        /// <summary>The text keys under "Emails.ResetPassword".</summary>
+        public static partial class ResetPassword
+        {
+            /// <summary>Set a new password</summary>
+            public const string Button = "Emails.ResetPassword.Button";
+            /// <summary>The link works for {0} hours.</summary>
+            public const string Expires = "Emails.ResetPassword.Expires";
+            /// <summary>Hello {0},</summary>
+            public const string Greeting = "Emails.ResetPassword.Greeting";
+            /// <summary>If you didn't ask for this, you can ignore this email. Your password stays the same.</summary>
+            public const string Ignore = "Emails.ResetPassword.Ignore";
+            /// <summary>We received a request to change the password of your account on {0}. Use the button below to set a new one.</summary>
+            public const string Intro = "Emails.ResetPassword.Intro";
+            /// <summary>We received a request to change the password of your account. Use the button below to set a new one.</summary>
+            public const string IntroNoSite = "Emails.ResetPassword.IntroNoSite";
         }
     }
 

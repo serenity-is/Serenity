@@ -1,30 +1,28 @@
 @model Serenity.Extensions.AccountEventEmailModel
 @inject Serenity.ITextLocalizer Localizer
 @using Serenity.Extensions
+@*
+    The email of an account change, e.g. a changed password. A kind of change can have a view of its own, e.g.
+    AccountEventEmail.PasswordChanged.cshtml in this folder, which is used instead of this one.
+*@
 @{
+    Layout = "~/Areas/Serenity.Extensions/Shared/_EmailLayout.cshtml";
+    ViewData["Title"] = Model.Subject;
+    ViewData["SiteTitle"] = Model.SiteTitle;
     var e = Model.Event;
     string T(LocalText text, params object?[] args) => string.Format(System.Globalization.CultureInfo.CurrentCulture, text.ToString(Localizer), args);
 }
-<html>
-<head>
-    <title>@Model.Subject</title>
-</head>
-<body>
-    <p>@T(AccountEventEmailTexts.Greeting, string.IsNullOrEmpty(e.DisplayName) ? e.Username : e.DisplayName)</p>
+<p style="margin: 0 0 16px;">@T(AccountEventEmailTexts.Greeting, string.IsNullOrEmpty(e.DisplayName) ? e.Username : e.DisplayName)</p>
 
-    <p>@Model.Message</p>
+<p style="margin: 0 0 16px;">@Model.Message</p>
 
-    <p>
-        @(e.IsSelf ? T(AccountEventEmailTexts.BySelf) : T(AccountEventEmailTexts.ByOther, string.IsNullOrEmpty(e.ActorDisplayName) ? e.ActorUsername : e.ActorDisplayName))<br />
-        @T(AccountEventEmailTexts.When, e.Time.ToString("yyyy-MM-dd HH:mm", System.Globalization.CultureInfo.InvariantCulture))
-        @if (!string.IsNullOrEmpty(e.IPAddress))
-        {
-            <br />@T(AccountEventEmailTexts.Where, e.IPAddress)
-        }
-    </p>
+<p style="margin: 0 0 16px; font-size: 13px; color: #4b5563;">
+    @(e.IsSelf ? T(AccountEventEmailTexts.BySelf) : T(AccountEventEmailTexts.ByOther, string.IsNullOrEmpty(e.ActorDisplayName) ? e.ActorUsername : e.ActorDisplayName))<br />
+    @T(AccountEventEmailTexts.When, e.Time.ToString("yyyy-MM-dd HH:mm", System.Globalization.CultureInfo.InvariantCulture))
+    @if (!string.IsNullOrEmpty(e.IPAddress))
+    {
+        <br />@T(AccountEventEmailTexts.Where, e.IPAddress)
+    }
+</p>
 
-    <p><b>@T(AccountEventEmailTexts.NotYou)</b></p>
-
-    <p>@T(AccountEventEmailTexts.Signature, Model.SiteTitle)</p>
-</body>
-</html>
+<p style="margin: 0 0 16px;"><b>@T(AccountEventEmailTexts.NotYou)</b></p>

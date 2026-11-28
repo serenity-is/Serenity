@@ -26,5 +26,4 @@ public static class AccountEventEmailTexts
     public static readonly LocalText When = "When: {0} (UTC)";
     public static readonly LocalText Where = "IP address: {0}";
     public static readonly LocalText NotYou = "If you didn't expect this, contact your administrator right away.";
-    public static readonly LocalText Signature = "The {0} team";
 }

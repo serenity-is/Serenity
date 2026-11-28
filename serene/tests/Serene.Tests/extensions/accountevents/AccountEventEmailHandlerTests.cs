@@ -1,3 +1,6 @@
+using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ViewEngines;
 using MimeKit;
 using System.Threading;
 
@@ -16,6 +19,39 @@ public class AccountEventEmailHandlerTests
         : AccountEventEmailHandler(Options.Create(options), NullTextLocalizer.Instance, null!, sender)
     {
         protected override string RenderBody(AccountEventEmailModel model) => model.Message;
+
+        public string ViewOf(IServiceProvider services, AccountEventKind kind) => GetViewName(services, kind);
+    }
+
+    /// <summary>The views of an application, by their paths.</summary>
+    private sealed class Views(params string[] paths) : IRazorViewEngine
+    {
+        private sealed class View(string path) : IView
+        {
+            public string Path => path;
+            public Task RenderAsync(ViewContext context) => Task.CompletedTask;
+        }
+
+        public ViewEngineResult GetView(string? executingFilePath, string viewPath, bool isMainPage) =>
+            paths.Contains(viewPath) ? ViewEngineResult.Found(viewPath, new View(viewPath)) : ViewEngineResult.NotFound(viewPath, [viewPath]);
+        public ViewEngineResult FindView(Microsoft.AspNetCore.Mvc.ActionContext context, string viewName, bool isMainPage) =>
+            ViewEngineResult.NotFound(viewName, []);
+        public RazorPageResult FindPage(Microsoft.AspNetCore.Mvc.ActionContext context, string pageName) => new(pageName, []);
+        public RazorPageResult GetPage(string executingFilePath, string pagePath) => new(pagePath, []);
+        public string? GetAbsolutePath(string? executingFilePath, string? pagePath) => pagePath;
+    }
+
+    [Fact]
+    public void A_Kind_Of_Event_Has_A_View_Of_Its_Own_When_The_Application_Adds_One()
+    {
+        const string shared = "~/Areas/Serenity.Extensions/Membership/AccountEvents/AccountEventEmail.cshtml";
+        const string own = "~/Areas/Serenity.Extensions/Membership/AccountEvents/AccountEventEmail.PasswordChanged.cshtml";
+        var services = new ServiceCollection().AddSingleton<IRazorViewEngine>(new Views(own)).BuildServiceProvider();
+        var handler = new TestHandler(new(), null);
+
+        Assert.Equal(own, handler.ViewOf(services, AccountEventKind.PasswordChanged));
+        Assert.Equal(shared, handler.ViewOf(services, AccountEventKind.EmailChanged));
+        Assert.Equal(shared, handler.ViewOf(new ServiceCollection().BuildServiceProvider(), AccountEventKind.PasswordChanged));
     }
 
     private static AccountEvent Event(AccountEventKind kind) => new()

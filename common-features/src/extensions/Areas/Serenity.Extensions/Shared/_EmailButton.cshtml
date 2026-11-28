@@ -1,0 +1,16 @@
+@model Serenity.Extensions.EmailButtonModel
+@*
+    A button of an email, e.g. the link that resets the password, with the address under it for the email clients that don't
+    show the button. It is a table with inline styles, as email clients ignore most CSS.
+*@
+@{
+    const string font = "-apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
+}
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin: 20px 0 8px;">
+    <tr>
+        <td style="border-radius: 6px; background-color: #2563eb;">
+            <a href="@Model.Url" target="_blank" style="display: inline-block; padding: 11px 22px; font-family: @font; font-size: 15px; font-weight: 600; color: #ffffff; text-decoration: none; border-radius: 6px;">@Model.Text</a>
+        </td>
+    </tr>
+</table>
+<p style="margin: 0 0 16px; font-size: 12px; line-height: 1.5; color: #6b7280; word-break: break-all;"><a href="@Model.Url" style="color: #6b7280;">@Model.Url</a></p>

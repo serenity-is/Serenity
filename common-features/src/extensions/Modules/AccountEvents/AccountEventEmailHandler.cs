@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Serenity.Extensions;
 
@@ -87,12 +89,29 @@ public class AccountEventEmailHandler(IOptions<AccountEventEmailOptions> options
     }
 
     /// <summary>
-    /// Renders the body of the email, from the AccountEventEmail view.
+    /// Renders the body of the email, from the view of its kind, see <see cref="GetViewName"/>.
     /// </summary>
     /// <param name="model">The model.</param>
     protected virtual string RenderBody(AccountEventEmailModel model)
     {
-        return TemplateHelper.RenderViewToString(httpContextAccessor?.HttpContext?.RequestServices ?? serviceProvider,
-            MVC.Views.Membership.AccountEvents.AccountEventEmail, model);
+        ArgumentNullException.ThrowIfNull(model);
+        var services = httpContextAccessor?.HttpContext?.RequestServices ?? serviceProvider;
+        return TemplateHelper.RenderViewToString(services, GetViewName(services, model.Event.Kind), model);
+    }
+
+    /// <summary>
+    /// Gets the view of the email of a kind of event: one of its own when there is one, e.g.
+    /// <c>AccountEventEmail.PasswordChanged.cshtml</c> next to the <c>AccountEventEmail</c> view, which an application adds at
+    /// the same path in its project, else the <c>AccountEventEmail</c> view.
+    /// </summary>
+    /// <param name="services">The services, which have the view engine.</param>
+    /// <param name="kind">The kind of the event.</param>
+    protected virtual string GetViewName(IServiceProvider services, AccountEventKind kind)
+    {
+        const string extension = ".cshtml";
+        var view = MVC.Views.Membership.AccountEvents.AccountEventEmail;
+        var own = view[..^extension.Length] + "." + kind + extension;
+        return services?.GetService<IRazorViewEngine>()?.GetView(executingFilePath: null, viewPath: own, isMainPage: false)
+            .Success == true ? own : view;
     }
 }

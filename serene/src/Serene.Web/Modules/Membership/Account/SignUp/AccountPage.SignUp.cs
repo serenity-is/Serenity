@@ -6,6 +6,9 @@ namespace Serene.Membership.Pages;
 
 public partial class AccountPage : Controller
 {
+    /// <summary>The hours that the link of an activation email works.</summary>
+    private const int ActivateLinkHours = 3;
+
     [HttpGet]
     public ActionResult SignUp()
     {
@@ -63,7 +66,7 @@ public partial class AccountPage : Controller
             using (var ms = new MemoryStream())
             using (var bw = new BinaryWriter(ms))
             {
-                bw.Write(DateTime.UtcNow.AddHours(3).ToBinary());
+                bw.Write(DateTime.UtcNow.AddHours(ActivateLinkHours).ToBinary());
                 bw.Write(userId);
                 bw.Flush();
                 bytes = ms.ToArray();
@@ -82,7 +85,8 @@ public partial class AccountPage : Controller
             {
                 Username = username,
                 DisplayName = displayName,
-                ActivateLink = activateLink
+                ActivateLink = activateLink,
+                LinkHours = ActivateLinkHours
             };
 
             var emailSubject = SignUpFormTexts.ActivateEmailSubject.ToString(Localizer);

@@ -19,6 +19,11 @@ namespace texts {
             namespace SignUp {
                 export function asKey(): typeof SignUp;
                 export function asTry(): typeof SignUp;
+                export const ActivateEmailButton: string;
+                export const ActivateEmailExpires: string;
+                export const ActivateEmailGreeting: string;
+                export const ActivateEmailIgnore: string;
+                export const ActivateEmailIntro: string;
                 export const ActivateEmailSubject: string;
                 export const ActivationCompleteMessage: string;
                 export const ConfirmEmail: string;

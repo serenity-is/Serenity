@@ -1,0 +1,29 @@
+@model Serenity.Extensions.EmailMessageModel
+@*
+    An email that code builds, e.g. an invitation or a two-factor code, from an EmailMessageModel, in the layout of the emails.
+    See IEmailMessageRenderer. An application changes it with a view of the same path in its own project.
+*@
+@{
+    Layout = "~/Areas/Serenity.Extensions/Shared/_EmailLayout.cshtml";
+    ViewData["Title"] = Model.Subject;
+}
+@if (!string.IsNullOrEmpty(Model.Greeting))
+{
+    <p style="margin: 0 0 16px;">@Model.Greeting</p>
+}
+@foreach (var paragraph in Model.Paragraphs)
+{
+    <p style="margin: 0 0 16px;">@paragraph</p>
+}
+@if (!string.IsNullOrEmpty(Model.Code))
+{
+    <p style="margin: 8px 0 20px; font-family: Consolas, 'Courier New', monospace; font-size: 28px; font-weight: 700; letter-spacing: 6px; color: #111827;">@Model.Code</p>
+}
+@if (Model.Button != null)
+{
+    <partial name="~/Areas/Serenity.Extensions/Shared/_EmailButton.cshtml" model="Model.Button" />
+}
+@foreach (var note in Model.Notes)
+{
+    <p style="margin: 0 0 16px; font-size: 13px; color: #4b5563;">@note</p>
+}

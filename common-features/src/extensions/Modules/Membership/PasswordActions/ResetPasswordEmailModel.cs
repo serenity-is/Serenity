@@ -14,4 +14,8 @@ public class ResetPasswordEmailModel
     /// The reset password link to include in the email.
     /// </summary>
     public string? ResetLink { get; set; }
+    /// <summary>
+    /// The hours that the link works, see <c>ResetPasswordTokenLifetime</c> of the page.
+    /// </summary>
+    public double LinkHours { get; set; } = 3;
 }

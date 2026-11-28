@@ -36,4 +36,15 @@ public static partial class Views
         /// <summary>The path to the <c>ReportPage</c> view.</summary>
         public const string ReportPage = "~/Areas/Serenity.Extensions/Reporting/ReportPage.cshtml";
     }
+
+    /// <summary>Provides view paths in the <c>Shared</c> folder.</summary>
+    public static partial class Shared
+    {
+        /// <summary>The path to the <c>_EmailButton</c> view.</summary>
+        public const string _EmailButton = "~/Areas/Serenity.Extensions/Shared/_EmailButton.cshtml";
+        /// <summary>The path to the <c>_EmailLayout</c> view.</summary>
+        public const string _EmailLayout = "~/Areas/Serenity.Extensions/Shared/_EmailLayout.cshtml";
+        /// <summary>The path to the <c>EmailMessage</c> view.</summary>
+        public const string EmailMessage = "~/Areas/Serenity.Extensions/Shared/EmailMessage.cshtml";
+    }
 }

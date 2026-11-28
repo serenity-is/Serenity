@@ -1,21 +1,16 @@
 @model Serene.Membership.ActivateEmailModel
+@inject Serenity.ITextLocalizer Localizer
+@{
+    Layout = "~/Areas/Serenity.Extensions/Shared/_EmailLayout.cshtml";
+    ViewData["Title"] = Serene.SignUpFormTexts.ActivateEmailSubject.ToString(Localizer);
+    var siteTitle = Localizer.TryGet("Navigation.SiteTitle") ?? "Serene";
+    string T(LocalText text, params object?[] args) => string.Format(System.Globalization.CultureInfo.CurrentCulture, text.ToString(Localizer), args);
+    var button = new Serenity.Extensions.EmailButtonModel { Text = T(Serene.SignUpFormTexts.ActivateEmailButton), Url = Model.ActivateLink };
+}
+<p style="margin: 0 0 16px;">@T(Serene.SignUpFormTexts.ActivateEmailGreeting, Model.DisplayName)</p>
 
-<html>
-<head>
-    <title>Activate your Serene account</title>
-</head>
-<body>
-    <p>@Model.DisplayName,</p>
+<p style="margin: 0 0 16px;">@T(Serene.SignUpFormTexts.ActivateEmailIntro, siteTitle)</p>
 
-    <p>We received a request to create a new account on Serene with your email address.</p>
+<partial name="~/Areas/Serenity.Extensions/Shared/_EmailButton.cshtml" model="button" />
 
-    <p>Click the link below to activate your account:</p>
-
-    <p><a href="@Model.ActivateLink">@Model.ActivateLink</a></p>
-
-    <p>If it wasn't you who requested this, you can ignore this email.</p>
-
-    Thanks,
-    The "Serene" Team
-</body>
-</html>
+<p style="margin: 0 0 16px; font-size: 13px; color: #4b5563;">@T(Serene.SignUpFormTexts.ActivateEmailExpires, Model.LinkHours)<br />@T(Serene.SignUpFormTexts.ActivateEmailIgnore)</p>
