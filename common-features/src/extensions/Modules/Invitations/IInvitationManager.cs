@@ -41,6 +41,13 @@ public interface IInvitationManager
     void Revoke(long invitationId);
 
     /// <summary>
+    /// Deletes invitations that are no longer pending: accepted, revoked or expired. A pending one is revoked first.
+    /// </summary>
+    /// <param name="invitationIds">The IDs of the invitations.</param>
+    /// <returns>The number of the invitations that were deleted.</returns>
+    int Delete(IEnumerable<long> invitationIds);
+
+    /// <summary>
     /// Gets the invitation of a link, or null when it is not one that can be accepted, e.g. expired or used.
     /// </summary>
     /// <param name="token">The token of the link.</param>
