@@ -340,9 +340,9 @@
             <ProjectItem ReplaceParameters="true" TargetFileName="chunk-4D5MACWE.js">chunk-4D5MACWE.js</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="chunk-4RRITRPO.js">chunk-4RRITRPO.js</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="chunk-64ZAROVM.js">chunk-64ZAROVM.js</ProjectItem>
+            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-6BAP3THV.js">chunk-6BAP3THV.js</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="chunk-BGXO3CPC.js">chunk-BGXO3CPC.js</ProjectItem>
             <ProjectItem ReplaceParameters="true" TargetFileName="chunk-PHAWVNK5.js">chunk-PHAWVNK5.js</ProjectItem>
-            <ProjectItem ReplaceParameters="true" TargetFileName="chunk-TUZYCHD7.js">chunk-TUZYCHD7.js</ProjectItem>
           </Folder>
           <ProjectItem ReplaceParameters="false" TargetFileName="build.esm-manifest">build.esm-manifest</ProjectItem>
           <Folder Name="Modules" TargetFolderName="Modules">
