@@ -18,6 +18,8 @@ import { Select2, type Select2QueryOptions } from "./select2";
 export interface ComboboxCommonOptions {
     /** Whether the selection can be cleared. */
     allowClear?: boolean;
+    /** Whether arbitrary values are allowed, besides the items. */
+    autoComplete?: boolean;
     /** Whether multiple items can be selected. */
     delimited?: boolean;
     /**
@@ -103,8 +105,6 @@ export interface ComboboxInplaceAddOptions {
     inplaceAddPermission?: string;
     /** Dialog type used for in-place add. */
     dialogType?: string | DialogType | PromiseLike<DialogType>;
-    /** Whether arbitrary values are allowed. */
-    autoComplete?: boolean;
     /** Whether the in-place add dialog opens as a panel. */
     openDialogAsPanel?: boolean;
 }

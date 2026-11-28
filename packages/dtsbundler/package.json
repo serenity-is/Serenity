@@ -36,7 +36,8 @@
     "prepack": "node --run dts",
     "prepublishOnly": "node --run test:dist -- --coverage",
     "test:dist": "node --run build && vitest run",
-    "tsc": "tsc"
+    "tsc": "tsc",
+    "tsc:test": "tsc -p test"
   },
   "keywords": [
     "typescript",

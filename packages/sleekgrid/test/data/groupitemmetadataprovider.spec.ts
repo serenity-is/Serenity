@@ -942,7 +942,7 @@ describe("GroupItemMetadataProvider data row indentation", () => {
 
         expect(cell.cssClass).toBe("slick-group-data slick-group-level-2");
         // the inline style would be dropped by a content security policy
-        expect(cell.style).toBeUndefined();
+        expect("style" in cell).toBe(false);
         // only the first cell is indented, the rest of the row stays aligned with the columns
         expect(Object.keys(metadata.columns)).toEqual(["0"]);
     });

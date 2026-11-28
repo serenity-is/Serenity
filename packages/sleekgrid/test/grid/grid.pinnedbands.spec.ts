@@ -132,7 +132,7 @@ describe("the vertical scrollbar after the columns pinned to the end", () => {
         const g = grid as any;
         const main = grid.getScrollContainerY();
         // the pinned panes of a grid in a test, as it pins no columns without a size, are whichever it made
-        const end = (grid.getViewports() as HTMLElement[]).find(vp => vp !== main && vp.classList.contains("sg-body"));
+        const end = (g.getViewports() as HTMLElement[]).find(vp => vp !== main && vp.classList.contains("sg-body"));
         expect(end).toBeTruthy();
         expect(end).not.toBe(main);
 

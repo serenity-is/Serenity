@@ -44,7 +44,8 @@
     "prepack": "node build/build && node --run dts",
     "prepublishOnly": "node --run test -- --coverage",
     "test": "node --run build && vitest run",
-    "tsc": "tsc --build"
+    "tsc": "tsc --build",
+    "tsc:test": "tsc --build"
   },
   "type": "module"
 }

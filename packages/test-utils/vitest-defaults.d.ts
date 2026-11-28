@@ -1,8 +1,5 @@
-declare global {
-    interface ImportMeta {
-        dirname: string;
-    }
-}
+// import.meta.dirname and import.meta.filename, for the vitest configs
+import "./node";
 
 export function serenityTestOptions(projectRoot?: string): {
     fsModuleCachePath: string,

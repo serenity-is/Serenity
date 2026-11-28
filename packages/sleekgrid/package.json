@@ -36,6 +36,7 @@
     "prepublishOnly": "node --run test -- --coverage",
     "test": "node --run build && vitest run",
     "tsc": "tsc",
+    "tsc:test": "tsc -p test",
     "www": "node --run build:full && cd docs && jekyll serve --livereload --config _config.yml,_config_local.yml"
   },
   "keywords": [

@@ -193,11 +193,13 @@ public class BaseUserListServiceTests
     [InlineData("a", new[] { "alice", "carol", "frank" })]
     [InlineData("50%", new[] { "frank" })]
     [InlineData("%", new[] { "frank" })]
+    [InlineData("CAROL@example", new[] { "carol" })]
+    [InlineData("example.com", new[] { "carol" })]
     [InlineData("zzz", new string[0])]
     [InlineData("dave", new string[0])]
     [InlineData("", new[] { "alice", "bob", "carol", "frank" })]
     [InlineData("   ", new[] { "alice", "bob", "carol", "frank" })]
-    public void Searches_The_Usernames_And_Display_Names(string text, string[] expected)
+    public void Searches_The_Usernames_Display_Names_And_Emails(string text, string[] expected)
     {
         WithUsers((service, _) =>
             Assert.Equal(expected, service.ListUsers(new UserListOptions { ContainsText = text }).Select(x => x.Username)));

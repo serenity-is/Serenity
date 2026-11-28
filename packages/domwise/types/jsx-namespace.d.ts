@@ -35,6 +35,8 @@ type ComponentChild =
     | DocumentFragment
     | Text
     | Comment
+    // any other node, which is appended as it is, e.g. one typed as Node by a function that gives a formatted value
+    | Node
     | boolean
     | null
     | undefined

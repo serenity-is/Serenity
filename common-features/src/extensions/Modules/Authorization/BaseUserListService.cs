@@ -97,7 +97,8 @@ public abstract class BaseUserListService<TRow>(ISqlConnections sqlConnections) 
     }
 
     /// <summary>
-    /// Gets the criteria for the text that the username or the display name should contain, if there is one.
+    /// Gets the criteria for the text that the username, the display name or the email address should contain, if there
+    /// is one.
     /// </summary>
     /// <param name="row">A user row, which has the fields.</param>
     /// <param name="options">The options.</param>
@@ -118,6 +119,12 @@ public abstract class BaseUserListService<TRow>(ISqlConnections sqlConnections) 
             new Criteria(GetUsernameField(row)).Contains(text);
         if (row is IDisplayNameRow displayName)
             matches |= new Criteria(displayName.DisplayNameField).Contains(text);
+
+        // the email address too, normalized like the username when there is a column for it
+        if (row is INormalizedEmailRow normalizedEmail)
+            matches |= new Criteria(normalizedEmail.NormalizedEmailField).Contains(BaseUserRetrieveService.NormalizeEmail(text)!);
+        else if (row is IEmailRow email)
+            matches |= new Criteria(email.EmailField).Contains(text);
 
         return matches;
     }

@@ -36,7 +36,8 @@
     "prepack": "node --run build && node --run dts",
     "prepublishOnly": "node --run test -- --coverage",
     "test": "node --run build && vitest run",
-    "tsc": "tsc"
+    "tsc": "tsc",
+    "tsc:test": "tsc -p test"
   },
   "keywords": [
     "dom",

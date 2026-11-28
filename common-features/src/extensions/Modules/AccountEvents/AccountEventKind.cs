@@ -52,5 +52,18 @@ public enum AccountEventKind
 
     /// <summary>An impersonation of the user ended, by its impersonator, or for <see cref="AccountEvent.Reason"/>, e.g. its
     /// time was up.</summary>
-    ImpersonationEnded = 28
+    ImpersonationEnded = 28,
+
+    /// <summary>Someone was invited to sign up, to the email address in <see cref="AccountEvent.NewValue"/> (and
+    /// <see cref="AccountEvent.Email"/>), by <see cref="AccountEvent.ActorUserId"/>; there is no user yet. A resend is one
+    /// too.</summary>
+    InvitationSent = 29,
+
+    /// <summary>The user signed up with an invitation, of the user in <see cref="AccountEvent.NewValue"/>; the
+    /// <see cref="AccountEvent.Reason"/> is "RolesDropped" when the inviter could no longer give some of its roles.</summary>
+    InvitationAccepted = 30,
+
+    /// <summary>An invitation to the email address in <see cref="AccountEvent.NewValue"/> was revoked, by
+    /// <see cref="AccountEvent.ActorUserId"/>.</summary>
+    InvitationRevoked = 31
 }

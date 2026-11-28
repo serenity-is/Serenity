@@ -14,6 +14,7 @@
   "scripts": {
     "all": "pnpm i && pnpm -r build && pnpm -r tsc && node --run test",
     "test": "pnpm -r test && pnpm --filter @serenity-is/dtsbundler test:dist",
+    "tsc:test": "pnpm -r --no-bail --if-present tsc:test",
     "builtin-ts-types": "pnpm --filter @serenity-is/sleekgrid --filter @serenity-is/corelib dts && dotnet run --project tests/Serenity.Net.CodeGenerator.Tests -- -explicit only -method Serenity.CodeGenerator.TSTypeListerASTTests.BuiltinTSTypesGenerator",
     "cleanup": "node build/cleanup.mjs"
   },

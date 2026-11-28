@@ -8,7 +8,8 @@
     "build:watch": "node ./tsbuild.js --watch",
     "dts": "dtsbundler",
     "test": "node --run build && vitest run",
-    "tsc": "tsc"
+    "tsc": "tsc",
+    "tsc:test": "tsc -p test"
   },
   "main": "dist/index.js",
   "private": true,

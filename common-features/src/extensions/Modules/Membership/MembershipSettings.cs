@@ -35,4 +35,10 @@ public class MembershipSettings
     /// The size of the salt used when hashing passwords.
     /// </summary>
     public int SaltSize { get; set; } = 5;
+    /// <summary>
+    /// Who can sign up, with a password or an external login: anyone (<see cref="SignUpMode.Open"/>, the default), only
+    /// the invited ones (<see cref="SignUpMode.InvitationOnly"/>), or nobody (<see cref="SignUpMode.Closed"/>). The sign-up
+    /// page of the application follows it.
+    /// </summary>
+    public SignUpMode SignUp { get; set; } = SignUpMode.Open;
 }

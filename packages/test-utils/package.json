@@ -1,6 +1,9 @@
 {
   "name": "test-utils",
   "private": true,
+  "scripts": {
+    "tsc:test": "tsc"
+  },
   "devDependencies": {
     "@serenity-is/corelib": "workspace:*"
   },

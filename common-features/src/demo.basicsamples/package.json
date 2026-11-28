@@ -11,7 +11,8 @@
     "build": "node ./tsbuild.js",
     "build:watch": "node ./tsbuild.js --watch",
     "test": "node --run build && vitest run",
-    "tsc": "tsc"
+    "tsc": "tsc",
+    "tsc:test": "tsc -p test"
   },
   "type": "module"
 }
