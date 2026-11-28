@@ -1,3 +1,8 @@
+## Unreleased
+
+### Bugfixes
+- A soft delete (`IIsDeletedRow`, `IIsActiveDeletedRow` or `IDeleteLogRow`) wrote the impersonated user to `DeleteUserId` or `UpdateUserId`, instead of the impersonator who did it, like the insert and update audit fields, the capture log and the data audit log do (`ClaimsPrincipal.GetAuditIdentifier()`).
+
 ## 10.9.0 (2026-11-28)
 
 ### Features
