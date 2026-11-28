@@ -163,7 +163,7 @@ public class DeleteRequestHandlerAsync<TRow, TDeleteRequest, TDeleteResponse> :
                 {
                     update.Set(deleteLogRow.DeleteDateField, DateTimeField.ToDateTimeKind(DateTime.Now,
                                     deleteLogRow.DeleteDateField.DateTimeKind))
-                          .Set(deleteLogRow.DeleteUserIdField, User?.GetIdentifier().TryParseID());
+                          .Set(deleteLogRow.DeleteUserIdField, User?.GetAuditIdentifier().TryParseID());
                 }
                 else
                 {
@@ -171,7 +171,7 @@ public class DeleteRequestHandlerAsync<TRow, TDeleteRequest, TDeleteResponse> :
                     {
                         update.Set(updateLogRow.UpdateDateField, DateTimeField.ToDateTimeKind(DateTime.Now,
                                         updateLogRow.UpdateDateField.DateTimeKind))
-                                .Set(updateLogRow.UpdateUserIdField, User?.GetIdentifier().TryParseID());
+                                .Set(updateLogRow.UpdateUserIdField, User?.GetAuditIdentifier().TryParseID());
                     }
                 }
 
@@ -186,7 +186,7 @@ public class DeleteRequestHandlerAsync<TRow, TDeleteRequest, TDeleteResponse> :
                 var update = new SqlUpdate(Row.Table)
                     .Set(deleteLogRow!.DeleteDateField, DateTimeField.ToDateTimeKind(DateTime.Now,
                         deleteLogRow.DeleteDateField.DateTimeKind))
-                    .Set(deleteLogRow.DeleteUserIdField, User?.GetIdentifier().TryParseID())
+                    .Set(deleteLogRow.DeleteUserIdField, User?.GetAuditIdentifier().TryParseID())
                     .WhereEqual(idField, id)
                     .Where(deleteLogRow.DeleteDateField.IsNull());
 
